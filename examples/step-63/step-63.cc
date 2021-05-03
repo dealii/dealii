@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2018 - 2019 by the deal.II authors
+ * Copyright (C) 2018 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -13,8 +13,8 @@
  *
  * ---------------------------------------------------------------------
  *
- * Authors: Thomas Clevenger, Clemson University
- *          Timo Heister, University of Utah
+ * Authors: Thomas C. Clevenger, Clemson University
+ *          Timo Heister, Clemson University and University of Utah
  */
 
 // @sect3{Include files}
@@ -38,13 +38,10 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_refinement.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/grid_out.h>
 
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/dofs/dof_tools.h>
 
@@ -66,6 +63,7 @@
 #include <deal.II/multigrid/mg_matrix.h>
 
 // C++:
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <random>
@@ -74,18 +72,22 @@
 #include <deal.II/meshworker/mesh_loop.h>
 
 
+// @sect3{MeshWorker data}
+
+// As always, we will be putting everything related to this program
+// into a namespace of its own.
+//
+// Since we will be using the MeshWorker framework, the first step is
+// to define the following structures needed by the assemble_cell()
+// function used by MeshWorker::mesh_loop(): `ScratchData`
+// contains an FEValues object which is needed for assembling
+// a cell's local contribution, while `CopyData` contains the
+// output from a cell's local contribution and necessary information
+// to copy that to the global system. (Their purpose is also explained
+// in the documentation of the WorkStream class.)
 namespace Step63
 {
   using namespace dealii;
-
-  // @sect3{MeshWorker Data}
-
-  // The following are structures needed by the assemble_cell()
-  // function used by Meshworker::mesh_loop(). ScratchData
-  // contains an FeValues object which is needed for assembling
-  // a cell's local contribution, while CopyData contains the
-  // output from a cell's local contribution and necessary information
-  // to copy that to the global system.
 
   template <int dim>
   struct ScratchData
@@ -126,10 +128,12 @@ namespace Step63
 
   // @sect3{Problem parameters}
 
+  // The second step is to define the classes that deal with run-time
+  // parameters to be read from an input file.
+  //
   // We will use ParameterHandler to pass in parameters at runtime. The
-  // structure Settings parses and stores these parameters to be queried
+  // structure `Settings` parses and stores the parameters to be queried
   // throughout the program.
-
   struct Settings
   {
     enum DoFRenumberingStrategy
@@ -151,8 +155,11 @@ namespace Step63
     bool                   output;
   };
 
+
+
   void Settings::get_parameters(const std::string &prm_filename)
   {
+    /* First declare the parameters... */
     ParameterHandler prm;
 
     prm.declare_entry("Epsilon",
@@ -186,11 +193,12 @@ namespace Step63
                       Patterns::Bool(),
                       "Generate graphical output: true|false");
 
+    /* ...and then try to read their values from the input file: */
     if (prm_filename.empty())
       {
         prm.print_parameters(std::cout, ParameterHandler::Text);
         AssertThrow(
-          false, ExcMessage("please pass a .prm file as the first argument!"));
+          false, ExcMessage("Please pass a .prm file as the first argument!"));
       }
 
     prm.parse_input(prm_filename);
@@ -209,6 +217,10 @@ namespace Step63
       dof_renumbering = DoFRenumberingStrategy::upstream;
     else if (renumbering == "random")
       dof_renumbering = DoFRenumberingStrategy::random;
+    else
+      AssertThrow(false,
+                  ExcMessage("The <DoF renumbering> parameter has "
+                             "an invalid value."));
 
     with_streamline_diffusion = prm.get_bool("With streamline diffusion");
     output                    = prm.get_bool("Output");
@@ -221,12 +233,19 @@ namespace Step63
   // will play a role in the speed of convergence for multiplicative
   // methods. Here we define functions which return a specific ordering
   // of cells to be used by the block smoothers.
-
-  // For each type of cell ordering, we define a function for the active
-  // mesh and one for a level mesh. While the only reordering necessary
-  // for solving the system will be on the level meshes, we include the
-  // active reordering for visualization purposes in output_results().
-
+  //
+  // For each type of cell ordering, we define a function for the
+  // active mesh and one for a level mesh (i.e., for the cells at one
+  // level of a multigrid hierarchy). While the only reordering
+  // necessary for solving the system will be on the level meshes, we
+  // include the active reordering for visualization purposes in
+  // output_results().
+  //
+  // For the two downstream ordering functions, we first create an
+  // array with all of the relevant cells that we then sort in
+  // downstream direction using a "comparator" object. The output of
+  // the functions is then simply an array of the indices of the cells
+  // in the just computed order.
   template <int dim>
   std::vector<unsigned int>
   create_downstream_cell_ordering(const DoFHandler<dim> &dof_handler,
@@ -235,13 +254,12 @@ namespace Step63
   {
     std::vector<typename DoFHandler<dim>::level_cell_iterator> ordered_cells;
     ordered_cells.reserve(dof_handler.get_triangulation().n_cells(level));
-    const DoFRenumbering::
-      CompareDownstream<typename DoFHandler<dim>::level_cell_iterator, dim>
-        comparator(direction);
-
     for (const auto &cell : dof_handler.cell_iterators_on_level(level))
       ordered_cells.push_back(cell);
 
+    const DoFRenumbering::
+      CompareDownstream<typename DoFHandler<dim>::level_cell_iterator, dim>
+        comparator(direction);
     std::sort(ordered_cells.begin(), ordered_cells.end(), comparator);
 
     std::vector<unsigned> ordered_indices;
@@ -253,6 +271,8 @@ namespace Step63
     return ordered_indices;
   }
 
+
+
   template <int dim>
   std::vector<unsigned int>
   create_downstream_cell_ordering(const DoFHandler<dim> &dof_handler,
@@ -260,13 +280,12 @@ namespace Step63
   {
     std::vector<typename DoFHandler<dim>::active_cell_iterator> ordered_cells;
     ordered_cells.reserve(dof_handler.get_triangulation().n_active_cells());
-    const DoFRenumbering::
-      CompareDownstream<typename DoFHandler<dim>::active_cell_iterator, dim>
-        comparator(direction);
-
     for (const auto &cell : dof_handler.active_cell_iterators())
       ordered_cells.push_back(cell);
 
+    const DoFRenumbering::
+      CompareDownstream<typename DoFHandler<dim>::active_cell_iterator, dim>
+        comparator(direction);
     std::sort(ordered_cells.begin(), ordered_cells.end(), comparator);
 
     std::vector<unsigned int> ordered_indices;
@@ -278,66 +297,54 @@ namespace Step63
     return ordered_indices;
   }
 
+
+  // The functions that produce a random ordering are similar in
+  // spirit in that they first put information about all cells into an
+  // array. But then, instead of sorting them, they shuffle the
+  // elements randomly using the facilities C++ offers to generate
+  // random numbers. The way this is done is by iterating over all
+  // elements of the array, drawing a random number for another
+  // element before that, and then exchanging these elements. The
+  // result is a random shuffle of the elements of the array.
   template <int dim>
   std::vector<unsigned int>
   create_random_cell_ordering(const DoFHandler<dim> &dof_handler,
                               const unsigned int     level)
   {
-    const unsigned int n_cells = dof_handler.get_triangulation().n_cells(level);
-
     std::vector<unsigned int> ordered_cells;
-    ordered_cells.reserve(n_cells);
-
+    ordered_cells.reserve(dof_handler.get_triangulation().n_cells(level));
     for (const auto &cell : dof_handler.cell_iterators_on_level(level))
       ordered_cells.push_back(cell->index());
 
-    // Shuffle the elements:
     std::mt19937 random_number_generator;
-    for (unsigned int i = 1; i < n_cells; ++i)
-      {
-        // Get a random number between 0 and i (inclusive):
-        const unsigned int j =
-          std::uniform_int_distribution<>(0, i)(random_number_generator);
-
-        // If possible, swap the elements:
-        if (i != j)
-          std::swap(ordered_cells[i], ordered_cells[j]);
-      }
+    std::shuffle(ordered_cells.begin(),
+                 ordered_cells.end(),
+                 random_number_generator);
 
     return ordered_cells;
   }
+
+
 
   template <int dim>
   std::vector<unsigned int>
   create_random_cell_ordering(const DoFHandler<dim> &dof_handler)
   {
-    const unsigned int n_cells =
-      dof_handler.get_triangulation().n_active_cells();
-
     std::vector<unsigned int> ordered_cells;
-    ordered_cells.reserve(n_cells);
-
+    ordered_cells.reserve(dof_handler.get_triangulation().n_active_cells());
     for (const auto &cell : dof_handler.active_cell_iterators())
       ordered_cells.push_back(cell->index());
 
-    // Shuffle the elements:
     std::mt19937 random_number_generator;
-    for (unsigned int i = 1; i < n_cells; ++i)
-      {
-        // Get a random number between 0 and i (inclusive):
-        const unsigned int j =
-          std::uniform_int_distribution<>(0, i)(random_number_generator);
-
-        // If possible, swap the elements:
-        if (i != j)
-          std::swap(ordered_cells[i], ordered_cells[j]);
-      }
+    std::shuffle(ordered_cells.begin(),
+                 ordered_cells.end(),
+                 random_number_generator);
 
     return ordered_cells;
   }
 
 
-  // @sect3{Right-hand Side and Boundary Values}
+  // @sect3{Right-hand side and boundary values}
 
   // The problem solved in this tutorial is an adaptation of Ex. 3.1.3 found
   // on pg. 118 of <a
@@ -345,17 +352,15 @@ namespace Step63
   // Finite Elements and Fast Iterative Solvers: with Applications in
   // Incompressible Fluid Dynamics by Elman, Silvester, and Wathen</a>. The
   // main difference being that we add a hole in the center of our domain with
-  // zero Dirichlet boundary.
-
-  // We have a zero right-hand side:
+  // zero Dirichlet boundary conditions.
+  //
+  // For a complete description, we need classes that implement the
+  // zero right-hand side first (we could of course have just used
+  // Functions::ZeroFunction):
   template <int dim>
   class RightHandSide : public Function<dim>
   {
   public:
-    RightHandSide()
-      : Function<dim>()
-    {}
-
     virtual double value(const Point<dim> & p,
                          const unsigned int component = 0) const override;
 
@@ -363,6 +368,8 @@ namespace Step63
                             std::vector<double> &          values,
                             const unsigned int component = 0) const override;
   };
+
+
 
   template <int dim>
   double RightHandSide<dim>::value(const Point<dim> &,
@@ -389,17 +396,13 @@ namespace Step63
   }
 
 
-  // We have Dirichlet boundary conditions. On a connected portion of the
+  // We also have Dirichlet boundary conditions. On a connected portion of the
   // outer, square boundary we set the value to 1, and we set the value to 0
-  // everywhere else (including the inner, circular boundary).
+  // everywhere else (including the inner, circular boundary):
   template <int dim>
   class BoundaryValues : public Function<dim>
   {
   public:
-    BoundaryValues()
-      : Function<dim>()
-    {}
-
     virtual double value(const Point<dim> & p,
                          const unsigned int component = 0) const override;
 
@@ -407,6 +410,7 @@ namespace Step63
                             std::vector<double> &          values,
                             const unsigned int component = 0) const override;
   };
+
 
 
   template <int dim>
@@ -444,13 +448,14 @@ namespace Step63
 
 
 
-  // @sect3{Streamline Diffusion}
+  // @sect3{Streamline diffusion implementation}
 
-  // Streamline diffusion stabilization constant. Parameter design is taken
-  // from <a
-  // href="https://link.springer.com/chapter/10.1007/978-3-540-34288-5_27"> On
-  // Discontinuity-Capturing Methods for Convection-Diffusion Equations by
-  // Volker John and Petr Knobloch</a>.
+  // The streamline diffusion method has a stabilization constant that
+  // we need to be able to compute. The choice of how this parameter
+  // is computed is taken from <a
+  // href="https://link.springer.com/chapter/10.1007/978-3-540-34288-5_27">On
+  // Discontinuity-Capturing Methods for Convection-Diffusion
+  // Equations by Volker John and Petr Knobloch</a>.
   template <int dim>
   double compute_stabilization_delta(const double         hk,
                                      const double         eps,
@@ -469,10 +474,10 @@ namespace Step63
 
   // This is the main class of the program, and should look very similar to
   // step-16. The major difference is that, since we are defining our multigrid
-  // smoother at runtime, we choose to define a function create_smoother() and a
-  // class object mg_smoother which is a std::unique_ptr to a smoother that is
-  // derived from MGSmoother. Note that for smoothers derived from
-  // RelaxationBlock, we must include a smoother_data object for each level.
+  // smoother at runtime, we choose to define a function `create_smoother()` and
+  // a class object `mg_smoother` which is a `std::unique_ptr` to a smoother
+  // that is derived from MGSmoother. Note that for smoothers derived from
+  // RelaxationBlock, we must include a `smoother_data` object for each level.
   // This will contain information about the cell ordering and the method of
   // inverting cell matrices.
 
@@ -480,7 +485,7 @@ namespace Step63
   class AdvectionProblem
   {
   public:
-    AdvectionProblem(Settings settings);
+    AdvectionProblem(const Settings &settings);
     void run();
 
   private:
@@ -540,7 +545,7 @@ namespace Step63
 
 
   template <int dim>
-  AdvectionProblem<dim>::AdvectionProblem(Settings settings)
+  AdvectionProblem<dim>::AdvectionProblem(const Settings &settings)
     : triangulation(Triangulation<dim>::limit_level_difference_at_vertices)
     , dof_handler(triangulation)
     , fe(settings.fe_degree)
@@ -548,29 +553,28 @@ namespace Step63
     , settings(settings)
   {
     advection_direction[0] = -std::sin(numbers::PI / 6.0);
-    if (dim > 1)
+    if (dim >= 2)
       advection_direction[1] = std::cos(numbers::PI / 6.0);
-    if (dim > 2)
+    if (dim >= 3)
       AssertThrow(false, ExcNotImplemented());
   }
 
 
-  // @sect4{<code>AdvectionProblem::setup_system</code>}
+  // @sect4{<code>AdvectionProblem::setup_system()</code>}
 
-  // Here we set up the DoFHandler, ConstraintMatrix, and sparsity patterns for
-  // both active and multigrid level meshes.
-
+  // Here we first set up the DoFHandler, AffineConstraints, and
+  // SparsityPattern objects for both active and multigrid level meshes.
+  //
+  // We could renumber the active DoFs with the DoFRenumbering class,
+  // but the smoothers only act on multigrid levels and as such, this
+  // would not matter for the computations. Instead, we will renumber the
+  // DoFs on each multigrid level below.
   template <int dim>
   void AdvectionProblem<dim>::setup_system()
   {
     const unsigned int n_levels = triangulation.n_levels();
 
     dof_handler.distribute_dofs(fe);
-
-    // We could renumber the active DoFs with the DoFRenumbering class
-    // here, but the smoothers only act on multigrid levels and as such, this
-    // would not matter for the computations. Instead, we will renumber the
-    // DoFs on each multigrid level below.
 
     solution.reinit(dof_handler.n_dofs());
     system_rhs.reinit(dof_handler.n_dofs());
@@ -595,9 +599,15 @@ namespace Step63
 
     dof_handler.distribute_mg_dofs();
 
-    // Renumber DoFs on each level in downstream or upstream direction if
-    // needed. This is only necessary for point smoothers (SOR and Jacobi) as
-    // the block smoothers operate on cells (see create_smoother()):
+    // Having enumerated the global degrees of freedom as well as (in
+    // the last line above) the level degrees of freedom, let us
+    // renumber the level degrees of freedom to get a better smoother
+    // as explained in the introduction.  The first block below
+    // renumbers DoFs on each level in downstream or upstream
+    // direction if needed. This is only necessary for point smoothers
+    // (SOR and Jacobi) as the block smoothers operate on cells (see
+    // `create_smoother()`). The blocks below then also implement
+    // random numbering.
     if (settings.smoother_type == "SOR" || settings.smoother_type == "Jacobi")
       {
         if (settings.dof_renumbering ==
@@ -628,6 +638,10 @@ namespace Step63
           Assert(false, ExcNotImplemented());
       }
 
+    // The rest of the function just sets up data structures. The last
+    // lines of the code below is unlike the other GMG tutorials, as
+    // it sets up both the interface in and out matrices. We need this
+    // since our problem is non-symmetric.
     mg_constrained_dofs.clear();
     mg_constrained_dofs.initialize(dof_handler);
 
@@ -660,8 +674,6 @@ namespace Step63
                                                    level);
           mg_interface_sparsity_patterns[level].copy_from(dsp);
 
-          // Unlike the other GMG tutorials, we need both interface in and out
-          // matrices since our problem is non-symmetric.
           mg_interface_in[level].reinit(mg_interface_sparsity_patterns[level]);
           mg_interface_out[level].reinit(mg_interface_sparsity_patterns[level]);
         }
@@ -669,12 +681,13 @@ namespace Step63
   }
 
 
-  // @sect4{<code>AdvectionProblem::assemble_cell</code>}
+  // @sect4{<code>AdvectionProblem::assemble_cell()</code>}
 
-  // Here we define the assembly of the linear system on each cell to be used by
-  // the mesh_loop() function below. This one function assembles the cell matrix
-  // for both and active and a level cell, and only assembles a right-hand side
-  // if called for an active cell.
+  // Here we define the assembly of the linear system on each cell to
+  // be used by the mesh_loop() function below. This one function
+  // assembles the cell matrix for either an active or a level cell
+  // (whatever it is passed as its first argument), and only assembles
+  // a right-hand side if called with an active cell.
 
   template <int dim>
   template <class IteratorType>
@@ -685,7 +698,7 @@ namespace Step63
     copy_data.level = cell->level();
 
     const unsigned int dofs_per_cell =
-      scratch_data.fe_values.get_fe().dofs_per_cell;
+      scratch_data.fe_values.get_fe().n_dofs_per_cell();
     copy_data.dofs_per_cell = dofs_per_cell;
     copy_data.cell_matrix.reinit(dofs_per_cell, dofs_per_cell);
 
@@ -700,8 +713,8 @@ namespace Step63
 
     scratch_data.fe_values.reinit(cell);
 
-    const RightHandSide<dim> right_hand_side;
-    std::vector<double>      rhs_values(n_q_points);
+    RightHandSide<dim>  right_hand_side;
+    std::vector<double> rhs_values(n_q_points);
 
     right_hand_side.value_list(scratch_data.fe_values.get_quadrature_points(),
                                rhs_values);
@@ -711,20 +724,21 @@ namespace Step63
     // using streamline diffusion, setting $\delta=0$ negates this contribution
     // below and we are left with the standard, Galerkin finite element
     // assembly.
-    const double delta = settings.with_streamline_diffusion ?
-                           compute_stabilization_delta(cell->diameter(),
-                                                       settings.epsilon,
-                                                       advection_direction,
-                                                       settings.fe_degree) :
-                           0.0;
+    const double delta = (settings.with_streamline_diffusion ?
+                            compute_stabilization_delta(cell->diameter(),
+                                                        settings.epsilon,
+                                                        advection_direction,
+                                                        settings.fe_degree) :
+                            0.0);
 
     for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         {
           for (unsigned int j = 0; j < dofs_per_cell; ++j)
             {
+              // The assembly of the local matrix has two parts. First
+              // the Galerkin contribution:
               copy_data.cell_matrix(i, j) +=
-                // Galerkin contribution:
                 (settings.epsilon *
                  scratch_data.fe_values.shape_grad(i, q_point) *
                  scratch_data.fe_values.shape_grad(j, q_point) *
@@ -732,14 +746,14 @@ namespace Step63
                 (scratch_data.fe_values.shape_value(i, q_point) *
                  (advection_direction *
                   scratch_data.fe_values.shape_grad(j, q_point)) *
-                 scratch_data.fe_values.JxW(q_point)) +
-                // Streamline diffusion contribution:
-                delta *
-                  (advection_direction *
-                   scratch_data.fe_values.shape_grad(j, q_point)) *
-                  (advection_direction *
-                   scratch_data.fe_values.shape_grad(i, q_point)) *
-                  scratch_data.fe_values.JxW(q_point) -
+                 scratch_data.fe_values.JxW(q_point))
+                // and then the streamline diffusion contribution:
+                + delta *
+                    (advection_direction *
+                     scratch_data.fe_values.shape_grad(j, q_point)) *
+                    (advection_direction *
+                     scratch_data.fe_values.shape_grad(i, q_point)) *
+                    scratch_data.fe_values.JxW(q_point) -
                 delta * settings.epsilon *
                   trace(scratch_data.fe_values.shape_hessian(j, q_point)) *
                   (advection_direction *
@@ -748,20 +762,21 @@ namespace Step63
             }
           if (cell->is_level_cell() == false)
             {
+              // The same applies to the right hand side. First the
+              // Galerkin contribution:
               copy_data.cell_rhs(i) +=
-                // Galerkin contribution:
                 scratch_data.fe_values.shape_value(i, q_point) *
-                  rhs_values[q_point] * scratch_data.fe_values.JxW(q_point) +
-                // Streamline diffusion contribution:
-                delta * rhs_values[q_point] * advection_direction *
-                  scratch_data.fe_values.shape_grad(i, q_point) *
-                  scratch_data.fe_values.JxW(q_point);
+                  rhs_values[q_point] * scratch_data.fe_values.JxW(q_point)
+                // and then the streamline diffusion contribution:
+                + delta * rhs_values[q_point] * advection_direction *
+                    scratch_data.fe_values.shape_grad(i, q_point) *
+                    scratch_data.fe_values.JxW(q_point);
             }
         }
   }
 
 
-  // @sect4{<code>AdvectionProblem::assemble_system_and_multigrid</code>}
+  // @sect4{<code>AdvectionProblem::assemble_system_and_multigrid()</code>}
 
   // Here we employ MeshWorker::mesh_loop() to go over cells and assemble the
   // system_matrix, system_rhs, and all mg_matrices for us.
@@ -769,16 +784,14 @@ namespace Step63
   template <int dim>
   void AdvectionProblem<dim>::assemble_system_and_multigrid()
   {
-    auto cell_worker_active =
+    const auto cell_worker_active =
       [&](const decltype(dof_handler.begin_active()) &cell,
           ScratchData<dim> &                          scratch_data,
           CopyData &                                  copy_data) {
         this->assemble_cell(cell, scratch_data, copy_data);
       };
 
-
-
-    auto copier_active = [&](const CopyData &copy_data) {
+    const auto copier_active = [&](const CopyData &copy_data) {
       constraints.distribute_local_to_global(copy_data.cell_matrix,
                                              copy_data.cell_rhs,
                                              copy_data.local_dof_indices,
@@ -814,25 +827,28 @@ namespace Step63
         boundary_constraints[level].close();
       }
 
-    auto cell_worker_mg = [&](const decltype(dof_handler.begin_mg()) &cell,
-                              ScratchData<dim> &scratch_data,
-                              CopyData &        copy_data) {
-      this->assemble_cell(cell, scratch_data, copy_data);
-    };
+    const auto cell_worker_mg =
+      [&](const decltype(dof_handler.begin_mg()) &cell,
+          ScratchData<dim> &                      scratch_data,
+          CopyData &                              copy_data) {
+        this->assemble_cell(cell, scratch_data, copy_data);
+      };
 
-    auto copier_mg = [&](const CopyData &copy_data) {
+    const auto copier_mg = [&](const CopyData &copy_data) {
       boundary_constraints[copy_data.level].distribute_local_to_global(
         copy_data.cell_matrix,
         copy_data.local_dof_indices,
         mg_matrices[copy_data.level]);
 
-      // If (i,j) is an interface_out dof pair, then (j,i) is an interface_in
-      // dof pair. Note: for interface_in, we load the transpose of the
-      // interface entries, i.e., the entry for dof pair (j,i) is stored in
-      // interface_in(i,j). This is an optimization for the symmetric case
-      // which allows only one matrix to be used when setting the edge_matrices
-      // in solve(). Here, however, since our problem is non-symmetric, we must
-      // store both interface_in and interface_out matrices.
+      // If $(i,j)$ is an `interface_out` dof pair, then $(j,i)$ is an
+      // `interface_in` dof pair. Note: For `interface_in`, we load
+      // the transpose of the interface entries, i.e., the entry for
+      // dof pair $(j,i)$ is stored in `interface_in(i,j)`. This is an
+      // optimization for the symmetric case which allows only one
+      // matrix to be used when setting the edge_matrices in
+      // solve(). Here, however, since our problem is non-symmetric,
+      // we must store both `interface_in` and `interface_out`
+      // matrices.
       for (unsigned int i = 0; i < copy_data.dofs_per_cell; ++i)
         for (unsigned int j = 0; j < copy_data.dofs_per_cell; ++j)
           if (mg_constrained_dofs.is_interface_matrix_entry(
@@ -861,34 +877,35 @@ namespace Step63
   }
 
 
-  // @sect4{<code>AdvectionProblem::setup_smoother</code>}
+  // @sect4{<code>AdvectionProblem::setup_smoother()</code>}
 
-  // Here we set up the smoother based on the settings in the .prm. The two
-  // options that are of significance is the number of pre- and post-smoothing
-  // steps on each level of the multigrid v-cycle and the relaxation parameter.
+  // Next, we set up the smoother based on the settings in the `.prm` file. The
+  // two options that are of significance is the number of pre- and
+  // post-smoothing steps on each level of the multigrid v-cycle and the
+  // relaxation parameter.
 
   // Since multiplicative methods tend to be more powerful than additive method,
-  // fewer smoothing steps are required to see convergence indepedent of mesh
+  // fewer smoothing steps are required to see convergence independent of mesh
   // size. The same holds for block smoothers over point smoothers. This is
   // reflected in the choice for the number of smoothing steps for each type of
   // smoother below.
 
   // The relaxation parameter for point smoothers is chosen based on trial and
-  // error, and they reflect values necessary to keep the iteration counts in
+  // error, and reflects values necessary to keep the iteration counts in
   // the GMRES solve constant (or as close as possible) as we refine the mesh.
-  // The two values given for both "Jacobi" and "SOR" in the .prm files are for
-  // degree 1 and degree 3 finite elements. If the user wants to change to
+  // The two values given for both "Jacobi" and "SOR" in the `.prm` files are
+  // for degree 1 and degree 3 finite elements. If the user wants to change to
   // another degree, they may need to adjust these numbers. For block smoothers,
   // this parameter has a more straightforward interpretation, namely that for
   // additive methods in 2D, a DoF can have a repeated contribution from up to 4
   // cells, therefore we must relax these methods by 0.25 to compensate. This is
-  // not an issue for multiplicative methods as each cell inverse application
+  // not an issue for multiplicative methods as each cell's inverse application
   // carries new information to all its DoFs.
 
   // Finally, as mentioned above, the point smoothers only operate on DoFs, and
   // the block smoothers on cells, so only the block smoothers need to be given
   // information regarding cell orderings. DoF ordering for point smoothers has
-  // already been taken care of in setup_system().
+  // already been taken care of in `setup_system()`.
 
   template <int dim>
   void AdvectionProblem<dim>::setup_smoother()
@@ -898,9 +915,9 @@ namespace Step63
         using Smoother = PreconditionSOR<SparseMatrix<double>>;
 
         auto smoother =
-          std_cxx14::make_unique<MGSmootherPrecondition<SparseMatrix<double>,
-                                                        Smoother,
-                                                        Vector<double>>>();
+          std::make_unique<MGSmootherPrecondition<SparseMatrix<double>,
+                                                  Smoother,
+                                                  Vector<double>>>();
         smoother->initialize(mg_matrices,
                              Smoother::AdditionalData(fe.degree == 1 ? 1.0 :
                                                                        0.62));
@@ -911,9 +928,9 @@ namespace Step63
       {
         using Smoother = PreconditionJacobi<SparseMatrix<double>>;
         auto smoother =
-          std_cxx14::make_unique<MGSmootherPrecondition<SparseMatrix<double>,
-                                                        Smoother,
-                                                        Vector<double>>>();
+          std::make_unique<MGSmootherPrecondition<SparseMatrix<double>,
+                                                  Smoother,
+                                                  Vector<double>>>();
         smoother->initialize(mg_matrices,
                              Smoother::AdditionalData(fe.degree == 1 ? 0.6667 :
                                                                        0.47));
@@ -938,8 +955,6 @@ namespace Step63
             std::vector<unsigned int> ordered_indices;
             switch (settings.dof_renumbering)
               {
-                // Order the cells downstream with respect
-                // to the advection direction.
                 case Settings::DoFRenumberingStrategy::downstream:
                   ordered_indices =
                     create_downstream_cell_ordering(dof_handler,
@@ -947,9 +962,6 @@ namespace Step63
                                                     level);
                   break;
 
-                // Order the cells upstream with respect to the advection
-                // direction, i.e., downstream with respect to the negative
-                // of the advection direction.
                 case Settings::DoFRenumberingStrategy::upstream:
                   ordered_indices =
                     create_downstream_cell_ordering(dof_handler,
@@ -957,13 +969,11 @@ namespace Step63
                                                     level);
                   break;
 
-                // Order the cells randomly.
                 case Settings::DoFRenumberingStrategy::random:
                   ordered_indices =
                     create_random_cell_ordering(dof_handler, level);
                   break;
 
-                // Keep the default cell ordering (z-order, see Glossary).
                 case Settings::DoFRenumberingStrategy::none:
                   break;
 
@@ -978,7 +988,7 @@ namespace Step63
 
         if (settings.smoother_type == "block SOR")
           {
-            auto smoother = std_cxx14::make_unique<MGSmootherPrecondition<
+            auto smoother = std::make_unique<MGSmootherPrecondition<
               SparseMatrix<double>,
               RelaxationBlockSOR<SparseMatrix<double>, double, Vector<double>>,
               Vector<double>>>();
@@ -988,7 +998,7 @@ namespace Step63
           }
         else if (settings.smoother_type == "block Jacobi")
           {
-            auto smoother = std_cxx14::make_unique<
+            auto smoother = std::make_unique<
               MGSmootherPrecondition<SparseMatrix<double>,
                                      RelaxationBlockJacobi<SparseMatrix<double>,
                                                            double,
@@ -1004,34 +1014,38 @@ namespace Step63
   }
 
 
-  // @sect4{<code>AdvectionProblem::solve</code>}
+  // @sect4{<code>AdvectionProblem::solve()</code>}
 
   // Before we can solve the system, we must first set up the multigrid
   // preconditioner. This requires the setup of the transfer between levels,
   // the coarse matrix solver, and the smoother. This setup follows almost
   // identically to Step-16, the main difference being the various smoothers
   // defined above and the fact that we need different interface edge matrices
-  // for in and out since our problem is non-symetric. (In reality, for this
+  // for in and out since our problem is non-symmetric. (In reality, for this
   // tutorial these interface matrices are empty since we are only using global
   // refinement, and thus have no refinement edges. However, we have still
   // included both here since if one made the simple switch to an adaptively
   // refined method, the program would still run correctly.)
 
-  // The last thing to note is that since our problem is non-symetric, we must
+  // The last thing to note is that since our problem is non-symmetric, we must
   // use an appropriate Krylov subspace method. We choose here to
   // use GMRES since it offers the guarantee of residual reduction in each
-  // iteration. The major disatvantage to GMRES is that, for each iteration, we
-  // must store an additional temporary vector as well as compute an additional
-  // scalar product. This requirement is relaxed by using the restarted GMRES
+  // iteration. The major disavantage of GMRES is that, for each iteration,
+  // the number of stored temporary vectors increases by one, and one also needs
+  // to compute a scalar product with all previously stored vectors. This is
+  // rather expensive. This requirement is relaxed by using the restarted GMRES
   // method which puts a cap on the number of vectors we are required to store
-  // at any one time (here we resart after 50 temporary vectors, or 48
-  // iterations). This then has the disatvantage that we lose information we
+  // at any one time (here we restart after 50 temporary vectors, or 48
+  // iterations). This then has the disadvantage that we lose information we
   // have gathered throughout the iteration and therefore we could see slower
-  // convergence. However, the goal of this tutorial is to have very low
+  // convergence. As a consequence, where to restart is a question of balancing
+  // memory consumption, CPU effort, and convergence speed.
+  // However, the goal of this tutorial is to have very low
   // iteration counts by using a powerful GMG preconditioner, so we have picked
   // the restart length such that all of the results shown below converge prior
-  // and thus we have a standard GMRES method. If the user is interested,
-  // another sutaible method offered in deal.II would be BiCGStab.
+  // to restart happening, and thus we have a standard GMRES method. If the user
+  // is interested, another suitable method offered in deal.II would be
+  // BiCGStab.
 
   template <int dim>
   void AdvectionProblem<dim>::solve()
@@ -1043,7 +1057,7 @@ namespace Step63
 
     using Transfer = MGTransferPrebuilt<Vector<double>>;
     Transfer mg_transfer(mg_constrained_dofs);
-    mg_transfer.build_matrices(dof_handler);
+    mg_transfer.build(dof_handler);
 
     FullMatrix<double> coarse_matrix;
     coarse_matrix.copy_from(mg_matrices[0]);
@@ -1066,8 +1080,8 @@ namespace Step63
 
     std::cout << "     Solving with GMRES to tol " << solve_tolerance << "..."
               << std::endl;
-    SolverGMRES<> solver(solver_control,
-                         SolverGMRES<>::AdditionalData(50, true));
+    SolverGMRES<Vector<double>> solver(
+      solver_control, SolverGMRES<Vector<double>>::AdditionalData(50, true));
 
     Timer time;
     time.start();
@@ -1084,24 +1098,27 @@ namespace Step63
   }
 
 
-  // @sect4{<code>AdvectionProblem::output_results</code>}
+  // @sect4{<code>AdvectionProblem::output_results()</code>}
 
+  // The final function of interest generates graphical output.
   // Here we output the solution and cell ordering in a .vtu format.
 
+  // At the top of the function, we generate an index for each cell to
+  // visualize the ordering used by the smoothers. Note that we do
+  // this only for the active cells instead of the levels, where the
+  // smoothers are actually used. For the point smoothers we renumber
+  // DoFs instead of cells, so this is only an approximation of what
+  // happens in reality. Finally, the random ordering is not the
+  // random ordering we actually use (see `create_smoother()` for that).
+  //
+  // The (integer) ordering of cells is then copied into a (floating
+  // point) vector for graphical output.
   template <int dim>
   void AdvectionProblem<dim>::output_results(const unsigned int cycle) const
   {
-    // We generate an index for each cell to visualize the ordering used
-    // by the smoothers. Note that we do this only for the active cells
-    // instead of the levels, where the smoothers are actually used. For the
-    // point smoothers we renumber DoFs instead of cells, so this is only an
-    // approximation of what happens in reality. Finally, the random ordering
-    // is not the random ordering we actually use (see create_smoother() for
-    // that).
     const unsigned int n_active_cells = triangulation.n_active_cells();
     Vector<double>     cell_indices(n_active_cells);
     {
-      // First generate a permutation vector for the cell indices:
       std::vector<unsigned int> ordered_indices;
       switch (settings.dof_renumbering)
         {
@@ -1131,11 +1148,12 @@ namespace Step63
             break;
         }
 
-      // Then copy the permutation in ordered_indices into an output vector:
       for (unsigned int i = 0; i < n_active_cells; ++i)
         cell_indices(ordered_indices[i]) = static_cast<double>(i);
     }
 
+    // The remainder of the function is then straightforward, given
+    // previous tutorial programs:
     DataOut<dim> data_out;
     data_out.attach_dof_handler(dof_handler);
     data_out.add_data_vector(solution, "solution");
@@ -1149,11 +1167,17 @@ namespace Step63
   }
 
 
-  // @sect4{<code>AdvectionProblem::run</code>}
+  // @sect4{<code>AdvectionProblem::run()</code>}
 
   // As in most tutorials, this function creates/refines the mesh and calls
-  // the various functions defined above to setup, assemble, solve, and output
+  // the various functions defined above to set up, assemble, solve, and output
   // the results.
+
+  // In cycle zero, we generate the mesh for the on the square
+  // <code>[-1,1]^dim</code> with a hole of radius 3/10 units centered
+  // at the origin. For objects with `manifold_id` equal to one
+  // (namely, the faces adjacent to the hole), we assign a spherical
+  // manifold.
 
   template <int dim>
   void AdvectionProblem<dim>::run()
@@ -1165,15 +1189,11 @@ namespace Step63
 
         if (cycle == 0)
           {
-            // We are solving on the square <code>[-1,1]^dim</code> with a hole
-            // of radius 3/10 units centered at the origin.
             GridGenerator::hyper_cube_with_cylindrical_hole(triangulation,
                                                             0.3,
                                                             1.0);
 
-            // Set manifold for the inner (curved) boundary.
-            static const SphericalManifold<dim> manifold_description(
-              Point<dim>(0, 0));
+            const SphericalManifold<dim> manifold_description(Point<dim>(0, 0));
             triangulation.set_manifold(1, manifold_description);
           }
 
@@ -1200,14 +1220,14 @@ namespace Step63
 } // namespace Step63
 
 
-// @sect4{The <code>main</code> function}
+// @sect3{The <code>main</code> function}
 
-// Here the main function is like most tutorials. The only interesting bit
-// is that we require the user to pass a .prm file as a sole command line
-// argument (see Step-19 for a complete discussion of parameter files). If no
-// parameter file is given, the program will output the contents of a sample
-// parameter file with all default values to the screen that the user can then
-// copy and paste into their own .prm file.
+// Finally, the main function is like most tutorials. The only
+// interesting bit is that we require the user to pass a `.prm` file
+// as a sole command line argument. If no parameter file is given, the
+// program will output the contents of a sample parameter file with
+// all default values to the screen that the user can then copy and
+// paste into their own `.prm` file.
 
 int main(int argc, char *argv[])
 {

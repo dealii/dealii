@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2018 by the deal.II authors
+// Copyright (C) 2001 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,7 +17,7 @@
 // test GridTools::exchange_cell_data_to_ghosts
 //
 // this test works just like the _01 test, but it skips those cells
-// where we have an odd 'counter' value via the boost::optional
+// where we have an odd 'counter' value via the std_cxx17::optional
 // framework
 
 #include <deal.II/base/logstream.h>
@@ -44,29 +44,57 @@ test()
   GridGenerator::hyper_cube(tria);
   tria.refine_global(2);
 
-  std::set<std::string> output;
+  std::map<CellId, std::string> input;
+  std::set<std::string>         output;
 
-  typedef
-    typename parallel::distributed::Triangulation<dim>::active_cell_iterator
-                 cell_iterator;
-  typedef double DT;
-  int            counter = 0;
+  using cell_iterator =
+    typename parallel::distributed::Triangulation<dim>::active_cell_iterator;
+  using DT = double;
+  std::map<CellId, int> map;
+  int                   counter = 0;
+
+  std::map<unsigned int, std::set<dealii::types::subdomain_id>>
+    vertices_with_ghost_neighbors =
+      GridTools::compute_vertices_with_ghost_neighbors(tria);
+
+  for (const auto &cell : tria.active_cell_iterators())
+    if (cell->is_locally_owned())
+      {
+        for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
+          {
+            const std::map<unsigned int,
+                           std::set<dealii::types::subdomain_id>>::
+              const_iterator neighbor_subdomains_of_vertex =
+                vertices_with_ghost_neighbors.find(cell->vertex_index(v));
+
+            if (neighbor_subdomains_of_vertex !=
+                vertices_with_ghost_neighbors.end())
+              {
+                map[cell->id()] = ++counter;
+                break;
+              }
+          }
+      }
+
   GridTools::
     exchange_cell_data_to_ghosts<DT, parallel::distributed::Triangulation<dim>>(
       tria,
-      [&](const cell_iterator &cell) -> boost::optional<DT> {
-        ++counter;
+      [&](const cell_iterator &cell) -> std_cxx17::optional<DT> {
+        const auto         counter = map[cell->id()];
+        std::ostringstream oss;
         if (counter % 2 == 0)
           {
             DT value = counter;
 
-            deallog << "pack " << cell->id() << " " << value << std::endl;
+            oss << "pack " << cell->id() << " " << value;
+            input[cell->id()] = oss.str();
             return value;
           }
         else
           {
-            deallog << "skipping " << cell->id() << ' ' << counter << std::endl;
-            return boost::optional<DT>();
+            oss << "skipping " << cell->id() << ' ' << counter;
+            input[cell->id()] = oss.str();
+            return std_cxx17::optional<DT>();
           }
       },
       [&](const cell_iterator &cell, const DT &data) {
@@ -78,6 +106,8 @@ test()
       });
 
   // sort the output because it will come in in random order
+  for (auto &it : input)
+    deallog << it.second << std::endl;
   for (auto &it : output)
     deallog << it << std::endl;
 }

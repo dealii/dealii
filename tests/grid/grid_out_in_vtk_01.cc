@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -56,7 +56,7 @@ check(Triangulation<dim, spacedim> &tria)
       AssertDimension(cell1->material_id(), cell2->material_id());
       AssertDimension(cell1->manifold_id(), cell2->manifold_id());
 
-      for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+      for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
         {
           auto obj1 = cell1->vertex_index(i);
           auto obj2 = cell2->vertex_index(i);
@@ -75,7 +75,7 @@ check(Triangulation<dim, spacedim> &tria)
             AssertDimension(obj1->boundary_id(), obj2->boundary_id());
           }
       if (dim > 1)
-        for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+        for (const unsigned int i : GeometryInfo<dim>::face_indices())
           {
             auto obj1 = cell1->face(i);
             auto obj2 = cell2->face(i);

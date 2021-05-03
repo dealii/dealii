@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2006 - 2019 by the deal.II authors
+## Copyright (C) 2006 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -14,10 +14,11 @@
 ## ---------------------------------------------------------------------
 
 
-# skip header lines at the top of the file, such as copyright notices 
-# and license information, if the file is a step-xx.cc tutorial. don't
-# skip for other files such as code-gallery files
-if ($ARGV[0] =~ /step-\d+.[cc|cu]/)
+# Skip header lines at the top of the file, such as copyright notices and
+# license information, if the file is a step-xx.cc or .cu tutorial. Here, xx
+# is either a number like step-32 or a number plus a letter like step-12b.
+# Don't skip for other files such as code-gallery files
+if ($ARGV[0] =~ /step-\d+[a-z]?.[cc|cu]/)
 {
   $_ = <>;
   while ( m!^/\*!  ||  m!\s*\*! || m/^$/ ) {
@@ -37,11 +38,6 @@ $state =  $comment_mode;
 print " * \n";
 
 do {
-
-    # Make sure that we don't output comment end markers that might confuse
-    # doxygen.
-    s!/\*!/ \*!g;
-    s!\*/!\* /!g;
 
     # substitute tabs
     s/\t/        /g;

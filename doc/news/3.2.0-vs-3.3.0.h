@@ -27,7 +27,7 @@ All entries are signed with the names of the author.
 
 <ol>
   <li> <p>
-       New: Output for 
+       New: Output for
        <a href="http://www.amtec.org" target="_top">Tecplot</a> has
        been added. It can be used by choosing output format «tecplot».
        <br>
@@ -51,7 +51,7 @@ All entries are signed with the names of the author.
        </p>
 
   <li> <p>
-       New: Output for 
+       New: Output for
        <a href="http://www.opendx.org" target="_top">OpenDX</a> has
        been added. It can be used by choosing output format «dx» (not
        yet for grid output). The data format is very basic now, but it
@@ -280,7 +280,7 @@ All entries are signed with the names of the author.
   <li> <p>
        New: the <code>SparseDirectMA27/47</code> classes
        now provide access to Mutex locks for external
-       synchronisation. 
+       synchronisation.
        <br>
        (WB 2001/11/14)
        </p>
@@ -468,12 +468,12 @@ All entries are signed with the names of the author.
        class="member">GridRefinement::refine_fixed_fraction</code>
        function sometimes had problems when indicators vary over
        several orders of magnitude, due to roundoff. This is now
-       fixed. 
+       fixed.
        <br>
        (WB 2001/11/05)
        </p>
 
-  <li> <p> 
+  <li> <p>
        New: <code
        class="member">DoFTools::extract_subdomain_dofs</code> selects
        those degrees of freedom which are located on cells with a

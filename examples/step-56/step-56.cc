@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2016 - 2019 by the deal.II authors
+ * Copyright (C) 2016 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -36,14 +36,11 @@
 
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/grid_refinement.h>
 
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_renumbering.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
@@ -361,7 +358,7 @@ namespace Step56
     // First solve with the approximation for S
     {
       SolverControl solver_control(1000, 1e-6 * src.block(1).l2_norm());
-      SolverCG<>    cg(solver_control);
+      SolverCG<Vector<double>> cg(solver_control);
 
       dst.block(1) = 0.0;
       cg.solve(schur_complement_matrix,
@@ -384,8 +381,8 @@ namespace Step56
     // or just apply one preconditioner sweep
     if (do_solve_A == true)
       {
-        SolverControl solver_control(10000, utmp.l2_norm() * 1e-4);
-        SolverCG<>    cg(solver_control);
+        SolverControl            solver_control(10000, utmp.l2_norm() * 1e-4);
+        SolverCG<Vector<double>> cg(solver_control);
 
         dst.block(0) = 0.0;
         cg.solve(system_matrix.block(0, 0),
@@ -553,11 +550,10 @@ namespace Step56
           }
       }
 
-    std::vector<types::global_dof_index> dofs_per_block(2);
-    DoFTools::count_dofs_per_block(dof_handler,
-                                   dofs_per_block,
-                                   block_component);
-    const unsigned int n_u = dofs_per_block[0], n_p = dofs_per_block[1];
+    const std::vector<types::global_dof_index> dofs_per_block =
+      DoFTools::count_dofs_per_fe_block(dof_handler, block_component);
+    const unsigned int n_u = dofs_per_block[0];
+    const unsigned int n_p = dofs_per_block[1];
 
     {
       constraints.clear();
@@ -621,7 +617,7 @@ namespace Step56
                             update_values | update_quadrature_points |
                               update_JxW_values | update_gradients);
 
-    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
 
     const unsigned int n_q_points = quadrature_formula.size();
 
@@ -719,7 +715,7 @@ namespace Step56
                             update_values | update_quadrature_points |
                               update_JxW_values | update_gradients);
 
-    const unsigned int dofs_per_cell = velocity_fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = velocity_fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
 
     FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
@@ -750,7 +746,7 @@ namespace Step56
       }
 
     // This iterator goes over all cells (not just active)
-    for (const auto &cell : velocity_dof_handler.active_cell_iterators())
+    for (const auto &cell : velocity_dof_handler.cell_iterators())
       {
         fe_values.reinit(cell);
         cell_matrix = 0;
@@ -880,12 +876,12 @@ namespace Step56
 
         // Transfer operators between levels
         MGTransferPrebuilt<Vector<double>> mg_transfer(mg_constrained_dofs);
-        mg_transfer.build_matrices(velocity_dof_handler);
+        mg_transfer.build(velocity_dof_handler);
 
         // Setup coarse grid solver
         FullMatrix<double> coarse_matrix;
         coarse_matrix.copy_from(mg_matrices[0]);
-        MGCoarseGridHouseholder<> coarse_grid_solver;
+        MGCoarseGridHouseholder<double, Vector<double>> coarse_grid_solver;
         coarse_grid_solver.initialize(coarse_matrix);
 
         using Smoother = PreconditionSOR<SparseMatrix<double>>;
@@ -1112,7 +1108,6 @@ int main()
 {
   try
     {
-      using namespace dealii;
       using namespace Step56;
 
       const int degree = 1;

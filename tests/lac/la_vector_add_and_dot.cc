@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2018 by the deal.II authors
+// Copyright (C) 2012 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -63,8 +63,18 @@ check()
           deallog << std::endl;
         }
 
-      deallog << "Add and dot should be " << prod / static_cast<number>(size)
-              << ", is " << prod_check / static_cast<number>(size) << std::endl;
+      deallog << "Add and dot is ";
+      if (std::abs(prod - prod_check) <
+          4. *
+            std::abs(
+              std::numeric_limits<
+                typename numbers::NumberTraits<number>::real_type>::epsilon()) *
+            std::sqrt(static_cast<double>(size)) * size)
+        deallog << "correct" << std::endl;
+      else
+        deallog << "wrong; should be " << prod / static_cast<number>(size)
+                << ", is " << prod_check / static_cast<number>(size)
+                << std::endl;
     }
 }
 
@@ -74,7 +84,7 @@ main()
 {
   std::ofstream logfile("output");
   deallog << std::fixed;
-  deallog << std::setprecision(2);
+  deallog << std::setprecision(10);
   deallog.attach(logfile);
 
   check<float>();

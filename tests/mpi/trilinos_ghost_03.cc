@@ -15,7 +15,7 @@
 
 
 
-// check correct behaviour of Trilinos ghosted vectors.  The
+// check correct behavior of Trilinos ghosted vectors.  The
 // test now checks that v.l2_norm() and v(idx)=... is disabled.
 
 #include <deal.II/base/index_set.h>

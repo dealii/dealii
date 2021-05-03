@@ -29,7 +29,7 @@
 void
 test(PETScWrappers::MatrixBase &m)
 {
-  typedef PETScWrappers::MatrixBase::size_type size_type;
+  using size_type = PETScWrappers::MatrixBase::size_type;
 
   Assert(m.m() != 0, ExcInternalError());
   Assert(m.n() != 0, ExcInternalError());

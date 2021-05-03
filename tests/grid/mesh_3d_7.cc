@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -32,13 +32,14 @@
 #include <deal.II/grid/tria_iterator.h>
 
 #include "../tests.h"
+
 #include "mesh_3d.h"
 
 
 
 void check_this(Triangulation<3> &tria)
 {
-  QTrapez<2>      quadrature;
+  QTrapezoid<2>   quadrature;
   FE_Q<3>         fe(1);
   FEFaceValues<3> fe_face_values1(fe,
                                   quadrature,
@@ -57,7 +58,7 @@ void check_this(Triangulation<3> &tria)
   for (DoFHandler<3>::cell_iterator cell = dof_handler.begin();
        cell != dof_handler.end();
        ++cell)
-    for (unsigned int f = 0; f < GeometryInfo<3>::faces_per_cell; ++f)
+    for (const unsigned int f : GeometryInfo<3>::face_indices())
       if (!cell->at_boundary(f))
         {
           const unsigned int nn = cell->neighbor_of_neighbor(f);

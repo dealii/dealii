@@ -1,7 +1,7 @@
 
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -24,10 +24,10 @@
 #include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/vector.h>
 
-#include "../testmatrix.h"
 #include "../tests.h"
 
-using namespace dealii;
+#include "../testmatrix.h"
+
 
 int
 main(int argc, char *argv[])

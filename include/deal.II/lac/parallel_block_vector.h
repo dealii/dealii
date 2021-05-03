@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2018 by the deal.II authors
+// Copyright (C) 2011 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,7 +21,7 @@
 #include <deal.II/lac/la_parallel_block_vector.h>
 
 DEAL_II_WARNING(
-  "This file is deprecated. Use <deal.II/lac/la_block_vector.h> and LinearAlgebra::distributed::BlockVector instead.")
+  "This file is deprecated. Use <deal.II/lac/la_parallel_block_vector.h> and LinearAlgebra::distributed::BlockVector instead.")
 
 #include <cstring>
 #include <iomanip>
@@ -52,7 +52,6 @@ namespace parallel
      *
      * @see
      * @ref GlossBlockLA "Block (linear algebra)"
-     * @author Katharina Kormann, Martin Kronbichler, 2011
      *
      * @deprecated Use LinearAlgebra::distributed::BlockVector instead.
      */

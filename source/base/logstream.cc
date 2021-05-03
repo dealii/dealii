@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -28,8 +28,8 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace
 {
-  Threads::Mutex log_lock;
-  Threads::Mutex write_lock;
+  std::mutex log_lock;
+  std::mutex write_lock;
 } // namespace
 
 
@@ -73,7 +73,8 @@ LogStream::Prefix::~Prefix()
 
 
 LogStream::LogStream()
-  : std_out(&std::cout)
+  : parent_thread(std::this_thread::get_id())
+  , std_out(&std::cout)
   , file(nullptr)
   , std_depth(0)
   , file_depth(10000)
@@ -381,7 +382,6 @@ LogStream::log_thread_id(const bool flag)
 std::stack<std::string> &
 LogStream::get_prefixes() const
 {
-#ifdef DEAL_II_WITH_THREADS
   bool                     exists         = false;
   std::stack<std::string> &local_prefixes = prefixes.get(exists);
 
@@ -389,25 +389,12 @@ LogStream::get_prefixes() const
   // from the initial thread that created logstream.
   if (!exists)
     {
-      const tbb::enumerable_thread_specific<std::stack<std::string>> &impl =
-        prefixes.get_implementation();
-
-      // The thread that created this LogStream object should be the first
-      // in tbb's enumerable_thread_specific container.
-      const tbb::enumerable_thread_specific<
-        std::stack<std::string>>::const_iterator first_elem = impl.begin();
-
-      if (first_elem != impl.end())
-        {
-          local_prefixes = *first_elem;
-        }
+      auto it = prefixes.data.find(parent_thread);
+      if (it != prefixes.data.end())
+        local_prefixes = it->second;
     }
 
   return local_prefixes;
-
-#else
-  return prefixes.get();
-#endif
 }
 
 

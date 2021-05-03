@@ -111,7 +111,7 @@ amount of memory for the member variable; note that the size of a
 
 
 
-The deal.II library is build around this concept
+The deal.II library is built around this concept
 of dimension-independent programming, and therefore allows you to program in
 a way that will not need to
 distinguish between the space dimensions. It should be noted that in

@@ -77,8 +77,8 @@ test()
       std::vector<std::string> filenames;
       filenames.push_back("output.vtu");
       {
-        std::ofstream master("output.pvtu");
-        data_out.write_pvtu_record(master, filenames);
+        std::ofstream pvtu_output("output.pvtu");
+        data_out.write_pvtu_record(pvtu_output, filenames);
       }
 
       cat_file("output.vtu");

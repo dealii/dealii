@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2019 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -28,12 +28,13 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#ifndef DOXYGEN
 template <typename>
 class Vector;
 template <typename>
 class FullMatrix;
-template <typename>
-class VectorizedArray;
+#endif
 
 /**
  * This is an abstract base class used for a special matrix class, namely the
@@ -63,16 +64,28 @@ class VectorizedArray;
  *
  * @tparam Number Arithmetic type of the underlying array elements.
  *
- * @tparam size Compile-time array lengths. By default at -1, which means that
- * the run-time information stored in the matrices passed to the reinit()
- * function is used.
- *
- * @author Martin Kronbichler and Julius Witte, 2017
+ * @tparam n_rows_1d Compile-time number of rows of 1D matrices (only
+ * valid if the number of rows and columns coincide for each
+ * dimension). By default at -1, which means that the number of rows
+ * is determined at run-time by means of the matrices passed to the
+ * reinit() function.
  */
-template <int dim, typename Number, int size = -1>
+template <int dim, typename Number, int n_rows_1d = -1>
 class TensorProductMatrixSymmetricSumBase
 {
 public:
+  /**
+   * Type of matrix entries. This alias is analogous to <tt>value_type</tt>
+   * in the standard library containers.
+   */
+  using value_type = Number;
+
+  /**
+   * The static number of rows of the 1D matrices. For more details,
+   * see the description of the template parameter <tt>n_rows_1d</tt>.
+   */
+  static constexpr int n_rows_1d_static = n_rows_1d;
+
   /**
    * Return the number of rows of the tensor product matrix
    * resulting from the Kronecker product of 1D matrices, which is described
@@ -199,10 +212,10 @@ private:
  *
  * Note that this class allows for two modes of usage. The first is a use case
  * with run time constants for the matrix dimensions that is achieved by
- * setting the optional template parameter for the size to -1. The second mode
- * of usage that is faster allows to set the template parameter as a compile
- * time constant, giving significantly faster code in particular for small
- * sizes of the matrix.
+ * setting the optional template parameter <tt>n_rows_1d</tt> to -1. The second
+ * mode of usage that is faster allows to set the template parameter as a
+ * compile time constant, giving significantly faster code in particular for
+ * small sizes of the matrix.
  *
  * @tparam dim Dimension of the problem. Currently, 1D, 2D, and 3D codes are
  * implemented.
@@ -215,15 +228,15 @@ private:
  * to perform LAPACK calculations for each vectorization lane, i.e. for the
  * supported float and double numbers.
  *
- * @tparam size Compile-time array lengths. By default at -1, which means that
- * the run-time information stored in the matrices passed to the reinit()
- * function is used.
- *
- * @author Martin Kronbichler and Julius Witte, 2017
+ * @tparam n_rows_1d Compile-time number of rows of 1D matrices (only
+ * valid if the number of rows and columns coincide for each
+ * dimension). By default at -1, which means that the number of rows
+ * is determined at run-time by means of the matrices passed to the
+ * reinit() function.
  */
-template <int dim, typename Number, int size = -1>
+template <int dim, typename Number, int n_rows_1d = -1>
 class TensorProductMatrixSymmetricSum
-  : public TensorProductMatrixSymmetricSumBase<dim, Number, size>
+  : public TensorProductMatrixSymmetricSumBase<dim, Number, n_rows_1d>
 {
 public:
   /**
@@ -312,14 +325,12 @@ private:
  * being the arithmetic template. For a detailed description see
  * the main documentation of the generic
  * TensorProductMatrixSymmetricSum class.
- *
- * @author Martin Kronbichler and Julius Witte, 2017
  */
-template <int dim, typename Number, int size>
-class TensorProductMatrixSymmetricSum<dim, VectorizedArray<Number>, size>
+template <int dim, typename Number, int n_rows_1d>
+class TensorProductMatrixSymmetricSum<dim, VectorizedArray<Number>, n_rows_1d>
   : public TensorProductMatrixSymmetricSumBase<dim,
                                                VectorizedArray<Number>,
-                                               size>
+                                               n_rows_1d>
 {
 public:
   /**
@@ -445,9 +456,9 @@ namespace internal
 } // namespace internal
 
 
-template <int dim, typename Number, int size>
+template <int dim, typename Number, int n_rows_1d>
 inline unsigned int
-TensorProductMatrixSymmetricSumBase<dim, Number, size>::m() const
+TensorProductMatrixSymmetricSumBase<dim, Number, n_rows_1d>::m() const
 {
   unsigned int m = mass_matrix[0].n_rows();
   for (unsigned int d = 1; d < dim; ++d)
@@ -457,9 +468,9 @@ TensorProductMatrixSymmetricSumBase<dim, Number, size>::m() const
 
 
 
-template <int dim, typename Number, int size>
+template <int dim, typename Number, int n_rows_1d>
 inline unsigned int
-TensorProductMatrixSymmetricSumBase<dim, Number, size>::n() const
+TensorProductMatrixSymmetricSumBase<dim, Number, n_rows_1d>::n() const
 {
   unsigned int n = mass_matrix[0].n_cols();
   for (unsigned int d = 1; d < dim; ++d)
@@ -469,19 +480,19 @@ TensorProductMatrixSymmetricSumBase<dim, Number, size>::n() const
 
 
 
-template <int dim, typename Number, int size>
+template <int dim, typename Number, int n_rows_1d>
 inline void
-TensorProductMatrixSymmetricSumBase<dim, Number, size>::vmult(
+TensorProductMatrixSymmetricSumBase<dim, Number, n_rows_1d>::vmult(
   const ArrayView<Number> &      dst_view,
   const ArrayView<const Number> &src_view) const
 {
   AssertDimension(dst_view.size(), this->m());
   AssertDimension(src_view.size(), this->n());
   std::lock_guard<std::mutex> lock(this->mutex);
-  const unsigned int          n =
-    Utilities::fixed_power<dim>(size > 0 ? size : eigenvalues[0].size());
+  const unsigned int          n = Utilities::fixed_power<dim>(
+    n_rows_1d > 0 ? n_rows_1d : eigenvalues[0].size());
   tmp_array.resize_fast(n * 2);
-  constexpr int kernel_size = size > 0 ? size : 0;
+  constexpr int kernel_size = n_rows_1d > 0 ? n_rows_1d : 0;
   internal::EvaluatorTensorProduct<internal::evaluate_general,
                                    dim,
                                    kernel_size,
@@ -537,18 +548,18 @@ TensorProductMatrixSymmetricSumBase<dim, Number, size>::vmult(
 
 
 
-template <int dim, typename Number, int size>
+template <int dim, typename Number, int n_rows_1d>
 inline void
-TensorProductMatrixSymmetricSumBase<dim, Number, size>::apply_inverse(
+TensorProductMatrixSymmetricSumBase<dim, Number, n_rows_1d>::apply_inverse(
   const ArrayView<Number> &      dst_view,
   const ArrayView<const Number> &src_view) const
 {
   AssertDimension(dst_view.size(), this->n());
   AssertDimension(src_view.size(), this->m());
   std::lock_guard<std::mutex> lock(this->mutex);
-  const unsigned int          n = size > 0 ? size : eigenvalues[0].size();
+  const unsigned int n = n_rows_1d > 0 ? n_rows_1d : eigenvalues[0].size();
   tmp_array.resize_fast(Utilities::fixed_power<dim>(n));
-  constexpr int kernel_size = size > 0 ? size : 0;
+  constexpr int kernel_size = n_rows_1d > 0 ? n_rows_1d : 0;
   internal::EvaluatorTensorProduct<internal::evaluate_general,
                                    dim,
                                    kernel_size,
@@ -615,8 +626,8 @@ TensorProductMatrixSymmetricSumBase<dim, Number, size>::apply_inverse(
 
 //---------------------- TensorProductMatrixSymmetricSum ----------------------
 
-template <int dim, typename Number, int size>
-inline TensorProductMatrixSymmetricSum<dim, Number, size>::
+template <int dim, typename Number, int n_rows_1d>
+inline TensorProductMatrixSymmetricSum<dim, Number, n_rows_1d>::
   TensorProductMatrixSymmetricSum(
     const std::array<Table<2, Number>, dim> &mass_matrix,
     const std::array<Table<2, Number>, dim> &derivative_matrix)
@@ -626,8 +637,8 @@ inline TensorProductMatrixSymmetricSum<dim, Number, size>::
 
 
 
-template <int dim, typename Number, int size>
-inline TensorProductMatrixSymmetricSum<dim, Number, size>::
+template <int dim, typename Number, int n_rows_1d>
+inline TensorProductMatrixSymmetricSum<dim, Number, n_rows_1d>::
   TensorProductMatrixSymmetricSum(
     const std::array<FullMatrix<Number>, dim> &mass_matrix,
     const std::array<FullMatrix<Number>, dim> &derivative_matrix)
@@ -637,8 +648,8 @@ inline TensorProductMatrixSymmetricSum<dim, Number, size>::
 
 
 
-template <int dim, typename Number, int size>
-inline TensorProductMatrixSymmetricSum<dim, Number, size>::
+template <int dim, typename Number, int n_rows_1d>
+inline TensorProductMatrixSymmetricSum<dim, Number, n_rows_1d>::
   TensorProductMatrixSymmetricSum(const Table<2, Number> &mass_matrix,
                                   const Table<2, Number> &derivative_matrix)
 {
@@ -647,10 +658,10 @@ inline TensorProductMatrixSymmetricSum<dim, Number, size>::
 
 
 
-template <int dim, typename Number, int size>
+template <int dim, typename Number, int n_rows_1d>
 template <typename MatrixArray>
 inline void
-TensorProductMatrixSymmetricSum<dim, Number, size>::reinit_impl(
+TensorProductMatrixSymmetricSum<dim, Number, n_rows_1d>::reinit_impl(
   MatrixArray &&mass_matrices_,
   MatrixArray &&derivative_matrices_)
 {
@@ -661,9 +672,10 @@ TensorProductMatrixSymmetricSum<dim, Number, size>::reinit_impl(
 
   for (int dir = 0; dir < dim; ++dir)
     {
-      Assert(size == -1 || (size > 0 && static_cast<unsigned int>(size) ==
-                                          mass_matrices[dir].n_rows()),
-             ExcDimensionMismatch(size, mass_matrices[dir].n_rows()));
+      Assert(n_rows_1d == -1 ||
+               (n_rows_1d > 0 && static_cast<unsigned int>(n_rows_1d) ==
+                                   mass_matrices[dir].n_rows()),
+             ExcDimensionMismatch(n_rows_1d, mass_matrices[dir].n_rows()));
       AssertDimension(mass_matrices[dir].n_rows(), mass_matrices[dir].n_cols());
       AssertDimension(mass_matrices[dir].n_rows(),
                       derivative_matrices[dir].n_rows());
@@ -673,7 +685,7 @@ TensorProductMatrixSymmetricSum<dim, Number, size>::reinit_impl(
       this->eigenvectors[dir].reinit(mass_matrices[dir].n_cols(),
                                      mass_matrices[dir].n_rows());
       this->eigenvalues[dir].resize(mass_matrices[dir].n_cols());
-      internal::TensorProductMatrix ::spectral_assembly<Number>(
+      internal::TensorProductMatrix::spectral_assembly<Number>(
         &(mass_matrices[dir](0, 0)),
         &(derivative_matrices[dir](0, 0)),
         mass_matrices[dir].n_rows(),
@@ -685,9 +697,9 @@ TensorProductMatrixSymmetricSum<dim, Number, size>::reinit_impl(
 
 
 
-template <int dim, typename Number, int size>
+template <int dim, typename Number, int n_rows_1d>
 inline void
-TensorProductMatrixSymmetricSum<dim, Number, size>::reinit(
+TensorProductMatrixSymmetricSum<dim, Number, n_rows_1d>::reinit(
   const std::array<Table<2, Number>, dim> &mass_matrix,
   const std::array<Table<2, Number>, dim> &derivative_matrix)
 {
@@ -696,9 +708,9 @@ TensorProductMatrixSymmetricSum<dim, Number, size>::reinit(
 
 
 
-template <int dim, typename Number, int size>
+template <int dim, typename Number, int n_rows_1d>
 inline void
-TensorProductMatrixSymmetricSum<dim, Number, size>::reinit(
+TensorProductMatrixSymmetricSum<dim, Number, n_rows_1d>::reinit(
   const std::array<FullMatrix<Number>, dim> &mass_matrix,
   const std::array<FullMatrix<Number>, dim> &derivative_matrix)
 {
@@ -723,9 +735,9 @@ TensorProductMatrixSymmetricSum<dim, Number, size>::reinit(
 
 
 
-template <int dim, typename Number, int size>
+template <int dim, typename Number, int n_rows_1d>
 inline void
-TensorProductMatrixSymmetricSum<dim, Number, size>::reinit(
+TensorProductMatrixSymmetricSum<dim, Number, n_rows_1d>::reinit(
   const Table<2, Number> &mass_matrix,
   const Table<2, Number> &derivative_matrix)
 {
@@ -744,8 +756,10 @@ TensorProductMatrixSymmetricSum<dim, Number, size>::reinit(
 
 //------------- vectorized spec.: TensorProductMatrixSymmetricSum -------------
 
-template <int dim, typename Number, int size>
-inline TensorProductMatrixSymmetricSum<dim, VectorizedArray<Number>, size>::
+template <int dim, typename Number, int n_rows_1d>
+inline TensorProductMatrixSymmetricSum<dim,
+                                       VectorizedArray<Number>,
+                                       n_rows_1d>::
   TensorProductMatrixSymmetricSum(
     const std::array<Table<2, VectorizedArray<Number>>, dim> &mass_matrix,
     const std::array<Table<2, VectorizedArray<Number>>, dim> &derivative_matrix)
@@ -755,8 +769,10 @@ inline TensorProductMatrixSymmetricSum<dim, VectorizedArray<Number>, size>::
 
 
 
-template <int dim, typename Number, int size>
-inline TensorProductMatrixSymmetricSum<dim, VectorizedArray<Number>, size>::
+template <int dim, typename Number, int n_rows_1d>
+inline TensorProductMatrixSymmetricSum<dim,
+                                       VectorizedArray<Number>,
+                                       n_rows_1d>::
   TensorProductMatrixSymmetricSum(
     const Table<2, VectorizedArray<Number>> &mass_matrix,
     const Table<2, VectorizedArray<Number>> &derivative_matrix)
@@ -766,10 +782,10 @@ inline TensorProductMatrixSymmetricSum<dim, VectorizedArray<Number>, size>::
 
 
 
-template <int dim, typename Number, int size>
+template <int dim, typename Number, int n_rows_1d>
 template <typename MatrixArray>
 inline void
-TensorProductMatrixSymmetricSum<dim, VectorizedArray<Number>, size>::
+TensorProductMatrixSymmetricSum<dim, VectorizedArray<Number>, n_rows_1d>::
   reinit_impl(MatrixArray &&mass_matrices_, MatrixArray &&derivative_matrices_)
 {
   auto &&mass_matrix       = std::forward<MatrixArray>(mass_matrices_);
@@ -777,9 +793,9 @@ TensorProductMatrixSymmetricSum<dim, VectorizedArray<Number>, size>::
   this->mass_matrix        = mass_matrix;
   this->derivative_matrix  = derivative_matrix;
 
-  constexpr unsigned int macro_size = VectorizedArray<Number>::n_array_elements;
-  std::size_t            n_rows_max = (size > 0) ? size : 0;
-  if (size == -1)
+  constexpr unsigned int macro_size = VectorizedArray<Number>::size();
+  std::size_t            n_rows_max = (n_rows_1d > 0) ? n_rows_1d : 0;
+  if (n_rows_1d == -1)
     for (unsigned int d = 0; d < dim; ++d)
       n_rows_max = std::max(n_rows_max, mass_matrix[d].n_rows());
   const std::size_t nm_flat_size_max = n_rows_max * n_rows_max * macro_size;
@@ -797,9 +813,10 @@ TensorProductMatrixSymmetricSum<dim, VectorizedArray<Number>, size>::
   std::array<unsigned int, macro_size> offsets_n;
   for (int dir = 0; dir < dim; ++dir)
     {
-      Assert(size == -1 || (size > 0 && static_cast<unsigned int>(size) ==
-                                          mass_matrix[dir].n_rows()),
-             ExcDimensionMismatch(size, mass_matrix[dir].n_rows()));
+      Assert(n_rows_1d == -1 ||
+               (n_rows_1d > 0 && static_cast<unsigned int>(n_rows_1d) ==
+                                   mass_matrix[dir].n_rows()),
+             ExcDimensionMismatch(n_rows_1d, mass_matrix[dir].n_rows()));
       AssertDimension(mass_matrix[dir].n_rows(), mass_matrix[dir].n_cols());
       AssertDimension(mass_matrix[dir].n_rows(),
                       derivative_matrix[dir].n_rows());
@@ -828,7 +845,7 @@ TensorProductMatrixSymmetricSum<dim, VectorizedArray<Number>, size>::
       Number *      eigenvec_begin = eigenvectors_flat.data();
       Number *      eigenval_begin = eigenvalues_flat.data();
       for (unsigned int lane = 0; lane < macro_size; ++lane)
-        internal::TensorProductMatrix ::spectral_assembly<Number>(
+        internal::TensorProductMatrix::spectral_assembly<Number>(
           mass_cbegin + nm * lane,
           deriv_cbegin + nm * lane,
           n_rows,
@@ -853,22 +870,23 @@ TensorProductMatrixSymmetricSum<dim, VectorizedArray<Number>, size>::
 
 
 
-template <int dim, typename Number, int size>
+template <int dim, typename Number, int n_rows_1d>
 inline void
-TensorProductMatrixSymmetricSum<dim, VectorizedArray<Number>, size>::reinit(
-  const std::array<Table<2, VectorizedArray<Number>>, dim> &mass_matrix,
-  const std::array<Table<2, VectorizedArray<Number>>, dim> &derivative_matrix)
+TensorProductMatrixSymmetricSum<dim, VectorizedArray<Number>, n_rows_1d>::
+  reinit(
+    const std::array<Table<2, VectorizedArray<Number>>, dim> &mass_matrix,
+    const std::array<Table<2, VectorizedArray<Number>>, dim> &derivative_matrix)
 {
   reinit_impl(mass_matrix, derivative_matrix);
 }
 
 
 
-template <int dim, typename Number, int size>
+template <int dim, typename Number, int n_rows_1d>
 inline void
-TensorProductMatrixSymmetricSum<dim, VectorizedArray<Number>, size>::reinit(
-  const Table<2, VectorizedArray<Number>> &mass_matrix,
-  const Table<2, VectorizedArray<Number>> &derivative_matrix)
+TensorProductMatrixSymmetricSum<dim, VectorizedArray<Number>, n_rows_1d>::
+  reinit(const Table<2, VectorizedArray<Number>> &mass_matrix,
+         const Table<2, VectorizedArray<Number>> &derivative_matrix)
 {
   std::array<Table<2, VectorizedArray<Number>>, dim> mass_matrices;
   std::array<Table<2, VectorizedArray<Number>>, dim> derivative_matrices;

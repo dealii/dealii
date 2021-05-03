@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2019 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,9 +16,10 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/signaling_nan.h>
-#include <deal.II/base/thread_management.h>
 #include <deal.II/base/timer.h>
 #include <deal.II/base/utilities.h>
+
+#include <boost/io/ios_state.hpp>
 
 #include <algorithm>
 #include <chrono>
@@ -161,7 +162,7 @@ Timer::Timer()
 
 
 
-Timer::Timer(MPI_Comm mpi_communicator, const bool sync_lap_times_)
+Timer::Timer(const MPI_Comm &mpi_communicator, const bool sync_lap_times_)
   : running(false)
   , mpi_communicator(mpi_communicator)
   , sync_lap_times(sync_lap_times_)
@@ -260,22 +261,6 @@ Timer::last_cpu_time() const
 
 
 double
-Timer::get_lap_time() const
-{
-  return internal::TimerImplementation::to_seconds(wall_times.last_lap_time);
-}
-
-
-
-double
-Timer::operator()() const
-{
-  return cpu_time();
-}
-
-
-
-double
 Timer::wall_time() const
 {
   wall_clock_type::duration current_elapsed_wall_time;
@@ -337,7 +322,7 @@ TimerOutput::TimerOutput(ConditionalOStream &  stream,
 
 
 
-TimerOutput::TimerOutput(MPI_Comm              mpi_communicator,
+TimerOutput::TimerOutput(const MPI_Comm &      mpi_communicator,
                          std::ostream &        stream,
                          const OutputFrequency output_frequency,
                          const OutputType      output_type)
@@ -350,7 +335,7 @@ TimerOutput::TimerOutput(MPI_Comm              mpi_communicator,
 
 
 
-TimerOutput::TimerOutput(MPI_Comm              mpi_communicator,
+TimerOutput::TimerOutput(const MPI_Comm &      mpi_communicator,
                          ConditionalOStream &  stream,
                          const OutputFrequency output_frequency,
                          const OutputType      output_type)
@@ -383,20 +368,25 @@ TimerOutput::~TimerOutput()
   // avoid communicating with other processes if there is an uncaught
   // exception
 #ifdef DEAL_II_WITH_MPI
-  if (std::uncaught_exception() && mpi_communicator != MPI_COMM_SELF)
+#  if __cpp_lib_uncaught_exceptions >= 201411
+  // std::uncaught_exception() is deprecated in c++17
+  if (std::uncaught_exceptions() > 0 && mpi_communicator != MPI_COMM_SELF)
+#  else
+  if (std::uncaught_exception() == true && mpi_communicator != MPI_COMM_SELF)
+#  endif
     {
-      std::cerr << "---------------------------------------------------------"
-                << std::endl
-                << "TimerOutput objects finalize timed values printed to the"
-                << std::endl
-                << "screen by communicating over MPI in their destructors."
-                << std::endl
-                << "Since an exception is currently uncaught, this" << std::endl
-                << "synchronization (and subsequent output) will be skipped to"
-                << std::endl
-                << "avoid a possible deadlock." << std::endl
-                << "---------------------------------------------------------"
-                << std::endl;
+      const unsigned int myid =
+        Utilities::MPI::this_mpi_process(mpi_communicator);
+      if (myid == 0)
+        std::cerr
+          << "---------------------------------------------------------\n"
+          << "TimerOutput objects finalize timed values printed to the\n"
+          << "screen by communicating over MPI in their destructors.\n"
+          << "Since an exception is currently uncaught, this\n"
+          << "synchronization (and subsequent output) will be skipped\n"
+          << "to avoid a possible deadlock.\n"
+          << "---------------------------------------------------------"
+          << std::endl;
     }
   else
     {
@@ -444,7 +434,7 @@ TimerOutput::enter_subsection(const std::string &section_name)
 
   sections[section_name].timer.reset();
   sections[section_name].timer.start();
-  sections[section_name].n_calls++;
+  ++sections[section_name].n_calls;
 
   active_sections.push_back(section_name);
 }
@@ -545,10 +535,8 @@ void
 TimerOutput::print_summary() const
 {
   // we are going to change the precision and width of output below. store the
-  // old values so we can restore it later on
-  const std::istream::fmtflags old_flags = out_stream.get_stream().flags();
-  const std::streamsize old_precision    = out_stream.get_stream().precision();
-  const std::streamsize old_width        = out_stream.get_stream().width();
+  // old values so the get restored when exiting this function
+  const boost::io::ios_base_all_saver restore_stream(out_stream.get_stream());
 
   // get the maximum width among all sections
   unsigned int max_width = 0;
@@ -567,7 +555,7 @@ TimerOutput::print_summary() const
       if (output_type != wall_times)
         {
           double total_cpu_time =
-            Utilities::MPI::sum(timer_all(), mpi_communicator);
+            Utilities::MPI::sum(timer_all.cpu_time(), mpi_communicator);
 
           // check that the sum of all times is less or equal than the total
           // time. otherwise, we might have generated a lot of overhead in this
@@ -728,7 +716,7 @@ TimerOutput::print_summary() const
     {
       const double total_wall_time = timer_all.wall_time();
       double       total_cpu_time =
-        Utilities::MPI::sum(timer_all(), mpi_communicator);
+        Utilities::MPI::sum(timer_all.cpu_time(), mpi_communicator);
 
       // check that the sum of all times is less or equal than the total time.
       // otherwise, we might have generated a lot of overhead in this function.
@@ -848,11 +836,185 @@ TimerOutput::print_summary() const
           << "(Timer function may have introduced too much overhead, or different\n"
           << "section timers may have run at the same time.)" << std::endl;
     }
+}
 
-  // restore previous precision and width
-  out_stream.get_stream().precision(old_precision);
-  out_stream.get_stream().width(old_width);
-  out_stream.get_stream().flags(old_flags);
+
+
+void
+TimerOutput::print_wall_time_statistics(const MPI_Comm &mpi_comm,
+                                        const double    quantile) const
+{
+  // we are going to change the precision and width of output below. store the
+  // old values so the get restored when exiting this function
+  const boost::io::ios_base_all_saver restore_stream(out_stream.get_stream());
+
+  AssertDimension(sections.size(),
+                  Utilities::MPI::max(sections.size(), mpi_comm));
+  Assert(quantile >= 0. && quantile <= 0.5,
+         ExcMessage("The quantile must be between 0 and 0.5"));
+
+  // get the maximum width among all sections
+  unsigned int max_width = 0;
+  for (const auto &i : sections)
+    max_width =
+      std::max(max_width, static_cast<unsigned int>(i.first.length()));
+
+  // 17 is the default width until | character
+  max_width = std::max(max_width + 1, static_cast<unsigned int>(17));
+  const std::string extra_dash  = std::string(max_width - 17, '-');
+  const std::string extra_space = std::string(max_width - 17, ' ');
+
+  // function to print data in a nice table
+  const auto print_statistics = [&](const double given_time) {
+    const unsigned int n_ranks = Utilities::MPI::n_mpi_processes(mpi_comm);
+    if (n_ranks == 1 || quantile == 0.)
+      {
+        Utilities::MPI::MinMaxAvg data =
+          Utilities::MPI::min_max_avg(given_time, mpi_comm);
+
+        out_stream << std::setw(10) << std::setprecision(4) << std::right;
+        out_stream << data.min << "s ";
+        out_stream << std::setw(5) << std::right;
+        out_stream << data.min_index << (n_ranks > 99999 ? "" : " ") << "|";
+        out_stream << std::setw(10) << std::setprecision(4) << std::right;
+        out_stream << data.avg << "s |";
+        out_stream << std::setw(10) << std::setprecision(4) << std::right;
+        out_stream << data.max << "s ";
+        out_stream << std::setw(5) << std::right;
+        out_stream << data.max_index << (n_ranks > 99999 ? "" : " ") << "|\n";
+      }
+    else
+      {
+        const unsigned int my_rank = Utilities::MPI::this_mpi_process(mpi_comm);
+        std::vector<double> receive_data(my_rank == 0 ? n_ranks : 0);
+        std::vector<double> result(9);
+#ifdef DEAL_II_WITH_MPI
+        int ierr = MPI_Gather(&given_time,
+                              1,
+                              MPI_DOUBLE,
+                              receive_data.data(),
+                              1,
+                              MPI_DOUBLE,
+                              0,
+                              mpi_comm);
+        AssertThrowMPI(ierr);
+        if (my_rank == 0)
+          {
+            // fill the received data in a pair and sort; on the way, also
+            // compute the average
+            std::vector<std::pair<double, unsigned int>> data_rank;
+            data_rank.reserve(n_ranks);
+            for (unsigned int i = 0; i < n_ranks; ++i)
+              {
+                data_rank.emplace_back(receive_data[i], i);
+                result[4] += receive_data[i];
+              }
+            result[4] /= n_ranks;
+            std::sort(data_rank.begin(), data_rank.end());
+
+            const unsigned int quantile_index =
+              static_cast<unsigned int>(std::round(quantile * n_ranks));
+            AssertIndexRange(quantile_index, data_rank.size());
+            result[0] = data_rank[0].first;
+            result[1] = data_rank[0].second;
+            result[2] = data_rank[quantile_index].first;
+            result[3] = data_rank[quantile_index].second;
+            result[5] = data_rank[n_ranks - 1 - quantile_index].first;
+            result[6] = data_rank[n_ranks - 1 - quantile_index].second;
+            result[7] = data_rank[n_ranks - 1].first;
+            result[8] = data_rank[n_ranks - 1].second;
+          }
+        ierr = MPI_Bcast(result.data(), 9, MPI_DOUBLE, 0, mpi_comm);
+        AssertThrowMPI(ierr);
+#endif
+        out_stream << std::setw(10) << std::setprecision(4) << std::right;
+        out_stream << result[0] << "s ";
+        out_stream << std::setw(5) << std::right;
+        out_stream << static_cast<unsigned int>(result[1])
+                   << (n_ranks > 99999 ? "" : " ") << "|";
+        out_stream << std::setw(10) << std::setprecision(4) << std::right;
+        out_stream << result[2] << "s ";
+        out_stream << std::setw(5) << std::right;
+        out_stream << static_cast<unsigned int>(result[3])
+                   << (n_ranks > 99999 ? "" : " ") << "|";
+        out_stream << std::setw(10) << std::setprecision(4) << std::right;
+        out_stream << result[4] << "s |";
+        out_stream << std::setw(10) << std::setprecision(4) << std::right;
+        out_stream << result[5] << "s ";
+        out_stream << std::setw(5) << std::right;
+        out_stream << static_cast<unsigned int>(result[6])
+                   << (n_ranks > 99999 ? "" : " ") << "|";
+        out_stream << std::setw(10) << std::setprecision(4) << std::right;
+        out_stream << result[7] << "s ";
+        out_stream << std::setw(5) << std::right;
+        out_stream << static_cast<unsigned int>(result[8])
+                   << (n_ranks > 99999 ? "" : " ") << "|\n";
+      }
+  };
+
+  // in case we want to write out wallclock times
+  {
+    const unsigned int n_ranks = Utilities::MPI::n_mpi_processes(mpi_comm);
+
+    const std::string time_rank_column = "------------------+";
+    const std::string time_rank_space  = "                  |";
+
+    // now generate a nice table
+    out_stream << "\n"
+               << "+------------------------------" << extra_dash << "+"
+               << time_rank_column
+               << (n_ranks > 1 && quantile > 0. ? time_rank_column : "")
+               << "------------+"
+               << (n_ranks > 1 && quantile > 0. ? time_rank_column : "")
+               << time_rank_column << "\n"
+               << "| Total wallclock time elapsed " << extra_space << "|";
+
+    print_statistics(timer_all.wall_time());
+
+    out_stream << "|                              " << extra_space << "|"
+               << time_rank_space
+               << (n_ranks > 1 && quantile > 0. ? time_rank_space : "")
+               << "             "
+               << (n_ranks > 1 && quantile > 0. ? time_rank_space : "")
+               << time_rank_space << "\n";
+    out_stream << "| Section          " << extra_space << "| no. calls "
+               << "|   min time  rank |";
+    if (n_ranks > 1 && quantile > 0.)
+      out_stream << " " << std::setw(5) << std::setprecision(2) << std::right
+                 << quantile << "-tile  rank |";
+    out_stream << "   avg time |";
+    if (n_ranks > 1 && quantile > 0.)
+      out_stream << " " << std::setw(5) << std::setprecision(2) << std::right
+                 << 1. - quantile << "-tile  rank |";
+    out_stream << "   max time  rank |\n";
+    out_stream << "+------------------------------" << extra_dash << "+"
+               << time_rank_column
+               << (n_ranks > 1 && quantile > 0. ? time_rank_column : "")
+               << "------------+"
+               << (n_ranks > 1 && quantile > 0. ? time_rank_column : "")
+               << time_rank_column << "\n";
+    for (const auto &i : sections)
+      {
+        std::string name_out = i.first;
+
+        // resize the array so that it is always of the same size
+        unsigned int pos_non_space = name_out.find_first_not_of(' ');
+        name_out.erase(0, pos_non_space);
+        name_out.resize(max_width, ' ');
+        out_stream << "| " << name_out;
+        out_stream << "| ";
+        out_stream << std::setw(9);
+        out_stream << i.second.n_calls << " |";
+
+        print_statistics(i.second.total_wall_time);
+      }
+    out_stream << "+------------------------------" << extra_dash << "+"
+               << time_rank_column
+               << (n_ranks > 1 && quantile > 0. ? time_rank_column : "")
+               << "------------+"
+               << (n_ranks > 1 && quantile > 0. ? time_rank_column : "")
+               << time_rank_column << "\n";
+  }
 }
 
 

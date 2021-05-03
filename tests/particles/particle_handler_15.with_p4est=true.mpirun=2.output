@@ -1,0 +1,26 @@
+
+DEAL:0:2d/2d::From cpu: 0 I got : {0, 2}
+DEAL:0:2d/2d::From cpu: 1 I got : {[1,2]}
+DEAL:0:2d/2d::To cpu : 1 I sent : {1}
+DEAL:0:2d/2d::From cpu: 1 I got : {0, 2}
+DEAL:0:2d/2d::To cpu : 1 I sent : {[0,2]}
+DEAL:0:2d/2d::Particle : 4, properties: 1001 - 104
+DEAL:0:2d/2d::Particle : 5, properties: 1001 - 105
+DEAL:0:2d/2d::Particle : 9, properties: 1001 - 203
+DEAL:0:2d/2d::Particle : 2, properties: 1000 - 102
+DEAL:0:2d/2d::Particle : 0, properties: 1000 - 100
+DEAL:0:2d/2d::Particle : 11, properties: 1001 - 205
+
+DEAL:1:2d/2d::From cpu: 0 I got : {1}
+DEAL:1:2d/2d::From cpu: 1 I got : {0}
+DEAL:1:2d/2d::To cpu : 0 I sent : {[1,2]}
+DEAL:1:2d/2d::From cpu: 0 I got : {[0,2]}
+DEAL:1:2d/2d::From cpu: 1 I got : {1}
+DEAL:1:2d/2d::To cpu : 0 I sent : {0, 2}
+DEAL:1:2d/2d::Particle : 7, properties: 1000 - 201
+DEAL:1:2d/2d::Particle : 8, properties: 1000 - 202
+DEAL:1:2d/2d::Particle : 6, properties: 1000 - 200
+DEAL:1:2d/2d::Particle : 10, properties: 1001 - 204
+DEAL:1:2d/2d::Particle : 3, properties: 1001 - 103
+DEAL:1:2d/2d::Particle : 1, properties: 1000 - 101
+

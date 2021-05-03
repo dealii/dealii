@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -54,7 +54,6 @@ namespace DoFToolsEx
  * one Vector be enough?
  *
  * @param
- *
  */
 template <int dim, class InVector, class OutVector>
 void
@@ -74,7 +73,7 @@ DoFToolsEx::transfer(const DoFHandler<dim> &source_dof,
   InVector local_dofs(source_dof.get_fe().dofs_per_cell);
 
   // iterate over all active source cells
-  typedef typename DoFHandler<dim>::active_cell_iterator cell_iterator;
+  using cell_iterator = typename DoFHandler<dim>::active_cell_iterator;
   cell_iterator cell = source_dof.begin_active(), endc = source_dof.end();
   for (; cell != endc; ++cell)
     {
@@ -116,8 +115,7 @@ public:
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
 
   // build test-case trias
@@ -182,25 +180,25 @@ main()
   data_out.attach_dof_handler(dof);
   data_out.add_data_vector(sol, "base");
   data_out.build_patches();
-  data_out.write_gnuplot(logfile);
+  data_out.write_gnuplot(deallog.get_file_stream());
 
   data_out.clear();
   data_out.attach_dof_handler(refined_dof);
   data_out.add_data_vector(refined_sol, "refined");
   data_out.build_patches();
-  data_out.write_gnuplot(logfile);
+  data_out.write_gnuplot(deallog.get_file_stream());
 
   data_out.clear();
   data_out.attach_dof_handler(coarse_dof);
   data_out.add_data_vector(coarse_sol, "coarse");
   data_out.build_patches();
-  data_out.write_gnuplot(logfile);
+  data_out.write_gnuplot(deallog.get_file_stream());
 
   data_out.clear();
   data_out.attach_dof_handler(both_dof);
   data_out.add_data_vector(both_sol, "both");
   data_out.build_patches();
-  data_out.write_gnuplot(logfile);
+  data_out.write_gnuplot(deallog.get_file_stream());
 
   // test output using DataOutStack
   DataOutStack<2> data_out_stack;
@@ -210,5 +208,5 @@ main()
   data_out_stack.add_data_vector(sol, "dof");
   data_out_stack.build_patches();
   data_out_stack.finish_parameter_value();
-  data_out_stack.write_gnuplot(logfile);
+  data_out_stack.write_gnuplot(deallog.get_file_stream());
 }

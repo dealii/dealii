@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -49,7 +49,6 @@
 #include "../tests.h"
 
 
-using namespace dealii;
 
 template <int dim>
 class Step4
@@ -200,14 +199,12 @@ Step4<dim>::setup_system()
 
   DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
 
-
   DynamicSparsityPattern dsp(dof_handler.n_dofs());
   DoFTools::make_sparsity_pattern(dof_handler, dsp, constraints, false);
-  SparsityTools::distribute_sparsity_pattern(
-    dsp,
-    dof_handler.n_locally_owned_dofs_per_processor(),
-    MPI_COMM_WORLD,
-    locally_relevant_dofs);
+  SparsityTools::distribute_sparsity_pattern(dsp,
+                                             locally_owned_dofs,
+                                             MPI_COMM_WORLD,
+                                             locally_relevant_dofs);
 
   system_matrix.reinit(locally_owned_dofs,
                        locally_owned_dofs,
@@ -288,7 +285,7 @@ template <int dim>
 void
 Step4<dim>::solve()
 {
-  typedef TrilinosWrappers::MPI::Vector VectorType;
+  using VectorType = TrilinosWrappers::MPI::Vector;
 
   // Compute 'reference' solution with direct solver
   VectorType temp_solution(system_rhs);

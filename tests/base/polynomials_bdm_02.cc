@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2018 by the deal.II authors
+// Copyright (C) 2010 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -32,7 +32,7 @@ void
 plot(const PolynomialsBDM<dim> &poly)
 {
   const PolynomialSpace<dim> legendre_poly_space =
-    Polynomials::Legendre::generate_complete_basis(poly.degree());
+    Polynomials::Legendre::generate_complete_basis(poly.degree() - 1);
 
   const Point<3> p0(0, 0, 0);
   const Point<3> p1(0.25, 0.5, 0.75);
@@ -57,16 +57,16 @@ plot(const PolynomialsBDM<dim> &poly)
 
   for (unsigned int k = 0; k < points.size(); ++k)
     {
-      if (k % (poly.degree() + 4) == 0)
-        deallog << "BDM" << poly.degree() << '<' << dim << '>' << std::endl;
+      if (k % (poly.degree() + 3) == 0)
+        deallog << "BDM" << poly.degree() - 1 << '<' << dim << '>' << std::endl;
 
       unsigned int start = dim * n_sub;
 
-      deallog << "BDM" << poly.degree() << '<' << dim << '>' << points[k]
+      deallog << "BDM" << poly.degree() - 1 << '<' << dim << '>' << points[k]
               << std::endl;
-      poly.compute(points[k], values, grads, grads2, thirds, fourths);
+      poly.evaluate(points[k], values, grads, grads2, thirds, fourths);
 
-      for (unsigned int i = 0; i < poly.degree() + 1; ++i, start += dim)
+      for (unsigned int i = 0; i < poly.degree(); ++i, start += dim)
         for (unsigned int j = 0; j < dim; ++j)
           {
             for (unsigned int d1 = 0; d1 < dim; ++d1)

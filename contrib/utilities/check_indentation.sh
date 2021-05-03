@@ -1,7 +1,7 @@
 #!/bin/sh
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2014 - 2018 by the deal.II authors
+## Copyright (C) 2014 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -17,23 +17,28 @@
 #
 # This is a script that is used by the continuous integration servers
 # to make sure that the currently checked out version of a git repository
-# satisfies our indentation standards.
+# satisfies our "indentation" standards. This does no longer only cover
+# indentation, but other automated checks as well.
 #
-# It does so by running the 'indent' script (located in the current
-# directory), calling 'git diff' to show what differences exist between
-# the correctly indented code and what is in the git index (which is
-# typically what is in the last commit), and then running a command
-# that either returns success or failure, depending on whether or not
-# there are differences. The continuous integration services return
-# a failure code for a pull request if this script returns a failure.
+# WARNING: The continuous integration services return a failure code for a
+# pull request if this script returns a failure, so the return value of this
+# script is important.
 #
 
-if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then 
-	echo "Running indentation test on master merge."
-else 
-	echo "Running indentation test on Pull Request #${TRAVIS_PULL_REQUEST}"
-fi
+# Run indent-all and fail if script fails:
+./contrib/utilities/indent-all || exit $?
 
-./contrib/utilities/indent-all
+# Show the diff in the output:
 git diff
-git diff-files --quiet 
+
+# Make this script fail if any changes were applied by indent above:
+git diff-files --quiet || exit $?
+
+# Run various checks involving doxygen documentation:
+./contrib/utilities/check_doxygen.sh || exit $?
+
+# Check for utf8 encoding:
+./contrib/utilities/check_encoding.py || exit $?
+
+# Success!
+exit 0

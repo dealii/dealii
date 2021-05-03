@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,10 +19,6 @@
 // matrix-vector products by comparing with the result of deal.II sparse
 // matrix. No hanging nodes and no other
 // constraints for a vector-valued problem (stokes equations).
-
-#include "../tests.h"
-
-std::ofstream logfile("output");
 
 #include <deal.II/base/utilities.h>
 
@@ -52,6 +48,8 @@ std::ofstream logfile("output");
 #include <complex>
 #include <iostream>
 
+#include "../tests.h"
+
 #include "create_mesh.h"
 
 
@@ -60,8 +58,8 @@ template <int dim, int degree_p, typename VectorType>
 class MatrixFreeTest
 {
 public:
-  typedef typename DoFHandler<dim>::active_cell_iterator CellIterator;
-  typedef double                                         Number;
+  using CellIterator = typename DoFHandler<dim>::active_cell_iterator;
+  using Number       = double;
 
   MatrixFreeTest(const MatrixFree<dim, Number> &data_in)
     : data(data_in){};
@@ -72,7 +70,7 @@ public:
               const VectorType &                           src,
               const std::pair<unsigned int, unsigned int> &cell_range) const
   {
-    typedef VectorizedArray<Number>                            vector_t;
+    using vector_t = VectorizedArray<Number>;
     FEEvaluation<dim, degree_p + 1, degree_p + 2, dim, Number> velocity(data,
                                                                         0);
     FEEvaluation<dim, degree_p, degree_p + 2, 1, Number> pressure(data, 1);
@@ -81,10 +79,10 @@ public:
       {
         velocity.reinit(cell);
         velocity.read_dof_values(src, 0);
-        velocity.evaluate(false, true, false);
+        velocity.evaluate(EvaluationFlags::gradients);
         pressure.reinit(cell);
         pressure.read_dof_values(src, dim);
-        pressure.evaluate(true, false, false);
+        pressure.evaluate(EvaluationFlags::values);
 
         for (unsigned int q = 0; q < velocity.n_q_points; ++q)
           {
@@ -101,9 +99,9 @@ public:
             velocity.submit_symmetric_gradient(sym_grad_u, q);
           }
 
-        velocity.integrate(false, true);
+        velocity.integrate(EvaluationFlags::gradients);
         velocity.distribute_local_to_global(dst, 0);
-        pressure.integrate(true, false);
+        pressure.integrate(EvaluationFlags::values);
         pressure.distribute_local_to_global(dst, dim);
       }
   }
@@ -163,8 +161,8 @@ test()
 
   constraints.close();
 
-  std::vector<types::global_dof_index> dofs_per_block(dim + 1);
-  DoFTools::count_dofs_per_component(dof_handler, dofs_per_block);
+  const std::vector<types::global_dof_index> dofs_per_block =
+    DoFTools::count_dofs_per_fe_component(dof_handler);
 
   // std::cout << "   Number of active cells: "
   //          << triangulation.n_active_cells()
@@ -299,7 +297,7 @@ test()
 
   system_matrix.vmult(solution, system_rhs);
 
-  typedef std::vector<Vector<double>>        VectorType;
+  using VectorType = std::vector<Vector<double>>;
   MatrixFreeTest<dim, fe_degree, VectorType> mf(mf_data);
   mf.vmult(vec2, vec1);
 
@@ -319,8 +317,7 @@ test()
 int
 main()
 {
-  deallog.attach(logfile);
-
+  initlog();
   deallog << std::setprecision(3);
 
   {

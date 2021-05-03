@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -74,6 +74,7 @@ namespace Differentiation
     /* ---------------- Symbol map creation and manipulation --------------*/
 
 
+#  ifndef DOXYGEN
     namespace internal
     {
       bool
@@ -161,6 +162,7 @@ namespace Differentiation
       for (const auto &entry : symbol_values)
         set_value_in_symbol_map(substitution_map, entry.first, entry.second);
     }
+#  endif
 
 
     /* ------------------ Symbol substitution map creation ----------------*/
@@ -175,6 +177,7 @@ namespace Differentiation
     }
 
 
+#  ifndef DOXYGEN
     /* ---------------- Symbolic substitution map enlargement --------------*/
 
 
@@ -239,7 +242,7 @@ namespace Differentiation
                 }
 
               // Compute and store the hash of the new object
-              hash_old = std::move(hash_new);
+              hash_old = hash_new;
               hash_new = out.get_RCP()->hash();
               AssertThrow(
                 iter < size,
@@ -260,6 +263,7 @@ namespace Differentiation
     {
       return expression.substitute(substitution_map);
     }
+#  endif // DOXYGEN
 
   } // namespace SD
 } // namespace Differentiation

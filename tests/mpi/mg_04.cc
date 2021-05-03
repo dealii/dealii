@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -89,7 +89,7 @@ test()
 
   static const FE_Q<dim> fe(1);
   dofh.distribute_dofs(fe);
-  dofh.distribute_mg_dofs(fe);
+  dofh.distribute_mg_dofs();
 
   {
     for (unsigned int lvl = 0; lvl < tr.n_levels(); ++lvl)

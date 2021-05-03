@@ -1,0 +1,43 @@
+DEAL::-----------------------------------
+DEAL::1d, p=1, max_p=2, n_modes=3
+DEAL::-----------------------------------
+DEAL::Linf norm in exact and calculate Fourier coefficients:
+DEAL::2.80948e-05
+DEAL::estimated regularity:
+DEAL::1.00043
+DEAL::-----------------------------------
+DEAL::2d, p=1, max_p=2, n_modes=3
+DEAL::-----------------------------------
+DEAL::Linf norm in exact and calculate Fourier coefficients:
+DEAL::1.40474e-05
+DEAL::estimated regularity:
+DEAL::1.11550
+DEAL::-----------------------------------
+DEAL::3d, p=1, max_p=2, n_modes=3
+DEAL::-----------------------------------
+DEAL::Linf norm in exact and calculate Fourier coefficients:
+DEAL::7.02369e-06
+DEAL::estimated regularity:
+DEAL::0.905620
+DEAL::-----------------------------------
+DEAL::1d, p=2, max_p=2, n_modes=4
+DEAL::-----------------------------------
+DEAL::Linf norm in exact and calculate Fourier coefficients:
+DEAL::1.59345e-05
+DEAL::estimated regularity:
+DEAL::1.04044
+DEAL::-----------------------------------
+DEAL::2d, p=2, max_p=2, n_modes=4
+DEAL::-----------------------------------
+DEAL::Linf norm in exact and calculate Fourier coefficients:
+DEAL::5.31151e-06
+DEAL::estimated regularity:
+DEAL::0.712977
+DEAL::-----------------------------------
+DEAL::3d, p=2, max_p=2, n_modes=4
+DEAL::-----------------------------------
+DEAL::Linf norm in exact and calculate Fourier coefficients:
+DEAL::1.77050e-06
+DEAL::estimated regularity:
+DEAL::0.706966
+DEAL::Ok

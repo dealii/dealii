@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -116,21 +116,17 @@ test()
 
     create_regular_particle_distribution(particle_handler, tr);
 
-    for (auto particle = particle_handler.begin();
-         particle != particle_handler.end();
-         ++particle)
-      deallog << "Before refinement particle id " << particle->get_id()
-              << " is in cell " << particle->get_surrounding_cell(tr)
+    for (const auto &particle : particle_handler)
+      deallog << "Before refinement particle id " << particle.get_id()
+              << " is in cell " << particle.get_surrounding_cell(tr)
               << std::endl;
 
     // Check that all particles are moved to children
     tr.refine_global(1);
 
-    for (auto particle = particle_handler.begin();
-         particle != particle_handler.end();
-         ++particle)
-      deallog << "After refinement particle id " << particle->get_id()
-              << " is in cell " << particle->get_surrounding_cell(tr)
+    for (const auto &particle : particle_handler)
+      deallog << "After refinement particle id " << particle.get_id()
+              << " is in cell " << particle.get_surrounding_cell(tr)
               << std::endl;
 
     // Reverse the refinement and check again
@@ -139,11 +135,9 @@ test()
 
     tr.execute_coarsening_and_refinement();
 
-    for (auto particle = particle_handler.begin();
-         particle != particle_handler.end();
-         ++particle)
-      deallog << "After coarsening particle id " << particle->get_id()
-              << " is in cell " << particle->get_surrounding_cell(tr)
+    for (const auto &particle : particle_handler)
+      deallog << "After coarsening particle id " << particle.get_id()
+              << " is in cell " << particle.get_surrounding_cell(tr)
               << std::endl;
   }
 

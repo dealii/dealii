@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2018 by the deal.II authors
+// Copyright (C) 2012 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -57,8 +57,19 @@ check()
           deallog << std::endl;
         }
 
-      deallog << "Add and dot should be " << prod / static_cast<number>(size)
-              << ", is " << prod_check / static_cast<number>(size) << std::endl;
+      deallog << "Add and dot is ";
+      // check tolerance with respect to the expected size of result which is
+      // ~ size^2 including the roundoff error ~ sqrt(size) we expect
+      const number tolerance = 4. * std::numeric_limits<number>::epsilon() *
+                               std::sqrt(static_cast<number>(size)) * size *
+                               size;
+      if (std::abs(prod - prod_check) < tolerance)
+        deallog << "correct" << std::endl;
+      else
+        deallog << "wrong by " << std::abs(prod - prod_check)
+                << " with tolerance " << tolerance << "; should be "
+                << prod / static_cast<number>(size) << ", is "
+                << prod_check / static_cast<number>(size) << std::endl;
     }
 }
 

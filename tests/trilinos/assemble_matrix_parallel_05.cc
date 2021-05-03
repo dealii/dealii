@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -59,7 +59,6 @@
 
 std::ofstream logfile("output");
 
-using namespace dealii;
 
 
 namespace Assembly
@@ -266,8 +265,8 @@ LaplaceProblem<dim>::setup_system()
                                            constraints);
   constraints.close();
 
-  typedef FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>
-             CellFilter;
+  using CellFilter =
+    FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>;
   CellFilter begin(IteratorFilters::LocallyOwnedCell(),
                    dof_handler.begin_active());
   CellFilter end(IteratorFilters::LocallyOwnedCell(), dof_handler.end());

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2018 by the deal.II authors
+// Copyright (C) 2011 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -60,7 +60,8 @@ main(int argc, char **argv)
                  0,
                  Utilities::Trilinos::comm_world());
   TrilinosWrappers::SparseMatrix tmatrix;
-  tmatrix.reinit(map, map, matrix);
+  const auto                     local_rows = complete_index_set(5);
+  tmatrix.reinit(local_rows, local_rows, matrix, MPI_COMM_SELF);
 
   // now copy things back into a SparseMatrix
   SparseMatrix<double> copy(sparsity);

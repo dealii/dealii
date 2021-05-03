@@ -45,6 +45,13 @@ ENDMACRO()
 MACRO(FEATURE_MPI_CONFIGURE_EXTERNAL)
 
   #
+  # We must convert the MPIEXEC_(PRE|POST)FLAGS strings to lists in order
+  # to use them in command lines:
+  #
+  SEPARATE_ARGUMENTS(MPIEXEC_PREFLAGS)
+  SEPARATE_ARGUMENTS(MPIEXEC_POSTFLAGS)
+
+  #
   # TODO: We might consider refactoring this option into an automatic check
   # (in Modules/FindMPI.cmake) at some point. For the time being this is an
   # advanced configuration option.

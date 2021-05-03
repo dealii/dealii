@@ -26,6 +26,8 @@
 
 #include <deal.II/numerics/rtree.h>
 
+#include <boost/geometry/algorithms/buffer.hpp>
+
 #include "../tests.h"
 
 namespace bgi = boost::geometry::index;

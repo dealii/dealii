@@ -1,0 +1,16 @@
+
+DEAL:1d::Direction 0 = -1.00000
+DEAL:1d::Direction 1 = 1.00000
+DEAL:1d::OK
+DEAL:2d::Direction 0 = -1.00000 0.00000
+DEAL:2d::Direction 1 = 1.00000 0.00000
+DEAL:2d::Direction 2 = 0.00000 -1.00000
+DEAL:2d::Direction 3 = 0.00000 1.00000
+DEAL:2d::OK
+DEAL:3d::Direction 0 = -1.00000 0.00000 0.00000
+DEAL:3d::Direction 1 = 1.00000 0.00000 0.00000
+DEAL:3d::Direction 2 = 0.00000 -1.00000 0.00000
+DEAL:3d::Direction 3 = 0.00000 1.00000 0.00000
+DEAL:3d::Direction 4 = 0.00000 0.00000 -1.00000
+DEAL:3d::Direction 5 = 0.00000 0.00000 1.00000
+DEAL:3d::OK

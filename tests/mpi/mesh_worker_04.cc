@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,14 +30,12 @@
 #include "../tests.h"
 
 
-using namespace dealii;
-
 
 template <int dim>
 class myIntegrator : public dealii::MeshWorker::LocalIntegrator<dim>
 {
 public:
-  typedef MeshWorker::IntegrationInfo<dim> CellInfo;
+  using CellInfo = MeshWorker::IntegrationInfo<dim>;
 
   void
   cell(MeshWorker::DoFInfo<dim> &dinfo, CellInfo &info) const;

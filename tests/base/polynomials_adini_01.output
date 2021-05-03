@@ -1,0 +1,401 @@
+
+DEAL::Adini<2> point 0 (0.00, 0.00)
+DEAL::Adini<2> shape fxn 0: 	1.00
+DEAL::Adini<2> shape grad 0: 	0.00	0.00
+DEAL::Adini<2> shape fxn 1: 	0.00
+DEAL::Adini<2> shape grad 1: 	1.00	0.00
+DEAL::Adini<2> shape fxn 2: 	0.00
+DEAL::Adini<2> shape grad 2: 	0.00	1.00
+DEAL::Adini<2> shape fxn 3: 	0.00
+DEAL::Adini<2> shape grad 3: 	0.00	0.00
+DEAL::Adini<2> shape fxn 4: 	0.00
+DEAL::Adini<2> shape grad 4: 	0.00	0.00
+DEAL::Adini<2> shape fxn 5: 	0.00
+DEAL::Adini<2> shape grad 5: 	0.00	0.00
+DEAL::Adini<2> shape fxn 6: 	0.00
+DEAL::Adini<2> shape grad 6: 	0.00	0.00
+DEAL::Adini<2> shape fxn 7: 	0.00
+DEAL::Adini<2> shape grad 7: 	0.00	0.00
+DEAL::Adini<2> shape fxn 8: 	0.00
+DEAL::Adini<2> shape grad 8: 	0.00	0.00
+DEAL::Adini<2> shape fxn 9: 	0.00
+DEAL::Adini<2> shape grad 9: 	0.00	0.00
+DEAL::Adini<2> shape fxn 10: 	0.00
+DEAL::Adini<2> shape grad 10: 	0.00	0.00
+DEAL::Adini<2> shape fxn 11: 	0.00
+DEAL::Adini<2> shape grad 11: 	0.00	0.00
+DEAL::Adini<2> point 1 (0.333, 0.00)
+DEAL::Adini<2> shape fxn 0: 	0.741
+DEAL::Adini<2> shape grad 0: 	-1.33	-0.0741
+DEAL::Adini<2> shape fxn 1: 	0.148
+DEAL::Adini<2> shape grad 1: 	5.55e-17	-0.148
+DEAL::Adini<2> shape fxn 2: 	0.00
+DEAL::Adini<2> shape grad 2: 	0.00	0.667
+DEAL::Adini<2> shape fxn 3: 	0.259
+DEAL::Adini<2> shape grad 3: 	1.33	0.0741
+DEAL::Adini<2> shape fxn 4: 	-0.0741
+DEAL::Adini<2> shape grad 4: 	-0.333	0.0741
+DEAL::Adini<2> shape fxn 5: 	0.00
+DEAL::Adini<2> shape grad 5: 	0.00	0.333
+DEAL::Adini<2> shape fxn 6: 	0.00
+DEAL::Adini<2> shape grad 6: 	0.00	0.0741
+DEAL::Adini<2> shape fxn 7: 	0.00
+DEAL::Adini<2> shape grad 7: 	0.00	0.148
+DEAL::Adini<2> shape fxn 8: 	0.00
+DEAL::Adini<2> shape grad 8: 	0.00	0.00
+DEAL::Adini<2> shape fxn 9: 	0.00
+DEAL::Adini<2> shape grad 9: 	0.00	-0.0741
+DEAL::Adini<2> shape fxn 10: 	0.00
+DEAL::Adini<2> shape grad 10: 	0.00	-0.0741
+DEAL::Adini<2> shape fxn 11: 	0.00
+DEAL::Adini<2> shape grad 11: 	0.00	0.00
+DEAL::Adini<2> point 2 (0.667, 0.00)
+DEAL::Adini<2> shape fxn 0: 	0.259
+DEAL::Adini<2> shape grad 0: 	-1.33	0.0741
+DEAL::Adini<2> shape fxn 1: 	0.0741
+DEAL::Adini<2> shape grad 1: 	-0.333	-0.0741
+DEAL::Adini<2> shape fxn 2: 	0.00
+DEAL::Adini<2> shape grad 2: 	0.00	0.333
+DEAL::Adini<2> shape fxn 3: 	0.741
+DEAL::Adini<2> shape grad 3: 	1.33	-0.0741
+DEAL::Adini<2> shape fxn 4: 	-0.148
+DEAL::Adini<2> shape grad 4: 	0.00	0.148
+DEAL::Adini<2> shape fxn 5: 	0.00
+DEAL::Adini<2> shape grad 5: 	0.00	0.667
+DEAL::Adini<2> shape fxn 6: 	0.00
+DEAL::Adini<2> shape grad 6: 	0.00	-0.0741
+DEAL::Adini<2> shape fxn 7: 	0.00
+DEAL::Adini<2> shape grad 7: 	0.00	0.0741
+DEAL::Adini<2> shape fxn 8: 	0.00
+DEAL::Adini<2> shape grad 8: 	0.00	0.00
+DEAL::Adini<2> shape fxn 9: 	0.00
+DEAL::Adini<2> shape grad 9: 	0.00	0.0741
+DEAL::Adini<2> shape fxn 10: 	0.00
+DEAL::Adini<2> shape grad 10: 	0.00	-0.148
+DEAL::Adini<2> shape fxn 11: 	0.00
+DEAL::Adini<2> shape grad 11: 	0.00	0.00
+DEAL::Adini<2> point 3 (1.00, 0.00)
+DEAL::Adini<2> shape fxn 0: 	0.00
+DEAL::Adini<2> shape grad 0: 	0.00	0.00
+DEAL::Adini<2> shape fxn 1: 	0.00
+DEAL::Adini<2> shape grad 1: 	0.00	0.00
+DEAL::Adini<2> shape fxn 2: 	0.00
+DEAL::Adini<2> shape grad 2: 	0.00	0.00
+DEAL::Adini<2> shape fxn 3: 	1.00
+DEAL::Adini<2> shape grad 3: 	0.00	0.00
+DEAL::Adini<2> shape fxn 4: 	0.00
+DEAL::Adini<2> shape grad 4: 	1.00	0.00
+DEAL::Adini<2> shape fxn 5: 	0.00
+DEAL::Adini<2> shape grad 5: 	0.00	1.00
+DEAL::Adini<2> shape fxn 6: 	0.00
+DEAL::Adini<2> shape grad 6: 	0.00	0.00
+DEAL::Adini<2> shape fxn 7: 	0.00
+DEAL::Adini<2> shape grad 7: 	0.00	0.00
+DEAL::Adini<2> shape fxn 8: 	0.00
+DEAL::Adini<2> shape grad 8: 	0.00	0.00
+DEAL::Adini<2> shape fxn 9: 	0.00
+DEAL::Adini<2> shape grad 9: 	0.00	0.00
+DEAL::Adini<2> shape fxn 10: 	0.00
+DEAL::Adini<2> shape grad 10: 	0.00	0.00
+DEAL::Adini<2> shape fxn 11: 	0.00
+DEAL::Adini<2> shape grad 11: 	0.00	0.00
+DEAL::Adini<2> point 4 (0.00, 0.333)
+DEAL::Adini<2> shape fxn 0: 	0.741
+DEAL::Adini<2> shape grad 0: 	-0.0741	-1.33
+DEAL::Adini<2> shape fxn 1: 	0.00
+DEAL::Adini<2> shape grad 1: 	0.667	0.00
+DEAL::Adini<2> shape fxn 2: 	0.148
+DEAL::Adini<2> shape grad 2: 	-0.148	5.55e-17
+DEAL::Adini<2> shape fxn 3: 	0.00
+DEAL::Adini<2> shape grad 3: 	0.0741	0.00
+DEAL::Adini<2> shape fxn 4: 	0.00
+DEAL::Adini<2> shape grad 4: 	0.00	0.00
+DEAL::Adini<2> shape fxn 5: 	0.00
+DEAL::Adini<2> shape grad 5: 	0.148	0.00
+DEAL::Adini<2> shape fxn 6: 	0.259
+DEAL::Adini<2> shape grad 6: 	0.0741	1.33
+DEAL::Adini<2> shape fxn 7: 	0.00
+DEAL::Adini<2> shape grad 7: 	0.333	0.00
+DEAL::Adini<2> shape fxn 8: 	-0.0741
+DEAL::Adini<2> shape grad 8: 	0.0741	-0.333
+DEAL::Adini<2> shape fxn 9: 	0.00
+DEAL::Adini<2> shape grad 9: 	-0.0741	0.00
+DEAL::Adini<2> shape fxn 10: 	0.00
+DEAL::Adini<2> shape grad 10: 	0.00	0.00
+DEAL::Adini<2> shape fxn 11: 	0.00
+DEAL::Adini<2> shape grad 11: 	-0.0741	0.00
+DEAL::Adini<2> point 5 (0.333, 0.333)
+DEAL::Adini<2> shape fxn 0: 	0.543
+DEAL::Adini<2> shape grad 0: 	-0.963	-0.963
+DEAL::Adini<2> shape fxn 1: 	0.0988
+DEAL::Adini<2> shape grad 1: 	1.11e-16	-0.148
+DEAL::Adini<2> shape fxn 2: 	0.0988
+DEAL::Adini<2> shape grad 2: 	-0.148	1.11e-16
+DEAL::Adini<2> shape fxn 3: 	0.198
+DEAL::Adini<2> shape grad 3: 	0.963	-0.370
+DEAL::Adini<2> shape fxn 4: 	-0.0494
+DEAL::Adini<2> shape grad 4: 	-0.222	0.0741
+DEAL::Adini<2> shape fxn 5: 	0.0494
+DEAL::Adini<2> shape grad 5: 	0.148	0.00
+DEAL::Adini<2> shape fxn 6: 	0.198
+DEAL::Adini<2> shape grad 6: 	-0.370	0.963
+DEAL::Adini<2> shape fxn 7: 	0.0494
+DEAL::Adini<2> shape grad 7: 	0.00	0.148
+DEAL::Adini<2> shape fxn 8: 	-0.0494
+DEAL::Adini<2> shape grad 8: 	0.0741	-0.222
+DEAL::Adini<2> shape fxn 9: 	0.0617
+DEAL::Adini<2> shape grad 9: 	0.370	0.370
+DEAL::Adini<2> shape fxn 10: 	-0.0247
+DEAL::Adini<2> shape grad 10: 	-0.111	-0.0741
+DEAL::Adini<2> shape fxn 11: 	-0.0247
+DEAL::Adini<2> shape grad 11: 	-0.0741	-0.111
+DEAL::Adini<2> point 6 (0.667, 0.333)
+DEAL::Adini<2> shape fxn 0: 	0.198
+DEAL::Adini<2> shape grad 0: 	-0.963	-0.370
+DEAL::Adini<2> shape fxn 1: 	0.0494
+DEAL::Adini<2> shape grad 1: 	-0.222	-0.0741
+DEAL::Adini<2> shape fxn 2: 	0.0494
+DEAL::Adini<2> shape grad 2: 	-0.148	1.11e-16
+DEAL::Adini<2> shape fxn 3: 	0.543
+DEAL::Adini<2> shape grad 3: 	0.963	-0.963
+DEAL::Adini<2> shape fxn 4: 	-0.0988
+DEAL::Adini<2> shape grad 4: 	0.00	0.148
+DEAL::Adini<2> shape fxn 5: 	0.0988
+DEAL::Adini<2> shape grad 5: 	0.148	0.00
+DEAL::Adini<2> shape fxn 6: 	0.0617
+DEAL::Adini<2> shape grad 6: 	-0.370	0.370
+DEAL::Adini<2> shape fxn 7: 	0.0247
+DEAL::Adini<2> shape grad 7: 	-0.111	0.0741
+DEAL::Adini<2> shape fxn 8: 	-0.0247
+DEAL::Adini<2> shape grad 8: 	0.0741	-0.111
+DEAL::Adini<2> shape fxn 9: 	0.198
+DEAL::Adini<2> shape grad 9: 	0.370	0.963
+DEAL::Adini<2> shape fxn 10: 	-0.0494
+DEAL::Adini<2> shape grad 10: 	0.00	-0.148
+DEAL::Adini<2> shape fxn 11: 	-0.0494
+DEAL::Adini<2> shape grad 11: 	-0.0741	-0.222
+DEAL::Adini<2> point 7 (1.00, 0.333)
+DEAL::Adini<2> shape fxn 0: 	-2.22e-16
+DEAL::Adini<2> shape grad 0: 	-0.0741	-1.11e-16
+DEAL::Adini<2> shape fxn 1: 	5.55e-17
+DEAL::Adini<2> shape grad 1: 	-2.22e-16	0.00
+DEAL::Adini<2> shape fxn 2: 	0.00
+DEAL::Adini<2> shape grad 2: 	-0.148	-5.55e-17
+DEAL::Adini<2> shape fxn 3: 	0.741
+DEAL::Adini<2> shape grad 3: 	0.0741	-1.33
+DEAL::Adini<2> shape fxn 4: 	0.00
+DEAL::Adini<2> shape grad 4: 	0.667	0.00
+DEAL::Adini<2> shape fxn 5: 	0.148
+DEAL::Adini<2> shape grad 5: 	0.148	5.55e-17
+DEAL::Adini<2> shape fxn 6: 	0.00
+DEAL::Adini<2> shape grad 6: 	0.0741	1.11e-16
+DEAL::Adini<2> shape fxn 7: 	0.00
+DEAL::Adini<2> shape grad 7: 	0.00	0.00
+DEAL::Adini<2> shape fxn 8: 	0.00
+DEAL::Adini<2> shape grad 8: 	0.0741	0.00
+DEAL::Adini<2> shape fxn 9: 	0.259
+DEAL::Adini<2> shape grad 9: 	-0.0741	1.33
+DEAL::Adini<2> shape fxn 10: 	0.00
+DEAL::Adini<2> shape grad 10: 	0.333	0.00
+DEAL::Adini<2> shape fxn 11: 	-0.0741
+DEAL::Adini<2> shape grad 11: 	-0.0741	-0.333
+DEAL::Adini<2> point 8 (0.00, 0.667)
+DEAL::Adini<2> shape fxn 0: 	0.259
+DEAL::Adini<2> shape grad 0: 	0.0741	-1.33
+DEAL::Adini<2> shape fxn 1: 	0.00
+DEAL::Adini<2> shape grad 1: 	0.333	0.00
+DEAL::Adini<2> shape fxn 2: 	0.0741
+DEAL::Adini<2> shape grad 2: 	-0.0741	-0.333
+DEAL::Adini<2> shape fxn 3: 	0.00
+DEAL::Adini<2> shape grad 3: 	-0.0741	0.00
+DEAL::Adini<2> shape fxn 4: 	0.00
+DEAL::Adini<2> shape grad 4: 	0.00	0.00
+DEAL::Adini<2> shape fxn 5: 	0.00
+DEAL::Adini<2> shape grad 5: 	0.0741	0.00
+DEAL::Adini<2> shape fxn 6: 	0.741
+DEAL::Adini<2> shape grad 6: 	-0.0741	1.33
+DEAL::Adini<2> shape fxn 7: 	0.00
+DEAL::Adini<2> shape grad 7: 	0.667	0.00
+DEAL::Adini<2> shape fxn 8: 	-0.148
+DEAL::Adini<2> shape grad 8: 	0.148	0.00
+DEAL::Adini<2> shape fxn 9: 	0.00
+DEAL::Adini<2> shape grad 9: 	0.0741	0.00
+DEAL::Adini<2> shape fxn 10: 	0.00
+DEAL::Adini<2> shape grad 10: 	0.00	0.00
+DEAL::Adini<2> shape fxn 11: 	0.00
+DEAL::Adini<2> shape grad 11: 	-0.148	0.00
+DEAL::Adini<2> point 9 (0.333, 0.667)
+DEAL::Adini<2> shape fxn 0: 	0.198
+DEAL::Adini<2> shape grad 0: 	-0.370	-0.963
+DEAL::Adini<2> shape fxn 1: 	0.0494
+DEAL::Adini<2> shape grad 1: 	1.11e-16	-0.148
+DEAL::Adini<2> shape fxn 2: 	0.0494
+DEAL::Adini<2> shape grad 2: 	-0.0741	-0.222
+DEAL::Adini<2> shape fxn 3: 	0.0617
+DEAL::Adini<2> shape grad 3: 	0.370	-0.370
+DEAL::Adini<2> shape fxn 4: 	-0.0247
+DEAL::Adini<2> shape grad 4: 	-0.111	0.0741
+DEAL::Adini<2> shape fxn 5: 	0.0247
+DEAL::Adini<2> shape grad 5: 	0.0741	-0.111
+DEAL::Adini<2> shape fxn 6: 	0.543
+DEAL::Adini<2> shape grad 6: 	-0.963	0.963
+DEAL::Adini<2> shape fxn 7: 	0.0988
+DEAL::Adini<2> shape grad 7: 	0.00	0.148
+DEAL::Adini<2> shape fxn 8: 	-0.0988
+DEAL::Adini<2> shape grad 8: 	0.148	0.00
+DEAL::Adini<2> shape fxn 9: 	0.198
+DEAL::Adini<2> shape grad 9: 	0.963	0.370
+DEAL::Adini<2> shape fxn 10: 	-0.0494
+DEAL::Adini<2> shape grad 10: 	-0.222	-0.0741
+DEAL::Adini<2> shape fxn 11: 	-0.0494
+DEAL::Adini<2> shape grad 11: 	-0.148	0.00
+DEAL::Adini<2> point 10 (0.667, 0.667)
+DEAL::Adini<2> shape fxn 0: 	0.0617
+DEAL::Adini<2> shape grad 0: 	-0.370	-0.370
+DEAL::Adini<2> shape fxn 1: 	0.0247
+DEAL::Adini<2> shape grad 1: 	-0.111	-0.0741
+DEAL::Adini<2> shape fxn 2: 	0.0247
+DEAL::Adini<2> shape grad 2: 	-0.0741	-0.111
+DEAL::Adini<2> shape fxn 3: 	0.198
+DEAL::Adini<2> shape grad 3: 	0.370	-0.963
+DEAL::Adini<2> shape fxn 4: 	-0.0494
+DEAL::Adini<2> shape grad 4: 	0.00	0.148
+DEAL::Adini<2> shape fxn 5: 	0.0494
+DEAL::Adini<2> shape grad 5: 	0.0741	-0.222
+DEAL::Adini<2> shape fxn 6: 	0.198
+DEAL::Adini<2> shape grad 6: 	-0.963	0.370
+DEAL::Adini<2> shape fxn 7: 	0.0494
+DEAL::Adini<2> shape grad 7: 	-0.222	0.0741
+DEAL::Adini<2> shape fxn 8: 	-0.0494
+DEAL::Adini<2> shape grad 8: 	0.148	0.00
+DEAL::Adini<2> shape fxn 9: 	0.543
+DEAL::Adini<2> shape grad 9: 	0.963	0.963
+DEAL::Adini<2> shape fxn 10: 	-0.0988
+DEAL::Adini<2> shape grad 10: 	0.00	-0.148
+DEAL::Adini<2> shape fxn 11: 	-0.0988
+DEAL::Adini<2> shape grad 11: 	-0.148	0.00
+DEAL::Adini<2> point 11 (1.00, 0.667)
+DEAL::Adini<2> shape fxn 0: 	4.44e-16
+DEAL::Adini<2> shape grad 0: 	0.0741	-4.44e-16
+DEAL::Adini<2> shape fxn 1: 	1.11e-16
+DEAL::Adini<2> shape grad 1: 	0.00	0.00
+DEAL::Adini<2> shape fxn 2: 	0.00
+DEAL::Adini<2> shape grad 2: 	-0.0741	0.00
+DEAL::Adini<2> shape fxn 3: 	0.259
+DEAL::Adini<2> shape grad 3: 	-0.0741	-1.33
+DEAL::Adini<2> shape fxn 4: 	0.00
+DEAL::Adini<2> shape grad 4: 	0.333	0.00
+DEAL::Adini<2> shape fxn 5: 	0.0741
+DEAL::Adini<2> shape grad 5: 	0.0741	-0.333
+DEAL::Adini<2> shape fxn 6: 	0.00
+DEAL::Adini<2> shape grad 6: 	-0.0741	4.44e-16
+DEAL::Adini<2> shape fxn 7: 	0.00
+DEAL::Adini<2> shape grad 7: 	0.00	0.00
+DEAL::Adini<2> shape fxn 8: 	0.00
+DEAL::Adini<2> shape grad 8: 	0.148	0.00
+DEAL::Adini<2> shape fxn 9: 	0.741
+DEAL::Adini<2> shape grad 9: 	0.0741	1.33
+DEAL::Adini<2> shape fxn 10: 	0.00
+DEAL::Adini<2> shape grad 10: 	0.667	0.00
+DEAL::Adini<2> shape fxn 11: 	-0.148
+DEAL::Adini<2> shape grad 11: 	-0.148	0.00
+DEAL::Adini<2> point 12 (0.00, 1.00)
+DEAL::Adini<2> shape fxn 0: 	0.00
+DEAL::Adini<2> shape grad 0: 	0.00	0.00
+DEAL::Adini<2> shape fxn 1: 	0.00
+DEAL::Adini<2> shape grad 1: 	0.00	0.00
+DEAL::Adini<2> shape fxn 2: 	0.00
+DEAL::Adini<2> shape grad 2: 	0.00	0.00
+DEAL::Adini<2> shape fxn 3: 	0.00
+DEAL::Adini<2> shape grad 3: 	0.00	0.00
+DEAL::Adini<2> shape fxn 4: 	0.00
+DEAL::Adini<2> shape grad 4: 	0.00	0.00
+DEAL::Adini<2> shape fxn 5: 	0.00
+DEAL::Adini<2> shape grad 5: 	0.00	0.00
+DEAL::Adini<2> shape fxn 6: 	1.00
+DEAL::Adini<2> shape grad 6: 	0.00	0.00
+DEAL::Adini<2> shape fxn 7: 	0.00
+DEAL::Adini<2> shape grad 7: 	1.00	0.00
+DEAL::Adini<2> shape fxn 8: 	0.00
+DEAL::Adini<2> shape grad 8: 	0.00	1.00
+DEAL::Adini<2> shape fxn 9: 	0.00
+DEAL::Adini<2> shape grad 9: 	0.00	0.00
+DEAL::Adini<2> shape fxn 10: 	0.00
+DEAL::Adini<2> shape grad 10: 	0.00	0.00
+DEAL::Adini<2> shape fxn 11: 	0.00
+DEAL::Adini<2> shape grad 11: 	0.00	0.00
+DEAL::Adini<2> point 13 (0.333, 1.00)
+DEAL::Adini<2> shape fxn 0: 	0.00
+DEAL::Adini<2> shape grad 0: 	-1.11e-16	-0.0741
+DEAL::Adini<2> shape fxn 1: 	0.00
+DEAL::Adini<2> shape grad 1: 	-5.55e-17	-0.148
+DEAL::Adini<2> shape fxn 2: 	5.55e-17
+DEAL::Adini<2> shape grad 2: 	0.00	2.22e-16
+DEAL::Adini<2> shape fxn 3: 	0.00
+DEAL::Adini<2> shape grad 3: 	1.11e-16	0.0741
+DEAL::Adini<2> shape fxn 4: 	0.00
+DEAL::Adini<2> shape grad 4: 	0.00	0.0741
+DEAL::Adini<2> shape fxn 5: 	0.00
+DEAL::Adini<2> shape grad 5: 	0.00	0.00
+DEAL::Adini<2> shape fxn 6: 	0.741
+DEAL::Adini<2> shape grad 6: 	-1.33	0.0741
+DEAL::Adini<2> shape fxn 7: 	0.148
+DEAL::Adini<2> shape grad 7: 	5.55e-17	0.148
+DEAL::Adini<2> shape fxn 8: 	0.00
+DEAL::Adini<2> shape grad 8: 	0.00	0.667
+DEAL::Adini<2> shape fxn 9: 	0.259
+DEAL::Adini<2> shape grad 9: 	1.33	-0.0741
+DEAL::Adini<2> shape fxn 10: 	-0.0741
+DEAL::Adini<2> shape grad 10: 	-0.333	-0.0741
+DEAL::Adini<2> shape fxn 11: 	0.00
+DEAL::Adini<2> shape grad 11: 	0.00	0.333
+DEAL::Adini<2> point 14 (0.667, 1.00)
+DEAL::Adini<2> shape fxn 0: 	4.44e-16
+DEAL::Adini<2> shape grad 0: 	-4.44e-16	0.0741
+DEAL::Adini<2> shape fxn 1: 	0.00
+DEAL::Adini<2> shape grad 1: 	0.00	-0.0741
+DEAL::Adini<2> shape fxn 2: 	1.11e-16
+DEAL::Adini<2> shape grad 2: 	0.00	0.00
+DEAL::Adini<2> shape fxn 3: 	0.00
+DEAL::Adini<2> shape grad 3: 	4.44e-16	-0.0741
+DEAL::Adini<2> shape fxn 4: 	0.00
+DEAL::Adini<2> shape grad 4: 	0.00	0.148
+DEAL::Adini<2> shape fxn 5: 	0.00
+DEAL::Adini<2> shape grad 5: 	0.00	0.00
+DEAL::Adini<2> shape fxn 6: 	0.259
+DEAL::Adini<2> shape grad 6: 	-1.33	-0.0741
+DEAL::Adini<2> shape fxn 7: 	0.0741
+DEAL::Adini<2> shape grad 7: 	-0.333	0.0741
+DEAL::Adini<2> shape fxn 8: 	0.00
+DEAL::Adini<2> shape grad 8: 	0.00	0.333
+DEAL::Adini<2> shape fxn 9: 	0.741
+DEAL::Adini<2> shape grad 9: 	1.33	0.0741
+DEAL::Adini<2> shape fxn 10: 	-0.148
+DEAL::Adini<2> shape grad 10: 	0.00	-0.148
+DEAL::Adini<2> shape fxn 11: 	0.00
+DEAL::Adini<2> shape grad 11: 	0.00	0.667
+DEAL::Adini<2> point 15 (1.00, 1.00)
+DEAL::Adini<2> shape fxn 0: 	0.00
+DEAL::Adini<2> shape grad 0: 	0.00	0.00
+DEAL::Adini<2> shape fxn 1: 	0.00
+DEAL::Adini<2> shape grad 1: 	0.00	0.00
+DEAL::Adini<2> shape fxn 2: 	0.00
+DEAL::Adini<2> shape grad 2: 	0.00	0.00
+DEAL::Adini<2> shape fxn 3: 	0.00
+DEAL::Adini<2> shape grad 3: 	0.00	0.00
+DEAL::Adini<2> shape fxn 4: 	0.00
+DEAL::Adini<2> shape grad 4: 	0.00	0.00
+DEAL::Adini<2> shape fxn 5: 	0.00
+DEAL::Adini<2> shape grad 5: 	0.00	0.00
+DEAL::Adini<2> shape fxn 6: 	0.00
+DEAL::Adini<2> shape grad 6: 	0.00	0.00
+DEAL::Adini<2> shape fxn 7: 	0.00
+DEAL::Adini<2> shape grad 7: 	0.00	0.00
+DEAL::Adini<2> shape fxn 8: 	0.00
+DEAL::Adini<2> shape grad 8: 	0.00	0.00
+DEAL::Adini<2> shape fxn 9: 	1.00
+DEAL::Adini<2> shape grad 9: 	0.00	0.00
+DEAL::Adini<2> shape fxn 10: 	0.00
+DEAL::Adini<2> shape grad 10: 	1.00	0.00
+DEAL::Adini<2> shape fxn 11: 	0.00
+DEAL::Adini<2> shape grad 11: 	0.00	1.00

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -43,8 +43,7 @@ main()
 
   Triangulation<3>::active_cell_iterator cell = tria.begin_active();
   for (; cell != tria.end(); ++cell)
-    for (unsigned int face_no = 0; face_no < GeometryInfo<3>::faces_per_cell;
-         ++face_no)
+    for (const unsigned int face_no : GeometryInfo<3>::face_indices())
       if (cell->at_boundary(face_no))
         {
           deallog << " Face" << face_no << std::endl;

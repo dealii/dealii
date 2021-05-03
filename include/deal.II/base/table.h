@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2019 by the deal.II authors
+// Copyright (C) 2002 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -31,6 +31,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 // forward declaration
+#ifndef DOXYGEN
 template <int N, typename T>
 class TableBase;
 template <int N, typename T>
@@ -49,6 +50,7 @@ template <typename T>
 class Table<5, T>;
 template <typename T>
 class Table<6, T>;
+#endif
 
 
 
@@ -67,8 +69,6 @@ namespace internal
    * should use explicitly in your programs (except, of course, through access
    * to the elements of tables with <tt>operator[]</tt>, which generates
    * temporary objects of the types of this namespace).
-   *
-   * @author Wolfgang Bangerth, 2002
    */
   namespace TableBaseAccessors
   {
@@ -155,8 +155,6 @@ namespace internal
      * objects of this class, as they are only thought as temporaries for
      * access to elements of the table class, not for passing them around as
      * arguments of functions, etc.
-     *
-     * @author Wolfgang Bangerth, 2002
      */
     template <int N, typename T, bool C, unsigned int P>
     class Accessor
@@ -222,10 +220,8 @@ namespace internal
       friend class dealii::Table;
       template <int N1, typename T1, bool C1, unsigned int P1>
       friend class Accessor;
-#ifndef DEAL_II_TEMPL_SPEC_FRIEND_BUG
       friend class dealii::Table<N, T>;
       friend class Accessor<N, T, C, P + 1>;
-#endif
     };
 
 
@@ -236,8 +232,6 @@ namespace internal
      * rather than recursively returning access objects for further subsets.
      * The same holds for this specialization as for the general template; see
      * there for more information.
-     *
-     * @author Wolfgang Bangerth, 2002
      */
     template <int N, typename T, bool C>
     class Accessor<N, T, C, 1>
@@ -329,10 +323,8 @@ namespace internal
       friend class dealii::Table;
       template <int N1, typename T1, bool C1, unsigned int P1>
       friend class Accessor;
-#ifndef DEAL_II_TEMPL_SPEC_FRIEND_BUG
       friend class dealii::Table<2, T>;
       friend class Accessor<N, T, C, 2>;
-#endif
     };
   } // namespace TableBaseAccessors
 
@@ -341,42 +333,20 @@ namespace internal
 
 
 /**
- * General class holding an array of objects of templated type in multiple
- * dimensions. If the template parameter indicating the number of dimensions
- * is one, then this is more or less a vector, if it is two then it is a
- * matrix, and so on.
+ * A class holding a multi-dimensional array of objects of templated type.
+ * If the template parameter indicating the number of dimensions
+ * is one, then this class more or less represents a vector; if it is two then
+ * it is a matrix; and so on.
  *
- * Previously, this data type was emulated in this library by constructs like
+ * This class specifically replaces attempts at higher-dimensional arrays like
  * <tt>std::vector<std::vector<T>></tt>, or even higher nested constructs.
- * However, this has the disadvantage that it is hard to initialize, and most
- * importantly that it is very inefficient if all rows have the same size
+ * These constructs have the disadvantage that they are hard to initialize, and
+ * most importantly that they are very inefficient if all rows of a matrix or
+ * higher-dimensional table have the same size
  * (which is the usual case), since then the memory for each row is allocated
  * independently, both wasting time and memory. This can be made more
- * efficient by allocating only one chunk of memory for the entire object.
- *
- * Therefore, this data type was invented. Its implementation is rather
- * straightforward, with two exceptions. The first thing to think about is how
- * to pass the size in each of the coordinate directions to the object; this
- * is done using the TableIndices class. Second, how to access the individual
- * elements. The basic problem here is that we would like to make the number
- * of arguments to be passed to the constructor as well as the access
- * functions dependent on the template parameter <tt>N</tt> indicating the
- * number of dimensions. Of course, this is not possible.
- *
- * The way out of the first problem (and partly the second one as well) is to
- * have a common base class TableBase and a derived class for each value of
- * <tt>N</tt>.  This derived class has a constructor with the correct number
- * of arguments, namely <tt>N</tt>. These then transform their arguments into
- * the data type the base class (this class in fact) uses in the constructor
- * as well as in element access through operator() functions.
- *
- * The second problem is that we would like to allow access through a sequence
- * of <tt>operator[]</tt> calls. This mostly because, as said, this class is a
- * replacement for previous use of nested <tt>std::vector</tt> objects, where
- * we had to use the <tt>operator[]</tt> access function recursively until we
- * were at the innermost object. Emulating this behavior without losing the
- * ability to do index checks, and in particular without losing performance is
- * possible but nontrivial, and done in the TableBaseAccessors namespace.
+ * efficient by allocating only one chunk of memory for the entire object, which
+ * is what the current class does.
  *
  *
  * <h3>Comparison with the Tensor class</h3>
@@ -385,12 +355,12 @@ namespace internal
  * templatizes on the number of dimensions. However, there are two major
  * differences. The first is that the Tensor class stores only numeric values
  * (as <tt>double</tt>s), while the Table class stores arbitrary objects. The
- * second is that the Tensor class has fixed dimensions, also given as a
- * template argument, while this class can handle arbitrary dimensions, which
- * may also be different between different indices.
+ * second is that the Tensor class has fixed sizes in each dimension, also given
+ * as a template argument, while this class can handle arbitrary and different
+ * sizes in each dimension.
  *
  * This has two consequences. First, since the size is not known at compile
- * time, it has to do explicit memory allocating. Second, the layout of
+ * time, it has to do explicit memory allocation. Second, the layout of
  * individual elements is not known at compile time, so access is slower than
  * for the Tensor class where the number of elements are their location is
  * known at compile time and the compiler can optimize with this knowledge
@@ -404,7 +374,6 @@ namespace internal
  * itself.
  *
  * @ingroup data
- * @author Wolfgang Bangerth, 2002.
  */
 template <int N, typename T>
 class TableBase : public Subscriptor
@@ -427,7 +396,7 @@ public:
    * Constructor. Initialize the array with the given dimensions in each index
    * component.
    */
-  TableBase(const TableIndices<N> &sizes);
+  explicit TableBase(const TableIndices<N> &sizes);
 
   /**
    * Constructor. Initialize the array with the given dimensions in each index
@@ -627,7 +596,8 @@ public:
 
   /**
    * Write or read the data of this object to or from a stream for the purpose
-   * of serialization.
+   * of serialization using the [BOOST serialization
+   * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
    */
   template <class Archive>
   void
@@ -674,9 +644,7 @@ protected:
    */
   TableIndices<N> table_size;
 
-  /**
-   * Make all other table classes friends.
-   */
+  // Make all other table classes friends.
   template <int, typename>
   friend class TableBase;
 };
@@ -693,24 +661,18 @@ protected:
  * See there, and in the documentation of the base class for more information.
  *
  * @ingroup data
- * @author Wolfgang Bangerth, 2002
  */
 template <int N, typename T>
-class Table : public TableBase<N, T>
-{};
+class Table;
 
 
 /**
  * A class representing a one-dimensional table, i.e. a vector-like class.
- * Since the C++ library has a vector class, there is probably not much need
- * for this particular class, but since it is so simple to implement on top of
- * the template base class, we provide it anyway.
- *
- * For the rationale of this class, and a description of the interface, see
- * the base class.
+ * The majority of the interface of this class is implemented in the
+ * TableBase base class. See there for an outline of the rationale for and
+ * interface of this class.
  *
  * @ingroup data
- * @author Wolfgang Bangerth, 2002
  */
 template <typename T>
 class Table<1, T> : public TableBase<1, T>
@@ -729,7 +691,7 @@ public:
   /**
    * Constructor. Pass down the given dimension to the base class.
    */
-  Table(const size_type size);
+  explicit Table(const size_type size);
 
   /**
    * Constructor. Create a table with a given size and initialize it from a
@@ -801,18 +763,9 @@ public:
   operator()(const size_type i);
 
   /**
-   * Make the corresponding operator () from the TableBase base class
-   * available also in this class.
+   * Make the variations of `operator()` from the base class available.
    */
-  typename AlignedVector<T>::reference
-  operator()(const TableIndices<1> &indices);
-
-  /**
-   * Make the corresponding operator () from the TableBase base class
-   * available also in this class.
-   */
-  typename AlignedVector<T>::const_reference
-  operator()(const TableIndices<1> &indices) const;
+  using TableBase<1, T>::operator();
 };
 
 
@@ -912,11 +865,29 @@ namespace MatrixTableIterators
                  const std::ptrdiff_t         linear_index);
 
     /**
+     * Comparison operator.
+     */
+    template <bool OtherConstness>
+    friend bool
+    operator==(
+      const AccessorBase<TableType, Constness, storage_order> &     left,
+      const AccessorBase<TableType, OtherConstness, storage_order> &right)
+    {
+      return left.container == right.container &&
+             left.linear_index == right.linear_index;
+    }
+
+    /**
      * Get a constant reference to the value of the element represented by
      * this accessor.
      */
     const value_type &
     value() const;
+
+    /**
+     * Conversion operator that returns a constant reference to the element.
+     */
+    operator const value_type &() const;
 
     /**
      * Return the row of the current entry.
@@ -950,14 +921,10 @@ namespace MatrixTableIterators
     void
     assert_valid_linear_index() const;
 
-    /**
-     * Make the const version a friend for copying.
-     */
+    // Make the const version a friend for copying.
     friend class AccessorBase<TableType, true, storage_order>;
 
-    /**
-     * Make the underlying iterator class a friend.
-     */
+    // Make the underlying iterator class a friend.
     friend class LinearIndexIterator<
       Iterator<TableType, Constness, storage_order>,
       Accessor<TableType, Constness, storage_order>>;
@@ -1042,6 +1009,11 @@ namespace MatrixTableIterators
      */
     value_type &
     value() const;
+
+    /**
+     * Conversion operator that returns a reference to the element.
+     */
+    operator value_type &();
   };
 
   /**
@@ -1108,15 +1080,15 @@ namespace MatrixTableIterators
 /**
  * A class representing a two-dimensional table, i.e. a matrix of objects (not
  * necessarily only numbers).
+ * The majority of the interface of this class is implemented in the
+ * TableBase base class. See there for an outline of the rationale for and
+ * interface of this class.
  *
- * For the rationale of this class, and a description of the interface, see
- * the base class. Since this serves as the base class of the full matrix
- * classes in this library, and to keep a minimal compatibility with a
- * predecessor class (<tt>vector2d</tt>), some additional functions are
- * provided.
+ * This class also serves as the base class for the FullMatrix class
+ * and consequently has a number of functions that are specific to
+ * matrices and their needs.
  *
  * @ingroup data
- * @author Wolfgang Bangerth, 2002
  */
 template <typename T>
 class Table<2, T> : public TableBase<2, T>
@@ -1248,7 +1220,6 @@ public:
   typename AlignedVector<T>::const_reference
   operator()(const size_type i, const size_type j) const;
 
-
   /**
    * Direct access to one element of the table by specifying all indices at
    * the same time. Range checks are performed.
@@ -1259,19 +1230,9 @@ public:
   operator()(const size_type i, const size_type j);
 
   /**
-   * Make the corresponding operator () from the TableBase base class
-   * available also in this class.
+   * Make the variations of `operator()` from the base class available.
    */
-  typename AlignedVector<T>::reference
-  operator()(const TableIndices<2> &indices);
-
-  /**
-   * Make the corresponding operator () from the TableBase base class
-   * available also in this class.
-   */
-  typename AlignedVector<T>::const_reference
-  operator()(const TableIndices<2> &indices) const;
-
+  using TableBase<2, T>::operator();
 
   /**
    * Number of rows. This function really makes only sense since we have a
@@ -1342,19 +1303,15 @@ protected:
   typename AlignedVector<T>::const_reference
   el(const size_type i, const size_type j) const;
 
-  /**
-   * Make the AccessorBase class a friend so that it may directly index into
-   * the array.
-   */
+  // Make the AccessorBase class a friend so that it may directly index into
+  // the array.
   friend class MatrixTableIterators::
     AccessorBase<Table<2, T>, true, MatrixTableIterators::Storage::row_major>;
   friend class MatrixTableIterators::
     AccessorBase<Table<2, T>, false, MatrixTableIterators::Storage::row_major>;
 
-  /**
-   * Make the mutable accessor class a friend so that we can write to array
-   * entries with iterators.
-   */
+  // Make the mutable accessor class a friend so that we can write to array
+  // entries with iterators.
   friend class MatrixTableIterators::
     Accessor<Table<2, T>, false, MatrixTableIterators::Storage::row_major>;
 };
@@ -1364,12 +1321,11 @@ protected:
 /**
  * A class representing a three-dimensional table of objects (not necessarily
  * only numbers).
- *
- * For the rationale of this class, and a description of the interface, see
- * the base class.
+ * The majority of the interface of this class is implemented in the
+ * TableBase base class.See there for an outline of the rationale for and
+ * interface of this class.
  *
  * @ingroup data
- * @author Wolfgang Bangerth, 2002
  */
 template <typename T>
 class Table<3, T> : public TableBase<3, T>
@@ -1477,18 +1433,9 @@ public:
   operator()(const size_type i, const size_type j, const size_type k);
 
   /**
-   * Make the corresponding operator () from the TableBase base class
-   * available also in this class.
+   * Make the variations of `operator()` from the base class available.
    */
-  typename AlignedVector<T>::reference
-  operator()(const TableIndices<3> &indices);
-
-  /**
-   * Make the corresponding operator () from the TableBase base class
-   * available also in this class.
-   */
-  typename AlignedVector<T>::const_reference
-  operator()(const TableIndices<3> &indices) const;
+  using TableBase<3, T>::operator();
 };
 
 
@@ -1496,12 +1443,11 @@ public:
 /**
  * A class representing a four-dimensional table of objects (not necessarily
  * only numbers).
- *
- * For the rationale of this class, and a description of the interface, see
- * the base class.
+ * The majority of the interface of this class is implemented in the
+ * TableBase base class. See there for an outline of the rationale for and
+ * interface of this class.
  *
  * @ingroup data
- * @author Wolfgang Bangerth, Ralf Hartmann 2002
  */
 template <typename T>
 class Table<4, T> : public TableBase<4, T>
@@ -1571,18 +1517,9 @@ public:
              const size_type l);
 
   /**
-   * Make the corresponding operator () from the TableBase base class
-   * available also in this class.
+   * Make the variations of `operator()` from the base class available.
    */
-  typename AlignedVector<T>::reference
-  operator()(const TableIndices<4> &indices);
-
-  /**
-   * Make the corresponding operator () from the TableBase base class
-   * available also in this class.
-   */
-  typename AlignedVector<T>::const_reference
-  operator()(const TableIndices<4> &indices) const;
+  using TableBase<4, T>::operator();
 };
 
 
@@ -1590,12 +1527,11 @@ public:
 /**
  * A class representing a five-dimensional table of objects (not necessarily
  * only numbers).
- *
- * For the rationale of this class, and a description of the interface, see
- * the base class.
+ * The majority of the interface of this class is implemented in the
+ * TableBase base class. See there for an outline of the rationale for and
+ * interface of this class.
  *
  * @ingroup data
- * @author Wolfgang Bangerth, Ralf Hartmann 2002
  */
 template <typename T>
 class Table<5, T> : public TableBase<5, T>
@@ -1668,18 +1604,9 @@ public:
              const size_type m);
 
   /**
-   * Make the corresponding operator () from the TableBase base class
-   * available also in this class.
+   * Make the variations of `operator()` from the base class available.
    */
-  typename AlignedVector<T>::reference
-  operator()(const TableIndices<5> &indices);
-
-  /**
-   * Make the corresponding operator () from the TableBase base class
-   * available also in this class.
-   */
-  typename AlignedVector<T>::const_reference
-  operator()(const TableIndices<5> &indices) const;
+  using TableBase<5, T>::operator();
 };
 
 
@@ -1687,12 +1614,11 @@ public:
 /**
  * A class representing a six-dimensional table of objects (not necessarily
  * only numbers).
- *
- * For the rationale of this class, and a description of the interface, see
- * the base class.
+ * The majority of the interface of this class is implemented in the
+ * TableBase base class. See there for an outline of the rationale for and
+ * interface of this class.
  *
  * @ingroup data
- * @author Wolfgang Bangerth, Ralf Hartmann 2002
  */
 template <typename T>
 class Table<6, T> : public TableBase<6, T>
@@ -1767,30 +1693,20 @@ public:
              const size_type n);
 
   /**
-   * Make the corresponding operator () from the TableBase base class
-   * available also in this class.
+   * Make the variations of `operator()` from the base class available.
    */
-  typename AlignedVector<T>::reference
-  operator()(const TableIndices<6> &indices);
-
-  /**
-   * Make the corresponding operator () from the TableBase base class
-   * available also in this class.
-   */
-  typename AlignedVector<T>::const_reference
-  operator()(const TableIndices<6> &indices) const;
+  using TableBase<6, T>::operator();
 };
 
 
 /**
  * A class representing a seven-dimensional table of objects (not necessarily
  * only numbers).
- *
- * For the rationale of this class, and a description of the interface, see
- * the base class.
+ * The majority of the interface of this class is implemented in the
+ * TableBase base class. See there for an outline of the rationale for and
+ * interface of this class.
  *
  * @ingroup data
- * @author Wolfgang Bangerth, 2002, Ralf Hartmann 2004
  */
 template <typename T>
 class Table<7, T> : public TableBase<7, T>
@@ -1868,49 +1784,10 @@ public:
              const size_type o);
 
   /**
-   * Make the corresponding operator () from the TableBase base class
-   * available also in this class.
+   * Make the variations of `operator()` from the base class available.
    */
-  typename AlignedVector<T>::reference
-  operator()(const TableIndices<7> &indices);
-
-  /**
-   * Make the corresponding operator () from the TableBase base class
-   * available also in this class.
-   */
-  typename AlignedVector<T>::const_reference
-  operator()(const TableIndices<7> &indices) const;
+  using TableBase<7, T>::operator();
 };
-
-
-/**
- * A namespace for iterators for TransposeTable. TransposeTable is unique in
- * that it stores entries in column-major order.
- *
- * @warning The classes defined in this namespace have been deprecated in
- * favor of the more general versions in MatrixTableIterators. Use those
- * instead.
- */
-namespace TransposeTableIterators
-{
-  template <typename T, bool Constness>
-  using AccessorBase DEAL_II_DEPRECATED = MatrixTableIterators::AccessorBase<
-    TransposeTable<T>,
-    Constness,
-    MatrixTableIterators::Storage::column_major>;
-
-  template <typename T, bool Constness>
-  using Accessor DEAL_II_DEPRECATED =
-    MatrixTableIterators::Accessor<TransposeTable<T>,
-                                   Constness,
-                                   MatrixTableIterators::Storage::column_major>;
-
-  template <typename T, bool Constness>
-  using Iterator DEAL_II_DEPRECATED =
-    MatrixTableIterators::Iterator<TransposeTable<T>,
-                                   Constness,
-                                   MatrixTableIterators::Storage::column_major>;
-} // namespace TransposeTableIterators
 
 
 /**
@@ -1924,7 +1801,6 @@ namespace TransposeTableIterators
  * TableBase.
  *
  * @ingroup data
- * @author Guido Kanschat, 2005
  */
 template <typename T>
 class TransposeTable : public TableBase<2, T>
@@ -2074,10 +1950,8 @@ protected:
   const_reference
   el(const size_type i, const size_type j) const;
 
-  /**
-   * Make the AccessorBase class a friend so that it may directly index into
-   * the array.
-   */
+  // Make the AccessorBase class a friend so that it may directly index into
+  // the array.
   friend class MatrixTableIterators::AccessorBase<
     TransposeTable<T>,
     true,
@@ -2087,10 +1961,8 @@ protected:
     false,
     MatrixTableIterators::Storage::column_major>;
 
-  /**
-   * Make the mutable accessor class a friend so that we can write to array
-   * entries with iterators.
-   */
+  // Make the mutable accessor class a friend so that we can write to array
+  // entries with iterators.
   friend class MatrixTableIterators::Accessor<
     TransposeTable<T>,
     false,
@@ -2192,7 +2064,7 @@ namespace internal
     inline Accessor<N, T, C, P - 1> Accessor<N, T, C, P>::
                                     operator[](const size_type i) const
     {
-      Assert(i < table.size()[N - P], ExcIndexRange(i, 0, table.size()[N - P]));
+      AssertIndexRange(i, table.size()[N - P]);
 
       // access i-th
       // subobject. optimize on the
@@ -2303,7 +2175,7 @@ template <int N, typename T>
 inline TableBase<N, T> &
 TableBase<N, T>::operator=(TableBase<N, T> &&m) noexcept
 {
-  static_cast<Subscriptor &>(*this) = std::move(m);
+  static_cast<Subscriptor &>(*this) = std::move(static_cast<Subscriptor &>(m));
   values                            = std::move(m.values);
   table_size                        = m.table_size;
   m.table_size                      = TableIndices<N>();
@@ -2400,7 +2272,7 @@ template <int N, typename T>
 inline typename TableBase<N, T>::size_type
 TableBase<N, T>::size(const unsigned int i) const
 {
-  Assert(i < N, ExcIndexRange(i, 0, N));
+  AssertIndexRange(i, N);
   return table_size[i];
 }
 
@@ -2639,24 +2511,6 @@ Table<1, T>::operator()(const size_type i)
 }
 
 
-
-template <typename T>
-inline typename AlignedVector<T>::const_reference
-Table<1, T>::operator()(const TableIndices<1> &indices) const
-{
-  return TableBase<1, T>::operator()(indices);
-}
-
-
-
-template <typename T>
-inline typename AlignedVector<T>::reference
-Table<1, T>::operator()(const TableIndices<1> &indices)
-{
-  return TableBase<1, T>::operator()(indices);
-}
-
-
 //---------------------------------------------------------------------------
 
 
@@ -2731,24 +2585,6 @@ Table<2, T>::operator()(const size_type i, const size_type j)
   AssertIndexRange(i, this->table_size[0]);
   AssertIndexRange(j, this->table_size[1]);
   return this->values[size_type(i) * this->table_size[1] + j];
-}
-
-
-
-template <typename T>
-inline typename AlignedVector<T>::const_reference
-Table<2, T>::operator()(const TableIndices<2> &indices) const
-{
-  return TableBase<2, T>::operator()(indices);
-}
-
-
-
-template <typename T>
-inline typename AlignedVector<T>::reference
-Table<2, T>::operator()(const TableIndices<2> &indices)
-{
-  return TableBase<2, T>::operator()(indices);
 }
 
 
@@ -2924,6 +2760,16 @@ namespace MatrixTableIterators
 
 
   template <typename TableType, bool Constness, Storage storage_order>
+  inline AccessorBase<TableType, Constness, storage_order>::
+  operator const value_type &() const
+  {
+    assert_valid_linear_index();
+    return this->container->values[linear_index];
+  }
+
+
+
+  template <typename TableType, bool Constness, Storage storage_order>
   inline typename AccessorBase<TableType, Constness, storage_order>::size_type
   AccessorBase<TableType, Constness, storage_order>::row() const
   {
@@ -3004,6 +2850,15 @@ namespace MatrixTableIterators
   template <typename TableType, Storage storage_order>
   inline typename Accessor<TableType, false, storage_order>::value_type &
   Accessor<TableType, false, storage_order>::value() const
+  {
+    this->assert_valid_linear_index();
+    return this->container->values[this->linear_index];
+  }
+
+
+
+  template <typename TableType, Storage storage_order>
+  inline Accessor<TableType, false, storage_order>::operator value_type &()
   {
     this->assert_valid_linear_index();
     return this->container->values[this->linear_index];
@@ -3259,24 +3114,6 @@ Table<3, T>::operator()(const size_type i, const size_type j, const size_type k)
 
 
 template <typename T>
-inline typename AlignedVector<T>::const_reference
-Table<3, T>::operator()(const TableIndices<3> &indices) const
-{
-  return TableBase<3, T>::operator()(indices);
-}
-
-
-
-template <typename T>
-inline typename AlignedVector<T>::reference
-Table<3, T>::operator()(const TableIndices<3> &indices)
-{
-  return TableBase<3, T>::operator()(indices);
-}
-
-
-
-template <typename T>
 inline Table<4, T>::Table(const size_type size1,
                           const size_type size2,
                           const size_type size3,
@@ -3348,24 +3185,6 @@ Table<4, T>::operator()(const size_type i,
               k) *
                this->table_size[3] +
              l];
-}
-
-
-
-template <typename T>
-inline typename AlignedVector<T>::const_reference
-Table<4, T>::operator()(const TableIndices<4> &indices) const
-{
-  return TableBase<4, T>::operator()(indices);
-}
-
-
-
-template <typename T>
-inline typename AlignedVector<T>::reference
-Table<4, T>::operator()(const TableIndices<4> &indices)
-{
-  return TableBase<4, T>::operator()(indices);
 }
 
 
@@ -3453,24 +3272,6 @@ Table<5, T>::operator()(const size_type i,
               l) *
                this->table_size[4] +
              m];
-}
-
-
-
-template <typename T>
-inline typename AlignedVector<T>::const_reference
-Table<5, T>::operator()(const TableIndices<5> &indices) const
-{
-  return TableBase<5, T>::operator()(indices);
-}
-
-
-
-template <typename T>
-inline typename AlignedVector<T>::reference
-Table<5, T>::operator()(const TableIndices<5> &indices)
-{
-  return TableBase<5, T>::operator()(indices);
 }
 
 
@@ -3577,24 +3378,6 @@ Table<6, T>::operator()(const size_type i,
               m) *
                this->table_size[5] +
              n];
-}
-
-
-
-template <typename T>
-inline typename AlignedVector<T>::const_reference
-Table<6, T>::operator()(const TableIndices<6> &indices) const
-{
-  return TableBase<6, T>::operator()(indices);
-}
-
-
-
-template <typename T>
-inline typename AlignedVector<T>::reference
-Table<6, T>::operator()(const TableIndices<6> &indices)
-{
-  return TableBase<6, T>::operator()(indices);
 }
 
 
@@ -3712,24 +3495,6 @@ Table<7, T>::operator()(const size_type i,
 }
 
 
-
-template <typename T>
-inline typename AlignedVector<T>::const_reference
-Table<7, T>::operator()(const TableIndices<7> &indices) const
-{
-  return TableBase<7, T>::operator()(indices);
-}
-
-
-
-template <typename T>
-inline typename AlignedVector<T>::reference
-Table<7, T>::operator()(const TableIndices<7> &indices)
-{
-  return TableBase<7, T>::operator()(indices);
-}
-
-
 #endif // DOXYGEN
 
 
@@ -3738,8 +3503,6 @@ Table<7, T>::operator()(const TableIndices<7> &indices)
  * Global function @p swap which overloads the default implementation of the
  * C++ standard library which uses a temporary object. The function simply
  * exchanges the data of the two tables.
- *
- * @author Martin Kronbichler, 2013
  */
 template <int N, typename T>
 inline void

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2018 by the deal.II authors
+// Copyright (C) 2015 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -215,7 +215,7 @@ DEAL_II_NAMESPACE_OPEN
  * are defined by a cell-wise composition of local shape functions associated
  * with the node on each element.
  *
- * There is a theoretical result about the linear independency of the global
+ * There is a theoretical result about the linear independence of the global
  * basis functions depending on the type of the boundary condition we consider.
  *
  * When homogeneous Dirichlet boundary conditions are given,
@@ -234,8 +234,8 @@ DEAL_II_NAMESPACE_OPEN
  * For a smooth function, we construct a piecewise linear function which belongs
  * to the element space by using its nodal values as DoF values.
  *
- * Note that for the P1 nonconforming element two nodal values of a smooth
- * function and its interpolant do not coincide in general, in contrast with
+ * Note that for the P1 nonconforming element, two nodal values of a smooth
+ * function and its interpolant do not coincide in general, in contrast to
  * ordinary Lagrange finite elements. Of course, it is meaningless to refer
  * 'nodal value' because the element space has nonconformity. But it is also
  * true even though the single global basis function associated with a node is
@@ -249,25 +249,10 @@ DEAL_II_NAMESPACE_OPEN
  * value 1. This is true whether the quadrilateral is a rectangle,
  * parallelogram, or any other shape.
  *
- * <h3>References</h3>
- * The original paper for the P1 nonconforming element is
- * accessible at http://epubs.siam.org/doi/abs/10.1137/S0036142902404923
- * and has the following complete reference:
- * @code{.bib}
- * @article{park2003p,
- *   title     = {P1-nonconforming quadrilateral finite element methods for
- *                second-order elliptic problems},
- *   author    = {Park, Chunjae and Sheen, Dongwoo},
- *   journal   = {SIAM Journal on Numerical Analysis},
- *   volume    = {41},
- *   number    = {2},
- *   pages     = {624--640},
- *   year      = {2003},
- *   publisher = {SIAM}
- * }
- * @endcode
- *
- * @author Jaeryun Yim, 2015, 2016.
+ * <h3>Reference</h3>
+ * The original paper for the P1 nonconforming element  by Park and Sheen
+ * is accessible at https://doi.org/10.1137/S0036142902404923 ,
+ * see @cite park2003p .
  */
 class FE_P1NC : public FiniteElement<2, 2>
 {
@@ -307,7 +292,7 @@ private:
    * x + b y + c$ on given cell. For each local shape function, the array
    * consists of three coefficients is in order of a,b and c.
    */
-  static std::array<std::array<double, 3>, 4>
+  static ndarray<double, 4, 3>
   get_linear_shape_coefficients(const Triangulation<2, 2>::cell_iterator &cell);
 
   /**
@@ -326,11 +311,13 @@ private:
     dealii::internal::FEValuesImplementation::FiniteElementRelatedData<2, 2>
       &output_data) const override;
 
+  using FiniteElement<2, 2>::get_face_data;
+
   virtual std::unique_ptr<FiniteElement<2, 2>::InternalDataBase>
   get_face_data(
     const UpdateFlags update_flags,
     const Mapping<2, 2> &,
-    const Quadrature<1> &quadrature,
+    const hp::QCollection<1> &quadrature,
     dealii::internal::FEValuesImplementation::FiniteElementRelatedData<2, 2>
       &output_data) const override;
 
@@ -358,6 +345,8 @@ private:
     internal::FEValuesImplementation::FiniteElementRelatedData<2, 2>
       &output_data) const override;
 
+  using FiniteElement<2, 2>::fill_fe_face_values;
+
   /**
    * Compute the data on the face of the current cell.
    */
@@ -365,7 +354,7 @@ private:
   fill_fe_face_values(
     const Triangulation<2, 2>::cell_iterator &cell,
     const unsigned int                        face_no,
-    const Quadrature<1> &                     quadrature,
+    const hp::QCollection<1> &                quadrature,
     const Mapping<2, 2> &                     mapping,
     const Mapping<2, 2>::InternalDataBase &   mapping_internal,
     const dealii::internal::FEValuesImplementation::MappingRelatedData<2, 2>

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2017 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -26,6 +26,51 @@
  * are discussed in their respective sub-modules listed above. In addition,
  * the FETools class provides functions that provide information on finite
  * elements, transformations between elements, etc.
+ *
+ * In the grand scheme of things, the pieces of this module interact
+ * with a variety of other parts of the library:
+ * @dot
+ digraph G
+{
+  graph[rankdir="TB",bgcolor="transparent"];
+
+  node [fontname="FreeSans",fontsize=15,
+        shape=box,height=0.2,width=0.4,
+        color="black", fillcolor="white", style="filled"];
+  edge [color="black", weight=10];
+
+  tria       [label="Triangulation",    URL="\ref grid"];
+  fe         [label="Finite elements",    URL="\ref feall", fillcolor="deepskyblue"];
+  mapping    [label="Mapping",          URL="\ref mapping"];
+  quadrature [label="Quadrature",       URL="\ref Quadrature"];
+  dh         [label="DoFHandler",       URL="\ref dofs"];
+  fevalues   [label="FEValues",         URL="\ref feaccess"];
+  systems    [label="Linear systems",   URL="\ref LAC"];
+  solvers    [label="Linear solvers",   URL="\ref Solvers"];
+  output     [label="Graphical output", URL="\ref output"];
+  manifold   [label="Manifold",         URL="\ref manifold"];
+
+  tria -> dh              [color="black",style="solid"];
+  fe -> dh                [color="black",style="solid"];
+  fe -> fevalues          [color="black",style="solid"];
+  mapping -> fevalues     [color="black",style="solid"];
+  quadrature -> fevalues  [color="black",style="solid"];
+  dh -> systems           [color="black",style="solid"];
+  fevalues -> systems     [color="black",style="solid"];
+  systems -> solvers      [color="black",style="solid"];
+  solvers -> output       [color="black",style="solid"];
+  manifold -> tria        [color="black",style="solid"];
+  manifold -> mapping     [color="black",style="solid"];
+
+  {
+    rank=same
+    mapping -> quadrature [dir="none", color="transparent"];
+    quadrature -> fe      [dir="none", color="transparent"];
+    fe -> tria            [dir="none", color="transparent"];
+  }
+
+}
+ * @enddot
  */
 
 
@@ -61,7 +106,7 @@
  * an introduction into the use of this class in the context of the
  * vector-valued elasticity (Lam&eacute;) equations. step-20 discusses a mixed
  * Laplace discretization that also uses vector-valued elements.
- * 
+ *
  * @ingroup feall
  */
 
@@ -96,7 +141,7 @@
  * specify up front which information you are actually interested in. The
  * UpdateFlags enumeration is used to offer symbolic names denoting what you
  * want the FEValues class to compute.
- * 
+ *
  * All these classes are used in all
  * @ref Tutorial "tutorial programs"
  * from step-3 onward, and are described there in significant detail.
@@ -105,6 +150,51 @@
  * complicated because it has to be general yet efficient. The page on
  * @ref UpdateFlags
  * attempts to give an overview of how this works.
+ *
+ * In the grand scheme of things, the pieces of this module interact
+ * with a variety of other parts of the library:
+ * @dot
+ digraph G
+{
+  graph[rankdir="TB",bgcolor="transparent"];
+
+  node [fontname="FreeSans",fontsize=15,
+        shape=box,height=0.2,width=0.4,
+        color="black", fillcolor="white", style="filled"];
+  edge [color="black", weight=10];
+
+  tria       [label="Triangulation",    URL="\ref grid"];
+  fe         [label="Finite elements",    URL="\ref feall"];
+  mapping    [label="Mapping",          URL="\ref mapping"];
+  quadrature [label="Quadrature",       URL="\ref Quadrature"];
+  dh         [label="DoFHandler",       URL="\ref dofs"];
+  fevalues   [label="FEValues",         URL="\ref feaccess", fillcolor="deepskyblue"];
+  systems    [label="Linear systems",   URL="\ref LAC"];
+  solvers    [label="Linear solvers",   URL="\ref Solvers"];
+  output     [label="Graphical output", URL="\ref output"];
+  manifold   [label="Manifold",         URL="\ref manifold"];
+
+  tria -> dh              [color="black",style="solid"];
+  fe -> dh                [color="black",style="solid"];
+  fe -> fevalues          [color="black",style="solid"];
+  mapping -> fevalues     [color="black",style="solid"];
+  quadrature -> fevalues  [color="black",style="solid"];
+  dh -> systems           [color="black",style="solid"];
+  fevalues -> systems     [color="black",style="solid"];
+  systems -> solvers      [color="black",style="solid"];
+  solvers -> output       [color="black",style="solid"];
+  manifold -> tria        [color="black",style="solid"];
+  manifold -> mapping     [color="black",style="solid"];
+
+  {
+    rank=same
+    mapping -> quadrature [dir="none", color="transparent"];
+    quadrature -> fe      [dir="none", color="transparent"];
+    fe -> tria            [dir="none", color="transparent"];
+  }
+
+}
+ * @enddot
  *
  * @ingroup feall
  */
@@ -171,7 +261,7 @@
  * <li> scalar: FE_DGP, FE_DGQ
  * <li> scalar, different shape functions: FE_DGPMonomial, FE_DGPNonparametric, FE_DGQArbitraryNodes
  * <li> vector-valued:  FE_DGBDM, FE_DGNedelec, FE_DGRaviartThomas
- * </ul> 
+ * </ul>
  *
  * @note The implementation of vector valued DG elements is supported
  * by the class FE_DGVector, in the way, that only the vector
@@ -197,13 +287,58 @@
  * it accepts a vector that describes a displacement field for each position
  * of the domain. This is used in Eulerian computations without the need to
  * actually move vertices after each time step.
- * 
+ *
  * In addition, the MappingC1 class provides for a boundary of the
  * computational domain that is not only curved, but also has a continuous
  * derivative at the interface between two cells on the boundary.
- * 
+ *
  * Finally, the MappingCartesian class is an optimization for elements that
  * are brick-shaped and with edges parallel to the coordinate axes.
- * 
+ *
+ * In the grand scheme of things, the pieces of this module interact
+ * with a variety of other parts of the library:
+ * @dot
+ digraph G
+{
+  graph[rankdir="TB",bgcolor="transparent"];
+
+  node [fontname="FreeSans",fontsize=15,
+        shape=box,height=0.2,width=0.4,
+        color="black", fillcolor="white", style="filled"];
+  edge [color="black", weight=10];
+
+  tria       [label="Triangulation",    URL="\ref grid"];
+  fe         [label="Finite elements",    URL="\ref feall"];
+  mapping    [label="Mapping",          URL="\ref mapping", fillcolor="deepskyblue"];
+  quadrature [label="Quadrature",       URL="\ref Quadrature"];
+  dh         [label="DoFHandler",       URL="\ref dofs"];
+  fevalues   [label="FEValues",         URL="\ref feaccess"];
+  systems    [label="Linear systems",   URL="\ref LAC"];
+  solvers    [label="Linear solvers",   URL="\ref Solvers"];
+  output     [label="Graphical output", URL="\ref output"];
+  manifold   [label="Manifold",         URL="\ref manifold"];
+
+  tria -> dh              [color="black",style="solid"];
+  fe -> dh                [color="black",style="solid"];
+  fe -> fevalues          [color="black",style="solid"];
+  mapping -> fevalues     [color="black",style="solid"];
+  quadrature -> fevalues  [color="black",style="solid"];
+  dh -> systems           [color="black",style="solid"];
+  fevalues -> systems     [color="black",style="solid"];
+  systems -> solvers      [color="black",style="solid"];
+  solvers -> output       [color="black",style="solid"];
+  manifold -> tria        [color="black",style="solid"];
+  manifold -> mapping     [color="black",style="solid"];
+
+  {
+    rank=same
+    mapping -> quadrature [dir="none", color="transparent"];
+    quadrature -> fe      [dir="none", color="transparent"];
+    fe -> tria            [dir="none", color="transparent"];
+  }
+
+}
+ * @enddot
+ *
  * @ingroup feall
  */

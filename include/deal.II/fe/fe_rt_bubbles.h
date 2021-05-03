@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -83,11 +83,9 @@ DEAL_II_NAMESPACE_OPEN
  * right - $3D,\,k=2$.</td></tr> </table>
  *
  * @todo Implement restriction matrices
- *
- * @author Eldar Khattatov, 2018
  */
 template <int dim>
-class FE_RT_Bubbles : public FE_PolyTensor<PolynomialsRT_Bubbles<dim>, dim>
+class FE_RT_Bubbles : public FE_PolyTensor<dim>
 {
 public:
   /**
@@ -140,6 +138,12 @@ private:
    */
   void
   initialize_support_points(const unsigned int rt_degree);
+
+  /**
+   * Initialize the permutation pattern and the pattern of sign change.
+   */
+  void
+  initialize_quad_dof_index_permutation_and_sign_change();
 };
 
 

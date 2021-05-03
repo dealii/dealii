@@ -63,7 +63,7 @@ main()
   // no constraints in 1d, but we had the matrices precomputed up to Q4 for 2d
   // and Q2 for 3d
   for (unsigned int degree = 1; degree <= 4; ++degree)
-    test<2>(FE_Q<2>(QIterated<1>(QTrapez<1>(), degree)));
+    test<2>(FE_Q<2>(QIterated<1>(QTrapezoid<1>(), degree)));
 
   // test the standard version (non-equidistant) as well
   test<2>(FE_Q<2>(4));

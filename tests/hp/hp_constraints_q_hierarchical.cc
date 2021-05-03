@@ -15,7 +15,7 @@
 
 
 
-// check that computation of hp constraints works for DGP_Monomial elements
+// check that computation of hp-constraints works for DGP_Monomial elements
 // correctly
 
 char logname[] = "output";

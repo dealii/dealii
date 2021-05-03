@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2018 by the deal.II authors
+// Copyright (C) 2014 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -34,9 +34,6 @@
 #include <deal.II/matrix_free/fe_evaluation.h>
 
 #include "../tests.h"
-
-
-std::ofstream logfile("output");
 
 
 
@@ -92,24 +89,26 @@ do_test(const DoFHandler<dim> &dof)
 
         fe_eval.reinit(cell);
         for (unsigned int i = 0; i < dofs_per_cell;
-             i += VectorizedArray<double>::n_array_elements)
+             i += VectorizedArray<double>::size())
           {
             const unsigned int n_items =
-              i + VectorizedArray<double>::n_array_elements > dofs_per_cell ?
+              i + VectorizedArray<double>::size() > dofs_per_cell ?
                 (dofs_per_cell - i) :
-                VectorizedArray<double>::n_array_elements;
+                VectorizedArray<double>::size();
             for (unsigned int j = 0; j < dofs_per_cell; ++j)
               fe_eval.begin_dof_values()[j] = VectorizedArray<double>();
             for (unsigned int v = 0; v < n_items; ++v)
               fe_eval.begin_dof_values()[i + v][v] = 1.;
 
-            fe_eval.evaluate(true, true);
+            fe_eval.evaluate(EvaluationFlags::values |
+                             EvaluationFlags::gradients);
             for (unsigned int q = 0; q < n_q_points; ++q)
               {
                 fe_eval.submit_value(10. * fe_eval.get_value(q), q);
                 fe_eval.submit_gradient(fe_eval.get_gradient(q), q);
               }
-            fe_eval.integrate(true, true);
+            fe_eval.integrate(EvaluationFlags::values |
+                              EvaluationFlags::gradients);
 
             for (unsigned int v = 0; v < n_items; ++v)
               for (unsigned int j = 0; j < dofs_per_cell; ++j)
@@ -136,7 +135,7 @@ test()
   typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(),
                                                     endc = tria.end();
   for (; cell != endc; ++cell)
-    for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+    for (const unsigned int f : GeometryInfo<dim>::face_indices())
       if (cell->at_boundary(f))
         cell->face(f)->set_all_manifold_ids(0);
   tria.set_manifold(0, manifold);
@@ -158,7 +157,7 @@ test()
 int
 main()
 {
-  deallog.attach(logfile);
+  initlog();
 
   deallog << std::setprecision(3);
 

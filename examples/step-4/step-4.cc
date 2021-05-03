@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 1999 - 2019 by the deal.II authors
+ * Copyright (C) 1999 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -25,9 +25,6 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_values.h>
@@ -102,11 +99,11 @@ private:
 // Function, which declares the common interface which all functions have to
 // follow. In particular, concrete classes have to overload the
 // <code>value</code> function, which takes a point in dim-dimensional space
-// as parameters and shall return the value at that point as a
+// as parameters and returns the value at that point as a
 // <code>double</code> variable.
 //
 // The <code>value</code> function takes a second argument, which we have here
-// named <code>component</code>: This is only meant for vector valued
+// named <code>component</code>: This is only meant for vector-valued
 // functions, where you may want to access a certain component of the vector
 // at the point <code>p</code>. However, our functions are scalar, so we need
 // not worry about this parameter and we will not use it in the implementation
@@ -118,26 +115,16 @@ private:
 // simply be omitted for scalar functions.
 //
 // Function objects are used in lots of places in the library (for example, in
-// step-2 we used a Functions::ZeroFunction instance as an argument to
-// VectorTools::interpolate_boundary_values) and this is the first step where
-// we define a new class that inherits from Function. Since we only ever call
-// Function::value, we could get away with just a plain function (and this is
-// what is done in step-5), but since this is a tutorial we inherit from
+// step-3 we used a Functions::ZeroFunction instance as an argument to
+// VectorTools::interpolate_boundary_values) and this is the first tutorial
+// where we define a new class that inherits from Function. Since we only ever
+// call Function::value(), we could get away with just a plain function (and
+// this is what is done in step-5), but since this is a tutorial we inherit from
 // Function for the sake of example.
-//
-// Unfortunately, we have to explicitly provide a default constructor for this
-// class (even though we do not need the constructor to do anything unusual)
-// to satisfy a strict reading of the C++ language standard. Some compilers
-// (like GCC from version 4.3 onwards) do not require this, but we provide the
-// default constructor so that all supported compilers are happy.
 template <int dim>
 class RightHandSide : public Function<dim>
 {
 public:
-  RightHandSide()
-    : Function<dim>()
-  {}
-
   virtual double value(const Point<dim> & p,
                        const unsigned int component = 0) const override;
 };
@@ -148,17 +135,37 @@ template <int dim>
 class BoundaryValues : public Function<dim>
 {
 public:
-  BoundaryValues()
-    : Function<dim>()
-  {}
-
   virtual double value(const Point<dim> & p,
                        const unsigned int component = 0) const override;
 };
 
-
-
-// For this example, we choose as right hand side function to function
+// If you are not familiar with what the keywords `virtual` and `override` in
+// the function declarations above mean, you will probably want to take a look
+// at your favorite C++ book or an online tutorial such as
+// http://www.cplusplus.com/doc/tutorial/polymorphism/ . In essence, what is
+// happening here is that Function<dim> is an "abstract" base class that
+// declares a certain "interface" -- a set of functions one can call on
+// objects of this kind. But it does not actually *implement* these functions:
+// it just says "this is how Function objects look like", but what kind of
+// function it actually is, is left to derived classes that implement
+// the `value()` function.
+//
+// Deriving one class from another is often called an "is-a" relationship
+// function. Here, the `RightHandSide` class "is a" Function class
+// because it implements the interface described by the Function base class.
+// (The actual implementation of the `value()` function is in the code block
+// below.) The `virtual` keyword then means "Yes, the
+// function here is one that can be overridden by derived classes",
+// and the `override` keyword means "Yes, this is in fact a function we know
+// has been declared as part of the base class". The `override` keyword is not
+// strictly necessary, but is an insurance against typos: If we get the name
+// of the function or the type of one argument wrong, the compiler will warn
+// us by stating "You say that this function overrides one in a base class,
+// but I don't actually know any such function with this name and these
+// arguments."
+//
+// But back to the concrete case here:
+// For this tutorial, we choose as right hand side the function
 // $4(x^4+y^4)$ in 2D, or $4(x^4+y^4+z^4)$ in 3D. We could write this
 // distinction using an if-statement on the space dimension, but here is a
 // simple way that also allows us to use the same function in 1D (or in 4D, if
@@ -167,10 +174,10 @@ public:
 // time when you define the template, the compiler doesn't know the value of
 // <code>dim</code>, but when it later encounters a statement or declaration
 // <code>RightHandSide@<2@></code>, it will take the template, replace all
-// occurrences of dim by 2 and compile the resulting function); in other
+// occurrences of dim by 2 and compile the resulting function).  In other
 // words, at the time of compiling this function, the number of times the body
-// will be executed is known, and the compiler can optimize away the overhead
-// needed for the loop and the result will be as fast as if we had used the
+// will be executed is known, and the compiler can minimize the overhead
+// needed for the loop; the result will be as fast as if we had used the
 // formulas above right away.
 //
 // The last thing to note is that a <code>Point@<dim@></code> denotes a point
@@ -314,7 +321,7 @@ void Step4<dim>::assemble_system()
   // the class declared above to generate the necessary data. Since this right
   // hand side object is only used locally in the present function, we declare
   // it here as a local variable:
-  const RightHandSide<dim> right_hand_side;
+  RightHandSide<dim> right_hand_side;
 
   // Compared to the previous example, in order to evaluate the non-constant
   // right hand side function we now also need the quadrature points on the
@@ -327,12 +334,12 @@ void Step4<dim>::assemble_system()
                           update_values | update_gradients |
                             update_quadrature_points | update_JxW_values);
 
-  // We then again define a few abbreviations. The values of these variables
-  // of course depend on the dimension which we are presently using. However,
-  // the FE and Quadrature classes do all the necessary work for you and you
-  // don't have to care about the dimension dependent parts:
-  const unsigned int dofs_per_cell = fe.dofs_per_cell;
-  const unsigned int n_q_points    = quadrature_formula.size();
+  // We then again define the same abbreviation as in the previous program.
+  // The value of this variable of course depends on the dimension which we
+  // are presently using, but the FiniteElement class does all the necessary
+  // work for you and you don't have to care about the dimension dependent
+  // parts:
+  const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
 
   FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
   Vector<double>     cell_rhs(dofs_per_cell);
@@ -362,10 +369,10 @@ void Step4<dim>::assemble_system()
       // difference to how we did things in step-3: Instead of using a
       // constant right hand side with value 1, we use the object representing
       // the right hand side and evaluate it at the quadrature points:
-      for (unsigned int q_index = 0; q_index < n_q_points; ++q_index)
-        for (unsigned int i = 0; i < dofs_per_cell; ++i)
+      for (const unsigned int q_index : fe_values.quadrature_point_indices())
+        for (const unsigned int i : fe_values.dof_indices())
           {
-            for (unsigned int j = 0; j < dofs_per_cell; ++j)
+            for (const unsigned int j : fe_values.dof_indices())
               cell_matrix(i, j) +=
                 (fe_values.shape_grad(i, q_index) * // grad phi_i(x_q)
                  fe_values.shape_grad(j, q_index) * // grad phi_j(x_q)
@@ -399,9 +406,9 @@ void Step4<dim>::assemble_system()
       // and right hand side is done exactly as before, but here we have again
       // merged some loops for efficiency:
       cell->get_dof_indices(local_dof_indices);
-      for (unsigned int i = 0; i < dofs_per_cell; ++i)
+      for (const unsigned int i : fe_values.dof_indices())
         {
-          for (unsigned int j = 0; j < dofs_per_cell; ++j)
+          for (const unsigned int j : fe_values.dof_indices())
             system_matrix.add(local_dof_indices[i],
                               local_dof_indices[j],
                               cell_matrix(i, j));
@@ -410,12 +417,19 @@ void Step4<dim>::assemble_system()
         }
     }
 
-
   // As the final step in this function, we wanted to have non-homogeneous
   // boundary values in this example, unlike the one before. This is a simple
   // task, we only have to replace the Functions::ZeroFunction used there by an
   // object of the class which describes the boundary values we would like to
   // use (i.e. the <code>BoundaryValues</code> class declared above):
+  //
+  // The function VectorTools::interpolate_boundary_values() will only work
+  // on faces that have been marked with boundary indicator 0 (because that's
+  // what we say the function should work on with the second argument below).
+  // If there are faces with boundary id other than 0, then the function
+  // interpolate_boundary_values will do nothing on these faces. For
+  // the Laplace equation doing nothing is equivalent to assuming that
+  // on those parts of the boundary a zero Neumann boundary condition holds.
   std::map<types::global_dof_index, double> boundary_values;
   VectorTools::interpolate_boundary_values(dof_handler,
                                            0,
@@ -436,8 +450,8 @@ void Step4<dim>::assemble_system()
 template <int dim>
 void Step4<dim>::solve()
 {
-  SolverControl solver_control(1000, 1e-12);
-  SolverCG<>    solver(solver_control);
+  SolverControl            solver_control(1000, 1e-12);
+  SolverCG<Vector<double>> solver(solver_control);
   solver.solve(system_matrix, solution, system_rhs, PreconditionIdentity());
 
   // We have made one addition, though: since we suppress output from the
@@ -451,14 +465,6 @@ void Step4<dim>::solve()
 
 // This function also does what the respective one did in step-3. No changes
 // here for dimension independence either.
-//
-// The only difference to the previous example is that we want to write output
-// in VTK format, rather than for gnuplot. VTK format is currently the most
-// widely used one and is supported by a number of visualization programs such
-// as Visit and Paraview (for ways to obtain these programs see the ReadMe
-// file of deal.II). To write data in this format, we simply replace the
-// <code>data_out.write_gnuplot</code> call by
-// <code>data_out.write_vtk</code>.
 //
 // Since the program will run both 2d and 3d versions of the Laplace solver,
 // we use the dimension in the filename to generate distinct filenames for
@@ -528,7 +534,6 @@ void Step4<dim>::run()
 // could actually use it.
 int main()
 {
-  deallog.depth_console(0);
   {
     Step4<2> laplace_problem_2d;
     laplace_problem_2d.run();

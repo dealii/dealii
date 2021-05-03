@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2018 by the deal.II authors
+// Copyright (C) 2007 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,6 +15,7 @@
 
 
 #include "../tests.h"
+
 #include "fe_restriction_common.h"
 
 
@@ -24,12 +25,12 @@ main()
 {
   initlog();
 
-  CHECK_SYS3(FE_DGQArbitraryNodes<2>(QIterated<1>(QTrapez<1>(), 3)),
-             1,
-             FESystem<2>(FE_DGQArbitraryNodes<2>(QIterated<1>(QTrapez<1>(), 3)),
-                         3),
-             1,
-             FESystem<2>(FE_Q<2>(2), 3, FE_DGQ<2>(0), 1),
-             2,
-             2);
+  CHECK_SYS3(
+    FE_DGQArbitraryNodes<2>(QIterated<1>(QTrapezoid<1>(), 3)),
+    1,
+    FESystem<2>(FE_DGQArbitraryNodes<2>(QIterated<1>(QTrapezoid<1>(), 3)), 3),
+    1,
+    FESystem<2>(FE_Q<2>(2), 3, FE_DGQ<2>(0), 1),
+    2,
+    2);
 }

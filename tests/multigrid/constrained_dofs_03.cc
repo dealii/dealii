@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -56,7 +56,7 @@ check_fe(FiniteElement<dim> &fe, ComponentMask &component_mask)
 
   DoFHandler<dim> dofh(tr);
   dofh.distribute_dofs(fe);
-  dofh.distribute_mg_dofs(fe);
+  dofh.distribute_mg_dofs();
 
   MGConstrainedDoFs            mg_constrained_dofs;
   std::set<types::boundary_id> boundary_indicators;

@@ -1,6 +1,6 @@
 //-----------------------------------------------------------
 //
-//    Copyright (C) 2017 - 2018 by the deal.II authors
+//    Copyright (C) 2017 - 2020 by the deal.II authors
 //
 //    This file is part of the deal.II library.
 //
@@ -22,13 +22,15 @@
 
 #include "../tests.h"
 
-// provide only residual function, use internal solver.
+// Solve a nonlinear system but provide only residual function. KINSOL
+// then uses its internal solvers which are based on a
+// finite-difference approximation to the Jacobian and a direct
+// solver.
 
 /**
  * Solve the non linear problem
  *
  * F(u) = 0 , where f_i(u) = u_i^2 - i^2,  0 <= i < N
- *
  */
 int
 main(int argc, char **argv)
@@ -38,18 +40,11 @@ main(int argc, char **argv)
   Utilities::MPI::MPI_InitFinalize mpi_initialization(
     argc, argv, numbers::invalid_unsigned_int);
 
-  typedef Vector<double> VectorType;
+  using VectorType = Vector<double>;
 
   SUNDIALS::KINSOL<VectorType>::AdditionalData data;
   ParameterHandler                             prm;
   data.add_parameters(prm);
-
-  if (false)
-    {
-      std::ofstream ofile(SOURCE_DIR "/kinsol_01.prm");
-      prm.print_parameters(ofile, ParameterHandler::ShortText);
-      ofile.close();
-    }
 
   std::ifstream ifile(SOURCE_DIR "/kinsol_01.prm");
   prm.parse_input(ifile);
@@ -77,6 +72,6 @@ main(int argc, char **argv)
   VectorType v(N);
   v          = 1.0;
   auto niter = kinsol.solve(v);
-  deallog << v << std::endl;
+  v.print(deallog.get_file_stream());
   deallog << "Converged in " << niter << " iterations." << std::endl;
 }

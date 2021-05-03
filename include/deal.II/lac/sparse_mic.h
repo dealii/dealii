@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2018 by the deal.II authors
+// Copyright (C) 2002 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,6 +15,8 @@
 
 #ifndef dealii_sparse_mic_h
 #define dealii_sparse_mic_h
+
+#include <deal.II/base/config.h>
 
 #include <deal.II/lac/sparse_decomposition.h>
 #include <deal.II/lac/sparse_matrix.h>
@@ -38,10 +40,6 @@ DEAL_II_NAMESPACE_OPEN
  * lower triangular matrix. The MIC(0) decomposition of the matrix $A$ is
  * defined by $B = (X-L)X^{-1}(X-L^T)$, where $X$ is a diagonal matrix defined
  * by the condition $\text{rowsum}(A) = \text{rowsum}(B)$.
- *
- * @author Stephen "Cheffo" Kolaroff, 2002, unified interface: Ralf Hartmann
- * 2003; extension for full compatibility with LinearOperator class: Jean-Paul
- * Pelteret, 2015.
  */
 template <typename number>
 class SparseMIC : public SparseLUDecomposition<number>
@@ -115,7 +113,6 @@ public:
    * Call @p initialize before calling this function.
    *
    * @note This function has not yet been implemented
-   *
    */
   template <typename somenumber>
   void

@@ -1,0 +1,105 @@
+
+<h1>Results</h1>
+
+<h3>Program output</h3>
+
+If we run the three-dimensional version of this program with polynomials of
+degree three, we get the following program output:
+
+@code
+> make run
+Scanning dependencies of target \step-65
+[ 33%] Building CXX object CMakeFiles/\step-65.dir/\step-65.cc.o
+[ 66%] Linking CXX executable \step-65
+[ 66%] Built target \step-65
+[100%] Run \step-65 with Release configuration
+
+====== Running with the basic MappingQGeneric class ======
+
+   Number of active cells:       6656
+   Number of degrees of freedom: 181609
+   Number of solver iterations:  285
+   L2 error vs exact solution:   8.99339e-08
+   H1 error vs exact solution:   6.45341e-06
+   Max cell-wise error estimate: 0.00743406
+
+
++---------------------------------------------+------------+------------+
+| Total wallclock time elapsed since start    |      49.4s |            |
+|                                             |            |            |
+| Section                         | no. calls |  wall time | % of total |
++---------------------------------+-----------+------------+------------+
+| Assemble linear system          |         1 |       5.8s |        12% |
+| Compute constraints             |         1 |     0.109s |      0.22% |
+| Compute error estimator         |         1 |      16.5s |        33% |
+| Compute error norms             |         1 |      9.11s |        18% |
+| Solve linear system             |         1 |      9.92s |        20% |
+| Write output                    |         1 |      4.85s |       9.8% |
++---------------------------------+-----------+------------+------------+
+
+====== Running with the optimized MappingQCache class ======
+
+   Memory consumption cache:     22.9981 MB
+   Number of active cells:       6656
+   Number of degrees of freedom: 181609
+   Number of solver iterations:  285
+   L2 error vs exact solution:   8.99339e-08
+   H1 error vs exact solution:   6.45341e-06
+   Max cell-wise error estimate: 0.00743406
+
+
++---------------------------------------------+------------+------------+
+| Total wallclock time elapsed since start    |      18.4s |            |
+|                                             |            |            |
+| Section                         | no. calls |  wall time | % of total |
++---------------------------------+-----------+------------+------------+
+| Assemble linear system          |         1 |      1.44s |       7.8% |
+| Compute constraints             |         1 |   0.00336s |         0% |
+| Compute error estimator         |         1 |     0.476s |       2.6% |
+| Compute error norms             |         1 |     0.505s |       2.7% |
+| Initialize mapping cache        |         1 |      4.96s |        27% |
+| Solve linear system             |         1 |      9.95s |        54% |
+| Write output                    |         1 |     0.875s |       4.8% |
++---------------------------------+-----------+------------+------------+
+
+[100%] Built target run
+@endcode
+
+Before discussing the timings, we look at the memory consumption for the
+MappingQCache object: Our program prints that it utilizes 23 MB of
+memory. If we relate this number to the memory consumption of a single
+(solution or right hand side) vector,
+which is 1.5 MB (namely, 181,609 elements times 8 bytes per entry in
+double precision), or to the memory consumed by the
+system matrix and the sparsity pattern (which is 274 MB), we realize that it is
+not an overly heavy data structure, given its benefits.
+
+With respect to the timers, we see a clear improvement in the overall run time
+of the program by a factor of 2.7. If we disregard the iterative solver, which
+is the same in both cases (and not optimal, given the simple preconditioner we
+use, and the fact that sparse matrix-vector products waste operations for
+cubic polynomials), the advantage is a factor of almost 5. This is pretty
+impressive for a linear stationary problem, and cost savings would indeed be
+much more prominent for time-dependent and nonlinear problems where assembly
+is called several times. If we look into the individual components, we get a
+clearer picture of what is going on and why the cache is so efficient: In the
+MappingQGeneric case, essentially every operation that involves a mapping take
+at least 5 seconds to run. The norm computation runs two
+VectorTools::integrate_difference() functions, which each take almost 5
+seconds. (The computation of constraints is cheaper because it only evaluates
+the mapping in cells at the boundary for the interpolation of boundary
+conditions.) If we compare these 5 seconds to the time it takes to fill the
+MappingQCache, which is 5.2 seconds (for all cells, not just the active ones),
+it becomes obvious that the computation of the mapping support points
+dominates over everything else in the MappingQGeneric case. Perhaps the most
+striking result is the time for the error estimator, labeled "Compute error
+estimator", where the MappingQGeneric implementation takes 17.3 seconds and
+the MappingQCache variant less than 0.5 seconds. The reason why the former is
+so expensive (three times more expensive than the assembly, for instance) is
+that the error estimation involves evaluation of quantities over faces, where
+each face in the mesh requests additional points of the mapping that in turn
+go through the very expensive TransfiniteInterpolationManifold class. As there
+are six faces per cell, this happens much more often than in assembly. Again,
+MappingQCache nicely eliminates the repeated evaluation, aggregating all the
+expensive steps involving the manifold in a single initialization call that
+gets repeatedly used.

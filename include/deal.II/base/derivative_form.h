@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2019 by the deal.II authors
+// Copyright (C) 2013 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,6 +15,8 @@
 
 #ifndef dealii_derivative_form_h
 #define dealii_derivative_form_h
+
+#include <deal.II/base/config.h>
 
 #include <deal.II/base/tensor.h>
 
@@ -51,8 +53,6 @@ DEAL_II_NAMESPACE_OPEN
  * In deal.II we represent these derivatives using objects of type
  * DerivativeForm@<1,dim,spacedim,Number@>,
  * DerivativeForm@<2,dim,spacedim,Number@> and so on.
- *
- * @author Sebastian Pauletti, 2011, Luca Heltai, 2015
  */
 template <int order, int dim, int spacedim, typename Number = double>
 class DerivativeForm
@@ -69,6 +69,11 @@ public:
   DerivativeForm(const Tensor<order + 1, dim, Number> &);
 
   /**
+   * Constructor from a tensor.
+   */
+  DerivativeForm(const Tensor<order, spacedim, Tensor<1, dim, Number>> &);
+
+  /**
    * Read-Write access operator.
    */
   Tensor<order, dim, Number> &operator[](const unsigned int i);
@@ -83,6 +88,12 @@ public:
    */
   DerivativeForm &
   operator=(const Tensor<order + 1, dim, Number> &);
+
+  /**
+   * Assignment operator.
+   */
+  DerivativeForm &
+  operator=(const Tensor<order, spacedim, Tensor<1, dim, Number>> &);
 
   /**
    * Assignment operator.
@@ -185,6 +196,16 @@ inline DerivativeForm<order, dim, spacedim, Number>::DerivativeForm(
 
 
 template <int order, int dim, int spacedim, typename Number>
+inline DerivativeForm<order, dim, spacedim, Number>::DerivativeForm(
+  const Tensor<order, spacedim, Tensor<1, dim, Number>> &T)
+{
+  for (unsigned int j = 0; j < spacedim; ++j)
+    (*this)[j] = T[j];
+}
+
+
+
+template <int order, int dim, int spacedim, typename Number>
 inline DerivativeForm<order, dim, spacedim, Number> &
 DerivativeForm<order, dim, spacedim, Number>::
 operator=(const Tensor<order + 1, dim, Number> &ta)
@@ -194,6 +215,18 @@ operator=(const Tensor<order + 1, dim, Number> &ta)
   if (dim == spacedim)
     for (unsigned int j = 0; j < dim; ++j)
       (*this)[j] = ta[j];
+  return *this;
+}
+
+
+
+template <int order, int dim, int spacedim, typename Number>
+inline DerivativeForm<order, dim, spacedim, Number> &
+DerivativeForm<order, dim, spacedim, Number>::
+operator=(const Tensor<order, spacedim, Tensor<1, dim, Number>> &T)
+{
+  for (unsigned int j = 0; j < spacedim; ++j)
+    (*this)[j] = T[j];
   return *this;
 }
 
@@ -218,7 +251,7 @@ template <int order, int dim, int spacedim, typename Number>
 inline Tensor<order, dim, Number> &
   DerivativeForm<order, dim, spacedim, Number>::operator[](const unsigned int i)
 {
-  Assert(i < spacedim, ExcIndexRange(i, 0, spacedim));
+  AssertIndexRange(i, spacedim);
 
   return tensor[i];
 }
@@ -230,7 +263,7 @@ inline const Tensor<order, dim, Number> &
   DerivativeForm<order, dim, spacedim, Number>::
   operator[](const unsigned int i) const
 {
-  Assert(i < spacedim, ExcIndexRange(i, 0, spacedim));
+  AssertIndexRange(i, spacedim);
 
   return tensor[i];
 }
@@ -344,12 +377,12 @@ DerivativeForm<order, dim, spacedim, Number>::covariant_form() const
     {
       const Tensor<2, dim, Number> DF_t =
         dealii::transpose(invert(static_cast<Tensor<2, dim, Number>>(*this)));
-      return DerivativeForm<1, dim, spacedim>(DF_t);
+      return DerivativeForm<1, dim, spacedim, Number>(DF_t);
     }
   else
     {
-      const DerivativeForm<1, spacedim, dim> DF_t = this->transpose();
-      Tensor<2, dim, Number>                 G; // First fundamental form
+      const DerivativeForm<1, spacedim, dim, Number> DF_t = this->transpose();
+      Tensor<2, dim, Number> G; // First fundamental form
       for (unsigned int i = 0; i < dim; ++i)
         for (unsigned int j = 0; j < dim; ++j)
           G[i][j] = DF_t[i] * DF_t[j];
@@ -390,7 +423,6 @@ DerivativeForm<order, dim, spacedim, Number>::memory_consumption()
  * $[\Delta \mathbf x] [\nabla \mathbf F(\mathbf x)]^T$ in matrix notation.
  *
  * @relatesalso DerivativeForm
- * @author Sebastian Pauletti, 2011, Reza Rastak, 2019
  */
 template <int spacedim, int dim, typename Number>
 inline Tensor<1, spacedim, Number>
@@ -408,23 +440,46 @@ apply_transformation(const DerivativeForm<1, dim, spacedim, Number> &grad_F,
 /**
  * Similar to the previous apply_transformation().
  * Each row of the result corresponds to one of the rows of @p D_X transformed
- * by @p grad_F, equivalent to $\text{D\_X} \, \text{grad\_F}^T$ in matrix notation.
+ * by @p grad_F, equivalent to $\mathrm{D\_X} \, \mathrm{grad\_F}^T$ in matrix
+ * notation.
  *
  * @relatesalso DerivativeForm
- * @author Sebastian Pauletti, 2011, Reza Rastak, 2019
  */
 // rank=2
 template <int spacedim, int dim, typename Number>
-inline DerivativeForm<1, spacedim, dim>
+inline DerivativeForm<1, spacedim, dim, Number>
 apply_transformation(const DerivativeForm<1, dim, spacedim, Number> &grad_F,
                      const Tensor<2, dim, Number> &                  D_X)
 {
-  DerivativeForm<1, spacedim, dim> dest;
+  DerivativeForm<1, spacedim, dim, Number> dest;
   for (unsigned int i = 0; i < dim; ++i)
     dest[i] = apply_transformation(grad_F, D_X[i]);
 
   return dest;
 }
+
+
+
+/**
+ * Similar to the previous apply_transformation().
+ * Each row of the result corresponds to one of the rows of @p D_X transformed
+ * by @p grad_F.
+ *
+ * @relatesalso DerivativeForm
+ */
+template <int spacedim, int dim, int n_components, typename Number>
+inline Tensor<1, n_components, Tensor<1, spacedim, Number>>
+apply_transformation(const DerivativeForm<1, dim, spacedim, Number> &grad_F,
+                     const Tensor<1, n_components, Tensor<1, dim, Number>> &D_X)
+{
+  Tensor<1, n_components, Tensor<1, spacedim, Number>> dest;
+  for (unsigned int i = 0; i < n_components; ++i)
+    dest[i] = apply_transformation(grad_F, D_X[i]);
+
+  return dest;
+}
+
+
 
 /**
  * Similar to the previous apply_transformation(). In matrix notation, it
@@ -440,7 +495,6 @@ apply_transformation(const DerivativeForm<1, dim, spacedim, Number> &grad_F,
  * @f]
  *
  * @relatesalso DerivativeForm
- * @author Sebastian Pauletti, 2011, Reza Rastak, 2019
  */
 template <int spacedim, int dim, typename Number>
 inline Tensor<2, spacedim, Number>
@@ -456,12 +510,12 @@ apply_transformation(const DerivativeForm<1, dim, spacedim, Number> &DF1,
 }
 
 
+
 /**
  * Transpose of a rectangular DerivativeForm DF, mostly for compatibility
  * reasons.
  *
  * @relatesalso DerivativeForm
- * @author Sebastian Pauletti, 2011
  */
 template <int dim, int spacedim, typename Number>
 inline DerivativeForm<1, spacedim, dim, Number>

@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2018 by the deal.II authors
+## Copyright (C) 2012 - 2019 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -44,11 +44,6 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-fpic")
 # the deal.II library with it.
 #
 ENABLE_IF_LINKS(DEAL_II_LINKER_FLAGS "-Wl,--as-needed")
-
-#
-# Set ansi mode:
-#
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-ansi")
 
 #
 # Enable verbose warnings:
@@ -96,6 +91,7 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-diag-disable=remark")
 #            references; however, it's the only useful way to do
 #            so if you need an invalid value for a reference)
 #   -w383   value copied to temporary, reference to temporary used
+#   -w854   const variable requires an initializer (defect 253 in http://www.open-std.org/jtc1/sc22/wg21/docs/cwg_defects.html)
 #   -w981   operands are evaluated in unspecified order
 #   -w1418  external function definition with no prior declaration
 #           (happens in boost)
@@ -109,6 +105,7 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-diag-disable=remark")
 #   -w3415  the "always_inline" attribute is ignored on non-inline functions
 #           incorrectly triggered by inline functions in tensor.h
 #   -w15531 A portion of SIMD loop is serialized
+#   -w15552 loop was not vectorized with "simd"
 #
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd21")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd68")
@@ -120,6 +117,7 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd193")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd279")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd327")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd383")
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd854")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd981")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd1418")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd1478")
@@ -129,6 +127,7 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd2536")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd2651")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd3415")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd15531")
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd15552")
 
 
 #

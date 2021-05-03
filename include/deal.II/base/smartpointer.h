@@ -62,7 +62,6 @@ DEAL_II_NAMESPACE_OPEN
  * <tt>SmartPointer<ABC></tt> is a mutable pointer.
  *
  * @ingroup memory
- * @author Guido Kanschat, Wolfgang Bangerth, 1998 - 2009
  */
 template <typename T, typename P = void>
 class SmartPointer

@@ -162,7 +162,7 @@ profit. Answer 2: this quick hack
 @code
   bool refinement_indicated = false;
   for (const auto &cell : triangulation.active_cell_iterators())
-    for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+    for (const auto v : cell->vertex_indices())
 	  if (cell->vertex(v) == Point<dim>(.5,.5))
 	    {
 	      cell->clear_coarsen_flag();
@@ -170,7 +170,7 @@ profit. Answer 2: this quick hack
 	    }
   if (refinement_indicated)
     for (const auto &cell : triangulation.active_cell_iterators())
-      for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+      for (const auto v : cell->vertex_indices())
 	    if (cell->vertex(v) == Point<dim>(.5,.5))
 	      cell->set_refine_flag ();
 @endcode
@@ -179,4 +179,3 @@ executing refinement would improve the results (exercise: what does
 the code do?), making them consistently better than global
 refinement. Behavior is still irregular, though, so no results about
 an order of convergence are possible.)
-

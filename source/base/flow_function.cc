@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2019 by the deal.II authors
+// Copyright (C) 2007 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -103,7 +103,7 @@ namespace Functions
   FlowFunction<dim>::value(const Point<dim> & point,
                            const unsigned int comp) const
   {
-    Assert(comp < dim + 1, ExcIndexRange(comp, 0, dim + 1));
+    AssertIndexRange(comp, dim + 1);
     const unsigned int      n_points = 1;
     std::vector<Point<dim>> points(1);
     points[0] = point;

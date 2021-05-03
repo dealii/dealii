@@ -14,7 +14,7 @@ values, but a nonzero right hand side:
   \\
   u &= 0 \qquad\qquad & \text{on}\ \partial\Omega.
 @f}
-We will solve this equation on the unit square, $\Omega=[0,1]^2$, for which
+We will solve this equation on the square, $\Omega=[-1,1]^2$, for which
 you've already learned how to generate a mesh in step-1 and step-2. In
 this program, we will also only consider the particular case
 $f(\mathbf x)=1$ and come back to how to implement the more general
@@ -63,7 +63,7 @@ we need the following:
 - A finite element that describes the shape functions we want to use on the
   reference cell (which in deal.II is always the unit interval $[0,1]$, the
   unit square $[0,1]^2$ or the unit cube $[0,1]^3$, depending on which space
-  dimension you work in. In step-2, we had already used an object of type
+  dimension you work in). In step-2, we had already used an object of type
   FE_Q<2>, which denotes the usual Lagrange elements that define shape
   functions by interpolation on support points. The simplest one is
   FE_Q<2>(1), which uses polynomial degree 1. In 2d, these are often referred
@@ -144,8 +144,9 @@ Now we know what we need (namely: objects that hold the matrix and
 vectors, as well as ways to compute $A_{ij},F_i$), and we can look at what it
 takes to make that happen:
 
-- The objects for $A,U,F$ are of type SparseMatrix and Vector, and we will see
-  in the program below what classes are used to solve linear systems.
+- The object for $A$ is of type SparseMatrix while those for $U$ and $F$ are of
+  type Vector. We will see in the program below what classes are used to solve
+  linear systems.
 - We need a way to form the integrals. In the finite element method, this is
   most commonly done using quadrature, i.e. the integrals are replaced by a
   weighted sum over a set of points on each cell. That is, we first split the
@@ -335,8 +336,13 @@ following tutorial programs.
 
 <h3> A note on types </h3>
 
-deal.II defines a number of integral %types via alias in namespace types. In
-particular, in this program you will see types::global_dof_index in a couple of
+deal.II defines a number of integral %types via alias in namespace dealii::types.
+(In the previous sentence, the word "integral" is used as the <i>adjective</i>
+that corresponds to the noun "integer". It shouldn't be confused with the
+<i>noun</i> "integral" that represents the area or volume under a curve
+or surface. The adjective "integral" is widely used in the C++ world in
+contexts such as "integral type", "integral constant", etc.)
+In particular, in this program you will see types::global_dof_index in a couple of
 places: an integer type that is used to denote the <i>global</i> index of a
 degree of freedom, i.e., the index of a particular degree of freedom within the
 DoFHandler object that is defined on top of a triangulation (as opposed to the
@@ -384,7 +390,7 @@ following piece of the code:
 @endcode
 where <code>local_dof_indices</code> is declared as
 @code
-  std::vector<types::global_dof_index> local_dof_indices (fe.dofs_per_cell);
+  std::vector<types::global_dof_index> local_dof_indices (fe.n_dofs_per_cell());
 @endcode
 The name of this variable might be a bit of a misnomer -- it stands for "the
 global indices of those degrees of freedom locally defined on the current
@@ -399,4 +405,3 @@ data types but, as explained above, they are used throughout the library so that
 becomes possible to change the actual type to a larger one if necessary without
 having to go through the entire library and figure out whether a particular use
 of <code>unsigned int</code> corresponds to, say, a material indicator.
-

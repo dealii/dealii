@@ -22,6 +22,18 @@ IF(_n_processors EQUAL 0)
   SET(_n_processors "1")
 ENDIF()
 
+
+# Windows quick tests have a race condition, so disable compiling/running
+# tests in parallel. This avoid errors like:
+#
+# error MSB3491: Could not write lines to file
+# "obj_boost_system_debug.dir\Debug\obj_boos.4A356C5C.tlog\obj_boost_system_debug.lastbuildstate". The
+# process cannot access the file '...' because it is being used by another
+# process.
+IF(CMAKE_HOST_SYSTEM_NAME MATCHES "Windows")
+  SET(_n_processors "1")
+ENDIF()
+
 SEPARATE_ARGUMENTS(ALL_TESTS)
 
 EXECUTE_PROCESS(COMMAND ${CMAKE_CTEST_COMMAND} -j${_n_processors}

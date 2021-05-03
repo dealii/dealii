@@ -1,0 +1,67 @@
+// ---------------------------------------------------------------------
+//
+// Copyright (C) 2020 by the deal.II Authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
+//
+// ---------------------------------------------------------------------
+
+// Test BoundingBoxDataOut with vector of bounding boxes.
+
+#include <deal.II/base/bounding_box_data_out.h>
+#include <deal.II/base/geometry_info.h>
+
+#include "../tests.h"
+
+using namespace dealii;
+
+template <int dim>
+void
+test()
+{
+  const unsigned int            N = 2;
+  std::vector<BoundingBox<dim>> boxes(N);
+  auto                          unit = create_unit_bounding_box<dim>();
+
+  Point<dim> ones;
+  for (unsigned int i = 0; i < dim; ++i)
+    ones[i] = 1;
+
+  for (auto &box : boxes)
+    {
+      const auto c = random_point<dim>();
+      const auto d = random_value();
+      box =
+        BoundingBox<dim>({Point<dim>(c - d * ones), Point<dim>(c + d * ones)});
+    }
+
+  std::string fname = "boxes_" + std::to_string(dim) + ".vtk";
+  {
+    std::ofstream           ofile(fname);
+    BoundingBoxDataOut<dim> data_out;
+    DataOutBase::VtkFlags   flags;
+    flags.print_date_and_time = false;
+    data_out.set_flags(flags);
+    data_out.build_patches(boxes);
+    data_out.write_vtk(ofile);
+  }
+  cat_file(fname.c_str());
+}
+
+
+int
+main()
+{
+  initlog();
+
+  test<1>();
+  test<2>();
+  test<3>();
+}

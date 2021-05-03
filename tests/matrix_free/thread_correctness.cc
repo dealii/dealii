@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,10 +21,8 @@
 #include <deal.II/base/function.h>
 
 #include "../tests.h"
+
 #include "create_mesh.h"
-
-std::ofstream logfile("output");
-
 #include "matrix_vector_common.h"
 
 
@@ -130,6 +128,8 @@ sub_test()
 
       // make 10 sweeps in order to get in some
       // variation to the threaded program
+      const double float_factor =
+        std::is_same<number, float>::value ? 0.01 : 1.;
       for (unsigned int sweep = 0; sweep < 10; ++sweep)
         {
           mf_color.vmult(out_color, in_dist);
@@ -137,14 +137,12 @@ sub_test()
 
           out_color -= out_dist;
           double diff_norm = out_color.linfty_norm();
-          deallog << "Sweep " << sweep
-                  << ", error in partition/color:     " << diff_norm
-                  << std::endl;
+          deallog << "Sweep " << sweep << ", error in partition/color:     "
+                  << diff_norm * float_factor << std::endl;
           out_partition -= out_dist;
           diff_norm = out_partition.linfty_norm();
-          deallog << "Sweep " << sweep
-                  << ", error in partition/partition: " << diff_norm
-                  << std::endl;
+          deallog << "Sweep " << sweep << ", error in partition/partition: "
+                  << diff_norm * float_factor << std::endl;
         }
       deallog << std::endl;
     }

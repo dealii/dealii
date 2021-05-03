@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -59,7 +59,6 @@
 
 std::ofstream logfile("output");
 
-using namespace dealii;
 
 
 namespace Assembly
@@ -269,8 +268,8 @@ LaplaceProblem<dim>::setup_system()
                                            constraints);
   constraints.close();
 
-  typedef FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>
-             CellFilter;
+  using CellFilter =
+    FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>;
   CellFilter begin(IteratorFilters::LocallyOwnedCell(),
                    dof_handler.begin_active());
   CellFilter end(IteratorFilters::LocallyOwnedCell(), dof_handler.end());
@@ -289,8 +288,8 @@ LaplaceProblem<dim>::setup_system()
            relevant_total;
   DoFTools::extract_locally_relevant_dofs(dof_handler, relevant_total);
 
-  std::vector<types::global_dof_index> dofs_per_block(2);
-  DoFTools::count_dofs_per_block(dof_handler, dofs_per_block, blocks);
+  const std::vector<types::global_dof_index> dofs_per_block =
+    DoFTools::count_dofs_per_fe_block(dof_handler, blocks);
   locally_owned[0] = locally_owned_total.get_view(0, dofs_per_block[0]);
   locally_owned[1] =
     locally_owned_total.get_view(dofs_per_block[0], dof_handler.n_dofs());

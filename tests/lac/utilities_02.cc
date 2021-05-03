@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2017 - 2018 by the deal.II authors
+ * Copyright (C) 2017 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -25,7 +25,6 @@
  * DEAL::1018.29
  * DEAL::1020.72
  * DEAL::1020.72
- *
  */
 
 #include <deal.II/base/index_set.h>
@@ -69,7 +68,6 @@
 
 const unsigned int dim = 2;
 
-using namespace dealii;
 
 const double eps = 1e-10;
 
@@ -143,12 +141,12 @@ test()
     mf_data->initialize_dof_vector(inv_mass_matrix);
     FEEvaluation<dim, fe_degree> fe_eval(*mf_data);
     const unsigned int           n_q_points = fe_eval.n_q_points;
-    for (unsigned int cell = 0; cell < mf_data->n_macro_cells(); ++cell)
+    for (unsigned int cell = 0; cell < mf_data->n_cell_batches(); ++cell)
       {
         fe_eval.reinit(cell);
         for (unsigned int q = 0; q < n_q_points; ++q)
           fe_eval.submit_value(one, q);
-        fe_eval.integrate(true, false);
+        fe_eval.integrate(EvaluationFlags::values);
         fe_eval.distribute_local_to_global(inv_mass_matrix);
       }
     inv_mass_matrix.compress(VectorOperation::add);

@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2019 by the deal.II authors
+## Copyright (C) 2012 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -28,9 +28,7 @@
 #   DEAL_II_HAVE_GLIBC_STACKTRACE
 #   DEAL_II_HAVE_LIBSTDCXX_DEMANGLER
 #   DEAL_II_COMPILER_HAS_ATTRIBUTE_PRETTY_FUNCTION
-#   DEAL_II_COMPILER_HAS_ATTRIBUTE_DEPRECATED
 #   DEAL_II_COMPILER_HAS_ATTRIBUTE_ALWAYS_INLINE
-#   DEAL_II_DEPRECATED
 #   DEAL_II_ALWAYS_INLINE
 #   DEAL_II_RESTRICT
 #   DEAL_II_COMPILER_HAS_DIAGNOSTIC_PRAGMA
@@ -38,25 +36,12 @@
 #
 
 #
-# A couple of test results depend on compiler flags and the C++ mode. Rerun
-# these tests if necessary
+# A couple of test results depend on compiler flags and the C++ mode.
+# Nota Bene: If your test depends on the value of compile flags set in
+# ${DEAL_II_CXX_FLAGS} it is probably a language feature and should go into
+# check_01_cxx_features.cmake
 #
 
-UNSET_IF_CHANGED(CHECK_CXX_FEATURES_FLAGS_SAVED
-  "${CMAKE_REQUIRED_FLAGS}${DEAL_II_CXX_VERSION_FLAG}${DEAL_II_WITH_CXX14}${DEAL_II_WITH_CXX17}"
-  DEAL_II_COMPILER_HAS_CXX14_ATTRIBUTE_DEPRECATED
-  DEAL_II_COMPILER_HAS_ATTRIBUTE_DEPRECATED
-  )
-
-#
-# MSVC needs different compiler flags to turn warnings into errors
-# additionally a suitable exception handling model is required
-#
-IF(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-  SET(_werror_flag "/WX /EHsc")
-ELSE()
-  SET(_werror_flag "-Werror")
-ENDIF()
 
 #
 # Check whether the compiler allows to use arithmetic operations
@@ -70,10 +55,7 @@ ENDIF()
 #
 CHECK_CXX_SOURCE_COMPILES(
   "
-  #include <emmintrin.h>
-#ifdef __AVX512F__
-  #include <immintrin.h>
-#endif
+  #include <x86intrin.h>
   int main()
   {
     __m128d a, b;
@@ -123,14 +105,20 @@ CHECK_CXX_COMPILER_BUG(
 # prediction unit in some cases. We use it in the AssertThrow
 # macros.
 #
+# Intel compilers don't handle __builtin_expect in C++14 constexpr contexts
+# properly so we disable this feature in case we are going to use
+# DEAL_II_CONSTEXPR with an Intel compiler.
+#
 # - Matthias Maier, rewritten 2012
 #
-CHECK_CXX_SOURCE_COMPILES(
-  "
-  bool f() { return true; }
-  int main(){ if (__builtin_expect(f(),false)) {} }
-  "
-  DEAL_II_HAVE_BUILTIN_EXPECT)
+IF(NOT CMAKE_CXX_COMPILER_ID MATCHES "Intel")
+  CHECK_CXX_SOURCE_COMPILES(
+    "
+    bool f() { return true; }
+    int main(){ if (__builtin_expect(f(),false)) {} }
+    "
+    DEAL_II_HAVE_BUILTIN_EXPECT)
+ENDIF()
 
 
 #
@@ -249,7 +237,6 @@ IF(NOT DEAL_II_COMPILER_HAS_ATTRIBUTE_PRETTY_FUNCTION)
   ELSE()
     SET(__PRETTY_FUNCTION__ "\"(not available)\"")
   ENDIF()
-
 ENDIF()
 
 
@@ -285,96 +272,6 @@ ENDIF()
 
 
 #
-# GCC and some other compilers have an attribute of the form
-# __attribute__((deprecated)) that can be used to make the
-# compiler warn whenever a deprecated function is used. C++14
-# provides a standardized attribute of the form [[deprecated]
-# with the exact same functionality.
-# See if one of these attribute is available.
-#
-# If it is, set the variable DEAL_II_DEPRECATED to its value. If
-# it isn't, set it to an empty string (actually, to a single
-# space, since the empty string causes CMAKE to #undef the
-# variable in config.h), i.e., to something the compiler will
-# ignore
-#
-# - Wolfgang Bangerth, 2012
-#
-
-# Some compilers swallow the deprecation attribute, but emit a warning saying
-# that it is actually not supported such as:
-# "warning: use of the 'deprecated' attribute is a C++14 extension" (clang in c++11 mode)
-# "warning #1292: unknown attribute "deprecated"" (icc)
-# Hence, we treat warnings as errors:
-ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_FLAGS}")
-ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${_werror_flag}")
-IF(NOT CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Wno-unused-command-line-argument")
-ENDIF()
-
-# first see if the compiler accepts the attribute
-CHECK_CXX_SOURCE_COMPILES(
-  "
-          [[deprecated]] int old_fn ();
-          int old_fn () { return 0; }
-
-          struct [[deprecated]] bob
-          {
-            [[deprecated]] bob(int i);
-            [[deprecated]] void test();
-          };
-
-          enum color
-          {
-            red [[deprecated]]
-          };
-
-          template <int dim>
-          struct foo {};
-          using bar [[deprecated]] = foo<2>;
-
-          int main () {}
-  "
-  DEAL_II_COMPILER_HAS_CXX14_ATTRIBUTE_DEPRECATED
-  )
-
-CHECK_CXX_SOURCE_COMPILES(
-  "
-          __attribute__((deprecated)) int old_fn ();
-          int old_fn () { return 0; }
-
-          struct __attribute__((deprecated)) bob
-          {
-            __attribute__((deprecated)) bob(int i);
-            __attribute__((deprecated)) void test();
-          };
-
-          enum color
-          {
-            red __attribute__((deprecated))
-          };
-
-          template <int dim>
-          struct foo {};
-          using bar __attribute__((deprecated)) = foo<2>;
-
-          int main () {}
-  "
-  DEAL_II_COMPILER_HAS_ATTRIBUTE_DEPRECATED
-  )
-
-RESET_CMAKE_REQUIRED()
-
-IF(DEAL_II_COMPILER_HAS_CXX14_ATTRIBUTE_DEPRECATED)
-  SET(DEAL_II_DEPRECATED "[[deprecated]]")
-ELSEIF(DEAL_II_COMPILER_HAS_ATTRIBUTE_DEPRECATED AND NOT DEAL_II_WITH_CUDA)
-  SET(DEAL_II_DEPRECATED "__attribute__((deprecated))")
-ELSE()
-  SET(DEAL_II_DEPRECATED " ")
-ENDIF()
-
-
-#
 # Do a similar check with the always_inline attribute on functions.
 #
 CHECK_CXX_SOURCE_COMPILES(
@@ -390,6 +287,7 @@ IF(DEAL_II_COMPILER_HAS_ATTRIBUTE_ALWAYS_INLINE)
 ELSE()
   SET(DEAL_II_ALWAYS_INLINE " ")
 ENDIF()
+
 
 #
 # Check whether the compiler understands the __restrict keyword.
@@ -444,22 +342,21 @@ RESET_CMAKE_REQUIRED()
 # ICC also emits a warning but passes for unsupported linkers
 # unless we turn diagnostic warnings into errors.
 #
-# Wolfgang Bangerth, Matthias Maier, Daniel Arndt, 2015, 2018
+# We also test linker support with "-shared -fPIC". This catches an
+# incompatibility where LLD refuses to produce a shared object from an
+# object file compiled by the Intel Compiler:
 #
+#   ld.lld: error: can't create dynamic relocation R_X86_64_64 against symbol:
+#   __gxx_personality_v0 in readonly segment; recompile object files with -fPIC
+#   or pass '-Wl,-z,notext' to allow text relocations in the output
+#
+# even if we actually had -fPIC option present. If we add -Wl,-z,notext, it
+# will link, but the produced libdeal_II.so is faulty and will crash randomly.
+#
+# Wolfgang Bangerth, Matthias Maier, Daniel Arndt, Binrui Dong, 2015, 2018-2020
+#
+
 IF(NOT CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-  IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Wno-unused-command-line-argument")
-  ELSEIF(CMAKE_CXX_COMPILER_ID MATCHES "Intel")
-    ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-diag-error warn")
-  ENDIF()
-  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Werror")
-  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-fuse-ld=lld")
-  CHECK_CXX_SOURCE_COMPILES(
-    "
-    int main() { return 0; }
-    "
-    DEAL_II_COMPILER_HAS_FUSE_LD_LLD)
-  RESET_CMAKE_REQUIRED()
 
   IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Wno-unused-command-line-argument")
@@ -467,17 +364,34 @@ IF(NOT CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-diag-error warn")
   ENDIF()
   ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Werror")
+  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-shared")
+  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-fPIC")
+
+  #
+  # Check for ld.lld and ld.gold support:
+  #
+  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-fuse-ld=lld")
+  CHECK_CXX_SOURCE_COMPILES(
+    "
+    #include <iostream>
+    void foo() { std::cout << \"Hello, world!\" << std::endl; }
+    "
+    DEAL_II_COMPILER_HAS_FUSE_LD_LLD)
+
+  STRIP_FLAG(CMAKE_REQUIRED_FLAGS "-fuse-ld=lld")
   ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-fuse-ld=gold")
   CHECK_CXX_SOURCE_COMPILES(
     "
-    int main() { return 0; }
+    #include <iostream>
+    void foo() { std::cout << \"Hello, world!\" << std::endl; }
     "
     DEAL_II_COMPILER_HAS_FUSE_LD_GOLD)
-  RESET_CMAKE_REQUIRED()
 
   IF(DEAL_II_COMPILER_HAS_FUSE_LD_LLD)
     ADD_FLAGS(DEAL_II_LINKER_FLAGS "-fuse-ld=lld")
   ELSEIF(DEAL_II_COMPILER_HAS_FUSE_LD_GOLD)
     ADD_FLAGS(DEAL_II_LINKER_FLAGS "-fuse-ld=gold")
   ENDIF()
+
+  RESET_CMAKE_REQUIRED()
 ENDIF()

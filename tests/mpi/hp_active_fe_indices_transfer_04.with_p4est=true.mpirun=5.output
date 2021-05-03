@@ -1,0 +1,323 @@
+
+DEAL:0:2d::writing with 3
+DEAL:0:2d::cellid=0_1:0 fe_index=0
+DEAL:0:2d::cellid=0_1:1 fe_index=1
+DEAL:0:2d::cellid=0_1:2 fe_index=2
+DEAL:0:2d::cellid=0_1:3 fe_index=3
+DEAL:0:2d::reading with 5
+DEAL:0:2d::cellid=0_1:0 fe_index=0
+DEAL:0:2d::cellid=0_1:1 fe_index=1
+DEAL:0:2d::cellid=0_1:2 fe_index=2
+DEAL:0:2d::cellid=0_1:3 fe_index=3
+DEAL:0:2d::cellid=1_1:0 fe_index=0 ghost
+DEAL:0:2d::cellid=1_1:2 fe_index=2 ghost
+DEAL:0:2d::cellid=2_1:0 fe_index=4 ghost
+DEAL:0:2d::cellid=2_1:1 fe_index=0 ghost
+DEAL:0:2d::cellid=3_1:0 fe_index=0 ghost
+DEAL:0:2d::OK
+DEAL:0:3d::writing with 3
+DEAL:0:3d::cellid=0_1:0 fe_index=0
+DEAL:0:3d::cellid=0_1:1 fe_index=1
+DEAL:0:3d::cellid=0_1:2 fe_index=2
+DEAL:0:3d::cellid=0_1:3 fe_index=3
+DEAL:0:3d::cellid=0_1:4 fe_index=4
+DEAL:0:3d::cellid=0_1:5 fe_index=5
+DEAL:0:3d::cellid=0_1:6 fe_index=6
+DEAL:0:3d::cellid=0_1:7 fe_index=7
+DEAL:0:3d::cellid=1_1:0 fe_index=8
+DEAL:0:3d::cellid=1_1:1 fe_index=0
+DEAL:0:3d::cellid=1_1:2 fe_index=1
+DEAL:0:3d::cellid=1_1:3 fe_index=2
+DEAL:0:3d::cellid=1_1:4 fe_index=3
+DEAL:0:3d::cellid=1_1:5 fe_index=4
+DEAL:0:3d::cellid=1_1:6 fe_index=5
+DEAL:0:3d::cellid=1_1:7 fe_index=6
+DEAL:0:3d::cellid=2_1:0 fe_index=7
+DEAL:0:3d::cellid=2_1:1 fe_index=8
+DEAL:0:3d::cellid=2_1:2 fe_index=0
+DEAL:0:3d::cellid=2_1:3 fe_index=1
+DEAL:0:3d::cellid=2_1:4 fe_index=2
+DEAL:0:3d::cellid=2_1:5 fe_index=3
+DEAL:0:3d::cellid=2_1:6 fe_index=4
+DEAL:0:3d::cellid=2_1:7 fe_index=5
+DEAL:0:3d::reading with 5
+DEAL:0:3d::cellid=0_1:0 fe_index=0
+DEAL:0:3d::cellid=0_1:1 fe_index=1
+DEAL:0:3d::cellid=0_1:2 fe_index=2
+DEAL:0:3d::cellid=0_1:3 fe_index=3
+DEAL:0:3d::cellid=0_1:4 fe_index=4
+DEAL:0:3d::cellid=0_1:5 fe_index=5
+DEAL:0:3d::cellid=0_1:6 fe_index=6
+DEAL:0:3d::cellid=0_1:7 fe_index=7
+DEAL:0:3d::cellid=1_1:0 fe_index=8
+DEAL:0:3d::cellid=1_1:1 fe_index=0
+DEAL:0:3d::cellid=1_1:2 fe_index=1
+DEAL:0:3d::cellid=1_1:3 fe_index=2
+DEAL:0:3d::cellid=1_1:4 fe_index=3
+DEAL:0:3d::cellid=1_1:5 fe_index=4
+DEAL:0:3d::cellid=1_1:6 fe_index=5
+DEAL:0:3d::cellid=1_1:7 fe_index=6
+DEAL:0:3d::cellid=2_1:0 fe_index=7 ghost
+DEAL:0:3d::cellid=2_1:1 fe_index=8 ghost
+DEAL:0:3d::cellid=2_1:4 fe_index=2 ghost
+DEAL:0:3d::cellid=2_1:5 fe_index=3 ghost
+DEAL:0:3d::cellid=3_1:0 fe_index=0 ghost
+DEAL:0:3d::cellid=3_1:1 fe_index=1 ghost
+DEAL:0:3d::cellid=3_1:4 fe_index=4 ghost
+DEAL:0:3d::cellid=3_1:5 fe_index=5 ghost
+DEAL:0:3d::cellid=4_1:0 fe_index=8 ghost
+DEAL:0:3d::cellid=4_1:1 fe_index=0 ghost
+DEAL:0:3d::cellid=4_1:2 fe_index=1 ghost
+DEAL:0:3d::cellid=4_1:3 fe_index=2 ghost
+DEAL:0:3d::cellid=5_1:0 fe_index=0 ghost
+DEAL:0:3d::cellid=5_1:1 fe_index=1 ghost
+DEAL:0:3d::cellid=5_1:2 fe_index=2 ghost
+DEAL:0:3d::cellid=5_1:3 fe_index=3 ghost
+DEAL:0:3d::cellid=6_1:0 fe_index=8 ghost
+DEAL:0:3d::cellid=6_1:1 fe_index=0 ghost
+DEAL:0:3d::cellid=7_1:0 fe_index=7 ghost
+DEAL:0:3d::cellid=7_1:1 fe_index=8 ghost
+DEAL:0:3d::OK
+
+DEAL:1:2d::writing with 3
+DEAL:1:2d::cellid=1_1:0 fe_index=0
+DEAL:1:2d::cellid=1_1:1 fe_index=1
+DEAL:1:2d::cellid=1_1:2 fe_index=2
+DEAL:1:2d::cellid=1_1:3 fe_index=3
+DEAL:1:2d::cellid=2_1:0 fe_index=4
+DEAL:1:2d::cellid=2_1:1 fe_index=0
+DEAL:1:2d::cellid=2_1:2 fe_index=1
+DEAL:1:2d::cellid=2_1:3 fe_index=2
+DEAL:1:2d::reading with 5
+DEAL:1:2d::cellid=0_1:1 fe_index=1 ghost
+DEAL:1:2d::cellid=0_1:3 fe_index=3 ghost
+DEAL:1:2d::cellid=1_1:0 fe_index=0
+DEAL:1:2d::cellid=1_1:1 fe_index=1
+DEAL:1:2d::cellid=1_1:2 fe_index=2
+DEAL:1:2d::cellid=1_1:3 fe_index=3
+DEAL:1:2d::cellid=2_1:1 fe_index=0 ghost
+DEAL:1:2d::cellid=3_1:0 fe_index=0 ghost
+DEAL:1:2d::cellid=3_1:1 fe_index=1 ghost
+DEAL:1:2d::OK
+DEAL:1:3d::writing with 3
+DEAL:1:3d::cellid=3_1:0 fe_index=0
+DEAL:1:3d::cellid=3_1:1 fe_index=1
+DEAL:1:3d::cellid=3_1:2 fe_index=2
+DEAL:1:3d::cellid=3_1:3 fe_index=3
+DEAL:1:3d::cellid=3_1:4 fe_index=4
+DEAL:1:3d::cellid=3_1:5 fe_index=5
+DEAL:1:3d::cellid=3_1:6 fe_index=6
+DEAL:1:3d::cellid=3_1:7 fe_index=7
+DEAL:1:3d::cellid=4_1:0 fe_index=8
+DEAL:1:3d::cellid=4_1:1 fe_index=0
+DEAL:1:3d::cellid=4_1:2 fe_index=1
+DEAL:1:3d::cellid=4_1:3 fe_index=2
+DEAL:1:3d::cellid=4_1:4 fe_index=3
+DEAL:1:3d::cellid=4_1:5 fe_index=4
+DEAL:1:3d::cellid=4_1:6 fe_index=5
+DEAL:1:3d::cellid=4_1:7 fe_index=6
+DEAL:1:3d::reading with 5
+DEAL:1:3d::cellid=0_1:2 fe_index=2 ghost
+DEAL:1:3d::cellid=0_1:3 fe_index=3 ghost
+DEAL:1:3d::cellid=0_1:6 fe_index=6 ghost
+DEAL:1:3d::cellid=0_1:7 fe_index=7 ghost
+DEAL:1:3d::cellid=1_1:2 fe_index=1 ghost
+DEAL:1:3d::cellid=1_1:6 fe_index=5 ghost
+DEAL:1:3d::cellid=2_1:0 fe_index=7
+DEAL:1:3d::cellid=2_1:1 fe_index=8
+DEAL:1:3d::cellid=2_1:2 fe_index=0
+DEAL:1:3d::cellid=2_1:3 fe_index=1
+DEAL:1:3d::cellid=2_1:4 fe_index=2
+DEAL:1:3d::cellid=2_1:5 fe_index=3
+DEAL:1:3d::cellid=2_1:6 fe_index=4
+DEAL:1:3d::cellid=2_1:7 fe_index=5
+DEAL:1:3d::cellid=3_1:0 fe_index=0 ghost
+DEAL:1:3d::cellid=3_1:2 fe_index=2 ghost
+DEAL:1:3d::cellid=3_1:4 fe_index=4 ghost
+DEAL:1:3d::cellid=3_1:6 fe_index=6 ghost
+DEAL:1:3d::cellid=4_1:2 fe_index=1 ghost
+DEAL:1:3d::cellid=4_1:3 fe_index=2 ghost
+DEAL:1:3d::cellid=5_1:2 fe_index=2 ghost
+DEAL:1:3d::cellid=6_1:0 fe_index=8 ghost
+DEAL:1:3d::cellid=6_1:1 fe_index=0 ghost
+DEAL:1:3d::cellid=6_1:2 fe_index=1 ghost
+DEAL:1:3d::cellid=6_1:3 fe_index=2 ghost
+DEAL:1:3d::cellid=7_1:0 fe_index=7 ghost
+DEAL:1:3d::cellid=7_1:2 fe_index=0 ghost
+DEAL:1:3d::OK
+
+
+DEAL:2:2d::writing with 3
+DEAL:2:2d::cellid=3_1:0 fe_index=0
+DEAL:2:2d::cellid=3_1:1 fe_index=1
+DEAL:2:2d::cellid=3_1:2 fe_index=2
+DEAL:2:2d::cellid=3_1:3 fe_index=3
+DEAL:2:2d::reading with 5
+DEAL:2:2d::OK
+DEAL:2:3d::writing with 3
+DEAL:2:3d::cellid=5_1:0 fe_index=0
+DEAL:2:3d::cellid=5_1:1 fe_index=1
+DEAL:2:3d::cellid=5_1:2 fe_index=2
+DEAL:2:3d::cellid=5_1:3 fe_index=3
+DEAL:2:3d::cellid=5_1:4 fe_index=4
+DEAL:2:3d::cellid=5_1:5 fe_index=5
+DEAL:2:3d::cellid=5_1:6 fe_index=6
+DEAL:2:3d::cellid=5_1:7 fe_index=7
+DEAL:2:3d::cellid=6_1:0 fe_index=8
+DEAL:2:3d::cellid=6_1:1 fe_index=0
+DEAL:2:3d::cellid=6_1:2 fe_index=1
+DEAL:2:3d::cellid=6_1:3 fe_index=2
+DEAL:2:3d::cellid=6_1:4 fe_index=3
+DEAL:2:3d::cellid=6_1:5 fe_index=4
+DEAL:2:3d::cellid=6_1:6 fe_index=5
+DEAL:2:3d::cellid=6_1:7 fe_index=6
+DEAL:2:3d::cellid=7_1:0 fe_index=7
+DEAL:2:3d::cellid=7_1:1 fe_index=8
+DEAL:2:3d::cellid=7_1:2 fe_index=0
+DEAL:2:3d::cellid=7_1:3 fe_index=1
+DEAL:2:3d::cellid=7_1:4 fe_index=2
+DEAL:2:3d::cellid=7_1:5 fe_index=3
+DEAL:2:3d::cellid=7_1:6 fe_index=4
+DEAL:2:3d::cellid=7_1:7 fe_index=5
+DEAL:2:3d::reading with 5
+DEAL:2:3d::cellid=0_1:3 fe_index=3 ghost
+DEAL:2:3d::cellid=0_1:4 fe_index=4 ghost
+DEAL:2:3d::cellid=0_1:5 fe_index=5 ghost
+DEAL:2:3d::cellid=0_1:6 fe_index=6 ghost
+DEAL:2:3d::cellid=0_1:7 fe_index=7 ghost
+DEAL:2:3d::cellid=1_1:2 fe_index=1 ghost
+DEAL:2:3d::cellid=1_1:3 fe_index=2 ghost
+DEAL:2:3d::cellid=1_1:4 fe_index=3 ghost
+DEAL:2:3d::cellid=1_1:6 fe_index=5 ghost
+DEAL:2:3d::cellid=1_1:7 fe_index=6 ghost
+DEAL:2:3d::cellid=2_1:1 fe_index=8 ghost
+DEAL:2:3d::cellid=2_1:3 fe_index=1 ghost
+DEAL:2:3d::cellid=2_1:4 fe_index=2 ghost
+DEAL:2:3d::cellid=2_1:5 fe_index=3 ghost
+DEAL:2:3d::cellid=2_1:7 fe_index=5 ghost
+DEAL:2:3d::cellid=3_1:0 fe_index=0
+DEAL:2:3d::cellid=3_1:1 fe_index=1
+DEAL:2:3d::cellid=3_1:2 fe_index=2
+DEAL:2:3d::cellid=3_1:3 fe_index=3
+DEAL:2:3d::cellid=3_1:4 fe_index=4
+DEAL:2:3d::cellid=3_1:5 fe_index=5
+DEAL:2:3d::cellid=3_1:6 fe_index=6
+DEAL:2:3d::cellid=3_1:7 fe_index=7
+DEAL:2:3d::cellid=4_1:0 fe_index=8
+DEAL:2:3d::cellid=4_1:1 fe_index=0
+DEAL:2:3d::cellid=4_1:2 fe_index=1
+DEAL:2:3d::cellid=4_1:3 fe_index=2
+DEAL:2:3d::cellid=4_1:4 fe_index=3
+DEAL:2:3d::cellid=4_1:5 fe_index=4
+DEAL:2:3d::cellid=4_1:6 fe_index=5
+DEAL:2:3d::cellid=4_1:7 fe_index=6
+DEAL:2:3d::cellid=5_1:0 fe_index=0 ghost
+DEAL:2:3d::cellid=5_1:2 fe_index=2 ghost
+DEAL:2:3d::cellid=5_1:3 fe_index=3 ghost
+DEAL:2:3d::cellid=5_1:4 fe_index=4 ghost
+DEAL:2:3d::cellid=5_1:6 fe_index=6 ghost
+DEAL:2:3d::cellid=6_1:0 fe_index=8 ghost
+DEAL:2:3d::cellid=6_1:1 fe_index=0 ghost
+DEAL:2:3d::cellid=6_1:3 fe_index=2 ghost
+DEAL:2:3d::cellid=6_1:4 fe_index=3 ghost
+DEAL:2:3d::cellid=6_1:5 fe_index=4 ghost
+DEAL:2:3d::cellid=7_1:0 fe_index=7 ghost
+DEAL:2:3d::cellid=7_1:1 fe_index=8 ghost
+DEAL:2:3d::cellid=7_1:2 fe_index=0 ghost
+DEAL:2:3d::cellid=7_1:3 fe_index=1 ghost
+DEAL:2:3d::cellid=7_1:4 fe_index=2 ghost
+DEAL:2:3d::OK
+
+
+DEAL:3:2d::reading with 5
+DEAL:3:2d::cellid=0_1:2 fe_index=2 ghost
+DEAL:3:2d::cellid=0_1:3 fe_index=3 ghost
+DEAL:3:2d::cellid=1_1:2 fe_index=2 ghost
+DEAL:3:2d::cellid=2_1:0 fe_index=4
+DEAL:3:2d::cellid=2_1:1 fe_index=0
+DEAL:3:2d::cellid=2_1:2 fe_index=1
+DEAL:3:2d::cellid=2_1:3 fe_index=2
+DEAL:3:2d::cellid=3_1:0 fe_index=0 ghost
+DEAL:3:2d::cellid=3_1:2 fe_index=2 ghost
+DEAL:3:2d::OK
+DEAL:3:3d::reading with 5
+DEAL:3:3d::cellid=0_1:5 fe_index=5 ghost
+DEAL:3:3d::cellid=0_1:7 fe_index=7 ghost
+DEAL:3:3d::cellid=1_1:4 fe_index=3 ghost
+DEAL:3:3d::cellid=1_1:5 fe_index=4 ghost
+DEAL:3:3d::cellid=1_1:6 fe_index=5 ghost
+DEAL:3:3d::cellid=1_1:7 fe_index=6 ghost
+DEAL:3:3d::cellid=2_1:5 fe_index=3 ghost
+DEAL:3:3d::cellid=3_1:4 fe_index=4 ghost
+DEAL:3:3d::cellid=3_1:5 fe_index=5 ghost
+DEAL:3:3d::cellid=4_1:1 fe_index=0 ghost
+DEAL:3:3d::cellid=4_1:3 fe_index=2 ghost
+DEAL:3:3d::cellid=4_1:5 fe_index=4 ghost
+DEAL:3:3d::cellid=4_1:7 fe_index=6 ghost
+DEAL:3:3d::cellid=5_1:0 fe_index=0
+DEAL:3:3d::cellid=5_1:1 fe_index=1
+DEAL:3:3d::cellid=5_1:2 fe_index=2
+DEAL:3:3d::cellid=5_1:3 fe_index=3
+DEAL:3:3d::cellid=5_1:4 fe_index=4
+DEAL:3:3d::cellid=5_1:5 fe_index=5
+DEAL:3:3d::cellid=5_1:6 fe_index=6
+DEAL:3:3d::cellid=5_1:7 fe_index=7
+DEAL:3:3d::cellid=6_1:1 fe_index=0 ghost
+DEAL:3:3d::cellid=6_1:5 fe_index=4 ghost
+DEAL:3:3d::cellid=7_1:0 fe_index=7 ghost
+DEAL:3:3d::cellid=7_1:1 fe_index=8 ghost
+DEAL:3:3d::cellid=7_1:4 fe_index=2 ghost
+DEAL:3:3d::cellid=7_1:5 fe_index=3 ghost
+DEAL:3:3d::OK
+
+
+DEAL:4:2d::reading with 5
+DEAL:4:2d::cellid=0_1:3 fe_index=3 ghost
+DEAL:4:2d::cellid=1_1:2 fe_index=2 ghost
+DEAL:4:2d::cellid=1_1:3 fe_index=3 ghost
+DEAL:4:2d::cellid=2_1:1 fe_index=0 ghost
+DEAL:4:2d::cellid=2_1:3 fe_index=2 ghost
+DEAL:4:2d::cellid=3_1:0 fe_index=0
+DEAL:4:2d::cellid=3_1:1 fe_index=1
+DEAL:4:2d::cellid=3_1:2 fe_index=2
+DEAL:4:2d::cellid=3_1:3 fe_index=3
+DEAL:4:2d::OK
+DEAL:4:3d::reading with 5
+DEAL:4:3d::cellid=0_1:6 fe_index=6 ghost
+DEAL:4:3d::cellid=0_1:7 fe_index=7 ghost
+DEAL:4:3d::cellid=1_1:6 fe_index=5 ghost
+DEAL:4:3d::cellid=1_1:7 fe_index=6 ghost
+DEAL:4:3d::cellid=2_1:4 fe_index=2 ghost
+DEAL:4:3d::cellid=2_1:5 fe_index=3 ghost
+DEAL:4:3d::cellid=2_1:6 fe_index=4 ghost
+DEAL:4:3d::cellid=2_1:7 fe_index=5 ghost
+DEAL:4:3d::cellid=3_1:4 fe_index=4 ghost
+DEAL:4:3d::cellid=3_1:5 fe_index=5 ghost
+DEAL:4:3d::cellid=3_1:6 fe_index=6 ghost
+DEAL:4:3d::cellid=3_1:7 fe_index=7 ghost
+DEAL:4:3d::cellid=4_1:2 fe_index=1 ghost
+DEAL:4:3d::cellid=4_1:3 fe_index=2 ghost
+DEAL:4:3d::cellid=4_1:6 fe_index=5 ghost
+DEAL:4:3d::cellid=4_1:7 fe_index=6 ghost
+DEAL:4:3d::cellid=5_1:2 fe_index=2 ghost
+DEAL:4:3d::cellid=5_1:3 fe_index=3 ghost
+DEAL:4:3d::cellid=5_1:6 fe_index=6 ghost
+DEAL:4:3d::cellid=5_1:7 fe_index=7 ghost
+DEAL:4:3d::cellid=6_1:0 fe_index=8
+DEAL:4:3d::cellid=6_1:1 fe_index=0
+DEAL:4:3d::cellid=6_1:2 fe_index=1
+DEAL:4:3d::cellid=6_1:3 fe_index=2
+DEAL:4:3d::cellid=6_1:4 fe_index=3
+DEAL:4:3d::cellid=6_1:5 fe_index=4
+DEAL:4:3d::cellid=6_1:6 fe_index=5
+DEAL:4:3d::cellid=6_1:7 fe_index=6
+DEAL:4:3d::cellid=7_1:0 fe_index=7
+DEAL:4:3d::cellid=7_1:1 fe_index=8
+DEAL:4:3d::cellid=7_1:2 fe_index=0
+DEAL:4:3d::cellid=7_1:3 fe_index=1
+DEAL:4:3d::cellid=7_1:4 fe_index=2
+DEAL:4:3d::cellid=7_1:5 fe_index=3
+DEAL:4:3d::cellid=7_1:6 fe_index=4
+DEAL:4:3d::cellid=7_1:7 fe_index=5
+DEAL:4:3d::OK
+

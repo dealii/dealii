@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -31,7 +31,7 @@ main()
   // test a non-empty rectangular table
   TransposeTable<double> table(3, 4);
   std::iota(table.begin(), table.end(), 1.0);
-  for (const auto entry : table)
+  for (const auto &entry : table)
     {
       deallog << entry.row() << ", " << entry.column() << ", " << entry.value()
               << std::endl;

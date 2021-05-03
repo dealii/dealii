@@ -1,6 +1,6 @@
 //-----------------------------------------------------------
 //
-//    Copyright (C) 2018 by the deal.II authors
+//    Copyright (C) 2018 - 2020 by the deal.II authors
 //
 //    This file is part of the deal.II library.
 //
@@ -39,7 +39,7 @@ template <typename number>
 void
 test()
 {
-  typedef Vector<number> VectorType;
+  using VectorType = Vector<number>;
 
   // size of the problem
   const unsigned int N = 10;
@@ -146,15 +146,14 @@ test()
   solver.solve(func, x);
 
   deallog << "Limited memory BFGS solution:" << std::endl;
-  x.print(deallog);
+  x.print(deallog.get_file_stream());
 }
 
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(5);
-  deallog.attach(logfile);
 
   test<double>();
 }

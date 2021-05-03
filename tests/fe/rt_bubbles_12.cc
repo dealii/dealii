@@ -60,7 +60,7 @@ test(const unsigned int degree)
       DoFHandler<dim> dof(tr);
       dof.distribute_dofs(fe_rt_bubbles);
 
-      QTrapez<dim> quadrature;
+      QTrapezoid<dim> quadrature;
 
       FEValues<dim> fe_values(fe_rt_bubbles, quadrature, update_gradients);
       fe_values.reinit(dof.begin_active());

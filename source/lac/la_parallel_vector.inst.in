@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2018 by the deal.II authors
+// Copyright (C) 2011 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,6 +22,11 @@ for (SCALAR : REAL_AND_COMPLEX_SCALARS)
       namespace distributed
       \{
         template class Vector<SCALAR, ::dealii::MemorySpace::Host>;
+        template void
+        Vector<SCALAR, ::dealii::MemorySpace::Host>::import<
+          ::dealii::MemorySpace::Host>(
+          const Vector<SCALAR, ::dealii::MemorySpace::Host> &,
+          VectorOperation::values);
       \}
     \}
   }

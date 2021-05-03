@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,7 +17,7 @@
 
 // this function tests the correctness of the implementation of
 // inhomogeneous constraints. The program is a modification of the step-27
-// tutorial program with hp elements and the constraints arising in that
+// tutorial program with hp-elements and the constraints arising in that
 // situation. the idea of the test is to set up a matrix with standard tools
 // (i.e., constraints and the boundary value list), and compare that with
 // the new function.
@@ -27,6 +27,7 @@
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
@@ -37,7 +38,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_values.h>
 
 #include <deal.II/lac/affine_constraints.h>
@@ -59,7 +59,6 @@
 
 std::ofstream logfile("output");
 
-using namespace dealii;
 
 template <int dim>
 class LaplaceProblem
@@ -93,7 +92,7 @@ private:
 
   Triangulation<dim> triangulation;
 
-  hp::DoFHandler<dim>      dof_handler;
+  DoFHandler<dim>          dof_handler;
   hp::FECollection<dim>    fe_collection;
   hp::QCollection<dim>     quadrature_collection;
   hp::QCollection<dim - 1> face_quadrature_collection;
@@ -313,9 +312,9 @@ LaplaceProblem<dim>::assemble_reference()
 
   std::vector<types::global_dof_index> local_dof_indices;
 
-  typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                              .begin_active(),
-                                                     endc = dof_handler.end();
+  typename DoFHandler<dim>::active_cell_iterator cell =
+                                                   dof_handler.begin_active(),
+                                                 endc = dof_handler.end();
   for (; cell != endc; ++cell)
     {
       const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
@@ -392,9 +391,9 @@ LaplaceProblem<dim>::assemble_test_1()
 
   std::vector<types::global_dof_index> local_dof_indices;
 
-  typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                              .begin_active(),
-                                                     endc = dof_handler.end();
+  typename DoFHandler<dim>::active_cell_iterator cell =
+                                                   dof_handler.begin_active(),
+                                                 endc = dof_handler.end();
   for (; cell != endc; ++cell)
     {
       const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
@@ -463,9 +462,9 @@ LaplaceProblem<dim>::assemble_test_2()
 
   std::vector<types::global_dof_index> local_dof_indices;
 
-  typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                              .begin_active(),
-                                                     endc = dof_handler.end();
+  typename DoFHandler<dim>::active_cell_iterator cell =
+                                                   dof_handler.begin_active(),
+                                                 endc = dof_handler.end();
   for (; cell != endc; ++cell)
     {
       const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
@@ -596,7 +595,7 @@ LaplaceProblem<2>::create_coarse_grid()
   std::vector<CellData<dim>> cells(n_cells, CellData<dim>());
   for (unsigned int i = 0; i < n_cells; ++i)
     {
-      for (unsigned int j = 0; j < GeometryInfo<dim>::vertices_per_cell; ++j)
+      for (const unsigned int j : GeometryInfo<dim>::vertex_indices())
         cells[i].vertices[j] = cell_vertices[i][j];
       cells[i].material_id = 0;
     }
@@ -731,9 +730,9 @@ LaplaceProblem<dim>::estimate_smoothness(
   std::vector<std::complex<double>> fourier_coefficients(n_fourier_modes);
   Vector<double>                    local_dof_values;
 
-  typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                              .begin_active(),
-                                                     endc = dof_handler.end();
+  typename DoFHandler<dim>::active_cell_iterator cell =
+                                                   dof_handler.begin_active(),
+                                                 endc = dof_handler.end();
   for (unsigned int index = 0; cell != endc; ++cell, ++index)
     {
       local_dof_values.reinit(cell->get_fe().dofs_per_cell);

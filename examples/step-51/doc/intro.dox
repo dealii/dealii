@@ -29,19 +29,14 @@ for systems of equations in 2 or 3 dimensions.
 <h4> Reducing the size of the linear system </h4>
 To alleviate the computational cost of solving such large linear systems,
 the hybridizable discontinuous Galerkin (HDG) methodology was introduced
-by Cockburn and co-workers
-(see the references in the recent HDG overview article by
- N.C. Nguyen and J. Peraire:
-   <i>Hybridizable discontinuous Galerkin methods for partial differential
-   equations in continuum mechanics</i>, Journal of Computational Physics,
-   2012, 231:18, 5955-5988.
-   <a href="http://dx.doi.org/10.1016/j.jcp.2012.02.033">[DOI]</a>).
-The HDG method achieves
-this goal by formulating the mathematical problem using Dirichlet-to-Neumann
-mappings.  The partial differential equations are first written as a first
-order system, and each field is then discretized via a DG method.  At this
-point, the  single-valued "trace" values on the skeleton of the
-mesh, i.e. element faces, are taken to be independent unknown quantities.
+by Cockburn and co-workers (see the references in the recent HDG overview
+article by Nguyen and Peraire @cite Ngu2012).
+
+The HDG method achieves this goal by formulating the mathematical problem using
+Dirichlet-to-Neumann mappings.  The partial differential equations are first
+written as a first order system, and each field is then discretized via a DG
+method.  At this point, the single-valued "trace" values on the skeleton of the
+mesh, i.e., element faces, are taken to be independent unknown quantities.
 This yields unknowns in the discrete formulation that fall into two categories:
 - Face unknowns that only couple with the cell unknowns from both sides of the face;
 - Cell unknowns that only couple with the cell and face unknowns
@@ -55,16 +50,27 @@ The Dirichlet-to-Neumann map concept then permits the following solution procedu
 skeleton of the triangulation.  The global problem is then to solve for the
 trace values, which are the only globally coupled unknowns.
   <li>  Use the known skeleton values as Dirichlet data for solving local
-element-level solutions.  This is known as the
-'local solver', and is an <i>embarrassingly parallel</i> element-by-element
-solution process.
+element-level solutions.  This is known as the 'local solver', and is an
+<i>embarrassingly parallel</i> element-by-element solution process.
 </ol>
 
-The above procedure also has a linear algebra interpretation and is referred to
-as static condensation. Let us write the complete linear system associated to
-the HDG problem as a block system with the discrete DG (cell interior)
-variables $U$ as first block and the skeleton (face) variables $\Lambda$ as the
-second block:
+<h4> Relation with Static Condensation </h4>
+The above procedure also has a linear algebra interpretation---referred to
+as <i>static condensation</i>---that was exploited to reduce the size of the
+global linear system by Guyan in the context of continuous Finite Elements
+@cite G65, and by Fraeijs de Veubeke for mixed methods @cite F65. In the
+latter case (mixed formulation), the system reduction was achieved through the
+use of discontinuous fluxes combined with the introduction of an additional
+auxiliary <i>hybrid</i> variable that approximates the trace of the unknown
+at the boundary of every element. This procedure became known as hybridization
+and---by analogy---is the reason why the local discontinuous Galerkin method
+introduced by Cockburn, Gopalakrishnan, and Lazarov in 2009 @cite CGL2009, and
+subsequently developed by their collaborators, eventually came to be known as
+the <i>hybridizable discontinuous Galerkin</i> (HDG) method.
+
+Let us write the complete linear system associated to the HDG problem as a
+block system with the discrete DG (cell interior) variables $U$ as first block
+and the skeleton (face) variables $\Lambda$ as the second block:
 @f{eqnarray*}
 \begin{pmatrix} A & B \\ C & D \end{pmatrix}
 \begin{pmatrix} U \\ \Lambda \end{pmatrix}
@@ -84,10 +90,12 @@ The coupling to other cells is introduced by the matrices
 $B$ and $C$ over the skeleton variable. The block-diagonality of
 $A$ and the structure in $B$ and $C$ allow us to invert the
 matrix $A$ element by element (the local solution of the Dirichlet
-problem) and subtract $CA^{-1}B$ from $D$. The steps in the Dirichlet-to-Neumann map concept hence correspond to
+problem) and subtract $CA^{-1}B$ from $D$. The steps in the Dirichlet-to-Neumann
+map concept hence correspond to
 <ol>
-  <li> constructing the Schur complement matrix $D-C A^{-1} B$ and right hand side $G - C A^{-1} F$  <i>locally on each cell</i>
-  and inserting the contribution into the global trace matrix in the usual way,
+  <li> constructing the Schur complement matrix $D-C A^{-1} B$ and right hand
+    side $G - C A^{-1} F$  <i>locally on each cell</i>
+    and inserting the contribution into the global trace matrix in the usual way,
   <li> solving the Schur complement system for $\Lambda$, and
   <li> solving for $U$ using the second equation, given $\Lambda$.
 </ol>
@@ -100,6 +108,13 @@ as $\mathcal{O}(h^{p+1})$, i.e., at optimal order.  Additionally, a
 super-convergence property can be used to post-process a new approximate
 solution that converges at the rate $\mathcal{O}(h^{p+2})$.
 
+
+<h4> Alternative approaches </h4>
+
+The hybridizable discontinuous Galerkin method is only one way in
+which the problems of the discontinuous Galerkin method can be
+addressed. Another idea is what is called the "weak Galerkin"
+method. It is explored in step-61.
 
 
 <h3> HDG applied to the convection-diffusion problem </h3>
@@ -348,7 +363,8 @@ Note that the convection is divergence-free, $\nabla \cdot c = 0$.
 
 <h3> Implementation </h3>
 
-Besides implementing the above equations, the implementation below provides the following features:
+Besides implementing the above equations, the implementation below provides
+the following features:
 <ul>
   <li> WorkStream to parallelize local solvers. Workstream has been presented
   in detail in step-9.

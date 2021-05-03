@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,16 +21,16 @@
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/vector.h>
 
-#include "../testmatrix.h"
 #include "../tests.h"
+
+#include "../testmatrix.h"
 
 
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(4);
-  deallog.attach(logfile);
 
   SparsityPattern sparsity_pattern(4, 4);
   sparsity_pattern.compress();
@@ -52,7 +52,7 @@ main()
     bicgstab.solve(M, solution, rhs, PreconditionIdentity());
   }
 
-  solution.print(deallog);
+  solution.print(deallog.get_file_stream());
 
   Vector<double> res(4);
   M.residual(res, solution, rhs);
@@ -70,7 +70,7 @@ main()
     SolverBicgstab<> bicgstab(control);
     bicgstab.solve(M1, solution, rhs, PreconditionIdentity());
   }
-  solution.print(deallog);
+  solution.print(deallog.get_file_stream());
   M1.residual(res, solution, rhs);
   deallog << "residual=" << res.l2_norm() << std::endl;
 }

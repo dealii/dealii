@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2018 by the deal.II authors
+// Copyright (C) 1999 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -76,8 +76,6 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @see
  * @ref GlossBlockLA "Block (linear algebra)"
- * @author Ralf Hartmann, Guido Kanschat
- * @date 1999, 2000, 2010
  */
 template <typename MatrixType,
           typename inverse_type = typename MatrixType::value_type>
@@ -374,8 +372,6 @@ protected:
  * section on
  * @ref Instantiations
  * in the manual).
- *
- * @author Ralf Hartmann, Guido Kanschat, 1999, 2000, 2003
  */
 template <typename MatrixType,
           typename inverse_type = typename MatrixType::value_type>
@@ -458,9 +454,7 @@ public:
        */
       typename FullMatrix<inverse_type>::const_iterator b_end;
 
-      /**
-       * Make enclosing class a friend.
-       */
+      // Make enclosing class a friend.
       friend class const_iterator;
     };
 
@@ -653,8 +647,6 @@ private:
  * section on
  * @ref Instantiations
  * in the manual).
- *
- * @author Ralf Hartmann, Guido Kanschat, 1999, 2000, 2001, 2002, 2003
  */
 template <typename MatrixType,
           typename inverse_type = typename MatrixType::value_type>
@@ -818,8 +810,6 @@ protected:
  * section on
  * @ref Instantiations
  * in the manual).
- *
- * @author Ralf Hartmann, Guido Kanschat, 1999, 2000
  */
 template <typename MatrixType,
           typename inverse_type = typename MatrixType::value_type>
@@ -941,12 +931,11 @@ inline PreconditionBlockJacobi<MatrixType, inverse_type>::const_iterator::
     const PreconditionBlockJacobi<MatrixType, inverse_type> *matrix,
     const size_type                                          row)
   : matrix(matrix)
+  , bs(matrix->block_size())
+  , a_block(row / bs)
   , b_iterator(&matrix->inverse(0), 0, 0)
   , b_end(&matrix->inverse(0), 0, 0)
 {
-  bs      = matrix->block_size();
-  a_block = row / bs;
-
   // This is the end accessor, which
   // does not have a valid block.
   if (a_block == matrix->size())
@@ -957,7 +946,7 @@ inline PreconditionBlockJacobi<MatrixType, inverse_type>::const_iterator::
   b_iterator = matrix->inverse(a_block).begin(r);
   b_end      = matrix->inverse(a_block).end();
 
-  Assert(a_block < matrix->size(), ExcIndexRange(a_block, 0, matrix->size()));
+  AssertIndexRange(a_block, matrix->size());
 }
 
 
@@ -1108,7 +1097,7 @@ inline
   PreconditionBlockJacobi<MatrixType, inverse_type>::begin(
     const size_type r) const
 {
-  Assert(r < this->A->m(), ExcIndexRange(r, 0, this->A->m()));
+  AssertIndexRange(r, this->A->m());
   return const_iterator(this, r);
 }
 
@@ -1120,7 +1109,7 @@ inline
   PreconditionBlockJacobi<MatrixType, inverse_type>::end(
     const size_type r) const
 {
-  Assert(r < this->A->m(), ExcIndexRange(r, 0, this->A->m()));
+  AssertIndexRange(r, this->A->m());
   return const_iterator(this, r + 1);
 }
 

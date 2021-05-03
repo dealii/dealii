@@ -36,7 +36,7 @@ where you may want to read up on the individual equations):
   while we assume free-flow conditions on the remainder of the external
   boundary,
   @f{align*}
-    (2\eta \varepsilon(\mathbf v) + p \mathbf 1) \cdot \mathbf n = 0
+    (2\eta \varepsilon(\mathbf v) - p \mathbf 1) \cdot \mathbf n = 0
      \qquad\qquad
      \text{on}\ \Gamma_{f,2} = \partial\Omega \cap \partial\Omega_f \backslash
      \Gamma_{f,1}.
@@ -69,9 +69,11 @@ where you may want to read up on the individual equations):
   Secondly, the forces (traction) on the solid equal the normal stress from the fluid,
   @f{align*}
     (C \varepsilon(\mathbf u)) \mathbf n =
-    (2 \eta \varepsilon(\mathbf v) + p \mathbf 1) \mathbf n \qquad\qquad
-     \text{on}\ \Gamma_{i} = \partial\Omega_s \cap \partial\Omega_f.
+    (2 \eta \varepsilon(\mathbf v) - p \mathbf 1) \mathbf n \qquad\qquad
+     \text{on}\ \Gamma_{i} = \partial\Omega_s \cap \partial\Omega_f,
   @f}
+  where $\mathbf{n}$ is the normal vector on $\Gamma_{i}$ pointing from
+  the solid to the fluid.
 
 We get a weak formulation of this problem by following our usual rule of
 multiplying from the left by a test function and integrating over the
@@ -86,7 +88,7 @@ H^1(\Omega_s)^d$ such that
 	+ (\varepsilon(\mathbf b), C \varepsilon(\mathbf u))_{\Omega_s} &
 	\\
 	- (\mathbf b,
-           (2 \eta \varepsilon(\mathbf v) + p \mathbf 1) \mathbf n)_{\Gamma_i}
+           (2 \eta \varepsilon(\mathbf v) - p \mathbf 1) \mathbf n)_{\Gamma_i}
 	&=
 	0,
 @f}
@@ -179,7 +181,7 @@ comes in: it describes a finite dimensional function space of
 functions that are constant zero. A particular property of this
 peculiar linear vector space is that it has no degrees of freedom: it
 isn't just finite dimensional, it is in fact zero dimensional, and
-consequently for objects of this type, FiniteElement::dofs_per_cell
+consequently for objects of this type, FiniteElement::n_dofs_per_cell()
 will return zero. For discussion below, let us give this space a
 proper symbol:
 @f[
@@ -246,21 +248,21 @@ the two elements are just variations of each other in that they have the same
 number of vector components but have different polynomial degrees &mdash; this
 smells very much like what one would do in $hp$ finite element methods, and it
 is exactly what we are going to do here: we are going to (ab)use the classes
-and facilities of the hp namespace to assign different elements to different
+and facilities of the hp-namespace to assign different elements to different
 cells. In other words, we will use collect the two finite elements in an
 hp::FECollection, will integrate with an appropriate hp::QCollection using an
-hp::FEValues object, and our DoF handler will be of type hp::DoFHandler. You
+hp::FEValues object, and our DoFHandler will be in <i>hp</i>-mode. You
 may wish to take a look at step-27 for an overview of all of these concepts.
 
 Before going on describing the testcase, let us clarify a bit <i>why</i> this
 approach of extending the functions by zero to the entire domain and then
-mapping the problem on to the hp framework makes sense:
+mapping the problem on to the hp-framework makes sense:
 
 - It makes things uniform: On all cells, the number of vector components is
   the same (here, <code>2*dim+1</code>). This makes all sorts of
   things possible since a uniform description allows for code
   re-use. For example, counting degrees of freedom per vector
-  component (DoFTools::count_dofs_per_component), sorting degrees of
+  component (DoFTools::count_dofs_per_fe_component), sorting degrees of
   freedom by component (DoFRenumbering::component_wise), subsequent
   partitioning of matrices and vectors into blocks and many other
   functions work as they always did without the need to add special
@@ -308,7 +310,7 @@ discrete level we recall to be
 	+ (\varepsilon(\mathbf b_h), C \varepsilon(\mathbf u_h))_{\Omega_s} &
 	\\
 	- (\mathbf b_h,
-           (2 \eta \varepsilon(\mathbf v_h) + p \mathbf 1) \mathbf n)_{\Gamma_i}
+           (2 \eta \varepsilon(\mathbf v_h) - p \mathbf 1) \mathbf n)_{\Gamma_i}
 	&=
 	0,
 @f}
@@ -323,8 +325,8 @@ in the @ref vector_valued module (rather than the one from step-8).
 
 The term that is of more interest is the interface term,
 @f[
-	(\mathbf b_h,
-           (2 \eta \varepsilon(\mathbf v_h) + p \mathbf 1) \mathbf n)_{\Gamma_i}.
+	-(\mathbf b_h,
+           (2 \eta \varepsilon(\mathbf v_h) - p \mathbf 1) \mathbf n)_{\Gamma_i}.
 @f]
 Based on our assumption that the interface $\Gamma_i$ coincides with
 cell boundaries, this can in fact be written as a set of face
@@ -334,8 +336,8 @@ notation $\psi_i[\mathbf v],\psi_i[p], \psi_i[\mathbf u]$, then the
 term above yields the following contribution to the global matrix
 entry $i,j$:
 @f[
-	\sum_K (\psi_i[\mathbf u],
-           (2 \eta \varepsilon(\psi_j[\mathbf v]) + \psi_j[p] \mathbf 1)
+	-\sum_K (\psi_i[\mathbf u],
+           (2 \eta \varepsilon(\psi_j[\mathbf v]) - \psi_j[p] \mathbf 1)
 	   \mathbf n)_{\partial K \cap \Gamma_i}.
 @f]
 Although it isn't immediately obvious, this term presents a slight
@@ -463,44 +465,38 @@ ensure that the velocity degrees of freedom on this face are
 zero. Some care is necessary to deal with the case that the adjacent
 solid cell is refined, yielding the following code:
 @code
-    std::vector<unsigned int> local_face_dof_indices (stokes_fe.dofs_per_face);
-    for (typename hp::DoFHandler<dim>::active_cell_iterator
-	   cell = dof_handler.begin_active();
-	 cell != dof_handler.end(); ++cell)
-      if (cell_is_in_fluid_domain (cell))
-	for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-	  if (!cell->at_boundary(f))
-	    {
-	      bool face_is_on_interface = false;
+std::vector<unsigned int> local_face_dof_indices (stokes_fe.dofs_per_face);
+for (const auto &cell: dof_handler.active_cell_iterators())
+  if (cell_is_in_fluid_domain (cell))
+    for (const auto f : cell->face_indices())
+      if (!cell->at_boundary(f))
+        {
+          bool face_is_on_interface = false;
 
-	      if ((cell->neighbor(f)->has_children() == false)
-		  &&
-		  (cell_is_in_solid_domain (cell->neighbor(f))))
-		face_is_on_interface = true;
-	      else if (cell->neighbor(f)->has_children() == true)
-		{
-						   // The neighbor does
-						   // have
-						   // children. See if
-						   // any of the cells
-						   // on the other
-						   // side are elastic
-		  for (unsigned int sf=0; sf<cell->face(f)->n_children(); ++sf)
-		    if (cell_is_in_solid_domain (cell->neighbor_child_on_subface(f, sf)))
-		      {
-			face_is_on_interface = true;
-			break;
-		      }
-		}
+          if ((cell->neighbor(f)->has_children() == false)
+	          &&
+	          (cell_is_in_solid_domain (cell->neighbor(f))))
+	        face_is_on_interface = true;
+          else if (cell->neighbor(f)->has_children() == true)
+	        {
+              // The neighbor does have children. See if any of the cells
+              // on the other side are elastic
+	          for (unsigned int sf=0; sf<cell->face(f)->n_children(); ++sf)
+	            if (cell_is_in_solid_domain (cell->neighbor_child_on_subface(f, sf)))
+	              {
+                   face_is_on_interface = true;
+		            break;
+	              }
+	        }
 
-	      if (face_is_on_interface)
-		{
-		  cell->face(f)->get_dof_indices (local_face_dof_indices, 0);
-		  for (unsigned int i=0; i<local_face_dof_indices.size(); ++i)
-		    if (stokes_fe.face_system_to_component_index(i).first < dim)
- 		      constraints.add_line (local_face_dof_indices[i]);
-		}
-	    }
+          if (face_is_on_interface)
+           {
+             cell->face(f)->get_dof_indices (local_face_dof_indices, 0);
+             for (unsigned int i=0; i<local_face_dof_indices.size(); ++i)
+             if (stokes_fe.face_system_to_component_index(i).first < dim)
+               constraints.add_line (local_face_dof_indices[i]);
+           }
+        }
 @endcode
 
 The call <code>constraints.add_line(t)</code> tells the
@@ -558,7 +554,7 @@ prescribe Dirichlet conditions for the flow at the top so that we get
 inflow at the left and outflow at the right. At the left and right
 boundaries, no boundary conditions are imposed explicitly for the
 flow, yielding the implicit no-stress condition $(2\eta
-\varepsilon(\mathbf v) + p \mathbf 1) \cdot \mathbf n = 0$.
+\varepsilon(\mathbf v) - p \mathbf 1) \cdot \mathbf n = 0$.
 The conditions on the interface between the two domains has already been
 discussed above.
 
@@ -584,15 +580,16 @@ alternative: we define an <code>enum</code> with symbolic names for
 material_id numbers and will use them to identify which part of the domain a
 cell is on.
 
-Secondly, we use an object of type hp::DoFHandler. This class needs to know
-which cells will use the Stokes and which the elasticity finite element. At
-the beginning of each refinement cycle we will therefore have to walk over
-all cells and set the (in hp parlance) active FE index to whatever is
-appropriate in the current situation. While we can use symbolic names for the
-material id, the active FE index is in fact a number that will frequently be
-used to index into collections of objects (e.g. of type hp::FECollection and
-hp::QCollection); that means that the active FE index actually has to have
-value zero for the fluid and one for the elastic part of the domain.
+Secondly, we use an object of type DoFHandler operating in <i>hp</i>-mode. This
+class needs to know which cells will use the Stokes and which the elasticity
+finite element. At the beginning of each refinement cycle we will therefore
+have to walk over all cells and set the (in hp-parlance) active FE index to
+whatever is appropriate in the current situation. While we can use symbolic
+names for the material id, the active FE index is in fact a number that will
+frequently be used to index into collections of objects (e.g. of type
+hp::FECollection and hp::QCollection); that means that the active FE index
+actually has to have value zero for the fluid and one for the elastic part of
+the domain.
 
 
 <h4>Linear solvers</h4>
@@ -660,9 +657,9 @@ the jump in the solution's gradient around the faces of each cell. This jump
 is likely to be very large at the locations where the solution is
 discontinuous and extended by zero; it also doesn't become smaller as the mesh
 is refined. The KellyErrorEstimator class can't just ignore the interface
-because it essentially only sees an hp::DoFHandler where the element type
-changes from one cell to another &mdash; precisely the thing that the
-hp::DoFHandler was designed for, the interface in the current program looks no
+because it essentially only sees a DoFHandler in <i>hp</i>-mode where the element
+type changes from one cell to another &mdash; precisely the thing that the
+<i>hp</i>-mode was designed for, the interface in the current program looks no
 different than the interfaces in step-27, for example, and certainly no less
 legitimate. Be that as it may, the end results is that there is a layer of
 cells on both sides of the interface between the two subdomains where error
@@ -684,4 +681,3 @@ to a reasonably refined mesh.
 
 While this is clearly a suboptimal solution, it works for now and leaves room
 for future improvement.
-

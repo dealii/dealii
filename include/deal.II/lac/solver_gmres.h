@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2019 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,7 +21,6 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/logstream.h>
-#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/subscriptor.h>
 
 #include <deal.II/lac/full_matrix.h>
@@ -33,6 +32,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <memory>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -95,7 +95,7 @@ namespace internal
 
     private:
       /**
-       * Pool were vectors are obtained from.
+       * Pool where vectors are obtained from.
        */
       VectorMemory<VectorType> &mem;
 
@@ -170,9 +170,6 @@ namespace internal
  * can be obtained by connecting a function as a slot using @p
  * connect_condition_number_slot and @p connect_eigenvalues_slot. These slots
  * will then be called from the solver with the estimates as argument.
- *
- *
- * @author Wolfgang Bangerth, Guido Kanschat, Ralf Hartmann.
  */
 template <class VectorType = Vector<double>>
 class SolverGMRES : public SolverBase<VectorType>
@@ -440,21 +437,23 @@ protected:
 
 /**
  * Implementation of the Generalized minimal residual method with flexible
- * preconditioning method.
+ * preconditioning (flexible GMRES or FGMRES).
  *
- * This version of the GMRES method allows for the use of a different
+ * This flexible version of the GMRES method allows for the use of a different
  * preconditioner in each iteration step. Therefore, it is also more robust
  * with respect to inaccurate evaluation of the preconditioner. An important
- * application is also the use of a Krylov space method inside the
+ * application is the use of a Krylov space method inside the
  * preconditioner. As opposed to SolverGMRES which allows one to choose
  * between left and right preconditioning, this solver always applies the
  * preconditioner from the right.
  *
  * FGMRES needs two vectors in each iteration steps yielding a total of
- * <tt>2*SolverFGMRES::AdditionalData::max_basis_size+1</tt> auxiliary
- * vectors.
+ * <tt>2*SolverFGMRES::%AdditionalData::%max_basis_size+1</tt> auxiliary
+ * vectors. Otherwise, FGMRES requires roughly the same number of operations
+ * per iteration compared to GMRES, except one application of the
+ * preconditioner less at each restart and at the end of solve().
  *
- * @author Guido Kanschat, 2003
+ * For more details see @cite Saad1991.
  */
 template <class VectorType = Vector<double>>
 class SolverFGMRES : public SolverBase<VectorType>
@@ -471,18 +470,6 @@ public:
     explicit AdditionalData(const unsigned int max_basis_size = 30)
       : max_basis_size(max_basis_size)
     {}
-
-    /**
-     * @deprecated: use the other constructor as the second argument is
-     unused.
-     */
-    DEAL_II_DEPRECATED
-    AdditionalData(const unsigned int max_basis_size,
-                   const bool         use_default_residual)
-      : max_basis_size(max_basis_size)
-    {
-      (void)use_default_residual;
-    }
 
     /**
      * Maximum basis size.
@@ -553,7 +540,7 @@ namespace internal
     inline VectorType &TmpVectors<VectorType>::
                        operator[](const unsigned int i) const
     {
-      Assert(i < data.size(), ExcIndexRange(i, 0, data.size()));
+      AssertIndexRange(i, data.size());
 
       Assert(data[i] != nullptr, ExcNotInitialized());
       return *data[i];
@@ -566,7 +553,7 @@ namespace internal
     TmpVectors<VectorType>::operator()(const unsigned int i,
                                        const VectorType & temp)
     {
-      Assert(i < data.size(), ExcIndexRange(i, 0, data.size()));
+      AssertIndexRange(i, data.size());
       if (data[i] == nullptr)
         {
           data[i] = std::move(typename VectorMemory<VectorType>::Pointer(mem));
@@ -865,7 +852,7 @@ SolverGMRES<VectorType>::solve(const MatrixType &        A,
       r->reinit(x);
       x_->reinit(x);
 
-      gamma_ = std_cxx14::make_unique<dealii::Vector<double>>(gamma.size());
+      gamma_ = std::make_unique<dealii::Vector<double>>(gamma.size());
     }
 
   bool re_orthogonalize = additional_data.force_re_orthogonalization;

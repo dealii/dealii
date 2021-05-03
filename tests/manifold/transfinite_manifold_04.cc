@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -40,13 +40,11 @@ do_test(const Triangulation<dim, spacedim> &tria)
         deallog << cell->line(line)->center(/*respect_manifold=*/true)
                 << std::endl;
       deallog << "Faces on cell with center: " << cell->center() << std::endl;
-      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-           ++face)
+      for (const unsigned int face : GeometryInfo<dim>::face_indices())
         deallog << cell->face(face)->center(/*respect_manifold=*/true)
                 << std::endl;
       deallog << "Center with manifold: " << cell->center(true) << std::endl;
-      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-           ++face)
+      for (const unsigned int face : GeometryInfo<dim>::face_indices())
         if (cell->at_boundary(face))
           {
             std::vector<Point<spacedim>> points;

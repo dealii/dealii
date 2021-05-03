@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -68,7 +68,7 @@ test()
   FE_Q<dim>       fe(1);
   DoFHandler<dim> dofh(tria);
   dofh.distribute_dofs(fe);
-  dofh.distribute_mg_dofs(fe);
+  dofh.distribute_mg_dofs();
 
 
   ScratchData scratch;
@@ -77,7 +77,7 @@ test()
   auto cell = dofh.begin_mg();
   auto endc = dofh.end_mg();
 
-  typedef decltype(cell) Iterator;
+  using Iterator = decltype(cell);
 
   auto cell_worker = [](const Iterator &cell, ScratchData &s, CopyData &c) {
     deallog << "Cell worker on : " << cell->id()

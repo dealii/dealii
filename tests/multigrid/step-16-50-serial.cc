@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2003 - 2019 by the deal.II authors
+ * Copyright (C) 2003 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -57,7 +57,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 template <int dim>
 class LaplaceProblem
@@ -165,7 +164,7 @@ void
 LaplaceProblem<dim>::setup_system()
 {
   mg_dof_handler.distribute_dofs(fe);
-  mg_dof_handler.distribute_mg_dofs(fe);
+  mg_dof_handler.distribute_mg_dofs();
 
   sparsity_pattern.reinit(mg_dof_handler.n_dofs(),
                           mg_dof_handler.n_dofs(),
@@ -192,7 +191,8 @@ LaplaceProblem<dim>::setup_system()
   system_matrix.reinit(sparsity_pattern);
 
   mg_constrained_dofs.clear();
-  mg_constrained_dofs.initialize(mg_dof_handler, dirichlet_boundary);
+  mg_constrained_dofs.initialize(mg_dof_handler);
+  mg_constrained_dofs.make_zero_boundary_constraints(mg_dof_handler, {0});
   const unsigned int n_levels = triangulation.n_levels();
 
   mg_interface_matrices.resize(0, n_levels - 1);
@@ -365,21 +365,24 @@ template <int dim>
 void
 LaplaceProblem<dim>::solve()
 {
-  typedef SparseMatrix<double> matrix_t;
-  typedef Vector<double>       vector_t;
+  using matrix_t = SparseMatrix<double>;
+  using vector_t = Vector<double>;
 
   MGTransferPrebuilt<vector_t> mg_transfer(mg_constrained_dofs);
-  mg_transfer.build_matrices(mg_dof_handler);
+  mg_transfer.build(mg_dof_handler);
 
   matrix_t &coarse_matrix = mg_matrices[0];
 
   SolverControl        coarse_solver_control(1000, 1e-10, false, false);
   SolverCG<vector_t>   coarse_solver(coarse_solver_control);
   PreconditionIdentity id;
-  MGCoarseGridLACIteration<SolverCG<vector_t>, vector_t> coarse_grid_solver(
-    coarse_solver, coarse_matrix, id);
+  MGCoarseGridIterativeSolver<vector_t,
+                              SolverCG<vector_t>,
+                              matrix_t,
+                              PreconditionIdentity>
+    coarse_grid_solver(coarse_solver, coarse_matrix, id);
 
-  typedef PreconditionJacobi<matrix_t>                 Smoother;
+  using Smoother = PreconditionJacobi<matrix_t>;
   MGSmootherPrecondition<matrix_t, Smoother, vector_t> mg_smoother;
   mg_smoother.initialize(mg_matrices, Smoother::AdditionalData(0.5));
   mg_smoother.set_steps(2);
@@ -388,12 +391,8 @@ LaplaceProblem<dim>::solve()
   mg::Matrix<vector_t> mg_interface_up(mg_interface_matrices);
   mg::Matrix<vector_t> mg_interface_down(mg_interface_matrices);
 
-  Multigrid<vector_t> mg(mg_dof_handler,
-                         mg_matrix,
-                         coarse_grid_solver,
-                         mg_transfer,
-                         mg_smoother,
-                         mg_smoother);
+  Multigrid<vector_t> mg(
+    mg_matrix, coarse_grid_solver, mg_transfer, mg_smoother, mg_smoother);
   mg.set_edge_matrices(mg_interface_down, mg_interface_up);
 
   PreconditionMG<dim, vector_t, MGTransferPrebuilt<vector_t>> preconditioner(

@@ -285,7 +285,7 @@ main()
 
           constraints.print(logfile);
 
-          // release fe
+          // release FE
           dof.clear();
 
           deallog << std::endl;

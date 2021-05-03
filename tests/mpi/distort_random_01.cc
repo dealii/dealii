@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2018 by the deal.II authors
+// Copyright (C) 2001 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -76,10 +76,8 @@ main(int argc, char *argv[])
 
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     {
-      std::ofstream logfile("output");
+      initlog();
       deallog << std::setprecision(4);
-      logfile << std::setprecision(4);
-      deallog.attach(logfile);
 
       test1<2>(true);
       test1<2>(false);

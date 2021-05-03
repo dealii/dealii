@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,6 +19,7 @@
 #include <deal.II/base/function.h>
 #include <deal.II/base/utilities.h>
 
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_enriched.h>
@@ -30,7 +31,6 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/fe_values.h>
 #include <deal.II/hp/q_collection.h>
@@ -49,7 +49,6 @@ const double eps = 1e-10;
 // argument for build_patches()
 const unsigned int patches = 10;
 
-using namespace dealii;
 
 // uncomment when debugging
 // #define DATA_OUT_FE_ENRICHED
@@ -131,7 +130,7 @@ test3()
       fe_values.get_function_values(solution_pou, solution_values_pou);
       fe_values.get_function_values(solution, solution_values);
 
-      for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+      for (const auto q_point : fe_values.quadrature_point_indices())
         deallog << " qp=" << q_points[q_point]
                 << " f(qp)=" << function.value(q_points[q_point])
                 << " U_fe(qp)=" << solution_values_fe[q_point]
@@ -195,10 +194,8 @@ plot_shape_function()
 int
 main(int argc, char **argv)
 {
-  std::ofstream logfile("output");
-  deallog << std::setprecision(4);
-  deallog << std::fixed;
-  deallog.attach(logfile);
+  initlog();
+  deallog << std::setprecision(4) << std::fixed;
   deallog.depth_console(0);
 
   try

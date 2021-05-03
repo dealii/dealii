@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -36,8 +36,6 @@
 
 #include "../tests.h"
 
-
-using namespace dealii;
 
 
 // x+y(+z), x^2+y^2 (, z+xy)

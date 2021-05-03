@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -143,6 +143,22 @@ test(std::ostream &out)
       deallog << "hyper_L" << std::endl;
       Triangulation<dim> tr;
       GridGenerator::hyper_L(tr, -1., 1.);
+      if (tr.n_cells() > 0)
+        go.write(tr, out, format);
+    }
+  if (dim > 1)
+    {
+      deallog << "subdivided_hyper_L" << std::endl;
+      Triangulation<dim>        tr;
+      std::vector<signed int>   cut_away_cells = {-2, -2};
+      std::vector<unsigned int> repetitions    = {8, 4};
+      if (dim == 3)
+        {
+          cut_away_cells.push_back(4);
+          repetitions.push_back(4);
+        }
+      GridGenerator::subdivided_hyper_L(
+        tr, repetitions, p1, p2, cut_away_cells);
       if (tr.n_cells() > 0)
         go.write(tr, out, format);
     }

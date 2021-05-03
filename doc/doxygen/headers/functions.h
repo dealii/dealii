@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2014 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -39,7 +39,7 @@
  *
  *
  * <h3>Time dependent functions</h3>
- * 
+ *
  * For time dependent computations, boundary conditions and/or right
  * hand side functions may also change with time. Since at a given
  * time step one is usually only interested in the spatial dependence
@@ -61,7 +61,7 @@
  * time of the function object to the present time step before handing
  * it off to the VectorTools::interpolate_boundary_values method.
  *
- * 
+ *
  * <h3>Tensor-valued functions</h3>
  *
  * The Function class is the most frequently used, but sometimes one needs a

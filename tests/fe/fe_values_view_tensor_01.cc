@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2018 by the deal.II authors
+// Copyright (C) 2007 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -47,7 +47,6 @@
 #include "../tests.h"
 
 
-using namespace dealii;
 
 template <int dim>
 class MixedElastoPlasticity
@@ -114,8 +113,8 @@ MixedElastoPlasticity<dim>::make_grid_and_dofs()
   DoFRenumbering::component_wise(dof_handler);
 
   // total number of dof per block component
-  std::vector<types::global_dof_index> dofs_per_block(2);
-  DoFTools::count_dofs_per_block(dof_handler, dofs_per_block, block_component);
+  const std::vector<types::global_dof_index> dofs_per_block =
+    DoFTools::count_dofs_per_fe_block(dof_handler, block_component);
 
   const unsigned int n_stress_dof = dofs_per_block[0];
   const unsigned int n_gamma_dof  = dofs_per_block[1];
@@ -244,10 +243,8 @@ check()
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(3);
-
-  deallog.attach(logfile);
 
   check();
 }

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2018 by the deal.II authors
+// Copyright (C) 2014 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -35,8 +35,6 @@
 
 #include "../tests.h"
 
-
-std::ofstream logfile("output");
 
 
 const unsigned int degree_p = 1;
@@ -114,18 +112,18 @@ do_test(const DoFHandler<dim> &dof)
         const unsigned int dofs_per_cell_u = phi_u.dofs_per_cell;
         const unsigned int dofs_per_cell_p = phi_p.dofs_per_cell;
         for (unsigned int i = 0; i < dofs_per_cell_u;
-             i += VectorizedArray<double>::n_array_elements)
+             i += VectorizedArray<double>::size())
           {
             const unsigned int n_items =
-              i + VectorizedArray<double>::n_array_elements > dofs_per_cell_u ?
+              i + VectorizedArray<double>::size() > dofs_per_cell_u ?
                 (dofs_per_cell_u - i) :
-                VectorizedArray<double>::n_array_elements;
+                VectorizedArray<double>::size();
             for (unsigned int j = 0; j < dofs_per_cell_u; ++j)
               phi_u.begin_dof_values()[j] = VectorizedArray<double>();
             for (unsigned int v = 0; v < n_items; ++v)
               phi_u.begin_dof_values()[i + v][v] = 1.;
 
-            phi_u.evaluate(false, true);
+            phi_u.evaluate(EvaluationFlags::gradients);
             for (unsigned int q = 0; q < n_q_points; ++q)
               {
                 VectorizedArray<double> div_u = phi_u.get_divergence(q);
@@ -133,8 +131,8 @@ do_test(const DoFHandler<dim> &dof)
                                                 q);
                 phi_p.submit_value(-div_u, q);
               }
-            phi_u.integrate(false, true);
-            phi_p.integrate(true, false);
+            phi_u.integrate(EvaluationFlags::gradients);
+            phi_p.integrate(EvaluationFlags::values);
 
             for (unsigned int v = 0; v < n_items; ++v)
               {
@@ -150,23 +148,23 @@ do_test(const DoFHandler<dim> &dof)
           }
 
         for (unsigned int i = 0; i < dofs_per_cell_p;
-             i += VectorizedArray<double>::n_array_elements)
+             i += VectorizedArray<double>::size())
           {
             const unsigned int n_items =
-              i + VectorizedArray<double>::n_array_elements > dofs_per_cell_p ?
+              i + VectorizedArray<double>::size() > dofs_per_cell_p ?
                 (dofs_per_cell_p - i) :
-                VectorizedArray<double>::n_array_elements;
+                VectorizedArray<double>::size();
             for (unsigned int j = 0; j < dofs_per_cell_p; ++j)
               phi_p.begin_dof_values()[j] = VectorizedArray<double>();
             for (unsigned int v = 0; v < n_items; ++v)
               phi_p.begin_dof_values()[i + v][v] = 1.;
 
-            phi_p.evaluate(true, false);
+            phi_p.evaluate(EvaluationFlags::values);
             for (unsigned int q = 0; q < n_q_points; ++q)
               {
                 phi_u.submit_divergence(-phi_p.get_value(q), q);
               }
-            phi_u.integrate(false, true);
+            phi_u.integrate(EvaluationFlags::gradients);
 
             for (unsigned int v = 0; v < n_items; ++v)
               for (unsigned int j = 0; j < dofs_per_cell_u; ++j)
@@ -193,7 +191,7 @@ test()
   typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(),
                                                     endc = tria.end();
   for (; cell != endc; ++cell)
-    for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+    for (const unsigned int f : GeometryInfo<dim>::face_indices())
       if (cell->at_boundary(f))
         cell->face(f)->set_all_manifold_ids(0);
   tria.set_manifold(0, manifold);
@@ -215,7 +213,7 @@ test()
 int
 main()
 {
-  deallog.attach(logfile);
+  initlog();
 
   deallog << std::setprecision(3);
 

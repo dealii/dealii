@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2018 by the deal.II authors
+// Copyright (C) 1999 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -36,6 +36,13 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+#ifdef signals
+#  error \
+    "The name 'signals' is already defined. You are most likely using the QT library \
+and using the 'signals' keyword. You can either #include the Qt headers (or any conflicting headers) \
+*after* the deal.II headers or you can define the 'QT_NO_KEYWORDS' macro and use the 'Q_SIGNALS' macro."
+#endif
+
 /*!@addtogroup mg */
 /*@{*/
 
@@ -70,6 +77,10 @@ namespace mg
      * This signal is triggered before (@p before is true) and after (@p before
      * is
      * false) the call to the coarse solver on @p level.
+     *
+     * The coarse solve will be done with ``defect[leve]`` and returned in
+     * ``solution[level]``, which can be inspected by the user using this
+     * signal.
      */
     boost::signals2::signal<void(const bool before, const unsigned int level)>
       coarse_solve;
@@ -78,6 +89,9 @@ namespace mg
      * This signal is triggered before (@p before is true) and after (@p before
      * is false) the call to MGTransfer::restrict_and_add() which restricts a
      * vector from @p level to the next coarser one (@p level - 1).
+     *
+     * The vector ``defect[level-1]`` will be updated between these two
+     * triggers and can be inspected by the user using this signal.
      */
     boost::signals2::signal<void(const bool before, const unsigned int level)>
       restriction;
@@ -94,6 +108,9 @@ namespace mg
      * This signal is triggered before (@p before is true) and after (@p before
      * is false) the call to a pre-smoothing step via MGPreSmoother::apply() on
      * @p level.
+     *
+     * The smoother result will be stored in ``solution[level]`` and can be
+     * inspected by the user using this signal.
      */
     boost::signals2::signal<void(const bool before, const unsigned int level)>
       pre_smoother_step;
@@ -130,8 +147,6 @@ namespace mg
  * will have to set up quite a few auxiliary objects before you can use it.
  * Unfortunately, it seems that this can be avoided only be restricting the
  * flexibility of this class in an unacceptable way.
- *
- * @author Guido Kanschat, 1999 - 2005
  */
 template <typename VectorType>
 class Multigrid : public Subscriptor
@@ -152,35 +167,6 @@ public:
 
   using vector_type       = VectorType;
   using const_vector_type = const VectorType;
-
-  /**
-   * Constructor. The DoFHandler is used to check whether the provided
-   * minlevel and maxlevel are in the range of valid levels.
-   * If maxlevel is set to the default value, the highest valid
-   * level is used.
-   * <tt>transfer</tt> is an object performing prolongation and
-   * restriction.
-   *
-   * This function already initializes the vectors which will be used later in
-   * the course of the computations. You should therefore create objects of
-   * this type as late as possible.
-   *
-   * @deprecated Use the other constructor instead.
-   * The DoFHandler is actually not needed.
-   */
-  template <int dim>
-#ifndef _MSC_VER
-  DEAL_II_DEPRECATED
-#endif
-  Multigrid(const DoFHandler<dim> &             mg_dof_handler,
-            const MGMatrixBase<VectorType> &    matrix,
-            const MGCoarseGridBase<VectorType> &coarse,
-            const MGTransferBase<VectorType> &  transfer,
-            const MGSmootherBase<VectorType> &  pre_smooth,
-            const MGSmootherBase<VectorType> &  post_smooth,
-            const unsigned int                  minlevel = 0,
-            const unsigned int maxlevel = numbers::invalid_unsigned_int,
-            Cycle              cycle    = v_cycle);
 
   /**
    * Constructor. <tt>transfer</tt> is an object performing prolongation and
@@ -300,16 +286,6 @@ public:
    * Chance #cycle_type used in cycle().
    */
   void set_cycle(Cycle);
-
-  /**
-   * @deprecated Debug output will go away. Use signals instead.
-   *
-   * Set the debug level. Higher values will create more debugging output
-   * during the multigrid cycles.
-   */
-  DEAL_II_DEPRECATED
-  void
-  set_debug(const unsigned int);
 
   /**
    * Connect a function to mg::Signals::coarse_solve.
@@ -468,11 +444,6 @@ private:
    */
   SmartPointer<const MGMatrixBase<VectorType>, Multigrid<VectorType>> edge_up;
 
-  /**
-   * Level for debug output. Defaults to zero and can be set by set_debug().
-   */
-  unsigned int debug;
-
   template <int dim, class OtherVectorType, class TRANSFER>
   friend class PreconditionMG;
 };
@@ -491,8 +462,6 @@ private:
  * If VectorType is in fact a block vector and the TRANSFER object supports
  * use of a separate DoFHandler for each block, this class also allows
  * to be initialized with a separate DoFHandler for each block.
- *
- * @author Guido Kanschat, Daniel Arndt, 1999, 2000, 2001, 2002, 2017
  */
 template <int dim, typename VectorType, class TRANSFER>
 class PreconditionMG : public Subscriptor
@@ -577,7 +546,7 @@ public:
   /**
    * Return the MPI communicator object in use with this preconditioner.
    */
-  MPI_Comm
+  const MPI_Comm &
   get_mpi_communicator() const;
 
   /**
@@ -637,40 +606,6 @@ private:
 
 
 template <typename VectorType>
-template <int dim>
-Multigrid<VectorType>::Multigrid(const DoFHandler<dim> &         mg_dof_handler,
-                                 const MGMatrixBase<VectorType> &matrix,
-                                 const MGCoarseGridBase<VectorType> &coarse,
-                                 const MGTransferBase<VectorType> &  transfer,
-                                 const MGSmootherBase<VectorType> &  pre_smooth,
-                                 const MGSmootherBase<VectorType> &post_smooth,
-                                 const unsigned int                min_level,
-                                 const unsigned int                max_level,
-                                 Cycle                             cycle)
-  : cycle_type(cycle)
-  , minlevel(min_level)
-  , matrix(&matrix, typeid(*this).name())
-  , coarse(&coarse, typeid(*this).name())
-  , transfer(&transfer, typeid(*this).name())
-  , pre_smooth(&pre_smooth, typeid(*this).name())
-  , post_smooth(&post_smooth, typeid(*this).name())
-  , edge_down(nullptr, typeid(*this).name())
-  , edge_up(nullptr, typeid(*this).name())
-  , debug(0)
-{
-  const unsigned int dof_handler_max_level =
-    mg_dof_handler.get_triangulation().n_global_levels() - 1;
-  if (max_level == numbers::invalid_unsigned_int)
-    maxlevel = dof_handler_max_level;
-  else
-    maxlevel = max_level;
-
-  reinit(minlevel, maxlevel);
-}
-
-
-
-template <typename VectorType>
 Multigrid<VectorType>::Multigrid(const MGMatrixBase<VectorType> &    matrix,
                                  const MGCoarseGridBase<VectorType> &coarse,
                                  const MGTransferBase<VectorType> &  transfer,
@@ -689,7 +624,6 @@ Multigrid<VectorType>::Multigrid(const MGMatrixBase<VectorType> &    matrix,
   , edge_in(nullptr, typeid(*this).name())
   , edge_down(nullptr, typeid(*this).name())
   , edge_up(nullptr, typeid(*this).name())
-  , debug(0)
 {
   if (max_level == numbers::invalid_unsigned_int)
     maxlevel = matrix.get_maxlevel();
@@ -929,14 +863,14 @@ PreconditionMG<dim, VectorType, TRANSFER>::locally_owned_domain_indices(
 
 
 template <int dim, typename VectorType, class TRANSFER>
-MPI_Comm
+const MPI_Comm &
 PreconditionMG<dim, VectorType, TRANSFER>::get_mpi_communicator() const
 {
-  // currently parallel GMG works with distributed Triangulation only,
+  // currently parallel GMG works with parallel triangulations only,
   // so it should be a safe bet to use it to query MPI communicator:
   const Triangulation<dim> &tria = dof_handler_vector[0]->get_triangulation();
-  const parallel::distributed::Triangulation<dim> *ptria =
-    dynamic_cast<const parallel::distributed::Triangulation<dim> *>(&tria);
+  const parallel::TriangulationBase<dim> *ptria =
+    dynamic_cast<const parallel::TriangulationBase<dim> *>(&tria);
   Assert(ptria != nullptr, ExcInternalError());
   return ptria->get_communicator();
 }

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2019 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -27,7 +27,8 @@
 
 #include <cmath>
 #include <complex>
-#include <cstdlib>
+#include <cstddef>
+#include <type_traits>
 
 #ifdef DEAL_II_COMPILER_CUDA_AWARE
 #  define DEAL_II_CUDA_HOST_DEV __host__ __device__
@@ -37,11 +38,95 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+namespace internal
+{
+  /**
+   * A helper class specifying the maximal vector length of VectorizedArray
+   * for a specified data type Number for the given processor architecture and
+   * optimization level.
+   *
+   * The value of the maximal vector length is used as default template
+   * argument in VectorizedArray, such that VectorizedArray<Number> is
+   * equivalent to VectorizedArray<Number,
+   * VectorizedArrayWidthSpecifier<Number>::max_width>.
+   *
+   * @note This class is the default implementation for data types for which
+   * no vectorization is supported.
+   *
+   * @tparam Number The underlying data type for which one wants to find out
+   *   the maximal length of hardware supported vectors.
+   */
+  template <typename Number>
+  struct VectorizedArrayWidthSpecifier
+  {
+    /**
+     * Maximal vector length of VectorizedArray for an arbitrary type.
+     */
+    constexpr static unsigned int max_width = 1;
+  };
+
+  /**
+   * A helper class specifying the maximal vector length of VectorizedArray
+   * for the data type `double` for the given processor architecture and
+   * optimization level. For a detailed description of supported maximal vector
+   * lengths, see the documentation of VectorizedArray.
+   */
+  template <>
+  struct VectorizedArrayWidthSpecifier<double>
+  {
+    /**
+     * Maximal vector length of VectorizedArray for double.
+     */
+    constexpr static unsigned int max_width =
+#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 512
+      8;
+#elif DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 256
+      4;
+#elif DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 128
+      2;
+#else
+      1;
+#endif
+  };
+
+  /**
+   * A helper class specifying the maximal vector length of VectorizedArray
+   * for the data type `float` for the given processor architecture and
+   * optimization level. For a detailed description of supported maximal vector
+   * lengths, see the documentation of VectorizedArray.
+   */
+  template <>
+  struct VectorizedArrayWidthSpecifier<float>
+  {
+    /**
+     * Maximal vector length of VectorizedArray for float.
+     */
+    constexpr static unsigned int max_width =
+#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 128 && defined(__ALTIVEC__)
+      4;
+#elif DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 512 && defined(__AVX512F__)
+      16;
+#elif DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 256 && defined(__AVX__)
+      8;
+#elif DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 128 && defined(__SSE2__)
+      4;
+#else
+      1;
+#endif
+  };
+
+
+} // namespace internal
+
 // forward declarations to support abs or sqrt operations on VectorizedArray
-template <typename Number>
+#ifndef DOXYGEN
+template <typename Number,
+          std::size_t width =
+            internal::VectorizedArrayWidthSpecifier<Number>::max_width>
 class VectorizedArray;
 template <typename T>
 struct EnableIfScalar;
+#endif
 
 DEAL_II_NAMESPACE_CLOSE
 
@@ -62,38 +147,38 @@ DEAL_II_NAMESPACE_CLOSE
 
 namespace std
 {
-  template <typename Number>
-  DEAL_II_ALWAYS_INLINE ::dealii::VectorizedArray<Number>
-  sqrt(const ::dealii::VectorizedArray<Number> &);
-  template <typename Number>
-  DEAL_II_ALWAYS_INLINE ::dealii::VectorizedArray<Number>
-  abs(const ::dealii::VectorizedArray<Number> &);
-  template <typename Number>
-  DEAL_II_ALWAYS_INLINE ::dealii::VectorizedArray<Number>
-  max(const ::dealii::VectorizedArray<Number> &,
-      const ::dealii::VectorizedArray<Number> &);
-  template <typename Number>
-  DEAL_II_ALWAYS_INLINE ::dealii::VectorizedArray<Number>
-  min(const ::dealii::VectorizedArray<Number> &,
-      const ::dealii::VectorizedArray<Number> &);
-  template <typename Number>
-  ::dealii::VectorizedArray<Number>
-  pow(const ::dealii::VectorizedArray<Number> &, const Number p);
-  template <typename Number>
-  ::dealii::VectorizedArray<Number>
-  sin(const ::dealii::VectorizedArray<Number> &);
-  template <typename Number>
-  ::dealii::VectorizedArray<Number>
-  cos(const ::dealii::VectorizedArray<Number> &);
-  template <typename Number>
-  ::dealii::VectorizedArray<Number>
-  tan(const ::dealii::VectorizedArray<Number> &);
-  template <typename Number>
-  ::dealii::VectorizedArray<Number>
-  exp(const ::dealii::VectorizedArray<Number> &);
-  template <typename Number>
-  ::dealii::VectorizedArray<Number>
-  log(const ::dealii::VectorizedArray<Number> &);
+  template <typename Number, std::size_t width>
+  DEAL_II_ALWAYS_INLINE ::dealii::VectorizedArray<Number, width>
+  sqrt(const ::dealii::VectorizedArray<Number, width> &);
+  template <typename Number, std::size_t width>
+  DEAL_II_ALWAYS_INLINE ::dealii::VectorizedArray<Number, width>
+  abs(const ::dealii::VectorizedArray<Number, width> &);
+  template <typename Number, std::size_t width>
+  DEAL_II_ALWAYS_INLINE ::dealii::VectorizedArray<Number, width>
+  max(const ::dealii::VectorizedArray<Number, width> &,
+      const ::dealii::VectorizedArray<Number, width> &);
+  template <typename Number, std::size_t width>
+  DEAL_II_ALWAYS_INLINE ::dealii::VectorizedArray<Number, width>
+  min(const ::dealii::VectorizedArray<Number, width> &,
+      const ::dealii::VectorizedArray<Number, width> &);
+  template <typename Number, size_t width>
+  ::dealii::VectorizedArray<Number, width>
+  pow(const ::dealii::VectorizedArray<Number, width> &, const Number p);
+  template <typename Number, size_t width>
+  ::dealii::VectorizedArray<Number, width>
+  sin(const ::dealii::VectorizedArray<Number, width> &);
+  template <typename Number, size_t width>
+  ::dealii::VectorizedArray<Number, width>
+  cos(const ::dealii::VectorizedArray<Number, width> &);
+  template <typename Number, size_t width>
+  ::dealii::VectorizedArray<Number, width>
+  tan(const ::dealii::VectorizedArray<Number, width> &);
+  template <typename Number, size_t width>
+  ::dealii::VectorizedArray<Number, width>
+  exp(const ::dealii::VectorizedArray<Number, width> &);
+  template <typename Number, size_t width>
+  ::dealii::VectorizedArray<Number, width>
+  log(const ::dealii::VectorizedArray<Number, width> &);
 } // namespace std
 
 DEAL_II_NAMESPACE_OPEN
@@ -182,23 +267,6 @@ namespace numbers
   {};
 
   /**
-   * Check whether a value is not a number.
-   *
-   * This function uses either <code>std::isnan</code>, <code>isnan</code>, or
-   * <code>_isnan</code>, whichever is available on the system and returns the
-   * result.
-   *
-   * If none of the functions detecting NaN is available, this function
-   * returns false.
-   *
-   * @deprecated This function has been deprecated in favor of the C++11
-   * function <code>std::isnan</code>.
-   */
-  DEAL_II_DEPRECATED
-  bool
-  is_nan(const double x);
-
-  /**
    * Return @p true if the given value is a finite floating point number, i.e.
    * is neither plus or minus infinity nor NaN (not a number).
    *
@@ -246,7 +314,7 @@ namespace numbers
    * of @p value_1.
    */
   template <typename Number1, typename Number2>
-  bool
+  constexpr bool
   values_are_equal(const Number1 &value_1, const Number2 &value_2);
 
   /**
@@ -271,7 +339,7 @@ namespace numbers
    * by the input arguments.
    */
   template <typename Number>
-  bool
+  constexpr bool
   value_is_zero(const Number &value);
 
   /**
@@ -341,8 +409,6 @@ namespace numbers
    * types and complex number types. This template is mostly used to implement
    * linear algebra classes such as vectors and matrices that work for both
    * real and complex numbers.
-   *
-   * @author Wolfgang Bangerth, 2007
    */
   template <typename number>
   struct NumberTraits
@@ -405,8 +471,6 @@ namespace numbers
   /**
    * Specialization of the general NumberTraits class that provides the
    * relevant information if the underlying data type is std::complex<T>.
-   *
-   * @author Wolfgang Bangerth, 2007
    */
   template <typename number>
   struct NumberTraits<std::complex<number>>
@@ -618,24 +682,15 @@ namespace internal
     static bool const value = test<From, To>(0);
   };
 
-  /**
-   * The structs below are needed since VectorizedArray<T1> is a POD-type
-   * without a constructor and can be a template argument for
-   * SymmetricTensor<...,T2> where T2 would equal VectorizedArray<T1>.
-   * Internally, in previous versions of deal.II, SymmetricTensor<...,T2> would
-   * make use of the constructor of T2 leading to a compile-time error. However
-   * simply adding a constructor for VectorizedArray<T1> breaks the POD-idioms
-   * needed elsewhere. Calls to constructors of T2 subsequently got replaced by
-   * a call to internal::NumberType<T2> which then determines the right function
-   * to use by template deduction. A detailed discussion can be found at
-   * https://github.com/dealii/dealii/pull/3967 . Also see numbers.h for another
-   * specialization.
+  /*
+   * The structs below are needed to convert between some special number types.
+   * Also see tensor.h for another specialization.
    */
   template <typename T>
   struct NumberType
   {
-    static constexpr DEAL_II_CUDA_HOST_DEV const T &
-                                                 value(const T &t)
+    static constexpr DEAL_II_ALWAYS_INLINE DEAL_II_CUDA_HOST_DEV const T &
+                                                                       value(const T &t)
     {
       return t;
     }
@@ -649,9 +704,9 @@ namespace internal
 
     // Type T is constructible from F.
     template <typename F>
-    static constexpr DEAL_II_CUDA_HOST_DEV T
-                                           value(const F &f,
-                                                 typename std::enable_if<
+    static constexpr DEAL_II_ALWAYS_INLINE DEAL_II_CUDA_HOST_DEV T
+                                                                 value(const F &f,
+                                                                       typename std::enable_if<
             !std::is_same<typename std::decay<T>::type,
                           typename std::decay<F>::type>::value &&
             std::is_constructible<T, F>::value>::type * = nullptr)
@@ -661,9 +716,9 @@ namespace internal
 
     // Type T is explicitly convertible (but not constructible) from F.
     template <typename F>
-    static constexpr T
-    value(const F &f,
-          typename std::enable_if<
+    static constexpr DEAL_II_ALWAYS_INLINE T
+                                           value(const F &f,
+                                                 typename std::enable_if<
             !std::is_same<typename std::decay<T>::type,
                           typename std::decay<F>::type>::value &&
             !std::is_constructible<T, F>::value &&
@@ -856,7 +911,7 @@ namespace numbers
 
 
   template <typename Number1, typename Number2>
-  inline bool
+  constexpr bool
   values_are_equal(const Number1 &value_1, const Number2 &value_2)
   {
     return (value_1 == internal::NumberType<Number1>::value(value_2));
@@ -872,7 +927,7 @@ namespace numbers
 
 
   template <typename Number>
-  inline bool
+  constexpr bool
   value_is_zero(const Number &value)
   {
     return values_are_equal(value, 0.0);

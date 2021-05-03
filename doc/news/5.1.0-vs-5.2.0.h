@@ -139,9 +139,9 @@ inconvenience this causes.
 
 <ol>
   <li> <p> New:
-       The step-19 tutorial demonstrates handling of parameters from a
+       The \step-19 tutorial demonstrates handling of parameters from a
        parameter file, as well as some simple techniques for merging output
-       from parallel computations. 
+       from parallel computations.
        <br>
        (WB 2005/09/09)
        </p>
@@ -178,7 +178,7 @@ inconvenience this causes.
        might issue error messages about multiple defined symbols. This is now
        detected, and the linker is forced to ignore these errors. However, if
        you accidentally defined symbols twice you might have a hard time
-       debugging now... In this case remove the <code>-Xlinker 
+       debugging now... In this case remove the <code>-Xlinker
        --allow-multiple-definition</code> flag from Make.global_options.
        <br>
        (Ralf B. Schulz, 2005/07/13)
@@ -236,7 +236,7 @@ inconvenience this causes.
   <li> <p>
        Fixed: When compiling shared libraries on CygWin systems, warnings
        concerning the <code>-fPIC</code> option were issued by the compiler.
-       This is now fixed.       
+       This is now fixed.
        Also, configure now issues a message at the end that you should include
        the DLL-path in your <code>.bash_profile</code> file on these systems.
        <br>
@@ -254,7 +254,7 @@ inconvenience this causes.
        systems. A new preprocessor variable, <code>DEAL_II_BROKEN_SOCKETS</code>
        has been added to <code>base/config.h</code> which is defined on
        affected systems.
-       <br> 
+       <br>
        (Ralf B. Schulz, WB, 2005/03/02)
        </p>
 
@@ -262,7 +262,7 @@ inconvenience this causes.
        Fixed: The step-16 example program wasn't listed in the
        navigation bar of the  tutorial section, although it was in the
        table of contents. This is fixed now.
-       <br> 
+       <br>
        (WB, 2005/02/09)
        </p>
 </ol>
@@ -278,14 +278,14 @@ inconvenience this causes.
        a file in a sequence of directories and by appending suffixes. The class
        generates the complete file name including directory prefix and suffix
        such that it can be used for subsequently opening the file.
-       <br> 
+       <br>
        (GK, 2005/09/14)
        </p>
 
   <li> <p>
        Extended: The <code>ParameterHandler</code> class now does a much better
        job generating output in the <code>print_parameters()</code> function if
-       parameters have documentation strings attached to them. See the step-19
+       parameters have documentation strings attached to them. See the \step-19
        example program output for this.
        <br>
        (WB, 2005/09/12)
@@ -306,10 +306,10 @@ inconvenience this causes.
        <br>
        (Ralf B. Schulz, 2005/07/19)
        </p>
-       
+
   <li> <p>
        Removed: The <code>write_multigrid</code> flag in <code
-       class="member">DataOutBase::DXFlags</code> 
+       class="member">DataOutBase::DXFlags</code>
        has been removed, since it wasn't used anywhere.
        <br>
        (WB, 2005/07/14)
@@ -323,7 +323,7 @@ inconvenience this causes.
        <br>
        (Ralf B. Schulz, 2005/07/13)
        </p>
-       
+
   <li> <p>
        Improved: The <code>QProjector</code> now has
        functions <code>project_to_face</code> and <code
@@ -471,7 +471,7 @@ inconvenience this causes.
        class="member">double_contract</code> contracts two tensors of
        rank 4 and 2 into a tensor of rank 2, by contracting over two
        indices at the same time.
-       <br> 
+       <br>
        (WB, 2005/03/29)
        </p>
 
@@ -480,14 +480,14 @@ inconvenience this causes.
        class="member">TableIndicesBase::sort</code> allows to sort the indices
        in ascending order. This is useful for cases where the order of indices
        is irrelevant (for example in symmetric tables).
-       <br> 
+       <br>
        (WB, 2005/03/29)
        </p>
 
   <li> <p>
        New: There is a new class <code>SymmetricTensor</code>
        that provides storage and operations for symmetric tensors.
-       <br> 
+       <br>
        (WB, 2005/03/28)
        </p>
 
@@ -497,27 +497,27 @@ inconvenience this causes.
        easily. The additional feature is being incorporated into <code
        class="class">SmartPointer</code> constructors throughout the
        library.
-       <br> 
+       <br>
        (GK, 2005/03/16)
        </p>
 
   <li> <p>
        New: Class <code>FunctionParser</code>. Wrapper
-       class for the fparser library (see 
+       class for the fparser library (see
        <a href="http://warp.povusers.org/FunctionParser/">
        http://warp.povusers.org/FunctionParser/</a>).
-       <br> 
+       <br>
        (Luca Heltai, 2005/03/07).
        </p>
 
   <li> <p>
        Fixed: The class <code
-       class="class">MultipleParameterLoop::UserClass</code> had only 
+       class="class">MultipleParameterLoop::UserClass</code> had only
        virtual abstract functions but no virtual destructor. This caused
        warnings with some compilers, and is generally bad practice
        anyway. This is now fixed. The same holds with respect to the class
        <code>DataOutInterface</code>.
-       <br> 
+       <br>
        (WB, 2005/02/20)
        </p>
 </ol>
@@ -532,7 +532,7 @@ inconvenience this causes.
        New: The new function <code
        class="member">PetscWrappers::VectorBase::set</code> allows to set
        several vector elements at once.
-       <br> 
+       <br>
        (WB, 2005/08/10)
        </p>
 
@@ -542,7 +542,7 @@ inconvenience this causes.
        class="member">clear_rows</code> that allow to set the elements of a row
        of a matrix to zero, without having to traverse the individual
        elements.
-       <br> 
+       <br>
        (WB, 2005/08/10)
        </p>
 
@@ -562,14 +562,14 @@ inconvenience this causes.
        has the complete interface of a preconditioner
        class. Therefore, it can be used in iterative solvers and in
        multigrid smoothers.
-       <br> 
+       <br>
        (GK, 2005/05/10)
        </p>
 
   <li> <p>
        Fixed: The PETSc matrix iterators had trouble when some rows of a
        matrix were empty. This has now been mostly fixed.
-       <br> 
+       <br>
        (WB, 2005/05/02)
        </p>
 
@@ -582,7 +582,7 @@ inconvenience this causes.
        about its effectiveness. This has now been fixed: The code now properly
        initializes these elements, and makes the resulting matrix much faster
        to use.
-       <br> 
+       <br>
        (WB, 2005/04/04)
        </p>
 
@@ -590,14 +590,14 @@ inconvenience this causes.
        New: The <code>ProductSparseMatrix</code>
        implements the product of two rectangular sparse matrices with
        the same <code>value_type</code>
-       <br> 
+       <br>
        (GK, 2005/03/11)
        </p>
 
   <li> <p>
        New: The <code>PreconditionRichardson</code>
        implements a Richardson preconditioner.
-       <br> 
+       <br>
        (GK, 2005/03/10)
        </p>
 
@@ -607,7 +607,7 @@ inconvenience this causes.
        made it a little awkward to use in some places. This has now
        been fixed.
 
-       <br> 
+       <br>
        (WB, 2005/03/03)
        </p>
 
@@ -679,7 +679,7 @@ inconvenience this causes.
        sometimes declared to iterators equal if only they had the same
        triangulation, refinement level, and index. Comparing iterators
        into different containers is now completely disallowed.
-       <br> 
+       <br>
        (WB, 2005/08/08)
        </p>
 
@@ -689,7 +689,7 @@ inconvenience this causes.
        vector-valued. It then makes up names for the individual components by
        adding numbers to the name, just like the <code
        class="class">DataOut</code> class already does for a long time.
-       <br> 
+       <br>
        (WB, 2005/07/29)
        </p>
 
@@ -697,7 +697,7 @@ inconvenience this causes.
        New: The <code>DataOutStack</code> class can now also be
        used to stack two-dimensional time or parameter dependent data into a 3d
        output.
-       <br> 
+       <br>
        (WB, 2005/07/25)
        </p>
 
@@ -708,10 +708,10 @@ inconvenience this causes.
        assumption that the coarse grid space is embedded into the fine
        grid space. In particular, no interpolation points are
        required.<p>
-       
+
        <p>Using this function, constraint matrices can be computed in
        a general way.
-       <br> 
+       <br>
        (GK, 2005/07/14)
        </p>
 
@@ -778,7 +778,7 @@ inconvenience this causes.
        <br>
        (GK 2005/06/29)
        </p>
-  
+
   <li> <p>
        New: Added function <code
        class="class">FiniteElementBase::component_to_system_index</code>
@@ -814,7 +814,7 @@ inconvenience this causes.
        also for the case of non-standard oriented faces in 3d. This
        avoids several awful pieces of code including questioning
        face_orientation and using child_switch_tables.
-       <br> 
+       <br>
        (RH, 2005/06/16)
        </p>
 
@@ -825,13 +825,13 @@ inconvenience this causes.
        a <code>FE_Q</code> object. Now this function can
        also be called by the <code>FE_Q</code>
        constructor which avoids code duplication.
-       <br> 
+       <br>
        (RH, 2005/06/13)
        </p>
 
   <li> <p>
        New: The method <code>create_mass_matrix</code>
-       in class <code>MatrixCreator</code> can now handle 
+       in class <code>MatrixCreator</code> can now handle
        vector valued finite elements. A similar change was applied
        to <code>create_right_hand_side</code> and
        <code>create_boundary_right_hand_side</code>
@@ -839,7 +839,7 @@ inconvenience this causes.
        now make the <code>project</code> function work also
        for Raviart-Thomas elements and other vector valued FEs. This
        is very useful, if some initial conditions have to be specified.
-       <br> 
+       <br>
        (Oliver Kayser-Herold, 2005/06/03)
        </p>
 
@@ -850,7 +850,7 @@ inconvenience this causes.
        now shows the solution also on the deformed mesh. This
        is an option and requires the mapping to be specified as
        additional parameter to <code>build_patches</code>.
-       <br> 
+       <br>
        (Oliver Kayser-Herold, 2005/05/31)
        </p>
 
@@ -870,7 +870,7 @@ inconvenience this causes.
        Gauss quadrature points on edges and in the interior for its
        node values. The implementation is restricted to Cartesian mesh
        cells right now, but works in 2D and 3D.
-       <br> 
+       <br>
        (GK, 2005/05/30)
        </p>
 
@@ -878,14 +878,14 @@ inconvenience this causes.
        Improved: The <code>Mapping::transform_*</code>
        functions accept <code>VectorSlice</code> instead
        of <code>Vector</code>, thus allowing more flexibility.
-       <br> 
+       <br>
        (GK, 2005/05/24)
        </p>
 
   <li> <p>
        New: The <code>MatrixTools::apply_boundary_values</code>
        function now also works for PETSc sequential and parallel matrices.
-       <br> 
+       <br>
        (WB, 2005/05/05)
        </p>
 
@@ -895,7 +895,7 @@ inconvenience this causes.
        mechanism provided by the class <code
        class="class">PathSearch</code>. Furthermore, a library of input
        meshes has been started in <code>lib/meshes</code>.
-       <br> 
+       <br>
        (GK, 2005/05/03)
        </p>
 
@@ -906,7 +906,7 @@ inconvenience this causes.
        overloaded and cell data was to be output; in that case, data from the
        wrong cells was written out. This is now fixed. In contrast to this,
        nodal data was never affected.
-       <br> 
+       <br>
        (WB, 2005/04/20)
        </p>
 
@@ -930,7 +930,7 @@ inconvenience this causes.
        New: The new <code>GeometryInfo</code>::<code
        class="member">line_to_cell_vertices</code> function maps line
        vertex numbers to cell vertex numbers.
-       <br> 
+       <br>
        (RH, 2005/03/11)
        </p>
 
@@ -938,7 +938,7 @@ inconvenience this causes.
        New: The new <code>GeometryInfo</code>::<code
        class="member">face_to_cell_lines</code> function maps face
        line numbers to cell line numbers.
-       <br> 
+       <br>
        (RH, 2005/03/11)
        </p>
 
@@ -946,7 +946,7 @@ inconvenience this causes.
        New: The new <code>GeometryInfo</code>::<code
        class="member">face_to_cell_vertices</code> function maps face
        vertex numbers to cell vertex numbers.
-       <br> 
+       <br>
        (RH, 2005/03/11)
        </p>
 
@@ -955,7 +955,7 @@ inconvenience this causes.
        class="class">KellyErrorEstimator</code> class that resulted in
        assertions being thrown when run with multithreading
        enabled. This is now fixed.
-       <br> 
+       <br>
        (WB, 2005/03/10)
        </p>
 
@@ -967,7 +967,7 @@ inconvenience this causes.
        vertices. This leads to a change in the ordering of vertices in
        output files generated by <code>GridOut</code>
        for refined grids.
-       <br> 
+       <br>
        (RH, 2005/03/09)
        </p>
 
@@ -977,7 +977,7 @@ inconvenience this causes.
        that happens when one coarsens an existing triangulation. In
        that case, it would throw unjustified exceptions. This is now
        fixed.
-       <br> 
+       <br>
        (WB, 2005/03/01)
        </p>
 
@@ -986,7 +986,7 @@ inconvenience this causes.
        virtual abstract functions but no virtual destructor. This caused
        warnings with some compilers, and is generally bad practice
        anyway. This is now fixed.
-       <br> 
+       <br>
        (WB, 2005/02/22)
        </p>
 
@@ -996,15 +996,15 @@ inconvenience this causes.
        automatic computation of embedding matrices under the sole
        assumption that the coarse grid space is embedded into the fine
        grid space. In particular, no interpolation points are required.
-       <br> 
+       <br>
        (GK, 2005/02/08)
        </p>
 
   <li> <p>
        Fixed: Several wrong assertions in the Raviart-Thomas finite element
        class have been fixed, that were triggered when integrating face terms.
-       <br> 
-       (Oliver Kayser-Herold, 2005/01/24; 
+       <br>
+       (Oliver Kayser-Herold, 2005/01/24;
         WB, 2005/01/31)
        </p>
 </ol>

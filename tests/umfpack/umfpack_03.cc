@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2018 by the deal.II authors
+// Copyright (C) 2002 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -43,7 +43,7 @@
 
 template <int dim>
 void
-test(bool transpose = false)
+test(const bool transpose = false)
 {
   deallog << dim << 'd' << std::endl;
 

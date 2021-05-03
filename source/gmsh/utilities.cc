@@ -76,7 +76,7 @@ namespace Gmsh
 
     dealii::OpenCASCADE::write_IGES(boundary, iges_file_name);
 
-    ofstream geofile;
+    std::ofstream geofile;
     geofile.open(geo_file_name);
     geofile << "Merge \"" << iges_file_name << "\";" << std::endl
             << "Line Loop (2) = {1};" << std::endl

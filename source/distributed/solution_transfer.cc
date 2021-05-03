@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2019 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -39,8 +39,76 @@
 #  include <deal.II/lac/vector.h>
 
 #  include <functional>
+#  include <numeric>
+
 
 DEAL_II_NAMESPACE_OPEN
+
+
+namespace
+{
+  /**
+   * Optimized pack function for values assigned on degrees of freedom.
+   *
+   * Given that the elements of @p dof_values are stored in consecutive
+   * locations, we can just memcpy them. Since floating point values don't
+   * compress well, we also waive the compression that the default
+   * Utilities::pack() and Utilities::unpack() functions offer.
+   */
+  template <typename value_type>
+  std::vector<char>
+  pack_dof_values(std::vector<Vector<value_type>> &dof_values,
+                  const unsigned int               dofs_per_cell)
+  {
+    for (const auto &values : dof_values)
+      {
+        AssertDimension(values.size(), dofs_per_cell);
+        (void)values;
+      }
+
+    const std::size_t bytes_per_entry = sizeof(value_type) * dofs_per_cell;
+
+    std::vector<char> buffer(dof_values.size() * bytes_per_entry);
+    for (unsigned int i = 0; i < dof_values.size(); ++i)
+      std::memcpy(&buffer[i * bytes_per_entry],
+                  &dof_values[i](0),
+                  bytes_per_entry);
+
+    return buffer;
+  }
+
+
+
+  /**
+   * Optimized unpack function for values assigned on degrees of freedom.
+   */
+  template <typename value_type>
+  std::vector<Vector<value_type>>
+  unpack_dof_values(
+    const boost::iterator_range<std::vector<char>::const_iterator> &data_range,
+    const unsigned int dofs_per_cell)
+  {
+    const std::size_t  bytes_per_entry = sizeof(value_type) * dofs_per_cell;
+    const unsigned int n_elements      = data_range.size() / bytes_per_entry;
+
+    Assert((data_range.size() % bytes_per_entry == 0), ExcInternalError());
+
+    std::vector<Vector<value_type>> unpacked_data;
+    unpacked_data.reserve(n_elements);
+    for (unsigned int i = 0; i < n_elements; ++i)
+      {
+        Vector<value_type> dof_values(dofs_per_cell);
+        std::memcpy(&dof_values(0),
+                    &(*std::next(data_range.begin(), i * bytes_per_entry)),
+                    bytes_per_entry);
+        unpacked_data.emplace_back(std::move(dof_values));
+      }
+
+    return unpacked_data;
+  }
+} // namespace
+
+
 
 namespace parallel
 {
@@ -53,8 +121,9 @@ namespace parallel
       , handle(numbers::invalid_unsigned_int)
     {
       Assert(
-        (dynamic_cast<const parallel::distributed::
-                        Triangulation<dim, DoFHandlerType::space_dimension> *>(
+        (dynamic_cast<const parallel::DistributedTriangulationBase<
+           dim,
+           DoFHandlerType::space_dimension> *>(
            &dof_handler->get_triangulation()) != nullptr),
         ExcMessage(
           "parallel::distributed::SolutionTransfer requires a parallel::distributed::Triangulation object."));
@@ -68,6 +137,10 @@ namespace parallel
       prepare_for_coarsening_and_refinement(
         const std::vector<const VectorType *> &all_in)
     {
+      for (unsigned int i = 0; i < all_in.size(); ++i)
+        Assert(all_in[i]->size() == dof_handler->n_dofs(),
+               ExcDimensionMismatch(all_in[i]->size(), dof_handler->n_dofs()));
+
       input_vectors = all_in;
       register_data_attach();
     }
@@ -79,21 +152,20 @@ namespace parallel
     SolutionTransfer<dim, VectorType, DoFHandlerType>::register_data_attach()
     {
       // TODO: casting away constness is bad
-      parallel::distributed::Triangulation<dim, DoFHandlerType::space_dimension>
-        *tria = (dynamic_cast<parallel::distributed::Triangulation<
-                   dim,
-                   DoFHandlerType::space_dimension> *>(
-          const_cast<dealii::Triangulation<dim, DoFHandlerType::space_dimension>
-                       *>(&dof_handler->get_triangulation())));
+      auto *tria = (dynamic_cast<parallel::DistributedTriangulationBase<
+                      dim,
+                      DoFHandlerType::space_dimension> *>(
+        const_cast<dealii::Triangulation<dim, DoFHandlerType::space_dimension>
+                     *>(&dof_handler->get_triangulation())));
       Assert(tria != nullptr, ExcInternalError());
 
       handle = tria->register_data_attach(
-        std::bind(
-          &SolutionTransfer<dim, VectorType, DoFHandlerType>::pack_callback,
-          this,
-          std::placeholders::_1,
-          std::placeholders::_2),
-        /*returns_variable_size_data=*/DoFHandlerType::is_hp_dof_handler);
+        [this](
+          const typename Triangulation<dim, DoFHandlerType::space_dimension>::
+            cell_iterator &cell_,
+          const typename Triangulation<dim, DoFHandlerType::space_dimension>::
+            CellStatus status) { return this->pack_callback(cell_, status); },
+        /*returns_variable_size_data=*/dof_handler->has_hp_capabilities());
     }
 
 
@@ -132,26 +204,6 @@ namespace parallel
 
     template <int dim, typename VectorType, typename DoFHandlerType>
     void
-    SolutionTransfer<dim, VectorType, DoFHandlerType>::prepare_serialization(
-      const VectorType &in)
-    {
-      prepare_for_serialization(in);
-    }
-
-
-
-    template <int dim, typename VectorType, typename DoFHandlerType>
-    void
-    SolutionTransfer<dim, VectorType, DoFHandlerType>::prepare_serialization(
-      const std::vector<const VectorType *> &all_in)
-    {
-      prepare_for_serialization(all_in);
-    }
-
-
-
-    template <int dim, typename VectorType, typename DoFHandlerType>
-    void
     SolutionTransfer<dim, VectorType, DoFHandlerType>::deserialize(
       VectorType &in)
     {
@@ -182,26 +234,29 @@ namespace parallel
     {
       Assert(input_vectors.size() == all_out.size(),
              ExcDimensionMismatch(input_vectors.size(), all_out.size()));
+      for (unsigned int i = 0; i < all_out.size(); ++i)
+        Assert(all_out[i]->size() == dof_handler->n_dofs(),
+               ExcDimensionMismatch(all_out[i]->size(), dof_handler->n_dofs()));
 
       // TODO: casting away constness is bad
-      parallel::distributed::Triangulation<dim, DoFHandlerType::space_dimension>
-        *tria = (dynamic_cast<parallel::distributed::Triangulation<
-                   dim,
-                   DoFHandlerType::space_dimension> *>(
-          const_cast<dealii::Triangulation<dim, DoFHandlerType::space_dimension>
-                       *>(&dof_handler->get_triangulation())));
+      auto *tria = (dynamic_cast<parallel::DistributedTriangulationBase<
+                      dim,
+                      DoFHandlerType::space_dimension> *>(
+        const_cast<dealii::Triangulation<dim, DoFHandlerType::space_dimension>
+                     *>(&dof_handler->get_triangulation())));
       Assert(tria != nullptr, ExcInternalError());
 
       tria->notify_ready_to_unpack(
         handle,
-        std::bind(
-          &SolutionTransfer<dim, VectorType, DoFHandlerType>::unpack_callback,
-          this,
-          std::placeholders::_1,
-          std::placeholders::_2,
-          std::placeholders::_3,
-          std::ref(all_out)));
-
+        [this, &all_out](
+          const typename Triangulation<dim, DoFHandlerType::space_dimension>::
+            cell_iterator &cell_,
+          const typename Triangulation<dim, DoFHandlerType::space_dimension>::
+            CellStatus status,
+          const boost::iterator_range<std::vector<char>::const_iterator>
+            &data_range) {
+          this->unpack_callback(cell_, status, data_range, all_out);
+        });
 
       for (typename std::vector<VectorType *>::iterator it = all_out.begin();
            it != all_out.end();
@@ -236,12 +291,12 @@ namespace parallel
       typename DoFHandlerType::cell_iterator cell(*cell_, dof_handler);
 
       // create buffer for each individual object
-      std::vector<::dealii::Vector<typename VectorType::value_type>> dofvalues(
+      std::vector<::dealii::Vector<typename VectorType::value_type>> dof_values(
         input_vectors.size());
 
-      if (DoFHandlerType::is_hp_dof_handler)
+      unsigned int fe_index = 0;
+      if (dof_handler->has_hp_capabilities())
         {
-          unsigned int fe_index = numbers::invalid_unsigned_int;
           switch (status)
             {
               case parallel::distributed::Triangulation<
@@ -259,27 +314,20 @@ namespace parallel
                 dim,
                 DoFHandlerType::space_dimension>::CELL_COARSEN:
                 {
-                  // In case of coarsening, we need to find a suitable fe index
-                  // for the parent cell. We choose the 'least dominating fe'
+                  // In case of coarsening, we need to find a suitable FE index
+                  // for the parent cell. We choose the 'least dominant fe'
                   // on all children from the associated FECollection.
-                  std::set<unsigned int> fe_indices_children;
-                  for (unsigned int child_index = 0;
-                       child_index < GeometryInfo<dim>::max_children_per_cell;
-                       ++child_index)
-                    fe_indices_children.insert(
-                      cell->child(child_index)->future_fe_index());
+#  ifdef DEBUG
+                  for (const auto &child : cell->child_iterators())
+                    Assert(child->is_active() && child->coarsen_flag_set(),
+                           typename dealii::Triangulation<
+                             dim>::ExcInconsistentCoarseningFlags());
+#  endif
 
-                  fe_index = dof_handler->get_fe_collection()
-                               .find_dominating_fe_extended(fe_indices_children,
-                                                            /*codim=*/0);
-
-                  Assert(
-                    fe_index != numbers::invalid_unsigned_int,
-                    ExcMessage(
-                      "No FiniteElement has been found in your FECollection "
-                      "that dominates all children of a cell you are trying "
-                      "to coarsen!"));
-
+                  fe_index = dealii::internal::hp::DoFHandlerImplementation::
+                    dominated_future_fe_on_children<
+                      dim,
+                      DoFHandlerType::space_dimension>(cell);
                   break;
                 }
 
@@ -287,38 +335,24 @@ namespace parallel
                 Assert(false, ExcInternalError());
                 break;
             }
-
-          const unsigned int dofs_per_cell =
-            dof_handler->get_fe(fe_index).dofs_per_cell;
-
-          auto it_input  = input_vectors.cbegin();
-          auto it_output = dofvalues.begin();
-          for (; it_input != input_vectors.cend(); ++it_input, ++it_output)
-            {
-              it_output->reinit(dofs_per_cell);
-              cell->get_interpolated_dof_values(*(*it_input),
-                                                *it_output,
-                                                fe_index);
-            }
         }
-      else
+
+      const unsigned int dofs_per_cell =
+        dof_handler->get_fe(fe_index).n_dofs_per_cell();
+
+      if (dofs_per_cell == 0)
+        return std::vector<char>(); // nothing to do for FE_Nothing
+
+      auto it_input  = input_vectors.cbegin();
+      auto it_output = dof_values.begin();
+      for (; it_input != input_vectors.cend(); ++it_input, ++it_output)
         {
-          auto it_input  = input_vectors.cbegin();
-          auto it_output = dofvalues.begin();
-          for (; it_input != input_vectors.cend(); ++it_input, ++it_output)
-            {
-              it_output->reinit(cell->get_fe().dofs_per_cell);
-              cell->get_interpolated_dof_values(*(*it_input), *it_output);
-            }
+          it_output->reinit(dofs_per_cell);
+          cell->get_interpolated_dof_values(*(*it_input), *it_output, fe_index);
         }
 
-      // We choose to compress the packed data depending on the registered
-      // dofhandler object. In case of hp, we write in the variable size buffer
-      // and thus allow compression. In the other case, we use the fixed size
-      // buffer and require consistent data sizes on each cell, so we leave it
-      // uncompressed.
-      return Utilities::pack(
-        dofvalues, /*allow_compression=*/DoFHandlerType::is_hp_dof_handler);
+      return pack_dof_values<typename VectorType::value_type>(dof_values,
+                                                              dofs_per_cell);
     }
 
 
@@ -337,20 +371,9 @@ namespace parallel
     {
       typename DoFHandlerType::cell_iterator cell(*cell_, dof_handler);
 
-      const std::vector<::dealii::Vector<typename VectorType::value_type>>
-        dofvalues = Utilities::unpack<
-          std::vector<::dealii::Vector<typename VectorType::value_type>>>(
-          data_range.begin(),
-          data_range.end(),
-          /*allow_compression=*/DoFHandlerType::is_hp_dof_handler);
-
-      // check if sizes match
-      Assert(dofvalues.size() == all_out.size(), ExcInternalError());
-
-      if (DoFHandlerType::is_hp_dof_handler)
+      unsigned int fe_index = 0;
+      if (dof_handler->has_hp_capabilities())
         {
-          unsigned int fe_index = numbers::invalid_unsigned_int;
-
           switch (status)
             {
               case parallel::distributed::Triangulation<
@@ -369,13 +392,13 @@ namespace parallel
                 DoFHandlerType::space_dimension>::CELL_REFINE:
                 {
                   // After refinement, this particular cell is no longer active,
-                  // and its children have inherited its fe index. However, to
-                  // unpack the data on the old cell, we need to recover its fe
+                  // and its children have inherited its FE index. However, to
+                  // unpack the data on the old cell, we need to recover its FE
                   // index from one of the children. Just to be sure, we also
-                  // check if all children have the same fe index.
+                  // check if all children have the same FE index.
                   fe_index = cell->child(0)->active_fe_index();
                   for (unsigned int child_index = 1;
-                       child_index < GeometryInfo<dim>::max_children_per_cell;
+                       child_index < cell->n_children();
                        ++child_index)
                     Assert(cell->child(child_index)->active_fe_index() ==
                              fe_index,
@@ -387,49 +410,41 @@ namespace parallel
                 Assert(false, ExcInternalError());
                 break;
             }
-
-          // check if we have enough dofs provided by the FE object
-          // to interpolate the transferred data correctly
-          for (auto it_dofvalues = dofvalues.begin();
-               it_dofvalues != dofvalues.end();
-               ++it_dofvalues)
-            Assert(
-              dof_handler->get_fe(fe_index).dofs_per_cell ==
-                it_dofvalues->size(),
-              ExcMessage(
-                "The transferred data was packed with a different number of dofs than the"
-                "currently registered FE object assigned to the DoFHandler has."));
-
-          // distribute data for each registered vector on mesh
-          auto it_input  = dofvalues.cbegin();
-          auto it_output = all_out.begin();
-          for (; it_input != dofvalues.cend(); ++it_input, ++it_output)
-            cell->set_dof_values_by_interpolation(*it_input,
-                                                  *(*it_output),
-                                                  fe_index);
         }
-      else
-        {
-          // check if we have enough dofs provided by the FE object
-          // to interpolate the transferred data correctly
-          for (auto it_dofvalues = dofvalues.begin();
-               it_dofvalues != dofvalues.end();
-               ++it_dofvalues)
-            Assert(
-              cell->get_fe().dofs_per_cell == it_dofvalues->size(),
-              ExcMessage(
-                "The transferred data was packed with a different number of dofs than the"
-                "currently registered FE object assigned to the DoFHandler has."));
 
-          // distribute data for each registered vector on mesh
-          auto it_input  = dofvalues.cbegin();
-          auto it_output = all_out.begin();
-          for (; it_input != dofvalues.cend(); ++it_input, ++it_output)
-            cell->set_dof_values_by_interpolation(*it_input, *(*it_output));
-        }
+      const unsigned int dofs_per_cell =
+        dof_handler->get_fe(fe_index).n_dofs_per_cell();
+
+      if (dofs_per_cell == 0)
+        return; // nothing to do for FE_Nothing
+
+      const std::vector<::dealii::Vector<typename VectorType::value_type>>
+        dof_values =
+          unpack_dof_values<typename VectorType::value_type>(data_range,
+                                                             dofs_per_cell);
+
+      // check if sizes match
+      Assert(dof_values.size() == all_out.size(), ExcInternalError());
+
+      // check if we have enough dofs provided by the FE object
+      // to interpolate the transferred data correctly
+      for (auto it_dof_values = dof_values.begin();
+           it_dof_values != dof_values.end();
+           ++it_dof_values)
+        Assert(
+          dofs_per_cell == it_dof_values->size(),
+          ExcMessage(
+            "The transferred data was packed with a different number of dofs than the "
+            "currently registered FE object assigned to the DoFHandler has."));
+
+      // distribute data for each registered vector on mesh
+      auto it_input  = dof_values.cbegin();
+      auto it_output = all_out.begin();
+      for (; it_input != dof_values.cend(); ++it_input, ++it_output)
+        cell->set_dof_values_by_interpolation(*it_input,
+                                              *(*it_output),
+                                              fe_index);
     }
-
-
   } // namespace distributed
 } // namespace parallel
 

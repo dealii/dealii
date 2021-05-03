@@ -173,7 +173,7 @@ to set up the parameters and run the simulation.
 First we create a HDF5 file where we store the parameters and the results of
 the simulation.
 
-Each of the simulations (displacement and calibration) is stored in a separate HDF5 group: 
+Each of the simulations (displacement and calibration) is stored in a separate HDF5 group:
 @code{.py}
 import numpy as np
 import h5py
@@ -197,15 +197,15 @@ for group in [displacement, calibration]:
     group.attrs['dimension_x'] = 2e-5
     # The waveguide width is equal to dimension_y
     group.attrs['dimension_y'] = 2e-8
-    
+
     # Position of the probe that we use to measure the flux
     group.attrs['probe_pos_x']   = 8e-6
     group.attrs['probe_pos_y']   = 0
     group.attrs['probe_width_y'] = 2e-08
-    
+
     # Number of points in the probe
     group.attrs['nb_probe_points'] = 5
-    
+
     # Global refinement
     group.attrs['grid_level'] = 1
 
@@ -220,7 +220,7 @@ for group in [displacement, calibration]:
     if group == displacement:
         group.attrs['material_b_rho'] = 2000
     else:
-        group.attrs['material_b_rho'] = 3200   
+        group.attrs['material_b_rho'] = 3200
     group.attrs['lambda'] = (group.attrs['youngs_modulus'] * group.attrs['poissons_ratio'] /
                            ((1 + group.attrs['poissons_ratio']) *
                            (1 - 2 * group.attrs['poissons_ratio'])))
@@ -256,6 +256,6 @@ for group in [displacement, calibration]:
     else:
         group.attrs['simulation_name'] = 'phononic_cavity_calibration'
     group.attrs['save_vtu_files'] = False
-    
+
 h5_file.close()
 @endcode

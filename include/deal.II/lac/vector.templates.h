@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2019 by the deal.II authors
+// Copyright (C) 1999 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,6 +16,8 @@
 #ifndef dealii_vector_templates_h
 #define dealii_vector_templates_h
 
+
+#include <deal.II/base/config.h>
 
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/template_constraints.h>
@@ -734,27 +736,6 @@ Vector<Number>::equ(const Number a, const Vector<Number2> &u)
 
 
 template <typename Number>
-void
-Vector<Number>::ratio(const Vector<Number> &a, const Vector<Number> &b)
-{
-  Assert(size() != 0, ExcEmptyObject());
-  Assert(a.size() == b.size(), ExcDimensionMismatch(a.size(), b.size()));
-
-  // no need to reinit with zeros, since
-  // we overwrite them anyway
-  reinit(a.size(), true);
-
-  internal::VectorOperations::Vectorization_ratio<Number> vector_ratio(
-    values.begin(), a.begin(), b.begin());
-  internal::VectorOperations::parallel_for(vector_ratio,
-                                           0,
-                                           size(),
-                                           thread_loop_partitioner);
-}
-
-
-
-template <typename Number>
 Vector<Number> &
 Vector<Number>::operator=(const BlockVector<Number> &v)
 {
@@ -846,19 +827,6 @@ Vector<Number>::operator==(const Vector<Number2> &v) const
 
 template <typename Number>
 void
-Vector<Number>::print(const char *format) const
-{
-  Assert(size() != 0, ExcEmptyObject());
-
-  for (size_type j = 0; j < size(); ++j)
-    internal::VectorOperations::print(values[j], format);
-  std::printf("\n");
-}
-
-
-
-template <typename Number>
-void
 Vector<Number>::print(std::ostream &     out,
                       const unsigned int precision,
                       const bool         scientific,
@@ -894,42 +862,21 @@ Vector<Number>::print(std::ostream &     out,
 
 template <typename Number>
 void
-Vector<Number>::print(LogStream &        out,
-                      const unsigned int width,
-                      const bool         across) const
-{
-  Assert(size() != 0, ExcEmptyObject());
-
-  if (across)
-    for (size_type i = 0; i < size(); ++i)
-      out << std::setw(width) << values[i] << ' ';
-  else
-    for (size_type i = 0; i < size(); ++i)
-      out << values[i] << std::endl;
-  out << std::endl;
-}
-
-
-template <typename Number>
-void
 Vector<Number>::block_write(std::ostream &out) const
 {
   AssertThrow(out, ExcIO());
 
   // other version of the following
   //  out << size() << std::endl << '[';
-  // reason: operator<< seems to use
-  // some resources that lead to
-  // problems in a multithreaded
-  // environment
-  const size_type sz = size();
-  char            buf[16];
 
-#ifdef DEAL_II_WITH_64BIT_INDICES
+  // reason: operator<< seems to use some resources that lead to problems in a
+  // multithreaded environment. We convert the size index to
+  // unsigned long long int that is at least 64 bits to be able to output it on
+  // all platforms, since std::uint64_t is not in C.
+  const unsigned long long int sz = size();
+  char                         buf[16];
+
   std::sprintf(buf, "%llu", sz);
-#else
-  std::sprintf(buf, "%u", sz);
-#endif
   std::strcat(buf, "\n[");
 
   out.write(buf, std::strlen(buf));

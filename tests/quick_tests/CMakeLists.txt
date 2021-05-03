@@ -92,9 +92,7 @@ FOREACH(_build ${DEAL_II_BUILD_TYPES})
 ENDFOREACH()
 
 # Test whether thread affinity is well behaved
-IF (DEAL_II_WITH_THREADS)
 make_quicktest("affinity" ${_mybuild} "")
-ENDIF()
 
 # Test if MPI is configured correctly
 IF (DEAL_II_WITH_MPI)
@@ -102,8 +100,13 @@ IF (DEAL_II_WITH_MPI)
 ENDIF()
 
 # Test if TBB works correctly
-IF (DEAL_II_WITH_THREADS)
+IF (DEAL_II_WITH_TBB)
   make_quicktest("tbb" ${_mybuild} "")
+ENDIF()
+
+# test taskflow
+IF (DEAL_II_WITH_TASKFLOW)
+  make_quicktest("taskflow" ${_mybuild} "")
 ENDIF()
 
 # Test p4est. This test exposes a bug in OpenMPI 1.3 and 1.4
@@ -150,11 +153,6 @@ ENDIF()
 # Test HDF5
 IF (DEAL_II_WITH_HDF5)
   make_quicktest("hdf5" ${_mybuild} "")
-ENDIF()
-
-# Test Nanoflann
-IF (DEAL_II_WITH_NANOFLANN)
-  make_quicktest("nanoflann" ${_mybuild} "")
 ENDIF()
 
 # Test Arpack

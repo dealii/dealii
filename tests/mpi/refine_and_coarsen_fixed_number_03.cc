@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -66,7 +66,7 @@ test()
   }
 
 
-  parallel::distributed::GridRefinement ::refine_and_coarsen_fixed_number(
+  parallel::distributed::GridRefinement::refine_and_coarsen_fixed_number(
     tr, indicators, 0.2, 0);
 
   // now count number of cells

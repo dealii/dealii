@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2013 - 2019 by the deal.II authors
+ * Copyright (C) 2013 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -35,10 +35,7 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_refinement.h>
 #include <deal.II/grid/grid_out.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
@@ -205,9 +202,7 @@ namespace Step26
   HeatEquation<dim>::HeatEquation()
     : fe(1)
     , dof_handler(triangulation)
-    , time(0.0)
     , time_step(1. / 500)
-    , timestep_number(0)
     , theta(0.5)
   {}
 
@@ -273,10 +268,10 @@ namespace Step26
   template <int dim>
   void HeatEquation<dim>::solve_time_step()
   {
-    SolverControl solver_control(1000, 1e-8 * system_rhs.l2_norm());
-    SolverCG<>    cg(solver_control);
+    SolverControl            solver_control(1000, 1e-8 * system_rhs.l2_norm());
+    SolverCG<Vector<double>> cg(solver_control);
 
-    PreconditionSSOR<> preconditioner;
+    PreconditionSSOR<SparseMatrix<double>> preconditioner;
     preconditioner.initialize(system_matrix, 1.0);
 
     cg.solve(system_matrix, solution, system_rhs, preconditioner);
@@ -291,7 +286,9 @@ namespace Step26
 
   // @sect4{<code>HeatEquation::output_results</code>}
   //
-  // Neither is there anything new in generating graphical output:
+  // Neither is there anything new in generating graphical output other than the
+  // fact that we tell the DataOut object what the current time and time step
+  // number is, so that this can be written into the output file:
   template <int dim>
   void HeatEquation<dim>::output_results() const
   {
@@ -301,6 +298,8 @@ namespace Step26
     data_out.add_data_vector(solution, "U");
 
     data_out.build_patches();
+
+    data_out.set_flags(DataOutBase::VtkFlags(time, timestep_number));
 
     const std::string filename =
       "solution-" + Utilities::int_to_string(timestep_number, 3) + ".vtk";
@@ -430,11 +429,11 @@ namespace Step26
   // <code>goto</code> is hard to understand. In fact, deal.II contains
   // virtually no occurrences: excluding code that was essentially
   // transcribed from books and not counting duplicated code pieces,
-  // there are 3 locations in about 600,000 lines of code; we also
-  // use it in 4 tutorial programs, in exactly the same context
-  // as here. Instead of trying to justify the occurrence here,
-  // let's first look at the code and we'll come back to the issue
-  // at the end of function.
+  // there are 3 locations in about 600,000 lines of code at the time
+  // this note is written; we also use it in 4 tutorial programs, in
+  // exactly the same context as here. Instead of trying to justify
+  // the occurrence here, let's first look at the code and we'll come
+  // back to the issue at the end of function.
   template <int dim>
   void HeatEquation<dim>::run()
   {
@@ -452,6 +451,9 @@ namespace Step26
     Vector<double> forcing_terms;
 
   start_time_iteration:
+
+    time            = 0.0;
+    timestep_number = 0;
 
     tmp.reinit(solution.size());
     forcing_terms.reinit(solution.size());
@@ -640,10 +642,14 @@ namespace Step26
 // to read or understand than a <code>goto</code>.
 //
 // In the end, one might simply agree that <i>in general</i>
-// <code>goto</code> statements are a bad idea but be pragmatic
-// and state that there may be occasions where they can help avoid
-// code duplication and awkward control flow. This may be one of these
-// places.
+// <code>goto</code> statements are a bad idea but be pragmatic and
+// state that there may be occasions where they can help avoid code
+// duplication and awkward control flow. This may be one of these
+// places, and it matches the position Steve McConnell takes in his
+// excellent book "Code Complete" @cite CodeComplete about good
+// programming practices (see the mention of this book in the
+// introduction of step-1) that spends a surprising ten pages on the
+// question of <code>goto</code> in general.
 
 
 // @sect3{The <code>main</code> function}
@@ -655,7 +661,6 @@ int main()
 {
   try
     {
-      using namespace dealii;
       using namespace Step26;
 
       HeatEquation<2> heat_equation_solver;

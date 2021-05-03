@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -79,7 +79,7 @@ void evaluate_normal(DoFHandler<2> &dof_handler, Vector<double> &solution)
 
   for (; cell != endc; ++cell)
     {
-      for (unsigned int f = 0; f < GeometryInfo<2>::faces_per_cell; ++f)
+      for (const unsigned int f : GeometryInfo<2>::face_indices())
         {
           if (!cell->face(f)->at_boundary())
             {

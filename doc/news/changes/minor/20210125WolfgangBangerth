@@ -1,0 +1,4 @@
+Improved: Exception texts are now formatted and broken to fixed-length
+lines, rather than flowing to arbitrary lengths.
+<br>
+(Wolfgang Bangerth, 2021/01/25)

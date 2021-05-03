@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -24,9 +24,8 @@
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(3);
-  deallog.attach(logfile);
 
   double a[3][3] = {{1, 2, 3}, {3, 4, 5}, {6, 7, 8}};
   double b[3][3] = {{25, 31, 37}, {45, 57, 69}, {75, 96, 117}};

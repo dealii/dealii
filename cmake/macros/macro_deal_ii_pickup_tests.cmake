@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2013 - 2018 by the deal.II authors
+## Copyright (C) 2013 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -20,7 +20,7 @@
 # If TEST_PICKUP_REGEX is set, only tests matching the regex will be
 # processed.
 #
-# Furthermore, the macro sets up (if necessary) deal.II, perl, a diff tool
+# Furthermore, the macro sets up (if necessary) deal.II, perl, numdiff,
 # and the following variables, that can be overwritten by environment or
 # command line:
 #
@@ -40,9 +40,8 @@
 #       - A regular expression to select only a subset of tests during setup.
 #         An empty string is interpreted as a catchall (this is the default).
 #
-# Either numdiff (if available), or diff are used for the comparison of
-# test results. Their location can be specified with NUMDIFF_DIR and
-# DIFF_DIR.
+# numdiff is used for the comparison of test results. Its location can be
+# specified with NUMDIFF_DIR.
 #
 # Usage:
 #     DEAL_II_PICKUP_TESTS()
@@ -83,19 +82,21 @@ MACRO(DEAL_II_PICKUP_TESTS)
   #
   # Necessary external interpreters and programs:
   #
+  IF(${DEAL_II_WITH_MPI})
+    IF("${DEAL_II_MPIEXEC}" STREQUAL "" OR
+       "${DEAL_II_MPIEXEC}" STREQUAL "MPIEXEC_EXECUTABLE-NOTFOUND")
+      MESSAGE(FATAL_ERROR "Could not find an MPI launcher program, which is required "
+"for running the testsuite. Please explicitly specify MPIEXEC_EXECUTABLE to CMake "
+"as a full path to the MPI launcher program.")
+    ENDIF()
+  ENDIF()
 
   IF(DEAL_II_WITH_CUDA)
     FIND_PACKAGE(CUDA)
-    SET(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} -std=c++11 -arch=sm_35 -Xcompiler ${OpenMP_CXX_FLAGS})
+    SET(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} -std=c++14 -arch=sm_35 -Xcompiler ${OpenMP_CXX_FLAGS})
   ENDIF()
 
   FIND_PACKAGE(Perl REQUIRED)
-
-  FIND_PROGRAM(DIFF_EXECUTABLE
-    NAMES diff
-    HINTS ${DIFF_DIR}
-    PATH_SUFFIXES bin
-    )
 
   FIND_PROGRAM(NUMDIFF_EXECUTABLE
     NAMES numdiff
@@ -103,49 +104,36 @@ MACRO(DEAL_II_PICKUP_TESTS)
     PATH_SUFFIXES bin
     )
 
-  MARK_AS_ADVANCED(DIFF_EXECUTABLE NUMDIFF_EXECUTABLE)
+  MARK_AS_ADVANCED(NUMDIFF_EXECUTABLE)
 
-  IF( NUMDIFF_EXECUTABLE MATCHES "-NOTFOUND" AND
-      DIFF_EXECUTABLE MATCHES "-NOTFOUND" )
+  IF( "${NUMDIFF_EXECUTABLE}" MATCHES "NUMDIFF_EXECUTABLE-NOTFOUND")
     MESSAGE(FATAL_ERROR
-      "Could not find diff or numdiff. One of those are required for running the testsuite.\n"
-      "Please specify DIFF_DIR or NUMDIFF_DIR to a location containing the binaries."
+      "Could not find numdiff, which is required for running the testsuite.\n"
+      "Please specify NUMDIFF_DIR to a location containing the binary."
       )
   ENDIF()
 
-  IF(DIFF_EXECUTABLE MATCHES "-NOTFOUND")
-    SET(DIFF_EXECUTABLE ${NUMDIFF_EXECUTABLE})
-  ENDIF()
-
-  IF(NUMDIFF_EXECUTABLE MATCHES "-NOTFOUND")
-    SET(NUMDIFF_EXECUTABLE ${DIFF_EXECUTABLE})
-  ENDIF()
-
   #
-  # Check that the diff programs can run and terminate successfully:
+  # Check that numdiff can run and terminate successfully:
   #
-  FOREACH(_diff_program ${NUMDIFF_EXECUTABLE} ${DIFF_EXECUTABLE})
-    EXECUTE_PROCESS(COMMAND ${_diff_program} "-v"
-      TIMEOUT 4 # seconds
-      OUTPUT_QUIET
-      ERROR_QUIET
-      RESULT_VARIABLE _diff_program_status
-      )
+  EXECUTE_PROCESS(COMMAND ${NUMDIFF_EXECUTABLE} "-v"
+    TIMEOUT 4 # seconds
+    OUTPUT_QUIET
+    ERROR_QUIET
+    RESULT_VARIABLE _diff_program_status
+    )
 
-    IF(NOT "${_diff_program_status}" STREQUAL "0")
-      MESSAGE(FATAL_ERROR
-        "\nThe command \"${_diff_program} -v\" did not run correctly: it either "
-        "failed to exit after a few seconds or returned a nonzero exit code. "
-        "The test suite cannot be set up without this program, so please "
-        "reinstall it and then run the test suite setup command again.\n")
-    ENDIF()
-  ENDFOREACH()
+  IF(NOT "${_diff_program_status}" STREQUAL "0")
+    MESSAGE(FATAL_ERROR
+      "\nThe command \"${NUMDIFF_EXECUTABLE} -v\" did not run correctly: it "
+      "either failed to exit after a few seconds or returned a nonzero exit "
+      "code. The test suite cannot be set up without this program, so please "
+      "reinstall it and then run the test suite setup command again.\n")
+  ENDIF()
 
   #
   # Also check that numdiff is not a symlink to diff by running a relative
-  # tolerance test. Note that we set NUMDIFF_EXECUTABLE to diff in case we were
-  # not able to find it above, but here we check that the executable is really
-  # named 'numdiff'.
+  # tolerance test.
   #
   STRING(FIND "${NUMDIFF_EXECUTABLE}" "numdiff" _found_numdiff_binary)
   IF(NOT "${_found_numdiff_binary}" STREQUAL "-1")
@@ -195,7 +183,12 @@ MACRO(DEAL_II_PICKUP_TESTS)
   ENABLE_TESTING()
 
   SET_IF_EMPTY(TEST_PICKUP_REGEX "$ENV{TEST_PICKUP_REGEX}")
-  GET_FILENAME_COMPONENT(_category ${CMAKE_CURRENT_SOURCE_DIR} NAME)
+
+  IF("${ARGN}" STREQUAL "")
+    GET_FILENAME_COMPONENT(_category ${CMAKE_CURRENT_SOURCE_DIR} NAME)
+  ELSE()
+    SET(_category "${ARGN}")
+  ENDIF()
 
   SET(DEAL_II_SOURCE_DIR) # avoid a bogus warning
 
@@ -208,8 +201,13 @@ MACRO(DEAL_II_PICKUP_TESTS)
     # Respect TEST_PICKUP_REGEX:
     #
 
+    #
+    # Only retain the base name of the test, i.e., remove everything after
+    # (and including) the first period ("."):
+    #
+    STRING(REGEX REPLACE "\\..*$" "" _regex_name "${_category}/${_test}")
     IF( "${TEST_PICKUP_REGEX}" STREQUAL "" OR
-        "${_category}/${_test}" MATCHES "${TEST_PICKUP_REGEX}" )
+        "${_regex_name}" MATCHES "${TEST_PICKUP_REGEX}" )
       SET(_define_test TRUE)
     ELSE()
       SET(_define_test FALSE)

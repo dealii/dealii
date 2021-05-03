@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2019 by the deal.II authors
+## Copyright (C) 2012 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -65,7 +65,7 @@ IF(DEAL_II_DOXYGEN_USE_MATHJAX)
       "/usr/share/yelp/mathjax"
       DOC "Root path of MathJax.js"
       )
-    IF(MATHJAX MATCHES "-NOTFOUND")
+    IF(MATHJAX_PATH MATCHES "MATHJAX_PATH-NOTFOUND")
       MESSAGE(FATAL_ERROR "MathJax was not found.")
     ENDIF()
   ENDIF()
@@ -88,6 +88,8 @@ ENDIF()
 # To get at this, find all of the .inst.in files, strip all but the
 # directory name under $CMAKE_SOURCE_DIR/source, and then prepend
 # the build directory to it
+#
+# See options.dox.in where ${_inst_in_dirs} is later added to INCLUDE_PATH.
 FILE(GLOB _inst_in_files
      "${CMAKE_SOURCE_DIR}/source/*/*.inst.in")
 STRING(REPLACE "${CMAKE_SOURCE_DIR}/source/" "" _inst_in_dirs_x "${_inst_in_files}")
@@ -98,8 +100,7 @@ FOREACH (_dir ${_inst_in_dirs_y})
   SET(_inst_in_dirs "${_inst_in_dirs} ${CMAKE_BINARY_DIR}/source/${_dir}")
 ENDFOREACH()
 
-MESSAGE(STATUS "translated this into")
-MESSAGE(STATUS "found ${_inst_in_dirs}")
+MESSAGE(STATUS "Additional doxygen include paths: ${_inst_in_dirs}")
 
 # make sure doxygen sees the extra.sty stylefile:
 SET(_extra_packages "${CMAKE_CURRENT_SOURCE_DIR}/extra")
@@ -116,8 +117,8 @@ CONFIGURE_FILE(
 # doxygen-generated HTML files.
 SET(_last_year "1997")
 FILE(GLOB _source_files
-     "${CMAKE_SOURCE_DIR}/source/*/*.cc" 
-     "${CMAKE_SOURCE_DIR}/include/deal.II/*/*.h" 
+     "${CMAKE_SOURCE_DIR}/source/*/*.cc"
+     "${CMAKE_SOURCE_DIR}/include/deal.II/*/*.h"
      "${CMAKE_SOURCE_DIR}/examples/*/*.cc")
 FOREACH (_source ${_source_files})
   FILE(READ "${_source}" contents)
@@ -284,8 +285,10 @@ ADD_CUSTOM_COMMAND(
     ${CMAKE_CURRENT_BINARY_DIR}/options.dox
     > ${CMAKE_BINARY_DIR}/doxygen.log 2>&1 # *pssst*
     || ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/doxygen.log ${CMAKE_BINARY_DIR}/doxygen.err
-  COMMAND
-    ${CMAKE_CURRENT_SOURCE_DIR}/scripts/set_canonical_doxygen.py
+  COMMAND ${PERL_EXECUTABLE}
+  ARGS
+    ${CMAKE_CURRENT_SOURCE_DIR}/scripts/set_canonical_doxygen.pl
+  COMMAND ${CMAKE_COMMAND} -E echo "-- Documentation is available at ${CMAKE_CURRENT_BINARY_DIR}/deal.II/index.html"
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
   DEPENDS
     tutorial

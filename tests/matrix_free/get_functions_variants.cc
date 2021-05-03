@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -42,14 +42,13 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
 
 
 template <int dim, int fe_degree, typename Number>
 class MatrixFreeTest
 {
 public:
-  typedef Vector<Number> VectorType;
+  using VectorType = Vector<Number>;
 
   MatrixFreeTest(const MatrixFree<dim, Number> &data_in)
     : data(data_in){};
@@ -105,27 +104,28 @@ operator()(const MatrixFree<dim, Number> &data,
     {
       fe_eval.reinit(cell);
       fe_eval.read_dof_values(src);
-      fe_eval.evaluate(true, true, true);
+      fe_eval.evaluate(EvaluationFlags::values | EvaluationFlags::gradients |
+                       EvaluationFlags::hessians);
 
       // only for values (additional test)
       fe_eval2.reinit(cell);
       fe_eval2.read_dof_values(src);
-      fe_eval2.evaluate(true, false, false);
+      fe_eval2.evaluate(EvaluationFlags::values);
 
       // only gradients
       fe_eval3.reinit(cell);
       fe_eval3.read_dof_values(src);
-      fe_eval3.evaluate(false, true, false);
+      fe_eval3.evaluate(EvaluationFlags::gradients);
 
       // only values and gradients
       fe_eval4.reinit(cell);
       fe_eval4.read_dof_values(src);
-      fe_eval4.evaluate(true, true, false);
+      fe_eval4.evaluate(EvaluationFlags::values | EvaluationFlags::gradients);
 
       // only laplacians
       fe_eval5.reinit(cell);
       fe_eval5.read_dof_values(src);
-      fe_eval5.evaluate(false, false, true);
+      fe_eval5.evaluate(EvaluationFlags::hessians);
 
 
       // compare values with the values that we get
@@ -133,8 +133,7 @@ operator()(const MatrixFree<dim, Number> &data,
       // FEEvaluations. Those are tested in other
       // functions and seen as reference here
       for (unsigned int q = 0; q < fe_eval.n_q_points; ++q)
-        for (unsigned int j = 0; j < VectorizedArray<Number>::n_array_elements;
-             ++j)
+        for (unsigned int j = 0; j < VectorizedArray<Number>::size(); ++j)
           {
             errors[0] +=
               std::fabs(fe_eval.get_value(q)[j] - fe_eval2.get_value(q)[j]);
@@ -197,7 +196,7 @@ test()
 int
 main()
 {
-  deallog.attach(logfile);
+  initlog();
 
   deallog << std::setprecision(3);
 

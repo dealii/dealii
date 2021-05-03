@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2013 - 2018 by the deal.II authors
+## Copyright (C) 2013 - 2019 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -65,9 +65,8 @@
 #
 # The following variables must be set:
 #
-#   NUMDIFF_EXECUTABLE, DIFF_EXECUTABLE
-#     - pointing to valid diff executables. If NUMDIFF_EXECUTABLE is not
-#       "numdiff" it will be ignored and DIFF_EXECUTABLE is used instead.
+#   NUMDIFF_EXECUTABLE
+#     - Complete path to the numdiff binary.
 #
 #   TEST_TIME_LIMIT
 #     - specifying the maximal wall clock time in seconds a test is allowed
@@ -97,17 +96,6 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
     SET(_configuration DEBUG)
   ELSEIF(_file MATCHES "\\.release\\.")
     SET(_configuration RELEASE)
-  ENDIF()
-
-  #
-  # A "binary" in the output file indicates binary output. In this case we
-  # have to switch to plain diff instead of (possibly) numdiff, which can
-  # only work on plain text files.
-  #
-  IF(_file MATCHES "\\.binary\\.")
-    SET(_test_diff ${DIFF_EXECUTABLE})
-  ELSE()
-    SET(_test_diff ${NUMDIFF_EXECUTABLE})
   ENDIF()
 
   #
@@ -178,14 +166,16 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
 
         SET(_source_file "${_test_name}.cc")
 
-        SET(_target ${_test_name}.${_build_lowercase}) # target name
+        SET(_target_short ${_test_name}.${_build_lowercase}) # target name
+        SET(_target ${_category}.${_test_name}.${_build_lowercase}) # target name
         SET(_run_args "$<TARGET_FILE:${_target}>") # the command to issue
 
       ELSEIF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.cu")
 
         SET(_source_file "${_test_name}.cu")
 
-        SET(_target ${_test_name}.${_build_lowercase}) # target name
+        SET(_target_short ${_test_name}.${_build_lowercase}) # target name
+        SET(_target ${_category}.${_test_name}.${_build_lowercase}) # target name
         SET(_run_args "$<TARGET_FILE:${_target}>") # the command to issue
 
       ELSEIF( EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.prm" OR
@@ -214,11 +204,31 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
             "\" is defined.\n\n"
             )
         ENDIF()
+        SET(_target_short ${_target})
         SET(_run_args
           "$<TARGET_FILE:${_target}>"
           "${_prm_file}"
           )
+      ELSEIF( EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.json")
+        # the same as above but for json files
+        SET(_json_file "${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.json")
 
+        IF(NOT "${TEST_TARGET_${_build}}" STREQUAL "")
+          SET(_target ${TEST_TARGET_${_build}})
+        ELSEIF(NOT "${TEST_TARGET}" STREQUAL "")
+          SET(_target ${TEST_TARGET})
+        ELSE()
+          MESSAGE(FATAL_ERROR
+            "\nFor ${_comparison_file}: \"${_test_name}.json\" provided, "
+            "but neither \"\${TEST_TARGET}\", nor \"\${TEST_TARGET_${_build}}"
+            "\" is defined.\n\n"
+            )
+        ENDIF()
+        SET(_target_short ${_target})
+        SET(_run_args
+          "$<TARGET_FILE:${_target}>"
+          "${_json_file}"
+          )
       ELSE()
         MESSAGE(FATAL_ERROR
           "\nFor ${_comparison_file}: Neither \"${_test_name}.cc\", "
@@ -234,13 +244,13 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
       # otherwise run the test with mpirun:
       IF("${_n_cpu}" STREQUAL "0")
 
-        SET(_diff_target ${_test_name}.${_build_lowercase}.diff) # diff target name
+        SET(_diff_target ${_category}.${_test_name}.${_build_lowercase}.diff) # diff target name
         SET(_test_full ${_category}/${_test_name}.${_build_lowercase}) # full test name
         SET(_test_directory ${CMAKE_CURRENT_BINARY_DIR}/${_test_name}.${_build_lowercase}) # directory to run the test in
 
       ELSE()
 
-        SET(_diff_target ${_test_name}.mpirun${_n_cpu}.${_build_lowercase}.diff) # diff target name
+        SET(_diff_target ${_category}.${_test_name}.mpirun${_n_cpu}.${_build_lowercase}.diff) # diff target name
         SET(_test_full ${_category}/${_test_name}.mpirun=${_n_cpu}.${_build_lowercase}) # full test name
         SET(_test_directory ${CMAKE_CURRENT_BINARY_DIR}/${_test_name}.${_build_lowercase}/mpirun=${_n_cpu}) # directory to run the test in
         SET(_run_args
@@ -267,16 +277,18 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
         # interruption.
         #
         ADD_CUSTOM_COMMAND(
-          OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_target}/interrupt_guard.cc
-          COMMAND touch ${CMAKE_CURRENT_BINARY_DIR}/${_target}/interrupt_guard.cc
+          OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_target_short}/interrupt_guard.cc
+          COMMAND touch ${CMAKE_CURRENT_BINARY_DIR}/${_target_short}/interrupt_guard.cc
           )
 
 
         ADD_EXECUTABLE(${_target} EXCLUDE_FROM_ALL
           ${_generated_files}
           ${_source_file}
-          ${CMAKE_CURRENT_BINARY_DIR}/${_target}/interrupt_guard.cc
+          ${CMAKE_CURRENT_BINARY_DIR}/${_target_short}/interrupt_guard.cc
           )
+
+        SET_TARGET_PROPERTIES(${_target} PROPERTIES OUTPUT_NAME ${_target_short})
 
         DEAL_II_SETUP_TARGET(${_target} ${_build})
         TARGET_LINK_LIBRARIES(${_target}
@@ -287,7 +299,7 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
           COMPILE_DEFINITIONS SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
           )
         SET_PROPERTY(TARGET ${_target} PROPERTY
-          RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${_target}"
+          RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${_target_short}"
           )
 
       ENDIF()
@@ -314,8 +326,8 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
 
       ADD_CUSTOM_COMMAND(OUTPUT ${_test_directory}/diff
         COMMAND sh ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/run_test.sh
-          diff "${_test_full}" "${_test_diff}"
-          "${DIFF_EXECUTABLE}" "${_comparison_file}" ${_run_args}
+          diff "${_test_full}" "${NUMDIFF_EXECUTABLE}"
+          "${_comparison_file}" ${_run_args}
         WORKING_DIRECTORY
           ${_test_directory}
         DEPENDS

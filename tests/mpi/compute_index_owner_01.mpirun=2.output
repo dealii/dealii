@@ -1,0 +1,23 @@
+
+DEAL:0::local
+DEAL:0::{1}
+DEAL:0::ghost
+DEAL:0::{2}
+DEAL:0::owning_ranks_of_ghosts:
+DEAL:0::1 
+DEAL:0::requesters:
+DEAL:0::1: {1}
+DEAL:0::
+DEAL:0::1
+
+DEAL:1::local
+DEAL:1::{2}
+DEAL:1::ghost
+DEAL:1::{1}
+DEAL:1::owning_ranks_of_ghosts:
+DEAL:1::0 
+DEAL:1::requesters:
+DEAL:1::0: {2}
+DEAL:1::
+DEAL:1::0
+

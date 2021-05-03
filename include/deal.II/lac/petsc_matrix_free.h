@@ -55,7 +55,6 @@ namespace PETScWrappers
    *
    * @ingroup PETScWrappers
    * @ingroup Matrix1
-   * @author Wolfgang Bangerth, Martin Steigemann, 2012
    */
   class MatrixFree : public MatrixBase
   {

@@ -1,0 +1,14 @@
+
+DEAL:0:2d::Workload imbalance: 2.66667
+DEAL:0:3d::Workload imbalance: 1.60976
+DEAL:0::OK
+
+DEAL:1:2d::Workload imbalance: 2.66667
+DEAL:1:3d::Workload imbalance: 1.60976
+DEAL:1::OK
+
+
+DEAL:2:2d::Workload imbalance: 2.66667
+DEAL:2:3d::Workload imbalance: 1.60976
+DEAL:2::OK
+

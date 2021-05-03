@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2018 by the deal.II authors
+// Copyright (C) 2007 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -84,7 +84,7 @@ void
 check_neighbors(const Triangulation<2> &tria)
 {
   Triangulation<2>::cell_iterator cell = tria.begin();
-  for (unsigned int f = 0; f < GeometryInfo<2>::faces_per_cell; ++f)
+  for (const unsigned int f : GeometryInfo<2>::face_indices())
     if (cell->neighbor(f).state() == IteratorState::valid)
       {
         const unsigned int neighbor_neighbor = cell->neighbor_of_neighbor(f);

@@ -1,0 +1,97 @@
+# This file is up-to-date if the command git log --format="%aN <%aE>" | sort -u
+# gives no duplicates.
+
+# Format:
+# Proper Name <good.email@address>
+# Proper Name <good@email.address> <old.or.incorrect@email.address>
+#
+# You can have several lines for the same person if more than one incorrect
+# email address is in use.
+#
+# Also see https://git-scm.com/docs/git-check-mailmap
+
+
+# adam4130 <adam4130@users.noreply.github.com>
+Adam Lee <adam4130@users.noreply.github.com>
+
+# tcclevenger <tcleven@clemson.edu>
+Thomas C. Clevenger <tcleven@clemson.edu>
+
+# Roland <roland.richter@ntnu.no>
+Roland Richter <roland.richter@ntnu.no>
+
+# saratro <sara.tro@colorado.edu>
+Sara Tro <sara.tro@colorado.edu>
+
+# rfildes <rfildes@ucdavis.edu>
+Rebecca Fildes <rfildes@ucdavis.edu>
+
+# notxor <pmnotxor@gmx.at>
+Daniel Jodlbauer <pmnotxor@gmx.at>
+
+# marcfehling <marc.fehling@gmx.net>
+Marc Fehling <marc.fehling@gmx.net>
+
+# rebeccampereira <rpereira2@umassd.edu>
+Rebecca Pereira <rpereira2@umassd.edu>
+
+# peterrum <peterrmuench@gmail.com>
+Peter Munch <peterrmuench@gmail.com>
+
+# ManaswineeB <bezba004@umn.edu>
+Manaswinee Bezbaruah <bezba004@umn.edu>
+
+# blaisb <blais.bruno@gmail.com>
+Bruno Blais <blais.bruno@gmail.com>
+
+# grahambenharper <grahambenharper@gmail.com>
+Graham Harper <grahambenharper@gmail.com>
+
+# kirana-bergstrom <kirana.bergstrom@ucdenver.edu>
+Kirana Bergstrom <kirana.bergstrom@ucdenver.edu>
+
+# luz.paz <luzpaz@users.noreply.github.com>
+unknown luzpaz <luzpaz@users.noreply.github.com>
+
+# zhuoranwang@ZhuorandeMacBook-Pro.local
+Zhuoran Wang <zhrwang@rams.colostate.edu> <zhuoranwang@ZhuorandeMacBook-Pro.local>
+
+# Wolfgang Bangerth <bangerth@gluon.math.colostate.edu>
+Wolfgang Bangerth <bangerth@colostate.edu> <bangerth@gluon.math.colostate.edu>
+
+# Matthias Maier
+Matthias Maier <tamiko@43-1.org> <tamiko@kyomu.43-1.org>
+Matthias Maier <tamiko@43-1.org> <tamiko+GITHUB@kyomu.43-1.org>
+Matthias Maier <tamiko@43-1.org> <matthias.maier@iwr.uni-heidelberg.de>
+
+# Manu Jayadharan
+Manu Jayadharan <maj136@pitt.edu> <35903705+mjayadharan@users.noreply.github.com>
+
+# aggarwal-ashna <53831151+aggarwal-ashna@users.noreply.github.com> 
+Ashna Aggarwal <aaggarwal01@ucla.edu> <53831151+aggarwal-ashna@users.noreply.github.com>
+
+# LiMaIG <lmig@math.umd.edu>
+Lise-Marie Imbert-Gerard <lmig@math.umd.edu>
+Lise-Marie Imbert-Gerard <lmig@math.umd.edu> <imbertgerard@cims.nyu.edu>
+
+# agrayver <agrayver@erdw.ethz.ch>
+Alexander Grayver <agrayver@erdw.ethz.ch>
+Alexander Grayver <agrayver@erdw.ethz.ch> <agrayver@agrayver-VirtualBox.(none)>
+
+#
+Krishnakumar Gopalakrishnan <krishna.kumar@ucl.ac.uk>
+Krishnakumar Gopalakrishnan <krishna.kumar@ucl.ac.uk> <krishnak@vt.edu>
+Krishnakumar Gopalakrishnan <krishna.kumar@ucl.ac.uk> <krishnakumarg1984@users.noreply.github.com>
+
+#
+Menno Fraters <menno.fraters@outlook.com>
+
+#
+Ignacio Tomas <itomas@sandia.gov>
+
+#
+Nicole Hayes <hayesni4@msu.edu>
+
+#
+Fabian Castelli <fabian.castelli@kit.edu>
+Fabian Castelli <fabian.castelli@kit.edu> <50630942+gfcas@users.noreply.github.com>

@@ -67,6 +67,8 @@ MACRO(DEAL_II_PACKAGE_HANDLE _feature _var)
   SET(_fill_clear FALSE)
   SET(_clear "")
 
+  CLEAR_FEATURE(${_feature})
+
   FOREACH(_arg ${ARGN})
     IF(_arg MATCHES "^LIBRARIES(|_DEBUG|_RELEASE)$"
        OR _arg MATCHES "^(|BUNDLED_|USER_)INCLUDE_DIRS$"
@@ -150,6 +152,20 @@ MACRO(DEAL_II_PACKAGE_HANDLE _feature _var)
         REMOVE_DUPLICATES(${_feature}_${_suffix})
       ELSE()
         REMOVE_DUPLICATES(${_feature}_${_suffix} REVERSE)
+      ENDIF()
+    ENDFOREACH()
+
+    #
+    # Remove certain system libraries from the link interface. This is
+    # purely cosmetic (we always implicitly link against the C library, and
+    # we always set up threading by linking against libpthread.so if
+    # necessary).
+    #
+    FOREACH(_suffix LIBRARIES LIBRARIES_DEBUG LIBRARIES_RELEASE)
+      IF(NOT "${${_feature}_${_suffix}}" STREQUAL "")
+        LIST(REMOVE_ITEM ${_feature}_${_suffix}
+          "pthread" "-pthread" "-lpthread" "c" "-lc"
+          )
       ENDIF()
     ENDFOREACH()
 

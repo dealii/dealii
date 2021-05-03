@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2019 by the deal.II authors
+## Copyright (C) 2012 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -29,7 +29,7 @@
 #   DEAL_II_HAVE_AVX512                  *)
 #   DEAL_II_HAVE_ALTIVEC                 *)
 #   DEAL_II_HAVE_OPENMP_SIMD             *)
-#   DEAL_II_COMPILER_VECTORIZATION_LEVEL
+#   DEAL_II_VECTORIZATION_WIDTH_IN_BITS
 #   DEAL_II_OPENMP_SIMD_PRAGMA
 #
 # *)
@@ -277,19 +277,28 @@ ENDIF() # IF DEAL_II_ALLOW_PLATFORM_INTROSPECTION
 #
 
 IF(DEAL_II_HAVE_AVX512)
-  SET(DEAL_II_COMPILER_VECTORIZATION_LEVEL 3)
+  SET(DEAL_II_VECTORIZATION_WIDTH_IN_BITS 512)
 ELSEIF(DEAL_II_HAVE_AVX)
-  SET(DEAL_II_COMPILER_VECTORIZATION_LEVEL 2)
+  SET(DEAL_II_VECTORIZATION_WIDTH_IN_BITS 256)
 ELSEIF(DEAL_II_HAVE_SSE2)
-  SET(DEAL_II_COMPILER_VECTORIZATION_LEVEL 1)
+  SET(DEAL_II_VECTORIZATION_WIDTH_IN_BITS 128)
 ELSE()
-  SET(DEAL_II_COMPILER_VECTORIZATION_LEVEL 0)
+  SET(DEAL_II_VECTORIZATION_WIDTH_IN_BITS 0)
 ENDIF()
 
 IF(DEAL_II_HAVE_ALTIVEC)
-  SET(DEAL_II_COMPILER_VECTORIZATION_LEVEL 1)
+  SET(DEAL_II_VECTORIZATION_WIDTH_IN_BITS 128)
 ENDIF()
 
+#
+# We need to disable SIMD vectorization for CUDA device code.
+# Otherwise, nvcc compilers from version 9 on will emit an error message like:
+# "[...] contains a vector, which is not supported in device code"
+#
+
+IF(DEAL_II_WITH_CUDA)
+  SET(DEAL_II_VECTORIZATION_WIDTH_IN_BITS 0)
+ENDIF()
 
 #
 # If we have OpenMP SIMD support (i.e. DEAL_II_HAVE_OPENMP_SIMD is true)

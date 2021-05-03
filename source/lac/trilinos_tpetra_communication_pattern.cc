@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-#include <deal.II/base/std_cxx14/memory.h>
-
 #include <deal.II/lac/trilinos_tpetra_communication_pattern.h>
 
 #ifdef DEAL_II_TRILINOS_WITH_TPETRA
@@ -66,10 +64,10 @@ namespace LinearAlgebra
       // Source map is vector_space_vector_map. This map must have uniquely
       // owned GID.
       tpetra_import =
-        std_cxx14::make_unique<Tpetra::Import<int, types::global_dof_index>>(
+        std::make_unique<Tpetra::Import<int, types::global_dof_index>>(
           read_write_vector_map, vector_space_vector_map);
       tpetra_export =
-        std_cxx14::make_unique<Tpetra::Export<int, types::global_dof_index>>(
+        std::make_unique<Tpetra::Export<int, types::global_dof_index>>(
           read_write_vector_map, vector_space_vector_map);
     }
 

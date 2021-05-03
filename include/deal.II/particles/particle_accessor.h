@@ -16,6 +16,8 @@
 #ifndef dealii_particles_particle_accessor_h
 #define dealii_particles_particle_accessor_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/array_view.h>
 
 #include <deal.II/grid/tria.h>
@@ -26,36 +28,50 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace Particles
 {
+  // Forward declarations
+#ifndef DOXYGEN
   template <int, int>
   class ParticleIterator;
   template <int, int>
   class ParticleHandler;
+#endif
 
+  /**
+   * Accessor class used by ParticleIterator to access particle data.
+   */
   template <int dim, int spacedim = dim>
   class ParticleAccessor
   {
   public:
     /**
-     * Write particle data into a data array. The array is expected
-     * to be large enough to take the data, and the void pointer should
-     * point to the first element in which the data should be written. This
-     * function is meant for serializing all particle properties and
-     * afterwards de-serializing the properties by calling the appropriate
-     * constructor Particle(void *&data, PropertyPool *property_pool = nullptr);
-     *
-     * @param [in,out] data The memory location to write particle data
-     * into. This pointer points to the begin of the memory, in which the
-     * data will be written and it will be advanced by the serialized size
-     * of this particle.
+     * @copydoc Particle::write_particle_data_to_memory
      */
-    void
-    write_data(void *&data) const;
+    void *
+    write_particle_data_to_memory(void *data) const;
+
+
+    /**
+     * @copydoc Particle::read_particle_data_from_memory
+     */
+    const void *
+    read_particle_data_from_memory(const void *data);
 
     /**
      * Set the location of this particle. Note that this does not check
      * whether this is a valid location in the simulation domain.
      *
      * @param [in] new_location The new location for this particle.
+     *
+     * @note In parallel programs, the ParticleHandler class stores particles
+     *   on both the locally owned cells, as well as on ghost cells. The
+     *   particles on the latter are *copies* of particles owned on other
+     *   processors, and should therefore be treated in the same way as
+     *   ghost entries in @ref GlossGhostedVector "vectors with ghost elements"
+     *   or @ref GlossGhostCell "ghost cells": In both cases, one should
+     *   treat the ghost elements or cells as `const` objects that shouldn't
+     *   be modified even if the objects allow for calls that modify
+     *   properties. Rather, properties should only be modified on processors
+     *   that actually *own* the particle.
      */
     void
     set_location(const Point<spacedim> &new_location);
@@ -73,6 +89,17 @@ namespace Particles
      *
      * @param [in] new_reference_location The new reference location for
      * this particle.
+     *
+     * @note In parallel programs, the ParticleHandler class stores particles
+     *   on both the locally owned cells, as well as on ghost cells. The
+     *   particles on the latter are *copies* of particles owned on other
+     *   processors, and should therefore be treated in the same way as
+     *   ghost entries in @ref GlossGhostedVector "vectors with ghost elements"
+     *   or @ref GlossGhostCell "ghost cells": In both cases, one should
+     *   treat the ghost elements or cells as `const` objects that shouldn't
+     *   be modified even if the objects allow for calls that modify
+     *   properties. Rather, properties should only be modified on processors
+     *   that actually *own* the particle.
      */
     void
     set_reference_location(const Point<dim> &new_reference_location);
@@ -97,7 +124,7 @@ namespace Particles
      * function is after particle transfer to a new process.
      */
     void
-    set_property_pool(PropertyPool &property_pool);
+    set_property_pool(PropertyPool<dim, spacedim> &property_pool);
 
     /**
      * Return whether this particle has a valid property pool and a valid
@@ -111,9 +138,40 @@ namespace Particles
      *
      * @param [in] new_properties A vector containing the
      * new properties for this particle.
+     *
+     * @note In parallel programs, the ParticleHandler class stores particles
+     *   on both the locally owned cells, as well as on ghost cells. The
+     *   particles on the latter are *copies* of particles owned on other
+     *   processors, and should therefore be treated in the same way as
+     *   ghost entries in @ref GlossGhostedVector "vectors with ghost elements"
+     *   or @ref GlossGhostCell "ghost cells": In both cases, one should
+     *   treat the ghost elements or cells as `const` objects that shouldn't
+     *   be modified even if the objects allow for calls that modify
+     *   properties. Rather, properties should only be modified on processors
+     *   that actually *own* the particle.
      */
     void
     set_properties(const std::vector<double> &new_properties);
+
+    /**
+     * Set the properties of this particle.
+     *
+     * @param [in] new_properties An ArrayView pointing to memory locations
+     * containing the new properties for this particle.
+     *
+     * @note In parallel programs, the ParticleHandler class stores particles
+     *   on both the locally owned cells, as well as on ghost cells. The
+     *   particles on the latter are *copies* of particles owned on other
+     *   processors, and should therefore be treated in the same way as
+     *   ghost entries in @ref GlossGhostedVector "vectors with ghost elements"
+     *   or @ref GlossGhostCell "ghost cells": In both cases, one should
+     *   treat the ghost elements or cells as `const` objects that shouldn't
+     *   be modified even if the objects allow for calls that modify
+     *   properties. Rather, properties should only be modified on processors
+     *   that actually *own* the particle.
+     */
+    void
+    set_properties(const ArrayView<const double> &new_properties);
 
     /**
      * Get write-access to properties of this particle.
@@ -150,7 +208,8 @@ namespace Particles
       const Triangulation<dim, spacedim> &triangulation) const;
 
     /**
-     * Serialize the contents of this class.
+     * Serialize the contents of this class using the [BOOST serialization
+     * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
      */
     template <class Archive>
     void
@@ -211,10 +270,8 @@ namespace Particles
     typename std::multimap<internal::LevelInd,
                            Particle<dim, spacedim>>::iterator particle;
 
-    /**
-     * Make ParticleIterator a friend to allow it constructing
-     * ParticleAccessors.
-     */
+    // Make ParticleIterator a friend to allow it constructing
+    // ParticleAccessors.
     template <int, int>
     friend class ParticleIterator;
     template <int, int>
@@ -233,8 +290,277 @@ namespace Particles
   }
 
 
+  // ------------------------- inline functions ------------------------------
+
+  template <int dim, int spacedim>
+  inline ParticleAccessor<dim, spacedim>::ParticleAccessor()
+    : map(nullptr)
+    , particle()
+  {}
+
+
+
+  template <int dim, int spacedim>
+  inline ParticleAccessor<dim, spacedim>::ParticleAccessor(
+    const std::multimap<internal::LevelInd, Particle<dim, spacedim>> &map,
+    const typename std::multimap<internal::LevelInd,
+                                 Particle<dim, spacedim>>::iterator & particle)
+    : map(const_cast<
+          std::multimap<internal::LevelInd, Particle<dim, spacedim>> *>(&map))
+    , particle(particle)
+  {}
+
+
+
+  template <int dim, int spacedim>
+  inline const void *
+  ParticleAccessor<dim, spacedim>::read_particle_data_from_memory(
+    const void *data)
+  {
+    Assert(particle != map->end(), ExcInternalError());
+
+    return particle->second.read_particle_data_from_memory(data);
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline void *
+  ParticleAccessor<dim, spacedim>::write_particle_data_to_memory(
+    void *data) const
+  {
+    Assert(particle != map->end(), ExcInternalError());
+
+    return particle->second.write_particle_data_to_memory(data);
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline void
+  ParticleAccessor<dim, spacedim>::set_location(const Point<spacedim> &new_loc)
+  {
+    Assert(particle != map->end(), ExcInternalError());
+
+    particle->second.set_location(new_loc);
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline const Point<spacedim> &
+  ParticleAccessor<dim, spacedim>::get_location() const
+  {
+    Assert(particle != map->end(), ExcInternalError());
+
+    return particle->second.get_location();
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline void
+  ParticleAccessor<dim, spacedim>::set_reference_location(
+    const Point<dim> &new_loc)
+  {
+    Assert(particle != map->end(), ExcInternalError());
+
+    particle->second.set_reference_location(new_loc);
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline const Point<dim> &
+  ParticleAccessor<dim, spacedim>::get_reference_location() const
+  {
+    Assert(particle != map->end(), ExcInternalError());
+
+    return particle->second.get_reference_location();
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline types::particle_index
+  ParticleAccessor<dim, spacedim>::get_id() const
+  {
+    Assert(particle != map->end(), ExcInternalError());
+
+    return particle->second.get_id();
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline void
+  ParticleAccessor<dim, spacedim>::set_property_pool(
+    PropertyPool<dim, spacedim> &new_property_pool)
+  {
+    Assert(particle != map->end(), ExcInternalError());
+
+    particle->second.set_property_pool(new_property_pool);
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline bool
+  ParticleAccessor<dim, spacedim>::has_properties() const
+  {
+    Assert(particle != map->end(), ExcInternalError());
+
+    return particle->second.has_properties();
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline void
+  ParticleAccessor<dim, spacedim>::set_properties(
+    const std::vector<double> &new_properties)
+  {
+    Assert(particle != map->end(), ExcInternalError());
+
+    particle->second.set_properties(new_properties);
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline void
+  ParticleAccessor<dim, spacedim>::set_properties(
+    const ArrayView<const double> &new_properties)
+  {
+    Assert(particle != map->end(), ExcInternalError());
+
+    particle->second.set_properties(new_properties);
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline const ArrayView<const double>
+  ParticleAccessor<dim, spacedim>::get_properties() const
+  {
+    Assert(particle != map->end(), ExcInternalError());
+
+    return particle->second.get_properties();
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline typename Triangulation<dim, spacedim>::cell_iterator
+  ParticleAccessor<dim, spacedim>::get_surrounding_cell(
+    const Triangulation<dim, spacedim> &triangulation) const
+  {
+    Assert(particle != map->end(), ExcInternalError());
+
+    const typename Triangulation<dim, spacedim>::cell_iterator cell(
+      &triangulation, particle->first.first, particle->first.second);
+    return cell;
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline const ArrayView<double>
+  ParticleAccessor<dim, spacedim>::get_properties()
+  {
+    Assert(particle != map->end(), ExcInternalError());
+
+    return particle->second.get_properties();
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline std::size_t
+  ParticleAccessor<dim, spacedim>::serialized_size_in_bytes() const
+  {
+    Assert(particle != map->end(), ExcInternalError());
+
+    return particle->second.serialized_size_in_bytes();
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline void
+  ParticleAccessor<dim, spacedim>::next()
+  {
+    Assert(particle != map->end(), ExcInternalError());
+    ++particle;
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline void
+  ParticleAccessor<dim, spacedim>::prev()
+  {
+    Assert(particle != map->begin(), ExcInternalError());
+    --particle;
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline bool
+  ParticleAccessor<dim, spacedim>::
+  operator!=(const ParticleAccessor<dim, spacedim> &other) const
+  {
+    return (map != other.map) || (particle != other.particle);
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline bool
+  ParticleAccessor<dim, spacedim>::
+  operator==(const ParticleAccessor<dim, spacedim> &other) const
+  {
+    return (map == other.map) && (particle == other.particle);
+  }
+
+
 } // namespace Particles
 
 DEAL_II_NAMESPACE_CLOSE
+
+namespace boost
+{
+  namespace geometry
+  {
+    namespace index
+    {
+      // Forward declaration of bgi::indexable
+      template <class T>
+      struct indexable;
+
+      /**
+       * Make sure we can construct an RTree from Particles::ParticleAccessor
+       * objects.
+       */
+      template <int dim, int spacedim>
+      struct indexable<dealii::Particles::ParticleAccessor<dim, spacedim>>
+      {
+        /**
+         * boost::rtree expects a const reference to an indexable object. For
+         * a Particles::Particle object, this is its reference location.
+         */
+        using result_type = const dealii::Point<spacedim> &;
+
+        result_type
+        operator()(const dealii::Particles::ParticleAccessor<dim, spacedim>
+                     &accessor) const
+        {
+          return accessor.get_location();
+        }
+      };
+    } // namespace index
+  }   // namespace geometry
+} // namespace boost
 
 #endif

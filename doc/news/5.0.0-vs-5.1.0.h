@@ -58,7 +58,7 @@ inconvenience this causes.
        and leads to very hard to find errors. Therefore, all constructors and
        reinit functions of the parallel sparse matrix classes now take an
        additional argument indicating the partitioning of columns of the matrix.
-       <br> 
+       <br>
        (WB 2004/06/02)
        </p>
 </ol>
@@ -70,7 +70,7 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
-       New: Support of shared libraries under Cygwin / Windows systems. Shared 
+       New: Support of shared libraries under Cygwin / Windows systems. Shared
        libraries are used as default. To use, make sure the library path is included
        in your <code>PATH</code> environment variable.
        <br>
@@ -93,7 +93,7 @@ inconvenience this causes.
        </p>
 
   <li> <p>
-       New: Configuration now detects the Intel Fortran compiler and can set 
+       New: Configuration now detects the Intel Fortran compiler and can set
        compilation flags accordingly.
        <br>
        (WB 2004/11/04)
@@ -117,7 +117,7 @@ inconvenience this causes.
        </p>
 
   <li> <p>
-       New: configuration option <tt>--with-umfpack</tt> for using the 
+       New: configuration option <tt>--with-umfpack</tt> for using the
        UMFPack version and enabling the class <code
        class="class">SparseDirectUMFPACK</code>, both included by
        Wolfgang.
@@ -136,7 +136,7 @@ inconvenience this causes.
   <li> <p>
        Fixed: None of the formulas in the step-8 tutorial program web
        page were visible. This is now fixed.
-       <br> 
+       <br>
        (WB 2004/06/29)
        </p>
 
@@ -147,31 +147,31 @@ inconvenience this causes.
 <h3>base</h3>
 
 <ol>
-  <li> <p> 
+  <li> <p>
        New: The <code>MultithreadInfo</code> class now also detects multiple
        processors on Mac OS X.
-       <br> 
+       <br>
        (Helmut M&uuml;ller 2004/11/29)
   </p>
 
-  <li> <p> 
+  <li> <p>
        New: The <code>
        TableHandler::write_tex</code> now accepts the additional boolean
        argument <code>with_header</code> which is set to
-       true by default and tells the function whether to add the latex 
+       true by default and tells the function whether to add the latex
        header and footer (i.e. the \\documentclass{...},
-       \\begin{document} and \\end{document} stuff) to the table.<br> 
-       In addition to this, there are two new members in the above class: 
+       \\begin{document} and \\end{document} stuff) to the table.<br>
+       In addition to this, there are two new members in the above class:
        <code> TableHandler::tex_set_table_caption</code> and
        <code> TableHandler::tex_set_table_label</code> to
-       add a caption and a label to the tex generated table.  
-       <br> 
+       add a caption and a label to the tex generated table.
+       <br>
        (Luca Heltai 2004/10/29)
   </p>
 
   <li> <p>
        Fixed: <code
-       class="member">DataOutBase&lt;2,3&gt;::write_tecplot</code>
+       class="member">DataOutBase::write_tecplot</code> for dim=2 and spacedim=3
        sometimes did not write the variable name <code>z</code> when
        only outputting faces of cells. This is now fixed.
        <br>
@@ -192,7 +192,7 @@ inconvenience this causes.
        class="class">Table&lt;N,T&gt;</code> class represents an
        <code>N</code>-dimensional array and might replace the
        N-times-nested-use of the <code
-       class="class">std::vector</code> class. 
+       class="class">std::vector</code> class.
        <br>
        (RH 2004/08/13)
        </p>
@@ -200,14 +200,14 @@ inconvenience this causes.
   <li> <p>
        New: Class <code>TableIndices</code> now has
        operators that check for equality and inequality of objects.
-       <br> 
+       <br>
        (WB 2004/07/28)
        </p>
 
   <li> <p>
        New: A class <code>PointerComparison</code> for comparing
        pointers that may or may not be of the same type.
-       <br> 
+       <br>
        (WB 2004/06/22)
        </p>
 
@@ -219,7 +219,7 @@ inconvenience this causes.
        class="member">ok</code> function. It was never really used for
        anything, and has thus finally been removed. The <code
        class="member">ok</code> is consequently gone as well.
-       <br> 
+       <br>
        (WB 2004/06/06)
        </p>
 
@@ -230,7 +230,7 @@ inconvenience this causes.
        or not. This is particular useful for parallel computations
        when only one process should print to standard output, while in all
        other processes we simply want output suppressed.
-       <br> 
+       <br>
        (RH 2004/05/26)
        </p>
 </ol>
@@ -246,24 +246,24 @@ inconvenience this causes.
        prevented deal.II from working with it (it couldn't be compiled at
        all). We have added checks that make sure that it can now again be
        compiled with PETSc versions 2.1.6, 2.2.0, and 2.2.1.
-       <br> 
+       <br>
        (WB 2004/10/07)
        </p>
 
   <li> <p>
        New: A class <code>PreconditionLU</code> which
        provides a wrapper to the complete LU decomposition
-       preconditioner of PETSc. Furthermore a class 
+       preconditioner of PETSc. Furthermore a class
        <code>SolverPreOnly</code> was implemented. It
        is a wrapper for the PETSc solver type KSPPREONLY, which
        only applies the preconditioner. In conjunction with
        <code>PreconditionLU</code> this provides a
        simple direct solver, which could be used for small to medium
        sized problems on a single processor machine.
-       <br> 
+       <br>
        (Oliver Kayser-Herold 2004/07/27)
        </p>
- 
+
  <li> <p>
        Improved: <code>VectorTools::point_difference</code>
        used to use an algorithm to find the cell the given point is in that
@@ -271,7 +271,7 @@ inconvenience this causes.
        to use
        <code>GridTools::find_active_cell_around_point</code>
        which is only logarithmic in its complexity.
-       <br> 
+       <br>
        (WB 2004/07/07)
        </p>
 
@@ -280,7 +280,7 @@ inconvenience this causes.
        (and invalid) states when some of the blocks had empty rows. In this
        common case, we would frequently skip elements when looping over the
        elements of a block matrix. These cases should now be fixed.
-       <br> 
+       <br>
        (WB 2004/07/07)
        </p>
 
@@ -290,7 +290,7 @@ inconvenience this causes.
        the position within a row. However, this was fragile, and has been
        removed. If you want an ordering of elements within a row, use the
        <code>operator &lt;</code> to compare iterators.
-       <br> 
+       <br>
        (WB 2004/07/07)
        </p>
 
@@ -299,14 +299,14 @@ inconvenience this causes.
        class="class">PETScWrappers::SolverGMRES::AdditionalData</code>
        class now takes an additional flag indicating the use of left
        or right preconditioning.
-       <br> 
+       <br>
        (RH 2004/06/24)
        </p>
 
   <li> <p>
        Improved: The <code>SparseDirectMA27</code> class can now
        handle float as well as double input matrices and vectors.
-       <br> 
+       <br>
        (WB 2004/06/23)
        </p>
 
@@ -318,7 +318,7 @@ inconvenience this causes.
        and output vectors, but were only instantiated in case the arguments
        were the same, and could also not be compiled if they weren't. Both
        problems are now fixed.
-       <br> 
+       <br>
        (WB 2004/06/22)
        </p>
 
@@ -333,7 +333,7 @@ inconvenience this causes.
        average. This should significantly reduce the total amount of memory
        required as well as memory fragmentation. It also cuts run-time for
        element addition by more than half.
-       <br> 
+       <br>
        (WB 2004/06/21)
        </p>
 
@@ -342,7 +342,7 @@ inconvenience this causes.
        class="member">CompressedSparsityPattern::max_entries_per_row()</code>
        ignored the first row and thus sometimes returned a value that was too
        low. This is now fixed.
-       <br> 
+       <br>
        (WB 2004/06/21)
        </p>
 
@@ -352,7 +352,7 @@ inconvenience this causes.
        removed them, but it still kept the number of blocks
        unchanged. Subsequent accesses to these blocks, or to their information
        yielded segmentation faults.
-       <br> 
+       <br>
        (WB 2004/06/02)
        </p>
 
@@ -362,7 +362,7 @@ inconvenience this causes.
        still exist in all their functionality, this allowed us to now also
        have block matrices and vectors for PETSc sequential and parallel
        objects.
-       <br> 
+       <br>
        (WB 2004/06/02)
        </p>
 
@@ -378,7 +378,7 @@ inconvenience this causes.
        temporaries without our ado. This bug is now detected during
        configuration time of the library, and these constructors are available
        whenever the compiler does not contain this bug.
-       <br> 
+       <br>
        (WB 2004/06/02)
        </p>
 
@@ -387,7 +387,7 @@ inconvenience this causes.
        now also have member functions <code>local_range</code>,
        <code>in_local_range</code>, and <code
        class="member">local_size</code>.
-       <br> 
+       <br>
        (WB 2004/06/02)
        </p>
 
@@ -395,7 +395,7 @@ inconvenience this causes.
        New: Parallel PETSc matrix and vector classes now have member functions
        <code>get_mpi_communicator</code> that returns the MPI
        communicator object these objects operate on.
-       <br> 
+       <br>
        (WB 2004/06/02)
        </p>
 
@@ -404,7 +404,7 @@ inconvenience this causes.
        than a nonconstant reference to the MPI communicator to be used. This
        prevents some unnecessary compiler problems in conjunction with the new
        <code>get_mpi_communicator</code> function.
-       <br> 
+       <br>
        (WB 2004/06/02)
        </p>
 
@@ -413,7 +413,7 @@ inconvenience this causes.
        initialized (via either constructor or reinit functions) with a
        compressed sparsity pattern object, allowing for more efficient
        preallocation of nonzero entries.
-       <br> 
+       <br>
        (WB 2004/06/02)
        </p>
 </ol>
@@ -508,7 +508,7 @@ inconvenience this causes.
        places in the library use or touch the user pointers. That is
        wrong, the <code>SolutionTransfer</code> class
        actually does. This is now properly documented.
-       <br> 
+       <br>
        (WB 2004/09/15)
        </p>
 
@@ -517,7 +517,7 @@ inconvenience this causes.
        class="member">DerivativeApproximation::approximate_second_derivative</code>
        function produced wrong results ("not a number", or an exception instead of
        "zero") if the field it was given was constant. This is now fixed.
-       <br> 
+       <br>
        (WB 2004/08/05)
        </p>
 
@@ -525,7 +525,7 @@ inconvenience this causes.
        New: The <code>MatrixTools::apply_boundary_values</code>
        that works on block matrices and vectors is now templatized over the
        number type, i.e. it also works for float matrices and vectors.
-       <br> 
+       <br>
        (WB 2004/06/22)
        </p>
 
@@ -533,7 +533,7 @@ inconvenience this causes.
        New: The new <code>FEValuesBase::get_cell</code>
        function returns the current cell, i.e. the latest cell the
        <code>FEValues</code> object was reinited with.
-       <br> 
+       <br>
        (RH 2004/06/22)
        </p>
 
@@ -548,7 +548,7 @@ inconvenience this causes.
        of information, but the cases where this applies and the strategies to
        work with this problem anyway are now well documented in the
        documentation of the <code>MatrixTools</code> class.
-       <br> 
+       <br>
        (WB 2004/06/07)
        </p>
 
@@ -558,7 +558,7 @@ inconvenience this causes.
        Jacobians. In usual finite element computations this simply leads to
        all components of the linear system being negated, so it is not
        harmful. It is fixed now anyway.
-       <br> 
+       <br>
        (WB 2004/06/07)
        </p>
 </ol>

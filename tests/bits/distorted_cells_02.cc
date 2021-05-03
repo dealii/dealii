@@ -53,18 +53,13 @@ check()
     {
       gi.read_ucd(in);
     }
-  catch (typename Triangulation<dim>::DistortedCellList &dcv)
+  catch (ExceptionBase &exc)
     {
+      deallog << exc.get_exc_name() << std::endl;
       flag = true;
-
-      deallog << dcv.distorted_cells.size() << " distorted cells" << std::endl;
-      Assert(dcv.distorted_cells.front() == coarse_grid.begin(0),
-             ExcInternalError());
     }
 
   Assert(flag == true, ExcInternalError());
-  Assert(coarse_grid.n_levels() == 1, ExcInternalError());
-  Assert(coarse_grid.n_active_cells() == 1, ExcInternalError());
 }
 
 

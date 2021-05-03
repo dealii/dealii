@@ -78,8 +78,6 @@ DEAL_II_NAMESPACE_OPEN
  * @note Instantiations for this template are provided for dimensions 0, 1, 2,
  * and 3 (see the section on
  * @ref Instantiations).
- *
- * @author Wolfgang Bangerth, Guido Kanschat, 1998, 1999, 2000, 2005, 2009
  */
 template <int dim>
 class Quadrature : public Subscriptor
@@ -235,7 +233,8 @@ public:
 
   /**
    * Write or read the data of this object to or from a stream for the purpose
-   * of serialization.
+   * of serialization using the [BOOST serialization
+   * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
    */
   template <class Archive>
   void
@@ -313,8 +312,6 @@ protected:
  *
  * @note Each constructor can only be used in the dimension matching the
  * number of arguments.
- *
- * @author Guido Kanschat, 2005
  */
 template <int dim>
 class QAnisotropic : public Quadrature<dim>
@@ -362,8 +359,6 @@ public:
  * The aim of this class is to provide a low order formula, where the error
  * constant can be tuned by increasing the number of quadrature points. This
  * is useful in integrating non-differentiable functions on cells.
- *
- * @author Wolfgang Bangerth 1999
  */
 template <int dim>
 class QIterated : public Quadrature<dim>
@@ -469,12 +464,18 @@ template <>
 Quadrature<0>::Quadrature(const Quadrature<-1> &, const Quadrature<1> &);
 template <>
 Quadrature<0>::Quadrature(const Quadrature<1> &);
+template <>
+Quadrature<0>::Quadrature(const Point<0> &);
 
 template <>
 Quadrature<1>::Quadrature(const Quadrature<0> &, const Quadrature<1> &);
 
 template <>
 Quadrature<1>::Quadrature(const Quadrature<0> &);
+
+template <>
+QIterated<1>::QIterated(const Quadrature<1> &base_quadrature,
+                        const unsigned int   n_copies);
 
 #endif // DOXYGEN
 DEAL_II_NAMESPACE_CLOSE

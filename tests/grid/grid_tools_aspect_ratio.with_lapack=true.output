@@ -1,0 +1,109 @@
+
+DEAL::
+DEAL::Parameters: d = 1, degree = 1, n_q_points = 2, deform = 0, factor = 1.00000
+DEAL::Aspect ratio vector = 
+1.000e+00 1.000e+00 
+DEAL::aspect ratio max    = 1.00000
+DEAL::
+DEAL::
+DEAL::Parameters: d = 1, degree = 1, n_q_points = 2, deform = 0, factor = 1.00000
+DEAL::Aspect ratio vector = 
+1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 
+DEAL::aspect ratio max    = 1.00000
+DEAL::
+DEAL::
+DEAL::Parameters: d = 2, degree = 1, n_q_points = 2, deform = 0, factor = 1.00000
+DEAL::Aspect ratio vector = 
+1.000e+00 1.000e+00 1.000e+00 1.000e+00 
+DEAL::aspect ratio max    = 1.00000
+DEAL::
+DEAL::
+DEAL::Parameters: d = 2, degree = 1, n_q_points = 2, deform = 1, factor = 1.00000
+DEAL::Aspect ratio vector = 
+1.327e+00 1.000e+00 1.000e+00 1.000e+00 
+DEAL::aspect ratio max    = 1.32670
+DEAL::
+DEAL::
+DEAL::Parameters: d = 2, degree = 1, n_q_points = 2, deform = 1, factor = 10.0000
+DEAL::Aspect ratio vector = 
+inf 1.000e+00 1.000e+00 1.000e+00 
+DEAL::aspect ratio max    = inf
+DEAL::
+DEAL::
+DEAL::Parameters: d = 2, degree = 1, n_q_points = 2, deform = 0, factor = 1.00000
+DEAL::Aspect ratio vector = 
+2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 
+DEAL::aspect ratio max    = 2.50000
+DEAL::
+DEAL::
+DEAL::Parameters: d = 2, degree = 1, n_q_points = 2, deform = 1, factor = 1.00000
+DEAL::Aspect ratio vector = 
+3.476e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 
+DEAL::aspect ratio max    = 3.47552
+DEAL::
+DEAL::
+DEAL::Parameters: d = 2, degree = 1, n_q_points = 5, deform = 1, factor = 1.00000
+DEAL::Aspect ratio vector = 
+3.866e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 
+DEAL::aspect ratio max    = 3.86561
+DEAL::
+DEAL::
+DEAL::Parameters: d = 2, degree = 1, n_q_points = 15, deform = 1, factor = 1.00000
+DEAL::Aspect ratio vector = 
+3.971e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 
+DEAL::aspect ratio max    = 3.97069
+DEAL::
+DEAL::
+DEAL::Parameters: d = 2, degree = 1, n_q_points = 2, deform = 1, factor = 10.0000
+DEAL::Aspect ratio vector = 
+inf 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 
+DEAL::aspect ratio max    = inf
+DEAL::
+DEAL::
+DEAL::Parameters: d = 3, degree = 1, n_q_points = 2, deform = 0, factor = 1.00000
+DEAL::Aspect ratio vector = 
+1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 
+DEAL::aspect ratio max    = 1.00000
+DEAL::
+DEAL::
+DEAL::Parameters: d = 3, degree = 1, n_q_points = 2, deform = 1, factor = 1.00000
+DEAL::Aspect ratio vector = 
+1.641e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 
+DEAL::aspect ratio max    = 1.64083
+DEAL::
+DEAL::
+DEAL::Parameters: d = 3, degree = 1, n_q_points = 2, deform = 1, factor = 10.0000
+DEAL::Aspect ratio vector = 
+inf 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 
+DEAL::aspect ratio max    = inf
+DEAL::
+DEAL::
+DEAL::Parameters: d = 3, degree = 1, n_q_points = 2, deform = 0, factor = 1.00000
+DEAL::Aspect ratio vector = 
+2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 
+DEAL::aspect ratio max    = 2.50000
+DEAL::
+DEAL::
+DEAL::Parameters: d = 3, degree = 1, n_q_points = 2, deform = 1, factor = 1.00000
+DEAL::Aspect ratio vector = 
+4.611e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 
+DEAL::aspect ratio max    = 4.61134
+DEAL::
+DEAL::
+DEAL::Parameters: d = 3, degree = 1, n_q_points = 5, deform = 1, factor = 1.00000
+DEAL::Aspect ratio vector = 
+1.613e+01 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 
+DEAL::aspect ratio max    = 16.1349
+DEAL::
+DEAL::
+DEAL::Parameters: d = 3, degree = 1, n_q_points = 15, deform = 1, factor = 1.00000
+DEAL::Aspect ratio vector = 
+6.696e+01 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 
+DEAL::aspect ratio max    = 66.9573
+DEAL::
+DEAL::
+DEAL::Parameters: d = 3, degree = 1, n_q_points = 2, deform = 1, factor = 10.0000
+DEAL::Aspect ratio vector = 
+inf 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 2.500e+00 
+DEAL::aspect ratio max    = inf
+DEAL::

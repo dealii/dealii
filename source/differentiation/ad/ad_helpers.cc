@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2017 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -81,11 +81,9 @@ namespace Differentiation
     HelperBase<ADNumberTypeCode,
                ScalarType>::reset_registered_independent_variables()
     {
-      for (typename std::vector<bool>::iterator it =
-             registered_independent_variable_values.begin();
-           it != registered_independent_variable_values.end();
-           ++it)
-        *it = false;
+      std::fill(registered_independent_variable_values.begin(),
+                registered_independent_variable_values.end(),
+                false);
     }
 
 
@@ -95,11 +93,9 @@ namespace Differentiation
     HelperBase<ADNumberTypeCode, ScalarType>::
       reset_registered_dependent_variables(const bool flag)
     {
-      for (typename std::vector<bool>::iterator it =
-             registered_marked_dependent_variables.begin();
-           it != registered_marked_dependent_variables.end();
-           ++it)
-        *it = flag;
+      std::fill(registered_marked_dependent_variables.begin(),
+                registered_marked_dependent_variables.end(),
+                flag);
     }
 
 
@@ -121,7 +117,7 @@ namespace Differentiation
           Assert(this->is_recording() == true,
                  ExcMessage(
                    "Cannot change the value of an independent variable "
-                   "of the tapeless variety while this class is not set"
+                   "of the tapeless variety while this class is not set "
                    "in recording operations."));
         }
       if (ADNumberTraits<ad_type>::is_taped == true)
@@ -944,7 +940,7 @@ namespace Differentiation
     {
       Assert(AD::ADNumberTraits<ad_type>::n_supported_derivative_levels >= 2,
              ExcMessage(
-               "Cannot computed function Hessian: AD number type does"
+               "Cannot computed function Hessian: AD number type does "
                "not support the calculation of second order derivatives."));
 
       if ((ADNumberTraits<ad_type>::is_taped == true &&
@@ -1483,7 +1479,7 @@ namespace Differentiation
     {
       Assert(AD::ADNumberTraits<ad_type>::n_supported_derivative_levels >= 2,
              ExcMessage(
-               "Cannot computed function Hessian: AD number type does"
+               "Cannot computed function Hessian: AD number type does "
                "not support the calculation of second order derivatives."));
 
       if ((ADNumberTraits<ad_type>::is_taped == true &&

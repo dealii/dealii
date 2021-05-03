@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2018 by the deal.II authors
+// Copyright (C) 2007 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -29,6 +29,7 @@
 #include <vector>
 
 #include "../tests.h"
+
 #include "functions.h"
 
 template <int dim>
@@ -96,7 +97,7 @@ check_function_derivative(const Functions::FlowFunction<dim> &f,
             patches[0].vertices[vertex_number](2) = -1. + 2. * iz;
           ++vertex_number;
         }
-  for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+  for (const unsigned int i : GeometryInfo<dim>::face_indices())
     patches[0].neighbors[i] = numbers::invalid_unsigned_int;
   patches[0].patch_index          = 0;
   patches[0].n_subdivisions       = sub;

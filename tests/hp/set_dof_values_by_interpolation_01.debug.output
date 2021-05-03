@@ -1,13 +1,13 @@
 
 DEAL::Yes, exception 1!
-DEAL::ExcMessage ("In hp::DoFHandler objects, finite elements are only associated " "with active cells. Consequently, you can not ask for the " "active finite element on cells with children.")
+DEAL::ExcMessage( "For DoFHandler objects in hp-mode, finite elements are only " "associated with active cells. Consequently, you can not ask " "for the active finite element on cells with children.")
 DEAL::Yes, exception!
-DEAL::ExcMessage ("You cannot call this function on non-active cells " "of hp::DoFHandler objects unless you provide an explicit " "finite element index because they do not have naturally " "associated finite element spaces associated: degrees " "of freedom are only distributed on active cells for which " "the active_fe_index has been set.")
+DEAL::ExcMessage( "You cannot call this function on non-active cells " "of DoFHandler objects unless you provide an explicit " "finite element index because they do not have naturally " "associated finite element spaces associated: degrees " "of freedom are only distributed on active cells for which " "the active FE index has been set.")
 DEAL::Yes, exception 1!
-DEAL::ExcMessage ("In hp::DoFHandler objects, finite elements are only associated " "with active cells. Consequently, you can not ask for the " "active finite element on cells with children.")
+DEAL::ExcMessage( "For DoFHandler objects in hp-mode, finite elements are only " "associated with active cells. Consequently, you can not ask " "for the active finite element on cells with children.")
 DEAL::Yes, exception!
-DEAL::ExcMessage ("You cannot call this function on non-active cells " "of hp::DoFHandler objects unless you provide an explicit " "finite element index because they do not have naturally " "associated finite element spaces associated: degrees " "of freedom are only distributed on active cells for which " "the active_fe_index has been set.")
+DEAL::ExcMessage( "You cannot call this function on non-active cells " "of DoFHandler objects unless you provide an explicit " "finite element index because they do not have naturally " "associated finite element spaces associated: degrees " "of freedom are only distributed on active cells for which " "the active FE index has been set.")
 DEAL::Yes, exception 1!
-DEAL::ExcMessage ("In hp::DoFHandler objects, finite elements are only associated " "with active cells. Consequently, you can not ask for the " "active finite element on cells with children.")
+DEAL::ExcMessage( "For DoFHandler objects in hp-mode, finite elements are only " "associated with active cells. Consequently, you can not ask " "for the active finite element on cells with children.")
 DEAL::Yes, exception!
-DEAL::ExcMessage ("You cannot call this function on non-active cells " "of hp::DoFHandler objects unless you provide an explicit " "finite element index because they do not have naturally " "associated finite element spaces associated: degrees " "of freedom are only distributed on active cells for which " "the active_fe_index has been set.")
+DEAL::ExcMessage( "You cannot call this function on non-active cells " "of DoFHandler objects unless you provide an explicit " "finite element index because they do not have naturally " "associated finite element spaces associated: degrees " "of freedom are only distributed on active cells for which " "the active FE index has been set.")

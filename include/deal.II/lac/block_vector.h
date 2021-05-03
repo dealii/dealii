@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2018 by the deal.II authors
+// Copyright (C) 1999 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -32,7 +32,9 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-#ifdef DEAL_II_WITH_TRILINOS
+// Forward declaration
+#ifndef DOXYGEN
+#  ifdef DEAL_II_WITH_TRILINOS
 namespace TrilinosWrappers
 {
   namespace MPI
@@ -40,6 +42,7 @@ namespace TrilinosWrappers
     class BlockVector;
   }
 } // namespace TrilinosWrappers
+#  endif
 #endif
 
 
@@ -62,7 +65,6 @@ namespace TrilinosWrappers
  *
  * @see
  * @ref GlossBlockLA "Block (linear algebra)"
- * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2000, 2001, 2002, 2004
  */
 template <typename Number>
 class BlockVector : public BlockVectorBase<Vector<Number>>
@@ -481,7 +483,6 @@ BlockVector<Number>::scale(const BlockVector2 &v)
  * exchanges the data of the two vectors.
  *
  * @relatesalso BlockVector
- * @author Wolfgang Bangerth, 2000
  */
 template <typename Number>
 inline void
@@ -530,9 +531,7 @@ namespace internal
 
 
 /**
- * Declare dealii::BlockVector< Number > as serial vector.
- *
- * @author Uwe Koecher, 2017
+ * Declare dealii::BlockVector as serial vector.
  */
 template <typename Number>
 struct is_serial_vector<BlockVector<Number>> : std::true_type

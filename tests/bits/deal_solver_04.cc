@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -31,8 +31,9 @@
 
 #include <typeinfo>
 
-#include "../testmatrix.h"
 #include "../tests.h"
+
+#include "../testmatrix.h"
 
 template <typename SolverType,
           typename MatrixType,
@@ -68,9 +69,8 @@ check_solve(SolverType &         solver,
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(4);
-  deallog.attach(logfile);
 
   GrowingVectorMemory<> mem;
   SolverControl         control(100, 1.e-3);

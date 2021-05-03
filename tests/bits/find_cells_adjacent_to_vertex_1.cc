@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -51,7 +51,7 @@ void check(Triangulation<2> &tria)
 
       for (unsigned c = 0; c < cells.size(); c++)
         {
-          for (unsigned int v = 0; v < GeometryInfo<2>::vertices_per_cell; ++v)
+          for (const unsigned int v : GeometryInfo<2>::vertex_indices())
             deallog << "<" << cells[c]->vertex(v) << "> ";
           deallog << std::endl;
         }

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2019 by the deal.II authors
+// Copyright (C) 2015 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,27 +13,28 @@
 //
 // ---------------------------------------------------------------------
 
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/fe/fe_nedelec_sz.h>
+
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
 // Constructor:
 template <int dim, int spacedim>
-FE_NedelecSZ<dim, spacedim>::FE_NedelecSZ(const unsigned int degree)
+FE_NedelecSZ<dim, spacedim>::FE_NedelecSZ(const unsigned int order)
   : FiniteElement<dim, dim>(
-      FiniteElementData<dim>(get_dpo_vector(degree),
+      FiniteElementData<dim>(get_dpo_vector(order),
                              dim,
-                             degree + 1,
+                             order + 1,
                              FiniteElementData<dim>::Hcurl),
-      std::vector<bool>(compute_num_dofs(degree), true),
-      std::vector<ComponentMask>(compute_num_dofs(degree),
+      std::vector<bool>(compute_num_dofs(order), true),
+      std::vector<ComponentMask>(compute_num_dofs(order),
                                  std::vector<bool>(dim, true)))
 {
   Assert(dim >= 2, ExcImpossibleInDim(dim));
 
-  this->mapping_type = mapping_nedelec;
+  this->mapping_kind = mapping_nedelec;
   // Set up the table converting components to base components. Since we have
   // only one base element, everything remains zero except the component in the
   // base, which is the component itself.
@@ -43,7 +44,7 @@ FE_NedelecSZ<dim, spacedim>::FE_NedelecSZ(const unsigned int degree)
     }
 
   // Generate the 1-D polynomial basis.
-  create_polynomials(degree);
+  create_polynomials(order);
 }
 
 
@@ -121,6 +122,7 @@ FE_NedelecSZ<dim, spacedim>::shape_grad_grad_component(
 }
 
 
+
 template <int dim, int spacedim>
 std::unique_ptr<typename dealii::FiniteElement<dim, spacedim>::InternalDataBase>
 FE_NedelecSZ<dim, spacedim>::get_data(
@@ -133,9 +135,9 @@ FE_NedelecSZ<dim, spacedim>::get_data(
 {
   std::unique_ptr<
     typename dealii::FiniteElement<dim, spacedim>::InternalDataBase>
-        data_ptr   = std_cxx14::make_unique<InternalData>();
+        data_ptr   = std::make_unique<InternalData>();
   auto &data       = dynamic_cast<InternalData &>(*data_ptr);
-  data.update_each = update_each(update_flags) | update_once(update_flags);
+  data.update_each = requires_update_flags(update_flags);
 
   // Useful quantities:
   const unsigned int degree(this->degree - 1); // Note: FE holds input degree+1
@@ -144,8 +146,10 @@ FE_NedelecSZ<dim, spacedim>::get_data(
   const unsigned int lines_per_cell    = GeometryInfo<dim>::lines_per_cell;
   const unsigned int faces_per_cell    = GeometryInfo<dim>::faces_per_cell;
 
-  const unsigned int n_line_dofs = this->dofs_per_line * lines_per_cell;
-  const unsigned int n_face_dofs = this->dofs_per_quad * faces_per_cell;
+  const unsigned int n_line_dofs = this->n_dofs_per_line() * lines_per_cell;
+
+  // we assume that all quads have the same numer of dofs
+  const unsigned int n_face_dofs = this->n_dofs_per_quad(0) * faces_per_cell;
 
   const UpdateFlags  flags(data.update_each);
   const unsigned int n_q_points = quadrature.size();
@@ -163,13 +167,13 @@ FE_NedelecSZ<dim, spacedim>::get_data(
   // Resize shape function arrays according to update flags:
   if (flags & update_values)
     {
-      data.shape_values.resize(this->dofs_per_cell,
+      data.shape_values.resize(this->n_dofs_per_cell(),
                                std::vector<Tensor<1, dim>>(n_q_points));
     }
 
   if (flags & update_gradients)
     {
-      data.shape_grads.resize(this->dofs_per_cell,
+      data.shape_grads.resize(this->n_dofs_per_cell(),
                               std::vector<DerivativeForm<1, dim, dim>>(
                                 n_q_points));
     }
@@ -1100,6 +1104,8 @@ FE_NedelecSZ<dim, spacedim>::get_data(
   return data_ptr;
 }
 
+
+
 template <int dim, int spacedim>
 void
 FE_NedelecSZ<dim, spacedim>::fill_edge_values(
@@ -1124,9 +1130,9 @@ FE_NedelecSZ<dim, spacedim>::fill_edge_values(
   const unsigned int n_q_points = quadrature.size();
 
   Assert(!(flags & update_values) ||
-           fe_data.shape_values.size() == this->dofs_per_cell,
+           fe_data.shape_values.size() == this->n_dofs_per_cell(),
          ExcDimensionMismatch(fe_data.shape_values.size(),
-                              this->dofs_per_cell));
+                              this->n_dofs_per_cell()));
   Assert(!(flags & update_values) ||
            fe_data.shape_values[0].size() == n_q_points,
          ExcDimensionMismatch(fe_data.shape_values[0].size(), n_q_points));
@@ -1247,7 +1253,7 @@ FE_NedelecSZ<dim, spacedim>::fill_edge_values(
 
               for (unsigned int m = 0; m < lines_per_cell; ++m)
                 {
-                  const unsigned int shift_m(m * this->dofs_per_line);
+                  const unsigned int shift_m(m * this->n_dofs_per_line());
                   for (unsigned int q = 0; q < n_q_points; ++q)
                     {
                       // Only compute 1d polynomials if degree>0.
@@ -1436,7 +1442,7 @@ FE_NedelecSZ<dim, spacedim>::fill_edge_values(
                 degree, std::vector<double>(poly_length));
               for (unsigned int m = 0; m < lines_per_cell; ++m)
                 {
-                  const unsigned int shift_m(m * this->dofs_per_line);
+                  const unsigned int shift_m(m * this->n_dofs_per_line());
                   for (unsigned int q = 0; q < n_q_points; ++q)
                     {
                       // precompute values of all 1d polynomials required:
@@ -1525,6 +1531,8 @@ FE_NedelecSZ<dim, spacedim>::fill_edge_values(
     }
 }
 
+
+
 template <int dim, int spacedim>
 void
 FE_NedelecSZ<dim, spacedim>::fill_face_values(
@@ -1559,9 +1567,9 @@ FE_NedelecSZ<dim, spacedim>::fill_face_values(
           const unsigned int n_q_points = quadrature.size();
 
           Assert(!(flags & update_values) ||
-                   fe_data.shape_values.size() == this->dofs_per_cell,
+                   fe_data.shape_values.size() == this->n_dofs_per_cell(),
                  ExcDimensionMismatch(fe_data.shape_values.size(),
-                                      this->dofs_per_cell));
+                                      this->n_dofs_per_cell()));
           Assert(!(flags & update_values) ||
                    fe_data.shape_values[0].size() == n_q_points,
                  ExcDimensionMismatch(fe_data.shape_values[0].size(),
@@ -1574,7 +1582,7 @@ FE_NedelecSZ<dim, spacedim>::fill_face_values(
 
           // DoF info:
           const unsigned int n_line_dofs =
-            this->dofs_per_line * GeometryInfo<dim>::lines_per_cell;
+            this->n_dofs_per_line() * GeometryInfo<dim>::lines_per_cell;
 
           // First we find the global face orientations on the current cell.
           std::vector<std::vector<unsigned int>> face_orientation(
@@ -1689,7 +1697,8 @@ FE_NedelecSZ<dim, spacedim>::fill_face_values(
           // Loop through quad points:
           for (unsigned int m = 0; m < faces_per_cell; ++m)
             {
-              const unsigned int shift_m(m * this->dofs_per_quad);
+              // we assume that all quads have the same numer of dofs
+              const unsigned int shift_m(m * this->n_dofs_per_quad(0));
               // Calculate the offsets for each face-based shape function:
               //
               // Type-1 (gradients)
@@ -1899,6 +1908,8 @@ FE_NedelecSZ<dim, spacedim>::fill_face_values(
     }
 }
 
+
+
 template <int dim, int spacedim>
 void
 FE_NedelecSZ<dim, spacedim>::fill_fe_values(
@@ -1931,9 +1942,9 @@ FE_NedelecSZ<dim, spacedim>::fill_fe_values(
   const unsigned int n_q_points = quadrature.size();
 
   Assert(!(flags & update_values) ||
-           fe_data.shape_values.size() == this->dofs_per_cell,
+           fe_data.shape_values.size() == this->n_dofs_per_cell(),
          ExcDimensionMismatch(fe_data.shape_values.size(),
-                              this->dofs_per_cell));
+                              this->n_dofs_per_cell()));
   Assert(!(flags & update_values) ||
            fe_data.shape_values[0].size() == n_q_points,
          ExcDimensionMismatch(fe_data.shape_values[0].size(), n_q_points));
@@ -1943,7 +1954,7 @@ FE_NedelecSZ<dim, spacedim>::fill_fe_values(
       // Now have all shape_values stored on the reference cell.
       // Must now transform to the physical cell.
       std::vector<Tensor<1, dim>> transformed_shape_values(n_q_points);
-      for (unsigned int dof = 0; dof < this->dofs_per_cell; ++dof)
+      for (unsigned int dof = 0; dof < this->n_dofs_per_cell(); ++dof)
         {
           const unsigned int first =
             data.shape_function_to_row_table[dof * this->n_components() +
@@ -1970,7 +1981,7 @@ FE_NedelecSZ<dim, spacedim>::fill_fe_values(
       // Must now transform to the physical cell.
       std::vector<Tensor<2, dim>> input(n_q_points);
       std::vector<Tensor<2, dim>> transformed_shape_grads(n_q_points);
-      for (unsigned int dof = 0; dof < this->dofs_per_cell; ++dof)
+      for (unsigned int dof = 0; dof < this->n_dofs_per_cell(); ++dof)
         {
           for (unsigned int q = 0; q < n_q_points; ++q)
             {
@@ -2011,12 +2022,14 @@ FE_NedelecSZ<dim, spacedim>::fill_fe_values(
     }
 }
 
+
+
 template <int dim, int spacedim>
 void
 FE_NedelecSZ<dim, spacedim>::fill_fe_face_values(
   const typename Triangulation<dim, dim>::cell_iterator &cell,
   const unsigned int                                     face_no,
-  const Quadrature<dim - 1> &                            quadrature,
+  const hp::QCollection<dim - 1> &                       quadrature,
   const Mapping<dim, dim> &                              mapping,
   const typename Mapping<dim, dim>::InternalDataBase &   mapping_internal,
   const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, dim>
@@ -2025,6 +2038,8 @@ FE_NedelecSZ<dim, spacedim>::fill_fe_face_values(
   dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, dim>
     &data) const
 {
+  AssertDimension(quadrature.size(), 1);
+
   // Note for future improvement:
   // We don't have the full quadrature - should use QProjector to create the 2D
   // quadrature.
@@ -2046,19 +2061,22 @@ FE_NedelecSZ<dim, spacedim>::fill_fe_face_values(
   // This will fill in the missing items in the InternalData
   // (fe_internal/fe_data) which was not filled in by get_data.
   fill_edge_values(cell,
-                   QProjector<dim>::project_to_all_faces(quadrature),
+                   QProjector<dim>::project_to_all_faces(this->reference_cell(),
+                                                         quadrature[0]),
                    fe_data);
   if (dim == 3 && this->degree > 1)
     {
       fill_face_values(cell,
-                       QProjector<dim>::project_to_all_faces(quadrature),
+                       QProjector<dim>::project_to_all_faces(
+                         this->reference_cell(), quadrature[0]),
                        fe_data);
     }
 
   const UpdateFlags  flags(fe_data.update_each);
-  const unsigned int n_q_points = quadrature.size();
-  const typename QProjector<dim>::DataSetDescriptor offset =
-    QProjector<dim>::DataSetDescriptor::face(face_no,
+  const unsigned int n_q_points = quadrature[0].size();
+  const auto         offset =
+    QProjector<dim>::DataSetDescriptor::face(this->reference_cell(),
+                                             face_no,
                                              cell->face_orientation(face_no),
                                              cell->face_flip(face_no),
                                              cell->face_rotation(face_no),
@@ -2069,7 +2087,7 @@ FE_NedelecSZ<dim, spacedim>::fill_fe_face_values(
       // Now have all shape_values stored on the reference cell.
       // Must now transform to the physical cell.
       std::vector<Tensor<1, dim>> transformed_shape_values(n_q_points);
-      for (unsigned int dof = 0; dof < this->dofs_per_cell; ++dof)
+      for (unsigned int dof = 0; dof < this->n_dofs_per_cell(); ++dof)
         {
           mapping.transform(make_array_view(fe_data.shape_values[dof],
                                             offset,
@@ -2099,7 +2117,7 @@ FE_NedelecSZ<dim, spacedim>::fill_fe_face_values(
       // Must now transform to the physical cell.
       std::vector<Tensor<2, dim>> input(n_q_points);
       std::vector<Tensor<2, dim>> transformed_shape_grads(n_q_points);
-      for (unsigned int dof = 0; dof < this->dofs_per_cell; ++dof)
+      for (unsigned int dof = 0; dof < this->n_dofs_per_cell(); ++dof)
         {
           for (unsigned int q = 0; q < n_q_points; ++q)
             {
@@ -2140,6 +2158,8 @@ FE_NedelecSZ<dim, spacedim>::fill_fe_face_values(
     }
 }
 
+
+
 template <int dim, int spacedim>
 void
 FE_NedelecSZ<dim, spacedim>::fill_fe_subface_values(
@@ -2158,30 +2178,12 @@ FE_NedelecSZ<dim, spacedim>::fill_fe_subface_values(
   Assert(false, ExcNotImplemented());
 }
 
+
+
 template <int dim, int spacedim>
 UpdateFlags
 FE_NedelecSZ<dim, spacedim>::requires_update_flags(
   const UpdateFlags flags) const
-{
-  return update_once(flags) | update_each(flags);
-}
-
-template <int dim, int spacedim>
-UpdateFlags
-FE_NedelecSZ<dim, spacedim>::update_once(const UpdateFlags flags) const
-{
-  const bool values_once = (mapping_type == mapping_none);
-
-  UpdateFlags out = update_default;
-  if (values_once && (flags & update_values))
-    out |= update_values;
-
-  return out;
-}
-
-template <int dim, int spacedim>
-UpdateFlags
-FE_NedelecSZ<dim, spacedim>::update_each(const UpdateFlags flags) const
 {
   UpdateFlags out = update_default;
 
@@ -2203,29 +2205,30 @@ FE_NedelecSZ<dim, spacedim>::update_each(const UpdateFlags flags) const
   return out;
 }
 
+
+
 template <int dim, int spacedim>
 std::string
 FE_NedelecSZ<dim, spacedim>::get_name() const
 {
-  // note that the
-  // FETools::get_fe_from_name
-  // function depends on the
-  // particular format of the string
-  // this function returns, so they
-  // have to be kept in synch
-
+  // note that the FETools::get_fe_by_name function depends on the particular
+  // format of the string this function returns, so they have to be kept in sync
   std::ostringstream namebuf;
   namebuf << "FE_NedelecSZ<" << dim << ">(" << this->degree - 1 << ")";
 
   return namebuf.str();
 }
 
+
+
 template <int dim, int spacedim>
 std::unique_ptr<FiniteElement<dim, dim>>
 FE_NedelecSZ<dim, spacedim>::clone() const
 {
-  return std_cxx14::make_unique<FE_NedelecSZ<dim, spacedim>>(*this);
+  return std::make_unique<FE_NedelecSZ<dim, spacedim>>(*this);
 }
+
+
 
 template <int dim, int spacedim>
 std::vector<unsigned int>
@@ -2247,6 +2250,8 @@ FE_NedelecSZ<dim, spacedim>::get_dpo_vector(const unsigned int degree)
     }
   return dpo;
 }
+
+
 
 template <int dim, int spacedim>
 unsigned int
@@ -2270,6 +2275,8 @@ FE_NedelecSZ<dim, spacedim>::compute_num_dofs(const unsigned int degree) const
     }
 }
 
+
+
 template <int dim, int spacedim>
 void
 FE_NedelecSZ<dim, spacedim>::create_polynomials(const unsigned int degree)
@@ -2278,6 +2285,8 @@ FE_NedelecSZ<dim, spacedim>::create_polynomials(const unsigned int degree)
   IntegratedLegendrePolynomials =
     IntegratedLegendreSZ::generate_complete_basis(degree + 1);
 }
+
+
 
 // explicit instantiations
 #include "fe_nedelec_sz.inst"

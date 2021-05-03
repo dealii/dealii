@@ -13,24 +13,19 @@ of optimal mesh refinement for its computation.
 We will not discuss the derivation of these concepts in too great detail, but
 will implement the main ideas in the present example program. For a thorough
 introduction into the general idea, we refer to the seminal work of Becker and
-Rannacher @ref step_14_BR95 "[BR95]",@ref step_14_BR96r "[BR96r]", and the overview article of the same authors in
-Acta Numerica @ref step_14_BR01 "[BR01]"; the first introduces the concept of error
+Rannacher @cite BR95, @cite BR96r, and the overview article of the same authors in
+Acta Numerica @cite BR01; the first introduces the concept of error
 estimation and adaptivity for general functional output for the Laplace
 equation, while the second gives many examples of applications of these
 concepts to a large number of other, more complicated equations. For
 applications to individual types of equations, see also the publications by
-Becker @ref step_14_Bec95 "[Bec95]", @ref step_14_Bec98 "[Bec98]",
-Kanschat @ref step_14_Kan96 "[Kan96]", @ref step_14_FK97 "[FK97]",
-Suttmeier @ref step_14_Sut96 "[Sut96]", @ref step_14_RS97 "[RS97]", @ref step_14_RS98c "[RS98c]",
-@ref step_14_RS99 "[RS99]",
-Bangerth @ref step_14_BR99b "[BR99b]", @ref step_14_Ban00w "[Ban00w]",
-@ref step_14_BR01a "[BR01a]", @ref step_14_Ban02 "[Ban02]", and
-Hartmann @ref step_14_Har02 "[Har02]", @ref step_14_HH01 "[HH01]",
-@ref step_14_HH01b "[HH01b]".
-All of these works, from the original introduction by Becker and Rannacher to
-individual contributions to particular equations, have later been summarized
-in a book by Bangerth and Rannacher that covers all of these topics, see
-@ref step_14_BR03 "[BR03]".
+Becker @cite Bec95, @cite Bec98, Kanschat @cite Kan96, @cite FK97, Suttmeier
+@cite Sut96, @cite RS97, @cite RS98c, @cite RS99, Bangerth @cite BR99b,
+@cite Ban00w, @cite BR01a, @cite Ban02, and Hartmann @cite Har02, @cite HH01,
+@cite HH01b. All of these works, from the original introduction by Becker and
+Rannacher to individual contributions to particular equations, have later been
+summarized in a book by Bangerth and Rannacher that covers all of these topics,
+see @cite BR03.
 
 
 The basic idea is the following: in applications, one is not usually
@@ -173,7 +168,7 @@ compute it with a higher order finite element space. While this is certainly
 not the most efficient way, it is simple since we already have all we need to
 do that in place, and it also allows for simple experimenting. For more
 efficient methods, again refer to the given literature, in particular
-@ref step_14_BR95 "[BR95]", @ref step_14_BR03 "[BR03]".
+@cite BR95, @cite BR03.
 
 With this, we end the discussion of the mathematical side of this program and
 turn to the actual implementation.
@@ -266,177 +261,3 @@ programs, we would kindly like to ask you to state this fact and the name of
 the author of the example program, Wolfgang Bangerth, in publications that
 arise from that, of your program consists in a considerable part of the
 example program.
-
-
-<h3>Bibliography</h3>
-
-<dl>
-
-<dt> @anchor step_14_Ban00w [Ban00w]</dt>
-<dd>Wolfgang Bangerth.
-<br> Mesh adaptivity and error control for a finite element approximation
-  of the elastic wave equation.
-<br> In Alfredo Bermudez, Dolores Gomez, Christophe Hazard, Patrick
-  Joly, and Jean E. Roberts, editors, <em>Proceedings of the Fifth
-  International Conference on Mathematical and Numerical Aspects of Wave
-  Propagation (Waves2000), Santiago de Compostela, Spain, 2000</em>, pages
-  725&ndash;729. SIAM, 2000.
-
-
-
-<dt> @anchor step_14_Ban02 [Ban02]</dt>
-<dd>Wolfgang Bangerth.
-<br> <em>Adaptive Finite Element Methods for the Identification of
-  Distributed Coefficient in Partial Differential Equations</em>.
-<br> PhD thesis, University of Heidelberg, 2002.
-
-
-
-<dt> @anchor step_14_BR99b [BR99b]</dt>
-<dd>Wolfgang Bangerth and Rolf Rannacher.
-<br> Finite element approximation of the acoustic wave equation: Error
-  control and mesh adaptation.
-<br> <em>East&ndash;West J. Numer. Math.</em>, 7(4):263&ndash;282, 1999.
-
-
-
-<dt> @anchor step_14_BR03 [BR03]</dt>
-<dd>Wolfgang Bangerth and Rolf Rannacher.
-<br> <em>Adaptive Finite Element Methods for Differential Equations</em>.
-<br> Birkh&auml;user Verlag, Basel, 2003.
-
-
-
-<dt> @anchor step_14_BR01a [BR01a]</dt>
-<dd>Wolfgang Bangerth and Rolf Rannacher.
-<br> Adaptive finite element techniques for the acoustic wave equation.
-<br> <em>J. Comput. Acoustics</em>, 9(2):575&ndash;591, 2001.
-
-
-
-<dt> @anchor step_14_BR01 [BR01]</dt>
-<dd>Roland Becker and Rolf Rannacher.
-<br> An optimal control approach to error estimation and mesh adaptation
-  in finite element methods.
-<br> <em>Acta Numerica</em>, 10:1&ndash;102, 2001.
-
-
-
-<dt> @anchor step_14_Bec95 [Bec95]</dt>
-<dd>Roland Becker.
-<br> <em>An Adaptive Finite Element Method for the Incompressible
-  Navier-Stokes Equations on Time-dependent Domains</em>.
-<br> Dissertation, Universit&auml;t Heidelberg, 1995.
-
-
-
-<dt> @anchor step_14_Bec98 [Bec98]</dt>
-<dd>Roland Becker.
-<br> Weighted error estimators for finite element approximations of the
-  incompressible Navier-Stokes equations.
-<br> Preprint 98-20, SFB 359, Universit&auml;t Heidelberg, 1998.
-
-
-
-<dt> @anchor step_14_BR96r [BR96r]</dt>
-<dd>Roland Becker and Rolf Rannacher.
-<br> A feed-back approach to error control in finite element methods:
-  Basic analysis and examples.
-<br> <em>East&ndash;West J. Numer. Math.</em>, 4:237&ndash;264, 1996.
-
-
-
-<dt> @anchor step_14_BR95 [BR95]</dt>
-<dd>Roland Becker and Rolf Rannacher.
-<br> Weighted a posteriori error control in FE methods.
-<br> In H. G. Bock et al., ed.s, <em>ENUMATH 95</em>, pages 621&ndash;637,
-  Paris, September 1998. World Scientific Publ., Singapore.
-<br> in @ref step_14_enumath97 "[enumath97]".
-
-
-
-<dt> @anchor step_14_enumath97 [enumath97]</dt>
-<dd>Hans Georg Bock, Franco Brezzi, Roland Glowinsky, Guido Kanschat, Yuri A.
-  Kuznetsov, Jacques Periaux, and Rolf Rannacher, editors.
-<br> <em>ENUMATH 97, Proceedings of the 2nd European Conference on
-  Numerical Mathematics and Advanced Applications</em>, Singapore, 1998. World
-  Scientific.
-
-
-
-<dt> @anchor step_14_FK97 [FK97]</dt>
-<dd>Christian F&uuml;hrer and Guido Kanschat.
-<br> A posteriori error control in radiative transfer.
-<br> <em>Computing</em>, 58(4):317&ndash;334, 1997.
-
-
-
-<dt> @anchor step_14_Har02 [Har02]</dt>
-<dd>Ralf Hartmann.
-<br> <em>Adaptive Finite Element Methods for the Compressible Euler Equations</em>.
-<br> PhD thesis, University of Heidelberg, 2002.
-
-
-
-<dt> @anchor step_14_HH01 [HH01]</dt>
-<dd>Ralf Hartmann and Paul Houston.
-<br> Adaptive discontinuous Galerkin finite element methods for
-  nonlinear hyperbolic conservation laws.
-<br> <em>SIAM J. Sci. Comput.</em>, 24 (2002), pp. 979-1004.
-
-
-
-<dt> @anchor step_14_HH01b [HH01b]</dt>
-<dd>Ralf Hartmann and Paul Houston.
-<br> Adaptive discontinuous Galerkin finite element methods for the
-  compressible Euler equations.
-<br> J. Comput. Phys. 183 (2002), pp. 508-532.
-
-
-
-<dt> @anchor step_14_Kan96 [Kan96]</dt>
-<dd>Guido Kanschat.
-<br> <em>Parallel and Adaptive Galerkin Methods for Radiative Transfer
-  Problems</em>.
-<br> Dissertation, Universit&auml;t Heidelberg, 1996.
-
-
-
-<dt> @anchor step_14_RS97 [RS97]</dt>
-<dd>Rolf Rannacher and Franz-Theo Suttmeier.
-<br> A feed-back approach to error control in finite element methods:
-  Application to linear elasticity.
-<br> <em>Comp. Mech.</em>, 19(5):434&ndash;446, 1997.
-
-
-
-<dt> @anchor step_14_RS98c [RS98c]</dt>
-<dd>Rolf Rannacher and Franz-Theo Suttmeier.
-<br> A posteriori error control in finite element methods via duality
-  techniques: Application to perfect plasticity.
-<br> <em>Comp. Mech.</em>, 21(2):123&ndash;133, 1998.
-
-
-
-<dt> @anchor step_14_RS99 [RS99]</dt>
-<dd>Rolf Rannacher and Franz-Theo Suttmeier.
-<br> A posteriori error control and mesh adaptation for finite element
-  models in elasticity and elasto-plasticity.
-<br> <em>Comput. Methods Appl. Mech. Engrg.</em>, pages 333&ndash;361, 1999.
-
-
-
-<dt> @anchor step_14_Sut96 [Sut96]</dt>
-<dd>Franz-Theo Suttmeier.
-<br> <em>Adaptive Finite Element Approximation of Problems in
-  Elasto-Plasticity Theory</em>.
-<br> Dissertation, Universit&auml;t Heidelberg, 1996.
-
-
-
-</dl>
-
-
-
-
-

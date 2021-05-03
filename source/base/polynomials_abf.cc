@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,6 +19,7 @@
 
 #include <iomanip>
 #include <iostream>
+#include <memory>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -47,21 +48,20 @@ namespace
 
 template <int dim>
 PolynomialsABF<dim>::PolynomialsABF(const unsigned int k)
-  : my_degree(k)
+  : TensorPolynomialsBase<dim>(k, n_polynomials(k))
   , polynomial_space(get_abf_polynomials<dim>(k))
-  , n_pols(compute_n_pols(k))
 {
   // check that the dimensions match. we only store one of the 'dim'
   // anisotropic polynomials that make up the vector-valued space, so
   // multiply by 'dim'
-  Assert(dim * polynomial_space.n() == compute_n_pols(k), ExcInternalError());
+  Assert(dim * polynomial_space.n() == n_polynomials(k), ExcInternalError());
 }
 
 
 
 template <int dim>
 void
-PolynomialsABF<dim>::compute(
+PolynomialsABF<dim>::evaluate(
   const Point<dim> &           unit_point,
   std::vector<Tensor<1, dim>> &values,
   std::vector<Tensor<2, dim>> &grads,
@@ -69,16 +69,17 @@ PolynomialsABF<dim>::compute(
   std::vector<Tensor<4, dim>> &third_derivatives,
   std::vector<Tensor<5, dim>> &fourth_derivatives) const
 {
-  Assert(values.size() == n_pols || values.size() == 0,
-         ExcDimensionMismatch(values.size(), n_pols));
-  Assert(grads.size() == n_pols || grads.size() == 0,
-         ExcDimensionMismatch(grads.size(), n_pols));
-  Assert(grad_grads.size() == n_pols || grad_grads.size() == 0,
-         ExcDimensionMismatch(grad_grads.size(), n_pols));
-  Assert(third_derivatives.size() == n_pols || third_derivatives.size() == 0,
-         ExcDimensionMismatch(third_derivatives.size(), n_pols));
-  Assert(fourth_derivatives.size() == n_pols || fourth_derivatives.size() == 0,
-         ExcDimensionMismatch(fourth_derivatives.size(), n_pols));
+  Assert(values.size() == this->n() || values.size() == 0,
+         ExcDimensionMismatch(values.size(), this->n()));
+  Assert(grads.size() == this->n() || grads.size() == 0,
+         ExcDimensionMismatch(grads.size(), this->n()));
+  Assert(grad_grads.size() == this->n() || grad_grads.size() == 0,
+         ExcDimensionMismatch(grad_grads.size(), this->n()));
+  Assert(third_derivatives.size() == this->n() || third_derivatives.size() == 0,
+         ExcDimensionMismatch(third_derivatives.size(), this->n()));
+  Assert(fourth_derivatives.size() == this->n() ||
+           fourth_derivatives.size() == 0,
+         ExcDimensionMismatch(fourth_derivatives.size(), this->n()));
 
   const unsigned int n_sub = polynomial_space.n();
   // guard access to the scratch
@@ -111,12 +112,12 @@ PolynomialsABF<dim>::compute(
       for (unsigned int c = 0; c < dim; ++c)
         p(c) = unit_point((c + d) % dim);
 
-      polynomial_space.compute(p,
-                               p_values,
-                               p_grads,
-                               p_grad_grads,
-                               p_third_derivatives,
-                               p_fourth_derivatives);
+      polynomial_space.evaluate(p,
+                                p_values,
+                                p_grads,
+                                p_grad_grads,
+                                p_third_derivatives,
+                                p_fourth_derivatives);
 
       for (unsigned int i = 0; i < p_values.size(); ++i)
         values[i + d * n_sub][d] = p_values[i];
@@ -154,7 +155,7 @@ PolynomialsABF<dim>::compute(
 
 template <int dim>
 unsigned int
-PolynomialsABF<dim>::compute_n_pols(const unsigned int k)
+PolynomialsABF<dim>::n_polynomials(const unsigned int k)
 {
   switch (dim)
     {
@@ -177,6 +178,14 @@ PolynomialsABF<dim>::compute_n_pols(const unsigned int k)
     }
 
   return 0;
+}
+
+
+template <int dim>
+std::unique_ptr<TensorPolynomialsBase<dim>>
+PolynomialsABF<dim>::clone() const
+{
+  return std::make_unique<PolynomialsABF<dim>>(*this);
 }
 
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2018 by the deal.II authors
+// Copyright (C) 2012 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -53,8 +53,6 @@
 
 namespace Step37
 {
-  using namespace dealii;
-
   const unsigned int degree_finite_element = 2;
 
 
@@ -218,7 +216,7 @@ namespace Step37
     typename MatrixFree<dim, number>::AdditionalData additional_data;
     additional_data.tasks_parallel_scheme =
       MatrixFree<dim, number>::AdditionalData::partition_color;
-    additional_data.level_mg_handler = level;
+    additional_data.mg_level = level;
     additional_data.mapping_update_flags =
       (update_gradients | update_JxW_values | update_quadrature_points);
     data.reinit(dof_handler,
@@ -235,7 +233,7 @@ namespace Step37
   LaplaceOperator<dim, fe_degree, number>::evaluate_coefficient(
     const Coefficient<dim> &coefficient_function)
   {
-    const unsigned int n_cells = data.n_macro_cells();
+    const unsigned int n_cells = data.n_cell_batches();
     FEEvaluation<dim, fe_degree, fe_degree + 1, 1, number> phi(data);
     coefficient.resize(n_cells * phi.n_q_points);
     for (unsigned int cell = 0; cell < n_cells; ++cell)
@@ -258,18 +256,18 @@ namespace Step37
     const std::pair<unsigned int, unsigned int> &cell_range) const
   {
     FEEvaluation<dim, fe_degree, fe_degree + 1, 1, number> phi(data);
-    AssertDimension(coefficient.size(), data.n_macro_cells() * phi.n_q_points);
+    AssertDimension(coefficient.size(), data.n_cell_batches() * phi.n_q_points);
 
     for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
       {
         phi.reinit(cell);
         phi.read_dof_values(src);
-        phi.evaluate(false, true, false);
+        phi.evaluate(EvaluationFlags::gradients);
         for (unsigned int q = 0; q < phi.n_q_points; ++q)
           phi.submit_gradient(coefficient[cell * phi.n_q_points + q] *
                                 phi.get_gradient(q),
                               q);
-        phi.integrate(false, true);
+        phi.integrate(EvaluationFlags::gradients);
         phi.distribute_local_to_global(dst);
       }
   }
@@ -378,9 +376,9 @@ namespace Step37
     void
     output_results(const unsigned int cycle) const;
 
-    typedef LaplaceOperator<dim, degree_finite_element, double>
-                                                               SystemMatrixType;
-    typedef LaplaceOperator<dim, degree_finite_element, float> LevelMatrixType;
+    using SystemMatrixType =
+      LaplaceOperator<dim, degree_finite_element, double>;
+    using LevelMatrixType = LaplaceOperator<dim, degree_finite_element, float>;
 
     Triangulation<dim>        triangulation;
     FE_Q<dim>                 fe;
@@ -416,7 +414,7 @@ namespace Step37
     mg_constraints.clear_elements();
 
     dof_handler.distribute_dofs(fe);
-    dof_handler.distribute_mg_dofs(fe);
+    dof_handler.distribute_mg_dofs();
 
     deallog << "Number of degrees of freedom: " << dof_handler.n_dofs()
             << std::endl;
@@ -575,12 +573,12 @@ namespace Step37
   LaplaceProblem<dim>::solve()
   {
     MGTransferPrebuilt<Vector<double>> mg_transfer;
-    mg_transfer.build_matrices(dof_handler);
+    mg_transfer.build(dof_handler);
 
     MGCoarseGridHouseholder<float, Vector<double>> mg_coarse;
     mg_coarse.initialize(coarse_matrix);
 
-    typedef PreconditionChebyshev<LevelMatrixType, Vector<double>> SMOOTHER;
+    using SMOOTHER = PreconditionChebyshev<LevelMatrixType, Vector<double>>;
     MGSmootherPrecondition<LevelMatrixType, SMOOTHER, Vector<double>>
       mg_smoother;
 
@@ -593,7 +591,7 @@ namespace Step37
     mg::Matrix<Vector<double>> mg_matrix(mg_matrices);
 
     Multigrid<Vector<double>> mg(
-      dof_handler, mg_matrix, mg_coarse, mg_transfer, mg_smoother, mg_smoother);
+      mg_matrix, mg_coarse, mg_transfer, mg_smoother, mg_smoother);
     PreconditionMG<dim, Vector<double>, MGTransferPrebuilt<Vector<double>>>
       preconditioner(dof_handler, mg, mg_transfer);
 

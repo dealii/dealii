@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -32,9 +32,11 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declaration
+#  ifndef DOXYGEN
 template <int, int>
 class DoFHandler;
-
+#  endif
 
 namespace internal
 {
@@ -111,9 +113,8 @@ namespace internal
        * This class implements the default policy for sequential operations,
        * i.e. for the case where all cells get degrees of freedom.
        */
-      template <class DoFHandlerType>
-      class Sequential : public PolicyBase<DoFHandlerType::dimension,
-                                           DoFHandlerType::space_dimension>
+      template <int dim, int spacedim>
+      class Sequential : public PolicyBase<dim, spacedim>
       {
       public:
         /**
@@ -121,7 +122,7 @@ namespace internal
          * @param dof_handler The DoFHandler object upon which this
          *   policy class is supposed to work.
          */
-        Sequential(DoFHandlerType &dof_handler);
+        Sequential(DoFHandler<dim, spacedim> &dof_handler);
 
         // documentation is inherited
         virtual NumberCache
@@ -146,7 +147,7 @@ namespace internal
         /**
          * The DoFHandler object on which this policy object works.
          */
-        SmartPointer<DoFHandlerType> dof_handler;
+        SmartPointer<DoFHandler<dim, spacedim>> dof_handler;
       };
 
 
@@ -155,9 +156,8 @@ namespace internal
        * This class implements the policy for operations when we use a
        * parallel::shared::Triangulation object.
        */
-      template <class DoFHandlerType>
-      class ParallelShared : public PolicyBase<DoFHandlerType::dimension,
-                                               DoFHandlerType::space_dimension>
+      template <int dim, int spacedim>
+      class ParallelShared : public PolicyBase<dim, spacedim>
       {
       public:
         /**
@@ -165,7 +165,7 @@ namespace internal
          * @param dof_handler The DoFHandler object upon which this
          *   policy class is supposed to work.
          */
-        ParallelShared(DoFHandlerType &dof_handler);
+        ParallelShared(DoFHandler<dim, spacedim> &dof_handler);
 
         /**
          * Distribute degrees of freedom on the object given as first
@@ -207,18 +207,16 @@ namespace internal
         /**
          * The DoFHandler object on which this policy object works.
          */
-        SmartPointer<DoFHandlerType> dof_handler;
+        SmartPointer<DoFHandler<dim, spacedim>> dof_handler;
       };
 
 
       /**
        * This class implements the policy for operations when we use a
-       * parallel::distributed::Triangulation object.
+       * parallel::DistributedTriangulationBase object.
        */
-      template <class DoFHandlerType>
-      class ParallelDistributed
-        : public PolicyBase<DoFHandlerType::dimension,
-                            DoFHandlerType::space_dimension>
+      template <int dim, int spacedim>
+      class ParallelDistributed : public PolicyBase<dim, spacedim>
       {
       public:
         /**
@@ -226,7 +224,7 @@ namespace internal
          * @param dof_handler The DoFHandler object upon which this
          *   policy class is supposed to work.
          */
-        ParallelDistributed(DoFHandlerType &dof_handler);
+        ParallelDistributed(DoFHandler<dim, spacedim> &dof_handler);
 
         // documentation is inherited
         virtual NumberCache
@@ -251,7 +249,7 @@ namespace internal
         /**
          * The DoFHandler object on which this policy object works.
          */
-        SmartPointer<DoFHandlerType> dof_handler;
+        SmartPointer<DoFHandler<dim, spacedim>> dof_handler;
       };
     } // namespace Policy
   }   // namespace DoFHandlerImplementation

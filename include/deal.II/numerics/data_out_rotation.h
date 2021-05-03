@@ -117,7 +117,6 @@ namespace internal
  * class consequently only a single template argument.
  *
  * @ingroup output
- * @author Wolfgang Bangerth, 2000
  */
 template <int dim, typename DoFHandlerType = DoFHandler<dim>>
 class DataOutRotation
@@ -215,6 +214,18 @@ private:
     std::vector<DataOutBase::Patch<dimension + 1, space_dimension + 1>>
       &my_patches);
 };
+
+namespace Legacy
+{
+  /**
+   * The template arguments of the original dealii::DataOutRotation class will
+   * change in a future release. If for some reason, you need a code that is
+   * compatible with deal.II 9.3 and the subsequent release, use this alias
+   * instead.
+   */
+  template <int dim, typename DoFHandlerType = DoFHandler<dim>>
+  using DataOutRotation = dealii::DataOutRotation<dim, DoFHandlerType>;
+} // namespace Legacy
 
 
 DEAL_II_NAMESPACE_CLOSE

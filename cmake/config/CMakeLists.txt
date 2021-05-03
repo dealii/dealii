@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2018 by the deal.II authors
+## Copyright (C) 2012 - 2019 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -150,10 +150,20 @@ CONFIGURE_FILE(
 # For installation:
 #
 
+# Make sure that we only ever record the bundled subdirectory if it is in
+# fact created:
+IF("${DEAL_II_BUNDLED_INCLUDE_DIRS}" STREQUAL "")
+  SET(_installed_bundled "")
+ELSE()
+  SET(_installed_bundled
+    "\${DEAL_II_PATH}/\${DEAL_II_INCLUDE_RELDIR}/deal.II/bundled"
+    )
+ENDIF()
+
 SET(CONFIG_BUILD_DIR FALSE)
 SET(CONFIG_INCLUDE_DIRS
   \${DEAL_II_PATH}/\${DEAL_II_INCLUDE_RELDIR}
-  \${DEAL_II_PATH}/\${DEAL_II_INCLUDE_RELDIR}/deal.II/bundled
+  ${_installed_bundled}
   ${DEAL_II_USER_INCLUDE_DIRS}
   )
 
@@ -185,7 +195,12 @@ SET(_files
   )
 FOREACH(_file ${_files})
   FILE(APPEND ${_file} "\n\n#\n# Feature configuration:\n#\n\n")
-  FILE(APPEND ${_file} "SET(DEAL_II_WITH_CXX11 ON)\n")
+  FILE(APPEND ${_file}
+    "SET(DEAL_II_WITH_CXX11 ON)\n"
+    "SET(DEAL_II_WITH_CXX14 ON)\n"
+    "SET(DEAL_II_WITH_CXX17 ${DEAL_II_HAVE_CXX17})\n"
+    "SET(DEAL_II_WITH_THREADS ON)\n"
+    )
 ENDFOREACH()
 
 GET_CMAKE_PROPERTY(_res VARIABLES)

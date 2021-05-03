@@ -34,10 +34,7 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_refinement.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/fe_system.h>
@@ -436,7 +433,7 @@ namespace Step17
                             update_values | update_gradients |
                               update_quadrature_points | update_JxW_values);
 
-    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
 
     FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
@@ -1001,7 +998,7 @@ namespace Step17
 
 // The <code>main()</code> works the same way as most of the main
 // functions in the other example programs, i.e., it delegates work to
-// the <code>run</code> function of a master object, and only wraps
+// the <code>run</code> function of a managing object, and only wraps
 // everything into some code to catch exceptions:
 int main(int argc, char **argv)
 {

@@ -32,7 +32,7 @@ test(PETScWrappers::MatrixBase &m)
   Assert(m.m() != 0, ExcInternalError());
   Assert(m.n() != 0, ExcInternalError());
 
-  typedef PETScWrappers::MatrixBase::size_type size_type;
+  using size_type = PETScWrappers::MatrixBase::size_type;
 
   // build a tri-diagonal pattern
   double          norm_sqr = 0;

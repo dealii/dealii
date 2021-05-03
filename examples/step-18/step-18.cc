@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2000 - 2019 by the deal.II authors
+ * Copyright (C) 2000 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -40,12 +40,9 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_refinement.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/fe/fe_values.h>
@@ -60,11 +57,6 @@
 // which symmetric tensors of rank 2 and 4 are implemented, as introduced in
 // the introduction:
 #include <deal.II/base/symmetric_tensor.h>
-
-// And a header that implements filters for iterators looping over all
-// cells. We will use this when selecting only those cells for output that are
-// owned by the present process in a %parallel program:
-#include <deal.II/grid/filtered_iterator.h>
 
 // And lastly a header that contains some functions that will help us compute
 // rotaton matrices of the local coordinate systems at specific points in the
@@ -112,8 +104,8 @@ namespace Step18
   // in the form $C_{ijkl} = \mu (\delta_{ik} \delta_{jl} + \delta_{il}
   // \delta_{jk}) + \lambda \delta_{ij} \delta_{kl}$. This tensor maps
   // symmetric tensor of rank 2 to symmetric tensors of rank 2. A function
-  // implementing its creation for given values of the Lame constants $\lambda$
-  // and $\mu$ is straightforward:
+  // implementing its creation for given values of the Lam&eacute; constants
+  // $\lambda$ and $\mu$ is straightforward:
   template <int dim>
   SymmetricTensor<4, dim> get_stress_strain_tensor(const double lambda,
                                                    const double mu)
@@ -134,11 +126,11 @@ namespace Step18
   // tensor. Note that in more elaborate programs, this will probably be a
   // member variable of some class instead, or a function that returns the
   // stress-strain relationship depending on other input. For example in
-  // damage theory models, the Lame constants are considered a function of the
-  // prior stress/strain history of a point. Conversely, in plasticity the
-  // form of the stress-strain tensor is modified if the material has reached
-  // the yield stress in a certain point, and possibly also depending on its
-  // prior history.
+  // damage theory models, the Lam&eacute; constants are considered a function
+  // of the prior stress/strain history of a point. Conversely, in plasticity
+  // the form of the stress-strain tensor is modified if the material has
+  // reached the yield stress in a certain point, and possibly also depending on
+  // its prior history.
   //
   // In the present program, however, we assume that the material is
   // completely elastic and linear, and a constant stress-strain tensor is
@@ -500,19 +492,9 @@ namespace Step18
 
     ConditionalOStream pcout;
 
-    // Here is a vector where each entry denotes the numbers of degrees of
-    // freedom that are stored on the processor with that particular number:
-    std::vector<types::global_dof_index> local_dofs_per_process;
-
     // We are storing the locally owned and the locally relevant indices:
     IndexSet locally_owned_dofs;
     IndexSet locally_relevant_dofs;
-
-    // In the same direction, also cache how many cells the present processor
-    // owns. Note that the cells that belong to a processor are not
-    // necessarily contiguously numbered (when iterating over them using
-    // <code>active_cell_iterator</code>).
-    unsigned int n_local_cells;
 
     // Finally, we have a static variable that denotes the linear relationship
     // between the stress and strain. Since it is a constant object that does
@@ -696,7 +678,7 @@ namespace Step18
 
   // Now for the implementation of the main class. First, we initialize the
   // stress-strain tensor, which we have declared as a static const
-  // variable. We chose Lame constants that are appropriate for steel:
+  // variable. We chose Lam&eacute; constants that are appropriate for steel:
   template <int dim>
   const SymmetricTensor<4, dim> TopLevel<dim>::stress_strain_tensor =
     get_stress_strain_tensor<dim>(/*lambda = */ 9.695e10,
@@ -725,7 +707,6 @@ namespace Step18
     , n_mpi_processes(Utilities::MPI::n_mpi_processes(mpi_communicator))
     , this_mpi_process(Utilities::MPI::this_mpi_process(mpi_communicator))
     , pcout(std::cout, this_mpi_process == 0)
-    , n_local_cells(numbers::invalid_unsigned_int)
   {}
 
 
@@ -774,22 +755,22 @@ namespace Step18
   {
     const double inner_radius = 0.8, outer_radius = 1;
     GridGenerator::cylinder_shell(triangulation, 3, inner_radius, outer_radius);
-    for (auto &cell : triangulation.active_cell_iterators())
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
-        if (cell->face(f)->at_boundary())
+    for (const auto &cell : triangulation.active_cell_iterators())
+      for (const auto &face : cell->face_iterators())
+        if (face->at_boundary())
           {
-            const Point<dim> face_center = cell->face(f)->center();
+            const Point<dim> face_center = face->center();
 
             if (face_center[2] == 0)
-              cell->face(f)->set_boundary_id(0);
+              face->set_boundary_id(0);
             else if (face_center[2] == 3)
-              cell->face(f)->set_boundary_id(1);
+              face->set_boundary_id(1);
             else if (std::sqrt(face_center[0] * face_center[0] +
                                face_center[1] * face_center[1]) <
                      (inner_radius + outer_radius) / 2)
-              cell->face(f)->set_boundary_id(2);
+              face->set_boundary_id(2);
             else
-              cell->face(f)->set_boundary_id(3);
+              face->set_boundary_id(3);
           }
 
     // Once all this is done, we can refine the mesh once globally:
@@ -823,14 +804,6 @@ namespace Step18
     locally_owned_dofs = dof_handler.locally_owned_dofs();
     DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
 
-    // The next thing is to store some information for later use on how many
-    // cells or degrees of freedom the present processor, or any of the
-    // processors has to work on. First the cells local to this processor...
-    n_local_cells = GridTools::count_cells_with_subdomain_association(
-      triangulation, triangulation.locally_owned_subdomain());
-
-    local_dofs_per_process = dof_handler.n_locally_owned_dofs_per_processor();
-
     // The next step is to set up constraints due to hanging nodes. This has
     // been handled many times before:
     hanging_node_constraints.clear();
@@ -860,7 +833,7 @@ namespace Step18
                                     hanging_node_constraints,
                                     /*keep constrained dofs*/ false);
     SparsityTools::distribute_sparsity_pattern(sparsity_pattern,
-                                               local_dofs_per_process,
+                                               locally_owned_dofs,
                                                mpi_communicator,
                                                locally_relevant_dofs);
     // Note that we have used the <code>DynamicSparsityPattern</code> class
@@ -948,7 +921,7 @@ namespace Step18
                             update_values | update_gradients |
                               update_quadrature_points | update_JxW_values);
 
-    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
 
     FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
@@ -1270,66 +1243,31 @@ namespace Step18
     // all these solution and other data vectors:
     data_out.build_patches();
 
-
-    // Let us determine the name of the file we will want to write it to. We
-    // compose it of the prefix <code>solution-</code>, followed by the time
-    // step number, and finally the processor id (encoded as a three digit
-    // number):
-    std::string filename =
-      "solution-" + Utilities::int_to_string(timestep_no, 4) + "." +
-      Utilities::int_to_string(this_mpi_process, 3) + ".vtu";
-
-    // The following assertion makes sure that there are less than 1000
-    // processes (a very conservative check, but worth having anyway) as our
-    // scheme of generating process numbers would overflow if there were 1000
-    // processes or more. Note that we choose to use <code>AssertThrow</code>
-    // rather than <code>Assert</code> since the number of processes is a
-    // variable that depends on input files or the way the process is started,
-    // rather than static assumptions in the program code. Therefore, it is
-    // inappropriate to use <code>Assert</code> that is optimized away in
-    // optimized mode, whereas here we actually can assume that users will run
-    // the largest computations with the most processors in optimized mode,
-    // and we should check our assumptions in this particular case, and not
-    // only when running in debug mode:
-    AssertThrow(n_mpi_processes < 1000, ExcNotImplemented());
-
-    // With the so-completed filename, let us open a file and write the data
-    // we have generated into it:
-    std::ofstream output(filename);
-    data_out.write_vtu(output);
+    // Let us call a function that opens the necessary output files and writes
+    // the data we have generated into them. The function automatically
+    // constructs the file names from the given directory name (the first
+    // argument) and file name base (second argument). It augments the resulting
+    // string by pieces that result from the time step number and a "piece
+    // number" that corresponds to a part of the overall domain that can consist
+    // of one or more subdomains.
+    //
+    // The function also writes a record files (with suffix `.pvd`) for Paraview
+    // that describes how all of these output files combine into the data for
+    // this single time step:
+    const std::string pvtu_filename = data_out.write_vtu_with_pvtu_record(
+      "./", "solution", timestep_no, mpi_communicator, 4);
 
     // The record files must be written only once and not by each processor,
     // so we do this on processor 0:
     if (this_mpi_process == 0)
       {
-        // Here we collect all filenames of the current timestep (same format as
-        // above)
-        std::vector<std::string> filenames;
-        for (unsigned int i = 0; i < n_mpi_processes; ++i)
-          filenames.push_back("solution-" +
-                              Utilities::int_to_string(timestep_no, 4) + "." +
-                              Utilities::int_to_string(i, 3) + ".vtu");
-
-        // Now we write the .visit file. The naming is similar to the .vtu
-        // files, only that the file obviously doesn't contain a processor id.
-        const std::string visit_master_filename =
-          ("solution-" + Utilities::int_to_string(timestep_no, 4) + ".visit");
-        std::ofstream visit_master(visit_master_filename);
-        DataOutBase::write_visit_record(visit_master, filenames);
-
-        // Similarly, we write the paraview .pvtu:
-        const std::string pvtu_master_filename =
-          ("solution-" + Utilities::int_to_string(timestep_no, 4) + ".pvtu");
-        std::ofstream pvtu_master(pvtu_master_filename);
-        data_out.write_pvtu_record(pvtu_master, filenames);
-
         // Finally, we write the paraview record, that references all .pvtu
         // files and their respective time. Note that the variable
         // times_and_names is declared static, so it will retain the entries
         // from the previous timesteps.
         static std::vector<std::pair<double, std::string>> times_and_names;
         times_and_names.push_back(
-          std::pair<double, std::string>(present_time, pvtu_master_filename));
+          std::pair<double, std::string>(present_time, pvtu_filename));
         std::ofstream pvd_output("solution.pvd");
         DataOutBase::write_pvd_record(pvd_output, times_and_names);
       }
@@ -1522,7 +1460,7 @@ namespace Step18
   // In this context, it is instructive to point out what a more general way
   // would be. For general finite elements, the way to go would be to take a
   // quadrature formula with the quadrature points in the vertices of a
-  // cell. The <code>QTrapez</code> formula for the trapezoidal rule does
+  // cell. The <code>QTrapezoid</code> formula for the trapezoidal rule does
   // exactly this. With this quadrature formula, we would then initialize an
   // <code>FEValues</code> object in each cell, and use the
   // <code>FEValues::get_function_values</code> function to obtain the values
@@ -1541,7 +1479,7 @@ namespace Step18
   // points, see @ref GlossSupport "support points"). For such a case, one
   // could construct a custom quadrature rule using
   // FiniteElement::get_unit_support_points(). The first
-  // <code>GeometryInfo@<dim@>::vertices_per_cell*fe.dofs_per_vertex</code>
+  // <code>cell-&gt;n_vertices()*fe.dofs_per_vertex</code>
   // quadrature points will then correspond to the vertices of the cell and
   // are ordered consistent with <code>cell-@>vertex(i)</code>, taking into
   // account that support points for vector elements will be duplicated
@@ -1574,7 +1512,7 @@ namespace Step18
 
     std::vector<bool> vertex_touched(triangulation.n_vertices(), false);
     for (auto &cell : dof_handler.active_cell_iterators())
-      for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+      for (const auto v : cell->vertex_indices())
         if (vertex_touched[cell->vertex_index(v)] == false)
           {
             vertex_touched[cell->vertex_index(v)] = true;

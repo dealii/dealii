@@ -90,7 +90,7 @@ template <int dim, int spacedim>
 void
 test()
 {
-  typedef parallel::distributed::Triangulation<dim, spacedim> TriaType;
+  using TriaType = parallel::distributed::Triangulation<dim, spacedim>;
 
   {
     const std::string prefix = Utilities::int_to_string(dim, 1) + "d-" +

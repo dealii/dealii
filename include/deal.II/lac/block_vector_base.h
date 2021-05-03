@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -32,6 +32,7 @@
 #include <cmath>
 #include <cstddef>
 #include <iterator>
+#include <type_traits>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -41,9 +42,11 @@ DEAL_II_NAMESPACE_OPEN
  *@{
  */
 
+// Forward declaration
+#ifndef DOXYGEN
 template <typename>
 class BlockVectorBase;
-
+#endif
 
 /**
  * A class that can be used to determine whether a given type is a block
@@ -58,35 +61,24 @@ class BlockVectorBase;
  * is true. This is sometimes useful in template contexts where we may want to
  * do things differently depending on whether a template type denotes a
  * regular or a block vector type.
- *
- * @author Wolfgang Bangerth, 2010
  */
 template <typename VectorType>
 struct IsBlockVector
 {
 private:
-  struct yes_type
-  {
-    char c[1];
-  };
-  struct no_type
-  {
-    char c[2];
-  };
-
   /**
    * Overload returning true if the class is derived from BlockVectorBase,
    * which is what block vectors do.
    */
   template <typename T>
-  static yes_type
+  static std::true_type
   check_for_block_vector(const BlockVectorBase<T> *);
 
   /**
    * Catch all for all other potential vector types that are not block
    * matrices.
    */
-  static no_type
+  static std::false_type
   check_for_block_vector(...);
 
 public:
@@ -96,8 +88,8 @@ public:
    * derived from BlockVectorBase<T>).
    */
   static const bool value =
-    (sizeof(check_for_block_vector(static_cast<VectorType *>(nullptr))) ==
-     sizeof(yes_type));
+    std::is_same<decltype(check_for_block_vector(std::declval<VectorType *>())),
+                 std::true_type>::value;
 };
 
 
@@ -111,8 +103,6 @@ namespace internal
 {
   /**
    * Namespace in which iterators in block vectors are implemented.
-   *
-   * @author Wolfgang Bangerth, 2001
    */
   namespace BlockVectorIterators
   {
@@ -130,8 +120,6 @@ namespace internal
      * does rarely change dynamically within an application, this is a
      * constant and we again have that the iterator satisfies the requirements
      * of a random access iterator.
-     *
-     * @author Wolfgang Bangerth, 2001
      */
     template <class BlockVectorType, bool Constness>
     class Iterator
@@ -398,10 +386,7 @@ namespace internal
       void
       move_backward();
 
-
-      /**
-       * Mark all other instances of this template as friends.
-       */
+      // Mark all other instances of this template as friends.
       template <typename, bool>
       friend class Iterator;
     };
@@ -445,7 +430,6 @@ namespace internal
  *
  * @see
  * @ref GlossBlockLA "Block (linear algebra)"
- * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2000, 2001, 2002, 2004
  */
 template <class VectorType>
 class BlockVectorBase : public Subscriptor
@@ -559,6 +543,14 @@ public:
    */
   std::size_t
   size() const;
+
+  /**
+   * Return local dimension of the vector. This is the sum of the local
+   * dimensions (i.e., values stored on the current processor) of all
+   * components.
+   */
+  std::size_t
+  locally_owned_size() const;
 
   /**
    * Return an index set that describes which elements of this vector are
@@ -937,15 +929,6 @@ public:
   equ(const value_type a, const BlockVector2 &V);
 
   /**
-   * U=a*V+b*W. Replacing by sum.
-   */
-  void
-  equ(const value_type       a,
-      const BlockVectorBase &V,
-      const value_type       b,
-      const BlockVectorBase &W);
-
-  /**
    * Update the ghost values by calling <code>update_ghost_values</code> for
    * each block.
    */
@@ -971,9 +954,7 @@ protected:
    */
   BlockIndices block_indices;
 
-  /**
-   * Make the iterator class a friend.
-   */
+  // Make the iterator class a friend.
   template <typename N, bool C>
   friend class dealii::internal::BlockVectorIterators::Iterator;
 
@@ -1458,6 +1439,18 @@ BlockVectorBase<VectorType>::size() const
 
 
 template <class VectorType>
+inline std::size_t
+BlockVectorBase<VectorType>::locally_owned_size() const
+{
+  std::size_t local_size = 0;
+  for (unsigned int b = 0; b < n_blocks(); ++b)
+    local_size += block(b).locally_owned_size();
+  return local_size;
+}
+
+
+
+template <class VectorType>
 inline IndexSet
 BlockVectorBase<VectorType>::locally_owned_elements() const
 {
@@ -1490,7 +1483,7 @@ template <class VectorType>
 inline typename BlockVectorBase<VectorType>::BlockType &
 BlockVectorBase<VectorType>::block(const unsigned int i)
 {
-  Assert(i < n_blocks(), ExcIndexRange(i, 0, n_blocks()));
+  AssertIndexRange(i, n_blocks());
 
   return components[i];
 }
@@ -1501,7 +1494,7 @@ template <class VectorType>
 inline const typename BlockVectorBase<VectorType>::BlockType &
 BlockVectorBase<VectorType>::block(const unsigned int i) const
 {
-  Assert(i < n_blocks(), ExcIndexRange(i, 0, n_blocks()));
+  AssertIndexRange(i, n_blocks());
 
   return components[i];
 }
@@ -1952,29 +1945,6 @@ BlockVectorBase<VectorType>::scale(const BlockVector2 &v)
 
 
 template <class VectorType>
-void
-BlockVectorBase<VectorType>::equ(const value_type                   a,
-                                 const BlockVectorBase<VectorType> &v,
-                                 const value_type                   b,
-                                 const BlockVectorBase<VectorType> &w)
-{
-  AssertIsFinite(a);
-  AssertIsFinite(b);
-
-  Assert(n_blocks() == v.n_blocks(),
-         ExcDimensionMismatch(n_blocks(), v.n_blocks()));
-  Assert(n_blocks() == w.n_blocks(),
-         ExcDimensionMismatch(n_blocks(), w.n_blocks()));
-
-  for (size_type i = 0; i < n_blocks(); ++i)
-    {
-      components[i].equ(a, v.components[i], b, w.components[i]);
-    }
-}
-
-
-
-template <class VectorType>
 std::size_t
 BlockVectorBase<VectorType>::memory_consumption() const
 {
@@ -2105,8 +2075,10 @@ BlockVectorBase<VectorType>::operator/=(const value_type factor)
   AssertIsFinite(factor);
   Assert(factor != 0., ExcDivideByZero());
 
+  const value_type inverse_factor = value_type(1.) / factor;
+
   for (size_type i = 0; i < n_blocks(); ++i)
-    components[i] /= factor;
+    components[i] *= inverse_factor;
 
   return *this;
 }

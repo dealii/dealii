@@ -1,0 +1,59 @@
+
+DEAL::face: 0.500000 0.00000 boundary id: 2
+DEAL::face: 0.00000 0.500000 boundary id: 0
+DEAL::face: 1.50000 0.00000 boundary id: 2
+DEAL::face: 0.00000 1.50000 boundary id: 0
+DEAL::face: 2.00000 0.500000 boundary id: 1
+DEAL::face: 2.00000 1.50000 boundary id: 1
+DEAL::face: 0.500000 2.00000 boundary id: 3
+DEAL::face: 1.50000 2.00000 boundary id: 3
+DEAL::face: 0.500000 0.00000 0.500000 boundary id: 2
+DEAL::line: 0.500000 0.00000 0.00000 boundary id: 0
+DEAL::line: 0.500000 0.00000 1.00000 boundary id: 0
+DEAL::line: 0.00000 0.00000 0.500000 boundary id: 0
+DEAL::line: 1.00000 0.00000 0.500000 boundary id: 0
+DEAL::face: 0.500000 0.500000 0.00000 boundary id: 4
+DEAL::line: 0.00000 0.500000 0.00000 boundary id: 0
+DEAL::line: 1.00000 0.500000 0.00000 boundary id: 0
+DEAL::line: 0.500000 0.00000 0.00000 boundary id: 0
+DEAL::line: 0.500000 1.00000 0.00000 boundary id: 0
+DEAL::face: 0.00000 0.500000 0.500000 boundary id: 0
+DEAL::line: 0.00000 0.00000 0.500000 boundary id: 0
+DEAL::line: 0.00000 1.00000 0.500000 boundary id: 0
+DEAL::line: 0.00000 0.500000 0.00000 boundary id: 0
+DEAL::line: 0.00000 0.500000 1.00000 boundary id: 0
+DEAL::face: 1.50000 0.500000 0.00000 boundary id: 4
+DEAL::line: 1.00000 0.500000 0.00000 boundary id: 0
+DEAL::line: 2.00000 0.500000 0.00000 boundary id: 0
+DEAL::line: 1.50000 0.00000 0.00000 boundary id: 0
+DEAL::line: 1.50000 1.00000 0.00000 boundary id: 0
+DEAL::face: 1.50000 0.00000 0.500000 boundary id: 2
+DEAL::line: 1.50000 0.00000 0.00000 boundary id: 0
+DEAL::line: 1.50000 0.00000 1.00000 boundary id: 0
+DEAL::line: 1.00000 0.00000 0.500000 boundary id: 0
+DEAL::line: 2.00000 0.00000 0.500000 boundary id: 0
+DEAL::face: 0.500000 1.00000 0.500000 boundary id: 3
+DEAL::line: 0.500000 1.00000 0.00000 boundary id: 0
+DEAL::line: 0.500000 1.00000 1.00000 boundary id: 0
+DEAL::line: 0.00000 1.00000 0.500000 boundary id: 0
+DEAL::line: 1.00000 1.00000 0.500000 boundary id: 0
+DEAL::face: 1.50000 1.00000 0.500000 boundary id: 3
+DEAL::line: 1.50000 1.00000 0.00000 boundary id: 0
+DEAL::line: 1.50000 1.00000 1.00000 boundary id: 0
+DEAL::line: 1.00000 1.00000 0.500000 boundary id: 0
+DEAL::line: 2.00000 1.00000 0.500000 boundary id: 0
+DEAL::face: 0.500000 0.500000 1.00000 boundary id: 5
+DEAL::line: 0.00000 0.500000 1.00000 boundary id: 0
+DEAL::line: 1.00000 0.500000 1.00000 boundary id: 0
+DEAL::line: 0.500000 0.00000 1.00000 boundary id: 0
+DEAL::line: 0.500000 1.00000 1.00000 boundary id: 0
+DEAL::face: 1.50000 0.500000 1.00000 boundary id: 5
+DEAL::line: 1.00000 0.500000 1.00000 boundary id: 0
+DEAL::line: 2.00000 0.500000 1.00000 boundary id: 0
+DEAL::line: 1.50000 0.00000 1.00000 boundary id: 0
+DEAL::line: 1.50000 1.00000 1.00000 boundary id: 0
+DEAL::face: 2.00000 0.500000 0.500000 boundary id: 1
+DEAL::line: 2.00000 0.00000 0.500000 boundary id: 0
+DEAL::line: 2.00000 1.00000 0.500000 boundary id: 0
+DEAL::line: 2.00000 0.500000 0.00000 boundary id: 0
+DEAL::line: 2.00000 0.500000 1.00000 boundary id: 0

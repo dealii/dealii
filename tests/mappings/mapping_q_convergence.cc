@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,7 +15,6 @@
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/dofs/dof_handler.h>
 
@@ -35,6 +34,8 @@
 
 #include <deal.II/numerics/vector_tools.h>
 
+#include <memory>
+
 #include "../tests.h"
 
 // Test that we achieve the correct rates of convergence with MappingQ when
@@ -49,7 +50,6 @@
 // In addition to checking the L2 errors of a projection, this test also
 // verifies that there is no loss in convergence order.
 
-using namespace dealii;
 // Like FESeries::linear_regression. Included here so that this test can also
 // be run with older versions of deal.II.
 double
@@ -156,7 +156,7 @@ template <int dim>
 std::unique_ptr<Manifold<dim>>
 Geometry<dim>::clone() const
 {
-  return std_cxx14::make_unique<Geometry<dim>>();
+  return std::make_unique<Geometry<dim>>();
 }
 
 
@@ -208,7 +208,7 @@ test(const FiniteElement<dim> &fe)
       deallog << "mapping order: " << mapping_p << std::endl;
       Triangulation<dim> triangulation;
       create_tria(triangulation, geometry);
-      DoFHandler<dim> dof_handler;
+      DoFHandler<dim> dof_handler(triangulation);
 
       std::vector<double> log_refinements;
       std::vector<double> log_l2_errors;
@@ -218,7 +218,7 @@ test(const FiniteElement<dim> &fe)
         {
           triangulation.refine_global(1);
           dof_handler.clear();
-          dof_handler.initialize(triangulation, fe);
+          dof_handler.distribute_dofs(fe);
 
           Vector<double> v(dof_handler.n_dofs());
           VectorTools::project(mapping,

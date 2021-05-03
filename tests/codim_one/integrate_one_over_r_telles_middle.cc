@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,7 +30,6 @@
 #include "../base/simplex.h"
 
 using namespace std;
-using namespace dealii;
 
 // We test the integration of singular kernels with a singularity of kind 1/R
 // We multiply this function with a polynomial up to degree 6.

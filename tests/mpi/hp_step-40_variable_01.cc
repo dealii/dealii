@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,6 +30,7 @@
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
@@ -39,7 +40,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/fe_values.h>
 
@@ -64,9 +64,6 @@
 
 namespace Step40
 {
-  using namespace dealii;
-
-
   template <int dim>
   class LaplaceProblem
   {
@@ -91,7 +88,7 @@ namespace Step40
 
     parallel::distributed::Triangulation<dim> triangulation;
 
-    hp::DoFHandler<dim>   dof_handler;
+    DoFHandler<dim>       dof_handler;
     hp::FECollection<dim> fe;
 
     IndexSet locally_owned_dofs;
@@ -167,16 +164,18 @@ namespace Step40
                                dof_handler.n_dofs(),
                                locally_relevant_dofs);
     DoFTools::make_sparsity_pattern(dof_handler, csp, constraints, false);
-    SparsityTools::distribute_sparsity_pattern(
-      csp,
-      dof_handler.n_locally_owned_dofs_per_processor(),
+    SparsityTools::distribute_sparsity_pattern(csp,
+                                               locally_owned_dofs,
+                                               mpi_communicator,
+                                               locally_relevant_dofs);
+    system_matrix.reinit(
       mpi_communicator,
-      locally_relevant_dofs);
-    system_matrix.reinit(mpi_communicator,
-                         csp,
-                         dof_handler.n_locally_owned_dofs_per_processor(),
-                         dof_handler.n_locally_owned_dofs_per_processor(),
-                         Utilities::MPI::this_mpi_process(mpi_communicator));
+      csp,
+      Utilities::MPI::all_gather(MPI_COMM_WORLD,
+                                 dof_handler.n_locally_owned_dofs()),
+      Utilities::MPI::all_gather(MPI_COMM_WORLD,
+                                 dof_handler.n_locally_owned_dofs()),
+      Utilities::MPI::this_mpi_process(mpi_communicator));
   }
 
 
@@ -200,9 +199,9 @@ namespace Step40
 
     std::vector<types::global_dof_index> local_dof_indices;
 
-    typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                                .begin_active(),
-                                                       endc = dof_handler.end();
+    typename DoFHandler<dim>::active_cell_iterator cell =
+                                                     dof_handler.begin_active(),
+                                                   endc = dof_handler.end();
     for (; cell != endc; ++cell)
       if (cell->is_locally_owned())
         {
@@ -331,11 +330,14 @@ namespace Step40
         pcout << "   Number of active cells:       "
               << triangulation.n_global_active_cells() << std::endl
               << "      ";
+        const auto n_locally_owned_active_cells_per_processor =
+          Utilities::MPI::all_gather(
+            triangulation.get_communicator(),
+            triangulation.n_locally_owned_active_cells());
         for (unsigned int i = 0;
              i < Utilities::MPI::n_mpi_processes(mpi_communicator);
              ++i)
-          pcout << triangulation.n_locally_owned_active_cells_per_processor()[i]
-                << '+';
+          pcout << n_locally_owned_active_cells_per_processor[i] << '+';
         pcout << std::endl;
 
         pcout << "   Number of degrees of freedom: " << dof_handler.n_dofs()
@@ -344,7 +346,9 @@ namespace Step40
         for (unsigned int i = 0;
              i < Utilities::MPI::n_mpi_processes(mpi_communicator);
              ++i)
-          pcout << dof_handler.n_locally_owned_dofs_per_processor()[i] << '+';
+          pcout << Utilities::MPI::all_gather(
+                     MPI_COMM_WORLD, dof_handler.n_locally_owned_dofs())[i]
+                << '+';
         pcout << std::endl;
 
         assemble_system();
@@ -361,7 +365,6 @@ test_mpi()
 {
   try
     {
-      using namespace dealii;
       using namespace Step40;
 
 

@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2014 by the deal.II authors
+## Copyright (C) 2012 - 2019 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -65,12 +65,12 @@ DEAL_II_FIND_PATH(TBB_INCLUDE_DIR tbb/tbb_stddef.h
 IF(EXISTS ${TBB_INCLUDE_DIR}/tbb/tbb_stddef.h)
   FILE(STRINGS "${TBB_INCLUDE_DIR}/tbb/tbb_stddef.h" TBB_VERSION_MAJOR_STRING
     REGEX "#define.*TBB_VERSION_MAJOR")
-  STRING(REGEX REPLACE "^.*TBB_VERSION_MAJOR.*([0-9]+).*" "\\1"
+  STRING(REGEX REPLACE "^.*TBB_VERSION_MAJOR +([0-9]+).*" "\\1"
     TBB_VERSION_MAJOR "${TBB_VERSION_MAJOR_STRING}"
     )
   FILE(STRINGS "${TBB_INCLUDE_DIR}/tbb/tbb_stddef.h" TBB_VERSION_MINOR_STRING
     REGEX "#define.*TBB_VERSION_MINOR")
-  STRING(REGEX REPLACE "^.*TBB_VERSION_MINOR.*([0-9]+).*" "\\1"
+  STRING(REGEX REPLACE "^.*TBB_VERSION_MINOR +([0-9]+).*" "\\1"
     TBB_VERSION_MINOR "${TBB_VERSION_MINOR_STRING}"
     )
   SET(TBB_VERSION

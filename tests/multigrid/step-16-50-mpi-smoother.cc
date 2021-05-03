@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2016 - 2018 by the deal.II authors
+ * Copyright (C) 2016 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -16,7 +16,7 @@
 
 // Same as step-16-50, but use Jacobi smoother at the coarsest grid via
 // MGCoarseGridApplySmoother. In this particular case, the number of iterations
-// until convergence is exactly the same as for MGCoarseGridLACIteration.
+// until convergence is exactly the same as for MGCoarseGridIterativeSolver.
 
 #include <deal.II/base/conditional_ostream.h>
 #include <deal.II/base/function.h>
@@ -79,10 +79,6 @@ namespace LA
 
 namespace Step50
 {
-  using namespace dealii;
-
-
-
   template <int dim>
   class LaplaceProblem
   {
@@ -107,8 +103,8 @@ namespace Step50
     FE_Q<dim>                                 fe;
     DoFHandler<dim>                           mg_dof_handler;
 
-    typedef LA::MPI::SparseMatrix matrix_t;
-    typedef LA::MPI::Vector       vector_t;
+    using matrix_t = LA::MPI::SparseMatrix;
+    using vector_t = LA::MPI::Vector;
 
     matrix_t system_matrix;
 
@@ -196,7 +192,7 @@ namespace Step50
   LaplaceProblem<dim>::setup_system()
   {
     mg_dof_handler.distribute_dofs(fe);
-    mg_dof_handler.distribute_mg_dofs(fe);
+    mg_dof_handler.distribute_mg_dofs();
 
     DoFTools::extract_locally_relevant_dofs(mg_dof_handler,
                                             locally_relevant_set);
@@ -225,8 +221,8 @@ namespace Step50
 
 
     mg_constrained_dofs.clear();
-    mg_constrained_dofs.initialize(mg_dof_handler, dirichlet_boundary);
-
+    mg_constrained_dofs.initialize(mg_dof_handler);
+    mg_constrained_dofs.make_zero_boundary_constraints(mg_dof_handler, {0});
 
     const unsigned int n_levels = triangulation.n_global_levels();
 
@@ -439,10 +435,10 @@ namespace Step50
   LaplaceProblem<dim>::solve()
   {
     MGTransferPrebuilt<vector_t> mg_transfer(mg_constrained_dofs);
-    mg_transfer.build_matrices(mg_dof_handler);
+    mg_transfer.build(mg_dof_handler);
 
     // pre and post smoothers:
-    typedef LA::MPI::PreconditionJacobi                  Smoother;
+    using Smoother = LA::MPI::PreconditionJacobi;
     MGSmootherPrecondition<matrix_t, Smoother, vector_t> mg_smoother;
     mg_smoother.initialize(mg_matrices, Smoother::AdditionalData(0.5));
     mg_smoother.set_steps(2);
@@ -461,12 +457,8 @@ namespace Step50
     mg::Matrix<vector_t> mg_interface_up(mg_interface_matrices);
     mg::Matrix<vector_t> mg_interface_down(mg_interface_matrices);
 
-    Multigrid<vector_t> mg(mg_dof_handler,
-                           mg_matrix,
-                           coarse_grid_solver,
-                           mg_transfer,
-                           mg_smoother,
-                           mg_smoother);
+    Multigrid<vector_t> mg(
+      mg_matrix, coarse_grid_solver, mg_transfer, mg_smoother, mg_smoother);
     mg.set_edge_matrices(mg_interface_down, mg_interface_up);
 
     PreconditionMG<dim, vector_t, MGTransferPrebuilt<vector_t>> preconditioner(
@@ -567,7 +559,6 @@ main(int argc, char *argv[])
 
   try
     {
-      using namespace dealii;
       using namespace Step50;
 
       LaplaceProblem<2> laplace_problem(1 /*degree*/);

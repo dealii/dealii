@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2018 by the deal.II authors
+// Copyright (C) 1999 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -141,6 +141,18 @@ PersistentTriangulation<dim, spacedim>::create_triangulation(
   const SubCellData &)
 {
   Assert(false, ExcImpossibleInDim(dim));
+}
+
+
+
+template <int dim, int spacedim>
+void
+PersistentTriangulation<dim, spacedim>::create_triangulation(
+  const TriangulationDescription::Description<dim, spacedim> &construction_data)
+{
+  (void)construction_data;
+
+  Assert(false, ExcInternalError());
 }
 
 

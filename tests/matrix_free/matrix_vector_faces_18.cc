@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -29,8 +29,6 @@
 #include <deal.II/lac/la_parallel_vector.h>
 
 #include "../tests.h"
-
-std::ofstream logfile("output");
 
 #include "matrix_vector_faces_common.h"
 
@@ -117,7 +115,7 @@ test()
            triangulation.begin();
          cell != triangulation.end();
          ++cell)
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+      for (const unsigned int f : GeometryInfo<dim>::face_indices())
         if (cell->face(f)->at_boundary())
           {
             if (std::abs(cell->face(f)->center()[2]) < 1e-12)

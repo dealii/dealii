@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2018 by the deal.II authors
+// Copyright (C) 2010 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -45,7 +45,7 @@ namespace dealii
                                                          c2 = t2.begin();
     for (; (c1 != t1.end()) && (c2 != t2.end()); ++c1, ++c2)
       {
-        for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+        for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
           {
             if (c1->vertex(v) != c2->vertex(v))
               return false;
@@ -53,7 +53,7 @@ namespace dealii
               return false;
           }
 
-        for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+        for (const unsigned int f : GeometryInfo<dim>::face_indices())
           {
             if (c1->face(f)->at_boundary() != c2->face(f)->at_boundary())
               return false;
@@ -75,7 +75,7 @@ namespace dealii
               }
           }
 
-        if (c1->active() && c2->active() &&
+        if (c1->is_active() && c2->is_active() &&
             (c1->subdomain_id() != c2->subdomain_id()))
           return false;
 
@@ -94,7 +94,7 @@ namespace dealii
         if (c1->manifold_id() != c2->manifold_id())
           return false;
 
-        if (c1->active() && c2->active())
+        if (c1->is_active() && c2->is_active())
           if (c1->active_cell_index() != c2->active_cell_index())
             return false;
 
@@ -126,7 +126,7 @@ do_boundary(Triangulation<dim, spacedim> &t1)
 {
   typename Triangulation<dim, spacedim>::cell_iterator c1 = t1.begin();
   for (; c1 != t1.end(); ++c1)
-    for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+    for (const unsigned int f : GeometryInfo<dim>::face_indices())
       if (c1->at_boundary(f))
         {
           c1->face(f)->set_boundary_id(42);

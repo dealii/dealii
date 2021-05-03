@@ -27,10 +27,11 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-// Forward declarations
+// Forward declaration
+#ifndef DOXYGEN
 template <typename Iterator>
 class IteratorOverIterators;
-
+#endif
 
 
 /**
@@ -52,7 +53,7 @@ class IteratorOverIterators;
  * @code
  *   Triangulation<dim> triangulation;
  *   ...
- *   for (auto & cell : triangulation.active_cell_iterators())
+ *   for (auto &cell : triangulation.active_cell_iterators())
  *     cell->set_user_flag();
  * @endcode
  * In other words, the <code>cell</code> objects are iterators, and the range
@@ -122,7 +123,6 @@ class IteratorOverIterators;
  * class.
  *
  * @ingroup CPP11
- * @author Wolfgang Bangerth, 2014
  */
 template <typename Iterator>
 class IteratorRange
@@ -287,8 +287,6 @@ private:
 /**
  * Create an object of type IteratorRange given the beginning and
  * end iterator.
- *
- * @author Jean-Paul Pelteret, 2019
  */
 template <typename BaseIterator>
 IteratorRange<BaseIterator>

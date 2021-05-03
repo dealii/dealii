@@ -1,0 +1,8 @@
+New: There are now versions of the constructors of the
+Functions::InterpolatedTensorProductGridData and
+Functions::InterpolatedUniformGridData classes
+that *move* the data in the arguments given,
+instead of copying it.
+<br>
+(Wolfgang Bangerth, 2021/04/19)
+

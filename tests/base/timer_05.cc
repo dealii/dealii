@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -76,15 +76,11 @@ test_timer(Timer &t)
   AssertThrow(old_wall_time > 0., ExcInternalError());
   const double old_cpu_time = t.cpu_time();
   AssertThrow(old_cpu_time > 0., ExcInternalError());
-  assert_min_max_avg_invalid(t.get_data());
-  assert_min_max_avg_invalid(t.get_total_data());
   assert_min_max_avg_invalid(t.get_last_lap_wall_time_data());
   assert_min_max_avg_invalid(t.get_accumulated_wall_time_data());
 
   burn(50);
   AssertThrow(t.stop() > 0., ExcInternalError());
-  assert_min_max_avg_valid(t.get_data());
-  assert_min_max_avg_valid(t.get_total_data());
   assert_min_max_avg_valid(t.get_last_lap_wall_time_data());
   assert_min_max_avg_valid(t.get_accumulated_wall_time_data());
 
@@ -96,8 +92,6 @@ test_timer(Timer &t)
   t.reset();
   AssertThrow(t.wall_time() == 0., ExcInternalError());
   AssertThrow(t.cpu_time() == 0., ExcInternalError());
-  assert_min_max_avg_invalid(t.get_data());
-  assert_min_max_avg_invalid(t.get_total_data());
   assert_min_max_avg_invalid(t.get_last_lap_wall_time_data());
   assert_min_max_avg_invalid(t.get_accumulated_wall_time_data());
 

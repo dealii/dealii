@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2019 by the deal.II authors
+// Copyright (C) 1999 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,12 +17,10 @@
 #ifndef dealii_sparse_matrix_templates_h
 #define dealii_sparse_matrix_templates_h
 
-
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/parallel.h>
 #include <deal.II/base/template_constraints.h>
-#include <deal.II/base/thread_management.h>
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
@@ -31,6 +29,8 @@
 #include <deal.II/lac/trilinos_sparse_matrix.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/vector_memory.h>
+
+#include <boost/io/ios_state.hpp>
 
 #include <algorithm>
 #include <cmath>
@@ -211,15 +211,15 @@ SparseMatrix<number>::operator=(const double d)
     parallel::apply_to_subranges(
       0U,
       matrix_size,
-      std::bind(
-        &internal::SparseMatrixImplementation::template zero_subrange<number>,
-        std::placeholders::_1,
-        std::placeholders::_2,
-        val.get()),
+      [this](const size_type begin, const size_type end) {
+        internal::SparseMatrixImplementation::zero_subrange(begin,
+                                                            end,
+                                                            val.get());
+      },
       grain_size);
   else if (matrix_size > 0)
     {
-#ifdef DEAL_II_WITH_CXX17
+#ifdef DEAL_II_HAVE_CXX17
       if constexpr (std::is_trivial<number>::value)
 #else
       if (std::is_trivial<number>::value)
@@ -269,7 +269,7 @@ SparseMatrix<number>::reinit(const SparsityPattern &sparsity)
   const std::size_t N = cols->n_nonzero_elements();
   if (N > max_len || max_len == 0)
     {
-      val     = std_cxx14::make_unique<number[]>(N);
+      val     = std::make_unique<number[]>(N);
       max_len = N;
     }
 
@@ -541,6 +541,7 @@ SparseMatrix<number>::add(const size_type  row,
                           const bool       col_indices_are_sorted)
 {
   Assert(cols != nullptr, ExcNotInitialized());
+  AssertIndexRange(row, m());
 
   // if we have sufficiently many columns
   // and sorted indices it is faster to
@@ -777,16 +778,17 @@ SparseMatrix<number>::vmult(OutVector &dst, const InVector &src) const
   parallel::apply_to_subranges(
     0U,
     m(),
-    std::bind(&internal::SparseMatrixImplementation::
-                vmult_on_subrange<number, InVector, OutVector>,
-              std::placeholders::_1,
-              std::placeholders::_2,
-              val.get(),
-              cols->rowstart.get(),
-              cols->colnums.get(),
-              std::cref(src),
-              std::ref(dst),
-              false),
+    [this, &src, &dst](const size_type begin_row, const size_type end_row) {
+      internal::SparseMatrixImplementation::vmult_on_subrange(
+        begin_row,
+        end_row,
+        val.get(),
+        cols->rowstart.get(),
+        cols->colnums.get(),
+        src,
+        dst,
+        false);
+    },
     internal::SparseMatrixImplementation::minimum_parallel_grain_size);
 }
 
@@ -806,9 +808,9 @@ SparseMatrix<number>::Tvmult(OutVector &dst, const InVector &src) const
 
   dst = 0;
 
-  for (size_type i = 0; i < m(); i++)
+  for (size_type i = 0; i < m(); ++i)
     {
-      for (size_type j = cols->rowstart[i]; j < cols->rowstart[i + 1]; j++)
+      for (size_type j = cols->rowstart[i]; j < cols->rowstart[i + 1]; ++j)
         {
           const size_type p = cols->colnums[j];
           dst(p) += typename OutVector::value_type(val[j]) *
@@ -834,16 +836,17 @@ SparseMatrix<number>::vmult_add(OutVector &dst, const InVector &src) const
   parallel::apply_to_subranges(
     0U,
     m(),
-    std::bind(&internal::SparseMatrixImplementation::
-                vmult_on_subrange<number, InVector, OutVector>,
-              std::placeholders::_1,
-              std::placeholders::_2,
-              val.get(),
-              cols->rowstart.get(),
-              cols->colnums.get(),
-              std::cref(src),
-              std::ref(dst),
-              true),
+    [this, &src, &dst](const size_type begin_row, const size_type end_row) {
+      internal::SparseMatrixImplementation::vmult_on_subrange(
+        begin_row,
+        end_row,
+        val.get(),
+        cols->rowstart.get(),
+        cols->colnums.get(),
+        src,
+        dst,
+        true);
+    },
     internal::SparseMatrixImplementation::minimum_parallel_grain_size);
 }
 
@@ -861,8 +864,8 @@ SparseMatrix<number>::Tvmult_add(OutVector &dst, const InVector &src) const
 
   Assert(!PointerComparison::equal(&src, &dst), ExcSourceEqualsDestination());
 
-  for (size_type i = 0; i < m(); i++)
-    for (size_type j = cols->rowstart[i]; j < cols->rowstart[i + 1]; j++)
+  for (size_type i = 0; i < m(); ++i)
+    for (size_type j = cols->rowstart[i]; j < cols->rowstart[i + 1]; ++j)
       {
         const size_type p = cols->colnums[j];
         dst(p) += typename OutVector::value_type(val[j]) *
@@ -921,14 +924,15 @@ SparseMatrix<number>::matrix_norm_square(const Vector<somenumber> &v) const
   Assert(n() == v.size(), ExcDimensionMismatch(n(), v.size()));
 
   return parallel::accumulate_from_subranges<somenumber>(
-    std::bind(&internal::SparseMatrixImplementation::
-                matrix_norm_sqr_on_subrange<number, Vector<somenumber>>,
-              std::placeholders::_1,
-              std::placeholders::_2,
-              val.get(),
-              cols->rowstart.get(),
-              cols->colnums.get(),
-              std::cref(v)),
+    [this, &v](const size_type begin_row, const size_type end_row) {
+      return internal::SparseMatrixImplementation::matrix_norm_sqr_on_subrange(
+        begin_row,
+        end_row,
+        val.get(),
+        cols->rowstart.get(),
+        cols->colnums.get(),
+        v);
+    },
     0,
     m(),
     internal::SparseMatrixImplementation::minimum_parallel_grain_size);
@@ -988,15 +992,16 @@ SparseMatrix<number>::matrix_scalar_product(const Vector<somenumber> &u,
   Assert(n() == v.size(), ExcDimensionMismatch(n(), v.size()));
 
   return parallel::accumulate_from_subranges<somenumber>(
-    std::bind(&internal::SparseMatrixImplementation::
-                matrix_scalar_product_on_subrange<number, Vector<somenumber>>,
-              std::placeholders::_1,
-              std::placeholders::_2,
-              val.get(),
-              cols->rowstart.get(),
-              cols->colnums.get(),
-              std::cref(u),
-              std::cref(v)),
+    [this, &u, &v](const size_type begin_row, const size_type end_row) {
+      return internal::SparseMatrixImplementation::
+        matrix_scalar_product_on_subrange(begin_row,
+                                          end_row,
+                                          val.get(),
+                                          cols->rowstart.get(),
+                                          cols->colnums.get(),
+                                          u,
+                                          v);
+    },
     0,
     m(),
     internal::SparseMatrixImplementation::minimum_parallel_grain_size);
@@ -1336,18 +1341,17 @@ SparseMatrix<number>::residual(Vector<somenumber> &      dst,
   Assert(&u != &dst, ExcSourceEqualsDestination());
 
   return std::sqrt(parallel::accumulate_from_subranges<somenumber>(
-    std::bind(&internal::SparseMatrixImplementation::residual_sqr_on_subrange<
-                number,
-                Vector<somenumber>,
-                Vector<somenumber>>,
-              std::placeholders::_1,
-              std::placeholders::_2,
-              val.get(),
-              cols->rowstart.get(),
-              cols->colnums.get(),
-              std::cref(u),
-              std::cref(b),
-              std::ref(dst)),
+    [this, &u, &b, &dst](const size_type begin_row, const size_type end_row) {
+      return internal::SparseMatrixImplementation::residual_sqr_on_subrange(
+        begin_row,
+        end_row,
+        val.get(),
+        cols->rowstart.get(),
+        cols->colnums.get(),
+        u,
+        b,
+        dst);
+    },
     0,
     m(),
     internal::SparseMatrixImplementation::minimum_parallel_grain_size));
@@ -1371,7 +1375,7 @@ namespace internal
                ExcMessage(
                  "There is a zero on the diagonal of this matrix "
                  "in row " +
-                 Utilities::to_string(row) +
+                 std::to_string(row) +
                  ". The preconditioner you selected cannot work if that "
                  "is the case because one of its steps requires "
                  "division by the diagonal elements of the matrix."
@@ -1847,10 +1851,10 @@ SparseMatrix<number>::SSOR(Vector<somenumber> &dst, const number om) const
   size_type       j;
   somenumber      s;
 
-  for (size_type i = 0; i < n; i++)
+  for (size_type i = 0; i < n; ++i)
     {
       s = 0.;
-      for (j = cols->rowstart[i]; j < cols->rowstart[i + 1]; j++)
+      for (j = cols->rowstart[i]; j < cols->rowstart[i + 1]; ++j)
         {
           const size_type p = cols->colnums[j];
           if (p != SparsityPattern::invalid_entry)
@@ -1867,7 +1871,7 @@ SparseMatrix<number>::SSOR(Vector<somenumber> &dst, const number om) const
        i--) // this time, i is signed, but always positive!
     {
       s = 0.;
-      for (j = cols->rowstart[i]; j < cols->rowstart[i + 1]; j++)
+      for (j = cols->rowstart[i]; j < cols->rowstart[i + 1]; ++j)
         {
           const size_type p = cols->colnums[j];
           if (p != SparsityPattern::invalid_entry)
@@ -1967,6 +1971,54 @@ SparseMatrix<number>::print_pattern(std::ostream &out,
 
 template <typename number>
 void
+SparseMatrix<number>::print_as_numpy_arrays(std::ostream &     out,
+                                            const unsigned int precision) const
+{
+  AssertThrow(out, ExcIO());
+  boost::io::ios_flags_saver restore_flags(out);
+
+  out.precision(precision);
+
+  Assert(cols != nullptr, ExcNotInitialized());
+  Assert(val != nullptr, ExcNotInitialized());
+
+  std::vector<number> rows;
+  std::vector<number> columns;
+  std::vector<number> values;
+  rows.reserve(n_nonzero_elements());
+  columns.reserve(n_nonzero_elements());
+  values.reserve(n_nonzero_elements());
+
+  for (size_type i = 0; i < cols->rows; ++i)
+    {
+      for (size_type j = cols->rowstart[i]; j < cols->rowstart[i + 1]; ++j)
+        {
+          rows.push_back(i);
+          columns.push_back(cols->colnums[j]);
+          values.push_back(val[j]);
+        }
+    }
+
+  for (auto d : values)
+    out << d << ' ';
+  out << '\n';
+
+  for (auto r : rows)
+    out << r << ' ';
+  out << '\n';
+
+  for (auto c : columns)
+    out << c << ' ';
+  out << '\n';
+  out << std::flush;
+
+  AssertThrow(out, ExcIO());
+}
+
+
+
+template <typename number>
+void
 SparseMatrix<number>::block_write(std::ostream &out) const
 {
   AssertThrow(out, ExcIO());
@@ -2004,7 +2056,7 @@ SparseMatrix<number>::block_read(std::istream &in)
   AssertThrow(c == '[', ExcIO());
 
   // reallocate space
-  val = std_cxx14::make_unique<number[]>(max_len);
+  val = std::make_unique<number[]>(max_len);
 
   // then read data
   in.read(reinterpret_cast<char *>(val.get()),

@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2017 by the deal.II authors
+## Copyright (C) 2012 - 2019 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -16,11 +16,10 @@
 INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
 SET(_unity_include_src
-  dof_faces.cc
-  dof_level.cc
   fe_collection.cc
   fe_values.cc
   mapping_collection.cc
+  refinement.cc
   )
 
 SET(_separate_src
@@ -41,6 +40,7 @@ SET(_inst
   fe_collection.inst.in
   fe_values.inst.in
   mapping_collection.inst.in
+  refinement.inst.in
   )
 
 FILE(GLOB _header

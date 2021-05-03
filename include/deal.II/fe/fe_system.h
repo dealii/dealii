@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2018 by the deal.II authors
+// Copyright (C) 1999 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -35,25 +35,62 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declaration
+#  ifndef DOXYGEN
 template <int dim, int spacedim>
 class FE_Enriched;
-
+#  endif
 
 /**
  * This class provides an interface to group several elements together into
- * one. To the outside world, the resulting object looks just like a usual
- * finite element object, which is composed of several other finite elements
- * that are possibly of different type. The result is then a vector-valued
- * finite element. An example is given in the documentation of namespace
- * FETools::Compositing, when using the "tensor product" strategy.
+ * one, vector-valued element. As example, consider the Taylor-Hood element
+ * that is used for the solution of the Stokes and Navier-Stokes equations:
+ * There, the velocity (of which there are as many components as the dimension
+ * $d$ of the domain) is discretized with $Q_2$ elements and the pressure with
+ * $Q_1$ elements. Mathematically, the finite element space for the coupled
+ * problem is then often written as $V_h = Q_2^d \times Q_1$ where the
+ * exponentiation is understood to be the tensor product of spaces -- i.e.,
+ * in 2d, we have $V_h=Q_2\times Q_2\times Q_1$ -- and tensor products
+ * lead to vectors where each component of the vector-valued function
+ * space corresponds to a scalar function in one of the $Q_2$ or $Q_1$
+ * spaces. Using the FESystem class, this space is created using
+ * @code
+ *   FESystem<dim> taylor_hood_fe (FE_Q<dim>(2)^dim,   // velocity components
+ *                                 FE_Q<dim>(1));      // pressure component
+ * @endcode
+ * The creation of this element here corresponds to taking tensor-product
+ * powers of the $Q_2$ element in the first line of the list of arguments
+ * to the FESystem constructor, and then concatenation via another tensor
+ * product with the element in the second line. This kind of construction
+ * is used, for example, in the step-22 tutorial program.
+ *
+ * Similarly, step-8 solves an elasticity equation where we need to solve
+ * for the displacement of a solid object. The displacement again has
+ * $d$ components if the domain is $d$-dimensional, and so the combined
+ * finite element is created using
+ * @code
+ *   FESystem<dim> displacement_fe (FE_Q<dim>(1)^dim);
+ * @endcode
+ * where now each (vector) component of the combined element corresponds to
+ * a $Q_1$ space.
+ *
+ * To the outside world, FESystem objects look just like a usual
+ * finite element object, they just happen to be composed of several other
+ * finite elements that are possibly of different type. These "base elements"
+ * can themselves have multiple components and, in particular, could
+ * also be vector-valued -- for example, if one of the base elements
+ * is an FESystem itself (see also below). An example is given in the
+ * documentation of namespace FETools::Compositing, when using the
+ * "tensor product" strategy.
  *
  * %Vector valued elements are discussed in a number of
- * tutorial programs, for example step-8, step-20, step-21, and in particular
- * in the
+ * tutorial programs, for example step-8, step-20, step-21, step-22, and in
+ * particular in the
  * @ref vector_valued
  * module.
  *
  * @dealiiVideoLecture{19,20}
+ *
  *
  * <h3>FESystem, components and blocks</h3>
  *
@@ -82,13 +119,23 @@ class FE_Enriched;
  * object is simply the sum of all multiplicities of base elements and is
  * given by n_blocks().
  *
- * For example, the FESystem for the Taylor-Hood element for the three-
- * dimensional Stokes problem can be built using the code
- *
+ * For example, the FESystem for the Taylor-Hood element for the
+ * three-dimensional Stokes problem can be built using the code
  * @code
- * FE_Q<3> u(2);
- * FE_Q<3> p(1);
+ * const FE_Q<3> u(2);
+ * const FE_Q<3> p(1);
  * FESystem<3> sys1(u,3, p,1);
+ * @endcode
+ * or more concisely via
+ * @code
+ * FESystem<3> sys1(FE_Q<3>(2),3,
+ *                  FE_Q<3>(1),1);
+ * @endcode
+ * or even shorter (mimicking the mathematical notation that we are dealing
+ * with a $Q_2^3 \times Q_1$ element):
+ * @code
+ * FESystem<3> sys1(FE_Q<3>(2)^3,
+ *                  FE_Q<3>(1));
  * @endcode
  *
  * This example creates an FESystem @p sys1 with four components, three for
@@ -101,7 +148,7 @@ class FE_Enriched;
  *
  * @code
  * FESystem<3> U(u,3);
- * FESystem<3> sys2(U,1, p,1);
+ * FESystem<3> sys2(U, p);
  * @endcode
  *
  * The FESystem @p sys2 created here has the same four components, but the
@@ -118,7 +165,7 @@ class FE_Enriched;
  * @code
  * FE_RaviartThomas<3> u(1);
  * FE_DGQ<3> p(1);
- * FESystem<3> sys3(u,1, p,1);
+ * FESystem<3> sys3(u, p);
  * @endcode
  *
  * This example also produces a system with four components, but only two
@@ -163,13 +210,17 @@ class FE_Enriched;
  *
  * @ingroup febase fe vector_valued
  *
- * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2002, 2003, 2006, Ralf
- * Hartmann 2001.
  */
 template <int dim, int spacedim = dim>
 class FESystem : public FiniteElement<dim, spacedim>
 {
 public:
+  /**
+   * Delete default constructor so that `FESystem(FEPairs &&... fe_pairs)` is
+   * not accidentally picked if no FiniteElement is provided.
+   */
+  FESystem() = delete;
+
   /**
    * Constructor. Take a finite element and the number of elements you want to
    * group together using this class.
@@ -456,10 +507,10 @@ public:
    * @code
    *   FiniteElementType1<dim,spacedim> fe_1;
    *   FiniteElementType1<dim,spacedim> fe_2;
-   *   FESystem<dim,spacedim> fe_system = ( fe_1^dim, fe_2^1 );
+   *   FESystem<dim,spacedim> fe_system ( fe_1^dim, fe_2 );
    * @endcode
    *
-   * The FiniteElement objects are not actually used for anything other than
+   * The `fe_1` and `fe_2` objects are not actually used for anything other than
    * creating a copy that will then be owned by the current object. In other
    * words, it is completely fine to call this constructor with a temporary
    * object for the finite element, as in this code snippet:
@@ -527,7 +578,13 @@ public:
   /**
    * Move constructor.
    */
-  FESystem(FESystem<dim, spacedim> &&) = default; // NOLINT
+  FESystem(FESystem<dim, spacedim> &&other_fe_system) noexcept
+    : FiniteElement<dim, spacedim>(std::move(other_fe_system))
+  {
+    base_elements = std::move(other_fe_system.base_elements);
+    generalized_support_points_index_table =
+      std::move(other_fe_system.generalized_support_points_index_table);
+  }
 
   /**
    * Destructor.
@@ -714,7 +771,7 @@ public:
   /**
    * Return the matrix interpolating from the given finite element to the
    * present one. The size of the matrix is then @p dofs_per_cell times
-   * <tt>source.dofs_per_cell</tt>.
+   * <tt>source.n_dofs_per_cell()</tt>.
    *
    * These matrices are available if source and destination element are both
    * @p FESystem elements, have the same number of base elements with same
@@ -860,7 +917,8 @@ public:
    * Implementation of the respective function in the base class.
    */
   virtual Point<dim - 1>
-  unit_face_support_point(const unsigned int index) const override;
+  unit_face_support_point(const unsigned int index,
+                          const unsigned int face_no = 0) const override;
 
   /**
    * Return a list of constant modes of the element. The returns table has as
@@ -879,7 +937,7 @@ public:
 
   /**
    * Return whether this element implements its hanging node constraints in
-   * the new way, which has to be used to make elements "hp compatible".
+   * the new way, which has to be used to make elements "hp-compatible".
    *
    * This function returns @p true if and only if all its base elements return
    * @p true for this function.
@@ -901,7 +959,8 @@ public:
    */
   virtual void
   get_face_interpolation_matrix(const FiniteElement<dim, spacedim> &source,
-                                FullMatrix<double> &matrix) const override;
+                                FullMatrix<double> &                matrix,
+                                const unsigned int face_no = 0) const override;
 
 
   /**
@@ -917,12 +976,14 @@ public:
    * will get propagated out from this element.
    */
   virtual void
-  get_subface_interpolation_matrix(const FiniteElement<dim, spacedim> &source,
-                                   const unsigned int                  subface,
-                                   FullMatrix<double> &matrix) const override;
+  get_subface_interpolation_matrix(
+    const FiniteElement<dim, spacedim> &source,
+    const unsigned int                  subface,
+    FullMatrix<double> &                matrix,
+    const unsigned int                  face_no = 0) const override;
 
   /**
-   * If, on a vertex, several finite elements are active, the hp code first
+   * If, on a vertex, several finite elements are active, the hp-code first
    * assigns the degrees of freedom of each of these FEs different global
    * indices. It then calls this function to find out which of them should get
    * identical values, and consequently can receive the same global DoF index.
@@ -931,10 +992,10 @@ public:
    * reference to a finite element object representing one of the other finite
    * elements active on this particular vertex. The function computes which of
    * the degrees of freedom of the two finite element objects are equivalent,
-   * both numbered between zero and the corresponding value of dofs_per_vertex
-   * of the two finite elements. The first index of each pair denotes one of
-   * the vertex dofs of the present element, whereas the second is the
-   * corresponding index of the other finite element.
+   * both numbered between zero and the corresponding value of
+   * n_dofs_per_vertex() of the two finite elements. The first index of each
+   * pair denotes one of the vertex dofs of the present element, whereas the
+   * second is the corresponding index of the other finite element.
    */
   virtual std::vector<std::pair<unsigned int, unsigned int>>
   hp_vertex_dof_identities(
@@ -953,8 +1014,8 @@ public:
    * of freedom on quads.
    */
   virtual std::vector<std::pair<unsigned int, unsigned int>>
-  hp_quad_dof_identities(
-    const FiniteElement<dim, spacedim> &fe_other) const override;
+  hp_quad_dof_identities(const FiniteElement<dim, spacedim> &fe_other,
+                         const unsigned int face_no = 0) const override;
 
   /**
    * @copydoc FiniteElement::compare_for_domination()
@@ -1006,12 +1067,14 @@ protected:
                                                                        spacedim>
       &output_data) const override;
 
+  using FiniteElement<dim, spacedim>::get_face_data;
+
   virtual std::unique_ptr<
     typename FiniteElement<dim, spacedim>::InternalDataBase>
   get_face_data(
-    const UpdateFlags             update_flags,
-    const Mapping<dim, spacedim> &mapping,
-    const Quadrature<dim - 1> &   quadrature,
+    const UpdateFlags               update_flags,
+    const Mapping<dim, spacedim> &  mapping,
+    const hp::QCollection<dim - 1> &quadrature,
     dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
                                                                        spacedim>
       &output_data) const override;
@@ -1041,11 +1104,13 @@ protected:
                                                                        spacedim>
       &output_data) const override;
 
+  using FiniteElement<dim, spacedim>::fill_fe_face_values;
+
   virtual void
   fill_fe_face_values(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const unsigned int                                          face_no,
-    const Quadrature<dim - 1> &                                 quadrature,
+    const hp::QCollection<dim - 1> &                            quadrature,
     const Mapping<dim, spacedim> &                              mapping,
     const typename Mapping<dim, spacedim>::InternalDataBase &mapping_internal,
     const dealii::internal::FEValuesImplementation::MappingRelatedData<dim,
@@ -1089,7 +1154,7 @@ protected:
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const unsigned int                                          face_no,
     const unsigned int                                          sub_no,
-    const Quadrature<dim_1> &                                   quadrature,
+    const hp::QCollection<dim_1> &                              quadrature,
     const CellSimilarity::Similarity                            cell_similarity,
     const typename Mapping<dim, spacedim>::InternalDataBase &mapping_internal,
     const typename FiniteElement<dim, spacedim>::InternalDataBase &fe_data,
@@ -1151,7 +1216,8 @@ private:
    */
   template <int structdim>
   std::vector<std::pair<unsigned int, unsigned int>>
-  hp_object_dof_identities(const FiniteElement<dim, spacedim> &fe_other) const;
+  hp_object_dof_identities(const FiniteElement<dim, spacedim> &fe_other,
+                           const unsigned int face_no = 0) const;
 
   /**
    * Usually: Fields of cell-independent data.
@@ -1226,10 +1292,10 @@ private:
       base_fe_output_objects;
   };
 
-  /*
+  /**
    * Mutex for protecting initialization of restriction and embedding matrix.
    */
-  mutable Threads::Mutex mutex;
+  mutable std::mutex mutex;
 
   friend class FE_Enriched<dim, spacedim>;
 };
@@ -1263,8 +1329,7 @@ namespace internal
     std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>, unsigned int>
     promote_to_fe_pair(const FiniteElement<dim, spacedim> &fe)
     {
-      return std::make_pair<std::unique_ptr<FiniteElement<dim, spacedim>>,
-                            unsigned int>(std::move(fe.clone()), 1u);
+      return std::make_pair(std::move(fe.clone()), 1u);
     }
 
 

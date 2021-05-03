@@ -88,8 +88,6 @@ class Vector;
  *
  * For more information about the <tt>spacedim</tt> template parameter check
  * the documentation of FiniteElement or the one of Triangulation.
- *
- * @author Michael Stadler, 2001
  */
 template <int dim, typename VectorType = Vector<double>, int spacedim = dim>
 class MappingQ1Eulerian : public MappingQGeneric<dim, spacedim>
@@ -118,7 +116,8 @@ public:
    * cell but instead evaluates an externally given displacement field in
    * addition to the geometry of the cell.
    */
-  virtual std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
+  virtual boost::container::small_vector<Point<spacedim>,
+                                         GeometryInfo<dim>::vertices_per_cell>
   get_vertices(const typename Triangulation<dim, spacedim>::cell_iterator &cell)
     const override;
 

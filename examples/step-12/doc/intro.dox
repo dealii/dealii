@@ -1,29 +1,33 @@
+<br>
+
+<i> Note: A variant called step-12b of this tutorial exists, using
+MeshWorker and LocalIntegrators instead of assembling matrices using
+FEInterfaceValues as is done in this tutorial.
+</i>
+
 <a name="Intro"></a>
-<h1>An example of the MeshWorker framework with an advection problem</h1>
+<h1>An example of an advection problem using the Discountinuous Galerkin method</h1>
 
 <h3>Overview</h3>
 
-This example is devoted to the MeshWorker framework and the <em>discontinuous
-Galerkin method</em>, or in short: DG method. It includes the following topics.
+This example is devoted to the <em>discontinuous
+Galerkin method</em>, or in short, the DG method. It includes the following topics.
 <ol>
   <li> Discretization of the linear advection equation with the DG method.
-  <li> Assembling of the system matrix using the MeshWorker::loop().
+  <li> Assembling of jump terms and other expressions on the interface between cells using FEInterfaceValues.
+  <li> Assembling of the system matrix using the MeshWorker::mesh_loop().
 </ol>
 
 The particular concern of this program are the loops of DG methods. These turn
 out to be especially complex, primarily because for the face terms, we have to
 distinguish the cases of boundary, regular interior faces and interior faces
-with hanging nodes, respectively. The MeshWorker framework implements the
-standard loop over all cells and faces in MeshWorker::loop() and takes care of
-distinguishing between all the different faces.
+with hanging nodes, respectively. The MeshWorker::mesh_loop() handles the
+complexity on iterating over cells and faces and allows specifying "workers"
+for the different cell and face terms. The integration of face terms itself,
+including on adaptively refined faces, is done using the FEInterfaceValues
+class.
 
-There are two things left to do if you use MeshWorker: first, you need
-to write the local integrators for your problem. Second, you select
-classes from the MeshWorker namespace and combine them to achieve your
-goal.
-
-
-<h3>Problem</h3>
+<h3>The equation</h3>
 
 The model problem solved in this example is the linear advection equation
 @f[
@@ -44,33 +48,57 @@ the inflow part of the boundary of the domain and ${\bf n}$ denotes
 the unit outward normal to the boundary $\Gamma$. This equation is the
 conservative version of the advection equation already considered in
 step-9 of this tutorial.
-In particular, we solve the advection equation on
+
+
+On each cell $T$, we multiply by a test function $v_h$ from the left and integrate by parts
+to get:
+@f[
+  \left( v_h, \nabla \cdot (\beta u_h) \right)_T
+= -(\nabla v_h, \beta u_h) + \int_\Gamma v_h u_h \beta \cdot n
+@f]
+When summing this expression over all cells $T$, the boundary integral is done over
+all internal and external faces and as such there are three cases:
+<ol>
+<li> outer boundary on the inflow (we replace $u_h$ by given $g$):
+  $\int_{\Gamma_-} v_h g \beta \cdot n$
+<li> outer boundary on the outflow:
+  $\int_{\Gamma_+} v_h u_h \beta \cdot n$
+<li> inner faces (integral from two sides turns into jump, we use the upwind velocity):
+  $\int_F [v_h] u_h^{\text{upwind}} \beta \cdot n$
+</ol>
+
+Here, the jump is defined as $[v] = v^+ - v^-$, where the superscripts refer
+to the left ('+') and right ('-') values at the face. The upwind value
+$u^{\text{upwind}}$ is defined to be $u^+$ if $\beta \cdot n>0$ and $u^-$ otherwise.
+
+As a result, the mesh-dependent weak form reads:
+@f[
+\sum_{T\in \mathbb T_h} -\bigl(\nabla \phi_i,{\mathbf \beta}\cdot \phi_j \bigr)_T +
+\sum_{F\in\mathbb F_h^i} \bigl< [\phi_i], \phi_j^{upwind} \beta\cdot \mathbf n\bigr>_{F} +
+\bigl<\phi_i, \phi_j \beta\cdot \mathbf n\bigr>_{\Gamma_+}
+= -\bigl<\phi_i, g \beta\cdot\mathbf n\bigr>_{\Gamma_-}.
+@f]
+Here, $\mathbb T_h$ is the set of all active cells of the triangulation
+and $\mathbb F_h^i$ is the set of all active interior faces. This formulation
+is known as the upwind discontinuous Galerkin method.
+
+In order to implement this bilinear form, we need to compute the cell terms
+(first sum) using the usual way to achieve integration on a cell, the interface terms (second sum) using
+FEInterfaceValues, and the boundary terms (the other two terms).
+The summation of all those is done by MeshWorker::mesh_loop().
+
+
+
+<h3>The test problem</h3>
+
+We solve the advection equation on
 $\Omega=[0,1]^2$ with ${\mathbf \beta}=\frac{1}{|x|}(-x_2, x_1)$
 representing a circular counterclockwise flow field, and $g=1$
-on ${\bf x}\in\Gamma_-^1 \dealcoloneq [0,0.5]\times\{0\}$ and $g=0$ on ${\bf x}\in
+on ${\bf x}\in\Gamma_-^1 := [0,0.5]\times\{0\}$ and $g=0$ on ${\bf x}\in
 \Gamma_-\setminus \Gamma_-^1$.
 
-We apply the well-known upwind discontinuous Galerkin method. To this
-end, we introduce the mesh dependent bilinear form
-
-@f[
-  -\sum_{T\in \mathbb T_h}\bigl(u_h,{\mathbf \beta}\cdot\nabla v_h\bigr)_T
-  +\sum_{F\in\mathbb F_h^i} \bigl<u_h^-, \beta\cdot[v_h\mathbf n]\bigr>_{F}
-  + \bigl<u_h, v_h \beta\cdot \mathbf n\bigr>_{\Gamma_+}
-  =-\bigl<g, v_h \beta\cdot\mathbf n\bigr>_{\Gamma_-}.
-@f]
-
-Here, $\mathbb T_h$ is the set of all active cells of the triangulation
-and $\mathbb F_h^i$ is the set of all active interior faces.
-$(\cdot, \cdot)_T$ and $\left<\cdot, \cdot\right>_{F}$ denote the
-<i>L<sup>2</sup></i>-inner products on the cell $T$ and a face $F$,
-respectively.  The jump is defined as $[v\mathbf n] = v^+\mathbf n^+ +
-v^-\mathbf n^-$, where the superscripts refer to the upwind ('+') and
-downwind ('-') values at the face.
-
-In order to implement this bilinear form, we need to compute the cell
-terms $\bigl(u_h,{\mathbf \beta}\cdot\nabla v_h\bigr)_T$, the internal fluxes
-$\bigl<u_h^-, \beta\cdot[v_h\mathbf n]\bigr>_{F}$, and the boundary terms $\bigl<u_h,
-v_h \beta\cdot \mathbf n]\bigr>_{\Gamma_+}$ and $\bigl<g, \beta\cdot\mathbf n
-v_h\bigr>_{\Gamma_-}$. The summation of all those is done by MeshWorker::integration_loop().
-
+We solve on a sequence of meshes by refining the mesh adaptively by estimating
+the norm of the gradient on each cell. After solving on each mesh, we output
+the solution in vtk format and compute the $L^\infty$ norm of the solution. As
+the exact solution is either 0 or 1, we can measure the magnitude of the
+overshoot of the numerical solution with this.

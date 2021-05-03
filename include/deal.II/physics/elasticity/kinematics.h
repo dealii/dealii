@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 by the deal.II authors
+// Copyright (C) 2016 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,6 +16,8 @@
 #ifndef dealii_elasticity_kinematics_h
 #define dealii_elasticity_kinematics_h
 
+
+#include <deal.II/base/config.h>
 
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/symmetric_tensor.h>
@@ -40,9 +42,7 @@ namespace Physics
 
      * @note These hold specifically for the codimension
      * 0 case, where the metric tensor is the identity tensor.
-     *
-     * @author Jean-Paul Pelteret, Andrew McBride, 2016
-     */
+*/
     namespace Kinematics
     {
       /**
@@ -70,8 +70,8 @@ namespace Physics
        * @dealiiHolzapfelA{71,2.39}
        */
       template <int dim, typename Number>
-      Tensor<2, dim, Number>
-      F(const Tensor<2, dim, Number> &Grad_u);
+      DEAL_II_ALWAYS_INLINE Tensor<2, dim, Number>
+                            F(const Tensor<2, dim, Number> &Grad_u);
 
       /**
        * Return the isochoric counterpart of the deformation gradient
@@ -86,8 +86,8 @@ namespace Physics
        * @dealiiHolzapfelA{228,6.79}
        */
       template <int dim, typename Number>
-      Tensor<2, dim, Number>
-      F_iso(const Tensor<2, dim, Number> &F);
+      DEAL_II_ALWAYS_INLINE Tensor<2, dim, Number>
+                            F_iso(const Tensor<2, dim, Number> &F);
 
       /**
        * Return the volumetric counterpart of the deformation gradient
@@ -102,8 +102,8 @@ namespace Physics
        * @dealiiHolzapfelA{228,6.79}
        */
       template <int dim, typename Number>
-      SymmetricTensor<2, dim, Number>
-      F_vol(const Tensor<2, dim, Number> &F);
+      DEAL_II_ALWAYS_INLINE SymmetricTensor<2, dim, Number>
+                            F_vol(const Tensor<2, dim, Number> &F);
 
       /**
        * Return the symmetric right Cauchy-Green deformation tensor,
@@ -117,8 +117,8 @@ namespace Physics
        * @dealiiHolzapfelA{78,2.65}
        */
       template <int dim, typename Number>
-      SymmetricTensor<2, dim, Number>
-      C(const Tensor<2, dim, Number> &F);
+      DEAL_II_ALWAYS_INLINE SymmetricTensor<2, dim, Number>
+                            C(const Tensor<2, dim, Number> &F);
 
       /**
        * Return the symmetric left Cauchy-Green deformation tensor,
@@ -132,8 +132,8 @@ namespace Physics
        * @dealiiHolzapfelA{81,2.79}
        */
       template <int dim, typename Number>
-      SymmetricTensor<2, dim, Number>
-      b(const Tensor<2, dim, Number> &F);
+      DEAL_II_ALWAYS_INLINE SymmetricTensor<2, dim, Number>
+                            b(const Tensor<2, dim, Number> &F);
 
       //@}
 
@@ -155,8 +155,8 @@ namespace Physics
        * @dealiiHolzapfelA{79,6.29}
        */
       template <int dim, typename Number>
-      SymmetricTensor<2, dim, Number>
-      E(const Tensor<2, dim, Number> &F);
+      DEAL_II_ALWAYS_INLINE SymmetricTensor<2, dim, Number>
+                            E(const Tensor<2, dim, Number> &F);
 
       /**
        * Return the symmetric small strain tensor,
@@ -175,8 +175,8 @@ namespace Physics
        * @dealiiWriggersA{24,3.17}
        */
       template <int dim, typename Number>
-      SymmetricTensor<2, dim, Number>
-      epsilon(const Tensor<2, dim, Number> &Grad_u);
+      DEAL_II_ALWAYS_INLINE SymmetricTensor<2, dim, Number>
+                            epsilon(const Tensor<2, dim, Number> &Grad_u);
 
       /**
        * Return the symmetric Almansi strain tensor,
@@ -191,8 +191,8 @@ namespace Physics
        * @dealiiHolzapfelA{81,2.83}
        */
       template <int dim, typename Number>
-      SymmetricTensor<2, dim, Number>
-      e(const Tensor<2, dim, Number> &F);
+      DEAL_II_ALWAYS_INLINE SymmetricTensor<2, dim, Number>
+                            e(const Tensor<2, dim, Number> &F);
 
       //@}
 

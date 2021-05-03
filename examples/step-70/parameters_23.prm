@@ -1,0 +1,50 @@
+# This is a parameter file that can be used to reproduce the three dimensional
+# results of the tutorial program step-70. The name of the parameter file
+# indicates that the program will expect to work with a fluid grid in three
+# dimensions, and a solid grid representing a surface embedded in three
+# dimensions. 
+#
+# With this parameter file, we generate a hyper rectangular grid slightly
+# larger w.r.t. to a impeller grid that was generated from the CAD files
+# downloaded from https://grabcad.com/library/lungstors-blower-1
+subsection Stokes Immersed Problem
+  set Final time                            = 1
+  set Homogeneous Dirichlet boundary ids    = 0
+  set Fluid bounding boxes extraction level = 1
+  set Initial fluid refinement              = 4
+  set Initial solid refinement              = 0
+  set Nitsche penalty term                  = 10
+  set Number of time steps                  = 501
+  set Output frequency                      = 1
+  set Output directory                      = .
+  set Particle insertion refinement         = 4
+  set Velocity degree                       = 2
+  set Viscosity                             = 1
+  subsection Angular velocity
+    set Function constants  = 
+    set Function expression = t < .500001 ? 10 : -10
+    set Variable names      = x,y,z,t
+  end
+  subsection Grid generation
+    set Fluid grid generator                = hyper_rectangle
+    set Fluid grid generator arguments      = -50,-50, -10: 50, 50, 40: false
+    set Solid grid generator                = impeller.vtk
+    set Solid grid generator arguments      = 
+    set Particle grid generator           = hyper_ball
+    set Particle grid generator arguments = 30, 30, 20: 10: false
+  end
+  subsection Refinement and remeshing
+    set Maximum number of cells        = 100000
+    set Refinement coarsening fraction = 0.3
+    set Refinement fraction            = 0.3
+    set Refinement maximal level       = 6
+    set Refinement minimal level       = 4
+    set Refinement step frequency      = 5
+    set Refinement strategy            = fixed_fraction
+  end
+  subsection Right hand side
+    set Function constants  = 
+    set Function expression = 0; 0; 0; 0
+    set Variable names      = x,y,z,t
+  end
+end

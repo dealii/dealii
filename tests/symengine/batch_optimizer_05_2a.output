@@ -1,0 +1,6 @@
+
+DEAL:Serialization:Float::OK
+DEAL:Serialization:Double::OK
+DEAL:Serialization:Complex float::OK
+DEAL:Serialization:Complex double::OK
+DEAL::OK

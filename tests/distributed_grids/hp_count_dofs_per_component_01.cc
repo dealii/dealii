@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2018 by the deal.II authors
+// Copyright (C) 2008 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,7 +15,7 @@
 
 
 
-// Test DoFTools::count_dofs_per_component
+// Test DoFTools::count_dofs_per_fe_component
 //
 // like the test without the hp_ prefix, but for hp::DoFHandler
 
@@ -26,6 +26,7 @@
 
 #include <deal.II/distributed/tria.h>
 
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_dgq.h>
@@ -37,7 +38,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 
 #include <cstdlib>
@@ -57,14 +57,14 @@ test()
   hp::FECollection<dim> fe;
   fe.push_back(FESystem<dim>(FE_Q<dim>(3), 2, FE_DGQ<dim>(1), 1));
 
-  hp::DoFHandler<dim> dof_handler(triangulation);
+  DoFHandler<dim> dof_handler(triangulation);
 
   GridGenerator::hyper_cube(triangulation);
   triangulation.refine_global(2);
   dof_handler.distribute_dofs(fe);
 
-  std::vector<types::global_dof_index> dofs_per_component(fe.n_components());
-  DoFTools::count_dofs_per_component(dof_handler, dofs_per_component);
+  const std::vector<types::global_dof_index> dofs_per_component =
+    DoFTools::count_dofs_per_fe_component(dof_handler);
 
   Assert(std::accumulate(dofs_per_component.begin(),
                          dofs_per_component.end(),

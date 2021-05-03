@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -232,7 +232,7 @@ DGTransportEquation<dim>::assemble_boundary_term(
   const std::vector<double> &JxW =
     fe_v.get_present_fe_values().get_JxW_values();
   const std::vector<Tensor<1, dim>> &normals =
-    fe_v.get_present_fe_values().get_all_normal_vectors();
+    fe_v.get_present_fe_values().get_normal_vectors();
 
   std::vector<Point<dim>> beta(
     fe_v.get_present_fe_values().n_quadrature_points);
@@ -279,7 +279,7 @@ DGTransportEquation<dim>::assemble_face_term1(
   const std::vector<double> &JxW =
     fe_v.get_present_fe_values().get_JxW_values();
   const std::vector<Tensor<1, dim>> &normals =
-    fe_v.get_present_fe_values().get_all_normal_vectors();
+    fe_v.get_present_fe_values().get_normal_vectors();
 
   std::vector<Point<dim>> beta(
     fe_v.get_present_fe_values().n_quadrature_points);
@@ -328,7 +328,7 @@ DGTransportEquation<dim>::assemble_face_term2(
   const std::vector<double> &JxW =
     fe_v.get_present_fe_values().get_JxW_values();
   const std::vector<Tensor<1, dim>> &normals =
-    fe_v.get_present_fe_values().get_all_normal_vectors();
+    fe_v.get_present_fe_values().get_normal_vectors();
 
   std::vector<Point<dim>> beta(
     fe_v.get_present_fe_values().n_quadrature_points);
@@ -421,7 +421,7 @@ private:
   const hp::MappingCollection<dim> mapping;
 
   hp::FECollection<dim> fe;
-  hp::DoFHandler<dim>   dof_handler;
+  DoFHandler<dim>       dof_handler;
 
   SparsityPattern      sparsity_pattern;
   SparseMatrix<double> system_matrix;
@@ -484,7 +484,7 @@ template <int dim>
 void
 DGMethod<dim>::assemble_system1()
 {
-  const unsigned int dofs_per_cell = dof_handler.get_fe()[0].dofs_per_cell;
+  const unsigned int dofs_per_cell = dof_handler.get_fe(0).dofs_per_cell;
   std::vector<types::global_dof_index> dofs(dofs_per_cell);
   std::vector<types::global_dof_index> dofs_neighbor(dofs_per_cell);
 
@@ -521,9 +521,9 @@ DGMethod<dim>::assemble_system1()
 
   Vector<double> cell_vector(dofs_per_cell);
 
-  typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                              .begin_active(),
-                                                     endc = dof_handler.end();
+  typename DoFHandler<dim>::active_cell_iterator cell =
+                                                   dof_handler.begin_active(),
+                                                 endc = dof_handler.end();
 
   for (; cell != endc; ++cell)
     {
@@ -536,12 +536,9 @@ DGMethod<dim>::assemble_system1()
 
       cell->get_dof_indices(dofs);
 
-      for (unsigned int face_no = 0;
-           face_no < GeometryInfo<dim>::faces_per_cell;
-           ++face_no)
+      for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
         {
-          typename hp::DoFHandler<dim>::face_iterator face =
-            cell->face(face_no);
+          typename DoFHandler<dim>::face_iterator face = cell->face(face_no);
 
           ue_vi_matrix = 0;
 
@@ -553,7 +550,7 @@ DGMethod<dim>::assemble_system1()
             }
           else
             {
-              typename hp::DoFHandler<dim>::cell_iterator neighbor =
+              typename DoFHandler<dim>::cell_iterator neighbor =
                 cell->neighbor(face_no);
               ;
 
@@ -567,7 +564,7 @@ DGMethod<dim>::assemble_system1()
                        subface_no < face->n_children();
                        ++subface_no)
                     {
-                      typename hp::DoFHandler<dim>::active_cell_iterator
+                      typename DoFHandler<dim>::active_cell_iterator
                         neighbor_child =
                           cell->neighbor_child_on_subface(face_no, subface_no);
 
@@ -665,7 +662,7 @@ template <int dim>
 void
 DGMethod<dim>::assemble_system2()
 {
-  const unsigned int dofs_per_cell = dof_handler.get_fe()[0].dofs_per_cell;
+  const unsigned int dofs_per_cell = dof_handler.get_fe(0).dofs_per_cell;
   std::vector<types::global_dof_index> dofs(dofs_per_cell);
   std::vector<types::global_dof_index> dofs_neighbor(dofs_per_cell);
 
@@ -701,9 +698,9 @@ DGMethod<dim>::assemble_system2()
 
   Vector<double> cell_vector(dofs_per_cell);
 
-  typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                              .begin_active(),
-                                                     endc = dof_handler.end();
+  typename DoFHandler<dim>::active_cell_iterator cell =
+                                                   dof_handler.begin_active(),
+                                                 endc = dof_handler.end();
   for (; cell != endc; ++cell)
     {
       ui_vi_matrix = 0;
@@ -715,12 +712,9 @@ DGMethod<dim>::assemble_system2()
 
       cell->get_dof_indices(dofs);
 
-      for (unsigned int face_no = 0;
-           face_no < GeometryInfo<dim>::faces_per_cell;
-           ++face_no)
+      for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
         {
-          typename hp::DoFHandler<dim>::face_iterator face =
-            cell->face(face_no);
+          typename DoFHandler<dim>::face_iterator face = cell->face(face_no);
 
           if (face->at_boundary())
             {
@@ -732,7 +726,7 @@ DGMethod<dim>::assemble_system2()
             {
               Assert(cell->neighbor(face_no).state() == IteratorState::valid,
                      ExcInternalError());
-              typename hp::DoFHandler<dim>::cell_iterator neighbor =
+              typename DoFHandler<dim>::cell_iterator neighbor =
                 cell->neighbor(face_no);
               if (face->has_children())
                 {
@@ -743,9 +737,8 @@ DGMethod<dim>::assemble_system2()
                        subface_no < face->n_children();
                        ++subface_no)
                     {
-                      typename hp::DoFHandler<dim>::cell_iterator
-                        neighbor_child =
-                          cell->neighbor_child_on_subface(face_no, subface_no);
+                      typename DoFHandler<dim>::cell_iterator neighbor_child =
+                        cell->neighbor_child_on_subface(face_no, subface_no);
                       Assert(neighbor_child->face(neighbor2) ==
                                face->child(subface_no),
                              ExcInternalError());
@@ -861,9 +854,9 @@ DGMethod<dim>::refine_grid()
                                                 solution2,
                                                 gradient_indicator);
 
-  typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                              .begin_active(),
-                                                     endc = dof_handler.end();
+  typename DoFHandler<dim>::active_cell_iterator cell =
+                                                   dof_handler.begin_active(),
+                                                 endc = dof_handler.end();
   for (unsigned int cell_no = 0; cell != endc; ++cell, ++cell_no)
     gradient_indicator(cell_no) *=
       std::pow(cell->diameter(), 1 + 1.0 * dim / 2);
@@ -899,7 +892,7 @@ DGMethod<dim>::output_results(const unsigned int cycle) const
   deallog << "Writing solution to <" << filename << ">..." << std::endl
           << std::endl;
 
-  DataOut<dim, hp::DoFHandler<dim>> data_out;
+  DataOut<dim, DoFHandler<dim>> data_out;
   data_out.attach_dof_handler(dof_handler);
   data_out.add_data_vector(solution2, "u");
 

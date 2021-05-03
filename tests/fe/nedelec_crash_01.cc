@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,8 +22,9 @@
 
 #include <deal.II/fe/fe_nedelec.h>
 
-#include "../test_grids.h"
 #include "../tests.h"
+
+#include "../test_grids.h"
 
 
 int

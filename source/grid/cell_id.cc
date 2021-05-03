@@ -22,7 +22,7 @@ DEAL_II_NAMESPACE_OPEN
 
 
 CellId::CellId()
-  : coarse_cell_id(numbers::invalid_unsigned_int)
+  : coarse_cell_id(numbers::invalid_coarse_cell_id)
   , n_child_indices(numbers::invalid_unsigned_int)
 {
   // initialize the child indices to invalid values
@@ -35,7 +35,7 @@ CellId::CellId()
 
 
 
-CellId::CellId(const unsigned int               coarse_cell_id,
+CellId::CellId(const types::coarse_cell_id      coarse_cell_id,
                const std::vector<std::uint8_t> &id)
   : coarse_cell_id(coarse_cell_id)
   , n_child_indices(id.size())
@@ -46,9 +46,9 @@ CellId::CellId(const unsigned int               coarse_cell_id,
 
 
 
-CellId::CellId(const unsigned int  coarse_cell_id,
-               const unsigned int  n_child_indices,
-               const std::uint8_t *id)
+CellId::CellId(const types::coarse_cell_id coarse_cell_id,
+               const unsigned int          n_child_indices,
+               const std::uint8_t *        id)
   : coarse_cell_id(coarse_cell_id)
   , n_child_indices(n_child_indices)
 {
@@ -93,6 +93,14 @@ CellId::CellId(const CellId::binary_type &binary_representation)
         }
       ++binary_entry;
     }
+}
+
+
+
+CellId::CellId(const std::string &string_representation)
+{
+  std::istringstream ss(string_representation);
+  ss >> *this;
 }
 
 
@@ -158,15 +166,9 @@ template <int dim, int spacedim>
 typename Triangulation<dim, spacedim>::cell_iterator
 CellId::to_cell(const Triangulation<dim, spacedim> &tria) const
 {
-  typename Triangulation<dim, spacedim>::cell_iterator cell(&tria,
-                                                            0,
-                                                            coarse_cell_id);
-
-  for (unsigned int i = 0; i < n_child_indices; ++i)
-    cell = cell->child(static_cast<unsigned int>(child_indices[i]));
-
-  return cell;
+  return tria.create_cell_iterator(*this);
 }
+
 
 // explicit instantiations
 #include "cell_id.inst"

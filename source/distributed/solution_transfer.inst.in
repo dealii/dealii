@@ -15,7 +15,8 @@
 
 
 
-for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
+for (DoFHandler : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS;
+     deal_II_space_dimension : SPACE_DIMENSIONS)
   {
     namespace parallel
     \{
@@ -43,27 +44,6 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
           ::dealii::LinearAlgebra::distributed::BlockVector<float>,
           DoFHandler<deal_II_dimension, deal_II_space_dimension>>;
 
-        template class SolutionTransfer<
-          deal_II_dimension,
-          ::dealii::Vector<double>,
-          hp::DoFHandler<deal_II_dimension, deal_II_space_dimension>>;
-        template class SolutionTransfer<
-          deal_II_dimension,
-          ::dealii::LinearAlgebra::distributed::Vector<double>,
-          hp::DoFHandler<deal_II_dimension, deal_II_space_dimension>>;
-        template class SolutionTransfer<
-          deal_II_dimension,
-          ::dealii::LinearAlgebra::distributed::Vector<float>,
-          hp::DoFHandler<deal_II_dimension, deal_II_space_dimension>>;
-        template class SolutionTransfer<
-          deal_II_dimension,
-          ::dealii::LinearAlgebra::distributed::BlockVector<double>,
-          hp::DoFHandler<deal_II_dimension, deal_II_space_dimension>>;
-        template class SolutionTransfer<
-          deal_II_dimension,
-          ::dealii::LinearAlgebra::distributed::BlockVector<float>,
-          hp::DoFHandler<deal_II_dimension, deal_II_space_dimension>>;
-
 
 #  ifdef DEAL_II_WITH_PETSC
         template class SolutionTransfer<
@@ -74,15 +54,6 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
           deal_II_dimension,
           PETScWrappers::MPI::BlockVector,
           DoFHandler<deal_II_dimension, deal_II_space_dimension>>;
-
-        template class SolutionTransfer<
-          deal_II_dimension,
-          PETScWrappers::MPI::Vector,
-          hp::DoFHandler<deal_II_dimension, deal_II_space_dimension>>;
-        template class SolutionTransfer<
-          deal_II_dimension,
-          PETScWrappers::MPI::BlockVector,
-          hp::DoFHandler<deal_II_dimension, deal_II_space_dimension>>;
 #  endif
 
 #  ifdef DEAL_II_WITH_TRILINOS
@@ -94,15 +65,6 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
           deal_II_dimension,
           TrilinosWrappers::MPI::BlockVector,
           DoFHandler<deal_II_dimension, deal_II_space_dimension>>;
-
-        template class SolutionTransfer<
-          deal_II_dimension,
-          TrilinosWrappers::MPI::Vector,
-          hp::DoFHandler<deal_II_dimension, deal_II_space_dimension>>;
-        template class SolutionTransfer<
-          deal_II_dimension,
-          TrilinosWrappers::MPI::BlockVector,
-          hp::DoFHandler<deal_II_dimension, deal_II_space_dimension>>;
 #  endif
 
 #endif

@@ -1,12 +1,14 @@
 
-DEAL:values::1.0000
-DEAL:values::2.0000
-DEAL:values::3.0000
-DEAL:values::4.0000
-DEAL:values::5.0000
-DEAL:values::6.0000
-DEAL:values::7.0000
-DEAL:values::8.0000
-DEAL:values::9.0000
-DEAL:norm_square::285.00
-DEAL:norm_square GPU::285.00
+DEAL:values::1.00000
+DEAL:values::2.00000
+DEAL:values::3.00000
+DEAL:values::4.00000
+DEAL:values::5.00000
+DEAL:values::6.00000
+DEAL:values::7.00000
+DEAL:values::8.00000
+DEAL:values::9.00000
+DEAL::norm: 16.8819
+DEAL::norm_square: 285.000
+DEAL::norm GPU: 16.8819
+DEAL::norm_square GPU: 285.000

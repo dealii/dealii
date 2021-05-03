@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2019 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -31,6 +31,8 @@
 
 #include <deal.II/distributed/shared_tria.h>
 
+#include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
@@ -39,8 +41,6 @@
 #include <deal.II/grid/intergrid_map.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-
-#include <deal.II/hp/dof_handler.h>
 
 #include <numeric>
 
@@ -71,7 +71,7 @@ test()
   hp::FECollection<dim> fe;
   fe.push_back(FE_Q<dim>(1));
 
-  hp::DoFHandler<dim> dof_handler(triangulation);
+  DoFHandler<dim> dof_handler(triangulation);
   dof_handler.distribute_dofs(fe);
 
   deallog << "n_dofs: " << dof_handler.n_dofs() << std::endl;
@@ -80,7 +80,8 @@ test()
 
   deallog << "n_locally_owned_dofs_per_processor: ";
   std::vector<types::global_dof_index> v =
-    dof_handler.n_locally_owned_dofs_per_processor();
+    Utilities::MPI::all_gather(MPI_COMM_WORLD,
+                               dof_handler.n_locally_owned_dofs());
   unsigned int sum = 0;
   for (unsigned int i = 0; i < v.size(); ++i)
     {
@@ -93,8 +94,7 @@ test()
   deallog << std::endl;
 
   Assert(dof_handler.n_locally_owned_dofs() ==
-           dof_handler.n_locally_owned_dofs_per_processor()
-             [triangulation.locally_owned_subdomain()],
+           v[triangulation.locally_owned_subdomain()],
          ExcInternalError());
   Assert(dof_handler.n_locally_owned_dofs() ==
            dof_handler.locally_owned_dofs().n_elements(),
@@ -103,21 +103,17 @@ test()
   const unsigned int N = dof_handler.n_dofs();
 
   Assert(dof_handler.n_locally_owned_dofs() <= N, ExcInternalError());
-  Assert(
-    std::accumulate(dof_handler.n_locally_owned_dofs_per_processor().begin(),
-                    dof_handler.n_locally_owned_dofs_per_processor().end(),
-                    0U) == N,
-    ExcInternalError());
+  Assert(std::accumulate(v.begin(), v.end(), 0U) == N, ExcInternalError());
 
+  std::vector<IndexSet> locally_owned_dofs_per_processor =
+    Utilities::MPI::all_gather(MPI_COMM_WORLD,
+                               dof_handler.locally_owned_dofs());
   IndexSet all(N);
-  for (unsigned int i = 0;
-       i < dof_handler.locally_owned_dofs_per_processor().size();
-       ++i)
+  for (unsigned int i = 0; i < locally_owned_dofs_per_processor.size(); ++i)
     {
-      IndexSet intersect =
-        all & dof_handler.locally_owned_dofs_per_processor()[i];
+      IndexSet intersect = all & locally_owned_dofs_per_processor[i];
       Assert(intersect.n_elements() == 0, ExcInternalError());
-      all.add_indices(dof_handler.locally_owned_dofs_per_processor()[i]);
+      all.add_indices(locally_owned_dofs_per_processor[i]);
     }
 
   Assert(all == complete_index_set(N), ExcInternalError());

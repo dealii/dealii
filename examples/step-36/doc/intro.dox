@@ -3,7 +3,7 @@
 <i>This program was contributed by Toby D. Young and Wolfgang
 Bangerth.  </i>
 
-<a name="Preamble"></a> 
+<a name="Preamble"></a>
 <h1>Preamble</h1>
 
 The problem we want to solve in this example is an eigenspectrum
@@ -30,7 +30,7 @@ Under suitable conditions, the above equations have a set of solutions
 $\Psi_\ell,\varepsilon_\ell$, $\ell\in {\cal I}$, where $\cal I$ can
 be a finite or infinite set (and in the latter case it may be a discrete or
 sometimes at least in part a continuous set). In either case, let us note that
-there is 
+there is
 no longer just a single solution, but a set of solutions (the various
 eigenfunctions and corresponding eigenvalues) that we want to
 compute. The problem of numerically finding all eigenvalues
@@ -59,8 +59,8 @@ function $\Psi(\mathbf x)$ that satisfies a relation of the
 (nondimensionalized) form
 @f{align*} [-\Delta + V(\mathbf x)]
 \Psi(\mathbf x) &= \varepsilon \Psi(\mathbf x) \qquad &&\text{in}\
-\Omega\quad, \\ \Psi &= 0 &&\text{on}\ \partial\Omega\quad.  
-@f} 
+\Omega\quad, \\ \Psi &= 0 &&\text{on}\ \partial\Omega\quad.
+@f}
 As a consequence, this particle can only exist in a certain number of
 eigenstates that correspond to the energy eigenvalues
 $\varepsilon_\ell$ admitted as solutions of this equation. The
@@ -99,23 +99,23 @@ are forced to have a zero value, after all. On the other hand, the
 finite element method gains much of its power and simplicity from
 the fact that we just do the same thing on every cell, without
 having to think too much about where a cell is, whether it bounds
-on a less refined cell and consequently has a hanging node, or is 
+on a less refined cell and consequently has a hanging node, or is
 adjacent to the boundary. All such checks would make the assembly
 of finite element linear systems unbearably difficult to write and
-even more so to read. 
+even more so to read.
 
 Consequently, of course, when you distribute degrees of freedom with
 your DoFHandler object, you don't care whether some of the degrees
 of freedom you enumerate are at a Dirichlet boundary. They all get
 numbers. We just have to take care of these degrees of freedom at a
 later time when we apply boundary values. There are two basic ways
-of doing this (either using MatrixTools::apply_boundary_values() 
+of doing this (either using MatrixTools::apply_boundary_values()
 <i>after</i> assembling the linear system, or using
 AffineConstraints::distribute_local_to_global() <i>during</i> assembly;
 see the @ref constraints "constraints module" for more information),
 but both result in the same: a linear system that has a total
 number of rows equal to the number of <i>all</i> degrees of freedom,
-including those that lie on the boundary. However, degrees of 
+including those that lie on the boundary. However, degrees of
 freedom that are constrained by Dirichlet conditions are separated
 from the rest of the linear system by zeroing out the corresponding
 row and column, putting a single positive entry on the diagonal,
@@ -137,7 +137,7 @@ a right hand side would look like this:
     F_i \\ F_b
   \end{pmatrix}.
 @f}
-Here, subscripts $i$ and $b$ correspond to interior and boundary 
+Here, subscripts $i$ and $b$ correspond to interior and boundary
 degrees of freedom, respectively. The interior degrees of freedom
 satisfy the linear system $A_i U_i=F_i$ which yields the correct
 solution in the interior, and boundary values are determined by
@@ -145,10 +145,10 @@ $U_b = D_b^{-1} F_b$ where $D_b$ is a diagonal matrix that results
 from the process of eliminating boundary degrees of freedom, and
 $F_b$ is chosen in such a way that $U_{b,j}=D_{b,jj}^{-1} F_{b,j}$
 has the correct boundary values for every boundary degree of freedom
-$j$. (For the curious, the entries of the 
+$j$. (For the curious, the entries of the
 matrix $D_b$ result from adding modified local contributions to the
-global matrix where for the local matrices the diagonal elements, if non-zero, 
-are set to their absolute value; otherwise, they are set to the average of  
+global matrix where for the local matrices the diagonal elements, if non-zero,
+are set to their absolute value; otherwise, they are set to the average of
 absolute values of the diagonal. This process guarantees that the entries
 of $D_b$ are positive and of a size comparable to the rest of the diagonal
 entries, ensuring that the resulting matrix does not incur unreasonable
@@ -207,7 +207,7 @@ On the other hand, it may happen that we find that one of the eigenvalues
 we compute in this program happens to be in this interval, and in that
 case we would not know immediately whether it is a spurious or a true
 eigenvalue. In that case, one could simply scale the diagonal elements of
-either matrix after computing the two matrices, 
+either matrix after computing the two matrices,
 thus shifting them away from the frequency of interest in the eigen-spectrum.
 This can be done by using the following code, making sure that all spurious
 eigenvalues are exactly equal to $1.234\cdot 10^5$:
@@ -218,18 +218,18 @@ eigenvalues are exactly equal to $1.234\cdot 10^5$:
           stiffness_matrix.set(i, i, 1.234e5);
           mass_matrix.set(i, i, 1);
         }
-@endcode 
+@endcode
 However, this strategy is not pursued here as the spurious eigenvalues
-we get from our program as-is happen to be greater than the lowest 
+we get from our program as-is happen to be greater than the lowest
 five that we will calculate and are interested in.
 
 
 <h3>Implementation details</h3>
 
-The program below is essentially just a slightly modified version of 
+The program below is essentially just a slightly modified version of
 step-4. The things that are different are the following:
 
-<ul> 
+<ul>
 
 <li>The main class (named <code>EigenvalueProblem</code>) now no
 longer has a single solution vector, but a whole set of vectors for
@@ -256,8 +256,7 @@ or the number of eigenvalues we want to solve for. We could go much
 further with this but stop at making only a few of the things that one
 could select at run time actual input file parameters. In order to see
 what could be done in this regard, take a look at @ref step_29
-"step-29", step-33, and in particular @ref step_19
-"step-19".</li>
+"step-29" and step-33.</li>
 
 <li>We use the FunctionParser class to make the potential $V(\mathbf
 x)$ a run-time parameter that can be specified in the input file as a
@@ -265,5 +264,5 @@ formula.</li>
 
 </ul>
 
-The rest of the program follows in a pretty straightforward way from 
+The rest of the program follows in a pretty straightforward way from
 step-4.

@@ -15,16 +15,16 @@
 
 
 
-// active fe indices transfer on refinement
+// active FE indices transfer on refinement
 
 
 #include <deal.II/distributed/tria.h>
 
+#include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/fe/fe_q.h>
 
 #include <deal.II/grid/grid_generator.h>
-
-#include <deal.II/hp/dof_handler.h>
 
 #include "../tests.h"
 
@@ -42,7 +42,6 @@ test()
   tria.refine_global(1);
   deallog << "cells before: " << tria.n_global_active_cells() << std::endl;
 
-  hp::DoFHandler<dim>   dh(tria);
   hp::FECollection<dim> fe_collection;
 
   // prepare FECollection with arbitrary number of entries
@@ -50,14 +49,13 @@ test()
   for (unsigned int i = 0; i < max_degree; ++i)
     fe_collection.push_back(FE_Q<dim>(max_degree - i));
 
-  // we need to introduce dof_handler to its fe_collection first
-  dh.set_fe(fe_collection);
+  DoFHandler<dim> dh(tria);
 
   unsigned int i = 0;
   for (auto &cell : dh.active_cell_iterators())
     if (cell->is_locally_owned())
       {
-        // set active fe index
+        // set active FE index
         if (!(cell->is_artificial()))
           {
             if (i >= fe_collection.size())
@@ -72,7 +70,7 @@ test()
                  ((dim == 2) ? "3_0:" : "7_0:"))
           cell->set_coarsen_flag();
 
-        deallog << "myid=" << myid << " cellid=" << cell->id()
+        deallog << "cellid=" << cell->id()
                 << " fe_index=" << cell->active_fe_index()
                 << " feq_degree=" << max_degree - cell->active_fe_index();
         if (cell->coarsen_flag_set())
@@ -82,6 +80,8 @@ test()
         deallog << std::endl;
       }
 
+  dh.distribute_dofs(fe_collection);
+
   // ----- transfer -----
   tria.execute_coarsening_and_refinement();
   deallog << "cells after: " << tria.n_global_active_cells() << std::endl;
@@ -89,11 +89,14 @@ test()
   // ------ verify ------
   // check if all children adopted the correct id
   for (auto &cell : dh.active_cell_iterators())
-    if (cell->is_locally_owned())
-      deallog << "myid=" << myid << " cellid=" << cell->id()
-              << " fe_index=" << cell->active_fe_index()
-              << " feq_degree=" << max_degree - cell->active_fe_index()
-              << std::endl;
+    if (!cell->is_artificial())
+      {
+        deallog << "cellid=" << cell->id()
+                << " fe_index=" << cell->active_fe_index();
+        if (cell->is_ghost())
+          deallog << " ghost";
+        deallog << std::endl;
+      }
 
   // for further calculations, distribute dofs, i.e.
   // dh.distribute_dofs(fe_collection);

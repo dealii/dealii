@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2018 by the deal.II authors
+// Copyright (C) 2010 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,6 +16,8 @@
 
 #ifndef dealii_mesh_worker_functional_h
 #define dealii_mesh_worker_functional_h
+
+#include <deal.II/base/config.h>
 
 #include <deal.II/algorithms/any_data.h>
 
@@ -42,7 +44,6 @@ namespace MeshWorker
      *
      *
      * @ingroup MeshWorker
-     * @author Guido Kanschat, 2009
      */
     template <typename number = double>
     class Functional
@@ -100,7 +101,6 @@ namespace MeshWorker
      * appropriately before using this class.
      *
      * @ingroup MeshWorker
-     * @author Guido Kanschat, 2009
      */
     template <typename number = double>
     class CellsAndFaces

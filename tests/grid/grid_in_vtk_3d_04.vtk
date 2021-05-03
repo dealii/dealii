@@ -1847,7 +1847,7 @@ CELL_TYPES 771
 9
 
 CELL_DATA 771
-SCALARS MaterialID double
+SCALARS MaterialID int
 LOOKUP_TABLE default
 0 0 0 0 0 0 0 0 0 
 0 0 0 0 0 0 0 0 0 

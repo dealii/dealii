@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2019 by the deal.II authors
+// Copyright (C) 2001 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -65,8 +65,6 @@
 
 namespace Step40
 {
-  using namespace dealii;
-
   template <int dim>
   class LaplaceProblem
   {
@@ -168,7 +166,8 @@ namespace Step40
     constraints.close();
 
     const std::vector<IndexSet> &locally_owned_dofs =
-      dof_handler.locally_owned_dofs_per_processor();
+      Utilities::MPI::all_gather(MPI_COMM_WORLD,
+                                 dof_handler.locally_owned_dofs());
     IndexSet locally_active_dofs;
     DoFTools::extract_locally_active_dofs(dof_handler, locally_active_dofs);
     AssertThrow(constraints.is_consistent_in_parallel(locally_owned_dofs,
@@ -181,16 +180,18 @@ namespace Step40
                                dof_handler.n_dofs(),
                                locally_relevant_dofs);
     DoFTools::make_sparsity_pattern(dof_handler, csp, constraints, false);
-    SparsityTools::distribute_sparsity_pattern(
-      csp,
-      dof_handler.n_locally_owned_dofs_per_processor(),
+    SparsityTools::distribute_sparsity_pattern(csp,
+                                               dof_handler.locally_owned_dofs(),
+                                               mpi_communicator,
+                                               locally_relevant_dofs);
+    system_matrix.reinit(
       mpi_communicator,
-      locally_relevant_dofs);
-    system_matrix.reinit(mpi_communicator,
-                         csp,
-                         dof_handler.n_locally_owned_dofs_per_processor(),
-                         dof_handler.n_locally_owned_dofs_per_processor(),
-                         Utilities::MPI::this_mpi_process(mpi_communicator));
+      csp,
+      Utilities::MPI::all_gather(MPI_COMM_WORLD,
+                                 dof_handler.n_locally_owned_dofs()),
+      Utilities::MPI::all_gather(MPI_COMM_WORLD,
+                                 dof_handler.n_locally_owned_dofs()),
+      Utilities::MPI::this_mpi_process(mpi_communicator));
   }
 
   template <int dim>
@@ -324,14 +325,19 @@ namespace Step40
                                        const int            proc,
                                        Vector<PetscScalar> &value) const
   {
-    typename DoFHandler<dim>::active_cell_iterator cell =
-      GridTools::find_active_cell_around_point(dof_handler, point);
+    try
+      {
+        typename DoFHandler<dim>::active_cell_iterator cell =
+          GridTools::find_active_cell_around_point(dof_handler, point);
 
-    if (cell->is_locally_owned())
-      VectorTools::point_value(dof_handler,
-                               locally_relevant_solution,
-                               point,
-                               value);
+        if (cell->is_locally_owned())
+          VectorTools::point_value(dof_handler,
+                                   locally_relevant_solution,
+                                   point,
+                                   value);
+      }
+    catch (GridTools::ExcPointNotFound<dim> &p)
+      {}
 
     std::vector<double> tmp(value.size());
     std::vector<double> tmp2(value.size());
@@ -499,8 +505,8 @@ namespace Step40
           filenames.push_back("solution-" + Utilities::int_to_string(cycle, 2) +
                               "." + Utilities::int_to_string(i, 4) + ".vtu");
 
-        std::ofstream master_output((filename + ".pvtu").c_str());
-        data_out.write_pvtu_record(master_output, filenames);
+        std::ofstream pvtu_output((filename + ".pvtu").c_str());
+        data_out.write_pvtu_record(pvtu_output, filenames);
       }
   }
 
@@ -568,7 +574,6 @@ main(int argc, char *argv[])
 {
   try
     {
-      using namespace dealii;
       using namespace Step40;
 
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);

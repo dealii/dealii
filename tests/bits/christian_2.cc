@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -32,8 +32,7 @@
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   Triangulation<2> tria;
   GridGenerator::hyper_cube(tria, 0, 1);
@@ -55,5 +54,5 @@ main()
   data_out_stack.build_patches();
   data_out_stack.finish_parameter_value();
 
-  data_out_stack.write_gnuplot(logfile);
+  data_out_stack.write_gnuplot(deallog.get_file_stream());
 }

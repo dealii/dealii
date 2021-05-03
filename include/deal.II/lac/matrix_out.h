@@ -67,7 +67,6 @@ DEAL_II_NAMESPACE_OPEN
  *
  *
  * @ingroup output
- * @author Wolfgang Bangerth, 2001
  */
 class MatrixOut : public DataOutInterface<2, 2>
 {
@@ -162,7 +161,7 @@ private:
   std::string name;
 
   /**
-   * Function by which the base class's functions get to know what patches
+   * %Function by which the base class's functions get to know what patches
    * they shall write to a file.
    */
   virtual const std::vector<Patch> &

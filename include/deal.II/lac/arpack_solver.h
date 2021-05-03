@@ -163,8 +163,6 @@ dseupd_(int *         rvec,
  * of eigenvalue problems) values. See also
  * @ref step_36 "step-36"
  * for an example.
- *
- * @author Baerbel Janssen, Agnieszka Miedlar, 2010, Guido Kanschat 2015, Joscha Gedicke 2016
  */
 class ArpackSolver : public Subscriptor
 {
@@ -483,6 +481,21 @@ inline ArpackSolver::AdditionalData::AdditionalData(
         ExcMessage(
           "'smallest imaginary part' can only be used for non-symmetric problems!"));
     }
+  // Check for possible options for asymmetric problems
+  else
+    {
+      Assert(
+        eigenvalue_of_interest != algebraically_largest,
+        ExcMessage(
+          "'largest algebraic part' can only be used for symmetric problems!"));
+      Assert(
+        eigenvalue_of_interest != algebraically_smallest,
+        ExcMessage(
+          "'smallest algebraic part' can only be used for symmetric problems!"));
+      Assert(eigenvalue_of_interest != both_ends,
+             ExcMessage(
+               "'both ends' can only be used for symmetric problems!"));
+    }
 }
 
 
@@ -764,6 +777,9 @@ ArpackSolver::solve(const MatrixType1 & /*system_matrix*/,
             break;
         }
     }
+
+  // Set number of used iterations in SolverControl
+  control().check(iparam[2], 0.);
 
   if (info < 0)
     {

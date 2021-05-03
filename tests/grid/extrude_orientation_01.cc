@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -47,7 +47,7 @@ test(std::ostream &out)
     {
       deallog << "2d cell " << c
               << " has the following face orientations:" << std::endl;
-      for (unsigned int l = 0; l < GeometryInfo<2>::faces_per_cell; ++l)
+      for (const unsigned int l : GeometryInfo<2>::face_indices())
         deallog << "    " << (c->face_orientation(l) ? "true" : "false")
                 << std::endl;
     }
@@ -63,7 +63,7 @@ test(std::ostream &out)
         << "3d cell " << c
         << " has the following face orientation/flips and edge orientations:"
         << std::endl;
-      for (unsigned int f = 0; f < GeometryInfo<3>::faces_per_cell; ++f)
+      for (const unsigned int f : GeometryInfo<3>::face_indices())
         deallog << "    face=" << f
                 << (c->face_orientation(f) ? " -> true" : " -> false")
                 << (c->face_flip(f) ? "/true" : "/false") << std::endl;

@@ -2,7 +2,9 @@
 DEAL::FE: FE_DGQ<2>(1)
 DEAL::no. cells: 16
 DEAL::Diff prolongate   l1: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff prolongate   l2: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff restrict     l1: 0.00000
 DEAL::Diff restrict add l1: 0.00000
 DEAL::Diff restrict     l2: 0.00000
@@ -10,8 +12,11 @@ DEAL::Diff restrict add l2: 0.00000
 DEAL::
 DEAL::no. cells: 64
 DEAL::Diff prolongate   l1: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff prolongate   l2: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff prolongate   l3: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff restrict     l1: 0.00000
 DEAL::Diff restrict add l1: 0.00000
 DEAL::Diff restrict     l2: 0.00000
@@ -21,7 +26,9 @@ DEAL::Diff restrict add l3: 0.00000
 DEAL::
 DEAL::no. cells: 144
 DEAL::Diff prolongate   l1: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff prolongate   l2: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff restrict     l1: 0.00000
 DEAL::Diff restrict add l1: 0.00000
 DEAL::Diff restrict     l2: 0.00000
@@ -29,9 +36,13 @@ DEAL::Diff restrict add l2: 0.00000
 DEAL::
 DEAL::no. cells: 256
 DEAL::Diff prolongate   l1: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff prolongate   l2: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff prolongate   l3: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff prolongate   l4: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff restrict     l1: 0.00000
 DEAL::Diff restrict add l1: 0.00000
 DEAL::Diff restrict     l2: 0.00000
@@ -43,7 +54,9 @@ DEAL::Diff restrict add l4: 0.00000
 DEAL::
 DEAL::no. cells: 400
 DEAL::Diff prolongate   l1: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff prolongate   l2: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff restrict     l1: 0.00000
 DEAL::Diff restrict add l1: 0.00000
 DEAL::Diff restrict     l2: 0.00000
@@ -51,8 +64,11 @@ DEAL::Diff restrict add l2: 0.00000
 DEAL::
 DEAL::no. cells: 576
 DEAL::Diff prolongate   l1: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff prolongate   l2: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff prolongate   l3: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff restrict     l1: 0.00000
 DEAL::Diff restrict add l1: 0.00000
 DEAL::Diff restrict     l2: 0.00000
@@ -62,10 +78,15 @@ DEAL::Diff restrict add l3: 0.00000
 DEAL::
 DEAL::no. cells: 1024
 DEAL::Diff prolongate   l1: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff prolongate   l2: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff prolongate   l3: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff prolongate   l4: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff prolongate   l5: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff restrict     l1: 0.00000
 DEAL::Diff restrict add l1: 0.00000
 DEAL::Diff restrict     l2: 0.00000
@@ -80,12 +101,15 @@ DEAL::
 DEAL::FE: FE_DGQ<2>(3)
 DEAL::no. cells: 4
 DEAL::Diff prolongate   l1: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff restrict     l1: 0.00000
 DEAL::Diff restrict add l1: 0.00000
 DEAL::
 DEAL::no. cells: 16
 DEAL::Diff prolongate   l1: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff prolongate   l2: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff restrict     l1: 0.00000
 DEAL::Diff restrict add l1: 0.00000
 DEAL::Diff restrict     l2: 0.00000
@@ -93,13 +117,17 @@ DEAL::Diff restrict add l2: 0.00000
 DEAL::
 DEAL::no. cells: 36
 DEAL::Diff prolongate   l1: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff restrict     l1: 0.00000
 DEAL::Diff restrict add l1: 0.00000
 DEAL::
 DEAL::no. cells: 64
 DEAL::Diff prolongate   l1: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff prolongate   l2: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff prolongate   l3: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff restrict     l1: 0.00000
 DEAL::Diff restrict add l1: 0.00000
 DEAL::Diff restrict     l2: 0.00000
@@ -109,12 +137,15 @@ DEAL::Diff restrict add l3: 0.00000
 DEAL::
 DEAL::no. cells: 100
 DEAL::Diff prolongate   l1: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff restrict     l1: 0.00000
 DEAL::Diff restrict add l1: 0.00000
 DEAL::
 DEAL::no. cells: 144
 DEAL::Diff prolongate   l1: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff prolongate   l2: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff restrict     l1: 0.00000
 DEAL::Diff restrict add l1: 0.00000
 DEAL::Diff restrict     l2: 0.00000
@@ -122,9 +153,13 @@ DEAL::Diff restrict add l2: 0.00000
 DEAL::
 DEAL::no. cells: 256
 DEAL::Diff prolongate   l1: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff prolongate   l2: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff prolongate   l3: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff prolongate   l4: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff restrict     l1: 0.00000
 DEAL::Diff restrict add l1: 0.00000
 DEAL::Diff restrict     l2: 0.00000
@@ -137,12 +172,15 @@ DEAL::
 DEAL::FE: FE_DGQ<3>(1)
 DEAL::no. cells: 8
 DEAL::Diff prolongate   l1: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff restrict     l1: 0.00000
 DEAL::Diff restrict add l1: 0.00000
 DEAL::
 DEAL::no. cells: 64
 DEAL::Diff prolongate   l1: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff prolongate   l2: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff restrict     l1: 0.00000
 DEAL::Diff restrict add l1: 0.00000
 DEAL::Diff restrict     l2: 0.00000
@@ -150,13 +188,17 @@ DEAL::Diff restrict add l2: 0.00000
 DEAL::
 DEAL::no. cells: 216
 DEAL::Diff prolongate   l1: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff restrict     l1: 0.00000
 DEAL::Diff restrict add l1: 0.00000
 DEAL::
 DEAL::no. cells: 512
 DEAL::Diff prolongate   l1: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff prolongate   l2: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff prolongate   l3: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff restrict     l1: 0.00000
 DEAL::Diff restrict add l1: 0.00000
 DEAL::Diff restrict     l2: 0.00000
@@ -166,12 +208,15 @@ DEAL::Diff restrict add l3: 0.00000
 DEAL::
 DEAL::no. cells: 1000
 DEAL::Diff prolongate   l1: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff restrict     l1: 0.00000
 DEAL::Diff restrict add l1: 0.00000
 DEAL::
 DEAL::no. cells: 1728
 DEAL::Diff prolongate   l1: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff prolongate   l2: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff restrict     l1: 0.00000
 DEAL::Diff restrict add l1: 0.00000
 DEAL::Diff restrict     l2: 0.00000
@@ -179,9 +224,13 @@ DEAL::Diff restrict add l2: 0.00000
 DEAL::
 DEAL::no. cells: 4096
 DEAL::Diff prolongate   l1: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff prolongate   l2: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff prolongate   l3: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff prolongate   l4: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff restrict     l1: 0.00000
 DEAL::Diff restrict add l1: 0.00000
 DEAL::Diff restrict     l2: 0.00000
@@ -196,6 +245,7 @@ DEAL::no. cells: 1
 DEAL::
 DEAL::no. cells: 8
 DEAL::Diff prolongate   l1: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff restrict     l1: 0.00000
 DEAL::Diff restrict add l1: 0.00000
 DEAL::
@@ -203,7 +253,9 @@ DEAL::no. cells: 27
 DEAL::
 DEAL::no. cells: 64
 DEAL::Diff prolongate   l1: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff prolongate   l2: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff restrict     l1: 0.00000
 DEAL::Diff restrict add l1: 0.00000
 DEAL::Diff restrict     l2: 0.00000
@@ -213,24 +265,30 @@ DEAL::no. cells: 125
 DEAL::
 DEAL::no. cells: 216
 DEAL::Diff prolongate   l1: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff restrict     l1: 0.00000
 DEAL::Diff restrict add l1: 0.00000
 DEAL::
 DEAL::no. cells: 512
 DEAL::Diff prolongate   l1: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff prolongate   l2: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff prolongate   l3: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff restrict     l1: 0.00000
 DEAL::Diff restrict add l1: 0.00000
 DEAL::Diff restrict     l2: 0.00000
 DEAL::Diff restrict add l2: 0.00000
-DEAL::Diff restrict     l3: 2.49702e-13
-DEAL::Diff restrict add l3: 2.50034e-13
+DEAL::Diff restrict     l3: 3.02285e-13
+DEAL::Diff restrict add l3: 3.02551e-13
 DEAL::
 DEAL::FE: FE_DGQ<2>(2)
 DEAL::no. cells: 16
 DEAL::Diff prolongate   l1: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff prolongate   l2: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff restrict     l1: 0.00000
 DEAL::Diff restrict add l1: 0.00000
 DEAL::Diff restrict     l2: 0.00000
@@ -238,8 +296,11 @@ DEAL::Diff restrict add l2: 0.00000
 DEAL::
 DEAL::no. cells: 64
 DEAL::Diff prolongate   l1: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff prolongate   l2: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff prolongate   l3: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff restrict     l1: 0.00000
 DEAL::Diff restrict add l1: 0.00000
 DEAL::Diff restrict     l2: 0.00000
@@ -249,7 +310,9 @@ DEAL::Diff restrict add l3: 0.00000
 DEAL::
 DEAL::no. cells: 144
 DEAL::Diff prolongate   l1: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff prolongate   l2: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff restrict     l1: 0.00000
 DEAL::Diff restrict add l1: 0.00000
 DEAL::Diff restrict     l2: 0.00000
@@ -257,9 +320,13 @@ DEAL::Diff restrict add l2: 0.00000
 DEAL::
 DEAL::no. cells: 256
 DEAL::Diff prolongate   l1: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff prolongate   l2: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff prolongate   l3: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff prolongate   l4: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff restrict     l1: 0.00000
 DEAL::Diff restrict add l1: 0.00000
 DEAL::Diff restrict     l2: 0.00000
@@ -271,7 +338,9 @@ DEAL::Diff restrict add l4: 0.00000
 DEAL::
 DEAL::no. cells: 400
 DEAL::Diff prolongate   l1: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff prolongate   l2: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff restrict     l1: 0.00000
 DEAL::Diff restrict add l1: 0.00000
 DEAL::Diff restrict     l2: 0.00000
@@ -279,8 +348,11 @@ DEAL::Diff restrict add l2: 0.00000
 DEAL::
 DEAL::no. cells: 576
 DEAL::Diff prolongate   l1: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff prolongate   l2: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff prolongate   l3: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff restrict     l1: 0.00000
 DEAL::Diff restrict add l1: 0.00000
 DEAL::Diff restrict     l2: 0.00000
@@ -290,10 +362,15 @@ DEAL::Diff restrict add l3: 0.00000
 DEAL::
 DEAL::no. cells: 1024
 DEAL::Diff prolongate   l1: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff prolongate   l2: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff prolongate   l3: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff prolongate   l4: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff prolongate   l5: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff restrict     l1: 0.00000
 DEAL::Diff restrict add l1: 0.00000
 DEAL::Diff restrict     l2: 0.00000
@@ -308,12 +385,15 @@ DEAL::
 DEAL::FE: FE_DGQ<3>(2)
 DEAL::no. cells: 8
 DEAL::Diff prolongate   l1: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff restrict     l1: 0.00000
 DEAL::Diff restrict add l1: 0.00000
 DEAL::
 DEAL::no. cells: 64
 DEAL::Diff prolongate   l1: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff prolongate   l2: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff restrict     l1: 0.00000
 DEAL::Diff restrict add l1: 0.00000
 DEAL::Diff restrict     l2: 0.00000
@@ -321,13 +401,17 @@ DEAL::Diff restrict add l2: 0.00000
 DEAL::
 DEAL::no. cells: 216
 DEAL::Diff prolongate   l1: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff restrict     l1: 0.00000
 DEAL::Diff restrict add l1: 0.00000
 DEAL::
 DEAL::no. cells: 512
 DEAL::Diff prolongate   l1: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff prolongate   l2: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff prolongate   l3: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff restrict     l1: 0.00000
 DEAL::Diff restrict add l1: 0.00000
 DEAL::Diff restrict     l2: 0.00000
@@ -337,12 +421,15 @@ DEAL::Diff restrict add l3: 0.00000
 DEAL::
 DEAL::no. cells: 1000
 DEAL::Diff prolongate   l1: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff restrict     l1: 0.00000
 DEAL::Diff restrict add l1: 0.00000
 DEAL::
 DEAL::no. cells: 1728
 DEAL::Diff prolongate   l1: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff prolongate   l2: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff restrict     l1: 0.00000
 DEAL::Diff restrict add l1: 0.00000
 DEAL::Diff restrict     l2: 0.00000
@@ -350,9 +437,13 @@ DEAL::Diff restrict add l2: 0.00000
 DEAL::
 DEAL::no. cells: 4096
 DEAL::Diff prolongate   l1: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff prolongate   l2: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff prolongate   l3: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff prolongate   l4: 0.00000
+DEAL::Vectors have ghosts: 0 0
 DEAL::Diff restrict     l1: 0.00000
 DEAL::Diff restrict add l1: 0.00000
 DEAL::Diff restrict     l2: 0.00000

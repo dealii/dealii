@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -77,8 +77,7 @@ main()
 
   for (; cell != endc; ++cell)
     if (cell->at_boundary() == true)
-      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-           ++face)
+      for (const unsigned int face : GeometryInfo<dim>::face_indices())
         if (cell->face(face)->at_boundary() == true)
           for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_face;
                ++v)

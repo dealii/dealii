@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -62,7 +62,6 @@ namespace PETScWrappers
      *
      * @ingroup Matrix1 @see
      * @ref GlossBlockLA "Block (linear algebra)"
-     * @author Wolfgang Bangerth, 2004
      */
     class BlockSparseMatrix : public BlockMatrixBase<SparseMatrix>
     {
@@ -137,7 +136,7 @@ namespace PETScWrappers
        * the sizes may be varying, the maximum number of elements per row may
        * be varying, etc. It is simpler not to reproduce the interface of the
        * SparsityPattern class here but rather let the user call whatever
-       * function she desires.
+       * function they desire.
        */
       void
       reinit(const size_type n_block_rows, const size_type n_block_columns);

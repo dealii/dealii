@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -29,7 +29,7 @@ test()
 {
   deallog << "Checking in " << dim << "d" << std::endl;
 
-  for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+  for (const unsigned int f : GeometryInfo<dim>::face_indices())
     for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_face; ++v)
       {
         deallog << "Face " << f << ", vertex=" << v << ": ";
@@ -38,7 +38,7 @@ test()
       }
 
   if (dim == 3)
-    for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+    for (const unsigned int f : GeometryInfo<dim>::face_indices())
       for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_face; ++v)
         {
           deallog << "Face " << f << ", vertex=" << v

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2018 by the deal.II authors
+// Copyright (C) 2001 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -104,14 +104,13 @@
 #include "../tests.h"
 
 
-using namespace dealii;
 
 template <int dim>
 struct periodicity_tests
 {
-  typedef TriaIterator<CellAccessor<dim>> cell_iterator;
-  typedef
-    typename Triangulation<dim>::active_cell_iterator active_cell_iterator;
+  using cell_iterator = TriaIterator<CellAccessor<dim>>;
+  using active_cell_iterator =
+    typename Triangulation<dim>::active_cell_iterator;
   periodicity_tests();
 
   unsigned                                  refn_cycle;
@@ -231,9 +230,9 @@ template <int dim>
 void
 periodicity_tests<dim>::check_periodicity()
 {
-  typedef std::pair<cell_iterator, unsigned> cell_face_pair;
-  typedef typename std::map<cell_face_pair, cell_face_pair>::iterator
-    cell_face_map_it;
+  using cell_face_pair = std::pair<cell_iterator, unsigned>;
+  using cell_face_map_it =
+    typename std::map<cell_face_pair, cell_face_pair>::iterator;
 
   for (int rank_i = 0; rank_i < comm_size; ++rank_i)
     {

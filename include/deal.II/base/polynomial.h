@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -56,7 +56,8 @@ namespace Polynomials
    * must be used. In case a manipulation is done that changes the roots, the
    * representation is switched to the coefficient form.
    *
-   * @author Ralf Hartmann, Guido Kanschat, 2000, 2006, Martin Kronbichler, 2011, 2017
+   * This class is a typical example of a possible template argument for the
+   * TensorProductPolynomials class.
    */
   template <typename number>
   class Polynomial : public Subscriptor
@@ -95,9 +96,11 @@ namespace Polynomials
     /**
      * Return the value of this polynomial at the given point.
      *
-     * This function uses the Horner scheme for numerical stability of the
-     * evaluation for polynomials in the coefficient form or the product of
-     * terms involving the roots if that representation is used.
+     * This function uses the most numerically stable evaluation
+     * algorithm for the provided form of the polynomial. If the
+     * polynomial is in the product form of roots, the evaluation is
+     * based on products of the form (x - x_i), whereas the Horner
+     * scheme is used for polynomials in the coefficient form.
      */
     number
     value(const number x) const;
@@ -122,14 +125,22 @@ namespace Polynomials
      * determined by @p n_derivatives and @p values has to provide sufficient
      * space for @p n_derivatives + 1 values.
      *
-     * This function uses the Horner scheme for numerical stability of the
-     * evaluation for polynomials in the coefficient form or the product of
-     * terms involving the roots if that representation is used.
+     * This function uses the most numerically stable evaluation
+     * algorithm for the provided form of the polynomial. If the
+     * polynomial is in the product form of roots, the evaluation is
+     * based on products of the form (x - x_i), whereas the Horner
+     * scheme is used for polynomials in the coefficient form.
+     *
+     * The template type `Number2` must implement arithmetic
+     * operations such as additions or multiplication with the type
+     * `number` of the polynomial, and must be convertible from
+     * `number` by `operator=`.
      */
+    template <typename Number2>
     void
-    value(const number       x,
+    value(const Number2      x,
           const unsigned int n_derivatives,
-          number *           values) const;
+          Number2 *          values) const;
 
     /**
      * Degree of the polynomial. This is the degree reflected by the number of
@@ -219,11 +230,18 @@ namespace Polynomials
 
     /**
      * Write or read the data of this object to or from a stream for the
-     * purpose of serialization.
+     * purpose of serialization using the [BOOST serialization
+     * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
      */
     template <class Archive>
     void
     serialize(Archive &ar, const unsigned int version);
+
+    /**
+     * Return an estimate (in bytes) for the memory consumption of this object.
+     */
+    virtual std::size_t
+    memory_consumption() const;
 
   protected:
     /**
@@ -286,8 +304,6 @@ namespace Polynomials
   /**
    * Class generates Polynomial objects representing a monomial of degree n,
    * that is, the function $x^n$.
-   *
-   * @author Guido Kanschat, 2004
    */
   template <typename number>
   class Monomial : public Polynomial<number>
@@ -331,8 +347,6 @@ namespace Polynomials
    * entire space of polynomials of degree less than or equal <tt>degree</tt>.
    *
    * The Lagrange polynomials are implemented up to degree 10.
-   *
-   * @author Ralf Hartmann, 2000
    */
   class LagrangeEquidistant : public Polynomial<double>
   {
@@ -391,8 +405,6 @@ namespace Polynomials
    * interval $[-1,1]$. (ii) The polynomials have been scaled in such a way
    * that they are orthonormal, not just orthogonal; consequently, the
    * polynomials do not necessarily have boundary values equal to one.
-   *
-   * @author Guido Kanschat, 2000
    */
   class Legendre : public Polynomial<double>
   {
@@ -430,8 +442,6 @@ namespace Polynomials
    *
    * These polynomials are used for the construction of the shape functions of
    * N&eacute;d&eacute;lec elements of arbitrary order.
-   *
-   * @author Markus B&uuml;rg, 2009
    */
   class Lobatto : public Polynomial<double>
   {
@@ -495,8 +505,6 @@ namespace Polynomials
    * concept of a polynomial degree, if the given argument is zero, it does
    * <b>not</b> return the linear polynomial described above, but rather a
    * constant polynomial.
-   *
-   * @author Brian Carnes, 2002
    */
   class Hierarchical : public Polynomial<double>
   {
@@ -574,9 +582,6 @@ namespace Polynomials
    * \ldots & \ldots \\
    * p_k(x) &= x^2(x-1)^2 L_{k-4}(x)
    * @f}
-   *
-   * @author Guido Kanschat
-   * @date 2012
    */
   class HermiteInterpolation : public Polynomial<double>
   {
@@ -602,13 +607,13 @@ namespace Polynomials
    * Polynomials for a variant of Hermite polynomials with better condition
    * number in the interpolation than the basis from HermiteInterpolation.
    *
-   * In analogy to the actual Hermite polynomials this basis evaluates the
+   * In analogy to the proper Hermite polynomials, this basis evaluates the
    * first polynomial $p_0$ to 1 at $x=0$ and has both a zero value and zero
    * derivative at $x=1$. Likewise, the last polynomial $p_n$ evaluates to 1
-   * at $x=1$ but has zero value and zero derivative at $x=0$. The second
+   * at $x=1$ with a zero value and zero derivative at $x=0$. The second
    * polynomial $p_1$ and the second to last polynomial $p_{n-1}$ represent
-   * the derivative degree of freedom at $x=0$ and $x=1$, respectively. As
-   * such, they are zero at both the end points $x=0, x=1$ and have zero
+   * the derivative degree of freedom at $x=0$ and $x=1$, respectively.
+   * They are zero at both the end points $x=0, x=1$ and have zero
    * derivative at the opposite end, $p_1'(1)=0$ and $p_{n-1}'(0)=0$. As
    * opposed to the original Hermite polynomials, $p_0$ does not have zero
    * derivative at $x=0$. The additional degree of freedom is used to make
@@ -617,22 +622,24 @@ namespace Polynomials
    * respectively. Furthermore, the extension of these polynomials to higher
    * degrees $n>3$ is constructed by adding additional nodes inside the unit
    * interval, again ensuring better conditioning. The nodes are computed as
-   * the roots of the Jacobi polynomials for $\alpha=\beta=2$ which are
-   * orthogonal against the generating function $x^2(1-x)^2$ with the Hermite
+   * the roots of the Jacobi polynomials for $\alpha=\beta=4$, which are
+   * orthogonal against the square of the generating function $x^2(1-x)^2$
+   * with the Hermite
    * property. Then, these polynomials are constructed in the usual way as
-   * Lagrange polynomials with double roots at $x=0$ and $x=1$. For example at
-   * $n=4$, all of $p_0, p_1, p_3, p_4$ get an additional root at $x=0.5$
+   * Lagrange polynomials with double roots at $x=0$ and $x=1$. For example
+   * with $n=4$, all of $p_0, p_1, p_3, p_4$ get an additional root at $x=0.5$
    * through the factor $(x-0.5)$. In summary, this basis is dominated by
    * nodal contributions, but it is not a nodal one because the second and
    * second to last polynomials that are non-nodal, and due to the presence of
-   * double nodes in $x=0$ and $x=1$.
+   * double nodes in $x=0$ and $x=1$. The weights of the basis functions are
+   * set such that the sum of all polynomials with unit weight represents the
+   * constant function 1, similarly to Lagrange polynomials.
    *
-   * The basis only contains Hermite information at <code>degree>=3</code>,
+   * The basis only contains Hermite information for <code>degree>=3</code>,
    * but it is also implemented for degrees between 0 and two. For the linear
    * case, the usual hat functions are implemented, whereas the polynomials
-   * for <code>degree=2</code> are $p_0(x)=(1-x)^2$, $p_1(x)=4x(x-1)$, and
-   * $p_2(x)=x^2$, in accordance with the construction principle for degree 3
-   * that allows a non-zero of $p_0$ and $p_2$.
+   * for <code>degree=2</code> are $p_0(x)=(1-x)^2$, $p_1(x)=2x(x-1)$, and
+   * $p_2(x)=x^2$, in accordance with the construction principle for degree 3.
    *
    * These two relaxations improve the condition number of the mass matrix
    * (i.e., interpolation) significantly, as can be seen from the following
@@ -661,43 +668,41 @@ namespace Polynomials
    *   <tr>
    *    <th>n=5</th>
    *    <th>1.875e+04</th>
-   *    <th>19.37</th>
+   *    <th>15.99</th>
    *   </tr>
    *   <tr>
    *    <th>n=6</th>
    *    <th>6.033e+04</th>
-   *    <th>18.99</th>
+   *    <th>16.34</th>
    *   </tr>
    *   <tr>
    *    <th>n=10</th>
    *    <th>9.756e+05</th>
-   *    <th>25.65</th>
+   *    <th>20.70</th>
    *   </tr>
    *   <tr>
    *    <th>n=15</th>
    *    <th>9.431e+06</th>
-   *    <th>36.47</th>
+   *    <th>27.91</th>
    *   </tr>
    *   <tr>
    *    <th>n=25</th>
    *    <th>2.220e+08</th>
-   *    <th>62.28</th>
+   *    <th>43.54</th>
    *   </tr>
    *   <tr>
    *    <th>n=35</th>
    *    <th>2.109e+09</th>
-   *    <th>91.50</th>
+   *    <th>59.51</th>
    *   </tr>
    * </table>
    *
    * This polynomial inherits the advantageous property of Hermite polynomials
    * where only two functions have value and/or derivative nonzero on a face
+   * advantageous for discontinuous Galerkin methods
    * but gives better condition numbers of interpolation, which improves the
    * performance of some iterative schemes like conjugate gradients with
-   * point-Jacobi.
-   *
-   * @author Martin Kronbichler
-   * @date 2018
+   * point-Jacobi. This polynomial is used in FE_DGQHermite.
    */
   class HermiteLikeInterpolation : public Polynomial<double>
   {
@@ -812,6 +817,141 @@ namespace Polynomials
         value *= lagrange_weight;
         return value;
       }
+  }
+
+
+
+  template <typename number>
+  template <typename Number2>
+  inline void
+  Polynomial<number>::value(const Number2      x,
+                            const unsigned int n_derivatives,
+                            Number2 *          values) const
+  {
+    // evaluate Lagrange polynomial and derivatives
+    if (in_lagrange_product_form == true)
+      {
+        // to compute the value and all derivatives of a polynomial of the
+        // form (x-x_1)*(x-x_2)*...*(x-x_n), expand the derivatives like
+        // automatic differentiation does.
+        const unsigned int n_supp = lagrange_support_points.size();
+        const number       weight = lagrange_weight;
+        switch (n_derivatives)
+          {
+            default:
+              values[0] = 1.;
+              for (unsigned int d = 1; d <= n_derivatives; ++d)
+                values[d] = 0.;
+              for (unsigned int i = 0; i < n_supp; ++i)
+                {
+                  const Number2 v = x - lagrange_support_points[i];
+
+                  // multiply by (x-x_i) and compute action on all derivatives,
+                  // too (inspired from automatic differentiation: implement the
+                  // product rule for the old value and the new variable 'v',
+                  // i.e., expand value v and derivative one). since we reuse a
+                  // value from the next lower derivative from the steps before,
+                  // need to start from the highest derivative
+                  for (unsigned int k = n_derivatives; k > 0; --k)
+                    values[k] = (values[k] * v + values[k - 1]);
+                  values[0] *= v;
+                }
+              // finally, multiply by the weight in the Lagrange
+              // denominator. Could be done instead of setting values[0] = 1
+              // above, but that gives different accumulation of round-off
+              // errors (multiplication is not associative) compared to when we
+              // computed the weight, and hence a basis function might not be
+              // exactly one at the center point, which is nice to have. We also
+              // multiply derivatives by k! to transform the product p_n =
+              // p^(n)(x)/k! into the actual form of the derivative
+              {
+                number k_factorial = 1;
+                for (unsigned int k = 0; k <= n_derivatives; ++k)
+                  {
+                    values[k] *= k_factorial * weight;
+                    k_factorial *= static_cast<number>(k + 1);
+                  }
+              }
+              break;
+
+            // manually implement case 0 (values only), case 1 (value + first
+            // derivative), and case 2 (up to second derivative) since they
+            // might be called often. then, we can unroll the inner loop and
+            // keep the temporary results as local variables to help the
+            // compiler with the pointer aliasing analysis.
+            case 0:
+              {
+                Number2 value = 1.;
+                for (unsigned int i = 0; i < n_supp; ++i)
+                  {
+                    const Number2 v = x - lagrange_support_points[i];
+                    value *= v;
+                  }
+                values[0] = weight * value;
+                break;
+              }
+
+            case 1:
+              {
+                Number2 value      = 1.;
+                Number2 derivative = 0.;
+                for (unsigned int i = 0; i < n_supp; ++i)
+                  {
+                    const Number2 v = x - lagrange_support_points[i];
+                    derivative      = derivative * v + value;
+                    value *= v;
+                  }
+                values[0] = weight * value;
+                values[1] = weight * derivative;
+                break;
+              }
+
+            case 2:
+              {
+                Number2 value      = 1.;
+                Number2 derivative = 0.;
+                Number2 second     = 0.;
+                for (unsigned int i = 0; i < n_supp; ++i)
+                  {
+                    const Number2 v = x - lagrange_support_points[i];
+                    second          = second * v + derivative;
+                    derivative      = derivative * v + value;
+                    value *= v;
+                  }
+                values[0] = weight * value;
+                values[1] = weight * derivative;
+                values[2] = static_cast<number>(2) * weight * second;
+                break;
+              }
+          }
+        return;
+      }
+
+    Assert(coefficients.size() > 0, ExcEmptyObject());
+
+    // if derivatives are needed, then do it properly by the full
+    // Horner scheme
+    const unsigned int   m = coefficients.size();
+    std::vector<Number2> a(coefficients.size());
+    std::copy(coefficients.begin(), coefficients.end(), a.begin());
+    unsigned int j_factorial = 1;
+
+    // loop over all requested derivatives. note that derivatives @p{j>m} are
+    // necessarily zero, as they differentiate the polynomial more often than
+    // the highest power is
+    const unsigned int min_valuessize_m = std::min(n_derivatives + 1, m);
+    for (unsigned int j = 0; j < min_valuessize_m; ++j)
+      {
+        for (int k = m - 2; k >= static_cast<int>(j); --k)
+          a[k] += x * a[k + 1];
+        values[j] = static_cast<number>(j_factorial) * a[j];
+
+        j_factorial *= j + 1;
+      }
+
+    // fill higher derivatives by zero
+    for (unsigned int j = min_valuessize_m; j <= n_derivatives; ++j)
+      values[j] = 0.;
   }
 
 

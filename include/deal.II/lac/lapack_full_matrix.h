@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2019 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -33,6 +33,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 // forward declarations
+#ifndef DOXYGEN
 template <typename number>
 class Vector;
 template <typename number>
@@ -41,7 +42,7 @@ template <typename number>
 class FullMatrix;
 template <typename number>
 class SparseMatrix;
-
+#endif
 
 /**
  * A variant of FullMatrix using LAPACK functions wherever possible. In order
@@ -53,7 +54,6 @@ class SparseMatrix;
  * usually the names chosen for the arguments in the LAPACK documentation.
  *
  * @ingroup Matrix1
- * @author Guido Kanschat, 2005, Denis Davydov, 2017, 2018
  */
 template <typename number>
 class LAPACKFullMatrix : public TransposeTable<number>
@@ -674,36 +674,6 @@ public:
   solve(LAPACKFullMatrix<number> &B, const bool transposed = false) const;
 
   /**
-   * Solve the linear system with right hand side given by applying
-   * forward/backward substitution to the previously computed LU
-   * factorization. Uses LAPACK function Xgetrs.
-   *
-   * The flag transposed indicates whether the solution of the transposed
-   * system is to be performed.
-   *
-   * @deprecated use solve() instead.
-   */
-  DEAL_II_DEPRECATED
-  void
-  apply_lu_factorization(Vector<number> &v, const bool transposed) const;
-
-  /**
-   * Solve the linear system with multiple right hand sides (as many as there
-   * are columns in the matrix b) given by applying forward/backward
-   * substitution to the previously computed LU factorization. Uses LAPACK
-   * function Xgetrs.
-   *
-   * The flag transposed indicates whether the solution of the transposed
-   * system is to be performed.
-   *
-   * @deprecated use solve() instead.
-   */
-  DEAL_II_DEPRECATED
-  void
-  apply_lu_factorization(LAPACKFullMatrix<number> &B,
-                         const bool                transposed) const;
-
-  /**
    * Compute eigenvalues of the matrix. After this routine has been called,
    * eigenvalues can be retrieved using the eigenvalue() function. The matrix
    * itself will be LAPACKSupport::unusable after this operation.
@@ -815,6 +785,17 @@ public:
    * Requires that the #state is LAPACKSupport::matrix, fills the data members
    * #wr, #svd_u, and #svd_vt, and leaves the object in the #state
    * LAPACKSupport::svd.
+   *
+   * The singular value decomposition factorizes the provided matrix (A) into
+   * three parts: U, sigma, and the transpose of V (V^T), such that A = U sigma
+   * V^T. Sigma is a MxN matrix which contains the singular values of A on
+   * the diagonal while all the other elements are zero. U is a MxM orthogonal
+   * matrix containing the left singular vectors corresponding to the singular
+   * values of A. V is a NxN orthonal matrix containing the right singular
+   * vectors corresponding the singular values of A.
+   *
+   * Note that the variable #svd_vt contains the tranpose of V and can be
+   * accessed by get_svd_vt(), while U is accessed with get_svd_u().
    */
   void
   compute_svd();
@@ -860,6 +841,20 @@ public:
    */
   number
   singular_value(const size_type i) const;
+
+  /**
+   * Retrieve the matrix #svd_u after compute_svd() or compute_inverse_svd() was
+   * called.
+   */
+  inline const LAPACKFullMatrix<number> &
+  get_svd_u() const;
+
+  /**
+   * Retrieve the matrix #svd_vt after compute_svd() or compute_inverse_svd()
+   * was called.
+   */
+  inline const LAPACKFullMatrix<number> &
+  get_svd_vt() const;
 
   /**
    * Print the matrix and allow formatting of entries.
@@ -977,7 +972,7 @@ private:
   /**
    * Thread mutex.
    */
-  mutable Threads::Mutex mutex;
+  mutable std::mutex mutex;
 };
 
 
@@ -986,7 +981,6 @@ private:
  * A preconditioner based on the LU-factorization of LAPACKFullMatrix.
  *
  * @ingroup Preconditioners
- * @author Guido Kanschat, 2006
  */
 template <typename number>
 class PreconditionLU : public Subscriptor
@@ -1170,6 +1164,28 @@ LAPACKFullMatrix<number>::singular_value(const size_type i) const
   AssertIndexRange(i, wr.size());
 
   return wr[i];
+}
+
+
+template <typename number>
+inline const LAPACKFullMatrix<number> &
+LAPACKFullMatrix<number>::get_svd_u() const
+{
+  Assert(state == LAPACKSupport::svd || state == LAPACKSupport::inverse_svd,
+         LAPACKSupport::ExcState(state));
+
+  return *svd_u;
+}
+
+
+template <typename number>
+inline const LAPACKFullMatrix<number> &
+LAPACKFullMatrix<number>::get_svd_vt() const
+{
+  Assert(state == LAPACKSupport::svd || state == LAPACKSupport::inverse_svd,
+         LAPACKSupport::ExcState(state));
+
+  return *svd_vt;
 }
 
 

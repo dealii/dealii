@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -108,7 +108,7 @@ plot(const Triangulation<dim> &tr, const unsigned int p)
   // the values of this so defined
   // function on each cell and on
   // each quadrature point
-  QTrapez<dim - 1>            quadrature;
+  QTrapezoid<dim - 1>         quadrature;
   std::vector<Vector<double>> shape_values1(quadrature.size(),
                                             Vector<double>(dim));
   std::vector<Vector<double>> shape_values2(quadrature.size(),
@@ -135,8 +135,7 @@ plot(const Triangulation<dim> &tr, const unsigned int p)
   for (typename DoFHandler<dim>::active_cell_iterator c = dof.begin_active();
        c != dof.end();
        ++c)
-    for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-         ++face)
+    for (const unsigned int face : GeometryInfo<dim>::face_indices())
       {
         deallog << "cell " << c << " face " << face;
         if (c->at_boundary(face))

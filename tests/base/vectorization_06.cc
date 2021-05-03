@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -35,7 +35,7 @@ test()
   for (unsigned int i = 0; i < vec.size(); ++i)
     vec[i] = i + 1;
 
-  const unsigned int n_vectors = VectorizedArray<Number>::n_array_elements;
+  const unsigned int n_vectors = VectorizedArray<Number>::size();
   unsigned int       indices[n_vectors];
   for (unsigned int i = 0; i < n_vectors; ++i)
     indices[i] = i;

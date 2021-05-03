@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -39,13 +39,11 @@ main()
                 << std::endl;
 
         bool manifold_ids_are_zero = cell->manifold_id() == 0;
-        for (unsigned int face_n = 0; face_n < GeometryInfo<2>::faces_per_cell;
-             ++face_n)
+        for (const unsigned int face_n : GeometryInfo<2>::face_indices())
           manifold_ids_are_zero &= cell->face(face_n)->manifold_id() == 0;
         AssertThrow(manifold_ids_are_zero, ExcInternalError());
 
-        for (unsigned int face_n = 0; face_n < GeometryInfo<2>::faces_per_cell;
-             ++face_n)
+        for (const unsigned int face_n : GeometryInfo<2>::face_indices())
           if (cell->face(face_n)->at_boundary())
             deallog << "boundary face center distance to origin: "
                     << (cell->face(face_n)->center(/*respect_manifold*/ true) -
@@ -71,13 +69,11 @@ main()
                 << cell->vertex(6) << ", " << cell->vertex(7) << std::endl;
 
         bool manifold_ids_are_zero = cell->manifold_id() == 0;
-        for (unsigned int face_n = 0; face_n < GeometryInfo<3>::faces_per_cell;
-             ++face_n)
+        for (const unsigned int face_n : GeometryInfo<3>::face_indices())
           manifold_ids_are_zero &= cell->face(face_n)->manifold_id() == 0;
         AssertThrow(manifold_ids_are_zero, ExcInternalError());
 
-        for (unsigned int face_n = 0; face_n < GeometryInfo<3>::faces_per_cell;
-             ++face_n)
+        for (const unsigned int face_n : GeometryInfo<3>::face_indices())
           if (cell->face(face_n)->at_boundary())
             deallog << "boundary face center distance to origin: "
                     << (cell->face(face_n)->center(/*respect_manifold*/ true) -

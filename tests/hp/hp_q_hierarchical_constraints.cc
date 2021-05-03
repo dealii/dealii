@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -44,7 +44,6 @@
 
 //#define FEQH_DEBUG_OUTPUT
 
-using namespace dealii;
 
 template <int dim>
 void
@@ -69,21 +68,21 @@ test(const bool apply_constrains, const unsigned int hp)
   }
 
   hp::FECollection<dim>     fe;
-  hp::DoFHandler<dim>       dof_handler(triangulation);
+  DoFHandler<dim>           dof_handler(triangulation);
   AffineConstraints<double> constraints; // for boundary conditions
 
 
-  // populate fe system:
+  // populate FE system:
   fe.push_back(FE_Q_Hierarchical<dim>(2));
   fe.push_back(FE_Q_Hierarchical<dim>(4));
 
   // set one cell to have different active_fe_index:
-  typename hp::DoFHandler<dim>::active_cell_iterator cell =
+  typename DoFHandler<dim>::active_cell_iterator cell =
     dof_handler.begin_active();
   cell->set_active_fe_index(1);
 
   // need to distribute dofs before refinement,
-  // otherwise active fe index will not transfer to child cells
+  // otherwise active FE index will not transfer to child cells
   dof_handler.distribute_dofs(fe);
 
   // refine first cell (simple case)
@@ -127,7 +126,7 @@ test(const bool apply_constrains, const unsigned int hp)
         }
 
 #ifdef FEQH_DEBUG_OUTPUT
-      DataOut<dim, hp::DoFHandler<dim>> data_out;
+      DataOut<dim, DoFHandler<dim>> data_out;
       data_out.attach_dof_handler(dof_handler);
 
       data_out.add_data_vector(v, "shape_function");

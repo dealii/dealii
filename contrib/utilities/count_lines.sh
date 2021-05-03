@@ -1,7 +1,7 @@
 #!/bin/sh
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2018 by the deal.II authors
+## Copyright (C) 2018 - 2019 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -38,6 +38,14 @@
 #       copy you are working in, where it will be an untracked file that
 #       git leaves alone as it cycles through repository commits.
 #
+# NOTE: Separately, since the script requires git to check out many
+#       different versions, all of which have files that may not exist
+#       in the current tip of the git repository you have on your hard
+#       drive, or have files that have changed over time, it is going
+#       to lead to certain heartbreak if you run this script in a directory
+#       that has anything other than a pristine clone of the current git
+#       repository. Do not run it in directory in which you do or have
+#       done development work.
 #
 # The output of this file consists of three numbers per line, showing
 #   date source-lines test-lines

@@ -1,0 +1,6 @@
+Removed: The class parallel::distributed::ErrorPredictor has been
+removed. Use the function hp::Refinement::predict_error() in combination
+with parallel::distributed::CellDataTransfer instead. Please consult the
+documentation of hp::Refinement::predict_error() for instructions.
+<br>
+(Marc Fehling, 2021/04/21)

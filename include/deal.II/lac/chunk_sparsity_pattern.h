@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2019 by the deal.II authors
+// Copyright (C) 2008 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,9 +30,11 @@
 DEAL_II_NAMESPACE_OPEN
 
 
+// Forward declaration
+#ifndef DOXYGEN
 template <typename>
 class ChunkSparseMatrix;
-
+#endif
 
 /*! @addtogroup Sparsity
  *@{
@@ -56,9 +58,6 @@ namespace ChunkSparsityPatternIterators
    * Note that this class only allows read access to elements, providing their
    * row and column number. It does not allow modifying the sparsity pattern
    * itself.
-   *
-   * @author Martin Kronbichler
-   * @date 2013
    */
   class Accessor
   {
@@ -155,9 +154,7 @@ namespace ChunkSparsityPatternIterators
     void
     advance();
 
-    /**
-     * Grant access to iterator class.
-     */
+    // Grant access to iterator class.
     friend class Iterator;
   };
 
@@ -241,8 +238,6 @@ namespace ChunkSparsityPatternIterators
  * It uses the compressed row storage (CSR) format to store data.
  *
  * The use of this class is demonstrated in step-51.
- *
- * @author Wolfgang Bangerth, 2008
  */
 class ChunkSparsityPattern : public Subscriptor
 {
@@ -852,15 +847,11 @@ private:
    */
   SparsityPattern sparsity_pattern;
 
-  /**
-   * Make all the chunk sparse matrix kinds friends.
-   */
+  // Make all the chunk sparse matrix kinds friends.
   template <typename>
   friend class ChunkSparseMatrix;
 
-  /**
-   * Make the accessor class a friend.
-   */
+  // Make the accessor class a friend.
   friend class ChunkSparsityPatternIterators::Accessor;
 };
 
@@ -1127,7 +1118,7 @@ ChunkSparsityPattern::end() const
 inline ChunkSparsityPattern::iterator
 ChunkSparsityPattern::begin(const size_type r) const
 {
-  Assert(r < n_rows(), ExcIndexRange(r, 0, n_rows()));
+  AssertIndexRange(r, n_rows());
   return {this, r};
 }
 
@@ -1136,7 +1127,7 @@ ChunkSparsityPattern::begin(const size_type r) const
 inline ChunkSparsityPattern::iterator
 ChunkSparsityPattern::end(const size_type r) const
 {
-  Assert(r < n_rows(), ExcIndexRange(r, 0, n_rows()));
+  AssertIndexRange(r, n_rows());
   return {this, r + 1};
 }
 

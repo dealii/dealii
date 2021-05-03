@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2018 by the deal.II authors
+// Copyright (C) 2015 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -32,13 +32,13 @@
 
 #include "../tests.h"
 
-#define PRINTME(name, var)                              \
-  deallog << "Block vector: " name << ":" << std::endl; \
-  for (unsigned int i = 0; i < var.n_blocks(); ++i)     \
-    deallog << "[block " << i << " ]  " << var.block(i);
-
-
-using namespace dealii;
+#define PRINTME(name, var)                               \
+  deallog << "Block vector: " name << ":" << std::endl;  \
+  for (unsigned int i = 0; i < var.n_blocks(); ++i)      \
+    {                                                    \
+      deallog << "[block " << i << " ]  " << std::flush; \
+      var.block(i).print(deallog.get_file_stream());     \
+    }
 
 int
 main()
@@ -58,8 +58,8 @@ main()
 
   dof_handler.distribute_dofs(fe);
 
-  std::vector<types::global_dof_index> dofs_per_component(2);
-  DoFTools::count_dofs_per_component(dof_handler, dofs_per_component);
+  const std::vector<types::global_dof_index> dofs_per_component =
+    DoFTools::count_dofs_per_fe_component(dof_handler);
   const unsigned int n_u = dofs_per_component[0], n_p = dofs_per_component[1];
 
   BlockDynamicSparsityPattern dsp(2, 2);
@@ -112,7 +112,7 @@ main()
   auto op_b11 = linear_operator(a.block(1, 1));
 
   std::array<std::array<decltype(op_b00), 2>, 2> temp{
-    {{op_b00, op_b01}, {op_b10, op_b11}}};
+    {{{op_b00, op_b01}}, {{op_b10, op_b11}}}};
   auto op_b = block_operator<2, 2, BlockVector<double>>(temp);
 
   {
@@ -189,9 +189,9 @@ main()
   // And finally complicated block structures:
 
   std::array<std::array<decltype(op_b00), 3>, 3> temp2{
-    {{op_b00, op_b01, op_b00},
-     {op_b10, op_b11, op_b10},
-     {op_b10, op_b11, op_b10}}};
+    {{{op_b00, op_b01, op_b00}},
+     {{op_b10, op_b11, op_b10}},
+     {{op_b10, op_b11, op_b10}}}};
   auto op_upp_x_upu = block_operator<3, 3, BlockVector<double>>(temp2);
 
   op_upp_x_upu.reinit_domain_vector(u, false);
@@ -210,11 +210,11 @@ main()
   PRINTME("v", v);
 
   std::array<std::array<decltype(op_b01), 1>, 3> temp3{
-    {{op_b01}, {op_b11}, {op_b11}}};
+    {{{op_b01}}, {{op_b11}}, {{op_b11}}}};
   auto op_upp_x_p = block_operator<3, 1, BlockVector<double>>(temp3);
 
   std::array<std::array<decltype(op_b01), 3>, 1> temp4{
-    {{op_b00, op_b01, op_b00}}};
+    {{{op_b00, op_b01, op_b00}}}};
   auto op_u_x_upu = block_operator<1, 3, BlockVector<double>>(temp4);
 
   auto op_long = op_u_x_upu * transpose_operator(op_upp_x_upu) * op_upp_x_p;

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -72,8 +72,7 @@ main()
       create_triangulation(case_no, tria);
       const Triangulation<2>::active_cell_iterator cell = tria.begin_active();
       Triangulation<2>::face_iterator              face;
-      for (unsigned int face_no = 0; face_no < GeometryInfo<2>::faces_per_cell;
-           ++face_no)
+      for (const unsigned int face_no : GeometryInfo<2>::face_indices())
         {
           face = cell->face(face_no);
           boundary.get_normals_at_vertices(face, normals);

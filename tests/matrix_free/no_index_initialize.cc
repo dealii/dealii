@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,11 +17,6 @@
 
 // check that FEEvaluation can be evaluated without indices initialized (and
 // throws an exception when trying to read/write from/to vectors)
-
-#include "../tests.h"
-
-
-std::ofstream logfile("output");
 
 #include <deal.II/base/utilities.h>
 
@@ -44,6 +39,8 @@ std::ofstream logfile("output");
 #include <deal.II/numerics/vector_tools.h>
 
 #include <iostream>
+
+#include "../tests.h"
 
 
 // forward declare this function
@@ -84,13 +81,12 @@ public:
         else
           for (unsigned int e = 0; e < fe_eval.dofs_per_cell; ++e)
             fe_eval.submit_dof_value(make_vectorized_array<Number>(1.), e);
-        fe_eval.evaluate(true, true, true);
+        fe_eval.evaluate(EvaluationFlags::values | EvaluationFlags::gradients |
+                         EvaluationFlags::hessians);
 
         // values should evaluate to one, derivatives to zero
         for (unsigned int q = 0; q < fe_eval.n_q_points; ++q)
-          for (unsigned int d = 0;
-               d < VectorizedArray<Number>::n_array_elements;
-               ++d)
+          for (unsigned int d = 0; d < VectorizedArray<Number>::size(); ++d)
             {
               Assert(fe_eval.get_value(q)[d] == 1., ExcInternalError());
               for (unsigned int e = 0; e < dim; ++e)
@@ -173,7 +169,7 @@ int
 main()
 {
   deal_II_exceptions::disable_abort_on_exception();
-  deallog.attach(logfile);
+  initlog();
 
   deallog << std::setprecision(3);
   test<2, 1>();
@@ -190,7 +186,7 @@ test()
   typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(),
                                                     endc = tria.end();
   for (; cell != endc; ++cell)
-    for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+    for (const unsigned int f : GeometryInfo<dim>::face_indices())
       if (cell->at_boundary(f))
         cell->face(f)->set_all_manifold_ids(0);
   tria.set_manifold(0, manifold);

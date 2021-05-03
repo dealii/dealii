@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2018 by the deal.II authors
+// Copyright (C) 2002 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -27,16 +27,25 @@ main()
 {
   initlog();
 
+  // default values
+  int         int1         = 1;
+  int         int2         = 2;
+  double      double1      = 1.234;
+  double      double2      = 4.321;
+  std::string str          = "< & > ; /";
+  int         intint       = 2;
+  double      doubledouble = 6.1415926;
+
   ParameterHandler prm;
-  prm.declare_entry("int1", "1", Patterns::Integer(), "doc 1");
-  prm.declare_entry("int2", "2", Patterns::Integer(), "doc 2");
+  prm.add_parameter("int1", int1, "doc 1");
+  prm.add_parameter("int2", int2, "doc 2");
   prm.enter_subsection("ss1");
   {
-    prm.declare_entry("double 1", "1.234", Patterns::Double(), "doc 3");
+    prm.add_parameter("double 1", double1, "doc 3");
 
     prm.enter_subsection("ss2");
     {
-      prm.declare_entry("double 2", "4.321", Patterns::Double(), "doc 4");
+      prm.add_parameter("double 2", double2, "doc 4");
     }
     prm.leave_subsection();
   }
@@ -45,21 +54,23 @@ main()
   // things with strange characters
   prm.enter_subsection("Testing%testing");
   {
-    prm.declare_entry("string&list",
-                      "< & > ; /",
-                      Patterns::Anything(),
-                      "docs 1");
-    prm.declare_entry("int*int", "2", Patterns::Integer());
-    prm.declare_entry("double+double",
-                      "6.1415926",
-                      Patterns::Double(),
-                      "docs 3");
+    prm.add_parameter("string&list", str, "docs 1");
+    prm.add_parameter("int*int", intint);
+    prm.add_parameter("double+double", doubledouble, "docs 3");
   }
   prm.leave_subsection();
 
   // read from json
   std::ifstream in(SOURCE_DIR "/prm/parameter_handler_read_json.prm");
   prm.parse_input_from_json(in);
+
+  Assert(int1 == 2, ExcNotImplemented());
+  Assert(int2 == 3, ExcNotImplemented());
+  Assert(double1 == 2.234, ExcNotImplemented());
+  Assert(double2 == 5.321, ExcNotImplemented());
+  Assert(str == "< & > ; /", ExcNotImplemented());
+  Assert(intint == 2, ExcNotImplemented());
+  Assert(doubledouble == 7.1415926, ExcNotImplemented());
 
   // write it out again
   prm.print_parameters(deallog.get_file_stream(), ParameterHandler::JSON);

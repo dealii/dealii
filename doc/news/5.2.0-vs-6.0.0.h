@@ -68,7 +68,7 @@ inconvenience this causes.
        namespace dealii;</code> declaration at the top of each file,
        or qualify each deal.II class and function explicitly with
        <code>dealii::</code> namespace access.
-       <br> 
+       <br>
        (WB 2006/10/22)
        </p>
 
@@ -76,8 +76,8 @@ inconvenience this causes.
        Changed: Indices, such as vertex indices, are usually represented by
        unsigned integers in deal.II. One place where we didn't do this was in
        the <code>CellData</code> structure that can be used to describe cells
-       when building a triangulation. This has now been rectified. 
-       <br> 
+       when building a triangulation. This has now been rectified.
+       <br>
        (WB 2006/09/06)
        </p>
 
@@ -107,7 +107,7 @@ inconvenience this causes.
        elements, the ordering of boundary DoFs returned by <code>DoFTools::map_dof_to_boundary_indices</code> has been
        changed. Fortunately, this is a rarely used function so that the effect
        should be limited to only a few programs.
-       <br> 
+       <br>
        (WB 2006/04/26)
        </p>
 
@@ -119,7 +119,7 @@ inconvenience this causes.
        that you can't call these functions for face or edge iterators
        any more, but only cells. Since this is what is usually
        desired, this should not be too severe a restriction.
-       <br> 
+       <br>
        (WB 2006/04/26)
        </p>
 
@@ -127,7 +127,7 @@ inconvenience this causes.
        Changed: The template argument of the <code>InterGridMap</code> class has been changed. Code
        like e.g. <code>InterGridMap&lt;DoFHandler,2&gt;</code> must be
        replaced by <code>InterGridMap&lt;DoFHandler&lt;2&gt; &gt;</code>.
-       <br> 
+       <br>
        (RH 2006/02/27)
        </p>
 
@@ -138,7 +138,7 @@ inconvenience this causes.
        argument is replaced by the type of DoFHandler they correspond
        to. This may be <code>::DoFHandler</code> or
        <code>hp::DoFHandler</code>.
-       <br> 
+       <br>
        (RH 2006/02/10, WB 2005/12/20)
        </p>
 
@@ -146,7 +146,7 @@ inconvenience this causes.
        Removed: Support for gcc2.95 in particular, and all compilers that do
        not support the <code>std::ostringstream</code> class in general,
        has been removed.
-       <br> 
+       <br>
        (WB 2006/02/03)
        </p>
 
@@ -158,7 +158,7 @@ inconvenience this causes.
        problems to application programs. On the other hand, it moves common
        names like <code>Line</code> and <code>Quad</code> out of the global
        namespace.
-       <br> 
+       <br>
        (WB 2006/01/13)
        </p>
 
@@ -177,7 +177,7 @@ inconvenience this causes.
        action; if you really want the old behavior back, cast the
        argument to the base class before the call, like so:
        <code>DoFRenumbering::component_wise(static_cast&lt;DoFHandler&lt;dim&gt;&&gt;(mg_dof_handler))</code>)
-       <br> 
+       <br>
        (WB 2005/12/15)
        </p>
 
@@ -195,8 +195,8 @@ inconvenience this causes.
        old vertex ordering. However, as this function might not be
        supported forever users are advised to change their code to the
        new numbering scheme and to use the <code>Triangulation::create_triangulation</code>
-       function.  
-       <br> 
+       function.
+       <br>
        (RH 2005/11/02)
        </p>
 </ol>
@@ -219,7 +219,7 @@ inconvenience this causes.
        </p>
 
   <li> <p>New: The step-27 tutorial program has been added. It solves a Laplace
-          equation with hp finite elements 
+          equation with hp finite elements
 	  and shows how to set finite element degrees, assemble matrices on
 	  cells with varying polynomial degrees, and how to compute a simple
 	  criterion for estimating the local Sobolev smoothness of a function.
@@ -243,12 +243,12 @@ inconvenience this causes.
        been extended by new flags <tt>face_flip</tt> and <tt>face_rotation</tt>,
        denoting a face which is rotated against the 'standard face' by 180 and 90
        degrees, respectively. Furthermore, there is a new flag
-       <tt>line_orientation</tt> with obvious meaning. 
+       <tt>line_orientation</tt> with obvious meaning.
 		 <br> These flags have to be respected during creation and refinement of a
 		 triangulation, when projecting quadrature points to faces or when the dof
 		 indices on a cell are extracted. Furthermore, asking for vertices and
 		 lines of cells is in some cases a bit more complicated. The same applies,
-       for example, 
+       for example,
 		 to the extraction of the information, which child of a neighbor is behind
 		 a given subface. However, this information is supplied by various
 		 functions in <code>GeometryInfo</code>. As a rule-of-thumb:
@@ -298,7 +298,7 @@ inconvenience this causes.
 	libraries that would contain illegal instructions. This is now fixed.
 	<br>
 	(WB 2006/08/09)
-	</p> 
+	</p>
 
   <li> <p> Changed: The default number of subdivisions in the <code>build_patches</code> functions of the DataOut classes is
        now part of the parameters read by <code>parse_parameters</code>. This default value is used
@@ -312,7 +312,7 @@ inconvenience this causes.
 	library instead of the contributed.
 	<br>
 	(GK 2006/03/23)
-	</p> 
+	</p>
 
   <li> <p>New: The step-20 tutorial program was added. It shows how to use
        Raviart-Thomas elements to solve a mixed formulation of the Laplace
@@ -367,7 +367,7 @@ inconvenience this causes.
        the API manual (and the other way round) and leads to a
        generally much nicer output. In particular, formulas embedded
        in the documentation of the programs are now properly displayed.
-       <br> 
+       <br>
        (WB 2006/01/16)
        </p>
 
@@ -375,7 +375,7 @@ inconvenience this causes.
        Improved: The link to the manual now points directly to
        Doxygen's module list, and almost all classes are now grouped
        into modules that capture related functionality.
-       <br> 
+       <br>
        (WB 2006/01/16)
        </p>
 
@@ -385,8 +385,8 @@ inconvenience this causes.
        <code>PETSC_ARCH</code> environment variables but do not wish
        deal.II to be configured for PETSc use, you
        should specify <code>--with-petsc=no</code> as a flag during
-       configuration. 
-       <br> 
+       configuration.
+       <br>
        (WB 2006/01/16)
        </p>
 
@@ -402,7 +402,7 @@ inconvenience this causes.
        impossible to figure out if you didn't know what was going
        on. This mechanism has now been robustified and should yield
        better error messages.
-       <br> 
+       <br>
        (WB 2005/11/23)
        </p>
 
@@ -410,14 +410,14 @@ inconvenience this causes.
        New: The dynamic libraries, which is the name of shared libs
        under Apples OSX, are now supported on these platforms and
        enabled by default. They should safe a lot of harddisk space.
-       <br> 
+       <br>
        (Oliver Kayser-Herold 2005/10/20)
        </p>
 
   <li> <p>
        Fixed: The <tt>Tecplot</tt> library (<tt>tecio.a</tt>) was
        detected but not added to <tt>LIBS</tt>. This is now fixed.
-       <br> 
+       <br>
        (RH 2005/09/23)
        </p>
 
@@ -428,7 +428,7 @@ inconvenience this causes.
        <tt>NetCDF</tt> installation directory can also be specified
        through the <tt>--with-netcdf=/path/to/netcdf</tt> configure
        option.
-       <br> 
+       <br>
        (RH 2005/09/23)
        </p>
 
@@ -436,7 +436,7 @@ inconvenience this causes.
        Fixed: The PETSc libraries have been relinked each time
        <tt>make</tt> was called. Now, the PETSc libraries will only be
        relinked if necessary.
-       <br> 
+       <br>
        (RH 2005/09/15)
        </p>
 
@@ -451,11 +451,11 @@ inconvenience this causes.
 
   <li> <p> New: There is a new class:
        <code>Functions::FEFieldFunction</code> which is a Function
-       interface to a finite element solution. 
-       <br> 
+       interface to a finite element solution.
+       <br>
        (Luca Heltai 2007/08/29)
 
-  
+
   <li> <p> Improved: <code>FunctionDerivative</code> is now
   derived from <code>AutoDerivativeFunction</code> and implements
   gradients as well, giving you automatic second derivatives of a function.
@@ -468,7 +468,7 @@ inconvenience this causes.
        <code>n</code> is a constant known at compile time. It allows to
        calculate powers efficiently at compile time, most often things like a
        number to the power <code>dim</code>.
-       <br> 
+       <br>
        (WB 2007/06/23)
        </p>
 
@@ -478,20 +478,20 @@ inconvenience this causes.
        be of no concern to users. However, this restriction was
        previously undocumented, even if implied. The documentation for
        this has now been updated.
-       <br> 
+       <br>
        (WB 2007/02/08)
        </p>
 
   <li> <p> New: The new <code>Functions::Monomial</code> class implements
        monomials as a function object.
-       <br> 
+       <br>
        (WB 2006/12/15)
        </p>
 
   <li> <p> Fixed: If no substring is found with a width smaller than the given
        threshold, the <code>Utilities::break_text_into_lines</code> function now
        returns the smallest possible substring (larger than the threshold).
-       <br> 
+       <br>
        (Tobias Leicht 2006/12/13)
        </p>
 
@@ -523,7 +523,7 @@ inconvenience this causes.
        tensors. There is now a new version of this function, that contracts a
        tensor of rank three with a second one of rank two over given indices
        <tt>index1</tt> and <tt>index2</tt> of the first and second tensor,
-       respectively, resulting in a tensor of rank three. 
+       respectively, resulting in a tensor of rank three.
        <br>
        (Tobias Leicht 2006/09/27)
        </p>
@@ -559,7 +559,7 @@ inconvenience this causes.
        desirable, for example here:
        <pre>
        <code>
-          void f() 
+          void f()
           {
 	    Triangulation tria;
 	    DoFHandler *dh = new DoFHandler(tria);
@@ -601,7 +601,7 @@ inconvenience this causes.
        distance of a given point to the unit cell, and
        <code>project_to_unit_cell</code> returning the projection of a point
        onto the unit cell. Also, a new member <code>vertex_to_face</code> allow
-       to determine to which faces of a cell a vertex belongs. 
+       to determine to which faces of a cell a vertex belongs.
        <br>
        (Ralf B. Schulz 2006/05/10)
        </p>
@@ -648,7 +648,7 @@ inconvenience this causes.
        (GK 2006/03/08)
        </p>
 
-  <li> <p>Fixed: Writing a denormal "NaN" through <code>LogStream</code> objects such as 
+  <li> <p>Fixed: Writing a denormal "NaN" through <code>LogStream</code> objects such as
        <code>deallog</code> erroneously printed zero, rather
        than "nan". This is now fixed.
        <br>
@@ -721,7 +721,7 @@ inconvenience this causes.
 
   <li> <p>
        New: There are new functions
-       <code>Utilities::match_at_string_start</code> and 
+       <code>Utilities::match_at_string_start</code> and
        <code>Utilities::get_integer_at_position</code>.
        <br>
        (WB 2005/12/19)
@@ -736,9 +736,9 @@ inconvenience this causes.
        </p>
 
   <li> <p>
-       Fixed: <code>DataOutBase&lt;2,3&gt;::write_tecplot_binary</code>
-       did not write the <code>z</code> coordinates. This is now
-       fixed.
+       Fixed: <code>DataOutBase::write_tecplot_binary()</code> with
+       dim=2 and spacedim=3 did not write the <code>z</code> coordinates.
+       This is now fixed.
        <br>
        (RH 2005/09/28)
        </p>
@@ -747,7 +747,7 @@ inconvenience this causes.
        Fixed: The <tt>tecplot_binary</tt> <code>OutputFormat</code> has been added to <code>DataOutBase::get_output_format_names</code>. Now
        an exception will be raised if <code>write_tecplot_binary</code> is invoked without
        specifying the filename through the <code>DataOutBase::TecplotFlags</code> interface.
-       <br> 
+       <br>
        (RH 2005/09/23)
        </p>
 
@@ -756,7 +756,7 @@ inconvenience this causes.
        <code>Utilities::System</code> namespace. In case
        of a code not running in parallel, they simply return 1 and 0,
        respectively.
-       <br> 
+       <br>
        (RH 2005/09/20)
        </p>
 </ol>
@@ -803,13 +803,13 @@ inconvenience this causes.
        (WB 2007/02/09)
        </p>
 
-  <li> <p>Improved: A simple <code>print_formatted</code> 
+  <li> <p>Improved: A simple <code>print_formatted</code>
        function has been added to <code>SparseMatrixEZ</code>.
        <br>
        (Moritz Allmaras 2007/02/08)
        </p>
 
-  <li> <p>Fixed: The <code>SparseDirectMA27</code> 
+  <li> <p>Fixed: The <code>SparseDirectMA27</code>
        class works for symmetric matrices and had a check to make sure the
        matrix is indeed symmetric. However, the check compared entries for
        equality, something one should not do for floating point numbers. It now
@@ -818,7 +818,7 @@ inconvenience this causes.
        (WB 2006/12/21)
        </p>
 
-  <li> <p>Fixed: The <code>FullMatrix::invert</code> 
+  <li> <p>Fixed: The <code>FullMatrix::invert</code>
        function would return wrong results if one tried to invert a
        matrix of dimension smaller than 5 in situ. This is now fixed.
        <br>
@@ -853,7 +853,7 @@ inconvenience this causes.
        now estimate the condition number of the linear system using <code>TridiagonalMatrix</code> and LAPACK.
        <br>
        (GK 2006/09/06)
-       </p>  
+       </p>
 
   <li> <p>New: the class <code>TridiagonalMatrix</code>
        has been introduced together with its basic methods, including an
@@ -863,8 +863,8 @@ inconvenience this causes.
        </p>
 
   <li> <p> Improved: PETSc 2.3.1 (<i>build 16</i>) is now supported by the
-       linear preconditioner classes. The new PETSc functions 
-       <code>PCFactorSetXXX</code> are used.<br>       
+       linear preconditioner classes. The new PETSc functions
+       <code>PCFactorSetXXX</code> are used.<br>
        (Florian Prill, 2006/08/04)
        </p>
 
@@ -874,43 +874,43 @@ inconvenience this causes.
        the transpose of the matrix it points to.
        <br>
        (GK 2006/07/07)
-       </p>  
+       </p>
 
   <li> <p>New: There is now a function <code>FullMatrix::trace</code> that does what its name suggests
        it does.
        <br>
        (WB 2006/06/16)
        </p>
-  
+
   <li> <p>Improved: <code>PointerMatrixAux</code> now has a
        default constructor and a function for setting the <code>VectorMemory</code> object.
        <br>
        (GK 2006/06/14)
        </p>
-  
+
   <li> <p>Fixed: <code>FullMatrix::print</code> would yield a link error
        when used with <code>std::ofstream</code> since an explicit
        instantiation was missing. The function has now been moved to
        the header file and made inline so that it is always visible,
        whatever the type of the output stream is.
-       <br> 
+       <br>
        (WB 2006/06/07)
        </p>
-  
+
   <li> <p> Improved: The <code>SparseDirectUMFPACK</code> solver can now also be
        used with sparse matrices with elements of type float, as well
        as with block matrices with types float and double.
-       <br> 
+       <br>
        (WB 2006/04/25)
        </p>
 
   <li> <p> New: The function <code>BlockSparsityPattern::row_length</code> adds up
        the row lengths of the individual blocks of a block matrix for
        a given row.
-       <br> 
+       <br>
        (WB 2006/04/25)
        </p>
-  
+
   <li> <p> New: There is a new class <code>IdentityMatrix</code> that represents an
        efficient version of the matrix with ones on the diagonal and
        zeros everywhere else. The main usefulness of this matrix lies
@@ -918,10 +918,10 @@ inconvenience this causes.
        assignment operators and copy constructors that allow to
        conveniently fill a (sparse, full) matrix with the identity
        matrix.
-       <br> 
+       <br>
        (WB 2006/04/24)
        </p>
-  
+
   <li> <p> New: There are now assignment operators from <code>BlockVector</code> to <code>Vector</code> and back.
        <br>
        (WB 2006/03/30)
@@ -942,7 +942,7 @@ inconvenience this causes.
        the linear solver fails.
        <br>
        (Stephan Kramer, WB 2006/03/15)
-       </p>  
+       </p>
 
   <li> <p>
        Changed: There are new <code>FullMatrix</code>::<code>equ</code> functions which assign <tt>this</tt>
@@ -951,7 +951,7 @@ inconvenience this causes.
        function for three vectors.
        <br>
        (RH 2006/02/21)
-       </p>  
+       </p>
 
   <li> <p>
        Fixed: The <code>SolverMinRes</code> class did not work
@@ -959,27 +959,27 @@ inconvenience this causes.
        This is now fixed.
        <br>
        (Luca Heltai 2006/02/19)
-       </p>  
+       </p>
 
   <li> <p>
        Changed: There are now new <code>FullMatrix</code>::<code>add</code> functions which add two and three
        scaled matrices.
        <br>
        (RH 2006/02/16)
-       </p>  
+       </p>
 
   <li> <p>
        Changed: The matrix classes <code>FullMatrix</code>, <code>SparseMatrix</code>, <code>SparseMatrixEZ</code> and <code>BlockMatrixBase</code> now have an <code>add</code> function analogous to the <code>add</code> of vector classes. The old <code>add_scaled</code> functions are now deprecated.
        <br>
        (RH 2006/02/16)
-       </p>  
+       </p>
 
-  <li> <p>       
+  <li> <p>
        Improved: <code>BlockMatrixArray</code>::<code>enter_aux</code> allows using matrices without
        adding vector multiplication by using <code>PointerMatrixAux</code>.
        <br>
        (GK 2006/02/02)
-       </p>  
+       </p>
 
   <li> <p>
        New: The class <code>PointerMatrixAux</code> was
@@ -994,10 +994,10 @@ inconvenience this causes.
        Improved: The <code>FilteredMatrix</code> class
        was able to filter only the <code>SparseMatrix</code>
        matrix class.
-       A new (faster) version is now in its place with the same interface 
-       that is able to perform such a filter on anything that provides 
+       A new (faster) version is now in its place with the same interface
+       that is able to perform such a filter on anything that provides
        the usual matrix vector operations.
-       <br> 
+       <br>
        (Luca Heltai 2006/01/09)
        </p>
 
@@ -1014,7 +1014,7 @@ inconvenience this causes.
        specifically use a different memory allocation class, have been
        changed to not specify anything at all, and thus fall back to
        the default.
-       <br> 
+       <br>
        (WB 2005/11/23)
        </p>
 
@@ -1024,7 +1024,7 @@ inconvenience this causes.
        (i.e. with a zero integer, rather than a floating point number on the
        right), in that that opened up a second conversion sequence and the
        compiler complained about an ambiguity. This is now fixed.
-       <br> 
+       <br>
        (WB 2005/10/17)
        </p>
 
@@ -1033,7 +1033,7 @@ inconvenience this causes.
        also the <code>Tvmult</code> method. This feature
        allows the straightforward use of <code>SparseILU</code>
        as a multigrid smoother within the framework.
-       <br> 
+       <br>
        (Oliver Kayser-Herold 2005/09/15)
        </p>
 </ol>
@@ -1047,11 +1047,11 @@ inconvenience this causes.
   <li> <p> New: There is a new class:
        <code>Functions::ParsedFunction</code> which is friendly
        wrapper to the <code>FunctionParser</code> class.
-       <br> 
+       <br>
        (Luca Heltai 2007/08/29)
-  
+
    <li> <p>Fixed: the function
-       <code>DataOut::build_patches</code> 
+       <code>DataOut::build_patches</code>
        had a quadratic algorithm when generatic cell-data (as opposed
        to DoF data). This algorithm became a bottleneck when
        generating output on meshes with large number of cells. This is
@@ -1061,14 +1061,14 @@ inconvenience this causes.
        </p>
 
    <li> <p>New: the function
-       <code>DoFTools::get_active_fe_indices</code> 
+       <code>DoFTools::get_active_fe_indices</code>
        extracts for each cell the active finite element index used on it.
        <br>
        (WB 2007/08/07)
        </p>
 
    <li> <p>Extended: the function
-       <code>Triangulation::copy_triangulation</code> 
+       <code>Triangulation::copy_triangulation</code>
        copies all members of a triangulation except for the list of
        <code>RefinementListener</code>s. In most cases this is exactly the
        intended behavior. However, if a RefinementListener should be copied to
@@ -1080,7 +1080,7 @@ inconvenience this causes.
        </p>
 
    <li> <p>New: the function
-       <code>DoFTools::make_sparsity_pattern</code> 
+       <code>DoFTools::make_sparsity_pattern</code>
        now takes an optional constraint matrix argument that can be used to
        avoid the subsequent call to condense the sparsity pattern. In effect,
        the sparsity pattern is generated condensed right away. For problems in
@@ -1091,7 +1091,7 @@ inconvenience this causes.
        </p>
 
    <li> <p>New: the new function
-       <code>ConstraintMatrix::add_entries_local_to_global</code> 
+       <code>ConstraintMatrix::add_entries_local_to_global</code>
        can be used to add entries to a matrix where entries that will appear if
        the current entry corresponds to a constrained degree of freedom are
        also added.
@@ -1100,7 +1100,7 @@ inconvenience this causes.
        </p>
 
    <li> <p>Fixed: the function
-       <code>GridTools::find_cells_adjacent_to_vertex</code> 
+       <code>GridTools::find_cells_adjacent_to_vertex</code>
        was not detecting properly the coarse cells adjacent to
        refined cells.
        <br>
@@ -1110,9 +1110,9 @@ inconvenience this causes.
    <li> <p>Fixed: the two tools
        <code>DoFTools::count_dofs_per_component</code> and
        <code>DoFTools::count_dofs_per_block</code> where changing the
-       size of the destination vector. Consistently with (most of) the 
-       rest of the library, now the vectors are expected to be the 
-       right size before calling these functions. 
+       size of the destination vector. Consistently with (most of) the
+       rest of the library, now the vectors are expected to be the
+       right size before calling these functions.
        <br>
        (Luca Heltai 2007/05/15)
        </p>
@@ -1180,9 +1180,9 @@ inconvenience this causes.
        (WB 2007/02/20)
        </p>
 
-   <li> <p>New: Added function <code>GridGenerator</code>::<code >hyper_cube_with_cylindrical_hole</code> that produces 
+   <li> <p>New: Added function <code>GridGenerator</code>::<code >hyper_cube_with_cylindrical_hole</code> that produces
 	a square with a circular hole in the middle in 2d, and extrudes it
-	along the z-direction between 0 and L. 
+	along the z-direction between 0 and L.
         <br>
         (Luca Heltai 2007/02/15)
         </p>
@@ -1192,7 +1192,7 @@ inconvenience this causes.
 	be properly visualized. The boundary indicator was added to the
 	material flag of the faces (which is ignored when reading back the
 	mesh) in order for the Gmsh reader to be able to display the boundary
-	indicator in a proper way. 
+	indicator in a proper way.
         <br>
         (Luca Heltai 2007/02/15)
         </p>
@@ -1206,7 +1206,7 @@ inconvenience this causes.
        </p>
 
    <li> <p>Fixed: A local variable in
-       <code>TriaAccessor&lt;3,3&gt;::measure</code> was
+       <code>TriaAccessor::measure()</code> was
        erroneously marked as static could lead to
        wrong results and crashes in multithreaded mode. This is now fixed.
        <br>
@@ -1214,8 +1214,8 @@ inconvenience this causes.
        </p>
 
    <li> <p>Fixed: <code>MatrixCreator</code>::<code >create_mass_matrix</code> and <code>
-       create_laplace_matrix</code> computed wrong values for the right 
-       hand sides. This has been fixed. 
+       create_laplace_matrix</code> computed wrong values for the right
+       hand sides. This has been fixed.
        <br>
        (Moritz Allmaras 2007/02/08)
        </p>
@@ -1311,13 +1311,13 @@ inconvenience this causes.
   <li> <p>
        New: There are now two new functions <code>GridGenerator</code>::<code>subdivided_hyper_rectangle</code> that produces
        a non-uniformly subdivided rectangle, ideally suited for graded
-       meshes. One of these functions is able to create meshes with holes. 
+       meshes. One of these functions is able to create meshes with holes.
        <br>
        (Yaqi Wang 2006/11/15, 2006/12/29)
        </p>
 
-  <li> <p> Fixed: Corrected <code>clone</code> method 
-       of <code>FE_DGQ</code> class for non-equidistant 
+  <li> <p> Fixed: Corrected <code>clone</code> method
+       of <code>FE_DGQ</code> class for non-equidistant
        support points.
        <br>
        (Florian Prill 2006/10/31)
@@ -1335,7 +1335,7 @@ inconvenience this causes.
        New: There is a new functions <code>GridTools</code>::<code>create_union_triangulation</code>
        that generates a triangulation that contains the respectively
        finest cells of two input triangulations.
-       <br> 
+       <br>
        (WB 2006/10/23)
        </p>
 
@@ -1347,14 +1347,14 @@ inconvenience this causes.
        of constraints are resolved at the time the
        <code>ConstraintMatrix::close()</code> function is called. The only
        thing that is not allowed are cycles in such constraints.
-       <br> 
+       <br>
        (WB 2006/09/19)
        </p>
 
   <li> <p>
        New: There are new functions <code>GridTools::minimal_cell_diameter</code> and <code>GridTools::maximal_cell_diameter</code>, with obvious
-       functionality. 
-       <br> 
+       functionality.
+       <br>
        (WB 2006/09/06)
        </p>
 
@@ -1368,25 +1368,28 @@ inconvenience this causes.
        in particular did not allow to check for the number of matrices
        in the array. The functions now take a reference to an array of
        the correct length.
-       <br> 
+       <br>
        (WB 2006/08/14)
        </p>
 
   <li> <p>
        Extended: The <code>VectorTools::project</code> functions
        are now also implemented for 1d.
-       <br> 
+       <br>
        (WB 2006/08/08)
        </p>
 
   <li> <p>
        Extended: <code >DerivativeApproximation</code> now offers access to the
        full tensor of derivatives of orders one, two and three. This
-       information can be requested for a single cell by means of the <code>DerivativeApproximation</code><code>::approximate_derivative_tensor</code> function. If the
-       norm of this tensor is required later on, the new <code >DerivativeApproximation</code><code>::derivative_norm</code> function can be used. Note, that
-       for second order derivatives, this returns the largest eigenvalue
-       instead of the Frobenius norm, which is returned by the <code >Tensor&lt;rank_,dim&gt;</code><code>::norm</code> function.
-       <br> 
+       information can be requested for a single cell by means of the
+       <code>DerivativeApproximation::approximate_derivative_tensor()</code>
+       function. If the norm of this tensor is required later on, the new
+       <code>DerivativeApproximation::derivative_norm()</code> function can be
+       used. Note, that for second order derivatives, this returns the largest
+       eigenvalue instead of the Frobenius norm, which is returned by the
+       <code >Tensor::()norm</code> function.
+       <br>
        (Tobias Leicht 2006/08/03)
        </p>
 
@@ -1397,7 +1400,7 @@ inconvenience this causes.
        symmetrized instead of an intermediate tensor. This should improve the
        results slightly, but cause no problems otherwise, as this is completely
        internal to the class.
-       <br> 
+       <br>
        (Tobias Leicht 2006/08/03)
        </p>
 
@@ -1407,7 +1410,7 @@ inconvenience this causes.
        zero as the second argument (denoting the number of threads to use if
        multithreading is enabled). This led to no output being created at
        all. This is now fixed by throwing an exception in this case.
-       <br> 
+       <br>
        (WB 2006/07/31)
        </p>
 
@@ -1417,12 +1420,12 @@ inconvenience this causes.
        <code>dofs_per_quad</code>, ..., depending on the explicitly
        specified function template argument. This is often useful for
        template trickery.
-       <br> 
+       <br>
        (WB, 2006/07/28)
        </p>
 
   <li> <p>
-       Fixed: <code >Triangulation&lt;dim&gt;::fix_coarsen_flags</code>
+       Fixed: <code >Triangulation::fix_coarsen_flags()</code>
        has been modified to allow coarsening in all possible cases. Up
        to now, coarsening was forbidden, if the neighbor cell was not refined
        but had the <code>refine_flag</code> set, whereas it was allowed, if
@@ -1430,7 +1433,7 @@ inconvenience this causes.
        allowed (if all children are flagged for coarsening). This leeds to
        triangulations with a slightly reduced number of cells. In some cases
        older references will have to be updated.
-       <br> 
+       <br>
        (Tobias Leicht 2006/06/22)
        </p>
 
@@ -1447,7 +1450,7 @@ inconvenience this causes.
        of a Dirac pulse on the base functions. This models a point source as
        used in the calculations of Green's functions and can also be used to
        extract the value of a finite element solution in a single point.
-       <br> 
+       <br>
        (Ralf B. Schulz, 2006/05/15)
        </p>
 
@@ -1455,7 +1458,7 @@ inconvenience this causes.
        Changed: Functions <code>VectorTools</code>::<code>point_value</code> and <code>VectorTools</code>::<code>point_difference</code> using the old interface
        without boundary mapping were replaced by wrapper functions
        calling the new versions.
-       <br> 
+       <br>
        (Ralf B. Schulz, 2006/05/15)
        </p>
 
@@ -1466,14 +1469,14 @@ inconvenience this causes.
        version as it automatically delivers also the local coordinate of the
        point (so it can save some computation time in most cases as you don't have
        to calculate that again).
-       <br> 
+       <br>
        (Ralf B. Schulz, 2006/05/12)
        </p>
 
   <li> <p>
        Improved: The functions <code>VectorTools</code>::<code>point_value</code> and <code>VectorTools</code>::<code>point_difference</code> now can also use arbitrary
        mappings, using the new <code>GridTools</code>::<code>find_active_cell_around_point</code> algorithm.
-       <br> 
+       <br>
        (Ralf B. Schulz, 2006/05/11)
        </p>
 
@@ -1488,7 +1491,7 @@ inconvenience this causes.
        determine the active cell in which a given point is located. For
        points located on boundaries and edges, it is in most cases also able
        to give the finest cell.
-       <br> 
+       <br>
        (Ralf B. Schulz 2006/05/10)
        </p>
 
@@ -1502,10 +1505,10 @@ inconvenience this causes.
        moved to the <code>DoFCellAccessor</code> class that provides
        access to cells (i.e. lines in 1d, quads in 2d, and hexes in
        3d) for which this operation is actually useful.
-       <br> 
+       <br>
        (WB 2006/05/01)
        </p>
-  
+
   <li> <p> Fixed: second derivatives where not computed correctly in <code>FEFaceValuesBase</code>, i.e. when evaluating
        second derivatives on faces of cells. This is now fixed. Using
        second derivatives evaluated at quadrature points within a cell
@@ -1519,7 +1522,7 @@ inconvenience this causes.
        <code>Triangulation::clear_user_flags_quad</code>, and
        <code>Triangulation::clear_user_flags_hex</code> can be used to
        selectively clear only some of the user flags as needed.
-       <br> 
+       <br>
        (WB 2006/04/25)
        </p>
 
@@ -1527,7 +1530,7 @@ inconvenience this causes.
        New: The function <code>VectorTools::project</code> functions can now
        also be used for vector arguments of type other than
        <code>Vector&lt;double&gt;</code>.
-       <br> 
+       <br>
        (WB 2006/04/17)
        </p>
 
@@ -1538,7 +1541,7 @@ inconvenience this causes.
        to integrate the solution on one mesh against the shape functions on
        another mesh, a situation that frequently happens in time-dependent but
        also in nonlinear problems.
-       <br> 
+       <br>
        (WB 2006/04/14)
        </p>
 
@@ -1546,7 +1549,7 @@ inconvenience this causes.
        New: The function <code>GridTools::have_same_coarse_mesh</code> figures
        out whether two triangulations, two DoFHandlers, etc, are built on the
        same coarse mesh.
-       <br> 
+       <br>
        (WB 2006/04/14)
        </p>
 
@@ -1555,7 +1558,7 @@ inconvenience this causes.
        fairly frequent operation (called about 7 times per cell in
        step-14, but much more often in more complicated programs), the
        results of this function are now cached for faster access.
-       <br> 
+       <br>
        (WB 2006/03/29)
        </p>
 
@@ -1565,7 +1568,7 @@ inconvenience this causes.
        element that also has non-primitive base elements (for example,
        trying to interpolate boundary values for a the last component
        of a RT x Q1 element). This is now fixed.
-       <br> 
+       <br>
        (WB 2006/03/27)
        </p>
 
@@ -1573,14 +1576,14 @@ inconvenience this causes.
        New: There is a new function <code>FiniteElement</code>::<code>face_to_equivalent_cell_index</code> that can
        convert a face index of a degree of freedom into a
        corresponding cell index.
-       <br> 
+       <br>
        (WB 2006/03/27)
        </p>
 
   <li> <p>
        New: There are now functions <code>VectorTools</code>::<code>point_value</code> that evaluate the value of a
        finite element function at a given point inside the domain.
-       <br> 
+       <br>
        (WB 2006/03/06)
        </p>
 
@@ -1594,14 +1597,14 @@ inconvenience this causes.
        Improved: The <code>Triangulation</code>, <code>PersistentTriangulation</code>, <code>DoFHandler</code>, <code>hp::DoFHandler</code> and <code>MGDoFHandler</code> classes now all have a <code>dimension</code> variable which allows to ask
        the template argument <tt>dim</tt> by
        <code>SomeClass::dimension</code>.
-       <br> 
+       <br>
        (RH 2006/02/27)
        </p>
 
   <li> <p>
        Fixed: When used, the copy constructor of <code>MappingQ</code> would lead to memory
        corruption. This is now fixed.
-       <br> 
+       <br>
        (RH 2006/02/23)
        </p>
 
@@ -1615,9 +1618,9 @@ inconvenience this causes.
        </p>
 
   <li> <p>
-       New: There is now a <code>GridOut</code>::<code>write_gmsh</code> function to write in the gmsh 
-       format. It has the same features of the write_ucd one. 
-       <br> 
+       New: There is now a <code>GridOut</code>::<code>write_gmsh</code> function to write in the gmsh
+       format. It has the same features of the write_ucd one.
+       <br>
        (Luca Heltai 2006/02/17)
        </p>
 
@@ -1626,15 +1629,15 @@ inconvenience this causes.
        the standard <code>operator[]</code>
        function. Similarly, the <code>FECollection</code>::<code>n_finite_elements</code>, <code>QCollection</code>::<code>n_quadratures</code> and <code>MappingCollection</code>::<code>n_mappings</code> functions are now renamed to
        the standard <code>size()</code> function.
-       <br> 
+       <br>
        (RH 2006/02/10)
        </p>
 
   <li> <p>
-       Improved: <code>GridGenerator</code>::<code>half_hyper_ball</code> now is implemented also 
-       in three dimensions, and the boundary now is colored with 0 and one 
+       Improved: <code>GridGenerator</code>::<code>half_hyper_ball</code> now is implemented also
+       in three dimensions, and the boundary now is colored with 0 and one
        respectively on the curved and plane.
-       <br> 
+       <br>
        (Luca Heltai 2006/02/07)
        </p>
 
@@ -1651,7 +1654,7 @@ inconvenience this causes.
        Fixed: The <code>MGDoFHandler</code>::<code>distribute_dofs</code> and <code>renumber</code> functions could not handle
        coarsened grids (unused vertices, faces and cells). This is now
        fixed.
-       <br> 
+       <br>
        (RH 2006/01/23)
        </p>
 
@@ -1659,7 +1662,7 @@ inconvenience this causes.
        New: The <code>Mapping</code> class and derived classes now have
        functions <code>clone()</code> that return a new object of the same
        (derived) type.
-       <br> 
+       <br>
        (WB 2006/1/8)
        </p>
 
@@ -1667,7 +1670,7 @@ inconvenience this causes.
        Improved: The <code>KellyErrorEstimator</code> class now also allows to
        select the cells on which it is supposed to work by giving a material
        ID, instead of only a subdomain ID.
-       <br> 
+       <br>
        (WB 2006/1/4)
        </p>
 
@@ -1675,7 +1678,7 @@ inconvenience this causes.
        Improved: A new <code>TriaAccessor::ExcCellHasNoChildren</code>
        exception will be raised if the <code>TriaObjectAccessor::child_index</code> function
        is invoked for cells without children.
-       <br> 
+       <br>
        (RH 2005/12/09)
        </p>
 
@@ -1685,14 +1688,14 @@ inconvenience this causes.
        thrown. In particular, this happened when the step-14 program was run on
        dual processor machines and the library was compiled for
        multithreading. This is now fixed.
-       <br> 
+       <br>
        (WB 2005/10/20)
        </p>
 
   <li> <p>
        New: There is now a new <code>Triangulation::get_boundary_indicators</code>
        function.
-       <br> 
+       <br>
        (RH 2005/09/30)
        </p>
 
@@ -1700,25 +1703,24 @@ inconvenience this causes.
        New: There is now a new <code>GridTools::delete_unused_vertices</code>
        function. Previously a <tt>private</tt> function in <code>GridIn</code> it has now been moved to and made
        <tt>public</tt> in <code>GridTools</code>.
-       <br> 
+       <br>
        (RH 2005/09/28)
        </p>
 
   <li> <p>
-       New: The <code>GridIn&lt;dim&gt;::read_netcdf(string
-       &filename)</code> function reads grids from NetCDF files. The
+       New: The <code>GridIn::read_netcdf()</code> function reads grids from NetCDF files. The
        only data format currently supported is the <tt>TAU grid
        format</tt>.
-       <br> 
+       <br>
        (RH 2005/09/23)
        </p>
 
   <li> <p>
-       Fixed: The <code>GridIn&lt;dim&gt;::read(filename, format)</code>
+       Fixed: The <code>GridIn::read()</code>
        function ran into an exception when called with
        <tt>Default</tt> format and a filename which does not include
        <tt>/</tt>. This is now fixed.
-       <br> 
+       <br>
        (RH 2005/09/21)
        </p>
 </ol>

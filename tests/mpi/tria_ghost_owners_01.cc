@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -129,7 +129,7 @@ test()
 
       Assert(neighbors == ghost_owners, ExcInternalError());
 
-      parallel::distributed::GridRefinement ::refine_and_coarsen_fixed_number(
+      parallel::distributed::GridRefinement::refine_and_coarsen_fixed_number(
         tr, indicators, 0.3, 0.0);
       tr.execute_coarsening_and_refinement();
       if (myid == 0)

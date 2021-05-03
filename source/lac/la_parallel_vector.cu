@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2017 by the deal.II authors
+// Copyright (C) 2016 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -25,6 +25,38 @@ namespace LinearAlgebra
   {
     template class Vector<float, ::dealii::MemorySpace::CUDA>;
     template class Vector<double, ::dealii::MemorySpace::CUDA>;
+    template void
+    Vector<float, ::dealii::MemorySpace::Host>::import<
+      ::dealii::MemorySpace::CUDA>(
+      const Vector<float, ::dealii::MemorySpace::CUDA> &,
+      VectorOperation::values);
+    template void
+    Vector<double, ::dealii::MemorySpace::Host>::import<
+      ::dealii::MemorySpace::CUDA>(
+      const Vector<double, ::dealii::MemorySpace::CUDA> &,
+      VectorOperation::values);
+
+    template void
+    Vector<float, ::dealii::MemorySpace::CUDA>::import<
+      ::dealii::MemorySpace::Host>(
+      const Vector<float, ::dealii::MemorySpace::Host> &,
+      VectorOperation::values);
+    template void
+    Vector<double, ::dealii::MemorySpace::CUDA>::import<
+      ::dealii::MemorySpace::Host>(
+      const Vector<double, ::dealii::MemorySpace::Host> &,
+      VectorOperation::values);
+
+    template void
+    Vector<float, ::dealii::MemorySpace::CUDA>::import<
+      ::dealii::MemorySpace::CUDA>(
+      const Vector<float, ::dealii::MemorySpace::CUDA> &,
+      VectorOperation::values);
+    template void
+    Vector<double, ::dealii::MemorySpace::CUDA>::import<
+      ::dealii::MemorySpace::CUDA>(
+      const Vector<double, ::dealii::MemorySpace::CUDA> &,
+      VectorOperation::values);
   } // namespace distributed
 } // namespace LinearAlgebra
 

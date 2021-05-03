@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -61,21 +61,19 @@
 
 namespace Step22
 {
-  using namespace dealii;
-
   template <int dim>
   struct InnerPreconditioner;
 
   template <>
   struct InnerPreconditioner<2>
   {
-    typedef SparseDirectUMFPACK type;
+    using type = SparseDirectUMFPACK;
   };
 
   template <>
   struct InnerPreconditioner<3>
   {
-    typedef SparseILU<double> type;
+    using type = SparseILU<double>;
   };
 
   template <int dim>
@@ -433,7 +431,7 @@ namespace Step22
 
       /*std::vector<bool> boundary_dofs (dof_handler.n_dofs(), false);
 
-      std::vector<bool>boundary_mask (dim+1, false);
+      std::vector<bool> boundary_mask (dim+1, false);
       boundary_mask[dim]=true;
 
       DoFTools::extract_boundary_dofs (dof_handler,boundary_mask,boundary_dofs);
@@ -469,10 +467,8 @@ namespace Step22
 
     constraints.close();
 
-    std::vector<types::global_dof_index> dofs_per_block(2);
-    DoFTools::count_dofs_per_block(dof_handler,
-                                   dofs_per_block,
-                                   block_component);
+    const std::vector<types::global_dof_index> dofs_per_block =
+      DoFTools::count_dofs_per_fe_block(dof_handler, block_component);
     const unsigned int n_u = dofs_per_block[0], n_p = dofs_per_block[1];
 
     deallog << "   Number of active cells: " << triangulation.n_active_cells()
@@ -560,7 +556,7 @@ namespace Step22
 
         right_hand_side.vector_value_list(fe_values.get_quadrature_points(),
                                           rhs_values);
-        for (unsigned int q = 0; q < n_q_points; ++q)
+        for (const auto q : fe_values.quadrature_point_indices())
           {
             for (unsigned int k = 0; k < dofs_per_cell; ++k)
               {
@@ -592,9 +588,7 @@ namespace Step22
           for (unsigned int j = i + 1; j < dofs_per_cell; ++j)
             local_matrix(i, j) = local_matrix(j, i);
 
-        for (unsigned int face_no = 0;
-             face_no < GeometryInfo<dim>::faces_per_cell;
-             ++face_no)
+        for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
           {
             typename DoFHandler<dim>::face_iterator face = cell->face(face_no);
             if (face->at_boundary() == false)
@@ -606,11 +600,11 @@ namespace Step22
                     fe_v_face.reinit(cell, face_no);
 
                     const std::vector<Tensor<1, dim>> &normals =
-                      fe_v_face.get_all_normal_vectors();
+                      fe_v_face.get_normal_vectors();
                     const std::vector<Point<dim>> &quad_points =
                       fe_v_face.get_quadrature_points();
 
-                    for (unsigned int q = 0; q < n_q_face; ++q)
+                    for (const auto q : fe_v_face.quadrature_point_indices())
                       {
                         double jump =
                           jumpfunction.jump(quad_points[q], normals[q]);
@@ -938,7 +932,7 @@ namespace Step22
         fe_v.reinit(cell);
         cell->get_dof_indices(local_dof_indices);
 
-        for (unsigned int q = 0; q < n_q_points; ++q)
+        for (const auto q : fe_v.quadrature_point_indices())
           {
             double div = 0;
             for (unsigned int i = 0; i < dofs_per_cell - 1; ++i)
@@ -962,7 +956,6 @@ namespace Step22
 int
 main()
 {
-  using namespace dealii;
   using namespace Step22;
 
   initlog();

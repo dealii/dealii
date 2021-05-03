@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -23,19 +23,46 @@ for (PATTERN : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS;
 
 #if deal_II_dimension <= deal_II_space_dimension
       template void
-      make_sparsity_pattern<
-        DoFHandler<deal_II_dimension, deal_II_space_dimension>,
-        PATTERN>(const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
-                 PATTERN &,
-                 const unsigned int);
+      make_sparsity_pattern<deal_II_dimension,
+                            deal_II_space_dimension,
+                            PATTERN,
+                            double>(
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        PATTERN &,
+        const unsigned int,
+        const AffineConstraints<double> &,
+        const bool);
 
       template void
-      make_interface_sparsity_pattern<
-        DoFHandler<deal_II_dimension, deal_II_space_dimension>,
-        PATTERN>(const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
-                 const MGConstrainedDoFs &,
-                 PATTERN &,
-                 const unsigned int);
+      make_sparsity_pattern<deal_II_dimension,
+                            deal_II_space_dimension,
+                            PATTERN,
+                            float>(
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        PATTERN &,
+        const unsigned int,
+        const AffineConstraints<float> &,
+        const bool);
+#endif
+    \}
+  }
+
+
+for (PATTERN : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS;
+     deal_II_space_dimension : SPACE_DIMENSIONS)
+  {
+    namespace MGTools
+    \{
+
+#if deal_II_dimension <= deal_II_space_dimension
+      template void
+      make_interface_sparsity_pattern<deal_II_dimension,
+                                      deal_II_space_dimension,
+                                      PATTERN>(
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const MGConstrainedDoFs &,
+        PATTERN &,
+        const unsigned int);
 #endif
 
 #if deal_II_dimension == deal_II_space_dimension
@@ -131,12 +158,6 @@ for (deal_II_dimension : DIMENSIONS)
         const DoFHandler<deal_II_dimension> &mg_dof_handler,
         std::vector<IndexSet> &              interface_dofs);
 
-      template void
-      extract_non_interface_dofs(
-        const DoFHandler<deal_II_dimension> &           mg_dof_handler,
-        std::vector<std::set<types::global_dof_index>> &non_interface_dofs);
-
-
 #if deal_II_dimension < 3
       template void
       count_dofs_per_block(
@@ -161,6 +182,10 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
 #if deal_II_dimension <= deal_II_space_dimension
       template unsigned int
       max_level_for_coarse_mesh(
+        const Triangulation<deal_II_dimension, deal_II_space_dimension> &tria);
+
+      template double
+      workload_imbalance(
         const Triangulation<deal_II_dimension, deal_II_space_dimension> &tria);
 #endif
     \}

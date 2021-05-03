@@ -19,10 +19,18 @@
 
 SET(CTEST_PROJECT_NAME "deal.II")
 
-SET(CTEST_DROP_METHOD "http")
-SET(CTEST_DROP_SITE "cdash.kyomu.43-1.org")
+SET(CTEST_DROP_METHOD "https")
+SET(CTEST_DROP_SITE "cdash.43-1.org")
 SET(CTEST_DROP_LOCATION "/submit.php?project=deal.II")
 SET(CTEST_DROP_SITE_CDASH TRUE)
+
+#
+# We use the CTEST_UPDATE routine to query information about the repository
+# but we don't want to actually perform an update. Thus, replace the update
+# by a noop:
+#
+SET(CTEST_GIT_COMMAND "git")
+SET(CTEST_UPDATE_VERSION_ONLY true)
 
 SET(CTEST_CUSTOM_MAXIMUM_NUMBER_OF_ERRORS   100)
 SET(CTEST_CUSTOM_MAXIMUM_NUMBER_OF_WARNINGS 300)

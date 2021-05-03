@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2018 by the deal.II authors
+// Copyright (C) 2014 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -62,7 +62,7 @@
 #include "../tests.h"
 
 
-typedef parallel::distributed::Triangulation<2, 3>::cell_iterator cell_iterator;
+using cell_iterator = parallel::distributed::Triangulation<2, 3>::cell_iterator;
 DeclException1(ExcMissingCell,
                cell_iterator,
                << "Trying to find cell " << arg1
@@ -71,16 +71,9 @@ DeclException1(ExcMissingCell,
 int
 main(int argc, char *argv[])
 {
-  using namespace dealii;
   Utilities::MPI::MPI_InitFinalize mpi_initialization(
     argc, argv, testing_max_num_threads());
   MPILogInitAll log;
-
-  if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
-    {
-      static std::ofstream logfile("output");
-      deallog.attach(logfile);
-    }
 
   parallel::distributed::Triangulation<2, 3> triangulation(
     MPI_COMM_WORLD,

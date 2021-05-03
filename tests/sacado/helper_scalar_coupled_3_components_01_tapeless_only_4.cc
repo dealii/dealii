@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2019 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -23,8 +23,9 @@
 //
 // AD number type: Sacado Rad-DFad
 
-#include "../ad_common_tests/helper_scalar_coupled_3_components_01_tapeless_only.h"
 #include "../tests.h"
+
+#include "../ad_common_tests/helper_scalar_coupled_3_components_01_tapeless_only.h"
 
 int
 main(int argc, char **argv)

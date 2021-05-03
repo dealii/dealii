@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2018 by the deal.II authors
+// Copyright (C) 2007 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -49,10 +49,10 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
 
   Functions::ConstantFunction<dim> constant_function(1., dim);
   std::map<types::boundary_id, const Function<dim> *> function_map;
-  for (unsigned int j = 0; j < GeometryInfo<dim>::faces_per_cell; ++j)
+  for (const unsigned int j : GeometryInfo<dim>::face_indices())
     function_map[j] = &constant_function;
 
-  for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+  for (const unsigned int i : GeometryInfo<dim>::face_indices())
     {
       deallog << "FE=" << fe.get_name() << ", case=" << i << std::endl;
 
@@ -77,8 +77,7 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
   typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
                                                  endc = dof.end();
   for (; cell != endc; ++cell)
-    for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell;
-         ++face_no)
+    for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
       if (cell->face(face_no)->at_boundary())
         {
           typename DoFHandler<dim>::face_iterator face = cell->face(face_no);
@@ -104,7 +103,7 @@ test_hyper_cube()
   Triangulation<dim> tr;
   GridGenerator::hyper_cube(tr);
 
-  for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+  for (const unsigned int i : GeometryInfo<dim>::face_indices())
     tr.begin_active()->face(i)->set_boundary_id(i);
 
   tr.refine_global(2);

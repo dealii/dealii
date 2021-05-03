@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,6 +22,7 @@
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_nedelec.h>
+#include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_raviart_thomas.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/mapping_q.h>
@@ -39,7 +40,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 double
 zvalue(const double x, const double y)
@@ -106,7 +106,7 @@ template <int dim>
 std::unique_ptr<Manifold<dim>>
 Geometry<dim>::clone() const
 {
-  return std_cxx14::make_unique<Geometry<dim>>();
+  return std::make_unique<Geometry<dim>>();
 }
 
 template <int dim>

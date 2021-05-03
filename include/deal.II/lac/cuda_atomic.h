@@ -29,8 +29,10 @@ namespace LinearAlgebra
     /**
      * Provide atomicAdd for floats.
      *
+     * @deprecated Use atomicAdd(address, val) directly.
      * @ingroup CUDAWrappers
      */
+    DEAL_II_DEPRECATED
     inline __device__ float
     atomicAdd_wrapper(float *address, float val)
     {
@@ -42,32 +44,14 @@ namespace LinearAlgebra
     /**
      * Provide atomicAdd for doubles.
      *
+     * @deprecated Use atomicAdd(address, val) directly.
      * @ingroup CUDAWrappers
      */
+    DEAL_II_DEPRECATED
     inline __device__ double
     atomicAdd_wrapper(double *address, double val)
     {
-      // Use native instruction for CUDA 8 on Pascal or newer architecture
-#  if __CUDACC_VER_MAJOR__ >= 8 && \
-    (!defined(__CUDA_ARCH__) || __CUDA_ARCH__ >= 600)
       return atomicAdd(address, val);
-#  else
-
-      unsigned long long int *address_as_ull =
-        reinterpret_cast<unsigned long long int *>(address);
-      unsigned long long int old = *address_as_ull, assumed;
-      do
-        {
-          assumed = old;
-          old     = atomicCAS(address_as_ull,
-                          assumed,
-                          __double_as_longlong(val +
-                                               __longlong_as_double(assumed)));
-        }
-      while (assumed != old);
-
-      return __longlong_as_double(old);
-#  endif
     }
 
 

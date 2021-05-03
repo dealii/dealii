@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2018 - 2019 by the deal.II authors
+ * Copyright (C) 2018 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -29,7 +29,6 @@
 #include <deal.II/base/timer.h>
 #include <deal.II/base/utilities.h>
 
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
@@ -66,7 +65,7 @@
 #include <deal.II/numerics/vector_tools.h>
 
 // We need this header for the function GridTools::find_active_cell_around_point
-// that we use in the function `ElasticWave<dim>::store_frequency_step_data()`
+// that we use in the function `ElasticWave::store_frequency_step_data()`
 #include <deal.II/grid/grid_tools.h>
 
 namespace step62
@@ -346,7 +345,7 @@ namespace step62
     HDF5::DataSet frequency_dataset;
     HDF5::DataSet probe_positions_dataset;
 
-    // HDF5 dataset that stores the values of the energy measured by the proble.
+    // HDF5 dataset that stores the values of the energy measured by the probe.
     HDF5::DataSet displacement;
 
 
@@ -358,7 +357,7 @@ namespace step62
 
   // @sect3{Implementation of the auxiliary classes}
 
-  // @sect4{The `RightHandSide` class}
+  // @sect4{The `RightHandSide` class implementation}
 
   // The constructor reads all the parameters from the HDF5::Group `data` using
   // the HDF5::Group::get_attribute() function.
@@ -420,7 +419,7 @@ namespace step62
 
 
 
-  // @sect4{The `PML` class}
+  // @sect4{The `PML` class implementation}
 
   // As before, the constructor reads all the parameters from the HDF5::Group
   // `data` using the HDF5::Group::get_attribute() function. As we have
@@ -483,7 +482,7 @@ namespace step62
 
 
 
-  // @sect4{The `Rho` class}
+  // @sect4{The `Rho` class implementation}
 
   // This class is used to define the mass density. As we have explaine before,
   // a phononic superlattice cavity is formed by two
@@ -646,7 +645,7 @@ namespace step62
 
 
 
-  // @sect4{The `Parameters` class}
+  // @sect4{The `Parameters` class implementation}
 
   // The constructor reads all the parameters from the HDF5::Group `data` using
   // the HDF5::Group::get_attribute() function.
@@ -677,7 +676,7 @@ namespace step62
 
 
 
-  // @sect4{The `QuadratureCache` class}
+  // @sect4{The `QuadratureCache` class implementation}
 
   // We need to reserve enough space for the mass and stiffness matrices and the
   // right hand side vector.
@@ -764,11 +763,10 @@ namespace step62
     DynamicSparsityPattern dsp(locally_relevant_dofs);
 
     DoFTools::make_sparsity_pattern(dof_handler, dsp, constraints, false);
-    SparsityTools::distribute_sparsity_pattern(
-      dsp,
-      dof_handler.n_locally_owned_dofs_per_processor(),
-      mpi_communicator,
-      locally_relevant_dofs);
+    SparsityTools::distribute_sparsity_pattern(dsp,
+                                               locally_owned_dofs,
+                                               mpi_communicator,
+                                               locally_relevant_dofs);
 
     system_matrix.reinit(locally_owned_dofs,
                          locally_owned_dofs,
@@ -795,7 +793,7 @@ namespace step62
                             quadrature_formula,
                             update_values | update_gradients |
                               update_quadrature_points | update_JxW_values);
-    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
 
     FullMatrix<std::complex<double>> cell_matrix(dofs_per_cell, dofs_per_cell);
@@ -878,6 +876,24 @@ namespace step62
                       s[component]     = pml_values[q][component];
                       xi *= s[component];
                     }
+
+                  // Here we calculate the $\alpha_{mnkl}$ and $\beta_{mnkl}$
+                  // tensors.
+                  Tensor<4, dim, std::complex<double>> alpha;
+                  Tensor<4, dim, std::complex<double>> beta;
+                  for (unsigned int m = 0; m < dim; ++m)
+                    for (unsigned int n = 0; n < dim; ++n)
+                      for (unsigned int k = 0; k < dim; ++k)
+                        for (unsigned int l = 0; l < dim; ++l)
+                          {
+                            alpha[m][n][k][l] = xi *
+                                                stiffness_tensor[m][n][k][l] /
+                                                (2.0 * s[n] * s[k]);
+                            beta[m][n][k][l] = xi *
+                                               stiffness_tensor[m][n][k][l] /
+                                               (2.0 * s[n] * s[l]);
+                          }
+
                   for (unsigned int i = 0; i < dofs_per_cell; ++i)
                     {
                       const Tensor<1, dim> phi_i =
@@ -904,15 +920,6 @@ namespace step62
                               for (unsigned int k = 0; k < dim; ++k)
                                 for (unsigned int l = 0; l < dim; ++l)
                                   {
-                                    // Here we calculate the tensors
-                                    // $\alpha_{mnkl}$ and $\beta_{mnkl}$
-                                    const std::complex<double> alpha =
-                                      xi * stiffness_tensor[m][n][k][l] /
-                                      (2.0 * s[n] * s[k]);
-                                    const std::complex<double> beta =
-                                      xi * stiffness_tensor[m][n][k][l] /
-                                      (2.0 * s[n] * s[l]);
-
                                     // Here we calculate the stiffness matrix.
                                     // Note that the stiffness matrix is not
                                     // symmetric because of the PMLs. We use the
@@ -932,8 +939,8 @@ namespace step62
                                     // very easy to make a mistake.
                                     stiffness_coefficient +=
                                       grad_phi_i[m][n] *
-                                      (alpha * grad_phi_j[l][k] +
-                                       beta * grad_phi_j[k][l]);
+                                      (alpha[m][n][k][l] * grad_phi_j[l][k] +
+                                       beta[m][n][k][l] * grad_phi_j[k][l]);
                                   }
 
                           // We save the value of the stiffness matrix in
@@ -1105,17 +1112,10 @@ namespace step62
     // been described in step-40.
     if (parameters.save_vtu_files)
       {
-        std::vector<std::string> solution_names(1, "displacement_x");
-        if (dim >= 2)
-          {
-            solution_names.emplace_back("displacement_y");
-          }
-        if (dim == 3)
-          {
-            solution_names.emplace_back("displacement_z");
-          }
+        std::vector<std::string> solution_names(dim, "displacement");
         std::vector<DataComponentInterpretation::DataComponentInterpretation>
-          interpretation(dim, DataComponentInterpretation::component_is_scalar);
+          interpretation(
+            dim, DataComponentInterpretation::component_is_part_of_vector);
 
         DataOut<dim> data_out;
         data_out.add_data_vector(dof_handler,
@@ -1227,7 +1227,7 @@ namespace step62
 
     quadrature_cache.resize(triangulation.n_locally_owned_active_cells() *
                               quadrature_formula.size(),
-                            QuadratureCache<dim>(fe.dofs_per_cell));
+                            QuadratureCache<dim>(fe.n_dofs_per_cell()));
     unsigned int cache_index = 0;
     for (const auto &cell : triangulation.active_cell_iterators())
       if (cell->is_locally_owned())
@@ -1370,10 +1370,99 @@ int main(int argc, char *argv[])
 
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
-      HDF5::File  data_file("results.h5",
-                           HDF5::File::FileAccessMode::open,
+      HDF5::File data_file("results.h5",
+                           HDF5::File::FileAccessMode::create,
                            MPI_COMM_WORLD);
-      HDF5::Group data = data_file.open_group("data");
+      auto       data = data_file.create_group("data");
+
+      // Each of the simulations (displacement and calibration) is stored in a
+      // separate HDF5 group:
+      const std::vector<std::string> group_names = {"displacement",
+                                                    "calibration"};
+      for (auto group_name : group_names)
+        {
+          // For each of these two group names, we now create the group and put
+          // attributes into these groups.
+          // Specifically, these are:
+          // - The dimensions of the waveguide (in $x$ and $y$ directions)
+          // - The position of the probe (in $x$ and $y$ directions)
+          // - The number of points in the probe
+          // - The global refinement level
+          // - The cavity resonance frequency
+          // - The number of mirror pairs
+          // - The material properties
+          // - The force parameters
+          // - The PML parameters
+          // - The frequency parameters
+
+          auto group = data.create_group(group_name);
+
+          group.set_attribute<double>("dimension_x", 2e-5);
+          group.set_attribute<double>("dimension_y", 2e-8);
+          group.set_attribute<double>("probe_pos_x", 8e-6);
+          group.set_attribute<double>("probe_pos_y", 0);
+          group.set_attribute<double>("probe_width_y", 2e-08);
+          group.set_attribute<unsigned int>("nb_probe_points", 5);
+          group.set_attribute<unsigned int>("grid_level", 1);
+          group.set_attribute<double>("cavity_resonance_frequency", 20e9);
+          group.set_attribute<unsigned int>("nb_mirror_pairs", 15);
+
+          group.set_attribute<double>("poissons_ratio", 0.27);
+          group.set_attribute<double>("youngs_modulus", 270000000000.0);
+          group.set_attribute<double>("material_a_rho", 3200);
+
+          if (group_name == std::string("displacement"))
+            group.set_attribute<double>("material_b_rho", 2000);
+          else
+            group.set_attribute<double>("material_b_rho", 3200);
+
+          group.set_attribute(
+            "lambda",
+            group.get_attribute<double>("youngs_modulus") *
+              group.get_attribute<double>("poissons_ratio") /
+              ((1 + group.get_attribute<double>("poissons_ratio")) *
+               (1 - 2 * group.get_attribute<double>("poissons_ratio"))));
+          group.set_attribute("mu",
+                              group.get_attribute<double>("youngs_modulus") /
+                                (2 * (1 + group.get_attribute<double>(
+                                            "poissons_ratio"))));
+
+          group.set_attribute<double>("max_force_amplitude", 1e26);
+          group.set_attribute<double>("force_sigma_x", 1e-7);
+          group.set_attribute<double>("force_sigma_y", 1);
+          group.set_attribute<double>("max_force_width_x", 3e-7);
+          group.set_attribute<double>("max_force_width_y", 2e-8);
+          group.set_attribute<double>("force_x_pos", -8e-6);
+          group.set_attribute<double>("force_y_pos", 0);
+
+          group.set_attribute<bool>("pml_x", true);
+          group.set_attribute<bool>("pml_y", false);
+          group.set_attribute<double>("pml_width_x", 1.8e-6);
+          group.set_attribute<double>("pml_width_y", 5e-7);
+          group.set_attribute<double>("pml_coeff", 1.6);
+          group.set_attribute<unsigned int>("pml_coeff_degree", 2);
+
+          group.set_attribute<double>("center_frequency", 20e9);
+          group.set_attribute<double>("frequency_range", 0.5e9);
+          group.set_attribute<double>(
+            "start_frequency",
+            group.get_attribute<double>("center_frequency") -
+              group.get_attribute<double>("frequency_range") / 2);
+          group.set_attribute<double>(
+            "stop_frequency",
+            group.get_attribute<double>("center_frequency") +
+              group.get_attribute<double>("frequency_range") / 2);
+          group.set_attribute<unsigned int>("nb_frequency_points", 400);
+
+          if (group_name == std::string("displacement"))
+            group.set_attribute<std::string>(
+              "simulation_name", std::string("phononic_cavity_displacement"));
+          else
+            group.set_attribute<std::string>(
+              "simulation_name", std::string("phononic_cavity_calibration"));
+
+          group.set_attribute<bool>("save_vtu_files", false);
+        }
 
       {
         // Displacement simulation. The parameters are read from the

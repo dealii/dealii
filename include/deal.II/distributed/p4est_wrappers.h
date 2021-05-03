@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2019 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,6 +15,8 @@
 
 #ifndef dealii_p4est_wrappers_h
 #define dealii_p4est_wrappers_h
+
+#include <deal.II/base/config.h>
 
 #include <deal.II/base/geometry_info.h>
 
@@ -38,6 +40,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declaration
+#  ifndef DOXYGEN
 namespace parallel
 {
   namespace distributed
@@ -46,7 +50,7 @@ namespace parallel
     class Triangulation;
   }
 } // namespace parallel
-
+#  endif
 
 namespace internal
 {
@@ -61,6 +65,20 @@ namespace internal
      */
     template <int>
     struct types;
+
+    // these struct mimics p4est for 1D
+    template <>
+    struct types<1>
+    {
+      // id of a quadrant is an integeger
+      using quadrant = int;
+
+      // maximum number of children
+      static const int max_n_child_indices_bits = 27;
+
+      // number of bits the data type of id has
+      static const int n_bits = std::numeric_limits<quadrant>::digits;
+    };
 
     template <>
     struct types<2>
@@ -141,6 +159,20 @@ namespace internal
         types<2>::topidx num_trees,
         types<2>::topidx num_corners,
         types<2>::topidx num_vtt);
+
+      static types<2>::connectivity *(&connectivity_new_copy)(
+        types<2>::topidx        num_vertices,
+        types<2>::topidx        num_trees,
+        types<2>::topidx        num_corners,
+        const double *          vertices,
+        const types<2>::topidx *ttv,
+        const types<2>::topidx *ttt,
+        const int8_t *          ttf,
+        const types<2>::topidx *ttc,
+        const types<2>::topidx *coff,
+        const types<2>::topidx *ctt,
+        const int8_t *          ctc);
+
       static void (&connectivity_join_faces)(types<2>::connectivity *conn,
                                              types<2>::topidx        tree_left,
                                              types<2>::topidx        tree_right,
@@ -161,6 +193,9 @@ namespace internal
         std::size_t             data_size,
         p4est_init_t            init_fn,
         void *                  user_pointer);
+
+      static types<2>::forest *(&copy_forest)(types<2>::forest *input,
+                                              int               copy_data);
 
       static void (&destroy)(types<2>::forest *p4est);
 
@@ -313,6 +348,24 @@ namespace internal
         types<3>::topidx num_corners,
         types<3>::topidx num_ctt);
 
+      static types<3>::connectivity *(&connectivity_new_copy)(
+        types<3>::topidx        num_vertices,
+        types<3>::topidx        num_trees,
+        types<3>::topidx        num_edges,
+        types<3>::topidx        num_corners,
+        const double *          vertices,
+        const types<3>::topidx *ttv,
+        const types<3>::topidx *ttt,
+        const int8_t *          ttf,
+        const types<3>::topidx *tte,
+        const types<3>::topidx *eoff,
+        const types<3>::topidx *ett,
+        const int8_t *          ete,
+        const types<3>::topidx *ttc,
+        const types<3>::topidx *coff,
+        const types<3>::topidx *ctt,
+        const int8_t *          ctc);
+
       static void (&connectivity_join_faces)(types<3>::connectivity *conn,
                                              types<3>::topidx        tree_left,
                                              types<3>::topidx        tree_right,
@@ -331,6 +384,9 @@ namespace internal
         std::size_t             data_size,
         p8est_init_t            init_fn,
         void *                  user_pointer);
+
+      static types<3>::forest *(&copy_forest)(types<3>::forest *input,
+                                              int               copy_data);
 
       static void (&destroy)(types<3>::forest *p8est);
 
@@ -525,17 +581,22 @@ namespace internal
                         const typename types<dim>::topidx  coarse_grid_cell);
 
 
-
     /**
-     * Compute the ghost neighbors surrounding each vertex by querying p4est
+     * Deep copy a p4est connectivity object.
      */
-    template <int dim, int spacedim>
-    std::map<unsigned int, std::set<dealii::types::subdomain_id>>
-    compute_vertices_with_ghost_neighbors(
-      const dealii::parallel::distributed::Triangulation<dim, spacedim> &tria,
-      typename dealii::internal::p4est::types<dim>::forest *parallel_forest,
-      typename dealii::internal::p4est::types<dim>::ghost * parallel_ghost);
+    template <int dim>
+    typename types<dim>::connectivity *
+    copy_connectivity(const typename types<dim>::connectivity *connectivity);
 
+#  ifndef DOXYGEN
+    template <>
+    typename types<2>::connectivity *
+    copy_connectivity<2>(const typename types<2>::connectivity *connectivity);
+
+    template <>
+    typename types<3>::connectivity *
+    copy_connectivity<3>(const typename types<3>::connectivity *connectivity);
+#  endif
   } // namespace p4est
 } // namespace internal
 

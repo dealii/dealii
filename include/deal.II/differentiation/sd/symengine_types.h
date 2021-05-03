@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,6 +19,8 @@
 #include <deal.II/base/config.h>
 
 #ifdef DEAL_II_WITH_SYMENGINE
+
+#  include <boost/serialization/map.hpp>
 
 #  include <map>
 #  include <vector>
@@ -75,6 +77,31 @@ namespace Differentiation
 
 
 DEAL_II_NAMESPACE_CLOSE
+
+
+#  ifndef DOXYGEN
+
+// Add serialization capability for SD::types::internal::ExpressionKeyLess
+// We need to define this so that we can use this comparator in maps that
+// are to be serialized.
+namespace boost
+{
+  namespace serialization
+  {
+    namespace SD = dealii::Differentiation::SD;
+
+    template <typename Archive>
+    void
+    serialize(Archive & /*ar*/,
+              SD::types::internal::ExpressionKeyLess & /*cmp*/,
+              unsigned int /*version*/)
+    {
+      // Nothing to do.
+    }
+  } // namespace serialization
+} // namespace boost
+
+#  endif // DOXYGEN
 
 #endif // DEAL_II_WITH_SYMENGINE
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -39,8 +39,7 @@ check()
     face->set_manifold_id(42);
 
   for (const auto &cell : tr.active_cell_iterators())
-    for (unsigned int face_n = 0; face_n < GeometryInfo<dim>::faces_per_cell;
-         ++face_n)
+    for (const unsigned int face_n : GeometryInfo<dim>::face_indices())
       Assert(cell->face(face_n)->manifold_id() == 42, ExcInternalError());
 
   deallog << "OK" << std::endl;

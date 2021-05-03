@@ -1,30 +1,38 @@
 <h1>Results</h1>
 
-Running the program produces graphics of two grids (grid-1.eps and grid-2.eps). They look like this:
+Running the program produces graphics of two grids (grid-1.svg and grid-2.svg).
+You can open these with most every web browser -- in the simplest case,
+just open the current directory in your file system explorer and click
+on the file. If you like working on the command line, you call your
+web browser with the file: `firefox grid-1.svg`, `google-chrome grid-1.svg`,
+or whatever the name of your browser is. If you do this, the two meshes
+should look like this:
 
 <table width="60%" align="center">
   <tr>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-1.grid-1.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-1.grid-1-r9.2.png" alt="">
     </td>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-1.grid-2r2.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-1.grid-2-r9.2.png" alt="">
     </td>
   </tr>
 </table>
 
 The left one, well, is not very exciting. The right one is &mdash; at least
-&mdash; unconventional.
+&mdash; unconventional. The pictures color-code the "refinement level" of each
+cell: How many times did a coarse mesh cell have to be subdivided to obtain
+the given cell. In the left image, this is boring since the mesh was
+refined globally a number of times, i.e., <i>every</i> cell was
+refined the same number of times.
 
-While the second mesh is entirely artificial and made-up, and
+(While the second mesh is entirely artificial and made-up, and
 certainly not very practical in applications, to everyone's surprise it
-has found its way into the literature: see the paper by M. Mu
-titled "PDE.MART: A network-based problem-solving environment", ACM
-Trans. Math. Software, vol. 31, pp. 508-531, 2005. Apparently it is
-good for some things at least.
+has found its way into the literature: see @cite Mu05. Apparently it is
+good for some things at least.)
 
 
-<h3> Possible extensions </h3>
+<h3> Possibilities for extensions </h3>
 
 <h4> Different adaptive refinement strategies </h4>
 
@@ -45,6 +53,19 @@ returns a Point<2> object; subscripting <code>[0]</code> would give
 the $x$-coordinate, subscripting <code>[1]</code> the
 $y$-coordinate). By looking at the functions that TriaAccessor
 provides, you can also use more complicated criteria for refinement.
+
+In general, what you can do with operations of the form
+`cell->something()` is a bit difficult to find in the documentation
+because `cell` is not a pointer but an iterator. The functions you can
+call on a cell can be found in the documentation of the classes
+`TriaAccessor` (which has functions that can also be called on faces
+of cells or, more generally, all sorts of geometric objects that
+appear in a triangulation), and `CellAccessor` (which adds a few
+functions that are specific to *cells*).
+
+A more thorough description of the whole iterator concept can be found
+in the @ref Iterators documentation module.
+
 
 <h4> Different geometries </h4>
 
@@ -86,7 +107,22 @@ Rather than postponing learning how to use a debugger till you really can't
 see any other way to find a bug, here's the one piece of
 advice we will provide in this program: learn how to use a debugger as soon as
 possible. It will be time well invested.
-(@dealiiVideoLectureSeeAlso{25}) The deal.II Frequently Asked 
+(@dealiiVideoLectureSeeAlso{25}) The deal.II Frequently Asked
 Questions (FAQ) page linked to from the top-level <a
 href="http://www.dealii.org/">deal.II webpage</a> also provides a good number
 of hints on debugging deal.II programs.
+
+
+<h4> More about graphical output </h4>
+
+It is often useful to include meshes into your theses or publications.
+For this, it may not be very useful to color-code the cells by
+refinement level, and to print the cell number onto each cell. But
+it doesn't have to be that way -- the GridOut class allows setting flags
+for each possible output format (see the classes in the GridOutFlags
+namespace) that control how exactly a mesh is plotted. You can of
+course also choose other output file formats such as VTK or VTU; this
+is particularly useful for 3d meshes where a 2d format such as SVG
+is not particular useful because it fixes a particular viewpoint onto
+the 3d object. As a consequence, you might want to explore other
+options in the GridOut class.

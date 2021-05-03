@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2019 by the deal.II authors
+// Copyright (C) 2011 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -31,7 +31,10 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declaration
+#ifndef DOXYGEN
 class DynamicSparsityPattern;
+#endif
 
 /*! @addtogroup Sparsity
  *@{
@@ -58,9 +61,6 @@ namespace DynamicSparsityPatternIterators
    * row and column number (or alternatively the index within the complete
    * sparsity pattern). It does not allow modifying the sparsity pattern
    * itself.
-   *
-   * @author Wolfgang Bangerth
-   * @date 2015
    */
   class Accessor
   {
@@ -155,9 +155,7 @@ namespace DynamicSparsityPatternIterators
     void
     advance();
 
-    /**
-     * Grant access to iterator class.
-     */
+    // Grant access to iterator class.
     friend class Iterator;
   };
 
@@ -306,18 +304,16 @@ namespace DynamicSparsityPatternIterators
  *
  * <h3>Usage</h3>
  *
- * Use this class as follows:
+ * Usage of this class is explained in step-2 (without constraints) and step-6
+ * (with AffineConstraints) and typically looks as follows:
  * @code
  * DynamicSparsityPattern dynamic_pattern (dof_handler.n_dofs());
  * DoFTools::make_sparsity_pattern (dof_handler,
- *                                  dynamic_pattern);
- * constraints.condense (dynamic_pattern);
- *
+ *                                  dynamic_pattern,
+ *                                  constraints);
  * SparsityPattern sp;
  * sp.copy_from (dynamic_pattern);
  * @endcode
- *
- * @author Timo Heister, 2008
  */
 class DynamicSparsityPattern : public Subscriptor
 {
@@ -1030,8 +1026,8 @@ DynamicSparsityPattern::n_cols() const
 inline void
 DynamicSparsityPattern::add(const size_type i, const size_type j)
 {
-  Assert(i < rows, ExcIndexRangeType<size_type>(i, 0, rows));
-  Assert(j < cols, ExcIndexRangeType<size_type>(j, 0, cols));
+  AssertIndexRange(i, rows);
+  AssertIndexRange(j, cols);
 
   if (rowset.size() > 0 && !rowset.is_element(i))
     return;
@@ -1052,7 +1048,7 @@ DynamicSparsityPattern::add_entries(const size_type row,
                                     ForwardIterator end,
                                     const bool      indices_are_sorted)
 {
-  Assert(row < rows, ExcIndexRangeType<size_type>(row, 0, rows));
+  AssertIndexRange(row, rows);
 
   if (rowset.size() > 0 && !rowset.is_element(row))
     return;
@@ -1070,7 +1066,7 @@ DynamicSparsityPattern::add_entries(const size_type row,
 inline types::global_dof_index
 DynamicSparsityPattern::row_length(const size_type row) const
 {
-  Assert(row < n_rows(), ExcIndexRangeType<size_type>(row, 0, n_rows()));
+  AssertIndexRange(row, n_rows());
 
   if (!have_entries)
     return 0;
@@ -1089,15 +1085,12 @@ inline types::global_dof_index
 DynamicSparsityPattern::column_number(const size_type row,
                                       const size_type index) const
 {
-  Assert(row < n_rows(), ExcIndexRangeType<size_type>(row, 0, n_rows()));
+  AssertIndexRange(row, n_rows());
   Assert(rowset.size() == 0 || rowset.is_element(row), ExcInternalError());
 
   const size_type local_row =
     rowset.size() ? rowset.index_within_set(row) : row;
-  Assert(index < lines[local_row].entries.size(),
-         ExcIndexRangeType<size_type>(index,
-                                      0,
-                                      lines[local_row].entries.size()));
+  AssertIndexRange(index, lines[local_row].entries.size());
   return lines[local_row].entries[index];
 }
 
@@ -1124,7 +1117,7 @@ DynamicSparsityPattern::end() const
 inline DynamicSparsityPattern::iterator
 DynamicSparsityPattern::begin(const size_type r) const
 {
-  Assert(r < n_rows(), ExcIndexRangeType<size_type>(r, 0, n_rows()));
+  AssertIndexRange(r, n_rows());
 
   if (!have_entries)
     return {this};
@@ -1182,7 +1175,7 @@ DynamicSparsityPattern::begin(const size_type r) const
 inline DynamicSparsityPattern::iterator
 DynamicSparsityPattern::end(const size_type r) const
 {
-  Assert(r < n_rows(), ExcIndexRangeType<size_type>(r, 0, n_rows()));
+  AssertIndexRange(r, n_rows());
 
   unsigned int row = r + 1;
   if (row == n_rows())

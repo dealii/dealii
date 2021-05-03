@@ -54,8 +54,8 @@ template <typename number>
 void
 test()
 {
-  typedef Vector<number> VectorType;
-  QR<VectorType>         qr;
+  using VectorType = Vector<number>;
+  QR<VectorType> qr;
 
   const unsigned int v_size = 5;
   VectorType         v(v_size);

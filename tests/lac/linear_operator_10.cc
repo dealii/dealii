@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2018 by the deal.II authors
+// Copyright (C) 2015 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -28,7 +28,6 @@
 #include "../tests.h"
 
 
-using namespace dealii;
 
 template <typename VECTOR>
 void
@@ -61,9 +60,9 @@ test_preconditioner(const MATRIX &         A,
   PRECONDITIONER preconditioner;
   preconditioner.initialize(A, data);
 
-  typedef TrilinosWrappers::SolverCG SOLVER;
-  SolverControl                      solver_control(100, 1.0e-10);
-  SOLVER                             solver(solver_control);
+  using SOLVER = TrilinosWrappers::SolverCG;
+  SolverControl solver_control(100, 1.0e-10);
+  SOLVER        solver(solver_control);
 
   // Exact inverse
   const auto lo_A_inv = inverse_operator(lo_A, solver, preconditioner);
@@ -126,9 +125,9 @@ test_preconditioner(const MATRIX &         A,
   {
     // Stand-alone
     deallog.push("S.A.");
-    typedef dealii::TrilinosWrappers::internal::LinearOperatorImplementation::
-      TrilinosPayload PAYLOAD;
-    const auto        lo_A_inv_approx =
+    using PAYLOAD = dealii::TrilinosWrappers::internal::
+      LinearOperatorImplementation::TrilinosPayload;
+    const auto lo_A_inv_approx =
       linear_operator<VECTOR, VECTOR, PAYLOAD>(preconditioner);
 
     // Singular operation
@@ -166,8 +165,8 @@ test_solver(const MATRIX &A, const VECTOR &b)
   SolverControl solver_control(100, 1.0e-10);
   SOLVER        solver(solver_control);
 
-  typedef TrilinosWrappers::PreconditionJacobi PRECONDITIONER;
-  PRECONDITIONER                               preconditioner;
+  using PRECONDITIONER = TrilinosWrappers::PreconditionJacobi;
+  PRECONDITIONER preconditioner;
   preconditioner.initialize(A);
 
   {
@@ -249,23 +248,25 @@ main(int argc, char *argv[])
 
     {
       deallog.push("PreconditionAMG");
-      typedef TrilinosWrappers::PreconditionAMG PREC;
+      using PREC = TrilinosWrappers::PreconditionAMG;
       test_preconditioner<PREC>(A, b);
       test_preconditioner<PREC>(A, c);
       deallog.pop();
     }
 
+#ifdef DEAL_II_TRILINOS_WITH_MUELU
     {
       deallog.push("PreconditionAMGMueLu");
-      typedef TrilinosWrappers::PreconditionAMGMueLu PREC;
+      using PREC = TrilinosWrappers::PreconditionAMGMueLu;
       test_preconditioner<PREC>(A, b);
       test_preconditioner<PREC>(A, c);
       deallog.pop();
     }
+#endif
 
     {
       deallog.push("PreconditionChebyshev");
-      typedef TrilinosWrappers::PreconditionChebyshev PREC;
+      using PREC = TrilinosWrappers::PreconditionChebyshev;
       test_preconditioner<PREC>(A, b);
       test_preconditioner<PREC>(A, c);
       deallog.pop();
@@ -273,7 +274,7 @@ main(int argc, char *argv[])
 
     {
       deallog.push("PreconditionIC");
-      typedef TrilinosWrappers::PreconditionIC PREC;
+      using PREC = TrilinosWrappers::PreconditionIC;
       test_preconditioner<PREC>(A, b);
       test_preconditioner<PREC>(A, c);
       deallog.pop();
@@ -281,7 +282,7 @@ main(int argc, char *argv[])
 
     {
       deallog.push("PreconditionIdentity");
-      typedef TrilinosWrappers::PreconditionIdentity PREC;
+      using PREC = TrilinosWrappers::PreconditionIdentity;
       test_preconditioner<PREC>(A, b);
       test_preconditioner<PREC>(A, c);
       deallog.pop();
@@ -289,7 +290,7 @@ main(int argc, char *argv[])
 
     {
       deallog.push("PreconditionILU");
-      typedef TrilinosWrappers::PreconditionILU PREC;
+      using PREC = TrilinosWrappers::PreconditionILU;
       test_preconditioner<PREC>(A, b);
       test_preconditioner<PREC>(A, c);
       deallog.pop();
@@ -297,7 +298,7 @@ main(int argc, char *argv[])
 
     {
       deallog.push("PreconditionILUT");
-      typedef TrilinosWrappers::PreconditionILUT PREC;
+      using PREC = TrilinosWrappers::PreconditionILUT;
       test_preconditioner<PREC>(A, b);
       test_preconditioner<PREC>(A, c);
       deallog.pop();
@@ -305,7 +306,7 @@ main(int argc, char *argv[])
 
     {
       deallog.push("PreconditionJacobi");
-      typedef TrilinosWrappers::PreconditionJacobi PREC;
+      using PREC = TrilinosWrappers::PreconditionJacobi;
       test_preconditioner<PREC>(A, b);
       test_preconditioner<PREC>(A, c);
       deallog.pop();
@@ -313,7 +314,7 @@ main(int argc, char *argv[])
 
     {
       deallog.push("PreconditionSOR");
-      typedef TrilinosWrappers::PreconditionSOR PREC;
+      using PREC = TrilinosWrappers::PreconditionSOR;
       test_preconditioner<PREC>(A, b);
       test_preconditioner<PREC>(A, c);
       deallog.pop();
@@ -321,7 +322,7 @@ main(int argc, char *argv[])
 
     {
       deallog.push("PreconditionSSOR");
-      typedef TrilinosWrappers::PreconditionSSOR PREC;
+      using PREC = TrilinosWrappers::PreconditionSSOR;
       test_preconditioner<PREC>(A, b);
       test_preconditioner<PREC>(A, c);
       deallog.pop();
@@ -341,7 +342,7 @@ main(int argc, char *argv[])
           // Note: Even though this test fails, we would still like to check
           //       that we can build LinearOperators with this solver
           deallog.push("SolverBicgstab");
-          typedef TrilinosWrappers::SolverBicgstab SLVR;
+          using SLVR = TrilinosWrappers::SolverBicgstab;
           test_solver<SLVR>(A, b);
           deallog.pop();
         }
@@ -355,14 +356,14 @@ main(int argc, char *argv[])
 
     {
       deallog.push("SolverCG");
-      typedef TrilinosWrappers::SolverCG SLVR;
+      using SLVR = TrilinosWrappers::SolverCG;
       test_solver<SLVR>(A, b);
       deallog.pop();
     }
 
     {
       deallog.push("SolverCGS");
-      typedef TrilinosWrappers::SolverCGS SLVR;
+      using SLVR = TrilinosWrappers::SolverCGS;
       test_solver<SLVR>(A, b);
       deallog.pop();
     }
@@ -371,10 +372,10 @@ main(int argc, char *argv[])
     // the LinearOperator class.
     // {
     //   deallog.push("SolverDirect");
-    //   typedef TrilinosWrappers::SolverDirect SLVR;
+    //   using SLVR = TrilinosWrappers::SolverDirect;
     //   // test_solver<SLVR> (A, b);
     //
-    //   typedef dealii::TrilinosWrappers::MPI::Vector VectorType;
+    //   using VectorType = dealii::TrilinosWrappers::MPI::Vector;
     //   typedef
     //   dealii::TrilinosWrappers::internal::LinearOperatorImplementation::TrilinosPayload
     //   PayloadType;
@@ -414,7 +415,7 @@ main(int argc, char *argv[])
 
     {
       deallog.push("SolverGMRES");
-      typedef TrilinosWrappers::SolverGMRES SLVR;
+      using SLVR = TrilinosWrappers::SolverGMRES;
       test_solver<SLVR>(A, b);
       deallog.pop();
     }
@@ -426,7 +427,7 @@ main(int argc, char *argv[])
           // Note: Even though this test fails, we would still like to check
           //       that we can build LinearOperators with this solver
           deallog.push("SolverTFQMR");
-          typedef TrilinosWrappers::SolverTFQMR SLVR;
+          using SLVR = TrilinosWrappers::SolverTFQMR;
           test_solver<SLVR>(A, b);
           deallog.pop();
         }

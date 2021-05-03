@@ -51,12 +51,12 @@ one used for the step-39 tutorial program. The discretization of the Laplacian
 is given by the following weak form
 @f{align*}
 &\sum_{K\in\text{cells}} \left(\nabla v_h, \nabla u_h\right)_{K}+\\
-&\sum_{F\in\text{faces}}\Big(-\left<[\![v_h]\!], \{\!\{\nabla u_h\}\!\}\right>_{F} - \left<\{\!\{\nabla v_h\}\!\}, [\![u_h]\!]\right>_{F} + \left<[\![v_h]\!], \sigma [\![u_h]\!]\right>_{F}\Big) \\
+&\sum_{F\in\text{faces}}\Big(-\left<\jump{v_h}, \average{\nabla u_h}\right>_{F} - \left<\average{\nabla v_h}, \jump{u_h}\right>_{F} + \left<\jump{v_h}, \sigma \jump{u_h}\right>_{F}\Big) \\
 &= \sum_{K\in\text{cells}}\left(v_h, f\right)_{K},
 @f}
-where $[\![v]\!] = v^- \mathbf{n}^- + v^+ \mathbf{n}^+ = \mathbf n^{-}
+where $\jump{v} = v^- \mathbf{n}^- + v^+ \mathbf{n}^+ = \mathbf n^{-}
 \left(v^- - v^+\right)$ denotes the directed jump of the quantity $v$ from the
-two associated cells $K^-$ and $K^+$, and $\{\!\{v\}\!\}=\frac{v^- + v^+}{2}$
+two associated cells $K^-$ and $K^+$, and $\average{v}=\frac{v^- + v^+}{2}$
 is the average from both sides.
 
 The terms in the equation represent the cell integral after integration by
@@ -68,7 +68,7 @@ length of the cells in direction normal to face multiplied by $k(k+1)$, see
 step-39. The penalty term is chosen such that an inverse estimate holds and
 the final weak form is coercive, i.e., positive definite in the discrete
 setting. The adjoint consistency term and the penalty term involve the jump
-$[\![u_h]\!]$ at the element interfaces, which disappears for the analytic
+$\jump{u_h}$ at the element interfaces, which disappears for the analytic
 solution $u$. Thus, these terms are consistent with the original PDE, ensuring
 that the method can retain optimal orders of convergence.
 
@@ -288,4 +288,3 @@ the diagonal (a point-Jacobi scheme), where FE_DGQ and FE_DGQHermite do indeed
 behave differently and FE_DGQ needs 2-5 less iterations than FE_DGQHermite,
 despite the modification made to the Hermite-like shape functions to ensure a
 good conditioning.
-

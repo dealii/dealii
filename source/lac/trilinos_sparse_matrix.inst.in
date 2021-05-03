@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,19 +21,6 @@ for (S : REAL_SCALARS)
     \{
       template void
       SparseMatrix::reinit(const dealii::SparseMatrix<S> &,
-                           const double,
-                           const bool,
-                           const dealii::SparsityPattern *);
-      template void
-      SparseMatrix::reinit(const Epetra_Map &,
-                           const dealii::SparseMatrix<S> &,
-                           const double,
-                           const bool,
-                           const dealii::SparsityPattern *);
-      template void
-      SparseMatrix::reinit(const Epetra_Map &,
-                           const Epetra_Map &,
-                           const dealii::SparseMatrix<S> &,
                            const double,
                            const bool,
                            const dealii::SparsityPattern *);

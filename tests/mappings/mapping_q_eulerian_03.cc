@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -42,7 +42,6 @@
 #include <deal.II/grid/tria_iterator.h>
 
 #include <deal.II/lac/affine_constraints.h>
-#include <deal.II/lac/filtered_matrix.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/identity_matrix.h>
 #include <deal.II/lac/precondition.h>
@@ -59,7 +58,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 
 template <int dim>

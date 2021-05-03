@@ -16,6 +16,8 @@
 #ifndef dealii_cuda_kernels_templates_h
 #define dealii_cuda_kernels_templates_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/lac/cuda_kernels.h>
 
 #ifdef DEAL_II_COMPILER_CUDA_AWARE
@@ -91,7 +93,7 @@ namespace LinearAlgebra
       __device__ Number
                  ElemSum<Number>::atomic_op(Number *dst, const Number a)
       {
-        return atomicAdd_wrapper(dst, a);
+        return atomicAdd(dst, a);
       }
 
 
@@ -127,7 +129,7 @@ namespace LinearAlgebra
       __device__ Number
                  L1Norm<Number>::atomic_op(Number *dst, const Number a)
       {
-        return atomicAdd_wrapper(dst, a);
+        return atomicAdd(dst, a);
       }
 
 
@@ -191,45 +193,13 @@ namespace LinearAlgebra
 
       template <typename Number, typename Operation>
       __device__ void
-      reduce_within_warp(volatile Number *result_buffer, size_type local_idx)
+      reduce(Number *         result,
+             volatile Number *result_buffer,
+             const size_type  local_idx,
+             const size_type  global_idx,
+             const size_type  N)
       {
-        if (block_size >= 64)
-          result_buffer[local_idx] =
-            Operation::reduction_op(result_buffer[local_idx],
-                                    result_buffer[local_idx + 32]);
-        if (block_size >= 32)
-          result_buffer[local_idx] =
-            Operation::reduction_op(result_buffer[local_idx],
-                                    result_buffer[local_idx + 16]);
-        if (block_size >= 16)
-          result_buffer[local_idx] =
-            Operation::reduction_op(result_buffer[local_idx],
-                                    result_buffer[local_idx + 8]);
-        if (block_size >= 8)
-          result_buffer[local_idx] =
-            Operation::reduction_op(result_buffer[local_idx],
-                                    result_buffer[local_idx + 4]);
-        if (block_size >= 4)
-          result_buffer[local_idx] =
-            Operation::reduction_op(result_buffer[local_idx],
-                                    result_buffer[local_idx + 2]);
-        if (block_size >= 2)
-          result_buffer[local_idx] =
-            Operation::reduction_op(result_buffer[local_idx],
-                                    result_buffer[local_idx + 1]);
-      }
-
-
-
-      template <typename Number, typename Operation>
-      __device__ void
-      reduce(Number *        result,
-             Number *        result_buffer,
-             const size_type local_idx,
-             const size_type global_idx,
-             const size_type N)
-      {
-        for (size_type s = block_size / 2; s > 32; s = s >> 1)
+        for (size_type s = block_size / 2; s > warp_size; s = s >> 1)
           {
             if (local_idx < s)
               result_buffer[local_idx] =
@@ -238,8 +208,15 @@ namespace LinearAlgebra
             __syncthreads();
           }
 
-        if (local_idx < 32)
-          reduce_within_warp<Number, Operation>(result_buffer, local_idx);
+        if (local_idx < warp_size)
+          {
+            for (size_type s = warp_size; s > 0; s = s >> 1)
+              {
+                result_buffer[local_idx] =
+                  Operation::reduction_op(result_buffer[local_idx],
+                                          result_buffer[local_idx + s]);
+              }
+          }
 
         if (local_idx == 0)
           Operation::atomic_op(result, result_buffer[0]);
@@ -292,7 +269,7 @@ namespace LinearAlgebra
       __device__ Number
                  DotProduct<Number>::atomic_op(Number *dst, const Number a)
       {
-        return atomicAdd_wrapper(dst, a);
+        return atomicAdd(dst, a);
       }
 
 

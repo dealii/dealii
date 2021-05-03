@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2019 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,9 +19,9 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <deque>
+#include <memory>
 #include <type_traits>
 
 DEAL_II_NAMESPACE_OPEN
@@ -44,8 +44,6 @@ DEAL_II_NAMESPACE_OPEN
  * iterations
  * $\{k-1,k-2,...,k-m\}$, then addition of the new element will make
  * the object contain elements from iterations $\{k,k-1,k-2,...,k-m+1\}$.
- *
- * @author Denis Davydov, 2018
  */
 template <typename T>
 class FiniteSizeHistory
@@ -148,7 +146,7 @@ template <typename T>
 void
 FiniteSizeHistory<T>::remove(const std::size_t ind)
 {
-  Assert(ind < data.size(), ExcIndexRange(ind, 0, data.size()));
+  AssertIndexRange(ind, data.size());
   auto el = std::move(data[ind]);
   data.erase(data.begin() + ind);
 
@@ -172,7 +170,7 @@ FiniteSizeHistory<T>::add(const T &element)
       if (cache.size() == 0)
         // nothing is cached, just copy a given element
         {
-          new_el = std_cxx14::make_unique<T>(element);
+          new_el = std::make_unique<T>(element);
         }
       else
         // something is cached, take one element and copy
@@ -207,7 +205,7 @@ FiniteSizeHistory<T>::add(const T &element)
 template <typename T>
 T &FiniteSizeHistory<T>::operator[](const std::size_t ind)
 {
-  Assert(ind < data.size(), ExcIndexRange(ind, 0, data.size()));
+  AssertIndexRange(ind, data.size());
   return *data[ind];
 }
 
@@ -216,7 +214,7 @@ T &FiniteSizeHistory<T>::operator[](const std::size_t ind)
 template <typename T>
 const T &FiniteSizeHistory<T>::operator[](const std::size_t ind) const
 {
-  Assert(ind < data.size(), ExcIndexRange(ind, 0, data.size()));
+  AssertIndexRange(ind, data.size());
   return *data[ind];
 }
 

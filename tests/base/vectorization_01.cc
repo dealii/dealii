@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2018 by the deal.II authors
+// Copyright (C) 2012 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,11 +30,15 @@ test()
   // since the number of array elements is system dependent, it is not a good
   // idea to print them to an output file. Instead, check the values manually
   VectorizedArray<Number> a, b, c;
-  const unsigned int      n_vectors = VectorizedArray<Number>::n_array_elements;
+  const unsigned int      n_vectors = VectorizedArray<Number>::size();
   a                                 = Number(2.);
   b                                 = Number(-1.);
   for (unsigned int i = 0; i < n_vectors; ++i)
     c[i] = Number(i);
+
+  AssertDimension(n_vectors, a.size());
+  AssertDimension(a.size(), sizeof(a) / sizeof(Number));
+  AssertDimension(VectorizedArray<Number>::size(), sizeof(a) / sizeof(Number));
 
   deallog << "Addition: ";
   VectorizedArray<Number> d = a + b;

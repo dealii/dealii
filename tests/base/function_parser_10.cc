@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -37,15 +37,30 @@ eval(const std::string &exp)
 }
 
 
+bool
+satisfies_randomness(std::vector<double> &v)
+{
+  // check that consecutive numbers are not the same
+  for (unsigned int i = 1; i < v.size(); ++i)
+    if (v[i - 1] == v[i])
+      return false;
+  // Check that the numbers are between 0 and 1
+  return std::all_of(v.begin(), v.end(), [](double n) {
+    return (n >= 0.) && (n <= 1.);
+  });
+}
+
+
 int
 main()
 {
   initlog();
 
-  double random = eval("rand()"); // random seed
+  std::vector<double> rands{eval("rand_seed(10)"),
+                            eval("rand()"),
+                            eval("rand_seed(10)"),
+                            eval("rand_seed(10)")};
 
-  if (0.0 <= random && random <= 1.0)
+  if (satisfies_randomness(rands))
     deallog << "OK" << std::endl;
-
-  deallog << eval("rand_seed(10)") << std::endl;
 }

@@ -39,34 +39,32 @@ Cycle 5:
 
 In each cycle, the number of cells quadruples and the number of CG
 iterations roughly doubles.
-Also, in each cycle, the program writes one output graphic file in EPS
+Also, in each cycle, the program writes one output graphic file in VTU
 format. They are depicted in the following:
-
-
 
 <table width="100%">
   <tr>
     <td>
-      <img src="https://www.dealii.org/images/steps/developer/step-5.solution-0.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-5.solution-0-r9.2.png" alt="">
     </td>
     <td>
-      <img src="https://www.dealii.org/images/steps/developer/step-5.solution-1.png" alt="">
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <img src="https://www.dealii.org/images/steps/developer/step-5.solution-2.png" alt="">
-    </td>
-    <td>
-      <img src="https://www.dealii.org/images/steps/developer/step-5.solution-3.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-5.solution-1-r9.2.png" alt="">
     </td>
   </tr>
   <tr>
     <td>
-      <img src="https://www.dealii.org/images/steps/developer/step-5.solution-4.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-5.solution-2-r9.2.png" alt="">
     </td>
     <td>
-      <img src="https://www.dealii.org/images/steps/developer/step-5.solution-5.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-5.solution-3-r9.2.png" alt="">
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <img src="https://www.dealii.org/images/steps/developer/step-5.solution-4-r9.2.png" alt="">
+    </td>
+    <td>
+      <img src="https://www.dealii.org/images/steps/developer/step-5.solution-5-r9.2.png" alt="">
     </td>
   </tr>
 </table>
@@ -76,6 +74,14 @@ format. They are depicted in the following:
 Due to the variable coefficient (the curvature there is reduced by the
 same factor by which the coefficient is increased), the top region of
 the solution is flattened. The gradient of the solution is
-discontinuous there, although this is not very clearly visible in the
-pictures above. We will look at this in more detail in the next
-example.
+discontinuous along the interface, although this is not very clearly
+visible in the pictures above. We will look at this in more detail in
+the next example.
+
+The pictures also show that the solution computed by this program is
+actually pretty wrong on a very coarse mesh (its magnitude is
+wrong). That's because no numerical method guarantees that the solution
+on a coarse mesh is particularly accurate -- but we know that the
+solution <i>converges</i> to the exact solution, and indeed you can
+see how the solutions from one mesh to the next seem to not change
+very much any more at the end.

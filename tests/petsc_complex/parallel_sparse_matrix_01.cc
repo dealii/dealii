@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -49,7 +49,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 template <int dim>
 void
@@ -92,11 +91,10 @@ test(const unsigned int poly_degree = 1)
 
   DynamicSparsityPattern dsp(locally_relevant_dofs);
   DoFTools::make_sparsity_pattern(dof_handler, dsp, constraints, false);
-  SparsityTools::distribute_sparsity_pattern(
-    dsp,
-    dof_handler.n_locally_owned_dofs_per_processor(),
-    mpi_communicator,
-    locally_relevant_dofs);
+  SparsityTools::distribute_sparsity_pattern(dsp,
+                                             locally_owned_dofs,
+                                             mpi_communicator,
+                                             locally_relevant_dofs);
 
   mass_matrix.reinit(locally_owned_dofs,
                      locally_owned_dofs,

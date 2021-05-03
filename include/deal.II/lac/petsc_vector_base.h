@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2019 by the deal.II authors
+// Copyright (C) 2004 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -36,22 +36,24 @@
 DEAL_II_NAMESPACE_OPEN
 
 // forward declaration
+#    ifndef DOXYGEN
 template <typename number>
 class Vector;
 
+namespace PETScWrappers
+{
+  class VectorBase;
+}
+#    endif
 
 /**
  * A namespace in which wrapper classes for PETSc objects reside.
  *
  * @ingroup PETScWrappers
  * @ingroup Vectors
- * @author Wolfgang Bangerth, 2004
  */
 namespace PETScWrappers
 {
-  // forward declaration
-  class VectorBase;
-
   /**
    * @cond internal
    */
@@ -90,8 +92,12 @@ namespace PETScWrappers
        */
       VectorReference(const VectorBase &vector, const size_type index);
 
-
     public:
+      /*
+       * Copy constrcutor.
+       */
+      VectorReference(const VectorReference &vector) = default;
+
       /**
        * This looks like a copy operator, but does something different than
        * usual. In particular, it does not copy the member variables of this
@@ -167,14 +173,22 @@ namespace PETScWrappers
       /**
        * Exception
        */
-      DeclException3(ExcAccessToNonlocalElement,
-                     int,
-                     int,
-                     int,
-                     << "You tried to access element " << arg1
-                     << " of a distributed vector, but only elements " << arg2
-                     << " through " << arg3
-                     << " are stored locally and can be accessed.");
+      DeclException3(
+        ExcAccessToNonlocalElement,
+        int,
+        int,
+        int,
+        << "You tried to access element " << arg1
+        << " of a distributed vector, but only elements in range [" << arg2
+        << "," << arg3 << "] are stored locally and can be accessed."
+        << "\n\n"
+        << "A common source for this kind of problem is that you "
+        << "are passing a 'fully distributed' vector into a function "
+        << "that needs read access to vector elements that correspond "
+        << "to degrees of freedom on ghost cells (or at least to "
+        << "'locally active' degrees of freedom that are not also "
+        << "'locally owned'). You need to pass a vector that has these "
+        << "elements as ghost entries.");
       /**
        * Exception.
        */
@@ -198,10 +212,8 @@ namespace PETScWrappers
        */
       const size_type index;
 
-      /**
-       * Make the vector class a friend, so that it can create objects of the
-       * present type.
-       */
+      // Make the vector class a friend, so that it can create objects of the
+      // present type.
       friend class ::dealii::PETScWrappers::VectorBase;
     };
   } // namespace internal
@@ -234,7 +246,6 @@ namespace PETScWrappers
    * before you actually use the vector.
    *
    * @ingroup PETScWrappers
-   * @author Wolfgang Bangerth, 2004
    */
   class VectorBase : public Subscriptor
   {
@@ -277,7 +288,7 @@ namespace PETScWrappers
     operator=(const VectorBase &) = delete;
 
     /**
-     * Destructor
+     * Destructor.
      */
     virtual ~VectorBase() override;
 
@@ -345,10 +356,24 @@ namespace PETScWrappers
      * is the same as size(), but for parallel vectors it may be smaller.
      *
      * To figure out which elements exactly are stored locally, use
-     * local_range().
+     * local_range() or locally_owned_elements().
+     *
+     * @deprecated use locally_owned_size() instead.
      */
+    DEAL_II_DEPRECATED_EARLY
     size_type
     local_size() const;
+
+    /**
+     * Return the local dimension of the vector, i.e. the number of elements
+     * stored on the present MPI process. For sequential vectors, this number
+     * is the same as size(), but for parallel vectors it may be smaller.
+     *
+     * To figure out which elements exactly are stored locally, use
+     * local_range() or locally_owned_elements().
+     */
+    size_type
+    locally_owned_size() const;
 
     /**
      * Return a pair of indices indicating which elements of this vector are
@@ -356,7 +381,7 @@ namespace PETScWrappers
      * stored, the second the index of the one past the last one that is
      * stored locally. If this is a sequential vector, then the result will be
      * the pair (0,N), otherwise it will be a pair (i,i+n), where
-     * <tt>n=local_size()</tt>.
+     * <tt>n=locally_owned_size()</tt>.
      */
     std::pair<size_type, size_type>
     local_range() const;
@@ -433,7 +458,10 @@ namespace PETScWrappers
      * vector, this function allows to set a whole set of elements at once.
      * The indices of the elements to be set are stated in the first argument,
      * the corresponding values in the second.
+     *
+     * @deprecated Use import() instead.
      */
+    DEAL_II_DEPRECATED
     void
     set(const std::vector<size_type> &  indices,
         const std::vector<PetscScalar> &values);
@@ -591,13 +619,23 @@ namespace PETScWrappers
 
     /**
      * Return the value of the vector element with the largest negative value.
+     *
+     * @deprecated This function has been deprecated to improve compatibility
+     * with other classes inheriting from VectorSpaceVector. If you need to
+     * use this functionality then use the PETSc function VecMin instead.
      */
+    DEAL_II_DEPRECATED
     real_type
     min() const;
 
     /**
      * Return the value of the vector element with the largest positive value.
+     *
+     * @deprecated This function has been deprecated to improve compatibility
+     * with other classes inheriting from VectorSpaceVector. If you need to
+     * use this functionality then use the PETSc function VecMax instead.
      */
+    DEAL_II_DEPRECATED
     real_type
     max() const;
 
@@ -613,7 +651,11 @@ namespace PETScWrappers
      * Return @p true if the vector has no negative entries, i.e. all entries
      * are zero or positive. This function is used, for example, to check
      * whether refinement indicators are really all positive (or zero).
+     *
+     * @deprecated This function has been deprecated to improve compatibility
+     * with other classes inheriting from VectorSpaceVector.
      */
+    DEAL_II_DEPRECATED
     bool
     is_non_negative() const;
 
@@ -688,20 +730,6 @@ namespace PETScWrappers
      */
     void
     equ(const PetscScalar a, const VectorBase &V);
-
-    /**
-     * Compute the elementwise ratio of the two given vectors, that is let
-     * <tt>this[i] = a[i]/b[i]</tt>. This is useful for example if you want to
-     * compute the cellwise ratio of true to estimated error.
-     *
-     * This vector is appropriately scaled to hold the result.
-     *
-     * If any of the <tt>b[i]</tt> is zero, the result is undefined. No
-     * attempt is made to catch such situations.
-     */
-    DEAL_II_DEPRECATED
-    void
-    ratio(const VectorBase &a, const VectorBase &b);
 
     /**
      * Prints the PETSc vector object values using PETSc internal vector
@@ -791,9 +819,7 @@ namespace PETScWrappers
      */
     mutable VectorOperation::values last_action;
 
-    /**
-     * Make the reference class a friend.
-     */
+    // Make the reference class a friend.
     friend class internal::VectorReference;
 
     /**
@@ -825,7 +851,6 @@ namespace PETScWrappers
    * exchanges the data of the two vectors.
    *
    * @relatesalso PETScWrappers::VectorBase
-   * @author Wolfgang Bangerth, 2004
    */
   inline void
   swap(VectorBase &u, VectorBase &v)

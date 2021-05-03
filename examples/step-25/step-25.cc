@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2006 - 2019 by the deal.II authors
+ * Copyright (C) 2006 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -401,7 +401,7 @@ namespace Step25
                             update_values | update_JxW_values |
                               update_quadrature_points);
 
-    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
 
     Vector<double>                       local_nl_term(dofs_per_cell);
@@ -461,7 +461,7 @@ namespace Step25
                             update_values | update_JxW_values |
                               update_quadrature_points);
 
-    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
 
     FullMatrix<double> local_nl_matrix(dofs_per_cell, dofs_per_cell);
@@ -531,10 +531,10 @@ namespace Step25
   template <int dim>
   unsigned int SineGordonProblem<dim>::solve()
   {
-    SolverControl solver_control(1000, 1e-12 * system_rhs.l2_norm());
-    SolverCG<>    cg(solver_control);
+    SolverControl            solver_control(1000, 1e-12 * system_rhs.l2_norm());
+    SolverCG<Vector<double>> cg(solver_control);
 
-    PreconditionSSOR<> preconditioner;
+    PreconditionSSOR<SparseMatrix<double>> preconditioner;
     preconditioner.initialize(system_matrix, 1.2);
 
     cg.solve(system_matrix, solution_update, system_rhs, preconditioner);
@@ -688,7 +688,6 @@ int main()
 {
   try
     {
-      using namespace dealii;
       using namespace Step25;
 
       SineGordonProblem<1> sg_problem;

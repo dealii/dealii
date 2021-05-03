@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -79,7 +79,7 @@ test()
   std::set<types::global_dof_index> starting_indices;
   for (const auto &cell : dofh.active_cell_iterators())
     if (cell->is_locally_owned())
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+      for (const unsigned int f : GeometryInfo<dim>::face_indices())
         if (!cell->at_boundary(f) && cell->neighbor(f)->is_ghost())
           {
             // we've identified a subdomain interface. use these DoFs

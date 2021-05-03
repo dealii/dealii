@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -26,6 +26,7 @@
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/utilities.h>
 
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/dofs/dof_tools.h>
 
@@ -41,7 +42,6 @@
 #include <deal.II/grid/grid_refinement.h>
 #include <deal.II/grid/grid_tools.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/fe_values.h>
 #include <deal.II/hp/q_collection.h>
@@ -69,7 +69,6 @@ unsigned int counter = 0;
 
 const double eps = 1e-10;
 
-using namespace dealii;
 
 template <int dim>
 struct less_than_key
@@ -120,7 +119,7 @@ test2cells(const FiniteElement<dim> &fe_0,
                                               p2);
   }
 
-  hp::DoFHandler<dim> dof_handler(triangulation);
+  DoFHandler<dim> dof_handler(triangulation);
 
   hp::FECollection<dim> fe_collection;
   fe_collection.push_back(fe_0);
@@ -128,7 +127,7 @@ test2cells(const FiniteElement<dim> &fe_0,
   fe_collection.push_back(fe_2);
   fe_collection.push_back(fe_common);
 
-  const QIterated<dim - 1> quad_formula(QTrapez<1>(), 2);
+  const QIterated<dim - 1> quad_formula(QTrapezoid<1>(), 2);
 
   hp::QCollection<dim - 1> q_face_collection;
   q_face_collection.push_back(quad_formula);
@@ -144,7 +143,7 @@ test2cells(const FiniteElement<dim> &fe_0,
   triangulation.begin_active()->set_refine_flag();
   triangulation.execute_coarsening_and_refinement();
 
-  for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
+  for (typename DoFHandler<dim>::active_cell_iterator cell =
          dof_handler.begin_active();
        cell != dof_handler.end();
        ++cell)
@@ -193,14 +192,14 @@ test2cells(const FiniteElement<dim> &fe_0,
       shape_functions.push_back(shape_function);
     }
 
-  DataOut<dim, hp::DoFHandler<dim>> data_out;
+  DataOut<dim, DoFHandler<dim>> data_out;
   data_out.attach_dof_handler(dof_handler);
 
   // get material ids:
   Vector<float> fe_index(triangulation.n_active_cells());
-  typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                              .begin_active(),
-                                                     endc = dof_handler.end();
+  typename DoFHandler<dim>::active_cell_iterator cell =
+                                                   dof_handler.begin_active(),
+                                                 endc = dof_handler.end();
   for (unsigned int index = 0; cell != endc; ++cell, ++index)
     {
       fe_index[index] = cell->active_fe_index();
@@ -236,14 +235,14 @@ test2cells(const FiniteElement<dim> &fe_0,
 
   std::vector<std::pair<Point<dim>, Vector<double>>> pairs_point_value;
 
-  for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
+  for (typename DoFHandler<dim>::active_cell_iterator cell =
          dof_handler.begin_active();
        cell != dof_handler.end();
        ++cell)
     {
       const unsigned int fe_index = cell->active_fe_index();
       local_face_dof_indices.resize(fe_collection[fe_index].dofs_per_face);
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+      for (const unsigned int f : GeometryInfo<dim>::face_indices())
         if (std::abs(cell->face(f)->center()[0]) < 0.1)
           {
             // deallog << "cell="<<cell<<" face="<<f<<std::endl;

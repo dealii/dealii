@@ -21,7 +21,9 @@
 #ifdef DEAL_II_WITH_SYMENGINE
 
 
+#  include <deal.II/base/symmetric_tensor.h>
 #  include <deal.II/base/template_constraints.h>
+#  include <deal.II/base/tensor.h>
 
 #  include <deal.II/differentiation/sd/symengine_number_types.h>
 
@@ -36,7 +38,7 @@ DEAL_II_NAMESPACE_OPEN
 template <>
 struct EnableIfScalar<Differentiation::SD::Expression>
 {
-  typedef Differentiation::SD::Expression type;
+  using type = Differentiation::SD::Expression;
 };
 
 
@@ -57,8 +59,6 @@ namespace internal
      * would otherwise occur if trying to directly implement
      * these as specializations of the ProductTypeImpl class
      * itself.
-     *
-     * @author Jean-Paul Pelteret, 2019
      */
     template <typename T, typename U, typename V = void>
     struct GeneralProductTypeImpl;
@@ -69,7 +69,7 @@ namespace internal
       Differentiation::SD::Expression,
       typename std::enable_if<std::is_arithmetic<T>::value>::type>
     {
-      typedef Differentiation::SD::Expression type;
+      using type = Differentiation::SD::Expression;
     };
 
     template <typename T>
@@ -80,7 +80,27 @@ namespace internal
         boost::is_complex<T>::value &&
         std::is_arithmetic<typename T::value_type>::value>::type>
     {
-      typedef Differentiation::SD::Expression type;
+      using type = Differentiation::SD::Expression;
+    };
+
+    template <int rank, int dim, typename T>
+    struct GeneralProductTypeImpl<Tensor<rank, dim, T>,
+                                  Differentiation::SD::Expression>
+    {
+      using type =
+        Tensor<rank,
+               dim,
+               typename ProductType<T, Differentiation::SD::Expression>::type>;
+    };
+
+    template <int rank, int dim, typename T>
+    struct GeneralProductTypeImpl<SymmetricTensor<rank, dim, T>,
+                                  Differentiation::SD::Expression>
+    {
+      using type = SymmetricTensor<
+        rank,
+        dim,
+        typename ProductType<T, Differentiation::SD::Expression>::type>;
     };
 
   } // namespace SD
@@ -90,26 +110,22 @@ namespace internal
   struct ProductTypeImpl<Differentiation::SD::Expression,
                          Differentiation::SD::Expression>
   {
-    typedef Differentiation::SD::Expression type;
+    using type = Differentiation::SD::Expression;
   };
 
 
   template <typename T>
   struct ProductTypeImpl<T, Differentiation::SD::Expression>
   {
-    typedef
-      typename SD::GeneralProductTypeImpl<T,
-                                          Differentiation::SD::Expression>::type
-        type;
+    using type = typename SD::
+      GeneralProductTypeImpl<T, Differentiation::SD::Expression>::type;
   };
 
   template <typename T>
   struct ProductTypeImpl<Differentiation::SD::Expression, T>
   {
-    typedef
-      typename SD::GeneralProductTypeImpl<T,
-                                          Differentiation::SD::Expression>::type
-        type;
+    using type = typename SD::
+      GeneralProductTypeImpl<T, Differentiation::SD::Expression>::type;
   };
 
 } // namespace internal

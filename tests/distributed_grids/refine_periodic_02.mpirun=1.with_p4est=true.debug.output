@@ -1,0 +1,8 @@
+
+DEAL::Checksum: 3787082418
+n_active_cells: 1234
+n_levels: 8
+DEAL::execute_coarsening_and_refinement()...
+DEAL::Checksum: 1951244648
+n_active_cells: 1381
+n_levels: 8

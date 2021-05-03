@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2019 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,6 +16,8 @@
 #ifndef dealii_symmetric_tensor_templates_h
 #define dealii_symmetric_tensor_templates_h
 
+
+#include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/symmetric_tensor.h>
@@ -750,7 +752,7 @@ namespace internal
                          const double       rotation_angle,
                          const unsigned int axis = 0)
     {
-      Assert(axis < 3, ExcIndexRange(axis, 0, 3));
+      AssertIndexRange(axis, 3);
 
       Tensor<2, 3> R;
       switch (axis)
@@ -924,7 +926,6 @@ eigenvectors(const SymmetricTensor<2, dim, Number> &T,
           const double delta = sf * std::numeric_limits<scalar_type>::epsilon();
           const double rotation_angle = delta * numbers::PI / 180.0;
 
-          Tensor<2, dim, Number> T_prime_ns;
           if (dim == 2)
             {
               const Tensor<2, dim, Number> T_prime_ns =
@@ -935,9 +936,8 @@ eigenvectors(const SymmetricTensor<2, dim, Number> &T,
               // cancel out. So we take the upper triangle as an approximation
               // instead.
               // TODO[JPP]: Perform the eigen-decomposition on the non-symmetric
-              // T_prime_ns.
-              //            This is, however, nontrivial to implement in this
-              //            context. See:
+              //            T_prime_ns. This is, however, nontrivial to
+              //            implement in this context. See:
               //            http://www.alglib.net/eigen/nonsymmetric/nonsymmetricevd.php
               //            https://groups.google.com/forum/#!topic/stan-users/QJe1TNioiyg
               SymmetricTensor<2, dim, Number> T_prime;
@@ -958,16 +958,16 @@ eigenvectors(const SymmetricTensor<2, dim, Number> &T,
                 {
                   // This is a little bit hacky, so here's a brief explanation
                   // as to what the principal of this operation is: What we're
-                  // trying to do here is perturb our tenosr such that the
-                  // sensitivity of the eigen-vectors with respect to each other
+                  // trying to do here is perturb our tensor such that the
+                  // sensitivity of the eigenvectors with respect to each other
                   // can be established. So, one at a time, we compute the
                   // perturbation of the input tensor such that the maximal
                   // number of off-diagonal entries are non-zero for any given
                   // "i". This means that we rotation not about the "ith" axis,
                   // but rather some offset of it. Note: This does NOT lead to
-                  // an exact value or derivative of the eigen-data being
+                  // an exact value or derivative of the eigendata being
                   // computed, so one should be aware that for this case (where
-                  // the eigen-values are equal), the linearisation of any
+                  // the eigenvalues are equal), the linearization of any
                   // resulting quantities is only approximate.
                   const unsigned int axis = (i + 2) % 3;
                   T_prime_ns = internal::SymmetricTensorImplementation::
@@ -977,9 +977,9 @@ eigenvectors(const SymmetricTensor<2, dim, Number> &T,
                   // cancel out. So we take the upper triangle as an
                   // approximation instead.
                   // TODO[JPP]: Keep the full row and perform the
-                  // eigen-decomposition on the
-                  //            non-symmetric T_prime_ns. See related comment
-                  //            above in 2d case.
+                  //            eigen-decomposition on the
+                  //            non-symmetric T_prime_ns. See the related
+                  //            comment above in the 2d case.
                   for (unsigned int j = i; j < dim; ++j)
                     T_prime[i][j] = T_prime_ns[i][j];
                 }
@@ -1004,78 +1004,42 @@ eigenvectors(const SymmetricTensor<2, dim, Number> &T,
 
 
 #ifdef DEAL_II_ADOLC_WITH_ADVANCED_BRANCHING
-
-// Specializations of the above functions for taped ADOL-C numbers
-// when the advanced branching feature is activated.
-// We could copy-paste all of these functions and add the appropriate
-// conditional assignments (see the ADOL-C manual, section 1.8).
-// However, some of the conditions are quite complicated (with possibly
-// no 1-1 correspondence for the operations along each branch) so this
-// needs some careful attention. For the sake of simplicity and until
-// this can be rigourously checked, at this point in time we simply
-// disable these functions.
-
 namespace internal
 {
   namespace SymmetricTensorImplementation
   {
     template <>
-    struct Inverse<4, 3, adouble>
-    {
-      static dealii::SymmetricTensor<4, 3, adouble>
-      value(const dealii::SymmetricTensor<4, 3, adouble> & /*t*/)
-      {
-        AssertThrow(false, ExcADOLCAdvancedBranching());
-        return dealii::SymmetricTensor<4, 3, adouble>();
-      }
-    };
+    struct Inverse<4, 3, adouble>;
   } // namespace SymmetricTensorImplementation
 } // namespace internal
 
 template <>
 std::array<adouble, 1>
-eigenvalues(const SymmetricTensor<2, 1, adouble> & /*T*/)
-{
-  AssertThrow(false, ExcADOLCAdvancedBranching());
-  return std::array<adouble, 1>();
-}
-
-
+eigenvalues(const SymmetricTensor<2, 1, adouble> & /*T*/);
 
 template <>
 std::array<adouble, 2>
-eigenvalues(const SymmetricTensor<2, 2, adouble> & /*T*/)
-{
-  AssertThrow(false, ExcADOLCAdvancedBranching());
-  return std::array<adouble, 2>();
-}
-
-
+eigenvalues(const SymmetricTensor<2, 2, adouble> & /*T*/);
 
 template <>
 std::array<adouble, 3>
-eigenvalues(const SymmetricTensor<2, 3, adouble> & /*T*/)
-{
-  AssertThrow(false, ExcADOLCAdvancedBranching());
-  return std::array<adouble, 3>();
-}
+eigenvalues(const SymmetricTensor<2, 3, adouble> & /*T*/);
 
+template <>
+std::array<std::pair<adouble, Tensor<1, 1, adouble>>, 1>
+eigenvectors(const SymmetricTensor<2, 1, adouble> & /*T*/,
+             const SymmetricTensorEigenvectorMethod /*method*/);
 
+template <>
+std::array<std::pair<adouble, Tensor<1, 2, adouble>>, 2>
+eigenvectors(const SymmetricTensor<2, 2, adouble> & /*T*/,
+             const SymmetricTensorEigenvectorMethod /*method*/);
 
-template <int dim>
-std::array<std::pair<adouble, Tensor<1, dim, adouble>>,
-           std::integral_constant<int, dim>::value>
-eigenvectors(const SymmetricTensor<2, dim, adouble> & /*T*/,
-             const SymmetricTensorEigenvectorMethod /*method*/)
-{
-  AssertThrow(false, ExcADOLCAdvancedBranching());
-  return std::array<std::pair<adouble, Tensor<1, dim, adouble>>,
-                    std::integral_constant<int, dim>::value>();
-}
-
+template <>
+std::array<std::pair<adouble, Tensor<1, 3, adouble>>, 3>
+eigenvectors(const SymmetricTensor<2, 3, adouble> & /*T*/,
+             const SymmetricTensorEigenvectorMethod /*method*/);
 #endif
-
-
 
 DEAL_II_NAMESPACE_CLOSE
 

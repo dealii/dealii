@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,6 +20,7 @@
 #include <string>
 
 #include "../tests.h"
+
 #include "shapes.h"
 
 #define PRECISION 8
@@ -45,12 +46,12 @@ plot_FE_Q_DG0_shape_functions()
   // reduce run-time
   if (dim < 3)
     {
-      FE_Q_DG0<dim> q3(QIterated<1>(QTrapez<1>(), 3));
+      FE_Q_DG0<dim> q3(QIterated<1>(QTrapezoid<1>(), 3));
       plot_shape_functions(m, q3, "Q3_DG0");
       plot_face_shape_functions(m, q3, "Q3_DG0");
       test_compute_functions(m, q3, "Q3_DG0");
 
-      FE_Q_DG0<dim> q4(QIterated<1>(QTrapez<1>(), 4));
+      FE_Q_DG0<dim> q4(QIterated<1>(QTrapezoid<1>(), 4));
       plot_shape_functions(m, q4, "Q4_DG0");
       plot_face_shape_functions(m, q4, "Q4_DG0");
       test_compute_functions(m, q4, "Q4_DG0");

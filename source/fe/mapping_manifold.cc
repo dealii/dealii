@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2019 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,7 +20,6 @@
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/tensor_product_polynomials.h>
 
 #include <deal.II/dofs/dof_accessor.h>
@@ -117,67 +116,23 @@ MappingManifold<dim, spacedim>::InternalData::initialize_face(
                      std::vector<Tensor<1, spacedim>>(n_original_q_points));
 
           // Compute tangentials to the unit cell.
-          for (unsigned int i = 0; i < unit_tangentials.size(); ++i)
-            unit_tangentials[i].resize(n_original_q_points);
-          switch (dim)
+          for (const unsigned int i : GeometryInfo<dim>::face_indices())
             {
-              case 2:
+              unit_tangentials[i].resize(n_original_q_points);
+              std::fill(unit_tangentials[i].begin(),
+                        unit_tangentials[i].end(),
+                        GeometryInfo<dim>::unit_tangential_vectors[i][0]);
+              if (dim > 2)
                 {
-                  // ensure a counterclockwise
-                  // orientation of tangentials
-                  static const int tangential_orientation[4] = {-1, 1, 1, -1};
-                  for (unsigned int i = 0;
-                       i < GeometryInfo<dim>::faces_per_cell;
-                       ++i)
-                    {
-                      Tensor<1, dim> tang;
-                      tang[1 - i / 2] = tangential_orientation[i];
-                      std::fill(unit_tangentials[i].begin(),
-                                unit_tangentials[i].end(),
-                                tang);
-                    }
-                  break;
+                  unit_tangentials[GeometryInfo<dim>::faces_per_cell + i]
+                    .resize(n_original_q_points);
+                  std::fill(
+                    unit_tangentials[GeometryInfo<dim>::faces_per_cell + i]
+                      .begin(),
+                    unit_tangentials[GeometryInfo<dim>::faces_per_cell + i]
+                      .end(),
+                    GeometryInfo<dim>::unit_tangential_vectors[i][1]);
                 }
-              case 3:
-                {
-                  for (unsigned int i = 0;
-                       i < GeometryInfo<dim>::faces_per_cell;
-                       ++i)
-                    {
-                      Tensor<1, dim> tang1, tang2;
-
-                      const unsigned int nd =
-                        GeometryInfo<dim>::unit_normal_direction[i];
-
-                      // first tangential
-                      // vector in direction
-                      // of the (nd+1)%3 axis
-                      // and inverted in case
-                      // of unit inward normal
-                      tang1[(nd + 1) % dim] =
-                        GeometryInfo<dim>::unit_normal_orientation[i];
-                      // second tangential
-                      // vector in direction
-                      // of the (nd+2)%3 axis
-                      tang2[(nd + 2) % dim] = 1.;
-
-                      // same unit tangents
-                      // for all quadrature
-                      // points on this face
-                      std::fill(unit_tangentials[i].begin(),
-                                unit_tangentials[i].end(),
-                                tang1);
-                      std::fill(
-                        unit_tangentials[GeometryInfo<dim>::faces_per_cell + i]
-                          .begin(),
-                        unit_tangentials[GeometryInfo<dim>::faces_per_cell + i]
-                          .end(),
-                        tang2);
-                    }
-                  break;
-                }
-              default:
-                Assert(false, ExcNotImplemented());
             }
         }
     }
@@ -196,7 +151,7 @@ template <int dim, int spacedim>
 std::unique_ptr<Mapping<dim, spacedim>>
 MappingManifold<dim, spacedim>::clone() const
 {
-  return std_cxx14::make_unique<MappingManifold<dim, spacedim>>(*this);
+  return std::make_unique<MappingManifold<dim, spacedim>>(*this);
 }
 
 
@@ -208,7 +163,7 @@ MappingManifold<dim, spacedim>::transform_real_to_unit_cell(
   const Point<spacedim> &) const
 {
   Assert(false, ExcNotImplemented());
-  return Point<dim>();
+  return {};
 }
 
 
@@ -222,7 +177,7 @@ MappingManifold<dim, spacedim>::transform_unit_to_real_cell(
   std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell> vertices;
   std::array<double, GeometryInfo<dim>::vertices_per_cell>          weights;
 
-  for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+  for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
     {
       vertices[v] = cell->vertex(v);
       weights[v]  = GeometryInfo<dim>::d_linear_shape_function(p, v);
@@ -315,7 +270,7 @@ MappingManifold<dim, spacedim>::get_data(const UpdateFlags      update_flags,
                                          const Quadrature<dim> &q) const
 {
   std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase> data_ptr =
-    std_cxx14::make_unique<InternalData>();
+    std::make_unique<InternalData>();
   auto &data = dynamic_cast<InternalData &>(*data_ptr);
   data.initialize(this->requires_update_flags(update_flags), q, q.size());
 
@@ -327,15 +282,18 @@ MappingManifold<dim, spacedim>::get_data(const UpdateFlags      update_flags,
 template <int dim, int spacedim>
 std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase>
 MappingManifold<dim, spacedim>::get_face_data(
-  const UpdateFlags          update_flags,
-  const Quadrature<dim - 1> &quadrature) const
+  const UpdateFlags               update_flags,
+  const hp::QCollection<dim - 1> &quadrature) const
 {
+  AssertDimension(quadrature.size(), 1);
+
   std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase> data_ptr =
-    std_cxx14::make_unique<InternalData>();
+    std::make_unique<InternalData>();
   auto &data = dynamic_cast<InternalData &>(*data_ptr);
   data.initialize_face(this->requires_update_flags(update_flags),
-                       QProjector<dim>::project_to_all_faces(quadrature),
-                       quadrature.size());
+                       QProjector<dim>::project_to_all_faces(
+                         ReferenceCells::get_hypercube<dim>(), quadrature[0]),
+                       quadrature[0].size());
 
   return data_ptr;
 }
@@ -349,10 +307,11 @@ MappingManifold<dim, spacedim>::get_subface_data(
   const Quadrature<dim - 1> &quadrature) const
 {
   std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase> data_ptr =
-    std_cxx14::make_unique<InternalData>();
+    std::make_unique<InternalData>();
   auto &data = dynamic_cast<InternalData &>(*data_ptr);
   data.initialize_face(this->requires_update_flags(update_flags),
-                       QProjector<dim>::project_to_all_subfaces(quadrature),
+                       QProjector<dim>::project_to_all_subfaces(
+                         ReferenceCells::get_hypercube<dim>(), quadrature),
                        quadrature.size());
 
   return data_ptr;
@@ -460,9 +419,8 @@ namespace internal
                     const Point<dim> np(p + L * ei);
 
                     // Get the weights to compute the np point in real space
-                    for (unsigned int j = 0;
-                         j < GeometryInfo<dim>::vertices_per_cell;
-                         ++j)
+                    for (const unsigned int j :
+                         GeometryInfo<dim>::vertex_indices())
                       data.vertex_weights[j] =
                         GeometryInfo<dim>::d_linear_shape_function(np, j);
 
@@ -507,9 +465,9 @@ template <int dim, int spacedim>
 CellSimilarity::Similarity
 MappingManifold<dim, spacedim>::fill_fe_values(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-  const CellSimilarity::Similarity                            cell_similarity,
-  const Quadrature<dim> &                                     quadrature,
-  const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
+  const CellSimilarity::Similarity,
+  const Quadrature<dim> &                                  quadrature,
+  const typename Mapping<dim, spacedim>::InternalDataBase &internal_data,
   internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
     &output_data) const
 {
@@ -585,39 +543,30 @@ MappingManifold<dim, spacedim>::fill_fe_values(
               output_data.JxW_values[point] =
                 std::sqrt(determinant(G)) * weights[point];
 
-              if (cell_similarity == CellSimilarity::inverted_translation)
+              if (update_flags & update_normal_vectors)
                 {
-                  // we only need to flip the normal
-                  if (update_flags & update_normal_vectors)
+                  Assert(spacedim == dim + 1,
+                         ExcMessage(
+                           "There is no (unique) cell normal for " +
+                           Utilities::int_to_string(dim) +
+                           "-dimensional cells in " +
+                           Utilities::int_to_string(spacedim) +
+                           "-dimensional space. This only works if the "
+                           "space dimension is one greater than the "
+                           "dimensionality of the mesh cells."));
+
+                  if (dim == 1)
+                    output_data.normal_vectors[point] =
+                      cross_product_2d(-DX_t[0]);
+                  else // dim == 2
+                    output_data.normal_vectors[point] =
+                      cross_product_3d(DX_t[0], DX_t[1]);
+
+                  output_data.normal_vectors[point] /=
+                    output_data.normal_vectors[point].norm();
+
+                  if (cell->direction_flag() == false)
                     output_data.normal_vectors[point] *= -1.;
-                }
-              else
-                {
-                  if (update_flags & update_normal_vectors)
-                    {
-                      Assert(spacedim == dim + 1,
-                             ExcMessage(
-                               "There is no (unique) cell normal for " +
-                               Utilities::int_to_string(dim) +
-                               "-dimensional cells in " +
-                               Utilities::int_to_string(spacedim) +
-                               "-dimensional space. This only works if the "
-                               "space dimension is one greater than the "
-                               "dimensionality of the mesh cells."));
-
-                      if (dim == 1)
-                        output_data.normal_vectors[point] =
-                          cross_product_2d(-DX_t[0]);
-                      else // dim == 2
-                        output_data.normal_vectors[point] =
-                          cross_product_3d(DX_t[0], DX_t[1]);
-
-                      output_data.normal_vectors[point] /=
-                        output_data.normal_vectors[point].norm();
-
-                      if (cell->direction_flag() == false)
-                        output_data.normal_vectors[point] *= -1.;
-                    }
                 }
             } // codim>0 case
         }
@@ -629,22 +578,20 @@ MappingManifold<dim, spacedim>::fill_fe_values(
   if (update_flags & update_jacobians)
     {
       AssertDimension(output_data.jacobians.size(), n_q_points);
-      if (cell_similarity != CellSimilarity::translation)
-        for (unsigned int point = 0; point < n_q_points; ++point)
-          output_data.jacobians[point] = data.contravariant[point];
+      for (unsigned int point = 0; point < n_q_points; ++point)
+        output_data.jacobians[point] = data.contravariant[point];
     }
 
   // copy values from InternalData to vector given by reference
   if (update_flags & update_inverse_jacobians)
     {
       AssertDimension(output_data.inverse_jacobians.size(), n_q_points);
-      if (cell_similarity != CellSimilarity::translation)
-        for (unsigned int point = 0; point < n_q_points; ++point)
-          output_data.inverse_jacobians[point] =
-            data.covariant[point].transpose();
+      for (unsigned int point = 0; point < n_q_points; ++point)
+        output_data.inverse_jacobians[point] =
+          data.covariant[point].transpose();
     }
 
-  return cell_similarity;
+  return CellSimilarity::invalid_next_cell;
 }
 
 
@@ -871,7 +818,7 @@ namespace internal
       void
       transform_fields(
         const ArrayView<const Tensor<rank, dim>> &               input,
-        const MappingType                                        mapping_type,
+        const MappingKind                                        mapping_kind,
         const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
         const ArrayView<Tensor<rank, spacedim>> &                output)
       {
@@ -885,7 +832,7 @@ namespace internal
             static_cast<const typename dealii::MappingManifold<dim, spacedim>::
                           InternalData &>(mapping_data);
 
-        switch (mapping_type)
+        switch (mapping_kind)
           {
             case mapping_contravariant:
               {
@@ -949,7 +896,7 @@ namespace internal
       void
       transform_gradients(
         const ArrayView<const Tensor<rank, dim>> &               input,
-        const MappingType                                        mapping_type,
+        const MappingKind                                        mapping_kind,
         const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
         const ArrayView<Tensor<rank, spacedim>> &                output)
       {
@@ -963,7 +910,7 @@ namespace internal
             static_cast<const typename dealii::MappingManifold<dim, spacedim>::
                           InternalData &>(mapping_data);
 
-        switch (mapping_type)
+        switch (mapping_kind)
           {
             case mapping_contravariant_gradient:
               {
@@ -1051,7 +998,7 @@ namespace internal
       void
       transform_hessians(
         const ArrayView<const Tensor<3, dim>> &                  input,
-        const MappingType                                        mapping_type,
+        const MappingKind                                        mapping_kind,
         const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
         const ArrayView<Tensor<3, spacedim>> &                   output)
       {
@@ -1065,7 +1012,7 @@ namespace internal
             static_cast<const typename dealii::MappingManifold<dim, spacedim>::
                           InternalData &>(mapping_data);
 
-        switch (mapping_type)
+        switch (mapping_kind)
           {
             case mapping_contravariant_hessian:
               {
@@ -1220,7 +1167,7 @@ namespace internal
       void
       transform_differential_forms(
         const ArrayView<const DerivativeForm<rank, dim, spacedim>> &input,
-        const MappingType                                        mapping_type,
+        const MappingKind                                        mapping_kind,
         const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
         const ArrayView<Tensor<rank + 1, spacedim>> &            output)
       {
@@ -1234,7 +1181,7 @@ namespace internal
             static_cast<const typename dealii::MappingManifold<dim, spacedim>::
                           InternalData &>(mapping_data);
 
-        switch (mapping_type)
+        switch (mapping_kind)
           {
             case mapping_covariant:
               {
@@ -1263,11 +1210,13 @@ void
 MappingManifold<dim, spacedim>::fill_fe_face_values(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const unsigned int                                          face_no,
-  const Quadrature<dim - 1> &                                 quadrature,
+  const hp::QCollection<dim - 1> &                            quadrature,
   const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
   internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
     &output_data) const
 {
+  AssertDimension(quadrature.size(), 1);
+
   // ensure that the following cast is really correct:
   Assert((dynamic_cast<const InternalData *>(&internal_data) != nullptr),
          ExcInternalError());
@@ -1278,12 +1227,14 @@ MappingManifold<dim, spacedim>::fill_fe_face_values(
     cell,
     face_no,
     numbers::invalid_unsigned_int,
-    QProjector<dim>::DataSetDescriptor::face(face_no,
-                                             cell->face_orientation(face_no),
-                                             cell->face_flip(face_no),
-                                             cell->face_rotation(face_no),
-                                             quadrature.size()),
-    quadrature,
+    QProjector<dim>::DataSetDescriptor::face(
+      ReferenceCells::get_hypercube<dim>(),
+      face_no,
+      cell->face_orientation(face_no),
+      cell->face_flip(face_no),
+      cell->face_rotation(face_no),
+      quadrature[0].size()),
+    quadrature[0],
     data,
     output_data);
 }
@@ -1311,13 +1262,15 @@ MappingManifold<dim, spacedim>::fill_fe_subface_values(
     cell,
     face_no,
     subface_no,
-    QProjector<dim>::DataSetDescriptor::subface(face_no,
-                                                subface_no,
-                                                cell->face_orientation(face_no),
-                                                cell->face_flip(face_no),
-                                                cell->face_rotation(face_no),
-                                                quadrature.size(),
-                                                cell->subface_case(face_no)),
+    QProjector<dim>::DataSetDescriptor::subface(
+      ReferenceCells::get_hypercube<dim>(),
+      face_no,
+      subface_no,
+      cell->face_orientation(face_no),
+      cell->face_flip(face_no),
+      cell->face_rotation(face_no),
+      quadrature.size(),
+      cell->subface_case(face_no)),
     quadrature,
     data,
     output_data);
@@ -1329,12 +1282,12 @@ template <int dim, int spacedim>
 void
 MappingManifold<dim, spacedim>::transform(
   const ArrayView<const Tensor<1, dim>> &                  input,
-  const MappingType                                        mapping_type,
+  const MappingKind                                        mapping_kind,
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
   const ArrayView<Tensor<1, spacedim>> &                   output) const
 {
   internal::MappingManifoldImplementation::transform_fields(input,
-                                                            mapping_type,
+                                                            mapping_kind,
                                                             mapping_data,
                                                             output);
 }
@@ -1345,12 +1298,12 @@ template <int dim, int spacedim>
 void
 MappingManifold<dim, spacedim>::transform(
   const ArrayView<const DerivativeForm<1, dim, spacedim>> &input,
-  const MappingType                                        mapping_type,
+  const MappingKind                                        mapping_kind,
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
   const ArrayView<Tensor<2, spacedim>> &                   output) const
 {
   internal::MappingManifoldImplementation::transform_differential_forms(
-    input, mapping_type, mapping_data, output);
+    input, mapping_kind, mapping_data, output);
 }
 
 
@@ -1359,15 +1312,15 @@ template <int dim, int spacedim>
 void
 MappingManifold<dim, spacedim>::transform(
   const ArrayView<const Tensor<2, dim>> &                  input,
-  const MappingType                                        mapping_type,
+  const MappingKind                                        mapping_kind,
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
   const ArrayView<Tensor<2, spacedim>> &                   output) const
 {
-  switch (mapping_type)
+  switch (mapping_kind)
     {
       case mapping_contravariant:
         internal::MappingManifoldImplementation::transform_fields(input,
-                                                                  mapping_type,
+                                                                  mapping_kind,
                                                                   mapping_data,
                                                                   output);
         return;
@@ -1376,7 +1329,7 @@ MappingManifold<dim, spacedim>::transform(
       case mapping_contravariant_gradient:
       case mapping_covariant_gradient:
         internal::MappingManifoldImplementation::transform_gradients(
-          input, mapping_type, mapping_data, output);
+          input, mapping_kind, mapping_data, output);
         return;
       default:
         Assert(false, ExcNotImplemented());
@@ -1389,7 +1342,7 @@ template <int dim, int spacedim>
 void
 MappingManifold<dim, spacedim>::transform(
   const ArrayView<const DerivativeForm<2, dim, spacedim>> &input,
-  const MappingType                                        mapping_type,
+  const MappingKind                                        mapping_kind,
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
   const ArrayView<Tensor<3, spacedim>> &                   output) const
 {
@@ -1398,7 +1351,7 @@ MappingManifold<dim, spacedim>::transform(
          ExcInternalError());
   const InternalData &data = static_cast<const InternalData &>(mapping_data);
 
-  switch (mapping_type)
+  switch (mapping_kind)
     {
       case mapping_covariant_gradient:
         {
@@ -1438,17 +1391,17 @@ template <int dim, int spacedim>
 void
 MappingManifold<dim, spacedim>::transform(
   const ArrayView<const Tensor<3, dim>> &                  input,
-  const MappingType                                        mapping_type,
+  const MappingKind                                        mapping_kind,
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
   const ArrayView<Tensor<3, spacedim>> &                   output) const
 {
-  switch (mapping_type)
+  switch (mapping_kind)
     {
       case mapping_piola_hessian:
       case mapping_contravariant_hessian:
       case mapping_covariant_hessian:
         internal::MappingManifoldImplementation::transform_hessians(
-          input, mapping_type, mapping_data, output);
+          input, mapping_kind, mapping_data, output);
         return;
       default:
         Assert(false, ExcNotImplemented());

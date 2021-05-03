@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 1999 - 2019 by the deal.II authors
+ * Copyright (C) 1999 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -33,9 +33,6 @@
 #include <deal.II/lac/precondition.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
@@ -63,7 +60,7 @@ using namespace dealii;
 // @sect3{The <code>Step5</code> class template}
 
 // The main class is mostly as in the previous example. The most visible
-// change is that the function <code>make_grid_and_dofs</code> has been
+// change is that the function <code>make_grid</code> has been
 // removed, since creating the grid is now done in the <code>run</code>
 // function and the rest of its functionality is now in
 // <code>setup_system</code>. Apart from this, everything is as before.
@@ -127,7 +124,7 @@ Step5<dim>::Step5()
 
 // @sect4{Step5::setup_system}
 
-// This is the function <code>make_grid_and_dofs</code> from the previous
+// This is the function <code>make_grid</code> from the previous
 // example, minus the generation of the grid. Everything else is unchanged:
 template <int dim>
 void Step5<dim>::setup_system()
@@ -169,8 +166,7 @@ void Step5<dim>::assemble_system()
                           update_values | update_gradients |
                             update_quadrature_points | update_JxW_values);
 
-  const unsigned int dofs_per_cell = fe.dofs_per_cell;
-  const unsigned int n_q_points    = quadrature_formula.size();
+  const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
 
   FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
   Vector<double>     cell_rhs(dofs_per_cell);
@@ -180,7 +176,7 @@ void Step5<dim>::assemble_system()
   // Next is the typical loop over all cells to compute local contributions
   // and then to transfer them into the global matrix and vector. The only
   // change in this part, compared to step-4, is that we will use the
-  // <code>coefficient</code> function defined above to compute the
+  // <code>coefficient()</code> function defined above to compute the
   // coefficient value at each quadrature point.
   for (const auto &cell : dof_handler.active_cell_iterators())
     {
@@ -189,13 +185,13 @@ void Step5<dim>::assemble_system()
 
       fe_values.reinit(cell);
 
-      for (unsigned int q_index = 0; q_index < n_q_points; ++q_index)
+      for (const unsigned int q_index : fe_values.quadrature_point_indices())
         {
           const double current_coefficient =
-            coefficient<dim>(fe_values.quadrature_point(q_index));
-          for (unsigned int i = 0; i < dofs_per_cell; ++i)
+            coefficient(fe_values.quadrature_point(q_index));
+          for (const unsigned int i : fe_values.dof_indices())
             {
-              for (unsigned int j = 0; j < dofs_per_cell; ++j)
+              for (const unsigned int j : fe_values.dof_indices())
                 cell_matrix(i, j) +=
                   (current_coefficient *              // a(x_q)
                    fe_values.shape_grad(i, q_index) * // grad phi_i(x_q)
@@ -210,9 +206,9 @@ void Step5<dim>::assemble_system()
 
 
       cell->get_dof_indices(local_dof_indices);
-      for (unsigned int i = 0; i < dofs_per_cell; ++i)
+      for (const unsigned int i : fe_values.dof_indices())
         {
-          for (unsigned int j = 0; j < dofs_per_cell; ++j)
+          for (const unsigned int j : fe_values.dof_indices())
             system_matrix.add(local_dof_indices[i],
                               local_dof_indices[j],
                               cell_matrix(i, j));
@@ -264,10 +260,10 @@ void Step5<dim>::assemble_system()
 template <int dim>
 void Step5<dim>::solve()
 {
-  SolverControl solver_control(1000, 1e-12);
-  SolverCG<>    solver(solver_control);
+  SolverControl            solver_control(1000, 1e-12);
+  SolverCG<Vector<double>> solver(solver_control);
 
-  PreconditionSSOR<> preconditioner;
+  PreconditionSSOR<SparseMatrix<double>> preconditioner;
   preconditioner.initialize(system_matrix, 1.2);
 
   solver.solve(system_matrix, solution, system_rhs, preconditioner);
@@ -279,9 +275,15 @@ void Step5<dim>::solve()
 
 // @sect4{Step5::output_results and setting output flags}
 
-// Writing output to a file is mostly the same as for the previous example,
-// but here we will show how to modify some output options and how to
-// construct a different filename for each refinement cycle.
+// Writing output to a file is mostly the same as for the previous tutorial.
+// The only difference is that we now need to construct a different filename
+// for each refinement cycle.
+//
+// The function writes the output in VTU format, a variation of the VTK format
+// that requires less disk space because it compresses the data. Of course,
+// there are many other formats supported by the DataOut class if you
+// desire to use a program for visualization that doesn't understand
+// VTK or VTU.
 template <int dim>
 void Step5<dim>::output_results(const unsigned int cycle) const
 {
@@ -292,54 +294,8 @@ void Step5<dim>::output_results(const unsigned int cycle) const
 
   data_out.build_patches();
 
-  // For this example, we would like to write the output directly to a file in
-  // Encapsulated Postscript (EPS) format. The library supports this, but
-  // things may be a bit more difficult sometimes, since EPS is a printing
-  // format, unlike most other supported formats which serve as input for
-  // graphical tools. Therefore, you can't scale or rotate the image after it
-  // has been written to disk, and you have to decide about the viewpoint or
-  // the scaling in advance.
-  //
-  // The defaults in the library are usually quite reasonable, and regarding
-  // viewpoint and scaling they coincide with the defaults of
-  // Gnuplot. However, since this is a tutorial, we will demonstrate how to
-  // change them. For this, we first have to generate an object describing the
-  // flags for EPS output (similar flag classes exist for all supported output
-  // formats):
-  DataOutBase::EpsFlags eps_flags;
-  // They are initialized with the default values, so we only have to change
-  // those that we don't like. For example, we would like to scale the z-axis
-  // differently (stretch each data point in z-direction by a factor of four):
-  eps_flags.z_scaling = 4.;
-  // Then we would also like to alter the viewpoint from which we look at the
-  // solution surface. The default is at an angle of 60 degrees down from the
-  // vertical axis, and 30 degrees rotated against it in mathematical positive
-  // sense. We raise our viewpoint a bit and look more along the y-axis:
-  eps_flags.azimut_angle = 40.;
-  eps_flags.turn_angle   = 10.;
-  // That shall suffice. There are more flags, for example whether to draw the
-  // mesh lines, which data vectors to use for colorization of the interior of
-  // the cells, and so on. You may want to take a look at the documentation of
-  // the EpsFlags structure to get an overview of what is possible.
-  //
-  // The only thing still to be done, is to tell the output object to use
-  // these flags:
-  data_out.set_flags(eps_flags);
-  // The above way to modify flags requires recompilation each time we would
-  // like to use different flags. This is inconvenient, and we will see more
-  // advanced ways in step-19 where the output flags are determined at run
-  // time using an input file (step-19 doesn't show many other things; you
-  // should feel free to read over it even if you haven't done step-6 to
-  // step-18 yet).
-
-  // Finally, we need the filename to which the results are to be written. We
-  // would like to have it of the form <code>solution-N.eps</code>, where N is
-  // the number of the refinement cycle. Thus, we have to convert an integer
-  // to a part of a string; this is most easily done using the C++ function
-  // <code>std::to_string</code>. With the so-constructed filename, we can
-  // then open an output stream and write the data to that file:
-  std::ofstream output("solution-" + std::to_string(cycle) + ".eps");
-  data_out.write_eps(output);
+  std::ofstream output("solution-" + std::to_string(cycle) + ".vtu");
+  data_out.write_vtu(output);
 }
 
 

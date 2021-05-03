@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2019 by the deal.II authors
+// Copyright (C) 2010 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -52,8 +52,6 @@ DEAL_II_NAMESPACE_OPEN
  *
  *
  * @ingroup Solvers
- * @author Guido Kanschat
- * @date 2010
  */
 template <typename VectorType = Vector<double>>
 class SolverRelaxation : public SolverBase<VectorType>
@@ -71,11 +69,6 @@ public:
    */
   SolverRelaxation(SolverControl &       cn,
                    const AdditionalData &data = AdditionalData());
-
-  /**
-   * Virtual destructor.
-   */
-  virtual ~SolverRelaxation();
 
   /**
    * Solve the system $Ax = b$ using the relaxation method $x_{k+1} =
@@ -98,11 +91,6 @@ SolverRelaxation<VectorType>::SolverRelaxation(SolverControl &cn,
   : SolverBase<VectorType>(cn)
 {}
 
-
-
-template <class VectorType>
-SolverRelaxation<VectorType>::~SolverRelaxation()
-{}
 
 
 template <class VectorType>

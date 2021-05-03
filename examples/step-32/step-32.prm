@@ -50,5 +50,3 @@ subsection Stabilization parameters
   # The c_R factor in the entropy viscosity stabilization.
   set c_R   = 0.5
 end
-
-

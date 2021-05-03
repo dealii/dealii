@@ -2,7 +2,7 @@
 
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2016 - 2018 by the deal.II authors
+## Copyright (C) 2016 - 2019 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -164,7 +164,7 @@ def format_block(lines, infostr=""):
             thisline = remove_junk([lines[idx]])[0]
             
             if not thisline.split(" ")[0] in ops_title_line:
-                print ("%s warning title not at start of line"%(infostr), file=sys.stderr)
+                print ("%s warning: @page/@name not at start of line"%(infostr), file=sys.stderr)
             out.append(start + thisline.strip())
 
         elif "@ref" in lines[idx]:

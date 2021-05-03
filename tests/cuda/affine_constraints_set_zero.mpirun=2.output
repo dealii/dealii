@@ -1,0 +1,51 @@
+
+DEAL:0::CM:
+    1 = 0
+    2 = 0
+DEAL:0::ghosted vector before:
+Process #0
+Local range: [0, 2), global size: 4
+Vector data:
+1.000e+00 2.000e+00 
+DEAL:0::ghosted vector after:
+Process #0
+Local range: [0, 2), global size: 4
+Vector data:
+1.000e+00 0.000e+00 
+DEAL:0::distributed vector before:
+Process #0
+Local range: [0, 2), global size: 4
+Vector data:
+1.000e+00 2.000e+00 
+DEAL:0::distributed vector after:
+Process #0
+Local range: [0, 2), global size: 4
+Vector data:
+1.000e+00 0.000e+00 
+DEAL:0::OK
+
+DEAL:1::CM:
+    1 = 0
+    2 = 0
+DEAL:1::ghosted vector before:
+Process #1
+Local range: [2, 4), global size: 4
+Vector data:
+3.000e+00 4.000e+00 
+DEAL:1::ghosted vector after:
+Process #1
+Local range: [2, 4), global size: 4
+Vector data:
+0.000e+00 4.000e+00 
+DEAL:1::distributed vector before:
+Process #1
+Local range: [2, 4), global size: 4
+Vector data:
+3.000e+00 4.000e+00 
+DEAL:1::distributed vector after:
+Process #1
+Local range: [2, 4), global size: 4
+Vector data:
+0.000e+00 4.000e+00 
+DEAL:1::OK
+

@@ -180,7 +180,7 @@ c_0^2\,k\,\theta\,A+c_0\,B  &  M   \\
               \end{array}\right)=\\
 \left(\begin{array}{l}
  G_1  \\
- G_2 -(\theta F^{n}+(1-\theta)F ^{n-1})c_{0}^{2}k \\        
+ G_2 -(\theta F^{n}+(1-\theta)F ^{n-1})c_{0}^{2}k \\
                 \end{array}\right)
 @f]
 
@@ -191,7 +191,7 @@ G_1 \\
 G_2 \\
    \end{array} \right)=\\
 \left(\begin{array}{l}
- M\bar{p}^{n-1}+k(1-\theta)Mv^{n-1}\\               
+ M\bar{p}^{n-1}+k(1-\theta)Mv^{n-1}\\
  (-c_{0}^{2}k (1-\theta)A+c_0 B)\bar{p}^{n-1} +Mv^{n-1}
                 \end{array}\right)
 @f]
@@ -199,10 +199,10 @@ G_2 \\
 By simple transformations, one then obtains two equations for
 the pressure potential and its derivative, just as in the previous tutorial program:
 @f{eqnarray*}
-(M+(k\,\theta\,c_{0})^{2}A+c_0k\theta B)\bar{p}^{n} & = & 
+(M+(k\,\theta\,c_{0})^{2}A+c_0k\theta B)\bar{p}^{n} & = &
 G_{1}+(k\, \theta)G_{2}-(c_0k)^2\theta (\theta F^{n}+(1-\theta)F^{n-1}) \\
-Mv^n & = & -(c_0^2\,k\, \theta\, A+c_0B)\bar{p}^{n}+ G_2 - 
-c_0^2k(\theta F^{n}+(1-\theta)F^{n-1}) 
+Mv^n & = & -(c_0^2\,k\, \theta\, A+c_0B)\bar{p}^{n}+ G_2 -
+c_0^2k(\theta F^{n}+(1-\theta)F^{n-1})
 @f}
 
 

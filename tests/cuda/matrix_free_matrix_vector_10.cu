@@ -45,6 +45,7 @@
 #include <iostream>
 
 #include "../tests.h"
+
 #include "matrix_vector_mf.h"
 
 
@@ -53,7 +54,7 @@ template <int dim, int fe_degree>
 void
 test()
 {
-  typedef double Number;
+  using Number = double;
 
   parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
   GridGenerator::hyper_cube(tria);
@@ -121,10 +122,10 @@ test()
                  Number,
                  LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA>>
                                                                 mf(mf_data, coef_size);
-  LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> in_dev(
-    owned_set, MPI_COMM_WORLD);
-  LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> out_dev(
-    owned_set, MPI_COMM_WORLD);
+  LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> in_dev;
+  LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> out_dev;
+  mf_data.initialize_dof_vector(in_dev);
+  mf_data.initialize_dof_vector(out_dev);
 
   LinearAlgebra::ReadWriteVector<Number> rw_in(owned_set);
   for (unsigned int i = 0; i < in_dev.local_size(); ++i)

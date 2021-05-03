@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2019 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -54,7 +54,7 @@ namespace NonMatching
      * Mapping and quadrature are those of this second triangulation.
      *
      * If the triangulation inside @p cache is parallel, only points lying over
-     * locally onwed cells are returned. This is why a vector of unsigned int
+     * locally owned cells are returned. This is why a vector of unsigned int
      * is returned: it describes the indices of cells from the immersed
      * triangulation which have been used (relative to a loop over al cells). If
      * embedding triangulation is not parallel, all cells shall be used.
@@ -124,6 +124,46 @@ namespace NonMatching
       }
       return {std::move(points_over_local_cells), std::move(used_cells_ids)};
     }
+
+
+    /**
+     * Given two ComponentMasks and the corresponding finite element spaces,
+     * compute a pairing between the selected components of the first finite
+     * element space, and the selected components of the second finite element
+     * space.
+     */
+    template <int dim0, int dim1, int spacedim>
+    std::pair<std::vector<unsigned int>, std::vector<unsigned int>>
+    compute_components_coupling(const ComponentMask &                comps0,
+                                const ComponentMask &                comps1,
+                                const FiniteElement<dim0, spacedim> &fe0,
+                                const FiniteElement<dim1, spacedim> &fe1)
+    {
+      // Take care of components
+      const ComponentMask mask0 =
+        (comps0.size() == 0 ? ComponentMask(fe0.n_components(), true) : comps0);
+
+      const ComponentMask mask1 =
+        (comps1.size() == 0 ? ComponentMask(fe1.n_components(), true) : comps1);
+
+      AssertDimension(mask0.size(), fe0.n_components());
+      AssertDimension(mask1.size(), fe1.n_components());
+
+      // Global to local indices
+      std::vector<unsigned int> gtl0(fe0.n_components(),
+                                     numbers::invalid_unsigned_int);
+      std::vector<unsigned int> gtl1(fe1.n_components(),
+                                     numbers::invalid_unsigned_int);
+
+      for (unsigned int i = 0, j = 0; i < gtl0.size(); ++i)
+        if (mask0[i])
+          gtl0[i] = j++;
+
+      for (unsigned int i = 0, j = 0; i < gtl1.size(); ++i)
+        if (mask1[i])
+          gtl1[i] = j++;
+      return {gtl0, gtl1};
+    }
   } // namespace internal
 
   template <int dim0,
@@ -177,21 +217,22 @@ namespace NonMatching
   {
     AssertDimension(sparsity.n_rows(), space_dh.n_dofs());
     AssertDimension(sparsity.n_cols(), immersed_dh.n_dofs());
-    static_assert(dim1 <= dim0, "This function can only work if dim1 <= dim0");
+    Assert(dim1 <= dim0,
+           ExcMessage("This function can only work if dim1 <= dim0"));
     Assert((dynamic_cast<
               const parallel::distributed::Triangulation<dim1, spacedim> *>(
               &immersed_dh.get_triangulation()) == nullptr),
            ExcNotImplemented());
 
     const bool tria_is_parallel =
-      (dynamic_cast<const parallel::Triangulation<dim1, spacedim> *>(
+      (dynamic_cast<const parallel::TriangulationBase<dim1, spacedim> *>(
          &space_dh.get_triangulation()) != nullptr);
     const auto &space_fe    = space_dh.get_fe();
     const auto &immersed_fe = immersed_dh.get_fe();
 
     // Dof indices
-    std::vector<types::global_dof_index> dofs(immersed_fe.dofs_per_cell);
-    std::vector<types::global_dof_index> odofs(space_fe.dofs_per_cell);
+    std::vector<types::global_dof_index> dofs(immersed_fe.n_dofs_per_cell());
+    std::vector<types::global_dof_index> odofs(space_fe.n_dofs_per_cell());
 
     // Take care of components
     const ComponentMask space_c =
@@ -234,14 +275,14 @@ namespace NonMatching
     // the version with the dof_mask, this should be uncommented.
     //
     // // Construct a dof_mask, used to distribute entries to the sparsity
-    // able< 2, bool > dof_mask(space_fe.dofs_per_cell,
-    //                          immersed_fe.dofs_per_cell);
+    // able< 2, bool > dof_mask(space_fe.n_dofs_per_cell(),
+    //                          immersed_fe.n_dofs_per_cell());
     // of_mask.fill(false);
-    // or (unsigned int i=0; i<space_fe.dofs_per_cell; ++i)
+    // or (unsigned int i=0; i<space_fe.n_dofs_per_cell(); ++i)
     //  {
     //    const auto comp_i = space_fe.system_to_component_index(i).first;
     //    if (space_gtl[comp_i] != numbers::invalid_unsigned_int)
-    //      for (unsigned int j=0; j<immersed_fe.dofs_per_cell; ++j)
+    //      for (unsigned int j=0; j<immersed_fe.n_dofs_per_cell(); ++j)
     //        {
     //          const auto comp_j =
     //          immersed_fe.system_to_component_index(j).first; if
@@ -360,22 +401,23 @@ namespace NonMatching
   {
     AssertDimension(matrix.m(), space_dh.n_dofs());
     AssertDimension(matrix.n(), immersed_dh.n_dofs());
-    static_assert(dim1 <= dim0, "This function can only work if dim1 <= dim0");
+    Assert(dim1 <= dim0,
+           ExcMessage("This function can only work if dim1 <= dim0"));
     Assert((dynamic_cast<
               const parallel::distributed::Triangulation<dim1, spacedim> *>(
               &immersed_dh.get_triangulation()) == nullptr),
            ExcNotImplemented());
 
     const bool tria_is_parallel =
-      (dynamic_cast<const parallel::Triangulation<dim1, spacedim> *>(
+      (dynamic_cast<const parallel::TriangulationBase<dim1, spacedim> *>(
          &space_dh.get_triangulation()) != nullptr);
 
     const auto &space_fe    = space_dh.get_fe();
     const auto &immersed_fe = immersed_dh.get_fe();
 
     // Dof indices
-    std::vector<types::global_dof_index> dofs(immersed_fe.dofs_per_cell);
-    std::vector<types::global_dof_index> odofs(space_fe.dofs_per_cell);
+    std::vector<types::global_dof_index> dofs(immersed_fe.n_dofs_per_cell());
+    std::vector<types::global_dof_index> odofs(space_fe.n_dofs_per_cell());
 
     // Take care of components
     const ComponentMask space_c =
@@ -404,7 +446,8 @@ namespace NonMatching
         immersed_gtl[i] = j++;
 
     FullMatrix<typename Matrix::value_type> cell_matrix(
-      space_dh.get_fe().dofs_per_cell, immersed_dh.get_fe().dofs_per_cell);
+      space_dh.get_fe().n_dofs_per_cell(),
+      immersed_dh.get_fe().n_dofs_per_cell());
 
     FEValues<dim1, spacedim> fe_v(immersed_mapping,
                                   immersed_dh.get_fe(),
@@ -534,14 +577,15 @@ namespace NonMatching
                 // Reset the matrices.
                 cell_matrix = typename Matrix::value_type();
 
-                for (unsigned int i = 0; i < space_dh.get_fe().dofs_per_cell;
+                for (unsigned int i = 0;
+                     i < space_dh.get_fe().n_dofs_per_cell();
                      ++i)
                   {
                     const auto comp_i =
                       space_dh.get_fe().system_to_component_index(i).first;
                     if (space_gtl[comp_i] != numbers::invalid_unsigned_int)
                       for (unsigned int j = 0;
-                           j < immersed_dh.get_fe().dofs_per_cell;
+                           j < immersed_dh.get_fe().n_dofs_per_cell();
                            ++j)
                         {
                           const auto comp_j = immersed_dh.get_fe()
@@ -572,8 +616,350 @@ namespace NonMatching
       }
   }
 
+  template <int dim0,
+            int dim1,
+            int spacedim,
+            typename Sparsity,
+            typename Number>
+  void
+  create_coupling_sparsity_pattern(
+    const double &                          epsilon,
+    const GridTools::Cache<dim0, spacedim> &cache0,
+    const GridTools::Cache<dim1, spacedim> &cache1,
+    const DoFHandler<dim0, spacedim> &      dh0,
+    const DoFHandler<dim1, spacedim> &      dh1,
+    const Quadrature<dim1> &                quad,
+    Sparsity &                              sparsity,
+    const AffineConstraints<Number> &       constraints0,
+    const ComponentMask &                   comps0,
+    const ComponentMask &                   comps1)
+  {
+    if (epsilon == 0.0)
+      {
+        Assert(dim1 <= dim0,
+               ExcMessage("When epsilon is zero, you can only "
+                          "call this function with dim1 <= dim0."));
+        create_coupling_sparsity_pattern(cache0,
+                                         dh0,
+                                         dh1,
+                                         quad,
+                                         sparsity,
+                                         constraints0,
+                                         comps0,
+                                         comps1,
+                                         cache1.get_mapping());
+        return;
+      }
+    AssertDimension(sparsity.n_rows(), dh0.n_dofs());
+    AssertDimension(sparsity.n_cols(), dh1.n_dofs());
+
+    const bool zero_is_distributed =
+      (dynamic_cast<const parallel::distributed::Triangulation<dim1, spacedim>
+                      *>(&dh0.get_triangulation()) != nullptr);
+    const bool one_is_distributed =
+      (dynamic_cast<const parallel::distributed::Triangulation<dim1, spacedim>
+                      *>(&dh1.get_triangulation()) != nullptr);
+
+    // We bail out if both are distributed triangulations
+    Assert(!zero_is_distributed || !one_is_distributed, ExcNotImplemented());
+
+    // If we can loop on both, we decide where to make the outer loop according
+    // to the size of the triangulation. The reasoning is the following:
+    // - cost for accessing the tree: log(N)
+    // - cost for computing the intersection for each of the outer loop cells: M
+    // Total cost (besides the setup) is: M log(N)
+    // If we can, make sure M is the smaller number of the two.
+    const bool outer_loop_on_zero =
+      (zero_is_distributed && !one_is_distributed) ||
+      (dh1.get_triangulation().n_active_cells() >
+       dh0.get_triangulation().n_active_cells());
+
+    const auto &fe0 = dh0.get_fe();
+    const auto &fe1 = dh1.get_fe();
+
+    // Dof indices
+    std::vector<types::global_dof_index> dofs0(fe0.n_dofs_per_cell());
+    std::vector<types::global_dof_index> dofs1(fe1.n_dofs_per_cell());
+
+    if (outer_loop_on_zero)
+      {
+        Assert(one_is_distributed == false, ExcInternalError());
+
+        const auto &tree1 = cache1.get_cell_bounding_boxes_rtree();
+
+        std::vector<std::pair<
+          BoundingBox<spacedim>,
+          typename Triangulation<dim1, spacedim>::active_cell_iterator>>
+          intersection;
+
+        for (const auto &cell0 : dh0.active_cell_iterators())
+          if (cell0->is_locally_owned())
+            {
+              intersection.resize(0);
+              BoundingBox<spacedim> box0 =
+                cache0.get_mapping().get_bounding_box(cell0);
+              box0.extend(epsilon);
+              boost::geometry::index::query(tree1,
+                                            boost::geometry::index::intersects(
+                                              box0),
+                                            std::back_inserter(intersection));
+              if (!intersection.empty())
+                {
+                  cell0->get_dof_indices(dofs0);
+                  for (const auto &entry : intersection)
+                    {
+                      typename DoFHandler<dim1, spacedim>::cell_iterator cell1(
+                        *entry.second, &dh1);
+                      cell1->get_dof_indices(dofs1);
+                      constraints0.add_entries_local_to_global(dofs0,
+                                                               dofs1,
+                                                               sparsity);
+                    }
+                }
+            }
+      }
+    else
+      {
+        Assert(zero_is_distributed == false, ExcInternalError());
+        const auto &tree0 = cache0.get_cell_bounding_boxes_rtree();
+
+        std::vector<std::pair<
+          BoundingBox<spacedim>,
+          typename Triangulation<dim0, spacedim>::active_cell_iterator>>
+          intersection;
+
+        for (const auto &cell1 : dh1.active_cell_iterators())
+          if (cell1->is_locally_owned())
+            {
+              intersection.resize(0);
+              BoundingBox<spacedim> box1 =
+                cache1.get_mapping().get_bounding_box(cell1);
+              box1.extend(epsilon);
+              boost::geometry::index::query(tree0,
+                                            boost::geometry::index::intersects(
+                                              box1),
+                                            std::back_inserter(intersection));
+              if (!intersection.empty())
+                {
+                  cell1->get_dof_indices(dofs1);
+                  for (const auto &entry : intersection)
+                    {
+                      typename DoFHandler<dim0, spacedim>::cell_iterator cell0(
+                        *entry.second, &dh0);
+                      cell0->get_dof_indices(dofs0);
+                      constraints0.add_entries_local_to_global(dofs0,
+                                                               dofs1,
+                                                               sparsity);
+                    }
+                }
+            }
+      }
+  }
+
+
+
+  template <int dim0, int dim1, int spacedim, typename Matrix>
+  void
+  create_coupling_mass_matrix(
+    Functions::CutOffFunctionBase<spacedim> &             kernel,
+    const double &                                        epsilon,
+    const GridTools::Cache<dim0, spacedim> &              cache0,
+    const GridTools::Cache<dim1, spacedim> &              cache1,
+    const DoFHandler<dim0, spacedim> &                    dh0,
+    const DoFHandler<dim1, spacedim> &                    dh1,
+    const Quadrature<dim0> &                              quadrature0,
+    const Quadrature<dim1> &                              quadrature1,
+    Matrix &                                              matrix,
+    const AffineConstraints<typename Matrix::value_type> &constraints0,
+    const ComponentMask &                                 comps0,
+    const ComponentMask &                                 comps1)
+  {
+    if (epsilon == 0)
+      {
+        Assert(dim1 <= dim0,
+               ExcMessage("When epsilon is zero, you can only "
+                          "call this function with dim1 <= dim0."));
+        create_coupling_mass_matrix(cache0,
+                                    dh0,
+                                    dh1,
+                                    quadrature1,
+                                    matrix,
+                                    constraints0,
+                                    comps0,
+                                    comps1,
+                                    cache1.get_mapping());
+        return;
+      }
+
+    AssertDimension(matrix.m(), dh0.n_dofs());
+    AssertDimension(matrix.n(), dh1.n_dofs());
+
+    const bool zero_is_distributed =
+      (dynamic_cast<const parallel::distributed::Triangulation<dim1, spacedim>
+                      *>(&dh0.get_triangulation()) != nullptr);
+    const bool one_is_distributed =
+      (dynamic_cast<const parallel::distributed::Triangulation<dim1, spacedim>
+                      *>(&dh1.get_triangulation()) != nullptr);
+
+    // We bail out if both are distributed triangulations
+    Assert(!zero_is_distributed || !one_is_distributed, ExcNotImplemented());
+
+    // If we can loop on both, we decide where to make the outer loop according
+    // to the size of the triangulation. The reasoning is the following:
+    // - cost for accessing the tree: log(N)
+    // - cost for computing the intersection for each of the outer loop cells: M
+    // Total cost (besides the setup) is: M log(N)
+    // If we can, make sure M is the smaller number of the two.
+    const bool outer_loop_on_zero =
+      (zero_is_distributed && !one_is_distributed) ||
+      (dh1.get_triangulation().n_active_cells() >
+       dh0.get_triangulation().n_active_cells());
+
+    const auto &fe0 = dh0.get_fe();
+    const auto &fe1 = dh1.get_fe();
+
+    FEValues<dim0, spacedim> fev0(cache0.get_mapping(),
+                                  fe0,
+                                  quadrature0,
+                                  update_values | update_JxW_values |
+                                    update_quadrature_points);
+
+    FEValues<dim1, spacedim> fev1(cache1.get_mapping(),
+                                  fe1,
+                                  quadrature1,
+                                  update_values | update_JxW_values |
+                                    update_quadrature_points);
+
+    // Dof indices
+    std::vector<types::global_dof_index> dofs0(fe0.n_dofs_per_cell());
+    std::vector<types::global_dof_index> dofs1(fe1.n_dofs_per_cell());
+
+    // Local Matrix
+    FullMatrix<typename Matrix::value_type> cell_matrix(fe0.n_dofs_per_cell(),
+                                                        fe1.n_dofs_per_cell());
+
+    // Global to local indices
+    const auto p =
+      internal::compute_components_coupling(comps0, comps1, fe0, fe1);
+    const auto &gtl0 = p.first;
+    const auto &gtl1 = p.second;
+
+    kernel.set_radius(epsilon);
+    std::vector<double> kernel_values(quadrature1.size());
+
+    auto assemble_one_pair = [&]() {
+      cell_matrix = 0;
+      for (unsigned int q0 = 0; q0 < quadrature0.size(); ++q0)
+        {
+          kernel.set_center(fev0.quadrature_point(q0));
+          kernel.value_list(fev1.get_quadrature_points(), kernel_values);
+          for (unsigned int j = 0; j < fe1.n_dofs_per_cell(); ++j)
+            {
+              const auto comp_j = fe1.system_to_component_index(j).first;
+
+              // First compute the part of the integral that does not
+              // depend on i
+              typename Matrix::value_type sum_q1 = {};
+              for (unsigned int q1 = 0; q1 < quadrature1.size(); ++q1)
+                sum_q1 +=
+                  fev1.shape_value(j, q1) * kernel_values[q1] * fev1.JxW(q1);
+              sum_q1 *= fev0.JxW(q0);
+
+              // Now compute the main integral with the sum over q1 already
+              // completed - this gives a cubic complexity as usual rather
+              // than a quartic one with naive loops
+              for (unsigned int i = 0; i < fe0.n_dofs_per_cell(); ++i)
+                {
+                  const auto comp_i = fe0.system_to_component_index(i).first;
+                  if (gtl0[comp_i] != numbers::invalid_unsigned_int &&
+                      gtl1[comp_j] == gtl0[comp_i])
+                    cell_matrix(i, j) += fev0.shape_value(i, q0) * sum_q1;
+                }
+            }
+        }
+
+      constraints0.distribute_local_to_global(cell_matrix,
+                                              dofs0,
+                                              dofs1,
+                                              matrix);
+    };
+
+    if (outer_loop_on_zero)
+      {
+        Assert(one_is_distributed == false, ExcInternalError());
+
+        const auto &tree1 = cache1.get_cell_bounding_boxes_rtree();
+
+        std::vector<std::pair<
+          BoundingBox<spacedim>,
+          typename Triangulation<dim1, spacedim>::active_cell_iterator>>
+          intersection;
+
+        for (const auto &cell0 : dh0.active_cell_iterators())
+          if (cell0->is_locally_owned())
+            {
+              intersection.resize(0);
+              BoundingBox<spacedim> box0 =
+                cache0.get_mapping().get_bounding_box(cell0);
+              box0.extend(epsilon);
+              boost::geometry::index::query(tree1,
+                                            boost::geometry::index::intersects(
+                                              box0),
+                                            std::back_inserter(intersection));
+              if (!intersection.empty())
+                {
+                  cell0->get_dof_indices(dofs0);
+                  fev0.reinit(cell0);
+                  for (const auto &entry : intersection)
+                    {
+                      typename DoFHandler<dim1, spacedim>::cell_iterator cell1(
+                        *entry.second, &dh1);
+                      cell1->get_dof_indices(dofs1);
+                      fev1.reinit(cell1);
+                      assemble_one_pair();
+                    }
+                }
+            }
+      }
+    else
+      {
+        Assert(zero_is_distributed == false, ExcInternalError());
+        const auto &tree0 = cache0.get_cell_bounding_boxes_rtree();
+
+        std::vector<std::pair<
+          BoundingBox<spacedim>,
+          typename Triangulation<dim0, spacedim>::active_cell_iterator>>
+          intersection;
+
+        for (const auto &cell1 : dh1.active_cell_iterators())
+          if (cell1->is_locally_owned())
+            {
+              intersection.resize(0);
+              BoundingBox<spacedim> box1 =
+                cache1.get_mapping().get_bounding_box(cell1);
+              box1.extend(epsilon);
+              boost::geometry::index::query(tree0,
+                                            boost::geometry::index::intersects(
+                                              box1),
+                                            std::back_inserter(intersection));
+              if (!intersection.empty())
+                {
+                  cell1->get_dof_indices(dofs1);
+                  fev1.reinit(cell1);
+                  for (const auto &entry : intersection)
+                    {
+                      typename DoFHandler<dim0, spacedim>::cell_iterator cell0(
+                        *entry.second, &dh0);
+                      cell0->get_dof_indices(dofs0);
+                      fev0.reinit(cell0);
+                      assemble_one_pair();
+                    }
+                }
+            }
+      }
+  }
+
 #include "coupling.inst"
 } // namespace NonMatching
-
 
 DEAL_II_NAMESPACE_CLOSE

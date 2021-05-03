@@ -75,7 +75,8 @@ compare_meshes(DoFHandler<dim> &shared_dof_handler,
             continue;
 
           typename Triangulation<dim>::cell_iterator tria_shared_cell =
-            cell->id().to_cell(shared_dof_handler.get_triangulation());
+            shared_dof_handler.get_triangulation().create_cell_iterator(
+              cell->id());
           typename DoFHandler<dim>::cell_iterator dof_shared_cell(
             &shared_dof_handler.get_triangulation(),
             tria_shared_cell->level(),

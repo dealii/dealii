@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -45,9 +45,6 @@
 
 namespace ResFlow
 {
-  using namespace dealii;
-
-
   template <int dim>
   class FluxBoundaryValues : public Function<dim>
   {
@@ -168,10 +165,8 @@ namespace ResFlow
     // Renumber to yield block structure
     DoFRenumbering::block_wise(dof_handler);
 
-    std::vector<types::global_dof_index> dofs_per_block(2);
-    DoFTools::count_dofs_per_block(dof_handler,
-                                   dofs_per_block,
-                                   resflow_sub_blocks);
+    const std::vector<types::global_dof_index> dofs_per_block =
+      DoFTools::count_dofs_per_fe_block(dof_handler, resflow_sub_blocks);
 
     const unsigned int n_u = dofs_per_block[0], n_p = dofs_per_block[1];
     pcout << "   Number of degrees of freedom: " << dof_handler.n_dofs() << " ("
@@ -208,7 +203,12 @@ namespace ResFlow
       DoFTools::make_hanging_node_constraints(dof_handler, constraints);
 
       VectorTools::project_boundary_values_div_conforming(
-        dof_handler, 0, FluxBoundaryValues<dim>(), 0, constraints);
+        dof_handler,
+        0,
+        FluxBoundaryValues<dim>(),
+        0,
+        constraints,
+        StaticMappingQ1<dim>::mapping);
 
       deallog << "Constraints" << std::endl;
       constraints.print(deallog.get_file_stream());
@@ -243,7 +243,6 @@ main(int argc, char *argv[])
 
   try
     {
-      using namespace dealii;
       using namespace ResFlow;
 
       Assert(dim == 2 || dim == 3, ExcNotImplemented());

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2019 by the deal.II authors
+// Copyright (C) 2002 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,12 +17,14 @@
 #include <deal.II/base/polynomial_space.h>
 #include <deal.II/base/table.h>
 
+#include <memory>
+
 DEAL_II_NAMESPACE_OPEN
 
 
 template <int dim>
 unsigned int
-PolynomialSpace<dim>::compute_n_pols(const unsigned int n)
+PolynomialSpace<dim>::n_polynomials(const unsigned int n)
 {
   unsigned int n_pols = n;
   for (unsigned int i = 1; i < dim; ++i)
@@ -36,7 +38,7 @@ PolynomialSpace<dim>::compute_n_pols(const unsigned int n)
 
 template <>
 unsigned int
-PolynomialSpace<0>::compute_n_pols(const unsigned int)
+PolynomialSpace<0>::n_polynomials(const unsigned int)
 {
   return 0;
 }
@@ -46,7 +48,7 @@ template <>
 std::array<unsigned int, 1>
 PolynomialSpace<1>::compute_index(const unsigned int i) const
 {
-  Assert(i < index_map.size(), ExcIndexRange(i, 0, index_map.size()));
+  AssertIndexRange(i, index_map.size());
   return {{index_map[i]}};
 }
 
@@ -56,7 +58,7 @@ template <>
 std::array<unsigned int, 2>
 PolynomialSpace<2>::compute_index(const unsigned int i) const
 {
-  Assert(i < index_map.size(), ExcIndexRange(i, 0, index_map.size()));
+  AssertIndexRange(i, index_map.size());
   const unsigned int n = index_map[i];
   // there should be a better way to
   // write this function (not
@@ -82,7 +84,7 @@ template <>
 std::array<unsigned int, 3>
 PolynomialSpace<3>::compute_index(const unsigned int i) const
 {
-  Assert(i < index_map.size(), ExcIndexRange(i, 0, index_map.size()));
+  AssertIndexRange(i, index_map.size());
   const unsigned int n = index_map[i];
   // there should be a better way to
   // write this function (not
@@ -200,7 +202,7 @@ PolynomialSpace<dim>::compute_grad_grad(const unsigned int i,
 
 template <int dim>
 void
-PolynomialSpace<dim>::compute(
+PolynomialSpace<dim>::evaluate(
   const Point<dim> &           p,
   std::vector<double> &        values,
   std::vector<Tensor<1, dim>> &grads,
@@ -210,41 +212,42 @@ PolynomialSpace<dim>::compute(
 {
   const unsigned int n_1d = polynomials.size();
 
-  Assert(values.size() == n_pols || values.size() == 0,
-         ExcDimensionMismatch2(values.size(), n_pols, 0));
-  Assert(grads.size() == n_pols || grads.size() == 0,
-         ExcDimensionMismatch2(grads.size(), n_pols, 0));
-  Assert(grad_grads.size() == n_pols || grad_grads.size() == 0,
-         ExcDimensionMismatch2(grad_grads.size(), n_pols, 0));
-  Assert(third_derivatives.size() == n_pols || third_derivatives.size() == 0,
-         ExcDimensionMismatch2(third_derivatives.size(), n_pols, 0));
-  Assert(fourth_derivatives.size() == n_pols || fourth_derivatives.size() == 0,
-         ExcDimensionMismatch2(fourth_derivatives.size(), n_pols, 0));
+  Assert(values.size() == this->n() || values.size() == 0,
+         ExcDimensionMismatch2(values.size(), this->n(), 0));
+  Assert(grads.size() == this->n() || grads.size() == 0,
+         ExcDimensionMismatch2(grads.size(), this->n(), 0));
+  Assert(grad_grads.size() == this->n() || grad_grads.size() == 0,
+         ExcDimensionMismatch2(grad_grads.size(), this->n(), 0));
+  Assert(third_derivatives.size() == this->n() || third_derivatives.size() == 0,
+         ExcDimensionMismatch2(third_derivatives.size(), this->n(), 0));
+  Assert(fourth_derivatives.size() == this->n() ||
+           fourth_derivatives.size() == 0,
+         ExcDimensionMismatch2(fourth_derivatives.size(), this->n(), 0));
 
   unsigned int v_size = 0;
   bool update_values = false, update_grads = false, update_grad_grads = false;
   bool update_3rd_derivatives = false, update_4th_derivatives = false;
-  if (values.size() == n_pols)
+  if (values.size() == this->n())
     {
       update_values = true;
       v_size        = 1;
     }
-  if (grads.size() == n_pols)
+  if (grads.size() == this->n())
     {
       update_grads = true;
       v_size       = 2;
     }
-  if (grad_grads.size() == n_pols)
+  if (grad_grads.size() == this->n())
     {
       update_grad_grads = true;
       v_size            = 3;
     }
-  if (third_derivatives.size() == n_pols)
+  if (third_derivatives.size() == this->n())
     {
       update_3rd_derivatives = true;
       v_size                 = 4;
     }
-  if (fourth_derivatives.size() == n_pols)
+  if (fourth_derivatives.size() == this->n())
     {
       update_4th_derivatives = true;
       v_size                 = 5;
@@ -393,6 +396,15 @@ PolynomialSpace<dim>::compute(
                       }
             }
     }
+}
+
+
+
+template <int dim>
+std::unique_ptr<ScalarPolynomialsBase<dim>>
+PolynomialSpace<dim>::clone() const
+{
+  return std::make_unique<PolynomialSpace<dim>>(*this);
 }
 
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2018 by the deal.II authors
+// Copyright (C) 2012 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -48,14 +48,26 @@ check()
       const std::complex<number> prod_check = check.add_and_dot(factor, v2, v3);
       if (test == 0 && std::is_same<number, double>::value)
         {
-          deallog << "Vector add reference:   ";
-          v1.print(deallog);
-          deallog << "Vector check reference: ";
-          check.print(deallog);
+          deallog << "Vector add reference:   " << std::flush;
+          v1.print(deallog.get_file_stream(), 7);
+          deallog << "DEAL::Vector check reference: " << std::flush;
+          check.print(deallog.get_file_stream(), 7);
+          deallog << "DEAL::";
         }
 
-      deallog << "Add and dot should be " << prod / static_cast<number>(size)
-              << ", is " << prod_check / static_cast<number>(size) << std::endl;
+      deallog << "Add and dot is ";
+      // check tolerance with respect to the expected size of result which is
+      // ~ size^2 including the roundoff error ~ sqrt(size) we expect
+      const number tolerance = 4. * std::numeric_limits<number>::epsilon() *
+                               std::sqrt(static_cast<number>(size)) * size *
+                               size;
+      if (std::abs(prod - prod_check) < tolerance)
+        deallog << "correct" << std::endl;
+      else
+        deallog << "wrong by " << std::abs(prod - prod_check)
+                << " with tolerance " << tolerance << "; should be "
+                << prod / static_cast<number>(size) << ", is "
+                << prod_check / static_cast<number>(size) << std::endl;
     }
 }
 

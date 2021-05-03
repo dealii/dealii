@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -39,6 +39,7 @@
 #include <vector>
 
 #include "../tests.h"
+
 #include "gla.h"
 
 template <class LA, int dim>
@@ -83,11 +84,10 @@ test()
                                   false,
                                   Utilities::MPI::this_mpi_process(
                                     MPI_COMM_WORLD));
-  SparsityTools::distribute_sparsity_pattern(
-    sp,
-    dof_handler.n_locally_owned_dofs_per_processor(),
-    MPI_COMM_WORLD,
-    relevant);
+  SparsityTools::distribute_sparsity_pattern(sp,
+                                             owned,
+                                             MPI_COMM_WORLD,
+                                             relevant);
   sp.compress();
   matrix.reinit(owned, owned, sp, MPI_COMM_WORLD);
 

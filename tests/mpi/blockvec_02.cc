@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -26,8 +26,9 @@
 #include <iostream>
 #include <vector>
 
-#include "../distributed_grids/coarse_grid_common.h"
 #include "../tests.h"
+
+#include "../distributed_grids/coarse_grid_common.h"
 
 void
 test()

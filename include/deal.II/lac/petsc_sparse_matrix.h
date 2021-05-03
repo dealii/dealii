@@ -29,9 +29,10 @@
 
 DEAL_II_NAMESPACE_OPEN
 // forward declaration
+#    ifndef DOXYGEN
 template <typename MatrixType>
 class BlockMatrixBase;
-
+#    endif
 
 namespace PETScWrappers
 {
@@ -46,7 +47,6 @@ namespace PETScWrappers
    *
    * @ingroup PETScWrappers
    * @ingroup Matrix1
-   * @author Wolfgang Bangerth, 2004
    */
   class SparseMatrix : public MatrixBase
   {
@@ -280,9 +280,7 @@ namespace PETScWrappers
     do_reinit(const SparsityPatternType &sparsity_pattern,
               const bool                 preset_nonzero_locations);
 
-    /**
-     * To allow calling protected prepare_add() and prepare_set().
-     */
+    // To allow calling protected prepare_add() and prepare_set().
     friend class BlockMatrixBase<SparseMatrix>;
   };
 
@@ -363,7 +361,6 @@ namespace PETScWrappers
      *
      * @ingroup PETScWrappers
      * @ingroup Matrix1
-     * @author Wolfgang Bangerth, 2004
      */
     class SparseMatrix : public MatrixBase
     {
@@ -756,9 +753,7 @@ namespace PETScWrappers
                 const IndexSet &           local_columns,
                 const SparsityPatternType &sparsity_pattern);
 
-      /**
-       * To allow calling protected prepare_add() and prepare_set().
-       */
+      // To allow calling protected prepare_add() and prepare_set().
       friend class BlockMatrixBase<SparseMatrix>;
     };
 

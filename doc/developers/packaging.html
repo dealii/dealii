@@ -1,0 +1,107 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+	  "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+  <head>
+    <title>Packaging deal.II</title>
+    <link href="../screen.css" rel="StyleSheet" media="screen">
+    <meta name="copyright" content="Copyright (C) 2000 - 2019 by the deal.II Authors">
+    <meta name="keywords" content="deal.II packaging">
+  </head>
+
+  <body>
+
+    <h1>Packaging <acronym>deal.II</acronym> for a Unix-like distribution</h1>
+
+    <h2>Overview</h2>
+    <p>
+      This page describes how to write packaging scripts
+      for <acronym>deal.II</acronym>. <acronym>deal.II</acronym> is written in
+      C++11 and is known to work with GCC, Clang, and Intel compilers. It is
+      licensed under the LGPL v2.1. We recommend reading
+      the <a href="porting.html">porting</a> document first for a description of
+      the requirements of the build system. <acronym>deal.II</acronym> does not
+      support any type of plug-in architecture for dependencies: all
+      dependencies must be provided at compile-time.
+
+      The only required dependency of <acronym>deal.II</acronym> is boost.
+    </p>
+
+
+    <h2>Examples</h2>
+    <acronym>deal.II</acronym> is already available in many Linux distributions:
+    for examples of packaging scripts see, e.g.,
+    <p>
+      <ul>
+        <li>
+          <a href="https://aur.archlinux.org/cgit/aur.git/tree/PKGBUILD?h=deal-ii">
+          a packaging script for the Arch Linux AUR</a>,
+        </li>
+        <li>
+          <a href="https://github.com/gentoo/sci/blob/master/sci-libs/dealii/dealii-9.1.0.ebuild">
+            a packaging script for the Gentoo science overlay</a>, and
+        </li>
+        <li>
+          <a href="https://packages.debian.org/stable/libs/libdeal.ii-8.4.2">
+            a packaging setup for Debian stable.</a>
+        </li>
+      </ul>
+    </p>
+
+    <h2>Suggestions</h2>
+    <ul>
+      <li>
+        <acronym>deal.II</acronym> defaults to installing several
+        configuration files
+        (<tt>LICENSE.md</tt>, <tt>README.md</tt>, <tt>detailed.log</tt>,
+        and <tt>summary.log</tt>) in the installation prefix. We recommend
+        deleting these files. <tt>LICENSE.md</tt> should be installed in the
+        correct directory for software licenses.
+      </li>
+      <li>
+        By default, all tutorial programs are compiled in both debug and release
+        mode and installed in the <tt>bin</tt> subdirectory of the installation
+        prefix. We recommend disabling the examples by configuring with
+        the <tt>-DDEAL_II_COMPILE_EXAMPLES=OFF</tt> option.
+      </li>
+      <li>
+        The CMake configuration of <acronym>deal.II</acronym> will determine
+        what compiler is being used and pick reasonable optimization and
+        debugging flags automatically. Further flags for debug and release mode
+        may be supplied by <tt>DEAL_II_CXX_FLAGS_DEBUG</tt>
+        and <tt>DEAL_II_CXX_FLAGS_RELEASE</tt> variables passed to CMake,
+        respectively.
+      </li>
+      <li>
+        The flag <tt>DEAL_II_ALLOW_PLATFORM_INTROSPECTION</tt> (enabled by
+        default) enables (as the name implies) CPU-specific issues (usually for
+        vectorization).
+      </li>
+      <li>
+        The flag <tt>DEAL_II_WITH_64BIT_INDICES</tt> changes an integral type
+        used for indices in the library. This value should be made consistent
+        with the way PETSc is configured.
+      </li>
+      <li>
+        <acronym>deal.II</acronym> includes copies of boost, muParser, TBB, and
+        UMFPACK. These bundled packages should be disabled
+        via <tt>-DDEAL_II_ALLOW_BUNDLED=OFF</tt> and these dependencies should
+        instead be resolved by ensuring that whenever <acronym>deal.II</acronym>
+        is installed, the packages above are also installed.
+      </li>
+      <li>
+        The standard build of GSL does not link <tt>libgsl.so</tt> against a
+        CBLAS implementation, which results in underlinkage
+        in <acronym>deal.II</acronym>. This is resolved, for example, in the
+        Arch Linux PKGBUILD script by stripping the <tt>-Wl,--as-needed</tt>
+        flag from the linker flags.
+      </li>
+    </ul>
+
+<hr />
+<div class="right">
+  <a href="http://validator.w3.org/check?uri=referer" target="_top">
+    <img style="border:0" src="http://www.w3.org/Icons/valid-html401" alt="Valid HTML 4.01!"></a>
+  <a href="http://jigsaw.w3.org/css-validator/check/referer" target="_top">
+    <img style="border:0;width:88px;height:31px" src="http://jigsaw.w3.org/css-validator/images/vcss" alt="Valid CSS!"></a>
+  </body>
+</html>

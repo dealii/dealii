@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2003 - 2018 by the deal.II authors
+ * Copyright (C) 2003 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -13,7 +13,6 @@
  *
  * ---------------------------------------------------------------------
 
- *
  *
  */
 
@@ -79,10 +78,6 @@ namespace LA
 
 namespace Step50
 {
-  using namespace dealii;
-
-
-
   template <int dim>
   class LaplaceProblem
   {
@@ -107,8 +102,8 @@ namespace Step50
     FE_Q<dim>                            fe;
     DoFHandler<dim>                      mg_dof_handler;
 
-    typedef LA::MPI::SparseMatrix matrix_t;
-    typedef LA::MPI::Vector       vector_t;
+    using matrix_t = LA::MPI::SparseMatrix;
+    using vector_t = LA::MPI::Vector;
 
     matrix_t system_matrix;
 
@@ -448,7 +443,7 @@ namespace Step50
   LaplaceProblem<dim>::solve()
   {
     MGTransferPrebuilt<vector_t> mg_transfer(mg_constrained_dofs);
-    mg_transfer.build_matrices(mg_dof_handler);
+    mg_transfer.build(mg_dof_handler);
 
     matrix_t &coarse_matrix = mg_matrices[0];
 
@@ -461,7 +456,7 @@ namespace Step50
                                 PreconditionIdentity>
       coarse_grid_solver(coarse_solver, coarse_matrix, id);
 
-    typedef LA::MPI::PreconditionJacobi                  Smoother;
+    using Smoother = LA::MPI::PreconditionJacobi;
     MGSmootherPrecondition<matrix_t, Smoother, vector_t> mg_smoother;
     mg_smoother.initialize(mg_matrices, Smoother::AdditionalData(0.5));
     mg_smoother.set_steps(2);
@@ -517,7 +512,7 @@ namespace Step50
            triangulation.begin_active();
          cell != triangulation.end();
          ++cell)
-      for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+      for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
         if (cell->vertex(v)[0] <= 0.5 && cell->vertex(v)[1] <= 0.5)
           cell->set_refine_flag();
     triangulation.execute_coarsening_and_refinement();
@@ -572,7 +567,6 @@ main(int argc, char *argv[])
 
   try
     {
-      using namespace dealii;
       using namespace Step50;
 
       LaplaceProblem<2> laplace_problem(1 /*degree*/);

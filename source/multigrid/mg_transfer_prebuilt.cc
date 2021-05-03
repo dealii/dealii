@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2019 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -55,32 +55,11 @@ MGTransferPrebuilt<VectorType>::MGTransferPrebuilt(
 
 
 template <typename VectorType>
-MGTransferPrebuilt<VectorType>::MGTransferPrebuilt(
-  const AffineConstraints<double> & /*c*/,
-  const MGConstrainedDoFs &mg_c)
-{
-  this->mg_constrained_dofs = &mg_c;
-}
-
-
-
-template <typename VectorType>
 void
 MGTransferPrebuilt<VectorType>::initialize_constraints(
   const MGConstrainedDoFs &mg_c)
 {
   this->mg_constrained_dofs = &mg_c;
-}
-
-
-
-template <typename VectorType>
-void
-MGTransferPrebuilt<VectorType>::initialize_constraints(
-  const AffineConstraints<double> & /*c*/,
-  const MGConstrainedDoFs &mg_c)
-{
-  initialize_constraints(mg_c);
 }
 
 
@@ -106,7 +85,20 @@ MGTransferPrebuilt<VectorType>::prolongate(const unsigned int to_level,
   Assert((to_level >= 1) && (to_level <= prolongation_matrices.size()),
          ExcIndexRange(to_level, 1, prolongation_matrices.size() + 1));
 
-  prolongation_matrices[to_level - 1]->vmult(dst, src);
+  if (this->mg_constrained_dofs != nullptr &&
+      this->mg_constrained_dofs->get_user_constraint_matrix(to_level - 1)
+          .get_local_lines()
+          .size() > 0)
+    {
+      VectorType copy_src(src);
+      this->mg_constrained_dofs->get_user_constraint_matrix(to_level - 1)
+        .distribute(copy_src);
+      prolongation_matrices[to_level - 1]->vmult(dst, copy_src);
+    }
+  else
+    {
+      prolongation_matrices[to_level - 1]->vmult(dst, src);
+    }
 }
 
 
@@ -128,7 +120,7 @@ MGTransferPrebuilt<VectorType>::restrict_and_add(const unsigned int from_level,
 namespace
 {
   /**
-   * Helper function for build_matrices. Checks for identity constrained dofs
+   * Helper function for build. Checks for identity constrained dofs
    * and replace with the indices of the dofs to which they are constrained
    */
   void
@@ -157,15 +149,16 @@ namespace
 template <typename VectorType>
 template <int dim, int spacedim>
 void
-MGTransferPrebuilt<VectorType>::build_matrices(
-  const DoFHandler<dim, spacedim> &mg_dof)
+MGTransferPrebuilt<VectorType>::build(
+  const DoFHandler<dim, spacedim> &dof_handler)
 {
-  const unsigned int n_levels = mg_dof.get_triangulation().n_global_levels();
-  const unsigned int dofs_per_cell = mg_dof.get_fe().dofs_per_cell;
+  const unsigned int n_levels =
+    dof_handler.get_triangulation().n_global_levels();
+  const unsigned int dofs_per_cell = dof_handler.get_fe().n_dofs_per_cell();
 
   this->sizes.resize(n_levels);
   for (unsigned int l = 0; l < n_levels; ++l)
-    this->sizes[l] = mg_dof.n_dofs(l);
+    this->sizes[l] = dof_handler.n_dofs(l);
 
   // reset the size of the array of
   // matrices. call resize(0) first,
@@ -212,19 +205,20 @@ MGTransferPrebuilt<VectorType>::build_matrices(
       // increment dofs_per_cell since a useless diagonal element will be
       // stored
       IndexSet level_p1_relevant_dofs;
-      DoFTools::extract_locally_relevant_level_dofs(mg_dof,
+      DoFTools::extract_locally_relevant_level_dofs(dof_handler,
                                                     level + 1,
                                                     level_p1_relevant_dofs);
       DynamicSparsityPattern                  dsp(this->sizes[level + 1],
                                  this->sizes[level],
                                  level_p1_relevant_dofs);
-      typename DoFHandler<dim>::cell_iterator cell, endc = mg_dof.end(level);
-      for (cell = mg_dof.begin(level); cell != endc; ++cell)
+      typename DoFHandler<dim>::cell_iterator cell,
+        endc = dof_handler.end(level);
+      for (cell = dof_handler.begin(level); cell != endc; ++cell)
         if (cell->has_children() &&
-            (mg_dof.get_triangulation().locally_owned_subdomain() ==
+            (dof_handler.get_triangulation().locally_owned_subdomain() ==
                numbers::invalid_subdomain_id ||
              cell->level_subdomain_id() ==
-               mg_dof.get_triangulation().locally_owned_subdomain()))
+               dof_handler.get_triangulation().locally_owned_subdomain()))
           {
             cell->get_mg_dof_indices(dof_indices_parent);
 
@@ -237,7 +231,7 @@ MGTransferPrebuilt<VectorType>::build_matrices(
               {
                 // set an alias to the prolongation matrix for this child
                 const FullMatrix<double> &prolongation =
-                  mg_dof.get_fe().get_prolongation_matrix(
+                  dof_handler.get_fe().get_prolongation_matrix(
                     child, cell->refinement_case());
 
                 Assert(prolongation.n() != 0, ExcNoProlongation());
@@ -272,36 +266,11 @@ MGTransferPrebuilt<VectorType>::build_matrices(
           // complete sparsity patterns on their own, the sparsity pattern must
           // be manually distributed.
 
-          // Retrieve communicator from triangulation if it is parallel
-          const parallel::Triangulation<dim, spacedim> *dist_tria =
-            dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
-              &(mg_dof.get_triangulation()));
-
-          MPI_Comm communicator = dist_tria != nullptr ?
-                                    dist_tria->get_communicator() :
-                                    MPI_COMM_SELF;
-
-          // Compute # of locally owned MG dofs / processor for distribution
-          const std::vector<::dealii::IndexSet>
-            &locally_owned_mg_dofs_per_processor =
-              mg_dof.locally_owned_mg_dofs_per_processor(level + 1);
-          std::vector<::dealii::types::global_dof_index>
-            n_locally_owned_mg_dofs_per_processor(
-              locally_owned_mg_dofs_per_processor.size(), 0);
-
-          for (std::size_t index = 0;
-               index < n_locally_owned_mg_dofs_per_processor.size();
-               ++index)
-            {
-              n_locally_owned_mg_dofs_per_processor[index] =
-                locally_owned_mg_dofs_per_processor[index].n_elements();
-            }
-
           // Distribute sparsity pattern
           ::dealii::SparsityTools::distribute_sparsity_pattern(
             dsp,
-            n_locally_owned_mg_dofs_per_processor,
-            communicator,
+            dof_handler.locally_owned_mg_dofs(level + 1),
+            dof_handler.get_communicator(),
             dsp.row_index_set());
         }
 #endif
@@ -311,7 +280,7 @@ MGTransferPrebuilt<VectorType>::build_matrices(
         *prolongation_sparsities[level],
         level,
         dsp,
-        mg_dof);
+        dof_handler);
       dsp.reinit(0, 0);
 
       // In the end, the entries in this object will only be real valued.
@@ -325,12 +294,12 @@ MGTransferPrebuilt<VectorType>::build_matrices(
       FullMatrix<typename VectorType::value_type> prolongation;
 
       // now actually build the matrices
-      for (cell = mg_dof.begin(level); cell != endc; ++cell)
+      for (cell = dof_handler.begin(level); cell != endc; ++cell)
         if (cell->has_children() &&
-            (mg_dof.get_triangulation().locally_owned_subdomain() ==
+            (dof_handler.get_triangulation().locally_owned_subdomain() ==
                numbers::invalid_subdomain_id ||
              cell->level_subdomain_id() ==
-               mg_dof.get_triangulation().locally_owned_subdomain()))
+               dof_handler.get_triangulation().locally_owned_subdomain()))
           {
             cell->get_mg_dof_indices(dof_indices_parent);
 
@@ -342,7 +311,7 @@ MGTransferPrebuilt<VectorType>::build_matrices(
             for (unsigned int child = 0; child < cell->n_children(); ++child)
               {
                 // set an alias to the prolongation matrix for this child
-                prolongation = mg_dof.get_fe().get_prolongation_matrix(
+                prolongation = dof_handler.get_fe().get_prolongation_matrix(
                   child, cell->refinement_case());
 
                 if (this->mg_constrained_dofs != nullptr &&
@@ -371,7 +340,18 @@ MGTransferPrebuilt<VectorType>::build_matrices(
       prolongation_matrices[level]->compress(VectorOperation::insert);
     }
 
-  this->fill_and_communicate_copy_indices(mg_dof);
+  this->fill_and_communicate_copy_indices(dof_handler);
+}
+
+
+
+template <typename VectorType>
+template <int dim, int spacedim>
+void
+MGTransferPrebuilt<VectorType>::build_matrices(
+  const DoFHandler<dim, spacedim> &dof_handler)
+{
+  build(dof_handler);
 }
 
 

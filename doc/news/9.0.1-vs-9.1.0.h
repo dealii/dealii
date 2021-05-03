@@ -42,8 +42,8 @@ inconvenience this causes.
 
  <li>
   Changed: Tasks of member function
-  hp::FECollection::find_face_dominating_fe_in_subset() are now divided
-  into two functions hp::FECollection::find_common_subspace()
+  hp::FECollection::find_least_face_dominating_fe() are now divided
+  into two functions hp::FECollection::find_common_fes()
   and hp::FECollection::find_dominated_fe().
   <br>
   (Marc Fehling, 2019/04/08)
@@ -90,7 +90,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  Changed: The constructor for Subscriptor requires providing a pointer to a boolean
+  Changed: Subscriptor::subscribe() requires providing a pointer to a boolean
   that can be used to signal validity of the object pointed to by the subscribing
   object.
   <br>
@@ -132,19 +132,20 @@ inconvenience this causes.
 
  <li>
   Changes: The data transfer interface of the class
-  `parallel::distributed::Triangulation` now requires different kinds of
-  callback functions. `register_data_attach()` now takes
-  `std::function<std::vector<char>(cell_iterator &, CellStatus)>`,
-  which returns the buffer of the packed data. `notify_ready_to_unpack()`
+  parallel::distributed::Triangulation now requires different kinds of
+  callback functions. parallel::distributed::Triangulation::register_data_attach()
+  now takes `std::function<std::vector<char>(cell_iterator &, CellStatus)>`,
+  which returns the buffer of the packed data.
+  parallel::distributed::Triangulation::notify_ready_to_unpack()
   requires `std::function<void(const cell_iterator &, const CellStatus,
-  const boost::iterator_range<std::vector<char>::const_iterator &>`, where
+  const boost::iterator_range<std::vector<char>::%const_iterator &>`, where
   the last argument describes an iterator range, from which the callback
   function is allowed to read.
   <br>
-  Further, the `register_data_attach()` function now requires a boolean
-  argument `returns_variable_size_data`, which denotes if the registered
-  pack_callback function interacts with the fixed size (`=false`) or
-  variable size (`=true`) buffer for data transfer.
+  Further, parallel::distributed::Triangulation::register_data_attach()
+  now requires a boolean argument `returns_variable_size_data`, which
+  denotes if the registered pack_callback function interacts with the fixed
+  size (`=false`) or variable size (`=true`) buffer for data transfer.
   <br>
   (Marc Fehling, 2018/07/20)
  </li>
@@ -154,7 +155,7 @@ inconvenience this causes.
   MatrixCreator::create_boundary_mass_matrix that had mixed number type (real
   valued for the matrix and complex valued for vectors) have been changed to
   support complex number types uniformly. This implies that now all
-  underlying number types of matrix, vectors and AffineConstraint objects
+  underlying number types of matrix, vectors and AffineConstraints objects
   have to match; mixed variants are no longer supported.
   <br>
   (Matthias Maier, 2018/05/25)
@@ -173,18 +174,21 @@ inconvenience this causes.
  </li>
 
  <li>
-  Changed: The OpenCASCADE Manifold classes with names ending in Boundary (i.e.,
-  NormalProjectionBoundary, DirectionalProjectionBoundary, and
-  NormalToMeshProjectionBoundary) have been deprecated in favor of renamed classes
-  ending in Manifold (i.e., NormalProjectionManifold,
-  DirectionalProjectionManifold, and NormalToMeshProjectionManifold).
+  Changed: The OpenCASCADE Manifold classes with names ending in Boundary
+  (i.e., OpenCASCADE::NormalProjectionBoundary,
+  OpenCASCADE::DirectionalProjectionBoundary, and
+  OpenCASCADE::NormalToMeshProjectionBoundary) have been deprecated in favor
+  of renamed classes ending in Manifold (i.e.,
+  OpenCASCADE::NormalProjectionManifold,
+  OpenCASCADE::DirectionalProjectionManifold, and
+  OpenCASCADE::NormalToMeshProjectionManifold).
   <br>
   (David Wells, 2018/05/16)
  </li>
 
  <li>
   Changed: The PolynomialSpace::compute_index() and
-  PolynomialsP::directional_degree() functions used to return their
+  PolynomialsP::directional_degrees() functions used to return their
   information through an array that they received as a reference
   argument. Instead, they now return a `std::array<unsigned int,dim>`
   by value.
@@ -227,7 +231,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: Ths step-64 tutorial demonstrates how to use the CUDAWrappers::MatrixFree
+  New: The step-64 tutorial demonstrates how to use the CUDAWrappers::MatrixFree
   framework (possibly with MPI) and discusses the peculiarities of using CUDA
   inside deal.II in general.
   <br>
@@ -323,10 +327,11 @@ inconvenience this causes.
 
  <li>
   New: Support for Ginkgo, a high-performance numerical linear algebra library
-  has been added. Ginkgo provides advanced highly optimized linear solvers,
-  matrix formats and an abstraction to easily create linear operators on both
-  the cpu and the gpu. The deal.II's Ginkgo interface can currently be used to
-  solve linear systems using Krylov solvers with the cuda and OpenMP paradigms.
+  has been added with classes inheriting from GinkgoWrappers::SolverBase. Ginkgo
+  provides advanced highly optimized linear solvers, matrix formats and an
+  abstraction to easily create linear operators on both the cpu and the gpu. The
+  deal.II's Ginkgo interface can currently be used to solve linear systems using
+  Krylov solvers with the cuda and OpenMP paradigms.
   <br>
   (Ginkgo developers, 2019/01/30)
  </li>
@@ -366,7 +371,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: Function FiniteElement::compare_for_domination() inspects two
+  New: %Function FiniteElement::compare_for_domination() inspects two
   FiniteElement objects upon FiniteElementDomination, and uses a codim
   parameter that determines in which subspace we actually compare them.
   <br>
@@ -494,6 +499,12 @@ inconvenience this causes.
 <ol>
 
  <li>
+  Improved: GridIn::read_msh has been extended to allow for gmsh mesh format 4.1.
+  <br>
+  (Daniel Arndt, 2019/05/21)
+ </li>
+
+ <li>
   Improved: The point identification of TransfiniteInterpolationManifold has
   been made more robust. It would previously sometimes fail for strongly curved,
   long and skinny cells.
@@ -578,7 +589,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  Improved: The Workstream::run() function is now capable of working with iterator
+  Improved: The WorkStream::run() function is now capable of working with iterator
   ranges, or any general iterable object that defines the `begin()` and `end()`
   of a range of elements to iterate over.
   <br>
@@ -641,27 +652,10 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: Member function hp::FECollection::find_dominated_fe_extended()
-  returns the index of the least dominating finite element out of a given
-  set of indices. If none was found, the search will be extended on the
-  complete collection.
-  <br>
-  (Marc Fehling, 2019/04/08)
- </li>
-
- <li>
   New: Member function hp::FECollection::find_dominating_fe_extended()
   returns the index of the most dominating finite element out of a given
   set of indices. If none was found, the search will be extended on the
   complete collection.
-  <br>
-  (Marc Fehling, 2019/04/08)
- </li>
-
- <li>
-  New: Member function hp::FECollection::find_dominated_fe()
-  returns the index of the least dominating finite element out of a given
-  set of indices.
   <br>
   (Marc Fehling, 2019/04/08)
  </li>
@@ -708,7 +702,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: Add ArraView::ArrayView() and ArrayView::reinit(value_type *, const std::size_t).
+  New: Add ArrayView::ArrayView() and ArrayView::reinit(value_type *, const std::size_t).
   <br>
   (Denis Davydov, 2019/04/02)
  </li>
@@ -752,8 +746,9 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: Add DynamicSparsityPattern::nonempty_cols()/DynamicSparsityPattern::nonempty_rows() to return columns/rows
-  stored in the sparsity pattern.
+  New: Add DynamicSparsityPattern::nonempty_cols() and
+  DynamicSparsityPattern::nonempty_rows() to return columns/rows stored in the
+  sparsity pattern.
   <br>
   (Denis Davydov, 2019/03/20)
  </li>
@@ -767,7 +762,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: FEValuesExtractor classes now have a new method get_name() that returns a unique string identifier
+  New: FEValuesExtractors classes now have a new method get_name() that returns a unique string identifier
   for each extractor.
   <br>
   (Luca Heltai, 2019/03/19)
@@ -851,7 +846,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  Fixed: EllipiticalManifold::push_forward_gradient did previously not take the
+  Fixed: EllipticalManifold::push_forward_gradient() did previously not take the
   rotation into account. This is now fixed.
   <br>
   (Daniel Appel, Martin Kronbichler, 2019/03/05)
@@ -891,7 +886,7 @@ inconvenience this causes.
  <li>
   New: Hierarchy of finite elements in hp::FECollection objects. Get succeeding
   and preceding indices via hp::FECollection::next_in_hierarchy() and
-  hp::FECollection::prev_in_hierarchy(). By default, a hierarchy corresponding
+  hp::FECollection::previous_in_hierarchy(). By default, a hierarchy corresponding
   to indices is established. Hierarchy can be overridden via
   hp::FECollection::set_hierarchy().
   <br>
@@ -905,7 +900,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: Function GridTools::guess_point_owner(), which uses a covering rtree
+  New: %Function GridTools::guess_point_owner(), which uses a covering rtree
   to guess which processes own the points of the given vector of points.
   <br>
   (Giovanni Alzetta, 2019/02/25)
@@ -921,8 +916,9 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: Function DoFRenumbering::random(dof_handler, level) which allows for a random renumbering
-  of degrees of freedom on a level in a mutilevel hierarchy.
+  New: A new function
+  DoFRenumbering::random(DoFHandlerType &, const unsigned int) which allows for a
+  random renumbering of degrees of freedom on a level in a mutilevel hierarchy.
   <br>
   (Conrad Clevenger, 2019/02/19)
  </li>
@@ -942,7 +938,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: Function MGConstrainedDoFs::make_no_normal_flux_constraints which adds
+  New: %Function MGConstrainedDoFs::make_no_normal_flux_constraints() which adds
   functionality for no normal flux constraints during geometric mutigrid computations.
   Currently, this function is limited to meshes with no normal flux boundaries
   normal to the x-, y-, or z-axis.
@@ -1033,7 +1029,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  Changed: Function GridGenerator::general_cell() can now generate
+  Changed: %Function GridGenerator::general_cell() can now generate
   a cell of dimension `dim` inside a space of dimension `spacedim`
   with `dim <= spacedim`
   <br>
@@ -1048,12 +1044,12 @@ inconvenience this causes.
  </li>
 
  <li>
-  Improved: A new dummy enumeration AD::NumberTypes::none has been added.
-  It exists to represent number types that are scalar arithmetic types,
-  i.e those that hold no derivatives. They are implemented primarily to
-  facilitate the use of template  meta-programming techniques to switch
-  between different AD types. This covers the case when the user does not
-  want an AD type at all, but rather a primitive type.
+  Improved: A new dummy enumeration Differentiation::AD::NumberTypes::none has
+  been added. It exists to represent number types that are scalar arithmetic
+  types, i.e those that hold no derivatives. They are implemented primarily to
+  facilitate the use of template meta-programming techniques to switch between
+  different AD types. This covers the case when the user does not want an AD
+  type at all, but rather a primitive type.
   <br>
   (Jean-Paul Pelteret, 2019/01/25)
  </li>
@@ -1134,7 +1130,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: Function GridTools::build_global_description_tree which exchanges a given
+  New: %Function GridTools::build_global_description_tree which exchanges a given
   vector of bounding boxes on all processes and uses the result to build an Rtree
   with packing algorithm.
   <br>
@@ -1186,7 +1182,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: Class EllipticalManifold<dim,spacedim> derived from ChartManifold,
+  New: Class EllipticalManifold derived from ChartManifold,
   valid only for dim=2 and spacedim=2. It maps points from a system of
   cartesian coordinates to a system of elliptical coordinates and vice-versa.
   <br>
@@ -1202,8 +1198,9 @@ inconvenience this causes.
  </li>
 
  <li>
-  Fixed: The MatrixFree::initialize() function would sometimes run into an
-  assertion when ghost faces occur on subdomain interfaces. This is now fixed.
+  Fixed: The internal::MatrixFreeFunctions::FaceSetup::initialize() function
+  would sometimes run into an assertion when ghost faces occur on subdomain
+  interfaces. This is now fixed.
   <br>
   (Martin Kronbichler, 2018/11/28)
  </li>
@@ -1358,8 +1355,8 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: Add inverse_Hilbert_space_filling_curve() to map points in dim-dimensional
-  space to line index of the Hilbert space filling curve.
+  New: Add Utilities::inverse_Hilbert_space_filling_curve() to map points in
+  dim-dimensional space to line index of the Hilbert space filling curve.
   <br>
   (Denis Davydov, 2018/10/05)
  </li>
@@ -1382,10 +1379,11 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: Class parallel::distributed::CellWeights allows to set the
+  New: Class parallel::CellWeights allows to set the
   weight of a cell depending on the number of degrees of freedom
   associated with it. This guarantees an improved load balancing
-  in case a hp::DoFHandler is used on a p::d::Triangulation.
+  in case a hp::DoFHandler is used on a
+  parallel::distributed::Triangulation.
   <br>
   (Marc Fehling, 2018/10/01)
  </li>
@@ -1601,14 +1599,14 @@ inconvenience this causes.
  </li>
 
  <li>
-  Fixed: CUDAWrappers::Vector performs now a deep copy instead of a shallow copy
-  in its copy assignment operator.
+  Fixed: LinearAlgebra::CUDAWrappers::Vector performs now a deep copy instead of
+  a shallow copy in its copy assignment operator.
   <br>
   (Daniel Arndt, 2018/08/16)
  </li>
 
  <li>
-  Fixed: MGConstrainedDofs::initialize(...) now handles refinement edges across periodic boundaries correctly.
+  Fixed: MGConstrainedDoFs::initialize() now handles refinement edges across periodic boundaries correctly.
   <br>
   (Alexander Knieps, 2018/08/13)
  </li>
@@ -1687,13 +1685,6 @@ inconvenience this causes.
  </li>
 
  <li>
-  Added support for high-order VTU output by using newly
-  introduced Lagrange VTK cells.
-  <br>
-  (Alexander Grayver, 2018/08/01)
- </li>
-
- <li>
   Added support for high-order VTK output by using newly
   introduced Lagrange VTK cells.
   <br>
@@ -1707,8 +1698,8 @@ inconvenience this causes.
  </li>
 
  <li>
-  Deprecate project_boundary_values_curl_conforming in favor
-  of project_boundary_values_curl_conforming_l2. The former
+  Deprecate VectorTools::project_boundary_values_curl_conforming in favor
+  of VectorTools::project_boundary_values_curl_conforming_l2. The former
   has a number of known limitations and bugs.
   <br>
   (Alexander Grayver, 2018/07/26)
@@ -1794,7 +1785,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: The class MatrixFreeFunctions::CellwiseInverseMassMatrix can now also be
+  New: The class MatrixFreeOperators::CellwiseInverseMassMatrix can now also be
   used in 1D.
   <br>
   (Martin Kronbichler, 2018/07/04)
@@ -1808,9 +1799,9 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: Extend get_vector_data_ranges() to return extra element in
-  the tuple to represent DataComponentInterpretation. The functions
-  were renamed to get_nonscalar_data_ranges().
+  New: Extend DataOutInterface::get_vector_data_ranges() to return extra element
+  in the tuple to represent DataComponentInterpretation. The functions were
+  renamed to get_nonscalar_data_ranges().
   <br>
   (Denis Davydov, 2018/06/21)
  </li>
@@ -1823,8 +1814,8 @@ inconvenience this causes.
  </li>
 
  <li>
-  Changed: Calling GridGenerator::refine_and_coarsen_fixed_fraction()
-  and GridGenerator::refine_and_coarsen_fixed_fraction() with values for
+  Changed: Calling GridRefinement::refine_and_coarsen_fixed_fraction()
+  and GridRefinement::refine_and_coarsen_fixed_fraction() with values for
   the coarsen and refine fractions that added to 1.0 in exact
   arithmetic, but something slightly larger in floating point
   arithmetic, resulted in an error. These functions are now slightly
@@ -1844,10 +1835,11 @@ inconvenience this causes.
  </li>
 
  <li>
-  Fixed: TrilinosWrappers::MPI::Vector::reinit check  now checks if
-  parallel_partitioner is_ascending_and_one_to_one before calling
-  make_trilinos_map because make_trilinos_map may be able to make
-  a linear map if is_ascending_and_one_to_one is true.
+  Fixed: TrilinosWrappers::MPI::Vector::reinit now checks if
+  IndexSet::is_ascending_and_one_to_one is `true` for
+  TrilinosWrappers::MPI::Vector::parallel partitioner before calling
+  IndexSet::make_trilinos_map because IndexSet::make_trilinos_map may be able
+  to make a linear map if the property holds.
   <br>
   (Joshua Hanophy, 2018/06/16)
  </li>
@@ -1860,8 +1852,8 @@ inconvenience this causes.
  </li>
 
  <li>
-  Bugfix: Fixed bugs for TrilinosWrapper::SparseMatrix::add(factor, other_matrix)
-  and TrilinosWrapper::SparseMatrix::copy_from(other_matrix) for the case of
+  Bugfix: Fixed bugs for TrilinosWrappers::SparseMatrix::add()
+  and TrilinosWrappers::SparseMatrix::copy_from() for the case of
   non-contiguous rows.
   <br>
   (Uwe Koecher, 2018/06/14)
@@ -1875,7 +1867,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  Bugfix: Fixed a bug where VectorDataExchange::ghosts_were_set was
+  Bugfix: Fixed a bug where internal::VectorDataExchange::ghosts_were_set was
   not set inside MatrixFree::cell_loop() for block vectors
   with many blocks.
   <br>
@@ -1936,8 +1928,8 @@ inconvenience this causes.
   LinearAlgebra::distributed::BlockVector::update_ghost_values() and
   LinearAlgebra::distributed::BlockVector::compress() calls on block vectors
   with many blocks, rather than splitting each method into two parts for
-  overlapping communication and computation. The latter is inefficient as soon
-  as too many MPI requests are in flight.
+  overlapping communication and computation. The latter is inefficient once
+  too many MPI requests are in flight.
   <br>
   (Martin Kronbichler, Denis Davydov, 2018/05/24)
  </li>

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,6 +19,7 @@
 
 #include <deal.II/base/utilities.h>
 
+#include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_manifold.h>
 #include <deal.II/fe/mapping_q_generic.h>
@@ -66,7 +67,7 @@ test()
          triangulation.begin_active();
        cell != triangulation.end();
        ++cell)
-    for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+    for (const unsigned int f : GeometryInfo<dim>::face_indices())
       {
         const double xc = cell->face(f)->center()[0] - 1.5;
         const double yc = cell->face(f)->center()[1] - 2.5;
@@ -100,7 +101,7 @@ test()
          triangulation.begin_active();
        cell != triangulation.end();
        ++cell)
-    for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+    for (const unsigned int f : GeometryInfo<dim>::face_indices())
       {
         const double xc = cell->face(f)->center()[0] - 1.5;
         const double yc = cell->face(f)->center()[1] - 2.5;

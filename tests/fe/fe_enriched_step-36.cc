@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,6 +22,7 @@
 #include <deal.II/base/function.h>
 #include <deal.II/base/utilities.h>
 
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/dofs/dof_tools.h>
 
@@ -35,7 +36,6 @@
 #include <deal.II/grid/grid_refinement.h>
 #include <deal.II/grid/grid_tools.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/fe_values.h>
 #include <deal.II/hp/q_collection.h>
@@ -56,7 +56,6 @@
 
 const unsigned int dim = 3;
 
-using namespace dealii;
 
 /**
  * Coulomb potential
@@ -154,7 +153,7 @@ namespace Step36
 
   private:
     bool
-    cell_is_pou(const typename hp::DoFHandler<dim>::cell_iterator &cell) const;
+    cell_is_pou(const typename DoFHandler<dim>::cell_iterator &cell) const;
 
     std::pair<unsigned int, unsigned int>
     setup_system();
@@ -170,7 +169,7 @@ namespace Step36
     output_results(const unsigned int cycle) const;
 
     Triangulation<dim>    triangulation;
-    hp::DoFHandler<dim>   dof_handler;
+    DoFHandler<dim>       dof_handler;
     hp::FECollection<dim> fe_collection;
     hp::QCollection<dim>  q_collection;
 
@@ -247,7 +246,7 @@ namespace Step36
     fe_collection.push_back(
       FE_Enriched<dim>(FE_Q<dim>(2), FE_Q<dim>(1), &enrichment));
 
-    // assign fe index in the constructor so that FE/FE+POU is determined
+    // assign FE index in the constructor so that FE/FE+POU is determined
     // on the coarsest mesh to avoid issues like
     // +---------+----+----+
     // |         | fe |    |
@@ -255,7 +254,7 @@ namespace Step36
     // |         | pou|    |
     // +---------+----+----+
     // see discussion in Step46.
-    for (typename hp::DoFHandler<dim>::cell_iterator cell =
+    for (typename DoFHandler<dim>::cell_iterator cell =
            dof_handler.begin_active();
          cell != dof_handler.end();
          ++cell)
@@ -269,7 +268,7 @@ namespace Step36
   std::pair<unsigned int, unsigned int>
   EigenvalueProblem<dim>::setup_system()
   {
-    for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
+    for (typename DoFHandler<dim>::active_cell_iterator cell =
            dof_handler.begin_active();
          cell != dof_handler.end();
          ++cell)
@@ -348,7 +347,7 @@ namespace Step36
 
     unsigned int n_pou_cells = 0, n_fem_cells = 0;
 
-    for (typename hp::DoFHandler<dim>::cell_iterator cell =
+    for (typename DoFHandler<dim>::cell_iterator cell =
            dof_handler.begin_active();
          cell != dof_handler.end();
          ++cell)
@@ -363,7 +362,7 @@ namespace Step36
   template <int dim>
   bool
   EigenvalueProblem<dim>::cell_is_pou(
-    const typename hp::DoFHandler<dim>::cell_iterator &cell) const
+    const typename DoFHandler<dim>::cell_iterator &cell) const
   {
     return cell->material_id() == pou_material_id;
   }
@@ -387,9 +386,9 @@ namespace Step36
                                      update_JxW_values);
 
 
-    typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                                .begin_active(),
-                                                       endc = dof_handler.end();
+    typename DoFHandler<dim>::active_cell_iterator cell =
+                                                     dof_handler.begin_active(),
+                                                   endc = dof_handler.end();
     for (; cell != endc; ++cell)
       if (cell->subdomain_id() == this_mpi_process)
         {
@@ -411,7 +410,7 @@ namespace Step36
           potential.value_list(fe_values.get_quadrature_points(),
                                potential_values);
 
-          for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+          for (const auto q_point : fe_values.quadrature_point_indices())
             for (unsigned int i = 0; i < dofs_per_cell; ++i)
               for (unsigned int j = i; j < dofs_per_cell; ++j)
                 {
@@ -540,9 +539,9 @@ namespace Step36
   {
     Vector<float> fe_index(triangulation.n_active_cells());
     {
-      typename hp::DoFHandler<dim>::active_cell_iterator
-        cell = dof_handler.begin_active(),
-        endc = dof_handler.end();
+      typename DoFHandler<dim>::active_cell_iterator cell = dof_handler
+                                                              .begin_active(),
+                                                     endc = dof_handler.end();
       for (unsigned int index = 0; cell != endc; ++cell, ++index)
         fe_index(index) = cell->active_fe_index();
     }
@@ -555,7 +554,7 @@ namespace Step36
         filename += ".vtk";
         std::ofstream output(filename.c_str());
 
-        DataOut<dim, hp::DoFHandler<dim>> data_out;
+        DataOut<dim, DoFHandler<dim>> data_out;
         data_out.attach_dof_handler(dof_handler);
         data_out.add_data_vector(eigenfunctions_locally_relevant[0],
                                  "solution");
@@ -571,7 +570,7 @@ namespace Step36
         filename += ".vtk";
         std::ofstream output(filename.c_str());
 
-        DataOut<dim, hp::DoFHandler<dim>> data_out;
+        DataOut<dim, DoFHandler<dim>> data_out;
         data_out.attach_dof_handler(dof_handler);
         data_out.add_data_vector(fe_index, "fe_index");
         data_out.add_data_vector(estimated_error_per_cell, "estimated_error");

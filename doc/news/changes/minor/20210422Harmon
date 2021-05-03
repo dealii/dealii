@@ -1,0 +1,4 @@
+Bugfix: FE_Nedelec<2>::convert_generalized_support_point_values_to_dof_values() 
+now works correctly for every degree.
+<br>
+(Jake Harmon, 2021/04/22)

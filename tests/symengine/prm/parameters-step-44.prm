@@ -1,0 +1,76 @@
+# Listing of Parameters
+# ---------------------
+subsection Finite element system
+  # Displacement system polynomial order
+  set Polynomial degree = 1
+
+  # Gauss quadrature order
+  set Quadrature order  = 2
+end
+
+
+subsection Geometry
+  # Global refinement level
+  # Low refinement level because symbolic computations are (apparently) rather slow at the moment...
+  set Global refinement   = 1
+
+  # Global grid scaling factor
+  set Grid scale          = 1e-3
+
+  # Ratio of applied pressure to reference pressure
+  set Pressure ratio p/p0 = 100
+end
+
+
+subsection Linear solver
+  # Linear solver iterations (multiples of the system matrix size)
+  # In 2-d, this value is best set at 2. In 3-d, a value of 1 work fine.
+  set Max iteration multiplier = 2
+
+  # Linear solver residual (scaled by residual norm)
+  set Residual                 = 1e-6
+
+  # Use static condensation and solve a 1-block system, or solve
+  # the full 3-block system using Linear Operators and the Schur
+  # complement
+  set Use static condensation = true
+
+  # Preconditioner type
+  set Preconditioner type  = ssor
+
+  # Preconditioner relaxation value
+  set Preconditioner relaxation  = 0.65
+
+  # Type of solver used to solve the linear system
+  set Solver type              = CG
+end
+
+
+subsection Material properties
+  # Poisson's ratio
+  set Poisson's ratio = 0.4999
+
+  # Shear modulus
+  set Shear modulus   = 80.194e6
+end
+
+
+subsection Nonlinear solver
+  # Number of Newton-Raphson iterations allowed
+  set Max iterations Newton-Raphson = 10
+
+  # Displacement error tolerance
+  set Tolerance displacement        = 1.0e-6
+
+  # Force residual tolerance
+  set Tolerance force               = 1.0e-9
+end
+
+
+subsection Time
+  # End time
+  set End time       = 1
+
+  # Time step size
+  set Time step size = 0.1
+end

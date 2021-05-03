@@ -1,0 +1,4 @@
+Fixed: The function hp::Refinement::predict_error() produced incorrect
+results for p-coarsening.
+<br>
+(Marc Fehling, 2021/04/21)

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -36,7 +36,6 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
 
 
 template <int dim,
@@ -108,16 +107,16 @@ private:
     FEEvaluation<dim, fe_degree, n_q_points_1d, n_components, number> phi(
       data, 0, 0, start_vector_component);
 
-    const unsigned int n_vect = VectorizedArray<number>::n_array_elements;
+    const unsigned int n_vect = VectorizedArray<number>::size();
 
     for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
       {
         phi.reinit(cell);
         phi.read_dof_values(src);
-        phi.evaluate(true, false);
+        phi.evaluate(EvaluationFlags::values);
         for (unsigned int q = 0; q < phi.n_q_points; ++q)
           phi.submit_gradient(advection * phi.get_value(q), q);
-        phi.integrate(false, true);
+        phi.integrate(EvaluationFlags::gradients);
         for (unsigned int v = 0; v < n_vect; ++v)
           {
             std::bitset<n_vect> mask;
@@ -138,22 +137,22 @@ private:
       data, true, 0, 0, start_vector_component);
     FEFaceEvaluation<dim, fe_degree, n_q_points_1d, n_components, number> phi_p(
       data, false, 0, 0, start_vector_component);
-    typedef typename FEFaceEvaluation<dim,
-                                      fe_degree,
-                                      n_q_points_1d,
-                                      n_components,
-                                      number>::value_type value_type;
+    using value_type = typename FEFaceEvaluation<dim,
+                                                 fe_degree,
+                                                 n_q_points_1d,
+                                                 n_components,
+                                                 number>::value_type;
 
-    const unsigned int n_vect = VectorizedArray<number>::n_array_elements;
+    const unsigned int n_vect = VectorizedArray<number>::size();
 
     for (unsigned int face = face_range.first; face < face_range.second; face++)
       {
         phi_m.reinit(face);
         phi_m.read_dof_values(src);
-        phi_m.evaluate(true, false);
+        phi_m.evaluate(EvaluationFlags::values);
         phi_p.reinit(face);
         phi_p.read_dof_values(src);
-        phi_p.evaluate(true, false);
+        phi_p.evaluate(EvaluationFlags::values);
 
         for (unsigned int q = 0; q < phi_m.n_q_points; ++q)
           {
@@ -169,14 +168,14 @@ private:
             phi_p.submit_value(flux_times_normal, q);
           }
 
-        phi_m.integrate(true, false);
+        phi_m.integrate(EvaluationFlags::values);
         for (unsigned int v = 0; v < n_vect; ++v)
           {
             std::bitset<n_vect> mask;
             mask[v] = true;
             phi_m.distribute_local_to_global(dst, 0, mask);
           }
-        phi_p.integrate(true, false);
+        phi_p.integrate(EvaluationFlags::values);
         for (unsigned int v = 0; v < n_vect; ++v)
           {
             std::bitset<n_vect> mask;
@@ -194,20 +193,20 @@ private:
     const std::pair<unsigned int, unsigned int> &face_range) const
   {
     FEFaceEvaluation<dim, fe_degree, n_q_points_1d, n_components, number>
-                                                          fe_eval(data, true, 0, 0, start_vector_component);
-    typedef typename FEFaceEvaluation<dim,
-                                      fe_degree,
-                                      n_q_points_1d,
-                                      n_components,
-                                      number>::value_type value_type;
+      fe_eval(data, true, 0, 0, start_vector_component);
+    using value_type = typename FEFaceEvaluation<dim,
+                                                 fe_degree,
+                                                 n_q_points_1d,
+                                                 n_components,
+                                                 number>::value_type;
 
-    const unsigned int n_vect = VectorizedArray<number>::n_array_elements;
+    const unsigned int n_vect = VectorizedArray<number>::size();
 
     for (unsigned int face = face_range.first; face < face_range.second; face++)
       {
         fe_eval.reinit(face);
         fe_eval.read_dof_values(src);
-        fe_eval.evaluate(true, false);
+        fe_eval.evaluate(EvaluationFlags::values);
 
         for (unsigned int q = 0; q < fe_eval.n_q_points; ++q)
           {
@@ -222,11 +221,11 @@ private:
             fe_eval.submit_value(-flux_times_normal, q);
           }
 
-        fe_eval.integrate(true, false);
+        fe_eval.integrate(EvaluationFlags::values);
         for (unsigned int v = 0; v < n_vect; ++v)
           {
             std::bitset<n_vect> mask =
-              std::bitset<VectorizedArray<number>::n_array_elements>();
+              std::bitset<VectorizedArray<number>::size()>();
             mask[v] = true;
             fe_eval.distribute_local_to_global(dst, 0, mask);
           }

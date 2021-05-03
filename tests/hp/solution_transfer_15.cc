@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,6 +21,7 @@
 #include <deal.II/base/function.h>
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/dofs/dof_tools.h>
 
@@ -33,8 +34,6 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-
-#include <deal.II/hp/dof_handler.h>
 
 #include <deal.II/lac/trilinos_parallel_block_vector.h>
 
@@ -61,9 +60,9 @@ initialize_indexsets(IndexSet &             locally_owned_dofs,
   locally_relevant_dofs = DoFTools::locally_relevant_dofs_per_subdomain(
     dof_handler)[this_mpi_process];
 
-  const unsigned int                   n_blocks = block_component.size();
-  std::vector<types::global_dof_index> dofs_per_block(n_blocks);
-  DoFTools::count_dofs_per_block(dof_handler, dofs_per_block, block_component);
+  const unsigned int                         n_blocks = block_component.size();
+  const std::vector<types::global_dof_index> dofs_per_block =
+    DoFTools::count_dofs_per_fe_block(dof_handler, block_component);
 
   locally_owned_partitioning.clear();
   locally_relevant_partitioning.clear();
@@ -108,7 +107,7 @@ transfer(const MPI_Comm &mpi_communicator)
   fe.push_back(FESystem<dim>(FE_Q<dim>(2), 1, FE_Q<dim>(2), 1));
   const std::vector<unsigned int> block_component({0, 1});
 
-  hp::DoFHandler<dim> dof_handler(tria);
+  DoFHandler<dim> dof_handler(tria);
   dof_handler.begin(0)->child(0)->set_active_fe_index(1);
 
   TrilinosWrappers::MPI::BlockVector solution;
@@ -133,7 +132,7 @@ transfer(const MPI_Comm &mpi_communicator)
     if (locally_owned_dofs.is_element(i))
       solution(i) = i;
 
-  SolutionTransfer<dim, TrilinosWrappers::MPI::BlockVector, hp::DoFHandler<dim>>
+  SolutionTransfer<dim, TrilinosWrappers::MPI::BlockVector, DoFHandler<dim>>
     soltrans(dof_handler);
 
   typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(),

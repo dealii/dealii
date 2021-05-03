@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -76,14 +76,12 @@ test()
     deallog << "Particle number: " << particle_handler.n_global_particles()
             << std::endl;
 
-    for (auto particle = particle_handler.begin();
-         particle != particle_handler.end();
-         ++particle)
+    for (const auto &particle : particle_handler)
       {
-        deallog << "Particle location: " << particle->get_location()
+        deallog << "Particle location: " << particle.get_location()
                 << std::endl;
         deallog << "Particle reference location: "
-                << particle->get_reference_location() << std::endl;
+                << particle.get_reference_location() << std::endl;
       }
   }
 

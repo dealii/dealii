@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,13 +16,14 @@
 
 #include <deal.II/base/polynomials_bernardi_raugel.h>
 
+#include <memory>
+
 DEAL_II_NAMESPACE_OPEN
 
 
 template <int dim>
 PolynomialsBernardiRaugel<dim>::PolynomialsBernardiRaugel(const unsigned int k)
-  : my_degree(k)
-  , n_pols(compute_n_pols(k))
+  : TensorPolynomialsBase<dim>(k + 1, n_polynomials(k))
   , polynomial_space_Q(create_polynomials_Q())
   , polynomial_space_bubble(create_polynomials_bubble())
 {}
@@ -67,7 +68,7 @@ PolynomialsBernardiRaugel<dim>::create_polynomials_Q()
 
 template <int dim>
 void
-PolynomialsBernardiRaugel<dim>::compute(
+PolynomialsBernardiRaugel<dim>::evaluate(
   const Point<dim> &           unit_point,
   std::vector<Tensor<1, dim>> &values,
   std::vector<Tensor<2, dim>> &grads,
@@ -75,16 +76,17 @@ PolynomialsBernardiRaugel<dim>::compute(
   std::vector<Tensor<4, dim>> &third_derivatives,
   std::vector<Tensor<5, dim>> &fourth_derivatives) const
 {
-  Assert(values.size() == n_pols || values.size() == 0,
-         ExcDimensionMismatch(values.size(), n_pols));
-  Assert(grads.size() == n_pols || grads.size() == 0,
-         ExcDimensionMismatch(grads.size(), n_pols));
-  Assert(grad_grads.size() == n_pols || grad_grads.size() == 0,
-         ExcDimensionMismatch(grad_grads.size(), n_pols));
-  Assert(third_derivatives.size() == n_pols || third_derivatives.size() == 0,
-         ExcDimensionMismatch(third_derivatives.size(), n_pols));
-  Assert(fourth_derivatives.size() == n_pols || fourth_derivatives.size() == 0,
-         ExcDimensionMismatch(fourth_derivatives.size(), n_pols));
+  Assert(values.size() == this->n() || values.size() == 0,
+         ExcDimensionMismatch(values.size(), this->n()));
+  Assert(grads.size() == this->n() || grads.size() == 0,
+         ExcDimensionMismatch(grads.size(), this->n()));
+  Assert(grad_grads.size() == this->n() || grad_grads.size() == 0,
+         ExcDimensionMismatch(grad_grads.size(), this->n()));
+  Assert(third_derivatives.size() == this->n() || third_derivatives.size() == 0,
+         ExcDimensionMismatch(third_derivatives.size(), this->n()));
+  Assert(fourth_derivatives.size() == this->n() ||
+           fourth_derivatives.size() == 0,
+         ExcDimensionMismatch(fourth_derivatives.size(), this->n()));
 
   std::vector<double>         Q_values;
   std::vector<Tensor<1, dim>> Q_grads;
@@ -119,7 +121,7 @@ PolynomialsBernardiRaugel<dim>::compute(
   // Normal vectors point in the +x, +y, and +z directions for
   // consistent orientation across edges
   std::vector<Tensor<1, dim>> normals;
-  for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+  for (unsigned int i : GeometryInfo<dim>::face_indices())
     {
       Tensor<1, dim> normal;
       normal[i / 2] = 1;
@@ -136,7 +138,7 @@ PolynomialsBernardiRaugel<dim>::compute(
     }
 
   // set indices for the anisotropic polynomials to find
-  // them after polynomial_space_bubble.compute is called
+  // them after polynomial_space_bubble.evaluate is called
   std::vector<int> aniso_indices;
   if (dim == 2)
     {
@@ -155,18 +157,18 @@ PolynomialsBernardiRaugel<dim>::compute(
       aniso_indices.push_back(17);
     }
 
-  polynomial_space_bubble.compute(unit_point,
-                                  bubble_values,
-                                  bubble_grads,
-                                  bubble_grad_grads,
-                                  bubble_third_derivatives,
-                                  bubble_fourth_derivatives);
-  polynomial_space_Q.compute(unit_point,
-                             Q_values,
-                             Q_grads,
-                             Q_grad_grads,
-                             Q_third_derivatives,
-                             Q_fourth_derivatives);
+  polynomial_space_bubble.evaluate(unit_point,
+                                   bubble_values,
+                                   bubble_grads,
+                                   bubble_grad_grads,
+                                   bubble_third_derivatives,
+                                   bubble_fourth_derivatives);
+  polynomial_space_Q.evaluate(unit_point,
+                              Q_values,
+                              Q_grads,
+                              Q_grad_grads,
+                              Q_third_derivatives,
+                              Q_fourth_derivatives);
 
   // first dim*vertices_per_cell functions are Q_1^2 functions
   for (unsigned int i = 0; i < dim * GeometryInfo<dim>::vertices_per_cell; ++i)
@@ -235,7 +237,7 @@ PolynomialsBernardiRaugel<dim>::compute(
 
 template <int dim>
 unsigned int
-PolynomialsBernardiRaugel<dim>::compute_n_pols(const unsigned int k)
+PolynomialsBernardiRaugel<dim>::n_polynomials(const unsigned int k)
 {
   (void)k;
   Assert(k == 1, ExcNotImplemented());
@@ -246,6 +248,14 @@ PolynomialsBernardiRaugel<dim>::compute_n_pols(const unsigned int k)
 
   Assert(false, ExcNotImplemented());
   return 0;
+}
+
+
+template <int dim>
+std::unique_ptr<TensorPolynomialsBase<dim>>
+PolynomialsBernardiRaugel<dim>::clone() const
+{
+  return std::make_unique<PolynomialsBernardiRaugel<dim>>(*this);
 }
 
 template class PolynomialsBernardiRaugel<1>; // to prevent errors

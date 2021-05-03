@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,11 +17,14 @@
 #ifndef dealii_polynomials_bernardi_raugel_h
 #define dealii_polynomials_bernardi_raugel_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/polynomial.h>
 #include <deal.II/base/polynomial_space.h>
 #include <deal.II/base/tensor.h>
+#include <deal.II/base/tensor_polynomials_base.h>
 #include <deal.II/base/tensor_product_polynomials.h>
 
 #include <vector>
@@ -77,46 +80,29 @@ DEAL_II_NAMESPACE_OPEN
  *
  *
  * @ingroup Polynomials
- * @author Graham Harper
- * @date 2018
  */
 template <int dim>
-class PolynomialsBernardiRaugel
+class PolynomialsBernardiRaugel : public TensorPolynomialsBase<dim>
 {
 public:
   /**
    * Constructor. Creates all basis functions for Bernardi-Raugel polynomials
    * of given degree.
    *
-   * @arg k: the degree of the Bernardi-Raugel-space, which is currently
-   * limited to the case <tt>k=1</tt>
+   * @arg k The degree of the Bernardi-Raugel-space, which is currently
+   * limited to the case <tt>k=1</tt>.
    */
   PolynomialsBernardiRaugel(const unsigned int k);
-
-  /**
-   * Return the number of Bernardi-Raugel polynomials.
-   */
-  unsigned int
-  n() const;
-
-
-  /**
-   * Return the degree of Bernardi-Raugel polynomials.
-   * Since the bubble functions are quadratic in at least one variable,
-   * the degree of the Bernardi-Raugel polynomials is two.
-   */
-  unsigned int
-  degree() const;
 
   /**
    * Return the name of the space, which is <tt>BernardiRaugel</tt>.
    */
   std::string
-  name() const;
+  name() const override;
 
   /**
-   * Compute the value and derivatives of each Bernardi-
-   * Raugel polynomial at @p unit_point.
+   * Compute the value and derivatives of each Bernardi-Raugel
+   * polynomial at @p unit_point.
    *
    * The size of the vectors must either be zero or equal <tt>n()</tt>.  In
    * the first case, the function will not compute these values.
@@ -127,12 +113,12 @@ public:
    * in a loop over all tensor product polynomials.
    */
   void
-  compute(const Point<dim> &           unit_point,
-          std::vector<Tensor<1, dim>> &values,
-          std::vector<Tensor<2, dim>> &grads,
-          std::vector<Tensor<3, dim>> &grad_grads,
-          std::vector<Tensor<4, dim>> &third_derivatives,
-          std::vector<Tensor<5, dim>> &fourth_derivatives) const;
+  evaluate(const Point<dim> &           unit_point,
+           std::vector<Tensor<1, dim>> &values,
+           std::vector<Tensor<2, dim>> &grads,
+           std::vector<Tensor<3, dim>> &grad_grads,
+           std::vector<Tensor<4, dim>> &third_derivatives,
+           std::vector<Tensor<5, dim>> &fourth_derivatives) const override;
 
   /**
    * Return the number of polynomials in the space <tt>BR(degree)</tt> without
@@ -140,19 +126,15 @@ public:
    * required by the FiniteElement classes.
    */
   static unsigned int
-  compute_n_pols(const unsigned int k);
+  n_polynomials(const unsigned int k);
+
+  /**
+   * @copydoc TensorPolynomialsBase::clone()
+   */
+  virtual std::unique_ptr<TensorPolynomialsBase<dim>>
+  clone() const override;
 
 private:
-  /**
-   * The degree of this object given to the constructor (must be 1).
-   */
-  const unsigned int my_degree;
-
-  /**
-   * The number of Bernardi-Raugel polynomials.
-   */
-  const unsigned int n_pols;
-
   /**
    * An object representing the polynomial space of Q
    * functions which forms the <tt>BR</tt> polynomials through
@@ -182,24 +164,6 @@ private:
   static std::vector<std::vector<Polynomials::Polynomial<double>>>
   create_polynomials_bubble();
 };
-
-
-template <int dim>
-inline unsigned int
-PolynomialsBernardiRaugel<dim>::n() const
-{
-  return n_pols;
-}
-
-
-
-template <int dim>
-inline unsigned int
-PolynomialsBernardiRaugel<dim>::degree() const
-{
-  return 2;
-}
-
 
 
 template <int dim>

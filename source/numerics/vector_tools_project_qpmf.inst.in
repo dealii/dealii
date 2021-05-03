@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,10 +19,11 @@ for (VEC : REAL_NONBLOCK_VECTORS; deal_II_dimension : DIMENSIONS)
   {
     namespace VectorTools
     \{
-
       template void
       project<deal_II_dimension, VEC>(
-        std::shared_ptr<const MatrixFree<deal_II_dimension, VEC::value_type>>
+        std::shared_ptr<const MatrixFree<deal_II_dimension,
+                                         VEC::value_type,
+                                         VectorizedArray<VEC::value_type>>>
                                                   matrix_free,
         const AffineConstraints<VEC::value_type> &constraints,
         const std::function<VectorizedArray<
@@ -32,7 +33,9 @@ for (VEC : REAL_NONBLOCK_VECTORS; deal_II_dimension : DIMENSIONS)
 
       template void
       project<deal_II_dimension, VEC>(
-        std::shared_ptr<const MatrixFree<deal_II_dimension, VEC::value_type>>
+        std::shared_ptr<const MatrixFree<deal_II_dimension,
+                                         VEC::value_type,
+                                         VectorizedArray<VEC::value_type>>>
                                                   matrix_free,
         const AffineConstraints<VEC::value_type> &constraints,
         const unsigned int,
@@ -40,6 +43,7 @@ for (VEC : REAL_NONBLOCK_VECTORS; deal_II_dimension : DIMENSIONS)
           VEC::value_type>(const unsigned int, const unsigned int)> &,
         VEC &,
         const unsigned int);
+
 
     \}
   }

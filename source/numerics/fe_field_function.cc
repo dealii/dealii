@@ -33,9 +33,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-namespace Functions
-{
+
 #include "fe_field_function.inst"
-}
+
 
 DEAL_II_NAMESPACE_CLOSE

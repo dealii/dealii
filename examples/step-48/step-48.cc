@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2011 - 2019 by the deal.II authors
+ * Copyright (C) 2011 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -132,12 +132,12 @@ namespace Step48
         fe_eval.reinit(cell);
         for (unsigned int q = 0; q < n_q_points; ++q)
           fe_eval.submit_value(make_vectorized_array(1.), q);
-        fe_eval.integrate(true, false);
+        fe_eval.integrate(EvaluationFlags::values);
         fe_eval.distribute_local_to_global(inv_mass_matrix);
       }
 
     inv_mass_matrix.compress(VectorOperation::add);
-    for (unsigned int k = 0; k < inv_mass_matrix.local_size(); ++k)
+    for (unsigned int k = 0; k < inv_mass_matrix.locally_owned_size(); ++k)
       if (inv_mass_matrix.local_element(k) > 1e-15)
         inv_mass_matrix.local_element(k) =
           1. / inv_mass_matrix.local_element(k);
@@ -198,8 +198,8 @@ namespace Step48
         current.read_dof_values(*src[0]);
         old.read_dof_values(*src[1]);
 
-        current.evaluate(true, true, false);
-        old.evaluate(true, false, false);
+        current.evaluate(EvaluationFlags::values | EvaluationFlags::gradients);
+        old.evaluate(EvaluationFlags::values);
 
         for (unsigned int q = 0; q < current.n_q_points; ++q)
           {
@@ -212,7 +212,7 @@ namespace Step48
             current.submit_gradient(-delta_t_sqr * current.get_gradient(q), q);
           }
 
-        current.integrate(true, true);
+        current.integrate(EvaluationFlags::values | EvaluationFlags::gradients);
         current.distribute_local_to_global(dst);
       }
   }
@@ -308,8 +308,11 @@ namespace Step48
 #else
     Triangulation<dim> triangulation;
 #endif
-    FE_Q<dim>                 fe;
-    DoFHandler<dim>           dof_handler;
+    FE_Q<dim>       fe;
+    DoFHandler<dim> dof_handler;
+
+    MappingQ1<dim> mapping;
+
     AffineConstraints<double> constraints;
     IndexSet                  locally_relevant_dofs;
 
@@ -434,7 +437,8 @@ namespace Step48
     additional_data.tasks_parallel_scheme =
       MatrixFree<dim>::AdditionalData::TasksParallelScheme::partition_partition;
 
-    matrix_free_data.reinit(dof_handler,
+    matrix_free_data.reinit(mapping,
+                            dof_handler,
                             constraints,
                             QGaussLobatto<1>(fe_degree + 1),
                             additional_data);
@@ -460,11 +464,11 @@ namespace Step48
   // data that is needed in the VectorTools::integrate_difference() function
   // as well as in DataOut. The only action to take at this point is to make
   // sure that the vector updates its ghost values before we read from
-  // them. This is a feature present only in the
-  // LinearAlgebra::distributed::Vector class. Distributed vectors with PETSc
-  // and Trilinos, on the other hand, need to be copied to special vectors
-  // including ghost values (see the relevant section in step-40). If we also
-  // wanted to access all degrees of freedom on ghost cells (e.g. when
+  // them, and to reset ghost values once done. This is a feature present only
+  // in the LinearAlgebra::distributed::Vector class. Distributed vectors with
+  // PETSc and Trilinos, on the other hand, need to be copied to special
+  // vectors including ghost values (see the relevant section in step-40). If
+  // we also wanted to access all degrees of freedom on ghost cells (e.g. when
   // computing error estimators that use the jump of solution over cell
   // boundaries), we would need more information and create a vector
   // initialized with locally relevant dofs just as in step-40. Observe also
@@ -479,7 +483,8 @@ namespace Step48
 
     Vector<float> norm_per_cell(triangulation.n_active_cells());
     solution.update_ghost_values();
-    VectorTools::integrate_difference(dof_handler,
+    VectorTools::integrate_difference(mapping,
+                                      dof_handler,
                                       solution,
                                       Functions::ZeroFunction<dim>(),
                                       norm_per_cell,
@@ -498,31 +503,12 @@ namespace Step48
 
     data_out.attach_dof_handler(dof_handler);
     data_out.add_data_vector(solution, "solution");
-    data_out.build_patches();
+    data_out.build_patches(mapping);
 
-    const std::string filename =
-      "solution-" + Utilities::int_to_string(timestep_number, 3);
+    data_out.write_vtu_with_pvtu_record(
+      "./", "solution", timestep_number, MPI_COMM_WORLD, 3);
 
-    std::ofstream output(
-      filename + "." +
-      Utilities::int_to_string(Utilities::MPI::this_mpi_process(MPI_COMM_WORLD),
-                               4) +
-      ".vtu");
-    data_out.write_vtu(output);
-
-    if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
-      {
-        std::vector<std::string> filenames;
-        for (unsigned int i = 0;
-             i < Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
-             ++i)
-          filenames.push_back("solution-" +
-                              Utilities::int_to_string(timestep_number, 3) +
-                              "." + Utilities::int_to_string(i, 4) + ".vtu");
-
-        std::ofstream master_output((filename + ".pvtu"));
-        data_out.write_pvtu_record(master_output, filenames);
-      }
+    solution.zero_out_ghost_values();
   }
 
 
@@ -550,13 +536,11 @@ namespace Step48
             << Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD) << std::endl;
       pcout << "Number of threads on each rank: "
             << MultithreadInfo::n_threads() << std::endl;
-      const unsigned int n_vect_doubles =
-        VectorizedArray<double>::n_array_elements;
-      const unsigned int n_vect_bits = 8 * sizeof(double) * n_vect_doubles;
+      const unsigned int n_vect_doubles = VectorizedArray<double>::size();
+      const unsigned int n_vect_bits    = 8 * sizeof(double) * n_vect_doubles;
       pcout << "Vectorization over " << n_vect_doubles
             << " doubles = " << n_vect_bits << " bits ("
-            << Utilities::System::get_current_vectorization_level()
-            << "), VECTORIZATION_LEVEL=" << DEAL_II_COMPILER_VECTORIZATION_LEVEL
+            << Utilities::System::get_current_vectorization_level() << ")"
             << std::endl
             << std::endl;
     }
@@ -584,10 +568,12 @@ namespace Step48
     // get later consumed by the SineGordonOperation::apply() function. Next,
     // an instance of the <code> SineGordonOperation class </code> based on
     // the finite element degree specified at the top of this file is set up.
-    VectorTools::interpolate(dof_handler,
+    VectorTools::interpolate(mapping,
+                             dof_handler,
                              InitialCondition<dim>(1, time),
                              solution);
-    VectorTools::interpolate(dof_handler,
+    VectorTools::interpolate(mapping,
+                             dof_handler,
                              InitialCondition<dim>(1, time - time_step),
                              old_solution);
     output_results(0);

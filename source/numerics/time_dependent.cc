@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2019 by the deal.II authors
+// Copyright (C) 1999 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,7 +15,6 @@
 
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/parallel.h>
-#include <deal.II/base/thread_management.h>
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/grid/grid_refinement.h>
@@ -169,33 +168,33 @@ TimeDependent::delete_timestep(const unsigned int position)
 void
 TimeDependent::solve_primal_problem()
 {
-  do_loop(std::bind(&TimeStepBase::init_for_primal_problem,
-                    std::placeholders::_1),
-          std::bind(&TimeStepBase::solve_primal_problem, std::placeholders::_1),
-          timestepping_data_primal,
-          forward);
+  do_loop(
+    [](TimeStepBase *const time_step) { time_step->init_for_primal_problem(); },
+    [](TimeStepBase *const time_step) { time_step->solve_primal_problem(); },
+    timestepping_data_primal,
+    forward);
 }
 
 
 void
 TimeDependent::solve_dual_problem()
 {
-  do_loop(std::bind(&TimeStepBase::init_for_dual_problem,
-                    std::placeholders::_1),
-          std::bind(&TimeStepBase::solve_dual_problem, std::placeholders::_1),
-          timestepping_data_dual,
-          backward);
+  do_loop(
+    [](TimeStepBase *const time_step) { time_step->init_for_dual_problem(); },
+    [](TimeStepBase *const time_step) { time_step->init_for_dual_problem(); },
+    timestepping_data_dual,
+    backward);
 }
 
 
 void
 TimeDependent::postprocess()
 {
-  do_loop(std::bind(&TimeStepBase::init_for_postprocessing,
-                    std::placeholders::_1),
-          std::bind(&TimeStepBase::postprocess_timestep, std::placeholders::_1),
-          timestepping_data_postprocess,
-          forward);
+  do_loop(
+    [](TimeStepBase *const time_step) { time_step->init_for_postprocessing(); },
+    [](TimeStepBase *const time_step) { time_step->postprocess_timestep(); },
+    timestepping_data_postprocess,
+    forward);
 }
 
 
@@ -227,13 +226,13 @@ TimeDependent::start_sweep(const unsigned int s)
 void
 TimeDependent::end_sweep()
 {
-  void (TimeDependent::*p)(const unsigned int, const unsigned int) =
-    &TimeDependent::end_sweep;
-  parallel::apply_to_subranges(
-    0U,
-    timesteps.size(),
-    std::bind(p, this, std::placeholders::_1, std::placeholders::_2),
-    1);
+  parallel::apply_to_subranges(0U,
+                               timesteps.size(),
+                               [this](const unsigned int begin,
+                                      const unsigned int end) {
+                                 this->end_sweep(begin, end);
+                               },
+                               1);
 }
 
 
@@ -433,6 +432,7 @@ TimeStepBase_Tria<dim>::TimeStepBase_Tria()
 
 
 
+#ifndef DOXYGEN
 template <int dim>
 TimeStepBase_Tria<dim>::TimeStepBase_Tria(
   const double              time,
@@ -445,6 +445,7 @@ TimeStepBase_Tria<dim>::TimeStepBase_Tria(
   , flags(flags)
   , refinement_flags(refinement_flags)
 {}
+#endif
 
 
 
@@ -536,12 +537,10 @@ TimeStepBase_Tria<dim>::restore_grid()
 
       // limit refinement depth if the user
       // desired so
-      //       if (flags.max_refinement_level != 0)
+      //    if (flags.max_refinement_level != 0)
       //      {
       //        typename Triangulation<dim>::active_cell_iterator cell, endc;
-      //        for (cell = tria->begin_active(),
-      //             endc = tria->end();
-      //             cell!=endc; ++cell)
+      //        for (const auto &cell : tria->active_cell_iterators())
       //          if (static_cast<unsigned int>(cell->level()) >=
       //              flags.max_refinement_level)
       //            cell->clear_refine_flag();
@@ -584,9 +583,9 @@ namespace
     // no problem at all, if it is on a lower
     // level than the present one, then it
     // will be refined below anyway.
-    if (new_cell->active())
+    if (new_cell->is_active())
       {
-        if (new_cell->refine_flag_set() && old_cell->active())
+        if (new_cell->refine_flag_set() && old_cell->is_active())
           {
             if (old_cell->coarsen_flag_set())
               old_cell->clear_coarsen_flag();
@@ -817,7 +816,7 @@ TimeStepBase_Tria<dim>::refine_grid(const RefinementData refinement_data)
   // refinement; in this case it often
   // happens that the number of cells
   // does not grow between sweeps, which
-  // clearly is not the wanted behaviour)
+  // clearly is not the wanted behavior)
   //
   // however, if we do not do anything, we
   // can get into trouble somewhen later.

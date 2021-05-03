@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2018 by the deal.II authors
+// Copyright (C) 2010 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -18,16 +18,17 @@
 #include <deal.II/base/polynomials_bdm.h>
 #include <deal.II/base/polynomials_nedelec.h>
 #include <deal.II/base/polynomials_raviart_thomas.h>
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/fe/fe_dg_vector.templates.h>
+
+#include <memory>
 
 
 DEAL_II_NAMESPACE_OPEN
 
 template <int dim, int spacedim>
 FE_DGNedelec<dim, spacedim>::FE_DGNedelec(const unsigned int p)
-  : FE_DGVector<PolynomialsNedelec<dim>, dim, spacedim>(p, mapping_nedelec)
+  : FE_DGVector<PolynomialsNedelec<dim>, dim, spacedim>(p, {mapping_nedelec})
 {}
 
 
@@ -52,7 +53,7 @@ template <int dim, int spacedim>
 FE_DGRaviartThomas<dim, spacedim>::FE_DGRaviartThomas(const unsigned int p)
   : FE_DGVector<PolynomialsRaviartThomas<dim>, dim, spacedim>(
       p,
-      mapping_raviart_thomas)
+      {mapping_raviart_thomas})
 {}
 
 
@@ -77,7 +78,7 @@ FE_DGRaviartThomas<dim, spacedim>::get_name() const
 
 template <int dim, int spacedim>
 FE_DGBDM<dim, spacedim>::FE_DGBDM(const unsigned int p)
-  : FE_DGVector<PolynomialsBDM<dim>, dim, spacedim>(p, mapping_bdm)
+  : FE_DGVector<PolynomialsBDM<dim>, dim, spacedim>(p, {mapping_bdm})
 {}
 
 

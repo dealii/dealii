@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2018 by the deal.II authors
+// Copyright (C) 2002 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -34,8 +34,11 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declaration
+#ifndef DOXYGEN
 template <typename Number>
 class BlockVector;
+#endif
 
 /*! @addtogroup Matrix1
  *@{
@@ -52,7 +55,6 @@ class BlockVector;
  *
  * @see
  * @ref GlossBlockLA "Block (linear algebra)"
- * @author Guido Kanschat, 2002, 2003
  */
 template <typename Number>
 class BlockSparseMatrixEZ : public Subscriptor
@@ -288,8 +290,8 @@ inline SparseMatrixEZ<Number> &
 BlockSparseMatrixEZ<Number>::block(const unsigned int row,
                                    const unsigned int column)
 {
-  Assert(row < n_block_rows(), ExcIndexRange(row, 0, n_block_rows()));
-  Assert(column < n_block_cols(), ExcIndexRange(column, 0, n_block_cols()));
+  AssertIndexRange(row, n_block_rows());
+  AssertIndexRange(column, n_block_cols());
 
   return blocks[row][column];
 }
@@ -301,8 +303,8 @@ inline const SparseMatrixEZ<Number> &
 BlockSparseMatrixEZ<Number>::block(const unsigned int row,
                                    const unsigned int column) const
 {
-  Assert(row < n_block_rows(), ExcIndexRange(row, 0, n_block_rows()));
-  Assert(column < n_block_cols(), ExcIndexRange(column, 0, n_block_cols()));
+  AssertIndexRange(row, n_block_rows());
+  AssertIndexRange(column, n_block_cols());
 
   return blocks[row][column];
 }

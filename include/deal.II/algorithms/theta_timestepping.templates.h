@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,6 +16,8 @@
 #ifndef dealii_theta_timestepping_templates_h
 #define dealii_theta_timestepping_templates_h
 
+
+#include <deal.II/base/config.h>
 
 #include <deal.II/algorithms/theta_timestepping.h>
 
@@ -58,7 +60,7 @@ namespace Algorithms
   {
     param.enter_subsection("ThetaTimestepping");
     TimestepControl::declare_parameters(param);
-    param.declare_entry("Theta", ".5", Patterns::Double());
+    param.declare_entry("Theta", ".5", Patterns::Double(0., 1.));
     param.declare_entry("Adaptive", "false", Patterns::Bool());
     param.leave_subsection();
   }

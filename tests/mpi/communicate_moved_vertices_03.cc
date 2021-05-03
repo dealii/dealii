@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -49,9 +49,7 @@ test()
   std::map<unsigned int, Point<dim>> non_artificial_vertices_old;
   for (cell = triangulation.begin_active(); cell != endc; ++cell)
     if (!cell->is_artificial())
-      for (unsigned int vertex_no = 0;
-           vertex_no < GeometryInfo<dim>::vertices_per_cell;
-           ++vertex_no)
+      for (const unsigned int vertex_no : GeometryInfo<dim>::vertex_indices())
         non_artificial_vertices_old[cell->vertex_index(vertex_no)] =
           cell->vertex(vertex_no);
 
@@ -60,9 +58,7 @@ test()
     GridTools::get_locally_owned_vertices(triangulation);
   for (cell = triangulation.begin_active(); cell != endc; ++cell)
     if (cell->is_locally_owned())
-      for (unsigned int vertex_no = 0;
-           vertex_no < GeometryInfo<dim>::vertices_per_cell;
-           ++vertex_no)
+      for (const unsigned int vertex_no : GeometryInfo<dim>::vertex_indices())
         {
           const unsigned global_vertex_no = cell->vertex_index(vertex_no);
           if (!vertex_moved[global_vertex_no] &&
@@ -78,9 +74,7 @@ test()
   std::map<unsigned int, Point<dim>> non_artificial_vertices_new;
   for (cell = triangulation.begin_active(); cell != endc; ++cell)
     if (!cell->is_artificial())
-      for (unsigned int vertex_no = 0;
-           vertex_no < GeometryInfo<dim>::vertices_per_cell;
-           ++vertex_no)
+      for (const unsigned int vertex_no : GeometryInfo<dim>::vertex_indices())
         {
           Point<dim> point = cell->vertex(vertex_no);
           point(0) -= 1.e-1;

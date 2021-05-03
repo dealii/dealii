@@ -94,7 +94,7 @@ program, but a more systematic treatment is also given in step-52.
 
 If you look at the meshes in the movie above, it is clear that they are not
 particularly well suited to the task at hand. In fact, they look rather
-random. 
+random.
 
 There are two factors at play. First, there are some islands where cells
 have been refined but that are surrounded by non-refined cells (and there
@@ -103,12 +103,12 @@ as they most of the time do not affect the approximation quality of the mesh,
 but they also don't help because so many of their additional degrees of
 freedom are in fact constrained by hanging node constraints. That said,
 this is easy to fix: the Triangulation class takes an argument to its
-constructor indicating a level of "mesh smoothing". Passing one of many 
-possible flags, this instructs the triangulation to refine some additional 
-cells, or not to refine some cells, so that the resulting mesh does not have 
+constructor indicating a level of "mesh smoothing". Passing one of many
+possible flags, this instructs the triangulation to refine some additional
+cells, or not to refine some cells, so that the resulting mesh does not have
 these artifacts.
 
-The second problem is more severe: the mesh appears to lag the solution. 
+The second problem is more severe: the mesh appears to lag the solution.
 The underlying reason is that we only adapt the mesh once every fifth
 time step, and only allow for a single refinement in these cases. Whenever a
 source switches on, the solution had been very smooth in this area before and
@@ -145,7 +145,7 @@ for which either the matrix $A$ or matrix $B$ has a nonzero entry at position
 $(i,j)$). If all coefficients
 fulfill the following conditions:
 @f{align*}
-  a_{ii} &> 0, & b_{ii} &\leq 0, & a_{ij} &\leq 0, & b_{ij} &\geq 0,
+  a_{ii} &> 0, & b_{ii} &\geq 0, & a_{ij} &\leq 0, & b_{ij} &\geq 0,
   &
   \forall j &\in S_i,
 @f}
@@ -201,13 +201,13 @@ double mass_matrix_min_diag    = std::numeric_limits<double>::max(),
 
 SparseMatrixIterators::Iterator<double,true> row_it (&mass_matrix, 0);
 
-for(unsigned int m = 0; m<num_rows; ++m) 
+for(unsigned int m = 0; m<num_rows; ++m)
 {
   // check the diagonal element
   row_it = mass_matrix.begin(m);
   mass_matrix_min_diag = std::min(row_it->value(), mass_matrix_min_diag);
   ++row_it;
-  
+
   // check the off-diagonal elements
   for(; row_it != mass_matrix.end(m); ++row_it)
     mass_matrix_max_offdiag = std::max(row_it->value(), mass_matrix_max_offdiag);

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -27,6 +27,11 @@ test()
   deallog << Utilities::int_to_string(42, 4) << std::endl;
   deallog << Utilities::int_to_string(42) << std::endl;
   deallog << Utilities::needed_digits(424) << std::endl;
+  deallog << Utilities::needed_digits(0) << std::endl;
+  deallog << Utilities::needed_digits(1) << std::endl;
+  deallog << Utilities::needed_digits(2) << std::endl;
+  deallog << Utilities::needed_digits(10) << std::endl;
+  deallog << Utilities::needed_digits(1000000000) << std::endl;
   deallog << Utilities::string_to_int(" 413 ") << std::endl;
 
   std::vector<std::string> v;

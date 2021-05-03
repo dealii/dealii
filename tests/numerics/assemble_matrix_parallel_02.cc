@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -26,6 +26,7 @@
 #include <deal.II/base/work_stream.h>
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
@@ -36,7 +37,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_values.h>
 
 #include <deal.II/lac/affine_constraints.h>
@@ -56,7 +56,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 
 namespace Assembly
@@ -136,19 +135,19 @@ private:
   postprocess();
 
   void
-  local_assemble(const typename hp::DoFHandler<dim>::active_cell_iterator &cell,
-                 Assembly::Scratch::Data<dim> &scratch,
-                 Assembly::Copy::Data &        data);
+  local_assemble(const typename DoFHandler<dim>::active_cell_iterator &cell,
+                 Assembly::Scratch::Data<dim> &                        scratch,
+                 Assembly::Copy::Data &                                data);
   void
   copy_local_to_global(const Assembly::Copy::Data &data);
 
   std::vector<types::global_dof_index>
   get_conflict_indices(
-    typename hp::DoFHandler<dim>::active_cell_iterator const &cell) const;
+    typename DoFHandler<dim>::active_cell_iterator const &cell) const;
 
   Triangulation<dim> triangulation;
 
-  hp::DoFHandler<dim>      dof_handler;
+  DoFHandler<dim>          dof_handler;
   hp::FECollection<dim>    fe_collection;
   hp::QCollection<dim>     quadrature_collection;
   hp::QCollection<dim - 1> face_quadrature_collection;
@@ -165,7 +164,7 @@ private:
   Vector<double> test_rhs;
   Vector<double> test_rhs_2;
 
-  std::vector<std::vector<typename hp::DoFHandler<dim>::active_cell_iterator>>
+  std::vector<std::vector<typename DoFHandler<dim>::active_cell_iterator>>
     graph;
 
   const unsigned int max_degree;
@@ -256,7 +255,7 @@ LaplaceProblem<dim>::~LaplaceProblem()
 template <int dim>
 std::vector<types::global_dof_index>
 LaplaceProblem<dim>::get_conflict_indices(
-  typename hp::DoFHandler<dim>::active_cell_iterator const &cell) const
+  typename DoFHandler<dim>::active_cell_iterator const &cell) const
 {
   std::vector<types::global_dof_index> local_dof_indices(
     cell->get_fe().dofs_per_cell);
@@ -297,7 +296,7 @@ LaplaceProblem<dim>::setup_system()
     dof_handler.begin_active(),
     dof_handler.end(),
     static_cast<std::function<std::vector<types::global_dof_index>(
-      typename hp::DoFHandler<dim>::active_cell_iterator const &)>>(
+      typename DoFHandler<dim>::active_cell_iterator const &)>>(
       std::bind(&LaplaceProblem<dim>::get_conflict_indices,
                 this,
                 std::placeholders::_1)));
@@ -317,9 +316,9 @@ LaplaceProblem<dim>::setup_system()
 template <int dim>
 void
 LaplaceProblem<dim>::local_assemble(
-  const typename hp::DoFHandler<dim>::active_cell_iterator &cell,
-  Assembly::Scratch::Data<dim> &                            scratch,
-  Assembly::Copy::Data &                                    data)
+  const typename DoFHandler<dim>::active_cell_iterator &cell,
+  Assembly::Scratch::Data<dim> &                        scratch,
+  Assembly::Copy::Data &                                data)
 {
   const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
 
@@ -391,8 +390,9 @@ LaplaceProblem<dim>::assemble_reference()
                                              quadrature_collection);
 
   for (unsigned int color = 0; color < graph.size(); ++color)
-    for (typename std::vector<typename hp::DoFHandler<
-           dim>::active_cell_iterator>::const_iterator p = graph[color].begin();
+    for (typename std::vector<
+           typename DoFHandler<dim>::active_cell_iterator>::const_iterator p =
+           graph[color].begin();
          p != graph[color].end();
          ++p)
       {
@@ -494,7 +494,7 @@ LaplaceProblem<dim>::postprocess()
                                                   0.03);
   triangulation.execute_coarsening_and_refinement();
 
-  for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
+  for (typename DoFHandler<dim>::active_cell_iterator cell =
          dof_handler.begin_active();
        cell != dof_handler.end();
        ++cell)

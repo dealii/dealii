@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2018 by the deal.II authors
+// Copyright (C) 2011 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -63,14 +63,11 @@ main(int argc, char **argv)
   xsparsity.add(2, 1);
   xsparsity.compress();
 
-
   // now copy everything into a Trilinos matrix
-  Epetra_Map                     map(TrilinosWrappers::types::int_type(5),
-                 5,
-                 0,
-                 Utilities::Trilinos::comm_world());
+  const auto                     local_rows = complete_index_set(5);
   TrilinosWrappers::SparseMatrix tmatrix;
-  tmatrix.reinit(map, map, matrix, 0, true, &xsparsity);
+  tmatrix.reinit(
+    local_rows, local_rows, matrix, MPI_COMM_SELF, 0, true, &xsparsity);
 
   deallog << "Copy structure only:" << std::endl;
   tmatrix.print(deallog.get_file_stream());

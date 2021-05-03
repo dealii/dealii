@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2019 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,7 +22,6 @@
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/geometry_info.h>
-#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/symmetric_tensor.h>
 #include <deal.II/base/tensor.h>
@@ -33,12 +32,15 @@
 
 #include <deal.II/lac/la_parallel_vector.h>
 
+#include <memory>
 #include <string>
 #include <vector>
 
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#ifndef DOXYGEN
 template <typename number>
 class FullMatrix;
 template <int dim>
@@ -51,7 +53,7 @@ template <int dim>
 class FiniteElementData;
 template <typename number>
 class AffineConstraints;
-
+#endif
 
 
 /*!@addtogroup feall */
@@ -69,9 +71,6 @@ class AffineConstraints;
  *
  * For more information about the <tt>spacedim</tt> template parameter check
  * the documentation of FiniteElement or the one of Triangulation.
- *
- * @author Wolfgang Bangerth, Ralf Hartmann, Guido Kanschat; 2000, 2003, 2004,
- * 2005, 2006
  */
 namespace FETools
 {
@@ -82,8 +81,6 @@ namespace FETools
    *
    * This class is used in the FETools::get_fe_by_name() and
    * FETools::add_fe_name() functions.
-   *
-   * @author Guido Kanschat, 2006
    */
   template <int dim, int spacedim = dim>
   class FEFactoryBase : public Subscriptor
@@ -117,8 +114,6 @@ namespace FETools
    * given as template argument, and with the degree (however the finite
    * element class wishes to interpret this number) given as argument to
    * get().
-   *
-   * @author Guido Kanschat, 2006
    */
   template <class FE>
   class FEFactory : public FEFactoryBase<FE::dimension, FE::space_dimension>
@@ -188,7 +183,7 @@ namespace FETools
   /**
    * Compute the interpolation matrix that interpolates a @p fe1-function to a
    * @p fe2-function on each cell. The interpolation_matrix needs to be of
-   * size <tt>(fe2.dofs_per_cell, fe1.dofs_per_cell)</tt>.
+   * size <tt>(fe2.n_dofs_per_cell(), fe1.n_dofs_per_cell())</tt>.
    *
    * Note, that if the finite element space @p fe1 is a subset of the finite
    * element space @p fe2 then the @p interpolation_matrix is an embedding
@@ -204,7 +199,7 @@ namespace FETools
    * Compute the interpolation matrix that interpolates a @p fe1-function to a
    * @p fe2-function, and interpolates this to a second @p fe1-function on
    * each cell. The interpolation_matrix needs to be of size
-   * <tt>(fe1.dofs_per_cell, fe1.dofs_per_cell)</tt>.
+   * <tt>(fe1.n_dofs_per_cell(), fe1.n_dofs_per_cell())</tt>.
    *
    * Note, that this function only makes sense if the finite element space due
    * to @p fe1 is not a subset of the finite element space due to @p fe2, as
@@ -219,8 +214,8 @@ namespace FETools
 
   /**
    * Compute the identity matrix minus the back interpolation matrix.
-   * The @p difference_matrix will be of size <tt>(fe1.dofs_per_cell,
-   * fe1.dofs_per_cell)</tt> after this function. Previous content
+   * The @p difference_matrix will be of size <tt>(fe1.n_dofs_per_cell(),
+   * fe1.n_dofs_per_cell())</tt> after this function. Previous content
    * of the argument will be overwritten.
    *
    * This function computes the matrix that transforms a @p fe1 function $z$ to
@@ -574,7 +569,7 @@ namespace FETools
    * This method implements the
    * FETools::compute_projection_from_quadrature_points_matrix method for
    * faces of a mesh.  The matrix that it returns, X, is face specific and its
-   * size is fe.dofs_per_cell by rhs_quadrature.size().  The dimension, dim
+   * size is fe.n_dofs_per_cell() by rhs_quadrature.size().  The dimension, dim
    * must be larger than 1 for this class, since Quadrature<dim-1> objects are
    * required. See the documentation on the Quadrature class for more
    * information.
@@ -649,25 +644,20 @@ namespace FETools
    * by calling the @p distribute function of your hanging node constraints
    * object.
    */
-  template <int dim,
-            int spacedim,
-            template <int, int> class DoFHandlerType1,
-            template <int, int> class DoFHandlerType2,
-            class InVector,
-            class OutVector>
+  template <int dim, int spacedim, class InVector, class OutVector>
   void
-  interpolate(const DoFHandlerType1<dim, spacedim> &dof1,
-              const InVector &                      u1,
-              const DoFHandlerType2<dim, spacedim> &dof2,
-              OutVector &                           u2);
+  interpolate(const DoFHandler<dim, spacedim> &dof1,
+              const InVector &                 u1,
+              const DoFHandler<dim, spacedim> &dof2,
+              OutVector &                      u2);
 
   /**
    * Compute the interpolation of a the @p dof1-function @p u1 to a @p
-   * dof2-function @p u2. @p dof1 and @p dof2 need to be DoFHandlers (or
-   * hp::DoFHandlers) based on the same triangulation.  @p constraints is a
-   * hanging node constraints object corresponding to @p dof2. This object is
-   * particular important when interpolating onto continuous elements on grids
-   * with hanging nodes (locally refined grids).
+   * dof2-function @p u2. @p dof1 and @p dof2 need to be DoFHandlers based on
+   * the same triangulation. @p constraints is a hanging node constraints object
+   * corresponding to @p dof2. This object is particular important when
+   * interpolating onto continuous elements on grids with hanging nodes (locally
+   * refined grids).
    *
    * If the elements @p fe1 and @p fe2 are either both continuous or both
    * discontinuous then this interpolation is the usual point interpolation.
@@ -677,17 +667,12 @@ namespace FETools
    * the discontinuities.  Therefore the mean value is taken at the DoF values
    * at the discontinuities.
    */
-  template <int dim,
-            int spacedim,
-            template <int, int> class DoFHandlerType1,
-            template <int, int> class DoFHandlerType2,
-            class InVector,
-            class OutVector>
+  template <int dim, int spacedim, class InVector, class OutVector>
   void
   interpolate(
-    const DoFHandlerType1<dim, spacedim> &                   dof1,
+    const DoFHandler<dim, spacedim> &                        dof1,
     const InVector &                                         u1,
-    const DoFHandlerType2<dim, spacedim> &                   dof2,
+    const DoFHandler<dim, spacedim> &                        dof2,
     const AffineConstraints<typename OutVector::value_type> &constraints,
     OutVector &                                              u2);
 
@@ -700,22 +685,16 @@ namespace FETools
    * nodes. For that case use the @p back_interpolate function, below, that
    * takes an additional @p AffineConstraints object.
    *
-   * @p dof1 might be a DoFHandler or a hp::DoFHandler onject.
-   *
    * Furthermore note, that for the specific case when the finite element
    * space corresponding to @p fe1 is a subset of the finite element space
    * corresponding to @p fe2, this function is simply an identity mapping.
    */
-  template <int dim,
-            template <int, int> class DoFHandlerType,
-            class InVector,
-            class OutVector,
-            int spacedim>
+  template <int dim, class InVector, class OutVector, int spacedim>
   void
-  back_interpolate(const DoFHandlerType<dim, spacedim> &dof1,
-                   const InVector &                     u1,
-                   const FiniteElement<dim, spacedim> & fe2,
-                   OutVector &                          u1_interpolated);
+  back_interpolate(const DoFHandler<dim, spacedim> &   dof1,
+                   const InVector &                    u1,
+                   const FiniteElement<dim, spacedim> &fe2,
+                   OutVector &                         u1_interpolated);
 
   /**
    * Compute the interpolation of the @p dof1-function @p u1 to a @p
@@ -893,56 +872,72 @@ namespace FETools
    * in y-direction and finally in z-direction. Discontinuous elements of
    * class FE_DGQ() are numbered in this way, for example.
    *
-   * This function constructs a table which lexicographic index each degree of
-   * freedom in the hierarchic numbering would have. It operates on the
-   * continuous finite element given as first argument, and outputs the
-   * lexicographic indices in the second.
-   *
-   * Note that since this function uses specifics of the continuous finite
-   * elements, it can only operate on FiniteElementData<dim> objects inherent
-   * in FE_Q(). However, this function does not take a FE_Q object as it is
-   * also invoked by the FE_Q() constructor.
-   *
-   * It is assumed that the size of the output argument already matches the
-   * correct size, which is equal to the number of degrees of freedom in the
-   * finite element.
+   * This function returns a vector containing information about the
+   * lexicographic index each degree of freedom in the hierarchic numbering
+   * would have to a given degree of a continuous finite element.
    */
-
   template <int dim>
-  void
+  std::vector<unsigned int>
+  hierarchic_to_lexicographic_numbering(unsigned int degree);
+
+  /**
+   * Like the previous function but instead of returning its result as a value
+   * return it through the last argument.
+   *
+   * @deprecated Use the function that returns the renumbering in a vector
+   * instead.
+   */
+  template <int dim>
+  DEAL_II_DEPRECATED void
   hierarchic_to_lexicographic_numbering(unsigned int               degree,
                                         std::vector<unsigned int> &h2l);
 
+  /**
+   * Like the previous functions but using a FiniteElementData instead of the
+   * polynomial degree.
+   *
+   * @deprecated Use the function that returns the renumbering in a vector and
+   * uses the degree of the basis as an argument instead.
+   */
   template <int dim>
-  void
+  DEAL_II_DEPRECATED void
   hierarchic_to_lexicographic_numbering(const FiniteElementData<dim> &fe_data,
                                         std::vector<unsigned int> &   h2l);
 
   /**
-   * Like the previous function but instead of returning its result through
-   * the last argument return it as a value.
+   * @deprecated Use the function that uses the degree of the basis as an
+   * argument instead.
    */
   template <int dim>
-  std::vector<unsigned int>
-  hierarchic_to_lexicographic_numbering(const FiniteElementData<dim> &fe_data);
+  DEAL_II_DEPRECATED std::vector<unsigned int>
+                     hierarchic_to_lexicographic_numbering(const FiniteElementData<dim> &fe_data);
 
   /**
    * This is the reverse function to the above one, generating the map from
-   * the lexicographic to the hierarchical numbering. All the remarks made
-   * about the above function are also valid here.
+   * the lexicographic to the hierarchical numbering for a given polynomial
+   * degree of a continuous finite element. All the remarks made about the
+   * above function are also valid here.
    */
   template <int dim>
-  void
+  std::vector<unsigned int>
+  lexicographic_to_hierarchic_numbering(unsigned int degree);
+
+  /**
+   * @deprecated Use the function that returns the renumbering in a vector and
+   * uses the degree of the basis as an argument instead.
+   */
+  template <int dim>
+  DEAL_II_DEPRECATED void
   lexicographic_to_hierarchic_numbering(const FiniteElementData<dim> &fe_data,
                                         std::vector<unsigned int> &   l2h);
 
   /**
-   * Like the previous function but instead of returning its result through
-   * the last argument return it as a value.
+   * @deprecated Use the function that uses the degree of the basis as an
+   * argument instead.
    */
   template <int dim>
-  std::vector<unsigned int>
-  lexicographic_to_hierarchic_numbering(const FiniteElementData<dim> &fe_data);
+  DEAL_II_DEPRECATED std::vector<unsigned int>
+                     lexicographic_to_hierarchic_numbering(const FiniteElementData<dim> &fe_data);
 
 
   /**
@@ -1249,7 +1244,8 @@ namespace FETools
       std::vector<std::pair<unsigned int, unsigned int>>
         &                                 face_system_to_component_table,
       const FiniteElement<dim, spacedim> &finite_element,
-      const bool                          do_tensor_product = true);
+      const bool                          do_tensor_product = true,
+      const unsigned int                  face_no           = 0 /*TODO*/);
 
   } // namespace Compositing
 
@@ -1290,15 +1286,6 @@ namespace FETools
   template <int dim, int spacedim = dim>
   std::unique_ptr<FiniteElement<dim, spacedim>>
   get_fe_by_name(const std::string &name);
-
-
-  /**
-   * @deprecated Use get_fe_by_name() with two template parameters instead
-   */
-  template <int dim>
-  DEAL_II_DEPRECATED FiniteElement<dim, dim> *
-                     get_fe_from_name(const std::string &name);
-
 
   /**
    * Extend the list of finite elements that can be generated by
@@ -1459,7 +1446,7 @@ namespace FETools
   std::unique_ptr<FiniteElement<FE::dimension, FE::space_dimension>>
   FEFactory<FE>::get(const unsigned int degree) const
   {
-    return std_cxx14::make_unique<FE>(degree);
+    return std::make_unique<FE>(degree);
   }
 
   namespace Compositing

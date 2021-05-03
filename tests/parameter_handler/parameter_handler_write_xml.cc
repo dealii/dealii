@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2018 by the deal.II authors
+// Copyright (C) 2002 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -60,6 +60,10 @@ main()
 
 
   prm.print_parameters(deallog.get_file_stream(), ParameterHandler::XML);
+  deallog.get_file_stream() << std::endl;
+
+  prm.print_parameters(deallog.get_file_stream(),
+                       ParameterHandler::XML | ParameterHandler::Short);
   deallog.get_file_stream() << std::endl;
 
   return 0;

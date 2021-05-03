@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -44,8 +44,6 @@
 
 namespace pdd
 {
-  using namespace dealii;
-
   // @sect3{The <code>PDDProblem</code> class template}
 
   template <int dim>

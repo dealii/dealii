@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2019 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -33,7 +33,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 namespace AD = dealii::Differentiation::AD;
 
 // Function and its derivatives
@@ -43,7 +42,7 @@ struct FunctionsTestTensorScalarCoupled
   static NumberType
   psi(const Tensor<2, dim, NumberType> &t, const NumberType &s)
   {
-    return double_contract(t, t) * std::pow(s, 3);
+    return double_contract<0, 0, 1, 1>(t, t) * std::pow(s, 3);
   };
 
   static Tensor<2, dim, NumberType>
@@ -55,7 +54,7 @@ struct FunctionsTestTensorScalarCoupled
   static NumberType
   dpsi_ds(const Tensor<2, dim, NumberType> &t, const NumberType &s)
   {
-    return 3.0 * double_contract(t, t) * std::pow(s, 2);
+    return 3.0 * double_contract<0, 0, 1, 1>(t, t) * std::pow(s, 2);
   };
 
   static Tensor<4, dim, NumberType>
@@ -89,7 +88,7 @@ struct FunctionsTestTensorScalarCoupled
   static NumberType
   d2psi_ds_ds(const Tensor<2, dim, NumberType> &t, const NumberType &s)
   {
-    return 6.0 * double_contract(t, t) * std::pow(s, 1);
+    return 6.0 * double_contract<0, 0, 1, 1>(t, t) * std::pow(s, 1);
   };
 };
 
@@ -97,9 +96,9 @@ template <int dim, typename number_t, enum AD::NumberTypes ad_type_code>
 void
 test_tensor_scalar_coupled()
 {
-  typedef AD::ScalarFunction<dim, ad_type_code, number_t> ADHelper;
-  typedef typename ADHelper::ad_type                      ADNumberType;
-  typedef typename ADHelper::scalar_type                  ScalarNumberType;
+  using ADHelper         = AD::ScalarFunction<dim, ad_type_code, number_t>;
+  using ADNumberType     = typename ADHelper::ad_type;
+  using ScalarNumberType = typename ADHelper::scalar_type;
 
   std::cout << "*** Test variables: Tensor + Scalar (coupled), "
             << "dim = " << Utilities::to_string(dim) << ", "
@@ -111,7 +110,7 @@ test_tensor_scalar_coupled()
   FullMatrix<ScalarNumberType> D2psi;
 
   // Function and its derivatives
-  typedef FunctionsTestTensorScalarCoupled<dim, ADNumberType> func_ad;
+  using func_ad = FunctionsTestTensorScalarCoupled<dim, ADNumberType>;
 
   const FEValuesExtractors::Tensor<2> t_dof(0);
   const FEValuesExtractors::Scalar    s_dof(
@@ -207,8 +206,8 @@ test_tensor_scalar_coupled()
   ;
 
   // Verify the result
-  typedef FunctionsTestTensorScalarCoupled<dim, ScalarNumberType> func;
-  static const ScalarNumberType                                   tol =
+  using func = FunctionsTestTensorScalarCoupled<dim, ScalarNumberType>;
+  static const ScalarNumberType tol =
     1e5 * std::numeric_limits<ScalarNumberType>::epsilon();
 
   Assert(std::abs(psi - func::psi(t, s)) < tol,

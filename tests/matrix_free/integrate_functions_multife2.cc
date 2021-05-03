@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -44,16 +44,16 @@
 #include <iostream>
 
 #include "../tests.h"
+
 #include "create_mesh.h"
 
-std::ofstream logfile("output");
 
 
 template <int dim, int fe_degree, typename Number>
 class MatrixFreeTest
 {
 public:
-  typedef std::vector<Vector<Number>> VectorType;
+  using VectorType = std::vector<Vector<Number>>;
 
   MatrixFreeTest(const MatrixFree<dim, Number> &data_in)
     : data(data_in)
@@ -204,7 +204,7 @@ operator()(const MatrixFree<dim, Number> &data,
             submit[d] = gradients0[q * dim + d];
           fe_eval0.submit_gradient(submit, q);
         }
-      fe_eval0.integrate(true, true);
+      fe_eval0.integrate(EvaluationFlags::values | EvaluationFlags::gradients);
       fe_eval0.distribute_local_to_global(dst[0]);
 
       // FE 1, Quad 1
@@ -216,7 +216,7 @@ operator()(const MatrixFree<dim, Number> &data,
             submit[d] = gradients1[q * dim + d];
           fe_eval1.submit_gradient(submit, q);
         }
-      fe_eval1.integrate(true, true);
+      fe_eval1.integrate(EvaluationFlags::values | EvaluationFlags::gradients);
       fe_eval1.distribute_local_to_global(dst[2]);
 
       // FE 0, Quad 1
@@ -228,7 +228,7 @@ operator()(const MatrixFree<dim, Number> &data,
             submit[d] = gradients1[q * dim + d];
           fe_eval01.submit_gradient(submit, q);
         }
-      fe_eval01.integrate(true, true);
+      fe_eval01.integrate(EvaluationFlags::values | EvaluationFlags::gradients);
       fe_eval01.distribute_local_to_global(dst[4]);
     }
 }
@@ -344,7 +344,7 @@ test()
 int
 main()
 {
-  deallog.attach(logfile);
+  initlog();
   deallog << std::setprecision(3);
 
   {

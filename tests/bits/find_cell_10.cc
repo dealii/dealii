@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -83,7 +83,6 @@ argv=0x7fffffffdf48) at find_cell_10.cc:103
 
 #include "../tests.h"
 
-using namespace dealii;
 
 void
 test()

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -29,9 +29,8 @@
 int
 main(int argc, char **argv)
 {
-  std::ofstream logfile("output");
-  logfile.precision(4);
-  deallog.attach(logfile);
+  initlog();
+  deallog << std::setprecision(4);
 
   {
     ConsecutiveControl solver_control(12345, 1.e-3, 3, false, false);

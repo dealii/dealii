@@ -15,17 +15,17 @@
 
 
 
-// active fe indices transfer on repartitioning
+// active FE indices transfer on repartitioning
 
 
 #include <deal.II/distributed/cell_weights.h>
 #include <deal.II/distributed/tria.h>
 
+#include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/fe/fe_q.h>
 
 #include <deal.II/grid/grid_generator.h>
-
-#include <deal.II/hp/dof_handler.h>
 
 #include "../tests.h"
 
@@ -49,24 +49,24 @@ test()
        ++i)
     fe_collection.push_back(FE_Q<dim>(i + 1));
 
-  // we need to introduce dof_handler to its fe_collection first
-  hp::DoFHandler<dim> dh(tria);
-  dh.set_fe(fe_collection);
+  DoFHandler<dim> dh(tria);
 
   for (auto &cell : dh.active_cell_iterators())
     if (cell->is_locally_owned())
       {
-        // set active fe index
+        // set active FE index
         if (!(cell->is_artificial()))
           cell->set_active_fe_index(myid);
 
-        deallog << "myid=" << myid << " cellid=" << cell->id()
+        deallog << "cellid=" << cell->id()
                 << " fe_index=" << cell->active_fe_index() << std::endl;
       }
 
+  dh.distribute_dofs(fe_collection);
+
   // ----- transfer -----
-  parallel::CellWeights<dim> cell_weights(dh);
-  cell_weights.register_ndofs_weighting(100000);
+  const parallel::CellWeights<dim> cell_weights(
+    dh, parallel::CellWeights<dim>::ndofs_weighting({100000, 1}));
 
   tria.repartition();
 
@@ -75,9 +75,14 @@ test()
   // ------ verify ------
   // check if all children adopted the correct id
   for (auto &cell : dh.active_cell_iterators())
-    if (cell->is_locally_owned())
-      deallog << "myid=" << myid << " cellid=" << cell->id()
-              << " fe_index=" << cell->active_fe_index() << std::endl;
+    if (!cell->is_artificial())
+      {
+        deallog << "cellid=" << cell->id()
+                << " fe_index=" << cell->active_fe_index();
+        if (cell->is_ghost())
+          deallog << " ghost";
+        deallog << std::endl;
+      }
 
   // for further calculations, distribute dofs, i.e.
   // dh.distribute_dofs(fe_collection);

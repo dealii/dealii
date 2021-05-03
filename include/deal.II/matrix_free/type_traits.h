@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -28,7 +28,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-
+#ifndef DOXYGEN
 namespace internal
 {
   //
@@ -164,6 +164,29 @@ namespace internal
   // We need to have a separate declaration for static const members
   template <typename T>
   const bool has_begin<T>::value;
+
+
+  // same as above to check
+  // ... T::shared_vector_data() const
+  template <typename T>
+  struct has_shared_vector_data
+  {
+  private:
+    static void
+    detect(...);
+
+    template <typename U>
+    static decltype(std::declval<U const>().shared_vector_data())
+    detect(const U &);
+
+  public:
+    static const bool value =
+      !std::is_same<void, decltype(detect(std::declval<T>()))>::value;
+  };
+
+  // We need to have a separate declaration for static const members
+  template <typename T>
+  const bool has_shared_vector_data<T>::value;
 
 
   // type trait for vector T and Number to see if
@@ -322,6 +345,7 @@ namespace internal
 
 
 } // namespace internal
+#endif
 
 DEAL_II_NAMESPACE_CLOSE
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2018 by the deal.II authors
+// Copyright (C) 2015 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -48,7 +48,6 @@
           << var.block(1) << std::endl;
 
 
-using namespace dealii;
 
 int
 main()
@@ -68,8 +67,8 @@ main()
 
   dof_handler.distribute_dofs(fe);
 
-  std::vector<types::global_dof_index> dofs_per_component(2);
-  DoFTools::count_dofs_per_component(dof_handler, dofs_per_component);
+  const std::vector<types::global_dof_index> dofs_per_component =
+    DoFTools::count_dofs_per_fe_component(dof_handler);
   const unsigned int n_u = dofs_per_component[0], n_p = dofs_per_component[1];
 
   BlockDynamicSparsityPattern dsp(2, 2);

@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2017 - 2019 by the deal.II authors
+## Copyright (C) 2017 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -18,6 +18,8 @@ INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 SET(_src
   symengine_math.cc
   symengine_number_types.cc
+  symengine_number_visitor_internal.cc
+  symengine_optimizer.cc
   symengine_scalar_operations.cc
   symengine_tensor_operations.cc
   symengine_types.cc
@@ -25,6 +27,8 @@ SET(_src
   )
 
 SET(_inst
+  symengine_number_visitor_internal.inst.in
+  symengine_optimizer.inst.in
   symengine_tensor_operations.inst.in
   )
 

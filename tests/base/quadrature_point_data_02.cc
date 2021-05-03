@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2019 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -28,6 +28,7 @@
 
 #include <deal.II/distributed/tria.h>
 
+#include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_tools.h>
 #include <deal.II/fe/fe_values.h>
 
@@ -40,7 +41,6 @@
 #include "../tests.h"
 
 
-using namespace dealii;
 
 template <int dim>
 class MyFunction : public Function<dim>

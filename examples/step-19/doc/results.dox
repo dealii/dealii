@@ -1,259 +1,295 @@
 <h1>Results</h1>
 
+When this program is run, it produces output that looks as follows:
+```
+Timestep 1
+  Field degrees of freedom:                                 4989
+  Total number of particles in simulation:  20
+  Number of particles lost this time step:  0
 
-With all that above, here is first what we get if we just run the program
-without any parameters at all:
+  Now at t=2.12647e-07, dt=2.12647e-07.
+
+Timestep 2
+  Field degrees of freedom:                 4989
+  Total number of particles in simulation:  24
+  Number of particles lost this time step:  0
+
+  Now at t=4.14362e-07, dt=2.01715e-07.
+
+Timestep 3
+  Field degrees of freedom:                 4989
+  Total number of particles in simulation:  28
+  Number of particles lost this time step:  0
+
+  Now at t=5.96019e-07, dt=1.81657e-07.
+
+Timestep 4
+  Field degrees of freedom:                 4989
+  Total number of particles in simulation:  32
+  Number of particles lost this time step:  0
+
+  Now at t=7.42634e-07, dt=1.46614e-07.
+
+
+...
+
+
+  Timestep 1000
+  Field degrees of freedom:                 4989
+  Total number of particles in simulation:  44
+  Number of particles lost this time step:  6
+  Fraction of particles lost through anode: 0.0601266
+
+  Now at t=4.93276e-05, dt=4.87463e-08.
+
+Timestep 1001
+  Field degrees of freedom:                 4989
+  Total number of particles in simulation:  44
+  Number of particles lost this time step:  0
+  Fraction of particles lost through anode: 0.0601266
+
+  Now at t=4.93759e-05, dt=4.82873e-08.
+
+
+...
+
+
+Timestep 2091
+  Field degrees of freedom:                 4989
+  Total number of particles in simulation:  44
+  Number of particles lost this time step:  0
+  Fraction of particles lost through anode: 0.0503338
+
+  Now at t=9.99237e-05, dt=4.26254e-08.
+
+Timestep 2092
+  Field degrees of freedom:                 4989
+  Total number of particles in simulation:  44
+  Number of particles lost this time step:  0
+  Fraction of particles lost through anode: 0.0503338
+
+  Now at t=9.99661e-05, dt=4.24442e-08.
+
+Timestep 2093
+  Field degrees of freedom:                 4989
+  Total number of particles in simulation:  44
+  Number of particles lost this time step:  2
+  Fraction of particles lost through anode: 0.050308
+
+  Now at t=0.0001, dt=3.38577e-08.
+```
+
+Picking a random few time steps, we can visualize the solution in the
+form of streamlines for the electric field and dots for the electrons:
+<div class="twocolumn" style="width: 80%">
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step-19.solution.0000.png"
+         alt="The solution at time step 0 (t=0 seconds)."
+         width="500">
+    <br>
+    Solution at time step 0 (t=0 seconds).
+    <br>
+  </div>
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step-19.solution.1400.png"
+         alt="The solution at time step 1400 (t=0.000068 seconds)."
+         width="500">
+    <br>
+    Solution at time step 1400 (t=0.000068 seconds).
+    <br>
+  </div>
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step-19.solution.0700.png"
+         alt="The solution at time step 700 (t=0.000035 seconds)."
+         width="500">
+    <br>
+    Solution at time step 700 (t=0.000035 seconds).
+    <br>
+  </div>
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step-19.solution.2092.png"
+         alt="The solution at time step 2092 (t=0.0001 seconds)."
+         width="500">
+    <br>
+    Solution at time step 2092 (t=0.0001 seconds).
+    <br>
+  </div>
+</div>
+
+That said, a more appropriate way to visualize the results of this
+program are by creating a video that shows how these electrons move, and how
+the electric field changes in response to their motion:
+
+@htmlonly
+<p align="center">
+  <iframe width="560" height="315" src="https://www.youtube.com/embed/HwUtE7xuteE"
+   frameborder="0"
+   allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+   allowfullscreen></iframe>
+ </p>
+@endhtmlonly
+
+What you can see here is how the "focus element" of the boundary with its negative
+voltage repels the electrons and makes sure that they do not just fly away
+perpendicular from the cathode (as they do in the initial part of their
+trajectories). It also shows how the electric field lines
+move around over time, in response to the charges flying by -- in other words,
+the feedback the particles have on the electric field that itself drives the
+motion of the electrons.
+
+The movie suggests that electrons move in "bunches" or "bursts". One element of
+this appearance is an artifact of how the movie was created: Every frame of the
+movie corresponds to one time step, but the time step length varies. More specifically,
+the fastest particle moving through the smallest cell determines the length of the
+time step (see the discussion in the introduction), and consequently time steps
+are small whenever a (fast) particle moves through the small cells at the right
+edge of the domain; time steps are longer again once the particle has left
+the domain. This slowing-accelerating effect can easily be visualized by plotting
+the time step length shown in the screen output.
+
+The second part of this is real, however: The simulation creates a large group
+of particles in the beginning, and fewer after about the 300th time step. This
+is probably because of the negative charge of the particles in the simulation:
+They reduce the magnitude of the electric field at the (also negatively charged
+electrode) and consequently reduce the number of points on the cathode at which
+the magnitude exceeds the threshold necessary to draw an electron out of the
+electrode.
+
+
+<a name="extensions"></a>
+<h3>Possibilities for extensions</h3>
+
+<h4> Avoiding a performance bottleneck with particles </h4>
+
+The `assemble_system()`, `move_particles()`, and `update_timestep_size()`
+functions all call Particles::ParticleHandler::particles_in_cell() and
+Particles::ParticleHandler::n_particles_in_cell() that query information
+about the particles located on the current cell. While this is convenient,
+it's also inefficient. To understand why this is so, one needs to know
+how particles are stored in Particles::ParticleHandler: namely, in a
+data structure in which particles are ordered in some kind of linear
+fashion sorted by the cell they are on. Consequently, in order to find
+the particles associated with a given cell, these functions need to
+search for the first (and possibly last) particle on a given cell --
+an effort that costs ${\cal O}(\log N)$ operations where $N$ is the
+number of particles. But this is repeated on every cell; assuming that
+for large computations, the number of cells and particles are roughly
+proportional, the accumulated cost of these function calls is then
+${\cal O}(N \log N)$ and consequently larger than the ${\cal O}(N)$
+cost that we should shoot for with all parts of a program.
+
+We can make this cheaper, though. First, instead of calling
+Particles::ParticleHandler::n_particles_in_cell(), we might first call
+Particles::ParticleHandler::particles_in_cell() and then compute the
+number of particles on a cell by just computing the distance of the last
+to the first particle on the current cell:
 @code
-examples/\step-19> ./\step-19
+  const typename Particles::ParticleHandler<dim, spacedim>::particle_iterator_range
+    particles_in_cell = particle_handler.particles_in_cell(cell);
+  const unsigned int
+    n_particles_in_cell = std::distance (particles_in_cell.begin(),
+                                         particles_in_cell.end());
+@endcode
+The first of these calls is of course still ${\cal O}(\log N)$,
+but at least the second call only takes a compute time proportional to
+the number of particles on the current cell and so, when accumulated
+over all cells, has a cost of ${\cal O}(N)$.
 
-Converter from deal.II intermediate format to other graphics formats.
+But we can even get rid of the first of these calls with some proper algorithm
+design. That's because particles are ordered in the same way as cells, and so
+we can just walk them as we move along on the cells. The following outline
+of an algorithm does this:
+@code
+  auto begin_particle_on_cell = particle_handler.begin();
+  for (const auto &cell : dof_handler.active_cell_iterators())
+    {
+      unsigned int n_particles_on_cell = 0;
+      auto end_particle_on_cell = begin_particle_on_cell;
+      while (end_particle_on_cell->get_surrounding_cell(triangulation)
+             == cell)
+        {
+          ++n_particles_on_cell;
+          ++end_particle_on_cell;
+        }
 
-Usage:
-    ./\step-19 [-p parameter_file] list_of_input_files
-              [-x output_format] [-o output_file]
+      ...now operate on the range of particles from begin_particle_on_cell
+         to end_particle_on_cell, all of which are known to be on the current
+         cell...;
 
-Parameter sequences in brackets can be omitted if a parameter file is
-specified on the command line and if it provides values for these
-missing parameters.
-
-The parameter file has the following format and allows the following
-values (you can cut and paste this and use it for your own parameter
-file):
-
-# Listing of Parameters
-# ---------------------
-# A dummy parameter asking for an integer
-set Dummy iterations = 42
-
-# The name of the output file to be generated
-set Output file      =
-
-# A name for the output format to be used
-set Output format    = gnuplot
-
-
-subsection DX output parameters
-  # A Boolean field indicating whether neighborship information between cells
-  # is to be written to the OpenDX output file
-  set Write neighbors = true
-end
-
-
-subsection Dummy subsection
-  # A dummy parameter that shows how one can define a parameter that can be
-  # assigned values from a finite set of values
-  set Dummy color of output = red
-
-  # A dummy parameter that can be fed with either 'true' or 'false'
-  set Dummy generate output = true
-end
-
-
-subsection Eps output parameters
-  # Angle of the viewing position against the vertical axis
-  set Azimut angle                        = 60
-
-  # Name of a color function used to colorize mesh lines and/or cell
-  # interiors
-  set Color function                      = default
-
-  # Whether the interior of cells shall be shaded
-  set Color shading of interior of cells  = true
-
-  # Whether the mesh lines, or only the surface should be drawn
-  set Draw mesh lines                     = true
-
-  # Whether only the mesh lines, or also the interior of cells should be
-  # plotted. If this flag is false, then one can see through the mesh
-  set Fill interior of cells              = true
-
-  # Number of the input vector that is to be used to generate color
-  # information
-  set Index of vector for color           = 0
-
-  # Number of the input vector that is to be used to generate height
-  # information
-  set Index of vector for height          = 0
-
-  # The width in which the postscript renderer is to plot lines
-  set Line widths in eps units            = 0.5
-
-  # Whether width or height should be scaled to match the given size
-  set Scale to width or height            = width
-
-  # Scaling for the z-direction relative to the scaling used in x- and
-  # y-directions
-  set Scaling for z-axis                  = 1
-
-  # The size (width or height) to which the eps output file is to be scaled
-  set Size (width or height) in eps units = 300
-
-  # Angle of the viewing direction against the y-axis
-  set Turn angle                          = 30
-end
-
-subsection Povray output parameters
-  # Whether camera and lighting information should be put into an external
-  # file "data.inc" or into the POVRAY input file
-  set Include external file = true
-
-  # Whether POVRAY should use bicubic patches
-  set Use bicubic patches   = false
-
-  # A flag indicating whether POVRAY should use smoothed triangles instead of
-  # the usual ones
-  set Use smooth triangles  = false
-end
-
-
-subsection UCD output parameters
-  # A flag indicating whether a comment should be written to the beginning of
-  # the output file indicating date and time of creation as well as the
-  # creating program
-  set Write preamble = true
-end
+      // Move the begin iterator forward so that it points to the first
+      // particle on the next cell
+      begin_particle_on_cell = end_particle_on_cell;
+    }
 @endcode
 
-That's a lot of output for such a little program, but then that's also a lot of
-output formats that deal.II supports. You will realize that the output consists
-of first entries in the top-level section (sorted alphabetically), then a
-sorted list of subsections. Most of the parameters have been declared by the
-<code>DataOutBase</code> class, but there are also the dummy entries and
-sections we have added in the <code>declare_parameters()</code> function, along
-with their default values and documentations.
+In this code, we touch every cell exactly once and we never have to search
+the big data structure for the first or last particle on each cell. As a
+consequence, the algorithm costs a total of ${\cal O}(N)$ for a complete
+sweep of all particles and all cells.
+
+It would not be very difficult to implement this scheme for all three of the
+functions in this program that have this issue.
 
 
+<h4> More statistics about electrons </h4>
 
-Let us try to run this program on a set of input files generated by a modified
-step-18 run on 32 nodes of a
-cluster. The computation was rather big, with more
-than 350,000 cells and some 1.2M unknowns. That makes for 32 rather big
-intermediate files that we will try to merge using the present program. Here is
-the list of files, totaling some 245MB of data:
-@code
-examples/\step-19> ls -l *d2
--rw-r--r--  1 bangerth wheeler 7982085 Aug 12 10:11 solution-0005.0000-000.d2
--rw-r--r--  1 bangerth wheeler 7888316 Aug 12 10:13 solution-0005.0000-001.d2
--rw-r--r--  1 bangerth wheeler 7715984 Aug 12 10:09 solution-0005.0000-002.d2
--rw-r--r--  1 bangerth wheeler 7887648 Aug 12 10:06 solution-0005.0000-003.d2
--rw-r--r--  1 bangerth wheeler 7833291 Aug 12 10:09 solution-0005.0000-004.d2
--rw-r--r--  1 bangerth wheeler 7536394 Aug 12 10:07 solution-0005.0000-005.d2
--rw-r--r--  1 bangerth wheeler 7817551 Aug 12 10:06 solution-0005.0000-006.d2
--rw-r--r--  1 bangerth wheeler 7996660 Aug 12 10:07 solution-0005.0000-007.d2
--rw-r--r--  1 bangerth wheeler 7761545 Aug 12 10:06 solution-0005.0000-008.d2
--rw-r--r--  1 bangerth wheeler 7754027 Aug 12 10:07 solution-0005.0000-009.d2
--rw-r--r--  1 bangerth wheeler 7607545 Aug 12 10:11 solution-0005.0000-010.d2
--rw-r--r--  1 bangerth wheeler 7728039 Aug 12 10:07 solution-0005.0000-011.d2
--rw-r--r--  1 bangerth wheeler 7577293 Aug 12 10:14 solution-0005.0000-012.d2
--rw-r--r--  1 bangerth wheeler 7735626 Aug 12 10:10 solution-0005.0000-013.d2
--rw-r--r--  1 bangerth wheeler 7629075 Aug 12 10:10 solution-0005.0000-014.d2
--rw-r--r--  1 bangerth wheeler 7314459 Aug 12 10:09 solution-0005.0000-015.d2
--rw-r--r--  1 bangerth wheeler 7414738 Aug 12 10:10 solution-0005.0000-016.d2
--rw-r--r--  1 bangerth wheeler 7330518 Aug 12 10:05 solution-0005.0000-017.d2
--rw-r--r--  1 bangerth wheeler 7418213 Aug 12 10:11 solution-0005.0000-018.d2
--rw-r--r--  1 bangerth wheeler 7508715 Aug 12 10:08 solution-0005.0000-019.d2
--rw-r--r--  1 bangerth wheeler 7747143 Aug 12 10:06 solution-0005.0000-020.d2
--rw-r--r--  1 bangerth wheeler 7563548 Aug 12 10:05 solution-0005.0000-021.d2
--rw-r--r--  1 bangerth wheeler 7846767 Aug 12 10:12 solution-0005.0000-022.d2
--rw-r--r--  1 bangerth wheeler 7479576 Aug 12 10:12 solution-0005.0000-023.d2
--rw-r--r--  1 bangerth wheeler 7925060 Aug 12 10:12 solution-0005.0000-024.d2
--rw-r--r--  1 bangerth wheeler 7842034 Aug 12 10:13 solution-0005.0000-025.d2
--rw-r--r--  1 bangerth wheeler 7585448 Aug 12 10:13 solution-0005.0000-026.d2
--rw-r--r--  1 bangerth wheeler 7609698 Aug 12 10:10 solution-0005.0000-027.d2
--rw-r--r--  1 bangerth wheeler 7576053 Aug 12 10:08 solution-0005.0000-028.d2
--rw-r--r--  1 bangerth wheeler 7682418 Aug 12 10:08 solution-0005.0000-029.d2
--rw-r--r--  1 bangerth wheeler 7544141 Aug 12 10:05 solution-0005.0000-030.d2
--rw-r--r--  1 bangerth wheeler 7348899 Aug 12 10:04 solution-0005.0000-031.d2
-@endcode
-
-So let's see what happens if we attempt to merge all these files into a single
-one:
-@code
-examples/\step-19> time ./\step-19 solution-0005.0000-*.d2 -x gmv -o solution-0005.gmv
-real    2m08.35s
-user    1m26.61s
-system  0m05.74s
-
-examples/\step-19> ls -l solution-0005.gmv
--rw-r--r--  1 bangerth wheeler 240680494 Sep  9 11:53 solution-0005.gmv
-@endcode
-So in roughly two minutes we have merged 240MB of data. Counting reading and
-writing, that averages a throughput of 3.8MB per second, not so bad.
+The program already computes the fraction of the electrons that leave the
+domain through the hole in the anode. But there are other quantities one might be
+interested in. For example, the average velocity of these particles. It would
+not be very difficult to obtain each particle's velocity from its properties,
+in the same way as we do in the `move_particles()` function, and compute
+statistics from it.
 
 
+<h4> A better-synchronized visualization </h4>
 
-If visualized, the output looks very much like that shown for
-step-18. But that's not quite as
-important for the moment, rather we are interested in showing how to use the
-parameter file. To this end, remember that if no parameter file is given, or if
-it is empty, all the default values listed above are used. However, whatever we
-specify in the parameter file is used, unless overridden again by
-parameters found later on the command line.
+As discussed above, there is a varying time difference between different frames
+of the video because we create output for every time step. A better way to
+create movies would be to generate a new output file in fixed time intervals,
+regardless of how many time steps lie between each such point.
 
 
+<h4> A better time integrator </h4>
 
-For example, let us use a simple parameter file named
-<code>solution-0005.prm</code> that contains only one line:
-@code
-set Output format  = gnuplot
-@endcode
-If we run step-19 with it again, we obtain this (for simplicity, and because we
-don't want to visualize 240MB of data anyway, we only convert the one, the
-twelfth, intermediate file to gnuplot format):
-@code
-examples/\step-19> ./\step-19 solution-0005.0000-012.d2 -p solution-0005.prm -o solution-0005.gnuplot
+The problem we are considering in this program is a coupled, multiphysics
+problem. But the way we solve it is by first computing the (electric) potential
+field and then update the particle locations. This is what is called an
+"operator-splitting method", a concept we will investigate in more detail
+in step-58.
 
-examples/\step-19> ls -l solution-0005.gnuplot
--rw-r--r--  1 bangerth wheeler 20281669 Sep  9 12:15 solution-0005.gnuplot
-@endcode
-
-We can then visualize this one file with gnuplot, obtaining something like
-this:
-<img src="https://www.dealii.org/images/steps/developer/step-19.solution-0005.png" alt="">
-
-That's not particularly exciting, but the file we're looking at has only one
-32nd of the entire domain anyway, so we can't expect much.
-
-In more complicated situations, we would use parameter files that set more of
-the values to non-default values. A file for which this is the case could look
-like this, generating output for the OpenDX visualization program:
-@code
-set Output format  = dx
-set Output file    = my_output_file.dx
-
-set Dummy iterations = -13
-
-subsection Dummy subsection
-  set Dummy color of output = blue
-  set Dummy generate output = false
-end
-@endcode
-If one wanted to, one could write comments into the file using the
-same format as used above in the help text, i.e. everything on a line
-following a hashmark (<code>#</code>) is considered a comment.
+While it is awkward to think of a way to solve this problem that does not involve
+splitting the problem into a PDE piece and a particles piece, one
+*can* (and probably should!) think of a better way to update the particle
+locations. Specifically, the equations we use to update the particle location
+are
+@f{align*}{
+  \frac{{\mathbf v}_i^{(n)}-{\mathbf v}_i^{(n-1)}}{\Delta t} &= \frac{e\nabla V^{(n)}}{m}
+  \\
+  \frac{{\mathbf x}_i^{(n)}-{\mathbf x}_i^{(n-1)}}{\Delta t} &= {\mathbf v}_i^{(n)}.
+@f}
+This corresponds to a simple forward-Euler time discretization -- a method of
+first order accuracy in the time step size $\Delta t$ that we know we should
+avoid because we can do better. Rather, one might want to consider a scheme such
+as the
+[leapfrog scheme](https://en.wikipedia.org/wiki/Leapfrog_integration)
+or more generally
+[symplectic integrators](https://en.wikipedia.org/wiki/Symplectic_integrator)
+such as the
+[Verlet scheme](https://en.wikipedia.org/wiki/Verlet_integration).
 
 
+<h4> Parallelization </h4>
 
-If one runs step-19 with this input file, this is what is going to happen:
-@code
-examples/\step-19> ./\step-19 solution-0005.0000-012.d2 -p solution-0005.prm
-Line 4:
-    The entry value
-        -13
-    for the entry named
-        Dummy iterations
-    does not match the given pattern
-        [Integer range 1...1000 (inclusive)]
-@endcode
-Ah, right: valid values for the iteration parameter needed to be within the
-range [1...1000]. We would fix that, then go back to run the program with
-correct parameters.
+In release mode, the program runs in about 3.5 minutes on one of the author's
+laptops at the time of writing this. That's acceptable. But what if we wanted
+to make the simulation three-dimensional? If we wanted to not use a maximum
+of around 100 particles at any given time (as happens with the parameters
+used here) but 100,000? If we needed a substantially finer mesh?
 
-
-
-This program should have given some insight into the input parameter file
-handling that deal.II provides. The <code>ParameterHandler</code> class has a
-few more goodies beyond what has been shown in this program, for those who want
-to use this class, it would be useful to read the documentation of that class
-to get the full picture.
-
+In those cases, one would want to run the program not just on a single processor,
+but in fact on as many as one has available. This requires parallelization
+both the PDE solution as well as over particles. In practice, while there
+are substantial challenges to making this efficient and scale well, these
+challenges are all addressed in deal.II itself. For example, step-40 shows
+how to parallelize the finite element part, and step-70 shows how one can
+then also parallelize the particles part.

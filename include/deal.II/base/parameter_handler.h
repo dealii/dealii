@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2019 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -36,8 +36,10 @@
 DEAL_II_NAMESPACE_OPEN
 
 // forward declarations for interfaces and friendship
+#ifndef DOXYGEN
 class LogStream;
 class MultipleParameterLoop;
+#endif
 
 /**
  * The ParameterHandler class provides a standard interface to an input file
@@ -51,10 +53,8 @@ class MultipleParameterLoop;
  * Input may be sorted into subsection trees in order to give the input a
  * logical structure, and input files may include other files.
  *
- * The ParameterHandler class is discussed in detail in the
- * @ref step_19 "step-19"
- * example program, and is used in more realistic situations in step-29,
- * step-33 and step-34.
+ * The ParameterHandler class is discussed in step-29,
+ * step-33, and step-34.
  *
  * <h3>Declaring entries</h3>
  *
@@ -344,7 +344,7 @@ class MultipleParameterLoop;
  * add_action() function.) Of course, in C++ one doesn't usually pass
  * around the address of a function, but an action can be a function-like
  * object (taking a string as argument) that results from calling
- * @p std::bind, or more conveniently, it can be a
+ * such as a
  * <a href="http://en.cppreference.com/w/cpp/language/lambda">lambda
  * function</a> that has the form
  * @code
@@ -836,54 +836,117 @@ class MultipleParameterLoop;
  *
  *
  * @ingroup input
- * @author Wolfgang Bangerth, October 1997, revised February 1998, 2010, 2011, 2017
- * @author Alberto Sartori, 2015
- * @author David Wells, 2016
- * @author Denis Davydov, 2018
  */
 class ParameterHandler : public Subscriptor
 {
 public:
   /**
-   * List of possible output formats used for
-   * ParameterHandler::print_parameters().
+   * List of possible output formats used for functions like
+   * ParameterHandler::print_parameters(). The options can be categorized into
+   * two groups:
+   * - format options: PRM, LaTeX, Description, XML, JSON
+   * - stylistic options: Short, KeepDeclarationOrder
+   *
+   * Only one format option may be specified at the time. Any function that
+   * accepts an OutputStyle as an option will throw if you specify more than
+   * one.
+   *
+   * A number of shortcuts of commonly used option combinations are provided.
+   * E.g., ShortPRM prints the parameters in the PRM format, while skipping the
+   * documentation.
    */
   enum OutputStyle
   {
     /**
-     * Write human readable output suitable to be read by ParameterHandler
-     * again.
+     * Default stylistic style: print documentation and sort all parameters
+     * alphabetically.
      */
-    Text = 1,
-
-    /**
-     * Write parameters as a LaTeX table.
-     */
-    LaTeX = 2,
-    /**
-     * Write out declared parameters with description and possible values.
-     */
-    Description = 3,
-
-    /**
-     * Write out everything as an <a
-     * href="http://en.wikipedia.org/wiki/XML">XML</a> file.
-     *
-     * See the general documentation of this class for an example of output.
-     */
-    XML = 4,
-
-    /**
-     * Write out everything as a <a
-     * href="http://en.wikipedia.org/wiki/JSON">JSON</a> file.
-     */
-    JSON = 5,
+    DefaultStyle = 0x0000,
 
     /**
      * Write input for ParameterHandler without comments or changed default
      * values.
      */
-    ShortText = 193
+    Short = 0x0001,
+
+    /**
+     * Keep the order of the parameters as they have been declared.
+     */
+    KeepDeclarationOrder = 0x0002,
+
+    /**
+     * Write human readable output suitable to be read by
+     * ParameterHandler::parse_input() again.
+     */
+    PRM = 0x0010,
+
+    /**
+     * Write human readable output suitable to be read by
+     * ParameterHandler::parse_input() again.
+     *
+     * @deprecated Use `PRM` instead of `Text`.
+     */
+    Text = PRM,
+
+    /**
+     * Write parameters as a LaTeX table.
+     */
+    LaTeX = 0x0020,
+
+    /**
+     * Write out declared parameters with description and possible values.
+     *
+     * @note This format is not suitable to be read back again.
+     */
+    Description = 0x0040,
+
+    /**
+     * Write out everything as an <a
+     * href="http://en.wikipedia.org/wiki/XML">XML</a> file suitable to be read
+     * by ParameterHandler::parse_input_from_xml() again.
+     *
+     * See the general documentation of this class for an example of output.
+     */
+    XML = 0x0080,
+
+    /**
+     * Write out everything as a <a
+     * href="http://en.wikipedia.org/wiki/JSON">JSON</a> file suitable to be
+     * read by ParameterHandler::parse_input_from_json() again.
+     */
+    JSON = 0x0100,
+
+    /**
+     * Write the content of ParameterHandler without comments or changed default
+     * values.
+     */
+    ShortPRM = PRM | Short,
+
+    /**
+     * Write the content of ParameterHandler without comments or changed default
+     * values.
+     *
+     * @deprecated Use `ShortPRM` instead of `ShortText`.
+     */
+    ShortText = ShortPRM,
+
+    /**
+     * Write the content of ParameterHandler without comments or changed default
+     * values as a XML file.
+     */
+    ShortXML = XML | Short,
+
+    /**
+     * Write the content of ParameterHandler without comments or changed default
+     * values as a JSON file.
+     */
+    ShortJSON = JSON | Short,
+
+    /**
+     * Write the content of ParameterHandler without comments or changed default
+     * values as a LaTeX file.
+     */
+    ShortLaTeX = LaTeX | Short,
   };
 
 
@@ -952,52 +1015,31 @@ public:
               const bool         skip_undefined = false);
 
   /**
-   * Parse the given file to provide values for known parameter fields. The
-   * PathSearch class "PARAMETERS" is used to find the file.
+   * Parse input from a specified parameter file @p filename independently
+   * of the type of input file (prm, xml, json) being used. The code path
+   * selected by this function is extracted from the ending of the filename,
+   * so the user has to make sure that the content of the input file is
+   * consistent with its name.
    *
-   * The function in essence reads the entire file into a stream and
-   * then calls the other parse_input() function with that stream. See
-   * there for more information.
+   * The parameter @p last_line will only be used for parameter files of .prm type.
+   * See the other parse_input function for documentation.
    *
-   * Previous versions of deal.II included a similar function named
-   * <code>read_input</code> which, if the parameter file could not be found
-   * by PathSearch::find, would not modify the calling ParameterHandler (i.e.,
-   * the parameters would all be set to their default values) and would
-   * (optionally) create a parameter file with default values. In order to
-   * obtain that behavior one should catch the PathSearch::ExcFileNotFound
-   * exception and then optionally call ParameterHandler::print_parameters,
-   * e.g.,
+   * The user can specify whether parameters in the input file not added to the
+   * parameter handler will be skipped by @p skip_undefined (enables partial
+   * parsing), and whether the code will assert that all parameters of the
+   * parameter handler declared with flag `has_to_be_set=true` are indeed found
+   * in the input file.
    *
-   * @code
-   * const std::string filename = "parameters.prm";
-   * const bool print_default_prm_file = true;
-   * try
-   *   {
-   *     parameter_handler.parse_input (filename);
-   *   }
-   * catch (const PathSearch::ExcFileNotFound &)
-   *   {
-   *     std::cerr << "ParameterHandler::parse_input: could not open file <"
-   *               << filename
-   *               << "> for reading."
-   *               << std::endl;
-   *     if (print_default_prm_file)
-   *       {
-   *         std::cerr << "Trying to make file <"
-   *                   << filename
-   *                   << "> with default values for you."
-   *                   << std::endl;
-   *         std::ofstream output (filename);
-   *         parameter_handler.print_parameters(
-   *           output, ParameterHandler::OutputStyle::Text);
-   *       }
-   *   }
-   * @endcode
+   * If the function is called with `skip_undefined=true`, it is recommended to
+   * also set `assert_mandatory_entries_are_found=true`. For example, this
+   * ensures that parameters with typos in the input file will not be skipped,
+   * while such mistakes would otherwise remain unrecognized.
    */
   virtual void
   parse_input(const std::string &filename,
-              const std::string &last_line      = "",
-              const bool         skip_undefined = false);
+              const std::string &last_line                          = "",
+              const bool         skip_undefined                     = false,
+              const bool         assert_mandatory_entries_are_found = false);
 
   /**
    * Parse input from a string to populate known parameter fields. The lines
@@ -1020,7 +1062,7 @@ public:
    * parameter GUI (see the general documentation of this class).
    */
   virtual void
-  parse_input_from_xml(std::istream &input);
+  parse_input_from_xml(std::istream &input, const bool skip_undefined = false);
 
   /**
    * Parse input from a JSON stream to populate known parameter fields. This
@@ -1030,7 +1072,7 @@ public:
    * input.
    */
   virtual void
-  parse_input_from_json(std::istream &input);
+  parse_input_from_json(std::istream &input, const bool skip_undefined = false);
 
   /**
    * Clear all contents.
@@ -1043,17 +1085,23 @@ public:
    * Declare a new entry with name <tt>entry</tt>, default and for which any
    * input has to match the <tt>pattern</tt> (default: any pattern).
    *
-   * The last parameter defaulting to an empty string is used to add a
-   * documenting text to each entry which will be printed as a comment when
-   * this class is asked to write out all declarations to a stream using the
-   * print_parameters() function.
-   *
    * The function generates an exception of type ExcValueDoesNotMatchPattern
    * if the default value doesn't match the given pattern, using the C++ throw
    * mechanism. However, this exception is only generated <i>after</i> the
    * entry has been created; if you have code where no sensible default value
    * for a parameter is possible, you can then catch and ignore this
    * exception.
+   *
+   * The parameter @p documentation defaulting to an empty string is used
+   * to add a documenting text to each entry which will be printed as a comment
+   * when this class is asked to write out all declarations to a stream using
+   * the print_parameters() function.
+   *
+   * The parameter @p has_to_be_set can be used in order to declare this
+   * parameter as a parameter whose default value has to be overwritten by
+   * one of the methods provided by this class. Whether a parameter has been set
+   * successfully can be queried by the functions get_entries_wrongly_not_set()
+   * and assert_that_entries_have_been_set().
    *
    * @note An entry can be declared more than once without generating an
    * error, for example to override an earlier default value.
@@ -1062,7 +1110,8 @@ public:
   declare_entry(const std::string &          entry,
                 const std::string &          default_value,
                 const Patterns::PatternBase &pattern = Patterns::Anything(),
-                const std::string &          documentation = "");
+                const std::string &          documentation = "",
+                const bool                   has_to_be_set = false);
 
   /**
    * Attach an action to the parameter with name @p entry in the current
@@ -1119,6 +1168,12 @@ public:
    *
    * By default, the pattern to use is obtained by calling the function
    * Patterns::Tools::Convert<T>::to_pattern(), but a custom one can be used.
+   *
+   * The parameter @p has_to_be_set can be used in order to declare this
+   * parameter as a parameter whose default value has to be overwritten by
+   * one of the methods provided by this class. Whether a parameter has been set
+   * successfully can be queried by the functions get_entries_wrongly_not_set()
+   * and assert_that_entries_have_been_set().
    */
   template <class ParameterType>
   void
@@ -1126,7 +1181,8 @@ public:
                 ParameterType &              parameter,
                 const std::string &          documentation = "",
                 const Patterns::PatternBase &pattern =
-                  *Patterns::Tools::Convert<ParameterType>::to_pattern());
+                  *Patterns::Tools::Convert<ParameterType>::to_pattern(),
+                const bool has_to_be_set = false);
 
   /**
    * Create an alias for an existing entry. This provides a way to refer to a
@@ -1187,6 +1243,14 @@ public:
    */
   void
   leave_subsection();
+
+  /**
+   * Check whether a subsection or a subsection path exists in current tree.
+   * The input parameter @p sub_path is assumed to be relative to the
+   * currently selected path.
+   */
+  bool
+  subsection_path_exists(const std::vector<std::string> &sub_path) const;
 
   /**
    * Return value of entry @p entry_string.  If the entry was changed,
@@ -1330,11 +1394,17 @@ public:
   void
   set(const std::string &entry_name, const bool new_value);
 
-
   /**
-   * Print all parameters with the given style to <tt>out</tt>.
+   * Print all parameters with the given @p style to @p out.
    *
-   * In <tt>Text</tt> format, the output is formatted in such a way that it is
+   * Before printing, all current parameters and subsections are sorted
+   * alphabetically by default.
+   * This behavior can be disabled setting the optional parameter @p style
+   * to <tt>KeepDeclarationOrder</tt>: in this case entries are printed in the
+   * same order as they have been declared.
+   *
+   * In <tt>PRM</tt>, <tt>XML</tt>, and <tt>JSON</tt> format, the output is
+   * formatted in such a way that it is
    * possible to use it for later input again. This is most useful to record
    * the parameters for a specific run, since if you output the parameters
    * using this function into a log file, you can always recover the results
@@ -1344,6 +1414,12 @@ public:
    * default value of entries if it is different from the actual value, as
    * well as the documenting string given to the declare_entry() function if
    * available.
+   *
+   * By using the flag <tt>Short</tt> in combination with <tt>PRM</tt>,
+   * <tt>XML</tt>, <tt>JSON</tt>, or <tt>LaTeX</tt> (or by using the shortcuts
+   * <tt>ShortPRM</tt>, <tt>ShortXML</tt>, <tt>ShortJSON</tt>, or
+   * <tt>ShortLaTeX</tt>), a reduced output can be generated, only containing
+   * the values and skipping the documentation.
    *
    * In <tt>XML</tt> format, the output starts with one root element
    * <tt>ParameterHandler</tt> in order to get a valid XML document and all
@@ -1393,37 +1469,48 @@ public:
   std::ostream &
   print_parameters(std::ostream &out, const OutputStyle style) const;
 
+
+
   /**
-   * Print out the parameters of the present subsection as given by the
-   * <tt>subsection_path</tt> member variable. This variable is controlled by
-   * entering and leaving subsections through the enter_subsection() and
-   * leave_subsection() functions.
+   * Print all parameters to the file given by @p filename with the given output
+   * style @p style.
    *
-   * If <tt>include_top_level_elements</tt> is <tt>true</tt>, also the higher
-   * subsection elements are printed. In <tt>XML</tt> format this is required
-   * to get a valid XML document and output starts with one root element
-   * <tt>ParameterHandler</tt>.
+   * This function deduces the output format from the extension of the specified
+   * filename. Supported extensions are `prm`, `xml`, `tex`, and `json`. Hence,
+   * it is not necessary to specify an output format via the @p style argument
+   * as long as one of these extensions is added to the filename. If an output
+   * format is specified in the @p style parameter nevertheless, the output
+   * format has to be consistent with the filename extension.
    *
-   * In most cases, you will not want to use this function directly, but have
-   * it called recursively by the previous function.
+   * If no extension is specified or the extension is not supported, the
+   * output format is deduced from the @p style argument.
    *
-   * @deprecated This function is deprecated because, even though it only
-   *   outputs information, it is not a <code>const</code> function.
+   * If neither the extension is supported, nor does the @p style parameter
+   * contain a format specification, an assertion is thrown.
+   *
+   * @param filename The output file name.
+   * @param style The style with which output is produced.
    */
-  DEAL_II_DEPRECATED
   void
-  print_parameters_section(std::ostream &     out,
-                           const OutputStyle  style,
-                           const unsigned int indent_level,
-                           const bool include_top_level_elements = false);
+  print_parameters(const std::string &filename,
+                   const OutputStyle  style = DefaultStyle) const;
 
   /**
    * Print parameters to a logstream. This function allows to print all
    * parameters into a log-file. Sections will be indented in the usual log-
    * file style.
+   *
+   * All current parameters and subsections are sorted
+   * alphabetically by default.
+   * This behavior can be disabled setting the optional parameter @p style
+   * to <tt>KeepDeclarationOrder</tt>: in this case entries are printed in the
+   * same order as they have been declared.
+   *
+   * @note All style settings in @p style not related to the ordering are
+   *   ignored.
    */
   void
-  log_parameters(LogStream &out);
+  log_parameters(LogStream &out, const OutputStyle style = DefaultStyle);
 
   /**
    * Log parameters in the present subsection. The subsection is determined by
@@ -1431,11 +1518,21 @@ public:
    * by entering and leaving subsections through the enter_subsection() and
    * leave_subsection() functions.
    *
+   * All current parameters and subsections are sorted
+   * alphabetically by default.
+   * This behavior can be disabled setting the optional parameter @p style
+   * to <tt>KeepDeclarationOrder</tt>: in this case entries are printed in the
+   * same order as they have been declared.
+   *
+   * @note All style settings in @p style not related to the ordering are
+   *   ignored.
+   *
    * In most cases, you will not want to use this function directly, but have
    * it called recursively by the previous function.
    */
   void
-  log_parameters_section(LogStream &out);
+  log_parameters_section(LogStream &       out,
+                         const OutputStyle style = DefaultStyle);
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
@@ -1446,7 +1543,8 @@ public:
 
   /**
    * Write the data of this object to a stream for the purpose of
-   * serialization.
+   * serialization using the [BOOST serialization
+   * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
    */
   template <class Archive>
   void
@@ -1454,19 +1552,52 @@ public:
 
   /**
    * Read the data of this object from a stream for the purpose of
-   * serialization.
+   * serialization using the [BOOST serialization
+   * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
    */
   template <class Archive>
   void
   load(Archive &ar, const unsigned int version);
 
+#ifdef DOXYGEN
+  /**
+   * Write and read the data of this object from a stream for the purpose
+   * of serialization using the [BOOST serialization
+   * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
+   */
+  template <class Archive>
+  void
+  serialize(Archive &archive, const unsigned int version);
+#else
+  // This macro defines the serialize() method that is compatible with
+  // the templated save() and load() method that have been implemented.
   BOOST_SERIALIZATION_SPLIT_MEMBER()
+#endif
 
   /**
    * Test for equality.
    */
   bool
   operator==(const ParameterHandler &prm2) const;
+
+  /**
+   * Return a set of parameter names (including subsection names) corresponding
+   * to those entries of the parameter handler that have not been set by one of
+   * the functions parsing parameters from an input file or by an explicit call
+   * to one of the set() functions, but that have been declared as mandatory
+   * parameters that must be set (through the last argument of the
+   * declare_entry() function or add_parameter() function).
+   */
+  std::set<std::string>
+  get_entries_wrongly_not_set() const;
+
+  /**
+   * Asserts that those entries of the parameter handler with flag
+   * `has_to_be_set = true` have been set. An exception is invoked
+   * if at least one of these parameters has not been set.
+   */
+  void
+  assert_that_entries_have_been_set() const;
 
   /**
    * @addtogroup Exceptions
@@ -1572,17 +1703,11 @@ public:
    * Exception for when an entry in an XML parameter file does not match the
    * provided pattern. The arguments are, in order, the entry value, entry
    * name, and a description of the pattern.
+   *
+   * @deprecated Use ExcValueDoesNotMatchPattern instead of ExcInvalidEntryForPatternXML.
    */
-  DeclException3(ExcInvalidEntryForPatternXML,
-                 std::string,
-                 std::string,
-                 std::string,
-                 << "    The entry value \n"
-                 << "        " << arg1 << '\n'
-                 << "    for the entry named\n"
-                 << "        " << arg2 << '\n'
-                 << "    does not match the given pattern:\n"
-                 << "        " << arg3);
+  using ExcInvalidEntryForPatternXML DEAL_II_DEPRECATED =
+    ExcValueDoesNotMatchPattern;
 
   /**
    * Exception for when the file given in an include statement cannot be
@@ -1602,6 +1727,7 @@ public:
     << arg3 << "> cannot be opened.");
 
   //@}
+
 private:
   /**
    * The separator used when accessing elements of a path into the parameter
@@ -1625,6 +1751,16 @@ private:
   std::unique_ptr<boost::property_tree::ptree> entries;
 
   /**
+   * A map that stores a pair of boolean variables for each entry
+   * added to the parameter handler. The first bool describes whether the
+   * parameter has to be set according to the last argument of the functions
+   * declare_entry() or add_parameter(), and the second bool contains the
+   * information whether the parameter has been set by any of the functions
+   * parsing input parameters or by a set function of this class.
+   */
+  std::map<std::string, std::pair<bool, bool>> entries_set_status;
+
+  /**
    * A list of patterns that are used to describe the parameters of this
    * object. Every nodes in the property tree corresponding to a parameter
    * stores an index into this array.
@@ -1638,15 +1774,6 @@ private:
    * store indices into this array in order to reference specific actions.
    */
   std::vector<std::function<void(const std::string &)>> actions;
-
-  /**
-   * Given a list of directories and subdirectories that identify
-   * a particular place in the tree, return the string that identifies
-   * this place in the way the BOOST property tree libraries likes
-   * to identify things.
-   */
-  static std::string
-  collate_path_string(const std::vector<std::string> &subsection_path);
 
   /**
    * Return the string that identifies the current path into the property
@@ -1711,15 +1838,29 @@ private:
    */
   void
   recursively_print_parameters(
-    const std::vector<std::string> &target_subsection_path,
-    const OutputStyle               style,
-    const unsigned int              indent_level,
-    std::ostream &                  out) const;
+    const boost::property_tree::ptree & tree,
+    const std::vector<std::string> &    target_subsection_path,
+    const ParameterHandler::OutputStyle style,
+    const unsigned int                  indent_level,
+    std::ostream &                      out) const;
 
   friend class MultipleParameterLoop;
 };
 
-
+/**
+ * Global operator which returns an object in which all bits are set which are
+ * either set in the first or the second argument. This operator exists since
+ * if it did not then the result of the bit-or <tt>operator |</tt> would be an
+ * integer which would in turn trigger a compiler warning when we tried to
+ * assign it to an object of type ParameterHandler::OutputStyle.
+ */
+inline ParameterHandler::OutputStyle
+operator|(const ParameterHandler::OutputStyle f1,
+          const ParameterHandler::OutputStyle f2)
+{
+  return static_cast<ParameterHandler::OutputStyle>(
+    static_cast<unsigned int>(f1) | static_cast<unsigned int>(f2));
+}
 
 /**
  * The class MultipleParameterLoop offers an easy possibility to test several
@@ -1796,7 +1937,7 @@ private:
  *
  *     void HelperClass::create_new (const unsigned int run_no)
  *     {
- *       p = std_cxx14::make_unique<Problem>());
+ *       p = std::make_unique<Problem>());
  *     }
  *
  *
@@ -1935,7 +2076,6 @@ private:
  *
  *
  * @ingroup input
- * @author Wolfgang Bangerth, October 1997, 2010
  */
 class MultipleParameterLoop : public ParameterHandler
 {
@@ -2185,17 +2325,19 @@ void
 ParameterHandler::add_parameter(const std::string &          entry,
                                 ParameterType &              parameter,
                                 const std::string &          documentation,
-                                const Patterns::PatternBase &pattern)
+                                const Patterns::PatternBase &pattern,
+                                const bool                   has_to_be_set)
 {
   static_assert(std::is_const<ParameterType>::value == false,
                 "You tried to add a parameter using a type "
                 "that is const. Use a non-const type.");
 
   declare_entry(entry,
-                Patterns::Tools::Convert<ParameterType>::to_string(
-                  parameter, pattern.clone()),
+                Patterns::Tools::Convert<ParameterType>::to_string(parameter,
+                                                                   pattern),
                 pattern,
-                documentation);
+                documentation,
+                has_to_be_set);
 
   std::string        path = get_current_full_path(entry);
   const unsigned int pattern_index =
@@ -2203,7 +2345,7 @@ ParameterHandler::add_parameter(const std::string &          entry,
 
   auto action = [&, pattern_index](const std::string &val) {
     parameter = Patterns::Tools::Convert<ParameterType>::to_value(
-      val, patterns[pattern_index]->clone());
+      val, *patterns[pattern_index]);
   };
   add_action(entry, action);
 }

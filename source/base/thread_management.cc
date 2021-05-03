@@ -31,26 +31,6 @@ namespace Threads
 {
   namespace internal
   {
-    static std::atomic<unsigned int> n_existing_threads_counter(1);
-
-
-    void
-    register_thread()
-    {
-      ++n_existing_threads_counter;
-    }
-
-
-
-    void
-    deregister_thread()
-    {
-      --n_existing_threads_counter;
-      Assert(n_existing_threads_counter >= 1, ExcInternalError());
-    }
-
-
-
     [[noreturn]] void
     handle_std_exception(const std::exception &exc) {
       // lock the following context
@@ -62,7 +42,7 @@ namespace Threads
       // std::abort, though
       static Mutex mutex;
       {
-        Mutex::ScopedLock lock(mutex);
+        std::lock_guard<std::mutex> lock(mutex);
 
         std::cerr
           << std::endl
@@ -101,7 +81,7 @@ namespace Threads
       // std::abort, though
       static Mutex mutex;
       {
-        Mutex::ScopedLock lock(mutex);
+        std::lock_guard<std::mutex> lock(mutex);
 
         std::cerr
           << std::endl
@@ -122,104 +102,6 @@ namespace Threads
       std::abort();
     }
   } // namespace internal
-
-
-
-  unsigned int
-  n_existing_threads()
-  {
-    return internal::n_existing_threads_counter;
-  }
-
-
-  unsigned int
-  this_thread_id()
-  {
-#ifdef SYS_gettid
-    const pid_t this_id = syscall(SYS_gettid);
-#elif defined(DEAL_II_HAVE_UNISTD_H) && defined(DEAL_II_HAVE_GETPID)
-    const pid_t this_id = getpid();
-#else
-    const unsigned int this_id = 0;
-#endif
-
-    return static_cast<unsigned int>(this_id);
-  }
-
-
-
-#ifdef DEAL_II_USE_MT_POSIX
-
-
-#  ifndef DEAL_II_USE_MT_POSIX_NO_BARRIERS
-  PosixThreadBarrier::PosixThreadBarrier(const unsigned int count,
-                                         const char *,
-                                         void *)
-  {
-    pthread_barrier_init(&barrier, nullptr, count);
-  }
-
-#  else
-
-  PosixThreadBarrier::PosixThreadBarrier(const unsigned int count,
-                                         const char *,
-                                         void *)
-    : count(count)
-  {
-    // throw an exception unless we
-    // have the special case that a
-    // count of 1 is given, since
-    // then waiting for a barrier is
-    // a no-op, and we don't need the
-    // POSIX functionality
-    AssertThrow(count == 1,
-                ExcMessage("Your local POSIX installation does not support\n"
-                           "POSIX barriers. You will not be able to use\n"
-                           "this class, but the rest of the threading\n"
-                           "functionality is available."));
-  }
-#  endif
-
-
-
-  PosixThreadBarrier::~PosixThreadBarrier()
-  {
-#  ifndef DEAL_II_USE_MT_POSIX_NO_BARRIERS
-    pthread_barrier_destroy(&barrier);
-#  else
-    // unless the barrier is a no-op,
-    // complain again (how did we get
-    // here then?)
-    if (count != 1)
-      std::abort();
-#  endif
-  }
-
-
-
-  int
-  PosixThreadBarrier::wait()
-  {
-#  ifndef DEAL_II_USE_MT_POSIX_NO_BARRIERS
-    return pthread_barrier_wait(&barrier);
-#  else
-    // in the special case, this
-    // function is a no-op. otherwise
-    // complain about the missing
-    // POSIX functions
-    if (count == 1)
-      return 0;
-    else
-      {
-        std::abort();
-        return 1;
-      }
-#  endif
-  }
-
-
-
-#endif
 
 
 

@@ -1,0 +1,10 @@
+
+DEAL::Encoding: Hello
+DEAL::Encoded: SGVsbG8=
+DEAL::Decoded: H e l l o
+DEAL::Encoding: deal.II rocks!
+DEAL::Encoded: ZGVhbC5JSSByb2NrcyE=
+DEAL::Decoded: d e a l . I I   r o c k s !
+DEAL::Encoding: 1234
+DEAL::Encoded: MTIzNA==
+DEAL::Decoded: 1 2 3 4

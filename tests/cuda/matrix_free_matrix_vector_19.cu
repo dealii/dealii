@@ -41,6 +41,7 @@
 #include <iostream>
 
 #include "../tests.h"
+
 #include "matrix_vector_mf.h"
 
 
@@ -49,7 +50,7 @@ template <int dim, int fe_degree>
 void
 test()
 {
-  typedef double Number;
+  using Number = double;
 
   parallel::shared::Triangulation<dim> tria(
     MPI_COMM_WORLD,

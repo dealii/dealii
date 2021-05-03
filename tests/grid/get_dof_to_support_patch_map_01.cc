@@ -28,6 +28,8 @@
 
 #include <deal.II/dofs/dof_handler.h>
 
+#include <deal.II/fe/fe_q.h>
+
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria.h>
@@ -38,15 +40,12 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 
 template <int dim>
 void
 test()
 {
-  using namespace dealii;
-
   Triangulation<dim> triangulation(
     Triangulation<dim>::limit_level_difference_at_vertices);
 
@@ -176,8 +175,6 @@ test()
 int
 main()
 {
-  using namespace dealii;
-
   initlog();
 
   deallog.push("1d");

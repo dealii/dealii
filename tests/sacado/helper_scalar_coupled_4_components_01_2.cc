@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,8 +20,9 @@
 //
 // AD number type: Sacado DFad-DFad
 
-#include "../ad_common_tests/helper_scalar_coupled_4_components_01.h"
 #include "../tests.h"
+
+#include "../ad_common_tests/helper_scalar_coupled_4_components_01.h"
 
 int
 main(int argc, char **argv)

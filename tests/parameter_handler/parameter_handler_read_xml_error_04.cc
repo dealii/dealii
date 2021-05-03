@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2018 by the deal.II authors
+// Copyright (C) 2002 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -64,7 +64,7 @@ main()
     {
       prm.parse_input_from_xml(in);
     }
-  catch (const ParameterHandler::ExcInvalidEntryForPatternXML &exc)
+  catch (const ParameterHandler::ExcValueDoesNotMatchPattern &exc)
     {
       deallog << exc.get_exc_name() << std::endl;
       exc.print_info(deallog.get_file_stream());

@@ -16,6 +16,33 @@
         "pattern": "1",
         "pattern_description": "[Integer range -2147483648...2147483647 (inclusive)]"
     },
+    "Testing_25testing":
+    {
+        "double_2bdouble":
+        {
+            "value": "6.1415926",
+            "default_value": "6.1415926",
+            "documentation": "docs 3",
+            "pattern": "6",
+            "pattern_description": "[Double -MAX_DOUBLE...MAX_DOUBLE (inclusive)]"
+        },
+        "int_2aint":
+        {
+            "value": "2",
+            "default_value": "2",
+            "documentation": "",
+            "pattern": "5",
+            "pattern_description": "[Integer range -2147483648...2147483647 (inclusive)]"
+        },
+        "string_26list":
+        {
+            "value": "< & > ; \/",
+            "default_value": "< & > ; \/",
+            "documentation": "docs 1",
+            "pattern": "4",
+            "pattern_description": "[Anything]"
+        }
+    },
     "ss1":
     {
         "double_201":
@@ -37,32 +64,24 @@
                 "pattern_description": "[Double -MAX_DOUBLE...MAX_DOUBLE (inclusive)]"
             }
         }
-    },
+    }
+}
+
+{
+    "int1": "1",
+    "int2": "2",
     "Testing_25testing":
     {
-        "string_26list":
+        "double_2bdouble": "6.1415926",
+        "int_2aint": "2",
+        "string_26list": "< & > ; \/"
+    },
+    "ss1":
+    {
+        "double_201": "1.234",
+        "ss2":
         {
-            "value": "< & > ; \/",
-            "default_value": "< & > ; \/",
-            "documentation": "docs 1",
-            "pattern": "4",
-            "pattern_description": "[Anything]"
-        },
-        "int_2aint":
-        {
-            "value": "2",
-            "default_value": "2",
-            "documentation": "",
-            "pattern": "5",
-            "pattern_description": "[Integer range -2147483648...2147483647 (inclusive)]"
-        },
-        "double_2bdouble":
-        {
-            "value": "6.1415926",
-            "default_value": "6.1415926",
-            "documentation": "docs 3",
-            "pattern": "6",
-            "pattern_description": "[Double -MAX_DOUBLE...MAX_DOUBLE (inclusive)]"
+            "double_202": "4.321"
         }
     }
 }

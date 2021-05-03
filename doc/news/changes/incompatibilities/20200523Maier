@@ -1,0 +1,5 @@
+Removed: The following preprocessor definitions have been removed from
+config.h.in: DEAL_II_NOEXCEPT, DEAL_II_USE_MT_POSIX,
+DEAL_II_USE_MT_POSIX_NO_BARRIERS
+<br>
+(Matthias Maier, 2020/05/23)

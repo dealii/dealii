@@ -1,0 +1,31 @@
+
+DEAL::ncells:13, nfes:4
+DEAL::sequence:0 1 2 3
+DEAL::cycle:0, fe count:12 1 0 0
+DEAL::cycle:1, fe count:8 4 1 0
+DEAL::cycle:2, fe count:4 4 4 1
+DEAL::OK
+DEAL::ncells:13, nfes:8
+DEAL::sequence:0 1 2 3 4 5 6 7
+DEAL::cycle:0, fe count:12 1 0 0 0 0 0 0
+DEAL::cycle:1, fe count:12 0 1 0 0 0 0 0
+DEAL::cycle:2, fe count:8 4 0 1 0 0 0 0
+DEAL::cycle:3, fe count:8 0 4 0 1 0 0 0
+DEAL::cycle:4, fe count:4 4 0 4 0 1 0 0
+DEAL::cycle:5, fe count:4 0 4 0 4 0 1 0
+DEAL::cycle:6, fe count:0 4 0 4 0 4 0 1
+DEAL::OK
+DEAL::ncells:13, nfes:12
+DEAL::sequence:0 1 2 3 4 5 6 7 8 9 10 11
+DEAL::cycle:0, fe count:12 1 0 0 0 0 0 0 0 0 0 0
+DEAL::cycle:1, fe count:12 0 1 0 0 0 0 0 0 0 0 0
+DEAL::cycle:2, fe count:12 0 0 1 0 0 0 0 0 0 0 0
+DEAL::cycle:3, fe count:8 4 0 0 1 0 0 0 0 0 0 0
+DEAL::cycle:4, fe count:8 0 4 0 0 1 0 0 0 0 0 0
+DEAL::cycle:5, fe count:8 0 0 4 0 0 1 0 0 0 0 0
+DEAL::cycle:6, fe count:4 4 0 0 4 0 0 1 0 0 0 0
+DEAL::cycle:7, fe count:4 0 4 0 0 4 0 0 1 0 0 0
+DEAL::cycle:8, fe count:4 0 0 4 0 0 4 0 0 1 0 0
+DEAL::cycle:9, fe count:0 4 0 0 4 0 0 4 0 0 1 0
+DEAL::cycle:10, fe count:0 0 4 0 0 4 0 0 4 0 0 1
+DEAL::OK

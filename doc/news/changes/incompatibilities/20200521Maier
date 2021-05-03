@@ -1,0 +1,3 @@
+Updated: deal.II now requires a compiler with enabled C++14 support.
+<br>
+(Matthias Maier, 2020/05/21)

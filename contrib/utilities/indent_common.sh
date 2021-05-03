@@ -1,7 +1,7 @@
 #!/bin/bash
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2018 - 2019 by the deal.II authors
+## Copyright (C) 2018 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -38,11 +38,11 @@ checks() {
   fi
 
   # Add the location 'download_clang_format' or 'compile_clang_format'
-  # installs clang-format to to the local PATH.
+  # installs clang-format to the local PATH.
   CLANG_FORMAT_PATH="$(cd "$(dirname "$0")" && pwd)/programs/clang-6/bin"
   export PATH="${CLANG_FORMAT_PATH}:${PATH}"
 
-  if ! [ -x "$(command -v ${DEAL_II_CLANG_FORMAT})" ]; then
+  if ! [ -x "$(command -v "${DEAL_II_CLANG_FORMAT}")" ]; then
     echo "***   No clang-format program found."
     echo "***"
     echo "***   You can run the './contrib/utilities/download_clang_format'"
@@ -66,6 +66,52 @@ checks() {
     echo "***   to install a compatible binary into './contrib/utilities/programs'."
     exit 1
   fi
+
+
+  # check formatting of usernames and email addresses, examples that will be detected:
+  # not-using-a-name <a@b.com>
+  # John Doe <doe@macbook.local>
+  # Jane Doe <a@nodomain>
+  #
+  # For commits already in the history, please see .mailmap in the root directory.
+  #
+  # Note that we currently allow email addresses of the form
+  # Luca Heltai <luca-heltai@users.noreply.github.com>
+  # as these are generated when using the website to commit.
+  #
+  # Finally, to stay sane, just go back until the beginning of 2019 for now.
+  #
+  # first user names:
+  git log --since "2019-01-01" --format="%aN" --no-merges | sort -u | while read name ; do
+      words=($name)
+      if [ "${#words[@]}" -lt "2" ]; then
+	  echo "invalid author '$name' without firstname and lastname"
+	  echo ""
+	  echo "hint: for possible solutions, consult the webpage:"
+	  echo "      https://github.com/dealii/dealii/wiki/Indentation#commit-authorship"
+	  exit 2
+      fi
+  done || exit 2
+
+  # now emails:
+  git log --since "2019-01-01" --format="%aE" --no-merges | sort -u | while read email ; do
+      words=($name)
+      if ! echo "$email" | grep -q "\."; then
+	  echo "invalid email '$email'"
+          echo ""
+          echo "hint: for possible solutions, consult the webpage:"
+          echo "      https://github.com/dealii/dealii/wiki/Indentation#commit-authorship"
+	  exit 3
+      fi
+      if ! echo "$email" | grep -q -v -e "\.local$"; then
+	  echo "invalid email '$email'"
+          echo ""
+          echo "hint: for possible solutions, consult the webpage:"
+          echo "      https://github.com/dealii/dealii/wiki/Indentation#commit-authorship"
+	  exit 3
+      fi
+  done || exit 3
+
 }
 
 #
@@ -115,6 +161,27 @@ format_file()
   rm -f "${tmpfile}"
 }
 export -f format_file
+
+#
+# Remove trailing whitespace.
+#
+
+remove_trailing_whitespace()
+{
+  file="${1}"
+  tmpfile="$(mktemp "${TMPDIR}/$(basename "$1").tmp.XXXXXXXX")"
+
+  #
+  # Mac OS uses BSD sed (other than GNU sed in Linux),
+  # so it doesn't recognize \s as 'spaces' or + as 'one or more'.
+  #
+  sed 's/[[:space:]]\{1,\}$//g' "${file}" > "${tmpfile}"
+  if ! diff -q "${file}" "${tmpfile}" >/dev/null; then
+    mv "${tmpfile}" "${file}"
+  fi
+  rm -f "${tmpfile}"
+}
+export -f remove_trailing_whitespace
 
 #
 # In order to format .inst.in files, we need to replace \{ and \} by a
@@ -212,13 +279,14 @@ export -f fix_permissions
 
 process()
 {
+  directories=$1
   case "${OSTYPE}" in
     darwin*)
-      find -E ${1} -regex "${2}" -print0 |
+      find -E ${directories} -regex "${2}" -print0 |
         xargs -0 -n 1 -P 10 -I {} bash -c "${3} {}"
       ;;
     *)
-      find ${1} -regextype egrep -regex "${2}" -print0 |
+      find ${directories} -regextype egrep -regex "${2}" -print0 |
         xargs -0 -n 1 -P 10 -I {} bash -c "${3} {}"
       ;;
   esac
@@ -235,7 +303,7 @@ process()
 process_changed()
 {
   LAST_MERGE_COMMIT="$(git log --format="%H" --merges --max-count=1 master)"
-  COMMON_ANCESTOR_WITH_MASTER="$(git merge-base ${LAST_MERGE_COMMIT} HEAD)"
+  COMMON_ANCESTOR_WITH_MASTER="$(git merge-base "${LAST_MERGE_COMMIT}" HEAD)"
 
   case "${OSTYPE}" in
     darwin*)
@@ -247,8 +315,36 @@ process_changed()
   esac
 
   ( git ls-files --others --exclude-standard -- ${1};
-    git diff --name-only --diff-filter=d $COMMON_ANCESTOR_WITH_MASTER -- ${1} )|
+    git diff --name-only $COMMON_ANCESTOR_WITH_MASTER -- ${1} )|
       sort -u |
+      xargs -n 1 ls -d 2>/dev/null |
       grep -E "^${2}$" |
       ${XARGS} '\n' -n 1 -P 10 -I {} bash -c "${3} {}"
 }
+
+#
+# Ensure only a single newline at end of files
+#
+ensure_single_trailing_newline()
+{
+  f=$1
+
+  # Remove newlines at end of file
+  # Check that the current line only contains newlines
+  # If it doesn't match, print it
+  # If it does match and we're not at the end of the file,
+  # append the next line to the current line and repeat the check
+  # If it does match and we're at the end of the file,
+  # remove the line.
+  sed -e :a -e '/^\n*$/{$d;N;};/\n$/ba' $f >$f.tmpi
+
+  # Then add a newline to the end of the file
+  # '$' denotes the end of file
+  # 'a\' appends the following text (which in this case is nothing)
+  # on a new line
+  sed -e '$a\' $f.tmpi >$f.tmp
+
+  diff -q $f $f.tmp >/dev/null || mv $f.tmp $f
+  rm -f $f.tmp $f.tmpi
+}
+export -f ensure_single_trailing_newline

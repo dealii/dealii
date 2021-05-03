@@ -217,7 +217,7 @@ test(std::string solver_name, std::string preconditioner_name)
 
   // test SLEPc by
   {
-    PETScWrappers::PreconditionerBase *preconditioner;
+    PETScWrappers::PreconditionBase *preconditioner;
 
     dealii::deallog << preconditioner_name << std::endl;
     if (preconditioner_name == "Jacobi")

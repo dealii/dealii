@@ -1,10 +1,10 @@
 
 DEAL:FIRE::Starting value 416.0
-DEAL:FIRE::Convergence step 101 value 0
-DEAL::FIRE::Solution vector: 0      0      
-DEAL:FIRE::Starting value 0.08000
-DEAL:FIRE::Convergence step 89 value 0
-DEAL::FIRE::Solution vector: 0       0 
-DEAL:FIRE::Starting value 480.1
-DEAL:FIRE::Convergence step 86 value 0
-DEAL::FIRE::Solution vector: 0      0
+DEAL:FIRE::Convergence step 101 value 4.281e-17
+3.208e-09 -6.416e-10 
+DEAL:FIRE::FIRE::Solution vector: Starting value 0.08000
+DEAL:FIRE::Convergence step 89 value 9.468e-16
+1.088e-08 -1.088e-08 
+DEAL:FIRE::FIRE::Solution vector: Starting value 480.1
+DEAL:FIRE::Convergence step 86 value 3.930e-16
+8.234e-09 -5.519e-09 

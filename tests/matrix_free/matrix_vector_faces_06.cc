@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -25,10 +25,8 @@
 #include <deal.II/grid/grid_tools.h>
 
 #include "../tests.h"
+
 #include "create_mesh.h"
-
-std::ofstream logfile("output");
-
 #include "matrix_vector_faces_common.h"
 
 template <int dim, int fe_degree>

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2019 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,9 +21,6 @@
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/function.h>
-#include <deal.II/base/thread_management.h>
-
-#include <deal.II/dofs/deprecated_function_map.h>
 
 #include <deal.II/lac/affine_constraints.h>
 
@@ -37,6 +34,7 @@ DEAL_II_NAMESPACE_OPEN
 
 
 // forward declarations
+#ifndef DOXYGEN
 template <int dim>
 class Quadrature;
 
@@ -69,7 +67,7 @@ namespace hp
 } // namespace hp
 
 
-#ifdef DEAL_II_WITH_PETSC
+#  ifdef DEAL_II_WITH_PETSC
 namespace PETScWrappers
 {
   class MatrixBase;
@@ -80,9 +78,9 @@ namespace PETScWrappers
     class BlockVector;
   } // namespace MPI
 } // namespace PETScWrappers
-#endif
+#  endif
 
-#ifdef DEAL_II_WITH_TRILINOS
+#  ifdef DEAL_II_WITH_TRILINOS
 namespace TrilinosWrappers
 {
   class SparseMatrix;
@@ -93,6 +91,7 @@ namespace TrilinosWrappers
     class BlockVector;
   } // namespace MPI
 } // namespace TrilinosWrappers
+#  endif
 #endif
 
 
@@ -227,7 +226,6 @@ namespace TrilinosWrappers
  * latter may be useful if you want to create many right hand side vectors.
  *
  * @ingroup numerics
- * @author Wolfgang Bangerth, 1998, Ralf Hartmann, 2001
  */
 namespace MatrixCreator
 {
@@ -320,38 +318,38 @@ namespace MatrixCreator
     const AffineConstraints<number> &constraints = AffineConstraints<number>());
 
   /**
-   * Same function as above, but for hp objects.
+   * Same function as above, but for hp-objects.
    */
   template <int dim, int spacedim, typename number>
   void
   create_mass_matrix(
     const hp::MappingCollection<dim, spacedim> &mapping,
-    const hp::DoFHandler<dim, spacedim> &       dof,
+    const DoFHandler<dim, spacedim> &           dof,
     const hp::QCollection<dim> &                q,
     SparseMatrix<number> &                      matrix,
     const Function<spacedim, number> *const     a = nullptr,
     const AffineConstraints<number> &constraints = AffineConstraints<number>());
 
   /**
-   * Same function as above, but for hp objects.
+   * Same function as above, but for hp-objects.
    */
   template <int dim, int spacedim, typename number>
   void
   create_mass_matrix(
-    const hp::DoFHandler<dim, spacedim> &   dof,
+    const DoFHandler<dim, spacedim> &       dof,
     const hp::QCollection<dim> &            q,
     SparseMatrix<number> &                  matrix,
     const Function<spacedim, number> *const a    = nullptr,
     const AffineConstraints<number> &constraints = AffineConstraints<number>());
 
   /**
-   * Same function as above, but for hp objects.
+   * Same function as above, but for hp-objects.
    */
   template <int dim, int spacedim, typename number>
   void
   create_mass_matrix(
     const hp::MappingCollection<dim, spacedim> &mapping,
-    const hp::DoFHandler<dim, spacedim> &       dof,
+    const DoFHandler<dim, spacedim> &           dof,
     const hp::QCollection<dim> &                q,
     SparseMatrix<number> &                      matrix,
     const Function<spacedim, number> &          rhs,
@@ -360,12 +358,12 @@ namespace MatrixCreator
     const AffineConstraints<number> &constraints = AffineConstraints<number>());
 
   /**
-   * Same function as above, but for hp objects.
+   * Same function as above, but for hp-objects.
    */
   template <int dim, int spacedim, typename number>
   void
   create_mass_matrix(
-    const hp::DoFHandler<dim, spacedim> &   dof,
+    const DoFHandler<dim, spacedim> &       dof,
     const hp::QCollection<dim> &            q,
     SparseMatrix<number> &                  matrix,
     const Function<spacedim, number> &      rhs,
@@ -432,13 +430,13 @@ namespace MatrixCreator
     std::vector<unsigned int>               component_mapping = {});
 
   /**
-   * Same function as above, but for hp objects.
+   * Same function as above, but for hp-objects.
    */
   template <int dim, int spacedim, typename number>
   void
   create_boundary_mass_matrix(
     const hp::MappingCollection<dim, spacedim> &mapping,
-    const hp::DoFHandler<dim, spacedim> &       dof,
+    const DoFHandler<dim, spacedim> &           dof,
     const hp::QCollection<dim - 1> &            q,
     SparseMatrix<number> &                      matrix,
     const std::map<types::boundary_id, const Function<spacedim, number> *>
@@ -449,14 +447,14 @@ namespace MatrixCreator
     std::vector<unsigned int>               component_mapping = {});
 
   /**
-   * Same function as above, but for hp objects.
+   * Same function as above, but for hp-objects.
    */
   template <int dim, int spacedim, typename number>
   void
   create_boundary_mass_matrix(
-    const hp::DoFHandler<dim, spacedim> &dof,
-    const hp::QCollection<dim - 1> &     q,
-    SparseMatrix<number> &               matrix,
+    const DoFHandler<dim, spacedim> &dof,
+    const hp::QCollection<dim - 1> & q,
+    SparseMatrix<number> &           matrix,
     const std::map<types::boundary_id, const Function<spacedim, number> *>
       &                                     boundary_functions,
     Vector<number> &                        rhs_vector,
@@ -552,41 +550,38 @@ namespace MatrixCreator
     const AffineConstraints<double> &constraints = AffineConstraints<double>());
 
   /**
-   * Like the functions above, but for hp dof handlers, mappings, and
-   * quadrature collections.
+   * Like the functions above, but for hp-objects.
    */
   template <int dim, int spacedim>
   void
   create_laplace_matrix(
     const hp::MappingCollection<dim, spacedim> &mapping,
-    const hp::DoFHandler<dim, spacedim> &       dof,
+    const DoFHandler<dim, spacedim> &           dof,
     const hp::QCollection<dim> &                q,
     SparseMatrix<double> &                      matrix,
     const Function<spacedim> *const             a = nullptr,
     const AffineConstraints<double> &constraints = AffineConstraints<double>());
 
   /**
-   * Like the functions above, but for hp dof handlers, mappings, and
-   * quadrature collections.
+   * Like the functions above, but for hp-objects.
    */
   template <int dim, int spacedim>
   void
   create_laplace_matrix(
-    const hp::DoFHandler<dim, spacedim> &dof,
-    const hp::QCollection<dim> &         q,
-    SparseMatrix<double> &               matrix,
-    const Function<spacedim> *const      a       = nullptr,
+    const DoFHandler<dim, spacedim> &dof,
+    const hp::QCollection<dim> &     q,
+    SparseMatrix<double> &           matrix,
+    const Function<spacedim> *const  a           = nullptr,
     const AffineConstraints<double> &constraints = AffineConstraints<double>());
 
   /**
-   * Like the functions above, but for hp dof handlers, mappings, and
-   * quadrature collections.
+   * Like the functions above, but for hp-objects.
    */
   template <int dim, int spacedim>
   void
   create_laplace_matrix(
     const hp::MappingCollection<dim, spacedim> &mapping,
-    const hp::DoFHandler<dim, spacedim> &       dof,
+    const DoFHandler<dim, spacedim> &           dof,
     const hp::QCollection<dim> &                q,
     SparseMatrix<double> &                      matrix,
     const Function<spacedim> &                  rhs,
@@ -595,18 +590,17 @@ namespace MatrixCreator
     const AffineConstraints<double> &constraints = AffineConstraints<double>());
 
   /**
-   * Like the functions above, but for hp dof handlers, mappings, and
-   * quadrature collections.
+   * Like the functions above, but for hp-objects.
    */
   template <int dim, int spacedim>
   void
   create_laplace_matrix(
-    const hp::DoFHandler<dim, spacedim> &dof,
-    const hp::QCollection<dim> &         q,
-    SparseMatrix<double> &               matrix,
-    const Function<spacedim> &           rhs,
-    Vector<double> &                     rhs_vector,
-    const Function<spacedim> *const      a       = nullptr,
+    const DoFHandler<dim, spacedim> &dof,
+    const hp::QCollection<dim> &     q,
+    SparseMatrix<double> &           matrix,
+    const Function<spacedim> &       rhs,
+    Vector<double> &                 rhs_vector,
+    const Function<spacedim> *const  a           = nullptr,
     const AffineConstraints<double> &constraints = AffineConstraints<double>());
 
   /**
@@ -633,14 +627,22 @@ namespace MatrixCreator
  *
  * <h3>Boundary conditions</h3>
  *
- * The apply_boundary_values() function inserts boundary conditions into a
- * system of equations.  To actually do this you have to specify a list of
- * degree of freedom indices along with the values these degrees of freedom
- * shall assume. To see how to get such a list, see the discussion of the
- * VectorTools::interpolate_boundary_values function.
+ * The apply_boundary_values() functions modifies a linear system to incorporate
+ * the constraints that result from Dirichlet-type boundary conditions (or, more
+ * specifically: "strong" boundary conditions). To actually do this, the
+ * functions of this name in the current namespace require a list of degree of
+ * freedom indices along with the values these degrees of freedom should have.
+ * To see how to get such a list, see the discussion of the
+ * VectorTools::interpolate_boundary_values() function as one example.
  *
  * There are two ways to incorporate fixed degrees of freedom such as boundary
- * nodes into a linear system, as discussed below.
+ * nodes into a linear system, as discussed below. Both operate at either the
+ * level of local contributions to the global linear system, or the global
+ * system itself. A third way, using
+ * AffineConstraints::copy_local_to_global(), performs the same process as part
+ * of adding the local contributions of one cell into the global linear system
+ * (the "assembly" step) and is the method predominantly used in the tutorial
+ * programs today.
  *
  * @dealiiVideoLecture{21.6,21.65}
  *
@@ -652,7 +654,8 @@ namespace MatrixCreator
  * respect for fixed degrees of freedom, and in a second step eliminate them
  * again from the linear system. The inclusion into the assembly process is as
  * follows: when the matrix and vectors are set up, a list of nodes subject to
- * Dirichlet bc is made and matrix and vectors are modified accordingly. This
+ * Dirichlet boundary conditions is made and matrix and vectors are
+ * modified accordingly. This
  * is done by deleting all entries in the matrix in the line of this degree of
  * freedom, setting the main diagonal entry to a suitable positive value and
  * the right hand side element to a value so that the solution of the linear
@@ -728,13 +731,21 @@ namespace MatrixCreator
  * other diagonal entries, but this seems to be too expensive.
  *
  * In some cases, it might be interesting to solve several times with the same
- * matrix, but for different right hand sides or boundary values. However,
+ * matrix, but for different right hand sides or boundary values. A typical
+ * case would be the solution of a time-dependent problem in which the boundary
+ * values or right hand side change, but the matrix itself does not. One
+ * may then be tempted to just assemble the matrix once and just call the
+ * MatrixTools::apply_boundary_values() function repeatedly on the same
+ * matrix object, with a right hand side vector newly formed in each time step.
+ * However,
  * since the modification for boundary values of the right hand side vector
  * depends on the original matrix, this is not possible without storing the
- * original matrix somewhere and applying the @p apply_boundary_conditions
- * function to a copy of it each time we want to solve. In that case, you can
- * use the FilteredMatrix class in the @p LAC sublibrary. There you can also
- * find a formal (mathematical) description of the process of modifying the
+ * original matrix somewhere, and in every time step initializing the system
+ * matrix with the unmodified matrix stored elsewhere. step-26 does a variation
+ * of this process by storing building blocks from which the system matrix is
+ * composed, but the general principle is the same. Alternatively, one can
+ * use the constrained_linear_operator() function. In its documentation you can
+ * also find a formal (mathematical) description of the process of modifying the
  * matrix and right hand side vectors for boundary values.
  *
  *
@@ -814,7 +825,6 @@ namespace MatrixCreator
  * no hanging nodes and even then doesn't always work fully satisfactorily.
  *
  * @ingroup numerics
- * @author Wolfgang Bangerth, 1998, 2000, 2004, 2005
  */
 namespace MatrixTools
 {
@@ -827,7 +837,7 @@ namespace MatrixTools
 
   /**
    * Apply Dirichlet boundary conditions to the system matrix and vectors as
-   * described in the general documentation.
+   * described in the general documentation of this namespace.
    */
   template <typename number>
   void
@@ -840,8 +850,8 @@ namespace MatrixTools
 
   /**
    * Apply Dirichlet boundary conditions to the system matrix and vectors as
-   * described in the general documentation. This function works for block
-   * sparse matrices and block vectors
+   * described in the general documentation of this namespace. This function
+   * works for block sparse matrices and block vectors.
    */
   template <typename number>
   void
@@ -855,8 +865,8 @@ namespace MatrixTools
 #ifdef DEAL_II_WITH_PETSC
   /**
    * Apply Dirichlet boundary conditions to the system matrix and vectors as
-   * described in the general documentation. This function works on the
-   * classes that are used to wrap PETSc objects.
+   * described in the general documentation of this namespace. This function
+   * works on the classes that are used to wrap PETSc objects.
    *
    * <b>Important:</b> This function is not very efficient: it needs to
    * alternatingly read and write into the matrix, a situation that PETSc does
@@ -912,8 +922,8 @@ namespace MatrixTools
 #ifdef DEAL_II_WITH_TRILINOS
   /**
    * Apply Dirichlet boundary conditions to the system matrix and vectors as
-   * described in the general documentation. This function works on the
-   * classes that are used to wrap Trilinos objects.
+   * described in the general documentation of this namespace. This function
+   * works on the classes that are used to wrap Trilinos objects.
    *
    * <b>Important:</b> This function is not very efficient: it needs to
    * alternatingly read and write into the matrix, a situation that Trilinos

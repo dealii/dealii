@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,15 +21,16 @@
 
 #include <iomanip>
 #include <iostream>
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
 
 template <int dim>
 PolynomialsBDM<dim>::PolynomialsBDM(const unsigned int k)
-  : polynomial_space(Polynomials::Legendre::generate_complete_basis(k))
+  : TensorPolynomialsBase<dim>(k + 1, n_polynomials(k))
+  , polynomial_space(Polynomials::Legendre::generate_complete_basis(k))
   , monomials((dim == 2) ? (1) : (k + 2))
-  , n_pols(compute_n_pols(k))
   , p_values(polynomial_space.n())
   , p_grads(polynomial_space.n())
   , p_grad_grads(polynomial_space.n())
@@ -52,7 +53,7 @@ PolynomialsBDM<dim>::PolynomialsBDM(const unsigned int k)
 
 template <int dim>
 void
-PolynomialsBDM<dim>::compute(
+PolynomialsBDM<dim>::evaluate(
   const Point<dim> &           unit_point,
   std::vector<Tensor<1, dim>> &values,
   std::vector<Tensor<2, dim>> &grads,
@@ -60,16 +61,17 @@ PolynomialsBDM<dim>::compute(
   std::vector<Tensor<4, dim>> &third_derivatives,
   std::vector<Tensor<5, dim>> &fourth_derivatives) const
 {
-  Assert(values.size() == n_pols || values.size() == 0,
-         ExcDimensionMismatch(values.size(), n_pols));
-  Assert(grads.size() == n_pols || grads.size() == 0,
-         ExcDimensionMismatch(grads.size(), n_pols));
-  Assert(grad_grads.size() == n_pols || grad_grads.size() == 0,
-         ExcDimensionMismatch(grad_grads.size(), n_pols));
-  Assert(third_derivatives.size() == n_pols || third_derivatives.size() == 0,
-         ExcDimensionMismatch(third_derivatives.size(), n_pols));
-  Assert(fourth_derivatives.size() == n_pols || fourth_derivatives.size() == 0,
-         ExcDimensionMismatch(fourth_derivatives.size(), n_pols));
+  Assert(values.size() == this->n() || values.size() == 0,
+         ExcDimensionMismatch(values.size(), this->n()));
+  Assert(grads.size() == this->n() || grads.size() == 0,
+         ExcDimensionMismatch(grads.size(), this->n()));
+  Assert(grad_grads.size() == this->n() || grad_grads.size() == 0,
+         ExcDimensionMismatch(grad_grads.size(), this->n()));
+  Assert(third_derivatives.size() == this->n() || third_derivatives.size() == 0,
+         ExcDimensionMismatch(third_derivatives.size(), this->n()));
+  Assert(fourth_derivatives.size() == this->n() ||
+           fourth_derivatives.size() == 0,
+         ExcDimensionMismatch(fourth_derivatives.size(), this->n()));
 
   // third and fourth derivatives not implemented
   (void)third_derivatives;
@@ -96,12 +98,12 @@ PolynomialsBDM<dim>::compute(
     // will have first all polynomials
     // in the x-component, then y and
     // z.
-    polynomial_space.compute(unit_point,
-                             p_values,
-                             p_grads,
-                             p_grad_grads,
-                             p_third_derivatives,
-                             p_fourth_derivatives);
+    polynomial_space.evaluate(unit_point,
+                              p_values,
+                              p_grads,
+                              p_grad_grads,
+                              p_third_derivatives,
+                              p_fourth_derivatives);
 
     std::fill(values.begin(), values.end(), Tensor<1, dim>());
     for (unsigned int i = 0; i < p_values.size(); ++i)
@@ -191,7 +193,8 @@ PolynomialsBDM<dim>::compute(
               // p(t) = t^(i+1)
               monomials[i + 1].value(unit_point(d), monovali[d]);
               // q(t) = t^(k-i)
-              monomials[degree() - i].value(unit_point(d), monovalk[d]);
+              monomials[this->degree() - 1 - i].value(unit_point(d),
+                                                      monovalk[d]);
             }
           if (values.size() != 0)
             {
@@ -353,7 +356,7 @@ PolynomialsBDM<dim>::compute(
               grad_grads[start + 2][2][2][2] = 0.;
             }
         }
-      Assert(start == n_pols, ExcInternalError());
+      Assert(start == this->n(), ExcInternalError());
     }
 }
 
@@ -427,7 +430,7 @@ square for (unsigned int j=0;j<moment_weight.size();++j)
 
 template <int dim>
 unsigned int
-PolynomialsBDM<dim>::compute_n_pols(unsigned int k)
+PolynomialsBDM<dim>::n_polynomials(const unsigned int k)
 {
   if (dim == 1)
     return k + 1;
@@ -437,6 +440,14 @@ PolynomialsBDM<dim>::compute_n_pols(unsigned int k)
     return ((k + 1) * (k + 2) * (k + 3)) / 2 + 3 * (k + 1);
   Assert(false, ExcNotImplemented());
   return 0;
+}
+
+
+template <int dim>
+std::unique_ptr<TensorPolynomialsBase<dim>>
+PolynomialsBDM<dim>::clone() const
+{
+  return std::make_unique<PolynomialsBDM<dim>>(*this);
 }
 
 

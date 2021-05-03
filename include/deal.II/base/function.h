@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2019 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -31,11 +31,13 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-
+// Forward declarations
+#ifndef DOXYGEN
 template <typename number>
 class Vector;
 template <int rank, int dim, typename Number>
 class TensorFunction;
+#endif
 
 /**
  * This class is a model for a general function that, given a point at which
@@ -61,7 +63,7 @@ class TensorFunction;
  * // return all components at one point
  * void
  * vector_value(const Point<dim> &p,
- *              Vector<double> &  value) const;
+ *              Vector<double>   &value) const;
  * @endcode
  *
  * For more efficiency, there are other functions returning one or all
@@ -70,13 +72,13 @@ class TensorFunction;
  * // access to one component at several points
  * void
  * value_list(const std::vector<Point<dim>> &point_list,
- *            std::vector<double> &          value_list,
+ *            std::vector<double>           &value_list,
  *            const unsigned int             component = 0) const;
  *
  * // return all components at several points
  * void
  * vector_value_list(const std::vector<Point<dim>> &point_list,
- *                   std::vector<Vector<double>> &  value_list) const;
+ *                   std::vector<Vector<double>>   &value_list) const;
  * @endcode
  *
  * Furthermore, there are functions returning the gradient of the function or
@@ -130,6 +132,7 @@ class TensorFunction;
  * argument of this class: it describes the scalar type to be used for each
  * component of your return values. It defaults to @p double, but in the
  * example above, it could be set to <code>std::complex@<double@></code>.
+ * step-58 is an example of this.
  *
  * @tparam dim The space dimension of the range space within which the domain
  *   $\Omega$ of the function lies. Consequently, the function will be
@@ -142,7 +145,6 @@ class TensorFunction;
  *   argument.
  *
  * @ingroup functions
- * @author Wolfgang Bangerth, 1998, 1999, Luca Heltai 2014
  */
 template <int dim, typename RangeNumberType = double>
 class Function : public FunctionTime<
@@ -172,8 +174,13 @@ public:
    * (which defaults to one, i.e. a scalar function), and the time variable,
    * which defaults to zero.
    */
-  Function(const unsigned int n_components = 1,
-           const time_type    initial_time = 0.0);
+  explicit Function(const unsigned int n_components = 1,
+                    const time_type    initial_time = 0.0);
+
+  /**
+   * Copy constructor.
+   */
+  Function(const Function &f) = default;
 
   /**
    * Virtual destructor; absolutely necessary in this case.
@@ -383,10 +390,10 @@ public:
 
   /**
    * Return an estimate for the memory consumption, in bytes, of this object.
-   * This is not exact (but will usually be close) because calculating the
-   * memory usage of trees (e.g., <tt>std::map</tt>) is difficult.
+   *
+   * This function is virtual and can be overloaded by derived classes.
    */
-  std::size_t
+  virtual std::size_t
   memory_consumption() const;
 };
 
@@ -398,7 +405,6 @@ namespace Functions
    * constructor.
    *
    * @ingroup functions
-   * @author Wolfgang Bangerth, 1998, 1999, Lei Qiao, 2015
    */
   template <int dim, typename RangeNumberType = double>
   class ConstantFunction : public Function<dim, RangeNumberType>
@@ -408,22 +414,22 @@ namespace Functions
      * Constructor; set values of all components to the provided one. The
      * default number of components is one.
      */
-    ConstantFunction(const RangeNumberType value,
-                     const unsigned int    n_components = 1);
+    explicit ConstantFunction(const RangeNumberType value,
+                              const unsigned int    n_components = 1);
 
     /**
      * Constructor; takes an <tt>std::vector<RangeNumberType></tt> object as an
      * argument. The number of components is determined by
      * <tt>values.size()</tt>.
      */
-    ConstantFunction(const std::vector<RangeNumberType> &values);
+    explicit ConstantFunction(const std::vector<RangeNumberType> &values);
 
     /**
      * Constructor; takes an <tt>Vector<RangeNumberType></tt> object as an
      * argument. The number of components is determined by
      * <tt>values.size()</tt>.
      */
-    ConstantFunction(const Vector<RangeNumberType> &values);
+    explicit ConstantFunction(const Vector<RangeNumberType> &values);
 
     /**
      * Constructor; uses whatever stores in [begin_ptr, begin_ptr+n_components)
@@ -469,8 +475,16 @@ namespace Functions
       std::vector<std::vector<Tensor<1, dim, RangeNumberType>>> &gradients)
       const override;
 
-    std::size_t
-    memory_consumption() const;
+    virtual SymmetricTensor<2, dim, RangeNumberType>
+    hessian(const Point<dim> & point,
+            const unsigned int component = 0) const override;
+
+    virtual RangeNumberType
+    laplacian(const Point<dim> & point,
+              const unsigned int component = 0) const override;
+
+    virtual std::size_t
+    memory_consumption() const override;
 
   protected:
     /**
@@ -491,7 +505,6 @@ namespace Functions
    * conditions, or zero initial conditions.
    *
    * @ingroup functions
-   * @author Wolfgang Bangerth, 1998, 1999
    */
   template <int dim, typename RangeNumberType = double>
   class ZeroFunction : public ConstantFunction<dim, RangeNumberType>
@@ -500,29 +513,56 @@ namespace Functions
     /**
      * Constructor. The number of components is preset to one.
      */
-    ZeroFunction(const unsigned int n_components = 1);
+    explicit ZeroFunction(const unsigned int n_components = 1);
   };
 
+  /**
+   * A function whose output is also its input. One possible application of this
+   * function is interpolating or projecting a finite element field that
+   * represents spatial coordinates: e.g., one can set up a finite element field
+   * to interpolate the positions of a Triangulation's cells with this function
+   * (via VectorTools::interpolate()), which is useful when doing calculations
+   * in a Lagrangian reference frame.
+   *
+   * @ingroup functions
+   */
+  template <int dim, typename RangeNumberType = double>
+  class IdentityFunction : public Function<dim, RangeNumberType>
+  {
+  public:
+    /**
+     * Constructor. The number of components is set to dim.
+     */
+    IdentityFunction();
+
+    /**
+     * @copydoc Function::value()
+     */
+    virtual RangeNumberType
+    value(const Point<dim> &p, const unsigned int component = 0) const override;
+
+    /**
+     * @copydoc Function::gradient()
+     */
+    virtual Tensor<1, dim, RangeNumberType>
+    gradient(const Point<dim> & p,
+             const unsigned int component = 0) const override;
+
+    /**
+     * @copydoc Function::laplacian()
+     */
+    virtual RangeNumberType
+    laplacian(const Point<dim> & p,
+              const unsigned int component = 0) const override;
+
+    /**
+     * @copydoc Function::hessian()
+     */
+    virtual SymmetricTensor<2, dim, RangeNumberType>
+    hessian(const Point<dim> & p,
+            const unsigned int component = 0) const override;
+  };
 } // namespace Functions
-
-/**
- * Provide a function which always returns the constant values handed to the
- * constructor.
- *
- * @deprecated use Functions::ConstantFunction instead.
- */
-template <int dim, typename RangeNumberType = double>
-using ConstantFunction DEAL_II_DEPRECATED =
-  Functions::ConstantFunction<dim, RangeNumberType>;
-
-/**
- * Provide a function which always returns zero.
- *
- * @deprecated use Functions::ZeroFunction instead.
- */
-template <int dim, typename RangeNumberType = double>
-using ZeroFunction DEAL_II_DEPRECATED =
-  Functions::ZeroFunction<dim, RangeNumberType>;
 
 
 
@@ -538,10 +578,10 @@ using ZeroFunction DEAL_II_DEPRECATED =
  * See the step-20 tutorial program for a detailed explanation and a use case.
  *
  * @ingroup functions
- * @author Guido Kanschat, 2000, Wolfgang Bangerth 2006
  */
 template <int dim, typename RangeNumberType = double>
-class ComponentSelectFunction : public ConstantFunction<dim, RangeNumberType>
+class ComponentSelectFunction
+  : public Functions::ConstantFunction<dim, RangeNumberType>
 {
 public:
   /**
@@ -580,7 +620,7 @@ public:
    * <tt>ComponentSelectFunction@<dim, RangeNumberType@></tt> class can only
    * have same value for all components.
    *
-   * @note: we copy the underlying component value data from @p f from its
+   * @note We copy the underlying component value data from @p f from its
    * beginning. So the number of components of @p f cannot be less than the
    * calling object.
    */
@@ -608,11 +648,9 @@ public:
 
   /**
    * Return an estimate for the memory consumption, in bytes, of this object.
-   * This is not exact (but will usually be close) because calculating the
-   * memory usage of trees (e.g., <tt>std::map</tt>) is difficult.
    */
-  std::size_t
-  memory_consumption() const;
+  virtual std::size_t
+  memory_consumption() const override;
 
 protected:
   /**
@@ -647,10 +685,10 @@ protected:
  *
  * The class gains additional expressive power because the argument it takes
  * does not have to be a pointer to an actual function. Rather, it is a
- * function object, i.e., it can also be the result of call to std::bind (or
- * boost::bind) or some other object that can be called with a single
- * argument. For example, if you need a Function object that returns the norm
- * of a point, you could write it like so:
+ * function object, i.e., it can also be the result of a lambda function or some
+ * other object that can be called with a single argument. For
+ * example, if you need a Function object that returns the norm of a point, you
+ * could write it like so:
  * @code
  * template <int dim, typename RangeNumberType>
  * class Norm : public Function<dim, RangeNumberType>
@@ -700,12 +738,11 @@ protected:
  * or we could write it like so:
  * @code
  * ScalarFunctionFromFunctionObject<dim, RangeNumberType> my_distance_object(
- *   std::bind(&Point<dim>::distance, q, std::placeholders::_1));
+ *   [&q](const Point<dim> &p){return q.distance(p);});
  * @endcode
  * The savings in work to write this are apparent.
  *
  * @ingroup functions
- * @author Wolfgang Bangerth, 2011
  */
 template <int dim, typename RangeNumberType = double>
 class ScalarFunctionFromFunctionObject : public Function<dim, RangeNumberType>
@@ -716,7 +753,7 @@ public:
    * value, convert this into an object that matches the Function<dim,
    * RangeNumberType> interface.
    */
-  ScalarFunctionFromFunctionObject(
+  explicit ScalarFunctionFromFunctionObject(
     const std::function<RangeNumberType(const Point<dim> &)> &function_object);
 
   /**
@@ -773,7 +810,6 @@ private:
  * component.
  *
  * @ingroup functions
- * @author Wolfgang Bangerth, 2011
  */
 template <int dim, typename RangeNumberType = double>
 class VectorFunctionFromScalarFunctionObject
@@ -862,8 +898,6 @@ private:
  *     custom_function({&first_component, &second_component},
  *                     {&zero_gradient, &zero_gradient});
  * @endcode
- *
- * @author Luca Heltai, 2019
  */
 template <int dim, typename RangeNumberType = double>
 class FunctionFromFunctionObjects : public Function<dim, RangeNumberType>
@@ -888,7 +922,7 @@ public:
    * method will trigger an exception, unless you first call the
    * set_function_gradients() method.
    */
-  FunctionFromFunctionObjects(
+  explicit FunctionFromFunctionObjects(
     const std::vector<std::function<RangeNumberType(const Point<dim> &)>>
       &          values,
     const double initial_time = 0.0);
@@ -1000,7 +1034,6 @@ private:
  * into the first <code>dim</code> components of the function object.
  *
  * @ingroup functions
- * @author Spencer Patty, 2013
  */
 template <int dim, typename RangeNumberType = double>
 class VectorFunctionFromTensorFunction : public Function<dim, RangeNumberType>
@@ -1022,7 +1055,7 @@ public:
    * the first argument.  This should be such that the entire tensor_function
    * fits inside the <tt>n_component</tt> length return vector.
    */
-  VectorFunctionFromTensorFunction(
+  explicit VectorFunctionFromTensorFunction(
     const TensorFunction<1, dim, RangeNumberType> &tensor_function,
     const unsigned int                             selected_component = 0,
     const unsigned int                             n_components       = dim);

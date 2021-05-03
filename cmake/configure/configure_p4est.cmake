@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2018 by the deal.II authors
+## Copyright (C) 2012 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -73,6 +73,10 @@ MACRO(FEATURE_P4EST_FIND_EXTERNAL var)
 
     CHECK_MPI_INTERFACE(P4EST ${var})
   ENDIF()
+ENDMACRO()
+
+MACRO(FEATURE_P4EST_CONFIGURE_EXTERNAL)
+  SET(DEAL_II_P4EST_WITH_VTK_BINARY ${P4EST_WITH_VTK_BINARY})
 ENDMACRO()
 
 

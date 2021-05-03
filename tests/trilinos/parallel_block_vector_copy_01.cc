@@ -30,8 +30,8 @@
 int
 main(int argc, char **argv)
 {
-  typedef BlockVector<double>                BlockVectorLocal;
-  typedef TrilinosWrappers::MPI::BlockVector BlockVector;
+  using BlockVectorLocal = BlockVector<double>;
+  using BlockVector      = TrilinosWrappers::MPI::BlockVector;
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   MPILogInitAll                    log;

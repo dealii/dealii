@@ -51,9 +51,9 @@ All entries are signed with the names of the author.
        <br>
        (<a href="mailto:or@winfos.com">Oliver Rheinbach</a> 2001/04/12)
        </p>
-       
+
   <li> <p>
-       Fixed: When using Neuman boundary functions in the 
+       Fixed: When using Neuman boundary functions in the
        <code>KellyErrorEstimator</code> class, it was
        assumed that the function object had <code
        class="member">Function::vector_value</code> overloaded, even
@@ -62,7 +62,7 @@ All entries are signed with the names of the author.
        <br>
        (WB 2001/04/09)
        </p>
-       
+
   <li> <p>
        New/Fixed: Now there exists a new <code
        class="class">Triangulation</code>::<code
@@ -77,7 +77,7 @@ All entries are signed with the names of the author.
        <br>
        (RH 2001/04/03)
        </p>
-       
+
   <li> <p>
        Fixed: Missing <code>ucd</code> is now added to the list of
        supported output formats returned by <code
@@ -104,12 +104,12 @@ All entries are signed with the names of the author.
        (Roger Young, WB 2001/03/22)
        </p>
 
-  <li> <p> 
+  <li> <p>
        Removed: The explicit instantiations of <code
        class="class">SparseMatrix&lt;long double&gt;</code> are removed as a
        prerelease of gcc3.0 fails to compile it. Now the user of <code
        class="class">SparseMatrix&lt;long double&gt;</code> needs to include
-       <code>lac/include/lac/sparse_matrix.templates.h</code> into his
+       <code>lac/include/lac/sparse_matrix.templates.h</code> into their
        source file and to use a different compiler, e.g. gcc 2.95.2 or
        a future version of gcc3.0 (that will then hopefully be fixed).
        <br>
@@ -120,7 +120,7 @@ All entries are signed with the names of the author.
        Changed: We now unconditionally include
        <code>deal.II/include/grid/tria_accessor.templates.h</code>
        (which contains some inline functions for triangulation
-       accessor classes) into 
+       accessor classes) into
        <code>deal.II/include/grid/tria_accessor.h</code> to work
        around a problem with gcc3.0 which does not place a copy of
        these functions into the library. Previously we only included

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2019 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,7 +22,6 @@
 #include <deal.II/base/array_view.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/linear_index_iterator.h>
-#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/subscriptor.h>
 
 // boost::serialization::make_array used to be in array.hpp, but was
@@ -37,10 +36,13 @@
 
 #include <algorithm>
 #include <iostream>
+#include <memory>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#ifndef DOXYGEN
 class SparsityPattern;
 class SparsityPatternBase;
 class DynamicSparsityPattern;
@@ -58,7 +60,7 @@ namespace ChunkSparsityPatternIterators
 {
   class Accessor;
 }
-
+#endif
 
 /*! @addtogroup Sparsity
  *@{
@@ -125,9 +127,6 @@ namespace SparsityPatternIterators
    * row and column number (or alternatively the index within the complete
    * sparsity pattern). It does not allow modifying the sparsity pattern
    * itself.
-   *
-   * @author Wolfgang Bangerth
-   * @date 2004
    */
   class Accessor
   {
@@ -243,14 +242,10 @@ namespace SparsityPatternIterators
     void
     advance();
 
-    /**
-     * Grant access to iterator class.
-     */
+    // Grant access to iterator class.
     friend class LinearIndexIterator<Iterator, Accessor>;
 
-    /**
-     * Grant access to accessor class of ChunkSparsityPattern.
-     */
+    // Grant access to accessor class of ChunkSparsityPattern.
     friend class ChunkSparsityPatternIterators::Accessor;
   };
 
@@ -325,8 +320,6 @@ namespace SparsityPatternIterators
  * SparseMatrix objects can store nonzero entries, are stored row-by-row.
  * The ordering of non-zero elements within each row (i.e. increasing
  * column index order) depends on the derived classes.
- *
- * @author Wolfgang Bangerth, Guido Kanschat and others
  */
 class SparsityPatternBase : public Subscriptor
 {
@@ -668,7 +661,8 @@ public:
 
   /**
    * Write the data of this object to a stream for the purpose of
-   * serialization
+   * serialization using the [BOOST serialization
+   * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
    */
   template <class Archive>
   void
@@ -676,13 +670,27 @@ public:
 
   /**
    * Read the data of this object from a stream for the purpose of
-   * serialization
+   * serialization using the [BOOST serialization
+   * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
    */
   template <class Archive>
   void
   load(Archive &ar, const unsigned int version);
 
+#ifdef DOXYGEN
+  /**
+   * Write and read the data of this object from a stream for the purpose
+   * of serialization using the [BOOST serialization
+   * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
+   */
+  template <class Archive>
+  void
+  serialize(Archive &archive, const unsigned int version);
+#else
+  // This macro defines the serialize() method that is compatible with
+  // the templated save() and load() method that have been implemented.
   BOOST_SERIALIZATION_SPLIT_MEMBER()
+#endif
 
   // @}
 
@@ -803,9 +811,7 @@ protected:
    */
   bool compressed;
 
-  /**
-   * Make all sparse matrices friends of this class.
-   */
+  // Make all sparse matrices friends of this class.
   template <typename number>
   friend class SparseMatrix;
   template <typename number>
@@ -818,9 +824,7 @@ protected:
   friend class ChunkSparsityPattern;
   friend class DynamicSparsityPattern;
 
-  /**
-   * Also give access to internal details to the iterator/accessor classes.
-   */
+  // Also give access to internal details to the iterator/accessor classes.
   friend class SparsityPatternIterators::Iterator;
   friend class SparsityPatternIterators::Accessor;
   friend class ChunkSparsityPatternIterators::Accessor;
@@ -846,7 +850,7 @@ protected:
  * is square (the first item will be the diagonal, followed by the other
  * entries sorted by column index).
  *
- * @note While this class forms the basis upon which SparseMatrix objects base
+ * While this class forms the basis upon which SparseMatrix objects base
  * their storage format, and thus plays a central role in setting up linear
  * systems, it is rarely set up directly due to the way it stores its
  * information. Rather, one typically goes through an intermediate format
@@ -854,7 +858,12 @@ protected:
  * documentation module
  * @ref Sparsity.
  *
- * @author Wolfgang Bangerth, Guido Kanschat and others
+ * You can iterate over entries in the pattern using begin(), end(),
+ * begin(row), and end(row). These functions return an iterator of type
+ * SparsityPatternIterators::Iterator. When dereferencing an iterator @p it,
+ * you have access to the member functions in
+ * SparsityPatternIterators::Accessor, like <tt>it->column()</tt> and
+ * <tt>it->row()</tt>.
  */
 class SparsityPattern : public SparsityPatternBase
 {
@@ -1129,6 +1138,13 @@ public:
    *
    * Previous content of this object is lost, and the sparsity pattern is in
    * compressed mode afterwards.
+   *
+   * Once you have built a sparsity pattern with this function, you
+   * probably want to attach a SparseMatrix object to it. The original
+   * `matrix` object can then be copied into this SparseMatrix object
+   * using the version of SparseMatrix::copy_from() that takes a
+   * FullMatrix object as argument. Through this procedure, you can
+   * convert a FullMatrix into a SparseMatrix.
    */
   template <typename number>
   void
@@ -1263,7 +1279,19 @@ public:
   void
   load(Archive &ar, const unsigned int version);
 
+#ifdef DOXYGEN
+  /**
+   * Write and read the data of this object from a stream for the purpose
+   * of serialization.
+   */
+  template <class Archive>
+  void
+  serialize(Archive &archive, const unsigned int version);
+#else
+  // This macro defines the serialize() method that is compatible with
+  // the templated save() and load() method that have been implemented.
   BOOST_SERIALIZATION_SPLIT_MEMBER()
+#endif
 
   // @}
 
@@ -1293,9 +1321,7 @@ private:
    */
   bool store_diagonal_first_in_row;
 
-  /**
-   * Make all sparse matrices friends of this class.
-   */
+  // Make all sparse matrices friends of this class.
   template <typename number>
   friend class SparseMatrix;
   template <typename number>
@@ -1308,9 +1334,7 @@ private:
   friend class ChunkSparsityPattern;
   friend class DynamicSparsityPattern;
 
-  /**
-   * Also give access to internal details to the iterator/accessor classes.
-   */
+  // Also give access to internal details to the iterator/accessor classes.
   friend class SparsityPatternIterators::Iterator;
   friend class SparsityPatternIterators::Accessor;
   friend class ChunkSparsityPatternIterators::Accessor;
@@ -1404,8 +1428,6 @@ namespace SparsityPatternIterators
   inline bool
   Accessor::operator==(const Accessor &other) const
   {
-    Assert(container != nullptr, DummyAccessor());
-    Assert(other.container != nullptr, DummyAccessor());
     return (container == other.container && linear_index == other.linear_index);
   }
 
@@ -1473,7 +1495,7 @@ SparsityPatternBase::end() const
 inline SparsityPatternBase::iterator
 SparsityPatternBase::begin(const size_type r) const
 {
-  Assert(r < n_rows(), ExcIndexRangeType<size_type>(r, 0, n_rows()));
+  AssertIndexRange(r, n_rows());
 
   return {this, rowstart[r]};
 }
@@ -1483,7 +1505,7 @@ SparsityPatternBase::begin(const size_type r) const
 inline SparsityPatternBase::iterator
 SparsityPatternBase::end(const size_type r) const
 {
-  Assert(r < n_rows(), ExcIndexRangeType<size_type>(r, 0, n_rows()));
+  AssertIndexRange(r, n_rows());
 
   return {this, rowstart[r + 1]};
 }
@@ -1525,7 +1547,7 @@ SparsityPattern::stores_only_added_elements() const
 inline unsigned int
 SparsityPatternBase::row_length(const size_type row) const
 {
-  Assert(row < rows, ExcIndexRangeType<size_type>(row, 0, rows));
+  AssertIndexRange(row, rows);
   return rowstart[row + 1] - rowstart[row];
 }
 
@@ -1535,8 +1557,8 @@ inline SparsityPattern::size_type
 SparsityPatternBase::column_number(const size_type    row,
                                    const unsigned int index) const
 {
-  Assert(row < rows, ExcIndexRangeType<size_type>(row, 0, rows));
-  Assert(index < row_length(row), ExcIndexRange(index, 0, row_length(row)));
+  AssertIndexRange(row, rows);
+  AssertIndexRange(index, row_length(row));
 
   return colnums[rowstart[row] + index];
 }
@@ -1581,8 +1603,8 @@ SparsityPatternBase::load(Archive &ar, const unsigned int)
 
   ar &max_dim &rows &cols &max_vec_len &max_row_length &compressed;
 
-  rowstart = std_cxx14::make_unique<std::size_t[]>(max_dim + 1);
-  colnums  = std_cxx14::make_unique<size_type[]>(max_vec_len);
+  rowstart = std::make_unique<std::size_t[]>(max_dim + 1);
+  colnums  = std::make_unique<size_type[]>(max_vec_len);
 
   ar &boost::serialization::make_array(rowstart.get(), max_dim + 1);
   ar &boost::serialization::make_array(colnums.get(), max_vec_len);
@@ -1719,7 +1741,7 @@ SparsityPattern::copy_from(const size_type       n_rows,
         {
           const size_type col =
             internal::SparsityPatternTools::get_column_index_from_iterator(*j);
-          Assert(col < n_cols, ExcIndexRange(col, 0, n_cols));
+          AssertIndexRange(col, n_cols);
 
           if ((col != row) || !is_square)
             *cols++ = col;

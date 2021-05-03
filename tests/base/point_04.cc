@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2019 by the deal.II authors
+// Copyright (C) 2010 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,8 +19,6 @@
 #include <deal.II/base/point.h>
 
 #include <deal.II/lac/vector.h>
-
-#include <boost/geometry.hpp>
 
 #include "../tests.h"
 

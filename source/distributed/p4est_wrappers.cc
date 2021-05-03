@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2019 by the deal.II authors
+// Copyright (C) 2008 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -380,6 +380,19 @@ namespace internal
       types<2>::topidx num_corners,
       types<2>::topidx num_vtt) = p4est_connectivity_new;
 
+    types<2>::connectivity *(&functions<2>::connectivity_new_copy)(
+      types<2>::topidx        num_vertices,
+      types<2>::topidx        num_trees,
+      types<2>::topidx        num_corners,
+      const double *          vertices,
+      const types<2>::topidx *ttv,
+      const types<2>::topidx *ttt,
+      const int8_t *          ttf,
+      const types<2>::topidx *ttc,
+      const types<2>::topidx *coff,
+      const types<2>::topidx *ctt,
+      const int8_t *          ctc) = p4est_connectivity_new_copy;
+
     void (&functions<2>::connectivity_join_faces)(types<2>::connectivity *conn,
                                                   types<2>::topidx tree_left,
                                                   types<2>::topidx tree_right,
@@ -400,6 +413,9 @@ namespace internal
       std::size_t             data_size,
       p4est_init_t            init_fn,
       void *                  user_pointer) = p4est_new_ext;
+
+    types<2>::forest *(&functions<2>::copy_forest)(types<2>::forest *input,
+                                                   int copy_data) = p4est_copy;
 
     void (&functions<2>::destroy)(types<2>::forest *p4est) = p4est_destroy;
 
@@ -472,58 +488,6 @@ namespace internal
 
     std::size_t (&functions<2>::connectivity_memory_used)(
       types<2>::connectivity *p4est) = p4est_connectivity_memory_used;
-
-    template <int dim, int spacedim>
-    std::map<unsigned int, std::set<dealii::types::subdomain_id>>
-    compute_vertices_with_ghost_neighbors(
-      const typename dealii::parallel::distributed::Triangulation<dim, spacedim>
-        &                                                   tria,
-      typename dealii::internal::p4est::types<dim>::forest *parallel_forest,
-      typename dealii::internal::p4est::types<dim>::ghost * parallel_ghost)
-    {
-      std::map<unsigned int, std::set<dealii::types::subdomain_id>>
-        vertices_with_ghost_neighbors;
-
-      dealii::internal::p4est::FindGhosts<dim, spacedim> fg;
-      fg.subids        = sc_array_new(sizeof(dealii::types::subdomain_id));
-      fg.triangulation = &tria;
-      fg.vertices_with_ghost_neighbors = &vertices_with_ghost_neighbors;
-
-      switch (dim)
-        {
-          case 2:
-            p4est_iterate(
-              reinterpret_cast<dealii::internal::p4est::types<2>::forest *>(
-                parallel_forest),
-              reinterpret_cast<dealii::internal::p4est::types<2>::ghost *>(
-                parallel_ghost),
-              static_cast<void *>(&fg),
-              nullptr,
-              find_ghosts_face<2, spacedim>,
-              find_ghosts_corner<2, spacedim>);
-            break;
-
-          case 3:
-            p8est_iterate(
-              reinterpret_cast<dealii::internal::p4est::types<3>::forest *>(
-                parallel_forest),
-              reinterpret_cast<dealii::internal::p4est::types<3>::ghost *>(
-                parallel_ghost),
-              static_cast<void *>(&fg),
-              nullptr,
-              find_ghosts_face<3, 3>,
-              find_ghosts_edge<3, 3>,
-              find_ghosts_corner<3, 3>);
-            break;
-
-          default:
-            Assert(false, ExcNotImplemented());
-        }
-
-      sc_array_destroy(fg.subids);
-
-      return vertices_with_ghost_neighbors;
-    }
 
     constexpr unsigned int functions<2>::max_level;
 
@@ -619,6 +583,24 @@ namespace internal
       types<3>::topidx num_corners,
       types<3>::topidx num_ctt) = p8est_connectivity_new;
 
+    types<3>::connectivity *(&functions<3>::connectivity_new_copy)(
+      types<3>::topidx        num_vertices,
+      types<3>::topidx        num_trees,
+      types<3>::topidx        num_edges,
+      types<3>::topidx        num_corners,
+      const double *          vertices,
+      const types<3>::topidx *ttv,
+      const types<3>::topidx *ttt,
+      const int8_t *          ttf,
+      const types<3>::topidx *tte,
+      const types<3>::topidx *eoff,
+      const types<3>::topidx *ett,
+      const int8_t *          ete,
+      const types<3>::topidx *ttc,
+      const types<3>::topidx *coff,
+      const types<3>::topidx *ctt,
+      const int8_t *          ctc) = p8est_connectivity_new_copy;
+
     void (&functions<3>::connectivity_destroy)(
       p8est_connectivity_t *connectivity) = p8est_connectivity_destroy;
 
@@ -639,6 +621,9 @@ namespace internal
       std::size_t             data_size,
       p8est_init_t            init_fn,
       void *                  user_pointer) = p8est_new_ext;
+
+    types<3>::forest *(&functions<3>::copy_forest)(types<3>::forest *input,
+                                                   int copy_data) = p8est_copy;
 
     void (&functions<3>::destroy)(types<3>::forest *p8est) = p8est_destroy;
 
@@ -834,6 +819,118 @@ namespace internal
       return ((coarse_grid_cell >= parallel_forest->first_local_tree) &&
               (coarse_grid_cell <= parallel_forest->last_local_tree));
     }
+
+
+
+    // template specializations
+
+    template <>
+    typename types<2>::connectivity *
+    copy_connectivity<2>(const typename types<2>::connectivity *connectivity)
+    {
+      return functions<2>::connectivity_new_copy(
+        connectivity->num_vertices,
+        connectivity->num_trees,
+        connectivity->num_corners,
+        connectivity->vertices,
+        connectivity->tree_to_vertex,
+        connectivity->tree_to_tree,
+        connectivity->tree_to_face,
+        connectivity->tree_to_corner,
+        connectivity->ctt_offset,
+        connectivity->corner_to_tree,
+        connectivity->corner_to_corner);
+    }
+
+    template <>
+    typename types<3>::connectivity *
+    copy_connectivity<3>(const typename types<3>::connectivity *connectivity)
+    {
+      return functions<3>::connectivity_new_copy(
+        connectivity->num_vertices,
+        connectivity->num_trees,
+        connectivity->num_edges,
+        connectivity->num_corners,
+        connectivity->vertices,
+        connectivity->tree_to_vertex,
+        connectivity->tree_to_tree,
+        connectivity->tree_to_face,
+        connectivity->tree_to_edge,
+        connectivity->ett_offset,
+        connectivity->edge_to_tree,
+        connectivity->edge_to_edge,
+        connectivity->tree_to_corner,
+        connectivity->ctt_offset,
+        connectivity->corner_to_tree,
+        connectivity->corner_to_corner);
+    }
+
+
+
+    template <>
+    bool
+    quadrant_is_equal<1>(const typename types<1>::quadrant &q1,
+                         const typename types<1>::quadrant &q2)
+    {
+      return q1 == q2;
+    }
+
+
+
+    template <>
+    bool quadrant_is_ancestor<1>(types<1>::quadrant const &q1,
+                                 types<1>::quadrant const &q2)
+    {
+      // determine level of quadrants
+      const int level_1 = (q1 << types<1>::max_n_child_indices_bits) >>
+                          types<1>::max_n_child_indices_bits;
+      const int level_2 = (q2 << types<1>::max_n_child_indices_bits) >>
+                          types<1>::max_n_child_indices_bits;
+
+      // q1 can be an ancestor of q2 if q1's level is smaller
+      if (level_1 >= level_2)
+        return false;
+
+      // extract path of quadrants up to level of possible ancestor q1
+      const int truncated_id_1 = (q1 >> (types<1>::n_bits - 1 - level_1))
+                                 << (types<1>::n_bits - 1 - level_1);
+      const int truncated_id_2 = (q2 >> (types<1>::n_bits - 1 - level_1))
+                                 << (types<1>::n_bits - 1 - level_1);
+
+      // compare paths
+      return truncated_id_1 == truncated_id_2;
+    }
+
+
+
+    template <>
+    void
+    init_quadrant_children<1>(
+      const typename types<1>::quadrant &q,
+      typename types<1>::quadrant (
+        &p4est_children)[dealii::GeometryInfo<1>::max_children_per_cell])
+    {
+      // determine the current level of quadrant
+      const int level_parent = (q << types<1>::max_n_child_indices_bits) >>
+                               types<1>::max_n_child_indices_bits;
+      const int level_child = level_parent + 1;
+
+      // left child: only n_child_indices has to be incremented
+      p4est_children[0] = (q + 1);
+
+      // right child: increment and set a bit to 1 indicating that it is a right
+      // child
+      p4est_children[1] = (q + 1) | (1 << (types<1>::n_bits - 1 - level_child));
+    }
+
+
+
+    template <>
+    void init_coarse_quadrant<1>(typename types<1>::quadrant &quad)
+    {
+      quad = 0;
+    }
+
   } // namespace p4est
 } // namespace internal
 

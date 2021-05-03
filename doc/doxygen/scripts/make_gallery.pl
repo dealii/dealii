@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2013 - 2016 by the deal.II authors
+## Copyright (C) 2013 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -56,7 +56,7 @@ chop $entryname;
 
 print
 "/**
-  * \@page code_gallery_$gallery_underscore The '$entryname' code gallery program
+\@page code_gallery_$gallery_underscore The '$entryname' code gallery program
 \@htmlonly
 <p align=\"center\"> 
   This program was contributed by $authors.

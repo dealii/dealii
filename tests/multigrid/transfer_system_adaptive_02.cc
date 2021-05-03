@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -137,7 +137,7 @@ check(const FiniteElement<dim> &fe)
 
   DoFHandler<dim> mg_dof_handler(tr);
   mg_dof_handler.distribute_dofs(fe);
-  mg_dof_handler.distribute_mg_dofs(fe);
+  mg_dof_handler.distribute_mg_dofs();
 
   deallog << "Global  dofs: " << mg_dof_handler.n_dofs() << std::endl;
   for (unsigned int l = 0; l < tr.n_levels(); ++l)
@@ -151,16 +151,12 @@ check(const FiniteElement<dim> &fe)
   for (unsigned int level = 0; level < tr.n_levels(); ++level)
     DoFRenumbering::component_wise(mg_dof_handler, level);
 
-  std::vector<std::set<unsigned int>> boundary_indices(tr.n_levels());
-  std::map<types::boundary_id, const Function<dim> *> dirichlet_boundary;
-  Functions::ZeroFunction<dim> dirichlet_bc(fe.n_components());
-  dirichlet_boundary[3] = &dirichlet_bc;
-
   MGConstrainedDoFs mg_constrained_dofs;
-  mg_constrained_dofs.initialize(mg_dof_handler, dirichlet_boundary);
+  mg_constrained_dofs.initialize(mg_dof_handler);
+  mg_constrained_dofs.make_zero_boundary_constraints(mg_dof_handler, {3});
 
   MGTransferPrebuilt<Vector<double>> transfer(mg_constrained_dofs);
-  transfer.build_matrices(mg_dof_handler);
+  transfer.build(mg_dof_handler);
 
   FullMatrix<double> prolong_0_1(mg_dof_handler.n_dofs(1),
                                  mg_dof_handler.n_dofs(0));
@@ -174,9 +170,8 @@ check(const FiniteElement<dim> &fe)
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(4);
-  deallog.attach(logfile);
 
   // TODO: do in 1d
   check(FESystem<2>(FE_Q<2>(1), 2));

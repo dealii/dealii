@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2019 by the deal.II authors
+// Copyright (C) 2004 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -29,6 +29,7 @@ namespace PETScWrappers
 {
   namespace MatrixIterators
   {
+#  ifndef DOXYGEN
     void
     MatrixBase::const_iterator::Accessor::visit_present_row()
     {
@@ -68,6 +69,7 @@ namespace PETScWrappers
       ierr = MatRestoreRow(*matrix, this->a_row, &ncols, &colnums, &values);
       AssertThrow(ierr == 0, ExcPETScError(ierr));
     }
+#  endif
   } // namespace MatrixIterators
 
 
@@ -553,6 +555,8 @@ namespace PETScWrappers
                             MAT_INITIAL_MATRIX,
                             PETSC_DEFAULT,
                             &result.petsc_matrix());
+          AssertThrow(ierr == 0, ExcPETScError(ierr));
+          ierr = PETScWrappers::destroy_matrix(tmp);
           AssertThrow(ierr == 0, ExcPETScError(ierr));
         }
     }

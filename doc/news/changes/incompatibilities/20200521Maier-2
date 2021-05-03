@@ -1,0 +1,9 @@
+Removed: The <code>DEAL_II_WITH_CXX14</code> and
+<code>DEAL_II_WITH_CXX17</code> configuration options have been removed.
+The library will now be compiled with the default C++ standard enabled by
+the compiler. This is (as of May 2020) C++14 for all compilers. If you want
+to override that behavior, please set the C++ standard directly for example
+by configuring with <code>-DDEAL_II_CXX_FLAGS="-std=c++17"</code>, or by
+setting the environement variable <code>CXXFLAGS="-std=c++17"</code>.
+<br>
+(Matthias Maier, 2020/05/21)

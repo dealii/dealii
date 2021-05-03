@@ -1,0 +1,4 @@
+Add: Adds new settings to PETScWrappers::PreconditionBoomerAMG::initialize()
+in the struct PETScWrappers::PreconditionBoomerAMG::AdditionalData.
+<br>
+(Maximilian Bergbauer, 2021/03/31)

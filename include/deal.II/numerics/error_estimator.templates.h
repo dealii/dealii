@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,11 +16,12 @@
 #ifndef dealii_error_estimator_templates_h
 #define dealii_error_estimator_templates_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/thread_management.h>
 #include <deal.II/base/work_stream.h>
 
 #include <deal.II/distributed/tria.h>
@@ -83,17 +84,14 @@ namespace internal
    * needs not allocate memory itself, or synchronize with other threads.
    *
    * The sizes of the arrays are initialized with the maximal number of
-   * entries necessary for the hp case. Within the loop over individual
+   * entries necessary for the hp-case. Within the loop over individual
    * cells, we then resize the arrays as necessary. Since for std::vector
    * resizing to a smaller size doesn't imply memory allocation, this is
    * fast.
    */
-  template <typename DoFHandlerType, typename number>
+  template <int dim, int spacedim, typename number>
   struct ParallelData
   {
-    static const unsigned int dim      = DoFHandlerType::dimension;
-    static const unsigned int spacedim = DoFHandlerType::space_dimension;
-
     /**
      * The finite element to be used.
      */
@@ -197,7 +195,7 @@ namespace internal
 
     /**
      * Resize the arrays so that they fit the number of quadrature points
-     * associated with the given finite element index into the hp
+     * associated with the given finite element index into the hp-
      * collections.
      */
     void
@@ -205,9 +203,9 @@ namespace internal
   };
 
 
-  template <typename DoFHandlerType, typename number>
+  template <int dim, int spacedim, typename number>
   template <class FE>
-  ParallelData<DoFHandlerType, number>::ParallelData(
+  ParallelData<dim, spacedim, number>::ParallelData(
     const FE &                                          fe,
     const dealii::hp::QCollection<dim - 1> &            face_quadratures,
     const dealii::hp::MappingCollection<dim, spacedim> &mapping,
@@ -264,9 +262,9 @@ namespace internal
 
 
 
-  template <typename DoFHandlerType, typename number>
+  template <int dim, int spacedim, typename number>
   void
-  ParallelData<DoFHandlerType, number>::resize(
+  ParallelData<dim, spacedim, number>::resize(
     const unsigned int active_fe_index)
   {
     const unsigned int n_q_points   = face_quadratures[active_fe_index].size();
@@ -303,16 +301,16 @@ namespace internal
    * object into a global such map. This is the copier stage of a WorkStream
    * pipeline.
    */
-  template <typename DoFHandlerType>
+  template <int dim, int spacedim>
   void
   copy_local_to_global(
-    const std::map<typename DoFHandlerType::face_iterator, std::vector<double>>
-      &local_face_integrals,
-    std::map<typename DoFHandlerType::face_iterator, std::vector<double>>
-      &face_integrals)
+    const std::map<typename DoFHandler<dim, spacedim>::face_iterator,
+                   std::vector<double>> &local_face_integrals,
+    std::map<typename DoFHandler<dim, spacedim>::face_iterator,
+             std::vector<double>> &      face_integrals)
   {
     // now copy locally computed elements into the global map
-    for (typename std::map<typename DoFHandlerType::face_iterator,
+    for (typename std::map<typename DoFHandler<dim, spacedim>::face_iterator,
                            std::vector<double>>::const_iterator p =
            local_face_integrals.begin();
          p != local_face_integrals.end();
@@ -338,13 +336,12 @@ namespace internal
    * Actually do the computation based on the evaluated gradients in
    * ParallelData.
    */
-  template <typename DoFHandlerType, typename number>
+  template <int dim, int spacedim, typename number>
   std::vector<double>
-  integrate_over_face(ParallelData<DoFHandlerType, number> &parallel_data,
-                      const typename DoFHandlerType::face_iterator &face,
-                      dealii::hp::FEFaceValues<DoFHandlerType::dimension,
-                                               DoFHandlerType::space_dimension>
-                        &fe_face_values_cell)
+  integrate_over_face(
+    ParallelData<dim, spacedim, number> &                    parallel_data,
+    const typename DoFHandler<dim, spacedim>::face_iterator &face,
+    dealii::hp::FEFaceValues<dim, spacedim> &fe_face_values_cell)
   {
     const unsigned int n_q_points = parallel_data.psi[0].size(),
                        n_components =
@@ -363,7 +360,7 @@ namespace internal
     // change the sign. We take the outward normal.
 
     parallel_data.normal_vectors =
-      fe_face_values_cell.get_present_fe_values().get_all_normal_vectors();
+      fe_face_values_cell.get_present_fe_values().get_normal_vectors();
 
     for (unsigned int n = 0; n < n_solution_vectors; ++n)
       for (unsigned int component = 0; component < n_components; ++component)
@@ -488,35 +485,26 @@ namespace internal
    * A factor to scale the integral for the face at the boundary. Used for
    * Neumann BC.
    */
-  template <typename DoFHandlerType>
+  template <int dim, int spacedim>
   double
   boundary_face_factor(
-    const typename DoFHandlerType::active_cell_iterator &cell,
-    const unsigned int                                   face_no,
-    const dealii::hp::FEFaceValues<DoFHandlerType::dimension,
-                                   DoFHandlerType::space_dimension>
-      &fe_face_values_cell,
-    const typename KellyErrorEstimator<
-      DoFHandlerType::dimension,
-      DoFHandlerType::space_dimension>::Strategy strategy)
+    const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
+    const unsigned int                                              face_no,
+    const dealii::hp::FEFaceValues<dim, spacedim> &fe_face_values_cell,
+    const typename KellyErrorEstimator<dim, spacedim>::Strategy strategy)
   {
     switch (strategy)
       {
-        case KellyErrorEstimator<
-          DoFHandlerType::dimension,
-          DoFHandlerType::space_dimension>::cell_diameter_over_24:
+        case KellyErrorEstimator<dim, spacedim>::cell_diameter_over_24:
           {
             return 1.0;
           }
-        case KellyErrorEstimator<
-          DoFHandlerType::dimension,
-          DoFHandlerType::space_dimension>::cell_diameter:
+        case KellyErrorEstimator<dim, spacedim>::cell_diameter:
           {
             return 1.0;
           }
-        case KellyErrorEstimator<
-          DoFHandlerType::dimension,
-          DoFHandlerType::space_dimension>::face_diameter_over_twice_max_degree:
+        case KellyErrorEstimator<dim,
+                                 spacedim>::face_diameter_over_twice_max_degree:
           {
             const double cell_degree =
               fe_face_values_cell.get_fe_collection()[cell->active_fe_index()]
@@ -535,38 +523,27 @@ namespace internal
   /**
    * A factor to scale the integral for the regular face.
    */
-  template <typename DoFHandlerType>
+  template <int dim, int spacedim>
   double
   regular_face_factor(
-    const typename DoFHandlerType::active_cell_iterator &cell,
-    const unsigned int                                   face_no,
-    const dealii::hp::FEFaceValues<DoFHandlerType::dimension,
-                                   DoFHandlerType::space_dimension>
-      &fe_face_values_cell,
-    const dealii::hp::FEFaceValues<DoFHandlerType::dimension,
-                                   DoFHandlerType::space_dimension>
-      &fe_face_values_neighbor,
-    const typename KellyErrorEstimator<
-      DoFHandlerType::dimension,
-      DoFHandlerType::space_dimension>::Strategy strategy)
+    const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
+    const unsigned int                                              face_no,
+    const dealii::hp::FEFaceValues<dim, spacedim> &fe_face_values_cell,
+    const dealii::hp::FEFaceValues<dim, spacedim> &fe_face_values_neighbor,
+    const typename KellyErrorEstimator<dim, spacedim>::Strategy strategy)
   {
     switch (strategy)
       {
-        case KellyErrorEstimator<
-          DoFHandlerType::dimension,
-          DoFHandlerType::space_dimension>::cell_diameter_over_24:
+        case KellyErrorEstimator<dim, spacedim>::cell_diameter_over_24:
           {
             return 1.0;
           }
-        case KellyErrorEstimator<
-          DoFHandlerType::dimension,
-          DoFHandlerType::space_dimension>::cell_diameter:
+        case KellyErrorEstimator<dim, spacedim>::cell_diameter:
           {
             return 1.0;
           }
-        case KellyErrorEstimator<
-          DoFHandlerType::dimension,
-          DoFHandlerType::space_dimension>::face_diameter_over_twice_max_degree:
+        case KellyErrorEstimator<dim,
+                                 spacedim>::face_diameter_over_twice_max_degree:
           {
             const double cell_degree =
               fe_face_values_cell.get_fe_collection()[cell->active_fe_index()]
@@ -589,40 +566,30 @@ namespace internal
   /**
    * A factor to scale the integral for the irregular face.
    */
-  template <typename DoFHandlerType>
+  template <int dim, int spacedim>
   double
   irregular_face_factor(
-    const typename DoFHandlerType::active_cell_iterator &cell,
-    const typename DoFHandlerType::active_cell_iterator &neighbor_child,
-    const unsigned int                                   face_no,
-    const unsigned int                                   subface_no,
-    const dealii::hp::FEFaceValues<DoFHandlerType::dimension,
-                                   DoFHandlerType::space_dimension>
-      &fe_face_values,
-    dealii::hp::FESubfaceValues<DoFHandlerType::dimension,
-                                DoFHandlerType::space_dimension>
-      &fe_subface_values,
-    const typename KellyErrorEstimator<
-      DoFHandlerType::dimension,
-      DoFHandlerType::space_dimension>::Strategy strategy)
+    const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
+    const typename DoFHandler<dim, spacedim>::active_cell_iterator
+      &                                            neighbor_child,
+    const unsigned int                             face_no,
+    const unsigned int                             subface_no,
+    const dealii::hp::FEFaceValues<dim, spacedim> &fe_face_values,
+    dealii::hp::FESubfaceValues<dim, spacedim> &   fe_subface_values,
+    const typename KellyErrorEstimator<dim, spacedim>::Strategy strategy)
   {
     switch (strategy)
       {
-        case KellyErrorEstimator<
-          DoFHandlerType::dimension,
-          DoFHandlerType::space_dimension>::cell_diameter_over_24:
+        case KellyErrorEstimator<dim, spacedim>::cell_diameter_over_24:
           {
             return 1.0;
           }
-        case KellyErrorEstimator<
-          DoFHandlerType::dimension,
-          DoFHandlerType::space_dimension>::cell_diameter:
+        case KellyErrorEstimator<dim, spacedim>::cell_diameter:
           {
             return 1.0;
           }
-        case KellyErrorEstimator<
-          DoFHandlerType::dimension,
-          DoFHandlerType::space_dimension>::face_diameter_over_twice_max_degree:
+        case KellyErrorEstimator<dim,
+                                 spacedim>::face_diameter_over_twice_max_degree:
           {
             const double cell_degree =
               fe_face_values.get_fe_collection()[cell->active_fe_index()]
@@ -646,32 +613,26 @@ namespace internal
    * A factor used when summing up all the contribution from different faces
    * of each cell.
    */
-  template <typename DoFHandlerType>
+  template <int dim, int spacedim>
   double
-  cell_factor(const typename DoFHandlerType::active_cell_iterator &cell,
-              const unsigned int /*face_no*/,
-              const DoFHandlerType & /*dof_handler*/,
-              const typename KellyErrorEstimator<
-                DoFHandlerType::dimension,
-                DoFHandlerType::space_dimension>::Strategy strategy)
+  cell_factor(
+    const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
+    const unsigned int /*face_no*/,
+    const DoFHandler<dim, spacedim> & /*dof_handler*/,
+    const typename KellyErrorEstimator<dim, spacedim>::Strategy strategy)
   {
     switch (strategy)
       {
-        case KellyErrorEstimator<
-          DoFHandlerType::dimension,
-          DoFHandlerType::space_dimension>::cell_diameter_over_24:
+        case KellyErrorEstimator<dim, spacedim>::cell_diameter_over_24:
           {
             return cell->diameter() / 24;
           }
-        case KellyErrorEstimator<
-          DoFHandlerType::dimension,
-          DoFHandlerType::space_dimension>::cell_diameter:
+        case KellyErrorEstimator<dim, spacedim>::cell_diameter:
           {
             return cell->diameter();
           }
-        case KellyErrorEstimator<
-          DoFHandlerType::dimension,
-          DoFHandlerType::space_dimension>::face_diameter_over_twice_max_degree:
+        case KellyErrorEstimator<dim,
+                                 spacedim>::face_diameter_over_twice_max_degree:
           {
             return 1.0;
           }
@@ -691,31 +652,23 @@ namespace internal
    * boundary), or the other side's refinement level is the same as that of
    * this side, then handle the integration of these both cases together.
    */
-  template <typename InputVector, typename DoFHandlerType>
+  template <typename InputVector, int dim, int spacedim>
   void
   integrate_over_regular_face(
     const std::vector<const InputVector *> &solutions,
-    ParallelData<DoFHandlerType, typename InputVector::value_type>
-      &parallel_data,
-    std::map<typename DoFHandlerType::face_iterator, std::vector<double>>
-      &                                                  local_face_integrals,
-    const typename DoFHandlerType::active_cell_iterator &cell,
-    const unsigned int                                   face_no,
-    dealii::hp::FEFaceValues<DoFHandlerType::dimension,
-                             DoFHandlerType::space_dimension>
-      &fe_face_values_cell,
-    dealii::hp::FEFaceValues<DoFHandlerType::dimension,
-                             DoFHandlerType::space_dimension>
-      &fe_face_values_neighbor,
-    const typename KellyErrorEstimator<
-      DoFHandlerType::dimension,
-      DoFHandlerType::space_dimension>::Strategy strategy)
+    ParallelData<dim, spacedim, typename InputVector::value_type>
+      &                            parallel_data,
+    std::map<typename DoFHandler<dim, spacedim>::face_iterator,
+             std::vector<double>> &local_face_integrals,
+    const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
+    const unsigned int                                              face_no,
+    dealii::hp::FEFaceValues<dim, spacedim> &fe_face_values_cell,
+    dealii::hp::FEFaceValues<dim, spacedim> &fe_face_values_neighbor,
+    const typename KellyErrorEstimator<dim, spacedim>::Strategy strategy)
   {
-    const unsigned int dim = DoFHandlerType::dimension;
-    (void)dim;
-
-    const typename DoFHandlerType::face_iterator face = cell->face(face_no);
-    const unsigned int n_solution_vectors             = solutions.size();
+    const typename DoFHandler<dim, spacedim>::face_iterator face =
+      cell->face(face_no);
+    const unsigned int n_solution_vectors = solutions.size();
 
 
     // initialize data of the restriction
@@ -736,8 +689,8 @@ namespace internal
         Assert(cell->neighbor(face_no).state() == IteratorState::valid,
                ExcInternalError());
 
-        const typename DoFHandlerType::active_cell_iterator neighbor =
-          cell->neighbor(face_no);
+        const typename DoFHandler<dim, spacedim>::active_cell_iterator
+          neighbor = cell->neighbor(face_no);
 
         // find which number the current face has relative to the
         // neighboring cell
@@ -747,17 +700,17 @@ namespace internal
                ExcInternalError());
 
         // get restriction of finite element function of @p{neighbor} to the
-        // common face. in the hp case, use the quadrature formula that
+        // common face. in the hp-case, use the quadrature formula that
         // matches the one we would use for the present cell
         fe_face_values_neighbor.reinit(neighbor,
                                        neighbor_neighbor,
                                        cell->active_fe_index());
 
-        factor = regular_face_factor<DoFHandlerType>(cell,
-                                                     face_no,
-                                                     fe_face_values_cell,
-                                                     fe_face_values_neighbor,
-                                                     strategy);
+        factor = regular_face_factor<dim, spacedim>(cell,
+                                                    face_no,
+                                                    fe_face_values_cell,
+                                                    fe_face_values_neighbor,
+                                                    strategy);
 
         // get gradients on neighbor cell
         for (unsigned int n = 0; n < n_solution_vectors; ++n)
@@ -768,15 +721,14 @@ namespace internal
           }
 
         parallel_data.neighbor_normal_vectors =
-          fe_face_values_neighbor.get_present_fe_values()
-            .get_all_normal_vectors();
+          fe_face_values_neighbor.get_present_fe_values().get_normal_vectors();
       }
     else
       {
-        factor = boundary_face_factor<DoFHandlerType>(cell,
-                                                      face_no,
-                                                      fe_face_values_cell,
-                                                      strategy);
+        factor = boundary_face_factor<dim, spacedim>(cell,
+                                                     face_no,
+                                                     fe_face_values_cell,
+                                                     strategy);
       }
 
     // now go to the generic function that does all the other things
@@ -794,33 +746,24 @@ namespace internal
    * over face @p face_no of @p cell, where the respective neighbor is
    * refined, so that the integration is a bit more complex.
    */
-  template <typename InputVector, typename DoFHandlerType>
+  template <typename InputVector, int dim, int spacedim>
   void
   integrate_over_irregular_face(
     const std::vector<const InputVector *> &solutions,
-    ParallelData<DoFHandlerType, typename InputVector::value_type>
-      &parallel_data,
-    std::map<typename DoFHandlerType::face_iterator, std::vector<double>>
-      &                                                  local_face_integrals,
-    const typename DoFHandlerType::active_cell_iterator &cell,
-    const unsigned int                                   face_no,
-    dealii::hp::FEFaceValues<DoFHandlerType::dimension,
-                             DoFHandlerType::space_dimension> &fe_face_values,
-    dealii::hp::FESubfaceValues<DoFHandlerType::dimension,
-                                DoFHandlerType::space_dimension>
-      &fe_subface_values,
-    const typename KellyErrorEstimator<
-      DoFHandlerType::dimension,
-      DoFHandlerType::space_dimension>::Strategy strategy)
+    ParallelData<dim, spacedim, typename InputVector::value_type>
+      &                            parallel_data,
+    std::map<typename DoFHandler<dim, spacedim>::face_iterator,
+             std::vector<double>> &local_face_integrals,
+    const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
+    const unsigned int                                              face_no,
+    dealii::hp::FEFaceValues<dim, spacedim> &   fe_face_values,
+    dealii::hp::FESubfaceValues<dim, spacedim> &fe_subface_values,
+    const typename KellyErrorEstimator<dim, spacedim>::Strategy strategy)
   {
-    const unsigned int dim = DoFHandlerType::dimension;
-    (void)dim;
-
-    const typename DoFHandlerType::cell_iterator neighbor =
-      cell->neighbor(face_no);
+    const auto neighbor = cell->neighbor(face_no);
     (void)neighbor;
-    const unsigned int n_solution_vectors             = solutions.size();
-    const typename DoFHandlerType::face_iterator face = cell->face(face_no);
+    const unsigned int n_solution_vectors = solutions.size();
+    const auto         face               = cell->face(face_no);
 
     Assert(neighbor.state() == IteratorState::valid, ExcInternalError());
     Assert(face->has_children(), ExcInternalError());
@@ -843,9 +786,9 @@ namespace internal
          ++subface_no)
       {
         // get an iterator pointing to the cell behind the present subface
-        const typename DoFHandlerType::active_cell_iterator neighbor_child =
-          cell->neighbor_child_on_subface(face_no, subface_no);
-        Assert(!neighbor_child->has_children(), ExcInternalError());
+        const typename DoFHandler<dim, spacedim>::active_cell_iterator
+          neighbor_child = cell->neighbor_child_on_subface(face_no, subface_no);
+        Assert(neighbor_child->is_active(), ExcInternalError());
 
         // restrict the finite element on the present cell to the subface
         fe_subface_values.reinit(cell,
@@ -860,13 +803,13 @@ namespace internal
                               cell->active_fe_index());
 
         const double factor =
-          irregular_face_factor<DoFHandlerType>(cell,
-                                                neighbor_child,
-                                                face_no,
-                                                subface_no,
-                                                fe_face_values,
-                                                fe_subface_values,
-                                                strategy);
+          irregular_face_factor<dim, spacedim>(cell,
+                                               neighbor_child,
+                                               face_no,
+                                               subface_no,
+                                               fe_face_values,
+                                               fe_subface_values,
+                                               strategy);
 
         // store the gradient of the solution in psi
         for (unsigned int n = 0; n < n_solution_vectors; ++n)
@@ -880,7 +823,7 @@ namespace internal
 
         // call generic evaluate function
         parallel_data.neighbor_normal_vectors =
-          fe_subface_values.get_present_fe_values().get_all_normal_vectors();
+          fe_subface_values.get_present_fe_values().get_normal_vectors();
 
         local_face_integrals[neighbor_child->face(neighbor_neighbor)] =
           integrate_over_face(parallel_data, face, fe_face_values);
@@ -918,20 +861,17 @@ namespace internal
    * This function is only needed in two or three dimensions.  The error
    * estimator in one dimension is implemented separately.
    */
-  template <typename InputVector, typename DoFHandlerType>
+  template <typename InputVector, int dim, int spacedim>
   void
   estimate_one_cell(
-    const typename DoFHandlerType::active_cell_iterator &cell,
-    ParallelData<DoFHandlerType, typename InputVector::value_type>
-      &parallel_data,
-    std::map<typename DoFHandlerType::face_iterator, std::vector<double>>
-      &                                     local_face_integrals,
+    const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
+    ParallelData<dim, spacedim, typename InputVector::value_type>
+      &                                     parallel_data,
+    std::map<typename DoFHandler<dim, spacedim>::face_iterator,
+             std::vector<double>> &         local_face_integrals,
     const std::vector<const InputVector *> &solutions,
-    const typename KellyErrorEstimator<
-      DoFHandlerType::dimension,
-      DoFHandlerType::space_dimension>::Strategy strategy)
+    const typename KellyErrorEstimator<dim, spacedim>::Strategy strategy)
   {
-    const unsigned int dim                = DoFHandlerType::dimension;
     const unsigned int n_solution_vectors = solutions.size();
 
     const types::subdomain_id subdomain_id = parallel_data.subdomain_id;
@@ -941,10 +881,10 @@ namespace internal
     local_face_integrals.clear();
 
     // loop over all faces of this cell
-    for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell;
-         ++face_no)
+    for (const unsigned int face_no : cell->face_indices())
       {
-        const typename DoFHandlerType::face_iterator face = cell->face(face_no);
+        const typename DoFHandler<dim, spacedim>::face_iterator face =
+          cell->face(face_no);
 
         // make sure we do work only once: this face may either be regular
         // or irregular. if it is regular and has a neighbor, then we visit
@@ -1061,12 +1001,12 @@ namespace internal
 // the following function is still independent of dimension, but it
 // calls dimension dependent functions
 template <int dim, int spacedim>
-template <typename InputVector, typename DoFHandlerType>
+template <typename InputVector>
 void
 KellyErrorEstimator<dim, spacedim>::estimate(
-  const Mapping<dim, spacedim> &mapping,
-  const DoFHandlerType &        dof_handler,
-  const Quadrature<dim - 1> &   quadrature,
+  const Mapping<dim, spacedim> &   mapping,
+  const DoFHandler<dim, spacedim> &dof_handler,
+  const Quadrature<dim - 1> &      quadrature,
   const std::map<types::boundary_id,
                  const Function<spacedim, typename InputVector::value_type> *>
     &                       neumann_bc,
@@ -1098,11 +1038,11 @@ KellyErrorEstimator<dim, spacedim>::estimate(
 
 
 template <int dim, int spacedim>
-template <typename InputVector, typename DoFHandlerType>
+template <typename InputVector>
 void
 KellyErrorEstimator<dim, spacedim>::estimate(
-  const DoFHandlerType &     dof_handler,
-  const Quadrature<dim - 1> &quadrature,
+  const DoFHandler<dim, spacedim> &dof_handler,
+  const Quadrature<dim - 1> &      quadrature,
   const std::map<types::boundary_id,
                  const Function<spacedim, typename InputVector::value_type> *>
     &                       neumann_bc,
@@ -1115,7 +1055,7 @@ KellyErrorEstimator<dim, spacedim>::estimate(
   const types::material_id  material_id,
   const Strategy            strategy)
 {
-  estimate(StaticMappingQ1<dim, spacedim>::mapping,
+  estimate(get_default_linear_mapping(dof_handler.get_triangulation()),
            dof_handler,
            quadrature,
            neumann_bc,
@@ -1131,12 +1071,12 @@ KellyErrorEstimator<dim, spacedim>::estimate(
 
 
 template <int dim, int spacedim>
-template <typename InputVector, typename DoFHandlerType>
+template <typename InputVector>
 void
 KellyErrorEstimator<dim, spacedim>::estimate(
-  const Mapping<dim, spacedim> &  mapping,
-  const DoFHandlerType &          dof_handler,
-  const hp::QCollection<dim - 1> &quadrature,
+  const Mapping<dim, spacedim> &   mapping,
+  const DoFHandler<dim, spacedim> &dof_handler,
+  const hp::QCollection<dim - 1> & quadrature,
   const std::map<types::boundary_id,
                  const Function<spacedim, typename InputVector::value_type> *>
     &                       neumann_bc,
@@ -1168,11 +1108,11 @@ KellyErrorEstimator<dim, spacedim>::estimate(
 
 
 template <int dim, int spacedim>
-template <typename InputVector, typename DoFHandlerType>
+template <typename InputVector>
 void
 KellyErrorEstimator<dim, spacedim>::estimate(
-  const DoFHandlerType &          dof_handler,
-  const hp::QCollection<dim - 1> &quadrature,
+  const DoFHandler<dim, spacedim> &dof_handler,
+  const hp::QCollection<dim - 1> & quadrature,
   const std::map<types::boundary_id,
                  const Function<spacedim, typename InputVector::value_type> *>
     &                       neumann_bc,
@@ -1185,7 +1125,7 @@ KellyErrorEstimator<dim, spacedim>::estimate(
   const types::material_id  material_id,
   const Strategy            strategy)
 {
-  estimate(StaticMappingQ1<dim, spacedim>::mapping,
+  estimate(get_default_linear_mapping(dof_handler.get_triangulation()),
            dof_handler,
            quadrature,
            neumann_bc,
@@ -1202,12 +1142,12 @@ KellyErrorEstimator<dim, spacedim>::estimate(
 
 
 template <int dim, int spacedim>
-template <typename InputVector, typename DoFHandlerType>
+template <typename InputVector>
 void
 KellyErrorEstimator<dim, spacedim>::estimate(
-  const Mapping<dim, spacedim> &  mapping,
-  const DoFHandlerType &          dof_handler,
-  const hp::QCollection<dim - 1> &face_quadratures,
+  const Mapping<dim, spacedim> &   mapping,
+  const DoFHandler<dim, spacedim> &dof_handler,
+  const hp::QCollection<dim - 1> & face_quadratures,
   const std::map<types::boundary_id,
                  const Function<spacedim, typename InputVector::value_type> *>
     &                                     neumann_bc,
@@ -1282,13 +1222,14 @@ KellyErrorEstimator<dim, spacedim>::estimate(
   // the integrated jump of the gradient for each face.  At the end of the
   // function, we again loop over the cells and collect the contributions of
   // the different faces of the cell.
-  std::map<typename DoFHandlerType::face_iterator, std::vector<double>>
+  std::map<typename DoFHandler<dim, spacedim>::face_iterator,
+           std::vector<double>>
     face_integrals;
 
   // all the data needed in the error estimator by each of the threads is
   // gathered in the following structures
   const hp::MappingCollection<dim, spacedim> mapping_collection(mapping);
-  const internal::ParallelData<DoFHandlerType, typename InputVector::value_type>
+  const internal::ParallelData<dim, spacedim, typename InputVector::value_type>
     parallel_data(dof_handler.get_fe_collection(),
                   face_quadratures,
                   mapping_collection,
@@ -1299,23 +1240,30 @@ KellyErrorEstimator<dim, spacedim>::estimate(
                   &neumann_bc,
                   component_mask,
                   coefficients);
-  std::map<typename DoFHandlerType::face_iterator, std::vector<double>>
+  std::map<typename DoFHandler<dim, spacedim>::face_iterator,
+           std::vector<double>>
     sample_local_face_integrals;
 
   // now let's work on all those cells:
   WorkStream::run(
     dof_handler.begin_active(),
-    static_cast<typename DoFHandlerType::active_cell_iterator>(
+    static_cast<typename DoFHandler<dim, spacedim>::active_cell_iterator>(
       dof_handler.end()),
-    std::bind(&internal::estimate_one_cell<InputVector, DoFHandlerType>,
-              std::placeholders::_1,
-              std::placeholders::_2,
-              std::placeholders::_3,
-              std::ref(solutions),
-              strategy),
-    std::bind(&internal::copy_local_to_global<DoFHandlerType>,
-              std::placeholders::_1,
-              std::ref(face_integrals)),
+    [&solutions, strategy](
+      const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
+      internal::ParallelData<dim, spacedim, typename InputVector::value_type>
+        &                            parallel_data,
+      std::map<typename DoFHandler<dim, spacedim>::face_iterator,
+               std::vector<double>> &local_face_integrals) {
+      internal::estimate_one_cell(
+        cell, parallel_data, local_face_integrals, solutions, strategy);
+    },
+    [&face_integrals](
+      const std::map<typename DoFHandler<dim, spacedim>::face_iterator,
+                     std::vector<double>> &local_face_integrals) {
+      internal::copy_local_to_global<dim, spacedim>(local_face_integrals,
+                                                    face_integrals);
+    },
     parallel_data,
     sample_local_face_integrals);
 
@@ -1333,25 +1281,21 @@ KellyErrorEstimator<dim, spacedim>::estimate(
 
   // now walk over all cells and collect information from the faces. only do
   // something if this is a cell we care for based on the subdomain id
-  unsigned int present_cell = 0;
-  for (typename DoFHandlerType::active_cell_iterator cell =
-         dof_handler.begin_active();
-       cell != dof_handler.end();
-       ++cell, ++present_cell)
+  for (const auto &cell : dof_handler.active_cell_iterators())
     if (((subdomain_id == numbers::invalid_subdomain_id) ||
          (cell->subdomain_id() == subdomain_id)) &&
         ((material_id == numbers::invalid_material_id) ||
          (cell->material_id() == material_id)))
       {
+        const unsigned int present_cell = cell->active_cell_index();
+
         // loop over all faces of this cell
-        for (unsigned int face_no = 0;
-             face_no < GeometryInfo<dim>::faces_per_cell;
-             ++face_no)
+        for (const unsigned int face_no : cell->face_indices())
           {
             Assert(face_integrals.find(cell->face(face_no)) !=
                      face_integrals.end(),
                    ExcInternalError());
-            const double factor = internal::cell_factor<DoFHandlerType>(
+            const double factor = internal::cell_factor<dim, spacedim>(
               cell, face_no, dof_handler, strategy);
 
             for (unsigned int n = 0; n < n_solution_vectors; ++n)
@@ -1374,12 +1318,12 @@ KellyErrorEstimator<dim, spacedim>::estimate(
 
 
 template <int dim, int spacedim>
-template <typename InputVector, typename DoFHandlerType>
+template <typename InputVector>
 void
 KellyErrorEstimator<dim, spacedim>::estimate(
-  const Mapping<dim, spacedim> &mapping,
-  const DoFHandlerType &        dof_handler,
-  const Quadrature<dim - 1> &   quadrature,
+  const Mapping<dim, spacedim> &   mapping,
+  const DoFHandler<dim, spacedim> &dof_handler,
+  const Quadrature<dim - 1> &      quadrature,
   const std::map<types::boundary_id,
                  const Function<spacedim, typename InputVector::value_type> *>
     &                                     neumann_bc,
@@ -1409,11 +1353,11 @@ KellyErrorEstimator<dim, spacedim>::estimate(
 
 
 template <int dim, int spacedim>
-template <typename InputVector, typename DoFHandlerType>
+template <typename InputVector>
 void
 KellyErrorEstimator<dim, spacedim>::estimate(
-  const DoFHandlerType &     dof_handler,
-  const Quadrature<dim - 1> &quadrature,
+  const DoFHandler<dim, spacedim> &dof_handler,
+  const Quadrature<dim - 1> &      quadrature,
   const std::map<types::boundary_id,
                  const Function<spacedim, typename InputVector::value_type> *>
     &                                     neumann_bc,
@@ -1426,7 +1370,7 @@ KellyErrorEstimator<dim, spacedim>::estimate(
   const types::material_id                material_id,
   const Strategy                          strategy)
 {
-  estimate(StaticMappingQ1<dim, spacedim>::mapping,
+  estimate(get_default_linear_mapping(dof_handler.get_triangulation()),
            dof_handler,
            quadrature,
            neumann_bc,
@@ -1443,11 +1387,11 @@ KellyErrorEstimator<dim, spacedim>::estimate(
 
 
 template <int dim, int spacedim>
-template <typename InputVector, typename DoFHandlerType>
+template <typename InputVector>
 void
 KellyErrorEstimator<dim, spacedim>::estimate(
-  const DoFHandlerType &          dof_handler,
-  const hp::QCollection<dim - 1> &quadrature,
+  const DoFHandler<dim, spacedim> &dof_handler,
+  const hp::QCollection<dim - 1> & quadrature,
   const std::map<types::boundary_id,
                  const Function<spacedim, typename InputVector::value_type> *>
     &                                     neumann_bc,
@@ -1460,7 +1404,7 @@ KellyErrorEstimator<dim, spacedim>::estimate(
   const types::material_id                material_id,
   const Strategy                          strategy)
 {
-  estimate(StaticMappingQ1<dim, spacedim>::mapping,
+  estimate(get_default_linear_mapping(dof_handler.get_triangulation()),
            dof_handler,
            quadrature,
            neumann_bc,

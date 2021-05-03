@@ -80,7 +80,7 @@ check(const unsigned int p)
   // then output these values at the
   // quadrature points of all cells
   // of the finer grid
-  QTrapez<dim>                quadrature;
+  QTrapezoid<dim>             quadrature;
   std::vector<Vector<double>> shape_values(quadrature.size(),
                                            Vector<double>(dim));
   FEValues<dim>               fe(fe_ned,

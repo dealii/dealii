@@ -1,0 +1,10 @@
+
+DEAL:2d/2d::Particle is inside cell 1: 1
+DEAL:2d/2d::Particle id: 42
+DEAL:2d/2d::OK
+DEAL:2d/3d::Particle is inside cell 1: 1
+DEAL:2d/3d::Particle id: 42
+DEAL:2d/3d::OK
+DEAL:3d/3d::Particle is inside cell 1: 1
+DEAL:3d/3d::Particle id: 42
+DEAL:3d/3d::OK

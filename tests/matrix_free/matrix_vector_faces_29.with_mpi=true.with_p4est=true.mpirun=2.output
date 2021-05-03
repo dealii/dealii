@@ -1,0 +1,17 @@
+
+DEAL:2d::Testing FE_DGQHermite<2>(2) on 144 DoFs
+DEAL:2d::Norm of difference:          0 0
+DEAL:2d::Testing FE_DGQHermite<2>(2) on 576 DoFs
+DEAL:2d::Norm of difference:          0 0
+DEAL:2d::Testing FE_DGQHermite<2>(3) on 256 DoFs
+DEAL:2d::Norm of difference:          0 0
+DEAL:2d::Testing FE_DGQHermite<2>(3) on 1024 DoFs
+DEAL:2d::Norm of difference:          0 0
+DEAL:3d::Testing FE_DGQHermite<3>(2) on 216 DoFs
+DEAL:3d::Norm of difference:          0 0
+DEAL:3d::Testing FE_DGQHermite<3>(2) on 1728 DoFs
+DEAL:3d::Norm of difference:          0 0
+DEAL:3d::Testing FE_DGQHermite<3>(3) on 512 DoFs
+DEAL:3d::Norm of difference:          0 0
+DEAL:3d::Testing FE_DGQHermite<3>(3) on 4096 DoFs
+DEAL:3d::Norm of difference:          0 0

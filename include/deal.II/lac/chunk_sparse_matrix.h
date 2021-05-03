@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2018 by the deal.II authors
+// Copyright (C) 2008 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -31,10 +31,13 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#  ifndef DOXYGEN
 template <typename number>
 class Vector;
 template <typename number>
 class FullMatrix;
+#  endif
 
 /*! @addtogroup Matrix1
  *@{
@@ -141,9 +144,7 @@ namespace ChunkSparseMatrixIterators
      */
     using ChunkSparsityPatternIterators::Accessor::advance;
 
-    /**
-     * Make iterator class a friend.
-     */
+    // Make iterator class a friend.
     template <typename, bool>
     friend class Iterator;
   };
@@ -274,9 +275,7 @@ namespace ChunkSparseMatrixIterators
      */
     using ChunkSparsityPatternIterators::Accessor::advance;
 
-    /**
-     * Make iterator class a friend.
-     */
+    // Make iterator class a friend.
     template <typename, bool>
     friend class Iterator;
   };
@@ -417,8 +416,6 @@ namespace ChunkSparseMatrixIterators
  * section on
  * @ref Instantiations
  * in the manual).
- *
- * @author Wolfgang Bangerth, 2008
  */
 template <typename number>
 class ChunkSparseMatrix : public virtual Subscriptor
@@ -1340,7 +1337,7 @@ public:
                  int,
                  << "You are trying to access the matrix entry with index <"
                  << arg1 << ',' << arg2
-                 << ">, but this entry does not exist in the sparsity pattern"
+                 << ">, but this entry does not exist in the sparsity pattern "
                     "of this matrix."
                     "\n\n"
                     "The most common cause for this problem is that you used "
@@ -1409,9 +1406,7 @@ private:
   template <typename somenumber>
   friend class ChunkSparseMatrix;
 
-  /**
-   * Also give access to internal details to the iterator/accessor classes.
-   */
+  // Also give access to internal details to the iterator/accessor classes.
   template <typename, bool>
   friend class ChunkSparseMatrixIterators::Iterator;
   template <typename, bool>
@@ -2012,7 +2007,7 @@ template <typename number>
 inline typename ChunkSparseMatrix<number>::const_iterator
 ChunkSparseMatrix<number>::begin(const unsigned int r) const
 {
-  Assert(r < m(), ExcIndexRange(r, 0, m()));
+  AssertIndexRange(r, m());
   return const_iterator(this, r);
 }
 
@@ -2022,7 +2017,7 @@ template <typename number>
 inline typename ChunkSparseMatrix<number>::const_iterator
 ChunkSparseMatrix<number>::end(const unsigned int r) const
 {
-  Assert(r < m(), ExcIndexRange(r, 0, m()));
+  AssertIndexRange(r, m());
   return const_iterator(this, r + 1);
 }
 
@@ -2032,7 +2027,7 @@ template <typename number>
 inline typename ChunkSparseMatrix<number>::iterator
 ChunkSparseMatrix<number>::begin(const unsigned int r)
 {
-  Assert(r < m(), ExcIndexRange(r, 0, m()));
+  AssertIndexRange(r, m());
   return iterator(this, r);
 }
 
@@ -2042,7 +2037,7 @@ template <typename number>
 inline typename ChunkSparseMatrix<number>::iterator
 ChunkSparseMatrix<number>::end(const unsigned int r)
 {
-  Assert(r < m(), ExcIndexRange(r, 0, m()));
+  AssertIndexRange(r, m());
   return iterator(this, r + 1);
 }
 

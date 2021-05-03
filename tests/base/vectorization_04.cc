@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2018 by the deal.II authors
+// Copyright (C) 2014 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -25,7 +25,7 @@ template <typename Number>
 void
 test()
 {
-  const unsigned int  n_vectors = VectorizedArray<Number>::n_array_elements;
+  const unsigned int  n_vectors = VectorizedArray<Number>::size();
   std::vector<Number> values(n_vectors * 5);
   for (unsigned int i = 0; i < values.size(); ++i)
     values[i] = i;

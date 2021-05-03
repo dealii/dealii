@@ -1,0 +1,6 @@
+Deprecated: The GridReordering class as well as
+Triangulation::create_triangulation_compatibility have been deprecated.
+These functions use the old-style (before 5.2) numbering and have been
+unofficially deprecated since 2005.
+<br>
+(David Wells, 2021/04/22)

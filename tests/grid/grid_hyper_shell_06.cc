@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2018 by the deal.II authors
+// Copyright (C) 2007 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -44,7 +44,7 @@ check(double r1, double r2, unsigned int n)
   for (typename Triangulation<dim>::cell_iterator cell = tria.begin();
        cell != tria.end();
        ++cell)
-    for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+    for (const unsigned int f : GeometryInfo<dim>::face_indices())
       if (cell->face(f)->at_boundary())
         for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_face; ++l)
           AssertThrow(cell->face(f)->line(l)->boundary_id() ==

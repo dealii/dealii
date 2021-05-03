@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2018 by the deal.II authors
+// Copyright (C) 2014 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -65,10 +65,10 @@ public:
       {
         fe_eval.reinit(cell);
         fe_eval.read_dof_values(src);
-        fe_eval.evaluate(true, false);
+        fe_eval.evaluate(EvaluationFlags::values);
         for (unsigned int q = 0; q < n_q_points; ++q)
           fe_eval.submit_value(fe_eval.get_value(q), q);
-        fe_eval.integrate(true, false);
+        fe_eval.integrate(EvaluationFlags::values);
         fe_eval.distribute_local_to_global(dst);
       }
   }
@@ -180,7 +180,7 @@ test()
   typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(),
                                                     endc = tria.end();
   for (; cell != endc; ++cell)
-    for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+    for (const unsigned int f : GeometryInfo<dim>::face_indices())
       if (cell->at_boundary(f))
         cell->face(f)->set_all_manifold_ids(0);
   tria.set_manifold(0, manifold);

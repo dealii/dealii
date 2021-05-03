@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2019 by the deal.II authors
+// Copyright (C) 2001 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -48,14 +48,6 @@ namespace Functions
   }
 
 
-  template <int dim>
-  void
-  CutOffFunctionBase<dim>::new_center(const Point<dim> &p)
-  {
-    set_center(p);
-  }
-
-
 
   template <int dim>
   void
@@ -71,15 +63,6 @@ namespace Functions
   CutOffFunctionBase<dim>::get_center() const
   {
     return center;
-  }
-
-
-
-  template <int dim>
-  void
-  CutOffFunctionBase<dim>::new_radius(const double r)
-  {
-    set_radius(r);
   }
 
 
@@ -251,8 +234,7 @@ namespace Functions
   {
     Assert(values.size() == points.size(),
            ExcDimensionMismatch(values.size(), points.size()));
-    Assert(component < this->n_components,
-           ExcIndexRange(component, 0, this->n_components));
+    AssertIndexRange(component, this->n_components);
 
 
     if (this->selected == CutOffFunctionBase<dim>::no_component ||

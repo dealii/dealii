@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -87,7 +87,7 @@ check()
       // produces quite random grids
       cell = dof_1.begin();
       for (unsigned int index = 0; cell != endc; ++cell)
-        if (cell->active())
+        if (cell->is_active())
           {
             ++index;
             if (index % 3 == 0)
@@ -97,7 +97,7 @@ check()
       cell = dof_2.begin();
       endc = dof_2.end();
       for (unsigned int index = 0; cell != endc; ++cell)
-        if (cell->active())
+        if (cell->is_active())
           {
             ++index;
             if (index % 3 == 1)

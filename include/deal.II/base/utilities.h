@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2019 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -45,15 +45,15 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/core/demangle.hpp>
+#include <boost/iostreams/device/array.hpp>
+#include <boost/iostreams/device/back_inserter.hpp>
+#include <boost/iostreams/filtering_streambuf.hpp>
 #include <boost/serialization/array.hpp>
 #include <boost/serialization/complex.hpp>
 #include <boost/serialization/vector.hpp>
 
 #ifdef DEAL_II_WITH_ZLIB
-#  include <boost/iostreams/device/back_inserter.hpp>
 #  include <boost/iostreams/filter/gzip.hpp>
-#  include <boost/iostreams/filtering_stream.hpp>
-#  include <boost/iostreams/stream.hpp>
 #endif
 
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
@@ -61,8 +61,10 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 DEAL_II_NAMESPACE_OPEN
 
 // forward declare Point
+#ifndef DOXYGEN
 template <int dim, typename Number>
 class Point;
+#endif
 
 /**
  * A namespace for utility functions that are not particularly specific to
@@ -70,7 +72,6 @@ class Point;
  * in various contexts when writing applications.
  *
  * @ingroup utilities
- * @author Wolfgang Bangerth, 2005
  */
 namespace Utilities
 {
@@ -135,15 +136,78 @@ namespace Utilities
                 const int                             bits_per_dim);
 
   /**
+   * If the library is configured with ZLIB, then this function compresses the
+   * input string and returns a non-zero terminated string containing the
+   * compressed input.
+   *
+   * If the library was not configured with ZLIB enabled, the returned string
+   * is identical to the input string.
+   *
+   * @param[in] input The string to compress
+   *
+   * @return A compressed version of the input string
+   */
+  std::string
+  compress(const std::string &input);
+
+  /**
+   * If the library is configured with ZLIB, then this function assumes that the
+   * input string has been compressed using the compress() function, and returns
+   * the original decompressed string.
+   *
+   * If the library was not configured with ZLIB enabled, the returned string
+   * is identical to the input string.
+   *
+   * @param[in] compressed_input A compressed string, as returned by the
+   * function compress()
+   *
+   * @return The original uncompressed string.
+   */
+  std::string
+  decompress(const std::string &compressed_input);
+
+  /**
+   * Encodes the binary input as a base64 string.
+   *
+   * Base64 is a group of binary-to-text encoding schemes that represent binary
+   * data in an ASCII string format by translating it into a radix-64
+   * representation. Base64 is designed to carry data stored in binary formats
+   * across channels that only reliably support text content. It is used also
+   * to store binary formats in a machine independent way.
+   *
+   * @param binary_input A vector of characters, representing your input as
+   * binary data.
+   * @return A string containing the binary input as a base64 string.
+   */
+  std::string
+  encode_base64(const std::vector<unsigned char> &binary_input);
+
+  /**
+   * Decodes a base64 string into a binary output.
+   *
+   * This is the inverse of the encode_base64() function above.
+   *
+   * @param base64_input A string that contains the input in base64 format.
+   * @return A vector of characters that represents your input as binary data.
+   */
+  std::vector<unsigned char>
+  decode_base64(const std::string &base64_input);
+
+  /**
    * Convert a number @p value to a string, with as many digits as given to
    * fill with leading zeros.
    *
    * If the second parameter is left at its default value, the number is not
    * padded with leading zeros. The result is then the same as if the standard
-   * C function <code>itoa()</code> had been called.
+   * C++ `std::to_string` (or the older C function `itoa()`) had been called.
    *
-   * When calling this function signed integers are implicitly converted to
-   * unsigned integers and long integers might experience an overflow.
+   * This function takes an `unsigned int` as argument. As a consequence,
+   * if you call it with a `signed int` (which is of course the same
+   * type as `int`), the argument is implicitly converted to
+   * unsigned integers and negative numbers may not be printed as you had
+   * hoped. Similarly, if you call the function with a `long int`, the
+   * printed result might show the effects of an overflow upon conversion
+   * to `unsigned int`.
    *
    * @note The use of this function is discouraged and users should use
    * <code>Utilities::to_string()</code> instead. In its current
@@ -161,8 +225,9 @@ namespace Utilities
    * decimal points and digits of @p value.
    *
    * If the second parameter is left at its default value, the number is not
-   * padded with leading zeros. The result is then the same as if the boost
-   * function <code>lexical_cast@<std::string@>()</code> had been called.
+   * padded with leading zeros. The result is then the same as if the C++
+   * function `std::to_string()` had been called (for integral types),
+   * or if `boost::lexical_cast()` had been called (for all other types).
    */
   template <typename number>
   std::string
@@ -175,6 +240,18 @@ namespace Utilities
    */
   unsigned int
   needed_digits(const unsigned int max_number);
+
+  /**
+   * This function allows to cut off a floating point number @p number
+   * after @p n_digits of accuracy, i.e., after @p n_digits decimal places
+   * in scientific floating point notation. When interpreted as rounding
+   * operation, this function reduces the absolute value of a floating point
+   * number and always rounds towards zero, since decimal places are simply
+   * cut off.
+   */
+  template <typename Number>
+  Number
+  truncate_to_n_digits(const Number number, const unsigned int n_digits);
 
   /**
    * Given a string, convert it to an integer. Throw an assertion if that is
@@ -357,8 +434,6 @@ namespace Utilities
    * In general, C++ uses mangled names to identify types. This function
    * uses boost::core::demangle to return a human readable string describing
    * the type of the variable passed as argument.
-   *
-   * @author Luca Heltai, 2019.
    */
   template <class T>
   std::string
@@ -377,58 +452,15 @@ namespace Utilities
   fixed_power(const T t);
 
   /**
-   * Calculate a fixed power of an integer number by a template expression
-   * where both the number <code>a</code> and the power <code>N</code> are
-   * compile-time constants. This computes the result of the power operation
-   * at compile time, enabling its use e.g. in other templates.
-   *
-   * Use this class as in <code>fixed_int_power@<5,2@>::%value</code> to
-   * compute 5<sup>2</sup>.
-   *
-   * @deprecated This template has been deprecated in favor of C++11's support
-   * for <code>constexpr</code> calculations, e.g., use
-   *
-   * @code
-   * constexpr int value = Utilities::pow(2, dim);
-   * @endcode
-   *
-   * instead of
-   *
-   * @code
-   * const int value = Utilities::fixed_int_power<2, dim>::value;
-   * @endcode
-   *
-   * to obtain a constant expression for <code>value</code>.
-   */
-  template <int a, int N>
-  struct DEAL_II_DEPRECATED fixed_int_power
-  {
-    static const int value = a * fixed_int_power<a, N - 1>::value;
-  };
-
-  /**
-   * Base case for the power operation with <code>N=0</code>, which gives the
-   * result 1.
-   *
-   * @deprecated This template is deprecated: see the note in the general
-   * version of this template for more information.
-   */
-  template <int a>
-  struct DEAL_II_DEPRECATED fixed_int_power<a, 0>
-  {
-    static const int value = 1;
-  };
-
-  /**
    * A replacement for <code>std::pow</code> that allows compile-time
-   * calculations for constant expression arguments. The exponent @p iexp
-   * must not be negative.
+   * calculations for constant expression arguments. The @p base must
+   * be an integer type and the exponent @p iexp must not be negative.
    */
-  constexpr unsigned int
-  pow(const unsigned int base, const int iexp)
+  template <typename T>
+  constexpr T
+  pow(const T base, const int iexp)
   {
-#if defined(DEBUG) && defined(DEAL_II_WITH_CXX14) && \
-  defined(DEAL_II_HAVE_CXX14_CONSTEXPR_CAN_CALL_NONCONSTEXPR)
+#if defined(DEBUG) && !defined(DEAL_II_CXX14_CONSTEXPR_BUG)
     // Up to __builtin_expect this is the same code as in the 'Assert' macro.
     // The call to __builtin_expect turns out to be problematic.
     if (!(iexp >= 0))
@@ -449,18 +481,26 @@ namespace Utilities
     // if (iexp <= 0)
     //   return 1;
     //
+    // // avoid overflow of one additional recursion with pow(base * base, 0)
+    // if (iexp == 1)
+    //   return base;
+    //
     // // if the current exponent is not divisible by two,
     // // we need to account for that.
     // const unsigned int prefactor = (iexp % 2 == 1) ? base : 1;
     //
-    // // a^b = (a*a)^(b/2)      for b evenb
+    // // a^b = (a*a)^(b/2)      for b even
     // // a^b = a*(a*a)^((b-1)/2 for b odd
     // return prefactor * dealii::Utilities::pow(base*base, iexp/2);
     // </code>
 
-    return iexp <= 0 ? 1 :
-                       (((iexp % 2 == 1) ? base : 1) *
-                        dealii::Utilities::pow(base * base, iexp / 2));
+    static_assert(std::is_integral<T>::value, "Only integral types supported");
+
+    return iexp <= 0 ?
+             1 :
+             (iexp == 1 ? base :
+                          (((iexp % 2 == 1) ? base : 1) *
+                           dealii::Utilities::pow(base * base, iexp / 2)));
   }
 
   /**
@@ -503,32 +543,18 @@ namespace Utilities
    * $p_i\in [0,N)$ and $p_i\neq p_j$ for $i\neq j$), produce the reverse
    * permutation $q_i=N-1-p_i$.
    */
-  std::vector<unsigned int>
-  reverse_permutation(const std::vector<unsigned int> &permutation);
+  template <typename Integer>
+  std::vector<Integer>
+  reverse_permutation(const std::vector<Integer> &permutation);
 
   /**
    * Given a permutation vector (i.e. a vector $p_0\ldots p_{N-1}$ where each
    * $p_i\in [0,N)$ and $p_i\neq p_j$ for $i\neq j$), produce the inverse
    * permutation $q_0\ldots q_{N-1}$ so that $q_{p_i}=p_{q_i}=i$.
    */
-  std::vector<unsigned int>
-  invert_permutation(const std::vector<unsigned int> &permutation);
-
-  /**
-   * Given a permutation vector (i.e. a vector $p_0\ldots p_{N-1}$ where each
-   * $p_i\in [0,N)$ and $p_i\neq p_j$ for $i\neq j$), produce the reverse
-   * permutation $q_i=N-1-p_i$.
-   */
-  std::vector<unsigned long long int>
-  reverse_permutation(const std::vector<unsigned long long int> &permutation);
-
-  /**
-   * Given a permutation vector (i.e. a vector $p_0\ldots p_{N-1}$ where each
-   * $p_i\in [0,N)$ and $p_i\neq p_j$ for $i\neq j$), produce the inverse
-   * permutation $q_0\ldots q_{N-1}$ so that $q_{p_i}=p_{q_i}=i$.
-   */
-  std::vector<unsigned long long int>
-  invert_permutation(const std::vector<unsigned long long int> &permutation);
+  template <typename Integer>
+  std::vector<Integer>
+  invert_permutation(const std::vector<Integer> &permutation);
 
   /**
    * Given an arbitrary object of type T, use boost::serialization utilities
@@ -544,8 +570,6 @@ namespace Utilities
    * If many consecutive calls with the same buffer are considered, it is
    * recommended for reasons of performance to ensure that its capacity is
    * sufficient.
-   *
-   * @author Timo Heister, Wolfgang Bangerth, 2017.
    */
   template <typename T>
   size_t
@@ -560,8 +584,6 @@ namespace Utilities
    * If the library has been compiled with ZLIB enabled, then the output buffer
    * can be compressed. This can be triggered with the parameter
    * @p allow_compression, and is only of effect if ZLIB is enabled.
-   *
-   * @author Timo Heister, Wolfgang Bangerth, 2017.
    */
   template <typename T>
   std::vector<char>
@@ -596,8 +618,6 @@ namespace Utilities
    *  This is because C++ does not allow functions to return arrays.
    *  Consequently, there is a separate unpack() function for arrays, see
    *  below.
-   *
-   * @author Timo Heister, Wolfgang Bangerth, 2017.
    */
   template <typename T>
   T
@@ -610,8 +630,6 @@ namespace Utilities
    * The @p allow_compression parameter denotes if the buffer to
    * read from could have been previously compressed with ZLIB, and
    * is only of effect if ZLIB is enabled.
-   *
-   * @author Timo Heister, Wolfgang Bangerth, 2017.
    */
   template <typename T>
   T
@@ -650,8 +668,6 @@ namespace Utilities
    *  Note that unlike the other unpack() function, it is not necessary
    *  to explicitly specify the template arguments since they can be
    *  deduced from the second argument.
-   *
-   * @author Timo Heister, Wolfgang Bangerth, 2017.
    */
   template <typename T, int N>
   void
@@ -666,8 +682,6 @@ namespace Utilities
    * The @p allow_compression parameter denotes if the buffer to
    * read from could have been previously compressed with ZLIB, and
    * is only of effect if ZLIB is enabled.
-   *
-   * @author Timo Heister, Wolfgang Bangerth, 2017.
    */
   template <typename T, int N>
   void
@@ -675,6 +689,20 @@ namespace Utilities
          const std::vector<char>::const_iterator &cend,
          T (&unpacked_object)[N],
          const bool allow_compression = true);
+
+  /**
+   * Check if the bit at position @p n in @p number is set.
+   */
+  bool
+  get_bit(const unsigned char number, const unsigned int n);
+
+
+  /**
+   * Set the bit at position @p n in @p number to value @p x.
+   */
+  void
+  set_bit(unsigned char &number, const unsigned int n, const bool x);
+
 
   /**
    * Convert an object of type `std::unique_ptr<From>` to an object of
@@ -735,20 +763,42 @@ namespace Utilities
    */
   template <typename To, typename From>
   std::unique_ptr<To>
-  dynamic_unique_cast(std::unique_ptr<From> &&p)
-  {
-    // Let's see if we can cast from 'From' to 'To'. If so, do the cast,
-    // and then release the pointer from the old
-    // owner
-    if (To *cast = dynamic_cast<To *>(p.get()))
-      {
-        std::unique_ptr<To> result(cast);
-        p.release();
-        return result;
-      }
-    else
-      throw std::bad_cast();
-  }
+  dynamic_unique_cast(std::unique_ptr<From> &&p);
+
+  /**
+   * Return underlying value. Default: return input.
+   */
+  template <typename T>
+  T &
+  get_underlying_value(T &p);
+
+  /**
+   * Return underlying value. Specialization for std::shared_ptr<T>.
+   */
+  template <typename T>
+  T &
+  get_underlying_value(std::shared_ptr<T> &p);
+
+  /**
+   * Return underlying value. Specialization for const std::shared_ptr<T>.
+   */
+  template <typename T>
+  T &
+  get_underlying_value(const std::shared_ptr<T> &p);
+
+  /**
+   * Return underlying value. Specialization for std::unique_ptr<T>.
+   */
+  template <typename T>
+  T &
+  get_underlying_value(std::unique_ptr<T> &p);
+
+  /**
+   * Return underlying value. Specialization for const std::unique_ptr<T>.
+   */
+  template <typename T>
+  T &
+  get_underlying_value(const std::unique_ptr<T> &p);
 
   /**
    * A namespace for utility functions that probe system properties.
@@ -768,8 +818,8 @@ namespace Utilities
     get_cpu_load();
 
     /**
-     * Return the current level of vectorization as described by
-     * DEAL_II_COMPILER_VECTORIZATION_LEVEL in vectorization.h as a string. The
+     * Return the instruction set extension for vectorization as described by
+     * DEAL_II_VECTORIZATION_WIDTH_IN_BITS in vectorization.h as a string. The
      * list of possible return values is:
      *
      * <table>
@@ -785,7 +835,7 @@ namespace Utilities
      * </tr>
      * <tr>
      *   <td>1</td>
-     *   <td>SSE2</td>
+     *   <td>SSE2/AltiVec</td>
      *   <td>128</td>
      * </tr>
      * <tr>
@@ -1028,27 +1078,21 @@ namespace Utilities
 {
   template <int N, typename T>
   inline T
-  fixed_power(const T n)
+  fixed_power(const T x)
   {
-    Assert(N >= 0, ExcNotImplemented());
-    switch (N)
-      {
-        case 0:
-          return dealii::internal::NumberType<T>::value(1);
-        case 1:
-          return n;
-        case 2:
-          return n * n;
-        case 3:
-          return n * n * n;
-        case 4:
-          return n * n * n * n;
-        default:
-          T result = n;
-          for (int d = 1; d < N; ++d)
-            result *= n;
-          return result;
-      }
+    Assert(
+      !std::is_integral<T>::value || (N >= 0),
+      ExcMessage(
+        "The non-type template parameter N must be a non-negative integer for integral type T"));
+
+    if (N == 0)
+      return T(1.);
+    else if (N < 0)
+      return T(1.) / fixed_power<-N>(x);
+    else
+      // Use exponentiation by squaring:
+      return ((N % 2 == 1) ? x * fixed_power<N / 2>(x * x) :
+                             fixed_power<N / 2>(x * x));
   }
 
 
@@ -1175,28 +1219,18 @@ namespace Utilities
        std::vector<char> &dest_buffer,
        const bool         allow_compression)
   {
-    // the data is never compressed when we can't use zlib.
-    (void)allow_compression;
-
     std::size_t size = 0;
 
     // see if the object is small and copyable via memcpy. if so, use
     // this fast path. otherwise, we have to go through the BOOST
     // serialization machinery
-    //
-    // we have to work around the fact that GCC 4.8.x claims to be C++
-    // conforming, but is not actually as it does not implement
-    // std::is_trivially_copyable.
-#if __GNUG__ && __GNUC__ < 5
-    if (__has_trivial_copy(T) && sizeof(T) < 256)
-#else
-#  ifdef DEAL_II_WITH_CXX17
+#ifdef DEAL_II_HAVE_CXX17
     if constexpr (std::is_trivially_copyable<T>() && sizeof(T) < 256)
-#  else
+#else
     if (std::is_trivially_copyable<T>() && sizeof(T) < 256)
-#  endif
 #endif
       {
+        (void)allow_compression;
         const std::size_t previous_size = dest_buffer.size();
         dest_buffer.resize(previous_size + sizeof(T));
 
@@ -1209,31 +1243,21 @@ namespace Utilities
         // use buffer as the target of a compressing
         // stream into which we serialize the current object
         const std::size_t previous_size = dest_buffer.size();
+        {
+          boost::iostreams::filtering_ostreambuf fosb;
 #ifdef DEAL_II_WITH_ZLIB
-        if (allow_compression)
-          {
-            boost::iostreams::filtering_ostream out;
-            out.push(
-              boost::iostreams::gzip_compressor(boost::iostreams::gzip_params(
-                boost::iostreams::gzip::best_compression)));
-            out.push(boost::iostreams::back_inserter(dest_buffer));
-
-            boost::archive::binary_oarchive archive(out);
-            archive << object;
-            out.flush();
-          }
-        else
+          if (allow_compression)
+            fosb.push(boost::iostreams::gzip_compressor());
+#else
+          (void)allow_compression;
 #endif
-          {
-            std::ostringstream              out;
-            boost::archive::binary_oarchive archive(out);
-            archive << object;
+          fosb.push(boost::iostreams::back_inserter(dest_buffer));
 
-            const std::string &s = out.str();
-            dest_buffer.reserve(dest_buffer.size() + s.size());
-            std::move(s.begin(), s.end(), std::back_inserter(dest_buffer));
-          }
-
+          boost::archive::binary_oarchive boa(fosb);
+          boa << object;
+          // the stream object has to be destroyed before the return statement
+          // to ensure that all data has been written in the buffer
+        }
         size = dest_buffer.size() - previous_size;
       }
 
@@ -1259,54 +1283,33 @@ namespace Utilities
   {
     T object;
 
-    // the data is never compressed when we can't use zlib.
-    (void)allow_compression;
-
     // see if the object is small and copyable via memcpy. if so, use
     // this fast path. otherwise, we have to go through the BOOST
     // serialization machinery
-    //
-    // we have to work around the fact that GCC 4.8.x claims to be C++
-    // conforming, but is not actually as it does not implement
-    // std::is_trivially_copyable.
-#if __GNUG__ && __GNUC__ < 5
-    if (__has_trivial_copy(T) && sizeof(T) < 256)
-#else
-#  ifdef DEAL_II_WITH_CXX17
+#ifdef DEAL_II_HAVE_CXX17
     if constexpr (std::is_trivially_copyable<T>() && sizeof(T) < 256)
-#  else
+#else
     if (std::is_trivially_copyable<T>() && sizeof(T) < 256)
-#  endif
 #endif
       {
+        (void)allow_compression;
         Assert(std::distance(cbegin, cend) == sizeof(T), ExcInternalError());
         std::memcpy(&object, &*cbegin, sizeof(T));
       }
     else
       {
-        std::string decompressed_buffer;
-
-        // first decompress the buffer
+        // decompress the buffer section into the object
+        boost::iostreams::filtering_istreambuf fisb;
 #ifdef DEAL_II_WITH_ZLIB
         if (allow_compression)
-          {
-            boost::iostreams::filtering_ostream decompressing_stream;
-            decompressing_stream.push(boost::iostreams::gzip_decompressor());
-            decompressing_stream.push(
-              boost::iostreams::back_inserter(decompressed_buffer));
-            decompressing_stream.write(&*cbegin, std::distance(cbegin, cend));
-          }
-        else
+          fisb.push(boost::iostreams::gzip_decompressor());
+#else
+        (void)allow_compression;
 #endif
-          {
-            decompressed_buffer.assign(cbegin, cend);
-          }
+        fisb.push(boost::iostreams::array_source(&*cbegin, &*cend));
 
-        // then restore the object from the buffer
-        std::istringstream              in(decompressed_buffer);
-        boost::archive::binary_iarchive archive(in);
-
-        archive >> object;
+        boost::archive::binary_iarchive bia(fisb);
+        bia >> object;
       }
 
     return object;
@@ -1331,17 +1334,7 @@ namespace Utilities
     // see if the object is small and copyable via memcpy. if so, use
     // this fast path. otherwise, we have to go through the BOOST
     // serialization machinery
-    //
-    // we have to work around the fact that GCC 4.8.x claims to be C++
-    // conforming, but is not actually as it does not implement
-    // std::is_trivially_copyable.
-    if (
-#if __GNUG__ && __GNUC__ < 5
-      __has_trivial_copy(T)
-#else
-      std::is_trivially_copyable<T>()
-#endif
-      && sizeof(T) * N < 256)
+    if (std::is_trivially_copyable<T>() && sizeof(T) * N < 256)
       {
         Assert(std::distance(cbegin, cend) == sizeof(T) * N,
                ExcInternalError());
@@ -1349,30 +1342,18 @@ namespace Utilities
       }
     else
       {
-        std::string decompressed_buffer;
-
-        // first decompress the buffer
-        (void)allow_compression;
+        // decompress the buffer section into the object
+        boost::iostreams::filtering_istreambuf fisb;
 #ifdef DEAL_II_WITH_ZLIB
         if (allow_compression)
-          {
-            boost::iostreams::filtering_ostream decompressing_stream;
-            decompressing_stream.push(boost::iostreams::gzip_decompressor());
-            decompressing_stream.push(
-              boost::iostreams::back_inserter(decompressed_buffer));
-            decompressing_stream.write(&*cbegin, std::distance(cbegin, cend));
-          }
-        else
+          fisb.push(boost::iostreams::gzip_decompressor());
+#else
+        (void)allow_compression;
 #endif
-          {
-            decompressed_buffer.assign(cbegin, cend);
-          }
+        fisb.push(boost::iostreams::array_source(&*cbegin, &*cend));
 
-        // then restore the object from the buffer
-        std::istringstream              in(decompressed_buffer);
-        boost::archive::binary_iarchive archive(in);
-
-        archive >> unpacked_object;
+        boost::archive::binary_iarchive bia(fisb);
+        bia >> unpacked_object;
       }
   }
 
@@ -1389,6 +1370,135 @@ namespace Utilities
                  allow_compression);
   }
 
+
+
+  inline bool
+  get_bit(const unsigned char number, const unsigned int n)
+  {
+    AssertIndexRange(n, 8);
+
+    // source:
+    // https://stackoverflow.com/questions/47981/how-do-you-set-clear-and-toggle-a-single-bit
+    // "Checking a bit"
+    return (number >> n) & 1U;
+  }
+
+
+
+  inline void
+  set_bit(unsigned char &number, const unsigned int n, const bool x)
+  {
+    AssertIndexRange(n, 8);
+
+    // source:
+    // https://stackoverflow.com/questions/47981/how-do-you-set-clear-and-toggle-a-single-bit
+    // "Changing the nth bit to x"
+    number ^= (-static_cast<unsigned char>(x) ^ number) & (1U << n);
+  }
+
+
+
+  template <typename To, typename From>
+  inline std::unique_ptr<To>
+  dynamic_unique_cast(std::unique_ptr<From> &&p)
+  {
+    // Let's see if we can cast from 'From' to 'To'. If so, do the cast,
+    // and then release the pointer from the old
+    // owner
+    if (To *cast = dynamic_cast<To *>(p.get()))
+      {
+        std::unique_ptr<To> result(cast);
+        p.release();
+        return result;
+      }
+    else
+      throw std::bad_cast();
+  }
+
+
+
+  template <typename T>
+  inline T &
+  get_underlying_value(T &p)
+  {
+    return p;
+  }
+
+
+
+  template <typename T>
+  inline T &
+  get_underlying_value(std::shared_ptr<T> &p)
+  {
+    return *p;
+  }
+
+
+
+  template <typename T>
+  inline T &
+  get_underlying_value(const std::shared_ptr<T> &p)
+  {
+    return *p;
+  }
+
+
+
+  template <typename T>
+  inline T &
+  get_underlying_value(std::unique_ptr<T> &p)
+  {
+    return *p;
+  }
+
+
+
+  template <typename T>
+  inline T &
+  get_underlying_value(const std::unique_ptr<T> &p)
+  {
+    return *p;
+  }
+
+
+
+  template <typename Integer>
+  std::vector<Integer>
+  reverse_permutation(const std::vector<Integer> &permutation)
+  {
+    const std::size_t n = permutation.size();
+
+    std::vector<Integer> out(n);
+    for (std::size_t i = 0; i < n; ++i)
+      out[i] = n - 1 - permutation[i];
+
+    return out;
+  }
+
+
+
+  template <typename Integer>
+  std::vector<Integer>
+  invert_permutation(const std::vector<Integer> &permutation)
+  {
+    const std::size_t n = permutation.size();
+
+    std::vector<Integer> out(n, numbers::invalid_unsigned_int);
+
+    for (std::size_t i = 0; i < n; ++i)
+      {
+        AssertIndexRange(permutation[i], n);
+        out[permutation[i]] = i;
+      }
+
+    // check that we have actually reached
+    // all indices
+    for (std::size_t i = 0; i < n; ++i)
+      Assert(out[i] != numbers::invalid_unsigned_int,
+             ExcMessage("The given input permutation had duplicate entries!"));
+
+    return out;
+  }
 } // namespace Utilities
 
 
@@ -1400,7 +1510,7 @@ namespace boost
   namespace serialization
   {
     // Provides boost and c++11 with a way to serialize tuples and pairs
-    // automatically
+    // automatically.
     template <int N>
     struct Serialize
     {

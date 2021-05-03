@@ -41,6 +41,7 @@ namespace LinearAlgebra
     {
       using ::dealii::CUDAWrappers::block_size;
       using ::dealii::CUDAWrappers::chunk_size;
+      using ::dealii::CUDAWrappers::warp_size;
       using size_type = types::global_dof_index;
 
       /**

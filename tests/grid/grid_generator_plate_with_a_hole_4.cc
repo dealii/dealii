@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -42,8 +42,7 @@ test()
   std::vector<Tuple> boundary_faces;
 
   for (const auto &cell : triangulation.active_cell_iterators())
-    for (unsigned int face_n = 0; face_n < GeometryInfo<dim>::faces_per_cell;
-         ++face_n)
+    for (const unsigned int face_n : GeometryInfo<dim>::face_indices())
       if (cell->face(face_n)->at_boundary())
         boundary_faces.push_back(
           std::make_tuple(cell->face(face_n)->center(),

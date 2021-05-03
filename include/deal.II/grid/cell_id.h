@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -18,6 +18,7 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/array_view.h>
 #include <deal.II/base/exceptions.h>
 
 #include <array>
@@ -31,15 +32,21 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#ifndef DOXYGEN
 template <int, int>
 class Triangulation;
+#endif
 
 /**
  * A class to represent a unique ID for a cell in a Triangulation. It is
- * returned by <tt>cell->id()</tt> if <tt>cell</tt> is a cell iterator.
+ * returned by `cell->id()` (i.e., CellAccessor::id()) where
+ * `cell` is assumed to be a cell iterator.
  *
- * This class
- * stores the index of the coarse cell from which a cell is descendant,
+ * This class stores the index of the coarse cell from which a cell is
+ * descendant (or, more specifically, the
+ * entry on
+ * @ref GlossCoarseCellId "coarse cell IDs"),
  * together with information on how to reach the cell from that coarse cell
  * (i.e., which child index to take on each level of the triangulation when
  * moving from one cell to its children). The important point about this
@@ -82,7 +89,7 @@ public:
    * and the number of children of a cell in the current space dimension (i.e.,
    * GeometryInfo<dim>::max_children_per_cell).
    */
-  CellId(const unsigned int               coarse_cell_id,
+  CellId(const types::coarse_cell_id      coarse_cell_id,
          const std::vector<std::uint8_t> &child_indices);
 
   /**
@@ -96,9 +103,9 @@ public:
    * GeometryInfo<dim>::max_children_per_cell). The array
    * @p child_indices must have at least @p n_child_indices valid entries.
    */
-  CellId(const unsigned int  coarse_cell_id,
-         const unsigned int  n_child_indices,
-         const std::uint8_t *child_indices);
+  CellId(const types::coarse_cell_id coarse_cell_id,
+         const unsigned int          n_child_indices,
+         const std::uint8_t *        child_indices);
 
   /**
    * Construct a CellId object with a given binary representation that was
@@ -107,12 +114,27 @@ public:
   CellId(const binary_type &binary_representation);
 
   /**
+   * Create a CellId from a string with the same format that is produced by
+   * to_string().
+   */
+  explicit CellId(const std::string &string_representation);
+
+  /**
    * Construct an invalid CellId.
    */
   CellId();
 
   /**
-   * Return a human readable string representation of this CellId.
+   * Return a human-readable string representation of this CellId.
+   *
+   * The string returned by this function consists of only ASCII characters
+   * and will look, for example, like this: `"0_3:006"`. It *can* be
+   * interpreted by humans as saying "This cell originates from the zeroth
+   * coarse mesh cell, lives on refinement level 3, and the path from the
+   * coarse mesh cell to its children and grand children is given by 006".
+   * But it is not *meant* to be interpreted in any meaningful way: It's just
+   * a way of representing the internal state of the current object using
+   * only ASCII characters in the printable range.
    */
   std::string
   to_string() const;
@@ -126,9 +148,11 @@ public:
 
   /**
    * Return a cell_iterator to the cell represented by this CellId.
+   *
+   * @deprecated Use Triangulation::create_cell_iterator() instead.
    */
   template <int dim, int spacedim>
-  typename Triangulation<dim, spacedim>::cell_iterator
+  DEAL_II_DEPRECATED typename Triangulation<dim, spacedim>::cell_iterator
   to_cell(const Triangulation<dim, spacedim> &tria) const;
 
   /**
@@ -152,18 +176,49 @@ public:
   operator<(const CellId &other) const;
 
   /**
-   * Boost serialization function
+   * Determine if this cell id is the direct parent of the input cell id.
+   */
+  bool
+  is_parent_of(const CellId &other) const;
+
+  /**
+   * Determine if this cell id is the ancestor of the input cell id.
+   */
+  bool
+  is_ancestor_of(const CellId &other) const;
+
+  /**
+   * Read or write the data of this object to or from a stream for the
+   * purpose of serialization using the [BOOST serialization
+   * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
    */
   template <class Archive>
   void
   serialize(Archive &ar, const unsigned int version);
+
+  /**
+   * Return the id of the coarse cell.
+   */
+  types::coarse_cell_id
+  get_coarse_cell_id() const;
+
+  /**
+   * Return a read-only container of integers that denotes which child to pick
+   * from one refinement level to the next, starting with the coarse cell, until
+   * we get to the cell represented by the current object.
+   *
+   * The number of elements in this container corresponds to (level-1) of the
+   * current cell.
+   */
+  ArrayView<const std::uint8_t>
+  get_child_indices() const;
 
 private:
   /**
    * The number of the coarse cell within whose tree the cell
    * represented by the current object is located.
    */
-  unsigned int coarse_cell_id;
+  types::coarse_cell_id coarse_cell_id;
 
   /**
    * The number of child indices stored in the child_indices array. This is
@@ -304,6 +359,59 @@ CellId::operator<(const CellId &other) const
     return false;
   return true; // other.id is longer
 }
+
+
+
+inline bool
+CellId::is_parent_of(const CellId &other) const
+{
+  if (this->coarse_cell_id != other.coarse_cell_id)
+    return false;
+
+  if (n_child_indices + 1 != other.n_child_indices)
+    return false;
+
+  for (unsigned int idx = 0; idx < n_child_indices; ++idx)
+    if (child_indices[idx] != other.child_indices[idx])
+      return false;
+
+  return true; // other.id is longer
+}
+
+
+
+inline bool
+CellId::is_ancestor_of(const CellId &other) const
+{
+  if (this->coarse_cell_id != other.coarse_cell_id)
+    return false;
+
+  if (n_child_indices >= other.n_child_indices)
+    return false;
+
+  for (unsigned int idx = 0; idx < n_child_indices; ++idx)
+    if (child_indices[idx] != other.child_indices[idx])
+      return false;
+
+  return true; // other.id is longer
+}
+
+
+
+inline types::coarse_cell_id
+CellId::get_coarse_cell_id() const
+{
+  return coarse_cell_id;
+}
+
+
+
+inline ArrayView<const std::uint8_t>
+CellId::get_child_indices() const
+{
+  return {child_indices.data(), n_child_indices};
+}
+
 
 DEAL_II_NAMESPACE_CLOSE
 

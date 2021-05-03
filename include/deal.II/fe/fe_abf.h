@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -94,13 +94,9 @@ DEAL_II_NAMESPACE_OPEN
  * RT<sub>0</sub>). See the
  * @ref GlossGeneralizedSupport "glossary entry on generalized support points"
  * for more information.
- *
- *
- * @author Oliver Kayser-Herold, 2006, based on previous work by Guido
- * Kanschat and Wolfgang Bangerth
  */
 template <int dim>
-class FE_ABF : public FE_PolyTensor<PolynomialsABF<dim>, dim>
+class FE_ABF : public FE_PolyTensor<dim>
 {
 public:
   /**
@@ -243,10 +239,17 @@ private:
    */
   Table<3, double> interior_weights_abf;
 
-
   /**
-   * Allow access from other dimensions.
+   * Initialize the permutation pattern and the pattern of sign change.
+   *
+   * @note This function is not fully filled with the correct implementation
+   * yet. It needs to be consistently implemented in a future release to work
+   * on meshes that contain cells with flipped faces.
    */
+  void
+  initialize_quad_dof_index_permutation_and_sign_change();
+
+  // Allow access from other dimensions.
   template <int dim1>
   friend class FE_ABF;
 };

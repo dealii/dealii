@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2013 - 2019 by the deal.II authors
+ * Copyright (C) 2013 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -29,8 +29,6 @@
 // @sect3{Include files}
 
 #include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/manifold_lib.h>
@@ -55,8 +53,8 @@ using namespace dealii;
 // - The number of boundary faces that use each boundary indicator, so that
 //   it can be compared with what we expect.
 //
-// Finally, the function outputs the mesh in encapsulated postscript (EPS)
-// format that can easily be visualized in the same way as was done in step-1.
+// Finally, the function outputs the mesh in VTU format that can easily be
+// visualized in Paraview or VisIt.
 template <int dim>
 void print_mesh_info(const Triangulation<dim> &triangulation,
                      const std::string &       filename)
@@ -72,15 +70,9 @@ void print_mesh_info(const Triangulation<dim> &triangulation,
   // we then increment it):
   {
     std::map<types::boundary_id, unsigned int> boundary_count;
-    for (auto &cell : triangulation.active_cell_iterators())
-      {
-        for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-             ++face)
-          {
-            if (cell->face(face)->at_boundary())
-              boundary_count[cell->face(face)->boundary_id()]++;
-          }
-      }
+    for (const auto &face : triangulation.active_face_iterators())
+      if (face->at_boundary())
+        boundary_count[face->boundary_id()]++;
 
     std::cout << " boundary indicators: ";
     for (const std::pair<const types::boundary_id, unsigned int> &pair :
@@ -95,7 +87,7 @@ void print_mesh_info(const Triangulation<dim> &triangulation,
   // file:
   std::ofstream out(filename);
   GridOut       grid_out;
-  grid_out.write_eps(triangulation, out);
+  grid_out.write_vtu(triangulation, out);
   std::cout << " written to " << filename << std::endl << std::endl;
 }
 
@@ -113,10 +105,10 @@ void grid_1()
 
   GridIn<2> gridin;
   gridin.attach_triangulation(triangulation);
-  std::ifstream f("untitled.msh");
+  std::ifstream f("example.msh");
   gridin.read_msh(f);
 
-  print_mesh_info(triangulation, "grid-1.eps");
+  print_mesh_info(triangulation, "grid-1.vtu");
 }
 
 
@@ -142,7 +134,7 @@ void grid_2()
   Triangulation<2> triangulation;
   GridGenerator::merge_triangulations(tria1, tria2, triangulation);
 
-  print_mesh_info(triangulation, "grid-2.eps");
+  print_mesh_info(triangulation, "grid-2.vtu");
 }
 
 
@@ -174,7 +166,7 @@ void grid_3()
 
   for (const auto &cell : triangulation.active_cell_iterators())
     {
-      for (unsigned int i = 0; i < GeometryInfo<2>::vertices_per_cell; ++i)
+      for (const auto i : cell->vertex_indices())
         {
           Point<2> &v = cell->vertex(i);
           if (std::abs(v(1) - 1.0) < 1e-5)
@@ -191,7 +183,7 @@ void grid_3()
   // section</a> for a fully worked example where we <em>do</em> attach a
   // Manifold object).
   triangulation.refine_global(2);
-  print_mesh_info(triangulation, "grid-3.eps");
+  print_mesh_info(triangulation, "grid-3.vtu");
 }
 
 // There is one snag to doing things as shown above: If one moves the nodes on
@@ -221,7 +213,7 @@ void grid_4()
   GridGenerator::hyper_cube_with_cylindrical_hole(triangulation, 0.25, 1.0);
 
   GridGenerator::extrude_triangulation(triangulation, 3, 2.0, out);
-  print_mesh_info(out, "grid-4.eps");
+  print_mesh_info(out, "grid-4.vtu");
 }
 
 
@@ -232,13 +224,17 @@ void grid_4()
 // and returns a mapped point. In this case, we transform $(x,y) \mapsto
 // (x,y+\sin(\pi x/5))$.
 //
-// GridTools::transform takes a triangulation and any kind of object that can
-// be called like a function as arguments. This function-like argument can be
-// the address of a function that takes a point and returns a point, an object
-// that has an <code>operator()</code> like the code below, or for example, a
-// <code>std::function@<Point@<2@>(const Point@<2@>)@></code> object one can
-// get via <code>std::bind</code> in more complex cases. Here we have a simple
-// transformation and use the simplest method: a lambda function.
+// GridTools::transform() takes a triangulation and an argument that
+// can be called like a function taking a Point and returning a
+// Point. There are different ways of providing such an argument: It
+// could be a pointer to a function; it could be an object of a class
+// that has an `operator()`; it could be a lambda function; or it
+// could be anything that is described via a
+// <code>std::function@<Point@<2@>(const Point@<2@>)@></code> object.
+//
+// Decidedly the more modern way is to use a lambda function that
+// takes a Point and returns a Point, and that is what we do in the
+// following:
 void grid_5()
 {
   Triangulation<2>          triangulation;
@@ -251,11 +247,11 @@ void grid_5()
                                             Point<2>(10.0, 1.0));
 
   GridTools::transform(
-    [](const Point<2> &in) -> Point<2> {
-      return {in[0], in[1] + std::sin(in[0] / 5.0 * numbers::PI)};
+    [](const Point<2> &in) {
+      return Point<2>(in[0], in[1] + std::sin(numbers::PI * in[0] / 5.0));
     },
     triangulation);
-  print_mesh_info(triangulation, "grid-5.eps");
+  print_mesh_info(triangulation, "grid-5.vtu");
 }
 
 
@@ -295,7 +291,7 @@ void grid_6()
                                             Point<2>(1.0, 1.0));
 
   GridTools::transform(Grid6Func(), triangulation);
-  print_mesh_info(triangulation, "grid-6.eps");
+  print_mesh_info(triangulation, "grid-6.vtu");
 }
 
 
@@ -303,10 +299,12 @@ void grid_6()
 
 // In this last example, we create a mesh and then distort its (interior)
 // vertices by a random perturbation. This is not something you want to do for
-// production computations, but it is a useful tool for testing
+// production computations (because results are generally better on meshes
+// with "nicely shaped" cells than on the deformed cells produced by
+// GridTools::distort_random()), but it is a useful tool for testing
 // discretizations and codes to make sure they don't work just by accident
 // because the mesh happens to be uniformly structured and supporting
-// super-convergence properties.
+// superconvergence properties.
 void grid_7()
 {
   Triangulation<2>          triangulation;
@@ -318,14 +316,14 @@ void grid_7()
                                             Point<2>(1.0, 1.0));
 
   GridTools::distort_random(0.3, triangulation, true);
-  print_mesh_info(triangulation, "grid-7.eps");
+  print_mesh_info(triangulation, "grid-7.vtu");
 }
 
 
 // @sect3{The main function}
 
-// Finally, the main function. There isn't much to do here, only to call the
-// subfunctions.
+// Finally, the main function. There isn't much to do here, only to call all the
+// various functions we wrote above.
 int main()
 {
   try

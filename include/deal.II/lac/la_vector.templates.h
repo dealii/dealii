@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2019 by the deal.II authors
+// Copyright (C) 2015 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,9 +16,13 @@
 #ifndef dealii_la_vector_templates_h
 #define dealii_la_vector_templates_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/lac/la_vector.h>
 #include <deal.II/lac/vector_operation.h>
 #include <deal.II/lac/vector_operations_internal.h>
+
+#include <boost/io/ios_state.hpp>
 
 #include <iomanip>
 #include <iostream>
@@ -91,10 +95,11 @@ namespace LinearAlgebra
 
     dealii::internal::VectorOperations::Vector_copy<Number, Number> copier(
       in_vector.values.get(), this->values.get());
-    internal::VectorOperations::parallel_for(copier,
-                                             static_cast<size_type>(0),
-                                             this->size(),
-                                             this->thread_loop_partitioner);
+    dealii::internal::VectorOperations::parallel_for(
+      copier,
+      static_cast<size_type>(0),
+      this->size(),
+      this->thread_loop_partitioner);
 
     return *this;
   }
@@ -112,10 +117,11 @@ namespace LinearAlgebra
 
     dealii::internal::VectorOperations::Vector_copy<Number, Number2> copier(
       in_vector.values.get(), this->values.get());
-    internal::VectorOperations::parallel_for(copier,
-                                             static_cast<size_type>(0),
-                                             this->size(),
-                                             this->thread_loop_partitioner);
+    dealii::internal::VectorOperations::parallel_for(
+      copier,
+      static_cast<size_type>(0),
+      this->size(),
+      this->thread_loop_partitioner);
 
     return *this;
   }
@@ -130,12 +136,10 @@ namespace LinearAlgebra
            ExcMessage("Only 0 can be assigned to a vector."));
     (void)s;
 
-    internal::VectorOperations::Vector_set<Number> setter(Number(),
-                                                          this->values.get());
-    internal::VectorOperations::parallel_for(setter,
-                                             0,
-                                             this->size(),
-                                             this->thread_loop_partitioner);
+    dealii::internal::VectorOperations::Vector_set<Number> setter(
+      Number(), this->values.get());
+    dealii::internal::VectorOperations::parallel_for(
+      setter, 0, this->size(), this->thread_loop_partitioner);
 
     return *this;
   }
@@ -148,12 +152,13 @@ namespace LinearAlgebra
   {
     AssertIsFinite(factor);
 
-    internal::VectorOperations::Vectorization_multiply_factor<Number>
+    dealii::internal::VectorOperations::Vectorization_multiply_factor<Number>
       vector_multiply(this->values.get(), factor);
-    internal::VectorOperations::parallel_for(vector_multiply,
-                                             static_cast<size_type>(0),
-                                             this->size(),
-                                             this->thread_loop_partitioner);
+    dealii::internal::VectorOperations::parallel_for(
+      vector_multiply,
+      static_cast<size_type>(0),
+      this->size(),
+      this->thread_loop_partitioner);
 
     return *this;
   }
@@ -187,12 +192,10 @@ namespace LinearAlgebra
            ExcMessage(
              "Cannot add two vectors with different numbers of elements"));
 
-    internal::VectorOperations::Vectorization_add_v<Number> vector_add(
+    dealii::internal::VectorOperations::Vectorization_add_v<Number> vector_add(
       this->values.get(), down_V.values.get());
-    internal::VectorOperations::parallel_for(vector_add,
-                                             0,
-                                             this->size(),
-                                             this->thread_loop_partitioner);
+    dealii::internal::VectorOperations::parallel_for(
+      vector_add, 0, this->size(), this->thread_loop_partitioner);
 
     return *this;
   }
@@ -212,12 +215,10 @@ namespace LinearAlgebra
     Assert(down_V.size() == this->size(),
            ExcMessage(
              "Cannot subtract two vectors with different numbers of elements"));
-    internal::VectorOperations::Vectorization_subtract_v<Number>
+    dealii::internal::VectorOperations::Vectorization_subtract_v<Number>
       vector_subtract(this->values.get(), down_V.values.get());
-    internal::VectorOperations::parallel_for(vector_subtract,
-                                             0,
-                                             this->size(),
-                                             this->thread_loop_partitioner);
+    dealii::internal::VectorOperations::parallel_for(
+      vector_subtract, 0, this->size(), this->thread_loop_partitioner);
 
     return *this;
   }
@@ -236,10 +237,10 @@ namespace LinearAlgebra
     Assert(down_V.size() == this->size(),
            ExcMessage("Cannot compute the scalar product "
                       "of two vectors with different numbers of elements"));
-    Number                                          sum;
-    internal::VectorOperations::Dot<Number, Number> dot(this->values.get(),
-                                                        down_V.values.get());
-    internal::VectorOperations::parallel_reduce(
+    Number                                                  sum;
+    dealii::internal::VectorOperations::Dot<Number, Number> dot(
+      this->values.get(), down_V.values.get());
+    dealii::internal::VectorOperations::parallel_reduce(
       dot, 0, this->size(), sum, this->thread_loop_partitioner);
 
     return sum;
@@ -249,9 +250,10 @@ namespace LinearAlgebra
 
   template <typename Number>
   void
-  Vector<Number>::import(const ReadWriteVector<Number> &,
-                         VectorOperation::values,
-                         std::shared_ptr<const CommunicationPatternBase>)
+  Vector<Number>::import(
+    const ReadWriteVector<Number> &,
+    VectorOperation::values,
+    std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>)
   {
     AssertThrow(false, ExcMessage("This function is not implemented."));
   }
@@ -264,12 +266,10 @@ namespace LinearAlgebra
   {
     AssertIsFinite(a);
 
-    internal::VectorOperations::Vectorization_add_factor<Number> vector_add(
-      this->values.get(), a);
-    internal::VectorOperations::parallel_for(vector_add,
-                                             0,
-                                             this->size(),
-                                             this->thread_loop_partitioner);
+    dealii::internal::VectorOperations::Vectorization_add_factor<Number>
+      vector_add(this->values.get(), a);
+    dealii::internal::VectorOperations::parallel_for(
+      vector_add, 0, this->size(), this->thread_loop_partitioner);
   }
 
 
@@ -289,12 +289,10 @@ namespace LinearAlgebra
            ExcMessage(
              "Cannot add two vectors with different numbers of elements"));
 
-    internal::VectorOperations::Vectorization_add_av<Number> vector_add_av(
-      this->values.get(), down_V.values.get(), a);
-    internal::VectorOperations::parallel_for(vector_add_av,
-                                             0,
-                                             this->size(),
-                                             this->thread_loop_partitioner);
+    dealii::internal::VectorOperations::Vectorization_add_av<Number>
+      vector_add_av(this->values.get(), down_V.values.get(), a);
+    dealii::internal::VectorOperations::parallel_for(
+      vector_add_av, 0, this->size(), this->thread_loop_partitioner);
   }
 
 
@@ -326,12 +324,11 @@ namespace LinearAlgebra
            ExcMessage(
              "Cannot add two vectors with different numbers of elements"));
 
-    internal::VectorOperations::Vectorization_add_avpbw<Number> vector_add(
-      this->values.get(), down_V.values.get(), down_W.values.get(), a, b);
-    internal::VectorOperations::parallel_for(vector_add,
-                                             0,
-                                             this->size(),
-                                             this->thread_loop_partitioner);
+    dealii::internal::VectorOperations::Vectorization_add_avpbw<Number>
+      vector_add(
+        this->values.get(), down_V.values.get(), down_W.values.get(), a, b);
+    dealii::internal::VectorOperations::parallel_for(
+      vector_add, 0, this->size(), this->thread_loop_partitioner);
   }
 
 
@@ -351,12 +348,10 @@ namespace LinearAlgebra
 
     // Downcast V. It fails, throws an exception.
     const Vector<Number> &down_V = dynamic_cast<const Vector<Number> &>(V);
-    internal::VectorOperations::Vectorization_sadd_xav<Number> vector_sadd_xav(
-      this->values.get(), down_V.values.get(), a, s);
-    internal::VectorOperations::parallel_for(vector_sadd_xav,
-                                             0,
-                                             this->size(),
-                                             this->thread_loop_partitioner);
+    dealii::internal::VectorOperations::Vectorization_sadd_xav<Number>
+      vector_sadd_xav(this->values.get(), down_V.values.get(), a, s);
+    dealii::internal::VectorOperations::parallel_for(
+      vector_sadd_xav, 0, this->size(), this->thread_loop_partitioner);
   }
 
 
@@ -376,12 +371,10 @@ namespace LinearAlgebra
            ExcMessage(
              "Cannot add two vectors with different numbers of elements"));
 
-    internal::VectorOperations::Vectorization_scale<Number> vector_scale(
-      this->values.get(), down_scaling_factors.values.get());
-    internal::VectorOperations::parallel_for(vector_scale,
-                                             0,
-                                             this->size(),
-                                             this->thread_loop_partitioner);
+    dealii::internal::VectorOperations::Vectorization_scale<Number>
+      vector_scale(this->values.get(), down_scaling_factors.values.get());
+    dealii::internal::VectorOperations::parallel_for(
+      vector_scale, 0, this->size(), this->thread_loop_partitioner);
   }
 
 
@@ -398,12 +391,10 @@ namespace LinearAlgebra
 
     // Downcast V. If fails, throws an exception.
     const Vector<Number> &down_V = dynamic_cast<const Vector<Number> &>(V);
-    internal::VectorOperations::Vectorization_equ_au<Number> vector_equ(
+    dealii::internal::VectorOperations::Vectorization_equ_au<Number> vector_equ(
       this->values.get(), down_V.values.get(), a);
-    internal::VectorOperations::parallel_for(vector_equ,
-                                             0,
-                                             this->size(),
-                                             this->thread_loop_partitioner);
+    dealii::internal::VectorOperations::parallel_for(
+      vector_equ, 0, this->size(), this->thread_loop_partitioner);
   }
 
 
@@ -431,10 +422,10 @@ namespace LinearAlgebra
     Assert(this->size(), ExcEmptyObject());
 
     using real_type = typename VectorSpaceVector<Number>::real_type;
-    value_type                                    sum;
-    internal::VectorOperations::MeanValue<Number> mean_value(
+    value_type                                            sum;
+    dealii::internal::VectorOperations::MeanValue<Number> mean_value(
       this->values.get());
-    internal::VectorOperations::parallel_reduce(
+    dealii::internal::VectorOperations::parallel_reduce(
       mean_value, 0, this->size(), sum, this->thread_loop_partitioner);
 
     return sum / static_cast<real_type>(this->size());
@@ -449,10 +440,10 @@ namespace LinearAlgebra
     Assert(this->size(), ExcEmptyObject());
 
     using real_type = typename VectorSpaceVector<Number>::real_type;
-    real_type                                            sum;
-    internal::VectorOperations::Norm1<Number, real_type> norm1(
+    real_type                                                    sum;
+    dealii::internal::VectorOperations::Norm1<Number, real_type> norm1(
       this->values.get());
-    internal::VectorOperations::parallel_reduce(
+    dealii::internal::VectorOperations::parallel_reduce(
       norm1, 0, this->size(), sum, this->thread_loop_partitioner);
 
     return sum;
@@ -472,10 +463,10 @@ namespace LinearAlgebra
     // so working on the vector twice is uncritical and paid off by the extended
     // precision) using the BLAS approach with a weight, see e.g. dnrm2.f.
     using real_type = typename VectorSpaceVector<Number>::real_type;
-    real_type                                            norm_square;
-    internal::VectorOperations::Norm2<Number, real_type> norm2(
+    real_type                                                    norm_square;
+    dealii::internal::VectorOperations::Norm2<Number, real_type> norm2(
       this->values.get());
-    internal::VectorOperations::parallel_reduce(
+    dealii::internal::VectorOperations::parallel_reduce(
       norm2, 0, this->size(), norm_square, this->thread_loop_partitioner);
     if (numbers::is_finite(norm_square) &&
         norm_square >= std::numeric_limits<real_type>::min())
@@ -546,16 +537,34 @@ namespace LinearAlgebra
            ExcMessage(
              "Cannot add two vectors with different numbers of elements"));
 
-    Number                                        sum;
-    internal::VectorOperations::AddAndDot<Number> adder(this->values.get(),
-                                                        down_V.values.get(),
-                                                        down_W.values.get(),
-                                                        a);
-    internal::VectorOperations::parallel_reduce(
+    Number                                                sum;
+    dealii::internal::VectorOperations::AddAndDot<Number> adder(
+      this->values.get(), down_V.values.get(), down_W.values.get(), a);
+    dealii::internal::VectorOperations::parallel_reduce(
       adder, 0, this->size(), sum, this->thread_loop_partitioner);
     AssertIsFinite(sum);
 
     return sum;
+  }
+
+
+
+  template <typename Number>
+  void
+  Vector<Number>::print_as_numpy_array(std::ostream &     out,
+                                       const unsigned int precision) const
+  {
+    AssertThrow(out, ExcIO());
+    boost::io::ios_flags_saver restore_flags(out);
+
+    out.precision(precision);
+
+    const unsigned int n_elements = this->n_elements();
+    for (unsigned int i = 0; i < n_elements; ++i)
+      out << this->values[i] << ' ';
+    out << '\n' << std::flush;
+
+    AssertThrow(out, ExcIO());
   }
 
 
@@ -568,15 +577,14 @@ namespace LinearAlgebra
 
     // Other version of the following
     //  out << size() << std::endl << '[';
-    // Reason: operator<< seems to use some resources  that lead to problems in
-    // a multithreaded environment.
-    const size_type sz = this->size();
-    char            buf[16];
-#ifdef DEAL_II_WITH_64BIT_INDICES
+    // Reason: operator<< seems to use some resources that lead to problems in
+    // a multithreaded environment.  We convert the size index to
+    // unsigned long long int that is at least 64 bits to be able to output it
+    // on all platforms, since std::uint64_t is not in C.
+    const unsigned long long int sz = this->size();
+    char                         buf[16];
+
     std::sprintf(buf, "%llu", sz);
-#else
-    std::sprintf(buf, "%u", sz);
-#endif
     std::strcat(buf, "\n[");
 
     out.write(buf, std::strlen(buf));

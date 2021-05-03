@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2018 by the deal.II authors
+// Copyright (C) 2007 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -57,7 +57,7 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
 
   DoFRenumbering::component_wise(dof);
 
-  for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+  for (const unsigned int i : GeometryInfo<dim>::face_indices())
     {
       deallog << "FE=" << fe.get_name() << ", case=" << i << std::endl;
 
@@ -87,7 +87,7 @@ test_hyper_cube()
 
   for (unsigned int degree = 1; degree < 4; ++degree)
     {
-      FESystem<dim> fe(FE_Q<dim>(QIterated<1>(QTrapez<1>(), degree)),
+      FESystem<dim> fe(FE_Q<dim>(QIterated<1>(QTrapezoid<1>(), degree)),
                        dim,
                        FE_DGP<dim>(degree + 1),
                        1);

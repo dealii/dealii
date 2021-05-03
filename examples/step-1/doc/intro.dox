@@ -176,20 +176,39 @@ that we typically train mathematicians, engineers, or scientists in but that
 is important when you start writing software of more than a few hundred
 lines. Remember: Producing software is not the same as just writing code.
 
-To make your life easier on this journey let us point to three resources that
+To make your life easier on this journey let us point to some resources that
 are worthwhile browsing through before you start any large-scale programming:
 
-- <a href="https://github.com/dealii/dealii/wiki/Frequently-Asked-Questions">
-  The deal.II FAQ</a> has a good number of answers to questions about
+- The <a href="https://github.com/dealii/dealii/wiki/Frequently-Asked-Questions">
+  deal.II FAQ</a> has a good number of answers to questions about
   particular aspects of deal.II, but also to more general questions such as "How
   do I debug scientific computing codes?" or "Can I train myself to write code
   that has fewer bugs?".
+
+- You will benefit from becoming a better programmer. An excellent
+  resource to this end is the book
+  [Code Complete](https://en.wikipedia.org/wiki/Code_Complete)
+  by Steve McConnell @cite CodeComplete . It's already
+  a few years old, with the last edition published in 2004, but it has
+  lost none of its appeal as a guide to good programming practices,
+  and some of the principal developers use it as a group reading
+  project with every generation of their research group members.
 
 - The <a href="http://software-carpentry.org/">Software Carpentry project</a>
   that provides introductions to many topics that are important to dealing
   with software, such as version control, make files, testing, etc. It is
   specifically written for scientists and engineers, not for computer
   scientists, and has a focus on short, practical lessons.
+
+- The <a href="https://bssw.io/">Better Scientific Software
+  project</a> has a lot of resources (and interesting blog posts) that
+  cover many aspects of writing scientific software.
+
+- The <a href="https://ideas-productivity.org/">IDEAS
+  project</a> also has resources on software development, in
+  particular for parallel computing. In the "Events" section on
+  that site are recorded tutorials and webinars that cover many
+  interesting topics.
 
 - An article on <a href="http://arxiv.org/abs/1210.0530">Best
   Practices for Scientific Computing</a> that gives an introduction to

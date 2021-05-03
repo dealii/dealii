@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2006 - 2015 by the deal.II authors
+## Copyright (C) 2006 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -26,13 +26,25 @@ while (my $line = <TUTORIAL>)
   print $line;
 }
 
-# List of additional node attributes to highlight purpose and state of the example
+# List of additional node and edge attributes to highlight purpose and state of
+# a tutorial or code gallery program. For a list of colors, take a look here:
+#   https://www.graphviz.org/doc/info/colors.html
+my %colors = (
+ "basic"          => 'green',
+ "techniques"     => 'orange',
+ "fluids"         => 'yellow2',
+ "solids"         => 'lightblue',
+ "time dependent" => 'dodgerblue1',
+ "unfinished"     => 'white',
+ "code-gallery"   => 'white',
+    );
+
 my %style = (
- "basic"          => ',height=.8,width=.8,shape="octagon",fillcolor="green"',
- "techniques"     => ',height=.35,width=.35,fillcolor="orange"',
- "fluids"         => ',height=.25,width=.25,fillcolor="yellow"',
- "solids"         => ',height=.25,width=.25,fillcolor="lightblue"',
- "time dependent" => ',height=.25,width=.25,fillcolor="blue"',
+ "basic"          => ',height=.8,width=.8,shape="octagon"',
+ "techniques"     => ',height=.35,width=.35',
+ "fluids"         => ',height=.25,width=.25',
+ "solids"         => ',height=.25,width=.25',
+ "time dependent" => ',height=.25,width=.25',
  "unfinished"     => ',height=.25,width=.25,style="dashed"',
  "code-gallery"   => ',height=.08,width=.125,shape="circle"',
     );
@@ -63,6 +75,7 @@ EOT
 # command line arguments denoting the tutorial programs
 
 my $step;
+my %kind_map;
 foreach $step (@ARGV)
 {
     # read first line of tooltip file
@@ -91,8 +104,10 @@ foreach $step (@ARGV)
       my $number = $step;
       $number =~ s/^.*-//;
 
+      $kind_map{"Step$number"} = $kind;
+
       printf "  Step$number [label=\"$number\", URL=\"\\ref step_$number\", tooltip=\"$tooltip\"";
-      print "$style{$kind}";
+      print "$style{$kind},fillcolor=\"$colors{$kind}\"";
     }
     else
     {
@@ -103,9 +118,11 @@ foreach $step (@ARGV)
       my $tag = $name;
       $tag =~ s/[^a-zA-Z]/_/g;
 
+      $kind_map{"code_gallery_$tag"} = "code-gallery";
+
       printf "  code_gallery_$tag [label=\"\", URL=\"\\ref code_gallery_$tag\", tooltip=\"$tooltip\"";
       my $kind = "code-gallery";
-      print "$style{$kind}";
+      print "$style{$kind},fillcolor=\"$colors{$kind}\"";
     }
 
     print "];\n";
@@ -145,12 +162,77 @@ foreach $step (@ARGV)
     my $source;
     foreach $source (split ' ', $buildson) {
         $source =~ s/step-/Step/g;
-        print "  $source -> $destination";
-        if ($destination =~ /code_gallery/)
+
+        # We want to treat the step-6 -> step-40 edge differently. If
+        # it is printed like any other edge, i.e., with step-40
+        # directly below step-6, then we end up with a tangle of lines
+        # because there are so many sub-graphs that originate from
+        # step-6 (with the next node at the same level as step-40) but
+        # where step-40 then feeds with a long line into one of the
+        # programs further down. It looks better if we place step-40 a
+        # couple of levels further down in the graph so that the
+        # higher up parts of the graph consists of the sequential
+        # programs and the lower-down parts to the parallel ones.
+        #
+        # The way to do this is to insert a few invisible nodes (with
+        # invisible edges) between step-6 and step-40.
+        if ($source eq "Step6" && $destination eq "Step40")
         {
-            print " [style=\"dashed\", arrowhead=\"empty\"]";
+            print "  Step40a [style=\"invis\"];";
+            print "  Step40b [style=\"invis\"];";
+            print "  Step40c [style=\"invis\"];";
+
+            print "  Step6 -> Step40a [style=\"invis\"];";
+            print "  Step40a -> Step40b [style=\"invis\"];";
+            print "  Step40b -> Step40c [style=\"invis\"];";
+            print "  Step40c -> Step40 [style=\"invis\"];";
+
+            print "  Step6 -> Step40 [weight=100,color=\"$colors{$kind_map{$source}}\"];";
         }
-        print "\n";
+
+        # All other edges in the graph
+        else
+        {
+            print "  $source -> $destination";
+
+            my $edge_attributes = "";
+
+            # Determine the style of the arrow that connects
+            # the two nodes. If the two nodes are of the same
+            # kind, use the same color as the nodes as this makes
+            # reading the flow of the graph a bit easier. Furthermore,
+            # set the edge weight to 5 (instead of the default of 1)
+            # to try and keep programs of the same kind together.
+            #
+            # There are two exceptions:
+            # * The "basic" tutorial programs: these are
+            #   going to be connected by edges of weight 100, ensuring
+            #   that they are all essentially aligned vertically.
+            # * Code gallery programs: Here, we don't care much where
+            #   they are placed, and so don't treat edges between these kinds
+            #   of programs as special
+            if ($kind_map{$source} eq $kind_map{$destination}
+                &&
+                ! ($kind_map{$source} eq "code-gallery"))
+            {
+                $edge_attributes = "color=\"$colors{$kind_map{$source}}\",";
+                if ($kind_map{$source} eq "basic")
+                {
+                    $edge_attributes .= "weight=100,";
+                }
+                else
+                {
+                    $edge_attributes .= "weight=5,";
+                }
+            }
+
+            # If the destination is a code gallery program, used a dashed line
+            if ($kind_map{$destination} eq "code-gallery")
+            {
+                $edge_attributes .= "style=\"dashed\", arrowhead=\"empty\", color=\"gray\",";
+            }
+            print " [$edge_attributes];\n";
+        }
     }
 }
 
@@ -204,13 +286,18 @@ foreach $kind (keys %style)
 {
     my $escaped_kind = $kind;
     $escaped_kind =~ s/[^a-zA-Z]/_/g;
-    printf "  $escaped_kind [label=\"\" $style{$kind}];\n";
+    printf "  $escaped_kind [label=\"\" $style{$kind}, fillcolor=\"$colors{$kind}\"];\n";
     printf "  fake_$escaped_kind [label=\"$kind_descriptions{$kind}\", shape=plaintext];\n";
     printf "  $escaped_kind -- fake_$escaped_kind [style=dotted, arrowhead=odot, arrowsize=1];\n";
 }
 # now add connections to make sure they appear nicely next to each other
 # in the legend
-print "  basic -- techniques -- fluids -- solids -- time_dependent -- unfinished -- code_gallery;\n";
+print "  basic -- techniques [style=invis];\n";
+print "  techniques -- fluids [style=invis];\n";
+print "  fluids -- solids [style=invis];\n";
+print "  solids -- time_dependent [style=invis];\n";
+print "  time_dependent -- unfinished [style=invis];\n";
+print "  unfinished -- code_gallery [style=invis];\n";
 
 # we need to tell 'dot' that all of these are at the same
 # rank to ensure they appear next to (as opposed to atop)

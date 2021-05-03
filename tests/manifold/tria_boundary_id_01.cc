@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -28,7 +28,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 template <typename Stream, int dim>
 void
@@ -40,8 +39,7 @@ print_triangulation_data(Stream &                  stream,
   std::map<int, int> manifold_id_count;
   for (const auto &cell : triangulation.active_cell_iterators())
     {
-      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-           ++face)
+      for (const unsigned int face : GeometryInfo<dim>::face_indices())
         {
           if (cell->face(face)->at_boundary())
             {
@@ -100,8 +98,7 @@ main()
   const types::manifold_id curved_manifold_id = 1;
   for (const auto &cell : tria.active_cell_iterators())
     {
-      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-           ++face)
+      for (const unsigned int face : GeometryInfo<dim>::face_indices())
         {
           if (cell->face(face)->at_boundary())
             {

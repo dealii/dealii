@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2018 by the deal.II authors
+// Copyright (C) 2014 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -26,7 +26,7 @@ void
 test()
 {
   const unsigned int  n_chunks  = 50000;
-  const unsigned int  n_vectors = VectorizedArray<Number>::n_array_elements;
+  const unsigned int  n_vectors = VectorizedArray<Number>::size();
   std::vector<Number> values(n_vectors * n_chunks);
   for (unsigned int i = 0; i < values.size(); ++i)
     values[i] = i;

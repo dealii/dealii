@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,40 +14,38 @@
 // ---------------------------------------------------------------------
 
 
-for (deal_II_dimension : DIMENSIONS)
+for (deal_II_dimension : DIMENSIONS;
+     deal_II_scalar_vectorized : REAL_SCALARS_VECTORIZED)
   {
-    template struct internal::MatrixFreeFunctions::
-      MappingInfo<deal_II_dimension, double>;
-    template struct internal::MatrixFreeFunctions::
-      MappingInfo<deal_II_dimension, float>;
+    template struct internal::MatrixFreeFunctions::MappingInfo<
+      deal_II_dimension,
+      deal_II_scalar_vectorized::value_type,
+      deal_II_scalar_vectorized>;
 
-    template struct internal::MatrixFreeFunctions::
-      MappingInfoStorage<deal_II_dimension, deal_II_dimension, double>;
-    template struct internal::MatrixFreeFunctions::
-      MappingInfoStorage<deal_II_dimension, deal_II_dimension, float>;
+    template struct internal::MatrixFreeFunctions::MappingInfoStorage<
+      deal_II_dimension,
+      deal_II_dimension,
+      deal_II_scalar_vectorized::value_type,
+      deal_II_scalar_vectorized>;
+
 #if deal_II_dimension > 1
-    template struct internal::MatrixFreeFunctions::
-      MappingInfoStorage<deal_II_dimension - 1, deal_II_dimension, double>;
-    template struct internal::MatrixFreeFunctions::
-      MappingInfoStorage<deal_II_dimension - 1, deal_II_dimension, float>;
+    template struct internal::MatrixFreeFunctions::MappingInfoStorage<
+      deal_II_dimension - 1,
+      deal_II_dimension,
+      deal_II_scalar_vectorized::value_type,
+      deal_II_scalar_vectorized>;
 #endif
 
     template void internal::MatrixFreeFunctions::MappingInfo<
       deal_II_dimension,
-      double>::print_memory_consumption<std::ostream>(std::ostream &,
-                                                      const TaskInfo &) const;
-    template void
-    internal::MatrixFreeFunctions::MappingInfo<deal_II_dimension, double>::
+      deal_II_scalar_vectorized::value_type,
+      deal_II_scalar_vectorized>::
+      print_memory_consumption<std::ostream>(std::ostream &, const TaskInfo &)
+        const;
+    template void internal::MatrixFreeFunctions::MappingInfo<
+      deal_II_dimension,
+      deal_II_scalar_vectorized::value_type,
+      deal_II_scalar_vectorized>::
       print_memory_consumption<ConditionalOStream>(ConditionalOStream &,
                                                    const TaskInfo &) const;
-
-    template void internal::MatrixFreeFunctions::MappingInfo<
-      deal_II_dimension,
-      float>::print_memory_consumption<std::ostream>(std::ostream &,
-                                                     const TaskInfo &) const;
-    template void internal::MatrixFreeFunctions::MappingInfo<
-      deal_II_dimension,
-      float>::print_memory_consumption<ConditionalOStream>(ConditionalOStream &,
-                                                           const TaskInfo &)
-      const;
   }

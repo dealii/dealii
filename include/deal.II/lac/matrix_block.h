@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2018 by the deal.II authors
+// Copyright (C) 2007 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -34,8 +34,11 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#ifndef DOXYGEN
 template <typename MatrixType>
 class MatrixBlock;
+#endif
 
 namespace internal
 {
@@ -103,7 +106,6 @@ namespace internal
  *
  * @see
  * @ref GlossBlockLA "Block (linear algebra)"
- * @author Guido Kanschat, 2006
  */
 template <typename MatrixType>
 class MatrixBlock : public Subscriptor
@@ -127,7 +129,13 @@ public:
   /**
    * Copy constructor.
    */
-  MatrixBlock(const MatrixBlock<MatrixType> &M);
+  MatrixBlock(const MatrixBlock<MatrixType> &M) = default;
+
+  /**
+   * Assignment operator.
+   */
+  MatrixBlock<MatrixType> &
+  operator=(const MatrixBlock<MatrixType> &) = default;
 
   /**
    * Constructor setting block coordinates, but not initializing the matrix.
@@ -339,7 +347,6 @@ private:
  *
  * @relatesalso MatrixBlock
  * @ingroup vector_valued
- * @author Baerbel Janssen, Guido Kanschat, 2010
  */
 template <typename MatrixType>
 class MatrixBlockVector : private AnyData
@@ -429,7 +436,6 @@ public:
  *
  * @relatesalso MatrixBlock
  * @ingroup vector_valued
- * @author Baerbel Janssen, Guido Kanschat, 2010
  */
 template <typename MatrixType>
 class MGMatrixBlockVector : public Subscriptor
@@ -632,17 +638,6 @@ template <typename MatrixType>
 inline MatrixBlock<MatrixType>::MatrixBlock()
   : row(numbers::invalid_size_type)
   , column(numbers::invalid_size_type)
-{}
-
-
-template <typename MatrixType>
-inline MatrixBlock<MatrixType>::MatrixBlock(const MatrixBlock<MatrixType> &M)
-  : Subscriptor()
-  , row(M.row)
-  , column(M.column)
-  , matrix(M.matrix)
-  , row_indices(M.row_indices)
-  , column_indices(M.column_indices)
 {}
 
 

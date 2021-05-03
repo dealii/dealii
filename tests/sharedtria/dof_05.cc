@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2018 by the deal.II authors
+// Copyright (C) 2008 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -57,9 +57,11 @@ compare_meshes(DoFHandler<dim> &shared_dof_handler,
   shared_dofs.print(deallog.get_file_stream());
 
   std::vector<IndexSet> shared_dofs_per_proc =
-    shared_dof_handler.locally_owned_dofs_per_processor();
+    Utilities::MPI::all_gather(MPI_COMM_WORLD,
+                               shared_dof_handler.locally_owned_dofs());
   std::vector<IndexSet> distributed_dofs_per_proc =
-    distributed_dof_handler.locally_owned_dofs_per_processor();
+    Utilities::MPI::all_gather(MPI_COMM_WORLD,
+                               distributed_dof_handler.locally_owned_dofs());
   for (unsigned int i = 0; i < Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
        ++i)
     Assert(shared_dofs_per_proc[i] == distributed_dofs_per_proc[i],
@@ -73,12 +75,10 @@ compare_meshes(DoFHandler<dim> &shared_dof_handler,
       if (cell->subdomain_id() == numbers::artificial_subdomain_id)
         continue;
 
-      typename Triangulation<dim>::active_cell_iterator tria_shared_cell =
-        cell->id().to_cell(shared_dof_handler.get_triangulation());
       typename DoFHandler<dim>::active_cell_iterator dof_shared_cell(
         &shared_dof_handler.get_triangulation(),
-        tria_shared_cell->level(),
-        tria_shared_cell->index(),
+        cell->level(),
+        cell->index(),
         &shared_dof_handler);
 
       std::vector<types::global_dof_index> distributed_cell_dofs(

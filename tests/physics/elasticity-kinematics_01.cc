@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -42,7 +42,6 @@
 #include "../tests.h"
 
 
-using namespace dealii;
 using namespace dealii::Physics;
 using namespace dealii::Physics::Elasticity;
 
@@ -65,7 +64,7 @@ test_kinematic_tensors()
        cell != dof_handler.end();
        ++cell)
     {
-      for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+      for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
         if (std::abs(cell->vertex(v)[0] - 1.0) < 1e-9)
           soln_t[cell->vertex_dof_index(v, 0)] = 1.0;
     }
@@ -205,9 +204,8 @@ test_kinematic_tensors()
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(3);
-  deallog.attach(logfile);
 
   test_kinematic_tensors<2>();
   test_kinematic_tensors<3>();

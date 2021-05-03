@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2019 by the deal.II authors
+// Copyright (C) 2015 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -46,7 +46,7 @@ namespace LinearAlgebra
    * A namespace for classes that provide wrappers for Trilinos' Epetra vectors.
    *
    * This namespace provides wrappers for the Epetra_FEVector class from the
-   * Epetra package (https://trilinos.org/packages/epetra/) that is part of
+   * Epetra package (https://trilinos.github.io/epetra.html) that is part of
    * Trilinos.
    */
   namespace EpetraWrappers
@@ -60,7 +60,6 @@ namespace LinearAlgebra
      *
      * @ingroup TrilinosWrappers
      * @ingroup Vectors
-     * @author Bruno Turcksin, 2015
      */
     class Vector : public VectorSpaceVector<double>, public Subscriptor
     {
@@ -128,11 +127,10 @@ namespace LinearAlgebra
        * improve performance.
        */
       virtual void
-      import(
-        const ReadWriteVector<double> &                 V,
-        VectorOperation::values                         operation,
-        std::shared_ptr<const CommunicationPatternBase> communication_pattern =
-          std::shared_ptr<const CommunicationPatternBase>()) override;
+      import(const ReadWriteVector<double> &V,
+             VectorOperation::values        operation,
+             std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+               communication_pattern = {}) override;
 
       /**
        * Multiply the entire vector by a fixed factor.
@@ -284,6 +282,13 @@ namespace LinearAlgebra
        */
       virtual size_type
       size() const override;
+
+      /**
+       * Return the local size of the vector, i.e., the number of indices
+       * owned locally.
+       */
+      size_type
+      locally_owned_size() const;
 
       /**
        * Return the MPI communicator object in use with this object.

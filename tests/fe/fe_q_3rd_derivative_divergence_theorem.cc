@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -82,7 +82,7 @@ test(const Triangulation<dim> &tr,
       fe_values.reinit(cell);
 
       deallog << "Cell nodes:" << std::endl;
-      for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+      for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
         {
           deallog << i << ": ( ";
           for (unsigned int d = 0; d < dim; ++d)
@@ -101,7 +101,7 @@ test(const Triangulation<dim> &tr,
               ss << "component=" << c << ", dof=" << i << std::endl;
 
               Tensor<3, dim> bulk_integral;
-              for (unsigned int q = 0; q < fe_values.n_quadrature_points; ++q)
+              for (const auto q : fe_values.quadrature_point_indices())
                 {
                   bulk_integral +=
                     fe_values[single_component].third_derivative(i, q) *
@@ -112,14 +112,10 @@ test(const Triangulation<dim> &tr,
                 }
 
               Tensor<3, dim> boundary_integral;
-              for (unsigned int face = 0;
-                   face < GeometryInfo<dim>::faces_per_cell;
-                   ++face)
+              for (const unsigned int face : GeometryInfo<dim>::face_indices())
                 {
                   fe_face_values.reinit(cell, face);
-                  for (unsigned int q = 0;
-                       q < fe_face_values.n_quadrature_points;
-                       ++q)
+                  for (const auto q : fe_face_values.quadrature_point_indices())
                     {
                       Tensor<2, dim> hessian =
                         fe_face_values[single_component].hessian(i, q);
@@ -181,10 +177,8 @@ test_hyper_ball(const double tolerance)
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(8);
-
-  deallog.attach(logfile);
 
   test_hyper_ball<2>(1e-6);
   test_hyper_ball<3>(1e-6);

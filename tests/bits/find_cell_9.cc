@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -56,7 +56,7 @@ void create_coarse_grid(Triangulation<2> &coarse_grid)
   std::vector<CellData<2>> cells(n_cells, CellData<2>());
   for (unsigned int i = 0; i < n_cells; ++i)
     {
-      for (unsigned int j = 0; j < GeometryInfo<2>::vertices_per_cell; ++j)
+      for (const unsigned int j : GeometryInfo<2>::vertex_indices())
         cells[i].vertices[j] = cell_vertices[i][j];
       cells[i].material_id = 0;
     }
@@ -73,7 +73,7 @@ void check(Triangulation<2> &tria)
     GridTools::find_active_cell_around_point(tria, p);
 
   deallog << cell << std::endl;
-  for (unsigned int v = 0; v < GeometryInfo<2>::vertices_per_cell; ++v)
+  for (const unsigned int v : GeometryInfo<2>::vertex_indices())
     deallog << "<" << cell->vertex(v) << "> ";
   deallog << std::endl;
 

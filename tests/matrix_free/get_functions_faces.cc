@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2018-2014 by the deal.II authors
+// Copyright (C) 2014 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -32,8 +32,6 @@
 #include <deal.II/numerics/vector_tools.h>
 
 #include "../tests.h"
-
-std::ofstream logfile("output");
 
 
 
@@ -76,7 +74,7 @@ private:
       {
         fe_eval.reinit(face);
         fe_eval.read_dof_values(src);
-        fe_eval.evaluate(true, true);
+        fe_eval.evaluate(EvaluationFlags::values | EvaluationFlags::gradients);
 
         // Only one vectorization component is filled in this case because we
         // only have one cell (otherwise the output will not be stable among

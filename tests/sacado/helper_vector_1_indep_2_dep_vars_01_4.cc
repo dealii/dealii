@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2019 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,8 +19,9 @@
 //
 // AD number type: Sacado Rad-DFad
 
-#include "../ad_common_tests/helper_vector_1_indep_2_dep_vars_01.h"
 #include "../tests.h"
+
+#include "../ad_common_tests/helper_vector_1_indep_2_dep_vars_01.h"
 
 int
 main()

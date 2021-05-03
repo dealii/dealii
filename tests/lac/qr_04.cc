@@ -101,7 +101,7 @@ template <typename number>
 void
 test()
 {
-  typedef Vector<number> VectorType;
+  using VectorType = Vector<number>;
   ImplicitQR<VectorType> qr;
 
   auto print_givens = [](const unsigned int           i,

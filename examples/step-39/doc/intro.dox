@@ -16,7 +16,7 @@ a face, and let the traces of functions <i>u<sub>i</sub></i> and the
 outer normal vectors <b>n</b><i><sub>i</sub></i> be labeled
 accordingly. Then, on the face, we let
 @f[
-	\{\!\{ u \}\!\} = \frac{u_1 + u_2}2
+	\average{ u } = \frac{u_1 + u_2}2
 @f]
 
 Note, that if such an expression contains a normal vector, the
@@ -28,9 +28,9 @@ becomes
 @f{multline*}
   \sum_{K\in \mathbb T_h} (\nabla u, \nabla v)_K
   \\
-  + \sum_{F \in F_h^i} \biggl\{4\sigma_F (\{\!\{ u \mathbf n\}\!\}, \{\!\{ v \mathbf n \}\!\})_F
-  - 2 (\{\!\{ \nabla u \}\!\},\{\!\{ v\mathbf n \}\!\})_F
-  - 2 (\{\!\{ \nabla v \}\!\},\{\!\{ u\mathbf n \}\!\})_F
+  + \sum_{F \in F_h^i} \biggl\{4\sigma_F (\average{ u \mathbf n}, \average{ v \mathbf n })_F
+  - 2 (\average{ \nabla u },\average{ v\mathbf n })_F
+  - 2 (\average{ \nabla v },\average{ u\mathbf n })_F
   \biggr\}
   \\
   + \sum_{F \in F_h^b} \biggl\{2\sigma_F (u, v)_F
@@ -70,7 +70,7 @@ structure, since it can be written as
   \eta_K^2 &= \sum_{K\in \mathbb T_h} h^2 \|f + \Delta u_h\|^2
   \\
   \eta_F^2 &= \sum_{F \in F_h^i} \biggl\{
-    4 \sigma_F \| \{\!\{u_h\mathbf n\}\!\} \|^2 + h \|\{\!\{\partial_n u_h\}\!\}\|^2 \biggr\}
+    4 \sigma_F \| \average{u_h\mathbf n} \|^2 + h \|\average{\partial_n u_h}\|^2 \biggr\}
   \\
   \eta_B^2 &= \sum_{F \in F_h^b} 2\sigma_F \| u_h-u^D \|^2.
 @f}
@@ -79,7 +79,7 @@ Thus, the functions for assembling matrices, right hand side and error
 estimates below exhibit that these loops are all generic and can be
 programmed in the same way.
 
-This program is related to step-12, in that it uses MeshWorker and
+This program is related to step-12b, in that it uses MeshWorker and
 discontinuous Galerkin methods. While there, we solved an advection
 problem, here it is a diffusion problem. Here, we also use multigrid
 preconditioning and a theoretically justified error estimator, see

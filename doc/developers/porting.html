@@ -4,7 +4,7 @@
   <head>
     <title>Porting deal.II</title>
     <link href="../screen.css" rel="StyleSheet" media="screen">
-    <meta name="copyright" content="Copyright (C) 2000 - 2018 by the deal.II Authors">
+    <meta name="copyright" content="Copyright (C) 2000 - 2020 by the deal.II Authors">
     <meta name="keywords" content="deal.II porting">
   </head>
 
@@ -45,7 +45,7 @@ DEAL_II_CXX_FLAGS_RELEASE - additional flags for the release library
 </pre>
           After that try to compile the library with minimal external
           dependencies (<code>-DDEAL_II_ALLOW_AUTODETECTION=OFF</code>, for
-          further information see the <a href="../users/cmake.html">deal.II CMake
+          further information see the <a href="../users/cmake_dealii.html">deal.II CMake
             documentation</a>).
         <li>
           For adding permanent support for the unknown compiler to the
@@ -118,40 +118,104 @@ include/deal.II/base/config.h.in
     <h2>Cross compiling</h2>
 
     <p>
-      It is possible to use <a href="http://www.cmake.org/"
-      target="_top">CMake</a> to cross compile
-      <acronym>deal.II</acronym> for a foreign platform.
-      Further information on that topic can be found at the <a
-      href="http://www.cmake.org/Wiki/CMake_Cross_Compiling">CMake
-      wiki</a>.
+      It is possible to use the
+      <a href="https://cmake.org/cmake/help/latest/manual/cmake-toolchains.7.html">CMake toolchain</a>
+      to cross compile deal.II for a platform other than the one on which the
+      compiler is running. The target platform can have a different operating
+      system, different architecture or different set of libraries. Cross
+      compilation is a very useful technique, for instance it can be used to
+      compile deal.II with a compiler that is not available in the target
+      machine. An alternative technique is to use a
+      <a href="https://www.docker.com/">Docker container</a> or a
+      <a href="https://en.wikipedia.org/wiki/Virtualization">virtual machine</a>
+      that mimics the target machine.
     </p>
 
     <p>
-      You have to set up a native deal.II build directory first and run
-      <code>make expand_instantiations_exe</code> in it. The executable is
-      needed for the build system (and obviously the cross compiled version
-      cannot be used). Locate the <code>expand_instantiations</code>
-      executable (it usually resides under
-      <code>${CMAKE_BINARY_DIR}/bin</code> and export its location with the
-      <code>PATH</code> environment variable.
-    </p>
-
-    <p>
-      Assuming you have a working cross compilation toolchain, the next
-      step is to set up a
-      <a href="Toolchain.sample"><i>toolchain file</i></a>
-      (or for for
+      You can use any compiler for cross compilation, although
+      <a href="https://clang.llvm.org/">LLVM/clang</a> might be more versatile
+      because it supports multiple architecture targets in a single
+      executable natively (see
+      <a href="https://clang.llvm.org/docs/CrossCompilation.html">Cross-compilation using Clang</a>).
+      Below you can find an example toolchain file for cross compilation with
+      clang (and another example for
       <a href="Toolchain-x86_64-w64-mingw32.sample">Windows64 using MinGW</a>).
-      After that invoke <code>cmake</code> with something like:
 <pre>
-$ cmake -DCMAKE_TOOLCHAIN_FILE=&lt;...&gt;/Toolchain.sample \
+set(target_root /path/to/sysroot)
+set(dealii_dir ${target_root}/path/to/lib/dealii)
+
+set(CMAKE_SYSTEM_NAME Linux)
+set(CMAKE_SYSTEM_PROCESSOR x86_64)
+
+set(CMAKE_SYSROOT ${target_root})
+
+set(CMAKE_C_COMPILER clang)
+set(CMAKE_CXX_COMPILER clang++)
+
+set(CMAKE_C_COMPILER_EXTERNAL_TOOLCHAIN ${target_root}/path/to/gcc/toolchain)
+set(CMAKE_CXX_COMPILER_EXTERNAL_TOOLCHAIN ${target_root}/path/to/gcc/toolchain)
+
+set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
+</pre>
+      If you use LLVM/clang you can use the gcc toolchain of the
+      target with the option <code>CMAKE_CXX_COMPILER_EXTERNAL_TOOLCHAIN</code>,
+      this is equivalent to the clang option
+      <a href="https://clang.llvm.org/docs/ClangCommandLineReference.html">--gcc-toolchain</a>.
+      You should place all the relevant libraries of the target in
+      <code>$target_root</code>. <code>ldd</code> is a great tool figure out the
+      libraries that you need. You can use the C libraries of the target such as
+      Blas, HDF5 and MPI. On the other hand C++ libraries can be problematic
+      because different C++ compilers (or even different versions of the same
+      compiler, or the same compiler on different platforms) mangle public
+      symbols in radically different ways. For this reason C++ libraries such
+      as Trilinos should be cross compiled by the same compiler as deal.II.
+    </p>
+
+    <p>
+      If the host and the target have a different architecture, you have to set
+      up a native deal.II build directory first and run
+      <code>make expand_instantiations_exe</code> in it. The executable is
+      needed for the build system (the cross compiled version cannot be used if
+      the architecture of the target and the host are not the same). Locate the
+      <code>expand_instantiations</code> executable (it usually resides under
+      <code>${CMAKE_BINARY_DIR}/bin</code>) and export its location with the
+      <code>PATH</code> environment variable. Below you can find a minimal cmake
+      script for the configuration of deal.II.
+<pre>
+mkdir $dealii_build
+cd $dealii_build
+export LD_LIBRARY_PATH=$target_root/lib/directories
+cmake -DCMAKE_TOOLCHAIN_FILE=toolchain.cmake \
         -DDEAL_II_FORCE_BUNDLED_BOOST=ON \
         -DDEAL_II_ALLOW_AUTODETECTION=OFF \
-        ../deal.II
+        -DDEAL_II_WITH_MPI=ON \
+        -DMPI_CXX_INCLUDE_PATH:STRING=$target_root'/path/to/mpi/include' \
+        -DMPI_CXX_LIBRARIES:STRING=$target_root'/path/to/mpi/lib/libmpi_1.so;'$target_root'/path/to/mpi/lib/libmpi_2.so' \
+        -DDEAL_II_WITH_TRILINOS=ON \
+        -DTRILINOS_DIR=$target_root/path/to/trilinos \
+        -DDEAL_II_WITH_P4EST=ON \
+        -DP4EST_DIR=$target_root/path/to/p4est \
+        -DCMAKE_INSTALL_PREFIX=$target_root/path/to/dealii \
+        /path/to/dealii/repository
+make expand_instantiations_exe
+export PATH=$dealii_build/bin/:$PATH
+make -jN install
 </pre>
-      where <code>CMAKE_TOOLCHAIN_FILE</code> points to the toolchain file.
-      The remaining configuration can be adjusted at will, see <a
-      href="cmake.html">the documentation</a>.
+      If the target uses <code>LD_LIBRARY_PATH</code> to set up some libraries,
+      you may need to export <code>LD_PRELOAD_PATH</code> with those libraries
+      before you call CMake. Note that CMake might not be able to guess the MPI
+      configuration, therefore you may have to give all the MPI flags to CMake.
+      There are two ways to obtain the MPI flags, you can compile another
+      program at the target and then inspect <code>CMakeCache.txt</code>
+      or you can obtain the flags using <code>mpic++ --showme:compile</code> and
+      <code>mpic++ --showme:link</code>. The remaining configuration can be
+      adjusted at will, see <a href="../users/cmake_dealii.html">the documentation</a>. Note
+      that the <a href="https://en.wikipedia.org/wiki/Rpath">rpaths</a> of the
+      examples might not be correct, this can be fixed using
+      <code>LD_LIBRARY_PATH</code> or <code>chrpath</code>.
     </p>
 
     <hr />

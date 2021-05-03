@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -76,7 +76,7 @@ test(std::string filename)
     {
       fe_values.reinit(cell);
       const std::vector<Tensor<1, spacedim>> &cellnormals =
-        fe_values.get_all_normal_vectors();
+        fe_values.get_normal_vectors();
       const std::vector<Point<spacedim>> &quad_points =
         fe_values.get_quadrature_points();
 

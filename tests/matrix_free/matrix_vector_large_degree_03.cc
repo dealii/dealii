@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2019 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,14 +20,12 @@
 // have a constant-coefficient Laplacian, we can verify the implementation by
 // comparing to the result with 21 quadrature points.
 
-#include "../tests.h"
-
-std::ofstream logfile("output");
-
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
+
+#include <deal.II/fe/fe_q.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/manifold_lib.h>
@@ -35,6 +33,8 @@ std::ofstream logfile("output");
 
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/vector.h>
+
+#include "../tests.h"
 
 #include "matrix_vector_mf.h"
 

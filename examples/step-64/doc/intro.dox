@@ -1,14 +1,14 @@
 <br>
 
 <i>
-This program was contributed by Bruno Turcksin, Daniel Arndt, Oak Ridge National Laboratory.
+This program was contributed by Bruno Turcksin and Daniel Arndt, Oak Ridge National Laboratory.
 </i>
 
 
 <h1>Introduction</h1>
 
 This example shows how to implement a matrix-free method on the GPU using CUDA
-for the Helmhotz equation with variable coefficients on a hypercube. The linear
+for the Helmholtz equation with variable coefficients on a hypercube. The linear
 system will be solved using the conjugate gradient method and is parallelized
  with MPI.
 
@@ -16,15 +16,18 @@ In the last few years, heterogeneous computing in general and GPUs in particular
 have gained a lot of popularity. This is because GPUs offer better computing
 capabilities and memory bandwidth than CPUs for a given power budget.
 Among the architectures available in early 2019, GPUs are about 2x-3x as power
-efficient than server CPUs with wide SIMD for PDE-related tasks. GPUs are also
-the most popular architecture for machine learning. Therefore, it might be
-interesting to be able to efficiently run a simulation alongside a machine
-learning code.
+efficient than server CPUs with wide <a
+href="https://en.wikipedia.org/wiki/SIMD">SIMD</a> for PDE-related
+tasks. GPUs are also
+the most popular architecture for machine learning. On the other hand,
+GPUs are not easy to program. This program explores the deal.II
+capabilities to see how efficiently such a program can be implemented.
 
 While we have tried for the interface of the matrix-free classes for the CPU and
 the GPU to be as close as possible, there are a few differences. When using
 the matrix-free framework on a GPU, one must write some CUDA code. However, the
 amount is fairly small and the use of CUDA is limited to a few keywords.
+
 
 <h3>The test case</h3>
 
@@ -33,28 +36,36 @@ In this example, we consider the Helmholtz problem @f{eqnarray*} - \nabla \cdot
 where $a(\mathbf x)$ is a variable coefficient.
 
 We choose as domain $\Omega=[0,1]^3$ and $a(\mathbf x)=\frac{10}{0.05 +
-2\|\mathbf x\|^2}$, Since the coefficient is symmetric around the origin but
+2\|\mathbf x\|^2}$. Since the coefficient is symmetric around the origin but
 the domain is not, we will end up with a non-symmetric solution.
+
+If you've made it this far into the tutorial, you will know how the
+weak formulation of this problem looks like and how, in principle, one
+assembles linear systems for it. Of course, in this program we will in
+fact not actually form the matrix, but rather only represent its
+action when one multiplies with it.
+
 
 <h3>Moving data to and from the device</h3>
 
-GPUs (we will use device from now on to refer to the GPU) have their own memory
+GPUs (we will use the term "device" from now on to refer to the GPU) have their own memory
 that is separate from the memory accessible to the CPU (we will use the term
 "host" from now on). A normal calculation on the device can be divided in three
 separate steps:
- -# the data is moved fromi the host to the device,
+ -# the data is moved from the host to the device,
  -# the computation is done on the device,
  -# the result is moved back from the device to the host
 
 The data movements can either be done explicitly by the user code or done
 automatically using UVM (Unified Virtual Memory). In deal.II, only the first
-method is supported. While it means an extra burden for the user, it allows a
+method is supported. While it means an extra burden for the user, this
+allows for
 better control of data movement and more importantly it avoids to mistakenly run
 important kernels on the host instead of the device.
 
 The data movement in deal.II is done using LinearAlgebra::ReadWriteVector. These
 vectors can be seen as buffers on the host that are used to either store data
-from the device or to send data to the device. There are two types of vectors
+received from the device or to send data to the device. There are two types of vectors
 that can be used on the device:
 - LinearAlgebra::CUDAWrappers::Vector, which is similar to the more common
 Vector<Number>, and
@@ -68,38 +79,62 @@ If no memory space is specified, the default is MemorySpace::Host.
 Next, we show how to move data to/from the device using
 LinearAlgebra::CUDAWrappers::Vector:
 @code
-unsigned int size = 10;
-LinearAlgebra::CUDAWrappers::Vector<double> vector_dev(10);
-LinearAlgebra::ReadWriteVector<double> rw_vector(10);
-// Fill rw_vector...
-// Move the data to the device.
-vector_dev.import(rw_vector, VectorOperations::insert);
-// Do some computations on the device
-// Move the data to the host
-rw_vector.import(vector_dev, VectorOperations::insert);
-@endcode
-Using LinearAlgebra::distributed::Vector<Number,
-MemorySpace::CUDA> is similar
-but the `import()` stage may involve MPI communication:
-@code
-IndexSet locally_owned_dofs, locally_relevant_dofs;
-// Fill the two IndexSet...
-LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA>
-distributed_vector_dev(locally_owned_dofs, MPI_COMM_WORLD);
-// Create the ReadWriteVector using an IndexSet instead of the size
-LinearAlgebra::ReadWriteVector<double> owned_rw_vector(locally_owned_dofs);
-// Fill owned_rw_vector
-// Move the data to the device
-distributed_vector_dev.import(owned_rw_vector, VectorOperations::insert);
-// Do some computations on the device
-// Create a ReadWriteVector with a different IndexSet
-LinearAlgebra::ReadWriteVector<double> relevant_rw_vector(locally_relevant_dofs);
-// Move the data to the host and do an MPI communication
-relevnt_rw_vector(distributed_vector_dev, VectorOperations::insert);
-@endcode
+  unsigned int size = 10;
+  LinearAlgebra::ReadWriteVector<double> rw_vector(size);
 
-While importing a vector, values can either by inserted (using VectorOperation::insert)
-or added (using VectorOperation::add).
+  ...do something with the rw_vector...
+
+  // Move the data to the device:
+  LinearAlgebra::CUDAWrappers::Vector<double> vector_dev(size);
+  vector_dev.import(rw_vector, VectorOperations::insert);
+
+  ...do some computations on the device...
+
+  // Move the data back to the host:
+  rw_vector.import(vector_dev, VectorOperations::insert);
+@endcode
+Both of the vector classes used here only work on a single machine,
+i.e., one memory space on a host and one on a device.
+
+But there are cases where one wants to run a parallel computation
+between multiple MPI processes on a number of machines, each of which
+is equipped with GPUs. In that case, one wants to use
+`LinearAlgebra::distributed::Vector<Number,MemorySpace::CUDA>`,
+which is similar but the `import()` stage may involve MPI communication:
+@code
+  IndexSet locally_owned_dofs, locally_relevant_dofs;
+  ...fill the two IndexSet objects...
+
+  // Create the ReadWriteVector using an IndexSet instead of the size
+  LinearAlgebra::ReadWriteVector<double> owned_rw_vector(locally_owned_dofs);
+
+  ...do something with the rw_vector...
+
+  // Move the data to the device:
+  LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA>
+    distributed_vector_dev(locally_owned_dofs, MPI_COMM_WORLD);
+  distributed_vector_dev.import(owned_rw_vector, VectorOperations::insert);
+
+  ...do something with the dev_vector...
+
+  // Create a ReadWriteVector with a different IndexSet:
+  LinearAlgebra::ReadWriteVector<double>
+    relevant_rw_vector(locally_relevant_dofs);
+
+  // Move the data to the host, possibly using MPI communication:
+  relevant_rw_vector.import(distributed_vector_dev, VectorOperations::insert);
+@endcode
+The `relevant_rw_vector` is an object that stores a subset of all
+elements of the vector. Typically, these are the
+@ref GlossLocallyRelevantDof "locally relevant DoFs",
+which implies that they overlap between different MPI
+processes. Consequently, the elements stored in that vector on one
+machine may not coincide with the ones stored by the GPU on that
+machine, requiring MPI communication to import them.
+
+In all of these cases, while importing a vector, values can either be
+inserted (using VectorOperation::insert) or added to prior content of
+the vector (using VectorOperation::add).
 
 
 <h3>Matrix-vector product implementation</h3>

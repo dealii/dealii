@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -24,7 +24,7 @@
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
-#include <deal.II/fe/fe_dgq.h>
+#include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_manifold.h>
@@ -49,7 +49,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 struct MappingEnum
 {
@@ -63,8 +62,6 @@ struct MappingEnum
 void
 test(MappingEnum::type mapping_name, unsigned int refinements = 1)
 {
-  using namespace dealii;
-
   deallog.depth_console(0);
 
   const unsigned int degree = 2; // Degree of shape functions

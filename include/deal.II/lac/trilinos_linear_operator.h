@@ -28,6 +28,7 @@ DEAL_II_NAMESPACE_OPEN
 namespace TrilinosWrappers
 {
   // Forward declarations:
+#  ifndef DOXYGEN
   class SparseMatrix;
   class PreconditionBase;
   class BlockSparseMatrix;
@@ -45,7 +46,7 @@ namespace TrilinosWrappers
       class TrilinosBlockPayload;
     }
   } // namespace internal
-
+#  endif
 
   /**
    * @name Creation of a LinearOperator
@@ -64,7 +65,6 @@ namespace TrilinosWrappers
    * ensures full compatibility with Trilinos operations by preselecting the
    * appropriate template parameters.
    *
-   * @author Jean-Paul Pelteret, 2016
    *
    * @ingroup TrilinosWrappers
    */
@@ -95,7 +95,6 @@ namespace TrilinosWrappers
    * ensures full compatibility with Trilinos operations by preselecting the
    * appropriate template parameters.
    *
-   * @author Jean-Paul Pelteret, 2016
    *
    * @ingroup TrilinosWrappers
    */
@@ -130,7 +129,6 @@ namespace TrilinosWrappers
    * ensures full compatibility with Trilinos operations by preselecting the
    * appropriate template parameters.
    *
-   * @author Jean-Paul Pelteret, 2016
    *
    * @ingroup TrilinosWrappers
    */
@@ -164,7 +162,6 @@ namespace TrilinosWrappers
    * ensures full compatibility with Trilinos operations by preselecting the
    * appropriate template parameters.
    *
-   * @author Jean-Paul Pelteret, 2016
    *
    * @ingroup TrilinosWrappers
    */
@@ -209,7 +206,6 @@ namespace TrilinosWrappers
    * ensures full compatibility with Trilinos operations by preselecting the
    * appropriate template parameters.
    *
-   * @author Jean-Paul Pelteret, 2016
    *
    * @ingroup TrilinosWrappers
    */
@@ -245,7 +241,6 @@ namespace TrilinosWrappers
    * ensures full compatibility with Trilinos operations by preselecting the
    * appropriate template parameters.
    *
-   * @author Jean-Paul Pelteret, 2016
    *
    * @ingroup TrilinosWrappers
    */

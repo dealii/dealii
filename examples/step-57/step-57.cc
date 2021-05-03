@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2008 - 2019 by the deal.II authors
+ * Copyright (C) 2008 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -32,7 +32,6 @@
 #include <deal.II/lac/solver_gmres.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/affine_constraints.h>
-#include <deal.II/lac/sparse_direct.h>
 
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
@@ -235,7 +234,7 @@ namespace Step57
 
     {
       SolverControl solver_control(1000, 1e-6 * src.block(1).l2_norm());
-      SolverCG<>    cg(solver_control);
+      SolverCG<Vector<double>> cg(solver_control);
 
       dst.block(1) = 0.0;
       cg.solve(pressure_mass_matrix,
@@ -290,10 +289,8 @@ namespace Step57
     block_component[dim] = 1;
     DoFRenumbering::component_wise(dof_handler, block_component);
 
-    dofs_per_block.resize(2);
-    DoFTools::count_dofs_per_block(dof_handler,
-                                   dofs_per_block,
-                                   block_component);
+    dofs_per_block =
+      DoFTools::count_dofs_per_fe_block(dof_handler, block_component);
     unsigned int dof_u = dofs_per_block[0];
     unsigned int dof_p = dofs_per_block[1];
 
@@ -378,7 +375,7 @@ namespace Step57
                             update_values | update_quadrature_points |
                               update_JxW_values | update_gradients);
 
-    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
 
     const FEValuesExtractors::Vector velocities(0);
@@ -840,7 +837,6 @@ int main()
 {
   try
     {
-      using namespace dealii;
       using namespace Step57;
 
       StationaryNavierStokes<2> flow(/* degree = */ 1);

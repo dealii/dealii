@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2017 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,6 +14,7 @@
 // ---------------------------------------------------------------------
 
 #include <deal.II/base/config.h>
+
 #include <deal.II/base/exceptions.h>
 
 #include <boost/python.hpp>
@@ -22,10 +23,21 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace python
 {
-  void export_cell_accessor();
-  void export_point();
-  void export_triangulation();
-}
+  void
+  export_tria_accessor();
+  void
+  export_cell_accessor();
+  void
+  export_point();
+  void
+  export_triangulation();
+  void
+  export_mapping();
+  void
+  export_manifold();
+  void
+  export_quadrature();
+} // namespace python
 
 DEAL_II_NAMESPACE_CLOSE
 
@@ -35,8 +47,7 @@ char const *pydealii_docstring =
   "========                                                     \n"
   "This module contains the python bindings to deal.II.         \n"
   "The Debug module uses deal.II compiled in Debug mode while   \n"
-  "the Release module uses deal.II compiled in Release mode.    \n"
-  ;
+  "the Release module uses deal.II compiled in Release mode.    \n";
 
 #ifdef DEBUG
 
@@ -54,9 +65,13 @@ BOOST_PYTHON_MODULE(Debug)
   // message is printed.
   dealii::deal_II_exceptions::disable_abort_on_exception();
 
+  dealii::python::export_tria_accessor();
   dealii::python::export_cell_accessor();
   dealii::python::export_point();
   dealii::python::export_triangulation();
+  dealii::python::export_mapping();
+  dealii::python::export_manifold();
+  dealii::python::export_quadrature();
 }
 
 #else
@@ -70,9 +85,13 @@ BOOST_PYTHON_MODULE(Release)
   doc_options.enable_py_signatures();
   doc_options.disable_cpp_signatures();
 
+  dealii::python::export_tria_accessor();
   dealii::python::export_cell_accessor();
   dealii::python::export_point();
   dealii::python::export_triangulation();
+  dealii::python::export_mapping();
+  dealii::python::export_manifold();
+  dealii::python::export_quadrature();
 }
 
 #endif

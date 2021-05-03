@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -113,7 +113,7 @@ test()
 
       static const FE_Q<dim> fe(1);
       dofh.distribute_dofs(fe);
-      dofh.distribute_mg_dofs(fe);
+      dofh.distribute_mg_dofs();
 
       {
         for (unsigned int lvl = 0; lvl < tr.n_levels(); ++lvl)
@@ -126,8 +126,7 @@ test()
               {
                 if (cell->level_subdomain_id() != tr.locally_owned_subdomain())
                   continue;
-                for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell;
-                     ++f)
+                for (const unsigned int f : GeometryInfo<dim>::face_indices())
                   {
                     if (cell->at_boundary(f))
                       continue;

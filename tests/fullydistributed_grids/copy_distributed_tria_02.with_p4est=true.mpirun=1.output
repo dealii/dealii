@@ -1,0 +1,47 @@
+
+DEAL:0:2d::n_levels:                  4
+DEAL:0:2d::n_cells:                   2125
+DEAL:0:2d::n_active_cells:            1600
+DEAL:0:2d::n_cells on level=0:        25
+DEAL:0:2d::n_cells on level=1:        100
+DEAL:0:2d::n_cells on level=2:        400
+DEAL:0:2d::n_cells on level=3:        1600
+DEAL:0:2d::n_active_cells on level=0: 0
+DEAL:0:2d::n_active_cells on level=1: 0
+DEAL:0:2d::n_active_cells on level=2: 0
+DEAL:0:2d::n_active_cells on level=3: 1600
+DEAL:0:2d::
+DEAL:0:2d::n_dofs:                             6561
+DEAL:0:2d::n_locally_owned_dofs:               6561
+DEAL:0:2d::n_dofs on level=0:                  121
+DEAL:0:2d::n_dofs on level=1:                  441
+DEAL:0:2d::n_dofs on level=2:                  1681
+DEAL:0:2d::n_dofs on level=3:                  6561
+DEAL:0:2d::n_locally_owned_mg_dofs on level=0: 121
+DEAL:0:2d::n_locally_owned_mg_dofs on level=1: 441
+DEAL:0:2d::n_locally_owned_mg_dofs on level=2: 1681
+DEAL:0:2d::n_locally_owned_mg_dofs on level=3: 6561
+DEAL:0:2d::
+DEAL:0:3d::n_levels:                  4
+DEAL:0:3d::n_cells:                   37440
+DEAL:0:3d::n_active_cells:            32768
+DEAL:0:3d::n_cells on level=0:        64
+DEAL:0:3d::n_cells on level=1:        512
+DEAL:0:3d::n_cells on level=2:        4096
+DEAL:0:3d::n_cells on level=3:        32768
+DEAL:0:3d::n_active_cells on level=0: 0
+DEAL:0:3d::n_active_cells on level=1: 0
+DEAL:0:3d::n_active_cells on level=2: 0
+DEAL:0:3d::n_active_cells on level=3: 32768
+DEAL:0:3d::
+DEAL:0:3d::n_dofs:                             274625
+DEAL:0:3d::n_locally_owned_dofs:               274625
+DEAL:0:3d::n_dofs on level=0:                  729
+DEAL:0:3d::n_dofs on level=1:                  4913
+DEAL:0:3d::n_dofs on level=2:                  35937
+DEAL:0:3d::n_dofs on level=3:                  274625
+DEAL:0:3d::n_locally_owned_mg_dofs on level=0: 729
+DEAL:0:3d::n_locally_owned_mg_dofs on level=1: 4913
+DEAL:0:3d::n_locally_owned_mg_dofs on level=2: 35937
+DEAL:0:3d::n_locally_owned_mg_dofs on level=3: 274625
+DEAL:0:3d::

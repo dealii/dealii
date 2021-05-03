@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,8 +15,8 @@
 
 
 
-// Check CellDataStorage initialize(cell,number), initialize(start,end,number)
-// and get_data() functions.
+// Check CellDataStorage initialize(cell,number), initialize(start,end,number),
+// get_data(), and try_get_data() functions.
 
 
 #include <deal.II/base/quadrature_point_data.h>
@@ -25,6 +25,7 @@
 
 #include <deal.II/distributed/tria.h>
 
+#include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_tools.h>
 #include <deal.II/fe/fe_values.h>
 
@@ -37,7 +38,6 @@
 #include "../tests.h"
 
 
-using namespace dealii;
 
 template <int dim>
 class MyFunction : public Function<dim>
@@ -73,18 +73,17 @@ DeclException3(ExcWrongValue,
                double,
                << arg1 << " != " << arg2 << " with delta = " << arg3);
 
-
 /**
  * Loop over quadrature points and check that value is the same as given by the
  * function.
  */
 template <int dim, typename DATA>
 void
-check_qph(Triangulation<dim> &         tr,
-          const CellDataStorage<typename Triangulation<dim, dim>::cell_iterator,
-                                DATA> &manager,
-          const Quadrature<dim> &      rhs_quadrature,
-          const MyFunction<dim> &      func)
+check_qph(Triangulation<dim> &tr,
+          CellDataStorage<typename Triangulation<dim, dim>::cell_iterator, DATA>
+            &                    manager,
+          const Quadrature<dim> &rhs_quadrature,
+          const MyFunction<dim> &func)
 {
   DoFHandler<dim> dof_handler(tr);
   FE_Q<dim>       dummy_fe(1);
@@ -99,14 +98,39 @@ check_qph(Triangulation<dim> &         tr,
         fe_values.reinit(dof_cell);
         const std::vector<Point<dim>> &q_points =
           fe_values.get_quadrature_points();
-        const std::vector<std::shared_ptr<const DATA>> qpd =
-          manager.get_data(cell);
+        const auto &                             manager_const = manager;
+        const std::vector<std::shared_ptr<DATA>> qpd = manager.get_data(cell);
+        const std::vector<std::shared_ptr<const DATA>> qpd_const =
+          manager_const.get_data(cell);
+        const std_cxx17::optional<std::vector<std::shared_ptr<DATA>>>
+          qpd_optional = manager.try_get_data(cell);
+        const std_cxx17::optional<std::vector<std::shared_ptr<const DATA>>>
+          qpd_const_optional = manager_const.try_get_data(cell);
+        AssertThrow(qpd_optional, ExcInternalError());
+        AssertThrow(qpd_const_optional, ExcInternalError());
         for (unsigned int q = 0; q < q_points.size(); q++)
           {
-            const double value  = func.value(q_points[q]);
-            const double value2 = qpd[q]->value;
-            AssertThrow(std::fabs(value - value2) < eps,
-                        ExcWrongValue(value, value2, value - value2));
+            const double correct_value = func.value(q_points[q]);
+            const double value         = qpd[q]->value;
+            AssertThrow(std::fabs(correct_value - value) < eps,
+                        ExcWrongValue(correct_value,
+                                      value,
+                                      correct_value - value));
+            const double value_const = qpd_const[q]->value;
+            AssertThrow(std::fabs(correct_value - value_const) < eps,
+                        ExcWrongValue(correct_value,
+                                      value_const,
+                                      correct_value - value_const));
+            const double value_optional = (*qpd_optional)[q]->value;
+            AssertThrow(std::fabs(correct_value - value_optional) < eps,
+                        ExcWrongValue(correct_value,
+                                      value_optional,
+                                      correct_value - value_optional));
+            const double value_const_optional = (*qpd_const_optional)[q]->value;
+            AssertThrow(std::fabs(correct_value - value_const_optional) < eps,
+                        ExcWrongValue(correct_value,
+                                      value_optional,
+                                      correct_value - value_const_optional));
           }
       }
   dof_handler.clear();
@@ -145,6 +169,19 @@ test()
             data_storage.get_data(cell);
           for (unsigned int q = 0; q < rhs.size(); q++)
             qpd[q]->value = my_func.value(q_points[q]);
+          {
+            // before initialization of the next cell, try_get_data must
+            // return null. This test has to be done after initialize()
+            // has been called at least one time
+            auto next_cell = cell;
+            next_cell++;
+            if (next_cell != tr.end())
+              {
+                const std_cxx17::optional<std::vector<std::shared_ptr<MyQData>>>
+                  nonexisting_data = data_storage.try_get_data(next_cell);
+                AssertThrow(!nonexisting_data, ExcInternalError());
+              }
+          }
         }
     dof_handler.clear();
   }

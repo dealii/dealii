@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2019 by the deal.II authors
+// Copyright (C) 1999 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -38,7 +38,8 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         Triangulation<deal_II_dimension, deal_II_space_dimension> &,
         const unsigned int,
         const double,
-        const double);
+        const double,
+        const bool);
 
 
       template void
@@ -65,15 +66,22 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const bool);
 
       template void
+      subdivided_hyper_L(
+        Triangulation<deal_II_dimension, deal_II_space_dimension> &,
+        const std::vector<unsigned int> &,
+        const Point<deal_II_dimension> &,
+        const Point<deal_II_dimension> &,
+        const std::vector<int> &);
+
+      template void
       cheese<deal_II_dimension, deal_II_space_dimension>(
         Triangulation<deal_II_dimension, deal_II_space_dimension> &,
         const std::vector<unsigned int> &);
 
       template void
       merge_triangulations(
-        const std::initializer_list<
-          const Triangulation<deal_II_dimension, deal_II_space_dimension>
-            *const> &,
+        const std::vector<
+          const Triangulation<deal_II_dimension, deal_II_space_dimension> *> &,
         Triangulation<deal_II_dimension, deal_II_space_dimension> &,
         const double,
         const bool);
@@ -87,6 +95,12 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         Triangulation<deal_II_dimension, deal_II_space_dimension> &result,
         const double duplicated_vertex_tolerance,
         const bool   copy_manifold_ids);
+
+      template void
+      replicate_triangulation(
+        const Triangulation<deal_II_dimension, deal_II_space_dimension> &input,
+        const std::vector<unsigned int> &                          extents,
+        Triangulation<deal_II_dimension, deal_II_space_dimension> &result);
 
       template void
       create_union_triangulation(
@@ -201,6 +215,20 @@ for (deal_II_dimension : DIMENSIONS)
                               const unsigned int,
                               const bool);
 
+      template void
+      eccentric_hyper_shell(Triangulation<deal_II_dimension> &,
+                            const Point<deal_II_dimension> &,
+                            const Point<deal_II_dimension> &,
+                            const double,
+                            const double,
+                            const unsigned int);
+
+#if deal_II_dimension >= 2
+      template void
+      hyper_ball_balanced<deal_II_dimension>(Triangulation<deal_II_dimension> &,
+                                             const Point<deal_II_dimension> &,
+                                             const double);
+#endif
     \}
   }
 
@@ -234,4 +262,39 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
         Triangulation<deal_II_dimension, deal_II_space_dimension_2> &);
 #endif
     \}
+  }
+
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
+  {
+    namespace GridGenerator
+    \{
+#if deal_II_dimension <= deal_II_space_dimension
+      template void
+      reference_cell<deal_II_dimension, deal_II_space_dimension>(
+        const ReferenceCell &,
+        Triangulation<deal_II_dimension, deal_II_space_dimension> &);
+
+      template void
+      convert_hypercube_to_simplex_mesh(
+        const Triangulation<deal_II_dimension, deal_II_space_dimension> &,
+        Triangulation<deal_II_dimension, deal_II_space_dimension> &);
+#endif
+    \}
+  }
+
+for (deal_II_dimension : DIMENSIONS)
+  {
+    template void GridGenerator::subdivided_hyper_rectangle_with_simplices(
+      Triangulation<deal_II_dimension> & tria,
+      const std::vector<unsigned int> &repetitions,
+      const Point<deal_II_dimension> & p1,
+      const Point<deal_II_dimension> & p2,
+      const bool                       colorize);
+
+    template void GridGenerator::subdivided_hyper_cube_with_simplices(
+      Triangulation<deal_II_dimension> & tria,
+      const unsigned int repetitions,
+      const double       p1,
+      const double       p2,
+      const bool         colorize);
   }

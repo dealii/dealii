@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2019 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -29,7 +29,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 
 template <int dim, int spacedim>
@@ -40,11 +39,11 @@ test()
   GridGenerator::hyper_cube(tria);
   tria.refine_global(1);
 
-  std::map<typename Triangulation<dim, spacedim>::face_iterator, double> mymap;
+  std::map<typename Triangulation<dim, spacedim>::face_iterator, int> mymap;
 
   for (auto &cell : tria.active_cell_iterators())
     {
-      for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+      for (const unsigned int i : GeometryInfo<dim>::face_indices())
         {
           if (mymap.find(cell->face(i)) == mymap.end())
             {

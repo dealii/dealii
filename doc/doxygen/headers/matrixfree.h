@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,8 +17,89 @@
 /**
  * @defgroup matrixfree Matrix-free infrastructure
  *
- * This module describes the matrix-free infrastructure in deal.II. In
- * essence, the framework provided by the FEEvaluation class on top of the
+ * This module describes the matrix-free infrastructure in deal.II.
+ * An outline of how the primary groups of classes in deal.II interact with the
+ * matrix-free infrastructure is given by the following clickable graph,
+ * with a more detailed description below:
+ *
+ * @dot
+digraph G
+{
+  graph[rankdir="TB",bgcolor="transparent"];
+  node [shape=box,fontname="FreeSans",fontsize=15,
+        height=0.2,width=0.4,
+        color="black", fillcolor="white", style="filled"];
+  edge [color="black", weight=10];
+  subgraph base {
+    rank="same";
+  tria       [label="Triangulation",    URL="\ref grid"];
+  fe         [label="FiniteElement",    URL="\ref feall"];
+  mapping    [label="Mapping",          URL="\ref mapping"];
+  quadrature [label="Quadrature",       URL="\ref Quadrature"];
+  }
+  dh         [label="DoFHandler",       URL="\ref dofs"];
+  simd     [label="SIMD", fontname="FreeSans",fontsize=12,
+            height=0.2,width=0.4,
+            color="gray", fontcolor="gray", fillcolor="white", style="filled"];
+  fevalues [label="FEEvaluation", fillcolor="deepskyblue"];
+  mf       [label="MatrixFree loops", fillcolor="deepskyblue"];
+  cuda     [label="CUDA",     URL="\ref CUDAWrappers", fontname="FreeSans",fontsize=12,
+            height=0.2,width=0.4,
+            color="gray", fontcolor="gray", fillcolor="white", style="filled"];
+  tbb      [label="TBB", fontname="FreeSans",fontsize=12,
+            height=0.2,width=0.4,
+            color="gray", fontcolor="gray", fillcolor="white", style="filled"];
+{rank=same
+  simd -> fevalues        [dir="none", color="transparent"];
+  fevalues -> mf          [dir="none", color="transparent"];
+  mf -> cuda              [dir="none", color="transparent"];
+  cuda -> tbb             [dir="none", color="transparent"];
+}
+  subgraph sol {
+    rank="same";
+    solvers [label="Solvers",   URL="\ref Solvers", fillcolor="deepskyblue"];
+    gmg     [label="Geometric Multigrid", fontname="FreeSans",fontsize=12,
+             height=0.2,width=0.4,
+             color="black", fontcolor="black", fillcolor="white", style="dashed"];
+  }
+  output     [label="Graphical output", URL="\ref output"];
+  manifold   [label="Manifold",         URL="\ref manifold"];
+  tria -> dh              [color="black",style="solid"];
+  fe -> dh                [color="black",style="solid"];
+  fe -> fevalues          [color="black",style="solid"];
+  mapping -> fevalues     [color="black",style="solid"];
+  quadrature -> fevalues  [color="black",style="solid"];
+  dh -> mf                [color="black",style="solid"];
+  mf -> systems           [color="black",style="solid"];
+  fevalues -> systems     [color="black",style="solid"];
+  systems -> solvers      [color="black",style="solid"];
+  solvers -> output       [color="black",style="solid"];
+  manifold -> tria        [color="black",style="solid"];
+  manifold -> mapping     [color="black",style="solid"];
+  node [fontname="FreeSans",fontsize=12,
+        shape=record,height=0.2,width=0.4,
+        color="gray", fontcolor="gray", fillcolor="white", style="filled"];
+  edge [color="gray", weight=1];
+  opencascade [label="OpenCASCADE"];
+  subgraph misclibs {
+  systems    [label="Operators", fillcolor="deepskyblue"];
+  }
+  opencascade -> manifold [dir="none"];
+
+  node [fontname="FreeSans",fontsize=12,
+        shape=ellipse,height=0.2,width=0.4,
+        color="gray", fontcolor="gray", fillcolor="white", style="filled"];
+  edge [color="gray", weight=1];
+  gmsh        [label="gmsh", URL="\ref Gmsh"];
+  visit       [label="VisIt"]
+  paraview    [label="ParaView"]
+  gmsh -> tria       [dir="none"];
+  output -> visit    [dir="none"];
+  output -> paraview [dir="none"];
+}
+ * @enddot
+ *
+ * In essence, the framework provided by the FEEvaluation class on top of the
  * data storage in MatrixFree is a specialized operator evaluation
  * framework. It is currently only compatible with a subset of the elements
  * provided by the library which have a special structure, namely those where
@@ -37,8 +118,8 @@
  * science education, including most of the deal.II developers, because it
  * appears to be wasteful to re-compute integrals over and over again, instead
  * of using precomputed data. However, as the tutorial programs step-37,
- * step-48, and step-59 show, these concepts usually outperform traditional
- * algorithms on modern computer architectures.
+ * step-48, step-59, step-64, and step-67 show, these concepts usually
+ * outperform traditional algorithms on modern computer architectures.
  *
  * The two main reasons that favor matrix-free computations are the
  * following:
@@ -211,7 +292,7 @@
  * array. The access granularity in terms of a <i>cell index</i> is controlled
  * by the auxiliary field internal::MatrixFreeFunctions::DoFInfo::row_starts
  * that is similar to the rowstart index in a compressed matrix storage. The
- * scheme supports variable lengths because we support hp adaptivity and index
+ * scheme supports variable lengths because we support hp-adaptivity and index
  * indirections due to constraints that are contained in the main index
  * array. Due to vectorization over cells, the access granularity would
  * initially be in terms of <i>cell batches</i>. However, we must be able to
@@ -220,7 +301,7 @@
  * access is thus not linear. Furthermore, the support for multi-component
  * systems becomes transparent if we provide a <i>start index</i> to every
  * single component separately. Thus, the `row_starts` field is of length
- * `n_cell_batches()*VectorizedArray<Number>::n_array_elements*n_components`.
+ * `n_cell_batches()*VectorizedArray<Number>::%size()*n_components`.
  * </li>
  * <li> The translation between components within a system of multiple base
  * elements is controlled by the four variables
@@ -237,7 +318,7 @@
  * </ol>
  * </li>
  *
- * <li>Information to extract the FE index in hp adaptive computations.</li>
+ * <li>Information to extract the FE index in hp-adaptive computations.</li>
  * <li>Information about the 'first access' into a particular vector entry
  * that is used to zero out the entries in a destination vectors within the
  * MatrixFree::loop shortly before accessing them the first time. This is used
@@ -327,7 +408,7 @@
  * element. We use an auxiliary index array that points to the start of the
  * data for each cell, namely the `data_index_offsets` field for the
  * Jacobians, JxW values, and normal vectors, and `quadrature_point_offsets`
- * for the quadrature points. This offset enables hp adaptivity with variable
+ * for the quadrature points. This offset enables hp-adaptivity with variable
  * lengths of fields similar to what is done for DoFInfo, but it also enables
  * something we call <i>geometry compression</i>. In order to reduce the data
  * access, we detect simple geometries of cells where Jacobians are constant

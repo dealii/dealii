@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -42,21 +42,20 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
 
 
 template <int dim, int fe_degree>
 void
 test()
 {
-  typedef double               number;
+  using number = double;
   const SphericalManifold<dim> manifold;
   Triangulation<dim>           tria;
   GridGenerator::hyper_ball(tria);
   typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(),
                                                     endc = tria.end();
   for (; cell != endc; ++cell)
-    for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+    for (const unsigned int f : GeometryInfo<dim>::face_indices())
       if (cell->at_boundary(f))
         cell->face(f)->set_all_manifold_ids(0);
   tria.set_manifold(0, manifold);
@@ -84,14 +83,14 @@ test()
   }
 
   double                       error_points = 0, abs_points = 0;
-  const unsigned int           n_cells = mf_data.n_macro_cells();
+  const unsigned int           n_cells = mf_data.n_cell_batches();
   FEEvaluation<dim, fe_degree> fe_eval(mf_data);
   FEValues<dim>                fe_values(mapping,
                           fe,
                           mf_data.get_quadrature(),
                           update_quadrature_points);
 
-  typedef VectorizedArray<double> vector_t;
+  using vector_t = VectorizedArray<double>;
   for (unsigned int cell = 0; cell < n_cells; ++cell)
     {
       fe_eval.reinit(cell);
@@ -116,7 +115,7 @@ test()
 int
 main()
 {
-  deallog.attach(logfile);
+  initlog();
   deallog << std::setprecision(3);
 
   {

@@ -17,11 +17,13 @@
 #define dealii_fe_poly_face_h
 
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/qprojector.h>
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/fe/fe.h>
 
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -50,8 +52,6 @@ DEAL_II_NAMESPACE_OPEN
  * are several pure virtual functions declared in the FiniteElement class
  * which cannot be implemented by this class but are left for implementation
  * in derived classes.
- *
- * @author Guido Kanschat, 2009
  */
 template <class PolynomialType,
           int dim      = PolynomialType::dimension + 1,
@@ -88,33 +88,43 @@ protected:
   virtual std::unique_ptr<
     typename FiniteElement<dim, spacedim>::InternalDataBase>
   get_data(
-    const UpdateFlags /*update_flags*/,
-    const Mapping<dim, spacedim> & /*mapping*/,
-    const Quadrature<dim> & /*quadrature*/,
+    const UpdateFlags             update_flags,
+    const Mapping<dim, spacedim> &mapping,
+    const Quadrature<dim> &       quadrature,
     dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
                                                                        spacedim>
-      & /*output_data*/) const override
+      &output_data) const override
   {
-    return std_cxx14::make_unique<InternalData>();
+    (void)update_flags;
+    (void)mapping;
+    (void)quadrature;
+    (void)output_data;
+    return std::make_unique<InternalData>();
   }
+
+  using FiniteElement<dim, spacedim>::get_face_data;
 
   std::unique_ptr<typename FiniteElement<dim, spacedim>::InternalDataBase>
   get_face_data(
-    const UpdateFlags update_flags,
-    const Mapping<dim, spacedim> & /*mapping*/,
-    const Quadrature<dim - 1> &quadrature,
+    const UpdateFlags               update_flags,
+    const Mapping<dim, spacedim> &  mapping,
+    const hp::QCollection<dim - 1> &quadrature,
     dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
                                                                        spacedim>
-      & /*output_data*/) const override
+      &output_data) const override
   {
+    (void)mapping;
+    (void)output_data;
+    AssertDimension(quadrature.size(), 1);
+
     // generate a new data object and
     // initialize some fields
     std::unique_ptr<typename FiniteElement<dim, spacedim>::InternalDataBase>
-          data_ptr   = std_cxx14::make_unique<InternalData>();
+          data_ptr   = std::make_unique<InternalData>();
     auto &data       = dynamic_cast<InternalData &>(*data_ptr);
     data.update_each = requires_update_flags(update_flags);
 
-    const unsigned int n_q_points = quadrature.size();
+    const unsigned int n_q_points = quadrature[0].size();
 
     // some scratch arrays
     std::vector<double>             values(0);
@@ -133,12 +143,12 @@ protected:
                                  std::vector<double>(n_q_points));
         for (unsigned int i = 0; i < n_q_points; ++i)
           {
-            poly_space.compute(quadrature.point(i),
-                               values,
-                               grads,
-                               grad_grads,
-                               empty_vector_of_3rd_order_tensors,
-                               empty_vector_of_4th_order_tensors);
+            poly_space.evaluate(quadrature[0].point(i),
+                                values,
+                                grads,
+                                grad_grads,
+                                empty_vector_of_3rd_order_tensors,
+                                empty_vector_of_4th_order_tensors);
 
             for (unsigned int k = 0; k < poly_space.n(); ++k)
               data.shape_values[k][i] = values[k];
@@ -164,11 +174,12 @@ protected:
                                                                        spacedim>
       &output_data) const override
   {
-    return get_face_data(update_flags,
-                         mapping,
-                         QProjector<dim - 1>::project_to_all_children(
-                           quadrature),
-                         output_data);
+    return get_face_data(
+      update_flags,
+      mapping,
+      hp::QCollection<dim - 1>(QProjector<dim - 1>::project_to_all_children(
+        ReferenceCells::get_hypercube<dim - 1>(), quadrature)),
+      output_data);
   }
 
   virtual void
@@ -186,11 +197,13 @@ protected:
                                                                        spacedim>
       &output_data) const override;
 
+  using FiniteElement<dim, spacedim>::fill_fe_face_values;
+
   virtual void
   fill_fe_face_values(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const unsigned int                                          face_no,
-    const Quadrature<dim - 1> &                                 quadrature,
+    const hp::QCollection<dim - 1> &                            quadrature,
     const Mapping<dim, spacedim> &                              mapping,
     const typename Mapping<dim, spacedim>::InternalDataBase &mapping_internal,
     const dealii::internal::FEValuesImplementation::MappingRelatedData<dim,

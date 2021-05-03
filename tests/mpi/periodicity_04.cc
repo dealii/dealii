@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2008 - 2019 by the deal.II authors
+ * Copyright (C) 2008 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -36,7 +36,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 template <int dim>
 void
@@ -49,7 +48,7 @@ set_periodicity(parallel::distributed::Triangulation<dim> &triangulation,
   typename Triangulation<dim>::face_iterator face_2;
 
   // Look for the two outermost faces:
-  for (unsigned int j = 0; j < GeometryInfo<dim>::faces_per_cell; ++j)
+  for (const unsigned int j : GeometryInfo<dim>::face_indices())
     {
       if (cell_1->face(j)->center()(dim - 1) > 2.9)
         face_1 = cell_1->face(j);
@@ -102,7 +101,7 @@ void generate_grid(parallel::distributed::Triangulation<2> &triangulation,
     {7, 6, 5, 4},
   };
 
-  for (unsigned int j = 0; j < GeometryInfo<2>::vertices_per_cell; ++j)
+  for (const unsigned int j : GeometryInfo<2>::vertex_indices())
     {
       cells[0].vertices[j] = cell_vertices_0[j];
       cells[1].vertices[j] = cell_vertices_1[orientation][j];
@@ -155,7 +154,7 @@ void generate_grid(parallel::distributed::Triangulation<3> &triangulation,
     {15, 13, 14, 12, 11, 9, 10, 8},
   };
 
-  for (unsigned int j = 0; j < GeometryInfo<3>::vertices_per_cell; ++j)
+  for (const unsigned int j : GeometryInfo<3>::vertex_indices())
     {
       cells[0].vertices[j] = cell_vertices_0[j];
       cells[1].vertices[j] = cell_vertices_1[orientation][j];
@@ -205,8 +204,9 @@ check(const unsigned int orientation, bool reverse)
   unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   constraints.print(deallog.get_file_stream());
 
-  const std::vector<IndexSet> &locally_owned_dofs_vector =
-    dof_handler.locally_owned_dofs_per_processor();
+  const std::vector<IndexSet> locally_owned_dofs_vector =
+    Utilities::MPI::all_gather(MPI_COMM_WORLD,
+                               dof_handler.locally_owned_dofs());
   IndexSet locally_active_dofs;
   DoFTools::extract_locally_active_dofs(dof_handler, locally_active_dofs);
   AssertThrow(constraints.is_consistent_in_parallel(locally_owned_dofs_vector,
@@ -258,8 +258,8 @@ check(const unsigned int orientation, bool reverse)
 
   triangulation.execute_coarsening_and_refinement();
 
-  typedef std::pair<typename Triangulation<dim>::cell_iterator, unsigned int>
-    CellFace;
+  using CellFace =
+    std::pair<typename Triangulation<dim>::cell_iterator, unsigned int>;
   const typename std::map<CellFace, std::pair<CellFace, std::bitset<3>>>
     &face_map = triangulation.get_periodic_face_map();
   typename std::map<CellFace,
@@ -317,8 +317,6 @@ main(int argc, char *argv[])
 {
   try
     {
-      using namespace dealii;
-
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
       MPILogInitAll log;

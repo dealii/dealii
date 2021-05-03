@@ -1,0 +1,16 @@
+
+DEAL::Testing FE_Nedelec(0): OK
+DEAL::Testing FESystem(FE_Nedelec(0)): OK
+DEAL::Checking Consistency: OK
+DEAL::Testing FE_Nedelec(1): OK
+DEAL::Testing FESystem(FE_Nedelec(1)): OK
+DEAL::Checking Consistency: OK
+DEAL::Testing FESystem(FE_Nedelec(0), FE_Nedelec(0)): OK
+DEAL::Testing FESystem(FE_Nedelec(1), FE_Nedelec(0)): OK
+DEAL::Testing FESystem(FE_Nedelec(0), FE_Nedelec(1)): OK
+DEAL::Testing FESystem(FE_Nedelec(0), FE_Q(1)): OK
+DEAL::Testing FESystem(FE_Q(1), FE_Nedelec(0)): OK
+DEAL::Testing FESystem(FE_Nedelec(0), FE_Q(2)): OK
+DEAL::Testing FESystem(FE_Q(2), FE_Nedelec(0)): OK
+DEAL::Testing FESystem(FE_Nedelec(1), FE_Q(1)): OK
+DEAL::Testing FESystem(FE_Q(1), FE_Nedelec(1)): OK
