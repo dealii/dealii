@@ -26,33 +26,33 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace python
 {
-  class CellTypeWrapper
+  class ReferenceCellWrapper
   {
   public:
     /**
      * Copy constructor.
      */
-    CellTypeWrapper(const CellTypeWrapper &other);
+    ReferenceCellWrapper(const ReferenceCellWrapper &other);
 
     /**
      * Constructor. Takes a cell kind id field and creates a Type class.
      */
-    CellTypeWrapper(const std::uint8_t &kind);
+    ReferenceCellWrapper(const std::uint8_t &kind);
 
     /**
      * Constructor. Takes a ReferenceCell object and creates a Type class.
      */
-    CellTypeWrapper(const ReferenceCell &cell_type_in);
+    ReferenceCellWrapper(const ReferenceCell &cell_type_in);
 
     /**
      * Constructor for an empty object.
      */
-    CellTypeWrapper();
+    ReferenceCellWrapper();
 
     /**
      * Destructor.
      */
-    ~CellTypeWrapper();
+    ~ReferenceCellWrapper();
 
     std::uint8_t
     cell_kind() const;

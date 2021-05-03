@@ -28,7 +28,7 @@ namespace python
 {
   class PointWrapper;
   class TriangulationWrapper;
-  class CellTypeWrapper;
+  class ReferenceCellWrapper;
 
   class CellAccessorWrapper
   {
@@ -187,7 +187,7 @@ namespace python
 
     /*! @copydoc TriaAccessor::reference_cell
      */
-    CellTypeWrapper
+    ReferenceCellWrapper
     reference_cell() const;
 
     /*! @copydoc TriaAccessor::n_vertices

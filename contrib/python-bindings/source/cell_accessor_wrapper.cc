@@ -798,7 +798,7 @@ namespace python
 
 
 
-  CellTypeWrapper
+  ReferenceCellWrapper
   CellAccessorWrapper::reference_cell() const
   {
     if ((dim == 2) && (spacedim == 2))
