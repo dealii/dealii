@@ -56,7 +56,10 @@ such that for all $i=1,\dots,N$ it holds:
  -
  \int_\Omega \varphi_i \exp(u_h) \,\mathrm{d}x \stackrel{!}{=} 0.
 @f}
-We directly define the nonlinear function $F\colon\mathbb{R}^N\to\mathbb{R}^N$
+As each finite element function is a linear combination of the basis functions
+$\{\varphi_i\}_{i=1,\dots,N}$, we can identify the finite element solution by
+a vector from $\mathbb{R}^N$ consisting of the unknow values in each DOF.
+Thus, we define the nonlinear function $F\colon\mathbb{R}^N\to\mathbb{R}^N$
 representing the discrete nonlinear problem.
 
 To solve this nonlinear problem we use Newton's method. So given an
