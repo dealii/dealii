@@ -105,14 +105,13 @@ discrete equations.
 
 
 <h3>Numerical linear algebra</h3>
-Note how the system matrix, the Jacobian, depends on the previous
-Newton step $A = F'(u^n)$. Hence before we need to tell the function that
-computes the system matrix about the solution at the last Newton step. In an
-implementation with a classical
-assemble_system function we would gather this information from the last Newton
-step during assembly by the use of the member functions get_function_values and
-get_function_gradients of the FEValuesBase class. The assemble_system function
-would then looks like:
+Note, how the system matrix, actually the Jacobian, depends on the previous
+Newton step $A = F'(u^n)$. Hence we need to tell the function that computes
+the system matrix about the solution at the last Newton step. In an
+implementation with a classical assemble_system function we would gather this
+information from the last Newton step during assembly by the use of the member
+functions get_function_values and get_function_gradients of the FEValuesBase
+class. The assemble_system function would then looks like:
 @code
 template<int dim>
 void
