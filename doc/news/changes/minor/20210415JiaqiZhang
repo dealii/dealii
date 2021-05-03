@@ -1,0 +1,4 @@
+New: FEInterfaceValues now can use FEValuesExtractors to extract scalar or
+vector components like FEValues does.
+<br>
+(Jiaqi Zhang, 2021/04/15)
