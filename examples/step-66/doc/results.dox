@@ -1,2 +1,148 @@
 <h1>Results</h1>
 
+<h3>Program Output</h3>
+Running the program via
+@code
+cmake . && make release && make && mpirun -n 2 ./step-66
+@endcode
+gives the follwoing output on the console
+@code
+===============================================================================
+START DATE: 2021/5/3, TIME: 19:06:13
+--------------------------------------------------------------------------------
+Running with 2 MPI processes
+Vectorization over 4 doubles = 256 bits (AVX), VECTORIZATION_LEVEL=2
+Finite element space: FE_Q<2>(4)
+================================================================================
+--------------------------------------------------------------------------------
+Cycle 0
+--------------------------------------------------------------------------------
+Setup system...
+   Triangulation: 20 cells
+   DoFHandler:    337 DoFs
+
+Solve using Newton's method...
+   Nstep 1, errf = 0.00259891, errx = 3.0903, it = 8
+   Nstep 2, errf = 1.40407e-06, errx = 0.0657231, it = 8
+   Nstep 3, errf = 9.0017e-13, errx = 3.54562e-05, it = 7
+Convergence step 3 value 9.0017e-13 (used wall time: 0.0173716 s)
+
+Time for setup+solve (CPU/Wall) 0.010866/0.0215132 s
+
+Output results...
+  H1 seminorm: 0.664407
+
+
+
++---------------------------------------------+------------+------------+
+| Total wallclock time elapsed since start    |    0.0251s |            |
+|                                             |            |            |
+| Section                         | no. calls |  wall time | % of total |
++---------------------------------+-----------+------------+------------+
+| assemble right hand side        |         3 |  0.000167s |      0.67% |
+| compute residual                |         3 |  7.57e-05s |       0.3% |
+| compute update                  |         3 |    0.0167s |        67% |
+| make grid                       |         1 |   0.00107s |       4.2% |
+| setup system                    |         1 |   0.00371s |        15% |
+| solve                           |         1 |    0.0174s |        69% |
++---------------------------------+-----------+------------+------------+
+
+--------------------------------------------------------------------------------
+Cycle 1
+--------------------------------------------------------------------------------
+Setup system...
+   Triangulation: 80 cells
+   DoFHandler:    1313 DoFs
+
+Solve using Newton's method...
+   Nstep 1, errf = 0.00172751, errx = 6.96753, it = 9
+   Nstep 2, errf = 1.48839e-06, errx = 0.186711, it = 9
+   Nstep 3, errf = 1.39271e-12, errx = 0.000161801, it = 8
+   Nstep 4, errf = 4.00139e-13, errx = 1.23232e-10, it = 6
+Convergence step 4 value 4.00139e-13 (used wall time: 0.0392664 s)
+
+Time for setup+solve (CPU/Wall) 0.036639/0.0444511 s
+
+Output results...
+  H1 seminorm: 0.746796
+
+
+
++---------------------------------------------+------------+------------+
+| Total wallclock time elapsed since start    |    0.0614s |            |
+|                                             |            |            |
+| Section                         | no. calls |  wall time | % of total |
++---------------------------------+-----------+------------+------------+
+| assemble right hand side        |         4 |  0.000623s |         1% |
+| compute residual                |         4 |  0.000261s |      0.43% |
+| compute update                  |         4 |    0.0359s |        59% |
+| setup system                    |         1 |   0.00482s |       7.9% |
+| solve                           |         1 |    0.0393s |        64% |
++---------------------------------+-----------+------------+------------+
+
+--------------------------------------------------------------------------------
+Cycle 2
+--------------------------------------------------------------------------------
+Setup system...
+   Triangulation: 320 cells
+   DoFHandler:    5185 DoFs
+
+Solve using Newton's method...
+   Nstep 1, errf = 0.000924254, errx = 14.3334, it = 10
+   Nstep 2, errf = 8.90578e-07, errx = 0.405858, it = 10
+   Nstep 3, errf = 8.53155e-13, errx = 0.000393987, it = 9
+Convergence step 3 value 8.53155e-13 (used wall time: 0.104414 s)
+
+Time for setup+solve (CPU/Wall) 0.114773/0.125019 s
+
+Output results...
+  H1 seminorm: 0.766926
+
+
+
++---------------------------------------------+------------+------------+
+| Total wallclock time elapsed since start    |     0.141s |            |
+|                                             |            |            |
+| Section                         | no. calls |  wall time | % of total |
++---------------------------------+-----------+------------+------------+
+| assemble right hand side        |         3 |  0.000374s |      0.27% |
+| compute residual                |         3 |  0.000353s |      0.25% |
+| compute update                  |         3 |     0.103s |        73% |
+| setup system                    |         1 |   0.00709s |         5% |
+| solve                           |         1 |     0.105s |        74% |
++---------------------------------+-----------+------------+------------+
+.
+.
+.
+@endcode
+
+
+
+
+
+TODO
+- Description of the output
+
+- Similar to step-50 comparing the wall clock times to implementaiton with trilinos (GMG/AMG)?
+  Table with computational times.
+
+- Time measurement for the parallel communication ot evaluate the old Newton step on each level.
+
+- Larger number of cores?
+
+
+
+
+Possibiliteis for extension
+
+- Path of eigenvalues $\lambda \mapsto \| u \|_{H^1(\Omega)} for $\lambda \in [0, 6.6]$.
+  Beyond $\lambda \approx 6.7$ the solution is no longer unique.
+
+Copied from @kronbichler's comment:
+Can you make MGTransferMatrixFree a class member? From an educational point of
+view, I think it would make sense to show that the transfer only needs to be
+set up once and can be re-used in subsequent nonlinear iterations. This is
+different to the mg_smoother object that must indeed be rebuilt because the
+diagonal changes (even though one could try to find a balance of not
+recomputing in every iteration - that would make for a good possibility for
+extensions, though).
