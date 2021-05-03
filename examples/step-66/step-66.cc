@@ -559,8 +559,8 @@ namespace Step66
     , pcout(std::cout, Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     , computing_timer(MPI_COMM_WORLD,
                       pcout,
-                      TimerOutput::summary,
-                      TimerOutput::cpu_and_wall_times)
+                      TimerOutput::never,
+                      TimerOutput::wall_times)
   {}
 
 
@@ -1096,6 +1096,11 @@ namespace Step66
 
         pcout << "  H1 seminorm: " << norm << std::endl;
         pcout << std::endl;
+
+
+        // Finally after each cycle we print the timing information
+        computing_timer.print_summary();
+        computing_timer.reset();
       }
   }
 } // namespace Step66
