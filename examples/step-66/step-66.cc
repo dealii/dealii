@@ -430,7 +430,8 @@ namespace Step66
     for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
       {
         phi.reinit(cell);
-        phi.gather_evaluate(src, true, true);
+        phi.read_dof_values_plain(src);
+        phi.evaluate(true, true);
 
         for (unsigned int q = 0; q < phi.n_q_points; ++q)
           {
