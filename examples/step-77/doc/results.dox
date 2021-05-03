@@ -1,0 +1,228 @@
+<h1>Results</h1>
+
+When running the program, you get output that looks like this:
+@code
+Mesh refinement step 0
+  Target_tolerance: 0.001
+
+  Computing residual vector... norm=0.231202
+  Computing Jacobian matrix
+  Factorizing Jacobian matrix
+  Solving linear system
+  Computing residual vector... norm=0.231202
+  Computing residual vector... norm=0.171585
+  Solving linear system
+  Computing residual vector... norm=0.171585
+  Computing residual vector... norm=0.127245
+  Computing residual vector... norm=0.0796471
+  Solving linear system
+  Computing residual vector... norm=0.0796471
+  Computing residual vector... norm=0.0625301
+  Solving linear system
+  Computing residual vector... norm=0.0625301
+  Computing residual vector... norm=0.0498864
+  Solving linear system
+  Computing residual vector... norm=0.0498864
+  Computing residual vector... norm=0.0407765
+  Solving linear system
+  Computing residual vector... norm=0.0407765
+  Computing residual vector... norm=0.0341589
+  Solving linear system
+  Computing residual vector... norm=0.0341589
+  Computing residual vector... norm=0.0292867
+  Solving linear system
+  Computing residual vector... norm=0.0292867
+  Computing residual vector... norm=0.0256309
+  Computing residual vector... norm=0.0223448
+  Solving linear system
+  Computing residual vector... norm=0.0223448
+  Computing residual vector... norm=0.0202797
+  Computing residual vector... norm=0.0183817
+  Solving linear system
+  Computing residual vector... norm=0.0183817
+  Computing residual vector... norm=0.0170464
+  Computing residual vector... norm=0.0157967
+  Computing Jacobian matrix
+  Factorizing Jacobian matrix
+  Solving linear system
+  Computing residual vector... norm=0.0157967
+  Computing residual vector... norm=0.0141572
+  Computing residual vector... norm=0.012657
+ Solving linear system
+  Computing residual vector... norm=0.012657
+  Computing residual vector... norm=0.0116863
+  Computing residual vector... norm=0.0107696
+  Solving linear system
+  Computing residual vector... norm=0.0107696
+  Computing residual vector... norm=0.0100986
+  Computing residual vector... norm=0.00944829
+  Computing residual vector... norm=0.00822576
+  Solving linear system
+  Computing residual vector... norm=0.00822576
+  Computing residual vector... norm=0.00781983
+  Computing residual vector... norm=0.00741619
+  Computing residual vector... norm=0.00661792
+  Solving linear system
+  Computing residual vector... norm=0.00661792
+  Computing residual vector... norm=0.00630571
+  Computing residual vector... norm=0.00599457
+  Computing residual vector... norm=0.00537663
+  Solving linear system
+  Computing residual vector... norm=0.00537663
+  Computing residual vector... norm=0.00512813
+  Computing residual vector... norm=0.00488033
+  Computing residual vector... norm=0.00438751
+  Computing residual vector... norm=0.00342052
+  Solving linear system
+  Computing residual vector... norm=0.00342052
+  Computing residual vector... norm=0.00326581
+  Computing residual vector... norm=0.00311176
+  Computing residual vector... norm=0.00280617
+  Computing residual vector... norm=0.00220992
+  Solving linear system
+  Computing residual vector... norm=0.00220992
+  Computing residual vector... norm=0.00209976
+  Computing residual vector... norm=0.00199943
+  Solving linear system
+  Computing residual vector... norm=0.00199942
+  Computing residual vector... norm=0.00190953
+  Computing residual vector... norm=0.00182005
+  Computing residual vector... norm=0.00164259
+  Computing residual vector... norm=0.00129652
+
+
++---------------------------------------------+------------+------------+
+| Total wallclock time elapsed since start    |     0.192s |            |
+|                                             |            |            |
+| Section                         | no. calls |  wall time | % of total |
++---------------------------------+-----------+------------+------------+
+| assembling the Jacobian         |         2 |    0.0141s |       7.4% |
+| assembling the residual         |        61 |     0.168s |        88% |
+| factorizing the Jacobian        |         2 |    0.0016s |      0.83% |
+| graphical output                |         1 |   0.00385s |         2% |
+| linear system solve             |        19 |    0.0013s |      0.68% |
++---------------------------------+-----------+------------+------------+
+
+
+Mesh refinement step 1
+  Target_tolerance: 0.0001
+
+  Computing residual vector... norm=0.0883422
+  Computing Jacobian matrix
+  Factorizing Jacobian matrix
+  Solving linear system
+  Computing residual vector... norm=0.0883422
+  Computing residual vector... norm=0.0607066
+  Solving linear system
+  Computing residual vector... norm=0.0607066
+  Computing residual vector... norm=0.0437266
+  Solving linear system
+  Computing residual vector... norm=0.0437266
+  Computing residual vector... norm=0.0327999
+  Solving linear system
+  Computing residual vector... norm=0.0327999
+  Computing residual vector... norm=0.0255418
+  Solving linear system
+  Computing residual vector... norm=0.0255417
+  Computing residual vector... norm=0.0206042
+  Solving linear system
+  Computing residual vector... norm=0.0206042
+  Computing residual vector... norm=0.0171602
+  Solving linear system
+  Computing residual vector... norm=0.0171602
+  Computing residual vector... norm=0.014689
+  Solving linear system
+
+[...]
+@endcode
+
+The way this should be interpreted is most easily explained by looking at
+the first few lines of the output on the first mesh:
+@code
+Mesh refinement step 0
+Mesh refinement step 0
+  Target_tolerance: 0.001
+
+  Computing residual vector... norm=0.231202
+  Computing Jacobian matrix
+  Factorizing Jacobian matrix
+  Solving linear system
+  Computing residual vector... norm=0.231202
+  Computing residual vector... norm=0.171585
+  Solving linear system
+  Computing residual vector... norm=0.171585
+  Computing residual vector... norm=0.127245
+  Computing residual vector... norm=0.0796471
+  Solving linear system
+  Computing residual vector... norm=0.0796471
+  ...
+@endcode
+What is happening is this:
+- In the first residual computation, KINSOL computes the residual to see whether
+  the desired tolerance has been reached. The answer is no, so it requests the
+  user program to compute the Jacobian matrix (and the function then also
+  factorizes the matrix via SparseDirectUMFPACK).
+- KINSOL then instructs us to solve a linear system of the form
+  $J_k \, \delta U_k = -F_k$ with this matrix and the previously computed
+  residual vector.
+- It is then time to determine how far we want to go in this direction,
+  i.e., do line search. To this end, KINSOL requires us to compute the
+  residual vector $F(U_k + \alpha_k \delta U_k)$ for different step lengths
+  $\alpha_k$. For the first step above, it finds an acceptable $\alpha_k$
+  after two tries, the second time around it takes three tries.
+- Having found a suitable updated solution $U_{k+1}$, the process is
+  repeated except now KINSOL is happy with the current Jacobian matrix
+  and does not instruct us to re-build the matrix and its factorization,
+  and instead asks us to solve a linear system with that same matrix.
+
+The program also writes the solution to a VTU file at the end
+of each mesh refinement cycle, and it looks as follows:
+<table width="60%" align="center">
+  <tr>
+    <td align="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-77.solution.png" alt="">
+    </td>
+  </tr>
+</table>
+
+
+The key takeaway messages of this program are the following:
+
+- The solution is the same as the one we computed in step-15, i.e., the
+  interfaces to %SUNDIALS' KINSOL package really did what they were supposed
+  to do. This should not come as a surprise, but the important point is that
+  we don't have to spend the time implementing the complex algorithms that
+  underlie advanced nonlinear solvers ourselves.
+
+- KINSOL is able to avoid all sorts of operations such as rebuilding the
+  Jacobian matrix when that is not actually necessary. Comparing the
+  number of linear solves in the output above with the number of times
+  we rebuild the Jacobian and compute its factorization should make it
+  clear that this leads to very substantial savings in terms of compute
+  times, without us having to implement the intricacies of algorithms
+  that determine when we need to rebuild this information.
+
+<a name="extensions"></a>
+<h3> Possibilities for extensions </h3>
+
+For all but the small problems we consider here, a sparse direct solver
+requires too much time and memory -- we need an iterative solver like
+we use in many other programs. The trade-off between constructing an
+expensive preconditioner (say, a geometric or algebraic multigrid method)
+is different in the current case, however: Since we can re-use the same
+matrix for numerous linear solves, we can do the same for the preconditioner
+and putting more work into building a good preconditioner can more easily
+be justified than if we used it only for a single linear solve as one
+does for many other situations.
+
+But iterative solvers also afford other opportunities. For example (and as
+discussed briefly in the introduction), we may not need to solve to
+very high accuracy (small tolerances) in early nonlinear iterations as long
+as we are still far away from the actual solution. This was the basis of the
+Eisenstat-Walker trick mentioned there.
+
+KINSOL provides the function that does the linear solution with a target
+tolerance that needs to be reached. We ignore it in the program above
+because the direct solver we use does not need a tolerance and instead
+solves the linear system exactly (up to round-off, of course), but iterative
+solvers could make use of this kind of information -- and, in fact, should.
