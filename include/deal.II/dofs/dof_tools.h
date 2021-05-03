@@ -1473,6 +1473,8 @@ namespace DoFTools
    * located that shall be extracted. If it is an empty list (the default), then
    * all boundary indicators are accepted.
    *
+   * This function is used in step-11 and step-15, for example.
+   *
    * @note If the DoFHandler object is defined on a
    * parallel Triangulation object, then the computed index set
    * will contain only those degrees of freedom on the boundary that belong to

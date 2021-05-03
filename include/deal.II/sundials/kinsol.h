@@ -51,7 +51,7 @@ DEAL_II_NAMESPACE_OPEN
 namespace SUNDIALS
 {
   /**
-   * Interface to SUNDIALS non linear solver (KINSOL).
+   * Interface to SUNDIALS' nonlinear solver (KINSOL).
    *
    * KINSOL is a solver for nonlinear algebraic systems in residual form $F(u)
    * = 0$ or fixed point form $G(u) = u$, where $u$ is a vector which we will
@@ -61,7 +61,8 @@ namespace SUNDIALS
    * $F,G:{\mathbb C}^N \to{\mathbb C}^N$. It includes a Newton-Krylov solver
    * as well as Picard and fixed point solvers, both of which can be
    * accelerated with Anderson acceleration. KINSOL is based on the previous
-   * Fortran package NKSOL of Brown and Saad.
+   * Fortran package NKSOL of Brown and Saad. An example of using KINSOL
+   * can be found in the step-77 tutorial program.
    *
    * KINSOL's Newton solver employs the inexact Newton method. As this solver
    * is intended mainly for large systems, the user is required to provide
