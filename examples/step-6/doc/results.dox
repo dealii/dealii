@@ -43,17 +43,12 @@ refinement.
 
 
 
-The final solution, as written by the program at the end of the
-<code>%run()</code> function, looks as follows:
+The program outputs the solution and mesh in each cycle of the
+refinement loop. The solution looks as follows:
 
+<img src="https://www.dealii.org/images/steps/developer/step-6.solution.9.2.png" alt="">
 
-
-<img src="https://www.dealii.org/images/steps/developer/step-6.solution.png" alt="">
-
-
-
-In each cycle, the program furthermore writes the grid in EPS
-format. These are shown in the following:
+It is interesting to follow how the program arrives at the final mesh:
 
 <div class="twocolumn" style="width: 80%">
   <div>
@@ -133,19 +128,17 @@ up for grabs.
 In deal.II, it is relatively simple to change the preconditioner. For
 example, by changing the existing lines of code
 @code
-  PreconditionSSOR<> preconditioner;
+  PreconditionSSOR<SparseMatrix<double>> preconditioner;
   preconditioner.initialize(system_matrix, 1.2);
 @endcode
 into
 @code
-  PreconditionSSOR<> preconditioner;
+  PreconditionSSOR<SparseMatrix<double>> preconditioner;
   preconditioner.initialize(system_matrix, 1.0);
 @endcode
 we can try out different relaxation parameters for SSOR. By using
-(you have to also add the header file <code>lac/sparse_ilu.h</code> to
-the include list at the top of the file)
 @code
-  PreconditionJacobi<> preconditioner;
+  PreconditionJacobi<SparseMatrix<double>> preconditioner;
   preconditioner.initialize(system_matrix);
 @endcode
 we can use Jacobi as a preconditioner. And by using
@@ -153,14 +146,16 @@ we can use Jacobi as a preconditioner. And by using
   SparseILU<double> preconditioner;
   preconditioner.initialize(system_matrix);
 @endcode
-we can use a simple incomplete LU decomposition without any
-thresholding or strengthening of the diagonal.
+we can use a simple incomplete LU decomposition without any thresholding or
+strengthening of the diagonal (to use this preconditioner, you have to also
+add the header file <code>deal.II/lac/sparse_ilu.h</code> to the include list
+at the top of the file).
 
 Using these various different preconditioners, we can compare the
 number of CG iterations needed (available through the
 <code>solver_control.last_step()</code> call, see
 step-4) as well as CPU time needed (using the Timer class,
-discussed, for example, in step-12) and get the
+discussed, for example, in step-28) and get the
 following results (left: iterations; right: CPU time):
 
 <table width="60%" align="center">
@@ -239,12 +234,30 @@ solving problems in 3d to high accuracy remains a challenge.
 If you look at the meshes above, you will see even though the domain is the
 unit disk, and the jump in the coefficient lies along a circle, the cells
 that make up the mesh do not track this geometry well. The reason, already hinted
-at in step-1, is that by default the Triangulation class only sees a bunch of
+at in step-1, is that in the absence of other information,
+the Triangulation class only sees a bunch of
 coarse grid cells but has, of course, no real idea what kind of geometry they
 might represent when looked at together. For this reason, we need to tell
 the Triangulation what to do when a cell is refined: where should the new
 vertices at the edge midpoints and the cell midpoint be located so that the
 child cells better represent the desired geometry than the parent cell.
+
+To visualize what the triangulation actually knows about the geometry,
+it is not enough to just output the location of vertices and draw a
+straight line for each edge; instead, we have to output both interior
+and boundary lines as multiple segments so that they look
+curved. We can do this by making one change to the gnuplot part of
+<code>output_results</code>:
+@code
+{
+  GridOut       grid_out;
+  std::ofstream output("grid-" + std::to_string(cycle) + ".gnuplot");
+  GridOutFlags::Gnuplot gnuplot_flags(false, 5, /*curved_interior_cells*/true);
+  grid_out.set_flags(gnuplot_flags);
+  MappingQGeneric<dim> mapping(3);
+  grid_out.write_gnuplot(triangulation, output, &mapping);
+}
+@endcode
 
 In the code above, we already do this for faces that sit at the boundary: this
 happens automatically since we use GridGenerator::hyper_ball, which attaches a
@@ -258,15 +271,15 @@ do this by adding the following snippet (testing that the center of a cell is
 larger than a small multiple, say one tenth, of the cell diameter away from
 center of the mesh only fails for the central square of the mesh):
 @code
-          GridGenerator::hyper_ball (triangulation);
-          // after GridGenerator::hyper_ball is called the Triangulation has
-          // a SphericalManifold with id 0. We can use it again on the interior.
-          const Point<dim> mesh_center;
-          for (const auto &cell : triangulation.active_cell_iterators())
-            if (mesh_center.distance (cell->center()) > cell->diameter()/10)
-              cell->set_all_manifold_ids (0);
+GridGenerator::hyper_ball(triangulation);
+// after GridGenerator::hyper_ball is called the Triangulation has
+// a SphericalManifold with id 0. We can use it again on the interior.
+const Point<dim> mesh_center;
+for (const auto &cell : triangulation.active_cell_iterators())
+  if (mesh_center.distance (cell->center()) > cell->diameter()/10)
+    cell->set_all_manifold_ids(0);
 
-          triangulation.refine_global (1);
+triangulation.refine_global(1);
 @endcode
 
 After a few global refinement steps, this would lead to a mesh of the following
@@ -294,82 +307,80 @@ the cells in these corners become worse and worse under mesh refinement.
 So we need something smarter. To this end, consider the following solution
 originally developed by Konstantin Ladutenko. We will use the following code:
 @code
-          GridGenerator::hyper_ball (triangulation);
+GridGenerator::hyper_ball(triangulation);
 
-          const Point<dim> mesh_center;
-          const double core_radius  = 1.0/5.0,
-                       inner_radius = 1.0/3.0;
+const Point<dim> mesh_center;
+const double core_radius  = 1.0/5.0,
+             inner_radius = 1.0/3.0;
 
-          // Step 1: Shrink the inner cell
-          //
-          // We cannot get a circle out of the inner cell because of
-          // the degeneration problem mentioned above. Rather, shrink
-          // the inner cell to a core radius of 1/5 that stays
-          // sufficiently far away from the place where the
-          // coefficient will have a discontinuity and where we want
-          // to have cell interfaces that actually lie on a circle.
-          // We do this shrinking by just scaling the location of each
-          // of the vertices, given that the center of the circle is
-          // simply the origin of the coordinate system.
-          for (const auto &cell : triangulation.active_cell_iterators())
-            if (mesh_center.distance (cell->center()) < 1e-5)
-              {
-                for (unsigned int v=0;
-                     v < GeometryInfo<dim>::vertices_per_cell;
-                     ++v)
-                  cell->vertex(v) *= core_radius/mesh_center.distance (cell->vertex(v));
-              }
+// Step 1: Shrink the inner cell
+//
+// We cannot get a circle out of the inner cell because of
+// the degeneration problem mentioned above. Rather, shrink
+// the inner cell to a core radius of 1/5 that stays
+// sufficiently far away from the place where the
+// coefficient will have a discontinuity and where we want
+// to have cell interfaces that actually lie on a circle.
+// We do this shrinking by just scaling the location of each
+// of the vertices, given that the center of the circle is
+// simply the origin of the coordinate system.
+for (const auto &cell : triangulation.active_cell_iterators())
+  if (mesh_center.distance(cell->center()) < 1e-5)
+    {
+      for (const auto v : cell->vertex_indices())
+        cell->vertex(v) *= core_radius/mesh_center.distance(cell->vertex(v));
+    }
 
-          // Step 2: Refine all cells except the central one
-          for (const auto &cell : triangulation.active_cell_iterators())
-            if (mesh_center.distance (cell->center()) >= 1e-5)
-              cell->set_refine_flag ();
-          triangulation.execute_coarsening_and_refinement ();
+// Step 2: Refine all cells except the central one
+for (const auto &cell : triangulation.active_cell_iterators())
+  if (mesh_center.distance(cell->center()) >= 1e-5)
+    cell->set_refine_flag();
+triangulation.execute_coarsening_and_refinement();
 
-          // Step 3: Resize the inner children of the outer cells
-          //
-          // The previous step replaced each of the four outer cells
-          // by its four children, but the radial distance at which we
-          // have intersected is not what we want to later refinement
-          // steps. Consequently, move the vertices that were just
-          // created in radial direction to a place where we need
-          // them.
-          for (const auto &cell : triangulation.active_cell_iterators())
-            for (unsigned int v=0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
-              {
-                const double dist = mesh_center.distance (cell->vertex(v));
-                if (dist > core_radius*1.0001 && dist < 0.9999)
-                  cell->vertex(v) *= inner_radius/dist;
-              }
+// Step 3: Resize the inner children of the outer cells
+//
+// The previous step replaced each of the four outer cells
+// by its four children, but the radial distance at which we
+// have intersected is not what we want to later refinement
+// steps. Consequently, move the vertices that were just
+// created in radial direction to a place where we need
+// them.
+for (const auto &cell : triangulation.active_cell_iterators())
+  for (const auto v : cell->vertex_indices())
+    {
+      const double dist = mesh_center.distance(cell->vertex(v));
+      if (dist > core_radius*1.0001 && dist < 0.9999)
+        cell->vertex(v) *= inner_radius/dist;
+    }
 
-          // Step 4: Apply curved manifold description
-          //
-          // As discussed above, we can not expect to subdivide the
-          // inner four cells (or their faces) onto concentric rings,
-          // but we can do so for all other cells that are located
-          // outside the inner radius. To this end, we loop over all
-          // cells and determine whether it is in this zone. If it
-          // isn't, then we set the manifold description of the cell
-          // and all of its bounding faces to the one that describes
-          // the spherical manifold already introduced above and that
-          // will be used for all further mesh refinement.
-          for (const auto &cell : triangulation.active_cell_iterators())
-            {
-              bool is_in_inner_circle = false;
-              for (unsigned int v=0; v < GeometryInfo<2>::vertices_per_cell; ++v)
-                if (mesh_center.distance (cell->vertex(v)) < inner_radius)
-                  {
-                    is_in_inner_circle = true;
-                    break;
-                  }
+// Step 4: Apply curved manifold description
+//
+// As discussed above, we can not expect to subdivide the
+// inner four cells (or their faces) onto concentric rings,
+// but we can do so for all other cells that are located
+// outside the inner radius. To this end, we loop over all
+// cells and determine whether it is in this zone. If it
+// isn't, then we set the manifold description of the cell
+// and all of its bounding faces to the one that describes
+// the spherical manifold already introduced above and that
+// will be used for all further mesh refinement.
+for (const auto &cell : triangulation.active_cell_iterators())
+  {
+    bool is_in_inner_circle = false;
+    for (const auto v : cell->vertex_indices())
+      if (mesh_center.distance(cell->vertex(v)) < inner_radius)
+        {
+          is_in_inner_circle = true;
+          break;
+        }
 
-              if (is_in_inner_circle == false)
-              // The Triangulation already has a SphericalManifold with
-              // manifold id 0 (see the documentation of
-              // GridGenerator::hyper_ball) so we just attach it to the outer
-              // ring here:
-                cell->set_all_manifold_ids (0);
-            }
+    if (is_in_inner_circle == false)
+    // The Triangulation already has a SphericalManifold with
+    // manifold id 0 (see the documentation of
+    // GridGenerator::hyper_ball) so we just attach it to the outer
+    // ring here:
+      cell->set_all_manifold_ids(0);
+  }
 @endcode
 
 This code then generates the following, much better sequence of meshes:
@@ -412,7 +423,9 @@ This code then generates the following, much better sequence of meshes:
 Creating good meshes, and in particular making them fit the geometry you
 want, is a complex topic in itself. You can find much more on this in
 step-49, step-53, and step-54, among other tutorial programs that cover
-the issue. Information on curved domains can also be found in the
+the issue. step-65 shows another, less manual way to achieve a mesh
+well fit to the problem here.
+Information on curved domains can also be found in the
 documentation module on @ref manifold "Manifold descriptions".
 
 Why does it make sense to choose a mesh that tracks the internal
@@ -439,7 +452,7 @@ approximation and the quadrature approximation of the integral will
 both be accurate. Note that such an alignment is common in many
 practical cases, so deal.II provides a number of functions (such as
 @ref GlossMaterialId "material_id") to help manage such a scenario.
-Refer to step-28 and step-46 for examples of how material id's can be
+Refer to step-28 and step-46 for examples of how material ids can be
 applied.
 
 Finally, let us consider the case of a coefficient that has a smooth
@@ -452,6 +465,39 @@ appropriate quadrature formula, or perform a combination of these
 steps. The key is that providing the best fit of the coefficient's
 spatial dependence with the quadrature polynomial will lead to a more
 accurate finite element solution of the PDE.
+
+As a final note: The discussion in the previous paragraphs shows, we here
+have a very concrete way of stating what we think of a good mesh -- it should
+be aligned with the jump in the coefficient. But one could also have asked
+this kind of question in a more general setting: Given some equation with
+a smooth solution and smooth coefficients, can we say what a good mesh
+would look like? This is a question for which the answer is easier to state
+in intuitive terms than mathematically: A good mesh has cells that all,
+by and large, look like squares (or cubes, in 3d). A bad mesh would contain
+cells that are very elongated in some directions or, more generally, for which
+there are cells that have both short and long edges. There are many ways
+in which one could assign a numerical quality index to each cell that measures
+whether the cell is "good" or "bad"; some of these are often chosen because
+they are cheap and easy to compute, whereas others are based on what enters
+into proofs of convergence. An example of the former would be the ratio of
+the longest to the shortest edge of a cell: In the ideal case, that ratio
+would be one; bad cells have values much larger than one. An example of the
+latter kind would consider the gradient (the "Jacobian") of the mapping
+from the reference cell $\hat K=[0,1]^d$ to the real cell $K$; this
+gradient is a matrix, and a quantity that enters into error estimates
+is the maximum over all points on the reference cell of the ratio of the
+largest to the smallest eigenvalue of this matrix. It is again not difficult
+to see that this ratio is constant if the cell $K$ is an affine image of
+$\hat K$, and that it is one for squares and cubes.
+
+In practice, it might be interesting to visualize such quality measures.
+The function GridTools::compute_aspect_ratio_of_cells() provides one
+way to get this kind of information. Even better, visualization tools
+such as VisIt often allow you to visualize this sort of information
+for a variety of measures from within the visualization software
+itself; in the case of VisIt, just add a "pseudo-color" plot and select
+one of the mesh quality measures instead of the solution field.
+
 
 <h4>Playing with the regularity of the solution</h4>
 
@@ -491,10 +537,16 @@ solution.
 In general, if the coefficient $a(\mathbf x)$ is discontinuous along a line in 2d,
 or a plane in 3d, then the solution may have a kink, but the gradient of the
 solution will not go to infinity. That means, that the solution is at least
-still in the space $W^{1,\infty}$. On the other hand, we know that in the most
+still in the <a href="https://en.wikipedia.org/wiki/Sobolev_space">Sobolev space</a>
+$W^{1,\infty}$ (i.e., roughly speaking, in the
+space of functions whose derivatives are bounded). On the other hand,
+we know that in the most
 extreme cases -- i.e., where the domain has reentrant corners, the
 right hand side only satisfies $f\in H^{-1}$, or the coefficient $a$ is only in
-$L^\infty$ -- all we can expect is that $u\in H^1$, a much larger space than
+$L^\infty$ -- all we can expect is that $u\in H^1$ (i.e., the
+<a
+href="https://en.wikipedia.org/wiki/Sobolev_space#Sobolev_spaces_with_integer_k">Sobolev
+space</a> of functions whose derivative is square integrable), a much larger space than
 $W^{1,\infty}$. It is not very difficult to create cases where
 the solution is in a space $H^{1+s}$ where we can get $s$ to become as small
 as we want. Such cases are often used to test adaptive finite element
@@ -502,14 +554,13 @@ methods because the mesh will have to resolve the singularity that causes
 the solution to not be in $W^{1,\infty}$ any more.
 
 The typical example one uses for this is called the <i>Kellogg problem</i>
-(referring to the paper "On the Poisson equation with intersecting interfaces"
-by R. B. Kellogg, Applicable Analysis, vol. 4, pp. 101-129, 1974), which
-in the commonly used form has a coefficient $a(\mathbf x)$ that has different values
-in the four quadrants of the plane (or eight different values in the octants
-of ${\mathbb R}^3$). The exact degree of regularity (the $s$ in the
-index of the Sobolev space above) depends on the values of $a(\mathbf x)$ coming
-together at the origin, and by choosing the jumps large enough, the
-regularity of the solution can be made as close as desired to $H^1$.
+(referring to @cite Kel74), which in the commonly used form has a coefficient
+$a(\mathbf x)$ that has different values in the four quadrants of the plane
+(or eight different values in the octants of ${\mathbb R}^3$). The exact degree
+of regularity (the $s$ in the index of the Sobolev space above) depends on the
+values of $a(\mathbf x)$ coming together at the origin, and by choosing the
+jumps large enough, the regularity of the solution can be made as close as
+desired to $H^1$.
 
 To implement something like this, one could replace the coefficient
 function by the following (shown here only for the 2d case):
@@ -527,7 +578,7 @@ double coefficient (const Point<dim> &p)
     return 1000;
   else
     {
-      Assert (false, ExcInternalError());
+      Assert(false, ExcInternalError());
       return 0;
     }
 }

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -48,8 +48,6 @@
 
 namespace LinearAdvectionTest
 {
-  using namespace dealii;
-
   template <int dim>
   class AdvectionProblem
   {
@@ -65,11 +63,9 @@ namespace LinearAdvectionTest
     assemble_system();
     void
     calculate_flux_terms(
-      const TriaActiveIterator<DoFCellAccessor<DoFHandler<dim>, false>>
-        &                current_cell,
-      FEFaceValues<dim> &current_face_values,
-      const TriaIterator<DoFCellAccessor<DoFHandler<dim>, false>>
-        &                 neighbor_cell,
+      const TriaActiveIterator<DoFCellAccessor<dim, dim, false>> &current_cell,
+      FEFaceValues<dim> &                                   current_face_values,
+      const TriaIterator<DoFCellAccessor<dim, dim, false>> &neighbor_cell,
       FEFaceValues<dim> & neighbor_face_values,
       FullMatrix<double> &current_to_current_flux,
       FullMatrix<double> &current_to_neighbor_flux,
@@ -132,11 +128,10 @@ namespace LinearAdvectionTest
                                          dynamic_sparsity_pattern,
                                          cell_integral_mask,
                                          flux_integral_mask);
-    SparsityTools::distribute_sparsity_pattern(
-      dynamic_sparsity_pattern,
-      dof_handler.n_locally_owned_dofs_per_processor(),
-      MPI_COMM_WORLD,
-      locally_relevant_dofs);
+    SparsityTools::distribute_sparsity_pattern(dynamic_sparsity_pattern,
+                                               locally_owned_dofs,
+                                               MPI_COMM_WORLD,
+                                               locally_relevant_dofs);
 
     system_matrix.reinit(locally_owned_dofs,
                          locally_owned_dofs,
@@ -149,11 +144,10 @@ namespace LinearAdvectionTest
   template <int dim>
   void
   AdvectionProblem<dim>::calculate_flux_terms(
-    const TriaActiveIterator<DoFCellAccessor<DoFHandler<dim>, false>>
-      &                current_cell,
-    FEFaceValues<dim> &current_face_values,
-    const TriaIterator<DoFCellAccessor<DoFHandler<dim>, false>> &neighbor_cell,
-    FEFaceValues<dim> & neighbor_face_values,
+    const TriaActiveIterator<DoFCellAccessor<dim, dim, false>> &current_cell,
+    FEFaceValues<dim> &                                   current_face_values,
+    const TriaIterator<DoFCellAccessor<dim, dim, false>> &neighbor_cell,
+    FEFaceValues<dim> &                                   neighbor_face_values,
     FullMatrix<double> &current_to_current_flux,
     FullMatrix<double> &current_to_neighbor_flux,
     FullMatrix<double> &neighbor_to_current_flux,
@@ -244,9 +238,7 @@ namespace LinearAdvectionTest
       {
         if (current_cell->is_locally_owned())
           {
-            for (unsigned int face_n = 0;
-                 face_n < GeometryInfo<dim>::faces_per_cell;
-                 ++face_n)
+            for (const unsigned int face_n : GeometryInfo<dim>::face_indices())
               {
                 const int neighbor_index = current_cell->neighbor_index(face_n);
                 if (neighbor_index != -1) // interior face
@@ -268,7 +260,7 @@ namespace LinearAdvectionTest
                       }
                     // If the neighbor is not active, then it is at a higher
                     // refinement level (so we do not need to integrate now)
-                    if (neighbor_cell->active())
+                    if (neighbor_cell->is_active())
                       {
                         if (neighbor_cell->is_locally_owned())
                           {
@@ -340,7 +332,6 @@ namespace LinearAdvectionTest
 int
 main(int argc, char **argv)
 {
-  using namespace dealii;
   initlog();
 
   Utilities::MPI::MPI_InitFinalize         mpi_initialization(argc, argv, 1);

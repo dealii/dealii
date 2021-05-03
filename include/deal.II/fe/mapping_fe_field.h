@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2018 by the deal.II authors
+// Copyright (C) 2001 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,12 +13,13 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii_mapping_fe_h
-#define dealii_mapping_fe_h
+#ifndef dealii_mapping_fe_field_h
+#define dealii_mapping_fe_field_h
 
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/mg_level_object.h>
 #include <deal.II/base/thread_management.h>
 
 #include <deal.II/dofs/dof_handler.h>
@@ -39,6 +40,56 @@ DEAL_II_NAMESPACE_OPEN
 /*@{*/
 
 /**
+ * @deprecated Use MappingFEField<dim, spacedim, VectorType> instead.
+ */
+template <int dim,
+          int spacedim            = dim,
+          typename VectorType     = Vector<double>,
+          typename DoFHandlerType = void>
+class MappingFEField;
+
+#ifndef DOXYGEN
+// prevent doxygen from complaining about potential recursive class relations
+template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
+class MappingFEField : public MappingFEField<dim, spacedim, VectorType, void>
+{
+public:
+  DEAL_II_DEPRECATED
+  MappingFEField(const DoFHandlerType &euler_dof_handler,
+                 const VectorType &    euler_vector,
+                 const ComponentMask & mask = ComponentMask())
+    : MappingFEField<dim, spacedim, VectorType, void>(euler_dof_handler,
+                                                      euler_vector,
+                                                      mask)
+  {}
+
+  DEAL_II_DEPRECATED
+  MappingFEField(const DoFHandlerType &         euler_dof_handler,
+                 const std::vector<VectorType> &euler_vector,
+                 const ComponentMask &          mask = ComponentMask())
+    : MappingFEField<dim, spacedim, VectorType, void>(euler_dof_handler,
+                                                      euler_vector,
+                                                      mask)
+  {}
+
+  DEAL_II_DEPRECATED
+  MappingFEField(const DoFHandlerType &           euler_dof_handler,
+                 const MGLevelObject<VectorType> &euler_vector,
+                 const ComponentMask &            mask = ComponentMask())
+    : MappingFEField<dim, spacedim, VectorType, void>(euler_dof_handler,
+                                                      euler_vector,
+                                                      mask)
+  {}
+
+  DEAL_II_DEPRECATED
+  MappingFEField(
+    const MappingFEField<dim, spacedim, VectorType, DoFHandlerType> &mapping)
+    : MappingFEField<dim, spacedim, VectorType, void>(mapping)
+  {}
+};
+#endif // DOXYGEN
+
+/**
  * The MappingFEField is a generalization of the MappingQEulerian class, for
  * arbitrary vector finite elements. The two main differences are that this
  * class uses a vector of absolute positions instead of a vector of
@@ -51,7 +102,7 @@ DEAL_II_NAMESPACE_OPEN
  * can be arbitrarily selected at construction time.
  *
  * The idea is to consider the Triangulation as a parameter configuration
- * space, on which we  construct an arbitrary geometrical mapping, using the
+ * space, on which we construct an arbitrary geometrical mapping, using the
  * instruments of the deal.II library: a vector of degrees of freedom, a
  * DoFHandler associated to the geometry of the problem and a ComponentMask
  * that tells us which components of the FiniteElement to use for the mapping.
@@ -72,14 +123,10 @@ DEAL_II_NAMESPACE_OPEN
  *    VectorTools::get_position_vector(dhq, eulerq, mask);
  *    MappingFEField<dim,spacedim> map(dhq, eulerq, mask);
  * @endcode
- *
- * @author Luca Heltai, Marco Tezzele 2013, 2015
  */
-template <int dim,
-          int spacedim            = dim,
-          typename VectorType     = Vector<double>,
-          typename DoFHandlerType = DoFHandler<dim, spacedim>>
-class MappingFEField : public Mapping<dim, spacedim>
+template <int dim, int spacedim, typename VectorType>
+class MappingFEField<dim, spacedim, VectorType, void>
+  : public Mapping<dim, spacedim>
 {
 public:
   /**
@@ -114,15 +161,39 @@ public:
    *
    * If an incompatible mask is passed, an exception is thrown.
    */
-  MappingFEField(const DoFHandlerType &euler_dof_handler,
-                 const VectorType &    euler_vector,
-                 const ComponentMask & mask = ComponentMask());
+  MappingFEField(const DoFHandler<dim, spacedim> &euler_dof_handler,
+                 const VectorType &               euler_vector,
+                 const ComponentMask &            mask = ComponentMask());
+
+  /**
+   * Constructor taking vectors on the multigrid levels rather than the active
+   * cells only. The vector of vectors is expected to have as many entries as
+   * there are global levels in the triangulation and provide valid data on
+   * each level, i.e., be of compatible length DoFHandler::n_dofs(level). A
+   * prerequisite of this constructor is that DoFHandler::distribute_mg_dofs()
+   * has been called. Apart from the level vectors, the same arguments as in
+   * the other constructor need to be provided.
+   */
+  MappingFEField(const DoFHandler<dim, spacedim> &euler_dof_handler,
+                 const std::vector<VectorType> &  euler_vector,
+                 const ComponentMask &            mask = ComponentMask());
+
+  /**
+   * Constructor with MGLevelObject instead of std::vector, otherwise the same
+   * as above. It is required that `euler_vector.max_level()+1` equals the
+   * global number of levels in the triangulation. The minimum level may be
+   * zero or more &mdash; it only needs to be consistent between what is set
+   * here and later used for evaluation of the mapping.
+   */
+  MappingFEField(const DoFHandler<dim, spacedim> &euler_dof_handler,
+                 const MGLevelObject<VectorType> &euler_vector,
+                 const ComponentMask &            mask = ComponentMask());
 
   /**
    * Copy constructor.
    */
   MappingFEField(
-    const MappingFEField<dim, spacedim, VectorType, DoFHandlerType> &mapping);
+    const MappingFEField<dim, spacedim, VectorType, void> &mapping);
 
   /**
    * Return a pointer to a copy of the present object. The caller of this copy
@@ -139,6 +210,9 @@ public:
   virtual bool
   preserves_vertex_locations() const override;
 
+  virtual bool
+  is_compatible_with(const ReferenceCell &reference_cell) const override;
+
   /**
    * Return the mapped vertices of a cell.
    *
@@ -146,7 +220,8 @@ public:
    * and constructs the position of the vertices according to the @p euler_vector
    * that was passed at construction time.
    */
-  virtual std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
+  virtual boost::container::small_vector<Point<spacedim>,
+                                         GeometryInfo<dim>::vertices_per_cell>
   get_vertices(const typename Triangulation<dim, spacedim>::cell_iterator &cell)
     const override;
 
@@ -179,35 +254,35 @@ public:
   // for documentation, see the Mapping base class
   virtual void
   transform(const ArrayView<const Tensor<1, dim>> &                  input,
-            const MappingType                                        type,
+            const MappingKind                                        kind,
             const typename Mapping<dim, spacedim>::InternalDataBase &internal,
             const ArrayView<Tensor<1, spacedim>> &output) const override;
 
   // for documentation, see the Mapping base class
   virtual void
   transform(const ArrayView<const DerivativeForm<1, dim, spacedim>> &input,
-            const MappingType                                        type,
+            const MappingKind                                        kind,
             const typename Mapping<dim, spacedim>::InternalDataBase &internal,
             const ArrayView<Tensor<2, spacedim>> &output) const override;
 
   // for documentation, see the Mapping base class
   virtual void
   transform(const ArrayView<const Tensor<2, dim>> &                  input,
-            const MappingType                                        type,
+            const MappingKind                                        kind,
             const typename Mapping<dim, spacedim>::InternalDataBase &internal,
             const ArrayView<Tensor<2, spacedim>> &output) const override;
 
   // for documentation, see the Mapping base class
   virtual void
   transform(const ArrayView<const DerivativeForm<2, dim, spacedim>> &input,
-            const MappingType                                        type,
+            const MappingKind                                        kind,
             const typename Mapping<dim, spacedim>::InternalDataBase &internal,
             const ArrayView<Tensor<3, spacedim>> &output) const override;
 
   // for documentation, see the Mapping base class
   virtual void
   transform(const ArrayView<const Tensor<3, dim>> &                  input,
-            const MappingType                                        type,
+            const MappingKind                                        kind,
             const typename Mapping<dim, spacedim>::InternalDataBase &internal,
             const ArrayView<Tensor<3, spacedim>> &output) const override;
 
@@ -330,7 +405,7 @@ public:
     fourth_derivative(const unsigned int qpoint, const unsigned int shape_nr);
 
     /**
-     * Return an estimate (in bytes) or the memory consumption of this object.
+     * Return an estimate (in bytes) for the memory consumption of this object.
      */
     virtual std::size_t
     memory_consumption() const override;
@@ -377,8 +452,8 @@ public:
      * Unit tangential vectors. Used for the computation of boundary forms and
      * normal vectors.
      *
-     * This array has (dim-1)*GeometryInfo::faces_per_cell entries. The first
-     * GeometryInfo::faces_per_cell contain the vectors in the first
+     * This array has `(dim-1)*GeometryInfo<dim>::%faces_per_cell` entries. The
+     * first GeometryInfo::faces_per_cell contain the vectors in the first
      * tangential direction for each face; the second set of
      * GeometryInfo::faces_per_cell entries contain the vectors in the second
      * tangential direction (only in 3d, since there we have 2 tangential
@@ -459,10 +534,12 @@ private:
   virtual std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase>
   get_data(const UpdateFlags, const Quadrature<dim> &quadrature) const override;
 
+  using Mapping<dim, spacedim>::get_face_data;
+
   // documentation can be found in Mapping::get_face_data()
   virtual std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase>
-  get_face_data(const UpdateFlags          flags,
-                const Quadrature<dim - 1> &quadrature) const override;
+  get_face_data(const UpdateFlags               flags,
+                const hp::QCollection<dim - 1> &quadrature) const override;
 
   // documentation can be found in Mapping::get_subface_data()
   virtual std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase>
@@ -479,12 +556,14 @@ private:
     internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
       &output_data) const override;
 
+  using Mapping<dim, spacedim>::fill_fe_face_values;
+
   // documentation can be found in Mapping::fill_fe_face_values()
   virtual void
   fill_fe_face_values(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const unsigned int                                          face_no,
-    const Quadrature<dim - 1> &                                 quadrature,
+    const hp::QCollection<dim - 1> &                            quadrature,
     const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
     internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
       &output_data) const override;
@@ -504,19 +583,24 @@ private:
    * @}
    */
 
+  /**
+   * Specifies whether we access unknowns on the active dofs (with a single
+   * Euler vector) or on the level dofs (via a vector of Euler vectors).
+   */
+  const bool uses_level_dofs;
 
   /**
    * Reference to the vector of shifts.
    */
-  SmartPointer<const VectorType,
-               MappingFEField<dim, spacedim, VectorType, DoFHandlerType>>
+  std::vector<SmartPointer<const VectorType,
+                           MappingFEField<dim, spacedim, VectorType, void>>>
     euler_vector;
 
   /**
    * Pointer to the DoFHandler to which the mapping vector is associated.
    */
-  SmartPointer<const DoFHandlerType,
-               MappingFEField<dim, spacedim, VectorType, DoFHandlerType>>
+  SmartPointer<const DoFHandler<dim, spacedim>,
+               MappingFEField<dim, spacedim, VectorType, void>>
     euler_dof_handler;
 
 private:
@@ -566,8 +650,8 @@ private:
   void
   update_internal_dofs(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-    const typename MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::
-      InternalData &data) const;
+    const typename MappingFEField<dim, spacedim, VectorType, void>::InternalData
+      &data) const;
 
   /**
    * See the documentation of the base class for detailed information.
@@ -575,8 +659,8 @@ private:
   virtual void
   compute_shapes_virtual(
     const std::vector<Point<dim>> &unit_points,
-    typename MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::
-      InternalData &data) const;
+    typename MappingFEField<dim, spacedim, VectorType, void>::InternalData
+      &data) const;
 
   /*
    * Which components to use for the mapping.
@@ -603,7 +687,7 @@ private:
   /**
    * A variable to guard access to the fe_values variable.
    */
-  mutable Threads::Mutex fe_values_mutex;
+  mutable std::mutex fe_values_mutex;
 
   void
   compute_data(const UpdateFlags      update_flags,
@@ -618,9 +702,7 @@ private:
                     InternalData &         data) const;
 
 
-  /**
-   * Declare other MappingFEField classes friends.
-   */
+  // Declare other MappingFEField classes friends.
   template <int, int, class, class>
   friend class MappingFEField;
 };

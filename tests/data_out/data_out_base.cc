@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -167,7 +167,7 @@ create_patches(std::vector<DataOutBase::Patch<dim, spacedim>> &patches)
           p.vertices[i](j) =
             PatchInfo<dim>::vertices[i][j] + PatchInfo<dim>::offsets[c][j];
 
-      for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+      for (const unsigned int i : GeometryInfo<dim>::face_indices())
         p.neighbors[i] = (unsigned int)PatchInfo<dim>::neighbors[c][i];
 
       unsigned int ndata = 1;

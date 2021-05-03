@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2019 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,10 +20,14 @@
 #include <deal.II/base/patterns.h>
 #include <deal.II/base/utilities.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
+#define BOOST_BIND_GLOBAL_PLACEHOLDERS
 #include <boost/io/ios_state.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
+#undef BOOST_BIND_GLOBAL_PLACEHOLDERS
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <algorithm>
 #include <cctype>
@@ -322,17 +326,17 @@ namespace Patterns
             is.ignore(strlen(description_init) + strlen(" range "));
 
             if (!(is >> lower_bound))
-              return std_cxx14::make_unique<Integer>();
+              return std::make_unique<Integer>();
 
             is.ignore(strlen("..."));
 
             if (!(is >> upper_bound))
-              return std_cxx14::make_unique<Integer>();
+              return std::make_unique<Integer>();
 
-            return std_cxx14::make_unique<Integer>(lower_bound, upper_bound);
+            return std::make_unique<Integer>(lower_bound, upper_bound);
           }
         else
-          return std_cxx14::make_unique<Integer>();
+          return std::make_unique<Integer>();
       }
     else
       return std::unique_ptr<Integer>();
@@ -496,8 +500,8 @@ namespace Patterns
 
     std::string temp = description.substr(description_init_str.size());
     if (temp == "]")
-      return std_cxx14::make_unique<Double>(1.0,
-                                            -1.0); // return an invalid range
+      return std::make_unique<Double>(1.0,
+                                      -1.0); // return an invalid range
 
     if (temp.find("...") != std::string::npos)
       temp.replace(temp.find("..."), 3, " ");
@@ -519,7 +523,7 @@ namespace Patterns
     if (is.fail())
       upper_bound = max_double_value;
 
-    return std_cxx14::make_unique<Double>(lower_bound, upper_bound);
+    return std::make_unique<Double>(lower_bound, upper_bound);
   }
 
 
@@ -633,7 +637,7 @@ namespace Patterns
         sequence.erase(0, std::strlen(description_init) + 1);
         sequence.erase(sequence.length() - 2, 2);
 
-        return std_cxx14::make_unique<Selection>(sequence);
+        return std::make_unique<Selection>(sequence);
       }
     else
       return std::unique_ptr<Selection>();
@@ -788,11 +792,11 @@ namespace Patterns
 
         is.ignore(strlen(" of length "));
         if (!(is >> min_elements))
-          return std_cxx14::make_unique<List>(*base_pattern);
+          return std::make_unique<List>(*base_pattern);
 
         is.ignore(strlen("..."));
         if (!(is >> max_elements))
-          return std_cxx14::make_unique<List>(*base_pattern, min_elements);
+          return std::make_unique<List>(*base_pattern, min_elements);
 
         is.ignore(strlen(" (inclusive) separated by <"));
         std::string separator;
@@ -801,10 +805,10 @@ namespace Patterns
         else
           separator = ",";
 
-        return std_cxx14::make_unique<List>(*base_pattern,
-                                            min_elements,
-                                            max_elements,
-                                            separator);
+        return std::make_unique<List>(*base_pattern,
+                                      min_elements,
+                                      max_elements,
+                                      separator);
       }
     else
       return std::unique_ptr<List>();
@@ -988,13 +992,13 @@ namespace Patterns
 
         is.ignore(strlen(" of length "));
         if (!(is >> min_elements))
-          return std_cxx14::make_unique<Map>(*key_pattern, *value_pattern);
+          return std::make_unique<Map>(*key_pattern, *value_pattern);
 
         is.ignore(strlen("..."));
         if (!(is >> max_elements))
-          return std_cxx14::make_unique<Map>(*key_pattern,
-                                             *value_pattern,
-                                             min_elements);
+          return std::make_unique<Map>(*key_pattern,
+                                       *value_pattern,
+                                       min_elements);
 
         is.ignore(strlen(" (inclusive) separated by <"));
         std::string separator;
@@ -1003,12 +1007,12 @@ namespace Patterns
         else
           separator = ",";
 
-        return std_cxx14::make_unique<Map>(*key_pattern,
-                                           *value_pattern,
-                                           min_elements,
-                                           max_elements,
-                                           separator,
-                                           key_value_separator);
+        return std::make_unique<Map>(*key_pattern,
+                                     *value_pattern,
+                                     min_elements,
+                                     max_elements,
+                                     separator,
+                                     key_value_separator);
       }
     else
       return std::unique_ptr<Map>();
@@ -1207,7 +1211,7 @@ namespace Patterns
         else
           separator = ":";
 
-        return std_cxx14::make_unique<Tuple>(patterns, separator);
+        return std::make_unique<Tuple>(patterns, separator);
       }
     else
       return std::unique_ptr<Tuple>();
@@ -1278,17 +1282,14 @@ namespace Patterns
 
 
     // check the different possibilities
-    for (std::vector<std::string>::const_iterator test_string =
-           split_names.begin();
-         test_string != split_names.end();
-         ++test_string)
+    for (const auto &test_string : split_names)
       {
         bool string_found = false;
 
         tmp = sequence;
         while (tmp.find('|') != std::string::npos)
           {
-            if (*test_string == std::string(tmp, 0, tmp.find('|')))
+            if (test_string == std::string(tmp, 0, tmp.find('|')))
               {
                 // string found, quit
                 // loop. don't change
@@ -1302,7 +1303,7 @@ namespace Patterns
           }
         // check last choice, not finished by |
         if (!string_found)
-          if (*test_string == tmp)
+          if (test_string == tmp)
             string_found = true;
 
         if (!string_found)
@@ -1377,7 +1378,7 @@ namespace Patterns
         sequence.erase(0, std::strlen(description_init) + 1);
         sequence.erase(sequence.length() - 2, 2);
 
-        return std_cxx14::make_unique<MultipleSelection>(sequence);
+        return std::make_unique<MultipleSelection>(sequence);
       }
     else
       return std::unique_ptr<MultipleSelection>();
@@ -1436,7 +1437,7 @@ namespace Patterns
     if (description.compare(0,
                             std::strlen(description_init),
                             description_init) == 0)
-      return std_cxx14::make_unique<Bool>();
+      return std::make_unique<Bool>();
     else
       return std::unique_ptr<Bool>();
   }
@@ -1497,7 +1498,7 @@ namespace Patterns
     if (description.compare(0,
                             std::strlen(description_init),
                             description_init) == 0)
-      return std_cxx14::make_unique<Anything>();
+      return std::make_unique<Anything>();
     else
       return std::unique_ptr<Anything>();
   }
@@ -1585,7 +1586,7 @@ namespace Patterns
         else
           type = output;
 
-        return std_cxx14::make_unique<FileName>(type);
+        return std::make_unique<FileName>(type);
       }
     else
       return std::unique_ptr<FileName>();
@@ -1647,7 +1648,7 @@ namespace Patterns
     if (description.compare(0,
                             std::strlen(description_init),
                             description_init) == 0)
-      return std_cxx14::make_unique<DirectoryName>();
+      return std::make_unique<DirectoryName>();
     else
       return std::unique_ptr<DirectoryName>();
   }

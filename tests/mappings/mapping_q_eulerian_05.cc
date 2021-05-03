@@ -59,7 +59,7 @@ test(unsigned int degree)
   grid_out.set_flags(GridOutFlags::Ucd(true));
   grid_out.write_ucd(tria, deallog.get_file_stream());
 
-  QTrapez<dim>                                    quad;
+  QTrapezoid<dim>                                 quad;
   MappingQEulerian<dim, Vector<double>, spacedim> mapping(degree,
                                                           shift_dh,
                                                           shift);

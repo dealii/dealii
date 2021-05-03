@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -28,16 +28,16 @@
 #include <iostream>
 #include <typeinfo>
 
-#include "../testmatrix.h"
 #include "../tests.h"
+
+#include "../testmatrix.h"
 
 
 int
 main(int argc, char **argv)
 {
-  std::ofstream logfile("output");
-  logfile.precision(4);
-  deallog.attach(logfile);
+  initlog();
+  deallog << std::setprecision(4);
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization(
     argc, argv, testing_max_num_threads());

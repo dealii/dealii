@@ -5,34 +5,28 @@
 The major advantage for GMG is that it is an $\mathcal{O}(n)$ method,
 that is, the complexity of the problem increases linearly with the
 problem size. To show then that the linear solver presented in this
-tutorial is also $\mathcal{O}(n)$, all one needs to do is show that
+tutorial is in fact $\mathcal{O}(n)$, all one needs to do is show that
 the iteration counts for the GMRES solve stay roughly constant as we
 refine the mesh.
 
 Each of the following tables gives the GMRES iteration counts to reduce the
-initial residual by 1e8. We selected a sufficient number of smoothing steps
-(based on the method) to get iteration numbers independent of mesh size. In
-this case, the method is indeed $\mathcal{O}(n)$.
+initial residual by a factor of $10^8$. We selected a sufficient number of smoothing steps
+(based on the method) to get iteration numbers independent of mesh size. As
+can be seen from the tables below, the method is indeed $\mathcal{O}(n)$.
 
 <h4> DoF/Cell Renumbering </h4>
 
 The point-wise smoothers ("Jacobi" and "SOR") get applied in the order the
 DoFs are numbered on each level. We can influence this using the
 DoFRenumbering namespace. The block smoothers are applied based on the
-ordering we set in @p setup_smoother. We can visualize this numbering. The
-following picture shows the cell numbering of the active cells in downstream,
+ordering we set in `setup_smoother()`. We can visualize this numbering. The
+following pictures show the cell numbering of the active cells in downstream,
 random, and upstream numbering (left to right):
 
 <img src="https://www.dealii.org/images/steps/developer/step-63-cell-order.png" alt="">
 
-Starting with the additive smoothers, we see that renumbering the
-DoFs/cells has no effect on convergence speed. This is because these
-smoothers compute operations on each DoF (point-smoother) or cell
-(block-smoother) independently and add up the results. Since we can
-define these smoothers as an application of a sum of matrices, and
-matrix addition is commutative, the order at which we sum the
-different components will not affect the end result.
-
+Let us start with the additive smoothers. The following table shows
+the number of iterations necessary to obtain convergence from GMRES:
 
 <table align="center" class="doxtable">
 <tr>
@@ -75,11 +69,11 @@ different components will not affect the end result.
   <th>48</th>
   <td>3</th>
   <td>3</th>
-  <td>3</th> 
+  <td>3</th>
   <th></th>
   <td>3</th>
   <td>3</th>
-  <td>3</th> 
+  <td>3</th>
 </tr>
 <tr>
   <th>128</th>
@@ -88,10 +82,10 @@ different components will not affect the end result.
   <td>6</th>
   <td>6</th>
   <td>6</th>
-  <th></th> 
+  <th></th>
   <td>6</th>
   <td>6</th>
-  <td>6</th> 
+  <td>6</th>
 </tr>
 <tr>
   <th>512</th>
@@ -103,7 +97,7 @@ different components will not affect the end result.
   <th></th>
   <td>9</th>
   <td>9</th>
-  <td>9</th>  
+  <td>9</th>
 </tr>
 <tr>
   <th>2048</th>
@@ -111,11 +105,11 @@ different components will not affect the end result.
   <th>2176</th>
   <td>15</th>
   <td>15</th>
-  <td>15</th> 
+  <td>15</th>
   <th></th>
   <td>13</th>
   <td>13</th>
-  <td>13</th> 
+  <td>13</th>
 </tr>
 <tr>
   <th>8192</th>
@@ -123,11 +117,11 @@ different components will not affect the end result.
   <th>8448</th>
   <td>18</th>
   <td>18</th>
-  <td>18</th> 
+  <td>18</th>
   <th></th>
   <td>15</th>
   <td>15</th>
-  <td>15</th> 
+  <td>15</th>
 </tr>
 <tr>
   <th>32768</th>
@@ -135,11 +129,11 @@ different components will not affect the end result.
   <th>33280</th>
   <td>20</th>
   <td>20</th>
-  <td>20</th> 
+  <td>20</th>
   <th></th>
   <td>16</th>
   <td>16</th>
-  <td>16</th> 
+  <td>16</th>
 </tr>
 <tr>
   <th>131072</th>
@@ -147,31 +141,23 @@ different components will not affect the end result.
   <th>132096</th>
   <td>20</th>
   <td>20</th>
-  <td>20</th> 
+  <td>20</th>
   <th></th>
   <td>16</th>
   <td>16</th>
-  <td>16</th> 
+  <td>16</th>
 </tr>
 </table>
 
-On the other hand, for the multiplicative smoothers, we can speed up
-convergence by renumbering the DoFs/cells in the advection direction,
-and similarly, we can slow down convergence if we do the renumbering
-in the opposite direction. This is because advection-dominated
-problems have a directional flow of information (in the advection
-direction) which, given the right renumbering of DoFs/cells,
-multiplicative methods are able to capture.
+We see that renumbering the
+DoFs/cells has no effect on convergence speed. This is because these
+smoothers compute operations on each DoF (point-smoother) or cell
+(block-smoother) independently and add up the results. Since we can
+define these smoothers as an application of a sum of matrices, and
+matrix addition is commutative, the order at which we sum the
+different components will not affect the end result.
 
-This feature of multiplicative methods is, however, dependent on the
-value of $\varepsilon$. As we increase $\varepsilon$ and the problem
-becomes more diffusion-dominated, we have a more uniform propagation
-of information over the mesh and there is a diminished advantage for
-renumbering in the advection direction. On the opposite end, in the
-extreme case of $\varepsilon=0$ (advection-only), we have a 1st-order
-PDE and multiplicative methods with the right renumbering become
-effective solvers (Note: special care must be taken for the boundary
-conditions in this case).
+On the other hand, the situation is different for multiplicative smoothers:
 
 <table align="center" class="doxtable">
 <tr>
@@ -214,11 +200,11 @@ conditions in this case).
   <th>48</th>
   <td>2</th>
   <td>2</th>
-  <td>3</th> 
+  <td>3</th>
   <th></th>
   <td>2</th>
   <td>2</th>
-  <td>3</th> 
+  <td>3</th>
 </tr>
 <tr>
   <th>128</th>
@@ -227,10 +213,10 @@ conditions in this case).
   <td>5</th>
   <td>5</th>
   <td>7</th>
-  <th></th> 
+  <th></th>
   <td>5</th>
   <td>5</th>
-  <td>7</th> 
+  <td>7</th>
 </tr>
 <tr>
   <th>512</th>
@@ -242,7 +228,7 @@ conditions in this case).
   <th></th>
   <td>7</th>
   <td>7</th>
-  <td>12</th>  
+  <td>12</th>
 </tr>
 <tr>
   <th>2048</th>
@@ -251,10 +237,10 @@ conditions in this case).
   <td>10</th>
   <td>12</th>
   <td>15</th>
-  <th></th> 
+  <th></th>
   <td>8</th>
   <td>10</th>
-  <td>17</th> 
+  <td>17</th>
 </tr>
 <tr>
   <th>8192</th>
@@ -262,11 +248,11 @@ conditions in this case).
   <th>8448</th>
   <td>11</th>
   <td>15</th>
-  <td>19</th> 
+  <td>19</th>
   <th></th>
   <td>10</th>
   <td>11</th>
-  <td>20</th> 
+  <td>20</th>
 </tr>
 <tr>
   <th>32768</th>
@@ -274,11 +260,11 @@ conditions in this case).
   <th>33280</th>
   <td>12</th>
   <td>16</th>
-  <td>20</th> 
+  <td>20</th>
   <th></th>
   <td>10</th>
   <td>12</th>
-  <td>21</th> 
+  <td>21</th>
 </tr>
 <tr>
   <th>131072</th>
@@ -286,16 +272,38 @@ conditions in this case).
   <th>132096</th>
   <td>12</th>
   <td>16</th>
-  <td>19</th> 
+  <td>19</th>
   <th></th>
   <td>11</th>
   <td>12</th>
-  <td>21</th> 
+  <td>21</th>
 </tr>
 </table>
 
+Here, we can speed up
+convergence by renumbering the DoFs/cells in the advection direction,
+and similarly, we can slow down convergence if we do the renumbering
+in the opposite direction. This is because advection-dominated
+problems have a directional flow of information (in the advection
+direction) which, given the right renumbering of DoFs/cells,
+multiplicative methods are able to capture.
 
-<h4> Point vs. Block Smoothers </h4>
+This feature of multiplicative methods is, however, dependent on the
+value of $\varepsilon$. As we increase $\varepsilon$ and the problem
+becomes more diffusion-dominated, we have a more uniform propagation
+of information over the mesh and there is a diminished advantage for
+renumbering in the advection direction. On the opposite end, in the
+extreme case of $\varepsilon=0$ (advection-only), we have a 1st-order
+PDE and multiplicative methods with the right renumbering become
+effective solvers: A correct downstream numbering may lead to methods
+that require only a single iteration because information can be
+propagated from the inflow boundary downstream, with no information
+transport in the opposite direction. (Note, however, that in the case
+of $\varepsilon=0$, special care must be taken for the boundary
+conditions in this case).
+
+
+<h4> %Point vs. block smoothers </h4>
 
 We will limit the results to runs using the downstream
 renumbering. Here is a cross comparison of all four smoothers for both
@@ -425,7 +433,7 @@ $Q_1$ and $Q_3$ elements:
 
 We see that for $Q_1$, both multiplicative smoothers require a smaller
 combination of smoothing steps and iteration counts than either
-additive smoother. However, when we in increase the degree to a $Q_3$
+additive smoother. However, when we increase the degree to a $Q_3$
 element, there is a clear advantage for the block smoothers in terms
 of the number of smoothing steps and iterations required to
 solve. Specifically, the block SOR smoother gives constant iteration
@@ -440,7 +448,7 @@ smoother over another. Obviously we must examine the cost of an
 iteration. Block smoothers here are at a disadvantage as they are
 having to construct and invert a cell matrix for each cell. Here is a
 comparison of solve times for a $Q_3$ element with 74,496 DoFs:
- 
+
 <table align="center" class="doxtable">
 <tr>
   <th colspan="1">$Q_3$</th>
@@ -464,7 +472,7 @@ comparison of solve times for a $Q_3$ element with 74,496 DoFs:
 
 The smoother that requires the most iterations (Jacobi) actually takes
 the shortest time (roughly 2/3 the time of the next fastest
-method). This is because all that is requires to apply a Jacobi
+method). This is because all that is required to apply a Jacobi
 smoothing step is multiplication by a diagonal matrix which is very
 cheap. On the other hand, while SOR requires over 3x more iterations
 (each with 3x more smoothing steps) than block SOR, the times are
@@ -473,21 +481,35 @@ roughly 9x slower than a smoothing step of SOR. Lastly, block Jacobi
 is almost 6x more expensive than block SOR, which intuitively makes
 sense from the fact that 1 step of each method has the same cost
 (inverting the cell matrices and either adding or multiply them
-together), and block Jacobi has 3 times the smoothing step per
+together), and block Jacobi has 3 times the number of smoothing steps per
 iteration with 2 times the iterations.
 
 
-<h3> Additional Points </h3>
+<h3> Additional points </h3>
 
 There are a few more important points to mention:
 
-1. For a mesh distributed in parallel, multiplicative methods cannot
-be executed over the entire domain. One can use a hybrid method where
+<ol>
+<li> For a mesh distributed in parallel, multiplicative methods cannot
+be executed over the entire domain. This is because they operate one
+cell at a time, and downstream cells can only be handled once upstream
+cells have already been done. This is fine on a single processor: The
+processor just goes through the list of cells one after the
+other. However, in parallel, it would imply that some processors are
+idle because upstream processors have not finished doing the work on
+cells upstream from the ones owned by the current processor. Once the
+upstream processors are done, the downstream ones can start, but by
+that time the upstream processors have no work left. In other words,
+most of the time during these smoother steps, most processors are in
+fact idle. This is not how one obtains good parallel scalability!
+
+One can use a hybrid method where
 a multiplicative smoother is applied on each subdomain, but as you
 increase the number of subdomains, the method approaches the behavior
 of an additive method. This is a major disadvantage to these methods.
+</li>
 
-2. Current research into block smoothers suggest that soon we will be
+<li> Current research into block smoothers suggest that soon we will be
 able to compute the inverse of the cell matrices much cheaper than
 what is currently being done inside deal.II. This research is based on
 the fast diagonalization method (dating back to the 1960s) and has
@@ -499,12 +521,15 @@ methods to DG and make them more robust. Also, it seems that one
 should be able to take advantage of matrix-free implementations and
 the fact that, in the interior of the domain, cell matrices tend to
 look very similar, allowing fewer matrix inverse computations.
+</li>
+</ol>
 
 Combining 1. and 2. gives a good reason for expecting that a method
 like block Jacobi could become very powerful in the future, even
 though currently for these examples it is quite slow.
 
-<h3> Possible Extensions </h3>
+
+<h3> Possibilities for extensions </h3>
 
 <h4> Constant iterations for Q<sub>5</sub> </h4>
 
@@ -515,7 +540,7 @@ that we maintain a constant number of iterations for a $Q_5$ element.
 
 <h4> Effectiveness of renumbering for changing epsilon </h4>
 
-Increase/decrease the parameter "Epsilon" in the .prm files of the
+Increase/decrease the parameter "Epsilon" in the `.prm` files of the
 multiplicative methods and observe for which values renumbering no
 longer influences convergence speed.
 
@@ -523,7 +548,4 @@ longer influences convergence speed.
 
 The code is set up to work correctly with an adaptively refined mesh (the
 interface matrices are created and set). Devise a suitable refinement
-criterium or try KellyErrorEstimator).
-
-
-
+criterium or try the KellyErrorEstimator class.

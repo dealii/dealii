@@ -1,0 +1,16 @@
+
+DEAL:1d::starting situation
+DEAL:1d:: fe_indices: 1 1 1 1
+DEAL:1d::p-adaptivity from absolute threshold
+DEAL:1d:: fe_indices: 2 1 1 0
+DEAL:1d::OK
+DEAL:2d::starting situation
+DEAL:2d:: fe_indices: 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+DEAL:2d::p-adaptivity from absolute threshold
+DEAL:2d:: fe_indices: 2 2 2 2 1 1 1 1 1 1 1 1 0 0 0 0
+DEAL:2d::OK
+DEAL:3d::starting situation
+DEAL:3d:: fe_indices: 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+DEAL:3d::p-adaptivity from absolute threshold
+DEAL:3d:: fe_indices: 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+DEAL:3d::OK

@@ -261,7 +261,7 @@ faster.
 <h4>Cache the explicit part of residual</h4>
 
 The residual calculated in ConservationLaw::assemble_cell_term function
-reads 
+reads
    $R_i = \left(\frac{\mathbf{w}^{k}_{n+1} - \mathbf{w}_n}{\delta t}
     , \mathbf{z}_i \right)_K  +
       \theta \mathbf{B}({\mathbf{w}^{k}_{n+1}})(\mathbf{z}_i)_K +

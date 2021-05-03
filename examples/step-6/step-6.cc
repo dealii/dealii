@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2000 - 2019 by the deal.II authors
+ * Copyright (C) 2000 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -23,7 +23,6 @@
 // The first few files have already been covered in previous examples and will
 // thus not be further commented on.
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/function_lib.h>
 
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
@@ -88,9 +87,7 @@ using namespace dealii;
 // The main class is again almost unchanged. Two additions, however, are made:
 // we have added the <code>refine_grid</code> function, which is used to
 // adaptively refine the grid (instead of the global refinement in the
-// previous examples), and a variable which will hold the constraints. In
-// addition, we have added a destructor to the class for reasons that will
-// become clear when we discuss its implementation.
+// previous examples), and a variable which will hold the constraints.
 template <int dim>
 class Step6
 {
@@ -240,32 +237,23 @@ void Step6<dim>::setup_system()
 
 // @sect4{Step6::assemble_system}
 
-// Next, we have to assemble the matrix again. There are two code changes
-// compared to step-5:
-//
-// First, we have to use a higher-order quadrature formula to account for the
-// higher polynomial degree in the finite element shape functions. This is
-// easy to change: the constructor of the <code>QGauss</code> class takes the
-// number of quadrature points in each space direction. Previously, we had two
-// points for bilinear elements. Now we should use three points for
-// biquadratic elements.
-//
-// Second, to copy the local matrix and vector on each cell into the global
-// system, we are no longer using a hand-written loop. Instead, we use
+// Next, we have to assemble the matrix. However, to copy the local matrix and
+// vector on each cell into the global system, we are no longer using a
+// hand-written loop. Instead, we use
 // AffineConstraints::distribute_local_to_global() that internally executes
 // this loop while performing Gaussian elimination on rows and columns
 // corresponding to constrained degrees on freedom.
 //
 // The rest of the code that forms the local contributions remains
 // unchanged. It is worth noting, however, that under the hood several things
-// are different than before. First, the variables <code>dofs_per_cell</code>
-// and <code>n_q_points</code> now are 9 each, where they were 4
-// before. Introducing such variables as abbreviations is a good strategy to
-// make code work with different elements without having to change too much
-// code. Secondly, the <code>fe_values</code> object of course needs to do
-// other things as well, since the shape functions are now quadratic, rather
-// than linear, in each coordinate variable. Again, however, this is something
-// that is completely handled by the library.
+// are different than before. First, the variable <code>dofs_per_cell</code>
+// and return value of <code>quadrature_formula.size()</code> now are 9 each,
+// where they were 4 before. Introducing such variables as abbreviations is a
+// good strategy to make code work with different elements without having to
+// change too much code. Secondly, the <code>fe_values</code> object of course
+// needs to do other things as well, since the shape functions are now
+// quadratic, rather than linear, in each coordinate variable. Again, however,
+// this is something that is completely handled by the library.
 template <int dim>
 void Step6<dim>::assemble_system()
 {
@@ -276,8 +264,7 @@ void Step6<dim>::assemble_system()
                           update_values | update_gradients |
                             update_quadrature_points | update_JxW_values);
 
-  const unsigned int dofs_per_cell = fe.dofs_per_cell;
-  const unsigned int n_q_points    = quadrature_formula.size();
+  const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
 
   FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
   Vector<double>     cell_rhs(dofs_per_cell);
@@ -291,13 +278,13 @@ void Step6<dim>::assemble_system()
 
       fe_values.reinit(cell);
 
-      for (unsigned int q_index = 0; q_index < n_q_points; ++q_index)
+      for (const unsigned int q_index : fe_values.quadrature_point_indices())
         {
           const double current_coefficient =
-            coefficient<dim>(fe_values.quadrature_point(q_index));
-          for (unsigned int i = 0; i < dofs_per_cell; ++i)
+            coefficient(fe_values.quadrature_point(q_index));
+          for (const unsigned int i : fe_values.dof_indices())
             {
-              for (unsigned int j = 0; j < dofs_per_cell; ++j)
+              for (const unsigned int j : fe_values.dof_indices())
                 cell_matrix(i, j) +=
                   (current_coefficient *              // a(x_q)
                    fe_values.shape_grad(i, q_index) * // grad phi_i(x_q)
@@ -321,9 +308,9 @@ void Step6<dim>::assemble_system()
   // constraints. The constrained nodes are still in the linear system (there
   // is a nonzero entry, chosen in a way that the matrix is well conditioned,
   // on the diagonal of the matrix and all other entries for this line are set
-  // to zero) but the computed values are invalid (i.e., the correspond entry
-  // in <code>system_rhs</code> is currently meaningless). We compute the
-  // correct values for these nodes at the end of the <code>solve</code>
+  // to zero) but the computed values are invalid (i.e., the corresponding
+  // entries in <code>system_rhs</code> are currently meaningless). We compute
+  // the correct values for these nodes at the end of the <code>solve</code>
   // function.
 }
 
@@ -347,10 +334,10 @@ void Step6<dim>::assemble_system()
 template <int dim>
 void Step6<dim>::solve()
 {
-  SolverControl solver_control(1000, 1e-12);
-  SolverCG<>    solver(solver_control);
+  SolverControl            solver_control(1000, 1e-12);
+  SolverCG<Vector<double>> solver(solver_control);
 
-  PreconditionSSOR<> preconditioner;
+  PreconditionSSOR<SparseMatrix<double>> preconditioner;
   preconditioner.initialize(system_matrix, 1.2);
 
   solver.solve(system_matrix, solution, system_rhs, preconditioner);
@@ -420,12 +407,11 @@ void Step6<dim>::refine_grid()
 {
   Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
 
-  KellyErrorEstimator<dim>::estimate(
-    dof_handler,
-    QGauss<dim - 1>(fe.degree + 1),
-    std::map<types::boundary_id, const Function<dim> *>(),
-    solution,
-    estimated_error_per_cell);
+  KellyErrorEstimator<dim>::estimate(dof_handler,
+                                     QGauss<dim - 1>(fe.degree + 1),
+                                     {},
+                                     solution,
+                                     estimated_error_per_cell);
 
   // The above function returned one error indicator value for each cell in
   // the <code>estimated_error_per_cell</code> array. Refinement is now done
@@ -476,21 +462,24 @@ void Step6<dim>::refine_grid()
 // cycle.
 //
 // We have already seen in step-1 how this can be achieved for the
-// mesh itself. The only thing we have to change is the generation of
-// the file name, since it should contain the number of the present
-// refinement cycle provided to this function as an argument. To this
-// end, we simply append the number of the refinement cycle as a
-// string to the file name.
-//
-// We also output the solution in the same way as we did before, with
-// a similarly constructed file name.
+// mesh itself. Here, we change a few things:
+// <ol>
+//   <li>We use two different formats: gnuplot and VTU.</li>
+//   <li>We embed the cycle number in the output file name.</li>
+//   <li>For gnuplot output, we set up a GridOutFlags::Gnuplot object to
+//   provide a few extra visualization arguments so that edges appear
+//   curved. This is explained in further detail in step-10.</li>
+// </ol>
 template <int dim>
 void Step6<dim>::output_results(const unsigned int cycle) const
 {
   {
-    GridOut       grid_out;
-    std::ofstream output("grid-" + std::to_string(cycle) + ".eps");
-    grid_out.write_eps(triangulation, output);
+    GridOut               grid_out;
+    std::ofstream         output("grid-" + std::to_string(cycle) + ".gnuplot");
+    GridOutFlags::Gnuplot gnuplot_flags(false, 5);
+    grid_out.set_flags(gnuplot_flags);
+    MappingQGeneric<dim> mapping(3);
+    grid_out.write_gnuplot(triangulation, output, &mapping);
   }
 
   {
@@ -499,8 +488,8 @@ void Step6<dim>::output_results(const unsigned int cycle) const
     data_out.add_data_vector(solution, "solution");
     data_out.build_patches();
 
-    std::ofstream output("solution-" + std::to_string(cycle) + ".vtk");
-    data_out.write_vtk(output);
+    std::ofstream output("solution-" + std::to_string(cycle) + ".vtu");
+    data_out.write_vtu(output);
   }
 }
 
@@ -513,13 +502,12 @@ void Step6<dim>::output_results(const unsigned int cycle) const
 // disk, in that we adaptively instead of globally refine the mesh, and that
 // we output the solution on the final mesh in the present function.
 //
-// The first block in the main loop of the function deals with mesh
-// generation. If this is the first cycle of the program, instead of reading
-// the grid from a file on disk as in the previous example, we now again
-// create it using a library function. The domain is again a circle, which is
-// why we have to provide a suitable boundary object as well. We place the
-// center of the circle at the origin and have the radius be one (these are
-// the two hidden arguments to the function, which have default values).
+// The first block in the main loop of the function deals with mesh generation.
+// If this is the first cycle of the program, instead of reading the grid from
+// a file on disk as in the previous example, we now again create it using a
+// library function. The domain is again a circle with center at the origin and
+// a radius of one (these are the two hidden arguments to the function, which
+// have default values).
 //
 // You will notice by looking at the coarse grid that it is of inferior
 // quality than the one which we read from the file in the previous example:

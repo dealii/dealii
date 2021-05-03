@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -48,10 +48,10 @@ namespace
     for (unsigned int i = 0; i < component_names.size(); ++i)
       {
         if (unique_component_names[j] != component_names[i])
-          masks.emplace_back(ComponentMask(bools[j++]));
+          masks.emplace_back(bools[j++]);
         bools[j][i] = true;
       }
-    masks.emplace_back(ComponentMask(bools[j++]));
+    masks.emplace_back(bools[j++]);
     AssertDimension(j, unique_component_names.size());
     return masks;
   }
@@ -78,13 +78,13 @@ ParsedConvergenceTable::ParsedConvergenceTable(
 ParsedConvergenceTable::ParsedConvergenceTable(
   const std::vector<std::string> &                    component_names,
   const std::vector<std::set<VectorTools::NormType>> &list_of_error_norms,
-  const double &                                      exponent,
+  const double                                        exponent,
   const std::set<std::string> &                       extra_columns,
   const std::string &                                 rate_key,
   const std::string &                                 rate_mode,
   const std::string &                                 error_file_name,
-  const unsigned int &                                precision,
-  const bool &                                        compute_error)
+  const unsigned int                                  precision,
+  const bool                                          compute_error)
   : component_names(component_names)
   , unique_component_names(get_unique_component_names(component_names))
   , unique_component_masks(get_unique_component_masks(component_names))
@@ -262,7 +262,7 @@ void
 ParsedConvergenceTable::add_extra_column(
   const std::string &            column_name,
   const std::function<double()> &custom_function,
-  const bool &                   compute_rate)
+  const bool                     compute_rate)
 {
   extra_column_functions[column_name] = {custom_function, compute_rate};
 }

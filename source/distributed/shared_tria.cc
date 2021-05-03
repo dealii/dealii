@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2018 by the deal.II authors
+// Copyright (C) 2015 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -37,14 +37,14 @@ namespace parallel
   {
     template <int dim, int spacedim>
     Triangulation<dim, spacedim>::Triangulation(
-      MPI_Comm mpi_communicator,
+      const MPI_Comm &mpi_communicator,
       const typename dealii::Triangulation<dim, spacedim>::MeshSmoothing
                      smooth_grid,
       const bool     allow_artificial_cells,
       const Settings settings)
-      : dealii::parallel::Triangulation<dim, spacedim>(mpi_communicator,
-                                                       smooth_grid,
-                                                       false)
+      : dealii::parallel::TriangulationBase<dim, spacedim>(mpi_communicator,
+                                                           smooth_grid,
+                                                           false)
       , settings(settings)
       , allow_artificial_cells(allow_artificial_cells)
     {
@@ -70,6 +70,15 @@ namespace parallel
 
 
     template <int dim, int spacedim>
+    bool
+    Triangulation<dim, spacedim>::is_multilevel_hierarchy_constructed() const
+    {
+      return (settings & construct_multigrid_hierarchy);
+    }
+
+
+
+    template <int dim, int spacedim>
     void
     Triangulation<dim, spacedim>::partition()
     {
@@ -81,7 +90,7 @@ namespace parallel
       Assert(
         max_active_cells == this->n_active_cells(),
         ExcMessage(
-          "A parallel::shared::Triangulation needs to be refined in the same"
+          "A parallel::shared::Triangulation needs to be refined in the same "
           "way on all processors, but the participating processors don't "
           "agree on the number of active cells."));
 #  endif
@@ -228,7 +237,7 @@ namespace parallel
                       // also keep its level subdomain id since it is either
                       // owned by this processor or in the ghost layer of the
                       // active mesh.
-                      if (!cell->has_children() &&
+                      if (cell->is_active() &&
                           cell->subdomain_id() !=
                             numbers::artificial_subdomain_id)
                         continue;
@@ -382,6 +391,19 @@ namespace parallel
 
     template <int dim, int spacedim>
     void
+    Triangulation<dim, spacedim>::create_triangulation(
+      const TriangulationDescription::Description<dim, spacedim>
+        &construction_data)
+    {
+      (void)construction_data;
+
+      Assert(false, ExcInternalError());
+    }
+
+
+
+    template <int dim, int spacedim>
+    void
     Triangulation<dim, spacedim>::copy_triangulation(
       const dealii::Triangulation<dim, spacedim> &other_tria)
     {
@@ -392,22 +414,10 @@ namespace parallel
         ExcMessage(
           "Cannot use this function on parallel::distributed::Triangulation."));
 
-      dealii::parallel::Triangulation<dim, spacedim>::copy_triangulation(
+      dealii::parallel::TriangulationBase<dim, spacedim>::copy_triangulation(
         other_tria);
       partition();
       this->update_number_cache();
-    }
-
-
-
-    template <int dim, int spacedim>
-    void
-    Triangulation<dim, spacedim>::update_number_cache()
-    {
-      parallel::Triangulation<dim, spacedim>::update_number_cache();
-
-      if (settings & construct_multigrid_hierarchy)
-        parallel::Triangulation<dim, spacedim>::fill_level_ghost_owners();
     }
   } // namespace shared
 } // namespace parallel
@@ -426,7 +436,12 @@ namespace parallel
       return true;
     }
 
-
+    template <int dim, int spacedim>
+    bool
+    Triangulation<dim, spacedim>::is_multilevel_hierarchy_constructed() const
+    {
+      return false;
+    }
 
     template <int dim, int spacedim>
     const std::vector<unsigned int> &
@@ -451,6 +466,59 @@ namespace parallel
 
 
 #endif
+
+
+
+namespace internal
+{
+  namespace parallel
+  {
+    namespace shared
+    {
+      template <int dim, int spacedim>
+      TemporarilyRestoreSubdomainIds<dim, spacedim>::
+        TemporarilyRestoreSubdomainIds(const Triangulation<dim, spacedim> &tria)
+        : shared_tria(
+            dynamic_cast<
+              const dealii::parallel::shared::Triangulation<dim, spacedim> *>(
+              &tria))
+      {
+        if (shared_tria && shared_tria->with_artificial_cells())
+          {
+            // Save the current set of subdomain IDs, and set subdomain IDs
+            // to the "true" owner of each cell.
+            const std::vector<types::subdomain_id> &true_subdomain_ids =
+              shared_tria->get_true_subdomain_ids_of_cells();
+
+            saved_subdomain_ids.resize(shared_tria->n_active_cells());
+            for (const auto &cell : shared_tria->active_cell_iterators())
+              {
+                const unsigned int index   = cell->active_cell_index();
+                saved_subdomain_ids[index] = cell->subdomain_id();
+                cell->set_subdomain_id(true_subdomain_ids[index]);
+              }
+          }
+      }
+
+
+
+      template <int dim, int spacedim>
+      TemporarilyRestoreSubdomainIds<dim, spacedim>::
+        ~TemporarilyRestoreSubdomainIds()
+      {
+        if (shared_tria && shared_tria->with_artificial_cells())
+          {
+            // Undo the subdomain modification.
+            for (const auto &cell : shared_tria->active_cell_iterators())
+              {
+                const unsigned int index = cell->active_cell_index();
+                cell->set_subdomain_id(saved_subdomain_ids[index]);
+              }
+          }
+      }
+    } // namespace shared
+  }   // namespace parallel
+} // namespace internal
 
 
 /*-------------- Explicit Instantiations -------------------------------*/

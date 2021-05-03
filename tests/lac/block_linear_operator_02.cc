@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2018 by the deal.II authors
+// Copyright (C) 2015 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -32,13 +32,14 @@
 
 #include "../tests.h"
 
-#define PRINTME(name, var)                              \
-  deallog << "Block vector: " name << ":" << std::endl; \
-  for (unsigned int i = 0; i < var.n_blocks(); ++i)     \
-    deallog << "[block " << i << " ]  " << var.block(i);
+#define PRINTME(name, var)                               \
+  deallog << "Block vector: " name << ":" << std::endl;  \
+  for (unsigned int i = 0; i < var.n_blocks(); ++i)      \
+    {                                                    \
+      deallog << "[block " << i << " ]  " << std::flush; \
+      var.block(i).print(deallog.get_file_stream());     \
+    }
 
-
-using namespace dealii;
 
 int
 main()
@@ -58,8 +59,8 @@ main()
 
   dof_handler.distribute_dofs(fe);
 
-  std::vector<types::global_dof_index> dpc(3);
-  DoFTools::count_dofs_per_component(dof_handler, dpc);
+  const std::vector<types::global_dof_index> dpc =
+    DoFTools::count_dofs_per_fe_component(dof_handler);
 
   BlockDynamicSparsityPattern dsp(3, 3);
   for (unsigned int i = 0; i < 3; ++i)

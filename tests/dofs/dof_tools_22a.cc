@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,7 +15,7 @@
 //
 // This test was written by Sam Cox.
 
-// Tests the behaviour of DoFTools::make_flux_sparsity_pattern (DoFHandler,
+// Tests the behavior of DoFTools::make_flux_sparsity_pattern (DoFHandler,
 //                          SparsityPattern, AffineConstraints<double>, bool,
 //                          coupling, flux_coupling, subdomain_id)
 
@@ -112,11 +112,10 @@ test()
                                        flux_coupling,
                                        Utilities::MPI::this_mpi_process(
                                          MPI_COMM_WORLD));
-  SparsityTools::distribute_sparsity_pattern(
-    sp,
-    dh.n_locally_owned_dofs_per_processor(),
-    MPI_COMM_WORLD,
-    relevant_partitioning);
+  SparsityTools::distribute_sparsity_pattern(sp,
+                                             dh.locally_owned_dofs(),
+                                             MPI_COMM_WORLD,
+                                             relevant_partitioning);
 
   // Output
   MPI_Barrier(MPI_COMM_WORLD);
@@ -124,7 +123,7 @@ test()
   deallog.push(Utilities::int_to_string(myid));
 
   deallog << "**** proc " << myid << ": \n\n";
-  deallog << "Sparsity pattern:\n";
+  deallog << "Sparsity pattern:" << std::endl;
   sp.print_gnuplot(deallog.get_file_stream());
 
   MPI_Barrier(MPI_COMM_WORLD);

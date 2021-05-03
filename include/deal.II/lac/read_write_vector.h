@@ -18,11 +18,13 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/communication_pattern_base.h>
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/mpi.h>
+#include <deal.II/base/parallel.h>
+#include <deal.II/base/subscriptor.h>
 #include <deal.II/base/template_constraints.h>
-#include <deal.II/base/thread_management.h>
 #include <deal.II/base/types.h>
 #include <deal.II/base/utilities.h>
 
@@ -43,9 +45,12 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#ifndef DOXYGEN
 namespace LinearAlgebra
 {
-  class CommunicationPatternBase;
+  template <typename>
+  class Vector;
   namespace distributed
   {
     template <typename, typename>
@@ -53,7 +58,7 @@ namespace LinearAlgebra
   } // namespace distributed
 } // namespace LinearAlgebra
 
-#ifdef DEAL_II_WITH_PETSC
+#  ifdef DEAL_II_WITH_PETSC
 namespace PETScWrappers
 {
   namespace MPI
@@ -61,9 +66,9 @@ namespace PETScWrappers
     class Vector;
   }
 } // namespace PETScWrappers
-#endif
+#  endif
 
-#ifdef DEAL_II_WITH_TRILINOS
+#  ifdef DEAL_II_WITH_TRILINOS
 namespace TrilinosWrappers
 {
   namespace MPI
@@ -71,9 +76,9 @@ namespace TrilinosWrappers
     class Vector;
   }
 } // namespace TrilinosWrappers
-#endif
+#  endif
 
-#ifdef DEAL_II_WITH_CUDA
+#  ifdef DEAL_II_WITH_CUDA
 namespace LinearAlgebra
 {
   namespace CUDAWrappers
@@ -82,6 +87,7 @@ namespace LinearAlgebra
     class Vector;
   }
 } // namespace LinearAlgebra
+#  endif
 #endif
 
 namespace LinearAlgebra
@@ -122,8 +128,6 @@ namespace LinearAlgebra
    * ranges are stored in ascending order of the first index of each range.
    * The function IndexSet::largest_range_starting_index() can be used to
    * get the first index of the largest range.
-   *
-   * @author Bruno Turcksin, 2015.
    */
   template <typename Number>
   class ReadWriteVector : public Subscriptor
@@ -287,6 +291,36 @@ namespace LinearAlgebra
      * Imports all the elements present in the vector's IndexSet from the
      * input vector @p vec. VectorOperation::values @p operation
      * is used to decide if the elements in @p V should be added to the
+     * current vector or replace the current elements.
+     *
+     * @note The parameter @p communication_pattern is ignored since we are
+     *   dealing with a serial vector here.
+     */
+    void
+    import(const dealii::Vector<Number> &vec,
+           VectorOperation::values       operation,
+           const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+             &communication_pattern = {});
+
+    /**
+     * Imports all the elements present in the vector's IndexSet from the
+     * input vector @p vec. VectorOperation::values @p operation
+     * is used to decide if the elements in @p V should be added to the
+     * current vector or replace the current elements.
+     *
+     * @note The parameter @p communication_pattern is ignored since we are
+     *   dealing with a serial vector here.
+     */
+    void
+    import(const LinearAlgebra::Vector<Number> &vec,
+           VectorOperation::values              operation,
+           const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+             &communication_pattern = {});
+
+    /**
+     * Imports all the elements present in the vector's IndexSet from the
+     * input vector @p vec. VectorOperation::values @p operation
+     * is used to decide if the elements in @p V should be added to the
      * current vector or replace the current elements. The last parameter can
      * be used if the same communication pattern is used multiple times. This
      * can be used to improve performance.
@@ -295,9 +329,8 @@ namespace LinearAlgebra
     void
     import(const distributed::Vector<Number, MemorySpace> &vec,
            VectorOperation::values                         operation,
-           const std::shared_ptr<const CommunicationPatternBase>
-             &communication_pattern =
-               std::shared_ptr<const CommunicationPatternBase>());
+           const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+             &communication_pattern = {});
 
 #ifdef DEAL_II_WITH_PETSC
     /**
@@ -311,9 +344,8 @@ namespace LinearAlgebra
     void
     import(const PETScWrappers::MPI::Vector &petsc_vec,
            VectorOperation::values           operation,
-           const std::shared_ptr<const CommunicationPatternBase>
-             &communication_pattern =
-               std::shared_ptr<const CommunicationPatternBase>());
+           const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+             &communication_pattern = {});
 #endif
 
 #ifdef DEAL_II_WITH_TRILINOS
@@ -325,14 +357,13 @@ namespace LinearAlgebra
      * communication pattern is used multiple times. This can be used to improve
      * performance.
      *
-     * @note: The @p trilinos_vec is not allowed to have ghost entries.
+     * @note The @p trilinos_vec is not allowed to have ghost entries.
      */
     void
     import(const TrilinosWrappers::MPI::Vector &trilinos_vec,
            VectorOperation::values              operation,
-           const std::shared_ptr<const CommunicationPatternBase>
-             &communication_pattern =
-               std::shared_ptr<const CommunicationPatternBase>());
+           const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+             &communication_pattern = {});
 
 #  ifdef DEAL_II_WITH_MPI
 #    ifdef DEAL_II_TRILINOS_WITH_TPETRA
@@ -347,9 +378,8 @@ namespace LinearAlgebra
     void
     import(const TpetraWrappers::Vector<Number> &tpetra_vec,
            VectorOperation::values               operation,
-           const std::shared_ptr<const CommunicationPatternBase>
-             &communication_pattern =
-               std::shared_ptr<const CommunicationPatternBase>());
+           const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+             &communication_pattern = {});
 #    endif
 
     /**
@@ -363,9 +393,8 @@ namespace LinearAlgebra
     void
     import(const EpetraWrappers::Vector &epetra_vec,
            VectorOperation::values       operation,
-           const std::shared_ptr<const CommunicationPatternBase>
-             &communication_pattern =
-               std::shared_ptr<const CommunicationPatternBase>());
+           const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+             &communication_pattern = {});
 #  endif
 #endif
 
@@ -379,9 +408,8 @@ namespace LinearAlgebra
     void
     import(const CUDAWrappers::Vector<Number> &cuda_vec,
            VectorOperation::values             operation,
-           const std::shared_ptr<const CommunicationPatternBase>
-             &communication_pattern =
-               std::shared_ptr<const CommunicationPatternBase>());
+           const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+             &communication_pattern = {});
 #endif
 
     /**
@@ -399,9 +427,19 @@ namespace LinearAlgebra
      * This function returns the number of elements stored. It is smaller or
      * equal to the dimension of the vector space that is modeled by an object
      * of this kind. This dimension is return by size().
+     *
+     * @deprecated use locally_owned_size() instead.
      */
+    DEAL_II_DEPRECATED_EARLY
     size_type
     n_elements() const;
+
+    /**
+     * Return the local size of the vector, i.e., the number of indices
+     * owned locally.
+     */
+    size_type
+    locally_owned_size() const;
 
     /**
      * Return the IndexSet that represents the indices of the elements stored.
@@ -623,7 +661,7 @@ namespace LinearAlgebra
       const IndexSet &        locally_owned_elements,
       VectorOperation::values operation,
       const MPI_Comm &        mpi_comm,
-      const std::shared_ptr<const CommunicationPatternBase>
+      const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
         &communication_pattern);
 #  endif
 
@@ -637,7 +675,7 @@ namespace LinearAlgebra
            const IndexSet &          locally_owned_elements,
            VectorOperation::values   operation,
            const MPI_Comm &          mpi_comm,
-           const std::shared_ptr<const CommunicationPatternBase>
+           const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
              &communication_pattern);
 #endif
 
@@ -693,12 +731,12 @@ namespace LinearAlgebra
      * CommunicationPattern for the communication between the
      * source_stored_elements IndexSet and the current vector.
      */
-    std::shared_ptr<CommunicationPatternBase> comm_pattern;
+    std::shared_ptr<Utilities::MPI::CommunicationPatternBase> comm_pattern;
 
     /**
      * Pointer to the array of local elements of this vector.
      */
-    std::unique_ptr<Number[], decltype(free) *> values;
+    std::unique_ptr<Number[], decltype(std::free) *> values;
 
     /**
      * For parallel loops with TBB, this member variable stores the affinity
@@ -707,9 +745,7 @@ namespace LinearAlgebra
     mutable std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
       thread_loop_partitioner;
 
-    /**
-     * Make all other ReadWriteVector types friends.
-     */
+    // Make all other ReadWriteVector types friends.
     template <typename Number2>
     friend class ReadWriteVector;
 
@@ -817,6 +853,15 @@ namespace LinearAlgebra
   template <typename Number>
   inline typename ReadWriteVector<Number>::size_type
   ReadWriteVector<Number>::n_elements() const
+  {
+    return stored_elements.n_elements();
+  }
+
+
+
+  template <typename Number>
+  inline typename ReadWriteVector<Number>::size_type
+  ReadWriteVector<Number>::locally_owned_size() const
   {
     return stored_elements.n_elements();
   }

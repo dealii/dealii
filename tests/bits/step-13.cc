@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,11 +16,6 @@
 
 
 // a un-hp-ified version of hp/step-13
-
-
-#include "../tests.h"
-std::ofstream logfile("output");
-
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
@@ -138,9 +133,7 @@ namespace Evaluation
                                                    endc = dof_handler.end();
     bool evaluation_point_found                         = false;
     for (; (cell != endc) && !evaluation_point_found; ++cell)
-      for (unsigned int vertex = 0;
-           vertex < GeometryInfo<dim>::vertices_per_cell;
-           ++vertex)
+      for (const unsigned int vertex : GeometryInfo<dim>::vertex_indices())
         if (cell->vertex(vertex) == evaluation_point)
           {
             point_value = solution(cell->vertex_dof_index(vertex, 0));
@@ -354,7 +347,7 @@ namespace LaplaceSolver
   void
   Solver<dim>::assemble_linear_system(LinearSystem &linear_system)
   {
-    typedef typename DoFHandler<dim>::active_cell_iterator active_cell_iterator;
+    using active_cell_iterator = typename DoFHandler<dim>::active_cell_iterator;
 
     const unsigned int n_threads = MultithreadInfo::n_threads();
     std::vector<std::pair<active_cell_iterator, active_cell_iterator>>
@@ -802,6 +795,7 @@ solve_problem(const std::string &solver_name)
 int
 main()
 {
+  std::ofstream logfile("output");
   try
     {
       deallog << std::setprecision(2);

@@ -211,7 +211,11 @@ def register_dealii_printers():
         ['TriaRawIterator', 'TriaIterator', 'TriaActiveIterator'],
         QuadraturePrinter:
         ['Quadrature', 'QGauss', 'QGaussLobatto', 'QMidpoint', 'QSimpson',
-         'QTrapez', 'QMilne', 'QWeddle', 'QGaussLog', 'QGaussLogR',
+         'QTrapezoid',
+         # The following name has been deprecated in deal.II 9.3 and can
+         # be removed at a later time.
+         'QTrapez',
+         'QMilne', 'QWeddle', 'QGaussLog', 'QGaussLogR',
          'QGaussOneOverR', 'QSorted', 'QTelles', 'QGaussChebyshev',
          'QGaussRadauChebyshev', 'QIterated', 'QAnisotropic']
     }

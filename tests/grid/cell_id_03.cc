@@ -49,7 +49,7 @@ check(TRIA &tr)
 
       const CellId cid = cell->id();
 
-      typename TRIA::cell_iterator cell2 = cid.to_cell(tr);
+      typename TRIA::cell_iterator cell2 = tr.create_cell_iterator(cid);
 
       deallog << cell2->level() << " " << cell2->index() << std::endl;
     }

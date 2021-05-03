@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -32,9 +32,7 @@ void fill_tensor(
   Number counter = 0.0;
   for (unsigned int i = 0; i < dim; ++i)
     for (unsigned int j = 0; j < dim; ++j)
-      for (unsigned int v = 0;
-           v < dealii::VectorizedArray<Number>::n_array_elements;
-           v++)
+      for (unsigned int v = 0; v < dealii::VectorizedArray<Number>::size(); v++)
         {
           A[i][j][v] = counter;
           counter += 1.0;
@@ -72,8 +70,7 @@ main()
   // like VectorizedArray<double> frob_norm = B.norm() -> Maybe a TODO?
   for (unsigned int i = 0; i < dim; ++i)
     for (unsigned int j = 0; j < dim; ++j)
-      for (unsigned int v = 0; v < VectorizedArray<double>::n_array_elements;
-           ++v)
+      for (unsigned int v = 0; v < VectorizedArray<double>::size(); ++v)
         if (B[i][j][v] != 0.0)
           deallog << "Not OK" << std::endl;
 

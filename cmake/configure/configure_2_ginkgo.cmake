@@ -17,23 +17,4 @@
 # Configuration for the Ginkgo library:
 #
 
-MACRO(FEATURE_GINKGO_ERROR_MESSAGE)
-  MESSAGE(FATAL_ERROR "\n"
-    "Could not find Ginkgo and supporting libraries!\n"
-    "Please ensure that the libraries are installed on your computer.\n"
-    "If the libraries are not at a default location, either provide some hints\n"
-    "for the autodetection:\n"
-    "    $ GINKGO_DIR=\"...\" cmake <...>\n"
-    "    $ cmake -DGINKGO_DIR=\"...\" <...>\n"
-    "or set the relevant variables by hand in ccmake.\n"
-    "Relevant hints for GINKGO are GINKGO_DIR.\n"
-    )
-ENDMACRO()
-
-MACRO(FEATURE_GINKGO_CONFIGURE_EXTERNAL)
-  SET(DEAL_II_GINKGO_BUILT_REFERENCE ${GINKGO_BUILT_REFERENCE})
-  SET(DEAL_II_GINKGO_BUILT_OPENMP ${GINKGO_BUILT_OMP})
-  SET(DEAL_II_GINKGO_BUILT_CUDA ${GINKGO_BUILT_CUDA})
-ENDMACRO()
-
 CONFIGURE_FEATURE(GINKGO)

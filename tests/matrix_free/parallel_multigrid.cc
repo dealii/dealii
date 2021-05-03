@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2018 by the deal.II authors
+// Copyright (C) 2014 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -49,7 +49,6 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
 
 
 template <int dim,
@@ -71,7 +70,7 @@ public:
     typename MatrixFree<dim, number>::AdditionalData addit_data;
     addit_data.tasks_parallel_scheme =
       MatrixFree<dim, number>::AdditionalData::none;
-    addit_data.level_mg_handler = level;
+    addit_data.mg_level = level;
 
     // extract the constraints due to Dirichlet boundary conditions
     AffineConstraints<double>                           constraints;
@@ -100,9 +99,7 @@ public:
             const FiniteElement<dim> &fe = cell->get_fe();
             local_dofs.resize(fe.dofs_per_face);
 
-            for (unsigned int face_no = 0;
-                 face_no < GeometryInfo<dim>::faces_per_cell;
-                 ++face_no)
+            for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
               if (cell->at_boundary(face_no) == true)
                 {
                   const typename DoFHandler<dim>::face_iterator face =
@@ -213,10 +210,10 @@ private:
       {
         phi.reinit(cell);
         phi.read_dof_values(src);
-        phi.evaluate(false, true, false);
+        phi.evaluate(EvaluationFlags::gradients);
         for (unsigned int q = 0; q < phi.n_q_points; ++q)
           phi.submit_gradient(phi.get_gradient(q), q);
-        phi.integrate(false, true);
+        phi.integrate(EvaluationFlags::gradients);
         phi.distribute_local_to_global(dst);
       }
   }
@@ -258,10 +255,10 @@ private:
             for (unsigned int j = 0; j < phi.dofs_per_cell; ++j)
               phi.begin_dof_values()[j] = VectorizedArray<number>();
             phi.begin_dof_values()[i] = 1.;
-            phi.evaluate(false, true, false);
+            phi.evaluate(EvaluationFlags::gradients);
             for (unsigned int q = 0; q < phi.n_q_points; ++q)
               phi.submit_gradient(phi.get_gradient(q), q);
-            phi.integrate(false, true);
+            phi.integrate(EvaluationFlags::gradients);
             local_diagonal_vector[i] = phi.begin_dof_values()[i];
           }
         for (unsigned int i = 0; i < phi.tensor_dofs_per_cell; ++i)
@@ -366,8 +363,8 @@ do_test(const DoFHandler<dim> &dof)
   in = 1.;
 
   // set up multigrid in analogy to step-37
-  typedef LaplaceOperator<dim, fe_degree, n_q_points_1d, number>
-    LevelMatrixType;
+  using LevelMatrixType =
+    LaplaceOperator<dim, fe_degree, n_q_points_1d, number>;
 
   MGLevelObject<LevelMatrixType> mg_matrices;
   mg_matrices.resize(0, dof.get_triangulation().n_global_levels() - 1);
@@ -379,14 +376,14 @@ do_test(const DoFHandler<dim> &dof)
     }
 
   MGTransferPrebuiltMF<LevelMatrixType> mg_transfer(mg_matrices);
-  mg_transfer.build_matrices(dof);
+  mg_transfer.build(dof);
 
   MGCoarseIterative<LevelMatrixType, number> mg_coarse;
   mg_coarse.initialize(mg_matrices[0]);
 
-  typedef PreconditionChebyshev<LevelMatrixType,
-                                LinearAlgebra::distributed::Vector<number>>
-    SMOOTHER;
+  using SMOOTHER =
+    PreconditionChebyshev<LevelMatrixType,
+                          LinearAlgebra::distributed::Vector<number>>;
   MGSmootherPrecondition<LevelMatrixType,
                          SMOOTHER,
                          LinearAlgebra::distributed::Vector<number>>
@@ -411,7 +408,7 @@ do_test(const DoFHandler<dim> &dof)
   mg::Matrix<LinearAlgebra::distributed::Vector<double>> mg_matrix(mg_matrices);
 
   Multigrid<LinearAlgebra::distributed::Vector<double>> mg(
-    dof, mg_matrix, mg_coarse, mg_transfer, mg_smoother, mg_smoother);
+    mg_matrix, mg_coarse, mg_transfer, mg_smoother, mg_smoother);
   PreconditionMG<dim,
                  LinearAlgebra::distributed::Vector<double>,
                  MGTransferPrebuiltMF<LevelMatrixType>>
@@ -446,7 +443,7 @@ test()
       FE_Q<dim>       fe(fe_degree);
       DoFHandler<dim> dof(tria);
       dof.distribute_dofs(fe);
-      dof.distribute_mg_dofs(fe);
+      dof.distribute_mg_dofs();
 
       do_test<dim, fe_degree, fe_degree + 1, double>(dof);
     }
@@ -458,12 +455,8 @@ int
 main(int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_init(argc, argv, 1);
-
-  if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
-    {
-      deallog.attach(logfile);
-      deallog << std::setprecision(4);
-    }
+  mpi_initlog();
+  deallog << std::setprecision(4);
 
   {
     deallog.push("2d");

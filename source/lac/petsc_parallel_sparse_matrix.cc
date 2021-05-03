@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2019 by the deal.II authors
+// Copyright (C) 2004 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -376,17 +376,17 @@ namespace PETScWrappers
                ExcMessage(
                  std::string(
                    "Each row has to be owned by exactly one owner (n_rows()=") +
-                 Utilities::to_string(sparsity_pattern.n_rows()) +
+                 std::to_string(sparsity_pattern.n_rows()) +
                  " but sum(local_rows.n_elements())=" +
-                 Utilities::to_string(row_owners) + ")"));
+                 std::to_string(row_owners) + ")"));
         Assert(
           col_owners == sparsity_pattern.n_cols(),
           ExcMessage(
             std::string(
               "Each column has to be owned by exactly one owner (n_cols()=") +
-            Utilities::to_string(sparsity_pattern.n_cols()) +
+            std::to_string(sparsity_pattern.n_cols()) +
             " but sum(local_columns.n_elements())=" +
-            Utilities::to_string(col_owners) + ")"));
+            std::to_string(col_owners) + ")"));
       }
 #  endif
 
@@ -607,6 +607,7 @@ namespace PETScWrappers
         }
     }
 
+#  ifndef DOXYGEN
     // explicit instantiations
     //
     template SparseMatrix::SparseMatrix(const MPI_Comm &,
@@ -671,6 +672,7 @@ namespace PETScWrappers
     SparseMatrix::do_reinit(const IndexSet &,
                             const IndexSet &,
                             const DynamicSparsityPattern &);
+#  endif
 
 
     PetscScalar

@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2009 - 2019 by the deal.II authors
+ * Copyright (C) 2009 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -22,8 +22,6 @@
 // various parts of the program. Most of them have been discussed in
 // previous tutorials already:
 #include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_in.h>
 #include <deal.II/grid/grid_out.h>
@@ -36,7 +34,7 @@
 // specifying <code>-DDEAL_II_WITH_OPENCASCADE=ON</code> and
 // <code>-DOPENCASCADE_DIR=/path/to/your/opencascade/installation</code>
 // when calling <code>cmake</code> during deal.II configuration.
-#include <deal.II/opencascade/boundary_lib.h>
+#include <deal.II/opencascade/manifold_lib.h>
 #include <deal.II/opencascade/utilities.h>
 
 
@@ -231,8 +229,8 @@ namespace Step54
     Triangulation<2, 3>::active_cell_iterator cell = tria.begin_active();
     cell->set_manifold_id(1);
 
-    for (unsigned int f = 0; f < GeometryInfo<2>::faces_per_cell; ++f)
-      cell->face(f)->set_manifold_id(2);
+    for (const auto &face : cell->face_iterators())
+      face->set_manifold_id(2);
 
     // Once both the CAD geometry and the initial mesh have been
     // imported and digested, we use the CAD surfaces and curves to
@@ -262,17 +260,17 @@ namespace Step54
     // The surface projector is created according to what is specified
     // with the @p surface_projection_kind option of the constructor. In particular,
     // if the surface_projection_kind value equals @p NormalProjection, we select the
-    // OpenCASCADE::NormalProjectionBoundary. The new mesh points will
+    // OpenCASCADE::NormalProjectionManifold. The new mesh points will
     // then initially be generated at the barycenter of the cell/edge
     // considered, and then projected on the CAD surface along its
-    // normal direction.  The NormalProjectionBoundary constructor
+    // normal direction.  The NormalProjectionManifold constructor
     // only needs a shape and a tolerance, and we then assign it to
     // the triangulation for use with all parts that manifold having id 1:
     switch (surface_projection_kind)
       {
         case NormalProjection:
           {
-            OpenCASCADE::NormalProjectionBoundary<2, 3> normal_projector(
+            OpenCASCADE::NormalProjectionManifold<2, 3> normal_projector(
               bow_surface, tolerance);
             tria.set_manifold(1, normal_projector);
 
@@ -280,15 +278,15 @@ namespace Step54
           }
 
         // @p If surface_projection_kind value is @p DirectionalProjection, we select the
-        // OpenCASCADE::DirectionalProjectionBoundary class. The new mesh points
+        // OpenCASCADE::DirectionalProjectionManifold class. The new mesh points
         // will then initially be generated at the barycenter of the cell/edge
         // considered, and then projected on the CAD surface along a
         // direction that is specified to the
-        // OpenCASCADE::DirectionalProjectionBoundary constructor. In this case,
+        // OpenCASCADE::DirectionalProjectionManifold constructor. In this case,
         // the projection is done along the y-axis.
         case DirectionalProjection:
           {
-            OpenCASCADE::DirectionalProjectionBoundary<2, 3>
+            OpenCASCADE::DirectionalProjectionManifold<2, 3>
               directional_projector(bow_surface,
                                     Point<3>(0.0, 1.0, 0.0),
                                     tolerance);
@@ -299,16 +297,16 @@ namespace Step54
 
         // As a third option, if @p surface_projection_kind value
         // is @p NormalToMeshProjection, we select the
-        // OpenCASCADE::NormalToMeshProjectionBoundary. The new mesh points will
+        // OpenCASCADE::NormalToMeshProjectionManifold. The new mesh points will
         // again initially be generated at the barycenter of the cell/edge
         // considered, and then projected on the CAD surface along a
         // direction that is an estimate of the mesh normal direction.
-        // The OpenCASCADE::NormalToMeshProjectionBoundary constructor only
+        // The OpenCASCADE::NormalToMeshProjectionManifold constructor only
         // requires a shape (containing at least a face) and a
         // tolerance.
         case NormalToMeshProjection:
           {
-            OpenCASCADE::NormalToMeshProjectionBoundary<2, 3>
+            OpenCASCADE::NormalToMeshProjectionManifold<2, 3>
               normal_to_mesh_projector(bow_surface, tolerance);
             tria.set_manifold(1, normal_to_mesh_projector);
 
@@ -386,33 +384,33 @@ int main()
 {
   try
     {
-      using namespace dealii;
       using namespace Step54;
 
       const std::string in_mesh_filename = "input/initial_mesh_3d.vtk";
       const std::string cad_file_name    = "input/DTMB-5415_bulbous_bow.iges";
 
-      cout << "----------------------------------------------------------"
-           << endl;
-      cout << "Testing projection in direction normal to CAD surface" << endl;
-      cout << "----------------------------------------------------------"
-           << endl;
+      std::cout << "----------------------------------------------------------"
+                << std::endl;
+      std::cout << "Testing projection in direction normal to CAD surface"
+                << std::endl;
+      std::cout << "----------------------------------------------------------"
+                << std::endl;
       std::string        out_mesh_filename = ("3d_mesh_normal_projection");
       TriangulationOnCAD tria_on_cad_norm(in_mesh_filename,
                                           cad_file_name,
                                           out_mesh_filename,
                                           TriangulationOnCAD::NormalProjection);
       tria_on_cad_norm.run();
-      cout << "----------------------------------------------------------"
-           << endl;
-      cout << endl;
-      cout << endl;
+      std::cout << "----------------------------------------------------------"
+                << std::endl;
+      std::cout << std::endl;
+      std::cout << std::endl;
 
-      cout << "----------------------------------------------------------"
-           << endl;
-      cout << "Testing projection in y-axis direction" << endl;
-      cout << "----------------------------------------------------------"
-           << endl;
+      std::cout << "----------------------------------------------------------"
+                << std::endl;
+      std::cout << "Testing projection in y-axis direction" << std::endl;
+      std::cout << "----------------------------------------------------------"
+                << std::endl;
       out_mesh_filename = ("3d_mesh_directional_projection");
       TriangulationOnCAD tria_on_cad_dir(
         in_mesh_filename,
@@ -420,16 +418,17 @@ int main()
         out_mesh_filename,
         TriangulationOnCAD::DirectionalProjection);
       tria_on_cad_dir.run();
-      cout << "----------------------------------------------------------"
-           << endl;
-      cout << endl;
-      cout << endl;
+      std::cout << "----------------------------------------------------------"
+                << std::endl;
+      std::cout << std::endl;
+      std::cout << std::endl;
 
-      cout << "----------------------------------------------------------"
-           << endl;
-      cout << "Testing projection in direction normal to mesh elements" << endl;
-      cout << "----------------------------------------------------------"
-           << endl;
+      std::cout << "----------------------------------------------------------"
+                << std::endl;
+      std::cout << "Testing projection in direction normal to mesh elements"
+                << std::endl;
+      std::cout << "----------------------------------------------------------"
+                << std::endl;
       out_mesh_filename = ("3d_mesh_normal_to_mesh_projection");
       TriangulationOnCAD tria_on_cad_norm_to_mesh(
         in_mesh_filename,
@@ -437,10 +436,10 @@ int main()
         out_mesh_filename,
         TriangulationOnCAD::NormalToMeshProjection);
       tria_on_cad_norm_to_mesh.run();
-      cout << "----------------------------------------------------------"
-           << endl;
-      cout << endl;
-      cout << endl;
+      std::cout << "----------------------------------------------------------"
+                << std::endl;
+      std::cout << std::endl;
+      std::cout << std::endl;
     }
   catch (std::exception &exc)
     {

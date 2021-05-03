@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2018 by the deal.II authors
+// Copyright (C) 2001 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -72,9 +72,9 @@ main()
   // vectors are indeed continuous
   // and pointing radially outward at
   // the vertices
-  const QTrapez<1>   quadrature;
-  const MappingC1<2> c1_mapping;
-  FEFaceValues<2>    c1_values(c1_mapping,
+  const QTrapezoid<1> quadrature;
+  const MappingC1<2>  c1_mapping;
+  FEFaceValues<2>     c1_values(c1_mapping,
                             fe,
                             quadrature,
                             update_quadrature_points | update_normal_vectors);
@@ -91,7 +91,7 @@ main()
   for (DoFHandler<2>::active_cell_iterator cell = dof_handler.begin_active();
        cell != dof_handler.end();
        ++cell)
-    for (unsigned int f = 0; f < GeometryInfo<2>::faces_per_cell; ++f)
+    for (const unsigned int f : GeometryInfo<2>::face_indices())
       if (cell->face(f)->at_boundary())
         {
           c1_values.reinit(cell, f);
@@ -100,7 +100,7 @@ main()
           // there should now be two
           // normal vectors, one for
           // each vertex of the face
-          Assert(c1_values.get_all_normal_vectors().size() == 2,
+          Assert(c1_values.get_normal_vectors().size() == 2,
                  ExcInternalError());
 
           // check that these two

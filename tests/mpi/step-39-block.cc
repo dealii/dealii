@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2018 by the deal.II authors
+// Copyright (C) 2010 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -62,8 +62,6 @@
 
 namespace Step39
 {
-  using namespace dealii;
-
   Functions::SlitSingularityFunction<2> exact_solution;
 
 
@@ -397,7 +395,7 @@ namespace Step39
   class InteriorPenaltyProblem
   {
   public:
-    typedef MeshWorker::IntegrationInfo<dim> CellInfo;
+    using CellInfo = MeshWorker::IntegrationInfo<dim>;
 
     InteriorPenaltyProblem(const FiniteElement<dim> &fe);
 
@@ -462,7 +460,7 @@ namespace Step39
   InteriorPenaltyProblem<dim>::setup_system()
   {
     dof_handler.distribute_dofs(fe);
-    dof_handler.distribute_mg_dofs(fe);
+    dof_handler.distribute_mg_dofs();
 
     DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_set);
     solution.reinit(dof_handler.locally_owned_dofs(), MPI_COMM_WORLD);
@@ -478,11 +476,11 @@ namespace Step39
 
     const unsigned int n_levels = triangulation.n_global_levels();
     mg_matrix.resize(0, n_levels - 1);
-    mg_matrix.clear();
+    mg_matrix.clear_elements();
     mg_matrix_dg_up.resize(0, n_levels - 1);
-    mg_matrix_dg_up.clear();
+    mg_matrix_dg_up.clear_elements();
     mg_matrix_dg_down.resize(0, n_levels - 1);
-    mg_matrix_dg_down.clear();
+    mg_matrix_dg_down.clear_elements();
 
     for (unsigned int level = mg_matrix.min_level();
          level <= mg_matrix.max_level();
@@ -630,21 +628,22 @@ namespace Step39
     SolverCG<TrilinosWrappers::MPI::Vector> solver(control);
 
     MGTransferPrebuilt<TrilinosWrappers::MPI::Vector> mg_transfer;
-    mg_transfer.build_matrices(dof_handler);
+    mg_transfer.build(dof_handler);
 
     SolverControl coarse_solver_control(1000, 1e-10, false, false);
     SolverCG<TrilinosWrappers::MPI::Vector> coarse_solver(
       coarse_solver_control);
     PreconditionIdentity            identity;
     TrilinosWrappers::SparseMatrix &coarse_matrix = mg_matrix[0];
-    MGCoarseGridLACIteration<SolverCG<TrilinosWrappers::MPI::Vector>,
-                             TrilinosWrappers::MPI::Vector>
+    MGCoarseGridIterativeSolver<TrilinosWrappers::MPI::Vector,
+                                SolverCG<TrilinosWrappers::MPI::Vector>,
+                                TrilinosWrappers::SparseMatrix,
+                                PreconditionIdentity>
       coarse_grid_solver(coarse_solver, coarse_matrix, identity);
 
-    typedef RelaxationBlockJacobi<TrilinosWrappers::SparseMatrix,
-                                  double,
-                                  TrilinosWrappers::MPI::Vector>
-      Smoother;
+    using Smoother = RelaxationBlockJacobi<TrilinosWrappers::SparseMatrix,
+                                           double,
+                                           TrilinosWrappers::MPI::Vector>;
 
     MGLevelObject<typename Smoother::AdditionalData> smoother_data;
     smoother_data.resize(0, triangulation.n_levels() - 1);
@@ -684,12 +683,8 @@ namespace Step39
     mg::Matrix<TrilinosWrappers::MPI::Vector> mgdown(mg_matrix_dg_down);
     mg::Matrix<TrilinosWrappers::MPI::Vector> mgup(mg_matrix_dg_up);
 
-    Multigrid<TrilinosWrappers::MPI::Vector> mg(dof_handler,
-                                                mgmatrix,
-                                                coarse_grid_solver,
-                                                mg_transfer,
-                                                mg_smoother,
-                                                mg_smoother);
+    Multigrid<TrilinosWrappers::MPI::Vector> mg(
+      mgmatrix, coarse_grid_solver, mg_transfer, mg_smoother, mg_smoother);
     mg.set_edge_flux_matrices(mgdown, mgup);
 
     PreconditionMG<dim,
@@ -817,7 +812,6 @@ namespace Step39
 int
 main(int argc, char *argv[])
 {
-  using namespace dealii;
   using namespace Step39;
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization(

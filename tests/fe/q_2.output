@@ -17,7 +17,7 @@ DEAL::0 100.00 0
 DEAL::-12.50 37.50 75.00
 DEAL::
 DEAL::
-DEAL::FE_Q<1>(QIterated(QTrapez(),3))
+DEAL::FE_Q<1>(QIterated(QTrapezoid(),3))
 DEAL::100.00 0 0 0
 DEAL::-6.25 -6.25 56.25 56.25
 DEAL::31.25 6.25 93.75 -31.25
@@ -29,7 +29,7 @@ DEAL::0 0 0 100.00
 DEAL::6.25 31.25 -31.25 93.75
 DEAL::
 DEAL::
-DEAL::FE_Q<1>(QIterated(QTrapez(),4))
+DEAL::FE_Q<1>(QIterated(QTrapezoid(),4))
 DEAL::100.00 0 0 0 0
 DEAL::0 0 0 100.00 0
 DEAL::27.34 -3.91 109.38 -54.69 21.88
@@ -121,7 +121,7 @@ DEAL::0 0 -12.50 37.50 0 0 0 75.00 0
 DEAL::1.56 -4.69 -4.69 14.06 -9.38 28.12 -9.38 28.12 56.25
 DEAL::
 DEAL::
-DEAL::FE_Q<2>(QIterated(QTrapez(),3))
+DEAL::FE_Q<2>(QIterated(QTrapezoid(),3))
 DEAL::100.00 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 DEAL::-6.25 -6.25 0 0 0 0 0 0 56.25 56.25 0 0 0 0 0 0
 DEAL::-6.25 0 -6.25 0 56.25 56.25 0 0 0 0 0 0 0 0 0 0

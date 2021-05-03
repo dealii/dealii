@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,16 +17,5 @@
 
 for (deal_II_dimension : DIMENSIONS)
   {
-    template class FE_PolyTensor<PolynomialsRaviartThomas<deal_II_dimension>,
-                                 deal_II_dimension>;
-    template class FE_PolyTensor<PolynomialsRT_Bubbles<deal_II_dimension>,
-                                 deal_II_dimension>;
-    template class FE_PolyTensor<PolynomialsABF<deal_II_dimension>,
-                                 deal_II_dimension>;
-    template class FE_PolyTensor<PolynomialsBernardiRaugel<deal_II_dimension>,
-                                 deal_II_dimension>;
-    template class FE_PolyTensor<PolynomialsBDM<deal_II_dimension>,
-                                 deal_II_dimension>;
-    template class FE_PolyTensor<PolynomialsNedelec<deal_II_dimension>,
-                                 deal_II_dimension>;
+    template class FE_PolyTensor<deal_II_dimension, deal_II_dimension>;
   }

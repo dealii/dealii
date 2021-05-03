@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,11 +16,6 @@
 
 
 // a un-hp-ified version of hp/step-14
-
-
-#include "../tests.h"
-std::ofstream logfile("output");
-
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
@@ -135,9 +130,7 @@ namespace Evaluation
                                                    endc = dof_handler.end();
     bool evaluation_point_found                         = false;
     for (; (cell != endc) && !evaluation_point_found; ++cell)
-      for (unsigned int vertex = 0;
-           vertex < GeometryInfo<dim>::vertices_per_cell;
-           ++vertex)
+      for (const unsigned int vertex : GeometryInfo<dim>::vertex_indices())
         if (cell->vertex(vertex).distance(evaluation_point) <
             cell->diameter() * 1e-8)
           {
@@ -190,7 +183,7 @@ namespace Evaluation
   {
     double point_derivative = 0;
 
-    QTrapez<dim>                vertex_quadrature;
+    QTrapezoid<dim>             vertex_quadrature;
     FEValues<dim>               fe_values(dof_handler.get_fe(),
                             vertex_quadrature,
                             update_gradients | update_quadrature_points);
@@ -201,9 +194,7 @@ namespace Evaluation
                                                    endc = dof_handler.end();
     unsigned int evaluation_point_hits                  = 0;
     for (; cell != endc; ++cell)
-      for (unsigned int vertex = 0;
-           vertex < GeometryInfo<dim>::vertices_per_cell;
-           ++vertex)
+      for (const unsigned int vertex : GeometryInfo<dim>::vertex_indices())
         if (cell->vertex(vertex) == evaluation_point)
           {
             fe_values.reinit(cell);
@@ -438,7 +429,7 @@ namespace LaplaceSolver
   void
   Solver<dim>::assemble_linear_system(LinearSystem &linear_system)
   {
-    typedef typename DoFHandler<dim>::active_cell_iterator active_cell_iterator;
+    using active_cell_iterator = typename DoFHandler<dim>::active_cell_iterator;
 
     const unsigned int n_threads = MultithreadInfo::n_threads();
     std::vector<std::pair<active_cell_iterator, active_cell_iterator>>
@@ -1024,7 +1015,7 @@ namespace Data
   template <int dim>
   struct Exercise_2_3
   {
-    typedef Functions::ZeroFunction<dim> BoundaryValues;
+    using BoundaryValues = Functions::ZeroFunction<dim>;
 
     class RightHandSide : public Functions::ConstantFunction<dim>
     {
@@ -1087,7 +1078,7 @@ namespace Data
     std::vector<CellData<dim>> cells(n_cells, CellData<dim>());
     for (unsigned int i = 0; i < n_cells; ++i)
       {
-        for (unsigned int j = 0; j < GeometryInfo<dim>::vertices_per_cell; ++j)
+        for (const unsigned int j : GeometryInfo<dim>::vertex_indices())
           cells[i].vertices[j] = cell_vertices[i][j];
         cells[i].material_id = 0;
       };
@@ -1150,9 +1141,7 @@ namespace DualFunctional
                                                      dof_handler.begin_active(),
                                                    endc = dof_handler.end();
     for (; cell != endc; ++cell)
-      for (unsigned int vertex = 0;
-           vertex < GeometryInfo<dim>::vertices_per_cell;
-           ++vertex)
+      for (const unsigned int vertex : GeometryInfo<dim>::vertex_indices())
         if (cell->vertex(vertex).distance(evaluation_point) <
             cell->diameter() * 1e-8)
           {
@@ -1365,10 +1354,10 @@ namespace LaplaceSolver
     void
     solve_dual_problem();
 
-    typedef typename DoFHandler<dim>::active_cell_iterator active_cell_iterator;
+    using active_cell_iterator = typename DoFHandler<dim>::active_cell_iterator;
 
-    typedef typename std::map<typename DoFHandler<dim>::face_iterator, double>
-      FaceIntegrals;
+    using FaceIntegrals =
+      typename std::map<typename DoFHandler<dim>::face_iterator, double>;
 
     struct CellData
     {
@@ -1638,9 +1627,7 @@ namespace LaplaceSolver
     for (active_cell_iterator cell = dual_solver.dof_handler.begin_active();
          cell != dual_solver.dof_handler.end();
          ++cell)
-      for (unsigned int face_no = 0;
-           face_no < GeometryInfo<dim>::faces_per_cell;
-           ++face_no)
+      for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
         face_integrals[cell->face(face_no)] = -1e20;
 
     error_indicators.reinit(
@@ -1661,9 +1648,7 @@ namespace LaplaceSolver
     for (active_cell_iterator cell = dual_solver.dof_handler.begin_active();
          cell != dual_solver.dof_handler.end();
          ++cell, ++present_cell)
-      for (unsigned int face_no = 0;
-           face_no < GeometryInfo<dim>::faces_per_cell;
-           ++face_no)
+      for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
         {
           Assert(face_integrals.find(cell->face(face_no)) !=
                    face_integrals.end(),
@@ -1717,9 +1702,7 @@ namespace LaplaceSolver
                             cell_data,
                             error_indicators);
 
-        for (unsigned int face_no = 0;
-             face_no < GeometryInfo<dim>::faces_per_cell;
-             ++face_no)
+        for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
           {
             if (cell->face(face_no)->at_boundary())
               {
@@ -1918,8 +1901,8 @@ template <int dim>
 struct Framework
 {
 public:
-  typedef Evaluation::EvaluationBase<dim> Evaluator;
-  typedef std::list<Evaluator *>          EvaluatorList;
+  using Evaluator     = Evaluation::EvaluationBase<dim>;
+  using EvaluatorList = std::list<Evaluator *>;
 
 
   struct ProblemDescription
@@ -2072,6 +2055,7 @@ Framework<dim>::run(const ProblemDescription &descriptor)
 int
 main()
 {
+  std::ofstream logfile("output");
   try
     {
       deallog << std::setprecision(2);

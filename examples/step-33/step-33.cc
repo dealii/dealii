@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2007 - 2019 by the deal.II authors
+ * Copyright (C) 2007 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -36,12 +36,9 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_refinement.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_in.h>
 
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_values.h>
@@ -207,10 +204,10 @@ namespace Step33
     // the function with different input vector data types, so we templatize
     // on it as well:
     template <typename InputVector>
-    static void compute_flux_matrix(
-      const InputVector &                            W,
-      std::array<std::array<typename InputVector::value_type, dim>,
-                 EulerEquations<dim>::n_components> &flux)
+    static void compute_flux_matrix(const InputVector &W,
+                                    ndarray<typename InputVector::value_type,
+                                            EulerEquations<dim>::n_components,
+                                            dim> &     flux)
     {
       // First compute the pressure that appears in the flux matrix, and then
       // compute the first <code>dim</code> columns of the matrix that
@@ -253,8 +250,9 @@ namespace Step33
       const double                                                alpha,
       std::array<typename InputVector::value_type, n_components> &normal_flux)
     {
-      std::array<std::array<typename InputVector::value_type, dim>,
-                 EulerEquations<dim>::n_components>
+      ndarray<typename InputVector::value_type,
+              EulerEquations<dim>::n_components,
+              dim>
         iflux, oflux;
 
       compute_flux_matrix(Wplus, iflux);
@@ -447,7 +445,7 @@ namespace Step33
                                   const Vector<double> & solution,
                                   Vector<double> &       refinement_indicators)
     {
-      const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
+      const unsigned int dofs_per_cell = dof_handler.get_fe().n_dofs_per_cell();
       std::vector<unsigned int> dofs(dofs_per_cell);
 
       const QMidpoint<dim> quadrature_formula;
@@ -1359,7 +1357,7 @@ namespace Step33
     // only prints something if verbose output has been requested) deals with
     // the interface we have in this program to the Trilinos library that
     // provides us with linear solvers. Similarly to including PETSc matrices
-    // in step-17, step-18, and step-19, all we need to do is to create a
+    // in step-17 and step-18, all we need to do is to create a
     // Trilinos sparse matrix instead of the standard deal.II class. The
     // system matrix is used for the Jacobian in each Newton step. Since we do
     // not intend to run this program in parallel (which wouldn't be too hard
@@ -1439,16 +1437,17 @@ namespace Step33
   template <int dim>
   void ConservationLaw<dim>::assemble_system()
   {
-    const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
+    const unsigned int dofs_per_cell = dof_handler.get_fe().n_dofs_per_cell();
 
     std::vector<types::global_dof_index> dof_indices(dofs_per_cell);
     std::vector<types::global_dof_index> dof_indices_neighbor(dofs_per_cell);
 
     const UpdateFlags update_flags = update_values | update_gradients |
-                                     update_q_points | update_JxW_values,
-                      face_update_flags = update_values | update_q_points |
-                                          update_JxW_values |
-                                          update_normal_vectors,
+                                     update_quadrature_points |
+                                     update_JxW_values,
+                      face_update_flags =
+                        update_values | update_quadrature_points |
+                        update_JxW_values | update_normal_vectors,
                       neighbor_face_update_flags = update_values;
 
     FEValues<dim>        fe_v(mapping, fe, quadrature, update_flags);
@@ -1485,9 +1484,7 @@ namespace Step33
         // whether we are working on an external or internal face; if it is an
         // external face, the fourth argument denoting the degrees of freedom
         // indices of the neighbor is ignored, so we pass an empty vector):
-        for (unsigned int face_no = 0;
-             face_no < GeometryInfo<dim>::faces_per_cell;
-             ++face_no)
+        for (const auto face_no : cell->face_indices())
           if (cell->at_boundary(face_no))
             {
               fe_v_face.reinit(cell, face_no);
@@ -1554,8 +1551,7 @@ namespace Step33
                       Assert(neighbor_child->face(neighbor2) ==
                                cell->face(face_no)->child(subface_no),
                              ExcInternalError());
-                      Assert(neighbor_child->has_children() == false,
-                             ExcInternalError());
+                      Assert(neighbor_child->is_active(), ExcInternalError());
 
                       fe_v_subface.reinit(cell, face_no, subface_no);
                       fe_v_face_neighbor.reinit(neighbor_child, neighbor2);
@@ -1778,12 +1774,12 @@ namespace Step33
     // terms of autodifferentiation variables, so that the Jacobian
     // contributions can later easily be computed from it:
 
-    std::vector<std::array<std::array<Sacado::Fad::DFad<double>, dim>,
-                           EulerEquations<dim>::n_components>>
+    std::vector<ndarray<Sacado::Fad::DFad<double>,
+                        EulerEquations<dim>::n_components,
+                        dim>>
       flux(n_q_points);
 
-    std::vector<
-      std::array<std::array<double, dim>, EulerEquations<dim>::n_components>>
+    std::vector<ndarray<double, EulerEquations<dim>::n_components, dim>>
       flux_old(n_q_points);
 
     std::vector<

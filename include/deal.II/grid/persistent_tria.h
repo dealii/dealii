@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2018 by the deal.II authors
+// Copyright (C) 1999 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -103,7 +103,6 @@ DEAL_II_NAMESPACE_OPEN
  * restore().
  *
  * @ingroup grid
- * @author Wolfgang Bangerth, 1999
  */
 template <int dim, int spacedim = dim>
 class PersistentTriangulation : public Triangulation<dim, spacedim>
@@ -203,11 +202,22 @@ public:
                        const SubCellData &subcelldata) override;
 
   /**
+   * @copydoc Triangulation::create_triangulation()
+   *
+   * @note Not implemented yet.
+   */
+  virtual void
+  create_triangulation(
+    const TriangulationDescription::Description<dim, spacedim>
+      &construction_data) override;
+
+  /**
    * An overload of the respective function of the base class.
    *
    * Throw an error, since this function is not useful in the context of this
    * class.
    */
+  DEAL_II_DEPRECATED_EARLY
   virtual void
   create_triangulation_compatibility(
     const std::vector<Point<spacedim>> &vertices,

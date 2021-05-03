@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,26 +22,42 @@ DEAL_II_NAMESPACE_OPEN
 #ifndef DOXYGEN
 
 template <int dim>
-const SymmetricTensor<2, dim>
-  Physics::Elasticity::StandardTensors<dim>::I = unit_symmetric_tensor<dim>();
+DEAL_II_CONSTEXPR const SymmetricTensor<2, dim>
+                        Physics::Elasticity::StandardTensors<dim>::I
+#  ifdef DEAL_II_CXX14_CONSTEXPR_BUG
+  = unit_symmetric_tensor<dim>()
+#  endif
+  ;
 
 
 
 template <int dim>
-const SymmetricTensor<4, dim>
-  Physics::Elasticity::StandardTensors<dim>::S = identity_tensor<dim>();
+DEAL_II_CONSTEXPR const SymmetricTensor<4, dim>
+                        Physics::Elasticity::StandardTensors<dim>::S
+#  ifdef DEAL_II_CXX14_CONSTEXPR_BUG
+  = identity_tensor<dim>()
+#  endif
+  ;
 
 
 
 template <int dim>
-const SymmetricTensor<4, dim> Physics::Elasticity::StandardTensors<dim>::IxI =
-  outer_product(unit_symmetric_tensor<dim>(), unit_symmetric_tensor<dim>());
+DEAL_II_CONSTEXPR const SymmetricTensor<4, dim>
+                        Physics::Elasticity::StandardTensors<dim>::IxI
+#  ifdef DEAL_II_CXX14_CONSTEXPR_BUG
+  = outer_product(unit_symmetric_tensor<dim>(), unit_symmetric_tensor<dim>())
+#  endif
+  ;
 
 
 
 template <int dim>
-const SymmetricTensor<4, dim>
-  Physics::Elasticity::StandardTensors<dim>::dev_P = deviator_tensor<dim>();
+DEAL_II_CONSTEXPR const SymmetricTensor<4, dim>
+                        Physics::Elasticity::StandardTensors<dim>::dev_P
+#  ifdef DEAL_II_CXX14_CONSTEXPR_BUG
+  = deviator_tensor<dim>()
+#  endif
+  ;
 
 #endif // DOXYGEN
 

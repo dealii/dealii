@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -72,7 +72,6 @@ namespace MeshWorker
    * initialize() in this class.
    *
    * @ingroup MeshWorker
-   * @author Guido Kanschat, 2009
    */
   template <int dim, int spacedim = dim>
   class IntegrationInfo
@@ -293,7 +292,6 @@ namespace MeshWorker
    * correctly, typically in an IntegrationInfoBox.
    *
    * @ingroup MeshWorker
-   * @author Guido Kanschat, 2009
    */
   template <int dim, int spacedim = dim>
   class IntegrationInfoBox
@@ -686,7 +684,7 @@ namespace MeshWorker
   inline const FEValuesBase<dim, spacedim> &
   IntegrationInfo<dim, spacedim>::fe_values(unsigned int i) const
   {
-    Assert(i < fevalv.size(), ExcIndexRange(i, 0, fevalv.size()));
+    AssertIndexRange(i, fevalv.size());
     return *fevalv[i];
   }
 

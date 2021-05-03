@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -73,11 +73,11 @@ main(int argc, char **argv)
           << triangulation.n_locally_owned_active_cells() << std::endl;
 
   FE_DGQ<2>     fe_0(0);
-  DoFHandler<2> dof_handler_0;
+  DoFHandler<2> dof_handler_0(triangulation);
   FE_Q<2>       fe_1(1);
-  DoFHandler<2> dof_handler_1;
-  dof_handler_0.initialize(triangulation, fe_0);
-  dof_handler_1.initialize(triangulation, fe_1);
+  DoFHandler<2> dof_handler_1(triangulation);
+  dof_handler_0.distribute_dofs(fe_0);
+  dof_handler_1.distribute_dofs(fe_1);
 
   IndexSet locally_relevant_dofs_0;
   IndexSet locally_relevant_dofs_1;
@@ -155,7 +155,7 @@ main(int argc, char **argv)
   dynamic_sparsity_pattern.print(deallog.get_file_stream());
   SparsityTools::distribute_sparsity_pattern(
     dynamic_sparsity_pattern,
-    dof_handler_0.n_locally_owned_dofs_per_processor(),
+    dof_handler_0.locally_owned_dofs(),
     MPI_COMM_WORLD,
     dof_handler_0.locally_owned_dofs());
   dynamic_sparsity_pattern.print(deallog.get_file_stream());

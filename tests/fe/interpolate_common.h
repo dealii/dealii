@@ -15,6 +15,7 @@
 
 
 #include <deal.II/base/function.h>
+#include <deal.II/base/function_lib.h>
 #include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/fe/fe.h>
@@ -145,4 +146,69 @@ public:
           }
       }
   }
+};
+
+
+// Local implementation of an alternative test function
+
+
+template <int dim, int degree, int COMP = 1>
+class PolynomialFunction : public Function<dim>
+{
+public:
+  PolynomialFunction()
+    : Function<dim>(COMP)
+  {
+    Table<2, double> exponents(degree, dim);
+    for (unsigned int i = 0; i < degree; ++i)
+      for (unsigned int d = 0; d < dim; ++d)
+        exponents[i][d] = i + d;
+    std::vector<double> coeffs(degree);
+    for (unsigned int i = 0; i < degree; ++i)
+      coeffs[i] = std::pow(-1.0, static_cast<double>(i)) * (i + 1);
+    poly = std::make_unique<Functions::Polynomial<dim>>(
+      Functions::Polynomial<dim>(exponents, coeffs));
+  }
+
+  double
+  value(const Point<dim> &p, const unsigned int c) const
+  {
+    return poly->value(p, 0) + c;
+  }
+
+  void
+  value_list(const std::vector<Point<dim>> &points,
+             std::vector<double> &          values,
+             const unsigned int             c) const
+  {
+    Assert(values.size() == points.size(),
+           ExcDimensionMismatch(values.size(), points.size()));
+
+    for (unsigned int i = 0; i < points.size(); ++i)
+      {
+        const Point<dim> &p = points[i];
+
+        values[i] = poly->value(p, 0) + c;
+      }
+  }
+
+  void
+  vector_value_list(const std::vector<Point<dim>> &points,
+                    std::vector<Vector<double>> &  values) const
+  {
+    Assert(values.size() == points.size(),
+           ExcDimensionMismatch(values.size(), points.size()));
+    Assert(values[0].size() == this->n_components,
+           ExcDimensionMismatch(values.size(), this->n_components));
+
+    for (unsigned int i = 0; i < points.size(); ++i)
+      {
+        const Point<dim> &p = points[i];
+        for (unsigned int c = 0; c < COMP; ++c)
+          values[i](c) = poly->value(p, 0);
+      }
+  }
+
+private:
+  std::unique_ptr<Functions::Polynomial<dim>> poly;
 };

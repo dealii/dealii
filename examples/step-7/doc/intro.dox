@@ -8,7 +8,8 @@ In this program, we will mainly consider two aspects:
   <li> Non-homogeneous Neumann boundary conditions for the Helmholtz equation.
 </ol>
 Besides these topics, again a variety of improvements and tricks will be
-shown. 
+shown.
+
 
 <h3>Verification of correctness</h3>
 
@@ -22,6 +23,8 @@ converges to zero with the right order of convergence, this is already a good
 indication of correctness, although there may be other sources of error
 persisting which have only a small contribution to the total error or are of
 higher order. In the context of finite element simulations, this technique
+of picking the solution by choosing appropriate right hand sides and
+boundary conditions
 is often called the <i>Method of Manufactured Solution</i>.
 
 In this example, we will not go into the theories of systematic software
@@ -29,35 +32,17 @@ verification which is a very complicated problem. Rather we will demonstrate
 the tools which deal.II can offer in this respect. This is basically centered
 around the functionality of a single function, VectorTools::integrate_difference().
 This function computes the difference between a given continuous function and
-a finite element field in various norms on each cell. At the time of writing
-this tutorial program, the norms this function can compute are the following,
-where $u$ denotes the continuous function
-and $u_h$ the finite element field, and $K$ is an element of the
-triangulation:
-@f{eqnarray*}
-  {\| u-u_h \|}_{L_1(K)} &=& \int_K |u-u_h| \; dx,
-  \\
-  {\| u-u_h \|}_{L_2(K)} &=& \left( \int_K |u-u_h|^2 \; dx \right)^{1/2},
-  \\
-  {\| u-u_h \|}_{L_\infty(K)} &=& \max_{x  \in K} |u(x) - u_h(x)|,
-  \\
-  {| u-u_h |}_{H^1(K)} &=& \left( \int_K |\nabla(u-u_h)|^2 \; dx \right)^{1/2},
-  \\
-  {\| u-u_h \|}_{H^1(K)} &=& \left( {\| u-u_h \|}^2_{L_2(K)} 
-                                   +{| u-u_h |}^2_{H^1(K)}    \right)^{1/2}.
-@f}
-(All these norms and semi-norms can also be evaluated with weighting functions,
-for example in order to exclude singularities from the determination of the
-global error, and the function also works for vector-valued functions.) Of
-course, like with any other integral, we can only evaluate these norms using quadrature formulas;
+a finite element field in various norms on each cell.
+Of course, like with any other integral, we can only evaluate these norms using quadrature formulas;
 the choice of the right quadrature formula is therefore crucial to the
 accurate evaluation of the error. This holds in particular for the $L_\infty$
 norm, where we evaluate the maximal deviation of numerical and exact solution
 only at the quadrature points; one should then not try to use a quadrature
-rule with points only at points where super-convergence might occur, such as
+rule whose evaluation occurs only at points where
+[super-convergence](https://en.wikipedia.org/wiki/Superconvergence) might occur, such as
 the Gauss points of the lowest-order Gauss quadrature formula for which the
 integrals in the assembly of the matrix is correct (e.g., for linear elements,
-do not use the QGauss(2) quadrature formula). In fact, this is generally good 
+do not use the QGauss(2) quadrature formula). In fact, this is generally good
 advice also for the other norms: if your quadrature points are fortuitously
 chosen at locations where the error happens to be particularly small due to
 superconvergence, the computed error will look like it is much smaller than
@@ -68,11 +53,12 @@ error norms than for the assembly of the linear system.
 The function VectorTools::integrate_difference() evaluates the desired norm on each
 cell $K$ of the triangulation and returns a vector which holds these
 values for each cell. From the local values, we can then obtain the global error. For
-example, if the vector $(e_i)$ contains the local $L_2$ norms, then
+example, if the vector $\mathbf e$ with element $e_K$ for all cells
+$K$ contains the local $L_2$ norms $\|u-u_h\|_K$, then
 @f[
-  E = \| {\mathbf e} \| = \left( \sum_i e_i^2 \right)^{1/2}
+  E = \| {\mathbf e} \| = \left( \sum_K e_K^2 \right)^{1/2}
 @f]
-is the global $L_2$ error.
+is the global $L_2$ error $E=\|u-u_h\|_\Omega$.
 
 In the program, we will show how to evaluate and use these quantities, and we
 will monitor their values under mesh refinement. Of course, we have to choose
@@ -101,27 +87,38 @@ Before we go into programming, let's have a brief look at the mathematical
 formulation. The equation that we want to solve here is the Helmholtz equation
 "with the nice sign":
 @f[
-  -\Delta u + u = f,
+  -\Delta u + \alpha u = f,
 @f]
-on the square $[-1,1]^2$, augmented by boundary conditions
+on the square $[-1,1]^2$ with $\alpha=1$, augmented by Dirichlet boundary conditions
 @f[
   u = g_1
 @f]
-on some part $\Gamma_1$ of the boundary $\Gamma$, and
+on some part $\Gamma_1$ of the boundary $\Gamma$, and Neumann conditions
 @f[
   {\mathbf n}\cdot \nabla u = g_2
 @f]
 on the rest $\Gamma_2 = \Gamma \backslash \Gamma_1$.
-In our particular testcase, we will use $\Gamma_1=\Gamma \cap\{\{x=1\} \cup \{y=1\}\}$.
+In our particular testcase, we will use $\Gamma_1=\Gamma \cap\{\{x=1\}
+\cup \{y=1\}\}$.
+(We say that this equation has the "nice sign" because the operator
+$-\Delta + \alpha I$ with the identity $I$ and $\alpha>0$ is a positive definite
+operator; the <a
+href="https://en.wikipedia.org/wiki/Helmholtz_equation">equation with
+the "bad sign"</a> is $-\Delta u - \alpha u$ and results from modeling
+time-harmonic processes. The operator is not positive
+definite if $\alpha>0$ is large, and this leads to all sorts of issues
+we need not discuss here. The operator may also not be invertible --
+i.e., the equation does not have a unique solution -- if $\alpha$
+happens to be one of the eigenvalues of $-\Delta$.)
 
 Because we want to verify the convergence of our numerical solution $u_h$,
 we want a setup so that we know the exact solution $u$. This is where
-the Method of Manufactured Solutions comes in. To this end, let us 
+the Method of Manufactured Solutions comes in. To this end, let us
 choose a function
 @f[
   \bar u(x) = \sum_{i=1}^3 \exp\left(-\frac{|x-x_i|^2}{\sigma^2}\right)
 @f]
-where the centers $x_i$ of the exponentials are 
+where the centers $x_i$ of the exponentials are
   $x_1=(-\frac 12,\frac 12)$,
   $x_2=(-\frac 12,-\frac 12)$, and
   $x_3=(\frac 12,-\frac 12)$,
@@ -139,18 +136,18 @@ particular way, we have manufactured ourselves a problem to which we
 know the solution. This allows us then to compute the error of our
 numerical solution. In the code below, we represent $\bar u$ by the
 <code>Solution</code> class, and other classes will be used to
-denote $\bar u|_{\Gamma_1}$ and ${\mathbf n}\cdot \nabla\bar u|_{\Gamma_2}$.
+denote $\bar u|_{\Gamma_1}=g_1$ and ${\mathbf n}\cdot \nabla\bar u|_{\Gamma_2}=g_2$.
 
 Using the above definitions, we can state the weak formulation of the
 equation, which reads: find $u\in H^1_g=\{v\in H^1: v|_{\Gamma_1}=g_1\}$ such
 that
 @f[
-  {(\nabla u, \nabla v)}_\Omega + {(u,v)}_\Omega
+  {(\nabla v, \nabla u)}_\Omega + {(v,u)}_\Omega
   =
-  {(f,v)}_\Omega + {(g_2,v)}_{\Gamma_2}
+  {(v,f)}_\Omega + {(v,g_2)}_{\Gamma_2}
 @f]
 for all test functions $v\in H^1_0=\{v\in H^1: v|_{\Gamma_1}=0\}$. The
-boundary term ${(g_2,v)}_{\Gamma_2}$ has appeared by integration by parts and
+boundary term ${(v,g_2)}_{\Gamma_2}$ has appeared by integration by parts and
 using $\partial_n u=g_2$ on $\Gamma_2$ and $v=0$ on $\Gamma_1$. The cell
 matrices and vectors which we use to build the global matrices and right hand
 side vectors in the discrete formulation therefore look like this:
@@ -158,8 +155,8 @@ side vectors in the discrete formulation therefore look like this:
   A_{ij}^K &=& \left(\nabla \varphi_i, \nabla \varphi_j\right)_K
               +\left(\varphi_i, \varphi_j\right)_K,
   \\
-  f_i^K &=& \left(f,\varphi_i\right)_K
-           +\left(g_2, \varphi_i\right)_{\partial K\cap \Gamma_2}.
+  F_i^K &=& \left(\varphi_i, f\right)_K
+           +\left(\varphi_i, g_2\right)_{\partial K\cap \Gamma_2}.
 @f}
 Since the generation of the domain integrals has been shown in previous
 examples several times, only the generation of the contour integral is of
@@ -204,7 +201,7 @@ to this program (with the exception of <code>main()</code>, which must be in
 the global namespace) into it, and only close it at the bottom of the file. In
 other words, the structure of the program is of the kind
 @code
-  ... #includes
+  #includes ...
 
   namespace Step7
   {

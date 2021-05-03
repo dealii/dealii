@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2019 by the deal.II authors
+// Copyright (C) 2010 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -55,11 +55,11 @@ test_vertices_orientation(
       face = surface_to_volume_mapping[cell];
 
       deallog << "Surface cell: " << cell << " with vertices:" << std::endl;
-      for (unsigned int k = 0; k < GeometryInfo<s_dim>::vertices_per_cell; ++k)
+      for (const unsigned int k : GeometryInfo<s_dim>::vertex_indices())
         deallog << "  " << cell->vertex(k) << std::endl;
 
       deallog << "Volume face: " << face << " with vertices:" << std::endl;
-      for (unsigned int k = 0; k < GeometryInfo<s_dim>::vertices_per_cell; ++k)
+      for (const unsigned int k : GeometryInfo<s_dim>::vertex_indices())
         deallog << "  " << face->vertex(k) << std::endl;
 
       Point<spacedim> diff(face->center());
@@ -81,8 +81,7 @@ save_mesh(const Triangulation<dim, spacedim> &tria)
 int
 main()
 {
-  ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
 
   {

@@ -49,9 +49,6 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @note This class is, in all reality, nothing more than a different name for
  * calling MappingQGeneric with a polynomial degree of one as argument.
- *
- * @author Guido Kanschat, 2000, 2001; Ralf Hartmann, 2000, 2001, 2005,
- * Wolfgang Bangerth, 2015
  */
 template <int dim, int spacedim = dim>
 class MappingQ1 : public MappingQGeneric<dim, spacedim>
@@ -83,6 +80,12 @@ public:
  * these contexts throughout the library, this class defines a static $Q_1$
  * mapping object. This object can then be used in all of those places where
  * such an object is needed.
+ *
+ * @note The use of this object should be avoided since it is only applicable
+ *   in cases where a mesh consists exclusively of quadrilaterals or hexahedra.
+ *   Use
+ * `ReferenceCells::get_hypercube<dim>().get_default_linear_mapping()`
+ *   instead.
  */
 template <int dim, int spacedim = dim>
 struct StaticMappingQ1

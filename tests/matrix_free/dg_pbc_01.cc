@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -32,7 +32,6 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
 
 
 // We want to use the matrix-vector product provided by this function (which
@@ -95,6 +94,9 @@ test()
   SolverControl control(1000, 1e-12 * std::sqrt(rhs.size()));
   SolverCG<LinearAlgebra::distributed::Vector<double>> solver(control);
   solver.solve(mf, sol, rhs, PreconditionIdentity());
+
+  const std::vector<IndexSet> locally_owned_dofs_per_processor =
+    Utilities::MPI::all_gather(MPI_COMM_WORLD, dof.locally_owned_dofs());
   // gather all data at root
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     {
@@ -107,14 +109,13 @@ test()
            ++i)
         {
           MPI_Recv(sol_gather_ptr,
-                   dof.locally_owned_dofs_per_processor()[i].n_elements(),
+                   locally_owned_dofs_per_processor[i].n_elements(),
                    MPI_DOUBLE,
                    i,
                    i,
                    MPI_COMM_WORLD,
                    MPI_STATUS_IGNORE);
-          sol_gather_ptr +=
-            dof.locally_owned_dofs_per_processor()[i].n_elements();
+          sol_gather_ptr += locally_owned_dofs_per_processor[i].n_elements();
         }
       solution_gather0.print(deallog.get_file_stream());
     }

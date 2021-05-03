@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2018 by the deal.II authors
+// Copyright (C) 2012 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -47,14 +47,25 @@ check()
       const number prod_check = check.add_and_dot(factor, v2, v3);
       if (test == 0 && std::is_same<number, double>::value)
         {
-          deallog << "Vector add reference:   ";
-          v1.print(deallog);
-          deallog << "Vector check reference: ";
-          check.print(deallog);
+          deallog << "Vector add reference:   " << std::flush;
+          v1.print(deallog.get_file_stream(), 7);
+          deallog << "DEAL::Vector check reference: " << std::flush;
+          check.print(deallog.get_file_stream(), 7);
+          deallog << "DEAL::";
         }
 
-      deallog << "Add and dot should be " << prod / static_cast<number>(size)
-              << ", is " << prod_check / static_cast<number>(size) << std::endl;
+      deallog << "Add and dot is ";
+      if (std::abs(prod - prod_check) <
+          4. *
+            std::abs(
+              std::numeric_limits<
+                typename numbers::NumberTraits<number>::real_type>::epsilon()) *
+            std::sqrt(static_cast<double>(size)) * size)
+        deallog << "correct" << std::endl;
+      else
+        deallog << "wrong; should be " << prod / static_cast<number>(size)
+                << ", is " << prod_check / static_cast<number>(size)
+                << std::endl;
     }
 }
 
@@ -64,7 +75,7 @@ main()
 {
   std::ofstream logfile("output");
   deallog << std::fixed;
-  deallog << std::setprecision(2);
+  deallog << std::setprecision(10);
   deallog.attach(logfile);
 
   check<float>();

@@ -18,6 +18,7 @@
 #include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/la_vector.h>
 #include <deal.II/lac/petsc_block_vector.h>
+#include <deal.II/lac/trilinos_epetra_vector.h>
 #include <deal.II/lac/trilinos_parallel_block_vector.h>
 #include <deal.II/lac/trilinos_tpetra_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
@@ -37,6 +38,22 @@ MGSmootherBase<VectorType>::apply(const unsigned int level,
 {
   u = typename VectorType::value_type(0.);
   smooth(level, u, rhs);
+}
+
+
+
+template <typename VectorType>
+void
+MGTransferBase<VectorType>::prolongate_and_add(const unsigned int to_level,
+                                               VectorType &       dst,
+                                               const VectorType & src) const
+{
+  VectorType temp;
+  temp.reinit(dst, true);
+
+  this->prolongate(to_level, temp, src);
+
+  dst += temp;
 }
 
 

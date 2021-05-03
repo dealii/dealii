@@ -1,0 +1,3 @@
+New: implemented p::f::Triangulation::load()/save() for use with p::d::SolutionTransfer.
+<br>
+(Pasquale Claudio Africa, Peter Munch, 2021/01/18)

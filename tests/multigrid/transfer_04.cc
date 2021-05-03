@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -122,8 +122,8 @@ check_fe(FiniteElement<dim> &fe)
 
   DoFHandler<dim> dofh(tr);
   dofh.distribute_dofs(fe);
-  dofh.distribute_mg_dofs(fe);
-  typedef TrilinosWrappers::MPI::Vector vector_t;
+  dofh.distribute_mg_dofs();
+  using vector_t = TrilinosWrappers::MPI::Vector;
 
   MGConstrainedDoFs mg_constrained_dofs;
   mg_constrained_dofs.initialize(dofh);
@@ -136,7 +136,7 @@ check_fe(FiniteElement<dim> &fe)
   hanging_node_constraints.close();
 
   MGTransferPrebuilt<vector_t> transfer(mg_constrained_dofs);
-  transfer.build_matrices(dofh);
+  transfer.build(dofh);
   // transfer.print_indices(deallog.get_file_stream());
 
   MGLevelObject<vector_t> u(0, tr.n_global_levels() - 1);

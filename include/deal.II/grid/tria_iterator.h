@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -32,6 +32,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#  ifndef DOXYGEN
 template <int dim, int spacedim>
 class Triangulation;
 template <int, int, int>
@@ -41,6 +43,7 @@ template <typename>
 class TriaIterator;
 template <typename>
 class TriaActiveIterator;
+#  endif
 
 
 
@@ -111,7 +114,7 @@ class TriaActiveIterator;
  * anyway. Most iterator and accessor functions are inlined.
  *
  * The main functionality of iterators, resides in the <tt>++</tt> and
- * <tt>--</tt> operators. These move the iterator forward or backward just as
+ * <tt>\--</tt> operators. These move the iterator forward or backward just as
  * if it were a pointer into an array. Here, this operation is not so easy,
  * since it may include skipping some elements and the transition between the
  * triangulation levels. This is completely hidden from the user, though you
@@ -148,7 +151,7 @@ class TriaActiveIterator;
  * member function <tt>bool used()</tt>, for the latter a member function
  * <tt>bool active()</tt>.
  *
- * <li> It must have void operators <tt>++</tt> and <tt>--</tt>.
+ * <li> It must have void operators <tt>++</tt> and <tt>\--</tt>.
  *
  * <li> It must declare a local alias <tt>AccessorData</tt> which states the
  * data type the accessor expects to get passed as fourth constructor
@@ -164,11 +167,10 @@ class TriaActiveIterator;
  * add functionality.
  *
  * The accessors provided by the library consist of two groups, determined by
- * whether they access the data of Triangulation objects or
- * DoFHandler/hp::DoFHandler objects. They are derived from TriaAccessor and
- * DoFAccessor, respectively. Each group also has specialized accessors for
- * cells (as opposed to faces and lines) that offer more functionality such as
- * accessing neighbors.
+ * whether they access the data of Triangulation objects or DoFHandler objects.
+ * They are derived from TriaAccessor and DoFAccessor, respectively. Each group
+ * also has specialized accessors for cells (as opposed to faces and lines) that
+ * offer more functionality such as accessing neighbors.
  *
  * @attention It seems impossible to preserve constness of a triangulation
  * through iterator usage. Thus, if you declare pointers to a <tt>const</tt>
@@ -222,8 +224,6 @@ class TriaActiveIterator;
  * @ref Triangulation
  * @ingroup grid
  * @ingroup Iterators
- * @author Wolfgang Bangerth, 1998
- * @author documentation update Guido Kanschat, 2004
  */
 template <typename Accessor>
 class TriaRawIterator
@@ -376,8 +376,10 @@ public:
   /**
    * Compare for equality.
    */
-  bool
-  operator==(const TriaRawIterator &) const;
+  template <typename OtherAccessor = Accessor>
+  typename std::enable_if<std::is_convertible<OtherAccessor, Accessor>::value,
+                          bool>::type
+  operator==(const TriaRawIterator<OtherAccessor> &) const;
 
   /**
    * Compare for inequality.
@@ -447,14 +449,14 @@ public:
   operator++(int);
 
   /**
-   * Prefix @p -- operator: @p --iterator. This operator moves the iterator to
+   * Prefix @p \-- operator: @p \--iterator. This operator moves the iterator to
    * the previous element and returns a reference to <tt>*this</tt>.
    */
   TriaRawIterator &
   operator--();
 
   /**
-   * Postfix @p -- operator: @p iterator--. This operator moves the iterator
+   * Postfix @p \-- operator: @p iterator\--. This operator moves the iterator
    * to the previous element, but returns an iterator to the element
    * previously pointed to.
    *
@@ -548,15 +550,13 @@ protected:
   Accessor accessor;
 
 
-  /**
-   * Make all other iterator class templates friends of this class. This is
-   * necessary for the implementation of conversion constructors.
-   *
-   * In fact, we would not need them to be friends if they were for different
-   * dimensions, but the compiler dislikes giving a fixed dimension and
-   * variable accessor since then it says that would be a partial
-   * specialization.
-   */
+  // Make all other iterator class templates friends of this class. This is
+  // necessary for the implementation of conversion constructors.
+  //
+  // In fact, we would not need them to be friends if they were for different
+  // dimensions, but the compiler dislikes giving a fixed dimension and
+  // variable accessor since then it says that would be a partial
+  // specialization.
   template <typename SomeAccessor>
   friend class TriaRawIterator;
   template <typename SomeAccessor>
@@ -713,14 +713,14 @@ public:
   operator++(int);
 
   /**
-   * Prefix @p -- operator: @p --i. This operator advances the iterator to the
+   * Prefix @p \-- operator: @p \--i. This operator advances the iterator to the
    * previous used element and returns a reference to <tt>*this</tt>.
    */
   TriaIterator<Accessor> &
   operator--();
 
   /**
-   * Postfix @p -- operator: @p i--.
+   * Postfix @p \-- operator: @p i\--.
    */
   TriaIterator<Accessor>
   operator--(int);
@@ -804,7 +804,7 @@ public:
     const Triangulation<Accessor::dimension, Accessor::space_dimension> *parent,
     const int                                                            level,
     const int                                                            index,
-    const typename Accessor::AccessorData *local_data = 0);
+    const typename Accessor::AccessorData *local_data = nullptr);
 
   /**
    * This is a conversion operator (constructor) which takes another iterator
@@ -914,14 +914,14 @@ public:
   operator++(int);
 
   /**
-   * Prefix @p -- operator: @p --i. This operator advances the iterator to the
+   * Prefix @p \-- operator: @p \--i. This operator advances the iterator to the
    * previous active element and returns a reference to <tt>*this</tt>.
    */
   TriaActiveIterator<Accessor> &
   operator--();
 
   /**
-   * Postfix @p -- operator: @p i--.
+   * Postfix @p \-- operator: @p i\--.
    */
   TriaActiveIterator<Accessor>
   operator--(int);
@@ -1221,8 +1221,6 @@ inline TriaActiveIterator<Accessor>::TriaActiveIterator(
  * Print the address to which this iterator points to @p out. The address is
  * given by the pair <tt>(level,index)</tt>, where @p index is an index
  * relative to the level in which the object is that is pointed to.
- *
- * @author Wolfgang Bangerth, 1998
  */
 template <typename Accessor>
 inline std::ostream &
@@ -1238,8 +1236,6 @@ operator<<(std::ostream &out, const TriaRawIterator<Accessor> &i)
  * Print the address to which this iterator points to @p out. The address is
  * given by the pair <tt>(level,index)</tt>, where @p index is an index
  * relative to the level in which the object is that is pointed to.
- *
- * @author Wolfgang Bangerth, 1998
  */
 template <typename Accessor>
 inline std::ostream &
@@ -1255,8 +1251,6 @@ operator<<(std::ostream &out, const TriaIterator<Accessor> &i)
  * Print the address to which this iterator points to @p out. The address is
  * given by the pair <tt>(level,index)</tt>, where @p index is an index
  * relative to the level in which the object is that is pointed to.
- *
- * @author Wolfgang Bangerth, 1998
  */
 template <typename Accessor>
 inline std::ostream &

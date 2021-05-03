@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2018 by the deal.II authors
+// Copyright (C) 2008 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -55,7 +55,7 @@ mypartition(parallel::shared::Triangulation<dim> &tria)
                                                                        lvl);
       for (; cell != endc; ++cell)
         {
-          if (cell->active())
+          if (cell->is_active())
             cell->set_level_subdomain_id(cell->subdomain_id());
           else
             cell->set_level_subdomain_id(cell->child(0)->level_subdomain_id());

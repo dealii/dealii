@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,6 +16,8 @@
 #ifndef dealii_block_info_h
 #define dealii_block_info_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/subscriptor.h>
 
@@ -26,14 +28,10 @@
 DEAL_II_NAMESPACE_OPEN
 
 // Forward declarations
-
+#ifndef DOXYGEN
 template <int dim, int spacedim>
 class DoFHandler;
-namespace hp
-{
-  template <int dim, int spacedim>
-  class DoFHandler;
-}
+#endif
 
 
 /**
@@ -87,11 +85,10 @@ namespace hp
  * levels of <tt>mg_vector</tt> will have the block structure needed on that
  * level.
  *
- * @todo Extend the functions local() and renumber() to the concept to
- * hp::DoFHandler.
+ * @todo Extend the functions local() and renumber() to allow for
+ * hp-capablilites.
  *
  * @ingroup dofs
- * @author Guido Kanschat, 2009
  */
 class BlockInfo : public Subscriptor
 {
@@ -181,7 +178,8 @@ public:
 
   /**
    * Read or write the data of this object to or from a stream for the purpose
-   * of serialization
+   * of serialization using the [BOOST serialization
+   * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
    */
   template <class Archive>
   void

@@ -1,0 +1,8 @@
+
+DEAL::Surrunding point 0 0.00000 0.00000 0.00000 weight 0.200000
+DEAL::Surrunding point 1 1.00000 0.00000 0.00000 weight 0.200000
+DEAL::Surrunding point 2 0.500000 0.00000 0.245356 weight 0.200000
+DEAL::Surrunding point 3 0.00000 1.00000 0.00000 weight 0.200000
+DEAL::Surrunding point 4 1.00000 1.00000 0.00000 weight 0.200000
+DEAL::Mean point 0.500000 0.400000 0.0490712
+DEAL::Projected point  0.500000 0.447721 0.245356

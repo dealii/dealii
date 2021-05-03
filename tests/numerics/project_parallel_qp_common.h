@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -78,7 +78,7 @@ public:
   {
     VectorizedArray<double> res = make_vectorized_array(0.);
     Point<dim>              p;
-    for (unsigned int v = 0; v < VectorizedArray<double>::n_array_elements; ++v)
+    for (unsigned int v = 0; v < VectorizedArray<double>::size(); ++v)
       {
         for (unsigned int d = 0; d < dim; d++)
           p[d] = p_vec[d][v];

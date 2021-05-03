@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,6 +22,7 @@
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/utilities.h>
 
+#include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_tools.h>
 #include <deal.II/fe/fe_values.h>
 
@@ -34,7 +35,6 @@
 #include "../tests.h"
 
 
-using namespace dealii;
 
 template <int dim>
 class MyFunction : public Function<dim>
@@ -102,6 +102,10 @@ test()
           fe_values.reinit(dof_cell);
           const std::vector<Point<dim>> &q_points =
             fe_values.get_quadrature_points();
+          // before initialization, you can erase it without any consequences
+          const bool erased_nonexisting_data = data_storage.erase(cell);
+          AssertThrow(!erased_nonexisting_data, ExcInternalError());
+          // initialize
           data_storage.initialize(cell, rhs.size());
           {
             std::vector<std::shared_ptr<MyQData>> qpd =
@@ -112,7 +116,7 @@ test()
 
           // do erase
           const bool erased = data_storage.erase(cell);
-          Assert(erased, ExcInternalError());
+          AssertThrow(erased, ExcInternalError());
           // initialize with default constructor
           data_storage.initialize(cell, rhs.size());
           // check that values are now zero (see default constructor)

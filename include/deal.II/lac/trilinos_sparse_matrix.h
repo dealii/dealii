@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2019 by the deal.II authors
+// Copyright (C) 2008 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -27,6 +27,7 @@
 #    include <deal.II/lac/exceptions.h>
 #    include <deal.II/lac/full_matrix.h>
 #    include <deal.II/lac/trilinos_epetra_vector.h>
+#    include <deal.II/lac/trilinos_index_access.h>
 #    include <deal.II/lac/trilinos_tpetra_vector.h>
 #    include <deal.II/lac/trilinos_vector.h>
 #    include <deal.II/lac/vector_memory.h>
@@ -54,6 +55,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 // forward declarations
+#    ifndef DOXYGEN
 template <typename MatrixType>
 class BlockMatrixBase;
 
@@ -62,23 +64,26 @@ class SparseMatrix;
 class SparsityPattern;
 class DynamicSparsityPattern;
 
-
-
 namespace TrilinosWrappers
 {
-  // forward declarations
   class SparseMatrix;
   class SparsityPattern;
 
+  namespace SparseMatrixIterators
+  {
+    template <bool Constness>
+    class Iterator;
+  }
+} // namespace TrilinosWrappers
+#    endif
+
+namespace TrilinosWrappers
+{
   /**
    * Iterators for Trilinos matrices
    */
   namespace SparseMatrixIterators
   {
-    // forward declaration
-    template <bool Constness>
-    class Iterator;
-
     /**
      * Exception
      */
@@ -102,9 +107,6 @@ namespace TrilinosWrappers
      * For a regular dealii::SparseMatrix, we would use an accessor for the
      * sparsity pattern. For Trilinos matrices, this does not seem so simple,
      * therefore, we write a little base class here.
-     *
-     * @author Guido Kanschat
-     * @date 2012
      */
     class AccessorBase
     {
@@ -244,9 +246,7 @@ namespace TrilinosWrappers
       value() const;
 
     private:
-      /**
-       * Make iterator class a friend.
-       */
+      // Make iterator class a friend.
       template <bool>
       friend class Iterator;
     };
@@ -328,14 +328,11 @@ namespace TrilinosWrappers
       value() const;
 
     private:
-      /**
-       * Make iterator class a friend.
-       */
+      // Make iterator class a friend.
       template <bool>
       friend class Iterator;
-      /**
-       * Make Reference object a friend.
-       */
+
+      // Make Reference object a friend.
       friend class Reference;
     };
 
@@ -351,7 +348,6 @@ namespace TrilinosWrappers
      * the elements.
      *
      * @ingroup TrilinosWrappers
-     * @author Martin Kronbichler, Wolfgang Bangerth, 2008
      */
     template <bool Constness>
     class Iterator
@@ -510,7 +506,6 @@ namespace TrilinosWrappers
    *
    * @ingroup TrilinosWrappers
    * @ingroup Matrix1
-   * @author Martin Kronbichler, Wolfgang Bangerth, 2008, 2009
    */
   class SparseMatrix : public Subscriptor
   {
@@ -699,188 +694,7 @@ namespace TrilinosWrappers
     void
     reinit(const Epetra_CrsMatrix &input_matrix, const bool copy_values = true);
     //@}
-    /**
-     * @name Constructors and initialization using an Epetra_Map description
-     */
-    //@{
-    /**
-     * Constructor using an Epetra_Map to describe the %parallel partitioning.
-     * The parameter @p n_max_entries_per_row sets the number of nonzero
-     * entries in each row that will be allocated. Note that this number does
-     * not need to be exact, and it is even allowed that the actual matrix
-     * structure has more nonzero entries than specified in the constructor.
-     * However it is still advantageous to provide good estimates here since
-     * this will considerably increase the performance of the matrix setup.
-     * However, there is no effect in the performance of matrix-vector
-     * products, since Trilinos reorganizes the matrix memory prior to use (in
-     * the compress() step).
-     *
-     * @deprecated Use the respective method with IndexSet argument instead.
-     */
-    DEAL_II_DEPRECATED
-    SparseMatrix(const Epetra_Map &parallel_partitioning,
-                 const size_type   n_max_entries_per_row = 0);
 
-    /**
-     * Same as before, but now set a value of nonzeros for each matrix row.
-     * Since we know the number of elements in the matrix exactly in this
-     * case, we can already allocate the right amount of memory, which makes
-     * the creation process including the insertion of nonzero elements by the
-     * respective SparseMatrix::reinit call considerably faster.
-     *
-     * @deprecated Use the respective method with IndexSet argument instead.
-     */
-    DEAL_II_DEPRECATED
-    SparseMatrix(const Epetra_Map &               parallel_partitioning,
-                 const std::vector<unsigned int> &n_entries_per_row);
-
-    /**
-     * This constructor is similar to the one above, but it now takes two
-     * different Epetra maps for rows and columns. This interface is meant to
-     * be used for generating rectangular matrices, where one map describes
-     * the %parallel partitioning of the dofs associated with the matrix rows
-     * and the other one the partitioning of dofs in the matrix columns. Note
-     * that there is no real parallelism along the columns &ndash; the
-     * processor that owns a certain row always owns all the column elements,
-     * no matter how far they might be spread out. The second Epetra_Map is
-     * only used to specify the number of columns and for internal
-     * arrangements when doing matrix-vector products with vectors based on
-     * that column map.
-     *
-     * The integer input @p n_max_entries_per_row defines the number of
-     * columns entries per row that will be allocated.
-     *
-     * @deprecated Use the respective method with IndexSet argument instead.
-     */
-    DEAL_II_DEPRECATED
-    SparseMatrix(const Epetra_Map &row_parallel_partitioning,
-                 const Epetra_Map &col_parallel_partitioning,
-                 const size_type   n_max_entries_per_row = 0);
-
-    /**
-     * This constructor is similar to the one above, but it now takes two
-     * different Epetra maps for rows and columns. This interface is meant to
-     * be used for generating rectangular matrices, where one map specifies
-     * the %parallel distribution of degrees of freedom associated with matrix
-     * rows and the second one specifies the %parallel distribution the dofs
-     * associated with columns in the matrix. The second map also provides
-     * information for the internal arrangement in matrix vector products
-     * (i.e., the distribution of vector this matrix is to be multiplied
-     * with), but is not used for the distribution of the columns &ndash;
-     * rather, all column elements of a row are stored on the same processor
-     * in any case. The vector <tt>n_entries_per_row</tt> specifies the number
-     * of entries in each row of the newly generated matrix.
-     *
-     * @deprecated Use the respective method with IndexSet argument instead.
-     */
-    DEAL_II_DEPRECATED
-    SparseMatrix(const Epetra_Map &               row_parallel_partitioning,
-                 const Epetra_Map &               col_parallel_partitioning,
-                 const std::vector<unsigned int> &n_entries_per_row);
-
-    /**
-     * This function is initializes the Trilinos Epetra matrix according to
-     * the specified sparsity_pattern, and also reassigns the matrix rows to
-     * different processes according to a user-supplied Epetra map. In
-     * programs following the style of the tutorial programs, this function
-     * (and the respective call for a rectangular matrix) are the natural way
-     * to initialize the matrix size, its distribution among the MPI processes
-     * (if run in %parallel) as well as the location of non-zero elements.
-     * Trilinos stores the sparsity pattern internally, so it won't be needed
-     * any more after this call, in contrast to the deal.II own object. The
-     * optional argument @p exchange_data can be used for reinitialization
-     * with a sparsity pattern that is not fully constructed. This feature is
-     * only implemented for input sparsity patterns of type
-     * DynamicSparsityPattern. If the flag is not set, each processor just
-     * sets the elements in the sparsity pattern that belong to its rows.
-     *
-     * If the sparsity pattern given to this function is of type
-     * DynamicSparsity pattern, then a matrix will be created that allows
-     * several threads to write into different rows of the matrix at the same
-     * also with MPI, as opposed to most other reinit() methods.
-     *
-     * This is a collective operation that needs to be called on all
-     * processors in order to avoid a dead lock.
-     *
-     * @deprecated Use the respective method with IndexSet argument instead.
-     */
-    template <typename SparsityPatternType>
-    DEAL_II_DEPRECATED void
-    reinit(const Epetra_Map &         parallel_partitioning,
-           const SparsityPatternType &sparsity_pattern,
-           const bool                 exchange_data = false);
-
-    /**
-     * This function is similar to the other initialization function above,
-     * but now also reassigns the matrix rows and columns according to two
-     * user-supplied Epetra maps.  To be used for rectangular matrices. The
-     * optional argument @p exchange_data can be used for reinitialization
-     * with a sparsity pattern that is not fully constructed. This feature is
-     * only implemented for input sparsity patterns of type
-     * DynamicSparsityPattern.
-     *
-     * This is a collective operation that needs to be called on all
-     * processors in order to avoid a dead lock.
-     *
-     * @deprecated Use the respective method with IndexSet argument instead.
-     */
-    template <typename SparsityPatternType>
-    DEAL_II_DEPRECATED void
-    reinit(const Epetra_Map &         row_parallel_partitioning,
-           const Epetra_Map &         col_parallel_partitioning,
-           const SparsityPatternType &sparsity_pattern,
-           const bool                 exchange_data = false);
-
-    /**
-     * This function initializes the Trilinos matrix using the deal.II sparse
-     * matrix and the entries stored therein. It uses a threshold to copy only
-     * elements with modulus larger than the threshold (so zeros in the
-     * deal.II matrix can be filtered away). In contrast to the other reinit
-     * function with deal.II sparse matrix argument, this function takes a
-     * %parallel partitioning specified by the user instead of internally
-     * generating it.
-     *
-     * The optional parameter <tt>copy_values</tt> decides whether only the
-     * sparsity structure of the input matrix should be used or the matrix
-     * entries should be copied, too.
-     *
-     * This is a collective operation that needs to be called on all
-     * processors in order to avoid a dead lock.
-     *
-     * @deprecated Use the respective method with IndexSet argument instead.
-     */
-    template <typename number>
-    DEAL_II_DEPRECATED void
-    reinit(const Epetra_Map &                    parallel_partitioning,
-           const ::dealii::SparseMatrix<number> &dealii_sparse_matrix,
-           const double                          drop_tolerance    = 1e-13,
-           const bool                            copy_values       = true,
-           const ::dealii::SparsityPattern *     use_this_sparsity = nullptr);
-
-    /**
-     * This function is similar to the other initialization function with
-     * deal.II sparse matrix input above, but now takes Epetra maps for both
-     * the rows and the columns of the matrix. Chosen for rectangular
-     * matrices.
-     *
-     * The optional parameter <tt>copy_values</tt> decides whether only the
-     * sparsity structure of the input matrix should be used or the matrix
-     * entries should be copied, too.
-     *
-     * This is a collective operation that needs to be called on all
-     * processors in order to avoid a dead lock.
-     *
-     * @deprecated Use the respective method with IndexSet argument instead.
-     */
-    template <typename number>
-    DEAL_II_DEPRECATED void
-    reinit(const Epetra_Map &                    row_parallel_partitioning,
-           const Epetra_Map &                    col_parallel_partitioning,
-           const ::dealii::SparseMatrix<number> &dealii_sparse_matrix,
-           const double                          drop_tolerance    = 1e-13,
-           const bool                            copy_values       = true,
-           const ::dealii::SparsityPattern *     use_this_sparsity = nullptr);
-    //@}
     /**
      * @name Constructors and initialization using an IndexSet description
      */
@@ -990,7 +804,9 @@ namespace TrilinosWrappers
      * processors in order to avoid a dead lock.
      */
     template <typename SparsityPatternType>
-    void
+    typename std::enable_if<
+      !std::is_same<SparsityPatternType,
+                    dealii::SparseMatrix<double>>::value>::type
     reinit(const IndexSet &           row_parallel_partitioning,
            const IndexSet &           col_parallel_partitioning,
            const SparsityPatternType &sparsity_pattern,
@@ -1820,52 +1636,6 @@ namespace TrilinosWrappers
     const Epetra_CrsGraph &
     trilinos_sparsity_pattern() const;
 
-    /**
-     * Return a const reference to the underlying Trilinos Epetra_Map that
-     * sets the partitioning of the domain space of this matrix, i.e., the
-     * partitioning of the vectors this matrix has to be multiplied with.
-     *
-     * @deprecated Use locally_owned_domain_indices() instead.
-     */
-    DEAL_II_DEPRECATED
-    const Epetra_Map &
-    domain_partitioner() const;
-
-    /**
-     * Return a const reference to the underlying Trilinos Epetra_Map that
-     * sets the partitioning of the range space of this matrix, i.e., the
-     * partitioning of the vectors that are result from matrix-vector
-     * products.
-     *
-     * @deprecated Use locally_owned_range_indices() instead.
-     */
-    DEAL_II_DEPRECATED
-    const Epetra_Map &
-    range_partitioner() const;
-
-    /**
-     * Return a const reference to the underlying Trilinos Epetra_Map that
-     * sets the partitioning of the matrix rows. Equal to the partitioning of
-     * the range.
-     *
-     * @deprecated Use locally_owned_range_indices() instead.
-     */
-    DEAL_II_DEPRECATED
-    const Epetra_Map &
-    row_partitioner() const;
-
-    /**
-     * Return a const reference to the underlying Trilinos Epetra_Map that
-     * sets the partitioning of the matrix columns. This is in general not
-     * equal to the partitioner Epetra_Map for the domain because of overlap
-     * in the matrix.
-     *
-     * @deprecated Usually not necessary. If desired, access it via the
-     * Epetra_CrsMatrix.
-     */
-    DEAL_II_DEPRECATED
-    const Epetra_Map &
-    col_partitioner() const;
     //@}
 
     /**
@@ -2018,7 +1788,6 @@ namespace TrilinosWrappers
     //@}
     /**
      * @addtogroup Exceptions
-     *
      */
     //@{
     /**
@@ -2061,9 +1830,9 @@ namespace TrilinosWrappers
                    size_type,
                    << "You tried to access element (" << arg1 << "/" << arg2
                    << ")"
-                   << " of a distributed matrix, but only rows " << arg3
-                   << " through " << arg4
-                   << " are stored locally and can be accessed.");
+                   << " of a distributed matrix, but only rows in range ["
+                   << arg3 << "," << arg4
+                   << "] are stored locally and can be accessed.");
 
     /**
      * Exception
@@ -2148,9 +1917,7 @@ namespace TrilinosWrappers
      */
     bool compressed;
 
-    /**
-     * To allow calling protected prepare_add() and prepare_set().
-     */
+    // To allow calling protected prepare_add() and prepare_set().
     friend class BlockMatrixBase<SparseMatrix>;
   };
 
@@ -2236,7 +2003,6 @@ namespace TrilinosWrappers
        * TrilinosWrappers::internal::LinearOperatorImplementation::TrilinosPayload::SetUseTranspose()
        * function for further details.
        *
-       * @author Jean-Paul Pelteret, 2016
        *
        * @ingroup TrilinosWrappers
        */
@@ -2914,7 +2680,7 @@ namespace TrilinosWrappers
   inline SparseMatrix::const_iterator
   SparseMatrix::begin(const size_type r) const
   {
-    Assert(r < m(), ExcIndexRange(r, 0, m()));
+    AssertIndexRange(r, m());
     if (in_local_range(r) && (row_length(r) > 0))
       return const_iterator(this, r, 0);
     else
@@ -2926,7 +2692,7 @@ namespace TrilinosWrappers
   inline SparseMatrix::const_iterator
   SparseMatrix::end(const size_type r) const
   {
-    Assert(r < m(), ExcIndexRange(r, 0, m()));
+    AssertIndexRange(r, m());
 
     // place the iterator on the first entry
     // past this line, or at the end of the
@@ -2961,7 +2727,7 @@ namespace TrilinosWrappers
   inline SparseMatrix::iterator
   SparseMatrix::begin(const size_type r)
   {
-    Assert(r < m(), ExcIndexRange(r, 0, m()));
+    AssertIndexRange(r, m());
     if (in_local_range(r) && (row_length(r) > 0))
       return iterator(this, r, 0);
     else
@@ -2973,7 +2739,7 @@ namespace TrilinosWrappers
   inline SparseMatrix::iterator
   SparseMatrix::end(const size_type r)
   {
-    Assert(r < m(), ExcIndexRange(r, 0, m()));
+    AssertIndexRange(r, m());
 
     // place the iterator on the first entry
     // past this line, or at the end of the
@@ -3132,11 +2898,7 @@ namespace TrilinosWrappers
     // sparsity pattern), it does not know about the number of columns so we
     // must always take this from the additional column space map
     Assert(column_space_map.get() != nullptr, ExcInternalError());
-#      ifndef DEAL_II_WITH_64BIT_INDICES
-    return column_space_map->NumGlobalElements();
-#      else
-    return column_space_map->NumGlobalElements64();
-#      endif
+    return n_global_elements(*column_space_map);
   }
 
 

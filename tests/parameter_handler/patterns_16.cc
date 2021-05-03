@@ -17,7 +17,6 @@
 
 #include <deal.II/base/function_parser.h>
 #include <deal.II/base/parameter_handler.h>
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/fe/component_mask.h>
 
@@ -33,7 +32,7 @@ main()
 {
   initlog();
 
-  typedef std::map<types::boundary_id, std::unique_ptr<FunctionParser<3>>> T;
+  using T = std::map<types::boundary_id, std::unique_ptr<FunctionParser<3>>>;
 
   T a;
   a = Convert<T>::to_value("0:x,y,z*t");

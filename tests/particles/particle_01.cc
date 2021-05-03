@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -28,8 +28,6 @@ test()
 {
   {
     Particles::Particle<dim> particle;
-
-    deallog << "Particle location: " << particle.get_location() << std::endl;
 
     Point<dim> position;
     position(0) = 1.0;

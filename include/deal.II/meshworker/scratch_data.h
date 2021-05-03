@@ -22,6 +22,7 @@
 
 #include <deal.II/differentiation/ad.h>
 
+#include <deal.II/fe/fe_interface_values.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_q1.h>
 
@@ -35,17 +36,6 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace MeshWorker
 {
-  namespace internal
-  {
-    /**
-     * Alias used to deduce the OutputType when asking for values or gradients
-     * of shape functions multiplied with the given @p NumberType.
-     */
-    template <int dim, int spacedim, typename NumberType, typename Extractor>
-    using OutputType = typename FEValuesViews::View<dim, spacedim, Extractor>::
-      template OutputType<NumberType>;
-  } // namespace internal
-
   /**
    * A helper class to simplify the parallel assembly of linear and non-linear
    * problems, and the evaluation of finite element fields.
@@ -54,9 +44,9 @@ namespace MeshWorker
    * function and with the MeshWorker::mesh_loop function().
    *
    * The ScratchData class has three main goals:
-   * - to create FEValues, FEFaceValues, and FESubfaceValues for the current
-   *   cell and for its neighbor cell *on demand* (only if they are
-   *   necessary for the algorithm provided by the user), and to provide a
+   * - to create FEValues, FEFaceValues, FESubfaceValues, and FEInterfaceValues
+   *   for the current cell and for its neighbor cell *on demand* (only if they
+   *   are necessary for the algorithm provided by the user), and to provide a
    *   uniform interface to access the FEValues objects when assembling cell,
    *   face, or subface contributions
    * - to store arbitrary data types (or references to arbitrary data types),
@@ -70,10 +60,10 @@ namespace MeshWorker
    *   values, gradients, etc., of already computed solution vectors.
    *
    * The methods in the section "Methods to work on current cell"
-   * initialize on demand internal FEValues,
-   * FEFaceValues, and FESubfaceValues objects on the current cell, allowing the
-   * use of this class as a single substitute for three different objects used
-   * to integrate and query finite element values on cells, faces, and subfaces.
+   * initialize on demand internal FEValues, FEFaceValues, FESubfaceValues, and
+   * FEInterfaceValues objects on the current cell, allowing the use of this
+   * class as a single substitute for four different objects used to integrate
+   * and query finite element values on cells, faces, and subfaces.
    *
    * Similarly, the methods in the section "Methods to work on neighbor cell"
    * initialize on demand
@@ -225,8 +215,6 @@ namespace MeshWorker
    * 	Volume  = {7},
    * 	Year    = {2018}}
    * @endcode
-   *
-   * @author Luca Heltai, 2019.
    */
   template <int dim, int spacedim = dim>
   class ScratchData
@@ -375,6 +363,29 @@ namespace MeshWorker
            const unsigned int subface_no);
 
     /**
+     * Initialize the internal FEInterfaceValues with the given arguments, and
+     * return a reference to it.
+     *
+     * After calling this function, get_local_dof_indices(),
+     * get_quadrature_points(), get_normal_vectors(), and get_JxW_values() will
+     * be forwarded to the local FEInterfaceValues object. The methods
+     * get_current_fe_values() will return the FEValuesBase associated to the
+     * current cell, while get_neighbor_fe_values() will be associated with the
+     * neighbor cell. The method get_local_dof_indices() will return the
+     * same result of FEInterfaceValues::get_interface_dof_to_dof_indices(),
+     * while the get_neighbor_dof_indices() will return the local dof indices
+     * of the neighbor cell.
+     */
+    const FEInterfaceValues<dim, spacedim> &
+    reinit(const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
+           const unsigned int face_no,
+           const unsigned int sub_face_no,
+           const typename DoFHandler<dim, spacedim>::active_cell_iterator
+             &                cell_neighbor,
+           const unsigned int face_no_neighbor,
+           const unsigned int sub_face_no_neighbor);
+
+    /**
      * Get the currently initialized FEValues.
      *
      * This function will return the internal FEValues if the
@@ -423,8 +434,8 @@ namespace MeshWorker
      * Initialize the internal neighbor FEValues to use the given @p cell, and
      * return a reference to it.
      *
-     * After calling this function, get_current_fe_values() will return the
-     * same object of this method, as an FEValuesBase reference.
+     * After calling this function, get_current_neighbor_fe_values() will return
+     * the same object of this method, as an FEValuesBase reference.
      */
     const FEValues<dim, spacedim> &
     reinit_neighbor(
@@ -434,8 +445,8 @@ namespace MeshWorker
      * Initialize the internal FEFaceValues to use the given @p face_no on the
      * given @p cell, and return a reference to it.
      *
-     * After calling this function, get_current_fe_values() will return the
-     * same object of this method, as an FEValuesBase reference.
+     * After calling this function, get_current_neighbor_fe_values() will return
+     * the same object of this method, as an FEValuesBase reference.
      */
     const FEFaceValues<dim, spacedim> &
     reinit_neighbor(
@@ -446,8 +457,8 @@ namespace MeshWorker
      * Initialize the internal FESubfaceValues to use the given @p subface_no,
      * on @p face_no, on the given @p cell, and return a reference to it.
      *
-     * After calling this function, get_current_fe_values() will return the
-     * same object of this method, as an FEValuesBase reference.
+     * After calling this function, get_current_neighbor_fe_values() will return
+     * the same object of this method, as an FEValuesBase reference.
      *
      * If @p subface_no is numbers::invalid_unsigned_int, the reinit() function
      * that takes only the @p cell and the @p face_no is called.
@@ -500,6 +511,14 @@ namespace MeshWorker
      */
     GeneralDataStorage &
     get_general_data_storage();
+
+    /**
+     * Return a GeneralDataStorage object that can be used to store any amount
+     * of data, of any type, which is then made accessible by an identifier
+     * string.
+     */
+    const GeneralDataStorage &
+    get_general_data_storage() const;
 
     /**
      * @name Evaluation of finite element fields and their derivatives on the current cell
@@ -576,9 +595,8 @@ namespace MeshWorker
      * the documentation of the FEValues class for more information.
      */
     template <typename Extractor, typename Number = double>
-    const std::vector<
-      typename internal::OutputType<dim, spacedim, Number, Extractor>::
-        value_type> &
+    const std::vector<typename FEValuesViews::View<dim, spacedim, Extractor>::
+                        template solution_value_type<Number>> &
     get_values(const std::string &global_vector_name,
                const Extractor &  variable,
                const Number       dummy = Number(0));
@@ -605,9 +623,8 @@ namespace MeshWorker
      * the documentation of the FEValues class for more information.
      */
     template <typename Extractor, typename Number = double>
-    const std::vector<
-      typename internal::OutputType<dim, spacedim, Number, Extractor>::
-        gradient_type> &
+    const std::vector<typename FEValuesViews::View<dim, spacedim, Extractor>::
+                        template solution_gradient_type<Number>> &
     get_gradients(const std::string &global_vector_name,
                   const Extractor &  variable,
                   const Number       dummy = Number(0));
@@ -635,9 +652,8 @@ namespace MeshWorker
      * the documentation of the FEValues class for more information.
      */
     template <typename Extractor, typename Number = double>
-    const std::vector<
-      typename internal::OutputType<dim, spacedim, Number, Extractor>::
-        symmetric_gradient_type> &
+    const std::vector<typename FEValuesViews::View<dim, spacedim, Extractor>::
+                        template solution_symmetric_gradient_type<Number>> &
     get_symmetric_gradients(const std::string &global_vector_name,
                             const Extractor &  variable,
                             const Number       dummy = Number(0));
@@ -664,9 +680,8 @@ namespace MeshWorker
      * the documentation of the FEValues class for more information.
      */
     template <typename Extractor, typename Number = double>
-    const std::vector<
-      typename internal::OutputType<dim, spacedim, Number, Extractor>::
-        divergence_type> &
+    const std::vector<typename FEValuesViews::View<dim, spacedim, Extractor>::
+                        template solution_divergence_type<Number>> &
     get_divergences(const std::string &global_vector_name,
                     const Extractor &  variable,
                     const Number       dummy = Number(0));
@@ -693,12 +708,11 @@ namespace MeshWorker
      * the documentation of the FEValues class for more information.
      */
     template <typename Extractor, typename Number = double>
-    const std::vector<typename internal::
-                        OutputType<dim, spacedim, Number, Extractor>::curl_type>
-      &
-      get_curls(const std::string &global_vector_name,
-                const Extractor &  variable,
-                const Number       dummy = Number(0));
+    const std::vector<typename FEValuesViews::View<dim, spacedim, Extractor>::
+                        template solution_curl_type<Number>> &
+    get_curls(const std::string &global_vector_name,
+              const Extractor &  variable,
+              const Number       dummy = Number(0));
 
     /**
      * For the solution vector identified by @p global_vector_name, compute
@@ -722,12 +736,39 @@ namespace MeshWorker
      * the documentation of the FEValues class for more information.
      */
     template <typename Extractor, typename Number = double>
-    const std::vector<
-      typename internal::OutputType<dim, spacedim, Number, Extractor>::
-        hessian_type> &
+    const std::vector<typename FEValuesViews::View<dim, spacedim, Extractor>::
+                        template solution_hessian_type<Number>> &
     get_hessians(const std::string &global_vector_name,
                  const Extractor &  variable,
                  const Number       dummy = Number(0));
+
+    /**
+     * For the solution vector identified by @p global_vector_name, compute
+     * the Laplacians of the function at the quadrature points, and return a
+     * vector with the correct type deduced by the Extractor you passed as the
+     * @p variable argument.
+     *
+     * Before you can call this method, you need to call the
+     * extract_local_dof_values() method at least once, passing the same
+     * @p global_vector_name string, and the same type for the variable @p dummy.
+     *
+     * If you have not previously called the extract_local_dof_values() method,
+     * this function will throw an exception.
+     *
+     * For this function to work properly, the underlying FEValues,
+     * FEFaceValues, or FESubfaceValues object for which you called one of the
+     * reinit() functions, must have computed the information you are
+     * requesting. To do so, the update_hessians flag must be an element of the
+     * list of UpdateFlags that you passed to the constructor of this object.
+     * See "The interplay of UpdateFlags, Mapping, and FiniteElement" in
+     * the documentation of the FEValues class for more information.
+     */
+    template <typename Extractor, typename Number = double>
+    const std::vector<typename FEValuesViews::View<dim, spacedim, Extractor>::
+                        template solution_laplacian_type<Number>> &
+    get_laplacians(const std::string &global_vector_name,
+                   const Extractor &  variable,
+                   const Number       dummy = Number(0));
 
     /**
      * For the solution vector identified by @p global_vector_name, compute
@@ -751,9 +792,8 @@ namespace MeshWorker
      * FiniteElement" in the documentation of the FEValues for more information.
      */
     template <typename Extractor, typename Number = double>
-    const std::vector<
-      typename internal::OutputType<dim, spacedim, Number, Extractor>::
-        third_derivative_type> &
+    const std::vector<typename FEValuesViews::View<dim, spacedim, Extractor>::
+                        template solution_third_derivative_type<Number>> &
     get_third_derivatives(const std::string &global_vector_name,
                           const Extractor &  variable,
                           const Number       dummy = Number(0));
@@ -865,6 +905,11 @@ namespace MeshWorker
     std::unique_ptr<FESubfaceValues<dim, spacedim>> neighbor_fe_subface_values;
 
     /**
+     * Interface values on facets.
+     */
+    std::unique_ptr<FEInterfaceValues<dim, spacedim>> interface_fe_values;
+
+    /**
      * Dof indices on the current cell.
      */
     std::vector<types::global_dof_index> local_dof_indices;
@@ -888,13 +933,13 @@ namespace MeshWorker
      * A pointer to the last used FEValues/FEFaceValues, or FESubfaceValues
      * object on this cell.
      */
-    SmartPointer<FEValuesBase<dim, spacedim>> current_fe_values;
+    SmartPointer<const FEValuesBase<dim, spacedim>> current_fe_values;
 
     /**
      * A pointer to the last used FEValues/FEFaceValues, or FESubfaceValues
      * object on the neighbor cell.
      */
-    SmartPointer<FEValuesBase<dim, spacedim>> current_neighbor_fe_values;
+    SmartPointer<const FEValuesBase<dim, spacedim>> current_neighbor_fe_values;
   };
 
 #ifndef DOXYGEN
@@ -938,7 +983,7 @@ namespace MeshWorker
     const VectorType & input_vector,
     const Number       dummy)
   {
-    const unsigned int n_dofs = get_current_fe_values().get_fe().dofs_per_cell;
+    const unsigned int n_dofs = local_dof_indices.size();
 
     const std::string name =
       get_unique_dofs_name(global_vector_name, n_dofs, dummy);
@@ -971,7 +1016,8 @@ namespace MeshWorker
     const std::string &global_vector_name,
     Number             dummy) const
   {
-    const unsigned int n_dofs = get_current_fe_values().get_fe().dofs_per_cell;
+    const unsigned int n_dofs =
+      get_current_fe_values().get_fe().n_dofs_per_cell();
 
     const std::string dofs_name =
       get_unique_dofs_name(global_vector_name, n_dofs, dummy);
@@ -989,13 +1035,11 @@ namespace MeshWorker
 
   template <int dim, int spacedim>
   template <typename Extractor, typename Number>
-  const std::vector<
-    typename internal::OutputType<dim, spacedim, Number, Extractor>::value_type>
-    &
-    ScratchData<dim, spacedim>::get_values(
-      const std::string &global_vector_name,
-      const Extractor &  variable,
-      const Number       dummy)
+  const std::vector<typename FEValuesViews::View<dim, spacedim, Extractor>::
+                      template solution_value_type<Number>> &
+  ScratchData<dim, spacedim>::get_values(const std::string &global_vector_name,
+                                         const Extractor &  variable,
+                                         const Number       dummy)
   {
     const std::vector<Number> &independent_local_dofs =
       get_local_dof_values(global_vector_name, dummy);
@@ -1009,8 +1053,8 @@ namespace MeshWorker
 
     // Now build the return type
     using RetType =
-      std::vector<typename internal::
-                    OutputType<dim, spacedim, Number, Extractor>::value_type>;
+      std::vector<typename FEValuesViews::View<dim, spacedim, Extractor>::
+                    template solution_value_type<Number>>;
 
     RetType &ret =
       internal_data_storage.template get_or_add_object_with_name<RetType>(
@@ -1027,9 +1071,8 @@ namespace MeshWorker
 
   template <int dim, int spacedim>
   template <typename Extractor, typename Number>
-  const std::vector<
-    typename internal::OutputType<dim, spacedim, Number, Extractor>::
-      gradient_type> &
+  const std::vector<typename FEValuesViews::View<dim, spacedim, Extractor>::
+                      template solution_gradient_type<Number>> &
   ScratchData<dim, spacedim>::get_gradients(
     const std::string &global_vector_name,
     const Extractor &  variable,
@@ -1046,9 +1089,9 @@ namespace MeshWorker
       global_vector_name, variable, "_gradients_q", n_q_points, dummy);
 
     // Now build the return type
-    using RetType = std::vector<
-      typename internal::OutputType<dim, spacedim, Number, Extractor>::
-        gradient_type>;
+    using RetType =
+      std::vector<typename FEValuesViews::View<dim, spacedim, Extractor>::
+                    template solution_gradient_type<Number>>;
 
     RetType &ret =
       internal_data_storage.template get_or_add_object_with_name<RetType>(
@@ -1065,9 +1108,8 @@ namespace MeshWorker
 
   template <int dim, int spacedim>
   template <typename Extractor, typename Number>
-  const std::vector<
-    typename internal::OutputType<dim, spacedim, Number, Extractor>::
-      hessian_type> &
+  const std::vector<typename FEValuesViews::View<dim, spacedim, Extractor>::
+                      template solution_hessian_type<Number>> &
   ScratchData<dim, spacedim>::get_hessians(
     const std::string &global_vector_name,
     const Extractor &  variable,
@@ -1085,8 +1127,8 @@ namespace MeshWorker
 
     // Now build the return type
     using RetType =
-      std::vector<typename internal::
-                    OutputType<dim, spacedim, Number, Extractor>::hessian_type>;
+      std::vector<typename FEValuesViews::View<dim, spacedim, Extractor>::
+                    template solution_hessian_type<Number>>;
 
     RetType &ret =
       internal_data_storage.template get_or_add_object_with_name<RetType>(
@@ -1104,9 +1146,46 @@ namespace MeshWorker
 
   template <int dim, int spacedim>
   template <typename Extractor, typename Number>
-  const std::vector<
-    typename internal::OutputType<dim, spacedim, Number, Extractor>::
-      third_derivative_type> &
+  const std::vector<typename FEValuesViews::View<dim, spacedim, Extractor>::
+                      template solution_laplacian_type<Number>> &
+  ScratchData<dim, spacedim>::get_laplacians(
+    const std::string &global_vector_name,
+    const Extractor &  variable,
+    const Number       dummy)
+  {
+    const std::vector<Number> &independent_local_dofs =
+      get_local_dof_values(global_vector_name, dummy);
+
+    const FEValuesBase<dim, spacedim> &fev = get_current_fe_values();
+
+    const unsigned int n_q_points = fev.n_quadrature_points;
+
+    const std::string name = get_unique_name(
+      global_vector_name, variable, "_laplacians_q", n_q_points, dummy);
+
+    // Now build the return type
+    using RetType =
+      std::vector<typename FEValuesViews::View<dim, spacedim, Extractor>::
+                    template solution_laplacian_type<Number>>;
+
+    RetType &ret =
+      internal_data_storage.template get_or_add_object_with_name<RetType>(
+        name, n_q_points);
+
+
+    AssertDimension(ret.size(), n_q_points);
+
+    fev[variable].get_function_laplacians_from_local_dof_values(
+      independent_local_dofs, ret);
+    return ret;
+  }
+
+
+
+  template <int dim, int spacedim>
+  template <typename Extractor, typename Number>
+  const std::vector<typename FEValuesViews::View<dim, spacedim, Extractor>::
+                      template solution_third_derivative_type<Number>> &
   ScratchData<dim, spacedim>::get_third_derivatives(
     const std::string &global_vector_name,
     const Extractor &  variable,
@@ -1123,9 +1202,9 @@ namespace MeshWorker
       global_vector_name, variable, "_third_derivatives_q", n_q_points, dummy);
 
     // Now build the return type
-    using RetType = std::vector<
-      typename internal::OutputType<dim, spacedim, Number, Extractor>::
-        third_derivative_type>;
+    using RetType =
+      std::vector<typename FEValuesViews::View<dim, spacedim, Extractor>::
+                    template solution_third_derivative_type<Number>>;
 
     RetType &ret =
       internal_data_storage.template get_or_add_object_with_name<RetType>(
@@ -1143,9 +1222,8 @@ namespace MeshWorker
 
   template <int dim, int spacedim>
   template <typename Extractor, typename Number>
-  const std::vector<
-    typename internal::OutputType<dim, spacedim, Number, Extractor>::
-      symmetric_gradient_type> &
+  const std::vector<typename FEValuesViews::View<dim, spacedim, Extractor>::
+                      template solution_symmetric_gradient_type<Number>> &
   ScratchData<dim, spacedim>::get_symmetric_gradients(
     const std::string &global_vector_name,
     const Extractor &  variable,
@@ -1163,9 +1241,9 @@ namespace MeshWorker
 
 
     // Now build the return type
-    using RetType = std::vector<
-      typename internal::OutputType<dim, spacedim, Number, Extractor>::
-        symmetric_gradient_type>;
+    using RetType =
+      std::vector<typename FEValuesViews::View<dim, spacedim, Extractor>::
+                    template solution_symmetric_gradient_type<Number>>;
 
     RetType &ret =
       internal_data_storage.template get_or_add_object_with_name<RetType>(
@@ -1182,9 +1260,8 @@ namespace MeshWorker
 
   template <int dim, int spacedim>
   template <typename Extractor, typename Number>
-  const std::vector<
-    typename internal::OutputType<dim, spacedim, Number, Extractor>::
-      divergence_type> &
+  const std::vector<typename FEValuesViews::View<dim, spacedim, Extractor>::
+                      template solution_divergence_type<Number>> &
   ScratchData<dim, spacedim>::get_divergences(
     const std::string &global_vector_name,
     const Extractor &  variable,
@@ -1201,9 +1278,9 @@ namespace MeshWorker
       global_vector_name, variable, "_divergence_q", n_q_points, dummy);
 
     // Now build the return type
-    using RetType = std::vector<
-      typename internal::OutputType<dim, spacedim, Number, Extractor>::
-        divergence_type>;
+    using RetType =
+      std::vector<typename FEValuesViews::View<dim, spacedim, Extractor>::
+                    template solution_divergence_type<Number>>;
 
     RetType &ret =
       internal_data_storage.template get_or_add_object_with_name<RetType>(
@@ -1221,12 +1298,11 @@ namespace MeshWorker
 
   template <int dim, int spacedim>
   template <typename Extractor, typename Number>
-  const std::vector<
-    typename internal::OutputType<dim, spacedim, Number, Extractor>::curl_type>
-    &
-    ScratchData<dim, spacedim>::get_curls(const std::string &global_vector_name,
-                                          const Extractor &  variable,
-                                          const Number       dummy)
+  const std::vector<typename FEValuesViews::View<dim, spacedim, Extractor>::
+                      template solution_curl_type<Number>> &
+  ScratchData<dim, spacedim>::get_curls(const std::string &global_vector_name,
+                                        const Extractor &  variable,
+                                        const Number       dummy)
   {
     const std::vector<Number> &independent_local_dofs =
       get_local_dof_values(global_vector_name, dummy);
@@ -1240,8 +1316,8 @@ namespace MeshWorker
 
     // Now build the return type
     using RetType =
-      std::vector<typename internal::
-                    OutputType<dim, spacedim, Number, Extractor>::curl_type>;
+      std::vector<typename FEValuesViews::View<dim, spacedim, Extractor>::
+                    template solution_curl_type<Number>>;
 
     RetType &ret =
       internal_data_storage.template get_or_add_object_with_name<RetType>(

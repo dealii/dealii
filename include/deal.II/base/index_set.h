@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2019 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -50,7 +50,7 @@ DEAL_II_NAMESPACE_OPEN
 /**
  * A class that represents a subset of indices among a larger set. For
  * example, it can be used to denote the set of degrees of freedom within the
- * range $[0,\text{dof\_handler.n\_dofs})$ that belongs to a particular
+ * range $[0,\mathrm{dof\_handler.n\_dofs()})$ that belongs to a particular
  * subdomain, or those among all degrees of freedom that are stored on a
  * particular processor in a distributed parallel computation.
  *
@@ -68,8 +68,6 @@ DEAL_II_NAMESPACE_OPEN
  * The data structures used in this class along with a rationale can be found
  * in the
  * @ref distributed_paper "Distributed Computing paper".
- *
- * @author Wolfgang Bangerth, 2009
  */
 class IndexSet
 {
@@ -215,7 +213,7 @@ public:
    * <code>[0,size())</code> represented by the current object.
    */
   void
-  add_indices(const IndexSet &other, const unsigned int offset = 0);
+  add_indices(const IndexSet &other, const size_type offset = 0);
 
   /**
    * Return whether the specified index is an element of the index set.
@@ -261,7 +259,7 @@ public:
    * n_elements().
    */
   size_type
-  nth_index_in_set(const unsigned int local_index) const;
+  nth_index_in_set(const size_type local_index) const;
 
   /**
    * Return the how-manyth element of this set (counted in ascending order) @p
@@ -286,8 +284,15 @@ public:
   /**
    * This function returns the local index of the beginning of the largest
    * range.
+   *
+   * In other words, the return value is nth_index_in_set(x), where x is the
+   * first index of the largest contiguous range of indices in the
+   * IndexSet. The return value is therefore equal to the number of elements
+   * in the set that come before the largest range.
+   *
+   * This call assumes that the IndexSet is nonempty.
    */
-  unsigned int
+  size_type
   largest_range_starting_index() const;
 
   /**
@@ -338,12 +343,40 @@ public:
   get_view(const size_type begin, const size_type end) const;
 
   /**
+   * Split the set indices represented by this object into blocks given by the
+   * @p n_indices_per_block structure. The sum of its entries must match the
+   * global size of the current object.
+   */
+  std::vector<IndexSet>
+  split_by_block(
+    const std::vector<types::global_dof_index> &n_indices_per_block) const;
+
+  /**
    * Remove all elements contained in @p other from this set. In other words,
    * if $x$ is the current object and $o$ the argument, then we compute $x
    * \leftarrow x \backslash o$.
    */
   void
   subtract_set(const IndexSet &other);
+
+  /**
+   * Return a new IndexSet, with global size equal to
+   * `this->size()*other.size()`, containing for every element `n` of this
+   * IndexSet, the entries in the half open range `[n*other.size(),
+   * (n+1)*other.size())` of the @p other IndexSet.
+   *
+   * The name results from the perspective that one starts with an IndexSet and
+   * takes the tensor product with another IndexSet with `other.size()`
+   * elements; this results in a matrix of size `this->size()` times
+   * `other.size()` that has ones in exactly the rows for which this IndexSet
+   * contained an index and in the columns for which the @p other IndexSet
+   * contained an index. This matrix is then "unrolled" again by going through
+   * each row one by one and reindexing the entries of the matrix in consecutive
+   * order. A one in the matrix then corresponds to an entry in the reindexed
+   * IndexSet that is returned by this function.
+   */
+  IndexSet
+  tensor_product(const IndexSet &other) const;
 
   /**
    * Remove and return the last element of the last range.
@@ -472,7 +505,8 @@ public:
 
   /**
    * Write or read the data of this object to or from a stream for the purpose
-   * of serialization
+   * of serialization using the [BOOST serialization
+   * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
    */
   template <class Archive>
   void
@@ -899,7 +933,8 @@ private:
 
     /**
      * Write or read the data of this object to or from a stream for the
-     * purpose of serialization
+     * purpose of serialization using the [BOOST serialization
+     * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
      */
     template <class Archive>
     void
@@ -975,7 +1010,7 @@ private:
  * @relatesalso IndexSet
  */
 inline IndexSet
-complete_index_set(const unsigned int N)
+complete_index_set(const IndexSet::size_type N)
 {
   IndexSet is(N);
   is.add_range(0, N);
@@ -1495,8 +1530,7 @@ inline IndexSet::ElementIterator
 IndexSet::at(const size_type global_index) const
 {
   compress();
-  Assert(global_index < size(),
-         ExcIndexRangeType<size_type>(global_index, 0, size()));
+  AssertIndexRange(global_index, size());
 
   if (ranges.empty())
     return end();
@@ -1618,8 +1652,7 @@ IndexSet::compress() const
 inline void
 IndexSet::add_index(const size_type index)
 {
-  Assert(index < index_space_size,
-         ExcIndexRangeType<size_type>(index, 0, index_space_size));
+  AssertIndexRange(index, index_space_size);
 
   const Range new_range(index, index + 1);
   if (ranges.size() == 0 || index > ranges.back().end)
@@ -1636,12 +1669,49 @@ IndexSet::add_index(const size_type index)
 
 
 
+inline void
+IndexSet::add_range(const size_type begin, const size_type end)
+{
+  Assert((begin < index_space_size) ||
+           ((begin == index_space_size) && (end == index_space_size)),
+         ExcIndexRangeType<size_type>(begin, 0, index_space_size));
+  Assert(end <= index_space_size,
+         ExcIndexRangeType<size_type>(end, 0, index_space_size + 1));
+  AssertIndexRange(begin, end + 1);
+
+  if (begin != end)
+    {
+      const Range new_range(begin, end);
+
+      // the new index might be larger than the last index present in the
+      // ranges. Then we can skip the binary search
+      if (ranges.size() == 0 || begin > ranges.back().end)
+        ranges.push_back(new_range);
+      else
+        ranges.insert(Utilities::lower_bound(ranges.begin(),
+                                             ranges.end(),
+                                             new_range),
+                      new_range);
+      is_compressed = false;
+    }
+}
+
+
+
 template <typename ForwardIterator>
 inline void
 IndexSet::add_indices(const ForwardIterator &begin, const ForwardIterator &end)
 {
-  // insert each element of the range. if some of them happen to be
-  // consecutive, merge them to a range
+  if (begin == end)
+    return;
+
+  // identify ranges in the given iterator range by checking whether some
+  // indices happen to be consecutive. to avoid quadratic complexity when
+  // calling add_range many times (as add_range() going into the middle of an
+  // already existing range must shift entries around), we first collect a
+  // vector of ranges.
+  std::vector<std::pair<size_type, size_type>> tmp_ranges;
+  bool                                         ranges_are_sorted = true;
   for (ForwardIterator p = begin; p != end;)
     {
       const size_type begin_index = *p;
@@ -1654,9 +1724,39 @@ IndexSet::add_indices(const ForwardIterator &begin, const ForwardIterator &end)
           ++q;
         }
 
-      add_range(begin_index, end_index);
+      tmp_ranges.emplace_back(begin_index, end_index);
       p = q;
+
+      // if the starting index of the next go-around of the for loop is less
+      // than the end index of the one just identified, then we will have at
+      // least one pair of ranges that are not sorted, and consequently the
+      // whole collection of ranges is not sorted.
+      if (p != end && *p < end_index)
+        ranges_are_sorted = false;
     }
+
+  if (!ranges_are_sorted)
+    std::sort(tmp_ranges.begin(), tmp_ranges.end());
+
+  // if we have many ranges, we first construct a temporary index set (where
+  // we add ranges in a consecutive way, so fast), otherwise, we work with
+  // add_range(). the number 9 is chosen heuristically given the fact that
+  // there are typically up to 8 independent ranges when adding the degrees of
+  // freedom on a 3D cell or 9 when adding degrees of freedom of faces. if
+  // doing cell-by-cell additions, we want to avoid repeated calls to
+  // IndexSet::compress() which gets called upon merging two index sets, so we
+  // want to be in the other branch then.
+  if (tmp_ranges.size() > 9)
+    {
+      IndexSet tmp_set(size());
+      tmp_set.ranges.reserve(tmp_ranges.size());
+      for (const auto &i : tmp_ranges)
+        tmp_set.add_range(i.first, i.second);
+      this->add_indices(tmp_set);
+    }
+  else
+    for (const auto &i : tmp_ranges)
+      add_range(i.first, i.second);
 }
 
 
@@ -1762,7 +1862,7 @@ IndexSet::n_intervals() const
 
 
 
-inline unsigned int
+inline IndexSet::size_type
 IndexSet::largest_range_starting_index() const
 {
   Assert(ranges.empty() == false, ExcMessage("IndexSet cannot be empty."));
@@ -1777,9 +1877,9 @@ IndexSet::largest_range_starting_index() const
 
 
 inline IndexSet::size_type
-IndexSet::nth_index_in_set(const unsigned int n) const
+IndexSet::nth_index_in_set(const size_type n) const
 {
-  Assert(n < n_elements(), ExcIndexRangeType<size_type>(n, 0, n_elements()));
+  AssertIndexRange(n, n_elements());
 
   compress();
 
@@ -1823,7 +1923,7 @@ IndexSet::index_within_set(const size_type n) const
   // to make this call thread-safe, compress() must not be called through this
   // function
   Assert(is_compressed == true, ExcMessage("IndexSet must be compressed."));
-  Assert(n < size(), ExcIndexRangeType<size_type>(n, 0, size()));
+  AssertIndexRange(n, size());
 
   // return immediately if the index set is empty
   if (is_empty())

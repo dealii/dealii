@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,6 +17,10 @@
 #include <deal.II/algorithms/newton.h>
 #include <deal.II/algorithms/operator.h>
 
+#include <deal.II/dofs/dof_handler.h>
+
+#include <deal.II/fe/fe_q.h>
+
 #include <deal.II/grid/grid_generator.h>
 
 #include <deal.II/numerics/vector_tools.h>
@@ -26,7 +30,6 @@
 
 // verify that all debug vectors have the correct size
 
-using namespace dealii;
 using namespace Algorithms;
 
 template <typename VectorType, int dim>
@@ -121,9 +124,7 @@ test()
 int
 main()
 {
-  std::string   logname = "output";
-  std::ofstream logfile(logname.c_str());
-  deallog.attach(logfile);
+  initlog();
 
   test<2>();
 }

@@ -1,0 +1,103 @@
+
+DEAL::dim= 2 cells=9
+DEAL::* default:
+DEAL:: cell lvl=1 active=1 id=0_1:1
+DEAL:: cell lvl=1 active=1 id=0_1:2
+DEAL:: cell lvl=1 active=1 id=0_1:3
+DEAL:: cell lvl=2 active=1 id=0_2:00
+DEAL:: cell lvl=2 active=1 id=0_2:01
+DEAL:: cell lvl=2 active=1 id=0_2:02
+DEAL:: cell lvl=2 active=1 id=0_2:03
+DEAL::* all cells:
+DEAL:: cell lvl=0 active=0 id=0_0:
+DEAL:: cell lvl=1 active=0 id=0_1:0
+DEAL:: cell lvl=1 active=1 id=0_1:1
+DEAL:: cell lvl=1 active=1 id=0_1:2
+DEAL:: cell lvl=1 active=1 id=0_1:3
+DEAL:: cell lvl=2 active=1 id=0_2:00
+DEAL:: cell lvl=2 active=1 id=0_2:01
+DEAL:: cell lvl=2 active=1 id=0_2:02
+DEAL:: cell lvl=2 active=1 id=0_2:03
+DEAL::* all cells with level <=1:
+DEAL:: cell lvl=0 active=0 id=0_0:
+DEAL:: cell lvl=1 active=0 id=0_1:0
+DEAL:: cell lvl=1 active=1 id=0_1:1
+DEAL:: cell lvl=1 active=1 id=0_1:2
+DEAL:: cell lvl=1 active=1 id=0_1:3
+DEAL::* LevelEqualTo 0
+DEAL:: cell lvl=0 active=0 id=0_0:
+DEAL::* LevelEqualTo 1
+DEAL:: cell lvl=1 active=0 id=0_1:0
+DEAL:: cell lvl=1 active=1 id=0_1:1
+DEAL:: cell lvl=1 active=1 id=0_1:2
+DEAL:: cell lvl=1 active=1 id=0_1:3
+DEAL::* LevelEqualTo 2
+DEAL:: cell lvl=2 active=1 id=0_2:00
+DEAL:: cell lvl=2 active=1 id=0_2:01
+DEAL:: cell lvl=2 active=1 id=0_2:02
+DEAL:: cell lvl=2 active=1 id=0_2:03
+DEAL::dim= 3 cells=17
+DEAL::* default:
+DEAL:: cell lvl=1 active=1 id=0_1:1
+DEAL:: cell lvl=1 active=1 id=0_1:2
+DEAL:: cell lvl=1 active=1 id=0_1:3
+DEAL:: cell lvl=1 active=1 id=0_1:4
+DEAL:: cell lvl=1 active=1 id=0_1:5
+DEAL:: cell lvl=1 active=1 id=0_1:6
+DEAL:: cell lvl=1 active=1 id=0_1:7
+DEAL:: cell lvl=2 active=1 id=0_2:00
+DEAL:: cell lvl=2 active=1 id=0_2:01
+DEAL:: cell lvl=2 active=1 id=0_2:02
+DEAL:: cell lvl=2 active=1 id=0_2:03
+DEAL:: cell lvl=2 active=1 id=0_2:04
+DEAL:: cell lvl=2 active=1 id=0_2:05
+DEAL:: cell lvl=2 active=1 id=0_2:06
+DEAL:: cell lvl=2 active=1 id=0_2:07
+DEAL::* all cells:
+DEAL:: cell lvl=0 active=0 id=0_0:
+DEAL:: cell lvl=1 active=0 id=0_1:0
+DEAL:: cell lvl=1 active=1 id=0_1:1
+DEAL:: cell lvl=1 active=1 id=0_1:2
+DEAL:: cell lvl=1 active=1 id=0_1:3
+DEAL:: cell lvl=1 active=1 id=0_1:4
+DEAL:: cell lvl=1 active=1 id=0_1:5
+DEAL:: cell lvl=1 active=1 id=0_1:6
+DEAL:: cell lvl=1 active=1 id=0_1:7
+DEAL:: cell lvl=2 active=1 id=0_2:00
+DEAL:: cell lvl=2 active=1 id=0_2:01
+DEAL:: cell lvl=2 active=1 id=0_2:02
+DEAL:: cell lvl=2 active=1 id=0_2:03
+DEAL:: cell lvl=2 active=1 id=0_2:04
+DEAL:: cell lvl=2 active=1 id=0_2:05
+DEAL:: cell lvl=2 active=1 id=0_2:06
+DEAL:: cell lvl=2 active=1 id=0_2:07
+DEAL::* all cells with level <=1:
+DEAL:: cell lvl=0 active=0 id=0_0:
+DEAL:: cell lvl=1 active=0 id=0_1:0
+DEAL:: cell lvl=1 active=1 id=0_1:1
+DEAL:: cell lvl=1 active=1 id=0_1:2
+DEAL:: cell lvl=1 active=1 id=0_1:3
+DEAL:: cell lvl=1 active=1 id=0_1:4
+DEAL:: cell lvl=1 active=1 id=0_1:5
+DEAL:: cell lvl=1 active=1 id=0_1:6
+DEAL:: cell lvl=1 active=1 id=0_1:7
+DEAL::* LevelEqualTo 0
+DEAL:: cell lvl=0 active=0 id=0_0:
+DEAL::* LevelEqualTo 1
+DEAL:: cell lvl=1 active=0 id=0_1:0
+DEAL:: cell lvl=1 active=1 id=0_1:1
+DEAL:: cell lvl=1 active=1 id=0_1:2
+DEAL:: cell lvl=1 active=1 id=0_1:3
+DEAL:: cell lvl=1 active=1 id=0_1:4
+DEAL:: cell lvl=1 active=1 id=0_1:5
+DEAL:: cell lvl=1 active=1 id=0_1:6
+DEAL:: cell lvl=1 active=1 id=0_1:7
+DEAL::* LevelEqualTo 2
+DEAL:: cell lvl=2 active=1 id=0_2:00
+DEAL:: cell lvl=2 active=1 id=0_2:01
+DEAL:: cell lvl=2 active=1 id=0_2:02
+DEAL:: cell lvl=2 active=1 id=0_2:03
+DEAL:: cell lvl=2 active=1 id=0_2:04
+DEAL:: cell lvl=2 active=1 id=0_2:05
+DEAL:: cell lvl=2 active=1 id=0_2:06
+DEAL:: cell lvl=2 active=1 id=0_2:07

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2019 by the deal.II authors
+// Copyright (C) 2010 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -37,6 +37,24 @@ for (VEC : VECTOR_TYPES; DH : DOFHANDLER_TEMPLATES;
         const VEC &,
         const DataPostprocessor<
           DH<deal_II_dimension, deal_II_dimension>::space_dimension> &);
+
+
+    template void DataOut_DoFData<DH<deal_II_dimension, deal_II_dimension>,
+                                  deal_II_dimension,
+                                  deal_II_dimension>::
+      add_mg_data_vector<VEC>(const DH<deal_II_dimension, deal_II_dimension> &,
+                              const MGLevelObject<VEC> &,
+                              const std::string &);
+
+    template void DataOut_DoFData<DH<deal_II_dimension, deal_II_dimension>,
+                                  deal_II_dimension,
+                                  deal_II_dimension>::
+      add_mg_data_vector<VEC>(
+        const DH<deal_II_dimension, deal_II_dimension> &,
+        const MGLevelObject<VEC> &,
+        const std::vector<std::string> &,
+        const std::vector<
+          DataComponentInterpretation::DataComponentInterpretation> &);
 
 
 
@@ -124,27 +142,6 @@ for (deal_II_dimension : DIMENSIONS)
       namespace DataOutImplementation
       \{
         template struct ParallelDataBase<deal_II_dimension, deal_II_dimension>;
-      \}
-    \}
-  }
-
-
-for (DH : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS)
-  {
-    namespace internal
-    \{
-      namespace DataOutImplementation
-      \{
-        template void
-        ParallelDataBase<deal_II_dimension, deal_II_dimension>::
-          reinit_all_fe_values<
-            dealii::DH<deal_II_dimension, deal_II_dimension>>(
-            std::vector<std::shared_ptr<
-              DataEntryBase<dealii::DH<deal_II_dimension, deal_II_dimension>>>>
-              &dof_data,
-            const dealii::Triangulation<deal_II_dimension,
-                                        deal_II_dimension>::cell_iterator &cell,
-            const unsigned int face);
       \}
     \}
   }

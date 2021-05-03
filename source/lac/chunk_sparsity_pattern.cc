@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2019 by the deal.II authors
+// Copyright (C) 2008 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -345,8 +345,8 @@ ChunkSparsityPattern::add(const size_type i, const size_type j)
 bool
 ChunkSparsityPattern::exists(const size_type i, const size_type j) const
 {
-  Assert(i < rows, ExcIndexRange(i, 0, rows));
-  Assert(j < cols, ExcIndexRange(j, 0, cols));
+  AssertIndexRange(i, rows);
+  AssertIndexRange(j, cols);
 
   return sparsity_pattern.exists(i / chunk_size, j / chunk_size);
 }
@@ -369,7 +369,7 @@ ChunkSparsityPattern::symmetrize()
 ChunkSparsityPattern::size_type
 ChunkSparsityPattern::row_length(const size_type i) const
 {
-  Assert(i < rows, ExcIndexRange(i, 0, rows));
+  AssertIndexRange(i, rows);
 
   // find out if we did padding and if this row is affected by it
   if (n_cols() % chunk_size == 0)
@@ -592,6 +592,7 @@ ChunkSparsityPattern::memory_consumption() const
 
 
 
+#ifndef DOXYGEN
 // explicit instantiations
 template void
 ChunkSparsityPattern::copy_from<DynamicSparsityPattern>(
@@ -616,5 +617,6 @@ ChunkSparsityPattern::copy_from<float>(const FullMatrix<float> &,
 template void
 ChunkSparsityPattern::copy_from<double>(const FullMatrix<double> &,
                                         const size_type);
+#endif
 
 DEAL_II_NAMESPACE_CLOSE

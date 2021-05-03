@@ -15,7 +15,7 @@
 
 
 
-// check correct behaviour of reinit of Trilinos vectors
+// check correct behavior of reinit of Trilinos vectors
 
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/utilities.h>

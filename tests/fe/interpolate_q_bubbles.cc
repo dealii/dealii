@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -40,8 +40,7 @@ check_q_bubbles(const Function<dim> &f, const unsigned int degree)
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   Q1WedgeFunction<1, 1> w1;
   check_q_bubbles(w1, 1);

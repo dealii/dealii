@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -49,33 +49,6 @@ for (deal_II_dimension : DIMENSIONS)
           const types<deal_II_dimension>::forest *parallel_forest,
           const types<deal_II_dimension>::topidx  coarse_grid_cell);
 
-#  endif
-      \}
-    \}
-#endif  // DEAL_II_WITH_P4EST
-  }
-
-
-for (deal_II_dimension, deal_II_space_dimension : DIMENSIONS)
-  {
-#ifdef DEAL_II_WITH_P4EST
-
-    namespace internal
-    \{
-      namespace p4est
-      \{
-#  if deal_II_dimension > 1
-#    if deal_II_space_dimension >= deal_II_dimension
-        template std::map<unsigned int, std::set<dealii::types::subdomain_id>>
-        compute_vertices_with_ghost_neighbors(
-          const dealii::parallel::distributed::
-            Triangulation<deal_II_dimension, deal_II_space_dimension> &tria,
-          typename dealii::internal::p4est::types<deal_II_dimension>::forest
-            *parallel_forest,
-          typename dealii::internal::p4est::types<deal_II_dimension>::ghost
-            *parallel_ghost);
-
-#    endif
 #  endif
       \}
     \}

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,6 +15,8 @@
 
 #ifndef dealii_lac_exceptions_h
 #define dealii_lac_exceptions_h
+
+#include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
 

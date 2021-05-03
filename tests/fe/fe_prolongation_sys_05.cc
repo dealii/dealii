@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2018 by the deal.II authors
+// Copyright (C) 2007 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,6 +15,7 @@
 
 
 #include "../tests.h"
+
 #include "fe_prolongation_common.h"
 
 
@@ -26,7 +27,7 @@ main()
 
   CHECK_SYS3((FESystem<2>(FE_Q<2>(1), 3)),
              3,
-             FE_DGQArbitraryNodes<2>(QIterated<1>(QTrapez<1>(), 3)),
+             FE_DGQArbitraryNodes<2>(QIterated<1>(QTrapezoid<1>(), 3)),
              1,
              FE_Q<2>(1),
              3,

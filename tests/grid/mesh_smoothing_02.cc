@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -50,19 +50,16 @@ char logname[] = "output";
 #include "../tests.h"
 
 
-using namespace dealii;
-
-
 
 template <int dim>
 bool
 cell_is_patch_level_1(const typename Triangulation<dim>::cell_iterator &cell)
 {
-  Assert(cell->active() == false, ExcInternalError());
+  Assert(cell->is_active() == false, ExcInternalError());
 
   unsigned int n_active_children = 0;
   for (unsigned int i = 0; i < cell->n_children(); ++i)
-    if (cell->child(i)->active())
+    if (cell->child(i)->is_active())
       ++n_active_children;
 
   return (n_active_children == 0) || (n_active_children == cell->n_children());
@@ -90,8 +87,8 @@ test()
        ++cell)
     {
       deallog << "Cell = " << cell
-              << (cell->active() ? " is active " : " is not active ");
-      if (!cell->active())
+              << (cell->is_active() ? " is active " : " is not active ");
+      if (!cell->is_active())
         {
           deallog << "and has children: ";
           for (unsigned int i = 0; i < 4; ++i)
@@ -118,7 +115,7 @@ test()
       AssertThrow((cell->refine_flag_set() == false) &&
                     (cell->coarsen_flag_set() == false),
                   ExcInternalError());
-      if (!cell->active())
+      if (!cell->is_active())
         AssertThrow(cell_is_patch_level_1<2>(cell), ExcInternalError());
     }
 

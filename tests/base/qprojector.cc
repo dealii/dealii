@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -56,7 +56,7 @@ void check_face(Quadrature<1> &q1)
   deallog << "Checking dim " << dim << " 1d-points " << q1.size() << std::endl;
 
   Quadrature<dim - 1> subquadrature(q1);
-  for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+  for (const unsigned int f : GeometryInfo<dim>::face_indices())
     {
       deallog << "Face " << f << std::endl;
 
@@ -66,7 +66,7 @@ void check_face(Quadrature<1> &q1)
         deallog << quadrature.point(k) << std::endl;
     }
 
-  for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+  for (const unsigned int f : GeometryInfo<dim>::face_indices())
     for (unsigned int s = 0; s < GeometryInfo<dim>::max_children_per_face; ++s)
       {
         deallog << "Face " << f << " subface " << s << std::endl;
@@ -91,7 +91,7 @@ void check_faces(Quadrature<1> &q1)
 
   Quadrature<dim> faces = QProjector<dim>::project_to_all_faces(subquadrature);
 
-  for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+  for (const unsigned int f : GeometryInfo<dim>::face_indices())
     {
       deallog << "Face " << f << " orientation false" << std::endl;
 
@@ -174,7 +174,7 @@ main()
   QGauss<1> midpoint(1);
   check(midpoint);
 
-  QTrapez<1> trapez;
+  QTrapezoid<1> trapez;
   check(trapez);
 
   QSimpson<1> simpson;

@@ -19,14 +19,15 @@
 
 
 // all include files you need here
-#include <deal.II/base/std_cxx14/memory.h>
-
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
+
+#include <memory>
+
 
 template <int dim, int spacedim>
 class MyManifold : public Manifold<dim, spacedim>
@@ -46,7 +47,7 @@ public:
   std::unique_ptr<Manifold<dim, spacedim>>
   clone() const override
   {
-    return std_cxx14::make_unique<MyManifold<dim, spacedim>>();
+    return std::make_unique<MyManifold<dim, spacedim>>();
   }
 };
 

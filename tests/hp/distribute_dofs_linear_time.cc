@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -23,6 +23,8 @@
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/quadrature_lib.h>
 
+#include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/mapping_q.h>
 
@@ -31,7 +33,6 @@
 #include <deal.II/grid/manifold.h>
 #include <deal.II/grid/manifold_lib.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/fe_values.h>
 #include <deal.II/hp/q_collection.h>
@@ -45,7 +46,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 static const types::manifold_id circular_manifold_id = 1;
 static const types::manifold_id straight_manifold_id = 3;
@@ -88,9 +88,8 @@ ladutenko_circle(Triangulation<dim> &triangulation,
     {
       if (cell->center().distance(center) < 1e-10)
         {
-          for (unsigned int vertex_n = 0;
-               vertex_n < GeometryInfo<dim>::vertices_per_cell;
-               ++vertex_n)
+          for (const unsigned int vertex_n :
+               GeometryInfo<dim>::vertex_indices())
             {
               cell->vertex(vertex_n) *=
                 core_radius / center.distance(cell->vertex(vertex_n));
@@ -110,7 +109,7 @@ ladutenko_circle(Triangulation<dim> &triangulation,
   cell = triangulation.begin_active();
   for (; cell != endc; ++cell)
     {
-      for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+      for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
         {
           const double dist = center.distance(cell->vertex(v));
           if (dist > core_radius * 1.0001 && dist < radius - 1.0e-5)
@@ -140,7 +139,7 @@ public:
   std::shared_ptr<Manifold<dim>> boundary_manifold;
   Triangulation<dim>             triangulation;
   hp::FECollection<dim>          finite_elements;
-  hp::DoFHandler<dim>            dof_handler;
+  DoFHandler<dim>                dof_handler;
 
   void
   setup_dofs();
@@ -180,9 +179,9 @@ QuadraticTimeCircle<dim>::setup_dofs()
 {
   deallog << "Number of cells: " << triangulation.n_active_cells() << std::endl;
 
-  typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                              .begin_active(),
-                                                     endc = dof_handler.end();
+  typename DoFHandler<dim>::active_cell_iterator cell =
+                                                   dof_handler.begin_active(),
+                                                 endc = dof_handler.end();
   {
     cell->set_active_fe_index(0);
   }

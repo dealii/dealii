@@ -5,7 +5,7 @@
   <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
   <title>The deal.II Testsuite</title>
   <link href="../screen.css" rel="StyleSheet">
-  <meta name="copyright" content="Copyright (C) 1998 - 2018 by the deal.II Authors">
+  <meta name="copyright" content="Copyright (C) 1998 - 2020 by the deal.II Authors">
   <meta name="keywords" content="deal dealii finite elements fem triangulation">
   <meta http-equiv="content-language" content="en">
 </head>
@@ -65,6 +65,13 @@ my_test_2.output</pre>
       variable) is invoked with the path of <code>my_test_2.prm</code> as
       first argument. Again, its screen output is compared against
       <code>my_test_2.output</code>
+      <pre>
+my_test_3.json
+my_test_3.output</pre>
+      Just like in the last case, an already built executable (that is defined by a CMake
+      variable) is invoked with the path of <code>my_test_3.json</code> as
+      first argument. Again, its screen output is compared against
+      <code>my_test_3.output</code>
     </p>
 
     <a name="examples"></a>
@@ -103,8 +110,8 @@ tests/my_test.prm</pre>
 SET(TARGET step-1)
 SET(TARGET_SRC step-1.cc)
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12)
-FIND_PACKAGE(deal.II 9.2.0 REQUIRED
+CMAKE_MINIMUM_REQUIRED(VERSION 3.1.0)
+FIND_PACKAGE(deal.II 9.3.0 REQUIRED
   HINTS ${deal.II_DIR} ${DEAL_II_DIR} ../ ../../ $ENV{DEAL_II_DIR}
   )
 
@@ -201,15 +208,15 @@ tests/support/my_test_2.output</pre>
 
     <p>
       Again, we want to use the "autopilot" configuration for user projects
-      (see the <a href="cmakelists.html">cmake documentation</a> for
+      (see the <a href="cmake_user.html">cmake documentation</a> for
       details). The top-level <code>CMakeLists.txt</code> is now solely
       responsible for finding deal.II, enable testing, and descending into
       subdirectories:
       <pre class="cmake">
 # top-level CMakelists.txt
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12)
-FIND_PACKAGE(deal.II 9.2.0 REQUIRED
+CMAKE_MINIMUM_REQUIRED(VERSION 3.1.0)
+FIND_PACKAGE(deal.II 9.3.0 REQUIRED
   HINTS ${deal.II_DIR} ${DEAL_II_DIR} ../ ../../ $ENV{DEAL_II_DIR}
   )
 
@@ -301,9 +308,8 @@ TEST_TARGET or
 TEST_TARGET_DEBUG and TEST_TARGET_RELEASE
   - used instead of TEST_TARGET for debug/release configuration
 
-NUMDIFF_EXECUTABLE, DIFF_EXECUTABLE
-  - pointing to valid diff executables. If NUMDIFF_EXECUTABLE is not
-    "numdiff" it will be ignored and DIFF_EXECUTABLE is used instead
+NUMDIFF_EXECUTABLE
+  - pointing to a valid "numdiff" executable
 
 TEST_TIME_LIMIT
   - specifying the maximal wall clock time in seconds a test is allowed

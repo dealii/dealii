@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -49,10 +49,20 @@ check_this(const DoFHandler<dim> &dof_handler);
 
 
 void
-output_bool_vector(std::vector<bool> &v)
+output_bool_vector(const std::vector<bool> &v)
 {
   for (unsigned int i = 0; i < v.size(); ++i)
     deallog << (v[i] ? '1' : '0');
+  deallog << std::endl;
+}
+
+
+
+void
+output_bool_vector(const IndexSet &v)
+{
+  for (unsigned int i = 0; i < v.size(); ++i)
+    deallog << (v.is_element(i) ? '1' : '0');
   deallog << std::endl;
 }
 
@@ -62,7 +72,7 @@ template <int dim>
 void
 set_boundary_ids(Triangulation<dim> &tria)
 {
-  for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+  for (const unsigned int f : GeometryInfo<dim>::face_indices())
     tria.begin_active()->face(f)->set_boundary_id(f);
 }
 
@@ -95,6 +105,8 @@ check(const FiniteElement<dim> &fe, const std::string &name)
        cell != tria.end();
        ++cell)
     cell->set_subdomain_id(cell->level());
+
+  // setup DoFHandler
   DoFHandler<dim> dof_handler(tria);
   dof_handler.distribute_dofs(fe);
 

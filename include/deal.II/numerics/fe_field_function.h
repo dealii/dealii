@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2018 by the deal.II authors
+// Copyright (C) 2007 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,8 +16,11 @@
 #ifndef dealii_fe_function_h
 #define dealii_fe_function_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/function.h>
 #include <deal.II/base/point.h>
+#include <deal.II/base/std_cxx17/optional.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/thread_local_storage.h>
 
@@ -30,15 +33,16 @@
 
 #include <deal.II/lac/vector.h>
 
-#include <boost/optional.hpp>
-
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declaration
+#ifndef DOXYGEN
 namespace VectorTools
 {
   class ExcPointNotAvailableHere;
 }
+#endif
 
 namespace Functions
 {
@@ -52,11 +56,12 @@ namespace Functions
    * needs to find out where the points lie.
    *
    * If you know in advance in which cell your points lie, you can accelerate
-   * things a bit, by calling set_active_cell before asking for values or
+   * things a bit, by calling set_active_cell() before asking for values or
    * gradients of the function. If you don't do this, and your points don't
    * lie in the cell that is currently stored, the function
-   * GridTools::find_cell_around_point is called to find out where the point
-   * is. You can specify an optional mapping to use when looking for points in
+   * GridTools::find_active_cell_around_point is called to find out where the
+   * point is.
+   * You can specify an optional mapping to use when looking for points in
    * the grid. If you don't do so, this function uses a Q1 mapping.
    *
    * Once the FEFieldFunction knows where the points lie, it creates a
@@ -66,7 +71,7 @@ namespace Functions
    *
    * If you only need the quadrature points but not the values of the finite
    * element function (you might want this for the adjoint interpolation), you
-   * can also use the function @p compute_point_locations alone.
+   * can also use the function compute_point_locations() alone.
    *
    * An example of how to use this function is the following:
    *
@@ -83,22 +88,25 @@ namespace Functions
    * DoFHandler<dim> dh1 (tria_1);
    * Vector<double> solution_1;
    *
-   * // Do the same with the second
+   * // On this first domain, set up the various data structures,
+   * // assemble matrices, solve the linear system, and get a Nobel
+   * // prize for the work we have done here:
+   * [...]
+   *
+   * // Then create a DoFHandler and solution vector for the second domain:
    * DoFHandler<dim> dh2 (tria_2);
    * Vector<double> solution_2;
    *
-   * // Setup the system, assemble matrices, solve problems and get the
-   * // nobel prize on the first domain...
-   *
-   * // Now project it to the second domain
-   * FEFieldFunction<dim> fe_function_1 (dh_1, solution_1);
+   * // Finally, project the solution on the first domain onto the
+   * // second domain, assuming that this does not require querying
+   * // values from outside the first domain:
+   * Functions::FEFieldFunction<dim> fe_function_1 (dh_1, solution_1);
    * VectorTools::project (dh_2, constraints_2, quad,
    *                       fe_function_1, solution_2);
    *
-   * // Or interpolate it...
+   * // Alternatively, we could have also interpolated it:
    * Vector<double> solution_3;
    * VectorTools::interpolate (dh_2, fe_function_1, solution_3);
-   *
    * @endcode
    *
    * The snippet of code above will work assuming that the second
@@ -154,7 +162,6 @@ namespace Functions
    * @endcode
    *
    * @ingroup functions
-   * @author Luca Heltai, 2006, Markus Buerg, 2012, Wolfgang Bangerth, 2013
    */
   template <int dim,
             typename DoFHandlerType = DoFHandler<dim>,
@@ -209,7 +216,7 @@ namespace Functions
      * only one component (i.e. the function is scalar), you should state the
      * component you want to have evaluated; it defaults to zero, i.e. the
      * first component. It is inefficient to use single points. If you need
-     * more than one at a time, use the vector_value_list function. For
+     * more than one at a time, use the vector_value_list() function. For
      * efficiency reasons, it is better if all the points lie on the same
      * cell. This is not mandatory, however it does speed things up.
      *
@@ -268,7 +275,7 @@ namespace Functions
     /**
      * Return the gradient of all components of the function at the given
      * point.  It is inefficient to use single points. If you need more than
-     * one at a time, use the vector_value_list function. For efficiency
+     * one at a time, use the vector_value_list() function. For efficiency
      * reasons, it is better if all the points lie on the same cell. This is
      * not mandatory, however it does speed things up.
      *
@@ -288,7 +295,7 @@ namespace Functions
     /**
      * Return the gradient of the specified component of the function at the
      * given point. It is inefficient to use single points. If you need more
-     * than one at a time, use the vector_value_list function. For efficiency
+     * than one at a time, use the vector_value_list() function. For efficiency
      * reasons, it is better if all the points lie on the same cell. This is
      * not mandatory, however it does speed things up.
      *
@@ -473,14 +480,33 @@ namespace Functions
     /**
      * Given a cell, return the reference coordinates of the given point
      * within this cell if it indeed lies within the cell. Otherwise return an
-     * uninitialized boost::optional object.
+     * uninitialized std_cxx17::optional object.
      */
-    boost::optional<Point<dim>>
+    std_cxx17::optional<Point<dim>>
     get_reference_coordinates(
       const typename DoFHandlerType::active_cell_iterator &cell,
       const Point<dim> &                                   point) const;
   };
 } // namespace Functions
+
+namespace Legacy
+{
+  namespace Functions
+  {
+    /**
+     * The template arguments of the original dealii::Functions::FEFieldFunction
+     * class will change in a future release. If for some reason, you need a
+     * code that is compatible with deal.II 9.3 and the subsequent release, use
+     * this alias instead.
+     */
+    template <int dim,
+              typename DoFHandlerType = DoFHandler<dim>,
+              typename VectorType     = Vector<double>>
+    using FEFieldFunction =
+      dealii::Functions::FEFieldFunction<dim, DoFHandlerType, VectorType>;
+  } // namespace Functions
+} // namespace Legacy
+
 
 DEAL_II_NAMESPACE_CLOSE
 

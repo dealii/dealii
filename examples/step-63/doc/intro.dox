@@ -9,17 +9,19 @@ Award EAR-0949446 and EAR-1550901 and The University of California -
 Davis.
 </i>
 
+@dealiiTutorialDOI{10.5281/zenodo.3382899,https://zenodo.org/badge/DOI/10.5281/zenodo.3382899.svg}
+
 <a name="Intro"></a>
 <h1>Introduction</h1>
 
 This program solves an advection-diffusion problem using a geometric multigrid
-preconditioner. The basics of this preconditioner are discussed in step-16;
+(GMG) preconditioner. The basics of this preconditioner are discussed in step-16;
 here we discuss the necessary changes needed for a non-symmetric
 PDE. Additionally, we introduce the idea of block smoothing (as compared to
 point smoothing in step-16), and examine the effects of DoF renumbering for
 additive and multiplicative smoothers.
 
-<h2>Equation</h2>
+<h3>Equation</h3>
 The advection-diffusion equation is given by
 @f{align*}{
 -\varepsilon \Delta u + \boldsymbol{\beta}\cdot \nabla u & = f &
@@ -35,16 +37,29 @@ direction</i>, and $f$ is a source. A few notes:
 2. If $\varepsilon=0$ then this is the stationary advection equation solved in
 step-9.
 
-3. Define the <i>Peclet number</i>: $\mathcal{P} \dealcoloneq \|\boldsymbol{\beta}\|
-\cdot L/\varepsilon$. If $\mathcal{P}>1$, we say the problem is
+3. One can define a dimensionless number for this problem, called the
+<i>Peclet number</i>: $\mathcal{P} \dealcoloneq \frac{\|\boldsymbol{\beta}\|
+L}{\varepsilon}$, where $L$ is the length scale of the domain. It
+characterizes the kind of equation we are
+considering: If $\mathcal{P}>1$, we say the problem is
 <i>advection-dominated</i>, else if $\mathcal{P}<1$ we will say the problem is
-<i>diffusion-dominated</i>. Here $L$ is the length scale of the domain.
+<i>diffusion-dominated</i>.
 
 For the discussion in this tutorial we will be concerned with
-advection-dominated flow. 
+advection-dominated flow. This is the complicated case: We know that
+for diffusion-dominated problems, the standard Galerkin method works
+just fine, and we also know that simple multigrid methods such as
+those defined in step-16 are very efficient. On the other hand, for
+advection-dominated problems, the standard Galerkin approach leads to
+oscillatory and unstable discretizations, and simple solvers are often
+not very efficient. This tutorial program is therefore intended to
+address both of these issues.
+
+
+<h4>Streamline diffusion</h4>
 
 Using the standard Galerkin finite element method, for suitable test
-functions $v_h$, the discrete weak form of the PDE reads
+functions $v_h$, a discrete weak form of the PDE would read
 @f{align*}{
 a(u_h,v_h) = F(v_h)
 @f}
@@ -55,16 +70,37 @@ a(u_h,v_h) &= (\varepsilon \nabla v_h,\, \nabla u_h) +
 F(v_h) &= (v_h,\,f).
 @f}
 
-<h3>Streamline diffusion</h3>
-
-The following error estimate can be shown for this PDE:
+Unfortunately, one typically gets oscillatory solutions with this
+approach. Indeed, the following error estimate can be shown for this
+formulation:
 @f{align*}{
 \|\nabla (u-u_h)\| \leq (1+\mathcal{P}) \inf_{v_h} \|\nabla (u-v_h)\|.
 @f}
+The infimum on the right can be estimated as follows if the exact
+solution is sufficiently smooth:
+@f{align*}{
+  \inf_{v_h} \|\nabla (u-v_h)\|.
+  \le
+  \|\nabla (u-I_h u)\|
+  \le
+  h^k
+  C
+  \|\nabla^k u)\|
+@f}
+where $k$ is the polynomial degree of the finite elements used. As a
+consequence, we obtain the estimate
+@f{align*}{
+\|\nabla (u-u_h)\|
+\leq (1+\mathcal{P}) C h^k
+  \|\nabla^k u)\|.
+@f}
+In other words, the numerical solution will converge. On the other hand,
+given the definition of $\mathcal{P}$ above, we have to expect poor
+numerical solutions with a large error when $\varepsilon \ll
+\|\boldsymbol{\beta}\| L$, i.e., if the problem has only a small
+amount of diffusion.
 
-Given the definition of $\mathcal{P}$ above, we may have poor
-numerical solutions when $\varepsilon \ll \|\boldsymbol{\beta}\|\cdot
-L$. To combat this, we will consider the new weak form
+To combat this, we will consider the new weak form
 @f{align*}{
 a(u_h,\,v_h) + \sum_K (-\varepsilon \Delta u_h +
 \boldsymbol{\beta}\cdot \nabla u_h-f,\,\delta_K
@@ -72,36 +108,66 @@ a(u_h,\,v_h) + \sum_K (-\varepsilon \Delta u_h +
 @f}
 where the sum is done over all cells $K$ with the inner product taken
 for each cell, and $\delta_K$ is a cell-wise constant
-stabilization parameter defined in <a
-href="https://link.springer.com/chapter/10.1007/978-3-540-34288-5_27">
-On Discontinuity-Capturing Methods for Convection-Diffusion Equations
-by Volker John and Petr Knobloch</a>. Essentially, adding in the
+stabilization parameter defined in
+@cite john2006discontinuity.
+
+Essentially, adding in the
 discrete strong form residual enhances the coercivity of the bilinear
 form $a(\cdot,\cdot)$ which increases the stability of the discrete
 solution. This method is commonly referred to as <i>streamline
 diffusion</i> or <i>SUPG</i> (streamline upwind/Petrov-Galerkin).
 
 
-<h2>Smoothers</h2>
+<h3>Smoothers</h3>
 
 One of the goals of this tutorial is to expand from using a simple
 (point-wise) Gauss-Seidel (SOR) smoother that is used in step-16
 (class PreconditionSOR) on each level of the multigrid hierarchy.
-Here, we consider point-wise smoothers (Jacobi and SOR) and cell-based
-smoothers (Block Jacobi and Block SOR). The cell-based smoothers can
+The term "point-wise" is traditionally used in solvers to indicate that one
+solves at one "grid point" at a time; for scalar problems, this means
+to use a solver that updates one unknown of the linear
+system at a time, keeping all of the others fixed; one would then
+iterate over all unknowns in the problem and, once done, start over again
+from the first unknown until these "sweeps" converge. Jacobi,
+Gauss-Seidel, and SOR iterations can all be interpreted in this way.
+In the context of multigrid, one does not think of these methods as
+"solvers", but as "smoothers". As such, one is not interested in
+actually solving the linear system. It is enough to remove the high-frequency
+part of the residual for the multigrid method to work, because that allows
+restricting the solution to a coarser mesh.  Therefore, one only does a few,
+fixed number of "sweeps" over all unknowns. In the code in this
+tutorial this is controlled by the "Smoothing steps" parameter.
+
+But these methods are known to converge rather slowly when used as
+solvers. While as multigrid smoothers, they are surprisingly good,
+they can also be improved upon. In particular, we consider
+"cell-based" smoothers here as well. These methods solve for all
+unknowns on a cell at once, keeping all other unknowns fixed; they
+then move on to the next cell, and so on and so forth. One can think
+of them as "block" versions of Jacobi, Gauss-Seidel, or SOR, but
+because degrees of freedom are shared among multiple cells, these
+blocks overlap and the methods are in fact
 best be explained within the framework of additive and multiplicative
 Schwarz methods.
 
 In contrast to step-16, our test problem contains an advective
 term. Especially with a small diffusion constant $\varepsilon$, information is
 transported along streamlines in the given advection direction. This means
-that smoothers are likely to be more effective, if they allow information to
-travel in downstream direction within a single smoother application. This
+that smoothers are likely to be more effective if they allow information to
+travel in downstream direction within a single smoother
+application. If we want to solve one unknown (or block of unknowns) at
+a time in the order in which these unknowns (or blocks) are
+enumerated, then this information propagation property
 requires reordering degrees of freedom or cells (for the cell-based smoothers)
-accordingly. The influence of the ordering will be visible in the results
-section.
+accordingly so that the ones further upstream are treated earlier
+(have lower indices) and those further downstream are treated later
+(have larger indices). The influence of the ordering will be visible
+in the results section.
 
-Let us now briefly define the smoothers used in this tutorial. A Schwarz
+Let us now briefly define the smoothers used in this tutorial.
+For a more detailed introduction, we refer to
+@cite KanschatNotesIterative and the books @cite smith2004domain and @cite toselli2006domain.
+A Schwarz
 preconditioner requires a decomposition
 @f{align*}{
 V = \sum_{j=1}^J V_j
@@ -120,9 +186,10 @@ operator $A$ as
 In other words, we project our solution into each subproblem, apply the
 inverse of the subproblem $A_j$, and sum the contributions up over all $j$.
 
-Note that one can interpret the point-wise Jacobi method as an additive
+Note that one can interpret the point-wise (one unknown at a time)
+Jacobi method as an additive
 Schwarz method by defining a subproblem $V_j$ for each degree of
-freedom. Then, $A_j^{-1}$ becomes a multiplication with the inverse of the
+freedom. Then, $A_j^{-1}$ becomes a multiplication with the inverse of a
 diagonal entry of $A$.
 
 For the "Block Jacobi" method used in this tutorial, we define a subproblem
@@ -130,24 +197,42 @@ $V_j$ for each cell of the mesh on the current level. Note that we use a
 continuous finite element, so these blocks are overlapping, as degrees of
 freedom on an interface between two cells belong to both subproblems. The
 logic for the Schwarz operator operating on the subproblems (in deal.II they
-are called "blocks"), is done in the class RelaxationBlock. The "Block
+are called "blocks") is implemented in the class RelaxationBlock. The "Block
 Jacobi" method is implemented in the class RelaxationBlockJacobi. Many
 aspects of the class (for example how the blocks are defined and how to invert
 the local subproblems $A_j$) can be configured in the smoother data, see
-RelaxationBlock::AdditionalData and DoFTools::make_cell_patches for details.
+RelaxationBlock::AdditionalData and DoFTools::make_cell_patches() for details.
 
 So far, we discussed additive smoothers where the updates can be applied
 independently and there is no information flowing within a single smoother
 application. A <i>multiplicative Schwarz preconditioner</i> addresses this
 and is defined by
 @f{align*}{
- B^{-1} = \left( I- \prod_{j=1}^J I-P_J \right) A^{-1}.
+ B^{-1} = \left( I- \prod_{j=1}^J \left(I-P_j\right) \right) A^{-1}.
 @f}
 In contrast to above, the updates on the subproblems $V_j$ are applied
 sequentially. This means that the update obtained when inverting the
-subproblem $A_j$ is immediately used in $A_{j+1}$.
+subproblem $A_j$ is immediately used in $A_{j+1}$. This becomes
+visible when writing out the project:
+@f{align*}{
+ B^{-1}
+ =
+ \left(
+   I
+   -
+   \left(I-P_1\right)\left(I-P_2\right)\cdots\left(I-P_J\right)
+ \right)
+ A^{-1}
+ =
+   A^{-1}
+   -
+   \left[ \left(I-P_1\right)
+   \left[ \left(I-P_2\right)\cdots
+     \left[\left(I-P_J\right) A^{-1}\right] \cdots \right] \right]
+@f}
 
-This method is implemented in the class RelaxationBlockSOR and used when you
+When defining the sub-spaces $V_j$ as whole blocks of degrees of
+freedom, this method is implemented in the class RelaxationBlockSOR and used when you
 select "Block SOR" in this tutorial. The class RelaxationBlockSOR is also
 derived from RelaxationBlock. As such, both additive and multiplicative
 Schwarz methods are implemented in a unified framework.
@@ -156,15 +241,16 @@ Finally, let us note that the standard Gauss-Seidel (or SOR) method can be
 seen as a multiplicative Schwarz method with a subproblem for each DoF.
 
 
-<h2>Test problem</h2>
+<h3>Test problem</h3>
 
 We will be considering the following test problem: $\Omega =
-[-1,\,1]\times[-1,\,1]$ with a circle of radius 0.3 centered at the
-origin removed, $\varepsilon=0.005$, $\boldsymbol{\beta} =
-[-\sin(\pi/6),\,\cos(\pi/6)]$, $f=0$, and the boundary function 
+[-1,\,1]\times[-1,\,1]\backslash B_{0.3}(0)$, i.e., a square
+with a circle of radius 0.3 centered at the
+origin removed. In addition, we use $\varepsilon=0.005$, $\boldsymbol{\beta} =
+[-\sin(\pi/6),\,\cos(\pi/6)]$, $f=0$, and Dirichlet boundary values
 @f{align*}{
-g = \left\{\begin{array}{ll} 1 & x=-1 \text{ OR } y=-1,\,x\geq 0.5 \\ 
-0 & \text{else} \end{array}\right.
+g = \left\{\begin{array}{ll} 1 & \text{if } x=-1 \text{ or } y=-1,\,x\geq 0.5 \\
+0 & \text{otherwise} \end{array}\right.
 @f}
 
 The following figures depict the solutions with (left) and without
@@ -177,7 +263,6 @@ of the standard Galerkin finite element method for this problem.
     <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-63-solution.png" alt="">
     </td>
-
     <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-63-solution-no-sd.png" alt="">
     </td>

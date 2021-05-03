@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2018 by the deal.II authors
+// Copyright (C) 2010 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -69,7 +69,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 template <int dim>
 class MaxwellProblem
 {
@@ -310,7 +309,12 @@ MaxwellProblem<dim>::setup_system()
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
   // FE_Nedelec boundary condition.
   VectorTools::project_boundary_values_curl_conforming_l2(
-    dof_handler, 0, ExactSolution<dim>(), 0, constraints);
+    dof_handler,
+    0,
+    ExactSolution<dim>(),
+    0,
+    constraints,
+    StaticMappingQ1<dim>::mapping);
 
   constraints.close();
   DynamicSparsityPattern c_sparsity(dof_handler.n_dofs());
@@ -349,7 +353,7 @@ MaxwellProblem<dim>::assemble_system()
       fe_values.reinit(cell);
       right_hand_side.vector_value_list(fe_values.get_quadrature_points(),
                                         rhs_values);
-      for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+      for (const auto q_point : fe_values.quadrature_point_indices())
         {
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             {

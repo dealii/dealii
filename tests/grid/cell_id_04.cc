@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -34,7 +34,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 template <int dim>
 void
@@ -57,7 +56,8 @@ check(Triangulation<dim> &tr)
 
       const CellId cid2(cids);
 
-      typename Triangulation<dim>::cell_iterator cell2 = cid2.to_cell(tr);
+      typename Triangulation<dim>::cell_iterator cell2 =
+        tr.create_cell_iterator(cid2);
 
       Assert(cid2 == cid, ExcInternalError());
       Assert(cell2 == cell, ExcInternalError());

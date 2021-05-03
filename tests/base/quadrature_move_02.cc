@@ -68,7 +68,7 @@ main()
   initlog();
 
   check_quadrature_assign_move<QMidpoint>();
-  check_quadrature_assign_move<QTrapez>();
+  check_quadrature_assign_move<QTrapezoid>();
   check_quadrature_assign_move<QSimpson>();
   check_quadrature_assign_move<QMilne>();
   check_quadrature_assign_move<QWeddle>();

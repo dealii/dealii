@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2018 by the deal.II authors
+// Copyright (C) 2011 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -56,8 +56,9 @@ test()
                                                local_relevant,
                                                MPI_COMM_WORLD);
 
-  deallog << "Local range of proc 0: " << v.local_range().first << " "
-          << v.local_range().second << std::endl;
+  deallog << "Local range of proc 0: "
+          << v.get_partitioner()->local_range().first << " "
+          << v.get_partitioner()->local_range().second << std::endl;
 
   // set local values
   for (types::global_dof_index i = min_index + myid * local_size;
@@ -75,7 +76,7 @@ test()
   Assert(v(min_index + 39) == min_index + 39, ExcInternalError());
   Assert(v(min_index + 38) == min_index + 38, ExcInternalError());
 
-  v.zero_out_ghosts();
+  v.zero_out_ghost_values();
   v(min_index + 38) = min_index;
   v(min_index + 39) = min_index * 2;
   v(min_index + 41) = min_index + 7;

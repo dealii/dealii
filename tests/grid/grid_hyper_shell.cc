@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2018 by the deal.II authors
+// Copyright (C) 2007 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -52,7 +52,7 @@ check(double r1, double r2, unsigned int n)
            tria.begin_active();
          c != tria.end();
          ++c)
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+      for (const unsigned int f : GeometryInfo<dim>::face_indices())
         if (c->face(f)->at_boundary())
           for (unsigned int e = 0; e < GeometryInfo<dim>::lines_per_face; ++e)
             c->face(f)->line(e)->set_manifold_id(0);

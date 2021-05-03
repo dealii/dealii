@@ -24,8 +24,11 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace Particles
 {
+  // Forward declaration
+#ifndef DOXYGEN
   template <int, int>
   class ParticleHandler;
+#endif
 
   /**
    * A class that is used to iterate over particles. Together with the
@@ -104,7 +107,7 @@ namespace Particles
     operator++(int);
 
     /**
-     * Prefix <tt>--</tt> operator: <tt>--iterator</tt>. This operator moves
+     * Prefix <tt>\--</tt> operator: <tt>\--iterator</tt>. This operator moves
      * the iterator to the previous element and returns a reference to
      * <tt>*this</tt>.
      */
@@ -112,7 +115,7 @@ namespace Particles
     operator--();
 
     /**
-     * Postfix <tt>--</tt> operator: <tt>iterator--</tt>. This operator moves
+     * Postfix <tt>\--</tt> operator: <tt>iterator\--</tt>. This operator moves
      * the iterator to the previous element, but returns an iterator to the
      * element previously pointed to.
      */
@@ -136,6 +139,120 @@ namespace Particles
      */
     ParticleAccessor<dim, spacedim> accessor;
   };
+
+
+
+  // ------------------------------ inline functions -------------------------
+
+  template <int dim, int spacedim>
+  inline ParticleIterator<dim, spacedim>::ParticleIterator(
+    const std::multimap<internal::LevelInd, Particle<dim, spacedim>> &map,
+    const typename std::multimap<internal::LevelInd,
+                                 Particle<dim, spacedim>>::iterator & particle)
+    : accessor(map, particle)
+  {}
+
+
+
+  template <int dim, int spacedim>
+  inline ParticleAccessor<dim, spacedim> &ParticleIterator<dim, spacedim>::
+                                          operator*()
+  {
+    return accessor;
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline ParticleAccessor<dim, spacedim> *ParticleIterator<dim, spacedim>::
+                                          operator->()
+  {
+    return &(this->operator*());
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline const ParticleAccessor<dim, spacedim> &
+    ParticleIterator<dim, spacedim>::operator*() const
+  {
+    return accessor;
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline const ParticleAccessor<dim, spacedim> *
+    ParticleIterator<dim, spacedim>::operator->() const
+  {
+    return &(this->operator*());
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline bool
+  ParticleIterator<dim, spacedim>::
+  operator!=(const ParticleIterator<dim, spacedim> &other) const
+  {
+    return accessor != other.accessor;
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline bool
+  ParticleIterator<dim, spacedim>::
+  operator==(const ParticleIterator<dim, spacedim> &other) const
+  {
+    return accessor == other.accessor;
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline ParticleIterator<dim, spacedim> &
+  ParticleIterator<dim, spacedim>::operator++()
+  {
+    accessor.next();
+    return *this;
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline ParticleIterator<dim, spacedim>
+  ParticleIterator<dim, spacedim>::operator++(int)
+  {
+    ParticleIterator tmp(*this);
+                     operator++();
+
+    return tmp;
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline ParticleIterator<dim, spacedim> &
+  ParticleIterator<dim, spacedim>::operator--()
+  {
+    accessor.prev();
+    return *this;
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline ParticleIterator<dim, spacedim>
+  ParticleIterator<dim, spacedim>::operator--(int)
+  {
+    ParticleIterator tmp(*this);
+                     operator--();
+
+    return tmp;
+  }
+
+
 } // namespace Particles
 
 DEAL_II_NAMESPACE_CLOSE

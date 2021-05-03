@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2019 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -56,7 +56,6 @@
 
 namespace LA = dealii::LinearAlgebraTrilinos;
 
-using namespace dealii;
 
 class Test_Solver_Output
 {
@@ -218,11 +217,10 @@ Test_Solver_Output::setup_system()
 
   DoFTools::make_sparsity_pattern(dof_handler, dsp, constraints, false);
 
-  SparsityTools::distribute_sparsity_pattern(
-    dsp,
-    dof_handler.n_locally_owned_dofs_per_processor(),
-    mpi_comm,
-    locally_relevant_dofs);
+  SparsityTools::distribute_sparsity_pattern(dsp,
+                                             locally_owned_dofs,
+                                             mpi_comm,
+                                             locally_relevant_dofs);
 
   system_matrix.reinit(locally_owned_dofs, locally_owned_dofs, dsp, mpi_comm);
 }
@@ -479,9 +477,9 @@ Test_Solver_Output::output(unsigned int cycle)
            ++i)
         filenames.push_back("solution-" + Utilities::int_to_string(cycle, 2) +
                             "." + Utilities::int_to_string(i, 4) + ".vtu");
-      std::ofstream master_output(
+      std::ofstream pvtu_output(
         ("solution-" + Utilities::int_to_string(cycle, 2) + ".pvtu").c_str());
-      data_out.write_pvtu_record(master_output, filenames);
+      data_out.write_pvtu_record(pvtu_output, filenames);
     }
 }
 

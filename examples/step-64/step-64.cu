@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2019 by the deal.II authors
+ * Copyright (C) 2019 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -17,7 +17,7 @@
  * Authors: Bruno Turcksin, Daniel Arndt, Oak Ridge National Laboratory, 2019
  */
 
-// First include the necessary files from the deal.II libary known from the
+// First include the necessary files from the deal.II library known from the
 // previous tutorials.
 #include <deal.II/base/conditional_ostream.h>
 #include <deal.II/base/quadrature_lib.h>
@@ -37,8 +37,8 @@
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/vector_tools.h>
 
-// This includes the data structures for the implementation of matrix-free
-// methods on GPU
+// The following ones include the data structures for the
+// implementation of matrix-free methods on GPU:
 #include <deal.II/base/cuda.h>
 
 #include <deal.II/matrix_free/cuda_fe_evaluation.h>
@@ -47,17 +47,22 @@
 
 #include <fstream>
 
+
+// As usual, we enclose everything into a namespace of its own:
 namespace Step64
 {
   using namespace dealii;
 
 
-  // Define a class that implements the varying coefficients we want to use in
-  // the Helmholtz operator.
-  // Later, we want to pass an object of this type to a
-  // CUDAWrappers::MatrixFree<dim, double> object that expects the class to have
-  // an operator that fills the values provided in the constructor for a given
-  // cell.
+  // @sect3{Class <code>VaryingCoefficientFunctor</code>}
+
+  // Next, we define a class that implements the varying coefficients
+  // we want to use in the Helmholtz operator. Later, we want to pass
+  // an object of this type to a CUDAWrappers::MatrixFree
+  // object that expects the class to have an `operator()` that fills the
+  // values provided in the constructor for a given cell. This operator
+  // needs to run on the device, so it needs to be marked as `__device__`
+  // for the compiler.
   template <int dim, int fe_degree>
   class VaryingCoefficientFunctor
   {
@@ -85,6 +90,9 @@ namespace Step64
 
 
 
+  // The following function implements this coefficient. Recall from
+  // the introduction that we have defined it as $a(\mathbf
+  // x)=\frac{10}{0.05 + 2\|\mathbf x\|^2}$
   template <int dim, int fe_degree>
   __device__ void VaryingCoefficientFunctor<dim, fe_degree>::operator()(
     const unsigned int                                          cell,
@@ -92,7 +100,7 @@ namespace Step64
   {
     const unsigned int pos = CUDAWrappers::local_q_point_id<dim, double>(
       cell, gpu_data, n_dofs_1d, n_q_points);
-    const Tensor<1, dim> q_point =
+    const Point<dim> q_point =
       CUDAWrappers::get_quadrature_point<dim, double>(cell,
                                                       gpu_data,
                                                       n_dofs_1d);
@@ -100,16 +108,23 @@ namespace Step64
     double p_square = 0.;
     for (unsigned int i = 0; i < dim; ++i)
       {
-        double coord = q_point[i];
+        const double coord = q_point[i];
         p_square += coord * coord;
       }
     coef[pos] = 10. / (0.05 + 2. * p_square);
   }
 
 
-  // The class `HelmholtzOperatorQuad` implements the evaluation of the
-  // Helmholtz operator at each quadrature point. It uses a similar mechanism as
-  // the MatrixFree framework introduced in step-37.
+  // @sect3{Class <code>HelmholtzOperatorQuad</code>}
+
+  // The class `HelmholtzOperatorQuad` implements the evaluation of
+  // the Helmholtz operator at each quadrature point. It uses a
+  // similar mechanism as the MatrixFree framework introduced in
+  // step-37. In contrast to there, the actual quadrature point
+  // index is treated implicitly by converting the current thread
+  // index. As before, the functions of this class need to run on
+  // the device, so need to be marked as `__device__` for the
+  // compiler.
   template <int dim, int fe_degree>
   class HelmholtzOperatorQuad
   {
@@ -119,29 +134,30 @@ namespace Step64
     {}
 
     __device__ void
-    operator()(CUDAWrappers::FEEvaluation<dim, fe_degree> *fe_eval,
-               const unsigned int                          q) const;
+    operator()(CUDAWrappers::FEEvaluation<dim, fe_degree> *fe_eval) const;
 
   private:
     double coef;
   };
 
 
-  // The Helmholtz problem reads in weak form
+  // The Helmholtz problem we want to solve here reads in weak form as follows:
   // @f{eqnarray*}
   //   (\nabla v, \nabla u)+ (v, a(\mathbf x) u) &=&(v,1) \quad \forall v.
   // @f}
-  // The two terms on the left-hand side correspond to the two function calls
-  // here.
+  // If you have seen step-37, then it will be obvious that
+  // the two terms on the left-hand side correspond to the two function calls
+  // here:
   template <int dim, int fe_degree>
   __device__ void HelmholtzOperatorQuad<dim, fe_degree>::
-                  operator()(CUDAWrappers::FEEvaluation<dim, fe_degree> *fe_eval,
-             const unsigned int                          q) const
+                  operator()(CUDAWrappers::FEEvaluation<dim, fe_degree> *fe_eval) const
   {
-    fe_eval->submit_value(coef * fe_eval->get_value(q), q);
-    fe_eval->submit_gradient(fe_eval->get_gradient(q), q);
+    fe_eval->submit_value(coef * fe_eval->get_value());
+    fe_eval->submit_gradient(fe_eval->get_gradient());
   }
 
+
+  // @sect3{Class <code>LocalHelmholtzOperator</code>}
 
   // Finally, we need to define a class that implements the whole operator
   // evaluation that corresponds to a matrix-vector product in matrix-based
@@ -193,16 +209,21 @@ namespace Step64
       fe_eval(cell, gpu_data, shared_data);
     fe_eval.read_dof_values(src);
     fe_eval.evaluate(true, true);
-    fe_eval.apply_quad_point_operations(
+    fe_eval.apply_for_each_quad_point(
       HelmholtzOperatorQuad<dim, fe_degree>(coef[pos]));
     fe_eval.integrate(true, true);
     fe_eval.distribute_local_to_global(dst);
   }
 
 
+  // @sect3{Class <code>HelmholtzOperator</code>}
 
-  // The HelmholtzOperator class acts as wrapper for LocalHelmholtzOperator
-  // defining an interface that can be used with linear solvers like SolverCG.
+  // The `HelmholtzOperator` class acts as wrapper for
+  // `LocalHelmholtzOperator` defining an interface that can be used
+  // with linear solvers like SolverCG. In particular, like every
+  // class that implements the interface of a linear operator, it
+  // needs to have a `vmult()` function that performs the action of
+  // the linear operator on a source vector.
   template <int dim, int fe_degree>
   class HelmholtzOperator
   {
@@ -215,6 +236,9 @@ namespace Step64
           const LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA>
             &src) const;
 
+    void initialize_dof_vector(
+      LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA> &vec) const;
+
   private:
     CUDAWrappers::MatrixFree<dim, double>       mf_data;
     LinearAlgebra::CUDAWrappers::Vector<double> coef;
@@ -222,6 +246,19 @@ namespace Step64
 
 
 
+  // The following is the implementation of the constructor of this
+  // class. In the first part, we initialize the `mf_data` member
+  // variable that is going to provide us with the necessary
+  // information when evaluating the operator.
+  //
+  // In the second half, we need to store the value of the coefficient
+  // for each quadrature point in every active, locally owned cell.
+  // We can ask the parallel triangulation for the number of active, locally
+  // owned cells but only have a DoFHandler object at hand. Since
+  // DoFHandler::get_triangulation() returns a Triangulation object, not a
+  // parallel::TriangulationBase object, we have to downcast the return value.
+  // This is safe to do here because we know that the triangulation is a
+  // parallel:distributed::Triangulation object in fact.
   template <int dim, int fe_degree>
   HelmholtzOperator<dim, fe_degree>::HelmholtzOperator(
     const DoFHandler<dim> &          dof_handler,
@@ -236,17 +273,22 @@ namespace Step64
     const QGauss<1> quad(fe_degree + 1);
     mf_data.reinit(mapping, dof_handler, constraints, quad, additional_data);
 
-    // We need to store the value of the coefficient for each quadrature point
-    // in every locally owned cells.
+
     const unsigned int n_owned_cells =
-      std::distance<decltype(dof_handler.begin_active())>(
-        dof_handler.begin_active(), dof_handler.end());
+      dynamic_cast<const parallel::TriangulationBase<dim> *>(
+        &dof_handler.get_triangulation())
+        ->n_locally_owned_active_cells();
     coef.reinit(Utilities::pow(fe_degree + 1, dim) * n_owned_cells);
-    VaryingCoefficientFunctor<dim, fe_degree> functor(coef.get_values());
+
+    const VaryingCoefficientFunctor<dim, fe_degree> functor(coef.get_values());
     mf_data.evaluate_coefficients(functor);
   }
 
 
+  // The key step then is to use all of the previous classes to loop over
+  // all cells to perform the matrix-vector product. We implement this
+  // in the next function.
+  //
   // When applying the Helmholtz operator, we have to be careful to handle
   // boundary conditions correctly. Since the local operator doesn't know about
   // constraints, we have to copy the correct values from the source to the
@@ -265,9 +307,21 @@ namespace Step64
   }
 
 
-  // This class defines the usual framework we use for tutorial programs. The
-  // only point worth commenting on the solve() function and the choice of
-  // vector types.
+
+  template <int dim, int fe_degree>
+  void HelmholtzOperator<dim, fe_degree>::initialize_dof_vector(
+    LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA> &vec) const
+  {
+    mf_data.initialize_dof_vector(vec);
+  }
+
+
+  // @sect3{Class <code>HelmholtzProblem</code>}
+
+  // This is the main class of this program. It defines the usual
+  // framework we use for tutorial programs. The only point worth
+  // commenting on is the `solve()` function and the choice of vector
+  // types.
   template <int dim, int fe_degree>
   class HelmholtzProblem
   {
@@ -298,16 +352,18 @@ namespace Step64
     AffineConstraints<double>                          constraints;
     std::unique_ptr<HelmholtzOperator<dim, fe_degree>> system_matrix_dev;
 
-    // Since all the operations in the solve functions are executed on the
-    // graphic card it is necessary for the vectors used to store their values
+    // Since all the operations in the `solve()` function are executed on the
+    // graphics card, it is necessary for the vectors used to store their values
     // on the GPU as well. LinearAlgebra::distributed::Vector can be told which
     // memory space to use. There is also LinearAlgebra::CUDAWrappers::Vector
     // that always uses GPU memory storage but doesn't work with MPI. It might
     // be worth noticing that the communication between different MPI processes
     // can be improved if the MPI implementation is CUDA-aware and the configure
-    // flag DEAL_II_MPI_WITH_CUDA_SUPPORT is enabled.
+    // flag `DEAL_II_MPI_WITH_CUDA_SUPPORT` is enabled. (The value of this
+    // flag needs to be set at the time you call `cmake` when installing
+    // deal.II.)
     //
-    // Here, we also have a finite element vector with CPU storage such that we
+    // In addition, we also keep a solution vector with CPU storage such that we
     // can view and display the solution as usual.
     LinearAlgebra::distributed::Vector<double, MemorySpace::Host>
                                                                   ghost_solution_host;
@@ -320,8 +376,8 @@ namespace Step64
 
 
   // The implementation of all the remaining functions of this class apart from
-  // Helmholtzproblem::solve() doesn't contain anything new and we won't further
-  // comment on it.
+  // `Helmholtzproblem::solve()` doesn't contain anything new and we won't
+  // further comment much on the overall approach.
   template <int dim, int fe_degree>
   HelmholtzProblem<dim, fe_degree>::HelmholtzProblem()
     : mpi_communicator(MPI_COMM_WORLD)
@@ -350,18 +406,36 @@ namespace Step64
                                              Functions::ZeroFunction<dim>(),
                                              constraints);
     constraints.close();
+
     system_matrix_dev.reset(
       new HelmholtzOperator<dim, fe_degree>(dof_handler, constraints));
 
     ghost_solution_host.reinit(locally_owned_dofs,
                                locally_relevant_dofs,
                                mpi_communicator);
-    solution_dev.reinit(locally_owned_dofs, mpi_communicator);
-    system_rhs_dev.reinit(locally_owned_dofs, mpi_communicator);
+    system_matrix_dev->initialize_dof_vector(solution_dev);
+    system_rhs_dev.reinit(solution_dev);
   }
 
 
 
+  // Unlike programs such as step-4 or step-6, we will not have to
+  // assemble the whole linear system but only the right hand side
+  // vector. This looks in essence like we did in step-4, for example,
+  // but we have to pay attention to using the right constraints
+  // object when copying local contributions into the global
+  // vector. In particular, we need to make sure the entries that
+  // correspond to boundary nodes are properly zeroed out. This is
+  // necessary for CG to converge.  (Another solution would be to
+  // modify the `vmult()` function above in such a way that we pretend
+  // the source vector has zero entries by just not taking them into
+  // account in matrix-vector products. But the approach used here is
+  // simpler.)
+  //
+  // At the end of the function, we can't directly copy the values
+  // from the host to the device but need to use an intermediate
+  // object of type LinearAlgebra::ReadWriteVector to construct the
+  // correct communication pattern necessary.
   template <int dim, int fe_degree>
   void HelmholtzProblem<dim, fe_degree>::assemble_rhs()
   {
@@ -376,7 +450,7 @@ namespace Step64
                             update_values | update_quadrature_points |
                               update_JxW_values);
 
-    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
 
     Vector<double> cell_rhs(dofs_per_cell);
@@ -397,12 +471,6 @@ namespace Step64
                                 fe_values.JxW(q_index));
             }
 
-          // Finally, transfer the contributions from @p cell_rhs into the global
-          // objects. Set the constraints to zero. This is necessary for CG to
-          // converge since the ansatz and solution space have these degrees of
-          // freedom constrained as well.
-          // The other solution is modifying vmult() so that the source
-          // vector sets the contrained dof to zero.
           cell->get_dof_indices(local_dof_indices);
           constraints.distribute_local_to_global(cell_rhs,
                                                  local_dof_indices,
@@ -410,9 +478,6 @@ namespace Step64
         }
     system_rhs_host.compress(VectorOperation::add);
 
-    // We can't directly copy the values from the host to the device but need to
-    // use an intermediate object of type LinearAlgebra::ReadWriteVector to
-    // construct the correct communication pattern.
     LinearAlgebra::ReadWriteVector<double> rw_vector(locally_owned_dofs);
     rw_vector.import(system_rhs_host, VectorOperation::insert);
     system_rhs_dev.import(rw_vector, VectorOperation::insert);
@@ -421,12 +486,17 @@ namespace Step64
 
 
   // This solve() function finally contains the calls to the new classes
-  // previously dicussed. Here we don't use any preconditioner, i.e.
-  // precondition by the identity, to focus just on the peculiarities of the
-  // CUDAWrappers::MatrixFree framework. Of course, in a real application the
-  // choice of a suitable preconditioner is crucial but we have at least the
+  // previously discussed. Here we don't use any preconditioner, i.e.,
+  // precondition by the identity matrix, to focus just on the peculiarities of
+  // the CUDAWrappers::MatrixFree framework. Of course, in a real application
+  // the choice of a suitable preconditioner is crucial but we have at least the
   // same restrictions as in step-37 since matrix entries are computed on the
   // fly and not stored.
+  //
+  // After solving the linear system in the first part of the function, we
+  // copy the solution from the device to the host to be able to view its
+  // values and display it in `output_results()`. This transfer works the same
+  // as at the end of the previous function.
   template <int dim, int fe_degree>
   void HelmholtzProblem<dim, fe_degree>::solve()
   {
@@ -441,8 +511,6 @@ namespace Step64
     pcout << "  Solved in " << solver_control.last_step() << " iterations."
           << std::endl;
 
-    // Copy the solution from the device to the host to be able to view its
-    // values and display it in output_results().
     LinearAlgebra::ReadWriteVector<double> rw_vector(locally_owned_dofs);
     rw_vector.import(solution_dev, VectorOperation::insert);
     ghost_solution_host.import(rw_vector, VectorOperation::insert);
@@ -454,6 +522,18 @@ namespace Step64
 
   // The output results function is as usual since we have already copied the
   // values back from the GPU to the CPU.
+  //
+  // While we're already doing something with the function, we might
+  // as well compute the $L_2$ norm of the solution. We do this by
+  // calling VectorTools::integrate_difference(). That function is
+  // meant to compute the error by evaluating the difference between
+  // the numerical solution (given by a vector of values for the
+  // degrees of freedom) and an object representing the exact
+  // solution. But we can easily compute the $L_2$ norm of the
+  // solution by passing in a zero function instead. That is, instead
+  // of evaluating the error $\|u_h-u\|_{L_2(\Omega)}$, we are just
+  // evaluating $\|u_h-0\|_{L_2(\Omega)}=\|u_h\|_{L_2(\Omega)}$
+  // instead.
   template <int dim, int fe_degree>
   void HelmholtzProblem<dim, fe_degree>::output_results(
     const unsigned int cycle) const
@@ -464,29 +544,11 @@ namespace Step64
     data_out.add_data_vector(ghost_solution_host, "solution");
     data_out.build_patches();
 
-    std::ofstream output(
-      "solution-" + std::to_string(cycle) + "." +
-      std::to_string(Utilities::MPI::this_mpi_process(mpi_communicator)) +
-      ".vtu");
     DataOutBase::VtkFlags flags;
     flags.compression_level = DataOutBase::VtkFlags::best_speed;
     data_out.set_flags(flags);
-    data_out.write_vtu(output);
-
-    if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
-      {
-        std::vector<std::string> filenames;
-        for (unsigned int i = 0;
-             i < Utilities::MPI::n_mpi_processes(mpi_communicator);
-             ++i)
-          filenames.emplace_back("solution-" + std::to_string(cycle) + "." +
-                                 std::to_string(i) + ".vtu");
-
-        std::string master_name =
-          "solution-" + Utilities::to_string(cycle) + ".pvtu";
-        std::ofstream master_output(master_name);
-        data_out.write_pvtu_record(master_output, filenames);
-      }
+    data_out.write_vtu_with_pvtu_record(
+      "./", "solution", cycle, mpi_communicator, 2);
 
     Vector<float> cellwise_norm(triangulation.n_active_cells());
     VectorTools::integrate_difference(dof_handler,
@@ -531,6 +593,25 @@ namespace Step64
   }
 } // namespace Step64
 
+
+// @sect3{The <code>main()</code> function}
+
+// Finally for the `main()` function.  By default, all the MPI ranks
+// will try to access the device with number 0, which we assume to be
+// the GPU device associated with the CPU on which a particular MPI
+// rank runs. This works, but if we are running with MPI support it
+// may be that multiple MPI processes are running on the same machine
+// (for example, one per CPU core) and then they would all want to
+// access the same GPU on that machine. If there is only one GPU in
+// the machine, there is nothing we can do about it: All MPI ranks on
+// that machine need to share it. But if there are more than one GPU,
+// then it is better to address different graphic cards for different
+// processes. The choice below is based on the MPI process id by
+// assigning GPUs round robin to GPU ranks. (To work correctly, this
+// scheme assumes that the MPI ranks on one machine are
+// consecutive. If that were not the case, then the rank-GPU
+// association may just not be optimal.) To make this work, MPI needs
+// to be initialized before using this function.
 int main(int argc, char *argv[])
 {
   try
@@ -539,22 +620,17 @@ int main(int argc, char *argv[])
 
       Utilities::MPI::MPI_InitFinalize mpi_init(argc, argv, 1);
 
-      // By default, all the ranks will try to access the device 0.
-      // If we are running with MPI support it is better to address different
-      // graphic cards for different processes even if only one node is used.
-      // The choice below is based on the MPI proccess id. MPI needs to be
-      // initialized before using this function.
       int         n_devices       = 0;
       cudaError_t cuda_error_code = cudaGetDeviceCount(&n_devices);
       AssertCuda(cuda_error_code);
-      const unsigned int my_id =
+      const unsigned int my_mpi_id =
         Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
-      const int device_id = my_id % n_devices;
+      const int device_id = my_mpi_id % n_devices;
       cuda_error_code     = cudaSetDevice(device_id);
       AssertCuda(cuda_error_code);
 
-      HelmholtzProblem<3, 3> helmhotz_problem;
-      helmhotz_problem.run();
+      HelmholtzProblem<3, 3> helmholtz_problem;
+      helmholtz_problem.run();
     }
   catch (std::exception &exc)
     {

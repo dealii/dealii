@@ -1,0 +1,3 @@
+Fixed: WorkStream::mesh_loop() should now work on anisotropic grids.
+<br>
+(Luca Heltai, 2020/11/03)

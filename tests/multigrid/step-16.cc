@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -54,7 +54,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 template <int dim>
 class LaplaceProblem
@@ -162,7 +161,7 @@ void
 LaplaceProblem<dim>::setup_system()
 {
   mg_dof_handler.distribute_dofs(fe);
-  mg_dof_handler.distribute_mg_dofs(fe);
+  mg_dof_handler.distribute_mg_dofs();
   deallog << "Number of degrees of freedom: " << mg_dof_handler.n_dofs();
 
   for (unsigned int l = 0; l < triangulation.n_levels(); ++l)
@@ -194,7 +193,8 @@ LaplaceProblem<dim>::setup_system()
   system_matrix.reinit(sparsity_pattern);
 
   mg_constrained_dofs.clear();
-  mg_constrained_dofs.initialize(mg_dof_handler, dirichlet_boundary);
+  mg_constrained_dofs.initialize(mg_dof_handler);
+  mg_constrained_dofs.make_zero_boundary_constraints(mg_dof_handler, {0});
   const unsigned int n_levels = triangulation.n_levels();
 
   mg_interface_matrices.resize(0, n_levels - 1);
@@ -448,15 +448,15 @@ void
 LaplaceProblem<dim>::solve()
 {
   MGTransferPrebuilt<Vector<double>> mg_transfer(mg_constrained_dofs);
-  mg_transfer.build_matrices(mg_dof_handler);
+  mg_transfer.build(mg_dof_handler);
 
   FullMatrix<double> coarse_matrix;
   coarse_matrix.copy_from(mg_matrices[0]);
   MGCoarseGridHouseholder<> coarse_grid_solver;
   coarse_grid_solver.initialize(coarse_matrix);
 
-  typedef PreconditionSOR<SparseMatrix<double>> Smoother;
-  GrowingVectorMemory<>                         vector_memory;
+  using Smoother = PreconditionSOR<SparseMatrix<double>>;
+  GrowingVectorMemory<> vector_memory;
   MGSmootherRelaxation<SparseMatrix<double>, Smoother, Vector<double>>
     mg_smoother;
   mg_smoother.initialize(mg_matrices);
@@ -467,12 +467,8 @@ LaplaceProblem<dim>::solve()
   mg::Matrix<> mg_interface_up(mg_interface_matrices);
   mg::Matrix<> mg_interface_down(mg_interface_matrices);
 
-  Multigrid<Vector<double>> mg(mg_dof_handler,
-                               mg_matrix,
-                               coarse_grid_solver,
-                               mg_transfer,
-                               mg_smoother,
-                               mg_smoother);
+  Multigrid<Vector<double>> mg(
+    mg_matrix, coarse_grid_solver, mg_transfer, mg_smoother, mg_smoother);
   mg.set_edge_matrices(mg_interface_down, mg_interface_up);
 
   PreconditionMG<dim, Vector<double>, MGTransferPrebuilt<Vector<double>>>
@@ -608,9 +604,8 @@ LaplaceProblem<dim>::run()
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(4);
-  deallog.attach(logfile);
 
   try
     {

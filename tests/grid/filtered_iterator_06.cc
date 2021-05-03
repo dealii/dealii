@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -53,8 +53,7 @@ test()
   std::set<typename Triangulation<dim, spacedim>::active_face_iterator>
     face_set;
   for (const auto &cell : tria.active_cell_iterators())
-    for (unsigned int face_n = 0; face_n < GeometryInfo<dim>::faces_per_cell;
-         ++face_n)
+    for (const unsigned int face_n : GeometryInfo<dim>::face_indices())
       if (cell->face(face_n)->at_boundary() &&
           cell->face(face_n)->manifold_id() == manifold_id)
         face_set.insert(cell->face(face_n));

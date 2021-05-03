@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2018 by the deal.II authors
+// Copyright (C) 2014 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -65,7 +65,6 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
 
 using namespace dealii::MatrixFreeOperators;
 
@@ -80,8 +79,8 @@ template <int dim,
 class BlockLaplace : public Subscriptor
 {
 public:
-  typedef typename BlockVectorType::value_type value_type;
-  typedef typename BlockVectorType::size_type  size_type;
+  using value_type = typename BlockVectorType::value_type;
+  using size_type  = typename BlockVectorType::size_type;
 
   BlockLaplace()
     : Subscriptor()
@@ -210,7 +209,7 @@ template <int dim, int fe_degree, int n_q_points_1d, typename number>
 void
 do_test(const DoFHandler<dim> &dof, const unsigned int nb)
 {
-  if (types_are_equal<number, float>::value == true)
+  if (std::is_same<number, float>::value == true)
     {
       deallog.push("float");
     }
@@ -225,7 +224,7 @@ do_test(const DoFHandler<dim> &dof, const unsigned int nb)
   DoFTools::extract_locally_relevant_dofs(dof, locally_relevant_dofs);
 
   // Dirichlet BC
-  ZeroFunction<dim>                                   zero_function;
+  Functions::ZeroFunction<dim>                        zero_function;
   std::map<types::boundary_id, const Function<dim> *> dirichlet_boundary;
   dirichlet_boundary[0] = &zero_function;
 
@@ -240,7 +239,8 @@ do_test(const DoFHandler<dim> &dof, const unsigned int nb)
 
   // level constraints:
   MGConstrainedDoFs mg_constrained_dofs;
-  mg_constrained_dofs.initialize(dof, dirichlet_boundary);
+  mg_constrained_dofs.initialize(dof);
+  mg_constrained_dofs.make_zero_boundary_constraints(dof, {0});
 
   MappingQ<dim> mapping(fe_degree + 1);
 
@@ -293,11 +293,11 @@ do_test(const DoFHandler<dim> &dof, const unsigned int nb)
   }
 
   // set up multigrid in analogy to step-37
-  typedef BlockLaplace<dim,
-                       fe_degree,
-                       n_q_points_1d,
-                       LinearAlgebra::distributed::BlockVector<number>>
-    LevelMatrixType;
+  using LevelMatrixType =
+    BlockLaplace<dim,
+                 fe_degree,
+                 n_q_points_1d,
+                 LinearAlgebra::distributed::BlockVector<number>>;
 
   MGLevelObject<LevelMatrixType>         mg_matrices;
   MGLevelObject<MatrixFree<dim, number>> mg_level_data;
@@ -311,7 +311,7 @@ do_test(const DoFHandler<dim> &dof, const unsigned int nb)
       mg_additional_data.tasks_parallel_scheme =
         MatrixFree<dim, number>::AdditionalData::none;
       mg_additional_data.tasks_block_size = 3;
-      mg_additional_data.level_mg_handler = level;
+      mg_additional_data.mg_level         = level;
 
       AffineConstraints<double> level_constraints;
       IndexSet                  relevant_dofs;
@@ -347,7 +347,7 @@ do_test(const DoFHandler<dim> &dof, const unsigned int nb)
   MGCoarseIterative<LevelMatrixType, number> mg_coarse;
   mg_coarse.initialize(mg_matrices[0]);
 
-  typedef PreconditionJacobi<LevelMatrixType> SMOOTHER;
+  using SMOOTHER = PreconditionJacobi<LevelMatrixType>;
   MGSmootherPrecondition<LevelMatrixType,
                          SMOOTHER,
                          LinearAlgebra::distributed::BlockVector<number>>
@@ -377,7 +377,7 @@ do_test(const DoFHandler<dim> &dof, const unsigned int nb)
     solver.solve(fine_matrix, sol, in, preconditioner);
   }
 
-  if (types_are_equal<number, float>::value == true)
+  if (std::is_same<number, float>::value == true)
     deallog.pop();
 
   fine_matrix.clear();
@@ -415,7 +415,7 @@ test(const unsigned int nbands = 1)
       FE_Q<dim>       fe(fe_degree);
       DoFHandler<dim> dof(tria);
       dof.distribute_dofs(fe);
-      dof.distribute_mg_dofs(fe);
+      dof.distribute_mg_dofs();
 
       do_test<dim, fe_degree, fe_degree + 1, double>(dof, nbands);
     }
@@ -427,12 +427,8 @@ int
 main(int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_init(argc, argv, 1);
-
-  if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
-    {
-      deallog.attach(logfile);
-      deallog << std::setprecision(4);
-    }
+  mpi_initlog();
+  deallog << std::setprecision(4);
 
   {
     deallog.push("2d");

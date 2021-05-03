@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2002 - 2019 by the deal.II authors
+ * Copyright (C) 2002 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -22,7 +22,6 @@
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/logstream.h>
-#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/work_stream.h>
 #include <deal.II/lac/vector.h>
@@ -35,11 +34,8 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_refinement.h>
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
@@ -49,10 +45,11 @@
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/error_estimator.h>
 
-#include <iostream>
-#include <fstream>
-#include <list>
 #include <algorithm>
+#include <fstream>
+#include <iostream>
+#include <list>
+#include <memory>
 #include <numeric>
 
 // The last step is as in all previous programs:
@@ -135,9 +132,7 @@ namespace Step14
       bool evaluation_point_found = false;
       for (const auto &cell : dof_handler.active_cell_iterators())
         if (!evaluation_point_found)
-          for (unsigned int vertex = 0;
-               vertex < GeometryInfo<dim>::vertices_per_cell;
-               ++vertex)
+          for (const auto vertex : cell->vertex_indices())
             if (cell->vertex(vertex).distance(evaluation_point) <
                 cell->diameter() * 1e-8)
               {
@@ -208,7 +203,7 @@ namespace Step14
 
       // ...then have some objects of which the meaning will become clear
       // below...
-      QTrapez<dim>                vertex_quadrature;
+      QTrapezoid<dim>             vertex_quadrature;
       FEValues<dim>               fe_values(dof_handler.get_fe(),
                               vertex_quadrature,
                               update_gradients | update_quadrature_points);
@@ -218,9 +213,7 @@ namespace Step14
       // often the vertex has been found:
       unsigned int evaluation_point_hits = 0;
       for (const auto &cell : dof_handler.active_cell_iterators())
-        for (unsigned int vertex = 0;
-             vertex < GeometryInfo<dim>::vertices_per_cell;
-             ++vertex)
+        for (const auto vertex : cell->vertex_indices())
           if (cell->vertex(vertex) == evaluation_point)
             {
               // Things are now no more as simple, since we can't get the
@@ -325,8 +318,8 @@ namespace Step14
                                      const Vector<double> & /*solution*/) const
     {
       std::ofstream out(output_name_base + "-" +
-                        std::to_string(this->refinement_cycle) + ".eps");
-      GridOut().write_eps(dof_handler.get_triangulation(), out);
+                        std::to_string(this->refinement_cycle) + ".svg");
+      GridOut().write_svg(dof_handler.get_triangulation(), out);
     }
   } // namespace Evaluation
 
@@ -519,20 +512,24 @@ namespace Step14
     template <int dim>
     void Solver<dim>::assemble_linear_system(LinearSystem &linear_system)
     {
-      Threads::Task<> rhs_task =
+      Threads::Task<void> rhs_task =
         Threads::new_task(&Solver<dim>::assemble_rhs, *this, linear_system.rhs);
+
+      auto worker =
+        [this](const typename DoFHandler<dim>::active_cell_iterator &cell,
+               AssemblyScratchData &scratch_data,
+               AssemblyCopyData &   copy_data) {
+          this->local_assemble_matrix(cell, scratch_data, copy_data);
+        };
+
+      auto copier = [this, &linear_system](const AssemblyCopyData &copy_data) {
+        this->copy_local_to_global(copy_data, linear_system);
+      };
 
       WorkStream::run(dof_handler.begin_active(),
                       dof_handler.end(),
-                      std::bind(&Solver<dim>::local_assemble_matrix,
-                                this,
-                                std::placeholders::_1,
-                                std::placeholders::_2,
-                                std::placeholders::_3),
-                      std::bind(&Solver<dim>::copy_local_to_global,
-                                this,
-                                std::placeholders::_1,
-                                std::ref(linear_system)),
+                      worker,
+                      copier,
                       AssemblyScratchData(*fe, *quadrature),
                       AssemblyCopyData());
       linear_system.hanging_node_constraints.condense(linear_system.matrix);
@@ -576,7 +573,7 @@ namespace Step14
       AssemblyScratchData &                                 scratch_data,
       AssemblyCopyData &                                    copy_data) const
     {
-      const unsigned int dofs_per_cell = fe->dofs_per_cell;
+      const unsigned int dofs_per_cell = fe->n_dofs_per_cell();
       const unsigned int n_q_points    = quadrature->size();
 
       copy_data.cell_matrix.reinit(dofs_per_cell, dofs_per_cell);
@@ -654,7 +651,7 @@ namespace Step14
         &DoFTools::make_hanging_node_constraints;
 
       // Start a side task then continue on the main thread
-      Threads::Task<> side_task =
+      Threads::Task<void> side_task =
         Threads::new_task(mhnc_p, dof_handler, hanging_node_constraints);
 
       DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
@@ -678,10 +675,10 @@ namespace Step14
     template <int dim>
     void Solver<dim>::LinearSystem::solve(Vector<double> &solution) const
     {
-      SolverControl solver_control(5000, 1e-12);
-      SolverCG<>    cg(solver_control);
+      SolverControl            solver_control(5000, 1e-12);
+      SolverCG<Vector<double>> cg(solver_control);
 
-      PreconditionSSOR<> preconditioner;
+      PreconditionSSOR<SparseMatrix<double>> preconditioner;
       preconditioner.initialize(matrix, 1.2);
 
       cg.solve(matrix, solution, rhs, preconditioner);
@@ -746,8 +743,8 @@ namespace Step14
       data_out.build_patches();
 
       std::ofstream out("solution-" + std::to_string(this->refinement_cycle) +
-                        ".gnuplot");
-      data_out.write(out, DataOutBase::gnuplot);
+                        ".vtu");
+      data_out.write(out, DataOutBase::vtu);
     }
 
 
@@ -760,7 +757,7 @@ namespace Step14
                               update_values | update_quadrature_points |
                                 update_JxW_values);
 
-      const unsigned int dofs_per_cell = this->fe->dofs_per_cell;
+      const unsigned int dofs_per_cell = this->fe->n_dofs_per_cell();
       const unsigned int n_q_points    = this->quadrature->size();
 
       Vector<double>                       cell_rhs(dofs_per_cell);
@@ -1132,10 +1129,6 @@ namespace Step14
       class BoundaryValues : public Function<dim>
       {
       public:
-        BoundaryValues()
-          : Function<dim>()
-        {}
-
         virtual double value(const Point<dim> & p,
                              const unsigned int component) const;
       };
@@ -1144,10 +1137,6 @@ namespace Step14
       class RightHandSide : public Function<dim>
       {
       public:
-        RightHandSide()
-          : Function<dim>()
-        {}
-
         virtual double value(const Point<dim> & p,
                              const unsigned int component) const;
       };
@@ -1298,8 +1287,7 @@ namespace Step14
       std::vector<CellData<dim>> cells(n_cells, CellData<dim>());
       for (unsigned int i = 0; i < n_cells; ++i)
         {
-          for (unsigned int j = 0; j < GeometryInfo<dim>::vertices_per_cell;
-               ++j)
+          for (unsigned int j = 0; j < cell_vertices[i].size(); ++j)
             cells[i].vertices[j] = cell_vertices[i][j];
           cells[i].material_id = 0;
         }
@@ -1392,7 +1380,7 @@ namespace Step14
     };
 
 
-    // @sect4{The PointValueEvaluation class}
+    // @sect4{The dual functional PointValueEvaluation class}
 
     // As a first application, we consider the functional corresponding to the
     // evaluation of the solution's value at a given point which again we
@@ -1451,9 +1439,7 @@ namespace Step14
       // vertices (or very close to a vertex, which may happen due to floating
       // point round-off):
       for (const auto &cell : dof_handler.active_cell_iterators())
-        for (unsigned int vertex = 0;
-             vertex < GeometryInfo<dim>::vertices_per_cell;
-             ++vertex)
+        for (const auto vertex : cell->vertex_indices())
           if (cell->vertex(vertex).distance(evaluation_point) <
               cell->diameter() * 1e-8)
             {
@@ -1469,7 +1455,7 @@ namespace Step14
     }
 
 
-    // @sect4{The PointXDerivativeEvaluation class}
+    // @sect4{The dual functional PointXDerivativeEvaluation class}
 
     // As second application, we again consider the evaluation of the
     // x-derivative of the solution at one point. Again, the declaration of
@@ -2000,7 +1986,7 @@ namespace Step14
     template <int dim>
     void WeightedResidual<dim>::solve_problem()
     {
-      Threads::TaskGroup<> tasks;
+      Threads::TaskGroup<void> tasks;
       tasks +=
         Threads::new_task(&WeightedResidual<dim>::solve_primal_problem, *this);
       tasks +=
@@ -2104,8 +2090,8 @@ namespace Step14
       data_out.build_patches();
 
       std::ofstream out("solution-" + std::to_string(this->refinement_cycle) +
-                        ".gnuplot");
-      data_out.write(out, DataOutBase::gnuplot);
+                        ".vtu");
+      data_out.write(out, DataOutBase::vtu);
     }
 
 
@@ -2191,24 +2177,28 @@ namespace Step14
       FaceIntegrals face_integrals;
       for (const auto &cell :
            DualSolver<dim>::dof_handler.active_cell_iterators())
-        for (unsigned int face_no = 0;
-             face_no < GeometryInfo<dim>::faces_per_cell;
-             ++face_no)
-          face_integrals[cell->face(face_no)] = -1e20;
+        for (const auto &face : cell->face_iterators())
+          face_integrals[face] = -1e20;
+
+      auto worker = [this,
+                     &error_indicators,
+                     &face_integrals](const active_cell_iterator & cell,
+                                      WeightedResidualScratchData &scratch_data,
+                                      WeightedResidualCopyData &   copy_data) {
+        this->estimate_on_one_cell(
+          cell, scratch_data, copy_data, error_indicators, face_integrals);
+      };
+
+      auto do_nothing_copier =
+        std::function<void(const WeightedResidualCopyData &)>();
 
       // Then hand it all off to WorkStream::run() to compute the
       // estimators for all cells in parallel:
       WorkStream::run(
         DualSolver<dim>::dof_handler.begin_active(),
         DualSolver<dim>::dof_handler.end(),
-        std::bind(&WeightedResidual<dim>::estimate_on_one_cell,
-                  this,
-                  std::placeholders::_1,
-                  std::placeholders::_2,
-                  std::placeholders::_3,
-                  std::ref(error_indicators),
-                  std::ref(face_integrals)),
-        std::function<void(const WeightedResidualCopyData &)>(),
+        worker,
+        do_nothing_copier,
         WeightedResidualScratchData(*DualSolver<dim>::fe,
                                     *DualSolver<dim>::quadrature,
                                     *DualSolver<dim>::face_quadrature,
@@ -2227,15 +2217,11 @@ namespace Step14
       for (const auto &cell :
            DualSolver<dim>::dof_handler.active_cell_iterators())
         {
-          for (unsigned int face_no = 0;
-               face_no < GeometryInfo<dim>::faces_per_cell;
-               ++face_no)
+          for (const auto &face : cell->face_iterators())
             {
-              Assert(face_integrals.find(cell->face(face_no)) !=
-                       face_integrals.end(),
+              Assert(face_integrals.find(face) != face_integrals.end(),
                      ExcInternalError());
-              error_indicators(present_cell) -=
-                0.5 * face_integrals[cell->face(face_no)];
+              error_indicators(present_cell) -= 0.5 * face_integrals[face];
             }
           ++present_cell;
         }
@@ -2277,9 +2263,7 @@ namespace Step14
       // After computing the cell terms, turn to the face terms. For this,
       // loop over all faces of the present cell, and see whether
       // something needs to be computed on it:
-      for (unsigned int face_no = 0;
-           face_no < GeometryInfo<dim>::faces_per_cell;
-           ++face_no)
+      for (const auto face_no : cell->face_indices())
         {
           // First, if this face is part of the boundary, then there is
           // nothing to do. However, to make things easier when summing up
@@ -2712,56 +2696,53 @@ namespace Step14
       {
         case ProblemDescription::dual_weighted_error_estimator:
           {
-            solver =
-              std_cxx14::make_unique<LaplaceSolver::WeightedResidual<dim>>(
-                triangulation,
-                primal_fe,
-                dual_fe,
-                quadrature,
-                face_quadrature,
-                descriptor.data->get_right_hand_side(),
-                descriptor.data->get_boundary_values(),
-                *descriptor.dual_functional);
+            solver = std::make_unique<LaplaceSolver::WeightedResidual<dim>>(
+              triangulation,
+              primal_fe,
+              dual_fe,
+              quadrature,
+              face_quadrature,
+              descriptor.data->get_right_hand_side(),
+              descriptor.data->get_boundary_values(),
+              *descriptor.dual_functional);
             break;
           }
 
         case ProblemDescription::global_refinement:
           {
-            solver =
-              std_cxx14::make_unique<LaplaceSolver::RefinementGlobal<dim>>(
-                triangulation,
-                primal_fe,
-                quadrature,
-                face_quadrature,
-                descriptor.data->get_right_hand_side(),
-                descriptor.data->get_boundary_values());
-            break;
-          }
-
-        case ProblemDescription::kelly_indicator:
-          {
-            solver =
-              std_cxx14::make_unique<LaplaceSolver::RefinementKelly<dim>>(
-                triangulation,
-                primal_fe,
-                quadrature,
-                face_quadrature,
-                descriptor.data->get_right_hand_side(),
-                descriptor.data->get_boundary_values());
-            break;
-          }
-
-        case ProblemDescription::weighted_kelly_indicator:
-          {
-            solver = std_cxx14::make_unique<
-              LaplaceSolver::RefinementWeightedKelly<dim>>(
+            solver = std::make_unique<LaplaceSolver::RefinementGlobal<dim>>(
               triangulation,
               primal_fe,
               quadrature,
               face_quadrature,
               descriptor.data->get_right_hand_side(),
-              descriptor.data->get_boundary_values(),
-              *descriptor.kelly_weight);
+              descriptor.data->get_boundary_values());
+            break;
+          }
+
+        case ProblemDescription::kelly_indicator:
+          {
+            solver = std::make_unique<LaplaceSolver::RefinementKelly<dim>>(
+              triangulation,
+              primal_fe,
+              quadrature,
+              face_quadrature,
+              descriptor.data->get_right_hand_side(),
+              descriptor.data->get_boundary_values());
+            break;
+          }
+
+        case ProblemDescription::weighted_kelly_indicator:
+          {
+            solver =
+              std::make_unique<LaplaceSolver::RefinementWeightedKelly<dim>>(
+                triangulation,
+                primal_fe,
+                quadrature,
+                face_quadrature,
+                descriptor.data->get_right_hand_side(),
+                descriptor.data->get_boundary_values(),
+                *descriptor.kelly_weight);
             break;
           }
 
@@ -2818,7 +2799,6 @@ int main()
 {
   try
     {
-      using namespace dealii;
       using namespace Step14;
 
       // Describe the problem we want to solve here by passing a descriptor
@@ -2845,7 +2825,7 @@ int main()
       // take here the description of <code>Exercise_2_3</code>, but you can
       // also use <code>CurvedRidges@<dim@></code>:
       descriptor.data =
-        std_cxx14::make_unique<Data::SetUp<Data::Exercise_2_3<dim>, dim>>();
+        std::make_unique<Data::SetUp<Data::Exercise_2_3<dim>, dim>>();
 
       // Next set first a dual functional, then a list of evaluation
       // objects. We choose as default the evaluation of the value at an
@@ -2862,7 +2842,7 @@ int main()
       // each step.
       const Point<dim> evaluation_point(0.75, 0.75);
       descriptor.dual_functional =
-        std_cxx14::make_unique<DualFunctional::PointValueEvaluation<dim>>(
+        std::make_unique<DualFunctional::PointValueEvaluation<dim>>(
           evaluation_point);
 
       Evaluation::PointValueEvaluation<dim> postprocessor1(evaluation_point);

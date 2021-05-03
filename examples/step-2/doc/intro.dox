@@ -60,7 +60,7 @@ corresponding to a particular differential equation using this finite element
 and mesh. We will keep this step for the step-3 program and rather talk about
 one practical aspect of a finite element program, namely that finite element
 matrices are always very sparse: almost all entries in these
-matrices are zero. 
+matrices are zero.
 
 To be more precise, we say that a matrix is sparse
 if the number of nonzero entries <i>per row</i> in the matrix is
@@ -72,7 +72,7 @@ total size of the matrix. For more complicated problems -- say, the Stokes
 problem of step-22 -- and in particular in 3d, the number of entries per row
 may be several hundred. But the important point is that this number is
 independent of the overall size of the problem: If you refine the mesh, the
-maximal number of unknowns per row remains the same. 
+maximal number of unknowns per row remains the same.
 
 Sparsity is one of the distinguishing feature of
 the finite element method compared to, say, approximating the solution of a
@@ -91,7 +91,7 @@ values of all $N$ unknowns with optimal complexity, i.e., with a total of
 ${\cal O}(N)$ operations. It is clear that this wouldn't be possible if the
 matrix were not sparse (because then the number of entries in the matrix would
 have to be ${\cal O}(N^s)$ with some $s>1$, and doing a fixed number of
-matrix-vector products would take ${\cal O}(N^s)$ operations), 
+matrix-vector products would take ${\cal O}(N^s)$ operations),
 but it also requires very specialized solvers such as
 multigrid methods to satisfy the requirement that the solution requires only a
 fixed number of matrix-vector multiplications. We will frequently look at the
@@ -121,7 +121,7 @@ demonstrate a simple way to output the "sparsity pattern" that corresponds to
 a DoFHandler, i.e., an object that represents all of the potentially nonzero
 elements of a matrix one may build when discretizing a partial differential
 equation on a mesh and its DoFHandler. This lack of structure in the sparsity
-pattern will be apparent from the pictures we show below. 
+pattern will be apparent from the pictures we show below.
 
 For most applications and algorithms, the exact way in which degrees of freedom
 are numbered does not matter. For example, the Conjugate Gradient method we

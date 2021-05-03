@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2018 by the deal.II authors
+// Copyright (C) 2010 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,8 +22,9 @@
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/vector_memory.h>
 
-#include "../testmatrix.h"
 #include "../tests.h"
+
+#include "../testmatrix.h"
 
 
 class MySolverControl : public SolverControl
@@ -72,9 +73,8 @@ check(const MatrixType &A, const VectorType &f)
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(4);
-  deallog.attach(logfile);
 
   unsigned int size = 37;
   unsigned int dim  = (size - 1) * (size - 1);

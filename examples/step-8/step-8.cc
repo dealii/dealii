@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2000 - 2019 by the deal.II authors
+ * Copyright (C) 2000 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -25,6 +25,7 @@
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/tensor.h>
+
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/sparse_matrix.h>
@@ -32,15 +33,16 @@
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/affine_constraints.h>
+
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_refinement.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
+
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
+
 #include <deal.II/fe/fe_values.h>
+
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/data_out.h>
@@ -70,11 +72,10 @@ namespace Step8
   // the step-6 example.
   //
   // The only change is the use of a different class for the <code>fe</code>
-  // variable: Instead of a concrete finite element class such as
-  // <code>FE_Q</code>, we now use a more generic one,
-  // <code>FESystem</code>. In fact, <code>FESystem</code> is not really a
+  // variable: Instead of a concrete finite element class such as FE_Q, we now
+  // use a more generic one, FESystem. In fact, FESystem is not really a
   // finite element itself in that it does not implement shape functions of
-  // its own.  Rather, it is a class that can be used to stack several other
+  // its own. Rather, it is a class that can be used to stack several other
   // elements together to form one vector-valued finite element. In our case,
   // we will compose the vector-valued element of <code>FE_Q(1)</code>
   // objects, as shown below in the constructor of this class.
@@ -83,7 +84,6 @@ namespace Step8
   {
   public:
     ElasticProblem();
-    ~ElasticProblem();
     void run();
 
   private:
@@ -98,7 +98,7 @@ namespace Step8
 
     FESystem<dim> fe;
 
-    AffineConstraints<double> hanging_node_constraints;
+    AffineConstraints<double> constraints;
 
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> system_matrix;
@@ -126,8 +126,8 @@ namespace Step8
   // subsequent calls would only have to do redundant checks). In addition,
   // checking and possibly resizing the vector is an operation that can not be
   // removed if we can't rely on the assumption that the vector already has
-  // the correct size; this is in contract to the <code>Assert</code> call
-  // that is completely removed if the program is compiled in optimized mode.
+  // the correct size; this is in contract to the Assert call that is
+  // completely removed if the program is compiled in optimized mode.
   //
   // Likewise, if by some accident someone tried to compile and run the
   // program in only one space dimension (in which the elastic equations do
@@ -149,8 +149,8 @@ namespace Step8
     // zero as well.
     //
     // For this, let us first define two objects that denote the centers of
-    // these areas. Note that upon construction of the <code>Point</code>
-    // objects, all components are set to zero.
+    // these areas. Note that upon construction of the Point objects, all
+    // components are set to zero.
     Point<dim> point_1, point_2;
     point_1(0) = 0.5;
     point_2(0) = -0.5;
@@ -179,7 +179,7 @@ namespace Step8
 
   // @sect3{The <code>ElasticProblem</code> class implementation}
 
-  // @sect4{ElasticProblem::ElasticProblem}
+  // @sect4{ElasticProblem::ElasticProblem constructor}
 
   // Following is the constructor of the main class. As said before, we would
   // like to construct a vector-valued finite element that is composed of
@@ -188,64 +188,56 @@ namespace Step8
   // functions of a scalar element). Of course, the number of scalar finite
   // elements we would like to stack together equals the number of components
   // the solution function has, which is <code>dim</code> since we consider
-  // displacement in each space direction. The <code>FESystem</code> class can
-  // handle this: we pass it the finite element of which we would like to
-  // compose the system of, and how often it shall be repeated:
+  // displacement in each space direction. The FESystem class can handle this:
+  // we pass it the finite element of which we would like to compose the
+  // system of, and how often it shall be repeated:
 
   template <int dim>
   ElasticProblem<dim>::ElasticProblem()
     : dof_handler(triangulation)
     , fe(FE_Q<dim>(1), dim)
   {}
-  // In fact, the <code>FESystem</code> class has several more constructors
-  // which can perform more complex operations than just stacking together
-  // several scalar finite elements of the same type into one; we will get to
-  // know these possibilities in later examples.
-
-
-
-  // @sect4{ElasticProblem::~ElasticProblem}
-
-  // The destructor, on the other hand, is exactly as in step-6:
-  template <int dim>
-  ElasticProblem<dim>::~ElasticProblem()
-  {
-    dof_handler.clear();
-  }
+  // In fact, the FESystem class has several more constructors which can
+  // perform more complex operations than just stacking together several
+  // scalar finite elements of the same type into one; we will get to know
+  // these possibilities in later examples.
 
 
   // @sect4{ElasticProblem::setup_system}
 
   // Setting up the system of equations is identical to the function used in
-  // the step-6 example. The <code>DoFHandler</code> class and all other
-  // classes used here are fully aware that the finite element we want to use
-  // is vector-valued, and take care of the vector-valuedness of the finite
-  // element themselves. (In fact, they do not, but this does not need to
-  // bother you: since they only need to know how many degrees of freedom
-  // there are per vertex, line and cell, and they do not ask what they
-  // represent, i.e. whether the finite element under consideration is
-  // vector-valued or whether it is, for example, a scalar Hermite element
-  // with several degrees of freedom on each vertex).
+  // the step-6 example. The DoFHandler class and all other classes used here
+  // are fully aware that the finite element we want to use is vector-valued,
+  // and take care of the vector-valuedness of the finite element
+  // themselves. (In fact, they do not, but this does not need to bother you:
+  // since they only need to know how many degrees of freedom there are per
+  // vertex, line and cell, and they do not ask what they represent,
+  // i.e. whether the finite element under consideration is vector-valued or
+  // whether it is, for example, a scalar Hermite element with several degrees
+  // of freedom on each vertex).
   template <int dim>
   void ElasticProblem<dim>::setup_system()
   {
     dof_handler.distribute_dofs(fe);
-    hanging_node_constraints.clear();
-    DoFTools::make_hanging_node_constraints(dof_handler,
-                                            hanging_node_constraints);
-    hanging_node_constraints.close();
+    solution.reinit(dof_handler.n_dofs());
+    system_rhs.reinit(dof_handler.n_dofs());
+
+    constraints.clear();
+    DoFTools::make_hanging_node_constraints(dof_handler, constraints);
+    VectorTools::interpolate_boundary_values(dof_handler,
+                                             0,
+                                             Functions::ZeroFunction<dim>(dim),
+                                             constraints);
+    constraints.close();
 
     DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
     DoFTools::make_sparsity_pattern(dof_handler,
                                     dsp,
-                                    hanging_node_constraints,
-                                    /*keep_constrained_dofs = */ true);
+                                    constraints,
+                                    /*keep_constrained_dofs = */ false);
     sparsity_pattern.copy_from(dsp);
 
     system_matrix.reinit(sparsity_pattern);
-
-    solution.reinit(dof_handler.n_dofs());
-    system_rhs.reinit(dof_handler.n_dofs());
   }
 
 
@@ -257,15 +249,15 @@ namespace Step8
   // examples.
   //
   // The first parts of this function are the same as before, however: setting
-  // up a suitable quadrature formula, initializing an <code>FEValues</code>
-  // object for the (vector-valued) finite element we use as well as the
-  // quadrature object, and declaring a number of auxiliary arrays. In
-  // addition, we declare the ever same two abbreviations:
-  // <code>n_q_points</code> and <code>dofs_per_cell</code>. The number of
-  // degrees of freedom per cell we now obviously ask from the composed finite
-  // element rather than from the underlying scalar Q1 element. Here, it is
-  // <code>dim</code> times the number of degrees of freedom per cell of the
-  // Q1 element, though this is not explicit knowledge we need to care about:
+  // up a suitable quadrature formula, initializing an FEValues object for the
+  // (vector-valued) finite element we use as well as the quadrature object,
+  // and declaring a number of auxiliary arrays. In addition, we declare the
+  // ever same two abbreviations: <code>n_q_points</code> and
+  // <code>dofs_per_cell</code>. The number of degrees of freedom per cell we
+  // now obviously ask from the composed finite element rather than from the
+  // underlying scalar Q1 element. Here, it is <code>dim</code> times the
+  // number of degrees of freedom per cell of the Q1 element, though this is
+  // not explicit knowledge we need to care about:
   template <int dim>
   void ElasticProblem<dim>::assemble_system()
   {
@@ -276,7 +268,7 @@ namespace Step8
                             update_values | update_gradients |
                               update_quadrature_points | update_JxW_values);
 
-    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
 
     FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
@@ -339,22 +331,23 @@ namespace Step8
         //
         // With this knowledge, we can assemble the local matrix
         // contributions:
-        for (unsigned int i = 0; i < dofs_per_cell; ++i)
+        for (const unsigned int i : fe_values.dof_indices())
           {
             const unsigned int component_i =
               fe.system_to_component_index(i).first;
 
-            for (unsigned int j = 0; j < dofs_per_cell; ++j)
+            for (const unsigned int j : fe_values.dof_indices())
               {
                 const unsigned int component_j =
                   fe.system_to_component_index(j).first;
 
-                for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+                for (const unsigned int q_point :
+                     fe_values.quadrature_point_indices())
                   {
                     cell_matrix(i, j) +=
-                      // The first term is (lambda d_i u_i, d_j v_j) + (mu d_i
-                      // u_j, d_j v_i).  Note that
-                      // <code>shape_grad(i,q_point)</code> returns the
+                      // The first term is $\lambda \partial_i u_i, \partial_j
+                      // v_j) + (\mu \partial_i u_j, \partial_j v_i)$. Note
+                      // that <code>shape_grad(i,q_point)</code> returns the
                       // gradient of the only nonzero component of the i-th
                       // shape function at quadrature point q_point. The
                       // component <code>comp(i)</code> of the gradient, which
@@ -371,17 +364,17 @@ namespace Step8
                          fe_values.shape_grad(j, q_point)[component_i] * //
                          mu_values[q_point])                             //
                         +                                                //
-                        // The second term is (mu nabla u_i, nabla v_j).  We
-                        // need not access a specific component of the
-                        // gradient, since we only have to compute the scalar
-                        // product of the two gradients, of which an
-                        // overloaded version of the operator* takes care, as
-                        // in previous examples.
+                        // The second term is $(\mu \nabla u_i, \nabla
+                        // v_j)$. We need not access a specific component of
+                        // the gradient, since we only have to compute the
+                        // scalar product of the two gradients, of which an
+                        // overloaded version of <tt>operator*</tt> takes
+                        // care, as in previous examples.
                         //
-                        // Note that by using the ?: operator, we only do this
-                        // if comp(i) equals comp(j), otherwise a zero is
-                        // added (which will be optimized away by the
-                        // compiler).
+                        // Note that by using the <tt>?:</tt> operator, we only
+                        // do this if <tt>component_i</tt> equals
+                        // <tt>component_j</tt>, otherwise a zero is added
+                        // (which will be optimized away by the compiler).
                         ((component_i == component_j) ?        //
                            (fe_values.shape_grad(i, q_point) * //
                             fe_values.shape_grad(j, q_point) * //
@@ -395,12 +388,13 @@ namespace Step8
 
         // Assembling the right hand side is also just as discussed in the
         // introduction:
-        for (unsigned int i = 0; i < dofs_per_cell; ++i)
+        for (const unsigned int i : fe_values.dof_indices())
           {
             const unsigned int component_i =
               fe.system_to_component_index(i).first;
 
-            for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+            for (const unsigned int q_point :
+                 fe_values.quadrature_point_indices())
               cell_rhs(i) += fe_values.shape_value(i, q_point) *
                              rhs_values[q_point][component_i] *
                              fe_values.JxW(q_point);
@@ -409,43 +403,11 @@ namespace Step8
         // The transfer from local degrees of freedom into the global matrix
         // and right hand side vector does not depend on the equation under
         // consideration, and is thus the same as in all previous
-        // examples. The same holds for the elimination of hanging nodes from
-        // the matrix and right hand side, once we are done with assembling
-        // the entire linear system:
+        // examples.
         cell->get_dof_indices(local_dof_indices);
-        for (unsigned int i = 0; i < dofs_per_cell; ++i)
-          {
-            for (unsigned int j = 0; j < dofs_per_cell; ++j)
-              system_matrix.add(local_dof_indices[i],
-                                local_dof_indices[j],
-                                cell_matrix(i, j));
-
-            system_rhs(local_dof_indices[i]) += cell_rhs(i);
-          }
+        constraints.distribute_local_to_global(
+          cell_matrix, cell_rhs, local_dof_indices, system_matrix, system_rhs);
       }
-
-    hanging_node_constraints.condense(system_matrix);
-    hanging_node_constraints.condense(system_rhs);
-
-    // The interpolation of the boundary values needs a small modification:
-    // since the solution function is vector-valued, so need to be the
-    // boundary values. The <code>Functions::ZeroFunction</code> constructor
-    // accepts a parameter that tells it that it shall represent a vector
-    // valued, constant zero function with that many components. By default,
-    // this parameter is equal to one, in which case the
-    // <code>Functions::ZeroFunction</code> object would represent a scalar
-    // function. Since the solution vector has <code>dim</code> components, we
-    // need to pass <code>dim</code> as number of components to the zero
-    // function as well.
-    std::map<types::global_dof_index, double> boundary_values;
-    VectorTools::interpolate_boundary_values(dof_handler,
-                                             0,
-                                             Functions::ZeroFunction<dim>(dim),
-                                             boundary_values);
-    MatrixTools::apply_boundary_values(boundary_values,
-                                       system_matrix,
-                                       solution,
-                                       system_rhs);
   }
 
 
@@ -459,15 +421,15 @@ namespace Step8
   template <int dim>
   void ElasticProblem<dim>::solve()
   {
-    SolverControl solver_control(1000, 1e-12);
-    SolverCG<>    cg(solver_control);
+    SolverControl            solver_control(1000, 1e-12);
+    SolverCG<Vector<double>> cg(solver_control);
 
-    PreconditionSSOR<> preconditioner;
+    PreconditionSSOR<SparseMatrix<double>> preconditioner;
     preconditioner.initialize(system_matrix, 1.2);
 
     cg.solve(system_matrix, solution, system_rhs, preconditioner);
 
-    hanging_node_constraints.distribute(solution);
+    constraints.distribute(solution);
   }
 
 
@@ -488,12 +450,11 @@ namespace Step8
   {
     Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
 
-    KellyErrorEstimator<dim>::estimate(
-      dof_handler,
-      QGauss<dim - 1>(fe.degree + 1),
-      std::map<types::boundary_id, const Function<dim> *>(),
-      solution,
-      estimated_error_per_cell);
+    KellyErrorEstimator<dim>::estimate(dof_handler,
+                                       QGauss<dim - 1>(fe.degree + 1),
+                                       {},
+                                       solution,
+                                       estimated_error_per_cell);
 
     GridRefinement::refine_and_coarsen_fixed_number(triangulation,
                                                     estimated_error_per_cell,
@@ -508,9 +469,8 @@ namespace Step8
 
   // The output happens mostly as has been shown in previous examples
   // already. The only difference is that the solution function is vector
-  // valued. The <code>DataOut</code> class takes care of this automatically,
-  // but we have to give each component of the solution vector a different
-  // name.
+  // valued. The DataOut class takes care of this automatically, but we have
+  // to give each component of the solution vector a different name.
   //
   // To do this, the DataOut::add_vector() function wants a vector of
   // strings. Since the number of components is the same as the number
@@ -527,10 +487,10 @@ namespace Step8
   //
   // After listing the 1d, 2d, and 3d case, it is good style to let the
   // program die if we run upon a case which we did not consider. Remember
-  // that the <code>Assert</code> macro generates an exception if the
-  // condition in the first parameter is not satisfied. Of course, the
-  // condition <code>false</code> can never be satisfied, so the program
-  // will always abort whenever it gets to the default statement:
+  // that the Assert macro generates an exception if the condition in the
+  // first parameter is not satisfied. Of course, the condition
+  // <code>false</code> can never be satisfied, so the program will always
+  // abort whenever it gets to the default statement:
   template <int dim>
   void ElasticProblem<dim>::output_results(const unsigned int cycle) const
   {
@@ -577,9 +537,9 @@ namespace Step8
 
   // The <code>run</code> function does the same things as in step-6, for
   // example. This time, we use the square [-1,1]^d as domain, and we refine
-  // it twice globally before starting the first iteration.
+  // it globally four times before starting the first iteration.
   //
-  // The reason for refining twice is a bit accidental: we use the QGauss
+  // The reason for refining is a bit accidental: we use the QGauss
   // quadrature formula with two points in each direction for integration of the
   // right hand side; that means that there are four quadrature points on each
   // cell (in 2D). If we only refine the initial grid once globally, then there
@@ -598,19 +558,18 @@ namespace Step8
   // an initial grid that is totally unsuitable for the problem at hand.
   //
   // The unfortunate thing is that if the discrete solution is constant, then
-  // the error indicators computed by the <code>KellyErrorEstimator</code>
-  // class are zero for each cell as well, and the call to
-  // <code>refine_and_coarsen_fixed_number</code> on the
-  // <code>triangulation</code> object will not flag any cells for refinement
-  // (why should it if the indicated error is zero for each cell?). The grid
-  // in the next iteration will therefore consist of four cells only as well,
-  // and the same problem occurs again.
+  // the error indicators computed by the KellyErrorEstimator class are zero
+  // for each cell as well, and the call to
+  // Triangulation::refine_and_coarsen_fixed_number() will not flag any cells
+  // for refinement (why should it if the indicated error is zero for each
+  // cell?). The grid in the next iteration will therefore consist of four
+  // cells only as well, and the same problem occurs again.
   //
   // The conclusion needs to be: while of course we will not choose the
   // initial grid to be well-suited for the accurate solution of the problem,
   // we must at least choose it such that it has the chance to capture the
-  // important features of the solution. In this case, it needs to be able
-  // to see the right hand side. Thus, we refine twice globally. (Any larger
+  // important features of the solution. In this case, it needs to be able to
+  // see the right hand side. Thus, we refine globally four times. (Any larger
   // number of global refinement steps would of course also work.)
   template <int dim>
   void ElasticProblem<dim>::run()
@@ -622,7 +581,7 @@ namespace Step8
         if (cycle == 0)
           {
             GridGenerator::hyper_cube(triangulation, -1, 1);
-            triangulation.refine_global(2);
+            triangulation.refine_global(4);
           }
         else
           refine_grid();

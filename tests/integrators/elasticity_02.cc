@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2019 by the deal.II authors
+// Copyright (C) 2012 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -25,8 +25,9 @@
 
 #include <deal.II/integrators/elasticity.h>
 
-#include "../test_grids.h"
 #include "../tests.h"
+
+#include "../test_grids.h"
 
 using namespace LocalIntegrators::Elasticity;
 
@@ -61,22 +62,9 @@ test_boundary(const FEValuesBase<dim> &fev)
         u    = 0.;
         u(i) = 1.;
         w    = 0.;
-        fev.get_function_values(u,
-                                indices,
-                                VectorSlice<std::vector<std::vector<double>>>(
-                                  uval),
-                                true);
-        fev.get_function_gradients(
-          u,
-          indices,
-          VectorSlice<std::vector<std::vector<Tensor<1, dim>>>>(ugrad),
-          true);
-        nitsche_tangential_residual(w,
-                                    fev,
-                                    make_slice(uval),
-                                    make_slice(ugrad),
-                                    make_slice(null_val),
-                                    17);
+        fev.get_function_values(u, indices, uval, true);
+        fev.get_function_gradients(u, indices, ugrad, true);
+        nitsche_tangential_residual<dim>(w, fev, uval, ugrad, null_val, 17);
         M.vmult(v, u);
         w.add(-1., v);
         deallog << ' ' << w.l2_norm();
@@ -98,7 +86,7 @@ test_fe(Triangulation<dim> &tr, FiniteElement<dim> &fe)
                          face_quadrature,
                          update_values | update_gradients |
                            update_normal_vectors | update_JxW_values);
-  for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+  for (const unsigned int i : GeometryInfo<dim>::face_indices())
     {
       deallog << "boundary_matrix " << i << std::endl;
       fef1.reinit(cell1, i);

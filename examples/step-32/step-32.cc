@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2008 - 2019 by the deal.II authors
+ * Copyright (C) 2008 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -47,8 +47,6 @@
 
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/grid_tools.h>
@@ -56,7 +54,6 @@
 
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_renumbering.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
@@ -366,8 +363,8 @@ namespace Step32
         const Mapping<dim> &      mapping,
         const UpdateFlags         update_flags)
         : stokes_fe_values(mapping, stokes_fe, stokes_quadrature, update_flags)
-        , grad_phi_u(stokes_fe.dofs_per_cell)
-        , phi_p(stokes_fe.dofs_per_cell)
+        , grad_phi_u(stokes_fe.n_dofs_per_cell())
+        , phi_p(stokes_fe.n_dofs_per_cell())
       {}
 
 
@@ -434,9 +431,9 @@ namespace Step32
                                 temperature_fe,
                                 stokes_quadrature,
                                 temperature_update_flags)
-        , phi_u(stokes_fe.dofs_per_cell)
-        , grads_phi_u(stokes_fe.dofs_per_cell)
-        , div_phi_u(stokes_fe.dofs_per_cell)
+        , phi_u(stokes_fe.n_dofs_per_cell())
+        , grads_phi_u(stokes_fe.n_dofs_per_cell())
+        , div_phi_u(stokes_fe.n_dofs_per_cell())
         , old_temperature_values(stokes_quadrature.size())
       {}
 
@@ -486,8 +483,8 @@ namespace Step32
                                 temperature_quadrature,
                                 update_values | update_gradients |
                                   update_JxW_values)
-        , phi_T(temperature_fe.dofs_per_cell)
-        , grad_phi_T(temperature_fe.dofs_per_cell)
+        , phi_T(temperature_fe.n_dofs_per_cell())
+        , grad_phi_T(temperature_fe.n_dofs_per_cell())
       {}
 
 
@@ -562,8 +559,8 @@ namespace Step32
                            stokes_fe,
                            quadrature,
                            update_values | update_gradients)
-        , phi_T(temperature_fe.dofs_per_cell)
-        , grad_phi_T(temperature_fe.dofs_per_cell)
+        , phi_T(temperature_fe.n_dofs_per_cell())
+        , grad_phi_T(temperature_fe.n_dofs_per_cell())
         ,
 
         old_velocity_values(quadrature.size())
@@ -637,8 +634,8 @@ namespace Step32
       template <int dim>
       StokesPreconditioner<dim>::StokesPreconditioner(
         const FiniteElement<dim> &stokes_fe)
-        : local_matrix(stokes_fe.dofs_per_cell, stokes_fe.dofs_per_cell)
-        , local_dof_indices(stokes_fe.dofs_per_cell)
+        : local_matrix(stokes_fe.n_dofs_per_cell(), stokes_fe.n_dofs_per_cell())
+        , local_dof_indices(stokes_fe.n_dofs_per_cell())
       {}
 
       template <int dim>
@@ -654,7 +651,6 @@ namespace Step32
       struct StokesSystem : public StokesPreconditioner<dim>
       {
         StokesSystem(const FiniteElement<dim> &stokes_fe);
-        StokesSystem(const StokesSystem<dim> &data);
 
         Vector<double> local_rhs;
       };
@@ -662,13 +658,7 @@ namespace Step32
       template <int dim>
       StokesSystem<dim>::StokesSystem(const FiniteElement<dim> &stokes_fe)
         : StokesPreconditioner<dim>(stokes_fe)
-        , local_rhs(stokes_fe.dofs_per_cell)
-      {}
-
-      template <int dim>
-      StokesSystem<dim>::StokesSystem(const StokesSystem<dim> &data)
-        : StokesPreconditioner<dim>(data)
-        , local_rhs(data.local_rhs)
+        , local_rhs(stokes_fe.n_dofs_per_cell())
       {}
 
 
@@ -677,7 +667,6 @@ namespace Step32
       struct TemperatureMatrix
       {
         TemperatureMatrix(const FiniteElement<dim> &temperature_fe);
-        TemperatureMatrix(const TemperatureMatrix &data);
 
         FullMatrix<double>                   local_mass_matrix;
         FullMatrix<double>                   local_stiffness_matrix;
@@ -687,18 +676,11 @@ namespace Step32
       template <int dim>
       TemperatureMatrix<dim>::TemperatureMatrix(
         const FiniteElement<dim> &temperature_fe)
-        : local_mass_matrix(temperature_fe.dofs_per_cell,
-                            temperature_fe.dofs_per_cell)
-        , local_stiffness_matrix(temperature_fe.dofs_per_cell,
-                                 temperature_fe.dofs_per_cell)
-        , local_dof_indices(temperature_fe.dofs_per_cell)
-      {}
-
-      template <int dim>
-      TemperatureMatrix<dim>::TemperatureMatrix(const TemperatureMatrix &data)
-        : local_mass_matrix(data.local_mass_matrix)
-        , local_stiffness_matrix(data.local_stiffness_matrix)
-        , local_dof_indices(data.local_dof_indices)
+        : local_mass_matrix(temperature_fe.n_dofs_per_cell(),
+                            temperature_fe.n_dofs_per_cell())
+        , local_stiffness_matrix(temperature_fe.n_dofs_per_cell(),
+                                 temperature_fe.n_dofs_per_cell())
+        , local_dof_indices(temperature_fe.n_dofs_per_cell())
       {}
 
 
@@ -707,7 +689,6 @@ namespace Step32
       struct TemperatureRHS
       {
         TemperatureRHS(const FiniteElement<dim> &temperature_fe);
-        TemperatureRHS(const TemperatureRHS &data);
 
         Vector<double>                       local_rhs;
         std::vector<types::global_dof_index> local_dof_indices;
@@ -717,17 +698,10 @@ namespace Step32
       template <int dim>
       TemperatureRHS<dim>::TemperatureRHS(
         const FiniteElement<dim> &temperature_fe)
-        : local_rhs(temperature_fe.dofs_per_cell)
-        , local_dof_indices(temperature_fe.dofs_per_cell)
-        , matrix_for_bc(temperature_fe.dofs_per_cell,
-                        temperature_fe.dofs_per_cell)
-      {}
-
-      template <int dim>
-      TemperatureRHS<dim>::TemperatureRHS(const TemperatureRHS &data)
-        : local_rhs(data.local_rhs)
-        , local_dof_indices(data.local_dof_indices)
-        , matrix_for_bc(data.matrix_for_bc)
+        : local_rhs(temperature_fe.n_dofs_per_cell())
+        , local_dof_indices(temperature_fe.n_dofs_per_cell())
+        , matrix_for_bc(temperature_fe.n_dofs_per_cell(),
+                        temperature_fe.n_dofs_per_cell())
       {}
     } // namespace CopyData
   }   // namespace Assembly
@@ -1287,7 +1261,7 @@ namespace Step32
   template <int dim>
   double BoussinesqFlowProblem<dim>::get_maximal_velocity() const
   {
-    const QIterated<dim> quadrature_formula(QTrapez<1>(),
+    const QIterated<dim> quadrature_formula(QTrapezoid<1>(),
                                             parameters.stokes_velocity_degree);
     const unsigned int   n_q_points = quadrature_formula.size();
 
@@ -1329,7 +1303,7 @@ namespace Step32
   template <int dim>
   double BoussinesqFlowProblem<dim>::get_cfl_number() const
   {
-    const QIterated<dim> quadrature_formula(QTrapez<1>(),
+    const QIterated<dim> quadrature_formula(QTrapezoid<1>(),
                                             parameters.stokes_velocity_degree);
     const unsigned int   n_q_points = quadrature_formula.size();
 
@@ -1484,7 +1458,7 @@ namespace Step32
   std::pair<double, double>
   BoussinesqFlowProblem<dim>::get_extrapolated_temperature_range() const
   {
-    const QIterated<dim> quadrature_formula(QTrapez<1>(),
+    const QIterated<dim> quadrature_formula(QTrapezoid<1>(),
                                             parameters.temperature_degree);
     const unsigned int   n_q_points = quadrature_formula.size();
 
@@ -1853,17 +1827,16 @@ namespace Step32
   {
     TimerOutput::Scope timing_section(computing_timer, "Setup dof systems");
 
+    stokes_dof_handler.distribute_dofs(stokes_fe);
+
     std::vector<unsigned int> stokes_sub_blocks(dim + 1, 0);
     stokes_sub_blocks[dim] = 1;
-    stokes_dof_handler.distribute_dofs(stokes_fe);
     DoFRenumbering::component_wise(stokes_dof_handler, stokes_sub_blocks);
 
     temperature_dof_handler.distribute_dofs(temperature_fe);
 
-    std::vector<types::global_dof_index> stokes_dofs_per_block(2);
-    DoFTools::count_dofs_per_block(stokes_dof_handler,
-                                   stokes_dofs_per_block,
-                                   stokes_sub_blocks);
+    const std::vector<types::global_dof_index> stokes_dofs_per_block =
+      DoFTools::count_dofs_per_fe_block(stokes_dof_handler, stokes_sub_blocks);
 
     const unsigned int n_u = stokes_dofs_per_block[0],
                        n_p = stokes_dofs_per_block[1],
@@ -2041,7 +2014,7 @@ namespace Step32
     Assembly::Scratch::StokesPreconditioner<dim> &        scratch,
     Assembly::CopyData::StokesPreconditioner<dim> &       data)
   {
-    const unsigned int dofs_per_cell = stokes_fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = stokes_fe.n_dofs_per_cell();
     const unsigned int n_q_points =
       scratch.stokes_fe_values.n_quadrature_points;
 
@@ -2106,19 +2079,17 @@ namespace Step32
   // specific signatures: three arguments in the first and one
   // argument in the latter case (see the documentation of the
   // WorkStream::run function for the meaning of these arguments).
-  // Note how we use the construct <code>std::bind</code> to
+  // Note how we use a lambda functions to
   // create a function object that satisfies this requirement. It uses
-  // placeholders <code>std::placeholders::_1, std::placeholders::_2,
-  // std::placeholders::_3</code> for the local assembly function that specify
-  // cell, scratch data, and copy data, as well as the placeholder
-  // <code>std::placeholders::_1</code> for the copy function that expects the
-  // data to be written into the global matrix (for placeholder
-  // arguments, also see the discussion in step-13's
-  // <code>assemble_linear_system()</code> function). On the other
+  // function arguments for the local assembly function that specify
+  // cell, scratch data, and copy data, as well as function argument
+  // for the copy function that expects the
+  // data to be written into the global matrix (also see the discussion in
+  // step-13's <code>assemble_linear_system()</code> function). On the other
   // hand, the implicit zeroth argument of member functions (namely
   // the <code>this</code> pointer of the object on which that member
   // function is to operate on) is <i>bound</i> to the
-  // <code>this</code> pointer of the current function. The
+  // <code>this</code> pointer of the current function and is captured. The
   // WorkStream::run function, as a consequence, does not need to know
   // anything about the object these functions work on.
   //
@@ -2146,27 +2117,30 @@ namespace Step32
     using CellFilter =
       FilteredIterator<typename DoFHandler<2>::active_cell_iterator>;
 
-    WorkStream::run(
-      CellFilter(IteratorFilters::LocallyOwnedCell(),
-                 stokes_dof_handler.begin_active()),
-      CellFilter(IteratorFilters::LocallyOwnedCell(), stokes_dof_handler.end()),
-      std::bind(
-        &BoussinesqFlowProblem<dim>::local_assemble_stokes_preconditioner,
-        this,
-        std::placeholders::_1,
-        std::placeholders::_2,
-        std::placeholders::_3),
-      std::bind(
-        &BoussinesqFlowProblem<dim>::copy_local_to_global_stokes_preconditioner,
-        this,
-        std::placeholders::_1),
-      Assembly::Scratch::StokesPreconditioner<dim>(stokes_fe,
-                                                   quadrature_formula,
-                                                   mapping,
-                                                   update_JxW_values |
-                                                     update_values |
-                                                     update_gradients),
-      Assembly::CopyData::StokesPreconditioner<dim>(stokes_fe));
+    auto worker =
+      [this](const typename DoFHandler<dim>::active_cell_iterator &cell,
+             Assembly::Scratch::StokesPreconditioner<dim> &        scratch,
+             Assembly::CopyData::StokesPreconditioner<dim> &       data) {
+        this->local_assemble_stokes_preconditioner(cell, scratch, data);
+      };
+
+    auto copier =
+      [this](const Assembly::CopyData::StokesPreconditioner<dim> &data) {
+        this->copy_local_to_global_stokes_preconditioner(data);
+      };
+
+    WorkStream::run(CellFilter(IteratorFilters::LocallyOwnedCell(),
+                               stokes_dof_handler.begin_active()),
+                    CellFilter(IteratorFilters::LocallyOwnedCell(),
+                               stokes_dof_handler.end()),
+                    worker,
+                    copier,
+                    Assembly::Scratch::StokesPreconditioner<dim>(
+                      stokes_fe,
+                      quadrature_formula,
+                      mapping,
+                      update_JxW_values | update_values | update_gradients),
+                    Assembly::CopyData::StokesPreconditioner<dim>(stokes_fe));
 
     stokes_preconditioner_matrix.compress(VectorOperation::add);
   }
@@ -2237,7 +2211,7 @@ namespace Step32
     Assembly::CopyData::StokesSystem<dim> &               data)
   {
     const unsigned int dofs_per_cell =
-      scratch.stokes_fe_values.get_fe().dofs_per_cell;
+      scratch.stokes_fe_values.get_fe().n_dofs_per_cell();
     const unsigned int n_q_points =
       scratch.stokes_fe_values.n_quadrature_points;
 
@@ -2339,14 +2313,14 @@ namespace Step32
       CellFilter(IteratorFilters::LocallyOwnedCell(),
                  stokes_dof_handler.begin_active()),
       CellFilter(IteratorFilters::LocallyOwnedCell(), stokes_dof_handler.end()),
-      std::bind(&BoussinesqFlowProblem<dim>::local_assemble_stokes_system,
-                this,
-                std::placeholders::_1,
-                std::placeholders::_2,
-                std::placeholders::_3),
-      std::bind(&BoussinesqFlowProblem<dim>::copy_local_to_global_stokes_system,
-                this,
-                std::placeholders::_1),
+      [this](const typename DoFHandler<dim>::active_cell_iterator &cell,
+             Assembly::Scratch::StokesSystem<dim> &                scratch,
+             Assembly::CopyData::StokesSystem<dim> &               data) {
+        this->local_assemble_stokes_system(cell, scratch, data);
+      },
+      [this](const Assembly::CopyData::StokesSystem<dim> &data) {
+        this->copy_local_to_global_stokes_system(data);
+      },
       Assembly::Scratch::StokesSystem<dim>(
         stokes_fe,
         mapping,
@@ -2384,7 +2358,7 @@ namespace Step32
     Assembly::CopyData::TemperatureMatrix<dim> &          data)
   {
     const unsigned int dofs_per_cell =
-      scratch.temperature_fe_values.get_fe().dofs_per_cell;
+      scratch.temperature_fe_values.get_fe().n_dofs_per_cell();
     const unsigned int n_q_points =
       scratch.temperature_fe_values.n_quadrature_points;
 
@@ -2453,15 +2427,14 @@ namespace Step32
                  temperature_dof_handler.begin_active()),
       CellFilter(IteratorFilters::LocallyOwnedCell(),
                  temperature_dof_handler.end()),
-      std::bind(&BoussinesqFlowProblem<dim>::local_assemble_temperature_matrix,
-                this,
-                std::placeholders::_1,
-                std::placeholders::_2,
-                std::placeholders::_3),
-      std::bind(
-        &BoussinesqFlowProblem<dim>::copy_local_to_global_temperature_matrix,
-        this,
-        std::placeholders::_1),
+      [this](const typename DoFHandler<dim>::active_cell_iterator &cell,
+             Assembly::Scratch::TemperatureMatrix<dim> &           scratch,
+             Assembly::CopyData::TemperatureMatrix<dim> &          data) {
+        this->local_assemble_temperature_matrix(cell, scratch, data);
+      },
+      [this](const Assembly::CopyData::TemperatureMatrix<dim> &data) {
+        this->copy_local_to_global_temperature_matrix(data);
+      },
       Assembly::Scratch::TemperatureMatrix<dim>(temperature_fe,
                                                 mapping,
                                                 quadrature_formula),
@@ -2502,7 +2475,7 @@ namespace Step32
     const bool use_bdf2_scheme = (timestep_number != 0);
 
     const unsigned int dofs_per_cell =
-      scratch.temperature_fe_values.get_fe().dofs_per_cell;
+      scratch.temperature_fe_values.get_fe().n_dofs_per_cell();
     const unsigned int n_q_points =
       scratch.temperature_fe_values.n_quadrature_points;
 
@@ -2716,26 +2689,32 @@ namespace Step32
     using CellFilter =
       FilteredIterator<typename DoFHandler<2>::active_cell_iterator>;
 
-    WorkStream::run(
-      CellFilter(IteratorFilters::LocallyOwnedCell(),
-                 temperature_dof_handler.begin_active()),
-      CellFilter(IteratorFilters::LocallyOwnedCell(),
-                 temperature_dof_handler.end()),
-      std::bind(&BoussinesqFlowProblem<dim>::local_assemble_temperature_rhs,
-                this,
-                global_T_range,
-                maximal_velocity,
-                global_entropy_variation,
-                std::placeholders::_1,
-                std::placeholders::_2,
-                std::placeholders::_3),
-      std::bind(
-        &BoussinesqFlowProblem<dim>::copy_local_to_global_temperature_rhs,
-        this,
-        std::placeholders::_1),
-      Assembly::Scratch::TemperatureRHS<dim>(
-        temperature_fe, stokes_fe, mapping, quadrature_formula),
-      Assembly::CopyData::TemperatureRHS<dim>(temperature_fe));
+    auto worker =
+      [this, global_T_range, maximal_velocity, global_entropy_variation](
+        const typename DoFHandler<dim>::active_cell_iterator &cell,
+        Assembly::Scratch::TemperatureRHS<dim> &              scratch,
+        Assembly::CopyData::TemperatureRHS<dim> &             data) {
+        this->local_assemble_temperature_rhs(global_T_range,
+                                             maximal_velocity,
+                                             global_entropy_variation,
+                                             cell,
+                                             scratch,
+                                             data);
+      };
+
+    auto copier = [this](const Assembly::CopyData::TemperatureRHS<dim> &data) {
+      this->copy_local_to_global_temperature_rhs(data);
+    };
+
+    WorkStream::run(CellFilter(IteratorFilters::LocallyOwnedCell(),
+                               temperature_dof_handler.begin_active()),
+                    CellFilter(IteratorFilters::LocallyOwnedCell(),
+                               temperature_dof_handler.end()),
+                    worker,
+                    copier,
+                    Assembly::Scratch::TemperatureRHS<dim>(
+                      temperature_fe, stokes_fe, mapping, quadrature_formula),
+                    Assembly::CopyData::TemperatureRHS<dim>(temperature_fe));
 
     temperature_rhs.compress(VectorOperation::add);
   }
@@ -3174,11 +3153,11 @@ namespace Step32
 
     {
       std::vector<types::global_dof_index> local_joint_dof_indices(
-        joint_fe.dofs_per_cell);
+        joint_fe.n_dofs_per_cell());
       std::vector<types::global_dof_index> local_stokes_dof_indices(
-        stokes_fe.dofs_per_cell);
+        stokes_fe.n_dofs_per_cell());
       std::vector<types::global_dof_index> local_temperature_dof_indices(
-        temperature_fe.dofs_per_cell);
+        temperature_fe.n_dofs_per_cell());
 
       typename DoFHandler<dim>::active_cell_iterator
         joint_cell       = joint_dof_handler.begin_active(),
@@ -3193,7 +3172,7 @@ namespace Step32
             stokes_cell->get_dof_indices(local_stokes_dof_indices);
             temperature_cell->get_dof_indices(local_temperature_dof_indices);
 
-            for (unsigned int i = 0; i < joint_fe.dofs_per_cell; ++i)
+            for (unsigned int i = 0; i < joint_fe.n_dofs_per_cell(); ++i)
               if (joint_fe.system_to_base_index(i).first.first == 0)
                 {
                   Assert(joint_fe.system_to_base_index(i).second <
@@ -3238,41 +3217,9 @@ namespace Step32
     data_out.add_data_vector(locally_relevant_joint_solution, postprocessor);
     data_out.build_patches();
 
-    static int        out_index = 0;
-    const std::string filename =
-      ("solution-" + Utilities::int_to_string(out_index, 5) + "." +
-       Utilities::int_to_string(triangulation.locally_owned_subdomain(), 4) +
-       ".vtu");
-    std::ofstream output(filename);
-    data_out.write_vtu(output);
-
-
-    // At this point, all processors have written their own files to disk. We
-    // could visualize them individually in Visit or Paraview, but in reality
-    // we of course want to visualize the whole set of files at once. To this
-    // end, we create a master file in each of the formats understood by Visit
-    // (<code>.visit</code>) and Paraview (<code>.pvtu</code>) on the zeroth
-    // processor that describes how the individual files are defining the
-    // global data set.
-    if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
-      {
-        std::vector<std::string> filenames;
-        for (unsigned int i = 0;
-             i < Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
-             ++i)
-          filenames.push_back(std::string("solution-") +
-                              Utilities::int_to_string(out_index, 5) + "." +
-                              Utilities::int_to_string(i, 4) + ".vtu");
-        const std::string pvtu_master_filename =
-          ("solution-" + Utilities::int_to_string(out_index, 5) + ".pvtu");
-        std::ofstream pvtu_master(pvtu_master_filename);
-        data_out.write_pvtu_record(pvtu_master, filenames);
-
-        const std::string visit_master_filename =
-          ("solution-" + Utilities::int_to_string(out_index, 5) + ".visit");
-        std::ofstream visit_master(visit_master_filename);
-        DataOutBase::write_visit_record(visit_master, filenames);
-      }
+    static int out_index = 0;
+    data_out.write_vtu_with_pvtu_record(
+      "./", "solution", out_index, MPI_COMM_WORLD, 5);
 
     out_index++;
   }

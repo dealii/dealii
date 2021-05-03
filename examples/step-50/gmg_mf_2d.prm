@@ -1,0 +1,19 @@
+# Listing of Parameters
+# ---------------------
+# The problem dimension.
+set dim             = 2
+
+# Number of adaptive refinement steps.
+set n_steps         = 16
+
+# Output graphical results.
+set output          = true
+
+# Dampen factor for the smoother.
+set smoother dampen = 1.0
+
+# Number of smoother steps.
+set smoother steps  = 1
+
+# Switch between GMG and AMG.
+set solver          = MF

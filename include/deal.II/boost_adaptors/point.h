@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2019 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,10 +16,9 @@
 #ifndef dealii_boost_adaptor_point_h
 #define dealii_boost_adaptor_point_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/point.h>
-
-#include <boost/geometry.hpp>
-
 
 namespace boost
 {

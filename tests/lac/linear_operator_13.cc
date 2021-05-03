@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2019 by the deal.II authors
+// Copyright (C) 2015 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -46,7 +46,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 template <int dim>
 void
@@ -79,7 +78,8 @@ build_matrix_vector(TrilinosWrappers::BlockSparseMatrix &matrix,
   // Setup system
   dof_handler.distribute_dofs(fe);
   DoFRenumbering::component_wise(dof_handler, block_component);
-  DoFTools::count_dofs_per_block(dof_handler, dofs_per_block, block_component);
+  dofs_per_block =
+    DoFTools::count_dofs_per_fe_block(dof_handler, block_component);
   std::vector<IndexSet> partitioning(2);
   partitioning[0] = complete_index_set(dofs_per_block[0]);
   partitioning[1] = complete_index_set(dofs_per_block[1]);
@@ -143,13 +143,13 @@ void
 evaluate_ops(const TrilinosWrappers::BlockSparseMatrix &matrix,
              const TrilinosWrappers::MPI::BlockVector & vector)
 {
-  const double                                   tol = 1e-12;
-  typedef dealii::TrilinosWrappers::SparseMatrix MatrixType;
-  typedef dealii::TrilinosWrappers::MPI::Vector  VectorType;
-  typedef dealii::TrilinosWrappers::internal::LinearOperatorImplementation::
-    TrilinosPayload                        PayloadType;
-  typedef typename PayloadType::VectorType PayloadVectorType;
-  typedef dealii::types::global_dof_index  size_type;
+  const double tol  = 1e-12;
+  using MatrixType  = dealii::TrilinosWrappers::SparseMatrix;
+  using VectorType  = dealii::TrilinosWrappers::MPI::Vector;
+  using PayloadType = dealii::TrilinosWrappers::internal::
+    LinearOperatorImplementation::TrilinosPayload;
+  using PayloadVectorType = typename PayloadType::VectorType;
+  using size_type         = dealii::types::global_dof_index;
 
   deallog.push("System info");
   {

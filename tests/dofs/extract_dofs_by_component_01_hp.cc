@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -23,6 +23,7 @@
 // the component_select flag
 
 
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_nedelec.h>
@@ -34,8 +35,6 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-
-#include <deal.II/hp/dof_handler.h>
 
 #include "../tests.h"
 
@@ -56,7 +55,7 @@ check()
   for (unsigned int i = 0; i < 2; ++i)
     element.push_back(
       FESystem<dim>(FE_Q<dim>(1 + i), 1, FE_Nedelec<dim>(0), 1));
-  hp::DoFHandler<dim> dof(tr);
+  DoFHandler<dim> dof(tr);
   dof.begin_active()->set_active_fe_index(1);
   dof.distribute_dofs(element);
 
@@ -70,11 +69,11 @@ check()
       for (unsigned int c = 0; c < element.n_components(); ++c)
         component_mask[c] = (int_mask & (1 << c));
 
-      std::vector<bool> dofs(dof.n_dofs());
-      DoFTools::extract_dofs(dof, ComponentMask(component_mask), dofs);
+      IndexSet dofs =
+        DoFTools::extract_dofs(dof, ComponentMask(component_mask));
 
       for (unsigned int d = 0; d < dof.n_dofs(); ++d)
-        deallog << dofs[d];
+        deallog << dofs.is_element(d);
       deallog << std::endl;
     }
 }
@@ -83,10 +82,8 @@ check()
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog << std::setprecision(2);
-  deallog << std::fixed;
-  deallog.attach(logfile);
+  initlog();
+  deallog << std::setprecision(2) << std::fixed;
 
   deallog.push("2d");
   check<2>();

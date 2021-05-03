@@ -99,7 +99,7 @@
 # For details, consult the ./README file.
 #
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.1.0)
 MESSAGE("-- This is CTest ${CMAKE_VERSION}")
 
 #
@@ -272,8 +272,8 @@ GET_CMAKE_PROPERTY(_variables VARIABLES)
 FOREACH(_var ${_variables})
   IF( _var MATCHES "^(TEST|DEAL_II|ALLOW|WITH|FORCE|COMPONENT)_" OR
       _var MATCHES "^(DOCUMENTATION|EXAMPLES)" OR
-      _var MATCHES "^(ADOLC|ARPACK|BOOST|OPENCASCADE|MUPARSER|HDF5|METIS|MPI)_" OR
-      _var MATCHES "^(GINKGO|NETCDF|P4EST|PETSC|SCALAPACK|SLEPC|THREADS|TBB|TRILINOS)_" OR
+      _var MATCHES "^(ADOLC|ARBORX|ARPACK|BOOST|OPENCASCADE|MUPARSER|HDF5|KOKKOS|METIS|MPI)_" OR
+      _var MATCHES "^(GINKGO|P4EST|PETSC|SCALAPACK|SLEPC|THREADS|TBB|TRILINOS)_" OR
       _var MATCHES "^(UMFPACK|ZLIB|LAPACK|MUPARSER|CUDA)_" OR
       _var MATCHES "^(CMAKE|DEAL_II)_(C|CXX|Fortran|BUILD)_(COMPILER|FLAGS)" OR
       _var MATCHES "^CMAKE_BUILD_TYPE$" OR
@@ -504,6 +504,9 @@ ENDIF()
 
 CTEST_START(Experimental TRACK ${TRACK})
 
+MESSAGE("-- Running CTEST_UPDATE() to query git information")
+CTEST_UPDATE(SOURCE ${CTEST_SOURCE_DIRECTORY})
+
 MESSAGE("-- Running CTEST_CONFIGURE()")
 CTEST_CONFIGURE(OPTIONS "${_options}" RETURN_VALUE _res)
 
@@ -573,18 +576,6 @@ Unable to determine test submission files from TAG. Bailing out.
 "
     )
 ENDIF()
-
-FILE(WRITE ${_path}/Update.xml
-"<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<Update mode=\"Client\" Generator=\"ctest-${CTEST_VERSION}\">
-<Site>${CTEST_SITE}</Site>
-<BuildName>${CTEST_BUILD_NAME}</BuildName>
-<BuildStamp>${_tag}-${TRACK}</BuildStamp>
-<UpdateType>GIT</UpdateType>
-<Revision>${_git_WC_SHORTREV}</Revision>
-<Path>${_git_WC_BRANCH}</Path>
-</Update>"
-  )
 
 #
 # And finally submit:

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -40,7 +40,8 @@ programs:
 
 Some of these programs were developed under contract from the California
 Institute of Technology with support by the National Science Foundation
-under Award No. EAR-0426271, the grant that funded the <a target="_top"
+under Award No. EAR-0426271, the first of the grants that funded
+the <a target="_top"
 href="http://www.geodynamics.org">Computational Infrastructure in
 Geodynamics</a> initiative. The recipient, Wolfgang Bangerth, gratefully
 acknowledges this source of support.
@@ -54,10 +55,13 @@ geodynamics applications. It has been discussed in the geodynamics community
 for several years and has been a continuous topic on the task list of CIG
 since its inception. Yet, relatively little has happened in this direction so
 far. Only recently have there been attempts to use AMR in geodynamics: CIG
-sponsored a workshop on AMR technique in Boulder in October 2007, and a
+sponsored a workshop on AMR technique in Boulder in October 2007; a
 collaboration between George Biros, Omar Ghattas, Mike Gurnis, and Shijie
 Zhong's groups is currently developing a %parallel adaptive mantle convection
-solver.
+solver; and some of the principal developers of deal.II eventually developed
+the <a href="https://aspect.geodynamics.org">ASPECT code</a> for the simulation
+of mantle convection that is by now a rather established and widely used
+code.
 
 One of the reasons for the slow adoption of AMR techniques in geodynamics is
 the relatively steep initial hurdle: codes have to provide the data structures
@@ -87,9 +91,10 @@ problems. In particular, they are aimed at the following goals:
   application specific behavior rather than using months of work on basic
   infrastructure code supporting AMR.
 
-  Supporting this point is the fact that although there are currently at least
-  170 publications presenting results obtained with deal.II, we are aware of
-  only a handful of applications that have been built with deal.II from
+  Supporting this point is the fact that although there are
+  <a href="https://www.dealii.org/publications.html">more than 1,000
+  publications</a> presenting results obtained with deal.II, we are aware of
+  only a relatively small number of applications that have been built with deal.II from
   scratch; all others have started as modifications of one of the tutorial
   programs.
 
@@ -125,7 +130,7 @@ problems. In particular, they are aimed at the following goals:
   correctness. Existing tutorial programs typically employ simpler rather than
   more complicated solver schemes for exposition but frequently suggest more
   complicated schemes including hints on how they might be implemented in an
-  appendix. 
+  appendix.
 
 <li> <i>Try algorithms:</i> The rapid prototyping abilities of deal.II may
   also help in determining best algorithms on the scale of programs to which
@@ -134,11 +139,8 @@ problems. In particular, they are aimed at the following goals:
   run on larger scale machines. For example, a small mantle convection code
   built on deal.II may be used to determine whether second order elements are
   useful for this purpose (see, for example, the results shown in
-  step-31). If so, then one may use this result to implement
-  second, rather than first, order elements in dedicated, large-scale mantle
-  convection codes such as that which
-  Ghattas and Zhong are building and that may run on 10,000s of processors, a
-  range currently unattainable by deal.II.
+  step-31). If so, then one may use this kind of knowledge in larger codes,
+  such as the ASPECT code mentioned above.
 </ul>
 
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2019 by the deal.II authors
+// Copyright (C) 2008 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,7 +17,7 @@
 #include <deal.II/lac/trilinos_precondition.h>
 
 #ifdef DEAL_II_WITH_TRILINOS
-#  if DEAL_II_TRILINOS_VERSION_GTE(11, 14, 0)
+#  ifdef DEAL_II_TRILINOS_WITH_MUELU
 #    include <deal.II/lac/sparse_matrix.h>
 #    include <deal.II/lac/trilinos_sparse_matrix.h>
 
@@ -214,19 +214,21 @@ namespace TrilinosWrappers
     preconditioner.reset();
     const size_type n_rows = deal_ii_sparse_matrix.m();
 
-    // Init Epetra Matrix using an
-    // equidistributed map; avoid
-    // storing the nonzero
-    // elements.
-    vector_distributor = std::make_shared<Epetra_Map>(
-      static_cast<TrilinosWrappers::types::int_type>(n_rows), 0, communicator);
+    // Init Epetra Matrix using an equidistributed map; avoid storing the
+    // nonzero elements.
+    IndexSet           distributor(n_rows);
+    const unsigned int n_mpi_processes = communicator.NumProc();
+    const unsigned int my_id           = communicator.MyPID();
+    distributor.add_range(my_id * n_rows / n_mpi_processes,
+                          (my_id + 1) * n_rows / n_mpi_processes);
 
     if (trilinos_matrix.get() == nullptr)
       trilinos_matrix = std::make_shared<SparseMatrix>();
 
-    trilinos_matrix->reinit(*vector_distributor,
-                            *vector_distributor,
+    trilinos_matrix->reinit(distributor,
+                            distributor,
                             deal_ii_sparse_matrix,
+                            communicator.Comm(),
                             drop_tolerance,
                             true,
                             use_this_sparsity);
@@ -259,6 +261,7 @@ namespace TrilinosWrappers
 
 
 
+#    ifndef DOXYGEN
   // explicit instantiations
   template void
   PreconditionAMGMueLu::initialize(const ::dealii::SparseMatrix<double> &,
@@ -270,10 +273,11 @@ namespace TrilinosWrappers
                                    const AdditionalData &,
                                    const double,
                                    const ::dealii::SparsityPattern *);
+#    endif
 
 } // namespace TrilinosWrappers
 
 DEAL_II_NAMESPACE_CLOSE
 
-#  endif // DEAL_II_TRILINOS_VERSION_GTE(11,14,0)
+#  endif // DEAL_II_TRILINOS_WITH_MUELU
 #endif   // DEAL_II_WITH_TRILINOS

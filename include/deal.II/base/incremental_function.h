@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,13 +17,21 @@
 #define dealii_incremental_function_h
 
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/function.h>
 #include <deal.II/base/thread_management.h>
 
+#include <deal.II/lac/vector.h>
+
+
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declaration
+#ifndef DOXYGEN
 template <typename number>
 class Vector;
+#endif
 
 namespace Functions
 {
@@ -39,7 +47,6 @@ namespace Functions
    * required by some implementations of non-linear solution schemes.
    *
    * @ingroup functions
-   * @author Denis Davydov, Jean-Paul Pelteret, 2018
    */
   template <int dim, typename RangeNumberType = double>
   class IncrementalFunction : public Function<dim, RangeNumberType>

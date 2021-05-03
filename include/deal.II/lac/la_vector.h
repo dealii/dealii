@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2018 by the deal.II authors
+// Copyright (C) 2015 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -72,8 +72,6 @@ namespace LinearAlgebra
    * ::dealii::LinearAlgebra::VectorSpaceVector. As opposed to the array of
    * the C++ standard library, this class implements an element of a vector
    * space suitable for numerical computations.
-   *
-   * @author Bruno Turcksin, 2015.
    */
   template <typename Number>
   class Vector : public ReadWriteVector<Number>,
@@ -161,6 +159,15 @@ namespace LinearAlgebra
            const bool omit_zeroing_entries = false) override;
 
     /**
+     * Returns `false` as this is a serial vector.
+     *
+     * This functionality only needs to be called if using MPI based vectors and
+     * exists in other objects for compatibility.
+     */
+    bool
+    has_ghost_elements() const;
+
+    /**
      * Copies the data of the input vector @p in_vector.
      */
     Vector<Number> &
@@ -213,11 +220,10 @@ namespace LinearAlgebra
      * This function is not implemented and will throw an exception.
      */
     virtual void
-    import(
-      const ReadWriteVector<Number> &                 V,
-      VectorOperation::values                         operation,
-      std::shared_ptr<const CommunicationPatternBase> communication_pattern =
-        std::shared_ptr<const CommunicationPatternBase>()) override;
+    import(const ReadWriteVector<Number> &V,
+           VectorOperation::values        operation,
+           std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+             communication_pattern = {}) override;
 
     /**
      * Add @p a to all components. Note that @p a is a scalar not a vector.
@@ -344,13 +350,25 @@ namespace LinearAlgebra
     locally_owned_elements() const override;
 
     /**
-     * Prints the vector to the output stream @p out.
+     * Print the vector to the output stream @p out.
      */
     virtual void
     print(std::ostream &     out,
           const unsigned int precision  = 3,
           const bool         scientific = true,
           const bool         across     = true) const override;
+
+    /**
+     * Print the vector to the output stream @p out in a format that can be
+     * read by numpy::readtxt(). Note that the IndexSet is not printed but only
+     * the values stored in the Vector. To load the vector in python just do
+     * <code>
+     * vector = numpy.loadtxt('my_vector.txt')
+     * </code>
+     */
+    void
+    print_as_numpy_array(std::ostream &     out,
+                         const unsigned int precision = 9) const;
 
     /**
      * Write the vector en bloc to a file. This is done in a binary mode, so
@@ -381,6 +399,15 @@ namespace LinearAlgebra
     memory_consumption() const override;
 
     /**
+     * Write and read the data of this object from a stream for the purpose
+     * of serialization using the [BOOST serialization
+     * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
+     */
+    template <typename Archive>
+    void
+    serialize(Archive &ar, const unsigned int version);
+
+    /**
      * Attempt to perform an operation between two incompatible vector types.
      *
      * @ingroup Exceptions
@@ -388,20 +415,7 @@ namespace LinearAlgebra
     DeclException0(ExcVectorTypeNotCompatible);
 
   private:
-    /**
-     * Serialize the data of this object using boost. This function is
-     * necessary to use boost::archive::text_iarchive and
-     * boost::archive::text_oarchive.
-     */
-    template <typename Archive>
-    void
-    serialize(Archive &ar, const unsigned int version);
-
-    friend class boost::serialization::access;
-
-    /**
-     * Make all other ReadWriteVector types friends.
-     */
+    // Make all other ReadWriteVector types friends.
     template <typename Number2>
     friend class Vector;
   };
@@ -490,13 +504,26 @@ namespace LinearAlgebra
 
 
 /**
- * Declare dealii::LinearAlgebra::Vector< Number > as serial vector.
- *
- * @author Uwe Koecher, 2017
+ * Declare dealii::LinearAlgebra::Vector as serial vector.
  */
 template <typename Number>
 struct is_serial_vector<LinearAlgebra::Vector<Number>> : std::true_type
 {};
+
+#ifndef DOXYGEN
+/*----------------------- Inline functions ----------------------------------*/
+
+namespace LinearAlgebra
+{
+  template <typename Number>
+  inline bool
+  Vector<Number>::has_ghost_elements() const
+  {
+    return false;
+  }
+} // namespace LinearAlgebra
+
+#endif
 
 
 DEAL_II_NAMESPACE_CLOSE

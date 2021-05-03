@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -45,8 +45,7 @@ do_test(const Triangulation<dim, spacedim> &tria)
                   << std::endl;
         }
       deallog << "Faces on cell with center: " << cell->center() << std::endl;
-      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-           ++face)
+      for (const unsigned int face : GeometryInfo<dim>::face_indices())
         {
           deallog << cell->face(face)->center(/*respect_manifold=*/true)
                   << std::endl;
@@ -56,8 +55,7 @@ do_test(const Triangulation<dim, spacedim> &tria)
 
       deallog << "Center with manifold: " << cell->center(true) << std::endl;
       deallog << "Manifold id: " << cell->manifold_id() << std::endl;
-      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-           ++face)
+      for (const unsigned int face : GeometryInfo<dim>::face_indices())
         if (cell->at_boundary(face))
           {
             std::vector<Point<spacedim>> points;
@@ -169,8 +167,7 @@ test_cylinder(unsigned int ref = 1)
     {
       if (cell->at_boundary())
         cell->set_all_manifold_ids(1);
-      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-           ++face)
+      for (const unsigned int face : GeometryInfo<dim>::face_indices())
         if (cell->at_boundary(face))
           {
             bool cell_at_surfaces = true;

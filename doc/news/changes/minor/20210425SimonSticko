@@ -1,0 +1,6 @@
+New: Add a function taylor_estimate_function_bounds, which estimates the range
+of the value and gradient components of a Function<dim> over a
+BoundingBox<dim>, by approximating the function by a 2nd order Taylor
+polynomial.
+<br>
+(Simon Sticko, 2021/04/25)

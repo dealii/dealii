@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2018 by the deal.II authors
+// Copyright (C) 2011 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -96,7 +96,8 @@ public:
       {
         fe_eval.reinit(cell);
         fe_eval.read_dof_values(src);
-        fe_eval.evaluate(true, true, true);
+        fe_eval.evaluate(EvaluationFlags::values | EvaluationFlags::gradients |
+                         EvaluationFlags::hessians);
 
         // compare values with the ones the FEValues
         // gives us. Those are seen as reference
@@ -161,7 +162,7 @@ public:
 
     // for doubles, use a stricter condition than
     // for floats for the relative error size
-    if (types_are_equal<Number, double>::value == true)
+    if (std::is_same<Number, double>::value == true)
       {
         deallog << "Error function values: " << errors[0] / total[0]
                 << std::endl;
@@ -184,7 +185,7 @@ public:
         const double output4 = total[4] == 0 ? 0. : errors[4] / total[4];
         deallog << "Error function Hessians: " << output4 << std::endl;
       }
-    else if (types_are_equal<Number, float>::value == true)
+    else if (std::is_same<Number, float>::value == true)
       {
         deallog << "Error function values: " << errors[0] / total[0]
                 << std::endl;
@@ -274,8 +275,7 @@ do_test(const DoFHandler<dim> &          dof,
 int
 main()
 {
-  deallog.attach(logfile);
-  deallog.depth_console(0);
+  initlog();
 
   deallog << std::setprecision(3);
   {

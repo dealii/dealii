@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 by the deal.II authors
+// Copyright (C) 2017 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,6 +21,7 @@
 #  include <deal.II/differentiation/ad/ad_number_traits.h>
 #  include <deal.II/differentiation/ad/adolc_number_types.h>
 
+#  include <functional>
 #  include <utility>
 
 DEAL_II_NAMESPACE_OPEN

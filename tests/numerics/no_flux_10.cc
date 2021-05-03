@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2018 by the deal.II authors
+// Copyright (C) 2012 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -35,6 +35,7 @@
 
 #include <deal.II/dofs/dof_handler.h>
 
+#include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/mapping_q.h>
 
@@ -63,7 +64,7 @@ void colorize_sixty_deg_hyper_shell(Triangulation<3> &tria,
   Triangulation<3>::cell_iterator cell = tria.begin();
 
   for (; cell != tria.end(); ++cell)
-    for (unsigned int f = 0; f < GeometryInfo<3>::faces_per_cell; ++f)
+    for (const unsigned int f : GeometryInfo<3>::face_indices())
       {
         if (!cell->face(f)->at_boundary())
           continue;
@@ -215,7 +216,7 @@ run()
   MappingQ<3>           m(4);
   GridOut               go;
   GridOutFlags::Gnuplot gof;
-  gof.n_boundary_face_points = 6;
+  gof.n_extra_curved_line_points = 6;
   go.set_flags(gof);
   go.write_gnuplot(triangulation, deallog.get_file_stream(), &m);
 

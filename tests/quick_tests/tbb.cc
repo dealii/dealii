@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -74,7 +74,7 @@ test2()
   WorkStream::run(v.begin(),
                   v.end(),
                   &assemble,
-                  std::bind(&copy, std::ref(result), std::placeholders::_1),
+                  [&result](const copy_data &data) { copy(result, data); },
                   scratch_data(),
                   copy_data());
   std::cout << "result: " << result << std::endl;

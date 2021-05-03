@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -61,17 +61,14 @@ check_simple(const FiniteElement<dim> &fe)
 
   DoFHandler<dim> mgdof(tr);
   mgdof.distribute_dofs(fe);
-  mgdof.distribute_mg_dofs(fe);
-
-  std::map<types::boundary_id, const Function<dim> *> dirichlet_boundary;
-  Functions::ZeroFunction<dim> homogeneous_dirichlet_bc(1);
-  dirichlet_boundary[0] = &homogeneous_dirichlet_bc;
+  mgdof.distribute_mg_dofs();
 
   MGConstrainedDoFs mg_constrained_dofs;
-  mg_constrained_dofs.initialize(mgdof, dirichlet_boundary);
+  mg_constrained_dofs.initialize(mgdof);
+  mg_constrained_dofs.make_zero_boundary_constraints(mgdof, {0});
 
   MGTransferPrebuilt<Vector<double>> transfer(mg_constrained_dofs);
-  transfer.build_matrices(mgdof);
+  transfer.build(mgdof);
 
   transfer.print_matrices(deallog.get_file_stream());
   transfer.print_indices(deallog.get_file_stream());

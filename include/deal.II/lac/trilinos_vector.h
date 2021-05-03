@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2018 by the deal.II authors
+// Copyright (C) 2008 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -47,12 +47,15 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#  ifndef DOXYGEN
 namespace LinearAlgebra
 {
   // Forward declaration
   template <typename Number>
   class ReadWriteVector;
 } // namespace LinearAlgebra
+#  endif
 
 /**
  * @addtogroup TrilinosWrappers
@@ -104,6 +107,11 @@ namespace TrilinosWrappers
       VectorReference(MPI::Vector &vector, const size_type index);
 
     public:
+      /**
+       * Copy constructor.
+       */
+      VectorReference(const VectorReference &) = default;
+
       /**
        * This looks like a copy operator, but does something different than
        * usual. In particular, it does not copy the member variables of this
@@ -179,10 +187,8 @@ namespace TrilinosWrappers
        */
       const size_type index;
 
-      /**
-       * Make the vector class a friend, so that it can create objects of the
-       * present type.
-       */
+      // Make the vector class a friend, so that it can create objects of the
+      // present type.
       friend class ::dealii::TrilinosWrappers::MPI::Vector;
     };
   } // namespace internal
@@ -214,7 +220,6 @@ namespace TrilinosWrappers
    * Namespace for Trilinos vector classes that work in parallel over MPI.
    *
    * @ingroup TrilinosWrappers
-   * @author Martin Kronbichler, Wolfgang Bangerth, Daniel Arndt, 2008, 2017
    */
   namespace MPI
   {
@@ -393,7 +398,6 @@ namespace TrilinosWrappers
      *
      * @ingroup TrilinosWrappers
      * @ingroup Vectors
-     * @author Martin Kronbichler, Wolfgang Bangerth, Daniel Arndt,
      *         2008, 2009, 2017
      */
     class Vector : public Subscriptor
@@ -734,9 +738,19 @@ namespace TrilinosWrappers
        *
        * If the vector contains ghost elements, they are included in this
        * number.
+       *
+       * @deprecated This function is deprecated.
        */
+      DEAL_II_DEPRECATED_EARLY
       size_type
       local_size() const;
+
+      /**
+       * Return the local size of the vector, i.e., the number of indices
+       * owned locally.
+       */
+      size_type
+      locally_owned_size() const;
 
       /**
        * Return a pair of indices indicating which elements of this vector are
@@ -1199,16 +1213,6 @@ namespace TrilinosWrappers
       trilinos_vector();
 
       /**
-       * Return a const reference to the underlying Trilinos Epetra_Map that
-       * sets the parallel partitioning of the vector.
-       *
-       * @deprecated Use trilinos_partitioner() instead.
-       */
-      DEAL_II_DEPRECATED
-      const Epetra_Map &
-      vector_partitioner() const;
-
-      /**
        * Return a const reference to the underlying Trilinos Epetra_BlockMap
        * that sets the parallel partitioning of the vector.
        */
@@ -1280,15 +1284,22 @@ namespace TrilinosWrappers
         size_type,
         size_type,
         size_type,
-        << "You tried to access element " << arg1
+        << "You are trying to access element " << arg1
         << " of a distributed vector, but this element is not stored "
         << "on the current processor. Note: There are " << arg2
         << " elements stored "
-        << "on the current processor from within the range " << arg3
-        << " through " << arg4
-        << " but Trilinos vectors need not store contiguous "
+        << "on the current processor from within the range [" << arg3 << ","
+        << arg4 << "] but Trilinos vectors need not store contiguous "
         << "ranges on each processor, and not every element in "
-        << "this range may in fact be stored locally.");
+        << "this range may in fact be stored locally."
+        << "\n\n"
+        << "A common source for this kind of problem is that you "
+        << "are passing a 'fully distributed' vector into a function "
+        << "that needs read access to vector elements that correspond "
+        << "to degrees of freedom on ghost cells (or at least to "
+        << "'locally active' degrees of freedom that are not also "
+        << "'locally owned'). You need to pass a vector that has these "
+        << "elements as ghost entries.");
 
     private:
       /**
@@ -1335,9 +1346,7 @@ namespace TrilinosWrappers
        */
       IndexSet owned_elements;
 
-      /**
-       * Make the reference class a friend.
-       */
+      // Make the reference class a friend.
       friend class internal::VectorReference;
     };
 
@@ -1352,7 +1361,6 @@ namespace TrilinosWrappers
      * simply exchanges the data of the two vectors.
      *
      * @relatesalso TrilinosWrappers::MPI::Vector
-     * @author Martin Kronbichler, Wolfgang Bangerth, 2008
      */
     inline void
     swap(Vector &u, Vector &v)
@@ -1737,6 +1745,14 @@ namespace TrilinosWrappers
     Vector::local_size() const
     {
       return vector->Map().NumMyElements();
+    }
+
+
+
+    inline Vector::size_type
+    Vector::locally_owned_size() const
+    {
+      return owned_elements.n_elements();
     }
 
 
@@ -2144,15 +2160,6 @@ namespace TrilinosWrappers
 
 
 
-    inline const Epetra_Map &
-    Vector::vector_partitioner() const
-    {
-      // TODO A dynamic_cast fails here. This is suspicious.
-      return static_cast<const Epetra_Map &>(vector->Map()); // NOLINT
-    }
-
-
-
     inline const Epetra_BlockMap &
     Vector::trilinos_partitioner() const
     {
@@ -2263,8 +2270,6 @@ namespace internal
 
 /**
  * Declare dealii::TrilinosWrappers::MPI::Vector as distributed vector.
- *
- * @author Uwe Koecher, 2017
  */
 template <>
 struct is_serial_vector<TrilinosWrappers::MPI::Vector> : std::false_type

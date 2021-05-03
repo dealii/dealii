@@ -1,8 +1,17 @@
 
+DEAL::dim = 1
 DEAL::true
 DEAL::false
 DEAL::false
 DEAL::false
+DEAL::dim = 2
+DEAL::true
+DEAL::false
+DEAL::false
+DEAL::false
+DEAL::true
+DEAL::false
+DEAL::dim = 3
 DEAL::true
 DEAL::false
 DEAL::false

@@ -17,9 +17,10 @@
 #define dealii_chunk_sparse_matrix_templates_h
 
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/parallel.h>
 #include <deal.II/base/template_constraints.h>
-#include <deal.II/base/thread_management.h>
 
 #include <deal.II/lac/chunk_sparse_matrix.h>
 #include <deal.II/lac/full_matrix.h>
@@ -396,11 +397,11 @@ ChunkSparseMatrix<number>::operator=(const double d)
     parallel::apply_to_subranges(
       0U,
       matrix_size,
-      std::bind(&internal::ChunkSparseMatrixImplementation::
-                  template zero_subrange<number>,
-                std::placeholders::_1,
-                std::placeholders::_2,
-                val.get()),
+      [this](const unsigned int begin, const unsigned int end) {
+        internal::ChunkSparseMatrixImplementation::zero_subrange(begin,
+                                                                 end,
+                                                                 val.get());
+      },
       grain_size);
   else if (matrix_size > 0)
     std::memset(val.get(), 0, matrix_size * sizeof(number));
@@ -449,7 +450,7 @@ ChunkSparseMatrix<number>::reinit(const ChunkSparsityPattern &sparsity)
     cols->sparsity_pattern.n_nonzero_elements() * chunk_size * chunk_size;
   if (N > max_len || max_len == 0)
     {
-      val     = std_cxx14::make_unique<number[]>(N);
+      val     = std::make_unique<number[]>(N);
       max_len = N;
     }
 
@@ -507,9 +508,7 @@ ChunkSparseMatrix<number>::n_actually_nonzero_elements() const
   return std::count_if(val.get(),
                        val.get() + cols->sparsity_pattern.n_nonzero_elements() *
                                      chunk_size * chunk_size,
-                       std::bind(std::not_equal_to<double>(),
-                                 std::placeholders::_1,
-                                 0));
+                       [](const double element) { return element != 0.; });
 }
 
 
@@ -707,16 +706,18 @@ ChunkSparseMatrix<number>::vmult_add(OutVector &dst, const InVector &src) const
   parallel::apply_to_subranges(
     0U,
     cols->sparsity_pattern.n_rows(),
-    std::bind(&internal::ChunkSparseMatrixImplementation::
-                vmult_add_on_subrange<number, InVector, OutVector>,
-              std::cref(*cols),
-              std::placeholders::_1,
-              std::placeholders::_2,
-              val.get(),
-              cols->sparsity_pattern.rowstart.get(),
-              cols->sparsity_pattern.colnums.get(),
-              std::cref(src),
-              std::ref(dst)),
+    [this, &src, &dst](const unsigned int begin_row,
+                       const unsigned int end_row) {
+      internal::ChunkSparseMatrixImplementation::vmult_add_on_subrange(
+        *cols,
+        begin_row,
+        end_row,
+        val.get(),
+        cols->sparsity_pattern.rowstart.get(),
+        cols->sparsity_pattern.colnums.get(),
+        src,
+        dst);
+    },
     internal::SparseMatrixImplementation::minimum_parallel_grain_size /
         cols->chunk_size +
       1);
@@ -1597,7 +1598,7 @@ ChunkSparseMatrix<number>::block_read(std::istream &in)
   AssertThrow(c == '[', ExcIO());
 
   // reallocate space
-  val = std_cxx14::make_unique<number[]>(max_len);
+  val = std::make_unique<number[]>(max_len);
 
   // then read data
   in.read(reinterpret_cast<char *>(val.get()),

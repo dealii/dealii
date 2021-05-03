@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -49,84 +49,37 @@ main()
 
   // rank3 * rank1 over all possible indices:
   {
-    Tensor<2, 3, int> result;
-
     deallog << contract<0, 0>(rank3, rank1) << std::endl;
-    contract(result, rank3, 1, rank1);
-    deallog << result << std::endl << std::endl;
-
     deallog << contract<1, 0>(rank3, rank1) << std::endl;
-    contract(result, rank3, 2, rank1);
-    deallog << result << std::endl << std::endl;
-
     deallog << contract<2, 0>(rank3, rank1) << std::endl;
-    contract(result, rank3, 3, rank1);
-    deallog << result << std::endl << std::endl;
   }
 
 
   // rank2 * rank2 over all possible indices:
   {
-    Tensor<2, 3, int> result;
-
     deallog << contract<0, 0>(rank2, rank2) << std::endl;
-    contract(result, rank2, 1, rank2, 1);
-    deallog << result << std::endl << std::endl;
-
     deallog << contract<1, 0>(rank2, rank2) << std::endl;
-    contract(result, rank2, 2, rank2, 1);
-    deallog << result << std::endl << std::endl;
-
     deallog << contract<0, 1>(rank2, rank2) << std::endl;
-    contract(result, rank2, 1, rank2, 2);
-    deallog << result << std::endl << std::endl;
-
     deallog << contract<1, 1>(rank2, rank2) << std::endl;
-    contract(result, rank2, 2, rank2, 2);
-    deallog << result << std::endl << std::endl;
   }
 
 
   // rank3 * rank2 over all possible indices:
   {
-    Tensor<3, 3, int> result;
-
     deallog << contract<0, 0>(rank3, rank2) << std::endl;
-    contract(result, rank3, 1, rank2, 1);
-    deallog << result << std::endl << std::endl;
-
     deallog << contract<1, 0>(rank3, rank2) << std::endl;
-    contract(result, rank3, 2, rank2, 1);
-    deallog << result << std::endl << std::endl;
-
     deallog << contract<2, 0>(rank3, rank2) << std::endl;
-    contract(result, rank3, 3, rank2, 1);
-    deallog << result << std::endl << std::endl;
-
     deallog << contract<0, 1>(rank3, rank2) << std::endl;
-    contract(result, rank3, 1, rank2, 2);
-    deallog << result << std::endl << std::endl;
-
     deallog << contract<1, 1>(rank3, rank2) << std::endl;
-    contract(result, rank3, 2, rank2, 2);
-    deallog << result << std::endl << std::endl;
-
     deallog << contract<2, 1>(rank3, rank2) << std::endl;
-    contract(result, rank3, 3, rank2, 2);
-    deallog << result << std::endl << std::endl;
   }
 
 
   // rank4 ** rank2, double contraction:
   {
-    Tensor<2, 3, int> result;
-
     deallog << double_contract<2, 0, 3, 1>(rank4, rank2) << std::endl;
     deallog << double_contract<3, 1, 2, 0>(rank4, rank2) << std::endl;
     deallog << double_contract<0, 2, 1, 3>(rank2, rank4) << std::endl;
     deallog << double_contract<1, 3, 0, 2>(rank2, rank4) << std::endl;
-
-    double_contract(result, rank4, rank2);
-    deallog << result << std::endl << std::endl;
   }
 }

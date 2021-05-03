@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 1999 - 2018 by the deal.II authors
+ * Copyright (C) 1999 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -51,7 +51,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 template <int dim>
 class BubbleFunction : public Function<dim>
@@ -223,7 +222,7 @@ Step3<dim>::assemble_system(unsigned int i)
       cell_rhs    = 0;
 
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
-        for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+        for (const auto q_point : fe_values.quadrature_point_indices())
           {
             for (unsigned int j = 0; j < dofs_per_cell; ++j)
               cell_matrix(i, j) +=
@@ -293,7 +292,7 @@ Step3<dim>::output_results(unsigned int i) const
                                     QGauss<dim>(m_degree + 2),
                                     VectorTools::H1_seminorm);
   const double         H1_error = difference_per_cell.l2_norm();
-  const QTrapez<1>     q_trapez;
+  const QTrapezoid<1>  q_trapez;
   const QIterated<dim> q_iterated(q_trapez, 5);
   VectorTools::integrate_difference(dof_handler,
                                     solution,

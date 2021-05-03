@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -64,8 +64,6 @@
 // The last step is as in all previous programs:
 namespace Step11
 {
-  using namespace dealii;
-
   // Then we declare a class which represents the solution of a Laplace
   // problem. As this example program is based on step-5, the class looks
   // rather the same, with the sole structural difference that the functions
@@ -222,7 +220,7 @@ namespace Step11
   void
   LaplaceProblem<dim>::assemble_and_solve()
   {
-    typedef decltype(dof_handler.begin_active()) Iterator;
+    using Iterator = decltype(dof_handler.begin_active());
 
     auto cell_worker = [](const Iterator &  cell,
                           ScratchData<dim> &scratch_data,
@@ -240,8 +238,8 @@ namespace Step11
 
       scratch_data.fe_values.reinit(cell);
 
-      std::vector<double>   rhs_values(n_q_points);
-      ConstantFunction<dim> right_hand_side(-2.0);
+      std::vector<double>              rhs_values(n_q_points);
+      Functions::ConstantFunction<dim> right_hand_side(-2.0);
       right_hand_side.value_list(scratch_data.fe_values.get_quadrature_points(),
                                  rhs_values);
 
@@ -271,8 +269,8 @@ namespace Step11
       const unsigned int n_face_q_points =
         scratch_data.fe_face_values.get_quadrature().size();
 
-      std::vector<double>   face_boundary_values(n_face_q_points);
-      ConstantFunction<dim> boundary_values(1.0);
+      std::vector<double>              face_boundary_values(n_face_q_points);
+      Functions::ConstantFunction<dim> boundary_values(1.0);
 
       scratch_data.fe_face_values.reinit(cell, face_no);
       boundary_values.value_list(
@@ -335,7 +333,7 @@ namespace Step11
     VectorTools::integrate_difference(mapping,
                                       dof_handler,
                                       solution,
-                                      ZeroFunction<dim>(),
+                                      Functions::ZeroFunction<dim>(),
                                       norm_per_cell,
                                       QGauss<dim>(gauss_degree + 1),
                                       VectorTools::H1_seminorm);

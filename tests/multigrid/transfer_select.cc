@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -55,14 +55,16 @@ check_select(const FiniteElement<dim> &fe,
   GridGenerator::hyper_cube(tr);
   tr.refine_global(2);
 
-  DoFHandler<dim>  mgdof(tr);
-  DoFHandler<dim> &dof = mgdof;
+  DoFHandler<dim> mgdof(tr);
   mgdof.distribute_dofs(fe);
-  mgdof.distribute_mg_dofs(fe);
+  mgdof.distribute_mg_dofs();
   DoFRenumbering::component_wise(mgdof, target_component);
-  vector<types::global_dof_index> ndofs(
-    *std::max_element(target_component.begin(), target_component.end()) + 1);
-  DoFTools::count_dofs_per_component(dof, ndofs, true, target_component);
+  const vector<types::global_dof_index> ndofs =
+    DoFTools::count_dofs_per_fe_component(mgdof, true, target_component);
+  Assert(ndofs.size() ==
+           *std::max_element(target_component.begin(), target_component.end()) +
+             1,
+         ExcInternalError());
 
   for (unsigned int l = 0; l < tr.n_levels(); ++l)
     DoFRenumbering::component_wise(mgdof, l, mg_target_component);
@@ -85,8 +87,8 @@ check_select(const FiniteElement<dim> &fe,
 
 
   MGTransferSelect<double> transfer;
-  transfer.build_matrices(
-    dof, mgdof, selected, mg_selected, target_component, mg_target_component);
+  transfer.build(
+    mgdof, selected, mg_selected, target_component, mg_target_component);
 
   Vector<double> u2(mg_ndofs[2][mg_selected]);
   Vector<double> u1(mg_ndofs[1][mg_selected]);
@@ -126,9 +128,8 @@ check_select(const FiniteElement<dim> &fe,
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(3);
-  deallog.attach(logfile);
 
   std::vector<unsigned int> v1(4);
   std::vector<unsigned int> v2(4);

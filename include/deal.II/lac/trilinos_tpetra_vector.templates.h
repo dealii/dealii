@@ -16,7 +16,7 @@
 #ifndef dealii_trilinos_tpetra_vector_templates_h
 #define dealii_trilinos_tpetra_vector_templates_h
 
-#include <deal.II/base/std_cxx14/memory.h>
+#include <deal.II/base/config.h>
 
 #include <deal.II/lac/trilinos_tpetra_vector.h>
 
@@ -86,7 +86,7 @@ namespace LinearAlgebra
       Tpetra::Map<int, types::global_dof_index> input_map =
         parallel_partitioner.make_tpetra_map(communicator, false);
       if (vector->getMap()->isSameAs(input_map) == false)
-        vector = std_cxx14::make_unique<
+        vector = std::make_unique<
           Tpetra::Vector<Number, int, types::global_dof_index>>(Teuchos::rcp(
           new Tpetra::Map<int, types::global_dof_index>(input_map)));
       else if (omit_zeroing_entries == false)
@@ -138,7 +138,7 @@ namespace LinearAlgebra
                                Tpetra::REPLACE);
             }
           else
-            vector = std_cxx14::make_unique<
+            vector = std::make_unique<
               Tpetra::Vector<Number, int, types::global_dof_index>>(
               V.trilinos_vector());
         }
@@ -165,9 +165,10 @@ namespace LinearAlgebra
     template <typename Number>
     void
     Vector<Number>::import(
-      const ReadWriteVector<Number> &                 V,
-      VectorOperation::values                         operation,
-      std::shared_ptr<const CommunicationPatternBase> communication_pattern)
+      const ReadWriteVector<Number> &V,
+      VectorOperation::values        operation,
+      std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+        communication_pattern)
     {
       // If no communication pattern is given, create one. Otherwise, use the
       // one given.
@@ -544,6 +545,15 @@ namespace LinearAlgebra
     Vector<Number>::size() const
     {
       return vector->getGlobalLength();
+    }
+
+
+
+    template <typename Number>
+    typename Vector<Number>::size_type
+    Vector<Number>::locally_owned_size() const
+    {
+      return vector->getLocalLength();
     }
 
 

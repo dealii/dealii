@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,7 +22,7 @@
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
-#include <deal.II/fe/fe_dgq.h>
+#include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_raviart_thomas.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/mapping_cartesian.h>
@@ -108,7 +108,7 @@ test_boundary_values(const FiniteElement<dim> &fe)
 
   GridGenerator::hyper_cube(triangulation);
   MappingQ<dim>      mapping(2);
-  QIterated<dim - 1> face_quadrature(QTrapez<1>(), 5);
+  QIterated<dim - 1> face_quadrature(QTrapezoid<1>(), 5);
 
   double old_max_disp_error = 0.0;
   double old_max_velo_error = 0.0;
@@ -168,9 +168,7 @@ test_boundary_values(const FiniteElement<dim> &fe)
       std::vector<double>         cell_pres_values(face_quadrature.size());
       for (const auto &cell : dof_handler.active_cell_iterators())
         {
-          for (unsigned int face_n = 0;
-               face_n < GeometryInfo<dim>::faces_per_cell;
-               ++face_n)
+          for (const unsigned int face_n : GeometryInfo<dim>::face_indices())
             {
               auto face = cell->face(face_n);
               if (face->at_boundary())

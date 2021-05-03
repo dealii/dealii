@@ -22,12 +22,9 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
-
 #include "matrix_vector_common.h"
 
-
-template <int dim, int fe_degree>
+template <int dim, int fe_degree, typename Number>
 void
 test()
 {
@@ -38,7 +35,7 @@ test()
   FE_Q<dim>       fe(fe_degree);
   DoFHandler<dim> dof(tria);
   dof.distribute_dofs(fe);
-  AffineConstraints<double> constraints;
+  AffineConstraints<Number> constraints;
   VectorTools::interpolate_boundary_values(dof,
                                            0,
                                            Functions::ZeroFunction<dim>(),
@@ -47,7 +44,7 @@ test()
 
   do_test<dim,
           fe_degree,
-          double,
-          LinearAlgebra::CUDAWrappers::Vector<double>,
+          Number,
+          LinearAlgebra::CUDAWrappers::Vector<Number>,
           fe_degree + 1>(dof, constraints, tria.n_active_cells());
 }

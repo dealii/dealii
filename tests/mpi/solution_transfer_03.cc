@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -59,9 +59,9 @@ initialize_indexsets(IndexSet &             locally_owned_dofs,
   locally_relevant_dofs = DoFTools::locally_relevant_dofs_per_subdomain(
     dof_handler)[this_mpi_process];
 
-  const unsigned int                   n_blocks = block_component.size();
-  std::vector<types::global_dof_index> dofs_per_block(n_blocks);
-  DoFTools::count_dofs_per_block(dof_handler, dofs_per_block, block_component);
+  const unsigned int                         n_blocks = block_component.size();
+  const std::vector<types::global_dof_index> dofs_per_block =
+    DoFTools::count_dofs_per_fe_block(dof_handler, block_component);
 
   locally_owned_partitioning.clear();
   locally_relevant_partitioning.clear();

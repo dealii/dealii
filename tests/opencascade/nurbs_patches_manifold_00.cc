@@ -17,7 +17,7 @@
 // Read goteborg.iges and dump its topological structure to the
 // logfile.
 
-#include <deal.II/opencascade/boundary_lib.h>
+#include <deal.II/opencascade/manifold_lib.h>
 #include <deal.II/opencascade/utilities.h>
 
 #include <Standard_Stream.hxx>

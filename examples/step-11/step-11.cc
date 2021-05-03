@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2001 - 2018 by the deal.II authors
+ * Copyright (C) 2001 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -31,16 +31,14 @@
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_q.h>
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/numerics/matrix_tools.h>
+#include <deal.II/numerics/data_out.h>
 
 // Just this one is new: it declares a class
 // DynamicSparsityPattern, which we will use and explain
@@ -83,6 +81,7 @@ namespace Step11
     void setup_system();
     void assemble_and_solve();
     void solve();
+    void write_high_order_mesh(const unsigned cycle);
 
     Triangulation<dim> triangulation;
     FE_Q<dim>          fe;
@@ -133,36 +132,22 @@ namespace Step11
     solution.reinit(dof_handler.n_dofs());
     system_rhs.reinit(dof_handler.n_dofs());
 
-    // Next task is to construct the object representing the constraint that
+    // The next task is to construct the object representing the constraint that
     // the mean value of the degrees of freedom on the boundary shall be
-    // zero. For this, we first want a list of those nodes which are actually
+    // zero. For this, we first want a list of those nodes that are actually
     // at the boundary. The <code>DoFTools</code> namespace has a function
-    // that returns an array of Boolean values where <code>true</code>
-    // indicates that the node is at the boundary. The second argument denotes
-    // a mask selecting which components of vector valued finite elements we
-    // want to be considered. This sort of information is encoded using the
-    // ComponentMask class (see also @ref GlossComponentMask). Since we have a
-    // scalar finite element anyway, this mask in reality should have only one
-    // entry with a <code>true</code> value. However, the ComponentMask class
-    // has semantics that allow it to represents a mask of indefinite size
-    // whose every element equals <code>true</code> when one just default
-    // constructs such an object, so this is what we'll do here.
-    std::vector<bool> boundary_dofs(dof_handler.n_dofs(), false);
-    DoFTools::extract_boundary_dofs(dof_handler,
-                                    ComponentMask(),
-                                    boundary_dofs);
+    // that returns an IndexSet object that contains the indices of all those
+    // degrees of freedom that are at the boundary.
+    //
+    // Once we have this index set, we wanted to know which is the first
+    // index corresponding to a degree of freedom on the boundary. We need
+    // this because we wanted to constrain one of the nodes on the boundary by
+    // the values of all other DoFs on the boundary. To get the index of this
+    // "first" degree of freedom is easy enough using the IndexSet class:
+    const IndexSet boundary_dofs = DoFTools::extract_boundary_dofs(dof_handler);
 
-    // Now first for the generation of the constraints: as mentioned in the
-    // introduction, we constrain one of the nodes on the boundary by the
-    // values of all other DoFs on the boundary. So, let us first pick out the
-    // first boundary node from this list. We do that by searching for the
-    // first <code>true</code> value in the array (note that
-    // <code>std::find</code> returns an iterator to this element), and
-    // computing its distance to the overall first element in the array to get
-    // its index:
-    const unsigned int first_boundary_dof = std::distance(
-      boundary_dofs.begin(),
-      std::find(boundary_dofs.begin(), boundary_dofs.end(), true));
+    const types::global_dof_index first_boundary_dof =
+      boundary_dofs.nth_index_in_set(0);
 
     // Then generate a constraints object with just this one constraint. First
     // clear all previous content (which might reside there from the previous
@@ -173,8 +158,8 @@ namespace Step11
     // of what is to come later:
     mean_value_constraints.clear();
     mean_value_constraints.add_line(first_boundary_dof);
-    for (unsigned int i = first_boundary_dof + 1; i < dof_handler.n_dofs(); ++i)
-      if (boundary_dofs[i] == true)
+    for (types::global_dof_index i : boundary_dofs)
+      if (i != first_boundary_dof)
         mean_value_constraints.add_entry(first_boundary_dof, i, -1);
     mean_value_constraints.close();
 
@@ -188,7 +173,7 @@ namespace Step11
     // beforehand the maximal number of entries per row, either for all rows
     // or for each row separately. There are functions in the library which
     // can tell you this number in case you just have hanging node constraints
-    // (namely <code>DoFHandler::max_coupling_between_dofs</code>), but how is
+    // (namely DoFHandler::max_couplings_between_dofs), but how is
     // this for the present case? The difficulty arises because the
     // elimination of the constrained degree of freedom requires a number of
     // additional entries in the matrix at places that are not so simple to
@@ -386,15 +371,65 @@ namespace Step11
   template <int dim>
   void LaplaceProblem<dim>::solve()
   {
-    SolverControl solver_control(1000, 1e-12);
-    SolverCG<>    cg(solver_control);
+    SolverControl            solver_control(1000, 1e-12);
+    SolverCG<Vector<double>> cg(solver_control);
 
-    PreconditionSSOR<> preconditioner;
+    PreconditionSSOR<SparseMatrix<double>> preconditioner;
     preconditioner.initialize(system_matrix, 1.2);
 
     cg.solve(system_matrix, solution, system_rhs, preconditioner);
   }
 
+
+
+  // Next, we write the solution as well as the
+  // material ids to a VTU file. This is similar to what was done in many
+  // other tutorial programs. The new ingredient presented in this tutorial
+  // program is that we want to ensure that the data written to the file
+  // used for visualization is actually a faithful representation of what
+  // is used internally by deal.II. That is because most of the visualization
+  // data formats only represent cells by their vertex coordinates, but
+  // have no way of representing the curved boundaries that are used
+  // in deal.II when using higher order mappings -- in other words, what
+  // you see in the visualization tool is not actually what you are computing
+  // on. (The same, incidentally, is true when using higher order shape
+  // functions: Most visualization tools only render bilinear/trilinear
+  // representations. This is discussed in detail in DataOut::build_patches().)
+  //
+  // So we need to ensure that a high-order representation is written
+  // to the file. We need to consider two particular topics. Firstly, we tell
+  // the DataOut object via the DataOutBase::VtkFlags that we intend to
+  // interpret the subdivisions of the elements as a high-order Lagrange
+  // polynomial rather than a collection of bilinear patches.
+  // Recent visualization programs, like ParaView version 5.5
+  // or newer, can then render a high-order solution (see a <a
+  // href="https://github.com/dealii/dealii/wiki/Notes-on-visualizing-high-order-output">wiki
+  // page</a> for more details). Secondly, we need to make sure that the mapping
+  // is passed to the DataOut::build_patches() method. Finally, the DataOut
+  // class only prints curved faces for <i>boundary</i> cells by default, so we
+  // need to ensure that also inner cells are printed in a curved representation
+  // via the mapping.
+  template <int dim>
+  void LaplaceProblem<dim>::write_high_order_mesh(const unsigned cycle)
+  {
+    DataOut<dim> data_out;
+
+    DataOutBase::VtkFlags flags;
+    flags.write_higher_order_cells = true;
+    data_out.set_flags(flags);
+
+    data_out.attach_dof_handler(dof_handler);
+    data_out.add_data_vector(solution, "solution");
+
+    data_out.build_patches(mapping,
+                           mapping.get_degree(),
+                           DataOut<dim>::curved_inner_cells);
+
+    std::ofstream file("solution-c=" + std::to_string(cycle) +
+                       ".p=" + std::to_string(mapping.get_degree()) + ".vtu");
+
+    data_out.write_vtu(file);
+  }
 
 
   // Finally the main function controlling the different steps to be
@@ -419,6 +454,7 @@ namespace Step11
       {
         setup_system();
         assemble_and_solve();
+        write_high_order_mesh(cycle);
 
         triangulation.refine_global();
       }

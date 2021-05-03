@@ -1,0 +1,7 @@
+
+DEAL::Initial number of dofs: 8
+DEAL::Initial Vector:
+1.000e+01 1.000e+01 1.000e+01 1.000e+01 1.000e+01 1.000e+01 1.000e+01 1.000e+01 
+DEAL::Final number of dofs: 4
+DEAL::Vector after solution transfer:
+0.000e+00 1.000e+01 1.000e+01 1.000e+01 

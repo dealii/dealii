@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -73,7 +73,7 @@ check()
 
       // then build hanging node
       // constraints. this should trip the
-      // new code using the hp constraints,
+      // new code using the hp-constraints,
       // added in late July 2006
       AffineConstraints<double> constraints;
       DoFTools::make_hanging_node_constraints(dof, constraints);
@@ -90,10 +90,8 @@ check()
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog << std::setprecision(2);
-  deallog << std::fixed;
-  deallog.attach(logfile);
+  initlog();
+  deallog << std::setprecision(2) << std::fixed;
 
   check<3>();
 }

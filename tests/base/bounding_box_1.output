@@ -15,12 +15,14 @@ DEAL::0.440000 is inside: 1
 DEAL::0.320000 is inside: 1
 DEAL::0.200000 is inside: 1
 DEAL::
+DEAL::Boxes should be equal : 1
 DEAL::Points outside:
 DEAL::-2.50000 is inside: 0
 DEAL::5.00000 is inside: 0
 DEAL::-7.50000 is inside: 0
 DEAL::10.0000 is inside: 0
 DEAL::-12.5000 is inside: 0
+DEAL::Boxes should not be equal : 1
 DEAL::
 DEAL::
 DEAL::Test for dimension 2
@@ -38,12 +40,14 @@ DEAL::0.440000 0.640000 is inside: 1
 DEAL::0.320000 0.320000 is inside: 1
 DEAL::0.200000 0.00000 is inside: 1
 DEAL::
+DEAL::Boxes should be equal : 1
 DEAL::Points outside:
 DEAL::-2.50000 -4.00000 is inside: 0
 DEAL::5.00000 8.00000 is inside: 0
 DEAL::-7.50000 -12.0000 is inside: 0
 DEAL::10.0000 16.0000 is inside: 0
 DEAL::-12.5000 -20.0000 is inside: 0
+DEAL::Boxes should not be equal : 1
 DEAL::
 DEAL::
 DEAL::Test for dimension 3
@@ -61,12 +65,14 @@ DEAL::0.440000 0.640000 0.840000 is inside: 1
 DEAL::0.320000 0.320000 0.320000 is inside: 1
 DEAL::0.200000 0.00000 -0.200000 is inside: 1
 DEAL::
+DEAL::Boxes should be equal : 1
 DEAL::Points outside:
 DEAL::-2.50000 -4.00000 -5.50000 is inside: 0
 DEAL::5.00000 8.00000 11.0000 is inside: 0
 DEAL::-7.50000 -12.0000 -16.5000 is inside: 0
 DEAL::10.0000 16.0000 22.0000 is inside: 0
 DEAL::-12.5000 -20.0000 -27.5000 is inside: 0
+DEAL::Boxes should not be equal : 1
 DEAL::
 DEAL::
 DEAL::Test for dimension 3, unitary box

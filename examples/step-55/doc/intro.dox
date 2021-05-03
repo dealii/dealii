@@ -2,7 +2,7 @@
 
 <i>This program was contributed by Timo Heister. Special thanks to Sander
 Rhebergen for the inspiration to finally write this tutorial.
- 
+
 This material is based upon work partially supported by National Science
 Foundation grant DMS1522191 and the Computational Infrastructure in
 Geodynamics initiative (CIG), through the National Science Foundation under
@@ -38,7 +38,7 @@ The learning outcomes for this tutorial are:
 
 - You understand the concept of optimal preconditioners and are able to check
   this for a particular problem.
-  
+
 - You are able to construct manufactured solutions using the free computer
   algreba system SymPy (https://sympy.org).
 
@@ -79,7 +79,8 @@ done in O(N) time. A preconditioner application can also only be O(N) at best
 required to solve the linear system is independent of $h$ (and therefore N),
 the total cost of solving the system will be O(N). It is not possible to beat
 this complexity, because even looking at all the entries of the right-hand
-side already takes O(N) time.
+side already takes O(N) time. For more information see @cite elman2005,
+Chapter 2.5 (Multigrid).
 
 The preconditioner described here is even simpler than the one described in
 step-22 and will typically require more iterations and consequently time to
@@ -122,9 +123,7 @@ where $S=-BA^{-1} B^T$ is the Schur complement.
 With this choice of $P$, assuming that we handle $A^{-1}$ and $S^{-1}$ exactly
 (which is an "idealized" situation), the preconditioned linear system has
 three distinct eigenvalues independent of $h$ and is therefore "optimal".  See
-section 6.2.1 (especially p. 292) in "Finite Elements and Fast Iterative
-Solvers: with Applications in Incompressible Fluid Dynamics" by Elman,
-Silvester, and Wathen (Oxford University Press (UK), 2005). For comparison,
+section 6.2.1 (especially p. 292) in @cite elman2005. For comparison,
 using the ideal version of the upper block-triangular preconditioner in
 step-22 (also used in step-56) would have all eigenvalues be equal to one.
 
@@ -152,9 +151,9 @@ size of the coarsest matrix is not predictable.
 
 <h3>The testcase</h3>
 
-We will construct a manufactured solution based on the Kovasznay problem
-("Laminar flow behind a two-dimensional grid" by Kovasznay, 1948). Here
-is an image of the solution colored by the x velocity including 
+We will construct a manufactured solution based on the classical Kovasznay problem,
+see @cite kovasznay1948laminar. Here
+is an image of the solution colored by the x velocity including
 streamlines of the velocity:
 
  <img src="https://www.dealii.org/images/steps/developer/step-55.solution.png" alt="">

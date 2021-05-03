@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -125,7 +125,7 @@ check()
   Triangulation<dim> tria;
   make_mesh(tria);
 
-  FE_Q<dim>       element(QIterated<1>(QTrapez<1>(), 3));
+  FE_Q<dim>       element(QIterated<1>(QTrapezoid<1>(), 3));
   DoFHandler<dim> dof(tria);
   dof.distribute_dofs(element);
 
@@ -205,10 +205,8 @@ check()
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog << std::setprecision(2);
-  deallog << std::fixed;
-  deallog.attach(logfile);
+  initlog();
+  deallog << std::setprecision(2) << std::fixed;
 
   deallog.push("1d");
   check<1>();

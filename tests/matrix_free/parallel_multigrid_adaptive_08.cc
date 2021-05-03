@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2019 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -56,7 +56,6 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
 
 using namespace dealii::MatrixFreeOperators;
 
@@ -147,10 +146,10 @@ private:
     for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
       {
         phi.reinit(cell);
-        phi.gather_evaluate(src, false, true);
+        phi.gather_evaluate(src, EvaluationFlags::gradients);
         for (unsigned int q = 0; q < phi.n_q_points; ++q)
           phi.submit_gradient(phi.get_gradient(q), q);
-        phi.integrate_scatter(false, true, dst);
+        phi.integrate_scatter(EvaluationFlags::gradients, dst);
       }
   }
 
@@ -167,8 +166,8 @@ private:
            ExcMessage("The vector passed to the vmult() function does not have "
                       "the correct size for compatibility with MatrixFree."));
     LinearAlgebra::distributed::Vector<Number> copy_vec(vec);
-    const_cast<LinearAlgebra::distributed::Vector<Number> &>(vec).reinit(
-      this->data->get_dof_info(0).vector_partitioner);
+    this->data->initialize_dof_vector(
+      const_cast<LinearAlgebra::distributed::Vector<Number> &>(vec), 0);
     const_cast<LinearAlgebra::distributed::Vector<Number> &>(vec)
       .copy_locally_owned_data_from(copy_vec);
   }
@@ -237,7 +236,8 @@ do_test(const DoFHandler<dim> &dof)
 
   // level constraints:
   MGConstrainedDoFs mg_constrained_dofs;
-  mg_constrained_dofs.initialize(dof, dirichlet_boundary);
+  mg_constrained_dofs.initialize(dof);
+  mg_constrained_dofs.make_zero_boundary_constraints(dof, {0});
 
   MappingQ<dim> mapping(fe_degree + 1);
 
@@ -292,7 +292,7 @@ do_test(const DoFHandler<dim> &dof)
       mg_additional_data.tasks_parallel_scheme =
         MatrixFree<dim, number>::AdditionalData::none;
       mg_additional_data.tasks_block_size = 3;
-      mg_additional_data.level_mg_handler = level;
+      mg_additional_data.mg_level         = level;
 
       AffineConstraints<double> level_constraints;
       IndexSet                  relevant_dofs;
@@ -327,9 +327,9 @@ do_test(const DoFHandler<dim> &dof)
   MGCoarseIterative<LevelMatrixType, number> mg_coarse;
   mg_coarse.initialize(mg_matrices[0]);
 
-  typedef PreconditionChebyshev<LevelMatrixType,
-                                LinearAlgebra::distributed::Vector<number>>
-    SMOOTHER;
+  using SMOOTHER =
+    PreconditionChebyshev<LevelMatrixType,
+                          LinearAlgebra::distributed::Vector<number>>;
   MGSmootherPrecondition<LevelMatrixType,
                          SMOOTHER,
                          LinearAlgebra::distributed::Vector<number>>
@@ -354,7 +354,7 @@ do_test(const DoFHandler<dim> &dof)
     mg_interface_matrices);
 
   Multigrid<LinearAlgebra::distributed::Vector<number>> mg(
-    dof, mg_matrix, mg_coarse, mg_transfer, mg_smoother, mg_smoother);
+    mg_matrix, mg_coarse, mg_transfer, mg_smoother, mg_smoother);
   mg.set_edge_matrices(mg_interface, mg_interface);
   PreconditionMG<dim,
                  LinearAlgebra::distributed::Vector<number>,
@@ -405,7 +405,7 @@ test()
       FE_Q<dim>       fe(fe_degree);
       DoFHandler<dim> dof(tria);
       dof.distribute_dofs(fe);
-      dof.distribute_mg_dofs(fe);
+      dof.distribute_mg_dofs();
 
       do_test<dim, fe_degree, fe_degree + 1, double>(dof);
     }

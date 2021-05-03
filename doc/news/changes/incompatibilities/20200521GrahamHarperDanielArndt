@@ -1,0 +1,4 @@
+Changed: The polynomial space template argument has been removed from
+FE_Poly and FE_PolyTensor.
+<br>
+(Graham Harper, Daniel Arndt, 2020/05/21)

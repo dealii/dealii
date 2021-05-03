@@ -35,7 +35,7 @@ For reasons that are probably lost to history (maybe that these functions
 used to be implemented in FORTRAN, a language that does not care about
 whether something is spelled in lower or UPPER case letters, with programmers
 often choosing upper case letters habitually), the loop above is often
-referenced in publications about mesh adaptivity as the 
+referenced in publications about mesh adaptivity as the
 SOLVE-ESTIMATE-MARK-REFINE loop (with this spelling).
 
 Beyond this structure, however, there are a variety of ways to achieve
@@ -53,7 +53,7 @@ two essential possibilities:
   neighbor to the opposite vertex; otherwise a slightly more involved
   construction is necessary that adds more new vertices on at least one
   other edge of the neighboring cell, and then may propagate to the neighbors
-  of the neighbor until the algorithm terminates. This is hard to describe 
+  of the neighbor until the algorithm terminates. This is hard to describe
   in words, and because deal.II does not use triangles not worth the time here.
   But if you're curious, you can always watch video lecture 15 at the link
   shown at the top of this introduction.
@@ -317,7 +317,7 @@ locally refined meshes for a wide range of equations, not even restricted
 to elliptic only problems. Although it will create non-optimal meshes for other
 equations, it is often a good way to quickly produce meshes that are
 well adapted to the features of solutions, such as regions of great
-variation or discontinuities. 
+variation or discontinuities.
 
 
 
@@ -332,17 +332,17 @@ simply yields the constraint $U_j=g({\mathbf x}_j)$.
 The AffineConstraints class can handle such constraints as well, which makes it
 convenient to let the same object we use for hanging node constraints
 also deal with these Dirichlet boundary conditions.
-This way, we don't need to apply the boundary conditions after assembly 
+This way, we don't need to apply the boundary conditions after assembly
 (like we did in the earlier steps).
 All that is necessary is that we call the variant of
 VectorTools::interpolate_boundary_values() that returns its information
 in an AffineConstraints object, rather than the `std::map` we have used
 in previous tutorial programs.
- 
+
 
  <h3> Other things this program shows </h3>
- 
- 
+
+
 Since the concepts used for locally refined grids are so important,
 we do not show much other material in this example. The most
 important exception is that we show how to use biquadratic elements

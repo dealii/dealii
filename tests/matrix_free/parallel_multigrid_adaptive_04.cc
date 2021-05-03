@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -50,7 +50,6 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
 
 using namespace dealii::MatrixFreeOperators;
 
@@ -155,7 +154,8 @@ do_test(const DoFHandler<dim> &dof)
 
   // level constraints:
   MGConstrainedDoFs mg_constrained_dofs;
-  mg_constrained_dofs.initialize(dof, dirichlet_boundary);
+  mg_constrained_dofs.initialize(dof);
+  mg_constrained_dofs.make_zero_boundary_constraints(dof, {0});
 
   MappingQ<dim> mapping(fe_degree + 1);
 
@@ -201,12 +201,12 @@ do_test(const DoFHandler<dim> &dof)
   }
 
   // set up multigrid in analogy to step-37
-  typedef LaplaceOperator<dim,
-                          fe_degree,
-                          n_q_points_1d,
-                          1,
-                          LinearAlgebra::distributed::Vector<number>>
-    LevelMatrixType;
+  using LevelMatrixType =
+    LaplaceOperator<dim,
+                    fe_degree,
+                    n_q_points_1d,
+                    1,
+                    LinearAlgebra::distributed::Vector<number>>;
 
   MGLevelObject<LevelMatrixType>         mg_matrices;
   MGLevelObject<MatrixFree<dim, number>> mg_level_data;
@@ -220,7 +220,7 @@ do_test(const DoFHandler<dim> &dof)
       mg_additional_data.tasks_parallel_scheme =
         MatrixFree<dim, number>::AdditionalData::none;
       mg_additional_data.tasks_block_size = 3;
-      mg_additional_data.level_mg_handler = level;
+      mg_additional_data.mg_level         = level;
 
       AffineConstraints<double> level_constraints;
       IndexSet                  relevant_dofs;
@@ -256,9 +256,9 @@ do_test(const DoFHandler<dim> &dof)
   MGCoarseIterative<LevelMatrixType, number> mg_coarse;
   mg_coarse.initialize(mg_matrices[0]);
 
-  typedef PreconditionChebyshev<LevelMatrixType,
-                                LinearAlgebra::distributed::Vector<number>>
-    SMOOTHER;
+  using SMOOTHER =
+    PreconditionChebyshev<LevelMatrixType,
+                          LinearAlgebra::distributed::Vector<number>>;
   mg::SmootherRelaxation<SMOOTHER, LinearAlgebra::distributed::Vector<number>>
     mg_smoother;
 
@@ -281,7 +281,7 @@ do_test(const DoFHandler<dim> &dof)
     mg_interface_matrices);
 
   Multigrid<LinearAlgebra::distributed::Vector<double>> mg(
-    dof, mg_matrix, mg_coarse, mg_transfer, mg_smoother, mg_smoother);
+    mg_matrix, mg_coarse, mg_transfer, mg_smoother, mg_smoother);
   mg.set_edge_matrices(mg_interface, mg_interface);
   PreconditionMG<dim,
                  LinearAlgebra::distributed::Vector<double>,
@@ -335,7 +335,7 @@ test()
       FE_Q<dim>       fe(fe_degree);
       DoFHandler<dim> dof(tria);
       dof.distribute_dofs(fe);
-      dof.distribute_mg_dofs(fe);
+      dof.distribute_mg_dofs();
 
       do_test<dim, fe_degree, fe_degree + 1, double>(dof);
     }
@@ -348,11 +348,8 @@ main(int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_init(argc, argv, 1);
 
-  if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
-    {
-      deallog.attach(logfile);
-      deallog << std::setprecision(4);
-    }
+  mpi_initlog();
+  deallog << std::setprecision(4);
 
   {
     deallog.push("2d");

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2019 by the deal.II authors
+// Copyright (C) 2008 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -29,11 +29,13 @@
 #include <memory>
 #include <tuple>
 
-#ifdef DEAL_II_WITH_THREADS
+#ifdef DEAL_II_WITH_TBB
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <tbb/blocked_range.h>
 #  include <tbb/parallel_for.h>
 #  include <tbb/parallel_reduce.h>
 #  include <tbb/partitioner.h>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #endif
 
 
@@ -147,7 +149,7 @@ namespace parallel
 
 
 
-#ifdef DEAL_II_WITH_THREADS
+#ifdef DEAL_II_WITH_TBB
     /**
      * Encapsulate tbb::parallel_for.
      */
@@ -214,7 +216,7 @@ namespace parallel
             const Predicate &    predicate,
             const unsigned int   grainsize)
   {
-#ifndef DEAL_II_WITH_THREADS
+#ifndef DEAL_II_WITH_TBB
     // make sure we don't get compiler
     // warnings about unused arguments
     (void)grainsize;
@@ -270,7 +272,7 @@ namespace parallel
             const Predicate &     predicate,
             const unsigned int    grainsize)
   {
-#ifndef DEAL_II_WITH_THREADS
+#ifndef DEAL_II_WITH_TBB
     // make sure we don't get compiler
     // warnings about unused arguments
     (void)grainsize;
@@ -329,7 +331,7 @@ namespace parallel
             const Predicate &     predicate,
             const unsigned int    grainsize)
   {
-#ifndef DEAL_II_WITH_THREADS
+#ifndef DEAL_II_WITH_TBB
     // make sure we don't get compiler
     // warnings about unused arguments
     (void)grainsize;
@@ -355,7 +357,7 @@ namespace parallel
 
   namespace internal
   {
-#ifdef DEAL_II_WITH_THREADS
+#ifdef DEAL_II_WITH_TBB
     /**
      * Take a range argument and call the given function with its begin and
      * end.
@@ -373,7 +375,8 @@ namespace parallel
 
   /**
    * This function applies the given function argument @p f to all elements in
-   * the range <code>[begin,end)</code> and may do so in parallel.
+   * the range <code>[begin,end)</code> and may do so in parallel. An example
+   * of its use is given in step-69.
    *
    * However, in many cases it is not efficient to call a function on each
    * element, so this function calls the given function object on sub-ranges.
@@ -398,11 +401,11 @@ namespace parallel
    *   {
    *     parallel::apply_to_subranges
    *        (0, A.n_rows(),
-   *         std::bind (&mat_vec_on_subranges,
-   *                    std::placeholders::_1, std::placeholders::_2,
-   *                    std::cref(A),
-   *                    std::cref(x),
-   *                    std::ref(y)),
+   *         [&](const unsigned int begin_row,
+   *             const unsigned int end_row)
+   *         {
+   *           mat_vec_on_subranges(begin_row, end_row, A, x, y);
+   *         },
    *         50);
    *   }
    *
@@ -418,14 +421,11 @@ namespace parallel
    *   }
    * @endcode
    *
-   * Note how we use the <code>std::bind</code> function to convert
+   * Note how we use the lambda function to convert
    * <code>mat_vec_on_subranges</code> from a function that takes 5 arguments
-   * to one taking 2 by binding the remaining arguments (the modifiers
-   * <code>std::ref</code> and <code>std::cref</code> make sure
-   * that the enclosed variables are actually passed by reference and constant
-   * reference, rather than by value). The resulting function object requires
-   * only two arguments, begin_row and end_row, with all other arguments
-   * fixed.
+   * to one taking 2 by binding the remaining arguments. The resulting function
+   * object requires only two arguments, `begin_row` and `end_row`, with all
+   * other arguments fixed.
    *
    * The code, if in single-thread mode, will call
    * <code>mat_vec_on_subranges</code> on the entire range
@@ -449,27 +449,20 @@ namespace parallel
                      const Function &                          f,
                      const unsigned int                        grainsize)
   {
-#ifndef DEAL_II_WITH_THREADS
+#ifndef DEAL_II_WITH_TBB
     // make sure we don't get compiler
     // warnings about unused arguments
     (void)grainsize;
 
-#  ifndef DEAL_II_BIND_NO_CONST_OP_PARENTHESES
     f(begin, end);
-#  else
-    // work around a problem with MS VC++ where there is no const
-    // operator() in 'Function' if 'Function' is the result of std::bind
-    Function ff = f;
-    ff(begin, end);
-#  endif
 #else
-    internal::parallel_for(
-      begin,
-      end,
-      std::bind(&internal::apply_to_subranges<RangeType, Function>,
-                std::placeholders::_1,
-                std::cref(f)),
-      grainsize);
+    internal::parallel_for(begin,
+                           end,
+                           [&f](const tbb::blocked_range<RangeType> &range) {
+                             internal::apply_to_subranges<RangeType, Function>(
+                               range, f);
+                           },
+                           grainsize);
 #endif
   }
 
@@ -537,7 +530,7 @@ namespace parallel
 
   namespace internal
   {
-#ifdef DEAL_II_WITH_THREADS
+#ifdef DEAL_II_WITH_TBB
     /**
      * A class that conforms to the Body requirements of the TBB
      * parallel_reduce function. The first template argument denotes the type
@@ -641,10 +634,11 @@ namespace parallel
    *      std::sqrt
    *       (parallel::accumulate_from_subranges<double>
    *        (0, A.n_rows(),
-   *         std::bind (&mat_norm_sqr_on_subranges,
-   *                     std::placeholders::_1, std::placeholders::_2,
-   *                     std::cref(A),
-   *                     std::cref(x)),
+   *         [&](const unsigned int begin_row,
+   *             const unsigned int end_row)
+   *         {
+   *           mat_vec_on_subranges(begin_row, end_row, A, x, y);
+   *         },
    *         50);
    *   }
    *
@@ -690,19 +684,12 @@ namespace parallel
                             const typename identity<RangeType>::type &end,
                             const unsigned int                        grainsize)
   {
-#ifndef DEAL_II_WITH_THREADS
+#ifndef DEAL_II_WITH_TBB
     // make sure we don't get compiler
     // warnings about unused arguments
     (void)grainsize;
 
-#  ifndef DEAL_II_BIND_NO_CONST_OP_PARENTHESES
     return f(begin, end);
-#  else
-    // work around a problem with MS VC++ where there is no const
-    // operator() in 'Function' if 'Function' is the result of std::bind
-    Function ff = f;
-    return ff(begin, end);
-#  endif
 #else
     internal::ReductionOnSubranges<ResultType, Function> reductor(
       f, std::plus<ResultType>(), 0);
@@ -735,7 +722,7 @@ namespace parallel
        */
       TBBPartitioner();
 
-#ifdef DEAL_II_WITH_THREADS
+#ifdef DEAL_II_WITH_TBB
       /**
        * Destructor. Check that the object is not in use any more, i.e., all
        * loops have been completed.
@@ -775,7 +762,7 @@ namespace parallel
       /**
        * A mutex to guard the access to the in_use flag.
        */
-      dealii::Threads::Mutex mutex;
+      std::mutex mutex;
 #endif
     };
   } // namespace internal
@@ -821,7 +808,7 @@ namespace internal
 
 namespace parallel
 {
-#ifdef DEAL_II_WITH_THREADS
+#ifdef DEAL_II_WITH_TBB
 
   namespace internal
   {
@@ -854,7 +841,7 @@ namespace parallel
     const std::size_t end,
     const std::size_t minimum_parallel_grain_size) const
   {
-#ifndef DEAL_II_WITH_THREADS
+#ifndef DEAL_II_WITH_TBB
     // make sure we don't get compiler
     // warnings about unused arguments
     (void)minimum_parallel_grain_size;

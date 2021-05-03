@@ -1,0 +1,43 @@
+
+DEAL:1d::starting situation: ncells: 2 fe_indices: 0 0
+DEAL:1d::full h&p flags
+DEAL:1d:: default behavior: ncells: 1 fe_indices: 1
+DEAL:1d:: force p over h   : ncells: 2 fe_indices: 1 1
+DEAL:1d:: choose p over h  : ncells: 2 fe_indices: 1 1
+DEAL:1d::full p flags
+DEAL:1d:: default behavior: ncells: 2 fe_indices: 1 1
+DEAL:1d:: force p over h   : ncells: 2 fe_indices: 1 1
+DEAL:1d:: choose p over h  : ncells: 2 fe_indices: 1 1
+DEAL:1d::full h flags
+DEAL:1d:: default behavior: ncells: 1 fe_indices: 1
+DEAL:1d:: force p over h   : ncells: 2 fe_indices: 0 1
+DEAL:1d:: choose p over h  : ncells: 1 fe_indices: 0
+DEAL:1d::OK
+DEAL:2d::starting situation: ncells: 4 fe_indices: 0 0 0 0
+DEAL:2d::full h&p flags
+DEAL:2d:: default behavior: ncells: 1 fe_indices: 1
+DEAL:2d:: force p over h   : ncells: 4 fe_indices: 1 1 1 1
+DEAL:2d:: choose p over h  : ncells: 4 fe_indices: 1 1 1 1
+DEAL:2d::full p flags
+DEAL:2d:: default behavior: ncells: 4 fe_indices: 1 1 1 1
+DEAL:2d:: force p over h   : ncells: 4 fe_indices: 1 1 1 1
+DEAL:2d:: choose p over h  : ncells: 4 fe_indices: 1 1 1 1
+DEAL:2d::full h flags
+DEAL:2d:: default behavior: ncells: 1 fe_indices: 1
+DEAL:2d:: force p over h   : ncells: 4 fe_indices: 0 1 1 1
+DEAL:2d:: choose p over h  : ncells: 1 fe_indices: 0
+DEAL:2d::OK
+DEAL:3d::starting situation: ncells: 8 fe_indices: 0 0 0 0 0 0 0 0
+DEAL:3d::full h&p flags
+DEAL:3d:: default behavior: ncells: 1 fe_indices: 1
+DEAL:3d:: force p over h   : ncells: 8 fe_indices: 1 1 1 1 1 1 1 1
+DEAL:3d:: choose p over h  : ncells: 8 fe_indices: 1 1 1 1 1 1 1 1
+DEAL:3d::full p flags
+DEAL:3d:: default behavior: ncells: 8 fe_indices: 1 1 1 1 1 1 1 1
+DEAL:3d:: force p over h   : ncells: 8 fe_indices: 1 1 1 1 1 1 1 1
+DEAL:3d:: choose p over h  : ncells: 8 fe_indices: 1 1 1 1 1 1 1 1
+DEAL:3d::full h flags
+DEAL:3d:: default behavior: ncells: 1 fe_indices: 1
+DEAL:3d:: force p over h   : ncells: 8 fe_indices: 0 1 1 1 1 1 1 1
+DEAL:3d:: choose p over h  : ncells: 1 fe_indices: 0
+DEAL:3d::OK

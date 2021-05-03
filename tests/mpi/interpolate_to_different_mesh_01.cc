@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -40,7 +40,6 @@
 
 // test VectorTools::interpolate_to_different_mesh in parallel
 
-using namespace dealii;
 
 namespace LA
 {
@@ -98,10 +97,10 @@ output(DoFHandler<dim> & dh,
            ++i)
         filenames.push_back(filename_ + Utilities::int_to_string(loop, 2) +
                             "." + Utilities::int_to_string(i, 2) + ".vtu");
-      const std::string pvtu_master_filename =
+      const std::string pvtu_filename =
         (filename_ + Utilities::int_to_string(loop, 2) + ".pvtu");
-      std::ofstream pvtu_master(pvtu_master_filename.c_str());
-      data_out.write_pvtu_record(pvtu_master, filenames);
+      std::ofstream pvtu_output(pvtu_filename.c_str());
+      data_out.write_pvtu_record(pvtu_output, filenames);
     }
 }
 

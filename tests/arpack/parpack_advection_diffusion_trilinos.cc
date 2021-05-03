@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2009 - 2018 by the deal.II authors
+ * Copyright (C) 2009 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -20,7 +20,6 @@
  * We test that the computed vectors are eigenvectors and mass-normal, i.e.
  * a) (A*x_i-\lambda*B*x_i).L2() == 0
  * b) x_i*B*x_i = 1
- *
  */
 
 #include <deal.II/base/index_set.h>
@@ -55,13 +54,12 @@
 
 const unsigned int dim = 2; // run in 2d to save time
 
-using namespace dealii;
 
 const double eps = 1e-10;
 
-template <typename DoFHandlerType>
+template <int dim>
 std::vector<IndexSet>
-locally_owned_dofs_per_subdomain(const DoFHandlerType &dof_handler)
+locally_owned_dofs_per_subdomain(const DoFHandler<dim> &dof_handler)
 {
   std::vector<types::subdomain_id> subdomain_association(dof_handler.n_dofs());
   DoFTools::get_subdomain_association(dof_handler, subdomain_association);
@@ -291,7 +289,7 @@ test()
                                             /*tolerance (global)*/ 0.0,
                                             /*reduce (w.r.t. initial)*/ 1.e-13);
 
-    typedef TrilinosWrappers::MPI::Vector  VectorType;
+    using VectorType = TrilinosWrappers::MPI::Vector;
     SolverGMRES<VectorType>                solver_c(inner_control_c);
     TrilinosWrappers::PreconditionIdentity preconditioner;
 

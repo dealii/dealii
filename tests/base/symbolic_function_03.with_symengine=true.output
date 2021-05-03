@@ -1,0 +1,11 @@
+
+DEAL::x, y, t -> x; y*alpha; t*alpha**2 # ( alpha = 1.0 )
+DEAL::p: 1.00000 2.00000
+DEAL::f_0(p): 1.00000
+DEAL::f_1(p): 2.00000
+DEAL::f_2(p): 0.00000
+DEAL::x, y, t -> x; y*alpha; t*alpha**2 # ( alpha = 2.0 )
+DEAL::p: 1.00000 2.00000
+DEAL::f_0(p): 1.00000
+DEAL::f_1(p): 4.00000
+DEAL::f_2(p): 0.00000

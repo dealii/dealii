@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2018 by the deal.II authors
+// Copyright (C) 2011 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -65,8 +65,7 @@ plot_faces(Mapping<dim> &                           mapping,
                                           update_gradients | update_hessians |
                                           update_normal_vectors));
 
-  for (unsigned int face_nr = 0; face_nr < GeometryInfo<dim>::faces_per_cell;
-       ++face_nr)
+  for (const unsigned int face_nr : GeometryInfo<dim>::face_indices())
     {
       deallog << "Face=" << face_nr << std::endl;
       fe_values.reinit(cell, face_nr);
@@ -108,8 +107,7 @@ plot_subfaces(Mapping<dim> &                           mapping,
     q,
     UpdateFlags(update_quadrature_points | update_JxW_values | update_values |
                 update_gradients | update_hessians | update_normal_vectors));
-  for (unsigned int face_nr = 0; face_nr < GeometryInfo<dim>::faces_per_cell;
-       ++face_nr)
+  for (const unsigned int face_nr : GeometryInfo<dim>::face_indices())
     for (unsigned int sub_nr = 0;
          sub_nr < GeometryInfo<dim>::max_children_per_face;
          ++sub_nr)

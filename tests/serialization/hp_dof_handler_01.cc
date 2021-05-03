@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2019 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,9 +14,10 @@
 // ---------------------------------------------------------------------
 
 
-// check serialization for hp::DoFHandler<dim>
+// check serialization for DoFHandler<dim>
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_renumbering.h>
 
 #include <deal.II/fe/fe_q.h>
@@ -27,24 +28,22 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
-
 #include "serialization.h"
 
 namespace dealii
 {
   template <int dim, int spacedim>
   bool
-  operator==(const hp::DoFHandler<dim, spacedim> &t1,
-             const hp::DoFHandler<dim, spacedim> &t2)
+  operator==(const DoFHandler<dim, spacedim> &t1,
+             const DoFHandler<dim, spacedim> &t2)
   {
     // test a few attributes, though we can't
     // test everything unfortunately...
-    typename hp::DoFHandler<dim, spacedim>::cell_iterator c1 = t1.begin(),
-                                                          c2 = t2.begin();
+    typename DoFHandler<dim, spacedim>::cell_iterator c1 = t1.begin(),
+                                                      c2 = t2.begin();
     for (; (c1 != t1.end()) && (c2 != t2.end()); ++c1, ++c2)
       {
-        for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+        for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
           {
             if (c1->vertex(v) != c2->vertex(v))
               return false;
@@ -52,7 +51,7 @@ namespace dealii
               return false;
           }
 
-        for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+        for (const unsigned int f : GeometryInfo<dim>::face_indices())
           {
             if (c1->face(f)->at_boundary() != c2->face(f)->at_boundary())
               return false;
@@ -71,7 +70,7 @@ namespace dealii
               }
           }
 
-        if (c1->active() && c2->active() &&
+        if (c1->is_active() && c2->is_active() &&
             (c1->subdomain_id() != c2->subdomain_id()))
           return false;
 
@@ -84,15 +83,15 @@ namespace dealii
         if (c1->user_flag_set() != c2->user_flag_set())
           return false;
 
-        if (c1->active() && c2->active() &&
+        if (c1->is_active() && c2->is_active() &&
             c1->get_fe().get_name() != c2->get_fe().get_name())
           return false;
 
-        if (c1->active() && c2->active() &&
+        if (c1->is_active() && c2->is_active() &&
             c1->active_fe_index() != c2->active_fe_index())
           return false;
 
-        if (c1->active() && c2->active() &&
+        if (c1->is_active() && c2->is_active() &&
             c1->future_fe_index() != c2->future_fe_index())
           return false;
 
@@ -109,7 +108,7 @@ namespace dealii
             if (local_dofs_1 != local_dofs_2)
               return false;
 
-            for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+            for (const unsigned int f : GeometryInfo<dim>::face_indices())
               {
                 std::vector<types::global_dof_index> local_dofs_1(
                   c1->get_fe().dofs_per_face);
@@ -128,8 +127,8 @@ namespace dealii
 
     // also check the order of raw iterators as they contain
     // something about the history of the triangulation
-    typename hp::DoFHandler<dim, spacedim>::cell_iterator r1 = t1.begin(),
-                                                          r2 = t2.begin();
+    typename DoFHandler<dim, spacedim>::cell_iterator r1 = t1.begin(),
+                                                      r2 = t2.begin();
     for (; (r1 != t1.end()) && (r2 != t2.end()); ++r1, ++r2)
       {
         if (r1->level() != r2->level())
@@ -148,7 +147,7 @@ do_boundary(Triangulation<dim, spacedim> &t1)
 {
   typename Triangulation<dim, spacedim>::cell_iterator c1 = t1.begin();
   for (; c1 != t1.end(); ++c1)
-    for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+    for (const unsigned int f : GeometryInfo<dim>::face_indices())
       if (c1->at_boundary(f))
         c1->face(f)->set_boundary_id(42);
 }
@@ -181,8 +180,8 @@ test()
   fe_collection.push_back(FESystem<dim, spacedim>(
     FE_Q<dim, spacedim>(3), dim, FE_Q<dim, spacedim>(2), 1));
 
-  hp::DoFHandler<dim, spacedim> dof_1(tria);
-  hp::DoFHandler<dim, spacedim> dof_2(tria);
+  DoFHandler<dim, spacedim> dof_1(tria);
+  DoFHandler<dim, spacedim> dof_2(tria);
 
   dof_1.begin_active()->set_active_fe_index(1);
   dof_2.begin_active()->set_active_fe_index(1);

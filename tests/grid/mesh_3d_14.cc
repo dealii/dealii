@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -36,13 +36,14 @@
 #include <deal.II/lac/vector.h>
 
 #include "../tests.h"
+
 #include "mesh_3d.h"
 
 
 
 void check_this(Triangulation<3> &tria)
 {
-  QTrapez<2>         quadrature;
+  QTrapezoid<2>      quadrature;
   FE_Q<3>            fe(1);
   FEFaceValues<3>    fe_face_values1(fe,
                                   quadrature,
@@ -59,8 +60,7 @@ void check_this(Triangulation<3> &tria)
 
   DoFHandler<3>::active_cell_iterator cell = dof_handler.begin_active();
   for (; cell != dof_handler.end(); ++cell)
-    for (unsigned int face_no = 0; face_no < GeometryInfo<3>::faces_per_cell;
-         ++face_no)
+    for (const unsigned int face_no : GeometryInfo<3>::face_indices())
       if (!cell->at_boundary(face_no) &&
           cell->neighbor(face_no)->has_children())
         for (unsigned int subface_no = 0;

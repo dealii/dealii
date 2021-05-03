@@ -30,7 +30,7 @@ void
 fill_vector(std::vector<Quadrature<dim> *> &quadratures)
 {
   quadratures.push_back(new QMidpoint<dim>());
-  quadratures.push_back(new QTrapez<dim>());
+  quadratures.push_back(new QTrapezoid<dim>());
   quadratures.push_back(new QSimpson<dim>());
   quadratures.push_back(new QMilne<dim>());
   quadratures.push_back(new QWeddle<dim>());

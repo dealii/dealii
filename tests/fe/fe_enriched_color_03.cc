@@ -16,11 +16,12 @@
 /*
  * Test function - ColorEnriched::internal::set_cellwise_color_set_and_fe_index
  * for a set of predicates.
- * Check for each cell, if appropriate fe index and color-index map is set.
+ * Check for each cell, if appropriate FE index and color-index map is set.
  * Color-index map associates different colors of different enrichment
  * functions with corresponding enrichment function index.
  */
 
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/dofs/dof_tools.h>
 
@@ -29,8 +30,6 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_refinement.h>
 #include <deal.II/grid/grid_tools.h>
-
-#include <deal.II/hp/dof_handler.h>
 
 #include <map>
 
@@ -92,9 +91,9 @@ main(int argc, char **argv)
   MPILogInitAll                    all;
 
   // Make basic grid
-  const unsigned int  dim = 2;
-  Triangulation<dim>  triangulation;
-  hp::DoFHandler<dim> dof_handler(triangulation);
+  const unsigned int dim = 2;
+  Triangulation<dim> triangulation;
+  DoFHandler<dim>    dof_handler(triangulation);
   GridGenerator::hyper_cube(triangulation, -2, 2);
   triangulation.refine_global(2);
 
@@ -124,13 +123,13 @@ main(int argc, char **argv)
     fe_sets);
 
   /*
-   * Run through active cells to check fe index, colors of
+   * Run through active cells to check FE index, colors of
    * enrichment functions associated with it.
    *
-   * A unique color set corresponds to an fe index.
+   * A unique color set corresponds to an FE index.
    *
-   * Eg: If an fe index 1 corresponds to color set {2,3},
-   * means that a cell with fe index 1 has enrichment functions
+   * Eg: If an FE index 1 corresponds to color set {2,3},
+   * means that a cell with FE index 1 has enrichment functions
    * which are colored 2 and 3. Here different enrichment function
    * have same color 2 but for a given cell only one of them would
    * be relevant. So all additional information we need is which
@@ -141,7 +140,6 @@ main(int argc, char **argv)
    * set_cellwise_color_set_and_fe_index. Now using material id,
    * each cell is associated with a map which assigns a color to a
    * particular enrichment function id.
-   *
    */
   auto cell = dof_handler.begin_active();
   auto endc = dof_handler.end();
@@ -164,7 +162,7 @@ main(int argc, char **argv)
                   << color_predicate_pair.second << "):";
         }
 
-      // For a cell, print fe active index and corresponding fe set.
+      // For a cell, print FE active index and corresponding FE set.
       //{1,2} indicates 2 enrichment functions of color 1 and 2 are relevant.
       deallog << ":fe_active_index:" << cell->active_fe_index() << ":fe_set:";
       for (auto fe_set_element : fe_sets[cell->active_fe_index()])

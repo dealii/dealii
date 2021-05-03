@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2019 by the deal.II authors
+// Copyright (C) 2011 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,17 +16,21 @@
 #ifndef dealii_matrix_free_mapping_info_templates_h
 #define dealii_matrix_free_mapping_info_templates_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/multithread_info.h>
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/utilities.h>
 
+#include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_values.h>
-#include <deal.II/fe/mapping_q1.h>
+#include <deal.II/fe/mapping_q_generic.h>
 
+#include <deal.II/matrix_free/evaluation_template_factory.h>
 #include <deal.II/matrix_free/mapping_info.h>
-
+#include <deal.II/matrix_free/util.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -37,30 +41,66 @@ namespace internal
   {
     /* ------------------------ MappingInfoStorage implementation ---------- */
 
-    template <int structdim, int spacedim, typename Number>
-    MappingInfoStorage<structdim, spacedim, Number>::QuadratureDescriptor ::
-      QuadratureDescriptor()
+    template <int structdim,
+              int spacedim,
+              typename Number,
+              typename VectorizedArrayType>
+    MappingInfoStorage<structdim, spacedim, Number, VectorizedArrayType>::
+      QuadratureDescriptor::QuadratureDescriptor()
       : n_q_points(numbers::invalid_unsigned_int)
     {}
 
 
 
-    template <int structdim, int spacedim, typename Number>
+    template <int structdim,
+              int spacedim,
+              typename Number,
+              typename VectorizedArrayType>
+    template <int dim_q>
     void
-    MappingInfoStorage<structdim, spacedim, Number>::QuadratureDescriptor ::
-      initialize(const Quadrature<1> &quadrature_1d,
-                 const UpdateFlags    update_flags_inner_faces)
+    MappingInfoStorage<structdim, spacedim, Number, VectorizedArrayType>::
+      QuadratureDescriptor::initialize(
+        const Quadrature<dim_q> &quadrature,
+        const UpdateFlags        update_flags_inner_faces)
     {
       Assert(structdim + 1 <= spacedim ||
                update_flags_inner_faces == update_default,
              ExcMessage("Volume cells do not allow for setting inner faces"));
-      quadrature = Quadrature<structdim>(quadrature_1d);
-      n_q_points = quadrature.size();
+      this->quadrature = quadrature;
+      n_q_points       = quadrature.size();
       quadrature_weights.resize(n_q_points);
       for (unsigned int i = 0; i < n_q_points; ++i)
         quadrature_weights[i] = quadrature.weight(i);
 
-      for (unsigned int d = 0; d < structdim; ++d)
+      // note: quadrature_1d and tensor_quadrature_weights are not set up
+
+      // TODO: set up face_orientations
+      (void)update_flags_inner_faces;
+    }
+
+
+
+    template <int structdim,
+              int spacedim,
+              typename Number,
+              typename VectorizedArrayType>
+    void
+    MappingInfoStorage<structdim, spacedim, Number, VectorizedArrayType>::
+      QuadratureDescriptor::initialize(
+        const Quadrature<1> &quadrature_1d,
+        const UpdateFlags    update_flags_inner_faces)
+    {
+      Assert(structdim + 1 <= spacedim ||
+               update_flags_inner_faces == update_default,
+             ExcMessage("Volume cells do not allow for setting inner faces"));
+      this->quadrature_1d = quadrature_1d;
+      quadrature          = Quadrature<structdim>(quadrature_1d);
+      n_q_points          = quadrature.size();
+      quadrature_weights.resize(n_q_points);
+      for (unsigned int i = 0; i < n_q_points; ++i)
+        quadrature_weights[i] = quadrature.weight(i);
+
+      for (int d = 0; d < structdim; ++d)
         {
           tensor_quadrature_weights[d].resize(quadrature_1d.size());
           for (unsigned int i = 0; i < quadrature_1d.size(); ++i)
@@ -98,24 +138,54 @@ namespace internal
 
 
 
-    template <int structdim, int spacedim, typename Number>
+    template <int structdim,
+              int spacedim,
+              typename Number,
+              typename VectorizedArrayType>
     std::size_t
-    MappingInfoStorage<structdim, spacedim, Number>::QuadratureDescriptor ::
-      memory_consumption() const
+    MappingInfoStorage<structdim, spacedim, Number, VectorizedArrayType>::
+      QuadratureDescriptor::memory_consumption() const
     {
       std::size_t memory = sizeof(this) + quadrature.memory_consumption() +
                            quadrature_weights.memory_consumption() +
                            face_orientations.memory_consumption();
-      for (unsigned int d = 0; d < structdim; ++d)
+      for (int d = 0; d < structdim; ++d)
         memory += tensor_quadrature_weights[d].memory_consumption();
       return memory;
     }
 
 
 
-    template <int structdim, int spacedim, typename Number>
+    template <int structdim,
+              int spacedim,
+              typename Number,
+              typename VectorizedArrayType>
+    void
+    MappingInfoStorage<structdim, spacedim, Number, VectorizedArrayType>::
+      clear_data_fields()
+    {
+      data_index_offsets.clear();
+      JxW_values.clear();
+      normal_vectors.clear();
+      for (unsigned int i = 0; i < 2; ++i)
+        {
+          jacobians[i].clear();
+          jacobian_gradients[i].clear();
+          normals_times_jacobians[i].clear();
+        }
+      quadrature_point_offsets.clear();
+      quadrature_points.clear();
+    }
+
+
+
+    template <int structdim,
+              int spacedim,
+              typename Number,
+              typename VectorizedArrayType>
     std::size_t
-    MappingInfoStorage<structdim, spacedim, Number>::memory_consumption() const
+    MappingInfoStorage<structdim, spacedim, Number, VectorizedArrayType>::
+      memory_consumption() const
     {
       return MemoryConsumption::memory_consumption(descriptor) +
              MemoryConsumption::memory_consumption(data_index_offsets) +
@@ -133,12 +203,14 @@ namespace internal
 
 
 
-    template <int structdim, int spacedim, typename Number>
+    template <int structdim,
+              int spacedim,
+              typename Number,
+              typename VectorizedArrayType>
     template <typename StreamType>
     void
-    MappingInfoStorage<structdim, spacedim, Number>::print_memory_consumption(
-      StreamType &    out,
-      const SizeInfo &task_info) const
+    MappingInfoStorage<structdim, spacedim, Number, VectorizedArrayType>::
+      print_memory_consumption(StreamType &out, const TaskInfo &task_info) const
     {
       // print_memory_statistics involves global communication, so we can
       // disable the check here only if no processor has any such data
@@ -192,24 +264,26 @@ namespace internal
 
     /* ------------------------ MappingInfo implementation ----------------- */
 
-    template <int dim, typename Number>
+    template <int dim, typename Number, typename VectorizedArrayType>
     void
-    MappingInfo<dim, Number>::clear()
+    MappingInfo<dim, Number, VectorizedArrayType>::clear()
     {
       cell_data.clear();
       face_data.clear();
       face_data_by_cells.clear();
       cell_type.clear();
       face_type.clear();
+      mapping_collection = nullptr;
+      mapping            = nullptr;
     }
 
 
 
-    template <int dim, typename Number>
+    template <int dim, typename Number, typename VectorizedArrayType>
     UpdateFlags
-    MappingInfo<dim, Number>::compute_update_flags(
-      const UpdateFlags                              update_flags,
-      const std::vector<dealii::hp::QCollection<1>> &quad)
+    MappingInfo<dim, Number, VectorizedArrayType>::compute_update_flags(
+      const UpdateFlags                                update_flags,
+      const std::vector<dealii::hp::QCollection<dim>> &quad)
     {
       // this class is build around the evaluation of jacobians, so compute
       // them in any case. The Jacobians will be inverted manually. Since we
@@ -252,40 +326,199 @@ namespace internal
 
 
 
-    template <int dim, typename Number>
+    template <int dim, typename Number, typename VectorizedArrayType>
     void
-    MappingInfo<dim, Number>::initialize(
-      const dealii::Triangulation<dim> &                         tria,
-      const std::vector<std::pair<unsigned int, unsigned int>> & cells,
-      const FaceInfo<VectorizedArray<Number>::n_array_elements> &face_info,
-      const std::vector<unsigned int> &              active_fe_index,
-      const Mapping<dim> &                           mapping,
-      const std::vector<dealii::hp::QCollection<1>> &quad,
-      const UpdateFlags                              update_flags_cells,
+    MappingInfo<dim, Number, VectorizedArrayType>::initialize(
+      const dealii::Triangulation<dim> &                        tria,
+      const std::vector<std::pair<unsigned int, unsigned int>> &cells,
+      const FaceInfo<VectorizedArrayType::size()> &             face_info,
+      const std::vector<unsigned int> &                         active_fe_index,
+      const std::shared_ptr<dealii::hp::MappingCollection<dim>> &mapping,
+      const std::vector<dealii::hp::QCollection<dim>> &          quad,
+      const UpdateFlags update_flags_cells,
       const UpdateFlags update_flags_boundary_faces,
       const UpdateFlags update_flags_inner_faces,
       const UpdateFlags update_flags_faces_by_cells)
     {
       clear();
+      this->mapping_collection = mapping;
+      this->mapping            = &mapping->operator[](0);
 
-      // Could call these functions in parallel, but not useful because the
-      // work inside is nicely split up already
-      initialize_cells(
-        tria, cells, active_fe_index, mapping, quad, update_flags_cells);
-      initialize_faces(tria,
-                       cells,
-                       face_info.faces,
-                       mapping,
-                       quad,
-                       update_flags_boundary_faces,
-                       update_flags_inner_faces);
-      initialize_faces_by_cells(
-        tria, cells, mapping, quad, update_flags_faces_by_cells);
+      cell_data.resize(quad.size());
+      face_data.resize(quad.size());
+      face_data_by_cells.resize(quad.size());
+
+      // dummy FE that is used to set up an FEValues object. Do not need the
+      // actual finite element because we will only evaluate quantities for
+      // the mapping that are independent of the FE
+      this->update_flags_cells = compute_update_flags(update_flags_cells, quad);
+
+      this->update_flags_boundary_faces =
+        ((update_flags_inner_faces | update_flags_boundary_faces) &
+             update_quadrature_points ?
+           update_quadrature_points :
+           update_default) |
+        update_normal_vectors | update_JxW_values | update_jacobians;
+      this->update_flags_inner_faces    = this->update_flags_boundary_faces;
+      this->update_flags_faces_by_cells = update_flags_faces_by_cells;
+
+      reference_cell_types.resize(quad.size());
+
+      for (unsigned int my_q = 0; my_q < quad.size(); ++my_q)
+        {
+          const unsigned int n_hp_quads = quad[my_q].size();
+          AssertIndexRange(0, n_hp_quads);
+
+          const unsigned int scale = std::max<unsigned int>(1, dim - 1);
+
+          cell_data[my_q].descriptor.resize(n_hp_quads);
+          face_data[my_q].descriptor.resize(n_hp_quads * scale);
+          face_data[my_q].q_collection.resize(n_hp_quads);
+          face_data_by_cells[my_q].descriptor.resize(n_hp_quads * scale);
+          reference_cell_types[my_q].resize(n_hp_quads);
+
+          for (unsigned int hpq = 0; hpq < n_hp_quads; ++hpq)
+            {
+              bool flag = quad[my_q][hpq].is_tensor_product();
+
+              if (flag)
+                for (unsigned int i = 1; i < dim; ++i)
+                  flag &= quad[my_q][hpq].get_tensor_basis()[0] ==
+                          quad[my_q][hpq].get_tensor_basis()[i];
+
+              if (flag == false)
+                {
+#ifdef DEAL_II_WITH_SIMPLEX_SUPPORT
+                  cell_data[my_q].descriptor[hpq].initialize(quad[my_q][hpq],
+                                                             update_default);
+                  const auto quad_face =
+                    get_unique_face_quadratures(quad[my_q][hpq]);
+
+                  if (quad_face.first.size() > 0) // line, quad
+                    {
+                      face_data[my_q].descriptor[hpq * scale].initialize(
+                        quad_face.first, update_default);
+                      face_data_by_cells[my_q]
+                        .descriptor[hpq * scale]
+                        .initialize(quad_face.first, update_default);
+                    }
+
+                  if (quad_face.second.size() > 0) // triangle
+                    {
+                      AssertDimension(dim, 3);
+                      face_data[my_q].descriptor[hpq * scale + 1].initialize(
+                        quad_face.second, update_default);
+                      face_data_by_cells[my_q]
+                        .descriptor[hpq * scale + 1]
+                        .initialize(quad_face.second, update_default);
+                    }
+
+                  const auto face_quadrature_collection =
+                    get_face_quadrature_collection(quad[my_q][hpq]);
+
+                  face_data[my_q].q_collection[hpq] =
+                    face_quadrature_collection.second;
+
+                  reference_cell_types[my_q][hpq] =
+                    face_quadrature_collection.first;
+#else
+                  Assert(false, ExcNotImplemented());
+#endif
+                }
+              else
+                {
+                  cell_data[my_q].descriptor[hpq].initialize(
+                    quad[my_q][hpq].get_tensor_basis()[0], update_default);
+
+                  const auto quad_face = quad[my_q][hpq].get_tensor_basis()[0];
+                  face_data[my_q].descriptor[hpq * scale].initialize(
+                    quad_face, update_flags_boundary_faces);
+                  face_data[my_q].q_collection[hpq] =
+                    dealii::hp::QCollection<dim - 1>(quad_face);
+                  face_data_by_cells[my_q].descriptor[hpq * scale].initialize(
+                    quad_face, update_default);
+                  reference_cell_types[my_q][hpq] =
+                    dealii::ReferenceCells::get_hypercube<dim>();
+                }
+            }
+        }
+
+      // In case we have no hp-adaptivity (active_fe_index is empty), we have
+      // cells, and the mapping is MappingQGeneric or a derived class, we can
+      // use the fast method.
+      if (active_fe_index.empty() && !cells.empty() && mapping->size() == 1 &&
+          dynamic_cast<const MappingQGeneric<dim> *>(&mapping->operator[](0)))
+        compute_mapping_q(tria, cells, face_info.faces);
+      else
+        {
+          // Could call these functions in parallel, but not useful because
+          // the work inside is nicely split up already
+          initialize_cells(tria, cells, active_fe_index, *mapping);
+          initialize_faces(
+            tria, cells, face_info.faces, active_fe_index, *mapping);
+          initialize_faces_by_cells(tria, cells, *mapping);
+        }
+    }
+
+
+
+    template <int dim, typename Number, typename VectorizedArrayType>
+    void
+    MappingInfo<dim, Number, VectorizedArrayType>::update_mapping(
+      const dealii::Triangulation<dim> &                        tria,
+      const std::vector<std::pair<unsigned int, unsigned int>> &cells,
+      const FaceInfo<VectorizedArrayType::size()> &             face_info,
+      const std::vector<unsigned int> &                         active_fe_index,
+      const std::shared_ptr<dealii::hp::MappingCollection<dim>> &mapping)
+    {
+      AssertDimension(cells.size() / VectorizedArrayType::size(),
+                      cell_type.size());
+
+      for (auto &data : cell_data)
+        data.clear_data_fields();
+      for (auto &data : face_data)
+        data.clear_data_fields();
+      for (auto &data : face_data_by_cells)
+        data.clear_data_fields();
+
+      this->mapping_collection = mapping;
+      this->mapping            = &mapping->operator[](0);
+
+      if (active_fe_index.empty() && !cells.empty() && mapping->size() == 1 &&
+          dynamic_cast<const MappingQGeneric<dim> *>(&mapping->operator[](0)))
+        compute_mapping_q(tria, cells, face_info.faces);
+      else
+        {
+          // Could call these functions in parallel, but not useful because
+          // the work inside is nicely split up already
+          initialize_cells(tria, cells, active_fe_index, *mapping);
+          initialize_faces(
+            tria, cells, face_info.faces, active_fe_index, *mapping);
+          initialize_faces_by_cells(tria, cells, *mapping);
+        }
     }
 
 
 
     /* ------------------------- initialization of cells ------------------- */
+
+    // Copy a vectorized array of one type to another type
+    template <typename VectorizedArrayType1, typename VectorizedArrayType2>
+    inline DEAL_II_ALWAYS_INLINE void
+    store_vectorized_array(const VectorizedArrayType1 value,
+                           const unsigned int         offset,
+                           VectorizedArrayType2 &     result)
+    {
+      static_assert(VectorizedArrayType2::size() >=
+                      VectorizedArrayType1::size(),
+                    "Cannot convert to vectorized array of wider number type");
+
+      DEAL_II_OPENMP_SIMD_PRAGMA
+      for (unsigned int v = 0; v < VectorizedArrayType1::size(); ++v)
+        result[offset + v] = value[v];
+    }
+
+
 
     // Namespace with implementation of extraction of values on cell
     // range
@@ -303,53 +536,52 @@ namespace internal
 
 
 
-      template <int dim, typename Number>
+      template <int dim, typename Number, typename VectorizedArrayType>
       struct CompressedCellData
       {
         CompressedCellData(const double expected_size)
-          : data(FPArrayComparator<Number>(expected_size))
+          : data(FPArrayComparator<Number, VectorizedArrayType>(expected_size))
         {}
 
-        std::map<
-          Tensor<2,
-                 dim,
-                 Tensor<1, VectorizedArray<Number>::n_array_elements, Number>>,
-          unsigned int,
-          FPArrayComparator<Number>>
+        std::map<Tensor<2, dim, Tensor<1, VectorizedArrayType::size(), Number>>,
+                 unsigned int,
+                 FPArrayComparator<Number, VectorizedArrayType>>
           data;
       };
 
       /**
        * Internal temporary data used for the initialization.
        */
-      template <int dim, typename Number>
+      template <int dim, typename Number, typename VectorizedArrayType>
       struct LocalData
       {
         LocalData(const double jac_size);
         void
         resize(const unsigned int size);
 
-        AlignedVector<Point<dim, VectorizedArray<Number>>> quadrature_points;
-        AlignedVector<Tensor<2, dim, VectorizedArray<Number>>> general_jac;
-        AlignedVector<VectorizedArray<Number>>                 JxW_values;
-        AlignedVector<Tensor<3, dim, VectorizedArray<Number>>> general_jac_grad;
-        AlignedVector<Tensor<1, dim, VectorizedArray<Number>>> normal_vectors;
-        Tensor<2, dim, VectorizedArray<Number>>                const_jac;
-        const double                                           jac_size;
+        AlignedVector<Point<dim, VectorizedArrayType>>     quadrature_points;
+        AlignedVector<Tensor<2, dim, VectorizedArrayType>> general_jac;
+        AlignedVector<VectorizedArrayType>                 JxW_values;
+        AlignedVector<Tensor<3, dim, VectorizedArrayType>> general_jac_grad;
+        AlignedVector<Tensor<1, dim, VectorizedArrayType>> normal_vectors;
+        Tensor<2, dim, VectorizedArrayType>                const_jac;
+        const double                                       jac_size;
       };
 
 
 
-      template <int dim, typename Number>
-      LocalData<dim, Number>::LocalData(const double jac_size_in)
+      template <int dim, typename Number, typename VectorizedArrayType>
+      LocalData<dim, Number, VectorizedArrayType>::LocalData(
+        const double jac_size_in)
         : jac_size(jac_size_in)
       {}
 
 
 
-      template <int dim, typename Number>
+      template <int dim, typename Number, typename VectorizedArrayType>
       void
-      LocalData<dim, Number>::resize(const unsigned int size)
+      LocalData<dim, Number, VectorizedArrayType>::resize(
+        const unsigned int size)
       {
         if (JxW_values.size() != size)
           {
@@ -361,31 +593,94 @@ namespace internal
           }
       }
 
+      // For second derivatives on the real cell, we need the gradient of the
+      // inverse Jacobian J. This involves some calculus and is done
+      // vectorized. If L is the gradient of the jacobian on the unit cell,
+      // the gradient of the inverse is given by (multidimensional calculus) -
+      // J * (J * L) * J (the third J is because we need to transform the
+      // gradient L from the unit to the real cell, and then apply the inverse
+      // Jacobian). Compare this with 1D with j(x) = 1/k(phi(x)), where j =
+      // phi' is the inverse of the jacobian and k is the derivative of the
+      // jacobian on the unit cell. Then j' = phi' k'/k^2 = j k' j^2.
+      template <int dim, typename Number>
+      Tensor<1, dim *(dim + 1) / 2, Tensor<1, dim, Number>>
+      process_jacobian_gradient(const Tensor<2, dim, Number> &inv_jac,
+                                const Tensor<3, dim, Number> &jac_grad)
+      {
+        Number inv_jac_grad[dim][dim][dim];
+
+        // compute: inv_jac_grad = J*grad_unit(J^-1)
+        for (unsigned int d = 0; d < dim; ++d)
+          for (unsigned int e = 0; e < dim; ++e)
+            for (unsigned int f = 0; f < dim; ++f)
+              {
+                inv_jac_grad[f][e][d] = (inv_jac[f][0] * jac_grad[d][e][0]);
+                for (unsigned int g = 1; g < dim; ++g)
+                  inv_jac_grad[f][e][d] += (inv_jac[f][g] * jac_grad[d][e][g]);
+              }
+
+        // compute: transpose (-jac * jac_grad[d] * jac)
+        Number tmp[dim];
+        Number grad_jac_inv[dim][dim][dim];
+        for (unsigned int d = 0; d < dim; ++d)
+          for (unsigned int e = 0; e < dim; ++e)
+            {
+              for (unsigned int f = 0; f < dim; ++f)
+                {
+                  tmp[f] = Number();
+                  for (unsigned int g = 0; g < dim; ++g)
+                    tmp[f] -= inv_jac_grad[d][f][g] * inv_jac[g][e];
+                }
+
+              // needed for non-diagonal part of Jacobian grad
+              for (unsigned int f = 0; f < dim; ++f)
+                {
+                  grad_jac_inv[f][d][e] = inv_jac[f][0] * tmp[0];
+                  for (unsigned int g = 1; g < dim; ++g)
+                    grad_jac_inv[f][d][e] += inv_jac[f][g] * tmp[g];
+                }
+            }
+
+        Tensor<1, dim *(dim + 1) / 2, Tensor<1, dim, Number>> result;
+
+        // the diagonal part of Jacobian gradient comes first
+        for (unsigned int d = 0; d < dim; ++d)
+          for (unsigned int e = 0; e < dim; ++e)
+            result[d][e] = grad_jac_inv[d][d][e];
+
+        // then the upper-diagonal part
+        for (unsigned int d = 0, count = 0; d < dim; ++d)
+          for (unsigned int e = d + 1; e < dim; ++e, ++count)
+            for (unsigned int f = 0; f < dim; ++f)
+              result[dim + count][f] = grad_jac_inv[d][e][f];
+        return result;
+      }
+
       /**
        * Helper function called internally during the initialize function.
        */
-      template <int dim, typename Number>
+      template <int dim, typename VectorizedArrayType>
       void
-      evaluate_on_cell(
-        const dealii::Triangulation<dim> &           tria,
-        const std::pair<unsigned int, unsigned int> *cells,
-        const unsigned int                           my_q,
-        GeometryType &                               cell_t_prev,
-        GeometryType (&cell_t)[VectorizedArray<Number>::n_array_elements],
-        dealii::FEValues<dim, dim> &fe_val,
-        LocalData<dim, Number> &    cell_data)
+      evaluate_on_cell(const dealii::Triangulation<dim> &           tria,
+                       const std::pair<unsigned int, unsigned int> *cells,
+                       const unsigned int                           my_q,
+                       GeometryType &                               cell_t_prev,
+                       GeometryType *                               cell_t,
+                       dealii::FEValues<dim, dim> &                 fe_val,
+                       LocalData<dim,
+                                 typename VectorizedArrayType::value_type,
+                                 VectorizedArrayType> &             cell_data)
       {
         const unsigned int n_q_points   = fe_val.n_quadrature_points;
         const UpdateFlags  update_flags = fe_val.get_update_flags();
 
-        cell_data.const_jac = Tensor<2, dim, VectorizedArray<Number>>();
+        cell_data.const_jac = Tensor<2, dim, VectorizedArrayType>();
 
         // this should be the same value as used in HashValue::scaling (but we
         // not have that field here)
         const double zero_tolerance_double =
           cell_data.jac_size * std::numeric_limits<double>::epsilon() * 1024.;
-        for (unsigned int j = 0; j < VectorizedArray<Number>::n_array_elements;
-             ++j)
+        for (unsigned int j = 0; j < VectorizedArrayType::size(); ++j)
           {
             typename dealii::Triangulation<dim>::cell_iterator cell_it(
               &tria, cells[j].first, cells[j].second);
@@ -547,32 +842,28 @@ namespace internal
                             jacobian_grad[d][e][f];
                   }
               }
-          } // end loop over entries of vectorization (n_array_elements cells)
+          } // end loop over entries of vectorization (size() cells)
 
         // set information for next cell
-        cell_t_prev = cell_t[VectorizedArray<Number>::n_array_elements - 1];
+        cell_t_prev = cell_t[VectorizedArrayType::size() - 1];
       }
 
 
 
-      template <int dim, typename Number>
+      template <int dim, typename Number, typename VectorizedArrayType>
       void
       initialize_cell_range(
         const std::pair<unsigned int, unsigned int>               cell_range,
         const dealii::Triangulation<dim> &                        tria,
         const std::vector<std::pair<unsigned int, unsigned int>> &cells,
         const std::vector<unsigned int> &              active_fe_index,
-        const Mapping<dim> &                           mapping,
-        const std::vector<dealii::hp::QCollection<1>> &quad,
-        const UpdateFlags                              update_flags,
-        MappingInfo<dim, Number> &                     mapping_info,
-        std::pair<std::vector<MappingInfoStorage<dim, dim, Number>>,
-                  CompressedCellData<dim, Number>> &   data)
+        const dealii::hp::MappingCollection<dim> &     mapping,
+        MappingInfo<dim, Number, VectorizedArrayType> &mapping_info,
+        std::pair<std::vector<
+                    MappingInfoStorage<dim, dim, Number, VectorizedArrayType>>,
+                  CompressedCellData<dim, Number, VectorizedArrayType>> &data)
       {
         FE_Nothing<dim> dummy_fe;
-
-        Tensor<3, dim, VectorizedArray<Number>> jac_grad, grad_jac_inv;
-        Tensor<1, dim, VectorizedArray<Number>> tmp;
 
         // when we make comparisons about the size of Jacobians we need to
         // know the approximate size of typical entries in Jacobians. We need
@@ -587,55 +878,38 @@ namespace internal
         // we fill them up. Only after all vectorization_width cells have been
         // processed, we can insert the data into the data structures of this
         // class
-        LocalData<dim, Number> cell_data(jacobian_size);
+        LocalData<dim, Number, VectorizedArrayType> cell_data(jacobian_size);
 
         // encodes the cell types of the current cell. Since several cells
         // must be considered together, this variable holds the individual
         // info of the last chunk of cells
-        GeometryType cell_t[VectorizedArray<Number>::n_array_elements];
+        GeometryType cell_t[VectorizedArrayType::size()];
         GeometryType cell_t_prev = general;
 
         // fe_values object that is used to compute the mapping data. for
-        // the hp case there might be more than one finite element. since we
+        // the hp-case there might be more than one finite element. since we
         // manually select the active FE index and not via a
-        // hp::DoFHandler<dim>::active_cell_iterator, we need to manually
+        // DoFHandler<dim>::active_cell_iterator, we need to manually
         // select the correct finite element, so just hold a vector of
         // FEValues
         std::vector<std::vector<std::shared_ptr<dealii::FEValues<dim>>>>
           fe_values(mapping_info.cell_data.size());
+
+        const unsigned int max_active_fe_index =
+          active_fe_index.size() > 0 ?
+            *std::max_element(active_fe_index.begin(), active_fe_index.end()) :
+            0;
+
         for (unsigned int i = 0; i < fe_values.size(); ++i)
-          fe_values[i].resize(mapping_info.cell_data[i].descriptor.size());
-        UpdateFlags update_flags_feval =
+          fe_values[i].resize(max_active_fe_index + 1);
+        const UpdateFlags update_flags = mapping_info.update_flags_cells;
+        const UpdateFlags update_flags_feval =
           (update_flags & update_jacobians ? update_jacobians :
                                              update_default) |
           (update_flags & update_jacobian_grads ? update_jacobian_grads :
                                                   update_default) |
           (update_flags & update_quadrature_points ? update_quadrature_points :
                                                      update_default);
-
-        std::vector<std::vector<unsigned int>> n_q_points_1d(quad.size()),
-          step_size_cartesian(quad.size());
-        for (unsigned int my_q = 0; my_q < quad.size(); ++my_q)
-          {
-            n_q_points_1d[my_q].resize(quad[my_q].size());
-            step_size_cartesian[my_q].resize(quad[my_q].size());
-            for (unsigned int hpq = 0; hpq < quad[my_q].size(); ++hpq)
-              {
-                n_q_points_1d[my_q][hpq] = quad[my_q][hpq].size();
-
-                // To walk on the diagonal for lexicographic ordering, we have
-                // to jump one index ahead in each direction. For direction 0,
-                // this is just the next point, for direction 1, it means adding
-                // n_q_points_1d, and so on.
-                step_size_cartesian[my_q][hpq] = 0;
-                unsigned int factor            = 1;
-                for (unsigned int d = 0; d < dim; ++d)
-                  {
-                    step_size_cartesian[my_q][hpq] += factor;
-                    factor *= n_q_points_1d[my_q][hpq];
-                  }
-              }
-          }
 
         const unsigned int end_cell = std::min(mapping_info.cell_type.size(),
                                                std::size_t(cell_range.second));
@@ -650,18 +924,27 @@ namespace internal
               // fill this data in
               const unsigned int fe_index =
                 active_fe_index.size() > 0 ? active_fe_index[cell] : 0;
-              const unsigned int n_q_points =
-                mapping_info.cell_data[my_q].descriptor[fe_index].n_q_points;
+              const unsigned int hp_quad_index =
+                mapping_info.cell_data[my_q].descriptor.size() == 1 ? 0 :
+                                                                      fe_index;
+              const unsigned int hp_mapping_index =
+                mapping.size() == 1 ? 0 : fe_index;
+              const unsigned int n_q_points = mapping_info.cell_data[my_q]
+                                                .descriptor[hp_quad_index]
+                                                .n_q_points;
               if (fe_values[my_q][fe_index].get() == nullptr)
-                fe_values[my_q][fe_index].reset(new dealii::FEValues<dim>(
-                  mapping,
-                  dummy_fe,
-                  mapping_info.cell_data[my_q].descriptor[fe_index].quadrature,
-                  update_flags_feval));
+                fe_values[my_q][fe_index] =
+                  std::make_shared<dealii::FEValues<dim>>(
+                    mapping[hp_mapping_index],
+                    dummy_fe,
+                    mapping_info.cell_data[my_q]
+                      .descriptor[hp_quad_index]
+                      .quadrature,
+                    update_flags_feval);
               dealii::FEValues<dim> &fe_val = *fe_values[my_q][fe_index];
               cell_data.resize(n_q_points);
 
-              // if the fe index has changed from the previous cell, set the
+              // if the FE index has changed from the previous cell, set the
               // old cell type to invalid (otherwise, we might detect
               // similarity due to some cells further ahead)
               if (my_q > 0)
@@ -670,14 +953,13 @@ namespace internal
                        active_fe_index[cell] != active_fe_index[cell - 1])
                 cell_t_prev = general;
 
-              evaluate_on_cell(
-                tria,
-                &cells[cell * VectorizedArray<Number>::n_array_elements],
-                my_q,
-                cell_t_prev,
-                cell_t,
-                fe_val,
-                cell_data);
+              evaluate_on_cell(tria,
+                               &cells[cell * VectorizedArrayType::size()],
+                               my_q,
+                               cell_t_prev,
+                               cell_t,
+                               fe_val,
+                               cell_data);
 
               // now reorder the data into vectorized types. if we are here
               // for the first time, we need to find out whether the Jacobian
@@ -689,9 +971,7 @@ namespace internal
                   // find the most general cell type (most general type is 3
                   // (general cell))
                   GeometryType most_general_type = cartesian;
-                  for (unsigned int j = 0;
-                       j < VectorizedArray<Number>::n_array_elements;
-                       ++j)
+                  for (unsigned int j = 0; j < VectorizedArrayType::size(); ++j)
                     if (cell_t[j] > most_general_type)
                       most_general_type = cell_t[j];
                   AssertIndexRange(most_general_type, 4U);
@@ -717,9 +997,7 @@ namespace internal
                       std::pair<
                         Tensor<2,
                                dim,
-                               Tensor<1,
-                                      VectorizedArray<Number>::n_array_elements,
-                                      Number>>,
+                               Tensor<1, VectorizedArrayType::size(), Number>>,
                         unsigned int>
                         new_entry;
                       // This number overlaps with the general data but we
@@ -729,7 +1007,7 @@ namespace internal
                       for (unsigned int d = 0; d < dim; ++d)
                         for (unsigned int e = 0; e < dim; ++e)
                           for (unsigned int v = 0;
-                               v < VectorizedArray<Number>::n_array_elements;
+                               v < VectorizedArrayType::size();
                                ++v)
                             new_entry.first[d][e][v] =
                               cell_data.const_jac[d][e][v];
@@ -750,12 +1028,11 @@ namespace internal
                 {
                   for (unsigned int q = 0; q < n_q_points; ++q)
                     {
-                      Tensor<2, dim, VectorizedArray<Number>> &jac =
+                      Tensor<2, dim, VectorizedArrayType> &jac =
                         cell_data.general_jac[q];
-                      Tensor<3, dim, VectorizedArray<Number>> &jacobian_grad =
+                      Tensor<3, dim, VectorizedArrayType> &jacobian_grad =
                         cell_data.general_jac_grad[q];
-                      for (unsigned int j = 0;
-                           j < VectorizedArray<Number>::n_array_elements;
+                      for (unsigned int j = 0; j < VectorizedArrayType::size();
                            ++j)
                         if (cell_t[j] < general)
                           {
@@ -770,115 +1047,51 @@ namespace internal
 
                       data.first[my_q].JxW_values.push_back(
                         determinant(jac) * fe_val.get_quadrature().weight(q));
-                      Tensor<2, dim, VectorizedArray<Number>> inv_jac =
+                      Tensor<2, dim, VectorizedArrayType> inv_jac =
                         transpose(invert(jac));
                       data.first[my_q].jacobians[0].push_back(inv_jac);
 
                       if (update_flags & update_jacobian_grads)
-                        {
-                          // for second derivatives on the real cell, need
-                          // also the gradient of the inverse Jacobian J. This
-                          // involves some calculus and is done
-                          // vectorized. This is very cheap compared to what
-                          // fe_values does (in early 2011). If L is the
-                          // gradient of the jacobian on the unit cell, the
-                          // gradient of the inverse is given by
-                          // (multidimensional calculus) - J * (J * L) * J
-                          // (the third J is because we need to transform the
-                          // gradient L from the unit to the real cell, and
-                          // then apply the inverse Jacobian). Compare this
-                          // with 1D with j(x) = 1/k(phi(x)), where j = phi'
-                          // is the inverse of the jacobian and k is the
-                          // derivative of the jacobian on the unit cell. Then
-                          // j' = phi' k'/k^2 = j k' j^2.
-
-                          // compute: jac_grad = J*grad_unit(J^-1)
-                          for (unsigned int d = 0; d < dim; ++d)
-                            for (unsigned int e = 0; e < dim; ++e)
-                              for (unsigned int f = 0; f < dim; ++f)
-                                {
-                                  jac_grad[f][e][d] =
-                                    (inv_jac[f][0] * jacobian_grad[d][e][0]);
-                                  for (unsigned int g = 1; g < dim; ++g)
-                                    jac_grad[f][e][d] +=
-                                      (inv_jac[f][g] * jacobian_grad[d][e][g]);
-                                }
-
-                          // compute: transpose (-jac * jac_grad[d] * jac)
-                          for (unsigned int d = 0; d < dim; ++d)
-                            for (unsigned int e = 0; e < dim; ++e)
-                              {
-                                for (unsigned int f = 0; f < dim; ++f)
-                                  {
-                                    tmp[f] = VectorizedArray<Number>();
-                                    for (unsigned int g = 0; g < dim; ++g)
-                                      tmp[f] -=
-                                        jac_grad[d][f][g] * inv_jac[g][e];
-                                  }
-
-                                // needed for non-diagonal part of Jacobian
-                                // grad
-                                for (unsigned int f = 0; f < dim; ++f)
-                                  {
-                                    grad_jac_inv[f][d][e] =
-                                      inv_jac[f][0] * tmp[0];
-                                    for (unsigned int g = 1; g < dim; ++g)
-                                      grad_jac_inv[f][d][e] +=
-                                        inv_jac[f][g] * tmp[g];
-                                  }
-                              }
-
-                          // the diagonal part of Jacobian gradient comes first
-                          Tensor<1,
-                                 dim *(dim + 1) / 2,
-                                 Tensor<1, dim, VectorizedArray<Number>>>
-                            final_grad;
-                          for (unsigned int d = 0; d < dim; ++d)
-                            for (unsigned int e = 0; e < dim; ++e)
-                              final_grad[d][e] = grad_jac_inv[d][d][e];
-
-                          // then the upper-diagonal part
-                          for (unsigned int d = 0, count = 0; d < dim; ++d)
-                            for (unsigned int e = d + 1; e < dim; ++e, ++count)
-                              for (unsigned int f = 0; f < dim; ++f)
-                                final_grad[dim + count][f] =
-                                  grad_jac_inv[d][e][f];
-                          data.first[my_q].jacobian_gradients[0].push_back(
-                            final_grad);
-                        }
+                        data.first[my_q].jacobian_gradients[0].push_back(
+                          process_jacobian_gradient(inv_jac, jacobian_grad));
                     }
                 }
 
               if (update_flags & update_quadrature_points)
                 {
                   // eventually we turn to the quadrature points that we can
-                  // compress in case we have Cartesian cells. we also need to
+                  // compress in case we have affine cells. we also need to
                   // reorder them into arrays of vectorized data types.  first
                   // go through the cells and find out how much memory we need
                   // to allocate for the quadrature points. We store
-                  // n_q_points for all cells but Cartesian cells. For
-                  // Cartesian cells, only need to store the values on a
-                  // diagonal through the cell (n_q_points_1d). This will give
-                  // (with some little indexing) the location of all
-                  // quadrature points.
+                  // n_q_points for general cells and a single value for
+                  // Cartesian and affine cells (the position of the (0,0)
+                  // point from the reference coordinates)
                   const unsigned int old_size =
                     data.first[my_q].quadrature_points.size();
                   data.first[my_q].quadrature_point_offsets.push_back(old_size);
 
-                  if (mapping_info.get_cell_type(cell) == cartesian)
+                  if (mapping_info.get_cell_type(cell) < general)
                     {
-                      for (unsigned int q = 0;
-                           q < n_q_points_1d[my_q][fe_index];
-                           ++q)
+                      Point<dim, VectorizedArrayType> quad_point;
+                      for (unsigned int v = 0; v < VectorizedArrayType::size();
+                           ++v)
                         {
-                          Point<dim, VectorizedArray<Number>> quad_point;
+                          typename dealii::Triangulation<dim>::cell_iterator
+                            cell_it(
+                              &tria,
+                              cells[cell * VectorizedArrayType::size() + v]
+                                .first,
+                              cells[cell * VectorizedArrayType::size() + v]
+                                .second);
+                          const Point<dim> p =
+                            mapping[hp_mapping_index]
+                              .transform_unit_to_real_cell(cell_it,
+                                                           Point<dim>());
                           for (unsigned int d = 0; d < dim; ++d)
-                            quad_point[d] =
-                              cell_data.quadrature_points
-                                [q * step_size_cartesian[my_q][fe_index]][d];
-                          data.first[my_q].quadrature_points.push_back(
-                            quad_point);
+                            quad_point[d][v] = p[d];
                         }
+                      data.first[my_q].quadrature_points.push_back(quad_point);
                     }
                   else
                     {
@@ -916,14 +1129,19 @@ namespace internal
 
 
 
-      template <int structdim, int dim, typename Number>
+      template <int structdim,
+                int dim,
+                typename Number,
+                typename VectorizedArrayType>
       void
-      copy_data(const unsigned int                          first_cell,
-                const std::array<std::size_t, 2> &          data_shift,
-                const std::vector<unsigned int> &           indices_compressed,
-                const std::vector<GeometryType> &           cell_type,
-                MappingInfoStorage<structdim, dim, Number> &data_cells_local,
-                MappingInfoStorage<structdim, dim, Number> &data_cells)
+      copy_data(const unsigned int                first_cell,
+                const std::array<std::size_t, 2> &data_shift,
+                const std::vector<unsigned int> & indices_compressed,
+                const std::vector<GeometryType> & cell_type,
+                MappingInfoStorage<structdim, dim, Number, VectorizedArrayType>
+                  &data_cells_local,
+                MappingInfoStorage<structdim, dim, Number, VectorizedArrayType>
+                  &data_cells)
       {
         // Copy the index offsets and shift by the appropriate value
         for (unsigned int lcell = 0;
@@ -932,8 +1150,10 @@ namespace internal
           {
             const unsigned int cell = lcell + first_cell;
             data_cells.data_index_offsets[cell] =
-              cell_type[cell] <= static_cast<unsigned int>(affine) ?
-                indices_compressed[data_cells_local.data_index_offsets[lcell]] :
+              cell_type[cell] <= affine ?
+                (dim == structdim ? 2 : 1) *
+                  indices_compressed[data_cells_local
+                                       .data_index_offsets[lcell]] :
                 data_cells_local.data_index_offsets[lcell] + data_shift[0];
             if (data_cells_local.quadrature_point_offsets.size() > lcell)
               data_cells.quadrature_point_offsets[cell] =
@@ -944,9 +1164,9 @@ namespace internal
         // Copy quadrature points
         if (data_cells.quadrature_point_offsets.empty() == false)
           {
-            Point<dim, VectorizedArray<Number>> *out_point =
+            Point<dim, VectorizedArrayType> *out_point =
               &data_cells.quadrature_points[data_shift[1]];
-            for (const Point<dim, VectorizedArray<Number>> *point =
+            for (const Point<dim, VectorizedArrayType> *point =
                    data_cells_local.quadrature_points.begin();
                  point != data_cells_local.quadrature_points.end();
                  ++point, ++out_point)
@@ -985,55 +1205,353 @@ namespace internal
           }
       }
 
+
+
+      /**
+       * This invokes the FEValues part of the initialization of MappingQ,
+       * storing the resulting quadrature points and an initial representation
+       * of Jacobians in two arrays.
+       */
+      template <int dim>
+      void
+      mapping_q_query_fe_values(
+        const unsigned int                                        begin_cell,
+        const unsigned int                                        end_cell,
+        const MappingQGeneric<dim> &                              mapping_q,
+        const dealii::Triangulation<dim> &                        tria,
+        const std::vector<std::pair<unsigned int, unsigned int>> &cell_array,
+        const double                                              jacobian_size,
+        std::vector<GeometryType> &preliminary_cell_type,
+        AlignedVector<double> &    plain_quadrature_points,
+        AlignedVector<std::array<Tensor<2, dim>, dim + 1>>
+          &jacobians_on_stencil)
+      {
+        if (begin_cell == end_cell)
+          return;
+
+        const unsigned int mapping_degree = mapping_q.get_degree();
+        FE_Nothing<dim>    dummy_fe;
+        QGaussLobatto<dim> quadrature(mapping_degree + 1);
+        const unsigned int n_mapping_points =
+          Utilities::pow(mapping_degree + 1, dim);
+
+        FEValues<dim> fe_values(mapping_q,
+                                dummy_fe,
+                                quadrature,
+                                update_quadrature_points | update_jacobians);
+
+        for (unsigned int cell = begin_cell; cell < end_cell; ++cell)
+          {
+            typename dealii::Triangulation<dim>::cell_iterator cell_it(
+              &tria, cell_array[cell].first, cell_array[cell].second);
+            fe_values.reinit(cell_it);
+            for (unsigned int d = 0; d < dim; ++d)
+              for (unsigned int q = 0; q < n_mapping_points; ++q)
+                plain_quadrature_points[(cell * dim + d) * n_mapping_points +
+                                        q] = fe_values.quadrature_point(q)[d];
+
+            // store the first, second, n-th and n^2-th one along a
+            // stencil-like pattern
+            std::array<Tensor<2, dim, double>, dim + 1> &my_jacobians =
+              jacobians_on_stencil[cell];
+            my_jacobians[0] = Tensor<2, dim, double>(fe_values.jacobian(0));
+            for (unsigned int d = 0, skip = 1; d < dim;
+                 ++d, skip *= (mapping_degree + 1))
+              my_jacobians[1 + d] =
+                Tensor<2, dim, double>(fe_values.jacobian(skip));
+
+            // check whether cell is Cartesian/affine/general
+            GeometryType type = cartesian;
+            for (unsigned int d = 0; d < dim; ++d)
+              for (unsigned int e = 0; e < dim; ++e)
+                if (d != e)
+                  if (std::abs(my_jacobians[0][d][e]) > 1e-12 * jacobian_size)
+                    type = affine;
+
+            for (unsigned int q = 1; q < n_mapping_points; ++q)
+              for (unsigned int d = 0; d < dim; ++d)
+                for (unsigned int e = 0; e < dim; ++e)
+                  if (std::abs(fe_values.jacobian(q)[d][e] -
+                               fe_values.jacobian(0)[d][e]) >
+                      1e-12 * jacobian_size)
+                    {
+                      type = general;
+                      goto endloop;
+                    }
+          endloop:
+            preliminary_cell_type[cell] = type;
+          }
+      }
+
+
+
+      template <int dim>
+      std::vector<unsigned int>
+      mapping_q_find_compression(
+        const double jacobian_size,
+        const AlignedVector<std::array<Tensor<2, dim>, dim + 1>>
+          &                          jacobians_on_stencil,
+        const unsigned int           n_mapping_points,
+        const AlignedVector<double> &plain_quadrature_points,
+        std::vector<GeometryType> &  preliminary_cell_type)
+      {
+        std::vector<unsigned int> cell_data_index(jacobians_on_stencil.size());
+
+        // we include a map to store some compressed information about the
+        // Jacobians which we collect by a stencil-like pattern around the
+        // first quadrature point on the cell - we use a relatively coarse
+        // tolerance to account for some inaccuracies in the manifold
+        // evaluation
+        const FPArrayComparator<double> comparator(1e4 * jacobian_size);
+        std::map<std::array<Tensor<2, dim>, dim + 1>,
+                 unsigned int,
+                 FPArrayComparator<double>>
+          compressed_jacobians(comparator);
+
+        unsigned int n_data_buckets = 0;
+        for (unsigned int cell = 0; cell < jacobians_on_stencil.size(); ++cell)
+          {
+            // check in the map for the index of this cell
+            auto inserted = compressed_jacobians.insert(
+              std::make_pair(jacobians_on_stencil[cell], cell));
+            bool add_this_cell = inserted.second;
+            if (inserted.second == false)
+              {
+                // check if the found duplicate really is a translation and
+                // the similarity identified by the map is not by accident
+                double        max_distance = 0;
+                const double *ptr_origin =
+                  plain_quadrature_points.data() +
+                  inserted.first->second * dim * n_mapping_points;
+                const double *ptr_mine = plain_quadrature_points.data() +
+                                         cell * dim * n_mapping_points;
+                for (unsigned int d = 0; d < dim; ++d)
+                  {
+                    const double translate_d =
+                      ptr_origin[d * n_mapping_points] -
+                      ptr_mine[d * n_mapping_points];
+                    for (unsigned int q = 1; q < n_mapping_points; ++q)
+                      max_distance =
+                        std::max(std::abs(ptr_origin[d * n_mapping_points + q] -
+                                          ptr_mine[d * n_mapping_points + q] -
+                                          translate_d),
+                                 max_distance);
+                  }
+
+                // this is not a duplicate, must add it again
+                if (max_distance > 1e-10 * jacobian_size)
+                  add_this_cell = true;
+              }
+            if (add_this_cell)
+              cell_data_index[cell] = n_data_buckets++;
+            else
+              {
+                cell_data_index[cell] = cell_data_index[inserted.first->second];
+                // make sure that the cell type is the same as in the original
+                // field, despite possible small differences due to roundoff
+                // and the tolerances we use
+                preliminary_cell_type[cell] =
+                  preliminary_cell_type[inserted.first->second];
+              }
+          }
+        return cell_data_index;
+      }
+
+
+      /**
+       * This evaluates the mapping information on a range of cells calling
+       * into the tensor product interpolators of the matrix-free framework,
+       * using a polynomial expansion of the cell geometry in terms of
+       * MappingQ.
+       */
+      template <int dim,
+                typename Number,
+                typename VectorizedArrayType,
+                typename VectorizedDouble>
+      void
+      mapping_q_compute_range(
+        const unsigned int                 begin_cell,
+        const unsigned int                 end_cell,
+        const std::vector<GeometryType> &  cell_type,
+        const std::vector<bool> &          process_cell,
+        const UpdateFlags                  update_flags_cells,
+        const AlignedVector<double> &      plain_quadrature_points,
+        const ShapeInfo<VectorizedDouble> &shape_info,
+        MappingInfoStorage<dim, dim, Number, VectorizedArrayType> &my_data)
+      {
+        constexpr unsigned int n_lanes   = VectorizedArrayType::size();
+        constexpr unsigned int n_lanes_d = VectorizedDouble::size();
+
+        const unsigned int n_q_points = my_data.descriptor[0].n_q_points;
+        const unsigned int n_mapping_points =
+          shape_info.dofs_per_component_on_cell;
+        constexpr unsigned int hess_dim = dim * (dim + 1) / 2;
+
+        AlignedVector<VectorizedDouble> cell_points(dim * n_mapping_points);
+        AlignedVector<VectorizedDouble> cell_quads(dim * n_q_points);
+        AlignedVector<VectorizedDouble> cell_grads(dim * dim * n_q_points);
+        AlignedVector<VectorizedDouble> cell_grad_grads(dim * hess_dim *
+                                                        n_q_points);
+        AlignedVector<VectorizedDouble> scratch_data(
+          dim * (2 * n_q_points + 3 * n_mapping_points));
+
+        for (unsigned int cell = begin_cell; cell < end_cell; ++cell)
+          for (unsigned vv = 0; vv < n_lanes; vv += n_lanes_d)
+            {
+              if (cell_type[cell] > affine || process_cell[cell])
+                {
+                  unsigned int start_indices[n_lanes_d];
+                  for (unsigned int v = 0; v < n_lanes_d; ++v)
+                    start_indices[v] =
+                      (cell * n_lanes + vv + v) * n_mapping_points * dim;
+                  vectorized_load_and_transpose(n_mapping_points * dim,
+                                                plain_quadrature_points.data(),
+                                                start_indices,
+                                                cell_points.data());
+
+                  FEEvaluationFactory<dim, double, VectorizedDouble>::evaluate(
+                    dim,
+                    EvaluationFlags::values | EvaluationFlags::gradients |
+                      (update_flags_cells & update_jacobian_grads ?
+                         EvaluationFlags::hessians :
+                         EvaluationFlags::nothing),
+                    shape_info,
+                    cell_points.data(),
+                    cell_quads.data(),
+                    cell_grads.data(),
+                    cell_grad_grads.data(),
+                    scratch_data.data());
+                }
+              if (update_flags_cells & update_quadrature_points)
+                {
+                  Point<dim, VectorizedArrayType> *quadrature_points =
+                    my_data.quadrature_points.data() +
+                    my_data.quadrature_point_offsets[cell];
+                  if (cell_type[cell] <= affine)
+                    for (unsigned int d = 0; d < dim; ++d)
+                      for (unsigned int v = 0; v < n_lanes_d; ++v)
+                        quadrature_points[0][d][vv + v] =
+                          plain_quadrature_points
+                            [(dim * (cell * n_lanes + vv + v) + d) *
+                             n_mapping_points];
+                  else
+                    for (unsigned int d = 0; d < dim; ++d)
+                      for (unsigned int q = 0; q < n_q_points; ++q)
+                        store_vectorized_array(cell_quads[q + d * n_q_points],
+                                               vv,
+                                               quadrature_points[q][d]);
+                }
+
+              const unsigned int n_points =
+                cell_type[cell] <= affine ? 1 : n_q_points;
+              if (process_cell[cell])
+                for (unsigned int q = 0; q < n_points; ++q)
+                  {
+                    const unsigned int idx =
+                      my_data.data_index_offsets[cell] + q;
+                    Tensor<2, dim, VectorizedDouble> jac;
+                    for (unsigned int d = 0; d < dim; ++d)
+                      for (unsigned int e = 0; e < dim; ++e)
+                        jac[d][e] = cell_grads[q + (d * dim + e) * n_q_points];
+
+                    // eliminate roundoff errors
+                    if (cell_type[cell] == cartesian)
+                      for (unsigned int d = 0; d < dim; ++d)
+                        for (unsigned int e = 0; e < dim; ++e)
+                          if (d != e)
+                            jac[d][e] = 0.;
+
+                    const VectorizedDouble jac_det = determinant(jac);
+                    const Tensor<2, dim, VectorizedDouble> inv_jac =
+                      transpose(invert(jac));
+
+                    if (cell_type[cell] <= affine)
+                      {
+                        store_vectorized_array(jac_det,
+                                               vv,
+                                               my_data.JxW_values[idx]);
+
+                        for (unsigned int d = 0; d < dim; ++d)
+                          for (unsigned int e = 0; e < dim; ++e)
+                            store_vectorized_array(
+                              jac[d][e],
+                              vv,
+                              my_data.jacobians[0][idx + 1][d][e]);
+                      }
+                    else
+                      {
+                        const double weight =
+                          my_data.descriptor[0].quadrature.weight(q);
+                        store_vectorized_array(jac_det * weight,
+                                               vv,
+                                               my_data.JxW_values[idx]);
+                      }
+                    for (unsigned int d = 0; d < dim; ++d)
+                      for (unsigned int e = 0; e < dim; ++e)
+                        store_vectorized_array(inv_jac[d][e],
+                                               vv,
+                                               my_data.jacobians[0][idx][d][e]);
+
+                    if (update_flags_cells & update_jacobian_grads &&
+                        cell_type[cell] > affine)
+                      {
+                        Tensor<3, dim, VectorizedDouble> jac_grad;
+                        for (unsigned int d = 0; d < dim; ++d)
+                          {
+                            for (unsigned int e = 0; e < dim; ++e)
+                              jac_grad[d][e][e] =
+                                cell_grad_grads[q + (d * hess_dim + e) *
+                                                      n_q_points];
+                            for (unsigned int c = dim, e = 0; e < dim; ++e)
+                              for (unsigned int f = e + 1; f < dim; ++f, ++c)
+                                jac_grad[d][e][f] = jac_grad[d][f][e] =
+                                  cell_grad_grads[q + (d * hess_dim + c) *
+                                                        n_q_points];
+                            const auto inv_jac_grad =
+                              process_jacobian_gradient(inv_jac, jac_grad);
+                            for (unsigned int d = 0; d < hess_dim; ++d)
+                              for (unsigned int e = 0; e < dim; ++e)
+                                store_vectorized_array(
+                                  inv_jac_grad[d][e],
+                                  vv,
+                                  my_data.jacobian_gradients[0][idx][d][e]);
+                          }
+                      }
+                  }
+            }
+      }
+
     } // namespace ExtractCellHelper
 
 
 
-    template <int dim, typename Number>
+    template <int dim, typename Number, typename VectorizedArrayType>
     void
-    MappingInfo<dim, Number>::initialize_cells(
+    MappingInfo<dim, Number, VectorizedArrayType>::initialize_cells(
       const dealii::Triangulation<dim> &                        tria,
       const std::vector<std::pair<unsigned int, unsigned int>> &cells,
       const std::vector<unsigned int> &                         active_fe_index,
-      const Mapping<dim> &                                      mapping,
-      const std::vector<dealii::hp::QCollection<1>> &           quad,
-      const UpdateFlags update_flags_input)
+      const dealii::hp::MappingCollection<dim> &                mapping)
     {
-      const unsigned int n_quads = quad.size();
       const unsigned int n_cells = cells.size();
-      const unsigned int vectorization_width =
-        VectorizedArray<Number>::n_array_elements;
-      Assert(n_cells % vectorization_width == 0, ExcInternalError());
-      const unsigned int n_macro_cells = n_cells / vectorization_width;
-      cell_data.resize(n_quads);
-      cell_type.resize(n_macro_cells);
+      const unsigned int n_lanes = VectorizedArrayType::size();
+      Assert(n_cells % n_lanes == 0, ExcInternalError());
+      const unsigned int n_cell_batches = n_cells / n_lanes;
+      cell_type.resize(n_cell_batches);
 
-      // dummy FE that is used to set up an FEValues object. Do not need the
-      // actual finite element because we will only evaluate quantities for
-      // the mapping that are independent of the FE
-      UpdateFlags update_flags = compute_update_flags(update_flags_input, quad);
-
-      for (unsigned int my_q = 0; my_q < n_quads; ++my_q)
-        {
-          const unsigned int n_hp_quads = quad[my_q].size();
-          AssertIndexRange(0, n_hp_quads);
-          cell_data[my_q].descriptor.resize(n_hp_quads);
-          for (unsigned int q = 0; q < n_hp_quads; ++q)
-            cell_data[my_q].descriptor[q].initialize(quad[my_q][q],
-                                                     update_default);
-        }
-
-      if (n_macro_cells == 0)
+      if (n_cell_batches == 0)
         return;
 
       // Create as many chunks of cells as we have threads and spawn the work
       unsigned int work_per_chunk =
         std::max(8U,
-                 (n_macro_cells + MultithreadInfo::n_threads() - 1) /
+                 (n_cell_batches + MultithreadInfo::n_threads() - 1) /
                    MultithreadInfo::n_threads());
 
-      std::vector<std::pair<std::vector<MappingInfoStorage<dim, dim, Number>>,
-                            ExtractCellHelper::CompressedCellData<dim, Number>>>
+      std::vector<std::pair<
+        std::vector<MappingInfoStorage<dim, dim, Number, VectorizedArrayType>>,
+        ExtractCellHelper::
+          CompressedCellData<dim, Number, VectorizedArrayType>>>
         data_cells_local;
       // Reserve enough space to avoid re-allocation (which would break the
       // references to the data fields passed to the tasks!)
@@ -1042,21 +1560,23 @@ namespace internal
       {
         Threads::TaskGroup<>                  tasks;
         std::pair<unsigned int, unsigned int> cell_range(0U, work_per_chunk);
-        while (cell_range.first < n_macro_cells)
+        while (cell_range.first < n_cell_batches)
           {
             data_cells_local.push_back(std::make_pair(
-              std::vector<MappingInfoStorage<dim, dim, Number>>(n_quads),
-              ExtractCellHelper::CompressedCellData<dim, Number>(
-                ExtractCellHelper::get_jacobian_size(tria))));
+              std::vector<
+                MappingInfoStorage<dim, dim, Number, VectorizedArrayType>>(
+                cell_data.size()),
+              ExtractCellHelper::
+                CompressedCellData<dim, Number, VectorizedArrayType>(
+                  ExtractCellHelper::get_jacobian_size(tria))));
             tasks += Threads::new_task(
-              &ExtractCellHelper::initialize_cell_range<dim, Number>,
+              &ExtractCellHelper::
+                initialize_cell_range<dim, Number, VectorizedArrayType>,
               cell_range,
               tria,
               cells,
               active_fe_index,
               mapping,
-              quad,
-              update_flags,
               *this,
               data_cells_local.back());
             cell_range.first = cell_range.second;
@@ -1084,7 +1604,7 @@ namespace internal
           cell_data[my_q].data_index_offsets.resize(cell_type.size());
           std::vector<std::array<std::size_t, 2>> shift(
             data_cells_local.size());
-          shift[0][0] = n_constant_jacobians;
+          shift[0][0] = 2 * n_constant_jacobians;
           shift[0][1] = 0;
           for (unsigned int i = 1; i < data_cells_local.size(); ++i)
             {
@@ -1100,10 +1620,10 @@ namespace internal
             data_cells_local.back().first[my_q].JxW_values.size());
           cell_data[my_q].jacobians[0].resize_fast(
             cell_data[my_q].JxW_values.size());
-          if (update_flags & update_jacobian_grads)
+          if (update_flags_cells & update_jacobian_grads)
             cell_data[my_q].jacobian_gradients[0].resize_fast(
               cell_data[my_q].JxW_values.size());
-          if (update_flags & update_quadrature_points)
+          if (update_flags_cells & update_quadrature_points)
             {
               cell_data[my_q].quadrature_point_offsets.resize(cell_type.size());
               cell_data[my_q].quadrature_points.resize_fast(
@@ -1114,39 +1634,45 @@ namespace internal
           // Start tasks that copy the local data
           Threads::TaskGroup<> tasks;
           for (unsigned int i = 0; i < data_cells_local.size(); ++i)
-            tasks +=
-              Threads::new_task(&ExtractCellHelper::copy_data<dim, dim, Number>,
-                                work_per_chunk * i,
-                                shift[i],
-                                indices_compressed[i],
-                                cell_type,
-                                data_cells_local[i].first[my_q],
-                                cell_data[my_q]);
+            tasks += Threads::new_task(
+              &ExtractCellHelper::
+                copy_data<dim, dim, Number, VectorizedArrayType>,
+              work_per_chunk * i,
+              shift[i],
+              indices_compressed[i],
+              cell_type,
+              data_cells_local[i].first[my_q],
+              cell_data[my_q]);
 
           // finally, insert the constant cell data at the beginning (the
-          // other tasks can already start copying the non-constant data)
+          // other tasks can already start copying the non-constant
+          // data). Note that we use two slots for the constant data to
+          // accommodate for both the inverse transposed Jacobian (that we
+          // need for derivatives) and the Jacobian (that we need for
+          // quadrature points)
           if (my_q == 0)
             {
               for (const auto &it : data_cells_local[0].second.data)
                 {
-                  Tensor<2, dim, VectorizedArray<Number>> jac;
+                  Tensor<2, dim, VectorizedArrayType> jac;
                   for (unsigned int d = 0; d < dim; ++d)
                     for (unsigned int e = 0; e < dim; ++e)
-                      for (unsigned int v = 0;
-                           v < VectorizedArray<Number>::n_array_elements;
+                      for (unsigned int v = 0; v < VectorizedArrayType::size();
                            ++v)
                         jac[d][e][v] = it.first[d][e][v];
                   AssertIndexRange(it.second, n_constant_jacobians);
-                  const std::size_t index           = it.second;
-                  cell_data[my_q].JxW_values[index] = determinant(jac);
+                  const std::size_t index               = it.second;
+                  cell_data[my_q].JxW_values[2 * index] = determinant(jac);
                   // invert and transpose jac
-                  cell_data[my_q].jacobians[0][index] = transpose(invert(jac));
+                  cell_data[my_q].jacobians[0][2 * index] =
+                    transpose(invert(jac));
+                  cell_data[my_q].jacobians[0][2 * index + 1] = jac;
                   // second derivative of transformation is zero on affine cells
                 }
             }
           else
             {
-              for (unsigned int i = 0; i < n_constant_jacobians; ++i)
+              for (unsigned int i = 0; i < 2 * n_constant_jacobians; ++i)
                 {
                   cell_data[my_q].JxW_values[i] = cell_data[0].JxW_values[i];
                   cell_data[my_q].jacobians[0][i] =
@@ -1167,7 +1693,7 @@ namespace internal
     // range
     namespace ExtractFaceHelper
     {
-      template <int dim, typename Number>
+      template <int dim, typename Number, typename VectorizedArrayType>
       struct CompressedFaceData
       {
         // Constructor. As a scaling factor for the FPArrayComparator, we
@@ -1175,7 +1701,8 @@ namespace internal
         // CompressedCellData) and add another factor of 512 to account for
         // some roundoff effects.
         CompressedFaceData(const Number jacobian_size)
-          : data(FPArrayComparator<Number>(512. / jacobian_size))
+          : data(FPArrayComparator<Number, VectorizedArrayType>(512. /
+                                                                jacobian_size))
           , jacobian_size(jacobian_size)
         {}
 
@@ -1185,12 +1712,11 @@ namespace internal
         // (inner tensor). We cannot choose a VectorizedArray type directly
         // because std::map does not provide the necessary alignment upon
         // memory allocation.
-        std::map<
-          Tensor<1,
-                 2 * dim * dim + dim + 1,
-                 Tensor<1, VectorizedArray<Number>::n_array_elements, Number>>,
-          unsigned int,
-          FPArrayComparator<Number>>
+        std::map<Tensor<1,
+                        2 * dim * dim + dim + 1,
+                        Tensor<1, VectorizedArrayType::size(), Number>>,
+                 unsigned int,
+                 FPArrayComparator<Number, VectorizedArrayType>>
           data;
 
         // Store the scaling factor
@@ -1204,10 +1730,25 @@ namespace internal
       // indices of the Jacobian appropriately.
       template <int dim>
       unsigned int
-      reorder_face_derivative_indices(const unsigned int face_no,
-                                      const unsigned int index)
+      reorder_face_derivative_indices(
+        const unsigned int          face_no,
+        const unsigned int          index,
+        const dealii::ReferenceCell reference_cell =
+          dealii::ReferenceCells::Invalid)
       {
         Assert(index < dim, ExcInternalError());
+
+        if ((reference_cell == dealii::ReferenceCells::Invalid ||
+             reference_cell == dealii::ReferenceCells::get_hypercube<dim>()) ==
+            false)
+          {
+#ifdef DEAL_II_WITH_SIMPLEX_SUPPORT
+            return index;
+#else
+            Assert(false, ExcNotImplemented());
+#endif
+          }
+
         if (dim == 3)
           {
             unsigned int table[3][3] = {{1, 2, 0}, {2, 0, 1}, {0, 1, 2}};
@@ -1230,36 +1771,54 @@ namespace internal
 
 
 
-      template <int dim, typename Number>
+      template <int dim, typename Number, typename VectorizedArrayType>
       void
       initialize_face_range(
         const std::pair<unsigned int, unsigned int>               face_range,
         const dealii::Triangulation<dim> &                        tria,
         const std::vector<std::pair<unsigned int, unsigned int>> &cells,
-        const std::vector<
-          FaceToCellTopology<VectorizedArray<Number>::n_array_elements>> &faces,
-        const Mapping<dim> &                        mapping,
-        const UpdateFlags                           update_flags_boundary,
-        const UpdateFlags                           update_flags_inner,
-        MappingInfo<dim, Number> &                  mapping_info,
-        std::pair<std::vector<MappingInfoStorage<dim - 1, dim, Number>>,
-                  CompressedFaceData<dim, Number>> &data)
+        const std::vector<FaceToCellTopology<VectorizedArrayType::size()>>
+          &                                            faces,
+        const std::vector<unsigned int> &              active_fe_index,
+        const dealii::hp::MappingCollection<dim> &     mapping_in,
+        MappingInfo<dim, Number, VectorizedArrayType> &mapping_info,
+        std::pair<
+          std::vector<
+            MappingInfoStorage<dim - 1, dim, Number, VectorizedArrayType>>,
+          CompressedFaceData<dim, Number, VectorizedArrayType>> &data)
       {
-        FE_Nothing<dim> dummy_fe;
+        std::vector<std::vector<std::shared_ptr<FE_Nothing<dim>>>> dummy_fe(
+          mapping_info.reference_cell_types.size());
+        for (unsigned int my_q = 0;
+             my_q < mapping_info.reference_cell_types.size();
+             ++my_q)
+          {
+            const unsigned int n_hp_quads =
+              mapping_info.reference_cell_types[my_q].size();
+            dummy_fe[my_q].resize(n_hp_quads);
+
+            for (unsigned int hpq = 0; hpq < n_hp_quads; ++hpq)
+              dummy_fe[my_q][hpq] = std::make_shared<FE_Nothing<dim>>(
+                mapping_info.reference_cell_types[my_q][hpq]);
+          }
+
+        const unsigned int max_active_fe_index =
+          active_fe_index.size() > 0 ?
+            *std::max_element(active_fe_index.begin(), active_fe_index.end()) :
+            0;
 
         std::vector<std::vector<std::shared_ptr<FEFaceValues<dim>>>>
           fe_face_values_container(mapping_info.face_data.size());
         for (unsigned int my_q = 0; my_q < mapping_info.face_data.size();
              ++my_q)
-          fe_face_values_container[my_q].resize(
-            mapping_info.face_data[my_q].descriptor.size());
+          fe_face_values_container[my_q].resize(max_active_fe_index + 1);
 
         std::vector<std::vector<std::shared_ptr<FEFaceValues<dim>>>>
           fe_boundary_face_values_container(mapping_info.face_data.size());
         for (unsigned int my_q = 0; my_q < mapping_info.face_data.size();
              ++my_q)
-          fe_boundary_face_values_container[my_q].resize(
-            mapping_info.face_data[my_q].descriptor.size());
+          fe_boundary_face_values_container[my_q].resize(max_active_fe_index +
+                                                         1);
 
         std::vector<std::vector<std::shared_ptr<FESubfaceValues<dim>>>>
           fe_subface_values_container(mapping_info.face_data.size());
@@ -1268,8 +1827,8 @@ namespace internal
           fe_subface_values_container[my_q].resize(
             mapping_info.face_data[my_q].descriptor.size());
 
-        ExtractCellHelper::LocalData<dim, Number> face_data(
-          ExtractCellHelper::get_jacobian_size(tria));
+        ExtractCellHelper::LocalData<dim, Number, VectorizedArrayType>
+          face_data(ExtractCellHelper::get_jacobian_size(tria));
 
         const unsigned int end_face =
           std::min(std::size_t(face_range.second), faces.size());
@@ -1277,37 +1836,61 @@ namespace internal
           for (unsigned int my_q = 0; my_q < mapping_info.face_data.size();
                ++my_q)
             {
-              // currently only non-hp case...
-              Assert(mapping_info.face_data[my_q].descriptor.size() == 1,
-                     ExcNotImplemented());
-              const Quadrature<dim - 1> &quadrature =
-                mapping_info.face_data[my_q].descriptor[0].quadrature;
+#ifndef DEAL_II_WITH_SIMPLEX_SUPPORT
+              // currently only non-hp-case...
+              AssertDimension(mapping_in.size(), 1);
+#endif
+
+              // We assume that we have the faces sorted by the active FE
+              // indices so that the active FE index of the interior side of the
+              // face batch is the same as the FE index of the interior side of
+              // its first entry.
+              const unsigned int fe_index =
+                active_fe_index.size() > 0 ?
+                  active_fe_index[faces[face].cells_interior[0] /
+                                  VectorizedArrayType::size()] :
+                  0;
+              const unsigned int hp_quad_index =
+                mapping_info.cell_data[my_q].descriptor.size() == 1 ? 0 :
+                                                                      fe_index;
+              const unsigned int hp_mapping_index =
+                mapping_in.size() == 1 ? 0 : fe_index;
+
+              const auto &mapping = mapping_in[hp_mapping_index];
+              const auto &quadrature =
+                mapping_info.face_data[my_q].q_collection[hp_quad_index];
 
               const bool is_boundary_face =
                 faces[face].cells_exterior[0] == numbers::invalid_unsigned_int;
 
               if (is_boundary_face &&
-                  fe_boundary_face_values_container[my_q][0] == nullptr)
-                fe_boundary_face_values_container[my_q][0].reset(
-                  new FEFaceValues<dim>(
-                    mapping, dummy_fe, quadrature, update_flags_boundary));
-              else if (fe_face_values_container[my_q][0] == nullptr)
-                fe_face_values_container[my_q][0].reset(new FEFaceValues<dim>(
-                  mapping, dummy_fe, quadrature, update_flags_inner));
+                  fe_boundary_face_values_container[my_q][fe_index] == nullptr)
+                fe_boundary_face_values_container[my_q][fe_index] =
+                  std::make_shared<FEFaceValues<dim>>(
+                    mapping,
+                    *dummy_fe[my_q][hp_quad_index],
+                    quadrature,
+                    mapping_info.update_flags_boundary_faces);
+              else if (fe_face_values_container[my_q][fe_index] == nullptr)
+                fe_face_values_container[my_q][fe_index] =
+                  std::make_shared<FEFaceValues<dim>>(
+                    mapping,
+                    *dummy_fe[my_q][hp_quad_index],
+                    quadrature,
+                    mapping_info.update_flags_inner_faces);
 
               FEFaceValues<dim> &fe_face_values =
-                is_boundary_face ? *fe_boundary_face_values_container[my_q][0] :
-                                   *fe_face_values_container[my_q][0];
-              const unsigned int n_q_points =
-                fe_face_values.n_quadrature_points;
-              face_data.resize(n_q_points);
+                is_boundary_face ?
+                  *fe_boundary_face_values_container[my_q][fe_index] :
+                  *fe_face_values_container[my_q][fe_index];
+
+              unsigned int n_q_points = 0; // will be override once FEFaceValues
+                                           // is set up
 
               bool normal_is_similar = true;
               bool JxW_is_similar    = true;
               bool cell_is_cartesian = true;
-              for (unsigned int v = 0;
-                   v < VectorizedArray<Number>::n_array_elements;
-                   ++v)
+              for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
                 {
                   Tensor<2, dim> jacobian_0;
                   double         compare_norm_jac = 1.;
@@ -1322,13 +1905,22 @@ namespace internal
                       fe_face_values.reinit(cell_it,
                                             faces[face].interior_face_no);
 
+                      if (v == 0)
+                        {
+                          n_q_points = fe_face_values.n_quadrature_points;
+                          face_data.resize(n_q_points);
+                        }
+
                       for (unsigned int q = 0; q < n_q_points; ++q)
                         {
                           if (std::abs(
-                                fe_face_values.JxW(q) * quadrature.weight(0) -
-                                fe_face_values.JxW(0) * quadrature.weight(q)) >
+                                fe_face_values.JxW(q) *
+                                  fe_face_values.get_quadrature().weight(0) -
+                                fe_face_values.JxW(0) *
+                                  fe_face_values.get_quadrature().weight(q)) >
                               2048. * std::numeric_limits<double>::epsilon() *
-                                fe_face_values.JxW(0) * quadrature.weight(q))
+                                fe_face_values.JxW(0) *
+                                fe_face_values.get_quadrature().weight(q))
                             JxW_is_similar = false;
                           face_data.JxW_values[q][v] = fe_face_values.JxW(q);
 
@@ -1361,7 +1953,9 @@ namespace internal
                                   JxW_is_similar = false;
                                 const unsigned int ee =
                                   reorder_face_derivative_indices<dim>(
-                                    faces[face].interior_face_no, e);
+                                    faces[face].interior_face_no,
+                                    e,
+                                    cell_it->reference_cell());
                                 face_data.general_jac[q][d][e][v] =
                                   inv_jac[d][ee];
                               }
@@ -1413,6 +2007,11 @@ namespace internal
                                 face_data.normal_vectors[q][d][v] =
                                   face_data.normal_vectors[q][d][0];
                               }
+                          if (fe_face_values.get_update_flags() &
+                              update_quadrature_points)
+                            for (unsigned int d = 0; d < dim; ++d)
+                              face_data.quadrature_points[q][d][v] =
+                                face_data.quadrature_points[q][d][0];
                         }
                     }
                   if (is_boundary_face == false &&
@@ -1428,18 +2027,53 @@ namespace internal
                       if (faces[face].subface_index >=
                           GeometryInfo<dim>::max_children_per_cell)
                         {
-                          fe_face_values.reinit(cell_it,
-                                                faces[face].exterior_face_no);
-                          actual_fe_face_values = &fe_face_values;
+                          // We assume that we have the faces sorted by the
+                          // active FE indices so that the active FE index of
+                          // the exterior side of the face batch is the same as
+                          // the FE index of the exterior side of its first
+                          // entry.
+                          const unsigned int fe_index =
+                            active_fe_index.size() > 0 ?
+                              active_fe_index[faces[face].cells_exterior[0] /
+                                              VectorizedArrayType::size()] :
+                              0;
+                          const unsigned int hp_quad_index =
+                            mapping_info.cell_data[my_q].descriptor.size() ==
+                                1 ?
+                              0 :
+                              fe_index;
+                          const unsigned int hp_mapping_index =
+                            mapping_in.size() == 1 ? 0 : fe_index;
+
+                          const auto &mapping = mapping_in[hp_mapping_index];
+                          const auto &quadrature =
+                            mapping_info.face_data[my_q]
+                              .q_collection[hp_quad_index];
+
+                          if (fe_face_values_container[my_q][fe_index] ==
+                              nullptr)
+                            fe_face_values_container[my_q][fe_index] =
+                              std::make_shared<FEFaceValues<dim>>(
+                                mapping,
+                                *dummy_fe[my_q][hp_quad_index],
+                                quadrature,
+                                mapping_info.update_flags_boundary_faces);
+
+                          fe_face_values_container[my_q][fe_index]->reinit(
+                            cell_it, faces[face].exterior_face_no);
+
+                          actual_fe_face_values =
+                            fe_face_values_container[my_q][fe_index].get();
                         }
                       else
                         {
                           if (fe_subface_values_container[my_q][0] == nullptr)
-                            fe_subface_values_container[my_q][0].reset(
-                              new FESubfaceValues<dim>(mapping,
-                                                       dummy_fe,
-                                                       quadrature,
-                                                       update_flags_inner));
+                            fe_subface_values_container[my_q][0] =
+                              std::make_shared<FESubfaceValues<dim>>(
+                                mapping,
+                                *dummy_fe[my_q][hp_quad_index],
+                                quadrature,
+                                mapping_info.update_flags_inner_faces);
                           fe_subface_values_container[my_q][0]->reinit(
                             cell_it,
                             faces[face].exterior_face_no,
@@ -1466,7 +2100,9 @@ namespace internal
                                   JxW_is_similar = false;
                                 const unsigned int ee =
                                   reorder_face_derivative_indices<dim>(
-                                    faces[face].exterior_face_no, e);
+                                    faces[face].exterior_face_no,
+                                    e,
+                                    cell_it->reference_cell());
                                 face_data.general_jac[n_q_points + q][d][e][v] =
                                   inv_jac[d][ee];
                               }
@@ -1528,8 +2164,7 @@ namespace internal
                         face_data.quadrature_points[q]);
                 }
 
-              using VEC_ARRAY =
-                Tensor<1, VectorizedArray<Number>::n_array_elements, Number>;
+              using VEC_ARRAY = Tensor<1, VectorizedArrayType::size(), Number>;
               unsigned int insert_position = data.first[my_q].JxW_values.size();
 
               // Fill in JxW values, apply compression
@@ -1542,18 +2177,18 @@ namespace internal
                                 unsigned int>
                         new_entry;
                       new_entry.second = data.second.data.size();
-                      for (unsigned int v = 0;
-                           v < VectorizedArray<Number>::n_array_elements;
+                      for (unsigned int v = 0; v < VectorizedArrayType::size();
                            ++v)
                         new_entry.first[2 * dim * dim + dim][v] =
-                          face_data.JxW_values[0][v] / quadrature.weight(0) /
+                          face_data.JxW_values[0][v] /
+                          fe_face_values.get_quadrature().weight(0) /
                           Utilities::fixed_power<dim>(face_data.jac_size);
 
                       new_entry.second = data.second.data.size();
                       for (unsigned int d = 0; d < dim; ++d)
                         for (unsigned int e = 0; e < dim; ++e)
                           for (unsigned int v = 0;
-                               v < VectorizedArray<Number>::n_array_elements;
+                               v < VectorizedArrayType::size();
                                ++v)
                             new_entry.first[d * dim + e][v] =
                               face_data.general_jac[0][d][e][v];
@@ -1561,7 +2196,7 @@ namespace internal
                         for (unsigned int d = 0; d < dim; ++d)
                           for (unsigned int e = 0; e < dim; ++e)
                             for (unsigned int v = 0;
-                                 v < VectorizedArray<Number>::n_array_elements;
+                                 v < VectorizedArrayType::size();
                                  ++v)
                               new_entry.first[dim * dim + d * dim + e][v] =
                                 face_data.general_jac[n_q_points][d][e][v];
@@ -1574,7 +2209,7 @@ namespace internal
                       // size to get the right scaling
                       for (unsigned int d = 0; d < dim; ++d)
                         for (unsigned int v = 0;
-                             v < VectorizedArray<Number>::n_array_elements;
+                             v < VectorizedArrayType::size();
                              ++v)
                           new_entry.first[2 * dim * dim + d][v] =
                             face_data.normal_vectors[0][d][v] /
@@ -1606,15 +2241,16 @@ namespace internal
             }
       }
 
-      template <int dim, typename Number>
+      template <int dim, typename Number, typename VectorizedArrayType>
       void
       compute_normal_times_jacobian(
         const unsigned int               first_face,
         const unsigned int               last_face,
         const std::vector<GeometryType> &face_type,
-        const std::vector<
-          FaceToCellTopology<VectorizedArray<Number>::n_array_elements>> &faces,
-        MappingInfoStorage<dim - 1, dim, Number> &data_faces)
+        const std::vector<FaceToCellTopology<VectorizedArrayType::size()>>
+          &faces,
+        MappingInfoStorage<dim - 1, dim, Number, VectorizedArrayType>
+          &data_faces)
       {
         for (unsigned int face = first_face; face < last_face; ++face)
           {
@@ -1638,66 +2274,263 @@ namespace internal
           }
       }
 
+
+
+      /**
+       * This evaluates the mapping information on a range of cells calling
+       * into the tensor product interpolators of the matrix-free framework,
+       * using a polynomial expansion of the cell geometry in terms of
+       * MappingQ.
+       */
+      template <int dim,
+                typename Number,
+                typename VectorizedArrayType,
+                typename VectorizedDouble>
+      void
+      mapping_q_compute_range(
+        const unsigned int begin_face,
+        const unsigned int end_face,
+        const std::vector<FaceToCellTopology<VectorizedArrayType::size()>>
+          &                                faces,
+        const std::vector<GeometryType> &  face_type,
+        const std::vector<bool> &          process_face,
+        const UpdateFlags                  update_flags_faces,
+        const AlignedVector<double> &      plain_quadrature_points,
+        const ShapeInfo<VectorizedDouble> &shape_info,
+        MappingInfoStorage<dim - 1, dim, Number, VectorizedArrayType> &my_data)
+      {
+        constexpr unsigned int n_lanes   = VectorizedArrayType::size();
+        constexpr unsigned int n_lanes_d = VectorizedDouble::size();
+
+        const unsigned int n_q_points = my_data.descriptor[0].n_q_points;
+        const unsigned int n_mapping_points =
+          shape_info.dofs_per_component_on_cell;
+
+        AlignedVector<VectorizedDouble> cell_points(dim * n_mapping_points);
+        AlignedVector<VectorizedDouble> face_quads(dim * n_q_points);
+        AlignedVector<VectorizedDouble> face_grads(dim * dim * n_q_points);
+        AlignedVector<VectorizedDouble> scratch_data(
+          dim * (2 * n_q_points + 3 * n_mapping_points));
+
+        for (unsigned int face = begin_face; face < end_face; ++face)
+          for (unsigned vv = 0; vv < n_lanes; vv += n_lanes_d)
+            {
+              // load the geometry field for all SIMD lanes
+              unsigned int       start_indices[n_lanes_d];
+              const unsigned int face_no = faces[face].interior_face_no;
+              for (unsigned int v = 0; v < n_lanes_d; ++v)
+                if (faces[face].cells_interior[vv + v] !=
+                    numbers::invalid_unsigned_int)
+                  start_indices[v] =
+                    faces[face].cells_interior[vv + v] * n_mapping_points * dim;
+                else
+                  start_indices[v] =
+                    faces[face].cells_interior[0] * n_mapping_points * dim;
+              vectorized_load_and_transpose(n_mapping_points * dim,
+                                            plain_quadrature_points.data(),
+                                            start_indices,
+                                            cell_points.data());
+
+              // now let the matrix-free evaluators provide us with the
+              // data on faces
+              FEFaceEvaluationFactory<dim, double, VectorizedDouble>::evaluate(
+                dim,
+                shape_info,
+                cell_points.data(),
+                face_quads.data(),
+                face_grads.data(),
+                scratch_data.data(),
+                true,
+                true,
+                face_no,
+                GeometryInfo<dim>::max_children_per_cell,
+                faces[face].face_orientation > 8 ?
+                  faces[face].face_orientation - 8 :
+                  0,
+                my_data.descriptor[0].face_orientations);
+
+
+              if (update_flags_faces & update_quadrature_points)
+                for (unsigned int q = 0; q < n_q_points; ++q)
+                  for (unsigned int d = 0; d < dim; ++d)
+                    store_vectorized_array(
+                      face_quads[d * n_q_points + q],
+                      vv,
+                      my_data.quadrature_points
+                        [my_data.quadrature_point_offsets[face] + q][d]);
+
+              if (process_face[face] == false)
+                continue;
+
+              // go through the faces and fill the result
+              const unsigned int offset = my_data.data_index_offsets[face];
+              const unsigned int n_points_compute =
+                face_type[face] <= affine ? 1 : n_q_points;
+              for (unsigned int q = 0; q < n_points_compute; ++q)
+                {
+                  Tensor<2, dim, VectorizedDouble> jac;
+                  for (unsigned int e = 0; e < dim; ++e)
+                    {
+                      const unsigned int ee =
+                        ExtractFaceHelper::reorder_face_derivative_indices<dim>(
+                          face_no, e);
+                      for (unsigned int d = 0; d < dim; ++d)
+                        jac[d][ee] = face_grads[(d * dim + e) * n_q_points + q];
+                    }
+                  Tensor<2, dim, VectorizedDouble> inv_jac = invert(jac);
+                  for (unsigned int e = 0; e < dim; ++e)
+                    {
+                      const unsigned int ee =
+                        ExtractFaceHelper::reorder_face_derivative_indices<dim>(
+                          face_no, e);
+                      for (unsigned int d = 0; d < dim; ++d)
+                        store_vectorized_array(
+                          inv_jac[ee][d],
+                          vv,
+                          my_data.jacobians[0][offset + q][d][e]);
+                    }
+
+                  std::array<Tensor<1, dim, VectorizedDouble>, dim - 1>
+                    tangential_vectors;
+                  for (unsigned int d = 0; d != dim - 1; ++d)
+                    for (unsigned int e = 0; e < dim; ++e)
+                      for (unsigned int f = 0; f < dim; ++f)
+                        tangential_vectors[d][e] +=
+                          jac[e][f] *
+                          GeometryInfo<dim>::unit_tangential_vectors[face_no][d]
+                                                                    [f];
+
+                  Tensor<1, dim, VectorizedDouble> boundary_form;
+                  if (dim == 1)
+                    boundary_form[0] = face_no == 0 ? -1. : 1.;
+                  else if (dim == 2)
+                    boundary_form = cross_product_2d(tangential_vectors[0]);
+                  else if (dim == 3)
+                    boundary_form = cross_product_3d(tangential_vectors[0],
+                                                     tangential_vectors[1]);
+                  else
+                    Assert(false, ExcNotImplemented());
+
+                  const VectorizedDouble JxW =
+                    boundary_form.norm() *
+                    (face_type[face] <= affine ?
+                       1. :
+                       my_data.descriptor[0].quadrature.weight(q));
+
+                  store_vectorized_array(JxW,
+                                         vv,
+                                         my_data.JxW_values[offset + q]);
+
+                  const Tensor<1, dim, VectorizedDouble> normal =
+                    boundary_form / boundary_form.norm();
+
+                  for (unsigned int d = 0; d < dim; ++d)
+                    store_vectorized_array(
+                      normal[d], vv, my_data.normal_vectors[offset + q][d]);
+
+                  my_data.normals_times_jacobians[0][offset + q] =
+                    my_data.normal_vectors[offset + q] *
+                    my_data.jacobians[0][offset + q];
+                }
+
+              if (faces[face].cells_exterior[0] !=
+                  numbers::invalid_unsigned_int)
+                {
+                  for (unsigned int v = 0; v < n_lanes_d; ++v)
+                    if (faces[face].cells_exterior[vv + v] !=
+                        numbers::invalid_unsigned_int)
+                      start_indices[v] = faces[face].cells_exterior[vv + v] *
+                                         n_mapping_points * dim;
+                    else
+                      start_indices[v] =
+                        faces[face].cells_exterior[0] * n_mapping_points * dim;
+
+                  vectorized_load_and_transpose(n_mapping_points * dim,
+                                                plain_quadrature_points.data(),
+                                                start_indices,
+                                                cell_points.data());
+
+                  FEFaceEvaluationFactory<dim, double, VectorizedDouble>::
+                    evaluate(dim,
+                             shape_info,
+                             cell_points.data(),
+                             face_quads.data(),
+                             face_grads.data(),
+                             scratch_data.data(),
+                             false,
+                             true,
+                             faces[face].exterior_face_no,
+                             faces[face].subface_index,
+                             faces[face].face_orientation < 8 ?
+                               faces[face].face_orientation :
+                               0,
+                             my_data.descriptor[0].face_orientations);
+
+                  for (unsigned int q = 0; q < n_points_compute; ++q)
+                    {
+                      Tensor<2, dim, VectorizedDouble> jac;
+                      for (unsigned int e = 0; e < dim; ++e)
+                        {
+                          const unsigned int ee =
+                            ExtractFaceHelper::reorder_face_derivative_indices<
+                              dim>(faces[face].exterior_face_no, e);
+                          for (unsigned int d = 0; d < dim; ++d)
+                            jac[d][ee] =
+                              face_grads[(d * dim + e) * n_q_points + q];
+                        }
+                      Tensor<2, dim, VectorizedDouble> inv_jac = invert(jac);
+                      for (unsigned int e = 0; e < dim; ++e)
+                        {
+                          const unsigned int ee =
+                            ExtractFaceHelper::reorder_face_derivative_indices<
+                              dim>(faces[face].exterior_face_no, e);
+                          for (unsigned int d = 0; d < dim; ++d)
+                            store_vectorized_array(
+                              inv_jac[ee][d],
+                              vv,
+                              my_data.jacobians[1][offset + q][d][e]);
+                        }
+                      my_data.normals_times_jacobians[1][offset + q] =
+                        my_data.normal_vectors[offset + q] *
+                        my_data.jacobians[1][offset + q];
+                    }
+                }
+            }
+      }
+
     } // namespace ExtractFaceHelper
 
 
 
-    template <int dim, typename Number>
+    template <int dim, typename Number, typename VectorizedArrayType>
     void
-    MappingInfo<dim, Number>::initialize_faces(
-      const dealii::Triangulation<dim> &                        tria,
-      const std::vector<std::pair<unsigned int, unsigned int>> &cells,
-      const std::vector<
-        FaceToCellTopology<VectorizedArray<Number>::n_array_elements>> &faces,
-      const Mapping<dim> &                                              mapping,
-      const std::vector<dealii::hp::QCollection<1>> &                   quad,
-      const UpdateFlags update_flags_boundary_faces,
-      const UpdateFlags update_flags_inner_faces)
+    MappingInfo<dim, Number, VectorizedArrayType>::initialize_faces(
+      const dealii::Triangulation<dim> &                                  tria,
+      const std::vector<std::pair<unsigned int, unsigned int>> &          cells,
+      const std::vector<FaceToCellTopology<VectorizedArrayType::size()>> &faces,
+      const std::vector<unsigned int> &         active_fe_index,
+      const dealii::hp::MappingCollection<dim> &mapping)
     {
       face_type.resize(faces.size(), general);
-      face_data.resize(quad.size());
-
-      // We currently always set the same flags on both inner and boundary
-      // faces to the same value. At some point, we might want to separate the
-      // two.
-      UpdateFlags update_flags_compute_boundary =
-        ((update_flags_inner_faces | update_flags_boundary_faces) &
-             update_quadrature_points ?
-           update_quadrature_points :
-           update_default) |
-        update_normal_vectors | update_JxW_values | update_jacobians;
-      UpdateFlags update_flags_compute_inner =
-        ((update_flags_inner_faces | update_flags_boundary_faces) &
-             update_quadrature_points ?
-           update_quadrature_points :
-           update_default) |
-        update_normal_vectors | update_JxW_values | update_jacobians;
-      UpdateFlags update_flags_common =
-        update_flags_inner_faces | update_flags_boundary_faces;
-
-      for (unsigned int my_q = 0; my_q < quad.size(); ++my_q)
-        {
-          face_data[my_q].descriptor.resize(quad[my_q].size());
-          for (unsigned int hpq = 0; hpq < quad[my_q].size(); ++hpq)
-            face_data[my_q].descriptor[hpq].initialize(
-              quad[my_q][hpq], update_flags_compute_inner);
-        }
 
       if (faces.size() == 0)
         return;
 
-      // Create as many chunks of cells as we have threads and spawn the work
+      // Create as many chunks of cells as we have threads and spawn the
+      // work
       unsigned int work_per_chunk =
         std::max(std::size_t(8),
                  (faces.size() + MultithreadInfo::n_threads() - 1) /
                    MultithreadInfo::n_threads());
 
-      std::vector<
-        std::pair<std::vector<MappingInfoStorage<dim - 1, dim, Number>>,
-                  ExtractFaceHelper::CompressedFaceData<dim, Number>>>
+      std::vector<std::pair<
+        std::vector<
+          MappingInfoStorage<dim - 1, dim, Number, VectorizedArrayType>>,
+        ExtractFaceHelper::
+          CompressedFaceData<dim, Number, VectorizedArrayType>>>
         data_faces_local;
-      // Reserve enough space to avoid re-allocation (which would destroy the
-      // references passed to the tasks!)
+      // Reserve enough space to avoid re-allocation (which would destroy
+      // the references passed to the tasks!)
       data_faces_local.reserve(MultithreadInfo::n_threads());
 
       {
@@ -1706,19 +2539,21 @@ namespace internal
         while (face_range.first < faces.size())
           {
             data_faces_local.push_back(std::make_pair(
-              std::vector<MappingInfoStorage<dim - 1, dim, Number>>(
-                quad.size()),
-              ExtractFaceHelper::CompressedFaceData<dim, Number>(
-                ExtractCellHelper::get_jacobian_size(tria))));
+              std::vector<
+                MappingInfoStorage<dim - 1, dim, Number, VectorizedArrayType>>(
+                face_data.size()),
+              ExtractFaceHelper::
+                CompressedFaceData<dim, Number, VectorizedArrayType>(
+                  ExtractCellHelper::get_jacobian_size(tria))));
             tasks += Threads::new_task(
-              &ExtractFaceHelper::initialize_face_range<dim, Number>,
+              &ExtractFaceHelper::
+                initialize_face_range<dim, Number, VectorizedArrayType>,
               face_range,
               tria,
               cells,
               faces,
+              active_fe_index,
               mapping,
-              update_flags_compute_boundary,
-              update_flags_compute_inner,
               *this,
               data_faces_local.back());
             face_range.first = face_range.second;
@@ -1737,6 +2572,9 @@ namespace internal
           data_faces_local[i].second.data,
           data_faces_local[0].second.data,
           indices_compressed[i]);
+
+      const UpdateFlags update_flags_common =
+        update_flags_boundary_faces | update_flags_inner_faces;
 
       // Collect all data in the final data fields.
       // First allocate the memory
@@ -1790,7 +2628,8 @@ namespace internal
           Threads::TaskGroup<> tasks;
           for (unsigned int i = 0; i < data_faces_local.size(); ++i)
             tasks += Threads::new_task(
-              &ExtractCellHelper::copy_data<dim - 1, dim, Number>,
+              &ExtractCellHelper::
+                copy_data<dim - 1, dim, Number, VectorizedArrayType>,
               work_per_chunk * i,
               shift[i],
               indices_compressed[i],
@@ -1806,9 +2645,7 @@ namespace internal
               for (const auto &it : data_faces_local[0].second.data)
                 {
                   // JxW values; invert previously applied scaling
-                  for (unsigned int v = 0;
-                       v < VectorizedArray<Number>::n_array_elements;
-                       ++v)
+                  for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
                     face_data[my_q].JxW_values[it.second][v] =
                       it.first[2 * dim * dim + dim][v] *
                       Utilities::fixed_power<dim>(jac_size);
@@ -1818,15 +2655,14 @@ namespace internal
                     for (unsigned int d = 0; d < dim; ++d)
                       for (unsigned int e = 0; e < dim; ++e)
                         for (unsigned int v = 0;
-                             v < VectorizedArray<Number>::n_array_elements;
+                             v < VectorizedArrayType::size();
                              ++v)
                           face_data[my_q].jacobians[i][it.second][d][e][v] =
                             it.first[i * dim * dim + d * dim + e][v];
 
                   // normal vectors; invert previously applied scaling
                   for (unsigned int d = 0; d < dim; ++d)
-                    for (unsigned int v = 0;
-                         v < VectorizedArray<Number>::n_array_elements;
+                    for (unsigned int v = 0; v < VectorizedArrayType::size();
                          ++v)
                       face_data[my_q].normal_vectors[it.second][d][v] =
                         it.first[2 * dim * dim + d][v] * jac_size;
@@ -1851,7 +2687,8 @@ namespace internal
           // finally compute the normal times the jacobian
           for (unsigned int i = 0; i < data_faces_local.size(); ++i)
             tasks += Threads::new_task(
-              &ExtractFaceHelper::compute_normal_times_jacobian<dim, Number>,
+              &ExtractFaceHelper::
+                compute_normal_times_jacobian<dim, Number, VectorizedArrayType>,
               work_per_chunk * i,
               std::min<unsigned int>(work_per_chunk * (i + 1), faces.size()),
               face_type,
@@ -1863,23 +2700,386 @@ namespace internal
 
 
 
-    template <int dim, typename Number>
+    template <int dim, typename Number, typename VectorizedArrayType>
     void
-    MappingInfo<dim, Number>::initialize_faces_by_cells(
+    MappingInfo<dim, Number, VectorizedArrayType>::compute_mapping_q(
+      const dealii::Triangulation<dim> &                        tria,
+      const std::vector<std::pair<unsigned int, unsigned int>> &cell_array,
+      const std::vector<FaceToCellTopology<VectorizedArrayType::size()>> &faces)
+    {
+      // step 1: extract quadrature point data with the data appropriate for
+      // MappingQGeneric
+      AssertDimension(this->mapping_collection->size(), 1);
+
+      const MappingQGeneric<dim> *mapping_q =
+        dynamic_cast<const MappingQGeneric<dim> *>(
+          &this->mapping_collection->operator[](0));
+      Assert(mapping_q != nullptr, ExcInternalError());
+
+      const unsigned int mapping_degree = mapping_q->get_degree();
+      const unsigned int n_mapping_points =
+        Utilities::pow(mapping_degree + 1, dim);
+      AlignedVector<double> plain_quadrature_points(cell_array.size() *
+                                                    n_mapping_points * dim);
+
+      const double jacobian_size = ExtractCellHelper::get_jacobian_size(tria);
+
+      std::vector<unsigned int> cell_data_index;
+      std::vector<GeometryType> preliminary_cell_type(cell_array.size());
+      {
+        AlignedVector<std::array<Tensor<2, dim>, dim + 1>> jacobians_on_stencil(
+          cell_array.size());
+
+        // Create as many chunks of cells as we have threads and spawn the
+        // work
+        unsigned int work_per_chunk =
+          std::max(std::size_t(1),
+                   (cell_array.size() + MultithreadInfo::n_threads() - 1) /
+                     MultithreadInfo::n_threads());
+
+        // we manually use tasks here rather than parallel::apply_to_subranges
+        // because we want exactly as many loops as we have threads - the
+        // initialization of the loops with FEValues is expensive
+        std::size_t          offset = 0;
+        Threads::TaskGroup<> tasks;
+        for (unsigned int t = 0; t < MultithreadInfo::n_threads();
+             ++t, offset += work_per_chunk)
+          tasks += Threads::new_task(
+            &ExtractCellHelper::mapping_q_query_fe_values<dim>,
+            offset,
+            std::min(cell_array.size(), offset + work_per_chunk),
+            *mapping_q,
+            tria,
+            cell_array,
+            jacobian_size,
+            preliminary_cell_type,
+            plain_quadrature_points,
+            jacobians_on_stencil);
+        tasks.join_all();
+        cell_data_index =
+          ExtractCellHelper::mapping_q_find_compression(jacobian_size,
+                                                        jacobians_on_stencil,
+                                                        n_mapping_points,
+                                                        plain_quadrature_points,
+                                                        preliminary_cell_type);
+      }
+
+      // step 2: compute the appropriate evaluation matrices for cells and
+      // faces
+
+      // We want to use vectorization for computing the quantities, but must
+      // evaluate the geometry in double precision; thus, for floats we need
+      // to do things in two sweeps and convert the final result.
+      constexpr unsigned int n_lanes = VectorizedArrayType::size();
+
+      using VectorizedDouble =
+        VectorizedArray<double,
+                        ((std::is_same<Number, float>::value &&
+                          VectorizedArrayType::size() > 1) ?
+                           VectorizedArrayType::size() / 2 :
+                           VectorizedArrayType::size())>;
+
+      // Create a ShapeInfo object to provide the necessary interpolators to
+      // the various quadrature points. Note that it is initialized with the
+      // finite element fe_geometry using the degree of the mapping, which is
+      // not the same as the degree of the underlying finite element shape
+      // functions or the quadrature points; shape info is merely a vehicle to
+      // return us the right interpolation matrices from the cell support
+      // points to the cell and face quadrature points.
+      std::vector<ShapeInfo<VectorizedDouble>> shape_infos(cell_data.size());
+      {
+        FE_DGQ<dim> fe_geometry(mapping_degree);
+        for (unsigned int my_q = 0; my_q < cell_data.size(); ++my_q)
+          shape_infos[my_q].reinit(cell_data[my_q].descriptor[0].quadrature,
+                                   fe_geometry);
+      }
+
+      // step 3: find compression of cells with vectorization
+      std::map<std::array<unsigned int, n_lanes>, unsigned int> compressed_data;
+
+      cell_type.resize(cell_array.size() / n_lanes);
+      std::vector<bool>         process_cell(cell_type.size());
+      std::vector<unsigned int> cell_data_index_vect(cell_type.size());
+
+      for (unsigned int cell = 0; cell < cell_array.size(); cell += n_lanes)
+        {
+          std::pair<std::array<unsigned int, n_lanes>, unsigned int>
+            data_indices;
+          for (unsigned int i = 0; i < n_lanes; ++i)
+            data_indices.first[i] = cell_data_index[cell + i];
+          data_indices.second = cell / n_lanes;
+
+          auto inserted = compressed_data.insert(data_indices);
+
+          process_cell[cell / n_lanes] = inserted.second;
+          if (inserted.second == true)
+            cell_data_index_vect[cell / n_lanes] = data_indices.second;
+          else
+            cell_data_index_vect[cell / n_lanes] = inserted.first->second;
+
+          cell_type[cell / n_lanes] =
+            *std::max_element(preliminary_cell_type.data() + cell,
+                              preliminary_cell_type.data() + cell + n_lanes);
+        }
+
+      // step 4: compute the data on cells from the cached quadrature
+      // points, filling up all SIMD lanes as appropriate
+      for (unsigned int my_q = 0; my_q < cell_data.size(); ++my_q)
+        {
+          MappingInfoStorage<dim, dim, Number, VectorizedArrayType> &my_data =
+            cell_data[my_q];
+
+          // step 4a: set the index offsets, find out how much to allocate,
+          // and allocate the memory
+          const unsigned int n_q_points = my_data.descriptor[0].n_q_points;
+          unsigned int       max_size   = 0;
+          my_data.data_index_offsets.resize(cell_type.size());
+          for (unsigned int cell = 0; cell < cell_type.size(); ++cell)
+            {
+              if (process_cell[cell] == false)
+                my_data.data_index_offsets[cell] =
+                  my_data.data_index_offsets[cell_data_index_vect[cell]];
+              else
+                my_data.data_index_offsets[cell] = max_size;
+              max_size =
+                std::max(max_size,
+                         my_data.data_index_offsets[cell] +
+                           (cell_type[cell] <= affine ? 2 : n_q_points));
+            }
+
+          my_data.JxW_values.resize_fast(max_size);
+          my_data.jacobians[0].resize_fast(max_size);
+          if (update_flags_cells & update_jacobian_grads)
+            my_data.jacobian_gradients[0].resize_fast(max_size);
+
+          if (update_flags_cells & update_quadrature_points)
+            {
+              my_data.quadrature_point_offsets.resize(cell_type.size());
+              for (unsigned int cell = 1; cell < cell_type.size(); ++cell)
+                if (cell_type[cell - 1] <= affine)
+                  my_data.quadrature_point_offsets[cell] =
+                    my_data.quadrature_point_offsets[cell - 1] + 1;
+                else
+                  my_data.quadrature_point_offsets[cell] =
+                    my_data.quadrature_point_offsets[cell - 1] + n_q_points;
+              my_data.quadrature_points.resize_fast(
+                my_data.quadrature_point_offsets.back() +
+                (cell_type.back() <= affine ? 1 : n_q_points));
+            }
+
+          // step 4b: go through the cells and compute the information using
+          // similar evaluators as for the matrix-free integrals
+          dealii::parallel::apply_to_subranges(
+            0U,
+            cell_type.size(),
+            [&](const unsigned int begin, const unsigned int end) {
+              ExtractCellHelper::mapping_q_compute_range<dim,
+                                                         Number,
+                                                         VectorizedArrayType,
+                                                         VectorizedDouble>(
+                begin,
+                end,
+                cell_type,
+                process_cell,
+                update_flags_cells,
+                plain_quadrature_points,
+                shape_infos[my_q],
+                my_data);
+            },
+            std::max(cell_type.size() / MultithreadInfo::n_threads() / 2,
+                     std::size_t(2U)));
+        }
+
+      if (faces.empty())
+        return;
+
+      // step 5: find compression of faces with vectorization
+      std::map<std::array<unsigned int, 2 * n_lanes + 3>, unsigned int>
+        compressed_faces;
+
+      face_type.resize(faces.size());
+      std::vector<bool>         process_face(face_type.size());
+      std::vector<unsigned int> face_data_index_vect(face_type.size());
+
+      for (unsigned int face = 0; face < faces.size(); ++face)
+        {
+          std::pair<std::array<unsigned int, 2 * n_lanes + 3>, unsigned int>
+            data_indices;
+          for (unsigned int i = 0; i < n_lanes; ++i)
+            if (faces[face].cells_interior[i] != numbers::invalid_unsigned_int)
+              data_indices.first[i] =
+                cell_data_index[faces[face].cells_interior[i]];
+            else
+              data_indices.first[i] = data_indices.first[0];
+          for (unsigned int i = 0; i < n_lanes; ++i)
+            data_indices.first[n_lanes + i] = data_indices.first[i];
+          for (unsigned int i = 0; i < n_lanes; ++i)
+            if (faces[face].cells_exterior[i] != numbers::invalid_unsigned_int)
+              data_indices.first[n_lanes + i] =
+                cell_data_index[faces[face].cells_exterior[i]];
+          data_indices.first[2 * n_lanes]     = faces[face].interior_face_no;
+          data_indices.first[2 * n_lanes + 1] = faces[face].exterior_face_no;
+          data_indices.first[2 * n_lanes + 2] = faces[face].subface_index;
+
+          data_indices.second = face;
+
+          auto inserted = compressed_faces.insert(data_indices);
+
+          process_face[face] = inserted.second;
+          if (inserted.second == true)
+            face_data_index_vect[face] = face;
+          else
+            face_data_index_vect[face] = inserted.first->second;
+
+          face_type[face] = cartesian;
+          for (unsigned int i = 0; i < n_lanes; ++i)
+            if (faces[face].cells_interior[i] != numbers::invalid_unsigned_int)
+              face_type[face] =
+                std::max(face_type[face],
+                         preliminary_cell_type[faces[face].cells_interior[i]]);
+          for (unsigned int i = 0; i < n_lanes; ++i)
+            if (faces[face].cells_exterior[i] != numbers::invalid_unsigned_int)
+              face_type[face] =
+                std::max(face_type[face],
+                         preliminary_cell_type[faces[face].cells_exterior[i]]);
+        }
+
+      // step 6: compute the data on faces from the cached cell quadrature
+      // points, filling up all SIMD lanes as appropriate
+      for (unsigned int my_q = 0; my_q < face_data.size(); ++my_q)
+        {
+          MappingInfoStorage<dim - 1, dim, Number, VectorizedArrayType>
+            &my_data = face_data[my_q];
+
+          // step 6a: set the index offsets, find out how much to allocate,
+          // and allocate the memory
+          const unsigned int n_q_points = my_data.descriptor[0].n_q_points;
+          unsigned int       max_size   = 0;
+          my_data.data_index_offsets.resize(face_type.size());
+          for (unsigned int face = 0; face < face_type.size(); ++face)
+            {
+              if (process_face[face] == false)
+                my_data.data_index_offsets[face] =
+                  my_data.data_index_offsets[face_data_index_vect[face]];
+              else
+                my_data.data_index_offsets[face] = max_size;
+              max_size =
+                std::max(max_size,
+                         my_data.data_index_offsets[face] +
+                           (face_type[face] <= affine ? 1 : n_q_points));
+            }
+
+          const UpdateFlags update_flags_common =
+            update_flags_boundary_faces | update_flags_inner_faces;
+
+          my_data.JxW_values.resize_fast(max_size);
+          my_data.normal_vectors.resize_fast(max_size);
+          my_data.jacobians[0].resize_fast(max_size);
+          my_data.jacobians[1].resize_fast(max_size);
+          if (update_flags_common & update_jacobian_grads)
+            {
+              my_data.jacobian_gradients[0].resize_fast(max_size);
+              my_data.jacobian_gradients[1].resize_fast(max_size);
+            }
+          my_data.normals_times_jacobians[0].resize_fast(max_size);
+          my_data.normals_times_jacobians[1].resize_fast(max_size);
+
+          if (update_flags_common & update_quadrature_points)
+            {
+              my_data.quadrature_point_offsets.resize(face_type.size());
+              my_data.quadrature_point_offsets[0] = 0;
+              for (unsigned int face = 1; face < faces.size(); ++face)
+                my_data.quadrature_point_offsets[face] =
+                  n_q_points + my_data.quadrature_point_offsets[face - 1];
+              my_data.quadrature_points.resize_fast(face_type.size() *
+                                                    n_q_points);
+            }
+
+          // step 6b: go through the faces and compute the information using
+          // similar evaluators as for the matrix-free face integrals
+          dealii::parallel::apply_to_subranges(
+            0U,
+            face_type.size(),
+            [&](const unsigned int begin, const unsigned int end) {
+              ExtractFaceHelper::mapping_q_compute_range<dim,
+                                                         Number,
+                                                         VectorizedArrayType,
+                                                         VectorizedDouble>(
+                begin,
+                end,
+                faces,
+                face_type,
+                process_face,
+                update_flags_common,
+                plain_quadrature_points,
+                shape_infos[my_q],
+                my_data);
+            },
+            std::max(face_type.size() / MultithreadInfo::n_threads() / 2,
+                     std::size_t(2U)));
+        }
+
+      // step 6c: figure out if normal vectors are the same on some of the
+      // faces which allows us to set the flat_faces face type
+      unsigned int quad_with_most_points = 0;
+      for (unsigned int my_q = 1; my_q < face_data.size(); ++my_q)
+        if (face_data[my_q].descriptor[0].n_q_points >
+            face_data[quad_with_most_points].descriptor[0].n_q_points)
+          quad_with_most_points = my_q;
+      dealii::parallel::apply_to_subranges(
+        0U,
+        face_type.size(),
+        [&](const unsigned int begin, const unsigned int end) {
+          for (unsigned int face = begin; face < end; ++face)
+            if (face_type[face] == general)
+              {
+                const unsigned int n_q_points =
+                  face_data[quad_with_most_points].descriptor[0].n_q_points;
+                const Tensor<1, dim, VectorizedArrayType> *normals =
+                  face_data[quad_with_most_points].normal_vectors.data() +
+                  face_data[quad_with_most_points].data_index_offsets[face];
+                VectorizedArrayType distance = 0.;
+                for (unsigned int q = 1; q < n_q_points; ++q)
+                  distance += (normals[q] - normals[0]).norm_square();
+                bool all_small = true;
+                for (unsigned int v = 0; v < n_lanes; ++v)
+                  if (distance[v] >
+                      50. * std::numeric_limits<Number>::epsilon() *
+                        std::numeric_limits<Number>::epsilon() * n_q_points)
+                    all_small = false;
+                if (all_small)
+                  face_type[face] = flat_faces;
+              }
+        },
+        std::max(face_type.size() / MultithreadInfo::n_threads() / 2,
+                 std::size_t(2U)));
+
+      // step 7: compute the face data by cells. This still needs to be
+      // transitioned to extracting the information from cell quadrature
+      // points but we need to figure out the correct indices of neighbors
+      // within the list of arrays still
+      initialize_faces_by_cells(tria, cell_array, *this->mapping_collection);
+    }
+
+
+
+    template <int dim, typename Number, typename VectorizedArrayType>
+    void
+    MappingInfo<dim, Number, VectorizedArrayType>::initialize_faces_by_cells(
       const dealii::Triangulation<dim> &                        tria,
       const std::vector<std::pair<unsigned int, unsigned int>> &cells,
-      const Mapping<dim> &                                      mapping,
-      const std::vector<dealii::hp::QCollection<1>> &           quad,
-      const UpdateFlags update_flags_faces_by_cells)
+      const dealii::hp::MappingCollection<dim> &                mapping_in)
     {
       if (update_flags_faces_by_cells == update_default)
         return;
 
-      face_data_by_cells.resize(quad.size());
-      const unsigned int n_quads = quad.size();
-      const unsigned int vectorization_width =
-        VectorizedArray<Number>::n_array_elements;
-      UpdateFlags update_flags =
+
+      AssertDimension(mapping_in.size(), 1);
+      const auto &mapping = mapping_in[0];
+
+      const unsigned int n_quads = face_data_by_cells.size();
+      const unsigned int n_lanes = VectorizedArrayType::size();
+      UpdateFlags        update_flags =
         (update_flags_faces_by_cells & update_quadrature_points ?
            update_quadrature_points :
            update_default) |
@@ -1887,17 +3087,10 @@ namespace internal
 
       for (unsigned int my_q = 0; my_q < n_quads; ++my_q)
         {
-          const unsigned int n_hp_quads = quad[my_q].size();
-          AssertIndexRange(0, n_hp_quads);
-          face_data_by_cells[my_q].descriptor.resize(n_hp_quads);
-          for (unsigned int q = 0; q < n_hp_quads; ++q)
-            face_data_by_cells[my_q].descriptor[q].initialize(quad[my_q][q],
-                                                              update_default);
-
           // since we already know the cell type, we can pre-allocate the right
           // amount of data straight away and we just need to do some basic
           // counting
-          AssertDimension(cell_type.size(), cells.size() / vectorization_width);
+          AssertDimension(cell_type.size(), cells.size() / n_lanes);
           face_data_by_cells[my_q].data_index_offsets.resize(
             cell_type.size() * GeometryInfo<dim>::faces_per_cell);
           if (update_flags & update_quadrature_points)
@@ -1905,9 +3098,7 @@ namespace internal
               cell_type.size() * GeometryInfo<dim>::faces_per_cell);
           std::size_t storage_length = 0;
           for (unsigned int i = 0; i < cell_type.size(); ++i)
-            for (unsigned int face = 0;
-                 face < GeometryInfo<dim>::faces_per_cell;
-                 ++face)
+            for (const unsigned int face : GeometryInfo<dim>::face_indices())
               {
                 if (cell_type[i] <= affine)
                   {
@@ -1934,12 +3125,18 @@ namespace internal
             storage_length * GeometryInfo<dim>::faces_per_cell);
           face_data_by_cells[my_q].jacobians[0].resize_fast(
             storage_length * GeometryInfo<dim>::faces_per_cell);
+          face_data_by_cells[my_q].jacobians[1].resize_fast(
+            storage_length * GeometryInfo<dim>::faces_per_cell);
           if (update_flags & update_normal_vectors)
             face_data_by_cells[my_q].normal_vectors.resize_fast(
               storage_length * GeometryInfo<dim>::faces_per_cell);
           if (update_flags & update_normal_vectors &&
               update_flags & update_jacobians)
             face_data_by_cells[my_q].normals_times_jacobians[0].resize_fast(
+              storage_length * GeometryInfo<dim>::faces_per_cell);
+          if (update_flags & update_normal_vectors &&
+              update_flags & update_jacobians)
+            face_data_by_cells[my_q].normals_times_jacobians[1].resize_fast(
               storage_length * GeometryInfo<dim>::faces_per_cell);
           if (update_flags & update_jacobian_grads)
             face_data_by_cells[my_q].jacobian_gradients[0].resize_fast(
@@ -1958,41 +3155,70 @@ namespace internal
         fe_face_values(face_data_by_cells.size());
       for (unsigned int i = 0; i < fe_face_values.size(); ++i)
         fe_face_values[i].resize(face_data_by_cells[i].descriptor.size());
+      std::vector<std::vector<std::shared_ptr<dealii::FEFaceValues<dim>>>>
+        fe_face_values_neigh(face_data_by_cells.size());
+      for (unsigned int i = 0; i < fe_face_values_neigh.size(); ++i)
+        fe_face_values_neigh[i].resize(face_data_by_cells[i].descriptor.size());
       for (unsigned int cell = 0; cell < cell_type.size(); ++cell)
         for (unsigned int my_q = 0; my_q < face_data_by_cells.size(); ++my_q)
-          for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-               ++face)
+          for (const unsigned int face : GeometryInfo<dim>::face_indices())
             {
               if (fe_face_values[my_q][fe_index].get() == nullptr)
-                fe_face_values[my_q][fe_index].reset(
-                  new dealii::FEFaceValues<dim>(
+                fe_face_values[my_q][fe_index] =
+                  std::make_shared<dealii::FEFaceValues<dim>>(
                     mapping,
                     dummy_fe,
-                    face_data_by_cells[my_q].descriptor[fe_index].quadrature,
-                    update_flags));
+                    face_data[my_q].q_collection[fe_index],
+                    update_flags);
+              if (fe_face_values_neigh[my_q][fe_index].get() == nullptr)
+                fe_face_values_neigh[my_q][fe_index] =
+                  std::make_shared<dealii::FEFaceValues<dim>>(
+                    mapping,
+                    dummy_fe,
+                    face_data[my_q].q_collection[fe_index],
+                    update_flags);
               dealii::FEFaceValues<dim> &fe_val =
                 *fe_face_values[my_q][fe_index];
+              dealii::FEFaceValues<dim> &fe_val_neigh =
+                *fe_face_values_neigh[my_q][fe_index];
               const unsigned int offset =
                 face_data_by_cells[my_q]
                   .data_index_offsets[cell * GeometryInfo<dim>::faces_per_cell +
                                       face];
 
-              for (unsigned int v = 0; v < vectorization_width; ++v)
+              for (unsigned int v = 0; v < n_lanes; ++v)
                 {
                   typename dealii::Triangulation<dim>::cell_iterator cell_it(
                     &tria,
-                    cells[cell * vectorization_width + v].first,
-                    cells[cell * vectorization_width + v].second);
+                    cells[cell * n_lanes + v].first,
+                    cells[cell * n_lanes + v].second);
                   fe_val.reinit(cell_it, face);
+
+                  const bool is_local =
+                    (cell_it->is_active() ?
+                       cell_it->is_locally_owned() :
+                       cell_it->is_locally_owned_on_level()) &&
+                    (!cell_it->at_boundary(face) ||
+                     (cell_it->at_boundary(face) &&
+                      cell_it->has_periodic_neighbor(face)));
+
+                  if (is_local)
+                    {
+                      auto cell_it_neigh =
+                        cell_it->neighbor_or_periodic_neighbor(face);
+                      fe_val_neigh.reinit(cell_it_neigh,
+                                          cell_it->at_boundary(face) ?
+                                            cell_it->periodic_neighbor_face_no(
+                                              face) :
+                                            cell_it->neighbor_face_no(face));
+                    }
 
                   // copy data for affine data type
                   if (cell_type[cell] <= affine)
                     {
                       if (update_flags & update_JxW_values)
                         face_data_by_cells[my_q].JxW_values[offset][v] =
-                          fe_val.JxW(0) / face_data_by_cells[my_q]
-                                            .descriptor[fe_index]
-                                            .quadrature.weight(0);
+                          fe_val.JxW(0) / fe_val.get_quadrature().weight(0);
                       if (update_flags & update_jacobians)
                         {
                           DerivativeForm<1, dim, dim> inv_jac =
@@ -2007,6 +3233,23 @@ namespace internal
                                   inv_jac[d][ee];
                               }
                         }
+                      if (is_local && (update_flags & update_jacobians))
+                        for (unsigned int q = 0; q < fe_val.n_quadrature_points;
+                             ++q)
+                          {
+                            DerivativeForm<1, dim, dim> inv_jac =
+                              fe_val_neigh.jacobian(q).covariant_form();
+                            for (unsigned int d = 0; d < dim; ++d)
+                              for (unsigned int e = 0; e < dim; ++e)
+                                {
+                                  const unsigned int ee = ExtractFaceHelper::
+                                    reorder_face_derivative_indices<dim>(face,
+                                                                         e);
+                                  face_data_by_cells[my_q]
+                                    .jacobians[1][offset][d][e][v] =
+                                    inv_jac[d][ee];
+                                }
+                          }
                       if (update_flags & update_jacobian_grads)
                         {
                           Assert(false, ExcNotImplemented());
@@ -2073,14 +3316,24 @@ namespace internal
                     .normals_times_jacobians[0][offset + q] =
                     face_data_by_cells[my_q].normal_vectors[offset + q] *
                     face_data_by_cells[my_q].jacobians[0][offset + q];
+              if (update_flags & update_normal_vectors &&
+                  update_flags & update_jacobians)
+                for (unsigned int q = 0; q < (cell_type[cell] <= affine ?
+                                                1 :
+                                                fe_val.n_quadrature_points);
+                     ++q)
+                  face_data_by_cells[my_q]
+                    .normals_times_jacobians[1][offset + q] =
+                    face_data_by_cells[my_q].normal_vectors[offset + q] *
+                    face_data_by_cells[my_q].jacobians[1][offset + q];
             }
     }
 
 
 
-    template <int dim, typename Number>
+    template <int dim, typename Number, typename VectorizedArrayType>
     std::size_t
-    MappingInfo<dim, Number>::memory_consumption() const
+    MappingInfo<dim, Number, VectorizedArrayType>::memory_consumption() const
     {
       std::size_t memory = MemoryConsumption::memory_consumption(cell_data);
       memory += MemoryConsumption::memory_consumption(face_data);
@@ -2092,12 +3345,12 @@ namespace internal
 
 
 
-    template <int dim, typename Number>
+    template <int dim, typename Number, typename VectorizedArrayType>
     template <typename StreamType>
     void
-    MappingInfo<dim, Number>::print_memory_consumption(
+    MappingInfo<dim, Number, VectorizedArrayType>::print_memory_consumption(
       StreamType &    out,
-      const SizeInfo &task_info) const
+      const TaskInfo &task_info) const
     {
       out << "    Cell types:                      ";
       task_info.print_memory_statistics(out,
@@ -2119,17 +3372,19 @@ namespace internal
 
     /* ------------------------------------------------------------------ */
 
-    template <typename Number>
-    FPArrayComparator<Number>::FPArrayComparator(const Number scaling)
+    template <typename Number, typename VectorizedArrayType>
+    FPArrayComparator<Number, VectorizedArrayType>::FPArrayComparator(
+      const Number scaling)
       : tolerance(scaling * std::numeric_limits<double>::epsilon() * 1024.)
     {}
 
 
 
-    template <typename Number>
+    template <typename Number, typename VectorizedArrayType>
     bool
-    FPArrayComparator<Number>::operator()(const std::vector<Number> &v1,
-                                          const std::vector<Number> &v2) const
+    FPArrayComparator<Number, VectorizedArrayType>::
+    operator()(const std::vector<Number> &v1,
+               const std::vector<Number> &v2) const
     {
       const unsigned int s1 = v1.size(), s2 = v2.size();
       if (s1 < s2)
@@ -2147,15 +3402,13 @@ namespace internal
 
 
 
-    template <typename Number>
+    template <typename Number, typename VectorizedArrayType>
     bool
-    FPArrayComparator<Number>::operator()(
-      const Tensor<1, VectorizedArray<Number>::n_array_elements, Number> &t1,
-      const Tensor<1, VectorizedArray<Number>::n_array_elements, Number> &t2)
-      const
+    FPArrayComparator<Number, VectorizedArrayType>::
+    operator()(const Tensor<1, VectorizedArrayType::size(), Number> &t1,
+               const Tensor<1, VectorizedArrayType::size(), Number> &t2) const
     {
-      for (unsigned int k = 0; k < VectorizedArray<Number>::n_array_elements;
-           ++k)
+      for (unsigned int k = 0; k < VectorizedArrayType::size(); ++k)
         if (t1[k] < t2[k] - tolerance)
           return true;
         else if (t1[k] > t2[k] + tolerance)
@@ -2165,22 +3418,16 @@ namespace internal
 
 
 
-    template <typename Number>
+    template <typename Number, typename VectorizedArrayType>
     template <int dim>
     bool
-    FPArrayComparator<Number>::operator()(
-      const Tensor<1,
-                   dim,
-                   Tensor<1, VectorizedArray<Number>::n_array_elements, Number>>
-        &t1,
-      const Tensor<1,
-                   dim,
-                   Tensor<1, VectorizedArray<Number>::n_array_elements, Number>>
-        &t2) const
+    FPArrayComparator<Number, VectorizedArrayType>::operator()(
+      const Tensor<1, dim, Tensor<1, VectorizedArrayType::size(), Number>> &t1,
+      const Tensor<1, dim, Tensor<1, VectorizedArrayType::size(), Number>> &t2)
+      const
     {
       for (unsigned int d = 0; d < dim; ++d)
-        for (unsigned int k = 0; k < VectorizedArray<Number>::n_array_elements;
-             ++k)
+        for (unsigned int k = 0; k < VectorizedArrayType::size(); ++k)
           if (t1[d][k] < t2[d][k] - tolerance)
             return true;
           else if (t1[d][k] > t2[d][k] + tolerance)
@@ -2190,24 +3437,17 @@ namespace internal
 
 
 
-    template <typename Number>
+    template <typename Number, typename VectorizedArrayType>
     template <int dim>
     bool
-    FPArrayComparator<Number>::operator()(
-      const Tensor<2,
-                   dim,
-                   Tensor<1, VectorizedArray<Number>::n_array_elements, Number>>
-        &t1,
-      const Tensor<2,
-                   dim,
-                   Tensor<1, VectorizedArray<Number>::n_array_elements, Number>>
-        &t2) const
+    FPArrayComparator<Number, VectorizedArrayType>::operator()(
+      const Tensor<2, dim, Tensor<1, VectorizedArrayType::size(), Number>> &t1,
+      const Tensor<2, dim, Tensor<1, VectorizedArrayType::size(), Number>> &t2)
+      const
     {
       for (unsigned int d = 0; d < dim; ++d)
         for (unsigned int e = 0; e < dim; ++e)
-          for (unsigned int k = 0;
-               k < VectorizedArray<Number>::n_array_elements;
-               ++k)
+          for (unsigned int k = 0; k < VectorizedArrayType::size(); ++k)
             if (t1[d][e][k] < t2[d][e][k] - tolerance)
               return true;
             else if (t1[d][e][k] > t2[d][e][k] + tolerance)
@@ -2215,7 +3455,26 @@ namespace internal
       return false;
     }
 
-  } // end of namespace MatrixFreeFunctions
+
+
+    template <typename Number, typename VectorizedArrayType>
+    template <int dim>
+    bool
+    FPArrayComparator<Number, VectorizedArrayType>::
+    operator()(const std::array<Tensor<2, dim, Number>, dim + 1> &t1,
+               const std::array<Tensor<2, dim, Number>, dim + 1> &t2) const
+    {
+      for (unsigned int i = 0; i < t1.size(); ++i)
+        for (unsigned int d = 0; d < dim; ++d)
+          for (unsigned int e = 0; e < dim; ++e)
+            if (t1[i][d][e] < t2[i][d][e] - tolerance)
+              return true;
+            else if (t1[i][d][e] > t2[i][d][e] + tolerance)
+              return false;
+      return false;
+    }
+
+  } // namespace MatrixFreeFunctions
 } // end of namespace internal
 
 DEAL_II_NAMESPACE_CLOSE

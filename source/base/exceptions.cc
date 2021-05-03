@@ -28,6 +28,10 @@
 #  include <mpi.h>
 #endif
 
+#ifdef DEAL_II_TRILINOS_WITH_SEACAS
+#  include <exodusII.h>
+#endif
+
 #ifdef DEAL_II_HAVE_GLIBC_STACKTRACE
 #  include <execinfo.h>
 #endif
@@ -317,10 +321,25 @@ ExceptionBase::generate_message() const
                 << "--------------------------------------------------------"
                 << std::endl;
 
-      // print out general data
+      // Print out general data
       print_exc_data(converter);
-      // print out exception specific data
-      print_info(converter);
+
+      // Print out exception specific data. Put this into another stringstream
+      // object for now so that we can break long lines and print them in a
+      // more easily read way
+      {
+        std::ostringstream message;
+        print_info(message);
+
+        const auto message_in_lines =
+          Utilities::break_text_into_lines(message.str(), 70);
+
+        // Put the message into the stream that will be output.
+        for (const auto &line : message_in_lines)
+          converter << "    " << line << '\n';
+      }
+
+
       print_stack_trace(converter);
 
       if (!deal_II_exceptions::internals::get_additional_assert_output()
@@ -347,9 +366,9 @@ ExceptionBase::generate_message() const
 
 
 
-#ifdef DEAL_II_WITH_MPI
 namespace StandardExceptions
 {
+#ifdef DEAL_II_WITH_MPI
   ExcMPI::ExcMPI(const int error_code)
     : error_code(error_code)
   {}
@@ -397,8 +416,30 @@ namespace StandardExceptions
     out << "The numerical value of the original error code is " << error_code
         << "." << std::endl;
   }
-} // namespace StandardExceptions
 #endif // DEAL_II_WITH_MPI
+
+
+
+#ifdef DEAL_II_TRILINOS_WITH_SEACAS
+  ExcExodusII::ExcExodusII(const int error_code)
+    : error_code(error_code)
+  {
+    // To avoid including yet another header in exceptions.h we assume that
+    // EX_NOERR is zero. Check that here:
+    static_assert(EX_NOERR == 0,
+                  "EX_NOERR is assumed to be zero in all versions of ExodusII");
+  }
+
+
+
+  void
+  ExcExodusII::print_info(std::ostream &out) const
+  {
+    out << "Error code is " << error_code << '\n';
+    out << "String description: " << ex_strerror(error_code) << '\n';
+  }
+#endif // DEAL_II_TRILINOS_WITH_SEACAS
+} // namespace StandardExceptions
 
 namespace deal_II_exceptions
 {

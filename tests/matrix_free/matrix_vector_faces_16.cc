@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,10 +30,8 @@
 #include <deal.II/lac/la_parallel_vector.h>
 
 #include "../tests.h"
+
 #include "create_mesh.h"
-
-std::ofstream logfile("output");
-
 #include "matrix_vector_faces_common.h"
 
 
@@ -50,7 +48,7 @@ test()
 
   parallel::distributed::Triangulation<mydim> tria(MPI_COMM_WORLD);
   GridGenerator::hyper_cube(tria);
-  for (unsigned int f = 0; f < GeometryInfo<mydim>::faces_per_cell; ++f)
+  for (const unsigned int f : GeometryInfo<mydim>::face_indices())
     tria.begin_active()->face(f)->set_all_boundary_ids(f);
   std::vector<
     GridTools::PeriodicFacePair<typename Triangulation<mydim>::cell_iterator>>

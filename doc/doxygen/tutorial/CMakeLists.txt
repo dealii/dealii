@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2019 by the deal.II Authors
+## Copyright (C) 2012 - 2020 by the deal.II Authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -28,14 +28,14 @@ FILE(GLOB _deal_ii_steps
 # "/a/b/c/name//doc//author", so make sure we eat the
 # double slashes in the second step
 SET_IF_EMPTY(DEAL_II_CODE_GALLERY_DIRECTORY ${CMAKE_SOURCE_DIR}/code-gallery)
-FILE(GLOB _code_gallery_names 
+FILE(GLOB _code_gallery_names
      "${DEAL_II_CODE_GALLERY_DIRECTORY}/*/doc/author")
 STRING(REGEX REPLACE "/+doc/+author" "" _code_gallery_names "${_code_gallery_names}")
 
 #
 # Define target for the tutorial. It depends on the
 # file tutorial.h built via the next target below, as well
-# as the various files we create from the tutorial 
+# as the various files we create from the tutorial
 # directories below that. These dependencies are added
 # below the respective targets.
 #

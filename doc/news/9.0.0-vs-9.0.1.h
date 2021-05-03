@@ -38,19 +38,11 @@ modifications to application programs. We apologize for the
 inconvenience this causes.
 </p>
 
-<ol>
-
-</ol>
-
 
 <!-- ----------- GENERAL IMPROVEMENTS ----------------- -->
 
 <a name="general"></a>
 <h3>General</h3>
-
-<ol>
-
-</ol>
 
 
 <!-- ----------- SPECIFIC IMPROVEMENTS ----------------- -->

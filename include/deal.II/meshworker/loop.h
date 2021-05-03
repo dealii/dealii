@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -33,8 +33,11 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declaration
+#ifndef DOXYGEN
 template <typename>
 class TriaActiveIterator;
+#endif
 
 namespace internal
 {
@@ -182,8 +185,6 @@ namespace MeshWorker
    * performed.
    *
    * @ingroup MeshWorker
-   * @author Guido Kanschat
-   * @date 2010
    */
   template <class INFOBOX, class DOFINFO, int dim, int spacedim, class ITERATOR>
   void
@@ -242,11 +243,7 @@ namespace MeshWorker
     info.post_cell(dof_info);
 
     if (integrate_interior_face || integrate_boundary)
-      for (unsigned int face_no = 0;
-           face_no <
-           GeometryInfo<
-             ITERATOR::AccessorType::Container::dimension>::faces_per_cell;
-           ++face_no)
+      for (const unsigned int face_no : cell->face_indices())
         {
           typename ITERATOR::AccessorType::Container::face_iterator face =
             cell->face(face_no);
@@ -272,7 +269,7 @@ namespace MeshWorker
               if (neighbor->is_level_cell())
                 neighbid = neighbor->level_subdomain_id();
               // subdomain id is only valid for active cells
-              else if (neighbor->active())
+              else if (neighbor->is_active())
                 neighbid = neighbor->subdomain_id();
 
               const bool own_neighbor =
@@ -304,8 +301,8 @@ namespace MeshWorker
                   (periodic_neighbor &&
                    cell->periodic_neighbor_is_coarser(face_no)))
                 {
-                  Assert(!cell->has_children(), ExcInternalError());
-                  Assert(!neighbor->has_children(), ExcInternalError());
+                  Assert(cell->is_active(), ExcInternalError());
+                  Assert(neighbor->is_active(), ExcInternalError());
 
                   // skip if only one processor needs to assemble the face
                   // to a ghost cell and the fine cell is not ours.
@@ -341,7 +338,7 @@ namespace MeshWorker
                 {
                   // If iterator is active and neighbor is refined, skip
                   // internal face.
-                  if (internal::is_active_iterator(cell) &&
+                  if (dealii::internal::is_active_iterator(cell) &&
                       neighbor->has_children())
                     {
                       Assert(
@@ -431,7 +428,6 @@ namespace MeshWorker
    * arguments.
    *
    * @ingroup MeshWorker
-   * @author Guido Kanschat, 2009
    */
   template <int dim,
             int spacedim,
@@ -458,7 +454,7 @@ namespace MeshWorker
     DoFInfoBox<dim, DOFINFO> dof_info(dinfo);
 
     assembler.initialize_info(dof_info.cell, false);
-    for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+    for (unsigned int i : GeometryInfo<dim>::face_indices())
       {
         assembler.initialize_info(dof_info.interior[i], true);
         assembler.initialize_info(dof_info.exterior[i], true);
@@ -468,17 +464,19 @@ namespace MeshWorker
     WorkStream::run(
       begin,
       end,
-      std::bind(&cell_action<INFOBOX, DOFINFO, dim, spacedim, ITERATOR>,
-                std::placeholders::_1,
-                std::placeholders::_3,
-                std::placeholders::_2,
-                cell_worker,
-                boundary_worker,
-                face_worker,
-                lctrl),
-      std::bind(&internal::assemble<dim, DOFINFO, ASSEMBLER>,
-                std::placeholders::_1,
-                &assembler),
+      [&cell_worker, &boundary_worker, &face_worker, &lctrl](
+        ITERATOR cell, INFOBOX &info, DoFInfoBox<dim, DOFINFO> &dof_info) {
+        cell_action<INFOBOX, DOFINFO, dim, spacedim, ITERATOR>(cell,
+                                                               dof_info,
+                                                               info,
+                                                               cell_worker,
+                                                               boundary_worker,
+                                                               face_worker,
+                                                               lctrl);
+      },
+      [&assembler](const MeshWorker::DoFInfoBox<dim, DOFINFO> &dinfo) {
+        dealii::internal::assemble<dim, DOFINFO, ASSEMBLER>(dinfo, &assembler);
+      },
       info,
       dof_info);
   }
@@ -489,7 +487,6 @@ namespace MeshWorker
    * virtual functions in LocalIntegrator.
    *
    * @ingroup MeshWorker
-   * @author Guido Kanschat, 2009
    */
   template <int dim, int spacedim, class ITERATOR, class ASSEMBLER>
   void
@@ -513,22 +510,28 @@ namespace MeshWorker
                        IntegrationInfo<dim, spacedim> &)>
       face_worker;
     if (integrator.use_cell)
-      cell_worker = std::bind(&LocalIntegrator<dim, spacedim>::cell,
-                              &integrator,
-                              std::placeholders::_1,
-                              std::placeholders::_2);
+      cell_worker =
+        [&integrator](DoFInfo<dim, spacedim> &        dof_info,
+                      IntegrationInfo<dim, spacedim> &integration_info) {
+          integrator.cell(dof_info, integration_info);
+        };
     if (integrator.use_boundary)
-      boundary_worker = std::bind(&LocalIntegrator<dim, spacedim>::boundary,
-                                  &integrator,
-                                  std::placeholders::_1,
-                                  std::placeholders::_2);
+      boundary_worker =
+        [&integrator](DoFInfo<dim, spacedim> &        dof_info,
+                      IntegrationInfo<dim, spacedim> &integration_info) {
+          integrator.boundary(dof_info, integration_info);
+        };
     if (integrator.use_face)
-      face_worker = std::bind(&LocalIntegrator<dim, spacedim>::face,
-                              &integrator,
-                              std::placeholders::_1,
-                              std::placeholders::_2,
-                              std::placeholders::_3,
-                              std::placeholders::_4);
+      face_worker =
+        [&integrator](DoFInfo<dim, spacedim> &        dof_info_1,
+                      DoFInfo<dim, spacedim> &        dof_info_2,
+                      IntegrationInfo<dim, spacedim> &integration_info_1,
+                      IntegrationInfo<dim, spacedim> &integration_info_2) {
+          integrator.face(dof_info_1,
+                          dof_info_2,
+                          integration_info_1,
+                          integration_info_2);
+        };
 
     loop<dim, spacedim>(begin,
                         end,

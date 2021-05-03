@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2011 - 2019 by the deal.II authors
+ * Copyright (C) 2011 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -38,19 +38,15 @@
 
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_refinement.h>
 
 #include <deal.II/dofs/dof_tools.h>
-#include <deal.II/dofs/dof_accessor.h>
 
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_values.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/fe_values.h>
 
@@ -70,7 +66,7 @@ namespace Step46
 
   // This is the main class. It is, if you want, a combination of step-8 and
   // step-22 in that it has member variables that either address the global
-  // problem (the Triangulation and hp::DoFHandler objects, as well as the
+  // problem (the Triangulation and DoFHandler objects, as well as the
   // hp::FECollection and various linear algebra objects) or that pertain to
   // either the elasticity or Stokes sub-problems. The general structure of
   // the class, however, is like that of most of the other programs
@@ -104,10 +100,10 @@ namespace Step46
     };
 
     static bool cell_is_in_fluid_domain(
-      const typename hp::DoFHandler<dim>::cell_iterator &cell);
+      const typename DoFHandler<dim>::cell_iterator &cell);
 
     static bool cell_is_in_solid_domain(
-      const typename hp::DoFHandler<dim>::cell_iterator &cell);
+      const typename DoFHandler<dim>::cell_iterator &cell);
 
 
     void make_grid();
@@ -132,7 +128,7 @@ namespace Step46
     FESystem<dim>         stokes_fe;
     FESystem<dim>         elasticity_fe;
     hp::FECollection<dim> fe_collection;
-    hp::DoFHandler<dim>   dof_handler;
+    DoFHandler<dim>       dof_handler;
 
     AffineConstraints<double> constraints;
 
@@ -249,7 +245,7 @@ namespace Step46
 
   template <int dim>
   bool FluidStructureProblem<dim>::cell_is_in_fluid_domain(
-    const typename hp::DoFHandler<dim>::cell_iterator &cell)
+    const typename DoFHandler<dim>::cell_iterator &cell)
   {
     return (cell->material_id() == fluid_domain_id);
   }
@@ -257,7 +253,7 @@ namespace Step46
 
   template <int dim>
   bool FluidStructureProblem<dim>::cell_is_in_solid_domain(
-    const typename hp::DoFHandler<dim>::cell_iterator &cell)
+    const typename DoFHandler<dim>::cell_iterator &cell)
   {
     return (cell->material_id() == solid_domain_id);
   }
@@ -281,10 +277,9 @@ namespace Step46
     GridGenerator::subdivided_hyper_cube(triangulation, 8, -1, 1);
 
     for (const auto &cell : triangulation.active_cell_iterators())
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
-        if (cell->face(f)->at_boundary() &&
-            (cell->face(f)->center()[dim - 1] == 1))
-          cell->face(f)->set_all_boundary_ids(1);
+      for (const auto &face : cell->face_iterators())
+        if (face->at_boundary() && (face->center()[dim - 1] == 1))
+          face->set_all_boundary_ids(1);
 
 
     for (const auto &cell : dof_handler.active_cell_iterators())
@@ -365,23 +360,24 @@ namespace Step46
     // introduction:
     {
       std::vector<types::global_dof_index> local_face_dof_indices(
-        stokes_fe.dofs_per_face);
+        stokes_fe.n_dofs_per_face());
       for (const auto &cell : dof_handler.active_cell_iterators())
         if (cell_is_in_fluid_domain(cell))
-          for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
-            if (!cell->at_boundary(f))
+          for (const auto face_no : cell->face_indices())
+            if (cell->face(face_no)->at_boundary() == false)
               {
                 bool face_is_on_interface = false;
 
-                if ((cell->neighbor(f)->has_children() == false) &&
-                    (cell_is_in_solid_domain(cell->neighbor(f))))
+                if ((cell->neighbor(face_no)->has_children() == false) &&
+                    (cell_is_in_solid_domain(cell->neighbor(face_no))))
                   face_is_on_interface = true;
-                else if (cell->neighbor(f)->has_children() == true)
+                else if (cell->neighbor(face_no)->has_children() == true)
                   {
-                    for (unsigned int sf = 0; sf < cell->face(f)->n_children();
+                    for (unsigned int sf = 0;
+                         sf < cell->face(face_no)->n_children();
                          ++sf)
                       if (cell_is_in_solid_domain(
-                            cell->neighbor_child_on_subface(f, sf)))
+                            cell->neighbor_child_on_subface(face_no, sf)))
                         {
                           face_is_on_interface = true;
                           break;
@@ -390,7 +386,8 @@ namespace Step46
 
                 if (face_is_on_interface)
                   {
-                    cell->face(f)->get_dof_indices(local_face_dof_indices, 0);
+                    cell->face(face_no)->get_dof_indices(local_face_dof_indices,
+                                                         0);
                     for (unsigned int i = 0; i < local_face_dof_indices.size();
                          ++i)
                       if (stokes_fe.face_system_to_component_index(i).first <
@@ -482,24 +479,26 @@ namespace Step46
     FEFaceValues<dim>    stokes_fe_face_values(stokes_fe,
                                             common_face_quadrature,
                                             update_JxW_values |
-                                              update_normal_vectors |
-                                              update_gradients);
+                                              update_gradients | update_values);
     FEFaceValues<dim>    elasticity_fe_face_values(elasticity_fe,
                                                 common_face_quadrature,
-                                                update_values);
+                                                update_normal_vectors |
+                                                  update_values);
     FESubfaceValues<dim> stokes_fe_subface_values(stokes_fe,
                                                   common_face_quadrature,
                                                   update_JxW_values |
-                                                    update_normal_vectors |
-                                                    update_gradients);
+                                                    update_gradients |
+                                                    update_values);
     FESubfaceValues<dim> elasticity_fe_subface_values(elasticity_fe,
                                                       common_face_quadrature,
-                                                      update_values);
+                                                      update_normal_vectors |
+                                                        update_values);
 
     // ...to objects that are needed to describe the local contributions to
     // the global linear system...
-    const unsigned int stokes_dofs_per_cell     = stokes_fe.dofs_per_cell;
-    const unsigned int elasticity_dofs_per_cell = elasticity_fe.dofs_per_cell;
+    const unsigned int stokes_dofs_per_cell = stokes_fe.n_dofs_per_cell();
+    const unsigned int elasticity_dofs_per_cell =
+      elasticity_fe.n_dofs_per_cell();
 
     FullMatrix<double> local_matrix;
     FullMatrix<double> local_interface_matrix(elasticity_dofs_per_cell,
@@ -538,9 +537,9 @@ namespace Step46
 
         const FEValues<dim> &fe_values = hp_fe_values.get_present_fe_values();
 
-        local_matrix.reinit(cell->get_fe().dofs_per_cell,
-                            cell->get_fe().dofs_per_cell);
-        local_rhs.reinit(cell->get_fe().dofs_per_cell);
+        local_matrix.reinit(cell->get_fe().n_dofs_per_cell(),
+                            cell->get_fe().n_dofs_per_cell());
+        local_rhs.reinit(cell->get_fe().n_dofs_per_cell());
 
         // With all of this done, we continue to assemble the cell terms for
         // cells that are part of the Stokes and elastic regions. While we
@@ -558,7 +557,7 @@ namespace Step46
         // documentation module for the elasticity equations:
         if (cell_is_in_fluid_domain(cell))
           {
-            const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
+            const unsigned int dofs_per_cell = cell->get_fe().n_dofs_per_cell();
             Assert(dofs_per_cell == stokes_dofs_per_cell, ExcInternalError());
 
             for (unsigned int q = 0; q < fe_values.n_quadrature_points; ++q)
@@ -584,7 +583,7 @@ namespace Step46
           }
         else
           {
-            const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
+            const unsigned int dofs_per_cell = cell->get_fe().n_dofs_per_cell();
             Assert(dofs_per_cell == elasticity_dofs_per_cell,
                    ExcInternalError());
 
@@ -622,7 +621,7 @@ namespace Step46
         // along since the elimination of nonzero boundary values requires the
         // modification of local and consequently also global right hand side
         // values:
-        local_dof_indices.resize(cell->get_fe().dofs_per_cell);
+        local_dof_indices.resize(cell->get_fe().n_dofs_per_cell());
         cell->get_dof_indices(local_dof_indices);
         constraints.distribute_local_to_global(local_matrix,
                                                local_rhs,
@@ -640,8 +639,8 @@ namespace Step46
         // boundary and the potential neighbor behind it is part of the fluid
         // domain. Let's start with these conditions:
         if (cell_is_in_solid_domain(cell))
-          for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
-            if (cell->at_boundary(f) == false)
+          for (const auto f : cell->face_indices())
+            if (cell->face(f)->at_boundary() == false)
               {
                 // At this point we know that the current cell is a candidate
                 // for integration and that a neighbor behind face
@@ -795,11 +794,14 @@ namespace Step46
     for (unsigned int q = 0; q < n_face_quadrature_points; ++q)
       {
         const Tensor<1, dim> normal_vector =
-          stokes_fe_face_values.normal_vector(q);
+          elasticity_fe_face_values.normal_vector(q);
 
         for (unsigned int k = 0; k < stokes_fe_face_values.dofs_per_cell; ++k)
-          stokes_symgrad_phi_u[k] =
-            stokes_fe_face_values[velocities].symmetric_gradient(k, q);
+          {
+            stokes_symgrad_phi_u[k] =
+              stokes_fe_face_values[velocities].symmetric_gradient(k, q);
+            stokes_phi_p[k] = stokes_fe_face_values[pressure].value(k, q);
+          }
         for (unsigned int k = 0; k < elasticity_fe_face_values.dofs_per_cell;
              ++k)
           elasticity_phi[k] =
@@ -809,7 +811,7 @@ namespace Step46
              ++i)
           for (unsigned int j = 0; j < stokes_fe_face_values.dofs_per_cell; ++j)
             local_interface_matrix(i, j) +=
-              -((2 * viscosity * (stokes_symgrad_phi_u[j] * normal_vector) +
+              -((2 * viscosity * (stokes_symgrad_phi_u[j] * normal_vector) -
                  stokes_phi_p[j] * normal_vector) *
                 elasticity_phi[i] * stokes_fe_face_values.JxW(q));
       }
@@ -839,8 +841,7 @@ namespace Step46
   // Generating graphical output is rather trivial here: all we have to do is
   // identify which components of the solution vector belong to scalars and/or
   // vectors (see, for example, step-22 for a previous example), and then pass
-  // it all on to the DataOut class (with the second template argument equal
-  // to hp::DoFHandler instead of the usual default DoFHandler):
+  // it all on to the DataOut class:
   template <int dim>
   void FluidStructureProblem<dim>::output_results(
     const unsigned int refinement_cycle) const
@@ -859,12 +860,12 @@ namespace Step46
       data_component_interpretation.push_back(
         DataComponentInterpretation::component_is_part_of_vector);
 
-    DataOut<dim, hp::DoFHandler<dim>> data_out;
+    DataOut<dim> data_out;
     data_out.attach_dof_handler(dof_handler);
 
     data_out.add_data_vector(solution,
                              solution_names,
-                             DataOut<dim, hp::DoFHandler<dim>>::type_dof_data,
+                             DataOut<dim>::type_dof_data,
                              data_component_interpretation);
     data_out.build_patches();
 
@@ -949,7 +950,7 @@ namespace Step46
     // encountered when assembling interface terms in
     // <code>assemble_system</code>.
     for (const auto &cell : dof_handler.active_cell_iterators())
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+      for (const auto f : cell->face_indices())
         if (cell_is_in_solid_domain(cell))
           {
             if ((cell->at_boundary(f) == false) &&
@@ -1033,7 +1034,6 @@ int main()
 {
   try
     {
-      using namespace dealii;
       using namespace Step46;
 
       FluidStructureProblem<2> flow_problem(1, 1);

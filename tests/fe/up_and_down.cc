@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -84,7 +84,7 @@ check_element(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
   for (typename DoFHandler<dim>::cell_iterator cell = dof_handler.begin();
        cell != dof_handler.end();
        ++cell)
-    if (cell->has_children() && cell->child(0)->active())
+    if (cell->has_children() && cell->child(0)->is_active())
       {
         // first make sure that what
         // we do is reasonable. for
@@ -93,7 +93,7 @@ check_element(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
         // some of them
         for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell;
              ++c)
-          AssertThrow(cell->child(c)->active(), ExcInternalError());
+          AssertThrow(cell->child(c)->is_active(), ExcInternalError());
 
         // then restrict and prolongate
         cell->get_interpolated_dof_values(tmp, v);
@@ -109,7 +109,7 @@ check_element(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
   for (typename DoFHandler<dim>::cell_iterator cell = dof_handler.begin();
        cell != dof_handler.end();
        ++cell)
-    if (cell->has_children() && cell->child(0)->active())
+    if (cell->has_children() && cell->child(0)->is_active())
       {
         cell->get_interpolated_dof_values(x, v);
         cell->set_dof_values_by_interpolation(v, x2);

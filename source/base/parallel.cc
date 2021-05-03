@@ -53,7 +53,7 @@ namespace parallel
 {
   namespace internal
   {
-#ifdef DEAL_II_WITH_THREADS
+#ifdef DEAL_II_WITH_TBB
     TBBPartitioner::TBBPartitioner()
       : my_partitioner(std::make_shared<tbb::affinity_partitioner>())
       , in_use(false)

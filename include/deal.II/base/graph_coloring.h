@@ -1,7 +1,7 @@
 
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2019 by the deal.II authors
+// Copyright (C) 2013 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -103,8 +103,6 @@ namespace GraphColoring
      * std::vector for efficiency). Each element of the outermost set
      * corresponds to the iterators pointing to objects that are in the same
      * partition (i.e., the same zone).
-     *
-     * @author Martin Kronbichler, Bruno Turcksin
      */
     template <typename Iterator>
     std::vector<std::vector<Iterator>>
@@ -199,12 +197,15 @@ namespace GraphColoring
 
     /**
      * This function uses DSATUR (Degree SATURation) to color the elements of
-     * a set. DSATUR works as follows: -# Arrange the vertices by decreasing
-     * order of degrees. -# Color a vertex of maximal degree with color 1. -#
-     * Choose a vertex with a maximal saturation degree. If there is equality,
-     * choose any vertex of maximal degree in the uncolored subgraph. -# Color
-     * the chosen vertex with the least possible (lowest numbered) color. -#
-     * If all the vertices are colored, stop. Otherwise, return to 3.
+     * a set. DSATUR works as follows:
+     * -# Arrange the vertices by decreasing order of degrees.
+     * -# Color a vertex of maximal degree with color 1.
+     * -# Choose a vertex with a maximal saturation degree. If there is
+     *    equality, choose any vertex of maximal degree in the uncolored
+     *    subgraph.
+     * -# Color the chosen vertex with the least possible (lowest numbered)
+     *    color.
+     * -# If all the vertices are colored, stop. Otherwise, return to 3.
      *
      * @param[in] partition The set of iterators that should be colored.
      * @param[in] get_conflict_indices A user defined function object
@@ -533,8 +534,6 @@ namespace GraphColoring
    * corresponds to the iterators pointing to objects that are in the same
    * partition (have the same color) and consequently do not conflict. The
    * elements of different sets may conflict.
-   *
-   * @author Martin Kronbichler, Bruno Turcksin
    */
   template <typename Iterator>
   std::vector<std::vector<Iterator>>

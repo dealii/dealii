@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -126,18 +126,17 @@ check_block(const FiniteElement<dim> &fe)
   GridGenerator::hyper_cube(tr);
   tr.refine_global(2);
 
-  DoFHandler<dim>  mgdof(tr);
-  DoFHandler<dim> &dof = mgdof;
+  DoFHandler<dim> mgdof(tr);
   mgdof.distribute_dofs(fe);
-  mgdof.distribute_mg_dofs(fe);
+  mgdof.distribute_mg_dofs();
 
   // Make sure all orderings are the
   // same
   Tensor<1, dim> direction;
   for (unsigned int d = 0; d < dim; ++d)
     direction[d] = d * d * d;
-  DoFRenumbering::downstream(dof, direction);
-  DoFRenumbering::component_wise(dof);
+  DoFRenumbering::downstream(mgdof, direction);
+  DoFRenumbering::component_wise(mgdof);
   for (unsigned int l = 0; l < tr.n_levels(); ++l)
     {
       DoFRenumbering::downstream(mgdof, l, direction);
@@ -145,8 +144,8 @@ check_block(const FiniteElement<dim> &fe)
     }
 
   // Store sizes
-  vector<types::global_dof_index> ndofs(fe.n_blocks());
-  DoFTools::count_dofs_per_block(mgdof, ndofs);
+  const vector<types::global_dof_index> ndofs =
+    DoFTools::count_dofs_per_fe_block(mgdof);
   std::vector<std::vector<types::global_dof_index>> mg_ndofs(
     mgdof.get_triangulation().n_levels(),
     std::vector<types::global_dof_index>(fe.n_blocks()));
@@ -155,9 +154,9 @@ check_block(const FiniteElement<dim> &fe)
   MGTransferPrebuilt<BlockVector<double>> transfer;
   MGTransferBlock<double>                 transfer_block;
   MGTransferBlockSelect<double>           transfer_select;
-  transfer.build_matrices(mgdof);
-  transfer_block.build_matrices(dof, mgdof, selected);
-  transfer_select.build_matrices(dof, mgdof, 0);
+  transfer.build(mgdof);
+  transfer_block.build(mgdof, selected);
+  transfer_select.build(mgdof, 0);
 
   BlockVector<double> u2(mg_ndofs[2]);
   BlockVector<double> u1(mg_ndofs[1]);
@@ -267,9 +266,8 @@ check_block(const FiniteElement<dim> &fe)
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(3);
-  deallog.attach(logfile);
 
   std::vector<double> factors;
 

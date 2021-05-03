@@ -441,7 +441,7 @@ independent of the dimension.
   <br>
   (WB, 2010/12/20)
   </p></li>
-  
+
   <li><p>New: When computing errors using
   VectorTools::integrate_difference in codimension one problems, if
   you specified a norm that requires the computation of the gradients,
@@ -452,7 +452,7 @@ independent of the dimension.
   <br>
   (Luca Heltai, 2010/12/05)
   </p></li>
-  
+
   <li><p>New: The VectorTools::interpolate_boundary_values function can now
   also be used to interpolate boundary values on meshes embedded in a higher
   dimensional space.

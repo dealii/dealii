@@ -1,6 +1,6 @@
 <h1>Results</h1>
 
-The program produces a series of <code>.eps</code> files of the
+The program produces a series of <code>.vtu</code> files of the
 triangulations. The methods are discussed above.
 
 
@@ -12,8 +12,7 @@ Triangulation needs to know where to put new vertices on the mid-points of
 edges, faces, and cells. By default, these new points will be placed at the
 arithmetic mean of the surrounding points, but this isn't what you want if you
 need curved boundaries that aren't already adequately resolved by the coarse
-mesh. Several of the meshes shown in the introduction section fall into this
-category. For example, for this mesh the central hole is supposed to be round:
+mesh. For example, for this mesh the central hole is supposed to be round:
 
 <img src="https://www.dealii.org/images/steps/developer/step-49.grid-2a.png" alt="" height="200px">
 
@@ -56,6 +55,12 @@ to use a curved geometry. The way to do this requires three steps:
   Now, when the grid is refined, all cell splitting calculations will be done in
   polar coordinates.
 
+All functions in the GridGenerator namespace which create a mesh where some
+cells should be curved also attach the correct Manifold object to the provided
+Triangulation: i.e., for those functions we get the correct behavior by
+default. For a hand-generated mesh, however, the situation is much more
+interesting.
+
 To illustrate this process in more detail, let us consider an example created
 by Yuhan Zhou as part of a 2013 semester project at Texas A&amp;M University.
 The goal was to generate (and use) a geometry that describes a
@@ -86,7 +91,7 @@ void create_2d_grid(
   std::vector<CellData<2>> cells(vertex_indices.size());
   for (unsigned int i = 0; i < cells.size(); ++i)
     {
-      for (unsigned int j = 0; j < GeometryInfo<2>::vertices_per_cell; ++j)
+      for (unsigned int j = 0; j < vertex_indices[i].size(); ++j)
         cells[i].vertices[j] = vertex_indices[i][j];
     }
 
@@ -304,11 +309,10 @@ for (auto &cell : triangulation.active_cell_iterators())
   if (cell->center()[1] >= 3.0)
     cell->set_all_manifold_ids(cylinder_id);
 
-for (auto &cell : triangulation.active_cell_iterators())
-  for (unsigned int face_n = 0; face_n < GeometryInfo<3>::faces_per_cell;
-       ++face_n)
+for (const auto &cell : triangulation.active_cell_iterators())
+  for (const auto &face : cell->face_iterators())
     {
-      const Point<3> face_center = cell->face(face_n)->center();
+      const Point<3> face_center = face->center();
       if (std::abs(face_center[0]) < 1.0e-5 &&
           std::abs(face_center[1] - 3.0) < 1.0e-5)
         cell->set_all_manifold_ids(numbers::flat_manifold_id);
@@ -328,3 +332,42 @@ the nice detail of the boundary fitted mesh if we refine two more times:
 
 <img src="https://www.dealii.org/images/steps/developer/step-49.yuhan.11.png"
      alt="" width="400" height="355">
+
+
+<h3> Possibilities for extensions </h3>
+
+<h4> Assigning different boundary ids </h4>
+
+It is often useful to assign different boundary ids to a mesh that is
+generated in one form or another as described in this tutorial to apply
+different boundary conditions.
+
+For example, you might want to apply a different boundary condition for the
+right boundary of the first grid in this program. To do this, iterate over the
+cells and their faces and identify the correct faces (for example using
+`cell->center()` to query the coordinates of the center of a cell as we
+do in step-1, or using `cell->face(f)->get_boundary_id()` to query the current
+boundary indicator of the $f$th face of the cell). You can then use
+`cell->face(f)->set_boundary_id()` to set the boundary id to something different.
+You can take a look back at step-1 how iteration over the meshes is done there.
+
+<h4> Extracting a boundary mesh </h4>
+
+Computations on manifolds, like they are done in step-38, require a surface
+mesh embedded into a higher dimensional space. While some can be constructed
+using the GridGenerator namespace or loaded from a file, it is sometimes
+useful to extract a surface mesh from a volume mesh.
+
+Use the function GridGenerator::extract_boundary_mesh() to extract the surface
+elements of a mesh. Using the function on a 3d mesh (a `Triangulation<3,3>`, for
+example from `grid_4()`), this will return a `Triangulation<2,3>` that you can use
+in step-38.  Also try extracting the boundary mesh of a `Triangulation<2,2>`.
+
+
+<!--
+
+Possible Extensions for this tutorial:
+
+- Database of unstructured meshes for convergence studies
+- how to remove or disable a cell inside a mesh
+-->

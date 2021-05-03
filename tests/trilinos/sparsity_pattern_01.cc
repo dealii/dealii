@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2018 by the deal.II authors
+// Copyright (C) 2008 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -26,10 +26,8 @@ main(int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(
     argc, argv, testing_max_num_threads());
-  std::ofstream logfile("output");
-  logfile.setf(std::ios::fixed);
-  deallog << std::setprecision(3);
-  deallog.attach(logfile);
+  initlog();
+  deallog << std::setprecision(3) << std::fixed;
 
   row_length();
 }

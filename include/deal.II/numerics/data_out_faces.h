@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -111,7 +111,6 @@ namespace internal
  * MeshWorker.
  *
  * @ingroup output
- * @author Wolfgang Bangerth, Guido Kanschat, 2000, 2011
  */
 template <int dim, typename DoFHandlerType = DoFHandler<dim>>
 class DataOutFaces : public DataOut_DoFData<DoFHandlerType,
@@ -180,7 +179,7 @@ public:
    * deformation of each vertex.
    *
    * @todo The @p mapping argument should be replaced by a
-   * hp::MappingCollection in case of a hp::DoFHandler.
+   * hp::MappingCollection in case of a DoFHandler with hp-capabilities.
    */
   virtual void
   build_patches(const Mapping<dimension> &mapping,
@@ -199,10 +198,13 @@ public:
 
   /**
    * Return the first face which we want output for. The default
-   * implementation returns the first face of an active cell or the first such
-   * on the boundary.
+   * implementation returns the first face of a (locally owned) active cell
+   * or, if the @p surface_only option was set in the destructor (as is the
+   * default), the first such face that is located on the boundary.
    *
-   * For more general sets, overload this function in a derived class.
+   * If you want to use a different logic to determine which faces should
+   * contribute to the creation of graphical output, you can overload this
+   * function in a derived class.
    */
   virtual FaceDescriptor
   first_face();
@@ -212,12 +214,17 @@ public:
    * faces, <tt>dofs->end()</tt> is returned as the first component of the
    * return value.
    *
-   * The default implementation returns the next face of an active cell, or
-   * the next such on the boundary.
+   * The default implementation returns the next face of a (locally owned)
+   * active cell, or the next such on the boundary (depending on whether the
+   * @p surface_only option was provided to the constructor).
    *
-   * This function traverses the mesh cell by cell (active only), and then
-   * through all faces of the cell. As a result, interior faces are output
-   * twice.  This function can be overloaded in a derived class to select a
+   * This function traverses the mesh active cell by active cell (restricted to
+   * locally owned cells), and then through all faces of the cell. As a result,
+   * interior faces are output twice, a feature that is useful for
+   * discontinuous Galerkin methods or if a DataPostprocessor is used that
+   * might produce results that are discontinuous between cells).
+   *
+   * This function can be overloaded in a derived class to select a
    * different set of faces. Note that the default implementation assumes that
    * the given @p face is active, which is guaranteed as long as first_face()
    * is also used from the default implementation. Overloading only one of the
@@ -242,6 +249,18 @@ private:
       &                                                 data,
     DataOutBase::Patch<dimension - 1, space_dimension> &patch);
 };
+
+namespace Legacy
+{
+  /**
+   * The template arguments of the original dealii::DataOutFaces class will
+   * change in a future release. If for some reason, you need a code that is
+   * compatible with deal.II 9.3 and the subsequent release, use this alias
+   * instead.
+   */
+  template <int dim, typename DoFHandlerType = DoFHandler<dim>>
+  using DataOutFaces = dealii::DataOutFaces<dim, DoFHandlerType>;
+} // namespace Legacy
 
 
 DEAL_II_NAMESPACE_CLOSE

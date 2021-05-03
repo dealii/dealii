@@ -1,0 +1,292 @@
+<h1>Results</h1>
+
+We run the program with right hand side and boundary values as
+discussed in the introduction. These will produce the
+solution $u = \sin(\pi x) \sin(\pi y)$ on the domain $\Omega = (0,1)^2$.
+We test this setup using $Q_2$, $Q_3$, and $Q_4$ elements, which one can
+change via the `fe_degree` variable in the `main()` function. With mesh
+refinement, the $L_2$ convergence rates, $H^1$-seminorm rate,
+and $H^2$-seminorm convergence of $u$
+should then be around 2, 2, 1 for $Q_2$ (with the $L_2$ norm
+sub-optimal as discussed in the introduction); 4, 3, 2 for
+$Q_3$; and 5, 4, 3 for $Q_4$, respectively.
+
+From the literature, it is not immediately clear what
+the penalty parameter $\gamma$ should be. For example,
+@cite Brenner2009 state that it needs to be larger than one, and
+choose $\gamma=5$. The FEniCS/Dolphin tutorial chooses it as
+$\gamma=8$, see
+https://fenicsproject.org/docs/dolfin/1.6.0/python/demo/documented/biharmonic/python/documentation.html
+. @cite Wells2007 uses a value for $\gamma$ larger than the
+number of edges belonging to an element for Kirchhoff plates (see
+their Section 4.2). This suggests that maybe
+$\gamma = 1$, $2$, are too small; on the other hand, a value
+$p(p+1)$ would be reasonable,
+where $p$ is the degree of polynomials. The last of these choices is
+the one one would expect to work by comparing
+to the discontinuous Galerkin formulations for the Laplace equation
+(see, for example, the discussions in step-39 and step-74),
+and it will turn out to also work here.
+But we should check what value of $\gamma$ is right, and we will do so
+below; changing $\gamma$ is easy in the two `face_worker` and
+`boundary_worker` functions defined in `assemble_system()`.
+
+
+<h3>Test results on <i>Q<sub>2</sub></i> with <i>&gamma; = p(p+1)</i> </h3>
+
+We run the code with differently refined meshes
+and get the following convergence rates.
+
+<table align="center" class="doxtable">
+  <tr>
+   <th>Number of refinements </th><th>  $\|u-u_h^\circ\|_{L_2}$ </th><th>  Conv. rates  </th><th>  $|u-u_h|_{H^1}$ </th><th> Conv. rates </th><th> $|u-u_h|_{H^2}$ </th><th> Conv. rates </th>
+  </tr>
+  <tr>
+   <td>   2                  </td><td>   8.780e-03 </td><td>       </td><td>  7.095e-02   </td><td>           </td><td>  1.645 </td><td>   </td>
+  </tr>
+  <tr>
+   <td>   3                  </td><td>   3.515e-03   </td><td>  1.32 </td><td> 2.174e-02  </td><td>     1.70     </td><td> 8.121e-01  </td><td>  1.018  </td>
+  </tr>
+  <tr>
+   <td>   4                  </td><td>   1.103e-03   </td><td>  1.67   </td><td> 6.106e-03    </td><td>  1.83        </td><td>   4.015e-01 </td><td> 1.016  </td>
+  </tr>
+  <tr>
+   <td>   5                  </td><td>  3.084e-04  </td><td>  1.83   </td><td>  1.622e-03   </td><td>    1.91        </td><td> 1.993e-01 </td><td>  1.010   </td>
+  </tr>
+</table>
+We can see that the $L_2$ convergence rates are around 2,
+$H^1$-seminorm convergence rates are around 2,
+and $H^2$-seminorm convergence rates are around 1. The latter two
+match the theoretically expected rates; for the former, we have no
+theorem but are not surprised that it is sub-optimal given the remark
+in the introduction.
+
+
+<h3>Test results on <i>Q<sub>3</sub></i> with <i>&gamma; = p(p+1)</i> </h3>
+
+
+<table align="center" class="doxtable">
+  <tr>
+   <th>Number of refinements </th><th>  $\|u-u_h^\circ\|_{L_2}$ </th><th>  Conv. rates  </th><th>  $|u-u_h|_{H^1}$ </th><th> Conv. rates </th><th> $|u-u_h|_{H^2}$ </th><th> Conv. rates </th>
+  </tr>
+  <tr>
+   <td>   2                  </td><td>    2.045e-04 </td><td>       </td><td>   4.402e-03   </td><td>           </td><td> 1.641e-01 </td><td>   </td>
+  </tr>
+  <tr>
+   <td>   3                  </td><td>   1.312e-05   </td><td> 3.96  </td><td>  5.537e-04  </td><td>   2.99     </td><td> 4.096e-02 </td><td>  2.00  </td>
+  </tr>
+  <tr>
+   <td>   4                  </td><td>   8.239e-07 </td><td>  3.99  </td><td> 6.904e-05   </td><td> 3.00     </td><td> 1.023e-02 </td><td> 2.00 </td>
+  </tr>
+  <tr>
+   <td>   5                  </td><td>   5.158e-08  </td><td>  3.99 </td><td> 8.621e-06 </td><td>  3.00      </td><td> 2.558e-03  </td><td>  2.00  </td>
+  </tr>
+</table>
+We can see that the $L_2$ convergence rates are around 4,
+$H^1$-seminorm convergence rates are around 3,
+and $H^2$-seminorm convergence rates are around 2.
+This, of course, matches our theoretical expectations.
+
+
+<h3>Test results on <i>Q<sub>4</sub></i> with <i>&gamma; = p(p+1)</i> </h3>
+
+<table align="center" class="doxtable">
+  <tr>
+   <th>Number of refinements </th><th>  $\|u-u_h^\circ\|_{L_2}$ </th><th>  Conv. rates  </th><th>  $|u-u_h|_{H^1}$ </th><th> Conv. rates </th><th> $|u-u_h|_{H^2}$ </th><th> Conv. rates </th>
+  </tr>
+  <tr>
+   <td>   2                  </td><td>    6.510e-06 </td><td>       </td><td> 2.215e-04   </td><td>           </td><td>  1.275e-02 </td><td>   </td>
+  </tr>
+  <tr>
+   <td>   3                  </td><td>   2.679e-07  </td><td>  4.60  </td><td> 1.569e-05  </td><td>   3.81    </td><td> 1.496e-03 </td><td>  3.09  </td>
+  </tr>
+  <tr>
+   <td>   4                  </td><td>   9.404e-09  </td><td> 4.83   </td><td> 1.040e-06    </td><td> 3.91       </td><td> 1.774e-04 </td><td> 3.07 </td>
+  </tr>
+  <tr>
+   <td>   5                  </td><td>   7.943e-10 </td><td>  3.56  </td><td>   6.693e-08 </td><td> 3.95     </td><td> 2.150e-05  </td><td> 3.04    </td>
+  </tr>
+</table>
+We can see that the $L_2$ norm convergence rates are around 5,
+$H^1$-seminorm convergence rates are around 4,
+and $H^2$-seminorm convergence rates are around 3.
+On the finest mesh, the $L_2$ norm convergence rate
+is much smaller than our theoretical expectations
+because the linear solver becomes the limiting factor due
+to round-off. Of course the $L_2$ error is also very small already in
+that case.
+
+
+<h3>Test results on <i>Q<sub>2</sub></i> with <i>&gamma; = 1</i> </h3>
+
+For comparison with the results above, let us now also consider the
+case where we simply choose $\gamma=1$:
+
+<table align="center" class="doxtable">
+  <tr>
+   <th>Number of refinements </th><th>  $\|u-u_h^\circ\|_{L_2}$ </th><th>  Conv. rates  </th><th>  $|u-u_h|_{H^1}$ </th><th> Conv. rates </th><th> $|u-u_h|_{H^2}$ </th><th> Conv. rates </th>
+  </tr>
+  <tr>
+   <td>   2                  </td><td>   7.350e-02 </td><td>       </td><td>   7.323e-01   </td><td>           </td><td> 10.343 </td><td>   </td>
+  </tr>
+  <tr>
+   <td>   3                  </td><td>   6.798e-03   </td><td> 3.43  </td><td> 1.716e-01   </td><td>   2.09    </td><td>4.836 </td><td>  1.09 </td>
+  </tr>
+  <tr>
+   <td>   4                  </td><td>  9.669e-04   </td><td> 2.81   </td><td> 6.436e-02    </td><td> 1.41      </td><td>  3.590 </td><td> 0.430 </td>
+  </tr>
+  <tr>
+   <td>   5                  </td><td>   1.755e-04 </td><td> 2.46 </td><td>  2.831e-02  </td><td>    1.18      </td><td>3.144  </td><td>  0.19  </td>
+  </tr>
+</table>
+Although $L_2$ norm convergence rates of $u$ more or less
+follows the theoretical expectations,
+the $H^1$-seminorm and $H^2$-seminorm do not seem to converge as expected.
+Comparing results from $\gamma = 1$ and $\gamma = p(p+1)$, it is clear that
+$\gamma = p(p+1)$ is a better penalty.
+Given that $\gamma=1$ is already too small for $Q_2$ elements, it may not be surprising that if one repeated the
+experiment with a $Q_3$ element, the results are even more disappointing: One again only obtains convergence
+rates of 2, 1, zero -- i.e., no better than for the $Q_2$ element (although the errors are smaller in magnitude).
+Maybe surprisingly, however, one obtains more or less the expected convergence orders when using $Q_4$
+elements. Regardless, this uncertainty suggests that $\gamma=1$ is at best a risky choice, and at worst an
+unreliable one and that we should choose $\gamma$ larger.
+
+
+<h3>Test results on <i>Q<sub>2</sub></i> with <i>&gamma; = 2</i> </h3>
+
+Since $\gamma=1$ is clearly too small, one might conjecture that
+$\gamma=2$ might actually work better. Here is what one obtains in
+that case:
+
+<table align="center" class="doxtable">
+  <tr>
+   <th>Number of refinements </th><th>  $\|u-u_h^\circ\|_{L_2}$ </th><th>  Conv. rates  </th><th>  $|u-u_h|_{H^1}$ </th><th> Conv. rates </th><th> $|u-u_h|_{H^2}$ </th><th> Conv. rates </th>
+  </tr>
+  <tr>
+   <td>   2                  </td><td>   4.133e-02 </td><td>       </td><td>  2.517e-01   </td><td>           </td><td> 3.056 </td><td>   </td>
+  </tr>
+  <tr>
+   <td>   3                  </td><td>  6.500e-03   </td><td>2.66  </td><td> 5.916e-02  </td><td>  2.08    </td><td>1.444 </td><td>  1.08 </td>
+  </tr>
+  <tr>
+   <td>   4                  </td><td> 6.780e-04   </td><td> 3.26  </td><td> 1.203e-02    </td><td> 2.296      </td><td> 6.151e-01 </td><td> 1.231 </td>
+  </tr>
+  <tr>
+   <td>   5                  </td><td> 1.622e-04 </td><td> 2.06 </td><td>  2.448e-03  </td><td>   2.297     </td><td> 2.618e-01  </td><td> 1.232  </td>
+  </tr>
+</table>
+In this case, the convergence rates more or less follow the
+theoretical expectations, but, compared to the results from $\gamma =
+p(p+1)$, are more variable.
+Again, we could repeat this kind of experiment for $Q_3$ and $Q_4$ elements. In both cases, we will find that we
+obtain roughly the expected convergence rates. Of more interest may then be to compare the absolute
+size of the errors. While in the table above, for the $Q_2$ case, the errors on the finest grid are comparable between
+the $\gamma=p(p+1)$ and $\gamma=2$ case, for $Q_3$ the errors are substantially larger for $\gamma=2$ than for
+$\gamma=p(p+1)$. The same is true for the $Q_4$ case.
+
+
+<h3> Conclusions for the choice of the penalty parameter </h3>
+
+The conclusions for which of the "reasonable" choices one should use for the penalty parameter
+is that $\gamma=p(p+1)$ yields the expected results. It is, consequently, what the code
+uses as currently written.
+
+
+<h3> Possibilities for extensions </h3>
+
+There are a number of obvious extensions to this program that would
+make sense:
+
+- The program uses a square domain and a uniform mesh. Real problems
+  don't come this way, and one should verify convergence also on
+  domains with other shapes and, in particular, curved boundaries. One
+  may also be interested in resolving areas of less regularity by
+  using adaptive mesh refinement.
+
+- From a more theoretical perspective, the convergence results above
+  only used the "broken" $H^2$ seminorm $|\cdot|^\circ_{H^2}$ instead
+  of the "equivalent" norm $|\cdot|_h$. This is good enough to
+  convince ourselves that the program isn't fundamentally
+  broken. However, it might be interesting to measure the error in the
+  actual norm for which we have theoretical results. Implementing this
+  addition should not be overly difficult using, for example, the
+  FEInterfaceValues class combined with MeshWorker::mesh_loop() in the
+  same spirit as we used for the assembly of the linear system.
+
+
+  <h4> Derivation for the simply supported plates </h4>
+
+  Similar to the "clamped" boundary condition addressed in the implementation,
+  we will derive the $C^0$ IP finite element scheme for simply supported plates:
+  @f{align*}{
+    \Delta^2 u(\mathbf x) &= f(\mathbf x)
+    \qquad \qquad &&\forall \mathbf x \in \Omega,
+    u(\mathbf x) &= g(\mathbf x) \qquad \qquad
+    &&\forall \mathbf x \in \partial\Omega, \\
+    \Delta u(\mathbf x) &= h(\mathbf x) \qquad \qquad
+    &&\forall \mathbf x \in \partial\Omega.
+  @f}
+  We multiply the biharmonic equation by the test function $v_h$ and integrate over $ K $ and get:
+  @f{align*}{
+    \int_K v_h (\Delta^2 u_h)
+     &= \int_K (D^2 v_h) : (D^2 u_h)
+       + \int_{\partial K} v_h \frac{\partial (\Delta u_h)}{\partial \mathbf{n}}
+       -\int_{\partial K} (\nabla v_h) \cdot (\frac{\partial \nabla u_h}{\partial \mathbf{n}}).
+  @f}
+
+  Summing up over all cells $K \in  \mathbb{T}$,since normal directions of $\Delta u_h$ are pointing at
+  opposite directions on each interior edge shared by two cells and $v_h = 0$ on $\partial \Omega$,
+  @f{align*}{
+  \sum_{K \in \mathbb{T}} \int_{\partial K} v_h \frac{\partial (\Delta u_h)}{\partial \mathbf{n}} = 0,
+  @f}
+  and by the definition of jump over cell interfaces,
+  @f{align*}{
+  -\sum_{K \in \mathbb{T}} \int_{\partial K} (\nabla v_h) \cdot (\frac{\partial \nabla u_h}{\partial \mathbf{n}}) = -\sum_{e \in \mathbb{F}} \int_{e} \jump{\frac{\partial v_h}{\partial \mathbf{n}}} (\frac{\partial^2 u_h}{\partial \mathbf{n^2}}).
+  @f}
+  We separate interior faces and boundary faces of the domain,
+  @f{align*}{
+  -\sum_{K \in \mathbb{T}} \int_{\partial K} (\nabla v_h) \cdot (\frac{\partial \nabla u_h}{\partial \mathbf{n}}) = -\sum_{e \in \mathbb{F}^i} \int_{e} \jump{\frac{\partial v_h}{\partial \mathbf{n}}} (\frac{\partial^2 u_h}{\partial \mathbf{n^2}})
+  - \sum_{e \in \partial \Omega} \int_{e} \jump{\frac{\partial v_h}{\partial \mathbf{n}}} h,
+  @f}
+  where $\mathbb{F}^i$ is the set of interior faces.
+  This leads us to
+  @f{align*}{
+  \sum_{K \in \mathbb{T}} \int_K (D^2 v_h) : (D^2 u_h) \ dx - \sum_{e \in \mathbb{F}^i} \int_{e} \jump{\frac{\partial v_h}{\partial \mathbf{n}}} (\frac{\partial^2 u_h}{\partial \mathbf{n^2}}) \ ds
+  = \sum_{K \in \mathbb{T}}\int_{K} v_h f  \ dx + \sum_{e\subset\partial\Omega} \int_{e} \jump{\frac{\partial v_h}{\partial \mathbf{n}}} h \ ds.
+  @f}
+
+  In order to symmetrize and stabilize the discrete problem,
+  we add symmetrization and stabilization term.
+  We finally get the $C^0$ IP finite element scheme for the biharmonic equation:
+  find $u_h$ such that $u_h =g$ on $\partial \Omega$ and
+  @f{align*}{
+  \mathcal{A}(v_h,u_h)&=\mathcal{F}(v_h) \quad \text{holds for all test functions } v_h,
+  @f}
+  where
+  @f{align*}{
+  \mathcal{A}(v_h,u_h):=&\sum_{K \in \mathbb{T}}\int_K D^2v_h:D^2u_h \ dx
+  \\
+  &
+   -\sum_{e \in \mathbb{F}^i} \int_{e}
+    \jump{\frac{\partial v_h}{\partial \mathbf n}}
+    \average{\frac{\partial^2 u_h}{\partial \mathbf n^2}} \ ds
+   -\sum_{e \in \mathbb{F}^i} \int_{e}
+   \average{\frac{\partial^2 v_h}{\partial \mathbf n^2}}
+   \jump{\frac{\partial u_h}{\partial \mathbf n}} \ ds
+  \\
+  &+ \sum_{e \in \mathbb{F}^i}
+   \frac{\gamma}{h_e}
+   \int_e
+   \jump{\frac{\partial v_h}{\partial \mathbf n}}
+   \jump{\frac{\partial u_h}{\partial \mathbf n}} \ ds,
+  @f}
+  and
+  @f{align*}{
+  \mathcal{F}(v_h)&:=\sum_{K \in \mathbb{T}}\int_{K} v_h f \ dx
+  +
+  \sum_{e\subset\partial\Omega}
+  \int_e \jump{\frac{\partial v_h}{\partial \mathbf n}} h \ ds.
+  @f}
+  The implementation of this boundary case is similar to the "clamped" version
+  except that `boundary_worker` is no longer needed for system assembling
+  and the right hand side is changed according to the formulation.

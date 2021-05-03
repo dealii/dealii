@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -92,7 +92,7 @@ void check(Triangulation<3> &tria)
   for (DoFHandler<3>::cell_iterator cell = dof_handler.begin();
        cell != dof_handler.end();
        ++cell)
-    for (unsigned int f = 0; f < GeometryInfo<3>::faces_per_cell; ++f)
+    for (const unsigned int f : GeometryInfo<3>::face_indices())
       if (!cell->at_boundary(f))
         {
           const unsigned int nn = cell->neighbor_of_neighbor(f);

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -51,7 +51,7 @@ plot_derivatives(Mapping<dim> &      mapping,
 
   const unsigned int div = 1;
 
-  QTrapez<dim> q;
+  QTrapezoid<dim> q;
   //  QIterated<dim> q(q_trapez, div);
   FEValues<dim> fe(mapping,
                    finel,
@@ -106,10 +106,8 @@ plot_FE_Bernstein_shape_functions()
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog << std::setprecision(8);
-  deallog << std::fixed;
-  deallog.attach(logfile);
+  initlog();
+  deallog << std::setprecision(8) << std::fixed;
 
   deallog.push("1d");
   plot_FE_Bernstein_shape_functions<1>();

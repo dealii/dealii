@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2018 by the deal.II authors
+// Copyright (C) 2015 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,6 +22,7 @@
 // K. Bzowski
 
 
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_nothing.h>
@@ -31,7 +32,6 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 
 #include <deal.II/numerics/data_out.h>
@@ -41,7 +41,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 int
 main()
@@ -57,11 +56,11 @@ main()
   // fe_collection.push_back(FE_Q<2>(2));
   fe_collection.push_back(FE_Nothing<2>());
 
-  hp::DoFHandler<2> dof_handler(triangulation);
+  DoFHandler<2> dof_handler(triangulation);
 
   // Assign FE
-  hp::DoFHandler<2>::active_cell_iterator cell = dof_handler.begin_active();
-  hp::DoFHandler<2>::active_cell_iterator endc = dof_handler.end();
+  DoFHandler<2>::active_cell_iterator cell = dof_handler.begin_active();
+  DoFHandler<2>::active_cell_iterator endc = dof_handler.end();
 
   /*
    * -----------
@@ -98,7 +97,7 @@ main()
     }
 
   // Save output
-  DataOut<2, hp::DoFHandler<2>> data_out;
+  DataOut<2, DoFHandler<2>> data_out;
   data_out.attach_dof_handler(dof_handler);
   data_out.add_data_vector(solution, "Solution");
   data_out.add_data_vector(FE_Type, "FE_Type");
@@ -125,7 +124,7 @@ main()
   triangulation.prepare_coarsening_and_refinement();
 
   // Interpolate solution
-  SolutionTransfer<2, Vector<double>, hp::DoFHandler<2>> solution_trans(
+  SolutionTransfer<2, Vector<double>, DoFHandler<2>> solution_trans(
     dof_handler);
   solution_trans.prepare_for_coarsening_and_refinement(solution);
 
@@ -147,7 +146,7 @@ main()
     }
 
   // Save new solution
-  DataOut<2, hp::DoFHandler<2>> data_out2;
+  DataOut<2, DoFHandler<2>> data_out2;
   data_out2.attach_dof_handler(dof_handler);
   data_out2.add_data_vector(new_solution, "Solution");
   data_out2.add_data_vector(FE_Type, "FE_type");
@@ -176,7 +175,7 @@ main()
   triangulation.prepare_coarsening_and_refinement();
 
   // Interpolate solution
-  SolutionTransfer<2, Vector<double>, hp::DoFHandler<2>> solution_trans2(
+  SolutionTransfer<2, Vector<double>, DoFHandler<2>> solution_trans2(
     dof_handler);
   solution_trans2.prepare_for_coarsening_and_refinement(solution);
 
@@ -198,7 +197,7 @@ main()
     }
 
   // Save new solution
-  DataOut<2, hp::DoFHandler<2>> data_out3;
+  DataOut<2, DoFHandler<2>> data_out3;
   data_out3.attach_dof_handler(dof_handler);
   data_out3.add_data_vector(new_solution2, "Solution");
   data_out3.add_data_vector(FE_Type, "FE_type");

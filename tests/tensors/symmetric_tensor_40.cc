@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -241,7 +241,7 @@ main()
                  -4.856e3,
                  Tensor<1, 3>({-0.2, 3, 1}),
                  -5.284e3,
-                 5e-6);
+                 1e-5);
     }
     deallog.pop();
 

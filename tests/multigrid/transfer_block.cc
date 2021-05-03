@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -96,13 +96,13 @@ check_block(const FiniteElement<dim> &fe,
   GridGenerator::hyper_cube(tr);
   tr.refine_global(2);
 
-  DoFHandler<dim>  mgdof(tr);
-  DoFHandler<dim> &dof = mgdof;
+  DoFHandler<dim> mgdof(tr);
   mgdof.distribute_dofs(fe);
-  mgdof.distribute_mg_dofs(fe);
+  mgdof.distribute_mg_dofs();
   DoFRenumbering::component_wise(mgdof);
-  vector<types::global_dof_index> ndofs(fe.n_blocks());
-  DoFTools::count_dofs_per_block(mgdof, ndofs);
+  const vector<types::global_dof_index> ndofs =
+    DoFTools::count_dofs_per_fe_block(mgdof);
+  Assert(ndofs.size() == fe.n_blocks(), ExcInternalError());
 
   for (unsigned int l = 0; l < tr.n_levels(); ++l)
     DoFRenumbering::component_wise(mgdof, l);
@@ -125,7 +125,7 @@ check_block(const FiniteElement<dim> &fe,
 
   PrimitiveVectorMemory<Vector<double>> mem;
   MGTransferBlock<double>               transfer;
-  transfer.build_matrices(dof, mgdof, selected);
+  transfer.build(mgdof, selected);
   if (factors.size() > 0)
     transfer.initialize(factors, mem);
 
@@ -201,9 +201,8 @@ check_block(const FiniteElement<dim> &fe,
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(3);
-  deallog.attach(logfile);
 
   std::vector<double> factors;
 

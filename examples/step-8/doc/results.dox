@@ -2,7 +2,7 @@
 
 
 There is not much to be said about the results of this program, other than
-that they look nice. All images were made using Visit from the
+that they look nice. All images were made using VisIt from the
 output files that the program wrote to disk. The first two pictures show
 the $x$- and $y$-displacements as scalar components:
 
@@ -19,14 +19,10 @@ the $x$- and $y$-displacements as scalar components:
 
 
 You can clearly see the sources of $x$-displacement around $x=0.5$ and
-$x=-0.5$, and of $y$-displacement at the origin. The next image shows the
-final grid after eight steps of refinement:
-
-<img src="https://www.dealii.org/images/steps/developer/step-8.grid.png" alt="">
-
+$x=-0.5$, and of $y$-displacement at the origin.
 
 What one frequently would like to do is to show the displacement as a vector
-field, i.e., show vectors that for each point show the direction and magnitude
+field, i.e., vectors that for each point illustrate the direction and magnitude
 of displacement. Unfortunately, that's a bit more involved. To understand why
 this is so, remember that we have just defined our finite element as a
 collection of two  components (in <code>dim=2</code> dimensions). Nowhere have
@@ -34,15 +30,16 @@ we said that this is not just a pressure and a concentration (two scalar
 quantities) but that the two components actually are the parts of a
 vector-valued quantity, namely the displacement. Absent this knowledge, the
 DataOut class assumes that all individual variables we print are separate
-scalars, and Visit then faithfully assumes that this is indeed what it is. In
+scalars, and VisIt and Paraview then faithfully assume that this is indeed what it is. In
 other words, once we have written the data as scalars, there is nothing in
-Visit that allows us to paste these two scalar fields back together as a
+these programs that allows us to paste these two scalar fields back together as a
 vector field. Where we would have to attack this problem is at the root,
 namely in <code>ElasticProblem::output_results()</code>. We won't do so here but
 instead refer the reader to the step-22 program where we show how to do this
 for a more general situation. That said, we couldn't help generating the data
 anyway that would show how this would look if implemented as discussed in
-step-22. The vector field then looks like this (Visit randomly selects a few
+step-22. The vector field then looks like this (VisIt and Paraview
+randomly select a few
 hundred vertices from which to draw the vectors; drawing them from each
 individual vertex would make the picture unreadable):
 
@@ -54,5 +51,3 @@ solution to be symmetric about the $x$- and $y$-axes since the $x$- and
 $y$-forces are symmetric with respect to these axes. However, the force
 considered as a vector is not symmetric and consequently neither is
 the solution.
-
-

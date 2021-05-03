@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 1999 - 2019 by the deal.II authors
+ * Copyright (C) 1999 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -27,14 +27,6 @@
 #include <deal.II/dofs/dof_handler.h>
 // And this is the file in which the functions are declared that create grids:
 #include <deal.II/grid/grid_generator.h>
-
-// The next three files contain classes which are needed for loops over all
-// cells and to get the information from the cell objects. The first two have
-// been used before to get geometric information from cells; the last one is
-// new and provides information about the degrees of freedom local to a cell:
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/dofs/dof_accessor.h>
 
 // This file contains the description of the Lagrange interpolation finite
 // element:
@@ -82,13 +74,13 @@ using namespace dealii;
 
 // Instead of the procedural programming of previous examples, we encapsulate
 // everything into a class for this program. The class consists of functions
-// which each perform certain aspects of a finite element program, a `main'
+// which each perform certain aspects of a finite element program, a `main`
 // function which controls what is done first and what is done next, and a
 // list of member variables.
 
 // The public part of the class is rather short: it has a constructor and a
-// function `run' that is called from the outside and acts as something like
-// the `main' function: it coordinates which operations of this class shall be
+// function `run` that is called from the outside and acts as something like
+// the `main` function: it coordinates which operations of this class shall be
 // run in which order. Everything else in the class, i.e. all the functions
 // that actually do anything, are in the private section of the class:
 class Step3
@@ -339,8 +331,8 @@ void Step3::assemble_system()
   // but maybe not so in higher level languages like C++, but serve
   // the current purpose quite well.
 
-  // For use further down below, we define two shortcuts for values that will
-  // be used very frequently. First, an abbreviation for the number of degrees
+  // For use further down below, we define a shortcut for a value that will
+  // be used very frequently. Namely, an abbreviation for the number of degrees
   // of freedom on each cell (since we are in 2D and degrees of freedom are
   // associated with vertices only, this number is four, but we rather want to
   // write the definition of this variable in a way that does not preclude us
@@ -348,19 +340,23 @@ void Step3::assemble_system()
   // number of degrees of freedom per cell, or work in a different space
   // dimension).
   //
-  // Secondly, we also define an abbreviation for the number of quadrature
-  // points (here that should be four). In general, it is a good idea to use
-  // their symbolic names instead of hard-coding these numbers even if you know
-  // them, since you may want to change the quadrature formula and/or finite
-  // element at some time; the program will just work with these changes,
-  // without the need to change anything in this function.
+  // In general, it is a good idea to use a symbolic name instead of
+  // hard-coding these numbers even if you know them, since for example,
+  // you may want to change the finite element at some time. Changing the
+  // element would have to be done in a different function and it is easy
+  // to forget to make a corresponding change in another part of the program.
+  // It is better to not rely on your own calculations, but instead ask
+  // the right object for the information: Here, we ask the finite element
+  // to tell us about the number of degrees of freedom per cell and we
+  // will get the correct number regardless of the space dimension or
+  // polynomial degree we may have chosen elsewhere in the program.
   //
-  // The shortcuts, finally, are only defined to make the following loops a
-  // bit more readable. You will see them in many places in larger programs,
-  // and `dofs_per_cell` and `n_q_points` are more or less by convention the
-  // standard names for these purposes:
-  const unsigned int dofs_per_cell = fe.dofs_per_cell;
-  const unsigned int n_q_points    = quadrature_formula.size();
+  // The shortcut here, defined primarily to discuss the basic concept
+  // and not because it saves a lot of typing, will then make the following
+  // loops a bit more readable. You will see such shortcuts in many places in
+  // larger programs, and `dofs_per_cell` is one that is more or less the
+  // conventional name for this kind of object.
+  const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
 
   // Now, we said that we wanted to assemble the global matrix and vector
   // cell-by-cell. We could write the results directly into the global matrix,
@@ -414,7 +410,7 @@ void Step3::assemble_system()
       // Now it is time to start integration over the cell, which we
       // do by looping over all quadrature points, which we will
       // number by q_index.
-      for (unsigned int q_index = 0; q_index < n_q_points; ++q_index)
+      for (const unsigned int q_index : fe_values.quadrature_point_indices())
         {
           // First assemble the matrix: For the Laplace problem, the
           // matrix on each cell is the integral over the gradients of
@@ -433,8 +429,8 @@ void Step3::assemble_system()
           // determinant and the quadrature point weight (that one
           // gets together by the call to FEValues::JxW() ). Finally,
           // this is repeated for all shape functions $i$ and $j$:
-          for (unsigned int i = 0; i < dofs_per_cell; ++i)
-            for (unsigned int j = 0; j < dofs_per_cell; ++j)
+          for (const unsigned int i : fe_values.dof_indices())
+            for (const unsigned int j : fe_values.dof_indices())
               cell_matrix(i, j) +=
                 (fe_values.shape_grad(i, q_index) * // grad phi_i(x_q)
                  fe_values.shape_grad(j, q_index) * // grad phi_j(x_q)
@@ -445,9 +441,9 @@ void Step3::assemble_system()
           // hand side function, which we choose to be the function
           // with constant value one (more interesting examples will
           // be considered in the following programs).
-          for (unsigned int i = 0; i < dofs_per_cell; ++i)
+          for (const unsigned int i : fe_values.dof_indices())
             cell_rhs(i) += (fe_values.shape_value(i, q_index) * // phi_i(x_q)
-                            1 *                                 // f(x_q)
+                            1. *                                // f(x_q)
                             fe_values.JxW(q_index));            // dx
         }
       // Now that we have the contribution of this cell, we have to transfer
@@ -459,14 +455,14 @@ void Step3::assemble_system()
       // Then again loop over all shape functions i and j and transfer the
       // local elements to the global matrix. The global numbers can be
       // obtained using local_dof_indices[i]:
-      for (unsigned int i = 0; i < dofs_per_cell; ++i)
-        for (unsigned int j = 0; j < dofs_per_cell; ++j)
+      for (const unsigned int i : fe_values.dof_indices())
+        for (const unsigned int j : fe_values.dof_indices())
           system_matrix.add(local_dof_indices[i],
                             local_dof_indices[j],
                             cell_matrix(i, j));
 
       // And again, we do the same thing for the right hand side vector.
-      for (unsigned int i = 0; i < dofs_per_cell; ++i)
+      for (const unsigned int i : fe_values.dof_indices())
         system_rhs(local_dof_indices[i]) += cell_rhs(i);
     }
 
@@ -493,15 +489,15 @@ void Step3::assemble_system()
   // example, you may have inflow and outflow boundaries in fluid dynamics, or
   // clamped and free parts of bodies in deformation computations of
   // bodies. Then you will want to denote these different parts of the
-  // boundary by different numbers and tell the interpolate_boundary_values
+  // boundary by indicators, and tell the interpolate_boundary_values
   // function to only compute the boundary values on a certain part of the
-  // boundary (e.g. the clamped part, or the inflow boundary). By default, all
-  // boundaries have the number `0`, and since we have not changed that, this
-  // is still so; therefore, if we give `0` as the desired portion of the
-  // boundary, this means we get the whole boundary. If you have boundaries
-  // with kinds of boundaries, you have to number them differently. The
-  // function call below will then only determine boundary values for parts of
-  // the boundary.
+  // boundary (e.g. the clamped part, or the inflow boundary). By default,
+  // all boundaries have a 0 boundary indicator, unless otherwise specified. If
+  // sections of the boundary have different boundary conditions, you have to
+  // number those parts with different boundary indicators. The function call
+  // below will then only determine boundary values for those parts of the
+  // boundary for which the boundary indicator is in fact the zero specified as
+  // the second argument.
   //
   // The function describing the boundary values is an object of type Function
   // or of a derived class. One of the derived classes is
@@ -549,10 +545,11 @@ void Step3::solve()
   // which stops the iteration:
   SolverControl solver_control(1000, 1e-12);
   // Then we need the solver itself. The template parameter to the SolverCG
-  // class is the type of the vectors, but the empty angle brackets indicate
-  // that we simply take the default argument (which is
-  // <code>Vector@<double@></code>):
-  SolverCG<> solver(solver_control);
+  // class is the type of the vectors, and leaving the empty angle brackets
+  // would indicate that we are taking the default argument (which is
+  // <code>Vector@<double@></code>). However, we explicitly mention the template
+  // argument:
+  SolverCG<Vector<double>> solver(solver_control);
 
   // Now solve the system of equations. The CG solver takes a preconditioner
   // as its fourth argument. We don't feel ready to delve into this yet, so we
@@ -594,11 +591,12 @@ void Step3::output_results() const
   data_out.build_patches();
 
   // Now we have everything in place for the actual output. Just open a file
-  // and write the data into it, using GNUPLOT format (there are other
-  // functions which write their data in postscript, AVS, GMV, or some other
-  // format):
-  std::ofstream output("solution.gpl");
-  data_out.write_gnuplot(output);
+  // and write the data into it, using VTK format (there are many other
+  // functions in the DataOut class we are using here that can write the
+  // data in postscript, AVS, GMV, Gnuplot, or some other file
+  // formats):
+  std::ofstream output("solution.vtk");
+  data_out.write_vtk(output);
 }
 
 

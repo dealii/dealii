@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2019 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -43,7 +43,6 @@
 #include <deal.II/grid/grid_in.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_boundary_lib.h>
 
 #include <deal.II/lac/block_sparse_matrix.h>
 #include <deal.II/lac/block_vector.h>
@@ -67,7 +66,6 @@
 #include "../tests.h"
 namespace Step44
 {
-  using namespace dealii;
   namespace AD = dealii::Differentiation::AD;
   namespace Parameters
   {
@@ -580,8 +578,8 @@ namespace Step44
         const unsigned int n_independent_variables =
           SymmetricTensor<2, dim>::n_independent_components + 1 + 1;
 
-        typedef AD::ScalarFunction<dim, ad_type_code, number_t> ADHelper;
-        typedef typename ADHelper::ad_type                      ADNumberType;
+        using ADHelper     = AD::ScalarFunction<dim, ad_type_code, number_t>;
+        using ADNumberType = typename ADHelper::ad_type;
         ADHelper ad_helper(n_independent_variables);
         ad_helper.set_tape_buffer_sizes(); // Increase the buffer size from the
                                            // default values
@@ -665,8 +663,8 @@ namespace Step44
         const FEValuesExtractors::Scalar J_dofs(0);
         const unsigned int               n_independent_variables = 1;
 
-        typedef typename AD::ScalarFunction<dim, ad_type_code, double>::ad_type
-                                                      ADNumberType;
+        using ADNumberType =
+          typename AD::ScalarFunction<dim, ad_type_code, double>::ad_type;
         AD::ScalarFunction<dim, ad_type_code, double> ad_helper(
           n_independent_variables);
         ad_helper.set_tape_buffer_sizes(); // Increase the buffer size from the
@@ -876,7 +874,7 @@ namespace Step44
     const QGauss<dim - 1>                qf_face;
     const unsigned int                   n_q_points;
     const unsigned int                   n_q_points_f;
-    ConstraintMatrix                     constraints;
+    AffineConstraints<double>            constraints;
     BlockSparsityPattern                 sparsity_pattern;
     BlockSparseMatrix<double>            tangent_matrix;
     BlockVector<double>                  system_rhs;
@@ -968,7 +966,7 @@ namespace Step44
     make_grid();
     system_setup();
     {
-      ConstraintMatrix constraints;
+      AffineConstraints<double> constraints;
       constraints.close();
       const ComponentSelectFunction<dim> J_mask(J_component, n_components);
       VectorTools::project(dof_handler_ref,
@@ -995,8 +993,7 @@ namespace Step44
             cell = dof_handler_ref.begin_active(),
             endc = dof_handler_ref.end();
           for (; cell != endc; ++cell)
-            for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell;
-                 ++v)
+            for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
               if (cell->vertex(v).distance(soln_pt) < 1e-6 * parameters.scale)
                 {
                   Tensor<1, dim> soln;
@@ -1238,8 +1235,7 @@ namespace Step44
                                                       endc =
                                                         triangulation.end();
     for (; cell != endc; ++cell)
-      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-           ++face)
+      for (const unsigned int face : GeometryInfo<dim>::face_indices())
         {
           if (cell->face(face)->at_boundary() == true &&
               cell->face(face)->center()[1] == 1.0 * parameters.scale)
@@ -1270,9 +1266,8 @@ namespace Step44
     dof_handler_ref.distribute_dofs(fe);
     DoFRenumbering::Cuthill_McKee(dof_handler_ref);
     DoFRenumbering::component_wise(dof_handler_ref, block_component);
-    DoFTools::count_dofs_per_block(dof_handler_ref,
-                                   dofs_per_block,
-                                   block_component);
+    dofs_per_block =
+      DoFTools::count_dofs_per_fe_block(dof_handler_ref, block_component);
     std::cout << "Triangulation:"
               << "\n\t Number of active cells: "
               << triangulation.n_active_cells()
@@ -1829,8 +1824,7 @@ namespace Step44
               Assert(i_group <= J_dof, ExcInternalError());
           }
       }
-    for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-         ++face)
+    for (const unsigned int face : GeometryInfo<dim>::face_indices())
       if (cell->face(face)->at_boundary() == true &&
           cell->face(face)->boundary_id() == 6)
         {
@@ -1880,14 +1874,14 @@ namespace Step44
         VectorTools::interpolate_boundary_values(
           dof_handler_ref,
           boundary_id,
-          ZeroFunction<dim>(n_components),
+          Functions::ZeroFunction<dim>(n_components),
           constraints,
           fe.component_mask(x_displacement));
       else
         VectorTools::interpolate_boundary_values(
           dof_handler_ref,
           boundary_id,
-          ZeroFunction<dim>(n_components),
+          Functions::ZeroFunction<dim>(n_components),
           constraints,
           fe.component_mask(x_displacement));
     }
@@ -1897,14 +1891,14 @@ namespace Step44
         VectorTools::interpolate_boundary_values(
           dof_handler_ref,
           boundary_id,
-          ZeroFunction<dim>(n_components),
+          Functions::ZeroFunction<dim>(n_components),
           constraints,
           fe.component_mask(y_displacement));
       else
         VectorTools::interpolate_boundary_values(
           dof_handler_ref,
           boundary_id,
-          ZeroFunction<dim>(n_components),
+          Functions::ZeroFunction<dim>(n_components),
           constraints,
           fe.component_mask(y_displacement));
     }
@@ -1917,7 +1911,7 @@ namespace Step44
             VectorTools::interpolate_boundary_values(
               dof_handler_ref,
               boundary_id,
-              ZeroFunction<dim>(n_components),
+              Functions::ZeroFunction<dim>(n_components),
               constraints,
               (fe.component_mask(x_displacement) |
                fe.component_mask(z_displacement)));
@@ -1925,7 +1919,7 @@ namespace Step44
             VectorTools::interpolate_boundary_values(
               dof_handler_ref,
               boundary_id,
-              ZeroFunction<dim>(n_components),
+              Functions::ZeroFunction<dim>(n_components),
               constraints,
               (fe.component_mask(x_displacement) |
                fe.component_mask(z_displacement)));
@@ -1936,14 +1930,14 @@ namespace Step44
             VectorTools::interpolate_boundary_values(
               dof_handler_ref,
               boundary_id,
-              ZeroFunction<dim>(n_components),
+              Functions::ZeroFunction<dim>(n_components),
               constraints,
               fe.component_mask(z_displacement));
           else
             VectorTools::interpolate_boundary_values(
               dof_handler_ref,
               boundary_id,
-              ZeroFunction<dim>(n_components),
+              Functions::ZeroFunction<dim>(n_components),
               constraints,
               fe.component_mask(z_displacement));
         }
@@ -1953,7 +1947,7 @@ namespace Step44
             VectorTools::interpolate_boundary_values(
               dof_handler_ref,
               boundary_id,
-              ZeroFunction<dim>(n_components),
+              Functions::ZeroFunction<dim>(n_components),
               constraints,
               (fe.component_mask(x_displacement) |
                fe.component_mask(z_displacement)));
@@ -1961,7 +1955,7 @@ namespace Step44
             VectorTools::interpolate_boundary_values(
               dof_handler_ref,
               boundary_id,
-              ZeroFunction<dim>(n_components),
+              Functions::ZeroFunction<dim>(n_components),
               constraints,
               (fe.component_mask(x_displacement) |
                fe.component_mask(z_displacement)));
@@ -1975,14 +1969,14 @@ namespace Step44
             VectorTools::interpolate_boundary_values(
               dof_handler_ref,
               boundary_id,
-              ZeroFunction<dim>(n_components),
+              Functions::ZeroFunction<dim>(n_components),
               constraints,
               (fe.component_mask(x_displacement)));
           else
             VectorTools::interpolate_boundary_values(
               dof_handler_ref,
               boundary_id,
-              ZeroFunction<dim>(n_components),
+              Functions::ZeroFunction<dim>(n_components),
               constraints,
               (fe.component_mask(x_displacement)));
         }
@@ -1992,14 +1986,14 @@ namespace Step44
             VectorTools::interpolate_boundary_values(
               dof_handler_ref,
               boundary_id,
-              ZeroFunction<dim>(n_components),
+              Functions::ZeroFunction<dim>(n_components),
               constraints,
               (fe.component_mask(x_displacement)));
           else
             VectorTools::interpolate_boundary_values(
               dof_handler_ref,
               boundary_id,
-              ZeroFunction<dim>(n_components),
+              Functions::ZeroFunction<dim>(n_components),
               constraints,
               (fe.component_mask(x_displacement)));
         }

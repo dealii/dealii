@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,16 +21,16 @@
 
 #include <iomanip>
 #include <iostream>
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
 
 template <int dim>
 PolynomialsRT_Bubbles<dim>::PolynomialsRT_Bubbles(const unsigned int k)
-  : my_degree(k)
+  : TensorPolynomialsBase<dim>(k, n_polynomials(k))
   , raviart_thomas_space(k - 1)
   , monomials(k + 2)
-  , n_pols(compute_n_pols(k))
 {
   Assert(dim >= 2, ExcImpossibleInDim(dim));
 
@@ -42,7 +42,7 @@ PolynomialsRT_Bubbles<dim>::PolynomialsRT_Bubbles(const unsigned int k)
 
 template <int dim>
 void
-PolynomialsRT_Bubbles<dim>::compute(
+PolynomialsRT_Bubbles<dim>::evaluate(
   const Point<dim> &           unit_point,
   std::vector<Tensor<1, dim>> &values,
   std::vector<Tensor<2, dim>> &grads,
@@ -50,16 +50,17 @@ PolynomialsRT_Bubbles<dim>::compute(
   std::vector<Tensor<4, dim>> &third_derivatives,
   std::vector<Tensor<5, dim>> &fourth_derivatives) const
 {
-  Assert(values.size() == n_pols || values.size() == 0,
-         ExcDimensionMismatch(values.size(), n_pols));
-  Assert(grads.size() == n_pols || grads.size() == 0,
-         ExcDimensionMismatch(grads.size(), n_pols));
-  Assert(grad_grads.size() == n_pols || grad_grads.size() == 0,
-         ExcDimensionMismatch(grad_grads.size(), n_pols));
-  Assert(third_derivatives.size() == n_pols || third_derivatives.size() == 0,
-         ExcDimensionMismatch(third_derivatives.size(), n_pols));
-  Assert(fourth_derivatives.size() == n_pols || fourth_derivatives.size() == 0,
-         ExcDimensionMismatch(fourth_derivatives.size(), n_pols));
+  Assert(values.size() == this->n() || values.size() == 0,
+         ExcDimensionMismatch(values.size(), this->n()));
+  Assert(grads.size() == this->n() || grads.size() == 0,
+         ExcDimensionMismatch(grads.size(), this->n()));
+  Assert(grad_grads.size() == this->n() || grad_grads.size() == 0,
+         ExcDimensionMismatch(grad_grads.size(), this->n()));
+  Assert(third_derivatives.size() == this->n() || third_derivatives.size() == 0,
+         ExcDimensionMismatch(third_derivatives.size(), this->n()));
+  Assert(fourth_derivatives.size() == this->n() ||
+           fourth_derivatives.size() == 0,
+         ExcDimensionMismatch(fourth_derivatives.size(), this->n()));
 
   // Third and fourth derivatives are not implemented
   (void)third_derivatives;
@@ -67,13 +68,14 @@ PolynomialsRT_Bubbles<dim>::compute(
   (void)fourth_derivatives;
   Assert(fourth_derivatives.size() == 0, ExcNotImplemented());
 
-  const unsigned int n_sub = raviart_thomas_space.n();
+  const unsigned int n_sub     = raviart_thomas_space.n();
+  const unsigned int my_degree = this->degree();
 
   // Guard access to the scratch arrays in the following block
   // using a mutex to make sure they are not used by multiple threads
   // at once
   {
-    static Threads::Mutex       mutex;
+    static std::mutex           mutex;
     std::lock_guard<std::mutex> lock(mutex);
 
     static std::vector<Tensor<1, dim>> p_values;
@@ -87,12 +89,12 @@ PolynomialsRT_Bubbles<dim>::compute(
     p_grad_grads.resize((grad_grads.size() == 0) ? 0 : n_sub);
 
     // This is the Raviart-Thomas part of the space
-    raviart_thomas_space.compute(unit_point,
-                                 p_values,
-                                 p_grads,
-                                 p_grad_grads,
-                                 p_third_derivatives,
-                                 p_fourth_derivatives);
+    raviart_thomas_space.evaluate(unit_point,
+                                  p_values,
+                                  p_grads,
+                                  p_grad_grads,
+                                  p_third_derivatives,
+                                  p_fourth_derivatives);
     for (unsigned int i = 0; i < p_values.size(); ++i)
       values[i] = p_values[i];
     for (unsigned int i = 0; i < p_grads.size(); ++i)
@@ -194,7 +196,7 @@ PolynomialsRT_Bubbles<dim>::compute(
                 monoval_plus[0][1] * monoval_i[1][2];
             }
         }
-      Assert(start == n_pols - my_degree - 1, ExcInternalError());
+      Assert(start == this->n() - my_degree - 1, ExcInternalError());
     }
   else if (dim == 3)
     {
@@ -825,7 +827,7 @@ PolynomialsRT_Bubbles<dim>::compute(
                 start += 2;
             }
         }
-      Assert(start == n_pols - 2 * n_curls, ExcInternalError());
+      Assert(start == this->n() - 2 * n_curls, ExcInternalError());
     }
 }
 
@@ -833,13 +835,21 @@ PolynomialsRT_Bubbles<dim>::compute(
 
 template <int dim>
 unsigned int
-PolynomialsRT_Bubbles<dim>::compute_n_pols(const unsigned int k)
+PolynomialsRT_Bubbles<dim>::n_polynomials(const unsigned int k)
 {
   if (dim == 1 || dim == 2 || dim == 3)
     return dim * Utilities::fixed_power<dim>(k + 1);
 
   Assert(false, ExcNotImplemented());
   return 0;
+}
+
+
+template <int dim>
+std::unique_ptr<TensorPolynomialsBase<dim>>
+PolynomialsRT_Bubbles<dim>::clone() const
+{
+  return std::make_unique<PolynomialsRT_Bubbles<dim>>(*this);
 }
 
 

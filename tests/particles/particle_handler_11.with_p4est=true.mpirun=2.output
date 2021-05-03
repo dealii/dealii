@@ -1,0 +1,43 @@
+
+DEAL:0:2d/2d::Particle : 11, property: 1
+DEAL:0:2d/2d::Particle : 16, property: 1
+DEAL:0:2d/2d::Particle : 12, property: 1
+DEAL:0:2d/2d::Particle : 13, property: 1
+DEAL:0:2d/2d::Particle : 2, property: 0
+DEAL:0:2d/2d::Particle : 0, property: 0
+DEAL:0:2d/2d::Particle : 15, property: 1
+DEAL:0:2d/2d::Particle : 17, property: 1
+DEAL:0:2d/2d::Particle : 19, property: 1
+DEAL:0:3d/3d::Particle : 19, property: 1
+DEAL:0:3d/3d::Particle : 8, property: 0
+DEAL:0:3d/3d::Particle : 11, property: 1
+DEAL:0:3d/3d::Particle : 6, property: 0
+DEAL:0:3d/3d::Particle : 9, property: 0
+DEAL:0:3d/3d::Particle : 2, property: 0
+DEAL:0:3d/3d::Particle : 10, property: 1
+DEAL:0:3d/3d::Particle : 17, property: 1
+DEAL:0:3d/3d::Particle : 1, property: 0
+DEAL:0:3d/3d::Particle : 13, property: 1
+
+DEAL:1:2d/2d::Particle : 9, property: 0
+DEAL:1:2d/2d::Particle : 4, property: 0
+DEAL:1:2d/2d::Particle : 5, property: 0
+DEAL:1:2d/2d::Particle : 6, property: 0
+DEAL:1:2d/2d::Particle : 3, property: 0
+DEAL:1:2d/2d::Particle : 18, property: 1
+DEAL:1:2d/2d::Particle : 8, property: 0
+DEAL:1:2d/2d::Particle : 14, property: 1
+DEAL:1:2d/2d::Particle : 10, property: 1
+DEAL:1:2d/2d::Particle : 1, property: 0
+DEAL:1:2d/2d::Particle : 7, property: 0
+DEAL:1:3d/3d::Particle : 7, property: 0
+DEAL:1:3d/3d::Particle : 14, property: 1
+DEAL:1:3d/3d::Particle : 15, property: 1
+DEAL:1:3d/3d::Particle : 12, property: 1
+DEAL:1:3d/3d::Particle : 3, property: 0
+DEAL:1:3d/3d::Particle : 16, property: 1
+DEAL:1:3d/3d::Particle : 0, property: 0
+DEAL:1:3d/3d::Particle : 4, property: 0
+DEAL:1:3d/3d::Particle : 18, property: 1
+DEAL:1:3d/3d::Particle : 5, property: 0
+

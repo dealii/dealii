@@ -134,8 +134,6 @@ DEAL_II_NAMESPACE_OPEN
  * <code>size_type</code> type.
  *
  * @note TransposeTable uses this template to implement its iterators.
- *
- * @author David Wells, 2018
  */
 template <class DerivedIterator, class AccessorType>
 class LinearIndexIterator
@@ -249,14 +247,27 @@ public:
    * Comparison operator. Returns <code>true</code> if both iterators point to
    * the same entry in the same container.
    */
-  bool
-  operator==(const DerivedIterator &) const;
+  template <typename OtherIterator>
+  friend typename std::enable_if<
+    std::is_convertible<OtherIterator, DerivedIterator>::value,
+    bool>::type
+  operator==(const LinearIndexIterator &left, const OtherIterator &right)
+  {
+    const auto &right_2 = static_cast<const DerivedIterator &>(right);
+    return left.accessor == right_2.accessor;
+  }
 
   /**
-   * Inverse of operator==().
+   * Opposite of operator==().
    */
-  bool
-  operator!=(const DerivedIterator &) const;
+  template <typename OtherIterator>
+  friend typename std::enable_if<
+    std::is_convertible<OtherIterator, DerivedIterator>::value,
+    bool>::type
+  operator!=(const LinearIndexIterator &left, const OtherIterator &right)
+  {
+    return !(left == right);
+  }
 
   /**
    * Comparison operator: uses the same ordering as operator<(), but also
@@ -440,28 +451,6 @@ inline typename LinearIndexIterator<DerivedIterator, AccessorType>::pointer
   LinearIndexIterator<DerivedIterator, AccessorType>::operator->() const
 {
   return &accessor;
-}
-
-
-
-template <class DerivedIterator, class AccessorType>
-inline bool
-LinearIndexIterator<DerivedIterator, AccessorType>::
-operator==(const DerivedIterator &other) const
-{
-  const auto &other_2 = static_cast<decltype(*this) &>(other);
-  return accessor.container == other_2.accessor.container &&
-         accessor.linear_index == other_2.accessor.linear_index;
-}
-
-
-
-template <class DerivedIterator, class AccessorType>
-inline bool
-LinearIndexIterator<DerivedIterator, AccessorType>::
-operator!=(const DerivedIterator &other) const
-{
-  return !(*this == other);
 }
 
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2018 by the deal.II authors
+// Copyright (C) 1999 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -28,8 +28,6 @@ DEAL_II_NAMESPACE_OPEN
  *
  * This iterator is abstracted from the actual matrix type and can be used for
  * any matrix having the required ACCESSOR type.
- *
- * @author Guido Kanschat, 2006, based on previous a implementation
  */
 template <class ACCESSOR>
 class MatrixIterator
@@ -118,9 +116,7 @@ private:
    */
   ACCESSOR accessor;
 
-  /**
-   * Allow other iterators access to private data.
-   */
+  // Allow other iterators access to private data.
   template <class OtherAccessor>
   friend class MatrixIterator;
 };

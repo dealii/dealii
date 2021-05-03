@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -23,10 +23,8 @@
 #include <deal.II/base/function.h>
 
 #include "../tests.h"
+
 #include "create_mesh.h"
-
-std::ofstream logfile("output");
-
 #include "get_functions_common.h"
 
 

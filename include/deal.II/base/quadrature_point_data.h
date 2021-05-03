@@ -19,6 +19,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/quadrature.h>
+#include <deal.II/base/std_cxx17/optional.h>
 #include <deal.II/base/subscriptor.h>
 
 #include <deal.II/distributed/tria.h>
@@ -46,14 +47,16 @@ DEAL_II_NAMESPACE_OPEN
  * The underlying structure and the initialize() method of this class are
  * designed in such a way that one could use different child classes derived
  * from the base DataType class to store data on a given cell. This implies the
- * usage of pointers, in our case -- std::shared_ptr().
+ * usage of pointers, in our case -- std::shared_ptr.
+ *
+ * The type @p DataType is arbitrary, but when using a class derived from
+ * TransferableQuadraturePointData one can use the facilities of
+ * parallel::distributed::ContinuousQuadratureDataTransfer.
  *
  * @note The data type stored on each cell can be different.
  * However, within the cell this class stores a vector of objects of a single
  * data type. For this reason, this class may not be sufficiently flexible when,
  * for example, adopting a level-set approach to describe material behavior.
- *
- * @author Denis Davydov, Jean-Paul Pelteret, 2016
  */
 template <typename CellIteratorType, typename DataType>
 class CellDataStorage : public Subscriptor
@@ -86,6 +89,10 @@ public:
    * @note It is possible to use different types @p T for different cells which
    * may reflect, for example, different constitutive models of continuum
    * mechanics in different parts of the domain.
+   *
+   * @note The first time this method is called, it stores a SmartPointer to the
+   * Triangulation object that owns the cell. The future invocations of this
+   * method expects the cell to be from the same stored triangulation.
    *
    * @pre The type @p T needs to either equal @p DataType, or be a class derived
    * from @p DataType. @p T needs to be default constructible.
@@ -134,6 +141,9 @@ public:
    * cell-by-cell basis.
    *
    * @pre The type @p T needs to match the class provided to initialize() .
+   *
+   * @pre @p cell must be from the same Triangulation that is used to
+   * initialize() the cell data.
    */
   template <typename T = DataType>
   std::vector<std::shared_ptr<T>>
@@ -149,16 +159,96 @@ public:
    * cell-by-cell basis.
    *
    * @pre The type @p T needs to match the class provided to initialize() .
+   *
+   * @pre @p cell must be from the same Triangulation that is used to
+   * initialize() the cell data.
    */
   template <typename T = DataType>
   std::vector<std::shared_ptr<const T>>
   get_data(const CellIteratorType &cell) const;
 
+  /**
+   * Returns a std_cxx17::optional indicating whether @p cell contains an
+   * associated data or not. If data is available, dereferencing the
+   * std_cxx17::optional reveals a vector of pointers to the underlying data
+   * at the quadrature points.
+   * A possible additional typename @p T is the class to which the base class
+   * DataType could be cast. Since @p DataType is stored as shared pointers,
+   * there is minimal overhead in returning a vector by value instead of by
+   * reference.
+   * This allows flexibility if class @p T is not the same as @p DataType on a
+   * cell-by-cell basis.
+   *
+   * @pre The type @p T needs to match the class provided to initialize().
+   * @pre @p cell must be from the same Triangulation that is used to
+   * initialize() the cell data.
+   */
+  template <typename T = DataType>
+  std_cxx17::optional<std::vector<std::shared_ptr<T>>>
+  try_get_data(const CellIteratorType &cell);
+
+  /**
+   * Returns a std_cxx17::optional indicating whether @p cell contains an
+   * associated data or not. If data is available, dereferencing the
+   * std_cxx17::optional reveals a vector of constant pointers to the
+   * underlying data at the quadrature points.
+   * A possible additional typename @p T is the class to which the base class
+   * DataType could be cast. Since @p DataType is stored as shared pointers,
+   * there is minimal overhead in returning a vector by value instead of by
+   * reference.
+   * This allows flexibility if class @p T is not the same as @p DataType on a
+   * cell-by-cell basis.
+   *
+   * @pre The type @p T needs to match the class provided to initialize().
+   * @pre @p cell must be from the same Triangulation that is used to
+   * initialize() the cell data.
+   */
+  template <typename T = DataType>
+  std_cxx17::optional<std::vector<std::shared_ptr<const T>>>
+  try_get_data(const CellIteratorType &cell) const;
+
 private:
   /**
-   * A map to store a vector of data on a cell.
+   * Number of dimensions
    */
-  std::map<CellIteratorType, std::vector<std::shared_ptr<DataType>>> map;
+  static constexpr unsigned int dimension =
+    CellIteratorType::AccessorType::dimension;
+
+  /**
+   * Number of space dimensions
+   */
+  static constexpr unsigned int space_dimension =
+    CellIteratorType::AccessorType::space_dimension;
+
+  /**
+   * To ensure that all the cells in the CellDataStorage come from the same
+   * Triangulation, we need to store a reference to that Triangulation within
+   * the class.
+   */
+  SmartPointer<const Triangulation<dimension, space_dimension>,
+               CellDataStorage<CellIteratorType, DataType>>
+    tria;
+
+  /**
+   * A map to store a vector of data on each cell.
+   * We need to use CellId as the key because it remains unique during
+   * adaptive refinement.
+   */
+  std::map<CellId, std::vector<std::shared_ptr<DataType>>> map;
+
+  /**
+   * @addtogroup Exceptions
+   */
+  DeclExceptionMsg(
+    ExcCellDataTypeMismatch,
+    "Cell data is being retrieved with a type which is different than the type used to initialize it");
+
+  /**
+   * @addtogroup Exceptions
+   */
+  DeclExceptionMsg(
+    ExcTriangulationMismatch,
+    "The provided cell iterator does not belong to the triangulation that corresponds to the CellDataStorage object.");
 };
 
 
@@ -176,9 +266,11 @@ private:
  * The transfer of quadrature point data between parent and child cells requires
  * some kind of projection and/or interpolation.
  * One possible implementation is via the L2 projection and prolongation
- * matrices as implemented in ContinuousQuadratureDataTransfer class.
+ * matrices as implemented in
+ * parallel::distributed::ContinuousQuadratureDataTransfer class.
  *
- * @author Denis Davydov, Jean-Paul Pelteret, 2016
+ * To store and access instances of classes derived from this class, see the
+ * CellDataStorage class.
  */
 class TransferableQuadraturePointData
 {
@@ -281,16 +373,16 @@ namespace parallel
      *   // a function to pack scalars into a vector
      *   void pack_values(std::vector<double> &values) const
      *   {
-     *     Assert (scalars.size()==2, ExcInternalError());
-     *     scalars[0] = elasticity_parameter_lambda;
-     *     scalars[1] = elasticity_parameter_mu;
+     *     Assert (values.size()==2, ExcInternalError());
+     *     values[0] = elasticity_parameter_lambda;
+     *     values[1] = elasticity_parameter_mu;
      *   }
      *
      *   void unpack_values(const std::vector<double> &values)
      *   {
-     *     Assert (scalars.size() ==2, ExcInternalError());
-     *     elasticity_parameter_lambda = scalars[0];
-     *     elasticity_parameter_mu     = scalars[1];
+     *     Assert (values.size() ==2, ExcInternalError());
+     *     elasticity_parameter_lambda = values[0];
+     *     elasticity_parameter_mu     = values[1];
      *   }
      * };
      * @endcode
@@ -340,8 +432,6 @@ namespace parallel
      * yield over and undershoots that, once evaluated at a different set of
      * quadrature points (on child or parent cells) results in values that will
      * not make much sense.
-     *
-     * @author Denis Davydov, Jean-Paul Pelteret, 2016
      */
     template <int dim, typename DataType>
     class ContinuousQuadratureDataTransfer
@@ -509,21 +599,27 @@ namespace parallel
 
 template <typename CellIteratorType, typename DataType>
 template <typename T>
-void
+inline void
 CellDataStorage<CellIteratorType, DataType>::initialize(
   const CellIteratorType &cell,
   const unsigned int      n_q_points)
 {
   static_assert(std::is_base_of<DataType, T>::value,
                 "User's T class should be derived from user's DataType class");
+  // The first time this method is called, it has to initialize the reference
+  // to the triangulation object
+  if (!tria)
+    tria = &cell->get_triangulation();
+  Assert(&cell->get_triangulation() == tria, ExcTriangulationMismatch());
 
-  if (map.find(cell) == map.end())
+  const auto key = cell->id();
+  if (map.find(key) == map.end())
     {
-      map[cell] = std::vector<std::shared_ptr<DataType>>(n_q_points);
+      map[key] = std::vector<std::shared_ptr<DataType>>(n_q_points);
       // we need to initialize one-by-one as the std::vector<>(q, T())
       // will end with a single same T object stored in each element of the
       // vector:
-      auto it = map.find(cell);
+      const auto it = map.find(key);
       for (unsigned int q = 0; q < n_q_points; q++)
         it->second[q] = std::make_shared<T>();
     }
@@ -533,7 +629,7 @@ CellDataStorage<CellIteratorType, DataType>::initialize(
 
 template <typename CellIteratorType, typename DataType>
 template <typename T>
-void
+inline void
 CellDataStorage<CellIteratorType, DataType>::initialize(
   const CellIteratorType &cell_start,
   const CellIteratorType &cell_end,
@@ -547,10 +643,14 @@ CellDataStorage<CellIteratorType, DataType>::initialize(
 
 
 template <typename CellIteratorType, typename DataType>
-bool
+inline bool
 CellDataStorage<CellIteratorType, DataType>::erase(const CellIteratorType &cell)
 {
-  const auto it = map.find(cell);
+  const auto key = cell->id();
+  const auto it  = map.find(key);
+  if (it == map.end())
+    return false;
+  Assert(&cell->get_triangulation() == tria, ExcTriangulationMismatch());
   for (unsigned int i = 0; i < it->second.size(); i++)
     {
       Assert(
@@ -559,13 +659,13 @@ CellDataStorage<CellIteratorType, DataType>::erase(const CellIteratorType &cell)
           "Can not erase the cell data multiple objects reference its data."));
     }
 
-  return (map.erase(cell) == 1);
+  return (map.erase(key) == 1);
 }
 
 
 
 template <typename CellIteratorType, typename DataType>
-void
+inline void
 CellDataStorage<CellIteratorType, DataType>::clear()
 {
   // Do not call
@@ -590,14 +690,15 @@ CellDataStorage<CellIteratorType, DataType>::clear()
 
 template <typename CellIteratorType, typename DataType>
 template <typename T>
-std::vector<std::shared_ptr<T>>
+inline std::vector<std::shared_ptr<T>>
 CellDataStorage<CellIteratorType, DataType>::get_data(
   const CellIteratorType &cell)
 {
   static_assert(std::is_base_of<DataType, T>::value,
                 "User's T class should be derived from user's DataType class");
+  Assert(&cell->get_triangulation() == tria, ExcTriangulationMismatch());
 
-  auto it = map.find(cell);
+  const auto it = map.find(cell->id());
   Assert(it != map.end(), ExcMessage("Could not find data for the cell"));
 
   // It would be nice to have a specialized version of this function for
@@ -607,7 +708,10 @@ CellDataStorage<CellIteratorType, DataType>::get_data(
   // the T==DataType:
   std::vector<std::shared_ptr<T>> res(it->second.size());
   for (unsigned int q = 0; q < res.size(); q++)
-    res[q] = std::dynamic_pointer_cast<T>(it->second[q]);
+    {
+      res[q] = std::dynamic_pointer_cast<T>(it->second[q]);
+      Assert(res[q], ExcCellDataTypeMismatch());
+    }
   return res;
 }
 
@@ -615,14 +719,15 @@ CellDataStorage<CellIteratorType, DataType>::get_data(
 
 template <typename CellIteratorType, typename DataType>
 template <typename T>
-std::vector<std::shared_ptr<const T>>
+inline std::vector<std::shared_ptr<const T>>
 CellDataStorage<CellIteratorType, DataType>::get_data(
   const CellIteratorType &cell) const
 {
   static_assert(std::is_base_of<DataType, T>::value,
                 "User's T class should be derived from user's DataType class");
+  Assert(&cell->get_triangulation() == tria, ExcTriangulationMismatch());
 
-  auto it = map.find(cell);
+  const auto it = map.find(cell->id());
   Assert(it != map.end(), ExcMessage("Could not find QP data for the cell"));
 
   // Cast base class to the desired class. This has to be done irrespectively of
@@ -630,8 +735,73 @@ CellDataStorage<CellIteratorType, DataType>::get_data(
   // does not modify the content of QP objects
   std::vector<std::shared_ptr<const T>> res(it->second.size());
   for (unsigned int q = 0; q < res.size(); q++)
-    res[q] = std::dynamic_pointer_cast<const T>(it->second[q]);
+    {
+      res[q] = std::dynamic_pointer_cast<const T>(it->second[q]);
+      Assert(res[q], ExcCellDataTypeMismatch());
+    }
   return res;
+}
+
+template <typename CellIteratorType, typename DataType>
+template <typename T>
+inline std_cxx17::optional<std::vector<std::shared_ptr<T>>>
+CellDataStorage<CellIteratorType, DataType>::try_get_data(
+  const CellIteratorType &cell)
+{
+  static_assert(std::is_base_of<DataType, T>::value,
+                "User's T class should be derived from user's DataType class");
+  Assert(&cell->get_triangulation() == tria, ExcTriangulationMismatch());
+
+  const auto it = map.find(cell->id());
+  if (it != map.end())
+    {
+      // Cast base class to the desired class. This has to be done
+      // irrespectively of T==DataType as we need to return
+      // shared_ptr<const T> to make sure the user
+      // does not modify the content of QP objects
+      std::vector<std::shared_ptr<T>> result(it->second.size());
+      for (unsigned int q = 0; q < result.size(); q++)
+        {
+          result[q] = std::dynamic_pointer_cast<T>(it->second[q]);
+          Assert(result[q], ExcCellDataTypeMismatch());
+        }
+      return {result};
+    }
+  else
+    {
+      return {};
+    }
+}
+
+template <typename CellIteratorType, typename DataType>
+template <typename T>
+inline std_cxx17::optional<std::vector<std::shared_ptr<const T>>>
+CellDataStorage<CellIteratorType, DataType>::try_get_data(
+  const CellIteratorType &cell) const
+{
+  static_assert(std::is_base_of<DataType, T>::value,
+                "User's T class should be derived from user's DataType class");
+  Assert(&cell->get_triangulation() == tria, ExcTriangulationMismatch());
+
+  const auto it = map.find(cell->id());
+  if (it != map.end())
+    {
+      // Cast base class to the desired class. This has to be done
+      // irrespectively of T==DataType as we need to return
+      // shared_ptr<const T> to make sure the user
+      // does not modify the content of QP objects
+      std::vector<std::shared_ptr<const T>> result(it->second.size());
+      for (unsigned int q = 0; q < result.size(); q++)
+        {
+          result[q] = std::dynamic_pointer_cast<const T>(it->second[q]);
+          Assert(result[q], ExcCellDataTypeMismatch());
+        }
+      return {result};
+    }
+  else
+    {
+      return {};
+    }
 }
 
 //--------------------------------------------------------------------
@@ -647,7 +817,7 @@ CellDataStorage<CellIteratorType, DataType>::get_data(
  * quadrature point in the DataType class.
  */
 template <typename CellIteratorType, typename DataType>
-void
+inline void
 pack_cell_data(const CellIteratorType &                           cell,
                const CellDataStorage<CellIteratorType, DataType> *data_storage,
                FullMatrix<double> &                               matrix_data)
@@ -656,22 +826,26 @@ pack_cell_data(const CellIteratorType &                           cell,
     std::is_base_of<TransferableQuadraturePointData, DataType>::value,
     "User's DataType class should be derived from QPData");
 
-  const std::vector<std::shared_ptr<const DataType>> qpd =
-    data_storage->get_data(cell);
-
-  const unsigned int n = matrix_data.n();
-
-  std::vector<double> single_qp_data(n);
-  Assert(qpd.size() == matrix_data.m(),
-         ExcDimensionMismatch(qpd.size(), matrix_data.m()));
-  for (unsigned int q = 0; q < qpd.size(); q++)
+  if (const auto qpd = data_storage->try_get_data(cell))
     {
-      qpd[q]->pack_values(single_qp_data);
-      Assert(single_qp_data.size() == n,
-             ExcDimensionMismatch(single_qp_data.size(), n));
+      const unsigned int m = qpd->size();
+      Assert(m > 0, ExcInternalError());
+      const unsigned int n = (*qpd)[0]->number_of_values();
+      matrix_data.reinit(m, n);
 
-      for (unsigned int i = 0; i < n; i++)
-        matrix_data(q, i) = single_qp_data[i];
+      std::vector<double> single_qp_data(n);
+      for (unsigned int q = 0; q < m; ++q)
+        {
+          (*qpd)[q]->pack_values(single_qp_data);
+          AssertDimension(single_qp_data.size(), n);
+
+          for (unsigned int i = 0; i < n; ++i)
+            matrix_data(q, i) = single_qp_data[i];
+        }
+    }
+  else
+    {
+      matrix_data.reinit({0, 0});
     }
 }
 
@@ -681,7 +855,7 @@ pack_cell_data(const CellIteratorType &                           cell,
  * the opposite of the pack function above.
  */
 template <typename CellIteratorType, typename DataType>
-void
+inline void
 unpack_to_cell_data(const CellIteratorType &                     cell,
                     const FullMatrix<double> &                   values_at_qp,
                     CellDataStorage<CellIteratorType, DataType> *data_storage)
@@ -690,19 +864,20 @@ unpack_to_cell_data(const CellIteratorType &                     cell,
     std::is_base_of<TransferableQuadraturePointData, DataType>::value,
     "User's DataType class should be derived from QPData");
 
-  std::vector<std::shared_ptr<DataType>> qpd = data_storage->get_data(cell);
-
-  const unsigned int n = values_at_qp.n();
-
-  std::vector<double> single_qp_data(n);
-  Assert(qpd.size() == values_at_qp.m(),
-         ExcDimensionMismatch(qpd.size(), values_at_qp.m()));
-
-  for (unsigned int q = 0; q < qpd.size(); q++)
+  if (const auto qpd = data_storage->try_get_data(cell))
     {
-      for (unsigned int i = 0; i < n; i++)
-        single_qp_data[i] = values_at_qp(q, i);
-      qpd[q]->unpack_values(single_qp_data);
+      const unsigned int n = values_at_qp.n();
+      AssertDimension((*qpd)[0]->number_of_values(), n);
+
+      std::vector<double> single_qp_data(n);
+      AssertDimension(qpd->size(), values_at_qp.m());
+
+      for (unsigned int q = 0; q < qpd->size(); ++q)
+        {
+          for (unsigned int i = 0; i < n; ++i)
+            single_qp_data[i] = values_at_qp(q, i);
+          (*qpd)[q]->unpack_values(single_qp_data);
+        }
     }
 }
 
@@ -714,7 +889,7 @@ namespace parallel
   namespace distributed
   {
     template <int dim, typename DataType>
-    ContinuousQuadratureDataTransfer<dim, DataType>::
+    inline ContinuousQuadratureDataTransfer<dim, DataType>::
       ContinuousQuadratureDataTransfer(const FiniteElement<dim> &projection_fe_,
                                        const Quadrature<dim> &   lhs_quadrature,
                                        const Quadrature<dim> &   rhs_quadrature)
@@ -722,8 +897,8 @@ namespace parallel
           std::unique_ptr<const FiniteElement<dim>>(projection_fe_.clone()))
       , data_size_in_bytes(0)
       , n_q_points(rhs_quadrature.size())
-      , project_to_fe_matrix(projection_fe->dofs_per_cell, n_q_points)
-      , project_to_qp_matrix(n_q_points, projection_fe->dofs_per_cell)
+      , project_to_fe_matrix(projection_fe->n_dofs_per_cell(), n_q_points)
+      , project_to_qp_matrix(n_q_points, projection_fe->n_dofs_per_cell())
       , handle(numbers::invalid_unsigned_int)
       , data_storage(nullptr)
       , triangulation(nullptr)
@@ -746,7 +921,7 @@ namespace parallel
 
 
     template <int dim, typename DataType>
-    void
+    inline void
     ContinuousQuadratureDataTransfer<dim, DataType>::
       prepare_for_coarsening_and_refinement(
         parallel::distributed::Triangulation<dim> &  tr_,
@@ -756,55 +931,31 @@ namespace parallel
              ExcMessage("This function can be called only once"));
       triangulation = &tr_;
       data_storage  = &data_storage_;
-      // get the number from the first active cell
-      unsigned int number_of_values = 0;
-      // if triangulation has some active cells locally owned cells on this
-      // processor we can expect data to be initialized. Do that to get the
-      // number:
-      for (typename parallel::distributed::Triangulation<
-             dim>::active_cell_iterator it = triangulation->begin_active();
-           it != triangulation->end();
-           it++)
-        if (it->is_locally_owned())
-          {
-            std::vector<std::shared_ptr<DataType>> qpd =
-              data_storage->get_data(it);
-            number_of_values = qpd[0]->number_of_values();
-            break;
-          }
-      // some processors may have no data stored, thus get the maximum among all
-      // processors:
-      number_of_values = Utilities::MPI::max(number_of_values,
-                                             triangulation->get_communicator());
-      Assert(number_of_values > 0, ExcInternalError());
-      const unsigned int dofs_per_cell = projection_fe->dofs_per_cell;
-      matrix_dofs.reinit(dofs_per_cell, number_of_values);
-      matrix_dofs_child.reinit(dofs_per_cell, number_of_values);
-      matrix_quadrature.reinit(n_q_points, number_of_values);
 
       handle = triangulation->register_data_attach(
-        std::bind(
-          &ContinuousQuadratureDataTransfer<dim, DataType>::pack_function,
-          this,
-          std::placeholders::_1,
-          std::placeholders::_2),
-        /*returns_variable_size_data=*/false);
+        [this](
+          const typename parallel::distributed::Triangulation<
+            dim>::cell_iterator &cell,
+          const typename parallel::distributed::Triangulation<dim>::CellStatus
+            status) { return this->pack_function(cell, status); },
+        /*returns_variable_size_data=*/true);
     }
 
 
 
     template <int dim, typename DataType>
-    void
+    inline void
     ContinuousQuadratureDataTransfer<dim, DataType>::interpolate()
     {
       triangulation->notify_ready_to_unpack(
         handle,
-        std::bind(
-          &ContinuousQuadratureDataTransfer<dim, DataType>::unpack_function,
-          this,
-          std::placeholders::_1,
-          std::placeholders::_2,
-          std::placeholders::_3));
+        [this](
+          const typename parallel::distributed::Triangulation<
+            dim>::cell_iterator &cell,
+          const typename parallel::distributed::Triangulation<dim>::CellStatus
+            status,
+          const boost::iterator_range<std::vector<char>::const_iterator>
+            &data_range) { this->unpack_function(cell, status, data_range); });
 
       // invalidate the pointers
       data_storage  = nullptr;
@@ -814,7 +965,7 @@ namespace parallel
 
 
     template <int dim, typename DataType>
-    std::vector<char>
+    inline std::vector<char>
     ContinuousQuadratureDataTransfer<dim, DataType>::pack_function(
       const typename parallel::distributed::Triangulation<dim>::cell_iterator
         &cell,
@@ -824,17 +975,18 @@ namespace parallel
       pack_cell_data(cell, data_storage, matrix_quadrature);
 
       // project to FE
-      project_to_fe_matrix.mmult(matrix_dofs, matrix_quadrature);
+      const unsigned int number_of_values = matrix_quadrature.n();
+      matrix_dofs.reinit(project_to_fe_matrix.m(), number_of_values);
+      if (number_of_values > 0)
+        project_to_fe_matrix.mmult(matrix_dofs, matrix_quadrature);
 
-      // to get consistent data sizes on each cell for the fixed size transfer,
-      // we won't allow compression
       return Utilities::pack(matrix_dofs, /*allow_compression=*/false);
     }
 
 
 
     template <int dim, typename DataType>
-    void
+    inline void
     ContinuousQuadratureDataTransfer<dim, DataType>::unpack_function(
       const typename parallel::distributed::Triangulation<dim>::cell_iterator
         &cell,
@@ -852,11 +1004,18 @@ namespace parallel
         Utilities::unpack<FullMatrix<double>>(data_range.begin(),
                                               data_range.end(),
                                               /*allow_compression=*/false);
+      const unsigned int number_of_values = matrix_dofs.n();
+      if (number_of_values == 0)
+        return;
+
+      matrix_quadrature.reinit(n_q_points, number_of_values);
 
       if (cell->has_children())
         {
           // we need to first use prolongation matrix to get dofvalues on child
           // cells based on dofvalues stored in the parent's data_store
+          matrix_dofs_child.reinit(projection_fe->n_dofs_per_cell(),
+                                   number_of_values);
           for (unsigned int child = 0; child < cell->n_children(); ++child)
             if (cell->child(child)->is_locally_owned())
               {

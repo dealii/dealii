@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2018 by the deal.II authors
+// Copyright (C) 2008 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,7 +15,7 @@
 
 
 
-// test DoFTools::count_dofs_per_block in parallel
+// test DoFTools::count_dofs_per_fe_block in parallel
 
 
 #include <deal.II/base/tensor.h>
@@ -55,8 +55,8 @@ test()
   DoFHandler<dim> dof_handler(triangulation);
   dof_handler.distribute_dofs(fe);
 
-  std::vector<types::global_dof_index> dofs_per_block(fe.n_blocks());
-  DoFTools::count_dofs_per_block(dof_handler, dofs_per_block);
+  const std::vector<types::global_dof_index> dofs_per_block =
+    DoFTools::count_dofs_per_fe_block(dof_handler);
 
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     for (unsigned int i = 0; i < fe.n_blocks(); ++i)

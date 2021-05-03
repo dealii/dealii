@@ -1,0 +1,82 @@
+// ---------------------------------------------------------------------
+//
+// Copyright (C) 2017 - 2020 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
+//
+// ---------------------------------------------------------------------
+
+
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
+  {
+#if deal_II_dimension <= deal_II_space_dimension
+    namespace Particles
+    \{
+      namespace Generators
+      \{
+        template void
+        regular_reference_locations<deal_II_dimension, deal_II_space_dimension>(
+          const Triangulation<deal_II_dimension, deal_II_space_dimension>
+            &triangulation,
+          const std::vector<Point<deal_II_dimension>>
+            &particle_reference_locations,
+          ParticleHandler<deal_II_dimension, deal_II_space_dimension>
+            &particle_handler,
+          const Mapping<deal_II_dimension, deal_II_space_dimension> &mapping);
+
+        template Particle<deal_II_dimension, deal_II_space_dimension>
+        random_particle_in_cell(
+          const typename Triangulation<
+            deal_II_dimension,
+            deal_II_space_dimension>::active_cell_iterator &cell,
+          const types::particle_index                       id,
+          std::mt19937 &random_number_generator,
+          const Mapping<deal_II_dimension, deal_II_space_dimension> &mapping);
+
+        template void
+        probabilistic_locations<deal_II_dimension, deal_II_space_dimension>(
+          const Triangulation<deal_II_dimension, deal_II_space_dimension>
+            &                                      triangulation,
+          const Function<deal_II_space_dimension> &probability_density_function,
+          const bool                               random_cell_selection,
+          const types::particle_index              n_particles_to_create,
+          ParticleHandler<deal_II_dimension, deal_II_space_dimension>
+            &particle_handler,
+          const Mapping<deal_II_dimension, deal_II_space_dimension> &mapping,
+          const unsigned int random_number_seed);
+
+        template void
+        dof_support_points<deal_II_dimension, deal_II_space_dimension>(
+          const DoFHandler<deal_II_dimension, deal_II_space_dimension>
+            &particle_dof_handler,
+          const std::vector<std::vector<BoundingBox<deal_II_space_dimension>>>
+            &global_bounding_boxes,
+          ParticleHandler<deal_II_dimension, deal_II_space_dimension>
+            &particle_handler,
+          const Mapping<deal_II_dimension, deal_II_space_dimension> &mapping,
+          const ComponentMask &                                      components,
+          const std::vector<std::vector<double>> &properties);
+
+        template void
+        quadrature_points<deal_II_dimension, deal_II_space_dimension>(
+          const Triangulation<deal_II_dimension, deal_II_space_dimension>
+            &                                  particle_tria,
+          const Quadrature<deal_II_dimension> &quadrature,
+          const std::vector<std::vector<BoundingBox<deal_II_space_dimension>>>
+            &global_bounding_boxes,
+          ParticleHandler<deal_II_dimension, deal_II_space_dimension>
+            &particle_handler,
+          const Mapping<deal_II_dimension, deal_II_space_dimension> &mapping,
+          const std::vector<std::vector<double>> &properties);
+
+      \}
+    \}
+#endif
+  }

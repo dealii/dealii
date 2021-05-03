@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1128,13 +1128,13 @@
  * (a mutex) rather than task scheduler resources. The result is a
  * deadlock.
  *
- * The bottom line is that tasks can not use mutices or condition variables to
+ * The bottom line is that tasks can not use mutexes or condition variables to
  * synchronize with other tasks. If communication between tasks is necessary,
  * you need to use threads because the operating system makes sure that all
  * threads eventually get to run, independent of the total number of threads.
  * Note however that the same is not true if you only use a Thread::Mutex on
  * each task separately to protect access to a variable that the tasks may
- * write to: this use of mutices is ok; tasks may simply not want to wait for
+ * write to: this use of mutexes is ok; tasks may simply not want to wait for
  * another task to do something.
  *
  *

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -72,11 +72,9 @@ test()
         particle_handler.insert_particle(particle1, cell1);
         particle_handler.insert_particle(particle2, cell2);
 
-        for (auto particle = particle_handler.begin();
-             particle != particle_handler.end();
-             ++particle)
-          deallog << "Before sort particle id " << particle->get_id()
-                  << " is in cell " << particle->get_surrounding_cell(tr)
+        for (const auto &particle : particle_handler)
+          deallog << "Before sort particle id " << particle.get_id()
+                  << " is in cell " << particle.get_surrounding_cell(tr)
                   << " on process "
                   << Utilities::MPI::this_mpi_process(tr.get_communicator())
                   << std::flush << std::endl;
@@ -86,11 +84,9 @@ test()
 
     particle_handler.sort_particles_into_subdomains_and_cells();
 
-    for (auto particle = particle_handler.begin();
-         particle != particle_handler.end();
-         ++particle)
-      deallog << "After sort particle id " << particle->get_id()
-              << " is in cell " << particle->get_surrounding_cell(tr)
+    for (const auto &particle : particle_handler)
+      deallog << "After sort particle id " << particle.get_id()
+              << " is in cell " << particle.get_surrounding_cell(tr)
               << " on process "
               << Utilities::MPI::this_mpi_process(tr.get_communicator())
               << std::flush << std::endl;
@@ -100,17 +96,13 @@ test()
     // coordinate dim-1 despite having a spacedim point.
     Point<spacedim> shift;
     shift(dim - 1) = 0.5;
-    for (auto particle = particle_handler.begin();
-         particle != particle_handler.end();
-         ++particle)
-      particle->set_location(particle->get_location() + shift);
+    for (auto &particle : particle_handler)
+      particle.set_location(particle.get_location() + shift);
 
     particle_handler.sort_particles_into_subdomains_and_cells();
-    for (auto particle = particle_handler.begin();
-         particle != particle_handler.end();
-         ++particle)
-      deallog << "After shift particle id " << particle->get_id()
-              << " is in cell " << particle->get_surrounding_cell(tr)
+    for (const auto &particle : particle_handler)
+      deallog << "After shift particle id " << particle.get_id()
+              << " is in cell " << particle.get_surrounding_cell(tr)
               << " on process "
               << Utilities::MPI::this_mpi_process(tr.get_communicator())
               << std::flush << std::endl;

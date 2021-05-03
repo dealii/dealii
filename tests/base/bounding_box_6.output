@@ -1,0 +1,121 @@
+
+DEAL::dim = 1
+DEAL::
+DEAL::test_center
+DEAL::center 0.500000
+DEAL::
+DEAL::test_side_length
+DEAL::1.00000 
+DEAL::
+DEAL::test_child
+DEAL::child 0
+DEAL::[-1.00000, 0.00000]
+DEAL::child 1
+DEAL::[0.00000, 1.00000]
+DEAL::
+DEAL::test_vertex
+DEAL::vertex 0 = -1.00000
+DEAL::vertex 1 = 1.00000
+DEAL::
+DEAL::test_bounds
+DEAL::Bounds in direction 0
+DEAL::[-1.00000, 1.00000]
+DEAL::
+DEAL::test_create_unit_bounding_box
+DEAL::[0.00000, 1.00000]
+DEAL::
+DEAL::
+DEAL::dim = 2
+DEAL::test_cross_section
+DEAL::orthogonal to 0
+DEAL::[-2.00000, 2.00000]
+DEAL::orthogonal to 1
+DEAL::[-1.00000, 1.00000]
+DEAL::
+DEAL::test_center
+DEAL::center 0.500000 0.500000
+DEAL::
+DEAL::test_side_length
+DEAL::1.00000 2.00000 
+DEAL::
+DEAL::test_child
+DEAL::child 0
+DEAL::[-1.00000, 0.00000]x[-2.00000, 0.00000]
+DEAL::child 1
+DEAL::[0.00000, 1.00000]x[-2.00000, 0.00000]
+DEAL::child 2
+DEAL::[-1.00000, 0.00000]x[0.00000, 2.00000]
+DEAL::child 3
+DEAL::[0.00000, 1.00000]x[0.00000, 2.00000]
+DEAL::
+DEAL::test_vertex
+DEAL::vertex 0 = -1.00000 -2.00000
+DEAL::vertex 1 = 1.00000 -2.00000
+DEAL::vertex 2 = -1.00000 2.00000
+DEAL::vertex 3 = 1.00000 2.00000
+DEAL::
+DEAL::test_bounds
+DEAL::Bounds in direction 0
+DEAL::[-1.00000, 1.00000]
+DEAL::Bounds in direction 1
+DEAL::[-2.00000, 2.00000]
+DEAL::
+DEAL::test_create_unit_bounding_box
+DEAL::[0.00000, 1.00000]x[0.00000, 1.00000]
+DEAL::
+DEAL::
+DEAL::dim = 3
+DEAL::test_cross_section
+DEAL::orthogonal to 0
+DEAL::[-2.00000, 2.00000]x[-3.00000, 3.00000]
+DEAL::orthogonal to 1
+DEAL::[-3.00000, 3.00000]x[-1.00000, 1.00000]
+DEAL::orthogonal to 2
+DEAL::[-1.00000, 1.00000]x[-2.00000, 2.00000]
+DEAL::
+DEAL::test_center
+DEAL::center 0.500000 0.500000 0.500000
+DEAL::
+DEAL::test_side_length
+DEAL::1.00000 2.00000 3.00000 
+DEAL::
+DEAL::test_child
+DEAL::child 0
+DEAL::[-1.00000, 0.00000]x[-2.00000, 0.00000]x[-3.00000, 0.00000]
+DEAL::child 1
+DEAL::[0.00000, 1.00000]x[-2.00000, 0.00000]x[-3.00000, 0.00000]
+DEAL::child 2
+DEAL::[-1.00000, 0.00000]x[0.00000, 2.00000]x[-3.00000, 0.00000]
+DEAL::child 3
+DEAL::[0.00000, 1.00000]x[0.00000, 2.00000]x[-3.00000, 0.00000]
+DEAL::child 4
+DEAL::[-1.00000, 0.00000]x[-2.00000, 0.00000]x[0.00000, 3.00000]
+DEAL::child 5
+DEAL::[0.00000, 1.00000]x[-2.00000, 0.00000]x[0.00000, 3.00000]
+DEAL::child 6
+DEAL::[-1.00000, 0.00000]x[0.00000, 2.00000]x[0.00000, 3.00000]
+DEAL::child 7
+DEAL::[0.00000, 1.00000]x[0.00000, 2.00000]x[0.00000, 3.00000]
+DEAL::
+DEAL::test_vertex
+DEAL::vertex 0 = -1.00000 -2.00000 -3.00000
+DEAL::vertex 1 = 1.00000 -2.00000 -3.00000
+DEAL::vertex 2 = -1.00000 2.00000 -3.00000
+DEAL::vertex 3 = 1.00000 2.00000 -3.00000
+DEAL::vertex 4 = -1.00000 -2.00000 3.00000
+DEAL::vertex 5 = 1.00000 -2.00000 3.00000
+DEAL::vertex 6 = -1.00000 2.00000 3.00000
+DEAL::vertex 7 = 1.00000 2.00000 3.00000
+DEAL::
+DEAL::test_bounds
+DEAL::Bounds in direction 0
+DEAL::[-1.00000, 1.00000]
+DEAL::Bounds in direction 1
+DEAL::[-2.00000, 2.00000]
+DEAL::Bounds in direction 2
+DEAL::[-3.00000, 3.00000]
+DEAL::
+DEAL::test_create_unit_bounding_box
+DEAL::[0.00000, 1.00000]x[0.00000, 1.00000]x[0.00000, 1.00000]
+DEAL::
+DEAL::

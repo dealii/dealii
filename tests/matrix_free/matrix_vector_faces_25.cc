@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -26,8 +26,6 @@
 #include <deal.II/fe/fe_dgq.h>
 
 #include "../tests.h"
-
-std::ofstream logfile("output");
 
 #include "matrix_vector_faces_common.h"
 
@@ -66,7 +64,7 @@ void generate_grid(Triangulation<3> &triangulation, int orientation)
     {10, 11, 8, 9, 6, 7, 4, 5},
     {11, 9, 10, 8, 7, 5, 6, 4}};
 
-  for (unsigned int j = 0; j < GeometryInfo<3>::vertices_per_cell; ++j)
+  for (const unsigned int j : GeometryInfo<3>::vertex_indices())
     {
       cells[0].vertices[j] = cell_vertices_0[j];
       cells[1].vertices[j] = cell_vertices_1[orientation][j];

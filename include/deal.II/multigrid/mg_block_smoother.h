@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -44,27 +44,11 @@ DEAL_II_NAMESPACE_OPEN
  * to the choice of a block smoother by being initialized with a matrix and a
  * smoother object. Therefore, the smoother object for each level must be
  * constructed by hand.
- *
- * @author Guido Kanschat, 2005
  */
 template <typename MatrixType, class RelaxationType, typename number>
 class MGSmootherBlock : public MGSmoother<BlockVector<number>>
 {
 public:
-  /**
-   * @deprecated Since GrowingVectorMemory now uses a joint memory pool, it is
-   * recommended to use the constructor without the memory object.
-   *
-   * Constructor. Sets memory and smoothing parameters.
-   */
-  DEAL_II_DEPRECATED
-  MGSmootherBlock(VectorMemory<BlockVector<number>> &mem,
-                  const unsigned int                 steps     = 1,
-                  const bool                         variable  = false,
-                  const bool                         symmetric = false,
-                  const bool                         transpose = false,
-                  const bool                         reverse   = false);
-
   /**
    * Constructor.
    */
@@ -148,19 +132,6 @@ private:
 //---------------------------------------------------------------------------
 
 #ifndef DOXYGEN
-
-template <typename MatrixType, class RelaxationType, typename number>
-inline MGSmootherBlock<MatrixType, RelaxationType, number>::MGSmootherBlock(
-  VectorMemory<BlockVector<number>> &mem,
-  const unsigned int                 steps,
-  const bool                         variable,
-  const bool                         symmetric,
-  const bool                         transpose,
-  const bool                         reverse)
-  : MGSmoother<BlockVector<number>>(steps, variable, symmetric, transpose)
-  , reverse(reverse)
-  , mem(&mem)
-{}
 
 template <typename MatrixType, class RelaxationType, typename number>
 inline MGSmootherBlock<MatrixType, RelaxationType, number>::MGSmootherBlock(

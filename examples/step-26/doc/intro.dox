@@ -13,7 +13,7 @@ This program implements the heat equation
   &=
   f(\mathbf x, t),
   \qquad\qquad &&
-  \forall \mathbf x \in \Omega, t\in (0,T), 
+  \forall \mathbf x \in \Omega, t\in (0,T),
   \\
   u(\mathbf x, 0) &= u_0(\mathbf x) &&
   \forall \mathbf x \in \Omega, \\
@@ -45,7 +45,7 @@ like $u^n(\mathbf x)$ to approximate $u(\mathbf x, t_n)$ at some time $t_n$:
   (1-\theta)f(\mathbf x, t_{n-1})
   +
   \theta f(\mathbf x, t_n)
-  \right].  
+  \right].
 @f}
 Here, $k_n=t_n-t_{n-1}$ is the time step size. The theta-scheme generalizes
 the explicit Euler ($\theta=0$), implicit Euler ($\theta=1$) and
@@ -168,12 +168,12 @@ compared to the stationary case. Let us go through them in turn:
     (1-\theta)f(\mathbf x, t_{n-1})
     +
     \theta f(\mathbf x, t_n)
-    \right].  
+    \right].
   @f}
   We can here consider $u^{n-1}$ as data since it has presumably been computed
-  before. Now, let us replace 
+  before. Now, let us replace
   @f{align*}
-    u^n(\mathbf x)\approx u_h^n(\mathbf x) 
+    u^n(\mathbf x)\approx u_h^n(\mathbf x)
     =
     \sum_j U^n \varphi_j(\mathbf x),
   @f}
@@ -400,7 +400,7 @@ we choose
 @f}
 Here,
 @f{align*}
-  \chi_1(\mathbf x) &= 
+  \chi_1(\mathbf x) &=
   \left\{
   \begin{array}{ll}
     1
@@ -411,7 +411,7 @@ Here,
   \end{array}
   \right.
   \\
-  \chi_2(\mathbf x) &= 
+  \chi_2(\mathbf x) &=
   \left\{
   \begin{array}{ll}
     1

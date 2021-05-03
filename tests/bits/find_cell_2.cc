@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -36,7 +36,7 @@ void check(Triangulation<3> &tria)
     GridTools::find_active_cell_around_point(tria, p);
 
   deallog << cell << std::endl;
-  for (unsigned int v = 0; v < GeometryInfo<3>::vertices_per_cell; ++v)
+  for (const unsigned int v : GeometryInfo<3>::vertex_indices())
     deallog << "<" << cell->vertex(v) << "> ";
   deallog << std::endl;
 

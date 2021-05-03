@@ -165,6 +165,11 @@ OPTION(DEAL_II_UNITY_BUILD
   OFF)
 MARK_AS_ADVANCED(DEAL_II_UNITY_BUILD)
 
+OPTION(DEAL_II_EARLY_DEPRECATIONS
+  "Enable deprecation warnings for features deprecated since the last release."
+  OFF)
+MARK_AS_ADVANCED(DEAL_II_EARLY_DEPRECATIONS)
+
 SET(BUILD_SHARED_LIBS "ON" CACHE BOOL
   "Build a shared library"
   )
@@ -371,6 +376,12 @@ OPTION(DEAL_II_WITH_64BIT_INDICES
   OFF
   )
 LIST(APPEND DEAL_II_FEATURES 64BIT_INDICES)
+
+OPTION(DEAL_II_WITH_SIMPLEX_SUPPORT
+  "If set to ON, triangulations with triangle and tetrahedron cells are supported in addition to quadrilateral- and hexahedra-only triangulations."
+  OFF
+  )
+LIST(APPEND DEAL_II_FEATURES SIMPLEX_SUPPORT)
 
 OPTION(DEAL_II_WITH_COMPLEX_VALUES
   "If set to OFF, the classes that take a number type are not explicitly instantiated for std::complex<float> and std::complex<double>. This effectively disables the support for computing with complex values. If PETSc is built with complex scalar type, this option must be ON."

@@ -16,7 +16,6 @@
 // test add_parameters with tuples.
 
 #include <deal.II/base/parameter_handler.h>
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <memory>
 
@@ -30,7 +29,7 @@ main()
 {
   initlog();
 
-  typedef std::tuple<std::string, Point<3>, unsigned int> T;
+  using T = std::tuple<std::string, Point<3>, unsigned int>;
 
   T a;
   a = Convert<T>::to_value("Ciao : 1.0, 2.0, 3.0 : 33");

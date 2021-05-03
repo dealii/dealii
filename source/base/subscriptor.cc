@@ -15,7 +15,6 @@
 
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/subscriptor.h>
-#include <deal.II/base/thread_management.h>
 
 #include <algorithm>
 #include <iostream>
@@ -37,6 +36,7 @@ Subscriptor::Subscriptor(Subscriptor &&subscriptor) noexcept
 {
   for (const auto validity_ptr : subscriptor.validity_pointers)
     *validity_ptr = false;
+  subscriptor.validity_pointers.clear();
 }
 
 
@@ -74,7 +74,12 @@ Subscriptor::check_no_subscribers() const noexcept
   // just display a message and continue the program.
   if (counter != 0)
     {
+#  if __cpp_lib_uncaught_exceptions >= 201411
+      // std::uncaught_exception() is deprecated in c++17
+      if (std::uncaught_exceptions() == 0)
+#  else
       if (std::uncaught_exception() == false)
+#  endif
         {
           std::string infostring;
           for (const auto &map_entry : counter_map)
@@ -120,6 +125,7 @@ Subscriptor::operator=(Subscriptor &&s) noexcept
 {
   for (const auto validity_ptr : s.validity_pointers)
     *validity_ptr = false;
+  s.validity_pointers.clear();
   object_info = s.object_info;
   return *this;
 }

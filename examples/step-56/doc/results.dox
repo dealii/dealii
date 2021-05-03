@@ -189,7 +189,7 @@ solve time.
 4. GMG needs slightly more memory than ILU to store the level and interface
 matrices.
 
-<h3> Possible extensions </h3>
+<h3> Possibilities for extensions </h3>
 
 <h4> Check higher order discretizations </h4>
 
@@ -211,4 +211,3 @@ option mentioned above is obtained by setting it to @p false.
 What you will find is that the number of FGMRES iterations stays
 constant under refinement if you use GMG this way. This means that the
 Multigrid is optimal and independent of $h$.
-

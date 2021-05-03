@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -78,7 +78,7 @@ test(const Triangulation<dim> &tr)
       fe_values.reinit(cell);
 
       deallog << "Jacobians: ";
-      for (unsigned int q = 0; q < fe_values.n_quadrature_points; ++q)
+      for (const auto q : fe_values.quadrature_point_indices())
         {
           deallog << "[ ";
           for (unsigned int d = 0; d < dim; ++d)
@@ -88,7 +88,7 @@ test(const Triangulation<dim> &tr)
         }
       deallog << std::endl;
       deallog << "Derivatives of shape function: ";
-      for (unsigned int q = 0; q < fe_values.n_quadrature_points; ++q)
+      for (const auto q : fe_values.quadrature_point_indices())
         {
           deallog << "[ ";
           for (unsigned int d = 0; d < dim; ++d)
@@ -114,7 +114,7 @@ test()
 
   for (Triangulation<dim>::cell_iterator cell = tr.begin(); cell != tr.end();
        ++cell)
-    for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+    for (const unsigned int f : GeometryInfo<dim>::face_indices())
       if (cell->face(f)->at_boundary() &&
           std::abs(cell->face(f)->center()[0] + 1.) < 1e-12 &&
           std::abs(cell->face(f)->center()[1]) < 1e-12)

@@ -28,7 +28,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>General</h3>
 
 <ol>
-  <li> <p> 
+  <li> <p>
        New: deal.II now uses a new threading
        scheme. The new scheme is simpler to use, and in particular
        more flexible in some cases where only one thread is started,
@@ -50,7 +50,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (WB 2003/02/06)
        </p>
 
-  <li> <p> 
+  <li> <p>
        New: deal.II now makes use of some parts of
        the <a href="http://www.boost.org/">boost</a> library, which is
        supposed to be a testground for the next generation C++ standard
@@ -60,7 +60,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        the string <code>_local</code> since you may still want to use
        another version or installation of boost in your own programs.
        </p>
-       
+
        <p>
        Also note that boost is large -- much larger than the subset we
        have imported --, so we only took what we needed.
@@ -68,7 +68,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (WB 2003/02/06)
        </p>
 
-  <li> <p> 
+  <li> <p>
        Fixed: A longstanding bug in the documentation system has been fixed: if
        a namespace was ended with <code>}</code> instead of <code>};</code>
        (note the semicolon), then the documentation tool assumed that the
@@ -82,7 +82,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (WB 2003/02/02)
        </p>
 
-  <li> <p> 
+  <li> <p>
        Changed: Classes and structures that are declared inside namespaces named
        <code>internal</code> are now no longer shown in the class
        index view of the documentation of each of the sublibraries. Since they
@@ -93,15 +93,15 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (WB 2003/02/02)
        </p>
 
-  <li> <p> 
-       Fixed: Some of the formulas in the step-14 tutorial were obviously 
+  <li> <p>
+       Fixed: Some of the formulas in the step-14 tutorial were obviously
        scrambled a little. This is now fixed.
        <br>
        (Roy Stogner, WB 2003/01/30)
        </p>
 
-  <li> <p> 
-       Changed: The main Makefile has been changed to sequentialize building 
+  <li> <p>
+       Changed: The main Makefile has been changed to sequentialize building
        the base, lac, and deal.II sublibraries. We changed this, since on some
        systems (notably AIX), the latter libraries need to be linked against
        the former ones, when creating shared libraries.
@@ -109,14 +109,14 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (WB 2003/01/24)
        </p>
 
-  <li> <p> 
-       New: Changes have been made to support compiling and using 
+  <li> <p>
+       New: Changes have been made to support compiling and using
        deal.II on AIX 5 systems.
        <br>
        (WB 2003/01/24)
        </p>
 
-  <li> <p> 
+  <li> <p>
        Removed: Thread support now relies solely on the use of POSIX
        functions. The use of the
        <a href="http://www.cs.wustl.edu/~schmidt/ACE.html" target="_top">ACE
@@ -128,7 +128,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (WB 2003/01/11)
        </p>
 
-  <li> <p> 
+  <li> <p>
        New: Some changes have been made to support Mac OS X 10.2. Shared
        libraries are not supported on this architecture, but everything else
        should work.
@@ -136,7 +136,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (WB 2002/12/18)
        </p>
 
-  <li> <p> 
+  <li> <p>
        New: deal.II can be compiled with version 7.0 of
        Intel's icc compiler, which was recently released. Since this compiler
        finally supports the very restrictive flags <code>-Xc -ansi</code> that
@@ -152,26 +152,26 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (WB 2002/12/05)
        </p>
 
-  <li> <p> 
+  <li> <p>
        Changed: Previously, we just set the preprocessor variable
        <code>DEAL_II_USE_MT</code>, when <code>--with-multithreading</code> was
        given as argument to <code>./configure</code>. Tests in the code
-       therefore looked like <code>#ifdef DEAL_II_USE_MT</code>. This has been
+       therefore looked like <code>\#ifdef DEAL_II_USE_MT</code>. This has been
        changed so that the variable is always defined, but its value is now
-       equal to <code>1</code> 
+       equal to <code>1</code>
        when multithreading was requested, and zero otherwise. The reason for
        this is that you can now write <code>if (DEAL_II_USE_MT && ...)</code>
        conditions, and need not interleave if-else clauses from regular code
        and the preprocessor, if conditions involve both the state of this
        preprocessor variable and the run-time state of your program. However,
-       this change requires that all appearances of <code>#ifdef
-       DEAL_II_USE_MT</code> be changed to <code>#if DEAL_II_USE_MT ==
+       this change requires that all appearances of <code>\#ifdef
+       DEAL_II_USE_MT</code> be changed to <code>\#if DEAL_II_USE_MT ==
        1</code>, since the variable is now defined unconditionally.
        <br>
        (WB 2002/11/14)
        </p>
 
-  <li> <p> 
+  <li> <p>
        New: Object files are now named according to the local defaults
        on the system we are running on. On Unix systems, this is
        usually a <code>.o</code> suffix, while on Windows it is
@@ -181,7 +181,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (WB 2002/11/11)
        </p>
 
-  <li> <p> 
+  <li> <p>
        New: deal.II can now also be compiled with Red Hat's
        version of the gcc compiler, gcc 2.96. However, some problems remain;
        for more information.
@@ -189,8 +189,8 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (WB 2002/10/14)
        </p>
 
-  <li> <p> 
-       Fixed: On CygWin, one header files has a <code>#define quad
+  <li> <p>
+       Fixed: On CygWin, one header files has a <code>\#define quad
        quad_t</code>. This is annoying, since we have local variables and
        member functions with the name <code>quad</code>, and in fact it breaks
        compilation on those versions of CygWin that has this. Fortunately, the
@@ -203,10 +203,10 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        set.
        <br>
        (Stephen Kolaroff, WB
-       2002/09/28) 
+       2002/09/28)
        </p>
 
-  <li> <p> 
+  <li> <p>
        New: Since <code>math.h</code> only defines the values of PI or E (as
        <code>M_PI</code> and <code>M_E</code>) when certain defines are set (on
        Linux, these are <code>__USE_BSD</code> or <code>__USE_XOPEN</code>),
@@ -219,7 +219,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (WB 2002/09/12)
        </p>
 
-  <li> <p> 
+  <li> <p>
        New: <code>base/config.h</code> now exports the
        deal.II base directory through the
        <code>DEAL_II_PATH</code> preprocessor variable.
@@ -227,7 +227,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (WB 2002/09/09)
        </p>
 
-  <li> <p> 
+  <li> <p>
        Removed: The forward declarations files have gone. We have never
        propagated their use in the example programs, but these files have been
        there in the base, lac, and grid include directories, and forward
@@ -254,15 +254,15 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (WB 2002/09/05)
        </p>
 
-  <li> <p> 
+  <li> <p>
        New: There is now
        a new report
-       on assembling matrices available from the 
+       on assembling matrices available from the
        <a href="../documentation.html" target="body">documentation
        page</a>. The main focus is assembling of matrices for
        vector-valued problems, where shape functions are
        vector-valued, and may have only one or more non-zero vector
-       components. 
+       components.
        <br>
        (WB 2002/06/17)
        </p>
@@ -286,7 +286,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (WB 2002/06/10)
        </p>
 
-  <li> <p> 
+  <li> <p>
        New: deal.II now also supports vector-valued
        finite elements with shape functions for which more than just
        one vector component is non-zero. Such elements are, for
@@ -299,7 +299,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (WB 2002/06/10)
        </p>
 
-  <li> <p> 
+  <li> <p>
        New: The top-level makefile now how a target <tt>distclean</tt>.
        <tt>clean</tt> leaves the libraries now, removing
        everything that is not needed to use
@@ -353,7 +353,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (WB 2003/02/13)
        </p>
 
-  <li> <p> 
+  <li> <p>
        New: The <code>Function</code> class now has an assignment
        operator. This way, you can put function objects into
        containers. However, the assignment operator makes sure that only
@@ -362,7 +362,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (WB 2003/02/06)
        </p>
 
-  <li> <p> 
+  <li> <p>
        New: The <code>ThreadMutex</code> classes now have a
        member class <code>ScopedLock</code> that implements the
        scoped thread-safe locking pattern of Doug Schmidt. It is also used in
@@ -371,7 +371,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (WB 2003/01/28)
        </p>
 
-  <li> <p> 
+  <li> <p>
        Fixed: The <code>PosixThreadManager</code> called
        its <code>wait</code> function in the
        destructor. If this had been called before already, then the
@@ -384,7 +384,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (Michael Anderson, WB 2003/01/16)
        </p>
 
-  <li> <p> 
+  <li> <p>
        Fixed: The <code>Subscriptor</code> uses a counter to
        count how many <code>SmartPointer</code> objects subscribe
        to the pointed-to object. This counter needs to be a volatile variable
@@ -395,7 +395,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (WB 2003/01/11)
        </p>
 
-  <li> <p> 
+  <li> <p>
        Fixed: In multithreaded mode, when a new thread is started, the
        arguments to the function being called need to be copied from the stack
        of the starting thread to that of the new thread. In order to
@@ -408,7 +408,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (Michael Anderson, WB 2003/01/11)
        </p>
 
-  <li> <p> 
+  <li> <p>
        New: There are now classes <code>ThreadCondition</code>
        that implement thread condition variable operations through POSIX
        functions (in multithreaded mode) or doing nothing (in singlethreaded
@@ -417,7 +417,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (WB 2003/01/11)
        </p>
 
-  <li> <p> 
+  <li> <p>
        New: Newer versions of gcc have a very nice feature: you can set
        a verbose terminate handler, that not only aborts a program
        when an exception is thrown and not caught somewhere, but
@@ -431,7 +431,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (WB 2002/12/19)
        </p>
 
-  <li> <p> 
+  <li> <p>
        New: There is now a <code>Patterns::List</code> pattern
        that matches a list of elements each of which has to satisfy a pattern
        that was given to the constructor.
@@ -439,7 +439,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (WB 2002/11/29)
        </p>
 
-  <li> <p> 
+  <li> <p>
        Changed: In POSIX mode, when the <code
        class="member">ThreadManager</code> class created a new thread through
        <code>pthread_create</code>, it only checked for the
@@ -453,7 +453,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (WB 2002/11/13)
        </p>
 
-  <li> <p> 
+  <li> <p>
        Fixed: The <code>write_text</code> and <code
        class="member">write_tex</code> functions of the <code
        class="class">TableHandler</code> class now check whether their
@@ -463,7 +463,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (RH 2002/11/11)
        </p>
 
-  <li> <p> 
+  <li> <p>
        New: Added Hierarchical Polynomial (similar to Legendre class). Will
        eventually be used in a hierarchical FiniteElement class similar to
        FE_Q class. Included in Polynomials namespace.
@@ -492,7 +492,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        </p>
 
   <li> <p> Changed: The class <code
-       class="member">Table&lt;2&gt;::fill</code> function, which is also
+       class="member">Table::fill()</code> function, which is also
        inherited from the <code>FullMatrix</code> class, used to
        work also when the size of the matrix was zero, by simply not copying
        something. This led to difficult to detect errors. It is therefore no
@@ -515,7 +515,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (RH 2002/09/24)
        </p>
 
-  <li> <p> 
+  <li> <p>
        New: The <code>Threads::n_existing_threads</code>
        function returns the present number of existing threads, allowing an
        assessment whether it is useful to spawn new threads or rather perform
@@ -531,7 +531,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (GK 2002/09/08)
        </p>
 
-  <li> <p> 
+  <li> <p>
        Extended: Previously, the <code
        class="class">Threads::PosixThreadBarrier</code>
        class could not be used at all (they threw exceptions), if your system
@@ -545,7 +545,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (WB 2002/09/05)
        </p>
 
-  <li> <p> 
+  <li> <p>
        New: The old class <code>vector2d</code>, implementing a
        two-dimensional array of objects is now gone. Instead, there is the new
        <code>Table</code> class that implements tables of
@@ -558,14 +558,14 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (WB 2002/09/03)
        </p>
 
-  <li> <p> 
+  <li> <p>
        New: There are now functions returning the transpose of <code
        class="class">Tensor</code> objects of rank 2.
        <br>
        (WB 2002/08/31)
        </p>
 
-  <li> <p> 
+  <li> <p>
        New: Row accessors for the <code>vector2d</code>
        class now have a member function <code
        class="member">size</code> that returns the size of the row,
@@ -574,7 +574,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (WB 2002/07/24)
        </p>
 
-  <li> <p> 
+  <li> <p>
        Fixed: In EPS output, colors were set to invalid values if the
        values of the field that is used for coloring are all
        equal. This happens, for example, in the very first time step
@@ -584,7 +584,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (WB 2002/07/24)
        </p>
 
-  <li> <p> 
+  <li> <p>
        Changed: To save disk space, color values in EPS output are
        written as grey scale with only one value instead of three RGB
        values if the color so represented is actually a grey scale.
@@ -592,7 +592,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (WB 2002/07/24)
        </p>
 
-  <li> <p> 
+  <li> <p>
        New: There are now operators to allow multiplication and
        division of <code>Tensor</code> objects by scalar
        factors.
@@ -607,22 +607,22 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>lac</h3>
 
 <ol>
-  <li> <p> New: Function 
+  <li> <p> New: Function
        <code>BlockSparseMatrix::print_formatted</code>
-       added, similar to the 
+       added, similar to the
        <code>BlockVector::print_formatted</code> function.
        <br>
        (Brian Carnes 2003/06/02)
-       </p> 
+       </p>
 
   <li> <p> New: Functions <code>SparseMatrix::operator *=</code>
-       and <code>SparseMatrix::operator /=</code> as well as 
+       and <code>SparseMatrix::operator /=</code> as well as
        <code>BlockSparseMatrix::operator *=</code>
-       and <code>BlockSparseMatrix::operator /=</code> 
+       and <code>BlockSparseMatrix::operator /=</code>
        are added.
        <br>
        (Brian Carnes 2003/06/02)
-       </p> 
+       </p>
 
   <li> <p> Deprecated: The functions <code>Vector::scale</code>
        and <code>BlockVector::scale</code> are now deprecated
@@ -630,7 +630,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        <code>operator/=</code> instead.
        <br>
        (WB 2003/05/31)
-       </p> 
+       </p>
 
   <li> <p> New: <code>Vector</code>, <code
        class="class">BlockVector</code> and
@@ -638,7 +638,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        for scaling by a scalar.
        <br>
        (WB 2003/05/31)
-       </p> 
+       </p>
 
   <li> <p> New: <code>PointerMatrix</code> now
        has <code>empty()</code> function, which returns true if the pointer is
@@ -699,7 +699,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (WB 2003/02/13)
        </p>
 
-  <li> <p> 
+  <li> <p>
        New: The <code>SolverGMRES</code> now accepts an
        <code>AdditionalData</code> parameter
        <code>use_default_residual</code> whose default is
@@ -714,7 +714,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (RH 2003/01/31)
        </p>
 
-  <li> <p> 
+  <li> <p>
        New: <code>FullMatrix</code> has a function <code
        class="member">copy_from</code>, copying from sparse matrices.
        It uses iterators of the sparse matrix classes.
@@ -743,7 +743,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        <br>
        (Stephen Kolaroff 2002/11/27)
        </p>
- 
+
   <li> <p>
        Changed: In multithread mode, the <code
        class="class">SparseMatrix</code> would spawn
@@ -757,9 +757,9 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        <br>
        (WB 2002/11/13)
        </p>
- 
+
   <li> <p>
-       Fixed: In the <code>SparseDirectMA27</code> class, wrapping 
+       Fixed: In the <code>SparseDirectMA27</code> class, wrapping
        the MA27 solver written in Fortran77 into some structure amenable to C++,
        we wrote beyond the end of an array on rare inputs. This is now fixed. The
        same probably holds for the respective code for MA47.
@@ -776,7 +776,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        computations using this solver. The actual operations are therefore
        distributed to distint programs that have separate address spaces. This
        allows to have as many concurrent instances of this solver in parallel
-       as you want. For more information, read the documentation of the 
+       as you want. For more information, read the documentation of the
        <code>SparseDirectMA27</code> class.
        <br>
        (WB 2002/09/25)
@@ -814,7 +814,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
   <li> <p>
        New: Classes <code>SparsityPattern</code> and <code
-       class="class">SparseMatrix</code> now have functions <code 
+       class="class">SparseMatrix</code> now have functions <code
        class="member">block_write/block_read</code>, allowing to dump the data
        of these objects into a file in binary format, and later to re-read it
        without much need for parsing.
@@ -830,7 +830,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (GK 2002/08/13)
        </p>
 
-  <li> <p> 
+  <li> <p>
        New: a way of using abstract base classes for matrices has
        been implemented with <code>PointerMatrixBase</code>
        and <code>PointerMatrix</code>. Storing a matrix in
@@ -867,7 +867,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        to the child cell; <code
        class="member">child_to_cell_coordinates</code> that does
        exactly the opposite; and <code
-       class="member">is_inside_unit_cell</code> that tells whether a 
+       class="member">is_inside_unit_cell</code> that tells whether a
        given point is inside the unit cell.
        <br>
        (WB 2003/05/01)
@@ -960,7 +960,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (WB 2003/02/21)
        </p>
 
-  <li> <p> 
+  <li> <p>
        Changed: Some implementation details of the <code
        class="class">GridReordering</code> class have been moved to a
        namespace <code>internal</code>.
@@ -989,7 +989,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        </p>
 
   <li> <p>
-       Fixed: Objects of type <code>FESystem</code> 
+       Fixed: Objects of type <code>FESystem</code>
        could not be constructed if one of the elements it is to be composed of
        did not implement interface constraints for hanging nodes. This is now
        fixed: you can construct such a composed element, but it does not
@@ -1010,7 +1010,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (RH 2003/02/03)
        </p>
 
-  <li> <p> 
+  <li> <p>
        Fixed: The <code>GridReordering</code> tried to be
        thread-safe in the initialization of some data, but was not due to a
        typo. This is now fixed.
@@ -1018,7 +1018,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (WB 2003/01/28)
        </p>
 
-  <li> <p> 
+  <li> <p>
        Changed: The <code>FEValues::get_cell</code> and
        <code>FEValues::get_face</code> functions have
        been removed, since they limited our ability to use this
@@ -1028,7 +1028,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (WB 2003/01/17)
        </p>
 
-  <li> <p> 
+  <li> <p>
        New: The DoF accessor classes now have a function <code
        class="member">get_fe()</code> that returns a reference to the finite
        element being used on this cell. The result is of course identical to
@@ -1039,22 +1039,22 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (WB 2003/01/10)
        </p>
 
-  <li> <p> 
-       New: Checked in new <code>GridGenerator</code> 
+  <li> <p>
+       New: Checked in new <code>GridGenerator</code>
        member function <code>half_hyper_ball</code>,
-       derived from member <code>hyper_ball</code>.     
+       derived from member <code>hyper_ball</code>.
        The initial mesh contains four elements. This mesh will work with
        the boundary class <code>HalfHyperBallBoundary</code>.
        <br>
        (Brian Carnes 2002/12/16)
        </p>
 
-  <li> <p> 
+  <li> <p>
        New: Checked in new class <code>FE_Q_Hierarchical</code>
-       derived from class <code>FiniteElement</code>.  
-       This element is analogous to <code>FE_Q</code>, but 
-       makes use of hierarchical shape functions, based on the 
-       <code>Polynomials::Hierarchical</code> class. 
+       derived from class <code>FiniteElement</code>.
+       This element is analogous to <code>FE_Q</code>, but
+       makes use of hierarchical shape functions, based on the
+       <code>Polynomials::Hierarchical</code> class.
        For <code>degree&gt;1</code>, the non-nodal basis functions are "bubble"
        functions, which are not Lagrange polynomials. Therefore, the usual
        interpolation based on using unit support points will not work for
@@ -1062,35 +1062,35 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        interpolation-projection operator, based on an hp-type interpolant.
        <br>
        The files for this element are
-       <code>deal.II/include/fe/fe_q_hierarchical.h</code> and 
+       <code>deal.II/include/fe/fe_q_hierarchical.h</code> and
        <code>deal.II/source/fe/fe_q_hierarchical.cc</code>.
        <br>
        (Brian Carnes 2002/12/13)
        </p>
 
-  <li> <p> 
+  <li> <p>
        New: For finite element classes, the functions
        <code>unit_support_point</code> and
        <code>unit_face_support_point</code> return the position
        of an individual support point. This is necessary when you want to get
        information about the support points of certain components in a composed
        finite element, where not all components provide support points, and the
-       composed element thus does not fill the array the 
+       composed element thus does not fill the array the
        <code>get_unit_support_points</code> function returns.
        <br>
        (WB 2002/11/23)
        </p>
 
-  <li> <p> 
+  <li> <p>
        Fixed: Vectors could not be given as input and output vectors to the
        <code>SolutionTransfer</code> class at the same time, but
        this was not checked. An assertion has now been added to ensure this
-       requirement. 
+       requirement.
        <br>
        (WB 2002/10/28)
        </p>
 
-  <li> <p> 
+  <li> <p>
        Fixed: The <code
        class="member">DoFRenumbering::component_wise</code> function accepts a
        parameter indicating the order in which the degrees of freedom
@@ -1101,7 +1101,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (WB 2002/10/17)
        </p>
 
-  <li> <p> 
+  <li> <p>
        New: The <code
        class="member">FiniteElement::system_to_base_index</code> function now
        exports the values of the <code
@@ -1111,7 +1111,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (WB 2002/10/17)
        </p>
 
-  <li> <p> 
+  <li> <p>
        New: The <code
        class="member">FiniteElement::element_multiplicity</code> function was
        previously only available in the <code>FESystem</code>
@@ -1123,7 +1123,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (WB 2002/10/17)
        </p>
 
-  <li> <p> 
+  <li> <p>
        Fixed: The algorithm to generate neighbor information for patches from
        cells in <code>DataOut::build_patches</code> was rather
        inefficient, tripling the time for patch generation when support for
@@ -1135,7 +1135,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (WB 2002/10/10)
        </p>
 
-  <li> <p> 
+  <li> <p>
        Changed (internals): Previously, the finite element base class
        initialized the restriction, prolongation, and face constraints matrices
        to their correct size. Derived classes had to fill these classes, and
@@ -1166,16 +1166,16 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (GK 2002/09/19)
        </p>
 
-  <li> <p> 
+  <li> <p>
        Fixed: Some of the various instances of the <code
        class="member">VectorTools::interpolate_boundary_values</code> functions
        were not explicitly instantiated, leading to linker errors. This is now
-       fixed. 
+       fixed.
        <br>
        (WB 2002/09/19)
        </p>
 
-  <li> <p> 
+  <li> <p>
        Removed: The <code
        class="member">FiniteElement::component_to_system_index</code> function
        and its counterpart for faces is gone. This data did not make much sense
@@ -1187,7 +1187,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (WB 2002/09/16)
        </p>
 
-  <li> <p> 
+  <li> <p>
        Changed: The <code
        class="member">FiniteElement::restriction_is_additive</code> function
        used to take an argument that denoted the vector component of a finite
@@ -1201,14 +1201,14 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (WB 2002/09/16)
        </p>
 
-  <li> <p> 
+  <li> <p>
        New: The mapping classes now also know how to transform tensors of rank
        2, not only vectors (tensors of rank 1) in a co- and contravariant way.
        <br>
        (WB 2002/09/03)
        </p>
 
-  <li> <p> 
+  <li> <p>
        Fixed: the <code>GridIn</code> class had problems
        when reading in UCD grids with comment lines that contained
        only the comment sign, but nothing else. This is now fixed.
@@ -1216,7 +1216,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (WB 2002/08/30)
        </p>
 
-  <li> <p> 
+  <li> <p>
        Improved: <code>VectorTools</code>::<code
        class="member">integrate_difference</code> can compute <i>L<sup>p</sup></i>
        and <i>W<sup>1,p</sup></i> norms for arbitrary <i>p</i>. The function
@@ -1276,7 +1276,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        class="member">Triangulation<1>::n_quads</code> now returns 0,
        instead of throwing an assertion, as before. The same holds for
        similar functions like <code
-       class="member">Triangulation&lt;dim&gt;::n_hexs</code> that now
+       class="member">Triangulation::n_hexs</code> that now
        returns 0 for <code>dim<3</code>.
        <br>
        (RH 2002/06/14)
@@ -1298,7 +1298,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        the library.
        <br>
        (RH 2002/06/14)
-       </p>  
+       </p>
 
   <li> <p> Fixed: <code
        class="member">FE_Q::has_support_on_face</code> always returned
@@ -1351,7 +1351,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (RH 2002/06/10)
        </p>
 
-  <li> <p> 
+  <li> <p>
        Fixed: The <code>get_dof_indices</code>
        functions of DoF accessor classes used to work also for
        non-active cells. However, the results were bogus except for
@@ -1364,7 +1364,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (WB 2002/06/08)
        </p>
 
-  <li> <p> 
+  <li> <p>
        New: For encapsulated postscript output of 2d grids, it is now
        possible to tell the <code>GridOut</code> class to
        write the cell numbers into each cell, as well as the numbers

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2019 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/table.h>
 #include <deal.II/base/tensor.h>
 
@@ -24,9 +23,12 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/container/small_vector.hpp>
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 
 #include <cmath>
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -40,7 +42,7 @@ Manifold<dim, spacedim>::project_to_manifold(
   const Point<spacedim> &) const
 {
   Assert(false, ExcPureFunctionCalled());
-  return Point<spacedim>();
+  return {};
 }
 
 
@@ -95,15 +97,21 @@ Manifold<dim, spacedim>::get_new_point(
   for (unsigned int i = 1; i < n_points; ++i)
     {
       double weight = 0.0;
-      if ((weights[permutation[i]] + w) < tol)
+      if (std::abs(weights[permutation[i]] + w) < tol)
         weight = 0.0;
       else
         weight = w / (weights[permutation[i]] + w);
 
       if (std::abs(weight) > 1e-14)
-        p = get_intermediate_point(p,
-                                   surrounding_points[permutation[i]],
-                                   1.0 - weight);
+        {
+          p = get_intermediate_point(p,
+                                     surrounding_points[permutation[i]],
+                                     1.0 - weight);
+        }
+      else
+        {
+          p = surrounding_points[permutation[i]];
+        }
       w += weights[permutation[i]];
     }
 
@@ -348,7 +356,7 @@ Manifold<dim, spacedim>::get_new_point_on_face(
         return get_new_point_on_quad(face);
     }
 
-  return Point<spacedim>();
+  return {};
 }
 
 
@@ -368,7 +376,7 @@ Manifold<dim, spacedim>::get_new_point_on_cell(
         return get_new_point_on_hex(cell);
     }
 
-  return Point<spacedim>();
+  return {};
 }
 
 
@@ -445,7 +453,7 @@ Manifold<dim, spacedim>::get_new_point_on_hex(
   const typename Triangulation<dim, spacedim>::hex_iterator & /*hex*/) const
 {
   Assert(false, ExcImpossibleInDim(dim));
-  return Point<spacedim>();
+  return {};
 }
 
 
@@ -521,8 +529,7 @@ template <int dim, int spacedim>
 std::unique_ptr<Manifold<dim, spacedim>>
 FlatManifold<dim, spacedim>::clone() const
 {
-  return std_cxx14::make_unique<FlatManifold<dim, spacedim>>(periodicity,
-                                                             tolerance);
+  return std::make_unique<FlatManifold<dim, spacedim>>(periodicity, tolerance);
 }
 
 
@@ -887,8 +894,19 @@ FlatManifold<dim, spacedim>::normal_vector(
   const unsigned int facedim = dim - 1;
 
   Point<facedim> xi;
-  for (unsigned int i = 0; i < facedim; ++i)
-    xi[i] = 1. / 2;
+
+  const auto face_reference_cell = face->reference_cell();
+
+  if (face_reference_cell == ReferenceCells::get_hypercube<facedim>())
+    {
+      for (unsigned int i = 0; i < facedim; ++i)
+        xi[i] = 1. / 2;
+    }
+  else
+    {
+      for (unsigned int i = 0; i < facedim; ++i)
+        xi[i] = 1. / 3;
+    }
 
   const double        eps = 1e-12;
   Tensor<1, spacedim> grad_F[facedim];
@@ -896,19 +914,17 @@ FlatManifold<dim, spacedim>::normal_vector(
   while (true)
     {
       Point<spacedim> F;
-      for (unsigned int v = 0; v < GeometryInfo<facedim>::vertices_per_cell;
-           ++v)
-        F += face->vertex(v) *
-             GeometryInfo<facedim>::d_linear_shape_function(xi, v);
+      for (const unsigned int v : face->vertex_indices())
+        F +=
+          face->vertex(v) * face_reference_cell.d_linear_shape_function(xi, v);
 
       for (unsigned int i = 0; i < facedim; ++i)
         {
           grad_F[i] = 0;
-          for (unsigned int v = 0; v < GeometryInfo<facedim>::vertices_per_cell;
-               ++v)
+          for (const unsigned int v : face->vertex_indices())
             grad_F[i] +=
               face->vertex(v) *
-              GeometryInfo<facedim>::d_linear_shape_function_gradient(xi, v)[i];
+              face_reference_cell.d_linear_shape_function_gradient(xi, v)[i];
         }
 
       Tensor<1, facedim> J;

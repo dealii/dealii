@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2016 - 2018 by the deal.II authors
+ * Copyright (C) 2016 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -21,7 +21,6 @@
  * We test that the computed vectors are eigenvectors and mass-orthonormal, i.e.
  * a) (A*x_i-\lambda*B*x_i).L2() == 0
  * b) x_j*B*x_i = \delta_{i,j}
- *
  */
 
 #include <deal.II/base/index_set.h>
@@ -57,7 +56,6 @@
 
 const unsigned int dim = 2;
 
-using namespace dealii;
 
 const double eps = 1e-10;
 
@@ -139,7 +137,7 @@ test()
     // set up iterative inverse
     static ReductionControl inner_control_c(dof_handler.n_dofs(), 0.0, 1.e-13);
 
-    typedef LinearAlgebra::distributed::Vector<double> VectorType;
+    using VectorType = LinearAlgebra::distributed::Vector<double>;
     SolverCG<VectorType> solver_c(inner_control_c);
     PreconditionIdentity preconditioner;
     const auto           shift_and_invert =

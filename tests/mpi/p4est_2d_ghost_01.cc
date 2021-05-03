@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -73,7 +73,7 @@ test()
               continue;
             }
 
-          for (unsigned int n = 0; n < GeometryInfo<dim>::faces_per_cell; ++n)
+          for (const unsigned int n : GeometryInfo<dim>::face_indices())
             {
               if (cell->at_boundary(n))
                 continue;

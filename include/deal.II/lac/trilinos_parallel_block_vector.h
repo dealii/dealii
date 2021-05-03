@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2018 by the deal.II authors
+// Copyright (C) 2008 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -31,12 +31,9 @@
 DEAL_II_NAMESPACE_OPEN
 
 // forward declaration
+#  ifndef DOXYGEN
 template <typename Number>
 class BlockVectorBase;
-
-/*! @addtogroup TrilinosWrappers
- *@{
- */
 
 namespace TrilinosWrappers
 {
@@ -46,8 +43,15 @@ namespace TrilinosWrappers
     class BlockVector;
   }
   class BlockSparseMatrix;
+} // namespace TrilinosWrappers
+#  endif
 
+/*! @addtogroup TrilinosWrappers
+ *@{
+ */
 
+namespace TrilinosWrappers
+{
   namespace MPI
   {
     /**
@@ -66,7 +70,6 @@ namespace TrilinosWrappers
      * @ingroup Vectors
      * @ingroup TrilinosWrappers @see
      * @ref GlossBlockLA "Block (linear algebra)"
-     * @author Martin Kronbichler, Wolfgang Bangerth, 2008, 2009
      */
     class BlockVector : public dealii::BlockVectorBase<MPI::Vector>
     {
@@ -413,7 +416,6 @@ namespace TrilinosWrappers
      * exchanges the data of the two vectors.
      *
      * @relatesalso TrilinosWrappers::MPI::BlockVector
-     * @author Martin Kronbichler, Wolfgang Bangerth, 2008
      */
     inline void
     swap(BlockVector &u, BlockVector &v)
@@ -472,8 +474,6 @@ namespace internal
 
 /**
  * Declare dealii::TrilinosWrappers::MPI::BlockVector as distributed vector.
- *
- * @author Uwe Koecher, 2017
  */
 template <>
 struct is_serial_vector<TrilinosWrappers::MPI::BlockVector> : std::false_type

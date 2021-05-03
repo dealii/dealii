@@ -336,7 +336,7 @@ inconvenience this causes.
   (Matthias Maier, 2013/11/20)
   </li>
 
-  <li> Changed: when a dealii::Exception is thrown, defer the symbol lookup of the
+  <li> Changed: when a dealii::%Exception is thrown, defer the symbol lookup of the
   stack trace to when it is needed. This improves performance if what() is never
   called.
   <br>

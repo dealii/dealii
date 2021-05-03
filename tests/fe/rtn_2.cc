@@ -52,7 +52,7 @@ plot_shape_functions(const unsigned int degree)
   typename DoFHandler<dim>::cell_iterator c = dof.begin();
   dof.distribute_dofs(fe_rt);
 
-  QTrapez<1>         q_trapez;
+  QTrapezoid<1>      q_trapez;
   const unsigned int div = 10;
   QIterated<dim>     q(q_trapez, div);
   FEValues<dim>      fe(fe_rt,

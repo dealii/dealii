@@ -1,0 +1,86 @@
+
+DEAL:Standard::psi: 0.5*(-3 + C_00 + C_11)*mu_e + log(C_11*C_00 - C_01**2)*kappa_e
+DEAL:Standard::S[0][0]: 2.0*(0.5*mu_e + C_11*kappa_e/(C_11*C_00 - C_01**2))
+DEAL:Standard::S[0][1]: -2.0*C_01*kappa_e/(C_11*C_00 - C_01**2)
+DEAL:Standard::S[1][1]: 2.0*(0.5*mu_e + C_00*kappa_e/(C_11*C_00 - C_01**2))
+DEAL:Standard::HH[0][0][0][0]: -4.0*C_11**2*kappa_e/(C_11*C_00 - C_01**2)**2
+DEAL:Standard::HH[0][0][0][1]: 4.0*C_11*C_01*kappa_e/(C_11*C_00 - C_01**2)**2
+DEAL:Standard::HH[0][0][1][1]: 4.0*(kappa_e/(C_11*C_00 - C_01**2) - C_11*C_00*kappa_e/(C_11*C_00 - C_01**2)**2)
+DEAL:Standard::HH[0][1][0][0]: 4.0*C_11*C_01*kappa_e/(C_11*C_00 - C_01**2)**2
+DEAL:Standard::HH[0][1][0][1]: 1.0*(-2.0*kappa_e/(C_11*C_00 - C_01**2) - 4.0*C_01**2*kappa_e/(C_11*C_00 - C_01**2)**2)
+DEAL:Standard::HH[0][1][1][1]: 4.0*C_00*C_01*kappa_e/(C_11*C_00 - C_01**2)**2
+DEAL:Standard::HH[1][1][0][0]: 4.0*(kappa_e/(C_11*C_00 - C_01**2) - C_11*C_00*kappa_e/(C_11*C_00 - C_01**2)**2)
+DEAL:Standard::HH[1][1][0][1]: 4.0*C_00*C_01*kappa_e/(C_11*C_00 - C_01**2)**2
+DEAL:Standard::HH[1][1][1][1]: -4.0*C_00**2*kappa_e/(C_11*C_00 - C_01**2)**2
+DEAL:Standard::psi: 15.36294361
+DEAL:Standard::S[0][0]: 13.00000000
+DEAL:Standard::S[0][1]: 0.000000000
+DEAL:Standard::S[1][1]: 13.00000000
+DEAL:Standard::HH[0][0][0][0]: -10.00000000
+DEAL:Standard::HH[0][0][0][1]: 0.000000000
+DEAL:Standard::HH[0][0][1][1]: 0.000000000
+DEAL:Standard::HH[0][1][0][0]: 0.000000000
+DEAL:Standard::HH[0][1][0][1]: -5.000000000
+DEAL:Standard::HH[0][1][1][1]: 0.000000000
+DEAL:Standard::HH[1][1][0][0]: 0.000000000
+DEAL:Standard::HH[1][1][0][1]: 0.000000000
+DEAL:Standard::HH[1][1][1][1]: -10.00000000
+DEAL::--------------------------------------------------
+DEAL:Explicit::psi (Q): kappa_v*log(C_00*Qi_00 + 2*C_01*Qi_01 + C_11*Qi_11) + 0.5*mu_v*(-3 + C_00*Qi_00 + 2*C_01*Qi_01 + C_11*Qi_11) + 0.5*(-3 + C_00 + C_11)*mu_e + log(C_11*C_00 - C_01**2)*kappa_e
+DEAL:Explicit::psi: 0.5*mu_v*(-3 + 2*C_00**2 + 4*C_01**2 + 2*C_11**2) + 0.5*(-3 + C_00 + C_11)*mu_e + log(C_11*C_00 - C_01**2)*kappa_e + log(2*C_00**2 + 4*C_01**2 + 2*C_11**2)*kappa_v
+DEAL:Explicit::S (Q)[0][0]: 2.0*(0.5*mu_e + 0.5*mu_v*Qi_00 + C_11*kappa_e/(C_11*C_00 - C_01**2) + Qi_00*kappa_v/(C_00*Qi_00 + 2*C_01*Qi_01 + C_11*Qi_11))
+DEAL:Explicit::S (Q)[0][1]: 1.0*(1.0*mu_v*Qi_01 - 2*C_01*kappa_e/(C_11*C_00 - C_01**2) + 2*Qi_01*kappa_v/(C_00*Qi_00 + 2*C_01*Qi_01 + C_11*Qi_11))
+DEAL:Explicit::S (Q)[1][1]: 2.0*(0.5*mu_e + 0.5*mu_v*Qi_11 + C_00*kappa_e/(C_11*C_00 - C_01**2) + Qi_11*kappa_v/(C_00*Qi_00 + 2*C_01*Qi_01 + C_11*Qi_11))
+DEAL:Explicit::S[0][0]: 2.0*(0.5*mu_e + 1.0*mu_v*C_00 + 2*C_00*kappa_v/(2*C_00**2 + 4*C_01**2 + 2*C_11**2) + C_11*kappa_e/(C_11*C_00 - C_01**2))
+DEAL:Explicit::S[0][1]: 1.0*(2.0*mu_v*C_01 - 2*C_01*kappa_e/(C_11*C_00 - C_01**2) + 4*C_01*kappa_v/(2*C_00**2 + 4*C_01**2 + 2*C_11**2))
+DEAL:Explicit::S[1][1]: 2.0*(0.5*mu_e + 1.0*mu_v*C_11 + C_00*kappa_e/(C_11*C_00 - C_01**2) + 2*C_11*kappa_v/(2*C_00**2 + 4*C_01**2 + 2*C_11**2))
+DEAL:Explicit::HH[0][0][0][0]: 4.0*(1.0*mu_v + 2*kappa_v/(2*C_00**2 + 4*C_01**2 + 2*C_11**2) - 8*C_00**2*kappa_v/(2*C_00**2 + 4*C_01**2 + 2*C_11**2)**2 - C_11**2*kappa_e/(C_11*C_00 - C_01**2)**2)
+DEAL:Explicit::HH[0][0][0][1]: 2.0*(-16*C_00*C_01*kappa_v/(2*C_00**2 + 4*C_01**2 + 2*C_11**2)**2 + 2*C_11*C_01*kappa_e/(C_11*C_00 - C_01**2)**2)
+DEAL:Explicit::HH[0][0][1][1]: 4.0*(kappa_e/(C_11*C_00 - C_01**2) - C_11*C_00*kappa_e/(C_11*C_00 - C_01**2)**2 - 8*C_11*C_00*kappa_v/(2*C_00**2 + 4*C_01**2 + 2*C_11**2)**2)
+DEAL:Explicit::HH[0][1][0][0]: 2.0*(-16*C_00*C_01*kappa_v/(2*C_00**2 + 4*C_01**2 + 2*C_11**2)**2 + 2*C_11*C_01*kappa_e/(C_11*C_00 - C_01**2)**2)
+DEAL:Explicit::HH[0][1][0][1]: 1.0*(2.0*mu_v - 2*kappa_e/(C_11*C_00 - C_01**2) + 4*kappa_v/(2*C_00**2 + 4*C_01**2 + 2*C_11**2) - 4*C_01**2*kappa_e/(C_11*C_00 - C_01**2)**2 - 32*C_01**2*kappa_v/(2*C_00**2 + 4*C_01**2 + 2*C_11**2)**2)
+DEAL:Explicit::HH[0][1][1][1]: 2.0*(2*C_00*C_01*kappa_e/(C_11*C_00 - C_01**2)**2 - 16*C_11*C_01*kappa_v/(2*C_00**2 + 4*C_01**2 + 2*C_11**2)**2)
+DEAL:Explicit::HH[1][1][0][0]: 4.0*(kappa_e/(C_11*C_00 - C_01**2) - C_11*C_00*kappa_e/(C_11*C_00 - C_01**2)**2 - 8*C_11*C_00*kappa_v/(2*C_00**2 + 4*C_01**2 + 2*C_11**2)**2)
+DEAL:Explicit::HH[1][1][0][1]: 2.0*(2*C_00*C_01*kappa_e/(C_11*C_00 - C_01**2)**2 - 16*C_11*C_01*kappa_v/(2*C_00**2 + 4*C_01**2 + 2*C_11**2)**2)
+DEAL:Explicit::HH[1][1][1][1]: 4.0*(1.0*mu_v + 2*kappa_v/(2*C_00**2 + 4*C_01**2 + 2*C_11**2) - C_00**2*kappa_e/(C_11*C_00 - C_01**2)**2 - 8*C_11**2*kappa_v/(2*C_00**2 + 4*C_01**2 + 2*C_11**2)**2)
+DEAL:Explicit::psi: 53.40812106
+DEAL:Explicit::S[0][0]: 34.00000000
+DEAL:Explicit::S[0][1]: 0.000000000
+DEAL:Explicit::S[1][1]: 34.00000000
+DEAL:Explicit::HH[0][0][0][0]: 10.00000000
+DEAL:Explicit::HH[0][0][0][1]: 0.000000000
+DEAL:Explicit::HH[0][0][1][1]: -1.000000000
+DEAL:Explicit::HH[0][1][0][0]: 0.000000000
+DEAL:Explicit::HH[0][1][0][1]: 5.500000000
+DEAL:Explicit::HH[0][1][1][1]: 0.000000000
+DEAL:Explicit::HH[1][1][0][0]: -1.000000000
+DEAL:Explicit::HH[1][1][0][1]: 0.000000000
+DEAL:Explicit::HH[1][1][1][1]: 10.00000000
+DEAL::--------------------------------------------------
+DEAL:Implicit::psi: kappa_v*log(C_00*Qi_00 + 2*C_01*Qi_01 + C_11*Qi_11) + 0.5*mu_v*(-3 + C_00*Qi_00 + 2*C_01*Qi_01 + C_11*Qi_11) + 0.5*(-3 + C_00 + C_11)*mu_e + log(C_11*C_00 - C_01**2)*kappa_e
+DEAL:Implicit::S[0][0]: 2.0*(0.5*mu_e + 0.5*mu_v*Qi_00 + C_11*kappa_e/(C_11*C_00 - C_01**2) + Qi_00*kappa_v/(C_00*Qi_00 + 2*C_01*Qi_01 + C_11*Qi_11))
+DEAL:Implicit::S[0][1]: 1.0*(1.0*mu_v*Qi_01 - 2*C_01*kappa_e/(C_11*C_00 - C_01**2) + 2*Qi_01*kappa_v/(C_00*Qi_00 + 2*C_01*Qi_01 + C_11*Qi_11))
+DEAL:Implicit::S[1][1]: 2.0*(0.5*mu_e + 0.5*mu_v*Qi_11 + C_00*kappa_e/(C_11*C_00 - C_01**2) + Qi_11*kappa_v/(C_00*Qi_00 + 2*C_01*Qi_01 + C_11*Qi_11))
+DEAL:Implicit::HH[0][0][0][0]: 4.0*(0.5*mu_v*dQ_dC_i_0000 - C_11**2*kappa_e/(C_11*C_00 - C_01**2)**2 + dQ_dC_i_0000*kappa_v/(C_00*Qi_00 + 2*C_01*Qi_01 + C_11*Qi_11) - Qi_00*kappa_v*(Qi_00 + C_00*dQ_dC_i_0000 + 2*C_01*dQ_dC_i_0100 + C_11*dQ_dC_i_1100)/(C_00*Qi_00 + 2*C_01*Qi_01 + C_11*Qi_11)**2)
+DEAL:Implicit::HH[0][0][0][1]: 2.0*(0.0 + 2*C_11*C_01*kappa_e/(C_11*C_00 - C_01**2)**2 - 2*Qi_00*Qi_01*kappa_v/(C_00*Qi_00 + 2*C_01*Qi_01 + C_11*Qi_11)**2)
+DEAL:Implicit::HH[0][0][1][1]: 4.0*(0.5*mu_v*dQ_dC_i_0011 + kappa_e/(C_11*C_00 - C_01**2) + dQ_dC_i_0011*kappa_v/(C_00*Qi_00 + 2*C_01*Qi_01 + C_11*Qi_11) - C_11*C_00*kappa_e/(C_11*C_00 - C_01**2)**2 - Qi_00*kappa_v*(Qi_11 + C_00*dQ_dC_i_0011 + 2*C_01*dQ_dC_i_0111 + C_11*dQ_dC_i_1111)/(C_00*Qi_00 + 2*C_01*Qi_01 + C_11*Qi_11)**2)
+DEAL:Implicit::HH[0][1][0][0]: 2.0*(1.0*mu_v*dQ_dC_i_0100 + 2*dQ_dC_i_0100*kappa_v/(C_00*Qi_00 + 2*C_01*Qi_01 + C_11*Qi_11) + 2*C_11*C_01*kappa_e/(C_11*C_00 - C_01**2)**2 - 2*Qi_01*kappa_v*(Qi_00 + C_00*dQ_dC_i_0000 + 2*C_01*dQ_dC_i_0100 + C_11*dQ_dC_i_1100)/(C_00*Qi_00 + 2*C_01*Qi_01 + C_11*Qi_11)**2)
+DEAL:Implicit::HH[0][1][0][1]: 1.0*(0.0 - 2*kappa_e/(C_11*C_00 - C_01**2) - 4*C_01**2*kappa_e/(C_11*C_00 - C_01**2)**2 - 4*Qi_01**2*kappa_v/(C_00*Qi_00 + 2*C_01*Qi_01 + C_11*Qi_11)**2)
+DEAL:Implicit::HH[0][1][1][1]: 2.0*(1.0*mu_v*dQ_dC_i_0111 + 2*dQ_dC_i_0111*kappa_v/(C_00*Qi_00 + 2*C_01*Qi_01 + C_11*Qi_11) + 2*C_00*C_01*kappa_e/(C_11*C_00 - C_01**2)**2 - 2*Qi_01*kappa_v*(Qi_11 + C_00*dQ_dC_i_0011 + 2*C_01*dQ_dC_i_0111 + C_11*dQ_dC_i_1111)/(C_00*Qi_00 + 2*C_01*Qi_01 + C_11*Qi_11)**2)
+DEAL:Implicit::HH[1][1][0][0]: 4.0*(0.5*mu_v*dQ_dC_i_1100 + kappa_e/(C_11*C_00 - C_01**2) + dQ_dC_i_1100*kappa_v/(C_00*Qi_00 + 2*C_01*Qi_01 + C_11*Qi_11) - C_11*C_00*kappa_e/(C_11*C_00 - C_01**2)**2 - Qi_11*kappa_v*(Qi_00 + C_00*dQ_dC_i_0000 + 2*C_01*dQ_dC_i_0100 + C_11*dQ_dC_i_1100)/(C_00*Qi_00 + 2*C_01*Qi_01 + C_11*Qi_11)**2)
+DEAL:Implicit::HH[1][1][0][1]: 2.0*(0.0 + 2*C_00*C_01*kappa_e/(C_11*C_00 - C_01**2)**2 - 2*Qi_11*Qi_01*kappa_v/(C_00*Qi_00 + 2*C_01*Qi_01 + C_11*Qi_11)**2)
+DEAL:Implicit::HH[1][1][1][1]: 4.0*(0.5*mu_v*dQ_dC_i_1111 - C_00**2*kappa_e/(C_11*C_00 - C_01**2)**2 + dQ_dC_i_1111*kappa_v/(C_00*Qi_00 + 2*C_01*Qi_01 + C_11*Qi_11) - Qi_11*kappa_v*(Qi_11 + C_00*dQ_dC_i_0011 + 2*C_01*dQ_dC_i_0111 + C_11*dQ_dC_i_1111)/(C_00*Qi_00 + 2*C_01*Qi_01 + C_11*Qi_11)**2)
+DEAL:Implicit::psi: 26.44646255
+DEAL:Implicit::S[0][0]: 21.50000000
+DEAL:Implicit::S[0][1]: 0.000000000
+DEAL:Implicit::S[1][1]: 21.50000000
+DEAL:Implicit::HH[0][0][0][0]: 21.50000000
+DEAL:Implicit::HH[0][0][0][1]: 0.000000000
+DEAL:Implicit::HH[0][0][1][1]: -2.500000000
+DEAL:Implicit::HH[0][1][0][0]: 0.000000000
+DEAL:Implicit::HH[0][1][0][1]: -5.000000000
+DEAL:Implicit::HH[0][1][1][1]: 0.000000000
+DEAL:Implicit::HH[1][1][0][0]: -2.500000000
+DEAL:Implicit::HH[1][1][0][1]: 0.000000000
+DEAL:Implicit::HH[1][1][1][1]: 21.50000000
+DEAL::OK

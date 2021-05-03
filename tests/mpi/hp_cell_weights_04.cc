@@ -37,11 +37,11 @@
 #include <deal.II/distributed/cell_weights.h>
 #include <deal.II/distributed/shared_tria.h>
 
+#include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/fe/fe_q.h>
 
 #include <deal.II/grid/grid_generator.h>
-
-#include <deal.II/hp/dof_handler.h>
 
 #include "../tests.h"
 
@@ -64,13 +64,15 @@ test()
   fe_collection.push_back(FE_Q<dim>(1));
   fe_collection.push_back(FE_Q<dim>(5));
 
-  hp::DoFHandler<dim> dh(tria);
-  dh.set_fe(fe_collection);
+  DoFHandler<dim> dh(tria);
+
   // default: active_fe_index = 0
   for (auto &cell : dh.active_cell_iterators())
     if (cell->is_locally_owned())
       if (cell->id().to_string() == "0_2:00")
         cell->set_active_fe_index(1);
+
+  dh.distribute_dofs(fe_collection);
 
   deallog << "Number of cells before repartitioning: "
           << tria.n_locally_owned_active_cells() << std::endl;
@@ -83,8 +85,8 @@ test()
   }
 
 
-  parallel::CellWeights<dim> cell_weights(dh);
-  cell_weights.register_ndofs_weighting(100000);
+  const parallel::CellWeights<dim> cell_weights(
+    dh, parallel::CellWeights<dim>::ndofs_weighting({100000, 1}));
 
   // we didn't mark any cells, but we want to repartition our domain
   tria.execute_coarsening_and_refinement();
@@ -100,6 +102,32 @@ test()
     deallog << "  Cumulative dofs per cell: " << dof_counter << std::endl;
   }
 
+#ifdef DEBUG
+  parallel::shared::Triangulation<dim> other_tria(
+    MPI_COMM_WORLD,
+    ::Triangulation<dim>::none,
+    false,
+    parallel::shared::Triangulation<dim>::Settings::partition_metis);
+  GridGenerator::hyper_cube(other_tria);
+  other_tria.refine_global(3);
+
+  dh.reinit(other_tria);
+  dh.distribute_dofs(fe_collection);
+
+  try
+    {
+      tria.execute_coarsening_and_refinement();
+    }
+  catch (const ExceptionBase &e)
+    {
+      deallog << e.get_exc_name() << std::endl;
+    }
+#else
+  deallog
+    << "ExcMessage(\"Triangulation associated with the DoFHandler has changed!\")"
+    << std::endl;
+#endif
+
   // make sure no processor is hanging
   MPI_Barrier(MPI_COMM_WORLD);
 
@@ -112,6 +140,8 @@ main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   MPILogInitAll                    log;
+
+  deal_II_exceptions::disable_abort_on_exception();
 
   deallog.push("2d");
   test<2>();

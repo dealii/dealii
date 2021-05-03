@@ -1,0 +1,10 @@
+
+DEAL:float::*** Test constexpr SymmetricTensor functions, dim = 1
+DEAL:float::*** Test constexpr SymmetricTensor functions, dim = 2
+DEAL:float::*** Test constexpr SymmetricTensor functions, dim = 3
+DEAL:double::*** Test constexpr SymmetricTensor functions, dim = 1
+DEAL:double::*** Test constexpr SymmetricTensor functions, dim = 2
+DEAL:double::*** Test constexpr SymmetricTensor functions, dim = 3
+DEAL::SymmetricTensor<2,2> = 1.00000 -5.00000 -5.00000 3.00000
+DEAL::SymmetricTensor<4,2> = 1.00000 0.00000 0.00000 0.00000 0.00000 0.200000 0.200000 0.00000 0.00000 0.200000 0.200000 0.00000 0.00000 0.00000 0.00000 2.50000
+DEAL::OK

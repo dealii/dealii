@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -29,12 +29,6 @@
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
-
-
-// forward declaration
-template <typename T>
-class VectorizedArray;
-
 
 /**
  * This namespace provides functions helping to determine the amount of memory
@@ -85,9 +79,7 @@ class VectorizedArray;
  * free to implement them and send them to us for inclusion.
  *
  * @ingroup memory
- * @author Wolfgang Bangerth, documentation updated by Guido Kanschat, David
  * Wells
- * @date 2000, 2015
  */
 namespace MemoryConsumption
 {
@@ -134,9 +126,9 @@ namespace MemoryConsumption
    * Determine the amount of memory in bytes consumed by a
    * <tt>VectorizedArray</tt> variable.
    */
-  template <typename T>
+  template <typename T, std::size_t width>
   inline std::size_t
-  memory_consumption(const VectorizedArray<T> &);
+  memory_consumption(const VectorizedArray<T, width> &);
 
   /**
    * Determine an estimate of the amount of memory in bytes consumed by a
@@ -302,11 +294,11 @@ namespace MemoryConsumption
 
 
 
-  template <typename T>
+  template <typename T, std::size_t width>
   inline std::size_t
-  memory_consumption(const VectorizedArray<T> &)
+  memory_consumption(const VectorizedArray<T, width> &)
   {
-    return sizeof(VectorizedArray<T>);
+    return sizeof(VectorizedArray<T, width>);
   }
 
 

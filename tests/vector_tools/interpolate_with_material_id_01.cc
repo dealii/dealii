@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -55,9 +55,7 @@
 
 namespace PhaseField
 {
-  using namespace dealii;
-
-  typedef Vector<double> vectorType;
+  using vectorType = Vector<double>;
 
 
   ///////////////////////////////////////////////////////////////

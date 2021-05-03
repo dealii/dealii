@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -78,10 +78,10 @@ check_simple(const FiniteElement<dim> &fe)
 
   DoFHandler<dim> mgdof(tr);
   mgdof.distribute_dofs(fe);
-  mgdof.distribute_mg_dofs(fe);
+  mgdof.distribute_mg_dofs();
 
   MGTransferPrebuilt<TrilinosWrappers::MPI::Vector> transfer;
-  transfer.build_matrices(mgdof);
+  transfer.build(mgdof);
 
   MGLevelObject<TrilinosWrappers::MPI::Vector> u(0, tr.n_levels() - 1);
   reinit_vector(mgdof, u);
@@ -154,9 +154,8 @@ main(int argc, char **argv)
   Utilities::MPI::MPI_InitFinalize mpi_initialization(
     argc, argv, testing_max_num_threads());
 
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(10);
-  deallog.attach(logfile);
 
   check_simple(FE_DGP<2>(0));
   check_simple(FE_DGP<2>(1));

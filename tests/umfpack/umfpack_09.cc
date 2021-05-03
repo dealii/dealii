@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2018 by the deal.II authors
+// Copyright (C) 2002 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -129,21 +129,26 @@ test()
       solution.block(2).reinit(dof_handler.n_dofs() -
                                2 * (dof_handler.n_dofs() / 3));
       solution.collect_sizes();
+
+      // Pick a solution vector
+      for (unsigned int j = 0; j < dof_handler.n_dofs(); ++j)
+        solution(j) = j + j * (i + 1) * (i + 1);
+
+      // Then choose as rhs for the linear system the vector
+      //   b = B*solution
+      // so that later the solution of the linear system Bx=b
+      // is again
+      //   x = solution
       BlockVector<double> x;
       x.reinit(solution);
       BlockVector<double> b;
       b.reinit(solution);
 
-      for (unsigned int j = 0; j < dof_handler.n_dofs(); ++j)
-        solution(j) = j + j * (i + 1) * (i + 1);
-
       B.vmult(b, solution);
       x = b;
-      Vector<double> tmp(solution.size());
-      tmp = x;
-      SparseDirectUMFPACK().solve(B, tmp);
-      x = tmp;
+      SparseDirectUMFPACK().solve(B, x);
 
+      // Check that we really got what we expected
       x -= solution;
       deallog << "relative norm distance = " << x.l2_norm() / solution.l2_norm()
               << std::endl;

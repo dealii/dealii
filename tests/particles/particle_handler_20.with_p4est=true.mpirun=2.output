@@ -1,0 +1,51 @@
+
+DEAL:0:2d/2d::Particle id : 0 location : 0.410000 0.410000 property : 1000.00 and 2000.00 is local on process : 0
+DEAL:0:2d/2d::Particle id : 1 location : 0.420000 0.420000 property : 1010.00 and 2010.00 is local on process : 0
+DEAL:0:2d/2d::Particle id : 2 location : 0.430000 0.430000 property : 1020.00 and 2020.00 is local on process : 0
+DEAL:0:2d/2d::Modifying particles positions and properties
+DEAL:0:2d/2d::Particle id : 0 location : 0.510000 0.410000 property : 11000.0 and 12000.0 is local on process : 0
+DEAL:0:2d/2d::Particle id : 1 location : 0.520000 0.420000 property : 11010.0 and 12010.0 is local on process : 0
+DEAL:0:2d/2d::Particle id : 2 location : 0.530000 0.430000 property : 11020.0 and 12020.0 is local on process : 0
+DEAL:0:2d/2d::OK
+DEAL:0:2d/3d::Particle id : 0 location : 0.410000 0.410000 0.00000 property : 1000.00 and 2000.00 is local on process : 0
+DEAL:0:2d/3d::Particle id : 1 location : 0.420000 0.420000 0.00000 property : 1010.00 and 2010.00 is local on process : 0
+DEAL:0:2d/3d::Particle id : 2 location : 0.430000 0.430000 0.00000 property : 1020.00 and 2020.00 is local on process : 0
+DEAL:0:2d/3d::Modifying particles positions and properties
+DEAL:0:2d/3d::Particle id : 0 location : 0.510000 0.410000 0.00000 property : 11000.0 and 12000.0 is local on process : 0
+DEAL:0:2d/3d::Particle id : 1 location : 0.520000 0.420000 0.00000 property : 11010.0 and 12010.0 is local on process : 0
+DEAL:0:2d/3d::Particle id : 2 location : 0.530000 0.430000 0.00000 property : 11020.0 and 12020.0 is local on process : 0
+DEAL:0:2d/3d::OK
+DEAL:0:3d/3d::Particle id : 0 location : 0.410000 0.410000 0.410000 property : 1000.00 and 2000.00 is local on process : 0
+DEAL:0:3d/3d::Particle id : 1 location : 0.420000 0.420000 0.420000 property : 1010.00 and 2010.00 is local on process : 0
+DEAL:0:3d/3d::Particle id : 2 location : 0.430000 0.430000 0.430000 property : 1020.00 and 2020.00 is local on process : 0
+DEAL:0:3d/3d::Modifying particles positions and properties
+DEAL:0:3d/3d::Particle id : 0 location : 0.510000 0.410000 0.410000 property : 11000.0 and 12000.0 is local on process : 0
+DEAL:0:3d/3d::Particle id : 1 location : 0.520000 0.420000 0.420000 property : 11010.0 and 12010.0 is local on process : 0
+DEAL:0:3d/3d::Particle id : 2 location : 0.530000 0.430000 0.430000 property : 11020.0 and 12020.0 is local on process : 0
+DEAL:0:3d/3d::OK
+
+DEAL:1:2d/2d::Particle id : 0 location : 0.410000 0.410000 property : 1000.00 and 2000.00 is ghost on process : 1
+DEAL:1:2d/2d::Particle id : 1 location : 0.420000 0.420000 property : 1010.00 and 2010.00 is ghost on process : 1
+DEAL:1:2d/2d::Particle id : 2 location : 0.430000 0.430000 property : 1020.00 and 2020.00 is ghost on process : 1
+DEAL:1:2d/2d::Modifying particles positions and properties
+DEAL:1:2d/2d::Particle id : 0 location : 0.510000 0.410000 property : 11000.0 and 12000.0 is ghost on process : 1
+DEAL:1:2d/2d::Particle id : 1 location : 0.520000 0.420000 property : 11010.0 and 12010.0 is ghost on process : 1
+DEAL:1:2d/2d::Particle id : 2 location : 0.530000 0.430000 property : 11020.0 and 12020.0 is ghost on process : 1
+DEAL:1:2d/2d::OK
+DEAL:1:2d/3d::Particle id : 0 location : 0.410000 0.410000 0.00000 property : 1000.00 and 2000.00 is ghost on process : 1
+DEAL:1:2d/3d::Particle id : 1 location : 0.420000 0.420000 0.00000 property : 1010.00 and 2010.00 is ghost on process : 1
+DEAL:1:2d/3d::Particle id : 2 location : 0.430000 0.430000 0.00000 property : 1020.00 and 2020.00 is ghost on process : 1
+DEAL:1:2d/3d::Modifying particles positions and properties
+DEAL:1:2d/3d::Particle id : 0 location : 0.510000 0.410000 0.00000 property : 11000.0 and 12000.0 is ghost on process : 1
+DEAL:1:2d/3d::Particle id : 1 location : 0.520000 0.420000 0.00000 property : 11010.0 and 12010.0 is ghost on process : 1
+DEAL:1:2d/3d::Particle id : 2 location : 0.530000 0.430000 0.00000 property : 11020.0 and 12020.0 is ghost on process : 1
+DEAL:1:2d/3d::OK
+DEAL:1:3d/3d::Particle id : 0 location : 0.410000 0.410000 0.410000 property : 1000.00 and 2000.00 is ghost on process : 1
+DEAL:1:3d/3d::Particle id : 1 location : 0.420000 0.420000 0.420000 property : 1010.00 and 2010.00 is ghost on process : 1
+DEAL:1:3d/3d::Particle id : 2 location : 0.430000 0.430000 0.430000 property : 1020.00 and 2020.00 is ghost on process : 1
+DEAL:1:3d/3d::Modifying particles positions and properties
+DEAL:1:3d/3d::Particle id : 0 location : 0.510000 0.410000 0.410000 property : 11000.0 and 12000.0 is ghost on process : 1
+DEAL:1:3d/3d::Particle id : 1 location : 0.520000 0.420000 0.420000 property : 11010.0 and 12010.0 is ghost on process : 1
+DEAL:1:3d/3d::Particle id : 2 location : 0.530000 0.430000 0.430000 property : 11020.0 and 12020.0 is ghost on process : 1
+DEAL:1:3d/3d::OK
+

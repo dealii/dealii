@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,15 +20,15 @@
 
 #include <iomanip>
 #include <iostream>
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
 
 template <int dim>
 PolynomialsNedelec<dim>::PolynomialsNedelec(const unsigned int k)
-  : my_degree(k)
+  : TensorPolynomialsBase<dim>(k, n_polynomials(k))
   , polynomial_space(create_polynomials(k))
-  , n_pols(compute_n_pols(k))
 {}
 
 template <int dim>
@@ -51,7 +51,7 @@ PolynomialsNedelec<dim>::create_polynomials(const unsigned int k)
 // polynomial at the given point.
 template <int dim>
 void
-PolynomialsNedelec<dim>::compute(
+PolynomialsNedelec<dim>::evaluate(
   const Point<dim> &           unit_point,
   std::vector<Tensor<1, dim>> &values,
   std::vector<Tensor<2, dim>> &grads,
@@ -59,16 +59,17 @@ PolynomialsNedelec<dim>::compute(
   std::vector<Tensor<4, dim>> &third_derivatives,
   std::vector<Tensor<5, dim>> &fourth_derivatives) const
 {
-  Assert(values.size() == n_pols || values.size() == 0,
-         ExcDimensionMismatch(values.size(), n_pols));
-  Assert(grads.size() == n_pols || grads.size() == 0,
-         ExcDimensionMismatch(grads.size(), n_pols));
-  Assert(grad_grads.size() == n_pols || grad_grads.size() == 0,
-         ExcDimensionMismatch(grad_grads.size(), n_pols));
-  Assert(third_derivatives.size() == n_pols || third_derivatives.size() == 0,
-         ExcDimensionMismatch(third_derivatives.size(), n_pols));
-  Assert(fourth_derivatives.size() == n_pols || fourth_derivatives.size() == 0,
-         ExcDimensionMismatch(fourth_derivatives.size(), n_pols));
+  Assert(values.size() == this->n() || values.size() == 0,
+         ExcDimensionMismatch(values.size(), this->n()));
+  Assert(grads.size() == this->n() || grads.size() == 0,
+         ExcDimensionMismatch(grads.size(), this->n()));
+  Assert(grad_grads.size() == this->n() || grad_grads.size() == 0,
+         ExcDimensionMismatch(grad_grads.size(), this->n()));
+  Assert(third_derivatives.size() == this->n() || third_derivatives.size() == 0,
+         ExcDimensionMismatch(third_derivatives.size(), this->n()));
+  Assert(fourth_derivatives.size() == this->n() ||
+           fourth_derivatives.size() == 0,
+         ExcDimensionMismatch(fourth_derivatives.size(), this->n()));
 
   // third and fourth derivatives not implemented
   (void)third_derivatives;
@@ -80,7 +81,8 @@ PolynomialsNedelec<dim>::compute(
   // and second derivatives vectors of
   // <tt>polynomial_space</tt> at
   // <tt>unit_point</tt>
-  const unsigned int  n_basis = polynomial_space.n();
+  const unsigned int  n_basis   = polynomial_space.n();
+  const unsigned int  my_degree = this->degree();
   std::vector<double> unit_point_values((values.size() == 0) ? 0 : n_basis);
   std::vector<Tensor<1, dim>> unit_point_grads((grads.size() == 0) ? 0 :
                                                                      n_basis);
@@ -93,12 +95,12 @@ PolynomialsNedelec<dim>::compute(
     {
       case 1:
         {
-          polynomial_space.compute(unit_point,
-                                   unit_point_values,
-                                   unit_point_grads,
-                                   unit_point_grad_grads,
-                                   empty_vector_of_3rd_order_tensors,
-                                   empty_vector_of_4th_order_tensors);
+          polynomial_space.evaluate(unit_point,
+                                    unit_point_values,
+                                    unit_point_grads,
+                                    unit_point_grad_grads,
+                                    empty_vector_of_3rd_order_tensors,
+                                    empty_vector_of_4th_order_tensors);
 
           // Assign the correct values to the
           // corresponding shape functions.
@@ -119,12 +121,12 @@ PolynomialsNedelec<dim>::compute(
 
       case 2:
         {
-          polynomial_space.compute(unit_point,
-                                   unit_point_values,
-                                   unit_point_grads,
-                                   unit_point_grad_grads,
-                                   empty_vector_of_3rd_order_tensors,
-                                   empty_vector_of_4th_order_tensors);
+          polynomial_space.evaluate(unit_point,
+                                    unit_point_values,
+                                    unit_point_grads,
+                                    unit_point_grad_grads,
+                                    empty_vector_of_3rd_order_tensors,
+                                    empty_vector_of_4th_order_tensors);
 
           // Declare the values, derivatives and
           // second derivatives vectors of
@@ -142,12 +144,12 @@ PolynomialsNedelec<dim>::compute(
           std::vector<Tensor<2, dim>> p_grad_grads(
             (grad_grads.size() == 0) ? 0 : n_basis);
 
-          polynomial_space.compute(p,
-                                   p_values,
-                                   p_grads,
-                                   p_grad_grads,
-                                   empty_vector_of_3rd_order_tensors,
-                                   empty_vector_of_4th_order_tensors);
+          polynomial_space.evaluate(p,
+                                    p_values,
+                                    p_grads,
+                                    p_grad_grads,
+                                    empty_vector_of_3rd_order_tensors,
+                                    empty_vector_of_4th_order_tensors);
 
           // Assign the correct values to the
           // corresponding shape functions.
@@ -305,12 +307,12 @@ PolynomialsNedelec<dim>::compute(
 
       case 3:
         {
-          polynomial_space.compute(unit_point,
-                                   unit_point_values,
-                                   unit_point_grads,
-                                   unit_point_grad_grads,
-                                   empty_vector_of_3rd_order_tensors,
-                                   empty_vector_of_4th_order_tensors);
+          polynomial_space.evaluate(unit_point,
+                                    unit_point_values,
+                                    unit_point_grads,
+                                    unit_point_grad_grads,
+                                    empty_vector_of_3rd_order_tensors,
+                                    empty_vector_of_4th_order_tensors);
 
           // Declare the values, derivatives
           // and second derivatives vectors of
@@ -333,21 +335,21 @@ PolynomialsNedelec<dim>::compute(
           p1(0) = unit_point(1);
           p1(1) = unit_point(2);
           p1(2) = unit_point(0);
-          polynomial_space.compute(p1,
-                                   p1_values,
-                                   p1_grads,
-                                   p1_grad_grads,
-                                   empty_vector_of_3rd_order_tensors,
-                                   empty_vector_of_4th_order_tensors);
+          polynomial_space.evaluate(p1,
+                                    p1_values,
+                                    p1_grads,
+                                    p1_grad_grads,
+                                    empty_vector_of_3rd_order_tensors,
+                                    empty_vector_of_4th_order_tensors);
           p2(0) = unit_point(2);
           p2(1) = unit_point(0);
           p2(2) = unit_point(1);
-          polynomial_space.compute(p2,
-                                   p2_values,
-                                   p2_grads,
-                                   p2_grad_grads,
-                                   empty_vector_of_3rd_order_tensors,
-                                   empty_vector_of_4th_order_tensors);
+          polynomial_space.evaluate(p2,
+                                    p2_values,
+                                    p2_grads,
+                                    p2_grad_grads,
+                                    empty_vector_of_3rd_order_tensors,
+                                    empty_vector_of_4th_order_tensors);
 
           // Assign the correct values to the
           // corresponding shape functions.
@@ -1484,7 +1486,7 @@ PolynomialsNedelec<dim>::compute(
 
 template <int dim>
 unsigned int
-PolynomialsNedelec<dim>::compute_n_pols(unsigned int k)
+PolynomialsNedelec<dim>::n_polynomials(const unsigned int k)
 {
   switch (dim)
     {
@@ -1503,6 +1505,14 @@ PolynomialsNedelec<dim>::compute_n_pols(unsigned int k)
           return 0;
         }
     }
+}
+
+
+template <int dim>
+std::unique_ptr<TensorPolynomialsBase<dim>>
+PolynomialsNedelec<dim>::clone() const
+{
+  return std::make_unique<PolynomialsNedelec<dim>>(*this);
 }
 
 

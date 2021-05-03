@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -25,6 +25,7 @@
 
 #include <deal.II/dofs/dof_tools.h>
 
+#include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
 
 #include <deal.II/grid/grid_generator.h>
@@ -39,7 +40,6 @@
 #include "../tests.h"
 
 
-using namespace dealii;
 
 // First dim components:
 // f_x = x^2+y(+z), f_y = x^2+y^2, f_z = z+xy
@@ -102,7 +102,7 @@ test(VectorTools::NormType norm, double value)
                                             2 * dim);
   VectorTools::integrate_difference(dofh,
                                     solution,
-                                    ZeroFunction<dim>(2 * dim),
+                                    Functions::ZeroFunction<dim>(2 * dim),
                                     cellwise_errors,
                                     QGauss<dim>(5),
                                     norm);
@@ -117,7 +117,7 @@ test(VectorTools::NormType norm, double value)
 
   VectorTools::integrate_difference(dofh,
                                     solution,
-                                    ZeroFunction<dim>(2 * dim),
+                                    Functions::ZeroFunction<dim>(2 * dim),
                                     cellwise_errors,
                                     QGauss<dim>(5),
                                     norm,

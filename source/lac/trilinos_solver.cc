@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2019 by the deal.II authors
+// Copyright (C) 2008 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -18,7 +18,6 @@
 #ifdef DEAL_II_WITH_TRILINOS
 
 #  include <deal.II/base/conditional_ostream.h>
-#  include <deal.II/base/std_cxx14/memory.h>
 
 #  include <deal.II/lac/trilinos_precondition.h>
 #  include <deal.II/lac/trilinos_sparse_matrix.h>
@@ -32,6 +31,7 @@
 
 #  include <cmath>
 #  include <limits>
+#  include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -80,7 +80,7 @@ namespace TrilinosWrappers
   {
     // We need an Epetra_LinearProblem object to let the AztecOO solver know
     // about the matrix and vectors.
-    linear_problem = std_cxx14::make_unique<Epetra_LinearProblem>(
+    linear_problem = std::make_unique<Epetra_LinearProblem>(
       const_cast<Epetra_CrsMatrix *>(&A.trilinos_matrix()),
       &x.trilinos_vector(),
       const_cast<Epetra_MultiVector *>(&b.trilinos_vector()));
@@ -100,10 +100,11 @@ namespace TrilinosWrappers
   {
     // We need an Epetra_LinearProblem object to let the AztecOO solver know
     // about the matrix and vectors.
-    linear_problem = std_cxx14::make_unique<Epetra_LinearProblem>(
-      const_cast<Epetra_Operator *>(&A),
-      &x.trilinos_vector(),
-      const_cast<Epetra_MultiVector *>(&b.trilinos_vector()));
+    linear_problem =
+      std::make_unique<Epetra_LinearProblem>(const_cast<Epetra_Operator *>(&A),
+                                             &x.trilinos_vector(),
+                                             const_cast<Epetra_MultiVector *>(
+                                               &b.trilinos_vector()));
 
     do_solve(preconditioner);
   }
@@ -120,10 +121,11 @@ namespace TrilinosWrappers
   {
     // We need an Epetra_LinearProblem object to let the AztecOO solver know
     // about the matrix and vectors.
-    linear_problem = std_cxx14::make_unique<Epetra_LinearProblem>(
-      const_cast<Epetra_Operator *>(&A),
-      &x.trilinos_vector(),
-      const_cast<Epetra_MultiVector *>(&b.trilinos_vector()));
+    linear_problem =
+      std::make_unique<Epetra_LinearProblem>(const_cast<Epetra_Operator *>(&A),
+                                             &x.trilinos_vector(),
+                                             const_cast<Epetra_MultiVector *>(
+                                               &b.trilinos_vector()));
 
     do_solve(preconditioner);
   }
@@ -140,10 +142,11 @@ namespace TrilinosWrappers
   {
     // We need an Epetra_LinearProblem object to let the AztecOO solver know
     // about the matrix and vectors.
-    linear_problem = std_cxx14::make_unique<Epetra_LinearProblem>(
-      const_cast<Epetra_Operator *>(&A),
-      &x,
-      const_cast<Epetra_MultiVector *>(&b));
+    linear_problem =
+      std::make_unique<Epetra_LinearProblem>(const_cast<Epetra_Operator *>(&A),
+                                             &x,
+                                             const_cast<Epetra_MultiVector *>(
+                                               &b));
 
     do_solve(preconditioner);
   }
@@ -160,10 +163,11 @@ namespace TrilinosWrappers
   {
     // We need an Epetra_LinearProblem object to let the AztecOO solver know
     // about the matrix and vectors.
-    linear_problem = std_cxx14::make_unique<Epetra_LinearProblem>(
-      const_cast<Epetra_Operator *>(&A),
-      &x,
-      const_cast<Epetra_MultiVector *>(&b));
+    linear_problem =
+      std::make_unique<Epetra_LinearProblem>(const_cast<Epetra_Operator *>(&A),
+                                             &x,
+                                             const_cast<Epetra_MultiVector *>(
+                                               &b));
 
     do_solve(preconditioner);
   }
@@ -185,14 +189,14 @@ namespace TrilinosWrappers
     Assert(A.trilinos_matrix().Filled(),
            ExcMessage("Matrix is not compressed. Call compress() method."));
 
-    Epetra_Vector ep_x(View, A.domain_partitioner(), x.begin());
+    Epetra_Vector ep_x(View, A.trilinos_matrix().DomainMap(), x.begin());
     Epetra_Vector ep_b(View,
-                       A.range_partitioner(),
+                       A.trilinos_matrix().RangeMap(),
                        const_cast<double *>(b.begin()));
 
     // We need an Epetra_LinearProblem object to let the AztecOO solver know
     // about the matrix and vectors.
-    linear_problem = std_cxx14::make_unique<Epetra_LinearProblem>(
+    linear_problem = std::make_unique<Epetra_LinearProblem>(
       const_cast<Epetra_CrsMatrix *>(&A.trilinos_matrix()), &ep_x, &ep_b);
 
     do_solve(preconditioner);
@@ -213,8 +217,7 @@ namespace TrilinosWrappers
 
     // We need an Epetra_LinearProblem object to let the AztecOO solver know
     // about the matrix and vectors.
-    linear_problem =
-      std_cxx14::make_unique<Epetra_LinearProblem>(&A, &ep_x, &ep_b);
+    linear_problem = std::make_unique<Epetra_LinearProblem>(&A, &ep_x, &ep_b);
 
     do_solve(preconditioner);
   }
@@ -229,17 +232,19 @@ namespace TrilinosWrappers
   {
     // In case we call the solver with deal.II vectors, we create views of the
     // vectors in Epetra format.
-    AssertDimension(x.local_size(), A.domain_partitioner().NumMyElements());
-    AssertDimension(b.local_size(), A.range_partitioner().NumMyElements());
+    AssertDimension(x.local_size(),
+                    A.trilinos_matrix().DomainMap().NumMyElements());
+    AssertDimension(b.local_size(),
+                    A.trilinos_matrix().RangeMap().NumMyElements());
 
-    Epetra_Vector ep_x(View, A.domain_partitioner(), x.begin());
+    Epetra_Vector ep_x(View, A.trilinos_matrix().DomainMap(), x.begin());
     Epetra_Vector ep_b(View,
-                       A.range_partitioner(),
+                       A.trilinos_matrix().RangeMap(),
                        const_cast<double *>(b.begin()));
 
     // We need an Epetra_LinearProblem object to let the AztecOO solver know
     // about the matrix and vectors.
-    linear_problem = std_cxx14::make_unique<Epetra_LinearProblem>(
+    linear_problem = std::make_unique<Epetra_LinearProblem>(
       const_cast<Epetra_CrsMatrix *>(&A.trilinos_matrix()), &ep_x, &ep_b);
 
     do_solve(preconditioner);
@@ -263,8 +268,7 @@ namespace TrilinosWrappers
 
     // We need an Epetra_LinearProblem object to let the AztecOO solver know
     // about the matrix and vectors.
-    linear_problem =
-      std_cxx14::make_unique<Epetra_LinearProblem>(&A, &ep_x, &ep_b);
+    linear_problem = std::make_unique<Epetra_LinearProblem>(&A, &ep_x, &ep_b);
 
     do_solve(preconditioner);
   }
@@ -364,21 +368,20 @@ namespace TrilinosWrappers
         , current_residual(std::numeric_limits<double>::max())
         // Consider linear problem converged if any of the collection of
         // criterion are met
-        , status_test_collection(
-            std_cxx14::make_unique<AztecOO_StatusTestCombo>(
-              AztecOO_StatusTestCombo::OR))
+        , status_test_collection(std::make_unique<AztecOO_StatusTestCombo>(
+            AztecOO_StatusTestCombo::OR))
       {
         // Maximum number of iterations
         Assert(max_steps >= 0, ExcInternalError());
         status_test_max_steps =
-          std_cxx14::make_unique<AztecOO_StatusTestMaxIters>(max_steps);
+          std::make_unique<AztecOO_StatusTestMaxIters>(max_steps);
         status_test_collection->AddStatusTest(*status_test_max_steps);
 
         Assert(linear_problem.GetRHS()->NumVectors() == 1,
                ExcMessage("RHS multivector holds more than one vector"));
 
         // Residual norm is below some absolute value
-        status_test_abs_tol = std_cxx14::make_unique<AztecOO_StatusTestResNorm>(
+        status_test_abs_tol = std::make_unique<AztecOO_StatusTestResNorm>(
           *linear_problem.GetOperator(),
           *(linear_problem.GetLHS()->operator()(0)),
           *(linear_problem.GetRHS()->operator()(0)),
@@ -390,7 +393,7 @@ namespace TrilinosWrappers
         status_test_collection->AddStatusTest(*status_test_abs_tol);
 
         // Residual norm, scaled by some initial value, is below some threshold
-        status_test_rel_tol = std_cxx14::make_unique<AztecOO_StatusTestResNorm>(
+        status_test_rel_tol = std::make_unique<AztecOO_StatusTestResNorm>(
           *linear_problem.GetOperator(),
           *(linear_problem.GetLHS()->operator()(0)),
           *(linear_problem.GetRHS()->operator()(0)),
@@ -467,12 +470,11 @@ namespace TrilinosWrappers
         if (const ReductionControl *const reduction_control =
               dynamic_cast<const ReductionControl *const>(&solver_control))
           {
-            status_test =
-              std_cxx14::make_unique<internal::TrilinosReductionControl>(
-                reduction_control->max_steps(),
-                reduction_control->tolerance(),
-                reduction_control->reduction(),
-                *linear_problem);
+            status_test = std::make_unique<internal::TrilinosReductionControl>(
+              reduction_control->max_steps(),
+              reduction_control->tolerance(),
+              reduction_control->reduction(),
+              *linear_problem);
             solver.SetStatusTest(status_test.get());
           }
       }
@@ -701,7 +703,7 @@ namespace TrilinosWrappers
   {
     // We need an Epetra_LinearProblem object to let the Amesos solver know
     // about the matrix and vectors.
-    linear_problem = std_cxx14::make_unique<Epetra_LinearProblem>();
+    linear_problem = std::make_unique<Epetra_LinearProblem>();
 
     // Assign the matrix operator to the Epetra_LinearProblem object
     linear_problem->SetOperator(
@@ -716,7 +718,7 @@ namespace TrilinosWrappers
                                     additional_data.output_solver_details);
 
     // Next allocate the Amesos solver, this is done in two steps, first we
-    // create a solver Factory and and generate with that the concrete Amesos
+    // create a solver Factory and generate with that the concrete Amesos
     // solver, if possible.
     Amesos Factory;
 
@@ -816,7 +818,7 @@ namespace TrilinosWrappers
                                     additional_data.output_solver_details);
 
     // Next allocate the Amesos solver, this is done in two steps, first we
-    // create a solver Factory and and generate with that the concrete Amesos
+    // create a solver Factory and generate with that the concrete Amesos
     // solver, if possible.
     Amesos Factory;
 
@@ -862,7 +864,7 @@ namespace TrilinosWrappers
   {
     // We need an Epetra_LinearProblem object to let the Amesos solver know
     // about the matrix and vectors.
-    linear_problem = std_cxx14::make_unique<Epetra_LinearProblem>(
+    linear_problem = std::make_unique<Epetra_LinearProblem>(
       const_cast<Epetra_CrsMatrix *>(&A.trilinos_matrix()),
       &x.trilinos_vector(),
       const_cast<Epetra_MultiVector *>(&b.trilinos_vector()));
@@ -883,14 +885,14 @@ namespace TrilinosWrappers
     Assert(b.size() == A.m(), ExcDimensionMismatch(b.size(), A.m()));
     Assert(A.local_range().second == A.m(),
            ExcMessage("Can only work in serial when using deal.II vectors."));
-    Epetra_Vector ep_x(View, A.domain_partitioner(), x.begin());
+    Epetra_Vector ep_x(View, A.trilinos_matrix().DomainMap(), x.begin());
     Epetra_Vector ep_b(View,
-                       A.range_partitioner(),
+                       A.trilinos_matrix().RangeMap(),
                        const_cast<double *>(b.begin()));
 
     // We need an Epetra_LinearProblem object to let the Amesos solver know
     // about the matrix and vectors.
-    linear_problem = std_cxx14::make_unique<Epetra_LinearProblem>(
+    linear_problem = std::make_unique<Epetra_LinearProblem>(
       const_cast<Epetra_CrsMatrix *>(&A.trilinos_matrix()), &ep_x, &ep_b);
 
     do_solve();
@@ -904,16 +906,18 @@ namespace TrilinosWrappers
     dealii::LinearAlgebra::distributed::Vector<double> &      x,
     const dealii::LinearAlgebra::distributed::Vector<double> &b)
   {
-    AssertDimension(x.local_size(), A.domain_partitioner().NumMyElements());
-    AssertDimension(b.local_size(), A.range_partitioner().NumMyElements());
-    Epetra_Vector ep_x(View, A.domain_partitioner(), x.begin());
+    AssertDimension(x.local_size(),
+                    A.trilinos_matrix().DomainMap().NumMyElements());
+    AssertDimension(b.local_size(),
+                    A.trilinos_matrix().RangeMap().NumMyElements());
+    Epetra_Vector ep_x(View, A.trilinos_matrix().DomainMap(), x.begin());
     Epetra_Vector ep_b(View,
-                       A.range_partitioner(),
+                       A.trilinos_matrix().RangeMap(),
                        const_cast<double *>(b.begin()));
 
     // We need an Epetra_LinearProblem object to let the Amesos solver know
     // about the matrix and vectors.
-    linear_problem = std_cxx14::make_unique<Epetra_LinearProblem>(
+    linear_problem = std::make_unique<Epetra_LinearProblem>(
       const_cast<Epetra_CrsMatrix *>(&A.trilinos_matrix()), &ep_x, &ep_b);
 
     do_solve();

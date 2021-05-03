@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -76,9 +76,7 @@ test_unequal()
 int
 main()
 {
-  std::string   logname = "output";
-  std::ofstream logfile(logname.c_str());
-  deallog.attach(logfile);
+  initlog();
 
   test_constant<2>();
   test_constant<3>();

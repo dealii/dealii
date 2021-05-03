@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,6 +16,8 @@
 
 #ifndef dealii_mg_transfer_component_templates_h
 #define dealii_mg_transfer_component_templates_h
+
+#include <deal.II/base/config.h>
 
 #include <deal.II/dofs/dof_accessor.h>
 
@@ -110,10 +112,8 @@ MGTransferSelect<number>::copy_from_mg(
       // the block back to dst.
       const unsigned int n_blocks =
         *std::max_element(target_component.begin(), target_component.end()) + 1;
-      std::vector<types::global_dof_index> dofs_per_block(n_blocks);
-      DoFTools::count_dofs_per_block(mg_dof_handler,
-                                     dofs_per_block,
-                                     target_component);
+      const std::vector<types::global_dof_index> dofs_per_block =
+        DoFTools::count_dofs_per_fe_block(mg_dof_handler, target_component);
       BlockVector<number> tmp;
       tmp.reinit(n_blocks);
       for (unsigned int b = 0; b < n_blocks; ++b)

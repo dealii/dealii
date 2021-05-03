@@ -16,6 +16,8 @@
 #ifndef dealii_mg_matrix_h
 #define dealii_mg_matrix_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/mg_level_object.h>
 
 #include <deal.II/lac/linear_operator.h>
@@ -37,9 +39,6 @@ namespace mg
    * Multilevel matrix. This matrix stores an MGLevelObject of
    * LinearOperator objects. It implements the interface defined in
    * MGMatrixBase, so that it can be used as a matrix in Multigrid.
-   *
-   * @author Guido Kanschat
-   * @date 2002, 2010
    */
   template <typename VectorType = Vector<double>>
   class Matrix : public MGMatrixBase<VectorType>
@@ -117,8 +116,6 @@ namespace mg
  * BlockSparseMatrixEZ. Then, this class stores a pointer to a MGLevelObject
  * of this matrix class. In each @p vmult, the block selected on
  * initialization will be multiplied with the vector provided.
- *
- * @author Guido Kanschat, 2002
  */
 template <typename MatrixType, typename number>
 class MGMatrixSelect : public MGMatrixBase<Vector<number>>
@@ -211,7 +208,9 @@ namespace mg
         // rich enough interface to populate reinit_(domain|range)_vector.
         // Thus, apply an empty LinearOperator exemplar.
         matrices[level] =
-          linear_operator<VectorType>(LinearOperator<VectorType>(), p[level]);
+          linear_operator<VectorType>(LinearOperator<VectorType>(),
+                                      Utilities::get_underlying_value(
+                                        p[level]));
       }
   }
 

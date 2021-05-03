@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2018 by the deal.II authors
+// Copyright (C) 2008 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -66,8 +66,6 @@
 
 namespace Step50
 {
-  using namespace dealii;
-
   template <int dim>
   class LaplaceProblem
   {
@@ -94,8 +92,8 @@ namespace Step50
     FE_Q<dim>                                 fe;
     DoFHandler<dim>                           mg_dof_handler;
 
-    typedef TrilinosWrappers::SparseMatrix matrix_t;
-    typedef TrilinosWrappers::MPI::Vector  vector_t;
+    using matrix_t = TrilinosWrappers::SparseMatrix;
+    using vector_t = TrilinosWrappers::MPI::Vector;
 
     matrix_t system_matrix;
 
@@ -176,7 +174,7 @@ namespace Step50
   LaplaceProblem<dim>::setup_system()
   {
     mg_dof_handler.distribute_dofs(fe);
-    mg_dof_handler.distribute_mg_dofs(fe);
+    mg_dof_handler.distribute_mg_dofs();
 
     deallog << "Number of degrees of freedom: " << mg_dof_handler.n_dofs();
 
@@ -211,7 +209,8 @@ namespace Step50
                          true);
 
     mg_constrained_dofs.clear();
-    mg_constrained_dofs.initialize(mg_dof_handler, dirichlet_boundary);
+    mg_constrained_dofs.initialize(mg_dof_handler);
+    mg_constrained_dofs.make_zero_boundary_constraints(mg_dof_handler, {0});
 
     const unsigned int n_levels = triangulation.n_global_levels();
 
@@ -404,17 +403,20 @@ namespace Step50
   LaplaceProblem<dim>::solve()
   {
     MGTransferPrebuilt<vector_t> mg_transfer(mg_constrained_dofs);
-    mg_transfer.build_matrices(mg_dof_handler);
+    mg_transfer.build(mg_dof_handler);
 
     matrix_t coarse_matrix;
     coarse_matrix.copy_from(mg_matrices[0]);
     SolverControl         coarse_solver_control(1000, 1e-10, false, false);
     SolverGMRES<vector_t> coarse_solver(coarse_solver_control);
     PreconditionIdentity  id;
-    MGCoarseGridLACIteration<SolverGMRES<vector_t>, vector_t>
+    MGCoarseGridIterativeSolver<vector_t,
+                                SolverGMRES<vector_t>,
+                                matrix_t,
+                                PreconditionIdentity>
       coarse_grid_solver(coarse_solver, coarse_matrix, id);
 
-    typedef TrilinosWrappers::PreconditionJacobi         Smoother;
+    using Smoother = TrilinosWrappers::PreconditionJacobi;
     MGSmootherPrecondition<matrix_t, Smoother, vector_t> mg_smoother;
     mg_smoother.initialize(mg_matrices);
     mg_smoother.set_steps(2);
@@ -422,17 +424,48 @@ namespace Step50
     mg::Matrix<vector_t> mg_interface_up(mg_interface_matrices);
     mg::Matrix<vector_t> mg_interface_down(mg_interface_matrices);
 
+    auto print_coarse_solve = [](const bool start, const unsigned int level) {
+      if (start)
+        {
+          deallog << "V-cycle entering level " << level << std::endl;
+          deallog << "Coarse level           " << level << std::endl;
+        }
+    };
+
+    auto print_restriction = [](const bool start, const unsigned int level) {
+      if (start)
+        deallog << "Residual on      level " << level << std::endl;
+    };
+
+    auto print_pre_smoother_step = [](const bool         start,
+                                      const unsigned int level) {
+      if (start)
+        {
+          deallog << "V-cycle entering level " << level << std::endl;
+          deallog << "Smoothing on     level " << level << std::endl;
+        }
+    };
+
+    auto print_post_smoother_step = [](const bool         start,
+                                       const unsigned int level) {
+      if (start)
+        {
+          deallog << "Smoothing on     level " << level << std::endl;
+          deallog << "V-cycle leaving  level " << level << std::endl;
+        }
+    };
+
     // Now, we are ready to set up the
     // V-cycle operator and the
     // multilevel preconditioner.
-    Multigrid<vector_t> mg(mg_dof_handler,
-                           mg_matrix,
-                           coarse_grid_solver,
-                           mg_transfer,
-                           mg_smoother,
-                           mg_smoother);
-    mg.set_debug(2);
+    Multigrid<vector_t> mg(
+      mg_matrix, coarse_grid_solver, mg_transfer, mg_smoother, mg_smoother);
     mg.set_edge_matrices(mg_interface_down, mg_interface_up);
+
+    mg.connect_coarse_solve(print_coarse_solve);
+    mg.connect_restriction(print_restriction);
+    mg.connect_pre_smoother_step(print_pre_smoother_step);
+    mg.connect_post_smoother_step(print_post_smoother_step);
 
     PreconditionMG<dim, vector_t, MGTransferPrebuilt<vector_t>> preconditioner(
       mg_dof_handler, mg, mg_transfer);
@@ -527,7 +560,6 @@ namespace Step50
 int
 main(int argc, char *argv[])
 {
-  using namespace dealii;
   using namespace Step50;
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization(

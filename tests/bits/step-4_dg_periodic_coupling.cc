@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -82,7 +82,7 @@ MatrixIntegrator<dim>::boundary(
   typename MeshWorker::IntegrationInfo<dim> &info) const
 {
   const unsigned int deg = info.fe_values(0).get_fe().degree;
-  LocalIntegrators::Laplace ::nitsche_matrix(
+  LocalIntegrators::Laplace::nitsche_matrix(
     dinfo.matrix(0, false).matrix,
     info.fe_values(0),
     LocalIntegrators::Laplace::compute_penalty(dinfo, dinfo, deg, deg));
@@ -97,7 +97,7 @@ MatrixIntegrator<dim>::face(
   typename MeshWorker::IntegrationInfo<dim> &info2) const
 {
   const unsigned int deg = info1.fe_values(0).get_fe().degree;
-  LocalIntegrators::Laplace ::ip_matrix(
+  LocalIntegrators::Laplace::ip_matrix(
     dinfo1.matrix(0, false).matrix,
     dinfo1.matrix(0, true).matrix,
     dinfo2.matrix(0, true).matrix,
@@ -154,7 +154,7 @@ void
 Step4<dim>::make_grid()
 {
   GridGenerator::hyper_cube(triangulation, -1, 1, true);
-  typedef typename dealii::Triangulation<dim>::cell_iterator CellIteratorTria;
+  using CellIteratorTria = typename dealii::Triangulation<dim>::cell_iterator;
   std::vector<dealii::GridTools::PeriodicFacePair<CellIteratorTria>>
                      periodic_faces;
   const unsigned int b_id1     = 2;

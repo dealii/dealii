@@ -1,4 +1,7 @@
 
+DEAL:0:0:0::**** proc 0: 
+
+Sparsity pattern:
 0 0
 1 0
 2 0
@@ -2508,6 +2511,9 @@
 118 -119
 119 -119
 
+DEAL:1:1:1::**** proc 1: 
+
+Sparsity pattern:
 2 -2
 3 -2
 7 -2
@@ -3421,6 +3427,9 @@
 133 -133
 
 
+DEAL:2:2:2::**** proc 2: 
+
+Sparsity pattern:
 3 -3
 50 -3
 53 -3

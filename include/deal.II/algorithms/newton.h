@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2018 by the deal.II authors
+// Copyright (C) 2010 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,6 +17,8 @@
 #ifndef dealii_newton_h
 #define dealii_newton_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/algorithms/any_data.h>
 #include <deal.II/algorithms/operator.h>
 
@@ -26,7 +28,10 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declaration
+#ifndef DOXYGEN
 class ParameterHandler;
+#endif
 
 namespace Algorithms
 {
@@ -62,8 +67,6 @@ namespace Algorithms
    *
    * For the call to (*#inverse_derivative), the vector <tt>"Newton
    * residual"</tt> is inserted before <tt>"Newton iterate"</tt>.
-   *
-   * @author Guido Kanschat, 2006, 2010
    */
   template <typename VectorType>
   class Newton : public OperatorBase
@@ -144,7 +147,7 @@ namespace Algorithms
      * A flag used to decide how many stepsize iteration should be made.
      * Default is the original value of 21.
      *
-     * Enter zero here to turn of stepsize control.
+     * Enter zero here to turn off stepsize control.
      *
      * @note Controlled by <tt>Stepsize iterations</tt> in parameter file
      */

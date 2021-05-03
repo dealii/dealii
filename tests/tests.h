@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2019 by the deal.II authors
+// Copyright (C) 2004 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,6 +20,7 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/bounding_box.h>
 #include <deal.II/base/cuda.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/job_identifier.h>
@@ -63,6 +64,13 @@ struct DisableWindowsDebugRuntimeDialog
   }
 } deal_II_windows_crt_dialog;
 #endif
+
+// Redefine Assert as AssertThrow to make sure that the code is tested similarly
+// in Release mode and in Debug mode. clang-format makes sure that this file is
+// included after all regular header files but before all the other local header
+// files.
+#undef Assert
+#define Assert AssertThrow
 
 // implicitly use the deal.II namespace everywhere, without us having to say
 // so in each and every testcase
@@ -261,21 +269,30 @@ random_point(const double &min = 0.0, const double &max = 1.0)
 
 
 
+// Construct a uniformly distributed random box, with each coordinate
+// between min and max
+template <int dim>
+inline BoundingBox<dim>
+random_box(const double &min = 0.0, const double &max = 1.0)
+{
+  Assert(max >= min, ExcMessage("Make sure max>=min"));
+  std::vector<Point<dim>> p = {random_point<dim>(min, max),
+                               random_point<dim>(min, max)};
+  return BoundingBox<dim>(p);
+}
+
+
+
 // given the name of a file, copy it to deallog
 // and then delete it
 void
 cat_file(const char *filename)
 {
-  std::ifstream in(filename);
-  Assert(in, dealii::ExcIO());
-
-  while (in)
-    {
-      std::string s;
-      std::getline(in, s);
-      dealii::deallog.get_file_stream() << s << "\n";
-    }
-  in.close();
+  {
+    std::ifstream in(filename);
+    Assert(in, dealii::ExcIO());
+    deallog.get_file_stream() << in.rdbuf() << "\n";
+  }
 
   std::remove(filename);
 }
@@ -395,6 +412,7 @@ filter_out_small_numbers(const Number number, const double tolerance)
   else
     return number;
 }
+
 
 // ---------------- Functions used in initializing subsystems -----------------
 
@@ -750,35 +768,13 @@ struct SetGrainSizes
 
 DEAL_II_NAMESPACE_CLOSE
 
-/*
- * Do not use a template here to work around an overload resolution issue with
- * clang and enabled  C++11 mode.
- *
- * - Maier 2013
- */
+template <class T>
 LogStream &
-operator<<(LogStream &out, const std::vector<unsigned int> &v)
+operator<<(LogStream &out, const std::vector<T> &v)
 {
-  for (unsigned int i = 0; i < v.size(); ++i)
+  for (std::size_t i = 0; i < v.size(); ++i)
     out << v[i] << (i == v.size() - 1 ? "" : " ");
   return out;
 }
-
-LogStream &
-operator<<(LogStream &out, const std::vector<long long unsigned int> &v)
-{
-  for (unsigned int i = 0; i < v.size(); ++i)
-    out << v[i] << (i == v.size() - 1 ? "" : " ");
-  return out;
-}
-
-LogStream &
-operator<<(LogStream &out, const std::vector<double> &v)
-{
-  for (unsigned int i = 0; i < v.size(); ++i)
-    out << v[i] << (i == v.size() - 1 ? "" : " ");
-  return out;
-}
-
 
 #endif // dealii_tests_h

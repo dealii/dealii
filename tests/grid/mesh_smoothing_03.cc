@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -36,9 +36,6 @@ char logname[] = "output";
 #include <iostream>
 
 #include "../tests.h"
-
-
-using namespace dealii;
 
 
 

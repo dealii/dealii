@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2018 by the deal.II authors
+// Copyright (C) 2007 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,6 +17,8 @@
 #define dealii_fe_field_function_templates_h
 
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
 
@@ -31,7 +33,7 @@
 #include <deal.II/hp/q_collection.h>
 
 #include <deal.II/numerics/fe_field_function.h>
-#include <deal.II/numerics/vector_tools.h>
+#include <deal.II/numerics/vector_tools_common.h>
 
 #include <tuple>
 
@@ -79,7 +81,7 @@ namespace Functions
     if (cell == dh->end())
       cell = dh->begin_active();
 
-    boost::optional<Point<dim>> qp = get_reference_coordinates(cell, p);
+    std_cxx17::optional<Point<dim>> qp = get_reference_coordinates(cell, p);
     if (!qp)
       {
         const std::pair<typename dealii::internal::
@@ -100,7 +102,7 @@ namespace Functions
                 VectorTools::ExcPointNotAvailableHere());
 
     // Now we can find out about the point
-    Quadrature<dim> quad(qp.get());
+    Quadrature<dim> quad = *qp;
     FEValues<dim>   fe_v(mapping, cell->get_fe(), quad, update_values);
     fe_v.reinit(cell);
     std::vector<Vector<typename VectorType::value_type>> vvalues(
@@ -138,7 +140,7 @@ namespace Functions
     if (cell == dh->end())
       cell = dh->begin_active();
 
-    boost::optional<Point<dim>> qp = get_reference_coordinates(cell, p);
+    std_cxx17::optional<Point<dim>> qp = get_reference_coordinates(cell, p);
     if (!qp)
       {
         const std::pair<typename dealii::internal::
@@ -159,7 +161,7 @@ namespace Functions
     cell_hint.get() = cell;
 
     // Now we can find out about the point
-    Quadrature<dim> quad(qp.get());
+    Quadrature<dim> quad = *qp;
     FEValues<dim>   fe_v(mapping, cell->get_fe(), quad, update_gradients);
     fe_v.reinit(cell);
 
@@ -211,7 +213,7 @@ namespace Functions
     if (cell == dh->end())
       cell = dh->begin_active();
 
-    boost::optional<Point<dim>> qp = get_reference_coordinates(cell, p);
+    std_cxx17::optional<Point<dim>> qp = get_reference_coordinates(cell, p);
     if (!qp)
       {
         const std::pair<typename dealii::internal::
@@ -232,7 +234,7 @@ namespace Functions
     cell_hint.get() = cell;
 
     // Now we can find out about the point
-    Quadrature<dim> quad(qp.get());
+    Quadrature<dim> quad = *qp;
     FEValues<dim>   fe_v(mapping, cell->get_fe(), quad, update_hessians);
     fe_v.reinit(cell);
     std::vector<Vector<typename VectorType::value_type>> vvalues(
@@ -531,7 +533,7 @@ namespace Functions
 
 
   template <int dim, typename DoFHandlerType, typename VectorType>
-  boost::optional<Point<dim>>
+  std_cxx17::optional<Point<dim>>
   FEFieldFunction<dim, DoFHandlerType, VectorType>::get_reference_coordinates(
     const typename DoFHandlerType::active_cell_iterator &cell,
     const Point<dim> &                                   point) const
@@ -542,14 +544,14 @@ namespace Functions
         if (GeometryInfo<dim>::is_inside_unit_cell(qp))
           return qp;
         else
-          return boost::optional<Point<dim>>();
+          return std_cxx17::optional<Point<dim>>();
       }
     catch (const typename Mapping<dim>::ExcTransformationFailed &)
       {
         // transformation failed, so
         // assume the point is
         // outside
-        return boost::optional<Point<dim>>();
+        return std_cxx17::optional<Point<dim>>();
       }
   }
 

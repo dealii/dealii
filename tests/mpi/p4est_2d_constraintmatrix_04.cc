@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -67,8 +67,7 @@ public:
   virtual typename DataOut<dim>::cell_iterator
   first_cell()
   {
-    typename DataOut<dim>::active_cell_iterator cell =
-      this->triangulation->begin_active();
+    auto cell = this->triangulation->begin_active();
     while ((cell != this->triangulation->end()) &&
            (cell->subdomain_id() != subdomain_id))
       ++cell;
@@ -83,8 +82,9 @@ public:
       {
         const IteratorFilters::SubdomainEqualTo predicate(subdomain_id);
 
-        return ++(FilteredIterator<typename DataOut<dim>::active_cell_iterator>(
-          predicate, old_cell));
+        return ++(
+          FilteredIterator<typename Triangulation<dim>::active_cell_iterator>(
+            predicate, old_cell));
       }
     else
       return old_cell;
@@ -216,7 +216,7 @@ test()
           if (coarsen_me)
             for (unsigned int i = 0; i < cell->n_children(); ++i)
               {
-                if (cell->child(i)->active() &&
+                if (cell->child(i)->is_active() &&
                     cell->child(i)->is_locally_owned())
                   {
                     cell->child(i)->clear_refine_flag();

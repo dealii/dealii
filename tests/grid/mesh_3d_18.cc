@@ -16,7 +16,7 @@
 
 
 // adapted from hp/crash_06, which itself is from
-// make_hanging_node_constraints for hp elements. used to crash. triggers the
+// make_hanging_node_constraints for hp-elements. used to crash. triggers the
 // crash that at the time of writing the test afflicts all
 // hp/hp_constraints_*_03 tests
 

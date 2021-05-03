@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -28,6 +28,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 // forward-definition
+#  ifndef DOXYGEN
 namespace LinearAlgebra
 {
   namespace CUDAWrappers
@@ -36,6 +37,7 @@ namespace LinearAlgebra
     class Vector;
   }
 } // namespace LinearAlgebra
+#  endif
 
 namespace CUDAWrappers
 {
@@ -55,8 +57,6 @@ namespace CUDAWrappers
    * @<double@></tt>.
    *
    * @ingroup Preconditioners CUDAWrappers
-   * @author Daniel Arndt
-   * @date 2018
    */
   template <typename Number>
   class PreconditionIC
@@ -270,8 +270,6 @@ namespace CUDAWrappers
    * @<double@></tt>.
    *
    * @ingroup Preconditioners CUDAWrappers
-   * @author Daniel Arndt
-   * @date 2018
    */
   template <typename Number>
   class PreconditionILU

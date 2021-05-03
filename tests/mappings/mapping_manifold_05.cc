@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -72,7 +72,7 @@ test()
 
   typename Triangulation<dim, spacedim>::active_cell_iterator cell =
     triangulation.begin_active();
-  for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+  for (const unsigned int f : GeometryInfo<dim>::face_indices())
     {
       fe_values_mapping.reinit(cell, f);
       fe_values_q.reinit(cell, f);

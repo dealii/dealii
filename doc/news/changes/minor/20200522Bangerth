@@ -1,0 +1,5 @@
+New: There is now a second overload for
+Particles::ParticleAccessor::set_properties() that takes an ArrayView
+as argument.
+<br>
+(Wolfgang Bangerth, 2020/05/22)

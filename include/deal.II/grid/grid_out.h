@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2018 by the deal.II authors
+// Copyright (C) 1999 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -28,11 +28,14 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#ifndef DOXYGEN
 class ParameterHandler;
 template <int dim, int spacedim>
 class Triangulation;
 template <int dim, int spacedim>
 class Mapping;
+#endif
 
 
 /**
@@ -250,18 +253,6 @@ namespace GridOutFlags
     unsigned int n_extra_curved_line_points;
 
     /**
-     * Based on the vertices of the face and #n_boundary_face_points
-     * additional points a tensor product mesh (transformed to the real space)
-     * of (#n_boundary_face_points+2)<sup>dim-1</sup> points is plotted on
-     * each boundary face.
-     *
-     * @deprecated Use n_extra_curved_line_points instead, which has
-     * a more precise name. For compatibility this is implemented as a
-     * reference to n_extra_curved_line_points.
-     */
-    DEAL_II_DEPRECATED unsigned int &n_boundary_face_points;
-
-    /**
      * Boolean indicating whether or not interior lines should be plotted with
      * <tt>n_extra_curved_line_points</tt> line segments.
      */
@@ -287,19 +278,6 @@ namespace GridOutFlags
             const unsigned int n_extra_curved_line_points      = 2,
             const bool         curved_inner_cells              = false,
             const bool         write_additional_boundary_lines = true);
-
-    /**
-     * Copy constructor. Needed since this class (for backwards compatibility)
-     * has a reference member variable.
-     */
-    Gnuplot(const Gnuplot &flags);
-
-    /**
-     * Copy operator. Needed since this class (for backwards compatibility)
-     * has a reference member variable.
-     */
-    Gnuplot &
-    operator=(const Gnuplot &flags);
 
     /**
      * Declare parameters in ParameterHandler.
@@ -665,46 +643,78 @@ namespace GridOutFlags
   /**
    * Flags controlling SVG output.
    *
+   * The figure below is a zoomed-in illustration of what the SVG flags are
+   * capable of producing. These exact settings are the same as those used
+   * in the test <code>tests/grid/grid_out_svg_02.cc</code> with the addition
+   * of the flag <code>svg_flags.label_boundary_id = true;</code> .
+   *
+   * @image html svg_flags.png
+   *
    * @ingroup output
    */
   struct Svg
   {
-    /// Height of the plot in SVG units, computed from width if zero. Defaults
-    /// to 1000
+    /**
+     *  Height of the plot in SVG units, computed from width if zero. Defaults
+     *  to 1000.
+     */
     unsigned int height;
-    /// The width of the plot. Computed automatically from height if zero
-    /// (default)
+
+    /**
+     *  The width of the plot. Computed automatically from height if zero
+     *  (default).
+     */
     unsigned int width;
-    /// Thickness of the lines between cells
+
+    /**
+     *  Thickness of the lines between cells.
+     */
     unsigned int line_thickness;
-    /// Thickness of lines at the boundary
+    /**
+     * Thickness of lines at the boundary.
+     */
     unsigned int boundary_line_thickness;
 
-    /// Margin around the plotted area
+    /**
+     *  Margin around the plotted area.
+     */
     bool margin;
 
     /**
-     * Background style.
+     * An `enum` describing all possible background styles.
      */
     enum Background
     {
-      /// Use transparent value of SVG
+      /**
+       * Use transparent value of SVG.
+       */
       transparent,
-      /// Use white background
+
+      /**
+       * Use white background.
+       */
       white,
-      /// Use a gradient from white (top) to steelblue (bottom), and add date
-      /// and time plus a deal.II logo. Automatically draws a margin.
+
+      /**
+       * Use a gradient from white (top) to steelblue (bottom), and add date
+       * and time plus a deal.II logo. Automatically draws a margin.
+       */
       dealii
     };
 
+    /**
+     * The style used for the background of the mesh.
+     */
     Background background;
 
     // View angles for the perspective view of the grid; Default is 0, 0 (top
     // view).
+
     /**
      * The azimuth angle measured from ??? in degrees. Default is 0.
      */
     int azimuth_angle;
+
     /**
      * The angle from vertically above the xy-plane. Default is 0.
      */
@@ -733,28 +743,60 @@ namespace GridOutFlags
     /// (useful in the perspective view).
     bool convert_level_number_to_height;
 
-    /// The factor determining the vertical distance between levels (default =
-    /// 0.3)
+    /**
+     * The factor determining the vertical distance between levels (default =
+     * 0.3.
+     */
     float level_height_factor;
 
-    /// Scaling of the font for cell annotations. Defaults to 1.
+    /**
+     * Scaling of the font for cell annotations. Defaults to 1.
+     */
     float cell_font_scaling;
-    /// Write level number into each cell. Defaults to true
+    /**
+     * Write level number into each cell. Defaults to false.
+     */
     bool label_level_number;
-    /// Write cell index into each cell. Defaults to true
+
+    /**
+     * Write cell index into each cell. Defaults to false.
+     */
     bool label_cell_index;
-    /// Write material id of each cell. Defaults to false
+
+    /**
+     * Write material id of each cell. Defaults to false.
+     */
     bool label_material_id;
-    /// Write subdomain id of each cell. Defaults to false
+
+    /**
+     * Write subdomain id of each cell. Defaults to false.
+     */
     bool label_subdomain_id;
-    /// Write level subdomain id of each cell. Defaults to false
+
+    /**
+     * Write level subdomain id of each cell. Defaults to false.
+     */
     bool label_level_subdomain_id;
 
-    /// Draw a colorbar next to the plotted grid with respect to the chosen
-    /// coloring of the cells
+    /**
+     * Write boundary id of each boundary face in a circle on the
+     * corresponding boundary edge. Defaults to false.
+     *
+     * Note: Depending on the choice of image viewer, the boundary id
+     * labels may not appear to be centered in the circle.
+     */
+    bool label_boundary_id;
+
+    /**
+     * Draw a colorbar next to the plotted grid with respect to the chosen
+     * coloring of the cells.
+     */
     bool draw_colorbar;
-    /// Draw a legend next to the plotted grid, explaining the label of the
-    /// cells
+
+    /**
+     * Draw a legend next to the plotted grid, explaining the label of the
+     * cells.
+     */
     bool draw_legend;
 
     /**
@@ -762,18 +804,19 @@ namespace GridOutFlags
      */
     Svg(const unsigned int line_thickness                 = 2,
         const unsigned int boundary_line_thickness        = 4,
-        bool               margin                         = true,
+        const bool         margin                         = true,
         const Background   background                     = white,
         const int          azimuth_angle                  = 0,
         const int          polar_angle                    = 0,
         const Coloring     coloring                       = level_number,
         const bool         convert_level_number_to_height = false,
-        const bool         label_level_number             = true,
-        const bool         label_cell_index               = true,
+        const bool         label_level_number             = false,
+        const bool         label_cell_index               = false,
         const bool         label_material_id              = false,
         const bool         label_subdomain_id             = false,
-        const bool         draw_colorbar                  = true,
-        const bool         draw_legend                    = true);
+        const bool         draw_colorbar                  = false,
+        const bool         draw_legend                    = false,
+        const bool         label_boundary_id              = false);
   };
 
   /**
@@ -814,17 +857,62 @@ namespace GridOutFlags
    * @ingroup output
    */
   struct Vtk : public DataOutBase::VtkFlags
-  {};
+  {
+    /**
+     * Default constructor.
+     */
+    Vtk(const bool output_cells         = true,
+        const bool output_faces         = true,
+        const bool output_edges         = true,
+        const bool output_only_relevant = true)
+      : output_cells(output_cells)
+      , output_faces(output_faces)
+      , output_edges(output_edges)
+      , output_only_relevant(output_only_relevant)
+    {}
+
+    /**
+     * Output cells.
+     */
+    bool output_cells;
+
+    /**
+     * Output faces.
+     */
+    bool output_faces;
+
+    /**
+     * Output co-faces/edges.
+     */
+    bool output_edges;
+
+    /**
+     * Output only faces/co-faces that differ from the default settings
+     * (e.g boundary_id).
+     */
+    bool output_only_relevant;
+  };
 
 
   /**
    * Flags for grid output in Vtu format. These flags are the same as those
-   * declared in DataOutBase::VtkFlags.
+   * declared in DataOutBase::VtkFlags, with the addition of a flag that
+   * determines if you want to add a entry in the vtu file (which is really
+   * a xml file) containing the entire serialization of the triangulation.
    *
    * @ingroup output
    */
   struct Vtu : public DataOutBase::VtkFlags
-  {};
+  {
+    Vtu(const bool serialize_triangulation = false)
+      : serialize_triangulation(serialize_triangulation)
+    {}
+
+    /**
+     * Add to the vtu file also the serialized triangulation.
+     */
+    bool serialize_triangulation;
+  };
 } // namespace GridOutFlags
 
 
@@ -836,7 +924,7 @@ namespace GridOutFlags
  *
  * Usage is simple: either you use the direct form
  * @code
- *   ofstream output_file("some_filename");
+ *   std::ofstream output_file("some_filename");
  *   GridOut().write_gnuplot (tria, output_file);
  * @endcode
  * if you know which format you want to have, or if you want the format to be
@@ -844,8 +932,8 @@ namespace GridOutFlags
  * @code
  *   GridOut::OutputFormat grid_format =
  *     GridOut::parse_output_format(get_format_name_from_somewhere());
- *   ofstream output_file("some_filename"
- *                        + GridOut::default_suffix(output_format));
+ *   std::ofstream output_file("some_filename"
+ *                             + GridOut::default_suffix(output_format));
  *   GridOut().write (tria, output_file, output_format);
  * @endcode
  * The function <tt>get_output_format_names()</tt> provides a list of possible
@@ -900,9 +988,6 @@ namespace GridOutFlags
  *
  * @ingroup grid
  * @ingroup output
- * @author Wolfgang Bangerth, Guido Kanschat, Luca Heltai, Stefan Nauber,
- * Christian Wülker
- * @date 1999 - 2013
  */
 class GridOut
 {
@@ -959,7 +1044,7 @@ public:
    * Write the triangulation in the gnuplot format.
    *
    * In GNUPLOT format, each cell is written as a sequence of its confining
-   * lines. Apart from the coordinates of the line's end points, the level and
+   * lines. Apart from the coordinates of the lines' end points, the level and
    * the material of the cell are appended to each line of output. Therefore,
    * if you let GNUPLOT draw a 2d grid as a 3d plot, you will see more refined
    * cells being raised against cells with less refinement.  Also, if you draw
@@ -994,7 +1079,7 @@ public:
   /**
    * Write the triangulation in the msh format.
    *
-   * Msh is the format used by Gmsh and it is described in the Gmsh user's
+   * Msh is the format used by %Gmsh and it is described in the %Gmsh user's
    * guide. Besides the usual output of the grid only, you can decide through
    * additional flags (see below, and the documentation of the
    * GridOutFlags::Msh() class) whether boundary faces with non-zero boundary
@@ -1012,6 +1097,53 @@ public:
   template <int dim, int spacedim>
   void
   write_msh(const Triangulation<dim, spacedim> &tria, std::ostream &out) const;
+
+#ifdef DEAL_II_GMSH_WITH_API
+  /**
+   * Write the triangulation in any format supported by gmsh API.
+   *
+   * Gmsh API allows writing its output in several formats through their C++
+   * API. This function translates a Triangulation object into a gmsh collection
+   * of entities and calls the gmsh::write() method with the filename passed as
+   * argument. This method generates a different entity for each unique pair of
+   * non default manifold id and boundary id, and writes a gmsh physical group
+   * for each unique combination, allowing you to read back the triangulation
+   * using the GridIn::read_msh() method that takes a string as argument.
+   *
+   * In particular, all cell objects with non default boundary id or non
+   * default manifold id are grouped in a unique physical tag, whose name
+   * contains the boundary and manifold indicators. The names are constructed
+   * using Patterns::Tools::to_value() applied to a `std::map<std::string, int>`
+   * where the keys are either `MaterialID`, `BoundaryID`, or `ManifoldID`,
+   * i.e., a cell with material id 1, and manifold id 3 would be grouped in a
+   * physical tag (whose numbering is not specified), named
+   * `MaterialID:1, ManifoldID:3`.
+   *
+   * For example, calling the method with a hyper ball grid refined once,
+   * would results in the following physical tags defined in the output file:
+   * @code
+   * MeshFormat
+   * 4.1 0 8
+   * \$EndMeshFormat
+   * \$PhysicalNames
+   * 3
+   * 1 1 "ManifoldID:0"
+   * 1 2 "BoundaryID:-1, ManifoldID:1"
+   * 2 3 "ManifoldID:1"
+   * \$EndPhysicalNames
+   * \$Entities
+   * ...
+   * @endcode
+   *
+   * The special boundary id `-1` is used to indicate internal boundaries. The
+   * internal boundaries must be specified whenever it is necessary to specify
+   * a non-flat manifold id.
+   */
+  template <int dim, int spacedim>
+  void
+  write_msh(const Triangulation<dim, spacedim> &tria,
+            const std::string &                 filename) const;
+#endif
 
   /**
    * Write the triangulation in the ucd format.
@@ -1108,7 +1240,9 @@ public:
    * further possible in order to visualize a certain property of the cells
    * such as their level or material id. A colorbar can be drawn to encode the
    * chosen coloring.  Moreover, a cell label can be added, showing level
-   * index, etc.
+   * index, etc. Indeed, by using the set_flags() with an appropriately
+   * generated object of type GridOutFlags::Svg, many aspects of how and
+   * what is being visualized by this function can be customized.
    *
    * @note This function is currently only implemented for two-dimensional
    * grids in two space dimensions.
@@ -1180,8 +1314,6 @@ public:
    *
    * The companion GridIn::read_vtk function can be used to read VTK files
    * generated with this method.
-   *
-   * @author Luca Heltai, 2018
    */
   template <int dim, int spacedim>
   void
@@ -1192,17 +1324,18 @@ public:
    *
    * Due to the way this function writes data to the output stream,
    * the resulting output files correspond to a faithful representation
-   * of the mesh in that all cells are visible for visualization. However,
+   * of the mesh in that all cells are visible for visualization. In general,
    * the data is not in a format that allows reading this file in again
    * through the GridIn class. This is because every vertex of the mesh is
    * duplicated as many times as there are adjacent cells. In other words,
    * every cell has its own, separate set of vertices that are at the
    * same location as the vertices of other cells, but are separately
-   * numbered. If such a file is read in through the GridIn class, then
-   * that will result in a mesh that has the correct cells and vertex
-   * locations, but because the vertices are logically separate (though at
-   * the same locations) all cells are unconnected and have no neighbors
-   * across faces.
+   * numbered.
+   *
+   * In order to create a file that can be read with the GridIn class,
+   * the flag GridOutFlags::Vtu::serialize_triangulation must be set to true. In
+   * this case, the generated vtu file will contain the triangulation in a xml
+   * section which is ignored by general vtu readers.
    */
   template <int dim, int spacedim>
   void
@@ -1210,7 +1343,7 @@ public:
 
   /**
    * Write triangulation in VTU format for each processor, and add a .pvtu file
-   * for visualization in Visit or Paraview that describes the collection of VTU
+   * for visualization in VisIt or Paraview that describes the collection of VTU
    * files as all part of the same simulation. The output is in the form
    * <tt>filename_without_extension.proc000*.vtu</tt> where * is
    * 0,1,...,n_proc-1 and <tt>filename_without_extension.pvtu</tt>. The input
@@ -1272,7 +1405,7 @@ public:
   set_flags(const GridOutFlags::DX &flags);
 
   /**
-   * Set flags for Gmsh output
+   * Set flags for %Gmsh output
    */
   void
   set_flags(const GridOutFlags::Msh &flags);
@@ -1421,7 +1554,7 @@ private:
   GridOutFlags::DX dx_flags;
 
   /**
-   * Flags for Gmsh output. Can be changed by using the set_flags(const
+   * Flags for %Gmsh output. Can be changed by using the set_flags(const
    * GridOutFlags::Msh&) function.
    */
   GridOutFlags::Msh msh_flags;
@@ -1486,7 +1619,7 @@ private:
    * printed which are on the boundary and which have a boundary indicator not
    * equal to zero, since the latter is the default for boundary faces.
    *
-   * Since, in Gmsh, geometric elements are continuously numbered, this
+   * Since, in %Gmsh, geometric elements are continuously numbered, this
    * function requires a parameter @p next_element_index providing the next
    * geometric element number. This index should have a numerical value equal
    * to one more than the index previously used to write a geometric element
@@ -1496,7 +1629,7 @@ private:
    *
    * @warning @p next_element_index should be (at least) one larger than the
    * current number of triangulation elements (lines, cells, faces) that have
-   * been written to @p out. Gmsh will not load the saved file correctly if
+   * been written to @p out. %Gmsh will not load the saved file correctly if
    * there are repeated indices.
    *
    * This function unfortunately can not be included in the regular @p
@@ -1539,7 +1672,7 @@ private:
    * printed which are on the boundary and which have a boundary indicator not
    * equal to zero, since the latter is the default for boundary faces.
    *
-   * Since, in Gmsh, geometric elements are continuously numbered, this
+   * Since, in %Gmsh, geometric elements are continuously numbered, this
    * function requires a parameter @p next_element_index providing the next
    * geometric element number. This index should have a numerical value equal
    * to one more than the index previously used to write a geometric element
@@ -1549,7 +1682,7 @@ private:
    *
    * @warning @p next_element_index should be (at least) one larger than the
    * current number of triangulation elements (lines, cells, faces) that have
-   * been written to @p out. Gmsh will not load the saved file correctly if
+   * been written to @p out. %Gmsh will not load the saved file correctly if
    * there are repeated indices.
    *
    * This function unfortunately can not be included in the regular @p
@@ -1581,6 +1714,11 @@ private:
   write_msh_lines(const Triangulation<1, 2> &tria,
                   const unsigned int         next_element_index,
                   std::ostream &             out) const;
+
+  /**
+   * Declaration of the specialization of above function for 1d, 3sd. Does
+   * nothing.
+   */
   unsigned int
   write_msh_lines(const Triangulation<1, 3> &tria,
                   const unsigned int         next_element_index,
@@ -1700,6 +1838,10 @@ private:
   write_ucd_lines(const Triangulation<1, 2> &tria,
                   const unsigned int         next_element_index,
                   std::ostream &             out) const;
+  /**
+   * Declaration of the specialization of above function for 1d, 3sd. Does
+   * nothing.
+   */
   unsigned int
   write_ucd_lines(const Triangulation<1, 3> &tria,
                   const unsigned int         next_element_index,
@@ -1722,22 +1864,6 @@ private:
                   const unsigned int         next_element_index,
                   std::ostream &             out) const;
 
-
-  /**
-   * This function projects a three-dimensional point (Point<3> point) onto a
-   * two-dimensional image plane, specified by the position of the camera
-   * viewing system (Point<3> camera_position), camera direction (Point<3>
-   * camera_position), camera horizontal (Point<3> camera_horizontal,
-   * necessary for the correct alignment of the later images), and the focus
-   * of the camera (float camera_focus).
-   *
-   * For SVG output of grids.
-   */
-  static Point<2> svg_project_point(Point<3> point,
-                                    Point<3> camera_position,
-                                    Point<3> camera_direction,
-                                    Point<3> camera_horizontal,
-                                    float    camera_focus);
 
   /**
    * Return the number of faces in the triangulation which have a boundary
@@ -1768,6 +1894,11 @@ private:
    */
   unsigned int
   n_boundary_faces(const Triangulation<1, 2> &tria) const;
+
+  /**
+   * Declaration of the specialization of above function for 1d, 3sd. Simply
+   * returns zero.
+   */
   unsigned int
   n_boundary_faces(const Triangulation<1, 3> &tria) const;
 
@@ -1800,6 +1931,11 @@ private:
    */
   unsigned int
   n_boundary_lines(const Triangulation<1, 2> &tria) const;
+
+  /**
+   * Declaration of the specialization of above function for 1d, 3sd. Simply
+   * returns zero.
+   */
   unsigned int
   n_boundary_lines(const Triangulation<1, 3> &tria) const;
 

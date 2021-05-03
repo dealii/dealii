@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,13 +20,13 @@
  * Instantiation of complex class and function templates is expensive both in
  * terms of compile time and disk space. Therefore, we try to separate
  * declaration and implementation of templates as far as possible, and make
- * sure that implementations are read by the compiler only when 
+ * sure that implementations are read by the compiler only when
  * necessary.
  *
  * Template classes in <tt>deal.II</tt> can be grouped into three categories,
  * depending on the number of probable different instantiations. These three
  * groups are discussed in the following.
- * 
+ *
  *
  * @section Inst1 Known and fixed number of instantiations
  *
@@ -50,7 +50,7 @@
  * For these classes, adding instantiations for new parameters involves
  * changing the library. However, this is rarely needed, of course, unless you
  * are not content with computing only in 1d, 2d, or 3d.
- * 
+ *
  *
  * @subsection Inst1a Available instances
  *
@@ -65,7 +65,7 @@
  * stored values: we only support <code>double</code>, <code>float</code>,
  * and in some cases <code>std::complex@<double@></code> and
  * <code>std::complex@<float@></code>.
- * 
+ *
  *
  * @section Inst2 A few instantiations, most of which are known
  *
@@ -86,7 +86,7 @@
  * interfaces, including vector types that are not part of the library but
  * possibly defined in an application program. In such a case, applications
  * can instantiate these templates by hand as described in the next section.
- * 
+ *
  *
  * @subsection Inst2c Creating new instances
  *
@@ -106,7 +106,7 @@
  * template class XXXX<long double>;
  * @endcode
  *
- * 
+ *
  * @subsection Inst2p Provided instances
  *
  * Like with the classes in section @ref Inst1, the instances provided in the

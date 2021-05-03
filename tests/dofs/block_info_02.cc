@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -35,7 +35,7 @@ test_grid(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
 {
   DoFHandler<dim> mgdof(tr);
   mgdof.distribute_dofs(fe);
-  mgdof.distribute_mg_dofs(fe);
+  mgdof.distribute_mg_dofs();
   BlockInfo bi;
   bi.initialize(mgdof, false, false);
   bi.initialize_local(mgdof);

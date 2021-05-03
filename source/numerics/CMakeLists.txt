@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2018 by the deal.II authors
+## Copyright (C) 2012 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -23,7 +23,6 @@ SET(_unity_include_src
   data_postprocessor.cc
   dof_output_operator.cc
   histogram.cc
-  kdtree.cc
   matrix_tools_once.cc
   matrix_tools.cc
   time_dependent.cc
@@ -35,6 +34,7 @@ SET(_unity_include_src
   )
 
 SET(_separate_src
+  cell_data_transfer.cc
   data_out_dof_data.cc
   data_out_dof_data_inst2.cc
   data_out_dof_data_codim.cc
@@ -47,6 +47,7 @@ SET(_separate_src
   matrix_creator_inst2.cc
   matrix_creator_inst3.cc
   point_value_history.cc
+  smoothness_estimator.cc
   solution_transfer.cc
   solution_transfer_inst2.cc
   solution_transfer_inst3.cc
@@ -55,8 +56,6 @@ SET(_separate_src
   vector_tools_interpolate.cc
   vector_tools_point_value.cc
   vector_tools_project.cc
-  vector_tools_project_inst2.cc
-  vector_tools_project_inst3.cc
   vector_tools_project_hp.cc
   vector_tools_project_codim.cc
   vector_tools_project_qp.cc
@@ -73,6 +72,7 @@ SETUP_SOURCE_LIST("${_unity_include_src}"
   )
 
 SET(_inst
+  cell_data_transfer.inst.in
   data_out_dof_data.inst.in
   data_out_dof_data_codim.inst.in
   data_out_faces.inst.in
@@ -88,6 +88,7 @@ SET(_inst
   matrix_creator.inst.in
   matrix_tools.inst.in
   point_value_history.inst.in
+  smoothness_estimator.inst.in
   solution_transfer.inst.in
   time_dependent.inst.in
   vector_tools_boundary.inst.in

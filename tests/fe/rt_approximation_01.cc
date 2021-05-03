@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -388,7 +388,7 @@ double TestProjection(Mapping<2> &mapping, DoFHandler<2> *dof_handler)
                                                  Vector<double>(n_components));
           fe_values.get_function_values(solution, this_value);
 
-          for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+          for (const auto q_point : fe_values.quadrature_point_indices())
             {
               double   u = this_value[q_point](0), v = this_value[q_point](1);
               Point<2> p = fe_values.quadrature_point(q_point);

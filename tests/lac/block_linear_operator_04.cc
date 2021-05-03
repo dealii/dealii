@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2018 by the deal.II authors
+// Copyright (C) 2015 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -24,13 +24,13 @@
 
 #include "../tests.h"
 
-#define PRINTME(name, var)                              \
-  deallog << "Block vector: " name << ":" << std::endl; \
-  for (unsigned int i = 0; i < var.n_blocks(); ++i)     \
-    deallog << "[block " << i << " ]  " << var.block(i);
+#define PRINTME(name, var)                                            \
+  deallog << "Block vector: " name << ":" << std::endl;               \
+  for (unsigned int i = 0; i < var.n_blocks(); ++i)                   \
+    deallog << "[block " << i << " ]  " << var.block(i) << std::endl; \
+  deallog << std::endl;
 
 
-using namespace dealii;
 
 int
 main()

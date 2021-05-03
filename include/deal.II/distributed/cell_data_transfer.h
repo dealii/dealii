@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2019 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,6 +21,8 @@
 #include <deal.II/base/smartpointer.h>
 
 #include <deal.II/distributed/tria.h>
+
+#include <deal.II/numerics/adaptation_strategies.h>
 
 #include <boost/range/iterator_range.hpp>
 
@@ -43,11 +45,11 @@ namespace parallel
      * freedom defined on a parallel::distributed::Triangulation.
      *
      * This class has been designed to operate on any kind of datatype that is
-     * serializable. A non-distributed Vector container has to be provided,
-     * which holds the cell-wise data in the same order as active cells are
-     * traversed. In other words, each entry corresponds to the cell with the
-     * same index CellAccessor::active_cell_index(), and the container has to be
-     * of size Triangulation::n_active_cells().
+     * serializable. A non-distributed container (like Vector or `std::vector`)
+     * has to be provided, which holds the cell-wise data in the same order as
+     * active cells are traversed. In other words, each entry corresponds to the
+     * cell with the same index CellAccessor::active_cell_index(), and the
+     * container has to be of size Triangulation::n_active_cells().
      *
      * <h3>Transferring cell-wise data</h3>
      *
@@ -60,7 +62,7 @@ namespace parallel
      *
      * // prepare the CellDataTransfer object for coarsening and refinement
      * // and give the cell data vector that we intend to unpack later,
-     * Vector<double> data_to_transfer (triangulation.n_active_cells());
+     * Vector<double> data_to_transfer(triangulation.n_active_cells());
      * //[fill data_to_transfer with cell-wise values...]
      *
      * parallel::distributed::CellDataTransfer<dim, spacedim, Vector<double>>
@@ -71,7 +73,7 @@ namespace parallel
      * triangulation.execute_coarsening_and_refinement();
      *
      * // unpack transferred data,
-     * Vector<double> transferred_data (triangulation.n_active_cells());
+     * Vector<double> transferred_data(triangulation.n_active_cells());
      * cell_data_trans.unpack(transferred_data);
      *
      * @endcode
@@ -85,7 +87,7 @@ namespace parallel
      * For serialization, the following code snippet saves not only the
      * triangulation itself, but also the cell-wise data attached:
      * @code
-     * Vector<double> data_to_transfer (triangulation.n_active_cells());
+     * Vector<double> data_to_transfer(triangulation.n_active_cells());
      * //[fill data_to_transfer with cell-wise values...]
      *
      * parallel::distributed::CellDataTransfer<dim, spacedim, Vector<double>>
@@ -103,7 +105,7 @@ namespace parallel
      *
      * parallel::distributed::CellDataTransfer<dim, spacedim, Vector<double>>
      *   cell_data_trans(triangulation);
-     * Vector<double> transferred_data (triangulation.n_active_cells());
+     * Vector<double> transferred_data(triangulation.n_active_cells());
      * cell_data_trans.deserialize(transferred_data);
      * @endcode
      *
@@ -120,28 +122,36 @@ namespace parallel
      * matching code snippets for both transfer and serialization.
      *
      * @ingroup distributed
-     * @author Marc Fehling, 2018
      */
     template <int dim, int spacedim = dim, typename VectorType = Vector<double>>
     class CellDataTransfer
     {
+    private:
+      /**
+       * An alias that defines the data type of provided container template.
+       */
+      using value_type = typename VectorType::value_type;
+
     public:
       /**
        * When data is transferred during coarsening, it is not trivial to decide
        * how to handle data of child cells which will be coarsened. Or in other
        * words, which data should be stored in the corresponding parent cell.
        *
-       * In this namespace, we offer a few strategies that cope with this
-       * problem. Such strategies can be passed to the
-       * parallel::distributed::CellDataTransfer constructor.
+       * In this struct, we offer a few strategies that cope with this
+       * problem. Such strategies can be passed to the CellDataTransfer and
+       * parallel::distributed::CellDataTransfer constructors.
+       *
+       * @deprecated Use the namespace dealii::AdaptationStrategies::Coarsening instead.
        */
-      struct CoarseningStrategies
+      struct DEAL_II_DEPRECATED CoarseningStrategies
       {
         /**
-         * Evaluate data from @p input_vector on children of @p parent.
-         * Check if data on all children match, and return that value.
+         * @copydoc dealii::AdaptationStrategies::Coarsening::check_equality()
+         *
+         * @deprecated Use dealii::AdaptationStrategies::Coarsening::check_equality() instead.
          */
-        static typename VectorType::value_type
+        DEAL_II_DEPRECATED static typename VectorType::value_type
         check_equality(const typename parallel::distributed::
                          Triangulation<dim, spacedim>::cell_iterator &parent,
                        const VectorType &input_vector)
@@ -161,10 +171,11 @@ namespace parallel
         }
 
         /**
-         * Evaluate data from @p input_vector on children of @p parent.
-         * Return sum.
+         * @copydoc dealii::AdaptationStrategies::Coarsening::sum()
+         *
+         * @deprecated Use dealii::AdaptationStrategies::Coarsening::sum() instead.
          */
-        static typename VectorType::value_type
+        DEAL_II_DEPRECATED static typename VectorType::value_type
         sum(const typename parallel::distributed::Triangulation<dim, spacedim>::
               cell_iterator & parent,
             const VectorType &input_vector)
@@ -180,10 +191,11 @@ namespace parallel
         }
 
         /**
-         * Evaluate data from @p input_vector on children of @p parent.
-         * Return mean value.
+         * @copydoc dealii::AdaptationStrategies::Coarsening::mean()
+         *
+         * @deprecated Use dealii::AdaptationStrategies::Coarsening::mean() instead.
          */
-        static typename VectorType::value_type
+        DEAL_II_DEPRECATED static typename VectorType::value_type
         mean(const typename parallel::distributed::
                Triangulation<dim, spacedim>::cell_iterator &parent,
              const VectorType &                             input_vector)
@@ -202,24 +214,59 @@ namespace parallel
        *   container stores values that differ in size. A varying amount of data
        *   may be packed per cell, if for example the underlying ValueType of
        *   the VectorType container is a container itself.
-       * @param[in] coarsening_strategy Function deciding which data to store on
-       *   a cell whose children will get coarsened into.
+       * @param[in] refinement_strategy %Function deciding how data will be
+       *   stored on refined cells from its parent cell.
+       * @param[in] coarsening_strategy %Function deciding which data to store
+       *   on a cell whose children will get coarsened into.
        */
-      CellDataTransfer(const parallel::distributed::Triangulation<dim, spacedim>
-                         &        triangulation,
-                       const bool transfer_variable_size_data = false,
-                       const std::function<typename VectorType::value_type(
-                         const typename parallel::distributed::
-                           Triangulation<dim, spacedim>::cell_iterator &parent,
-                         const VectorType &input_vector)> coarsening_strategy =
-                         &CoarseningStrategies::check_equality);
+      CellDataTransfer(
+        const parallel::distributed::Triangulation<dim, spacedim>
+          &                               triangulation,
+        const bool                        transfer_variable_size_data = false,
+        const std::function<std::vector<value_type>(
+          const typename dealii::Triangulation<dim, spacedim>::cell_iterator
+            &              parent,
+          const value_type parent_value)> refinement_strategy =
+          &dealii::AdaptationStrategies::Refinement::
+            preserve<dim, spacedim, value_type>,
+        const std::function<value_type(
+          const typename dealii::Triangulation<dim, spacedim>::cell_iterator
+            &                            parent,
+          const std::vector<value_type> &children_values)> coarsening_strategy =
+          &dealii::AdaptationStrategies::Coarsening::
+            check_equality<dim, spacedim, value_type>);
 
       /**
-       * Prepare the current object for coarsening and refinement. It registers
-       * the data transfer of @p in on the underlying triangulation. @p in includes
-       * data to be interpolated onto the new (refined and/or coarsened) grid.
-       * See documentation of this class for more information on how to use this
-       * functionality.
+       * Constructor.
+       *
+       * @param[in] triangulation The triangulation on which all operations will
+       *   happen. At the time when this constructor is called, the refinement
+       *   in question has not happened yet.
+       * @param[in] transfer_variable_size_data Specify whether your VectorType
+       *   container stores values that differ in size. A varying amount of data
+       *   may be packed per cell, if for example the underlying ValueType of
+       *   the VectorType container is a container itself.
+       * @param[in] coarsening_strategy %Function deciding which data to store
+       *   on a cell whose children will get coarsened into.
+       *
+       * @deprecated Use the above constructor instead.
+       */
+      DEAL_II_DEPRECATED
+      CellDataTransfer(const parallel::distributed::Triangulation<dim, spacedim>
+                         &        triangulation,
+                       const bool transfer_variable_size_data,
+                       const std::function<value_type(
+                         const typename parallel::distributed::
+                           Triangulation<dim, spacedim>::cell_iterator &parent,
+                         const VectorType &input_vector)> coarsening_strategy);
+
+      /**
+       * Prepare the current object for coarsening and refinement.
+       *
+       * It registers the data transfer of @p in on the underlying triangulation.
+       * @p in includes data to be interpolated onto the new (refined and/or
+       * coarsened) grid. See documentation of this class for more information
+       * on how to use this functionality.
        *
        * This function can be called only once for the specified container
        * until data transfer has been completed. If multiple vectors shall be
@@ -236,9 +283,10 @@ namespace parallel
         const std::vector<const VectorType *> &all_in);
 
       /**
-       * Prepare the serialization of the given vector. The serialization is
-       * done by Triangulation::save(). See documentation of this class for more
-       * information on how to use this functionality.
+       * Prepare the serialization of the given vector.
+       *
+       * The serialization is done by Triangulation::save(). See documentation
+       * of this class for more information on how to use this functionality.
        *
        * This function can be called only once for the specified container
        * until data transfer has been completed. If multiple vectors shall be
@@ -293,13 +341,21 @@ namespace parallel
       const bool transfer_variable_size_data;
 
       /**
-       * Function deciding which data to store from @p input_vector on a
-       * cell @p parent, whose children will get coarsened into.
+       * %Function deciding how data will be stored on refined cells from its
+       * parent cell.
        */
-      const std::function<typename VectorType::value_type(
-        const typename parallel::distributed::Triangulation<dim, spacedim>::
-          cell_iterator & parent,
-        const VectorType &input_vector)>
+      const std::function<std::vector<value_type>(
+        const typename Triangulation<dim, spacedim>::cell_iterator &parent,
+        const value_type parent_value)>
+        refinement_strategy;
+
+      /**
+       * %Function deciding on how to process data from children to be stored on
+       * the parent cell.
+       */
+      const std::function<value_type(
+        const typename Triangulation<dim, spacedim>::cell_iterator &parent,
+        const std::vector<value_type> &children_values)>
         coarsening_strategy;
 
       /**
@@ -353,4 +409,4 @@ namespace parallel
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif
+#endif /* dealii_distributed_cell_data_transfer_h */

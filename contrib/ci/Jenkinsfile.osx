@@ -54,8 +54,11 @@ pipeline
         stage("check")
         {
           when {
-            allOf {
-              not {branch 'master'}
+            not {
+	      anyOf {
+	        branch 'master'
+	        branch pattern: "dealii-*", comparator: "GLOB"
+	      }
             }
           }
 
@@ -84,15 +87,17 @@ pipeline
         {
           steps
           {
-            timeout(time: 1, unit: 'HOURS')
+            timeout(time: 2, unit: 'HOURS')
             {
               sh "echo \"building on node ${env.NODE_NAME}\""
               sh '''#!/bin/bash
                     set -e
+                    set -x
                     mkdir build && cd build
                     cmake \
                       -D DEAL_II_WITH_MPI=OFF \
                       -D DEAL_II_CXX_FLAGS='-Werror' \
+                      -D DEAL_II_EARLY_DEPRECATIONS=ON \
                       -D CMAKE_BUILD_TYPE=Debug \
                       $WORKSPACE/ && make -j 4
                     make test # quicktests

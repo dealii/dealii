@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2019 by the deal.II authors
+// Copyright (C) 2004 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -61,12 +61,12 @@ gmsh_grid(const char *name_v2, const char *name_v4)
     {
       AssertThrow(cell_v2->material_id() == cell_v4->material_id(),
                   ExcInternalError());
-      for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+      for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
         {
           AssertThrow((cell_v2->vertex(i) - cell_v4->vertex(i)).norm() < 1.e-10,
                       ExcInternalError());
         }
-      for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+      for (const unsigned int i : GeometryInfo<dim>::face_indices())
         {
           AssertThrow(cell_v2->face(i)->boundary_id() ==
                         cell_v4->face(i)->boundary_id(),

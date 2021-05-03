@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2017 - 2018 by the deal.II authors
+ * Copyright (C) 2017 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -20,6 +20,8 @@
 // all required messages in GridTools::exchange_cell_data_to_ghosts.
 
 #include <deal.II/distributed/tria.h>
+
+#include <deal.II/fe/fe_q.h>
 
 #include <deal.II/grid/grid_in.h>
 #include <deal.II/grid/grid_tools.h>
@@ -44,7 +46,7 @@ main(int argc, char *argv[])
     endc = triangulation.end();
   for (; cell != endc; ++cell)
     {
-      for (unsigned int f = 0; f < GeometryInfo<3>::faces_per_cell; ++f)
+      for (const unsigned int f : GeometryInfo<3>::face_indices())
         {
           const Point<3> face_center = cell->face(f)->center();
           if (cell->face(f)->at_boundary())

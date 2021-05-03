@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2018 by the deal.II authors
+// Copyright (C) 2011 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -74,8 +74,8 @@ test()
     Assert(v2.local_element(i) == 1., ExcInternalError());
 
   v2.update_ghost_values();
-  for (unsigned int i = 0; i < v2.local_size() + v2.n_ghost_entries(); ++i)
-    Assert(v2.local_element(i) == 1., ExcInternalError());
+  for (const auto i : locally_relevant_dofs2)
+    Assert(v2(i) == 1., ExcInternalError());
 }
 
 

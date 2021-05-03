@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -56,7 +56,7 @@ dofs(const DoFHandler<dim> &dof)
       indices.resize(cell->get_fe().dofs_per_face);
 
       deallog << "Level " << cell->level() << std::endl;
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+      for (const unsigned int f : GeometryInfo<dim>::face_indices())
         {
           typename DoFHandler<dim>::face_iterator face = cell->face(f);
           face->get_mg_dof_indices(cell->level(), indices);
@@ -88,7 +88,7 @@ check_fe(FiniteElement<dim> &fe)
 
   DoFHandler<dim> mgdof(tr);
   mgdof.distribute_dofs(fe);
-  mgdof.distribute_mg_dofs(fe);
+  mgdof.distribute_mg_dofs();
   dofs(mgdof);
 }
 

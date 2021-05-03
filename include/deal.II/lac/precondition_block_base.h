@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2018 by the deal.II authors
+// Copyright (C) 1999 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -31,10 +31,13 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#ifndef DOXYGEN
 template <typename number>
 class FullMatrix;
 template <typename number>
 class Vector;
+#endif
 
 /**
  * A class storing the inverse diagonal blocks for block preconditioners and
@@ -50,9 +53,6 @@ class Vector;
  * Additionally, it allows the storage of the original diagonal blocks, not
  * only the inverses. These are for instance used in the intermediate step of
  * the SSOR preconditioner.
- *
- * @author Guido Kanschat
- * @date 2010
  */
 template <typename number>
 class PreconditionBlockBase
@@ -478,8 +478,7 @@ PreconditionBlockBase<number>::inverse(size_type i) const
   if (same_diagonal())
     return var_inverse_full[0];
 
-  Assert(i < var_inverse_full.size(),
-         ExcIndexRange(i, 0, var_inverse_full.size()));
+  AssertIndexRange(i, var_inverse_full.size());
   return var_inverse_full[i];
 }
 
@@ -517,7 +516,7 @@ PreconditionBlockBase<number>::diagonal(size_type i) const
   if (same_diagonal())
     return var_diagonal[0];
 
-  Assert(i < var_diagonal.size(), ExcIndexRange(i, 0, var_diagonal.size()));
+  AssertIndexRange(i, var_diagonal.size());
   return var_diagonal[i];
 }
 
@@ -531,8 +530,7 @@ PreconditionBlockBase<number>::inverse(size_type i)
   if (same_diagonal())
     return var_inverse_full[0];
 
-  Assert(i < var_inverse_full.size(),
-         ExcIndexRange(i, 0, var_inverse_full.size()));
+  AssertIndexRange(i, var_inverse_full.size());
   return var_inverse_full[i];
 }
 
@@ -574,7 +572,7 @@ PreconditionBlockBase<number>::diagonal(size_type i)
   if (same_diagonal())
     return var_diagonal[0];
 
-  Assert(i < var_diagonal.size(), ExcIndexRange(i, 0, var_diagonal.size()));
+  AssertIndexRange(i, var_diagonal.size());
   return var_diagonal[i];
 }
 

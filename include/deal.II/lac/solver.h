@@ -28,8 +28,11 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declaration
+#ifndef DOXYGEN
 template <typename number>
 class Vector;
+#endif
 
 /**
  * A base class for iterative linear solvers. This class provides interfaces
@@ -80,6 +83,9 @@ class Vector;
  * class Vector
  * {
  *   public:
+ *     // Define value type of the entries
+ *     using value_type = double;
+ *
  *     // Resize the current object to have the same size and layout as
  *     // the model_vector argument provided. The second argument
  *     // indicates whether to clear the current object after resizing.
@@ -89,6 +95,13 @@ class Vector;
  *
  *     // Inner product between the current object and the argument.
  *     double operator * (const Vector &v) const;
+ *
+ *     // Set all the vector entries to a constant scalar.
+ *     Vector & operator = (const double a);
+ *
+ *     // Deep copy of the vector.
+ *     // Important if Vector contains pointers to data to duplicate data.
+ *     Vector & operator = (const Vector &x);
  *
  *     // Addition of vectors
  *     void add (const Vector &x);
@@ -203,18 +216,18 @@ class Vector;
  * In the language of signals, the functions called are called <i>slots</i>
  * and one can attach any number of slots to a signal. (The implementation of
  * signals and slots we use here is the one from the BOOST.signals2 library.)
- * A number of details may clarify what is happening underneath: - In reality,
- * the signal object does not store pointers to functions, but function
- * objects as slots. Each slot must conform to a particular signature: here,
- * it is an object that can be called with three arguments (the number of the
- * current linear iteration, the current residual, and the current iterate;
+ * A number of details may clarify what is happening underneath:
+ * - In reality, the signal object does not store pointers to functions, but
+ * function objects as slots. Each slot must conform to a particular signature:
+ * here, it is an object that can be called with three arguments (the number of
+ * the current linear iteration, the current residual, and the current iterate;
  * more specifics are discussed in the documentation of the connect()
  * function). A pointer to a function with this argument list satisfies the
  * requirements, but you can also pass a member function whose
- * <code>this</code> argument has been bound using the
- * <code>std::bind</code> mechanism (see the example below). - Each of
- * the slots will return a value that indicates whether the iteration should
- * continue, should stop because it has succeeded, or stop because it has
+ * <code>this</code> argument has been bound using a lambda function
+ * (see the example below).
+ * - Each of the slots will return a value that indicates whether the iteration
+ * should continue, should stop because it has succeeded, or stop because it has
  * failed. The return type of slots is therefore of type SolverControl::State.
  * The returned values from all of the slots will then have to be combined
  * before they are returned to the iterative solver that invoked the signal.
@@ -223,7 +236,8 @@ class Vector;
  * otherwise, if at least one slot returned SolverControl::iterate, then this
  * is going to be the return value of the signal; finally, only if all slots
  * return SolverControl::success will the signal's return value be
- * SolverControl::success. - It may of course be that a particular slot has
+ * SolverControl::success.
+ * - It may of course be that a particular slot has
  * been connected to the signal only to observe how the solution or a specific
  * part of it converges, but has no particular opinion on whether the
  * iteration should continue or not. In such cases, the slot should just
@@ -280,16 +294,17 @@ class Vector;
  *   SolverControl           solver_control (1000, 1e-12);
  *   SolverCG<>              solver (solver_control);
  *
- *   solver.connect (std::bind (&Step3::write_intermediate_solution,
- *                              this,
- *                              std::placeholders::_1,
- *                              std::placeholders::_2,
- *                              std::placeholders::_3));
+ *   solver.connect ([this](const unsigned int iteration,
+ *                          const double check_value,
+ *                          const Vector<double> *current_iterate){
+ *                     this->write_intermediate_solution(
+ *                       iteration, check_value, current_iterate);
+ *                   });
  *   solver.solve (system_matrix, solution, system_rhs,
  *                 PreconditionIdentity());
  * }
  * @endcode
- * The use of <code>std::bind</code> here ensures that we convert the
+ * The use of a lambda function here ensures that we convert the
  * member function with its three arguments plus the <code>this</code>
  * pointer, to a function that only takes three arguments, by fixing the
  * implicit <code>this</code> argument of the function to the
@@ -321,8 +336,6 @@ class Vector;
  * </td> </tr> </table>
  *
  * @ingroup Solvers
- * @author Wolfgang Bangerth, Guido Kanschat, Ralf Hartmann, 1997-2001, 2005,
- * 2014
  */
 template <class VectorType = Vector<double>>
 class SolverBase : public Subscriptor
@@ -460,17 +473,6 @@ protected:
 
 
 
-/**
- * Type definition for the base class for iterative linear solvers.
- * This class provides interfaces to a memory pool and the objects that
- * determine whether a solver has converged.
- *
- * @deprecated Use <code>SolverBase</code> instead.
- */
-template <class VectorType = Vector<double>>
-using Solver DEAL_II_DEPRECATED = SolverBase<VectorType>;
-
-
 /*-------------------------------- Inline functions ------------------------*/
 
 
@@ -520,10 +522,11 @@ inline SolverBase<VectorType>::SolverBase(
   // only takes two arguments, the iteration and the check_value, and so
   // we simply ignore the third argument that is passed in whenever the
   // signal is executed
-  connect(std::bind(&SolverControl::check,
-                    std::ref(solver_control),
-                    std::placeholders::_1,
-                    std::placeholders::_2));
+  connect([&solver_control](const unsigned int iteration,
+                            const double       check_value,
+                            const VectorType &) {
+    return solver_control.check(iteration, check_value);
+  });
 }
 
 
@@ -537,10 +540,11 @@ inline SolverBase<VectorType>::SolverBase(SolverControl &solver_control)
   // only takes two arguments, the iteration and the check_value, and so
   // we simply ignore the third argument that is passed in whenever the
   // signal is executed
-  connect(std::bind(&SolverControl::check,
-                    std::ref(solver_control),
-                    std::placeholders::_1,
-                    std::placeholders::_2));
+  connect([&solver_control](const unsigned int iteration,
+                            const double       check_value,
+                            const VectorType &) {
+    return solver_control.check(iteration, check_value);
+  });
 }
 
 

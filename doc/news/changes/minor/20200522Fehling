@@ -1,0 +1,3 @@
+Bugfix: hp::Refinement::choose_p_over_h() now works in parallel.
+<br>
+(Marc Fehling, 2020/05/22)

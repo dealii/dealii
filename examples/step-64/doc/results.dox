@@ -1,7 +1,8 @@
 <h1>Results</h1>
 
 Since the main purpose of this tutorial is to demonstrate how to use the
-CUDAWrappers::MatrixFree interface, we just show the expected output here:
+CUDAWrappers::MatrixFree interface, not to compute anything useful in
+itself, we just show the expected output here:
 @code
 Cycle 0
    Number of active cells:       8
@@ -28,11 +29,26 @@ Cycle 3
   solution norm: 0.0205261
 @endcode
 
-<a name="extensions"></a>
-<h3> Possible extensions </h3>
+One can make two observations here: First, the norm of the numerical solution
+converges, presumably to the norm of the exact (but unknown)
+solution. And second, the number of iterations roughly doubles with
+each refinement of the mesh. (This is in keeping with the expectation
+that the number of CG iterations grows with the square root of the
+condition number of the matrix; and that we know that the condition
+number of the matrix of a second-order differential operation grows
+like ${\cal O}(h^{-2})$.) This is of course rather inefficient, as an
+optimal solver would have a number of iterations that is independent
+of the size of the problem. But having such a solver would require
+using a better preconditioner than the identity matrix we have used here.
 
-Currently, there is no preconditioner used at all. This is mainly since 
-constructing an efficient matrix-free preconditioner is non-trivial.
-However, simple choices just requiring the diagonal of the corresponding matrix
-are good candidates. In particular, one could extend the tutorial to use multigrid 
-with Chebyshev smoothers similar to step-37.
+
+<a name="extensions"></a>
+<h3> Possibilities for extensions </h3>
+
+Currently, this program uses no preconditioner at all. This is mainly
+since constructing an efficient matrix-free preconditioner is
+non-trivial.  However, simple choices just requiring the diagonal of
+the corresponding matrix are good candidates and these can be computed
+in a matrix-free way as well. Alternatively, and maybe even better,
+one could extend the tutorial to use multigrid with Chebyshev
+smoothers similar to step-37.

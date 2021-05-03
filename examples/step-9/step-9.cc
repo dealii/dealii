@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2000 - 2018 by the deal.II authors
+ * Copyright (C) 2000 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -33,10 +33,7 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_refinement.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/numerics/vector_tools.h>
@@ -609,7 +606,7 @@ namespace Step9
     AssemblyCopyData &                                    copy_data)
   {
     // We define some abbreviations to avoid unnecessarily long lines:
-    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
     const unsigned int n_q_points =
       scratch_data.fe_values.get_quadrature().size();
     const unsigned int n_face_q_points =
@@ -675,15 +672,14 @@ namespace Step9
     // the direction of flow at this point; we obtain this information
     // using the FEFaceValues object and only decide within the main loop
     // whether a quadrature point is on the inflow boundary.
-    for (unsigned int face_n = 0; face_n < GeometryInfo<dim>::faces_per_cell;
-         ++face_n)
-      if (cell->face(face_n)->at_boundary())
+    for (const auto &face : cell->face_iterators())
+      if (face->at_boundary())
         {
           // Ok, this face of the present cell is on the boundary of the
           // domain. Just as for the usual FEValues object which we have
           // used in previous examples and also above, we have to
           // reinitialize the FEFaceValues object for the present face:
-          scratch_data.fe_face_values.reinit(cell, face_n);
+          scratch_data.fe_face_values.reinit(cell, face);
 
           // For the quadrature points at hand, we ask for the values of
           // the inflow function and for the direction of flow:
@@ -766,11 +762,11 @@ namespace Step9
   template <int dim>
   void AdvectionProblem<dim>::solve()
   {
-    SolverControl        solver_control(std::max<std::size_t>(1000,
+    SolverControl               solver_control(std::max<std::size_t>(1000,
                                                        system_rhs.size() / 10),
                                  1e-10 * system_rhs.l2_norm());
-    SolverGMRES<>        solver(solver_control);
-    PreconditionJacobi<> preconditioner;
+    SolverGMRES<Vector<double>> solver(solver_control);
+    PreconditionJacobi<SparseMatrix<double>> preconditioner;
     preconditioner.initialize(system_matrix, 1.0);
     solver.solve(system_matrix, solution, system_rhs, preconditioner);
 
@@ -955,7 +951,7 @@ namespace Step9
     WorkStream::run(dof_handler.begin_active(),
                     dof_handler.end(),
                     &GradientEstimation::template estimate_cell<dim>,
-                    [](const EstimateCopyData &) {},
+                    std::function<void(const EstimateCopyData &)>(),
                     EstimateScratchData<dim>(dof_handler.get_fe(),
                                              solution,
                                              error_per_cell),
@@ -1044,8 +1040,7 @@ namespace Step9
     // have to clear the array storing the iterators to the active
     // neighbors, of course.
     scratch_data.active_neighbors.clear();
-    for (unsigned int face_n = 0; face_n < GeometryInfo<dim>::faces_per_cell;
-         ++face_n)
+    for (const auto face_n : cell->face_indices())
       if (!cell->at_boundary(face_n))
         {
           // First define an abbreviation for the iterator to the face and
@@ -1056,7 +1051,7 @@ namespace Step9
           // Then check whether the neighbor is active. If it is, then it
           // is on the same level or one level coarser (if we are not in
           // 1D), and we are interested in it in any case.
-          if (neighbor->active())
+          if (neighbor->is_active())
             scratch_data.active_neighbors.push_back(neighbor);
           else
             {

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -31,7 +31,6 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
 
 template <int dim, int fe_degree, typename number>
 class MatrixFreeTest
@@ -82,16 +81,14 @@ private:
         check.reinit(face);
 
         ref.read_dof_values(src);
-        ref.evaluate(true, false);
-        check.gather_evaluate(src, true, false);
+        ref.evaluate(EvaluationFlags::values);
+        check.gather_evaluate(src, EvaluationFlags::values);
 
         for (unsigned int q = 0; q < ref.n_q_points; ++q)
           {
             VectorizedArray<number> diff =
               (ref.get_value(q) - check.get_value(q));
-            for (unsigned int v = 0;
-                 v < VectorizedArray<number>::n_array_elements;
-                 ++v)
+            for (unsigned int v = 0; v < VectorizedArray<number>::size(); ++v)
               {
                 if (std::abs(diff[v]) > 1e-12)
                   {
@@ -132,16 +129,14 @@ private:
         checkr.reinit(face);
 
         refr.read_dof_values(src);
-        refr.evaluate(true, false);
-        checkr.gather_evaluate(src, true, false);
+        refr.evaluate(EvaluationFlags::values);
+        checkr.gather_evaluate(src, EvaluationFlags::values);
 
         for (unsigned int q = 0; q < ref.n_q_points; ++q)
           {
             VectorizedArray<number> diff =
               (refr.get_value(q) - checkr.get_value(q));
-            for (unsigned int v = 0;
-                 v < VectorizedArray<number>::n_array_elements;
-                 ++v)
+            for (unsigned int v = 0; v < VectorizedArray<number>::size(); ++v)
               {
                 if (std::abs(diff[v]) > 1e-12)
                   {
@@ -213,7 +208,7 @@ test()
   AffineConstraints<double> constraints;
   constraints.close();
 
-  typedef double number;
+  using number = double;
 
   MatrixFree<dim, number> mf_data;
   {

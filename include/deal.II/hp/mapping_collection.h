@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,6 +22,8 @@
 
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/mapping_q1.h>
+
+#include <deal.II/hp/collection.h>
 
 #include <memory>
 #include <vector>
@@ -49,11 +51,9 @@ namespace hp
    * for the rules which mapping will be selected for a given cell.
    *
    * @ingroup hp hpcollection
-   *
-   * @author Oliver Kayser-Herold, 2005
    */
   template <int dim, int spacedim = dim>
-  class MappingCollection : public Subscriptor
+  class MappingCollection : public Collection<Mapping<dim, spacedim>>
   {
   public:
     /**
@@ -77,6 +77,15 @@ namespace hp
       const MappingCollection<dim, spacedim> &mapping_collection);
 
     /**
+     * Constructor. This constructor creates a MappingCollection from one or
+     * more mapping objects passed to the constructor. For this
+     * call to be valid, all arguments need to be of types derived
+     * from class Mapping<dim,spacedim>.
+     */
+    template <class... MappingTypes>
+    explicit MappingCollection(const MappingTypes &... mappings);
+
+    /**
      * Add a new mapping to the MappingCollection. Generally, you will
      * want to use the same order for mappings as for the elements of
      * the hp::FECollection object you use. However, the same
@@ -90,35 +99,6 @@ namespace hp
      */
     void
     push_back(const Mapping<dim, spacedim> &new_mapping);
-
-    /**
-     * Return the mapping object which was specified by the user for the
-     * active_fe_index which is provided as a parameter to this method.
-     *
-     * @pre @p index must be between zero and the number of elements of the
-     * collection.
-     */
-    const Mapping<dim, spacedim> &operator[](const unsigned int index) const;
-
-    /**
-     * Return the number of mapping objects stored in this container.
-     */
-    unsigned int
-    size() const;
-
-    /**
-     * Determine an estimate for the memory consumption (in bytes) of this
-     * object.
-     */
-    std::size_t
-    memory_consumption() const;
-
-  private:
-    /**
-     * The real container, which stores pointers to the different Mapping
-     * objects.
-     */
-    std::vector<std::shared_ptr<const Mapping<dim, spacedim>>> mappings;
   };
 
 
@@ -152,20 +132,22 @@ namespace hp
   /* --------------- inline functions ------------------- */
 
   template <int dim, int spacedim>
-  inline unsigned int
-  MappingCollection<dim, spacedim>::size() const
+  template <class... MappingTypes>
+  MappingCollection<dim, spacedim>::MappingCollection(
+    const MappingTypes &... mappings)
   {
-    return mappings.size();
-  }
+    static_assert(
+      is_base_of_all<Mapping<dim, spacedim>, MappingTypes...>::value,
+      "Not all of the input arguments of this function "
+      "are derived from FiniteElement<dim,spacedim>!");
 
-
-
-  template <int dim, int spacedim>
-  inline const Mapping<dim, spacedim> &MappingCollection<dim, spacedim>::
-                                       operator[](const unsigned int index) const
-  {
-    Assert(index < mappings.size(), ExcIndexRange(index, 0, mappings.size()));
-    return *mappings[index];
+    // loop over all of the given arguments and add the mappings to
+    // this collection. Inlining the definition of mapping_pointers causes
+    // internal compiler errors on GCC 7.1.1 so we define it separately:
+    const auto mapping_pointers = {
+      (static_cast<const Mapping<dim, spacedim> *>(&mappings))...};
+    for (const auto p : mapping_pointers)
+      push_back(*p);
   }
 
 } // namespace hp

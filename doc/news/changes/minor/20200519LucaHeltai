@@ -1,0 +1,4 @@
+New: A new BoundingBoxDataOut class is available, to output a collection
+of objects that can be converted to BoundingBox objects in graphical format.
+<br>
+(Luca Heltai, 2020/05/19)

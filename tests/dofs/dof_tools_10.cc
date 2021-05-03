@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,6 +17,7 @@
 #include <deal.II/fe/mapping_q.h>
 
 #include "../tests.h"
+
 #include "dof_tools_common.h"
 
 // check
@@ -30,7 +31,7 @@ template <int dim>
 void
 check_this(const DoFHandler<dim> &dof_handler)
 {
-  // don't check if fe has no support
+  // don't check if FE has no support
   // points
   if (dof_handler.get_fe().get_unit_support_points().size() == 0)
     return;

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -31,6 +31,7 @@
 #include <deal.II/grid/tria_iterator.h>
 
 #include "../tests.h"
+
 #include "coarse_grid_common.h"
 
 

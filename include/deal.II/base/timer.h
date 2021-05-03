@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -114,7 +114,6 @@ struct CPUClock
  * exceed the wall times.
  *
  * @ingroup utilities
- * @author G. Kanschat, W. Bangerth, M. Kronbichler, D. Wells
  */
 class Timer
 {
@@ -138,19 +137,7 @@ public:
    * communicator occurs; the extra cost of the synchronization is not
    * measured.
    */
-  Timer(MPI_Comm mpi_communicator, const bool sync_lap_times = false);
-
-  /**
-   * Return a reference to the data structure with global timing information
-   * for the last lap. This structure does not contain meaningful values until
-   * Timer::stop() has been called.
-   *
-   * @deprecated Use Timer::get_last_lap_wall_time_data() instead, which
-   * returns a reference to the same structure.
-   */
-  DEAL_II_DEPRECATED
-  const Utilities::MPI::MinMaxAvg &
-  get_data() const;
+  Timer(const MPI_Comm &mpi_communicator, const bool sync_lap_times = false);
 
   /**
    * Return a reference to the data structure containing basic statistics on
@@ -166,33 +153,9 @@ public:
    * the accumulated wall time measured across all MPI processes in the given
    * communicator. This structure does not contain meaningful values until
    * Timer::stop() has been called.
-   *
-   * @deprecated Use Timer::get_accumulated_wall_time_data() instead, which
-   * returns a reference the same structure.
-   */
-  DEAL_II_DEPRECATED
-  const Utilities::MPI::MinMaxAvg &
-  get_total_data() const;
-
-  /**
-   * Return a reference to the data structure containing basic statistics on
-   * the accumulated wall time measured across all MPI processes in the given
-   * communicator. This structure does not contain meaningful values until
-   * Timer::stop() has been called.
    */
   const Utilities::MPI::MinMaxAvg &
   get_accumulated_wall_time_data() const;
-
-  /**
-   * Prints the data returned by get_data(), i.e. for the last lap,
-   * to the given stream.
-   *
-   * @deprecated Use Timer::print_last_lap_wall_time_data() instead, which
-   * prints the same information.
-   */
-  template <class StreamType>
-  DEAL_II_DEPRECATED void
-  print_data(StreamType &stream) const;
 
   /**
    * Print the data returned by Timer::get_last_lap_wall_time_data() to the
@@ -201,17 +164,6 @@ public:
   template <class StreamType>
   void
   print_last_lap_wall_time_data(StreamType &stream) const;
-
-  /**
-   * Prints the data returned by get_total_data(), i.e. for the total run,
-   * to the given stream.
-   *
-   * @deprecated Use Timer::print_accumulated_wall_time_data() instead, which
-   * prints the same information.
-   */
-  template <class StreamType>
-  DEAL_II_DEPRECATED void
-  print_total_data(StreamType &stream) const;
 
   /**
    * Print the data returned by Timer::get_accumulated_wall_time_data() to the
@@ -254,16 +206,6 @@ public:
   restart();
 
   /**
-   * Access to the current CPU time without stopping the timer. The elapsed
-   * time is returned in units of seconds.
-   *
-   * @deprecated Use cpu_time() instead.
-   */
-  DEAL_II_DEPRECATED
-  double
-  operator()() const;
-
-  /**
    * Return the current accumulated wall time (including the current lap, if
    * the timer is running) in seconds without stopping the timer.
    */
@@ -294,15 +236,6 @@ public:
    */
   double
   last_cpu_time() const;
-
-  /**
-   * Return the wall time taken between the last start()/stop() call.
-   *
-   * @deprecated Use last_wall_time() instead.
-   */
-  DEAL_II_DEPRECATED
-  double
-  get_lap_time() const;
 
 private:
   /**
@@ -558,7 +491,7 @@ private:
  * do with the run time of the section on other processors but instead with
  * the run time of <i>the previous section</i> on another processor.
  *
- * The usual way to avoid this is to introduce a barrier into the parallel
+ * The first way to avoid this is to introduce a barrier into the parallel
  * code just before we start and stop timing sections. This ensures that all
  * processes are at the same place and the timing information then reflects
  * the maximal run time across all processors. To achieve this, you need to
@@ -574,8 +507,39 @@ private:
  * sure that we only generate output on a single processor. See the step-32,
  * step-40, and step-42 tutorial programs for this kind of usage of this class.
  *
+ * The second variant to cope with this issue is print more information about
+ * the recorded times to be able to understand this kind of imbalances without
+ * actually adding the barriers. While this approach is still affected by
+ * imbalances between different MPI processes, its output is not the arbitrary
+ * time of rank 0, but the minimum, average and maximum of the MPI results,
+ * using information from Utilities::MPI::MinMaxAvg. As the data is also
+ * equipped with the rank id where the minimum and maximum are attained, this
+ * approach allows to identify on which ranks certain slowdowns occur. In case
+ * some imbalance between the MPI ranks from one section to the next can be
+ * tolerated, this strategy can hence be advantageous over the barrier variant
+ * as it does not synchronize the program in places where it is not necessary,
+ * and rather tries to display the imbalance observed in various phases. In
+ * order to use this variant initialize the output object without any native
+ * print settings and without communicator,
+ * @code
+ *   TimerOutput timer (pcout,
+ *                      TimerOutput::never,
+ *                      TimerOutput::wall_times);
+ * @endcode
+ * and then call
+ * @code
+ *   timer.print_wall_time_statistics(MPI_COMM_WORLD);
+ * @endcode
+ * where appropriate. Here, the output is written to the <code>pcout</code>
+ * object of type ConditionalOStream passed to the constructor, making sure
+ * the information is only printed once. See step-67 for an example usage of
+ * this variant. Besides the basic minimum, average, and maximum of times over
+ * all MPI ranks, the TimerOutput::print_wall_time_statistics() function also
+ * takes a second argument to specify output of quantiles, e.g., the time
+ * taken by the 10\% of the slowest and fastest ranks, respectively, to get
+ * additional insight into the statistical distribution.
+ *
  * @ingroup utilities
- * @author M. Kronbichler, 2009.
  */
 class TimerOutput
 {
@@ -742,7 +706,7 @@ public:
    * <code>MPI_Barrier</code> call before starting and stopping the timer for
    * each section.
    */
-  TimerOutput(MPI_Comm              mpi_comm,
+  TimerOutput(const MPI_Comm &      mpi_comm,
               std::ostream &        stream,
               const OutputFrequency output_frequency,
               const OutputType      output_type);
@@ -770,7 +734,7 @@ public:
    * <code>MPI_Barrier</code> call before starting and stopping the timer for
    * each section.)
    */
-  TimerOutput(MPI_Comm              mpi_comm,
+  TimerOutput(const MPI_Comm &      mpi_comm,
               ConditionalOStream &  stream,
               const OutputFrequency output_frequency,
               const OutputType      output_type);
@@ -790,12 +754,11 @@ public:
 
   /**
    * Same as @p enter_subsection.
+   *
+   * @deprecated Use enter_subsection() instead.
    */
-  void
+  DEAL_II_DEPRECATED void
   enter_section(const std::string &section_name);
-
-  // TODO: make some of these functions DEPRECATED (I would keep
-  // enter/exit_section)
 
   /**
    * Leave a section. If no name is given, the last section that was entered
@@ -806,8 +769,10 @@ public:
 
   /**
    * Same as @p leave_subsection.
+   *
+   * @deprecated Use leave_subsection() instead.
    */
-  void
+  DEAL_II_DEPRECATED void
   exit_section(const std::string &section_name = "");
 
   /**
@@ -822,6 +787,27 @@ public:
    */
   void
   print_summary() const;
+
+  /**
+   * Print a formatted table that summarizes the wall time consumed in the
+   * various sections, using statistics in terms of the minimum, average, and
+   * maximum of times in the various sections and the MPI ranks where the
+   * minimum and maximum are attained. Note that this call only provides
+   * useful information when the TimerOutput object is constructed without an
+   * MPI_Comm argument, to let individual sections run without being disturbed
+   * by barriers.
+   *
+   * The optional argument `quantile` allows to add two additional columns to
+   * the output in terms of the distribution of run times. If quantile = 0.1,
+   * the value and rank of the 10% lowest data is printed as well as the value
+   * and rank at 90% of the distribution function, in addition to the minimum
+   * and the maximum. The value of `quantile` needs to be between 0 (no
+   * quantiles are printed besides the minimum and maximum) and 0.5 (when the
+   * median is given).
+   */
+  void
+  print_wall_time_statistics(const MPI_Comm &mpi_comm,
+                             const double    print_quantile = 0.) const;
 
   /**
    * By calling this function, all output can be disabled. This function
@@ -928,14 +914,6 @@ Timer::restart()
 
 
 inline const Utilities::MPI::MinMaxAvg &
-Timer::get_data() const
-{
-  return last_lap_wall_time_data;
-}
-
-
-
-inline const Utilities::MPI::MinMaxAvg &
 Timer::get_last_lap_wall_time_data() const
 {
   return last_lap_wall_time_data;
@@ -944,26 +922,9 @@ Timer::get_last_lap_wall_time_data() const
 
 
 inline const Utilities::MPI::MinMaxAvg &
-Timer::get_total_data() const
-{
-  return accumulated_wall_time_data;
-}
-
-
-
-inline const Utilities::MPI::MinMaxAvg &
 Timer::get_accumulated_wall_time_data() const
 {
   return accumulated_wall_time_data;
-}
-
-
-
-template <class StreamType>
-inline void
-Timer::print_data(StreamType &stream) const
-{
-  print_last_lap_wall_time_data(stream);
 }
 
 
@@ -982,18 +943,9 @@ Timer::print_last_lap_wall_time_data(StreamType &stream) const
 
 template <class StreamType>
 inline void
-Timer::print_total_data(StreamType &stream) const
-{
-  print_accumulated_wall_time_data(stream);
-}
-
-
-
-template <class StreamType>
-inline void
 Timer::print_accumulated_wall_time_data(StreamType &stream) const
 {
-  const Utilities::MPI::MinMaxAvg statistic = get_accumulated_wall_time_data();
+  const Utilities::MPI::MinMaxAvg &statistic = get_accumulated_wall_time_data();
   stream << statistic.max << " wall,"
          << " max @" << statistic.max_index << ", min=" << statistic.min << " @"
          << statistic.min_index << ", avg=" << statistic.avg << std::endl;
@@ -1021,7 +973,7 @@ inline TimerOutput::Scope::Scope(dealii::TimerOutput &timer_,
   , section_name(section_name_)
   , in(true)
 {
-  timer.enter_section(section_name);
+  timer.enter_subsection(section_name);
 }
 
 
@@ -1033,7 +985,7 @@ TimerOutput::Scope::stop()
     return;
   in = false;
 
-  timer.exit_section(section_name);
+  timer.leave_subsection(section_name);
 }
 
 

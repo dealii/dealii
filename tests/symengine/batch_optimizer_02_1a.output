@@ -1,0 +1,6 @@
+
+DEAL:Scalar:Float::OK
+DEAL:Scalar:Double::OK
+DEAL:Tensor:Float::OK
+DEAL:Tensor:Double::OK
+DEAL::OK

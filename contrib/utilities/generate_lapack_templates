@@ -23,6 +23,7 @@ disabled then also add them to lapack_templates_data/fp_exceptions.
 
 import argparse
 import glob
+import os
 import os.path as osp
 import re
 import sys
@@ -226,6 +227,9 @@ class FortranRoutine:
     self.general_name : string containing the general name (i.e., name without
     field code) of the subroutine or function.
 
+    self.macro_name : string containing a macro that will expand to the correct
+    symbol name.
+
     self.arguments_by_type : A dictionary (with regular expression keys) mapping
     regular expressions matching FORTRAN types to input arguments.
     """
@@ -252,6 +256,15 @@ class FortranRoutine:
 
         self.field_code = name[0].lower()
         self.general_name = name[1:].strip().lower()
+
+        # we need a different macro for mangling FORTRAN names with underscores:
+        fortran_name = self.field_code + self.general_name
+        if "_" in fortran_name:
+            self.macro_name = "DEAL_II_FORTRAN_MANGLE_UNDERSCORE({}, {})".format(
+                fortran_name, fortran_name.upper())
+        else:
+            self.macro_name = "DEAL_II_FORTRAN_MANGLE({}, {})".format(
+                fortran_name, fortran_name.upper())
 
         self.arguments_by_type = dict()
         self.arguments_by_type[re.compile("CHARACTER")] = list()
@@ -300,8 +313,9 @@ class FortranRoutine:
         """Print a deal.II-compatible function prototype.
         """
         print("", file=file)
-        print("{} {}{}_(".format(self.return_type, self.field_code, self.general_name),
-              end='', file=file)
+
+        print(self.return_type, self.macro_name, "(",
+              sep=os.linesep, end='', file=file)
         for index, argument in enumerate(self.arguments):
             found_type = False
             if argument in self.const_arguments:
@@ -451,7 +465,7 @@ class FortranRoutine:
             print("  ", end='', file=file)
         else:
             print("  return ", end='', file=file)
-        print("{}{}_(".format(self.field_code, self.general_name), end='', file=file)
+        print(self.macro_name + "(", end='', file=file)
         for index, argument in enumerate(self.arguments):
             print(argument.lower(), end='', file=file)
 
@@ -556,7 +570,7 @@ def main():
                     guard_fp = routine_name in fp_guarded_subroutines
                     routines.append(FortranRoutine(file_name, guard_fp))
                 except NotImplementedError:
-                    # not a lot we can do. If its in the whitelist we will fail
+                    # Not a lot we can do. If its in the allowed list we will fail
                     # again later anyway
                     continue
             routines.sort(key=lambda u: u.general_name)
@@ -602,9 +616,9 @@ def main():
               file=output)
         print("// version 2.1 of the License, or (at your option) any later version.",
               file=output)
-        print("// The full text of the license can be found in the file LICENSE at",
+        print("// The full text of the license can be found in the file LICENSE.md at",
               file=output)
-        print("// the top level of the deal.II distribution.",
+        print("// the top level directory of deal.II.",
               file=output)
         print("//",
               file=output)

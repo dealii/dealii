@@ -1,0 +1,209 @@
+<h1>Results</h1>
+
+Running the code results in screen output like the following:
+```
+Number of active cells: 4096
+Number of degrees of freedom: 16641
+
+Time step 1 at t=0
+Time step 2 at t=0.00390625
+Time step 3 at t=0.0078125
+Time step 4 at t=0.0117188
+[...]
+```
+Running the program also yields a good number of output files that we will
+visualize in the following.
+
+
+<h3>Visualizing the solution</h3>
+
+The `output_results()` function of this program generates output files that
+consist of a number of variables: The solution (split into its real and imaginary
+parts), the amplitude, and the phase. If we visualize these four fields, we get
+images like the following after a few time steps (at time $t=0.242$, to be
+precise:
+
+<div class="twocolumn" style="width: 80%">
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step-58.re.png"
+         alt="Real part of the solution at t=0.242"
+         width="400">
+  </div>
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step-58.im.png"
+         alt="Imaginary part of the solution at t=0.242"
+         width="400">
+  </div>
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step-58.magnitude.png"
+         alt="Amplitude of the solution at t=0.242"
+         width="400">
+  </div>
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step-58.phase.png"
+         alt="Phase of the solution at t=0.242"
+         width="400">
+  </div>
+</div>
+
+While the real and imaginary parts of the solution shown above are not
+particularly interesting (because, from a physical perspective, the
+global offset of the phase and therefore the balance between real and
+imaginary components, is meaningless), it is much more interesting to
+visualize the amplitude $|\psi(\mathbf x,t)|^2$ and phase
+$\text{arg}(\psi(\mathbf x,t))$ of the solution and, in particular,
+their evolution. This leads to pictures like the following:
+
+The phase picture shown here clearly has some flaws:
+- First, phase is a "cyclic quantity", but the color scale uses a
+  fundamentally different color for values close to $-\pi$ than
+  for values close to $+\pi$. This is a nuisance -- what we need
+  is a "cyclic color map" that uses the same colors for the two
+  extremes of the range of the phase. Such color maps exist,
+  see <a href="https://nicoguaro.github.io/posts/cyclic_colormaps/">this
+  blog post of Nicolás Guarín-Zapata</a> or
+  <a href="https://stackoverflow.com/questions/23712207/cyclic-colormap-without-visual-distortions-for-use-in-phase-angle-plots">this
+  StackExchange post</a>, for example. The problem is that the
+  author's favorite
+  one of the two big visualization packages, VisIt, does not have any
+  of these color maps built in. In an act of desperation, I therefore
+  had to resort to using Paraview given that it has several of the
+  color maps mentioned in the post above implemented. The picture
+  below uses the `nic_Edge` map in which both of the extreme values are shown
+  as black.
+- There is a problem on cells in which the phase wraps around. If
+  at some evaluation point of the cell the phase value is close to
+  $-\pi$ and at another evaluation point it is close to $+\pi$, then
+  what we would really like to happen is for the entire cell to have a
+  color close to the extremes. But, instead, visualization programs
+  produce a linear interpolation in which the values within the cell,
+  i.e., between the evaluation points, is linearly interpolated between
+  these two values, covering essentially the entire range of possible
+  phase values and, consequently, cycling through the entire
+  rainbow of colors from dark red to dark green over the course of
+  one cell. The solution to this problem is to just output
+  the phase value on each cell as a piecewise constant. Because
+  averaging values close to the $-\pi$ and $+\pi$ is going to
+  result in an average that has nothing to do with the actual phase
+  angle, the `ComplexPhase` class just uses the *maximal* phase
+  angle encountered on each cell.
+
+With these modifications, the phase plot now looks as follows:
+
+<p align="center">
+  <img src="https://www.dealii.org/images/steps/developer/step-58.phase-cyclic.png"
+         alt="Phase of the solution at t=0.242, with a cyclic color map"
+         width="400">
+</p>
+
+Finally, we can generate a movie out of this. (To be precise, the video
+uses two more global refinement cycles and a time step half the size
+of what is used in the program above.) The author of these lines
+made the movie with VisIt,
+because that's what he's more familiar with, and using a hacked color map
+that is also cyclic -- though this color map lacks all of the skill employed by
+the people who wrote the posts mentioned in the links above. It
+does, however, show the character of the solution as a wave equation
+if you look at the shaded part of the domain outside the circle of
+radius 0.7 in which the potential is zero -- you can see how every time
+one of the bumps (showing the amplitude $|\psi_h(\mathbf x,t)|^2$)
+bumps into the area where the potential is large: a wave travels
+outbound from there. Take a look at the video:
+
+@htmlonly
+<p align="center">
+  <iframe width="560" height="315" src="https://www.youtube.com/embed/nraszP3GZHk"
+   frameborder="0"
+   allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+   allowfullscreen></iframe>
+ </p>
+@endhtmlonly
+
+So why did I end up shading the area where the potential $V(\mathbf x)$ is
+large? In that outside region, the solution is relatively small. It is also
+relatively smooth. As a consequence, to some approximate degree, the
+equation in that region simplifies to
+@f[
+  - i \frac{\partial \psi}{\partial t}
+  + V \psi
+  \approx 0,
+@f]
+or maybe easier to read:
+@f[
+  \frac{\partial \psi}{\partial t}
+  \approx - i V \psi.
+@f]
+To the degree to which this approximation is valid (which, among other things,
+eliminates the traveling waves you can see in the video), this equation has
+a solution
+@f[
+  \psi(\mathbf x, t) = \psi(\mathbf x, 0) e^{-i V t}.
+@f]
+Because $V$ is large, this means that the phase *rotates quite rapidly*.
+If you focus on the semi-transparent outer part of the domain, you can
+see that. If one colors this region in the same way as the inner part of
+the domain, this rapidly flashing outer part may be psychedelic, but is also
+distracting of what's happening on the inside; it's also quite hard to
+actually see the radiating waves that are easy to see at the beginning
+of the video.
+
+
+<a name="extensions"></a>
+<h3>Possibilities for extensions</h3>
+
+<h4> Better linear solvers </h4>
+
+The solver chosen here is just too simple. It is also not efficient.
+What we do here is give the matrix to a sparse direct solver in every
+time step and let it find the solution of the linear system. But we
+know that we could do far better:
+
+- First, we should make use of the fact that the matrix doesn't
+  actually change from time step to time step. This is an artifact
+  of the fact that we here have constant boundary values and that
+  we don't change the time step size -- two assumptions that might
+  not be true in actual applications. But at least in cases where this
+  does happen to be the case, it would make sense to only factorize
+  the matrix once (i.e., compute $L$ and $U$ factors once) and then
+  use these factors for all following time steps until the matrix
+  $C$ changes and requires a new factorization. The interface of the
+  SparseDirectUMFPACK class allows for this.
+
+- Ultimately, however, sparse direct solvers are only efficient for
+  relatively small problems, say up to a few 100,000 unknowns. Beyond
+  this, one needs iterative solvers such as the Conjugate Gradient method (for
+  symmetric and positive definite problems) or GMRES. We have used many
+  of these in other tutorial programs. In all cases, they need to be
+  accompanied by good preconditioners. For the current case, one
+  could in principle use GMRES -- a method that does not require
+  any specific properties of the matrix -- but would be better
+  advised to implement an iterative scheme that exploits the one
+  structural feature we know is true for this problem: That the matrix
+  is complex-symmetric (albeit not Hermitian).
+
+
+<h4> Boundary conditions </h4>
+
+In order to be usable for actual, realistic problems, solvers for the
+nonlinear Schr&ouml;dinger equation need to utilize boundary conditions
+that make sense for the problem at hand. We have here restricted ourselves
+to simple Neumann boundary conditions -- but these do not actually make
+sense for the problem. Indeed, the equations are generally posed on an
+infinite domain. But, since we can't compute on infinite domains, we need
+to truncate it somewhere and instead pose boundary conditions that make
+sense for this artificially small domain. The approach widely used is to
+use the <a
+href="https://en.wikipedia.org/wiki/Perfectly_matched_layer">Perfectly
+Matched Layer</a> method that corresponds to a particular
+kind of attenuation. It is, in a different context, also used in
+step-62.
+
+
+<h4> Adaptive meshes </h4>
+
+Finally, we know from experience and many other tutorial programs that
+it is worthwhile to use adaptively refined meshes, rather than the uniform
+meshes used here. It would, in fact, not be very difficult to add this
+here: It just requires periodic remeshing and transfer of the solution
+from one mesh to the next. step-26 will be a good guide for how this
+could be implemented.

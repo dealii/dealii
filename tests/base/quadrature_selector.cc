@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -53,4 +53,20 @@ main()
   check("gauss", 10, QGauss<3>(10));
 
   check("weddle", 0, QWeddle<2>());
+
+  check("gauss_lobatto", 2, QGaussLobatto<1>(2));
+  check("gauss_lobatto", 3, QGaussLobatto<2>(3));
+  check("gauss_lobatto", 4, QGaussLobatto<3>(4));
+
+  check("gauss_chebyshev", 2, QGaussChebyshev<1>(2));
+  check("gauss_chebyshev", 3, QGaussChebyshev<2>(3));
+  check("gauss_chebyshev", 4, QGaussChebyshev<3>(4));
+
+  check("gauss_radau_chebyshev", 2, QGaussRadauChebyshev<1>(2));
+  check("gauss_radau_chebyshev", 3, QGaussRadauChebyshev<2>(3));
+  check("gauss_radau_chebyshev", 4, QGaussRadauChebyshev<3>(4));
+
+  check("gauss_lobatto_chebyshev", 2, QGaussLobattoChebyshev<1>(2));
+  check("gauss_lobatto_chebyshev", 3, QGaussLobattoChebyshev<2>(3));
+  check("gauss_lobatto_chebyshev", 4, QGaussLobattoChebyshev<3>(4));
 }

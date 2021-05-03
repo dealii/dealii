@@ -73,7 +73,7 @@ enabled), running the program in release mode:
 \$ make run
 Number of MPI ranks:            1
 Number of threads on each rank: 24
-Vectorization over 4 doubles = 256 bits (AVX), VECTORIZATION_LEVEL=2
+Vectorization over 4 doubles = 256 bits (AVX)
 
    Number of global active cells: 15412
    Number of degrees of freedom: 249065
@@ -126,7 +126,7 @@ In 3D, the respective output looks like
 \$ make run
 Number of MPI ranks:            1
 Number of threads on each rank: 24
-Vectorization over 4 doubles = 256 bits (AVX), VECTORIZATION_LEVEL=2
+Vectorization over 4 doubles = 256 bits (AVX)
 
    Number of global active cells: 17592
    Number of degrees of freedom: 1193881
@@ -158,7 +158,7 @@ timings change into:
 \$ mpirun -n 24 ./step-48
 Number of MPI ranks:            24
 Number of threads on each rank: 1
-Vectorization over 4 doubles = 256 bits (AVX), VECTORIZATION_LEVEL=2
+Vectorization over 4 doubles = 256 bits (AVX)
 ...
    Performed 1706 time steps.
    Average wallclock time per time step: 0.0051747s
@@ -194,7 +194,7 @@ MPI-only program when proper pinning is done):
 \$ mpirun -n 12 ./step-48
 Number of MPI ranks:            12
 Number of threads on each rank: 2
-Vectorization over 4 doubles = 256 bits (AVX), VECTORIZATION_LEVEL=2
+Vectorization over 4 doubles = 256 bits (AVX)
 ...
    Performed 1706 time steps.
    Average wallclock time per time step: 0.0056651s

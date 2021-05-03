@@ -66,7 +66,7 @@ the OpenCASCADE framework. From a <code>TopoDS_Shape</code>, it is then possible
 to access all the sub-shapes (such as vertices, edges and faces) composing it,
 along with their geometrical description. In the deal.II framework, the
 topological entities composing a shape are used to create a corresponding
-Manifold representation. In step-6 we saw how to use GridGenerator::hyper_sphere() 
+Manifold representation. In step-6 we saw how to use GridGenerator::hyper_sphere()
 to create a hyper sphere, which automatically attaches a SphericalManifold
 to all boundary faces. This guarantees that boundary faces stay on a
 sphere or circle during mesh refinement. The functions of the CAD modeling interface

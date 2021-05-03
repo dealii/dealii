@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2003 - 2019 by the deal.II authors
+ * Copyright (C) 2003 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -36,12 +36,9 @@
 #include <deal.II/lac/precondition.h>
 
 #include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_refinement.h>
 
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
@@ -474,11 +471,11 @@ namespace Step16
   void LaplaceProblem<dim>::solve()
   {
     MGTransferPrebuilt<Vector<double>> mg_transfer(mg_constrained_dofs);
-    mg_transfer.build_matrices(dof_handler);
+    mg_transfer.build(dof_handler);
 
     FullMatrix<double> coarse_matrix;
     coarse_matrix.copy_from(mg_matrices[0]);
-    MGCoarseGridHouseholder<> coarse_grid_solver;
+    MGCoarseGridHouseholder<double, Vector<double>> coarse_grid_solver;
     coarse_grid_solver.initialize(coarse_matrix);
 
     // The next component of a multilevel solver or preconditioner is that we
@@ -534,8 +531,8 @@ namespace Step16
 
     // With all this together, we can finally get about solving the linear
     // system in the usual way:
-    SolverControl solver_control(1000, 1e-12);
-    SolverCG<>    solver(solver_control);
+    SolverControl            solver_control(1000, 1e-12);
+    SolverCG<Vector<double>> solver(solver_control);
 
     solution = 0;
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,6 +19,7 @@
 #include <deal.II/base/function.h>
 #include <deal.II/base/utilities.h>
 
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_enriched.h>
@@ -30,7 +31,6 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/fe_values.h>
 #include <deal.II/hp/q_collection.h>
@@ -46,7 +46,6 @@
 
 const double eps = 1e-10;
 
-using namespace dealii;
 
 template <int dim>
 void
@@ -71,14 +70,14 @@ test2cellsFESystem(const unsigned int p_feq = 2, const unsigned int p_feen = 1)
                                         triangulation);
   }
 
-  hp::DoFHandler<dim> dof_handler(triangulation);
+  DoFHandler<dim> dof_handler(triangulation);
 
   hp::FECollection<dim> fe_collection;
   fe_collection.push_back(
     FESystem<dim>(FE_Q<dim>(p_feq), 1, FE_Nothing<dim>(), 1));
   fe_collection.push_back(FESystem<dim>(FE_Q<dim>(p_feen), 1, FE_Q<dim>(1), 1));
 
-  // push back to be able to resolve hp constrains:
+  // push back to be able to resolve hp-constrains:
   fe_collection.push_back(
     FESystem<dim>(FE_Q<dim>(p_feen), 1, FE_Nothing<dim>(), 1));
 
@@ -99,10 +98,8 @@ test2cellsFESystem(const unsigned int p_feq = 2, const unsigned int p_feen = 1)
 int
 main(int argc, char **argv)
 {
-  std::ofstream logfile("output");
-  deallog << std::setprecision(4);
-  deallog << std::fixed;
-  deallog.attach(logfile);
+  initlog();
+  deallog << std::setprecision(4) << std::fixed;
   deallog.depth_console(0);
 
 

@@ -5,7 +5,7 @@
   <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
   <title>The deal.II Testsuite</title>
   <link href="../screen.css" rel="StyleSheet">
-  <meta name="copyright" content="Copyright (C) 1998 - 2018 by the deal.II Authors">
+  <meta name="copyright" content="Copyright (C) 1998 - 2020 by the deal.II Authors">
   <meta name="keywords" content="deal dealii finite elements fem triangulation">
   <meta http-equiv="content-language" content="en">
 </head>
@@ -29,8 +29,8 @@
       we add at least one new test to the testsuite, and we also do so if
       we fix a bug, in both cases to make sure that future changes do not
       break this functionality (again). Machines running the testsuite
-      submit the results to our cdash 
-      <a href="http://cdash.kyomu.43-1.org/index.php?project=deal.II">CDash instance</a>, 
+      submit the results to our cdash
+      <a href="https://cdash.43-1.org/index.php?project=deal.II">CDash instance</a>,
       a webpage showing the status of our regression tests.
     </p>
 
@@ -314,7 +314,7 @@ xx: ===============================    OUTPUT END   ============================
      <p>
        At the end of all of this, results will be shown in a separate section
        "Dynamic Analysis" at the
-       <a href="http://cdash.kyomu.43-1.org/index.php?project=deal.II&display=project"
+       <a href="https://cdash.43-1.org/index.php?project=deal.II&display=project"
        target="_top">deal.II cdash site</a>.
      </p>
 
@@ -371,7 +371,7 @@ ctest <...> -S ../tests/run_coverage.cmake
     <p>
       At the end of all of this, results will be shown in a separate section
       "Coverage" at the
-      <a href="http://cdash.kyomu.43-1.org/index.php?project=deal.II&display=project"
+      <a href="https://cdash.43-1.org/index.php?project=deal.II&display=project"
       target="_top">deal.II cdash site</a>.
       In case you download the coverage report uploader for Codecov via
       <code>contrib/utilities/download_codecov</code>, the coverage
@@ -540,22 +540,6 @@ category/test.mpirun=N.output
       files for different numbers of MPI processes.
     </p>
 
-
-    <a name="binary"></a>
-    <h3>Tests with binary output</h3>
-    <p>
-      If a test produces binary output add <code>binary</code> to the
-      output file to indicate this:
-<pre>
-category/test.binary.output
-</pre>
-      The testsuite ensures that a diff tool suitable for comparing binary
-      output files is used instead of the default diff tool, which (as in
-      the case of <code>numdiff</code>) might be unable to compare binary
-      files.
-    </p>
-
-
     <a name="variants"></a>
     <h3>Tests with multiple comparison files</h3>
     <p>
@@ -630,7 +614,7 @@ category/test.expect=run.output
 <pre>
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2018 by the deal.II Authors
+// Copyright (C) 2015 - 2020 by the deal.II Authors
 //
 // This file is part of the deal.II library.
 //
@@ -736,7 +720,7 @@ $ ctest -V -R "category/my_new_test"
       a <code>CMakeLists.txt</code> file into it containing
     </p>
 <pre>
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.1.0)
 INCLUDE(../setup_testsubproject.cmake)
 PROJECT(testsuite CXX)
 INCLUDE(${DEAL_II_TARGET_CONFIG})
@@ -748,9 +732,12 @@ DEAL_II_PICKUP_TESTS()
 
     <p>
       To submit test results to our <a
-        href="http://cdash.kyomu.43-1.org/index.php?project=deal.II">CDash</a>
+        href="https://cdash.43-1.org/index.php?project=deal.II">CDash</a>
       instance just invoke ctest within a build directory (or designated
       build directory) with the <code>-S</code> option pointing to the
+      <code>run_testsuite.cmake</code> script (assuming here for the
+      moment that your build directory is a sub-directory of the
+      source directory):
 <pre>
 $ ctest [...] -V -S ../tests/run_testsuite.cmake
 </pre>
@@ -767,7 +754,13 @@ $ ctest [...] -V -S ../tests/run_testsuite.cmake
 <pre>
 $ ctest -DMAKEOPTS="-j N" -j N [...] -V -S ../tests/run_testsuite.cmake
 </pre>
-      for compiling the library and running the tests in parallel.
+      for compiling the library and running the tests in parallel,
+      where <code>N</code> is the number of jobs you want to
+      simultaneously execute on your machine; you would typically
+      choose <code>N</code> equal to the number of processor cores you
+      have in your machine, or maybe somewhere around one half to
+      three quarters if you don't want to overload it or are short on
+      memory.
     </p>
 
     <p>
@@ -866,11 +859,11 @@ MAKEOPTS
       different systems and with different compilers as well as
       different configuration options. Results are collected in the "Build
       Tests" track in <a
-      href="http://cdash.kyomu.43-1.org/index.php?project=deal.II">CDash</a>.<p>
+      href="https://cdash.43-1.org/index.php?project=deal.II">CDash</a>.<p>
 
       <p>Running the build test suite is simple and we encourage deal.II
       users with configurations not found on the <a
-      href="http://cdash.kyomu.43-1.org/index.php?project=deal.II">CDash page</a> to
+      href="https://cdash.43-1.org/index.php?project=deal.II">CDash page</a> to
       participate. Assuming you checked out deal.II into the directory
       <code>dealii</code>, running it is as simple as:
 <pre>

@@ -27,7 +27,7 @@
 int
 main()
 {
-  typedef Sacado::Fad::DFad<double> Sdouble;
+  using Sdouble = Sacado::Fad::DFad<double>;
   initlog();
 
 

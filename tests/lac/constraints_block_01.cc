@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2018 by the deal.II authors
+// Copyright (C) 2012 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -42,7 +42,6 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/fe_values.h>
 #include <deal.II/hp/q_collection.h>
@@ -122,9 +121,9 @@ main()
   fe_collection.push_back(*solid_fe);
   fe_collection.push_back(*fluid_fe);
 
-  hp::DoFHandler<dim> dh(tria);
+  DoFHandler<dim> dh(tria);
 
-  for (hp::DoFHandler<dim>::active_cell_iterator cell = dh.begin_active();
+  for (DoFHandler<dim>::active_cell_iterator cell = dh.begin_active();
        cell != dh.end();
        ++cell)
     {
@@ -147,12 +146,8 @@ main()
         block_component[comp] = 2;
     } // comp
 
-  std::vector<types::global_dof_index> dofs_per_block(
-    3, 0); // 3 blocks, count dofs:
-  DoFTools::count_dofs_per_component(dh,
-                                     dofs_per_block,
-                                     false,
-                                     block_component);
+  const std::vector<types::global_dof_index> dofs_per_block =
+    DoFTools::count_dofs_per_fe_component(dh, false, block_component);
 
   DoFRenumbering::component_wise(dh, block_component);
 
@@ -241,14 +236,14 @@ main()
   std::vector<std::pair<unsigned int, unsigned int>> solid_fluid_pairs;
   std::vector<std::pair<unsigned int, unsigned int>> solid_mesh_pairs;
 
-  for (hp::DoFHandler<dim>::active_cell_iterator cell = dh.begin_active();
+  for (DoFHandler<dim>::active_cell_iterator cell = dh.begin_active();
        cell != dh.end();
        ++cell) // loops over the cells
     {
       if (int(cell->material_id()) == 1)
         {
           // Only loop over cells in the fluid region
-          for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+          for (const unsigned int f : GeometryInfo<dim>::face_indices())
             {
               if (!cell->at_boundary(f))
                 {
@@ -348,7 +343,7 @@ main()
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-    for (hp::DoFHandler<dim>::active_cell_iterator cell = dh.begin_active();
+    for (DoFHandler<dim>::active_cell_iterator cell = dh.begin_active();
          cell != dh.end();
          ++cell) // loops over the cells
       {

@@ -3,7 +3,17 @@ DEAL::Forward Euler
 DEAL::0
 DEAL::Runge-Kutta third order
 DEAL::0
+DEAL::Strong Stability Preserving Runge-Kutta third order
+DEAL::0
 DEAL::Runge-Kutta fourth order
+DEAL::0
+DEAL::Low-storage Runge-Kutta stage 3 order 3
+DEAL::0
+DEAL::Low-storage Runge-Kutta stage 5 order 4
+DEAL::0
+DEAL::Low-storage Runge-Kutta stage 7 order 4
+DEAL::0
+DEAL::Low-storage Runge-Kutta stage 9 order 5
 DEAL::0
 DEAL::Backward Euler
 DEAL::0
@@ -23,3 +33,99 @@ DEAL::Fehlberg
 DEAL::0
 DEAL::Cash-Karp
 DEAL::0
+DEAL::Forward Euler first order
+DEAL::convergence rate
+DEAL::0.634657
+DEAL::0.763742
+DEAL::0.862050
+DEAL::0.924783
+DEAL::0.960617
+DEAL::0.979834
+DEAL::Runge-Kutta third order
+DEAL::convergence rate
+DEAL::0.0523936
+DEAL::2.00049
+DEAL::2.55207
+DEAL::2.78347
+DEAL::2.89332
+DEAL::2.94704
+DEAL::Strong Stability Preserving Runge-Kutta third order
+DEAL::convergence rate
+DEAL::2.72007
+DEAL::2.86894
+DEAL::2.93941
+DEAL::2.97135
+DEAL::2.98614
+DEAL::2.99319
+DEAL::Runge-Kutta fourth order
+DEAL::convergence rate
+DEAL::3.64708
+DEAL::3.86926
+DEAL::3.95478
+DEAL::3.98399
+DEAL::3.99389
+DEAL::3.99746
+DEAL::Low-storage Runge-Kutta stage 3 order 3
+DEAL::convergence rate
+DEAL::2.65986
+DEAL::2.82914
+DEAL::2.91745
+DEAL::2.95989
+DEAL::2.98029
+DEAL::2.99024
+DEAL::Low-storage Runge-Kutta stage 5 order 4
+DEAL::convergence rate
+DEAL::3.52474
+DEAL::3.77867
+DEAL::3.89561
+DEAL::3.94964
+DEAL::3.97531
+DEAL::3.98778
+DEAL::Low-storage Runge-Kutta stage 7 order 4
+DEAL::convergence rate
+DEAL::-0.579086
+DEAL::3.29557
+DEAL::3.71647
+DEAL::3.87052
+DEAL::3.93798
+DEAL::3.96951
+DEAL::Low-storage Runge-Kutta stage 9 order 5
+DEAL::convergence rate
+DEAL::4.66916
+DEAL::4.85354
+DEAL::4.93262
+DEAL::4.96796
+DEAL::4.98436
+DEAL::4.99866
+DEAL::Backward Euler first order
+DEAL::convergence rate
+DEAL::6.54345
+DEAL::1.54696
+DEAL::1.20585
+DEAL::1.09170
+DEAL::1.04350
+DEAL::1.02129
+DEAL::Implicit midpoint second order
+DEAL::convergence rate
+DEAL::1.96525
+DEAL::1.99777
+DEAL::2.00269
+DEAL::2.00884
+DEAL::2.04892
+DEAL::2.05461
+DEAL::Crank-Nicolson second order
+DEAL::convergence rate
+DEAL::2.34241
+DEAL::2.07476
+DEAL::2.01846
+DEAL::2.00559
+DEAL::2.00652
+DEAL::2.00632
+DEAL::SDIRK second order
+DEAL::convergence rate
+DEAL::2.11605
+DEAL::2.02959
+DEAL::2.00992
+DEAL::2.01080
+DEAL::2.01420
+DEAL::2.11290

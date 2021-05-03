@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -98,7 +98,7 @@ test(const Triangulation<dim> &tr)
 
       for (unsigned int i = 0; i < fe_values.dofs_per_cell; ++i)
         for (unsigned int j = 0; j < fe_values.dofs_per_cell; ++j)
-          for (unsigned int q = 0; q < fe_values.n_quadrature_points; ++q)
+          for (const auto q : fe_values.quadrature_point_indices())
             {
               mass_matrix[cell->index()](i, j) += fe_values.shape_value(i, q) *
                                                   fe_values.shape_value(j, q) *
@@ -157,7 +157,7 @@ test()
   tr.set_manifold(1, boundary);
 
   // set boundary id on cell 1
-  for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+  for (const unsigned int f : GeometryInfo<dim>::face_indices())
     if (tr.begin_active()->at_boundary(f))
       tr.begin_active()->face(f)->set_boundary_id(1);
 
@@ -168,10 +168,8 @@ test()
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(4);
-
-  deallog.attach(logfile);
 
   test<2>();
   test<3>();

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2019 by the deal.II authors
+// Copyright (C) 1999 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,7 +22,6 @@
 #include <deal.II/base/aligned_vector.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/index_set.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/subscriptor.h>
 
 #include <deal.II/differentiation/ad/ad_number_traits.h>
@@ -41,14 +40,16 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-#ifdef DEAL_II_WITH_PETSC
+// Forward declarations
+#ifndef DOXYGEN
+#  ifdef DEAL_II_WITH_PETSC
 namespace PETScWrappers
 {
   class VectorBase;
 }
-#endif
+#  endif
 
-#ifdef DEAL_II_WITH_TRILINOS
+#  ifdef DEAL_II_WITH_TRILINOS
 namespace TrilinosWrappers
 {
   namespace MPI
@@ -56,7 +57,7 @@ namespace TrilinosWrappers
     class Vector;
   }
 } // namespace TrilinosWrappers
-#endif
+#  endif
 
 template <typename number>
 class LAPACKFullMatrix;
@@ -71,7 +72,7 @@ namespace parallel
     class TBBPartitioner;
   }
 } // namespace parallel
-
+#endif
 
 
 /*! @addtogroup Vectors
@@ -103,8 +104,6 @@ namespace parallel
  * others can be generated in application programs (see the section on
  * @ref Instantiations
  * in the manual).
- *
- * @author Guido Kanschat, Franz-Theo Suttmeier, Wolfgang Bangerth
  */
 template <typename Number>
 class Vector : public Subscriptor
@@ -275,7 +274,7 @@ public:
    * waste some memory, so keep this in mind.  However, if <tt>N==0</tt> all
    * memory is freed, i.e. if you want to resize the vector and release the
    * memory not needed, you have to first call <tt>reinit(0)</tt> and then
-   * <tt>reinit(N)</tt>. This cited behaviour is analogous to that of the
+   * <tt>reinit(N)</tt>. This cited behavior is analogous to that of the
    * standard library containers.
    *
    * If @p omit_zeroing_entries is false, the vector is filled by zeros.
@@ -834,22 +833,6 @@ public:
   equ(const Number a, const Vector<Number2> &u);
 
   /**
-   * Compute the elementwise ratio of the two given vectors, that is let
-   * <tt>this[i] = a[i]/b[i]</tt>. This is useful for example if you want to
-   * compute the cellwise ratio of true to estimated error.
-   *
-   * This vector is appropriately scaled to hold the result.
-   *
-   * If any of the <tt>b[i]</tt> is zero, the result is undefined. No attempt
-   * is made to catch such situations.
-   *
-   * @dealiiOperationIsMultithreaded
-   */
-  DEAL_II_DEPRECATED
-  void
-  ratio(const Vector<Number> &a, const Vector<Number> &b);
-
-  /**
    * This function does nothing but exists for compatibility with the @p
    * parallel vector classes (e.g., LinearAlgebra::distributed::Vector class).
    */
@@ -863,16 +846,6 @@ public:
    */
   //@{
   /**
-   * Output of vector in user-defined format. For complex-valued vectors, the
-   * format should include specifiers for both the real and imaginary parts.
-   *
-   * This function is deprecated.
-   */
-  DEAL_II_DEPRECATED
-  void
-  print(const char *format = nullptr) const;
-
-  /**
    * Print to a stream. @p precision denotes the desired precision with which
    * values shall be printed, @p scientific whether scientific notation shall
    * be used. If @p across is @p true then the vector is printed in a line,
@@ -883,20 +856,6 @@ public:
         const unsigned int precision  = 3,
         const bool         scientific = true,
         const bool         across     = true) const;
-
-  /**
-   * Print to a LogStream. <tt>width</tt> is used as argument to the std::setw
-   * manipulator, if printing across.  If @p across is @p true then the vector
-   * is printed in a line, while if @p false then the elements are printed on
-   * a separate line each.
-   *
-   * This function is deprecated.
-   */
-  DEAL_II_DEPRECATED
-  void
-  print(LogStream &        out,
-        const unsigned int width  = 6,
-        const bool         across = true) const;
 
   /**
    * Write the vector en bloc to a file. This is done in a binary mode, so the
@@ -922,7 +881,8 @@ public:
 
   /**
    * Write the data of this object to a stream for the purpose of
-   * serialization.
+   * serialization using the [BOOST serialization
+   * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
    */
   template <class Archive>
   void
@@ -930,13 +890,27 @@ public:
 
   /**
    * Read the data of this object from a stream for the purpose of
-   * serialization.
+   * serialization using the [BOOST serialization
+   * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
    */
   template <class Archive>
   void
   load(Archive &ar, const unsigned int version);
 
+#ifdef DOXYGEN
+  /**
+   * Write and read the data of this object from a stream for the purpose
+   * of serialization using the [BOOST serialization
+   * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
+   */
+  template <class Archive>
+  void
+  serialize(Archive &archive, const unsigned int version);
+#else
+  // This macro defines the serialize() method that is compatible with
+  // the templated save() and load() method that have been implemented.
   BOOST_SERIALIZATION_SPLIT_MEMBER()
+#endif
 
   /**
    * @}
@@ -980,6 +954,16 @@ public:
   size() const;
 
   /**
+   * Return local dimension of the vector. Since this vector does not support
+   * distributed data this is always the same value as size().
+   *
+   * @note This function exists for compatibility with
+   * LinearAlgebra::ReadWriteVector.
+   */
+  size_type
+  locally_owned_size() const;
+
+  /**
    * Return whether the vector contains only elements with value zero. This
    * function is mainly for internal consistency checks and should seldom be
    * used when not in debug mode since it uses quite some time.
@@ -1005,6 +989,14 @@ public:
    */
   std::size_t
   memory_consumption() const;
+
+  /**
+   * This function exists for compatibility with the @p
+   * parallel vector classes (e.g., LinearAlgebra::distributed::Vector class).
+   * Always returns false since this implementation is serial.
+   */
+  bool
+  has_ghost_elements() const;
   //@}
 
 private:
@@ -1036,9 +1028,7 @@ private:
   mutable std::shared_ptr<parallel::internal::TBBPartitioner>
     thread_loop_partitioner;
 
-  /**
-   * Make all other vector types friends.
-   */
+  // Make all other vector types friends.
   template <typename Number2>
   friend class Vector;
 };
@@ -1108,6 +1098,16 @@ Vector<Number>::size() const
 }
 
 
+
+template <typename Number>
+inline typename Vector<Number>::size_type
+Vector<Number>::locally_owned_size() const
+{
+  return values.size();
+}
+
+
+
 template <typename Number>
 inline bool
 Vector<Number>::in_local_range(const size_type) const
@@ -1175,7 +1175,7 @@ template <typename Number>
 inline Number
 Vector<Number>::operator()(const size_type i) const
 {
-  Assert(i < size(), ExcIndexRange(i, 0, size()));
+  AssertIndexRange(i, size());
   return values[i];
 }
 
@@ -1185,7 +1185,7 @@ template <typename Number>
 inline Number &
 Vector<Number>::operator()(const size_type i)
 {
-  Assert(i < size(), ExcIndexRangeType<size_type>(i, 0, size()));
+  AssertIndexRange(i, size());
   return values[i];
 }
 
@@ -1284,7 +1284,7 @@ Vector<Number>::add(const size_type    n_indices,
 {
   for (size_type i = 0; i < n_indices; ++i)
     {
-      Assert(indices[i] < size(), ExcIndexRange(indices[i], 0, size()));
+      AssertIndexRange(indices[i], size());
       Assert(
         numbers::is_finite(values[i]),
         ExcMessage(
@@ -1311,6 +1311,12 @@ inline void Vector<Number>::compress(::dealii::VectorOperation::values) const
 {}
 
 
+template <typename Number>
+inline bool
+Vector<Number>::has_ghost_elements() const
+{
+  return false;
+}
 
 template <typename Number>
 inline void
@@ -1369,7 +1375,6 @@ Vector<Number>::load(Archive &ar, const unsigned int)
  * exchanges the data of the two vectors.
  *
  * @relatesalso Vector
- * @author Wolfgang Bangerth, 2000
  */
 template <typename Number>
 inline void
@@ -1380,25 +1385,26 @@ swap(Vector<Number> &u, Vector<Number> &v)
 
 
 /**
- * Output operator writing a vector to a stream.
+ * Output operator writing a vector to a stream. This operator outputs the
+ * elements of the vector one by one, with a space between entries. Each entry
+ * is formatted according to the flags set on the output stream.
+ *
+ * @relatesalso Vector
  */
 template <typename number>
 inline std::ostream &
-operator<<(std::ostream &os, const Vector<number> &v)
+operator<<(std::ostream &out, const Vector<number> &v)
 {
-  v.print(os);
-  return os;
-}
+  Assert(v.size() != 0, ExcEmptyObject());
+  AssertThrow(out, ExcIO());
 
-/**
- * Output operator writing a vector to a LogStream.
- */
-template <typename number>
-inline LogStream &
-operator<<(LogStream &os, const Vector<number> &v)
-{
-  v.print(os);
-  return os;
+  for (typename Vector<number>::size_type i = 0; i < v.size() - 1; ++i)
+    out << v(i) << ' ';
+  out << v(v.size() - 1);
+
+  AssertThrow(out, ExcIO());
+
+  return out;
 }
 
 /*@}*/
@@ -1407,7 +1413,7 @@ operator<<(LogStream &os, const Vector<number> &v)
 /**
  * Declare dealii::Vector< Number > as serial vector.
  *
- * @author Uwe Koecher, 2017
+ * @relatesalso Vector
  */
 template <typename Number>
 struct is_serial_vector<Vector<Number>> : std::true_type

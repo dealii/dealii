@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,6 +20,7 @@
 #include <deal.II/base/function.h>
 #include <deal.II/base/utilities.h>
 
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_enriched.h>
@@ -31,7 +32,6 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/fe_values.h>
 #include <deal.II/hp/q_collection.h>
@@ -57,7 +57,6 @@ const double eps = 1e-10;
 // in the same way for FE_System and FEEnriched.
 const unsigned int patches = 10;
 
-using namespace dealii;
 
 template <int dim>
 class EnrichmentFunction : public Function<dim>
@@ -230,7 +229,7 @@ test(const FiniteElement<dim> & fe1,
 
       // check shape functions
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
-        for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+        for (const auto q_point : fe_values_system.quadrature_point_indices())
           check_consistency(
             q_points[q_point],
             function,
@@ -244,8 +243,7 @@ test(const FiniteElement<dim> & fe1,
             fe_values_system.shape_grad_component(i, q_point, 1),
             fe_values_system.shape_hessian_component(i, q_point, 1));
 
-      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-           ++face)
+      for (const unsigned int face : GeometryInfo<dim>::face_indices())
         {
           fe_face_values_enriched.reinit(cell_enriched, face);
           fe_face_values_system.reinit(cell_system, face);
@@ -254,7 +252,8 @@ test(const FiniteElement<dim> & fe1,
             fe_face_values_system.get_quadrature_points();
 
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
-            for (unsigned int q_point = 0; q_point < n_q_points_face; ++q_point)
+            for (const auto q_point :
+                 fe_face_values_system.quadrature_point_indices())
               check_consistency(
                 q_points[q_point],
                 function,
@@ -281,10 +280,8 @@ test(const FiniteElement<dim> & fe1,
 int
 main(int argc, char **argv)
 {
-  std::ofstream logfile("output");
-  deallog << std::setprecision(4);
-  deallog << std::fixed;
-  deallog.attach(logfile);
+  initlog();
+  deallog << std::setprecision(4) << std::fixed;
   deallog.depth_console(0);
 
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -32,10 +32,10 @@
 #include <fstream>
 #include <iomanip>
 
-#include "../serialization/serialization.h"
 #include "../tests.h"
 
-using namespace dealii;
+#include "../serialization/serialization.h"
+
 namespace SD = Differentiation::SD;
 namespace SE = ::SymEngine;
 

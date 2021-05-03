@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2018 by the deal.II authors
+// Copyright (C) 2001 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -75,9 +75,6 @@ DEAL_II_NAMESPACE_OPEN
  * For the behavior of the mapping and convergence rates in case of mixing
  * different manifolds, please consult the respective section of
  * MappingQGeneric.
- *
- * @author Ralf Hartmann, 2000, 2001, 2005; Guido Kanschat 2000, 2001,
- * Wolfgang Bangerth, 2015
  */
 template <int dim, int spacedim = dim>
 class MappingQ : public Mapping<dim, spacedim>
@@ -122,6 +119,14 @@ public:
   virtual bool
   preserves_vertex_locations() const override;
 
+  // for documentation, see the Mapping base class
+  virtual BoundingBox<spacedim>
+  get_bounding_box(const typename Triangulation<dim, spacedim>::cell_iterator
+                     &cell) const override;
+
+  virtual bool
+  is_compatible_with(const ReferenceCell &reference_cell) const override;
+
   /**
    * Transform the point @p p on the unit cell to the point @p p_real on the
    * real cell @p cell and returns @p p_real.
@@ -160,35 +165,35 @@ public:
   // for documentation, see the Mapping base class
   virtual void
   transform(const ArrayView<const Tensor<1, dim>> &                  input,
-            const MappingType                                        type,
+            const MappingKind                                        kind,
             const typename Mapping<dim, spacedim>::InternalDataBase &internal,
             const ArrayView<Tensor<1, spacedim>> &output) const override;
 
   // for documentation, see the Mapping base class
   virtual void
   transform(const ArrayView<const DerivativeForm<1, dim, spacedim>> &input,
-            const MappingType                                        type,
+            const MappingKind                                        kind,
             const typename Mapping<dim, spacedim>::InternalDataBase &internal,
             const ArrayView<Tensor<2, spacedim>> &output) const override;
 
   // for documentation, see the Mapping base class
   virtual void
   transform(const ArrayView<const Tensor<2, dim>> &                  input,
-            const MappingType                                        type,
+            const MappingKind                                        kind,
             const typename Mapping<dim, spacedim>::InternalDataBase &internal,
             const ArrayView<Tensor<2, spacedim>> &output) const override;
 
   // for documentation, see the Mapping base class
   virtual void
   transform(const ArrayView<const DerivativeForm<2, dim, spacedim>> &input,
-            const MappingType                                        type,
+            const MappingKind                                        kind,
             const typename Mapping<dim, spacedim>::InternalDataBase &internal,
             const ArrayView<Tensor<3, spacedim>> &output) const override;
 
   // for documentation, see the Mapping base class
   virtual void
   transform(const ArrayView<const Tensor<3, dim>> &                  input,
-            const MappingType                                        type,
+            const MappingKind                                        kind,
             const typename Mapping<dim, spacedim>::InternalDataBase &internal,
             const ArrayView<Tensor<3, spacedim>> &output) const override;
 
@@ -237,7 +242,7 @@ protected:
 
 
     /**
-     * Return an estimate (in bytes) or the memory consumption of this object.
+     * Return an estimate (in bytes) for the memory consumption of this object.
      */
     virtual std::size_t
     memory_consumption() const override;
@@ -274,10 +279,12 @@ protected:
   virtual std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase>
   get_data(const UpdateFlags, const Quadrature<dim> &quadrature) const override;
 
+  using Mapping<dim, spacedim>::get_face_data;
+
   // documentation can be found in Mapping::get_face_data()
   virtual std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase>
-  get_face_data(const UpdateFlags          flags,
-                const Quadrature<dim - 1> &quadrature) const override;
+  get_face_data(const UpdateFlags               flags,
+                const hp::QCollection<dim - 1> &quadrature) const override;
 
   // documentation can be found in Mapping::get_subface_data()
   virtual std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase>
@@ -294,12 +301,14 @@ protected:
     internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
       &output_data) const override;
 
+  using Mapping<dim, spacedim>::fill_fe_face_values;
+
   // documentation can be found in Mapping::fill_fe_face_values()
   virtual void
   fill_fe_face_values(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const unsigned int                                          face_no,
-    const Quadrature<dim - 1> &                                 quadrature,
+    const hp::QCollection<dim - 1> &                            quadrature,
     const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
     internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
       &output_data) const override;

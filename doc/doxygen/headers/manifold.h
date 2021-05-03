@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2019 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -74,6 +74,9 @@
  *   using high order mappings.
  *
  * </ul>
+ * Many other examples, as well as much theoretical underpinning for the
+ * implementation in deal.II, is provided in the
+ * @ref geometry_paper "geometry paper".
  *
  * In deal.II, a Manifold is seen as a collection of points, together
  * with a notion of distance between points (on the manifold). New
@@ -91,6 +94,68 @@
  * the trivial geometries, like cylinders, spheres or shells, deal.II provides
  * reasonable implementations. More complicated examples can be described
  * using the techniques shown in step-53 and step-54.
+ *
+ * In the grand scheme of things, the classes of this module interact
+ * with a variety of other parts of the library:
+ * @dot
+ digraph G
+{
+  graph[rankdir="TB",bgcolor="transparent"];
+
+  node [fontname="FreeSans",fontsize=15,
+        shape=box,height=0.2,width=0.4,
+        color="black", fillcolor="white", style="filled"];
+  edge [color="black", weight=10];
+
+  tria       [label="Triangulation",    URL="\ref grid"];
+  fe         [label="Finite elements",    URL="\ref feall"];
+  mapping    [label="Mapping",          URL="\ref mapping"];
+  quadrature [label="Quadrature",       URL="\ref Quadrature"];
+  dh         [label="DoFHandler",       URL="\ref dofs"];
+  fevalues   [label="FEValues",         URL="\ref feaccess"];
+  systems    [label="Linear systems",   URL="\ref LAC"];
+  solvers    [label="Linear solvers",   URL="\ref Solvers"];
+  output     [label="Graphical output", URL="\ref output"];
+  manifold   [label="Manifold",         URL="\ref manifold", fillcolor="deepskyblue"];
+
+  tria -> dh              [color="black",style="solid"];
+  fe -> dh                [color="black",style="solid"];
+  fe -> fevalues          [color="black",style="solid"];
+  mapping -> fevalues     [color="black",style="solid"];
+  quadrature -> fevalues  [color="black",style="solid"];
+  dh -> systems           [color="black",style="solid"];
+  fevalues -> systems     [color="black",style="solid"];
+  systems -> solvers      [color="black",style="solid"];
+  solvers -> output       [color="black",style="solid"];
+  manifold -> tria        [color="black",style="solid"];
+  manifold -> mapping     [color="black",style="solid"];
+
+  {
+    rank=same
+    mapping -> quadrature [dir="none", color="transparent"];
+    quadrature -> fe      [dir="none", color="transparent"];
+    fe -> tria            [dir="none", color="transparent"];
+  }
+
+  node [fontname="FreeSans",fontsize=12,
+        shape=record,height=0.2,width=0.4,
+        color="gray55", fontcolor="gray55", fillcolor="white", style="filled"];
+  edge [color="gray55", weight=1];
+
+  opencascade [label="OpenCASCADE"];
+  opencascade -> manifold [dir="none"];
+
+
+  node [fontname="FreeSans",fontsize=12,
+        shape=ellipse,height=0.2,width=0.4,
+        color="gray55", fontcolor="gray55", fillcolor="white", style="filled"];
+  edge [color="gray55", weight=1];
+
+  gmsh        [label="gmsh", URL="\ref Gmsh"];
+  gmsh -> tria       [dir="none"];
+}
+ * @enddot
+ *
  *
  * <h3>An example</h3>
  *

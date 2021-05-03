@@ -51,7 +51,7 @@ test()
   auto cell = tria.begin_active();
   auto endc = tria.end();
 
-  typedef decltype(cell) Iterator;
+  using Iterator = decltype(cell);
 
 
 

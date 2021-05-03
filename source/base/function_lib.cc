@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2019 by the deal.II authors
+// Copyright (C) 1999 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1172,17 +1172,18 @@ namespace Functions
   double
   LSingularityFunction::value(const Point<2> &p, const unsigned int) const
   {
-    double x = p(0);
-    double y = p(1);
+    const double x = p(0);
+    const double y = p(1);
 
     if ((x >= 0) && (y >= 0))
       return 0.;
 
-    double phi = std::atan2(y, -x) + numbers::PI;
-    double r2  = x * x + y * y;
+    const double phi       = std::atan2(y, -x) + numbers::PI;
+    const double r_squared = x * x + y * y;
 
-    return std::pow(r2, 1. / 3.) * std::sin(2. / 3. * phi);
+    return std::pow(r_squared, 1. / 3.) * std::sin(2. / 3. * phi);
   }
+
 
 
   void
@@ -1195,20 +1196,21 @@ namespace Functions
 
     for (unsigned int i = 0; i < points.size(); ++i)
       {
-        double x = points[i](0);
-        double y = points[i](1);
+        const double x = points[i](0);
+        const double y = points[i](1);
 
         if ((x >= 0) && (y >= 0))
           values[i] = 0.;
         else
           {
-            double phi = std::atan2(y, -x) + numbers::PI;
-            double r2  = x * x + y * y;
+            const double phi       = std::atan2(y, -x) + numbers::PI;
+            const double r_squared = x * x + y * y;
 
-            values[i] = std::pow(r2, 1. / 3.) * std::sin(2. / 3. * phi);
+            values[i] = std::pow(r_squared, 1. / 3.) * std::sin(2. / 3. * phi);
           }
       }
   }
+
 
 
   void
@@ -1223,27 +1225,31 @@ namespace Functions
       {
         Assert(values[i].size() == 1,
                ExcDimensionMismatch(values[i].size(), 1));
-        double x = points[i](0);
-        double y = points[i](1);
+        const double x = points[i](0);
+        const double y = points[i](1);
 
         if ((x >= 0) && (y >= 0))
           values[i](0) = 0.;
         else
           {
-            double phi = std::atan2(y, -x) + numbers::PI;
-            double r2  = x * x + y * y;
+            const double phi       = std::atan2(y, -x) + numbers::PI;
+            const double r_squared = x * x + y * y;
 
-            values[i](0) = std::pow(r2, 1. / 3.) * std::sin(2. / 3. * phi);
+            values[i](0) =
+              std::pow(r_squared, 1. / 3.) * std::sin(2. / 3. * phi);
           }
       }
   }
 
 
+
   double
   LSingularityFunction::laplacian(const Point<2> &, const unsigned int) const
   {
+    // Not a bug but exactly how the function is defined:
     return 0.;
   }
+
 
 
   void
@@ -1259,13 +1265,14 @@ namespace Functions
   }
 
 
+
   Tensor<1, 2>
   LSingularityFunction::gradient(const Point<2> &p, const unsigned int) const
   {
-    double x   = p(0);
-    double y   = p(1);
-    double phi = std::atan2(y, -x) + numbers::PI;
-    double r43 = std::pow(x * x + y * y, 2. / 3.);
+    const double x   = p(0);
+    const double y   = p(1);
+    const double phi = std::atan2(y, -x) + numbers::PI;
+    const double r43 = std::pow(x * x + y * y, 2. / 3.);
 
     Tensor<1, 2> result;
     result[0] = 2. / 3. *
@@ -1276,6 +1283,7 @@ namespace Functions
                 r43;
     return result;
   }
+
 
 
   void
@@ -1289,10 +1297,10 @@ namespace Functions
     for (unsigned int i = 0; i < points.size(); ++i)
       {
         const Point<2> &p   = points[i];
-        double          x   = p(0);
-        double          y   = p(1);
-        double          phi = std::atan2(y, -x) + numbers::PI;
-        double          r43 = std::pow(x * x + y * y, 2. / 3.);
+        const double    x   = p(0);
+        const double    y   = p(1);
+        const double    phi = std::atan2(y, -x) + numbers::PI;
+        const double    r43 = std::pow(x * x + y * y, 2. / 3.);
 
         gradients[i][0] =
           2. / 3. *
@@ -1302,6 +1310,7 @@ namespace Functions
           (std::sin(2. / 3. * phi) * y - std::cos(2. / 3. * phi) * x) / r43;
       }
   }
+
 
 
   void
@@ -1317,10 +1326,10 @@ namespace Functions
         Assert(gradients[i].size() == 1,
                ExcDimensionMismatch(gradients[i].size(), 1));
         const Point<2> &p   = points[i];
-        double          x   = p(0);
-        double          y   = p(1);
-        double          phi = std::atan2(y, -x) + numbers::PI;
-        double          r43 = std::pow(x * x + y * y, 2. / 3.);
+        const double    x   = p(0);
+        const double    y   = p(1);
+        const double    phi = std::atan2(y, -x) + numbers::PI;
+        const double    r43 = std::pow(x * x + y * y, 2. / 3.);
 
         gradients[i][0][0] =
           2. / 3. *
@@ -1336,6 +1345,7 @@ namespace Functions
   LSingularityGradFunction::LSingularityGradFunction()
     : Function<2>(2)
   {}
+
 
 
   double
@@ -1464,13 +1474,13 @@ namespace Functions
   SlitSingularityFunction<dim>::value(const Point<dim> &p,
                                       const unsigned int) const
   {
-    double x = p(0);
-    double y = p(1);
+    const double x = p(0);
+    const double y = p(1);
 
-    double phi = std::atan2(x, y) + numbers::PI;
-    double r2  = x * x + y * y;
+    const double phi       = std::atan2(x, y) + numbers::PI;
+    const double r_squared = x * x + y * y;
 
-    return std::pow(r2, .25) * std::sin(.5 * phi);
+    return std::pow(r_squared, .25) * std::sin(.5 * phi);
   }
 
 
@@ -1486,13 +1496,13 @@ namespace Functions
 
     for (unsigned int i = 0; i < points.size(); ++i)
       {
-        double x = points[i](0);
-        double y = points[i](1);
+        const double x = points[i](0);
+        const double y = points[i](1);
 
-        double phi = std::atan2(x, y) + numbers::PI;
-        double r2  = x * x + y * y;
+        const double phi       = std::atan2(x, y) + numbers::PI;
+        const double r_squared = x * x + y * y;
 
-        values[i] = std::pow(r2, .25) * std::sin(.5 * phi);
+        values[i] = std::pow(r_squared, .25) * std::sin(.5 * phi);
       }
   }
 
@@ -1511,13 +1521,13 @@ namespace Functions
         Assert(values[i].size() == 1,
                ExcDimensionMismatch(values[i].size(), 1));
 
-        double x = points[i](0);
-        double y = points[i](1);
+        const double x = points[i](0);
+        const double y = points[i](1);
 
-        double phi = std::atan2(x, y) + numbers::PI;
-        double r2  = x * x + y * y;
+        const double phi       = std::atan2(x, y) + numbers::PI;
+        const double r_squared = x * x + y * y;
 
-        values[i](0) = std::pow(r2, .25) * std::sin(.5 * phi);
+        values[i](0) = std::pow(r_squared, .25) * std::sin(.5 * phi);
       }
   }
 
@@ -1551,10 +1561,10 @@ namespace Functions
   SlitSingularityFunction<dim>::gradient(const Point<dim> &p,
                                          const unsigned int) const
   {
-    double x   = p(0);
-    double y   = p(1);
-    double phi = std::atan2(x, y) + numbers::PI;
-    double r64 = std::pow(x * x + y * y, 3. / 4.);
+    const double x   = p(0);
+    const double y   = p(1);
+    const double phi = std::atan2(x, y) + numbers::PI;
+    const double r64 = std::pow(x * x + y * y, 3. / 4.);
 
     Tensor<1, dim> result;
     result[0] = 1. / 2. *
@@ -1580,10 +1590,10 @@ namespace Functions
     for (unsigned int i = 0; i < points.size(); ++i)
       {
         const Point<dim> &p   = points[i];
-        double            x   = p(0);
-        double            y   = p(1);
-        double            phi = std::atan2(x, y) + numbers::PI;
-        double            r64 = std::pow(x * x + y * y, 3. / 4.);
+        const double      x   = p(0);
+        const double      y   = p(1);
+        const double      phi = std::atan2(x, y) + numbers::PI;
+        const double      r64 = std::pow(x * x + y * y, 3. / 4.);
 
         gradients[i][0] =
           1. / 2. *
@@ -1611,10 +1621,10 @@ namespace Functions
                ExcDimensionMismatch(gradients[i].size(), 1));
 
         const Point<dim> &p   = points[i];
-        double            x   = p(0);
-        double            y   = p(1);
-        double            phi = std::atan2(x, y) + numbers::PI;
-        double            r64 = std::pow(x * x + y * y, 3. / 4.);
+        const double      x   = p(0);
+        const double      y   = p(1);
+        const double      phi = std::atan2(x, y) + numbers::PI;
+        const double      r64 = std::pow(x * x + y * y, 3. / 4.);
 
         gradients[i][0][0] =
           1. / 2. *
@@ -1634,13 +1644,13 @@ namespace Functions
   SlitHyperSingularityFunction::value(const Point<2> &p,
                                       const unsigned int) const
   {
-    double x = p(0);
-    double y = p(1);
+    const double x = p(0);
+    const double y = p(1);
 
-    double phi = std::atan2(x, y) + numbers::PI;
-    double r2  = x * x + y * y;
+    const double phi       = std::atan2(x, y) + numbers::PI;
+    const double r_squared = x * x + y * y;
 
-    return std::pow(r2, .125) * std::sin(.25 * phi);
+    return std::pow(r_squared, .125) * std::sin(.25 * phi);
   }
 
 
@@ -1654,13 +1664,13 @@ namespace Functions
 
     for (unsigned int i = 0; i < points.size(); ++i)
       {
-        double x = points[i](0);
-        double y = points[i](1);
+        const double x = points[i](0);
+        const double y = points[i](1);
 
-        double phi = std::atan2(x, y) + numbers::PI;
-        double r2  = x * x + y * y;
+        const double phi       = std::atan2(x, y) + numbers::PI;
+        const double r_squared = x * x + y * y;
 
-        values[i] = std::pow(r2, .125) * std::sin(.25 * phi);
+        values[i] = std::pow(r_squared, .125) * std::sin(.25 * phi);
       }
   }
 
@@ -1678,13 +1688,13 @@ namespace Functions
         Assert(values[i].size() == 1,
                ExcDimensionMismatch(values[i].size(), 1));
 
-        double x = points[i](0);
-        double y = points[i](1);
+        const double x = points[i](0);
+        const double y = points[i](1);
 
-        double phi = std::atan2(x, y) + numbers::PI;
-        double r2  = x * x + y * y;
+        const double phi       = std::atan2(x, y) + numbers::PI;
+        const double r_squared = x * x + y * y;
 
-        values[i](0) = std::pow(r2, .125) * std::sin(.25 * phi);
+        values[i](0) = std::pow(r_squared, .125) * std::sin(.25 * phi);
       }
   }
 
@@ -1715,10 +1725,10 @@ namespace Functions
   SlitHyperSingularityFunction::gradient(const Point<2> &p,
                                          const unsigned int) const
   {
-    double x   = p(0);
-    double y   = p(1);
-    double phi = std::atan2(x, y) + numbers::PI;
-    double r78 = std::pow(x * x + y * y, 7. / 8.);
+    const double x   = p(0);
+    const double y   = p(1);
+    const double phi = std::atan2(x, y) + numbers::PI;
+    const double r78 = std::pow(x * x + y * y, 7. / 8.);
 
 
     Tensor<1, 2> result;
@@ -1744,10 +1754,10 @@ namespace Functions
     for (unsigned int i = 0; i < points.size(); ++i)
       {
         const Point<2> &p   = points[i];
-        double          x   = p(0);
-        double          y   = p(1);
-        double          phi = std::atan2(x, y) + numbers::PI;
-        double          r78 = std::pow(x * x + y * y, 7. / 8.);
+        const double    x   = p(0);
+        const double    y   = p(1);
+        const double    phi = std::atan2(x, y) + numbers::PI;
+        const double    r78 = std::pow(x * x + y * y, 7. / 8.);
 
         gradients[i][0] =
           1. / 4. *
@@ -1773,10 +1783,10 @@ namespace Functions
                ExcDimensionMismatch(gradients[i].size(), 1));
 
         const Point<2> &p   = points[i];
-        double          x   = p(0);
-        double          y   = p(1);
-        double          phi = std::atan2(x, y) + numbers::PI;
-        double          r78 = std::pow(x * x + y * y, 7. / 8.);
+        const double    x   = p(0);
+        const double    y   = p(1);
+        const double    phi = std::atan2(x, y) + numbers::PI;
+        const double    r78 = std::pow(x * x + y * y, 7. / 8.);
 
         gradients[i][0][0] =
           1. / 4. *
@@ -1816,7 +1826,7 @@ namespace Functions
   double
   JumpFunction<dim>::value(const Point<dim> &p, const unsigned int) const
   {
-    double x = steepness * (-cosine * p(0) + sine * p(1));
+    const double x = steepness * (-cosine * p(0) + sine * p(1));
     return -std::atan(x);
   }
 
@@ -1833,8 +1843,8 @@ namespace Functions
 
     for (unsigned int i = 0; i < p.size(); ++i)
       {
-        double x  = steepness * (-cosine * p[i](0) + sine * p[i](1));
-        values[i] = -std::atan(x);
+        const double x = steepness * (-cosine * p[i](0) + sine * p[i](1));
+        values[i]      = -std::atan(x);
       }
   }
 
@@ -1843,8 +1853,8 @@ namespace Functions
   double
   JumpFunction<dim>::laplacian(const Point<dim> &p, const unsigned int) const
   {
-    double x = steepness * (-cosine * p(0) + sine * p(1));
-    double r = 1 + x * x;
+    const double x = steepness * (-cosine * p(0) + sine * p(1));
+    const double r = 1 + x * x;
     return 2 * steepness * steepness * x / (r * r);
   }
 
@@ -1862,9 +1872,9 @@ namespace Functions
 
     for (unsigned int i = 0; i < p.size(); ++i)
       {
-        double x  = steepness * (-cosine * p[i](0) + sine * p[i](1));
-        double r  = 1 + x * x;
-        values[i] = f * x / (r * r);
+        const double x = steepness * (-cosine * p[i](0) + sine * p[i](1));
+        const double r = 1 + x * x;
+        values[i]      = f * x / (r * r);
       }
   }
 
@@ -1874,8 +1884,8 @@ namespace Functions
   Tensor<1, dim>
   JumpFunction<dim>::gradient(const Point<dim> &p, const unsigned int) const
   {
-    double         x = steepness * (-cosine * p(0) + sine * p(1));
-    double         r = -steepness * (1 + x * x);
+    const double   x = steepness * (-cosine * p(0) + sine * p(1));
+    const double   r = -steepness * (1 + x * x);
     Tensor<1, dim> erg;
     erg[0] = cosine * r;
     erg[1] = sine * r;
@@ -1895,8 +1905,8 @@ namespace Functions
 
     for (unsigned int i = 0; i < p.size(); ++i)
       {
-        double x        = steepness * (cosine * p[i](0) + sine * p[i](1));
-        double r        = -steepness * (1 + x * x);
+        const double x  = steepness * (cosine * p[i](0) + sine * p[i](1));
+        const double r  = -steepness * (1 + x * x);
         gradients[i][0] = cosine * r;
         gradients[i][1] = sine * r;
       }
@@ -1933,7 +1943,7 @@ namespace Functions
                                     const unsigned int component) const
   {
     (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    AssertIndexRange(component, 1);
     return std::cos(fourier_coefficients * p);
   }
 
@@ -1945,7 +1955,7 @@ namespace Functions
                                        const unsigned int component) const
   {
     (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    AssertIndexRange(component, 1);
     return -fourier_coefficients * std::sin(fourier_coefficients * p);
   }
 
@@ -1957,7 +1967,7 @@ namespace Functions
                                         const unsigned int component) const
   {
     (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    AssertIndexRange(component, 1);
     return (fourier_coefficients * fourier_coefficients) *
            (-std::cos(fourier_coefficients * p));
   }
@@ -1983,7 +1993,7 @@ namespace Functions
                                   const unsigned int component) const
   {
     (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    AssertIndexRange(component, 1);
     return std::sin(fourier_coefficients * p);
   }
 
@@ -1995,7 +2005,7 @@ namespace Functions
                                      const unsigned int component) const
   {
     (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    AssertIndexRange(component, 1);
     return fourier_coefficients * std::cos(fourier_coefficients * p);
   }
 
@@ -2007,7 +2017,7 @@ namespace Functions
                                       const unsigned int component) const
   {
     (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    AssertIndexRange(component, 1);
     return (fourier_coefficients * fourier_coefficients) *
            (-std::sin(fourier_coefficients * p));
   }
@@ -2039,7 +2049,7 @@ namespace Functions
                              const unsigned int component) const
   {
     (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    AssertIndexRange(component, 1);
 
     const unsigned int n   = weights.size();
     double             sum = 0;
@@ -2057,7 +2067,7 @@ namespace Functions
                                 const unsigned int component) const
   {
     (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    AssertIndexRange(component, 1);
 
     const unsigned int n = weights.size();
     Tensor<1, dim>     sum;
@@ -2075,7 +2085,7 @@ namespace Functions
                                  const unsigned int component) const
   {
     (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    AssertIndexRange(component, 1);
 
     const unsigned int n   = weights.size();
     double             sum = 0;
@@ -2113,7 +2123,7 @@ namespace Functions
                                const unsigned int component) const
   {
     (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    AssertIndexRange(component, 1);
 
     const unsigned int n   = weights.size();
     double             sum = 0;
@@ -2131,7 +2141,7 @@ namespace Functions
                                   const unsigned int component) const
   {
     (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    AssertIndexRange(component, 1);
 
     const unsigned int n = weights.size();
     Tensor<1, dim>     sum;
@@ -2149,7 +2159,7 @@ namespace Functions
                                    const unsigned int component) const
   {
     (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    AssertIndexRange(component, 1);
 
     const unsigned int n   = weights.size();
     double             sum = 0;
@@ -2180,8 +2190,7 @@ namespace Functions
   Monomial<dim>::value(const Point<dim> &p, const unsigned int component) const
   {
     (void)component;
-    Assert(component < this->n_components,
-           ExcIndexRange(component, 0, this->n_components));
+    AssertIndexRange(component, this->n_components);
 
     double prod = 1;
     for (unsigned int s = 0; s < dim; ++s)
@@ -2216,7 +2225,7 @@ namespace Functions
                           const unsigned int component) const
   {
     (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    AssertIndexRange(component, 1);
 
     Tensor<1, dim> r;
     for (unsigned int d = 0; d < dim; ++d)
@@ -2475,6 +2484,8 @@ namespace Functions
     }
   } // namespace
 
+
+
   template <int dim>
   InterpolatedTensorProductGridData<dim>::InterpolatedTensorProductGridData(
     const std::array<std::vector<double>, dim> &coordinate_values,
@@ -2495,6 +2506,33 @@ namespace Functions
               "Coordinate arrays must be sorted in strictly ascending order."));
 
         Assert(data_values.size()[d] == coordinate_values[d].size(),
+               ExcMessage(
+                 "Data and coordinate tables do not have the same size."));
+      }
+  }
+
+
+
+  template <int dim>
+  InterpolatedTensorProductGridData<dim>::InterpolatedTensorProductGridData(
+    std::array<std::vector<double>, dim> &&coordinate_values,
+    Table<dim, double> &&                  data_values)
+    : coordinate_values(std::move(coordinate_values))
+    , data_values(std::move(data_values))
+  {
+    for (unsigned int d = 0; d < dim; ++d)
+      {
+        Assert(
+          this->coordinate_values[d].size() >= 2,
+          ExcMessage(
+            "Coordinate arrays must have at least two coordinate values!"));
+        for (unsigned int i = 0; i < this->coordinate_values[d].size() - 1; ++i)
+          Assert(
+            this->coordinate_values[d][i] < this->coordinate_values[d][i + 1],
+            ExcMessage(
+              "Coordinate arrays must be sorted in strictly ascending order."));
+
+        Assert(this->data_values.size()[d] == this->coordinate_values[d].size(),
                ExcMessage(
                  "Data and coordinate tables do not have the same size."));
       }
@@ -2535,6 +2573,28 @@ namespace Functions
       }
 
     return ix;
+  }
+
+
+
+  template <int dim>
+  std::size_t
+  InterpolatedTensorProductGridData<dim>::memory_consumption() const
+  {
+    return sizeof(*this) +
+           MemoryConsumption::memory_consumption(coordinate_values) -
+           sizeof(coordinate_values) +
+           MemoryConsumption::memory_consumption(data_values) -
+           sizeof(data_values);
+  }
+
+
+
+  template <int dim>
+  const Table<dim, double> &
+  InterpolatedTensorProductGridData<dim>::get_data() const
+  {
+    return data_values;
   }
 
 
@@ -2623,6 +2683,32 @@ namespace Functions
   }
 
 
+
+  template <int dim>
+  InterpolatedUniformGridData<dim>::InterpolatedUniformGridData(
+    std::array<std::pair<double, double>, dim> &&interval_endpoints,
+    std::array<unsigned int, dim> &&             n_subintervals,
+    Table<dim, double> &&                        data_values)
+    : interval_endpoints(std::move(interval_endpoints))
+    , n_subintervals(std::move(n_subintervals))
+    , data_values(std::move(data_values))
+  {
+    for (unsigned int d = 0; d < dim; ++d)
+      {
+        Assert(this->n_subintervals[d] >= 1,
+               ExcMessage("There needs to be at least one subinterval in each "
+                          "coordinate direction."));
+        Assert(this->interval_endpoints[d].first <
+                 this->interval_endpoints[d].second,
+               ExcMessage("The interval in each coordinate direction needs "
+                          "to have positive size"));
+        Assert(this->data_values.size()[d] == this->n_subintervals[d] + 1,
+               ExcMessage("The data table does not have the correct size."));
+      }
+  }
+
+
+
   template <int dim>
   double
   InterpolatedUniformGridData<dim>::value(const Point<dim> & p,
@@ -2670,6 +2756,78 @@ namespace Functions
     return interpolate(data_values, ix, p_unit);
   }
 
+
+
+  template <int dim>
+  Tensor<1, dim>
+  InterpolatedUniformGridData<dim>::gradient(const Point<dim> & p,
+                                             const unsigned int component) const
+  {
+    (void)component;
+    Assert(
+      component == 0,
+      ExcMessage(
+        "This is a scalar function object, the component can only be zero."));
+
+    // find out where this data point lies, relative to the given
+    // subdivision points
+    TableIndices<dim> ix;
+    for (unsigned int d = 0; d < dim; ++d)
+      {
+        const double delta_x = ((this->interval_endpoints[d].second -
+                                 this->interval_endpoints[d].first) /
+                                this->n_subintervals[d]);
+        if (p[d] <= this->interval_endpoints[d].first)
+          ix[d] = 0;
+        else if (p[d] >= this->interval_endpoints[d].second - delta_x)
+          ix[d] = this->n_subintervals[d] - 1;
+        else
+          ix[d] = static_cast<unsigned int>(
+            (p[d] - this->interval_endpoints[d].first) / delta_x);
+      }
+
+    // now compute the relative point within the interval/rectangle/box
+    // defined by the point coordinates found above. truncate below and
+    // above to accommodate points that may lie outside the range
+    Point<dim> p_unit;
+    Point<dim> delta_x;
+    for (unsigned int d = 0; d < dim; ++d)
+      {
+        delta_x[d] = ((this->interval_endpoints[d].second -
+                       this->interval_endpoints[d].first) /
+                      this->n_subintervals[d]);
+        p_unit[d] =
+          std::max(std::min((p[d] - this->interval_endpoints[d].first -
+                             ix[d] * delta_x[d]) /
+                              delta_x[d],
+                            1.),
+                   0.);
+      }
+
+    return gradient_interpolate(this->data_values, ix, p_unit, delta_x);
+  }
+
+
+
+  template <int dim>
+  std::size_t
+  InterpolatedUniformGridData<dim>::memory_consumption() const
+  {
+    return sizeof(*this) + data_values.memory_consumption() -
+           sizeof(data_values);
+  }
+
+
+
+  template <int dim>
+  const Table<dim, double> &
+  InterpolatedUniformGridData<dim>::get_data() const
+  {
+    return data_values;
+  }
+
+
+
   /* ---------------------- Polynomial ----------------------- */
 
 
@@ -2695,7 +2853,7 @@ namespace Functions
                          const unsigned int component) const
   {
     (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    AssertIndexRange(component, 1);
 
     double sum = 0;
     for (unsigned int monom = 0; monom < exponents.n_rows(); ++monom)
@@ -2737,7 +2895,7 @@ namespace Functions
                             const unsigned int component) const
   {
     (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    AssertIndexRange(component, 1);
 
     Tensor<1, dim> r;
 
@@ -2775,6 +2933,18 @@ namespace Functions
       }
     return r;
   }
+
+
+
+  template <int dim>
+  std::size_t
+  Polynomial<dim>::memory_consumption() const
+  {
+    return sizeof(*this) + exponents.memory_consumption() - sizeof(exponents) +
+           MemoryConsumption::memory_consumption(coefficients) -
+           sizeof(coefficients);
+  }
+
 
 
   // explicit instantiations

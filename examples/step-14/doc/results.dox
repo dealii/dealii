@@ -1,6 +1,6 @@
 <h1>Results</h1>
 
-<h2>Point values</h2>
+<h3>Point values</h3>
 
 
 This program offers a lot of possibilities to play around. We can thus
@@ -47,41 +47,46 @@ Refinement cycle: 8
 @endcode
 
 
-First let's look what the program actually computed. On the fifth
-grid, primal and dual numerical solutions look like this:
+First let's look what the program actually computed. On the seventh
+grid, primal and dual numerical solutions look like this (using a
+color scheme intended to evoke the snow-capped mountains of
+Colorado that the original author of this program now calls
+home):
 <table align="center">
   <tr>
     <td width="50%">
-      <img src="https://www.dealii.org/images/steps/developer/step-14.point-value.solution-5.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-14.point-value.solution-7.9.2.png" alt="">
     </td>
     <td width="50%">
-      <img src="https://www.dealii.org/images/steps/developer/step-14.point-value.solution-5-dual.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-14.point-value.solution-7-dual.9.2.png" alt="">
     </td>
   </tr>
 </table>
-Obviously, the region at the bottom left is so unimportant for the
+Apparently, the region at the bottom left is so unimportant for the
 point value evaluation at the top right that the grid is left entirely
-unrefined there, even though the solution has singularities there! Due
+unrefined there, even though the solution has singularities at the inner
+corner of that cell! Due
 to the symmetry in right hand side and domain, the solution should
 actually look like at the top right in all four corners, but the mesh
 refinement criterion involving the dual solution chose to refine them
-differently.
+differently -- because we said that we really only care about a single
+function value somewhere at the top right.
 
 
 
-Looking at the grids that are produced in the course of subsequent
-refinement, here are some of them:
+Here are some of the meshes that are produced in refinement cycles 0,
+2, 4 (top row), and 5, 7, and 8 (bottom row):
 
 <table width="80%" align="center">
   <tr>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-14.point-value.grid-0.png" alt="" width="100%"></td>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-14.point-value.grid-2.png" alt="" width="100%"></td>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-14.point-value.grid-4.png" alt="" width="100%"></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-14.point-value.grid-0.9.2.png" alt="" width="100%"></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-14.point-value.grid-2.9.2.png" alt="" width="100%"></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-14.point-value.grid-4.9.2.png" alt="" width="100%"></td>
   </tr>
   <tr>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-14.point-value.grid-5.png" alt="" width="100%"></td>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-14.point-value.grid-7.png" alt="" width="100%"></td>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-14.point-value.grid-8.png" alt="" width="100%"></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-14.point-value.grid-5.9.2.png" alt="" width="100%"></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-14.point-value.grid-7.9.2.png" alt="" width="100%"></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-14.point-value.grid-8.9.2.png" alt="" width="100%"></td>
   </tr>
 </table>
 
@@ -89,14 +94,14 @@ Note the subtle interplay between resolving the corner singularities,
 and resolving around the point of evaluation. It will be rather
 difficult to generate such a mesh by hand, as this would involve to
 judge quantitatively how much which of the four corner singularities
-shall be resolved, and to set the weight compared to the vicinity of
+should be resolved, and to set the weight compared to the vicinity of
 the evaluation point.
 
 
 
 The program prints the point value and the estimated error in this
 quantity. From extrapolating it, we can guess that the exact value is
-somewhat like 0.0334473, plus or minus 0.0000001 (note that we get
+somewhere close to 0.0334473, plus or minus 0.0000001 (note that we get
 almost 6 valid digits from only 22,000 (primal) degrees of
 freedom. This number cannot be obtained from the value of the
 functional alone, but I have used the assumption that the error
@@ -131,7 +136,7 @@ value:
 </table>
 
 
-<h2>Comparing refinement criteria</h2>
+<h3>Comparing refinement criteria</h3>
 
 
 Since we have accepted quite some effort when using the mesh
@@ -167,7 +172,7 @@ smaller errors.
 
 
 
-<h2>Evaluation of point stresses</h2>
+<h3>Evaluation of point stresses</h3>
 
 
 Besides evaluating the values of the solution at a certain point, the
@@ -227,7 +232,10 @@ evaluation shows this:
 <table align="center">
   <tr>
     <td width="50%">
-      <img src="https://www.dealii.org/images/steps/developer/step-14.point-derivative.solution-5-dual.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-14.point-derivative.solution-7-dual.png" alt="">
+    </td>
+    <td width="50%">
+      <img src="https://www.dealii.org/images/steps/developer/step-14.point-derivative.solution-7-dual-close-up.png" alt="">
     </td>
 </table>
 This time, the grids in refinement cycles 0, 5, 6, 7, 8, and 9 look
@@ -235,20 +243,21 @@ like this:
 
 <table align="center" width="80%">
   <tr>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-14.point-derivative.grid-0.png" alt="" width="100%"></td>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-14.point-derivative.grid-5.png" alt="" width="100%"></td>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-14.point-derivative.grid-6.png" alt="" width="100%"></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-14.point-derivative.grid-0.9.2.png" alt="" width="100%"></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-14.point-derivative.grid-5.9.2.png" alt="" width="100%"></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-14.point-derivative.grid-6.9.2.png" alt="" width="100%"></td>
   </tr>
   <tr>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-14.point-derivative.grid-7.png" alt="" width="100%"></td>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-14.point-derivative.grid-8.png" alt="" width="100%"></td>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-14.point-derivative.grid-9.png" alt="" width="100%"></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-14.point-derivative.grid-7.9.2.png" alt="" width="100%"></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-14.point-derivative.grid-8.9.2.png" alt="" width="100%"></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-14.point-derivative.grid-9.9.2.png" alt="" width="100%"></td>
   </tr>
 </table>
 
 Note the asymmetry of the grids compared with those we obtained for
-the point evaluation, which is due to the directionality of the
-x-derivative for which we tailored the refinement criterion.
+the point evaluation. This is due to the fact that the domain and the primal
+solution may be symmetric about the diagonal, but the $x$-derivative is
+not, and the latter enters the refinement criterion.
 
 
 
@@ -281,36 +290,38 @@ computed value of $J(u_h)$.
 
 
 
-<h2>Step-13 revisited</h2>
+<h3>step-13 revisited</h3>
 
 
 If instead of the <code>Exercise_2_3</code> data set, we choose
-<code>CurvedRidges</code> in the main function, we can redo the
+<code>CurvedRidges</code> in the main function, and choose $(0.5,0.5)$
+as the evaluation point, then we can redo the
 computations of the previous example program, to compare whether the
 results obtained with the help of the dual weighted error estimator
 are better than those we had previously.
 
 
 
-First, the meshes after 9 and 10 adaptive refinement cycles,
-respectively, look like this:
+First, the meshes after 9 adaptive refinement cycles obtained with
+the point evaluation and derivative evaluation refinement
+criteria, respectively, look like this:
 
 <table width="80%" align="center">
   <tr>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-14.step-13.grid-9.png" alt="" width="100%"></td>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-14.step-13.grid-10.png" alt="" width="100%"></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-14.step-13.point-value.png" alt="" width="100%"></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-14.step-13.point-derivative.png" alt="" width="100%"></td>
   </tr>
 </table>
 
-The features of the solution can still be seen slightly, but since the
-solution is smooth, the roughness of the dual solution entirely
-dominates the mesh refinement criterion, and leads to strongly
-concentrated meshes. The solution after the seventh refinement step is
-like so:
+The features of the solution can still be seen in the mesh, but since the
+solution is smooth, the singularities of the dual solution entirely
+dominate the mesh refinement criterion, and lead to strongly
+concentrated meshes. The solution after the seventh refinement step looks
+like the following:
 
-<table width="80%" align="center">
+<table width="40%" align="center">
   <tr>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-14.step-13.solution-7.png" alt="" width="100%"></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-14.step-13.solution-7.9.2.png" alt="" width="100%"></td>
   </tr>
 </table>
 
@@ -346,7 +357,7 @@ would remain.
 
 
 
-<h2>Conclusions and outlook</h2>
+<h3>Conclusions and outlook</h3>
 
 
 The results here are not too clearly indicating the superiority of the
@@ -381,8 +392,3 @@ program in a modular way, such that implementing another test case, or
 another evaluation and dual functional is simple. You are encouraged
 to take the program as a basis for your own experiments, and to play a
 little.
-
-
-
-
-

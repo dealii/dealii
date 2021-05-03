@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -79,14 +79,16 @@ for (deal_II_dimension : DIMENSIONS; S : REAL_SCALARS)
         setup_transfer<deal_II_dimension>(
           const dealii::DoFHandler<deal_II_dimension> &,
           const MGConstrainedDoFs *,
+          const std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
+            &,
           ElementInfo<S> &,
           std::vector<std::vector<unsigned int>> &,
           std::vector<std::vector<std::pair<unsigned int, unsigned int>>> &,
           std::vector<unsigned int> &,
           std::vector<std::vector<std::vector<unsigned short>>> &,
           std::vector<std::vector<S>> &,
-          std::vector<std::vector<std::pair<unsigned int, unsigned int>>> &,
-          MGLevelObject<LinearAlgebra::distributed::Vector<S>> &);
+          std::vector<Table<2, unsigned int>> &,
+          MGLevelObject<std::shared_ptr<const Utilities::MPI::Partitioner>> &);
       \}
     \}
   }

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2018 by the deal.II authors
+// Copyright (C) 2001 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -63,7 +63,6 @@ test()
           << std::endl;
 }
 
-using namespace dealii;
 int
 main()
 {

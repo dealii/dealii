@@ -17,11 +17,11 @@ DEAL::Number of run: 2
 # ---------------------
 subsection Testing
   # docs 3
-  set double      = 3.9999 # default: 3.1415926
-  set int         = 333    # default: 1
+  set double      = 3.141592 # default: 3.1415926
+  set int         = 393      # default: 1
 
   # docs 1
-  set string list = b      # default: a
+  set string list = b        # default: a
 end
 
 
@@ -30,11 +30,11 @@ DEAL::Number of run: 3
 # ---------------------
 subsection Testing
   # docs 3
-  set double      = 3.141592 # default: 3.1415926
-  set int         = 393      # default: 1
+  set double      = 3.9999 # default: 3.1415926
+  set int         = 333    # default: 1
 
   # docs 1
-  set string list = c        # default: a
+  set string list = c      # default: a
 end
 
 

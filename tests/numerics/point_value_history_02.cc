@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -48,8 +48,6 @@
 
 #include "../tests.h"
 
-
-using namespace dealii;
 
 
 template <int dim>
@@ -184,7 +182,7 @@ TestPointValueHistory<dim>::run()
 
   //            // BlockVector
   //        std::vector<unsigned int> dofs_per_block(2);
-  //        DoFTools::count_dofs_per_block(dof_handler, dofs_per_block,
+  //        DoFTools::count_dofs_per_fe_block(dof_handler, dofs_per_block,
   //        block_component); const unsigned int n_u = dofs_per_block[0],
   //                n_p = dofs_per_block[1];
   //        BlockVector<double> solution;

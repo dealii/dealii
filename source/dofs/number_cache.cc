@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,6 +14,7 @@
 // ---------------------------------------------------------------------
 
 #include <deal.II/base/memory_consumption.h>
+#include <deal.II/base/mpi.h>
 
 #include <deal.II/dofs/number_cache.h>
 
@@ -79,6 +80,54 @@ namespace internal
       n_locally_owned_dofs_per_processor.clear();
       locally_owned_dofs_per_processor.clear();
     }
+
+
+
+    std::vector<types::global_dof_index>
+    NumberCache::get_n_locally_owned_dofs_per_processor(
+      const MPI_Comm &mpi_communicator) const
+    {
+      if (n_global_dofs == 0)
+        return std::vector<types::global_dof_index>();
+      else if (n_locally_owned_dofs_per_processor.empty() == false)
+        {
+          AssertDimension(n_locally_owned_dofs_per_processor.size(),
+                          (Utilities::MPI::job_supports_mpi() ?
+                             Utilities::MPI::n_mpi_processes(mpi_communicator) :
+                             1));
+          return n_locally_owned_dofs_per_processor;
+        }
+      else
+        {
+          return Utilities::MPI::all_gather(mpi_communicator,
+                                            n_locally_owned_dofs);
+        }
+    }
+
+
+
+    std::vector<IndexSet>
+    NumberCache::get_locally_owned_dofs_per_processor(
+      const MPI_Comm &mpi_communicator) const
+    {
+      AssertDimension(locally_owned_dofs.size(), n_global_dofs);
+      if (n_global_dofs == 0)
+        return std::vector<IndexSet>();
+      else if (locally_owned_dofs_per_processor.empty() == false)
+        {
+          AssertDimension(locally_owned_dofs_per_processor.size(),
+                          (Utilities::MPI::job_supports_mpi() ?
+                             Utilities::MPI::n_mpi_processes(mpi_communicator) :
+                             1));
+          return locally_owned_dofs_per_processor;
+        }
+      else
+        {
+          return Utilities::MPI::all_gather(mpi_communicator,
+                                            locally_owned_dofs);
+        }
+    }
+
 
     std::size_t
     NumberCache::memory_consumption() const

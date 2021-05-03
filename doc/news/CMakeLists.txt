@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2016 by the deal.II Authors
+## Copyright (C) 2016 - 2020 by the deal.II Authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -30,7 +30,7 @@ IF(DEAL_II_COMPONENT_DOCUMENTATION)
     COMMAND ${CMAKE_COMMAND} -DOUTPUT_FILE=${CMAKE_CURRENT_BINARY_DIR}/changes.h
                              -P ${CMAKE_CURRENT_SOURCE_DIR}/changes/create_changes_h.cmake
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/changes
-    DEPENDS 
+    DEPENDS
       ${CMAKE_CURRENT_SOURCE_DIR}/changes/header
       ${CMAKE_CURRENT_SOURCE_DIR}/changes/header_incompatibilities
       ${CMAKE_CURRENT_SOURCE_DIR}/changes/header_major
@@ -48,4 +48,3 @@ IF(DEAL_II_COMPONENT_DOCUMENTATION)
   ADD_DEPENDENCIES(documentation changelog)
 
 ENDIF(DEAL_II_COMPONENT_DOCUMENTATION)
-

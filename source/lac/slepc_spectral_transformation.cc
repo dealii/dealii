@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -123,7 +123,7 @@ namespace SLEPcWrappers
     Assert((false),
            ExcMessage(
              "Folding transformation has been removed in SLEPc 3.5.0 and newer."
-             "You cannot use this transformation anymore."));
+             " You cannot use this transformation anymore."));
 #  endif
   }
 

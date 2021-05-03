@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2015 by the deal.II authors
+## Copyright (C) 2012 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -26,6 +26,9 @@
 SET(ARPACK_DIR "" CACHE PATH "An optional hint to an ARPACK installation")
 SET_IF_EMPTY(ARPACK_DIR "$ENV{ARPACK_DIR}")
 
+SET(PARPACK_DIR "" CACHE PATH "An optional hint to a PARPACK installation")
+SET_IF_EMPTY(PARPACK_DIR "$ENV{PARPACK_DIR}")
+
 DEAL_II_FIND_LIBRARY(ARPACK_LIBRARY
   NAMES arpack
   HINTS ${ARPACK_DIR}
@@ -33,20 +36,11 @@ DEAL_II_FIND_LIBRARY(ARPACK_LIBRARY
   )
 
 IF(DEAL_II_WITH_MPI)
-  #
-  # Sanity check: Only search the parpack library in the same directory as
-  # the arpack library...
-  #
   GET_FILENAME_COMPONENT(_path "${ARPACK_LIBRARY}" PATH)
   DEAL_II_FIND_LIBRARY(PARPACK_LIBRARY
     NAMES parpack
-    HINTS ${_path}
-    NO_DEFAULT_PATH
-    NO_CMAKE_ENVIRONMENT_PATH
-    NO_CMAKE_PATH
-    NO_SYSTEM_ENVIRONMENT_PATH
-    NO_CMAKE_SYSTEM_PATH
-    NO_CMAKE_FIND_ROOT_PATH
+    HINTS ${_path} ${ARPACK_DIR} ${PARPACK_DIR}
+    PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
     )
 ELSE()
   SET(PARPACK_LIBRARY "PARPACK_LIBRARY-NOTFOUND")

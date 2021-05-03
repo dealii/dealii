@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2018 by the deal.II authors
+// Copyright (C) 2001 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -28,6 +28,7 @@
 #include <sstream>
 
 #include "../tests.h"
+
 #include "dof_tools_periodic.h"
 
 // A simple test for
@@ -44,9 +45,9 @@
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-check_this(const DoFHandler<dim> &dof_handler)
+check_this(const DoFHandler<dim, spacedim> &dof_handler)
 {
   Functions::CosineFunction<dim> test_func(dof_handler.get_fe().n_components());
 

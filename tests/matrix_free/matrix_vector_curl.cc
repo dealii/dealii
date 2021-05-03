@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,10 +20,6 @@
 // matrix. The mesh uses a hyperball mesh with hanging nodes for a
 // vector-valued problem (curl-curl operator which does not really make a lot
 // of sense from a problem point of view, though).
-
-#include "../tests.h"
-
-std::ofstream logfile("output");
 
 #include <deal.II/base/utilities.h>
 
@@ -52,6 +48,8 @@ std::ofstream logfile("output");
 #include <complex>
 #include <iostream>
 
+#include "../tests.h"
+
 const double global_coefficient = 0.1;
 
 
@@ -59,8 +57,8 @@ template <int dim, int degree, typename VectorType>
 class MatrixFreeTest
 {
 public:
-  typedef typename DoFHandler<dim>::active_cell_iterator CellIterator;
-  typedef double                                         Number;
+  using CellIterator = typename DoFHandler<dim>::active_cell_iterator;
+  using Number       = double;
 
   MatrixFreeTest(const MatrixFree<dim, Number> &data_in)
     : data(data_in){};
@@ -71,7 +69,7 @@ public:
               const VectorType &                           src,
               const std::pair<unsigned int, unsigned int> &cell_range) const
   {
-    typedef VectorizedArray<Number>                    vector_t;
+    using vector_t = VectorizedArray<Number>;
     FEEvaluation<dim, degree, degree + 1, dim, Number> phi(data);
     vector_t coeff = make_vectorized_array(global_coefficient);
 
@@ -79,12 +77,12 @@ public:
       {
         phi.reinit(cell);
         phi.read_dof_values(src);
-        phi.evaluate(false, true, false);
+        phi.evaluate(EvaluationFlags::gradients);
 
         for (unsigned int q = 0; q < phi.n_q_points; ++q)
           phi.submit_curl(coeff * phi.get_curl(q), q);
 
-        phi.integrate(false, true);
+        phi.integrate(EvaluationFlags::gradients);
         phi.distribute_local_to_global(dst);
       }
   }
@@ -115,7 +113,7 @@ test()
   typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(),
                                                     endc = tria.end();
   for (; cell != endc; ++cell)
-    for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+    for (const unsigned int f : GeometryInfo<dim>::face_indices())
       if (cell->at_boundary(f))
         cell->face(f)->set_all_manifold_ids(0);
   tria.set_manifold(0, manifold);
@@ -283,8 +281,7 @@ test()
 int
 main()
 {
-  deallog.attach(logfile);
-
+  initlog();
   deallog << std::setprecision(3);
 
   {

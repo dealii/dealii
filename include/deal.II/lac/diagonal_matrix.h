@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,6 +16,8 @@
 #ifndef dealii_diagonal_matrix_h
 #define dealii_diagonal_matrix_h
 
+
+#include <deal.II/base/config.h>
 
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/vector_operation.h>
@@ -41,8 +43,6 @@ DEAL_II_NAMESPACE_OPEN
  *                        locally_relevant_dofs,
  *                        mpi_communicator);
  * @endcode
- *
- * @author Martin Kronbichler, 2016
  */
 template <typename VectorType = Vector<double>>
 class DiagonalMatrix : public Subscriptor
@@ -52,9 +52,17 @@ public:
   using size_type  = typename VectorType::size_type;
 
   /**
-   * Constructor.
+   * Default constructor. The object needs still to be reinitialized to be
+   * usable.
    */
   DiagonalMatrix() = default;
+
+  /**
+   * Constructor initializing this object as a diagonal matrix of size `n x n`
+   * where `n` is the size of the vector, and with diagonal entries equal to the
+   * elements of @p vec.
+   */
+  explicit DiagonalMatrix(const VectorType &vec);
 
   /**
    * Initialize with a given vector by copying the content of the vector
@@ -214,6 +222,13 @@ private:
 /* ---------------------------------- Inline functions ------------------- */
 
 #ifndef DOXYGEN
+
+template <typename VectorType>
+DiagonalMatrix<VectorType>::DiagonalMatrix(const VectorType &vec)
+  : diagonal(vec)
+{}
+
+
 
 template <typename VectorType>
 void

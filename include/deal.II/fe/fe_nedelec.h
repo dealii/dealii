@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2018 by the deal.II authors
+// Copyright (C) 2002 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -42,14 +42,51 @@ DEAL_II_NAMESPACE_OPEN
  * consistent orientation of faces. See the todo entries below for more
  * detailed caveats.
  *
- * Implementation of N&eacute;d&eacute;lec elements, conforming with the space
- * H<sup>curl</sup>. These elements generate vector fields with tangential
- * components continuous between mesh cells.
+ * Implementation of N&eacute;d&eacute;lec elements. The N&eacute;d&eacute;lec
+ * space is designed to solve problems in which the solution only lives in the
+ * space
+ * $H^\text{curl}=\{ {\mathbf u} \in L_2: \text{curl}\, {\mathbf u} \in L_2\}$,
+ * rather than in the more commonly used space
+ * $H^1=\{ u \in L_2: \nabla u \in L_2\}$. In other words, the solution must
+ * be a vector field whose curl is square integrable, but for which the
+ * gradient may not be square integrable. The typical application for this
+ * space (and these elements) is to the Maxwell equations and corresponding
+ * simplifications, such as the reduced version of the Maxwell equation
+ * that only involves the electric field $\mathbf E$ which has to satisfy
+ * the equation $\text{curl}\, \text{curl}\, {\mathbf E} = 0$ in the
+ * time independent case when no currents are present, or the equation
+ * $\text{curl}\,\text{curl}\,{\mathbf A} = 4\pi{\mathbf j}$ that the
+ * magnetic vector potential $\mathbf A$ has to satisfy in the
+ * time independent case.
  *
- * We follow the convention that the degree of N&eacute;d&eacute;lec elements
- * denotes the polynomial degree of the largest complete polynomial subspace
- * contained in the N&eacute;d&eacute;lec space. This leads to the
- * consistently numbered sequence of spaces
+ * The defining
+ * characteristic of functions in $H^\text{curl}$ is that they are in
+ * general discontinuous -- but that if you draw a line in 2d (or a
+ * surface in 3d), then the <i>tangential</i> component(s) of the vector
+ * field must be continuous across the line (or surface) even though
+ * the normal component may not be. As a consequence, the
+ * N&eacute;d&eacute;lec element is constructed in such a way that (i) it is
+ * @ref vector_valued "vector-valued", (ii) the shape functions are
+ * discontinuous, but (iii) the tangential component(s) of the vector field
+ * represented by each shape function are continuous across the faces
+ * of cells.
+ *
+ * Other properties of the N&eacute;d&eacute;lec element are that (i) it is
+ * @ref GlossPrimitive "not a primitive element"; (ii) the shape functions
+ * are defined so that certain integrals over the faces are either zero
+ * or one, rather than the common case of certain point values being
+ * either zero or one.
+ *
+ * We follow the commonly used -- though confusing -- definition of the "degree"
+ * of N&eacute;d&eacute;lec elements. Specifically, the "degree" of the element
+ * denotes the polynomial degree of the <i>largest complete polynomial
+ * subspace</i> contained in the finite element space, even if the space may
+ * contain shape functions of higher polynomial degree. The lowest order element
+ * is consequently FE_Nedelec(0), i.e., the Raviart-Thomas element "of degree
+ * zero", even though the functions of this space are in general polynomials of
+ * degree one in each variable. This choice of "degree" implies that the
+ * approximation order of the function itself is <i>degree+1</i>, as with usual
+ * polynomial spaces. The numbering so chosen implies the sequence
  * @f[
  *   Q_{k+1}
  *   \stackrel{\text{grad}}{\rightarrow}
@@ -59,11 +96,8 @@ DEAL_II_NAMESPACE_OPEN
  *   \stackrel{\text{div}}{\rightarrow}
  *   DGQ_{k}
  * @f]
- * Consequently, approximation order of the Nédélec space equals the value
- * <i>degree</i> given to the constructor. In this scheme, the lowest order
- * element would be created by the call FE_Nedelec<dim>(0). Note that this
- * follows the convention of Brezzi and Raviart, though not the one used in
- * the original paper by Nédélec.
+ * Note that this follows the convention of Brezzi and Raviart,
+ * though not the one used in the original paper by N&eacute;d&eacute;lec.
  *
  * This class is not implemented for the codimension one case (<tt>spacedim !=
  * dim</tt>).
@@ -105,19 +139,22 @@ DEAL_II_NAMESPACE_OPEN
  * The points needed are those of QGauss<sub>k+1</sub> on each edge and
  * QGauss<sub>k+2</sub> on each face and in the interior of the cell (or none
  * for N<sub>1</sub>).
- *
- * @author Markus B&uuml;rg
- * @date 2009, 2010, 2011
  */
 template <int dim>
-class FE_Nedelec : public FE_PolyTensor<PolynomialsNedelec<dim>, dim>
+class FE_Nedelec : public FE_PolyTensor<dim>
 {
 public:
   /**
-   * Constructor for the N&eacute;d&eacute;lec element of given @p order.
-   * The maximal polynomial degree of the shape functions is
-   * <code>order+1</code> (in each variable; the total polynomial degree
-   * may be higher).
+   * Constructor for the Nedelec element of given @p order. The maximal
+   * polynomial degree of the shape functions is `order+1` (in each variable;
+   * the total polynomial degree may be higher). If `order = 0`, the element is
+   * linear and has degrees of freedom only on the edges. If `order >=1` the
+   * element has degrees of freedom on the edges, faces and volume. For example
+   * the 3D version of FE_Nedelec has 12 degrees of freedom for `order = 0`
+   * and 54 for `degree = 1`. It is important to have enough quadrature points
+   * in order to perform the quadrature with sufficient accuracy.
+   * For example [QGauss<dim>(order + 2)](@ref QGauss) can be used for the
+   * quadrature formula, where `order` is the order of FE_Nedelec.
    */
   FE_Nedelec(const unsigned int order);
 
@@ -140,11 +177,11 @@ public:
 
   /**
    * Return whether this element implements its hanging node constraints in
-   * the new way, which has to be used to make elements "hp compatible".
+   * the new way, which has to be used to make elements "hp-compatible".
    *
    * For the <tt>FE_Nedelec</tt> class the result is always true (independent
    * of the degree of the element), as it implements the complete set of
-   * functions necessary for hp capability.
+   * functions necessary for hp-capability.
    */
   virtual bool
   hp_constraints_are_implemented() const override;
@@ -157,7 +194,7 @@ public:
                          const unsigned int codim = 0) const override final;
 
   /**
-   * If, on a vertex, several finite elements are active, the hp code first
+   * If, on a vertex, several finite elements are active, the hp-code first
    * assigns the degrees of freedom of each of these FEs different global
    * indices. It then calls this function to find out which of them should get
    * identical values, and consequently can receive the same global DoF index.
@@ -166,10 +203,10 @@ public:
    * reference to a finite element object representing one of the other finite
    * elements active on this particular vertex. The function computes which of
    * the degrees of freedom of the two finite element objects are equivalent,
-   * both numbered between zero and the corresponding value of dofs_per_vertex
-   * of the two finite elements. The first index of each pair denotes one of
-   * the vertex dofs of the present element, whereas the second is the
-   * corresponding index of the other finite element.
+   * both numbered between zero and the corresponding value of
+   * n_dofs_per_vertex() of the two finite elements. The first index of each
+   * pair denotes one of the vertex dofs of the present element, whereas the
+   * second is the corresponding index of the other finite element.
    */
   virtual std::vector<std::pair<unsigned int, unsigned int>>
   hp_vertex_dof_identities(const FiniteElement<dim> &fe_other) const override;
@@ -186,7 +223,8 @@ public:
    * of freedom on lines.
    */
   virtual std::vector<std::pair<unsigned int, unsigned int>>
-  hp_quad_dof_identities(const FiniteElement<dim> &fe_other) const override;
+  hp_quad_dof_identities(const FiniteElement<dim> &fe_other,
+                         const unsigned int        face_no = 0) const override;
 
   /**
    * Return the matrix interpolating from a face of one element to the face of
@@ -201,7 +239,8 @@ public:
    */
   virtual void
   get_face_interpolation_matrix(const FiniteElement<dim> &source,
-                                FullMatrix<double> &matrix) const override;
+                                FullMatrix<double> &      matrix,
+                                const unsigned int face_no = 0) const override;
 
   /**
    * Return the matrix interpolating from a face of one element to the subface
@@ -215,9 +254,11 @@ public:
    * <tt>ExcInterpolationNotImplemented</tt>.
    */
   virtual void
-  get_subface_interpolation_matrix(const FiniteElement<dim> &source,
-                                   const unsigned int        subface,
-                                   FullMatrix<double> &matrix) const override;
+  get_subface_interpolation_matrix(
+    const FiniteElement<dim> &source,
+    const unsigned int        subface,
+    FullMatrix<double> &      matrix,
+    const unsigned int        face_no = 0) const override;
 
   /**
    * Projection from a fine grid space onto a coarse grid space. If this
@@ -323,14 +364,22 @@ private:
    */
   Table<2, double> boundary_weights;
 
-  /*
+  /**
    * Mutex for protecting initialization of restriction and embedding matrix.
    */
   mutable Threads::Mutex mutex;
 
   /**
-   * Allow access from other dimensions.
+   * Initialize the permutation pattern and the pattern of sign change.
+   *
+   * @note This function is not fully filled with the correct implementation
+   * yet. It needs to be consistently implemented in a future release to work
+   * on meshes that contain cells with flipped faces.
    */
+  void
+  initialize_quad_dof_index_permutation_and_sign_change();
+
+  // Allow access from other dimensions.
   template <int dim1>
   friend class FE_Nedelec;
 };

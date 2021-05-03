@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -18,8 +18,9 @@
 
 // Note: This is (almost) a clone of the tests/petsc/solver_03_mf.cc
 
-#include "../petsc/petsc_mf_testmatrix.h" // It is tempting to copy
 #include "../tests.h"
+
+#include "../petsc/petsc_mf_testmatrix.h" // It is tempting to copy
 // ../petsc/petsc_mf_testmatrix.h
 // into this directory and
 // play with it, but, by

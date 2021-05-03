@@ -15,15 +15,16 @@
 
 
 
-// check if future fe indices will be set correctly
+// check if future FE indices will be set correctly
 
+
+#include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/fe_q.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 
 #include "../tests.h"
@@ -41,7 +42,7 @@ test()
   fe_collection.push_back(FE_Q<dim>(1));
   fe_collection.push_back(FE_Q<dim>(1));
 
-  hp::DoFHandler<dim> dh(tria);
+  DoFHandler<dim> dh(tria);
   dh.distribute_dofs(fe_collection);
 
   // check if indices are initialized correctly
@@ -52,20 +53,15 @@ test()
   auto cell = dh.begin_active();
   cell->set_future_fe_index(1);
 
-  // try to set future index to an invalid one
-  try
-    {
-      (++cell)->set_future_fe_index(2);
-    }
-  catch (const ExcIndexRange &)
-    {
-      deallog << "Set to 2 failed" << std::endl;
-    }
-
   // verify flags
   for (const auto &cell : dh.active_cell_iterators())
-    deallog << "cell:" << cell->id().to_string()
-            << ", future_fe:" << cell->future_fe_index() << std::endl;
+    {
+      deallog << "cell:" << cell->id().to_string()
+              << ", future_fe:" << cell->future_fe_index() << std::endl;
+      Assert(&(dh.get_fe(cell->future_fe_index())) == &(cell->get_future_fe()),
+             ExcMessage(
+               "DoFCellAccessor::get_future_fe() returns the wrong object."));
+    }
 
   // clear all flags and check if all were cleared
   for (const auto &cell : dh.active_cell_iterators())

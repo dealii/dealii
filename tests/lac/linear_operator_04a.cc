@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -23,7 +23,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 int
 main(int argc, char *argv[])
@@ -33,8 +32,8 @@ main(int argc, char *argv[])
   initlog();
   deallog << std::setprecision(10);
 
-  typedef TrilinosWrappers::MPI::Vector  vector_t;
-  typedef TrilinosWrappers::SparseMatrix matrix_t;
+  using vector_t = TrilinosWrappers::MPI::Vector;
+  using matrix_t = TrilinosWrappers::SparseMatrix;
 
   matrix_t a(5U, 5U, 3U);
   a.compress(VectorOperation::add);

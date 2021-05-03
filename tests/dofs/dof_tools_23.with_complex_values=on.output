@@ -1,0 +1,159 @@
+
+DEAL::Checking Q1 in 2d:
+DEAL::7
+DEAL::1
+DEAL::L2_Error : 0
+DEAL::Checking Q1 in 3d:
+DEAL::41
+DEAL::1
+DEAL::L2_Error : 0
+DEAL::Checking Q2 in 2d:
+DEAL::13
+DEAL::1
+DEAL::L2_Error : 0
+DEAL::Checking Q2 in 3d:
+DEAL::141
+DEAL::1
+DEAL::L2_Error : 0
+DEAL::Checking Q3 in 2d:
+DEAL::19
+DEAL::1
+DEAL::L2_Error : 0
+DEAL::Checking Q3 in 3d:
+DEAL::297
+DEAL::1
+DEAL::L2_Error : 0
+DEAL::Checking DGQ0 in 2d:
+DEAL::0
+DEAL::0
+DEAL::L2_Error : 0
+DEAL::Checking DGQ0 in 3d:
+DEAL::0
+DEAL::0
+DEAL::L2_Error : 0
+DEAL::Checking DGQ1 in 2d:
+DEAL::0
+DEAL::0
+DEAL::L2_Error : 0
+DEAL::Checking DGQ1 in 3d:
+DEAL::0
+DEAL::0
+DEAL::L2_Error : 0
+DEAL::Checking DGQ3 in 2d:
+DEAL::0
+DEAL::0
+DEAL::L2_Error : 0
+DEAL::Checking DGQ3 in 3d:
+DEAL::0
+DEAL::0
+DEAL::L2_Error : 0
+DEAL::Checking DGP0 in 2d:
+DEAL::0
+DEAL::0
+DEAL::Checking DGP0 in 3d:
+DEAL::0
+DEAL::0
+DEAL::Checking DGP1 in 2d:
+DEAL::0
+DEAL::0
+DEAL::Checking DGP1 in 3d:
+DEAL::0
+DEAL::0
+DEAL::Checking DGP3 in 2d:
+DEAL::0
+DEAL::0
+DEAL::Checking DGP3 in 3d:
+DEAL::0
+DEAL::0
+DEAL::Checking Nedelec0 in 2d:
+DEAL::6
+DEAL::1
+DEAL::Checking Nedelec0 in 3d:
+DEAL::72
+DEAL::1
+DEAL::Checking RaviartThomas0 in 2d:
+DEAL::6
+DEAL::1
+DEAL::Checking RaviartThomas1 in 2d:
+DEAL::12
+DEAL::1
+DEAL::Checking RaviartThomas2 in 2d:
+DEAL::18
+DEAL::1
+DEAL::Checking RaviartThomasNodal0 in 2d:
+DEAL::6
+DEAL::1
+DEAL::Checking RaviartThomasNodal1 in 2d:
+DEAL::12
+DEAL::1
+DEAL::Checking RaviartThomasNodal2 in 2d:
+DEAL::18
+DEAL::1
+DEAL::Checking RaviartThomasNodal0 in 3d:
+DEAL::28
+DEAL::1
+DEAL::Checking RaviartThomasNodal1 in 3d:
+DEAL::112
+DEAL::1
+DEAL::Checking RaviartThomasNodal2 in 3d:
+DEAL::252
+DEAL::1
+DEAL::Checking FE_Q<2>(1)3 in 2d:
+DEAL::21
+DEAL::1
+DEAL::L2_Error : 0
+DEAL::Checking FE_DGQ<2>(2)2 in 2d:
+DEAL::0
+DEAL::0
+DEAL::L2_Error : 0
+DEAL::Checking FE_DGP<2>(3)1 in 2d:
+DEAL::0
+DEAL::0
+DEAL::Checking FE_Q<3>(1)3 in 3d:
+DEAL::123
+DEAL::1
+DEAL::L2_Error : 0
+DEAL::Checking FE_DGQ<3>(2)2 in 3d:
+DEAL::0
+DEAL::0
+DEAL::L2_Error : 0
+DEAL::Checking FE_DGP<3>(3)1 in 3d:
+DEAL::0
+DEAL::0
+DEAL::Checking FE_Q<2>(1)3FE_DGQ<2>(2)2 in 2d:
+DEAL::21
+DEAL::1
+DEAL::L2_Error : 0
+DEAL::Checking FE_DGQ<2>(2)2FE_DGP<2>(3)1 in 2d:
+DEAL::0
+DEAL::0
+DEAL::Checking FE_DGP<2>(3)1FE_DGQ<2>(2)2 in 2d:
+DEAL::0
+DEAL::0
+DEAL::Checking FE_Q<2>(1)3FE_DGP<2>(3)1FE_Q<2>(1)3 in 2d:
+DEAL::42
+DEAL::1
+DEAL::Checking FE_DGQ<2>(2)2FE_DGQ<2>(2)2FE_Q<2>(3)3 in 2d:
+DEAL::57
+DEAL::1
+DEAL::L2_Error : 0
+DEAL::Checking FE_DGP<2>(3)1FE_DGP<2>(3)1FE_Q<2>(2)3 in 2d:
+DEAL::39
+DEAL::1
+DEAL::Checking FE_DGQ<3>(1)3FE_DGP<3>(3)1FE_Q<3>(1)3 in 3d:
+DEAL::123
+DEAL::1
+DEAL::Checking (FESystem<2>(FE_Q<2>(1),3))3FE_DGQ<2>(0)1FE_Q<2>(1)3 in 2d:
+DEAL::84
+DEAL::1
+DEAL::L2_Error : 0
+DEAL::Checking FE_DGQ<2>(3)1FESystem<2>(FE_DGQ<2>(0),3)1FESystem<2>(FE_Q<2>(2),1, FE_DGQ<2>(0),1)2 in 2d:
+DEAL::26
+DEAL::1
+DEAL::L2_Error : 0
+DEAL::Checking FE_DGQ<2>(3)1FE_Nedelec<2>(0)2 in 2d:
+DEAL::12
+DEAL::1
+DEAL::Checking FE_Nedelec<2>(0)1FESystem<2>(FE_DGQ<2>(1),2)1FESystem<2>(FE_Q<2>(2),1, FE_Nedelec<2>(0),2)2 in 2d:
+DEAL::56
+DEAL::1

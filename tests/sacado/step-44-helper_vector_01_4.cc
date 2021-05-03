@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2019 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -18,8 +18,9 @@
 //
 // AD number type: Sacado Rad-DFad
 
-#include "../ad_common_tests/step-44-helper_vector_01.h"
 #include "../tests.h"
+
+#include "../ad_common_tests/step-44-helper_vector_01.h"
 
 int
 main(int argc, char **argv)
@@ -29,7 +30,6 @@ main(int argc, char **argv)
   Utilities::MPI::MPI_InitFinalize mpi_initialization(
     argc, argv, testing_max_num_threads());
 
-  using namespace dealii;
   namespace AD = dealii::Differentiation::AD;
   using namespace Step44;
   try

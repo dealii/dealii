@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2005 - 2019 by the deal.II authors
+ * Copyright (C) 2005 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -38,11 +38,8 @@
 
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_renumbering.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_system.h>
@@ -64,7 +61,8 @@
 // <code>TensorFunction</code> class that offers such functionality:
 #include <deal.II/base/tensor_function.h>
 
-// The last step is as in all previous programs:
+// The last step is as in all previous programs: We put all of the code relevant
+// to this program into a namespace. (This idea was first introduced in step-7.)
 namespace Step20
 {
   using namespace dealii;
@@ -116,7 +114,7 @@ namespace Step20
 
   // Our next task is to define the right hand side of our problem (i.e., the
   // scalar right hand side for the pressure in the original Laplace
-  // equation), boundary values for the pressure, as well as a function that
+  // equation), boundary values for the pressure, and a function that
   // describes both the pressure and the velocity of the exact solution for
   // later computations of the error. Note that these functions have one, one,
   // and <code>dim+1</code> components, respectively, and that we pass the
@@ -124,154 +122,168 @@ namespace Step20
   // class. For the exact solution, we only declare the function that actually
   // returns the entire solution vector (i.e. all components of it) at
   // once. Here are the respective declarations:
-  template <int dim>
-  class RightHandSide : public Function<dim>
+  namespace PrescribedSolution
   {
-  public:
-    RightHandSide()
-      : Function<dim>(1)
-    {}
-
-    virtual double value(const Point<dim> & p,
-                         const unsigned int component = 0) const override;
-  };
+    constexpr double alpha = 0.3;
+    constexpr double beta  = 1;
 
 
+    template <int dim>
+    class RightHandSide : public Function<dim>
+    {
+    public:
+      RightHandSide()
+        : Function<dim>(1)
+      {}
 
-  template <int dim>
-  class PressureBoundaryValues : public Function<dim>
-  {
-  public:
-    PressureBoundaryValues()
-      : Function<dim>(1)
-    {}
-
-    virtual double value(const Point<dim> & p,
-                         const unsigned int component = 0) const override;
-  };
-
-
-  template <int dim>
-  class ExactSolution : public Function<dim>
-  {
-  public:
-    ExactSolution()
-      : Function<dim>(dim + 1)
-    {}
-
-    virtual void vector_value(const Point<dim> &p,
-                              Vector<double> &  value) const override;
-  };
-
-
-  // And then we also have to define these respective functions, of
-  // course. Given our discussion in the introduction of how the solution
-  // should look like, the following computations should be straightforward:
-  template <int dim>
-  double RightHandSide<dim>::value(const Point<dim> & /*p*/,
-                                   const unsigned int /*component*/) const
-  {
-    return 0;
-  }
+      virtual double value(const Point<dim> & p,
+                           const unsigned int component = 0) const override;
+    };
 
 
 
-  template <int dim>
-  double
-  PressureBoundaryValues<dim>::value(const Point<dim> &p,
+    template <int dim>
+    class PressureBoundaryValues : public Function<dim>
+    {
+    public:
+      PressureBoundaryValues()
+        : Function<dim>(1)
+      {}
+
+      virtual double value(const Point<dim> & p,
+                           const unsigned int component = 0) const override;
+    };
+
+
+    template <int dim>
+    class ExactSolution : public Function<dim>
+    {
+    public:
+      ExactSolution()
+        : Function<dim>(dim + 1)
+      {}
+
+      virtual void vector_value(const Point<dim> &p,
+                                Vector<double> &  value) const override;
+    };
+
+
+    // And then we also have to define these respective functions, of
+    // course. Given our discussion in the introduction of how the solution
+    // should look, the following computations should be straightforward:
+    template <int dim>
+    double RightHandSide<dim>::value(const Point<dim> & /*p*/,
                                      const unsigned int /*component*/) const
-  {
-    const double alpha = 0.3;
-    const double beta  = 1;
-    return -(alpha * p[0] * p[1] * p[1] / 2 + beta * p[0] -
-             alpha * p[0] * p[0] * p[0] / 6);
-  }
+    {
+      return 0;
+    }
 
 
 
-  template <int dim>
-  void ExactSolution<dim>::vector_value(const Point<dim> &p,
-                                        Vector<double> &  values) const
-  {
-    Assert(values.size() == dim + 1,
-           ExcDimensionMismatch(values.size(), dim + 1));
-
-    const double alpha = 0.3;
-    const double beta  = 1;
-
-    values(0) = alpha * p[1] * p[1] / 2 + beta - alpha * p[0] * p[0] / 2;
-    values(1) = alpha * p[0] * p[1];
-    values(2) = -(alpha * p[0] * p[1] * p[1] / 2 + beta * p[0] -
-                  alpha * p[0] * p[0] * p[0] / 6);
-  }
+    template <int dim>
+    double
+    PressureBoundaryValues<dim>::value(const Point<dim> &p,
+                                       const unsigned int /*component*/) const
+    {
+      return -(alpha * p[0] * p[1] * p[1] / 2 + beta * p[0] -
+               alpha * p[0] * p[0] * p[0] / 6);
+    }
 
 
 
-  // @sect3{The inverse permeability tensor}
+    template <int dim>
+    void ExactSolution<dim>::vector_value(const Point<dim> &p,
+                                          Vector<double> &  values) const
+    {
+      Assert(values.size() == dim + 1,
+             ExcDimensionMismatch(values.size(), dim + 1));
 
-  // In addition to the other equation data, we also want to use a
-  // permeability tensor, or better -- because this is all that appears in the
-  // weak form -- the inverse of the permeability tensor,
-  // <code>KInverse</code>. For the purpose of verifying the exactness of the
-  // solution and determining convergence orders, this tensor is more in the
-  // way than helpful. We will therefore simply set it to the identity matrix.
-  //
-  // However, a spatially varying permeability tensor is indispensable in
-  // real-life porous media flow simulations, and we would like to use the
-  // opportunity to demonstrate the technique to use tensor valued functions.
-  //
-  // Possibly unsurprising, deal.II also has a base class not only for scalar
-  // and generally vector-valued functions (the <code>Function</code> base
-  // class) but also for functions that return tensors of fixed dimension and
-  // rank, the <code>TensorFunction</code> template. Here, the function under
-  // consideration returns a dim-by-dim matrix, i.e. a tensor of rank 2 and
-  // dimension <code>dim</code>. We then choose the template arguments of the
-  // base class appropriately.
-  //
-  // The interface that the <code>TensorFunction</code> class provides is
-  // essentially equivalent to the <code>Function</code> class. In particular,
-  // there exists a <code>value_list</code> function that takes a list of
-  // points at which to evaluate the function, and returns the values of the
-  // function in the second argument, a list of tensors:
-  template <int dim>
-  class KInverse : public TensorFunction<2, dim>
-  {
-  public:
-    KInverse()
-      : TensorFunction<2, dim>()
-    {}
-
-    virtual void value_list(const std::vector<Point<dim>> &points,
-                            std::vector<Tensor<2, dim>> &values) const override;
-  };
+      values(0) = alpha * p[1] * p[1] / 2 + beta - alpha * p[0] * p[0] / 2;
+      values(1) = alpha * p[0] * p[1];
+      values(2) = -(alpha * p[0] * p[1] * p[1] / 2 + beta * p[0] -
+                    alpha * p[0] * p[0] * p[0] / 6);
+    }
 
 
-  // The implementation is less interesting. As in previous examples, we add a
-  // check to the beginning of the class to make sure that the sizes of input
-  // and output parameters are the same (see step-5 for a discussion of this
-  // technique). Then we loop over all evaluation points, and for each one
-  // first clear the output tensor and then set all its diagonal elements to
-  // one (i.e. fill the tensor with the identity matrix):
-  template <int dim>
-  void KInverse<dim>::value_list(const std::vector<Point<dim>> &points,
-                                 std::vector<Tensor<2, dim>> &  values) const
-  {
-    // The value we are going to store for a given point does not depend on its
-    // coordinates and we use the `points` object only for checking that the
-    // `values` object has the correct size. In release mode, `AssertDimension`
-    // is defined empty and the compiler will complain that the `points` object
-    // is unused. The following line silences this warning.
-    (void)points;
-    AssertDimension(points.size(), values.size());
 
-    for (auto &value : values)
-      {
-        value.clear();
+    // @sect3{The inverse permeability tensor}
 
-        for (unsigned int d = 0; d < dim; ++d)
-          value[d][d] = 1.;
-      }
-  }
+    // In addition to the other equation data, we also want to use a
+    // permeability tensor, or better -- because this is all that appears in the
+    // weak form -- the inverse of the permeability tensor,
+    // <code>KInverse</code>. For the purpose of verifying the exactness of the
+    // solution and determining convergence orders, this tensor is more in the
+    // way than helpful. We will therefore simply set it to the identity matrix.
+    //
+    // However, a spatially varying permeability tensor is indispensable in
+    // real-life porous media flow simulations, and we would like to use the
+    // opportunity to demonstrate the technique to use tensor valued functions.
+    //
+    // Possibly unsurprisingly, deal.II also has a base class not only for
+    // scalar and generally vector-valued functions (the <code>Function</code>
+    // base class) but also for functions that return tensors of fixed dimension
+    // and rank, the <code>TensorFunction</code> template. Here, the function
+    // under consideration returns a dim-by-dim matrix, i.e. a tensor of rank 2
+    // and dimension <code>dim</code>. We then choose the template arguments of
+    // the base class appropriately.
+    //
+    // The interface that the <code>TensorFunction</code> class provides is
+    // essentially equivalent to the <code>Function</code> class. In particular,
+    // there exists a <code>value_list</code> function that takes a list of
+    // points at which to evaluate the function, and returns the values of the
+    // function in the second argument, a list of tensors:
+    template <int dim>
+    class KInverse : public TensorFunction<2, dim>
+    {
+    public:
+      KInverse()
+        : TensorFunction<2, dim>()
+      {}
+
+      virtual void
+      value_list(const std::vector<Point<dim>> &points,
+                 std::vector<Tensor<2, dim>> &  values) const override;
+    };
+
+
+    // The implementation is less interesting. As in previous examples, we add a
+    // check to the beginning of the class to make sure that the sizes of input
+    // and output parameters are the same (see step-5 for a discussion of this
+    // technique). Then we loop over all evaluation points, and for each one
+    // set the output tensor to the identity matrix.
+    //
+    // There is an oddity at the top of the function (the
+    // `(void)points;` statement) that is worth discussing. The values
+    // we put into the output `values` array does not actually depend
+    // on the `points` arrays of coordinates at which the function is
+    // evaluated. In other words, the `points` argument is in fact
+    // unused, and we could have just not given it a name if we had
+    // wanted. But we want to use the `points` object for checking
+    // that the `values` object has the correct size. The problem is
+    // that in release mode, `AssertDimension` is defined as a macro
+    // that expands to nothing; the compiler will then complain that
+    // the `points` object is unused. The idiomatic approach to
+    // silencing this warning is to have a statement that evaluates
+    // (reads) variable but doesn't actually do anything: That's what
+    // `(void)points;` does: It reads from `points`, and then casts
+    // the result of the read to `void`, i.e., nothing. This statement
+    // is, in other words, completely pointless and implies no actual
+    // action except to explain to the compiler that yes, this
+    // variable is in fact used even in release mode. (In debug mode,
+    // the `AssertDimension` macro expands to something that reads
+    // from the variable, and so the funny statement would not be
+    // necessary in debug mode.)
+    template <int dim>
+    void KInverse<dim>::value_list(const std::vector<Point<dim>> &points,
+                                   std::vector<Tensor<2, dim>> &  values) const
+    {
+      (void)points;
+      AssertDimension(points.size(), values.size());
+
+      for (auto &value : values)
+        value = unit_symmetric_tensor<dim>();
+    }
+  } // namespace PrescribedSolution
 
 
 
@@ -334,17 +346,17 @@ namespace Step20
     // velocities and pressures are not intermingled: First all velocity
     // degrees of freedom, then all pressure DoFs. This way, the global matrix
     // separates nicely into a $2 \times 2$ system. To achieve this, we have to
-    // renumber degrees of freedom base on their vector component, an
+    // renumber degrees of freedom based on their vector component, an
     // operation that conveniently is already implemented:
     DoFRenumbering::component_wise(dof_handler);
 
     // The next thing is that we want to figure out the sizes of these blocks
     // so that we can allocate an appropriate amount of space. To this end, we
-    // call the DoFTools::count_dofs_per_component() function that
+    // call the DoFTools::count_dofs_per_fe_component() function that
     // counts how many shape functions are non-zero for a particular vector
     // component. We have <code>dim+1</code> vector components, and
-    // DoFTools::count_dofs_per_component() will count how many shape functions
-    // belong to each of these components.
+    // DoFTools::count_dofs_per_fe_component() will count how many shape
+    // functions belong to each of these components.
     //
     // There is one problem here. As described in the documentation of that
     // function, it <i>wants</i> to put the number of $x$-velocity shape
@@ -368,13 +380,13 @@ namespace Step20
     // the vector and matrix block sizes, as well as create output.
     //
     // @note If you find this concept difficult to understand, you may
-    // want to consider using the function DoFTools::count_dofs_per_block()
+    // want to consider using the function DoFTools::count_dofs_per_fe_block()
     // instead, as we do in the corresponding piece of code in step-22.
     // You might also want to read up on the difference between
     // @ref GlossBlock "blocks" and @ref GlossComponent "components"
     // in the glossary.
-    std::vector<types::global_dof_index> dofs_per_component(dim + 1);
-    DoFTools::count_dofs_per_component(dof_handler, dofs_per_component);
+    const std::vector<types::global_dof_index> dofs_per_component =
+      DoFTools::count_dofs_per_fe_component(dof_handler);
     const unsigned int n_u = dofs_per_component[0],
                        n_p = dofs_per_component[dim];
 
@@ -449,7 +461,7 @@ namespace Step20
                                        update_quadrature_points |
                                        update_JxW_values);
 
-    const unsigned int dofs_per_cell   = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell   = fe.n_dofs_per_cell();
     const unsigned int n_q_points      = quadrature_formula.size();
     const unsigned int n_face_q_points = face_quadrature_formula.size();
 
@@ -464,9 +476,10 @@ namespace Step20
     // arrays to hold their values at the quadrature points of individual
     // cells (or faces, for the boundary values). Note that in the case of the
     // coefficient, the array has to be one of matrices.
-    const RightHandSide<dim>          right_hand_side;
-    const PressureBoundaryValues<dim> pressure_boundary_values;
-    const KInverse<dim>               k_inverse;
+    const PrescribedSolution::RightHandSide<dim> right_hand_side;
+    const PrescribedSolution::PressureBoundaryValues<dim>
+                                            pressure_boundary_values;
+    const PrescribedSolution::KInverse<dim> k_inverse;
 
     std::vector<double>         rhs_values(n_q_points);
     std::vector<double>         boundary_values(n_face_q_points);
@@ -523,12 +536,10 @@ namespace Step20
               local_rhs(i) += -phi_i_p * rhs_values[q] * fe_values.JxW(q);
             }
 
-        for (unsigned int face_n = 0;
-             face_n < GeometryInfo<dim>::faces_per_cell;
-             ++face_n)
-          if (cell->at_boundary(face_n))
+        for (const auto &face : cell->face_iterators())
+          if (face->at_boundary())
             {
-              fe_face_values.reinit(cell, face_n);
+              fe_face_values.reinit(cell, face);
 
               pressure_boundary_values.value_list(
                 fe_face_values.get_quadrature_points(), boundary_values);
@@ -560,7 +571,7 @@ namespace Step20
   }
 
 
-  // @sect3{Linear solvers and preconditioners}
+  // @sect3{Implementation of linear solvers and preconditioners}
 
   // The linear solvers and preconditioners we use in this example have
   // been discussed in significant detail already in the introduction. We
@@ -595,9 +606,9 @@ namespace Step20
     const auto op_M = linear_operator(M);
     const auto op_B = linear_operator(B);
 
-    ReductionControl     reduction_control_M(2000, 1.0e-18, 1.0e-10);
-    SolverCG<>           solver_M(reduction_control_M);
-    PreconditionJacobi<> preconditioner_M;
+    ReductionControl         reduction_control_M(2000, 1.0e-18, 1.0e-10);
+    SolverCG<Vector<double>> solver_M(reduction_control_M);
+    PreconditionJacobi<SparseMatrix<double>> preconditioner_M;
 
     preconditioner_M.initialize(M);
 
@@ -611,8 +622,8 @@ namespace Step20
 
     // We now create a preconditioner out of <code>op_aS</code> that
     // applies a fixed number of 30 (inexpensive) CG iterations:
-    IterationNumberControl iteration_number_control_aS(30, 1.e-18);
-    SolverCG<>             solver_aS(iteration_number_control_aS);
+    IterationNumberControl   iteration_number_control_aS(30, 1.e-18);
+    SolverCG<Vector<double>> solver_aS(iteration_number_control_aS);
 
     const auto preconditioner_S =
       inverse_operator(op_aS, solver_aS, PreconditionIdentity());
@@ -623,8 +634,8 @@ namespace Step20
     // preconditioner we just declared.
     const auto schur_rhs = transpose_operator(op_B) * op_M_inv * F - G;
 
-    SolverControl solver_control_S(2000, 1.e-12);
-    SolverCG<>    solver_S(solver_control_S);
+    SolverControl            solver_control_S(2000, 1.e-12);
+    SolverCG<Vector<double>> solver_S(solver_control_S);
 
     const auto op_S_inv = inverse_operator(op_S, solver_S, preconditioner_S);
 
@@ -685,8 +696,8 @@ namespace Step20
     const ComponentSelectFunction<dim> velocity_mask(std::make_pair(0, dim),
                                                      dim + 1);
 
-    ExactSolution<dim> exact_solution;
-    Vector<double>     cellwise_errors(triangulation.n_active_cells());
+    PrescribedSolution::ExactSolution<dim> exact_solution;
+    Vector<double> cellwise_errors(triangulation.n_active_cells());
 
     // As already discussed in step-7, we have to realize that it is
     // impossible to integrate the errors exactly. All we can do is
@@ -702,7 +713,7 @@ namespace Step20
     // points for integration. To avoid this problem, we simply use a
     // trapezoidal rule and iterate it <code>degree+2</code> times in each
     // coordinate direction (again as explained in step-7):
-    QTrapez<1>     q_trapez;
+    QTrapezoid<1>  q_trapez;
     QIterated<dim> quadrature(q_trapez, degree + 2);
 
     // With this, we can then let the library compute the errors and output
@@ -741,7 +752,7 @@ namespace Step20
   // The last interesting function is the one in which we generate graphical
   // output. Note that all velocity components get the same solution name
   // "u". Together with using
-  // DataComponentInterpretation::::component_is_part_of_vector this will
+  // DataComponentInterpretation::component_is_part_of_vector this will
   // cause DataOut<dim>::write_vtu() to generate a vector representation of
   // the individual velocity components, see step-22 or the
   // @ref VVOutput "Generating graphical output"
@@ -803,10 +814,10 @@ int main()
 {
   try
     {
-      using namespace dealii;
       using namespace Step20;
 
-      MixedLaplaceProblem<2> mixed_laplace_problem(0);
+      const unsigned int     fe_degree = 0;
+      MixedLaplaceProblem<2> mixed_laplace_problem(fe_degree);
       mixed_laplace_problem.run();
     }
   catch (std::exception &exc)

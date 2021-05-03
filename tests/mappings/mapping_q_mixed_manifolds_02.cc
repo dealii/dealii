@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -94,7 +94,7 @@ void create_triangulation(Triangulation<2> &tria)
        cell != middle.end();
        ++cell)
     {
-      for (unsigned int v = 0; v < GeometryInfo<2>::vertices_per_cell; ++v)
+      for (const unsigned int v : GeometryInfo<2>::vertex_indices())
         {
           Point<2> &vertex = cell->vertex(v);
           if (std::abs(vertex[0] - X_2) < 1e-10 &&

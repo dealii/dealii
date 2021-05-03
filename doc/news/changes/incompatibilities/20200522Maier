@@ -1,0 +1,6 @@
+Removed: The deprecated classes Threads::Mutex::ScopedLock,
+Threads::ConditionVariable, and deprecated functions
+Threads::Mutex::acquire(), Threads::Mutex::release(),
+Threads::n_existing_threads(), Threads::this_thread_id() have been removed.
+<br>
+(Matthias Maier, 2020/05/22)

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -38,20 +38,21 @@
 #include <set>
 
 #include "../tests.h"
+
 #include "mesh_3d.h"
 
 void check_this(Triangulation<3> &tria)
 {
   for (Triangulation<3>::cell_iterator cell = tria.begin(); cell != tria.end();
        ++cell)
-    for (unsigned int f = 0; f < GeometryInfo<3>::faces_per_cell; ++f)
+    for (const unsigned int f : GeometryInfo<3>::face_indices())
       if (!cell->at_boundary())
         {
           const Triangulation<3>::cell_iterator neighbor = cell->neighbor(f);
           const unsigned int nb_nb = cell->neighbor_of_neighbor(f);
 
           bool found = false;
-          for (unsigned int ff = 0; ff < GeometryInfo<3>::faces_per_cell; ++ff)
+          for (const unsigned int ff : GeometryInfo<3>::face_indices())
             if (neighbor->neighbor(ff) == cell)
               {
                 AssertThrow(found == false, ExcInternalError());

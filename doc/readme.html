@@ -7,7 +7,7 @@
     <title>The deal.II Readme</title>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
     <link href="screen.css" rel="StyleSheet" />
-    <meta name="copyright" content="Copyright (C) 1998 - 2019 by the deal.II Authors" />
+    <meta name="copyright" content="Copyright (C) 1998 - 2020 by the deal.II Authors" />
     <meta name="keywords" content="deal.II" />
 </head>
 
@@ -53,17 +53,23 @@
     <h3>Supported platforms</h3>
 
     <p>
-        <acronym>deal.II</acronym> is mostly developed on Linux using the
-        <a href="http://gcc.gnu.org">GCC</a> compiler. However, it is not platform specific and we strive to keep the source code compliant with the <a href="https://www.iso.org/standard/50372.html">C++ 2011
-  Standard</a> (see also <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2012/n3337.pdf">here</a> for a copy of the C++11 standard).
+      <acronym>deal.II</acronym> is mostly developed on Linux using the
+      <a href="http://gcc.gnu.org">GCC</a> compiler. However, it is
+      not platform specific and we strive to keep the source code
+      compliant with
+      the <a href="https://en.cppreference.com/w/cpp/links">C++ 2014
+      Standard</a> (see
+      also <a href="https://github.com/cplusplus/draft/blob/master/papers/n4140.pdf?raw=true">here</a>
+      for PDFs of the various C++ standards).
     </p>
 
     <p>
         <acronym>deal.II</acronym> supports at least the following platforms:
     </p>
     <ul>
-        <li>GNU/Linux: GCC version 4.8 or later; Clang version 3.3 or later; ICC versions 15 or later</li>
-        <li>Mac OS X: GCC version 4.8 or later; Clang version 3.3 or later. Please see the <a href="https://github.com/dealii/dealii/wiki/MacOSX" target="_top">deal.II Wiki</a> for installation instructions.</li>
+        <li>GNU/Linux: GCC version 5.0 or later; Clang version 4.0 or later; ICC versions 15 or later</li>
+        <li>Mac OS X: GCC version 5.0 or later; Clang version 4.0 or later; <a href="https://en.wikipedia.org/wiki/Xcode#Xcode_7.0_-_11.x_(since_Free_On-Device_Development)">Apple Clang version 9.0</a>  or later.
+            Please see the <a href="https://github.com/dealii/dealii/wiki/MacOSX" target="_top">deal.II Wiki</a> for installation instructions.</li>
         <li>Windows: experimental support for Visual Studio 2017. Please have a look at the
             <a href="https://github.com/dealii/dealii/wiki/Frequently-Asked-Questions#can-i-use-dealii-on-a-windows-platform">
       FAQ</a> and at the <a href="https://github.com/dealii/dealii/wiki/Windows" target="_top">deal.II Wiki</a> for more information and alternative solutions.</li>
@@ -84,7 +90,7 @@
     </p>
     <ul>
         <li>
-            <a href="http://www.cmake.org/" target="_top">CMake</a> version 2.8.12 or later
+            <a href="http://www.cmake.org/" target="_top">CMake</a> version 3.1.0 or later
         </li>
 
         <li>
@@ -123,7 +129,7 @@
                 <code>gnuplot</code> and a postscript viewer (for <code>eps</code>) should be available almost everywhere. In the last few years, most new visualization programs have moved to support
                 <code>vtk</code>/<code>vtu</code> format. There are a number of excellent programs that can read <code>vtk</code> and
                 <code>vtu</code>, such as
-                <a href="http://www.llnl.gov/visit/" target="_top">Visit</a>,
+                <a href="http://www.llnl.gov/visit/" target="_top">VisIt</a>,
                 <a href="http://www.paraview.org/" target="_top">ParaView</a>, as well as others. Povray is freely available for almost all platforms. AVS is a commercial program available for most Unix flavors. Tecplot is a commercial program available
                 for Windows and most Unix platforms.
             </p>
@@ -161,29 +167,37 @@
 
     <p>
         <acronym>deal.II</acronym> uses the
-        <a href="http://www.cmake.org/" target="_top">CMake</a> integrated configuration and build system. Unpacking will create a subdirectory <tt>deal.II/</tt> in the current directory. Then do the following steps to configure the build process:</p>
+        <a href="http://www.cmake.org/" target="_top">CMake</a> integrated configuration and build system. Unpacking will create a subdirectory <tt>deal.II/</tt> in the current directory. Then do the following steps to configure the build process (make sure the installation directory is not the same as the location where you unpacked <tt>deal.II/</tt>):</p>
 
     <pre>
   mkdir build
   cd build
   cmake -DCMAKE_INSTALL_PREFIX=/path/to/install/dir ../deal.II
     </pre>
-    We recommend compiling deal.II in parallel if your machine has more than one processor core. This can be done by providing the <code>--jobs</code> flag to <code>make</code> with a numerical argument. Here we compile with four <code>make</code> jobs:
+    We recommend compiling deal.II in parallel if your machine has
+    more than one processor core. This can be done by providing
+    the <code>--jobs=N</code> flag to <code>make</code> with a
+    numerical argument <code>N</code>. (The
+    argument <code>--jobs=N</code> is often abbreviated
+    as <code>-jN</code>.) Here we compile with four <code>make</code>
+    jobs:
     <pre>
   make --jobs=4 install
   make test
     </pre>
-    One should usually use one job for each processor core on the machine.
+    One should usually use one job for each processor core on the
+    machine.
 
     <p>
         These steps compile, link, install the deal.II library, and run a few consistency checks. The whole process should take between a few minutes and an hour, depending on your machine.
     </p>
 
     <p>
-        <b>Note:</b></p>
+        <b>Notes:</b></p>
     <ul>
-        <li> <code>/path/to/install/dir</code> is the directory which deal.II should be installed into. This can be a directory in your home directory (e.g., <code>~/bin/deal.II</code>) or a directory such as <code>/usr/local</code> if you have root privileges.
-            Another option is to use something like <code>`pwd`/../installed/</code> (note the backticks). Make sure the installation directory is not the same as the location where you unpacked <tt>deal.II/</tt>.
+        <li> The part "<code>/path/to/install/dir</code>" in the
+            command above needs to be replaced by the path to the directory which deal.II should be installed into. This can be a directory in your home directory (e.g., <code>~/bin/deal.II</code>) or a directory such as <code>/usr/local</code> if you have root privileges.
+            Another option is to use something like <code>`pwd`/../installed/</code> (note the backticks).
         </li>
 
         <li> <code>make test</code> automatically runs in parallel and no <code>-jN</code> flag should be supplied to it.
@@ -201,7 +215,18 @@
         </li>
 
         <li> If you are changing part of the <acronym>deal.II</acronym> code itself, you can re-compile the library using only the last two commands above in the previously created build directory. It is also possible to change the configuration used in this
-            directory by calling <code>cmake</code> a second time, possibly with different arguments. However, this sometimes leads to surprising results and you may not get exactly what you were hoping for. For more information, see <a href="users/cmake.html">here</a>.
+            directory by calling <code>cmake</code> a second time, possibly with different arguments. However, this sometimes leads to surprising results and you may not get exactly what you were hoping for. For more information, see <a href="users/cmake_dealii.html">here</a>.
+        </li>
+
+        <li>
+          Compilers require a lot of memory. If your machine has many
+          cores but not so much memory, then using <code>-jN</code>
+          with a large <code>N</code> might lead to situations where
+          not enough memory is available for all compilers, and this
+          typically manifests as an "internal compiler error" or a
+          segmentation fault. If that happens, just
+          reduce <code>N</code> and type the <code>make install</code>
+          command again.
         </li>
     </ul>
 
@@ -248,9 +273,13 @@
 
     <pre>
       cmake -DDEAL_II_COMPONENT_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/path/install/dir ../deal.II
+      make documentation
+      make install
     </pre>
 
     <p>
+        As usual, you can pass <code>-jN</code> to <code>make</code>
+        in order to use more than one processor.
         For this to succeed, you will need <a href="http://www.perl.org/" target="_top">Perl 5.x</a>,
         <a href="http://www.doxygen.org/" target="_top">doxygen</a> and <code>dot</code> (which is part of the <a href="http://www.graphviz.org" target="_top">GraphViz</a> package) to be installed.
     </p>
@@ -261,13 +290,6 @@
 
     <p> Finally, the default for locally installed documentation is to render formulas as images. You can force formulas to be displayed via the MathJax system by adding <code>-DDEAL_II_DOXYGEN_USE_MATHJAX=ON</code> to the CMake call above. These formulas
         are then rendered natively by the browser. With <code>-DDEAL_II_DOXYGEN_USE_ONLINE_MATHJAX=OFF</code> CMake will try to find a local installation of MathJax scripts, otherwise the online version of the scripts will be used in the documentation.
-    </p>
-
-    <p>
-        Upon calling <code>make</code> and <code>make install</code>, this will install both this readme, other installation instructions, as well as the
-        <a href="doxygen/deal.II/index.html" target="_top">manual that documents
-      all functions and classes</a> as well as the <a href="doxygen/deal.II/Tutorial.html" target="_top"> tutorial
-      of well-documented example programs</a> (the "steps").
     </p>
 
     <p>
@@ -282,7 +304,7 @@
     <p>
         <acronym>deal.II</acronym> has a large number of optional interfaces to other libraries. <b>By default, <code>cmake</code> will automatically
       enable support  for all external libraries it can find in default
-      paths.</b> However, this behavior can be changed using command line switches to the initial call to <code>cmake</code>. A detailed description can be found here: <a href="users/cmake.html">Detailed build system description</a>.
+      paths.</b> However, this behavior can be changed using command line switches to the initial call to <code>cmake</code>. A detailed description can be found here: <a href="users/cmake_dealii.html">Detailed build system description</a>.
     </p>
 
     <p>
@@ -320,10 +342,16 @@
 
         <li>
             <p>
-                <i>64bit indices</i>: By default, deal.II use unsigned int (32bit) indices for degrees of freedom, using the <code>types::global_dof_index</code> type. This limits the number of unknowns to approximately four billions. If larger problem
-                must be solved, pass the
+                <i>64bit indices</i>: By default, deal.II uses
+                unsigned int (32bit) indices for degrees of freedom,
+                using the <code>types::global_dof_index</code> type.
+                (The same is true for a few other index types such as the
+                global number of cells.) This limits the number of
+                cells or unknowns to approximately four billions. If
+                larger problem must be solved, pass the
                 <code>-DDEAL_II_WITH_64BIT_INDICES=ON</code> argument to
-                <code>cmake</code>. You will not be able to solve problems of this size on a single machine, but only when using clusters of computers and linear algebra packages PETSc or Trilinos. To use this option with PETSc, PETSc must be compiled
+                <code>cmake</code>. To use this option with
+                PETSc, PETSc must be compiled
                 with the option <code>--with-64-bit-indices</code>.
             </p>
         </li>
@@ -379,6 +407,15 @@
             </p>
         </dd>
 
+        <dt><a name="ArborX"/>
+            <a href="https://github.com/arborx/ArborX" target="_top">ArborX</a></dt>
+        <dd>
+            <p>
+                <a href="https://github.com/arborx/ArborX" target="_top">ArborX</a> is an open-source library designed to provide performance portable algorithms for geometric search, similarly to nanoflann and Boost Geometry.
+                To use a self compiled version, pass <code>-DARBORX_DIR=/path/to/arborx</code> to the deal.II CMake call. To use <a href="https://github.com/arborx/ArborX" target="_top">ArborX</a>, deal.II needs to be configured with <a href="https://github.com/kokkos/kokkos" target="_top">Kokkos</a> support.
+            </p>
+        </dd>
+
         <dt><a name="ARPACK"/>
 	<a href="http://www.caam.rice.edu/software/ARPACK/" target="_top">ARPACK</a></dt>
         <dd>
@@ -413,7 +450,7 @@
                 <a href="http://www.netlib.org/lapack/" target="_top">LAPACK</a> (
                 <i>Linear Algebra Package</i>) are two packages that support low-level linear algebra operations on vectors and dense matrices. Both libraries should be packaged by almost all Linux distributions and found automatically whenever available.
                 (You might have to install development versions of the libraries for <acronym>deal.II</acronym> being able to use them). For details on how to set up <acronym>deal.II</acronym> with a non standard BLAS/LAPACK implementation, see the
-                <a href="users/cmake.html#advanced">advanced
+                <a href="users/cmake_dealii.html#advanced">advanced
             setup</a> section in the CMake ReadME.
             </p>
         </dd>
@@ -437,7 +474,7 @@
                     while providing a multitude of linear solvers and preconditioners
                     and extension to other linear operators with minimal changes required in the code.
                     To enable Ginkgo, pass <code>-DGINKGO_DIR=/path/to/ginkgo</code> to CMake when
-                    configuring deal.II. For more detailed instructions, one can refer to 
+                    configuring deal.II. For more detailed instructions, one can refer to
                     <a href="external-libs/ginkgo.html" target="body">this page</a>.
                 </p>
             </dd>
@@ -476,6 +513,15 @@
                 </p>
             </dd>
 
+            <dt><a name="Kokkos"/>
+                <a href="https://github.com/kokkos/kokkos" target="_top">Kokkos</a></dt>
+            <dd>
+                <p>
+                    <a href="https://github.com/kokkos/kokkos" target="_top">Kokkos</a> implements a programming model in C++ for writing performance portable applications targeting all major HPC platforms.
+                    To use a self compiled version, pass <code>-DKOKKOS_DIR=/path/to/kokkos</code> to the deal.II CMake call.
+                </p>
+            </dd>
+
 
             <dt><a name="metis"></a><a href="http://glaros.dtc.umn.edu/gkhome/metis/metis/overview"
 	     target="_top">METIS</a></dt>
@@ -501,28 +547,6 @@
                 <p>
                     <a href="http://muparser.beltoforion.de/">muparser</a> is a library that allows to enter functions in text form and have them interpreted at run time. This is particularly useful in input parameter files. <code>cmake</code> will usually
                     find the version of this library that comes bundled with <acronym>deal.II</acronym>, but you can specify <code>-DMUPARSER_DIR=/path/to/muparser</code> if desired.
-                </p>
-            </dd>
-
-            <dt><a name="nanoflann"/>
-             <a href="https://github.com/jlblancoc/nanoflann" target="_top">nanoflann</a></dt>
-            <dd>
-                <p>
-                    <a href="https://github.com/jlblancoc/nanoflann" target="_top">nanoflann</a> is a C++11 header-only library for building KD-Trees of datasets with different topologies. In particular, it can be used for operations such as finding the
-                    vertex or cell closest to a given evaluation point that occur frequently in many applications using unstructured meshes. scale eigenvalue problems.
-                    <a href="https://github.com/jlblancoc/nanoflann" target="_top">nanoflann</a> should be readily packaged by most Linux distributions. To use a self compiled version, pass
-                    <code>-DNANOFLANN_DIR=/path/to/nanoflann</code> to the deal.II CMake call.
-                </p>
-            </dd>
-
-            <dt><a name="netcdf"></a><a href="http://www.unidata.ucar.edu/software/netcdf/" target="_top">NetCDF</a></dt>
-            <dd>
-                <p>
-                <a href="http://www.unidata.ucar.edu/software/netcdf/" target="_top">NetCDF</a> is a library that provides services for reading and writing mesh data (and many other things). <acronym>deal.II</acronym> can use it to read meshes via one
-                of the functions of the <code>GridIn</code> class.
-                <a href="http://www.unidata.ucar.edu/software/netcdf/" target="_top">NetCDF</a> should be readily packaged by most Linux distributions. To use a self compiled version, pass
-                <code>-DNETCDF_DIR=/path/to/netcdf</code> to <code>cmake</code>.
-                <em>The deal.II NetCDF bindings are only compatible with an obsolete version of NetCDF and will be removed in a future release of the library unless newer bindings are contributed.</em>
                 </p>
             </dd>
 
@@ -606,7 +630,7 @@
                     <code>-DSUNDIALS_DIR=/path/to/sundials</code> to the deal.II CMake call.
                 </p>
             </dd>
-            
+
             <dt><a name="SymEngine"/>
                 <a href="https://symengine.github.io/" target="_top">SymEngine</a></dt>
             <dd>
@@ -690,8 +714,8 @@
 
     <p>
         The <acronym>deal.II</acronym> <code>cmake</code> system allows far greater control over what exactly is configured or built than just the outline above. If you want to learn more about this, take a look
-        <a href="users/cmake.html">here</a>. You might also be interested in
-        <a href="users/cmakelists.html">CMake for user projects</a> or
+        <a href="users/cmake_dealii.html">here</a>. You might also be interested in
+        <a href="users/cmake_user.html">CMake for user projects</a> or
         <a href="developers/cmake-internals.html">build system internals</a>.
     </p>
 

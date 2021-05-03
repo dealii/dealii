@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2018 by the deal.II authors
+// Copyright (C) 2010 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -58,7 +58,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 
 template <int dim, typename number, int spacedim>
@@ -209,9 +208,9 @@ void
 LaplaceProblem<dim>::setup_system()
 {
   mg_dof_handler.distribute_dofs(fe);
-  mg_dof_handler.distribute_mg_dofs(fe);
+  mg_dof_handler.distribute_mg_dofs();
   mg_dof_handler_renumbered.distribute_dofs(fe);
-  mg_dof_handler_renumbered.distribute_mg_dofs(fe);
+  mg_dof_handler_renumbered.distribute_mg_dofs();
 
   std::vector<unsigned int> block_component(2 * dim, 0);
   for (unsigned int c = dim; c < 2 * dim; ++c)
@@ -340,10 +339,6 @@ template <int dim>
 void
 LaplaceProblem<dim>::test()
 {
-  std::map<types::boundary_id, const Function<dim> *> dirichlet_boundary;
-  Functions::ZeroFunction<dim> dirichlet_bc(fe.n_components());
-  dirichlet_boundary[0] = &dirichlet_bc;
-
   const unsigned int min_l = mg_matrices.min_level();
   const unsigned int max_l = mg_matrices.max_level();
   for (unsigned int l = min_l; l < max_l; ++l)
@@ -353,16 +348,18 @@ LaplaceProblem<dim>::test()
     }
 
   MGConstrainedDoFs mg_constrained_dofs;
-  mg_constrained_dofs.initialize(mg_dof_handler, dirichlet_boundary);
+  mg_constrained_dofs.initialize(mg_dof_handler);
+  mg_constrained_dofs.make_zero_boundary_constraints(mg_dof_handler, {0});
   MGConstrainedDoFs mg_constrained_dofs_renumbered;
-  mg_constrained_dofs_renumbered.initialize(mg_dof_handler_renumbered,
-                                            dirichlet_boundary);
+  mg_constrained_dofs_renumbered.initialize(mg_dof_handler_renumbered);
+  mg_constrained_dofs_renumbered.make_zero_boundary_constraints(
+    mg_dof_handler_renumbered, {0});
 
   MGTransferPrebuilt<Vector<double>> mg_transfer(mg_constrained_dofs);
-  mg_transfer.build_matrices(mg_dof_handler);
+  mg_transfer.build(mg_dof_handler);
   MGTransferPrebuilt<Vector<double>> mg_transfer_renumbered(
     mg_constrained_dofs_renumbered);
-  mg_transfer_renumbered.build_matrices(mg_dof_handler_renumbered);
+  mg_transfer_renumbered.build(mg_dof_handler_renumbered);
 
   FullMatrix<double> coarse_matrix;
   coarse_matrix.copy_from(mg_matrices[0]);
@@ -374,7 +371,7 @@ LaplaceProblem<dim>::test()
   MGCoarseGridHouseholder<double, Vector<double>> mg_coarse_renumbered;
   mg_coarse_renumbered.initialize(coarse_matrix_renumbered);
 
-  typedef PreconditionIdentity RELAXATION;
+  using RELAXATION = PreconditionIdentity;
   MGSmootherPrecondition<SparseMatrix<double>, RELAXATION, Vector<double>>
     mg_smoother;
 
@@ -392,15 +389,10 @@ LaplaceProblem<dim>::test()
 
   mg::Matrix<Vector<double>> mg_matrix_renumbered(mg_matrices_renumbered);
 
-  Multigrid<Vector<double>> mg(mg_dof_handler,
-                               mg_matrix,
-                               mg_coarse,
-                               mg_transfer,
-                               mg_smoother,
-                               mg_smoother);
+  Multigrid<Vector<double>> mg(
+    mg_matrix, mg_coarse, mg_transfer, mg_smoother, mg_smoother);
 
-  Multigrid<Vector<double>> mg_renumbered(mg_dof_handler_renumbered,
-                                          mg_matrix_renumbered,
+  Multigrid<Vector<double>> mg_renumbered(mg_matrix_renumbered,
                                           mg_coarse_renumbered,
                                           mg_transfer_renumbered,
                                           mg_smoother_renumbered,
@@ -444,9 +436,7 @@ LaplaceProblem<dim>::refine_local()
        cell != triangulation.end();
        ++cell)
     {
-      for (unsigned int vertex = 0;
-           vertex < GeometryInfo<dim>::vertices_per_cell;
-           ++vertex)
+      for (const unsigned int vertex : GeometryInfo<dim>::vertex_indices())
         {
           const Point<dim> p = cell->vertex(vertex);
           const Point<dim> origin =

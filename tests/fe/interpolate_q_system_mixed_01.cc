@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -182,10 +182,8 @@ main()
 {
   deal_II_exceptions::disable_abort_on_exception();
 
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(3);
-
-  deallog.attach(logfile);
 
   test<1>();
   test<2>();

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -99,10 +99,9 @@ test(const bool adaptive_ref = true)
     mf_data->reinit(dof, constraints, quad, data);
   }
 
-  const unsigned int     n_cells  = mf_data->n_macro_cells();
-  const auto &           dof_info = mf_data->get_dof_info();
-  constexpr unsigned int n_vectorization =
-    VectorizedArray<number>::n_array_elements;
+  const unsigned int     n_cells         = mf_data->n_cell_batches();
+  const auto &           dof_info        = mf_data->get_dof_info();
+  constexpr unsigned int n_vectorization = VectorizedArray<number>::size();
 
   std::vector<unsigned int> my_rows;
   my_rows.reserve(fe.dofs_per_cell * n_vectorization);

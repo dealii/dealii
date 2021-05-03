@@ -1,0 +1,37 @@
+
+DEAL:double:2d::Testing FE_Q<2>(1)
+DEAL:double:2d::Norm of difference: 6.11e-15
+DEAL:double:2d::
+DEAL:double:2d::Testing FE_Q<2>(2)
+DEAL:double:2d::Norm of difference: 4.71e-15
+DEAL:double:2d::
+DEAL:double:2d::Testing FE_Q<2>(3)
+DEAL:double:2d::Norm of difference: 2.02e-14
+DEAL:double:2d::
+DEAL:double:3d::Testing FE_Q<3>(1)
+DEAL:double:3d::Norm of difference: 1.54e-15
+DEAL:double:3d::
+DEAL:double:3d::Testing FE_Q<3>(2)
+DEAL:double:3d::Norm of difference: 2.64e-15
+DEAL:double:3d::
+DEAL:double:3d::Testing FE_Q<3>(3)
+DEAL:double:3d::Norm of difference: 1.74e-14
+DEAL:double:3d::
+DEAL:float:2d::Testing FE_Q<2>(1)
+DEAL:float:2d::Norm of difference: 5.83e-15
+DEAL:float:2d::
+DEAL:float:2d::Testing FE_Q<2>(2)
+DEAL:float:2d::Norm of difference: 3.76e-15
+DEAL:float:2d::
+DEAL:float:2d::Testing FE_Q<2>(3)
+DEAL:float:2d::Norm of difference: 1.88e-14
+DEAL:float:2d::
+DEAL:float:3d::Testing FE_Q<3>(1)
+DEAL:float:3d::Norm of difference: 1.10e-15
+DEAL:float:3d::
+DEAL:float:3d::Testing FE_Q<3>(2)
+DEAL:float:3d::Norm of difference: 2.61e-15
+DEAL:float:3d::
+DEAL:float:3d::Testing FE_Q<3>(3)
+DEAL:float:3d::Norm of difference: 1.87e-14
+DEAL:float:3d::

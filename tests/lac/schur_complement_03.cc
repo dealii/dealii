@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2008 - 2018 by the deal.II authors
+ * Copyright (C) 2008 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -59,7 +59,6 @@
 
 namespace Step22
 {
-  using namespace dealii;
   template <int dim>
   class StokesProblem
   {
@@ -181,10 +180,8 @@ namespace Step22
                                                fe.component_mask(velocities));
     }
     constraints.close();
-    std::vector<types::global_dof_index> dofs_per_block(2);
-    DoFTools::count_dofs_per_block(dof_handler,
-                                   dofs_per_block,
-                                   block_component);
+    const std::vector<types::global_dof_index> dofs_per_block =
+      DoFTools::count_dofs_per_fe_block(dof_handler, block_component);
     const unsigned int n_u = dofs_per_block[0], n_p = dofs_per_block[1];
     deallog << "   Number of active cells: " << triangulation.n_active_cells()
             << std::endl
@@ -378,7 +375,7 @@ namespace Step22
            triangulation.begin_active();
          cell != triangulation.end();
          ++cell)
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+      for (const unsigned int f : GeometryInfo<dim>::face_indices())
         if (cell->face(f)->center()[dim - 1] == 0)
           cell->face(f)->set_all_boundary_ids(1);
     triangulation.refine_global(4 - dim);

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,14 +20,12 @@
 // matrix for MG DoFHandler on a hyperball mesh with no hanging nodes but
 // homogeneous Dirichlet conditions
 
-#include "../tests.h"
-
-std::ofstream logfile("output");
-
 #include <deal.II/base/function.h>
 
 #include <deal.II/multigrid/mg_matrix.h>
 #include <deal.II/multigrid/mg_tools.h>
+
+#include "../tests.h"
 
 #include "matrix_vector_common.h"
 
@@ -44,7 +42,7 @@ test()
   typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(),
                                                     endc = tria.end();
   for (; cell != endc; ++cell)
-    for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+    for (const unsigned int f : GeometryInfo<dim>::face_indices())
       if (cell->at_boundary(f))
         cell->face(f)->set_all_manifold_ids(0);
   tria.set_manifold(0, manifold);
@@ -55,7 +53,7 @@ test()
   // setup DoFs
   DoFHandler<dim> dof(tria);
   dof.distribute_dofs(fe);
-  dof.distribute_mg_dofs(fe);
+  dof.distribute_mg_dofs();
   AffineConstraints<double> constraints;
   VectorTools::interpolate_boundary_values(dof,
                                            0,
@@ -85,8 +83,8 @@ test()
   system_matrix.reinit(sparsity);
 
   // setup MG levels
-  const unsigned int                       nlevels = tria.n_levels();
-  typedef MatrixFree<dim>                  MatrixFreeTestType;
+  const unsigned int nlevels = tria.n_levels();
+  using MatrixFreeTestType   = MatrixFree<dim>;
   MGLevelObject<MatrixFreeTestType>        mg_matrices;
   MGLevelObject<AffineConstraints<double>> mg_constraints;
   MGLevelObject<SparsityPattern>           mg_sparsities;
@@ -109,7 +107,7 @@ test()
         mg_constraints[level].add_line(*bc_it);
       mg_constraints[level].close();
       typename MatrixFree<dim>::AdditionalData data;
-      data.level_mg_handler = level;
+      data.mg_level = level;
       mg_matrices[level].reinit(
         mapping, dof, mg_constraints[level], quad, data);
 

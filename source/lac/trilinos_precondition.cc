@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2019 by the deal.II authors
+// Copyright (C) 2008 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -788,6 +788,7 @@ namespace TrilinosWrappers
     dst = src;
   }
 
+#  ifndef DOXYGEN
   void
   PreconditionIdentity::vmult(
     LinearAlgebra::distributed::Vector<double> &      dst,
@@ -803,6 +804,7 @@ namespace TrilinosWrappers
   {
     dst = src;
   }
+#  endif // DOXYGEN
 } // namespace TrilinosWrappers
 
 DEAL_II_NAMESPACE_CLOSE

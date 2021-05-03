@@ -64,7 +64,7 @@ template <typename number>
 void
 test()
 {
-  typedef Vector<number> VectorType;
+  using VectorType = Vector<number>;
   ImplicitQR<VectorType> qr;
 
   const unsigned int v_size = 5;

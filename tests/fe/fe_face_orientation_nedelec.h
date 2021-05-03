@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -212,7 +212,7 @@ evaluate(const FE_Nedelec<3> & fe,
       fe_field_function.vector_value_list(fe_values.get_quadrature_points(),
                                           values);
 
-      for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+      for (const auto q_point : fe_values.quadrature_point_indices())
         {
           for (unsigned int d = 0; d < 3; ++d)
             deallog << values_ref[q_point][d] - values[q_point](d) << "  ";

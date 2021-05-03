@@ -18,7 +18,6 @@
 #include <deal.II/base/polynomial.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/tensor_product_polynomials.h>
 #include <deal.II/base/utilities.h>
 
@@ -152,7 +151,7 @@ MappingQ<dim, spacedim>::get_data(const UpdateFlags      update_flags,
                                   const Quadrature<dim> &quadrature) const
 {
   std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase> data_ptr =
-    std_cxx14::make_unique<InternalData>();
+    std::make_unique<InternalData>();
   auto &data = dynamic_cast<InternalData &>(*data_ptr);
 
   // build the Q1 and Qp internal data objects in parallel
@@ -180,21 +179,25 @@ MappingQ<dim, spacedim>::get_data(const UpdateFlags      update_flags,
 template <int dim, int spacedim>
 std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase>
 MappingQ<dim, spacedim>::get_face_data(
-  const UpdateFlags          update_flags,
-  const Quadrature<dim - 1> &quadrature) const
+  const UpdateFlags               update_flags,
+  const hp::QCollection<dim - 1> &quadrature) const
 {
   std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase> data_ptr =
-    std_cxx14::make_unique<InternalData>();
+    std::make_unique<InternalData>();
   auto &data = dynamic_cast<InternalData &>(*data_ptr);
+
+  std::unique_ptr<typename MappingQGeneric<dim, spacedim>::InternalDataBase> (
+    MappingQGeneric<dim, spacedim>::*mapping_get_face_data)(
+    const UpdateFlags, const hp::QCollection<dim - 1> &) const =
+    &MappingQGeneric<dim, spacedim>::get_face_data;
 
   // build the Q1 and Qp internal data objects in parallel
   Threads::Task<
     std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase>>
-    do_get_data =
-      Threads::new_task(&MappingQGeneric<dim, spacedim>::get_face_data,
-                        *qp_mapping,
-                        update_flags,
-                        quadrature);
+    do_get_data = Threads::new_task(mapping_get_face_data,
+                                    *qp_mapping,
+                                    update_flags,
+                                    quadrature);
 
   if (!use_mapping_q_on_all_cells)
     data.mapping_q1_data = Utilities::dynamic_unique_cast<
@@ -217,7 +220,7 @@ MappingQ<dim, spacedim>::get_subface_data(
   const Quadrature<dim - 1> &quadrature) const
 {
   std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase> data_ptr =
-    std_cxx14::make_unique<InternalData>();
+    std::make_unique<InternalData>();
   auto &data = dynamic_cast<InternalData &>(*data_ptr);
 
   // build the Q1 and Qp internal data objects in parallel
@@ -303,7 +306,7 @@ void
 MappingQ<dim, spacedim>::fill_fe_face_values(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const unsigned int                                          face_no,
-  const Quadrature<dim - 1> &                                 quadrature,
+  const hp::QCollection<dim - 1> &                            quadrature,
   const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
   internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
     &output_data) const
@@ -384,7 +387,7 @@ template <int dim, int spacedim>
 void
 MappingQ<dim, spacedim>::transform(
   const ArrayView<const Tensor<1, dim>> &                  input,
-  const MappingType                                        mapping_type,
+  const MappingKind                                        mapping_kind,
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
   const ArrayView<Tensor<1, spacedim>> &                   output) const
 {
@@ -395,10 +398,10 @@ MappingQ<dim, spacedim>::transform(
 
   // check whether we should in fact work on the Q1 portion of it
   if (data->use_mapping_q1_on_current_cell)
-    q1_mapping->transform(input, mapping_type, *data->mapping_q1_data, output);
+    q1_mapping->transform(input, mapping_kind, *data->mapping_q1_data, output);
   else
     // otherwise use the full mapping
-    qp_mapping->transform(input, mapping_type, *data->mapping_qp_data, output);
+    qp_mapping->transform(input, mapping_kind, *data->mapping_qp_data, output);
 }
 
 
@@ -407,7 +410,7 @@ template <int dim, int spacedim>
 void
 MappingQ<dim, spacedim>::transform(
   const ArrayView<const DerivativeForm<1, dim, spacedim>> &input,
-  const MappingType                                        mapping_type,
+  const MappingKind                                        mapping_kind,
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
   const ArrayView<Tensor<2, spacedim>> &                   output) const
 {
@@ -419,10 +422,10 @@ MappingQ<dim, spacedim>::transform(
 
   // check whether we should in fact work on the Q1 portion of it
   if (data->use_mapping_q1_on_current_cell)
-    q1_mapping->transform(input, mapping_type, *data->mapping_q1_data, output);
+    q1_mapping->transform(input, mapping_kind, *data->mapping_q1_data, output);
   else
     // otherwise use the full mapping
-    qp_mapping->transform(input, mapping_type, *data->mapping_qp_data, output);
+    qp_mapping->transform(input, mapping_kind, *data->mapping_qp_data, output);
 }
 
 
@@ -431,7 +434,7 @@ template <int dim, int spacedim>
 void
 MappingQ<dim, spacedim>::transform(
   const ArrayView<const Tensor<2, dim>> &                  input,
-  const MappingType                                        mapping_type,
+  const MappingKind                                        mapping_kind,
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
   const ArrayView<Tensor<2, spacedim>> &                   output) const
 {
@@ -443,10 +446,10 @@ MappingQ<dim, spacedim>::transform(
 
   // check whether we should in fact work on the Q1 portion of it
   if (data->use_mapping_q1_on_current_cell)
-    q1_mapping->transform(input, mapping_type, *data->mapping_q1_data, output);
+    q1_mapping->transform(input, mapping_kind, *data->mapping_q1_data, output);
   else
     // otherwise use the full mapping
-    qp_mapping->transform(input, mapping_type, *data->mapping_qp_data, output);
+    qp_mapping->transform(input, mapping_kind, *data->mapping_qp_data, output);
 }
 
 
@@ -455,7 +458,7 @@ template <int dim, int spacedim>
 void
 MappingQ<dim, spacedim>::transform(
   const ArrayView<const DerivativeForm<2, dim, spacedim>> &input,
-  const MappingType                                        mapping_type,
+  const MappingKind                                        mapping_kind,
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
   const ArrayView<Tensor<3, spacedim>> &                   output) const
 {
@@ -467,10 +470,10 @@ MappingQ<dim, spacedim>::transform(
 
   // check whether we should in fact work on the Q1 portion of it
   if (data->use_mapping_q1_on_current_cell)
-    q1_mapping->transform(input, mapping_type, *data->mapping_q1_data, output);
+    q1_mapping->transform(input, mapping_kind, *data->mapping_q1_data, output);
   else
     // otherwise use the full mapping
-    qp_mapping->transform(input, mapping_type, *data->mapping_qp_data, output);
+    qp_mapping->transform(input, mapping_kind, *data->mapping_qp_data, output);
 }
 
 
@@ -479,7 +482,7 @@ template <int dim, int spacedim>
 void
 MappingQ<dim, spacedim>::transform(
   const ArrayView<const Tensor<3, dim>> &                  input,
-  const MappingType                                        mapping_type,
+  const MappingKind                                        mapping_kind,
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
   const ArrayView<Tensor<3, spacedim>> &                   output) const
 {
@@ -491,10 +494,10 @@ MappingQ<dim, spacedim>::transform(
 
   // check whether we should in fact work on the Q1 portion of it
   if (data->use_mapping_q1_on_current_cell)
-    q1_mapping->transform(input, mapping_type, *data->mapping_q1_data, output);
+    q1_mapping->transform(input, mapping_kind, *data->mapping_q1_data, output);
   else
     // otherwise use the full mapping
-    qp_mapping->transform(input, mapping_type, *data->mapping_qp_data, output);
+    qp_mapping->transform(input, mapping_kind, *data->mapping_qp_data, output);
 }
 
 
@@ -535,8 +538,40 @@ template <int dim, int spacedim>
 std::unique_ptr<Mapping<dim, spacedim>>
 MappingQ<dim, spacedim>::clone() const
 {
-  return std_cxx14::make_unique<MappingQ<dim, spacedim>>(
+  return std::make_unique<MappingQ<dim, spacedim>>(
     this->polynomial_degree, this->use_mapping_q_on_all_cells);
+}
+
+
+
+template <int dim, int spacedim>
+BoundingBox<spacedim>
+MappingQ<dim, spacedim>::get_bounding_box(
+  const typename Triangulation<dim, spacedim>::cell_iterator &cell) const
+{
+  if (cell->has_boundary_lines() || use_mapping_q_on_all_cells ||
+      (dim != spacedim))
+    return BoundingBox<spacedim>(
+      qp_mapping->compute_mapping_support_points(cell));
+  else
+    return BoundingBox<spacedim>(q1_mapping->get_vertices(cell));
+}
+
+
+
+template <int dim, int spacedim>
+bool
+MappingQ<dim, spacedim>::is_compatible_with(
+  const ReferenceCell &reference_cell) const
+{
+  Assert(dim == reference_cell.get_dimension(),
+         ExcMessage("The dimension of your mapping (" +
+                    Utilities::to_string(dim) +
+                    ") and the reference cell cell_type (" +
+                    Utilities::to_string(reference_cell.get_dimension()) +
+                    " ) do not agree."));
+
+  return reference_cell.is_hyper_cube();
 }
 
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -75,7 +75,7 @@ main()
   for (auto &cell : tria.active_cell_iterators())
     {
       deallog << "Face centers:" << std::endl;
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+      for (const unsigned int f : GeometryInfo<dim>::face_indices())
         deallog << cell->face(f)->center(true) << std::endl;
       deallog << std::endl;
     }

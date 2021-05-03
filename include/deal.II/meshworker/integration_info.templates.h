@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,6 +16,8 @@
 #ifndef dealii_integration_info_templates_h
 #define dealii_integration_info_templates_h
 
+
+#include <deal.II/base/config.h>
 
 #include <deal.II/base/quadrature_lib.h>
 
@@ -36,41 +38,38 @@ namespace MeshWorker
     const unsigned int nqp = fevalv[0]->n_quadrature_points;
 
     values.resize(global_data->n_values());
-    // For all selected finite
-    // element functions
-    for (unsigned int i = 0; i < values.size(); ++i)
+    // For all selected finite element functions
+    for (auto &function_values : values)
       {
-        values[i].resize(n_components);
+        function_values.resize(n_components);
         // For all components
-        for (unsigned int j = 0; j < values[i].size(); ++j)
+        for (auto &component_values : function_values)
           {
-            values[i][j].resize(nqp);
+            component_values.resize(nqp);
           }
       }
 
     gradients.resize(global_data->n_gradients());
-    // For all selected finite
-    // element functions
-    for (unsigned int i = 0; i < gradients.size(); ++i)
+    // For all selected finite element functions
+    for (auto &function_gradients : gradients)
       {
-        gradients[i].resize(n_components);
+        function_gradients.resize(n_components);
         // For all components
-        for (unsigned int j = 0; j < gradients[i].size(); ++j)
+        for (auto &component_gradients : function_gradients)
           {
-            gradients[i][j].resize(nqp);
+            component_gradients.resize(nqp);
           }
       }
 
     hessians.resize(global_data->n_hessians());
-    // For all selected finite
-    // element functions
-    for (unsigned int i = 0; i < hessians.size(); ++i)
+    // For all selected finite element functions
+    for (auto &function_hessians : hessians)
       {
-        hessians[i].resize(n_components);
+        function_hessians.resize(n_components);
         // For all components
-        for (unsigned int j = 0; j < hessians[i].size(); ++j)
+        for (auto &component_hessians : function_hessians)
           {
-            hessians[i][j].resize(nqp);
+            component_hessians.resize(nqp);
           }
       }
   }

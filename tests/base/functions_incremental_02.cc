@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -18,6 +18,8 @@
 // to its original state.
 
 #include <deal.II/base/incremental_function.h>
+
+#include <deal.II/lac/vector.h>
 
 #include "../tests.h"
 
@@ -76,18 +78,18 @@ check()
       deallog << "time = " << el.first << " delta = " << el.second << std::endl;
       func.set_time(el.first);
       func.vector_value(point, v1);
-      v1.print(deallog);
+      v1.print(deallog.get_file_stream());
       deallog << "-" << std::endl;
 
       func.set_time(el.first - el.second);
       func.vector_value(point, v2);
-      v2.print(deallog);
+      v2.print(deallog.get_file_stream());
       deallog << "=" << std::endl;
 
       inc.set_time(el.first);
       inc.set_decrement(el.second);
       inc.vector_value(point, v3);
-      v3.print(deallog);
+      v3.print(deallog.get_file_stream());
 
       v1.add(-1, v2);
       v1.add(-1, v3);

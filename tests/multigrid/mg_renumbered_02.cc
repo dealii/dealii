@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -63,7 +63,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 
 template <int dim, typename number, int spacedim>
@@ -180,7 +179,7 @@ template <int dim>
 class LaplaceProblem
 {
 public:
-  typedef MeshWorker::IntegrationInfo<dim> CellInfo;
+  using CellInfo = MeshWorker::IntegrationInfo<dim>;
 
   LaplaceProblem(const unsigned int deg);
   void
@@ -221,7 +220,7 @@ void
 LaplaceProblem<dim>::setup_system()
 {
   mg_dof_handler_renumbered.distribute_dofs(fe);
-  mg_dof_handler_renumbered.distribute_mg_dofs(fe);
+  mg_dof_handler_renumbered.distribute_mg_dofs();
 
   const unsigned int nlevels = triangulation.n_levels();
 
@@ -249,7 +248,7 @@ LaplaceProblem<dim>::output_gpl(const DoFHandler<dim> &        dof,
 {
   MeshWorker::IntegrationInfoBox<dim> info_box;
   const unsigned int n_gauss_points = dof.get_fe().tensor_degree();
-  QTrapez<1>         trapez;
+  QTrapezoid<1>      trapez;
   QIterated<dim>     quadrature(trapez, n_gauss_points);
   info_box.cell_quadrature = quadrature;
   info_box.initialize_update_flags();
@@ -330,9 +329,7 @@ LaplaceProblem<dim>::refine_local()
        cell != triangulation.end();
        ++cell)
     {
-      for (unsigned int vertex = 0;
-           vertex < GeometryInfo<dim>::vertices_per_cell;
-           ++vertex)
+      for (const unsigned int vertex : GeometryInfo<dim>::vertex_indices())
         {
           const Point<dim> p = cell->vertex(vertex);
           const Point<dim> origin =

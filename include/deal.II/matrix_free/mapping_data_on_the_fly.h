@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2018 by the deal.II authors
+// Copyright (C) 2014 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -55,12 +55,14 @@ namespace internal
      * the geometry, but it rather provides the evaluated geometry from a
      * given deal.II mapping (as passed to the constructor of this class) in a
      * form accessible to FEEvaluation.
-     *
-     * @author Martin Kronbichler, 2014
      */
-    template <int dim, typename Number = double>
+    template <int dim, typename Number, typename VectorizedArrayType>
     class MappingDataOnTheFly
     {
+      static_assert(
+        std::is_same<Number, typename VectorizedArrayType::value_type>::value,
+        "Type of Number and of VectorizedArrayType do not match.");
+
     public:
       /**
        * Constructor, similar to FEValues. Since this class only evaluates the
@@ -114,7 +116,7 @@ namespace internal
        * MappingInfo. This ensures compatibility with the precomputed data
        * fields in the MappingInfo class.
        */
-      const MappingInfoStorage<dim, dim, Number> &
+      const MappingInfoStorage<dim, dim, Number, VectorizedArrayType> &
       get_data_storage() const;
 
       /**
@@ -150,21 +152,24 @@ namespace internal
        * The storage part created for a single cell and held in analogy to
        * MappingInfo.
        */
-      MappingInfoStorage<dim, dim, Number> mapping_info_storage;
+      MappingInfoStorage<dim, dim, Number, VectorizedArrayType>
+        mapping_info_storage;
     };
 
 
     /*-------------------------- Inline functions ---------------------------*/
 
-    template <int dim, typename Number>
-    inline MappingDataOnTheFly<dim, Number>::MappingDataOnTheFly(
-      const Mapping<dim> & mapping,
-      const Quadrature<1> &quadrature,
-      const UpdateFlags    update_flags)
-      : fe_values(mapping,
-                  fe_dummy,
-                  Quadrature<dim>(quadrature),
-                  MappingInfo<dim, Number>::compute_update_flags(update_flags))
+    template <int dim, typename Number, typename VectorizedArrayType>
+    inline MappingDataOnTheFly<dim, Number, VectorizedArrayType>::
+      MappingDataOnTheFly(const Mapping<dim> & mapping,
+                          const Quadrature<1> &quadrature,
+                          const UpdateFlags    update_flags)
+      : fe_values(
+          mapping,
+          fe_dummy,
+          Quadrature<dim>(quadrature),
+          MappingInfo<dim, Number, VectorizedArrayType>::compute_update_flags(
+            update_flags))
       , quadrature_1d(quadrature)
     {
       mapping_info_storage.descriptor.resize(1);
@@ -191,10 +196,10 @@ namespace internal
 
 
 
-    template <int dim, typename Number>
-    inline MappingDataOnTheFly<dim, Number>::MappingDataOnTheFly(
-      const Quadrature<1> &quadrature,
-      const UpdateFlags    update_flags)
+    template <int dim, typename Number, typename VectorizedArrayType>
+    inline MappingDataOnTheFly<dim, Number, VectorizedArrayType>::
+      MappingDataOnTheFly(const Quadrature<1> &quadrature,
+                          const UpdateFlags    update_flags)
       : MappingDataOnTheFly(::dealii::StaticMappingQ1<dim, dim>::mapping,
                             quadrature,
                             update_flags)
@@ -202,9 +207,9 @@ namespace internal
 
 
 
-    template <int dim, typename Number>
+    template <int dim, typename Number, typename VectorizedArrayType>
     inline void
-    MappingDataOnTheFly<dim, Number>::reinit(
+    MappingDataOnTheFly<dim, Number, VectorizedArrayType>::reinit(
       typename dealii::Triangulation<dim>::cell_iterator cell)
     {
       if (present_cell == cell)
@@ -241,9 +246,10 @@ namespace internal
 
 
 
-    template <int dim, typename Number>
+    template <int dim, typename Number, typename VectorizedArrayType>
     inline bool
-    MappingDataOnTheFly<dim, Number>::is_initialized() const
+    MappingDataOnTheFly<dim, Number, VectorizedArrayType>::is_initialized()
+      const
     {
       return present_cell !=
              typename dealii::Triangulation<dim>::cell_iterator();
@@ -251,36 +257,38 @@ namespace internal
 
 
 
-    template <int dim, typename Number>
+    template <int dim, typename Number, typename VectorizedArrayType>
     inline typename dealii::Triangulation<dim>::cell_iterator
-    MappingDataOnTheFly<dim, Number>::get_cell() const
+    MappingDataOnTheFly<dim, Number, VectorizedArrayType>::get_cell() const
     {
       return fe_values.get_cell();
     }
 
 
 
-    template <int dim, typename Number>
+    template <int dim, typename Number, typename VectorizedArrayType>
     inline const dealii::FEValues<dim> &
-    MappingDataOnTheFly<dim, Number>::get_fe_values() const
+    MappingDataOnTheFly<dim, Number, VectorizedArrayType>::get_fe_values() const
     {
       return fe_values;
     }
 
 
 
-    template <int dim, typename Number>
-    inline const MappingInfoStorage<dim, dim, Number> &
-    MappingDataOnTheFly<dim, Number>::get_data_storage() const
+    template <int dim, typename Number, typename VectorizedArrayType>
+    inline const MappingInfoStorage<dim, dim, Number, VectorizedArrayType> &
+    MappingDataOnTheFly<dim, Number, VectorizedArrayType>::get_data_storage()
+      const
     {
       return mapping_info_storage;
     }
 
 
 
-    template <int dim, typename Number>
+    template <int dim, typename Number, typename VectorizedArrayType>
     inline const Quadrature<1> &
-    MappingDataOnTheFly<dim, Number>::get_quadrature() const
+    MappingDataOnTheFly<dim, Number, VectorizedArrayType>::get_quadrature()
+      const
     {
       return quadrature_1d;
     }

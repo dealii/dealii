@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2014 by the deal.II authors
+// Copyright (C) 2011 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,7 +17,7 @@
 
 /**
  * @defgroup SLEPcWrappers SLEPcWrappers
- * 
+ *
  * The classes in this module are wrappers around functionality
  * provided by the SLEPc library. All classes and functions in this
  * group reside in a namespace @p PETScWrappers.

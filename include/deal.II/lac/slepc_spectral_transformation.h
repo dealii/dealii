@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -33,14 +33,20 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declaration
+#    ifndef DOXYGEN
 namespace PETScWrappers
 {
   // forward declarations
   class SolverBase;
 } // namespace PETScWrappers
+#    endif
 
 namespace SLEPcWrappers
 {
+  // forward declaration
+  class SolverBase;
+
   /**
    * Base class for spectral transformation classes using the SLEPc solvers
    * which are selected based on flags passed to the spectral transformation.
@@ -66,7 +72,6 @@ namespace SLEPcWrappers
    * @note These options can also be set at the command line.
    *
    * @ingroup SLEPcWrappers
-   * @author Toby D. Young 2009, 2013; and Denis Davydov 2015.
    */
   class TransformationBase
   {
@@ -106,10 +111,8 @@ namespace SLEPcWrappers
      */
     ST st;
 
-    /**
-     * Make the solver class a friend, since it needs to set spectral
-     * transformation object.
-     */
+    // Make the solver class a friend, since it needs to set spectral
+    // transformation object.
     friend class SolverBase;
   };
 
@@ -117,7 +120,6 @@ namespace SLEPcWrappers
    * An implementation of the transformation interface using the SLEPc Shift.
    *
    * @ingroup SLEPcWrappers
-   * @author Toby D. Young 2009
    */
   class TransformationShift : public TransformationBase
   {
@@ -158,7 +160,6 @@ namespace SLEPcWrappers
    * and Invert.
    *
    * @ingroup SLEPcWrappers
-   * @author Toby D. Young 2009
    */
   class TransformationShiftInvert : public TransformationBase
   {
@@ -192,10 +193,8 @@ namespace SLEPcWrappers
      */
     const AdditionalData additional_data;
 
-    /**
-     * Make the solver class a friend, since it may need to set target
-     * equal the provided shift value.
-     */
+    // Make the solver class a friend, since it may need to set target
+    // equal the provided shift value.
     friend class SolverBase;
   };
 
@@ -205,7 +204,6 @@ namespace SLEPcWrappers
    * 3.5.0 and thus cannot be used in the newer versions.
    *
    * @ingroup SLEPcWrappers
-   * @author Toby D. Young 2009
    */
   class TransformationSpectrumFolding : public TransformationBase
   {
@@ -245,7 +243,6 @@ namespace SLEPcWrappers
    * An implementation of the transformation interface using the SLEPc Cayley.
    *
    * @ingroup SLEPcWrappers
-   * @author Toby D. Young 2009
    */
   class TransformationCayley : public TransformationBase
   {

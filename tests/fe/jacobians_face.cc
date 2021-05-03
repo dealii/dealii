@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2018 by the deal.II authors
+// Copyright (C) 2012 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -59,7 +59,7 @@ test()
                                                         tria.begin_active(),
                                                       endc = tria.end();
     for (; cell != endc; ++cell)
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+      for (const unsigned int f : GeometryInfo<dim>::face_indices())
         {
           fe_val.reinit(cell, f);
 
@@ -97,7 +97,7 @@ test()
                                                         tria.begin_active(),
                                                       endc = tria.end();
     for (; cell != endc; ++cell)
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+      for (const unsigned int f : GeometryInfo<dim>::face_indices())
         {
           fe_val.reinit(cell, f);
 
@@ -135,7 +135,7 @@ test()
                                                         tria.begin_active(),
                                                       endc = tria.end();
     for (; cell != endc; ++cell)
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+      for (const unsigned int f : GeometryInfo<dim>::face_indices())
         {
           fe_val.reinit(cell, f);
 
@@ -178,7 +178,7 @@ test()
                                                         tria.begin_active(),
                                                       endc = tria.end();
     for (; cell != endc; ++cell)
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+      for (const unsigned int f : GeometryInfo<dim>::face_indices())
         {
           fe_val.reinit(cell, f);
 
@@ -224,7 +224,7 @@ test()
                                                         tria.begin_active(),
                                                       endc = tria.end();
     for (; cell != endc; ++cell)
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+      for (const unsigned int f : GeometryInfo<dim>::face_indices())
         {
           fe_val.reinit(cell, f);
 
@@ -270,7 +270,7 @@ test()
                                                         tria.begin_active(),
                                                       endc = tria.end();
     for (; cell != endc; ++cell)
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+      for (const unsigned int f : GeometryInfo<dim>::face_indices())
         {
           fe_val.reinit(cell, f);
 
@@ -320,7 +320,7 @@ test()
                                                         tria.begin_active(),
                                                       endc = tria.end();
     for (; cell != endc; ++cell)
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+      for (const unsigned int f : GeometryInfo<dim>::face_indices())
         {
           fe_val.reinit(cell, f);
 
@@ -369,7 +369,7 @@ test()
                                                         tria.begin_active(),
                                                       endc = tria.end();
     for (; cell != endc; ++cell)
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+      for (const unsigned int f : GeometryInfo<dim>::face_indices())
         {
           fe_val.reinit(cell, f);
 
@@ -411,9 +411,8 @@ test()
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(8) << std::fixed;
-  deallog.attach(logfile);
 
   test<2>();
   test<3>();

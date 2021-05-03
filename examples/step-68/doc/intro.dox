@@ -1,0 +1,233 @@
+<br>
+
+<i>
+This program was contributed by
+Bruno Blais (Polytechnique Montréal),
+Toni El Geitani Nehme (Polytechnique Montréal),
+Rene Gassmöller (University of California Davis),
+and Peter Munch (Technical University of Munich and Helmholtz-Zentrum Geesthacht).
+Bruno Blais was supported by NSERC Discovery grant
+RGPIN-2020-04510, by Compute Canada and Calcul Québec.
+</i>
+
+<h1>Introduction</h1>
+
+<h3>Simulation of the motion of massless tracer particles in a vortical flow</h3>
+
+Particles play an important part in numerical models for a large
+ number of applications. Particles are routinely used
+ as massless tracers to visualize the dynamic of a transient flow. They
+ can also play an intrinsic role as part of a more complex finite element
+ model, as is the case for the Particle-In-Cell (PIC) method @cite GLHPW2018
+ or they can even be used to simulate the motion of granular matter, as in
+ the Discrete Element Method (DEM) @cite Blais2019. In the case
+ of DEM, the resulting model is not related to the finite element method anymore,
+ but just leads to a system of ordinary differential equation which describes
+ the motion of the particles and the dynamic of their collisions. All of
+ these models can be built using deal.II's particle handling capabilities.
+
+In the present step, we use particles as massless tracers to illustrate
+the dynamic of a vortical flow. Since the particles are massless tracers,
+the position of each particle $i$ is described by the
+following ordinary differential equation (ODE):
+@f[
+\frac{d \textbf{x}_i}{dt} =\textbf{u}(\textbf{x}_i)
+@f]
+
+where $\textbf{x}_i$ is the position of particle $i$ and $\textbf{u}(\textbf{x}_i)$ the flow velocity at its position.
+In the present step, this ODE is solved using the explicit Euler method. The resulting scheme is:
+@f[
+\textbf{x}_{i}^{n+1} = \textbf{x}_{i}^{n} + \Delta t \; \textbf{u}(\textbf{x}_{i}^{n})
+@f]
+
+where $\textbf{x}_{i}^{n+1}$ and $\textbf{x}_{i}^{n}$ are the position
+of particle $i$ at time $t+\Delta t$ and $t$, respectively and where $\Delta t$
+is the time step. In the present step, the velocity at the location of particles
+is obtained in two different fashions:
+- By evaluating the velocity function at the location of the particles;
+- By evaluating the velocity function on a background triangulation and, using
+a  finite element support, interpolating at the position of the particle.
+
+The first approach is not practical, since the velocity profile
+is generally not known analytically. The second approach, based on interpolating a solution
+at the position of the particles, mimics exactly what would be done in a
+realistic computational fluid dynamic simulation, and this follows the way we have also evaluated
+the finite element solution at particle locations in step-19. In this step, we illustrate both strategies.
+
+We note that much greater accuracy could be obtained by using a fourth
+order Runge-Kutta method or another appropriate scheme for the time integration
+of the motion of the particles.  Implementing a more advanced time-integration scheme
+would be a straightforward extension of this step.
+
+<h3>Particles in deal.II</h3>
+
+In deal.II, Particles::Particle are very simple and flexible entities that can be used
+to build PIC, DEM or any type of particle-based models. Particles have a location
+in real space, a location in the reference space of the element in which they
+are located and a unique ID. In the majority of cases, simulations that include
+particles require a significant number of them. Thus, it becomes interesting
+to handle all particles through an entity which agglomerates all particles.
+In deal.II, this is achieved through the use of the Particles::ParticleHandler class.
+
+By default, particles do not have a diameter,
+a mass or any other physical properties which we would generally expect of physical particles. However, through
+a ParticleHandler, particles have access to a Particles::PropertyPool. This PropertyPool is
+an array which can be used to store an arbitrary number of properties
+associated with the particles. Consequently, users can build their own
+particle solver and attribute the desired properties to the particles (e.g., mass, charge,
+diameter, temperature, etc.). In the present tutorial, this is used to
+store the value of the fluid velocity and the process id to which the particles
+belong.
+
+<h3>Challenges related to distributed particle simulations</h3>
+
+Although the present step is not computationally intensive, simulations that
+include many particles can be computationally demanding and require parallelization.
+The present step showcases the distributed parallel capabilities of deal.II for particles.
+In general, there are three main challenges
+that specifically arise in parallel distributed simulations that include particles:
+- Generating the particles on the distributed triangulation;
+- Exchanging the particles that leave local domains between the processors;
+- Load balancing the simulation so that every processor has a similar computational load.
+These challenges and their solution in deal.II have been discussed in more detail in
+@cite GLHPW2018, but we will summarize them below.
+
+There are of course also questions on simply setting up a code that uses particles. These have largely already been
+addressed in step-19. Some more advanced techniques will also be discussed in step-70.
+
+<h4>Parallel particle generation</h4>
+
+Generating distributed particles in a scalable way is not straightforward since
+the processor to which they belong must first be identified before the cell in
+which they are located is found.  deal.II provides numerous capabilities to
+generate particles through the Particles::Generator namespace.  Some of these
+particle generators create particles only on the locally owned subdomain. For
+example, Particles::Generators::regular_reference_locations() creates particles
+at the same reference locations within each cell of the local subdomain and
+Particles::Generators::probabilistic_locations() uses a globally defined probability
+density function to determine how many and where to generate particles locally.
+
+In other situations, such as the present step, particles must be generated at
+specific locations on cells that may be owned only by a subset of the processors.
+In  most of these situations, the insertion of the particles is done for a very
+limited number of time-steps and, consequently, does not constitute a large
+portion of the computational cost. For these occasions, deal.II provides
+convenient Particles::Generators that can globally insert the particles even if
+the particle is not located in a cell owned by the parallel process on which the call to create the particle is initiated. The
+generators first locate on which subdomain the particles are situated, identify
+in which cell they are located and exchange the necessary information among
+the processors to ensure that the particle is generated with the right
+properties. Consequently, this type of particle generation can be communication
+intensive. The Particles::Generators::dof_support_points and the
+Particles::Generators::quadrature_points generate particles using a
+triangulation and the points of an associated DoFHandler or quadrature
+respectively. The triangulation that is used to generate the particles can be
+the same triangulation that is used for the background mesh, in which case these
+functions are very similar to the
+Particles::Generators::regular_reference_locations() function described in the
+previous paragraph. However, the triangulation used to generate particles can
+also be different (non-matching) from the triangulation of the background grid,
+which is useful to generate particles in particular shapes (as in this
+example), or to transfer information between two different computational grids
+(as in step-70).  Furthermore, the Particles::ParticleHandler class provides the
+Particles::ParticleHandler::insert_global_particles() function which enables the
+global insertion of particles from a vector of arbitrary points and a global
+vector of bounding boxes. In the present step, we use the
+Particles::Generators::quadrature_points() function on a non-matching triangulation to
+insert particles located at positions in the shape of a disk.
+
+<h4>Particle exchange</h4>
+
+As particles move around in parallel distributed computations they may leave
+the locally owned subdomain and need to be transferred to their new owner
+processes. This situation can arise in two very different ways: First, if the
+previous owning process knows the new owner of the particles that were lost
+(for example because the particles moved from the locally owned cell of one processor
+into an adjacent ghost cells of a distributed
+triangulation) then the transfer can be handled efficiently as a point-to-point
+communication between each process and the new owners. This transfer happens
+automatically whenever particles are sorted into their new cells. Secondly,
+the previous owner may not know to which process the particle has moved. In
+this case the particle is discarded by default, as a global search for the
+owner can be expensive. step-19 shows how such a discarded particle can still
+be collected, interpreted, and potentially reinserted by the user. In the
+present example we prevent the second case by imposing a CFL criterion on the
+timestep to ensure particles will at most move into the ghost layer of the
+local process and can therefore be send to neighboring processes automatically.
+
+<h4>Balancing mesh and particle load</h4>
+
+The last challenge that arises in parallel distributed computations using
+particles is to balance the computational load between work that is done on the
+grid, for example solving the finite-element problem, and the work that is done
+on the particles, for example advecting the particles or computing the forces
+between particles or between particles and grid. By default, for example in
+step-40, deal.II distributes the background mesh as evenly as possible between
+the available processes, that is it balances the number of cells on each
+process. However, if some cells own many more particles than other cells, or if
+the particles of one cell are much more computationally expensive than the
+particles in other cells, then this problem no longer scales efficiently (for a
+discussion of what we consider "scalable" programs, see
+@ref GlossParallelScaling "this glossary entry"). Thus, we have to apply a form of
+"load balancing", which means we estimate the computational load that is
+associated with each cell and its particles. Repartitioning the mesh then
+accounts for this combined computational load instead of the simplified
+assumption of the number of cells @cite GLHPW2018.
+
+In this section we only discussed the particle-specific challenges in distributed
+computation. Parallel challenges that particles share with
+finite-element solutions (parallel output, data transfer during mesh
+refinement) can be addressed with the solutions found for
+finite-element problems already discussed in other examples.
+
+<h3>The testcase</h3>
+
+In the present step, we use particles as massless tracers to illustrate
+the dynamics of a particular vortical flow: the Rayleigh--Kothe vortex. This flow pattern
+is generally used as a complex test case for interface tracking methods
+(e.g., volume-of-fluid and level set approaches) since
+it leads to strong rotation and elongation of the fluid @cite Blais2013.
+
+The stream function $\Psi$ of this Rayleigh-Kothe vortex is defined as:
+
+@f[
+\Psi = \frac{1}{\pi} \sin^2 (\pi x) \sin^2 (\pi y) \cos \left( \pi \frac{t}{T} \right)
+@f]
+where $T$ is half the period of the flow. The velocity profile in 2D ($\textbf{u}=[u,v]^T$) is :
+@f{eqnarray*}
+   u &=&  - \frac{\partial\Psi}{\partial y} = -2 \sin^2 (\pi x) \sin (\pi y) \cos (\pi y)  \cos \left( \pi \frac{t}{T} \right)\\
+   v &=&  \frac{\partial\Psi}{\partial x} = 2 \cos(\pi x) \sin(\pi x) \sin^2 (\pi y) \cos \left( \pi \frac{t}{T} \right)
+@f}
+
+The velocity profile is illustrated in the following animation:
+
+@htmlonly
+<p align="center">
+  <iframe width="560" height="500" src="https://www.youtube.com/embed/m6hQm7etji8"
+   frameborder="0"
+   allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+   allowfullscreen></iframe>
+ </p>
+@endhtmlonly
+
+It can be seen that this velocity reverses periodically due to the term
+$\cos \left( \pi \frac{t}{T} \right)$ and that material will end up at its
+starting position after every period of length $t=2T$. We will run this tutorial
+program for exactly one period and compare the final particle location to the
+initial location to illustrate this flow property. This example uses the testcase
+to produce two models that handle the particles
+slightly differently. The first model prescribes the exact analytical velocity
+solution as the velocity for each particle. Therefore in this model there is no
+error in the assigned velocity to the particles, and any deviation of particle
+positions from the analytical position at a given time results from the error
+in solving the equation of motion for the particle inexactly, using a time stepping method. In the second model the
+analytical velocity field is first interpolated to a finite-element vector
+space (to simulate the case that the velocity was obtained from solving a
+finite-element problem, in the same way as the ODE for each particle in step-19 depends on a finite element
+solution). This finite-element "solution" is then evaluated at
+the locations of the particles to solve their equation of motion. The
+difference between the two cases allows to assess whether the chosen
+finite-element space is sufficiently accurate to advect the particles with the
+optimal convergence rate of the chosen particle advection scheme, a question
+that is important in practice to determine the accuracy of the combined
+algorithm (see e.g. @cite Gassmoller2019).

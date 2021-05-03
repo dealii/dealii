@@ -37,7 +37,9 @@ right hand side) is generally considered a good model equation
 for fluid flow in porous media. Of course, one typically models fluid flow through
 the <a href="https://en.wikipedia.org/wiki/Navier%E2%80%93Stokes_equations">Navier-Stokes
 equations</a> or, if fluid velocities are slow or the viscosity is large, the
-<a href="https://en.wikipedia.org/wiki/Stokes_flow">Stokes equations</a>.
+<a href="https://en.wikipedia.org/wiki/Stokes_flow">Stokes
+equations</a>
+(which we cover in step-22).
 In the first of these two models, the forces that act are inertia and
 viscous friction, whereas in the second it is only viscous friction -- i.e.,
 forces that one fluid particle exerts on a nearby one. This is appropriate
@@ -45,14 +47,15 @@ if you have free flow in a large domain, say a pipe, a river, or in the air.
 On the other hand, if the fluid is confined in pores, then friction forces
 exerted by the pore walls on the fluid become more and more important and
 internal viscous friction becomes less and less important. Modeling this
-then first leads to the 
+then first leads to the
 <a href="https://en.wikipedia.org/wiki/Darcy%27s_law#Brinkman_form_of_Darcy's_law">Brinkman
 model</a> if both effects are important, and in the limit of very small pores
 to the <a href="https://en.wikipedia.org/wiki/Darcy%27s_law">Darcy equations</a>.
-The latter is just a different name for the Poisson or Laplace equation, 
+The latter is just a different name for the Poisson or Laplace equation,
 connotating it with the area to which one wants to apply it: slow flow
 in a porous medium. In essence it says that the velocity is proportional
-to the pressure gradient that drives the fluid through the porous medium.
+to the negative pressure gradient that drives the fluid through the
+porous medium.
 
 The Darcy equation models this pressure that drives the flow. (Because the
 solution variable is a pressure, we here use the name $p$ instead of the
@@ -60,30 +63,32 @@ name $u$ more commonly used for the solution of partial differential equations.)
 Typical applications of this view of the Laplace equation are then modeling
 groundwater flow, or the flow of hydrocarbons in oil reservoirs. In these
 applications, $K$ is the permeability tensor, i.e., a measure for how much
-resistance the soil or rock matrix asserts on the fluid flow. In the
-applications just named, a desirable feature is that the numerical scheme is
-locally conservative, i.e., that whatever flows into a cell also flows out of
-it (or the difference is equal to the integral over the source terms over each
-cell, if the sources are nonzero). However, as it turns out, the usual
-discretizations of the Laplace equation (such as those used in step-3, step-4,
-or step-6) do not satisfy this property. But, one can achieve this by choosing
-a different formulation of the problem and a particular combination of finite
-element spaces.
+resistance the soil or rock matrix asserts on the fluid flow.
+
+In the applications named above, a desirable feature for a numerical
+scheme is that it should be locally conservative, i.e., that whatever
+flows into a cell also flows out of it (or the difference is equal to
+the integral over the source terms over each cell, if the sources are
+nonzero). However, as it turns out, the usual discretizations of the
+Laplace equation (such as those used in step-3, step-4, or step-6) do
+not satisfy this property. But, one can achieve this by choosing a
+different formulation of the problem and a particular combination of
+finite element spaces.
 
 
 <h3>Formulation, weak form, and discrete problem</h3>
 
-To this end, one first introduces a second variable, called the flux,
-${\mathbf u}=-K\nabla p$. By its definition, the flux is a vector in the
+To this end, one first introduces a second variable, called the velocity,
+${\mathbf u}=-K\nabla p$. By its definition, the velocity is a vector in the
 negative
 direction of the pressure gradient, multiplied by the permeability tensor. If
 the permeability tensor is proportional to the unit matrix, this equation is
 easy to understand and intuitive: the higher the permeability, the higher the
-flux; and the flux is proportional to the gradient of the pressure, going from
+velocity; and the velocity is proportional to the gradient of the pressure, going from
 areas of high pressure to areas of low pressure (thus the negative sign).
 
 With this second variable, one then finds an alternative version of the
-Laplace equation, called the mixed formulation:
+Laplace equation, called the <i>mixed formulation</i>:
 @f{eqnarray*}
   K^{-1} {\mathbf u} + \nabla p &=& 0 \qquad {\textrm{in}\ } \Omega, \\
   -{\textrm{div}}\ {\mathbf u} &=& -f \qquad {\textrm{in}\ }\Omega, \\
@@ -119,8 +124,12 @@ space $H({\textrm{div}})=\{{\mathbf w}\in L^2(\Omega)^d:\ {\textrm{div}}\ {\math
 for $\mathbf u$,$\mathbf v$, and $L^2$ for $p,q$. It is a well-known fact stated in
 almost every book on finite element theory that if one chooses discrete finite
 element spaces for the approximation of ${\mathbf u},p$ inappropriately, then the
-resulting discrete saddle-point problem is instable and the discrete solution
-will not converge to the exact solution.
+resulting discrete problem is instable and the discrete solution
+will not converge to the exact solution. (Some details on the problem
+considered here -- which falls in the class of "saddle-point problems"
+-- can be found on the Wikipedia page on the <a
+href="https://en.wikipedia.org/wiki/Ladyzhenskaya%E2%80%93Babu%C5%A1ka%E2%80%93Brezzi_condition">Ladyzhenskaya-Babuska-Brezzi
+(LBB) condition</a>.)
 
 To overcome this, a number of different finite element pairs for ${\mathbf u},p$
 have been developed that lead to a stable discrete problem. One such pair is
@@ -129,7 +138,62 @@ discontinuous elements of class $DQ(k)$ for the pressure $p$. For details
 about these spaces, we refer in particular to the book on mixed finite element
 methods by Brezzi and Fortin, but many other books on the theory of finite
 elements, for example the classic book by Brenner and Scott, also state the
-relevant results.
+relevant results. In any case, with appropriate choices of function
+spaces, the discrete formulation reads as follows: Find ${\mathbf
+u}_h,p_h$ so that
+@f{eqnarray*}
+  A(\{{\mathbf u}_h,p_h\},\{{\mathbf v}_h,q_h\}) = F(\{{\mathbf v}_h,q_h\})
+  \qquad\qquad \forall {\mathbf v}_h,q_h.
+@f}
+
+
+Before continuing, let us briefly pause and show that the choice of
+function spaces above provides us with the desired local conservation
+property. In particular, because the pressure space consists of
+discontinuous piecewise polynomials, we can choose the test function
+$q$ as the function that is equal to one on any given cell $K$ and
+zero everywhere else. If we also choose ${\mathbf v}=0$ everywhere
+(remember that the weak form above has to hold for <i>all</i> discrete
+test functions $q,v$), then putting these choices of test functions
+into the weak formulation above implies in particular that
+@f{eqnarray*}
+  - (1,{\textrm{div}}\ {\mathbf u}_h)_K
+  =
+  -(1,f)_K,
+@f}
+which we can of course write in more explicit form as
+@f{eqnarray*}
+  \int_K {\textrm{div}}\ {\mathbf u}_h
+ =
+  \int_K f.
+@f}
+Applying the divergence theorem results in the fact that ${\mathbf
+u}_h$ has to satisfy, for every choice of cell $K$, the relationship
+@f{eqnarray*}
+  \int_{\partial K} {\mathbf u}_h\cdot{\mathbf n}
+  =
+  \int_K f.
+@f}
+If you now recall that ${\mathbf u}$ was the velocity, then the
+integral on the left is exactly the (discrete) flux across the
+boundary of the cell $K$. The statement is then that the flux must be equal
+to the integral over the sources within $K$. In particular, if there
+are no sources (i.e., $f=0$ in $K$), then the statement is that
+<i>total</i> flux is zero, i.e., whatever flows into a cell must flow out
+of it through some other part of the cell boundary. This is what we call
+<i>local conservation</i> because it holds for every cell.
+
+On the other hand, the usual continuous $Q_k$ elements would not result in
+this kind of property when used for the pressure (as, for example, we
+do in step-43) because one can not choose a discrete test function
+$q_h$ that is one on a cell $K$ and zero everywhere else: It would be
+discontinuous and consequently not in the finite element
+space. (Strictly speaking, all we can say is that the proof above
+would not work for continuous elements. Whether these elements might
+still result in local conservation is a different question as one
+could think that a different kind of proof might still work; in
+reality, however, the property really does not hold.)
+
 
 
 <h3>Assembling the linear system</h3>
@@ -228,8 +292,7 @@ If we implemented this, we would get code like this:
                               k_inverse_values[q][1][1] *
                               fe_values.shape_value_component(i,q,1) *
                               fe_values.shape_value_component(j,q,1)
-                             )
-                             *
+                             ) *
                              fe_values.JxW(q);
 @endcode
 
@@ -332,24 +395,20 @@ to loop over all boundary faces and integrate there. The mechanism works in
 the same way as above, i.e. the extractor classes also work on FEFaceValues objects:
 
 @code
-      for (unsigned int face_no=0;
-           face_no<GeometryInfo<dim>::faces_per_cell;
-           ++face_no)
-        if (cell->at_boundary(face_no))
-          {
-            fe_face_values.reinit (cell, face_no);
+        for (const auto &face : cell->face_iterators())
+          if (face->at_boundary())
+            {
+              fe_face_values.reinit(cell, face);
 
-            pressure_boundary_values
-              .value_list (fe_face_values.get_quadrature_points(),
-                           boundary_values);
+              pressure_boundary_values.value_list(
+                fe_face_values.get_quadrature_points(), boundary_values);
 
-            for (unsigned int q=0; q<n_face_q_points; ++q)
-              for (unsigned int i=0; i<dofs_per_cell; ++i)
-                local_rhs(i) += -(fe_face_values[velocities].value (i, q) *
-                                  fe_face_values.normal_vector(q) *
-                                  boundary_values[q] *
-                                  fe_face_values.JxW(q));
-          }
+              for (unsigned int q = 0; q < n_face_q_points; ++q)
+                for (unsigned int i = 0; i < dofs_per_cell; ++i)
+                  local_rhs(i) += -(fe_face_values[velocities].value(i, q) *
+                                    fe_face_values.normal_vector(q) *
+                                    boundary_values[q] *
+                                    fe_face_values.JxW(q));
 @endcode
 
 You will find the exact same code as above in the sources for the present
@@ -359,15 +418,25 @@ program. We will therefore not comment much on it below.
 <h3>Linear solvers and preconditioners</h3>
 
 After assembling the linear system we are faced with the task of solving
-it. The problem here is: the matrix has a zero block at the bottom right
-(there is no term in the bilinear form that couples the pressure $p$ with the
-pressure test function $q$), and it is indefinite. At least it is
-symmetric. In other words: the Conjugate Gradient method is not going to
-work. We would have to resort to other iterative solvers instead, such as
+it. The problem here is that the matrix possesses two undesirable properties:
+- It is <a href="https://en.wikipedia.org/wiki/Definiteness_of_a_matrix">indefinite</a>,
+  i.e., it has both positive and negative eigenvalues.
+  We don't want to prove this property here, but note that this is true
+  for all matrices of the form
+  $\left(\begin{array}{cc} M & B \\ B^T & 0 \end{array}\right)$
+  such as the one here where $M$ is positive definite.
+- The matrix has a zero block at the bottom right (there is no term in
+  the bilinear form that couples the pressure $p$ with the
+  pressure test function $q$).
+
+At least it is symmetric, but the first issue above still means that
+the Conjugate Gradient method is not going to work since it is only
+applicable to problems in which the matrix is symmetric and positive definite.
+We would have to resort to other iterative solvers instead, such as
 MinRes, SymmLQ, or GMRES, that can deal with indefinite systems. However, then
-the next problem immediately surfaces: due to the zero block, there are zeros
-on the diagonal and none of the usual preconditioners (Jacobi, SSOR) will work
-as they require division by diagonal elements.
+the next problem immediately surfaces: Due to the zero block, there are zeros
+on the diagonal and none of the usual, "simple" preconditioners (Jacobi, SSOR)
+will work as they require division by diagonal elements.
 
 For the matrix sizes we expect to run with this program, the by far simplest
 approach would be to just use a direct solver (in particular, the
@@ -375,7 +444,7 @@ SparseDirectUMFPACK class that is bundled with deal.II). step-29 goes this
 route and shows that solving <i>any</i> linear system can be done in just
 3 or 4 lines of code.
 
-But then, this is a tutorial: we teach how to do things. Consequently,
+But then, this is a tutorial: We teach how to do things. Consequently,
 in the following, we will introduce some techniques that can be used in cases
 like these. Namely, we will consider the linear system as not consisting of one
 large matrix and vectors, but we will want to decompose matrices
@@ -383,7 +452,7 @@ into <i>blocks</i> that correspond to the individual operators that appear in
 the system. We note that the resulting solver is not optimal -- there are
 much better ways to efficiently compute the system, for example those
 explained in the results section of step-22 or the one we use in step-43
-for a problem similar to the current one. Here, our goal shall be to
+for a problem similar to the current one. Here, our goal is simply to
 introduce new solution techniques and how they can be implemented in
 deal.II.
 
@@ -393,7 +462,7 @@ deal.II.
 In view of the difficulties using standard solvers and preconditioners
 mentioned above, let us take another look at the matrix. If we sort our
 degrees of freedom so that all velocity come before all pressure variables,
-then we can subdivide the linear system $Ax=h$ into the following blocks:
+then we can subdivide the linear system $Ax=b$ into the following blocks:
 @f{eqnarray*}
   \left(\begin{array}{cc}
     M & B \\ B^T & 0
@@ -418,25 +487,39 @@ second row from it):
   B^TM^{-1}B P &=& B^TM^{-1} F - G, \\
   MU &=& F - BP.
 @f}
-Here, the matrix $S=B^TM^{-1}B$ (called the <em>Schur complement</em> of $A$)
+Here, the matrix $S=B^TM^{-1}B$ (called the
+<a href="https://en.wikipedia.org/wiki/Schur_complement">Schur complement</a>
+of $A$)
 is obviously symmetric and, owing to the positive definiteness of $M$ and the
 fact that $B$ has full column rank, $S$ is also positive
 definite.
 
 Consequently, if we could compute $S$, we could apply the Conjugate Gradient
-method to it. However, computing $S$ is expensive, and $S$ is in fact
-also a full matrix. On the other hand, the CG algorithm doesn't require
-us to actually have a representation of $S$, it is sufficient to form
-matrix-vector products with it. We can do so in steps: to compute $Sv=B^TM^{-1}Bv=B^T(M^{-1}(Bv))$, we
+method to it. However, computing $S$ is expensive because it requires us
+to compute the inverse of the (possibly large) matrix $M$; and $S$ is in fact
+also a full matrix because even though $M$ is sparse, its inverse $M^{-1}$
+will generally be a dense matrix.
+On the other hand, the CG algorithm doesn't require
+us to actually have a representation of $S$: It is sufficient to form
+matrix-vector products with it. We can do so in steps, using the fact that
+matrix products are associative (i.e., we can set parentheses in such a
+way that the product is more convenient to compute):
+To compute $Sv=(B^TM^{-1}B)v=B^T(M^{-1}(Bv))$, we
 <ol>
- <li> form $w = B v$;
+ <li> compute $w = B v$;
  <li> solve $My = w$ for $y=M^{-1}w$, using the CG method applied to the
   positive definite and symmetric mass matrix $M$;
- <li> form $z=B^Ty$ to obtain $z=Sv$.
+ <li> compute $z=B^Ty$ to obtain $z=Sv$.
 </ol>
 Note how we evaluate the expression $B^TM^{-1}Bv$ right to left to
 avoid matrix-matrix products; this way, all we have to do is evaluate
 matrix-vector products.
+
+In the following, we will then have to come up with ways to represent the
+matrix $S$ so that it can be used in a Conjugate Gradient solver,
+as well as to define ways in which we can precondition the solution
+of the linear system involving $S$, and deal with solving linear systems
+with the matrix $M$ (the second step above).
 
 @note The key point in this consideration is to recognize that to implement
 an iterative solver such as CG or GMRES, we never actually need the actual
@@ -480,11 +563,11 @@ we can write:
 @code
     const auto op_M = linear_operator(M);
 
-    PreconditionJacobi<> preconditioner_M;
+    PreconditionJacobi<SparseMatrix<double>> preconditioner_M;
     preconditioner_M.initialize(M);
 
     ReductionControl reduction_control_M(2000, 1.0e-18, 1.0e-10);
-    SolverCG<>    solver_M(reduction_control_M);
+    SolverCG<Vector<double>>    solver_M(reduction_control_M);
 
     const auto op_M_inv = inverse_operator(op_M, solver_M, preconditioner_M);
 @endcode
@@ -596,7 +679,7 @@ With these prerequisites at hand, solving for $P$ and $U$ is a matter of
 creating another solver and inverse:
 @code
     SolverControl solver_control_S(2000, 1.e-12);
-    SolverCG<>    solver_S(solver_control_S);
+    SolverCG<Vector<double>>    solver_S(solver_control_S);
     PreconditionIdentity preconditioner_S;
 
     const auto op_S_inv = inverse_operator(op_S, solver_S, preconditioner_S);
@@ -668,7 +751,7 @@ using an IterationNumberControl that allows us to fix the number of CG
 iterations that are performed to a fixed small number (in our case 30):
 @code
     IterationNumberControl iteration_number_control_aS(30, 1.e-18);
-    SolverCG<>           solver_aS(iteration_number_control_aS);
+    SolverCG<Vector<double>>           solver_aS(iteration_number_control_aS);
     PreconditionIdentity preconditioner_aS;
     const auto preconditioner_S =
       inverse_operator(op_aS, solver_aS, preconditioner_aS);

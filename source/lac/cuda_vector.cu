@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -126,9 +126,10 @@ namespace LinearAlgebra
 
     template <typename Number>
     void
-    Vector<Number>::import(const ReadWriteVector<Number> &V,
-                           VectorOperation::values        operation,
-                           std::shared_ptr<const CommunicationPatternBase>)
+    Vector<Number>::import(
+      const ReadWriteVector<Number> &V,
+      VectorOperation::values        operation,
+      std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>)
     {
       if (operation == VectorOperation::insert)
         {
@@ -158,13 +159,7 @@ namespace LinearAlgebra
 
           kernel::vector_bin_op<Number, kernel::Binop_Addition>
             <<<n_blocks, block_size>>>(val.get(), tmp, n_elements);
-
-#  ifdef DEBUG
-          // Check that the kernel was launched correctly
-          AssertCuda(cudaGetLastError());
-          // Check that there was no problem during the execution of the kernel
-          AssertCuda(cudaDeviceSynchronize());
-#  endif
+          AssertCudaKernel();
 
           // Delete the temporary vector
           Utilities::CUDA::free(tmp);
@@ -199,13 +194,7 @@ namespace LinearAlgebra
       const int n_blocks = 1 + (n_elements - 1) / (chunk_size * block_size);
       kernel::vec_scale<Number>
         <<<n_blocks, block_size>>>(val.get(), factor, n_elements);
-
-#  ifdef DEBUG
-      // Check that the kernel was launched correctly
-      AssertCuda(cudaGetLastError());
-      // Check that there was no problem during the execution of the kernel
-      AssertCuda(cudaDeviceSynchronize());
-#  endif
+      AssertCudaKernel();
 
       return *this;
     }
@@ -221,13 +210,7 @@ namespace LinearAlgebra
       const int n_blocks = 1 + (n_elements - 1) / (chunk_size * block_size);
       kernel::vec_scale<Number>
         <<<n_blocks, block_size>>>(val.get(), 1. / factor, n_elements);
-
-#  ifdef DEBUG
-      // Check that the kernel was launched correctly
-      AssertCuda(cudaGetLastError());
-      // Check that there was no problem during the execution of the kernel
-      AssertCuda(cudaDeviceSynchronize());
-#  endif
+      AssertCudaKernel();
 
       return *this;
     }
@@ -252,13 +235,7 @@ namespace LinearAlgebra
 
       kernel::vector_bin_op<Number, kernel::Binop_Addition>
         <<<n_blocks, block_size>>>(val.get(), down_V.val.get(), n_elements);
-
-#  ifdef DEBUG
-      // Check that the kernel was launched correctly
-      AssertCuda(cudaGetLastError());
-      // Check that there was no problem during the execution of the kernel
-      AssertCuda(cudaDeviceSynchronize());
-#  endif
+      AssertCudaKernel();
 
       return *this;
     }
@@ -283,13 +260,7 @@ namespace LinearAlgebra
 
       kernel::vector_bin_op<Number, kernel::Binop_Subtraction>
         <<<n_blocks, block_size>>>(val.get(), down_V.val.get(), n_elements);
-
-#  ifdef DEBUG
-      // Check that the kernel was launched correctly
-      AssertCuda(cudaGetLastError());
-      // Check that there was no problem during the execution of the kernel
-      AssertCuda(cudaDeviceSynchronize());
-#  endif
+      AssertCudaKernel();
 
       return *this;
     }
@@ -346,13 +317,7 @@ namespace LinearAlgebra
       const int n_blocks = 1 + (n_elements - 1) / (chunk_size * block_size);
       kernel::vec_add<Number>
         <<<n_blocks, block_size>>>(val.get(), a, n_elements);
-
-#  ifdef DEBUG
-      // Check that the kernel was launched correctly
-      AssertCuda(cudaGetLastError());
-      // Check that there was no problem during the execution of the kernel
-      AssertCuda(cudaDeviceSynchronize());
-#  endif
+      AssertCudaKernel();
     }
 
 
@@ -376,13 +341,7 @@ namespace LinearAlgebra
       const int n_blocks = 1 + (n_elements - 1) / (chunk_size * block_size);
       kernel::add_aV<Number><<<dim3(n_blocks, 1), dim3(block_size)>>>(
         val.get(), a, down_V.val.get(), n_elements);
-
-#  ifdef DEBUG
-      // Check that the kernel was launched correctly
-      AssertCuda(cudaGetLastError());
-      // Check that there was no problem during the execution of the kernel
-      AssertCuda(cudaDeviceSynchronize());
-#  endif
+      AssertCudaKernel();
     }
 
 
@@ -420,13 +379,7 @@ namespace LinearAlgebra
       const int n_blocks = 1 + (n_elements - 1) / (chunk_size * block_size);
       kernel::add_aVbW<Number><<<dim3(n_blocks, 1), dim3(block_size)>>>(
         val.get(), a, down_V.val.get(), b, down_W.val.get(), n_elements);
-
-#  ifdef DEBUG
-      // Check that the kernel was launched correctly
-      AssertCuda(cudaGetLastError());
-      // Check that there was no problem during the execution of the kernel
-      AssertCuda(cudaDeviceSynchronize());
-#  endif
+      AssertCudaKernel();
     }
 
 
@@ -453,13 +406,7 @@ namespace LinearAlgebra
       const int n_blocks = 1 + (n_elements - 1) / (chunk_size * block_size);
       kernel::sadd<Number><<<dim3(n_blocks, 1), dim3(block_size)>>>(
         s, val.get(), a, down_V.val.get(), n_elements);
-
-#  ifdef DEBUG
-      // Check that the kernel was launched correctly
-      AssertCuda(cudaGetLastError());
-      // Check that there was no problem during the execution of the kernel
-      AssertCuda(cudaDeviceSynchronize());
-#  endif
+      AssertCudaKernel();
     }
 
 
@@ -482,13 +429,7 @@ namespace LinearAlgebra
       const int n_blocks = 1 + (n_elements - 1) / (chunk_size * block_size);
       kernel::scale<Number><<<dim3(n_blocks, 1), dim3(block_size)>>>(
         val.get(), down_scaling_factors.val.get(), n_elements);
-
-#  ifdef DEBUG
-      // Check that the kernel was launched correctly
-      AssertCuda(cudaGetLastError());
-      // Check that there was no problem during the execution of the kernel
-      AssertCuda(cudaDeviceSynchronize());
-#  endif
+      AssertCudaKernel();
     }
 
 
@@ -513,13 +454,7 @@ namespace LinearAlgebra
       const int n_blocks = 1 + (n_elements - 1) / (chunk_size * block_size);
       kernel::equ<Number><<<dim3(n_blocks, 1), dim3(block_size)>>>(
         val.get(), a, down_V.val.get(), n_elements);
-
-#  ifdef DEBUG
-      // Check that the kernel was launched correctly
-      AssertCuda(cudaGetLastError());
-      // Check that there was no problem during the execution of the kernel
-      AssertCuda(cudaDeviceSynchronize());
-#  endif
+      AssertCudaKernel();
     }
 
 

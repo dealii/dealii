@@ -8,15 +8,19 @@ BOOL            := { true; false }
 // real scalar floating point types
 REAL_SCALARS    := { double; float }
 
+// real scalar floating point types (vectorized)
+REAL_SCALARS_VECTORIZED    := { @DEAL_II_EXPAND_REAL_SCALARS_VECTORIZED@; }
+FLOAT_VECTORIZED           := { @DEAL_II_EXPAND_FLOAT_VECTORIZED@; }
+
 // complex scalar types
-COMPLEX_SCALARS := { 
+COMPLEX_SCALARS := {
     @DEAL_II_EXPAND_COMPLEX_SCALARS@;
     }
 
 // real scalar floating point types
-REAL_AND_COMPLEX_SCALARS    := { 
+REAL_AND_COMPLEX_SCALARS    := {
         double;
-        float; 
+        float;
         @DEAL_II_EXPAND_COMPLEX_SCALARS@;
         }
 
@@ -63,7 +67,7 @@ MPI_SCALARS     := { int;
                      unsigned long long int;
                      float;
                      double;
-                     long double; 
+                     long double;
                      @DEAL_II_EXPAND_COMPLEX_SCALARS@;
                    }
 
@@ -105,7 +109,7 @@ VECTOR_TYPES := {   Vector<double>;
                     @DEAL_II_EXPAND_PETSC_MPI_BLOCKVECTOR@;
                   }
 
-// same as VECTOR_TYPES but only real-valued vectors (and only with PETSc 
+// same as VECTOR_TYPES but only real-valued vectors (and only with PETSc
 // vectors if the PETScScalar data type is real-valued)
 REAL_VECTOR_TYPES  := {  Vector<double>;
                          Vector<float> ;
@@ -204,9 +208,11 @@ GENERAL_CONTAINER_TYPES := { std::vector;
                              ArrayView
                            }
 
+// DoFHandler (for iterators!)
+DOFHANDLER_TEMPLATE := { DoFHandler }
+
 // DoFHandler and hp::DoFHandler templates
-DOFHANDLER_TEMPLATES := { DoFHandler;
-                          hp::DoFHandler }
+DOFHANDLER_TEMPLATES := { DoFHandler; hp::DoFHandler }
 
 // Triangulation and DoFHandler templates
 TRIANGULATION_AND_DOFHANDLER_TEMPLATES := { Triangulation;
@@ -214,6 +220,11 @@ TRIANGULATION_AND_DOFHANDLER_TEMPLATES := { Triangulation;
                                             parallel::distributed::Triangulation;
                                             DoFHandler;
                                             hp::DoFHandler }
+
+// concrete sequential Triangulation and DoFHandler with hard-coded
+// <deal_II_dimension, deal_II_space_dimension> (for iterators!)
+SEQUENTIAL_TRIANGULATION_AND_DOFHANDLER := { Triangulation<deal_II_dimension, deal_II_space_dimension>;
+                                             DoFHandler<deal_II_dimension, deal_II_space_dimension> }
 
 // concrete sequential Triangulation and DoFHandler types with hard-coded
 // <deal_II_dimension, deal_II_space_dimension>

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2018 by the deal.II authors
+// Copyright (C) 2001 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -79,7 +79,7 @@ create_stokes_matrix_1(const DoFHandler<dim> &dof_handler,
 
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         for (unsigned int j = 0; j < dofs_per_cell; ++j)
-          for (unsigned int q = 0; q < n_q_points; ++q)
+          for (const auto q : fe_values.quadrature_point_indices())
             {
               const unsigned int comp_i = fe.system_to_component_index(i).first,
                                  comp_j = fe.system_to_component_index(j).first;
@@ -150,7 +150,7 @@ create_stokes_matrix_2(const DoFHandler<dim> &dof_handler,
         for (unsigned int comp_i = 0; comp_i < fe.n_components(); ++comp_i)
           for (unsigned int j = 0; j < fe.dofs_per_cell; ++j)
             for (unsigned int comp_j = 0; comp_j < fe.n_components(); ++comp_j)
-              for (unsigned int q = 0; q < n_q_points; ++q)
+              for (const auto q : fe_values.quadrature_point_indices())
                 {
                   // velocity-velocity coupling?
                   if ((comp_i < dim) && (comp_j < dim))
@@ -227,7 +227,7 @@ create_stokes_matrix_3(const DoFHandler<dim> &dof_handler,
               for (unsigned int comp_j = 0; comp_j < fe.n_components();
                    ++comp_j)
                 if (fe.get_nonzero_components(j)[comp_j] == true)
-                  for (unsigned int q = 0; q < n_q_points; ++q)
+                  for (const auto q : fe_values.quadrature_point_indices())
                     {
                       // velocity-velocity coupling?
                       if ((comp_i < dim) && (comp_j < dim))

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -18,6 +18,7 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/ndarray.h>
 #include <deal.II/base/types.h>
 
 #include <deal.II/lac/full_matrix.h>
@@ -43,8 +44,6 @@ namespace MeshWorker
    * - @tparam n_matrices: Size of the array of matrices
    * - @tparam n_vectors: size of the array of vectors
    * - @tparam n_dof_indices: size of the array of local dof indices
-   *
-   * @author Luca Heltai, 2019.
    */
   template <int n_matrices    = 1,
             int n_vectors     = n_matrices,
@@ -55,14 +54,14 @@ namespace MeshWorker
      * Initialize everything with the same @p size. This is usually the number
      * of local degrees of freedom.
      */
-    CopyData(const unsigned int size);
+    explicit CopyData(const unsigned int size);
 
     /**
      * For every object, specify the size they should have.
      */
-    CopyData(
-      const std::array<std::array<unsigned int, 2>, n_matrices> &matrix_sizes,
-      const std::array<unsigned int, n_vectors> &                vector_sizes,
+    explicit CopyData(
+      const ndarray<unsigned int, n_matrices, 2> &   matrix_sizes,
+      const std::array<unsigned int, n_vectors> &    vector_sizes,
       const std::array<unsigned int, n_dof_indices> &dof_indices_sizes);
 
     /**
@@ -70,19 +69,6 @@ namespace MeshWorker
      */
     CopyData(const CopyData<n_matrices, n_vectors, n_dof_indices> &other) =
       default;
-
-    /**
-     * Allow resetting of all elements of the struct to zero, by simply
-     * calling `(*this) = 0;`
-     *
-     * Notice that the only allowed number here is really `0`. Calling this
-     * function with any other number will trigger an assertion.
-     *
-     * The elements of the arrays of local degrees of freedom indices are
-     * all set to numbers::invalid_dof_index.
-     */
-    void
-    operator=(const double &number);
 
     /**
      * An array of local matrices.
@@ -122,8 +108,8 @@ namespace MeshWorker
 
   template <int n_matrices, int n_vectors, int n_dof_indices>
   CopyData<n_matrices, n_vectors, n_dof_indices>::CopyData(
-    const std::array<std::array<unsigned int, 2>, n_matrices> &matrix_sizes,
-    const std::array<unsigned int, n_vectors> &                vector_sizes,
+    const ndarray<unsigned int, n_matrices, 2> &   matrix_sizes,
+    const std::array<unsigned int, n_vectors> &    vector_sizes,
     const std::array<unsigned int, n_dof_indices> &dof_indices_sizes)
   {
     for (unsigned int i = 0; i < n_matrices; ++i)
@@ -134,26 +120,6 @@ namespace MeshWorker
 
     for (unsigned int i = 0; i < n_dof_indices; ++i)
       local_dof_indices[i].resize(dof_indices_sizes[i++]);
-  }
-
-
-
-  template <int n_matrices, int n_vectors, int n_dof_indices>
-  void
-  CopyData<n_matrices, n_vectors, n_dof_indices>::
-  operator=(const double &number)
-  {
-    Assert(number == 0.0,
-           ExcMessage("You should only call this method with "
-                      "argument 0.0"));
-
-    for (auto &m : matrices)
-      m = number;
-    for (auto &v : vectors)
-      v = number;
-    for (auto &d : local_dof_indices)
-      for (auto &val : d)
-        val = numbers::invalid_dof_index;
   }
 
 #endif // DOXYGEN

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2018 by the deal.II authors
+// Copyright (C) 2010 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,106 +14,61 @@
 // ---------------------------------------------------------------------
 
 
-for (deal_II_dimension : DIMENSIONS)
+for (deal_II_dimension : DIMENSIONS;
+     deal_II_scalar_vectorized : REAL_SCALARS_VECTORIZED)
   {
-    template class MatrixFree<deal_II_dimension, double>;
-    template class MatrixFree<deal_II_dimension, float>;
+    template class MatrixFree<deal_II_dimension,
+                              deal_II_scalar_vectorized::value_type,
+                              deal_II_scalar_vectorized>;
 
-    template void
-    MatrixFree<deal_II_dimension,
-               double>::print_memory_consumption<std::ostream>(std::ostream &)
-      const;
-    template void MatrixFree<deal_II_dimension, double>::
+    template void MatrixFree<deal_II_dimension,
+                             deal_II_scalar_vectorized::value_type,
+                             deal_II_scalar_vectorized>::
+      print_memory_consumption<std::ostream>(std::ostream &) const;
+
+    template void MatrixFree<deal_II_dimension,
+                             deal_II_scalar_vectorized::value_type,
+                             deal_II_scalar_vectorized>::
       print_memory_consumption<ConditionalOStream>(ConditionalOStream &) const;
 
-    template void
-    MatrixFree<deal_II_dimension,
-               float>::print_memory_consumption<std::ostream>(std::ostream &)
-      const;
-
-    template void MatrixFree<deal_II_dimension, float>::
-      print_memory_consumption<ConditionalOStream>(ConditionalOStream &) const;
-
-    template void MatrixFree<deal_II_dimension, double>::internal_reinit<
-      double>(const Mapping<deal_II_dimension> &,
-              const std::vector<const DoFHandler<deal_II_dimension> *> &,
-              const std::vector<const AffineConstraints<double> *> &,
-              const std::vector<IndexSet> &,
-              const std::vector<hp::QCollection<1>> &,
-              const AdditionalData &);
-
-    template void MatrixFree<deal_II_dimension, double>::internal_reinit<
-      double>(const Mapping<deal_II_dimension> &,
-              const std::vector<const hp::DoFHandler<deal_II_dimension> *> &,
-              const std::vector<const AffineConstraints<double> *> &,
-              const std::vector<IndexSet> &,
-              const std::vector<hp::QCollection<1>> &,
-              const AdditionalData &);
-
-    template void MatrixFree<deal_II_dimension, float>::internal_reinit<double>(
-      const Mapping<deal_II_dimension> &,
-      const std::vector<const DoFHandler<deal_II_dimension> *> &,
-      const std::vector<const AffineConstraints<double> *> &,
-      const std::vector<IndexSet> &,
-      const std::vector<hp::QCollection<1>> &,
-      const AdditionalData &);
-
-    template void MatrixFree<deal_II_dimension, float>::internal_reinit<double>(
-      const Mapping<deal_II_dimension> &,
-      const std::vector<const hp::DoFHandler<deal_II_dimension> *> &,
-      const std::vector<const AffineConstraints<double> *> &,
-      const std::vector<IndexSet> &,
-      const std::vector<hp::QCollection<1>> &,
-      const AdditionalData &);
-
-    template void MatrixFree<deal_II_dimension, float>::internal_reinit<float>(
-      const Mapping<deal_II_dimension> &,
-      const std::vector<const DoFHandler<deal_II_dimension> *> &,
-      const std::vector<const AffineConstraints<float> *> &,
-      const std::vector<IndexSet> &,
-      const std::vector<hp::QCollection<1>> &,
-      const AdditionalData &);
-
-    template void MatrixFree<deal_II_dimension, float>::internal_reinit<float>(
-      const Mapping<deal_II_dimension> &,
-      const std::vector<const hp::DoFHandler<deal_II_dimension> *> &,
-      const std::vector<const AffineConstraints<float> *> &,
-      const std::vector<IndexSet> &,
-      const std::vector<hp::QCollection<1>> &,
-      const AdditionalData &);
-
-    template void
-    internal::MatrixFreeFunctions::ShapeInfo<double>::reinit<deal_II_dimension>(
-      const Quadrature<1> &,
-      const FiniteElement<deal_II_dimension, deal_II_dimension> &,
-      const unsigned int);
-
-    template void
-    internal::MatrixFreeFunctions::ShapeInfo<float>::reinit<deal_II_dimension>(
-      const Quadrature<1> &,
-      const FiniteElement<deal_II_dimension, deal_II_dimension> &,
-      const unsigned int);
-
-    template void internal::MatrixFreeFunctions::
-      ShapeInfo<VectorizedArray<double>>::reinit<deal_II_dimension>(
-        const Quadrature<1> &,
-        const FiniteElement<deal_II_dimension, deal_II_dimension> &,
-        const unsigned int);
-
-    template void internal::MatrixFreeFunctions::
-      ShapeInfo<VectorizedArray<float>>::reinit<deal_II_dimension>(
-        const Quadrature<1> &,
-        const FiniteElement<deal_II_dimension, deal_II_dimension> &,
-        const unsigned int);
+    template void MatrixFree<deal_II_dimension,
+                             deal_II_scalar_vectorized::value_type,
+                             deal_II_scalar_vectorized>::
+      internal_reinit<deal_II_scalar_vectorized::value_type>(
+        const std::shared_ptr<hp::MappingCollection<deal_II_dimension>> &,
+        const std::vector<const DoFHandler<deal_II_dimension> *> &,
+        const std::vector<
+          const AffineConstraints<deal_II_scalar_vectorized::value_type> *> &,
+        const std::vector<IndexSet> &,
+        const std::vector<hp::QCollection<deal_II_dimension>> &,
+        const AdditionalData &);
   }
 
-for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
+
+for (deal_II_dimension : DIMENSIONS;
+     deal_II_float_vectorized : FLOAT_VECTORIZED)
+  {
+    template void MatrixFree<deal_II_dimension,
+                             deal_II_float_vectorized::value_type,
+                             deal_II_float_vectorized>::
+      internal_reinit<double>(
+        const std::shared_ptr<hp::MappingCollection<deal_II_dimension>> &,
+        const std::vector<const DoFHandler<deal_II_dimension> *> &,
+        const std::vector<const AffineConstraints<double> *> &,
+        const std::vector<IndexSet> &,
+        const std::vector<hp::QCollection<deal_II_dimension>> &,
+        const AdditionalData &);
+  }
+
+
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
+     deal_II_scalar_vectorized : REAL_SCALARS_VECTORIZED)
   {
 #if deal_II_dimension <= deal_II_space_dimension
-    template bool MatrixFree<deal_II_dimension, double>::is_supported(
-      const FiniteElement<deal_II_dimension, deal_II_space_dimension> &);
-
-    template bool MatrixFree<deal_II_dimension, float>::is_supported(
-      const FiniteElement<deal_II_dimension, deal_II_space_dimension> &);
+    template bool MatrixFree<deal_II_dimension,
+                             deal_II_scalar_vectorized::value_type,
+                             deal_II_scalar_vectorized>::
+      is_supported(
+        const FiniteElement<deal_II_dimension, deal_II_space_dimension> &);
 #endif
   }

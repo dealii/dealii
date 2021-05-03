@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2019 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -34,9 +34,11 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace MeshWorker
 {
+  // Forward declaration
+#ifndef DOXYGEN
   template <int dim, class DOFINFO>
   class DoFInfoBox;
-
+#endif
 
   /**
    * A class containing information on geometry and degrees of freedom of a
@@ -68,7 +70,6 @@ namespace MeshWorker
    * class will automatically use the new structures.
    *
    * @ingroup MeshWorker
-   * @author Guido Kanschat, 2009
    */
   template <int dim, int spacedim = dim, typename number = double>
   class DoFInfo : public LocalResults<number>
@@ -215,7 +216,6 @@ namespace MeshWorker
    * cleanliness.
    *
    * @ingroup MeshWorker
-   * @author Guido Kanschat, 2010
    */
   template <int dim, class DOFINFO>
   class DoFInfoBox
@@ -231,6 +231,12 @@ namespace MeshWorker
      * constructor.
      */
     DoFInfoBox(const DoFInfoBox<dim, DOFINFO> &);
+
+    /**
+     * Copy assignment operator, taking another object as seed.
+     */
+    DoFInfoBox &
+    operator=(const DoFInfoBox<dim, DOFINFO> &);
 
     /**
      * Reset all the availability flags.
@@ -298,7 +304,7 @@ namespace MeshWorker
     , level_cell(false)
   {
     std::vector<types::global_dof_index> aux(1);
-    aux[0] = dof_handler.get_fe().dofs_per_cell;
+    aux[0] = dof_handler.get_fe().n_dofs_per_cell();
     aux_local_indices.reinit(aux);
   }
 
@@ -308,12 +314,12 @@ namespace MeshWorker
   inline void
   DoFInfo<dim, spacedim, number>::get_indices(const DHCellIterator &c)
   {
-    indices.resize(c->get_fe().dofs_per_cell);
+    indices.resize(c->get_fe().n_dofs_per_cell());
     if (block_info == nullptr || block_info->local().size() == 0)
       c->get_active_or_mg_dof_indices(indices);
     else
       {
-        indices_org.resize(c->get_fe().dofs_per_cell);
+        indices_org.resize(c->get_fe().n_dofs_per_cell());
         c->get_active_or_mg_dof_indices(indices_org);
         set_block_indices();
       }
@@ -425,7 +431,7 @@ namespace MeshWorker
     : cell(seed)
     , cell_valid(true)
   {
-    for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+    for (unsigned int i : GeometryInfo<dim>::face_indices())
       {
         exterior[i]                = seed;
         interior[i]                = seed;
@@ -441,7 +447,7 @@ namespace MeshWorker
     : cell(other.cell)
     , cell_valid(other.cell_valid)
   {
-    for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+    for (unsigned int i : GeometryInfo<dim>::face_indices())
       {
         exterior[i]                = other.exterior[i];
         interior[i]                = other.interior[i];
@@ -452,11 +458,28 @@ namespace MeshWorker
 
 
   template <int dim, class DOFINFO>
+  inline DoFInfoBox<dim, DOFINFO> &
+  DoFInfoBox<dim, DOFINFO>::operator=(const DoFInfoBox<dim, DOFINFO> &other)
+  {
+    cell       = other.cell;
+    cell_valid = other.cell_valid;
+    for (unsigned int i : GeometryInfo<dim>::face_indices())
+      {
+        exterior[i]                = other.exterior[i];
+        interior[i]                = other.interior[i];
+        interior_face_available[i] = false;
+        exterior_face_available[i] = false;
+      }
+    return *this;
+  }
+
+
+  template <int dim, class DOFINFO>
   inline void
   DoFInfoBox<dim, DOFINFO>::reset()
   {
     cell_valid = false;
-    for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+    for (unsigned int i : GeometryInfo<dim>::face_indices())
       {
         interior_face_available[i] = false;
         exterior_face_available[i] = false;
@@ -473,7 +496,7 @@ namespace MeshWorker
       return;
 
     assembler.assemble(cell);
-    for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+    for (unsigned int i : GeometryInfo<dim>::face_indices())
       {
         // Only do something if data available
         if (interior_face_available[i])

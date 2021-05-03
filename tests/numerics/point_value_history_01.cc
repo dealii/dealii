@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -44,9 +44,6 @@
 #include <deal.II/numerics/point_value_history.h>
 
 #include "../tests.h"
-
-
-using namespace dealii;
 
 
 
@@ -165,7 +162,7 @@ TestPointValueHistory<dim>::run()
   test_copy.add_point(Point<2>(1, 0.2));
   test_copy.add_field_name("Solution");
   std::vector<std::vector<Point<dim>>> selected_locations;
-  test_copy.get_points(selected_locations);
+  test_copy.get_support_locations(selected_locations);
   test_copy.mark_support_locations();
   test_copy.close();
   test_copy.start_new_dataset(0.1);
@@ -201,7 +198,7 @@ TestPointValueHistory<dim>::run()
     no_dof_handler.close(); // closing still required!
 
     std::vector<std::vector<Point<dim>>> selected_locations;
-    node_monitor.get_points(selected_locations);
+    node_monitor.get_support_locations(selected_locations);
     // write output to a file
     Vector<double> node_locations = node_monitor.mark_support_locations();
     // write output to a file

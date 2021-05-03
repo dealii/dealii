@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2019 by the deal.II authors
+## Copyright (C) 2012 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -29,12 +29,14 @@ SET(_unity_include_src
   fe_dgp_nonparametric.cc
   fe_dgq.cc
   fe_dg_vector.cc
+  fe_enriched.cc
   fe_face.cc
   fe_nedelec.cc
   fe_nedelec_sz.cc
   fe_nothing.cc
   fe_poly.cc
   fe_poly_tensor.cc
+  fe_pyramid_p.cc
   fe_p1nc.cc
   fe_q_base.cc
   fe_q.cc
@@ -50,14 +52,16 @@ SET(_unity_include_src
   fe_series_fourier.cc
   fe_series_legendre.cc
   fe_system.cc
-  fe_enriched.cc
-  fe_tools.cc
+  fe_simplex_p.cc
+  fe_simplex_p_bubbles.cc
   fe_trace.cc
+  fe_wedge_p.cc
   mapping_c1.cc
   mapping_cartesian.cc
   mapping.cc
   mapping_q1.cc
   mapping_q.cc
+  mapping_q_cache.cc
   mapping_manifold.cc
   )
 
@@ -71,8 +75,10 @@ SET(_separate_src
   fe_values_inst6.cc
   mapping_fe_field.cc
   mapping_fe_field_inst2.cc
+  fe_tools.cc
   fe_tools_interpolate.cc
   fe_tools_extrapolate.cc
+  mapping_fe.cc
   mapping_q_generic.cc
   mapping_q1_eulerian.cc
   mapping_q_eulerian.cc
@@ -103,6 +109,7 @@ SET(_inst
   fe_nothing.inst.in
   fe_poly.inst.in
   fe_poly_tensor.inst.in
+  fe_pyramid_p.inst.in
   fe_q_base.inst.in
   fe_q_bubbles.inst.in
   fe_q_dg0.inst.in
@@ -115,6 +122,8 @@ SET(_inst
   fe_rt_bubbles.inst.in
   fe_series_fourier.inst.in
   fe_series_legendre.inst.in
+  fe_simplex_p.inst.in
+  fe_simplex_p_bubbles.inst.in
   fe_system.inst.in
   fe_enriched.inst.in
   fe_tools.inst.in
@@ -126,13 +135,16 @@ SET(_inst
   fe_values.impl.1.inst.in
   fe_values.impl.2.inst.in
   fe_values.inst.in
+  fe_wedge_p.inst.in
   mapping_c1.inst.in
   mapping_cartesian.inst.in
   mapping.inst.in
+  mapping_fe.inst.in
   mapping_fe_field.inst.in
   mapping_q_generic.inst.in
   mapping_q1_eulerian.inst.in
   mapping_q1.inst.in
+  mapping_q_cache.inst.in
   mapping_q_eulerian.inst.in
   mapping_q.inst.in
   mapping_manifold.inst.in

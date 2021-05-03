@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -44,12 +44,21 @@ namespace Polynomials
    * Definition of piecewise 1D polynomials for the unit interval. This space
    * allows the description of interpolating polynomials on parts of the unit
    * interval, similarly to the definition of finite element basis functions
-   * on the subdivided elements. This primary purpose of this class is to
-   * allow constructing FE_Q_iso_Q1 elements that put additional degrees of
-   * freedom into an equivalent of a refined mesh instead of higher order
-   * polynomials, which is useful when using mixed finite elements.
+   * on subdivided elements. The primary purpose of this class is to
+   * allow constructing the shape functions of the FE_Q_iso_Q1 class that has
+   * a number of interpolation points in each coordinate direction, but instead
+   * of using them for higher-order polynomials just chooses piecewise linear
+   * shape functions -- in effect, it is a $Q_1$ element defined on a
+   * subdivision of the reference cell, and replicated on each of these
+   * sub-cells.
    *
-   * @author Martin Kronbichler, 2013
+   * This class is not derived from the ScalarPolynomialsBase base class
+   * because it is not actually a polynomial -- it is a piecewise polynomial.
+   * However, it is interface-compatible with the Polynomials::Polynomial
+   * class, and consequently can be used as template argument for
+   * TensorProductPolynomials.
+   *
+   * @ingroup Polynomials
    */
   template <typename number>
   class PiecewisePolynomial : public Subscriptor
@@ -87,7 +96,7 @@ namespace Polynomials
      * thus determined by the size of the vector passed.
      *
      * Note that all the derivatives evaluate to zero at the border between
-     * intervals (assuming exact arithmetics) in the interior of the unit
+     * intervals (assuming exact arithmetic) in the interior of the unit
      * interval, as there is no unique gradient value in that case for a
      * piecewise polynomial. This is not always desired (e.g., when evaluating
      * jumps of gradients on the element boundary), but it is the user's
@@ -105,7 +114,7 @@ namespace Polynomials
      * space for @p n_derivatives + 1 values.
      *
      * Note that all the derivatives evaluate to zero at the border between
-     * intervals (assuming exact arithmetics) in the interior of the unit
+     * intervals (assuming exact arithmetic) in the interior of the unit
      * interval, as there is no unique gradient value in that case for a
      * piecewise polynomial. This is not always desired (e.g., when evaluating
      * jumps of gradients on the element boundary), but it is the user's
@@ -126,11 +135,18 @@ namespace Polynomials
 
     /**
      * Write or read the data of this object to or from a stream for the
-     * purpose of serialization.
+     * purpose of serialization using the [BOOST serialization
+     * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
      */
     template <class Archive>
     void
     serialize(Archive &ar, const unsigned int version);
+
+    /**
+     * Return an estimate (in bytes) for the memory consumption of this object.
+     */
+    virtual std::size_t
+    memory_consumption() const;
 
   protected:
     /**

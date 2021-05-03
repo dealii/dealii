@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -44,7 +44,6 @@
 #include <deal.II/grid/tria_iterator.h>
 
 #include <deal.II/lac/affine_constraints.h>
-#include <deal.II/lac/filtered_matrix.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/identity_matrix.h>
 #include <deal.II/lac/petsc_vector.h>
@@ -69,9 +68,6 @@
 
 
 
-using namespace dealii;
-
-
 template <int dim>
 class Displacement : public Function<dim>
 {
@@ -92,8 +88,7 @@ public:
   {
     Tensor<1, dim, VectorizedArray<NumberType>> shift_vec;
     Point<dim>                                  p;
-    for (unsigned int v = 0; v < VectorizedArray<NumberType>::n_array_elements;
-         ++v)
+    for (unsigned int v = 0; v < VectorizedArray<NumberType>::size(); ++v)
       {
         for (unsigned int d = 0; d < dim; ++d)
           p[d] = p_vec[d][v];
@@ -204,7 +199,7 @@ test(const unsigned int n_ref = 0)
 
   MGTransferMatrixFree<dim, LevelNumberType> mg_transfer_euler(
     mg_constrained_dofs_euler);
-  mg_transfer_euler.build(dof_handler);
+  mg_transfer_euler.build(dof_handler_euler);
 
   // now the core of the test:
   const unsigned int max_level =
@@ -242,8 +237,8 @@ test(const unsigned int n_ref = 0)
         matrix_free_euler);
       FEEvaluation<dim, fe_degree, n_q_points, 1, NumberType> fe_eval(
         matrix_free);
-      const unsigned int n_cells = matrix_free_euler.n_macro_cells();
-      Assert(matrix_free_euler.n_macro_cells() == matrix_free.n_macro_cells(),
+      const unsigned int n_cells = matrix_free_euler.n_cell_batches();
+      Assert(matrix_free_euler.n_cell_batches() == matrix_free.n_cell_batches(),
              ExcInternalError());
       const unsigned int nqp = fe_eval.n_q_points;
       for (unsigned int cell = 0; cell < n_cells; ++cell)
@@ -256,8 +251,7 @@ test(const unsigned int n_ref = 0)
               const auto &qp = fe_eval.quadrature_point(q);
               const auto  v2 = qp + displacement_function.shift_value(qp);
               VectorizedArray<NumberType> dist = v1.distance(v2);
-              for (unsigned int v = 0;
-                   v < VectorizedArray<NumberType>::n_array_elements;
+              for (unsigned int v = 0; v < VectorizedArray<NumberType>::size();
                    ++v)
                 AssertThrow(dist[v] < 1e-8,
                             ExcMessage("distance: " + std::to_string(dist[v])));
@@ -280,7 +274,7 @@ test(const unsigned int n_ref = 0)
         mg_additional_data;
       mg_additional_data.tasks_parallel_scheme =
         MatrixFree<dim, LevelNumberType>::AdditionalData::partition_color;
-      mg_additional_data.level_mg_handler = level;
+      mg_additional_data.mg_level = level;
       mg_additional_data.mapping_update_flags =
         update_values | update_gradients | update_JxW_values |
         update_quadrature_points;
@@ -321,8 +315,8 @@ test(const unsigned int n_ref = 0)
           mg_level_euler);
         FEEvaluation<dim, fe_degree, n_q_points, 1, NumberType> fe_eval(
           mg_level);
-        const unsigned int n_cells = mg_level_euler.n_macro_cells();
-        Assert(mg_level_euler.n_macro_cells() == mg_level.n_macro_cells(),
+        const unsigned int n_cells = mg_level_euler.n_cell_batches();
+        Assert(mg_level_euler.n_cell_batches() == mg_level.n_cell_batches(),
                ExcInternalError());
         const unsigned int nqp = fe_eval.n_q_points;
         for (unsigned int cell = 0; cell < n_cells; ++cell)
@@ -336,7 +330,7 @@ test(const unsigned int n_ref = 0)
                 const auto  v2 = qp + displacement_function.shift_value(qp);
                 VectorizedArray<NumberType> dist = v1.distance(v2);
                 for (unsigned int v = 0;
-                     v < VectorizedArray<NumberType>::n_array_elements;
+                     v < VectorizedArray<NumberType>::size();
                      ++v)
                   AssertThrow(dist[v] < 1e-8,
                               ExcMessage(

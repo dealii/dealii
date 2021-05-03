@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2014 by the deal.II authors
+// Copyright (C) 2008 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,7 +17,7 @@
 
 /**
  * @defgroup TrilinosWrappers TrilinosWrappers
- * 
+ *
  * The classes in this module are wrappers around functionality
  * provided by the Trilinos library. They provide a modern
  * object-oriented interface that is compatible with the interfaces of

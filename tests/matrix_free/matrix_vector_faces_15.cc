@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,10 +30,8 @@
 #include <deal.II/lac/la_parallel_vector.h>
 
 #include "../tests.h"
+
 #include "create_mesh.h"
-
-std::ofstream logfile("output");
-
 #include "matrix_vector_faces_common.h"
 
 

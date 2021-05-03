@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,6 +30,7 @@ std::ofstream logfile("output");
 #include <deal.II/base/work_stream.h>
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_dgp.h>
@@ -44,8 +45,6 @@ std::ofstream logfile("output");
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
-
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/precondition.h>
@@ -58,8 +57,6 @@ std::ofstream logfile("output");
 
 namespace Step51
 {
-  using namespace dealii;
-
   template <int dim>
   class SolutionBase
   {
@@ -273,7 +270,7 @@ namespace Step51
     void
     postprocess();
     void
-    refine_grid(const unsigned int cylce);
+    refine_grid(const unsigned int cycle);
     void
     output_results(const unsigned int cycle);
 
@@ -443,8 +440,7 @@ namespace Step51
       , fe_local_support_on_face(GeometryInfo<dim>::faces_per_cell)
       , fe_support_on_face(GeometryInfo<dim>::faces_per_cell)
     {
-      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-           ++face)
+      for (const unsigned int face : GeometryInfo<dim>::face_indices())
         for (unsigned int i = 0; i < fe_local.dofs_per_cell; ++i)
           {
             if (fe_local.has_support_on_face(i, face))
@@ -453,8 +449,7 @@ namespace Step51
               }
           }
 
-      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-           ++face)
+      for (const unsigned int face : GeometryInfo<dim>::face_indices())
         for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
           {
             if (fe.has_support_on_face(i, face))
@@ -635,8 +630,7 @@ namespace Step51
           }
       }
 
-    for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-         ++face)
+    for (const unsigned int face : GeometryInfo<dim>::face_indices())
       {
         scratch.fe_face_values_local.reinit(loc_cell, face);
         scratch.fe_face_values.reinit(cell, face);
@@ -974,8 +968,7 @@ namespace Step51
     typename Triangulation<dim>::cell_iterator cell = triangulation.begin(),
                                                endc = triangulation.end();
     for (; cell != endc; ++cell)
-      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-           ++face)
+      for (const unsigned int face : GeometryInfo<dim>::face_indices())
         if (cell->face(face)->at_boundary())
           for (unsigned int d = 0; d < dim; ++d)
             if ((std::fabs(cell->face(face)->center()(d) - (1)) < 1e-12))

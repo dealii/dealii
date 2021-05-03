@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2019 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -48,8 +48,6 @@ DEAL_II_NAMESPACE_OPEN
  * compute the smallest eigenvalue, too.
  *
  * Convergence of this method is known to be slow.
- *
- * @author Guido Kanschat, 2000
  */
 template <typename VectorType = Vector<double>>
 class EigenPower : private SolverBase<VectorType>
@@ -85,10 +83,6 @@ public:
              VectorMemory<VectorType> &mem,
              const AdditionalData &    data = AdditionalData());
 
-  /**
-   * Virtual destructor.
-   */
-  virtual ~EigenPower();
 
   /**
    * Power method. @p x is the (not necessarily normalized, but nonzero) start
@@ -127,8 +121,6 @@ protected:
  * converges to the eigenvalue closest to the initial guess. This can be aided
  * by the parameter AdditionalData::start_adaption, which indicates the first
  * iteration step in which the shift value should be adapted.
- *
- * @author Guido Kanschat, 2000, 2003
  */
 template <typename VectorType = Vector<double>>
 class EigenInverse : private SolverBase<VectorType>
@@ -176,12 +168,6 @@ public:
                VectorMemory<VectorType> &mem,
                const AdditionalData &    data = AdditionalData());
 
-
-  /**
-   * Virtual destructor.
-   */
-  virtual ~EigenInverse();
-
   /**
    * Inverse method. @p value is the start guess for the eigenvalue and @p x
    * is the (not necessarily normalized, but nonzero) start vector for the
@@ -210,12 +196,6 @@ EigenPower<VectorType>::EigenPower(SolverControl &           cn,
                                    const AdditionalData &    data)
   : SolverBase<VectorType>(cn, mem)
   , additional_data(data)
-{}
-
-
-
-template <class VectorType>
-EigenPower<VectorType>::~EigenPower()
 {}
 
 
@@ -299,12 +279,6 @@ EigenInverse<VectorType>::EigenInverse(SolverControl &           cn,
                                        const AdditionalData &    data)
   : SolverBase<VectorType>(cn, mem)
   , additional_data(data)
-{}
-
-
-
-template <class VectorType>
-EigenInverse<VectorType>::~EigenInverse()
 {}
 
 

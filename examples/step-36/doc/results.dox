@@ -1,6 +1,6 @@
 <h1>Results</h1>
 
-<h2>Running the problem</h2>
+<h3>Running the problem</h3>
 
 The problem's input is parameterized by an input file <code>\step-36.prm</code>
 which could, for example, contain the following text:
@@ -47,7 +47,7 @@ look like this:
 </tr>
 </table>
 
-<h2>Possibilities for extensions</h2>
+<h3>Possibilities for extensions</h3>
 
 It is always worth playing a few games in the playground! So here goes
 with a few suggestions:

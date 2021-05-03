@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2019 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -33,7 +33,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 namespace AD = dealii::Differentiation::AD;
 
 // Function and its derivatives
@@ -89,9 +88,9 @@ template <int dim, typename number_t, enum AD::NumberTypes ad_type_code>
 void
 test_vector_scalar_coupled()
 {
-  typedef AD::ScalarFunction<dim, ad_type_code, number_t> ADHelper;
-  typedef typename ADHelper::ad_type                      ADNumberType;
-  typedef typename ADHelper::scalar_type                  ScalarNumberType;
+  using ADHelper         = AD::ScalarFunction<dim, ad_type_code, number_t>;
+  using ADNumberType     = typename ADHelper::ad_type;
+  using ScalarNumberType = typename ADHelper::scalar_type;
 
   std::cout << "*** Test variables: Vector + Scalar (coupled), "
             << "dim = " << Utilities::to_string(dim) << ", "
@@ -103,7 +102,7 @@ test_vector_scalar_coupled()
   FullMatrix<ScalarNumberType> D2psi;
 
   // Function and its derivatives
-  typedef FunctionsTestVectorScalarCoupled<dim, ADNumberType> func_ad;
+  using func_ad = FunctionsTestVectorScalarCoupled<dim, ADNumberType>;
 
   // Setup the variable components and choose a value at which to
   // evaluate the tape
@@ -197,8 +196,8 @@ test_vector_scalar_coupled()
             << "extracted Dpsi (s): " << dpsi_ds << "\n";
 
   // Verify the result
-  typedef FunctionsTestVectorScalarCoupled<dim, ScalarNumberType> func;
-  static const ScalarNumberType                                   tol =
+  using func = FunctionsTestVectorScalarCoupled<dim, ScalarNumberType>;
+  static const ScalarNumberType tol =
     1e5 * std::numeric_limits<ScalarNumberType>::epsilon();
   Assert(std::abs(psi - func::psi(v, s)) < tol,
          ExcMessage("No match for function value."));

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2019 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -76,8 +76,6 @@ DEAL_II_NAMESPACE_OPEN
  * in 3d, the result would be <code>[true, true, true, false]</code>.
  *
  * @ingroup fe
- * @author Wolfgang Bangerth
- * @date 2012
  * @ingroup vector_valued
  */
 class ComponentMask
@@ -256,7 +254,7 @@ private:
 std::ostream &
 operator<<(std::ostream &out, const ComponentMask &mask);
 
-
+#ifndef DOXYGEN
 // -------------------- inline functions ---------------------
 
 inline ComponentMask::ComponentMask(const std::vector<bool> &component_mask)
@@ -413,7 +411,7 @@ ComponentMask::operator!=(const ComponentMask &mask) const
 {
   return component_mask != mask.component_mask;
 }
-
+#endif // DOXYGEN
 
 
 DEAL_II_NAMESPACE_CLOSE

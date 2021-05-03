@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2008 - 2019 by the deal.II authors
+ * Copyright (C) 2008 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -35,14 +35,11 @@
 
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/grid_refinement.h>
 
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_renumbering.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
@@ -308,8 +305,8 @@ namespace Step22
     Vector<double> &      dst,
     const Vector<double> &src) const
   {
-    SolverControl solver_control(src.size(), 1e-6 * src.l2_norm());
-    SolverCG<>    cg(solver_control);
+    SolverControl            solver_control(src.size(), 1e-6 * src.l2_norm());
+    SolverCG<Vector<double>> cg(solver_control);
 
     dst = 0;
 
@@ -492,13 +489,11 @@ namespace Step22
     // In analogy to step-20, we count the dofs in the individual components.
     // We could do this in the same way as there, but we want to operate on
     // the block structure we used already for the renumbering: The function
-    // <code>DoFTools::count_dofs_per_block</code> does the same as
-    // <code>DoFTools::count_dofs_per_component</code>, but now grouped as
+    // <code>DoFTools::count_dofs_per_fe_block</code> does the same as
+    // <code>DoFTools::count_dofs_per_fe_component</code>, but now grouped as
     // velocity and pressure block via <code>block_component</code>.
-    std::vector<types::global_dof_index> dofs_per_block(2);
-    DoFTools::count_dofs_per_block(dof_handler,
-                                   dofs_per_block,
-                                   block_component);
+    const std::vector<types::global_dof_index> dofs_per_block =
+      DoFTools::count_dofs_per_fe_block(dof_handler, block_component);
     const unsigned int n_u = dofs_per_block[0];
     const unsigned int n_p = dofs_per_block[1];
 
@@ -622,7 +617,7 @@ namespace Step22
                             update_values | update_quadrature_points |
                               update_JxW_values | update_gradients);
 
-    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
 
     const unsigned int n_q_points = quadrature_formula.size();
 
@@ -832,9 +827,9 @@ namespace Step22
         system_matrix, A_inverse);
 
       // The usual control structures for the solver call are created...
-      SolverControl solver_control(solution.block(1).size(),
+      SolverControl            solver_control(solution.block(1).size(),
                                    1e-6 * schur_rhs.l2_norm());
-      SolverCG<>    cg(solver_control);
+      SolverCG<Vector<double>> cg(solver_control);
 
       // Now to the preconditioner to the Schur complement. As explained in
       // the introduction, the preconditioning is done by a mass matrix in the
@@ -1023,9 +1018,9 @@ namespace Step22
     // the last coordinate direction. See the example description above for
     // details.
     for (const auto &cell : triangulation.active_cell_iterators())
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
-        if (cell->face(f)->center()[dim - 1] == 0)
-          cell->face(f)->set_all_boundary_ids(1);
+      for (const auto &face : cell->face_iterators())
+        if (face->center()[dim - 1] == 0)
+          face->set_all_boundary_ids(1);
 
 
     // We then apply an initial refinement before solving for the first
@@ -1068,7 +1063,6 @@ int main()
 {
   try
     {
-      using namespace dealii;
       using namespace Step22;
 
       StokesProblem<2> flow_problem(1);

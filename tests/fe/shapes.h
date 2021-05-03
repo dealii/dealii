@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -59,7 +59,7 @@ plot_shape_functions(Mapping<dim> &      mapping,
 
   const unsigned int div = 4;
 
-  QTrapez<1>     q_trapez;
+  QTrapezoid<1>  q_trapez;
   QIterated<dim> q(q_trapez, div);
   FEValues<dim>  fe(mapping,
                    finel,
@@ -146,7 +146,7 @@ plot_face_shape_functions(Mapping<dim> &      mapping,
 
   const unsigned int div = 4;
 
-  QTrapez<1>           q_trapez;
+  QTrapezoid<1>        q_trapez;
   QIterated<dim - 1>   q(q_trapez, div);
   FEFaceValues<dim>    fe(mapping,
                        finel,
@@ -157,14 +157,26 @@ plot_face_shape_functions(Mapping<dim> &      mapping,
                            q,
                            UpdateFlags(uflags | update_quadrature_points));
 
+  // Test the iterator-based initialization routines too:
+  FEFaceValues<dim>    fe2(mapping,
+                        finel,
+                        q,
+                        UpdateFlags(uflags | update_quadrature_points));
+  FESubfaceValues<dim> sub2(mapping,
+                            finel,
+                            q,
+                            UpdateFlags(uflags | update_quadrature_points));
+
+
   sprintf(fname, "Face%dd-%s", dim, name);
   deallog.push(fname);
 
-  for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+  for (const unsigned int f : GeometryInfo<dim>::face_indices())
     {
       if (!c->face(f)->has_children())
         {
           fe.reinit(c, f);
+          fe2.reinit(c, c->face(f));
 
           unsigned int k = 0;
           for (unsigned int my = 0; my <= ((dim > 2) ? div : 0); ++my)
@@ -187,23 +199,47 @@ plot_face_shape_functions(Mapping<dim> &      mapping,
                               c)
                             {
                               if (uflags & update_values)
-                                AssertThrow((fe.shape_value(i, k) ==
-                                             fe.shape_value_component(i, k, c)),
-                                            ExcInternalError());
+                                {
+                                  AssertThrow(
+                                    (fe.shape_value(i, k) ==
+                                     fe.shape_value_component(i, k, c)),
+                                    ExcInternalError());
+                                  AssertThrow((fe.shape_value(i, k) ==
+                                               fe2.shape_value(i, k)),
+                                              ExcInternalError());
+                                }
                               if (uflags & update_gradients)
-                                AssertThrow((fe.shape_grad(i, k) ==
-                                             fe.shape_grad_component(i, k, c)),
-                                            ExcInternalError());
+                                {
+                                  AssertThrow(
+                                    (fe.shape_grad(i, k) ==
+                                     fe.shape_grad_component(i, k, c)),
+                                    ExcInternalError());
+                                  AssertThrow((fe.shape_grad(i, k) ==
+                                               fe2.shape_grad(i, k)),
+                                              ExcInternalError());
+                                }
                               if (uflags & update_hessians)
-                                AssertThrow(
-                                  (fe.shape_hessian(i, k) ==
-                                   fe.shape_hessian_component(i, k, c)),
-                                  ExcInternalError());
+                                {
+                                  AssertThrow(
+                                    (fe.shape_hessian(i, k) ==
+                                     fe.shape_hessian_component(i, k, c)),
+                                    ExcInternalError());
+                                  AssertThrow((fe.shape_hessian(i, k) ==
+                                               fe2.shape_hessian(i, k)),
+                                              ExcInternalError());
+                                }
                               if (uflags & update_3rd_derivatives)
-                                AssertThrow(
-                                  (fe.shape_3rd_derivative(i, k) ==
-                                   fe.shape_3rd_derivative_component(i, k, c)),
-                                  ExcInternalError());
+                                {
+                                  AssertThrow(
+                                    (fe.shape_3rd_derivative(i, k) ==
+                                     fe.shape_3rd_derivative_component(i,
+                                                                       k,
+                                                                       c)),
+                                    ExcInternalError());
+                                  AssertThrow((fe.shape_3rd_derivative(i, k) ==
+                                               fe2.shape_3rd_derivative(i, k)),
+                                              ExcInternalError());
+                                }
                             }
                           else
                             {
@@ -239,6 +275,7 @@ plot_face_shape_functions(Mapping<dim> &      mapping,
                ++s)
             {
               sub.reinit(c, f, s);
+              sub2.reinit(c, c->face(f), c->face(f)->child(s));
 
               unsigned int k = 0;
               for (unsigned int my = 0; my <= ((dim > 2) ? div : 0); ++my)
@@ -267,23 +304,29 @@ plot_face_shape_functions(Mapping<dim> &      mapping,
                                       const double v1 = sub.shape_value(i, k),
                                                    v2 =
                                                      sub.shape_value_component(
-                                                       i, k, c);
+                                                       i, k, c),
+                                                   v3 = sub2.shape_value(i, k);
                                       Assert(v1 == v2, ExcInternalError());
+                                      Assert(v1 == v3, ExcInternalError());
                                     }
                                   if (uflags & update_gradients)
                                     {
                                       const Tensor<1, dim>
                                         g1 = sub.shape_grad(i, k),
-                                        g2 = sub.shape_grad_component(i, k, c);
+                                        g2 = sub.shape_grad_component(i, k, c),
+                                        g3 = sub2.shape_grad(i, k);
                                       Assert(g1 == g2, ExcInternalError());
+                                      Assert(g1 == g3, ExcInternalError());
                                     }
                                   if (uflags & update_hessians)
                                     {
                                       const Tensor<2, dim>
                                         s1 = sub.shape_hessian(i, k),
                                         s2 =
-                                          sub.shape_hessian_component(i, k, c);
+                                          sub.shape_hessian_component(i, k, c),
+                                        s3 = sub2.shape_hessian(i, k);
                                       Assert(s1 == s2, ExcInternalError());
+                                      Assert(s1 == s3, ExcInternalError());
                                     }
                                   if (uflags & update_3rd_derivatives)
                                     {
@@ -292,8 +335,11 @@ plot_face_shape_functions(Mapping<dim> &      mapping,
                                         t2 =
                                           sub.shape_3rd_derivative_component(i,
                                                                              k,
-                                                                             c);
+                                                                             c),
+                                        t3 = sub2.shape_3rd_derivative(i, k);
+
                                       Assert(t1 == t2, ExcInternalError());
+                                      Assert(t1 == t3, ExcInternalError());
                                     }
                                 }
                               else

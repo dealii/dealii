@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2019 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -43,9 +43,18 @@ DEAL_II_NAMESPACE_OPEN
 namespace LinearAlgebra
 {
   // Forward declaration
+#  ifndef DOXYGEN
   template <typename Number>
   class ReadWriteVector;
+#  endif
 
+  /**
+   * A namespace for classes that provide wrappers for Trilinos' Tpetra vectors.
+   *
+   * This namespace provides wrappers for the Tpetra::Vector class from the
+   * Tpetra package (https://trilinos.github.io/tpetra.html) that is part of
+   * Trilinos.
+   */
   namespace TpetraWrappers
   {
     /**
@@ -69,7 +78,6 @@ namespace LinearAlgebra
      *
      * @ingroup TrilinosWrappers
      * @ingroup Vectors
-     * @author Daniel Arndt, 2019
      */
     template <typename Number>
     class Vector : public VectorSpaceVector<Number>, public Subscriptor
@@ -142,11 +150,10 @@ namespace LinearAlgebra
        * improve performance.
        */
       virtual void
-      import(
-        const ReadWriteVector<Number> &                 V,
-        VectorOperation::values                         operation,
-        std::shared_ptr<const CommunicationPatternBase> communication_pattern =
-          std::shared_ptr<const CommunicationPatternBase>()) override;
+      import(const ReadWriteVector<Number> &V,
+             VectorOperation::values        operation,
+             std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+               communication_pattern = {}) override;
 
       /**
        * Multiply the entire vector by a fixed factor.
@@ -298,6 +305,13 @@ namespace LinearAlgebra
        */
       virtual size_type
       size() const override;
+
+      /**
+       * Return the local size of the vector, i.e., the number of indices
+       * owned locally.
+       */
+      size_type
+      locally_owned_size() const;
 
       /**
        * Return the MPI communicator object in use with this object.

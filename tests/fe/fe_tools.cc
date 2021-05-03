@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -200,12 +200,11 @@ test_renumbering()
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
-  test_projection<1>(logfile);
-  test_projection<2>(logfile);
-  test_projection<3>(logfile);
+  test_projection<1>(deallog.get_file_stream());
+  test_projection<2>(deallog.get_file_stream());
+  test_projection<3>(deallog.get_file_stream());
 
   test_renumbering<1>();
   test_renumbering<2>();

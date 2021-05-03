@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2018 by the deal.II authors
+// Copyright (C) 2014 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -25,6 +25,7 @@
 #include <tuple>
 
 #include "../tests.h"
+
 #include "create_matrix.h"
 
 DeclException5(ExcEl,
@@ -111,14 +112,14 @@ main()
   initlog();
   deallog.get_file_stream().precision(3);
 
-  const std::vector<std::array<unsigned int, 3>> sizes = {{3, 3, 3},
-                                                          {7, 7, 7},
-                                                          {51, 51, 51},
-                                                          {320, 320, 320},
-                                                          {3, 5, 9},
-                                                          {7, 7, 9},
-                                                          {10, 5, 10},
-                                                          {320, 320, 120}};
+  const std::vector<std::array<unsigned int, 3>> sizes = {{{3, 3, 3}},
+                                                          {{7, 7, 7}},
+                                                          {{51, 51, 51}},
+                                                          {{320, 320, 320}},
+                                                          {{3, 5, 9}},
+                                                          {{7, 7, 9}},
+                                                          {{10, 5, 10}},
+                                                          {{320, 320, 120}}};
 
   deallog.push("double");
   for (auto el : sizes)

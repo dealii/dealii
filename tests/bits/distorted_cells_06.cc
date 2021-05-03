@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -83,7 +83,7 @@ check()
   GridGenerator::subdivided_hyper_rectangle(coarse_grid, sub, p1, p2, true);
 
   // set bottom middle edge to use MyManifold
-  for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+  for (const unsigned int f : GeometryInfo<dim>::face_indices())
     for (unsigned int e = 0; e < GeometryInfo<dim - 1>::faces_per_cell; ++e)
       if (coarse_grid.begin_active()->face(f)->line(e)->center()[0] == 0)
         if (coarse_grid.begin_active()->face(f)->line(e)->center()[1] == 0.5)

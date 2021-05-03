@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2019 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -190,7 +190,7 @@ DataOutFaces<dim, DoFHandlerType>::build_one_patch(
 
                   if (update_flags & update_normal_vectors)
                     data.patch_values_scalar.normals =
-                      this_fe_patch_values.get_all_normal_vectors();
+                      this_fe_patch_values.get_normal_vectors();
 
                   const typename DoFHandlerType::active_cell_iterator dh_cell(
                     &cell_and_face->first->get_triangulation(),
@@ -234,7 +234,7 @@ DataOutFaces<dim, DoFHandlerType>::build_one_patch(
 
                   if (update_flags & update_normal_vectors)
                     data.patch_values_system.normals =
-                      this_fe_patch_values.get_all_normal_vectors();
+                      this_fe_patch_values.get_normal_vectors();
 
                   const typename DoFHandlerType::active_cell_iterator dh_cell(
                     &cell_and_face->first->get_triangulation(),
@@ -295,7 +295,7 @@ DataOutFaces<dim, DoFHandlerType>::build_one_patch(
           // belongs in order to access the cell data. this is not readily
           // available, so choose the following rather inefficient way:
           Assert(
-            cell_and_face->first->active(),
+            cell_and_face->first->is_active(),
             ExcMessage(
               "The current function is trying to generate cell-data output "
               "for a face that does not belong to an active cell. This is "
@@ -396,19 +396,21 @@ DataOutFaces<dim, DoFHandlerType>::build_patches(
     n_datasets, Utilities::fixed_power<dimension - 1>(n_subdivisions + 1));
 
   // now build the patches in parallel
-  WorkStream::run(all_faces.data(),
-                  all_faces.data() + all_faces.size(),
-                  std::bind(&DataOutFaces<dim, DoFHandlerType>::build_one_patch,
-                            this,
-                            std::placeholders::_1,
-                            std::placeholders::_2,
-                            std::placeholders::_3),
-                  std::bind(&internal::DataOutFacesImplementation::
-                              append_patch_to_list<dim, space_dimension>,
-                            std::placeholders::_1,
-                            std::ref(this->patches)),
-                  thread_data,
-                  sample_patch);
+  WorkStream::run(
+    all_faces.data(),
+    all_faces.data() + all_faces.size(),
+    [this](const FaceDescriptor *cell_and_face,
+           internal::DataOutFacesImplementation::ParallelData<dimension,
+                                                              dimension> &data,
+           DataOutBase::Patch<dimension - 1, space_dimension> &patch) {
+      this->build_one_patch(cell_and_face, data, patch);
+    },
+    [this](const DataOutBase::Patch<dim - 1, space_dimension> &patch) {
+      internal::DataOutFacesImplementation::
+        append_patch_to_list<dim, space_dimension>(patch, this->patches);
+    },
+    thread_data,
+    sample_patch);
 }
 
 
@@ -422,7 +424,7 @@ DataOutFaces<dim, DoFHandlerType>::first_face()
     cell = this->triangulation->begin_active();
   for (; cell != this->triangulation->end(); ++cell)
     if (cell->is_locally_owned())
-      for (unsigned int f = 0; f < GeometryInfo<dimension>::faces_per_cell; ++f)
+      for (const unsigned int f : GeometryInfo<dimension>::face_indices())
         if (!surface_only || cell->face(f)->at_boundary())
           return FaceDescriptor(cell, f);
 
@@ -469,8 +471,7 @@ DataOutFaces<dim, DoFHandlerType>::next_face(const FaceDescriptor &old_face)
       // check all the faces of this active cell. but skip it altogether
       // if it isn't locally owned
       if (active_cell->is_locally_owned())
-        for (unsigned int f = 0; f < GeometryInfo<dimension>::faces_per_cell;
-             ++f)
+        for (const unsigned int f : GeometryInfo<dimension>::face_indices())
           if (!surface_only || active_cell->face(f)->at_boundary())
             {
               face.first  = active_cell;

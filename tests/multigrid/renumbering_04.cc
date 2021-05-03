@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -52,7 +52,7 @@ check(FiniteElement<dim> &fe)
 
   DoFHandler<dim> dh(tria);
   dh.distribute_dofs(fe);
-  dh.distribute_mg_dofs(fe);
+  dh.distribute_mg_dofs();
 
   deallog << "** before:" << std::endl;
   {

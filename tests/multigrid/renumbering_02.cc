@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -57,7 +57,7 @@ check()
 
   DoFHandler<dim> mg_dof_handler(tria);
   mg_dof_handler.distribute_dofs(fe);
-  mg_dof_handler.distribute_mg_dofs(fe);
+  mg_dof_handler.distribute_mg_dofs();
   Point<dim> a;
   a(0) = 1;
   for (unsigned int level = 0; level < tria.n_levels(); ++level)

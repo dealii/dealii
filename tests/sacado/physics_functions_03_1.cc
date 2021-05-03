@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,8 +20,9 @@
 //
 // AD number type: Sacado DFad
 
-#include "../ad_common_tests/physics_functions_03.h"
 #include "../tests.h"
+
+#include "../ad_common_tests/physics_functions_03.h"
 
 int
 main()

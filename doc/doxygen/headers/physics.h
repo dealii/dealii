@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,23 +30,23 @@ namespace Physics
 
   /**
    * Notations that reduce the order of tensors, effectively storing them in some
-   * sort of consistent compressed storage pattern. An example is storing the 
-   * 6 independent components of $3\times 3$ symmetric tensors of rank 2 as a 
-   * vector with 6 components, and then representing the 36 independent elements 
-   * of symmetric $3\times 3 \times 3\times 3$ tensors of rank 4 (which when 
-   * applied to a symmetric rank-2 tensor yields another symmetric rank-2 tensor) 
-   * as a $6 \times 6$ matrix. 
+   * sort of consistent compressed storage pattern. An example is storing the
+   * 6 independent components of $3\times 3$ symmetric tensors of rank 2 as a
+   * vector with 6 components, and then representing the 36 independent elements
+   * of symmetric $3\times 3 \times 3\times 3$ tensors of rank 4 (which when
+   * applied to a symmetric rank-2 tensor yields another symmetric rank-2 tensor)
+   * as a $6 \times 6$ matrix.
    *
    * Although this method of representing tensors is most regularly associated with
    * the efficient storage of the fourth-order elasticity tensor, with its
-   * generalization it has wider applicability. This representation is also common 
+   * generalization it has wider applicability. This representation is also common
    * in the physics, material science and FEM literature.
    *
    * There are several variations of tensor notation, each a slightly different
    * structure. The primary difference between the various forms of tensor notation
    * is the weighting prescribed to the various elements of the compressed tensors.
    * This <a
-   * href="https://en.wikipedia.org/wiki/Voigt_notation">wikipedia article</a> has 
+   * href="https://en.wikipedia.org/wiki/Voigt_notation">wikipedia article</a> has
    * some further general insights on this topic.
    *
    * @ingroup physics

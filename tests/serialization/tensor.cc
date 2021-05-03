@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2018 by the deal.II authors
+// Copyright (C) 2010 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -24,6 +24,7 @@
 #include <sstream>
 
 #include "../tests.h"
+
 #include "serialization.h"
 
 

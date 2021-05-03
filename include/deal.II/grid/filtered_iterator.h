@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2019 by the deal.II authors
+// Copyright (C) 2002 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,10 +21,10 @@
 
 #  include <deal.II/base/exceptions.h>
 #  include <deal.II/base/iterator_range.h>
-#  include <deal.II/base/std_cxx14/memory.h>
 
 #  include <deal.II/grid/tria_iterator_base.h>
 
+#  include <memory>
 #  include <set>
 #  include <tuple>
 
@@ -45,7 +45,6 @@ DEAL_II_NAMESPACE_OPEN
  * the general description of the FilteredIterator class.
  *
  * @ingroup Iterators
- * @author Wolfgang Bangerth, 2002
  */
 namespace IteratorFilters
 {
@@ -225,7 +224,6 @@ namespace IteratorFilters
    * pointed to is equal to a value or set of values given to the constructor,
    * assuming that the iterator allows querying for a material id.
    *
-   * @author Jean-Paul Pelteret, Denis Davydov, 2015
    *
    * @ingroup Iterators
    */
@@ -272,7 +270,6 @@ namespace IteratorFilters
    * pointed to is equal to a value or set of values given to the constructor,
    * assuming that the iterator allows querying for an active FE index.
    *
-   * @author Jean-Paul Pelteret, Denis Davydov, 2015
    *
    * @ingroup Iterators
    */
@@ -318,7 +315,6 @@ namespace IteratorFilters
    * Filter for iterators that evaluates to true if the iterator of the object
    * pointed to is on the boundary.
    *
-   * @author Bruno Turcksin, 2016
    *
    * @ingroup Iterators
    */
@@ -341,7 +337,7 @@ namespace IteratorFilters
  * filter (called a <em>predicate</em>, following the notation of the C++
  * standard library). Once initialized with a predicate and a value for the
  * iterator, a filtered iterator hops to the next or previous element that
- * satisfies the predicate if operators ++ or -- are invoked. Intermediate
+ * satisfies the predicate if operators ++ or \-- are invoked. Intermediate
  * iterator values that lie in between but do not satisfy the predicate are
  * skipped. It is thus very simple to write loops over a certain class of
  * objects without the need to explicitly write down the condition they have
@@ -349,7 +345,7 @@ namespace IteratorFilters
  * functions are called with a pair of iterators denoting a range on which
  * they shall act, by choosing a filtered iterator instead of usual ones.
  *
- * This class is used in step-18 and step-32.
+ * This class is used in step-32.
  *
  *
  * <h3>Predicates</h3>
@@ -387,11 +383,11 @@ namespace IteratorFilters
  * @endcode
  * then
  * @code
- *   std::bind (&level_equal_to<active_cell_iterator>, std::placeholders::_1, 3)
+ *   [](const BIterator& c){ return level_equal_to<active_cell_iterator>(c, 3);}
  * @endcode
  * is another valid predicate (here: a function that returns true if either
  * the iterator is past the end or the level is equal to the second argument;
- * this second argument is bound to a fixed value using the @p std::bind
+ * this second argument is taken considered fixed when creating the lambda
  * function).
  *
  * Finally, classes can be predicates. The following class is one:
@@ -402,7 +398,7 @@ namespace IteratorFilters
  *     template <class Iterator>
  *     bool operator () (const Iterator &i) const
  *     {
- *       return (i->active());
+ *       return i->is_active();
  *     }
  *   };
  * @endcode
@@ -441,7 +437,7 @@ namespace IteratorFilters
  * <h3>Initialization of filtered iterators</h3>
  *
  * Filtered iterators are given a predicate at construction time which cannot
- * be changed any more. This behaviour would be expected if the predicate
+ * be changed any more. This behavior would be expected if the predicate
  * would have been given as a template parameter to the class, but since that
  * would make the declaration of filtered iterators a nightmare, we rather
  * give the predicate as an unchangeable entity to the constructor. Note that
@@ -523,7 +519,6 @@ namespace IteratorFilters
  *
  * @ingroup grid
  * @ingroup Iterators
- * @author Wolfgang Bangerth, 2002
  */
 template <typename BaseIterator>
 class FilteredIterator : public BaseIterator
@@ -786,7 +781,7 @@ private:
  * explicitly specify the type of the base iterator by hand -- it is deduced
  * automatically here.
  *
- * @author Wolfgang Bangerth @relatesalso FilteredIterator
+ * @relatesalso FilteredIterator
  */
 template <typename BaseIterator, typename Predicate>
 FilteredIterator<BaseIterator>
@@ -857,7 +852,6 @@ namespace internal
  *     }
  * @endcode
  *
- * @author Bruno Turcksin, 2016
  * @relatesalso FilteredIterator
  * @ingroup CPP11
  */
@@ -906,7 +900,6 @@ filter_iterators(IteratorRange<BaseIterator> i, const Predicate &p)
  *     }
  * @endcode
  *
- * @author Bruno Turcksin, 2016
  * @relatesalso FilteredIterator
  * @ingroup CPP11
  */
@@ -1151,7 +1144,7 @@ template <typename Predicate>
 std::unique_ptr<typename FilteredIterator<BaseIterator>::PredicateBase>
 FilteredIterator<BaseIterator>::PredicateTemplate<Predicate>::clone() const
 {
-  return std_cxx14::make_unique<PredicateTemplate>(predicate);
+  return std::make_unique<PredicateTemplate>(predicate);
 }
 
 
@@ -1164,7 +1157,7 @@ namespace IteratorFilters
   inline bool
   Active::operator()(const Iterator &i) const
   {
-    return (i->active());
+    return i->is_active();
   }
 
 

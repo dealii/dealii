@@ -657,7 +657,8 @@ As explained above, our approach to solving the joint system for
 velocities/pressure on the one hand and temperature on the other is to use an
 operator splitting where we first solve the Stokes system for the velocities
 and pressures using the old temperature field, and then solve for the new
-temperature field using the just computed velocity field.
+temperature field using the just computed velocity field. (A more
+extensive discussion of operator splitting methods can be found in step-58.)
 
 
 <h5>Linear solvers for the Stokes problem</h5>

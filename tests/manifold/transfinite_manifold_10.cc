@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,10 +16,10 @@
 
 // This test verifies that the transfinite interpolation works on a torus
 
-#include <deal.II/base/std_cxx14/memory.h>
-
 #include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
+
+#include <memory>
 
 #include "../tests.h"
 
@@ -38,7 +38,7 @@ public:
   virtual std::unique_ptr<Manifold<dim, spacedim>>
   clone() const override
   {
-    return std_cxx14::make_unique<InnerTorusManifold>();
+    return std::make_unique<InnerTorusManifold>();
   }
 
   virtual Point<chartdim>
@@ -148,7 +148,7 @@ main()
   for (auto &cell : tria.cell_iterators())
     {
       bool cell_at_boundary = false;
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+      for (const unsigned int f : GeometryInfo<dim>::face_indices())
         if (cell->at_boundary(f))
           cell_at_boundary = true;
       if (cell_at_boundary == false)

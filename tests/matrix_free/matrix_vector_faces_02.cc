@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -24,8 +24,6 @@
 #include <deal.II/fe/fe_dgq.h>
 
 #include "../tests.h"
-
-std::ofstream logfile("output");
 
 #include "matrix_vector_faces_common.h"
 

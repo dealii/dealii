@@ -1,0 +1,519 @@
+<br>
+
+<i>
+This program was contributed by Natasha Sharma, Guido Kanschat, Timo
+Heister, Wolfgang Bangerth, and Zhuoran Wang.
+
+The first author would like to acknowledge the support of NSF Grant
+No. DMS-1520862.
+Timo Heister and Wolfgang Bangerth acknowledge support through NSF
+awards DMS-1821210, EAR-1550901, and OAC-1835673.
+</i>
+
+<a name="Intro"></a>
+<h1>Introduction</h1>
+
+This program deals with the <a
+href="https://en.wikipedia.org/wiki/Biharmonic_equation">biharmonic
+equation</a>,
+@f{align*}{
+  \Delta^2 u(\mathbf x) &= f(\mathbf x)
+  \qquad \qquad &&\forall \mathbf x \in \Omega.
+@f}
+This equation appears in the modeling of thin structures such as roofs
+of stadiums. These objects are of course in reality
+three-dimensional with a large aspect ratio of lateral extent to
+perpendicular thickness, but one can often very accurately model these
+structures as two dimensional by making assumptions about how internal
+forces vary in the perpendicular direction. These assumptions lead to the
+equation above.
+
+The model typically comes in two different kinds, depending on what
+kinds of boundary conditions are imposed. The first case,
+@f{align*}{
+  u(\mathbf x) &= g(\mathbf x) \qquad \qquad
+  &&\forall \mathbf x \in \partial\Omega, \\
+  \Delta u(\mathbf x) &= h(\mathbf x) \qquad \qquad
+  &&\forall \mathbf x \in \partial\Omega,
+@f}
+corresponds to the edges of the thin structure attached to the top of
+a wall of height $g(\mathbf x)$ in such a way that the bending forces
+that act on the structure are $h(\mathbf x)$; in most physical
+situations, one will have $h=0$, corresponding to the structure simply
+sitting atop the wall.
+
+In the second possible case of boundary values, one would have
+@f{align*}{
+  u(\mathbf x) &= g(\mathbf x) \qquad \qquad
+  &&\forall \mathbf x \in \partial\Omega, \\
+  \frac{\partial u(\mathbf x)}{\partial \mathbf n} &= j(\mathbf x) \qquad \qquad
+  &&\forall \mathbf x \in \partial\Omega.
+@f}
+This corresponds to a "clamped" structure for which a nonzero
+$j(\mathbf x)$ implies a certain angle against the horizontal.
+
+As with Dirichlet and Neumann boundary conditions for the Laplace
+equation, it is of course possible to have one kind of boundary
+conditions on one part of the boundary, and the other on the
+remainder.
+
+
+<h3> What's the issue? </h3>
+
+The fundamental issue with the equation is that it takes four
+derivatives of the solution. In the case of the Laplace equation
+we treated in step-3, step-4, and several other tutorial programs,
+one multiplies by a test function, integrates, integrates by parts,
+and ends up with only one derivative on both the test function and
+trial function -- something one can do with functions that are
+continuous globally, but may have kinks at the interfaces between
+cells: The derivative may not be defined at the interfaces, but
+that is on a lower-dimensional manifold (and so doesn't show up
+in the integrated value).
+
+But for the biharmonic equation, if one followed the same procedure
+using integrals over the entire domain (i.e., the union of all cells),
+one would end up with two derivatives on the test functions and trial
+functions each. If one were to use the usual piecewise polynomial
+functions with their kinks on cell interfaces, the first derivative
+would yield a discontinuous gradient, and the second derivative with
+delta functions on the interfaces -- but because both the second
+derivatives of the test functions and of the trial functions yield a
+delta function, we would try to integrate the product of two delta
+functions. For example, in 1d, where $\varphi_i$ are the usual
+piecewise linear "hat functions", we would get integrals of the sort
+@f{align*}{
+  \int_0^L (\Delta \varphi_i) (\Delta \varphi_j)
+  =
+  \int_0^L
+  \frac 1h \left[\delta(x-x_{i-1}) - 2\delta(x-x_i) + \delta(x-x_{i+1})\right]
+  \frac 1h \left[\delta(x-x_{j-1}) - 2\delta(x-x_j) + \delta(x-x_{j+1})\right]
+@f}
+where $x_i$ is the node location at which the shape function
+$\varphi_i$ is defined, and $h$ is the mesh size (assumed
+uniform). The problem is that delta functions in integrals are defined
+using the relationship
+@f{align*}{
+  \int_0^L \delta(x-\hat x) f(x) \; dx
+  =
+  f(\hat x).
+@f}
+But that only works if (i) $f(\cdot)$ is actually well defined at
+$\hat x$, and (ii) if it is finite. On the other hand, an integral of
+the form
+@f{align*}{
+\int_0^L \delta(x-x_i) \delta (x-x_i)
+@f}
+does not make sense. Similar reasoning can be applied for 2d and 3d
+situations.
+
+In other words: This approach of trying to integrate over the entire
+domain and then integrating by parts can't work.
+
+Historically, numerical analysts have tried to address this by
+inventing finite elements that are "C<sup>1</sup> continuous", i.e., that use
+shape functions that are not just continuous but also have continuous
+first derivatives. This is the realm of elements such as the Argyris
+element, the Clough-Tocher element and others, all developed in the
+late 1960s. From a twenty-first century perspective, they can only be
+described as bizarre in their construction. They are also exceedingly
+cumbersome to implement if one wants to use general meshes. As a
+consequence, they have largely fallen out of favor and deal.II currently
+does not contain implementations of these shape functions.
+
+
+<h3> What to do instead? </h3>
+
+So how does one approach solving such problems then? That depends a
+bit on the boundary conditions. If one has the first set of boundary
+conditions, i.e., if the equation is
+@f{align*}{
+  \Delta^2 u(\mathbf x) &= f(\mathbf x)
+  \qquad \qquad &&\forall \mathbf x \in \Omega, \\
+  u(\mathbf x) &= g(\mathbf x) \qquad \qquad
+  &&\forall \mathbf x \in \partial\Omega, \\
+  \Delta u(\mathbf x) &= h(\mathbf x) \qquad \qquad
+  &&\forall \mathbf x \in \partial\Omega,
+@f}
+then the following trick works (at least if the domain is convex, see
+below): In the same way as we obtained the
+mixed Laplace equation of step-20 from the regular Laplace equation by
+introducing a second variable, we can here introduce a variable
+$v=\Delta u$ and can then replace the equations above by the
+following, "mixed" system:
+@f{align*}{
+  -\Delta u(\mathbf x) +v(\mathbf x) &= 0
+  \qquad \qquad &&\forall \mathbf x \in \Omega, \\
+  -\Delta v(\mathbf x) &= -f(\mathbf x)
+  \qquad \qquad &&\forall \mathbf x \in \Omega, \\
+  u(\mathbf x) &= g(\mathbf x) \qquad \qquad
+  &&\forall \mathbf x \in \partial\Omega, \\
+  v(\mathbf x) &= h(\mathbf x) \qquad \qquad
+  &&\forall \mathbf x \in \partial\Omega.
+@f}
+In other words, we end up with what is in essence a system of two
+coupled Laplace equations for $u,v$, each with Dirichlet-type boundary
+conditions. We know how to solve such problems, and it should not be
+very difficult to construct good solvers and preconditioners for this
+system either using the techniques of step-20 or step-22. So this
+case is pretty simple to deal with.
+
+@note It is worth pointing out that this only works for domains whose
+  boundary has corners if the domain is also convex -- in other words,
+  if there are no re-entrant corners.
+  This sounds like a rather random condition, but it makes
+  sense in view of the following two facts: The solution of the
+  original biharmonic equation must satisfy $u\in H^2(\Omega)$. On the
+  other hand, the mixed system reformulation above suggests that both
+  $u$ and $v$ satisfy $u,v\in H^1(\Omega)$ because both variables only
+  solve a Poisson equation. In other words, if we want to ensure that
+  the solution $u$ of the mixed problem is also a solution of the
+  original biharmonic equation, then we need to be able to somehow
+  guarantee that the solution of $-\Delta u=v$ is in fact more smooth
+  than just $H^1(\Omega)$. This can be argued as follows: For convex
+  domains,
+  <a href="https://en.wikipedia.org/wiki/Elliptic_operator#Elliptic_regularity_theorem">"elliptic
+  regularity"</a> implies that if the right hand side $v\in H^s$, then
+  $u\in H^{s+2}$ if the domain is convex and the boundary is smooth
+  enough. (This could also be guaranteed if the domain boundary is
+  sufficiently smooth -- but domains whose boundaries have no corners
+  are not very practical in real life.)
+  We know that $v\in H^1$ because it solves the equation
+  $-\Delta v=f$, but we are still left with the condition on convexity
+  of the boundary; one can show that polygonal, convex domains are
+  good enough to guarantee that $u\in H^2$ in this case (smoothly
+  bounded, convex domains would result in $u\in H^3$, but we don't
+  need this much regularity). On the other hand, if the domain is not
+  convex, we can not guarantee that the solution of the mixed system
+  is in $H^2$, and consequently may obtain a solution that can't be
+  equal to the solution of the original biharmonic equation.
+
+The more complicated situation is if we have the "clamped" boundary
+conditions, i.e., if the equation looks like this:
+@f{align*}{
+  \Delta^2 u(\mathbf x) &= f(\mathbf x)
+  \qquad \qquad &&\forall \mathbf x \in \Omega, \\
+  u(\mathbf x) &= g(\mathbf x) \qquad \qquad
+  &&\forall \mathbf x \in \partial\Omega, \\
+  \frac{\partial u(\mathbf x)}{\partial \mathbf n} &= j(\mathbf x) \qquad \qquad
+  &&\forall \mathbf x \in \partial\Omega.
+@f}
+The same trick with the mixed system does not work here, because we
+would end up with <i>both</i> Dirichlet and Neumann boundary conditions for
+$u$, but none for $v$.
+
+
+The solution to this conundrum arrived with the Discontinuous Galerkin
+method wave in the 1990s and early 2000s: In much the same way as one
+can use <i>discontinuous</i> shape functions for the Laplace equation
+by penalizing the size of the discontinuity to obtain a scheme for an
+equation that has one derivative on each shape function, we can use a
+scheme that uses <i>continuous</i> (but not $C^1$ continuous) shape
+functions and penalize the jump in the derivative to obtain a scheme
+for an equation that has two derivatives on each shape function. In
+analogy to the Interior Penalty (IP) method for the Laplace equation,
+this scheme for the biharmonic equation is typically called the $C^0$ IP
+(or C0IP) method, since it uses $C^0$ (continuous but not continuously
+differentiable) shape functions with an interior penalty formulation.
+
+
+<h3> Derivation of the C0IP method </h3>
+
+We base this program on the $C^0$ IP method presented by Susanne
+Brenner and Li-Yeng Sung in the paper "C$^0$ Interior Penalty Method
+for Linear Fourth Order Boundary Value Problems on polygonal
+domains'' @cite Brenner2005 , where the method is
+derived for the biharmonic equation with "clamped" boundary
+conditions.
+
+As mentioned, this method relies on the use of $C^0$ Lagrange finite
+elements where the $C^1$ continuity requirement is relaxed and has
+been replaced with interior penalty techniques. To derive this method,
+we consider a $C^0$ shape function $v_h$ which vanishes on
+$\partial\Omega$. We introduce notation $ \mathbb{F} $ as the set of
+all faces of $\mathbb{T}$, $ \mathbb{F}^b $ as the set of boundary faces,
+and $ \mathbb{F}^i $ as the set of interior faces for use further down below.
+Since the higher order derivatives of $v_h$ have two
+values on each interface $e\in \mathbb{F}$ (shared by the two cells
+$K_{+},K_{-} \in \mathbb{T}$), we cope with this discontinuity by
+defining the following single-valued functions on $e$:
+@f{align*}{
+  \jump{\frac{\partial^k v_h}{\partial \mathbf n^k}}
+  &=
+  \frac{\partial^k v_h|_{K_+}}{\partial \mathbf n^k} \bigg |_e
+  - \frac{\partial^k v_h|_{K_-}}{\partial \mathbf n^k} \bigg |_e,
+  \\
+  \average{\frac{\partial^k v_h}{\partial \mathbf n^k}}
+  &=
+  \frac{1}{2}
+  \bigg( \frac{\partial^k v_h|_{K_+}}{\partial \mathbf n^k} \bigg |_e
+  + \frac{\partial^k v_h|_{K_-}}{\partial \mathbf n^k} \bigg |_e \bigg )
+@f}
+for $k =1,2$ (i.e., for the gradient and the matrix of second
+derivatives), and where $\mathbf n$ denotes a unit vector normal to
+$e$ pointing from $K_+$ to $K_-$. In the
+literature, these functions are referred to as the "jump" and
+"average" operations, respectively.
+
+To obtain the $C^0$ IP approximation $u_h$, we left multiply the
+biharmonic equation by $v_h$, and then integrate over $\Omega$. As
+explained above, we can't do the integration by parts on all of
+$\Omega$ with these shape functions, but we can do it on each cell
+individually since the shape functions are just polynomials on each
+cell. Consequently, we start by using the following
+integration-by-parts formula on each mesh cell $K \in {\mathbb{T}}$:
+@f{align*}{
+  \int_K v_h (\Delta^2 w_h)
+  &= \int_K v_h (\nabla\cdot\nabla) (\Delta w_h)
+  \\
+  &= -\int_K \nabla v_h \cdot (\nabla \Delta w_h)
+     +\int_{\partial K} v_h (\nabla \Delta w_h \cdot \mathbf n).
+@f}
+At this point, we have two options: We can integrate the domain term's
+$\nabla\Delta w_h$ one more time to obtain
+@f{align*}{
+  \int_K v_h (\Delta^2 w_h)
+  &= \int_K (\Delta v_h) (\Delta w_h)
+     +\int_{\partial K} v_h (\nabla \Delta w_h \cdot \mathbf n)
+     -\int_{\partial K} (\nabla v_h \cdot \mathbf n) \Delta w_h.
+@f}
+For a variety of reasons, this turns out to be a variation that is not
+useful for our purposes.
+
+Instead, what we do is recognize that
+$\nabla\Delta w_h = \text{grad}\,(\text{div}\,\text{grad}\, w_h)$, and we
+can re-sort these operations as
+$\nabla\Delta w_h = \text{div}\,(\text{grad}\,\text{grad}\, w_h)$ where we
+typically write $\text{grad}\,\text{grad}\, w_h = D^2 w_h$ to indicate
+that this is the "Hessian" matrix of second derivatives. With this
+re-ordering, we can now integrate the divergence, rather than the
+gradient operator, and we get the following instead:
+@f{align*}{
+  \int_K v_h (\Delta^2 w_h)
+  &= \int_K (\nabla \nabla v_h) : (\nabla \nabla w_h)
+     +\int_{\partial K} v_h (\nabla \Delta w_h \cdot \mathbf n)
+     -\int_{\partial K} (\nabla v_h \otimes \mathbf n) : (\nabla\nabla w_h)
+  \\
+  &= \int_K (D^2 v_h) : (D^2 w_h)
+     +\int_{\partial K} v_h (\nabla \Delta w_h \cdot \mathbf n)
+     -\int_{\partial K} (\nabla v_h) \cdot (D^2 w_h \mathbf n).
+@f}
+Here, the colon indicates a double-contraction over the indices of the
+matrices to its left and right, i.e., the scalar product between two
+tensors. The outer product of two vectors $a \otimes b$ yields the
+matrix $(a \otimes b)_{ij} = a_i b_j$.
+
+Then, we sum over all cells $K \in  \mathbb{T}$, and take into account
+that this means that every interior face appears twice in the
+sum. If we therefore split everything into a sum of integrals over
+cell interiors and a separate sum over cell interfaces, we can use
+the jump and average operators defined above. There are two steps
+left: First, because our shape functions are continuous, the gradients
+of the shape functions may be discontinuous, but the continuity
+guarantees that really only the normal component of the gradient is
+discontinuous across faces whereas the tangential component(s) are
+continuous. Second, the discrete formulation that results is not
+stable as the mesh size goes to zero, and to obtain a stable
+formulation that converges to the correct solution, we need to add
+the following terms:
+@f{align*}{
+-\sum_{e \in \mathbb{F}} \int_{e}
+  \average{\frac{\partial^2 v_h}{\partial \mathbf n^2}}
+  \jump{\frac{\partial u_h}{\partial \mathbf n}}
++ \sum_{e \in \mathbb{F}}
+  \frac{\gamma}{h_e}\int_e
+  \jump{\frac{\partial v_h}{\partial \mathbf n}}
+  \jump{\frac{\partial u_h}{\partial \mathbf n}}.
+@f}
+Then, after making cancellations that arise, we arrive at the following
+C0IP formulation of the biharmonic equation: find $u_h$ such that $u_h =
+g$ on $\partial \Omega$ and
+@f{align*}{
+\mathcal{A}(v_h,u_h)&=\mathcal{F}(v_h) \quad \text{holds for all test functions } v_h,
+@f}
+where
+@f{align*}{
+\mathcal{A}(v_h,u_h):=&\sum_{K \in \mathbb{T}}\int_K D^2v_h:D^2u_h \ dx
+\\
+&
+ -\sum_{e \in \mathbb{F}} \int_{e}
+  \jump{\frac{\partial v_h}{\partial \mathbf n}}
+  \average{\frac{\partial^2 u_h}{\partial \mathbf n^2}} \ ds
+ -\sum_{e \in \mathbb{F}} \int_{e}
+ \average{\frac{\partial^2 v_h}{\partial \mathbf n^2}}
+ \jump{\frac{\partial u_h}{\partial \mathbf n}} \ ds
+\\
+&+ \sum_{e \in \mathbb{F}}
+ \frac{\gamma}{h_e}
+ \int_e
+ \jump{\frac{\partial v_h}{\partial \mathbf n}}
+ \jump{\frac{\partial u_h}{\partial \mathbf n}} \ ds,
+@f}
+and
+@f{align*}{
+\mathcal{F}(v_h)&:=\sum_{K \in \mathbb{T}}\int_{K} v_h f \ dx
+-
+\sum_{e \in \mathbb{F}, e\subset\partial\Omega}
+\int_e \average{\frac{\partial^2 v_h}{\partial \mathbf n^2}} j \ ds
++
+\sum_{e \in \mathbb{F}, e\subset\partial\Omega}
+\frac{\gamma}{h_e}
+\int_e \jump{\frac{\partial v_h}{\partial \mathbf n}} j \ ds.
+@f}
+Here, $\gamma$ is the penalty parameter which both weakly enforces the
+boundary condition
+@f{align*}{
+\frac{\partial u(\mathbf x)}{\partial \mathbf n} = j(\mathbf x)
+@f}
+on the boundary interfaces $e \in \mathbb{F}^b$, and also ensures that
+in the limit $h\rightarrow 0$, $u_h$ converges to a $C^1$ continuous
+function. $\gamma$ is chosen to be large enough to guarantee the
+stability of the method. We will discuss our choice in the program below.
+
+
+<h4>Convergence Rates </h4>
+On polygonal domains, the weak solution $u$ to the biharmonic equation
+lives in $H^{2 +\alpha}(\Omega)$ where $\alpha \in(1/2, 2]$ is
+determined by the interior angles at the corners of $\Omega$. For
+instance, whenever $\Omega$ is convex, $\alpha=1$; $\alpha$ may be less
+than one if the domain has re-entrant corners but
+$\alpha$ is close to $1$ if one of all interior angles is close to
+$\pi$.
+
+Now suppose that the $C^0$ IP solution $u_h$ is approximated by $C^0$
+shape functions with polynomial degree $p \ge 2$. Then the
+discretization outlined above yields the convergence rates as
+discussed below.
+
+
+<b>Convergence in the $C^0$ IP-norm</b>
+
+Ideally, we would like to measure convergence in the "energy norm"
+$\|D^2(u-u_h)\|$. However, this does not work because, again, the
+discrete solution $u_h$ does not have two (weak) derivatives. Instead,
+one can define a discrete ($C^0$ IP) seminorm that is "equivalent" to the
+energy norm, as follows:
+@f{align*}{
+ |u_h|_{h}^2 :=
+ \sum\limits_{K \in \mathbb{T}} \big|u_h\big|_{H^2(K)}^2
+ +
+ \sum\limits_{e \in \mathbb{F} }
+ \frac{\gamma }{h_e} \left\|
+ \jump{\frac{\partial u_h}{\partial \mathbf n}} \right\|_{L^2(e)}^2.
+@f}
+
+In this seminorm, the theory in the paper mentioned above yields that we
+can expect
+@f{align*}{
+ |u-u_h|_{h}^2 = {\cal O}(h^{p-1}),
+@f}
+much as one would expect given the convergence rates we know are true
+for the usual discretizations of the Laplace equation.
+
+Of course, this is true only if the exact solution is sufficiently
+smooth. Indeed, if $f \in H^m(\Omega)$ with $m \ge 0$,
+$u \in H^{2+\alpha}(\Omega)$ where $ 2 < 2+\alpha  \le m+4$,
+then the convergence rate of the $C^0$ IP method is
+$\mathcal{O}(h^{\min\{p-1, \alpha\}})$. In other words, the optimal
+convergence rate can only be expected if the solution is so smooth
+that $\alpha\ge p-1$; this can
+only happen if (i) the domain is convex with a sufficiently smooth
+boundary, and (ii) $m\ge p-3$. In practice, of course, the solution is
+what it is (independent of the polynomial degree we choose), and the
+last condition can then equivalently be read as saying that there is
+definitely no point in choosing $p$ large if $m$ is not also
+large. In other words, the only reasonably choices for $p$ are $p\le
+m+3$ because larger polynomial degrees do not result in higher
+convergence orders.
+
+For the purposes of this program, we're a bit too lazy to actually
+implement this equivalent seminorm -- though it's not very difficult and
+would make for a good exercise. Instead, we'll simply check in the
+program what the "broken" $H^2$ seminorm
+@f{align*}{
+ \left(|u_h|^\circ_{H^2}\right)^2
+ :=
+ \sum\limits_{K \in \mathbb{T}} \big|u_h\big|_{H^2(K)}^2
+ =
+ \sum\limits_{K \in \mathbb{T}} \big|D^2 u_h\big|_{L_2}^2
+@f}
+yields. The convergence rate in this norm can, from a theoretical
+perspective, of course not be <i>worse</i> than the one for
+$|\cdot|_h$ because it contains only a subset of the necessary terms,
+but it could at least conceivably be better. It could also be the case that
+we get the optimal convergence rate even though there is a bug in the
+program, and that that bug would only show up in sub-optimal rates for
+the additional terms present in $|\cdot|_h$. But, one might hope
+that if we get the optimal rate in the broken norm and the norms
+discussed below, then the program is indeed correct. The results
+section will demonstrate that we obtain optimal rates in all norms
+shown.
+
+
+<b>Convergence in the $L_2$-norm</b>
+
+The optimal convergence rate in the $L_2$-norm is $\mathcal{O}(h^{p+1})$
+provided $p \ge 3$. More details can be found in Theorem 4.6 of
+@cite Engel2002 .
+
+The default in the program below is to choose $p=2$. In that case, the
+theorem does not apply, and indeed one only gets $\mathcal{O}(h^2)$
+instead of $\mathcal{O}(h^3)$ as we will show in the results section.
+
+
+<b>Convergence in the $H^1$-seminorm</b>
+
+Given that we expect
+$\mathcal{O}(h^{p-1})$ in the best of cases for a norm equivalent to
+the $H^2$ seminorm, and $\mathcal{O}(h^{p+1})$ for the $L_2$ norm, one
+may ask about what happens in the $H^1$ seminorm that is intermediate
+to the two others. A reasonable guess is that one should expect
+$\mathcal{O}(h^{p})$. There is probably a paper somewhere that proves
+this, but we also verify that this conjecture is experimentally true
+below.
+
+
+
+<h3>Other Boundary Conditions</h3>
+
+We remark that the derivation of the $C^0$ IP method for the
+biharmonic equation with other boundary conditions -- for instance,
+for the first set of boundary conditions namely $u(\mathbf x) =
+g(\mathbf x)$ and $\Delta u(\mathbf x)= h(\mathbf x)$ on
+$\partial\Omega$ -- can be obtained with suitable modifications to
+$\mathcal{A}(\cdot,\cdot)$ and $\mathcal{F}(\cdot)$ described in
+the book chapter @cite Brenner2011 .
+
+
+<h3>The testcase</h3>
+
+The last step that remains to describe is what this program solves
+for. As always, a trigonometric function is both a good and a bad
+choice because it does not lie in any polynomial space in which we may
+seek the solution while at the same time being smoother than real
+solutions typically are (here, it is in $C^\infty$ while real
+solutions are typically only in $H^3$ or so on convex polygonal
+domains, or somewhere between $H^2$ and $H^3$ if the domain is not
+convex). But, since we don't have the means to describe solutions of
+realistic problems in terms of relatively simple formulas, we just go
+with the following, on the unit square for the domain $\Omega$:
+@f{align*}{
+  u = \sin(\pi x) \sin(\pi y).
+@f}
+As a consequence, we then need choose as boundary conditions the following:
+@f{align*}{
+  g &= u|_{\partial\Omega} = \sin(\pi x) \sin(\pi y)|_{\partial\Omega},
+  \\
+  j &= \frac{\partial u}{\partial\mathbf n}|_{\partial\Omega}
+  \\
+    &= \left.\begin{pmatrix}
+                \pi\cos(\pi x) \sin(\pi y) \\
+                \pi\sin(\pi x) \cos(\pi y)
+             \end{pmatrix}\right|_{\partial\Omega} \cdot \mathbf n.
+@f}
+The right hand side is easily computed as
+@f{align*}{
+  f = \Delta^2 u = 4 \pi^4 \sin(\pi x) \sin(\pi y).
+@f}
+The program has classes `ExactSolution::Solution` and
+`ExactSolution::RightHandSide` that encode this information.

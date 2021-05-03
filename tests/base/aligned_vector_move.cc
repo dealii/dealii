@@ -24,7 +24,7 @@
 void
 test()
 {
-  typedef AlignedVector<unsigned int> VEC;
+  using VEC = AlignedVector<unsigned int>;
 
   VEC a(4, 2);
 
