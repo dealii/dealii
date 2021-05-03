@@ -505,11 +505,14 @@ namespace Step66
     // step for the preconditioner. For this reason we need beside the
     // mg_matrices also a MGLevelObject to store the interpolated solution
     // vector on each level. As in step-37 we use for the preconditioner float
-    // precision.
+    // precision. Moreover, we define the MGTransferMatrixFree object as class
+    // variable, since we need to set it up only once when the tirangulation has
+    // changed and then can reuse it in each Newton step.
     MGConstrainedDoFs mg_constrained_dofs;
     typedef JacobianOperator<dim, degree_finite_element, float> LevelMatrixType;
     MGLevelObject<LevelMatrixType>                              mg_matrices;
     MGLevelObject<LinearAlgebra::distributed::Vector<float>>    mg_solution;
+    MGTransferMatrixFree<dim, float>                            mg_transfer;
 
 
     // Of course we need also vector holding the solution, the Newton update and
@@ -598,7 +601,9 @@ namespace Step66
   // TimerOutput::Scope instead of measuring each part individually and more
   // important the initialization of the ResidualOperator with the MatrixFree
   // object as well as the initialization of the MGLevelObject for the
-  // interpolated solution vector of the last Newton.
+  // interpolated solution vector of the last Newton. Another important change
+  // is the setup of the MGTransferMatrixFree object, which we can reuse in each
+  // Newton step as the trinagulation has not changed.
   //
   // Note, how we can use the same MatrixFree object twice, for the
   // JacobianOperator and the ResidualOperator.
@@ -657,6 +662,9 @@ namespace Step66
     mg_constrained_dofs.initialize(dof_handler);
     mg_constrained_dofs.make_zero_boundary_constraints(dof_handler,
                                                        dirichlet_boundary);
+
+    mg_transfer.initialize_constraints(mg_constrained_dofs);
+    mg_transfer.build(dof_handler);
 
     for (unsigned int level = 0; level < nlevels; ++level)
       {
@@ -773,9 +781,6 @@ namespace Step66
     // operators. However, therefore we need to interpolate the Newton step to
     // all levels of the triangulation. This is done with the interpolate_to_mg
     // function of the MGTransferMatrixFree class.
-    MGTransferMatrixFree<dim, float> mg_transfer(mg_constrained_dofs);
-    mg_transfer.build(dof_handler);
-
     mg_transfer.interpolate_to_mg(dof_handler, mg_solution, solution);
 
 
