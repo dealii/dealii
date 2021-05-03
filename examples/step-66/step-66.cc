@@ -25,6 +25,7 @@
 #include <deal.II/base/timer.h>
 #include <deal.II/base/vectorization.h>
 
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/precondition.h>
@@ -491,7 +492,7 @@ namespace Step66
     // is a matrix-free operator. For the assembly of the right hand side and
     // the resiudal we use the matrix-free ResidualOperator also implemented
     // above.
-    ConstraintMatrix                                     constraints;
+    AffineConstraints<double>                            constraints;
     JacobianOperator<dim, degree_finite_element, double> system_matrix;
     ResidualOperator<dim, degree_finite_element>         residual_operator;
 
@@ -662,7 +663,7 @@ namespace Step66
                                                       level,
                                                       relevant_dofs);
 
-        ConstraintMatrix level_constraints;
+        AffineConstraints<double> level_constraints;
         level_constraints.reinit(relevant_dofs);
         level_constraints.add_lines(
           mg_constrained_dofs.get_boundary_indices(level));
