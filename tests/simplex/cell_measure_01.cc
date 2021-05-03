@@ -15,7 +15,8 @@
 
 
 
-// Test TriaAccessor::measure() and TriaAccessor::diameter().
+// Test TriaAccessor::measure(), TriaAccessor::diameter(), and
+// TriaAccessor::barycenter().
 
 #include <deal.II/fe/fe_pyramid_p.h>
 #include <deal.II/fe/fe_simplex_p.h>
@@ -41,6 +42,9 @@ process(const std::vector<Point<spacedim>> &vertices,
     {
       deallog << "measure:  " << cell->measure() << std::endl;
       deallog << "diameter: " << cell->diameter() << std::endl;
+      // Only implemented for tensor-product and simplices at the moment
+      if (cell->reference_cell() == ReferenceCells::get_simplex<dim>())
+        deallog << "barycenter: " << cell->barycenter() << std::endl;
     }
 
   std::shared_ptr<MappingFE<dim>> mapping;
