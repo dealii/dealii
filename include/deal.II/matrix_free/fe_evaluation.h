@@ -2320,7 +2320,10 @@ protected:
  * setting the macro `FE_EVAL_FACTORY_DEGREE_MAX` to the desired integer and
  * instantiating the classes FEEvaluationFactory and FEFaceEvaluationFactory
  * (the latter for FEFaceEvaluation) creates paths to templated functions for
- * a possibly larger set of degrees.
+ * a possibly larger set of degrees. You can check if fast
+ * evaluation/integration for a given degree/n_quadrature_points pair by calling
+ * FEEvaluation::fast_evaluation_supported() or
+ * FEFaceEvaluation::fast_evaluation_supported().
  *
  * <h3>Handling multi-component systems</h3>
  *
@@ -2764,6 +2767,13 @@ public:
   reinit(const typename Triangulation<dim>::cell_iterator &cell);
 
   /**
+   * Check if face evaluation/integration is supported.
+   */
+  static bool
+  fast_evaluation_supported(const unsigned int given_degree,
+                            const unsigned int give_n_q_points_1d);
+
+  /**
    * Evaluate the function values, the gradients, and the Hessians of the
    * polynomial interpolation from the DoF values in the input vector to the
    * quadrature points on the unit cell.  The function arguments specify which
@@ -3174,6 +3184,13 @@ public:
    */
   void
   reinit(const unsigned int cell_batch_number, const unsigned int face_number);
+
+  /**
+   * Check if face evaluation/integration is supported.
+   */
+  static bool
+  fast_evaluation_supported(const unsigned int given_degree,
+                            const unsigned int give_n_q_points_1d);
 
   /**
    * Evaluates the function values, the gradients, and the Laplacians of the
@@ -9534,6 +9551,54 @@ FEFaceEvaluation<dim,
     }
 
   return face_no_data;
+}
+
+
+
+template <int dim,
+          int fe_degree,
+          int n_q_points_1d,
+          int n_components_,
+          typename Number,
+          typename VectorizedArrayType>
+bool
+FEEvaluation<dim,
+             fe_degree,
+             n_q_points_1d,
+             n_components_,
+             Number,
+             VectorizedArrayType>::
+  fast_evaluation_supported(const unsigned int given_degree,
+                            const unsigned int give_n_q_points_1d)
+{
+  return fe_degree == -1 ?
+           internal::FEEvaluationFactory<dim, Number, VectorizedArrayType>::
+             fast_evaluation_supported(given_degree, give_n_q_points_1d) :
+           true;
+}
+
+
+
+template <int dim,
+          int fe_degree,
+          int n_q_points_1d,
+          int n_components_,
+          typename Number,
+          typename VectorizedArrayType>
+bool
+FEFaceEvaluation<dim,
+                 fe_degree,
+                 n_q_points_1d,
+                 n_components_,
+                 Number,
+                 VectorizedArrayType>::
+  fast_evaluation_supported(const unsigned int given_degree,
+                            const unsigned int give_n_q_points_1d)
+{
+  return fe_degree == -1 ?
+           internal::FEFaceEvaluationFactory<dim, Number, VectorizedArrayType>::
+             fast_evaluation_supported(given_degree, give_n_q_points_1d) :
+           true;
 }
 
 
