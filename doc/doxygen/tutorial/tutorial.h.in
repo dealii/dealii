@@ -608,6 +608,13 @@
  *       <td> Like step-67, but for demonstrating MPI-3.0 shared-memory features.
  *       <br/> Keywords: MatrixFree, MatrixFree::cell_loop()
  *       </td></tr>
+ *
+ *   <tr valign="top">
+ *       <td>step-77</td>
+ *       <td> The nonlinear minimal surface equation revisited.
+ *       Interfacing with SUNDIALS' KINSOL nonlinear solver.
+ *       </td></tr>
+ *
  * </table>
  *
  *
