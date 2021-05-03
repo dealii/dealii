@@ -444,10 +444,10 @@ namespace Particles
      *
      * The vector @p input_vector should have read access to the indices
      * created by extracting the locally relevant ids with
-     * locally_relevant_ids(), and taking its tensor
+     * locally_owned_particle_ids(), and taking its tensor
      * product with the index set representing the range `[0, spacedim)`, i.e.:
      * @code
-     * IndexSet ids = particle_handler.locally_relevant_ids().
+     * IndexSet ids = particle_handler.locally_owned_particle_ids().
      *  tensor_product(complete_index_set(spacedim));
      * @endcode
      *
@@ -497,7 +497,7 @@ namespace Particles
      * get_particle_positions() function, and then modify the resulting vector.
      *
      * @param [in] new_positions A vector of points of dimension
-     * particle_handler.n_locally_owned_particles()
+     * particle_handler.n_locally_owned_particle_ids()
      *
      * @param [in] displace_particles When true, this function adds the value
      * of the vector of points to the
@@ -641,7 +641,7 @@ namespace Particles
      * triangulation.
      */
     types::particle_index
-    n_locally_owned_particles() const;
+    n_locally_owned_particle_ids() const;
 
     /**
      * Return the next free particle index in the global set
@@ -666,9 +666,30 @@ namespace Particles
      *
      * @return An IndexSet of size get_next_free_particle_index(), containing
      * n_locally_owned_particle() indices.
+     *
+     * @deprecated Use locally_owned_particle_ids() instead.
+     */
+    DEAL_II_DEPRECATED IndexSet
+                       locally_relevant_ids() const;
+
+    /**
+     * Extract an IndexSet with global dimensions equal to
+     * get_next_free_particle_index(), containing the locally owned
+     * particle indices.
+     *
+     * This function can be used to construct distributed vectors and matrices
+     * to manipulate particles using linear algebra operations.
+     *
+     * Notice that it is the user's responsibility to guarantee that particle
+     * indices are unique, and no check is performed to verify that this is the
+     * case, nor that the union of all IndexSet objects on each mpi process is
+     * complete.
+     *
+     * @return An IndexSet of size get_next_free_particle_index(), containing
+     * n_locally_owned_particle() indices.
      */
     IndexSet
-    locally_relevant_ids() const;
+    locally_owned_particle_ids() const;
 
     /**
      * Return the number of properties each particle has.
@@ -1144,6 +1165,15 @@ namespace Particles
       output_vector.compress(VectorOperation::add);
     else
       output_vector.compress(VectorOperation::insert);
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline IndexSet
+  ParticleHandler<dim, spacedim>::locally_relevant_ids() const
+  {
+    return this->locally_owned_particle_ids();
   }
 
 } // namespace Particles

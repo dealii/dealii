@@ -191,7 +191,7 @@ namespace Particles
       OutputVectorType &                               interpolated_field,
       const ComponentMask &field_comps = ComponentMask())
     {
-      if (particle_handler.n_locally_owned_particles() == 0)
+      if (particle_handler.n_locally_owned_particle_ids() == 0)
         {
           interpolated_field.compress(VectorOperation::add);
           return; // nothing else to do here

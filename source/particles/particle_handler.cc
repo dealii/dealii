@@ -767,7 +767,7 @@ namespace Particles
 
   template <int dim, int spacedim>
   types::particle_index
-  ParticleHandler<dim, spacedim>::n_locally_owned_particles() const
+  ParticleHandler<dim, spacedim>::n_locally_owned_particle_ids() const
   {
     return particles.size();
   }
@@ -794,7 +794,7 @@ namespace Particles
 
   template <int dim, int spacedim>
   IndexSet
-  ParticleHandler<dim, spacedim>::locally_relevant_ids() const
+  ParticleHandler<dim, spacedim>::locally_owned_particle_ids() const
   {
     IndexSet set(get_next_free_particle_index());
     for (const auto &p : *this)
@@ -812,7 +812,7 @@ namespace Particles
     const bool                    add_to_output_vector)
   {
     // There should be one point per particle to gather
-    AssertDimension(positions.size(), n_locally_owned_particles());
+    AssertDimension(positions.size(), n_locally_owned_particle_ids());
 
     unsigned int i = 0;
     for (auto it = begin(); it != end(); ++it, ++i)
@@ -833,7 +833,7 @@ namespace Particles
     const bool                          displace_particles)
   {
     // There should be one point per particle to fix the new position
-    AssertDimension(new_positions.size(), n_locally_owned_particles());
+    AssertDimension(new_positions.size(), n_locally_owned_particle_ids());
 
     unsigned int i = 0;
     for (auto it = begin(); it != end(); ++it, ++i)
@@ -929,7 +929,7 @@ namespace Particles
     // processes around (with an invalid cell).
 
     std::vector<particle_iterator> particles_out_of_cell;
-    particles_out_of_cell.reserve(n_locally_owned_particles());
+    particles_out_of_cell.reserve(n_locally_owned_particle_ids());
 
     // Now update the reference locations of the moved particles
     std::vector<Point<spacedim>> real_locations;

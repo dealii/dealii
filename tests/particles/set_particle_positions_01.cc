@@ -65,7 +65,7 @@ test()
   auto cpu_to_index =
     particle_handler.insert_global_particles(points, global_bounding_boxes);
 
-  const auto set = particle_handler.locally_relevant_ids().tensor_product(
+  const auto set = particle_handler.locally_owned_particle_ids().tensor_product(
     complete_index_set(spacedim));
 
   TrilinosWrappers::MPI::Vector vector(set, MPI_COMM_WORLD);
@@ -81,8 +81,9 @@ test()
 
   // Make sure we have a new index set
 
-  const auto new_set = particle_handler.locally_relevant_ids().tensor_product(
-    complete_index_set(spacedim));
+  const auto new_set =
+    particle_handler.locally_owned_particle_ids().tensor_product(
+      complete_index_set(spacedim));
 
   TrilinosWrappers::MPI::Vector new_vector(new_set, MPI_COMM_WORLD);
 
