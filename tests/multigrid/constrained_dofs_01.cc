@@ -121,7 +121,6 @@ check_fe(FiniteElement<dim> &fe)
         std::vector<types::global_dof_index> &renumbered =
           mgdofmap[cell->id().to_string()];
         cell->set_mg_dof_indices(renumbered);
-        cell->update_cell_dof_indices_cache();
       }
 
     mg_constrained_dofs_ref.initialize(dofhref);
