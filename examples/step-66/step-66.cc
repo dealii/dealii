@@ -853,17 +853,21 @@ namespace Step66
         compute_update();
 
 
+        // Then we compute the errors, namely the norm of the Newton update
+        // and the residual. Note, at this point one could incorporate a step
+        // size control for the Newton method by playing with the input
+        // parameter alpha for the compute_residual function. However, here we
+        // just use alpha equal to one for a plain Newton iteration.
+        const double ERRx = newton_update.l2_norm();
+        const double ERRf = compute_residual(1.0);
+
+
         // Next we advance the Newton step by adding the Newton update to the
         // current Newton step.
         solution.add(1.0, newton_update);
 
 
-        // Then we compute the errors, namely the norm of the Newton update
-        // and the residual. A short output will inform us on the current Newton
-        // step.
-        const double ERRx = newton_update.l2_norm();
-        const double ERRf = compute_residual(1.0);
-
+        // A short output will inform us on the current Newton step.
         pcout << "   Nstep " << newton_step << ", errf = " << ERRf
               << ", errx = " << ERRx << ", it = " << linear_iterations
               << std::endl;
