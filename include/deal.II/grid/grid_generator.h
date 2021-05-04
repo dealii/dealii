@@ -2410,8 +2410,8 @@ namespace GridGenerator
    * for creating a linear/bilinear surface mesh on the iso line/contour of a
    * scalar field.
    *
-   * To increase the approximation of the iso line/contour and the resulting
-   * linear surface mesh, one increase the number of subdivision so that the
+   * To improve the approximation of the iso line/contour and the resulting
+   * linear surface mesh, one increases the number of subdivision so that the
    * algorithm is not run on a cell but on subcells with vertex values having
    * been interpolated from the cell values.
    *
@@ -2454,21 +2454,11 @@ namespace GridGenerator
      *   of subdivisions in this case.
      */
     void
-    process_cell(std::vector<value_type> &    ls_values,
-                 const std::vector<Point<2>> &points,
-                 const double                 iso_level,
-                 std::vector<Point<2>> &      vertices,
-                 std::vector<CellData<1>> &   cells) const;
-
-    /**
-     * Process a cell (3D).
-     */
-    void
-    process_cell(std::vector<value_type> &    ls_values,
-                 const std::vector<Point<3>> &points,
-                 const double                 iso_level,
-                 std::vector<Point<3>> &      vertices,
-                 std::vector<CellData<2>> &   cells) const;
+    process_cell(std::vector<value_type> &       ls_values,
+                 const std::vector<Point<dim>> & points,
+                 const double                    iso_level,
+                 std::vector<Point<dim>> &       vertices,
+                 std::vector<CellData<dim - 1>> &cells) const;
 
     /**
      * Process the cell @p cell. Calls the above functions but allows the users
@@ -2488,7 +2478,7 @@ namespace GridGenerator
      * equally-positioned quadrature points.
      */
     static Quadrature<dim>
-    create_qudrature_rule(const unsigned int n_subdivisions);
+    create_quadrature_rule(const unsigned int n_subdivisions);
 
     /**
      * Process a sub-cell (2D).
@@ -2496,24 +2486,24 @@ namespace GridGenerator
      * @note Subcells with saddle points are ignored. Please increase the number
      *   of subdivisions in this case.
      */
-    static void
+    void
     process_sub_cell(const std::vector<value_type> & ls_values,
                      const std::vector<Point<2>> &   points,
                      const std::vector<unsigned int> mask,
                      const double                    iso_level,
                      std::vector<Point<2>> &         vertices,
-                     std::vector<CellData<1>> &      cells);
+                     std::vector<CellData<1>> &      cells) const;
 
     /**
      * Process a sub-cell (3D).
      */
-    static void
+    void
     process_sub_cell(const std::vector<value_type> & ls_values,
                      const std::vector<Point<3>> &   points,
                      const std::vector<unsigned int> mask,
                      const double                    iso_level,
                      std::vector<Point<3>> &         vertices,
-                     std::vector<CellData<2>> &      cells);
+                     std::vector<CellData<2>> &      cells) const;
 
     /**
      * Number of subdivisions defined in the constructor.
@@ -2535,11 +2525,12 @@ namespace GridGenerator
   template <int dim, typename VectorType>
   void
   create_triangulation_with_marching_cube_algorithm(
-    const MarchingCubeAlgorithm<dim, VectorType> &mc,
-    const DoFHandler<dim> &                       background_dof_handler,
-    const VectorType &                            ls_vector,
-    const double                                  iso_level,
-    Triangulation<dim - 1, dim> &                 tria);
+    const Mapping<dim> &         mapping,
+    const DoFHandler<dim> &      background_dof_handler,
+    const VectorType &           ls_vector,
+    const double                 iso_level,
+    const unsigned int           n_subdivisions,
+    Triangulation<dim - 1, dim> &tria);
 
   ///@}
 

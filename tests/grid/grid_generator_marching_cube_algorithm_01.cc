@@ -148,14 +148,16 @@ test(const unsigned int n_subdivisions, const double iso_level)
 
   ls_vector.update_ghost_values();
 
-  GridGenerator::MarchingCubeAlgorithm<spacedim, VectorType> mc(
-    background_mapping, background_dof_handler.get_fe(), n_subdivisions);
-
   parallel::shared::Triangulation<dim, spacedim> tria(
     MPI_COMM_WORLD, Triangulation<dim, spacedim>::none, true);
 
   GridGenerator::create_triangulation_with_marching_cube_algorithm(
-    mc, background_dof_handler, ls_vector, iso_level, tria);
+    background_mapping,
+    background_dof_handler,
+    ls_vector,
+    iso_level,
+    n_subdivisions,
+    tria);
 
   // write computed vectors to Paraview
   if (true)

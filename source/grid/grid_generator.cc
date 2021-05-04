@@ -8454,7 +8454,7 @@ namespace GridGenerator
     : n_subdivisions(n_subdivisions)
     , fe_values(mapping,
                 fe,
-                create_qudrature_rule(n_subdivisions),
+                create_quadrature_rule(n_subdivisions),
                 update_values | update_quadrature_points)
   {}
 
@@ -8462,7 +8462,7 @@ namespace GridGenerator
 
   template <int dim, typename VectorType>
   Quadrature<dim>
-  MarchingCubeAlgorithm<dim, VectorType>::create_qudrature_rule(
+  MarchingCubeAlgorithm<dim, VectorType>::create_quadrature_rule(
     const unsigned int n_subdivisions)
   {
     std::vector<Point<dim>> quadrature_points;
@@ -8528,55 +8528,48 @@ namespace GridGenerator
   template <int dim, typename VectorType>
   void
   MarchingCubeAlgorithm<dim, VectorType>::process_cell(
-    std::vector<value_type> &    ls_values,
-    const std::vector<Point<2>> &points,
-    const double                 iso_level,
-    std::vector<Point<2>> &      vertices,
-    std::vector<CellData<1>> &   cells) const
-  {
-    for (unsigned int j = 0; j < n_subdivisions; ++j)
-      for (unsigned int i = 0; i < n_subdivisions; ++i)
-        {
-          std::vector<unsigned int> mask{
-            (n_subdivisions + 1) * (j + 0) + (i + 0),
-            (n_subdivisions + 1) * (j + 0) + (i + 1),
-            (n_subdivisions + 1) * (j + 1) + (i + 1),
-            (n_subdivisions + 1) * (j + 1) + (i + 0)};
-
-          process_sub_cell(ls_values, points, mask, iso_level, vertices, cells);
-        }
-  }
-
-
-
-  template <int dim, typename VectorType>
-  void
-  MarchingCubeAlgorithm<dim, VectorType>::process_cell(
-    std::vector<value_type> &    ls_values,
-    const std::vector<Point<3>> &points,
-    const double                 iso_level,
-    std::vector<Point<3>> &      vertices,
-    std::vector<CellData<2>> &   cells) const
+    std::vector<value_type> &       ls_values,
+    const std::vector<Point<dim>> & points,
+    const double                    iso_level,
+    std::vector<Point<dim>> &       vertices,
+    std::vector<CellData<dim - 1>> &cells) const
   {
     const unsigned p = n_subdivisions + 1;
 
-    for (unsigned int k = 0; k < n_subdivisions; ++k)
-      for (unsigned int j = 0; j < n_subdivisions; ++j)
-        for (unsigned int i = 0; i < n_subdivisions; ++i)
-          {
-            std::vector<unsigned int> mask{
-              p * p * (k + 0) + p * (j + 0) + (i + 0),
-              p * p * (k + 0) + p * (j + 0) + (i + 1),
-              p * p * (k + 0) + p * (j + 1) + (i + 1),
-              p * p * (k + 0) + p * (j + 1) + (i + 0),
-              p * p * (k + 1) + p * (j + 0) + (i + 0),
-              p * p * (k + 1) + p * (j + 0) + (i + 1),
-              p * p * (k + 1) + p * (j + 1) + (i + 1),
-              p * p * (k + 1) + p * (j + 1) + (i + 0)};
+    if (dim == 2)
+      {
+        for (unsigned int j = 0; j < n_subdivisions; ++j)
+          for (unsigned int i = 0; i < n_subdivisions; ++i)
+            {
+              std::vector<unsigned int> mask{p * (j + 0) + (i + 0),
+                                             p * (j + 0) + (i + 1),
+                                             p * (j + 1) + (i + 1),
+                                             p * (j + 1) + (i + 0)};
 
-            process_sub_cell(
-              ls_values, points, mask, iso_level, vertices, cells);
-          }
+              process_sub_cell(
+                ls_values, points, mask, iso_level, vertices, cells);
+            }
+      }
+    else if (dim == 3)
+      {
+        for (unsigned int k = 0; k < n_subdivisions; ++k)
+          for (unsigned int j = 0; j < n_subdivisions; ++j)
+            for (unsigned int i = 0; i < n_subdivisions; ++i)
+              {
+                std::vector<unsigned int> mask{
+                  p * p * (k + 0) + p * (j + 0) + (i + 0),
+                  p * p * (k + 0) + p * (j + 0) + (i + 1),
+                  p * p * (k + 0) + p * (j + 1) + (i + 1),
+                  p * p * (k + 0) + p * (j + 1) + (i + 0),
+                  p * p * (k + 1) + p * (j + 0) + (i + 0),
+                  p * p * (k + 1) + p * (j + 0) + (i + 1),
+                  p * p * (k + 1) + p * (j + 1) + (i + 1),
+                  p * p * (k + 1) + p * (j + 1) + (i + 0)};
+
+                process_sub_cell(
+                  ls_values, points, mask, iso_level, vertices, cells);
+              }
+      }
   }
 
 
@@ -8685,7 +8678,7 @@ namespace GridGenerator
     const std::vector<unsigned int> mask,
     const double                    iso_level,
     std::vector<Point<2>> &         vertices,
-    std::vector<CellData<1>> &      cells)
+    std::vector<CellData<1>> &      cells) const
   {
     // set up dimension-dependent sizes and tables
     static constexpr unsigned int n_vertices     = 4;
@@ -8761,7 +8754,7 @@ namespace GridGenerator
     const std::vector<unsigned int> mask,
     const double                    iso_level,
     std::vector<Point<3>> &         vertices,
-    std::vector<CellData<2>> &      cells)
+    std::vector<CellData<2>> &      cells) const
   {
     // set up dimension-dependent sizes and tables
     static constexpr unsigned int n_vertices     = 8;
@@ -9095,15 +9088,19 @@ namespace GridGenerator
   template <int dim, typename VectorType>
   void
   create_triangulation_with_marching_cube_algorithm(
-    const MarchingCubeAlgorithm<dim, VectorType> &mc,
-    const DoFHandler<dim> &                       background_dof_handler,
-    const VectorType &                            ls_vector,
-    const double                                  iso_level,
-    Triangulation<dim - 1, dim> &                 tria)
+    const Mapping<dim> &         mapping,
+    const DoFHandler<dim> &      background_dof_handler,
+    const VectorType &           ls_vector,
+    const double                 iso_level,
+    const unsigned int           n_subdivisions,
+    Triangulation<dim - 1, dim> &tria)
   {
     std::vector<Point<dim>>        vertices;
     std::vector<CellData<dim - 1>> cells;
     SubCellData                    subcelldata;
+
+    const MarchingCubeAlgorithm<dim, VectorType> mc(
+      mapping, background_dof_handler.get_fe(), n_subdivisions);
 
     mc.process(background_dof_handler, ls_vector, iso_level, vertices, cells);
 
