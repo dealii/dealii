@@ -409,19 +409,20 @@ namespace Step15
     solution_transfer.interpolate(current_solution, tmp);
     current_solution = tmp;
 
-    // On the new mesh, there are different hanging nodes, which we have to
-    // compute again. To ensure there are no hanging nodes of the old mesh in
-    // the object, it's first cleared.  To be on the safe side, we then also
-    // make sure that the current solution's vector entries satisfy the
-    // hanging node constraints (see the discussion in the documentation of
-    // the SolutionTransfer class for why this is necessary):
+    // On the new mesh, there are different hanging nodes, for which we have to
+    // compute constraints again, after throwing away previous content of the
+    // object. To be on the safe side, we should then also make sure that the
+    // current solution's vector entries satisfy the hanging node constraints
+    // (see the discussion in the documentation of the SolutionTransfer class
+    // for why this is necessary). We could do this by calling
+    // `hanging_node_constraints.distribute(current_solution)` explicitly; we
+    // omit this step because this will happen at the end of the call to
+    // `set_boundary_values()` below, and it is not necessary to do it twice.
     hanging_node_constraints.clear();
 
     DoFTools::make_hanging_node_constraints(dof_handler,
                                             hanging_node_constraints);
     hanging_node_constraints.close();
-
-    hanging_node_constraints.distribute(current_solution);
 
     // Once we have the interpolated solution and all information about
     // hanging nodes, we have to make sure that the $u^n$ we now have
