@@ -384,8 +384,9 @@ namespace VectorTools
    * @f}
    * where $\vec{n}$ is an outward normal vector.
    *
-   * This function throws exception if used with $H_{curl}$ conforming elements,
-   * so the project_boundary_values_curl_conforming() should be used instead.
+   * This function throws an exception if used with $H_\text{curl}$ conforming
+   * elements, so the project_boundary_values_curl_conforming() should be used
+   * instead.
    *
    * @param[in] mapping The mapping that will be used in the transformations
    * necessary to integrate along the boundary.
