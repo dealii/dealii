@@ -239,7 +239,7 @@ namespace Particles
     bool
     operator==(const ParticleAccessor<dim, spacedim> &other) const;
 
-  protected:
+  private:
     /**
      * Construct an invalid accessor. Such an object is not usable.
      */
@@ -247,7 +247,7 @@ namespace Particles
 
     /**
      * Construct an accessor from a reference to a map and an iterator to the
-     * map. This constructor is protected so that it can only be accessed by
+     * map. This constructor is `private` so that it can only be accessed by
      * friend classes.
      */
     ParticleAccessor(
