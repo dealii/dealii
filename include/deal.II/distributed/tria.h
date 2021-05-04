@@ -973,10 +973,11 @@ namespace parallel
        * constructed (see also the class documentation).
        */
       explicit Triangulation(
-        const MPI_Comm &mpi_communicator,
+        const MPI_Comm & /*mpi_communicator*/,
         const typename dealii::Triangulation<dim, spacedim>::MeshSmoothing
-                       smooth_grid = (dealii::Triangulation<dim, spacedim>::none),
-        const Settings settings    = default_setting) = delete;
+        /*smooth_grid*/
+        = (dealii::Triangulation<dim, spacedim>::none),
+        const Settings /*settings*/ = default_setting) = delete;
 
       /**
        * Dummy replacement to allow for better error messages when compiling
@@ -993,7 +994,7 @@ namespace parallel
        * this class.
        */
       virtual void
-      save(const std::string &filename) const override
+      save(const std::string & /*filename*/) const override
       {}
 
       /**
@@ -1001,8 +1002,8 @@ namespace parallel
        * this class.
        */
       virtual void
-      load(const std::string &filename,
-           const bool         autopartition = true) override
+      load(const std::string & /*filename*/,
+           const bool /*autopartition*/ = true) override
       {}
 
       /**
