@@ -415,10 +415,10 @@ namespace Step66
     // variable, since we need to set it up only once when the tirangulation has
     // changed and then can reuse it in each Newton step.
     MGConstrainedDoFs mg_constrained_dofs;
-    typedef JacobianOperator<dim, degree_finite_element, float> LevelMatrixType;
-    MGLevelObject<LevelMatrixType>                              mg_matrices;
-    MGLevelObject<LinearAlgebra::distributed::Vector<float>>    mg_solution;
-    MGTransferMatrixFree<dim, float>                            mg_transfer;
+    using LevelMatrixType = JacobianOperator<dim, degree_finite_element, float>;
+    MGLevelObject<LevelMatrixType>                           mg_matrices;
+    MGLevelObject<LinearAlgebra::distributed::Vector<float>> mg_solution;
+    MGTransferMatrixFree<dim, float>                         mg_transfer;
 
 
     // Of course we need also vector holding the solution, the Newton update and
