@@ -404,31 +404,33 @@ namespace Step15
     // values of the old solution, but rather indices, we need to preserve the
     // old solution vector until we have gotten the new interpolated
     // values. Thus, we have the new values written into a temporary vector,
-    // and only afterwards write them into the solution vector object. Once we
-    // have this solution we have to make sure that the $u^n$ we now have
-    // actually has the correct boundary values. As explained at the end of
-    // the introduction, this is not automatically the case even if the
-    // solution before refinement had the correct boundary values, and so we
-    // have to explicitly make sure that it now has:
+    // and only afterwards write them into the solution vector object:
     Vector<double> tmp(dof_handler.n_dofs());
     solution_transfer.interpolate(current_solution, tmp);
     current_solution = tmp;
 
-    set_boundary_values();
-
-    // On the new mesh, there are different hanging nodes, which we have to
-    // compute again. To ensure there are no hanging nodes of the old mesh in
-    // the object, it's first cleared.  To be on the safe side, we then also
-    // make sure that the current solution's vector entries satisfy the
-    // hanging node constraints (see the discussion in the documentation of
-    // the SolutionTransfer class for why this is necessary):
+    // On the new mesh, there are different hanging nodes, for which we have to
+    // compute constraints again, after throwing away previous content of the
+    // object. To be on the safe side, we should then also make sure that the
+    // current solution's vector entries satisfy the hanging node constraints
+    // (see the discussion in the documentation of the SolutionTransfer class
+    // for why this is necessary). We could do this by calling
+    // `hanging_node_constraints.distribute(current_solution)` explicitly; we
+    // omit this step because this will happen at the end of the call to
+    // `set_boundary_values()` below, and it is not necessary to do it twice.
     hanging_node_constraints.clear();
 
     DoFTools::make_hanging_node_constraints(dof_handler,
                                             hanging_node_constraints);
     hanging_node_constraints.close();
 
-    hanging_node_constraints.distribute(current_solution);
+    // Once we have the interpolated solution and all information about
+    // hanging nodes, we have to make sure that the $u^n$ we now have
+    // actually has the correct boundary values. As explained at the end of
+    // the introduction, this is not automatically the case even if the
+    // solution before refinement had the correct boundary values, and so we
+    // have to explicitly make sure that it now has:
+    set_boundary_values();
 
     // We end the function by updating all the remaining data structures,
     // indicating to <code>setup_dofs()</code> that this is not the first
@@ -445,9 +447,15 @@ namespace Step15
   // boundary values for our problem.  Having refined the mesh (or just
   // started computations), there might be new nodal points on the
   // boundary. These have values that are simply interpolated from the
-  // previous mesh (or are just zero), instead of the correct boundary
-  // values. This is fixed up by setting all boundary nodes explicit to the
-  // right value:
+  // previous mesh in `refine_mesh()`, instead of the correct boundary
+  // values. This is fixed up by setting all boundary nodes of the current
+  // solution vector explicit to the right value.
+  //
+  // There is one issue we have to pay attention to, though: If we have
+  // a hanging node right next to a new boundary node, then its value
+  // must also be adjusted to make sure that the finite element field
+  // remains continuous. This is what the call in the last line of this
+  // function does.
   template <int dim>
   void MinimalSurfaceProblem<dim>::set_boundary_values()
   {
@@ -458,6 +466,8 @@ namespace Step15
                                              boundary_values);
     for (auto &boundary_value : boundary_values)
       current_solution(boundary_value.first) = boundary_value.second;
+
+    hanging_node_constraints.distribute(current_solution);
   }
 
 
