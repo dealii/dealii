@@ -803,3 +803,19 @@ compressible Navier--Stokes equations by adding viscous terms, as described in
 here despite the additional cost of elliptic terms, e.g. via an interior
 penalty method, one can switch the basis from FE_DGQ to FE_DGQHermite like in
 the step-59 tutorial program.
+
+
+<h4>Using cell-centric loops and shared memory</h4>
+
+In this tutorial, we used face-centric loops. Here, cell and face integrals
+are treated in separate loops, resulting in multiple writing accesses into the
+result vector, which is relatively expensive on modern hardware since writing
+operations generally result also in an implicit read operation. Element-centric
+loops, on the other hand, are processing a cell and in direct succession
+processing all its 2d faces. Although this kind of loop implies that fluxes have
+to be computed twice (for each side of an interior face), the fact that the
+result vector has to accessed only once might - and the fact that the resulting
+algorithm is free of race-conditions and as such perfectly suitable for
+shared memory - already give a performance boost. If you are interested in these
+advanced topics, you can take a look at step-76 where we take the present
+tutorial and modify it so that we can use these features.
