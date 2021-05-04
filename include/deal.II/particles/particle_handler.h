@@ -497,7 +497,7 @@ namespace Particles
      * get_particle_positions() function, and then modify the resulting vector.
      *
      * @param [in] new_positions A vector of points of dimension
-     * particle_handler.n_locally_owned_particle_ids()
+     * particle_handler.n_locally_owned_particles()
      *
      * @param [in] displace_particles When true, this function adds the value
      * of the vector of points to the
@@ -641,7 +641,7 @@ namespace Particles
      * triangulation.
      */
     types::particle_index
-    n_locally_owned_particle_ids() const;
+    n_locally_owned_particles() const;
 
     /**
      * Return the next free particle index in the global set

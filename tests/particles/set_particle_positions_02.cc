@@ -72,10 +72,10 @@ test()
   Tensor<1, spacedim> displacement;
   displacement[0] = 0.1;
   std::vector<Point<spacedim>> new_particle_positions(
-    particle_handler.n_locally_owned_particle_ids());
+    particle_handler.n_locally_owned_particles());
 
   std::vector<Point<spacedim>> old_particle_positions(
-    particle_handler.n_locally_owned_particle_ids());
+    particle_handler.n_locally_owned_particles());
   particle_handler.get_particle_positions(old_particle_positions);
 
   for (unsigned int i = 0; i < old_particle_positions.size(); ++i)

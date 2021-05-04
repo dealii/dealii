@@ -40,7 +40,7 @@ namespace Particles
         "belong to a single vector or tensor."));
 
     if ((data_component_names.size() > 0) &&
-        (particles.n_locally_owned_particle_ids() > 0))
+        (particles.n_locally_owned_particles() > 0))
       {
         Assert(
           particles.begin()->has_properties(),
@@ -75,7 +75,7 @@ namespace Particles
     const unsigned int n_property_components = data_component_names.size();
     const unsigned int n_data_components     = dataset_names.size();
 
-    patches.resize(particles.n_locally_owned_particle_ids());
+    patches.resize(particles.n_locally_owned_particles());
 
     auto particle = particles.begin();
     for (unsigned int i = 0; particle != particles.end(); ++particle, ++i)

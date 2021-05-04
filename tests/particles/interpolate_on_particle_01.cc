@@ -78,7 +78,7 @@ test()
             << particle_handler.n_global_particles() << std::endl;
 
   const auto n_local_particles_dofs =
-    particle_handler.n_locally_owned_particle_ids() * n_comps;
+    particle_handler.n_locally_owned_particles() * n_comps;
 
   auto particle_sizes =
     Utilities::MPI::all_gather(MPI_COMM_WORLD, n_local_particles_dofs);
