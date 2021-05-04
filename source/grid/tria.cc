@@ -4070,20 +4070,17 @@ namespace internal
       {
         AssertDimension(dim, 2);
 
-        {
-          typename Triangulation<dim, spacedim>::raw_cell_iterator
-            cell = triangulation.begin_active(triangulation.levels.size() - 1),
-            endc = triangulation.end();
-          for (; cell != endc; ++cell)
-            if (cell->used())
-              if (cell->refine_flag_set())
-                {
-                  triangulation.levels.push_back(
-                    std::make_unique<
-                      internal::TriangulationImplementation::TriaLevel>(dim));
-                  break;
-                }
-        }
+        // Check whether a new level is needed. We have to check for
+        // this on the highest level only
+        for (const auto &cell : triangulation.active_cell_iterators_on_level(
+               triangulation.levels.size() - 1))
+          if (cell->refine_flag_set())
+            {
+              triangulation.levels.push_back(
+                std::make_unique<
+                  internal::TriangulationImplementation::TriaLevel>(dim));
+              break;
+            }
 
         for (typename Triangulation<dim, spacedim>::line_iterator line =
                triangulation.begin_line();
@@ -4614,23 +4611,17 @@ namespace internal
       {
         const unsigned int dim = 1;
 
-        // check whether a new level is needed we have to check for
-        // this on the highest level only (on this, all used cells are
-        // also active, so we only have to check for this)
-        {
-          typename Triangulation<dim, spacedim>::raw_cell_iterator
-            cell = triangulation.begin_active(triangulation.levels.size() - 1),
-            endc = triangulation.end();
-          for (; cell != endc; ++cell)
-            if (cell->used())
-              if (cell->refine_flag_set())
-                {
-                  triangulation.levels.push_back(
-                    std::make_unique<
-                      internal::TriangulationImplementation::TriaLevel>(dim));
-                  break;
-                }
-        }
+        // Check whether a new level is needed. We have to check for
+        // this on the highest level only
+        for (const auto &cell : triangulation.active_cell_iterators_on_level(
+               triangulation.levels.size() - 1))
+          if (cell->refine_flag_set())
+            {
+              triangulation.levels.push_back(
+                std::make_unique<
+                  internal::TriangulationImplementation::TriaLevel>(dim));
+              break;
+            }
 
 
         // check how much space is needed on every level we need not
@@ -4855,42 +4846,34 @@ namespace internal
         const unsigned int dim = 2;
 
 
+        // First check whether we can get away with isotropic refinement, or
+        // whether we need to run through the full anisotropic algorithm
         {
-          bool flag_isotropic_mesh = true;
-          typename Triangulation<dim, spacedim>::raw_cell_iterator
-            cell = triangulation.begin(),
-            endc = triangulation.end();
-          for (; cell != endc; ++cell)
-            if (cell->used())
-              if (cell->refine_flag_set() == RefinementCase<dim>::cut_x ||
-                  cell->refine_flag_set() == RefinementCase<dim>::cut_y)
-                {
-                  flag_isotropic_mesh = false;
-                  break;
-                }
+          bool do_isotropic_refinement = true;
+          for (const auto &cell : triangulation.active_cell_iterators())
+            if (cell->refine_flag_set() == RefinementCase<dim>::cut_x ||
+                cell->refine_flag_set() == RefinementCase<dim>::cut_y)
+              {
+                do_isotropic_refinement = false;
+                break;
+              }
 
-          if (flag_isotropic_mesh)
+          if (do_isotropic_refinement)
             return execute_refinement_isotropic(triangulation,
                                                 check_for_distorted_cells);
         }
 
-        // check whether a new level is needed we have to check for
-        // this on the highest level only (on this, all used cells are
-        // also active, so we only have to check for this)
-        {
-          typename Triangulation<dim, spacedim>::raw_cell_iterator
-            cell = triangulation.begin_active(triangulation.levels.size() - 1),
-            endc = triangulation.end();
-          for (; cell != endc; ++cell)
-            if (cell->used())
-              if (cell->refine_flag_set())
-                {
-                  triangulation.levels.push_back(
-                    std::make_unique<
-                      internal::TriangulationImplementation::TriaLevel>(dim));
-                  break;
-                }
-        }
+        // Check whether a new level is needed. We have to check for
+        // this on the highest level only
+        for (const auto &cell : triangulation.active_cell_iterators_on_level(
+               triangulation.levels.size() - 1))
+          if (cell->refine_flag_set())
+            {
+              triangulation.levels.push_back(
+                std::make_unique<
+                  internal::TriangulationImplementation::TriaLevel>(dim));
+              break;
+            }
 
         // TODO[WB]: we clear user flags and pointers of lines; we're going
         // to use them to flag which lines need refinement
@@ -5196,23 +5179,17 @@ namespace internal
         // functions above.
         Assert(spacedim == 3, ExcNotImplemented());
 
-        // check whether a new level is needed we have to check for
-        // this on the highest level only (on this, all used cells are
-        // also active, so we only have to check for this)
-        {
-          typename Triangulation<dim, spacedim>::raw_cell_iterator
-            cell = triangulation.begin_active(triangulation.levels.size() - 1),
-            endc = triangulation.end();
-          for (; cell != endc; ++cell)
-            if (cell->used())
-              if (cell->refine_flag_set())
-                {
-                  triangulation.levels.push_back(
-                    std::make_unique<
-                      internal::TriangulationImplementation::TriaLevel>(dim));
-                  break;
-                }
-        }
+        // Check whether a new level is needed. We have to check for
+        // this on the highest level only
+        for (const auto &cell : triangulation.active_cell_iterators_on_level(
+               triangulation.levels.size() - 1))
+          if (cell->refine_flag_set())
+            {
+              triangulation.levels.push_back(
+                std::make_unique<
+                  internal::TriangulationImplementation::TriaLevel>(dim));
+              break;
+            }
 
 
         // first clear user flags for quads and lines; we're going to
