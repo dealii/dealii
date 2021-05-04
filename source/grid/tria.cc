@@ -1280,30 +1280,17 @@ namespace internal
                                         tria_level.neighbors.size(),
                                       std::make_pair(-1, -1));
 
-
-          if (tria_level.dim == 3)
-            {
-              tria_level.face_orientations.reserve(
-                total_cells * GeometryInfo<3>::faces_per_cell);
-              tria_level.face_orientations.insert(
-                tria_level.face_orientations.end(),
-                total_cells * GeometryInfo<3>::faces_per_cell -
-                  tria_level.face_orientations.size(),
-                true);
-            }
-          else if (tria_level.dim == 2) // TODO: not needed for QUADs!!!
-            {                           // we need to pass the information here
-              tria_level.face_orientations.reserve(
-                total_cells * GeometryInfo<2>::faces_per_cell);
-              tria_level.face_orientations.insert(
-                tria_level.face_orientations.end(),
-                total_cells * GeometryInfo<2>::faces_per_cell -
-                  tria_level.face_orientations.size(),
-                true);
-            }
-
           if (tria_level.dim == 2 || tria_level.dim == 3)
             {
+              const unsigned int max_faces_per_cell = 2 * dimension;
+              tria_level.face_orientations.reserve(total_cells *
+                                                   max_faces_per_cell);
+              tria_level.face_orientations.insert(
+                tria_level.face_orientations.end(),
+                total_cells * max_faces_per_cell -
+                  tria_level.face_orientations.size(),
+                true);
+
               tria_level.reference_cell.reserve(total_cells);
               tria_level.reference_cell.insert(
                 tria_level.reference_cell.end(),
@@ -1418,31 +1405,15 @@ namespace internal
           // only allocate space if necessary
           if (new_size > tria_objects.n_objects())
             {
-              unsigned int faces_per_cell        = 1;
-              unsigned int max_children_per_cell = 1;
+              const unsigned int max_faces_per_cell =
+                2 * tria_objects.structdim;
+              const unsigned int max_children_per_cell =
+                1 << tria_objects.structdim;
 
-              if (tria_objects.structdim == 1)
-                faces_per_cell = GeometryInfo<1>::faces_per_cell;
-              else if (tria_objects.structdim == 2)
-                faces_per_cell = GeometryInfo<2>::faces_per_cell;
-              else if (tria_objects.structdim == 3)
-                faces_per_cell = GeometryInfo<3>::faces_per_cell;
-              else
-                AssertThrow(false, ExcNotImplemented());
-
-              if (tria_objects.structdim == 1)
-                max_children_per_cell = GeometryInfo<1>::max_children_per_cell;
-              else if (tria_objects.structdim == 2)
-                max_children_per_cell = GeometryInfo<2>::max_children_per_cell;
-              else if (tria_objects.structdim == 3)
-                max_children_per_cell = GeometryInfo<3>::max_children_per_cell;
-              else
-                AssertThrow(false, ExcNotImplemented());
-
-              tria_objects.cells.reserve(new_size * faces_per_cell);
+              tria_objects.cells.reserve(new_size * max_faces_per_cell);
               tria_objects.cells.insert(tria_objects.cells.end(),
                                         (new_size - tria_objects.n_objects()) *
-                                          faces_per_cell,
+                                          max_faces_per_cell,
                                         -1);
 
               tria_objects.used.reserve(new_size);
@@ -1505,21 +1476,13 @@ namespace internal
           // see above...
           if (new_size > tria_objects.n_objects())
             {
-              unsigned int faces_per_cell = 1;
+              const unsigned int max_faces_per_cell =
+                2 * tria_objects.structdim;
 
-              if (tria_objects.structdim == 1)
-                faces_per_cell = GeometryInfo<1>::faces_per_cell;
-              else if (tria_objects.structdim == 2)
-                faces_per_cell = GeometryInfo<2>::faces_per_cell;
-              else if (tria_objects.structdim == 3)
-                faces_per_cell = GeometryInfo<3>::faces_per_cell;
-              else
-                AssertThrow(false, ExcNotImplemented());
-
-              tria_objects.cells.reserve(new_size * faces_per_cell);
+              tria_objects.cells.reserve(new_size * max_faces_per_cell);
               tria_objects.cells.insert(tria_objects.cells.end(),
                                         (new_size - tria_objects.n_objects()) *
-                                          faces_per_cell,
+                                          max_faces_per_cell,
                                         -1);
 
               tria_objects.used.reserve(new_size);
@@ -2658,10 +2621,7 @@ namespace internal
       {
         const unsigned int dim = faces.dim;
 
-        const unsigned int faces_per_cell =
-          structdim == 1 ? GeometryInfo<1>::faces_per_cell :
-                           (structdim == 2 ? GeometryInfo<2>::faces_per_cell :
-                                             GeometryInfo<3>::faces_per_cell);
+        const unsigned int max_faces_per_cell = 2 * structdim;
 
         if (dim == 3 && structdim == 2)
           {
@@ -2670,7 +2630,7 @@ namespace internal
                                              dealii::ReferenceCells::Invalid);
 
             // quad line orientations
-            faces.quads_line_orientations.assign(size * faces_per_cell, -1);
+            faces.quads_line_orientations.assign(size * max_faces_per_cell, -1);
           }
       }
 
@@ -2684,10 +2644,7 @@ namespace internal
       {
         const unsigned int dim = level.dim;
 
-        const unsigned int faces_per_cell =
-          dim == 1 ? GeometryInfo<1>::faces_per_cell :
-                     (dim == 2 ? GeometryInfo<2>::faces_per_cell :
-                                 GeometryInfo<3>::faces_per_cell);
+        const unsigned int max_faces_per_cell = 2 * dim;
 
         level.active_cell_indices.assign(size, -1);
         level.subdomain_ids.assign(size, 0);
@@ -2701,12 +2658,12 @@ namespace internal
         if (dim < spacedim)
           level.direction_flags.assign(size, true);
 
-        level.neighbors.assign(size * faces_per_cell, {-1, -1});
+        level.neighbors.assign(size * max_faces_per_cell, {-1, -1});
 
         level.reference_cell.assign(size, dealii::ReferenceCells::Invalid);
 
         if (orientation_needed)
-          level.face_orientations.assign(size * faces_per_cell, -1);
+          level.face_orientations.assign(size * max_faces_per_cell, -1);
 
         level.global_active_cell_indices.assign(size,
                                                 numbers::invalid_dof_index);
@@ -2721,15 +2678,8 @@ namespace internal
       {
         const unsigned int structdim = obj.structdim;
 
-        const unsigned int max_children_per_cell =
-          structdim == 1 ?
-            GeometryInfo<1>::max_children_per_cell :
-            (structdim == 2 ? GeometryInfo<2>::max_children_per_cell :
-                              GeometryInfo<3>::max_children_per_cell);
-        const unsigned int faces_per_cell =
-          structdim == 1 ? GeometryInfo<1>::faces_per_cell :
-                           (structdim == 2 ? GeometryInfo<2>::faces_per_cell :
-                                             GeometryInfo<3>::faces_per_cell);
+        const unsigned int max_children_per_cell = 1 << structdim;
+        const unsigned int max_faces_per_cell    = 2 * structdim;
 
         obj.used.assign(size, true);
         obj.boundary_or_material_id.assign(
@@ -2745,7 +2695,7 @@ namespace internal
 
         obj.children.assign(max_children_per_cell / 2 * size, -1);
 
-        obj.cells.assign(faces_per_cell * size, -1);
+        obj.cells.assign(max_faces_per_cell * size, -1);
 
         if (structdim <= 2)
           {
