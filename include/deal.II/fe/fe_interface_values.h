@@ -1393,6 +1393,7 @@ inline const FEInterfaceViews::Vector<dim, spacedim>
     (fe.n_components() >= Tensor<1, spacedim>::n_independent_components ?
        fe.n_components() - Tensor<1, spacedim>::n_independent_components + 1 :
        0);
+  (void)n_vectors;
   AssertIndexRange(vector.first_vector_component, n_vectors);
   return FEInterfaceViews::Vector<dim, spacedim>(*this,
                                                  vector.first_vector_component);
