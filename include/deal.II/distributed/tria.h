@@ -958,10 +958,61 @@ namespace parallel
     {
     public:
       /**
+       * Dummy settings to allow defining the deleted constructor.
+       */
+      enum Settings
+      {
+        default_setting                          = 0x0,
+        mesh_reconstruction_after_repartitioning = 0x1,
+        construct_multigrid_hierarchy            = 0x2,
+        no_automatic_repartitioning              = 0x4
+      };
+
+      /**
        * Constructor. Deleted to make sure that objects of this type cannot be
        * constructed (see also the class documentation).
        */
-      Triangulation() = delete;
+      explicit Triangulation(
+        const MPI_Comm & /*mpi_communicator*/,
+        const typename dealii::Triangulation<dim, spacedim>::MeshSmoothing
+        /*smooth_grid*/
+        = (dealii::Triangulation<dim, spacedim>::none),
+        const Settings /*settings*/ = default_setting) = delete;
+
+      /**
+       * Dummy replacement to allow for better error messages when compiling
+       * this class.
+       */
+      virtual bool
+      is_multilevel_hierarchy_constructed() const override
+      {
+        return false;
+      }
+
+      /**
+       * Dummy replacement to allow for better error messages when compiling
+       * this class.
+       */
+      virtual void
+      save(const std::string & /*filename*/) const override
+      {}
+
+      /**
+       * Dummy replacement to allow for better error messages when compiling
+       * this class.
+       */
+      virtual void
+      load(const std::string & /*filename*/,
+           const bool /*autopartition*/ = true) override
+      {}
+
+      /**
+       * Dummy replacement to allow for better error messages when compiling
+       * this class.
+       */
+      virtual void
+      update_cell_relations() override
+      {}
     };
   } // namespace distributed
 } // namespace parallel
