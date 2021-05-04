@@ -1,0 +1,5 @@
+Improved: There is now a cache for TriaAccessor::vertex_index() for the cells
+of a mesh, which considerably speeds up operations with intensive use of
+`cell->vertex()` or `cell->vertex_index()`.
+<br>
+(Martin Kronbichler, 2021/05/04)

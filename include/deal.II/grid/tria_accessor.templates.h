@@ -1112,8 +1112,23 @@ TriaAccessor<structdim, dim, spacedim>::vertex_index(
 {
   AssertIndexRange(corner, this->n_vertices());
 
-  return dealii::internal::TriaAccessorImplementation::Implementation::
-    vertex_index(*this, corner);
+  if (structdim == dim)
+    {
+      constexpr unsigned int max_vertices_per_cell = 1 << dim;
+      const std::size_t      my_index =
+        static_cast<std::size_t>(this->present_index) * max_vertices_per_cell;
+      AssertIndexRange(my_index + corner,
+                       this->tria->levels[this->present_level]
+                         ->cell_vertex_indices_cache.size());
+      const unsigned int vertex_index =
+        this->tria->levels[this->present_level]
+          ->cell_vertex_indices_cache[my_index + corner];
+      Assert(vertex_index != numbers::invalid_unsigned_int, ExcInternalError());
+      return vertex_index;
+    }
+  else
+    return dealii::internal::TriaAccessorImplementation::Implementation::
+      vertex_index(*this, corner);
 }
 
 
@@ -3206,7 +3221,8 @@ namespace internal
            ((i == 1) && cell.at_boundary(1) ?
               dealii::TriaAccessor<0, 1, spacedim>::right_vertex :
               dealii::TriaAccessor<0, 1, spacedim>::interior_vertex)),
-        cell.vertex_index(i));
+        dealii::internal::TriaAccessorImplementation::Implementation::
+          vertex_index(cell, i));
       return dealii::TriaIterator<dealii::TriaAccessor<0, 1, spacedim>>(a);
     }
 
