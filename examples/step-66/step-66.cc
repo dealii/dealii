@@ -86,10 +86,10 @@ namespace Step66
 
   // @sect3{Matrix-free operators}
 
-  // In the beginning we define the two matrix-free operator for the Jacobian
-  // and the residual. As guideline we follow the tutorials step-37 and step-48,
-  // where the precise interface of the MatrixFreeOperators::Base class was
-  // extensively documented.
+  // In the beginning we define the matrix-free operator for the Jacobian. As
+  // guideline we follow the tutorials step-37 and step-48, where the precise
+  // interface of the MatrixFreeOperators::Base class was extensively
+  // documented.
 
 
   // @sect4{JacobianOperator}
@@ -342,109 +342,6 @@ namespace Step66
 
 
 
-  // @sect4{ResidualOperator}
-
-  // The next class implements the ResidualOperator, which we use to evaluate
-  // the residual and to assemble the right hand side. Since we will not pass
-  // objects of this class to any other objects for example linear solvers, etc.
-  // we have not need to fulfill any interface requirements. The operator's main
-  // functionality is implemented in the apply function. We can actually think
-  // of ResidualOperator.apply(dst, src) is mathematically expressed as
-  // F(src) = dst, where $F\colon\mathbb{R}^N\to\mathbb{R}^N$ is the discrete
-  // residual introduced in the introduction. Further the ResidualOperator has
-  // an initialization function, which stores a shared pointer to the MatrixFree
-  // object handling the loop over all cells, and a local_apply function
-  // implementing the calculation of the cell contribution.
-
-  // TODO: As functor with operator() function?
-
-  template <int dim, int fe_degree>
-  class ResidualOperator
-  {
-  public:
-    ResidualOperator() = default;
-
-    void initialize(std::shared_ptr<const MatrixFree<dim, double>> data_in);
-
-    void apply(LinearAlgebra::distributed::Vector<double> &      dst,
-               const LinearAlgebra::distributed::Vector<double> &src) const;
-
-  private:
-    void
-    local_apply(const MatrixFree<dim, double> &                   data,
-                LinearAlgebra::distributed::Vector<double> &      dst,
-                const LinearAlgebra::distributed::Vector<double> &src,
-                const std::pair<unsigned int, unsigned int> &cell_range) const;
-
-    std::shared_ptr<const MatrixFree<dim, double>> data;
-  };
-
-
-
-  // The initialize function checks if given shared pointer of the MatrixFree
-  // object is not empty and pass it to the class varaiable.
-  template <int dim, int fe_degree>
-  void ResidualOperator<dim, fe_degree>::initialize(
-    std::shared_ptr<const MatrixFree<dim, double>> data_in)
-  {
-    Assert(data_in, ExcNotInitialized());
-
-    data = data_in;
-  }
-
-
-
-  // The main function evaluating the residual is just a wrapper around the
-  // cell_loop of the MatrixFree object.
-  template <int dim, int fe_degree>
-  void ResidualOperator<dim, fe_degree>::apply(
-    LinearAlgebra::distributed::Vector<double> &      dst,
-    const LinearAlgebra::distributed::Vector<double> &src) const
-  {
-    Assert(data, ExcNotInitialized());
-
-    data->cell_loop(
-      &ResidualOperator<dim, fe_degree>::local_apply, this, dst, src, true);
-  }
-
-
-
-  // The heart of the ResidualOperator is the local_apply function. The
-  // implementation is similar to the local_apply function of the above
-  // JacobianOperator. We setup a FEEvaluation object, gather and evaluate the
-  // values and gradients, submit the new values and gradients and finally
-  // integrate and distribute the local contributions to the global vector.
-  // Different to the Jacobian we need no additional table storing the values of
-  // the old Newton step, instead we can evaluate the nonlinearity on the fly,
-  // since we have to evaluate the residual in the input vector src,
-  // representing the last Newton step.
-  template <int dim, int fe_degree>
-  void ResidualOperator<dim, fe_degree>::local_apply(
-    const MatrixFree<dim> &                           data,
-    LinearAlgebra::distributed::Vector<double> &      dst,
-    const LinearAlgebra::distributed::Vector<double> &src,
-    const std::pair<unsigned int, unsigned int> &     cell_range) const
-  {
-    FEEvaluation<dim, fe_degree> phi(data);
-
-    for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
-      {
-        phi.reinit(cell);
-        phi.read_dof_values_plain(src);
-        phi.evaluate(true, true);
-
-        for (unsigned int q = 0; q < phi.n_q_points; ++q)
-          {
-            phi.submit_value(-std::exp(phi.get_value(q)), q);
-            phi.submit_gradient(phi.get_gradient(q), q);
-          }
-
-        phi.integrate_scatter(true, true, dst);
-      }
-  }
-
-
-
   // @sect3{GelfandProblem class}
 
   // After implementing the matrix-free operators we can now define the solver
@@ -453,8 +350,13 @@ namespace Step66
   // step-15, solving also a nonlinear problem. Since we using the matrix-free
   // framework, we need no assemble_system function any more, instead the
   // information of the matrix is rebuild in every call of the vmult function.
-  // However, for the nonlinear solver we need additional functions for the
-  // computation of the residual and the Newton method.
+  // However, for the application of the Newton scheme we need to assemble the
+  // right hand side of the linearized problems and compute the residuals.
+  // Therefore we implement an additional function evaluate_residual, which we
+  // later call in the assemble_rhs and the compute_residual fucntion. Finally,
+  // the typical solve function here implements the Newton method, whereas the
+  // solution of the linearized system is compute in the function
+  // compute_update.
   template <int dim>
   class GelfandProblem
   {
@@ -467,6 +369,10 @@ namespace Step66
     void make_grid();
 
     void setup_system();
+
+    void evaluate_residual(
+      LinearAlgebra::distributed::Vector<double> &      dst,
+      const LinearAlgebra::distributed::Vector<double> &src) const;
 
     void assemble_rhs();
 
@@ -490,13 +396,13 @@ namespace Step66
     DoFHandler<dim> dof_handler;
 
 
-    // For the system matrix we have defined the class JacobianOperator, which
-    // is a matrix-free operator. For the assembly of the right hand side and
-    // the resiudal we use the matrix-free ResidualOperator also implemented
-    // above.
-    AffineConstraints<double>                            constraints;
-    JacobianOperator<dim, degree_finite_element, double> system_matrix;
-    ResidualOperator<dim, degree_finite_element>         residual_operator;
+    // For the linearized discrete system we define two objects for the
+    // constraints and the system matrix, which is in this example represented
+    // as a matrix-free operator.
+    AffineConstraints<double> constraints;
+    using SystemMatrixType =
+      JacobianOperator<dim, degree_finite_element, double>;
+    SystemMatrixType system_matrix;
 
 
     // The multilevel object which are also based on the matrix-free operator
@@ -599,14 +505,13 @@ namespace Step66
   // The setup_system function is quasi identical to the one in step-37. The
   // only differences are obviously the time measurement with only one
   // TimerOutput::Scope instead of measuring each part individually and more
-  // important the initialization of the ResidualOperator with the MatrixFree
-  // object as well as the initialization of the MGLevelObject for the
-  // interpolated solution vector of the last Newton. Another important change
-  // is the setup of the MGTransferMatrixFree object, which we can reuse in each
-  // Newton step as the trinagulation has not changed.
+  // important the initialization of the MGLevelObject for the interpolated
+  // solution vector of the previous Newton. Another important change is the
+  // setup of the MGTransferMatrixFree object, which we can reuse in each Newton
+  // step as the trinagulation has not changed.
   //
   // Note, how we can use the same MatrixFree object twice, for the
-  // JacobianOperator and the ResidualOperator.
+  // JacobianOperator.
   template <int dim>
   void GelfandProblem<dim>::setup_system()
   {
@@ -645,7 +550,6 @@ namespace Step66
                                 additional_data);
 
       system_matrix.initialize(system_mf_storage);
-      residual_operator.initialize(system_mf_storage);
     }
 
     system_matrix.initialize_dof_vector(solution);
@@ -702,20 +606,72 @@ namespace Step66
 
 
 
+  // @sect4{GelfandProblem::evaluate_residual}
+
+  // Next we implement a function, which evaluates the nonlinear discrete
+  // residual for a given input vector ($dst = F(src)$). This function is then
+  // used for the assembly of the right hand side of the linearized system and
+  // later for the computation of the reisudal of the next Newton step to check
+  // if we already reached the error tolerance. As this function should not
+  // affect any class variable we define it as a constant function. Internally
+  // we expolit the fast finite element evaluation through the FEEvaluation
+  // class, similar to local_apply function of the JacobianOperator.
+  template <int dim>
+  void GelfandProblem<dim>::evaluate_residual(
+    LinearAlgebra::distributed::Vector<double> &      dst,
+    const LinearAlgebra::distributed::Vector<double> &src) const
+  {
+    // First we update the ghost values of the given input vector src and clear
+    // the output vector dst.
+    src.update_ghost_values();
+    dst = 0.0;
+
+    // Then we get a reference to the MatrixFree object stored in the
+    // JacobianOperator and setup the FEEvaluation.
+    const MatrixFree<dim, double> &data = *system_matrix.get_matrix_free();
+    FEEvaluation<dim, degree_finite_element> phi(data);
+
+    // At the main part of this function we loop over all cell batches defined
+    // in the MatrixFree object and compute the residual evaulation, by
+    // evaulating the input vector and integrate against the test functions
+    // according to the weak formulation of the Gelfand problem.
+    for (unsigned int cell = 0; cell < data.n_cell_batches(); ++cell)
+      {
+        phi.reinit(cell);
+        phi.read_dof_values_plain(src);
+        phi.evaluate(true, true);
+
+        for (unsigned int q = 0; q < phi.n_q_points; ++q)
+          {
+            phi.submit_value(-std::exp(phi.get_value(q)), q);
+            phi.submit_gradient(phi.get_gradient(q), q);
+          }
+
+        phi.integrate_scatter(true, true, dst);
+      }
+
+    // Finally, we dont have to forget initiating the MPI data exchange via the
+    // compress function.
+    dst.compress(VectorOperation::add);
+  }
+
+
+
   // @sect4{GelfandProblem::assemble_rhs}
 
-  // Using the implementation of the ResidualOperator the assembly of the right
-  // hand side becomes now a very easy task. We just call the main function of
-  // the residual operator and multiply the result with minus one.
+  // Using the above function evaluate_residual to evaluate the nonlinear
+  // residual, the assembly of the right hand side of the linearized systems
+  // becomes now a very easy task. We just call the evaluate_reisudal function
+  // and multiply the result with minus one.
   //
-  // Experiences show that using the cell_loop of the MatrixFree class together
-  // with the FEEvaluation class is much faster than a classical implementation.
+  // Experiences show that using the FEEvaluation class is much faster than a
+  // classical implementation with FEValues and co.
   template <int dim>
   void GelfandProblem<dim>::assemble_rhs()
   {
     TimerOutput::Scope t(computing_timer, "assemble right hand side");
 
-    residual_operator.apply(system_rhs, solution);
+    evaluate_residual(system_rhs, solution);
 
     system_rhs *= -1.0;
   }
@@ -724,18 +680,19 @@ namespace Step66
 
   // @sect4{GelfandProblem::compute_residual}
 
-  // With the help of the ResidualOperator the next function computes the
-  // residual of the nonlinear problem. The input argument alpha becomes
+  // Accoring to step-15 the following function computes the norm of the
+  // nonlinear residual for the solution $u_h^n + \alpha s_h^n$ with the help of
+  // the evaluate_residual function. The Newton step length alpha becomes
   // important if we would use an adaptive version of the Newton method. Then
   // for example we would compute the residual for different step lengths and
-  // compare the residuals. However for our problem the full Newton step with
+  // compare the residuals. However, for our problem the full Newton step with
   // $\alpha=1$ is the best we can do. An adaptive version of Newton's method
   // becomes interesting if we have no good initial value. Note, the theory
-  // states that Newton's method converges with quadratic order, but only if we
-  // have an appropriate initial value. For wrong initial values the Newton
+  // states that Newton's method converges with quadratic order, but only if
+  // we have an appropriate initial value. For wrong initial values the Newton
   // method diverges even with quadratic order. A common way is then to use a
-  // damped version $\alpha<1$ until the Newton step is good enough and the full
-  // Newton step can be performed. This was also discussed in step-15.
+  // damped version $\alpha<1$ until the Newton step is good enough and the
+  // full Newton step can be performed. This was also discussed in step-15.
   template <int dim>
   double GelfandProblem<dim>::compute_residual(const double alpha)
   {
@@ -751,7 +708,7 @@ namespace Step66
     if (alpha > 1e-12)
       evaluation_point.add(alpha, newton_update);
 
-    residual_operator.apply(residual, evaluation_point);
+    evaluate_residual(residual, evaluation_point);
 
     return residual.l2_norm();
   }
@@ -761,17 +718,17 @@ namespace Step66
   // @sect4{GelfandProblem::compute_update}
 
   // In order to compute the Newton updates in each step Newton step we solve
-  // the linear system with the cg algorithm together with a geometric multigrid
-  // preconditioner. For this we first setup the PreconditionMG object with a
-  // Chebyshev smoother like we did in step-37.
+  // the linear system with the cg algorithm together with a geometric
+  // multigrid preconditioner. For this we first setup the PreconditionMG
+  // object with a Chebyshev smoother like we did in step-37.
   template <int dim>
   void GelfandProblem<dim>::compute_update()
   {
     TimerOutput::Scope t(computing_timer, "compute update");
 
     // We remember that the Jacobian depends on the last Newton step stored in
-    // the solution vector. So we update the ghost values of the Newton step and
-    // pass it to the JacobianOperator to store the information.
+    // the solution vector. So we update the ghost values of the Newton step
+    // and pass it to the JacobianOperator to store the information.
     solution.update_ghost_values();
 
     system_matrix.evaluate_newton_step(solution);
@@ -779,13 +736,14 @@ namespace Step66
 
     // Next we have to pass the last Newton step also to the multilevel
     // operators. However, therefore we need to interpolate the Newton step to
-    // all levels of the triangulation. This is done with the interpolate_to_mg
-    // function of the MGTransferMatrixFree class.
+    // all levels of the triangulation. This is done with the
+    // interpolate_to_mg function of the MGTransferMatrixFree class.
     mg_transfer.interpolate_to_mg(dof_handler, mg_solution, solution);
 
 
-    // Now we can setup the preconditioner. We define the smoother and pass the
-    // interpolated vectors of the Newton step to the multilevel operators.
+    // Now we can setup the preconditioner. We define the smoother and pass
+    // the interpolated vectors of the Newton step to the multilevel
+    // operators.
     typedef PreconditionChebyshev<LevelMatrixType,
                                   LinearAlgebra::distributed::Vector<float>>
       SmootherType;
@@ -844,8 +802,8 @@ namespace Step66
       preconditioner(dof_handler, mg, mg_transfer);
 
 
-    // Having now a geometric multigrid preconditioner for the Jacobian we solve
-    // the linear system with the cg algorithm.
+    // Having now a geometric multigrid preconditioner for the Jacobian we
+    // solve the linear system with the cg algorithm.
     SolverControl solver_control(100, 1.e-12);
     SolverCG<LinearAlgebra::distributed::Vector<double>> cg(solver_control);
 
@@ -872,11 +830,11 @@ namespace Step66
     // We define a maximal number of Newton step and tolerances for the
     // convergence criterion. Usually, for good starting values, the Newton
     // method converges in three to six steps, so maximal ten steps should be
-    // totally sufficient. As tolerances we use for the residual
-    // $\|F(u^n_h)\|<\text{TOL}_f = 10^{-12}$ and
-    // $\|s_h^n\| < \text{TOL}_x = 10^{-10}$.
-    // This seems a bit over the top, but we will see that, for our example, we
-    // will achieve these tolerances after a few steps.
+    // totally sufficient. As tolerances we use for the norm of the residual
+    // $\|F(u^n_h)\|<\text{TOL}_f = 10^{-12}$ and for the norm of the Newton
+    // update $\|s_h^n\| < \text{TOL}_x = 10^{-10}$.
+    // This seems a bit over the top, but we will see that, for our example,
+    // we will achieve these tolerances after a few steps.
     const unsigned int itmax = 10;
     const double       TOLf  = 1e-12;
     const double       TOLx  = 1e-10;
@@ -886,8 +844,8 @@ namespace Step66
     solver_timer.start();
 
 
-    // In a loop over the Newton steps we first assemble the right hand side for
-    // the linear problem and then compute the update.
+    // In a loop over the Newton steps we first assemble the right hand side
+    // for the linear problem and then compute the update.
     for (unsigned int newton_step = 1; newton_step <= itmax; ++newton_step)
       {
         assemble_rhs();
@@ -895,8 +853,8 @@ namespace Step66
         compute_update();
 
 
-        // Then we compute the errors, namely the norm of the Newton update and
-        // the residual.
+        // Then we compute the errors, namely the norm of the Newton update
+        // and the residual.
         const double ERRx = newton_update.l2_norm();
         const double ERRf = compute_residual(1.0);
 
@@ -941,8 +899,8 @@ namespace Step66
 
   // @sect4{GelfandProblem::compute_solution_norm}
 
-  // The computation of the H1-seminorm of the solution can be done in the same
-  // way as in step-59. We update the ghost values and use the function
+  // The computation of the H1-seminorm of the solution can be done in the
+  // same way as in step-59. We update the ghost values and use the function
   // integrate_difference from the VectorTools namespace. In the end we gather
   // all computations from all MPI ranks and return the norm.
   template <int dim>
@@ -969,10 +927,10 @@ namespace Step66
 
   // @sect4{GelfandProblem::output_results}
 
-  // The graphical output files in vtu format together with an pvtu master file
-  // we generate in the same way as in step-37. Note, that we write also the
-  // distribution of the triangulation into the output file as it was done in
-  // step-40. So no further comments are necessary.
+  // The graphical output files in vtu format together with an pvtu master
+  // file we generate in the same way as in step-37. Note, that we write also
+  // the distribution of the triangulation into the output file as it was done
+  // in step-40. So no further comments are necessary.
   template <int dim>
   void GelfandProblem<dim>::output_results(const unsigned int cycle) const
   {
@@ -1088,8 +1046,8 @@ namespace Step66
         pcout << std::endl;
 
 
-        // After the problem was solved we compute the norm of the solution and
-        // generate the graphical output files.
+        // After the problem was solved we compute the norm of the solution
+        // and generate the graphical output files.
         pcout << "Output results..." << std::endl;
         const double norm = compute_solution_norm();
         output_results(cycle);
