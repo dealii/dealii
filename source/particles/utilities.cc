@@ -36,7 +36,7 @@ namespace Particles
       const AffineConstraints<number> &                constraints,
       const ComponentMask &                            space_comps)
     {
-      if (particle_handler.n_locally_owned_particle_ids() == 0)
+      if (particle_handler.n_locally_owned_particles() == 0)
         return; // nothing to do here
 
       const auto &tria = space_dh.get_triangulation();
@@ -119,7 +119,7 @@ namespace Particles
       const AffineConstraints<typename MatrixType::value_type> &constraints,
       const ComponentMask &                                     space_comps)
     {
-      if (particle_handler.n_locally_owned_particle_ids() == 0)
+      if (particle_handler.n_locally_owned_particles() == 0)
         {
           matrix.compress(VectorOperation::add);
           return; // nothing else to do here
