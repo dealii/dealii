@@ -844,29 +844,29 @@ namespace Step66
     solver_timer.start();
 
 
-    // In a loop over the Newton steps we first assemble the right hand side
-    // for the linear problem and then compute the update.
+    // Now we start the actual Newton iteration.
     for (unsigned int newton_step = 1; newton_step <= itmax; ++newton_step)
       {
+        // We assemble the right hand side of the linearized problem and compute
+        // the Newton update.
         assemble_rhs();
-
         compute_update();
 
 
+        // Next we advance the Newton step by adding the Newton update to the
+        // current Newton step.
+        solution.add(1.0, newton_update);
+
+
         // Then we compute the errors, namely the norm of the Newton update
-        // and the residual.
+        // and the residual. A short output will inform us on the current Newton
+        // step.
         const double ERRx = newton_update.l2_norm();
         const double ERRf = compute_residual(1.0);
-
-
-        // Compute the next Newton step by adding the update. A short output
-        // will inform us on the current Newton step.
-        solution.add(1.0, newton_update);
 
         pcout << "   Nstep " << newton_step << ", errf = " << ERRf
               << ", errx = " << ERRx << ", it = " << linear_iterations
               << std::endl;
-
 
 
         // After each Newton step we check the convergence criterions. If at
