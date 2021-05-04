@@ -10539,6 +10539,7 @@ Triangulation<dim, spacedim>::create_triangulation(
 
   // update our counts of the various elements of a triangulation, and set
   // active_cell_indices of all cells
+  reset_cell_vertex_indices_cache();
   internal::TriangulationImplementation::Implementation::compute_number_cache(
     *this, levels.size(), number_cache);
   reset_active_cell_indices();
@@ -13390,6 +13391,8 @@ Triangulation<dim, spacedim>::execute_coarsening_and_refinement()
 
   const DistortedCellList cells_with_distorted_children = execute_refinement();
 
+  reset_cell_vertex_indices_cache();
+
   // verify a case with which we have had
   // some difficulty in the past (see the
   // deal.II/coarsening_* tests)
@@ -13448,6 +13451,29 @@ Triangulation<dim, spacedim>::reset_global_cell_indices()
       types::global_cell_index cell_index = 0;
       for (const auto &cell : cell_iterators_on_level(l))
         cell->set_global_level_cell_index(cell_index++);
+    }
+}
+
+
+
+template <int dim, int spacedim>
+void
+Triangulation<dim, spacedim>::reset_cell_vertex_indices_cache()
+{
+  for (unsigned int l = 0; l < levels.size(); ++l)
+    {
+      constexpr unsigned int     max_vertices_per_cell = 1 << dim;
+      std::vector<unsigned int> &cache = levels[l]->cell_vertex_indices_cache;
+      cache.clear();
+      cache.resize(levels[l]->refine_flags.size() * max_vertices_per_cell,
+                   numbers::invalid_unsigned_int);
+      for (const auto &cell : cell_iterators_on_level(l))
+        {
+          const unsigned int my_index = cell->index() * max_vertices_per_cell;
+          for (const unsigned int i : cell->vertex_indices())
+            cache[my_index + i] = internal::TriaAccessorImplementation::
+              Implementation::vertex_index(*cell, i);
+        }
     }
 }
 

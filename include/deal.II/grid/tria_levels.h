@@ -225,6 +225,14 @@ namespace internal
       std::vector<dealii::ReferenceCell> reference_cell;
 
       /**
+       * A cache for the vertex indices of the cells (`structdim == dim`), in
+       * order to more quickly retrieve these frequently accessed quantities.
+       * For simplified addressing, the information is indexed by the maximum
+       * number of vertices possible for a cell (quadrilateral/hexahedron).
+       */
+      std::vector<unsigned int> cell_vertex_indices_cache;
+
+      /**
        * Determine an estimate for the memory consumption (in bytes) of this
        * object.
        */
@@ -250,9 +258,9 @@ namespace internal
 
       ar &refine_flags &coarsen_flags;
 
-      // do not serialize 'active_cell_indices' here. instead of storing them
-      // to the stream and re-reading them again later, we just rebuild them
-      // in Triangulation::load()
+      // do not serialize `active_cell_indices` and `vertex_indices_cache`
+      // here. instead of storing them to the stream and re-reading them again
+      // later, we just rebuild them in Triangulation::load()
 
       ar &neighbors;
       ar &subdomain_ids;
