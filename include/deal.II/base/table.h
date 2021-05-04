@@ -373,6 +373,65 @@ namespace internal
  * functions, so the data type is not a single scalar value, but a tensor
  * itself.
  *
+ *
+ * <h3>Dealing with large data sets</h3>
+ *
+ * The Table classes (derived from this class) are frequently used to store
+ * large data tables. A modest example is given in step-53 where we store a
+ * $380 \times 220$ table of geographic elevation data for a region of
+ * Africa, and this data requires about 670 kB if memory; however,
+ * tables that store three- or more-dimensional data (say, information about
+ * the density, pressure, and temperature in the earth interior on a regular
+ * grid of `(latitude, longitude, depth)` points) can easily run into hundreds
+ * of megabytes or more. These tables are then often provided to classes
+ * such as InterpolatedTensorProductGridData or InterpolatedUniformGridData.
+ *
+ * If you need to load such tables on single-processor (or multi-threaded)
+ * jobs, then there is nothing you can do about the size of these tables: The
+ * table just has to fit into memory. But, if your program is parallelized
+ * via MPI, then a typical first implementation would create a table object
+ * on every process and fill it on every MPI process by reading the data
+ * from a file. This is inefficient from two perspectives:
+ * - You will have a lot of processes that are all trying to read from
+ *   the same file at the same time.
+ * - In most cases, the data stored on every process is the same, and
+ *   while every process needs to be able to read from a table, it is not
+ *   necessary that every process stores its own table: All MPI processes
+ *   that happen to be located on the same machine might as well store
+ *   only one copy and make it available to each other via
+ *   [shared memory](https://en.wikipedia.org/wiki/Shared_memory); in
+ *   this model, only one MPI process per machine needs to store the data, and
+ *   all other processes could then access it.
+ *
+ * Both of these use cases are enabled by the
+ * TableBase::replicate_across_communicator() function that is internally based
+ * on AlignedVector::replicate_across_communicator(). This function allows for
+ * workflows like the following where we put that MPI process with rank zero in
+ * charge of reading the data (but it could have been any other "root rank" as
+ * well):
+ * @code
+ *    const unsigned int N=..., M=...;     // table sizes, assumed known
+ *    Table<2,double>    data_table;
+ *    const unsigned int root_rank = 0;
+ *
+ *    if (Utilities::MPI::this_mpi_process(mpi_communicator) == root_rank)
+ *    {
+ *      data_table.resize (N,M);
+ *
+ *      std::ifstream input_file ("data_file.dat");
+ *      ...;                               // read the data from the file
+ *    }
+ *
+ *    // Now distribute to all processes
+ *    data_table.replicate_across_communicator (mpi_communicator, root_rank);
+ * @endcode
+ *
+ * The last call in this code snippet makes sure that the data is made
+ * available on all non-root processes, either by re-creating a copy of
+ * the table in the other processes' memory space or, if possible,
+ * by creating copies in shared memory once for all processes located
+ * on each of the machines used by the MPI job.
+ *
  * @ingroup data
  */
 template <int N, typename T>
@@ -571,6 +630,94 @@ public:
    */
   typename AlignedVector<T>::const_reference
   operator()(const TableIndices<N> &indices) const;
+
+  /**
+   * This function replicates the state found on the process indicated by
+   * @p root_process across all processes of the MPI communicator. The current
+   * state found on any of the processes other than @p root_process is lost
+   * in this process. One can imagine this operation to act like a call to
+   * Utilities::MPI::broadcast() from the root process to all other processes,
+   * though in practice the function may try to move the data into shared
+   * memory regions on each of the machines that host MPI processes and
+   * let all MPI processes on this machine then access this shared memory
+   * region instead of keeping their own copy. See the general documentation
+   * of this class for a code example.
+   *
+   * The intent of this function is to quickly exchange large arrays from
+   * one process to others, rather than having to compute or create it on
+   * all processes. This is specifically the case for data loaded from
+   * disk -- say, large data tables -- that are more easily dealt with by
+   * reading once and then distributing across all processes in an MPI
+   * universe, than letting each process read the data from disk itself.
+   * Specifically, the use of shared memory regions allows for replicating
+   * the data only once per multicore machine in the MPI universe, rather
+   * than replicating data once for each MPI process. This results in
+   * large memory savings if the data is large on today's machines that
+   * can easily house several dozen MPI processes per shared memory
+   * space.
+   *
+   * This function does not imply a model of keeping data on different processes
+   * in sync, as parallel::distributed::Vector and other vector classes do where
+   * there exists a notion of certain elements of the vector owned by each
+   * process and possibly ghost elements that are mirrored from its owning
+   * process to other processes. Rather, the elements of the current object are
+   * simply copied to the other processes, and it is useful to think of this
+   * operation as creating a set of `const` AlignedVector objects on all
+   * processes that should not be changed any more after the replication
+   * operation, as this is the only way to ensure that the vectors remain the
+   * same on all processes. This is particularly true because of the use of
+   * shared memory regions where any modification of a vector element on one MPI
+   * process may also result in a modification of elements visible on other
+   * processes, assuming they are located within one shared memory node.
+   *
+   * @note The use of shared memory between MPI processes requires
+   *   that the detected MPI installation supports the necessary operations.
+   *   This is the case for MPI 3.0 and higher.
+   *
+   * @note This function is not cheap. It needs to create sub-communicators
+   *   of the provided @p communicator object, which is generally an expensive
+   *   operation. Likewise, the generation of shared memory spaces is not
+   *   a cheap operation. As a consequence, this function primarily makes
+   *   sense when the goal is to share large read-only data tables among
+   *   processes; examples are data tables that are loaded at start-up
+   *   time and then used over the course of the run time of the program.
+   *   In such cases, the start-up cost of running this function can be
+   *   amortized over time, and the potential memory savings from not having to
+   *   store the table on each process may be substantial on machines with
+   *   large core counts on which many MPI processes run on the same machine.
+   *
+   * @note This function only makes sense if the data type `T` is
+   *   "self-contained", i.e., all of its information is stored in its
+   *   member variables, and if none of the member variables are pointers
+   *   to other parts of the memory. This is because if a type `T` does
+   *   have pointers to other parts of memory, then moving `T` into
+   *   a shared memory space does not result in the other processes having
+   *   access to data that the object points to with its member variable
+   *   pointers: These continue to live only on one process, and are
+   *   typically in memory areas not accessible to the other processes.
+   *   As a consequence, the usual use case for this function is to share
+   *   arrays of simple objects such as `double`s or `int`s.
+   *
+   * @note After calling this function, objects on different MPI processes
+   *   share a common state. That means that certain operations become
+   *   "collective", i.e., they must be called on all participating
+   *   processors at the same time. In particular, you can no longer call
+   *   resize(), reserve(), or clear() on one MPI process -- you have to do
+   *   so on all processes at the same time, because they have to communicate
+   *   for these operations. If you do not do so, you will likely get
+   *   a deadlock that may be difficult to debug. By extension, this rule of
+   *   only collectively resizing extends to this function itself: You can
+   *   not call it twice in a row because that implies that first all but the
+   *   `root_process` throw away their data, which is not a collective
+   *   operation. Generally, these restrictions on what can and can not be
+   *   done hint at the correctness of the comments above: You should treat
+   *   an AlignedVector on which the current function has been called as
+   *   `const`, on which no further operations can be performed until
+   *   the destructor is called.
+   */
+  void
+  replicate_across_communicator(const MPI_Comm &   communicator,
+                                const unsigned int root_process);
 
   /**
    * Swap the contents of this table and the other table @p v. One could do
@@ -2211,6 +2358,21 @@ TableBase<N, T>::fill(const T &value)
 {
   if (n_elements() != 0)
     values.fill(value);
+}
+
+
+
+template <int N, typename T>
+inline void
+TableBase<N, T>::replicate_across_communicator(const MPI_Comm &   communicator,
+                                               const unsigned int root_process)
+{
+  // Replicate first the actual data, then also exchange the
+  // extents of the table
+  values.replicate_across_communicator(communicator, root_process);
+
+  table_size =
+    Utilities::MPI::broadcast(communicator, table_size, root_process);
 }
 
 
