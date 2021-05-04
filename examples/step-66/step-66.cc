@@ -356,8 +356,10 @@ namespace Step66
   // later call in the assemble_rhs and the compute_residual fucntion. Finally,
   // the typical solve function here implements the Newton method, whereas the
   // solution of the linearized system is compute in the function
-  // compute_update.
-  template <int dim>
+  // compute_update. As the MatrixFree framework handles the polynomial degree
+  // of the Lagrangian finite element method as template parameter, we declare
+  // it also as template parameter for the problem solver class.
+  template <int dim, int fe_degree>
   class GelfandProblem
   {
   public:
@@ -400,8 +402,7 @@ namespace Step66
     // constraints and the system matrix, which is in this example represented
     // as a matrix-free operator.
     AffineConstraints<double> constraints;
-    using SystemMatrixType =
-      JacobianOperator<dim, degree_finite_element, double>;
+    using SystemMatrixType = JacobianOperator<dim, fe_degree, double>;
     SystemMatrixType system_matrix;
 
 
@@ -415,7 +416,7 @@ namespace Step66
     // variable, since we need to set it up only once when the tirangulation has
     // changed and then can reuse it in each Newton step.
     MGConstrainedDoFs mg_constrained_dofs;
-    using LevelMatrixType = JacobianOperator<dim, degree_finite_element, float>;
+    using LevelMatrixType = JacobianOperator<dim, fe_degree, float>;
     MGLevelObject<LevelMatrixType>                           mg_matrices;
     MGLevelObject<LinearAlgebra::distributed::Vector<float>> mg_solution;
     MGTransferMatrixFree<dim, float>                         mg_transfer;
@@ -454,13 +455,13 @@ namespace Step66
   // parallel::distributed::Triangulation<dim>, initilaize the
   // ConditionalOStream and tell the TimerOutput taht we want to see the CPU and
   // wall time in the end of the program.
-  template <int dim>
-  GelfandProblem<dim>::GelfandProblem()
+  template <int dim, int fe_degree>
+  GelfandProblem<dim, fe_degree>::GelfandProblem()
     : triangulation(MPI_COMM_WORLD,
                     Triangulation<dim>::limit_level_difference_at_vertices,
                     parallel::distributed::Triangulation<
                       dim>::construct_multigrid_hierarchy)
-    , fe(degree_finite_element)
+    , fe(fe_degree)
     , dof_handler(triangulation)
     , pcout(std::cout, Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     , computing_timer(MPI_COMM_WORLD,
@@ -477,8 +478,8 @@ namespace Step66
   // the instructions for the TransfiniteInterpolationManifold class and assign
   // also a SphericalManifold for the boundaty. In the end we use a six times
   // globally refined triangulation.
-  template <int dim>
-  void GelfandProblem<dim>::make_grid()
+  template <int dim, int fe_degree>
+  void GelfandProblem<dim, fe_degree>::make_grid()
   {
     TimerOutput::Scope t(computing_timer, "make grid");
 
@@ -512,8 +513,8 @@ namespace Step66
   //
   // Note, how we can use the same MatrixFree object twice, for the
   // JacobianOperator.
-  template <int dim>
-  void GelfandProblem<dim>::setup_system()
+  template <int dim, int fe_degree>
+  void GelfandProblem<dim, fe_degree>::setup_system()
   {
     TimerOutput::Scope t(computing_timer, "setup system");
 
@@ -616,8 +617,8 @@ namespace Step66
   // affect any class variable we define it as a constant function. Internally
   // we expolit the fast finite element evaluation through the FEEvaluation
   // class, similar to local_apply function of the JacobianOperator.
-  template <int dim>
-  void GelfandProblem<dim>::evaluate_residual(
+  template <int dim, int fe_degree>
+  void GelfandProblem<dim, fe_degree>::evaluate_residual(
     LinearAlgebra::distributed::Vector<double> &      dst,
     const LinearAlgebra::distributed::Vector<double> &src) const
   {
@@ -629,7 +630,7 @@ namespace Step66
     // Then we get a reference to the MatrixFree object stored in the
     // JacobianOperator and setup the FEEvaluation.
     const MatrixFree<dim, double> &data = *system_matrix.get_matrix_free();
-    FEEvaluation<dim, degree_finite_element> phi(data);
+    FEEvaluation<dim, fe_degree>   phi(data);
 
     // At the main part of this function we loop over all cell batches defined
     // in the MatrixFree object and compute the residual evaulation, by
@@ -666,8 +667,8 @@ namespace Step66
   //
   // Experiences show that using the FEEvaluation class is much faster than a
   // classical implementation with FEValues and co.
-  template <int dim>
-  void GelfandProblem<dim>::assemble_rhs()
+  template <int dim, int fe_degree>
+  void GelfandProblem<dim, fe_degree>::assemble_rhs()
   {
     TimerOutput::Scope t(computing_timer, "assemble right hand side");
 
@@ -693,8 +694,8 @@ namespace Step66
   // method diverges even with quadratic order. A common way is then to use a
   // damped version $\alpha<1$ until the Newton step is good enough and the
   // full Newton step can be performed. This was also discussed in step-15.
-  template <int dim>
-  double GelfandProblem<dim>::compute_residual(const double alpha)
+  template <int dim, int fe_degree>
+  double GelfandProblem<dim, fe_degree>::compute_residual(const double alpha)
   {
     TimerOutput::Scope t(computing_timer, "compute residual");
 
@@ -721,8 +722,8 @@ namespace Step66
   // the linear system with the cg algorithm together with a geometric
   // multigrid preconditioner. For this we first setup the PreconditionMG
   // object with a Chebyshev smoother like we did in step-37.
-  template <int dim>
-  void GelfandProblem<dim>::compute_update()
+  template <int dim, int fe_degree>
+  void GelfandProblem<dim, fe_degree>::compute_update()
   {
     TimerOutput::Scope t(computing_timer, "compute update");
 
@@ -821,8 +822,8 @@ namespace Step66
   // @sect4{GelfandProblem::solve}
 
   // Now we implement the actual Newton solver for the nonlinear problem.
-  template <int dim>
-  void GelfandProblem<dim>::solve()
+  template <int dim, int fe_degree>
+  void GelfandProblem<dim, fe_degree>::solve()
   {
     TimerOutput::Scope t(computing_timer, "solve");
 
@@ -907,8 +908,8 @@ namespace Step66
   // same way as in step-59. We update the ghost values and use the function
   // integrate_difference from the VectorTools namespace. In the end we gather
   // all computations from all MPI ranks and return the norm.
-  template <int dim>
-  double GelfandProblem<dim>::compute_solution_norm() const
+  template <int dim, int fe_degree>
+  double GelfandProblem<dim, fe_degree>::compute_solution_norm() const
   {
     solution.update_ghost_values();
 
@@ -935,8 +936,9 @@ namespace Step66
   // file we generate in the same way as in step-37. Note, that we write also
   // the distribution of the triangulation into the output file as it was done
   // in step-40. So no further comments are necessary.
-  template <int dim>
-  void GelfandProblem<dim>::output_results(const unsigned int cycle) const
+  template <int dim, int fe_degree>
+  void
+  GelfandProblem<dim, fe_degree>::output_results(const unsigned int cycle) const
   {
     if (triangulation.n_global_active_cells() > 1e6)
       return;
@@ -973,8 +975,8 @@ namespace Step66
   // <i>Gelfand problem</i> is the run function. In the beginning we write a
   // short information of the system and the finite element space we use. The
   // problem is solved several times on a successivley refined mesh.
-  template <int dim>
-  void GelfandProblem<dim>::run()
+  template <int dim, int fe_degree>
+  void GelfandProblem<dim, fe_degree>::run()
   {
     {
       const unsigned int n_ranks =
@@ -1083,7 +1085,7 @@ int main(int argc, char *argv[])
 
       Utilities::MPI::MPI_InitFinalize mpi_init(argc, argv, 1);
 
-      GelfandProblem<dimension> gelfand_problem;
+      GelfandProblem<dimension, degree_finite_element> gelfand_problem;
       gelfand_problem.run();
     }
   catch (std::exception &exc)
