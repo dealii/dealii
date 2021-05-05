@@ -1027,6 +1027,7 @@ namespace VectorTools
 
       // Get boundary function values
       // at quadrature points.
+      AssertDimension(boundary_function.n_components, fe.n_components());
       boundary_function.vector_value_list(quadrature_points, values);
 
       const std::vector<Point<dim>> &reference_quadrature_points =
@@ -1219,6 +1220,7 @@ namespace VectorTools
       // Get boundary function
       // values at quadrature
       // points.
+      AssertDimension(boundary_function.n_components, fe.n_components());
       boundary_function.vector_value_list(quadrature_points, values);
 
       switch (dim)
@@ -2133,6 +2135,7 @@ namespace VectorTools
 
       // Get boundary function values
       // at quadrature points.
+      AssertDimension(boundary_function.n_components, fe.n_components());
       boundary_function.vector_value_list(quadrature_points, values);
 
       // Find the group of vector components we want to project onto
@@ -2440,6 +2443,7 @@ namespace VectorTools
                                          Vector<number>(fe.n_components()));
 
       // Get boundary function values at quadrature points.
+      AssertDimension(boundary_function.n_components, fe.n_components());
       boundary_function.vector_value_list(quadrature_points, values);
 
       // Find where the group of vector components (dim of them,
