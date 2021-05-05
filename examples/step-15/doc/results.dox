@@ -174,12 +174,15 @@ A separate point, very much worthwhile making, however, is that in practice
 the implementation of efficient nonlinear solvers is about as complicated as
 the implementation of efficient finite element methods. One should not
 attempt to reinvent the wheel by implementing all of the necessary steps
-oneself. Rather, just like building finite element solvers on libraries
+oneself. Substantial pieces of the puzzle are already available in
+the LineMinimization::line_search() function and could be used to this end.
+But, instead, just like building finite element solvers on libraries
 such as deal.II, one should be building nonlinear solvers on libraries such
 as [SUNDIALS](https://computing.llnl.gov/projects/sundials). In fact,
 deal.II has interfaces to SUNDIALS and in particular to its nonlinear solver
 sub-package KINSOL through the SUNDIALS::KINSOL class. It would not be
-very difficult to base the current problem on that interface.
+very difficult to base the current problem on that interface --
+indeed, that is what step-77 does.
 
 
 

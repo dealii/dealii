@@ -241,7 +241,8 @@ full step lengths we forego the rapid, quadratic convergence that
 makes Newton's method so appealing. Obviously, this is a point one
 eventually has to address if the program was made into one that is
 meant to solve more realistic problems. We will comment on this issue
-some more in the <a href="#Results">results section</a>.
+some more in the <a href="#Results">results section</a>, and use an
+even better approach in step-77.
 
 
 <h3> Summary of the algorithm and testcase </h3>
@@ -270,6 +271,11 @@ follows:
   $\alpha^n=0.1$. To make things easier to extend later on, this
   happens in a function of its own, namely in
   <code>MinimalSurfaceProblem::determine_step_length</code>.
+  (The strategy of always choosing $\alpha^n=0.1$ is of course not
+  optimal -- we should choose a step length that works for a given
+  search direction -- but it requires a bit of work to do that. In the
+  end, we leave these sorts of things to external packages: step-77
+  does that.)
 </li>
 
 <li>

@@ -361,7 +361,13 @@ private:
  * entered several times. By changing the options in OutputFrequency and
  * OutputType, the user can choose whether output should be generated every
  * time a section is joined or just in the end of the program. Moreover, it is
- * possible to show CPU times, wall times or both.
+ * possible to show CPU times, wall times, or both.
+ *
+ * The class is used in a substantial number of tutorial programs that collect
+ * timing data. step-77 is an example of a relatively simple sequential program
+ * that uses it. step-40 and several others mentioned below use it for parallel
+ * computations.
+ *
  *
  * <h3>Usage</h3>
  *

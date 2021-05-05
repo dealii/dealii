@@ -91,7 +91,9 @@ namespace Step15
   //   <code>determine_step_length()</code> computes the step length $\alpha^n$
   //   in each Newton iteration. As discussed in the introduction, we here use a
   //   fixed step length and leave implementing a better strategy as an
-  //   exercise.
+  //   exercise. (step-77 does this differently: It simply uses an
+  //   external package for the whole solution process, and a good
+  //   line search strategy is part of what that package provides.)
 
   template <int dim>
   class MinimalSurfaceProblem
@@ -581,7 +583,7 @@ namespace Step15
   // choice: ideally, what one wants is that the step size goes to one as we
   // get closer to the solution, so that we get to enjoy the rapid quadratic
   // convergence of Newton's method. We will discuss better strategies below
-  // in the results section.
+  // in the results section, and step-77 also covers this aspect.
   template <int dim>
   double MinimalSurfaceProblem<dim>::determine_step_length() const
   {
