@@ -152,35 +152,21 @@ test(const unsigned int n_subdivisions, const double iso_level)
     MPI_COMM_WORLD, Triangulation<dim, spacedim>::none, true);
 
   GridGenerator::create_triangulation_with_marching_cube_algorithm(
+    tria,
     background_mapping,
     background_dof_handler,
     ls_vector,
     iso_level,
-    n_subdivisions,
-    tria);
+    n_subdivisions);
 
   // write computed vectors to Paraview
-  if (true)
+  if (true /*write surface mesh*/)
     {
-      if (false)
-        {
-          GridOut().write_mesh_per_processor_as_vtu(tria, "grid_surface");
-        }
-      else if (false)
-        {
-          GridOut       grid_out;
-          std::ofstream out("grid_surface." + std::to_string(spacedim) + "." +
-                            std::to_string(n_subdivisions) + ".vtk");
-          grid_out.write_vtk(tria, out);
-        }
-      else
-        {
-          GridOut grid_out;
-          grid_out.write_vtk(tria, deallog.get_file_stream());
-        }
+      GridOut grid_out;
+      grid_out.write_vtk(tria, deallog.get_file_stream());
     }
 
-  if (false)
+  if (false /*write background mesh*/)
     {
       DataOutBase::VtkFlags flags;
       flags.write_higher_order_cells = true;

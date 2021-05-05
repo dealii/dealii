@@ -2407,7 +2407,8 @@ namespace GridGenerator
 
   /**
    * An implementation of the marching-square (2D) and marching-cube algorithm
-   * for creating a linear/bilinear surface mesh on the iso line/contour of a
+   * for creating data structures (vectors of Point and CellData) to
+   * create a linear/bilinear surface mesh on the iso line/contour of a
    * scalar field.
    *
    * To improve the approximation of the iso line/contour and the resulting
@@ -2435,10 +2436,12 @@ namespace GridGenerator
      */
     MarchingCubeAlgorithm(const Mapping<dim, dim> &      mapping,
                           const FiniteElement<dim, dim> &fe,
-                          const unsigned int             n_subdivisions = 1);
+                          const unsigned int             n_subdivisions = 1,
+                          const double                   tolerance = 1e-10);
 
     /**
-     * Process all locally-owned cells.
+     * Process all locally-owned cells and fill @p vertices and @p for all cells
+     * that are cut.
      */
     void
     process(const DoFHandler<dim> &         background_dof_handler,
@@ -2448,22 +2451,10 @@ namespace GridGenerator
             std::vector<CellData<dim - 1>> &cells) const;
 
     /**
-     * Process a cell (2D).
+     * Process the provided cell and fill @p vertices and @p for all cells
+     * that are cut.
      *
-     * @note Subcells with saddle points are ignored. Please increase the number
-     *   of subdivisions in this case.
-     */
-    void
-    process_cell(std::vector<value_type> &       ls_values,
-                 const std::vector<Point<dim>> & points,
-                 const double                    iso_level,
-                 std::vector<Point<dim>> &       vertices,
-                 std::vector<CellData<dim - 1>> &cells) const;
-
-    /**
-     * Process the cell @p cell. Calls the above functions but allows the users
-     * to perform their own cell loop and potentially perform some pre- and
-     * post-processing steps.
+     * @note The resulting vectors are empty if the cell is not cut.
      */
     void
     process_cell(const typename DoFHandler<dim>::active_cell_iterator &cell,
@@ -2479,6 +2470,16 @@ namespace GridGenerator
      */
     static Quadrature<dim>
     create_quadrature_rule(const unsigned int n_subdivisions);
+
+    /**
+     * Process a cell.
+     */
+    void
+    process_cell(std::vector<value_type> &       ls_values,
+                 const std::vector<Point<dim>> & points,
+                 const double                    iso_level,
+                 std::vector<Point<dim>> &       vertices,
+                 std::vector<CellData<dim - 1>> &cells) const;
 
     /**
      * Process a sub-cell (2D).
@@ -2506,9 +2507,16 @@ namespace GridGenerator
                      std::vector<CellData<2>> &      cells) const;
 
     /**
-     * Number of subdivisions defined in the constructor.
+     * Number of subdivisions each cell is subdivided into in each direction to
+     * improve the approximation.
      */
     const unsigned int n_subdivisions;
+
+    /**
+     * Absolute tolerance specifying the minimum distance between a vertex and
+     * the cut point so that a line is considered cut.
+     */
+    const double tolerance;
 
     /**
      * FEValues used internally and set up with a quadrature rule with the
@@ -2519,18 +2527,24 @@ namespace GridGenerator
 
 
   /**
-   * Create a codim-1 triangulation based on a iso-line/surface and the
-   * marching-cube algorithm (MarchingCubeAlgorithm).
+   * Create a codim-1 triangulation @p based on a iso-line/surface (defined by
+   * @p mapping, @p background_dof_handler, @p ls_vector, and @p iso_level) and
+   * the marching-cube algorithm (MarchingCubeAlgorithm).
+   *
+   * @note The marching-cube altorithm is called for each cell individually
+   *   creating lines/triangles line by line. No effort is taken to merge
+   *   these at sharing geometric entities so that one might end up with
+   *   a triangulation with many unconnected lines/triangles.
    */
   template <int dim, typename VectorType>
-  void
-  create_triangulation_with_marching_cube_algorithm(
+  void create_triangulation_with_marching_cube_algorithm(
+    Triangulation<dim - 1, dim> &tria,
     const Mapping<dim> &         mapping,
     const DoFHandler<dim> &      background_dof_handler,
     const VectorType &           ls_vector,
     const double                 iso_level,
-    const unsigned int           n_subdivisions,
-    Triangulation<dim - 1, dim> &tria);
+    const unsigned int           n_subdivisions = 1,
+    const double                 tolerance      = 1e-10);
 
   ///@}
 
