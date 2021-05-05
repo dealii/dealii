@@ -1,0 +1,114 @@
+
+DEAL:0:2d/2d::Rank: 0. Locally owned active cells: 0. Local particles: 0
+DEAL:0:2d/2d::OK
+DEAL:0:2d/3d::Rank: 0. Locally owned active cells: 0. Local particles: 0
+DEAL:0:2d/3d::OK
+DEAL:0:3d/3d::Rank: 0. Locally owned active cells: 0. Local particles: 0
+DEAL:0:3d/3d::OK
+
+DEAL:1:2d/2d::Rank: 1. Locally owned active cells: 1. Local particles: 16
+DEAL:1:2d/2d::Cell 0.0 has 16 particles.
+DEAL:1:2d/2d::Particle index 0 is in cell 0.0
+DEAL:1:2d/2d::Particle location: 0.246806 0.602738
+DEAL:1:2d/2d::Particle index 1 is in cell 0.0
+DEAL:1:2d/2d::Particle location: 0.756380 0.916857
+DEAL:1:2d/2d::Particle index 2 is in cell 0.0
+DEAL:1:2d/2d::Particle location: 0.595957 0.950968
+DEAL:1:2d/2d::Particle index 3 is in cell 0.0
+DEAL:1:2d/2d::Particle location: 0.793715 0.387718
+DEAL:1:2d/2d::Particle index 4 is in cell 0.0
+DEAL:1:2d/2d::Particle location: 0.731510 0.439705
+DEAL:1:2d/2d::Particle index 5 is in cell 0.0
+DEAL:1:2d/2d::Particle location: 0.135658 0.326733
+DEAL:1:2d/2d::Particle index 6 is in cell 0.0
+DEAL:1:2d/2d::Particle location: 0.251525 0.339426
+DEAL:1:2d/2d::Particle index 7 is in cell 0.0
+DEAL:1:2d/2d::Particle location: 0.595620 0.859503
+DEAL:1:2d/2d::Particle index 8 is in cell 0.0
+DEAL:1:2d/2d::Particle location: 0.362813 0.242154
+DEAL:1:2d/2d::Particle index 9 is in cell 0.0
+DEAL:1:2d/2d::Particle location: 0.299327 0.941832
+DEAL:1:2d/2d::Particle index 10 is in cell 0.0
+DEAL:1:2d/2d::Particle location: 0.910383 0.872167
+DEAL:1:2d/2d::Particle index 11 is in cell 0.0
+DEAL:1:2d/2d::Particle location: 0.375099 0.884627
+DEAL:1:2d/2d::Particle index 12 is in cell 0.0
+DEAL:1:2d/2d::Particle location: 0.138433 0.419489
+DEAL:1:2d/2d::Particle index 13 is in cell 0.0
+DEAL:1:2d/2d::Particle location: 0.692605 0.474755
+DEAL:1:2d/2d::Particle index 14 is in cell 0.0
+DEAL:1:2d/2d::Particle location: 0.382099 0.844530
+DEAL:1:2d/2d::Particle index 15 is in cell 0.0
+DEAL:1:2d/2d::Particle location: 0.319646 0.518143
+DEAL:1:2d/2d::OK
+DEAL:1:2d/3d::Rank: 1. Locally owned active cells: 1. Local particles: 16
+DEAL:1:2d/3d::Cell 0.0 has 16 particles.
+DEAL:1:2d/3d::Particle index 0 is in cell 0.0
+DEAL:1:2d/3d::Particle location: 0.246806 0.602738 0.00000
+DEAL:1:2d/3d::Particle index 1 is in cell 0.0
+DEAL:1:2d/3d::Particle location: 0.916857 0.595957 0.00000
+DEAL:1:2d/3d::Particle index 2 is in cell 0.0
+DEAL:1:2d/3d::Particle location: 0.793715 0.387718 0.00000
+DEAL:1:2d/3d::Particle index 3 is in cell 0.0
+DEAL:1:2d/3d::Particle location: 0.439705 0.135658 0.00000
+DEAL:1:2d/3d::Particle index 4 is in cell 0.0
+DEAL:1:2d/3d::Particle location: 0.251525 0.339426 0.00000
+DEAL:1:2d/3d::Particle index 5 is in cell 0.0
+DEAL:1:2d/3d::Particle location: 0.859503 0.362813 0.00000
+DEAL:1:2d/3d::Particle index 6 is in cell 0.0
+DEAL:1:2d/3d::Particle location: 0.299327 0.941832 0.00000
+DEAL:1:2d/3d::Particle index 7 is in cell 0.0
+DEAL:1:2d/3d::Particle location: 0.872167 0.375099 0.00000
+DEAL:1:2d/3d::Particle index 8 is in cell 0.0
+DEAL:1:2d/3d::Particle location: 0.138433 0.419489 0.00000
+DEAL:1:2d/3d::Particle index 9 is in cell 0.0
+DEAL:1:2d/3d::Particle location: 0.474755 0.382099 0.00000
+DEAL:1:2d/3d::Particle index 10 is in cell 0.0
+DEAL:1:2d/3d::Particle location: 0.319646 0.518143 0.00000
+DEAL:1:2d/3d::Particle index 11 is in cell 0.0
+DEAL:1:2d/3d::Particle location: 0.456149 0.635687 0.00000
+DEAL:1:2d/3d::Particle index 12 is in cell 0.0
+DEAL:1:2d/3d::Particle location: 0.588260 0.522915 0.00000
+DEAL:1:2d/3d::Particle index 13 is in cell 0.0
+DEAL:1:2d/3d::Particle location: 0.256491 0.534039 0.00000
+DEAL:1:2d/3d::Particle index 14 is in cell 0.0
+DEAL:1:2d/3d::Particle location: 0.957838 0.850786 0.00000
+DEAL:1:2d/3d::Particle index 15 is in cell 0.0
+DEAL:1:2d/3d::Particle location: 0.635976 0.937905 0.00000
+DEAL:1:2d/3d::OK
+DEAL:1:3d/3d::Rank: 1. Locally owned active cells: 1. Local particles: 16
+DEAL:1:3d/3d::Cell 0.0 has 16 particles.
+DEAL:1:3d/3d::Particle index 0 is in cell 0.0
+DEAL:1:3d/3d::Particle location: 0.246806 0.602738 0.756380
+DEAL:1:3d/3d::Particle index 1 is in cell 0.0
+DEAL:1:3d/3d::Particle location: 0.916857 0.595957 0.950968
+DEAL:1:3d/3d::Particle index 2 is in cell 0.0
+DEAL:1:3d/3d::Particle location: 0.793715 0.387718 0.731510
+DEAL:1:3d/3d::Particle index 3 is in cell 0.0
+DEAL:1:3d/3d::Particle location: 0.439705 0.135658 0.326733
+DEAL:1:3d/3d::Particle index 4 is in cell 0.0
+DEAL:1:3d/3d::Particle location: 0.251525 0.339426 0.595620
+DEAL:1:3d/3d::Particle index 5 is in cell 0.0
+DEAL:1:3d/3d::Particle location: 0.859503 0.362813 0.242154
+DEAL:1:3d/3d::Particle index 6 is in cell 0.0
+DEAL:1:3d/3d::Particle location: 0.299327 0.941832 0.910383
+DEAL:1:3d/3d::Particle index 7 is in cell 0.0
+DEAL:1:3d/3d::Particle location: 0.872167 0.375099 0.884627
+DEAL:1:3d/3d::Particle index 8 is in cell 0.0
+DEAL:1:3d/3d::Particle location: 0.138433 0.419489 0.692605
+DEAL:1:3d/3d::Particle index 9 is in cell 0.0
+DEAL:1:3d/3d::Particle location: 0.474755 0.382099 0.844530
+DEAL:1:3d/3d::Particle index 10 is in cell 0.0
+DEAL:1:3d/3d::Particle location: 0.319646 0.518143 0.716901
+DEAL:1:3d/3d::Particle index 11 is in cell 0.0
+DEAL:1:3d/3d::Particle location: 0.456149 0.635687 0.609423
+DEAL:1:3d/3d::Particle index 12 is in cell 0.0
+DEAL:1:3d/3d::Particle location: 0.588260 0.522915 0.510393
+DEAL:1:3d/3d::Particle index 13 is in cell 0.0
+DEAL:1:3d/3d::Particle location: 0.256491 0.534039 0.682149
+DEAL:1:3d/3d::Particle index 14 is in cell 0.0
+DEAL:1:3d/3d::Particle location: 0.957838 0.850786 0.290195
+DEAL:1:3d/3d::Particle index 15 is in cell 0.0
+DEAL:1:3d/3d::Particle location: 0.635976 0.937905 0.412123
+DEAL:1:3d/3d::OK
+

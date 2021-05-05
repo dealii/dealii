@@ -1,0 +1,4 @@
+Fixed: The function Particles::Generators::probabilistic_locations could crash
+if some MPI ranks had no active cells. This is fixed now.
+<br>
+(Rene Gassmoeller, 2021/05/05)
