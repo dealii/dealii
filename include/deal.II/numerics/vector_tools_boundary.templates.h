@@ -2965,17 +2965,15 @@ namespace VectorTools
                                              update_JxW_values);
 
       // Storage for dof values found and whether they have been processed:
-      std::vector<bool>                                        dofs_processed;
-      std::vector<number>                                      dof_values;
-      std::vector<types::global_dof_index>                     face_dof_indices;
-      typename DoFHandler<dim, spacedim>::active_cell_iterator cell =
-        dof_handler.begin_active();
+      std::vector<bool>                    dofs_processed;
+      std::vector<number>                  dof_values;
+      std::vector<types::global_dof_index> face_dof_indices;
 
       switch (dim)
         {
           case 2:
             {
-              for (; cell != dof_handler.end(); ++cell)
+              for (const auto &cell : dof_handler.active_cell_iterators())
                 {
                   if (cell->at_boundary() && cell->is_locally_owned())
                     {
@@ -3098,7 +3096,7 @@ namespace VectorTools
                                                  update_quadrature_points |
                                                  update_values);
 
-              for (; cell != dof_handler.end(); ++cell)
+              for (const auto &cell : dof_handler.active_cell_iterators())
                 {
                   if (cell->at_boundary() && cell->is_locally_owned())
                     {
@@ -3147,7 +3145,7 @@ namespace VectorTools
 
                               // First compute the projection on the edges.
                               for (unsigned int line = 0;
-                                   line < GeometryInfo<3>::lines_per_face;
+                                   line < cell->face(face)->n_lines();
                                    ++line)
                                 {
                                   compute_edge_projection_l2(
