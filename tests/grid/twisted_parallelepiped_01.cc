@@ -63,7 +63,8 @@ check_parallelepiped(std::ostream &logfile)
 
   Point<dim> origin;
 
-  Triangulation<dim>        triangulation;
+  Triangulation<dim> triangulation(Triangulation<dim>::MeshSmoothing::none,
+                                   /*check_for_distorted_cells*/ true);
   std::vector<unsigned int> subdivisions;
 
   try
