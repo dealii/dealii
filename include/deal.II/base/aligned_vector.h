@@ -1553,6 +1553,10 @@ AlignedVector<T>::replicate_across_communicator(const MPI_Comm &   communicator,
   used_elements_end      = elements.get() + array_size;
   allocated_elements_end = used_elements_end;
 
+  // Make sure that the shared memory host has copied the data before we try to
+  // access it.
+  MPI_Barrier(shmem_group_communicator);
+
   // **** Consistency check ****
   // At this point, each process should have a copy of the data.
   // Verify this in some sort of round-about way
