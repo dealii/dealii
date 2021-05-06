@@ -3563,89 +3563,86 @@ namespace parallel
 
 
 
-namespace internal
+namespace parallel
 {
-  namespace parallel
+  namespace distributed
   {
-    namespace distributed
+    template <int dim, int spacedim>
+    TemporarilyMatchRefineFlags<dim, spacedim>::TemporarilyMatchRefineFlags(
+      dealii::Triangulation<dim, spacedim> &tria)
+      : distributed_tria(
+          dynamic_cast<
+            dealii::parallel::distributed::Triangulation<dim, spacedim> *>(
+            &tria))
     {
-      template <int dim, int spacedim>
-      TemporarilyMatchRefineFlags<dim, spacedim>::TemporarilyMatchRefineFlags(
-        Triangulation<dim, spacedim> &tria)
-        : distributed_tria(
-            dynamic_cast<
-              dealii::parallel::distributed::Triangulation<dim, spacedim> *>(
-              &tria))
-      {
 #ifdef DEAL_II_WITH_P4EST
-        if (distributed_tria != nullptr)
-          {
-            // Save the current set of refinement flags, and adjust the
-            // refinement flags to be consistent with the p4est oracle.
-            distributed_tria->save_coarsen_flags(saved_coarsen_flags);
-            distributed_tria->save_refine_flags(saved_refine_flags);
+      if (distributed_tria != nullptr)
+        {
+          // Save the current set of refinement flags, and adjust the
+          // refinement flags to be consistent with the p4est oracle.
+          distributed_tria->save_coarsen_flags(saved_coarsen_flags);
+          distributed_tria->save_refine_flags(saved_refine_flags);
 
-            for (const auto &pair : distributed_tria->local_cell_relations)
-              {
-                const auto &cell   = pair.first;
-                const auto &status = pair.second;
+          for (const auto &pair : distributed_tria->local_cell_relations)
+            {
+              const auto &cell   = pair.first;
+              const auto &status = pair.second;
 
-                switch (status)
-                  {
-                    case dealii::Triangulation<dim, spacedim>::CELL_PERSIST:
-                      // cell remains unchanged
-                      cell->clear_refine_flag();
-                      cell->clear_coarsen_flag();
-                      break;
+              switch (status)
+                {
+                  case dealii::Triangulation<dim, spacedim>::CELL_PERSIST:
+                    // cell remains unchanged
+                    cell->clear_refine_flag();
+                    cell->clear_coarsen_flag();
+                    break;
 
-                    case dealii::Triangulation<dim, spacedim>::CELL_REFINE:
-                      // cell will be refined
-                      cell->clear_coarsen_flag();
-                      cell->set_refine_flag();
-                      break;
+                  case dealii::Triangulation<dim, spacedim>::CELL_REFINE:
+                    // cell will be refined
+                    cell->clear_coarsen_flag();
+                    cell->set_refine_flag();
+                    break;
 
-                    case dealii::Triangulation<dim, spacedim>::CELL_COARSEN:
-                      // children of this cell will be coarsened
-                      for (const auto &child : cell->child_iterators())
-                        {
-                          child->clear_refine_flag();
-                          child->set_coarsen_flag();
-                        }
-                      break;
+                  case dealii::Triangulation<dim, spacedim>::CELL_COARSEN:
+                    // children of this cell will be coarsened
+                    for (const auto &child : cell->child_iterators())
+                      {
+                        child->clear_refine_flag();
+                        child->set_coarsen_flag();
+                      }
+                    break;
 
-                    case dealii::Triangulation<dim, spacedim>::CELL_INVALID:
-                      // do nothing as cell does not exist yet
-                      break;
+                  case dealii::Triangulation<dim, spacedim>::CELL_INVALID:
+                    // do nothing as cell does not exist yet
+                    break;
 
-                    default:
-                      Assert(false, ExcInternalError());
-                      break;
-                  }
-              }
-          }
+                  default:
+                    Assert(false, ExcInternalError());
+                    break;
+                }
+            }
+        }
 #endif
-      }
+    }
 
 
 
-      template <int dim, int spacedim>
-      TemporarilyMatchRefineFlags<dim, spacedim>::~TemporarilyMatchRefineFlags()
-      {
+    template <int dim, int spacedim>
+    TemporarilyMatchRefineFlags<dim, spacedim>::~TemporarilyMatchRefineFlags()
+    {
 #ifdef DEAL_II_WITH_P4EST
-        if (distributed_tria)
-          {
-            // Undo the refinement flags modification.
-            distributed_tria->load_coarsen_flags(saved_coarsen_flags);
-            distributed_tria->load_refine_flags(saved_refine_flags);
-          }
+      if (distributed_tria)
+        {
+          // Undo the refinement flags modification.
+          distributed_tria->load_coarsen_flags(saved_coarsen_flags);
+          distributed_tria->load_refine_flags(saved_refine_flags);
+        }
 #else
-        // pretend that this destructor does something to silence clang-tidy
-        (void)distributed_tria;
+      // pretend that this destructor does something to silence clang-tidy
+      (void)distributed_tria;
 #endif
-      }
-    } // namespace distributed
-  }   // namespace parallel
-} // namespace internal
+    }
+  } // namespace distributed
+} // namespace parallel
 
 
 

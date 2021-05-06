@@ -113,7 +113,7 @@ test()
   // ----- connect error predictor -----
   Vector<float> predicted_errors;
   tria.signals.post_p4est_refinement.connect([&]() {
-    const internal::parallel::distributed::TemporarilyMatchRefineFlags<dim>
+    const parallel::distributed::TemporarilyMatchRefineFlags<dim>
       refine_modifier(tria);
     predicted_errors.reinit(tria.n_active_cells());
     hp::Refinement::predict_error(dh,
