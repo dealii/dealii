@@ -331,7 +331,7 @@ multi-variate function returns the derivative of that function with respect
 to one of those variables while holding the others constant:
 @f[
   \frac{\partial f\left(x, y\right)}{\partial x}
-  = \frac{d f\left(x, y\right)}{d x} \vert_{y} .
+  = \frac{d f\left(x, y\right)}{d x} \Big\vert_{y} .
 @f]
 More specific to what's encoded in the dissipation inequality (with the very general
 free energy density function $\psi_{0}$ with its parameterization yet to be formalized),
@@ -341,10 +341,10 @@ derivative would imply judicious use of the chain rule. This can be better
 understood by comparing the following two statements:
 @f{align*}
   \frac{\partial f\left(x, y\left(x\right)\right)}{\partial x}
-  &= \frac{d f\left(x, y\left(x\right)\right)}{d x} \vert_{y} \\
+  &= \frac{d f\left(x, y\left(x\right)\right)}{d x} \Big\vert_{y} \\
   \frac{d f\left(x, y\left(x\right)\right)}{d x}
-  &= \frac{d f\left(x, y\left(x\right)\right)}{d x} \vert_{y}
-   + \frac{d f\left(x, y\left(x\right)\right)}{d y} \vert_{x} \frac{d y\left(x\right)}{x} .
+  &= \frac{d f\left(x, y\left(x\right)\right)}{d x} \Big\vert_{y}
+   + \frac{d f\left(x, y\left(x\right)\right)}{d y} \Big\vert_{x} \frac{d y\left(x\right)}{x} .
 @f}
 
 Returning to the thermodynamics of the problem, we next exploit the arbitrariness
@@ -406,18 +406,18 @@ these quantities may be computed by
 For the case of rate-dependent materials, this expands to
 @f{align*}{
   \mathcal{H}^{\text{tot}} \left( \mathbf{C}, \mathbf{C}_{v}^{i}, \boldsymbol{\mathbb{H}} \right)
-  &= 2 \frac{d^{2} \psi_{0} \left( \mathbf{C}, \mathbf{C}_{v}^{i}, \boldsymbol{\mathbb{H}} \right)}{d \mathbf{C} \otimes \partial \mathbf{C}} , \\
+  &= 4 \frac{d^{2} \psi_{0} \left( \mathbf{C}, \mathbf{C}_{v}^{i}, \boldsymbol{\mathbb{H}} \right)}{\partial \mathbf{C} \otimes d \mathbf{C}} , \\
   \mathbb{D} \left( \mathbf{C}, \mathbf{C}_{v}^{i}, \boldsymbol{\mathbb{H}} \right)
-  &= -\frac{d^{2} \psi_{0} \left( \mathbf{C}, \mathbf{C}_{v}^{i}, \boldsymbol{\mathbb{H}} \right)}{d \boldsymbol{\mathbb{H}} \otimes \partial \boldsymbol{\mathbb{H}}} , \\
+  &= -\frac{d^{2} \psi_{0} \left( \mathbf{C}, \mathbf{C}_{v}^{i}, \boldsymbol{\mathbb{H}} \right)}{\partial \boldsymbol{\mathbb{H}} \otimes d \boldsymbol{\mathbb{H}}} , \\
   \mathfrak{P}^{\text{tot}} \left( \mathbf{C}, \mathbf{C}_{v}^{i}, \boldsymbol{\mathbb{H}} \right)
-  &= - 2 \frac{d^{2} \psi_{0} \left( \mathbf{C}, \mathbf{C}_{v}^{i}, \boldsymbol{\mathbb{H}} \right)}{d \boldsymbol{\mathbb{H}} \otimes \partial \mathbf{C}} , \\
+  &= - 2 \frac{d^{2} \psi_{0} \left( \mathbf{C}, \mathbf{C}_{v}^{i}, \boldsymbol{\mathbb{H}} \right)}{\partial \boldsymbol{\mathbb{H}} \otimes d \mathbf{C}} , \\
   \left[ \mathfrak{P}^{\text{tot}} \left( \mathbf{C}, \mathbf{C}_{v}^{i}, \boldsymbol{\mathbb{H}} \right)  \right]^{T}
-  &= - 2 \frac{d^{2} \psi_{0} \left( \mathbf{C}, \mathbf{C}_{v}^{i}, \boldsymbol{\mathbb{H}} \right)}{d \mathbf{C} \otimes \partial \boldsymbol{\mathbb{H}}} ,
+  &= - 2 \frac{d^{2} \psi_{0} \left( \mathbf{C}, \mathbf{C}_{v}^{i}, \boldsymbol{\mathbb{H}} \right)}{\partial \mathbf{C} \otimes d \boldsymbol{\mathbb{H}}} ,
 @f}
 while for rate-independent materials the linearizations are
 @f{align*}{
   \mathcal{H}^{\text{tot}} \left( \mathbf{C}, \boldsymbol{\mathbb{H}} \right)
-  &= 2 \frac{d^{2} \psi_{0} \left( \mathbf{C}, \boldsymbol{\mathbb{H}} \right)}{d \mathbf{C} \otimes d \mathbf{C}} , \\
+  &= 4 \frac{d^{2} \psi_{0} \left( \mathbf{C}, \boldsymbol{\mathbb{H}} \right)}{d \mathbf{C} \otimes d \mathbf{C}} , \\
   \mathbb{D} \left( \mathbf{C}, \boldsymbol{\mathbb{H}} \right)
   &= -\frac{d^{2} \psi_{0} \left( \mathbf{C}, \boldsymbol{\mathbb{H}} \right)}{d \boldsymbol{\mathbb{H}} \otimes d \boldsymbol{\mathbb{H}}} , \\
   \mathfrak{P}^{\text{tot}} \left( \mathbf{C}, \boldsymbol{\mathbb{H}} \right)

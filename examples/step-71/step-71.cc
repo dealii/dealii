@@ -1691,7 +1691,7 @@ namespace Step71
       // @cite Pelteret2018a, equation 29). Thereafter we can compute the
       // dissipative component of the energy density function; its expression
       // is stated in @cite Pelteret2018a (equation 28), which is a
-      // straight-forward extension of an energy density function formulated by
+      // straight-forward extension of an energy density function formulated in
       // @cite Linder2011a (equation 46).
       const Differentiation::SD::Expression f_mu_v_sd =
         1.0 +
@@ -1718,11 +1718,11 @@ namespace Step71
       // This means that deriving any function $f = f(\mathbf{C}, \mathbf{Q})$
       // with respect to  $\mathbf{C}$ will return partial derivatives
       // $\frac{\partial f(\mathbf{C}, \mathbf{Q})}{\partial \mathbf{C}}
-      // \Big\vert_{\mathbf{C}_{v}}$ as opposed to the total derivative
+      // \Big\vert_{\mathbf{Q}}$ as opposed to the total derivative
       // $\frac{d f(\mathbf{C}, \mathbf{Q}(\mathbf{C}))}{d \mathbf{C}} =
       // \frac{\partial f(\mathbf{C}, \mathbf{Q}(\mathbf{C}))}{\partial
-      // \mathbf{C}} \Big\vert_{\mathbf{C}_{v}} + \frac{\partial f(\mathbf{C},
-      // \mathbf{Q}(\mathbf{C}))}{\partial \mathbf{C}_{v}}
+      // \mathbf{C}} \Big\vert_{\mathbf{Q}} + \frac{\partial f(\mathbf{C},
+      // \mathbf{Q}(\mathbf{C}))}{\partial \mathbf{Q}}
       // \Big\vert_{\mathbf{C}} : \frac{d \mathbf{Q}(\mathbf{C}))}{d
       // \mathbf{C}}$.
       //
