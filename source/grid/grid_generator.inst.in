@@ -271,8 +271,8 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
 #if deal_II_dimension <= deal_II_space_dimension
       template void
       reference_cell<deal_II_dimension, deal_II_space_dimension>(
-        const ReferenceCell &,
-        Triangulation<deal_II_dimension, deal_II_space_dimension> &);
+        Triangulation<deal_II_dimension, deal_II_space_dimension> &,
+        const ReferenceCell &);
 
       template void
       convert_hypercube_to_simplex_mesh(
