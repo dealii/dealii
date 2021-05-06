@@ -330,4 +330,5 @@ There are a few logical ways in which this program could be extended:
 
 With less effort, one could think about re-writing nonlinear problem
 solvers such as the one implemented in step-15 using AD or SD
-approaches to compute the Newton matrix.
+approaches to compute the Newton matrix. Indeed, this is done in
+step-72.

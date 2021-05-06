@@ -207,3 +207,47 @@ iterations.
 
 How to do this is, again, not entirely trivial, and we again leave it as a
 future exercise.
+
+
+
+<h4> Using automatic differentiation to compute the Jacobian matrix </h4>
+
+As outlined in the introduction, when solving a nonlinear problem of
+the form
+  @f[
+    F(u) \dealcoloneq
+    -\nabla \cdot \left( \frac{1}{\sqrt{1+|\nabla u|^{2}}}\nabla u \right)
+    = 0
+  @f]
+we use a Newton iteration that requires us to repeatedly solve the
+linear partial differential equation
+  @f{align*}
+    F'(u^{n},\delta u^{n}) &=- F(u^{n})
+  @f}
+so that we can compute the update
+  @f{align*}
+    u^{n+1}&=u^{n}+\alpha^n \delta u^{n}
+  @f}
+with the solution $\delta u^{n}$ of the Newton step. For the problem
+here, we could compute the derivative $F'(u,\delta u)$ by hand and
+obtained
+  @f[
+  F'(u,\delta u)
+  =
+  - \nabla \cdot \left( \frac{1}{\left(1+|\nabla u|^{2}\right)^{\frac{1}{2}}}\nabla
+  \delta u \right) +
+  \nabla \cdot \left( \frac{\nabla u \cdot
+  \nabla \delta u}{\left(1+|\nabla u|^{2}\right)^{\frac{3}{2}}} \nabla u
+  \right).
+  @f]
+But this is already a sizable expression that is cumbersome both to
+derive and to implement. It is also, in some sense, duplicative: If we
+implement what $F(u)$ is somewhere in the code, then $F'(u,\delta u)$
+is not an independent piece of information but is something that, at
+least in principle, a computer should be able to infer itself.
+Wouldn't it be nice if that could actually happen? That is, if we
+really only had to implement $F(u)$, and $F'(u,\delta u)$ was then somehow
+done implicitly? That is in fact possible, and runs under the name
+"automatic differentiation". step-71 discusses this very
+concept in general terms, and step-72 illustrates how this can be
+applied in practice for the very problem we are considering here.
