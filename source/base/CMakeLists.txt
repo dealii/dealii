@@ -36,6 +36,7 @@ SET(_unity_include_src
   function_lib.cc
   function_lib_cutoff.cc
   function_parser.cc
+  function_restriction.cc
   function_spherical.cc
   function_time.cc
   function_tools.cc
@@ -131,6 +132,7 @@ SET(_inst
   data_out_base.inst.in
   function.inst.in
   function_level_set.inst.in
+  function_restriction.inst.in
   function_time.inst.in
   function_tools.inst.in
   incremental_function.inst.in
