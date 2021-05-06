@@ -51,7 +51,7 @@ compute_nodal_quadrature(const FiniteElement<dim, spacedim> &fe)
   const Quadrature<dim> q_gauss =
     type.get_gauss_type_quadrature<dim>(fe.tensor_degree() + 1);
   Triangulation<dim, spacedim> tria;
-  GridGenerator::reference_cell(type, tria);
+  GridGenerator::reference_cell(tria, type);
   const Mapping<dim, spacedim> &mapping =
     type.template get_default_linear_mapping<dim, spacedim>();
 

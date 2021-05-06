@@ -203,7 +203,7 @@ ReferenceCell::get_nodal_type_quadrature() const
   // reference cell
   const auto create_quadrature = [](const ReferenceCell &reference_cell) {
     Triangulation<dim> tria;
-    GridGenerator::reference_cell(reference_cell, tria);
+    GridGenerator::reference_cell(tria, reference_cell);
 
     return Quadrature<dim>(tria.get_vertices());
   };

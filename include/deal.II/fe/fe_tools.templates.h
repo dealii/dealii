@@ -1584,7 +1584,7 @@ namespace FETools
 
     // First, create a local mass matrix for the unit cell
     Triangulation<dim, spacedim> tr;
-    GridGenerator::reference_cell(reference_cell, tr);
+    GridGenerator::reference_cell(tr, reference_cell);
 
     const auto &mapping =
       reference_cell.template get_default_linear_mapping<dim, spacedim>();
@@ -1792,7 +1792,7 @@ namespace FETools
         // Set up meshes, one with a single
         // reference cell and refine it once
         Triangulation<dim, spacedim> tria;
-        GridGenerator::reference_cell(reference_cell, tria);
+        GridGenerator::reference_cell(tria, reference_cell);
         tria.begin_active()->set_refine_flag(RefinementCase<dim>(ref_case));
         tria.execute_coarsening_and_refinement();
 
@@ -2183,7 +2183,7 @@ namespace FETools
     {
       // set up a triangulation for coarse cell
       Triangulation<dim, spacedim> tr;
-      GridGenerator::reference_cell(reference_cell, tr);
+      GridGenerator::reference_cell(tr, reference_cell);
 
       FEValues<dim, spacedim> coarse(mapping,
                                      fe,
@@ -2239,7 +2239,7 @@ namespace FETools
 
         // create a respective refinement on the triangulation
         Triangulation<dim, spacedim> tr;
-        GridGenerator::reference_cell(reference_cell, tr);
+        GridGenerator::reference_cell(tr, reference_cell);
         tr.begin_active()->set_refine_flag(RefinementCase<dim>(ref_case));
         tr.execute_coarsening_and_refinement();
 
