@@ -63,6 +63,16 @@ namespace internal
       return EvaluatorType::template run<-1, 0>(args...);
   }
 
+  struct FastEvaluationSupported
+  {
+    template <int fe_degree, int n_q_points_1d>
+    static bool
+    run()
+    {
+      return fe_degree != -1;
+    }
+  };
+
 
 
   template <int dim, typename Number, typename VectorizedArrayType>
@@ -119,6 +129,18 @@ namespace internal
       gradients_quad,
       scratch_data,
       sum_into_values_array);
+  }
+
+
+
+  template <int dim, typename Number, typename VectorizedArrayType>
+  bool
+  FEEvaluationFactory<dim, Number, VectorizedArrayType>::
+    fast_evaluation_supported(const unsigned int given_degree,
+                              const unsigned int n_q_points_1d)
+  {
+    return instantiation_helper_run<1, FastEvaluationSupported>(given_degree,
+                                                                n_q_points_1d);
   }
 
 
@@ -303,6 +325,18 @@ namespace internal
       dof_access_index,
       face_orientations,
       orientation_map);
+  }
+
+
+
+  template <int dim, typename Number, typename VectorizedArrayType>
+  bool
+  FEFaceEvaluationFactory<dim, Number, VectorizedArrayType>::
+    fast_evaluation_supported(const unsigned int given_degree,
+                              const unsigned int n_q_points_1d)
+  {
+    return instantiation_helper_run<1, FastEvaluationSupported>(given_degree,
+                                                                n_q_points_1d);
   }
 
 

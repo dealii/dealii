@@ -60,6 +60,10 @@ namespace internal
       VectorizedArrayType *gradients_quad,
       VectorizedArrayType *scratch_data,
       const bool           sum_into_values_array);
+
+    static bool
+    fast_evaluation_supported(const unsigned int given_degree,
+                              const unsigned int n_q_points_1d);
   };
 
 
@@ -143,6 +147,10 @@ namespace internal
       const std::array<unsigned int, VectorizedArrayType::size()>
                                     face_orientations,
       const Table<2, unsigned int> &orientation_map);
+
+    static bool
+    fast_evaluation_supported(const unsigned int given_degree,
+                              const unsigned int n_q_points_1d);
   };
 
 
