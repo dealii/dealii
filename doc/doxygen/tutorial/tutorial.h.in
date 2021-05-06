@@ -598,6 +598,15 @@
  *       </td></tr>
  *
  *   <tr valign="top">
+ *       <td>step-71</td>
+ *       <td> Constitutive modelling: a demonstration of how automatic and symbolic 
+ *       differentiation can be used to rapidly implement a complex coupled constitutive
+ *       law.
+ *       <br/> Keywords: Automatic differentiation, Symbolic differentiation, 
+ *       Constitutive modelling
+ *       </td></tr>
+ *
+ *   <tr valign="top">
  *       <td>step-74</td>
  *       <td> The Symmetric interior penalty Galerkin (SIPG) method for Poisson's equation.
  *       <br/> Keywords: MeshWorker::mesh_loop(), FEInterfaceValues, ConvergenceTable
@@ -720,7 +729,8 @@
  *       step-42,
  *       step-43,
  *       step-50,
- *       step-55
+ *       step-55,
+ *       step-71
  *     </td>
  *   </tr>
  *
@@ -798,7 +808,8 @@
  *       step-60,
  *       step-62,
  *       step-69,
- *       step-70
+ *       step-70,
+ *       step-71
  *     </td>
  *   </tr>
  *
@@ -877,9 +888,12 @@
  *   </tr>
  *
  *   <tr valign="top">
- *     <td> Computing Jacobians from residuals, automatic differentiation
+ *     <td> Computing Jacobians from residuals, automatic and symbolic differentiation
  *     </td>
- *     <td>step-33</td>
+ *     <td>
+ *       step-33,
+ *       step-71
+ *     </td>
  *   </tr>
  *
  *   <tr valign="top">
