@@ -212,7 +212,7 @@ namespace Utilities
        * ConsensusAlgorithms::Interface base class, using only point-to-point
        * communications and a single IBarrier.
        *
-       * @note This class closely follows @note hoefler2010scalable. Since the
+       * @note This class closely follows @cite hoefler2010scalable. Since the
        *       algorithm shown there is not considering payloads, the algorithm
        *       has been modified here in such a way that synchronous sends
        *       (Issend) have been replaced by equivalent Isend/Irecv, where
