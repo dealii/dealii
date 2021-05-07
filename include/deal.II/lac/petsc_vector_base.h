@@ -458,10 +458,7 @@ namespace PETScWrappers
      * vector, this function allows to set a whole set of elements at once.
      * The indices of the elements to be set are stated in the first argument,
      * the corresponding values in the second.
-     *
-     * @deprecated Use import() instead.
      */
-    DEAL_II_DEPRECATED
     void
     set(const std::vector<size_type> &  indices,
         const std::vector<PetscScalar> &values);
