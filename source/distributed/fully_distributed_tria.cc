@@ -184,7 +184,9 @@ namespace parallel
             }
 
           // 4b) set actual (level_)subdomain_ids
-          for (unsigned int level = 0; level < cell_infos.size(); ++level)
+          for (unsigned int level = 0;
+               level < cell_infos.size() && !cell_infos[level].empty();
+               ++level)
             {
               auto cell      = this->begin(level);
               auto cell_info = cell_infos[level].begin();
