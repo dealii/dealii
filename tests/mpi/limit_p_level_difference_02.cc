@@ -73,7 +73,7 @@ test(const unsigned int fes_size, const unsigned int max_difference)
   bool fe_indices_changed;
   tria.signals.post_p4est_refinement.connect(
     [&]() {
-      const internal::parallel::distributed::TemporarilyMatchRefineFlags<dim>
+      const parallel::distributed::TemporarilyMatchRefineFlags<dim>
         refine_modifier(tria);
       fe_indices_changed =
         hp::Refinement::limit_p_level_difference(dofh,

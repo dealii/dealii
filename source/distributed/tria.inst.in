@@ -24,21 +24,10 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
 #if deal_II_dimension <= deal_II_space_dimension
         template class Triangulation<deal_II_dimension,
                                      deal_II_space_dimension>;
-#endif
-      \}
-    \}
 
-    namespace internal
-    \{
-      namespace parallel
-      \{
-        namespace distributed
-        \{
-#if deal_II_dimension <= deal_II_space_dimension
-          template class TemporarilyMatchRefineFlags<deal_II_dimension,
-                                                     deal_II_space_dimension>;
+        template class TemporarilyMatchRefineFlags<deal_II_dimension,
+                                                   deal_II_space_dimension>;
 #endif
-        \}
       \}
     \}
   }
