@@ -209,7 +209,7 @@ of calls is sufficiently small.
 
 Perhaps you've been convinced that these tools have some merit, and can be
 of immediate help or use to you. The obvious question now is which one to
-use. Focussing specifically at a continuum point level, where you would be
+use. Focusing specifically at a continuum point level, where you would be
 using these frameworks to compute derivatives of a constitutive law in
 particular, we can say the following:
 - Automatic differentiation probably provides the simplest entry point into

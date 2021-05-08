@@ -157,7 +157,7 @@ namespace Step71
       // is arbitrarily assigned a value of 1. The second template argument
       // stipulates which AD framework will be used (deal.II has support for
       // several external AD frameworks), and what the underlying number type
-      // provided by this framework is to be employed. This number type
+      // provided by this framework is to be used. This number type
       // influences the maximum order of the differential operation, and the
       // underlying algorithms that are used to compute them. Given its template
       // nature, this choice is a compile-time decision because many (but not
@@ -236,8 +236,7 @@ namespace Step71
       // {
       //   double value;          // The value of the object
       //   double derivatives[2]; // Array of derivatives of the object with
-      //   respect
-      //                          // to x and y
+      //                          // respect to x and y
       // };
       // @endcode
       //
@@ -459,7 +458,7 @@ namespace Step71
     }
 
     // Hmm... there's a lot of places in the above where we could have
-    // introduced an error in the above, especially when it comes to employing
+    // introduced an error in the above, especially when it comes to applying
     // the chain rule. Although they're no silver bullet, at the very least
     // these AD frameworks can serve as a verification tool to make sure that we
     // haven't made any errors (either by calculation or by implementation) that
@@ -535,7 +534,7 @@ namespace Step71
       // composition of operations. In fact, the individual components that are
       // used to compose the function are also placeholders. The sequence of
       // operations are encoded into in a tree-like data structure (conceptually
-      // simlar to an [abstract syntax
+      // similar to an [abstract syntax
       // tree](https://en.wikipedia.org/wiki/Abstract_syntax_tree)).
       //
       // Once we form these data structures we can defer any operations that we
@@ -767,7 +766,7 @@ namespace Step71
   // because $\psi_{0}$ doesn't just depend on two scalar variables, but
   // instead on a whole bunch of *tensors*, each with several
   // components. In some cases, these are *symmetric* tensors, for
-  // which only a subset of components is in fact independent, and has
+  // which only a subset of components is in fact independent, and one has
   // to think about what it actually means to compute a derivative
   // such as $\frac{\partial\psi_{0}}{\partial \mathbf{C}}$ where $\mathbf
   // C$ is a symmetric tensor. How all of this will work will,
@@ -1094,7 +1093,7 @@ namespace Step71
 
     // @sect4{Magnetoelastic constitutive law (using automatic differentiation)}
 
-    // We'll being by considering a non-dissipative material, namely one that
+    // We'll begin by considering a non-dissipative material, namely one that
     // is governed by a magneto-hyperelastic constitutive law that exhibits
     // stiffening when immersed in a magnetic field. As described in
     // the introduction, the stored energy density function for such a material
@@ -1189,10 +1188,11 @@ namespace Step71
       FullMatrix<double> D2psi;
     };
 
-    // When setting up the field component extractors, its completely arbitrary
-    // as to how they are ordered. But it is important that the extractors do
-    // not have overlapping indices. The total number of components of these
-    // extractors defines the number of independent variables that the
+    // When setting up the field component extractors, it is completely
+    // arbitrary as to how they are ordered. But it is important that the
+    // extractors do not have overlapping indices. The total number of
+    // components of these extractors defines the number of independent
+    // variables that the
     // @p ad_helper needs to track, and with respect to which we'll be taking
     // derivatives. The resulting data structures @p Dpsi and @p D2psi must also
     // be sized accordingly. Once the @p ad_helper is configured (its input
@@ -1429,7 +1429,7 @@ namespace Step71
     // approximation.
     //
     // Again, let us see how this is implemented in a concrete class. Instead of
-    // the AD framework used in the previous class, we will now employ the SD
+    // the AD framework used in the previous class, we will now utilize the SD
     // approach. To support this,
     // the class constructor accepts not only the @p constitutive_parameters,
     // but also two additional variables that will be used to initialize
@@ -1447,7 +1447,7 @@ namespace Step71
 
       // Like for the automatic differentiation helper, the
       // Differentiation::SD::BatchOptimizer will return a collection of
-      // results all at once. So, in order to do that just once, we'll employ
+      // results all at once. So, in order to do that just once, we'll utilize
       // a similar approach to before and do all of the expensive calculations
       // within the `update_internal_data()` function, and cache the results
       // for layer extraction.
@@ -1583,7 +1583,7 @@ namespace Step71
     // The various symbolic variables representing the constitutive parameters,
     // time step size, and field and internal variables all get a unique
     // identifier. The optimizer is passed the two parameters that declare which
-    // optimization (acceleration) technique should be employed, as well as
+    // optimization (acceleration) technique should be applied, as well as
     // which additional steps should be taken by the CAS to help improve
     // performance during evaluation.
     template <int dim>
@@ -2641,7 +2641,7 @@ namespace Step71
     // this dissipative material, we must adhere strictly to the outcome of
     // applying the Coleman-Noll procedure: we must take *partial derivatives*
     // of the free energy density function with respect to the field variables.
-    // (For out non-dissipative magnetoelastic material, taking either partial
+    // (For our non-dissipative magnetoelastic material, taking either partial
     // or total derivatives would have had the same result, so there was no
     // need to draw your attention to this before.)
     // The crucial part of the operation is to freeze the internal variable

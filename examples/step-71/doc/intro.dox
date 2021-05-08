@@ -590,7 +590,7 @@ conditions that are, in some way, representative of some conditions that might
 be found either in an application or in a laboratory setting. One way to achieve
 that aim would be to embed these constitutive laws in a finite element model to
 simulate a device. In this instance, though, we'll keep things simple (we are
-focussing on the automatic and symbolic differentiation concepts, after all)
+focusing on the automatic and symbolic differentiation concepts, after all)
 and will find a concise way to faithfully replicate an industry-standard
 rheological experiment using an analytical expression for the loading conditions.
 
