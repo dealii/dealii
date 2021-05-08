@@ -10660,8 +10660,12 @@ Triangulation<dim, spacedim>::create_triangulation(
           return a_id < b_id;
       });
 
-  // 2) create all levels via a sequence of refinements
-  for (unsigned int level = 0; level < cell_infos.size(); ++level)
+  // 2) create all levels via a sequence of refinements. note that
+  //    we must make sure that we actually have cells on this level,
+  //    which is not clear in a parallel context for some processes
+  for (unsigned int level = 0;
+       level < cell_infos.size() && !cell_infos[level].empty();
+       ++level)
     {
       // a) set manifold ids here (because new vertices have to be
       //    positioned correctly during each refinement step)
@@ -10714,7 +10718,9 @@ Triangulation<dim, spacedim>::create_triangulation(
     }
 
   // 3) set boundary ids
-  for (unsigned int level = 0; level < cell_infos.size(); ++level)
+  for (unsigned int level = 0;
+       level < cell_infos.size() && !cell_infos[level].empty();
+       ++level)
     {
       auto cell      = this->begin(level);
       auto cell_info = cell_infos[level].begin();
