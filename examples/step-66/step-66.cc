@@ -196,7 +196,7 @@ namespace Step66
   void JacobianOperator<dim, fe_degree, number>::evaluate_newton_step(
     const LinearAlgebra::distributed::Vector<number> &src)
   {
-    const unsigned int n_cells = this->data->n_macro_cells();
+    const unsigned int n_cells = this->data->n_cell_batches();
     FEEvaluation<dim, fe_degree, fe_degree + 1, 1, number> phi(*this->data);
 
     nonlinear_values.reinit(n_cells, phi.n_q_points);
@@ -232,7 +232,7 @@ namespace Step66
 
     for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
       {
-        AssertDimension(nonlinear_values.size(0), data.n_macro_cells());
+        AssertDimension(nonlinear_values.size(0), data.n_cell_batches());
         AssertDimension(nonlinear_values.size(1), phi.n_q_points);
 
         phi.reinit(cell);
@@ -314,7 +314,7 @@ namespace Step66
 
     for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
       {
-        AssertDimension(nonlinear_values.size(0), data.n_macro_cells());
+        AssertDimension(nonlinear_values.size(0), data.n_cell_batches());
         AssertDimension(nonlinear_values.size(1), phi.n_q_points);
 
         phi.reinit(cell);
@@ -545,7 +545,8 @@ namespace Step66
          update_quadrature_points);
       std::shared_ptr<MatrixFree<dim, double>> system_mf_storage(
         new MatrixFree<dim, double>());
-      system_mf_storage->reinit(dof_handler,
+      system_mf_storage->reinit(mapping,
+                                dof_handler,
                                 constraints,
                                 QGauss<1>(fe.degree + 1),
                                 additional_data);
@@ -593,7 +594,8 @@ namespace Step66
         additional_data.mg_level = level;
         std::shared_ptr<MatrixFree<dim, float>> mg_mf_storage_level(
           new MatrixFree<dim, float>());
-        mg_mf_storage_level->reinit(dof_handler,
+        mg_mf_storage_level->reinit(mapping,
+                                    dof_handler,
                                     level_constraints,
                                     QGauss<1>(fe.degree + 1),
                                     additional_data);
