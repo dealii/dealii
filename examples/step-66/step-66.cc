@@ -956,12 +956,11 @@ namespace Step66
       }
     data_out.add_data_vector(subdomain, "subdomain");
 
-    data_out.build_patches(mapping,
-                           fe.degree); // TODO coarse meshes look strange in
-                                       // paraview if we give the mapping object
+    data_out.build_patches(mapping, fe.degree);
 
     DataOutBase::VtkFlags flags;
-    flags.compression_level = DataOutBase::VtkFlags::best_speed;
+    flags.compression_level        = DataOutBase::VtkFlags::best_speed;
+    flags.write_higher_order_cells = true;
     data_out.set_flags(flags);
     data_out.write_vtu_with_pvtu_record(
       "./", "solution", cycle, MPI_COMM_WORLD, 3);
