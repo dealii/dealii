@@ -1763,7 +1763,7 @@ template <typename number>
 inline typename SparseMatrix<number>::size_type
 SparseMatrix<number>::m() const
 {
-  Assert(cols != nullptr, ExcNotInitialized());
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
   return cols->rows;
 }
 
@@ -1772,7 +1772,7 @@ template <typename number>
 inline typename SparseMatrix<number>::size_type
 SparseMatrix<number>::n() const
 {
-  Assert(cols != nullptr, ExcNotInitialized());
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
   return cols->cols;
 }
 
@@ -1961,7 +1961,7 @@ template <typename number>
 inline SparseMatrix<number> &
 SparseMatrix<number>::operator*=(const number factor)
 {
-  Assert(cols != nullptr, ExcNotInitialized());
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(val != nullptr, ExcNotInitialized());
 
   number *            val_ptr = val.get();
@@ -1979,7 +1979,7 @@ template <typename number>
 inline SparseMatrix<number> &
 SparseMatrix<number>::operator/=(const number factor)
 {
-  Assert(cols != nullptr, ExcNotInitialized());
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(val != nullptr, ExcNotInitialized());
   Assert(factor != number(), ExcDivideByZero());
 
@@ -2000,7 +2000,7 @@ template <typename number>
 inline const number &
 SparseMatrix<number>::operator()(const size_type i, const size_type j) const
 {
-  Assert(cols != nullptr, ExcNotInitialized());
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(cols->operator()(i, j) != SparsityPattern::invalid_entry,
          ExcInvalidIndex(i, j));
   return val[cols->operator()(i, j)];
@@ -2012,7 +2012,7 @@ template <typename number>
 inline number &
 SparseMatrix<number>::operator()(const size_type i, const size_type j)
 {
-  Assert(cols != nullptr, ExcNotInitialized());
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(cols->operator()(i, j) != SparsityPattern::invalid_entry,
          ExcInvalidIndex(i, j));
   return val[cols->operator()(i, j)];
@@ -2024,7 +2024,7 @@ template <typename number>
 inline number
 SparseMatrix<number>::el(const size_type i, const size_type j) const
 {
-  Assert(cols != nullptr, ExcNotInitialized());
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
   const size_type index = cols->operator()(i, j);
 
   if (index != SparsityPattern::invalid_entry)
@@ -2039,7 +2039,7 @@ template <typename number>
 inline number
 SparseMatrix<number>::diag_element(const size_type i) const
 {
-  Assert(cols != nullptr, ExcNotInitialized());
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(m() == n(), ExcNotQuadratic());
   AssertIndexRange(i, m());
 
@@ -2054,7 +2054,7 @@ template <typename number>
 inline number &
 SparseMatrix<number>::diag_element(const size_type i)
 {
-  Assert(cols != nullptr, ExcNotInitialized());
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(m() == n(), ExcNotQuadratic());
   AssertIndexRange(i, m());
 
@@ -2466,7 +2466,7 @@ SparseMatrix<number>::print(StreamType &out,
                             const bool  across,
                             const bool  diagonal_first) const
 {
-  Assert(cols != nullptr, ExcNotInitialized());
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(val != nullptr, ExcNotInitialized());
 
   bool   hanging_diagonal = false;
