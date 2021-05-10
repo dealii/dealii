@@ -21,6 +21,8 @@
 
 #  include <hdf5.h>
 
+#  include <iostream>
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace HDF5
