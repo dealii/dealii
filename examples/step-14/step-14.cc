@@ -617,9 +617,9 @@ namespace Step14
     // at least; otherwise, the actions are performed
     // sequentially). Note that we start only one thread, and do the
     // second action in the main thread. Since only one thread is
-    // generated, we don't use the <code>Threads::ThreadGroup</code>
-    // class here, but rather use the one created thread object
-    // directly to wait for this particular thread's exit. The
+    // generated, we don't use the <code>Threads::TaskGroup</code>
+    // class here, but rather use the one created task object
+    // directly to wait for this particular task's exit. The
     // approach is generally the same as the one we have used in
     // <code>Solver::assemble_linear_system()</code> above.
     //

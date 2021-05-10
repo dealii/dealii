@@ -913,10 +913,10 @@ namespace Step13
     // independent, we do that in parallel (if the library was configured to
     // use concurrency, at least; otherwise, the actions are performed
     // sequentially). Note that we start only one thread, and do the second
-    // action in the main thread. Since only one thread is generated, we don't
-    // use the <code>Threads::ThreadGroup</code> class here, but rather use
-    // the one created thread object directly to wait for this particular
-    // thread's exit.
+    // action in the main thread. Since only one task is generated, we don't
+    // use the <code>Threads::TaskGroup</code> class here, but rather use
+    // the one created task object directly to wait for this particular
+    // task's exit.
     //
     // Note that taking up the address of the
     // <code>DoFTools::make_hanging_node_constraints</code> function is a
