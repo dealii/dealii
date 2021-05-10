@@ -352,8 +352,7 @@ namespace Utilities
        * @note The function
        *   Utilities::MPI::compute_point_to_point_communication_pattern() is
        *   used to determine the source processes, which implements a
-       *   PEX-algorithm from Hoefner et al., "Scalable Communication
-       *   Protocols for Dynamic Sparse Data Exchange".
+       *   PEX-algorithm from @cite hoefler2010scalable.
        *
        * @tparam T1 The type of the elements of the vector to be sent.
        * @tparam T2 The type of the elements of the vector to be received.
