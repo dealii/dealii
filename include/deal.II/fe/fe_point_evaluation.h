@@ -25,6 +25,7 @@
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/vectorization.h>
 
+#include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_q_generic.h>
 
 #include <deal.II/matrix_free/evaluation_flags.h>
@@ -611,6 +612,13 @@ FEPointEvaluation<n_components, dim, spacedim>::evaluate(
   const ArrayView<const double> &                             solution_values,
   const EvaluationFlags::EvaluationFlags &                    evaluation_flag)
 {
+  if (unit_points.size() == 0) // no evaluation points provided
+    {
+      values.clear();
+      gradients.clear();
+      return;
+    }
+
   AssertDimension(solution_values.size(), fe->dofs_per_cell);
   if (((evaluation_flag & EvaluationFlags::values) ||
        (evaluation_flag & EvaluationFlags::gradients)) &&
@@ -747,6 +755,9 @@ FEPointEvaluation<n_components, dim, spacedim>::integrate(
   const ArrayView<double> &                                   solution_values,
   const EvaluationFlags::EvaluationFlags &                    integration_flags)
 {
+  if (unit_points.size() == 0) // no evaluation points provided
+    return;
+
   AssertDimension(solution_values.size(), fe->dofs_per_cell);
   if (false /*TODO*/ && (((integration_flags & EvaluationFlags::values) ||
                           (integration_flags & EvaluationFlags::gradients)) &&
