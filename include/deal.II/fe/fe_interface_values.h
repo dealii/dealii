@@ -809,6 +809,14 @@ private:
    * as determined in reinit().
    */
   FEFaceValuesBase<dim, spacedim> *fe_face_values_neighbor;
+
+  /* Make the view classes friends of this class, since they access internal
+   * data.
+   */
+  template <int, int>
+  friend class FEInterfaceViews::Scalar;
+  template <int, int>
+  friend class FEInterfaceViews::Vector;
 };
 
 
@@ -1427,10 +1435,17 @@ namespace FEInterfaceViews
                                const unsigned int interface_dof_index,
                                const unsigned int q_point) const
   {
-    return this->fe_interface->shape_value(here_or_there,
-                                           interface_dof_index,
-                                           q_point,
-                                           extractor.component);
+    const auto dof_pair = this->fe_interface->dofmap[interface_dof_index];
+
+    if (here_or_there && dof_pair[0] != numbers::invalid_unsigned_int)
+      return (*(this->fe_interface->fe_face_values))[extractor].value(
+        dof_pair[0], q_point);
+
+    if (!here_or_there && dof_pair[1] != numbers::invalid_unsigned_int)
+      return (*(this->fe_interface->fe_face_values_neighbor))[extractor].value(
+        dof_pair[1], q_point);
+
+    return 0.0;
   }
 
 
@@ -1440,9 +1455,21 @@ namespace FEInterfaceViews
   Scalar<dim, spacedim>::jump(const unsigned int interface_dof_index,
                               const unsigned int q_point) const
   {
-    return this->fe_interface->jump(interface_dof_index,
-                                    q_point,
-                                    extractor.component);
+    const auto dof_pair = this->fe_interface->dofmap[interface_dof_index];
+
+    value_type value = 0.0;
+
+    if (dof_pair[0] != numbers::invalid_unsigned_int)
+      value +=
+        (*(this->fe_interface->fe_face_values))[extractor].value(dof_pair[0],
+                                                                 q_point);
+
+    if (dof_pair[1] != numbers::invalid_unsigned_int)
+      value -=
+        (*(this->fe_interface->fe_face_values_neighbor))[extractor].value(
+          dof_pair[1], q_point);
+
+    return value;
   }
 
 
@@ -1452,9 +1479,26 @@ namespace FEInterfaceViews
   Scalar<dim, spacedim>::average(const unsigned int interface_dof_index,
                                  const unsigned int q_point) const
   {
-    return this->fe_interface->average(interface_dof_index,
-                                       q_point,
-                                       extractor.component);
+    const auto dof_pair = this->fe_interface->dofmap[interface_dof_index];
+
+    if (this->fe_interface->at_boundary())
+      return 1.0 * (*(this->fe_interface->fe_face_values))[extractor].value(
+                     dof_pair[0], q_point);
+
+    value_type value = 0.0;
+
+    if (dof_pair[0] != numbers::invalid_unsigned_int)
+      value +=
+        0.5 *
+        (*(this->fe_interface->fe_face_values))[extractor].value(dof_pair[0],
+                                                                 q_point);
+
+    if (dof_pair[1] != numbers::invalid_unsigned_int)
+      value +=
+        0.5 * (*(this->fe_interface->fe_face_values_neighbor))[extractor].value(
+                dof_pair[1], q_point);
+
+    return value;
   }
 
 
@@ -1465,9 +1509,25 @@ namespace FEInterfaceViews
     const unsigned int interface_dof_index,
     const unsigned int q_point) const
   {
-    return this->fe_interface->average_gradient(interface_dof_index,
-                                                q_point,
-                                                extractor.component);
+    const auto dof_pair = this->fe_interface->dofmap[interface_dof_index];
+
+    if (this->fe_interface->at_boundary())
+      return 1.0 * (*(this->fe_interface->fe_face_values))[extractor].gradient(
+                     dof_pair[0], q_point);
+
+    gradient_type value;
+
+    if (dof_pair[0] != numbers::invalid_unsigned_int)
+      value +=
+        0.5 *
+        (*(this->fe_interface->fe_face_values))[extractor].gradient(dof_pair[0],
+                                                                    q_point);
+
+    if (dof_pair[1] != numbers::invalid_unsigned_int)
+      value += 0.5 * (*(this->fe_interface->fe_face_values_neighbor))[extractor]
+                       .gradient(dof_pair[1], q_point);
+
+    return value;
   }
 
 
@@ -1477,9 +1537,25 @@ namespace FEInterfaceViews
   Scalar<dim, spacedim>::jump_gradient(const unsigned int interface_dof_index,
                                        const unsigned int q_point) const
   {
-    return this->fe_interface->jump_gradient(interface_dof_index,
-                                             q_point,
-                                             extractor.component);
+    const auto dof_pair = this->fe_interface->dofmap[interface_dof_index];
+
+    if (this->fe_interface->at_boundary())
+      return 1.0 * (*(this->fe_interface->fe_face_values))[extractor].gradient(
+                     dof_pair[0], q_point);
+
+    gradient_type value;
+
+    if (dof_pair[0] != numbers::invalid_unsigned_int)
+      value +=
+        1.0 *
+        (*(this->fe_interface->fe_face_values))[extractor].gradient(dof_pair[0],
+                                                                    q_point);
+
+    if (dof_pair[1] != numbers::invalid_unsigned_int)
+      value -= 1.0 * (*(this->fe_interface->fe_face_values_neighbor))[extractor]
+                       .gradient(dof_pair[1], q_point);
+
+    return value;
   }
 
 
@@ -1489,9 +1565,25 @@ namespace FEInterfaceViews
   Scalar<dim, spacedim>::average_hessian(const unsigned int interface_dof_index,
                                          const unsigned int q_point) const
   {
-    return this->fe_interface->average_hessian(interface_dof_index,
-                                               q_point,
-                                               extractor.component);
+    const auto dof_pair = this->fe_interface->dofmap[interface_dof_index];
+
+    if (this->fe_interface->at_boundary())
+      return 1.0 * (*(this->fe_interface->fe_face_values))[extractor].hessian(
+                     dof_pair[0], q_point);
+
+    hessian_type value;
+
+    if (dof_pair[0] != numbers::invalid_unsigned_int)
+      value +=
+        0.5 *
+        (*(this->fe_interface->fe_face_values))[extractor].hessian(dof_pair[0],
+                                                                   q_point);
+
+    if (dof_pair[1] != numbers::invalid_unsigned_int)
+      value += 0.5 * (*(this->fe_interface->fe_face_values_neighbor))[extractor]
+                       .hessian(dof_pair[1], q_point);
+
+    return value;
   }
 
 
@@ -1502,9 +1594,23 @@ namespace FEInterfaceViews
     const unsigned int interface_dof_index,
     const unsigned int q_point) const
   {
-    return this->fe_interface->jump_3rd_derivative(interface_dof_index,
-                                                   q_point,
-                                                   extractor.component);
+    const auto dof_pair = this->fe_interface->dofmap[interface_dof_index];
+
+    if (this->fe_interface->at_boundary())
+      return 1.0 * (*(this->fe_interface->fe_face_values))[extractor]
+                     .third_derivative(dof_pair[0], q_point);
+
+    third_derivative_type value;
+
+    if (dof_pair[0] != numbers::invalid_unsigned_int)
+      value += 1.0 * (*(this->fe_interface->fe_face_values))[extractor]
+                       .third_derivative(dof_pair[0], q_point);
+
+    if (dof_pair[1] != numbers::invalid_unsigned_int)
+      value -= 1.0 * (*(this->fe_interface->fe_face_values_neighbor))[extractor]
+                       .third_derivative(dof_pair[1], q_point);
+
+    return value;
   }
 
 
@@ -1514,9 +1620,25 @@ namespace FEInterfaceViews
   Scalar<dim, spacedim>::jump_hessian(const unsigned int interface_dof_index,
                                       const unsigned int q_point) const
   {
-    return this->fe_interface->jump_hessian(interface_dof_index,
-                                            q_point,
-                                            extractor.component);
+    const auto dof_pair = this->fe_interface->dofmap[interface_dof_index];
+
+    if (this->fe_interface->at_boundary())
+      return 1.0 * (*(this->fe_interface->fe_face_values))[extractor].hessian(
+                     dof_pair[0], q_point);
+
+    hessian_type value;
+
+    if (dof_pair[0] != numbers::invalid_unsigned_int)
+      value +=
+        1.0 *
+        (*(this->fe_interface->fe_face_values))[extractor].hessian(dof_pair[0],
+                                                                   q_point);
+
+    if (dof_pair[1] != numbers::invalid_unsigned_int)
+      value -= 1.0 * (*(this->fe_interface->fe_face_values_neighbor))[extractor]
+                       .hessian(dof_pair[1], q_point);
+
+    return value;
   }
 
 
@@ -1537,15 +1659,17 @@ namespace FEInterfaceViews
                                const unsigned int interface_dof_index,
                                const unsigned int q_point) const
   {
-    value_type result;
-    for (int d = 0; d < dim; ++d)
-      result[d] =
-        this->fe_interface->shape_value(here_or_there,
-                                        interface_dof_index,
-                                        q_point,
-                                        d + extractor.first_vector_component);
+    const auto dof_pair = this->fe_interface->dofmap[interface_dof_index];
 
-    return result;
+    if (here_or_there && dof_pair[0] != numbers::invalid_unsigned_int)
+      return (*(this->fe_interface->fe_face_values))[extractor].value(
+        dof_pair[0], q_point);
+
+    if (!here_or_there && dof_pair[1] != numbers::invalid_unsigned_int)
+      return (*(this->fe_interface->fe_face_values_neighbor))[extractor].value(
+        dof_pair[1], q_point);
+
+    return value_type();
   }
 
 
@@ -1555,14 +1679,21 @@ namespace FEInterfaceViews
   Vector<dim, spacedim>::jump(const unsigned int interface_dof_index,
                               const unsigned int q_point) const
   {
-    value_type result;
-    for (int d = 0; d < dim; ++d)
-      result[d] =
-        this->fe_interface->jump(interface_dof_index,
-                                 q_point,
-                                 d + extractor.first_vector_component);
+    const auto dof_pair = this->fe_interface->dofmap[interface_dof_index];
 
-    return result;
+    value_type value;
+
+    if (dof_pair[0] != numbers::invalid_unsigned_int)
+      value +=
+        (*(this->fe_interface->fe_face_values))[extractor].value(dof_pair[0],
+                                                                 q_point);
+
+    if (dof_pair[1] != numbers::invalid_unsigned_int)
+      value -=
+        (*(this->fe_interface->fe_face_values_neighbor))[extractor].value(
+          dof_pair[1], q_point);
+
+    return value;
   }
 
 
@@ -1572,14 +1703,26 @@ namespace FEInterfaceViews
   Vector<dim, spacedim>::average(const unsigned int interface_dof_index,
                                  const unsigned int q_point) const
   {
-    value_type result;
-    for (int d = 0; d < dim; ++d)
-      result[d] =
-        this->fe_interface->average(interface_dof_index,
-                                    q_point,
-                                    d + extractor.first_vector_component);
+    const auto dof_pair = this->fe_interface->dofmap[interface_dof_index];
 
-    return result;
+    if (this->fe_interface->at_boundary())
+      return 1.0 * (*(this->fe_interface->fe_face_values))[extractor].value(
+                     dof_pair[0], q_point);
+
+    value_type value;
+
+    if (dof_pair[0] != numbers::invalid_unsigned_int)
+      value +=
+        0.5 *
+        (*(this->fe_interface->fe_face_values))[extractor].value(dof_pair[0],
+                                                                 q_point);
+
+    if (dof_pair[1] != numbers::invalid_unsigned_int)
+      value +=
+        0.5 * (*(this->fe_interface->fe_face_values_neighbor))[extractor].value(
+                dof_pair[1], q_point);
+
+    return value;
   }
 
 
@@ -1590,12 +1733,25 @@ namespace FEInterfaceViews
     const unsigned int interface_dof_index,
     const unsigned int q_point) const
   {
-    gradient_type result;
-    for (int d = 0; d < dim; ++d)
-      result[d] = this->fe_interface->average_gradient(
-        interface_dof_index, q_point, d + extractor.first_vector_component);
+    const auto dof_pair = this->fe_interface->dofmap[interface_dof_index];
 
-    return result;
+    if (this->fe_interface->at_boundary())
+      return 1.0 * (*(this->fe_interface->fe_face_values))[extractor].gradient(
+                     dof_pair[0], q_point);
+
+    gradient_type value;
+
+    if (dof_pair[0] != numbers::invalid_unsigned_int)
+      value +=
+        0.5 *
+        (*(this->fe_interface->fe_face_values))[extractor].gradient(dof_pair[0],
+                                                                    q_point);
+
+    if (dof_pair[1] != numbers::invalid_unsigned_int)
+      value += 0.5 * (*(this->fe_interface->fe_face_values_neighbor))[extractor]
+                       .gradient(dof_pair[1], q_point);
+
+    return value;
   }
 
 
@@ -1605,14 +1761,25 @@ namespace FEInterfaceViews
   Vector<dim, spacedim>::jump_gradient(const unsigned int interface_dof_index,
                                        const unsigned int q_point) const
   {
-    gradient_type result;
-    for (int d = 0; d < dim; ++d)
-      result[d] =
-        this->fe_interface->jump_gradient(interface_dof_index,
-                                          q_point,
-                                          d + extractor.first_vector_component);
+    const auto dof_pair = this->fe_interface->dofmap[interface_dof_index];
 
-    return result;
+    if (this->fe_interface->at_boundary())
+      return 1.0 * (*(this->fe_interface->fe_face_values))[extractor].gradient(
+                     dof_pair[0], q_point);
+
+    gradient_type value;
+
+    if (dof_pair[0] != numbers::invalid_unsigned_int)
+      value +=
+        1.0 *
+        (*(this->fe_interface->fe_face_values))[extractor].gradient(dof_pair[0],
+                                                                    q_point);
+
+    if (dof_pair[1] != numbers::invalid_unsigned_int)
+      value -= 1.0 * (*(this->fe_interface->fe_face_values_neighbor))[extractor]
+                       .gradient(dof_pair[1], q_point);
+
+    return value;
   }
 
 
@@ -1622,12 +1789,25 @@ namespace FEInterfaceViews
   Vector<dim, spacedim>::average_hessian(const unsigned int interface_dof_index,
                                          const unsigned int q_point) const
   {
-    hessian_type result;
-    for (int d = 0; d < dim; ++d)
-      result[d] = this->fe_interface->average_hessian(
-        interface_dof_index, q_point, d + extractor.first_vector_component);
+    const auto dof_pair = this->fe_interface->dofmap[interface_dof_index];
 
-    return result;
+    if (this->fe_interface->at_boundary())
+      return 1.0 * (*(this->fe_interface->fe_face_values))[extractor].hessian(
+                     dof_pair[0], q_point);
+
+    hessian_type value;
+
+    if (dof_pair[0] != numbers::invalid_unsigned_int)
+      value +=
+        0.5 *
+        (*(this->fe_interface->fe_face_values))[extractor].hessian(dof_pair[0],
+                                                                   q_point);
+
+    if (dof_pair[1] != numbers::invalid_unsigned_int)
+      value += 0.5 * (*(this->fe_interface->fe_face_values_neighbor))[extractor]
+                       .hessian(dof_pair[1], q_point);
+
+    return value;
   }
 
 
@@ -1637,14 +1817,25 @@ namespace FEInterfaceViews
   Vector<dim, spacedim>::jump_hessian(const unsigned int interface_dof_index,
                                       const unsigned int q_point) const
   {
-    hessian_type result;
-    for (int d = 0; d < dim; ++d)
-      result[d] =
-        this->fe_interface->jump_hessian(interface_dof_index,
-                                         q_point,
-                                         d + extractor.first_vector_component);
+    const auto dof_pair = this->fe_interface->dofmap[interface_dof_index];
 
-    return result;
+    if (this->fe_interface->at_boundary())
+      return 1.0 * (*(this->fe_interface->fe_face_values))[extractor].hessian(
+                     dof_pair[0], q_point);
+
+    hessian_type value;
+
+    if (dof_pair[0] != numbers::invalid_unsigned_int)
+      value +=
+        1.0 *
+        (*(this->fe_interface->fe_face_values))[extractor].hessian(dof_pair[0],
+                                                                   q_point);
+
+    if (dof_pair[1] != numbers::invalid_unsigned_int)
+      value -= 1.0 * (*(this->fe_interface->fe_face_values_neighbor))[extractor]
+                       .hessian(dof_pair[1], q_point);
+
+    return value;
   }
 
 
@@ -1655,12 +1846,23 @@ namespace FEInterfaceViews
     const unsigned int interface_dof_index,
     const unsigned int q_point) const
   {
-    third_derivative_type result;
-    for (int d = 0; d < dim; ++d)
-      result[d] = this->fe_interface->jump_3rd_derivative(
-        interface_dof_index, q_point, d + extractor.first_vector_component);
+    const auto dof_pair = this->fe_interface->dofmap[interface_dof_index];
 
-    return result;
+    if (this->fe_interface->at_boundary())
+      return 1.0 * (*(this->fe_interface->fe_face_values))[extractor]
+                     .third_derivative(dof_pair[0], q_point);
+
+    third_derivative_type value;
+
+    if (dof_pair[0] != numbers::invalid_unsigned_int)
+      value += 1.0 * (*(this->fe_interface->fe_face_values))[extractor]
+                       .third_derivative(dof_pair[0], q_point);
+
+    if (dof_pair[1] != numbers::invalid_unsigned_int)
+      value -= 1.0 * (*(this->fe_interface->fe_face_values_neighbor))[extractor]
+                       .third_derivative(dof_pair[1], q_point);
+
+    return value;
   }
 } // namespace FEInterfaceViews
 
