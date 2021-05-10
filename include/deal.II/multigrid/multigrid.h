@@ -546,7 +546,7 @@ public:
   /**
    * Return the MPI communicator object in use with this preconditioner.
    */
-  const MPI_Comm &
+  MPI_Comm
   get_mpi_communicator() const;
 
   /**
@@ -863,7 +863,7 @@ PreconditionMG<dim, VectorType, TRANSFER>::locally_owned_domain_indices(
 
 
 template <int dim, typename VectorType, class TRANSFER>
-const MPI_Comm &
+MPI_Comm
 PreconditionMG<dim, VectorType, TRANSFER>::get_mpi_communicator() const
 {
   // currently parallel GMG works with parallel triangulations only,
