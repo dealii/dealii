@@ -30,7 +30,6 @@
 
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
-#include <boost/geometry/index/detail/serialization.hpp>
 #include <boost/optional.hpp>
 #include <boost/serialization/array.hpp>
 #include <boost/serialization/vector.hpp>
