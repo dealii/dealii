@@ -554,7 +554,8 @@ namespace Step77
         // reach; but you might want to look into what other members the
         // SUNDIALS::KINSOL::AdditionalData class has and play with them).
         {
-          SUNDIALS::KINSOL<Vector<double>>::AdditionalData additional_data;
+          typename SUNDIALS::KINSOL<Vector<double>>::AdditionalData
+            additional_data;
           additional_data.function_tolerance = target_tolerance;
 
           SUNDIALS::KINSOL<Vector<double>> nonlinear_solver(additional_data);
