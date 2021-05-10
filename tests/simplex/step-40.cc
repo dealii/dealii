@@ -292,12 +292,30 @@ namespace Step40
                  system_rhs,
                  preconditioner);
 
-    pcout << "   Solved in " << solver_control.last_step() << " iterations."
-          << std::endl;
-
     constraints.distribute(completely_distributed_solution);
 
     locally_relevant_solution = completely_distributed_solution;
+
+    Vector<double> difference(triangulation.n_active_cells());
+
+#ifdef HEX
+    const QGauss<dim> quadrature_formula(fe.degree + 1);
+#else
+    const QGaussSimplex<dim> quadrature_formula(fe.degree + 1);
+#endif
+
+    VectorTools::integrate_difference(mapping,
+                                      dof_handler,
+                                      locally_relevant_solution,
+                                      Functions::ZeroFunction<dim>(),
+                                      difference,
+                                      quadrature_formula,
+                                      VectorTools::NormType::L2_norm);
+
+    pcout << VectorTools::compute_global_error(triangulation,
+                                               difference,
+                                               VectorTools::NormType::L2_norm)
+          << std::endl;
   }
 
   template <int dim>
