@@ -1320,7 +1320,8 @@ namespace GridTools
    *
    * If the point requested does not lie in a locally-owned or ghost cell,
    * then this function will return the (invalid) MeshType<dim, spacedim>::end()
-   * iterator.
+   * iterator. This case can be handled similarly to the various `std::find()`
+   * and `std::lower_bound()` functions.
    *
    * @param mapping The mapping used to determine whether the given point is
    *   inside a given cell.
@@ -1445,7 +1446,8 @@ namespace GridTools
    *   auto cell_and_ref_point = GridTools::find_active_cell_around_point(
    *     cache, p, cell_hint, marked_vertices, tolerance);
    *
-   *   if(cell_and_ref_point.first != triangulation.end()) {
+   *   if (cell_and_ref_point.first != triangulation.end())
+   *     {
    *      // use current cell as hint for the next point
    *      cell_hint = cell_and_ref_point.first;
    *      // do something with cell_and_ref_point

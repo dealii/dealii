@@ -450,6 +450,9 @@ namespace GridTools
     int                                         best_level    = -1;
     std::pair<active_cell_iterator, Point<dim>> best_cell;
 
+    // Initialize best_cell.first to the end iterator
+    best_cell.first = mesh.end();
+
     // Find closest vertex and determine
     // all adjacent cells
     std::vector<active_cell_iterator> adjacent_cells_tmp =
@@ -574,7 +577,7 @@ namespace GridTools
     const auto cell_and_point = find_active_cell_around_point(
       mapping, mesh, p, marked_vertices, tolerance);
 
-    if (cell_and_point.first.state() != IteratorState::valid)
+    if (cell_and_point.first == mesh.end())
       return {};
 
     return find_all_active_cells_around_point(
@@ -609,7 +612,7 @@ namespace GridTools
     // insert the fist cell and point into the vector
     cells_and_points.push_back(first_cell);
 
-    // check if the given point is on the surface of the unit cell. if yes,
+    // check if the given point is on the surface of the unit cell. If yes,
     // need to find all neighbors
     const Point<dim> unit_point = cells_and_points.front().second;
     const auto       my_cell    = cells_and_points.front().first;
