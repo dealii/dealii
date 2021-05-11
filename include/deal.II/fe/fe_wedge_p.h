@@ -32,15 +32,15 @@ DEAL_II_NAMESPACE_OPEN
  * @ingroup simplex
  */
 template <int dim, int spacedim = dim>
-class FE_Wedge : public dealii::FE_Poly<dim, spacedim>
+class FE_WedgePoly : public dealii::FE_Poly<dim, spacedim>
 {
 public:
   /**
    * Constructor.
    */
-  FE_Wedge(const unsigned int                                degree,
-           const internal::GenericDoFsPerObject &            dpos,
-           const typename FiniteElementData<dim>::Conformity conformity);
+  FE_WedgePoly(const unsigned int                                degree,
+               const internal::GenericDoFsPerObject &            dpos,
+               const typename FiniteElementData<dim>::Conformity conformity);
 };
 
 /**
@@ -51,7 +51,7 @@ public:
  * @ingroup simplex
  */
 template <int dim, int spacedim = dim>
-class FE_WedgeP : public FE_Wedge<dim, spacedim>
+class FE_WedgeP : public FE_WedgePoly<dim, spacedim>
 {
 public:
   /**
@@ -110,7 +110,7 @@ public:
  * @ingroup simplex
  */
 template <int dim, int spacedim = dim>
-class FE_WedgeDGP : public FE_Wedge<dim, spacedim>
+class FE_WedgeDGP : public FE_WedgePoly<dim, spacedim>
 {
 public:
   /**

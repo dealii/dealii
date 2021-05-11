@@ -73,7 +73,7 @@ namespace
 
 
 template <int dim, int spacedim>
-FE_Pyramid<dim, spacedim>::FE_Pyramid(
+FE_PyramidPoly<dim, spacedim>::FE_PyramidPoly(
   const unsigned int                                degree,
   const internal::GenericDoFsPerObject &            dpos,
   const typename FiniteElementData<dim>::Conformity conformity)
@@ -110,9 +110,9 @@ FE_Pyramid<dim, spacedim>::FE_Pyramid(
 
 template <int dim, int spacedim>
 FE_PyramidP<dim, spacedim>::FE_PyramidP(const unsigned int degree)
-  : FE_Pyramid<dim, spacedim>(degree,
-                              get_dpo_vector_fe_pyramid_p(degree),
-                              FiniteElementData<dim>::H1)
+  : FE_PyramidPoly<dim, spacedim>(degree,
+                                  get_dpo_vector_fe_pyramid_p(degree),
+                                  FiniteElementData<dim>::H1)
 {}
 
 
@@ -279,9 +279,9 @@ FE_PyramidP<dim, spacedim>::hp_quad_dof_identities(
 
 template <int dim, int spacedim>
 FE_PyramidDGP<dim, spacedim>::FE_PyramidDGP(const unsigned int degree)
-  : FE_Pyramid<dim, spacedim>(degree,
-                              get_dpo_vector_fe_pyramid_dgp(degree),
-                              FiniteElementData<dim>::L2)
+  : FE_PyramidPoly<dim, spacedim>(degree,
+                                  get_dpo_vector_fe_pyramid_dgp(degree),
+                                  FiniteElementData<dim>::L2)
 {}
 
 

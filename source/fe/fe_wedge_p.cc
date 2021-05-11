@@ -81,7 +81,7 @@ namespace
 } // namespace
 
 template <int dim, int spacedim>
-FE_Wedge<dim, spacedim>::FE_Wedge(
+FE_WedgePoly<dim, spacedim>::FE_WedgePoly(
   const unsigned int                                degree,
   const internal::GenericDoFsPerObject &            dpos,
   const typename FiniteElementData<dim>::Conformity conformity)
@@ -118,9 +118,9 @@ FE_Wedge<dim, spacedim>::FE_Wedge(
 
 template <int dim, int spacedim>
 FE_WedgeP<dim, spacedim>::FE_WedgeP(const unsigned int degree)
-  : FE_Wedge<dim, spacedim>(degree,
-                            get_dpo_vector_fe_wedge_p(degree),
-                            FiniteElementData<dim>::H1)
+  : FE_WedgePoly<dim, spacedim>(degree,
+                                get_dpo_vector_fe_wedge_p(degree),
+                                FiniteElementData<dim>::H1)
 {}
 
 
@@ -287,9 +287,9 @@ FE_WedgeP<dim, spacedim>::hp_quad_dof_identities(
 
 template <int dim, int spacedim>
 FE_WedgeDGP<dim, spacedim>::FE_WedgeDGP(const unsigned int degree)
-  : FE_Wedge<dim, spacedim>(degree,
-                            get_dpo_vector_fe_wedge_dgp(degree),
-                            FiniteElementData<dim>::L2)
+  : FE_WedgePoly<dim, spacedim>(degree,
+                                get_dpo_vector_fe_wedge_dgp(degree),
+                                FiniteElementData<dim>::L2)
 {}
 
 
