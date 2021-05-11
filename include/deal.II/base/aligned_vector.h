@@ -930,16 +930,13 @@ AlignedVector<T>::resize_fast(const size_type new_size)
     {} // nothing to do here
   else if (new_size < old_size)
     {
-      // call destructor on fields that are released. doing it backward
-      // releases the elements in reverse order as compared to how they were
-      // created
+      // call destructor on fields that are released, if the type requires it.
+      // doing it backward releases the elements in reverse order as compared to
+      // how they were created
       if (std::is_trivial<T>::value == false)
-        {
-          while (used_elements_end != elements.get() + new_size)
-            (--used_elements_end)->~T();
-        }
-      else
-        used_elements_end = elements.get() + new_size;
+        for (T *p = used_elements_end - 1; p >= elements.get() + new_size; --p)
+          p->~T();
+      used_elements_end = elements.get() + new_size;
     }
   else // new_size > old_size
     {
@@ -969,16 +966,13 @@ AlignedVector<T>::resize(const size_type new_size)
     {} // nothing to do here
   else if (new_size < old_size)
     {
-      // call destructor on fields that are released. doing it backward
-      // releases the elements in reverse order as compared to how they were
-      // created
+      // call destructor on fields that are released, if the type requires it.
+      // doing it backward releases the elements in reverse order as compared to
+      // how they were created
       if (std::is_trivial<T>::value == false)
-        {
-          while (used_elements_end != elements.get() + new_size)
-            (--used_elements_end)->~T();
-        }
-      else
-        used_elements_end = elements.get() + new_size;
+        for (T *p = used_elements_end - 1; p >= elements.get() + new_size; --p)
+          p->~T();
+      used_elements_end = elements.get() + new_size;
     }
   else // new_size > old_size
     {
@@ -1006,16 +1000,13 @@ AlignedVector<T>::resize(const size_type new_size, const T &init)
     {} // nothing to do here
   else if (new_size < old_size)
     {
-      // call destructor on fields that are released. doing it backward
-      // releases the elements in reverse order as compared to how they were
-      // created
+      // call destructor on fields that are released, if the type requires it.
+      // doing it backward releases the elements in reverse order as compared to
+      // how they were created
       if (std::is_trivial<T>::value == false)
-        {
-          while (used_elements_end != elements.get() + new_size)
-            (--used_elements_end)->~T();
-        }
-      else
-        used_elements_end = elements.get() + new_size;
+        for (T *p = used_elements_end - 1; p >= elements.get() + new_size; --p)
+          p->~T();
+      used_elements_end = elements.get() + new_size;
     }
   else // new_size > old_size
     {
