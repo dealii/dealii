@@ -8730,39 +8730,33 @@ XDMFEntry::get_xdmf_content(const unsigned int   indent_level,
   ss << indent(indent_level + 3) << h5_mesh_filename << ":/nodes\n";
   ss << indent(indent_level + 2) << "</DataItem>\n";
   ss << indent(indent_level + 1) << "</Geometry>\n";
+
   // If we have cells defined, use the topology corresponding to the dimension
   if (num_cells > 0)
     {
+      ss << indent(indent_level + 1) << "<Topology TopologyType=\"";
+
       if (dimension == 0)
-        ss << indent(indent_level + 1) << "<Topology TopologyType=\""
-           << "Polyvertex"
-           << "\" NumberOfElements=\"" << num_cells
-           << "\" NodesPerElement=\"1\">\n";
+        {
+          ss << "Polyvertex";
+        }
       else if (dimension == 1)
-        ss << indent(indent_level + 1) << "<Topology TopologyType=\""
-           << "Polyline"
-           << "\" NumberOfElements=\"" << num_cells
-           << "\" NodesPerElement=\"2\">\n";
+        {
+          ss << "Polyline";
+        }
       else if (dimension == 2)
         {
           Assert(reference_cell == ReferenceCells::Quadrilateral ||
                    reference_cell == ReferenceCells::Triangle,
                  ExcNotImplemented());
 
-          ss << indent(indent_level + 1) << "<Topology TopologyType=\"";
           if (reference_cell == ReferenceCells::Quadrilateral)
             {
-              ss << "Quadrilateral"
-                 << "\" NumberOfElements=\"" << num_cells << "\">\n"
-                 << indent(indent_level + 2) << "<DataItem Dimensions=\""
-                 << num_cells << " " << (1 << dimension);
+              ss << "Quadrilateral";
             }
           else // if (reference_cell == ReferenceCells::Triangle)
             {
-              ss << "Triangle"
-                 << "\" NumberOfElements=\"" << num_cells << "\">\n"
-                 << indent(indent_level + 2) << "<DataItem Dimensions=\""
-                 << num_cells << " " << 3;
+              ss << "Triangle";
             }
         }
       else if (dimension == 3)
@@ -8771,24 +8765,29 @@ XDMFEntry::get_xdmf_content(const unsigned int   indent_level,
                    reference_cell == ReferenceCells::Tetrahedron,
                  ExcNotImplemented());
 
-          ss << indent(indent_level + 1) << "<Topology TopologyType=\"";
           if (reference_cell == ReferenceCells::Hexahedron)
             {
-              ss << "Hexahedron"
-                 << "\" NumberOfElements=\"" << num_cells << "\">\n"
-                 << indent(indent_level + 2) << "<DataItem Dimensions=\""
-                 << num_cells << " " << (1 << dimension);
+              ss << "Hexahedron";
             }
           else // if (reference_cell == ReferenceCells::Tetrahedron)
             {
-              ss << "Tetrahedron"
-                 << "\" NumberOfElements=\"" << num_cells << "\">\n"
-                 << indent(indent_level + 2) << "<DataItem Dimensions=\""
-                 << num_cells << " " << 4;
+              ss << "Tetrahedron";
             }
         }
 
-      ss << "\" NumberType=\"UInt\" Format=\"HDF\">\n";
+      ss << "\" NumberOfElements=\"" << num_cells;
+      if (dimension == 0)
+        ss << "\" NodesPerElement=\"1\">\n";
+      else if (dimension == 1)
+        ss << "\" NodesPerElement=\"2\">\n";
+      else
+        // no "NodesPerElement" for dimension 2 and higher
+        ss << "\">\n";
+
+      ss << indent(indent_level + 2) << "<DataItem Dimensions=\"" << num_cells
+         << " " << reference_cell.n_vertices()
+         << "\" NumberType=\"UInt\" Format=\"HDF\">\n";
+
       ss << indent(indent_level + 3) << h5_mesh_filename << ":/cells\n";
       ss << indent(indent_level + 2) << "</DataItem>\n";
       ss << indent(indent_level + 1) << "</Topology>\n";
