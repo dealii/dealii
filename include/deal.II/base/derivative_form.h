@@ -424,12 +424,12 @@ DerivativeForm<order, dim, spacedim, Number>::memory_consumption()
  *
  * @relatesalso DerivativeForm
  */
-template <int spacedim, int dim, typename Number>
-inline Tensor<1, spacedim, Number>
-apply_transformation(const DerivativeForm<1, dim, spacedim, Number> &grad_F,
-                     const Tensor<1, dim, Number> &                  d_x)
+template <int spacedim, int dim, typename Number1, typename Number2 = Number1>
+inline Tensor<1, spacedim, Number2>
+apply_transformation(const DerivativeForm<1, dim, spacedim, Number1> &grad_F,
+                     const Tensor<1, dim, Number2> &                  d_x)
 {
-  Tensor<1, spacedim, Number> dest;
+  Tensor<1, spacedim, Number2> dest;
   for (unsigned int i = 0; i < spacedim; ++i)
     dest[i] = grad_F[i] * d_x;
   return dest;

@@ -39,7 +39,7 @@
 
 
 
-template <int dim>
+template <int dim, typename Number = double>
 void
 test(const unsigned int degree)
 {
@@ -59,7 +59,7 @@ test(const unsigned int degree)
     {
       Point<dim> p;
       for (unsigned int d = 0; d < dim; ++d)
-        p[d] = static_cast<double>(i) / 17. + 0.015625 * d;
+        p[d] = static_cast<Number>(i) / 17. + 0.015625 * d;
       unit_points.push_back(p);
     }
 
@@ -71,20 +71,20 @@ test(const unsigned int degree)
 
   DoFHandler<dim> dof_handler(tria);
   dof_handler.distribute_dofs(fe);
-  Vector<double> vector(dof_handler.n_dofs());
+  Vector<Number> vector(dof_handler.n_dofs());
 
-  FEPointEvaluation<1, dim> evaluator(mapping, fe);
+  FEPointEvaluation<1, dim, dim, Number> evaluator(mapping, fe);
 
-  Tensor<1, dim> exponents;
+  Tensor<1, dim, Number> exponents;
   exponents[0] = 1.;
   VectorTools::interpolate(mapping,
                            dof_handler,
-                           Functions::Monomial<dim>(exponents),
+                           Functions::Monomial<dim, Number>(exponents),
                            vector);
 
-  std::vector<double>         solution_values(fe.dofs_per_cell);
-  std::vector<double>         function_values(unit_points.size());
-  std::vector<Tensor<1, dim>> function_gradients(unit_points.size());
+  std::vector<Number>                 solution_values(fe.dofs_per_cell);
+  std::vector<Number>                 function_values(unit_points.size());
+  std::vector<Tensor<1, dim, Number>> function_gradients(unit_points.size());
 
   for (const auto &cell : dof_handler.active_cell_iterators())
     {
@@ -139,4 +139,6 @@ main()
   test<2>(2);
   test<2>(6);
   test<3>(5);
+
+  test<3, float>(5);
 }
