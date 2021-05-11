@@ -299,8 +299,11 @@ private:
   std::shared_ptr<const Utilities::MPI::Partitioner> partitioner_coarse;
 
   /**
-   * Internal vector needed for collecting all degrees of freedom of the
-   * fine cells.
+   * Internal vector needed for collecting all degrees of freedom of the fine
+   * cells. It is only initialized if the fine-level DoF indices touch DoFs
+   * other than the locally active ones (which we always assume can be
+   * accessed by the given vectors in the prolongate/restrict functions),
+   * otherwise it is left at size zero.
    */
   mutable LinearAlgebra::distributed::Vector<Number> vec_fine;
 
