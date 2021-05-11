@@ -40,6 +40,7 @@ template <int dim, int spacedim>
 MappingQCache<dim, spacedim>::MappingQCache(
   const unsigned int polynomial_degree)
   : MappingQGeneric<dim, spacedim>(polynomial_degree)
+  , uses_level_info(false)
 {}
 
 
@@ -49,6 +50,7 @@ MappingQCache<dim, spacedim>::MappingQCache(
   const MappingQCache<dim, spacedim> &mapping)
   : MappingQGeneric<dim, spacedim>(mapping)
   , support_point_cache(mapping.support_point_cache)
+  , uses_level_info(mapping.uses_level_info)
 {}
 
 
@@ -180,6 +182,8 @@ MappingQCache<dim, spacedim>::initialize(
     /* copy_data */ nullptr,
     2 * MultithreadInfo::n_threads(),
     /* chunk_size = */ 1);
+
+  uses_level_info = true;
 }
 
 
@@ -245,6 +249,8 @@ MappingQCache<dim, spacedim>::initialize(
 
       return points;
     });
+
+  uses_level_info = true;
 }
 
 
@@ -268,6 +274,8 @@ MappingQCache<dim, spacedim>::initialize(
                      return new_point;
                    },
                    function_describes_relative_displacement);
+
+  uses_level_info = true;
 }
 
 
@@ -481,6 +489,8 @@ MappingQCache<dim, spacedim>::initialize(
 
       return result;
     });
+
+  uses_level_info = false;
 }
 
 
@@ -694,6 +704,8 @@ MappingQCache<dim, spacedim>::initialize(
 
       return result;
     });
+
+  uses_level_info = true;
 }
 
 
@@ -719,6 +731,8 @@ MappingQCache<dim, spacedim>::compute_mapping_support_points(
   Assert(support_point_cache.get() != nullptr,
          ExcMessage("Must call MappingQCache::initialize() before "
                     "using it or after mesh has changed!"));
+
+  Assert(uses_level_info || cell->is_active(), ExcInternalError());
 
   AssertIndexRange(cell->level(), support_point_cache->size());
   AssertIndexRange(cell->index(), (*support_point_cache)[cell->level()].size());
