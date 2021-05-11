@@ -344,6 +344,10 @@ namespace internal
         return value;
       }
     };
+
+    template <int dim, int spacedim>
+    bool
+    is_fast_path_supported(const FiniteElement<dim, spacedim> &fe);
   } // namespace FEPointEvaluation
 } // namespace internal
 
@@ -558,7 +562,7 @@ FEPointEvaluation<n_components, dim, spacedim>::FEPointEvaluation(
   , fe(&fe)
 {
   if (mapping_q_generic != nullptr &&
-      internal::MatrixFreeFunctions::ShapeInfo<double>::is_supported(fe))
+      internal::FEPointEvaluation::is_fast_path_supported(fe))
     {
       internal::MatrixFreeFunctions::ShapeInfo<double> shape_info;
       unsigned int                                     base_element_number = 0;
