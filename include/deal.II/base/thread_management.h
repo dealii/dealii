@@ -1318,14 +1318,8 @@ namespace Threads
    *
    * @note Threads::new_task() is, in essence, equivalent to calling
    *   `std::async(std::launch::async, ...)` in that it runs the given task
-   *   in the background. (See https://en.cppreference.com/w/cpp/thread/async
-   *   for more information.) The only difference is if you configured deal.II
-   *   with `DEAL_II_WITH_THREADS=OFF`, then the operation described by the
-   *   arguments of this function are executed immediately and the returned
-   *   value is placed in the Task object returned here. This is useful for
-   *   cases where one wants to run a program in a way where deal.II does not
-   *   internally create parallel tasks, for example because one is already
-   *   using one MPI process per core in a parallel computation.
+   *   in the background. See https://en.cppreference.com/w/cpp/thread/async
+   *   for more information.
    *
    * @ingroup threads
    */
@@ -1408,14 +1402,8 @@ namespace Threads
    *
    * @note Threads::new_task() is, in essence, equivalent to calling
    *   `std::async(std::launch::async, ...)` in that it runs the given task
-   *   in the background. (See https://en.cppreference.com/w/cpp/thread/async
-   *   for more information.) The only difference is if you configured deal.II
-   *   with `DEAL_II_WITH_THREADS=OFF`, then the operation described by the
-   *   arguments of this function are executed immediately and the returned
-   *   value is placed in the Task object returned here. This is useful for
-   *   cases where one wants to run a program in a way where deal.II does not
-   *   internally create parallel tasks, for example because one is already
-   *   using one MPI process per core in a parallel computation.
+   *   in the background. See https://en.cppreference.com/w/cpp/thread/async
+   *   for more information.
    *
    * @ingroup CPP11
    */

@@ -66,11 +66,12 @@
 #cmakedefine DEAL_II_WITH_ZLIB
 
 #ifdef DEAL_II_WITH_TBB
-/*
- * Backward compatibility setting:
- * FIXME: Update once transition to taskflow is complete
+/**
+ * For backwards compatibility, continue defining DEAL_II_WITH_THREADS when the
+ * library is configured with TBB.
  */
 #define DEAL_II_WITH_THREADS
+
 #define TBB_SUPPRESS_DEPRECATED_MESSAGES 1
 #endif
 

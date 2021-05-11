@@ -106,9 +106,6 @@ SparseVanka<number>::compute_inverses()
   Assert(matrix != nullptr, ExcNotInitialized());
   Assert(selected != nullptr, ExcNotInitialized());
 
-#ifndef DEAL_II_WITH_THREADS
-  compute_inverses(0, matrix->m());
-#else
   const size_type n_inverses =
     std::count(selected->begin(), selected->end(), true);
   // somewhat arbitrarily set up an equal number of tasks as we have threads
@@ -161,7 +158,6 @@ SparseVanka<number>::compute_inverses()
       this->compute_inverses(blocking[i].first, blocking[i].second);
     });
   tasks.join_all();
-#endif
 }
 
 
