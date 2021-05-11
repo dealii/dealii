@@ -279,7 +279,7 @@ namespace Step71
       //   output.derivatives[1] = cos(a.value)*a.derivatives[1];
       //
       //   return output;
-      // };
+      // }
       // @endcode
       //
       // All of that could of course also be done for second and even higher
@@ -908,7 +908,8 @@ namespace Step71
       // instance to do any additional tasks before moving on to the next
       // timestep. Again, the reason for doing this will become clear a little
       // later.
-      virtual void update_end_of_timestep(){};
+      virtual void update_end_of_timestep()
+      {}
 
       // In the `protected` part of the class,
       // we store a reference to an instance of the constitutive parameters
@@ -1938,7 +1939,7 @@ namespace Step71
     void Magnetoviscoelastic_Constitutive_Law_SD<dim>::update_end_of_timestep()
     {
       Q_t1 = Q_t;
-    };
+    }
 
 
     // @sect3{A more complex example (continued): Parameters and hand-derived material classes}
@@ -3151,7 +3152,7 @@ namespace Step71
     void Magnetoviscoelastic_Constitutive_Law<dim>::update_end_of_timestep()
     {
       Q_t1 = Q_t;
-    };
+    }
 
 
     template <int dim>
@@ -3174,7 +3175,7 @@ namespace Step71
     {
       const Tensor<1, dim> &H = get_H();
       return (2.0 * H * H) / (mu_h_sat * mu_h_sat);
-    };
+    }
 
 
     template <int dim>
@@ -3182,7 +3183,7 @@ namespace Step71
       dim>::get_tanh_two_h_dot_h_div_h_sat_squ(const double mu_h_sat) const
     {
       return std::tanh(get_two_h_dot_h_div_h_sat_squ(mu_h_sat));
-    };
+    }
 
     // A scaling function that will cause the shear modulus
     // to change (increase) under the influence of a magnetic
@@ -3195,7 +3196,7 @@ namespace Step71
     {
       return 1.0 +
              (mu_inf / mu - 1.0) * get_tanh_two_h_dot_h_div_h_sat_squ(mu_h_sat);
-    };
+    }
 
     // First derivative of scaling function
     template <int dim>
@@ -3204,7 +3205,7 @@ namespace Step71
     {
       return std::pow(1.0 / std::cosh(get_two_h_dot_h_div_h_sat_squ(mu_h_sat)),
                       2.0);
-    };
+    }
 
 
     template <int dim>
@@ -3212,7 +3213,7 @@ namespace Step71
       dim>::get_dtwo_h_dot_h_div_h_sat_squ_dH(const double mu_h_sat) const
     {
       return 2.0 * 2.0 / (mu_h_sat * mu_h_sat) * get_H();
-    };
+    }
 
 
     template <int dim>
@@ -3224,7 +3225,7 @@ namespace Step71
       return (mu_inf / mu - 1.0) *
              (get_dtanh_two_h_dot_h_div_h_sat_squ(mu_h_sat) *
               get_dtwo_h_dot_h_div_h_sat_squ_dH(mu_h_sat));
-    };
+    }
 
 
     template <int dim>
@@ -3233,7 +3234,7 @@ namespace Step71
     {
       return -2.0 * get_tanh_two_h_dot_h_div_h_sat_squ(mu_h_sat) *
              get_dtanh_two_h_dot_h_div_h_sat_squ(mu_h_sat);
-    };
+    }
 
 
     template <int dim>
@@ -3242,7 +3243,7 @@ namespace Step71
     {
       return 2.0 * 2.0 / (mu_h_sat * mu_h_sat) *
              Physics::Elasticity::StandardTensors<dim>::I;
-    };
+    }
 
 
     template <int dim>
@@ -3259,7 +3260,7 @@ namespace Step71
                                 get_dtwo_h_dot_h_div_h_sat_squ_dH(mu_h_sat))) +
               get_dtanh_two_h_dot_h_div_h_sat_squ(mu_h_sat) *
                 get_d2two_h_dot_h_div_h_sat_squ_dH_dH(mu_h_sat));
-    };
+    }
 
     // For the cached calculation approach that we've adopted for this material
     // class, the root of all calculations are the field variables, and the
@@ -3922,7 +3923,7 @@ namespace Step71
           std::ofstream output(filename);
           output << stream.str();
         }
-    };
+    }
 
     // @sect4{The CoupledConstitutiveLaws::run() function}
 
