@@ -569,7 +569,12 @@ namespace Threads
    * omit the template argument.
    *
    * @ingroup threads
-   * @ingroup threads
+   *
+   * @deprecated Use Task instead.
+   *
+   * @note Since this class is used in ThreadGroup, its constructors, rather
+   * than the class itself, are deprecated to allow compilation with
+   * -Werror=deprecated-declarations.
    */
   template <typename RT = void>
   class Thread
@@ -578,6 +583,7 @@ namespace Threads
     /**
      * Construct a thread object with a function object.
      */
+    DEAL_II_DEPRECATED_EARLY
     Thread(const std::function<RT()> &function)
       : thread_descriptor(new internal::ThreadDescriptor<RT>())
     {
@@ -590,11 +596,13 @@ namespace Threads
      * this way, except for assigning it a thread object that holds data
      * created by the new_thread() functions.
      */
+    DEAL_II_DEPRECATED_EARLY
     Thread() = default;
 
     /**
      * Copy constructor.
      */
+    DEAL_II_DEPRECATED_EARLY
     Thread(const Thread<RT> &t)
       : thread_descriptor(t.thread_descriptor)
     {}
@@ -885,9 +893,11 @@ namespace Threads
    * value for the called function.
    *
    * @ingroup threads
+   *
+   * @deprecated Use TaskGroup instead.
    */
   template <typename RT = void>
-  class ThreadGroup
+  class DEAL_II_DEPRECATED_EARLY ThreadGroup
   {
   public:
     /**
