@@ -42,14 +42,14 @@ namespace internal
      * Struct to distinguish between the value and gradient types of different
      * numbers of components used by the FlexibleEvaluator class.
      */
-    template <int dim, int n_components>
+    template <int dim, int n_components, typename Number>
     struct EvaluatorTypeTraits
     {
-      using value_type    = Tensor<1, n_components>;
-      using gradient_type = Tensor<1, n_components, Tensor<1, dim>>;
+      using value_type    = Tensor<1, n_components, Number>;
+      using gradient_type = Tensor<1, n_components, Tensor<1, dim, Number>>;
 
       static void
-      read_value(const double       vector_entry,
+      read_value(const Number       vector_entry,
                  const unsigned int component,
                  value_type &       result)
       {
@@ -58,7 +58,7 @@ namespace internal
       }
 
       static void
-      write_value(double &           vector_entry,
+      write_value(Number &           vector_entry,
                   const unsigned int component,
                   const value_type & result)
       {
@@ -68,7 +68,7 @@ namespace internal
 
       static void
       set_gradient(
-        const Tensor<1, dim, Tensor<1, n_components, VectorizedArray<double>>>
+        const Tensor<1, dim, Tensor<1, n_components, VectorizedArray<Number>>>
           &                value,
         const unsigned int vector_lane,
         gradient_type &    result)
@@ -79,7 +79,7 @@ namespace internal
       }
 
       static void get_gradient(
-        Tensor<1, dim, Tensor<1, n_components, VectorizedArray<double>>> &value,
+        Tensor<1, dim, Tensor<1, n_components, VectorizedArray<Number>>> &value,
         const unsigned int   vector_lane,
         const gradient_type &result)
       {
@@ -89,7 +89,7 @@ namespace internal
       }
 
       static void
-      set_value(const Tensor<1, n_components, VectorizedArray<double>> &value,
+      set_value(const Tensor<1, n_components, VectorizedArray<Number>> &value,
                 const unsigned int vector_lane,
                 value_type &       result)
       {
@@ -98,7 +98,7 @@ namespace internal
       }
 
       static void
-        get_value(Tensor<1, n_components, VectorizedArray<double>> &value,
+        get_value(Tensor<1, n_components, VectorizedArray<Number>> &value,
                   const unsigned int                                vector_lane,
                   const value_type &                                result)
       {
@@ -106,30 +106,30 @@ namespace internal
           value[i][vector_lane] = result[i];
       }
 
-      template <typename Number>
-      static Number &access(Tensor<1, n_components, Number> &value,
-                            const unsigned int               component)
+      template <typename Number2>
+      static Number2 &access(Tensor<1, n_components, Number2> &value,
+                             const unsigned int                component)
       {
         return value[component];
       }
 
-      template <typename Number>
-      static const Number &
-      access(const Tensor<1, n_components, Number> &value,
-             const unsigned int                     component)
+      template <typename Number2>
+      static const Number2 &
+      access(const Tensor<1, n_components, Number2> &value,
+             const unsigned int                      component)
       {
         return value[component];
       }
     };
 
-    template <int dim>
-    struct EvaluatorTypeTraits<dim, 1>
+    template <int dim, typename Number>
+    struct EvaluatorTypeTraits<dim, 1, Number>
     {
-      using value_type    = double;
-      using gradient_type = Tensor<1, dim>;
+      using value_type    = Number;
+      using gradient_type = Tensor<1, dim, Number>;
 
       static void
-      read_value(const double vector_entry,
+      read_value(const Number vector_entry,
                  const unsigned int,
                  value_type &result)
       {
@@ -137,7 +137,7 @@ namespace internal
       }
 
       static void
-      write_value(double &vector_entry,
+      write_value(Number &vector_entry,
                   const unsigned int,
                   const value_type &result)
       {
@@ -145,7 +145,7 @@ namespace internal
       }
 
       static void
-      set_gradient(const Tensor<1, dim, VectorizedArray<double>> &value,
+      set_gradient(const Tensor<1, dim, VectorizedArray<Number>> &value,
                    const unsigned int                             vector_lane,
                    gradient_type &                                result)
       {
@@ -153,7 +153,7 @@ namespace internal
           result[d] = value[d][vector_lane];
       }
 
-      static void get_gradient(Tensor<1, dim, VectorizedArray<double>> &value,
+      static void get_gradient(Tensor<1, dim, VectorizedArray<Number>> &value,
                                const unsigned int   vector_lane,
                                const gradient_type &result)
       {
@@ -162,7 +162,7 @@ namespace internal
       }
 
       static void
-      set_value(const VectorizedArray<double> &value,
+      set_value(const VectorizedArray<Number> &value,
                 const unsigned int             vector_lane,
                 value_type &                   result)
       {
@@ -170,36 +170,36 @@ namespace internal
       }
 
       static void
-      get_value(VectorizedArray<double> &value,
+      get_value(VectorizedArray<Number> &value,
                 const unsigned int       vector_lane,
                 const value_type &       result)
       {
         value[vector_lane] = result;
       }
 
-      template <typename Number>
-      static Number &
-      access(Number &value, const unsigned int)
+      template <typename Number2>
+      static Number2 &
+      access(Number2 &value, const unsigned int)
       {
         return value;
       }
 
-      template <typename Number>
-      static const Number &
-      access(const Number &value, const unsigned int)
+      template <typename Number2>
+      static const Number2 &
+      access(const Number2 &value, const unsigned int)
       {
         return value;
       }
     };
 
-    template <int dim>
-    struct EvaluatorTypeTraits<dim, dim>
+    template <int dim, typename Number>
+    struct EvaluatorTypeTraits<dim, dim, Number>
     {
-      using value_type    = Tensor<1, dim>;
-      using gradient_type = Tensor<2, dim>;
+      using value_type    = Tensor<1, dim, Number>;
+      using gradient_type = Tensor<2, dim, Number>;
 
       static void
-      read_value(const double       vector_entry,
+      read_value(const Number       vector_entry,
                  const unsigned int component,
                  value_type &       result)
       {
@@ -207,7 +207,7 @@ namespace internal
       }
 
       static void
-      write_value(double &           vector_entry,
+      write_value(Number &           vector_entry,
                   const unsigned int component,
                   const value_type & result)
       {
@@ -216,7 +216,7 @@ namespace internal
 
       static void
       set_gradient(
-        const Tensor<1, dim, Tensor<1, dim, VectorizedArray<double>>> &value,
+        const Tensor<1, dim, Tensor<1, dim, VectorizedArray<Number>>> &value,
         const unsigned int vector_lane,
         gradient_type &    result)
       {
@@ -226,7 +226,7 @@ namespace internal
       }
 
       static void get_gradient(
-        Tensor<1, dim, Tensor<1, dim, VectorizedArray<double>>> &value,
+        Tensor<1, dim, Tensor<1, dim, VectorizedArray<Number>>> &value,
         const unsigned int                                       vector_lane,
         const gradient_type &                                    result)
       {
@@ -236,7 +236,7 @@ namespace internal
       }
 
       static void
-      set_value(const Tensor<1, dim, VectorizedArray<double>> &value,
+      set_value(const Tensor<1, dim, VectorizedArray<Number>> &value,
                 const unsigned int                             vector_lane,
                 value_type &                                   result)
       {
@@ -244,7 +244,7 @@ namespace internal
           result[i] = value[i][vector_lane];
       }
 
-      static void get_value(Tensor<1, dim, VectorizedArray<double>> &value,
+      static void get_value(Tensor<1, dim, VectorizedArray<Number>> &value,
                             const unsigned int vector_lane,
                             const value_type & result)
       {
@@ -252,13 +252,13 @@ namespace internal
           value[i][vector_lane] = result[i];
       }
 
-      static double &
+      static Number &
       access(value_type &value, const unsigned int component)
       {
         return value[component];
       }
 
-      static const double &
+      static const Number &
       access(const value_type &value, const unsigned int component)
       {
         return value[component];
@@ -277,14 +277,14 @@ namespace internal
       }
     };
 
-    template <>
-    struct EvaluatorTypeTraits<1, 1>
+    template <typename Number>
+    struct EvaluatorTypeTraits<1, 1, Number>
     {
-      using value_type    = double;
-      using gradient_type = Tensor<1, 1>;
+      using value_type    = Number;
+      using gradient_type = Tensor<1, 1, Number>;
 
       static void
-      read_value(const double vector_entry,
+      read_value(const Number vector_entry,
                  const unsigned int,
                  value_type &result)
       {
@@ -292,7 +292,7 @@ namespace internal
       }
 
       static void
-      write_value(double &vector_entry,
+      write_value(Number &vector_entry,
                   const unsigned int,
                   const value_type &result)
       {
@@ -300,14 +300,14 @@ namespace internal
       }
 
       static void
-      set_gradient(const Tensor<1, 1, VectorizedArray<double>> &value,
+      set_gradient(const Tensor<1, 1, VectorizedArray<Number>> &value,
                    const unsigned int                           vector_lane,
                    gradient_type &                              result)
       {
         result[0] = value[0][vector_lane];
       }
 
-      static void get_gradient(Tensor<1, 1, VectorizedArray<double>> &value,
+      static void get_gradient(Tensor<1, 1, VectorizedArray<Number>> &value,
                                const unsigned int   vector_lane,
                                const gradient_type &result)
       {
@@ -315,7 +315,7 @@ namespace internal
       }
 
       static void
-      set_value(const VectorizedArray<double> &value,
+      set_value(const VectorizedArray<Number> &value,
                 const unsigned int             vector_lane,
                 value_type &                   result)
       {
@@ -323,23 +323,23 @@ namespace internal
       }
 
       static void
-      get_value(VectorizedArray<double> &value,
+      get_value(VectorizedArray<Number> &value,
                 const unsigned int       vector_lane,
                 const value_type &       result)
       {
         value[vector_lane] = result;
       }
 
-      template <typename Number>
-      static Number &
-      access(Number &value, const unsigned int)
+      template <typename Number2>
+      static Number2 &
+      access(Number2 &value, const unsigned int)
       {
         return value;
       }
 
-      template <typename Number>
-      static const Number &
-      access(const Number &value, const unsigned int)
+      template <typename Number2>
+      static const Number2 &
+      access(const Number2 &value, const unsigned int)
       {
         return value;
       }
@@ -369,14 +369,17 @@ namespace internal
  * by this class is similar (or sometimes even somewhat lower) than using
  * `FEValues::reinit(cell)` followed by `FEValues::get_function_gradients`.
  */
-template <int n_components, int dim, int spacedim = dim>
+template <int n_components,
+          int dim,
+          int spacedim    = dim,
+          typename Number = double>
 class FEPointEvaluation
 {
 public:
   using value_type = typename internal::FEPointEvaluation::
-    EvaluatorTypeTraits<dim, n_components>::value_type;
+    EvaluatorTypeTraits<dim, n_components, Number>::value_type;
   using gradient_type = typename internal::FEPointEvaluation::
-    EvaluatorTypeTraits<dim, n_components>::gradient_type;
+    EvaluatorTypeTraits<dim, n_components, Number>::gradient_type;
 
   /**
    * Constructor.
@@ -414,7 +417,7 @@ public:
   void
   evaluate(const typename Triangulation<dim, spacedim>::cell_iterator &cell,
            const ArrayView<const Point<dim>> &     unit_points,
-           const ArrayView<const double> &         solution_values,
+           const ArrayView<const Number> &         solution_values,
            const EvaluationFlags::EvaluationFlags &evaluation_flags);
 
   /**
@@ -436,7 +439,7 @@ public:
   void
   integrate(const typename Triangulation<dim, spacedim>::cell_iterator &cell,
             const ArrayView<const Point<dim>> &     unit_points,
-            const ArrayView<double> &               solution_values,
+            const ArrayView<Number> &               solution_values,
             const EvaluationFlags::EvaluationFlags &integration_flags);
 
   /**
@@ -547,8 +550,8 @@ private:
 // ----------------------- template and inline function ----------------------
 
 
-template <int n_components, int dim, int spacedim>
-FEPointEvaluation<n_components, dim, spacedim>::FEPointEvaluation(
+template <int n_components, int dim, int spacedim, typename Number>
+FEPointEvaluation<n_components, dim, spacedim, Number>::FEPointEvaluation(
   const Mapping<dim> &      mapping,
   const FiniteElement<dim> &fe,
   const unsigned int        first_selected_component)
@@ -604,12 +607,12 @@ FEPointEvaluation<n_components, dim, spacedim>::FEPointEvaluation(
 
 
 
-template <int n_components, int dim, int spacedim>
+template <int n_components, int dim, int spacedim, typename Number>
 void
-FEPointEvaluation<n_components, dim, spacedim>::evaluate(
+FEPointEvaluation<n_components, dim, spacedim, Number>::evaluate(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const ArrayView<const Point<dim>> &                         unit_points,
-  const ArrayView<const double> &                             solution_values,
+  const ArrayView<const Number> &                             solution_values,
   const EvaluationFlags::EvaluationFlags &                    evaluation_flag)
 {
   if (unit_points.size() == 0) // no evaluation points provided
@@ -629,10 +632,11 @@ FEPointEvaluation<n_components, dim, spacedim>::evaluate(
         solution_renumbered.resize(dofs_per_component);
       for (unsigned int comp = 0; comp < n_components; ++comp)
         for (unsigned int i = 0; i < dofs_per_component; ++i)
-          internal::FEPointEvaluation::EvaluatorTypeTraits<dim, n_components>::
-            read_value(solution_values[renumber[comp * dofs_per_component + i]],
-                       comp,
-                       solution_renumbered[i]);
+          internal::FEPointEvaluation::
+            EvaluatorTypeTraits<dim, n_components, Number>::read_value(
+              solution_values[renumber[comp * dofs_per_component + i]],
+              comp,
+              solution_renumbered[i]);
 
       if (evaluation_flag & EvaluationFlags::values)
         values.resize(unit_points.size());
@@ -640,11 +644,11 @@ FEPointEvaluation<n_components, dim, spacedim>::evaluate(
         gradients.resize(unit_points.size());
 
       const std::size_t n_points = unit_points.size();
-      const std::size_t n_lanes  = VectorizedArray<double>::size();
+      const std::size_t n_lanes  = VectorizedArray<Number>::size();
       for (unsigned int i = 0; i < n_points; i += n_lanes)
         {
           // convert to vectorized format
-          Point<dim, VectorizedArray<double>> vectorized_points;
+          Point<dim, VectorizedArray<Number>> vectorized_points;
           for (unsigned int j = 0; j < n_lanes && i + j < n_points; ++j)
             for (unsigned int d = 0; d < dim; ++d)
               vectorized_points[d][j] = unit_points[i + j][d];
@@ -657,13 +661,13 @@ FEPointEvaluation<n_components, dim, spacedim>::evaluate(
           // convert back to standard format
           if (evaluation_flag & EvaluationFlags::values)
             for (unsigned int j = 0; j < n_lanes && i + j < n_points; ++j)
-              internal::FEPointEvaluation::EvaluatorTypeTraits<
-                dim,
-                n_components>::set_value(val_and_grad.first, j, values[i + j]);
+              internal::FEPointEvaluation::
+                EvaluatorTypeTraits<dim, n_components, Number>::set_value(
+                  val_and_grad.first, j, values[i + j]);
           if (evaluation_flag & EvaluationFlags::gradients)
             for (unsigned int j = 0; j < n_lanes && i + j < n_points; ++j)
               internal::FEPointEvaluation::
-                EvaluatorTypeTraits<dim, n_components>::set_gradient(
+                EvaluatorTypeTraits<dim, n_components, Number>::set_gradient(
                   val_and_grad.second, j, gradients[i + j]);
         }
 
@@ -702,20 +706,19 @@ FEPointEvaluation<n_components, dim, spacedim>::evaluate(
           std::fill(values.begin(), values.end(), value_type());
           for (unsigned int i = 0; i < fe->n_dofs_per_cell(); ++i)
             {
-              const double value = solution_values[i];
+              const Number value = solution_values[i];
               for (unsigned int d = 0; d < n_components; ++d)
                 if (nonzero_shape_function_component[i][d] &&
                     (fe->is_primitive(i) || fe->is_primitive()))
                   for (unsigned int q = 0; q < unit_points.size(); ++q)
                     internal::FEPointEvaluation::
-                      EvaluatorTypeTraits<dim, n_components>::access(values[q],
-                                                                     d) +=
-                      fe_values.shape_value(i, q) * value;
+                      EvaluatorTypeTraits<dim, n_components, Number>::access(
+                        values[q], d) += fe_values.shape_value(i, q) * value;
                 else if (nonzero_shape_function_component[i][d])
                   for (unsigned int q = 0; q < unit_points.size(); ++q)
                     internal::FEPointEvaluation::
-                      EvaluatorTypeTraits<dim, n_components>::access(values[q],
-                                                                     d) +=
+                      EvaluatorTypeTraits<dim, n_components, Number>::access(
+                        values[q], d) +=
                       fe_values.shape_value_component(i, q, d) * value;
             }
         }
@@ -726,19 +729,19 @@ FEPointEvaluation<n_components, dim, spacedim>::evaluate(
           std::fill(gradients.begin(), gradients.end(), gradient_type());
           for (unsigned int i = 0; i < fe->n_dofs_per_cell(); ++i)
             {
-              const double value = solution_values[i];
+              const Number value = solution_values[i];
               for (unsigned int d = 0; d < n_components; ++d)
                 if (nonzero_shape_function_component[i][d] &&
                     (fe->is_primitive(i) || fe->is_primitive()))
                   for (unsigned int q = 0; q < unit_points.size(); ++q)
                     internal::FEPointEvaluation::
-                      EvaluatorTypeTraits<dim, n_components>::access(
+                      EvaluatorTypeTraits<dim, n_components, Number>::access(
                         gradients[q], d) += fe_values.shape_grad(i, q) * value;
                 else if (nonzero_shape_function_component[i][d])
                   for (unsigned int q = 0; q < unit_points.size(); ++q)
-                    internal::FEPointEvaluation::EvaluatorTypeTraits<
-                      dim,
-                      n_components>::access(gradients[q], d) +=
+                    internal::FEPointEvaluation::
+                      EvaluatorTypeTraits<dim, n_components, Number>::access(
+                        gradients[q], d) +=
                       fe_values.shape_grad_component(i, q, d) * value;
             }
         }
@@ -747,12 +750,12 @@ FEPointEvaluation<n_components, dim, spacedim>::evaluate(
 
 
 
-template <int n_components, int dim, int spacedim>
+template <int n_components, int dim, int spacedim, typename Number>
 void
-FEPointEvaluation<n_components, dim, spacedim>::integrate(
+FEPointEvaluation<n_components, dim, spacedim, Number>::integrate(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const ArrayView<const Point<dim>> &                         unit_points,
-  const ArrayView<double> &                                   solution_values,
+  const ArrayView<Number> &                                   solution_values,
   const EvaluationFlags::EvaluationFlags &                    integration_flags)
 {
   if (unit_points.size() == 0) // no evaluation points provided
@@ -788,36 +791,36 @@ FEPointEvaluation<n_components, dim, spacedim>::integrate(
         AssertIndexRange(unit_points.size(), gradients.size() + 1);
 
       const std::size_t n_points = unit_points.size();
-      const std::size_t n_lanes  = VectorizedArray<double>::size();
+      const std::size_t n_lanes  = VectorizedArray<Number>::size();
       for (unsigned int i = 0; i < n_points; i += n_lanes)
         {
           // convert to vectorized format
-          Point<dim, VectorizedArray<double>> vectorized_points;
+          Point<dim, VectorizedArray<Number>> vectorized_points;
           for (unsigned int j = 0; j < n_lanes && i + j < n_points; ++j)
             for (unsigned int d = 0; d < dim; ++d)
               vectorized_points[d][j] = unit_points[i + j][d];
 
           typename internal::ProductTypeNoPoint<value_type,
-                                                VectorizedArray<double>>::type
+                                                VectorizedArray<Number>>::type
             value;
           Tensor<1,
                  dim,
                  typename internal::ProductTypeNoPoint<
                    value_type,
-                   VectorizedArray<double>>::type>
+                   VectorizedArray<Number>>::type>
             gradient;
 
           // convert back to standard format
           if (integration_flags & EvaluationFlags::values)
             for (unsigned int j = 0; j < n_lanes && i + j < n_points; ++j)
-              internal::FEPointEvaluation::EvaluatorTypeTraits<
-                dim,
-                n_components>::get_value(value, j, values[i + j]);
+              internal::FEPointEvaluation::
+                EvaluatorTypeTraits<dim, n_components, Number>::get_value(
+                  value, j, values[i + j]);
           if (integration_flags & EvaluationFlags::gradients)
             for (unsigned int j = 0; j < n_lanes && i + j < n_points; ++j)
-              internal::FEPointEvaluation::EvaluatorTypeTraits<
-                dim,
-                n_components>::get_gradient(gradient, j, gradients[i + j]);
+              internal::FEPointEvaluation::
+                EvaluatorTypeTraits<dim, n_components, Number>::get_gradient(
+                  gradient, j, gradients[i + j]);
 
           // compute
           internal::integrate_tensor_product_value_and_gradient(
@@ -831,8 +834,8 @@ FEPointEvaluation<n_components, dim, spacedim>::integrate(
 
       for (unsigned int comp = 0; comp < n_components; ++comp)
         for (unsigned int i = 0; i < dofs_per_component; ++i)
-          internal::FEPointEvaluation::EvaluatorTypeTraits<dim, n_components>::
-            write_value(
+          internal::FEPointEvaluation::
+            EvaluatorTypeTraits<dim, n_components, Number>::write_value(
               solution_values[renumber[comp * dofs_per_component + i]],
               comp,
               solution_renumbered[i]);
@@ -867,16 +870,16 @@ FEPointEvaluation<n_components, dim, spacedim>::integrate(
                   for (unsigned int q = 0; q < unit_points.size(); ++q)
                     solution_values[i] +=
                       fe_values.shape_value(i, q) *
-                      internal::FEPointEvaluation::EvaluatorTypeTraits<
-                        dim,
-                        n_components>::access(values[q], d);
+                      internal::FEPointEvaluation::
+                        EvaluatorTypeTraits<dim, n_components, Number>::access(
+                          values[q], d);
                 else if (nonzero_shape_function_component[i][d])
                   for (unsigned int q = 0; q < unit_points.size(); ++q)
                     solution_values[i] +=
                       fe_values.shape_value_component(i, q, d) *
-                      internal::FEPointEvaluation::EvaluatorTypeTraits<
-                        dim,
-                        n_components>::access(values[q], d);
+                      internal::FEPointEvaluation::
+                        EvaluatorTypeTraits<dim, n_components, Number>::access(
+                          values[q], d);
             }
         }
 
@@ -891,16 +894,16 @@ FEPointEvaluation<n_components, dim, spacedim>::integrate(
                   for (unsigned int q = 0; q < unit_points.size(); ++q)
                     solution_values[i] +=
                       fe_values.shape_grad(i, q) *
-                      internal::FEPointEvaluation::EvaluatorTypeTraits<
-                        dim,
-                        n_components>::access(gradients[q], d);
+                      internal::FEPointEvaluation::
+                        EvaluatorTypeTraits<dim, n_components, Number>::access(
+                          gradients[q], d);
                 else if (nonzero_shape_function_component[i][d])
                   for (unsigned int q = 0; q < unit_points.size(); ++q)
                     solution_values[i] +=
                       fe_values.shape_grad_component(i, q, d) *
-                      internal::FEPointEvaluation::EvaluatorTypeTraits<
-                        dim,
-                        n_components>::access(gradients[q], d);
+                      internal::FEPointEvaluation::
+                        EvaluatorTypeTraits<dim, n_components, Number>::access(
+                          gradients[q], d);
             }
         }
     }
@@ -908,10 +911,10 @@ FEPointEvaluation<n_components, dim, spacedim>::integrate(
 
 
 
-template <int n_components, int dim, int spacedim>
-inline const typename FEPointEvaluation<n_components, dim, spacedim>::value_type
-  &
-  FEPointEvaluation<n_components, dim, spacedim>::get_value(
+template <int n_components, int dim, int spacedim, typename Number>
+inline const typename FEPointEvaluation<n_components, dim, spacedim, Number>::
+  value_type &
+  FEPointEvaluation<n_components, dim, spacedim, Number>::get_value(
     const unsigned int q_point) const
 {
   AssertIndexRange(q_point, values.size());
@@ -920,10 +923,10 @@ inline const typename FEPointEvaluation<n_components, dim, spacedim>::value_type
 
 
 
-template <int n_components, int dim, int spacedim>
-inline const typename FEPointEvaluation<n_components, dim, spacedim>::
+template <int n_components, int dim, int spacedim, typename Number>
+inline const typename FEPointEvaluation<n_components, dim, spacedim, Number>::
   gradient_type &
-  FEPointEvaluation<n_components, dim, spacedim>::get_gradient(
+  FEPointEvaluation<n_components, dim, spacedim, Number>::get_gradient(
     const unsigned int q_point) const
 {
   AssertIndexRange(q_point, gradients.size());
@@ -932,9 +935,9 @@ inline const typename FEPointEvaluation<n_components, dim, spacedim>::
 
 
 
-template <int n_components, int dim, int spacedim>
+template <int n_components, int dim, int spacedim, typename Number>
 inline void
-FEPointEvaluation<n_components, dim, spacedim>::submit_value(
+FEPointEvaluation<n_components, dim, spacedim, Number>::submit_value(
   const value_type & value,
   const unsigned int q_point)
 {
@@ -946,9 +949,9 @@ FEPointEvaluation<n_components, dim, spacedim>::submit_value(
 
 
 
-template <int n_components, int dim, int spacedim>
+template <int n_components, int dim, int spacedim, typename Number>
 inline void
-FEPointEvaluation<n_components, dim, spacedim>::submit_gradient(
+FEPointEvaluation<n_components, dim, spacedim, Number>::submit_gradient(
   const gradient_type &gradient,
   const unsigned int   q_point)
 {

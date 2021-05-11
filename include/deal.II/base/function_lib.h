@@ -1316,8 +1316,8 @@ namespace Functions
    *
    * @ingroup functions
    */
-  template <int dim>
-  class Monomial : public Function<dim>
+  template <int dim, typename Number = double>
+  class Monomial : public Function<dim, Number>
   {
   public:
     /**
@@ -1326,13 +1326,13 @@ namespace Functions
      * components this object shall represent. All vector components will have
      * the same value.
      */
-    Monomial(const Tensor<1, dim> &exponents,
-             const unsigned int    n_components = 1);
+    Monomial(const Tensor<1, dim, Number> &exponents,
+             const unsigned int            n_components = 1);
 
     /**
      * Function value at one point.
      */
-    virtual double
+    virtual Number
     value(const Point<dim> &p, const unsigned int component = 0) const override;
 
     /**
@@ -1342,20 +1342,20 @@ namespace Functions
      * #n_components.
      */
     virtual void
-    vector_value(const Point<dim> &p, Vector<double> &values) const override;
+    vector_value(const Point<dim> &p, Vector<Number> &values) const override;
 
     /**
      * Function values at multiple points.
      */
     virtual void
     value_list(const std::vector<Point<dim>> &points,
-               std::vector<double> &          values,
+               std::vector<Number> &          values,
                const unsigned int             component = 0) const override;
 
     /**
      * Function gradient at one point.
      */
-    virtual Tensor<1, dim>
+    virtual Tensor<1, dim, Number>
     gradient(const Point<dim> & p,
              const unsigned int component = 0) const override;
 
@@ -1363,7 +1363,7 @@ namespace Functions
     /**
      * The set of exponents.
      */
-    const Tensor<1, dim> exponents;
+    const Tensor<1, dim, Number> exponents;
   };
 
 
