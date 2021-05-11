@@ -56,8 +56,6 @@ DEAL_II_NAMESPACE_OPEN
  * assertions, and cut some unnecessary functionality. Note that this vector
  * is a bit more memory-consuming than std::vector because of alignment, so it
  * is recommended to only use this vector on long vectors.
- *
- * @p author Katharina Kormann, Martin Kronbichler, 2011
  */
 template <class T>
 class AlignedVector
