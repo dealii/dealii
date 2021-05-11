@@ -23,6 +23,8 @@
 #  include <deal.II/base/utilities.h>
 
 #  include <deal.II/lac/block_vector.h>
+#  include <deal.II/lac/la_parallel_block_vector.h>
+#  include <deal.II/lac/la_parallel_vector.h>
 #  ifdef DEAL_II_WITH_TRILINOS
 #    include <deal.II/lac/trilinos_parallel_block_vector.h>
 #    include <deal.II/lac/trilinos_vector.h>
@@ -611,6 +613,9 @@ namespace SUNDIALS
 
   template class KINSOL<Vector<double>>;
   template class KINSOL<BlockVector<double>>;
+
+  template class KINSOL<LinearAlgebra::distributed::Vector<double>>;
+  template class KINSOL<LinearAlgebra::distributed::BlockVector<double>>;
 
 #  ifdef DEAL_II_WITH_MPI
 

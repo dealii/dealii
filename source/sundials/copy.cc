@@ -56,6 +56,77 @@ namespace SUNDIALS
       return static_cast<std::size_t>(length);
     }
 
+
+    void
+    copy(LinearAlgebra::distributed::Vector<double> &dst, const N_Vector &src)
+    {
+      const IndexSet    is = dst.locally_owned_elements();
+      const std::size_t N  = is.n_elements();
+      AssertDimension(N, N_Vector_length(src));
+      dst.zero_out_ghost_values();
+      for (std::size_t i = 0; i < N; ++i)
+        {
+#  ifdef DEAL_II_WITH_MPI
+          dst.local_element(i) = NV_Ith_P(src, i);
+#  else
+          dst.local_element(i)        = NV_Ith_S(src, i);
+#  endif
+        }
+      dst.compress(VectorOperation::insert);
+    }
+
+    void
+    copy(N_Vector &dst, const LinearAlgebra::distributed::Vector<double> &src)
+    {
+      const IndexSet    is = src.locally_owned_elements();
+      const std::size_t N  = is.n_elements();
+      AssertDimension(N, N_Vector_length(dst));
+      for (std::size_t i = 0; i < N; ++i)
+        {
+#  ifdef DEAL_II_WITH_MPI
+          NV_Ith_P(dst, i) = src.local_element(i);
+#  else
+          NV_Ith_S(dst, i)            = src.local_element(i);
+#  endif
+        }
+    }
+
+    void
+    copy(LinearAlgebra::distributed::BlockVector<double> &dst,
+         const N_Vector &                                 src)
+    {
+      const IndexSet    is = dst.locally_owned_elements();
+      const std::size_t N  = is.n_elements();
+      AssertDimension(N, N_Vector_length(src));
+      dst.zero_out_ghost_values();
+      for (std::size_t i = 0; i < N; ++i)
+        {
+#  ifdef DEAL_II_WITH_MPI
+          dst[is.nth_index_in_set(i)] = NV_Ith_P(src, i);
+#  else
+          dst[is.nth_index_in_set(i)] = NV_Ith_S(src, i);
+#  endif
+        }
+      dst.compress(VectorOperation::insert);
+    }
+
+    void
+    copy(N_Vector &                                             dst,
+         const LinearAlgebra::distributed::BlockVector<double> &src)
+    {
+      IndexSet          is = src.locally_owned_elements();
+      const std::size_t N  = is.n_elements();
+      AssertDimension(N, N_Vector_length(dst));
+      for (std::size_t i = 0; i < N; ++i)
+        {
+#  ifdef DEAL_II_WITH_MPI
+          NV_Ith_P(dst, i) = src[is.nth_index_in_set(i)];
+#  else
+          NV_Ith_S(dst, i)            = src[is.nth_index_in_set(i)];
+#  endif
+        }
+    }
+
 #  ifdef DEAL_II_WITH_MPI
 
 #    ifdef DEAL_II_WITH_TRILINOS

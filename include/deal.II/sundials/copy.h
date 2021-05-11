@@ -24,6 +24,8 @@
 #    include <nvector/nvector_parallel.h>
 #  endif
 #  include <deal.II/lac/block_vector.h>
+#  include <deal.II/lac/la_parallel_block_vector.h>
+#  include <deal.II/lac/la_parallel_vector.h>
 #  include <deal.II/lac/vector.h>
 
 #  include <nvector/nvector_serial.h>
@@ -82,6 +84,18 @@ namespace SUNDIALS
     copy(Vector<double> &dst, const N_Vector &src);
     void
     copy(N_Vector &dst, const Vector<double> &src);
+
+    void
+    copy(LinearAlgebra::distributed::BlockVector<double> &dst,
+         const N_Vector &                                 src);
+    void
+    copy(N_Vector &                                             dst,
+         const LinearAlgebra::distributed::BlockVector<double> &src);
+
+    void
+    copy(LinearAlgebra::distributed::Vector<double> &dst, const N_Vector &src);
+    void
+    copy(N_Vector &dst, const LinearAlgebra::distributed::Vector<double> &src);
   } // namespace internal
 } // namespace SUNDIALS
 DEAL_II_NAMESPACE_CLOSE
