@@ -570,7 +570,7 @@ namespace Threads
    *
    * @ingroup threads
    *
-   * @deprecated Use Task instead.
+   * @deprecated Use std::thread or std::jthread instead.
    *
    * @note Since this class is used in ThreadGroup, its constructors, rather
    * than the class itself, are deprecated to allow compilation with
