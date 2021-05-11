@@ -232,6 +232,12 @@ private:
    * this class goes out of scope.
    */
   boost::signals2::connection clear_signal;
+
+  /**
+   * Specifies if support_point_cache has been set up for the cells on the
+   * levels.
+   */
+  bool uses_level_info;
 };
 
 /*@}*/
