@@ -18,7 +18,7 @@
 for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : DIMENSIONS)
   {
 #if deal_II_dimension <= deal_II_space_dimension
-    template class FE_Wedge<deal_II_dimension, deal_II_space_dimension>;
+    template class FE_WedgePoly<deal_II_dimension, deal_II_space_dimension>;
     template class FE_WedgeP<deal_II_dimension, deal_II_space_dimension>;
     template class FE_WedgeDGP<deal_II_dimension, deal_II_space_dimension>;
 #endif

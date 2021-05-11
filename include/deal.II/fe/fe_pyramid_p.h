@@ -32,15 +32,15 @@ DEAL_II_NAMESPACE_OPEN
  * @ingroup simplex
  */
 template <int dim, int spacedim = dim>
-class FE_Pyramid : public dealii::FE_Poly<dim, spacedim>
+class FE_PyramidPoly : public dealii::FE_Poly<dim, spacedim>
 {
 public:
   /**
    * Constructor.
    */
-  FE_Pyramid(const unsigned int                                degree,
-             const internal::GenericDoFsPerObject &            dpos,
-             const typename FiniteElementData<dim>::Conformity conformity);
+  FE_PyramidPoly(const unsigned int                                degree,
+                 const internal::GenericDoFsPerObject &            dpos,
+                 const typename FiniteElementData<dim>::Conformity conformity);
 };
 
 /**
@@ -51,7 +51,7 @@ public:
  * @ingroup simplex
  */
 template <int dim, int spacedim = dim>
-class FE_PyramidP : public FE_Pyramid<dim, spacedim>
+class FE_PyramidP : public FE_PyramidPoly<dim, spacedim>
 {
 public:
   /**
@@ -110,7 +110,7 @@ public:
  * @ingroup simplex
  */
 template <int dim, int spacedim = dim>
-class FE_PyramidDGP : public FE_Pyramid<dim, spacedim>
+class FE_PyramidDGP : public FE_PyramidPoly<dim, spacedim>
 {
 public:
   /**
