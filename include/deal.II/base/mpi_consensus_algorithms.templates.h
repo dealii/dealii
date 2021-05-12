@@ -98,7 +98,7 @@ namespace Utilities
 
 
       template <typename T1, typename T2>
-      void
+      std::vector<unsigned int>
       NBX<T1, T2>::run()
       {
         static CollectiveMutex      mutex;
@@ -124,6 +124,10 @@ namespace Utilities
 
         // 5) process the answer to all requests
         clean_up_and_end_communication();
+
+        return std::vector<unsigned int>(requesting_processes.begin(),
+                                         requesting_processes.end());
+        ;
       }
 
 
@@ -211,12 +215,10 @@ namespace Utilities
             // get rank of requesting process
             const auto other_rank = status.MPI_SOURCE;
 
-#  ifdef DEBUG
             Assert(requesting_processes.find(other_rank) ==
                      requesting_processes.end(),
                    ExcMessage("Process is requesting a second time!"));
             requesting_processes.insert(other_rank);
-#  endif
 
             std::vector<T1> buffer_recv;
             // get size of incoming message
@@ -378,7 +380,7 @@ namespace Utilities
 
 
       template <typename T1, typename T2>
-      void
+      std::vector<unsigned int>
       PEX<T1, T2>::run()
       {
         static CollectiveMutex      mutex;
@@ -394,6 +396,9 @@ namespace Utilities
 
         // 3) process answers
         clean_up_and_end_communication();
+
+        return std::vector<unsigned int>(requesting_processes.begin(),
+                                         requesting_processes.end());
       }
 
 
@@ -414,6 +419,11 @@ namespace Utilities
 
         // get rank of incoming message
         const auto other_rank = status.MPI_SOURCE;
+
+        Assert(requesting_processes.find(other_rank) ==
+                 requesting_processes.end(),
+               ExcMessage("Process is requesting a second time!"));
+        requesting_processes.insert(other_rank);
 
         std::vector<T1> buffer_recv;
 
@@ -560,25 +570,27 @@ namespace Utilities
 
 
       template <typename T1, typename T2>
-      void
+      std::vector<unsigned int>
       Serial<T1, T2>::run()
       {
         const auto targets = this->process.compute_targets();
 
-        if (targets.size() == 0)
-          return; // nothing to do
+        if (targets.size() != 0)
+          {
+            AssertDimension(targets[0], 0);
 
-        AssertDimension(targets[0], 0);
+            std::vector<T1> send_buffer;
+            std::vector<T2> recv_buffer;
+            std::vector<T2> request_buffer;
 
-        std::vector<T1> send_buffer;
-        std::vector<T2> recv_buffer;
-        std::vector<T2> request_buffer;
+            this->process.create_request(0, send_buffer);
+            this->process.prepare_buffer_for_answer(0, recv_buffer);
+            this->process.answer_request(0, send_buffer, request_buffer);
+            recv_buffer = request_buffer;
+            this->process.read_answer(0, recv_buffer);
+          }
 
-        this->process.create_request(0, send_buffer);
-        this->process.prepare_buffer_for_answer(0, recv_buffer);
-        this->process.answer_request(0, send_buffer, request_buffer);
-        recv_buffer = request_buffer;
-        this->process.read_answer(0, recv_buffer);
+        return targets; // nothing to do
       }
 
 
@@ -612,10 +624,10 @@ namespace Utilities
 
 
       template <typename T1, typename T2>
-      void
+      std::vector<unsigned int>
       Selector<T1, T2>::run()
       {
-        consensus_algo->run();
+        return consensus_algo->run();
       }
 
 
