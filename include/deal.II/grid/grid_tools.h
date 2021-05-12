@@ -1149,7 +1149,8 @@ namespace GridTools
       const std::vector<Point<spacedim>> &                   points,
       const std::vector<std::vector<BoundingBox<spacedim>>> &global_bboxes,
       const double                                           tolerance,
-      const bool                                             perform_handshake);
+      const bool                                             perform_handshake,
+      const bool enforce_unique_mapping = false);
 
   } // namespace internal
 
