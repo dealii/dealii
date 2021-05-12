@@ -15,6 +15,7 @@
 
 // Create all reference cells, and output them with gmsh.
 
+#include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/tria.h>
 
@@ -28,8 +29,8 @@ test(const std::uint8_t kind, const std::string out = "")
           << "<" << dim << "," << spacedim << ">" << std::endl;
 
   Triangulation<dim, spacedim> tria;
-  ReferenceCell::make_triangulation(
-    ReferenceCell::internal::make_reference_cell_from_int(kind), tria);
+  GridGenerator::reference_cell(
+    internal::ReferenceCell::make_reference_cell_from_int(kind), tria);
   GridOut go;
   go.write_msh(tria, "output.msh");
   cat_file("output.msh");
