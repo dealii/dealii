@@ -247,10 +247,10 @@ adaptation type, of which a few are already implemented in deal.II:
   The transition from the Fourier strategy to the Legendre one is quite simple:
   You just need to change the series expansion class and the corresponding
   smoothness estimation function to be part of the proper namespaces
-  FESeries::Legendre and SmoothnessEstimator::Legendre. For the theoretical
-  background of this strategy, consult the general documentation of the
-  SmoothnessEstimator::Legendre namespace, as well as @cite mavriplis1994hp ,
-  @cite eibner2007hp and @cite davydov2017hp.</li>
+  FESeries::Legendre and SmoothnessEstimator::Legendre. This strategy is used
+  in step-75. For the theoretical background of this strategy, consult the
+  general documentation of the SmoothnessEstimator::Legendre namespace, as well
+  as @cite mavriplis1994hp , @cite eibner2007hp and @cite davydov2017hp .</li>
 
   <li><i>Refinement history:</i> The last strategy is quite different
   from the other two. In theory, we know how the error will converge
@@ -295,3 +295,7 @@ parallel::distributed::Triangulation classes. If you feel eager to try
 it, we recommend reading step-18 for the former and step-40 for the
 latter case first for further background information on the topic, and
 then come back to this tutorial to try out your newly acquired skills.
+
+We go one step further in step-75: Here, we combine hp-adapative and
+MatrixFree methods in combination with
+parallel::distributed::Triangulation objects.

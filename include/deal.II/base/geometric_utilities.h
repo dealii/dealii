@@ -51,6 +51,8 @@ namespace GeometricUtilities
      *  \theta &= {\rm atan}(y/x) \\
      *  \phi &= {\rm acos} (z/r)
      * @f}
+     *
+     * The use of this function is demonstrated in step-75.
      */
     template <int dim>
     std::array<double, dim>

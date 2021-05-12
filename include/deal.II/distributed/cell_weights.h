@@ -73,6 +73,8 @@ namespace parallel
    *         {1000, 1}));
    * @endcode
    *
+   * The use of this class is demonstrated in step-75.
+   *
    * @note See Triangulation::Signals::cell_weight for more information on
    * weighting and load balancing.
    *
