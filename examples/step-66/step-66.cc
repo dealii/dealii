@@ -957,7 +957,9 @@ namespace Step66
       }
     data_out.add_data_vector(subdomain, "subdomain");
 
-    data_out.build_patches(mapping, fe.degree);
+    data_out.build_patches(mapping,
+                           fe.degree,
+                           DataOut<dim>::curved_inner_cells);
 
     DataOutBase::VtkFlags flags;
     flags.compression_level        = DataOutBase::VtkFlags::best_speed;
