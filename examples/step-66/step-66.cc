@@ -42,7 +42,7 @@
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
-#include <deal.II/fe/mapping_c1.h>
+#include <deal.II/fe/mapping_q_generic.h>
 
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/numerics/data_out.h>
@@ -392,7 +392,7 @@ namespace Step66
     // For the triangulation we use directly the parallel::distributed version
     // and define an object for the C^1 mapping.
     parallel::distributed::Triangulation<dim> triangulation;
-    const MappingC1<dim>                      mapping;
+    const MappingQGeneric<dim>                mapping;
 
     FE_Q<dim>       fe;
     DoFHandler<dim> dof_handler;
@@ -461,6 +461,7 @@ namespace Step66
                     Triangulation<dim>::limit_level_difference_at_vertices,
                     parallel::distributed::Triangulation<
                       dim>::construct_multigrid_hierarchy)
+    , mapping(fe_degree + 1)
     , fe(fe_degree)
     , dof_handler(triangulation)
     , pcout(std::cout, Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
