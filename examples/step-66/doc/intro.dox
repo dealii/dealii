@@ -4,7 +4,7 @@
 <br>
 A version of this code was presented and discussed in:
 G.F. Castelli: Numerical Investigation of Cahn-Hilliard-Type Phase-Field
-Models for Battery Active Particles, PhD thesis, Karslruhe Institute of
+Models for Battery Active Particles, PhD thesis, Karlsruhe Institute of
 Technology (KIT), 2021. (To be published)
 
 F.C. was supported by the German Research Foundation (DFG) through the
@@ -42,7 +42,7 @@ by Jerrold Bebernes and David Eberly</a>.
 As usual, we first derive the weak formulation for this problem by multiplying
 with a smooth test function $v\colon\Omega\to\mathbb{R}$ respecting the
 boundary condition and integrating over the domain $\Omega$. Integration by
-parts and putting the term on the right hand side to the left yields the weak
+parts and putting the term from the right hand side to the left yields the weak
 formulation: Find a function $u\colon\Omega\to\mathbb{R}$ such that for all
 test functions $v$ it holds:
 @f{align*}{
@@ -69,7 +69,7 @@ such that for all $i=1,\dots,N$ it holds:
 @f}
 As each finite element function is a linear combination of the basis functions
 $\{\varphi_i\}_{i=1,\dots,N}$, we can identify the finite element solution by
-a vector from $\mathbb{R}^N$ consisting of the unknow values in each DOF.
+a vector from $\mathbb{R}^N$ consisting of the unknown values in each DOF.
 Thus, we define the nonlinear function $F\colon\mathbb{R}^N\to\mathbb{R}^N$
 representing the discrete nonlinear problem.
 
@@ -131,7 +131,7 @@ GelfandProblem<dim>::assemble_system()
   system_matrix = 0;
   system_rhs    = 0;
 
-  const QGauss<dim> quadrature_fomrula(fe.degree+1);
+  const QGauss<dim> quadrature_formula(fe.degree+1);
   FEValues<dim> fe_values(fe, quadrature_formula,
                           update_values | update_gradients | update_JxW_values);
 
@@ -212,7 +212,7 @@ GelfandProblem<dim>::compute_update()
   mg_transfer.interpolate_to_mg(dof_handler, mg_solution, solution);
 
   // Set up options for the multilevel preconditioner
-  for(unsigend int level=0; level<triangulation.n_levels()-1; ++level)
+  for(unsigned int level=0; level<triangulation.n_levels()-1; ++level)
   {
 	mg_matrices[level].evaluate_newton_step(mg_solution[level]);
   }
