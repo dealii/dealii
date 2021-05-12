@@ -1034,6 +1034,8 @@ namespace parallel
      * the triangulation is still unchanged. After the modification, all
      * refine and coarsen flags describe how the traingulation will acutally
      * be refined.
+     *
+     * The use of this class is demonstrated in step-75.
      */
     template <int dim, int spacedim = dim>
     class TemporarilyMatchRefineFlags : public Subscriptor

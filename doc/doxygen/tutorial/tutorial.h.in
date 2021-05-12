@@ -622,6 +622,13 @@
  *       </td></tr>
  *
  *   <tr valign="top">
+ *       <td>step-75</td>
+ *       <td> Solving the Laplace equation on hp-adaptive meshes with MatrixFree
+ *       methods on thousands of processors.
+ *       <br/> Keywords: parallel::distributed::Triangulation, hp::Refinement, MatrixFree
+ *       </td></tr>
+ *
+ *   <tr valign="top">
  *       <td>step-76</td>
  *       <td> Like step-67, but for demonstrating MPI-3.0 shared-memory features.
  *       <br/> Keywords: MatrixFree, MatrixFree::cell_loop()
@@ -740,7 +747,8 @@
  *       step-50,
  *       step-55,
  *       step-71,
- *       step-72
+ *       step-72,
+ *       step-75
  *     </td>
  *   </tr>
  *
@@ -798,7 +806,8 @@
  *       step-59,
  *       step-67,
  *       step-69,
- *       step-70
+ *       step-70,
+ *       step-75
  *     </td>
  *   </tr>
  *
@@ -888,7 +897,8 @@
  *     </td>
  *     <td>
  *       step-27,
- *       step-46
+ *       step-46,
+ *       step-75
  *     </td>
  *   </tr>
  *
@@ -1037,7 +1047,8 @@
  *       step-50,
  *       step-56,
  *       step-59,
- *       step-63
+ *       step-63,
+ *       step-75
  *     </td>
  *   </tr>
  *
@@ -1053,7 +1064,8 @@
  *       step-42,
  *       step-50,
  *       step-55,
- *       step-59
+ *       step-59,
+ *       step-75
  *     </td>
  *   </tr>
  *
