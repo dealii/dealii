@@ -383,7 +383,7 @@ namespace Step55
     relevant_partitioning[1] = locally_relevant_dofs.get_view(n_u, n_u + n_p);
 
     // Setting up the constraints for boundary conditions and hanging nodes
-    // is identical to step-40. Rven though we don't have any hanging nodes
+    // is identical to step-40. Even though we don't have any hanging nodes
     // because we only perform global refinement, it is still a good idea
     // to put this function call in, in case adaptive refinement gets
     // introduced later.
