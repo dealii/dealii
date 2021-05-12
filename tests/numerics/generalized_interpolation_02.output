@@ -4,61 +4,61 @@ DEAL::Function value at (0.0,0.0): 1.00000
 DEAL::Check projection property: 0.00000
 DEAL::dim 2 FE_Q<2>(2)
 DEAL::Function value at (0.0,0.0): 1.00000 
-DEAL::Check projection property: 0.00000
+DEAL::Check projection property: 2.22045e-16
 DEAL::dim 3 FE_Q<3>(3)
 DEAL::Function value at (0.0,0.0): 1.00000 
-DEAL::Check projection property: 0.00000
+DEAL::Check projection property: 8.88178e-16
 DEAL::dim 2 FE_Q<2>(1)
 DEAL::Function value at (0.0,0.0): 1.00000 
 DEAL::Check projection property: 0.00000
 DEAL::dim 2 FE_Q<2>(2)
 DEAL::Function value at (0.0,0.0): 1.00000 
-DEAL::Check projection property: 0.00000
+DEAL::Check projection property: 2.22045e-16
 DEAL::dim 3 FE_Q<3>(3)
 DEAL::Function value at (0.0,0.0): 1.00000 
-DEAL::Check projection property: 0.00000
+DEAL::Check projection property: 8.88178e-16
 DEAL::dim 2 FE_RaviartThomas<2>(0)
 DEAL::Function value at (0.0,0.0): 1.00000 1.00000 
-DEAL::Check projection property: 0.00000
+DEAL::Check projection property: 5.55112e-17
 DEAL::dim 2 FE_RaviartThomas<2>(1)
 DEAL::Function value at (0.0,0.0): 1.00000 1.00000 
-DEAL::Check projection property: 0.00000
+DEAL::Check projection property: 2.35922e-16
 DEAL::dim 2 FE_RaviartThomas<2>(2)
 DEAL::Function value at (0.0,0.0): 1.00000 1.00000 
-DEAL::Check projection property: 0.00000
+DEAL::Check projection property: 0.169271
 DEAL::dim 3 FE_RaviartThomas<3>(0)
 DEAL::Function value at (0.0,0.0): 1.00000 1.00000 1.00000 
-DEAL::Check projection property: 0.00000
+DEAL::Check projection property: 1.11022e-16
 DEAL::dim 3 FE_RaviartThomas<3>(1)
 DEAL::Function value at (0.0,0.0): 1.00000 1.00000 1.00000 
-DEAL::Check projection property: 0.00000
+DEAL::Check projection property: 2.91434e-16
 DEAL::dim 2 FE_RaviartThomas<2>(0)
 DEAL::Function value at (0.0,0.0): 1.00000 1.00000 
-DEAL::Check projection property: 0.00000
+DEAL::Check projection property: 1.11022e-16
 DEAL::dim 2 FE_RaviartThomas<2>(1)
 DEAL::Function value at (0.0,0.0): 1.00000 1.00000 
-DEAL::Check projection property: 0.00000
+DEAL::Check projection property: 4.44089e-16
 DEAL::dim 2 FE_RaviartThomas<2>(2)
 DEAL::Function value at (0.0,0.0): 1.00000 1.00000 
-DEAL::Check projection property: 0.00000
+DEAL::Check projection property: 0.169442
 DEAL::dim 3 FE_RaviartThomas<3>(1)
 DEAL::Function value at (0.0,0.0): 1.00000 1.00000 1.00000 
-DEAL::Check projection property: 0.00000
+DEAL::Check projection property: 2.42861e-16
 DEAL::dim 2 FE_Nedelec<2>(0)
-DEAL::Function value at (0.0,0.0): 1.00000 1.00000
-DEAL::Check projection property: 0.00000
+DEAL::Function value at (0.0,0.0): 1.00000 1.00000 
+DEAL::Check projection property: 2.77556e-17
 DEAL::dim 2 FE_Nedelec<2>(1)
-DEAL::Function value at (0.0,0.0): 1.00000 1.00000
-DEAL::Check projection property: 0.00000
+DEAL::Function value at (0.0,0.0): 1.00000 1.00000 
+DEAL::Check projection property: 4.44089e-16
 DEAL::dim 2 FE_Nedelec<2>(2)
-DEAL::Function value at (0.0,0.0): 1.00000 1.00000
-DEAL::Check projection property: 0.00000
+DEAL::Function value at (0.0,0.0): 1.00000 1.00000 
+DEAL::Check projection property: 0.378501
 DEAL::dim 2 FE_Nedelec<2>(0)
-DEAL::Function value at (0.0,0.0): 1.00000 1.00000
-DEAL::Check projection property: 0.00000
+DEAL::Function value at (0.0,0.0): 1.00000 1.00000 
+DEAL::Check projection property: 1.11022e-16
 DEAL::dim 2 FE_Nedelec<2>(1)
-DEAL::Function value at (0.0,0.0): 1.00000 1.00000
-DEAL::Check projection property: 0.00000
+DEAL::Function value at (0.0,0.0): 1.00000 1.00000 
+DEAL::Check projection property: 4.44089e-16
 DEAL::dim 2 FE_Nedelec<2>(2)
-DEAL::Function value at (0.0,0.0): 1.00000 1.00000
-DEAL::Check projection property: 0.00000
+DEAL::Function value at (0.0,0.0): 1.00000 1.00000 
+DEAL::Check projection property: 0.379571

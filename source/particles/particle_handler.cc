@@ -1088,18 +1088,16 @@ namespace Particles
               // The particle is not in a neighbor of the old cell.
               // Look for the new cell in the whole local domain.
               // This case is rare.
-              try
-                {
-                  const std::pair<const typename Triangulation<dim, spacedim>::
-                                    active_cell_iterator,
-                                  Point<dim>>
-                    current_cell_and_position =
-                      GridTools::find_active_cell_around_point<>(
-                        *mapping, *triangulation, out_particle->get_location());
-                  current_cell               = current_cell_and_position.first;
-                  current_reference_position = current_cell_and_position.second;
-                }
-              catch (GridTools::ExcPointNotFound<spacedim> &)
+              const std::pair<const typename Triangulation<dim, spacedim>::
+                                active_cell_iterator,
+                              Point<dim>>
+                current_cell_and_position =
+                  GridTools::find_active_cell_around_point<>(
+                    *mapping, *triangulation, out_particle->get_location());
+              current_cell               = current_cell_and_position.first;
+              current_reference_position = current_cell_and_position.second;
+
+              if (current_cell.state() != IteratorState::valid)
                 {
                   // We can find no cell for this particle. It has left the
                   // domain due to an integration error or an open boundary.
