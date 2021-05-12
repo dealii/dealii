@@ -368,7 +368,7 @@ one another then, for each mechanism `i`,
   \frac{\partial \psi_{0}}{\partial \mathbf{C}_{v}^{i}} : \dot{\mathbf{C}}_{v}^{i}
   \leq 0 .
 @f]
-This constraint must be satisfies through the appropriate choice of free energy
+This constraint must be satisfied through the appropriate choice of free energy
 function, as well as a carefully considered evolution law for the internal
 variables.
 
@@ -489,7 +489,7 @@ law is defined.
 
 <h5>Magneto-viscoelastic constitutive law</h5>
 
-The second material that we'll formulate is one that for a
+The second material that we'll formulate is one for a
 magneto-viscoelastic material with a single dissipative mechanism `i`.
 The *free energy density function* that we'll be considering is defined as
 @f{align*}{
@@ -665,7 +665,7 @@ for this particular problem, we will also be computing the tangents as well.
 Even though they are not directly used in this particular piece of work, these
 second derivatives are needed to embed the constitutive law within a
 finite element model (one possible extension to this work). We'll therefore
-take the opportunity to checked our hand calculations for correctness using
+take the opportunity to check our hand calculations for correctness using
 the assisted differentiation frameworks.
 
 <h3>Suggested literature</h3>
