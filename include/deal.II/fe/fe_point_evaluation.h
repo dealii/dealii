@@ -586,8 +586,11 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::FEPointEvaluation(
       shape_info.reinit(QMidpoint<1>(), fe, base_element_number);
       renumber           = shape_info.lexicographic_numbering;
       dofs_per_component = shape_info.dofs_per_component_on_cell;
-      poly               = Polynomials::generate_complete_Lagrange_basis(
-        QGaussLobatto<1>(shape_info.data[0].fe_degree + 1).get_points());
+      poly =
+        shape_info.data[0].fe_degree == 0 ?
+          Polynomials::LagrangeEquidistant::generate_complete_basis(0) :
+          Polynomials::generate_complete_Lagrange_basis(
+            QGaussLobatto<1>(shape_info.data[0].fe_degree + 1).get_points());
     }
   if (true /*TODO: as long as the fast path of integrate() is not working*/)
     {
