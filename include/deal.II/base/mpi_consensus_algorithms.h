@@ -174,9 +174,9 @@ namespace Utilities
         virtual ~Interface() = default;
 
         /**
-         * Run consensus algorithm.
+         * Run consensus algorithm and return the requesting processes.
          */
-        virtual void
+        virtual std::vector<unsigned int>
         run() = 0;
 
       protected:
@@ -241,7 +241,7 @@ namespace Utilities
         /**
          * @copydoc Interface::run()
          */
-        virtual void
+        virtual std::vector<unsigned int>
         run() override;
 
       private:
@@ -286,12 +286,10 @@ namespace Utilities
         MPI_Request barrier_request;
 #endif
 
-#ifdef DEBUG
         /**
          * List of processes who have made a request to this process.
          */
         std::set<unsigned int> requesting_processes;
-#endif
 
         /**
          * Check if all request answers have been received by this rank.
@@ -377,7 +375,7 @@ namespace Utilities
         /**
          * @copydoc Interface::run()
          */
-        virtual void
+        virtual std::vector<unsigned int>
         run() override;
 
       private:
@@ -419,6 +417,10 @@ namespace Utilities
          */
         std::vector<MPI_Request> requests_answers;
 #endif
+        /**
+         * List of processes who have made a request to this process.
+         */
+        std::set<unsigned int> requesting_processes;
 
         /**
          * The ith request message from another rank has been received: process
@@ -461,7 +463,7 @@ namespace Utilities
         /**
          * @copydoc Interface::run()
          */
-        virtual void
+        virtual std::vector<unsigned int>
         run() override;
       };
 
@@ -497,7 +499,7 @@ namespace Utilities
          *
          * @note The function call is delegated to another ConsensusAlgorithms::Interface implementation.
          */
-        virtual void
+        virtual std::vector<unsigned int>
         run() override;
 
       private:
