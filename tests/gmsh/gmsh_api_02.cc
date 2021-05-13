@@ -30,7 +30,7 @@ test(const std::uint8_t kind, const std::string out = "")
 
   Triangulation<dim, spacedim> tria;
   GridGenerator::reference_cell(
-    internal::ReferenceCell::make_reference_cell_from_int(kind), tria);
+    tria, internal::ReferenceCell::make_reference_cell_from_int(kind));
   GridOut go;
   go.write_msh(tria, "output.msh");
   cat_file("output.msh");
