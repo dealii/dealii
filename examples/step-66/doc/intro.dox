@@ -1,6 +1,17 @@
 <br>
 
-<i>This program was contributed by Fabian Castelli.</i>
+<i>This program was contributed by Fabian Castelli.
+<br>
+A version of this code was presented and discussed in:
+G.F. Castelli: Numerical Investigation of Cahn-Hilliard-Type Phase-Field
+Models for Battery Active Particles, PhD thesis, Karlsruhe Institute of
+Technology (KIT), 2021. (To be published)
+
+F.C. was supported by the German Research Foundation (DFG) through the
+Research Training Group 2218 SiMET -- Simulation of mechano-electro-thermal
+processes in lithium-ion batteries, project number 281041241.
+</i>
+
 
 <a name="Intro"></a>
 <h1>Introduction</h1>
@@ -28,12 +39,12 @@ by Jerrold Bebernes and David Eberly</a>.
 
 
 <h3>Discretization with finite elements</h3>
-As usual, we first derive the weak formulation for this
-problem by multiplying with a smooth test function $v\colon\Omega\to\mathbb{R}$
-respecting the boundary condition and integrating over the domain $\Omega$.
-Integration by parts and putting the term on the right hand side to the left
-yields the weak formulation: Find a function $u\colon\Omega\to\mathbb{R}$
-such that for all test functions $v$ it holds:
+As usual, we first derive the weak formulation for this problem by multiplying
+with a smooth test function $v\colon\Omega\to\mathbb{R}$ respecting the
+boundary condition and integrating over the domain $\Omega$. Integration by
+parts and putting the term from the right hand side to the left yields the weak
+formulation: Find a function $u\colon\Omega\to\mathbb{R}$ such that for all
+test functions $v$ it holds:
 @f{align*}{
  \int_\Omega \nabla v \cdot \nabla u \,\mathrm{d}x
  -
@@ -42,10 +53,13 @@ such that for all test functions $v$ it holds:
  0.
 @f}
 
-Choosing the Lagrangian finite element space $V_h$ we can define a basis
-$\{\varphi_i\}_{i=1,\dots,N}$ and it suffices to test only with those basis
-functions. So the discrete problem reads as follows: Find $u_h\in V_h$ such that
-for all $i=1,\dots,N$ it holds:
+Choosing the Lagrangian finite element space $V_h \dealcoloneq
+\Bigl\{ v \in C(\overline{\Omega}) : v|_Q \in \mathbb{Q}_p \text{ for all }
+Q \in \mathcal{T}_h \Bigr\} \cap H_0^1(\Omega)$, which directly incorporates
+the homogeneous Dirichlet boundary condition, we can define a basis
+$\{\varphi_i\}_{i=1,\dots,N}$ and thus it suffices to test only with those
+basis functions. So the discrete problem reads as follows: Find $u_h\in V_h$
+such that for all $i=1,\dots,N$ it holds:
 @f{align*}{
  F(u_h)
  \dealcoloneq
@@ -53,12 +67,16 @@ for all $i=1,\dots,N$ it holds:
  -
  \int_\Omega \varphi_i \exp(u_h) \,\mathrm{d}x \stackrel{!}{=} 0.
 @f}
-We directly define the nonlinear function $F\colon\mathbb{R}^N\to\mathbb{R}^N$
+As each finite element function is a linear combination of the basis functions
+$\{\varphi_i\}_{i=1,\dots,N}$, we can identify the finite element solution by
+a vector from $\mathbb{R}^N$ consisting of the unknown values in each DOF.
+Thus, we define the nonlinear function $F\colon\mathbb{R}^N\to\mathbb{R}^N$
 representing the discrete nonlinear problem.
 
 To solve this nonlinear problem we use Newton's method. So given an
-initial guess $u_h^0\in V_h$ we determine a sequence of Newton steps
-$\bigl( u_h^n \bigr)_n$ by successively applying      the following scheme:
+initial guess $u_h^0\in V_h$, which already fulfills the Dirichlet boundary
+condition, we determine a sequence of Newton steps $\bigl( u_h^n \bigr)_n$ by
+successively applying the following scheme:
 @f{align*}{
  &\text{Solve for } s_h^n\in V_h: \qquad & F'(u_h^n)[s_h^n] &= -F(u_h^n),\\
  &\text{Update: } & u_h^{n+1} &= u_h^n + s_h^n.
@@ -67,7 +85,11 @@ So in each Newton step we have to solve a linear problem $A\,x = b$, where the
 system matrix $A$ is represented by the Jacobian
 $F'(u_h^n)[\,\cdot\,]\colon\mathbb{R}^N\to\mathbb{R}^N$ and the right hand side
 $b$ by the negative residual $-F(u_h^n)$. The solution vector $x$ is in that
-case the Newton update of the $n$-th Newton step.
+case the Newton update of the $n$-th Newton step. Note, that we assume an
+initial guess $u_h^0$, which already fulfills the Dirichlet boundary conditions
+of the problem formulation (in fact this could also be an inhomogeneous
+Dirichlet boundary condition) and thus the Newton updates $s_h$ satisfy a
+homogeneous Dirichlet condition.
 
 Until now we only tested with the basis functions, however, we can also
 represent any function of $V_h$ as linear combination of basis functions. More
@@ -94,14 +116,13 @@ discrete equations.
 
 
 <h3>Numerical linear algebra</h3>
-Note how the system matrix, the Jacobian, depends on the previous
-Newton step $A = F'(u^n)$. Hence before we need to tell the function that
-computes the system matrix about the solution at the last Newton step. In an
-implementation with a classical
-assemble_system function we would gather this information from the last Newton
-step during assembly by the use of the member functions get_function_values and
-get_function_gradients of the FEValuesBase class. The assemble_system function
-would then looks like:
+Note, how the system matrix, actually the Jacobian, depends on the previous
+Newton step $A = F'(u^n)$. Hence we need to tell the function that computes
+the system matrix about the solution at the last Newton step. In an
+implementation with a classical assemble_system function we would gather this
+information from the last Newton step during assembly by the use of the member
+functions get_function_values and get_function_gradients of the FEValuesBase
+class. The assemble_system function would then looks like:
 @code
 template<int dim>
 void
@@ -110,7 +131,7 @@ GelfandProblem<dim>::assemble_system()
   system_matrix = 0;
   system_rhs    = 0;
 
-  const QGauss<dim> quadrature_fomrula(fe.degree+1);
+  const QGauss<dim> quadrature_formula(fe.degree+1);
   FEValues<dim> fe_values(fe, quadrature_formula,
                           update_values | update_gradients | update_JxW_values);
 
@@ -139,12 +160,10 @@ GelfandProblem<dim>::assemble_system()
 	{
 	  const double nonlinearity = std::exp(newton_step_values[q]);
 	  const double dx           = fe_values.JxW(q);
-
 	  for(unsigned int i=0; i<dofs_per_cell; ++i)
 	  {
 		const double        phi_i      = fe_values.shape_value(i,q);
 		const Tensor<1,dim> grad_phi_i = fe_values.shape_grad(i,q);
-
 		for(unsigned int j=0; j<dofs_per_cell; ++j)
 		{
 		  const double        phi_j      = fe_values.shape_value(j,q);
@@ -193,7 +212,7 @@ GelfandProblem<dim>::compute_update()
   mg_transfer.interpolate_to_mg(dof_handler, mg_solution, solution);
 
   // Set up options for the multilevel preconditioner
-  for(unsigend int level=0; level<triangulation.n_levels()-1; ++level)
+  for(unsigned int level=0; level<triangulation.n_levels()-1; ++level)
   {
 	mg_matrices[level].evaluate_newton_step(mg_solution[level]);
   }
@@ -216,13 +235,11 @@ JacobianOperator<dim,fe_degree,number>::evaluate_newton_step(const LinearAlgebra
 {
   const unsigned int n_cells = this->data->n_macro_cells();
   FEEvaluation<dim,fe_degree,fe_degree+1,1,number> phi(*this->data);
-
   nl_values.reinit(n_cells, phi.n_q_points);
   for(unsigned int cell=0; cell<n_cells; ++cell)
   {
 	phi.reinit(cell);
 	phi.gather_evaluate(src, true, false);
-
 	for(unsigned int q=0; q<phi.n_q_points; ++q)
 	  nl_values(cell, q) = std::exp(phi.get_value(q));
   }
