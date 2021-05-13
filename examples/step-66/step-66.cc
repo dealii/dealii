@@ -553,8 +553,7 @@ namespace Step66
       additional_data.mapping_update_flags =
         (update_values | update_gradients | update_JxW_values |
          update_quadrature_points);
-      std::shared_ptr<MatrixFree<dim, double>> system_mf_storage(
-        new MatrixFree<dim, double>());
+      auto system_mf_storage = std::make_shared<MatrixFree<dim, double>>();
       system_mf_storage->reinit(mapping,
                                 dof_handler,
                                 constraints,
@@ -602,8 +601,7 @@ namespace Step66
           (update_values | update_gradients | update_JxW_values |
            update_quadrature_points);
         additional_data.mg_level = level;
-        std::shared_ptr<MatrixFree<dim, float>> mg_mf_storage_level(
-          new MatrixFree<dim, float>());
+        auto mg_mf_storage_level = std::make_shared<MatrixFree<dim, float>>();
         mg_mf_storage_level->reinit(mapping,
                                     dof_handler,
                                     level_constraints,
