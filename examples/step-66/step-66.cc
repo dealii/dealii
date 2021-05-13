@@ -208,7 +208,7 @@ namespace Step66
       {
         phi.reinit(cell);
         phi.read_dof_values_plain(src);
-        phi.evaluate(true, false);
+        phi.evaluate(EvaluationFlags::values);
 
         for (unsigned int q = 0; q < phi.n_q_points; ++q)
           nonlinear_values(cell, q) = std::exp(phi.get_value(q));
@@ -241,7 +241,7 @@ namespace Step66
         AssertDimension(nonlinear_values.size(1), phi.n_q_points);
 
         phi.reinit(cell);
-        phi.gather_evaluate(src, true, true);
+        phi.gather_evaluate(src, EvaluationFlags::values | EvaluationFlags::gradients);
 
         for (unsigned int q = 0; q < phi.n_q_points; ++q)
           {
@@ -249,7 +249,7 @@ namespace Step66
             phi.submit_gradient(phi.get_gradient(q), q);
           }
 
-        phi.integrate_scatter(true, true, dst);
+        phi.integrate_scatter(EvaluationFlags::values | EvaluationFlags::gradients, dst);
       }
   }
 
@@ -333,14 +333,14 @@ namespace Step66
               phi.submit_dof_value(VectorizedArray<number>(), j);
             phi.submit_dof_value(make_vectorized_array<number>(1.), i);
 
-            phi.evaluate(true, true);
+            phi.evaluate(EvaluationFlags::values | EvaluationFlags::gradients);
             for (unsigned int q = 0; q < phi.n_q_points; ++q)
               {
                 phi.submit_value(-nonlinear_values(cell, q) * phi.get_value(q),
                                  q);
                 phi.submit_gradient(phi.get_gradient(q), q);
               }
-            phi.integrate(true, true);
+            phi.integrate(EvaluationFlags::values | EvaluationFlags::gradients);
             diagonal[i] = phi.get_dof_value(i);
           }
         for (unsigned int i = 0; i < phi.dofs_per_cell; ++i)
@@ -654,7 +654,7 @@ namespace Step66
       {
         phi.reinit(cell);
         phi.read_dof_values_plain(src);
-        phi.evaluate(true, true);
+        phi.evaluate(EvaluationFlags::values | EvaluationFlags::gradients);
 
         for (unsigned int q = 0; q < phi.n_q_points; ++q)
           {
@@ -662,7 +662,7 @@ namespace Step66
             phi.submit_gradient(phi.get_gradient(q), q);
           }
 
-        phi.integrate_scatter(true, true, dst);
+        phi.integrate_scatter(EvaluationFlags::values | EvaluationFlags::gradients, dst);
       }
 
     // Finally, we must not forget to initiate the MPI data exchange via the
