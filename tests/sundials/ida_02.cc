@@ -16,6 +16,8 @@
 #include <deal.II/base/parameter_handler.h>
 
 #include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/precondition.h>
+#include <deal.II/lac/solver_gmres.h>
 #include <deal.II/lac/vector.h>
 
 #include <deal.II/sundials/ida.h>
@@ -24,8 +26,9 @@
 
 
 /**
- * Solve the Harmonic oscillator problem, using a direct solver for the
- * jacobian system.
+ * Solve the Harmonic oscillator problem, using an iterative solver for the
+ * jacobian system (with the interface that is available only in version >
+ * 4.0.0)
  *
  * u'' = -k^2 u
  * u (0) = 0
@@ -95,23 +98,17 @@ public:
       J(0, 0) = alpha;
       J(1, 1) = alpha;
 
-      Jinv.invert(J);
-      return 0;
-    };
-
-
-    time_stepper.solve_jacobian_system = [&](const VectorType &src,
-                                             VectorType &      dst) -> int {
-      Jinv.vmult(dst, src);
       return 0;
     };
 
     time_stepper.solve_with_jacobian = [&](const VectorType &src,
                                            VectorType &      dst,
                                            int &             n_iter,
-                                           const double) -> int {
-      Jinv.vmult(dst, src);
-      n_iter = 1;
+                                           const double      tolerance) -> int {
+      SolverControl               solver_control(1000, tolerance);
+      SolverGMRES<Vector<double>> solver(solver_control);
+      solver.solve(J, dst, src, PreconditionIdentity());
+      n_iter = solver_control.last_step() > 0 ? solver_control.last_step() : 1;
       return 0;
     };
 
