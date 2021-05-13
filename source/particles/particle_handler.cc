@@ -1093,7 +1093,7 @@ namespace Particles
                               Point<dim>>
                 current_cell_and_position =
                   GridTools::find_active_cell_around_point<>(
-                    *mapping, *triangulation, out_particle->get_location());
+                    *triangulation_cache, out_particle->get_location());
               current_cell               = current_cell_and_position.first;
               current_reference_position = current_cell_and_position.second;
 

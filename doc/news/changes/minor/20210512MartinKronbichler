@@ -1,0 +1,5 @@
+Improved: ParticleHandler::sort_particles_into_subdomains_and_cells()
+now uses a faster method to identify particles in cells farther away
+from their previous cell.
+<br>
+(Martin Kronbichler, 2021/05/12)
