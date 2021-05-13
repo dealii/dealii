@@ -32,10 +32,8 @@ $u\colon\Omega\to\mathbb{R}$ such that it holds:
           u &= 0       & \qquad & \text{on } \partial\Omega.
 @f}
 This problem is also called the <i>Gelfand problem</i> and is a typical example
-for problems from combustion theory, see for example in the book
-<a href="https://link.springer.com/book/10.1007/978-1-4612-4546-9">
-Mathematical Problems from Combustion Theory
-by Jerrold Bebernes and David Eberly</a>.
+for problems from combustion theory, see for example
+@cite bebernes1989mathematical.
 
 
 <h3>Discretization with finite elements</h3>
