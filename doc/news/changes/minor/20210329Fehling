@@ -1,0 +1,5 @@
+New: Class parallel::distributed::TemporarilyMatchRefineFlags that
+temporarily modifies the refine and coarsen flags of all active cells
+on a parallel::distributed::Triangulation to match its p4est oracle.
+<br>
+(Marc Fehling, 2021/03/29)
