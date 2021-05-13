@@ -263,7 +263,7 @@ namespace Step66
     LinearAlgebra::distributed::Vector<number> &      dst,
     const LinearAlgebra::distributed::Vector<number> &src) const
   {
-    this->data->cell_loop(&JacobianOperator::local_apply, this, dst, src, true);
+    this->data->cell_loop(&JacobianOperator::local_apply, this, dst, src);
   }
 
 
