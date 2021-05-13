@@ -269,13 +269,17 @@ namespace Step66
 
 
   // The remaining two functions of the <code>JacobianOperator</code> calculate
-  // the diagonal entries of the Jacobian. The only difference compared to
-  // step-37 is the calculation of the cell contribution in the
+  // the inverse of the diagonal entries of the Jacobian. The only difference
+  // compared to step-37 is the calculation of the cell contribution in the
   // <code>local_compute_diagonal()</code> function. Therefore, we only have to
   // extend and change the arguments for the submit functions in the loop over
   // all quadrature points and this can be done according to the
-  // <code>local_apply()</code> function. So no further comments to these two
-  // functions should be necessary.
+  // <code>local_apply()</code> function.
+  //
+  // Note that although the function is called <code>compute_diagonal()</code>,
+  // it does a bit more, namely it fills the
+  // <code>inverse_diagonal_entries</code>, which we need for the application of
+  // the Chebyshev smoother in the multigrid preconditioner.
   template <int dim, int fe_degree, typename number>
   void JacobianOperator<dim, fe_degree, number>::compute_diagonal()
   {
@@ -293,15 +297,14 @@ namespace Step66
                           dummy);
 
     this->set_constrained_entries_to_one(inverse_diagonal);
-
-    for (unsigned int i = 0; i < inverse_diagonal.locally_owned_size(); ++i)
+    
+    for (auto &i : inverse_diagonal)
       {
         Assert(
-          inverse_diagonal.local_element(i) > 0.,
+          std::abs(i) > 1.0e-10,
           ExcMessage(
             "No diagonal entry in a positive definite operator should be zero"));
-        inverse_diagonal.local_element(i) =
-          1. / inverse_diagonal.local_element(i);
+        i = 1.0 / i;
       }
   }
 
