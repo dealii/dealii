@@ -188,6 +188,15 @@ namespace GridGenerator
                          unsigned int,
                          bool>(quarter_hyper_shell, arguments, tria);
 
+      else if (name == "eccentric_hyper_shell")
+        parse_and_create<dim,
+                         dim,
+                         const Point<dim> &,
+                         const Point<dim> &,
+                         double,
+                         double,
+                         unsigned int>(eccentric_hyper_shell, arguments, tria);
+
       else if (name == "cylinder_shell")
         parse_and_create<dim,
                          dim,
