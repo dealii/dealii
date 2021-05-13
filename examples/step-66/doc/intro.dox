@@ -248,7 +248,8 @@ JacobianOperator<dim,fe_degree,number>::evaluate_newton_step(const LinearAlgebra
 <h3>Triangulation</h3>
 As said in step-37 the matrix-free method gets more efficient if we choose a
 higher order finite element space. Since we want to solve the problem on the
-unit circle, it would be good to have an appropriate boundary approximation to
-overcome convergence issues. For this reason we use the MappingC1 class to
-recover the smooth boundary. In addition, to get a good triangulation in total
-we make use of the TransfiniteInterpolationManifold.
+$d$-dimensional unit ball, it would be good to have an appropriate boundary
+approximation to overcome convergence issues. For this reason we use an
+isoparametric approach with the MappingQGeneric<dim> class to recover the smooth
+boundary as well as the mapping for inner cells. In addition, to get a good
+triangulation in total we make use of the TransfiniteInterpolationManifold<dim>.
