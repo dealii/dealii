@@ -88,7 +88,8 @@ namespace Functions
                           ActiveCellIterator<dim, dim, DoFHandlerType>::type,
                         Point<dim>>
           my_pair = GridTools::find_active_cell_around_point(mapping, *dh, p);
-        AssertThrow(!my_pair.first->is_artificial(),
+        AssertThrow(my_pair.first.state() == IteratorState::valid &&
+                      !my_pair.first->is_artificial(),
                     VectorTools::ExcPointNotAvailableHere());
 
         cell = my_pair.first;
@@ -147,7 +148,8 @@ namespace Functions
                           ActiveCellIterator<dim, dim, DoFHandlerType>::type,
                         Point<dim>>
           my_pair = GridTools::find_active_cell_around_point(mapping, *dh, p);
-        AssertThrow(!my_pair.first->is_artificial(),
+        AssertThrow(my_pair.first.state() == IteratorState::valid &&
+                      !my_pair.first->is_artificial(),
                     VectorTools::ExcPointNotAvailableHere());
 
         cell = my_pair.first;
@@ -220,7 +222,8 @@ namespace Functions
                           ActiveCellIterator<dim, dim, DoFHandlerType>::type,
                         Point<dim>>
           my_pair = GridTools::find_active_cell_around_point(mapping, *dh, p);
-        AssertThrow(!my_pair.first->is_artificial(),
+        AssertThrow(my_pair.first.state() == IteratorState::valid &&
+                      !my_pair.first->is_artificial(),
                     VectorTools::ExcPointNotAvailableHere());
 
         cell = my_pair.first;
