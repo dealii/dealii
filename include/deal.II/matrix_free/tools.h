@@ -611,7 +611,7 @@ namespace MatrixFreeTools
     // initialize vector
     matrix_free.initialize_dof_vector(diagonal_global, dof_no);
 
-    int dummy;
+    int dummy = 0;
 
     matrix_free.template cell_loop<VectorType, int>(
       [&](const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
