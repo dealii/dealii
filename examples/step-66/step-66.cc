@@ -185,9 +185,9 @@ namespace Step66
   // finite element function, namely the last Newton step needed for the
   // Jacobian. Therefore we set up a FEEvaluateion object and evaluate the
   // finite element function in the quadrature points with the
-  // FEEvaluation::read_dof_values_plain() and FEEvaluation::evaluate() functions.
-  // We store the evaluated values of the finite element function directly in a
-  // table.
+  // FEEvaluation::read_dof_values_plain() and FEEvaluation::evaluate()
+  // functions. We store the evaluated values of the finite element function
+  // directly in a table.
   //
   // This will work well and in the <code>local_apply()</code> function we can
   // use the values stored in the table to apply the matrix-vector product.
@@ -241,7 +241,9 @@ namespace Step66
         AssertDimension(nonlinear_values.size(1), phi.n_q_points);
 
         phi.reinit(cell);
-        phi.gather_evaluate(src, EvaluationFlags::values | EvaluationFlags::gradients);
+        phi.gather_evaluate(src,
+                            EvaluationFlags::values |
+                              EvaluationFlags::gradients);
 
         for (unsigned int q = 0; q < phi.n_q_points; ++q)
           {
@@ -249,7 +251,9 @@ namespace Step66
             phi.submit_gradient(phi.get_gradient(q), q);
           }
 
-        phi.integrate_scatter(EvaluationFlags::values | EvaluationFlags::gradients, dst);
+        phi.integrate_scatter(EvaluationFlags::values |
+                                EvaluationFlags::gradients,
+                              dst);
       }
   }
 
@@ -297,7 +301,7 @@ namespace Step66
                           dummy);
 
     this->set_constrained_entries_to_one(inverse_diagonal);
-    
+
     for (auto &i : inverse_diagonal)
       {
         Assert(
@@ -414,7 +418,7 @@ namespace Step66
     parallel::distributed::Triangulation<dim> triangulation;
     const MappingQGeneric<dim>                mapping;
 
-    
+
     // As usual we then define the Lagrangian finite elements FE_Q and a
     // DoFHandler.
     FE_Q<dim>       fe;
@@ -674,7 +678,9 @@ namespace Step66
             phi.submit_gradient(phi.get_gradient(q), q);
           }
 
-        phi.integrate_scatter(EvaluationFlags::values | EvaluationFlags::gradients, dst);
+        phi.integrate_scatter(EvaluationFlags::values |
+                                EvaluationFlags::gradients,
+                              dst);
       }
 
     // Finally, we must not forget to initiate the MPI data exchange via the
