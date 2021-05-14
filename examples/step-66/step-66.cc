@@ -400,11 +400,23 @@ namespace Step66
     void output_results(const unsigned int cycle) const;
 
 
-    // For the triangulation we directly use the parallel::distributed version
-    // and define an object for the C^1 mapping.
+    // For the parallel computation we define a
+    // parallel::distributed::Triangulation. As the computational domain is a
+    // circle in 2D and a ball in 3D, we assign in addition to the
+    // SphericalManifold for boundary cells a TransfiniteInterpolationManifold
+    // object for the mapping of the inner cells, which takes care of the inner
+    // cells. In this example we use an isoparametric finite element approach
+    // and thus use the MappingQGeneric class. Note, that we could also create
+    // an instance of the MappingQ class and set the
+    // <code>use_mapping_q_on_all_cells</code> flags in the contructor call to
+    // <code>true</code>. For further details on the connection of MappingQ and
+    // MappingQGeneric you may read the detailed description of these classes.
     parallel::distributed::Triangulation<dim> triangulation;
     const MappingQGeneric<dim>                mapping;
 
+    
+    // As usual we then define the Lagrangian finite elements FE_Q and a
+    // DoFHandler.
     FE_Q<dim>       fe;
     DoFHandler<dim> dof_handler;
 
@@ -462,18 +474,18 @@ namespace Step66
 
 
 
-  // The constructor of the GelfandProblem initializes the class variables. In
-  // particluar, we set up the multilevel support for the
-  // parallel::distributed::Triangulation, initialize the ConditionalOStream and
-  // tell the TimerOutput that we want to see the CPU and wall time in the end
-  // of the program.
+  // The constructor of the <code>GelfandProblem</code> initializes the class
+  // variables. In particluar, we set up the multilevel support for the
+  // parallel::distributed::Triangulation, set the mapping degree equal to the
+  // finite element degree, initialize the ConditionalOStream and tell the
+  // TimerOutput that we want to see the wall times only on demand.
   template <int dim, int fe_degree>
   GelfandProblem<dim, fe_degree>::GelfandProblem()
     : triangulation(MPI_COMM_WORLD,
                     Triangulation<dim>::limit_level_difference_at_vertices,
                     parallel::distributed::Triangulation<
                       dim>::construct_multigrid_hierarchy)
-    , mapping(fe_degree + 1)
+    , mapping(fe_degree)
     , fe(fe_degree)
     , dof_handler(triangulation)
     , pcout(std::cout, Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
@@ -487,10 +499,10 @@ namespace Step66
 
   // @sect4{GelfandProblem::make_grid}
 
-  // As the computational domain we use the two-dimensional unit circle. We
-  // follow the instructions for the TransfiniteInterpolationManifold class and
-  // also assign a SphericalManifold for the boundaty. In the end we refine the
-  // triangulation six times globally.
+  // As the computational domain we use the <code>dim</code>-dimensional unit
+  // ball. We follow the instructions for the TransfiniteInterpolationManifold
+  // class and also assign a SphericalManifold for the boundaty. Finally, we
+  // refine the initial mesh $3 - \texttt{dim}$ times globally.
   template <int dim, int fe_degree>
   void GelfandProblem<dim, fe_degree>::make_grid()
   {
@@ -948,9 +960,24 @@ namespace Step66
   // @sect4{GelfandProblem::output_results}
 
   // We generate the graphical output files in vtu format together with a pvtu
-  // master file in the same way as in step-37. Note that we also write the
-  // distribution of the triangulation into the output file as it was done in
-  // step-40. So no further comments are necessary.
+  // master file at once by calling the DataOut::write_vtu_with_pvtu_record
+  // function in the same way as in step-37. In addition, as in step-40, we
+  // query the types::subdomain_id of each cell and write the distribution of
+  // the triangulation among the MPI ranks into the output file. Finally, we
+  // generate the patches of the solution by calling DataOut::build_patches.
+  // However, since we have a computational domain with a curved boundary, we
+  // additionally pass the <code>mapping</code> and the finite element degree as
+  // number of subdivision. But this is still not enough for the correct
+  // representation of the solution, for example in ParaView, because we
+  // attached a TransfiniteInterpolationManifold to the inner cells, which
+  // results in curved cells in the interior. Therefore we pass as thrid
+  // argument the DataOut::curved_inner_cells option, such that also the inner
+  // cells use the corresponding manifold description to build the patches.
+  //
+  // Note that we could handle the higher order elements with the
+  // DataOutBase::VtkFlags::write_higher_order_cells. However, due to the
+  // limited compatibility to previous version of ParaView and the missing
+  // support by VisIt, we left this option for a future version.
   template <int dim, int fe_degree>
   void
   GelfandProblem<dim, fe_degree>::output_results(const unsigned int cycle) const
@@ -976,8 +1003,7 @@ namespace Step66
                            DataOut<dim>::curved_inner_cells);
 
     DataOutBase::VtkFlags flags;
-    flags.compression_level        = DataOutBase::VtkFlags::best_speed;
-    flags.write_higher_order_cells = true;
+    flags.compression_level = DataOutBase::VtkFlags::best_speed;
     data_out.set_flags(flags);
     data_out.write_vtu_with_pvtu_record(
       "./", "solution", cycle, MPI_COMM_WORLD, 3);
