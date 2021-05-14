@@ -1175,7 +1175,7 @@ namespace Step75
             << std::endl
             << "     by partition:              ";
 
-      std::vector<unsigned int> n_dofs_per_subdomain =
+      std::vector<types::global_dof_index> n_dofs_per_subdomain =
         Utilities::MPI::gather(mpi_communicator,
                                dof_handler.n_locally_owned_dofs());
       for (unsigned int i = 0; i < first_n_processes; ++i)
@@ -1186,7 +1186,7 @@ namespace Step75
     }
 
     {
-      std::vector<unsigned int> n_constraints_per_subdomain =
+      std::vector<types::global_dof_index> n_constraints_per_subdomain =
         Utilities::MPI::gather(mpi_communicator, constraints.n_constraints());
 
       pcout << "   Number of constraints:        "
