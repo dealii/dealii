@@ -42,7 +42,7 @@
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
-#include <deal.II/fe/mapping_c1.h>
+#include <deal.II/fe/mapping_q_generic.h>
 
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/numerics/data_out.h>
@@ -393,7 +393,7 @@ namespace Step66
     // For the triangulation we directly use the parallel::distributed version
     // and define an object for the C^1 mapping.
     parallel::distributed::Triangulation<dim> triangulation;
-    const MappingC1<dim>                      mapping;
+    const MappingQGeneric<dim>                mapping;
 
     FE_Q<dim>       fe;
     DoFHandler<dim> dof_handler;
@@ -462,6 +462,7 @@ namespace Step66
                     Triangulation<dim>::limit_level_difference_at_vertices,
                     parallel::distributed::Triangulation<
                       dim>::construct_multigrid_hierarchy)
+    , mapping(fe_degree + 1)
     , fe(fe_degree)
     , dof_handler(triangulation)
     , pcout(std::cout, Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
@@ -959,11 +960,12 @@ namespace Step66
     data_out.add_data_vector(subdomain, "subdomain");
 
     data_out.build_patches(mapping,
-                           fe.degree); // TODO coarse meshes look strange in
-                                       // paraview if we give the mapping object
+                           fe.degree,
+                           DataOut<dim>::curved_inner_cells);
 
     DataOutBase::VtkFlags flags;
-    flags.compression_level = DataOutBase::VtkFlags::best_speed;
+    flags.compression_level        = DataOutBase::VtkFlags::best_speed;
+    flags.write_higher_order_cells = true;
     data_out.set_flags(flags);
     data_out.write_vtu_with_pvtu_record(
       "./", "solution", cycle, MPI_COMM_WORLD, 3);
