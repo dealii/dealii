@@ -25,47 +25,48 @@
 #include <deal.II/base/timer.h>
 #include <deal.II/base/vectorization.h>
 
-#include <deal.II/lac/affine_constraints.h>
-#include <deal.II/lac/vector.h>
-#include <deal.II/lac/solver_cg.h>
-#include <deal.II/lac/precondition.h>
-
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_out.h>
-#include <deal.II/grid/manifold_lib.h>
-
-#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/mapping_q_generic.h>
 
-#include <deal.II/numerics/vector_tools.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/manifold_lib.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+
+#include <deal.II/lac/affine_constraints.h>
+#include <deal.II/lac/precondition.h>
+#include <deal.II/lac/solver_cg.h>
+#include <deal.II/lac/vector.h>
+
 #include <deal.II/numerics/data_out.h>
+#include <deal.II/numerics/vector_tools.h>
 
 // In particular, we need to include the headers for the matrix-free framework:
+#include <deal.II/matrix_free/fe_evaluation.h>
 #include <deal.II/matrix_free/matrix_free.h>
 #include <deal.II/matrix_free/operators.h>
-#include <deal.II/matrix_free/fe_evaluation.h>
+#include <deal.II/matrix_free/tools.h>
 
 // And since we want to use a geometric multigrid preconditioner, we need also
 // the multilevel headers:
-#include <deal.II/multigrid/multigrid.h>
-#include <deal.II/multigrid/mg_transfer_matrix_free.h>
-#include <deal.II/multigrid/mg_tools.h>
 #include <deal.II/multigrid/mg_coarse.h>
-#include <deal.II/multigrid/mg_smoother.h>
-#include <deal.II/multigrid/mg_matrix.h>
 #include <deal.II/multigrid/mg_constrained_dofs.h>
+#include <deal.II/multigrid/mg_matrix.h>
+#include <deal.II/multigrid/mg_smoother.h>
+#include <deal.II/multigrid/mg_tools.h>
+#include <deal.II/multigrid/mg_transfer_matrix_free.h>
+#include <deal.II/multigrid/multigrid.h>
 
 
 // Finally some common C++ headers for in and output:
-#include <iostream>
 #include <fstream>
+#include <iostream>
 
 
 
@@ -84,38 +85,42 @@ namespace Step66
 
 
 
-  // @sect3{Matrix-free operators}
+  // @sect3{Matrix-Free JacobianOperator}
 
   // In the beginning we define the matrix-free operator for the Jacobian. As
   // a guideline we follow the tutorials step-37 and step-48, where the precise
   // interface of the MatrixFreeOperators::Base class was extensively
   // documented.
 
-
-  // @sect4{JacobianOperator}
-
   // Since we want to use the Jacobian as system matrix and pass it to the
   // linear solver as well as to the multilevel preconditioner classes, we
   // derive the <code>JacobianOperator</code> class from the
   // MatrixFreeOperators::Base class, such that we have already the right
   // interface. The two functions we need to reimplement from the base class are
-  // the <code>apply_add()</code> and the <code>compute_diagonal()</code>
-  // function. To allow preconditioning with float precision we define the
-  // number type as template argument.
+  // the MatrixFreeOperators::Base::apply_add() and the
+  // MatrixFreeOperators::Base::compute_diagonal() function. To allow
+  // preconditioning with float precision we define the number type as template
+  // argument.
   //
-  // As mentioned already in the introduction, for the Jacobian $F'$ of the
-  // $n+1$-th Newton step we need to evaluate it at the last Newton step
-  // $u_h^n$. To get the information of the last Newton step $u_h^n$ we do
-  // pretty much the same as in step-37, where we stored the values of a
-  // coefficient function in a table once before we use the matrix-free
-  // operator. Instead of a function <code>evaluate_coefficient()</code>, we
-  // here implement a function <code>evaluate_newton_step()</code>.
+  // As mentioned already in the introduction, we need to evaluate the Jacobian
+  // $F'$ at the last Newton step $u_h^n$ for the computation of the Newton
+  // update $s_h^n$. To get the information of the last Newton step $u_h^n$ we
+  // do pretty much the same as in step-37, where we stored the values of a
+  // coefficient function in a table <code>nonlinear_values</code> once before
+  // we use the matrix-free operator. Instead of a function
+  // <code>evaluate_coefficient()</code>, we here implement a function
+  // <code>evaluate_newton_step()</code>.
   //
-  // As private member functions of the <code>JacobianOperator</code> we
-  // implement the <code>local_apply()</code> and the
-  // <code>local_compute_diagonal()</code> function, which we call in the
-  // MatrixFree::cell_loop() for computing the matrix-vector product or the
-  // diagonal.
+  // As additional private member functions of the <code>JacobianOperator</code>
+  // we implement the <code>local_apply()</code> and the
+  // <code>local_compute_diagonal()</code> function. The first one is the actual
+  // worker function for the matrix-vector application, which we pass to the
+  // MatrixFree::cell_loop() in the <code>apply_add()</code> function. The later
+  // one is the worker function to compute the diagonal, which we pass to the
+  // MatrixFreeTools::compute_diagonal() function.
+  //
+  // For better readability of the source code we further define an alias for
+  // the FEEvaluation object.
   template <int dim, int fe_degree, typename number>
   class JacobianOperator
     : public MatrixFreeOperators::
@@ -124,17 +129,23 @@ namespace Step66
   public:
     using value_type = number;
 
+    using FECellIntegrator =
+      FEEvaluation<dim, fe_degree, fe_degree + 1, 1, number>;
+
     JacobianOperator();
 
-    virtual void clear() override;
+    virtual void
+    clear() override;
 
     void
     evaluate_newton_step(const LinearAlgebra::distributed::Vector<number> &src);
 
-    virtual void compute_diagonal() override;
+    virtual void
+    compute_diagonal() override;
 
   private:
-    virtual void apply_add(
+    virtual void
+    apply_add(
       LinearAlgebra::distributed::Vector<number> &      dst,
       const LinearAlgebra::distributed::Vector<number> &src) const override;
 
@@ -144,11 +155,8 @@ namespace Step66
                 const LinearAlgebra::distributed::Vector<number> &src,
                 const std::pair<unsigned int, unsigned int> &cell_range) const;
 
-    void local_compute_diagonal(
-      const MatrixFree<dim, number> &              data,
-      LinearAlgebra::distributed::Vector<number> & dst,
-      const unsigned int &                         dummy,
-      const std::pair<unsigned int, unsigned int> &cell_range) const;
+    void
+    local_compute_diagonal(FECellIntegrator &integrator) const;
 
     Table<2, VectorizedArray<number>> nonlinear_values;
   };
@@ -170,7 +178,8 @@ namespace Step66
   // the nonlinearity and call the <code>clear()</code> function of the base
   // class.
   template <int dim, int fe_degree, typename number>
-  void JacobianOperator<dim, fe_degree, number>::clear()
+  void
+  JacobianOperator<dim, fe_degree, number>::clear()
   {
     nonlinear_values.reinit(0, 0);
     MatrixFreeOperators::Base<dim, LinearAlgebra::distributed::Vector<number>>::
@@ -183,11 +192,11 @@ namespace Step66
   // <code>evaluate_coefficient()</code> function from step-37. However, it does
   // not evaluate a function object, but evaluates a vector representing a
   // finite element function, namely the last Newton step needed for the
-  // Jacobian. Therefore we set up a FEEvaluateion object and evaluate the
+  // Jacobian. Therefore we set up a FEEvaluation object and evaluate the
   // finite element function in the quadrature points with the
   // FEEvaluation::read_dof_values_plain() and FEEvaluation::evaluate()
   // functions. We store the evaluated values of the finite element function
-  // directly in a table.
+  // directly in the <code>nonlinear_values</code> table.
   //
   // This will work well and in the <code>local_apply()</code> function we can
   // use the values stored in the table to apply the matrix-vector product.
@@ -197,13 +206,15 @@ namespace Step66
   // skips all evaluations of the nonlinearity in each call of the
   // <code>vmult()</code> function.
   template <int dim, int fe_degree, typename number>
-  void JacobianOperator<dim, fe_degree, number>::evaluate_newton_step(
+  void
+  JacobianOperator<dim, fe_degree, number>::evaluate_newton_step(
     const LinearAlgebra::distributed::Vector<number> &src)
   {
     const unsigned int n_cells = this->data->n_cell_batches();
-    FEEvaluation<dim, fe_degree, fe_degree + 1, 1, number> phi(*this->data);
+    FECellIntegrator   phi(*this->data);
 
     nonlinear_values.reinit(n_cells, phi.n_q_points);
+
     for (unsigned int cell = 0; cell < n_cells; ++cell)
       {
         phi.reinit(cell);
@@ -211,36 +222,42 @@ namespace Step66
         phi.evaluate(EvaluationFlags::values);
 
         for (unsigned int q = 0; q < phi.n_q_points; ++q)
-          nonlinear_values(cell, q) = std::exp(phi.get_value(q));
+          {
+            nonlinear_values(cell, q) = std::exp(phi.get_value(q));
+          }
       }
   }
 
 
 
   // Now in the <code>local_apply()</code> function, which actually implements
-  // the local action of the system matrix on a cell, we can use the information
+  // the cell wise action of the system matrix, we can use the information
   // of the last Newton step stored in the table <code>nonlinear_values</code>.
   // The rest of this function is basically the same as in step-37. We set up
   // the FEEvaluation object, gather and evaluate the values and gradients of
   // the input vector <code>src</code>, submit the values and gradients
   // according to the form of the Jacobian and finally call
-  // FEEvaluation::integrate_scatter() to distribute the local contributions
-  // into the global vector <code>dst</code>.
+  // FEEvaluation::integrate_scatter() to perform the cell integration and
+  // distribute the local contributions into the global vector <code>dst</code>.
   template <int dim, int fe_degree, typename number>
-  void JacobianOperator<dim, fe_degree, number>::local_apply(
+  void
+  JacobianOperator<dim, fe_degree, number>::local_apply(
     const MatrixFree<dim, number> &                   data,
     LinearAlgebra::distributed::Vector<number> &      dst,
     const LinearAlgebra::distributed::Vector<number> &src,
     const std::pair<unsigned int, unsigned int> &     cell_range) const
   {
-    FEEvaluation<dim, fe_degree, fe_degree + 1, 1, number> phi(data);
+    FECellIntegrator phi(data);
 
     for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
       {
-        AssertDimension(nonlinear_values.size(0), data.n_cell_batches());
+        AssertDimension(nonlinear_values.size(0),
+                        phi.get_matrix_free().n_cell_batches());
         AssertDimension(nonlinear_values.size(1), phi.n_q_points);
 
+
         phi.reinit(cell);
+
         phi.gather_evaluate(src,
                             EvaluationFlags::values |
                               EvaluationFlags::gradients);
@@ -260,10 +277,10 @@ namespace Step66
 
 
   // Next we use MatrixFree::cell_loop() to perform the actual loop over all
-  // cells computing the cell contribution to the matrix-vector
-  // product.
+  // cells computing the cell contribution to the matrix-vector product.
   template <int dim, int fe_degree, typename number>
-  void JacobianOperator<dim, fe_degree, number>::apply_add(
+  void
+  JacobianOperator<dim, fe_degree, number>::apply_add(
     LinearAlgebra::distributed::Vector<number> &      dst,
     const LinearAlgebra::distributed::Vector<number> &src) const
   {
@@ -272,20 +289,50 @@ namespace Step66
 
 
 
-  // The remaining two functions of the <code>JacobianOperator</code> calculate
-  // the inverse of the diagonal entries of the Jacobian. The only difference
-  // compared to step-37 is the calculation of the cell contribution in the
-  // <code>local_compute_diagonal()</code> function. Therefore, we only have to
-  // extend and change the arguments for the submit functions in the loop over
-  // all quadrature points and this can be done according to the
-  // <code>local_apply()</code> function.
-  //
-  // Note that although the function is called <code>compute_diagonal()</code>,
-  // it does a bit more, namely it fills the
-  // <code>inverse_diagonal_entries</code>, which we need for the application of
-  // the Chebyshev smoother in the multigrid preconditioner.
+  // The internal worker function <code>local_compute_diagonal()</code> for the
+  // computation of the diagonal is similar to the above worker function
+  // <code>local_apply()</code>. However, as major difference we do not read
+  // values from a input vector or distribute any local results to a destination
+  // vector. Instead the only input argument is the used FEEvaluation object.
   template <int dim, int fe_degree, typename number>
-  void JacobianOperator<dim, fe_degree, number>::compute_diagonal()
+  void
+  JacobianOperator<dim, fe_degree, number>::local_compute_diagonal(
+    FECellIntegrator &phi) const
+  {
+    AssertDimension(nonlinear_values.size(0),
+                    phi.get_matrix_free().n_cell_batches());
+    AssertDimension(nonlinear_values.size(1), phi.n_q_points);
+
+    const unsigned int cell = phi.get_current_cell_index();
+
+    phi.evaluate(EvaluationFlags::values | EvaluationFlags::gradients);
+
+    for (unsigned int q = 0; q < phi.n_q_points; ++q)
+      {
+        phi.submit_value(-nonlinear_values(cell, q) * phi.get_value(q), q);
+        phi.submit_gradient(phi.get_gradient(q), q);
+      }
+
+    phi.integrate(EvaluationFlags::values | EvaluationFlags::gradients);
+  }
+
+
+
+  // Finally we override the MatrixFreeOperators::Base::compute_diagonal()
+  // function of the base class of the <code>JacobianOperator</code>. Although
+  // the function name suggerates just the computation of the diagonal, this
+  // function does a bit more. Becasue we only really need the inverse of the
+  // matrix diagonal elements for the Chebyshev smoother of the multigrid
+  // preconditioner, we compute the diagonal and store the inverse elements.
+  // Therefore we first initialize the <code>inverse_diagonal_entries</code>.
+  // Then we compute the diagonal by passing the worker function
+  // <code>local_compute_diagonal()</code> to the
+  // MatrixFreeTools::compute_diagonal() function. In the end we loop over the
+  // diagonal and invert the elements by hand. Note, that during this loop we
+  // catch the contrained DOFs and set them manually to one.
+  template <int dim, int fe_degree, typename number>
+  void
+  JacobianOperator<dim, fe_degree, number>::compute_diagonal()
   {
     this->inverse_diagonal_entries.reset(
       new DiagonalMatrix<LinearAlgebra::distributed::Vector<number>>());
@@ -293,63 +340,16 @@ namespace Step66
       this->inverse_diagonal_entries->get_vector();
     this->data->initialize_dof_vector(inverse_diagonal);
 
-    unsigned int dummy = 0;
+    MatrixFreeTools::compute_diagonal(*this->data,
+                                      inverse_diagonal,
+                                      &JacobianOperator::local_compute_diagonal,
+                                      this);
 
-    this->data->cell_loop(&JacobianOperator::local_compute_diagonal,
-                          this,
-                          inverse_diagonal,
-                          dummy);
-
-    this->set_constrained_entries_to_one(inverse_diagonal);
-
-    for (auto &i : inverse_diagonal)
+    for (auto &diagonal_element : inverse_diagonal)
       {
-        Assert(
-          std::abs(i) > 1.0e-10,
-          ExcMessage(
-            "No diagonal entry in a positive definite operator should be zero"));
-        i = 1.0 / i;
-      }
-  }
-
-
-
-  template <int dim, int fe_degree, typename number>
-  void JacobianOperator<dim, fe_degree, number>::local_compute_diagonal(
-    const MatrixFree<dim, number> &             data,
-    LinearAlgebra::distributed::Vector<number> &dst,
-    const unsigned int &,
-    const std::pair<unsigned int, unsigned int> &cell_range) const
-  {
-    FEEvaluation<dim, fe_degree, fe_degree + 1, 1, number> phi(data);
-
-    AlignedVector<VectorizedArray<number>> diagonal(phi.dofs_per_cell);
-
-    for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
-      {
-        AssertDimension(nonlinear_values.size(0), data.n_cell_batches());
-        AssertDimension(nonlinear_values.size(1), phi.n_q_points);
-
-        phi.reinit(cell);
-        for (unsigned int i = 0; i < phi.dofs_per_cell; ++i)
-          {
-            for (unsigned int j = 0; j < phi.dofs_per_cell; ++j)
-              phi.submit_dof_value(VectorizedArray<number>(), j);
-            phi.submit_dof_value(make_vectorized_array<number>(1.), i);
-
-            phi.evaluate(EvaluationFlags::values | EvaluationFlags::gradients);
-            for (unsigned int q = 0; q < phi.n_q_points; ++q)
-              {
-                phi.submit_value(-nonlinear_values(cell, q) * phi.get_value(q),
-                                 q);
-                phi.submit_gradient(phi.get_gradient(q), q);
-              }
-            phi.integrate(EvaluationFlags::values | EvaluationFlags::gradients);
-            diagonal[i] = phi.get_dof_value(i);
-          }
-        for (unsigned int i = 0; i < phi.dofs_per_cell; ++i)
-          phi.submit_dof_value(diagonal[i], i);
-        phi.distribute_local_to_global(dst);
+        diagonal_element = (std::abs(diagonal_element) > 1.0e-10) ?
+                             (1.0 / diagonal_element) :
+                             1.0;
       }
   }
 
@@ -380,28 +380,38 @@ namespace Step66
   public:
     GelfandProblem();
 
-    void run();
+    void
+    run();
 
   private:
-    void make_grid();
+    void
+    make_grid();
 
-    void setup_system();
+    void
+    setup_system();
 
-    void evaluate_residual(
+    void
+    evaluate_residual(
       LinearAlgebra::distributed::Vector<double> &      dst,
       const LinearAlgebra::distributed::Vector<double> &src) const;
 
-    void assemble_rhs();
+    void
+    assemble_rhs();
 
-    double compute_residual(const double alpha);
+    double
+    compute_residual(const double alpha);
 
-    void compute_update();
+    void
+    compute_update();
 
-    void solve();
+    void
+    solve();
 
-    double compute_solution_norm() const;
+    double
+    compute_solution_norm() const;
 
-    void output_results(const unsigned int cycle) const;
+    void
+    output_results(const unsigned int cycle) const;
 
 
     // For the parallel computation we define a
@@ -508,7 +518,8 @@ namespace Step66
   // class and also assign a SphericalManifold for the boundaty. Finally, we
   // refine the initial mesh $3 - \texttt{dim}$ times globally.
   template <int dim, int fe_degree>
-  void GelfandProblem<dim, fe_degree>::make_grid()
+  void
+  GelfandProblem<dim, fe_degree>::make_grid()
   {
     TimerOutput::Scope t(computing_timer, "make grid");
 
@@ -543,7 +554,8 @@ namespace Step66
   // Note how we can use the same MatrixFree object twice, for the
   // <code>JacobianOperator</code> and the multigrid preconditioner.
   template <int dim, int fe_degree>
-  void GelfandProblem<dim, fe_degree>::setup_system()
+  void
+  GelfandProblem<dim, fe_degree>::setup_system()
   {
     TimerOutput::Scope t(computing_timer, "setup system");
 
@@ -648,7 +660,8 @@ namespace Step66
   // the FEEvaluation class, similar to <code>local_apply</code> function of the
   // <code>JacobianOperator</code>.
   template <int dim, int fe_degree>
-  void GelfandProblem<dim, fe_degree>::evaluate_residual(
+  void
+  GelfandProblem<dim, fe_degree>::evaluate_residual(
     LinearAlgebra::distributed::Vector<double> &      dst,
     const LinearAlgebra::distributed::Vector<double> &src) const
   {
@@ -701,7 +714,8 @@ namespace Step66
   // Experiences show that using the FEEvaluation class is much faster than a
   // classical implementation with FEValues and co.
   template <int dim, int fe_degree>
-  void GelfandProblem<dim, fe_degree>::assemble_rhs()
+  void
+  GelfandProblem<dim, fe_degree>::assemble_rhs()
   {
     TimerOutput::Scope t(computing_timer, "assemble right hand side");
 
@@ -728,7 +742,8 @@ namespace Step66
   // use a damped version $\alpha<1$ until the Newton step is good enough and
   // the full Newton step can be performed. This was also discussed in step-15.
   template <int dim, int fe_degree>
-  double GelfandProblem<dim, fe_degree>::compute_residual(const double alpha)
+  double
+  GelfandProblem<dim, fe_degree>::compute_residual(const double alpha)
   {
     TimerOutput::Scope t(computing_timer, "compute residual");
 
@@ -756,7 +771,8 @@ namespace Step66
   // multigrid preconditioner. For this we first set up the PreconditionMG
   // object with a Chebyshev smoother like we did in step-37.
   template <int dim, int fe_degree>
-  void GelfandProblem<dim, fe_degree>::compute_update()
+  void
+  GelfandProblem<dim, fe_degree>::compute_update()
   {
     TimerOutput::Scope t(computing_timer, "compute update");
 
@@ -805,7 +821,7 @@ namespace Step66
 
         mg_matrices[level].evaluate_newton_step(mg_solution[level]);
         mg_matrices[level].compute_diagonal();
-
+        
         smoother_data[level].preconditioner =
           mg_matrices[level].get_matrix_diagonal_inverse();
       }
@@ -857,7 +873,8 @@ namespace Step66
 
   // Now we implement the actual Newton solver for the nonlinear problem.
   template <int dim, int fe_degree>
-  void GelfandProblem<dim, fe_degree>::solve()
+  void
+  GelfandProblem<dim, fe_degree>::solve()
   {
     TimerOutput::Scope t(computing_timer, "solve");
 
@@ -942,7 +959,8 @@ namespace Step66
   // VectorTools::integrate_difference(). In the end we gather all computations
   // from all MPI ranks and return the norm.
   template <int dim, int fe_degree>
-  double GelfandProblem<dim, fe_degree>::compute_solution_norm() const
+  double
+  GelfandProblem<dim, fe_degree>::compute_solution_norm() const
   {
     solution.update_ghost_values();
 
@@ -1024,7 +1042,8 @@ namespace Step66
   // information about the system specifications and the finite element space we
   // use. The problem is solved several times on a successivley refined mesh.
   template <int dim, int fe_degree>
-  void GelfandProblem<dim, fe_degree>::run()
+  void
+  GelfandProblem<dim, fe_degree>::run()
   {
     {
       const unsigned int n_ranks =
@@ -1125,7 +1144,8 @@ namespace Step66
 // framework and limit the number of threads to one. Finally to run the solver
 // for the <i>Gelfand problem</i> we create an object of the
 // <code>GelfandProblem</code> class and call the run function.
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   try
     {
