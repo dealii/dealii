@@ -828,6 +828,12 @@ namespace SUNDIALS
      * contains algebraic constraints, or Lagrange multipliers), you should
      * overwrite this function in order to return only the differential
      * components of your system.
+     *
+     * When running in parallel, every process will call this function
+     * independently, and syncronization will happen at the end of the
+     * initialization setup to communicate what components are local. Make sure
+     * you only return the locally owned (or locally relevant) components, in
+     * order to minimize communication between processes.
      */
     std::function<IndexSet()> differential_components;
 
@@ -878,30 +884,9 @@ namespace SUNDIALS
     void *ida_mem;
 
     /**
-     * IDA solution vector.
-     */
-    N_Vector yy;
-
-    /**
-     * IDA solution derivative vector.
-     */
-    N_Vector yp;
-
-    /**
-     * IDA absolute tolerances vector.
-     */
-    N_Vector abs_tolls;
-
-    /**
-     * IDA differential components vector.
-     */
-    N_Vector diff_id;
-
-    /**
      * Number of iteration required to solve the Jacobian system
      */
     int n_iter;
-
 
     /**
      * MPI communicator. SUNDIALS solver runs happily in

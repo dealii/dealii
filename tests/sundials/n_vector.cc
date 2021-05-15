@@ -587,6 +587,33 @@ test_weighted_rms_norm()
 
 template <typename VectorType>
 void
+test_weighted_rms_norm_mask()
+{
+  const auto vector_a = create_test_vector<VectorType>(2.0);
+  const auto vector_b = create_test_vector<VectorType>(3.0);
+  const auto vector_c = create_test_vector<VectorType>(1.0);
+  const auto vector_d = create_test_vector<VectorType>(0.0);
+
+  auto nv_a = make_nvector_view(vector_a);
+  auto nv_b = make_nvector_view(vector_b);
+  auto nv_c = make_nvector_view(vector_c);
+  auto nv_d = make_nvector_view(vector_d);
+  {
+    const auto result = N_VWrmsNormMask(nv_a, nv_b, nv_c);
+    Assert(std::fabs(result - 6.0) < 1e-12, NVectorTestError());
+    deallog << "test_weighted_rms_norm_mask 1 OK" << std::endl;
+  }
+  {
+    const auto result = N_VWrmsNormMask(nv_a, nv_b, nv_d);
+    Assert(std::fabs(result) < 1e-12, NVectorTestError());
+    deallog << "test_weighted_rms_norm_mask 0 OK" << std::endl;
+  }
+}
+
+
+
+template <typename VectorType>
+void
 test_max_norm()
 {
   const auto vector_a = create_test_vector<VectorType>(2.0);
@@ -674,6 +701,7 @@ run_all_tests(const std::string &prefix)
   test_elementwise_inv<VectorType>();
   test_elementwise_abs<VectorType>();
   test_weighted_rms_norm<VectorType>();
+  test_weighted_rms_norm_mask<VectorType>();
   test_max_norm<VectorType>();
   test_min_element<VectorType>();
   test_scale<VectorType>();
