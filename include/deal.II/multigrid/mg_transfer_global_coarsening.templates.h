@@ -1779,10 +1779,8 @@ namespace internal
               transfer.schemes[i].level_dof_indices_fine.data();
           }
 
-        bool     fine_indices_touch_non_active_dofs = false;
-        IndexSet locally_active_dofs;
-        DoFTools::extract_locally_active_dofs(dof_handler_coarse,
-                                              locally_active_dofs);
+        bool     fine_indices_touch_remote_dofs = false;
+        IndexSet locally_owned_dofs = dof_handler_coarse.locally_owned_dofs();
 
         process_cells([&](const auto &cell_coarse, const auto &cell_fine) {
           const auto fe_pair_no =
@@ -1807,11 +1805,11 @@ namespace internal
                 transfer.partitioner_fine->global_to_local(
                   local_dof_indices_fine
                     [fe_pair_no][lexicographic_numbering_fine[fe_pair_no][i]]);
-              if (!locally_active_dofs.is_element(
+              if (!locally_owned_dofs.is_element(
                     local_dof_indices_fine
                       [fe_pair_no]
                       [lexicographic_numbering_fine[fe_pair_no][i]]))
-                fine_indices_touch_non_active_dofs = true;
+                fine_indices_touch_remote_dofs = true;
             }
 
           level_dof_indices_coarse_[fe_pair_no] +=
@@ -1820,10 +1818,10 @@ namespace internal
             transfer.schemes[fe_pair_no].dofs_per_cell_fine;
         });
 
-        // if all access goes to the locally active dofs on all ranks, we do
+        // if all access goes to the locally owned dofs on all ranks, we do
         // not need the vec_fine vector
         if (Utilities::MPI::max(static_cast<unsigned int>(
-                                  fine_indices_touch_non_active_dofs),
+                                  fine_indices_touch_remote_dofs),
                                 comm) == 0)
           transfer.vec_fine.reinit(0);
       }
