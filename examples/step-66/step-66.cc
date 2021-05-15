@@ -85,7 +85,7 @@ namespace Step66
 
 
 
-  // @sect3{Matrix-Free JacobianOperator}
+  // @sect3{Matrix-free JacobianOperator}
 
   // In the beginning we define the matrix-free operator for the Jacobian. As
   // a guideline we follow the tutorials step-37 and step-48, where the precise
@@ -138,7 +138,8 @@ namespace Step66
     clear() override;
 
     void
-    evaluate_newton_step(const LinearAlgebra::distributed::Vector<number> &src);
+    evaluate_newton_step(
+      const LinearAlgebra::distributed::Vector<number> &newton_step);
 
     virtual void
     compute_diagonal() override;
@@ -188,6 +189,8 @@ namespace Step66
 
 
 
+  // @sect4{Evaluation of the old Newton step}
+
   // The following <code>evaluate_newton_step()</code> function is based on the
   // <code>evaluate_coefficient()</code> function from step-37. However, it does
   // not evaluate a function object, but evaluates a vector representing a
@@ -202,13 +205,13 @@ namespace Step66
   // use the values stored in the table to apply the matrix-vector product.
   // However, we can also optimize the implementation of the Jacobian at this
   // stage. We can directly evaluate the nonlinear function
-  // <code>std::exp(u_h^n[q])</code> and store these values in the table. This
-  // skips all evaluations of the nonlinearity in each call of the
+  // <code>std::exp(newton_step[q])</code> and store these values in the table.
+  // This skips all evaluations of the nonlinearity in each call of the
   // <code>vmult()</code> function.
   template <int dim, int fe_degree, typename number>
   void
   JacobianOperator<dim, fe_degree, number>::evaluate_newton_step(
-    const LinearAlgebra::distributed::Vector<number> &src)
+    const LinearAlgebra::distributed::Vector<number> &newton_step)
   {
     const unsigned int n_cells = this->data->n_cell_batches();
     FECellIntegrator   phi(*this->data);
@@ -229,6 +232,8 @@ namespace Step66
   }
 
 
+
+  // @sect4{Nonlinear matrix-free operator application}
 
   // Now in the <code>local_apply()</code> function, which actually implements
   // the cell wise action of the system matrix, we can use the information
@@ -288,6 +293,8 @@ namespace Step66
   }
 
 
+
+  // @sect4{Diagonal of the JacobianOperator}
 
   // The internal worker function <code>local_compute_diagonal()</code> for the
   // computation of the diagonal is similar to the above worker function
@@ -461,7 +468,7 @@ namespace Step66
 
 
     // Of course we also need vectors holding the <code>solution</code>, the
-    // <code>newton_update>/code> and the <code>system_rhs</code>. In that way
+    // <code>newton_update</code> and the <code>system_rhs</code>. In that way
     // we can always store the last Newton step in the solution vector and just
     // add the update to get the next Newton step.
     LinearAlgebra::distributed::Vector<double> solution;
@@ -821,7 +828,7 @@ namespace Step66
 
         mg_matrices[level].evaluate_newton_step(mg_solution[level]);
         mg_matrices[level].compute_diagonal();
-        
+
         smoother_data[level].preconditioner =
           mg_matrices[level].get_matrix_diagonal_inverse();
       }
@@ -1035,7 +1042,7 @@ namespace Step66
 
 
 
-  // @sect4{Run function}
+  // @sect4{GelfandProblem::run}
 
   // The last missing function of the solver class for the
   // <i>Gelfand problem</i> is the run function. In the beginning we print
@@ -1138,7 +1145,7 @@ namespace Step66
 
 
 
-// @sect3{The main function}
+// @sect3{The <code>main</code> function}
 
 // As typical for programs running in parallel with MPI we set up the MPI
 // framework and limit the number of threads to one. Finally to run the solver
