@@ -168,9 +168,6 @@ namespace Step7
   // dimension <code>dim</code> guarantees that the tensor will have the right
   // shape (since it is built into the type of the object itself), so the
   // compiler can catch most size-related mistakes for us.
-  //
-  // Like in step-4, for compatibility with some compilers we explicitly
-  // declare the default constructor:
   template <int dim>
   class Solution : public Function<dim>, protected SolutionBase<dim>
   {
