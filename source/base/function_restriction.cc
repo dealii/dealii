@@ -119,11 +119,11 @@ namespace Functions
     // the derivatives with respect to this direction and copy the other
     // values.
     SymmetricTensor<2, dim> hess;
-    for (unsigned int i = 0; i < dim; ++i)
+    for (int i = 0; i < dim; ++i)
       {
         const unsigned int i_to_write_from =
           internal::coordinate_to_one_dim_higher<dim>(restricted_direction, i);
-        for (unsigned int j = 0; j < dim; ++j)
+        for (int j = 0; j < dim; ++j)
           {
             const unsigned int j_to_write_from =
               internal::coordinate_to_one_dim_higher<dim>(restricted_direction,
