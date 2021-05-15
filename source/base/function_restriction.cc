@@ -29,7 +29,7 @@ namespace internal
 
     Point<dim + 1> output;
     output(component_in_dim_plus_1) = coordinate_value;
-    for (unsigned int d = 0; d < dim; ++d)
+    for (int d = 0; d < dim; ++d)
       {
         const unsigned int component_to_write_to =
           dealii::internal::coordinate_to_one_dim_higher<dim>(
@@ -91,7 +91,7 @@ namespace Functions
     // the derivatives with respect to this direction and copy the other
     // values.
     Tensor<1, dim> grad;
-    for (unsigned int d = 0; d < dim; ++d)
+    for (int d = 0; d < dim; ++d)
       {
         const unsigned int index_to_write_from =
           internal::coordinate_to_one_dim_higher<dim>(restricted_direction, d);
