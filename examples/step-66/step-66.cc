@@ -802,9 +802,9 @@ namespace Step66
     // Now we can set up the preconditioner. We define the smoother and pass
     // the interpolated vectors of the Newton step to the multilevel
     // operators.
-    typedef PreconditionChebyshev<LevelMatrixType,
-                                  LinearAlgebra::distributed::Vector<float>>
-      SmootherType;
+    using SmootherType =
+      PreconditionChebyshev<LevelMatrixType,
+                            LinearAlgebra::distributed::Vector<float>>;
     mg::SmootherRelaxation<SmootherType,
                            LinearAlgebra::distributed::Vector<float>>
                                                          mg_smoother;
