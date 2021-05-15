@@ -84,9 +84,9 @@ public:
 
   /**
    * Constructor. <tt>pols</tt> is a vector of objects that should be derived
-   * or otherwise convertible to one-dimensional polynomial objects of type @p
-   * PolynomialType (template argument of class). It will be copied element by
-   * element into a private variable.
+   * or otherwise convertible to one-dimensional polynomial objects of type
+   * `PolynomialType` (template argument of class). It will be copied element
+   * by element into a protected member variable.
    */
   template <class Pol>
   TensorProductPolynomials(const std::vector<Pol> &pols);
@@ -244,6 +244,13 @@ public:
    */
   virtual std::size_t
   memory_consumption() const override;
+
+  /**
+   * Return a copy of the underlying one-dimensional polynomials given to the
+   * constructor of this class.
+   */
+  std::vector<PolynomialType>
+  get_underlying_polynomials() const;
 
 protected:
   /**

@@ -504,6 +504,16 @@ TensorProductPolynomials<dim, PolynomialType>::memory_consumption() const
 
 
 
+template <int dim, typename PolynomialType>
+std::vector<PolynomialType>
+TensorProductPolynomials<dim, PolynomialType>::get_underlying_polynomials()
+  const
+{
+  return polynomials;
+}
+
+
+
 /* ------------------- AnisotropicPolynomials -------------- */
 
 
