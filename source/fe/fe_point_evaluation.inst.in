@@ -19,6 +19,10 @@ for (deal_II_dimension, deal_II_space_dimension : DIMENSIONS)
   {
 #if deal_II_dimension <= deal_II_space_dimension
     template bool internal::FEPointEvaluation::is_fast_path_supported(
-      const FiniteElement<deal_II_dimension, deal_II_space_dimension> &fe);
+      const FiniteElement<deal_II_dimension, deal_II_space_dimension> &,
+      const unsigned int);
+    template std::vector<Polynomials::Polynomial<double>>
+    internal::FEPointEvaluation::get_polynomial_space(
+      const FiniteElement<deal_II_dimension, deal_II_space_dimension> &);
 #endif
   }
