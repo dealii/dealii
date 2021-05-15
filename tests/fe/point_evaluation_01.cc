@@ -86,6 +86,11 @@ test(const unsigned int degree)
   std::vector<Number>                 function_values(unit_points.size());
   std::vector<Tensor<1, dim, Number>> function_gradients(unit_points.size());
 
+  // For float numbers that are sensitive to roundoff in the numdiff
+  // tolerances (absolute 1e-8), we multiply by 1e-3 to ensure that the test
+  // remains robust
+  const double factor_float = std::is_same<Number, float>::value ? 0.001 : 1.;
+
   for (const auto &cell : dof_handler.active_cell_iterators())
     {
       fe_values.reinit(cell);
@@ -104,9 +109,12 @@ test(const unsigned int degree)
       deallog << "Cell with center " << cell->center(true) << std::endl;
       for (unsigned int i = 0; i < function_values.size(); ++i)
         deallog << mapping.transform_unit_to_real_cell(cell, unit_points[i])
-                << ": " << evaluator.get_value(i) << " error value "
-                << function_values[i] - evaluator.get_value(i) << " error grad "
-                << (evaluator.get_gradient(i) - function_gradients[i]).norm()
+                << ": " << factor_float * evaluator.get_value(i)
+                << " error value "
+                << factor_float * (function_values[i] - evaluator.get_value(i))
+                << " error grad "
+                << factor_float *
+                     (evaluator.get_gradient(i) - function_gradients[i]).norm()
                 << std::endl;
       deallog << std::endl;
 
@@ -122,7 +130,7 @@ test(const unsigned int degree)
                           EvaluationFlags::values | EvaluationFlags::gradients);
 
       for (const auto i : solution_values)
-        deallog << i << " ";
+        deallog << factor_float * i << " ";
       deallog << std::endl;
     }
 }
