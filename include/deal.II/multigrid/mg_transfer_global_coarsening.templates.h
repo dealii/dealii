@@ -1234,9 +1234,7 @@ namespace internal
       transfer.schemes[1].degree_fine     = fe_coarse.degree * 2 + 1;
 
       // continuous or discontinuous
-      transfer.schemes[0].fine_element_is_continuous =
-        transfer.schemes[1].fine_element_is_continuous =
-          fe_fine.dofs_per_vertex > 0;
+      transfer.fine_element_is_continuous = fe_fine.dofs_per_vertex > 0;
 
       // count coarse cells for each scheme (0, 1)
       {
@@ -1486,7 +1484,7 @@ namespace internal
 
 
       // ------------------------------- weights -------------------------------
-      if (transfer.schemes[0].fine_element_is_continuous)
+      if (transfer.fine_element_is_continuous)
         {
           LinearAlgebra::distributed::Vector<Number> touch_count, touch_count_;
 
@@ -1601,6 +1599,15 @@ namespace internal
       transfer.n_components =
         dof_handler_fine.get_fe_collection().n_components();
 
+      transfer.fine_element_is_continuous =
+        dof_handler_fine.get_fe(0).dofs_per_vertex > 0;
+
+      for (unsigned int i = 0; i < dof_handler_fine.get_fe_collection().size();
+           ++i)
+        Assert(transfer.fine_element_is_continuous ==
+                 (dof_handler_fine.get_fe(i).dofs_per_vertex > 0),
+               ExcInternalError());
+
       const auto process_cells = [&](const auto &fu) {
         typename MeshType::active_cell_iterator            //
           cell_coarse = dof_handler_coarse.begin_active(), //
@@ -1655,10 +1662,6 @@ namespace internal
             dof_handler_coarse.get_fe(fe_index_pair.first.first).degree;
           transfer.schemes[fe_index_pair.second].degree_fine =
             dof_handler_fine.get_fe(fe_index_pair.first.second).degree;
-
-          transfer.schemes[fe_index_pair.second].fine_element_is_continuous =
-            dof_handler_fine.get_fe(fe_index_pair.first.second)
-              .dofs_per_vertex > 0;
         }
 
       precompute_constraints(dof_handler_coarse, constraint_coarse, transfer);
@@ -1956,13 +1959,7 @@ namespace internal
         }
 
       // ------------------------------- weights -------------------------------
-      const bool fine_element_is_continuous = Utilities::MPI::max(
-        static_cast<unsigned int>(
-          transfer.schemes.size() > 0 ?
-            transfer.schemes.front().fine_element_is_continuous :
-            false),
-        comm);
-      if (fine_element_is_continuous)
+      if (transfer.fine_element_is_continuous)
         {
           for (auto &scheme : transfer.schemes)
             scheme.weights.resize(scheme.n_coarse_cells *
@@ -2176,7 +2173,7 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::prolongate(
   this->vec_coarse
     .update_ghost_values(); // note: make sure that ghost values are set
 
-  if (schemes.size() > 0 && schemes.front().fine_element_is_continuous)
+  if (fine_element_is_continuous)
     *vec_fine_ptr = Number(0.);
 
   AlignedVector<VectorizedArrayType> evaluation_data_fine;
@@ -2193,12 +2190,12 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::prolongate(
             scheme.level_dof_indices_coarse.data();
           const Number *weights = nullptr;
 
-          if (scheme.fine_element_is_continuous)
+          if (fine_element_is_continuous)
             weights = scheme.weights.data();
 
           for (unsigned int cell = 0; cell < scheme.n_coarse_cells; ++cell)
             {
-              if (scheme.fine_element_is_continuous)
+              if (fine_element_is_continuous)
                 for (unsigned int i = 0; i < scheme.dofs_per_cell_fine; ++i)
                   vec_fine_ptr->local_element(indices_fine[i]) +=
                     this->vec_coarse.local_element(indices_coarse[i]) *
@@ -2211,7 +2208,7 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::prolongate(
               indices_fine += scheme.dofs_per_cell_fine;
               indices_coarse += scheme.dofs_per_cell_coarse;
 
-              if (scheme.fine_element_is_continuous)
+              if (fine_element_is_continuous)
                 weights += scheme.dofs_per_cell_fine;
             }
 
@@ -2274,12 +2271,12 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::prolongate(
               &scheme.level_dof_indices_fine[cell * scheme.dofs_per_cell_fine];
             const Number *weights = nullptr;
 
-            if (scheme.fine_element_is_continuous)
+            if (fine_element_is_continuous)
               weights = &scheme.weights[cell * scheme.dofs_per_cell_fine];
 
             for (unsigned int v = 0; v < n_lanes_filled; ++v)
               {
-                if (scheme.fine_element_is_continuous)
+                if (fine_element_is_continuous)
                   for (unsigned int i = 0; i < scheme.dofs_per_cell_fine; ++i)
                     vec_fine_ptr->local_element(indices[i]) +=
                       evaluation_data_fine[i][v] * weights[i];
@@ -2290,7 +2287,7 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::prolongate(
 
                 indices += scheme.dofs_per_cell_fine;
 
-                if (scheme.fine_element_is_continuous)
+                if (fine_element_is_continuous)
                   weights += scheme.dofs_per_cell_fine;
               }
           }
@@ -2300,7 +2297,7 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::prolongate(
   this->vec_coarse.zero_out_ghost_values(); // clear ghost values; else compress
                                             // in do_restrict_add does not work
 
-  if (schemes.size() > 0 && schemes.front().fine_element_is_continuous)
+  if (fine_element_is_continuous || use_dst_inplace == false)
     vec_fine_ptr->compress(VectorOperation::add);
 
   if (use_dst_inplace == false)
@@ -2325,8 +2322,7 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
   if (use_src_inplace == false)
     this->vec_fine.copy_locally_owned_data_from(src);
 
-  if ((schemes.size() > 0 && schemes.front().fine_element_is_continuous) ||
-      use_src_inplace == false)
+  if (fine_element_is_continuous || use_src_inplace == false)
     vec_fine_ptr->update_ghost_values();
 
   this->vec_coarse.copy_locally_owned_data_from(dst);
@@ -2364,12 +2360,12 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
             scheme.level_dof_indices_coarse.data();
           const Number *weights = nullptr;
 
-          if (scheme.fine_element_is_continuous)
+          if (fine_element_is_continuous)
             weights = scheme.weights.data();
 
           for (unsigned int cell = 0; cell < scheme.n_coarse_cells; ++cell)
             {
-              if (scheme.fine_element_is_continuous)
+              if (fine_element_is_continuous)
                 for (unsigned int i = 0; i < scheme.dofs_per_cell_fine; ++i)
                   distribute_local_to_global(
                     indices_coarse[i],
@@ -2385,7 +2381,7 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
               indices_fine += scheme.dofs_per_cell_fine;
               indices_coarse += scheme.dofs_per_cell_coarse;
 
-              if (scheme.fine_element_is_continuous)
+              if (fine_element_is_continuous)
                 weights += scheme.dofs_per_cell_fine;
             }
 
@@ -2417,12 +2413,12 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
               &scheme.level_dof_indices_fine[cell * scheme.dofs_per_cell_fine];
             const Number *weights = nullptr;
 
-            if (scheme.fine_element_is_continuous)
+            if (fine_element_is_continuous)
               weights = &scheme.weights[cell * scheme.dofs_per_cell_fine];
 
             for (unsigned int v = 0; v < n_lanes_filled; ++v)
               {
-                if (scheme.fine_element_is_continuous)
+                if (fine_element_is_continuous)
                   for (unsigned int i = 0; i < scheme.dofs_per_cell_fine; ++i)
                     evaluation_data_fine[i][v] =
                       vec_fine_ptr->local_element(indices[i]) * weights[i];
@@ -2433,7 +2429,7 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
 
                 indices += scheme.dofs_per_cell_fine;
 
-                if (scheme.fine_element_is_continuous)
+                if (fine_element_is_continuous)
                   weights += scheme.dofs_per_cell_fine;
               }
           }
@@ -2491,8 +2487,7 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
 
   const bool use_src_inplace = this->vec_fine.size() == 0;
   const auto vec_fine_ptr    = use_src_inplace ? &src : &this->vec_fine;
-  if ((schemes.size() > 0 && schemes.front().fine_element_is_continuous) ||
-      use_src_inplace == false)
+  if (fine_element_is_continuous || use_src_inplace == false)
     vec_fine_ptr->update_ghost_values();
 
   this->vec_coarse = 0.0;
