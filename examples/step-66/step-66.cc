@@ -860,12 +860,20 @@ namespace Step66
       preconditioner(dof_handler, mg, mg_transfer);
 
 
-    // With a geometric multigrid preconditioner for the Jacobian we
-    // solve the linear system with the CG algorithm.
+    // Finally we set up the SolverControl and the SolverCG to solve the
+    // linearized problem for the current Newton update. An important fact of
+    // the implementation of SolverCG or also SolverGMRES is, that the vector
+    // holding the solution of the linear system (here
+    // <code>newton_update</code>) can be used to pass a starting value. In
+    // order to start the iterative solver always with a zero vector we reset
+    // the <code>newton_update</code> explicitly before calling
+    // SolverCG::solve(). Afterwards we distribute the Dirichlet boundary
+    // conditions stored in <code>constraints</code> and store the number of
+    // iteration steps for the later output.
     SolverControl solver_control(100, 1.e-12);
     SolverCG<LinearAlgebra::distributed::Vector<double>> cg(solver_control);
 
-    constraints.set_zero(solution);
+    newton_update = 0.0;
 
     cg.solve(system_matrix, newton_update, system_rhs, preconditioner);
 
