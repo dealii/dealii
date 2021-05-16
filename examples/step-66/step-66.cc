@@ -706,6 +706,10 @@ namespace Step66
     // Finally, we must not forget to initiate the MPI data exchange via the
     // <code>compress</code> function.
     dst.compress(VectorOperation::add);
+    
+    
+    // For bookkeeping we zero out the ghost values.
+    src.zero_out_ghost_values();
   }
 
 
@@ -880,6 +884,10 @@ namespace Step66
     constraints.distribute(newton_update);
 
     linear_iterations = solver_control.last_step();
+    
+    
+    // Then for bookkeeping we zero out the ghost values.
+    solution.zero_out_ghost_values();
   }
 
 
@@ -988,6 +996,8 @@ namespace Step66
                                       norm_per_cell,
                                       QGauss<dim>(fe.degree + 2),
                                       VectorTools::H1_seminorm);
+    
+    solution.zero_out_ghost_values();
 
     return VectorTools::compute_global_error(triangulation,
                                              norm_per_cell,
@@ -1046,6 +1056,8 @@ namespace Step66
     data_out.set_flags(flags);
     data_out.write_vtu_with_pvtu_record(
       "./", "solution", cycle, MPI_COMM_WORLD, 3);
+    
+    solution.zero_out_ghost_values();
   }
 
 
