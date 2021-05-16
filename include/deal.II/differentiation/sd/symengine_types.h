@@ -53,10 +53,9 @@ namespace Differentiation
       /**
        * Type definition for a value substitution map.
        *
-       * This serves the same purpose as a
-       * <code>SymEngine::map_basic_basic</code>, which is equivalent to a
-       * <code>std::map<SymEngine::RCP<const SymEngine::Basic>,
-       * SymEngine::RCP<const SymEngine::Basic>></code>.
+       * This serves the same purpose as a `SymEngine::map_basic_basic`, which
+       * is equivalent to a `std::map<SymEngine::RCP<const SymEngine::Basic>,
+       * SymEngine::RCP<const SymEngine::Basic>>`.
        */
       using substitution_map =
         std::map<SD::Expression, SD::Expression, internal::ExpressionKeyLess>;
@@ -64,9 +63,8 @@ namespace Differentiation
       /**
        * Type definition for a vector of symbols.
        *
-       * This serves the same purpose as a <code>SymEngine::vec_basic</code>,
-       * which is equivalent to a <code>std::vector<SymEngine::RCP<const
-       * SymEngine::Basic>></code>
+       * This serves the same purpose as a `SymEngine::vec_basic`, which is
+       * equivalent to a `std::vector<SymEngine::RCP<const SymEngine::Basic>>`.
        */
       using symbol_vector = std::vector<SD::Expression>;
 
