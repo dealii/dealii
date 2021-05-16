@@ -101,10 +101,11 @@ public:
       return 0;
     };
 
-    time_stepper.solve_with_jacobian = [&](const VectorType &src,
-                                           VectorType &      dst,
-                                           int &             n_iter,
-                                           const double      tolerance) -> int {
+    time_stepper.solve_jacobian_system_up_to_tolerance =
+      [&](const VectorType &src,
+          VectorType &      dst,
+          int &             n_iter,
+          const double      tolerance) -> int {
       SolverControl               solver_control(1000, tolerance);
       SolverGMRES<Vector<double>> solver(solver_control);
       solver.solve(J, dst, src, PreconditionIdentity());

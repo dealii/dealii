@@ -72,9 +72,14 @@ namespace SUNDIALS
    *  - reinit_vector;
    *  - residual;
    *  - setup_jacobian;
-   *  - solve_jacobian_system;
+   *  - solve_jacobian_system/solve_jacobian_system_up_to_tolerance;
    *
-   * Optionally, also the following functions could be rewritten. By default
+   * The function `solve_jacobian_system` should be implemented for SUNDIALS
+   * < 4.0.0. For later versions, you should use
+   * `solve_jacobian_system_up_to_tolerance` to leverage better non-linear
+   * algorithms.
+   *
+   * Optionally, also the following functions could be provided. By default
    * they do nothing, or are not required. If you call the constructor in a way
    * that requires a not-implemented function, an Assertion will be
    * thrown.
@@ -595,25 +600,25 @@ namespace SUNDIALS
      * @param mpi_comm MPI communicator
      */
     IDA(const AdditionalData &data     = AdditionalData(),
-        const MPI_Comm        mpi_comm = MPI_COMM_WORLD);
+        const MPI_Comm &      mpi_comm = MPI_COMM_WORLD);
 
     /**
      * Destructor.
      */
     ~IDA();
 
-
+    /**
+     * Save the number of iterations of the last Jacobian solve.
+     */
     void
-    set_n_iter(const int n_iter)
-    {
-      this->n_iter = n_iter;
-    }
+    set_n_iterations(const int n_iter);
 
+    /**
+     * Return the number of iterations of the last Jacobian solve.
+     */
     int
-    get_n_iter() const
-    {
-      return this->n_iter;
-    }
+    get_n_iterations() const;
+
     /**
      * Integrate differential-algebraic equations. This function returns the
      * final number of computed steps.
@@ -670,7 +675,9 @@ namespace SUNDIALS
      * Compute Jacobian. This function is called by IDA any time a Jacobian
      * update is required. The user should compute the Jacobian (or update all
      * the variables that allow the application of the Jacobian). This function
-     * is called by IDA once, before any call to solve_jacobian_system().
+     * is called by IDA once, before any call to solve_jacobian_system() (for
+     * SUNDIALS < 4.0.0) or solve_jacobian_system_up_to_tolerance() (for
+     * SUNDIALS >= 4.0.0).
      *
      * The Jacobian $J$ should be a (possibly inexact) computation of
      * \f[
@@ -681,13 +688,15 @@ namespace SUNDIALS
      * If the user uses a matrix based computation of the Jacobian, than this
      * is the right place where an assembly routine should be called to
      * assemble both a matrix and a preconditioner for the Jacobian system.
-     * Subsequent calls (possibly more than one) to solve_jacobian_system() can
-     * assume that this function has been called at least once.
+     * Subsequent calls (possibly more than one) to solve_jacobian_system() or
+     * solve_jacobian_system_up_to_tolerance() can assume that this function has
+     * been called at least once.
      *
      * Notice that no assumption is made by this interface on what the user
      * should do in this function. IDA only assumes that after a call to
-     * setup_jacobian() it is possible to call solve_jacobian_system(), to
-     * obtain a solution $x$ to the system $J x = b$.
+     * setup_jacobian() it is possible to call solve_jacobian_system() or
+     * solve_jacobian_system_up_to_tolerance() to obtain a solution $x$ to the
+     * system $J x = b$.
      *
      * This function should return:
      * - 0: Success
@@ -734,20 +743,22 @@ namespace SUNDIALS
      * specifying the tolerance for the resolution. A part from the tolerance
      * only `rhs` is provided and `dst` needs to be returned.
      */
+#  if DEAL_II_SUNDIALS_VERSION_GTE(4, 0, 0)
     DEAL_II_DEPRECATED_EARLY
+#  endif
     std::function<int(const VectorType &rhs, VectorType &dst)>
       solve_jacobian_system;
 
-
     /**
-     * Solve the Jacobian linear system. This function will be called by IDA
-     * (possibly several times) after setup_jacobian() has been called at least
-     * once. IDA tries to do its best to call setup_jacobian() the minimum
-     * amount of times. If convergence can be achieved without updating the
-     * Jacobian, then IDA does not call setup_jacobian() again. If, on the
-     * contrary, internal IDA convergence tests fail, then IDA calls again
-     * setup_jacobian() with updated vectors and coefficients so that successive
-     * calls to solve_jacobian_systems() lead to better convergence in the
+     * Solve the Jacobian linear system up to a specified tolerance. This
+     * function will be called by IDA (possibly several times) after
+     * setup_jacobian() has been called at least once. IDA tries to do its best
+     * to call setup_jacobian() the minimum amount of times. If convergence can
+     * be achieved without updating the Jacobian, then IDA does not call
+     * setup_jacobian() again. If, on the contrary, internal IDA convergence
+     * tests fail, then IDA calls again setup_jacobian() with updated vectors
+     * and coefficients so that successive calls to
+     * solve_jacobian_system_up_to_tolerance() lead to better convergence in the
      * Newton process.
      *
      * The jacobian $J$ should be (an approximation of) the system Jacobian
@@ -780,7 +791,7 @@ namespace SUNDIALS
                       VectorType &      dst,
                       int &             n_iter,
                       const double      tolerance)>
-      solve_with_jacobian;
+      solve_jacobian_system_up_to_tolerance;
 
     /**
      * Process solution. This function is called by IDA at fixed time steps,
@@ -876,7 +887,7 @@ namespace SUNDIALS
     /**
      * IDA configuration data.
      */
-    AdditionalData data;
+    const AdditionalData data;
 
     /**
      * IDA memory object.
@@ -884,9 +895,9 @@ namespace SUNDIALS
     void *ida_mem;
 
     /**
-     * Number of iteration required to solve the Jacobian system
+     * Number of iteration that were required to solve the last Jacobian system
      */
-    int n_iter;
+    int n_iterations;
 
     /**
      * MPI communicator. SUNDIALS solver runs happily in
@@ -894,8 +905,6 @@ namespace SUNDIALS
      * support, MPI_Comm is aliased as int.
      */
     MPI_Comm communicator;
-
-
 
     /**
      * Memory pool of vectors.
@@ -915,7 +924,6 @@ namespace SUNDIALS
 #    endif // PETSC_USE_COMPLEX
 #  endif   // DEAL_II_WITH_PETSC
   };
-
 } // namespace SUNDIALS
 
 DEAL_II_NAMESPACE_CLOSE

@@ -173,36 +173,30 @@ namespace SUNDIALS
                                 SUNMatrix /*ignored*/,
                                 N_Vector x,
                                 N_Vector b,
-                                realtype /*tol*/)
-    {
-      const IDA<VectorType> &solver =
-        *static_cast<const IDA<VectorType> *>(LS->content);
-
-      auto *src_b = internal::unwrap_nvector_const<VectorType>(b);
-      auto *dst_x = internal::unwrap_nvector<VectorType>(x);
-
-      const int err = solver.solve_jacobian_system(*src_b, *dst_x);
-
-      return err;
-    }
-
-
-    template <typename VectorType>
-    int
-    t_dae_solve_with_jacobian(SUNLinearSolver LS,
-                              SUNMatrix /*ignored*/,
-                              N_Vector x,
-                              N_Vector b,
-                              realtype tol)
+                                realtype tol)
     {
       IDA<VectorType> &solver = *static_cast<IDA<VectorType> *>(LS->content);
 
       auto *src_b = internal::unwrap_nvector_const<VectorType>(b);
       auto *dst_x = internal::unwrap_nvector<VectorType>(x);
+      int   err   = 0;
+      if (solver.solve_jacobian_system_up_to_tolerance)
+        {
+          int n_iter = 0;
 
-      int       n_iter;
-      const int err = solver.solve_with_jacobian(*src_b, *dst_x, n_iter, tol);
-      solver.set_n_iter(n_iter > 0 ? n_iter : 1);
+          err = solver.solve_jacobian_system_up_to_tolerance(*src_b,
+                                                             *dst_x,
+                                                             n_iter,
+                                                             tol);
+          solver.set_n_iterations(n_iter > 0 ? n_iter : 1);
+        }
+      else if (solver.solve_jacobian_system)
+        {
+          err = solver.solve_jacobian_system(*src_b, *dst_x);
+        }
+      else
+        // We have already checked this outside, so we should never get here.
+        Assert(false, ExcInternalError());
 
       return err;
     }
@@ -212,7 +206,7 @@ namespace SUNDIALS
 
 
   template <typename VectorType>
-  IDA<VectorType>::IDA(const AdditionalData &data, const MPI_Comm mpi_comm)
+  IDA<VectorType>::IDA(const AdditionalData &data, const MPI_Comm &mpi_comm)
     : data(data)
     , ida_mem(nullptr)
     , communicator(is_serial_vector<VectorType>::value ?
@@ -240,6 +234,24 @@ namespace SUNDIALS
 
 
   template <typename VectorType>
+  void
+  IDA<VectorType>::set_n_iterations(const int n_iter)
+  {
+    n_iterations = n_iter;
+  }
+
+
+
+  template <typename VectorType>
+  int
+  IDA<VectorType>::get_n_iterations() const
+  {
+    return n_iterations;
+  }
+
+
+
+  template <typename VectorType>
   unsigned int
   IDA<VectorType>::solve_dae(VectorType &solution, VectorType &solution_dot)
   {
@@ -247,7 +259,7 @@ namespace SUNDIALS
     double       h           = data.initial_step_size;
     unsigned int step_number = 0;
 
-    this->n_iter = 1;
+    this->n_iterations = 1;
     int status;
     (void)status;
 
@@ -399,18 +411,12 @@ namespace SUNDIALS
       return 0;
     };
 
-    if (solve_with_jacobian)
-      {
-        LS->ops->solve = t_dae_solve_with_jacobian<VectorType>;
-      }
-    else if (solve_jacobian_system)
-      {
-        LS->ops->solve = t_dae_solve_jacobian_system<VectorType>;
-      }
-    else
-      {
-        AssertThrow(false, ExcFunctionNotProvided("solve_with_jacobian"));
-      }
+    AssertThrow(
+      solve_jacobian_system || solve_jacobian_system_up_to_tolerance,
+      ExcFunctionNotProvided(
+        "solve_jacobian_system or solve_jacobian_system_up_to_tolerance"));
+    LS->ops->solve = t_dae_solve_jacobian_system<VectorType>;
+
     // When we set an iterative solver IDA requires that resid is provided. From
     // SUNDIALS docs If an iterative method computes the preconditioned initial
     // residual and returns with a successful solve without performing any
@@ -426,7 +432,7 @@ namespace SUNDIALS
     // has provided we set 1. This is clearly suboptimal.
     LS->ops->numiters = [](SUNLinearSolver LS) -> int {
       IDA<VectorType> &solver = *static_cast<IDA<VectorType> *>(LS->content);
-      return solver.get_n_iter();
+      return solver.get_n_iterations();
     };
     // Even though we don't use it, IDA still wants us to set some
     // kind of matrix object for the nonlinear solver. This is because
@@ -530,8 +536,7 @@ namespace SUNDIALS
       GrowingVectorMemory<VectorType>            mem;
       typename VectorMemory<VectorType>::Pointer v(mem);
       reinit_vector(*v);
-      const unsigned int size = v->size();
-      return complete_index_set(size);
+      return v->locally_owned_elements();
     };
   }
 
