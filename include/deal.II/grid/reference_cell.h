@@ -294,24 +294,24 @@ public:
    *
    * For example, in 2D the layout of a quadrilateral cell is as follows:
    * @verbatim
-   * .      3
-   * .   2-->--3
-   * .   |     |
-   * . 0 ^     ^ 1
-   * .   |     |
-   * .   0-->--1
-   * .      2
+   *      3
+   *   2-->--3
+   *   |     |
+   * 0 ^     ^ 1
+   *   |     |
+   *   0-->--1
+   *      2
    * @endverbatim
    * Vertices and faces are indicated with their numbers, faces also with
    * their directions.
    *
    * Now, when refined, the layout is like this:
    * @verbatim
-   * *--*--*
-   * | 2|3 |
-   * *--*--*
-   * | 0|1 |
-   * *--*--*
+   * *---*---*
+   * | 2 | 3 |
+   * *---*---*
+   * | 0 | 1 |
+   * *---*---*
    * @endverbatim
    *
    * Thus, the child cells on face 0 are (ordered in the direction of the
@@ -319,10 +319,20 @@ public:
    *
    * For three spatial dimensions, the exact order of the children is laid
    * down in the general documentation of this class.
+   *
+   * The <tt>face_orientation</tt> argument is meant exclusively for
+   * quadrilaterals and hexahedra at the moment. It determines how this function
+   * handles faces oriented in the standard and non-standard orientation. It
+   * represents a bit-code for the overall <tt>face_orientation</tt>,
+   * <tt>face_flip</tt> and <tt>face_rotation</tt> and defaults to the standard
+   * orientation. The concept of face orientations is explained in this
+   * @ref GlossFaceOrientation "glossary"
+   * entry.
    */
   unsigned int
-  child_cell_on_face(const unsigned int face_n,
-                     const unsigned int subface_n) const;
+  child_cell_on_face(const unsigned int  face_n,
+                     const unsigned int  subface_n,
+                     const unsigned char face_orientation = 1) const;
 
   /**
    * For a given vertex in a cell, return a pair of a face index and a
@@ -929,8 +939,10 @@ ReferenceCell::face_reference_cell(const unsigned int face_no) const
 
 
 inline unsigned int
-ReferenceCell::child_cell_on_face(const unsigned int face,
-                                  const unsigned int subface) const
+ReferenceCell::child_cell_on_face(
+  const unsigned int  face,
+  const unsigned int  subface,
+  const unsigned char face_orientation_raw) const
 {
   AssertIndexRange(face, n_faces());
 
@@ -951,7 +963,17 @@ ReferenceCell::child_cell_on_face(const unsigned int face,
     }
   else if (*this == ReferenceCells::Quadrilateral)
     {
-      Assert(false, ExcNotImplemented());
+      const bool face_orientation = Utilities::get_bit(face_orientation_raw, 0);
+      const bool face_flip        = Utilities::get_bit(face_orientation_raw, 2);
+      const bool face_rotation    = Utilities::get_bit(face_orientation_raw, 1);
+
+      return GeometryInfo<2>::child_cell_on_face(
+        RefinementCase<2>(RefinementPossibilities<2>::no_refinement),
+        face,
+        subface,
+        face_orientation,
+        face_flip,
+        face_rotation);
     }
   else if (*this == ReferenceCells::Tetrahedron)
     {
@@ -967,7 +989,17 @@ ReferenceCell::child_cell_on_face(const unsigned int face,
     }
   else if (*this == ReferenceCells::Hexahedron)
     {
-      Assert(false, ExcNotImplemented());
+      const bool face_orientation = Utilities::get_bit(face_orientation_raw, 0);
+      const bool face_flip        = Utilities::get_bit(face_orientation_raw, 2);
+      const bool face_rotation    = Utilities::get_bit(face_orientation_raw, 1);
+
+      return GeometryInfo<3>::child_cell_on_face(
+        RefinementCase<3>(RefinementPossibilities<3>::no_refinement),
+        face,
+        subface,
+        face_orientation,
+        face_flip,
+        face_rotation);
     }
 
   Assert(false, ExcNotImplemented());
