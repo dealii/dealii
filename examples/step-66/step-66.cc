@@ -221,7 +221,7 @@ namespace Step66
     for (unsigned int cell = 0; cell < n_cells; ++cell)
       {
         phi.reinit(cell);
-        phi.read_dof_values_plain(src);
+        phi.read_dof_values_plain(newton_step);
         phi.evaluate(EvaluationFlags::values);
 
         for (unsigned int q = 0; q < phi.n_q_points; ++q)
