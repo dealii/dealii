@@ -225,35 +225,35 @@ namespace GridTools
    * get the same result using <code>cell-@>measure()</code>, but this
    * function also works for cells that do not exist except that you make it
    * up by naming its vertices from the list.
+   *
+   * @deprecated Use the more general function which takes an ArrayView instead.
    */
   template <int dim>
-  double
+  DEAL_II_DEPRECATED_EARLY double
   cell_measure(
     const std::vector<Point<dim>> &all_vertices,
     const unsigned int (&vertex_indices)[GeometryInfo<dim>::vertices_per_cell]);
 
   /**
-   * A variant of cell_measure() accepting an ArrayView instead of a
-   * fixed-sized array for @p vertex_indices.
+   * Given a list of vertices (typically obtained using
+   * Triangulation::get_vertices()) as the first, and a list of vertex indices
+   * that characterize a single cell as the second argument, return the
+   * measure (area, volume) of this cell. If this is a real cell, then you can
+   * get the same result using <code>cell-@>measure()</code>, but this
+   * function also works for cells that do not exist except that you make it
+   * up by naming its vertices from the list.
    *
    * The parameter @p vertex_indices is expected to have
    * GeometryInfo<dim>::vertices_per_cell entries. A std::vector is implicitly
    * convertible to an ArrayView, so it can be passed directly. See the
    * ArrayView class for more information.
+   *
+   * @note This function is only implemented for codimension zero objects.
    */
   template <int dim>
   double
   cell_measure(const std::vector<Point<dim>> &      all_vertices,
                const ArrayView<const unsigned int> &vertex_indices);
-
-  /**
-   * A version of the function above that can accept input for nonzero
-   * codimension cases. This function only exists to aid generic programming
-   * and calling it will just raise an exception.
-   */
-  template <int dim, typename T>
-  double
-  cell_measure(const T &, ...);
 
   /**
    * This function computes an affine approximation of the map from the unit
@@ -3359,14 +3359,6 @@ namespace GridTools
     const ArrayView<const unsigned int> view(
       indices, GeometryInfo<dim>::vertices_per_cell);
     return cell_measure(all_vertices, view);
-  }
-
-  template <int dim, typename T>
-  double
-  cell_measure(const T &, ...)
-  {
-    Assert(false, ExcNotImplemented());
-    return std::numeric_limits<double>::quiet_NaN();
   }
 
 

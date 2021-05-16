@@ -876,7 +876,7 @@ namespace GridTools
                  ReferenceCells::get_hypercube<dim>().n_vertices(),
                ExcNotImplemented());
         const ArrayView<const unsigned int> vertices(cell.vertices);
-        if (GridTools::cell_measure<dim>(all_vertices, vertices) < 0)
+        if (GridTools::cell_measure(all_vertices, vertices) < 0)
           {
             ++n_negative_cells;
 
@@ -898,8 +898,7 @@ namespace GridTools
             // Check whether the resulting cell is now ok.
             // If not, then the grid is seriously broken and
             // we just give up.
-            AssertThrow(GridTools::cell_measure<dim>(all_vertices, vertices) >
-                          0,
+            AssertThrow(GridTools::cell_measure(all_vertices, vertices) > 0,
                         ExcInternalError());
           }
       }
