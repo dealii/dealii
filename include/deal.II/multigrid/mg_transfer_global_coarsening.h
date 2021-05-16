@@ -239,13 +239,6 @@ private:
     unsigned int degree_fine;
 
     /**
-     * Flag if the finite element on the fine cells are continuous. If yes,
-     * the multiplicity of DoF sharing a vertex/line as well as constraints have
-     * to be taken in account via weights.
-     */
-    bool fine_element_is_continuous;
-
-    /**
      * Weights for continuous elements.
      */
     std::vector<Number> weights;
@@ -287,6 +280,13 @@ private:
    * Transfer schemes.
    */
   std::vector<MGTransferScheme> schemes;
+
+  /**
+   * Flag if the finite elements on the fine cells are continuous. If yes,
+   * the multiplicity of DoF sharing a vertex/line as well as constraints have
+   * to be taken into account via weights.
+   */
+  bool fine_element_is_continuous;
 
   /**
    * Partitioner needed by the intermediate vector.
