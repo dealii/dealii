@@ -712,21 +712,6 @@ namespace SUNDIALS
     void *kinsol_mem;
 
     /**
-     * KINSOL solution vector.
-     */
-    N_Vector solution;
-
-    /**
-     * KINSOL solution scale.
-     */
-    N_Vector u_scale;
-
-    /**
-     * KINSOL f scale.
-     */
-    N_Vector f_scale;
-
-    /**
      * MPI communicator. SUNDIALS solver runs happily in parallel.
      */
     MPI_Comm communicator;
