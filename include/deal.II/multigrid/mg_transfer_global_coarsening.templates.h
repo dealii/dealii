@@ -1783,7 +1783,7 @@ namespace internal
           }
 
         bool     fine_indices_touch_remote_dofs = false;
-        IndexSet locally_owned_dofs = dof_handler_coarse.locally_owned_dofs();
+        IndexSet locally_owned_dofs = dof_handler_fine.locally_owned_dofs();
 
         process_cells([&](const auto &cell_coarse, const auto &cell_fine) {
           const auto fe_pair_no =
