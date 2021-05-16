@@ -810,9 +810,9 @@ public:
    * here.
    *
    * The matrix @p P is the concatenation or the sum of the cell matrices @p
-   * P_i, depending on the #restriction_is_additive_flags. This distinguishes
-   * interpolation (concatenation) and projection with respect to scalar
-   * products (summation).
+   * P_i, depending on the value of FiniteElement::restriction_is_additive().
+   * This distinguishes interpolation (concatenation) and projection with
+   * respect to scalar products (summation).
    *
    * Row and column indices are related to coarse grid and fine grid spaces,
    * respectively, consistent with the definition of the associated operator.
