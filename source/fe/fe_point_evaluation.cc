@@ -39,46 +39,32 @@ namespace internal
      */
     template <int dim, int spacedim>
     bool
-    is_fast_path_supported(const FiniteElement<dim, spacedim> &fe)
+    is_fast_path_supported(const FiniteElement<dim, spacedim> &fe,
+                           const unsigned int base_element_number)
     {
       // check if supported
       const bool flag = [&]() {
         if (dim != spacedim)
           return false;
 
-        for (unsigned int base = 0; base < fe.n_base_elements(); ++base)
+        const FiniteElement<dim, spacedim> *fe_ptr =
+          &(fe.base_element(base_element_number));
+        if (fe_ptr->n_components() != 1)
+          return false;
+
+        // then check if the base element is supported or not
+        if (dynamic_cast<const FE_Poly<dim, spacedim> *>(fe_ptr) != nullptr)
           {
-            const FiniteElement<dim, spacedim> *fe_ptr =
-              &(fe.base_element(base));
-            if (fe_ptr->n_components() != 1)
-              return false;
+            const FE_Poly<dim, spacedim> *fe_poly_ptr =
+              dynamic_cast<const FE_Poly<dim, spacedim> *>(fe_ptr);
 
-            // then check if the base element is supported or not
-            if (dynamic_cast<const FE_Poly<dim, spacedim> *>(fe_ptr) != nullptr)
-              {
-                const FE_Poly<dim, spacedim> *fe_poly_ptr =
-                  dynamic_cast<const FE_Poly<dim, spacedim> *>(fe_ptr);
-
-                if (dynamic_cast<const TensorProductPolynomials<dim> *>(
-                      &fe_poly_ptr->get_poly_space()) == nullptr &&
-                    dynamic_cast<const TensorProductPolynomials<
-                        dim,
-                        Polynomials::PiecewisePolynomial<double>> *>(
-                      &fe_poly_ptr->get_poly_space()) == nullptr &&
-                    dynamic_cast<const FE_DGP<dim, spacedim> *>(fe_ptr) ==
-                      nullptr &&
-                    dynamic_cast<const FE_Q_DG0<dim, spacedim> *>(fe_ptr) ==
-                      nullptr &&
-                    dynamic_cast<const FE_DGQHermite<dim, spacedim> *>(
-                      fe_ptr) == nullptr)
-                  return false;
-              }
-            else
+            if (dynamic_cast<const TensorProductPolynomials<dim> *>(
+                  &fe_poly_ptr->get_poly_space()) == nullptr)
               return false;
           }
+        else
+          return false;
 
-        // if we arrived here, all base elements were supported so we can
-        // support the present element
         return true;
       }();
 
@@ -89,6 +75,27 @@ namespace internal
                ExcInternalError());
 
       return flag;
+    }
+
+
+    template <int dim, int spacedim>
+    std::vector<Polynomials::Polynomial<double>>
+    get_polynomial_space(const FiniteElement<dim, spacedim> &fe)
+    {
+      Assert(fe.n_components() == 1, ExcNotImplemented());
+      const FE_Poly<dim, spacedim> *fe_poly_ptr =
+        dynamic_cast<const FE_Poly<dim, spacedim> *>(&fe);
+
+      // we should catch the case that we cannot dynamic cast in
+      // is_fast_path_supported
+      Assert(fe_poly_ptr != nullptr, ExcNotImplemented());
+      if (const auto polyspace =
+            dynamic_cast<const TensorProductPolynomials<dim> *>(
+              &fe_poly_ptr->get_poly_space()))
+        return polyspace->get_underlying_polynomials();
+      else
+        Assert(false, ExcNotImplemented());
+      return {};
     }
   } // namespace FEPointEvaluation
 } // namespace internal

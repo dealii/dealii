@@ -347,7 +347,12 @@ namespace internal
 
     template <int dim, int spacedim>
     bool
-    is_fast_path_supported(const FiniteElement<dim, spacedim> &fe);
+    is_fast_path_supported(const FiniteElement<dim, spacedim> &fe,
+                           const unsigned int base_element_number);
+
+    template <int dim, int spacedim>
+    std::vector<Polynomials::Polynomial<double>>
+    get_polynomial_space(const FiniteElement<dim, spacedim> &fe);
   } // namespace FEPointEvaluation
 } // namespace internal
 
@@ -564,33 +569,32 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::FEPointEvaluation(
       dynamic_cast<const MappingQGeneric<dim, spacedim> *>(&mapping))
   , fe(&fe)
 {
+  bool         same_base_element   = true;
+  unsigned int base_element_number = 0;
+  unsigned int component           = 0;
+  for (; base_element_number < fe.n_base_elements(); ++base_element_number)
+    if (component + fe.element_multiplicity(base_element_number) >
+        first_selected_component)
+      {
+        if (first_selected_component + n_components >
+            component + fe.element_multiplicity(base_element_number))
+          same_base_element = false;
+        break;
+      }
+    else
+      component += fe.element_multiplicity(base_element_number);
   if (mapping_q_generic != nullptr &&
-      internal::FEPointEvaluation::is_fast_path_supported(fe))
+      internal::FEPointEvaluation::is_fast_path_supported(
+        fe, base_element_number) &&
+      same_base_element)
     {
       internal::MatrixFreeFunctions::ShapeInfo<double> shape_info;
-      unsigned int                                     base_element_number = 0;
-      unsigned int                                     component           = 0;
-      for (; base_element_number < fe.n_base_elements(); ++base_element_number)
-        if (component + fe.element_multiplicity(base_element_number) >
-            first_selected_component)
-          {
-            Assert(first_selected_component + n_components <=
-                     component + fe.element_multiplicity(base_element_number),
-                   ExcMessage("You selected an evaluation which crosses "
-                              "different base elements, a case not supported"));
-            break;
-          }
-        else
-          component += fe.element_multiplicity(base_element_number);
 
       shape_info.reinit(QMidpoint<1>(), fe, base_element_number);
       renumber           = shape_info.lexicographic_numbering;
       dofs_per_component = shape_info.dofs_per_component_on_cell;
-      poly =
-        shape_info.data[0].fe_degree == 0 ?
-          Polynomials::LagrangeEquidistant::generate_complete_basis(0) :
-          Polynomials::generate_complete_Lagrange_basis(
-            QGaussLobatto<1>(shape_info.data[0].fe_degree + 1).get_points());
+      poly               = internal::FEPointEvaluation::get_polynomial_space(
+        fe.base_element(base_element_number));
     }
   if (true /*TODO: as long as the fast path of integrate() is not working*/)
     {

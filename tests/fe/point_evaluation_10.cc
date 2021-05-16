@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2020 - 2021 by the deal.II authors
+// Copyright (C) 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,15 +14,17 @@
 // ---------------------------------------------------------------------
 
 
-// check FEPointEvaluation for scalar FE_Q and MappingQGeneric by comparing to
-// the output of FEValues with the same settings
+// check FEPointEvaluation for scalar FE_DGQArbitraryNodes and MappingQGeneric
+// by comparing to the output of FEValues with the same settings (apart from
+// the finite element, this test is the same as point_evaluation_02)
 
 #include <deal.II/base/function_lib.h>
+#include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/dofs/dof_handler.h>
 
+#include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_point_evaluation.h>
-#include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_q_generic.h>
 
@@ -39,7 +41,7 @@
 
 
 
-template <int dim, typename Number = double>
+template <int dim>
 void
 test(const unsigned int degree)
 {
@@ -59,37 +61,32 @@ test(const unsigned int degree)
     {
       Point<dim> p;
       for (unsigned int d = 0; d < dim; ++d)
-        p[d] = static_cast<Number>(i) / 17. + 0.015625 * d;
+        p[d] = static_cast<double>(i) / 17. + 0.015625 * d;
       unit_points.push_back(p);
     }
 
-  FE_Q<dim>     fe(degree);
-  FEValues<dim> fe_values(mapping,
+  FE_DGQArbitraryNodes<dim> fe(QGauss<1>(degree + 1));
+  FEValues<dim>             fe_values(mapping,
                           fe,
                           Quadrature<dim>(unit_points),
                           update_values | update_gradients);
 
   DoFHandler<dim> dof_handler(tria);
   dof_handler.distribute_dofs(fe);
-  Vector<Number> vector(dof_handler.n_dofs());
+  Vector<double> vector(dof_handler.n_dofs());
 
-  FEPointEvaluation<1, dim, dim, Number> evaluator(mapping, fe);
+  FEPointEvaluation<1, dim> evaluator(mapping, fe);
 
-  Tensor<1, dim, Number> exponents;
+  Tensor<1, dim> exponents;
   exponents[0] = 1.;
   VectorTools::interpolate(mapping,
                            dof_handler,
-                           Functions::Monomial<dim, Number>(exponents),
+                           Functions::Monomial<dim>(exponents),
                            vector);
 
-  std::vector<Number>                 solution_values(fe.dofs_per_cell);
-  std::vector<Number>                 function_values(unit_points.size());
-  std::vector<Tensor<1, dim, Number>> function_gradients(unit_points.size());
-
-  // For float numbers that are sensitive to roundoff in the numdiff
-  // tolerances (absolute 1e-8), we multiply by 1e-3 to ensure that the test
-  // remains robust
-  const double factor_float = std::is_same<Number, float>::value ? 0.001 : 1.;
+  std::vector<double>         solution_values(fe.dofs_per_cell);
+  std::vector<double>         function_values(unit_points.size());
+  std::vector<Tensor<1, dim>> function_gradients(unit_points.size());
 
   for (const auto &cell : dof_handler.active_cell_iterators())
     {
@@ -109,12 +106,9 @@ test(const unsigned int degree)
       deallog << "Cell with center " << cell->center(true) << std::endl;
       for (unsigned int i = 0; i < function_values.size(); ++i)
         deallog << mapping.transform_unit_to_real_cell(cell, unit_points[i])
-                << ": " << factor_float * evaluator.get_value(i)
-                << " error value "
-                << factor_float * (function_values[i] - evaluator.get_value(i))
-                << " error grad "
-                << factor_float *
-                     (evaluator.get_gradient(i) - function_gradients[i]).norm()
+                << ": " << evaluator.get_value(i) << " error value "
+                << function_values[i] - evaluator.get_value(i) << " error grad "
+                << (evaluator.get_gradient(i) - function_gradients[i]).norm()
                 << std::endl;
       deallog << std::endl;
 
@@ -130,7 +124,7 @@ test(const unsigned int degree)
                           EvaluationFlags::values | EvaluationFlags::gradients);
 
       for (const auto i : solution_values)
-        deallog << factor_float * i << " ";
+        deallog << i << " ";
       deallog << std::endl;
     }
 }
@@ -147,6 +141,4 @@ main()
   test<2>(2);
   test<2>(6);
   test<3>(5);
-
-  test<3, float>(5);
 }
