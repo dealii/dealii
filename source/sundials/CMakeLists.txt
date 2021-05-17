@@ -18,7 +18,6 @@ INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 SET(_src
   arkode.cc
   ida.cc
-  copy.cc
   kinsol.cc
   n_vector.cc
   sunlinsol_wrapper.cc
