@@ -162,8 +162,13 @@ namespace Functions
   {
     Assert(initialized, ExcNotInitialized());
     Tensor<1, dim> ret;
-    for (unsigned int i = 0; i < dim; ++i)
-      ret[i] = base[i]->gradient(Point<1>(p[i]), component)[0];
+    for (unsigned int d = 0; d < dim; ++d)
+      {
+        ret[d] = base[d]->gradient(Point<1>(p[d]), component)[0];
+        for (unsigned int i = 0; i < dim; ++i)
+          if (i != d)
+            ret[d] *= base[i]->value(Point<1>(p[i]), component);
+      }
     return ret;
   }
 
