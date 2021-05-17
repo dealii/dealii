@@ -572,7 +572,7 @@
  *       <td>step-66</td>
  *       <td> A matrix-free geometric multigrid solver for a nonlinear problem.
  *       <br/> Keywords: MatrixFree, Multigrid,
- *       MGTransferMatrixFree::interpolate_to_mg(),
+ *       MGTransferMatrixFree::interpolate_to_mg(), MatrixFreeTools::compute_diagonal(),
  *       TransfiniteInterpolationManifold, MappingQGeneric
  *       </td></tr>
  *
