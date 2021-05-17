@@ -222,6 +222,10 @@ namespace SUNDIALS
 
       template <typename VectorType>
       realtype
+      weighted_rms_norm_mask(N_Vector x, N_Vector w, N_Vector mask);
+
+      template <typename VectorType>
+      realtype
       max_norm(N_Vector x);
 
       template <
@@ -667,6 +671,24 @@ SUNDIALS::internal::NVectorOperations::weighted_rms_norm(N_Vector x, N_Vector w)
 
 template <typename VectorType>
 realtype
+SUNDIALS::internal::NVectorOperations::weighted_rms_norm_mask(N_Vector x,
+                                                              N_Vector w,
+                                                              N_Vector mask)
+{
+  // TODO copy can be avoided by a custom kernel
+  VectorType tmp         = *unwrap_nvector_const<VectorType>(x);
+  auto *     w_dealii    = unwrap_nvector_const<VectorType>(w);
+  auto *     mask_dealii = unwrap_nvector_const<VectorType>(mask);
+  const auto n           = tmp.size();
+  tmp.scale(*w_dealii);
+  tmp.scale(*mask_dealii);
+  return tmp.l2_norm() / std::sqrt(n);
+}
+
+
+
+template <typename VectorType>
+realtype
 SUNDIALS::internal::NVectorOperations::max_norm(N_Vector x)
 {
   return unwrap_nvector_const<VectorType>(x)->linfty_norm();
@@ -940,11 +962,11 @@ SUNDIALS::internal::create_empty_nvector()
   v->ops->nvdotprod   = NVectorOperations::dot_product<VectorType>;
   v->ops->nvmaxnorm   = NVectorOperations::max_norm<VectorType>;
   v->ops->nvwrmsnorm  = NVectorOperations::weighted_rms_norm<VectorType>;
-  //  v->ops->nvwrmsnormmask = undef;
-  v->ops->nvmin     = NVectorOperations::min_element<VectorType>;
-  v->ops->nvwl2norm = NVectorOperations::weighted_l2_norm<VectorType>;
-  v->ops->nvl1norm  = NVectorOperations::l1_norm<VectorType>;
-  ;
+  v->ops->nvmin       = NVectorOperations::min_element<VectorType>;
+  v->ops->nvwl2norm   = NVectorOperations::weighted_l2_norm<VectorType>;
+  v->ops->nvl1norm    = NVectorOperations::l1_norm<VectorType>;
+  v->ops->nvwrmsnormmask =
+    NVectorOperations::weighted_rms_norm_mask<VectorType>;
   //  v->ops->nvcompare      = undef;
   //  v->ops->nvinvtest      = undef;
   //  v->ops->nvconstrmask   = undef;
