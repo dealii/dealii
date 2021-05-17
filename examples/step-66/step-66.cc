@@ -403,6 +403,13 @@ namespace Step66
       const LinearAlgebra::distributed::Vector<double> &src) const;
 
     void
+    local_evaluate_residual(
+      const MatrixFree<dim, double> &                   data,
+      LinearAlgebra::distributed::Vector<double> &      dst,
+      const LinearAlgebra::distributed::Vector<double> &src,
+      const std::pair<unsigned int, unsigned int> &     cell_range) const;
+
+    void
     assemble_rhs();
 
     double
@@ -664,31 +671,62 @@ namespace Step66
   // Newton step to check if we already reached the error tolerance. As this
   // function should not affect any class variable we define it as a constant
   // function. Internally we exploit the fast finite element evaluation through
-  // the FEEvaluation class, similar to <code>local_apply</code> function of the
-  // <code>JacobianOperator</code>.
+  // the FEEvaluation class and the MatrixFree::cell_loop(), similar to
+  // <code>apply_add()</code> function of the <code>JacobianOperator</code>.
+  //
+  // First we create a pointer to the MatrixFree object, which is stored in
+  // the <code>system_matrix</code>.
+  // Then we pass the worker function <code>local_evaluate_residual()</code>
+  // for the cell wise evaulation of the residual together with the input and
+  // output vector to the MatrixFree::cell_loop(). In addition, we enable the
+  // zero out of the output vector in the loop, which is more efficient than
+  // calling <code>dst = 0.0</code> separately before.
+  //
+  // Note that with this approach we do not
+  // have to take care about the MPI related data exchange, since all the
+  // bookkeeping is done by the MatrixFree::cell_loop().
   template <int dim, int fe_degree>
   void
   GelfandProblem<dim, fe_degree>::evaluate_residual(
     LinearAlgebra::distributed::Vector<double> &      dst,
     const LinearAlgebra::distributed::Vector<double> &src) const
   {
-    // First we update the ghost values of the given input vector
-    // <code>src</code> and clear the output vector <code>dst</code>.
-    src.update_ghost_values();
-    dst = 0.0;
+    auto matrix_free = system_matrix.get_matrix_free();
 
-    // Then we get a reference to the MatrixFree object stored in the
-    // <code>JacobianOperator</code> and set up the FEEvaluation.
-    const MatrixFree<dim, double> &data = *system_matrix.get_matrix_free();
-    FEEvaluation<dim, fe_degree>   phi(data);
+    matrix_free->cell_loop(&GelfandProblem::local_evaluate_residual,
+                           this,
+                           dst,
+                           src,
+                           /*zero_dst_vector = */ true);
+  }
 
-    // At the main part of this function we loop over all cell batches defined
-    // in the MatrixFree object and compute the residual evaluation, by
-    // evaluating the input vector and integrate against the test functions
-    // according to the weak formulation of the <i>Gelfand problem</i>.
-    for (unsigned int cell = 0; cell < data.n_cell_batches(); ++cell)
+
+
+  // @sect4{GelfandProblem::local_evaluate_residual}
+
+  // This is the internal worker function for the evaluation of the residual.
+  // Essentially it has the same structure as the <code>local_apply()</code>
+  // function of the <code>JacobianOperator</code> and evaluates the residual
+  // for the input vector <code>src</code> on the given set of
+  // cells <code>cell_range</code>. The difference to the above mentioned
+  // <code>local_apply()</code> function is, that we split the
+  // FEEvaluation::gather_evaluate() function into
+  // FEEvaluation::read_dof_values_plain() and FEEvaluation::evaluate(), since
+  // the input vector might have constrained DOFs.
+  template <int dim, int fe_degree>
+  void
+  GelfandProblem<dim, fe_degree>::local_evaluate_residual(
+    const MatrixFree<dim, double> &                   data,
+    LinearAlgebra::distributed::Vector<double> &      dst,
+    const LinearAlgebra::distributed::Vector<double> &src,
+    const std::pair<unsigned int, unsigned int> &     cell_range) const
+  {
+    FEEvaluation<dim, fe_degree, fe_degree + 1, 1, double> phi(data);
+
+    for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
       {
         phi.reinit(cell);
+
         phi.read_dof_values_plain(src);
         phi.evaluate(EvaluationFlags::values | EvaluationFlags::gradients);
 
@@ -702,14 +740,6 @@ namespace Step66
                                 EvaluationFlags::gradients,
                               dst);
       }
-
-    // Finally, we must not forget to initiate the MPI data exchange via the
-    // <code>compress</code> function.
-    dst.compress(VectorOperation::add);
-    
-    
-    // For bookkeeping we zero out the ghost values.
-    src.zero_out_ghost_values();
   }
 
 
@@ -766,7 +796,9 @@ namespace Step66
 
     evaluation_point = solution;
     if (alpha > 1e-12)
-      evaluation_point.add(alpha, newton_update);
+      {
+        evaluation_point.add(alpha, newton_update);
+      }
 
     evaluate_residual(residual, evaluation_point);
 
@@ -884,8 +916,8 @@ namespace Step66
     constraints.distribute(newton_update);
 
     linear_iterations = solver_control.last_step();
-    
-    
+
+
     // Then for bookkeeping we zero out the ghost values.
     solution.zero_out_ghost_values();
   }
@@ -996,7 +1028,7 @@ namespace Step66
                                       norm_per_cell,
                                       QGauss<dim>(fe.degree + 2),
                                       VectorTools::H1_seminorm);
-    
+
     solution.zero_out_ghost_values();
 
     return VectorTools::compute_global_error(triangulation,
@@ -1056,7 +1088,7 @@ namespace Step66
     data_out.set_flags(flags);
     data_out.write_vtu_with_pvtu_record(
       "./", "solution", cycle, MPI_COMM_WORLD, 3);
-    
+
     solution.zero_out_ghost_values();
   }
 
