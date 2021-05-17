@@ -1042,8 +1042,51 @@ TimerOutput::reset()
   timer_all.restart();
 }
 
+
+
+  namespace
+  {
+      /**
+       * Abort, should there be an exception being processed (see the error
+       * message).
+       */
+      void
+      check_exception(const std::string &scope_name)
+      {
+#  ifdef DEAL_II_WITH_MPI
+#    if __cpp_lib_uncaught_exceptions >= 201411
+        // std::uncaught_exception() is deprecated in c++17
+        if (std::uncaught_exceptions() != 0)
+#    else
+        if (std::uncaught_exception() == true)
+#    endif
+          {
+            std::cerr
+              << "---------------------------------------------------------\n"
+              << "The timer scope named <" << scope_name << "> is destroyed, but this \n"
+              << "requires MPI synchronization. Since an exception is\n"
+              << "currently uncaught, this synchronization would likely\n"
+              << "deadlock because only the current process is trying to\n"
+              << "destroy the object. As a consequence, the program will be\n"
+              << "aborted.\n"
+              << "---------------------------------------------------------"
+              << std::endl;
+
+            MPI_Abort(MPI_COMM_WORLD, 1);
+          }
+#  else
+        (void)type;
+        (void)name;
+#  endif
+      }
+  }   // namespace
+
+
+
 TimerOutput::Scope::~Scope()
 {
+  check_exception(section_name);
+
   try
     {
       stop();
