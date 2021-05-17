@@ -16,6 +16,8 @@
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/grid_tools_cache.h>
 
+#include <deal.II/numerics/vector_tools.h>
+
 #include <deal.II/particles/particle_handler.h>
 
 #include <memory>
@@ -437,11 +439,19 @@ namespace Particles
     local_start_index += local_next_particle_index;
 
     auto point_locations =
-      GridTools::compute_point_locations(*triangulation_cache, positions);
+      GridTools::compute_point_locations_try_all(*triangulation_cache,
+                                                 positions);
 
     auto &cells           = std::get<0>(point_locations);
     auto &local_positions = std::get<1>(point_locations);
     auto &index_map       = std::get<2>(point_locations);
+    auto &missing_points  = std::get<3>(point_locations);
+    // If a point was not found, throwing an error, as the old
+    // implementation of compute_point_locations would have done
+    AssertThrow(std::get<3>(point_locations).size() == 0,
+                VectorTools::ExcPointNotAvailableHere());
+
+    (void)missing_points;
 
     if (cells.size() == 0)
       return;
