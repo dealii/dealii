@@ -1,1 +1,150 @@
 <h1>Results</h1>
+
+The aim of this tutorial step was to demonstrate the solution of a nonlinear PDE with the matrix-free framework.
+
+<h3>Program output</h3>
+Running the program via
+@code
+cmake . && make release && make && mpirun -n 2 ./step-66
+@endcode
+gives the following output on the console
+
+TODO New output
+@code
+================================================================================
+START DATE: 2021/5/3, TIME: 19:06:13
+--------------------------------------------------------------------------------
+Running with 2 MPI processes
+Vectorization over 4 doubles = 256 bits (AVX), VECTORIZATION_LEVEL=2
+Finite element space: FE_Q<2>(4)
+================================================================================
+--------------------------------------------------------------------------------
+Cycle 0
+--------------------------------------------------------------------------------
+Setup system...
+   Triangulation: 20 cells
+   DoFHandler:    337 DoFs
+
+Solve using Newton's method...
+   Nstep 1, errf = 0.00259891, errx = 3.0903, it = 8
+   Nstep 2, errf = 1.40407e-06, errx = 0.0657231, it = 8
+   Nstep 3, errf = 9.0017e-13, errx = 3.54562e-05, it = 7
+Convergence step 3 value 9.0017e-13 (used wall time: 0.0173716 s)
+
+Time for setup+solve (CPU/Wall) 0.010866/0.0215132 s
+
+Output results...
+  H1 seminorm: 0.664407
+
+
+
++---------------------------------------------+------------+------------+
+| Total wallclock time elapsed since start    |    0.0251s |            |
+|                                             |            |            |
+| Section                         | no. calls |  wall time | % of total |
++---------------------------------+-----------+------------+------------+
+| assemble right hand side        |         3 |  0.000167s |      0.67% |
+| compute residual                |         3 |  7.57e-05s |       0.3% |
+| compute update                  |         3 |    0.0167s |        67% |
+| make grid                       |         1 |   0.00107s |       4.2% |
+| setup system                    |         1 |   0.00371s |        15% |
+| solve                           |         1 |    0.0174s |        69% |
++---------------------------------+-----------+------------+------------+
+
+--------------------------------------------------------------------------------
+Cycle 1
+--------------------------------------------------------------------------------
+Setup system...
+   Triangulation: 80 cells
+   DoFHandler:    1313 DoFs
+
+Solve using Newton's method...
+   Nstep 1, errf = 0.00172751, errx = 6.96753, it = 9
+   Nstep 2, errf = 1.48839e-06, errx = 0.186711, it = 9
+   Nstep 3, errf = 1.39271e-12, errx = 0.000161801, it = 8
+   Nstep 4, errf = 4.00139e-13, errx = 1.23232e-10, it = 6
+Convergence step 4 value 4.00139e-13 (used wall time: 0.0392664 s)
+
+Time for setup+solve (CPU/Wall) 0.036639/0.0444511 s
+
+Output results...
+  H1 seminorm: 0.746796
+
+
+
++---------------------------------------------+------------+------------+
+| Total wallclock time elapsed since start    |    0.0614s |            |
+|                                             |            |            |
+| Section                         | no. calls |  wall time | % of total |
++---------------------------------+-----------+------------+------------+
+| assemble right hand side        |         4 |  0.000623s |         1% |
+| compute residual                |         4 |  0.000261s |      0.43% |
+| compute update                  |         4 |    0.0359s |        59% |
+| setup system                    |         1 |   0.00482s |       7.9% |
+| solve                           |         1 |    0.0393s |        64% |
++---------------------------------+-----------+------------+------------+
+
+.
+.
+.
+@endcode
+
+The solution itself looks not that fancy, however, at least we want to show it for the two- and three-dimensional problem in the following figure.
+
+TODO How to include figures?
+
+<div class="twocolumn" style="width: 80%; text-align: center;">
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step-66.solution-2d.png"
+         alt="Solution of the two-dimensional Gelfand problem.">
+  </div>
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step-66.solution-3d.png"
+         alt="Solution of the three-dimensional Gelfand problem.">
+  </div>
+</div>
+
+
+
+<h3>Newton solver</h3>
+In the program output above we can read some interesting information on the Newton iteration. The major output in each refinement cycle is the detailed diagnostics of the Newton method, which shows first of all the number of Newton steps and for each step the residual $\|F(u_h^{n+1})\|$, the norm of the Newton update $\|s_h^n\|$ and the number of CG iterations <code>itmax</code>.
+
+We observe that for all cases the Newton method converges in approximately three to four steps, which shows the quadratic convergence of the Newton method with full step length $\alpha = 1$. However, be aware that for a badly chosen initial guess $u_h^0$, the Newton method will diverge also quadratically. Usually if you do not have an appropriate initial guess, one tries some few damped Newton steps with reduced step length $\alpha < 1$ until the Newton step is again in the quadratic convergence domain. This damping and relaxation of the Newton step length needs truly a more sophisticated implementation of the Newton method, which we left as usual as exercise. Furthermore, we see that the number of CG iterations is approximately constant against successively mesh refinement and an increasing number of DOFs. This is of course due to the employed geometric multigrid preconditioner and similar to the description of the results in step-16, step-37 and others. Just to give an example, in the three-dimensional case on refinement level five having distributed appriximately 14.7e6 DOFs according to the fourth-order Lagrangian finite element method, the number of CG iterations is still less than ten.
+
+In any case, there is one more very useful optimization that should be mentioned here. In the <code>compute_update()</code> function we explicitly reset the vector holding the Newton update before passing as output vector to the SolverCG. In that case we use a zero staring value for the CG method, which is more suitable than the previous Newton step and thus reduces the number of CG iterations by some few steps.
+
+TODO Mathematical background of this? Zero vector is in every subspace contained.
+
+
+
+<h3>Possibilities for extensions</h3>
+
+A couple of possible extensions are available.
+
+<h4>More sophisticated Newton iteration</h4>
+Beside a step size controlled version of the Newton iteration, one could implement a more flexible stopping criterion for the Newton iteration. For example based on a mixed error control with an given absolute and relative tolerance.
+
+TODO Citation?
+
+<h4>Eigenvalue problem</h4>
+One can consider the corresponding eigenvalue problem, which is called Bratu problem. For example, if we define a fixed eigenvalue $\lambda\in[0,6]$, we can compute the corresponding discrete eigenfunction. You will notice that the number of Newton steps will increase with increasing $\lambda$. To reduce the number of Newton steps you can use a trick by starting from a certain $\lambda$, compute the eigenfunction, increase $\lambda=\lambda + \delta_\lambda$ and use the previous solution as initial guess for the Newton iteration. In the end you can plot the $H^1(\Omega)$-norm over the eigenvalue. What do you observe for further increasing $\lambda>7$?
+
+
+
+
+<h4>Extension for future update of the tutorial</h4>
+
+- Parallel scalability, see castelli2021numerical
+
+- Comparison against matrix-based AMG, see step-50
+
+- Thread parallelism
+
+- @kronbichler's comment in #8229
+Can you make MGTransferMatrixFree a class member? From an educational point of
+view, I think it would make sense to show that the transfer only needs to be
+set up once and can be re-used in subsequent nonlinear iterations. This is
+different to the mg_smoother object that must indeed be rebuilt because the
+diagonal changes (even though one could try to find a balance of not
+recomputing in every iteration - that would make for a good possibility for
+extensions, though).
