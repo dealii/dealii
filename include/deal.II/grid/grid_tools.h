@@ -1302,7 +1302,7 @@ namespace GridTools
                                 const unsigned int             vertex_index);
 
   /**
-   * Find an active cell that surrounds a given point @p p. The return type
+   * Find an active non-artificial cell that surrounds a given point @p p. The return type
    * is a pair of an iterator to the active cell along with the unit cell
    * coordinates of the point.
    *
@@ -1412,10 +1412,10 @@ namespace GridTools
     const double                                tolerance = 1.e-10);
 
   /**
-   * Finding an active cell around a point can be very expensive in terms
-   * of computational costs. This function aims at providing a fast version
-   * of the above functions by using a space-tree to speed up the geometry
-   * search.
+   * Finding an active non-artificial cell around a point can be very expensive
+   * in terms of computational costs. This function aims at providing a fast
+   * version of the above functions by using a space-tree to speed up the
+   * geometry search.
    *
    * @param cache Object with information about the space-tree of a triangulation,
    * see GridTools::Cache.
@@ -1510,9 +1510,10 @@ namespace GridTools
     const double tolerance = 1.e-10);
 
   /**
-   * As compared to the functions above, this function identifies all cells
-   * around a point for a given tolerance level `tolerance` in terms of unit
-   * coordinates. Given a first cell with reference coordinates as parameter
+   * As compared to the functions above, this function identifies all active
+   * non-artificial cells around a point for a given tolerance level `tolerance`
+   * in terms of unit coordinates. Given a first cell with reference coordinates
+   * as parameter
    * @p first_cell, e.g. obtained by one of the functions above, all
    * corresponding neighboring cells with points in unit coordinates are also
    * identified.
@@ -1550,8 +1551,8 @@ namespace GridTools
   /**
    * A variant of the previous function that internally calls one of the
    * functions find_active_cell_around_point() to obtain a first cell, and
-   * subsequently adds all other cells by calling the function
-   * find_all_active_cells_around_point() above.
+   * subsequently adds all other active non-artificial cells by calling the
+   * function find_all_active_cells_around_point() above.
    */
   template <int dim, template <int, int> class MeshType, int spacedim>
 #  ifndef _MSC_VER
