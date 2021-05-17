@@ -64,9 +64,11 @@
 // to evaluate the result of the simulation.
 #include <deal.II/numerics/vector_tools.h>
 
-// We need this header for the function GridTools::find_active_cell_around_point
-// that we use in the function `ElasticWave::store_frequency_step_data()`
+// We need these headers for the function
+// GridTools::find_active_cell_around_point that we use in the function
+// `ElasticWave::store_frequency_step_data()`
 #include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/grid_tools_cache.h>
 
 namespace step62
 {
@@ -1054,6 +1056,13 @@ namespace step62
     // displacement_data contains the value of the displacement at these points.
     std::vector<hsize_t>              coordinates;
     std::vector<std::complex<double>> displacement_data;
+
+    const auto &mapping = get_default_linear_mapping(triangulation);
+    GridTools::Cache<dim, dim> cache(triangulation, mapping);
+    typename Triangulation<dim, dim>::active_cell_iterator cell_hint{};
+    std::vector<bool>                                      marked_vertices = {};
+    const double                                           tolerance = 1.e-10;
+
     for (unsigned int position_idx = 0;
          position_idx < parameters.nb_probe_points;
          ++position_idx)
@@ -1063,17 +1072,16 @@ namespace step62
           {
             point[dim_idx] = probe_positions[position_idx][dim_idx];
           }
-        bool point_in_locally_owned_cell;
+        bool point_in_locally_owned_cell = false;
         {
-          // First we have to find out if the point is in a locally owned cell.
-          auto mapping = StaticMappingQ1<dim>::mapping;
-          const std::pair<typename DoFHandler<dim>::active_cell_iterator,
-                          Point<dim>>
-            cell_point = GridTools::find_active_cell_around_point(mapping,
-                                                                  dof_handler,
-                                                                  point);
-
-          point_in_locally_owned_cell = cell_point.first->is_locally_owned();
+          auto cell_and_ref_point = GridTools::find_active_cell_around_point(
+            cache, point, cell_hint, marked_vertices, tolerance);
+          if (cell_and_ref_point.first.state() == IteratorState::valid)
+            {
+              cell_hint = cell_and_ref_point.first;
+              point_in_locally_owned_cell =
+                cell_and_ref_point.first->is_locally_owned();
+            }
         }
         if (point_in_locally_owned_cell)
           {
