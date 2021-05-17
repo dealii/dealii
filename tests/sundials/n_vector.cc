@@ -229,7 +229,7 @@ test_nvector_view_unwrap()
       unwrap_nvector<VectorType>(const_n_vector);
       Assert(false, NVectorTestError());
     }
-  catch (ExcMessage e)
+  catch (const ExcMessage &e)
     {
       const std::string msg(e.what());
       Assert(msg.find(
@@ -614,6 +614,30 @@ test_weighted_rms_norm_mask()
 
 template <typename VectorType>
 void
+test_weighted_l2_norm()
+{
+  const auto vector_a = create_test_vector<VectorType>(2.0);
+  const auto vector_b = create_test_vector<VectorType>(3.0);
+
+  auto nv_a = make_nvector_view(vector_a);
+  auto nv_b = make_nvector_view(vector_b);
+
+  const auto result = N_VWL2Norm(nv_a, nv_b);
+
+  auto vector_a_reference = create_test_vector<VectorType>(2.0);
+  auto vector_b_reference = create_test_vector<VectorType>(3.0);
+  vector_a_reference.scale(vector_b_reference);
+  const auto result_reference = vector_a_reference.l2_norm();
+
+  Assert(std::fabs(result - result_reference) < 1e-12, NVectorTestError());
+
+  deallog << "test_weighted_l2_norm OK" << std::endl;
+}
+
+
+
+template <typename VectorType>
+void
 test_max_norm()
 {
   const auto vector_a = create_test_vector<VectorType>(2.0);
@@ -629,6 +653,27 @@ test_max_norm()
   Assert(std::fabs(result - 3.0) < 1e-12, NVectorTestError());
 
   deallog << "test_max_norm OK" << std::endl;
+}
+
+
+
+template <typename VectorType>
+void
+test_l1_norm()
+{
+  const auto vector_a = create_test_vector<VectorType>(2.0);
+  const auto vector_b = create_test_vector<VectorType>(-3.0);
+
+  auto nv_a = make_nvector_view(vector_a);
+  auto nv_b = make_nvector_view(vector_b);
+
+  auto result = N_VL1Norm(nv_a);
+  Assert(std::fabs(result - vector_a.l1_norm()) < 1e-12, NVectorTestError());
+
+  result = N_VL1Norm(nv_b);
+  Assert(std::fabs(result - vector_b.l1_norm()) < 1e-12, NVectorTestError());
+
+  deallog << "test_l1_norm OK" << std::endl;
 }
 
 
@@ -702,7 +747,9 @@ run_all_tests(const std::string &prefix)
   test_elementwise_abs<VectorType>();
   test_weighted_rms_norm<VectorType>();
   test_weighted_rms_norm_mask<VectorType>();
+  test_weighted_l2_norm<VectorType>();
   test_max_norm<VectorType>();
+  test_l1_norm<VectorType>();
   test_min_element<VectorType>();
   test_scale<VectorType>();
 }
