@@ -22,15 +22,22 @@
 
 #include "../tests.h"
 
-// Solve a nonlinear system but provide only residual function. KINSOL
-// then uses its internal solvers which are based on a
-// finite-difference approximation to the Jacobian and a direct
-// solver.
+// Solve a nonlinear system using fixed point iteration, and Anderson
+// acceleration
 
 /**
- * Solve the non linear problem
- *
- * F(u) = 0 , where f_i(u) = u_i^2 - i^2,  0 <= i < N
+ * The following is a simple example problem, with the coding
+ * needed for its solution by the accelerated fixed point solver in
+ * KINSOL.
+ * The problem is from chemical kinetics, and consists of solving
+ * the first time step in a Backward Euler solution for the
+ * following three rate equations:
+ *    dy1/dt = -.04*y1 + 1.e4*y2*y3
+ *    dy2/dt = .04*y1 - 1.e4*y2*y3 - 3.e2*(y2)^2
+ *    dy3/dt = 3.e2*(y2)^2
+ * on the interval from t = 0.0 to t = 0.1, with initial
+ * conditions: y1 = 1.0, y2 = y3 = 0. The problem is stiff.
+ * Run statistics (optional outputs) are printed at the end.
  */
 int
 main(int argc, char **argv)
@@ -46,31 +53,35 @@ main(int argc, char **argv)
   ParameterHandler                             prm;
   data.add_parameters(prm);
 
-  std::ifstream ifile(SOURCE_DIR "/kinsol_01.prm");
+  std::ifstream ifile(SOURCE_DIR "/kinsol_fixed_point.prm");
   prm.parse_input(ifile);
 
   // Size of the problem
-  unsigned int N = 10;
+  unsigned int N = 3;
 
   SUNDIALS::KINSOL<VectorType> kinsol(data);
 
   kinsol.reinit_vector = [N](VectorType &v) { v.reinit(N); };
 
-  kinsol.residual = [](const VectorType &u, VectorType &F) -> int {
-    for (unsigned int i = 0; i < u.size(); ++i)
-      F[i] = u[i] * u[i] - (i + 1) * (i + 1);
-    return 0;
-  };
-
-
+  // Robert example
   kinsol.iteration_function = [](const VectorType &u, VectorType &F) -> int {
-    for (unsigned int i = 0; i < u.size(); ++i)
-      F[i] = u[i] * u[i] - i * i - u[i];
+    const double dstep = 0.1;
+    const double y10   = 1.0;
+    const double y20   = 0.0;
+    const double y30   = 0.0;
+
+    const double yd1 = dstep * (-0.04 * u[0] + 1.0e4 * u[1] * u[2]);
+    const double yd3 = dstep * 3.0e2 * u[1] * u[1];
+
+    F[0] = yd1 + y10;
+    F[1] = -yd1 - yd3 + y20;
+    F[2] = yd3 + y30;
+
     return 0;
   };
 
   VectorType v(N);
-  v          = 1.0;
+  v[0]       = 1;
   auto niter = kinsol.solve(v);
   v.print(deallog.get_file_stream());
   deallog << "Converged in " << niter << " iterations." << std::endl;

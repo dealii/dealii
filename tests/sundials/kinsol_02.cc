@@ -22,23 +22,18 @@
 
 #include "../tests.h"
 
-// Solve a nonlinear system but provide only residual function. KINSOL
-// then uses its internal solvers which are based on a
-// finite-difference approximation to the Jacobian and a direct
-// solver.
+// Solve a nonlinear system in the form accepted by Picard iteration.
 //
-// Compared to the _01 test, this is simply a more complicated function:
 // We solve the nonlinear problem
 //
-//   F(u) = 0
+// F(u) = L u + N(u) = 0
 //
-// with a 2-dimensional vector u and where
+// where L is a constant matrix, and N(u) is non linear.
 //
-//   F(u) = [  cos(u1 + u2) - 1   ]              -> u1=-u2
-//          [  sin(u1 - u2)       ]              -> u1=u2
+// We set L = id and
 //
-// In other words, we need to find the solution u1=u2=0.
-
+// N_i(u) = .1*u_i^2 - i - 1
+//
 int
 main(int argc, char **argv)
 {
@@ -49,43 +44,54 @@ main(int argc, char **argv)
 
   using VectorType = Vector<double>;
 
+  // Size of the problem
+  unsigned int N = 2;
+
+  FullMatrix<double> L(N, N);
+  L(0, 0) = 1;
+  L(1, 1) = 1;
+  L(0, 1) = 1;
+
+  FullMatrix<double> Linv(N, N);
+  Linv.invert(L);
+
   SUNDIALS::KINSOL<VectorType>::AdditionalData data;
   ParameterHandler                             prm;
   data.add_parameters(prm);
 
-  std::ifstream ifile(SOURCE_DIR "/kinsol_01.prm");
+  std::ifstream ifile(SOURCE_DIR "/kinsol_picard.prm");
   prm.parse_input(ifile);
-
-  // Size of the problem
-  unsigned int N = 2;
 
   SUNDIALS::KINSOL<VectorType> kinsol(data);
 
   kinsol.reinit_vector = [N](VectorType &v) { v.reinit(N); };
 
-  kinsol.residual = [](const VectorType &u, VectorType &F) -> int {
-    F(0) = std::cos(u[0] + u[1]) - 1;
-    F(1) = std::sin(u[0] - u[1]);
+  kinsol.residual = [&](const VectorType &u, VectorType &F) -> int {
+    F = u;
+
+    F[0] += .1 * u[0] * u[0] - 1;
+    F[1] += .1 * u[1] * u[1] - 2;
     return 0;
   };
 
+  kinsol.solve_with_jacobian =
+    [&](const VectorType &rhs, VectorType &dst, double) -> int {
+    dst = rhs;
+    return 0;
+  };
 
-  kinsol.iteration_function = [](const VectorType &u, VectorType &F) -> int {
-    // We want a Newton-type scheme, not a fixed point iteration. So we
-    // shouldn't get into this function.
-    std::abort();
-
-    // But if anyone wanted to see how it would look like:
-    F(0) = std::cos(u[0] + u[1]) - 1 - u[0];
-    F(1) = std::sin(u[0] - u[1]) - u[1];
+  kinsol.solve_jacobian_system = [&](const VectorType &,
+                                     const VectorType &,
+                                     const VectorType &rhs,
+                                     VectorType &      dst) -> int {
+    dst = rhs;
     return 0;
   };
 
   VectorType v(N);
-  v(0) = 0.5;
-  v(1) = 1.234;
 
   auto niter = kinsol.solve(v);
+
   v.print(deallog.get_file_stream());
   deallog << "Converged in " << niter << " iterations." << std::endl;
 }

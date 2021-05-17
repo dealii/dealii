@@ -66,10 +66,7 @@ namespace SUNDIALS
    *
    * KINSOL's Newton solver employs the inexact Newton method. As this solver
    * is intended mainly for large systems, the user is required to provide
-   * their own solver function. If a solver function is not provided, the
-   * internal dense solver of KINSOL is used. Be warned that this solver
-   * computes the Jacobian approximately, and may be efficient only for small
-   * systems.
+   * their own solver function.
    *
    * At the highest level, KINSOL implements the following iteration
    * scheme:
@@ -136,22 +133,6 @@ namespace SUNDIALS
    * algorithm is that the full Newton step tends to be taken close to the
    * solution.
    *
-   * As a user option, KINSOL permits the application of inequality
-   * constraints, $u_i > 0$ and $u_i < 0$, as well as $u_i \geq 0$ and $u_i
-   * \leq 0$, where $u_i$ is the $i$-th component of $u$. Any such constraint,
-   * or no constraint, may be imposed on each component by providing the
-   * optional functions
-   * - get_lower_than_zero_constrained_entries()
-   * - get_greater_than_zero_constrained_entries()
-   * - get_lower_equal_than_zero_constrained_entries()
-   * - get_greater_or_equal_than_zero_constrained_entries()
-   *
-   * KINSOL will reduce step lengths in order to ensure that no constraint is
-   * violated. Specifically, if a new Newton iterate will violate a constraint,
-   * the maximum step length along the Newton direction that will satisfy all
-   * constraints is found, and $\delta_n$ is scaled to take a step of that
-   * length.
-   *
    * The basic fixed-point iteration scheme implemented in KINSOL is given by:
    * - Set $u_0 =$ an initial guess
    * - For $n = 0, 1, 2, \dots$ until convergence do:
@@ -180,20 +161,17 @@ namespace SUNDIALS
    * or
    *  - iteration_function;
    *
-   * Specifying residual() allows the user to use Newton strategies (i.e.,
-   * $F(u)=0$ will be solved), while specifying iteration_function(), fixed
-   * point iteration or Picard iteration will be used (i.e., $G(u)=u$ will be
-   * solved).
+   * Specifying residual() allows the user to use Newton and Picard strategies
+   * (i.e., $F(u)=0$ will be solved), while specifying iteration_function(), a
+   * fixed point iteration will be used (i.e., $G(u)=u$ will be solved).
    *
-   * If the use of a Newton method is desired, then the user should also supply
-   *  - solve_jacobian_system;
+   * If the use of a Newton or Picard method is desired, then the user should
+   * also supply
+   *  - solve_jacobian_system or solve_with_jacobian;
    * and optionally
    *  - setup_jacobian;
    *
-   * If the solve_jacobian_system() function is not supplied, then KINSOL will
-   * use its internal dense solver for Newton methods, with approximate
-   * Jacobian. This may be very expensive for large systems. Fixed point
-   * iteration does not require the solution of any linear system.
+   * Fixed point iteration does not require the solution of any linear system.
    *
    * Also the following functions could be rewritten, to provide additional
    * scaling factors for both the solution and the residual evaluation during
@@ -710,11 +688,6 @@ namespace SUNDIALS
      * KINSOL memory object.
      */
     void *kinsol_mem;
-
-    /**
-     * MPI communicator. SUNDIALS solver runs happily in parallel.
-     */
-    MPI_Comm communicator;
 
     /**
      * Memory pool of vectors.

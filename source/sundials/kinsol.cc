@@ -133,7 +133,7 @@ namespace SUNDIALS
   {
     template <typename VectorType>
     int
-    residual_or_iteration_callback(N_Vector yy, N_Vector FF, void *user_data)
+    residual_callback(N_Vector yy, N_Vector FF, void *user_data)
     {
       KINSOL<VectorType> &solver =
         *static_cast<KINSOL<VectorType> *>(user_data);
@@ -144,7 +144,26 @@ namespace SUNDIALS
       int err = 0;
       if (solver.residual)
         err = solver.residual(*src_yy, *dst_FF);
-      else if (solver.iteration_function)
+      else
+        Assert(false, ExcInternalError());
+
+      return err;
+    }
+
+
+
+    template <typename VectorType>
+    int
+    iteration_callback(N_Vector yy, N_Vector FF, void *user_data)
+    {
+      KINSOL<VectorType> &solver =
+        *static_cast<KINSOL<VectorType> *>(user_data);
+
+      auto *src_yy = internal::unwrap_nvector_const<VectorType>(yy);
+      auto *dst_FF = internal::unwrap_nvector<VectorType>(FF);
+
+      int err = 0;
+      if (solver.iteration_function)
         err = solver.iteration_function(*src_yy, *dst_FF);
       else
         Assert(false, ExcInternalError());
@@ -281,20 +300,15 @@ namespace SUNDIALS
           return err;
         }
     }
-
 #  endif
   } // namespace
 
 
 
   template <typename VectorType>
-  KINSOL<VectorType>::KINSOL(const AdditionalData &data,
-                             const MPI_Comm &      mpi_comm)
+  KINSOL<VectorType>::KINSOL(const AdditionalData &data, const MPI_Comm &)
     : data(data)
     , kinsol_mem(nullptr)
-    , communicator(is_serial_vector<VectorType>::value ?
-                     MPI_COMM_SELF :
-                     Utilities::MPI::duplicate_communicator(mpi_comm))
   {
     set_functions_to_trigger_an_assert();
   }
@@ -306,15 +320,6 @@ namespace SUNDIALS
   {
     if (kinsol_mem)
       KINFree(&kinsol_mem);
-
-#  ifdef DEAL_II_WITH_MPI
-    if (is_serial_vector<VectorType>::value == false)
-      {
-        const int ierr = MPI_Comm_free(&communicator);
-        (void)ierr;
-        AssertNothrow(ierr == MPI_SUCCESS, ExcMPI(ierr));
-      }
-#  endif
   }
 
 
@@ -323,8 +328,6 @@ namespace SUNDIALS
   unsigned int
   KINSOL<VectorType>::solve(VectorType &initial_guess_and_solution)
   {
-    unsigned int system_size = initial_guess_and_solution.size();
-
     NVectorView<VectorType> u_scale, f_scale;
 
     VectorType u_scale_temp, f_scale_temp;
@@ -347,6 +350,20 @@ namespace SUNDIALS
         f_scale      = internal::make_nvector_view(f_scale_temp);
       }
 
+    // Make sure we have what we need
+    if (data.strategy == AdditionalData::fixed_point)
+      {
+        Assert(iteration_function,
+               ExcFunctionNotProvided("iteration_function"));
+      }
+    else
+      {
+        Assert(residual, ExcFunctionNotProvided("residual"));
+        Assert(solve_jacobian_system || solve_with_jacobian,
+               ExcFunctionNotProvided(
+                 "solve_jacobian_system || solve_with_jacobian"));
+      }
+
     auto solution = internal::make_nvector_view(initial_guess_and_solution);
 
     if (kinsol_mem)
@@ -354,15 +371,24 @@ namespace SUNDIALS
 
     kinsol_mem = KINCreate();
 
-    int status =
-      KINInit(kinsol_mem, residual_or_iteration_callback<VectorType>, solution);
+    int status = 0;
     (void)status;
-    AssertKINSOL(status);
 
     status = KINSetUserData(kinsol_mem, static_cast<void *>(this));
     AssertKINSOL(status);
 
+    // This must be called before KINSetMAA
     status = KINSetNumMaxIters(kinsol_mem, data.maximum_non_linear_iterations);
+    AssertKINSOL(status);
+
+    // From the manual: this must be called BEFORE KINInit
+    status = KINSetMAA(kinsol_mem, data.anderson_subspace_size);
+    AssertKINSOL(status);
+
+    if (data.strategy == AdditionalData::fixed_point)
+      status = KINInit(kinsol_mem, iteration_callback<VectorType>, solution);
+    else
+      status = KINInit(kinsol_mem, residual_callback<VectorType>, solution);
     AssertKINSOL(status);
 
     status = KINSetFuncNormTol(kinsol_mem, data.function_tolerance);
@@ -383,9 +409,6 @@ namespace SUNDIALS
     status = KINSetMaxBetaFails(kinsol_mem, data.maximum_beta_failures);
     AssertKINSOL(status);
 
-    status = KINSetMAA(kinsol_mem, data.anderson_subspace_size);
-    AssertKINSOL(status);
-
     status = KINSetRelErrFunc(kinsol_mem, data.dq_relative_error);
     AssertKINSOL(status);
 
@@ -398,8 +421,11 @@ namespace SUNDIALS
       {
 /* interface up to and including 4.0 */
 #  if DEAL_II_SUNDIALS_VERSION_LT(4, 1, 0)
-        auto KIN_mem        = static_cast<KINMem>(kinsol_mem);
-        KIN_mem->kin_lsolve = solve_with_jacobian_callback<VectorType>;
+        auto KIN_mem = static_cast<KINMem>(kinsol_mem);
+        // Old version only works with solve_jacobian_system
+        Assert(solve_jacobian_system,
+               ExcFunctionNotProvided("solve_jacobian_system"))
+          KIN_mem->kin_lsolve = solve_with_jacobian_callback<VectorType>;
         if (setup_jacobian) // user assigned a function object to the Jacobian
           // set-up slot
           KIN_mem->kin_lsetup = setup_jacobian_callback<VectorType>;
@@ -486,21 +512,6 @@ namespace SUNDIALS
           }
 #  endif
       }
-    else
-      {
-        J      = SUNDenseMatrix(system_size, system_size);
-        LS     = SUNDenseLinearSolver(u_scale, J);
-        status = KINDlsSetLinearSolver(kinsol_mem, LS, J);
-        AssertKINSOL(status);
-      }
-
-    if (data.strategy == AdditionalData::newton ||
-        data.strategy == AdditionalData::linesearch)
-      Assert(residual, ExcFunctionNotProvided("residual"));
-
-    if (data.strategy == AdditionalData::fixed_point ||
-        data.strategy == AdditionalData::picard)
-      Assert(iteration_function, ExcFunctionNotProvided("iteration_function"));
 
     // call to KINSol
     status = KINSol(kinsol_mem, solution, data.strategy, u_scale, f_scale);
@@ -510,8 +521,10 @@ namespace SUNDIALS
     status = KINGetNumNonlinSolvIters(kinsol_mem, &nniters);
     AssertKINSOL(status);
 
-    SUNMatDestroy(J);
-    SUNLinSolFree(LS);
+    if (J != nullptr)
+      SUNMatDestroy(J);
+    if (LS != nullptr)
+      SUNLinSolFree(LS);
     KINFree(&kinsol_mem);
 
     return static_cast<unsigned int>(nniters);
@@ -524,6 +537,8 @@ namespace SUNDIALS
     reinit_vector = [](VectorType &) {
       AssertThrow(false, ExcFunctionNotProvided("reinit_vector"));
     };
+
+    setup_jacobian = [](const VectorType &, const VectorType &) { return 0; };
   }
 
   template class KINSOL<Vector<double>>;
