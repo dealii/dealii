@@ -133,6 +133,25 @@ namespace SUNDIALS
    * algorithm is that the full Newton step tends to be taken close to the
    * solution.
    *
+   * As a user option, KINSOL permits the application of inequality
+   * constraints, $u_i > 0$ and $u_i < 0$, as well as $u_i \geq 0$ and $u_i
+   * \leq 0$, where $u_i$ is the $i$-th component of $u$. Any such constraint,
+   * or no constraint, may be imposed on each component by providing the
+   * optional function
+   * - get_constraints()
+   * which should return a vector whose entries can take the following values:
+   * - 0.0 then no constraint is imposed on $u_i$
+   * - 1.0 then $u_i$ will be constrained to be $u_i \geq 0.0$;
+   * - −1.0 then $u_i$ will be constrained to be $u_i \leq 0.0$;
+   * - 2.0 then $u_i$ will be constrained to be $u_i > 0.0$;
+   * - −2.0 then $u_i$ will be constrained to be $u_i < 0.0$;
+   *
+   * KINSOL will reduce step lengths in order to ensure that no constraint is
+   * violated. Specifically, if a new Newton iterate will violate a constraint,
+   * the maximum step length along the Newton direction that will satisfy all
+   * constraints is found, and $\delta_n$ is scaled to take a step of that
+   * length.
+   *
    * The basic fixed-point iteration scheme implemented in KINSOL is given by:
    * - Set $u_0 =$ an initial guess
    * - For $n = 0, 1, 2, \dots$ until convergence do:
@@ -634,6 +653,33 @@ namespace SUNDIALS
      * considered as one.
      */
     std::function<VectorType &()> get_solution_scaling;
+
+    /**
+     * A function object that users may supply and that is intended to return a
+     * vector whose components are used to impose inequality constraints on the
+     * solution. The implementation of this function is optional, and it is used
+     * only if implemented.
+     *
+     * KINSOL permits the application of inequality
+     * constraints, $u_i > 0$ and $u_i < 0$, as well as $u_i \geq 0$ and $u_i
+     * \leq 0$, where $u_i$ is the $i$-th component of $u$. Any such constraint,
+     * or no constraint, may be imposed on each component by providing the
+     * optional function
+     * - get_constraints()
+     * which should return a vector whose entries can take the following values:
+     * - 0.0 then no constraint is imposed on $u_i$
+     * - 1.0 then $u_i$ will be constrained to be $u_i \geq 0.0$;
+     * - −1.0 then $u_i$ will be constrained to be $u_i \leq 0.0$;
+     * - 2.0 then $u_i$ will be constrained to be $u_i > 0.0$;
+     * - −2.0 then $u_i$ will be constrained to be $u_i < 0.0$;
+     *
+     * KINSOL will reduce step lengths in order to ensure that no constraint is
+     * violated. Specifically, if a new Newton iterate will violate a
+     * constraint, the maximum step length along the Newton direction that will
+     * satisfy all constraints is found, and $\delta_n$ is scaled to take a step
+     * of that length.
+     */
+    std::function<VectorType &()> get_constraints;
 
     /**
      * A function object that users may supply and that is intended to return a

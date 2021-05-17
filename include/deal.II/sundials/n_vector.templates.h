@@ -225,6 +225,14 @@ namespace SUNDIALS
       weighted_rms_norm_mask(N_Vector x, N_Vector w, N_Vector mask);
 
       template <typename VectorType>
+      booleantype
+      constraint_mask(N_Vector c, N_Vector w, N_Vector mask);
+
+      template <typename VectorType>
+      realtype
+      min_quotient(N_Vector n, N_Vector d);
+
+      template <typename VectorType>
       realtype
       max_norm(N_Vector x);
 
@@ -685,8 +693,103 @@ SUNDIALS::internal::NVectorOperations::weighted_rms_norm_mask(N_Vector x,
   return tmp.l2_norm() / std::sqrt(n);
 }
 
+template <typename VectorType>
+booleantype
+SUNDIALS::internal::NVectorOperations::constraint_mask(N_Vector c,
+                                                       N_Vector x,
+                                                       N_Vector mask)
+{
+  // TODO copy can be avoided by a custom kernel
+  auto *c_dealii      = unwrap_nvector_const<VectorType>(c);
+  auto *x_dealii      = unwrap_nvector_const<VectorType>(x);
+  auto *mask_dealii   = unwrap_nvector<VectorType>(mask);
+  bool  everything_ok = true;
+
+  AssertDimension(c_dealii->size(), x_dealii->size());
+  AssertDimension(c_dealii->size(), mask_dealii->size());
+  for (const auto &i : x_dealii->locally_owned_elements())
+    {
+      if ((*c_dealii)[i] == 1)
+        {
+          if ((*x_dealii)[i] >= 0)
+            {
+              (*mask_dealii)[i] = true;
+            }
+          else
+            {
+              (*mask_dealii)[i] = false;
+              everything_ok     = false;
+            }
+        }
+      else if ((*c_dealii)[i] == 2)
+        {
+          if ((*x_dealii)[i] > 0)
+            {
+              (*mask_dealii)[i] = true;
+            }
+          else
+            {
+              (*mask_dealii)[i] = false;
+              everything_ok     = false;
+            }
+        }
+      else if ((*c_dealii)[i] == -1)
+        {
+          if ((*x_dealii)[i] <= 0)
+            {
+              (*mask_dealii)[i] = true;
+            }
+          else
+            {
+              (*mask_dealii)[i] = false;
+              everything_ok     = false;
+            }
+        }
+      else if ((*c_dealii)[i] == -2)
+        {
+          if ((*x_dealii)[i] < 0)
+            {
+              (*mask_dealii)[i] = true;
+            }
+          else
+            {
+              (*mask_dealii)[i] = false;
+              everything_ok     = false;
+            }
+        }
+      else
+        {
+          Assert((*c_dealii)[i] == 0,
+                 ExcMessage("KINSOL constraints value is not admissible"));
+        }
+    }
+  if (everything_ok)
+    return SUNTRUE;
+  else
+    return SUNFALSE;
+}
 
 
+template <typename VectorType>
+realtype
+SUNDIALS::internal::NVectorOperations::min_quotient(N_Vector n, N_Vector d)
+{
+  // TODO copy can be avoided by a custom kernel
+  auto *   n_dealii = unwrap_nvector_const<VectorType>(n);
+  auto *   d_dealii = unwrap_nvector_const<VectorType>(d);
+  realtype mq       = std::numeric_limits<realtype>::max();
+  AssertDimension(n_dealii->size(), d_dealii->size());
+  for (const auto i : n_dealii->locally_owned_elements())
+    {
+      realtype di = (*d_dealii)[i];
+      if (di != 0)
+        {
+          realtype current_quotient = (*n_dealii)[i] / di;
+          mq = current_quotient < mq ? current_quotient : mq;
+        }
+    }
+  return mq;
+}
 template <typename VectorType>
 realtype
 SUNDIALS::internal::NVectorOperations::max_norm(N_Vector x)
@@ -969,8 +1072,9 @@ SUNDIALS::internal::create_empty_nvector()
     NVectorOperations::weighted_rms_norm_mask<VectorType>;
   //  v->ops->nvcompare      = undef;
   //  v->ops->nvinvtest      = undef;
-  //  v->ops->nvconstrmask   = undef;
-  //  v->ops->nvminquotient  = undef;
+  v->ops->nvconstrmask  = NVectorOperations::constraint_mask<VectorType>;
+  v->ops->nvminquotient = NVectorOperations::min_quotient<VectorType>;
+  ;
 
   /* fused and vector array operations are disabled (NULL) by default */
 

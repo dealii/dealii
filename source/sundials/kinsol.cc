@@ -328,7 +328,7 @@ namespace SUNDIALS
   unsigned int
   KINSOL<VectorType>::solve(VectorType &initial_guess_and_solution)
   {
-    NVectorView<VectorType> u_scale, f_scale;
+    NVectorView<VectorType> u_scale, f_scale, constraints;
 
     VectorType u_scale_temp, f_scale_temp;
 
@@ -348,6 +348,22 @@ namespace SUNDIALS
         reinit_vector(f_scale_temp);
         f_scale_temp = 1.0;
         f_scale      = internal::make_nvector_view(f_scale_temp);
+      }
+    if (get_constraints)
+      constraints = internal::make_nvector_view(get_constraints());
+
+    // Make sure we have what we need
+    if (data.strategy == AdditionalData::fixed_point)
+      {
+        Assert(iteration_function,
+               ExcFunctionNotProvided("iteration_function"));
+      }
+    else
+      {
+        Assert(residual, ExcFunctionNotProvided("residual"));
+        Assert(solve_jacobian_system || solve_with_jacobian,
+               ExcFunctionNotProvided(
+                 "solve_jacobian_system || solve_with_jacobian"));
       }
 
     // Make sure we have what we need
@@ -411,6 +427,12 @@ namespace SUNDIALS
 
     status = KINSetRelErrFunc(kinsol_mem, data.dq_relative_error);
     AssertKINSOL(status);
+
+    if (get_constraints)
+      {
+        status = KINSetConstraints(kinsol_mem, constraints);
+        AssertKINSOL(status);
+      }
 
     SUNMatrix       J  = nullptr;
     SUNLinearSolver LS = nullptr;
@@ -537,6 +559,8 @@ namespace SUNDIALS
     reinit_vector = [](VectorType &) {
       AssertThrow(false, ExcFunctionNotProvided("reinit_vector"));
     };
+
+    setup_jacobian = [](const VectorType &, const VectorType &) { return 0; };
   }
 
   template class KINSOL<Vector<double>>;
