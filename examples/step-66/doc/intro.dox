@@ -8,9 +8,10 @@ G.F. Castelli: Numerical Investigation of Cahn-Hilliard-Type Phase-Field
 Models for Battery Active Particles, PhD thesis, Karlsruhe Institute of
 Technology (KIT), 2021. (To be published)
 
-Fabian Castelli was supported by the German Research Foundation (DFG) through
-the Research Training Group 2218 SiMET -- Simulation of mechano-electro-thermal
-processes in lithium-ion batteries, project number 281041241.
+Fabian Castelli acknowledges financial support by the German Research
+Foundation (DFG) through the Research Training Group 2218 SiMET -- Simulation
+of mechano-electro-thermal processes in lithium-ion batteries, project number
+281041241.
 
 Finally Fabian Castelli would like to thank Timo Heister for the encouragement
 and advice in writing this tutorial.
@@ -32,8 +33,8 @@ we consider the following nonlinear elliptic boundary value problem subject to a
 homogeneous Dirichlet boundary condition: Find a function
 $u\colon\Omega\to\mathbb{R}$ such that it holds:
 @f{align*}
- - \Delta u &= \exp(u) & \qquad & \text{in } \Omega,\\
-          u &= 0       & \qquad & \text{on } \partial\Omega.
+    - \Delta u &= \exp(u) & \quad & \text{in } \Omega,\\
+             u &= 0       & \quad & \text{on } \partial\Omega.
 @f}
 This problem is also called the <i>Gelfand problem</i> and is a typical example
 for problems from combustion theory, see for example
@@ -56,8 +57,8 @@ test functions $v$ it holds:
 @f}
 
 Choosing the Lagrangian finite element space $V_h \dealcoloneq
-\Bigl\{ v \in C(\overline{\Omega}) : v|_Q \in \mathbb{Q}_p \text{ for all }
-Q \in \mathcal{T}_h \Bigr\} \cap H_0^1(\Omega)$, which directly incorporates
+\bigl\{ v \in C(\overline{\Omega}) : v|_Q \in \mathbb{Q}_p \text{ for all }
+Q \in \mathcal{T}_h \bigr\} \cap H_0^1(\Omega)$, which directly incorporates
 the homogeneous Dirichlet boundary condition, we can define a basis
 $\{\varphi_i\}_{i=1,\dots,N}$ and thus it suffices to test only with those
 basis functions. So the discrete problem reads as follows: Find $u_h\in V_h$
@@ -71,17 +72,18 @@ such that for all $i=1,\dots,N$ it holds:
 @f}
 As each finite element function is a linear combination of the basis functions
 $\{\varphi_i\}_{i=1,\dots,N}$, we can identify the finite element solution by
-a vector from $\mathbb{R}^N$ consisting of the unknown values in each DOF.
-Thus, we define the nonlinear function $F\colon\mathbb{R}^N\to\mathbb{R}^N$
-representing the discrete nonlinear problem.
+a vector from $\mathbb{R}^N$ consisting of the unknown values in each degree of
+freedom (DOF). Thus, we define the nonlinear function
+$F\colon\mathbb{R}^N\to\mathbb{R}^N$ representing the discrete nonlinear
+problem.
 
 To solve this nonlinear problem we use Newton's method. So given an
 initial guess $u_h^0\in V_h$, which already fulfills the Dirichlet boundary
 condition, we determine a sequence of Newton steps $\bigl( u_h^n \bigr)_n$ by
 successively applying the following scheme:
 @f{align*}{
- &\text{Solve for } s_h^n\in V_h: \qquad & F'(u_h^n)[s_h^n] &= -F(u_h^n),\\
- &\text{Update: } & u_h^{n+1} &= u_h^n + s_h^n.
+ &\text{Solve for } s_h^n\in V_h: \quad & F'(u_h^n)[s_h^n] &= -F(u_h^n),\\
+ &\text{Update: }                       & u_h^{n+1} &= u_h^n + s_h^n.
 @f}
 So in each Newton step we have to solve a linear problem $A\,x = b$, where the
 system matrix $A$ is represented by the Jacobian
@@ -100,12 +102,12 @@ identified with a vector $U\in\mathbb{R}^N$ via the representation formula:
 $u_h = \sum_{i=1}^N U_i \varphi_i$. So using this we can give an expression for
 the discrete Jacobian and the residual:
 @f{align*}{
- A_{i,j} = \bigl( F'(u_h^n) \bigr)_{i,j}
+ A_{i,j} = \bigl( F'(u_h^n) \bigr)_{i,j} 
  &=
  \int_\Omega \nabla\varphi_i \cdot \nabla \varphi_j \,\mathrm{d} x
  -
  \int_\Omega \varphi_i \, \exp( u_h ) \varphi_j \,\mathrm{d} x,\\
- b_{i} = \bigl( F(u_h^n) \bigr)_{i}
+ b_{i} = \bigl( F(u_h^n) \bigr)_{i} 
  &=
  \int_\Omega \nabla\varphi_i \cdot \nabla u_h^n \,\mathrm{d} x
  -
