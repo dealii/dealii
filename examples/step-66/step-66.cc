@@ -1085,7 +1085,7 @@ namespace Step66
     flags.compression_level = DataOutBase::VtkFlags::best_speed;
     data_out.set_flags(flags);
     data_out.write_vtu_with_pvtu_record(
-      "./", "solution", cycle, MPI_COMM_WORLD, 3);
+      "./", "solution_" + std::to_string(dim) + "d", cycle, MPI_COMM_WORLD, 3);
 
     solution.zero_out_ghost_values();
   }
