@@ -66,7 +66,7 @@ IF(DEAL_II_COMPONENT_EXAMPLES)
       #
       # Extract dependency information from CMakeLists.txt file.
       #
-      SET(_dependency_string TRUE)
+      SET(_setup FALSE)
       IF(EXISTS "${_directory}/CMakeLists.txt")
         FILE(STRINGS "${_directory}/CMakeLists.txt" _dependency_string
           REGEX "^IF.*DEAL_II.* # keep in one line$"
@@ -74,22 +74,17 @@ IF(DEAL_II_COMPONENT_EXAMPLES)
         STRING(REPLACE "IF(" "" _dependency_string "${_dependency_string}")
         STRING(REPLACE ") # keep in one line" "" _dependency_string "${_dependency_string}")
         IF("${_dependency_string}" STREQUAL "")
-          SET(_dependency_string "TRUE")
+          SET(_setup TRUE)
         ELSE()
-          SET(_dependency_string "NOT (${_dependency_string})")
+          # if the dependency string evaluates to TRUE then the example
+          # CMakeLists.txt encounters a fatal error - we want the opposite logic
+          # here so add a NOT.
+          EVALUATE_EXPRESSION("
+            IF(NOT (${_dependency_string}))
+              SET(_setup TRUE)
+            ENDIF()")
         ENDIF()
       ENDIF()
-
-      #
-      # Now evaluate the _dependency_string and store the result in _setup.
-      # We have to be careful - ${_dependency_string} evaluating to true
-      # means that not all dependencies are fulfilled.
-      #
-      SET(_setup FALSE)
-      EVALUATE_EXPRESSION("
-        IF(${_dependency_string})
-          SET(_setup TRUE)
-        ENDIF()")
 
       IF(_setup)
         FOREACH(_build ${DEAL_II_BUILD_TYPES})
