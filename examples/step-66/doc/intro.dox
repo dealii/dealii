@@ -1,15 +1,19 @@
 <br>
 
-<i>This program was contributed by Fabian Castelli.
-<br>
+<i>
+This program was contributed by Fabian Castelli.
+
 A version of this code was presented and discussed in:
 G.F. Castelli: Numerical Investigation of Cahn-Hilliard-Type Phase-Field
 Models for Battery Active Particles, PhD thesis, Karlsruhe Institute of
 Technology (KIT), 2021. (To be published)
 
-F.C. was supported by the German Research Foundation (DFG) through the
-Research Training Group 2218 SiMET -- Simulation of mechano-electro-thermal
+Fabian Castelli was supported by the German Research Foundation (DFG) through
+the Research Training Group 2218 SiMET -- Simulation of mechano-electro-thermal
 processes in lithium-ion batteries, project number 281041241.
+
+Finally Fabian Castelli would like to thank Timo Heister for the encouragement
+and advice in writing this tutorial.
 </i>
 
 
