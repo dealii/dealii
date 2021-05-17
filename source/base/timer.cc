@@ -1035,8 +1035,42 @@ TimerOutput::reset()
   timer_all.restart();
 }
 
+
+
 TimerOutput::Scope::~Scope()
 {
+  try
+    {
+      stop();
+    }
+  catch (...)
+    {}
+}
+
+
+
+TimerOutput::MPISafeScope::~MPISafeScope()
+{
+#ifdef DEAL_II_WITH_MPI
+  if (std::uncaught_exceptions() > 0 &&
+      timer.mpi_communicator != MPI_COMM_SELF &&
+      Utilities::MPI::n_mpi_processes(timer.mpi_communicator) > 1)
+    {
+      std::cerr << "---------------------------------------------------------\n"
+                << "The timer scope named <" << section_name
+                << "> is destroyed, but this \n"
+                << "requires MPI synchronization. Since an exception is\n"
+                << "currently uncaught, this synchronization would likely\n"
+                << "deadlock because only the current process is trying to\n"
+                << "destroy the object. As a consequence, the program will be\n"
+                << "aborted.\n"
+                << "---------------------------------------------------------"
+                << std::endl;
+
+      MPI_Abort(timer.mpi_communicator, 1);
+    }
+#endif
+
   try
     {
       stop();

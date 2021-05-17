@@ -549,7 +549,7 @@ class TimerOutput
 {
 public:
   /**
-   * Helper class to enter/exit sections in TimerOutput be constructing a
+   * Helper class to enter/exit sections in TimerOutput by constructing a
    * simple scope-based object. The purpose of this class is explained in the
    * documentation of TimerOutput.
    */
@@ -563,9 +563,59 @@ public:
     Scope(dealii::TimerOutput &timer_, const std::string &section_name);
 
     /**
-     * Destructor calls stop()
+     * Destructor calls stop().
      */
     ~Scope();
+
+    /**
+     * In case you want to exit the scope before the destructor is executed,
+     * call this function.
+     */
+    void
+    stop();
+
+  private:
+    /**
+     * Reference to the TimerOutput object
+     */
+    dealii::TimerOutput &timer;
+
+    /**
+     * Name of the section we need to exit
+     */
+    const std::string section_name;
+
+    /**
+     * Do we still need to exit the section we are in?
+     */
+    bool in;
+  };
+
+  /**
+   * Helper class to enter/exit sections in TimerOutput by constructing a
+   * simple scope-based object. The purpose of this class is explained in the
+   * documentation of TimerOutput. This class works just like the Scope class
+   * above, except in MPI programs it will abort the program when an exception
+   * is pending during scope destruction. This behavior avoids MPI communication
+   * deadlocks, which can happen if not all of the MPI ranks throw an
+   * exception. In the Scope class only the ranks throwing the exception would
+   * then initiate MPI communication, all other ranks would proceed and
+   * therefore cause a deadlock.
+   */
+  class MPISafeScope
+  {
+  public:
+    /**
+     * Enter the given section in the timer. Exit automatically when calling
+     * stop() or destructor runs.
+     */
+    MPISafeScope(dealii::TimerOutput &timer_, const std::string &section_name);
+
+    /**
+     * Destructor calls stop() except if there is an uncaught exception in which
+     * case it safely aborts the program with an error message.
+     */
+    ~MPISafeScope();
 
     /**
      * In case you want to exit the scope before the destructor is executed,
@@ -954,6 +1004,29 @@ inline TimerOutput::Scope::Scope(dealii::TimerOutput &timer_,
 
 inline void
 TimerOutput::Scope::stop()
+{
+  if (!in)
+    return;
+  in = false;
+
+  timer.leave_subsection(section_name);
+}
+
+
+
+inline TimerOutput::MPISafeScope::MPISafeScope(dealii::TimerOutput &timer_,
+                                               const std::string &section_name_)
+  : timer(timer_)
+  , section_name(section_name_)
+  , in(true)
+{
+  timer.enter_subsection(section_name);
+}
+
+
+
+inline void
+TimerOutput::MPISafeScope::stop()
 {
   if (!in)
     return;
