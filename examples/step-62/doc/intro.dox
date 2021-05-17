@@ -168,7 +168,7 @@ F_i &=& \int_\Omega\varphi_m^i f_m
 
 <h3>Simulation parameters</h3>
 In this tutorial we use a python
-[jupyter notebook](https://github.com/dealii/dealii/blob/phononic-cavity/examples/step-62/step-62.ipynb)
+[jupyter notebook](https://github.com/dealii/dealii/blob/master/examples/step-62/step-62.ipynb)
 to set up the parameters and run the simulation.
 First we create a HDF5 file where we store the parameters and the results of
 the simulation.
