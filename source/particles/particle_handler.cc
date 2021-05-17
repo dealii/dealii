@@ -448,7 +448,7 @@ namespace Particles
     auto &missing_points  = std::get<3>(point_locations);
     // If a point was not found, throwing an error, as the old
     // implementation of compute_point_locations would have done
-    AssertThrow(std::get<3>(point_locations).size() == 0,
+    AssertThrow(missing_points.size() == 0,
                 VectorTools::ExcPointNotAvailableHere());
 
     (void)missing_points;
