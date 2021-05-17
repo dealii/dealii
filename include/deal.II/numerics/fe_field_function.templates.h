@@ -523,7 +523,11 @@ namespace Functions
   {
     // Calling the GridTools routine and preparing output
     auto cell_qpoint_map =
-      GridTools::compute_point_locations(cache, points, cell_hint.get());
+      GridTools::compute_point_locations_try_all(cache,
+                                                 points,
+                                                 cell_hint.get());
+    AssertThrow(std::get<3>(cell_qpoint_map).size() == 0,
+                VectorTools::ExcPointNotAvailableHere());
     const auto &tria_cells = std::get<0>(cell_qpoint_map);
     cells.resize(tria_cells.size());
     unsigned int i = 0;
