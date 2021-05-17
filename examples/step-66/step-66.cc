@@ -87,11 +87,11 @@ namespace Step66
 
   // @sect3{Matrix-free JacobianOperator}
 
-  // In the beginning we define the matrix-free operator for the Jacobian. As
-  // a guideline we follow the tutorials step-37 and step-48, where the precise
+  // In the beginning we define the matrix-free operator for the Jacobian. As a
+  // guideline we follow the tutorials step-37 and step-48, where the precise
   // interface of the MatrixFreeOperators::Base class was extensively
   // documented.
-
+  //
   // Since we want to use the Jacobian as system matrix and pass it to the
   // linear solver as well as to the multilevel preconditioner classes, we
   // derive the <code>JacobianOperator</code> class from the
@@ -195,8 +195,8 @@ namespace Step66
   // <code>evaluate_coefficient()</code> function from step-37. However, it does
   // not evaluate a function object, but evaluates a vector representing a
   // finite element function, namely the last Newton step needed for the
-  // Jacobian. Therefore we set up a FEEvaluation object and evaluate the
-  // finite element function in the quadrature points with the
+  // Jacobian. Therefore we set up a FEEvaluation object and evaluate the finite
+  // element function in the quadrature points with the
   // FEEvaluation::read_dof_values_plain() and FEEvaluation::evaluate()
   // functions. We store the evaluated values of the finite element function
   // directly in the <code>nonlinear_values</code> table.
@@ -236,14 +236,14 @@ namespace Step66
   // @sect4{Nonlinear matrix-free operator application}
 
   // Now in the <code>local_apply()</code> function, which actually implements
-  // the cell wise action of the system matrix, we can use the information
-  // of the last Newton step stored in the table <code>nonlinear_values</code>.
-  // The rest of this function is basically the same as in step-37. We set up
-  // the FEEvaluation object, gather and evaluate the values and gradients of
-  // the input vector <code>src</code>, submit the values and gradients
-  // according to the form of the Jacobian and finally call
-  // FEEvaluation::integrate_scatter() to perform the cell integration and
-  // distribute the local contributions into the global vector <code>dst</code>.
+  // the cell wise action of the system matrix, we can use the information of
+  // the last Newton step stored in the table <code>nonlinear_values</code>. The
+  // rest of this function is basically the same as in step-37. We set up the
+  // FEEvaluation object, gather and evaluate the values and gradients of the
+  // input vector <code>src</code>, submit the values and gradients according to
+  // the form of the Jacobian and finally call FEEvaluation::integrate_scatter()
+  // to perform the cell integration and distribute the local contributions into
+  // the global vector <code> dst</code>.
   template <int dim, int fe_degree, typename number>
   void
   JacobianOperator<dim, fe_degree, number>::local_apply(
@@ -299,7 +299,7 @@ namespace Step66
   // The internal worker function <code>local_compute_diagonal()</code> for the
   // computation of the diagonal is similar to the above worker function
   // <code>local_apply()</code>. However, as major difference we do not read
-  // values from a input vector or distribute any local results to a destination
+  // values from a input vector or distribute any local results to an output
   // vector. Instead the only input argument is the used FEEvaluation object.
   template <int dim, int fe_degree, typename number>
   void
@@ -457,10 +457,10 @@ namespace Step66
     SystemMatrixType system_matrix;
 
 
-    // The multilevel object is also based on the matrix-free operator
-    // for the Jacobian. Since we need to evaluate the Jacobian with the last
-    // Newton step, we also need to evaluate the level operator with the last
-    // Newton step for the preconditioner. Thus in addition to
+    // The multilevel object is also based on the matrix-free operator for the
+    // Jacobian. Since we need to evaluate the Jacobian with the last Newton
+    // step, we also need to evaluate the level operator with the last Newton
+    // step for the preconditioner. Thus in addition to
     // <code>mg_matrices</code>, we also need a MGLevelObject to store the
     // interpolated solution vector on each level. As in step-37 we use float
     // precision for the preconditioner. Moreover, we define the
@@ -530,7 +530,7 @@ namespace Step66
   // As the computational domain we use the <code>dim</code>-dimensional unit
   // ball. We follow the instructions for the TransfiniteInterpolationManifold
   // class and also assign a SphericalManifold for the boundary. Finally, we
-  // refine the initial mesh $3 - \texttt{dim}$ times globally.
+  // refine the initial mesh 3 - <code>dim</code> times globally.
   template <int dim, int fe_degree>
   void
   GelfandProblem<dim, fe_degree>::make_grid()
@@ -675,13 +675,13 @@ namespace Step66
   // the FEEvaluation class and the MatrixFree::cell_loop(), similar to
   // <code>apply_add()</code> function of the <code>JacobianOperator</code>.
   //
-  // First we create a pointer to the MatrixFree object, which is stored in
-  // the <code>system_matrix</code>.
-  // Then we pass the worker function <code>local_evaluate_residual()</code>
-  // for the cell wise evaluation of the residual together with the input and
-  // output vector to the MatrixFree::cell_loop(). In addition, we enable the
-  // zero out of the output vector in the loop, which is more efficient than
-  // calling <code>dst = 0.0</code> separately before.
+  // First we create a pointer to the MatrixFree object, which is stored in the
+  // <code>system_matrix</code>. Then we pass the worker function
+  // <code>local_evaluate_residual()</code> for the cell wise evaluation of the
+  // residual together with the input and output vector to the
+  // MatrixFree::cell_loop(). In addition, we enable the zero out of the output
+  // vector in the loop, which is more efficient than calling <code>dst =
+  // 0.0</code> separately before.
   //
   // Note that with this approach we do not have to take care about the MPI
   // related data exchange, since all the bookkeeping is done by the
@@ -694,11 +694,8 @@ namespace Step66
   {
     auto matrix_free = system_matrix.get_matrix_free();
 
-    matrix_free->cell_loop(&GelfandProblem::local_evaluate_residual,
-                           this,
-                           dst,
-                           src,
-                           /*zero_dst_vector = */ true);
+    matrix_free->cell_loop(
+      &GelfandProblem::local_evaluate_residual, this, dst, src, true);
   }
 
 
@@ -708,8 +705,8 @@ namespace Step66
   // This is the internal worker function for the evaluation of the residual.
   // Essentially it has the same structure as the <code>local_apply()</code>
   // function of the <code>JacobianOperator</code> and evaluates the residual
-  // for the input vector <code>src</code> on the given set of
-  // cells <code>cell_range</code>. The difference to the above mentioned
+  // for the input vector <code>src</code> on the given set of cells
+  // <code>cell_range</code>. The difference to the above mentioned
   // <code>local_apply()</code> function is, that we split the
   // FEEvaluation::gather_evaluate() function into
   // FEEvaluation::read_dof_values_plain() and FEEvaluation::evaluate(), since
@@ -810,10 +807,10 @@ namespace Step66
 
   // @sect4{GelfandProblem::compute_update}
 
-  // In order to compute the Newton updates in each Newton step we solve
-  // the linear system with the CG algorithm together with a geometric
-  // multigrid preconditioner. For this we first set up the PreconditionMG
-  // object with a Chebyshev smoother like we did in step-37.
+  // In order to compute the Newton updates in each Newton step we solve the
+  // linear system with the CG algorithm together with a geometric multigrid
+  // preconditioner. For this we first set up the PreconditionMG object with a
+  // Chebyshev smoother like we did in step-37.
   template <int dim, int fe_degree>
   void
   GelfandProblem<dim, fe_degree>::compute_update()
@@ -821,24 +818,22 @@ namespace Step66
     TimerOutput::Scope t(computing_timer, "compute update");
 
     // We remember that the Jacobian depends on the last Newton step stored in
-    // the solution vector. So we update the ghost values of the Newton step
-    // and pass it to the <code>JacobianOperator</code> to store the
-    // information.
+    // the solution vector. So we update the ghost values of the Newton step and
+    // pass it to the <code>JacobianOperator</code> to store the information.
     solution.update_ghost_values();
 
     system_matrix.evaluate_newton_step(solution);
 
 
     // Next we also have to pass the last Newton step to the multilevel
-    // operators. Therefore, we need to interpolate the Newton step to
-    // all levels of the triangulation. This is done with the
+    // operators. Therefore, we need to interpolate the Newton step to all
+    // levels of the triangulation. This is done with the
     // MGTransferMatrixFree::interpolate_to_mg().
     mg_transfer.interpolate_to_mg(dof_handler, mg_solution, solution);
 
 
-    // Now we can set up the preconditioner. We define the smoother and pass
-    // the interpolated vectors of the Newton step to the multilevel
-    // operators.
+    // Now we can set up the preconditioner. We define the smoother and pass the
+    // interpolated vectors of the Newton step to the multilevel operators.
     using SmootherType =
       PreconditionChebyshev<LevelMatrixType,
                             LinearAlgebra::distributed::Vector<float>>;
@@ -883,7 +878,9 @@ namespace Step66
     mg_interface_matrices.resize(0, triangulation.n_global_levels() - 1);
     for (unsigned int level = 0; level < triangulation.n_global_levels();
          ++level)
-      mg_interface_matrices[level].initialize(mg_matrices[level]);
+      {
+        mg_interface_matrices[level].initialize(mg_matrices[level]);
+      }
     mg::Matrix<LinearAlgebra::distributed::Vector<float>> mg_interface(
       mg_interface_matrices);
 
@@ -938,11 +935,11 @@ namespace Step66
     // We define a maximal number of Newton steps and tolerances for the
     // convergence criterion. Usually, with good starting values, the Newton
     // method converges in three to six steps, so maximal ten steps should be
-    // totally sufficient. As tolerances we use
-    // $\|F(u^n_h)\|<\text{TOL}_f = 10^{-12}$ for the norm of the residual and
-    // $\|s_h^n\| < \text{TOL}_x = 10^{-10}$ for the norm of the Newton update.
-    // This seems a bit over the top, but we will see that, for our example,
-    // we will achieve these tolerances after a few steps.
+    // totally sufficient. As tolerances we use $\|F(u^n_h)\|<\text{TOL}_f =
+    // 10^{-12}$ for the norm of the residual and $\|s_h^n\| < \text{TOL}_x =
+    // 10^{-10}$ for the norm of the Newton update. This seems a bit over the
+    // top, but we will see that, for our example, we will achieve these
+    // tolerances after a few steps.
     const unsigned int itmax = 10;
     const double       TOLf  = 1e-12;
     const double       TOLx  = 1e-10;
@@ -961,11 +958,11 @@ namespace Step66
         compute_update();
 
 
-        // Then we compute the errors, namely the norm of the Newton update
-        // and the residual. Note that at this point one could incorporate a
-        // step size control for the Newton method by varying the input
-        // parameter $\alpha$ for the compute_residual function. However, here
-        // we just use $\alpha$ equal to one for a plain Newton iteration.
+        // Then we compute the errors, namely the norm of the Newton update and
+        // the residual. Note that at this point one could incorporate a step
+        // size control for the Newton method by varying the input parameter
+        // $\alpha$ for the compute_residual function. However, here we just use
+        // $\alpha$ equal to one for a plain Newton iteration.
         const double ERRx = newton_update.l2_norm();
         const double ERRf = compute_residual(1.0);
 
@@ -1010,8 +1007,8 @@ namespace Step66
 
   // @sect4{GelfandProblem::compute_solution_norm}
 
-  // The computation of the H1-seminorm of the solution can be done in the
-  // same way as in step-59. We update the ghost values and use the function
+  // The computation of the H1-seminorm of the solution can be done in the same
+  // way as in step-59. We update the ghost values and use the function
   // VectorTools::integrate_difference(). In the end we gather all computations
   // from all MPI ranks and return the norm.
   template <int dim, int fe_degree>
@@ -1097,10 +1094,10 @@ namespace Step66
 
   // @sect4{GelfandProblem::run}
 
-  // The last missing function of the solver class for the
-  // <i>Gelfand problem</i> is the run function. In the beginning we print
-  // information about the system specifications and the finite element space we
-  // use. The problem is solved several times on a successively refined mesh.
+  // The last missing function of the solver class for the <i>Gelfand
+  // problem</i> is the run function. In the beginning we print information
+  // about the system specifications and the finite element space we use. The
+  // problem is solved several times on a successively refined mesh.
   template <int dim, int fe_degree>
   void
   GelfandProblem<dim, fe_degree>::run()
@@ -1179,8 +1176,8 @@ namespace Step66
         pcout << std::endl;
 
 
-        // After the problem was solved we compute the norm of the solution
-        // and generate the graphical output files.
+        // After the problem was solved we compute the norm of the solution and
+        // generate the graphical output files.
         pcout << "Output results..." << std::endl;
         const double norm = compute_solution_norm();
         output_results(cycle);
