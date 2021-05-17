@@ -408,8 +408,9 @@ public:
                     const unsigned int        first_selected_component = 0);
 
   /**
-   * This is one of the main functions in this class and the one that does the
-   * heavy lifting.
+   * This function interpolates the finite element solution, represented by
+   * `solution_values` on the given cell, to the `unit_points` passed to the
+   * function.
    *
    * @param[in] cell An iterator to the current cell in question
    *
@@ -430,16 +431,28 @@ public:
            const EvaluationFlags::EvaluationFlags &evaluation_flags);
 
   /**
-   * This is one of the main functions in this class and the one that does the
-   * heavy lifting.
+   * This function multiplies the quantities passed in by previous
+   * submit_value() or submit_gradient() calls by the value or gradient of the
+   * test functions, and performs summation over all given points. This is
+   * similar to the integration of a bilinear form in terms of the test
+   * function, with the difference that this formula does not include a `JxW`
+   * factor. This allows the class to naturally embed point information
+   * (e.g. particles) into a finite element formulation. Of course, by
+   * multiplication of a `JxW` information of the data given to
+   * submit_value(), the integration can also be represented by this class.
    *
    * @param[in] cell An iterator to the current cell in question
    *
    * @param[in] unit_points List of points in the reference locations of the
    * current cell where the FiniteElement object should be evaluated
    *
-   * @param[out] solution_values This array is filled and can be used to
-   * during `cell->set_dof_values(global_vector, solution_values)`.
+   * @param[out] solution_values This array will contain the result of the
+   * integral, which can be used to during
+   * `cell->set_dof_values(solution_values, global_vector)` or
+   * `cell->distribute_local_to_global(solution_values, global_vector)`. Note
+   * that for multi-component systems where only some of the components are
+   * selected by the present class, the entries not touched by this class will
+   * be zeroed out.
    *
    * @param[in] integration_flags Flags specifying which quantities should be
    * integrated at the points.
@@ -538,6 +551,18 @@ private:
   std::vector<value_type> solution_renumbered;
 
   /**
+   * Temporary array to store a vectorized version of the `solution_values`
+   * computed during `integrate()` in a format compatible with the tensor
+   * product evaluators. For vector-valued setups, this array uses a
+   * `Tensor<1, n_components, VectorizedArray<Number>>` format.
+   */
+  AlignedVector<typename internal::FEPointEvaluation::EvaluatorTypeTraits<
+    dim,
+    n_components,
+    VectorizedArray<Number>>::value_type>
+    solution_renumbered_vectorized;
+
+  /**
    * Temporary array to store the values at the points.
    */
   std::vector<value_type> values;
@@ -606,7 +631,7 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::FEPointEvaluation(
          poly[0].value(1.) == 0. && poly[1].value(0.) == 0. &&
          poly[1].value(1.) == 1.);
     }
-  if (true /*TODO: as long as the fast path of integrate() is not working*/)
+  else
     {
       nonzero_shape_function_component.resize(fe.n_dofs_per_cell());
       for (unsigned int d = 0; d < n_components; ++d)
@@ -702,6 +727,7 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::evaluate(
           mapping_q_generic->transform_variable(
             cell,
             mapping_covariant,
+            /* apply_from_left */ true,
             unit_points,
             ArrayView<const gradient_type>(gradients.data(), gradients.size()),
             ArrayView<gradient_type>(gradients.data(), gradients.size()));
@@ -789,17 +815,13 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::integrate(
     }
 
   AssertDimension(solution_values.size(), fe->dofs_per_cell);
-  if (false /*TODO*/ && (((integration_flags & EvaluationFlags::values) ||
-                          (integration_flags & EvaluationFlags::gradients)) &&
-                         !poly.empty()))
+  if (((integration_flags & EvaluationFlags::values) ||
+       (integration_flags & EvaluationFlags::gradients)) &&
+      !poly.empty())
     {
-      Assert(false, ExcNotImplemented());
       // fast path with tensor product integration
 
-      if (solution_renumbered.size() != dofs_per_component)
-        solution_renumbered.resize(dofs_per_component);
-
-      // let mapping compute the transformation
+      // let mapping apply the transformation
       if (integration_flags & EvaluationFlags::gradients)
         {
           Assert(mapping_q_generic != nullptr, ExcInternalError());
@@ -807,6 +829,7 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::integrate(
           mapping_q_generic->transform_variable(
             cell,
             mapping_covariant,
+            /* apply_from_left */ false,
             unit_points,
             ArrayView<const gradient_type>(gradients.data(), gradients.size()),
             ArrayView<gradient_type>(gradients.data(), gradients.size()));
@@ -816,6 +839,15 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::integrate(
         AssertIndexRange(unit_points.size(), values.size() + 1);
       if (integration_flags & EvaluationFlags::gradients)
         AssertIndexRange(unit_points.size(), gradients.size() + 1);
+
+      if (solution_renumbered_vectorized.size() != dofs_per_component)
+        solution_renumbered_vectorized.resize(dofs_per_component);
+      // zero content
+      solution_renumbered_vectorized.fill(
+        typename internal::FEPointEvaluation::EvaluatorTypeTraits<
+          dim,
+          n_components,
+          VectorizedArray<Number>>::value_type());
 
       const std::size_t n_points = unit_points.size();
       const std::size_t n_lanes  = VectorizedArray<Number>::size();
@@ -829,7 +861,7 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::integrate(
 
           typename internal::ProductTypeNoPoint<value_type,
                                                 VectorizedArray<Number>>::type
-            value;
+            value = {};
           Tensor<1,
                  dim,
                  typename internal::ProductTypeNoPoint<
@@ -837,7 +869,6 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::integrate(
                    VectorizedArray<Number>>::type>
             gradient;
 
-          // convert back to standard format
           if (integration_flags & EvaluationFlags::values)
             for (unsigned int j = 0; j < n_lanes && i + j < n_points; ++j)
               internal::FEPointEvaluation::
@@ -850,22 +881,29 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::integrate(
                   gradient, j, gradients[i + j]);
 
           // compute
-          internal::integrate_tensor_product_value_and_gradient(
+          internal::integrate_add_tensor_product_value_and_gradient(
             poly,
-            solution_renumbered,
             value,
             gradient,
             vectorized_points,
-            poly.size() == 2);
+            solution_renumbered_vectorized);
         }
 
+      // add between the lanes and write into the result
+      std::fill(solution_values.begin(), solution_values.end(), Number());
       for (unsigned int comp = 0; comp < n_components; ++comp)
         for (unsigned int i = 0; i < dofs_per_component; ++i)
-          internal::FEPointEvaluation::
-            EvaluatorTypeTraits<dim, n_components, Number>::write_value(
-              solution_values[renumber[comp * dofs_per_component + i]],
-              comp,
-              solution_renumbered[i]);
+          {
+            VectorizedArray<Number> result;
+            internal::FEPointEvaluation::
+              EvaluatorTypeTraits<dim, n_components, VectorizedArray<Number>>::
+                write_value(result, comp, solution_renumbered_vectorized[i]);
+            for (unsigned int lane = n_lanes / 2; lane > 0; lane /= 2)
+              for (unsigned int j = 0; j < lane; ++j)
+                result[j] += result[lane + j];
+            solution_values[renumber[comp * dofs_per_component + i]] =
+              result[0];
+          }
     }
   else if ((integration_flags & EvaluationFlags::values) ||
            (integration_flags & EvaluationFlags::gradients))

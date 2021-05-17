@@ -2524,25 +2524,60 @@ namespace internal
    */
   template <int dim, typename Number, typename Number2>
   inline void
-  integrate_tensor_product_value_and_gradient(
-    const std::vector<Polynomials::Polynomial<double>> &      poly,
-    const std::vector<Number> &                               values,
-    const typename ProductTypeNoPoint<Number, Number2>::type &value,
-    const Tensor<1, dim, typename ProductTypeNoPoint<Number, Number2>::type>
-      &                              gradient,
-    const Point<dim, Number2> &      p,
-    const bool                       d_linear = false,
-    const std::vector<unsigned int> &renumber = {})
+  integrate_add_tensor_product_value_and_gradient(
+    const std::vector<Polynomials::Polynomial<double>> &poly,
+    const Number2 &                                     value,
+    const Tensor<1, dim, Number2> &                     gradient,
+    const Point<dim, Number> &                          p,
+    AlignedVector<Number2> &                            values,
+    const std::vector<unsigned int> &                   renumber = {})
   {
-    Assert(false, ExcNotImplemented());
+    static_assert(dim >= 1 && dim <= 3, "Only dim=1,2,3 implemented");
 
-    (void)poly;
-    (void)values;
-    (void)value;
-    (void)gradient;
-    (void)p;
-    (void)d_linear;
-    (void)renumber;
+    const unsigned int n_shapes = poly.size();
+    AssertDimension(Utilities::pow(n_shapes, dim), values.size());
+    Assert(renumber.empty() || renumber.size() == values.size(),
+           ExcDimensionMismatch(renumber.size(), values.size()));
+
+    AssertIndexRange(n_shapes, 200);
+    std::array<Number, 2 * dim * 200> shapes;
+
+    // Evaluate 1D polynomials and their derivatives
+    for (unsigned int d = 0; d < dim; ++d)
+      for (unsigned int i = 0; i < n_shapes; ++i)
+        poly[i].value(p[d], 1, shapes.data() + 2 * (d * n_shapes + i));
+
+    // Implement the transpose of the function above
+    for (unsigned int i2 = 0, i = 0; i2 < (dim > 2 ? n_shapes : 1); ++i2)
+      {
+        const Number2 test_value_z =
+          dim > 2 ? (value * shapes[4 * n_shapes + 2 * i2] +
+                     gradient[2] * shapes[4 * n_shapes + 2 * i2 + 1]) :
+                    value;
+        const Number2 test_grad_x =
+          dim > 2 ? gradient[0] * shapes[4 * n_shapes + 2 * i2] : gradient[0];
+        const Number2 test_grad_y =
+          dim > 2 ? gradient[1] * shapes[4 * n_shapes + 2 * i2] :
+                    (dim > 1 ? gradient[1] : Number2());
+        for (unsigned int i1 = 0; i1 < (dim > 1 ? n_shapes : 1); ++i1)
+          {
+            const Number2 test_value_y =
+              dim > 1 ? (test_value_z * shapes[2 * n_shapes + 2 * i1] +
+                         test_grad_y * shapes[2 * n_shapes + 2 * i1 + 1]) :
+                        test_value_z;
+            const Number2 test_grad_xy =
+              dim > 1 ? test_grad_x * shapes[2 * n_shapes + 2 * i1] :
+                        test_grad_x;
+            if (renumber.empty())
+              for (unsigned int i0 = 0; i0 < n_shapes; ++i0, ++i)
+                values[i] += shapes[2 * i0] * test_value_y +
+                             shapes[2 * i0 + 1] * test_grad_xy;
+            else
+              for (unsigned int i0 = 0; i0 < n_shapes; ++i0, ++i)
+                values[renumber[i]] += shapes[2 * i0] * test_value_y +
+                                       shapes[2 * i0 + 1] * test_grad_xy;
+          }
+      }
   }
 
 
