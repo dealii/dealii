@@ -119,6 +119,24 @@ IF(DEAL_II_COMPONENT_EXAMPLES)
       ENDIF()
 
     ENDFOREACH()
+
+    # the same as above but for the examples folder
+    FILE(GLOB _steps
+      ${CMAKE_CURRENT_SOURCE_DIR}/doxygen/*.cc)
+    FOREACH(_step ${_steps})
+      GET_FILENAME_COMPONENT(_name ${_step} NAME_WE)
+
+        FOREACH(_build ${DEAL_II_BUILD_TYPES})
+          STRING(TOLOWER ${_build} _build_lowercase)
+          ADD_EXECUTABLE(${_name}.${_build_lowercase} ${_step})
+          DEAL_II_INSOURCE_SETUP_TARGET(${_name}.${_build_lowercase} ${_build})
+
+          SET_TARGET_PROPERTIES(${_name}.${_build_lowercase}
+            PROPERTIES
+            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${DEAL_II_EXECUTABLE_RELDIR}"
+            )
+        ENDFOREACH()
+    ENDFOREACH()
   ENDIF()
 
   MESSAGE(STATUS "Setting up examples - Done")
