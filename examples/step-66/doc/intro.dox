@@ -121,10 +121,10 @@ discrete equations.
 Note, how the system matrix, actually the Jacobian, depends on the previous
 Newton step $A = F'(u^n)$. Hence we need to tell the function that computes
 the system matrix about the solution at the last Newton step. In an
-implementation with a classical <code>assemble_system</code> function we would
-gather this information from the last Newton step during assembly by the use of
-the member functions FEValuesBase::get_function_values() and
-FEValuesBase::get_function_gradients(). The <code>assemble_system</code>
+implementation with a classical <code>assemble_system()</code> function we
+would gather this information from the last Newton step during assembly by the
+use of the member functions FEValuesBase::get_function_values() and
+FEValuesBase::get_function_gradients(). The <code>assemble_system()</code>
 function would then looks like:
 @code
 template<int dim>
@@ -191,9 +191,9 @@ GelfandProblem<dim>::assemble_system()
 }
 @endcode
 
-Since we want to solve this problem without storing a matrix, we need
-to tell the MatrixFreeOperator this information before we use it. Therefore in
-the derived class <code>JacobianOperator</code> we will implement a function
+Since we want to solve this problem without storing a matrix, we need to tell
+the matrix-free operator this information before we use it. Therefore in the
+derived class <code>JacobianOperator</code> we will implement a function
 called <code>evaluate_newton_step</code>, which will process the information of
 the last Newton step prior to the usage of the matrix-vector implementation.
 Furthermore we want to use a geometric multigrid (GMG) preconditioner for the

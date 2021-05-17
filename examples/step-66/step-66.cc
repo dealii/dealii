@@ -96,7 +96,7 @@ namespace Step66
   // linear solver as well as to the multilevel preconditioner classes, we
   // derive the <code>JacobianOperator</code> class from the
   // MatrixFreeOperators::Base class, such that we have already the right
-  // interface. The two functions we need to reimplement from the base class are
+  // interface. The two functions we need to override from the base class are
   // the MatrixFreeOperators::Base::apply_add() and the
   // MatrixFreeOperators::Base::compute_diagonal() function. To allow
   // preconditioning with float precision we define the number type as template
@@ -327,16 +327,16 @@ namespace Step66
 
   // Finally we override the MatrixFreeOperators::Base::compute_diagonal()
   // function of the base class of the <code>JacobianOperator</code>. Although
-  // the function name suggerates just the computation of the diagonal, this
-  // function does a bit more. Becasue we only really need the inverse of the
-  // matrix diagonal elements for the Chebyshev smoother of the multigrid
+  // the name of the function suggests just the computation of the diagonal,
+  // this function does a bit more. Because we only really need the inverse of
+  // the matrix diagonal elements for the Chebyshev smoother of the multigrid
   // preconditioner, we compute the diagonal and store the inverse elements.
   // Therefore we first initialize the <code>inverse_diagonal_entries</code>.
   // Then we compute the diagonal by passing the worker function
   // <code>local_compute_diagonal()</code> to the
   // MatrixFreeTools::compute_diagonal() function. In the end we loop over the
   // diagonal and invert the elements by hand. Note, that during this loop we
-  // catch the contrained DOFs and set them manually to one.
+  // catch the constrained DOFs and set them manually to one.
   template <int dim, int fe_degree, typename number>
   void
   JacobianOperator<dim, fe_degree, number>::compute_diagonal()
@@ -366,7 +366,7 @@ namespace Step66
 
   // After implementing the matrix-free operators we can now define the solver
   // class for the <i>Gelfand problem</i>. This class is based on the common
-  // structure of all previous tutorial programs, in particluar it is based on
+  // structure of all previous tutorial programs, in particular it is based on
   // step-15, solving also a nonlinear problem. Since we are using the
   // matrix-free framework, we no longer need an assemble_system function any
   // more, instead the information of the matrix is rebuilt in every call of the
@@ -503,7 +503,7 @@ namespace Step66
 
 
   // The constructor of the <code>GelfandProblem</code> initializes the class
-  // variables. In particluar, we set up the multilevel support for the
+  // variables. In particular, we set up the multilevel support for the
   // parallel::distributed::Triangulation, set the mapping degree equal to the
   // finite element degree, initialize the ConditionalOStream and tell the
   // TimerOutput that we want to see the wall times only on demand.
@@ -529,7 +529,7 @@ namespace Step66
 
   // As the computational domain we use the <code>dim</code>-dimensional unit
   // ball. We follow the instructions for the TransfiniteInterpolationManifold
-  // class and also assign a SphericalManifold for the boundaty. Finally, we
+  // class and also assign a SphericalManifold for the boundary. Finally, we
   // refine the initial mesh $3 - \texttt{dim}$ times globally.
   template <int dim, int fe_degree>
   void
@@ -557,13 +557,14 @@ namespace Step66
 
   // @sect4{GelfandProblem::setup_system}
 
-  // The setup_system function is quasi identical to the one in step-37. The
-  // only differences are obviously the time measurement with only one
-  // TimerOutput::Scope instead of measuring each part individually, and more
-  // importantly the initialization of the MGLevelObject for the interpolated
-  // solution vector of the previous Newton step. Another important change is
-  // the setup of the MGTransferMatrixFree object, which we can reuse in each
-  // Newton step as the <code>triangulation</code> will not be not changed.
+  // The <code>setup_system()</code> function is quasi identical to the one in
+  // step-37. The only differences are obviously the time measurement with only
+  // one TimerOutput::Scope instead of measuring each part individually, and
+  // more importantly the initialization of the MGLevelObject for the
+  // interpolated solution vector of the previous Newton step. Another important
+  // change is the setup of the MGTransferMatrixFree object, which we can reuse
+  // in each Newton step as the <code>triangulation</code> will not be not
+  // changed.
   //
   // Note how we can use the same MatrixFree object twice, for the
   // <code>JacobianOperator</code> and the multigrid preconditioner.
@@ -677,14 +678,14 @@ namespace Step66
   // First we create a pointer to the MatrixFree object, which is stored in
   // the <code>system_matrix</code>.
   // Then we pass the worker function <code>local_evaluate_residual()</code>
-  // for the cell wise evaulation of the residual together with the input and
+  // for the cell wise evaluation of the residual together with the input and
   // output vector to the MatrixFree::cell_loop(). In addition, we enable the
   // zero out of the output vector in the loop, which is more efficient than
   // calling <code>dst = 0.0</code> separately before.
   //
-  // Note that with this approach we do not
-  // have to take care about the MPI related data exchange, since all the
-  // bookkeeping is done by the MatrixFree::cell_loop().
+  // Note that with this approach we do not have to take care about the MPI
+  // related data exchange, since all the bookkeeping is done by the
+  // MatrixFree::cell_loop().
   template <int dim, int fe_degree>
   void
   GelfandProblem<dim, fe_degree>::evaluate_residual(
@@ -769,7 +770,7 @@ namespace Step66
 
   // @sect4{GelfandProblem::compute_residual}
 
-  // Accoring to step-15 the following function computes the norm of the
+  // According to step-15 the following function computes the norm of the
   // nonlinear residual for the solution $u_h^n + \alpha s_h^n$ with the help of
   // the <code>evaluate_residual()</code> function. The Newton step length
   // $\alpha$ becomes important if we would use an adaptive version of the
@@ -980,10 +981,10 @@ namespace Step66
               << std::endl;
 
 
-        // After each Newton step we check the convergence criterions. If at
-        // least one of those is fulfilled we are done and end the loop. If
-        // we haven't found a satisfying solution after the maximal amount of
-        // Newton iterations, we inform the user about this shortcoming.
+        // After each Newton step we check the convergence criteria. If at least
+        // one of those is fulfilled we are done and end the loop. If we haven't
+        // found a satisfying solution after the maximal amount of Newton
+        // iterations, we inform the user about this shortcoming.
         if (ERRf < TOLf || ERRx < TOLx)
           {
             solver_timer.stop();
@@ -1041,17 +1042,17 @@ namespace Step66
   // @sect4{GelfandProblem::output_results}
 
   // We generate the graphical output files in vtu format together with a pvtu
-  // master file at once by calling the DataOut::write_vtu_with_pvtu_record
+  // master file at once by calling the DataOut::write_vtu_with_pvtu_record()
   // function in the same way as in step-37. In addition, as in step-40, we
   // query the types::subdomain_id of each cell and write the distribution of
   // the triangulation among the MPI ranks into the output file. Finally, we
-  // generate the patches of the solution by calling DataOut::build_patches.
+  // generate the patches of the solution by calling DataOut::build_patches().
   // However, since we have a computational domain with a curved boundary, we
   // additionally pass the <code>mapping</code> and the finite element degree as
   // number of subdivision. But this is still not enough for the correct
   // representation of the solution, for example in ParaView, because we
   // attached a TransfiniteInterpolationManifold to the inner cells, which
-  // results in curved cells in the interior. Therefore we pass as thrid
+  // results in curved cells in the interior. Therefore we pass as third
   // argument the DataOut::curved_inner_cells option, such that also the inner
   // cells use the corresponding manifold description to build the patches.
   //
@@ -1099,7 +1100,7 @@ namespace Step66
   // The last missing function of the solver class for the
   // <i>Gelfand problem</i> is the run function. In the beginning we print
   // information about the system specifications and the finite element space we
-  // use. The problem is solved several times on a successivley refined mesh.
+  // use. The problem is solved several times on a successively refined mesh.
   template <int dim, int fe_degree>
   void
   GelfandProblem<dim, fe_degree>::run()
