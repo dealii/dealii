@@ -519,6 +519,11 @@ private:
   std::vector<Polynomials::Polynomial<double>> poly;
 
   /**
+   * Store whether the polynomials are linear with nodes at 0 and 1.
+   */
+  bool polynomials_are_hat_functions;
+
+  /**
    * Renumbering between the unknowns of unknowns implied by the FiniteElement
    * class and a lexicographic numbering used for the tensorized code path.
    */
@@ -595,6 +600,11 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::FEPointEvaluation(
       dofs_per_component = shape_info.dofs_per_component_on_cell;
       poly               = internal::FEPointEvaluation::get_polynomial_space(
         fe.base_element(base_element_number));
+
+      polynomials_are_hat_functions =
+        (poly.size() == 2 && poly[0].value(0.) == 1. &&
+         poly[0].value(1.) == 0. && poly[1].value(0.) == 0. &&
+         poly[1].value(1.) == 1.);
     }
   if (true /*TODO: as long as the fast path of integrate() is not working*/)
     {
@@ -667,7 +677,10 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::evaluate(
           // compute
           const auto val_and_grad =
             internal::evaluate_tensor_product_value_and_gradient(
-              poly, solution_renumbered, vectorized_points, poly.size() == 2);
+              poly,
+              solution_renumbered,
+              vectorized_points,
+              polynomials_are_hat_functions);
 
           // convert back to standard format
           if (evaluation_flag & EvaluationFlags::values)

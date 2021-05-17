@@ -144,8 +144,10 @@ main()
   deallog << std::setprecision(10);
 
   test<1>(3);
+  test<2>(1);
   test<2>(2);
   test<2>(6);
+  test<3>(1);
   test<3>(5);
 
   test<3, float>(5);
