@@ -51,7 +51,7 @@ test(const unsigned int degree)
   else
     GridGenerator::subdivided_hyper_cube(tria, 2, 0, 1);
 
-  MappingQGeneric<dim> mapping(degree);
+  MappingQGeneric<dim> mapping(std::max<unsigned int>(1, degree));
   deallog << "Mapping of degree " << degree << std::endl;
 
   std::vector<Point<dim>> unit_points;
@@ -135,6 +135,7 @@ main()
   initlog();
   deallog << std::setprecision(10);
 
+  test<1>(0);
   test<1>(3);
   test<2>(2);
   test<2>(6);
