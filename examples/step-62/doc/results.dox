@@ -3,7 +3,7 @@
 <h3>Resonance frequency and bandgap</h3>
 
 The results are analyzed in the
-[jupyter notebook](https://github.com/dealii/dealii/blob/phononic-cavity/examples/step-62/step-62.ipynb)
+[jupyter notebook](https://github.com/dealii/dealii/blob/master/examples/step-62/step-62.ipynb)
 with the following code
 @code{.py}
 h5_file = h5py.File('results.h5', 'r')
