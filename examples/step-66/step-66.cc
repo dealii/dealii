@@ -76,15 +76,6 @@ namespace Step66
 
 
 
-  // As in the previous tutorials on the matrix-free framework we define the
-  // degree of the finite element space and the space dimension as constant
-  // variables. For this example we solve a two dimensional problem and use the
-  // fourth order Lagrangian finite element space.
-  const unsigned int degree_finite_element = 4;
-  const unsigned int dimension             = 2;
-
-
-
   // @sect3{Matrix-free JacobianOperator}
 
   // In the beginning we define the matrix-free operator for the Jacobian. As a
@@ -1053,7 +1044,7 @@ namespace Step66
   // argument the DataOut::curved_inner_cells option, such that also the inner
   // cells use the corresponding manifold description to build the patches.
   //
-  // Note that we could handle the higher order elements with the
+  // Note that we could handle the higher order elements with the flag
   // DataOutBase::VtkFlags::write_higher_order_cells. However, due to the
   // limited compatibility to previous version of ParaView and the missing
   // support by VisIt, we left this option for a future version.
@@ -1198,9 +1189,11 @@ namespace Step66
 // @sect3{The <code>main</code> function}
 
 // As typical for programs running in parallel with MPI we set up the MPI
-// framework and limit the number of threads to one. Finally to run the solver
-// for the <i>Gelfand problem</i> we create an object of the
-// <code>GelfandProblem</code> class and call the run function.
+// framework and disable shared-memory parallelization by limiting the number of
+// threads to one. Finally to run the solver for the <i>Gelfand problem</i> we
+// create an object of the <code>GelfandProblem</code> class and call the run
+// function. Exemplarily we solve the problem once in 2D and once in 3D each
+// with fourth-order Lagrangian finite elements.
 int
 main(int argc, char *argv[])
 {
@@ -1210,8 +1203,15 @@ main(int argc, char *argv[])
 
       Utilities::MPI::MPI_InitFinalize mpi_init(argc, argv, 1);
 
-      GelfandProblem<dimension, degree_finite_element> gelfand_problem;
-      gelfand_problem.run();
+      {
+        GelfandProblem<2, 4> gelfand_problem;
+        gelfand_problem.run();
+      }
+
+      {
+        GelfandProblem<3, 4> gelfand_problem;
+        gelfand_problem.run();
+      }
     }
   catch (std::exception &exc)
     {

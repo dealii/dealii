@@ -13,7 +13,7 @@ cmake . && make release && make && mpirun -n 2 ./step-66
 gives the following output on the console
 @code
 ================================================================================
-START DATE: 2021/5/18, TIME: 11:10:03
+START DATE: 2021/5/18, TIME: 16:25:48
 --------------------------------------------------------------------------------
 Running with 2 MPI processes
 Vectorization over 4 doubles = 256 bits (AVX), VECTORIZATION_LEVEL=2
@@ -31,9 +31,9 @@ Solve using Newton's method...
    Nstep 2, errf = 3.80167e-06, errx = 0.104353, it = 6
    Nstep 3, errf = 3.97939e-12, errx = 0.00010511, it = 4
    Nstep 4, errf = 2.28859e-13, errx = 1.07726e-10, it = 1
-Convergence step 4 value 2.28859e-13 (used wall time: 0.0308227 s)
+Convergence step 4 value 2.28859e-13 (used wall time: 0.0096409 s)
 
-Time for setup+solve (CPU/Wall) 0.001595/0.110047 s
+Time for setup+solve (CPU/Wall) 0.015617/0.0156447 s
 
 Output results...
   H1 seminorm: 0.773426
@@ -41,16 +41,16 @@ Output results...
 
 
 +---------------------------------------------+------------+------------+
-| Total wallclock time elapsed since start    |     0.185s |            |
+| Total wallclock time elapsed since start    |    0.0286s |            |
 |                                             |            |            |
 | Section                         | no. calls |  wall time | % of total |
 +---------------------------------+-----------+------------+------------+
-| assemble right hand side        |         4 |  9.91e-05s |         0% |
-| compute residual                |         4 |  0.000134s |         0% |
-| compute update                  |         4 |    0.0303s |        16% |
-| make grid                       |         1 |     0.044s |        24% |
-| setup system                    |         1 |    0.0791s |        43% |
-| solve                           |         1 |    0.0309s |        17% |
+| assemble right hand side        |         4 |  9.71e-05s |      0.34% |
+| compute residual                |         4 |  0.000137s |      0.48% |
+| compute update                  |         4 |   0.00901s |        32% |
+| make grid                       |         1 |   0.00954s |        33% |
+| setup system                    |         1 |   0.00585s |        20% |
+| solve                           |         1 |   0.00966s |        34% |
 +---------------------------------+-----------+------------+------------+
 
 .
@@ -68,9 +68,9 @@ Solve using Newton's method...
    Nstep 1, errf = 5.90478e-05, errx = 231.427, it = 9
    Nstep 2, errf = 5.89991e-08, errx = 6.67102, it = 6
    Nstep 3, errf = 4.28813e-13, errx = 0.0067188, it = 4
-Convergence step 3 value 4.28813e-13 (used wall time: 3.7966 s)
+Convergence step 3 value 4.28813e-13 (used wall time: 4.82953 s)
 
-Time for setup+solve (CPU/Wall) 4.93994/5.04057 s
+Time for setup+solve (CPU/Wall) 6.25094/6.37174 s
 
 Output results...
   H1 seminorm: 0.773426
@@ -78,15 +78,59 @@ Output results...
 
 
 +---------------------------------------------+------------+------------+
-| Total wallclock time elapsed since start    |      7.14s |            |
+| Total wallclock time elapsed since start    |      9.04s |            |
 |                                             |            |            |
 | Section                         | no. calls |  wall time | % of total |
 +---------------------------------+-----------+------------+------------+
-| assemble right hand side        |         3 |    0.0583s |      0.82% |
-| compute residual                |         3 |    0.0655s |      0.92% |
-| compute update                  |         3 |      3.67s |        51% |
-| setup system                    |         1 |      1.24s |        17% |
-| solve                           |         1 |       3.8s |        53% |
+| assemble right hand side        |         3 |    0.0827s |      0.91% |
+| compute residual                |         3 |    0.0909s |         1% |
+| compute update                  |         3 |      4.65s |        51% |
+| setup system                    |         1 |      1.54s |        17% |
+| solve                           |         1 |      4.83s |        53% |
++---------------------------------+-----------+------------+------------+
+
+================================================================================
+START DATE: 2021/5/18, TIME: 16:26:00
+--------------------------------------------------------------------------------
+Running with 2 MPI processes
+Vectorization over 4 doubles = 256 bits (AVX), VECTORIZATION_LEVEL=2
+Finite element space: FE_Q<3>(4)
+================================================================================
+
+.
+.
+.
+
+--------------------------------------------------------------------------------
+Cycle 5
+--------------------------------------------------------------------------------
+Set up system...
+   Triangulation: 229376 cells
+   DoFHandler:    14729857 DoFs
+
+Solve using Newton's method...
+   Nstep 1, errf = 6.30096e-06, errx = 481.74, it = 8
+   Nstep 2, errf = 4.25607e-10, errx = 4.14315, it = 6
+   Nstep 3, errf = 7.29563e-13, errx = 0.000321775, it = 2
+Convergence step 3 value 7.29563e-13 (used wall time: 133.793 s)
+
+Time for setup+solve (CPU/Wall) 226.809/232.615 s
+
+Output results...
+  H1 seminorm: 0.588667
+
+
+
++---------------------------------------------+------------+------------+
+| Total wallclock time elapsed since start    |       390s |            |
+|                                             |            |            |
+| Section                         | no. calls |  wall time | % of total |
++---------------------------------+-----------+------------+------------+
+| assemble right hand side        |         3 |      2.06s |      0.53% |
+| compute residual                |         3 |      2.46s |      0.63% |
+| compute update                  |         3 |       129s |        33% |
+| setup system                    |         1 |      98.8s |        25% |
+| solve                           |         1 |       134s |        34% |
 +---------------------------------+-----------+------------+------------+
 @endcode
 
