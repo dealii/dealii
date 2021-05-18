@@ -82,9 +82,6 @@ main(int argc, char *argv[])
   deallog.push("2d/2d");
   test<2, 2>();
   deallog.pop();
-  deallog.push("2d/3d");
-  test<2, 3>();
-  deallog.pop();
   deallog.push("3d/3d");
   test<3, 3>();
   deallog.pop();
