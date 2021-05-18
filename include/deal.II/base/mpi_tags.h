@@ -146,6 +146,9 @@ namespace Utilities
           // global coarsening transfer
           fine_dof_handler_view_reinit,
 
+          // GridTools::internal::distributed_compute_point_locations
+          distributed_compute_point_locations,
+
         };
       } // namespace Tags
     }   // namespace internal

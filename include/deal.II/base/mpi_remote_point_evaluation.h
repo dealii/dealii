@@ -53,8 +53,11 @@ namespace Utilities
        *   the tolerance in order to be able to identify a cell.
        *   Floating point arithmetic implies that a point will, in general, not
        *   lie exactly on a vertex, edge, or face.
+       * @param enforce_unique_mapping Enforce unique mapping, i.e.,
+       *   (one-to-one) relation of points and cells.
        */
-      RemotePointEvaluation(const double tolerance = 1e-6);
+      RemotePointEvaluation(const double tolerance              = 1e-6,
+                            const bool   enforce_unique_mapping = false);
 
       /**
        * Destructor.
@@ -167,6 +170,12 @@ namespace Utilities
        * point.
        */
       const double tolerance;
+
+      /**
+       * Enforce unique mapping, i.e., (one-to-one) relation of points and
+       * cells.
+       */
+      const bool enforce_unique_mapping;
 
       /**
        * Storage for the status of the triangulation signal.
