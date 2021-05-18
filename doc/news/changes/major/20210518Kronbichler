@@ -1,0 +1,7 @@
+New: The class FEPointEvaluation provides an interface to the evaluation of 
+interpolated solution values and gradients on cells on arbitrary reference 
+point positions. These points can change from cell to cell, both with 
+respect to their quantity as well to the location. The two typical use 
+cases are evaluations on non-matching grids and particle simulations.
+<br>
+(Martin Kronbichler, 2021/05/18)
