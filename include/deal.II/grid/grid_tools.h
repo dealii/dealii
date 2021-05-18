@@ -889,6 +889,8 @@ namespace GridTools
    * The algorithm builds an rtree of @p points to sort them spatially, before
    * attempting to call find_active_cell_around_point().
    *
+   * @note This function is not implemented for the codimension one case (<tt>spacedim != dim</tt>).
+   *
    * @note If a point is not found inside the mesh, or is lying inside an
    * artificial cell of a parallel::TriangulationBase, the point is silently
    * ignored. If you want to infer for which points the search failed, use the
@@ -950,6 +952,8 @@ namespace GridTools
    *     std::vector<unsigned int>
    *   >
    * @endcode
+   *
+   * @note This function is not implemented for the codimension one case (<tt>spacedim != dim</tt>).
    *
    * @note This function optimizes the search by making use of
    * GridTools::Cache::get_cell_bounding_boxes_rtree(), which either returns
