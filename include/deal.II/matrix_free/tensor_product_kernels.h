@@ -2397,7 +2397,11 @@ namespace internal
 
     using Number3 = typename ProductTypeNoPoint<Number, Number2>::type;
 
-    const unsigned int n_shapes = poly.size();
+    // use `int` type for this variable and the loops below to inform the
+    // compiler that the loops below will never overflow, which allows it to
+    // generate more optimized code for the variable loop bounds in the
+    // present context
+    const int n_shapes = poly.size();
     AssertDimension(Utilities::pow(n_shapes, dim), values.size());
     Assert(renumber.empty() || renumber.size() == values.size(),
            ExcDimensionMismatch(renumber.size(), values.size()));
@@ -2456,16 +2460,16 @@ namespace internal
 
     // Evaluate 1D polynomials and their derivatives
     for (unsigned int d = 0; d < dim; ++d)
-      for (unsigned int i = 0; i < n_shapes; ++i)
+      for (int i = 0; i < n_shapes; ++i)
         poly[i].value(p[d], 1, shapes.data() + 2 * (d * n_shapes + i));
 
     // Go through the tensor product of shape functions and interpolate
     // with optimal algorithm
     std::pair<Number3, Tensor<1, dim, Number3>> result = {};
-    for (unsigned int i2 = 0, i = 0; i2 < (dim > 2 ? n_shapes : 1); ++i2)
+    for (int i2 = 0, i = 0; i2 < (dim > 2 ? n_shapes : 1); ++i2)
       {
         Number3 value_y = {}, deriv_x = {}, deriv_y = {};
-        for (unsigned int i1 = 0; i1 < (dim > 1 ? n_shapes : 1); ++i1)
+        for (int i1 = 0; i1 < (dim > 1 ? n_shapes : 1); ++i1)
           {
             // Interpolation + derivative x direction
             Number3 value = {}, deriv = {};
@@ -2473,13 +2477,13 @@ namespace internal
             // Distinguish the inner loop based on whether we have a
             // renumbering or not
             if (renumber.empty())
-              for (unsigned int i0 = 0; i0 < n_shapes; ++i0, ++i)
+              for (int i0 = 0; i0 < n_shapes; ++i0, ++i)
                 {
                   value += shapes[2 * i0] * values[i];
                   deriv += shapes[2 * i0 + 1] * values[i];
                 }
             else
-              for (unsigned int i0 = 0; i0 < n_shapes; ++i0, ++i)
+              for (int i0 = 0; i0 < n_shapes; ++i0, ++i)
                 {
                   value += shapes[2 * i0] * values[renumber[i]];
                   deriv += shapes[2 * i0 + 1] * values[renumber[i]];
@@ -2534,7 +2538,8 @@ namespace internal
   {
     static_assert(dim >= 1 && dim <= 3, "Only dim=1,2,3 implemented");
 
-    const unsigned int n_shapes = poly.size();
+    // as in evaluate, use `int` type to produce better code in this context
+    const int n_shapes = poly.size();
     AssertDimension(Utilities::pow(n_shapes, dim), values.size());
     Assert(renumber.empty() || renumber.size() == values.size(),
            ExcDimensionMismatch(renumber.size(), values.size()));
@@ -2544,11 +2549,11 @@ namespace internal
 
     // Evaluate 1D polynomials and their derivatives
     for (unsigned int d = 0; d < dim; ++d)
-      for (unsigned int i = 0; i < n_shapes; ++i)
+      for (int i = 0; i < n_shapes; ++i)
         poly[i].value(p[d], 1, shapes.data() + 2 * (d * n_shapes + i));
 
     // Implement the transpose of the function above
-    for (unsigned int i2 = 0, i = 0; i2 < (dim > 2 ? n_shapes : 1); ++i2)
+    for (int i2 = 0, i = 0; i2 < (dim > 2 ? n_shapes : 1); ++i2)
       {
         const Number2 test_value_z =
           dim > 2 ? (value * shapes[4 * n_shapes + 2 * i2] +
@@ -2559,7 +2564,7 @@ namespace internal
         const Number2 test_grad_y =
           dim > 2 ? gradient[1] * shapes[4 * n_shapes + 2 * i2] :
                     (dim > 1 ? gradient[1] : Number2());
-        for (unsigned int i1 = 0; i1 < (dim > 1 ? n_shapes : 1); ++i1)
+        for (int i1 = 0; i1 < (dim > 1 ? n_shapes : 1); ++i1)
           {
             const Number2 test_value_y =
               dim > 1 ? (test_value_z * shapes[2 * n_shapes + 2 * i1] +
@@ -2569,11 +2574,11 @@ namespace internal
               dim > 1 ? test_grad_x * shapes[2 * n_shapes + 2 * i1] :
                         test_grad_x;
             if (renumber.empty())
-              for (unsigned int i0 = 0; i0 < n_shapes; ++i0, ++i)
+              for (int i0 = 0; i0 < n_shapes; ++i0, ++i)
                 values[i] += shapes[2 * i0] * test_value_y +
                              shapes[2 * i0 + 1] * test_grad_xy;
             else
-              for (unsigned int i0 = 0; i0 < n_shapes; ++i0, ++i)
+              for (int i0 = 0; i0 < n_shapes; ++i0, ++i)
                 values[renumber[i]] += shapes[2 * i0] * test_value_y +
                                        shapes[2 * i0 + 1] * test_grad_xy;
           }
