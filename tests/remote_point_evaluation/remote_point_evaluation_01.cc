@@ -349,7 +349,8 @@ compute_force_vector_sharp_interface(
     AffineConstraints<double> constraints; // TODO: use the right ones
 
     FEPointEvaluation<spacedim, spacedim> phi_force(mapping,
-                                                    dof_handler.get_fe());
+                                                    dof_handler.get_fe(),
+                                                    update_values);
 
     std::vector<double>                  buffer;
     std::vector<types::global_dof_index> local_dof_indices;
@@ -378,10 +379,12 @@ compute_force_vector_sharp_interface(
           cell_data.reference_point_ptrs[i + 1] -
             cell_data.reference_point_ptrs[i]);
 
+        phi_force.reinit(cell, unit_points);
+
         for (unsigned int q = 0; q < unit_points.size(); ++q)
           phi_force.submit_value(force_JxW[q], q);
 
-        phi_force.integrate(cell, unit_points, buffer, EvaluationFlags::values);
+        phi_force.integrate(buffer, EvaluationFlags::values);
 
         constraints.distribute_local_to_global(buffer,
                                                local_dof_indices,

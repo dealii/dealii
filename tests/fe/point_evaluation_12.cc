@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2020 - 2021 by the deal.II authors
+// Copyright (C) 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,16 +14,16 @@
 // ---------------------------------------------------------------------
 
 
-// check FEPointEvaluation for scalar FE_DGQ and MappingQGeneric by comparing
-// to the output of FEValues with the same settings
+// check FEPointEvaluation::real_point(), FEPointEvaluation::unit_point(),
+// FEPointEvaluation::jacobian(), FEPointEvaluation::inverse_jacobian(),
+// FEPointEvaluation::get_unit_gradient().
 
 #include <deal.II/base/function_lib.h>
 
 #include <deal.II/dofs/dof_handler.h>
 
-#include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_point_evaluation.h>
-#include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/mapping_q_generic.h>
 
 #include <deal.II/grid/grid_generator.h>
@@ -51,11 +51,11 @@ test(const unsigned int degree)
   else
     GridGenerator::subdivided_hyper_cube(tria, 2, 0, 1);
 
-  MappingQGeneric<dim> mapping(std::max<unsigned int>(1, degree));
+  MappingQGeneric<dim> mapping(degree);
   deallog << "Mapping of degree " << degree << std::endl;
 
   std::vector<Point<dim>> unit_points;
-  for (unsigned int i = 0; i < 13; ++i)
+  for (unsigned int i = 0; i < 7; ++i)
     {
       Point<dim> p;
       for (unsigned int d = 0; d < dim; ++d)
@@ -63,19 +63,11 @@ test(const unsigned int degree)
       unit_points.push_back(p);
     }
 
-  FE_DGQ<dim>   fe(degree);
-  FEValues<dim> fe_values(mapping,
-                          fe,
-                          Quadrature<dim>(unit_points),
-                          update_values | update_gradients);
+  FE_Q<dim> fe(degree);
 
   DoFHandler<dim> dof_handler(tria);
   dof_handler.distribute_dofs(fe);
   Vector<double> vector(dof_handler.n_dofs());
-
-  FEPointEvaluation<1, dim> evaluator(mapping,
-                                      fe,
-                                      update_values | update_gradients);
 
   Tensor<1, dim> exponents;
   exponents[0] = 1.;
@@ -84,16 +76,15 @@ test(const unsigned int degree)
                            Functions::Monomial<dim>(exponents),
                            vector);
 
-  std::vector<double>         solution_values(fe.dofs_per_cell);
-  std::vector<double>         function_values(unit_points.size());
-  std::vector<Tensor<1, dim>> function_gradients(unit_points.size());
+  FEPointEvaluation<1, dim> evaluator(mapping,
+                                      fe,
+                                      update_values | update_gradients |
+                                        update_quadrature_points |
+                                        update_jacobians);
+  std::vector<double>       solution_values(fe.dofs_per_cell);
 
   for (const auto &cell : dof_handler.active_cell_iterators())
     {
-      fe_values.reinit(cell);
-      fe_values.get_function_values(vector, function_values);
-      fe_values.get_function_gradients(vector, function_gradients);
-
       cell->get_dof_values(vector,
                            solution_values.begin(),
                            solution_values.end());
@@ -103,26 +94,16 @@ test(const unsigned int degree)
                          EvaluationFlags::values | EvaluationFlags::gradients);
 
       deallog << "Cell with center " << cell->center(true) << std::endl;
-      for (unsigned int i = 0; i < function_values.size(); ++i)
-        deallog << mapping.transform_unit_to_real_cell(cell, unit_points[i])
-                << ": " << evaluator.get_value(i) << " error value "
-                << function_values[i] - evaluator.get_value(i) << " error grad "
-                << (evaluator.get_gradient(i) - function_gradients[i]).norm()
-                << std::endl;
-      deallog << std::endl;
-
       for (unsigned int i = 0; i < unit_points.size(); ++i)
-        {
-          evaluator.submit_value(evaluator.get_value(i), i);
-          evaluator.submit_gradient(evaluator.get_gradient(i), i);
-        }
-
-      evaluator.integrate(solution_values,
-                          EvaluationFlags::values | EvaluationFlags::gradients);
-
-      for (const auto i : solution_values)
-        deallog << i << " ";
-      deallog << std::endl;
+        deallog << "unit point " << unit_points[i] << std::endl
+                << "unit point via evaluator: " << evaluator.unit_point(i)
+                << std::endl
+                << "real point: " << evaluator.real_point(i) << std::endl
+                << "jacobian: " << Tensor<2, dim>(evaluator.jacobian(i))
+                << std::endl
+                << "inverse jacobian: "
+                << Tensor<2, dim>(evaluator.inverse_jacobian(i)) << std::endl
+                << std::endl;
     }
 }
 
@@ -134,7 +115,6 @@ main()
   initlog();
   deallog << std::setprecision(10);
 
-  test<1>(0);
   test<1>(3);
   test<2>(2);
   test<2>(6);

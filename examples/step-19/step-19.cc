@@ -144,7 +144,7 @@ namespace Step19
     void output_results() const;
 
     Triangulation<dim>        triangulation;
-    MappingQ<dim>             mapping;
+    MappingQGeneric<dim>      mapping;
     FE_Q<dim>                 fe;
     DoFHandler<dim>           dof_handler;
     AffineConstraints<double> constraints;
@@ -652,7 +652,7 @@ namespace Step19
     const double dt = time.get_next_step_size();
 
     Vector<double>            solution_values(fe.n_dofs_per_cell());
-    FEPointEvaluation<1, dim> evaluator(mapping, fe);
+    FEPointEvaluation<1, dim> evaluator(mapping, fe, update_gradients);
 
     for (const auto &cell : dof_handler.active_cell_iterators())
       if (particle_handler.n_particles_in_cell(cell) > 0)
@@ -670,9 +670,8 @@ namespace Step19
           // Then we can ask the FEPointEvaluation object for the gradients of
           // the solution (i.e., the electric field $\mathbf E$) at these
           // locations and loop over the individual particles:
-          evaluator.evaluate(cell,
-                             particle_positions,
-                             make_array_view(solution_values),
+          evaluator.reinit(cell, particle_positions);
+          evaluator.evaluate(make_array_view(solution_values),
                              EvaluationFlags::gradients);
 
           {
