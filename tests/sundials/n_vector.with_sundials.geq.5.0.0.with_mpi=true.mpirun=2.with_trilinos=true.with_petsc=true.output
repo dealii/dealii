@@ -16,7 +16,9 @@ DEAL:0:Vector<double>::test_elementwise_abs OK
 DEAL:0:Vector<double>::test_weighted_rms_norm OK
 DEAL:0:Vector<double>::test_weighted_rms_norm_mask 1 OK
 DEAL:0:Vector<double>::test_weighted_rms_norm_mask 0 OK
+DEAL:0:Vector<double>::test_weighted_l2_norm OK
 DEAL:0:Vector<double>::test_max_norm OK
+DEAL:0:Vector<double>::test_l1_norm OK
 DEAL:0:Vector<double>::test_min_element OK
 DEAL:0:Vector<double>::test_scale OK
 DEAL:0:BlockVector<double>::test_nvector_view_unwrap OK
@@ -36,7 +38,9 @@ DEAL:0:BlockVector<double>::test_elementwise_abs OK
 DEAL:0:BlockVector<double>::test_weighted_rms_norm OK
 DEAL:0:BlockVector<double>::test_weighted_rms_norm_mask 1 OK
 DEAL:0:BlockVector<double>::test_weighted_rms_norm_mask 0 OK
+DEAL:0:BlockVector<double>::test_weighted_l2_norm OK
 DEAL:0:BlockVector<double>::test_max_norm OK
+DEAL:0:BlockVector<double>::test_l1_norm OK
 DEAL:0:BlockVector<double>::test_min_element OK
 DEAL:0:BlockVector<double>::test_scale OK
 DEAL:0:LinearAlgebra::distributed::Vector<double>::test_nvector_view_unwrap OK
@@ -56,7 +60,9 @@ DEAL:0:LinearAlgebra::distributed::Vector<double>::test_elementwise_abs OK
 DEAL:0:LinearAlgebra::distributed::Vector<double>::test_weighted_rms_norm OK
 DEAL:0:LinearAlgebra::distributed::Vector<double>::test_weighted_rms_norm_mask 1 OK
 DEAL:0:LinearAlgebra::distributed::Vector<double>::test_weighted_rms_norm_mask 0 OK
+DEAL:0:LinearAlgebra::distributed::Vector<double>::test_weighted_l2_norm OK
 DEAL:0:LinearAlgebra::distributed::Vector<double>::test_max_norm OK
+DEAL:0:LinearAlgebra::distributed::Vector<double>::test_l1_norm OK
 DEAL:0:LinearAlgebra::distributed::Vector<double>::test_min_element OK
 DEAL:0:LinearAlgebra::distributed::Vector<double>::test_scale OK
 DEAL:0:LinearAlgebra::distributed::BlockVector<double>::test_nvector_view_unwrap OK
@@ -76,7 +82,9 @@ DEAL:0:LinearAlgebra::distributed::BlockVector<double>::test_elementwise_abs OK
 DEAL:0:LinearAlgebra::distributed::BlockVector<double>::test_weighted_rms_norm OK
 DEAL:0:LinearAlgebra::distributed::BlockVector<double>::test_weighted_rms_norm_mask 1 OK
 DEAL:0:LinearAlgebra::distributed::BlockVector<double>::test_weighted_rms_norm_mask 0 OK
+DEAL:0:LinearAlgebra::distributed::BlockVector<double>::test_weighted_l2_norm OK
 DEAL:0:LinearAlgebra::distributed::BlockVector<double>::test_max_norm OK
+DEAL:0:LinearAlgebra::distributed::BlockVector<double>::test_l1_norm OK
 DEAL:0:LinearAlgebra::distributed::BlockVector<double>::test_min_element OK
 DEAL:0:LinearAlgebra::distributed::BlockVector<double>::test_scale OK
 DEAL:0:TrilinosWrappers::MPI::Vector::test_nvector_view_unwrap OK
@@ -96,7 +104,9 @@ DEAL:0:TrilinosWrappers::MPI::Vector::test_elementwise_abs OK
 DEAL:0:TrilinosWrappers::MPI::Vector::test_weighted_rms_norm OK
 DEAL:0:TrilinosWrappers::MPI::Vector::test_weighted_rms_norm_mask 1 OK
 DEAL:0:TrilinosWrappers::MPI::Vector::test_weighted_rms_norm_mask 0 OK
+DEAL:0:TrilinosWrappers::MPI::Vector::test_weighted_l2_norm OK
 DEAL:0:TrilinosWrappers::MPI::Vector::test_max_norm OK
+DEAL:0:TrilinosWrappers::MPI::Vector::test_l1_norm OK
 DEAL:0:TrilinosWrappers::MPI::Vector::test_min_element OK
 DEAL:0:TrilinosWrappers::MPI::Vector::test_scale OK
 DEAL:0:TrilinosWrappers::MPI::BlockVector::test_nvector_view_unwrap OK
@@ -116,7 +126,9 @@ DEAL:0:TrilinosWrappers::MPI::BlockVector::test_elementwise_abs OK
 DEAL:0:TrilinosWrappers::MPI::BlockVector::test_weighted_rms_norm OK
 DEAL:0:TrilinosWrappers::MPI::BlockVector::test_weighted_rms_norm_mask 1 OK
 DEAL:0:TrilinosWrappers::MPI::BlockVector::test_weighted_rms_norm_mask 0 OK
+DEAL:0:TrilinosWrappers::MPI::BlockVector::test_weighted_l2_norm OK
 DEAL:0:TrilinosWrappers::MPI::BlockVector::test_max_norm OK
+DEAL:0:TrilinosWrappers::MPI::BlockVector::test_l1_norm OK
 DEAL:0:TrilinosWrappers::MPI::BlockVector::test_min_element OK
 DEAL:0:TrilinosWrappers::MPI::BlockVector::test_scale OK
 DEAL:0:PETScWrappers::MPI::Vector::test_nvector_view_unwrap OK
@@ -136,7 +148,9 @@ DEAL:0:PETScWrappers::MPI::Vector::test_elementwise_abs OK
 DEAL:0:PETScWrappers::MPI::Vector::test_weighted_rms_norm OK
 DEAL:0:PETScWrappers::MPI::Vector::test_weighted_rms_norm_mask 1 OK
 DEAL:0:PETScWrappers::MPI::Vector::test_weighted_rms_norm_mask 0 OK
+DEAL:0:PETScWrappers::MPI::Vector::test_weighted_l2_norm OK
 DEAL:0:PETScWrappers::MPI::Vector::test_max_norm OK
+DEAL:0:PETScWrappers::MPI::Vector::test_l1_norm OK
 DEAL:0:PETScWrappers::MPI::Vector::test_min_element OK
 DEAL:0:PETScWrappers::MPI::Vector::test_scale OK
 DEAL:0:PETScWrappers::MPI::BlockVector::test_nvector_view_unwrap OK
@@ -156,7 +170,9 @@ DEAL:0:PETScWrappers::MPI::BlockVector::test_elementwise_abs OK
 DEAL:0:PETScWrappers::MPI::BlockVector::test_weighted_rms_norm OK
 DEAL:0:PETScWrappers::MPI::BlockVector::test_weighted_rms_norm_mask 1 OK
 DEAL:0:PETScWrappers::MPI::BlockVector::test_weighted_rms_norm_mask 0 OK
+DEAL:0:PETScWrappers::MPI::BlockVector::test_weighted_l2_norm OK
 DEAL:0:PETScWrappers::MPI::BlockVector::test_max_norm OK
+DEAL:0:PETScWrappers::MPI::BlockVector::test_l1_norm OK
 DEAL:0:PETScWrappers::MPI::BlockVector::test_min_element OK
 DEAL:0:PETScWrappers::MPI::BlockVector::test_scale OK
 
@@ -177,7 +193,9 @@ DEAL:1:Vector<double>::test_elementwise_abs OK
 DEAL:1:Vector<double>::test_weighted_rms_norm OK
 DEAL:1:Vector<double>::test_weighted_rms_norm_mask 1 OK
 DEAL:1:Vector<double>::test_weighted_rms_norm_mask 0 OK
+DEAL:1:Vector<double>::test_weighted_l2_norm OK
 DEAL:1:Vector<double>::test_max_norm OK
+DEAL:1:Vector<double>::test_l1_norm OK
 DEAL:1:Vector<double>::test_min_element OK
 DEAL:1:Vector<double>::test_scale OK
 DEAL:1:BlockVector<double>::test_nvector_view_unwrap OK
@@ -197,7 +215,9 @@ DEAL:1:BlockVector<double>::test_elementwise_abs OK
 DEAL:1:BlockVector<double>::test_weighted_rms_norm OK
 DEAL:1:BlockVector<double>::test_weighted_rms_norm_mask 1 OK
 DEAL:1:BlockVector<double>::test_weighted_rms_norm_mask 0 OK
+DEAL:1:BlockVector<double>::test_weighted_l2_norm OK
 DEAL:1:BlockVector<double>::test_max_norm OK
+DEAL:1:BlockVector<double>::test_l1_norm OK
 DEAL:1:BlockVector<double>::test_min_element OK
 DEAL:1:BlockVector<double>::test_scale OK
 DEAL:1:LinearAlgebra::distributed::Vector<double>::test_nvector_view_unwrap OK
@@ -217,7 +237,9 @@ DEAL:1:LinearAlgebra::distributed::Vector<double>::test_elementwise_abs OK
 DEAL:1:LinearAlgebra::distributed::Vector<double>::test_weighted_rms_norm OK
 DEAL:1:LinearAlgebra::distributed::Vector<double>::test_weighted_rms_norm_mask 1 OK
 DEAL:1:LinearAlgebra::distributed::Vector<double>::test_weighted_rms_norm_mask 0 OK
+DEAL:1:LinearAlgebra::distributed::Vector<double>::test_weighted_l2_norm OK
 DEAL:1:LinearAlgebra::distributed::Vector<double>::test_max_norm OK
+DEAL:1:LinearAlgebra::distributed::Vector<double>::test_l1_norm OK
 DEAL:1:LinearAlgebra::distributed::Vector<double>::test_min_element OK
 DEAL:1:LinearAlgebra::distributed::Vector<double>::test_scale OK
 DEAL:1:LinearAlgebra::distributed::BlockVector<double>::test_nvector_view_unwrap OK
@@ -237,7 +259,9 @@ DEAL:1:LinearAlgebra::distributed::BlockVector<double>::test_elementwise_abs OK
 DEAL:1:LinearAlgebra::distributed::BlockVector<double>::test_weighted_rms_norm OK
 DEAL:1:LinearAlgebra::distributed::BlockVector<double>::test_weighted_rms_norm_mask 1 OK
 DEAL:1:LinearAlgebra::distributed::BlockVector<double>::test_weighted_rms_norm_mask 0 OK
+DEAL:1:LinearAlgebra::distributed::BlockVector<double>::test_weighted_l2_norm OK
 DEAL:1:LinearAlgebra::distributed::BlockVector<double>::test_max_norm OK
+DEAL:1:LinearAlgebra::distributed::BlockVector<double>::test_l1_norm OK
 DEAL:1:LinearAlgebra::distributed::BlockVector<double>::test_min_element OK
 DEAL:1:LinearAlgebra::distributed::BlockVector<double>::test_scale OK
 DEAL:1:TrilinosWrappers::MPI::Vector::test_nvector_view_unwrap OK
@@ -257,7 +281,9 @@ DEAL:1:TrilinosWrappers::MPI::Vector::test_elementwise_abs OK
 DEAL:1:TrilinosWrappers::MPI::Vector::test_weighted_rms_norm OK
 DEAL:1:TrilinosWrappers::MPI::Vector::test_weighted_rms_norm_mask 1 OK
 DEAL:1:TrilinosWrappers::MPI::Vector::test_weighted_rms_norm_mask 0 OK
+DEAL:1:TrilinosWrappers::MPI::Vector::test_weighted_l2_norm OK
 DEAL:1:TrilinosWrappers::MPI::Vector::test_max_norm OK
+DEAL:1:TrilinosWrappers::MPI::Vector::test_l1_norm OK
 DEAL:1:TrilinosWrappers::MPI::Vector::test_min_element OK
 DEAL:1:TrilinosWrappers::MPI::Vector::test_scale OK
 DEAL:1:TrilinosWrappers::MPI::BlockVector::test_nvector_view_unwrap OK
@@ -277,7 +303,9 @@ DEAL:1:TrilinosWrappers::MPI::BlockVector::test_elementwise_abs OK
 DEAL:1:TrilinosWrappers::MPI::BlockVector::test_weighted_rms_norm OK
 DEAL:1:TrilinosWrappers::MPI::BlockVector::test_weighted_rms_norm_mask 1 OK
 DEAL:1:TrilinosWrappers::MPI::BlockVector::test_weighted_rms_norm_mask 0 OK
+DEAL:1:TrilinosWrappers::MPI::BlockVector::test_weighted_l2_norm OK
 DEAL:1:TrilinosWrappers::MPI::BlockVector::test_max_norm OK
+DEAL:1:TrilinosWrappers::MPI::BlockVector::test_l1_norm OK
 DEAL:1:TrilinosWrappers::MPI::BlockVector::test_min_element OK
 DEAL:1:TrilinosWrappers::MPI::BlockVector::test_scale OK
 DEAL:1:PETScWrappers::MPI::Vector::test_nvector_view_unwrap OK
@@ -297,7 +325,9 @@ DEAL:1:PETScWrappers::MPI::Vector::test_elementwise_abs OK
 DEAL:1:PETScWrappers::MPI::Vector::test_weighted_rms_norm OK
 DEAL:1:PETScWrappers::MPI::Vector::test_weighted_rms_norm_mask 1 OK
 DEAL:1:PETScWrappers::MPI::Vector::test_weighted_rms_norm_mask 0 OK
+DEAL:1:PETScWrappers::MPI::Vector::test_weighted_l2_norm OK
 DEAL:1:PETScWrappers::MPI::Vector::test_max_norm OK
+DEAL:1:PETScWrappers::MPI::Vector::test_l1_norm OK
 DEAL:1:PETScWrappers::MPI::Vector::test_min_element OK
 DEAL:1:PETScWrappers::MPI::Vector::test_scale OK
 DEAL:1:PETScWrappers::MPI::BlockVector::test_nvector_view_unwrap OK
@@ -317,7 +347,9 @@ DEAL:1:PETScWrappers::MPI::BlockVector::test_elementwise_abs OK
 DEAL:1:PETScWrappers::MPI::BlockVector::test_weighted_rms_norm OK
 DEAL:1:PETScWrappers::MPI::BlockVector::test_weighted_rms_norm_mask 1 OK
 DEAL:1:PETScWrappers::MPI::BlockVector::test_weighted_rms_norm_mask 0 OK
+DEAL:1:PETScWrappers::MPI::BlockVector::test_weighted_l2_norm OK
 DEAL:1:PETScWrappers::MPI::BlockVector::test_max_norm OK
+DEAL:1:PETScWrappers::MPI::BlockVector::test_l1_norm OK
 DEAL:1:PETScWrappers::MPI::BlockVector::test_min_element OK
 DEAL:1:PETScWrappers::MPI::BlockVector::test_scale OK
 
