@@ -125,19 +125,15 @@ namespace Step66
 
     JacobianOperator();
 
-    virtual void
-    clear() override;
+    virtual void clear() override;
 
-    void
-    evaluate_newton_step(
+    void evaluate_newton_step(
       const LinearAlgebra::distributed::Vector<number> &newton_step);
 
-    virtual void
-    compute_diagonal() override;
+    virtual void compute_diagonal() override;
 
   private:
-    virtual void
-    apply_add(
+    virtual void apply_add(
       LinearAlgebra::distributed::Vector<number> &      dst,
       const LinearAlgebra::distributed::Vector<number> &src) const override;
 
@@ -147,8 +143,7 @@ namespace Step66
                 const LinearAlgebra::distributed::Vector<number> &src,
                 const std::pair<unsigned int, unsigned int> &cell_range) const;
 
-    void
-    local_compute_diagonal(FECellIntegrator &integrator) const;
+    void local_compute_diagonal(FECellIntegrator &integrator) const;
 
     Table<2, VectorizedArray<number>> nonlinear_values;
   };
@@ -170,8 +165,7 @@ namespace Step66
   // the nonlinearity and call the <code>clear()</code> function of the base
   // class.
   template <int dim, int fe_degree, typename number>
-  void
-  JacobianOperator<dim, fe_degree, number>::clear()
+  void JacobianOperator<dim, fe_degree, number>::clear()
   {
     nonlinear_values.reinit(0, 0);
     MatrixFreeOperators::Base<dim, LinearAlgebra::distributed::Vector<number>>::
@@ -200,8 +194,7 @@ namespace Step66
   // This skips all evaluations of the nonlinearity in each call of the
   // <code>vmult()</code> function.
   template <int dim, int fe_degree, typename number>
-  void
-  JacobianOperator<dim, fe_degree, number>::evaluate_newton_step(
+  void JacobianOperator<dim, fe_degree, number>::evaluate_newton_step(
     const LinearAlgebra::distributed::Vector<number> &newton_step)
   {
     const unsigned int n_cells = this->data->n_cell_batches();
@@ -236,8 +229,7 @@ namespace Step66
   // to perform the cell integration and distribute the local contributions into
   // the global vector <code> dst</code>.
   template <int dim, int fe_degree, typename number>
-  void
-  JacobianOperator<dim, fe_degree, number>::local_apply(
+  void JacobianOperator<dim, fe_degree, number>::local_apply(
     const MatrixFree<dim, number> &                   data,
     LinearAlgebra::distributed::Vector<number> &      dst,
     const LinearAlgebra::distributed::Vector<number> &src,
@@ -275,8 +267,7 @@ namespace Step66
   // Next we use MatrixFree::cell_loop() to perform the actual loop over all
   // cells computing the cell contribution to the matrix-vector product.
   template <int dim, int fe_degree, typename number>
-  void
-  JacobianOperator<dim, fe_degree, number>::apply_add(
+  void JacobianOperator<dim, fe_degree, number>::apply_add(
     LinearAlgebra::distributed::Vector<number> &      dst,
     const LinearAlgebra::distributed::Vector<number> &src) const
   {
@@ -293,8 +284,7 @@ namespace Step66
   // values from a input vector or distribute any local results to an output
   // vector. Instead the only input argument is the used FEEvaluation object.
   template <int dim, int fe_degree, typename number>
-  void
-  JacobianOperator<dim, fe_degree, number>::local_compute_diagonal(
+  void JacobianOperator<dim, fe_degree, number>::local_compute_diagonal(
     FECellIntegrator &phi) const
   {
     AssertDimension(nonlinear_values.size(0),
@@ -329,8 +319,7 @@ namespace Step66
   // diagonal and invert the elements by hand. Note, that during this loop we
   // catch the constrained DOFs and set them manually to one.
   template <int dim, int fe_degree, typename number>
-  void
-  JacobianOperator<dim, fe_degree, number>::compute_diagonal()
+  void JacobianOperator<dim, fe_degree, number>::compute_diagonal()
   {
     this->inverse_diagonal_entries.reset(
       new DiagonalMatrix<LinearAlgebra::distributed::Vector<number>>());
@@ -378,45 +367,34 @@ namespace Step66
   public:
     GelfandProblem();
 
-    void
-    run();
+    void run();
 
   private:
-    void
-    make_grid();
+    void make_grid();
 
-    void
-    setup_system();
+    void setup_system();
 
-    void
-    evaluate_residual(
+    void evaluate_residual(
       LinearAlgebra::distributed::Vector<double> &      dst,
       const LinearAlgebra::distributed::Vector<double> &src) const;
 
-    void
-    local_evaluate_residual(
+    void local_evaluate_residual(
       const MatrixFree<dim, double> &                   data,
       LinearAlgebra::distributed::Vector<double> &      dst,
       const LinearAlgebra::distributed::Vector<double> &src,
       const std::pair<unsigned int, unsigned int> &     cell_range) const;
 
-    void
-    assemble_rhs();
+    void assemble_rhs();
 
-    double
-    compute_residual(const double alpha);
+    double compute_residual(const double alpha);
 
-    void
-    compute_update();
+    void compute_update();
 
-    void
-    solve();
+    void solve();
 
-    double
-    compute_solution_norm() const;
+    double compute_solution_norm() const;
 
-    void
-    output_results(const unsigned int cycle) const;
+    void output_results(const unsigned int cycle) const;
 
 
     // For the parallel computation we define a
@@ -523,8 +501,7 @@ namespace Step66
   // class and also assign a SphericalManifold for the boundary. Finally, we
   // refine the initial mesh 3 - <code>dim</code> times globally.
   template <int dim, int fe_degree>
-  void
-  GelfandProblem<dim, fe_degree>::make_grid()
+  void GelfandProblem<dim, fe_degree>::make_grid()
   {
     TimerOutput::Scope t(computing_timer, "make grid");
 
@@ -560,8 +537,7 @@ namespace Step66
   // Note how we can use the same MatrixFree object twice, for the
   // <code>JacobianOperator</code> and the multigrid preconditioner.
   template <int dim, int fe_degree>
-  void
-  GelfandProblem<dim, fe_degree>::setup_system()
+  void GelfandProblem<dim, fe_degree>::setup_system()
   {
     TimerOutput::Scope t(computing_timer, "setup system");
 
@@ -678,8 +654,7 @@ namespace Step66
   // related data exchange, since all the bookkeeping is done by the
   // MatrixFree::cell_loop().
   template <int dim, int fe_degree>
-  void
-  GelfandProblem<dim, fe_degree>::evaluate_residual(
+  void GelfandProblem<dim, fe_degree>::evaluate_residual(
     LinearAlgebra::distributed::Vector<double> &      dst,
     const LinearAlgebra::distributed::Vector<double> &src) const
   {
@@ -703,8 +678,7 @@ namespace Step66
   // FEEvaluation::read_dof_values_plain() and FEEvaluation::evaluate(), since
   // the input vector might have constrained DOFs.
   template <int dim, int fe_degree>
-  void
-  GelfandProblem<dim, fe_degree>::local_evaluate_residual(
+  void GelfandProblem<dim, fe_degree>::local_evaluate_residual(
     const MatrixFree<dim, double> &                   data,
     LinearAlgebra::distributed::Vector<double> &      dst,
     const LinearAlgebra::distributed::Vector<double> &src,
@@ -744,8 +718,7 @@ namespace Step66
   // Experiences show that using the FEEvaluation class is much faster than a
   // classical implementation with FEValues and co.
   template <int dim, int fe_degree>
-  void
-  GelfandProblem<dim, fe_degree>::assemble_rhs()
+  void GelfandProblem<dim, fe_degree>::assemble_rhs()
   {
     TimerOutput::Scope t(computing_timer, "assemble right hand side");
 
@@ -772,8 +745,7 @@ namespace Step66
   // use a damped version $\alpha<1$ until the Newton step is good enough and
   // the full Newton step can be performed. This was also discussed in step-15.
   template <int dim, int fe_degree>
-  double
-  GelfandProblem<dim, fe_degree>::compute_residual(const double alpha)
+  double GelfandProblem<dim, fe_degree>::compute_residual(const double alpha)
   {
     TimerOutput::Scope t(computing_timer, "compute residual");
 
@@ -803,8 +775,7 @@ namespace Step66
   // preconditioner. For this we first set up the PreconditionMG object with a
   // Chebyshev smoother like we did in step-37.
   template <int dim, int fe_degree>
-  void
-  GelfandProblem<dim, fe_degree>::compute_update()
+  void GelfandProblem<dim, fe_degree>::compute_update()
   {
     TimerOutput::Scope t(computing_timer, "compute update");
 
@@ -917,8 +888,7 @@ namespace Step66
 
   // Now we implement the actual Newton solver for the nonlinear problem.
   template <int dim, int fe_degree>
-  void
-  GelfandProblem<dim, fe_degree>::solve()
+  void GelfandProblem<dim, fe_degree>::solve()
   {
     TimerOutput::Scope t(computing_timer, "solve");
 
@@ -1003,8 +973,7 @@ namespace Step66
   // VectorTools::integrate_difference(). In the end we gather all computations
   // from all MPI ranks and return the norm.
   template <int dim, int fe_degree>
-  double
-  GelfandProblem<dim, fe_degree>::compute_solution_norm() const
+  double GelfandProblem<dim, fe_degree>::compute_solution_norm() const
   {
     solution.update_ghost_values();
 
@@ -1090,8 +1059,7 @@ namespace Step66
   // about the system specifications and the finite element space we use. The
   // problem is solved several times on a successively refined mesh.
   template <int dim, int fe_degree>
-  void
-  GelfandProblem<dim, fe_degree>::run()
+  void GelfandProblem<dim, fe_degree>::run()
   {
     {
       const unsigned int n_ranks =
@@ -1194,8 +1162,7 @@ namespace Step66
 // create an object of the <code>GelfandProblem</code> class and call the run
 // function. Exemplarily we solve the problem once in 2D and once in 3D each
 // with fourth-order Lagrangian finite elements.
-int
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
   try
     {
