@@ -243,7 +243,7 @@ zero velocity will roughly pick up equal velocity increments in each successive
 time step if the electric field it encounters along the way were roughly
 constant. So the maximal difference between $\|\mathbf v_i^{(n-1)}\|$ and
 $\|\mathbf v_i^{(n)}\|$ would be a factor of two. As a consequence,
-we will choose $c_\text{saftey}=0.5$.
+we will choose $c_\text{safety}=0.5$.
 
 There is only one other case we ought to consider: What happens in
 the very first time step? There, any particles to be moved along have just
@@ -331,7 +331,7 @@ and call `insert_particle`. The only thing that may be surprising is
 the reference location: In order to evaluate things such as
 $\nabla V(\mathbf x_i)$, it is necessary to evaluate finite element
 fields at locations $\mathbf x_i$. But this requires evaluating the
-finite element shape functions at points on the refence cell
+finite element shape functions at points on the reference cell
 $\hat{\mathbf x}_i$. To make this efficient, every particle doesn't
 just store its location and the cell it is on, but also what location
 that point corresponds to in the cell's reference coordinate system.
@@ -418,7 +418,7 @@ field lines are also shown). The green part of the boundary is the anode,
 held at $V=+V_0$. The rest of the boundary satisfies a Neumann boundary
 condition.
 
-This setup mimicks real devices. The re-entrant corner results in an
+This setup mimics real devices. The re-entrant corner results in an
 electric potential $V$ whose derivative (the electric field $\mathbf E$)
 has a singularity -- in other words, it becomes very large in the vicinity
 of the corner, allowing it to rip electrons away from the metal. These
@@ -447,7 +447,7 @@ Of practical interest is to figure out which fraction of the
 electrons emitted from the cathode actually make it through the
 hole in the anode -- electrons that just bounce into the anode
 itself are not actually doing anything useful other than converting
-eletricity into heat. As a consequence, in the `track_lost_particle()`
+electricity into heat. As a consequence, in the `track_lost_particle()`
 function (which is called for each particle that leaves the domain,
 see above), we will estimate where it might have left the domain
 and report this in the output.

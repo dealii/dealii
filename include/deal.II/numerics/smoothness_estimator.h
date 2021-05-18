@@ -267,7 +267,7 @@ namespace SmoothnessEstimator
    * @f}
    * with $u_j$ the degrees of freedom and $\varphi_j$ the corresponding shape
    * functions. $\{\phi_{\bf k}({\bf x}) = \exp(i \, 2 \pi \, {\bf k} \cdot
-   * {\bf x}) \}$ are expoential functions on cell $K$. $a_{\bf k}$ and ${\cal
+   * {\bf x}) \}$ are exponential functions on cell $K$. $a_{\bf k}$ and ${\cal
    * F}_{{\bf k},j}$ are coefficients and transformation matrices from the
    * Fourier expansion of each shape function. For practical reasons, we will
    * perform the calculation of these matrices and coefficients only on the

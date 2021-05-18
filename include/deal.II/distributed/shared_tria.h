@@ -232,7 +232,7 @@ namespace parallel
       /**
        * Constructor.
        *
-       * The flag @p allow_artificial_cells can be used to enable artifical
+       * The flag @p allow_artificial_cells can be used to enable artificial
        * cells. If enabled, this class will behave similarly
        * to parallel::distributed::Triangulation and
        * parallel::fullydistributed::Triangulation in the sense that there will
@@ -248,9 +248,9 @@ namespace parallel
        * updates lead to communication only with the direct process neighbors in
        * a point-to-point fashion, these degenerate to an operation in which
        * every process communicates with every other process (an "all-to-all"
-       * communication) if no artifical cells are available. If such ghost-value
-       * updates are the bottleneck in your code, you may want to consider
-       * enabling artificial cells.
+       * communication) if no artificial cells are available. If such
+       * ghost-value updates are the bottleneck in your code, you may want to
+       * consider enabling artificial cells.
        */
       Triangulation(
         const MPI_Comm &mpi_communicator,

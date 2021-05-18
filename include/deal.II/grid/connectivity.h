@@ -977,7 +977,7 @@ namespace internal
                 {
                   // face is visited the second time -> now we know the cells
                   // on both sides of the face and we can determine for both
-                  // cells the neigbor
+                  // cells the neighbor
                   col_cc[j_0] = neighbors[col_cf[j_0]].first;
                   col_cc[neighbors[col_cf[j_0]].second] = i_0;
                 }

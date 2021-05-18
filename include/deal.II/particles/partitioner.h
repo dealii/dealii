@@ -28,7 +28,7 @@ namespace Particles
   {
     /**
      * Cache structure used to store the elements which are required to
-     * exchange the particle information (location and properties) accross
+     * exchange the particle information (location and properties) across
      * processors in order to update the ghost particles.
      *
      * This structure should only be used when one wishes to carry out work

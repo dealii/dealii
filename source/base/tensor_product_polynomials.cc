@@ -210,7 +210,7 @@ TensorProductPolynomials<dim, PolynomialType>::compute_grad(
   // compute values and
   // uni-directional derivatives at
   // the given point in each
-  // co-ordinate direction
+  // coordinate direction
   ndarray<double, dim, 2> v;
   {
     std::vector<double> tmp(2);
@@ -617,7 +617,7 @@ AnisotropicPolynomials<dim>::compute_grad(const unsigned int i,
   // compute values and
   // uni-directional derivatives at
   // the given point in each
-  // co-ordinate direction
+  // coordinate direction
   ndarray<double, dim, 2> v;
   for (unsigned int d = 0; d < dim; ++d)
     polynomials[d][indices[d]].value(p(d), 1, v[d].data());

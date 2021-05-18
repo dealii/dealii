@@ -1113,7 +1113,7 @@ namespace Step33
       prm.declare_entry("mesh",
                         "grid.inp",
                         Patterns::Anything(),
-                        "intput file name");
+                        "input file name");
 
       prm.declare_entry("diffusion power",
                         "2.0",

@@ -374,7 +374,7 @@ bool Settings::try_parse(const std::string &prm_filename)
 // MatrixFreeOperators::LaplaceOperator class which defines `local_apply()`,
 // `compute_diagonal()`, and `set_coefficient()` functions internally. Note that
 // the polynomial degree is a template parameter of this class. This is
-// necesary for the matrix-free code.
+// necessary for the matrix-free code.
 template <int dim, int degree>
 class LaplaceProblem
 {
@@ -919,7 +919,7 @@ void LaplaceProblem<dim, degree>::assemble_multigrid()
 // Finally, the system_rhs vector is of type LA::MPI::Vector, but the
 // MatrixFree class only work for
 // dealii::LinearAlgebra::distributed::Vector.  Therefore we must
-// compute the right-hand side using MatrixFree funtionality and then
+// compute the right-hand side using MatrixFree functionality and then
 // use the functions in the `ChangeVectorType` namespace to copy it to
 // the correct type.
 template <int dim, int degree>

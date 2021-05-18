@@ -841,7 +841,7 @@ namespace SUNDIALS
      * components of your system.
      *
      * When running in parallel, every process will call this function
-     * independently, and syncronization will happen at the end of the
+     * independently, and synchronization will happen at the end of the
      * initialization setup to communicate what components are local. Make sure
      * you only return the locally owned (or locally relevant) components, in
      * order to minimize communication between processes.

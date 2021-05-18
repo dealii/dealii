@@ -406,7 +406,7 @@ MappingQCache<dim, spacedim>::initialize(
       std::vector<Point<spacedim>> result;
 
       // Step 2b) read of quadrature points in the relative displacement case
-      // note: we also take this path for non-active or artifical cells so that
+      // note: we also take this path for non-active or artificial cells so that
       // these cells are filled with some useful data
       if (vector_describes_relative_displacement ||
           is_active_non_artificial_cell == false)
@@ -612,7 +612,7 @@ MappingQCache<dim, spacedim>::initialize(
       std::vector<Point<spacedim>> result;
 
       // Step 2b) read of quadrature points in the relative displacement case
-      // note: we also take this path for non-active or artifical cells so that
+      // note: we also take this path for non-active or artificial cells so that
       // these cells are filled with some useful data
       if (vector_describes_relative_displacement ||
           (is_non_artificial_cell == false))

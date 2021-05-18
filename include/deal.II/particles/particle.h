@@ -105,7 +105,7 @@ namespace Particles
      * specified ID at the specified location. Note that there is no check for
      * duplicate particle IDs so the user must make sure the IDs are unique over
      * all processes. Data is stored in a global PropertyPool object
-     * (corresponding to the global "heap") but can later be transfered to
+     * (corresponding to the global "heap") but can later be transferred to
      * another property pool by calling set_property_pool().
      *
      * @param[in] location Initial location of particle.
@@ -121,7 +121,7 @@ namespace Particles
      * Copy-constructor for Particle. This function creates a particle with
      * exactly the state of the input argument. The copied data is stored in a
      * global PropertyPool object (corresponding to the global "heap") but can
-     * later be transfered to another property pool by calling
+     * later be transferred to another property pool by calling
      * set_property_pool().
      */
     Particle(const Particle<dim, spacedim> &particle);
@@ -129,7 +129,7 @@ namespace Particles
     /**
      * Constructor for Particle. This function creates a particle from a data
      * vector. Data is stored in a global PropertyPool object (corresponding to
-     * the global "heap") but can later be transfered to another property pool
+     * the global "heap") but can later be transferred to another property pool
      * by calling set_property_pool(). This constructor is usually called after
      * serializing a particle by calling the write_data() function.
      *
@@ -274,7 +274,7 @@ namespace Particles
     /**
      * Return the ID number of this particle. The ID of a particle is intended
      * to be a property that is globally unique even in parallel computations
-     * and is transfered along with other properties of a particle if it
+     * and is transferred along with other properties of a particle if it
      * moves from a cell owned by the current processor to a cell owned by
      * a different processor, or if ownership of the cell it is on is
      * transferred to a different processor.
@@ -285,7 +285,7 @@ namespace Particles
     /**
      * Set the ID number of this particle. The ID of a particle is intended
      * to be a property that is globally unique even in parallel computations
-     * and is transfered along with other properties of a particle if it
+     * and is transferred along with other properties of a particle if it
      * moves from a cell owned by the current processor to a cell owned by
      * a different processor, or if ownership of the cell it is on is
      * transferred to a different processor. As a consequence, when setting
@@ -625,7 +625,7 @@ namespace Particles
   inline bool
   Particle<dim, spacedim>::has_properties() const
   {
-    // Particles always have a property pool asssociated with them,
+    // Particles always have a property pool associated with them,
     // but we can access properties only if there is a valid handle.
     // The only way a particle can have no valid handle if it has
     // been moved-from -- but that leaves an object in an invalid

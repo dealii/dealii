@@ -85,7 +85,7 @@ namespace internal
 
 
     /**
-     * Generate evalution points on a simplex with arbitrary number of
+     * Generate evaluation points on a simplex with arbitrary number of
      * subdivisions.
      */
     template <int dim>

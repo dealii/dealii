@@ -335,7 +335,7 @@ namespace Particles
      * Create and insert a number of particles into the collection of particles.
      * This function takes a list of positions and creates a set of particles
      * at these positions, which are then distributed and added to the local
-     * particle collection of a procesor. Note that this function uses
+     * particle collection of a processor. Note that this function uses
      * GridTools::distributed_compute_point_locations(). Consequently, it can
      * require intense communications between the processors. This function
      * is used in step-70.
@@ -374,7 +374,7 @@ namespace Particles
      *
      * @param[in] properties (Optional) A vector of vector of properties
      * associated with each local point. The size of the vector should be either
-     * zero (no properties will be transfered nor attached to the generated
+     * zero (no properties will be transferred nor attached to the generated
      * particles) or it should be a vector of `positions.size()` vectors of size
      * `n_properties_per_particle()`. Notice that this function call will
      * transfer the properties from the local mpi process to the final mpi
@@ -403,7 +403,7 @@ namespace Particles
      * Insert a number of particles into the collection of particles. This
      * function takes a list of particles for which we don't know the associated
      * cell iterator, and distributes them to the correct local particle
-     * collection of a procesor, by unpacking the locations, figuring out where
+     * collection of a processor, by unpacking the locations, figuring out where
      * to send the particles by calling
      * GridTools::distributed_compute_point_locations(), and sending the
      * particles to the corresponding process.
@@ -513,7 +513,7 @@ namespace Particles
     /**
      * Set the position of the particles within the particle handler using a
      * function with spacedim components. The new set of point defined by the
-     * fuction has to be sufficiently close to the original one to ensure that
+     * function has to be sufficiently close to the original one to ensure that
      * the sort_particles_into_subdomains_and_cells algorithm manages to find
      * the new cells in which the particles belong.
      *
@@ -995,7 +995,7 @@ namespace Particles
 
     /**
      * Cache structure used to store the elements which are required to
-     * exchange the particle information (location and properties) accross
+     * exchange the particle information (location and properties) across
      * processors in order to update the ghost particles. This structure
      * is only used to update the ghost particles.
      */

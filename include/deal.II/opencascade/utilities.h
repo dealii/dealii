@@ -144,7 +144,7 @@ namespace OpenCASCADE
    * shape and the mesh, to control the shape and regularity of the triangles
    * you should use other meshing softwares. The two arguments `deflection` and
    * `angular_deflection` select the accuracy of the created triangulation with
-   * respect to the orginal topological shape. The argument
+   * respect to the original topological shape. The argument
    * `sew_different_faces` gives the possibility to use a Sewer from OpenCASCADE
    * to create a watertight closed STL using the argument `sewer_tolerance`. The
    * argument `is_relative` specifies if distance are relative and `in_parallel`

@@ -60,14 +60,14 @@ namespace SUNDIALS
     public:
       /**
        * Create a non-owning content with an existing @p vector.
-       * @param vector The underlying vector to wrap in thi object.
+       * @param vector The underlying vector to wrap in this object.
        */
       NVectorContent(VectorType *vector);
 
       /**
        * Create a non-owning content with an existing const @p vector. If this
        * constructor is used, access is only allowed via the get() const method.
-       * @param vector The underlying vector to wrap in thi object.
+       * @param vector The underlying vector to wrap in this object.
        */
       NVectorContent(const VectorType *vector);
 

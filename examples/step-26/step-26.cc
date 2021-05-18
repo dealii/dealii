@@ -396,7 +396,7 @@ namespace Step26
     // solution vector, i.e., to make sure that the values of degrees of
     // freedom located on hanging nodes are so that the solution is
     // continuous. This is necessary since SolutionTransfer only operates on
-    // cells locally, without regard to the neighborhoof.
+    // cells locally, without regard to the neighborhood.
     triangulation.execute_coarsening_and_refinement();
     setup_system();
 

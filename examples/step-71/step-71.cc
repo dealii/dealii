@@ -1673,7 +1673,7 @@ namespace Step71
       // Next is the symbolic representation of the saturation function for
       // the elastic part of the free energy density function, followed by the
       // magnetoelastic contribution to the free energy density function.
-      // This all has the same stucture as we'd seen previously.
+      // This all has the same structure as we'd seen previously.
       const Differentiation::SD::Expression f_mu_e_sd =
         1.0 +
         (mu_e_inf_sd / mu_e_sd - 1.0) *
@@ -3893,7 +3893,7 @@ namespace Step71
             material_assisted_computation.update_end_of_timestep();
           }
 
-          // ... and test for discrepencies between the two.
+          // ... and test for discrepancies between the two.
           check_material_class_results(material_hand_calculated,
                                        material_assisted_computation);
 

@@ -158,7 +158,7 @@ Mapping<dim, spacedim>::fill_fe_face_values(
   dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
     &output_data) const
 {
-  // base class version, implement overriden function in derived classes
+  // base class version, implement overridden function in derived classes
   AssertDimension(quadrature.size(), 1);
   fill_fe_face_values(cell, face_no, quadrature[0], internal_data, output_data);
 }
@@ -193,7 +193,7 @@ Mapping<dim, spacedim>::get_face_data(
   const UpdateFlags               update_flags,
   const hp::QCollection<dim - 1> &quadrature) const
 {
-  // base class version, implement overriden function in derived classes
+  // base class version, implement overridden function in derived classes
   return get_face_data(update_flags, quadrature[0]);
 }
 

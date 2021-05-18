@@ -94,7 +94,7 @@ namespace PETScWrappers
 
     public:
       /*
-       * Copy constrcutor.
+       * Copy constructor.
        */
       VectorReference(const VectorReference &vector) = default;
 

@@ -309,7 +309,7 @@ There are a few logical ways in which this program could be extended:
   magnetic hysteretic effects or damage models for the composite polymer that these material
   seek to model.
 - Of course, the implemented models could be modified or completely replaced with models that are
-  focussed on other aspects of physics, such as electro-active polymers, biomechanical materials,
+  focused on other aspects of physics, such as electro-active polymers, biomechanical materials,
   elastoplastic media, etc.
 - Implement a different time-discretization scheme for the viscoelastic evolution law.
 - Instead of deriving everything directly from an energy density function, use the

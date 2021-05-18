@@ -189,16 +189,17 @@ namespace VectorTools
 
     Assert(cache.is_ready(),
            ExcMessage(
-             "Utilties::MPI::RemotePointEvaluation is not ready yet! "
-             "Please call Utilties::MPI::RemotePointEvaluation::reinit() "
+             "Utilities::MPI::RemotePointEvaluation is not ready yet! "
+             "Please call Utilities::MPI::RemotePointEvaluation::reinit() "
              "yourself or the other evaluate_at_points(), which does this for"
              "you."));
 
-    Assert(&dof_handler.get_triangulation() == &cache.get_triangulation(),
-           ExcMessage(
-             "The provided Utilties::MPI::RemotePointEvaluation and DoFHandler "
-             "object have been set up with different Triangulation objects, "
-             "a scenario not supported!"));
+    Assert(
+      &dof_handler.get_triangulation() == &cache.get_triangulation(),
+      ExcMessage(
+        "The provided Utilities::MPI::RemotePointEvaluation and DoFHandler "
+        "object have been set up with different Triangulation objects, "
+        "a scenario not supported!"));
 
     // evaluate values at points if possible
     const auto evaluation_point_results = [&]() {

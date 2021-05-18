@@ -98,7 +98,7 @@ namespace SUNDIALS
     /**
      * A view to a vector which can be used whenever a N_Vector is required.
      *
-     * Objects of this class should preferrably be created by
+     * Objects of this class should preferably be created by
      * make_nvector_view() as
      *
      * @code
