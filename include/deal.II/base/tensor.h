@@ -167,6 +167,30 @@ public:
   Tensor(const OtherNumber &initializer);
 
   /**
+   * Copy constructor
+   */
+  constexpr DEAL_II_CUDA_HOST_DEV
+  Tensor(const Tensor<0, dim, Number> &other);
+
+  /**
+   * Copy assignment operator
+   */
+  constexpr DEAL_II_CUDA_HOST_DEV Tensor<0, dim, Number> &
+                                  operator=(const Tensor<0, dim, Number> &other);
+
+  /**
+   * Move constructor
+   */
+  constexpr DEAL_II_CUDA_HOST_DEV
+    Tensor(Tensor<0, dim, Number> &&other) noexcept;
+
+  /**
+   * Move assignment operator
+   */
+  constexpr DEAL_II_CUDA_HOST_DEV Tensor<0, dim, Number> &
+                                  operator=(Tensor<0, dim, Number> &&other) noexcept;
+
+  /**
    * Return a pointer to the first element of the underlying storage.
    */
   Number *
@@ -222,19 +246,6 @@ public:
   template <typename OtherNumber>
   constexpr DEAL_II_CUDA_HOST_DEV Tensor &
                                   operator=(const Tensor<0, dim, OtherNumber> &rhs);
-
-#ifdef __INTEL_COMPILER
-  /**
-   * Assignment from tensors with same underlying scalar type.
-   * This is needed for ICC15 because it can't generate a suitable
-   * copy constructor for Sacado::Rad::ADvar types automatically.
-   * See https://github.com/dealii/dealii/pull/5865.
-   *
-   * @note This function can also be used in CUDA device code.
-   */
-  constexpr DEAL_II_CUDA_HOST_DEV Tensor &
-                                  operator=(const Tensor<0, dim, Number> &rhs);
-#endif
 
   /**
    * This operator assigns a scalar to a tensor. This obviously requires
@@ -546,6 +557,28 @@ public:
   template <typename OtherNumber>
   constexpr
   operator Tensor<1, dim, Tensor<rank_ - 1, dim, OtherNumber>>() const;
+
+  /**
+   * Copy constructor
+   */
+  constexpr Tensor(const Tensor<rank_, dim, Number> &);
+
+  /**
+   * Copy assignment operator
+   */
+  constexpr Tensor<rank_, dim, Number> &
+  operator=(const Tensor<rank_, dim, Number> &);
+
+  /**
+   * Move constructor
+   */
+  constexpr Tensor(Tensor<rank_, dim, Number> &&) noexcept;
+
+  /**
+   * Move assignment operator
+   */
+  constexpr Tensor<rank_, dim, Number> &
+  operator=(Tensor<rank_, dim, Number> &&) noexcept;
 
   /**
    * Read-Write access operator.
@@ -887,6 +920,42 @@ constexpr DEAL_II_ALWAYS_INLINE DEAL_II_CUDA_HOST_DEV
 
 
 template <int dim, typename Number>
+constexpr DEAL_II_ALWAYS_INLINE DEAL_II_CUDA_HOST_DEV
+                                Tensor<0, dim, Number>::Tensor(const Tensor<0, dim, Number> &other)
+  : value{other.value}
+{}
+
+
+
+template <int dim, typename Number>
+constexpr DEAL_II_ALWAYS_INLINE DEAL_II_CUDA_HOST_DEV Tensor<0, dim, Number> &
+Tensor<0, dim, Number>::operator=(const Tensor<0, dim, Number> &other)
+{
+  value = other.value;
+  return *this;
+}
+
+
+
+template <int dim, typename Number>
+constexpr DEAL_II_ALWAYS_INLINE DEAL_II_CUDA_HOST_DEV
+                                Tensor<0, dim, Number>::Tensor(Tensor<0, dim, Number> &&other) noexcept
+  : value{std::move(other.value)}
+{}
+
+
+
+template <int dim, typename Number>
+constexpr DEAL_II_ALWAYS_INLINE DEAL_II_CUDA_HOST_DEV Tensor<0, dim, Number> &
+  Tensor<0, dim, Number>::operator=(Tensor<0, dim, Number> &&other) noexcept
+{
+  value = std::move(other.value);
+  return *this;
+}
+
+
+
+template <int dim, typename Number>
 inline Number *
 Tensor<0, dim, Number>::begin_raw()
 {
@@ -957,18 +1026,6 @@ constexpr inline DEAL_II_ALWAYS_INLINE
   value = internal::NumberType<Number>::value(p);
   return *this;
 }
-
-
-#  ifdef __INTEL_COMPILER
-template <int dim, typename Number>
-constexpr inline DEAL_II_ALWAYS_INLINE
-  DEAL_II_CUDA_HOST_DEV Tensor<0, dim, Number> &
-  Tensor<0, dim, Number>::operator=(const Tensor<0, dim, Number> &p)
-{
-  value = p.value;
-  return *this;
-}
-#  endif
 
 
 template <int dim, typename Number>
@@ -1218,6 +1275,44 @@ constexpr DEAL_II_ALWAYS_INLINE Tensor<rank_, dim, Number>::
   return Tensor<1, dim, Tensor<rank_ - 1, dim, Number>>(values);
 }
 
+
+template <int rank_, int dim, typename Number>
+constexpr DEAL_II_ALWAYS_INLINE
+Tensor<rank_, dim, Number>::Tensor(const Tensor<rank_, dim, Number> &other)
+{
+  for (unsigned int i = 0; i < dim; ++i)
+    values[i] = other.values[i];
+}
+
+
+template <int rank_, int dim, typename Number>
+constexpr DEAL_II_ALWAYS_INLINE Tensor<rank_, dim, Number> &
+Tensor<rank_, dim, Number>::operator=(const Tensor<rank_, dim, Number> &other)
+{
+  for (unsigned int i = 0; i < dim; ++i)
+    values[i] = other.values[i];
+  return *this;
+}
+
+
+template <int rank_, int dim, typename Number>
+constexpr DEAL_II_ALWAYS_INLINE
+Tensor<rank_, dim, Number>::Tensor(Tensor<rank_, dim, Number> &&other) noexcept
+{
+  for (unsigned int i = 0; i < dim; ++i)
+    values[i] = other.values[i];
+}
+
+
+template <int rank_, int dim, typename Number>
+constexpr DEAL_II_ALWAYS_INLINE Tensor<rank_, dim, Number> &
+                                Tensor<rank_, dim, Number>::
+                                operator=(Tensor<rank_, dim, Number> &&other) noexcept
+{
+  for (unsigned int i = 0; i < dim; ++i)
+    values[i] = other.values[i];
+  return *this;
+}
 
 
 namespace internal
