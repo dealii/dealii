@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2021 by the deal.II authors
+// Copyright (C) 2020 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,24 +14,25 @@
 // ---------------------------------------------------------------------
 
 
-// check FEPointEvaluation for scalar FE_DGQHermite and MappingQGeneric by
-// comparing to the output of FEValues with the same settings (apart from the
-// finite element and the interpolated function, this is the same as
-// point_evaluation_02)
+// check FEPointEvaluation for scalar FE_DGQ and MappingFEField by comparing
+// to the output of FEValues with the same settings
 
 #include <deal.II/base/function_lib.h>
 
 #include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/fe_dgq.h>
-#include <deal.II/fe/fe_point_evaluation.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_values.h>
-#include <deal.II/fe/mapping_q_generic.h>
+#include <deal.II/fe/mapping_fe_field.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 
 #include <deal.II/lac/vector.h>
+
+#include <deal.II/matrix_free/fe_point_evaluation.h>
 
 #include <deal.II/numerics/vector_tools.h>
 
@@ -53,7 +54,14 @@ test(const unsigned int degree)
   else
     GridGenerator::subdivided_hyper_cube(tria, 2, 0, 1);
 
-  MappingQGeneric<dim> mapping(degree);
+  FESystem<dim>   fe_grid(FE_Q<dim>(degree), dim);
+  DoFHandler<dim> dof_handler_grid(tria);
+  dof_handler_grid.distribute_dofs(fe_grid);
+  const ComponentMask mask(dim, true);
+  Vector<double>      location_vector(dof_handler_grid.n_dofs());
+  VectorTools::get_position_vector(dof_handler_grid, location_vector, mask);
+  MappingFEField<dim> mapping(dof_handler_grid, location_vector, mask);
+
   deallog << "Mapping of degree " << degree << std::endl;
 
   std::vector<Point<dim>> unit_points;
@@ -65,8 +73,8 @@ test(const unsigned int degree)
       unit_points.push_back(p);
     }
 
-  FE_DGQHermite<dim> fe(degree);
-  FEValues<dim>      fe_values(mapping,
+  FE_DGQ<dim>   fe(degree);
+  FEValues<dim> fe_values(mapping,
                           fe,
                           Quadrature<dim>(unit_points),
                           update_values | update_gradients);
@@ -79,10 +87,12 @@ test(const unsigned int degree)
                                       fe,
                                       update_values | update_gradients);
 
-  // FE_DGQHermite is not interpolatory, so we just set up some arbitrary
-  // content in the vector for the sake of comparison
-  for (unsigned int i = 0; i < vector.size(); ++i)
-    vector(i) = (i + 2) % 17;
+  Tensor<1, dim> exponents;
+  exponents[0] = 1.;
+  VectorTools::interpolate(mapping,
+                           dof_handler,
+                           Functions::Monomial<dim>(exponents),
+                           vector);
 
   std::vector<double>         solution_values(fe.dofs_per_cell);
   std::vector<double>         function_values(unit_points.size());

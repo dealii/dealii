@@ -14,15 +14,15 @@
 // ---------------------------------------------------------------------
 
 
-// check FEPointEvaluation for scalar FE_DGQ and MappingQGeneric by comparing
-// to the output of FEValues with the same settings
+// check FEPointEvaluation for vector-valued FE_Q and MappingQGeneric by
+// comparing to the output of FEValues with the same settings
 
 #include <deal.II/base/function_lib.h>
 
 #include <deal.II/dofs/dof_handler.h>
 
-#include <deal.II/fe/fe_dgq.h>
-#include <deal.II/fe/fe_point_evaluation.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_q_generic.h>
 
@@ -31,11 +31,30 @@
 
 #include <deal.II/lac/vector.h>
 
+#include <deal.II/matrix_free/fe_point_evaluation.h>
+
 #include <deal.II/numerics/vector_tools.h>
 
 #include <iostream>
 
 #include "../tests.h"
+
+
+
+template <int dim>
+class MyFunction : public Function<dim>
+{
+public:
+  MyFunction()
+    : Function<dim>(dim)
+  {}
+
+  double
+  value(const Point<dim> &p, const unsigned int component) const override
+  {
+    return component + p[component];
+  }
+};
 
 
 
@@ -51,7 +70,7 @@ test(const unsigned int degree)
   else
     GridGenerator::subdivided_hyper_cube(tria, 2, 0, 1);
 
-  MappingQGeneric<dim> mapping(std::max<unsigned int>(1, degree));
+  MappingQGeneric<dim> mapping(degree);
   deallog << "Mapping of degree " << degree << std::endl;
 
   std::vector<Point<dim>> unit_points;
@@ -63,7 +82,7 @@ test(const unsigned int degree)
       unit_points.push_back(p);
     }
 
-  FE_DGQ<dim>   fe(degree);
+  FESystem<dim> fe(FE_Q<dim>(degree), dim);
   FEValues<dim> fe_values(mapping,
                           fe,
                           Quadrature<dim>(unit_points),
@@ -73,26 +92,23 @@ test(const unsigned int degree)
   dof_handler.distribute_dofs(fe);
   Vector<double> vector(dof_handler.n_dofs());
 
-  FEPointEvaluation<1, dim> evaluator(mapping,
-                                      fe,
-                                      update_values | update_gradients);
+  FEPointEvaluation<dim, dim> evaluator(mapping,
+                                        fe,
+                                        update_values | update_gradients);
 
-  Tensor<1, dim> exponents;
-  exponents[0] = 1.;
-  VectorTools::interpolate(mapping,
-                           dof_handler,
-                           Functions::Monomial<dim>(exponents),
-                           vector);
+  VectorTools::interpolate(mapping, dof_handler, MyFunction<dim>(), vector);
 
   std::vector<double>         solution_values(fe.dofs_per_cell);
-  std::vector<double>         function_values(unit_points.size());
-  std::vector<Tensor<1, dim>> function_gradients(unit_points.size());
+  std::vector<Tensor<1, dim>> function_values(unit_points.size());
+  std::vector<Tensor<2, dim>> function_gradients(unit_points.size());
+
+  FEValuesExtractors::Vector extractor(0);
 
   for (const auto &cell : dof_handler.active_cell_iterators())
     {
       fe_values.reinit(cell);
-      fe_values.get_function_values(vector, function_values);
-      fe_values.get_function_gradients(vector, function_gradients);
+      fe_values[extractor].get_function_values(vector, function_values);
+      fe_values[extractor].get_function_gradients(vector, function_gradients);
 
       cell->get_dof_values(vector,
                            solution_values.begin(),
@@ -106,7 +122,8 @@ test(const unsigned int degree)
       for (unsigned int i = 0; i < function_values.size(); ++i)
         deallog << mapping.transform_unit_to_real_cell(cell, unit_points[i])
                 << ": " << evaluator.get_value(i) << " error value "
-                << function_values[i] - evaluator.get_value(i) << " error grad "
+                << (function_values[i] - evaluator.get_value(i)).norm()
+                << " error grad "
                 << (evaluator.get_gradient(i) - function_gradients[i]).norm()
                 << std::endl;
       deallog << std::endl;
@@ -134,8 +151,6 @@ main()
   initlog();
   deallog << std::setprecision(10);
 
-  test<1>(0);
-  test<1>(3);
   test<2>(2);
   test<2>(6);
   test<3>(5);

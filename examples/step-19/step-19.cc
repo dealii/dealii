@@ -37,7 +37,7 @@
 #include <deal.II/grid/grid_refinement.h>
 
 #include <deal.II/fe/mapping_q.h>
-#include <deal.II/fe/fe_point_evaluation.h>
+#include <deal.II/matrix_free/fe_point_evaluation.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
 
