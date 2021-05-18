@@ -321,7 +321,7 @@ namespace internal
             if (reference_cell != temp.first)
               {
                 // TODO: this might happen if the quadrature rule and the
-                // the FE do not match
+                // FE do not match
                 this->n_q_points_face = 0;
               }
             else

@@ -80,7 +80,7 @@ namespace Functions
     // The (`dim + 1`)-coordinate direction that has been restricted.
     const unsigned int restricted_direction;
 
-    // Value of the restriced coordinate.
+    // Value of the restricted coordinate.
     const double coordinate_value;
   };
 

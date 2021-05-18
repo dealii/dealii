@@ -28,7 +28,7 @@ namespace Particles
   {
     /**
      * Cache structure used to store the elements which are required to
-     * exchange the particle information (location and properties) accross
+     * exchange the particle information (location and properties) across
      * processors in order to update the ghost particles.
      *
      * This structure should only be used when one wishes to carry out work
@@ -109,7 +109,7 @@ namespace Particles
       /**
        * Temporary storage that holds the data of the particles to receive
        * the ghost particles information from other processors in
-       * in update_ghost_particles()
+       * update_ghost_particles()
        * send_recv_particles_properties_and_location()
        */
       std::vector<char> recv_data;

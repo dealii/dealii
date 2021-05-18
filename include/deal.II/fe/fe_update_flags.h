@@ -581,7 +581,7 @@ namespace internal
       HessianVector shape_hessians;
 
       /**
-       * Store the 3nd derivatives of the shape functions at the quadrature
+       * Store the 3rd derivatives of the shape functions at the quadrature
        * points.  See the description of the data type for the layout of the
        * data in this field.
        */

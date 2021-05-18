@@ -252,7 +252,7 @@ private:
    * dof_index / n</code> (integer division). The indices <code>i</code> and
    * <code>j</code> can then be used to compute the offset.
    *
-   * For our example of Raviart-Thomas elements this means if if the
+   * For our example of Raviart-Thomas elements this means if the
    * switches are <code>(true | true | true)</code> that means we rotate the
    * face first by + 90 degree(counterclockwise) then by another +180
    * degrees but we do not flip it since the face has standard

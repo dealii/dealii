@@ -30,7 +30,7 @@ namespace ArborXWrappers
 {
   /**
    * Base class for Point-based predicates providing basic functionality for
-   * dericed classes, not supposed to be used on its own.
+   * derived classes, not supposed to be used on its own.
    */
   class PointPredicate
   {
@@ -119,7 +119,7 @@ namespace ArborXWrappers
 
   /**
    * Base class for BoundingBox predicates providing basic functionality for
-   * dericed classes, not supposed to be used on its own.
+   * derived classes, not supposed to be used on its own.
    */
   class BoundingBoxPredicate
   {

@@ -289,7 +289,7 @@ namespace VectorTools
    * Like the above function but also taking @p mapping as argument.
    * This will introduce an additional approximation between the true geometry
    * specified by the manifold if the degree of the mapping is lower than the
-   * degree of the finite finite element in the DoFHandler @p dh, but more
+   * degree of the finite element in the DoFHandler @p dh, but more
    * importantly it allows to fill location vectors for mappings that do not
    * preserve vertex locations (like Eulerian mappings).
    */

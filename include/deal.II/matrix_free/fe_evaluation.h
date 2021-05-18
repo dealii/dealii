@@ -8828,7 +8828,7 @@ FEFaceEvaluation<dim,
       const auto face_orientations = this->compute_face_orientations();
 
 #  ifdef DEBUG
-      // currently on structured meshes are supported -> face numers and
+      // currently on structured meshes are supported -> face numbers and
       // orientations have to be the same for all filled lanes
       for (unsigned int v = 1; v < VectorizedArrayType::size(); ++v)
         {

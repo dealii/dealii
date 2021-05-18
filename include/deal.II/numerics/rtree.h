@@ -388,7 +388,7 @@ struct ExtractLevelVisitor
  * processes. The finest level of information is given by the leaves, which in
  * this context would be the collection of all the bounding boxes associated
  * to the locally owned cells of the triangulation. Exchanging this information
- * with all participating processess would defeat the purpuse of parallel
+ * with all participating processes would defeat the purpuse of parallel
  * computations. If however one constructs an RTree containing these bounding
  * boxes (for example, by calling
  * GridTools::Cache::get_cell_bounding_boxes_rtree()), and then extracts one of

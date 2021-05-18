@@ -676,7 +676,7 @@ namespace DerivativeApproximation
     public:
       /**
        * alias to select the DerivativeDescription corresponding to the
-       * <tt>order</tt>th derivative. In this general template we set an unvalid
+       * <tt>order</tt>th derivative. In this general template we set an invalid
        * alias to void, the real alias have to be specialized.
        */
       using DerivDescr = void;

@@ -1598,7 +1598,7 @@ private:
    * Pointer to the first cached degree of freedom of a geometric object for all
    * relevant active finite elements.
    *
-   * @note In normal mode it is possible to access this data strucutre directly.
+   * @note In normal mode it is possible to access this data structure directly.
    *   In hp-mode, an indirection via hp_object_fe_indices/hp_object_fe_ptr is
    * necessary.
    */
@@ -1665,7 +1665,7 @@ private:
 
   /**
    * A list of connections with which this object connects to the
-   * triangulation. They get triggered specifially when data needs to be
+   * triangulation. They get triggered specifically when data needs to be
    * transferred due to refinement or repartitioning. Only active in hp-mode.
    */
   std::vector<boost::signals2::connection> tria_listeners_for_transfer;

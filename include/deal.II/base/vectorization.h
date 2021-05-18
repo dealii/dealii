@@ -176,7 +176,7 @@ public:
   }
 
   /**
-   * This operator advances the iterator by @p offet lanes and returns a
+   * This operator advances the iterator by @p offset lanes and returns a
    * reference to <tt>*this</tt>.
    */
   VectorizedArrayIterator<T> &
@@ -5011,7 +5011,7 @@ enum class SIMDComparison : int
  * whenever the control flow itself would depend on (computed) data. For
  * example, in case of a scalar data type the statement
  * <code>(left < right) ? true_value : false_value</code>
- * could have been also implementd using an <code>if</code>-statement:
+ * could have been also implemented using an <code>if</code>-statement:
  * @code
  * if (left < right)
  *     result = true_value;

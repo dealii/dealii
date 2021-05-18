@@ -104,7 +104,7 @@ FE_BDM<dim>::FE_BDM(const unsigned int deg)
         ++target_row;
       }
 
-  // We need to initialize the dof permuation table and the one for the sign
+  // We need to initialize the dof permutation table and the one for the sign
   // change.
   initialize_quad_dof_index_permutation_and_sign_change();
 }

@@ -1030,9 +1030,9 @@ namespace parallel
      *
      * The TemporarilyMatchRefineFlags class should only be used in
      * combination with the Triangulation::Signals::post_p4est_refinement
-     * signal. At this stage, the p4est orcale already has been refined, but
+     * signal. At this stage, the p4est oracle already has been refined, but
      * the triangulation is still unchanged. After the modification, all
-     * refine and coarsen flags describe how the traingulation will acutally
+     * refine and coarsen flags describe how the traingulation will actually
      * be refined.
      *
      * The use of this class is demonstrated in step-75.
