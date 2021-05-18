@@ -230,11 +230,15 @@ compute_force_vector_sharp_interface(
   const auto fu = [&](const auto &values, const auto &cell_data) {
     AffineConstraints<double> constraints; // TODO: use the right ones
 
-    FEPointEvaluation<1, spacedim> phi_curvature(mapping, dof_handler.get_fe());
+    FEPointEvaluation<1, spacedim>        phi_curvature(mapping,
+                                                 dof_handler.get_fe(),
+                                                 update_values);
     FEPointEvaluation<spacedim, spacedim> phi_normal(mapping,
-                                                     dof_handler_dim.get_fe());
+                                                     dof_handler_dim.get_fe(),
+                                                     update_values);
     FEPointEvaluation<spacedim, spacedim> phi_force(mapping,
-                                                    dof_handler_dim.get_fe());
+                                                    dof_handler_dim.get_fe(),
+                                                    update_values);
 
     std::vector<double>                  buffer;
     std::vector<double>                  buffer_dim;
@@ -278,9 +282,8 @@ compute_force_vector_sharp_interface(
                                      buffer.begin(),
                                      buffer.end());
 
-          phi_curvature.evaluate(cell,
-                                 unit_points,
-                                 make_array_view(buffer),
+          phi_curvature.reinit(cell, unit_points);
+          phi_curvature.evaluate(make_array_view(buffer),
                                  EvaluationFlags::values);
         }
 
@@ -296,13 +299,13 @@ compute_force_vector_sharp_interface(
                                      buffer_dim.begin(),
                                      buffer_dim.end());
 
-          phi_normal.evaluate(cell_dim,
-                              unit_points,
-                              make_array_view(buffer_dim),
+          phi_normal.reinit(cell_dim, unit_points);
+          phi_normal.evaluate(make_array_view(buffer_dim),
                               EvaluationFlags::values);
         }
 
         // perform operation on quadrature points
+        phi_force.reinit(cell_dim, unit_points);
         for (unsigned int q = 0; q < unit_points.size(); ++q)
           phi_force.submit_value(surface_tension * phi_normal.get_value(q) *
                                    phi_curvature.get_value(q) * JxW[q],
@@ -310,10 +313,7 @@ compute_force_vector_sharp_interface(
 
         // integrate_scatter force
         {
-          phi_force.integrate(cell_dim,
-                              unit_points,
-                              buffer_dim,
-                              EvaluationFlags::values);
+          phi_force.integrate(buffer_dim, EvaluationFlags::values);
 
           constraints.distribute_local_to_global(buffer_dim,
                                                  local_dof_indices_dim,

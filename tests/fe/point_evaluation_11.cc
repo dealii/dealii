@@ -75,7 +75,9 @@ test(const unsigned int degree)
   dof_handler.distribute_dofs(fe);
   Vector<double> vector(dof_handler.n_dofs());
 
-  FEPointEvaluation<1, dim> evaluator(mapping, fe);
+  FEPointEvaluation<1, dim> evaluator(mapping,
+                                      fe,
+                                      update_values | update_gradients);
 
   // FE_DGQHermite is not interpolatory, so we just set up some arbitrary
   // content in the vector for the sake of comparison
@@ -96,9 +98,8 @@ test(const unsigned int degree)
                            solution_values.begin(),
                            solution_values.end());
 
-      evaluator.evaluate(cell,
-                         unit_points,
-                         solution_values,
+      evaluator.reinit(cell, unit_points);
+      evaluator.evaluate(solution_values,
                          EvaluationFlags::values | EvaluationFlags::gradients);
 
       deallog << "Cell with center " << cell->center(true) << std::endl;
@@ -116,9 +117,7 @@ test(const unsigned int degree)
           evaluator.submit_gradient(evaluator.get_gradient(i), i);
         }
 
-      evaluator.integrate(cell,
-                          unit_points,
-                          solution_values,
+      evaluator.integrate(solution_values,
                           EvaluationFlags::values | EvaluationFlags::gradients);
 
       for (const auto i : solution_values)

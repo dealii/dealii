@@ -1236,6 +1236,107 @@ MappingQGeneric<dim, spacedim>::fill_fe_subface_values(
 
 
 template <int dim, int spacedim>
+inline void
+MappingQGeneric<dim, spacedim>::fill_mapping_data_for_generic_points(
+  const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+  const ArrayView<const Point<dim>> &                         unit_points,
+  const UpdateFlags                                           update_flags,
+  dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
+    &output_data) const
+{
+  if (update_flags == update_default)
+    return;
+
+  Assert(update_flags & update_inverse_jacobians ||
+           update_flags & update_jacobians ||
+           update_flags & update_quadrature_points,
+         ExcNotImplemented());
+
+  output_data.initialize(unit_points.size(), update_flags);
+  const std::vector<Point<spacedim>> support_points =
+    this->compute_mapping_support_points(cell);
+
+  const unsigned int n_points = unit_points.size();
+  const unsigned int n_lanes  = VectorizedArray<double>::size();
+
+  // Use the more heavy VectorizedArray code path if there is more than
+  // one point left to compute
+  for (unsigned int i = 0; i < n_points; i += n_lanes)
+    if (n_points - i > 1)
+      {
+        Point<dim, VectorizedArray<double>> p_vec;
+        for (unsigned int j = 0; j < n_lanes; ++j)
+          if (i + j < n_points)
+            for (unsigned int d = 0; d < spacedim; ++d)
+              p_vec[d][j] = unit_points[i + j][d];
+          else
+            for (unsigned int d = 0; d < spacedim; ++d)
+              p_vec[d][j] = unit_points[i][d];
+
+        const auto result =
+          internal::evaluate_tensor_product_value_and_gradient(
+            polynomials_1d,
+            support_points,
+            p_vec,
+            polynomial_degree == 1,
+            renumber_lexicographic_to_hierarchic);
+
+        if (update_flags & update_quadrature_points)
+          for (unsigned int j = 0; j < n_lanes && i + j < n_points; ++j)
+            for (unsigned int d = 0; d < spacedim; ++d)
+              output_data.quadrature_points[i + j][d] = result.first[d][j];
+
+        if (update_flags & update_jacobians)
+          for (unsigned int j = 0; j < n_lanes && i + j < n_points; ++j)
+            for (unsigned int d = 0; d < dim; ++d)
+              for (unsigned int e = 0; e < spacedim; ++e)
+                output_data.jacobians[i + j][d][e] = result.second[e][d][j];
+
+        if (update_flags & update_inverse_jacobians)
+          {
+            DerivativeForm<1, spacedim, dim, VectorizedArray<double>> jac(
+              result.second);
+            const DerivativeForm<1, spacedim, dim, VectorizedArray<double>>
+              inv_jac = jac.covariant_form();
+            for (unsigned int j = 0; j < n_lanes && i + j < n_points; ++j)
+              for (unsigned int d = 0; d < spacedim; ++d)
+                for (unsigned int e = 0; e < dim; ++e)
+                  output_data.inverse_jacobians[i + j][d][e] = inv_jac[d][e][j];
+          }
+      }
+    else
+      {
+        const auto result =
+          internal::evaluate_tensor_product_value_and_gradient(
+            polynomials_1d,
+            support_points,
+            unit_points[i],
+            polynomial_degree == 1,
+            renumber_lexicographic_to_hierarchic);
+
+        if (update_flags & update_quadrature_points)
+          output_data.quadrature_points[i] = result.first;
+
+        if (update_flags & update_jacobians)
+          {
+            DerivativeForm<1, spacedim, dim> jac = result.second;
+            output_data.jacobians[i]             = jac.transpose();
+          }
+
+        if (update_flags & update_inverse_jacobians)
+          {
+            DerivativeForm<1, spacedim, dim> jac(result.second);
+            DerivativeForm<1, spacedim, dim> inv_jac = jac.covariant_form();
+            for (unsigned int d = 0; d < spacedim; ++d)
+              for (unsigned int e = 0; e < dim; ++e)
+                output_data.inverse_jacobians[i][d][e] = inv_jac[d][e];
+          }
+      }
+}
+
+
+
+template <int dim, int spacedim>
 void
 MappingQGeneric<dim, spacedim>::transform(
   const ArrayView<const Tensor<1, dim>> &                  input,

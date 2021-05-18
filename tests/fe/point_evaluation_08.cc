@@ -101,8 +101,14 @@ test(const unsigned int degree)
   dof_handler.distribute_dofs(fe);
   Vector<double> vector(dof_handler.n_dofs());
 
-  FEPointEvaluation<dim, dim> evaluator(mapping, fe, 0);
-  FEPointEvaluation<1, dim>   evaluator_scalar(mapping, fe, dim);
+  FEPointEvaluation<dim, dim> evaluator(mapping,
+                                        fe,
+                                        update_values | update_gradients,
+                                        0);
+  FEPointEvaluation<1, dim>   evaluator_scalar(mapping,
+                                             fe,
+                                             update_values | update_gradients,
+                                             dim);
 
   VectorTools::interpolate(mapping, dof_handler, MyFunction<dim>(), vector);
 
@@ -129,13 +135,11 @@ test(const unsigned int degree)
                            solution_values.begin(),
                            solution_values.end());
 
-      evaluator.evaluate(cell,
-                         unit_points,
-                         solution_values,
+      evaluator.reinit(cell, unit_points);
+      evaluator_scalar.reinit(cell, unit_points);
+      evaluator.evaluate(solution_values,
                          EvaluationFlags::values | EvaluationFlags::gradients);
-      evaluator_scalar.evaluate(cell,
-                                unit_points,
-                                solution_values,
+      evaluator_scalar.evaluate(solution_values,
                                 EvaluationFlags::values |
                                   EvaluationFlags::gradients);
 
@@ -163,18 +167,14 @@ test(const unsigned int degree)
           evaluator_scalar.submit_gradient(evaluator_scalar.get_gradient(i), i);
         }
 
-      evaluator.integrate(cell,
-                          unit_points,
-                          solution_values,
+      evaluator.integrate(solution_values,
                           EvaluationFlags::values | EvaluationFlags::gradients);
 
       for (const auto i : solution_values)
         deallog << i << " ";
       deallog << std::endl;
 
-      evaluator_scalar.integrate(cell,
-                                 unit_points,
-                                 solution_values,
+      evaluator_scalar.integrate(solution_values,
                                  EvaluationFlags::values |
                                    EvaluationFlags::gradients);
 

@@ -216,7 +216,9 @@ namespace VectorTools
           if (evaluators[active_fe_index] == nullptr)
             evaluators[active_fe_index] =
               std::make_unique<FEPointEvaluation<n_components, dim>>(
-                cache.get_mapping(), dof_handler.get_fe(active_fe_index));
+                cache.get_mapping(),
+                dof_handler.get_fe(active_fe_index),
+                update_values);
 
           return *evaluators[active_fe_index];
         };
@@ -243,9 +245,8 @@ namespace VectorTools
 
             auto &evaluator = get_evaluator(cell->active_fe_index());
 
-            evaluator.evaluate(cell,
-                               unit_points,
-                               solution_values,
+            evaluator.reinit(cell, unit_points);
+            evaluator.evaluate(solution_values,
                                dealii::EvaluationFlags::values);
 
             for (unsigned int q = 0; q < unit_points.size(); ++q)
