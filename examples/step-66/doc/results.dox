@@ -89,7 +89,7 @@ Output results...
 .
 @endcode
 
-The solution itself looks not that fancy, however, at least we want to show it for the two- and three-dimensional problem in the following figure.
+We show the solution for the two- and three-dimensional problem in the following figure.
 
 TODO How to include figures?
 
@@ -107,11 +107,13 @@ TODO How to include figures?
 
 
 <h3>Newton solver</h3>
-In the program output above we can read some interesting information on the Newton iteration. The major output in each refinement cycle is the detailed diagnostics of the Newton method, which shows first of all the number of Newton steps and for each step the residual $\|F(u_h^{n+1})\|$, the norm of the Newton update $\|s_h^n\|$ and the number of CG iterations <code>itmax</code>.
+In the program output above we find some interesting information about the Newton iterations. The terminal output in each refinement cycle presents detailed diagnostics of the Newton method, which show first of all the number of Newton steps and for each step the residual $\|F(u_h^{n+1})\|$, the norm of the Newton update $\|s_h^n\|$, and the number of CG iterations <code>itmax</code>.
 
-We observe that for all cases the Newton method converges in approximately three to four steps, which shows the quadratic convergence of the Newton method with full step length $\alpha = 1$. However, be aware that for a badly chosen initial guess $u_h^0$, the Newton method will diverge also quadratically. Usually if you do not have an appropriate initial guess, one tries some few damped Newton steps with reduced step length $\alpha < 1$ until the Newton step is again in the quadratic convergence domain. This damping and relaxation of the Newton step length needs truly a more sophisticated implementation of the Newton method, which we left as usual as exercise. Furthermore, we see that the number of CG iterations is approximately constant against successively mesh refinement and an increasing number of DOFs. This is of course due to the employed geometric multigrid preconditioner and similar to the description of the results in step-16, step-37 and others. Just to give an example, in the three-dimensional case on refinement level five having distributed appriximately 14.7e6 DOFs according to the fourth-order Lagrangian finite element method, the number of CG iterations is still less than ten.
+We observe that for all cases the Newton method converges in approximately three to four steps, which shows the quadratic convergence of the Newton method with a full step length $\alpha = 1$. However, be aware that for a badly chosen initial guess $u_h^0$, the Newton method will also diverge quadratically. Usually if you do not have an appropriate initial guess, you try a few damped Newton steps with a reduced step length $\alpha < 1$ until the Newton step is again in the quadratic convergence domain. This damping and relaxation of the Newton step length truly requires a more sophisticated implementation of the Newton method, which we designate to you as a possible extension of the tutorial.
 
-In any case, there is one more very useful optimization that should be mentioned here. In the <code>compute_update()</code> function we explicitly reset the vector holding the Newton update before passing as output vector to the SolverCG. In that case we use a zero staring value for the CG method, which is more suitable than the previous Newton step and thus reduces the number of CG iterations by some few steps.
+Furthermore, we see that the number of CG iterations is approximately constant with successive mesh refinements and an increasing number of DoFs. This is of course due to the geometric multigrid preconditioner and similar to the observations made in other tutorials that use this method, e.g., step-16 and step-37. Just to give an example, in the three-dimensional case after five refinements, we have approximately 14.7 million distributed DoFs with fourth-order Lagrangian finite elements, but the number of CG iterations is still less than ten.
+
+In addition, there is one more very useful optimization that we applied and that should be mentioned here. In the <code>compute_update()</code> function we explicitly reset the vector holding the Newton update before passing it as the output vector to the solver. In that case we use a starting value of zero for the CG method, which is more suitable than the previous Newton step and thus reduces the number of CG iterations by a few steps.
 
 TODO Mathematical background of this? Zero vector is in every subspace contained.
 
@@ -122,12 +124,12 @@ TODO Mathematical background of this? Zero vector is in every subspace contained
 A couple of possible extensions are available.
 
 <h4>More sophisticated Newton iteration</h4>
-Beside a step size controlled version of the Newton iteration, one could implement a more flexible stopping criterion for the Newton iteration. For example based on a mixed error control with an given absolute and relative tolerance.
+Beside a step size controlled version of the Newton iteration, one could implement a more flexible stopping criterion for the Newton iteration. For example based on a mixed error control with a given absolute and relative tolerance.
 
 TODO Citation?
 
 <h4>Eigenvalue problem</h4>
-One can consider the corresponding eigenvalue problem, which is called Bratu problem. For example, if we define a fixed eigenvalue $\lambda\in[0,6]$, we can compute the corresponding discrete eigenfunction. You will notice that the number of Newton steps will increase with increasing $\lambda$. To reduce the number of Newton steps you can use a trick by starting from a certain $\lambda$, compute the eigenfunction, increase $\lambda=\lambda + \delta_\lambda$ and use the previous solution as initial guess for the Newton iteration. In the end you can plot the $H^1(\Omega)$-norm over the eigenvalue. What do you observe for further increasing $\lambda>7$?
+One can consider the corresponding eigenvalue problem, which is called Bratu problem. For example, if we define a fixed eigenvalue $\lambda\in[0,6]$, we can compute the corresponding discrete eigenfunction. You will notice that the number of Newton steps will increase with increasing $\lambda$. To reduce the number of Newton steps you can use the following trick: start from a certain $\lambda$, compute the eigenfunction, increase $\lambda=\lambda + \delta_\lambda$, and use the previous solution as an initial guess for the Newton iteration. In the end you can plot the $H^1(\Omega)$-norm over the eigenvalue. What do you observe for further increasing $\lambda>7$?
 
 
 
