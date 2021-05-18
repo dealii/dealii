@@ -3,7 +3,7 @@
 The aim of this tutorial step was to demonstrate the solution of a nonlinear PDE with the matrix-free framework.
 
 <h3>Program output</h3>
-Running the program via
+Running the program on two processes in release mode via
 @code
 cmake . && make release && make && mpirun -n 2 ./step-66
 @endcode
@@ -12,7 +12,7 @@ gives the following output on the console
 TODO New output
 @code
 ================================================================================
-START DATE: 2021/5/3, TIME: 19:06:13
+START DATE: 2021/5/18, TIME: 11:10:03
 --------------------------------------------------------------------------------
 Running with 2 MPI processes
 Vectorization over 4 doubles = 256 bits (AVX), VECTORIZATION_LEVEL=2
@@ -21,72 +21,72 @@ Finite element space: FE_Q<2>(4)
 --------------------------------------------------------------------------------
 Cycle 0
 --------------------------------------------------------------------------------
-Setup system...
+Set up system...
    Triangulation: 20 cells
    DoFHandler:    337 DoFs
 
 Solve using Newton's method...
-   Nstep 1, errf = 0.00259891, errx = 3.0903, it = 8
-   Nstep 2, errf = 1.40407e-06, errx = 0.0657231, it = 8
-   Nstep 3, errf = 9.0017e-13, errx = 3.54562e-05, it = 7
-Convergence step 3 value 9.0017e-13 (used wall time: 0.0173716 s)
+   Nstep 1, errf = 0.00380835, errx = 3.61904, it = 7
+   Nstep 2, errf = 3.80167e-06, errx = 0.104353, it = 6
+   Nstep 3, errf = 3.97939e-12, errx = 0.00010511, it = 4
+   Nstep 4, errf = 2.28859e-13, errx = 1.07726e-10, it = 1
+Convergence step 4 value 2.28859e-13 (used wall time: 0.0308227 s)
 
-Time for setup+solve (CPU/Wall) 0.010866/0.0215132 s
+Time for setup+solve (CPU/Wall) 0.001595/0.110047 s
 
 Output results...
-  H1 seminorm: 0.664407
+  H1 seminorm: 0.773426
 
 
 
 +---------------------------------------------+------------+------------+
-| Total wallclock time elapsed since start    |    0.0251s |            |
+| Total wallclock time elapsed since start    |     0.185s |            |
 |                                             |            |            |
 | Section                         | no. calls |  wall time | % of total |
 +---------------------------------+-----------+------------+------------+
-| assemble right hand side        |         3 |  0.000167s |      0.67% |
-| compute residual                |         3 |  7.57e-05s |       0.3% |
-| compute update                  |         3 |    0.0167s |        67% |
-| make grid                       |         1 |   0.00107s |       4.2% |
-| setup system                    |         1 |   0.00371s |        15% |
-| solve                           |         1 |    0.0174s |        69% |
+| assemble right hand side        |         4 |  9.91e-05s |         0% |
+| compute residual                |         4 |  0.000134s |         0% |
+| compute update                  |         4 |    0.0303s |        16% |
+| make grid                       |         1 |     0.044s |        24% |
+| setup system                    |         1 |    0.0791s |        43% |
+| solve                           |         1 |    0.0309s |        17% |
 +---------------------------------+-----------+------------+------------+
 
+.
+.
+.
+
 --------------------------------------------------------------------------------
-Cycle 1
+Cycle 6
 --------------------------------------------------------------------------------
-Setup system...
-   Triangulation: 80 cells
-   DoFHandler:    1313 DoFs
+Set up system...
+   Triangulation: 81920 cells
+   DoFHandler:    1311745 DoFs
 
 Solve using Newton's method...
-   Nstep 1, errf = 0.00172751, errx = 6.96753, it = 9
-   Nstep 2, errf = 1.48839e-06, errx = 0.186711, it = 9
-   Nstep 3, errf = 1.39271e-12, errx = 0.000161801, it = 8
-   Nstep 4, errf = 4.00139e-13, errx = 1.23232e-10, it = 6
-Convergence step 4 value 4.00139e-13 (used wall time: 0.0392664 s)
+   Nstep 1, errf = 5.90478e-05, errx = 231.427, it = 9
+   Nstep 2, errf = 5.89991e-08, errx = 6.67102, it = 6
+   Nstep 3, errf = 4.28813e-13, errx = 0.0067188, it = 4
+Convergence step 3 value 4.28813e-13 (used wall time: 3.7966 s)
 
-Time for setup+solve (CPU/Wall) 0.036639/0.0444511 s
+Time for setup+solve (CPU/Wall) 4.93994/5.04057 s
 
 Output results...
-  H1 seminorm: 0.746796
+  H1 seminorm: 0.773426
 
 
 
 +---------------------------------------------+------------+------------+
-| Total wallclock time elapsed since start    |    0.0614s |            |
+| Total wallclock time elapsed since start    |      7.14s |            |
 |                                             |            |            |
 | Section                         | no. calls |  wall time | % of total |
 +---------------------------------+-----------+------------+------------+
-| assemble right hand side        |         4 |  0.000623s |         1% |
-| compute residual                |         4 |  0.000261s |      0.43% |
-| compute update                  |         4 |    0.0359s |        59% |
-| setup system                    |         1 |   0.00482s |       7.9% |
-| solve                           |         1 |    0.0393s |        64% |
+| assemble right hand side        |         3 |    0.0583s |      0.82% |
+| compute residual                |         3 |    0.0655s |      0.92% |
+| compute update                  |         3 |      3.67s |        51% |
+| setup system                    |         1 |      1.24s |        17% |
+| solve                           |         1 |       3.8s |        53% |
 +---------------------------------+-----------+------------+------------+
-
-.
-.
-.
 @endcode
 
 We show the solution for the two- and three-dimensional problem in the following figure.
