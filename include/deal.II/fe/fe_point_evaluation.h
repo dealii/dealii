@@ -783,7 +783,10 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::integrate(
   const EvaluationFlags::EvaluationFlags &                    integration_flags)
 {
   if (unit_points.size() == 0) // no evaluation points provided
-    return;
+    {
+      std::fill(solution_values.begin(), solution_values.end(), 0.0);
+      return;
+    }
 
   AssertDimension(solution_values.size(), fe->dofs_per_cell);
   if (false /*TODO*/ && (((integration_flags & EvaluationFlags::values) ||
