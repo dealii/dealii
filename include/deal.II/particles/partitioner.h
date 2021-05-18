@@ -109,7 +109,7 @@ namespace Particles
       /**
        * Temporary storage that holds the data of the particles to receive
        * the ghost particles information from other processors in
-       * in update_ghost_particles()
+       * update_ghost_particles()
        * send_recv_particles_properties_and_location()
        */
       std::vector<char> recv_data;

@@ -977,7 +977,7 @@ public:
    * (including the MPI data exchange), allowing to execute some vector update
    * that the `src` vector depends upon. The `operation_after_loop` is similar
    * - it starts to execute on a range of DoFs once all DoFs in that range
-   * have been touched for the last time time by the `cell_operation`
+   * have been touched for the last time by the `cell_operation`
    * (including the MPI data exchange), allowing e.g. to compute some vector
    * operations that depend on the result of the current cell loop in `dst` or
    * want to modify `src`. The efficiency of caching depends on the numbering

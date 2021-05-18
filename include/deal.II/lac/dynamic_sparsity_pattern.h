@@ -472,7 +472,7 @@ public:
 
   /**
    * Construct and store in this object the sparsity pattern corresponding to
-   * the product of transposed @p left and and non-transpose @p right sparsity pattern.
+   * the product of transposed @p left and non-transpose @p right sparsity pattern.
    */
   template <typename SparsityPatternTypeLeft, typename SparsityPatternTypeRight>
   void

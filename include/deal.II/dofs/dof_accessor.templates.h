@@ -794,9 +794,9 @@ namespace internal
         const unsigned int fe_index_,
         const bool         count_level_dofs)
       {
-        // note: we cannot rely on the the template parameter level_dof_access
-        // here, since the function get_mg_dof_indices()/set_mg_dof_indices()
-        // can be called even if level_dof_access==false.
+        // note: we cannot rely on the template parameter level_dof_access here,
+        // since the function get_mg_dof_indices()/set_mg_dof_indices() can be
+        // called even if level_dof_access==false.
         if (count_level_dofs)
           {
             const auto &fe = accessor.get_fe(fe_index_);
@@ -891,9 +891,9 @@ namespace internal
         const DoFOperation &dof_operation,
         const bool          count_level_dofs)
       {
-        // we cannot rely on the the template parameter level_dof_access
-        // here, since the function get_mg_dof_indices()/set_mg_dof_indices()
-        // can be called even if level_dof_access==false.
+        // we cannot rely on the template parameter level_dof_access here, since
+        // the function get_mg_dof_indices()/set_mg_dof_indices() can be called
+        // even if level_dof_access==false.
         (void)count_level_dofs;
 
         AssertIndexRange(n_dof_indices(accessor, fe_index, count_level_dofs),

@@ -481,7 +481,7 @@ namespace MatrixFreeTools
         //          (C_e^T(j,:) * A_e(:,i)) * C_e(i,j)
         //       or
         //          (C_e^T(j,:) * A_e(:,i)) * C_e^T(j,i)
-        //       This gives a contribution the the j-th entry of the
+        //       This gives a contribution the j-th entry of the
         //       locally-relevant diagonal and comprises the multiplication
         //       by the locally-relevant constraint matrix from the left and
         //       the right. There is no contribution to the j-th vector

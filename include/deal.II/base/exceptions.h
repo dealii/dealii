@@ -1154,7 +1154,7 @@ namespace StandardExceptions
     ExcNeedsExodusII,
     "You are attempting to use functionality that is only available if deal.II "
     "was configured to use Trilinos' SEACAS library (which provides ExodusII), "
-    "but cmake did not find find a valid SEACAS library.");
+    "but cmake did not find a valid SEACAS library.");
 
 #ifdef DEAL_II_WITH_MPI
   /**
