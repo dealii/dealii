@@ -232,11 +232,11 @@ namespace VectorTools
           {
             phi.reinit(cell);
             phi.read_dof_values_plain(inhomogeneities);
-            phi.evaluate(EvaluationFlags::values);
+            phi.evaluate(::dealii::EvaluationFlags::values);
             for (unsigned int q = 0; q < phi.n_q_points; ++q)
               phi.submit_value(phi.get_value(q), q);
 
-            phi.integrate(EvaluationFlags::values);
+            phi.integrate(::dealii::EvaluationFlags::values);
             phi.distribute_local_to_global(rhs);
           }
         rhs.compress(VectorOperation::add);
@@ -665,7 +665,7 @@ namespace VectorTools
             for (unsigned int q = 0; q < n_q_points; ++q)
               fe_eval.submit_value(func(cell, q), q);
 
-            fe_eval.integrate(EvaluationFlags::values);
+            fe_eval.integrate(::dealii::EvaluationFlags::values);
             fe_eval.distribute_local_to_global(rhs);
           }
         rhs.compress(VectorOperation::add);
