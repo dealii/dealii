@@ -2240,14 +2240,15 @@ FE_NedelecSZ<dim, spacedim>::get_dpo_vector(const unsigned int degree)
   // 1 = edge
   // 2 = face (which is a cell in 2D)
   // 3 = cell
-  std::vector<unsigned int> dpo(dim + 1);
-  dpo[0] = 0;
-  dpo[1] = degree + 1;
-  dpo[2] = 2 * degree * (degree + 1);
-  if (dim == 3)
-    {
-      dpo[3] = 3 * degree * degree * (degree + 1);
-    }
+  std::vector<unsigned int> dpo;
+
+  dpo.push_back(0);
+  dpo.push_back(degree + 1);
+  if (dim > 1)
+    dpo.push_back(2 * degree * (degree + 1));
+  if (dim > 2)
+    dpo.push_back(3 * degree * degree * (degree + 1));
+
   return dpo;
 }
 
