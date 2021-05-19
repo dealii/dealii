@@ -34,7 +34,6 @@ SET(_unity_include_src
   fe_nedelec.cc
   fe_nedelec_sz.cc
   fe_nothing.cc
-  fe_point_evaluation.cc
   fe_poly.cc
   fe_poly_tensor.cc
   fe_pyramid_p.cc
@@ -108,7 +107,6 @@ SET(_inst
   fe_nedelec.inst.in
   fe_nedelec_sz.inst.in
   fe_nothing.inst.in
-  fe_point_evaluation.inst.in
   fe_poly.inst.in
   fe_poly_tensor.inst.in
   fe_pyramid_p.inst.in

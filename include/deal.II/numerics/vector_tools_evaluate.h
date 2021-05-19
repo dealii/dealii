@@ -23,7 +23,7 @@
 
 #include <deal.II/dofs/dof_handler.h>
 
-#include <deal.II/fe/fe_point_evaluation.h>
+#include <deal.II/matrix_free/fe_point_evaluation.h>
 
 #include <map>
 

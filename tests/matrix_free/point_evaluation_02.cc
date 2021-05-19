@@ -14,23 +14,23 @@
 // ---------------------------------------------------------------------
 
 
-// check FEPointEvaluation for scalar FE_Q and MappingField by comparing to
-// the output of FEValues with the same settings
+// check FEPointEvaluation for scalar FE_DGQ and MappingQGeneric by comparing
+// to the output of FEValues with the same settings
 
 #include <deal.II/base/function_lib.h>
 
 #include <deal.II/dofs/dof_handler.h>
 
-#include <deal.II/fe/fe_point_evaluation.h>
-#include <deal.II/fe/fe_q.h>
-#include <deal.II/fe/fe_system.h>
+#include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_values.h>
-#include <deal.II/fe/mapping_fe_field.h>
+#include <deal.II/fe/mapping_q_generic.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 
 #include <deal.II/lac/vector.h>
+
+#include <deal.II/matrix_free/fe_point_evaluation.h>
 
 #include <deal.II/numerics/vector_tools.h>
 
@@ -52,14 +52,7 @@ test(const unsigned int degree)
   else
     GridGenerator::subdivided_hyper_cube(tria, 2, 0, 1);
 
-  FESystem<dim>   fe_grid(FE_Q<dim>(degree), dim);
-  DoFHandler<dim> dof_handler_grid(tria);
-  dof_handler_grid.distribute_dofs(fe_grid);
-  const ComponentMask mask(dim, true);
-  Vector<double>      location_vector(dof_handler_grid.n_dofs());
-  VectorTools::get_position_vector(dof_handler_grid, location_vector, mask);
-  MappingFEField<dim> mapping(dof_handler_grid, location_vector, mask);
-
+  MappingQGeneric<dim> mapping(std::max<unsigned int>(1, degree));
   deallog << "Mapping of degree " << degree << std::endl;
 
   std::vector<Point<dim>> unit_points;
@@ -71,7 +64,7 @@ test(const unsigned int degree)
       unit_points.push_back(p);
     }
 
-  FE_Q<dim>     fe(degree);
+  FE_DGQ<dim>   fe(degree);
   FEValues<dim> fe_values(mapping,
                           fe,
                           Quadrature<dim>(unit_points),
@@ -142,6 +135,7 @@ main()
   initlog();
   deallog << std::setprecision(10);
 
+  test<1>(0);
   test<1>(3);
   test<2>(2);
   test<2>(6);

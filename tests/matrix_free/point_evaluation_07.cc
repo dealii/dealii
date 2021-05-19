@@ -14,14 +14,13 @@
 // ---------------------------------------------------------------------
 
 
-// check FEPointEvaluation for FESystem(FE_Q^dim, FE_Q) and MappingFEField by
+// check FEPointEvaluation for vector-valued FE_Q and MappingFEField by
 // comparing to the output of FEValues with the same settings
 
 #include <deal.II/base/function_lib.h>
 
 #include <deal.II/dofs/dof_handler.h>
 
-#include <deal.II/fe/fe_point_evaluation.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_values.h>
@@ -31,6 +30,8 @@
 #include <deal.II/grid/tria.h>
 
 #include <deal.II/lac/vector.h>
+
+#include <deal.II/matrix_free/fe_point_evaluation.h>
 
 #include <deal.II/numerics/vector_tools.h>
 
@@ -45,16 +46,13 @@ class MyFunction : public Function<dim>
 {
 public:
   MyFunction()
-    : Function<dim>(dim + 1)
+    : Function<dim>(dim)
   {}
 
   double
   value(const Point<dim> &p, const unsigned int component) const override
   {
-    if (component < dim)
-      return component + p[component];
-    else
-      return component + p[0];
+    return component + p[component];
   }
 };
 
@@ -91,7 +89,7 @@ test(const unsigned int degree)
       unit_points.push_back(p);
     }
 
-  FESystem<dim> fe(FE_Q<dim>(degree + 1) ^ dim, FE_Q<dim>(degree));
+  FESystem<dim> fe(FE_Q<dim>(degree), dim);
   FEValues<dim> fe_values(mapping,
                           fe,
                           Quadrature<dim>(unit_points),
@@ -103,45 +101,29 @@ test(const unsigned int degree)
 
   FEPointEvaluation<dim, dim> evaluator(mapping,
                                         fe,
-                                        update_values | update_gradients,
-                                        0);
-  FEPointEvaluation<1, dim>   evaluator_scalar(mapping,
-                                             fe,
-                                             update_values | update_gradients,
-                                             dim);
+                                        update_values | update_gradients);
 
   VectorTools::interpolate(mapping, dof_handler, MyFunction<dim>(), vector);
 
   std::vector<double>         solution_values(fe.dofs_per_cell);
   std::vector<Tensor<1, dim>> function_values(unit_points.size());
   std::vector<Tensor<2, dim>> function_gradients(unit_points.size());
-  std::vector<double>         function_values_scalar(unit_points.size());
-  std::vector<Tensor<1, dim>> function_gradients_scalar(unit_points.size());
 
   FEValuesExtractors::Vector extractor(0);
-  FEValuesExtractors::Scalar extractor_s(dim);
 
   for (const auto &cell : dof_handler.active_cell_iterators())
     {
       fe_values.reinit(cell);
       fe_values[extractor].get_function_values(vector, function_values);
       fe_values[extractor].get_function_gradients(vector, function_gradients);
-      fe_values[extractor_s].get_function_values(vector,
-                                                 function_values_scalar);
-      fe_values[extractor_s].get_function_gradients(vector,
-                                                    function_gradients_scalar);
 
       cell->get_dof_values(vector,
                            solution_values.begin(),
                            solution_values.end());
 
       evaluator.reinit(cell, unit_points);
-      evaluator_scalar.reinit(cell, unit_points);
       evaluator.evaluate(solution_values,
                          EvaluationFlags::values | EvaluationFlags::gradients);
-      evaluator_scalar.evaluate(solution_values,
-                                EvaluationFlags::values |
-                                  EvaluationFlags::gradients);
 
       deallog << "Cell with center " << cell->center(true) << std::endl;
       for (unsigned int i = 0; i < function_values.size(); ++i)
@@ -150,12 +132,6 @@ test(const unsigned int degree)
                 << (function_values[i] - evaluator.get_value(i)).norm()
                 << " error grad "
                 << (evaluator.get_gradient(i) - function_gradients[i]).norm()
-                << " error scalar value "
-                << function_values_scalar[i] - evaluator_scalar.get_value(i)
-                << " error scalar grad "
-                << (function_gradients_scalar[i] -
-                    evaluator_scalar.get_gradient(i))
-                     .norm()
                 << std::endl;
       deallog << std::endl;
 
@@ -163,20 +139,10 @@ test(const unsigned int degree)
         {
           evaluator.submit_value(evaluator.get_value(i), i);
           evaluator.submit_gradient(evaluator.get_gradient(i), i);
-          evaluator_scalar.submit_value(evaluator_scalar.get_value(i), i);
-          evaluator_scalar.submit_gradient(evaluator_scalar.get_gradient(i), i);
         }
 
       evaluator.integrate(solution_values,
                           EvaluationFlags::values | EvaluationFlags::gradients);
-
-      for (const auto i : solution_values)
-        deallog << i << " ";
-      deallog << std::endl;
-
-      evaluator_scalar.integrate(solution_values,
-                                 EvaluationFlags::values |
-                                   EvaluationFlags::gradients);
 
       for (const auto i : solution_values)
         deallog << i << " ";

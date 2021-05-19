@@ -18,10 +18,10 @@
 
 #include <deal.II/fe/fe_dgp.h>
 #include <deal.II/fe/fe_dgq.h>
-#include <deal.II/fe/fe_point_evaluation.h>
 #include <deal.II/fe/fe_poly.h>
 #include <deal.II/fe/fe_q_dg0.h>
 
+#include <deal.II/matrix_free/fe_point_evaluation.h>
 #include <deal.II/matrix_free/shape_info.h>
 
 #include <memory>
