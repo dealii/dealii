@@ -5457,6 +5457,9 @@ namespace GridTools
     const typename Triangulation<dim, spacedim>::active_cell_iterator
       &cell_hint)
   {
+    Assert((dim == spacedim),
+           ExcMessage("Only implemented for dim==spacedim."));
+
     // Alias
     namespace bgi = boost::geometry::index;
 
