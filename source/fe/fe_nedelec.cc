@@ -2060,20 +2060,21 @@ template <int dim>
 std::vector<unsigned int>
 FE_Nedelec<dim>::get_dpo_vector(const unsigned int degree, bool dg)
 {
-  std::vector<unsigned int> dpo(dim + 1);
+  std::vector<unsigned int> dpo;
 
   if (dg)
     {
+      dpo.resize(dim + 1);
       dpo[dim] = PolynomialsNedelec<dim>::n_polynomials(degree);
     }
   else
     {
-      dpo[0] = 0;
-      dpo[1] = degree + 1;
-      dpo[2] = 2 * degree * (degree + 1);
-
-      if (dim == 3)
-        dpo[3] = 3 * degree * degree * (degree + 1);
+      dpo.push_back(0);
+      dpo.push_back(degree + 1);
+      if (dim > 1)
+        dpo.push_back(2 * degree * (degree + 1));
+      if (dim > 2)
+        dpo.push_back(3 * degree * degree * (degree + 1));
     }
 
   return dpo;
