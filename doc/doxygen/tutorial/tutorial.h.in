@@ -653,6 +653,12 @@
  *       <td> Solves the Black-Scholes equation for options pricing in 1-D.
  *       </td></tr>
  *
+ *   <tr valign="top">
+ *       <td>step-79</td>
+ *       <td> A topology optimization program for elastic media using the solid
+ *       isotropic material penalization (SIMP) formulation.
+ *       </td></tr>
+ *
  * </table>
  *
  *
