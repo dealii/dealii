@@ -1267,10 +1267,10 @@ MappingQGeneric<dim, spacedim>::fill_mapping_data_for_generic_points(
         Point<dim, VectorizedArray<double>> p_vec;
         for (unsigned int j = 0; j < n_lanes; ++j)
           if (i + j < n_points)
-            for (unsigned int d = 0; d < spacedim; ++d)
+            for (unsigned int d = 0; d < dim; ++d)
               p_vec[d][j] = unit_points[i + j][d];
           else
-            for (unsigned int d = 0; d < spacedim; ++d)
+            for (unsigned int d = 0; d < dim; ++d)
               p_vec[d][j] = unit_points[i][d];
 
         const auto result =
@@ -1288,8 +1288,8 @@ MappingQGeneric<dim, spacedim>::fill_mapping_data_for_generic_points(
 
         if (update_flags & update_jacobians)
           for (unsigned int j = 0; j < n_lanes && i + j < n_points; ++j)
-            for (unsigned int d = 0; d < dim; ++d)
-              for (unsigned int e = 0; e < spacedim; ++e)
+            for (unsigned int d = 0; d < spacedim; ++d)
+              for (unsigned int e = 0; e < dim; ++e)
                 output_data.jacobians[i + j][d][e] = result.second[e][d][j];
 
         if (update_flags & update_inverse_jacobians)
@@ -1299,8 +1299,8 @@ MappingQGeneric<dim, spacedim>::fill_mapping_data_for_generic_points(
             const DerivativeForm<1, spacedim, dim, VectorizedArray<double>>
               inv_jac = jac.covariant_form();
             for (unsigned int j = 0; j < n_lanes && i + j < n_points; ++j)
-              for (unsigned int d = 0; d < spacedim; ++d)
-                for (unsigned int e = 0; e < dim; ++e)
+              for (unsigned int d = 0; d < dim; ++d)
+                for (unsigned int e = 0; e < spacedim; ++e)
                   output_data.inverse_jacobians[i + j][d][e] = inv_jac[d][e][j];
           }
       }
@@ -1327,8 +1327,8 @@ MappingQGeneric<dim, spacedim>::fill_mapping_data_for_generic_points(
           {
             DerivativeForm<1, spacedim, dim> jac(result.second);
             DerivativeForm<1, spacedim, dim> inv_jac = jac.covariant_form();
-            for (unsigned int d = 0; d < spacedim; ++d)
-              for (unsigned int e = 0; e < dim; ++e)
+            for (unsigned int d = 0; d < dim; ++d)
+              for (unsigned int e = 0; e < spacedim; ++e)
                 output_data.inverse_jacobians[i][d][e] = inv_jac[d][e];
           }
       }
