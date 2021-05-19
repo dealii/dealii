@@ -23,6 +23,7 @@
 
 #  include <list>
 #  include <map>
+#  include <memory>
 #  include <shared_mutex>
 #  include <thread>
 #  include <vector>
