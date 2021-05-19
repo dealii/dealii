@@ -1067,6 +1067,11 @@ namespace Particles
                                                           cell_centers);
                     });
 
+          // make a copy of the current cell, since we will modify the variable
+          // current_cell in the following but we need a backup in the case
+          // the particle is not found
+          const auto previous_cell_of_particle = current_cell;
+
           // Search all of the cells adjacent to the closest vertex of the
           // previous cell Most likely we will find the particle in them.
           for (unsigned int i = 0; i < n_neighbor_cells; ++i)
@@ -1112,7 +1117,8 @@ namespace Particles
                   // We can find no cell for this particle. It has left the
                   // domain due to an integration error or an open boundary.
                   // Signal the loss and move on.
-                  signals.particle_lost(out_particle, current_cell);
+                  signals.particle_lost(out_particle,
+                                        previous_cell_of_particle);
                   continue;
                 }
             }
