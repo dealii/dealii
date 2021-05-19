@@ -648,6 +648,11 @@
  *       Interfacing with SUNDIALS' KINSOL nonlinear solver.
  *       </td></tr>
  *
+ *   <tr valign="top">
+ *       <td>step-78</td>
+ *       <td> Solves the Black-Scholes equation for options pricing in 1-D.
+ *       </td></tr>
+ *
  * </table>
  *
  *
