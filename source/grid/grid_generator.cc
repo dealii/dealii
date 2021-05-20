@@ -413,7 +413,7 @@ namespace GridGenerator
          *  airfoil points.
          */
         static std::array<std::vector<Point<2>>, 2>
-        joukowski(const Point<2>     centerpoint,
+        joukowski(const Point<2> &   centerpoint,
                   const unsigned int number_points,
                   const unsigned int factor)
         {
@@ -3282,7 +3282,7 @@ namespace GridGenerator
                          const double /*pad_top*/,
                          const double /*pad_left*/,
                          const double /*pad_right*/,
-                         const Point<1> /*center*/,
+                         const Point<1> & /*center*/,
                          const types::manifold_id /*polar_manifold_id*/,
                          const types::manifold_id /*tfi_manifold_id*/,
                          const double /*L*/,
@@ -3344,7 +3344,7 @@ namespace GridGenerator
                          const double             pad_top,
                          const double             pad_left,
                          const double             pad_right,
-                         const Point<2>           new_center,
+                         const Point<2> &         new_center,
                          const types::manifold_id polar_manifold_id,
                          const types::manifold_id tfi_manifold_id,
                          const double             L,
@@ -3527,7 +3527,7 @@ namespace GridGenerator
                          const double             pad_top,
                          const double             pad_left,
                          const double             pad_right,
-                         const Point<3>           new_center,
+                         const Point<3> &         new_center,
                          const types::manifold_id polar_manifold_id,
                          const types::manifold_id tfi_manifold_id,
                          const double             L,

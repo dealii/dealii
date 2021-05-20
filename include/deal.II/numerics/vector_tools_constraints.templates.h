@@ -656,8 +656,8 @@ namespace VectorTools
                         normal_vector[d] = 0;
                     normal_vector /= normal_vector.norm();
 
-                    const Point<dim> point = fe_values.quadrature_point(i);
-                    Vector<double>   b_values(dim);
+                    const Point<dim> &point = fe_values.quadrature_point(i);
+                    Vector<double>    b_values(dim);
                     function_map.at(*b_id)->vector_value(point, b_values);
 
                     // now enter the (dofs,(normal_vector,cell)) entry into
@@ -1165,8 +1165,8 @@ namespace VectorTools
                                            i, face_no)
                                          .second][component] = face_dofs[i];
 
-                      const Point<dim> point = fe_values.quadrature_point(i);
-                      const double     b_value =
+                      const Point<dim> &point = fe_values.quadrature_point(i);
+                      const double      b_value =
                         function_map.at(*b_id)->value(point, component);
                       dof_to_b_value.insert(
                         std::make_pair(face_dofs[i], b_value));

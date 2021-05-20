@@ -261,7 +261,7 @@ namespace internal
       for (unsigned int i = 0; i < M; ++i)
         for (unsigned int j = 0; j < M; ++j)
           {
-            const Point<2> p =
+            const Point<2> &p =
               gl.point((i + 1) * (polynomial_degree + 1) + (j + 1));
             const unsigned int index_table = i * M + j;
             for (unsigned int v = 0; v < 4; ++v)
@@ -315,8 +315,8 @@ namespace internal
         for (unsigned int j = 0; j < M; ++j)
           for (unsigned int k = 0; k < M; ++k)
             {
-              const Point<3>     p = gl.point((i + 1) * (M + 2) * (M + 2) +
-                                          (j + 1) * (M + 2) + (k + 1));
+              const Point<3> &   p = gl.point((i + 1) * (M + 2) * (M + 2) +
+                                           (j + 1) * (M + 2) + (k + 1));
               const unsigned int index_table = i * M * M + j * M + k;
 
               // vertices

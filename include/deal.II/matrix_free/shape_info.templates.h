@@ -386,7 +386,7 @@ namespace internal
                         for (unsigned int i = 0; i < n_dofs; ++i)
                           for (unsigned int q = 0; q < n_q_points_face; ++q)
                             {
-                              const auto point =
+                              const auto &point =
                                 projected_quad_face.point(q + offset);
 
                               shape_values_face(f, o, i * n_q_points_face + q) =

@@ -470,7 +470,7 @@ namespace Step19
         if (particle_handler.n_particles_in_cell(cell) > 0)
           for (const auto &particle : particle_handler.particles_in_cell(cell))
             {
-              const Point<dim> reference_location =
+              const Point<dim> &reference_location =
                 particle.get_reference_location();
               for (const unsigned int i : fe_values.dof_indices())
                 cell_rhs(i) +=
@@ -613,7 +613,7 @@ namespace Step19
                 if ((E * fe_face_values.normal_vector(q_point) < 0) &&
                     (E.norm() > Constants::E_threshold))
                   {
-                    const Point<dim> location =
+                    const Point<dim> &location =
                       fe_face_values.quadrature_point(q_point);
 
                     Particles::Particle<dim> new_particle;
@@ -682,7 +682,8 @@ namespace Step19
                  particle != particles_in_cell.end();
                  ++particle, ++particle_index)
               {
-                const Tensor<1, dim> E = evaluator.get_gradient(particle_index);
+                const Tensor<1, dim> &E =
+                  evaluator.get_gradient(particle_index);
 
                 // Having now obtained the electric field at the location of one
                 // of the particles, we use this to update first the velocity

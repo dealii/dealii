@@ -177,7 +177,7 @@ namespace Particles
       std::uniform_real_distribution<double> uniform_distribution_01(0, 1);
 
       const BoundingBox<spacedim> cell_bounding_box(cell->bounding_box());
-      const std::pair<Point<spacedim>, Point<spacedim>> cell_bounds(
+      const std::pair<Point<spacedim>, Point<spacedim>> &cell_bounds(
         cell_bounding_box.get_boundary_points());
 
       // Generate random points in these bounds until one is within the cell
