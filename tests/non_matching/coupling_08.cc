@@ -151,7 +151,7 @@ test()
 int
 main()
 {
-  initlog(1);
+  initlog(true);
   test<1, 1, 1>();
   test<2, 1, 2>();
   test<2, 2, 2>();
