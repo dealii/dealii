@@ -501,7 +501,7 @@ initlog(bool                          console = false,
                                               std::ios::left)
 {
   deallogname = "output";
-  deallogfile.open(deallogname.c_str());
+  deallogfile.open(deallogname);
   deallog.attach(deallogfile, true, flags);
   deallog.depth_console(console ? 10 : 0);
 }
