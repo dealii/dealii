@@ -496,7 +496,7 @@ std::string   deallogname;
 std::ofstream deallogfile;
 
 void
-initlog(bool                          console = false,
+initlog(const bool                    console = false,
         const std::ios_base::fmtflags flags   = std::ios::showpoint |
                                               std::ios::left)
 {
