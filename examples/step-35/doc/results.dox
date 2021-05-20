@@ -63,24 +63,24 @@ vorticity and in the right the velocity field:
 
 <table>
   <tr>
-    <td> <img src="https://www.dealii.org/images/steps/developer/step-35.Re_100.vorticity.0.png" alt="" width="400"> </td>
-    <td> <img src="https://www.dealii.org/images/steps/developer/step-35.Re_100.velocity.0.png" alt="" width="400"> </td>
+    <td> <img src="https://www.dealii.org/images/steps/developer/step-35.Re_100.vorticity.0.9.3.png" alt="" width="400"> </td>
+    <td> <img src="https://www.dealii.org/images/steps/developer/step-35.Re_100.velocity.0.9.3.png" alt="" width="400"> </td>
   </tr>
   <tr>
-    <td> <img src="https://www.dealii.org/images/steps/developer/step-35.Re_100.vorticity.1.png" alt="" width="400"> </td>
-    <td> <img src="https://www.dealii.org/images/steps/developer/step-35.Re_100.velocity.1.png" alt="" width="400"> </td>
+    <td> <img src="https://www.dealii.org/images/steps/developer/step-35.Re_100.vorticity.1.9.3.png" alt="" width="400"> </td>
+    <td> <img src="https://www.dealii.org/images/steps/developer/step-35.Re_100.velocity.1.9.3.png" alt="" width="400"> </td>
   </tr>
   <tr>
-    <td> <img src="https://www.dealii.org/images/steps/developer/step-35.Re_100.vorticity.2.png" alt="" width="400"> </td>
-    <td> <img src="https://www.dealii.org/images/steps/developer/step-35.Re_100.velocity.2.png" alt="" width="400"> </td>
+    <td> <img src="https://www.dealii.org/images/steps/developer/step-35.Re_100.vorticity.2.9.3.png" alt="" width="400"> </td>
+    <td> <img src="https://www.dealii.org/images/steps/developer/step-35.Re_100.velocity.2.9.3.png" alt="" width="400"> </td>
   </tr>
   <tr>
-    <td> <img src="https://www.dealii.org/images/steps/developer/step-35.Re_100.vorticity.3.png" alt="" width="400"> </td>
-    <td> <img src="https://www.dealii.org/images/steps/developer/step-35.Re_100.velocity.3.png" alt="" width="400"> </td>
+    <td> <img src="https://www.dealii.org/images/steps/developer/step-35.Re_100.vorticity.3.9.3.png" alt="" width="400"> </td>
+    <td> <img src="https://www.dealii.org/images/steps/developer/step-35.Re_100.velocity.3.9.3.png" alt="" width="400"> </td>
   </tr>
   <tr>
-    <td> <img src="https://www.dealii.org/images/steps/developer/step-35.Re_100.vorticity.4.png" alt="" width="400"> </td>
-    <td> <img src="https://www.dealii.org/images/steps/developer/step-35.Re_100.velocity.4.png" alt="" width="400"> </td>
+    <td> <img src="https://www.dealii.org/images/steps/developer/step-35.Re_100.vorticity.4.9.3.png" alt="" width="400"> </td>
+    <td> <img src="https://www.dealii.org/images/steps/developer/step-35.Re_100.velocity.4.9.3.png" alt="" width="400"> </td>
   </tr>
 </table>
 
@@ -98,12 +98,12 @@ yields the following images at times $t=20,40$:
 
 <table>
   <tr>
-    <td> <img src="https://www.dealii.org/images/steps/developer/step-35.Re_500.vorticity.0.png" alt="" width="400"> </td>
-    <td> <img src="https://www.dealii.org/images/steps/developer/step-35.Re_500.velocity.0.png" alt="" width="400"> </td>
+    <td> <img src="https://www.dealii.org/images/steps/developer/step-35.Re_500.vorticity.0.9.3.png" alt="" width="400"> </td>
+    <td> <img src="https://www.dealii.org/images/steps/developer/step-35.Re_500.velocity.0.9.3.png" alt="" width="400"> </td>
   </tr>
   <tr>
-    <td> <img src="https://www.dealii.org/images/steps/developer/step-35.Re_500.vorticity.1.png" alt="" width="400"> </td>
-    <td> <img src="https://www.dealii.org/images/steps/developer/step-35.Re_500.velocity.1.png" alt="" width="400"> </td>
+    <td> <img src="https://www.dealii.org/images/steps/developer/step-35.Re_500.vorticity.1.9.3.png" alt="" width="400"> </td>
+    <td> <img src="https://www.dealii.org/images/steps/developer/step-35.Re_500.velocity.1.9.3.png" alt="" width="400"> </td>
   </tr>
 </table>
 
@@ -117,12 +117,12 @@ the geometry is large. We look at a zoom at the region behind the obstacle, and
 the mesh size we have there:
 
 
-<img src="https://www.dealii.org/images/steps/developer/step-35.Re_500.zoom.png" alt="" width="400">
+<img src="https://www.dealii.org/images/steps/developer/step-35.Re_500.zoom.9.3.png" alt="" width="400">
 
 We can easily test our hypothesis by re-running the simulation with one more
 mesh refinement set in the parameter file:
 
-<img src="https://www.dealii.org/images/steps/developer/step-35.Re_500.zoom_2.png" alt="" width="400">
+<img src="https://www.dealii.org/images/steps/developer/step-35.Re_500.zoom_2.9.3.png" alt="" width="400">
 
 Indeed, the vorticity field now looks much smoother. While we can expect that
 further refining the mesh will suppress the remaining oscillations as well,
