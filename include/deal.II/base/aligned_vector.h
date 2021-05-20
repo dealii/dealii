@@ -613,22 +613,18 @@ namespace internal
       if (end == begin)
         return;
 
-      // for classes trivial assignment can use memcpy. cast element to
+      // Classes with trivial assignment can use memcpy. cast element to
       // (void*) to silence compiler warning for virtual classes (they will
       // never arrive here because they are non-trivial).
-
       if (std::is_trivial<T>::value == true)
         std::memcpy(static_cast<void *>(destination_ + begin),
                     static_cast<void *>(source_ + begin),
                     (end - begin) * sizeof(T));
       else
+        // For everything else just use the move constructor. The original
+        // object remains alive and will be destroyed elsewhere.
         for (std::size_t i = begin; i < end; ++i)
-          {
-            // initialize memory (copy construct by placement new), and
-            // destruct the source
-            new (&destination_[i]) T(std::move(source_[i]));
-            source_[i].~T();
-          }
+          new (&destination_[i]) T(std::move(source_[i]));
     }
 
   private:
@@ -872,13 +868,10 @@ inline AlignedVector<T>::AlignedVector(const AlignedVector<T> &vec)
 
 template <class T>
 inline AlignedVector<T>::AlignedVector(AlignedVector<T> &&vec) noexcept
-  : elements(std::move(vec.elements))
-  , used_elements_end(vec.used_elements_end)
-  , allocated_elements_end(vec.allocated_elements_end)
+  : AlignedVector<T>()
 {
-  vec.elements               = nullptr;
-  vec.used_elements_end      = nullptr;
-  vec.allocated_elements_end = nullptr;
+  // forward to the move operator
+  *this = std::move(vec);
 }
 
 
@@ -903,8 +896,24 @@ AlignedVector<T>::operator=(AlignedVector<T> &&vec) noexcept
 {
   clear();
 
-  // Move the actual data
-  elements = std::move(vec.elements);
+  // Move the actual data in the 'elements' object. One problem is that this
+  // also moves the deleter object, but the deleter object is a lambda function
+  // that references 'this' (i.e., the 'this' pointer of the *moved-from*
+  // object). So what we actually do is steal the pointer via
+  // std::unique_ptr::release() and then install our own deleter object that
+  // mirrors the one used in reserve() below.
+  elements = decltype(elements)(vec.elements.release(), [this](T *ptr) {
+    if (ptr != nullptr)
+      {
+        Assert(this->used_elements_end != nullptr, ExcInternalError());
+
+        if (std::is_trivial<T>::value == false)
+          for (T *p = this->used_elements_end - 1; p >= ptr; --p)
+            p->~T();
+      }
+
+    std::free(ptr);
+  });
 
   // Then also steal the other pointers and clear them in the original object:
   used_elements_end      = vec.used_elements_end;
@@ -1042,20 +1051,40 @@ AlignedVector<T>::reserve(const size_type new_allocated_size)
       T *new_data_ptr;
       Utilities::System::posix_memalign(
         reinterpret_cast<void **>(&new_data_ptr), 64, new_size * sizeof(T));
-      std::unique_ptr<T[], void (*)(T *)> new_data(new_data_ptr, [](T *ptr) {
+
+      // Now create a deleter that encodes what should happen when the object is
+      // released: We need to destroy the objects that are currently alive (in
+      // reverse order, and then release the memory. Note that we catch the
+      // 'this' pointer because the number of elements currently alive might
+      // change over time.
+      auto deleter = [this](T *ptr) {
+        if (ptr != nullptr)
+          {
+            Assert(this->used_elements_end != nullptr, ExcInternalError());
+
+            if (std::is_trivial<T>::value == false)
+              for (T *p = this->used_elements_end - 1; p >= ptr; --p)
+                p->~T();
+          }
+
         std::free(ptr);
-      });
+      };
 
       // copy whatever elements we need to retain
       if (new_allocated_size > 0)
         dealii::internal::AlignedVectorMove<T>(elements.get(),
                                                elements.get() + old_size,
-                                               new_data.get());
+                                               new_data_ptr);
 
       // Now reset all of the member variables of the current object
       // based on the allocation above. Assigning to a std::unique_ptr
       // object also releases the previously pointed to memory.
-      elements               = std::move(new_data);
+      //
+      // Note that at the time of releasing the old memory, 'used_elements_end'
+      // still points to its previous value, and this is important for the
+      // deleter object of the previously allocated array (see how it loops over
+      // the to-be-destroyed elements a few lines above).
+      elements               = decltype(elements)(new_data_ptr, deleter);
       used_elements_end      = elements.get() + old_size;
       allocated_elements_end = elements.get() + new_size;
     }
@@ -1071,13 +1100,14 @@ template <class T>
 inline void
 AlignedVector<T>::clear()
 {
-  if (elements != nullptr)
-    {
-      if (std::is_trivial<T>::value == false)
-        while (used_elements_end != elements.get())
-          (--used_elements_end)->~T();
-    }
-  elements               = nullptr;
+  // Just release the memory (which also calls the destructor of the elements),
+  // and then set the auxiliary pointers to invalid values.
+  //
+  // Note that at the time of releasing the old memory, 'used_elements_end'
+  // still points to its previous value, and this is important for the
+  // deleter object of the previously allocated array (see how it loops over
+  // the to-be-destroyed elements a few lines above).
+  elements.reset();
   used_elements_end      = nullptr;
   allocated_elements_end = nullptr;
 }
@@ -1576,7 +1606,42 @@ template <class T>
 inline void
 AlignedVector<T>::swap(AlignedVector<T> &vec)
 {
-  std::swap(elements, vec.elements);
+  // Swap the data in the 'elements' objects. One problem is that this
+  // also moves the deleter object, but the deleter object is a lambda function
+  // that references 'this' (i.e., the 'this' pointer of the *moved-from*
+  // object). So what we actually do is steal the pointer via
+  // std::unique_ptr::release() and then install our own deleter object that
+  // mirrors the one used in reserve() below.
+  //
+  // We have to do the same for the other object
+  T *this_element_pointer = elements.release();
+
+  elements = decltype(elements)(vec.elements.release(), [this](T *ptr) {
+    if (ptr != nullptr)
+      {
+        Assert(this->used_elements_end != nullptr, ExcInternalError());
+
+        if (std::is_trivial<T>::value == false)
+          for (T *p = this->used_elements_end - 1; p >= ptr; --p)
+            p->~T();
+      }
+
+    std::free(ptr);
+  });
+
+  vec.elements = decltype(vec.elements)(this_element_pointer, [&vec](T *ptr) {
+    if (ptr != nullptr)
+      {
+        Assert(vec.used_elements_end != nullptr, ExcInternalError());
+
+        if (std::is_trivial<T>::value == false)
+          for (T *p = vec.used_elements_end - 1; p >= ptr; --p)
+            p->~T();
+      }
+
+    std::free(ptr);
+  });
+
   std::swap(used_elements_end, vec.used_elements_end);
   std::swap(allocated_elements_end, vec.allocated_elements_end);
 }
