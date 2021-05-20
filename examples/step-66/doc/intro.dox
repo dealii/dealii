@@ -206,7 +206,13 @@ linear solver, so in order to apply the multilevel operators we need to pass the
 last Newton step also to these operators. This is kind of a tricky task, since
 the vector containing the last Newton step has to be interpolated to all levels
 of the triangulation. In the code this task will be done by the function
-MGTransferMatrixFree::interpolate_to_mg():
+MGTransferMatrixFree::interpolate_to_mg(). Note, a fundamental difference to
+the previous cases, where we set up and used a geometric multigrid
+preconditioner, is the fact, that we can reuse the MGTransferMatrixFree object
+for the computation of all Newton steps. So we can save some work here by
+defining a class variable and using an already set up MGTransferMatrixFree
+object <code>mg_transfer</code> that was initialized in the
+<code>setup_system()</code> function.
 @code
 template <int dim, int fe_degree>
 void GelfandProblem<dim, fe_degree>::compute_update()
