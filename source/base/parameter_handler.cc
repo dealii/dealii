@@ -1260,7 +1260,7 @@ ParameterHandler::print_parameters(std::ostream &    out,
   boost::property_tree::ptree current_entries = *entries.get();
 
   // Sort parameters alphabetically, if needed.
-  if (!(style & KeepDeclarationOrder))
+  if ((style & KeepDeclarationOrder) == 0)
     {
       // Dive recursively into the subsections,
       // starting from the top level.
@@ -1282,13 +1282,13 @@ ParameterHandler::print_parameters(std::ostream &    out,
   // first
 
   // explicitly compress the tree if requested
-  if ((style & Short) && (style & (XML | JSON)))
+  if (((style & Short) != 0) && ((style & (XML | JSON)) != 0))
     {
       // modify the copy of the tree
       recursively_compress_tree(current_entries);
     }
 
-  if (style & XML)
+  if ((style & XML) != 0)
     {
       // call the writer function and exit as there is nothing
       // further to do down in this function
@@ -1306,29 +1306,29 @@ ParameterHandler::print_parameters(std::ostream &    out,
       return out;
     }
 
-  if (style & JSON)
+  if ((style & JSON) != 0)
     {
       write_json(out, current_entries);
       return out;
     }
 
   // for all of the other formats, print a preamble:
-  if ((style & Short) && (style & Text))
+  if (((style & Short) != 0) && ((style & Text) != 0))
     {
       // nothing to do
     }
-  else if (style & Text)
+  else if ((style & Text) != 0)
     {
       out << "# Listing of Parameters" << std::endl
           << "# ---------------------" << std::endl;
     }
-  else if (style & LaTeX)
+  else if ((style & LaTeX) != 0)
     {
       out << "\\subsection{Global parameters}" << std::endl;
       out << "\\label{parameters:global}" << std::endl;
       out << std::endl << std::endl;
     }
-  else if (style & Description)
+  else if ((style & Description) != 0)
     {
       out << "Listing of Parameters:" << std::endl << std::endl;
     }
@@ -1393,9 +1393,9 @@ ParameterHandler::recursively_print_parameters(
 
   unsigned int overall_indent_level = indent_level;
 
-  const bool is_short = style & Short;
+  const bool is_short = (style & Short) != 0;
 
-  if (style & Text)
+  if ((style & Text) != 0)
     {
       // first find out the longest entry name to be able to align the
       // equal signs to do this loop over all nodes of the current
@@ -1466,7 +1466,7 @@ ParameterHandler::recursively_print_parameters(
             out << '\n';
           }
     }
-  else if (style & LaTeX)
+  else if ((style & LaTeX) != 0)
     {
       auto escape = [](const std::string &input) {
         return Patterns::internal::escape(input, Patterns::PatternBase::LaTeX);
@@ -1598,7 +1598,7 @@ ParameterHandler::recursively_print_parameters(
           out << "\\end{itemize}" << '\n';
         }
     }
-  else if (style & Description)
+  else if ((style & Description) != 0)
     {
       // first find out the longest entry name to be able to align the
       // equal signs
@@ -1664,8 +1664,9 @@ ParameterHandler::recursively_print_parameters(
       else if (is_alias_node(p.second) == false)
         ++n_sections;
 
-    if (!(style & Description) && (!((style & Text) && is_short)) &&
-        (n_parameters != 0) && (n_sections != 0))
+    if (((style & Description) == 0) &&
+        (!(((style & Text) != 0) && is_short)) && (n_parameters != 0) &&
+        (n_sections != 0))
       out << "\n\n";
   }
 
@@ -1675,12 +1676,12 @@ ParameterHandler::recursively_print_parameters(
         (is_alias_node(p.second) == false))
       {
         // first print the subsection header
-        if ((style & Text) || (style & Description))
+        if (((style & Text) != 0) || ((style & Description) != 0))
           {
             out << std::setw(overall_indent_level * 2) << ""
                 << "subsection " << demangle(p.first) << '\n';
           }
-        else if (style & LaTeX)
+        else if ((style & LaTeX) != 0)
           {
             auto escape = [](const std::string &input) {
               return Patterns::internal::escape(input,
@@ -1717,13 +1718,13 @@ ParameterHandler::recursively_print_parameters(
         recursively_print_parameters(
           tree, directory_path, style, overall_indent_level + 1, out);
 
-        if (is_short && (style & Text))
+        if (is_short && ((style & Text) != 0))
           {
             // write end of subsection.
             out << std::setw(overall_indent_level * 2) << ""
                 << "end" << '\n';
           }
-        else if (style & Text)
+        else if ((style & Text) != 0)
           {
             // write end of subsection. one blank line after each
             // subsection
@@ -1736,11 +1737,11 @@ ParameterHandler::recursively_print_parameters(
             if (overall_indent_level == 0)
               out << '\n';
           }
-        else if (style & Description)
+        else if ((style & Description) != 0)
           {
             // nothing to do
           }
-        else if (style & LaTeX)
+        else if ((style & LaTeX) != 0)
           {
             // nothing to do
           }
@@ -1775,7 +1776,7 @@ ParameterHandler::log_parameters_section(LogStream &       out,
   boost::property_tree::ptree *current_entries = entries.get();
 
   // Sort parameters alphabetically, if needed.
-  if (!(style & KeepDeclarationOrder))
+  if ((style & KeepDeclarationOrder) == 0)
     {
       sorted_entries  = *entries;
       current_entries = &sorted_entries;
@@ -1859,7 +1860,7 @@ ParameterHandler::scan_line(std::string        line,
            Utilities::match_at_string_start(line, "end"))
     {
       line.erase(0, 3);
-      while ((line.size() > 0) && (std::isspace(line[0])))
+      while ((line.size() > 0) && ((std::isspace(line[0])) != 0))
         line.erase(0, 1);
 
       AssertThrow(
@@ -2291,9 +2292,9 @@ MultipleParameterLoop::Entry::split_different_values()
     multiple.erase(multiple.size() - 1, 1);
   // erase leading and trailing spaces
   // in multiple
-  while (std::isspace(multiple[0]))
+  while (std::isspace(multiple[0]) != 0)
     multiple.erase(0, 1);
-  while (std::isspace(multiple[multiple.size() - 1]))
+  while (std::isspace(multiple[multiple.size() - 1]) != 0)
     multiple.erase(multiple.size() - 1, 1);
 
   // delete spaces around '|'

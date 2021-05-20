@@ -635,7 +635,7 @@ namespace LinearAlgebra
         return -Utilities::MPI::max(
           local_result, this->block(0).partitioner->get_mpi_communicator());
       else
-        return local_result;
+        return local_result != 0;
     }
 
 

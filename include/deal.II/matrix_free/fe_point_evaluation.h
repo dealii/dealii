@@ -800,12 +800,12 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::FEPointEvaluation(
     }
 
   // translate update flags
-  if (update_flags & update_jacobians)
+  if ((update_flags & update_jacobians) != 0u)
     update_flags_mapping |= update_jacobians;
-  if (update_flags & update_gradients ||
-      update_flags & update_inverse_jacobians)
+  if (((update_flags & update_gradients) != 0u) ||
+      ((update_flags & update_inverse_jacobians) != 0u))
     update_flags_mapping |= update_inverse_jacobians;
-  if (update_flags & update_quadrature_points)
+  if ((update_flags & update_quadrature_points) != 0u)
     update_flags_mapping |= update_quadrature_points;
 }
 
@@ -835,20 +835,20 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::reinit(
         update_flags | update_flags_mapping);
       fe_values->reinit(cell);
       mapping_data.initialize(unit_points.size(), update_flags_mapping);
-      if (update_flags_mapping & update_jacobians)
+      if ((update_flags_mapping & update_jacobians) != 0)
         for (unsigned int q = 0; q < unit_points.size(); ++q)
           mapping_data.jacobians[q] = fe_values->jacobian(q);
-      if (update_flags_mapping & update_inverse_jacobians)
+      if ((update_flags_mapping & update_inverse_jacobians) != 0)
         for (unsigned int q = 0; q < unit_points.size(); ++q)
           mapping_data.inverse_jacobians[q] = fe_values->inverse_jacobian(q);
-      if (update_flags_mapping & update_quadrature_points)
+      if ((update_flags_mapping & update_quadrature_points) != 0)
         for (unsigned int q = 0; q < unit_points.size(); ++q)
           mapping_data.quadrature_points[q] = fe_values->quadrature_point(q);
     }
 
-  if (update_flags & update_values)
+  if ((update_flags & update_values) != 0)
     values.resize(unit_points.size(), numbers::signaling_nan<value_type>());
-  if (update_flags & update_gradients)
+  if ((update_flags & update_gradients) != 0)
     gradients.resize(unit_points.size(),
                      numbers::signaling_nan<gradient_type>());
 }
@@ -865,8 +865,8 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::evaluate(
     return;
 
   AssertDimension(solution_values.size(), fe->dofs_per_cell);
-  if (((evaluation_flag & EvaluationFlags::values) ||
-       (evaluation_flag & EvaluationFlags::gradients)) &&
+  if ((((evaluation_flag & EvaluationFlags::values) != 0u) ||
+       ((evaluation_flag & EvaluationFlags::gradients) != 0u)) &&
       !poly.empty())
     {
       // fast path with tensor product evaluation
@@ -906,12 +906,12 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::evaluate(
               polynomials_are_hat_functions);
 
           // convert back to standard format
-          if (evaluation_flag & EvaluationFlags::values)
+          if ((evaluation_flag & EvaluationFlags::values) != 0u)
             for (unsigned int j = 0; j < n_lanes && i + j < n_points; ++j)
               internal::FEPointEvaluation::
                 EvaluatorTypeTraits<dim, n_components, Number>::set_value(
                   val_and_grad.first, j, values[i + j]);
-          if (evaluation_flag & EvaluationFlags::gradients)
+          if ((evaluation_flag & EvaluationFlags::gradients) != 0u)
             {
               Assert(update_flags & update_gradients ||
                        update_flags & update_inverse_jacobians,
@@ -933,15 +933,15 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::evaluate(
             }
         }
     }
-  else if ((evaluation_flag & EvaluationFlags::values) ||
-           (evaluation_flag & EvaluationFlags::gradients))
+  else if (((evaluation_flag & EvaluationFlags::values) != 0u) ||
+           ((evaluation_flag & EvaluationFlags::gradients) != 0u))
     {
       // slow path with FEValues
       Assert(fe_values.get() != nullptr,
              ExcMessage(
                "Not initialized. Please call FEPointEvaluation::reinit()!"));
 
-      if (evaluation_flag & EvaluationFlags::values)
+      if ((evaluation_flag & EvaluationFlags::values) != 0u)
         {
           values.resize(unit_points.size());
           std::fill(values.begin(), values.end(), value_type());
@@ -964,7 +964,7 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::evaluate(
             }
         }
 
-      if (evaluation_flag & EvaluationFlags::gradients)
+      if ((evaluation_flag & EvaluationFlags::gradients) != 0u)
         {
           gradients.resize(unit_points.size());
           std::fill(gradients.begin(), gradients.end(), gradient_type());
@@ -1004,15 +1004,15 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::integrate(
     }
 
   AssertDimension(solution_values.size(), fe->dofs_per_cell);
-  if (((integration_flags & EvaluationFlags::values) ||
-       (integration_flags & EvaluationFlags::gradients)) &&
+  if ((((integration_flags & EvaluationFlags::values) != 0u) ||
+       ((integration_flags & EvaluationFlags::gradients) != 0u)) &&
       !poly.empty())
     {
       // fast path with tensor product integration
 
-      if (integration_flags & EvaluationFlags::values)
+      if ((integration_flags & EvaluationFlags::values) != 0u)
         AssertIndexRange(unit_points.size(), values.size() + 1);
-      if (integration_flags & EvaluationFlags::gradients)
+      if ((integration_flags & EvaluationFlags::gradients) != 0u)
         AssertIndexRange(unit_points.size(), gradients.size() + 1);
 
       if (solution_renumbered_vectorized.size() != dofs_per_component)
@@ -1044,12 +1044,12 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::integrate(
                    VectorizedArray<Number>>::type>
             gradient;
 
-          if (integration_flags & EvaluationFlags::values)
+          if ((integration_flags & EvaluationFlags::values) != 0u)
             for (unsigned int j = 0; j < n_lanes && i + j < n_points; ++j)
               internal::FEPointEvaluation::
                 EvaluatorTypeTraits<dim, n_components, Number>::get_value(
                   value, j, values[i + j]);
-          if (integration_flags & EvaluationFlags::gradients)
+          if ((integration_flags & EvaluationFlags::gradients) != 0u)
             for (unsigned int j = 0; j < n_lanes && i + j < n_points; ++j)
               {
                 Assert(update_flags_mapping & update_inverse_jacobians,
@@ -1087,8 +1087,8 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::integrate(
               result[0];
           }
     }
-  else if ((integration_flags & EvaluationFlags::values) ||
-           (integration_flags & EvaluationFlags::gradients))
+  else if (((integration_flags & EvaluationFlags::values) != 0u) ||
+           ((integration_flags & EvaluationFlags::gradients) != 0u))
     {
       // slow path with FEValues
 
@@ -1097,7 +1097,7 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::integrate(
                "Not initialized. Please call FEPointEvaluation::reinit()!"));
       std::fill(solution_values.begin(), solution_values.end(), 0.0);
 
-      if (integration_flags & EvaluationFlags::values)
+      if ((integration_flags & EvaluationFlags::values) != 0u)
         {
           AssertIndexRange(unit_points.size(), values.size() + 1);
           for (unsigned int i = 0; i < fe->n_dofs_per_cell(); ++i)
@@ -1121,7 +1121,7 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::integrate(
             }
         }
 
-      if (integration_flags & EvaluationFlags::gradients)
+      if ((integration_flags & EvaluationFlags::gradients) != 0u)
         {
           AssertIndexRange(unit_points.size(), gradients.size() + 1);
           for (unsigned int i = 0; i < fe->n_dofs_per_cell(); ++i)

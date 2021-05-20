@@ -734,7 +734,7 @@ namespace Utilities
 
         int ierr =
           MPI_Op_create(reinterpret_cast<MPI_User_function *>(&max_reduce),
-                        true,
+                        static_cast<int>(true),
                         &op);
         AssertThrowMPI(ierr);
 

@@ -609,11 +609,11 @@ FiniteElement<dim, spacedim>::face_to_cell_index(const unsigned int face_index,
 
       // then get the number of this vertex on the cell and translate
       // this to a DoF number on the cell
-      return (this->reference_cell().face_to_cell_vertices(face,
-                                                           face_vertex,
-                                                           face_orientation +
-                                                             2 * face_rotation +
-                                                             4 * face_flip) *
+      return (this->reference_cell().face_to_cell_vertices(
+                face,
+                face_vertex,
+                (face_orientation ? 1 : 0) + (face_rotation ? 2 : 0) +
+                  (face_flip ? 4 : 0)) *
                 this->n_dofs_per_vertex() +
               dof_index_on_vertex);
     }
@@ -628,14 +628,15 @@ FiniteElement<dim, spacedim>::face_to_cell_index(const unsigned int face_index,
       const unsigned int face_line         = index / this->n_dofs_per_line();
       const unsigned int dof_index_on_line = index % this->n_dofs_per_line();
 
-      return (this->get_first_line_index() +
-              this->reference_cell().face_to_cell_lines(face,
-                                                        face_line,
-                                                        face_orientation +
-                                                          2 * face_rotation +
-                                                          4 * face_flip) *
-                this->n_dofs_per_line() +
-              dof_index_on_line);
+      return (
+        this->get_first_line_index() +
+        this->reference_cell().face_to_cell_lines(face,
+                                                  face_line,
+                                                  (face_orientation ? 1 : 0) +
+                                                    (face_rotation ? 2 : 0) +
+                                                    (face_flip ? 4 : 0)) *
+          this->n_dofs_per_line() +
+        dof_index_on_line);
     }
   else
     // DoF is on a quad
@@ -689,8 +690,10 @@ FiniteElement<dim, spacedim>::adjust_quad_dof_index_for_face_orientation(
          ExcInternalError());
   return index +
          adjust_quad_dof_index_for_face_orientation_table
-           [this->n_unique_quads() == 1 ? 0 : face](
-             index, 4 * face_orientation + 2 * face_flip + face_rotation);
+           [this->n_unique_quads() == 1 ? 0 : face](index,
+                                                    (face_orientation ? 4 : 0) +
+                                                      (face_flip ? 2 : 0) +
+                                                      (face_rotation ? 1 : 0));
 }
 
 

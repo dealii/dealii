@@ -2226,7 +2226,7 @@ inline types::global_dof_index
 AffineConstraints<number>::calculate_line_index(const size_type line_n) const
 {
   // IndexSet is unused (serial case)
-  if (!local_lines.size())
+  if (local_lines.size() == 0)
     return line_n;
 
   Assert(local_lines.is_element(line_n), ExcRowNotStoredHere(line_n));
@@ -2238,7 +2238,7 @@ template <typename number>
 inline bool
 AffineConstraints<number>::can_store_line(size_type line_n) const
 {
-  return !local_lines.size() || local_lines.is_element(line_n);
+  return local_lines.size() == 0 || local_lines.is_element(line_n);
 }
 
 template <typename number>

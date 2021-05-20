@@ -156,7 +156,7 @@ namespace Utilities
                                       MPI_STATUSES_IGNORE);
         AssertThrowMPI(ierr);
 
-        return all_receive_requests_are_done;
+        return all_receive_requests_are_done != 0;
 #else
         return true;
 #endif
@@ -193,7 +193,7 @@ namespace Utilities
                                    &all_ranks_reached_barrier,
                                    MPI_STATUSES_IGNORE);
         AssertThrowMPI(ierr);
-        return all_ranks_reached_barrier;
+        return all_ranks_reached_barrier != 0;
 #else
         return true;
 #endif
@@ -228,7 +228,7 @@ namespace Utilities
                                      &status);
         AssertThrowMPI(ierr);
 
-        if (request_is_pending)
+        if (request_is_pending != 0)
           {
             // Get the rank of the requesting process and add it to the
             // list of requesting processes (which may contain duplicates).

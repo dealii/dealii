@@ -5222,8 +5222,9 @@ namespace GridGenerator
       {1, 8, 3, 9, 5, 10, 7, 11}}; // shifted cube
 
     // binary to case number
-    const unsigned int this_case =
-      4 * face_orientation + 2 * face_flip + face_rotation;
+    const unsigned int this_case = 4 * static_cast<int>(face_orientation) +
+                                   2 * static_cast<int>(face_flip) +
+                                   static_cast<int>(face_rotation);
 
     if (manipulate_left_cube)
       {

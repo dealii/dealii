@@ -677,11 +677,11 @@ UpdateFlags
 FE_FaceQ<1, spacedim>::requires_update_flags(const UpdateFlags flags) const
 {
   UpdateFlags out = flags & update_values;
-  if (flags & update_gradients)
+  if ((flags & update_gradients) != 0u)
     out |= update_gradients | update_covariant_transformation;
-  if (flags & update_hessians)
+  if ((flags & update_hessians) != 0u)
     out |= update_hessians | update_covariant_transformation;
-  if (flags & update_normal_vectors)
+  if ((flags & update_normal_vectors) != 0u)
     out |= update_normal_vectors | update_JxW_values;
 
   return out;
@@ -956,7 +956,7 @@ FE_FaceP<dim, spacedim>::get_subface_interpolation_matrix(
           for (unsigned int k = 0; k < face_quadrature.size(); ++k)
             {
               const Point<dim - 1> p =
-                numbers::invalid_unsigned_int ?
+                numbers::invalid_unsigned_int != 0u ?
                   face_quadrature.point(k) :
                   GeometryInfo<dim - 1>::child_to_cell_coordinates(
                     face_quadrature.point(k), subface);

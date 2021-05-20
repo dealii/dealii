@@ -1177,7 +1177,7 @@ namespace internal
             tria_faces.quads_line_orientations.end(),
             new_size * GeometryInfo<2>::lines_per_cell -
               tria_faces.quads_line_orientations.size(),
-            true);
+            1u);
 
           tria_faces.quad_reference_cell.reserve(new_size);
           tria_faces.quad_reference_cell.insert(
@@ -1290,7 +1290,7 @@ namespace internal
                 tria_level.face_orientations.end(),
                 total_cells * max_faces_per_cell -
                   tria_level.face_orientations.size(),
-                true);
+                1u);
 
               tria_level.reference_cell.reserve(total_cells);
               tria_level.reference_cell.insert(
@@ -2678,7 +2678,7 @@ namespace internal
         level.subdomain_ids.assign(size, 0);
         level.level_subdomain_ids.assign(size, 0);
 
-        level.refine_flags.assign(size, false);
+        level.refine_flags.assign(size, 0u);
         level.coarsen_flags.assign(size, false);
 
         level.parents.assign((size + 1) / 2, -1);
@@ -16144,14 +16144,14 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
                                         nb->face_flip(nb_indices.first),
                                         nb->face_rotation(nb_indices.first));
                                     if ((nb_frc & RefinementCase<dim>::cut_x) &&
-                                        !(refined_along_x ||
-                                          to_be_refined_along_x))
+                                        !((refined_along_x != 0u) ||
+                                          (to_be_refined_along_x != 0u)))
                                       changed |= cell->flag_for_face_refinement(
                                         i,
                                         RefinementCase<dim - 1>::cut_axis(0));
                                     if ((nb_frc & RefinementCase<dim>::cut_y) &&
-                                        !(refined_along_y ||
-                                          to_be_refined_along_y))
+                                        !((refined_along_y != 0u) ||
+                                          (to_be_refined_along_y != 0u)))
                                       changed |= cell->flag_for_face_refinement(
                                         i,
                                         RefinementCase<dim - 1>::cut_axis(1));
@@ -16335,7 +16335,7 @@ Triangulation<dim, spacedim>::read_bool_vector(const unsigned int magic_number1,
     }
 
   for (unsigned int position = 0; position != N; ++position)
-    v[position] = (flags[position / 8] & (1 << (position % 8)));
+    v[position] = ((flags[position / 8] & (1 << (position % 8))) != 0);
 
   in >> magic_number;
   AssertThrow(magic_number == magic_number2, ExcGridReadError());

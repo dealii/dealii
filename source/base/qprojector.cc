@@ -1391,11 +1391,13 @@ QProjector<dim>::DataSetDescriptor::face(const ReferenceCell reference_cell,
       reference_cell == ReferenceCells::Tetrahedron)
     {
       if (dim == 2)
-        return {(2 * face_no + face_orientation) * n_quadrature_points};
+        return {(2 * face_no + (face_orientation ? 1 : 0)) *
+                n_quadrature_points};
       else if (dim == 3)
         {
-          const unsigned int orientation =
-            (face_flip * 2 + face_rotation) * 2 + face_orientation;
+          const unsigned int orientation = (face_flip ? 4 : 0) +
+                                           (face_rotation ? 2 : 0) +
+                                           (face_orientation ? 1 : 0);
           return {(6 * face_no + orientation) * n_quadrature_points};
         }
     }
@@ -1509,8 +1511,9 @@ QProjector<dim>::DataSetDescriptor::face(
                   quadrature[quadrature.size() == 1 ? 0 : face_no].size()};
       else if (dim == 3)
         {
-          const unsigned int orientation =
-            (face_flip * 2 + face_rotation) * 2 + face_orientation;
+          const unsigned int orientation = (face_flip ? 4 : 0) +
+                                           (face_rotation ? 2 : 0) +
+                                           (face_orientation ? 1 : 0);
 
           return {offset +
                   orientation *

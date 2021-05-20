@@ -220,26 +220,26 @@ DataOutRotation<dim, spacedim>::build_one_patch(
                       // at each point there is
                       // only one component of
                       // value, gradient etc.
-                      if (update_flags & update_values)
+                      if ((update_flags & update_values) != 0u)
                         this->dof_data[dataset]->get_function_values(
                           fe_patch_values,
                           internal::DataOutImplementation::ComponentExtractor::
                             real_part,
                           data.patch_values_scalar.solution_values);
-                      if (update_flags & update_gradients)
+                      if ((update_flags & update_gradients) != 0u)
                         this->dof_data[dataset]->get_function_gradients(
                           fe_patch_values,
                           internal::DataOutImplementation::ComponentExtractor::
                             real_part,
                           data.patch_values_scalar.solution_gradients);
-                      if (update_flags & update_hessians)
+                      if ((update_flags & update_hessians) != 0u)
                         this->dof_data[dataset]->get_function_hessians(
                           fe_patch_values,
                           internal::DataOutImplementation::ComponentExtractor::
                             real_part,
                           data.patch_values_scalar.solution_hessians);
 
-                      if (update_flags & update_quadrature_points)
+                      if ((update_flags & update_quadrature_points) != 0u)
                         data.patch_values_scalar.evaluation_points =
                           fe_patch_values.get_quadrature_points();
 
@@ -261,26 +261,26 @@ DataOutRotation<dim, spacedim>::build_one_patch(
 
                       // at each point there is a vector valued function and
                       // its derivative...
-                      if (update_flags & update_values)
+                      if ((update_flags & update_values) != 0u)
                         this->dof_data[dataset]->get_function_values(
                           fe_patch_values,
                           internal::DataOutImplementation::ComponentExtractor::
                             real_part,
                           data.patch_values_system.solution_values);
-                      if (update_flags & update_gradients)
+                      if ((update_flags & update_gradients) != 0u)
                         this->dof_data[dataset]->get_function_gradients(
                           fe_patch_values,
                           internal::DataOutImplementation::ComponentExtractor::
                             real_part,
                           data.patch_values_system.solution_gradients);
-                      if (update_flags & update_hessians)
+                      if ((update_flags & update_hessians) != 0u)
                         this->dof_data[dataset]->get_function_hessians(
                           fe_patch_values,
                           internal::DataOutImplementation::ComponentExtractor::
                             real_part,
                           data.patch_values_system.solution_hessians);
 
-                      if (update_flags & update_quadrature_points)
+                      if ((update_flags & update_quadrature_points) != 0u)
                         data.patch_values_system.evaluation_points =
                           fe_patch_values.get_quadrature_points();
 

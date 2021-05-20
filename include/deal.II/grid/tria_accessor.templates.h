@@ -845,7 +845,9 @@ namespace internal
         return accessor.reference_cell().standard_vs_true_line_orientation(
           pair[1],
           face_orientation_raw(accessor, quad_index),
-          accessor.quad(quad_index)->line_orientation(line_within_face_index));
+          static_cast<unsigned char>(
+            accessor.quad(quad_index)
+              ->line_orientation(line_within_face_index)));
       }
 
 
