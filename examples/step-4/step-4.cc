@@ -378,7 +378,7 @@ void Step4<dim>::assemble_system()
                  fe_values.shape_grad(j, q_index) * // grad phi_j(x_q)
                  fe_values.JxW(q_index));           // dx
 
-            const auto x_q = fe_values.quadrature_point(q_index);
+            const auto &x_q = fe_values.quadrature_point(q_index);
             cell_rhs(i) += (fe_values.shape_value(i, q_index) * // phi_i(x_q)
                             right_hand_side.value(x_q) *        // f(x_q)
                             fe_values.JxW(q_index));            // dx

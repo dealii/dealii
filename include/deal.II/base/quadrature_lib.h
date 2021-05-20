@@ -253,7 +253,7 @@ public:
    * formula or it is factored out, to be included in the integrand.
    */
   QGaussLogR(const unsigned int n,
-             const Point<dim>   x0                         = Point<dim>(),
+             const Point<dim> & x0                         = Point<dim>(),
              const double       alpha                      = 1,
              const bool         factor_out_singular_weight = false);
 
@@ -333,7 +333,7 @@ public:
    * @endcode
    */
   QGaussOneOverR(const unsigned int n,
-                 const Point<dim>   singularity,
+                 const Point<dim> & singularity,
                  const bool         factor_out_singular_weight = false);
   /**
    * The constructor takes three arguments: the order of the Gauss formula,
@@ -380,7 +380,7 @@ private:
    * the cell, on an edge of the cell, or on a corner of the cell.
    */
   static unsigned int
-  quad_size(const Point<dim> singularity, const unsigned int n);
+  quad_size(const Point<dim> &singularity, const unsigned int n);
 };
 
 
@@ -911,7 +911,7 @@ template <>
 QGaussLog<1>::QGaussLog(const unsigned int n, const bool revert);
 template <>
 QGaussLogR<1>::QGaussLogR(const unsigned int n,
-                          const Point<1>     x0,
+                          const Point<1> &   x0,
                           const double       alpha,
                           const bool         flag);
 template <>

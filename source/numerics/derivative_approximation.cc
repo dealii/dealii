@@ -839,7 +839,7 @@ namespace DerivativeApproximation
                 neighbor_fe_midpoint_value, solution, component);
 
           // ...and the place where it lives
-          const Point<dim> neighbor_center =
+          const Point<dim> &neighbor_center =
             neighbor_fe_midpoint_value.quadrature_point(0);
 
 
@@ -848,6 +848,7 @@ namespace DerivativeApproximation
           // direction between
           // the centers of two
           // cells
+
           Tensor<1, dim> y        = neighbor_center - this_center;
           const double   distance = y.norm();
           // normalize y

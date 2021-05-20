@@ -522,7 +522,7 @@ namespace Step61
 
             for (unsigned int q = 0; q < n_face_q_points; ++q)
               {
-                const Tensor<1, dim> normal = fe_face_values.normal_vector(q);
+                const Tensor<1, dim> &normal = fe_face_values.normal_vector(q);
 
                 for (unsigned int i = 0; i < dofs_per_cell_dgrt; ++i)
                   {
@@ -769,7 +769,7 @@ namespace Step61
 
             for (unsigned int q = 0; q < n_face_q_points; ++q)
               {
-                const Tensor<1, dim> normal = fe_face_values.normal_vector(q);
+                const Tensor<1, dim> &normal = fe_face_values.normal_vector(q);
 
                 for (unsigned int i = 0; i < dofs_per_cell_dgrt; ++i)
                   {
@@ -939,7 +939,7 @@ namespace Step61
                 const Tensor<1, dim> true_velocity =
                   exact_velocity.value(fe_face_values_dgrt.quadrature_point(q));
 
-                const Tensor<1, dim> normal =
+                const Tensor<1, dim> &normal =
                   fe_face_values_dgrt.normal_vector(q);
 
                 L2_err_flux_face_sqr_local +=

@@ -526,7 +526,7 @@ QGaussLog<1>::get_quadrature_weights(const unsigned int n)
 
 template <>
 QGaussLogR<1>::QGaussLogR(const unsigned int n,
-                          const Point<1>     origin,
+                          const Point<1> &   origin,
                           const double       alpha,
                           const bool         factor_out_singularity)
   : Quadrature<1>(
@@ -606,7 +606,7 @@ QGaussLogR<1>::QGaussLogR(const unsigned int n,
 
 template <>
 unsigned int
-QGaussOneOverR<2>::quad_size(const Point<2> singularity, const unsigned int n)
+QGaussOneOverR<2>::quad_size(const Point<2> &singularity, const unsigned int n)
 {
   const double eps = 1e-8;
   const bool   on_edge =
@@ -628,7 +628,7 @@ QGaussOneOverR<2>::quad_size(const Point<2> singularity, const unsigned int n)
 
 template <>
 QGaussOneOverR<2>::QGaussOneOverR(const unsigned int n,
-                                  const Point<2>     singularity,
+                                  const Point<2> &   singularity,
                                   const bool         factor_out_singularity)
   : Quadrature<2>(quad_size(singularity, n))
 {
@@ -1258,8 +1258,8 @@ QTrianglePolar::QTrianglePolar(const Quadrature<1> &radial_quadrature,
   this->weights.resize(base.size());
   for (unsigned int i = 0; i < base.size(); ++i)
     {
-      const auto q = base.point(i);
-      const auto w = base.weight(i);
+      const auto &q = base.point(i);
+      const auto  w = base.weight(i);
 
       const auto xhat = q[0];
       const auto yhat = q[1];
@@ -1295,8 +1295,8 @@ QDuffy::QDuffy(const Quadrature<1> &radial_quadrature,
   this->weights.resize(base.size());
   for (unsigned int i = 0; i < base.size(); ++i)
     {
-      const auto q = base.point(i);
-      const auto w = base.weight(i);
+      const auto &q = base.point(i);
+      const auto  w = base.weight(i);
 
       const auto xhat = q[0];
       const auto yhat = q[1];

@@ -111,7 +111,7 @@ namespace GridGenerator
                          double,
                          double,
                          double,
-                         const Point<dim>,
+                         const Point<dim> &,
                          types::manifold_id,
                          types::manifold_id,
                          double,

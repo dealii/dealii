@@ -405,12 +405,12 @@ namespace Step47
         {
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             {
-              const Tensor<2, dim> hessian_i =
+              const Tensor<2, dim> &hessian_i =
                 fe_values.shape_hessian(i, qpoint);
 
               for (unsigned int j = 0; j < dofs_per_cell; ++j)
                 {
-                  const Tensor<2, dim> hessian_j =
+                  const Tensor<2, dim> &hessian_j =
                     fe_values.shape_hessian(j, qpoint);
 
                   copy_data.cell_matrix(i, j) +=

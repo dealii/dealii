@@ -2832,7 +2832,7 @@ namespace VectorTools
                     }
 
                   // Tensor of normal vector on the face at q_point;
-                  const Tensor<1, dim> normal_vector =
+                  const Tensor<1, dim> &normal_vector =
                     fe_face_values.normal_vector(q_point);
 
                   // Now compute the linear system:
