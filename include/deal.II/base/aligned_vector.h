@@ -489,7 +489,10 @@ private:
 namespace internal
 {
   /**
-   * A class that actually issues the copy commands in AlignedVector.
+   * A class that given a range of memory locations calls the placement-new
+   * operator on these memory locations and copy-constructs objects of type
+   * `T` there.
+   *
    * This class is based on the specialized for loop base class
    * ParallelForLoop in parallel.h whose purpose is the following: When
    * calling a parallel for loop on AlignedVector with apply_to_subranges, it
@@ -504,7 +507,8 @@ namespace internal
    * @relatesalso AlignedVector
    */
   template <typename T>
-  class AlignedVectorCopy : private dealii::parallel::ParallelForInteger
+  class AlignedVectorCopyConstruct
+    : private dealii::parallel::ParallelForInteger
   {
     static const std::size_t minimum_parallel_grain_size =
       160000 / sizeof(T) + 1;
@@ -519,9 +523,9 @@ namespace internal
      * The elements from the source array are simply copied via the placement
      * new copy constructor.
      */
-    AlignedVectorCopy(const T *const source_begin,
-                      const T *const source_end,
-                      T *const       destination)
+    AlignedVectorCopyConstruct(const T *const source_begin,
+                               const T *const source_end,
+                               T *const       destination)
       : source_(source_begin)
       , destination_(destination)
     {
@@ -530,7 +534,7 @@ namespace internal
              ExcInternalError());
       const std::size_t size = source_end - source_begin;
       if (size < minimum_parallel_grain_size)
-        AlignedVectorCopy::apply_to_subrange(0, size);
+        AlignedVectorCopyConstruct::apply_to_subrange(0, size);
       else
         apply_parallel(0, size, minimum_parallel_grain_size);
     }
@@ -566,12 +570,14 @@ namespace internal
 
 
   /**
-   * Like AlignedVectorCopy, but use move operations instead of copy operations.
+   * Like AlignedVectorCopyConstruct, but use the move-constructor of `T`
+   * to create new objects.
    *
    * @relatesalso AlignedVector
    */
   template <typename T>
-  class AlignedVectorMove : private dealii::parallel::ParallelForInteger
+  class AlignedVectorMoveConstruct
+    : private dealii::parallel::ParallelForInteger
   {
     static const std::size_t minimum_parallel_grain_size =
       160000 / sizeof(T) + 1;
@@ -586,9 +592,9 @@ namespace internal
      * The data is moved between the two arrays by invoking the destructor on
      * the source range (preparing for a subsequent call to free).
      */
-    AlignedVectorMove(T *const source_begin,
-                      T *const source_end,
-                      T *const destination)
+    AlignedVectorMoveConstruct(T *const source_begin,
+                               T *const source_end,
+                               T *const destination)
       : source_(source_begin)
       , destination_(destination)
     {
@@ -597,7 +603,7 @@ namespace internal
              ExcInternalError());
       const std::size_t size = source_end - source_begin;
       if (size < minimum_parallel_grain_size)
-        AlignedVectorMove::apply_to_subrange(0, size);
+        AlignedVectorMoveConstruct::apply_to_subrange(0, size);
       else
         apply_parallel(0, size, minimum_parallel_grain_size);
     }
@@ -634,9 +640,15 @@ namespace internal
 
 
   /**
-   * Class that issues the set commands for AlignedVector.
+   * A class that given a range of memory locations calls either calls
+   * the placement-new operator on these memory locations (if
+   * `initialize_memory==true`) or just copies the given initializer
+   * into this memory location (if `initialize_memory==false`). The
+   * latter is appropriate for classes that have only trivial constructors,
+   * such as the built-in types `double`, `int`, etc., and structures
+   * composed of such types.
    *
-   * @tparam initialize_memory Sets whether the set command should
+   * @tparam initialize_memory Determines whether the set command should
    * initialize memory (with a call to the copy constructor) or rather use the
    * copy assignment operator. A template is necessary to select the
    * appropriate operation since some classes might define only one of those
@@ -645,7 +657,7 @@ namespace internal
    * @relatesalso AlignedVector
    */
   template <typename T, bool initialize_memory>
-  class AlignedVectorSet : private dealii::parallel::ParallelForInteger
+  class AlignedVectorInitialize : private dealii::parallel::ParallelForInteger
   {
     static const std::size_t minimum_parallel_grain_size =
       160000 / sizeof(T) + 1;
@@ -655,9 +667,9 @@ namespace internal
      * Constructor. Issues a parallel call if there are sufficiently many
      * elements, otherwise work in serial.
      */
-    AlignedVectorSet(const std::size_t size,
-                     const T &         element,
-                     T *const          destination)
+    AlignedVectorInitialize(const std::size_t size,
+                            const T &         element,
+                            T *const          destination)
       : element_(element)
       , destination_(destination)
       , trivial_element(false)
@@ -682,7 +694,7 @@ namespace internal
             trivial_element = true;
         }
       if (size < minimum_parallel_grain_size)
-        AlignedVectorSet::apply_to_subrange(0, size);
+        AlignedVectorInitialize::apply_to_subrange(0, size);
       else
         apply_parallel(0, size, minimum_parallel_grain_size);
     }
@@ -736,7 +748,8 @@ namespace internal
 
 
   /**
-   * Class that issues the set commands for AlignedVector.
+   * Like AlignedVectorInitialize, but use default-constructed objects
+   * as initializers.
    *
    * @tparam initialize_memory Sets whether the set command should
    * initialize memory (with a call to the copy constructor) or rather use the
@@ -859,9 +872,9 @@ inline AlignedVector<T>::AlignedVector(const AlignedVector<T> &vec)
   // copy the data from vec
   reserve(vec.size());
   used_elements_end = allocated_elements_end;
-  internal::AlignedVectorCopy<T>(vec.elements.get(),
-                                 vec.used_elements_end,
-                                 elements.get());
+  internal::AlignedVectorCopyConstruct<T>(vec.elements.get(),
+                                          vec.used_elements_end,
+                                          elements.get());
 }
 
 
@@ -882,9 +895,9 @@ AlignedVector<T>::operator=(const AlignedVector<T> &vec)
 {
   resize(0);
   resize_fast(vec.used_elements_end - vec.elements.get());
-  internal::AlignedVectorCopy<T>(vec.elements.get(),
-                                 vec.used_elements_end,
-                                 elements.get());
+  internal::AlignedVectorCopyConstruct<T>(vec.elements.get(),
+                                          vec.used_elements_end,
+                                          elements.get());
   return *this;
 }
 
@@ -1024,9 +1037,8 @@ AlignedVector<T>::resize(const size_type new_size, const T &init)
       used_elements_end = elements.get() + new_size;
 
       // finally set the desired init values
-      dealii::internal::AlignedVectorSet<T, true>(new_size - old_size,
-                                                  init,
-                                                  elements.get() + old_size);
+      dealii::internal::AlignedVectorInitialize<T, true>(
+        new_size - old_size, init, elements.get() + old_size);
     }
 }
 
@@ -1072,9 +1084,8 @@ AlignedVector<T>::reserve(const size_type new_allocated_size)
 
       // copy whatever elements we need to retain
       if (new_allocated_size > 0)
-        dealii::internal::AlignedVectorMove<T>(elements.get(),
-                                               elements.get() + old_size,
-                                               new_data_ptr);
+        dealii::internal::AlignedVectorMoveConstruct<T>(
+          elements.get(), elements.get() + old_size, new_data_ptr);
 
       // Now reset all of the member variables of the current object
       // based on the allocation above. Assigning to a std::unique_ptr
@@ -1182,7 +1193,9 @@ template <class T>
 inline void
 AlignedVector<T>::fill(const T &value)
 {
-  dealii::internal::AlignedVectorSet<T, false>(size(), value, elements.get());
+  dealii::internal::AlignedVectorInitialize<T, false>(size(),
+                                                      value,
+                                                      elements.get());
 }
 
 
