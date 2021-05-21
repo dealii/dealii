@@ -69,7 +69,7 @@ namespace BlackScholesSolver
   // @sect3{Solution Class}
 
   // This section creates a class for the known solution when testing using the
-  // MMS. Here I am using $v(\tau,S) = -\tau^2 -S^2 + 6$ for my solution. We
+  // MMS. Here we are using $v(\tau,S) = -\tau^2 -S^2 + 6$ for the solution. We
   // need to include the solution equation and the gradient for the H1 seminorm
   // calculation.
   template <int dim>

@@ -71,7 +71,7 @@ So, $\Omega=[0,S_\text{max}]$.
 
 Second, after truncating the domain, we need to ask what boundary values we
 should pose at this now finite boundary. To take care of this, we use "put-call"
-parity @cite stoll1969relationship. A "pull option" is one in which I am
+parity @cite stoll1969relationship. A "pull option" is one in which we are
 allowed, but not required, to *sell* a stock at price $K$ to someone at a future
 time $T$. This says
 @f{align*}{
@@ -88,10 +88,10 @@ $S_\text{max}$.
 
 The second complication of the Block-Scholes equation is that we are given a
 final condition, and not an initial condition. This is because we know what the
-option is worth at time $t=T$: If the stock price at $T$ is $S<K$, then I have
-no incentive to use my option of buying a price $K$ because I can buy that stock
+option is worth at time $t=T$: If the stock price at $T$ is $S<K$, then we have
+no incentive to use our option of buying a price $K$ because we can buy that stock
 for cheaper on the open market. So $V(S,T)=0$ for $S<K$. On the other hand, if
-at time $T$ we have $S>K$, then I can buy my stock at price $K$ via the option
+at time $T$ we have $S>K$, then we can buy the stock at price $K$ via the option
 and immediately sell it again on the market for price $S$, giving me a profit of
 $S-K$. In other words, $V(S,T)=S-K$ for $S>K$. So, we only know
 values for $V$ at the *end time* but not the initial time -- in fact, finding
