@@ -2262,7 +2262,8 @@ namespace Patterns
         const auto  string_array = Convert<T>::to_string_internal_2(t, *p);
         std::string str;
         for (unsigned int i = 0; i < string_array.size(); ++i)
-          str += (i ? " " + p->get_separator() + " " : "") + string_array[i];
+          str +=
+            (i != 0u ? " " + p->get_separator() + " " : "") + string_array[i];
         AssertThrow(p->match(str), ExcNoMatch(str, p->description()));
         return str;
       }

@@ -62,11 +62,11 @@ FE_PolyFace<PolynomialType, dim, spacedim>::requires_update_flags(
   const UpdateFlags flags) const
 {
   UpdateFlags out = flags & update_values;
-  if (flags & update_gradients)
+  if ((flags & update_gradients) != 0u)
     out |= update_gradients | update_covariant_transformation;
-  if (flags & update_hessians)
+  if ((flags & update_hessians) != 0u)
     out |= update_hessians | update_covariant_transformation;
-  if (flags & update_normal_vectors)
+  if ((flags & update_normal_vectors) != 0u)
     out |= update_normal_vectors | update_JxW_values;
 
   return out;

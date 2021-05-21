@@ -271,12 +271,12 @@ namespace internal
         case 1:
           for (unsigned int c = 0; c < n_components; c++)
             {
-              if (evaluation_flag & EvaluationFlags::values)
+              if ((evaluation_flag & EvaluationFlags::values) != 0u)
                 eval.template values<0, true, false>(values_dofs, values_quad);
-              if (evaluation_flag & EvaluationFlags::gradients)
+              if ((evaluation_flag & EvaluationFlags::gradients) != 0u)
                 eval.template gradients<0, true, false>(values_dofs,
                                                         gradients_quad);
-              if (evaluation_flag & EvaluationFlags::hessians)
+              if ((evaluation_flag & EvaluationFlags::hessians) != 0u)
                 eval.template hessians<0, true, false>(values_dofs,
                                                        hessians_quad);
 
@@ -292,15 +292,15 @@ namespace internal
           for (unsigned int c = 0; c < n_components; c++)
             {
               // grad x
-              if (evaluation_flag & EvaluationFlags::gradients)
+              if ((evaluation_flag & EvaluationFlags::gradients) != 0u)
                 {
                   eval.template gradients<0, true, false>(values_dofs, temp1);
                   eval.template values<1, true, false>(temp1, gradients_quad);
                 }
-              if (evaluation_flag & EvaluationFlags::hessians)
+              if ((evaluation_flag & EvaluationFlags::hessians) != 0u)
                 {
                   // grad xy
-                  if (!(evaluation_flag & EvaluationFlags::gradients))
+                  if ((evaluation_flag & EvaluationFlags::gradients) == 0u)
                     eval.template gradients<0, true, false>(values_dofs, temp1);
                   eval.template gradients<1, true, false>(temp1,
                                                           hessians_quad +
@@ -313,19 +313,19 @@ namespace internal
 
               // grad y
               eval.template values<0, true, false>(values_dofs, temp1);
-              if (evaluation_flag & EvaluationFlags::gradients)
+              if ((evaluation_flag & EvaluationFlags::gradients) != 0u)
                 eval.template gradients<1, true, false>(temp1,
                                                         gradients_quad +
                                                           n_q_points);
 
               // grad yy
-              if (evaluation_flag & EvaluationFlags::hessians)
+              if ((evaluation_flag & EvaluationFlags::hessians) != 0u)
                 eval.template hessians<1, true, false>(temp1,
                                                        hessians_quad +
                                                          n_q_points);
 
               // val: can use values applied in x
-              if (evaluation_flag & EvaluationFlags::values)
+              if ((evaluation_flag & EvaluationFlags::values) != 0u)
                 eval.template values<1, true, false>(temp1, values_quad);
 
               // advance to the next component in 1D array
@@ -339,7 +339,7 @@ namespace internal
         case 3:
           for (unsigned int c = 0; c < n_components; c++)
             {
-              if (evaluation_flag & EvaluationFlags::gradients)
+              if ((evaluation_flag & EvaluationFlags::gradients) != 0u)
                 {
                   // grad x
                   eval.template gradients<0, true, false>(values_dofs, temp1);
@@ -347,10 +347,10 @@ namespace internal
                   eval.template values<2, true, false>(temp2, gradients_quad);
                 }
 
-              if (evaluation_flag & EvaluationFlags::hessians)
+              if ((evaluation_flag & EvaluationFlags::hessians) != 0u)
                 {
                   // grad xz
-                  if (!(evaluation_flag & EvaluationFlags::gradients))
+                  if ((evaluation_flag & EvaluationFlags::gradients) == 0u)
                     {
                       eval.template gradients<0, true, false>(values_dofs,
                                                               temp1);
@@ -374,7 +374,7 @@ namespace internal
 
               // grad y
               eval.template values<0, true, false>(values_dofs, temp1);
-              if (evaluation_flag & EvaluationFlags::gradients)
+              if ((evaluation_flag & EvaluationFlags::gradients) != 0u)
                 {
                   eval.template gradients<1, true, false>(temp1, temp2);
                   eval.template values<2, true, false>(temp2,
@@ -382,10 +382,10 @@ namespace internal
                                                          n_q_points);
                 }
 
-              if (evaluation_flag & EvaluationFlags::hessians)
+              if ((evaluation_flag & EvaluationFlags::hessians) != 0u)
                 {
                   // grad yz
-                  if (!(evaluation_flag & EvaluationFlags::gradients))
+                  if ((evaluation_flag & EvaluationFlags::gradients) == 0u)
                     eval.template gradients<1, true, false>(temp1, temp2);
                   eval.template gradients<2, true, false>(temp2,
                                                           hessians_quad +
@@ -401,21 +401,21 @@ namespace internal
               // grad z: can use the values applied in x direction stored in
               // temp1
               eval.template values<1, true, false>(temp1, temp2);
-              if (evaluation_flag & EvaluationFlags::gradients)
+              if ((evaluation_flag & EvaluationFlags::gradients) != 0u)
                 eval.template gradients<2, true, false>(temp2,
                                                         gradients_quad +
                                                           2 * n_q_points);
 
               // grad zz: can use the values applied in x and y direction stored
               // in temp2
-              if (evaluation_flag & EvaluationFlags::hessians)
+              if ((evaluation_flag & EvaluationFlags::hessians) != 0u)
                 eval.template hessians<2, true, false>(temp2,
                                                        hessians_quad +
                                                          2 * n_q_points);
 
               // val: can use the values applied in x & y direction stored in
               // temp2
-              if (evaluation_flag & EvaluationFlags::values)
+              if ((evaluation_flag & EvaluationFlags::values) != 0u)
                 eval.template values<2, true, false>(temp2, values_quad);
 
               // advance to the next component in 1D array
@@ -433,7 +433,7 @@ namespace internal
     // case additional dof for FE_Q_DG0: add values; gradients and second
     // derivatives evaluate to zero
     if (type == MatrixFreeFunctions::tensor_symmetric_plus_dg0 &&
-        (evaluation_flag & EvaluationFlags::values))
+        ((evaluation_flag & EvaluationFlags::values) != 0u))
       {
         values_quad -= n_components * n_q_points;
         values_dofs -= n_components * dofs_per_comp;
@@ -519,7 +519,7 @@ namespace internal
         case 1:
           for (unsigned int c = 0; c < n_components; c++)
             {
-              if (integration_flag & EvaluationFlags::values)
+              if ((integration_flag & EvaluationFlags::values) != 0u)
                 {
                   if (add_into_values_array == false)
                     eval.template values<0, false, false>(values_quad,
@@ -528,9 +528,9 @@ namespace internal
                     eval.template values<0, false, true>(values_quad,
                                                          values_dofs);
                 }
-              if (integration_flag & EvaluationFlags::gradients)
+              if ((integration_flag & EvaluationFlags::gradients) != 0u)
                 {
-                  if (integration_flag & EvaluationFlags::values ||
+                  if (((integration_flag & EvaluationFlags::values) != 0u) ||
                       add_into_values_array == true)
                     eval.template gradients<0, false, true>(gradients_quad,
                                                             values_dofs);
@@ -549,8 +549,8 @@ namespace internal
         case 2:
           for (unsigned int c = 0; c < n_components; c++)
             {
-              if ((integration_flag & EvaluationFlags::values) &&
-                  !(integration_flag & EvaluationFlags::gradients))
+              if (((integration_flag & EvaluationFlags::values) != 0u) &&
+                  ((integration_flag & EvaluationFlags::gradients) == 0u))
                 {
                   eval.template values<1, false, false>(values_quad, temp1);
                   if (add_into_values_array == false)
@@ -558,12 +558,12 @@ namespace internal
                   else
                     eval.template values<0, false, true>(temp1, values_dofs);
                 }
-              if (integration_flag & EvaluationFlags::gradients)
+              if ((integration_flag & EvaluationFlags::gradients) != 0u)
                 {
                   eval.template gradients<1, false, false>(gradients_quad +
                                                              n_q_points,
                                                            temp1);
-                  if (integration_flag & EvaluationFlags::values)
+                  if ((integration_flag & EvaluationFlags::values) != 0u)
                     eval.template values<1, false, true>(values_quad, temp1);
                   if (add_into_values_array == false)
                     eval.template values<0, false, false>(temp1, values_dofs);
@@ -583,8 +583,8 @@ namespace internal
         case 3:
           for (unsigned int c = 0; c < n_components; c++)
             {
-              if ((integration_flag & EvaluationFlags::values) &&
-                  !(integration_flag & EvaluationFlags::gradients))
+              if (((integration_flag & EvaluationFlags::values) != 0u) &&
+                  ((integration_flag & EvaluationFlags::gradients) == 0u))
                 {
                   eval.template values<2, false, false>(values_quad, temp1);
                   eval.template values<1, false, false>(temp1, temp2);
@@ -593,12 +593,12 @@ namespace internal
                   else
                     eval.template values<0, false, true>(temp2, values_dofs);
                 }
-              if (integration_flag & EvaluationFlags::gradients)
+              if ((integration_flag & EvaluationFlags::gradients) != 0u)
                 {
                   eval.template gradients<2, false, false>(gradients_quad +
                                                              2 * n_q_points,
                                                            temp1);
-                  if (integration_flag & EvaluationFlags::values)
+                  if ((integration_flag & EvaluationFlags::values) != 0u)
                     eval.template values<2, false, true>(values_quad, temp1);
                   eval.template values<1, false, false>(temp1, temp2);
                   eval.template values<2, false, false>(gradients_quad +
@@ -631,7 +631,7 @@ namespace internal
         values_dofs -= n_components * dofs_per_comp -
                        shape_info.dofs_per_component_on_cell + 1;
         values_quad -= n_components * n_q_points;
-        if (integration_flag & EvaluationFlags::values)
+        if ((integration_flag & EvaluationFlags::values) != 0u)
           for (unsigned int c = 0; c < n_components; ++c)
             {
               values_dofs[0] = values_quad[0];
@@ -699,7 +699,7 @@ namespace internal
     using Eval =
       EvaluatorTensorProduct<evaluate_general, 1, 0, 0, Number, Number>;
 
-    if (evaluation_flag & EvaluationFlags::values)
+    if ((evaluation_flag & EvaluationFlags::values) != 0u)
       {
         const auto shape_values = shape_info.data.front().shape_values.data();
         auto       values_quad_ptr        = values_quad;
@@ -716,7 +716,7 @@ namespace internal
           }
       }
 
-    if (evaluation_flag & EvaluationFlags::gradients)
+    if ((evaluation_flag & EvaluationFlags::gradients) != 0u)
       {
         const auto shape_gradients =
           shape_info.data.front().shape_gradients.data();
@@ -742,7 +742,7 @@ namespace internal
           }
       }
 
-    if (evaluation_flag & EvaluationFlags::hessians)
+    if ((evaluation_flag & EvaluationFlags::hessians) != 0u)
       {
         Assert(false, ExcNotImplemented());
         (void)hessians_quad;
@@ -775,7 +775,7 @@ namespace internal
     using Eval =
       EvaluatorTensorProduct<evaluate_general, 1, 0, 0, Number, Number>;
 
-    if (integration_flag & EvaluationFlags::values)
+    if ((integration_flag & EvaluationFlags::values) != 0u)
       {
         const auto shape_values = shape_info.data.front().shape_values.data();
         auto       values_quad_ptr        = values_quad;
@@ -796,7 +796,7 @@ namespace internal
           }
       }
 
-    if (integration_flag & EvaluationFlags::gradients)
+    if ((integration_flag & EvaluationFlags::gradients) != 0u)
       {
         const auto shape_gradients =
           shape_info.data.front().shape_gradients.data();
@@ -814,7 +814,7 @@ namespace internal
                           n_q_points);
 
                 if ((add_into_values_array == false &&
-                     (integration_flag & EvaluationFlags::values) == false) &&
+                     (integration_flag & EvaluationFlags::values) == 0) &&
                     d == 0)
                   eval.template gradients<0, false, false>(
                     gradients_quad_ptr, values_dofs_actual_ptr);
@@ -1297,11 +1297,11 @@ namespace internal
 
     for (unsigned int c = 0; c < n_components; c++)
       {
-        if (evaluation_flag & EvaluationFlags::values)
+        if ((evaluation_flag & EvaluationFlags::values) != 0u)
           for (unsigned int i = 0; i < n_q_points; ++i)
             values_quad[i] = values_dofs[i];
-        if (evaluation_flag &
-            (EvaluationFlags::gradients | EvaluationFlags::hessians))
+        if ((evaluation_flag &
+             (EvaluationFlags::gradients | EvaluationFlags::hessians)) != 0u)
           {
             eval.template gradients<0, true, false>(values_dofs,
                                                     gradients_quad);
@@ -1314,7 +1314,7 @@ namespace internal
                                                       gradients_quad +
                                                         2 * n_q_points);
           }
-        if (evaluation_flag & EvaluationFlags::hessians)
+        if ((evaluation_flag & EvaluationFlags::hessians) != 0u)
           {
             eval.template hessians<0, true, false>(values_dofs, hessians_quad);
             if (dim > 1)
@@ -1375,7 +1375,7 @@ namespace internal
 
     for (unsigned int c = 0; c < n_components; c++)
       {
-        if (integration_flag & EvaluationFlags::values)
+        if ((integration_flag & EvaluationFlags::values) != 0u)
           {
             if (add_into_values_array == false)
               for (unsigned int i = 0; i < n_q_points; ++i)
@@ -1384,9 +1384,9 @@ namespace internal
               for (unsigned int i = 0; i < n_q_points; ++i)
                 values_dofs[i] += values_quad[i];
           }
-        if (integration_flag & EvaluationFlags::gradients)
+        if ((integration_flag & EvaluationFlags::gradients) != 0u)
           {
-            if (integration_flag & EvaluationFlags::values ||
+            if (((integration_flag & EvaluationFlags::values) != 0u) ||
                 add_into_values_array == true)
               eval.template gradients<0, false, true>(gradients_quad,
                                                       values_dofs);
@@ -1483,8 +1483,8 @@ namespace internal
                               values_quad);
 
         // apply derivatives in the collocation space
-        if (evaluation_flag &
-            (EvaluationFlags::gradients | EvaluationFlags::hessians))
+        if ((evaluation_flag &
+             (EvaluationFlags::gradients | EvaluationFlags::hessians)) != 0u)
           FEEvaluationImplCollocation<dim, n_q_points_1d - 1, Number>::evaluate(
             1,
             evaluation_flag &
@@ -1533,7 +1533,7 @@ namespace internal
     for (unsigned int c = 0; c < n_components; c++)
       {
         // apply derivatives in collocation space
-        if (integration_flag & EvaluationFlags::gradients)
+        if ((integration_flag & EvaluationFlags::gradients) != 0u)
           FEEvaluationImplCollocation<dim, n_q_points_1d - 1, Number>::
             integrate(1,
                       integration_flag & EvaluationFlags::gradients,
