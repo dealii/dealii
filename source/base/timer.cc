@@ -1044,55 +1044,49 @@ TimerOutput::reset()
 
 
 
-namespace
-{
-  /**
-   * Abort, should there be an exception being processed (see the error
-   * message).
-   */
-  void
-  check_exception(const std::string &scope_name)
-  {
-#ifdef DEAL_II_WITH_MPI
-#  if __cpp_lib_uncaught_exceptions >= 201411
-    // std::uncaught_exception() is deprecated in c++17
-    if (std::uncaught_exceptions() != 0)
-#  else
-    if (std::uncaught_exception() == true)
-#  endif
-      {
-        std::cerr
-          << "---------------------------------------------------------\n"
-          << "The timer scope named <" << scope_name
-          << "> is destroyed, but this \n"
-          << "requires MPI synchronization. Since an exception is\n"
-          << "currently uncaught, this synchronization would likely\n"
-          << "deadlock because only the current process is trying to\n"
-          << "destroy the object. As a consequence, the program will be\n"
-          << "aborted.\n"
-          << "---------------------------------------------------------"
-          << std::endl;
-
-        MPI_Abort(MPI_COMM_WORLD, 1);
-      }
-#else
-    (void)scope_name;
-#endif
-  }
-} // namespace
-
-
-
 TimerOutput::Scope::~Scope()
 {
-  check_exception(section_name);
-
+  // avoid communicating with other processes if there is an uncaught
+  // exception
+#ifdef DEAL_II_WITH_MPI
+#  if __cpp_lib_uncaught_exceptions >= 201411
+  // std::uncaught_exception() is deprecated in c++17
+  if (std::uncaught_exceptions() > 0 && timer.mpi_communicator != MPI_COMM_SELF)
+#  else
+  if (std::uncaught_exception() == true &&
+      timer.mpi_communicator != MPI_COMM_SELF)
+#  endif
+    {
+      const unsigned int myid =
+        Utilities::MPI::this_mpi_process(timer.mpi_communicator);
+      if (myid == 0)
+        std::cerr
+          << "---------------------------------------------------------\n"
+          << "TimerOutput objects finalize timed values printed to the\n"
+          << "screen by communicating over MPI in their destructors.\n"
+          << "Since an exception is currently uncaught, this\n"
+          << "synchronization (and subsequent output) will be skipped\n"
+          << "to avoid a possible deadlock.\n"
+          << "---------------------------------------------------------"
+          << std::endl;
+    }
+  else
+    {
+      try
+        {
+          stop();
+        }
+      catch (...)
+        {}
+    }
+#else
   try
     {
       stop();
     }
   catch (...)
     {}
+#endif
 }
 
 

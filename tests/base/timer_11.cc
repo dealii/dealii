@@ -15,14 +15,15 @@
 
 
 // test that when throwing an exception inside a Timer::Scope the
-// desctruction of the timer calls MPI_Abort
+// destruction of the timer does not trigger MPI communication and
+// potentially cause a deadlock
 
 #include <deal.II/base/timer.h>
 
 #include <algorithm>
+#include <chrono>
 #include <sstream>
 #include <thread>
-#include <chrono>
 
 #include "../tests.h"
 
@@ -31,20 +32,21 @@ test()
 {
   std::stringstream ss;
 
-  TimerOutput t(MPI_COMM_WORLD, ss, TimerOutput::never, TimerOutput::wall_times);
-
-  t.enter_subsection("Base section");
+  TimerOutput t(MPI_COMM_WORLD,
+                ss,
+                TimerOutput::never,
+                TimerOutput::wall_times);
 
   {
-  TimerOutput::Scope(t, "Test section");
+    TimerOutput::Scope(t, "Test section");
 
-  if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
-  {
-    std::this_thread::sleep_for(std::chrono::seconds(2));
-    AssertThrow(false,ExcInternalError());
-  }
+    if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
+      {
+        std::this_thread::sleep_for(std::chrono::seconds(2));
+        AssertThrow(false, ExcInternalError());
+      }
 
-  MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Barrier(MPI_COMM_WORLD);
   }
 }
 
@@ -54,6 +56,16 @@ main(int argc, char **argv)
   Utilities::MPI::MPI_InitFinalize mpi(argc, argv);
 
   mpi_initlog();
-  
-  test();
+
+  // We need to call test() within a try-catch block, because
+  // otherwise the stack may not be unwound, not triggering the
+  // error message from TimerOutput::Scope::~Scope
+  try
+    {
+      test();
+    }
+  catch (const ExcInternalError &e)
+    {
+      throw e;
+    }
 }
