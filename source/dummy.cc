@@ -32,4 +32,6 @@ use_global_symbol_42()
  * generate a header file allheaders.h that includes all deal.II
  * headers. Include the file here so that all headers are being checked.
  */
-#include <deal.II/allheaders.h>
+#ifdef CLANG_TIDY
+#  include <deal.II/allheaders.h>
+#endif
