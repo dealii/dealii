@@ -801,7 +801,11 @@ namespace DerivativeApproximation
                                                           solution,
                                                           component);
       // ...and the place where it lives
-      const Point<dim> this_center = fe_midpoint_value.quadrature_point(0);
+      // This needs to be a copy. If it was a reference, it would be changed
+      // after the next `reinit` call of the FEValues object. clang-tidy
+      // complains about this not being a reference, so we suppress the warning.
+      const Point<dim> this_center =
+        fe_midpoint_value.quadrature_point(0); // NOLINT
 
       // loop over all neighbors and
       // accumulate the difference
