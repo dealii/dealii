@@ -334,12 +334,12 @@ namespace BlackScholesSolver
     Vector<double> solution;
     Vector<double> system_rhs;
 
-    double       time;
-    double       time_step;
-    unsigned int timestep_number;
+    double time;
+    double time_step;
 
     const double       theta;
     const unsigned int n_cycles;
+    const unsigned int n_time_steps;
 
     DataOutStack<dim>        data_out_stack;
     std::vector<std::string> solution_names;
@@ -366,9 +366,9 @@ namespace BlackScholesSolver
     , fe(1)
     , dof_handler(triangulation)
     , time(0.0)
-    , timestep_number(0)
     , theta(0.5)
-    , n_cycles(3)
+    , n_cycles(4)
+    , n_time_steps(5000)
   {
     Assert(dim == 1, ExcNotImplemented());
   }
@@ -388,7 +388,7 @@ namespace BlackScholesSolver
   {
     dof_handler.distribute_dofs(fe);
 
-    time_step = maturity_time / 5000.;
+    time_step = maturity_time / n_time_steps;
 
     constraints.clear();
     DoFTools::make_hanging_node_constraints(dof_handler, constraints);
@@ -712,8 +712,7 @@ namespace BlackScholesSolver
         if (cycle != 0)
           {
             refine_grid();
-            time            = 0.0;
-            timestep_number = 0;
+            time = 0.0;
           }
 
         setup_system();
@@ -745,10 +744,10 @@ namespace BlackScholesSolver
         // vector:
         vmult_result.reinit(dof_handler.n_dofs());
         forcing_terms.reinit(dof_handler.n_dofs());
-        while (time < maturity_time)
+        for (unsigned int timestep_number = 0; timestep_number < n_time_steps;
+             ++timestep_number)
           {
             time += time_step;
-            ++timestep_number;
 
             if (timestep_number % 1000 == 0)
               std::cout << "Time step " << timestep_number << " at t=" << time
