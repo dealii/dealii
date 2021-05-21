@@ -72,11 +72,11 @@ namespace SUNDIALS
    *  - reinit_vector;
    *  - residual;
    *  - setup_jacobian;
-   *  - solve_jacobian_system/solve_jacobian_system_up_to_tolerance;
+   *  - solve_jacobian_system/solve_with_jacobian;
    *
    * The function `solve_jacobian_system` should be implemented for SUNDIALS
    * < 4.0.0. For later versions, you should use
-   * `solve_jacobian_system_up_to_tolerance` to leverage better non-linear
+   * `solve_with_jacobian` to leverage better non-linear
    * algorithms.
    *
    * Optionally, also the following functions could be provided. By default
@@ -608,21 +608,6 @@ namespace SUNDIALS
     ~IDA();
 
     /**
-     * Save the number of iterations of the last Jacobian solve.
-     */
-    void
-    set_n_iterations(const int n_iter);
-
-    /**
-     * Return the number of iterations of the last Jacobian solve. This
-     * piece of information corresponds to the what the
-     * solve_jacobian_system_up_to_tolerance() function returns through
-     * its third argument.
-     */
-    int
-    get_n_iterations() const;
-
-    /**
      * Integrate differential-algebraic equations. This function returns the
      * final number of computed steps.
      */
@@ -679,7 +664,7 @@ namespace SUNDIALS
      * update is required. The user should compute the Jacobian (or update all
      * the variables that allow the application of the Jacobian). This function
      * is called by IDA once, before any call to solve_jacobian_system() (for
-     * SUNDIALS < 4.0.0) or solve_jacobian_system_up_to_tolerance() (for
+     * SUNDIALS < 4.0.0) or solve_with_jacobian() (for
      * SUNDIALS >= 4.0.0).
      *
      * The Jacobian $J$ should be a (possibly inexact) computation of
@@ -692,13 +677,13 @@ namespace SUNDIALS
      * is the right place where an assembly routine should be called to
      * assemble both a matrix and a preconditioner for the Jacobian system.
      * Subsequent calls (possibly more than one) to solve_jacobian_system() or
-     * solve_jacobian_system_up_to_tolerance() can assume that this function has
+     * solve_with_jacobian() can assume that this function has
      * been called at least once.
      *
      * Notice that no assumption is made by this interface on what the user
      * should do in this function. IDA only assumes that after a call to
      * setup_jacobian() it is possible to call solve_jacobian_system() or
-     * solve_jacobian_system_up_to_tolerance() to obtain a solution $x$ to the
+     * solve_with_jacobian() to obtain a solution $x$ to the
      * system $J x = b$.
      *
      * This function should return:
@@ -746,9 +731,7 @@ namespace SUNDIALS
      * specifying the tolerance for the resolution. A part from the tolerance
      * only `rhs` is provided and `dst` needs to be returned.
      */
-#  if DEAL_II_SUNDIALS_VERSION_GTE(4, 0, 0)
     DEAL_II_DEPRECATED_EARLY
-#  endif
     std::function<int(const VectorType &rhs, VectorType &dst)>
       solve_jacobian_system;
 
@@ -761,7 +744,7 @@ namespace SUNDIALS
      * setup_jacobian() again. If, on the contrary, internal IDA convergence
      * tests fail, then IDA calls again setup_jacobian() with updated vectors
      * and coefficients so that successive calls to
-     * solve_jacobian_system_up_to_tolerance() lead to better convergence in the
+     * solve_with_jacobian() lead to better convergence in the
      * Newton process.
      *
      * The Jacobian $J$ should be (an approximation of) the system Jacobian
@@ -774,11 +757,6 @@ namespace SUNDIALS
      *
      * @param[in] rhs The system right hand side to solve for.
      * @param[out] dst The solution of $J^{-1} * src$.
-     * @param[out] n_iter the number of iterations required to solve the
-     *   Jacobian system. This is an output argument through which the
-     *   function can communicate how many iterations it took to solve the
-     *   linear system, and that can then be queried from the outside using the
-     *   get_n_iterations() function.
      * @param[in] tolerance The tolerance with which to solve the linear system
      *   of equations.
      *
@@ -798,11 +776,9 @@ namespace SUNDIALS
      * - <0: Unrecoverable error the computation will be aborted and an
      * assertion will be thrown.
      */
-    std::function<int(const VectorType &rhs,
-                      VectorType &      dst,
-                      int &             n_iter,
-                      const double      tolerance)>
-      solve_jacobian_system_up_to_tolerance;
+    std::function<
+      int(const VectorType &rhs, VectorType &dst, const double tolerance)>
+      solve_with_jacobian;
 
     /**
      * Process solution. This function is called by IDA at fixed time steps,
@@ -904,13 +880,6 @@ namespace SUNDIALS
      * IDA memory object.
      */
     void *ida_mem;
-
-    /**
-     * Number of iteration that were required to solve the last
-     * Jacobian system. This variable is set by the wrapper that calls
-     * `solve_jacobian_system_up_to_tolerance`.
-     */
-    int n_iterations;
 
     /**
      * MPI communicator. SUNDIALS solver runs happily in
