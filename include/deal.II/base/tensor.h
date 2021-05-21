@@ -157,6 +157,7 @@ public:
   constexpr DEAL_II_CUDA_HOST_DEV
   Tensor(const Tensor<0, dim, OtherNumber> &initializer);
 
+#if __GNUC__ >= 11 || defined __INTEL_COMPILER
   /**
    * Constructor, where the data is copied from a C-style array.
    *
@@ -189,6 +190,7 @@ public:
    */
   constexpr DEAL_II_CUDA_HOST_DEV Tensor<0, dim, Number> &
                                   operator=(Tensor<0, dim, Number> &&other) noexcept;
+#endif
 
   /**
    * Return a pointer to the first element of the underlying storage.
@@ -558,6 +560,7 @@ public:
   constexpr
   operator Tensor<1, dim, Tensor<rank_ - 1, dim, OtherNumber>>() const;
 
+#if __GNUC__ >= 11 || defined __INTEL_COMPILER
   /**
    * Copy constructor
    */
@@ -579,6 +582,7 @@ public:
    */
   constexpr Tensor<rank_, dim, Number> &
   operator=(Tensor<rank_, dim, Number> &&) noexcept;
+#endif
 
   /**
    * Read-Write access operator.
@@ -919,6 +923,7 @@ constexpr DEAL_II_ALWAYS_INLINE DEAL_II_CUDA_HOST_DEV
 
 
 
+#  if __GNUC__ >= 11 || defined __INTEL_COMPILER
 template <int dim, typename Number>
 constexpr DEAL_II_ALWAYS_INLINE DEAL_II_CUDA_HOST_DEV
                                 Tensor<0, dim, Number>::Tensor(const Tensor<0, dim, Number> &other)
@@ -952,6 +957,7 @@ constexpr DEAL_II_ALWAYS_INLINE DEAL_II_CUDA_HOST_DEV Tensor<0, dim, Number> &
   value = std::move(other.value);
   return *this;
 }
+#  endif
 
 
 
@@ -1276,6 +1282,7 @@ constexpr DEAL_II_ALWAYS_INLINE Tensor<rank_, dim, Number>::
 }
 
 
+#  if __GNUC__ >= 11 || defined __INTEL_COMPILER
 template <int rank_, int dim, typename Number>
 constexpr DEAL_II_ALWAYS_INLINE
 Tensor<rank_, dim, Number>::Tensor(const Tensor<rank_, dim, Number> &other)
@@ -1313,6 +1320,7 @@ constexpr DEAL_II_ALWAYS_INLINE Tensor<rank_, dim, Number> &
     values[i] = other.values[i];
   return *this;
 }
+#  endif
 
 
 namespace internal
