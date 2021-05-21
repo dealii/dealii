@@ -64,7 +64,7 @@ cmake --build . --target expand_all_instantiations || (echo "make expand_all_ins
 #
 # pipe away stderr (just contains nonsensical "x warnings generated")
 # pipe output to output.txt
-run-clang-tidy.py -p . -quiet -header-filter "$SRC/include/*" -extra-arg='-DCLANG_TIDY' 2>error.txt >output.txt
+run-clang-tidy.py -fix-errors -p . -quiet -header-filter "$SRC/include/*" -extra-arg='-DCLANG_TIDY' 2>error.txt >output.txt
 
 # grep interesting errors and make sure we remove duplicates:
 grep -E '(warning|error): ' output.txt | sort | uniq >clang-tidy.log
