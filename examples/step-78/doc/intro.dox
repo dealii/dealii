@@ -131,11 +131,10 @@ refinement and time step choice. There is also the issue that the diffusion term
 
 <h3>Scheme for the numerical solution</h3>
 
-We will solve this problem using the fractional step method (of which the
-Crank-Nicolson method is a special case with $\theta=\frac 12$; the explicit
-Euler method corresponds to $\theta=0$ and the implicit Euler method to
-$\theta=1$). So, we first discretize in time, where we would like $V^n(S)$ to
-approximate $V(S,\tau_n)$:
+We will solve this problem using an IMEX method. In particular, we first discretize
+in time with the theta method and will later pick different values of theta for
+the advective and diffusive terms.
+Let $V^n(S)$ approximate $V(S,\tau_n)$:
 @f{align*}{
     0=&-\frac{V^n(S)-V^{n-1}(S)}{k_n} \\
     &+\frac{\sigma^2S^2}{2}\left[(1-\theta)\frac{d^2V^{n-1}(S)}{dS^2} + \
