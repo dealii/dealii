@@ -1240,7 +1240,7 @@ namespace internal
      *
      * Furthermore, the type of the quad is determined.
      */
-    void
+    inline void
     build_intersection(
       const std::vector<std::shared_ptr<CellTypeBase>> &cell_types,
       const std::vector<dealii::ReferenceCell> &        cell_types_index,

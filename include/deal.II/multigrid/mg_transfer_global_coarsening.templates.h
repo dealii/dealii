@@ -2123,45 +2123,6 @@ namespace internal
 
 namespace MGTransferGlobalCoarseningTools
 {
-  unsigned int
-  create_next_polynomial_coarsening_degree(
-    const unsigned int                      previous_fe_degree,
-    const PolynomialCoarseningSequenceType &p_sequence)
-  {
-    switch (p_sequence)
-      {
-        case PolynomialCoarseningSequenceType::bisect:
-          return std::max(previous_fe_degree / 2, 1u);
-        case PolynomialCoarseningSequenceType::decrease_by_one:
-          return std::max(previous_fe_degree - 1, 1u);
-        case PolynomialCoarseningSequenceType::go_to_one:
-          return 1u;
-        default:
-          Assert(false, StandardExceptions::ExcNotImplemented());
-          return 1u;
-      }
-  }
-
-
-
-  std::vector<unsigned int>
-  create_polynomial_coarsening_sequence(
-    const unsigned int                      max_degree,
-    const PolynomialCoarseningSequenceType &p_sequence)
-  {
-    std::vector<unsigned int> degrees{max_degree};
-
-    while (degrees.back() > 1)
-      degrees.push_back(
-        create_next_polynomial_coarsening_degree(degrees.back(), p_sequence));
-
-    std::reverse(degrees.begin(), degrees.end());
-
-    return degrees;
-  }
-
-
-
   template <int dim, int spacedim>
   std::vector<std::shared_ptr<const Triangulation<dim, spacedim>>>
   create_geometric_coarsening_sequence(

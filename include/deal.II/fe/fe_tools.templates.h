@@ -1030,115 +1030,6 @@ namespace FETools
     return nullptr;
   }
 
-  // Specializations for FE_Q.
-  template <>
-  std::unique_ptr<FiniteElement<1, 1>>
-  FEFactory<FE_Q<1, 1>>::get(const Quadrature<1> &quad) const
-  {
-    return std::make_unique<FE_Q<1>>(quad);
-  }
-
-  template <>
-  std::unique_ptr<FiniteElement<2, 2>>
-  FEFactory<FE_Q<2, 2>>::get(const Quadrature<1> &quad) const
-  {
-    return std::make_unique<FE_Q<2>>(quad);
-  }
-
-  template <>
-  std::unique_ptr<FiniteElement<3, 3>>
-  FEFactory<FE_Q<3, 3>>::get(const Quadrature<1> &quad) const
-  {
-    return std::make_unique<FE_Q<3>>(quad);
-  }
-
-  // Specializations for FE_Q_DG0.
-  template <>
-  std::unique_ptr<FiniteElement<1, 1>>
-  FEFactory<FE_Q_DG0<1, 1>>::get(const Quadrature<1> &quad) const
-  {
-    return std::make_unique<FE_Q_DG0<1>>(quad);
-  }
-
-  template <>
-  std::unique_ptr<FiniteElement<2, 2>>
-  FEFactory<FE_Q_DG0<2, 2>>::get(const Quadrature<1> &quad) const
-  {
-    return std::make_unique<FE_Q_DG0<2>>(quad);
-  }
-
-  template <>
-  std::unique_ptr<FiniteElement<3, 3>>
-  FEFactory<FE_Q_DG0<3, 3>>::get(const Quadrature<1> &quad) const
-  {
-    return std::make_unique<FE_Q_DG0<3>>(quad);
-  }
-
-  // Specializations for FE_Q_Bubbles.
-  template <>
-  std::unique_ptr<FiniteElement<1, 1>>
-  FEFactory<FE_Q_Bubbles<1, 1>>::get(const Quadrature<1> &quad) const
-  {
-    return std::make_unique<FE_Q_Bubbles<1>>(quad);
-  }
-
-  template <>
-  std::unique_ptr<FiniteElement<2, 2>>
-  FEFactory<FE_Q_Bubbles<2, 2>>::get(const Quadrature<1> &quad) const
-  {
-    return std::make_unique<FE_Q_Bubbles<2>>(quad);
-  }
-
-  template <>
-  std::unique_ptr<FiniteElement<3, 3>>
-  FEFactory<FE_Q_Bubbles<3, 3>>::get(const Quadrature<1> &quad) const
-  {
-    return std::make_unique<FE_Q_Bubbles<3>>(quad);
-  }
-
-  // Specializations for FE_DGQArbitraryNodes.
-  template <>
-  std::unique_ptr<FiniteElement<1, 1>>
-  FEFactory<FE_DGQ<1>>::get(const Quadrature<1> &quad) const
-  {
-    return std::make_unique<FE_DGQArbitraryNodes<1>>(quad);
-  }
-
-  template <>
-  std::unique_ptr<FiniteElement<1, 2>>
-  FEFactory<FE_DGQ<1, 2>>::get(const Quadrature<1> &quad) const
-  {
-    return std::make_unique<FE_DGQArbitraryNodes<1, 2>>(quad);
-  }
-
-  template <>
-  std::unique_ptr<FiniteElement<1, 3>>
-  FEFactory<FE_DGQ<1, 3>>::get(const Quadrature<1> &quad) const
-  {
-    return std::make_unique<FE_DGQArbitraryNodes<1, 3>>(quad);
-  }
-
-  template <>
-  std::unique_ptr<FiniteElement<2, 2>>
-  FEFactory<FE_DGQ<2>>::get(const Quadrature<1> &quad) const
-  {
-    return std::make_unique<FE_DGQArbitraryNodes<2>>(quad);
-  }
-
-  template <>
-  std::unique_ptr<FiniteElement<2, 3>>
-  FEFactory<FE_DGQ<2, 3>>::get(const Quadrature<1> &quad) const
-  {
-    return std::make_unique<FE_DGQArbitraryNodes<2, 3>>(quad);
-  }
-
-  template <>
-  std::unique_ptr<FiniteElement<3, 3>>
-  FEFactory<FE_DGQ<3>>::get(const Quadrature<1> &quad) const
-  {
-    return std::make_unique<FE_DGQArbitraryNodes<3>>(quad);
-  }
-
 
 
   namespace internal
@@ -1249,8 +1140,7 @@ namespace FETools
       std::array<
         std::array<std::map<std::string, std::unique_ptr<const Subscriptor>>,
                    4>,
-        4>
-      fill_default_map()
+        4> inline fill_default_map()
       {
         std::array<
           std::array<std::map<std::string, std::unique_ptr<const Subscriptor>>,
