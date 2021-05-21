@@ -90,7 +90,7 @@ public:
   /**
    * Destructor.
    */
-  ~AlignedVector();
+  ~AlignedVector() = default;
 
   /**
    * Copy constructor.
@@ -838,14 +838,6 @@ inline AlignedVector<T>::AlignedVector(const size_type size, const T &init)
 {
   if (size > 0)
     resize(size, init);
-}
-
-
-
-template <class T>
-inline AlignedVector<T>::~AlignedVector()
-{
-  clear();
 }
 
 
