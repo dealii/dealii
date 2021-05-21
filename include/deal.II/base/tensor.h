@@ -923,7 +923,7 @@ constexpr DEAL_II_ALWAYS_INLINE DEAL_II_CUDA_HOST_DEV
 
 
 
-#if __GNUC__ >= 11 || defined __INTEL_COMPILER
+#  if __GNUC__ >= 11 || defined __INTEL_COMPILER
 template <int dim, typename Number>
 constexpr DEAL_II_ALWAYS_INLINE DEAL_II_CUDA_HOST_DEV
                                 Tensor<0, dim, Number>::Tensor(const Tensor<0, dim, Number> &other)
@@ -1282,7 +1282,7 @@ constexpr DEAL_II_ALWAYS_INLINE Tensor<rank_, dim, Number>::
 }
 
 
-#if __GNUC__ >= 11 || defined __INTEL_COMPILER
+#  if __GNUC__ >= 11 || defined __INTEL_COMPILER
 template <int rank_, int dim, typename Number>
 constexpr DEAL_II_ALWAYS_INLINE
 Tensor<rank_, dim, Number>::Tensor(const Tensor<rank_, dim, Number> &other)
