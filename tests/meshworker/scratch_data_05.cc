@@ -169,7 +169,7 @@ test()
 int
 main()
 {
-  initlog(1);
+  initlog(true);
   MultithreadInfo::set_thread_limit(1); // to make output deterministic
 
   test<2, 2>();

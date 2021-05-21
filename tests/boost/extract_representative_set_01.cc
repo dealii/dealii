@@ -29,7 +29,7 @@
 int
 main()
 {
-  initlog(1);
+  initlog(true);
 
   const unsigned int    N = 20;
   std::vector<Point<2>> points(N);
