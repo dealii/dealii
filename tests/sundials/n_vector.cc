@@ -275,6 +275,96 @@ test_clone()
 
 template <typename VectorType>
 void
+test_constraint_mask()
+{
+  // deal.II vectors
+  auto constraint_0  = create_test_vector<VectorType>(0);
+  auto constraint_1  = create_test_vector<VectorType>(1);
+  auto constraint_2  = create_test_vector<VectorType>(2);
+  auto constraint_m1 = create_test_vector<VectorType>(-1);
+  auto constraint_m2 = create_test_vector<VectorType>(-2);
+
+  auto vector0        = create_test_vector<VectorType>(0);
+  auto vectorpositive = create_test_vector<VectorType>(3);
+  auto vectornegative = create_test_vector<VectorType>(-3);
+  auto mask           = create_test_vector<VectorType>(0);
+
+  // N_Vectors
+  auto view_constraint_0  = make_nvector_view(constraint_0);
+  auto view_constraint_1  = make_nvector_view(constraint_1);
+  auto view_constraint_2  = make_nvector_view(constraint_2);
+  auto view_constraint_m1 = make_nvector_view(constraint_m1);
+  auto view_constraint_m2 = make_nvector_view(constraint_m2);
+
+  auto view_vector0        = make_nvector_view(vector0);
+  auto view_vectorpositive = make_nvector_view(vectorpositive);
+  auto view_vectornegative = make_nvector_view(vectornegative);
+
+  auto view_mask = make_nvector_view(mask);
+
+  auto check_true = [](bool in) {
+    if (in == false)
+      {
+        deallog << "test_failed" << std::endl;
+        AssertThrow(false, ExcInternalError());
+      }
+  };
+
+  auto check_false = [](bool in) {
+    if (in == true)
+      {
+        deallog << "test_failed" << std::endl;
+        AssertThrow(false, ExcInternalError());
+      }
+  };
+
+  check_true(N_VConstrMask(view_constraint_0, view_vector0, view_mask));
+  check_true(N_VConstrMask(view_constraint_0, view_vectorpositive, view_mask));
+  check_true(N_VConstrMask(view_constraint_0, view_vectornegative, view_mask));
+
+  check_true(N_VConstrMask(view_constraint_1, view_vector0, view_mask));
+  check_true(N_VConstrMask(view_constraint_1, view_vectorpositive, view_mask));
+  check_false(N_VConstrMask(view_constraint_1, view_vectornegative, view_mask));
+
+  check_false(N_VConstrMask(view_constraint_2, view_vector0, view_mask));
+  check_true(N_VConstrMask(view_constraint_2, view_vectorpositive, view_mask));
+  check_false(N_VConstrMask(view_constraint_2, view_vectornegative, view_mask));
+
+  check_true(N_VConstrMask(view_constraint_m1, view_vector0, view_mask));
+  check_false(
+    N_VConstrMask(view_constraint_m1, view_vectorpositive, view_mask));
+  check_true(N_VConstrMask(view_constraint_m1, view_vectornegative, view_mask));
+
+  check_false(N_VConstrMask(view_constraint_m2, view_vector0, view_mask));
+  check_false(
+    N_VConstrMask(view_constraint_m2, view_vectorpositive, view_mask));
+  check_true(N_VConstrMask(view_constraint_m2, view_vectornegative, view_mask));
+
+  deallog << "test_constraint_mask OK" << std::endl;
+}
+
+
+
+template <typename VectorType>
+void
+test_min_quotient()
+{
+  auto vector1   = create_test_vector<VectorType>(12.);
+  auto vector2   = create_test_vector<VectorType>(3.);
+  auto n_vector1 = make_nvector_view(vector1);
+  auto n_vector2 = make_nvector_view(vector2);
+
+  auto m = N_VMinQuotient(n_vector1, n_vector2);
+  if (m == 4)
+    deallog << "test_min_quotient OK" << std::endl;
+  else
+    deallog << "test_min_quotient failed" << std::endl;
+}
+
+
+
+template <typename VectorType>
+void
 test_destroy()
 {
   GrowingVectorMemory<VectorType>                   mem;
@@ -733,25 +823,27 @@ run_all_tests(const std::string &prefix)
   test_get_vector_id<VectorType>();
 
   // test vector operations
-  test_clone<VectorType>();
-  test_destroy<VectorType>();
-  test_get_communicator<VectorType>();
-  test_length<VectorType>();
-  test_linear_sum<VectorType>();
-  test_dot_product<VectorType>();
-  test_set_constant<VectorType>();
   test_add_constant<VectorType>();
-  test_elementwise_product<VectorType>();
+  test_clone<VectorType>();
+  test_constraint_mask<VectorType>();
+  test_destroy<VectorType>();
+  test_dot_product<VectorType>();
+  test_elementwise_abs<VectorType>();
   test_elementwise_div<VectorType>();
   test_elementwise_inv<VectorType>();
-  test_elementwise_abs<VectorType>();
-  test_weighted_rms_norm<VectorType>();
-  test_weighted_rms_norm_mask<VectorType>();
-  test_weighted_l2_norm<VectorType>();
-  test_max_norm<VectorType>();
+  test_elementwise_product<VectorType>();
+  test_get_communicator<VectorType>();
   test_l1_norm<VectorType>();
+  test_length<VectorType>();
+  test_linear_sum<VectorType>();
+  test_max_norm<VectorType>();
   test_min_element<VectorType>();
+  test_min_quotient<VectorType>();
   test_scale<VectorType>();
+  test_set_constant<VectorType>();
+  test_weighted_l2_norm<VectorType>();
+  test_weighted_rms_norm_mask<VectorType>();
+  test_weighted_rms_norm<VectorType>();
 }
 
 int
