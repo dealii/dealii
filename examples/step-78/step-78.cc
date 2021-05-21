@@ -533,8 +533,6 @@ namespace BlackScholesSolver
     preconditioner.initialize(system_matrix, 1.0);
     cg.solve(system_matrix, solution, system_rhs, preconditioner);
     constraints.distribute(solution);
-    std::cout << "     " << solver_control.last_step() << " CG iterations."
-              << std::endl;
   }
 
   // @sect4{<code>BlackScholes::add_results_for_output</code>}
@@ -751,8 +749,10 @@ namespace BlackScholesSolver
           {
             time += time_step;
             ++timestep_number;
-            std::cout << "Time step " << timestep_number << " at t=" << time
-                      << std::endl;
+
+            if (timestep_number % 1000 == 0)
+              std::cout << "Time step " << timestep_number << " at t=" << time
+                        << std::endl;
 
             mass_matrix.vmult(system_rhs, solution);
 
