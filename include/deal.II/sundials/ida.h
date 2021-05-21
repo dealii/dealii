@@ -614,7 +614,10 @@ namespace SUNDIALS
     set_n_iterations(const int n_iter);
 
     /**
-     * Return the number of iterations of the last Jacobian solve.
+     * Return the number of iterations of the last Jacobian solve. This
+     * piece of information corresponds to the what the
+     * solve_jacobian_system_up_to_tolerance() function returns through
+     * its third argument.
      */
     int
     get_n_iterations() const;
@@ -753,7 +756,7 @@ namespace SUNDIALS
      * Solve the Jacobian linear system up to a specified tolerance. This
      * function will be called by IDA (possibly several times) after
      * setup_jacobian() has been called at least once. IDA tries to do its best
-     * to call setup_jacobian() the minimum amount of times. If convergence can
+     * to call setup_jacobian() the minimum number of times. If convergence can
      * be achieved without updating the Jacobian, then IDA does not call
      * setup_jacobian() again. If, on the contrary, internal IDA convergence
      * tests fail, then IDA calls again setup_jacobian() with updated vectors
@@ -761,7 +764,7 @@ namespace SUNDIALS
      * solve_jacobian_system_up_to_tolerance() lead to better convergence in the
      * Newton process.
      *
-     * The jacobian $J$ should be (an approximation of) the system Jacobian
+     * The Jacobian $J$ should be (an approximation of) the system Jacobian
      * \f[
      *   J=\dfrac{\partial G}{\partial y} = \dfrac{\partial F}{\partial y} +
      *  \alpha \dfrac{\partial F}{\partial \dot y}.
@@ -772,18 +775,26 @@ namespace SUNDIALS
      * @param[in] rhs The system right hand side to solve for.
      * @param[out] dst The solution of $J^{-1} * src$.
      * @param[out] n_iter the number of iterations required to solve the
-     * jacobian system
+     *   Jacobian system. This is an output argument through which the
+     *   function can communicate how many iterations it took to solve the
+     *   linear system, and that can then be queried from the outside using the
+     *   get_n_iterations() function.
      * @param[in] tolerance The tolerance with which to solve the linear system
      *   of equations.
      *
      * A call to this function should store in `dst` the result of $J^{-1}$
-     * applied to `src`, i.e., `J*dst = src`. It is the users responsibility
-     * to set up proper solvers and preconditioners inside this function.
+     * applied to `src`, i.e., the solution of the linear system `J*dst = src`.
+     * It is the user's responsibility to set up proper solvers and
+     * preconditioners either inside this function, or already within the
+     * `setup_jacobian()` function. (The latter is, for example, what the
+     * step-77 program does: All expensive operations happen in
+     * `setup_jacobian()`, given that that function is called far less often
+     * than the current one.)
      *
      * This function should return:
      * - 0: Success
      * - >0: Recoverable error (IDAReinit will be called if this happens, and
-     *       then last function will be attempted again
+     *       then the last function will be attempted again).
      * - <0: Unrecoverable error the computation will be aborted and an
      * assertion will be thrown.
      */
@@ -895,7 +906,9 @@ namespace SUNDIALS
     void *ida_mem;
 
     /**
-     * Number of iteration that were required to solve the last Jacobian system
+     * Number of iteration that were required to solve the last
+     * Jacobian system. This variable is set by the wrapper that calls
+     * `solve_jacobian_system_up_to_tolerance`.
      */
     int n_iterations;
 
