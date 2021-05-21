@@ -107,7 +107,7 @@ main(int argc, char *argv[])
     {
       for (unsigned k = 0; k < diffs.size(); k++)
         {
-          res[k] = static_cast<const SE::RealDouble &>(*diffs[k]->subs(dict)).i;
+          res[k] = SE::eval_double(*diffs[k]->subs(dict));
           r += res[k];
         }
     }
