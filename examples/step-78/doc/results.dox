@@ -46,7 +46,7 @@ n cells         H1                  L2
 @endcode
 
 What is more interesting is the output of the convergence tables. They are
-outputted into the console, as well into a LaTex file. The convergence tables
+outputted into the console, as well into a LaTeX file. The convergence tables
 are shown above. Here, you can see that the the solution has a convergence rate
 of $\mathcal{O}(h)$ with respect to the $H^1$-norm, and the solution has a convergence rate
 of $\mathcal{O}(h^2)$ with respect to the $L^2$-norm.

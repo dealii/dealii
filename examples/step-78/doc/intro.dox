@@ -66,8 +66,8 @@ In practice, for us to use a finite element method to solve this, we are going
 to need to bound $\Omega$. Since this equation describes prices, and it doesn't
 make sense to talk about prices being negative, we will set the lower bound of
 $\Omega$ to be 0. Then, for an upper bound, we will choose a very large number,
-one that $S$ is not very likely to ever get to. We will call this $S_\text{max}$
-. So, $\Omega=[0,S_\text{max}]$.
+one that $S$ is not very likely to ever get to. We will call this $S_\text{max}$.
+So, $\Omega=[0,S_\text{max}]$.
 
 Second, after truncating the domain, we need to ask what boundary values we
 should pose at this now finite boundary. To take care of this, we use "put-call"
@@ -101,7 +101,7 @@ what solving these equations is all about.
 This means that this is not an equation that is posed going forward in
 time, but in fact going *backward* in time. Thus it makes sense to solve this
 problem in reverse by making the change of variables $\tau=T-t$ where now $\tau$
-denotes "time before the strike time $T$".
+denotes the time before the strike time $T$.
 
 With all of this, we finally end up with the following problem:
 @f{align*}{
@@ -229,8 +229,8 @@ applicable, we arrive at the following for (2):
 @f}
 But, because the matrix $\textbf{B}$ involves an advective term, we will choose
 $\theta=0$ there -- in other words, we use an explicit Euler method to treat
-advection. Conversely, since the matrix $\textbf{D}$ involves the diffusive term
-, we will choose $\theta=1/2$ there -- i.e., we treat diffusion using the second
+advection. Conversely, since the matrix $\textbf{D}$ involves the diffusive term,
+we will choose $\theta=1/2$ there -- i.e., we treat diffusion using the second
 order Crank-Nicolson method.
 
 So, we arrive at the following:

@@ -277,7 +277,7 @@ namespace BlackScholesSolver
   // when the option expires.\n
   // - <code>asset_volatility</code>: The volatility of the stock price.\n
   // - <code>interest_rate</code>: The risk free interest rate.\n
-  // - <code>strike_price</code>: The aggreed upon price that the buyer will
+  // - <code>strike_price</code>: The agreed upon price that the buyer will
   // have the option of purchasing  the stocks at the expiration time.
   //
   // Some slight differences between this program and step-26 are the creation
@@ -354,7 +354,7 @@ namespace BlackScholesSolver
   // they are fairly normal values for these parameters. Although the stock
   // price has no upper bound in reality (it is in fact infinite), we impose
   // an upper bound that is twice the strike price. This is a somewhat arbitrary
-  // choice to be twice the strike price, but it is large enought to see the
+  // choice to be twice the strike price, but it is large enough to see the
   // interesting parts of the solution.
   template <int dim>
   BlackScholes<dim>::BlackScholes()
@@ -539,7 +539,7 @@ namespace BlackScholesSolver
 
   // @sect4{<code>BlackScholes::add_results_for_output</code>}
 
-  // This is simply the function to stitch the solution peices together. For
+  // This is simply the function to stitch the solution pieces together. For
   // this, we create a new layer at each time, and then add the solution vector
   // for that timestep. The function then stitches this together with the old
   // solutions using 'build_patches'.
@@ -650,7 +650,7 @@ namespace BlackScholesSolver
     convergence_table.write_tex(error_table_file);
 
     // Next, we will make the convergence table. We will again write this to
-    // the console and to the convergence LaTex file.
+    // the console and to the convergence LaTeX file.
     convergence_table.add_column_to_supercolumn("cells", "n cells");
     std::vector<std::string> new_order;
     new_order.emplace_back("n cells");
