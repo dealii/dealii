@@ -101,15 +101,12 @@ public:
       return 0;
     };
 
-    time_stepper.solve_jacobian_system_up_to_tolerance =
-      [&](const VectorType &src,
-          VectorType &      dst,
-          int &             n_iter,
-          const double      tolerance) -> int {
+    time_stepper.solve_with_jacobian = [&](const VectorType &src,
+                                           VectorType &      dst,
+                                           const double      tolerance) -> int {
       SolverControl               solver_control(1000, tolerance);
       SolverGMRES<Vector<double>> solver(solver_control);
       solver.solve(J, dst, src, PreconditionIdentity());
-      n_iter = solver_control.last_step() > 0 ? solver_control.last_step() : 1;
       return 0;
     };
 

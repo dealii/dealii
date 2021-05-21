@@ -180,20 +180,10 @@ namespace SUNDIALS
       auto *src_b = internal::unwrap_nvector_const<VectorType>(b);
       auto *dst_x = internal::unwrap_nvector<VectorType>(x);
       int   err   = 0;
-      if (solver.solve_jacobian_system_up_to_tolerance)
-        {
-          int n_iter = 0;
-
-          err = solver.solve_jacobian_system_up_to_tolerance(*src_b,
-                                                             *dst_x,
-                                                             n_iter,
-                                                             tol);
-          solver.set_n_iterations(n_iter > 0 ? n_iter : 1);
-        }
+      if (solver.solve_with_jacobian)
+        err = solver.solve_with_jacobian(*src_b, *dst_x, tol);
       else if (solver.solve_jacobian_system)
-        {
-          err = solver.solve_jacobian_system(*src_b, *dst_x);
-        }
+        err = solver.solve_jacobian_system(*src_b, *dst_x);
       else
         // We have already checked this outside, so we should never get here.
         Assert(false, ExcInternalError());
@@ -234,24 +224,6 @@ namespace SUNDIALS
 
 
   template <typename VectorType>
-  void
-  IDA<VectorType>::set_n_iterations(const int n_iter)
-  {
-    n_iterations = n_iter;
-  }
-
-
-
-  template <typename VectorType>
-  int
-  IDA<VectorType>::get_n_iterations() const
-  {
-    return n_iterations;
-  }
-
-
-
-  template <typename VectorType>
   unsigned int
   IDA<VectorType>::solve_dae(VectorType &solution, VectorType &solution_dot)
   {
@@ -259,7 +231,6 @@ namespace SUNDIALS
     double       h           = data.initial_step_size;
     unsigned int step_number = 0;
 
-    this->n_iterations = 1;
     int status;
     (void)status;
 
@@ -411,10 +382,9 @@ namespace SUNDIALS
       return 0;
     };
 
-    AssertThrow(
-      solve_jacobian_system || solve_jacobian_system_up_to_tolerance,
-      ExcFunctionNotProvided(
-        "solve_jacobian_system or solve_jacobian_system_up_to_tolerance"));
+    AssertThrow(solve_jacobian_system || solve_with_jacobian,
+                ExcFunctionNotProvided(
+                  "solve_jacobian_system or solve_with_jacobian"));
     LS->ops->solve = t_dae_solve_jacobian_system<VectorType>;
 
     // When we set an iterative solver IDA requires that resid is provided. From
@@ -430,10 +400,7 @@ namespace SUNDIALS
     // When we set an iterative solver IDA requires that last number of
     // iteration is provided. Since we can't know what kind of solver the user
     // has provided we set 1. This is clearly suboptimal.
-    LS->ops->numiters = [](SUNLinearSolver LS) -> int {
-      IDA<VectorType> &solver = *static_cast<IDA<VectorType> *>(LS->content);
-      return solver.get_n_iterations();
-    };
+    LS->ops->numiters = [](SUNLinearSolver /*ignored*/) -> int { return 1; };
     // Even though we don't use it, IDA still wants us to set some
     // kind of matrix object for the nonlinear solver. This is because
     // if we don't set it, it won't call the functions that set up
