@@ -504,12 +504,12 @@ namespace SUNDIALS
         // Finally, if we were given a set-up function, tell KINSOL about
         // it as well. The manual says that this must happen *after*
         // calling KINSetLinearSolver
-        if (setup_jacobian)
-          {
-            status =
-              KINSetJacFn(kinsol_mem, &setup_jacobian_callback<VectorType>);
-            AssertKINSOL(status);
-          }
+        if (!setup_jacobian)
+          setup_jacobian = [](const VectorType &, const VectorType &) {
+            return 0;
+          };
+        status = KINSetJacFn(kinsol_mem, &setup_jacobian_callback<VectorType>);
+        AssertKINSOL(status);
 #  endif
       }
 
@@ -537,8 +537,6 @@ namespace SUNDIALS
     reinit_vector = [](VectorType &) {
       AssertThrow(false, ExcFunctionNotProvided("reinit_vector"));
     };
-
-    setup_jacobian = [](const VectorType &, const VectorType &) { return 0; };
   }
 
   template class KINSOL<Vector<double>>;
