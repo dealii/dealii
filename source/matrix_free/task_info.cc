@@ -807,7 +807,7 @@ namespace internal
       // power of two, which allows it to replace integer divisions by shifts
       unsigned int vectorization_length_bits = 0;
       unsigned int my_length                 = vectorization_length;
-      while (my_length >>= 1)
+      while ((my_length >>= 1) != 0u)
         ++vectorization_length_bits;
       const unsigned int n_lanes = 1 << vectorization_length_bits;
 
@@ -852,9 +852,9 @@ namespace internal
         for (unsigned int j = n_categories - 1; j > 0; --j)
           {
             unsigned int lower_index = j - 1;
-            while (renumbering_category[j].size() % n_lanes)
+            while ((renumbering_category[j].size() % n_lanes) != 0u)
               {
-                while (renumbering_category[j].size() % n_lanes &&
+                while (((renumbering_category[j].size() % n_lanes) != 0u) &&
                        !renumbering_category[lower_index].empty())
                   {
                     renumbering_category[j].push_back(
@@ -1044,7 +1044,7 @@ namespace internal
                             cell_vectorization_categories[n_active_cells]);
           renumbering[cell] = cell;
         }
-      if (n_ghost_cells % n_lanes)
+      if ((n_ghost_cells % n_lanes) != 0u)
         incompletely_filled_vectorization.back() = n_ghost_cells % n_lanes;
       cell_partition_data.push_back(n_cell_batches + n_ghost_batches);
       partition_row_index.back() = cell_partition_data.size() - 1;

@@ -501,7 +501,7 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::interpolate(
             *const valuesptr = pointerstruct->second.dof_values_ptr;
 
           // cell stayed as it was or was refined
-          if (indexptr)
+          if (indexptr != nullptr)
             {
               Assert(valuesptr == nullptr, ExcInternalError());
 

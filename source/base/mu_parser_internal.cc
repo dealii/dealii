@@ -43,7 +43,7 @@ namespace internal
     double
     mu_if(double condition, double thenvalue, double elsevalue)
     {
-      if (mu_round(condition))
+      if (mu_round(condition) != 0)
         return thenvalue;
       else
         return elsevalue;
@@ -52,13 +52,15 @@ namespace internal
     double
     mu_or(double left, double right)
     {
-      return (mu_round(left)) || (mu_round(right));
+      return static_cast<double>((mu_round(left) != 0) ||
+                                 (mu_round(right) != 0));
     }
 
     double
     mu_and(double left, double right)
     {
-      return (mu_round(left)) && (mu_round(right));
+      return static_cast<double>((mu_round(left) != 0) &&
+                                 (mu_round(right) != 0));
     }
 
     double

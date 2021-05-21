@@ -98,7 +98,7 @@ MappingCartesian<dim, spacedim>::requires_update_flags(
   // since they can be computed from the normal vectors without much
   // further ado
   UpdateFlags out = in;
-  if (out & update_boundary_forms)
+  if ((out & update_boundary_forms) != 0u)
     out |= update_normal_vectors;
 
   return out;

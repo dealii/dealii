@@ -107,7 +107,7 @@ LogStream::~LogStream()
         // (note that we can't issue an assertion here either since Assert
         // may want to write to 'deallog' itself, and AssertThrow will
         // throw an exception that can't be caught)
-        if ((this == &deallog) && file)
+        if ((this == &deallog) && (file != nullptr))
           *std_out << ("You still have content that was written to 'deallog' "
                        "but not flushed to the screen or a file while the "
                        "program is being terminated. This would lead to a "
@@ -204,7 +204,7 @@ LogStream::operator<<(std::ostream &(*p)(std::ostream &))
       if (get_prefixes().size() <= std_depth)
         *std_out << stream.str();
 
-      if (file && (get_prefixes().size() <= file_depth))
+      if ((file != nullptr) && (get_prefixes().size() <= file_depth))
         *file << stream.str() << std::flush;
 
       // Start a new string:
@@ -414,7 +414,7 @@ LogStream::print_line_head()
         *std_out << head << ':';
     }
 
-  if (file && (get_prefixes().size() <= file_depth))
+  if ((file != nullptr) && (get_prefixes().size() <= file_depth))
     {
       if (print_thread_id)
         *file << '[' << thread << ']';
