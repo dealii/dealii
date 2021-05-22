@@ -754,16 +754,6 @@ namespace PETScWrappers
     MatrixBase &
     add(const PetscScalar factor, const MatrixBase &other);
 
-
-    /**
-     * Add the matrix @p other scaled by the factor @p factor to the current
-     * matrix.
-     * @deprecated Use the function with order of arguments reversed instead.
-     */
-    DEAL_II_DEPRECATED
-    MatrixBase &
-    add(const MatrixBase &other, const PetscScalar factor);
-
     /**
      * Matrix-vector multiplication: let <i>dst = M*src</i> with <i>M</i>
      * being this matrix.
