@@ -27,8 +27,10 @@ test(const unsigned int n_refinements, const unsigned int fe_degree_fine)
 {
   using VectorType = LinearAlgebra::distributed::Vector<Number>;
 
-  Triangulation<dim> tria(
-    Triangulation<dim>::MeshSmoothing::limit_level_difference_at_vertices);
+  parallel::distributed::Triangulation<dim> tria(
+    MPI_COMM_WORLD,
+    Triangulation<dim>::MeshSmoothing::none,
+    parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy);
   GridGenerator::subdivided_hyper_cube(
     tria, 2 * Utilities::pow<unsigned int>(2, n_refinements));
 
@@ -87,6 +89,8 @@ test(const unsigned int n_refinements, const unsigned int fe_degree_fine)
       constraint.add_lines(
         mg_constrained_dofs.get_boundary_indices(0 /*level*/));
       constraint.close();
+
+      constraint.print(std::cout);
 
       // set up operator
       op.reinit(*mapping, dof_handler, *quad, constraint, 0 /*level*/);
