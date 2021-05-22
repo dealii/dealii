@@ -66,12 +66,12 @@ In practice, for us to use a finite element method to solve this, we are going
 to need to bound $\Omega$. Since this equation describes prices, and it doesn't
 make sense to talk about prices being negative, we will set the lower bound of
 $\Omega$ to be 0. Then, for an upper bound, we will choose a very large number,
-one that $S$ is not very likely to ever get to. We will call this $S_\text{max}$
-. So, $\Omega=[0,S_\text{max}]$.
+one that $S$ is not very likely to ever get to. We will call this $S_\text{max}$.
+So, $\Omega=[0,S_\text{max}]$.
 
 Second, after truncating the domain, we need to ask what boundary values we
 should pose at this now finite boundary. To take care of this, we use "put-call"
-parity @cite stoll1969relationship. A "pull option" is one in which I am
+parity @cite stoll1969relationship. A "pull option" is one in which we are
 allowed, but not required, to *sell* a stock at price $K$ to someone at a future
 time $T$. This says
 @f{align*}{
@@ -88,10 +88,10 @@ $S_\text{max}$.
 
 The second complication of the Block-Scholes equation is that we are given a
 final condition, and not an initial condition. This is because we know what the
-option is worth at time $t=T$: If the stock price at $T$ is $S<K$, then I have
-no incentive to use my option of buying a price $K$ because I can buy that stock
+option is worth at time $t=T$: If the stock price at $T$ is $S<K$, then we have
+no incentive to use our option of buying a price $K$ because we can buy that stock
 for cheaper on the open market. So $V(S,T)=0$ for $S<K$. On the other hand, if
-at time $T$ we have $S>K$, then I can buy my stock at price $K$ via the option
+at time $T$ we have $S>K$, then we can buy the stock at price $K$ via the option
 and immediately sell it again on the market for price $S$, giving me a profit of
 $S-K$. In other words, $V(S,T)=S-K$ for $S>K$. So, we only know
 values for $V$ at the *end time* but not the initial time -- in fact, finding
@@ -101,7 +101,7 @@ what solving these equations is all about.
 This means that this is not an equation that is posed going forward in
 time, but in fact going *backward* in time. Thus it makes sense to solve this
 problem in reverse by making the change of variables $\tau=T-t$ where now $\tau$
-denotes "time before the strike time $T$".
+denotes the time before the strike time $T$.
 
 With all of this, we finally end up with the following problem:
 @f{align*}{
@@ -131,11 +131,10 @@ refinement and time step choice. There is also the issue that the diffusion term
 
 <h3>Scheme for the numerical solution</h3>
 
-We will solve this problem using the fractional step method (of which the
-Crank-Nicolson method is a special case with $\theta=\frac 12$; the explicit
-Euler method corresponds to $\theta=0$ and the implicit Euler method to
-$\theta=1$). So, we first discretize in time, where we would like $V^n(S)$ to
-approximate $V(S,\tau_n)$:
+We will solve this problem using an IMEX method. In particular, we first discretize
+in time with the theta method and will later pick different values of theta for
+the advective and diffusive terms.
+Let $V^n(S)$ approximate $V(S,\tau_n)$:
 @f{align*}{
     0=&-\frac{V^n(S)-V^{n-1}(S)}{k_n} \\
     &+\frac{\sigma^2S^2}{2}\left[(1-\theta)\frac{d^2V^{n-1}(S)}{dS^2} + \
@@ -229,8 +228,8 @@ applicable, we arrive at the following for (2):
 @f}
 But, because the matrix $\textbf{B}$ involves an advective term, we will choose
 $\theta=0$ there -- in other words, we use an explicit Euler method to treat
-advection. Conversely, since the matrix $\textbf{D}$ involves the diffusive term
-, we will choose $\theta=1/2$ there -- i.e., we treat diffusion using the second
+advection. Conversely, since the matrix $\textbf{D}$ involves the diffusive term,
+we will choose $\theta=1/2$ there -- i.e., we treat diffusion using the second
 order Crank-Nicolson method.
 
 So, we arrive at the following:

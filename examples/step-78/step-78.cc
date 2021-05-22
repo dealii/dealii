@@ -69,7 +69,7 @@ namespace BlackScholesSolver
   // @sect3{Solution Class}
 
   // This section creates a class for the known solution when testing using the
-  // MMS. Here I am using $v(\tau,S) = -\tau^2 -S^2 + 6$ for my solution. We
+  // MMS. Here we are using $v(\tau,S) = -\tau^2 -S^2 + 6$ for the solution. We
   // need to include the solution equation and the gradient for the H1 seminorm
   // calculation.
   template <int dim>
@@ -277,7 +277,7 @@ namespace BlackScholesSolver
   // when the option expires.\n
   // - <code>asset_volatility</code>: The volatility of the stock price.\n
   // - <code>interest_rate</code>: The risk free interest rate.\n
-  // - <code>strike_price</code>: The aggreed upon price that the buyer will
+  // - <code>strike_price</code>: The agreed upon price that the buyer will
   // have the option of purchasing  the stocks at the expiration time.
   //
   // Some slight differences between this program and step-26 are the creation
@@ -334,12 +334,12 @@ namespace BlackScholesSolver
     Vector<double> solution;
     Vector<double> system_rhs;
 
-    double       time;
-    double       time_step;
-    unsigned int timestep_number;
+    double time;
+    double time_step;
 
     const double       theta;
     const unsigned int n_cycles;
+    const unsigned int n_time_steps;
 
     DataOutStack<dim>        data_out_stack;
     std::vector<std::string> solution_names;
@@ -354,7 +354,7 @@ namespace BlackScholesSolver
   // they are fairly normal values for these parameters. Although the stock
   // price has no upper bound in reality (it is in fact infinite), we impose
   // an upper bound that is twice the strike price. This is a somewhat arbitrary
-  // choice to be twice the strike price, but it is large enought to see the
+  // choice to be twice the strike price, but it is large enough to see the
   // interesting parts of the solution.
   template <int dim>
   BlackScholes<dim>::BlackScholes()
@@ -366,9 +366,9 @@ namespace BlackScholesSolver
     , fe(1)
     , dof_handler(triangulation)
     , time(0.0)
-    , timestep_number(0)
     , theta(0.5)
-    , n_cycles(3)
+    , n_cycles(4)
+    , n_time_steps(5000)
   {
     Assert(dim == 1, ExcNotImplemented());
   }
@@ -388,7 +388,7 @@ namespace BlackScholesSolver
   {
     dof_handler.distribute_dofs(fe);
 
-    time_step = maturity_time / 5000.;
+    time_step = maturity_time / n_time_steps;
 
     constraints.clear();
     DoFTools::make_hanging_node_constraints(dof_handler, constraints);
@@ -533,13 +533,11 @@ namespace BlackScholesSolver
     preconditioner.initialize(system_matrix, 1.0);
     cg.solve(system_matrix, solution, system_rhs, preconditioner);
     constraints.distribute(solution);
-    std::cout << "     " << solver_control.last_step() << " CG iterations."
-              << std::endl;
   }
 
   // @sect4{<code>BlackScholes::add_results_for_output</code>}
 
-  // This is simply the function to stitch the solution peices together. For
+  // This is simply the function to stitch the solution pieces together. For
   // this, we create a new layer at each time, and then add the solution vector
   // for that timestep. The function then stitches this together with the old
   // solutions using 'build_patches'.
@@ -650,7 +648,7 @@ namespace BlackScholesSolver
     convergence_table.write_tex(error_table_file);
 
     // Next, we will make the convergence table. We will again write this to
-    // the console and to the convergence LaTex file.
+    // the console and to the convergence LaTeX file.
     convergence_table.add_column_to_supercolumn("cells", "n cells");
     std::vector<std::string> new_order;
     new_order.emplace_back("n cells");
@@ -714,8 +712,7 @@ namespace BlackScholesSolver
         if (cycle != 0)
           {
             refine_grid();
-            time            = 0.0;
-            timestep_number = 0;
+            time = 0.0;
           }
 
         setup_system();
@@ -747,12 +744,14 @@ namespace BlackScholesSolver
         // vector:
         vmult_result.reinit(dof_handler.n_dofs());
         forcing_terms.reinit(dof_handler.n_dofs());
-        while (time < maturity_time)
+        for (unsigned int timestep_number = 0; timestep_number < n_time_steps;
+             ++timestep_number)
           {
             time += time_step;
-            ++timestep_number;
-            std::cout << "Time step " << timestep_number << " at t=" << time
-                      << std::endl;
+
+            if (timestep_number % 1000 == 0)
+              std::cout << "Time step " << timestep_number << " at t=" << time
+                        << std::endl;
 
             mass_matrix.vmult(system_rhs, solution);
 
