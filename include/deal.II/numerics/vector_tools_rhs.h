@@ -35,8 +35,6 @@ class Quadrature;
 namespace hp
 {
   template <int dim, int spacedim>
-  class DoFHandler;
-  template <int dim, int spacedim>
   class MappingCollection;
   template <int dim>
   class QCollection;

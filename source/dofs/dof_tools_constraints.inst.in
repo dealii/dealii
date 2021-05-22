@@ -117,8 +117,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
 #endif
   }
 
-for (DoFHandler : DOFHANDLER_TEMPLATE; deal_II_dimension : DIMENSIONS;
-     deal_II_space_dimension : SPACE_DIMENSIONS;
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
      S : REAL_AND_COMPLEX_SCALARS)
   {
 #if deal_II_dimension <= deal_II_space_dimension

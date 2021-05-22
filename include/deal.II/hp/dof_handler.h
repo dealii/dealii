@@ -117,17 +117,11 @@ namespace hp
    *
    *
    * @ingroup dofs
-   * @ingroup hp
    *
    * @deprecated The basic dealii::DoFHandler is capable of hp-adaptation now.
    */
   template <int dim, int spacedim = dim>
-  class DEAL_II_DEPRECATED DoFHandler : public dealii::DoFHandler<dim, spacedim>
-  {
-    using dealii::DoFHandler<dim, spacedim>::DoFHandler;
-    using dealii::DoFHandler<dim, spacedim>::operator=;
-  };
-
+  using DoFHandler DEAL_II_DEPRECATED = dealii::DoFHandler<dim, spacedim>;
 } // namespace hp
 
 DEAL_II_NAMESPACE_CLOSE
