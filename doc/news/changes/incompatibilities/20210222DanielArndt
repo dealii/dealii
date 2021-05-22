@@ -1,5 +1,0 @@
-Changed: The various parse_arguments(), to_string(), and to_value() functions
-related to the Pattern namespace take their last argument by `const&` instead of
-`const std::unique_ptr<>&`.
-<br>
-(Daniel Arndt, 2021/02/22)

@@ -1,4 +1,0 @@
-New: Added a new finite element FE_SimplexP_Bubbles suitable for using mass
-lumping on simplex meshes.
-<br>
-(David Wells, 2021/01/26)

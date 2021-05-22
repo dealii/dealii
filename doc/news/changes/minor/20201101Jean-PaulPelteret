@@ -1,7 +1,0 @@
-Fixed: There was a bug in 
-Differentiation::AD::ScalarFunction::extract_hessian_component()
-that was triggered when using a symmetric tensor extractor with a non-zero
-first component index. Having previously lead to either incorrect results being
-returned or valid user programs crashing, it has now been corrected.
-<br>
-(Jean-Paul Pelteret, 2020/11/01)

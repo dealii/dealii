@@ -1,7 +1,0 @@
-Deprecated: The version of DoFTools::extract_boundary_dofs() that
-returns its information via an `IndexSet` reference argument has been
-deprecated. Use the version of the function that returns information
-via an IndexSet return type instead.
-<br>
-(Wolfgang Bangerth, 2021/03/30)
-

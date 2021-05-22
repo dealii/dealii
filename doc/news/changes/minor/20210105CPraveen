@@ -1,3 +1,0 @@
-Fixed: Reset time and timestep_number during pre refinement steps in step-26.
-<br>
-(Praveen Chandrashekar, 2021/01/05)

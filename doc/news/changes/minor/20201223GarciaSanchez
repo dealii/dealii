@@ -1,5 +1,0 @@
-Improved: If there is an uncaught exception the destructor of the HDF5
-interface does not call H5Dclose, H5Gclose or H5Fclose. In addition,
-to avoid MPI synchronization and a possible deadlock, the destructor
-calls MPI_Abort().
-(Daniel Garcia-Sanchez, 2020/12/23)

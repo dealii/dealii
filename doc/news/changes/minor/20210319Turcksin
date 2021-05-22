@@ -1,5 +1,0 @@
-New: Add nearest neighbor predicate support to ArborXWrappers::BVH(). This
-allows to find the `n` closest bounding boxes or points to any given bounding
-box or point.
-<br>
-(Bruno Turcksin, 2021/03/19)

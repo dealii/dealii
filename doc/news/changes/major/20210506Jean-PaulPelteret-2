@@ -1,6 +1,0 @@
-New: The step-72 tutorial revisits step-15 (that solves a nonlinear elliptic
-problem using Newton's method). In this variant, automatic differentiation
-is used either to linearize the residual, or to compute the full linear system
-from an energy functional.
-<br>
-(Jean-Paul Pelteret, 2021/05/06)

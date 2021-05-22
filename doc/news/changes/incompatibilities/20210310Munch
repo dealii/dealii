@@ -1,4 +1,0 @@
-Changed: The order of parameters has been switched in MappingQCache::initialize(), 
-with the Mapping now being the first argument.
-<br>
-(Peter Munch, 2020/05/23)

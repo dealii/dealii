@@ -1,8 +1,0 @@
-Removed: The file `affine_constraints.h` had a class called
-`IsBlockMatrix` that, however, also allowed to check whether its
-template argument is in fact a block sparsity pattern. The class was
-likely never intended to be in the public interface, and has been
-moved to internal::AffineConstraints::IsBlockMatrix and now also
-internal::AffineConstraints::IsBlockSparsityPattern.
-<br>
-(Wolfgang Bangerth, 2020/11/29)

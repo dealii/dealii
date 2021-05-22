@@ -1,4 +1,0 @@
-Fixed: DoFTools::extract_dofs() return an IndexSet as result used to have a
-quadratic complexity in the number of extracted indices. This is now fixed.
-<br>
-(Martin Kronbichler, 2020/08/11)

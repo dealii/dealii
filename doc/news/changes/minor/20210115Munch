@@ -1,5 +1,0 @@
-New: The method parallel::distributed::Triagnulation::communicate_locally_moved_vertices() 
-has been refactored and moved to parallel::DistributedTriangulationBase so that it can now also be
-used for parallel::fullydistributed::Triangulation.
-<br>
-(Daniel Arndt, Ivan Fumagalli, Peter Munch, 2021/01/15)

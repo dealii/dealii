@@ -1,3 +1,0 @@
-New: Utilities::MPI::logical_or() for collective <i>logical or</i> operations.
-<br>
-(Marc Fehling, 2021/03/04)

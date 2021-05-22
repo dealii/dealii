@@ -1,6 +1,0 @@
-Fixed: The AffineConstraints class had a bug where, if deal.II was
-compiled without threading, the class used a global variable. If a
-user program used threads nonetheless, this global variable led to
-race conditions. This is now fixed.
-<br>
-(Wolfgang Bangerth, 2020/06/11)

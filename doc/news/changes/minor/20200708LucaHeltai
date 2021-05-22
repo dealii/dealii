@@ -1,3 +1,0 @@
-Fixed: MeshWorker::mesh_loop() did not work on 1d with refined grids. This is now fixed.
-<br>
-(Luca Heltai, 2020/07/08)

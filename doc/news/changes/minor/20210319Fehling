@@ -1,5 +1,0 @@
-Improved: The function parallel::distributed::Triangulation::copy_triangulation()
-now also works with locally refined meshes of type
-parallel::distributed::Triangulation.
-<br>
-(Marc Fehling, 2021/03/19)

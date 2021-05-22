@@ -1,7 +1,0 @@
-Changed: The internal data structures of DoFHandler have been modified to use 
-compressed row storage, enabling it to also handle hp::DoFHandler functionalities.
-Currently, the user can choose between the normal mode and the hp mode during
-calling the constructur. Please note that the multigrid functionalities are only 
-available during normal mode.
-<br>
-(Peter Munch, 2020/05/23)

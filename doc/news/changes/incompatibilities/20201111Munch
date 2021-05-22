@@ -1,4 +1,0 @@
-Deprecated: All `MatrixFree::reinit()` functions without `Mapping` as argument 
-have been deprecated. Use the functions that explicit provide the Mapping instead.
-<br>
-(Peter Munch, 2020/11/11)

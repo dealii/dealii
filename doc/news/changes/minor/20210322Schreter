@@ -1,7 +1,0 @@
-New: The getter function for the divergence in 
-FEEvaluationAccess<1, 1, Number, is_face, VectorizedArrayType>::get_divergence() 
-is now also implemented for dim==1 and n_components==1. The function 
-FEEvaluationAccess<1, 1, Number, is_face, VectorizedArrayType>::submit_gradient()
-now also takes a rank 2 tensor as input argument.
-<br>
-(Magdalena Schreter, Peter Munch, Martin Kronbichler, 2021/03/22)

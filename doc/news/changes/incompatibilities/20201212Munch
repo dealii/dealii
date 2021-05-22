@@ -1,6 +1,0 @@
-Changed: The interface of FE::fill_fe_face_values() now accepts instead
-of a Quadrature instance a hp::QCollection instance, enabling the evaluation of
-shape functions for different quadrature formulas on different faces for
-FiniteElement classes with supports for this feature (e.g. FE_Q, FE_SimplexP). 
-<br>
-(Peter Munch, 2020/12/12)

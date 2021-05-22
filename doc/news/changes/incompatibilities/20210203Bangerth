@@ -1,7 +1,0 @@
-Changed: The FE_Q_Base class took a description of the polynomial
-space as a template argument. But that is not necessary: It is
-entirely sufficient to pass this information to the constructor in the
-form of a regular constructor argument. This has been changed, and the
-class has therefore lost its first template argument.
-<br>
-(Wolfgang Bangerth, 2021/02/03)

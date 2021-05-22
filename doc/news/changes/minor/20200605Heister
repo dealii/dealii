@@ -1,9 +1,0 @@
-New: FEEvaluation::evaluate(), FEEvaluation::integrate(),
-FEFaceEvaluation::evaluate() and FEFaceEvaluation::integrate() now take an
-argument of type EvaluationFlags::EvaluationFlags to determine which of the
-values, gradients or hessians should be evaluated to quadrature points or
-integrated, allowing much more expressive programs than the previous list of
-bools. The evaluation flags can be combined with `operator|`, similarly to
-UpdateFlags for FEValues.
-<br>
-(Timo Heister, 2020/06/05)

@@ -1,3 +1,0 @@
-Fixed: Make SUNDIALS::IDA function names  consistent with SUNDIALS::KINSOL function names.
-<br>
-(Luca Heltai, 2021/05/21)

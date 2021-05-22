@@ -1,4 +1,0 @@
-Deprecated: The function CellId::to_cell() has been replaced by
-Triangulation::create_cell_iterator().
-<br>
-(Marc Fehling, 2020/12/12)

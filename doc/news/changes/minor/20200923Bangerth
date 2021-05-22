@@ -1,4 +1,0 @@
-Changed: step-29 no longer uses the `deallog` variable to generate
-output, but instead directly writes to `std::cout`.
-<br>
-(Wolfgang Bangerth, 2020/09/23)

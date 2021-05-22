@@ -1,4 +1,0 @@
-New: The new MGTransferBase::prolongate_and_add() performs a prolongation
-without zeroing out the destination vector.
-<br>
-(Martin Kronbichler, 2021/02/22)

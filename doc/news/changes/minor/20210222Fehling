@@ -1,5 +1,0 @@
-New: Member function hp::FECollection::get_hierarchy_sequence() returning
-the sequence of finite element indices that correspond to the registered
-hierarchy. 
-<br>
-(Marc Fehling, 2021/02/22)

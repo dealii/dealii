@@ -1,6 +1,0 @@
-Add a new grid generator (subdivided_cylinder) which generates a 
-cylinder with a number of x subdivisions which is specified by the user.
-Alter cylinder so that it also uses this new generator to prevent code
-duplication.
-<br>
-(Bruno Blais, 2021/04/01)

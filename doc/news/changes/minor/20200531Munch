@@ -1,4 +1,0 @@
-Changed: The vertices in CellData are now stored in form of a std::vector
-instead of C-style array.
-<br>
-(Peter Munch, 2020/05/31)

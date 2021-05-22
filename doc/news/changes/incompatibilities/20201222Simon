@@ -1,7 +1,0 @@
-Patch to fix issue#7970 for 'RaviartThomas<3>(degree)' elements on meshes
-that contain cells with faces that are flipped and/or not in standard
-orientation. The patch provides a possible way to fix other FE classes inheriting
-from 'FE_PolyTensor' but does not implement it yet. It does not change the interface
-to FE classes.
-<br>
-(Konrad Simon, 2020/12/22)

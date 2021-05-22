@@ -1,5 +1,0 @@
-New: The method parallel::distributed::Triangulation::load()
-can now also accept a p4est/p8est forest, which can be queried
-from an existing triangulation via parallel::distributed::Triangulation::get_p4est().
-<br>
-(Marc Fehling, Peter Munch, 2021/02/09)

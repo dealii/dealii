@@ -1,4 +1,0 @@
-Improved: The MeshWorker::ScratchData::get_general_data_storage() method now has
-a `const` variant.
-<br>
-(Jean-Paul Pelteret, 2021/03/13)

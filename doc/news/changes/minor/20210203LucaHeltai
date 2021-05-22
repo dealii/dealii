@@ -1,3 +1,0 @@
-Fixed: Triangulation::get_manifold_ids() was not returning all ids correctly.
-<br>
-(Luca Heltai, 2021/02/03)

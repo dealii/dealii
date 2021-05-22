@@ -1,4 +1,0 @@
-New: Add a component parameter to FESeries::Fourier/Legendre to
-make them working with non-primitive elements.
-<br>
-(Ce Qin, 2021/03/01)

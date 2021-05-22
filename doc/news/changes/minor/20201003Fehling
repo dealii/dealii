@@ -1,5 +1,0 @@
-New: Helper functions CellAccessor::child_iterators() and
-DoFCellAccessor::child_iterators() which return iterators to children of
-a cell via `cell->child_iterators()`.
-<br>
-(Marc Fehling, 2020/10/03)

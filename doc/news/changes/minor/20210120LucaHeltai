@@ -1,4 +1,0 @@
-New: Added support for gmsh library API. This allows using GridIn::read_msh()
-and GridOut::write_msh() to save and read also manifold id information.
-<br>
-(Luca Heltai, 2021/01/20)
