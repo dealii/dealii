@@ -1224,11 +1224,14 @@ namespace internal
     static void
     compute_weights(
       const MeshType &                         dof_handler_fine,
+      const unsigned int                       mg_level_fine,
       const dealii::AffineConstraints<Number> &constraint_fine,
       const MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>
         &                                         transfer,
       LinearAlgebra::distributed::Vector<Number> &touch_count)
     {
+      (void)mg_level_fine;
+
       LinearAlgebra::distributed::Vector<Number> touch_count_;
       touch_count.reinit(transfer.partitioner_fine);
 
@@ -1682,6 +1685,7 @@ namespace internal
           // compute weights globally
           LinearAlgebra::distributed::Vector<Number> weight_vector;
           compute_weights(dof_handler_fine,
+                          numbers::invalid_unsigned_int /*active level*/,
                           constraint_fine,
                           transfer,
                           weight_vector);
@@ -1761,6 +1765,7 @@ namespace internal
                                                          mg_level_fine,
                                                          mg_level_coarse);
 
+      // TODO: adjust assert
       AssertDimension(
         dof_handler_fine.get_triangulation().n_global_active_cells(),
         dof_handler_coarse.get_triangulation().n_global_active_cells());
@@ -2158,6 +2163,7 @@ namespace internal
           // compute weights globally
           LinearAlgebra::distributed::Vector<Number> weight_vector;
           compute_weights(dof_handler_fine,
+                          mg_level_fine,
                           constraint_fine,
                           transfer,
                           weight_vector);
