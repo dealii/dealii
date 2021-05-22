@@ -1,5 +1,0 @@
-Fixed: A previous patch accidentally broke step-46 and led to
-exceptions about accessing neighboring cells that don't actually exist
-because a cell is at the boundary. This has been fixed.
-<br>
-(Wolfgang Bangerth, 2020/12/03)

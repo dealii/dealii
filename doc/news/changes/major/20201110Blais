@@ -1,3 +1,0 @@
-New: Added capacity to update ghost particles without rebuilding them from scratch in the particle_handler
-<br>
-(Bruno Blais, Peter Munch, 2020/11/10)

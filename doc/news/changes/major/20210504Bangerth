@@ -1,6 +1,0 @@
-New: The step-77 tutorial explores one of the mentioned extensions to step-15,
-namely implementing a proper step length control algorithm. It uses the KINSOL
-nonlinear solver package from the SUNDIALS library to incorporate a line
-search method into the incremental update for Newton's method.
-<br>
-(Wolfgang Bangerth, 2021/05/04)

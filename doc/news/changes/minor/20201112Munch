@@ -1,6 +1,0 @@
-Improved: QCollection<dim> now also accepts Quadrature<1> and converts this
-input quadrature rule to a dim-dimensional quadrature rule internally via
-tensor product. Furthermore, a copy constructor has been added
-accepting QCollection<1>.
-<br>
-(Peter Munch, 2020/11/12)

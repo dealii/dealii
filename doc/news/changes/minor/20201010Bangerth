@@ -1,6 +1,0 @@
-New: step-9 uses the "streamline-upwind Petrov-Galerkin" method, but
-does not make any attempt at explaining what this method is or why it
-might be named like this. This has been rectified: The introduction
-now has a long section that explains the origin of the method and its name.
-<br>
-(Wolfgang Bangerth, 2020/10/10)

@@ -1,4 +1,0 @@
-New: The class hp::MappingCollection has a new constructor. This constructor creates 
-a MappingCollection from one or more mapping objects passed to the constructor.
-<br>
-(Peter Munch, 2020/07/15)

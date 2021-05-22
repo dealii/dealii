@@ -1,8 +1,0 @@
-Deprecated: The DoFHandlerType template argument for the functions
-DataPostprocessorInputs::CommonInputs::set_cell() and
-DataPostprocessorInputs::CommonInputs::get_cell() has been deprecated.
-These functions now only work with the basic `DoFHandler` class. As a
-consequence, the get_cell() function requires an additional dim
-template. For example, write: cell=common_inputs.template get_cell<dim>()
-<br>
-(Marc Fehling, 2020/11/15)

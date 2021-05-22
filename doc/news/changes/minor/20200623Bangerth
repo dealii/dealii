@@ -1,6 +1,0 @@
-Fixed: The ParticleHandler::insert_particles() function forgot to
-associate particles with the common property pool. Consequently,
-setting properties on particles added to a ParticleHandler this way
-led to an error.
-<br>
-(Andrew Davis, Wolfgang Bangerth, 2020/06/23)

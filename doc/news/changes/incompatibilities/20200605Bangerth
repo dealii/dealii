@@ -1,4 +1,0 @@
-Removed: The header file `deal.II/grid/tria_object.h` has been
-removed. It was only used for internal purposes.
-<br>
-(Wolfgang Bangerth, 2020/06/05)

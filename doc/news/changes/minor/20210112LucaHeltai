@@ -1,5 +1,0 @@
-New: Created two new methods ParameterAcceptor::enter_subsection() and
-ParameterAcceptor::leave_subsection() that allow more intricated parameter 
-paths within ParameterAcceptor classes.
-<br>
-(Luca Heltai, 2021/01/12)

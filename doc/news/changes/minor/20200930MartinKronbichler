@@ -1,7 +1,0 @@
-Improved: MappingQGeneric::transform_real_to_unit_cell() has been made much
-faster by directly working with the tensor product form of the mapping shape
-functions and avoiding many unnecessary memory allocations. The main cost is
-now MappingQGeneric::compute_mapping_support_points(), which can be made fast
-with MappingQCache, for example.
-<br>
-(Martin Kronbichler, 2020/09/30)

@@ -1,5 +1,0 @@
-Improved: The result type deduction for the product of symbolic types 
-(specifically, Differentiation::SD::Expression) with tensors and symmetric
-tensors has been improved.
-<br>
-(Jean-Paul Pelteret, 2021/03/13)

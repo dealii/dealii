@@ -1,6 +1,0 @@
-Improved: An inverse quadratic approximation has been added for the pull-back
-operation in the TransfiniteInterpolationManifold::new_points() function. The
-better initial guesses for the Newton/Broyden iteration make the computation
-faster and more robust in some difficult scenarios.
-<br>
-(Martin Kronbichler, 2020/11/01)

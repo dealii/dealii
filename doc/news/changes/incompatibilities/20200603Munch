@@ -1,7 +1,0 @@
-Changed: The binary representation of the Triangulation and DoFHandler classes 
-created by the function `save()` with release 9.2 cannot be read anymore with 
-`load()` due to major internal changes
-of these classes. This change also affects, i.a., the functions
-`GridIn::read_vtu()` and `GridOut::write_vtu()`.
-<br>
-(Peter Munch, 2020/06/03)

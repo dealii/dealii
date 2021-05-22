@@ -1,6 +1,0 @@
-Fixed: Fix a bug where only one CUDAWrappers::MatrixFree object was valid at a
-given time. There is now a variable CUDAWrappers::mf_n_concurrent_objects in
-base/cuda_size.h that controls the maximum number of concurrent objects. The
-default value is five.
-<br>
-(Bruno Turcksin, 2020/05/29)

@@ -1,4 +1,0 @@
-New: The MeshWorker::ScratchData class is now able to compute the Laplacians
-of the scalar-valued and vector-valued components of the solution vector.
-<br>
-(Jean-Paul Pelteret, 2021/03/13)

@@ -1,8 +1,0 @@
-Deprecated: The initialization interface for the DoFHandler class has
-changed. DoFHandler::initialize() and DoFHandler::set_fe() have been
-deprecated. Instead, use the constructor DoFHandler::DoFHandler(tria) or
-DoFHandler::DoFHandler() followed by DoFHandler::reinit(tria) to attach
-a Triangulation tria, and DoFHandler::distribute_dofs() to enumerate
-degrees of freedom.
-<br>
-(Marc Fehling, 2020/10/30)

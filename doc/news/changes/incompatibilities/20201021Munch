@@ -1,6 +1,0 @@
-Changed: MatrixFree::loop() only accepts LinearAlgebra::distributed::Vector arguments
-that have been initialized via MatrixFree::initialize_dof_vector()
-and are as a consequence globally compatible with the 
-Utilities::MPI::Partitioner within internal::MatrixFreeFunctions::DoFInfo. 
-<br>
-(Peter Munch, Martin Kronbichler, 2020/10/21)

@@ -1,4 +1,0 @@
-Deprecated: The class hp::DoFHandler has been deprecated, since the DoFHandler
-has been extended with its functionalities.
-<br>
-(Peter Munch, 2020/05/23)

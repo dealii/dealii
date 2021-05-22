@@ -1,5 +1,0 @@
-New: The old tensor basis transformation functions internal::Physics::transformation_contraction()
-have been moved out of the internal namespace and renamed to
-Physics::Transformations::basis_transformation() and have documentation now.
-<br>
-(Nils Much, 2021/01/12)

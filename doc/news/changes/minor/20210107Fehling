@@ -1,5 +1,0 @@
-New: Function GridTools::get_subdomain_association() determines
-the owning process of any valid cell on a Triangulation that is
-represented by a globally unique CellId.
-<br>
-(Marc Fehling, 2021/01/07)

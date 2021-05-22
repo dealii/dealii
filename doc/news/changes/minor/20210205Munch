@@ -1,4 +1,0 @@
-Improved: AffineConstraints::copy_from() now also works for differing
-number template types.
-<br>
-(Peter Munch, Maximilian Bergbauer, 2021/02/05)

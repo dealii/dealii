@@ -1,7 +1,0 @@
-New: The new method Differentiation::SD::BatchOptimizer::extract() allows one to
-extract results from previous evaluation of the symbolic expressions. 
-This means that one can safely use a single instance of a batch optimizer to
-pre-compute a set of results, cache them, and then later extract some results
-from the cached data without re-evaluating any symbolic expressions.
-<br>
-(Jean-Paul Pelteret, 2021/03/13)

@@ -1,5 +1,0 @@
-New: MGTools::make_sparsity_pattern() can now take an optional
-AffineConstraints argument to add the effect of, e.g., periodic boundary
-conditions.
-<br>
-(Martin Kronbichler, 2020/08/11)

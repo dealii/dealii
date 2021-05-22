@@ -1,6 +1,0 @@
-Added: A multidimensional array dealii::ndarray that allows one to
-conveniently create "stacked" std::array objects that model a
-multidimensional array. `dealii::ndarray<double, 1, 2, 3, 4>` for example
-is a short-hand for `std::array<std::array<std::array<std::array<double, 4>, 3>, 2>, 1>`.
-<br>
-(Matthias Maier, 2021/02/19)

@@ -1,6 +1,0 @@
-New: When executing a task on a separate thread, if that task ends
-with throwing an exception instead of returing a value, then this
-exception will be obtained when you wait for the task using
-Threads::Task::join() or Threads::Task::return_value().
-<br>
-(Wolfgang Bangerth, 2020/05/27)

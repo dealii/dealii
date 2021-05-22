@@ -1,6 +1,0 @@
-New: Add functions CUDAWrappers::local_q_point_id_host(),
-CUDAWrappers::get_quadrature_point_host(), CUDAWrappers::copy_mf_data_to_host(), and
-CUDAWrappers::MatrixFree::get_colored_graph(). These functions can be used to
-evaluate material properties in the same order on the host and on the device.
-<br>
-(Bruno Turcksin, 2020/12/06)

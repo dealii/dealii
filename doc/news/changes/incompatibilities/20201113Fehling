@@ -1,5 +1,0 @@
-Deprecated: The variant of the function MatrixFree::get_dof_handler
-expecting a DoFHandlerType template has been deprecated. Use the 
-template-less variant returning a DoFHandler instead.
-<br>
-(Marc Fehling, 2020/11/13)
