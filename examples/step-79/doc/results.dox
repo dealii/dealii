@@ -1,0 +1,79 @@
+<h1>Results</h1>
+<h3>Test Problem</h3>
+The algorithms used above are tested against a traditional topology optimization
+ problem called the Messerschmitt-Bolkow-Blohm Beam (MBB Beam).
+
+This problem considers the optimal 2-d structure that can be built on a
+rectangle 6 units wide, and 1 unit tall. The bottom corners are fixed in place
+in the $y$ direction using a zero Dirichlet boundary condition, and a downward
+force is applied in the center of the top of the beam by enforcing a Neumann
+boundary condition. The rest of the boundary is allowed to move, and has no
+external force applied, which takes the form of a zero Neumann boundary
+condition. In essence, we are asking the following question: How should we
+design a bridge in a way so that if the bottom left and bottom right point of
+the bridge are on rollers that allow these points to move horizontally but not
+vertically, and so that the displacement in response to the vertical force in
+the center is minimal.
+
+While the total volume of the domain is 6 units, 3 units of material are allowed for
+the structure. Because of the symmetry of the problem, it could be posed on a
+rectangle of width 3 and height 1 by cutting the original domain in half, and
+using zero Dirichlet boundary conditions in the $x$ direction along the cut
+edge. That said, symmetry of the solution is a good indicator that the program
+is working as expected, so we solved the problem on the whole domain,
+as shown below. @cite Bendse2004
+
+<div style="text-align:center;">
+  <img src="https://www.dealii.org/images/steps/developer/step-79.mbbgeometry.png"
+       alt="The MBB problem domain and boundary conditions">
+</div>
+
+
+Using the program discussed above, we find the minimum volume of the MBB Beam and the
+individual components of the solution look as follows:
+
+<div class="onecolumn" style="width: 80%; text-align: center;">
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step-79.filtereddensity.png"
+         alt="Filtered Density Solution">
+  </div>
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step-79.unfiltereddensity.png"
+         alt="Unfiltered Density Solution">
+  </div>
+</div>
+
+
+These pictures show that what we find here is in accordance with what one
+typically sees in other publications on the topic @cite Bendse2004. Maybe more interestingly, the
+result looks like a truss bridge (except that we apply the load at the top of
+the trusses, rather than the bottom as in real truss bridges, akin to a "deck
+truss" bridge), suggesting that the designs that have been used in bridge-
+building for centuries are indeed based on ideas we can now show to be optimal
+in some sense.
+
+
+<h4>Possibilities for extensions</h4>
+
+The results shown above took around 75 iterations to find, which is quite
+concerning given the expense in solving the large linear systems in each
+iteration. Looking at the evolution, it does look as though the convergence has
+moments of happening quickly and moments of happening slowly. We believe this to
+be due to both a lack of precision on when and how to decrease the boundary
+values, as well as our choice of merit function being sub-optimal. In the future,
+a LOQO barrier update replacing the monotone reduction, as well as a Markov
+Filter in place of a merit function will decrease the number of necessary
+iterations significantly.
+
+The barrier decrease is most sensitive in the middle of the convergence, which
+is problematic, as it seems like we need it to decrease quickly, then slowly,
+then quickly again.
+
+Secondly, the linear solver used here is just the sparse direct solver based on
+the SparseDirectUMFPACK class. This works reasonably well on small problems,
+but the formulation of the optimization problem detailed above has quite a large
+number of variables and so the linear problem is not only large but also has a
+lot of nonzero entries in many rows, even on meshes that overall are still
+relatively coarse. As a consequence, the solver time dominates the
+computations, and more sophisticated approaches at solving the linear system
+are necessary.
