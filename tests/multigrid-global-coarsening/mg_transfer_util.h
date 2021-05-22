@@ -25,10 +25,17 @@ using namespace dealii;
 template <typename MeshType, typename Number>
 void
 initialize_dof_vector(LinearAlgebra::distributed::Vector<Number> &vec,
-                      const MeshType &                            dof_handler)
+                      const MeshType &                            dof_handler,
+                      const unsigned int                          level)
 {
   IndexSet locally_relevant_dofs;
-  DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
+  if (level == numbers::invalid_unsigned_int)
+    DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
+  else
+    DoFTools::extract_locally_relevant_level_dofs(dof_handler,
+                                                  level,
+                                                  locally_relevant_dofs);
+
 
   const parallel::TriangulationBase<MeshType::dimension> *dist_tria =
     dynamic_cast<const parallel::TriangulationBase<MeshType::dimension> *>(
@@ -37,7 +44,11 @@ initialize_dof_vector(LinearAlgebra::distributed::Vector<Number> &vec,
   MPI_Comm comm =
     dist_tria != nullptr ? dist_tria->get_communicator() : MPI_COMM_SELF;
 
-  vec.reinit(dof_handler.locally_owned_dofs(), locally_relevant_dofs, comm);
+  vec.reinit(level == numbers::invalid_unsigned_int ?
+               dof_handler.locally_owned_dofs() :
+               dof_handler.locally_owned_mg_dofs(level),
+             locally_relevant_dofs,
+             comm);
 }
 
 template <typename Number>
@@ -54,9 +65,11 @@ template <int dim, typename Number, typename MeshType>
 void
 test_transfer_operator(
   const MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>
-    &             transfer,
-  const MeshType &dof_handler_fine,
-  const MeshType &dof_handler_coarse)
+    &                transfer,
+  const MeshType &   dof_handler_fine,
+  const MeshType &   dof_handler_coarse,
+  const unsigned int mg_level_fine   = numbers::invalid_unsigned_int,
+  const unsigned int mg_level_coarse = numbers::invalid_unsigned_int)
 {
   AffineConstraints<Number> constraint_fine;
   DoFTools::make_hanging_node_constraints(dof_handler_fine, constraint_fine);
@@ -65,8 +78,8 @@ test_transfer_operator(
   // perform prolongation
   LinearAlgebra::distributed::Vector<Number> src, dst;
 
-  initialize_dof_vector(dst, dof_handler_fine);
-  initialize_dof_vector(src, dof_handler_coarse);
+  initialize_dof_vector(dst, dof_handler_fine, mg_level_fine);
+  initialize_dof_vector(src, dof_handler_coarse, mg_level_coarse);
 
   // test prolongation
   {
