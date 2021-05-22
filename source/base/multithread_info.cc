@@ -25,12 +25,6 @@
 #endif
 
 
-#ifdef DEAL_II_WITH_TASKFLOW
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
-#  include <taskflow/taskflow.hpp>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
-#endif
-
 DEAL_II_NAMESPACE_OPEN
 
 
@@ -98,10 +92,6 @@ MultithreadInfo::set_thread_limit(const unsigned int max_threads)
     dummy.terminate();
   dummy.initialize(n_max_threads);
 #endif
-
-#ifdef DEAL_II_WITH_TASKFLOW
-  executor = std::make_unique<tf::Executor>(n_max_threads);
-#endif
 }
 
 
@@ -142,23 +132,6 @@ MultithreadInfo::initialize_multithreading()
   MultithreadInfo::set_thread_limit(numbers::invalid_unsigned_int);
   done = true;
 }
-
-#ifdef DEAL_II_WITH_TASKFLOW
-tf::Executor &
-MultithreadInfo::get_taskflow_executor()
-{
-  // This should not trigger in normal user code, because we initialize the
-  // Executor in the static DoOnce struct at the end of this file unless you
-  // ask for the Executor before this static object gets constructed.
-  Assert(
-    executor.get() != nullptr,
-    ExcMessage(
-      "Please initialize multithreading using MultithreadInfo::set_thread_limit() first."));
-  return *(executor.get());
-}
-
-std::unique_ptr<tf::Executor> MultithreadInfo::executor = nullptr;
-#endif
 
 unsigned int MultithreadInfo::n_max_threads = numbers::invalid_unsigned_int;
 
