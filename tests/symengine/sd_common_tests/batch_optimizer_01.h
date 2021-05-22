@@ -21,6 +21,9 @@
 #include <deal.II/differentiation/ad.h>
 #include <deal.II/differentiation/sd.h>
 
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/vector.h>
+
 #include <iostream>
 
 using namespace dealii;
