@@ -78,7 +78,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  Changed: The order of parameters has been switched in MappingQCache::initialize(), 
+  Changed: The order of parameters has been switched in MappingQCache::initialize(),
   with the Mapping now being the first argument.
   <br>
   (Peter Munch, 2020/05/23)
@@ -140,7 +140,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  Deprecated: All `LinearAlgebra::distributed::Vector::zero_out_ghosts()` has been deprecated. 
+  Deprecated: All `LinearAlgebra::distributed::Vector::zero_out_ghosts()` has been deprecated.
   Use `LinearAlgebra::distributed::Vector::zero_out_ghost_values()` instead.
   <br>
   (Peter Munch, 2021/01/04)
@@ -160,7 +160,7 @@ inconvenience this causes.
   Changed: The interface of FE::fill_fe_face_values() now accepts instead
   of a Quadrature instance a hp::QCollection instance, enabling the evaluation of
   shape functions for different quadrature formulas on different faces for
-  FiniteElement classes with supports for this feature (e.g. FE_Q, FE_SimplexP). 
+  FiniteElement classes with supports for this feature (e.g. FE_Q, FE_SimplexP).
   <br>
   (Peter Munch, 2020/12/12)
  </li>
@@ -250,14 +250,14 @@ inconvenience this causes.
 
  <li>
   Deprecated: The variant of the function MatrixFree::get_dof_handler
-  expecting a DoFHandlerType template has been deprecated. Use the 
+  expecting a DoFHandlerType template has been deprecated. Use the
   template-less variant returning a DoFHandler instead.
   <br>
   (Marc Fehling, 2020/11/13)
  </li>
 
  <li>
-  Deprecated: All `MatrixFree::reinit()` functions without `Mapping` as argument 
+  Deprecated: All `MatrixFree::reinit()` functions without `Mapping` as argument
   have been deprecated. Use the functions that explicit provide the Mapping instead.
   <br>
   (Peter Munch, 2020/11/11)
@@ -285,15 +285,15 @@ inconvenience this causes.
  <li>
   Changed: MatrixFree::loop() only accepts LinearAlgebra::distributed::Vector arguments
   that have been initialized via MatrixFree::initialize_dof_vector()
-  and are as a consequence globally compatible with the 
-  Utilities::MPI::Partitioner within internal::MatrixFreeFunctions::DoFInfo. 
+  and are as a consequence globally compatible with the
+  Utilities::MPI::Partitioner within internal::MatrixFreeFunctions::DoFInfo.
   <br>
   (Peter Munch, Martin Kronbichler, 2020/10/21)
  </li>
 
  <li>
   Changed: The return type of the method Mapping::get_vertices() has been changed
-  from std::array to boost::container::small_vector.  
+  from std::array to boost::container::small_vector.
   <br>
   (Peter Munch, 2020/10/16)
  </li>
@@ -321,16 +321,16 @@ inconvenience this causes.
  <li>
   Changed: The template arguments of the classes DoFAccessor and DoFCellAccessor have changed.
   The template argument DoFHandlerType has been replaced by dimension and
-  space dimension.  
+  space dimension.
   <br>
   (Peter Munch, 2020/06/24)
  </li>
 
  <li>
-  Deprecated: The functions MatrixFree::reinit(), which take 
+  Deprecated: The functions MatrixFree::reinit(), which take
   a vector of hp::DoFHandlers, have been deprecated. Users are asked
   to provide vectors of DoFhandlers, which may contain hp::DoFHandlers. This is
-  possible now since hp::DoFHandler is deriving from DoFHandler.  
+  possible now since hp::DoFHandler is deriving from DoFHandler.
   <br>
   (Peter Munch, 2020/06/03)
  </li>
@@ -349,8 +349,8 @@ inconvenience this causes.
  </li>
 
  <li>
-  Changed: The binary representation of the Triangulation and DoFHandler classes 
-  created by the function `save()` with release 9.2 cannot be read anymore with 
+  Changed: The binary representation of the Triangulation and DoFHandler classes
+  created by the function `save()` with release 9.2 cannot be read anymore with
   `load()` due to major internal changes
   of these classes. This change also affects, i.a., the functions
   `GridIn::read_vtu()` and `GridOut::write_vtu()`.
@@ -464,10 +464,10 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: The class FEPointEvaluation provides an interface to the evaluation of 
-  interpolated solution values and gradients on cells on arbitrary reference 
-  point positions. These points can change from cell to cell, both with 
-  respect to their quantity as well to the location. The two typical use 
+  New: The class FEPointEvaluation provides an interface to the evaluation of
+  interpolated solution values and gradients on cells on arbitrary reference
+  point positions. These points can change from cell to cell, both with
+  respect to their quantity as well to the location. The two typical use
   cases are evaluations on non-matching grids and particle simulations.
   <br>
   (Martin Kronbichler, 2021/05/18)
@@ -508,9 +508,9 @@ inconvenience this causes.
  <li>
   New: Experimental support for simplex meshes (i.e., meshes consisting
   of triangle or tetrahedron cells) and mixed meshes (i.e., meshes consisting
-  of lines, triangles, quadrilateral, tetrahedron, pyramid, wedge, and/or 
-  hexahedron cells) has been added. The new features are presented 
-  in the test folder `tests/simplex` and in the 
+  of lines, triangles, quadrilateral, tetrahedron, pyramid, wedge, and/or
+  hexahedron cells) has been added. The new features are presented
+  in the test folder `tests/simplex` and in the
   new "Simplex" module page.
   <br>
   (various, 2021/03/04)
@@ -519,13 +519,13 @@ inconvenience this causes.
  <li>
   New: The class Utilities::MPI::RemotePointEvaluation and the function
   VectorTools::evaluate_at_points() allow to work on arbitrary distributed
-  points. 
+  points.
   <br>
   (Peter Munch, Martin Kronbichler, Magdalena Schreter, Niklas Fehn, 2021/02/28)
  </li>
 
  <li>
-  New: The communicator of an arbitrary (not just parallel) Triangulation class can now be 
+  New: The communicator of an arbitrary (not just parallel) Triangulation class can now be
   queried via Triangulation::get_communicator() or DoFHandler::get_communicator(). In
   the case of serial Triangulations and DoFHandler set up with serial Triangulations,
   MPI_COMM_SELF is returned.
@@ -606,10 +606,10 @@ inconvenience this causes.
  </li>
 
  <li>
-  Changed: The internal data structures of DoFHandler have been modified to use 
+  Changed: The internal data structures of DoFHandler have been modified to use
   compressed row storage, enabling it to also handle hp::DoFHandler functionalities.
   Currently, the user can choose between the normal mode and the hp mode during
-  calling the constructur. Please note that the multigrid functionalities are only 
+  calling the constructur. Please note that the multigrid functionalities are only
   available during normal mode.
   <br>
   (Peter Munch, 2020/05/23)
@@ -637,7 +637,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  Improved: The images in tutorial 35 have been updated to cold and hot color scheme with higher resolution and more consistent sizing. 
+  Improved: The images in tutorial 35 have been updated to cold and hot color scheme with higher resolution and more consistent sizing.
   <br>
   (Bryn Barker, 2021/05/18)
  </li>
@@ -700,7 +700,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  Bugfix: FE_Nedelec<2>::convert_generalized_support_point_values_to_dof_values() 
+  Bugfix: FE_Nedelec<2>::convert_generalized_support_point_values_to_dof_values()
   now works correctly for every degree.
   <br>
   (Jake Harmon, 2021/04/22)
@@ -772,7 +772,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  Add a new grid generator (subdivided_cylinder) which generates a 
+  Add a new grid generator (subdivided_cylinder) which generates a
   cylinder with a number of x subdivisions which is specified by the user.
   Alter cylinder so that it also uses this new generator to prevent code
   duplication.
@@ -814,9 +814,9 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: The getter function for the divergence in 
-  FEEvaluationAccess<1, 1, Number, is_face, VectorizedArrayType>::get_divergence() 
-  is now also implemented for dim==1 and n_components==1. The function 
+  New: The getter function for the divergence in
+  FEEvaluationAccess<1, 1, Number, is_face, VectorizedArrayType>::get_divergence()
+  is now also implemented for dim==1 and n_components==1. The function
   FEEvaluationAccess<1, 1, Number, is_face, VectorizedArrayType>::submit_gradient()
   now also takes a rank 2 tensor as input argument.
   <br>
@@ -868,7 +868,7 @@ inconvenience this causes.
 
  <li>
   New: The new method Differentiation::SD::BatchOptimizer::extract() allows one to
-  extract results from previous evaluation of the symbolic expressions. 
+  extract results from previous evaluation of the symbolic expressions.
   This means that one can safely use a single instance of a batch optimizer to
   pre-compute a set of results, cache them, and then later extract some results
   from the cached data without re-evaluating any symbolic expressions.
@@ -877,7 +877,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  Improved: The result type deduction for the product of symbolic types 
+  Improved: The result type deduction for the product of symbolic types
   (specifically, Differentiation::SD::Expression) with tensors and symmetric
   tensors has been improved.
   <br>
@@ -899,7 +899,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  Improved: The function VectorTools::get_position_vector() can now also take 
+  Improved: The function VectorTools::get_position_vector() can now also take
   a Mapping object as input parameter.
   <br>
   (Peter Munch, 2021/03/10)
@@ -908,7 +908,7 @@ inconvenience this causes.
  <li>
   New: MappingQCache has new initialize functions. One set of functions takes
   either a std::function or a dealii::Function for transforming
-  individual points. Another set of functions take global vectors (and 
+  individual points. Another set of functions take global vectors (and
   MGLevelObjects of global vectors) and use these to initialize the position of
   the support points much like MappingFEField does.
   <br>
@@ -953,7 +953,7 @@ inconvenience this causes.
  <li>
   New: Member function hp::FECollection::get_hierarchy_sequence() returning
   the sequence of finite element indices that correspond to the registered
-  hierarchy. 
+  hierarchy.
   <br>
   (Marc Fehling, 2021/02/22)
  </li>
@@ -1085,7 +1085,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: The method parallel::distributed::Triagnulation::communicate_locally_moved_vertices() 
+  New: The method parallel::distributed::Triagnulation::communicate_locally_moved_vertices()
   has been refactored and moved to parallel::DistributedTriangulationBase so that it can now also be
   used for parallel::fullydistributed::Triangulation.
   <br>
@@ -1108,7 +1108,7 @@ inconvenience this causes.
 
  <li>
   New: Created two new methods ParameterAcceptor::enter_subsection() and
-  ParameterAcceptor::leave_subsection() that allow more intricated parameter 
+  ParameterAcceptor::leave_subsection() that allow more intricated parameter
   paths within ParameterAcceptor classes.
   <br>
   (Luca Heltai, 2021/01/12)
@@ -1159,7 +1159,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  Fixed: DoFTools::make_periodicity_constraints() was not instantiated for condition 'dim < spacedim'. The instantiation was corrected and a test was added to verify that the function works for such condition.     
+  Fixed: DoFTools::make_periodicity_constraints() was not instantiated for condition 'dim < spacedim'. The instantiation was corrected and a test was added to verify that the function works for such condition.
   <br>
   (Malhar Tidke, 2020/12/23)
  </li>
@@ -1199,7 +1199,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: A new class LowStorageRungeKutta is added to the namespace TimeStepping to 
+  New: A new class LowStorageRungeKutta is added to the namespace TimeStepping to
   implement the explicit low-storage Runge-Kutta methods, see @cite KennedyCarpenterLewis2000 and step-67.
   <br>
   (Jiaqi Zhang, 2020/11/18)
@@ -1230,7 +1230,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  Fixed: There was a bug in 
+  Fixed: There was a bug in
   Differentiation::AD::ScalarFunction::extract_hessian_component()
   that was triggered when using a symmetric tensor extractor with a non-zero
   first component index. Having previously lead to either incorrect results being
@@ -1274,8 +1274,8 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: SSP_THIRD_ORDER is added to the namespace TimeStepping to 
-  implement the explicit third order Strong Stability Preserving (SSP) Runge-Kutta method, 
+  New: SSP_THIRD_ORDER is added to the namespace TimeStepping to
+  implement the explicit third order Strong Stability Preserving (SSP) Runge-Kutta method,
   which is also called the third order Total Variation Diminishing (TVD) Runge-Kutta method, see @cite gottlieb2001strong.
   <br>
   (Jiaqi Zhang, 2020/10/05)
@@ -1452,7 +1452,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: The class hp::MappingCollection has a new constructor. This constructor creates 
+  New: The class hp::MappingCollection has a new constructor. This constructor creates
   a MappingCollection from one or more mapping objects passed to the constructor.
   <br>
   (Peter Munch, 2020/07/15)
@@ -1536,9 +1536,9 @@ inconvenience this causes.
 
  <li>
   New: The class TriaAccessor provides now the capability to query
-  the number of vertices, lines, and faces (with n_vertices(), 
-  n_lines(), n_faces(), vertex_indices(), 
-  line_indices(), face_indices()). The new methods can be used as an 
+  the number of vertices, lines, and faces (with n_vertices(),
+  n_lines(), n_faces(), vertex_indices(),
+  line_indices(), face_indices()). The new methods can be used as an
   alternative to the methods in GeometryInfo.
   <br>
   (Peter Munch, 2020/06/23)
@@ -1561,12 +1561,12 @@ inconvenience this causes.
 
  <li>
   New: Particles::Particle and Particles::ParticleAccessor can now be used as
-  indexable in boost::rtree objects. 
+  indexable in boost::rtree objects.
   <br> (Luca Heltai, 2020/06/15)
  </li>
 
  <li>
-  New: Each cell is assigned a globally unique active cell index and (if requested) 
+  New: Each cell is assigned a globally unique active cell index and (if requested)
   a level cell index. These indices are integers enumerated contiguously within
   each subdomain of the mesh.
   Users can query locally-owned and ghost cells for their indices via CellAccessor::global_active_cell_index()
@@ -1574,17 +1574,17 @@ inconvenience this causes.
   The value is managed automatically by the Triangulation classes.
   Furthermore, triangulations deriving from parallel::TriangulationBase provide partitioners
   for these indices, which can be used to set up ghosted vectors with one entry per
-  cell. 
+  cell.
   <br>
   (Peter Munch, 2020/06/12)
  </li>
 
  <li>
-  New: The function Particles::ParticleHandler::add_global_particles() now takes 
+  New: The function Particles::ParticleHandler::add_global_particles() now takes
   another optional argument, that allows one to set ids arbitrarily. Moreover,
   now the numbering of the ids is correct also if we call the method more than
   one time. Newly added particles, if ids are not specified, now correctly get
-  the first available ids. 
+  the first available ids.
   Added a new version of Particles::ParticleHandler::add_global_particles() that
   takes a vector of Particles::Particle objects instead of just their positions.
   This can be used in conjunction with the signal
@@ -1611,7 +1611,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: Applying user constraints 
+  New: Applying user constraints
   before prolongation in MGTransferPrebuilt.
   <br>
   (Julian Roth and Conrad Clevenger, 2020/06/05)
@@ -1653,7 +1653,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: Add multigrid transfer operators for distributed polynomial and 
+  New: Add multigrid transfer operators for distributed polynomial and
   global coarsening.
   <br>
   (Peter Munch, Laura Prieto Saavedra, 2020/05/29)
