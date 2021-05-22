@@ -102,7 +102,7 @@ public:
    *
    * @deprecated Use initialize() version above instead.
    */
-  DEAL_II_DEPRECATED_EARLY void
+  DEAL_II_DEPRECATED void
   initialize(const Triangulation<dim, spacedim> &  triangulation,
              const MappingQGeneric<dim, spacedim> &mapping);
 

@@ -731,7 +731,7 @@ namespace SUNDIALS
      * specifying the tolerance for the resolution. A part from the tolerance
      * only `rhs` is provided and `dst` needs to be returned.
      */
-    DEAL_II_DEPRECATED_EARLY
+    DEAL_II_DEPRECATED
     std::function<int(const VectorType &rhs, VectorType &dst)>
       solve_jacobian_system;
 

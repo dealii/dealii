@@ -234,7 +234,7 @@ namespace GridTools
    * @deprecated Use the more general function which takes an ArrayView instead.
    */
   template <int dim>
-  DEAL_II_DEPRECATED_EARLY double
+  DEAL_II_DEPRECATED double
   cell_measure(
     const std::vector<Point<dim>> &all_vertices,
     const unsigned int (&vertex_indices)[GeometryInfo<dim>::vertices_per_cell]);

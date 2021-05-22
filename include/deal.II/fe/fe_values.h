@@ -230,7 +230,7 @@ namespace FEValuesViews
      * @deprecated Use the types defined in the surrounding class instead.
      */
     template <typename Number>
-    struct DEAL_II_DEPRECATED_EARLY OutputType
+    struct DEAL_II_DEPRECATED OutputType
     {
       /**
        * An alias for the data type of the product of a @p Number and the
@@ -794,7 +794,7 @@ namespace FEValuesViews
      * @deprecated Use the types defined in the surrounding class instead.
      */
     template <typename Number>
-    struct DEAL_II_DEPRECATED_EARLY OutputType
+    struct DEAL_II_DEPRECATED OutputType
     {
       /**
        * An alias for the data type of the product of a @p Number and the
@@ -1475,7 +1475,7 @@ namespace FEValuesViews
      * @deprecated Use the types defined in the surrounding class instead.
      */
     template <typename Number>
-    struct DEAL_II_DEPRECATED_EARLY OutputType
+    struct DEAL_II_DEPRECATED OutputType
     {
       /**
        * An alias for the data type of the product of a @p Number and the
@@ -1803,7 +1803,7 @@ namespace FEValuesViews
      * @deprecated Use the types defined in the surrounding class instead.
      */
     template <typename Number>
-    struct DEAL_II_DEPRECATED_EARLY OutputType
+    struct DEAL_II_DEPRECATED OutputType
     {
       /**
        * An alias for the data type of the product of a @p Number and the

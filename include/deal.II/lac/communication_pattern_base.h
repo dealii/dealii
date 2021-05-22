@@ -30,7 +30,7 @@ namespace LinearAlgebra
    * originally defined in the LinearAlgebra namespace but is now used for more
    * general purposes.
    */
-  using CommunicationPatternBase DEAL_II_DEPRECATED_EARLY =
+  using CommunicationPatternBase DEAL_II_DEPRECATED =
     Utilities::MPI::CommunicationPatternBase;
 } // end of namespace LinearAlgebra
 

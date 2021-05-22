@@ -545,7 +545,7 @@ namespace SUNDIALS
      *   AdditionalData::maximum_newton_step variable to one, indicating
      *   that the Jacobian should be re-computed in every iteration.
      */
-    DEAL_II_DEPRECATED_EARLY
+    DEAL_II_DEPRECATED
     std::function<int(const VectorType &ycur,
                       const VectorType &fcur,
                       const VectorType &rhs,
