@@ -1230,18 +1230,23 @@ namespace internal
         &                                         transfer,
       LinearAlgebra::distributed::Vector<Number> &touch_count)
     {
-      (void)mg_level_fine;
-
       LinearAlgebra::distributed::Vector<Number> touch_count_;
       touch_count.reinit(transfer.partitioner_fine);
 
       IndexSet locally_relevant_dofs;
-      DoFTools::extract_locally_relevant_dofs(dof_handler_fine,
-                                              locally_relevant_dofs);
+      if (mg_level_fine == numbers::invalid_unsigned_int)
+        DoFTools::extract_locally_relevant_dofs(dof_handler_fine,
+                                                locally_relevant_dofs);
+      else
+        DoFTools::extract_locally_relevant_level_dofs(dof_handler_fine,
+                                                      mg_level_fine,
+                                                      locally_relevant_dofs);
 
       const auto partitioner_fine_ =
         std::make_shared<Utilities::MPI::Partitioner>(
-          dof_handler_fine.locally_owned_dofs(),
+          mg_level_fine == numbers::invalid_unsigned_int ?
+            dof_handler_fine.locally_owned_dofs() :
+            dof_handler_fine.locally_owned_mg_dofs(mg_level_fine),
           locally_relevant_dofs,
           dof_handler_fine.get_communicator());
       transfer.vec_fine.reinit(transfer.partitioner_fine);
@@ -1250,18 +1255,40 @@ namespace internal
 
       std::vector<types::global_dof_index> local_dof_indices;
 
-      for (const auto &cell : dof_handler_fine.active_cell_iterators())
+      if (mg_level_fine == numbers::invalid_unsigned_int)
         {
-          if (cell->is_locally_owned() == false)
-            continue;
+          for (const auto &cell : dof_handler_fine.active_cell_iterators())
+            {
+              if (cell->is_locally_owned() == false)
+                continue;
 
-          local_dof_indices.resize(cell->get_fe().n_dofs_per_cell());
+              local_dof_indices.resize(cell->get_fe().n_dofs_per_cell());
 
-          cell->get_dof_indices(local_dof_indices);
+              cell->get_dof_indices(local_dof_indices);
 
-          for (auto i : local_dof_indices)
-            if (constraint_fine.is_constrained(i) == false)
-              touch_count_[i] += 1;
+              for (auto i : local_dof_indices)
+                if (constraint_fine.is_constrained(i) == false)
+                  touch_count_[i] += 1;
+            }
+        }
+      else
+        {
+          for (const auto &cell :
+               dof_handler_fine.mg_cell_iterators_on_level(mg_level_fine))
+            {
+              if (cell->level_subdomain_id() !=
+                  dof_handler_fine.get_triangulation()
+                    .locally_owned_subdomain())
+                continue;
+
+              local_dof_indices.resize(cell->get_fe().n_dofs_per_cell());
+
+              cell->get_mg_dof_indices(local_dof_indices);
+
+              for (auto i : local_dof_indices)
+                if (constraint_fine.is_constrained(i) == false)
+                  touch_count_[i] += 1;
+            }
         }
 
       touch_count_.compress(VectorOperation::add);
