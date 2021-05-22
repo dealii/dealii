@@ -3201,10 +3201,10 @@ public:
   max_adjacent_cells() const;
 
   /**
-   * This function always returns @p invalid_subdomain_id but is there for
-   * compatibility with the derived @p parallel::distributed::Triangulation
-   * class. For distributed parallel triangulations this function returns the
-   * subdomain id of those cells that are owned by the current processor.
+   * This function returns the locally owned subdomain. For a serial
+   * triangulation, the returned value is always zero. For parallel
+   * triangulations the value corresponds to the rank of current process
+   * within the MPI communicator passed to their constructors.
    */
   virtual types::subdomain_id
   locally_owned_subdomain() const;
