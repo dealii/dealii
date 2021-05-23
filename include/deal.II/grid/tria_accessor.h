@@ -956,7 +956,7 @@ public:
   /**
    * @deprecated Use n_active_descendants() instead.
    */
-  DEAL_II_DEPRECATED_EARLY
+  DEAL_II_DEPRECATED
   unsigned int
   number_of_children() const;
 
@@ -2140,7 +2140,7 @@ public:
   /**
    * @deprecated Use n_active_descendants() instead.
    */
-  DEAL_II_DEPRECATED_EARLY
+  DEAL_II_DEPRECATED
   static unsigned int
   number_of_children();
 
@@ -2606,7 +2606,7 @@ public:
   /**
    * @deprecated Use n_active_descendants() instead.
    */
-  DEAL_II_DEPRECATED_EARLY
+  DEAL_II_DEPRECATED
   static unsigned int
   number_of_children();
 

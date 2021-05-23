@@ -1455,7 +1455,7 @@ namespace DoFTools
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   template <int dim, int spacedim>
-  DEAL_II_DEPRECATED_EARLY void
+  DEAL_II_DEPRECATED void
   extract_boundary_dofs(const DoFHandler<dim, spacedim> &   dof_handler,
                         const ComponentMask &               component_mask,
                         std::vector<bool> &                 selected_dofs,
@@ -1516,7 +1516,7 @@ namespace DoFTools
    * @deprecated Use the previous function instead.
    */
   template <int dim, int spacedim>
-  DEAL_II_DEPRECATED_EARLY void
+  DEAL_II_DEPRECATED void
   extract_boundary_dofs(const DoFHandler<dim, spacedim> &   dof_handler,
                         const ComponentMask &               component_mask,
                         IndexSet &                          selected_dofs,

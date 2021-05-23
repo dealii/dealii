@@ -34,7 +34,7 @@ DEAL_II_NAMESPACE_OPEN
  * this class. Usage of the old-style numbering is deprecated.
  */
 template <int dim, int spacedim = dim>
-class DEAL_II_DEPRECATED_EARLY GridReordering
+class DEAL_II_DEPRECATED GridReordering
 {
 public:
   /**
@@ -53,7 +53,7 @@ public:
    *
    * @deprecated Use GridTools::consistently_order_cells() instead.
    */
-  DEAL_II_DEPRECATED_EARLY
+  DEAL_II_DEPRECATED
   static void
   reorder_cells(std::vector<CellData<dim>> &original_cells,
                 const bool                  use_new_style_ordering = false);
@@ -83,7 +83,7 @@ public:
    *
    * @deprecated Use GridTools::invert_all_negative_measure_cells() instead.
    */
-  DEAL_II_DEPRECATED_EARLY
+  DEAL_II_DEPRECATED
   static void
   invert_all_cells_of_negative_grid(
     const std::vector<Point<spacedim>> &all_vertices,

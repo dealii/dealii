@@ -351,7 +351,7 @@ namespace LinearAlgebra
        *
        * @deprecated Use zero_out_ghost_values() instead.
        */
-      DEAL_II_DEPRECATED_EARLY void
+      DEAL_II_DEPRECATED void
       zero_out_ghosts() const;
 
 

@@ -583,7 +583,7 @@ namespace Threads
     /**
      * Construct a thread object with a function object.
      */
-    DEAL_II_DEPRECATED_EARLY
+    DEAL_II_DEPRECATED
     Thread(const std::function<RT()> &function)
       : thread_descriptor(new internal::ThreadDescriptor<RT>())
     {
@@ -596,13 +596,13 @@ namespace Threads
      * this way, except for assigning it a thread object that holds data
      * created by the new_thread() functions.
      */
-    DEAL_II_DEPRECATED_EARLY
+    DEAL_II_DEPRECATED
     Thread() = default;
 
     /**
      * Copy constructor.
      */
-    DEAL_II_DEPRECATED_EARLY
+    DEAL_II_DEPRECATED
     Thread(const Thread<RT> &t)
       : thread_descriptor(t.thread_descriptor)
     {}
@@ -897,7 +897,7 @@ namespace Threads
    * @deprecated Use TaskGroup instead.
    */
   template <typename RT = void>
-  class DEAL_II_DEPRECATED_EARLY ThreadGroup
+  class DEAL_II_DEPRECATED ThreadGroup
   {
   public:
     /**

@@ -741,7 +741,7 @@ namespace TrilinosWrappers
        *
        * @deprecated This function is deprecated.
        */
-      DEAL_II_DEPRECATED_EARLY
+      DEAL_II_DEPRECATED
       size_type
       local_size() const;
 
