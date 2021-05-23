@@ -464,7 +464,7 @@ namespace SAND
     // The use of the symbolic names defined in namespace
     // `SolutionComponents` helps understand what each of the
     // following terms corresponds to, but it also makes the
-    // expressions lengthy and unwieldy: An term such as
+    // expressions lengthy and unwieldy: A term such as
     // `coupling[SolutionComponents::density_upper_slack_multiplier<dim>][SolutionComponents::density<dim>]`
     // just doesn't read very well, and would either have to be
     // split over several lines or run off the right edge of
@@ -792,9 +792,9 @@ namespace SAND
     // us how far off our filtered density is from the filter
     // applied to the unfiltered density. That is because while at
     // the solution of the nonlinear problem, we have
-    // $\rho=H\sigma$, but at intermediate iterations, we in
-    // general have $\rho^k\neq H\sigma^k$ and the "residual"
-    // $\rho^k-H\sigma^k$ will then appear as the right hand side
+    // $\rho=H\varrho$, but at intermediate iterations, we in
+    // general have $\rho^k\neq H\varrho^k$ and the "residual"
+    // $\rho^k-H\varrho^k$ will then appear as the right hand side
     // of one of the Newton update equations that we compute
     // below.
     BlockVector<double> filtered_unfiltered_density_solution =
