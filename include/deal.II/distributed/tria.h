@@ -50,7 +50,6 @@
 #  include <p8est_ghost.h>
 #endif
 
-
 DEAL_II_NAMESPACE_OPEN
 
 #ifdef DEAL_II_WITH_P4EST
@@ -324,7 +323,15 @@ namespace parallel
          * after a refinement cycle. It can be executed manually by calling
          * repartition().
          */
-        no_automatic_repartitioning = 0x4
+        no_automatic_repartitioning = 0x4,
+        /**
+         * Setting this flag will communicate vertices to p4est. In debug mode,
+         * the vertices will always be communicated. This way one can
+         * use the 'find_point_owner_rank()' to find the MPI rank of the active
+         * cell that owns an arbitrary point in case all attached manifolds are
+         * flat.
+         */
+        communicate_vertices_to_p4est = 0x8
       };
 
 
@@ -387,6 +394,12 @@ namespace parallel
       is_multilevel_hierarchy_constructed() const override;
 
       /**
+       * Return if vertices will be communicated to p4est in release mode.
+       */
+      bool
+      are_vertices_communicated_to_p4est() const;
+
+      /**
        * Transfer data across forests.
        *
        * Besides the actual @p parallel_forest, which has been already refined
@@ -440,6 +453,36 @@ namespace parallel
       create_triangulation(
         const TriangulationDescription::Description<dim, spacedim>
           &construction_data) override;
+
+      /**
+       * Find the MPI rank of the cell that contains this point in a distributed
+       * mesh.
+       *
+       * @note This function calls `find_point_owner_rank(const std::vector<Point<dim>> &points)`
+       * (requires p4est v2.2 and higher). Please see the documentation of
+       * `find_point_owner_rank(const std::vector<Point<dim>> &points)`.
+       */
+      types::subdomain_id
+      find_point_owner_rank(const Point<dim> &p);
+
+      /**
+       * Find the MPI rank of the cells that contain the input points in a
+       * distributed mesh. If any point is not owned by any mesh cell its return
+       * value will be `numbers::invalid_subdomain_id`.
+       *
+       * @note The query points do not need to be owned locally or in the ghost layer.
+       *
+       * @note This function can only be used with p4est v2.2 and higher, flat manifolds
+       * and requires the settings flag
+       * `Settings::communicate_vertices_to_p4est` to be set.
+       *
+       * @note The algorithm is free of communication.
+       *
+       * @param[in] points a list of query points
+       * @return list of owner ranks
+       */
+      std::vector<types::subdomain_id>
+      find_point_owner_rank(const std::vector<Point<dim>> &points);
 
       /**
        * Coarsen and refine the mesh according to refinement and coarsening
@@ -564,6 +607,9 @@ namespace parallel
        *
        * More than anything else, this function is useful for debugging the
        * interface between deal.II and p4est.
+       *
+       * @note To use the function the flag
+       * `Settings::communicate_vertices_to_p4est` must be set.
        */
       void
       write_mesh_vtk(const std::string &file_basename) const;
@@ -900,6 +946,13 @@ namespace parallel
        * This function is not implemented, but needs to be present for the
        * compiler.
        */
+      bool
+      are_vertices_communicated_to_p4est() const;
+
+      /**
+       * This function is not implemented, but needs to be present for the
+       * compiler.
+       */
       virtual void
       update_cell_relations() override;
 
@@ -972,7 +1025,8 @@ namespace parallel
         default_setting                          = 0x0,
         mesh_reconstruction_after_repartitioning = 0x1,
         construct_multigrid_hierarchy            = 0x2,
-        no_automatic_repartitioning              = 0x4
+        no_automatic_repartitioning              = 0x4,
+        communicate_vertices_to_p4est            = 0x8
       };
 
       /**
@@ -992,6 +1046,16 @@ namespace parallel
        */
       virtual bool
       is_multilevel_hierarchy_constructed() const override
+      {
+        return false;
+      }
+
+      /**
+       * Dummy replacement to allow for better error messages when compiling
+       * this class.
+       */
+      bool
+      are_vertices_communicated_to_p4est() const
       {
         return false;
       }

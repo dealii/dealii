@@ -1,0 +1,13 @@
+
+DEAL:0:2D-Test:: Point search on subdivided hyper cube...
+DEAL:0:2D-Test::   Number of MPI processes = 1
+DEAL:0:2D-Test::   Number of this MPI processes = 0
+DEAL:0:2D-Test::   Number of cells = 256
+DEAL:0:2D-Test::   Number of levels = 4
+DEAL:0:2D-Test::   Number of global levels = 4
+DEAL:0:2D-Test::   Triangulation checksum = 1754413825
+DEAL:0:2D-Test::   points = 0.230000 0.770000    
+DEAL:0:2D-Test::
+DEAL:0:2D-Test::   All point owner ranks found on all processes equal each other. TEST PASSED.
+DEAL:0:2D-Test::
+DEAL:0:2D-Test::   >>> Reached end of test <<<
