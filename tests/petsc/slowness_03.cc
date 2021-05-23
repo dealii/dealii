@@ -22,9 +22,11 @@
 //
 // the tests build the 5-point stencil matrix for a uniform grid of size N*N
 
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/petsc_sparse_matrix.h>
 #include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/sparsity_pattern.h>
 
 #include <iostream>
 
@@ -34,11 +36,47 @@
 void
 test()
 {
-  const unsigned int N = 200;
+  const unsigned int N      = 200;
+  const unsigned int n_dofs = N * N;
 
-  // build the sparse matrix
-  PETScWrappers::MPI::SparseMatrix matrix(
-    PETSC_COMM_WORLD, N * N, N * N, N * N, N * N, 5);
+  DynamicSparsityPattern dsp(n_dofs, n_dofs);
+  // An older version of this test relied on PETSc doing dynamic allocation, but
+  // we require sparsity patterns in constructors now so we need the sparsity
+  // pattern ahead of time - hence this is done twice
+  for (unsigned int i = 0; i < N; i++)
+    for (unsigned int j = 0; j < N; j++)
+      {
+        const unsigned int global = i * N + j;
+        dsp.add(global, global);
+        if (j > 0)
+          {
+            dsp.add(global - 1, global);
+            dsp.add(global, global - 1);
+          }
+        if (j < N - 1)
+          {
+            dsp.add(global + 1, global);
+            dsp.add(global, global + 1);
+          }
+        if (i > 0)
+          {
+            dsp.add(global - N, global);
+            dsp.add(global, global - N);
+          }
+        if (i < N - 1)
+          {
+            dsp.add(global + N, global);
+            dsp.add(global, global + N);
+          }
+      }
+
+  SparsityPattern sparsity_pattern;
+  sparsity_pattern.copy_from(dsp);
+  IndexSet all_dofs(n_dofs);
+  all_dofs.add_range(0, n_dofs);
+
+  PETScWrappers::MPI::SparseMatrix matrix;
+  matrix.reinit(all_dofs, all_dofs, sparsity_pattern, PETSC_COMM_WORLD);
   for (unsigned int i = 0; i < N; i++)
     for (unsigned int j = 0; j < N; j++)
       {

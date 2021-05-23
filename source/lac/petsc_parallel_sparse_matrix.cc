@@ -49,47 +49,6 @@ namespace PETScWrappers
       destroy_matrix(matrix);
     }
 
-    SparseMatrix::SparseMatrix(const MPI_Comm &communicator,
-                               const size_type m,
-                               const size_type n,
-                               const size_type local_rows,
-                               const size_type local_columns,
-                               const size_type n_nonzero_per_row,
-                               const bool      is_symmetric,
-                               const size_type n_offdiag_nonzero_per_row)
-      : communicator(communicator)
-    {
-      do_reinit(m,
-                n,
-                local_rows,
-                local_columns,
-                n_nonzero_per_row,
-                is_symmetric,
-                n_offdiag_nonzero_per_row);
-    }
-
-
-
-    SparseMatrix::SparseMatrix(
-      const MPI_Comm &              communicator,
-      const size_type               m,
-      const size_type               n,
-      const size_type               local_rows,
-      const size_type               local_columns,
-      const std::vector<size_type> &row_lengths,
-      const bool                    is_symmetric,
-      const std::vector<size_type> &offdiag_row_lengths)
-      : communicator(communicator)
-    {
-      do_reinit(m,
-                n,
-                local_rows,
-                local_columns,
-                row_lengths,
-                is_symmetric,
-                offdiag_row_lengths);
-    }
-
 
 
     template <typename SparsityPatternType>
@@ -108,6 +67,7 @@ namespace PETScWrappers
                 this_process,
                 preset_nonzero_locations);
     }
+
 
 
     void
@@ -144,59 +104,6 @@ namespace PETScWrappers
       const PetscErrorCode ierr =
         MatCopy(other.matrix, matrix, SAME_NONZERO_PATTERN);
       AssertThrow(ierr == 0, ExcPETScError(ierr));
-    }
-
-    void
-    SparseMatrix::reinit(const MPI_Comm &communicator,
-                         const size_type m,
-                         const size_type n,
-                         const size_type local_rows,
-                         const size_type local_columns,
-                         const size_type n_nonzero_per_row,
-                         const bool      is_symmetric,
-                         const size_type n_offdiag_nonzero_per_row)
-    {
-      this->communicator = communicator;
-
-      // get rid of old matrix and generate a new one
-      const PetscErrorCode ierr = destroy_matrix(matrix);
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
-
-      do_reinit(m,
-                n,
-                local_rows,
-                local_columns,
-                n_nonzero_per_row,
-                is_symmetric,
-                n_offdiag_nonzero_per_row);
-    }
-
-
-
-    void
-    SparseMatrix::reinit(const MPI_Comm &              communicator,
-                         const size_type               m,
-                         const size_type               n,
-                         const size_type               local_rows,
-                         const size_type               local_columns,
-                         const std::vector<size_type> &row_lengths,
-                         const bool                    is_symmetric,
-                         const std::vector<size_type> &offdiag_row_lengths)
-    {
-      this->communicator = communicator;
-
-      // get rid of old matrix and generate a
-      // new one
-      const PetscErrorCode ierr = destroy_matrix(matrix);
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
-
-      do_reinit(m,
-                n,
-                local_rows,
-                local_columns,
-                row_lengths,
-                is_symmetric,
-                offdiag_row_lengths);
     }
 
 
@@ -241,110 +148,6 @@ namespace PETScWrappers
       do_reinit(local_rows, local_columns, sparsity_pattern);
     }
 
-    void
-    SparseMatrix::do_reinit(const size_type m,
-                            const size_type n,
-                            const size_type local_rows,
-                            const size_type local_columns,
-                            const size_type n_nonzero_per_row,
-                            const bool      is_symmetric,
-                            const size_type n_offdiag_nonzero_per_row)
-    {
-      Assert(local_rows <= m, ExcLocalRowsTooLarge(local_rows, m));
-
-      // use the call sequence indicating only
-      // a maximal number of elements per row
-      // for all rows globally
-      const PetscErrorCode ierr = MatCreateAIJ(communicator,
-                                               local_rows,
-                                               local_columns,
-                                               m,
-                                               n,
-                                               n_nonzero_per_row,
-                                               nullptr,
-                                               n_offdiag_nonzero_per_row,
-                                               nullptr,
-                                               &matrix);
-      set_matrix_option(matrix, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
-
-      // set symmetric flag, if so requested
-      if (is_symmetric == true)
-        {
-          set_matrix_option(matrix, MAT_SYMMETRIC, PETSC_TRUE);
-        }
-    }
-
-
-
-    void
-    SparseMatrix::do_reinit(const size_type               m,
-                            const size_type               n,
-                            const size_type               local_rows,
-                            const size_type               local_columns,
-                            const std::vector<size_type> &row_lengths,
-                            const bool                    is_symmetric,
-                            const std::vector<size_type> &offdiag_row_lengths)
-    {
-      Assert(local_rows <= m, ExcLocalRowsTooLarge(local_rows, m));
-
-      Assert(row_lengths.size() == m,
-             ExcDimensionMismatch(row_lengths.size(), m));
-
-      // For the case that local_columns is smaller than one of the row lengths
-      // MatCreateMPIAIJ throws an error. In this case use a
-      // PETScWrappers::SparseMatrix
-      for (const size_type row_length : row_lengths)
-        {
-          (void)row_length;
-          Assert(row_length <= local_columns,
-                 ExcIndexRange(row_length, 1, local_columns + 1));
-        }
-
-      // use the call sequence indicating a
-      // maximal number of elements for each
-      // row individually. annoyingly, we
-      // always use unsigned ints for cases
-      // like this, while PETSc wants to see
-      // signed integers. so we have to
-      // convert, unless we want to play dirty
-      // tricks with conversions of pointers
-      const std::vector<PetscInt> int_row_lengths(row_lengths.begin(),
-                                                  row_lengths.end());
-      const std::vector<PetscInt> int_offdiag_row_lengths(
-        offdiag_row_lengths.begin(), offdiag_row_lengths.end());
-
-      // TODO: There must be a significantly better way to provide information
-      // about the off-diagonal blocks of the matrix. this way, petsc keeps
-      // allocating tiny chunks of memory, and gets completely hung up over this
-      const PetscErrorCode ierr =
-        MatCreateAIJ(communicator,
-                     local_rows,
-                     local_columns,
-                     m,
-                     n,
-                     0,
-                     int_row_lengths.data(),
-                     0,
-                     offdiag_row_lengths.size() ?
-                       int_offdiag_row_lengths.data() :
-                       nullptr,
-                     &matrix);
-
-      // TODO: Sometimes the actual number of nonzero entries allocated is
-      // greater than the number of nonzero entries, which petsc will complain
-      // about unless explicitly disabled with MatSetOption. There is probably a
-      // way to prevent a different number nonzero elements being allocated in
-      // the first place. (See also previous TODO).
-      set_matrix_option(matrix, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
-
-      // set symmetric flag, if so requested
-      if (is_symmetric == true)
-        {
-          set_matrix_option(matrix, MAT_SYMMETRIC, PETSC_TRUE);
-        }
-    }
 
 
     template <typename SparsityPatternType>
