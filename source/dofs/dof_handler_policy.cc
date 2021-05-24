@@ -3442,10 +3442,13 @@ namespace internal
             // one-to-one relation between old and new DoFs.
             std::vector<unsigned int> flag_1(this->dof_handler->n_dofs(), 0);
             std::vector<unsigned int> flag_2(this->dof_handler->n_dofs(), 0);
+            std::vector<IndexSet>     locally_owned_dofs_per_processor =
+              Utilities::MPI::all_gather(
+                tr->get_communicator(),
+                this->dof_handler->locally_owned_dofs());
             for (unsigned int i = 0; i < n_cpu; i++)
               {
-                const IndexSet iset =
-                  this->dof_handler->locally_owned_dofs_per_processor()[i];
+                const IndexSet iset = locally_owned_dofs_per_processor[i];
                 for (types::global_dof_index ind = 0; ind < iset.n_elements();
                      ind++)
                   {
