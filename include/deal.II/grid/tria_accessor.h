@@ -729,7 +729,7 @@ public:
   /**
    * Move constructor.
    */
-  TriaAccessor(TriaAccessor &&) = default;
+  TriaAccessor(TriaAccessor &&) noexcept = default;
 
   /**
    * Conversion constructor. This constructor exists to make certain
@@ -769,7 +769,7 @@ public:
    * Move assignment operator. Moving is allowed.
    */
   TriaAccessor &
-  operator=(TriaAccessor &&) = default;
+  operator=(TriaAccessor &&) noexcept = default;
 
   /**
    * Defaulted destructor.
