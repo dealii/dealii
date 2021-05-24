@@ -1616,10 +1616,10 @@ namespace internal
             data_cells_local.back().first[my_q].JxW_values.size());
           cell_data[my_q].jacobians[0].resize_fast(
             cell_data[my_q].JxW_values.size());
-          if (update_flags_cells & update_jacobian_grads)
+          if ((update_flags_cells & update_jacobian_grads) != 0)
             cell_data[my_q].jacobian_gradients[0].resize_fast(
               cell_data[my_q].JxW_values.size());
-          if (update_flags_cells & update_quadrature_points)
+          if ((update_flags_cells & update_quadrature_points) != 0)
             {
               cell_data[my_q].quadrature_point_offsets.resize(cell_type.size());
               cell_data[my_q].quadrature_points.resize_fast(
@@ -2836,10 +2836,10 @@ namespace internal
 
           my_data.JxW_values.resize_fast(max_size);
           my_data.jacobians[0].resize_fast(max_size);
-          if (update_flags_cells & update_jacobian_grads)
+          if ((update_flags_cells & update_jacobian_grads) != 0)
             my_data.jacobian_gradients[0].resize_fast(max_size);
 
-          if (update_flags_cells & update_quadrature_points)
+          if ((update_flags_cells & update_quadrature_points) != 0)
             {
               my_data.quadrature_point_offsets.resize(cell_type.size());
               for (unsigned int cell = 1; cell < cell_type.size(); ++cell)
@@ -3067,7 +3067,7 @@ namespace internal
       const unsigned int n_quads = face_data_by_cells.size();
       const unsigned int n_lanes = VectorizedArrayType::size();
       UpdateFlags        update_flags =
-        (update_flags_faces_by_cells & update_quadrature_points ?
+        ((update_flags_faces_by_cells & update_quadrature_points) != 0 ?
            update_quadrature_points :
            update_default) |
         update_normal_vectors | update_JxW_values | update_jacobians;

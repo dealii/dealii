@@ -72,8 +72,9 @@ namespace parallel
       settings = construction_data.settings;
 
       // set the smoothing properties
-      if (settings &
-          TriangulationDescription::Settings::construct_multigrid_hierarchy)
+      if ((settings &
+           TriangulationDescription::Settings::construct_multigrid_hierarchy) !=
+          0)
         this->set_mesh_smoothing(
           static_cast<
             typename dealii::Triangulation<dim, spacedim>::MeshSmoothing>(
@@ -201,8 +202,8 @@ namespace parallel
                     cell->set_subdomain_id(cell_info->subdomain_id);
 
                   // level subdomain id
-                  if (settings & TriangulationDescription::Settings::
-                                   construct_multigrid_hierarchy)
+                  if ((settings & TriangulationDescription::Settings::
+                                    construct_multigrid_hierarchy) != 0)
                     cell->set_level_subdomain_id(cell_info->level_subdomain_id);
                 }
             }
@@ -363,9 +364,8 @@ namespace parallel
     bool
     Triangulation<dim, spacedim>::is_multilevel_hierarchy_constructed() const
     {
-      return (
-        settings &
-        TriangulationDescription::Settings::construct_multigrid_hierarchy);
+      return (settings & TriangulationDescription::Settings::
+                           construct_multigrid_hierarchy) != 0;
     }
 
 

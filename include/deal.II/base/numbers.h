@@ -518,7 +518,7 @@ namespace numbers
   inline bool
   is_nan(const double x)
   {
-    return std::isnan(x) != 0;
+    return std::isnan(x);
   }
 
 
