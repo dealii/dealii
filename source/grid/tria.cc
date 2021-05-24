@@ -10992,7 +10992,8 @@ Triangulation<dim, spacedim>::clear_user_data()
 {
   // let functions in anonymous namespace do their work
   dealii::clear_user_data(levels);
-  dealii::clear_user_data(faces.get());
+  if (dim > 1)
+    dealii::clear_user_data(faces.get());
 }
 
 
