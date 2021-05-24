@@ -761,19 +761,19 @@ public:
    * this operation is not useful for iterators on triangulations.
    * Consequently, this operator is declared as deleted and can not be used.
    */
-  void
+  TriaAccessor &
   operator=(const TriaAccessor &) = delete;
 
   /**
-   * Move assignemt operator. Moving is allowed.
+   * Move assignment operator. Moving is allowed.
    */
-  void
+  TriaAccessor &
   operator=(TriaAccessor &&) = default;
 
   /**
    * Defaulted destructor.
    */
-  ~TriaAcessor() = default;
+  ~TriaAccessor() = default;
 
   /**
    * Test for the element being used or not.  The return value is @p true for
