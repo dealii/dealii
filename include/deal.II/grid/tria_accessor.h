@@ -721,6 +721,17 @@ public:
                const AccessorData *                local_data = nullptr);
 
   /**
+   * The copy constructor is not deleted but copied constructed elements should
+   * not be modified, also the comments to the copy assignemtn operator.
+   */
+  TriaAccessor(const TriaAccessor &) = default;
+
+  /**
+   * Move constructor.
+   */
+  TriaAccessor(TriaAccessor &&) noexcept = default;
+
+  /**
    * Conversion constructor. This constructor exists to make certain
    * constructs simpler to write in dimension independent code. For example,
    * it allows assigning a face iterator to a line iterator, an operation that
@@ -751,8 +762,19 @@ public:
    * this operation is not useful for iterators on triangulations.
    * Consequently, this operator is declared as deleted and can not be used.
    */
-  void
+  TriaAccessor &
   operator=(const TriaAccessor &) = delete;
+
+  /**
+   * Move assignment operator. Moving is allowed.
+   */
+  TriaAccessor &
+  operator=(TriaAccessor &&) noexcept = default;
+
+  /**
+   * Defaulted destructor.
+   */
+  ~TriaAccessor() = default;
 
   /**
    * Test for the element being used or not.  The return value is @p true for
