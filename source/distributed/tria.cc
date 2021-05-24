@@ -794,7 +794,7 @@ namespace
       }
 
     // p4est cell is not in list
-    return 1;
+    return 0;
   }
 
 
@@ -858,7 +858,7 @@ namespace
       }
 
     // p4est cell is not in list
-    return 1;
+    return 0;
   }
 
 
