@@ -6,7 +6,7 @@ structure that is bearing some load. Ideally, we would like to minimize the
 maximum stress placed on a structure by selecting a region $E$ where material is
 placed. In other words,
 @f[
-  \text{Minimize}\| \boldsymbol{\sigma} (\mathbf{u}) \|_\infty
+  \text{minimize}\| \boldsymbol{\sigma} (\mathbf{u}) \|_\infty
 @f]
 @f[
   \text{subject to } |E|\leq V_{\max},
@@ -35,7 +35,7 @@ measure of the potential energy stored in an object due to its deformation, but
 also works as a measure of total deformation over the structure.
 
 @f[
-  \text{Minimize  } \int_E \frac{1}{2}\boldsymbol{\sigma} : \boldsymbol{\varepsilon} dV
+  \text{minimize  } \int_E \frac{1}{2}\boldsymbol{\sigma} : \boldsymbol{\varepsilon} dV
 @f]
 @f[
   \text{subject to } \|E\| \leq V_{\max}
@@ -91,10 +91,10 @@ optimization problem. Use of SIMP then turns the optimization problem into the
 following:
 
 @f[
-  \text{Minimize  } \int_\Omega \frac{1}{2}\boldsymbol{\sigma}(\rho) : \boldsymbol{\varepsilon}(\rho) d_\Omega
+  \text{minimize  } \int_\Omega \frac{1}{2}\boldsymbol{\sigma}(\rho) : \boldsymbol{\varepsilon}(\rho) d\Omega
 @f]
 @f[
-  \text{subject to } \int_\Omega \rho(x) d_\Omega= V_{\max},
+  \text{subject to } \int_\Omega \rho(x) d\Omega= V_{\max},
 @f]
 @f[
   0<\rho_{\min}\leq \rho(x) \leq 1,
@@ -103,7 +103,7 @@ following:
 
   \nabla \cdot \boldsymbol{\sigma}(\rho) + \mathbf{F} = 0 \quad \text{on } \Omega
 @f]
-The final constraint, the balance of linear momentum (sometimes referred to as the elasticity equation),
+The final constraint, the balance of linear momentum (which we will refer to as the elasticity equation),
  gives a method for finding $\boldsymbol{\sigma}$ and $\boldsymbol{\varepsilon}$ given the density $\rho$.
 
 <h3>Elasticity Equation</h3>
@@ -123,7 +123,7 @@ $\mathbf{u}$ and $\boldsymbol{\sigma}$ as solution variables (as is done in mixe
 formulations).
 
 Furthermore, we will make the assumption that the material is linear isotropic,
-in which case the stress-strain tensor can be expressed in terms of the Lam\'{e}
+in which case the stress-strain tensor can be expressed in terms of the Lam&eacute;
 parameters $\lambda,\mu$ such that
 @f{align}
   \boldsymbol{\sigma} &= \rho^p (\lambda \text{tr}(\boldsymbol{\varepsilon}) \mathbf{I} + 2 \mu \boldsymbol{\varepsilon}) , \\
@@ -242,21 +242,21 @@ the objective function and the constraints by multiplying the constraints by
 Lagrange multipliers. Specifically, we will use the following symbols for the
 Lagrange multipliers for the various constraints:
 <ol>
-    <li> $\mathbf{y}_1 $ - a Lagrange multiplier corresponding to the
-    elasticity constraint </li>
-    <li> $y_2$ - a Lagrange multiplier corresponding to the convolution
-    filter constraint </li>
-    <li> $z_1$ - a Lagrange multiplier corresponding to the lower slack variable </li>
-    <li> $z_2$ - a Lagrange multiplier corresponding to the upper slack variable. </li>
+    <li> $\mathbf{y}_1 $: a Lagrange multiplier corresponding to the
+    elasticity constraint, </li>
+    <li> $y_2$: a Lagrange multiplier corresponding to the convolution
+    filter constraint, </li>
+    <li> $z_1$: a Lagrange multiplier corresponding to the lower slack variable, and </li>
+    <li> $z_2$: a Lagrange multiplier corresponding to the upper slack variable. </li>
 </ol>
 With these variables, the Lagrangian function reads as follows:
 
 @f{align}{
   \mathcal{L} =& \int_{\partial\Omega} \mathbf{u} \cdot \mathbf{t} d\partial\Omega
-   - \alpha \int_\Omega \left(\log(s_1) + \log(s_2)\right) d\Omega-  \left(\int_\Omega
+   - \alpha \int_\Omega \left(\log(s_1) + \log(s_2)\right) d\Omega-  \int_\Omega
    \rho^p \left(\frac{\mu}{2}\left(\boldsymbol{\varepsilon}(\mathbf{y}_1):\boldsymbol{\varepsilon}(\mathbf{u}))
    \right) + \lambda \left( \nabla \cdot \mathbf{u} \nabla \cdot \mathbf{y}_1
-   \right) d\Omega \right)- \int_{\partial \Omega} \mathbf{y}_1 \cdot \mathbf{t} d\partial\Omega \right) \\
+   \right)\right) d\Omega - \int_{\partial \Omega} \mathbf{y}_1 \cdot \mathbf{t} d\partial\Omega  \\
    & -\int_\Omega y_2 (\rho - H(\varrho)) d\Omega - \int_\Omega z_1 (\varrho-s_1) d\Omega
    - \int_\Omega z_2 (1 - s_2 -\varrho) d\Omega
 @f}
@@ -345,13 +345,14 @@ relationships are also inequalities. We will address the nonlinearity using a
 Newton method to compute search directions, and come back to how to deal with
 the inequalities below when talking about step length procedures.
 
-Newton's method applied to the equations above results in the following system.
-Here, variational derivatives with respect to the $\{\bullet\}$ variable are taken
- in the $c_{\{\bullet\}}$ direction. This gives
+Newton's method applied to the equations above results in the system of equations
+listed below.
+Therein, variational derivatives with respect to the $\{\bullet\}$ variable are
+taken in the $c_{\{\bullet\}}$ direction.
 
 <ol>
-<li> Stationarity - these equations ensure we are at a critical point of the
-objective function when constrained
+<li> Stationarity: These equations ensure we are at a critical point of the
+objective function when constrained.
 
 Equation 1
 @f{align}{
@@ -387,7 +388,7 @@ Equation 3
 @f]
 </li>
 
-<li> Primal Feasibility - these equations ensure the equality constraints
+<li> Primal Feasibility: These equations ensure the equality constraints
 are met.
 
 Equation 4
@@ -421,8 +422,8 @@ Equation 7
 @f]
 </li>
 
-<li>Complementary Slackness - these equations essentially ensure the barrier
-is met - in the final solution, we need $s^T z = 0$
+<li>Complementary Slackness: These equations essentially ensure the barrier
+is met - in the final solution, we need $s^T z = 0$.
 
 Equation 8
 @f[
@@ -437,9 +438,9 @@ Equation 9
 @f]
 </li>
 
-<li>Dual Feasibility - Multiplier on slacks and slack variables must be kept
+<li>Dual Feasibility: The Lagrange multiplier on slacks and slack variables must be kept
 greater than 0. (This is the only part not implemented in the
-SANDTopOpt::assemble_system() function)
+`SANDTopOpt::assemble_system()` function.)
 @f[
   s,z \geq 0
 @f]
@@ -564,7 +565,7 @@ penalty parameter should be in the next iteration, rather than using reduction
 factors that are independent of the current solution. That said, such methods
 are also more complicated and we will not do this here.
 
-<h3>Merit Function</h3>
+<h3>Merit %Function</h3>
 
 The algorithm outlined above makes use of a "merit function". Merit functions
 are used to determine whether a step from $x_k$ to a proposed point $x_{k+1}$ is
@@ -596,7 +597,8 @@ there exists some $p_0$ so that for any $p > p_0$, the merit function has its
 minima at the same location as the original problem. This penalty parameter is
 updated (by recommendation of Nocedal and Wright @cite Benson2002) as follows:
 @f[
-  p > \frac{\frac{1}{2} \mathbf{x}^T \cdot \mathbf{H} \cdot \mathbf{x} - \mathbf{x}^T \cdot \nabla f}{\|c_i\|_{l_\infty}, i \in \mathcal{E}} ,
+  p > \frac{\frac{1}{2} \mathbf{x}^T \cdot \mathbf{H} \cdot \mathbf{x} - \mathbf{x}^T \cdot \nabla f}{\|c_i\|_{l_\infty}}
+  \quad , i \in \mathcal{E},
 @f]
 where $\mathbf{H}$ is the Hessian of the objective function, $\mathbf{x}$ is a vector of our
 decision (primal) variables, $f$ is the objective function, and $c_i$ is the error on a
