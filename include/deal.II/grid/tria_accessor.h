@@ -721,12 +721,13 @@ public:
                const AccessorData *                local_data = nullptr);
 
   /**
-   * Similar to the copy assignment operator the copy constructor is deleted.
+   * The copy constructor is not deleted but copied constructed elements should
+   * not be modified, also the comments to the copy assignemtn operator.
    */
-  TriaAccessor(const TriaAccessor &) = delete;
+  TriaAccessor(const TriaAccessor &) = default;
 
   /**
-   * Move construction is still allowed.
+   * Move constructor.
    */
   TriaAccessor(TriaAccessor &&) = default;
 
