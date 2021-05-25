@@ -123,6 +123,28 @@ namespace internal
       DoFInfo(const DoFInfo &) = default;
 
       /**
+       * Move constructor.
+       */
+      DoFInfo(DoFInfo &&) noexcept = default;
+
+      /**
+       * Destructor.
+       */
+      ~DoFInfo() = default;
+
+      /**
+       * Copy assignment operator.
+       */
+      DoFInfo &
+      operator=(const DoFInfo &) = default;
+
+      /**
+       * Move assignment operator.
+       */
+      DoFInfo &
+      operator=(DoFInfo &&) noexcept = default;
+
+      /**
        * Clear all data fields in this class.
        */
       void
