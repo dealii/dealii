@@ -60,11 +60,11 @@ namespace SUNDIALS
   {
     template <typename VectorType>
     int
-    t_dae_residual(realtype tt,
-                   N_Vector yy,
-                   N_Vector yp,
-                   N_Vector rr,
-                   void *   user_data)
+    residual_callback(realtype tt,
+                      N_Vector yy,
+                      N_Vector yp,
+                      N_Vector rr,
+                      void *   user_data)
     {
       IDA<VectorType> &solver = *static_cast<IDA<VectorType> *>(user_data);
 
@@ -112,12 +112,12 @@ namespace SUNDIALS
 
     template <typename VectorType>
     int
-    t_dae_solve(IDAMem   IDA_mem,
-                N_Vector b,
-                N_Vector weight,
-                N_Vector yy,
-                N_Vector yp,
-                N_Vector resp)
+    solve_with_jacobian_callback(IDAMem   IDA_mem,
+                                 N_Vector b,
+                                 N_Vector weight,
+                                 N_Vector yy,
+                                 N_Vector yp,
+                                 N_Vector resp)
     {
       (void)weight;
       (void)yy;
@@ -143,16 +143,16 @@ namespace SUNDIALS
 #  else
     template <typename VectorType>
     int
-    t_dae_jacobian_setup(realtype tt,
-                         realtype cj,
-                         N_Vector yy,
-                         N_Vector yp,
-                         N_Vector /* residual */,
-                         SUNMatrix /* ignored */,
-                         void *user_data,
-                         N_Vector /* tmp1 */,
-                         N_Vector /* tmp2 */,
-                         N_Vector /* tmp3 */)
+    setup_jacobian_callback(realtype tt,
+                            realtype cj,
+                            N_Vector yy,
+                            N_Vector yp,
+                            N_Vector /* residual */,
+                            SUNMatrix /* ignored */,
+                            void *user_data,
+                            N_Vector /* tmp1 */,
+                            N_Vector /* tmp2 */,
+                            N_Vector /* tmp3 */)
     {
       Assert(user_data != nullptr, ExcInternalError());
       IDA<VectorType> &solver = *static_cast<IDA<VectorType> *>(user_data);
@@ -169,11 +169,11 @@ namespace SUNDIALS
 
     template <typename VectorType>
     int
-    t_dae_solve_jacobian_system(SUNLinearSolver LS,
-                                SUNMatrix /*ignored*/,
-                                N_Vector x,
-                                N_Vector b,
-                                realtype tol)
+    solve_with_jacobian_callback(SUNLinearSolver LS,
+                                 SUNMatrix /*ignored*/,
+                                 N_Vector x,
+                                 N_Vector b,
+                                 realtype tol)
     {
       IDA<VectorType> &solver = *static_cast<IDA<VectorType> *>(LS->content);
 
@@ -290,7 +290,8 @@ namespace SUNDIALS
     auto yy = internal::make_nvector_view(solution);
     auto yp = internal::make_nvector_view(solution_dot);
 
-    status = IDAInit(ida_mem, t_dae_residual<VectorType>, current_time, yy, yp);
+    status =
+      IDAInit(ida_mem, residual_callback<VectorType>, current_time, yy, yp);
     AssertIDA(status);
     if (get_local_tolerances)
       {
@@ -346,7 +347,7 @@ namespace SUNDIALS
     IDA_mem->ida_lsetup = t_dae_lsetup<VectorType>;
 
     if (solve_jacobian_system)
-      IDA_mem->ida_lsolve = t_dae_solve<VectorType>;
+      IDA_mem->ida_lsolve = solve_with_jacobian_callback<VectorType>;
     else
       AssertThrow(false, ExcFunctionNotProvided("solve_jacobian_system"));
 #    if DEAL_II_SUNDIALS_VERSION_LT(3, 0, 0)
@@ -385,7 +386,7 @@ namespace SUNDIALS
     AssertThrow(solve_jacobian_system || solve_with_jacobian,
                 ExcFunctionNotProvided(
                   "solve_jacobian_system or solve_with_jacobian"));
-    LS->ops->solve = t_dae_solve_jacobian_system<VectorType>;
+    LS->ops->solve = solve_with_jacobian_callback<VectorType>;
 
     // When we set an iterative solver IDA requires that resid is provided. From
     // SUNDIALS docs If an iterative method computes the preconditioned initial
@@ -436,7 +437,7 @@ namespace SUNDIALS
     // Finally tell IDA about
     // it as well. The manual says that this must happen *after*
     // calling IDASetLinearSolver
-    status = IDASetJacFn(ida_mem, &t_dae_jacobian_setup<VectorType>);
+    status = IDASetJacFn(ida_mem, &setup_jacobian_callback<VectorType>);
     AssertIDA(status);
 #  endif
     status = IDASetMaxOrd(ida_mem, data.maximum_order);
