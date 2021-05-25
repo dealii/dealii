@@ -1398,8 +1398,9 @@ namespace Utilities
       std::vector<int> size_all_data(n_procs, 0);
 
       // Exchanging the size of each buffer
-      MPI_Allgather(
+      int ierr = MPI_Allgather(
         &n_local_data, 1, MPI_INT, size_all_data.data(), 1, MPI_INT, comm);
+      AssertThrowMPI(ierr);
 
       // Now computing the displacement, relative to recvbuf,
       // at which to store the incoming buffer
@@ -1412,14 +1413,15 @@ namespace Utilities
       std::vector<char> received_unrolled_buffer(rdispls.back() +
                                                  size_all_data.back());
 
-      MPI_Allgatherv(buffer.data(),
-                     n_local_data,
-                     MPI_CHAR,
-                     received_unrolled_buffer.data(),
-                     size_all_data.data(),
-                     rdispls.data(),
-                     MPI_CHAR,
-                     comm);
+      ierr = MPI_Allgatherv(buffer.data(),
+                            n_local_data,
+                            MPI_CHAR,
+                            received_unrolled_buffer.data(),
+                            size_all_data.data(),
+                            rdispls.data(),
+                            MPI_CHAR,
+                            comm);
+      AssertThrowMPI(ierr);
 
       std::vector<T> received_objects(n_procs);
       for (unsigned int i = 0; i < n_procs; ++i)

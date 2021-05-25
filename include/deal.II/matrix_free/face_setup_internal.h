@@ -299,46 +299,50 @@ namespace internal
               MPI_Status   status;
               unsigned int mysize    = inner_face.second.shared_faces.size();
               unsigned int othersize = numbers::invalid_unsigned_int;
-              MPI_Sendrecv(&mysize,
-                           1,
-                           MPI_UNSIGNED,
-                           inner_face.first,
-                           600 + my_domain,
-                           &othersize,
-                           1,
-                           MPI_UNSIGNED,
-                           inner_face.first,
-                           600 + inner_face.first,
-                           comm,
-                           &status);
+
+              int ierr = MPI_Sendrecv(&mysize,
+                                      1,
+                                      MPI_UNSIGNED,
+                                      inner_face.first,
+                                      600 + my_domain,
+                                      &othersize,
+                                      1,
+                                      MPI_UNSIGNED,
+                                      inner_face.first,
+                                      600 + inner_face.first,
+                                      comm,
+                                      &status);
+              AssertThrowMPI(ierr);
               AssertDimension(mysize, othersize);
               mysize = inner_face.second.n_hanging_faces_smaller_subdomain;
-              MPI_Sendrecv(&mysize,
-                           1,
-                           MPI_UNSIGNED,
-                           inner_face.first,
-                           700 + my_domain,
-                           &othersize,
-                           1,
-                           MPI_UNSIGNED,
-                           inner_face.first,
-                           700 + inner_face.first,
-                           comm,
-                           &status);
+              ierr   = MPI_Sendrecv(&mysize,
+                                  1,
+                                  MPI_UNSIGNED,
+                                  inner_face.first,
+                                  700 + my_domain,
+                                  &othersize,
+                                  1,
+                                  MPI_UNSIGNED,
+                                  inner_face.first,
+                                  700 + inner_face.first,
+                                  comm,
+                                  &status);
+              AssertThrowMPI(ierr);
               AssertDimension(mysize, othersize);
               mysize = inner_face.second.n_hanging_faces_larger_subdomain;
-              MPI_Sendrecv(&mysize,
-                           1,
-                           MPI_UNSIGNED,
-                           inner_face.first,
-                           800 + my_domain,
-                           &othersize,
-                           1,
-                           MPI_UNSIGNED,
-                           inner_face.first,
-                           800 + inner_face.first,
-                           comm,
-                           &status);
+              ierr   = MPI_Sendrecv(&mysize,
+                                  1,
+                                  MPI_UNSIGNED,
+                                  inner_face.first,
+                                  800 + my_domain,
+                                  &othersize,
+                                  1,
+                                  MPI_UNSIGNED,
+                                  inner_face.first,
+                                  800 + inner_face.first,
+                                  comm,
+                                  &status);
+              AssertThrowMPI(ierr);
               AssertDimension(mysize, othersize);
 #  endif
 
@@ -463,44 +467,47 @@ namespace internal
 
                 // make sure the splitting is consistent between both sides
 #  if defined(DEAL_II_WITH_MPI) && defined(DEBUG)
-              MPI_Sendrecv(&split_index,
-                           1,
-                           MPI_UNSIGNED,
-                           inner_face.first,
-                           900 + my_domain,
-                           &othersize,
-                           1,
-                           MPI_UNSIGNED,
-                           inner_face.first,
-                           900 + inner_face.first,
-                           comm,
-                           &status);
+              ierr = MPI_Sendrecv(&split_index,
+                                  1,
+                                  MPI_UNSIGNED,
+                                  inner_face.first,
+                                  900 + my_domain,
+                                  &othersize,
+                                  1,
+                                  MPI_UNSIGNED,
+                                  inner_face.first,
+                                  900 + inner_face.first,
+                                  comm,
+                                  &status);
+              AssertThrowMPI(ierr);
               AssertDimension(split_index, othersize);
-              MPI_Sendrecv(&n_faces_lower_proc,
-                           1,
-                           MPI_UNSIGNED,
-                           inner_face.first,
-                           1000 + my_domain,
-                           &othersize,
-                           1,
-                           MPI_UNSIGNED,
-                           inner_face.first,
-                           1000 + inner_face.first,
-                           comm,
-                           &status);
+              ierr = MPI_Sendrecv(&n_faces_lower_proc,
+                                  1,
+                                  MPI_UNSIGNED,
+                                  inner_face.first,
+                                  1000 + my_domain,
+                                  &othersize,
+                                  1,
+                                  MPI_UNSIGNED,
+                                  inner_face.first,
+                                  1000 + inner_face.first,
+                                  comm,
+                                  &status);
+              AssertThrowMPI(ierr);
               AssertDimension(n_faces_lower_proc, othersize);
-              MPI_Sendrecv(&n_faces_higher_proc,
-                           1,
-                           MPI_UNSIGNED,
-                           inner_face.first,
-                           1100 + my_domain,
-                           &othersize,
-                           1,
-                           MPI_UNSIGNED,
-                           inner_face.first,
-                           1100 + inner_face.first,
-                           comm,
-                           &status);
+              ierr = MPI_Sendrecv(&n_faces_higher_proc,
+                                  1,
+                                  MPI_UNSIGNED,
+                                  inner_face.first,
+                                  1100 + my_domain,
+                                  &othersize,
+                                  1,
+                                  MPI_UNSIGNED,
+                                  inner_face.first,
+                                  1100 + inner_face.first,
+                                  comm,
+                                  &status);
+              AssertThrowMPI(ierr);
               AssertDimension(n_faces_higher_proc, othersize);
 #  endif
 

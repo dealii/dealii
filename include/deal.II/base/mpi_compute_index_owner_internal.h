@@ -359,7 +359,7 @@ namespace Utilities
                   {
                     // wait for an incoming message
                     MPI_Status status;
-                    auto       ierr =
+                    int        ierr =
                       MPI_Probe(MPI_ANY_SOURCE, mpi_tag, comm, &status);
                     AssertThrowMPI(ierr);
 
@@ -876,9 +876,8 @@ namespace Utilities
                  ++c)
               {
                 // wait for an incoming message
-                MPI_Status   status;
-                unsigned int ierr =
-                  MPI_Probe(MPI_ANY_SOURCE, mpi_tag, comm, &status);
+                MPI_Status status;
+                int ierr = MPI_Probe(MPI_ANY_SOURCE, mpi_tag, comm, &status);
                 AssertThrowMPI(ierr);
 
                 // retrieve size of incoming message
