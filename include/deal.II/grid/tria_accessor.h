@@ -2879,6 +2879,22 @@ public:
   CellAccessor(const TriaAccessor<structdim2, dim2, spacedim2> &);
 
   /**
+   * Copy constructor.
+   */
+  CellAccessor(const CellAccessor<dim, spacedim> &) = default;
+
+  /**
+   * Move constructor.
+   */
+  // NOLINTNEXTLINE OSX does not compile with noexcept
+  CellAccessor(CellAccessor<dim, spacedim> &&) = default;
+
+  /**
+   * Destructor.
+   */
+  ~CellAccessor() = default;
+
+  /**
    * Copy operator. These operators are usually used in a context like
    * <tt>iterator a,b; *a=*b;</tt>. Presumably, the intent here is to copy the
    * object pointed to
@@ -2887,8 +2903,15 @@ public:
    * this operation is not useful for iterators on triangulations.
    * Consequently, this operator is declared as deleted and can not be used.
    */
-  void
+  CellAccessor<dim, spacedim> &
   operator=(const CellAccessor<dim, spacedim> &) = delete;
+
+  /**
+   * Move assignment operator.
+   */
+  // NOLINTNEXTLINE OSX does not compile with noexcept
+  CellAccessor<dim, spacedim> &
+  operator=(CellAccessor<dim, spacedim> &&) = default; // NOLINT
 
   /**
    * @}

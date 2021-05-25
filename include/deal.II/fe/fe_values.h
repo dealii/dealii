@@ -314,11 +314,34 @@ namespace FEValuesViews
            const unsigned int                 component);
 
     /**
+     * Copy constructor. This is not a lightweight object so we don't allow
+     * copying and generate a compile-time error if this function is called.
+     */
+    Scalar(const Scalar<dim, spacedim> &) = delete;
+
+    /**
+     * Move constructor.
+     */
+    // NOLINTNEXTLINE OSX does not compile with noexcept
+    Scalar(Scalar<dim, spacedim> &&) = default;
+
+    /**
+     * Destructor.
+     */
+    ~Scalar() = default;
+
+    /**
      * Copy operator. This is not a lightweight object so we don't allow
      * copying and generate a compile-time error if this function is called.
      */
     Scalar &
     operator=(const Scalar<dim, spacedim> &) = delete;
+
+    /**
+     * Move assignment operator.
+     */
+    Scalar &
+    operator=(Scalar<dim, spacedim> &&) noexcept = default;
 
     /**
      * Return the value of the vector component selected by this view, for the
@@ -917,11 +940,35 @@ namespace FEValuesViews
            const unsigned int                 first_vector_component);
 
     /**
+     * Copy constructor. This is not a lightweight object so we don't allow
+     * copying and generate a compile-time error if this function is called.
+     */
+    Vector(const Vector<dim, spacedim> &) = delete;
+
+    /**
+     * Move constuctor.
+     */
+    // NOLINTNEXTLINE OSX does not compile with noexcept
+    Vector(Vector<dim, spacedim> &&) = default;
+
+    /**
+     * Destructor.
+     */
+    ~Vector() = default;
+
+    /**
      * Copy operator. This is not a lightweight object so we don't allow
      * copying and generate a compile-time error if this function is called.
      */
     Vector &
     operator=(const Vector<dim, spacedim> &) = delete;
+
+    /**
+     * Move assignment operator.
+     */
+    // NOLINTNEXTLINE OSX does not compile with noexcept
+    Vector &
+    operator=(Vector<dim, spacedim> &&) = default; // NOLINT
 
     /**
      * Return the value of the vector components selected by this view, for
@@ -1556,11 +1603,29 @@ namespace FEValuesViews
                     const unsigned int                 first_tensor_component);
 
     /**
+     * Copy constructor. This is not a lightweight object so we don't allow
+     * copying and generate a compile-time error if this function is called.
+     */
+    SymmetricTensor(const SymmetricTensor<2, dim, spacedim> &) = delete;
+
+    /**
+     * Move constructor.
+     */
+    // NOLINTNEXTLINE OSX does not compile with noexcept
+    SymmetricTensor(SymmetricTensor<2, dim, spacedim> &&) = default;
+
+    /**
      * Copy operator. This is not a lightweight object so we don't allow
      * copying and generate a compile-time error if this function is called.
      */
     SymmetricTensor &
     operator=(const SymmetricTensor<2, dim, spacedim> &) = delete;
+
+    /**
+     * Move assignment operator.
+     */
+    SymmetricTensor &
+    operator=(SymmetricTensor<2, dim, spacedim> &&) noexcept = default;
 
     /**
      * Return the value of the vector components selected by this view, for
@@ -1880,6 +1945,23 @@ namespace FEValuesViews
     Tensor();
 
     /**
+     * Copy constructor. This is not a lightweight object so we don't allow
+     * copying and generate a compile-time error if this function is called.
+     */
+    Tensor(const Tensor<2, dim, spacedim> &) = delete;
+
+    /**
+     * Move constructor.
+     */
+    // NOLINTNEXTLINE OSX does not compile with noexcept
+    Tensor(Tensor<2, dim, spacedim> &&) = default;
+
+    /**
+     * Destructor.
+     */
+    ~Tensor() = default;
+
+    /**
      * Constructor for an object that represents <code>(dim*dim)</code>
      * components of a FEValuesBase object (or of one of the classes derived
      * from FEValuesBase), representing the unique components comprising a
@@ -1898,6 +1980,12 @@ namespace FEValuesViews
      */
     Tensor &
     operator=(const Tensor<2, dim, spacedim> &) = delete;
+
+    /**
+     * Move assignment operator.
+     */
+    // NOLINTNEXTLINE
+    Tensor &operator=(Tensor<2, dim, spacedim> &&) = default;
 
     /**
      * Return the value of the vector components selected by this view, for

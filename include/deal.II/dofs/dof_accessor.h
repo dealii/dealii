@@ -269,6 +269,23 @@ public:
               const DoFHandler<dim, spacedim> *   dof_handler);
 
   /**
+   * Copy constructor.
+   */
+  DoFAccessor(const DoFAccessor<structdim, dim, spacedim, level_dof_access> &) =
+    default;
+
+  /**
+   * Move constructor.
+   */
+  DoFAccessor(DoFAccessor<structdim, dim, spacedim, level_dof_access>
+                &&) noexcept = default;
+
+  /**
+   * Destructor.
+   */
+  ~DoFAccessor() = default;
+
+  /**
    * Conversion constructor. This constructor exists to make certain
    * constructs simpler to write in dimension independent code. For example,
    * it allows assigning a face iterator to a line iterator, an operation that
@@ -309,6 +326,13 @@ public:
   DoFAccessor<structdim, dim, spacedim, level_dof_access> &
   operator=(const DoFAccessor<structdim, dim, spacedim, level_dof_access> &da) =
     delete;
+
+  /**
+   * Move assignment operator.
+   */
+  DoFAccessor<structdim, dim, spacedim, level_dof_access> &
+  operator=(DoFAccessor<structdim, dim, spacedim, level_dof_access>
+              &&) noexcept = default;
 
   /**
    * @}
@@ -852,6 +876,22 @@ public:
     const DoFAccessor<structdim2, dim2, spacedim2, level_dof_access2> &);
 
   /**
+   * Copy constructor.
+   */
+  DoFAccessor(const DoFAccessor<0, 1, spacedim, level_dof_access> &) = default;
+
+  /**
+   * Move constructor.
+   */
+  // NOLINTNEXTLINE OSX does not compile with noexcept
+  DoFAccessor(DoFAccessor<0, 1, spacedim, level_dof_access> &&) = default;
+
+  /**
+   * Destructor.
+   */
+  ~DoFAccessor() = default;
+
+  /**
    * Copy operator. These operators are usually used in a context like
    * <tt>iterator a,b; *a=*b;</tt>. Presumably, the intent here is to copy the
    * object pointed to
@@ -862,6 +902,12 @@ public:
    */
   DoFAccessor<0, 1, spacedim, level_dof_access> &
   operator=(const DoFAccessor<0, 1, spacedim, level_dof_access> &da) = delete;
+
+  /**
+   * Move assignment operator.
+   */
+  DoFAccessor<0, 1, spacedim, level_dof_access> &operator      =(
+    DoFAccessor<0, 1, spacedim, level_dof_access> &&) noexcept = default;
 
   /**
    * @}
@@ -1400,6 +1446,25 @@ public:
     const DoFAccessor<structdim2, dim2, spacedim2, level_dof_access2> &);
 
   /**
+   * Copy constructor.
+   */
+  DoFCellAccessor(
+    const DoFCellAccessor<dimension_, space_dimension_, level_dof_access> &) =
+    default;
+
+  /**
+   * Move constructor.
+   */
+  DoFCellAccessor(
+    DoFCellAccessor<dimension_, space_dimension_, level_dof_access>
+      &&) noexcept = default;
+
+  /**
+   * Destructor
+   */
+  ~DoFCellAccessor() = default;
+
+  /**
    * Copy operator. These operators are usually used in a context like
    * <tt>iterator a,b; *a=*b;</tt>. Presumably, the intent here is to copy the
    * object pointed to
@@ -1412,6 +1477,13 @@ public:
   operator=(
     const DoFCellAccessor<dimension_, space_dimension_, level_dof_access> &da) =
     delete;
+
+  /**
+   * Move assignment operator.
+   */
+  DoFCellAccessor<dimension_, space_dimension_, level_dof_access> &
+  operator=(DoFCellAccessor<dimension_, space_dimension_, level_dof_access>
+              &&) noexcept = default;
 
   /**
    * @}
