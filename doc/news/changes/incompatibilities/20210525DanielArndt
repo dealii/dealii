@@ -1,0 +1,5 @@
+Removed the deprecated 
+parallel::distributed::CellDataTransfer::CoarseningStrategies
+use AdaptationStrategies::Coarsening instead.
+<br>
+(Daniel Arndt, 2021/05/25)
