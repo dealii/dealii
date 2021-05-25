@@ -955,7 +955,7 @@ namespace SUNDIALS
 
     /**
      * A function object that users may supply and that is intended to set up
-     * all data necessary for the application of jacobian_times_setup(). This
+     * all data necessary for the application of jacobian_times_vector(). This
      * function is called by ARKode any time a Jacobian update is required.
      * The user should compute the Jacobian (or update all the variables that
      * allow the application of Jacobian). This function is guaranteed to
