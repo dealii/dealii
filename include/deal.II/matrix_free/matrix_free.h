@@ -208,9 +208,6 @@ public:
       color = internal::MatrixFreeFunctions::TaskInfo::color
     };
 
-    // remove with level_mg_handler
-    DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
-
     /**
      * Constructor for AdditionalData.
      */
@@ -236,7 +233,6 @@ public:
       , mapping_update_flags_inner_faces(mapping_update_flags_inner_faces)
       , mapping_update_flags_faces_by_cells(mapping_update_flags_faces_by_cells)
       , mg_level(mg_level)
-      , level_mg_handler(this->mg_level)
       , store_plain_indices(store_plain_indices)
       , initialize_indices(initialize_indices)
       , initialize_mapping(initialize_mapping)
@@ -260,7 +256,6 @@ public:
       , mapping_update_flags_faces_by_cells(
           other.mapping_update_flags_faces_by_cells)
       , mg_level(other.mg_level)
-      , level_mg_handler(this->mg_level)
       , store_plain_indices(other.store_plain_indices)
       , initialize_indices(other.initialize_indices)
       , initialize_mapping(other.initialize_mapping)
@@ -272,9 +267,6 @@ public:
           other.cell_vectorization_categories_strict)
       , communicator_sm(other.communicator_sm)
     {}
-
-    // remove with level_mg_handler
-    DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
     /**
      * Copy assignment.
@@ -446,13 +438,6 @@ public:
      * <code>dof_handler.distribute_mg_dofs(fe);</code>.
      */
     unsigned int mg_level;
-
-    /**
-     * Alias for mg_level
-     *
-     * @deprecated Use mg_level instead.
-     */
-    DEAL_II_DEPRECATED unsigned int &level_mg_handler;
 
     /**
      * Controls whether to enable reading from vectors without resolving
