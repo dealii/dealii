@@ -722,7 +722,7 @@ public:
 
   /**
    * The copy constructor is not deleted but copied constructed elements should
-   * not be modified, also the comments to the copy assignemtn operator.
+   * not be modified, also the comments to the copy assignment operator.
    */
   TriaAccessor(const TriaAccessor &) = default;
 
