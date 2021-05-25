@@ -43,7 +43,7 @@ enum Type
 
 
 template <int dim>
-std::unique_ptr<parallel::Triangulation<dim>>
+std::unique_ptr<parallel::TriangulationBase<dim>>
 create_triangulation(Type type)
 {
   if (type == Type::Shared)
@@ -59,7 +59,7 @@ create_triangulation(Type type)
 
 template <int dim>
 void
-test(parallel::Triangulation<dim> &tria)
+test(parallel::TriangulationBase<dim> &tria)
 {
   // ----- setup -----
   tria.clear();
