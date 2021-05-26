@@ -67,7 +67,7 @@ namespace SUNDIALS
   {
     template <typename VectorType>
     int
-    t_arkode_explicit_function(realtype tt,
+    explicit_function_callback(realtype tt,
                                N_Vector yy,
                                N_Vector yp,
                                void *   user_data)
@@ -86,7 +86,7 @@ namespace SUNDIALS
 
     template <typename VectorType>
     int
-    t_arkode_implicit_function(realtype tt,
+    implicit_function_callback(realtype tt,
                                N_Vector yy,
                                N_Vector yp,
                                void *   user_data)
@@ -106,7 +106,7 @@ namespace SUNDIALS
 #  if DEAL_II_SUNDIALS_VERSION_LT(4, 0, 0)
     template <typename VectorType>
     int
-    t_arkode_setup_jacobian(ARKodeMem    arkode_mem,
+    setup_jacobian_callback(ARKodeMem    arkode_mem,
                             int          convfail,
                             N_Vector     ypred,
                             N_Vector     fpred,
@@ -142,13 +142,13 @@ namespace SUNDIALS
 
     template <typename VectorType>
     int
-    t_arkode_solve_jacobian(ARKodeMem arkode_mem,
-                            N_Vector  b,
+    solve_with_jacobian_callback(ARKodeMem arkode_mem,
+                                 N_Vector  b,
 #    if DEAL_II_SUNDIALS_VERSION_LT(3, 0, 0)
-                            N_Vector,
+                                 N_Vector,
 #    endif
-                            N_Vector ycur,
-                            N_Vector fcur)
+                                 N_Vector ycur,
+                                 N_Vector fcur)
     {
       Assert(arkode_mem->ark_user_data != nullptr, ExcInternalError());
       ARKode<VectorType> &solver =
@@ -176,7 +176,10 @@ namespace SUNDIALS
 
     template <typename VectorType>
     int
-    t_arkode_setup_mass(ARKodeMem arkode_mem, N_Vector, N_Vector, N_Vector)
+    setup_mass_matrix_callback(ARKodeMem arkode_mem,
+                               N_Vector,
+                               N_Vector,
+                               N_Vector)
     {
       Assert(arkode_mem->ark_user_data != nullptr, ExcInternalError());
       ARKode<VectorType> &solver =
@@ -189,12 +192,12 @@ namespace SUNDIALS
 
     template <typename VectorType>
     int
-    t_arkode_solve_mass(ARKodeMem arkode_mem,
+    solve_with_mass_matrix_callback(ARKodeMem arkode_mem,
 #    if DEAL_II_SUNDIALS_VERSION_LT(3, 0, 0)
-                        N_Vector b,
-                        N_Vector
+                                    N_Vector b,
+                                    N_Vector
 #    else
-                        N_Vector b
+                                    N_Vector b
 #    endif
     )
     {
@@ -215,13 +218,13 @@ namespace SUNDIALS
 
     template <typename VectorType>
     int
-    t_arkode_jac_times_vec_function(N_Vector v,
-                                    N_Vector Jv,
-                                    realtype t,
-                                    N_Vector y,
-                                    N_Vector fy,
-                                    void *   user_data,
-                                    N_Vector)
+    jacobian_times_vector_callback(N_Vector v,
+                                   N_Vector Jv,
+                                   realtype t,
+                                   N_Vector y,
+                                   N_Vector fy,
+                                   void *   user_data,
+                                   N_Vector)
     {
       Assert(user_data != nullptr, ExcInternalError());
       ARKode<VectorType> &solver =
@@ -240,10 +243,10 @@ namespace SUNDIALS
 
     template <typename VectorType>
     int
-    t_arkode_jac_times_setup_function(realtype t,
-                                      N_Vector y,
-                                      N_Vector fy,
-                                      void *   user_data)
+    jacobian_times_vector_setup_callback(realtype t,
+                                         N_Vector y,
+                                         N_Vector fy,
+                                         void *   user_data)
     {
       Assert(user_data != nullptr, ExcInternalError());
       ARKode<VectorType> &solver =
@@ -259,7 +262,7 @@ namespace SUNDIALS
 
     template <typename VectorType>
     int
-    t_arkode_prec_solve_function(realtype t,
+    solve_with_jacobian_callback(realtype t,
                                  N_Vector y,
                                  N_Vector fy,
                                  N_Vector r,
@@ -287,13 +290,13 @@ namespace SUNDIALS
 
     template <typename VectorType>
     int
-    t_arkode_prec_setup_function(realtype     t,
-                                 N_Vector     y,
-                                 N_Vector     fy,
-                                 booleantype  jok,
-                                 booleantype *jcurPtr,
-                                 realtype     gamma,
-                                 void *       user_data)
+    jacobian_solver_setup_callback(realtype     t,
+                                   N_Vector     y,
+                                   N_Vector     fy,
+                                   booleantype  jok,
+                                   booleantype *jcurPtr,
+                                   realtype     gamma,
+                                   void *       user_data)
     {
       Assert(user_data != nullptr, ExcInternalError());
       ARKode<VectorType> &solver =
@@ -310,10 +313,10 @@ namespace SUNDIALS
 
     template <typename VectorType>
     int
-    t_arkode_mass_times_vec_function(N_Vector v,
-                                     N_Vector Mv,
-                                     realtype t,
-                                     void *   mtimes_data)
+    mass_matrix_times_vector_callback(N_Vector v,
+                                      N_Vector Mv,
+                                      realtype t,
+                                      void *   mtimes_data)
     {
       Assert(mtimes_data != nullptr, ExcInternalError());
       ARKode<VectorType> &solver =
@@ -329,7 +332,7 @@ namespace SUNDIALS
 
     template <typename VectorType>
     int
-    t_arkode_mass_times_setup_function(realtype t, void *mtimes_data)
+    mass_matrix_times_vector_setup_callback(realtype t, void *mtimes_data)
     {
       Assert(mtimes_data != nullptr, ExcInternalError());
       ARKode<VectorType> &solver =
@@ -342,12 +345,12 @@ namespace SUNDIALS
 
     template <typename VectorType>
     int
-    t_arkode_mass_prec_solve_function(realtype t,
-                                      N_Vector r,
-                                      N_Vector z,
-                                      realtype delta,
-                                      int      lr,
-                                      void *   user_data)
+    solve_with_mass_matrix_callback(realtype t,
+                                    N_Vector r,
+                                    N_Vector z,
+                                    realtype delta,
+                                    int      lr,
+                                    void *   user_data)
     {
       Assert(user_data != nullptr, ExcInternalError());
       ARKode<VectorType> &solver =
@@ -363,7 +366,7 @@ namespace SUNDIALS
 
     template <typename VectorType>
     int
-    t_arkode_mass_prec_setup_function(realtype t, void *user_data)
+    mass_matrix_solver_setup_callback(realtype t, void *user_data)
     {
       Assert(user_data != nullptr, ExcInternalError());
       ARKode<VectorType> &solver =
@@ -524,8 +527,8 @@ namespace SUNDIALS
 
     status = ARKodeInit(
       arkode_mem,
-      explicit_function ? &t_arkode_explicit_function<VectorType> : nullptr,
-      implicit_function ? &t_arkode_implicit_function<VectorType> : nullptr,
+      explicit_function ? &explicit_function_callback<VectorType> : nullptr,
+      implicit_function ? &implicit_function_callback<VectorType> : nullptr,
       current_time,
       initial_condition_nvector);
     AssertARKode(status);
@@ -573,10 +576,10 @@ namespace SUNDIALS
           }
 
 
-        ARKode_mem->ark_lsolve = t_arkode_solve_jacobian<VectorType>;
+        ARKode_mem->ark_lsolve = solve_with_jacobian_callback<VectorType>;
         if (setup_jacobian)
           {
-            ARKode_mem->ark_lsetup = t_arkode_setup_jacobian<VectorType>;
+            ARKode_mem->ark_lsetup = setup_jacobian_callback<VectorType>;
 #    if DEAL_II_SUNDIALS_VERSION_LT(3, 0, 0)
             ARKode_mem->ark_setupNonNull = true;
 #    endif
@@ -592,11 +595,11 @@ namespace SUNDIALS
 
     if (solve_mass_system)
       {
-        ARKode_mem->ark_msolve = t_arkode_solve_mass<VectorType>;
+        ARKode_mem->ark_msolve = solve_with_mass_matrix_callback<VectorType>;
 
         if (setup_mass)
           {
-            ARKode_mem->ark_msetup = t_arkode_setup_mass<VectorType>;
+            ARKode_mem->ark_msetup = setup_mass_matrix_callback<VectorType>;
 #    if DEAL_II_SUNDIALS_VERSION_LT(3, 0, 0)
             ARKode_mem->ark_MassSetupNonNull = true;
 #    endif
@@ -633,8 +636,8 @@ namespace SUNDIALS
            ExcFunctionNotProvided("explicit_function || implicit_function"));
 
     arkode_mem = ARKStepCreate(
-      explicit_function ? &t_arkode_explicit_function<VectorType> : nullptr,
-      implicit_function ? &t_arkode_implicit_function<VectorType> : nullptr,
+      explicit_function ? &explicit_function_callback<VectorType> : nullptr,
+      implicit_function ? &implicit_function_callback<VectorType> : nullptr,
       current_time,
       initial_condition_nvector);
 
@@ -713,21 +716,21 @@ namespace SUNDIALS
           }
         status = ARKStepSetLinearSolver(arkode_mem, sun_linear_solver, nullptr);
         AssertARKode(status);
-        status =
-          ARKStepSetJacTimes(arkode_mem,
-                             jacobian_times_setup ?
-                               t_arkode_jac_times_setup_function<VectorType> :
-                               nullptr,
-                             t_arkode_jac_times_vec_function<VectorType>);
+        status = ARKStepSetJacTimes(
+          arkode_mem,
+          jacobian_times_setup ?
+            jacobian_times_vector_setup_callback<VectorType> :
+            nullptr,
+          jacobian_times_vector_callback<VectorType>);
         AssertARKode(status);
         if (jacobian_preconditioner_solve)
           {
             status = ARKStepSetPreconditioner(
               arkode_mem,
               jacobian_preconditioner_setup ?
-                t_arkode_prec_setup_function<VectorType> :
+                jacobian_solver_setup_callback<VectorType> :
                 nullptr,
-              t_arkode_prec_solve_function<VectorType>);
+              solve_with_jacobian_callback<VectorType>);
             AssertARKode(status);
           }
         if (data.implicit_function_is_linear)
@@ -788,13 +791,13 @@ namespace SUNDIALS
                                             nullptr,
                                             mass_time_dependent);
         AssertARKode(status);
-        status =
-          ARKStepSetMassTimes(arkode_mem,
-                              mass_times_setup ?
-                                t_arkode_mass_times_setup_function<VectorType> :
-                                nullptr,
-                              t_arkode_mass_times_vec_function<VectorType>,
-                              this);
+        status = ARKStepSetMassTimes(
+          arkode_mem,
+          mass_times_setup ?
+            mass_matrix_times_vector_setup_callback<VectorType> :
+            nullptr,
+          mass_matrix_times_vector_callback<VectorType>,
+          this);
         AssertARKode(status);
 
         if (mass_preconditioner_solve)
@@ -802,9 +805,9 @@ namespace SUNDIALS
             status = ARKStepSetMassPreconditioner(
               arkode_mem,
               mass_preconditioner_setup ?
-                t_arkode_mass_prec_setup_function<VectorType> :
+                mass_matrix_solver_setup_callback<VectorType> :
                 nullptr,
-              t_arkode_mass_prec_solve_function<VectorType>);
+              solve_with_mass_matrix_callback<VectorType>);
             AssertARKode(status);
           }
       }
