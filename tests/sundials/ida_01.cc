@@ -1,6 +1,6 @@
 //-----------------------------------------------------------
 //
-//    Copyright (C) 2017 - 2018 by the deal.II authors
+//    Copyright (C) 2017 - 2021 by the deal.II authors
 //
 //    This file is part of the deal.II library.
 //
@@ -24,7 +24,8 @@
 
 
 /**
- * Solve the Harmonic oscillator problem.
+ * Solve the Harmonic oscillator problem, using a direct solver for the
+ * jacobian system.
  *
  * u'' = -k^2 u
  * u (0) = 0
@@ -98,8 +99,16 @@ public:
       return 0;
     };
 
+    // Used only in ver < 4.0.0
     time_stepper.solve_jacobian_system = [&](const VectorType &src,
                                              VectorType &      dst) -> int {
+      Jinv.vmult(dst, src);
+      return 0;
+    };
+
+    // Used in ver >= 4.0.0
+    time_stepper.solve_with_jacobian =
+      [&](const VectorType &src, VectorType &dst, const double) -> int {
       Jinv.vmult(dst, src);
       return 0;
     };

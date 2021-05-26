@@ -26,7 +26,6 @@
 
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_nothing.h>
-#include <deal.II/fe/fe_point_evaluation.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_q_iso_q1.h>
 #include <deal.II/fe/fe_system.h>
@@ -41,6 +40,7 @@
 #include <deal.II/lac/la_parallel_block_vector.h>
 
 #include <deal.II/matrix_free/fe_evaluation.h>
+#include <deal.II/matrix_free/fe_point_evaluation.h>
 
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/vector_tools.h>
@@ -208,9 +208,11 @@ test_1(const Triangulation<dim, spacedim> &surface_mesh,
     AffineConstraints<double> constraints; // TODO: use the right ones
 
     FEPointEvaluation<spacedim, spacedim> phi_normal(mapping,
-                                                     dof_handler_dim.get_fe());
+                                                     dof_handler_dim.get_fe(),
+                                                     update_values);
     FEPointEvaluation<spacedim, spacedim> phi_force(mapping,
-                                                    dof_handler_dim.get_fe());
+                                                    dof_handler_dim.get_fe(),
+                                                    update_values);
 
     std::vector<double>                  buffer;
     std::vector<double>                  buffer_dim;
@@ -248,9 +250,8 @@ test_1(const Triangulation<dim, spacedim> &surface_mesh,
                                      buffer_dim.begin(),
                                      buffer_dim.end());
 
-          phi_normal.evaluate(cell_dim,
-                              unit_points,
-                              make_array_view(buffer_dim),
+          phi_normal.reinit(cell_dim, unit_points);
+          phi_normal.evaluate(make_array_view(buffer_dim),
                               EvaluationFlags::values);
         }
 

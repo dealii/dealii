@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2018 by the deal.II authors
+// Copyright (C) 2010 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,18 +15,18 @@
 
 
 
-for (deal_II_dimension : DIMENSIONS)
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
   {
     namespace parallel
     \{
       namespace distributed
       \{
-        template class Triangulation<deal_II_dimension>;
-#if deal_II_dimension < 3
-        template class Triangulation<deal_II_dimension, deal_II_dimension + 1>;
-#endif
-#if deal_II_dimension < 2
-        template class Triangulation<deal_II_dimension, deal_II_dimension + 2>;
+#if deal_II_dimension <= deal_II_space_dimension
+        template class Triangulation<deal_II_dimension,
+                                     deal_II_space_dimension>;
+
+        template class TemporarilyMatchRefineFlags<deal_II_dimension,
+                                                   deal_II_space_dimension>;
 #endif
       \}
     \}

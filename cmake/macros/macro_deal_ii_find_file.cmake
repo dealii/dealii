@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2014 by the deal.II authors
+## Copyright (C) 2014 - 2021 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -18,11 +18,14 @@
 #
 
 MACRO(DEAL_II_FIND_FILE _file_name)
+  # Save a string representation of the arguments before cmake's
+  # FIND_FILE gets its hands on it.
+  TO_STRING(_str ${ARGN})
+
   FIND_FILE(${_file_name} ${ARGN})
 
   IF(${_file_name} MATCHES "-NOTFOUND")
-    MESSAGE(STATUS "${_file_name} not found! Call:")
-    TO_STRING(_str ${ARGN})
+    MESSAGE(STATUS "${_file_name} not found! The call was:")
     MESSAGE(STATUS "    FIND_FILE(${_file_name} ${_str})")
   ELSE()
     MESSAGE(STATUS "Found ${_file_name}")

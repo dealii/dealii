@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2020 by the deal.II authors
+// Copyright (C) 2020 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -99,8 +99,6 @@ test(const unsigned int n_refinements)
 
     return result;
   };
-
-  AssertDimension(process(), false); // not categorize
 
   MatrixFreeTools::categorize_by_boundary_ids(tria, additional_data);
 

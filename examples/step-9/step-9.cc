@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2000 - 2020 by the deal.II authors
+ * Copyright (C) 2000 - 2021 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -131,7 +131,7 @@ namespace Step9
   template <int dim>
   Tensor<1, dim> AdvectionField<dim>::value(const Point<dim> &p) const
   {
-    Point<dim> value;
+    Tensor<1, dim> value;
     value[0] = 2;
     for (unsigned int i = 1; i < dim; ++i)
       value[i] = 1 + 0.8 * std::sin(8. * numbers::PI * p[0]);

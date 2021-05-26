@@ -1,6 +1,6 @@
 //-----------------------------------------------------------
 //
-//    Copyright (C) 2020 by the deal.II authors
+//    Copyright (C) 2020 - 2021 by the deal.II authors
 //
 //    This file is part of the deal.II library.
 //
@@ -60,14 +60,14 @@ namespace SUNDIALS
     public:
       /**
        * Create a non-owning content with an existing @p vector.
-       * @param vector The underlying vector to wrap in thi object.
+       * @param vector The underlying vector to wrap in this object.
        */
       NVectorContent(VectorType *vector);
 
       /**
        * Create a non-owning content with an existing const @p vector. If this
        * constructor is used, access is only allowed via the get() const method.
-       * @param vector The underlying vector to wrap in thi object.
+       * @param vector The underlying vector to wrap in this object.
        */
       NVectorContent(const VectorType *vector);
 
@@ -169,6 +169,14 @@ namespace SUNDIALS
       dot_product(N_Vector x, N_Vector y);
 
       template <typename VectorType>
+      realtype
+      weighted_l2_norm(N_Vector x, N_Vector y);
+
+      template <typename VectorType>
+      realtype
+      l1_norm(N_Vector x);
+
+      template <typename VectorType>
       void
       elementwise_product(N_Vector x, N_Vector y, N_Vector z);
 
@@ -211,6 +219,10 @@ namespace SUNDIALS
       template <typename VectorType>
       realtype
       weighted_rms_norm(N_Vector x, N_Vector w);
+
+      template <typename VectorType>
+      realtype
+      weighted_rms_norm_mask(N_Vector x, N_Vector w, N_Vector mask);
 
       template <typename VectorType>
       realtype
@@ -570,6 +582,28 @@ SUNDIALS::internal::NVectorOperations::dot_product(N_Vector x, N_Vector y)
 
 
 template <typename VectorType>
+realtype
+SUNDIALS::internal::NVectorOperations::weighted_l2_norm(N_Vector x, N_Vector w)
+{
+  // TODO copy can be avoided by a custom kernel
+  VectorType tmp      = *unwrap_nvector_const<VectorType>(x);
+  auto *     w_dealii = unwrap_nvector_const<VectorType>(w);
+  tmp.scale(*w_dealii);
+  return tmp.l2_norm();
+}
+
+
+
+template <typename VectorType>
+realtype
+SUNDIALS::internal::NVectorOperations::l1_norm(N_Vector x)
+{
+  return unwrap_nvector_const<VectorType>(x)->l1_norm();
+}
+
+
+
+template <typename VectorType>
 void
 SUNDIALS::internal::NVectorOperations::set_constant(realtype c, N_Vector v)
 {
@@ -630,6 +664,24 @@ SUNDIALS::internal::NVectorOperations::weighted_rms_norm(N_Vector x, N_Vector w)
   auto *     w_dealii = unwrap_nvector_const<VectorType>(w);
   const auto n        = tmp.size();
   tmp.scale(*w_dealii);
+  return tmp.l2_norm() / std::sqrt(n);
+}
+
+
+
+template <typename VectorType>
+realtype
+SUNDIALS::internal::NVectorOperations::weighted_rms_norm_mask(N_Vector x,
+                                                              N_Vector w,
+                                                              N_Vector mask)
+{
+  // TODO copy can be avoided by a custom kernel
+  VectorType tmp         = *unwrap_nvector_const<VectorType>(x);
+  auto *     w_dealii    = unwrap_nvector_const<VectorType>(w);
+  auto *     mask_dealii = unwrap_nvector_const<VectorType>(mask);
+  const auto n           = tmp.size();
+  tmp.scale(*w_dealii);
+  tmp.scale(*mask_dealii);
   return tmp.l2_norm() / std::sqrt(n);
 }
 
@@ -910,10 +962,11 @@ SUNDIALS::internal::create_empty_nvector()
   v->ops->nvdotprod   = NVectorOperations::dot_product<VectorType>;
   v->ops->nvmaxnorm   = NVectorOperations::max_norm<VectorType>;
   v->ops->nvwrmsnorm  = NVectorOperations::weighted_rms_norm<VectorType>;
-  //  v->ops->nvwrmsnormmask = undef;
-  v->ops->nvmin = NVectorOperations::min_element<VectorType>;
-  //  v->ops->nvwl2norm      = undef;
-  //  v->ops->nvl1norm       = undef;
+  v->ops->nvmin       = NVectorOperations::min_element<VectorType>;
+  v->ops->nvwl2norm   = NVectorOperations::weighted_l2_norm<VectorType>;
+  v->ops->nvl1norm    = NVectorOperations::l1_norm<VectorType>;
+  v->ops->nvwrmsnormmask =
+    NVectorOperations::weighted_rms_norm_mask<VectorType>;
   //  v->ops->nvcompare      = undef;
   //  v->ops->nvinvtest      = undef;
   //  v->ops->nvconstrmask   = undef;

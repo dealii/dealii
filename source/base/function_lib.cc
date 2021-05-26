@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2020 by the deal.II authors
+// Copyright (C) 1999 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -2176,23 +2176,24 @@ namespace Functions
 
 
 
-  template <int dim>
-  Monomial<dim>::Monomial(const Tensor<1, dim> &exponents,
-                          const unsigned int    n_components)
-    : Function<dim>(n_components)
+  template <int dim, typename Number>
+  Monomial<dim, Number>::Monomial(const Tensor<1, dim, Number> &exponents,
+                                  const unsigned int            n_components)
+    : Function<dim, Number>(n_components)
     , exponents(exponents)
   {}
 
 
 
-  template <int dim>
-  double
-  Monomial<dim>::value(const Point<dim> &p, const unsigned int component) const
+  template <int dim, typename Number>
+  Number
+  Monomial<dim, Number>::value(const Point<dim> & p,
+                               const unsigned int component) const
   {
     (void)component;
     AssertIndexRange(component, this->n_components);
 
-    double prod = 1;
+    Number prod = 1;
     for (unsigned int s = 0; s < dim; ++s)
       {
         if (p[s] < 0)
@@ -2206,23 +2207,24 @@ namespace Functions
 
 
 
-  template <int dim>
+  template <int dim, typename Number>
   void
-  Monomial<dim>::vector_value(const Point<dim> &p, Vector<double> &values) const
+  Monomial<dim, Number>::vector_value(const Point<dim> &p,
+                                      Vector<Number> &  values) const
   {
     Assert(values.size() == this->n_components,
            ExcDimensionMismatch(values.size(), this->n_components));
 
     for (unsigned int i = 0; i < values.size(); ++i)
-      values(i) = Monomial<dim>::value(p, i);
+      values(i) = Monomial<dim, Number>::value(p, i);
   }
 
 
 
-  template <int dim>
-  Tensor<1, dim>
-  Monomial<dim>::gradient(const Point<dim> & p,
-                          const unsigned int component) const
+  template <int dim, typename Number>
+  Tensor<1, dim, Number>
+  Monomial<dim, Number>::gradient(const Point<dim> & p,
+                                  const unsigned int component) const
   {
     (void)component;
     AssertIndexRange(component, 1);
@@ -2258,17 +2260,17 @@ namespace Functions
 
 
 
-  template <int dim>
+  template <int dim, typename Number>
   void
-  Monomial<dim>::value_list(const std::vector<Point<dim>> &points,
-                            std::vector<double> &          values,
-                            const unsigned int             component) const
+  Monomial<dim, Number>::value_list(const std::vector<Point<dim>> &points,
+                                    std::vector<Number> &          values,
+                                    const unsigned int component) const
   {
     Assert(values.size() == points.size(),
            ExcDimensionMismatch(values.size(), points.size()));
 
     for (unsigned int i = 0; i < points.size(); ++i)
-      values[i] = Monomial<dim>::value(points[i], component);
+      values[i] = Monomial<dim, Number>::value(points[i], component);
   }
 
 
@@ -2484,6 +2486,8 @@ namespace Functions
     }
   } // namespace
 
+
+
   template <int dim>
   InterpolatedTensorProductGridData<dim>::InterpolatedTensorProductGridData(
     const std::array<std::vector<double>, dim> &coordinate_values,
@@ -2504,6 +2508,33 @@ namespace Functions
               "Coordinate arrays must be sorted in strictly ascending order."));
 
         Assert(data_values.size()[d] == coordinate_values[d].size(),
+               ExcMessage(
+                 "Data and coordinate tables do not have the same size."));
+      }
+  }
+
+
+
+  template <int dim>
+  InterpolatedTensorProductGridData<dim>::InterpolatedTensorProductGridData(
+    std::array<std::vector<double>, dim> &&coordinate_values,
+    Table<dim, double> &&                  data_values)
+    : coordinate_values(std::move(coordinate_values))
+    , data_values(std::move(data_values))
+  {
+    for (unsigned int d = 0; d < dim; ++d)
+      {
+        Assert(
+          this->coordinate_values[d].size() >= 2,
+          ExcMessage(
+            "Coordinate arrays must have at least two coordinate values!"));
+        for (unsigned int i = 0; i < this->coordinate_values[d].size() - 1; ++i)
+          Assert(
+            this->coordinate_values[d][i] < this->coordinate_values[d][i + 1],
+            ExcMessage(
+              "Coordinate arrays must be sorted in strictly ascending order."));
+
+        Assert(this->data_values.size()[d] == this->coordinate_values[d].size(),
                ExcMessage(
                  "Data and coordinate tables do not have the same size."));
       }
@@ -2652,6 +2683,32 @@ namespace Functions
                ExcMessage("The data table does not have the correct size."));
       }
   }
+
+
+
+  template <int dim>
+  InterpolatedUniformGridData<dim>::InterpolatedUniformGridData(
+    std::array<std::pair<double, double>, dim> &&interval_endpoints,
+    std::array<unsigned int, dim> &&             n_subintervals,
+    Table<dim, double> &&                        data_values)
+    : interval_endpoints(std::move(interval_endpoints))
+    , n_subintervals(std::move(n_subintervals))
+    , data_values(std::move(data_values))
+  {
+    for (unsigned int d = 0; d < dim; ++d)
+      {
+        Assert(this->n_subintervals[d] >= 1,
+               ExcMessage("There needs to be at least one subinterval in each "
+                          "coordinate direction."));
+        Assert(this->interval_endpoints[d].first <
+                 this->interval_endpoints[d].second,
+               ExcMessage("The interval in each coordinate direction needs "
+                          "to have positive size"));
+        Assert(this->data_values.size()[d] == this->n_subintervals[d] + 1,
+               ExcMessage("The data table does not have the correct size."));
+      }
+  }
+
 
 
   template <int dim>
@@ -2931,6 +2988,9 @@ namespace Functions
   template class Monomial<1>;
   template class Monomial<2>;
   template class Monomial<3>;
+  template class Monomial<1, float>;
+  template class Monomial<2, float>;
+  template class Monomial<3, float>;
   template class Bessel1<1>;
   template class Bessel1<2>;
   template class Bessel1<3>;

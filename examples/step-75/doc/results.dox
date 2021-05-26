@@ -1,0 +1,178 @@
+<h1>Results</h1>
+
+When you run the program with the given parameters on four processes in
+release mode, your terminal output should look like this:
+@code
+Running with Trilinos on 4 MPI rank(s)...
+Calculating transformation matrices...
+Cycle 0:
+   Number of active cells:       3072
+     by partition:               768 768 768 768
+   Number of degrees of freedom: 12545
+     by partition:               3201 3104 3136 3104
+   Number of constraints:        542
+     by partition:               165 74 138 165
+   Frequencies of poly. degrees: 2:3072
+   Solved in 7 iterations.
+
+
++---------------------------------------------+------------+------------+
+| Total wallclock time elapsed since start    |     0.598s |            |
+|                                             |            |            |
+| Section                         | no. calls |  wall time | % of total |
++---------------------------------+-----------+------------+------------+
+| calculate transformation        |         1 |    0.0533s |       8.9% |
+| compute indicators              |         1 |    0.0177s |         3% |
+| initialize grid                 |         1 |    0.0397s |       6.6% |
+| output results                  |         1 |    0.0844s |        14% |
+| setup system                    |         1 |    0.0351s |       5.9% |
+| solve system                    |         1 |     0.362s |        61% |
++---------------------------------+-----------+------------+------------+
+
+
+Cycle 1:
+   Number of active cells:       3351
+     by partition:               875 761 843 872
+   Number of degrees of freedom: 18223
+     by partition:               4535 4735 4543 4410
+   Number of constraints:        1202
+     by partition:               303 290 326 283
+   Frequencies of poly. degrees: 2:2523 3:828
+   Solved in 7 iterations.
+
+
++---------------------------------------------+------------+------------+
+| Total wallclock time elapsed since start    |     0.442s |            |
+|                                             |            |            |
+| Section                         | no. calls |  wall time | % of total |
++---------------------------------+-----------+------------+------------+
+| adapt resolution                |         1 |    0.0189s |       4.3% |
+| compute indicators              |         1 |    0.0135s |         3% |
+| output results                  |         1 |     0.064s |        14% |
+| setup system                    |         1 |    0.0232s |       5.2% |
+| solve system                    |         1 |     0.322s |        73% |
++---------------------------------+-----------+------------+------------+
+
+
+...
+
+
+Cycle 7:
+   Number of active cells:       5610
+     by partition:               1324 1483 1482 1321
+   Number of degrees of freedom: 82062
+     by partition:               21116 19951 20113 20882
+   Number of constraints:        14383
+     by partition:               3825 3225 3557 3776
+   Frequencies of poly. degrees: 2:1130 3:1283 4:2727 5:465 6:5
+   Solved in 7 iterations.
+
+
++---------------------------------------------+------------+------------+
+| Total wallclock time elapsed since start    |     0.932s |            |
+|                                             |            |            |
+| Section                         | no. calls |  wall time | % of total |
++---------------------------------+-----------+------------+------------+
+| adapt resolution                |         1 |    0.0182s |       1.9% |
+| compute indicators              |         1 |    0.0173s |       1.9% |
+| output results                  |         1 |    0.0572s |       6.1% |
+| setup system                    |         1 |    0.0252s |       2.7% |
+| solve system                    |         1 |     0.813s |        87% |
++---------------------------------+-----------+------------+------------+
+@endcode
+
+When running the code with more processes, you will notice slight
+differences in the number of active cells and degrees of freedom. This
+is due to the fact that solver and preconditioner depend on the
+partitioning of the problem, which might yield to slight differences of
+the solution in the last digits and ultimately yields to different
+adaptation behavior.
+
+Furthermore, the number of iterations for the solver stays about the
+same in all cycles despite hp-adaptation, indicating the robustness of
+the proposed algorithms and promising good scalability for even larger
+problem sizes and on more processes.
+
+Let us have a look at the graphical output of the program. After all
+refinement cycles in the given parameter configuration, the actual
+discretized function space looks like the following with its
+partitioning on twelve processes on the left and the polynomial degrees
+of finite elements on the right. In the left picture, each color
+represents a unique subdomain. In the right picture, the lightest color
+corresponds to the polynomial degree two and the darkest one corresponds
+to degree six:
+
+<div class="twocolumn" style="width: 80%; text-align: center;">
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step-75.subdomains-07.svg"
+         alt="Partitioning after seven refinements.">
+  </div>
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step-75.fedegrees-07.svg"
+         alt="Local approximation degrees after seven refinements.">
+  </div>
+</div>
+
+
+
+<a name="extensions"></a>
+<h3>Possibilities for extensions</h3>
+
+<h4>Different hp-decision strategies</h4>
+
+The deal.II library offers multiple strategies to decide which type of
+adaptation to impose on cells: either adjust the grid resolution or
+change the polynomial degree. We only presented the <i>Legendre
+coefficient decay</i> strategy in this tutorial, while step-27
+demonstrated the <i>Fourier</i> equivalent of the same idea.
+
+See the "possibilities for extensions" section of step-27 for an
+overview over these strategies, or the corresponding documentation
+for a detailed description.
+
+There, another strategy is mentioned that has not been shown in any
+tutorial so far: the strategy based on <i>refinement history</i>. The
+usage of this method for parallel distributed applications is more
+tricky than the others, so we will highlight the challenges that come
+along with it. We need information about the final state of refinement
+flags, and we need to transfer the solution across refined meshes. For
+the former, we need to attach the hp::Refinement::predict_error()
+function to the Triangulation::Signals::post_p4est_refinement signal in
+a way that it will be called <i>after</i> the
+hp::Refinement::limit_p_level_difference() function. At this stage, all
+refinement flags and future FE indices are terminally set and a reliable
+prediction of the error is possible. The predicted error then needs to
+be transferred across refined meshes with the aid of
+parallel::distributed::CellDataTransfer.
+
+Try implementing one of these strategies into this tutorial and observe
+the subtle changes to the results. You will notice that all strategies
+are capable of identifying the singularities near the reentrant corners
+and will perform $h$-refinement in these regions, while preferring
+$p$-refinement in the bulk domain. A detailed comparison of these
+strategies is presented in @cite fehling2020 .
+
+
+<h4>Solve with matrix-based methods</h4>
+
+This tutorial focuses solely on matrix-free strategies. All hp-adaptive
+algorithms however also work with matrix-based approaches in the
+parallel distributed context.
+
+To create a system matrix, you can either use the
+LaplaceOperator::get_system_matrix() function, or use an
+<code>assemble_system()</code> function similar to the one of step-27.
+You can then pass the system matrix to the solver as usual.
+
+You can time the results of both matrix-based and matrix-free
+implementations, quantify the speed-up, and convince yourself which
+variant is faster.
+
+
+<h4>Multigrid variants</h4>
+
+For sake of simplicity, we have restricted ourselves to a single type of
+coarse-grid solver (CG with AMG), smoother (Chebyshev smoother with
+point Jacobi preconditioner), and geometric-coarsening scheme (global
+coarsening) within the multigrid algorithm. Feel free to try out
+alternatives and investigate their performance and robustness.

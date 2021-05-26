@@ -1,3 +1,0 @@
-New: The method hp::FEFaceValues::reinit() can now also accept face iterators.
-<br>
-(Peter Munch, 2020/07/16)

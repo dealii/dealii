@@ -1,5 +1,0 @@
-Added a template version of CUDAWrappers::MatrixFree::reinit() that takes an
-IteratorFilters object. This allows to perform the operator evaluation on part
-of the domain.
-<br>
-(Bruno Turcksin, 2021/02/19)

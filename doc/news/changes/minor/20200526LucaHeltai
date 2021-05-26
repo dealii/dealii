@@ -1,6 +1,0 @@
-New: GridTools::Cache::get_locally_owned_cell_bounding_boxes_rtree() extracts
-a tree of bounding boxes covering the locally owned cells of a triangulation.
-This can be used in conjunction with GridTools::Cache::get_covering_rtree() to
-make approximate geometrical queries on who owns what spatial region.
-<br>
-(Luca Heltai, 2020/05/26)

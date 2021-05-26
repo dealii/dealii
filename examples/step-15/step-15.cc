@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2012 - 2020 by the deal.II authors
+ * Copyright (C) 2012 - 2021 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -91,15 +91,15 @@ namespace Step15
   //   <code>determine_step_length()</code> computes the step length $\alpha^n$
   //   in each Newton iteration. As discussed in the introduction, we here use a
   //   fixed step length and leave implementing a better strategy as an
-  //   exercise.
+  //   exercise. (step-77 does this differently: It simply uses an
+  //   external package for the whole solution process, and a good
+  //   line search strategy is part of what that package provides.)
 
   template <int dim>
   class MinimalSurfaceProblem
   {
   public:
     MinimalSurfaceProblem();
-    ~MinimalSurfaceProblem();
-
     void run();
 
   private:
@@ -110,6 +110,7 @@ namespace Step15
     void   set_boundary_values();
     double compute_residual(const double alpha) const;
     double determine_step_length() const;
+    void   output_results(const unsigned int refinement_cycle) const;
 
     Triangulation<dim> triangulation;
 
@@ -160,13 +161,6 @@ namespace Step15
     , fe(2)
   {}
 
-
-
-  template <int dim>
-  MinimalSurfaceProblem<dim>::~MinimalSurfaceProblem()
-  {
-    dof_handler.clear();
-  }
 
   // @sect4{MinimalSurfaceProblem::setup_system}
 
@@ -412,31 +406,33 @@ namespace Step15
     // values of the old solution, but rather indices, we need to preserve the
     // old solution vector until we have gotten the new interpolated
     // values. Thus, we have the new values written into a temporary vector,
-    // and only afterwards write them into the solution vector object. Once we
-    // have this solution we have to make sure that the $u^n$ we now have
-    // actually has the correct boundary values. As explained at the end of
-    // the introduction, this is not automatically the case even if the
-    // solution before refinement had the correct boundary values, and so we
-    // have to explicitly make sure that it now has:
+    // and only afterwards write them into the solution vector object:
     Vector<double> tmp(dof_handler.n_dofs());
     solution_transfer.interpolate(current_solution, tmp);
     current_solution = tmp;
 
-    set_boundary_values();
-
-    // On the new mesh, there are different hanging nodes, which we have to
-    // compute again. To ensure there are no hanging nodes of the old mesh in
-    // the object, it's first cleared.  To be on the safe side, we then also
-    // make sure that the current solution's vector entries satisfy the
-    // hanging node constraints (see the discussion in the documentation of
-    // the SolutionTransfer class for why this is necessary):
+    // On the new mesh, there are different hanging nodes, for which we have to
+    // compute constraints again, after throwing away previous content of the
+    // object. To be on the safe side, we should then also make sure that the
+    // current solution's vector entries satisfy the hanging node constraints
+    // (see the discussion in the documentation of the SolutionTransfer class
+    // for why this is necessary). We could do this by calling
+    // `hanging_node_constraints.distribute(current_solution)` explicitly; we
+    // omit this step because this will happen at the end of the call to
+    // `set_boundary_values()` below, and it is not necessary to do it twice.
     hanging_node_constraints.clear();
 
     DoFTools::make_hanging_node_constraints(dof_handler,
                                             hanging_node_constraints);
     hanging_node_constraints.close();
 
-    hanging_node_constraints.distribute(current_solution);
+    // Once we have the interpolated solution and all information about
+    // hanging nodes, we have to make sure that the $u^n$ we now have
+    // actually has the correct boundary values. As explained at the end of
+    // the introduction, this is not automatically the case even if the
+    // solution before refinement had the correct boundary values, and so we
+    // have to explicitly make sure that it now has:
+    set_boundary_values();
 
     // We end the function by updating all the remaining data structures,
     // indicating to <code>setup_dofs()</code> that this is not the first
@@ -453,9 +449,15 @@ namespace Step15
   // boundary values for our problem.  Having refined the mesh (or just
   // started computations), there might be new nodal points on the
   // boundary. These have values that are simply interpolated from the
-  // previous mesh (or are just zero), instead of the correct boundary
-  // values. This is fixed up by setting all boundary nodes explicit to the
-  // right value:
+  // previous mesh in `refine_mesh()`, instead of the correct boundary
+  // values. This is fixed up by setting all boundary nodes of the current
+  // solution vector explicit to the right value.
+  //
+  // There is one issue we have to pay attention to, though: If we have
+  // a hanging node right next to a new boundary node, then its value
+  // must also be adjusted to make sure that the finite element field
+  // remains continuous. This is what the call in the last line of this
+  // function does.
   template <int dim>
   void MinimalSurfaceProblem<dim>::set_boundary_values()
   {
@@ -466,6 +468,8 @@ namespace Step15
                                              boundary_values);
     for (auto &boundary_value : boundary_values)
       current_solution(boundary_value.first) = boundary_value.second;
+
+    hanging_node_constraints.distribute(current_solution);
   }
 
 
@@ -524,7 +528,8 @@ namespace Step15
 
         for (unsigned int q = 0; q < n_q_points; ++q)
           {
-            const double coeff = 1 / std::sqrt(1 + gradients[q] * gradients[q]);
+            const double coeff =
+              1. / std::sqrt(1 + gradients[q] * gradients[q]);
 
             for (unsigned int i = 0; i < dofs_per_cell; ++i)
               cell_residual(i) -= (fe_values.shape_grad(i, q) // \nabla \phi_i
@@ -549,17 +554,15 @@ namespace Step15
     // thing on every cell and so we didn't not want to deal with the question
     // of whether a particular degree of freedom sits at the boundary in the
     // integration above. Rather, we will simply set to zero these entries
-    // after the fact. To this end, we first need to determine which degrees
+    // after the fact. To this end, we need to determine which degrees
     // of freedom do in fact belong to the boundary and then loop over all of
     // those and set the residual entry to zero. This happens in the following
-    // lines which we have already seen used in step-11:
+    // lines which we have already seen used in step-11, using the appropriate
+    // function from namespace DoFTools:
     hanging_node_constraints.condense(residual);
 
-    IndexSet boundary_dofs(dof_handler.n_dofs());
-    DoFTools::extract_boundary_dofs(dof_handler,
-                                    ComponentMask(),
-                                    boundary_dofs);
-    for (types::global_dof_index i : boundary_dofs)
+    for (types::global_dof_index i :
+         DoFTools::extract_boundary_dofs(dof_handler))
       residual(i) = 0;
 
     // At the end of the function, we return the norm of the residual:
@@ -580,13 +583,36 @@ namespace Step15
   // choice: ideally, what one wants is that the step size goes to one as we
   // get closer to the solution, so that we get to enjoy the rapid quadratic
   // convergence of Newton's method. We will discuss better strategies below
-  // in the results section.
+  // in the results section, and step-77 also covers this aspect.
   template <int dim>
   double MinimalSurfaceProblem<dim>::determine_step_length() const
   {
     return 0.1;
   }
 
+
+
+  // @sect4{MinimalSurfaceProblem::output_results}
+
+  // This last function to be called from `run()` outputs the current solution
+  // (and the Newton update) in graphical form as a VTU file. It is entirely the
+  // same as what has been used in previous tutorials.
+  template <int dim>
+  void MinimalSurfaceProblem<dim>::output_results(
+    const unsigned int refinement_cycle) const
+  {
+    DataOut<dim> data_out;
+
+    data_out.attach_dof_handler(dof_handler);
+    data_out.add_data_vector(current_solution, "solution");
+    data_out.add_data_vector(newton_update, "update");
+    data_out.build_patches();
+
+    const std::string filename =
+      "solution-" + Utilities::int_to_string(refinement_cycle, 2) + ".vtu";
+    std::ofstream output(filename);
+    data_out.write_vtu(output);
+  }
 
 
   // @sect4{MinimalSurfaceProblem::run}
@@ -611,13 +637,15 @@ namespace Step15
     setup_system(/*first time=*/true);
     set_boundary_values();
 
-    // The Newton iteration starts next. During the first step we do not have
-    // information about the residual prior to this step and so we continue
-    // the Newton iteration until we have reached at least one iteration and
-    // until residual is less than $10^{-3}$.
-    double       previous_res     = 0;
-    unsigned int refinement_cycle = 0;
-    while ((refinement_cycle == 0) || (previous_res > 1e-3))
+    // The Newton iteration starts next. We iterate until the (norm of the)
+    // residual computed at the end of the previous iteration is less than
+    // $10^{-3}$, as checked at the end of the `do { ... } while` loop that
+    // starts here. Because we don't have a reasonable value to initialize
+    // the variable, we just use the largest value that can be represented
+    // as a `double`.
+    double       last_residual_norm = std::numeric_limits<double>::max();
+    unsigned int refinement_cycle   = 0;
+    do
       {
         std::cout << "Mesh refinement step " << refinement_cycle << std::endl;
 
@@ -632,38 +660,30 @@ namespace Step15
         // hand side as the residual to check against when deciding whether to
         // stop the iterations. We then solve the linear system (the function
         // also updates $u^{n+1}=u^n+\alpha^n\;\delta u^n$) and output the
-        // residual at the end of this Newton step:
+        // norm of the residual at the end of this Newton step.
+        //
+        // After the end of this loop, we then also output the solution on the
+        // current mesh in graphical form and increment the counter for the
+        // mesh refinement cycle.
         std::cout << "  Initial residual: " << compute_residual(0) << std::endl;
 
         for (unsigned int inner_iteration = 0; inner_iteration < 5;
              ++inner_iteration)
           {
             assemble_system();
-            previous_res = system_rhs.l2_norm();
+            last_residual_norm = system_rhs.l2_norm();
 
             solve();
 
             std::cout << "  Residual: " << compute_residual(0) << std::endl;
           }
 
-        // Just before we refine the mesh again, we then output the
-        // solution as well as the Newton update, and increment the
-        // mesh refinement cycle counter by one:
-        DataOut<dim> data_out;
-
-        data_out.attach_dof_handler(dof_handler);
-        data_out.add_data_vector(current_solution, "solution");
-        data_out.add_data_vector(newton_update, "update");
-        data_out.build_patches();
-
-        const std::string filename =
-          "solution-" + Utilities::int_to_string(refinement_cycle, 2) + ".vtu";
-        std::ofstream output(filename);
-        data_out.write_vtu(output);
+        output_results(refinement_cycle);
 
         ++refinement_cycle;
         std::cout << std::endl;
       }
+    while (last_residual_norm > 1e-3);
   }
 } // namespace Step15
 

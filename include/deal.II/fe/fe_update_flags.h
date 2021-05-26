@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2019 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -581,7 +581,7 @@ namespace internal
       HessianVector shape_hessians;
 
       /**
-       * Store the 3nd derivatives of the shape functions at the quadrature
+       * Store the 3rd derivatives of the shape functions at the quadrature
        * points.  See the description of the data type for the layout of the
        * data in this field.
        */

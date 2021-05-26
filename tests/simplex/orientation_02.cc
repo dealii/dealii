@@ -30,7 +30,7 @@ test(const unsigned int orientation)
 
 
   Triangulation<3> dummy, tria;
-  GridGenerator::reference_cell(ReferenceCells::Tetrahedron, dummy);
+  GridGenerator::reference_cell(dummy, ReferenceCells::Tetrahedron);
 
   auto vertices = dummy.get_vertices();
 

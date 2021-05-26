@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2020 by the deal.II authors
+// Copyright (C) 1998 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1027,6 +1027,7 @@ namespace VectorTools
 
       // Get boundary function values
       // at quadrature points.
+      AssertDimension(boundary_function.n_components, fe.n_components());
       boundary_function.vector_value_list(quadrature_points, values);
 
       const std::vector<Point<dim>> &reference_quadrature_points =
@@ -1219,6 +1220,7 @@ namespace VectorTools
       // Get boundary function
       // values at quadrature
       // points.
+      AssertDimension(boundary_function.n_components, fe.n_components());
       boundary_function.vector_value_list(quadrature_points, values);
 
       switch (dim)
@@ -2133,6 +2135,7 @@ namespace VectorTools
 
       // Get boundary function values
       // at quadrature points.
+      AssertDimension(boundary_function.n_components, fe.n_components());
       boundary_function.vector_value_list(quadrature_points, values);
 
       // Find the group of vector components we want to project onto
@@ -2440,6 +2443,7 @@ namespace VectorTools
                                          Vector<number>(fe.n_components()));
 
       // Get boundary function values at quadrature points.
+      AssertDimension(boundary_function.n_components, fe.n_components());
       boundary_function.vector_value_list(quadrature_points, values);
 
       // Find where the group of vector components (dim of them,
@@ -2828,7 +2832,7 @@ namespace VectorTools
                     }
 
                   // Tensor of normal vector on the face at q_point;
-                  const Tensor<1, dim> normal_vector =
+                  const Tensor<1, dim> &normal_vector =
                     fe_face_values.normal_vector(q_point);
 
                   // Now compute the linear system:
@@ -2961,17 +2965,15 @@ namespace VectorTools
                                              update_JxW_values);
 
       // Storage for dof values found and whether they have been processed:
-      std::vector<bool>                                        dofs_processed;
-      std::vector<number>                                      dof_values;
-      std::vector<types::global_dof_index>                     face_dof_indices;
-      typename DoFHandler<dim, spacedim>::active_cell_iterator cell =
-        dof_handler.begin_active();
+      std::vector<bool>                    dofs_processed;
+      std::vector<number>                  dof_values;
+      std::vector<types::global_dof_index> face_dof_indices;
 
       switch (dim)
         {
           case 2:
             {
-              for (; cell != dof_handler.end(); ++cell)
+              for (const auto &cell : dof_handler.active_cell_iterators())
                 {
                   if (cell->at_boundary() && cell->is_locally_owned())
                     {
@@ -3094,7 +3096,7 @@ namespace VectorTools
                                                  update_quadrature_points |
                                                  update_values);
 
-              for (; cell != dof_handler.end(); ++cell)
+              for (const auto &cell : dof_handler.active_cell_iterators())
                 {
                   if (cell->at_boundary() && cell->is_locally_owned())
                     {
@@ -3143,7 +3145,7 @@ namespace VectorTools
 
                               // First compute the projection on the edges.
                               for (unsigned int line = 0;
-                                   line < GeometryInfo<3>::lines_per_face;
+                                   line < cell->face(face)->n_lines();
                                    ++line)
                                 {
                                   compute_edge_projection_l2(

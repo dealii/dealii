@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2020 by the deal.II authors
+// Copyright (C) 1999 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -248,18 +248,11 @@ namespace internal
             AssertDimension(fe_index,
                             (DoFHandler<dim, spacedim>::default_fe_index));
 
-            if (d == 0)
-              process(
-                dof_handler.object_dof_indices
-                  [0][0][obj_index * dof_handler.get_fe().n_dofs_per_vertex() +
-                         local_index],
-                global_index);
-            else
-              process(dof_handler.object_dof_indices
-                        [obj_level][d]
-                        [dof_handler.object_dof_ptr[obj_level][d][obj_index] +
-                         local_index],
-                      global_index);
+            process(dof_handler.object_dof_indices
+                      [obj_level][d]
+                      [dof_handler.object_dof_ptr[obj_level][d][obj_index] +
+                       local_index],
+                    global_index);
 
             return;
           }
@@ -360,25 +353,12 @@ namespace internal
             AssertDimension(fe_index,
                             (DoFHandler<dim, spacedim>::default_fe_index));
 
-            // vertex -> no pointers are saved
-            if (d == 0)
-              {
-                const unsigned int ptr_0 =
-                  obj_index * dof_handler.get_fe().n_dofs_per_vertex();
-                const unsigned int ptr_1 =
-                  ptr_0 + dof_handler.get_fe().n_dofs_per_vertex();
+            const unsigned int ptr_0 =
+              dof_handler.object_dof_ptr[obj_level][d][obj_index];
+            const unsigned int ptr_1 =
+              dof_handler.object_dof_ptr[obj_level][d][obj_index + 1];
 
-                return {ptr_0, ptr_1};
-              }
-            else // line or quad
-              {
-                const unsigned int ptr_0 =
-                  dof_handler.object_dof_ptr[obj_level][d][obj_index];
-                const unsigned int ptr_1 =
-                  dof_handler.object_dof_ptr[obj_level][d][obj_index + 1];
-
-                return {ptr_0, ptr_1};
-              }
+            return {ptr_0, ptr_1};
           }
 
         // 3) hp is used
@@ -811,9 +791,13 @@ namespace internal
       n_dof_indices(
         const dealii::DoFAccessor<structdim, dim, spacedim, level_dof_access>
           &                accessor,
-        const unsigned int fe_index_)
+        const unsigned int fe_index_,
+        const bool         count_level_dofs)
       {
-        if (level_dof_access)
+        // note: we cannot rely on the template parameter level_dof_access here,
+        // since the function get_mg_dof_indices()/set_mg_dof_indices() can be
+        // called even if level_dof_access==false.
+        if (count_level_dofs)
           {
             const auto &fe = accessor.get_fe(fe_index_);
 
@@ -904,9 +888,16 @@ namespace internal
           &                 accessor,
         DoFIndicesType &    dof_indices,
         const unsigned int  fe_index,
-        const DoFOperation &dof_operation)
+        const DoFOperation &dof_operation,
+        const bool          count_level_dofs)
       {
-        AssertDimension(dof_indices.size(), n_dof_indices(accessor, fe_index));
+        // we cannot rely on the template parameter level_dof_access here, since
+        // the function get_mg_dof_indices()/set_mg_dof_indices() can be called
+        // even if level_dof_access==false.
+        (void)count_level_dofs;
+
+        AssertIndexRange(n_dof_indices(accessor, fe_index, count_level_dofs),
+                         dof_indices.size() + 1);
 
         const auto &fe = accessor.get_fe(fe_index);
 
@@ -967,7 +958,17 @@ namespace internal
                                    dof_indices,
                                    fe_index);
 
-        AssertDimension(dof_indices.size(), index);
+        AssertDimension(n_dof_indices(accessor, fe_index, count_level_dofs),
+                        index);
+
+        // PM: This is a part that should not be reached since it indicates that
+        // an object (and/or its subobjects) is not active. However,
+        // unfortunately this function is called by
+        // DoFTools::set_periodicity_constraints() indirectly by
+        // get_dof_indices() also for artificial faces to determine if a face
+        // is artificial.
+        for (; index < dof_indices.size(); ++index)
+          dof_operation.process_non_active_dof(dof_indices, index);
       }
 
 
@@ -1054,6 +1055,17 @@ namespace internal
           const unsigned int) const
         {
           Assert(false, ExcInternalError());
+        }
+
+        /**
+         * Process non-active DoF.
+         */
+        DEAL_II_ALWAYS_INLINE void
+        process_non_active_dof(
+          std::vector<types::global_dof_index> &dof_indices,
+          const unsigned int                    index) const
+        {
+          dof_indices[index] = numbers::invalid_dof_index;
         }
       };
 
@@ -1142,6 +1154,16 @@ namespace internal
         {
           Assert(false, ExcInternalError());
         }
+
+        /**
+         * Process non-active DoF.
+         */
+        DEAL_II_ALWAYS_INLINE void
+        process_non_active_dof(const std::vector<types::global_dof_index> &,
+                               const unsigned int) const
+        {
+          Assert(false, ExcInternalError());
+        }
       };
 
 
@@ -1213,6 +1235,16 @@ namespace internal
           unsigned int &,
           std::vector<types::global_dof_index> &,
           const unsigned int) const
+        {
+          Assert(false, ExcInternalError());
+        }
+
+        /**
+         * Process non-active DoF.
+         */
+        DEAL_II_ALWAYS_INLINE void
+        process_non_active_dof(std::vector<types::global_dof_index> &,
+                               const unsigned int) const
         {
           Assert(false, ExcInternalError());
         }
@@ -1297,6 +1329,16 @@ namespace internal
           Assert(false, ExcInternalError());
         }
 
+        /**
+         * Process non-active DoF.
+         */
+        DEAL_II_ALWAYS_INLINE void
+        process_non_active_dof(const std::vector<types::global_dof_index> &,
+                               const unsigned int) const
+        {
+          Assert(false, ExcInternalError());
+        }
+
       private:
         const FiniteElement<dim, spacedim> &fe;
         const unsigned int                  level;
@@ -1316,7 +1358,8 @@ namespace internal
           accessor,
           dof_indices,
           fe_index,
-          DoFIndexGetter<dim, spacedim, level_dof_access, structdim>());
+          DoFIndexGetter<dim, spacedim, level_dof_access, structdim>(),
+          false);
       }
 
 
@@ -1344,7 +1387,8 @@ namespace internal
           accessor,
           dof_indices,
           fe_index,
-          DoFIndexSetter<dim, spacedim, level_dof_access, structdim>());
+          DoFIndexSetter<dim, spacedim, level_dof_access, structdim>(),
+          false);
       }
 
 
@@ -1363,7 +1407,8 @@ namespace internal
           dof_indices,
           fe_index,
           MGDoFIndexGetter<dim, spacedim, level_dof_access, structdim>(
-            accessor.get_fe(fe_index), level));
+            accessor.get_fe(fe_index), level),
+          true);
       }
 
 
@@ -1392,7 +1437,8 @@ namespace internal
           dof_indices,
           fe_index,
           MGDoFIndexSetter<dim, spacedim, level_dof_access, structdim>(
-            accessor.get_fe(fe_index), level));
+            accessor.get_fe(fe_index), level),
+          true);
       }
     };
   } // namespace DoFAccessorImplementation

@@ -46,6 +46,16 @@ namespace LACExceptions
   DeclException0(ExcDifferentBlockIndices);
 
   /**
+   * The operation requires a sparsity pattern.
+   */
+  DeclExceptionMsg(
+    ExcNeedsSparsityPattern,
+    "This function requires that the current object have a "
+    "sparsity pattern attached to it, but no sparsity pattern "
+    "is available. This usually means that there is a missing "
+    "reinit() call which would have added the sparsity pattern.");
+
+  /**
    * Exception thrown when a PETSc function reports an error. If possible,
    * this exception uses the message provided by
    * <code>PetscErrorMessage</code> to print a description of the error.

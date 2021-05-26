@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2020 by the deal.II authors
+// Copyright (C) 2001 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -143,6 +143,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const std::vector<Point<deal_II_space_dimension>> &,
         const std::vector<std::vector<BoundingBox<deal_II_space_dimension>>> &,
         const double,
+        const bool,
         const bool);
     \}
 
@@ -244,6 +245,16 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
                                  SubCellData &,
                                  std::vector<unsigned int> &,
                                  double);
+
+      template void
+      invert_all_negative_measure_cells(
+        const std::vector<Point<deal_II_space_dimension>> &,
+        std::vector<CellData<deal_II_dimension>> &);
+
+#  if deal_II_dimension == deal_II_space_dimension
+      template void
+      consistently_order_cells(std::vector<CellData<deal_II_dimension>> &);
+#  endif
 
       template void
       shift<deal_II_dimension>(
@@ -481,5 +492,13 @@ for (deal_II_dimension : DIMENSIONS)
         Triangulation<deal_II_dimension, deal_II_dimension + 1> &,
         double,
         unsigned int);
+#endif
+  }
+
+for (deal_II_vec : REAL_NONBLOCK_VECTORS; deal_II_dimension : DIMENSIONS)
+  {
+#if deal_II_dimension > 1
+    template class GridTools::MarchingCubeAlgorithm<deal_II_dimension,
+                                                    deal_II_vec>;
 #endif
   }

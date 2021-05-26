@@ -53,8 +53,11 @@ namespace Utilities
        *   the tolerance in order to be able to identify a cell.
        *   Floating point arithmetic implies that a point will, in general, not
        *   lie exactly on a vertex, edge, or face.
+       * @param enforce_unique_mapping Enforce unique mapping, i.e.,
+       *   (one-to-one) relation of points and cells.
        */
-      RemotePointEvaluation(const double tolerance = 1e-6);
+      RemotePointEvaluation(const double tolerance              = 1e-6,
+                            const bool   enforce_unique_mapping = false);
 
       /**
        * Destructor.
@@ -167,6 +170,12 @@ namespace Utilities
        * point.
        */
       const double tolerance;
+
+      /**
+       * Enforce unique mapping, i.e., (one-to-one) relation of points and
+       * cells.
+       */
+      const bool enforce_unique_mapping;
 
       /**
        * Storage for the status of the triangulation signal.
@@ -301,13 +310,14 @@ namespace Utilities
 
           requests.push_back(MPI_Request());
 
-          MPI_Isend(buffer.data(),
-                    buffer.size(),
-                    MPI_CHAR,
-                    send_ranks[i],
-                    internal::Tags::remote_point_evaluation,
-                    tria->get_communicator(),
-                    &requests.back());
+          const int ierr = MPI_Isend(buffer.data(),
+                                     buffer.size(),
+                                     MPI_CHAR,
+                                     send_ranks[i],
+                                     internal::Tags::remote_point_evaluation,
+                                     tria->get_communicator(),
+                                     &requests.back());
+          AssertThrowMPI(ierr);
         }
 
       for (const auto recv_rank : recv_ranks)
@@ -316,30 +326,35 @@ namespace Utilities
             continue;
 
           MPI_Status status;
-          MPI_Probe(MPI_ANY_SOURCE,
-                    internal::Tags::remote_point_evaluation,
-                    tria->get_communicator(),
-                    &status);
+          int        ierr = MPI_Probe(MPI_ANY_SOURCE,
+                               internal::Tags::remote_point_evaluation,
+                               tria->get_communicator(),
+                               &status);
+          AssertThrowMPI(ierr);
 
           int message_length;
-          MPI_Get_count(&status, MPI_CHAR, &message_length);
+          ierr = MPI_Get_count(&status, MPI_CHAR, &message_length);
+          AssertThrowMPI(ierr);
 
           std::vector<char> buffer(message_length);
 
-          MPI_Recv(buffer.data(),
-                   buffer.size(),
-                   MPI_CHAR,
-                   status.MPI_SOURCE,
-                   internal::Tags::remote_point_evaluation,
-                   tria->get_communicator(),
-                   MPI_STATUS_IGNORE);
+          ierr = MPI_Recv(buffer.data(),
+                          buffer.size(),
+                          MPI_CHAR,
+                          status.MPI_SOURCE,
+                          internal::Tags::remote_point_evaluation,
+                          tria->get_communicator(),
+                          MPI_STATUS_IGNORE);
+          AssertThrowMPI(ierr);
 
           temp_recv_map[status.MPI_SOURCE] =
             Utilities::unpack<std::vector<T>>(buffer, false);
         }
 
       // make sure all messages have been sent
-      MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
+      const int ierr =
+        MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
+      AssertThrowMPI(ierr);
 
       // copy received data into output vector
       auto it = recv_permutation.begin();
@@ -434,13 +449,14 @@ namespace Utilities
 
           requests.push_back(MPI_Request());
 
-          MPI_Isend(buffer_send.data(),
-                    buffer_send.size(),
-                    MPI_CHAR,
-                    recv_rank,
-                    internal::Tags::remote_point_evaluation,
-                    tria->get_communicator(),
-                    &requests.back());
+          const int ierr = MPI_Isend(buffer_send.data(),
+                                     buffer_send.size(),
+                                     MPI_CHAR,
+                                     recv_rank,
+                                     internal::Tags::remote_point_evaluation,
+                                     tria->get_communicator(),
+                                     &requests.back());
+          AssertThrowMPI(ierr);
         }
 
       for (unsigned int i = 0; i < send_ranks.size(); ++i)
@@ -465,24 +481,26 @@ namespace Utilities
             }
 
           MPI_Status status;
-          MPI_Probe(MPI_ANY_SOURCE,
-                    internal::Tags::remote_point_evaluation,
-                    tria->get_communicator(),
-                    &status);
+          int        ierr = MPI_Probe(MPI_ANY_SOURCE,
+                               internal::Tags::remote_point_evaluation,
+                               tria->get_communicator(),
+                               &status);
+          AssertThrowMPI(ierr);
 
           int message_length;
-          MPI_Get_count(&status, MPI_CHAR, &message_length);
+          ierr = MPI_Get_count(&status, MPI_CHAR, &message_length);
+          AssertThrowMPI(ierr);
 
           std::vector<char> recv_buffer(message_length);
 
-          MPI_Recv(recv_buffer.data(),
-                   recv_buffer.size(),
-                   MPI_CHAR,
-                   status.MPI_SOURCE,
-                   internal::Tags::remote_point_evaluation,
-                   tria->get_communicator(),
-                   MPI_STATUS_IGNORE);
-
+          ierr = MPI_Recv(recv_buffer.data(),
+                          recv_buffer.size(),
+                          MPI_CHAR,
+                          status.MPI_SOURCE,
+                          internal::Tags::remote_point_evaluation,
+                          tria->get_communicator(),
+                          MPI_STATUS_IGNORE);
+          AssertThrowMPI(ierr);
 
           const auto recv_buffer_unpacked =
             Utilities::unpack<std::vector<T>>(recv_buffer, false);
@@ -506,7 +524,9 @@ namespace Utilities
             }
         }
 
-      MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
+      const int ierr =
+        MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
+      AssertThrowMPI(ierr);
 
       // sort for easy access during function call
       for (unsigned int i = 0; i < send_permutation.size(); ++i)

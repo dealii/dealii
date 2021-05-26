@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2020 by the deal.II authors
+// Copyright (C) 2011 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,8 +19,11 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/array_view.h>
+#include <deal.II/base/index_set.h>
 #include <deal.II/base/mpi_tags.h>
 #include <deal.II/base/numbers.h>
+
+#include <boost/signals2.hpp>
 
 #include <map>
 #include <numeric>
@@ -990,6 +993,32 @@ namespace Utilities
       static void
       unregister_request(MPI_Request &request);
 
+      /**
+       * A structure that has boost::signal objects to register a call back
+       * to run after MPI init or finalize.
+       *
+       * For documentation on signals, see
+       * http://www.boost.org/doc/libs/release/libs/signals2 .
+       */
+      struct Signals
+      {
+        /**
+         * A signal that is triggered immediately after we have
+         * initialized the MPI context with <code>MPI_Init()</code>.
+         */
+        boost::signals2::signal<void()> at_mpi_init;
+
+        /**
+         * A signal that is triggered just before we close the MPI context
+         * with <code>MPI_Finalize()</code>. It can be used to deallocate
+         * statically allocated MPI resources that need to be deallocated
+         * before <code>MPI_Finalize()</code> is called.
+         */
+        boost::signals2::signal<void()> at_mpi_finalize;
+      };
+
+      static Signals signals;
+
     private:
       /**
        * Requests to MPI_Wait before finalizing
@@ -1085,7 +1114,9 @@ namespace Utilities
      * @param[in] root_process The process that sends the object to all
      * processes. By default the process with rank 0 is the root process.
      *
-     * @return Every process receives the object sent by the @p root_process.
+     * @return On the root process, return a copy of @p object_to_send.
+     *   On every other process, return a copy of the object sent by
+     *   the @p root_process.
      */
     template <typename T>
     T
@@ -1367,8 +1398,9 @@ namespace Utilities
       std::vector<int> size_all_data(n_procs, 0);
 
       // Exchanging the size of each buffer
-      MPI_Allgather(
+      int ierr = MPI_Allgather(
         &n_local_data, 1, MPI_INT, size_all_data.data(), 1, MPI_INT, comm);
+      AssertThrowMPI(ierr);
 
       // Now computing the displacement, relative to recvbuf,
       // at which to store the incoming buffer
@@ -1381,14 +1413,15 @@ namespace Utilities
       std::vector<char> received_unrolled_buffer(rdispls.back() +
                                                  size_all_data.back());
 
-      MPI_Allgatherv(buffer.data(),
-                     n_local_data,
-                     MPI_CHAR,
-                     received_unrolled_buffer.data(),
-                     size_all_data.data(),
-                     rdispls.data(),
-                     MPI_CHAR,
-                     comm);
+      ierr = MPI_Allgatherv(buffer.data(),
+                            n_local_data,
+                            MPI_CHAR,
+                            received_unrolled_buffer.data(),
+                            size_all_data.data(),
+                            rdispls.data(),
+                            MPI_CHAR,
+                            comm);
+      AssertThrowMPI(ierr);
 
       std::vector<T> received_objects(n_procs);
       for (unsigned int i = 0; i < n_procs; ++i)
@@ -1485,6 +1518,8 @@ namespace Utilities
 #  endif
     }
 
+
+
     template <typename T>
     T
     broadcast(const MPI_Comm &   comm,
@@ -1524,7 +1559,10 @@ namespace Utilities
         MPI_Bcast(buffer.data(), buffer_size, MPI_CHAR, root_process, comm);
       AssertThrowMPI(ierr);
 
-      return Utilities::unpack<T>(buffer, false);
+      if (Utilities::MPI::this_mpi_process(comm) == root_process)
+        return object_to_send;
+      else
+        return Utilities::unpack<T>(buffer, false);
 #  endif
     }
 

@@ -192,7 +192,7 @@ SparseMatrix<number>::operator=(const double d)
   (void)d;
   Assert(d == 0, ExcScalarAssignmentOnlyForZeroValue());
 
-  Assert(cols != nullptr, ExcNotInitialized());
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(cols->compressed || cols->empty(),
          SparsityPattern::ExcNotCompressed());
 
@@ -305,7 +305,7 @@ template <typename number>
 typename SparseMatrix<number>::size_type
 SparseMatrix<number>::get_row_length(const size_type row) const
 {
-  Assert(cols != nullptr, ExcNotInitialized());
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
   return cols->row_length(row);
 }
 
@@ -315,7 +315,7 @@ template <typename number>
 std::size_t
 SparseMatrix<number>::n_nonzero_elements() const
 {
-  Assert(cols != nullptr, ExcNotInitialized());
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
   return cols->n_nonzero_elements();
 }
 
@@ -325,7 +325,7 @@ template <typename number>
 std::size_t
 SparseMatrix<number>::n_actually_nonzero_elements(const double threshold) const
 {
-  Assert(cols != nullptr, ExcNotInitialized());
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(threshold >= 0, ExcMessage("Negative threshold!"));
   size_type         nnz       = 0;
   const std::size_t nnz_alloc = n_nonzero_elements();
@@ -341,7 +341,7 @@ template <typename number>
 void
 SparseMatrix<number>::symmetrize()
 {
-  Assert(cols != nullptr, ExcNotInitialized());
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(cols->rows == cols->cols, ExcNotQuadratic());
 
   const size_type n_rows = m();
@@ -381,7 +381,7 @@ template <typename somenumber>
 SparseMatrix<number> &
 SparseMatrix<number>::copy_from(const SparseMatrix<somenumber> &matrix)
 {
-  Assert(cols != nullptr, ExcNotInitialized());
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(val != nullptr, ExcNotInitialized());
   Assert(cols == matrix.cols, ExcDifferentSparsityPatterns());
 
@@ -464,7 +464,7 @@ void
 SparseMatrix<number>::add(const number                    factor,
                           const SparseMatrix<somenumber> &matrix)
 {
-  Assert(cols != nullptr, ExcNotInitialized());
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(val != nullptr, ExcNotInitialized());
   Assert(cols == matrix.cols, ExcDifferentSparsityPatterns());
 
@@ -540,7 +540,7 @@ SparseMatrix<number>::add(const size_type  row,
                           const bool       elide_zero_values,
                           const bool       col_indices_are_sorted)
 {
-  Assert(cols != nullptr, ExcNotInitialized());
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
   AssertIndexRange(row, m());
 
   // if we have sufficiently many columns
@@ -689,7 +689,7 @@ SparseMatrix<number>::set(const size_type  row,
                           const number2 *  values,
                           const bool       elide_zero_values)
 {
-  Assert(cols != nullptr, ExcNotInitialized());
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
   AssertIndexRange(row, m());
 
   // First, search all the indices to find
@@ -768,7 +768,7 @@ template <class OutVector, class InVector>
 void
 SparseMatrix<number>::vmult(OutVector &dst, const InVector &src) const
 {
-  Assert(cols != nullptr, ExcNotInitialized());
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(val != nullptr, ExcNotInitialized());
   Assert(m() == dst.size(), ExcDimensionMismatch(m(), dst.size()));
   Assert(n() == src.size(), ExcDimensionMismatch(n(), src.size()));
@@ -800,7 +800,7 @@ void
 SparseMatrix<number>::Tvmult(OutVector &dst, const InVector &src) const
 {
   Assert(val != nullptr, ExcNotInitialized());
-  Assert(cols != nullptr, ExcNotInitialized());
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(n() == dst.size(), ExcDimensionMismatch(n(), dst.size()));
   Assert(m() == src.size(), ExcDimensionMismatch(m(), src.size()));
 
@@ -826,7 +826,7 @@ template <class OutVector, class InVector>
 void
 SparseMatrix<number>::vmult_add(OutVector &dst, const InVector &src) const
 {
-  Assert(cols != nullptr, ExcNotInitialized());
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(val != nullptr, ExcNotInitialized());
   Assert(m() == dst.size(), ExcDimensionMismatch(m(), dst.size()));
   Assert(n() == src.size(), ExcDimensionMismatch(n(), src.size()));
@@ -858,7 +858,7 @@ void
 SparseMatrix<number>::Tvmult_add(OutVector &dst, const InVector &src) const
 {
   Assert(val != nullptr, ExcNotInitialized());
-  Assert(cols != nullptr, ExcNotInitialized());
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(n() == dst.size(), ExcDimensionMismatch(n(), dst.size()));
   Assert(m() == src.size(), ExcDimensionMismatch(m(), src.size()));
 
@@ -918,7 +918,7 @@ template <typename somenumber>
 somenumber
 SparseMatrix<number>::matrix_norm_square(const Vector<somenumber> &v) const
 {
-  Assert(cols != nullptr, ExcNotInitialized());
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(val != nullptr, ExcNotInitialized());
   Assert(m() == v.size(), ExcDimensionMismatch(m(), v.size()));
   Assert(n() == v.size(), ExcDimensionMismatch(n(), v.size()));
@@ -986,7 +986,7 @@ somenumber
 SparseMatrix<number>::matrix_scalar_product(const Vector<somenumber> &u,
                                             const Vector<somenumber> &v) const
 {
-  Assert(cols != nullptr, ExcNotInitialized());
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(val != nullptr, ExcNotInitialized());
   Assert(m() == u.size(), ExcDimensionMismatch(m(), u.size()));
   Assert(n() == v.size(), ExcDimensionMismatch(n(), v.size()));
@@ -1019,9 +1019,9 @@ SparseMatrix<number>::mmult(SparseMatrix<numberC> &      C,
 {
   const bool use_vector = V.size() == n() ? true : false;
   Assert(n() == B.m(), ExcDimensionMismatch(n(), B.m()));
-  Assert(cols != nullptr, ExcNotInitialized());
-  Assert(B.cols != nullptr, ExcNotInitialized());
-  Assert(C.cols != nullptr, ExcNotInitialized());
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
+  Assert(B.cols != nullptr, ExcNeedsSparsityPattern());
+  Assert(C.cols != nullptr, ExcNeedsSparsityPattern());
 
   const SparsityPattern &sp_A = *cols;
   const SparsityPattern &sp_B = *B.cols;
@@ -1125,9 +1125,9 @@ SparseMatrix<number>::Tmmult(SparseMatrix<numberC> &      C,
 {
   const bool use_vector = V.size() == m() ? true : false;
   Assert(m() == B.m(), ExcDimensionMismatch(m(), B.m()));
-  Assert(cols != nullptr, ExcNotInitialized());
-  Assert(B.cols != nullptr, ExcNotInitialized());
-  Assert(C.cols != nullptr, ExcNotInitialized());
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
+  Assert(B.cols != nullptr, ExcNeedsSparsityPattern());
+  Assert(C.cols != nullptr, ExcNeedsSparsityPattern());
 
   const SparsityPattern &sp_A = *cols;
   const SparsityPattern &sp_B = *B.cols;
@@ -1226,7 +1226,7 @@ template <typename number>
 typename SparseMatrix<number>::real_type
 SparseMatrix<number>::l1_norm() const
 {
-  Assert(cols != nullptr, ExcNotInitialized());
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(val != nullptr, ExcNotInitialized());
 
   Vector<real_type> column_sums(n());
@@ -1245,7 +1245,7 @@ template <typename number>
 typename SparseMatrix<number>::real_type
 SparseMatrix<number>::linfty_norm() const
 {
-  Assert(cols != nullptr, ExcNotInitialized());
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(val != nullptr, ExcNotInitialized());
 
   const number *val_ptr = &val[cols->rowstart[0]];
@@ -1332,7 +1332,7 @@ SparseMatrix<number>::residual(Vector<somenumber> &      dst,
                                const Vector<somenumber> &u,
                                const Vector<somenumber> &b) const
 {
-  Assert(cols != nullptr, ExcNotInitialized());
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(val != nullptr, ExcNotInitialized());
   Assert(m() == dst.size(), ExcDimensionMismatch(m(), dst.size()));
   Assert(m() == b.size(), ExcDimensionMismatch(m(), b.size()));
@@ -1400,7 +1400,7 @@ SparseMatrix<number>::precondition_Jacobi(Vector<somenumber> &      dst,
                                           const Vector<somenumber> &src,
                                           const number              om) const
 {
-  Assert(cols != nullptr, ExcNotInitialized());
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(val != nullptr, ExcNotInitialized());
   AssertDimension(m(), n());
   AssertDimension(dst.size(), n());
@@ -1447,7 +1447,7 @@ SparseMatrix<number>::precondition_SSOR(
   // you may want to take a look at the CVS
   // archives to see the original version
   // which is much clearer...
-  Assert(cols != nullptr, ExcNotInitialized());
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(val != nullptr, ExcNotInitialized());
   AssertDimension(m(), n());
   AssertDimension(dst.size(), n());
@@ -1574,7 +1574,7 @@ SparseMatrix<number>::precondition_SOR(Vector<somenumber> &      dst,
                                        const Vector<somenumber> &src,
                                        const number              om) const
 {
-  Assert(cols != nullptr, ExcNotInitialized());
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(val != nullptr, ExcNotInitialized());
 
   dst = src;
@@ -1589,7 +1589,7 @@ SparseMatrix<number>::precondition_TSOR(Vector<somenumber> &      dst,
                                         const Vector<somenumber> &src,
                                         const number              om) const
 {
-  Assert(cols != nullptr, ExcNotInitialized());
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(val != nullptr, ExcNotInitialized());
 
   dst = src;
@@ -1602,7 +1602,7 @@ template <typename somenumber>
 void
 SparseMatrix<number>::SOR(Vector<somenumber> &dst, const number om) const
 {
-  Assert(cols != nullptr, ExcNotInitialized());
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(val != nullptr, ExcNotInitialized());
   AssertDimension(m(), n());
   AssertDimension(dst.size(), n());
@@ -1629,7 +1629,7 @@ template <typename somenumber>
 void
 SparseMatrix<number>::TSOR(Vector<somenumber> &dst, const number om) const
 {
-  Assert(cols != nullptr, ExcNotInitialized());
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(val != nullptr, ExcNotInitialized());
   AssertDimension(m(), n());
   AssertDimension(dst.size(), n());
@@ -1662,7 +1662,7 @@ SparseMatrix<number>::PSOR(Vector<somenumber> &          dst,
                            const std::vector<size_type> &inverse_permutation,
                            const number                  om) const
 {
-  Assert(cols != nullptr, ExcNotInitialized());
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(val != nullptr, ExcNotInitialized());
   AssertDimension(m(), n());
 
@@ -1701,7 +1701,7 @@ SparseMatrix<number>::TPSOR(Vector<somenumber> &          dst,
                             const std::vector<size_type> &inverse_permutation,
                             const number                  om) const
 {
-  Assert(cols != nullptr, ExcNotInitialized());
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(val != nullptr, ExcNotInitialized());
   AssertDimension(m(), n());
 
@@ -1738,7 +1738,7 @@ SparseMatrix<number>::Jacobi_step(Vector<somenumber> &      v,
                                   const Vector<somenumber> &b,
                                   const number              om) const
 {
-  Assert(cols != nullptr, ExcNotInitialized());
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(val != nullptr, ExcNotInitialized());
   AssertDimension(m(), n());
 
@@ -1769,7 +1769,7 @@ SparseMatrix<number>::SOR_step(Vector<somenumber> &      v,
                                const Vector<somenumber> &b,
                                const number              om) const
 {
-  Assert(cols != nullptr, ExcNotInitialized());
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(val != nullptr, ExcNotInitialized());
   AssertDimension(m(), n());
   Assert(m() == v.size(), ExcDimensionMismatch(m(), v.size()));
@@ -1797,7 +1797,7 @@ SparseMatrix<number>::TSOR_step(Vector<somenumber> &      v,
                                 const Vector<somenumber> &b,
                                 const number              om) const
 {
-  Assert(cols != nullptr, ExcNotInitialized());
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(val != nullptr, ExcNotInitialized());
   AssertDimension(m(), n());
   Assert(m() == v.size(), ExcDimensionMismatch(m(), v.size()));
@@ -1840,7 +1840,7 @@ SparseMatrix<number>::SSOR(Vector<somenumber> &dst, const number om) const
   // missing
   Assert(false, ExcNotImplemented());
 
-  Assert(cols != nullptr, ExcNotInitialized());
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(val != nullptr, ExcNotInitialized());
   AssertDimension(m(), n());
   Assert(m() == dst.size(), ExcDimensionMismatch(m(), dst.size()));
@@ -1890,7 +1890,7 @@ template <typename number>
 const SparsityPattern &
 SparseMatrix<number>::get_sparsity_pattern() const
 {
-  Assert(cols != nullptr, ExcNotInitialized());
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
   return *cols;
 }
 
@@ -1905,7 +1905,7 @@ SparseMatrix<number>::print_formatted(std::ostream &     out,
                                       const char *       zero_string,
                                       const double       denominator) const
 {
-  Assert(cols != nullptr, ExcNotInitialized());
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(val != nullptr, ExcNotInitialized());
 
   unsigned int width = width_;
@@ -1950,7 +1950,7 @@ void
 SparseMatrix<number>::print_pattern(std::ostream &out,
                                     const double  threshold) const
 {
-  Assert(cols != nullptr, ExcNotInitialized());
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(val != nullptr, ExcNotInitialized());
 
   for (size_type i = 0; i < m(); ++i)
@@ -1979,7 +1979,7 @@ SparseMatrix<number>::print_as_numpy_arrays(std::ostream &     out,
 
   out.precision(precision);
 
-  Assert(cols != nullptr, ExcNotInitialized());
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(val != nullptr, ExcNotInitialized());
 
   std::vector<number> rows;

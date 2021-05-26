@@ -176,7 +176,7 @@ public:
   }
 
   /**
-   * This operator advances the iterator by @p offet lanes and returns a
+   * This operator advances the iterator by @p offset lanes and returns a
    * reference to <tt>*this</tt>.
    */
   VectorizedArrayIterator<T> &
@@ -5011,7 +5011,7 @@ enum class SIMDComparison : int
  * whenever the control flow itself would depend on (computed) data. For
  * example, in case of a scalar data type the statement
  * <code>(left < right) ? true_value : false_value</code>
- * could have been also implementd using an <code>if</code>-statement:
+ * could have been also implemented using an <code>if</code>-statement:
  * @code
  * if (left < right)
  *     result = true_value;
@@ -5425,6 +5425,30 @@ namespace std
     for (unsigned int i = 0; i < dealii::VectorizedArray<Number, width>::size();
          ++i)
       values[i] = std::pow(x[i], p);
+    ::dealii::VectorizedArray<Number, width> out;
+    out.load(&values[0]);
+    return out;
+  }
+
+
+
+  /**
+   * Raises the given number @p x to the power @p p for a vectorized data
+   * field. The result is returned as vectorized array in the form
+   * <tt>{pow(x[0],p[0]), pow(x[1],p[1]), ...,
+   * pow(x[size()-1],p[size()-1])}</tt>.
+   *
+   * @relatesalso VectorizedArray
+   */
+  template <typename Number, std::size_t width>
+  inline ::dealii::VectorizedArray<Number, width>
+  pow(const ::dealii::VectorizedArray<Number, width> &x,
+      const ::dealii::VectorizedArray<Number, width> &p)
+  {
+    Number values[::dealii::VectorizedArray<Number, width>::size()];
+    for (unsigned int i = 0; i < dealii::VectorizedArray<Number, width>::size();
+         ++i)
+      values[i] = std::pow(x[i], p[i]);
     ::dealii::VectorizedArray<Number, width> out;
     out.load(&values[0]);
     return out;

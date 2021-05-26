@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2020 by the deal.II authors
+// Copyright (C) 1998 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -563,6 +563,25 @@ namespace Functions
             const unsigned int component = 0) const override;
   };
 } // namespace Functions
+
+/**
+ * Provide a function which always returns the constant values handed to the
+ * constructor.
+ *
+ * @deprecated use Functions::ConstantFunction instead.
+ */
+template <int dim, typename RangeNumberType = double>
+using ConstantFunction DEAL_II_DEPRECATED =
+  Functions::ConstantFunction<dim, RangeNumberType>;
+
+/**
+ * Provide a function which always returns zero.
+ *
+ * @deprecated use Functions::ZeroFunction instead.
+ */
+template <int dim, typename RangeNumberType = double>
+using ZeroFunction DEAL_II_DEPRECATED =
+  Functions::ZeroFunction<dim, RangeNumberType>;
 
 
 

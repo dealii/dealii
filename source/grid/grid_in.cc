@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2020 by the deal.II authors
+// Copyright (C) 1999 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -560,8 +560,8 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
 
 
       // TODO: the functions below (GridTools::delete_unused_vertices(),
-      // GridTools::invert_all_cells_of_negative_grid(),
-      // GridReordering::reorder_cells()) need to be
+      // GridTools::invert_all_negative_measure_cells(),
+      // GridTools::consistently_order_cells()) need to be
       // revisited for simplex/mixed meshes
 
       if (dim == 1 || (is_quad_or_hex_mesh && !is_tria_or_tet_mesh))
@@ -569,20 +569,15 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
           GridTools::delete_unused_vertices(vertices, cells, subcelldata);
 
           if (dim == spacedim)
-            GridReordering<dim, spacedim>::invert_all_cells_of_negative_grid(
-              vertices, cells, true);
+            GridTools::invert_all_negative_measure_cells(vertices, cells);
 
-          GridReordering<dim, spacedim>::reorder_cells(cells, true);
+          GridTools::consistently_order_cells(cells);
           tria->create_triangulation(vertices, cells, subcelldata);
-
-          return;
         }
       else
         {
           // simplex or mixed mesh
-          tria->create_triangulation_compatibility(vertices,
-                                                   cells,
-                                                   subcelldata);
+          tria->create_triangulation(vertices, cells, subcelldata);
         }
     }
   else
@@ -719,11 +714,13 @@ GridIn<dim, spacedim>::read_unv(std::istream &in)
       if ((((type == 44) || (type == 94)) && (dim == 2)) ||
           ((type == 115) && (dim == 3))) // cell
         {
+          const auto reference_cell = ReferenceCells::get_hypercube<dim>();
           cells.emplace_back();
 
           AssertThrow(in, ExcIO());
           for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
-            in >> cells.back().vertices[v];
+            in >> cells.back()
+                    .vertices[reference_cell.unv_vertex_to_deal_vertex(v)];
 
           cells.back().material_id = 0;
 
@@ -759,12 +756,16 @@ GridIn<dim, spacedim>::read_unv(std::istream &in)
         }
       else if (((type == 44) || (type == 94)) && (dim == 3)) // boundary quad
         {
+          const auto reference_cell = ReferenceCells::Quadrilateral;
           subcelldata.boundary_quads.emplace_back();
 
           AssertThrow(in, ExcIO());
-          for (unsigned int &vertex :
-               subcelldata.boundary_quads.back().vertices)
-            in >> vertex;
+          Assert(subcelldata.boundary_quads.back().vertices.size() ==
+                   GeometryInfo<2>::vertices_per_cell,
+                 ExcInternalError());
+          for (const unsigned int v : GeometryInfo<2>::vertex_indices())
+            in >> subcelldata.boundary_quads.back()
+                    .vertices[reference_cell.unv_vertex_to_deal_vertex(v)];
 
           subcelldata.boundary_quads.back().material_id = 0;
 
@@ -859,12 +860,11 @@ GridIn<dim, spacedim>::read_unv(std::istream &in)
   GridTools::delete_unused_vertices(vertices, cells, subcelldata);
 
   if (dim == spacedim)
-    GridReordering<dim, spacedim>::invert_all_cells_of_negative_grid(vertices,
-                                                                     cells);
+    GridTools::invert_all_negative_measure_cells(vertices, cells);
 
-  GridReordering<dim, spacedim>::reorder_cells(cells);
+  GridTools::consistently_order_cells(cells);
 
-  tria->create_triangulation_compatibility(vertices, cells, subcelldata);
+  tria->create_triangulation(vertices, cells, subcelldata);
 }
 
 
@@ -946,7 +946,7 @@ GridIn<dim, spacedim>::read_ucd(std::istream &in,
           // allocate and read indices
           cells.emplace_back();
           for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
-            in >> cells.back().vertices[i];
+            in >> cells.back().vertices[GeometryInfo<dim>::ucd_to_deal[i]];
 
           // to make sure that the cast won't fail
           Assert(material_id <= std::numeric_limits<types::material_id>::max(),
@@ -1033,10 +1033,9 @@ GridIn<dim, spacedim>::read_ucd(std::istream &in,
         // boundary info
         {
           subcelldata.boundary_quads.emplace_back();
-          in >> subcelldata.boundary_quads.back().vertices[0] >>
-            subcelldata.boundary_quads.back().vertices[1] >>
-            subcelldata.boundary_quads.back().vertices[2] >>
-            subcelldata.boundary_quads.back().vertices[3];
+          for (const unsigned int i : GeometryInfo<2>::vertex_indices())
+            in >> subcelldata.boundary_quads.back()
+                    .vertices[GeometryInfo<2>::ucd_to_deal[i]];
 
           // to make sure that the cast won't fail
           Assert(material_id <= std::numeric_limits<types::boundary_id>::max(),
@@ -1095,10 +1094,9 @@ GridIn<dim, spacedim>::read_ucd(std::istream &in,
   GridTools::delete_unused_vertices(vertices, cells, subcelldata);
   // ... and cells
   if (dim == spacedim)
-    GridReordering<dim, spacedim>::invert_all_cells_of_negative_grid(vertices,
-                                                                     cells);
-  GridReordering<dim, spacedim>::reorder_cells(cells);
-  tria->create_triangulation_compatibility(vertices, cells, subcelldata);
+    GridTools::invert_all_negative_measure_cells(vertices, cells);
+  GridTools::consistently_order_cells(cells);
+  tria->create_triangulation(vertices, cells, subcelldata);
 }
 
 namespace
@@ -1312,7 +1310,7 @@ GridIn<dim, spacedim>::read_dbmesh(std::istream &in)
       cells.emplace_back();
       for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
         {
-          in >> cells.back().vertices[i];
+          in >> cells.back().vertices[GeometryInfo<dim>::ucd_to_deal[i]];
 
           AssertThrow((cells.back().vertices[i] >= 1) &&
                         (static_cast<unsigned int>(cells.back().vertices[i]) <=
@@ -1349,168 +1347,77 @@ GridIn<dim, spacedim>::read_dbmesh(std::istream &in)
   // do some clean-up on vertices...
   GridTools::delete_unused_vertices(vertices, cells, subcelldata);
   // ...and cells
-  GridReordering<dim, spacedim>::invert_all_cells_of_negative_grid(vertices,
-                                                                   cells);
-  GridReordering<dim, spacedim>::reorder_cells(cells);
-  tria->create_triangulation_compatibility(vertices, cells, subcelldata);
+  GridTools::invert_all_negative_measure_cells(vertices, cells);
+  GridTools::consistently_order_cells(cells);
+  tria->create_triangulation(vertices, cells, subcelldata);
 }
 
 
 
 template <int dim, int spacedim>
 void
-GridIn<dim, spacedim>::read_xda(std::istream &)
-{
-  Assert(false, ExcNotImplemented());
-}
-
-
-
-template <>
-void
-GridIn<2>::read_xda(std::istream &in)
+GridIn<dim, spacedim>::read_xda(std::istream &in)
 {
   Assert(tria != nullptr, ExcNoTriangulationSelected());
   AssertThrow(in, ExcIO());
 
+  const auto reference_cell = ReferenceCells::get_hypercube<dim>();
+
   std::string line;
   // skip comments at start of file
-  getline(in, line);
-
+  std::getline(in, line);
 
   unsigned int n_vertices;
   unsigned int n_cells;
 
   // read cells, throw away rest of line
   in >> n_cells;
-  getline(in, line);
+  std::getline(in, line);
 
   in >> n_vertices;
-  getline(in, line);
+  std::getline(in, line);
 
   // ignore following 8 lines
   for (unsigned int i = 0; i < 8; ++i)
-    getline(in, line);
+    std::getline(in, line);
 
   // set up array of cells
-  std::vector<CellData<2>> cells(n_cells);
-  SubCellData              subcelldata;
+  std::vector<CellData<dim>> cells(n_cells);
+  SubCellData                subcelldata;
 
-  for (unsigned int cell = 0; cell < n_cells; ++cell)
+  for (CellData<dim> &cell : cells)
     {
-      // note that since in the input
-      // file we found the number of
-      // cells at the top, there
-      // should still be input here,
-      // so check this:
+      // note that since in the input file we found the number of cells at the
+      // top, there should still be input here, so check this:
       AssertThrow(in, ExcIO());
-      Assert(GeometryInfo<2>::vertices_per_cell == 4, ExcInternalError());
 
-      for (unsigned int &vertex : cells[cell].vertices)
-        in >> vertex;
+      // XDA happens to use ExodusII's numbering because XDA/XDR is libMesh's
+      // native format, and libMesh's node numberings come from ExodusII:
+      for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; i++)
+        in >> cell.vertices[reference_cell.exodusii_vertex_to_deal_vertex(i)];
     }
 
-
-
   // set up array of vertices
-  std::vector<Point<2>> vertices(n_vertices);
-  for (unsigned int vertex = 0; vertex < n_vertices; ++vertex)
+  std::vector<Point<spacedim>> vertices(n_vertices);
+  for (Point<spacedim> &vertex : vertices)
     {
-      double x[3];
-
-      // read vertex
-      in >> x[0] >> x[1] >> x[2];
-
-      // store vertex
-      for (unsigned int d = 0; d < 2; ++d)
-        vertices[vertex](d) = x[d];
+      for (unsigned int d = 0; d < spacedim; ++d)
+        in >> vertex[d];
+      for (unsigned int d = spacedim; d < 3; ++d)
+        {
+          // file is always in 3D
+          double dummy;
+          in >> dummy;
+        }
     }
   AssertThrow(in, ExcIO());
 
   // do some clean-up on vertices...
   GridTools::delete_unused_vertices(vertices, cells, subcelldata);
   // ... and cells
-  GridReordering<2>::invert_all_cells_of_negative_grid(vertices, cells);
-  GridReordering<2>::reorder_cells(cells);
-  tria->create_triangulation_compatibility(vertices, cells, subcelldata);
-}
-
-
-
-template <>
-void
-GridIn<3>::read_xda(std::istream &in)
-{
-  Assert(tria != nullptr, ExcNoTriangulationSelected());
-  AssertThrow(in, ExcIO());
-
-  static const unsigned int xda_to_dealII_map[] = {0, 1, 5, 4, 3, 2, 6, 7};
-
-  std::string line;
-  // skip comments at start of file
-  getline(in, line);
-
-
-  unsigned int n_vertices;
-  unsigned int n_cells;
-
-  // read cells, throw away rest of line
-  in >> n_cells;
-  getline(in, line);
-
-  in >> n_vertices;
-  getline(in, line);
-
-  // ignore following 8 lines
-  for (unsigned int i = 0; i < 8; ++i)
-    getline(in, line);
-
-  // set up array of cells
-  std::vector<CellData<3>> cells(n_cells);
-  SubCellData              subcelldata;
-
-  for (unsigned int cell = 0; cell < n_cells; ++cell)
-    {
-      // note that since in the input
-      // file we found the number of
-      // cells at the top, there
-      // should still be input here,
-      // so check this:
-      AssertThrow(in, ExcIO());
-      Assert(GeometryInfo<3>::vertices_per_cell == 8, ExcInternalError());
-
-      unsigned int xda_ordered_nodes[8];
-
-      for (unsigned int &xda_ordered_node : xda_ordered_nodes)
-        in >> xda_ordered_node;
-
-      for (unsigned int i = 0; i < 8; i++)
-        cells[cell].vertices[i] = xda_ordered_nodes[xda_to_dealII_map[i]];
-    }
-
-
-
-  // set up array of vertices
-  std::vector<Point<3>> vertices(n_vertices);
-  for (unsigned int vertex = 0; vertex < n_vertices; ++vertex)
-    {
-      double x[3];
-
-      // read vertex
-      in >> x[0] >> x[1] >> x[2];
-
-      // store vertex
-      for (unsigned int d = 0; d < 3; ++d)
-        vertices[vertex](d) = x[d];
-    }
-  AssertThrow(in, ExcIO());
-
-  // do some clean-up on vertices...
-  GridTools::delete_unused_vertices(vertices, cells, subcelldata);
-  // ... and cells
-  GridReordering<3>::invert_all_cells_of_negative_grid(vertices, cells);
-  GridReordering<3>::reorder_cells(cells);
-  tria->create_triangulation_compatibility(vertices, cells, subcelldata);
+  GridTools::invert_all_negative_measure_cells(vertices, cells);
+  GridTools::consistently_order_cells(cells);
+  tria->create_triangulation(vertices, cells, subcelldata);
 }
 
 
@@ -2009,7 +1916,19 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
                 cells.emplace_back();
                 cells.back().vertices.resize(vertices_per_cell);
                 for (unsigned int i = 0; i < vertices_per_cell; ++i)
-                  in >> cells.back().vertices[i];
+                  {
+                    // hypercube cells need to be reordered
+                    if (vertices_per_cell ==
+                        GeometryInfo<dim>::vertices_per_cell)
+                      {
+                        in >> cells.back()
+                                .vertices[GeometryInfo<dim>::ucd_to_deal[i]];
+                      }
+                    else
+                      {
+                        in >> cells.back().vertices[i];
+                      }
+                  }
 
                 // to make sure that the cast won't fail
                 Assert(material_id <=
@@ -2024,8 +1943,7 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
 
                 cells.back().material_id = material_id;
 
-                // transform from ucd to
-                // consecutive numbering
+                // transform from gmsh to consecutive numbering
                 for (unsigned int i = 0; i < vertices_per_cell; ++i)
                   {
                     AssertThrow(
@@ -2177,8 +2095,8 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
   AssertThrow(cells.size() > 0, ExcGmshNoCellInformation());
 
   // TODO: the functions below (GridTools::delete_unused_vertices(),
-  // GridTools::invert_all_cells_of_negative_grid(),
-  // GridReordering::reorder_cells()) need to be revisited
+  // GridTools::invert_all_negative_measure_cells(),
+  // GridTools::consistently_order_cells()) need to be revisited
   // for simplex/mixed meshes
 
   if (dim == 1 || (is_quad_or_hex_mesh && !is_tria_or_tet_mesh))
@@ -2187,16 +2105,10 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
       GridTools::delete_unused_vertices(vertices, cells, subcelldata);
       // ... and cells
       if (dim == spacedim)
-        GridReordering<dim, spacedim>::invert_all_cells_of_negative_grid(
-          vertices, cells);
-      GridReordering<dim, spacedim>::reorder_cells(cells);
-      tria->create_triangulation_compatibility(vertices, cells, subcelldata);
+        GridTools::invert_all_negative_measure_cells(vertices, cells);
+      GridTools::consistently_order_cells(cells);
     }
-  else
-    {
-      // simplex or mixed mesh
-      tria->create_triangulation_compatibility(vertices, cells, subcelldata);
-    }
+  tria->create_triangulation(vertices, cells, subcelldata);
 
   // in 1d, we also have to attach boundary ids to vertices, which does not
   // currently work through the call above
@@ -2824,8 +2736,8 @@ GridIn<2>::read_tecplot(std::istream &in)
           {
             cells[cell].vertices[0] = i + j * I;
             cells[cell].vertices[1] = i + 1 + j * I;
-            cells[cell].vertices[2] = i + 1 + (j + 1) * I;
-            cells[cell].vertices[3] = i + (j + 1) * I;
+            cells[cell].vertices[2] = i + (j + 1) * I;
+            cells[cell].vertices[3] = i + 1 + (j + 1) * I;
             ++cell;
           }
       Assert(cell == n_cells, ExcInternalError());
@@ -2872,8 +2784,8 @@ GridIn<2>::read_tecplot(std::istream &in)
           // get the connectivity from the
           // input file. the vertices are
           // ordered like in the ucd format
-          for (unsigned int &vertex : cells[i].vertices)
-            in >> vertex;
+          for (const unsigned int j : GeometryInfo<dim>::vertex_indices())
+            in >> cells[i].vertices[GeometryInfo<dim>::ucd_to_deal[j]];
         }
       // do some clean-up on vertices
       GridTools::delete_unused_vertices(vertices, cells, subcelldata);
@@ -2886,10 +2798,9 @@ GridIn<2>::read_tecplot(std::istream &in)
   AssertThrow(in, ExcIO());
 
   // do some cleanup on cells
-  GridReordering<dim, spacedim>::invert_all_cells_of_negative_grid(vertices,
-                                                                   cells);
-  GridReordering<dim, spacedim>::reorder_cells(cells);
-  tria->create_triangulation_compatibility(vertices, cells, subcelldata);
+  GridTools::invert_all_negative_measure_cells(vertices, cells);
+  GridTools::consistently_order_cells(cells);
+  tria->create_triangulation(vertices, cells, subcelldata);
 }
 
 
@@ -2994,7 +2905,8 @@ GridIn<dim, spacedim>::read_assimp(const std::string &filename,
             {
               for (const unsigned int f : GeometryInfo<dim>::vertex_indices())
                 {
-                  cells[valid_cell].vertices[f] =
+                  cells[valid_cell]
+                    .vertices[GeometryInfo<dim>::ucd_to_deal[f]] =
                     mFaces[i].mIndices[f] + v_offset;
                 }
               cells[valid_cell].material_id = m;
@@ -3041,14 +2953,10 @@ GridIn<dim, spacedim>::read_assimp(const std::string &filename,
 
   GridTools::delete_unused_vertices(vertices, cells, subcelldata);
   if (dim == spacedim)
-    GridReordering<dim, spacedim>::invert_all_cells_of_negative_grid(vertices,
-                                                                     cells);
+    GridTools::invert_all_negative_measure_cells(vertices, cells);
+  GridTools::consistently_order_cells(cells);
+  tria->create_triangulation(vertices, cells, subcelldata);
 
-  GridReordering<dim, spacedim>::reorder_cells(cells);
-  if (dim == 2)
-    tria->create_triangulation_compatibility(vertices, cells, subcelldata);
-  else
-    tria->create_triangulation(vertices, cells, subcelldata);
 #else
   (void)filename;
   (void)mesh_index;

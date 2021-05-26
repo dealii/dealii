@@ -88,7 +88,8 @@ namespace Functions
                           ActiveCellIterator<dim, dim, DoFHandlerType>::type,
                         Point<dim>>
           my_pair = GridTools::find_active_cell_around_point(mapping, *dh, p);
-        AssertThrow(!my_pair.first->is_artificial(),
+        AssertThrow(my_pair.first.state() == IteratorState::valid &&
+                      !my_pair.first->is_artificial(),
                     VectorTools::ExcPointNotAvailableHere());
 
         cell = my_pair.first;
@@ -147,7 +148,8 @@ namespace Functions
                           ActiveCellIterator<dim, dim, DoFHandlerType>::type,
                         Point<dim>>
           my_pair = GridTools::find_active_cell_around_point(mapping, *dh, p);
-        AssertThrow(!my_pair.first->is_artificial(),
+        AssertThrow(my_pair.first.state() == IteratorState::valid &&
+                      !my_pair.first->is_artificial(),
                     VectorTools::ExcPointNotAvailableHere());
 
         cell = my_pair.first;
@@ -220,7 +222,8 @@ namespace Functions
                           ActiveCellIterator<dim, dim, DoFHandlerType>::type,
                         Point<dim>>
           my_pair = GridTools::find_active_cell_around_point(mapping, *dh, p);
-        AssertThrow(!my_pair.first->is_artificial(),
+        AssertThrow(my_pair.first.state() == IteratorState::valid &&
+                      !my_pair.first->is_artificial(),
                     VectorTools::ExcPointNotAvailableHere());
 
         cell = my_pair.first;
@@ -520,7 +523,9 @@ namespace Functions
   {
     // Calling the GridTools routine and preparing output
     auto cell_qpoint_map =
-      GridTools::compute_point_locations(cache, points, cell_hint.get());
+      GridTools::compute_point_locations_try_all(cache,
+                                                 points,
+                                                 cell_hint.get());
     const auto &tria_cells = std::get<0>(cell_qpoint_map);
     cells.resize(tria_cells.size());
     unsigned int i = 0;
@@ -528,6 +533,10 @@ namespace Functions
       cells[i++] = typename DoFHandlerType::cell_iterator(*c, dh);
     qpoints = std::get<1>(cell_qpoint_map);
     maps    = std::get<2>(cell_qpoint_map);
+
+    // Ensure that we found all points
+    AssertThrow(std::get<3>(cell_qpoint_map).empty(),
+                VectorTools::ExcPointNotAvailableHere());
     return cells.size();
   }
 

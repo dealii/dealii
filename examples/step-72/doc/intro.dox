@@ -1,0 +1,204 @@
+<br>
+
+<i>This program was contributed by Jean-Paul Pelteret and Wolfgang Bangerth.
+
+Wolfgang Bangerth's work is partially supported by National Science
+Foundation grants OCI-1148116, OAC-1835673, DMS-1821210, and EAR-1925595;
+and by the Computational Infrastructure in
+Geodynamics initiative (CIG), through the National Science Foundation under
+Award No. EAR-1550901 and The University of California-Davis.
+</i>
+
+
+<h1>Introduction</h1>
+
+<h3>Motivation</h3>
+
+This program solves the same problem as step-15, that is, it solves
+for the
+[minimal surface equation](https://en.wikipedia.org/wiki/Minimal_surface)
+  @f{align*}
+    F(u) \dealcoloneq -\nabla \cdot \left( \frac{1}{\sqrt{1+|\nabla u|^{2}}}\nabla u \right) &= 0 \qquad
+    \qquad &&\textrm{in} ~ \Omega
+    \\
+    u&=g \qquad\qquad &&\textrm{on} ~ \partial \Omega.
+  @f}
+
+Among the issues we had identified there (see the
+<a href="step_15#extensions">Possibilities for extensions</a> section)
+was that when wanting to use
+a Newton iteration, we needed to compute the derivative of the
+residual of the equation with regard to the solution $u$ (here,
+because the right hand side is zero, the residual is simply the left
+hand side). For the equation we have here, this is cumbersome but not
+impossible -- but one can easily imagine much more complicated
+equations where just implementing the residual itself correctly is a
+challenge, let alone doing so for the derivative necessary to compute
+the Jacobian matrix. We will address this issue in this program: Using
+the automatic differentiation techniques discussed in great detail in
+step-71, we will come up with a way how we only have to implement the
+residual and get the Jacobian for free.
+
+In fact, we can even go one step further. While in step-15 we have
+just taken the equation as a given, the minimal surface equation is
+actually the product of minimizing an energy. Specifically,
+the minimal surface equations are the Euler-Lagrange equations that
+correspond to minimizing the energy
+  @f[
+    E(u) = \int_\Omega \Psi \left( u \right)
+  @f]
+where the *energy density* is given by
+  @f[
+    \Psi \left( u \right) = \sqrt{1+|\nabla u|^{2}}.
+  @f]
+This is the same as saying that we seek to find the stationary point of
+the variation of the energy functional
+  @f[
+    \min\limits_{u} E \left( u \right)
+      \quad \rightarrow \quad
+      \delta E \left( u, \varphi \right) \dealcoloneq
+      \left(\varphi, F(u)\right) = 0
+      \qquad
+      \forall \varphi,
+  @f]
+as this is where the equilibrium solution to the boundary value problem lies.
+
+The key point then is that, maybe, we don't even need to implement the
+residual, but that implementing the simpler energy density $\Psi(u)$
+might actually be enough.
+
+Our goal then is this: When
+using a Newton iteration, we need to repeatedly solve the
+linear partial differential equation
+  @f{align*}
+    F'(u^{n},\delta u^{n}) &=- F(u^{n})
+  @f}
+so that we can compute the update
+  @f{align*}
+    u^{n+1}&=u^{n}+\alpha^n \delta u^{n}
+  @f}
+with the solution $\delta u^{n}$ of the Newton step. As discussed in step-15,
+we can compute the derivative $F'(u,\delta u)$ by hand and
+obtain
+  @f[
+  F'(u,\delta u)
+  =
+  - \nabla \cdot \left( \frac{1}{\left(1+|\nabla u|^{2}\right)^{\frac{1}{2}}}\nabla
+  \delta u \right) +
+  \nabla \cdot \left( \frac{\nabla u \cdot
+  \nabla \delta u}{\left(1+|\nabla u|^{2}\right)^{\frac{3}{2}}} \nabla u
+  \right).
+  @f]
+
+So here then is what this program is about: It is about techniques
+that can help us with computing $F'(u,\delta u)$ without having to
+implement it explicitly, either by providing an implementation of
+$F(u)$ or an implementation of $E(u)$. More precisely, we will
+implement three different approaches and compare them in terms of
+run-time but also -- maybe more importantly -- how much human effort
+it takes to implement them:
+- The method used in step-15 to form the Jacobian matrix.
+- Computing the Jacobian matrix from an implementation of the
+  residual $F(u)$, using automatic differentiation.
+- Computing both the residual and Jacobian matrix from an
+  implementation of the energy functional $E(u)$, also using automatic
+  differentiation.
+
+For the first of these methods, there are no conceptual changes
+compared to step-15.
+
+
+<h3> Computing the Jacobian from the residual </h3>
+
+For the second method, let us outline how we will approach the issue
+using automatic differentiation
+to compute the linearization of the residual vector. To this end, let
+us change notation for a moment and denote by $F(U)$ not the residual
+of the differential equation, but in fact the *residual vector* --
+i.e., the *discrete residual*. We do so because that is what we
+*actually* do when we discretize the problem on a given mesh: We solve
+the problem $F(U)=0$ where $U$ is the vector of unknowns.
+
+More precisely, the $i$th component of the residual is given by
+@f[
+  F(U)_i \dealcoloneq
+  \int\limits_{\Omega}\nabla \varphi_i \cdot \left[ \frac{1}{\sqrt{1+|\nabla
+  u|^{2}}} \nabla u \right] \, dV ,
+@f]
+where $u(\mathbf x)=\sum_j U_j \varphi_j(\mathbf x)$. Given this, the
+contribution for cell $K$ is
+@f[
+  F(U)_i^K \dealcoloneq
+  \int\limits_K\nabla \varphi_i \cdot \left[ \frac{1}{\sqrt{1+|\nabla
+  u|^{2}}} \nabla u \right] \, dV ,
+@f]
+Its first order Taylor expansion is given as
+@f[
+  F(U + \delta U)_i^K
+  \approx F(U)_i^K
+  + \sum_{j}^{n_{\textrm{dofs}}} \left[ \frac{\partial F(U)_i^K}{\partial
+  U_j} \delta U_j \right],
+@f]
+and consequently we can compute the contribution of cell $K$ to the
+Jacobian matrix $J$ as $J(U)_{ij}^K = \frac{\partial F(U)_i^K}{\partial U_j}$. The
+important point here is that on cell $K$, we can express
+@f[
+  F(U)_i^K \dealcoloneq
+  \int\limits_K\nabla \varphi_i \cdot \left[ \frac{1}{\sqrt{1+\left|
+  \sum_{j'}^{n_\textrm{dofs}} U_{j'} \nabla \varphi_{j'}\right|^{2}}}
+  \left(\sum_{j''}^{n_\textrm{dofs}} U_{j''} \nabla \varphi_{j''}\right)\right] \, dV.
+@f]
+For clarity, we have used $j'$ and $j''$ as counting indices to make
+clear that they are distinct from each other and from $j$ above.
+Because in this formula, $F(U)$ only depends on the coefficients
+$U_j$, we can compute the derivative $J(U)_{ij}^K$ as a matrix via
+automatic differentiation of $F(U)_i^K$. By the same argument as we
+always use, it is clear that $F(U)^K$ does not actually depend on
+*all* unknowns $U_j$, but only on those unknowns for which $j$ is a
+shape function that lives on cell $K$, and so in practice, we restrict
+$F(U)^K$ and $J(U)^K$ to that part of the vector and matrix that
+corresponds to the *local* DoF indices, and then distribute from the
+local cell $K$ to the global objects.
+
+Using all of these realizations, the approach will then be to
+implement $F(U)^K$ in the program and let the automatic differentiation
+machinery compute the derivatives $J(U)^K$ from that.
+
+
+<h3> Computing the Jacobian and the residual from the energy functional </h3>
+
+For the final implementation of the assembly process, we will move a level
+higher than the residual: our entire linear system will be determined
+directly from the energy functional that governs the physics of this
+boundary value problem. We can take advantage of the fact that we can
+calculate the total energy in the domain directly from the local
+contributions, i.e.,
+@f[
+  E \left( U \right) \dealcoloneq \int\limits_{\Omega} \Psi \left( u
+  \right) \, dV .
+@f]
+In the discrete setting, this means that on each finite element we have
+@f[
+   E \left( U \right)^K
+    \dealcoloneq \int\limits_{K} \Psi \left( u \right) \, dV
+    \approx \sum\limits_{q}^{n_{\textrm{q-points}}} \Psi \left( u \left(
+    \mathbf{x}_{q} \right) \right) \underbrace{\vert J_{q} \vert \times W_{q}}_{\text{JxW(q)}} .
+@f]
+If we implement the cell energy, which depends on the field solution,
+we can compute its first (discrete) variation
+@f[
+  F(U)^K_i
+    = \frac{\partial E(U)^K}{\partial U_i}
+@f]
+and, thereafter, its second (discrete) variation
+@f[
+  J(U)^K_{ij}
+    = \frac{\partial^{2}  E(U)^K}{\partial U_i \partial U_j}.
+@f]
+So, from the cell contribution to the total energy function, we may expect
+to have the approximate residual and tangent contributions generated
+for us as long as we can provide an implementation of the local energy
+$E(U)^K$. Again, due to the design of the
+automatic differentiation variables used in this tutorial, in practice
+these approximations for the contributions to the residual vector and
+tangent matrix are actually accurate to machine precision.

@@ -1,6 +1,0 @@
-Fixed: In parallel hp-adaptive applications,
-DoFHandler::distribute_dofs() no longer fails to enumerate degrees of
-freedom on ghost interfaces if continuous finite elements do not
-dominate each other.
-<br>
-(Marc Fehling, 2020/07/03)

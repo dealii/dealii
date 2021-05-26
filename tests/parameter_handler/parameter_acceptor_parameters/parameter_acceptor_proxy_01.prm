@@ -16,4 +16,3 @@ subsection Function 3D
   set Function expression = 0
   set Variable names      = x,y,z,t
 end
-

@@ -1,9 +1,0 @@
-New: The classes FEEvaluation and FEFaceEvaluation with template parameter -1
-for the polynomial degree is now based on pre-compiled templated code for
-polynomial degrees between 1 and 6. This allows for fast execution of
-matrix-free evaluation for run-time polynomial degrees. The generated
-instantiations are controlled by
-`include/deal.II/matrix_free/evaluation_template_factory.templates.h` and can
-be pre-compiled for additional degrees in user code.
-<br>
-(Martin Kronbichler, Peter Munch, 2020/09/21)

@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2007 - 2020 by the deal.II authors
+ * Copyright (C) 2007 - 2021 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -1113,7 +1113,7 @@ namespace Step33
       prm.declare_entry("mesh",
                         "grid.inp",
                         Patterns::Anything(),
-                        "intput file name");
+                        "input file name");
 
       prm.declare_entry("diffusion power",
                         "2.0",

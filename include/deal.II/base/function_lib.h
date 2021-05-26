@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2019 by the deal.II authors
+// Copyright (C) 1999 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1316,8 +1316,8 @@ namespace Functions
    *
    * @ingroup functions
    */
-  template <int dim>
-  class Monomial : public Function<dim>
+  template <int dim, typename Number = double>
+  class Monomial : public Function<dim, Number>
   {
   public:
     /**
@@ -1326,13 +1326,13 @@ namespace Functions
      * components this object shall represent. All vector components will have
      * the same value.
      */
-    Monomial(const Tensor<1, dim> &exponents,
-             const unsigned int    n_components = 1);
+    Monomial(const Tensor<1, dim, Number> &exponents,
+             const unsigned int            n_components = 1);
 
     /**
      * Function value at one point.
      */
-    virtual double
+    virtual Number
     value(const Point<dim> &p, const unsigned int component = 0) const override;
 
     /**
@@ -1342,20 +1342,20 @@ namespace Functions
      * #n_components.
      */
     virtual void
-    vector_value(const Point<dim> &p, Vector<double> &values) const override;
+    vector_value(const Point<dim> &p, Vector<Number> &values) const override;
 
     /**
      * Function values at multiple points.
      */
     virtual void
     value_list(const std::vector<Point<dim>> &points,
-               std::vector<double> &          values,
+               std::vector<Number> &          values,
                const unsigned int             component = 0) const override;
 
     /**
      * Function gradient at one point.
      */
-    virtual Tensor<1, dim>
+    virtual Tensor<1, dim, Number>
     gradient(const Point<dim> & p,
              const unsigned int component = 0) const override;
 
@@ -1363,7 +1363,7 @@ namespace Functions
     /**
      * The set of exponents.
      */
-    const Tensor<1, dim> exponents;
+    const Tensor<1, dim, Number> exponents;
   };
 
 
@@ -1398,6 +1398,55 @@ namespace Functions
    * @note The use of the related class InterpolatedUniformGridData is
    * discussed in step-53.
    *
+   *
+   * <h3>Dealing with large data sets</h3>
+   *
+   * This class is often used to interpolate data provided by fairly
+   * large data tables that are expensive to read from disk, and that take
+   * a large amount of memory when replicated on every process of parallel
+   * (MPI) programs.
+   *
+   * The Table class can help with amortizing this cost by using
+   * shared memory to store the data only as often as necessary -- see the
+   * documentation of the TableBase class. Once one has obtained such a
+   * Table object that uses shared memory to store the data only as often
+   * as is necessary, one has to avoid that the current class *copies*
+   * the table into its own member variable. Rather, it is necessary to
+   * use the *move* constructor of this class to take over ownership of
+   * the table and its shared memory space. This can be achieved using
+   * the following extension of the code snippet shown in the
+   * documentation of the TableBase class:
+   * @code
+   *    const unsigned int N=..., M=...;     // table sizes, assumed known
+   *    Table<2,double>    data_table;
+   *    const unsigned int root_rank = 0;
+   *
+   *    if (Utilities::MPI::this_mpi_process(mpi_communicator) == root_rank)
+   *    {
+   *      data_table.resize (N,M);
+   *
+   *      std::ifstream input_file ("data_file.dat");
+   *      ...;                               // read the data from the file
+   *    }
+   *
+   *    // Now distribute to all processes
+   *    data_table.replicate_across_communicator (mpi_communicator, root_rank);
+   *
+   *    // Set up the x- and y-coordinates of the points stored in the
+   *    // data table
+   *    std::array<std::vector<double>, dim> coordinate_values;
+   *    ...;                                 // do what needs to be done
+   *
+   *    // And finally set up the interpolation object. The calls
+   *    // to std::move() make sure that the tables are moved into
+   *    // the memory space of the InterpolateTensorProductGridData
+   *    // object:
+   *    InterpolatedTensorProductGridData<2>
+   *          interpolation_function (std::move(coordinate_values),
+   *                                  std::move(data_table));
+   * @endcode
+   *
+   *
    * @ingroup functions
    */
   template <int dim>
@@ -1424,6 +1473,19 @@ namespace Functions
     InterpolatedTensorProductGridData(
       const std::array<std::vector<double>, dim> &coordinate_values,
       const Table<dim, double> &                  data_values);
+
+    /**
+     * Like the previous constructor, but take the arguments as rvalue
+     * references and *move*, instead of *copy* the data. This is often useful
+     * in cases where the data stored in these tables is large and the
+     * information used to initialize the current object is no longer needed
+     * separately. In other words, there is no need to keep the original object
+     * from which this object could copy its information, but it might as well
+     * take over ("move") the data.
+     */
+    InterpolatedTensorProductGridData(
+      std::array<std::vector<double>, dim> &&coordinate_values,
+      Table<dim, double> &&                  data_values);
 
     /**
      * Compute the value of the function set by bilinear interpolation of the
@@ -1517,6 +1579,14 @@ namespace Functions
    *
    * @note The use of this class is discussed in step-53.
    *
+   *
+   * <h3>Dealing with large data sets</h3>
+   *
+   * This class supports the same facilities for dealing with large data sets
+   * as the InterpolatedTensorProductGridData class. See there for more
+   * information and example codes.
+   *
+   *
    * @ingroup functions
    */
   template <int dim>
@@ -1541,6 +1611,20 @@ namespace Functions
       const std::array<std::pair<double, double>, dim> &interval_endpoints,
       const std::array<unsigned int, dim> &             n_subintervals,
       const Table<dim, double> &                        data_values);
+
+    /**
+     * Like the previous constructor, but take the arguments as rvalue
+     * references and *move*, instead of *copy* the data. This is often useful
+     * in cases where the data stored in these tables is large and the
+     * information used to initialize the current object is no longer needed
+     * separately. In other words, there is no need to keep the original object
+     * from which this object could copy its information, but it might as well
+     * take over ("move") the data.
+     */
+    InterpolatedUniformGridData(
+      std::array<std::pair<double, double>, dim> &&interval_endpoints,
+      std::array<unsigned int, dim> &&             n_subintervals,
+      Table<dim, double> &&                        data_values);
 
     /**
      * Compute the value of the function set by bilinear interpolation of the

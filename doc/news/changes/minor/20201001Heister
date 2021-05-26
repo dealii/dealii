@@ -1,3 +1,0 @@
-New: CellId has a new constructor to create it from a std::string.
-<br>
-(Timo Heister, 2020/10/05)

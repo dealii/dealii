@@ -1,0 +1,6 @@
+Removed: The deprecated member functions 
+DoFHandler::locally_owned_dofs_per_processor(), 
+DoFHandler::n_locally_owned_dofs_per_processor(), and 
+DoFHandler::n_locally_owned_mg_dofs_per_processor() have been removed.
+<br>
+(Daniel Arndt, 2021/05/24)

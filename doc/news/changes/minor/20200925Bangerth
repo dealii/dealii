@@ -1,4 +1,0 @@
-New: The function BlockSparsityPattern::print_svg() outputs a block
-sparsity pattern in SVG format.
-<br>
-(Wolfgang Bangerth, 2020/09/25)

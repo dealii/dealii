@@ -1,4 +1,0 @@
-Fixed: The class parallel::distributed::SolutionTransfer can now
-also handle FE_Nothing.
-<br>
-(Dominic Soldner, Peter Munch, 2020/06/24)

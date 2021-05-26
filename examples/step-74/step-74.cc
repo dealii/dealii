@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2020 by the deal.II authors
+ * Copyright (C) 2020 - 2021 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -531,7 +531,7 @@ namespace Step74
     // The following lambda function will then copy data into the
     // global matrix and right-hand side.  Though there are no hanging
     // node constraints in DG discretization, we define an empty
-    // AffineConstraints oject that allows us to use the
+    // AffineConstraints object that allows us to use the
     // AffineConstraints::distribute_local_to_global() functionality.
     AffineConstraints<double> constraints;
     constraints.close();

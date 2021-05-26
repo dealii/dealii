@@ -1,3 +1,0 @@
-New: Adds the new generalized MPI_Bcast function Utilities::MPI::broadcast() for arbitrary data types T.
-<br>
-(Maximilian Bergbauer, 2021/03/18)

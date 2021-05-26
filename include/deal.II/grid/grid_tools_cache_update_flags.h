@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2019 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -80,7 +80,7 @@ namespace GridTools
     update_locally_owned_cell_bounding_boxes_rtree = 0x080,
 
     /**
-     * Update vertex to neighbhor subdomain
+     * Update vertex to neighbor subdomain
      */
     update_vertex_to_neighbor_subdomain = 0x100,
 

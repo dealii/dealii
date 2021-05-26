@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2020 by the deal.II authors
+// Copyright (C) 2020 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -239,13 +239,6 @@ private:
     unsigned int degree_fine;
 
     /**
-     * Flag if the finite element on the fine cells are continuous. If yes,
-     * the multiplicity of DoF sharing a vertex/line as well as constraints have
-     * to be taken in account via weights.
-     */
-    bool fine_element_is_continuous;
-
-    /**
      * Weights for continuous elements.
      */
     std::vector<Number> weights;
@@ -289,6 +282,13 @@ private:
   std::vector<MGTransferScheme> schemes;
 
   /**
+   * Flag if the finite elements on the fine cells are continuous. If yes,
+   * the multiplicity of DoF sharing a vertex/line as well as constraints have
+   * to be taken into account via weights.
+   */
+  bool fine_element_is_continuous;
+
+  /**
    * Partitioner needed by the intermediate vector.
    */
   std::shared_ptr<const Utilities::MPI::Partitioner> partitioner_fine;
@@ -299,8 +299,11 @@ private:
   std::shared_ptr<const Utilities::MPI::Partitioner> partitioner_coarse;
 
   /**
-   * Internal vector needed for collecting all degrees of freedom of the
-   * fine cells.
+   * Internal vector needed for collecting all degrees of freedom of the fine
+   * cells. It is only initialized if the fine-level DoF indices touch DoFs
+   * other than the locally active ones (which we always assume can be
+   * accessed by the given vectors in the prolongate/restrict functions),
+   * otherwise it is left at size zero.
    */
   mutable LinearAlgebra::distributed::Vector<Number> vec_fine;
 

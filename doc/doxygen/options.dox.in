@@ -71,7 +71,8 @@ WARN_IF_DOC_ERROR      = YES
 INPUT                  =
 RECURSIVE              = YES
 EXCLUDE_PATTERNS       = *.templates.h
-EXAMPLE_PATH           = @CMAKE_BINARY_DIR@/doc/doxygen/tutorial
+EXAMPLE_PATH           = @CMAKE_BINARY_DIR@/doc/doxygen/tutorial \
+                         @CMAKE_SOURCE_DIR@/examples/doxygen
 EXAMPLE_RECURSIVE      = NO
 IMAGE_PATH             =
 INPUT_FILTER           = ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/filter
@@ -229,7 +230,6 @@ PREDEFINED             = DOXYGEN=1 \
                          DEAL_II_WITH_SYMENGINE=1 \
                          DEAL_II_SYMENGINE_WITH_LLVM=1 \
                          DEAL_II_WITH_TBB=1 \
-                         DEAL_II_WITH_THREADS=1 \
                          DEAL_II_WITH_TRILINOS=1 \
                          DEAL_II_TRILINOS_WITH_EPETRAEXT=1 \
                          DEAL_II_TRILINOS_WITH_MUELU=1 \

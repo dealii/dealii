@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2020 by the deal.II authors
+// Copyright (C) 1998 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1344,7 +1344,7 @@ public:
   /**
    * Same as above, but an overload where the second argument is a character
    * pointer. This is necessary, since otherwise the call to
-   * <tt>set("abc","def")</code> will be mapped to the function taking one
+   * <code>set("abc","def")</code> will be mapped to the function taking one
    * string and a bool as arguments, which is certainly not what is most often
    * intended.
    *

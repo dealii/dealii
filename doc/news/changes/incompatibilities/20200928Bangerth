@@ -1,5 +1,0 @@
-Deprecated: The QTrapez class, poorly named because the proper English
-term is "trapezoidal quadrature rule", has been renamed to QTrapezoid,
-and the class with the old name has been deprecated.
-<br>
-(Wolfgang Bangerth, 2020/09/28)

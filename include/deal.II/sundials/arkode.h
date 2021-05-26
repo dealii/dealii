@@ -1,6 +1,6 @@
 //-----------------------------------------------------------
 //
-//    Copyright (C) 2017 - 2020 by the deal.II authors
+//    Copyright (C) 2017 - 2021 by the deal.II authors
 //
 //    This file is part of the deal.II library.
 //
@@ -931,7 +931,7 @@ namespace SUNDIALS
      *
      * Arguments to the function are
      *
-     * @param[in] v  The vector to be mulitplied by the Jacobian
+     * @param[in] v  The vector to be multiplied by the Jacobian
      * @param[out] Jv The vector to be filled with the product J*v
      * @param[in] t  The current time
      * @param[in] y  The current $y$ vector for the current ARKode internal
@@ -955,7 +955,7 @@ namespace SUNDIALS
 
     /**
      * A function object that users may supply and that is intended to set up
-     * all data necessary for the application of jacobian_times_setup(). This
+     * all data necessary for the application of jacobian_times_vector(). This
      * function is called by ARKode any time a Jacobian update is required.
      * The user should compute the Jacobian (or update all the variables that
      * allow the application of Jacobian). This function is guaranteed to
@@ -993,7 +993,7 @@ namespace SUNDIALS
     /**
      * A LinearSolveFunction object that users may supply and that is intended
      * to solve the linearized system $Ax=b$, where $A = M-\gamma J$ is the
-     * Jacobian of the nonlinear residual. The application fo the mass matrix
+     * Jacobian of the nonlinear residual. The application of the mass matrix
      * $M$ and Jacobian $J$ are known through the functions mass_times_vector()
      * and jacobian_times_vector() and $\gamma$ is a factor provided by
      * SUNDIALS. The matrix-vector product $Ax$ is encoded in the supplied

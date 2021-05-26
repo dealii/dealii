@@ -437,13 +437,13 @@
 
 
 #
-# Threading support:
+# TBB support:
 #
-# SET(DEAL_II_WITH_THREADS ON CACHE BOOL
-#   "Build deal.II with support for threads"
+# SET(DEAL_II_WITH_TBB ON CACHE BOOL
+#   "Build deal.II with support for threads via TBB"
 #   )
 #
-# SET(DEAL_II_FORCE_BUNDLED_THREADS TRUE CACHE BOOL
+# SET(DEAL_II_FORCE_BUNDLED_TBB TRUE CACHE BOOL
 #   "Always use the bundled tbb library instead of an external one."
 #   )
 #

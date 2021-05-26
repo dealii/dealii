@@ -7,4 +7,3 @@ library itself, namely LGPL-2.1+.
 Exceptions:
 
   `external-libraries/p4est-setup.sh` - coming from the p4est project, GPL-2+
-

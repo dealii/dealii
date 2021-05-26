@@ -1,4 +1,0 @@
-Fixed: Our cmake scripts forgot to install some of the files that are
-part of the code gallery. This is now fixed.
-<br>
-(Wolfgang Bangerth, 2020/09/17)

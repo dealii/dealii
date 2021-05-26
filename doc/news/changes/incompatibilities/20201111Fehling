@@ -1,5 +1,0 @@
-Deprecated: The operator FiniteElement::operator[] has been deprecated.
-Use DoFHandler::get_fe() with a specified index instead of code like
-dof_handler->get_fe()[index].
-<br>
-(Marc Fehling, 2020/11/11)

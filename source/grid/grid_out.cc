@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2020 by the deal.II authors
+// Copyright (C) 1999 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1555,7 +1555,7 @@ GridOut::write_msh(const Triangulation<dim, spacedim> &tria,
   std::vector<std::vector<std::vector<std::size_t>>> element_nodes(
     n_entity_tags, std::vector<std::vector<std::size_t>>(8));
 
-  // One elment id counter for all dimensions.
+  // One element id counter for all dimensions.
   std::size_t element_id = 1;
 
   const auto add_element = [&](const auto &element, const int &entity_tag) {

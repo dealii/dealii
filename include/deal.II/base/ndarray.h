@@ -90,7 +90,7 @@ namespace internal
  * @endcode
  * The repetitions of `std::array` look awkward and, worse, the index
  * ranges have reversed: the leftmost index has range [0,2), the middle
- * index has rnage [0,3) and the rightmost index has range [0,4).
+ * index has range [0,3) and the rightmost index has range [0,4).
  * We address this issue by providing a class ndarray that allows to you
  * declare the above stacked `std::array` type by simply writing:
  * @code

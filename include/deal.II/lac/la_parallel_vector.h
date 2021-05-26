@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2020 by the deal.II authors
+// Copyright (C) 2011 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -615,7 +615,7 @@ namespace LinearAlgebra
        *
        * @deprecated Use zero_out_ghost_values() instead.
        */
-      DEAL_II_DEPRECATED_EARLY void
+      DEAL_II_DEPRECATED void
       zero_out_ghosts() const;
 
       /**
@@ -932,7 +932,7 @@ namespace LinearAlgebra
        *
        * @deprecated Use locally_owned_size() instead.
        */
-      DEAL_II_DEPRECATED_EARLY
+      DEAL_II_DEPRECATED
       size_type
       local_size() const;
 

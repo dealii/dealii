@@ -1,5 +1,0 @@
-New: SUNDIALS N_Vector module now directly operates on different deal.II vectors without internally
-creating copies.
-In particular, ARKode can now also be used with LinearAlgebra::distributed::(Block)Vector.
-<br>
-(Sebastian Proell, 2021/01/31)

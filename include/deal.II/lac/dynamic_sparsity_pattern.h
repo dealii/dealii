@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2020 by the deal.II authors
+// Copyright (C) 2011 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -472,7 +472,7 @@ public:
 
   /**
    * Construct and store in this object the sparsity pattern corresponding to
-   * the product of transposed @p left and and non-transpose @p right sparsity pattern.
+   * the product of transposed @p left and non-transpose @p right sparsity pattern.
    */
   template <typename SparsityPatternTypeLeft, typename SparsityPatternTypeRight>
   void
@@ -1177,7 +1177,7 @@ DynamicSparsityPattern::end(const size_type r) const
 {
   AssertIndexRange(r, n_rows());
 
-  unsigned int row = r + 1;
+  const size_type row = r + 1;
   if (row == n_rows())
     return {this};
   else

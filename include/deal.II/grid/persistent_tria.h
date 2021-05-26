@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2020 by the deal.II authors
+// Copyright (C) 1999 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -217,6 +217,7 @@ public:
    * Throw an error, since this function is not useful in the context of this
    * class.
    */
+  DEAL_II_DEPRECATED
   virtual void
   create_triangulation_compatibility(
     const std::vector<Point<spacedim>> &vertices,

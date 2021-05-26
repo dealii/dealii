@@ -1,0 +1,11 @@
+for (deal_II_dimension : DIMENSIONS)
+  {
+    template class Functions::PointRestriction<deal_II_dimension>;
+
+    template Point<deal_II_dimension> internal::create_higher_dim_point(
+      const Point<deal_II_dimension - 1> &, const unsigned int, const double);
+
+#if deal_II_dimension != 3
+    template class Functions::CoordinateRestriction<deal_II_dimension>;
+#endif
+  }

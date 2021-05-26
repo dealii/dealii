@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2020 by the deal.II authors
+// Copyright (C) 1999 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1427,6 +1427,82 @@ namespace
 
 
 
+  // Separate these out to avoid an internal compiler error with intel 17
+  namespace DataOutBaseImplementation
+  {
+    /**
+     * Set up the node numbers for a given cell being written to an output
+     * stream.
+     */
+    template <int dim>
+    std::array<unsigned int, GeometryInfo<dim>::vertices_per_cell>
+    set_node_numbers(const unsigned int /*start*/,
+                     const unsigned int /*d1*/,
+                     const unsigned int /*d2*/,
+                     const unsigned int /*d3*/)
+    {
+      Assert(false, ExcInternalError());
+      return {};
+    }
+
+
+
+    template <>
+    std::array<unsigned int, GeometryInfo<1>::vertices_per_cell>
+    set_node_numbers<1>(const unsigned int start,
+                        const unsigned int d1,
+                        const unsigned int /*d2*/,
+                        const unsigned int /*d3*/)
+
+    {
+      std::array<unsigned int, GeometryInfo<1>::vertices_per_cell> nodes;
+      nodes[0] = start;
+      nodes[1] = start + d1;
+      return nodes;
+    }
+
+
+
+    template <>
+    std::array<unsigned int, GeometryInfo<2>::vertices_per_cell>
+    set_node_numbers<2>(const unsigned int start,
+                        const unsigned int d1,
+                        const unsigned int d2,
+                        const unsigned int /*d3*/)
+
+    {
+      std::array<unsigned int, GeometryInfo<2>::vertices_per_cell> nodes;
+      nodes[0] = start;
+      nodes[1] = start + d1;
+      nodes[2] = start + d2;
+      nodes[3] = start + d2 + d1;
+      return nodes;
+    }
+
+
+
+    template <>
+    std::array<unsigned int, GeometryInfo<3>::vertices_per_cell>
+    set_node_numbers<3>(const unsigned int start,
+                        const unsigned int d1,
+                        const unsigned int d2,
+                        const unsigned int d3)
+    {
+      std::array<unsigned int, GeometryInfo<3>::vertices_per_cell> nodes;
+      nodes[0] = start;
+      nodes[1] = start + d1;
+      nodes[2] = start + d2;
+      nodes[3] = start + d2 + d1;
+      nodes[4] = start + d3;
+      nodes[5] = start + d3 + d1;
+      nodes[6] = start + d3 + d2;
+      nodes[7] = start + d3 + d2 + d1;
+      return nodes;
+    }
+  } // namespace DataOutBaseImplementation
+
+
+
   template <int dim>
   void
   DXStream::write_cell(unsigned int,
@@ -1435,36 +1511,23 @@ namespace
                        unsigned int d2,
                        unsigned int d3)
   {
-    int nodes[1 << dim];
-    nodes[GeometryInfo<dim>::dx_to_deal[0]] = start;
-    if (dim >= 1)
-      {
-        nodes[GeometryInfo<dim>::dx_to_deal[1]] = start + d1;
-        if (dim >= 2)
-          {
-            // Add shifted line in y direction
-            nodes[GeometryInfo<dim>::dx_to_deal[2]] = start + d2;
-            nodes[GeometryInfo<dim>::dx_to_deal[3]] = start + d2 + d1;
-            if (dim >= 3)
-              {
-                // Add shifted quad in z direction
-                nodes[GeometryInfo<dim>::dx_to_deal[4]] = start + d3;
-                nodes[GeometryInfo<dim>::dx_to_deal[5]] = start + d3 + d1;
-                nodes[GeometryInfo<dim>::dx_to_deal[6]] = start + d3 + d2;
-                nodes[GeometryInfo<dim>::dx_to_deal[7]] = start + d3 + d2 + d1;
-              }
-          }
-      }
+    const auto nodes =
+      DataOutBaseImplementation::set_node_numbers<dim>(start, d1, d2, d3);
 
     if (flags.int_binary)
-      stream.write(reinterpret_cast<const char *>(nodes),
-                   (1 << dim) * sizeof(*nodes));
+      {
+        std::array<unsigned int, GeometryInfo<dim>::vertices_per_cell> temp;
+        for (unsigned int i = 0; i < nodes.size(); ++i)
+          temp[i] = nodes[GeometryInfo<dim>::dx_to_deal[i]];
+        stream.write(reinterpret_cast<const char *>(temp.data()),
+                     temp.size() * sizeof(temp[0]));
+      }
     else
       {
-        const unsigned int final = (1 << dim) - 1;
-        for (unsigned int i = 0; i < final; ++i)
-          stream << nodes[i] << '\t';
-        stream << nodes[final] << '\n';
+        for (unsigned int i = 0; i < nodes.size() - 1; ++i)
+          stream << nodes[GeometryInfo<dim>::dx_to_deal[i]] << '\t';
+        stream << nodes[GeometryInfo<dim>::dx_to_deal[nodes.size() - 1]]
+               << '\n';
       }
   }
 
@@ -1613,32 +1676,13 @@ namespace
                         unsigned int d2,
                         unsigned int d3)
   {
-    int nodes[1 << dim];
-    nodes[GeometryInfo<dim>::ucd_to_deal[0]] = start;
-    if (dim >= 1)
-      {
-        nodes[GeometryInfo<dim>::ucd_to_deal[1]] = start + d1;
-        if (dim >= 2)
-          {
-            // Add shifted line in y direction
-            nodes[GeometryInfo<dim>::ucd_to_deal[2]] = start + d2;
-            nodes[GeometryInfo<dim>::ucd_to_deal[3]] = start + d2 + d1;
-            if (dim >= 3)
-              {
-                // Add shifted quad in z direction
-                nodes[GeometryInfo<dim>::ucd_to_deal[4]] = start + d3;
-                nodes[GeometryInfo<dim>::ucd_to_deal[5]] = start + d3 + d1;
-                nodes[GeometryInfo<dim>::ucd_to_deal[6]] = start + d3 + d2;
-                nodes[GeometryInfo<dim>::ucd_to_deal[7]] = start + d3 + d2 + d1;
-              }
-          }
-      }
+    const auto nodes =
+      DataOutBaseImplementation::set_node_numbers<dim>(start, d1, d2, d3);
 
     // Write out all cells and remember that all indices must be shifted by one.
     stream << index + 1 << "\t0 " << ucd_cell_type[dim];
-    const unsigned int final = (1 << dim);
-    for (unsigned int i = 0; i < final; ++i)
-      stream << '\t' << nodes[i] + 1;
+    for (unsigned int i = 0; i < nodes.size(); ++i)
+      stream << '\t' << nodes[GeometryInfo<dim>::ucd_to_deal[i]] + 1;
     stream << '\n';
   }
 
@@ -8730,39 +8774,33 @@ XDMFEntry::get_xdmf_content(const unsigned int   indent_level,
   ss << indent(indent_level + 3) << h5_mesh_filename << ":/nodes\n";
   ss << indent(indent_level + 2) << "</DataItem>\n";
   ss << indent(indent_level + 1) << "</Geometry>\n";
+
   // If we have cells defined, use the topology corresponding to the dimension
   if (num_cells > 0)
     {
+      ss << indent(indent_level + 1) << "<Topology TopologyType=\"";
+
       if (dimension == 0)
-        ss << indent(indent_level + 1) << "<Topology TopologyType=\""
-           << "Polyvertex"
-           << "\" NumberOfElements=\"" << num_cells
-           << "\" NodesPerElement=\"1\">\n";
+        {
+          ss << "Polyvertex";
+        }
       else if (dimension == 1)
-        ss << indent(indent_level + 1) << "<Topology TopologyType=\""
-           << "Polyline"
-           << "\" NumberOfElements=\"" << num_cells
-           << "\" NodesPerElement=\"2\">\n";
+        {
+          ss << "Polyline";
+        }
       else if (dimension == 2)
         {
           Assert(reference_cell == ReferenceCells::Quadrilateral ||
                    reference_cell == ReferenceCells::Triangle,
                  ExcNotImplemented());
 
-          ss << indent(indent_level + 1) << "<Topology TopologyType=\"";
           if (reference_cell == ReferenceCells::Quadrilateral)
             {
-              ss << "Quadrilateral"
-                 << "\" NumberOfElements=\"" << num_cells << "\">\n"
-                 << indent(indent_level + 2) << "<DataItem Dimensions=\""
-                 << num_cells << " " << (1 << dimension);
+              ss << "Quadrilateral";
             }
           else // if (reference_cell == ReferenceCells::Triangle)
             {
-              ss << "Triangle"
-                 << "\" NumberOfElements=\"" << num_cells << "\">\n"
-                 << indent(indent_level + 2) << "<DataItem Dimensions=\""
-                 << num_cells << " " << 3;
+              ss << "Triangle";
             }
         }
       else if (dimension == 3)
@@ -8771,24 +8809,29 @@ XDMFEntry::get_xdmf_content(const unsigned int   indent_level,
                    reference_cell == ReferenceCells::Tetrahedron,
                  ExcNotImplemented());
 
-          ss << indent(indent_level + 1) << "<Topology TopologyType=\"";
           if (reference_cell == ReferenceCells::Hexahedron)
             {
-              ss << "Hexahedron"
-                 << "\" NumberOfElements=\"" << num_cells << "\">\n"
-                 << indent(indent_level + 2) << "<DataItem Dimensions=\""
-                 << num_cells << " " << (1 << dimension);
+              ss << "Hexahedron";
             }
           else // if (reference_cell == ReferenceCells::Tetrahedron)
             {
-              ss << "Tetrahedron"
-                 << "\" NumberOfElements=\"" << num_cells << "\">\n"
-                 << indent(indent_level + 2) << "<DataItem Dimensions=\""
-                 << num_cells << " " << 4;
+              ss << "Tetrahedron";
             }
         }
 
-      ss << "\" NumberType=\"UInt\" Format=\"HDF\">\n";
+      ss << "\" NumberOfElements=\"" << num_cells;
+      if (dimension == 0)
+        ss << "\" NodesPerElement=\"1\">\n";
+      else if (dimension == 1)
+        ss << "\" NodesPerElement=\"2\">\n";
+      else
+        // no "NodesPerElement" for dimension 2 and higher
+        ss << "\">\n";
+
+      ss << indent(indent_level + 2) << "<DataItem Dimensions=\"" << num_cells
+         << " " << reference_cell.n_vertices()
+         << "\" NumberType=\"UInt\" Format=\"HDF\">\n";
+
       ss << indent(indent_level + 3) << h5_mesh_filename << ":/cells\n";
       ss << indent(indent_level + 2) << "</DataItem>\n";
       ss << indent(indent_level + 1) << "</Topology>\n";

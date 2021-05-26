@@ -1,4 +1,0 @@
-Added the functions CUDAWrappers::MatrixFree::get_vector_partitioner() and
-CUDAWrappers::MatrixFree::get_dof_handler()
-<br>
-(Bruno Turcksin, 2020/07/06)

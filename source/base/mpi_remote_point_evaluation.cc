@@ -37,8 +37,10 @@ namespace Utilities
   {
     template <int dim, int spacedim>
     RemotePointEvaluation<dim, spacedim>::RemotePointEvaluation(
-      const double tolerance)
+      const double tolerance,
+      const bool   enforce_unique_mapping)
       : tolerance(tolerance)
+      , enforce_unique_mapping(enforce_unique_mapping)
       , ready_flag(false)
     {}
 
@@ -94,7 +96,12 @@ namespace Utilities
 
       const auto data =
         GridTools::internal::distributed_compute_point_locations(
-          cache, points, global_bboxes, tolerance, true);
+          cache,
+          points,
+          global_bboxes,
+          tolerance,
+          true,
+          enforce_unique_mapping);
 
       this->recv_ranks = data.recv_ranks;
       this->recv_ptrs  = data.recv_ptrs;

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -241,5 +241,5 @@ public:
                                         n_components,
                                         Number,
                                         VectorizedArrayType> &)>
-    &cell_operation;
+    cell_operation;
 };

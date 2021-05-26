@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2020 by the deal.II authors
+// Copyright (C) 1998 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1332,7 +1332,7 @@ FiniteElement<dim, spacedim>::fill_fe_face_values(
                                                                      spacedim>
     &output_data) const
 {
-  // base class version, implement overriden function in derived classes
+  // base class version, implement overridden function in derived classes
   AssertDimension(quadrature.size(), 1);
   fill_fe_face_values(cell,
                       face_no,

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2020 by the deal.II authors
+// Copyright (C) 2020 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -157,7 +157,7 @@ namespace MatrixFreeTools
 
   // implementations
 
-
+#ifndef DOXYGEN
 
   template <int dim, typename AdditionalData>
   void
@@ -481,7 +481,7 @@ namespace MatrixFreeTools
         //          (C_e^T(j,:) * A_e(:,i)) * C_e(i,j)
         //       or
         //          (C_e^T(j,:) * A_e(:,i)) * C_e^T(j,i)
-        //       This gives a contribution the the j-th entry of the
+        //       This gives a contribution the j-th entry of the
         //       locally-relevant diagonal and comprises the multiplication
         //       by the locally-relevant constraint matrix from the left and
         //       the right. There is no contribution to the j-th vector
@@ -611,7 +611,7 @@ namespace MatrixFreeTools
     // initialize vector
     matrix_free.initialize_dof_vector(diagonal_global, dof_no);
 
-    int dummy;
+    int dummy = 0;
 
     matrix_free.template cell_loop<VectorType, int>(
       [&](const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
@@ -889,6 +889,8 @@ namespace MatrixFreeTools
                                quad_no,
                                first_selected_component);
   }
+
+#endif // DOXYGEN
 
 } // namespace MatrixFreeTools
 

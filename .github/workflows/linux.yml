@@ -65,7 +65,6 @@ jobs:
               -D DEAL_II_CXX_FLAGS='-Werror' \
               -D DEAL_II_EARLY_DEPRECATIONS=ON \
               -D DEAL_II_WITH_MPI="ON" \
-              -D DEAL_II_WITH_SIMPLEX_SUPPORT="ON" \
               -D DEAL_II_WITH_TRILINOS="ON" \
               -D DEAL_II_WITH_PETSC="ON" \
               -D DEAL_II_WITH_METIS="ON" \
@@ -86,6 +85,11 @@ jobs:
         make -j 2
     - name: test
       run: |
+        # Remove warning: "A high-performance Open MPI point-to-point
+        # messaging module was unable to find any relevant network
+        # interfaces."
+        export OMPI_MCA_btl_base_warn_component_unused='0'
+        
         cd build
         make -j 2 setup_tests_simplex
         ctest --output-on-failure -j 2

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2020 by the deal.II authors
+// Copyright (C) 2000 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -676,7 +676,7 @@ namespace DerivativeApproximation
     public:
       /**
        * alias to select the DerivativeDescription corresponding to the
-       * <tt>order</tt>th derivative. In this general template we set an unvalid
+       * <tt>order</tt>th derivative. In this general template we set an invalid
        * alias to void, the real alias have to be specialized.
        */
       using DerivDescr = void;
@@ -801,7 +801,11 @@ namespace DerivativeApproximation
                                                           solution,
                                                           component);
       // ...and the place where it lives
-      const Point<dim> this_center = fe_midpoint_value.quadrature_point(0);
+      // This needs to be a copy. If it was a reference, it would be changed
+      // after the next `reinit` call of the FEValues object. clang-tidy
+      // complains about this not being a reference, so we suppress the warning.
+      const Point<dim> this_center =
+        fe_midpoint_value.quadrature_point(0); // NOLINT
 
       // loop over all neighbors and
       // accumulate the difference
@@ -839,7 +843,7 @@ namespace DerivativeApproximation
                 neighbor_fe_midpoint_value, solution, component);
 
           // ...and the place where it lives
-          const Point<dim> neighbor_center =
+          const Point<dim> &neighbor_center =
             neighbor_fe_midpoint_value.quadrature_point(0);
 
 
@@ -848,6 +852,7 @@ namespace DerivativeApproximation
           // direction between
           // the centers of two
           // cells
+
           Tensor<1, dim> y        = neighbor_center - this_center;
           const double   distance = y.norm();
           // normalize y

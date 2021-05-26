@@ -1,5 +1,0 @@
-Changed: The template arguments of the classes DoFAccessor and DoFCellAccessor have changed.
-The template argument DoFHandlerType has been replaced by dimension and
-space dimension.  
-<br>
-(Peter Munch, 2020/06/24)

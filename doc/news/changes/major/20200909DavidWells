@@ -1,4 +1,0 @@
-New: The GridIn class can now read ExodusII files when deal.II is configured
-with Trilinos and SEACAS.
-<br>
-(David Wells, 2020/09/09)

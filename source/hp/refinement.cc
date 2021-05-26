@@ -634,7 +634,8 @@ namespace hp
             if (cell->future_fe_index_set())
               {
                 predicted_errors[cell->active_cell_index()] *=
-                  std::pow(gamma_p, future_fe_degree - cell->get_fe().degree);
+                  std::pow(gamma_p,
+                           int(future_fe_degree) - int(cell->get_fe().degree));
               }
 
             // step 2: algebraic decay with h-adaptation
@@ -828,8 +829,7 @@ namespace hp
       // possible
       using level_type =
         typename dealii::DoFHandler<dim, spacedim>::active_fe_index_type;
-      static const level_type invalid_level =
-        dealii::DoFHandler<dim, spacedim>::invalid_active_fe_index;
+      const auto invalid_level = static_cast<level_type>(-1);
 
       // map from FE index to level in hierarchy
       // FE indices that are not covered in the hierarchy are not in the map
@@ -888,8 +888,8 @@ namespace hp
       // Function that updates the level of neighbor to fulfill difference
       // criterion, and returns whether it was changed.
       const auto update_neighbor_level =
-        [&future_levels, max_difference](const auto &     neighbor,
-                                         const level_type cell_level) -> bool {
+        [&future_levels, max_difference, invalid_level](
+          const auto &neighbor, const level_type cell_level) -> bool {
         Assert(neighbor->is_active(), ExcInternalError());
         // We only care about locally owned neighbors. If neighbor is a ghost
         // cell, its future FE index will be updated on the owning process and

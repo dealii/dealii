@@ -1,15 +1,19 @@
 
 DEAL:0::ConsensusAlgorithmProcess::answer_request() passed!
 DEAL:0::ConsensusAlgorithmProcess::function_read_answer() passed!
+DEAL:0::3 
 
 DEAL:1::ConsensusAlgorithmProcess::answer_request() passed!
 DEAL:1::ConsensusAlgorithmProcess::function_read_answer() passed!
+DEAL:1::0 
 
 
 DEAL:2::ConsensusAlgorithmProcess::answer_request() passed!
 DEAL:2::ConsensusAlgorithmProcess::function_read_answer() passed!
+DEAL:2::1 
 
 
 DEAL:3::ConsensusAlgorithmProcess::answer_request() passed!
 DEAL:3::ConsensusAlgorithmProcess::function_read_answer() passed!
+DEAL:3::2 
 

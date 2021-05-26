@@ -24,7 +24,6 @@
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_dgq.h>
-#include <deal.II/fe/fe_point_evaluation.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/mapping_fe.h>
 #include <deal.II/fe/mapping_q_generic.h>
@@ -38,6 +37,8 @@
 #include <deal.II/lac/solver_control.h>
 #include <deal.II/lac/trilinos_sparse_matrix.h>
 #include <deal.II/lac/trilinos_sparsity_pattern.h>
+
+#include <deal.II/matrix_free/fe_point_evaluation.h>
 
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/vector_tools.h>
@@ -260,13 +261,13 @@ public:
       A.compress(VectorOperation::values::add);
 
       // solve linear equation system
-      ReductionControl                                     reduction_control;
+      ReductionControl reduction_control(1000, 1e-12, 1e-10);
       SolverCG<LinearAlgebra::distributed::Vector<double>> solver(
         reduction_control);
       solver.solve(A, solution, b, PreconditionIdentity());
 
-      if (Utilities::MPI::this_mpi_process(
-            get_mpi_comm(dof_handler.get_triangulation())) == 0)
+      if (false && Utilities::MPI::this_mpi_process(
+                     get_mpi_comm(dof_handler.get_triangulation())) == 0)
         deallog << "Solved in " << reduction_control.last_step()
                 << " iterations." << std::endl;
 
@@ -342,6 +343,8 @@ main(int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi(argc, argv, 1);
   MPILogInitAll                    all;
+
+  deallog.depth_file(1);
 
   test();
 }

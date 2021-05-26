@@ -3,7 +3,7 @@
 
 The output of the program looks as follows:
 @code
-Mesh refinement step
+Mesh refinement step 0
   Initial residual: 1.53143
   Residual: 1.08746
   Residual: 0.966748
@@ -11,7 +11,7 @@ Mesh refinement step
   Residual: 0.766462
   Residual: 0.685475
 
-Mesh refinement step
+Mesh refinement step 1
   Initial residual: 0.868959
   Residual: 0.762125
   Residual: 0.677792
@@ -19,7 +19,7 @@ Mesh refinement step
   Residual: 0.542748
   Residual: 0.48704
 
-Mesh refinement step
+Mesh refinement step 2
   Initial residual: 0.426445
   Residual: 0.382731
   Residual: 0.343865
@@ -27,7 +27,7 @@ Mesh refinement step
   Residual: 0.278147
   Residual: 0.250327
 
-Mesh refinement step
+Mesh refinement step 3
   Initial residual: 0.282026
   Residual: 0.253146
   Residual: 0.227414
@@ -35,7 +35,7 @@ Mesh refinement step
   Residual: 0.183803
   Residual: 0.165319
 
-Mesh refinement step
+Mesh refinement step 4
   Initial residual: 0.154404
   Residual: 0.138723
   Residual: 0.124694
@@ -174,12 +174,15 @@ A separate point, very much worthwhile making, however, is that in practice
 the implementation of efficient nonlinear solvers is about as complicated as
 the implementation of efficient finite element methods. One should not
 attempt to reinvent the wheel by implementing all of the necessary steps
-oneself. Rather, just like building finite element solvers on libraries
+oneself. Substantial pieces of the puzzle are already available in
+the LineMinimization::line_search() function and could be used to this end.
+But, instead, just like building finite element solvers on libraries
 such as deal.II, one should be building nonlinear solvers on libraries such
 as [SUNDIALS](https://computing.llnl.gov/projects/sundials). In fact,
 deal.II has interfaces to SUNDIALS and in particular to its nonlinear solver
 sub-package KINSOL through the SUNDIALS::KINSOL class. It would not be
-very difficult to base the current problem on that interface.
+very difficult to base the current problem on that interface --
+indeed, that is what step-77 does.
 
 
 
@@ -204,3 +207,47 @@ iterations.
 
 How to do this is, again, not entirely trivial, and we again leave it as a
 future exercise.
+
+
+
+<h4> Using automatic differentiation to compute the Jacobian matrix </h4>
+
+As outlined in the introduction, when solving a nonlinear problem of
+the form
+  @f[
+    F(u) \dealcoloneq
+    -\nabla \cdot \left( \frac{1}{\sqrt{1+|\nabla u|^{2}}}\nabla u \right)
+    = 0
+  @f]
+we use a Newton iteration that requires us to repeatedly solve the
+linear partial differential equation
+  @f{align*}
+    F'(u^{n},\delta u^{n}) &=- F(u^{n})
+  @f}
+so that we can compute the update
+  @f{align*}
+    u^{n+1}&=u^{n}+\alpha^n \delta u^{n}
+  @f}
+with the solution $\delta u^{n}$ of the Newton step. For the problem
+here, we could compute the derivative $F'(u,\delta u)$ by hand and
+obtained
+  @f[
+  F'(u,\delta u)
+  =
+  - \nabla \cdot \left( \frac{1}{\left(1+|\nabla u|^{2}\right)^{\frac{1}{2}}}\nabla
+  \delta u \right) +
+  \nabla \cdot \left( \frac{\nabla u \cdot
+  \nabla \delta u}{\left(1+|\nabla u|^{2}\right)^{\frac{3}{2}}} \nabla u
+  \right).
+  @f]
+But this is already a sizable expression that is cumbersome both to
+derive and to implement. It is also, in some sense, duplicative: If we
+implement what $F(u)$ is somewhere in the code, then $F'(u,\delta u)$
+is not an independent piece of information but is something that, at
+least in principle, a computer should be able to infer itself.
+Wouldn't it be nice if that could actually happen? That is, if we
+really only had to implement $F(u)$, and $F'(u,\delta u)$ was then somehow
+done implicitly? That is in fact possible, and runs under the name
+"automatic differentiation". step-71 discusses this very
+concept in general terms, and step-72 illustrates how this can be
+applied in practice for the very problem we are considering here.

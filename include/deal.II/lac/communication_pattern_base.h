@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2020 by the deal.II authors
+// Copyright (C) 2015 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,7 +30,7 @@ namespace LinearAlgebra
    * originally defined in the LinearAlgebra namespace but is now used for more
    * general purposes.
    */
-  using CommunicationPatternBase DEAL_II_DEPRECATED_EARLY =
+  using CommunicationPatternBase DEAL_II_DEPRECATED =
     Utilities::MPI::CommunicationPatternBase;
 } // end of namespace LinearAlgebra
 

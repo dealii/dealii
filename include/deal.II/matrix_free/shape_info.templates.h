@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2020 by the deal.II authors
+// Copyright (C) 2011 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -94,8 +94,8 @@ namespace internal
       const auto fe_poly = dynamic_cast<const FE_Poly<dim, dim> *>(&fe);
 
       if (dynamic_cast<const FE_SimplexPoly<dim, dim> *>(&fe) != nullptr ||
-          dynamic_cast<const FE_Wedge<dim, dim> *>(&fe) != nullptr ||
-          dynamic_cast<const FE_Pyramid<dim, dim> *>(&fe) != nullptr)
+          dynamic_cast<const FE_WedgePoly<dim, dim> *>(&fe) != nullptr ||
+          dynamic_cast<const FE_PyramidPoly<dim, dim> *>(&fe) != nullptr)
         {
           scalar_lexicographic.resize(fe.n_dofs_per_cell());
           for (unsigned int i = 0; i < scalar_lexicographic.size(); ++i)
@@ -203,7 +203,6 @@ namespace internal
             {
               const FE_Poly<dim, spacedim> *fe_poly_ptr =
                 dynamic_cast<const FE_Poly<dim, spacedim> *>(fe_ptr);
-#ifdef DEAL_II_WITH_SIMPLEX_SUPPORT
               // Simplices are a special case since the polynomial family is not
               // indicative of their support
               if (dynamic_cast<const FE_SimplexP<dim> *>(fe_poly_ptr) ||
@@ -211,7 +210,6 @@ namespace internal
                   dynamic_cast<const FE_WedgeP<dim> *>(fe_poly_ptr) ||
                   dynamic_cast<const FE_PyramidP<dim> *>(fe_poly_ptr))
                 return true;
-#endif
 
               if (dynamic_cast<const TensorProductPolynomials<dim> *>(
                     &fe_poly_ptr->get_poly_space()) == nullptr &&
@@ -243,7 +241,6 @@ namespace internal
                               const FiniteElement<dim> &fe_in,
                               const unsigned int        base_element_number)
     {
-#ifdef DEAL_II_WITH_SIMPLEX_SUPPORT
       if (quad_in.is_tensor_product() == false ||
           dynamic_cast<const FE_SimplexP<dim> *>(
             &fe_in.base_element(base_element_number)) ||
@@ -324,7 +321,7 @@ namespace internal
             if (reference_cell != temp.first)
               {
                 // TODO: this might happen if the quadrature rule and the
-                // the FE do not match
+                // FE do not match
                 this->n_q_points_face = 0;
               }
             else
@@ -389,7 +386,7 @@ namespace internal
                         for (unsigned int i = 0; i < n_dofs; ++i)
                           for (unsigned int q = 0; q < n_q_points_face; ++q)
                             {
-                              const auto point =
+                              const auto &point =
                                 projected_quad_face.point(q + offset);
 
                               shape_values_face(f, o, i * n_q_points_face + q) =
@@ -433,9 +430,6 @@ namespace internal
 
           return;
         }
-#else
-      Assert(quad_in.is_tensor_product(), ExcNotImplemented());
-#endif
 
       const auto quad = quad_in.get_tensor_basis()[0];
 

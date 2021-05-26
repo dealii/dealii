@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2020 by the deal.II authors
+// Copyright (C) 2018 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -175,6 +175,10 @@ namespace parallel
            ExcMessage(
              "Triangulation associated with the DoFHandler has changed!"));
     (void)triangulation;
+
+    // Skip if the DoFHandler has not been initialized yet.
+    if (dof_handler.get_fe_collection().size() == 0)
+      return 0;
 
     // Convert cell type from Triangulation to DoFHandler to be able
     // to access the information about the degrees of freedom.

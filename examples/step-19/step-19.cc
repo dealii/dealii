@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2020 by the deal.II authors
+ * Copyright (C) 2020 - 2021 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -37,7 +37,7 @@
 #include <deal.II/grid/grid_refinement.h>
 
 #include <deal.II/fe/mapping_q.h>
-#include <deal.II/fe/fe_point_evaluation.h>
+#include <deal.II/matrix_free/fe_point_evaluation.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
 
@@ -144,7 +144,7 @@ namespace Step19
     void output_results() const;
 
     Triangulation<dim>        triangulation;
-    MappingQ<dim>             mapping;
+    MappingQGeneric<dim>      mapping;
     FE_Q<dim>                 fe;
     DoFHandler<dim>           dof_handler;
     AffineConstraints<double> constraints;
@@ -470,7 +470,7 @@ namespace Step19
         if (particle_handler.n_particles_in_cell(cell) > 0)
           for (const auto &particle : particle_handler.particles_in_cell(cell))
             {
-              const Point<dim> reference_location =
+              const Point<dim> &reference_location =
                 particle.get_reference_location();
               for (const unsigned int i : fe_values.dof_indices())
                 cell_rhs(i) +=
@@ -613,7 +613,7 @@ namespace Step19
                 if ((E * fe_face_values.normal_vector(q_point) < 0) &&
                     (E.norm() > Constants::E_threshold))
                   {
-                    const Point<dim> location =
+                    const Point<dim> &location =
                       fe_face_values.quadrature_point(q_point);
 
                     Particles::Particle<dim> new_particle;
@@ -652,7 +652,7 @@ namespace Step19
     const double dt = time.get_next_step_size();
 
     Vector<double>            solution_values(fe.n_dofs_per_cell());
-    FEPointEvaluation<1, dim> evaluator(mapping, fe);
+    FEPointEvaluation<1, dim> evaluator(mapping, fe, update_gradients);
 
     for (const auto &cell : dof_handler.active_cell_iterators())
       if (particle_handler.n_particles_in_cell(cell) > 0)
@@ -670,9 +670,8 @@ namespace Step19
           // Then we can ask the FEPointEvaluation object for the gradients of
           // the solution (i.e., the electric field $\mathbf E$) at these
           // locations and loop over the individual particles:
-          evaluator.evaluate(cell,
-                             particle_positions,
-                             make_array_view(solution_values),
+          evaluator.reinit(cell, particle_positions);
+          evaluator.evaluate(make_array_view(solution_values),
                              EvaluationFlags::gradients);
 
           {
@@ -682,7 +681,8 @@ namespace Step19
                  particle != particles_in_cell.end();
                  ++particle, ++particle_index)
               {
-                const Tensor<1, dim> E = evaluator.get_gradient(particle_index);
+                const Tensor<1, dim> &E =
+                  evaluator.get_gradient(particle_index);
 
                 // Having now obtained the electric field at the location of one
                 // of the particles, we use this to update first the velocity

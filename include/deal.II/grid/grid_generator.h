@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2020 by the deal.II authors
+// Copyright (C) 1999 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -136,8 +136,8 @@ namespace GridGenerator
    */
   template <int dim, int spacedim>
   void
-  reference_cell(const ReferenceCell &         reference_cell,
-                 Triangulation<dim, spacedim> &tria);
+  reference_cell(Triangulation<dim, spacedim> &tria,
+                 const ReferenceCell &         reference_cell);
 
 
   /**
@@ -157,10 +157,8 @@ namespace GridGenerator
    * @param tria The triangulation to create. It needs to be empty upon
    * calling this function.
    *
-   * @param repetitions A vector of @p dim positive values denoting the number
-   * of cells to generate in that direction. For example, the first component of
-   * the vector specifies the number of cells in the x-direction, the second
-   * component specifies that for the y-direction for dim=2.
+   * @param repetitions An unsigned integer denoting the number of cells to
+   * generate in each direction.
    *
    * @param left Lower bound for the interval used to create the hyper cube.
    *
@@ -397,7 +395,7 @@ namespace GridGenerator
                     const double             pad_top           = 2.,
                     const double             pad_left          = 1.,
                     const double             pad_right         = 1.,
-                    const Point<dim>         center            = Point<dim>(),
+                    const Point<dim> &       center            = Point<dim>(),
                     const types::manifold_id polar_manifold_id = 0,
                     const types::manifold_id tfi_manifold_id   = 1,
                     const double             L                 = 1.,
@@ -948,6 +946,48 @@ namespace GridGenerator
            const double        radius      = 1.,
            const double        half_length = 1.);
 
+
+  /**
+   * Create a @p dim dimensional cylinder where the $x$-axis serves as
+   * the axis of the cylinder. For the purposes of this function, a
+   * cylinder is defined as a (@p dim - 1) dimensional disk of given
+   * @p radius, extruded along the axis of the cylinder (which is the
+   * first coordinate direction). Consequently, in three dimensions,
+   * the cylinder extends from `x=-half_length` to `x=+half_length`
+   * and its projection into the @p yz-plane is a circle of radius @p
+   * radius. In two dimensions, the cylinder is a rectangle from
+   * `x=-half_length` to `x=+half_length` and from `y=-radius` to
+   * `y=radius`. This function is only implemented for dim==3.
+   *
+   * The boundaries are colored according to the following scheme: 0 for the
+   * hull of the cylinder, 1 for the left hand face and 2 for the right hand
+   * face (see
+   * @ref GlossColorization "the glossary entry on colorization").
+   *
+   * The manifold id for the hull of the cylinder is set to zero, and a
+   * CylindricalManifold is attached to it.
+   *
+   * @image html subdivided_cylinder_3D.png
+   *
+   * @param tria The triangulation to be created. It needs to be empty upon
+   * calling this function.
+   *
+   * @param x_subdivisions A positive integer denoting the number
+   * of cells to generate in the x direction. The default cylinder has
+   * x_repetitions=2.
+   *
+   * @param radius The radius of the circle in the yz-plane used to extrude the cylinder.
+   *
+   * @param half_length The half-length of the cylinder in the x direction.
+   */
+  template <int dim>
+  void
+  subdivided_cylinder(Triangulation<dim> &tria,
+                      const unsigned int  x_subdivisions,
+                      const double        radius      = 1.,
+                      const double        half_length = 1.);
+
+
   /**
    * Create a cut cone around the x-axis.  The cone extends from
    * <tt>x=-half_length</tt> to <tt>x=half_length</tt> and its projection into
@@ -1074,6 +1114,8 @@ namespace GridGenerator
    * the y-direction, and front to back in the z-direction. A negative number
    * denotes cutting away cells in the reverse direction, so right to left,
    * top to bottom, and back to front.
+   *
+   * A demonstration of this grid can be found in step-75.
    *
    * This function may be used to generate a mesh for a backward
    * facing step, a useful domain for benchmark problems in fluid dynamics.

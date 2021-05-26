@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2019 by the deal.II authors
+// Copyright (C) 2018 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,6 +21,9 @@
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/thread_management.h>
+
+#include <deal.II/lac/vector.h>
+
 
 DEAL_II_NAMESPACE_OPEN
 

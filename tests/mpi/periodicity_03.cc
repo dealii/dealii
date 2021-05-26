@@ -509,20 +509,17 @@ namespace Step22
                                       const int        proc,
                                       Vector<double> & value) const
   {
-    try
-      {
-        const typename DoFHandler<dim>::active_cell_iterator cell =
-          GridTools::find_active_cell_around_point(dof_handler, point);
+    const typename DoFHandler<dim>::active_cell_iterator cell =
+      GridTools::find_active_cell_around_point(dof_handler, point);
 
+    if (cell.state() == IteratorState::valid)
+      {
         if (cell->is_locally_owned())
           VectorTools::point_value(dof_handler, solution, point, value);
       }
-    catch (GridTools::ExcPointNotFound<dim> &p)
-      {
-        pcout << "Point: " << point << " is not inside a non-artificial cell!"
-              << std::endl;
-      }
-
+    else
+      pcout << "Point: " << point << " is not inside a non-artificial cell!"
+            << std::endl;
 
     std::vector<double> tmp(value.size());
     for (unsigned int i = 0; i < value.size(); ++i)

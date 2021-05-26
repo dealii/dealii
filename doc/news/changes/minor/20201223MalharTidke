@@ -1,3 +1,0 @@
-Fixed: DoFTools::make_periodicity_constraints() was not instantiated for condition 'dim < spacedim'. The instantiation was corrected and a test was added to verify that the function works for such condition.     
-<br>
-(Malhar Tidke, 2020/12/23)

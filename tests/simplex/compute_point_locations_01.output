@@ -1,0 +1,332 @@
+
+DEAL::Print out results in 2D: 
+DEAL::At cell 0:
+DEAL::    qpoints 0: 
+DEAL::        reference position  : (0.00000 0.00000)
+DEAL::        physical position   : (0.00000 0.00000)
+DEAL::        FE mapping position : (0.00000 0.00000)
+DEAL::    qpoints 1: 
+DEAL::        reference position  : (0.00000 0.333333)
+DEAL::        physical position   : (0.00000 0.333333)
+DEAL::        FE mapping position : (0.00000 0.333333)
+DEAL::    qpoints 2: 
+DEAL::        reference position  : (0.00000 0.666667)
+DEAL::        physical position   : (0.00000 0.666667)
+DEAL::        FE mapping position : (0.00000 0.666667)
+DEAL::    qpoints 3: 
+DEAL::        reference position  : (0.00000 1.00000)
+DEAL::        physical position   : (0.00000 1.00000)
+DEAL::        FE mapping position : (0.00000 1.00000)
+DEAL::    qpoints 4: 
+DEAL::        reference position  : (0.333333 0.00000)
+DEAL::        physical position   : (0.333333 0.00000)
+DEAL::        FE mapping position : (0.333333 0.00000)
+DEAL::    qpoints 5: 
+DEAL::        reference position  : (0.333333 0.333333)
+DEAL::        physical position   : (0.333333 0.333333)
+DEAL::        FE mapping position : (0.333333 0.333333)
+DEAL::    qpoints 6: 
+DEAL::        reference position  : (0.333333 0.666667)
+DEAL::        physical position   : (0.333333 0.666667)
+DEAL::        FE mapping position : (0.333333 0.666667)
+DEAL::    qpoints 7: 
+DEAL::        reference position  : (0.666667 0.00000)
+DEAL::        physical position   : (0.666667 0.00000)
+DEAL::        FE mapping position : (0.666667 0.00000)
+DEAL::    qpoints 8: 
+DEAL::        reference position  : (0.666667 0.333333)
+DEAL::        physical position   : (0.666667 0.333333)
+DEAL::        FE mapping position : (0.666667 0.333333)
+DEAL::    qpoints 9: 
+DEAL::        reference position  : (1.00000 0.00000)
+DEAL::        physical position   : (1.00000 0.00000)
+DEAL::        FE mapping position : (1.00000 0.00000)
+DEAL::At cell 1:
+DEAL::    qpoints 0: 
+DEAL::        reference position  : (0.666667 0.00000)
+DEAL::        physical position   : (0.333333 1.00000)
+DEAL::        FE mapping position : (0.333333 1.00000)
+DEAL::    qpoints 1: 
+DEAL::        reference position  : (0.333333 0.333333)
+DEAL::        physical position   : (0.666667 0.666667)
+DEAL::        FE mapping position : (0.666667 0.666667)
+DEAL::    qpoints 2: 
+DEAL::        reference position  : (0.333333 0.00000)
+DEAL::        physical position   : (0.666667 1.00000)
+DEAL::        FE mapping position : (0.666667 1.00000)
+DEAL::    qpoints 3: 
+DEAL::        reference position  : (0.00000 0.666667)
+DEAL::        physical position   : (1.00000 0.333333)
+DEAL::        FE mapping position : (1.00000 0.333333)
+DEAL::    qpoints 4: 
+DEAL::        reference position  : (0.00000 0.333333)
+DEAL::        physical position   : (1.00000 0.666667)
+DEAL::        FE mapping position : (1.00000 0.666667)
+DEAL::    qpoints 5: 
+DEAL::        reference position  : (0.00000 0.00000)
+DEAL::        physical position   : (1.00000 1.00000)
+DEAL::        FE mapping position : (1.00000 1.00000)
+DEAL::
+DEAL::Print out results in 3D: 
+DEAL::At cell 0:
+DEAL::    qpoints 0: 
+DEAL::        reference position  : (0.00000 0.00000 0.333333)
+DEAL::        physical position   : (0.00000 0.00000 0.333333)
+DEAL::        FE mapping position : (0.00000 0.00000 0.333333)
+DEAL::    qpoints 1: 
+DEAL::        reference position  : (0.333333 0.00000 0.666667)
+DEAL::        physical position   : (0.333333 0.00000 0.666667)
+DEAL::        FE mapping position : (0.333333 0.00000 0.666667)
+DEAL::    qpoints 2: 
+DEAL::        reference position  : (0.333333 0.00000 0.333333)
+DEAL::        physical position   : (0.333333 0.00000 0.333333)
+DEAL::        FE mapping position : (0.333333 0.00000 0.333333)
+DEAL::    qpoints 3: 
+DEAL::        reference position  : (0.333333 0.00000 0.00000)
+DEAL::        physical position   : (0.333333 0.00000 0.00000)
+DEAL::        FE mapping position : (0.333333 0.00000 0.00000)
+DEAL::    qpoints 4: 
+DEAL::        reference position  : (0.00000 0.00000 0.00000)
+DEAL::        physical position   : (0.00000 0.00000 0.00000)
+DEAL::        FE mapping position : (0.00000 0.00000 0.00000)
+DEAL::    qpoints 5: 
+DEAL::        reference position  : (0.333333 0.333333 0.333333)
+DEAL::        physical position   : (0.333333 0.333333 0.333333)
+DEAL::        FE mapping position : (0.333333 0.333333 0.333333)
+DEAL::    qpoints 6: 
+DEAL::        reference position  : (0.333333 0.333333 0.00000)
+DEAL::        physical position   : (0.333333 0.333333 0.00000)
+DEAL::        FE mapping position : (0.333333 0.333333 0.00000)
+DEAL::    qpoints 7: 
+DEAL::        reference position  : (0.00000 0.00000 0.666667)
+DEAL::        physical position   : (0.00000 0.00000 0.666667)
+DEAL::        FE mapping position : (0.00000 0.00000 0.666667)
+DEAL::    qpoints 8: 
+DEAL::        reference position  : (0.00000 0.00000 1.00000)
+DEAL::        physical position   : (0.00000 0.00000 1.00000)
+DEAL::        FE mapping position : (0.00000 0.00000 1.00000)
+DEAL::    qpoints 9: 
+DEAL::        reference position  : (0.00000 0.333333 0.00000)
+DEAL::        physical position   : (0.00000 0.333333 0.00000)
+DEAL::        FE mapping position : (0.00000 0.333333 0.00000)
+DEAL::    qpoints 10: 
+DEAL::        reference position  : (0.00000 0.333333 0.333333)
+DEAL::        physical position   : (0.00000 0.333333 0.333333)
+DEAL::        FE mapping position : (0.00000 0.333333 0.333333)
+DEAL::    qpoints 11: 
+DEAL::        reference position  : (0.00000 0.333333 0.666667)
+DEAL::        physical position   : (0.00000 0.333333 0.666667)
+DEAL::        FE mapping position : (0.00000 0.333333 0.666667)
+DEAL::    qpoints 12: 
+DEAL::        reference position  : (0.00000 0.666667 0.333333)
+DEAL::        physical position   : (0.00000 0.666667 0.333333)
+DEAL::        FE mapping position : (0.00000 0.666667 0.333333)
+DEAL::    qpoints 13: 
+DEAL::        reference position  : (0.00000 0.666667 0.00000)
+DEAL::        physical position   : (0.00000 0.666667 0.00000)
+DEAL::        FE mapping position : (0.00000 0.666667 0.00000)
+DEAL::    qpoints 14: 
+DEAL::        reference position  : (0.333333 0.666667 0.00000)
+DEAL::        physical position   : (0.333333 0.666667 0.00000)
+DEAL::        FE mapping position : (0.333333 0.666667 0.00000)
+DEAL::    qpoints 15: 
+DEAL::        reference position  : (0.00000 1.00000 0.00000)
+DEAL::        physical position   : (0.00000 1.00000 0.00000)
+DEAL::        FE mapping position : (0.00000 1.00000 0.00000)
+DEAL::    qpoints 16: 
+DEAL::        reference position  : (0.666667 0.00000 0.00000)
+DEAL::        physical position   : (0.666667 0.00000 0.00000)
+DEAL::        FE mapping position : (0.666667 0.00000 0.00000)
+DEAL::    qpoints 17: 
+DEAL::        reference position  : (1.00000 0.00000 0.00000)
+DEAL::        physical position   : (1.00000 0.00000 0.00000)
+DEAL::        FE mapping position : (1.00000 0.00000 0.00000)
+DEAL::    qpoints 18: 
+DEAL::        reference position  : (0.666667 0.00000 0.333333)
+DEAL::        physical position   : (0.666667 0.00000 0.333333)
+DEAL::        FE mapping position : (0.666667 0.00000 0.333333)
+DEAL::    qpoints 19: 
+DEAL::        reference position  : (0.666667 0.333333 0.00000)
+DEAL::        physical position   : (0.666667 0.333333 0.00000)
+DEAL::        FE mapping position : (0.666667 0.333333 0.00000)
+DEAL::At cell 1:
+DEAL::    qpoints 0: 
+DEAL::        reference position  : (0.666667 0.333333 0.00000)
+DEAL::        physical position   : (0.333333 0.00000 1.00000)
+DEAL::        FE mapping position : (0.333333 0.00000 1.00000)
+DEAL::    qpoints 1: 
+DEAL::        reference position  : (0.666667 0.00000 0.333333)
+DEAL::        physical position   : (0.333333 0.333333 1.00000)
+DEAL::        FE mapping position : (0.333333 0.333333 1.00000)
+DEAL::    qpoints 2: 
+DEAL::        reference position  : (0.00000 1.00000 0.00000)
+DEAL::        physical position   : (1.00000 0.00000 1.00000)
+DEAL::        FE mapping position : (1.00000 0.00000 1.00000)
+DEAL::    qpoints 3: 
+DEAL::        reference position  : (0.00000 0.666667 0.00000)
+DEAL::        physical position   : (1.00000 0.00000 0.666667)
+DEAL::        FE mapping position : (1.00000 0.00000 0.666667)
+DEAL::    qpoints 4: 
+DEAL::        reference position  : (0.00000 0.333333 0.00000)
+DEAL::        physical position   : (1.00000 0.00000 0.333333)
+DEAL::        FE mapping position : (1.00000 0.00000 0.333333)
+DEAL::    qpoints 5: 
+DEAL::        reference position  : (0.333333 0.333333 0.00000)
+DEAL::        physical position   : (0.666667 0.00000 0.666667)
+DEAL::        FE mapping position : (0.666667 0.00000 0.666667)
+DEAL::    qpoints 6: 
+DEAL::        reference position  : (0.333333 0.666667 0.00000)
+DEAL::        physical position   : (0.666667 0.00000 1.00000)
+DEAL::        FE mapping position : (0.666667 0.00000 1.00000)
+DEAL::    qpoints 7: 
+DEAL::        reference position  : (0.333333 0.333333 0.333333)
+DEAL::        physical position   : (0.666667 0.333333 1.00000)
+DEAL::        FE mapping position : (0.666667 0.333333 1.00000)
+DEAL::    qpoints 8: 
+DEAL::        reference position  : (0.333333 0.00000 0.333333)
+DEAL::        physical position   : (0.666667 0.333333 0.666667)
+DEAL::        FE mapping position : (0.666667 0.333333 0.666667)
+DEAL::    qpoints 9: 
+DEAL::        reference position  : (0.00000 0.666667 0.333333)
+DEAL::        physical position   : (1.00000 0.333333 1.00000)
+DEAL::        FE mapping position : (1.00000 0.333333 1.00000)
+DEAL::    qpoints 10: 
+DEAL::        reference position  : (0.00000 0.333333 0.333333)
+DEAL::        physical position   : (1.00000 0.333333 0.666667)
+DEAL::        FE mapping position : (1.00000 0.333333 0.666667)
+DEAL::    qpoints 11: 
+DEAL::        reference position  : (0.00000 0.333333 0.666667)
+DEAL::        physical position   : (1.00000 0.666667 1.00000)
+DEAL::        FE mapping position : (1.00000 0.666667 1.00000)
+DEAL::    qpoints 12: 
+DEAL::        reference position  : (0.333333 0.00000 0.666667)
+DEAL::        physical position   : (0.666667 0.666667 1.00000)
+DEAL::        FE mapping position : (0.666667 0.666667 1.00000)
+DEAL::At cell 2:
+DEAL::    qpoints 0: 
+DEAL::        reference position  : (0.666667 0.00000 0.333333)
+DEAL::        physical position   : (0.00000 0.333333 1.00000)
+DEAL::        FE mapping position : (0.00000 0.333333 1.00000)
+DEAL::    qpoints 1: 
+DEAL::        reference position  : (0.333333 0.00000 0.333333)
+DEAL::        physical position   : (0.00000 0.666667 0.666667)
+DEAL::        FE mapping position : (0.00000 0.666667 0.666667)
+DEAL::    qpoints 2: 
+DEAL::        reference position  : (0.333333 0.00000 0.666667)
+DEAL::        physical position   : (0.00000 0.666667 1.00000)
+DEAL::        FE mapping position : (0.00000 0.666667 1.00000)
+DEAL::    qpoints 3: 
+DEAL::        reference position  : (0.333333 0.333333 0.00000)
+DEAL::        physical position   : (0.333333 0.666667 0.666667)
+DEAL::        FE mapping position : (0.333333 0.666667 0.666667)
+DEAL::    qpoints 4: 
+DEAL::        reference position  : (0.00000 0.00000 1.00000)
+DEAL::        physical position   : (0.00000 1.00000 1.00000)
+DEAL::        FE mapping position : (0.00000 1.00000 1.00000)
+DEAL::    qpoints 5: 
+DEAL::        reference position  : (0.00000 0.00000 0.333333)
+DEAL::        physical position   : (0.00000 1.00000 0.333333)
+DEAL::        FE mapping position : (0.00000 1.00000 0.333333)
+DEAL::    qpoints 6: 
+DEAL::        reference position  : (0.333333 0.333333 0.333333)
+DEAL::        physical position   : (0.333333 0.666667 1.00000)
+DEAL::        FE mapping position : (0.333333 0.666667 1.00000)
+DEAL::    qpoints 7: 
+DEAL::        reference position  : (0.00000 0.333333 0.333333)
+DEAL::        physical position   : (0.333333 1.00000 0.666667)
+DEAL::        FE mapping position : (0.333333 1.00000 0.666667)
+DEAL::    qpoints 8: 
+DEAL::        reference position  : (0.00000 0.333333 0.666667)
+DEAL::        physical position   : (0.333333 1.00000 1.00000)
+DEAL::        FE mapping position : (0.333333 1.00000 1.00000)
+DEAL::    qpoints 9: 
+DEAL::        reference position  : (0.00000 0.00000 0.666667)
+DEAL::        physical position   : (0.00000 1.00000 0.666667)
+DEAL::        FE mapping position : (0.00000 1.00000 0.666667)
+DEAL::    qpoints 10: 
+DEAL::        reference position  : (0.00000 0.666667 0.333333)
+DEAL::        physical position   : (0.666667 1.00000 1.00000)
+DEAL::        FE mapping position : (0.666667 1.00000 1.00000)
+DEAL::At cell 3:
+DEAL::    qpoints 0: 
+DEAL::        reference position  : (0.166667 0.500000 0.166667)
+DEAL::        physical position   : (0.333333 0.333333 0.666667)
+DEAL::        FE mapping position : (0.333333 0.333333 0.666667)
+DEAL::    qpoints 1: 
+DEAL::        reference position  : (0.500000 0.166667 0.166667)
+DEAL::        physical position   : (0.333333 0.666667 0.333333)
+DEAL::        FE mapping position : (0.333333 0.666667 0.333333)
+DEAL::    qpoints 2: 
+DEAL::        reference position  : (0.166667 0.166667 0.166667)
+DEAL::        physical position   : (0.666667 0.333333 0.333333)
+DEAL::        FE mapping position : (0.666667 0.333333 0.333333)
+DEAL::    qpoints 3: 
+DEAL::        reference position  : (0.166667 0.166667 0.500000)
+DEAL::        physical position   : (0.666667 0.666667 0.666667)
+DEAL::        FE mapping position : (0.666667 0.666667 0.666667)
+DEAL::At cell 4:
+DEAL::    qpoints 0: 
+DEAL::        reference position  : (0.00000 0.333333 0.00000)
+DEAL::        physical position   : (0.333333 1.00000 0.00000)
+DEAL::        FE mapping position : (0.333333 1.00000 0.00000)
+DEAL::    qpoints 1: 
+DEAL::        reference position  : (0.00000 1.11022e-16 0.333333)
+DEAL::        physical position   : (0.333333 1.00000 0.333333)
+DEAL::        FE mapping position : (0.333333 1.00000 0.333333)
+DEAL::    qpoints 2: 
+DEAL::        reference position  : (0.666667 0.333333 0.00000)
+DEAL::        physical position   : (1.00000 0.333333 0.00000)
+DEAL::        FE mapping position : (1.00000 0.333333 0.00000)
+DEAL::    qpoints 3: 
+DEAL::        reference position  : (0.666667 0.00000 0.333333)
+DEAL::        physical position   : (1.00000 0.333333 0.333333)
+DEAL::        FE mapping position : (1.00000 0.333333 0.333333)
+DEAL::    qpoints 4: 
+DEAL::        reference position  : (0.333333 0.00000 0.666667)
+DEAL::        physical position   : (1.00000 0.666667 0.666667)
+DEAL::        FE mapping position : (1.00000 0.666667 0.666667)
+DEAL::    qpoints 5: 
+DEAL::        reference position  : (0.333333 0.333333 0.333333)
+DEAL::        physical position   : (1.00000 0.666667 0.333333)
+DEAL::        FE mapping position : (1.00000 0.666667 0.333333)
+DEAL::    qpoints 6: 
+DEAL::        reference position  : (0.333333 0.666667 0.00000)
+DEAL::        physical position   : (1.00000 0.666667 0.00000)
+DEAL::        FE mapping position : (1.00000 0.666667 0.00000)
+DEAL::    qpoints 7: 
+DEAL::        reference position  : (0.333333 0.333333 0.00000)
+DEAL::        physical position   : (0.666667 0.666667 0.00000)
+DEAL::        FE mapping position : (0.666667 0.666667 0.00000)
+DEAL::    qpoints 8: 
+DEAL::        reference position  : (0.00000 2.22045e-16 0.666667)
+DEAL::        physical position   : (0.666667 1.00000 0.666667)
+DEAL::        FE mapping position : (0.666667 1.00000 0.666667)
+DEAL::    qpoints 9: 
+DEAL::        reference position  : (0.00000 0.333333 0.333333)
+DEAL::        physical position   : (0.666667 1.00000 0.333333)
+DEAL::        FE mapping position : (0.666667 1.00000 0.333333)
+DEAL::    qpoints 10: 
+DEAL::        reference position  : (0.00000 0.666667 0.00000)
+DEAL::        physical position   : (0.666667 1.00000 0.00000)
+DEAL::        FE mapping position : (0.666667 1.00000 0.00000)
+DEAL::    qpoints 11: 
+DEAL::        reference position  : (0.333333 0.00000 0.333333)
+DEAL::        physical position   : (0.666667 0.666667 0.333333)
+DEAL::        FE mapping position : (0.666667 0.666667 0.333333)
+DEAL::    qpoints 12: 
+DEAL::        reference position  : (0.00000 1.00000 0.00000)
+DEAL::        physical position   : (1.00000 1.00000 0.00000)
+DEAL::        FE mapping position : (1.00000 1.00000 0.00000)
+DEAL::    qpoints 13: 
+DEAL::        reference position  : (0.00000 0.666667 0.333333)
+DEAL::        physical position   : (1.00000 1.00000 0.333333)
+DEAL::        FE mapping position : (1.00000 1.00000 0.333333)
+DEAL::    qpoints 14: 
+DEAL::        reference position  : (0.00000 0.333333 0.666667)
+DEAL::        physical position   : (1.00000 1.00000 0.666667)
+DEAL::        FE mapping position : (1.00000 1.00000 0.666667)
+DEAL::    qpoints 15: 
+DEAL::        reference position  : (0.00000 0.00000 1.00000)
+DEAL::        physical position   : (1.00000 1.00000 1.00000)
+DEAL::        FE mapping position : (1.00000 1.00000 1.00000)
+DEAL::

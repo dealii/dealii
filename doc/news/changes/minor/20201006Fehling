@@ -1,6 +1,0 @@
-New: GridRefinement::refine_and_coarsen_fixed_fraction() and
-parallel::distributed::GridRefinement::refine_and_coarsen_fixed_fraction()
-now allow to specify a VectorTools::NormType, which determines how
-combined errors on subsets of cells will be calculated.
-<br>
-(Marc Fehling, 2020/10/06)

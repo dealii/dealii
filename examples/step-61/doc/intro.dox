@@ -194,6 +194,15 @@ we need to think of $\nabla_{w,d} p_h|_K$ as that
 Raviart-Thomas function of degree $s$ for which the left hand side and right hand side
 are equal for all test functions.
 
+A key point to make is then the following: While the usual gradient $\nabla$ is
+a *local* operator that computes derivatives based simply on the value of
+a function at a point and its (infinitesimal) neighborhood, the weak discrete gradient
+$\nabla_{w,d}$ does not have this property: It depends on the values of the function
+it is applied to on the entire cell, including the cell's boundary. Both are,
+however, linear operators as is clear from the definition of $\nabla_{w,d}$
+above, and that will allow us to represent $\nabla_{w,d}$ via a matrix
+in the discussion below.
+
 @note It may be worth pointing out that while the weak discrete
   gradient is an element of the Raviart-Thomas space $RT_s(K)$ on each
   cell $K$, it is discontinuous between cells. On the other hand, the

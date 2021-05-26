@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2020 by the deal.II authors
+// Copyright (C) 1998 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1082,9 +1082,16 @@ namespace StandardExceptions
    * argument zero. In other cases, this exception is thrown.
    */
   DeclExceptionMsg(ExcScalarAssignmentOnlyForZeroValue,
-                   "You are trying an operation of the form 'vector=s' with "
-                   "a nonzero scalar value 's'. However, such assignments "
-                   "are only allowed if the right hand side is zero.");
+                   "You are trying an operation of the form 'vector = C', "
+                   "'matrix = C', or 'tensor = C' with a nonzero scalar value "
+                   "'C'. However, such assignments are only allowed if the "
+                   "C is zero, since the semantics for assigning any other "
+                   "value are not clear. For example: one could interpret "
+                   "assigning a matrix a value of 1 to mean the matrix has a "
+                   "norm of 1, the matrix is the identity matrix, or the "
+                   "matrix contains only 1s. Similar problems exist with "
+                   "vectors and tensors. Hence, to avoid this ambiguity, such "
+                   "assignments are not permitted.");
 
   /**
    * This function requires support for the LAPACK library.
@@ -1102,14 +1109,6 @@ namespace StandardExceptions
     ExcNeedsMPI,
     "You are attempting to use functionality that is only available "
     "if deal.II was configured to use MPI.");
-
-  /**
-   * This function requires simplex support.
-   */
-  DeclExceptionMsg(
-    ExcNeedsSimplexSupport,
-    "You are attempting to use functionality that is only available "
-    "if deal.II was configured with DEAL_II_WITH_SIMPLEX_SUPPORT enabled.");
 
   /**
    * This function requires support for the FunctionParser library.
@@ -1155,7 +1154,7 @@ namespace StandardExceptions
     ExcNeedsExodusII,
     "You are attempting to use functionality that is only available if deal.II "
     "was configured to use Trilinos' SEACAS library (which provides ExodusII), "
-    "but cmake did not find find a valid SEACAS library.");
+    "but cmake did not find a valid SEACAS library.");
 
 #ifdef DEAL_II_WITH_MPI
   /**

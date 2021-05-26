@@ -1,4 +1,0 @@
-New: There are now functions Utilities::get_bit() and
-Utilities::set_bit() that do as their names suggest.
-<br>
-(Peter Munch, Wolfgang Bangerth, 2021/02/05)

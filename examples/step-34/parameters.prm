@@ -77,5 +77,3 @@ subsection Wind function 3d
   # by ','.
   set Variable names      = x,y,z,t
 end
-
-

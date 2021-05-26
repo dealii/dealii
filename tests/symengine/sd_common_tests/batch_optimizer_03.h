@@ -75,12 +75,12 @@ namespace Diff_Test
                                  symbolic_HH); // Dependent symbolic functions
     optimizer.optimize();
 
-    const bool print_symbols = true;
+    const bool print_symbols = false;
     if (print_symbols == true)
       {
-        print(deallog, "psi", symbolic_psi);
-        print(deallog, "S", symbolic_S);
-        print(deallog, "HH", symbolic_HH);
+        print(std::cout, "psi", symbolic_psi);
+        print(std::cout, "S", symbolic_S);
+        print(std::cout, "HH", symbolic_HH);
       }
 
     // Numerical substitution
@@ -172,14 +172,14 @@ namespace Diff_Test
                                  symbolic_HH); // Dependent symbolic functions
     optimizer.optimize();
 
-    const bool print_symbols = true;
+    const bool print_symbols = false;
     if (print_symbols == true)
       {
-        print(deallog, "psi (Q)", symbolic_psi_CQi);
-        print(deallog, "psi", symbolic_psi);
-        print(deallog, "S (Q)", symbolic_S_CQi);
-        print(deallog, "S", symbolic_S);
-        print(deallog, "HH", symbolic_HH);
+        print(std::cout, "psi (Q)", symbolic_psi_CQi);
+        print(std::cout, "psi", symbolic_psi);
+        print(std::cout, "S (Q)", symbolic_S_CQi);
+        print(std::cout, "S", symbolic_S);
+        print(std::cout, "HH", symbolic_HH);
       }
 
     // Numerical substitution
@@ -307,12 +307,12 @@ namespace Diff_Test
                                  symbolic_HH); // Dependent symbolic functions
     optimizer.optimize();
 
-    const bool print_symbols = true;
+    const bool print_symbols = false;
     if (print_symbols == true)
       {
-        print(deallog, "psi", symbolic_psi);
-        print(deallog, "S", symbolic_S);
-        print(deallog, "HH", symbolic_HH);
+        print(std::cout, "psi", symbolic_psi);
+        print(std::cout, "S", symbolic_S);
+        print(std::cout, "HH", symbolic_HH);
       }
 
     // Numerical substitution
@@ -367,12 +367,14 @@ run_tests()
   test_standard<dim, double, opt_method, opt_flags>();
   deallog.pop();
 
+  std::cout << std::string(50, '-') << std::endl;
   deallog << std::string(50, '-') << std::endl;
 
   deallog.push("Explicit");
   test_explicit<dim, double, opt_method, opt_flags>();
   deallog.pop();
 
+  std::cout << std::string(50, '-') << std::endl;
   deallog << std::string(50, '-') << std::endl;
 
   deallog.push("Implicit");

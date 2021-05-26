@@ -1,5 +1,0 @@
-Improved: The macro DEAL_II_PICKUP_TESTS can now also be run with on optional
-input parameter that can be used to manipulate the folder name of tests during
-ctest.
-<br>
-(Peter Munch, 2020/07/23)

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2020 by the deal.II authors
+// Copyright (C) 2004 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -94,7 +94,7 @@ namespace PETScWrappers
 
     public:
       /*
-       * Copy constrcutor.
+       * Copy constructor.
        */
       VectorReference(const VectorReference &vector) = default;
 
@@ -360,7 +360,7 @@ namespace PETScWrappers
      *
      * @deprecated use locally_owned_size() instead.
      */
-    DEAL_II_DEPRECATED_EARLY
+    DEAL_II_DEPRECATED
     size_type
     local_size() const;
 
@@ -458,10 +458,7 @@ namespace PETScWrappers
      * vector, this function allows to set a whole set of elements at once.
      * The indices of the elements to be set are stated in the first argument,
      * the corresponding values in the second.
-     *
-     * @deprecated Use import() instead.
      */
-    DEAL_II_DEPRECATED
     void
     set(const std::vector<size_type> &  indices,
         const std::vector<PetscScalar> &values);

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 - 2020 by the deal.II authors
+// Copyright (C) 2019 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -177,7 +177,7 @@ namespace Particles
       std::uniform_real_distribution<double> uniform_distribution_01(0, 1);
 
       const BoundingBox<spacedim> cell_bounding_box(cell->bounding_box());
-      const std::pair<Point<spacedim>, Point<spacedim>> cell_bounds(
+      const std::pair<Point<spacedim>, Point<spacedim>> &cell_bounds(
         cell_bounding_box.get_boundary_points());
 
       // Generate random points in these bounds until one is within the cell
@@ -261,7 +261,10 @@ namespace Particles
                                                 probability_density_function);
 
         // Sum the local integrals over all nodes
-        double local_weight_integral = cumulative_cell_weights.back();
+        double local_weight_integral = (cumulative_cell_weights.size() > 0) ?
+                                         cumulative_cell_weights.back() :
+                                         0.0;
+
         double global_weight_integral;
 
         if (const auto tria =

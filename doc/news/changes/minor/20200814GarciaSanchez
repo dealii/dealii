@@ -1,5 +1,0 @@
-Improved: The definitions of the templated functions of the HDF5 interface are
-now in hdf5.h, therefore it is possible to use additional template combinations.
-The instantiations are no longer necessary, therefore they have been removed.
-<br>
-(Daniel Garcia-Sanchez, 2020/08/14)

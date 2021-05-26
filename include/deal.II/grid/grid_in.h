@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2020 by the deal.II authors
+// Copyright (C) 1999 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -754,7 +754,12 @@ public:
   /**
    * Exception
    */
-  DeclException0(ExcNoTriangulationSelected);
+  DeclExceptionMsg(ExcNoTriangulationSelected,
+                   "No Triangulation has been attached to this GridIn object "
+                   "so that nothing can be filled during any read function "
+                   "calls.  Please pass a reference to the Triangulation tria "
+                   "to be  filled in the constructor GridIn(tria) or attach "
+                   "it with the function call GridIn::attach_triangulation().");
   /**
    * Exception
    */

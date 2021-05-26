@@ -1,5 +1,0 @@
-Deprecated: The DoFHandlerType template argument for the MappingFEField
-class has been deprecated. Use MappingFEField<dim, spacedim, VectorType>
-instead.
-<br>
-(Marc Fehling, 2020/11/15)

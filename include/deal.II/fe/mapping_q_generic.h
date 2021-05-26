@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2020 by the deal.II authors
+// Copyright (C) 2000 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -242,28 +242,11 @@ public:
             const ArrayView<Tensor<3, spacedim>> &output) const override;
 
   /**
-   * As compared to the other transform functions that rely on pre-computed
-   * information of InternalDataBase, this function chooses the flexible
-   * evaluation path on the cell and points passed in to the current
-   * function. The types `Number` and `Number2` of the input and output arrays
-   * must be such that `Number2 = apply_transformation(DerivativeForm<1,
-   * spacedim, dim>, Number)`.
-   */
-  template <typename Number, typename Number2>
-  void
-  transform_variable(
-    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-    const MappingKind                                           kind,
-    const ArrayView<const Point<dim>> &                         unit_points,
-    const ArrayView<const Number> &                             input,
-    const ArrayView<Number2> &                                  output) const;
-
-  /**
    * @}
    */
 
   /**
-   * @name Interface with FEValues
+   * @name Interface with FEValues and friends
    * @{
    */
 
@@ -621,6 +604,32 @@ public:
     dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
       &output_data) const override;
 
+
+  /**
+   * As opposed to the other fill_fe_values() and fill_fe_face_values()
+   * functions that rely on pre-computed information of InternalDataBase, this
+   * function chooses the flexible evaluation path on the cell and points
+   * passed in to the current function.
+   *
+   * @param[in] cell The cell where to evaluate the mapping
+   *
+   * @param[in] unit_points The points in reference coordinates where the
+   * transformation (Jacobians, positions) should be computed.
+   *
+   * @param[in] update_flags The kind of information that should be computed.
+   *
+   * @param[out] output_data A struct containing the evaluated quantities such
+   * as the Jacobian resulting from application of the mapping on the given
+   * cell with its underlying manifolds.
+   */
+  void
+  fill_mapping_data_for_generic_points(
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+    const ArrayView<const Point<dim>> &                         unit_points,
+    const UpdateFlags                                           update_flags,
+    dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
+      &output_data) const;
+
   /**
    * @}
    */
@@ -927,79 +936,6 @@ inline bool
 MappingQGeneric<dim, spacedim>::preserves_vertex_locations() const
 {
   return true;
-}
-
-
-
-template <int dim, int spacedim>
-template <typename Number, typename Number2>
-inline void
-MappingQGeneric<dim, spacedim>::transform_variable(
-  const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-  const MappingKind                                           kind,
-  const ArrayView<const Point<dim>> &                         unit_points,
-  const ArrayView<const Number> &                             input,
-  const ArrayView<Number2> &                                  output) const
-{
-  AssertDimension(unit_points.size(), output.size());
-  AssertDimension(unit_points.size(), input.size());
-
-  const std::vector<Point<spacedim>> support_points =
-    this->compute_mapping_support_points(cell);
-
-  const unsigned int n_points = unit_points.size();
-  const unsigned int n_lanes  = VectorizedArray<double>::size();
-
-  if (kind != mapping_covariant)
-    Assert(false, ExcNotImplemented());
-
-  // Use the more heavy VectorizedArray code path if there is more than
-  // one point left to compute
-  for (unsigned int i = 0; i < n_points; i += n_lanes)
-    if (n_points - i > 1)
-      {
-        Point<dim, VectorizedArray<double>> p_vec;
-        for (unsigned int j = 0; j < n_lanes; ++j)
-          if (i + j < n_points)
-            for (unsigned int d = 0; d < spacedim; ++d)
-              p_vec[d][j] = unit_points[i + j][d];
-          else
-            for (unsigned int d = 0; d < spacedim; ++d)
-              p_vec[d][j] = unit_points[i][d];
-
-        const DerivativeForm<1, spacedim, dim, VectorizedArray<double>> grad =
-          internal::evaluate_tensor_product_value_and_gradient(
-            polynomials_1d,
-            support_points,
-            p_vec,
-            polynomial_degree == 1,
-            renumber_lexicographic_to_hierarchic)
-            .second;
-
-        const DerivativeForm<1, spacedim, dim, VectorizedArray<double>> jac =
-          grad.transpose().covariant_form();
-        for (unsigned int j = 0; j < n_lanes && i + j < n_points; ++j)
-          {
-            DerivativeForm<1, spacedim, dim> jac_j;
-            for (unsigned int d = 0; d < spacedim; ++d)
-              for (unsigned int e = 0; e < dim; ++e)
-                jac_j[d][e] = jac[d][e][j];
-            output[i + j] = apply_transformation(jac_j, input[i + j]);
-          }
-      }
-    else
-      {
-        const DerivativeForm<1, spacedim, dim> grad =
-          internal::evaluate_tensor_product_value_and_gradient(
-            polynomials_1d,
-            support_points,
-            unit_points[i],
-            polynomial_degree == 1,
-            renumber_lexicographic_to_hierarchic)
-            .second;
-        output[i] =
-          apply_transformation(grad.transpose().covariant_form(), input[i]);
-      }
 }
 
 #endif // DOXYGEN

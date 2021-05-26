@@ -1,4 +1,0 @@
-Fixed: FEInterfaceValues now works also for codim one and two. Instantiated
-also DoFTools::make_flux_sparsity_pattern() for codim one and two.
-<br>
-(Luca Heltai, 2020/06/24)

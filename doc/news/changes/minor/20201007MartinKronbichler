@@ -1,6 +1,0 @@
-New: Mapping::transform_points_real_to_unit_cell() can compute the operation
-of Mapping::transform_real_to_unit_cell() on many points simultaneously, which
-can be much faster for MappingQGeneric and derived classes that involve
-expensive operations to compute the support points of the mapping.
-<br>
-(Martin Kronbichler, 2020/10/07)

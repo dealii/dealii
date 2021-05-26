@@ -569,7 +569,12 @@ namespace Threads
    * omit the template argument.
    *
    * @ingroup threads
-   * @ingroup threads
+   *
+   * @deprecated Use std::thread or std::jthread instead.
+   *
+   * @note Since this class is used in ThreadGroup, its constructors, rather
+   * than the class itself, are deprecated to allow compilation with
+   * -Werror=deprecated-declarations.
    */
   template <typename RT = void>
   class Thread
@@ -578,6 +583,7 @@ namespace Threads
     /**
      * Construct a thread object with a function object.
      */
+    DEAL_II_DEPRECATED
     Thread(const std::function<RT()> &function)
       : thread_descriptor(new internal::ThreadDescriptor<RT>())
     {
@@ -590,11 +596,13 @@ namespace Threads
      * this way, except for assigning it a thread object that holds data
      * created by the new_thread() functions.
      */
+    DEAL_II_DEPRECATED
     Thread() = default;
 
     /**
      * Copy constructor.
      */
+    DEAL_II_DEPRECATED
     Thread(const Thread<RT> &t)
       : thread_descriptor(t.thread_descriptor)
     {}
@@ -885,9 +893,11 @@ namespace Threads
    * value for the called function.
    *
    * @ingroup threads
+   *
+   * @deprecated Use TaskGroup instead.
    */
   template <typename RT = void>
-  class ThreadGroup
+  class DEAL_II_DEPRECATED ThreadGroup
   {
   public:
     /**
@@ -1308,14 +1318,8 @@ namespace Threads
    *
    * @note Threads::new_task() is, in essence, equivalent to calling
    *   `std::async(std::launch::async, ...)` in that it runs the given task
-   *   in the background. (See https://en.cppreference.com/w/cpp/thread/async
-   *   for more information.) The only difference is if you configured deal.II
-   *   with `DEAL_II_WITH_THREADS=OFF`, then the operation described by the
-   *   arguments of this function are executed immediately and the returned
-   *   value is placed in the Task object returned here. This is useful for
-   *   cases where one wants to run a program in a way where deal.II does not
-   *   internally create parallel tasks, for example because one is already
-   *   using one MPI process per core in a parallel computation.
+   *   in the background. See https://en.cppreference.com/w/cpp/thread/async
+   *   for more information.
    *
    * @ingroup threads
    */
@@ -1398,14 +1402,8 @@ namespace Threads
    *
    * @note Threads::new_task() is, in essence, equivalent to calling
    *   `std::async(std::launch::async, ...)` in that it runs the given task
-   *   in the background. (See https://en.cppreference.com/w/cpp/thread/async
-   *   for more information.) The only difference is if you configured deal.II
-   *   with `DEAL_II_WITH_THREADS=OFF`, then the operation described by the
-   *   arguments of this function are executed immediately and the returned
-   *   value is placed in the Task object returned here. This is useful for
-   *   cases where one wants to run a program in a way where deal.II does not
-   *   internally create parallel tasks, for example because one is already
-   *   using one MPI process per core in a parallel computation.
+   *   in the background. See https://en.cppreference.com/w/cpp/thread/async
+   *   for more information.
    *
    * @ingroup CPP11
    */

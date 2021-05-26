@@ -1,4 +1,0 @@
-New: There is now a constructor for class Tensor that takes
-an initializer from an object of type ArrayView.
-<br>
-(Wolfgang Bangerth, 2020/06/27)

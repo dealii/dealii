@@ -197,7 +197,7 @@ namespace internal
    * Specialization for Trilinos. Use the ghosted vector.
    */
   template <>
-  const TrilinosWrappers::MPI::Vector &
+  inline const TrilinosWrappers::MPI::Vector &
   prepare_ghost_vector(const TrilinosWrappers::MPI::Vector &prev,
                        TrilinosWrappers::MPI::Vector *      other)
   {

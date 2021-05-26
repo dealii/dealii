@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2019 by the deal.II authors
+// Copyright (C) 2015 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,6 +22,8 @@
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/mpi.h>
+#include <deal.II/base/parallel.h>
+#include <deal.II/base/subscriptor.h>
 #include <deal.II/base/template_constraints.h>
 #include <deal.II/base/types.h>
 #include <deal.II/base/utilities.h>
@@ -428,7 +430,7 @@ namespace LinearAlgebra
      *
      * @deprecated use locally_owned_size() instead.
      */
-    DEAL_II_DEPRECATED_EARLY
+    DEAL_II_DEPRECATED
     size_type
     n_elements() const;
 

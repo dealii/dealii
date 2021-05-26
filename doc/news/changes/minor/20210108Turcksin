@@ -1,5 +1,0 @@
-New: Add new BVH (Bounding Volume Hierarchy) class based on ArborX. This class
-performs multiple kinds of geometric search: intersection of bounding boxes and
-intersection of bounding boxes with points.
-<br>
-(Bruno Turcksin, 2021/01/08)

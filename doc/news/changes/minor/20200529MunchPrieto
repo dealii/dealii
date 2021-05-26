@@ -1,4 +1,0 @@
-New: Add multigrid transfer operators for distributed polynomial and 
-global coarsening.
-<br>
-(Peter Munch, Laura Prieto Saavedra, 2020/05/29)

@@ -1,4 +1,0 @@
-Deprecated: All `LinearAlgebra::distributed::Vector::zero_out_ghosts()` has been deprecated. 
-Use `LinearAlgebra::distributed::Vector::zero_out_ghost_values()` instead.
-<br>
-(Peter Munch, 2021/01/04)

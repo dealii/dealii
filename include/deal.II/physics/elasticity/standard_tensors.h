@@ -373,7 +373,8 @@ DEAL_II_CONSTEXPR SymmetricTensor<2, dim, Number>
                   Physics::Elasticity::StandardTensors<dim>::ddet_F_dC(
   const Tensor<2, dim, Number> &F)
 {
-  return Number(0.5) * determinant(F) * symmetrize(invert(transpose(F) * F));
+  return internal::NumberType<Number>::value(0.5 * determinant(F)) *
+         symmetrize(invert(transpose(F) * F));
 }
 
 

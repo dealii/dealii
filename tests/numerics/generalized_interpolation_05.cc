@@ -36,7 +36,7 @@ main()
                    2,
                    FE_Q<dim>(1),
                    1,
-                   FESystem<dim>(FE_Nedelec<dim>(2), 2),
+                   FESystem<dim>(FE_Nedelec<dim>(1), 2),
                    1,
                    FESystem<dim>(FE_Q<dim>(1), dim),
                    1);

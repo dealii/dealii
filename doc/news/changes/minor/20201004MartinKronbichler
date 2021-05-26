@@ -1,5 +1,0 @@
-New: GridTools::affine_cell_approximation() returns a matrix <i>A</i> and
-offset vector <i>b</i> that describe a least-squares fit of an affine
-approximation to a set of vertices of a cell.
-<br>
-(Martin Kronbichler, 2020/10/04)

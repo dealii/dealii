@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 - 2020 by the deal.II authors
+// Copyright (C) 2019 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -111,7 +111,7 @@ namespace GridGenerator
                          double,
                          double,
                          double,
-                         const Point<dim>,
+                         const Point<dim> &,
                          types::manifold_id,
                          types::manifold_id,
                          double,
@@ -141,6 +141,10 @@ namespace GridGenerator
 
       else if (name == "cylinder")
         parse_and_create<dim, dim, double, double>(cylinder, arguments, tria);
+
+      else if (name == "subdivided_cylinder")
+        parse_and_create<dim, dim, unsigned int, double, double>(
+          subdivided_cylinder, arguments, tria);
 
       else if (name == "truncated_cone")
         parse_and_create<dim, dim, double, double, double>(truncated_cone,
@@ -183,6 +187,15 @@ namespace GridGenerator
                          double,
                          unsigned int,
                          bool>(quarter_hyper_shell, arguments, tria);
+
+      else if (name == "eccentric_hyper_shell")
+        parse_and_create<dim,
+                         dim,
+                         const Point<dim> &,
+                         const Point<dim> &,
+                         double,
+                         double,
+                         unsigned int>(eccentric_hyper_shell, arguments, tria);
 
       else if (name == "cylinder_shell")
         parse_and_create<dim,

@@ -1,4 +1,0 @@
-Removed: The deprecated bindings to the legacy NETCDF C++ library have been
-removed.
-<br>
-(David Wells, 2020/05/27)

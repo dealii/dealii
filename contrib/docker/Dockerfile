@@ -11,7 +11,6 @@ RUN cd /usr/src \
     -DDEAL_II_COMPILE_EXAMPLES=OFF \
     -DDEAL_II_COMPONENT_PYTHON_BINDINGS=ON \
     -DDEAL_II_WITH_MPI=ON \
-    -DDEAL_II_WITH_SIMPLEX_SUPPORT=ON \
     -DCMAKE_CXX_FLAGS="-std=c++17" \
     .. \  
     && ninja install \

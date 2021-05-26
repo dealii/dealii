@@ -228,15 +228,19 @@ namespace Step27
 #ifdef DEBUG
     // We did not think about hp-constraints on ghost cells yet.
     // Thus, we are content with verifying their consistency for now.
+    std::vector<IndexSet> locally_owned_dofs_per_processor =
+      Utilities::MPI::all_gather(dof_handler.get_communicator(),
+                                 dof_handler.locally_owned_dofs());
+
     IndexSet locally_active_dofs;
     DoFTools::extract_locally_active_dofs(dof_handler, locally_active_dofs);
-    AssertThrow(constraints.is_consistent_in_parallel(
-                  dof_handler.locally_owned_dofs_per_processor(),
-                  locally_active_dofs,
-                  mpi_communicator,
-                  /*verbose=*/true),
-                ExcMessage(
-                  "AffineConstraints object contains inconsistencies!"));
+
+    AssertThrow(
+      constraints.is_consistent_in_parallel(locally_owned_dofs_per_processor,
+                                            locally_active_dofs,
+                                            mpi_communicator,
+                                            /*verbose=*/true),
+      ExcMessage("AffineConstraints object contains inconsistencies!"));
 #endif
     constraints.close();
 

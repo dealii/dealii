@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2019 by the deal.II authors
+// Copyright (C) 1999 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -58,7 +58,7 @@ public:
 
 /**
  * This class is used to stack the output from several computations into one
- * output file by stacking the data sets in another co-ordinate direction
+ * output file by stacking the data sets in another coordinate direction
  * orthogonal to the space directions. The most common use is to stack the
  * results of several time steps into one space-time output file, or for
  * example to connect the results of solutions of a parameter dependent

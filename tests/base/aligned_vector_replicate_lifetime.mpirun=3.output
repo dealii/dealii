@@ -1,0 +1,36 @@
+
+DEAL:0::*** On process 0: Starting up...
+DEAL:0::Default constructor. Object number 0
+DEAL:0::destructor. Object number 0
+DEAL:0::*** On process 0: Replicating...
+DEAL:0::*** On process 0: Going out of scope
+DEAL:0::Objects created: 1
+DEAL:0::Objects destroyed: 1
+
+DEAL:1::*** On process 1: Starting up...
+DEAL:1::Default constructor. Object number 0
+DEAL:1::copy constructor from 0. Object number 1
+DEAL:1::destructor. Object number 0
+DEAL:1::*** On process 1: Replicating...
+DEAL:1::copy constructor from 1. Object number 2
+DEAL:1::destructor. Object number 2
+DEAL:1::move constructor from 1. Object number 3
+DEAL:1::destructor. Object number 1
+DEAL:1::*** On process 1: Going out of scope
+DEAL:1::destructor. Object number 3
+DEAL:1::Objects created: 4
+DEAL:1::Objects destroyed: 4
+
+
+DEAL:2::*** On process 2: Starting up...
+DEAL:2::Default constructor. Object number 0
+DEAL:2::copy constructor from 0. Object number 1
+DEAL:2::copy constructor from 0. Object number 2
+DEAL:2::destructor. Object number 0
+DEAL:2::*** On process 2: Replicating...
+DEAL:2::destructor. Object number 2
+DEAL:2::destructor. Object number 1
+DEAL:2::*** On process 2: Going out of scope
+DEAL:2::Objects created: 3
+DEAL:2::Objects destroyed: 3
+

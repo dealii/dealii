@@ -283,11 +283,11 @@ write code that works for both isotropic and anisotropic refinement:
 @endcode
      Here the number of subfaces is three. It is important to note the subtle
   differences between, for a face, TriaAccessor::n_children() and
-  TriaAccessor::number_of_children(). The first function returns the number of
+  TriaAccessor::n_active_descendants(). The first function returns the number of
   immediate children, which would be two for the above example, whereas the
   second returns the number of active offspring (i.e., including children,
   grandchildren, and further descendants), which is the correct three in
-  the example above. Using <code>face->number_of_children()</code> works for
+  the example above. Using <code>face->n_active_descendants()</code> works for
   isotropic and anisotropic as well as 2D and 3D cases, so it should always be
   used. It should be noted that if any of the cells behind the two
   small subfaces on the left side of the rightmost image is further

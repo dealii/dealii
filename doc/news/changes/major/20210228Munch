@@ -1,6 +1,0 @@
-New: The communicator of an arbitrary (not just parallel) Triangulation class can now be 
-queried via Triangulation::get_communicator() or DoFHandler::get_communicator(). In
-the case of serial Triangulations and DoFHandler set up with serial Triangulations,
-MPI_COMM_SELF is returned.
-<br>
-(Peter Munch, 2021/02/28)

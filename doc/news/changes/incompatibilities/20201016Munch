@@ -1,4 +1,0 @@
-Changed: The return type of the method Mapping::get_vertices() has been changed
-from std::array to boost::container::small_vector.  
-<br>
-(Peter Munch, 2020/10/16)

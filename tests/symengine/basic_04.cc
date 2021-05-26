@@ -92,7 +92,7 @@ main(int argc, char *argv[])
   auto t1 = std::chrono::high_resolution_clock::now();
   for (unsigned j = 0; j < n_runs; j++)
     {
-      res += static_cast<const SE::RealDouble &>(*h->subs(dict)).i;
+      res += SE::eval_double(*h->subs(dict));
     }
   auto         t2 = std::chrono::high_resolution_clock::now();
   const double diff_symm_subs =

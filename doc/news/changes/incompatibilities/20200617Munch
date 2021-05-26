@@ -1,6 +1,0 @@
-Deprecated: The functions MatrixFree::reinit(), which take 
-a vector of hp::DoFHandlers, have been deprecated. Users are asked
-to provide vectors of DoFhandlers, which may contain hp::DoFHandlers. This is
-possible now since hp::DoFHandler is deriving from DoFHandler.  
-<br>
-(Peter Munch, 2020/06/03)

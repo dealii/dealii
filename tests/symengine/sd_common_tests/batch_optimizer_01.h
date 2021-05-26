@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2020 by the deal.II authors
+// Copyright (C) 2020 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,6 +20,9 @@
 
 #include <deal.II/differentiation/ad.h>
 #include <deal.II/differentiation/sd.h>
+
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/vector.h>
 
 #include <iostream>
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2020 by the deal.II authors
+// Copyright (C) 1999 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -85,7 +85,7 @@ namespace internal
 
 
     /**
-     * Generate evalution points on a simplex with arbitrary number of
+     * Generate evaluation points on a simplex with arbitrary number of
      * subdivisions.
      */
     template <int dim>

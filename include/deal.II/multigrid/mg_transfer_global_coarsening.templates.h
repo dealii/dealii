@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2020 by the deal.II authors
+// Copyright (C) 2020 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -417,9 +417,11 @@ namespace internal
     FineDoFHandlerViewCell(
       const std::function<bool()> &has_children_function,
       const std::function<void(std::vector<types::global_dof_index> &)>
-        &get_dof_indices_function)
+        &                                  get_dof_indices_function,
+      const std::function<unsigned int()> &active_fe_index_function)
       : has_children_function(has_children_function)
       , get_dof_indices_function(get_dof_indices_function)
+      , active_fe_index_function(active_fe_index_function)
     {}
 
     bool
@@ -434,11 +436,18 @@ namespace internal
       get_dof_indices_function(dof_indices);
     }
 
+    unsigned int
+    active_fe_index() const
+    {
+      return active_fe_index_function();
+    }
+
 
   private:
     const std::function<bool()> has_children_function;
     const std::function<void(std::vector<types::global_dof_index> &)>
-      get_dof_indices_function;
+                                        get_dof_indices_function;
+    const std::function<unsigned int()> active_fe_index_function;
   };
 
   template <int dim>
@@ -627,9 +636,6 @@ namespace internal
       const auto &dof_handler_dst = mesh_fine; // TODO: remove
       const auto &tria_dst        = mesh_fine.get_triangulation(); // TODO
 
-      const unsigned int dofs_per_cell =
-        mesh_coarse.get_fe_collection()[0].dofs_per_cell;
-
       const auto targets_with_indexset = process.get_requesters();
 
       std::map<unsigned int, std::vector<types::global_dof_index>>
@@ -638,7 +644,7 @@ namespace internal
       requests.reserve(targets_with_indexset.size());
 
       {
-        std::vector<types::global_dof_index> indices(dofs_per_cell);
+        std::vector<types::global_dof_index> indices;
 
         for (const auto &i : targets_with_indexset)
           {
@@ -653,7 +659,10 @@ namespace internal
                     cell_id_translator.to_cell_id(cell_id)),
                   &dof_handler_dst);
 
+                indices.resize(cell->get_fe().n_dofs_per_cell());
+
                 cell->get_dof_indices(indices);
+                buffer.push_back(cell->active_fe_index());
                 buffer.insert(buffer.end(), indices.begin(), indices.end());
               }
 
@@ -675,7 +684,7 @@ namespace internal
 
       // process local cells
       {
-        std::vector<types::global_dof_index> indices(dofs_per_cell);
+        std::vector<types::global_dof_index> indices;
 
         for (const auto id : is_dst_locally_owned)
           {
@@ -683,6 +692,8 @@ namespace internal
 
             typename MeshType::cell_iterator cell_(
               *tria_dst.create_cell_iterator(cell_id), &dof_handler_dst);
+
+            indices.resize(cell_->get_fe().n_dofs_per_cell());
 
             cell_->get_dof_indices(indices);
 
@@ -712,7 +723,7 @@ namespace internal
         for (unsigned int i = 0; i < ranks.size(); ++i)
           {
             MPI_Status status;
-            const auto ierr_1 = MPI_Probe(
+            const int  ierr_1 = MPI_Probe(
               MPI_ANY_SOURCE,
               Utilities::MPI::internal::Tags::fine_dof_handler_view_reinit,
               communicator,
@@ -721,8 +732,8 @@ namespace internal
 
             std::vector<types::global_dof_index> buffer;
 
-            int        message_length;
-            const auto ierr_2 =
+            int       message_length;
+            const int ierr_2 =
               MPI_Get_count(&status,
                             Utilities::MPI::internal::mpi_type_id(
                               buffer.data()),
@@ -731,7 +742,7 @@ namespace internal
 
             buffer.resize(message_length);
 
-            const auto ierr_3 = MPI_Recv(
+            const int ierr_3 = MPI_Recv(
               buffer.data(),
               buffer.size(),
               Utilities::MPI::internal::mpi_type_id(buffer.data()),
@@ -741,25 +752,34 @@ namespace internal
               MPI_STATUS_IGNORE);
             AssertThrowMPI(ierr_3);
 
-            ghost_indices.insert(ghost_indices.end(),
-                                 buffer.begin(),
-                                 buffer.end());
+            for (unsigned int i = 0; i < buffer.size();
+                 i += dof_handler_dst.get_fe(buffer[i]).n_dofs_per_cell() + 1)
+              ghost_indices.insert(
+                ghost_indices.end(),
+                buffer.begin() + i + 1,
+                buffer.begin() + i + 1 +
+                  dof_handler_dst.get_fe(buffer[i]).n_dofs_per_cell());
 
             const unsigned int rank = status.MPI_SOURCE;
 
             const auto ids = rank_to_ids[rank];
 
-            std::vector<types::global_dof_index> indices(dofs_per_cell);
+            std::vector<types::global_dof_index> indices;
 
             for (unsigned int i = 0, k = 0; i < ids.size(); ++i)
               {
-                for (unsigned int j = 0; j < dofs_per_cell; ++j, ++k)
+                const unsigned int active_fe_index = buffer[k++];
+
+                indices.resize(
+                  dof_handler_dst.get_fe(active_fe_index).n_dofs_per_cell());
+
+                for (unsigned int j = 0; j < indices.size(); ++j, ++k)
                   indices[j] = buffer[k];
-                map[ids[i]] = indices;
+                map[ids[i]] = {active_fe_index, indices};
               }
           }
 
-        const auto ierr_1 =
+        const int ierr_1 =
           MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
         AssertThrowMPI(ierr_1);
       }
@@ -819,11 +839,31 @@ namespace internal
             }
           else if (is_cell_remotly_owned)
             {
-              dof_indices = map.at(id);
+              dof_indices = map.at(id).second;
             }
           else
             {
               AssertThrow(false, ExcNotImplemented()); // should not happen!
+            }
+        },
+        [cell, is_cell_locally_owned, is_cell_remotly_owned, id, this]()
+          -> unsigned int {
+          if (is_cell_locally_owned)
+            {
+              return (typename MeshType::cell_iterator(
+                        *mesh_fine.get_triangulation().create_cell_iterator(
+                          cell->id()),
+                        &mesh_fine))
+                ->active_fe_index();
+            }
+          else if (is_cell_remotly_owned)
+            {
+              return map.at(id).first;
+            }
+          else
+            {
+              AssertThrow(false, ExcNotImplemented()); // should not happen!
+              return 0;
             }
         });
     }
@@ -858,12 +898,19 @@ namespace internal
             }
           else if (is_cell_remotly_owned)
             {
-              dof_indices = map.at(id);
+              dof_indices = map.at(id).second;
             }
           else
             {
               AssertThrow(false, ExcNotImplemented()); // should not happen!
             }
+        },
+        []() -> unsigned int {
+          AssertThrow(false, ExcNotImplemented()); // currently we do not need
+                                                   // active_fe_index() for
+                                                   // children
+
+          return 0;
         });
     }
 
@@ -896,14 +943,16 @@ namespace internal
     IndexSet is_extended_locally_owned;
     IndexSet is_extended_ghosts;
 
-    std::map<unsigned int, std::vector<types::global_dof_index>> map;
+    std::map<unsigned int,
+             std::pair<unsigned int, std::vector<types::global_dof_index>>>
+      map;
 
     static unsigned int
     n_coarse_cells(const MeshType &mesh)
     {
       types::coarse_cell_id n_coarse_cells = 0;
 
-      for (auto cell : mesh.get_triangulation().active_cell_iterators())
+      for (const auto &cell : mesh.get_triangulation().active_cell_iterators())
         if (!cell->is_artificial())
           n_coarse_cells =
             std::max(n_coarse_cells, cell->id().get_coarse_cell_id());
@@ -935,13 +984,13 @@ namespace internal
       IndexSet is_dst_remote(this->cell_id_translator.size());
       IndexSet is_src_locally_owned(this->cell_id_translator.size());
 
-      for (auto cell : tria_dst.active_cell_iterators())
+      for (const auto &cell : tria_dst.active_cell_iterators())
         if (!cell->is_artificial() && cell->is_locally_owned())
           is_dst_locally_owned.add_index(
             this->cell_id_translator.translate(cell));
 
 
-      for (auto cell : tria_src.active_cell_iterators())
+      for (const auto &cell : tria_src.active_cell_iterators())
         if (!cell->is_artificial() && cell->is_locally_owned())
           {
             is_src_locally_owned.add_index(
@@ -962,6 +1011,45 @@ namespace internal
                    is_dst_remote,
                    is_src_locally_owned,
                    true);
+    }
+  };
+
+  template <typename MeshType>
+  class PermutationFineDoFHandlerView
+    : public internal::FineDoFHandlerView<MeshType>
+  {
+  public:
+    PermutationFineDoFHandlerView(const MeshType &dof_handler_dst,
+                                  const MeshType &dof_handler_src)
+      : internal::FineDoFHandlerView<MeshType>(dof_handler_dst, dof_handler_src)
+    {
+      // get reference to triangulations
+      const auto &tria_dst = dof_handler_dst.get_triangulation();
+      const auto &tria_src = dof_handler_src.get_triangulation();
+
+      // create index sets
+      IndexSet is_dst_locally_owned(this->cell_id_translator.size());
+      IndexSet is_dst_remote(this->cell_id_translator.size());
+      IndexSet is_src_locally_owned(this->cell_id_translator.size());
+
+      for (const auto &cell : tria_dst.active_cell_iterators())
+        if (!cell->is_artificial() && cell->is_locally_owned())
+          is_dst_locally_owned.add_index(
+            this->cell_id_translator.translate(cell));
+
+
+      for (const auto &cell : tria_src.active_cell_iterators())
+        if (!cell->is_artificial() && cell->is_locally_owned())
+          {
+            is_src_locally_owned.add_index(
+              this->cell_id_translator.translate(cell));
+            is_dst_remote.add_index(this->cell_id_translator.translate(cell));
+          }
+
+      this->reinit(is_dst_locally_owned,
+                   is_dst_remote,
+                   is_src_locally_owned,
+                   false);
     }
   };
 
@@ -1036,6 +1124,8 @@ namespace internal
         }
     }
 
+
+
     template <int dim, typename Number>
     static void
     precompute_restriction_constraints(
@@ -1087,6 +1177,67 @@ namespace internal
       fu(partitioner->locally_owned_range());
       fu(partitioner->ghost_indices());
     }
+
+
+
+    template <int dim, typename Number, typename MeshType>
+    static void
+    compute_weights(
+      const MeshType &                         dof_handler_fine,
+      const dealii::AffineConstraints<Number> &constraint_fine,
+      const MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>
+        &                                         transfer,
+      LinearAlgebra::distributed::Vector<Number> &touch_count)
+    {
+      LinearAlgebra::distributed::Vector<Number> touch_count_;
+      touch_count.reinit(transfer.partitioner_fine);
+
+      IndexSet locally_relevant_dofs;
+      DoFTools::extract_locally_relevant_dofs(dof_handler_fine,
+                                              locally_relevant_dofs);
+
+      const auto partitioner_fine_ =
+        std::make_shared<Utilities::MPI::Partitioner>(
+          dof_handler_fine.locally_owned_dofs(),
+          locally_relevant_dofs,
+          dof_handler_fine.get_communicator());
+      transfer.vec_fine.reinit(transfer.partitioner_fine);
+
+      touch_count_.reinit(partitioner_fine_);
+
+      std::vector<types::global_dof_index> local_dof_indices;
+
+      for (const auto &cell : dof_handler_fine.active_cell_iterators())
+        {
+          if (cell->is_locally_owned() == false)
+            continue;
+
+          local_dof_indices.resize(cell->get_fe().n_dofs_per_cell());
+
+          cell->get_dof_indices(local_dof_indices);
+
+          for (auto i : local_dof_indices)
+            if (constraint_fine.is_constrained(i) == false)
+              touch_count_[i] += 1;
+        }
+
+      touch_count_.compress(VectorOperation::add);
+
+      for (unsigned int i = 0; i < touch_count_.local_size(); ++i)
+        touch_count_.local_element(i) =
+          constraint_fine.is_constrained(
+            touch_count_.get_partitioner()->local_to_global(i)) ?
+            Number(0.) :
+            Number(1.) / touch_count_.local_element(i);
+
+      touch_count_.update_ghost_values();
+
+      // copy weights to other indexset
+      touch_count.copy_locally_owned_data_from(touch_count_);
+      touch_count.update_ghost_values();
+    }
+
+
 
   public:
     template <int dim, typename Number, typename MeshType>
@@ -1159,10 +1310,11 @@ namespace internal
       {
         // ... for fine mesh
         {
-          transfer.partitioner_fine.reset(new Utilities::MPI::Partitioner(
-            view.locally_owned_dofs(),
-            view.locally_relevant_dofs(),
-            dof_handler_fine.get_communicator()));
+          transfer.partitioner_fine =
+            std::make_shared<Utilities::MPI::Partitioner>(
+              view.locally_owned_dofs(),
+              view.locally_relevant_dofs(),
+              dof_handler_fine.get_communicator());
           transfer.vec_fine.reinit(transfer.partitioner_fine);
         }
 
@@ -1172,10 +1324,11 @@ namespace internal
           DoFTools::extract_locally_relevant_dofs(dof_handler_coarse,
                                                   locally_relevant_dofs);
 
-          transfer.partitioner_coarse.reset(new Utilities::MPI::Partitioner(
-            dof_handler_coarse.locally_owned_dofs(),
-            locally_relevant_dofs,
-            dof_handler_coarse.get_communicator()));
+          transfer.partitioner_coarse =
+            std::make_shared<Utilities::MPI::Partitioner>(
+              dof_handler_coarse.locally_owned_dofs(),
+              locally_relevant_dofs,
+              dof_handler_coarse.get_communicator());
           transfer.vec_coarse.reinit(transfer.partitioner_coarse);
           precompute_restriction_constraints(transfer.partitioner_coarse,
                                              constraint_coarse,
@@ -1213,7 +1366,7 @@ namespace internal
             }
         };
 
-      // set up two mg-schesmes
+      // set up two mg-schemes
       //   (0) no refinement -> identity
       //   (1) h-refinement
       transfer.schemes.resize(2);
@@ -1234,9 +1387,7 @@ namespace internal
       transfer.schemes[1].degree_fine     = fe_coarse.degree * 2 + 1;
 
       // continuous or discontinuous
-      transfer.schemes[0].fine_element_is_continuous =
-        transfer.schemes[1].fine_element_is_continuous =
-          fe_fine.dofs_per_vertex > 0;
+      transfer.fine_element_is_continuous = fe_fine.dofs_per_vertex > 0;
 
       // count coarse cells for each scheme (0, 1)
       {
@@ -1486,57 +1637,16 @@ namespace internal
 
 
       // ------------------------------- weights -------------------------------
-      if (transfer.schemes[0].fine_element_is_continuous)
+      if (transfer.fine_element_is_continuous)
         {
-          LinearAlgebra::distributed::Vector<Number> touch_count, touch_count_;
+          // compute weights globally
+          LinearAlgebra::distributed::Vector<Number> weight_vector;
+          compute_weights(dof_handler_fine,
+                          constraint_fine,
+                          transfer,
+                          weight_vector);
 
-          touch_count.reinit(transfer.partitioner_fine);
-
-          IndexSet locally_relevant_dofs;
-          DoFTools::extract_locally_relevant_dofs(dof_handler_fine,
-                                                  locally_relevant_dofs);
-
-          const auto partitioner_fine_ =
-            std::make_shared<Utilities::MPI::Partitioner>(
-              dof_handler_fine.locally_owned_dofs(),
-              locally_relevant_dofs,
-              dof_handler_fine.get_communicator());
-          transfer.vec_fine.reinit(transfer.partitioner_fine);
-
-          touch_count_.reinit(partitioner_fine_);
-
-          std::vector<types::global_dof_index> local_dof_indices(
-            transfer.schemes[0].dofs_per_cell_coarse);
-
-          for (auto cell : dof_handler_fine.active_cell_iterators())
-            {
-              if (cell->is_locally_owned() == false)
-                continue;
-
-              cell->get_dof_indices(local_dof_indices);
-
-              for (auto i : local_dof_indices)
-                if (constraint_fine.is_constrained(i) == false)
-                  touch_count_[i] += 1;
-            }
-
-          touch_count_.compress(VectorOperation::add);
-
-          for (unsigned int i = 0; i < touch_count_.local_size(); ++i)
-            touch_count_.local_element(i) =
-              constraint_fine.is_constrained(
-                touch_count_.get_partitioner()->local_to_global(i)) ?
-                Number(0.) :
-                Number(1.) / touch_count_.local_element(i);
-
-          // TODO: needed?
-          touch_count_.update_ghost_values();
-
-
-          // copy weights to other indexset
-          touch_count.copy_locally_owned_data_from(touch_count_);
-          touch_count.update_ghost_values();
-
+          // ... and store them cell-wise a DG format
           transfer.schemes[0].weights.resize(
             transfer.schemes[0].n_coarse_cells *
             transfer.schemes[0].dofs_per_cell_fine);
@@ -1556,7 +1666,8 @@ namespace internal
               for (unsigned int i = 0;
                    i < transfer.schemes[0].dofs_per_cell_fine;
                    i++)
-                weights_0[i] = touch_count.local_element(dof_indices_fine_0[i]);
+                weights_0[i] =
+                  weight_vector.local_element(dof_indices_fine_0[i]);
 
               dof_indices_fine_0 += transfer.schemes[0].dofs_per_cell_fine;
               weights_0 += transfer.schemes[0].dofs_per_cell_fine;
@@ -1566,7 +1677,7 @@ namespace internal
                    i < transfer.schemes[1].dofs_per_cell_coarse;
                    i++)
                 weights_1[cell_local_chilren_indices[c][i]] =
-                  touch_count.local_element(
+                  weight_vector.local_element(
                     dof_indices_fine_1[cell_local_chilren_indices[c][i]]);
 
               // move pointers (only once at the end)
@@ -1591,8 +1702,12 @@ namespace internal
       MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>
         &transfer)
     {
-      AssertDimension(dof_handler_fine.get_triangulation().n_active_cells(),
-                      dof_handler_coarse.get_triangulation().n_active_cells());
+      const PermutationFineDoFHandlerView<MeshType> view(dof_handler_fine,
+                                                         dof_handler_coarse);
+
+      AssertDimension(
+        dof_handler_fine.get_triangulation().n_global_active_cells(),
+        dof_handler_coarse.get_triangulation().n_global_active_cells());
 
       // extract number of components
       AssertDimension(dof_handler_fine.get_fe_collection().n_components(),
@@ -1601,18 +1716,25 @@ namespace internal
       transfer.n_components =
         dof_handler_fine.get_fe_collection().n_components();
 
-      const auto process_cells = [&](const auto &fu) {
-        typename MeshType::active_cell_iterator            //
-          cell_coarse = dof_handler_coarse.begin_active(), //
-          end_coarse  = dof_handler_coarse.end(),          //
-          cell_fine   = dof_handler_fine.begin_active();
+      transfer.fine_element_is_continuous =
+        dof_handler_fine.get_fe(0).dofs_per_vertex > 0;
 
-        for (; cell_coarse != end_coarse; cell_coarse++, cell_fine++)
+      for (unsigned int i = 0; i < dof_handler_fine.get_fe_collection().size();
+           ++i)
+        Assert(transfer.fine_element_is_continuous ==
+                 (dof_handler_fine.get_fe(i).dofs_per_vertex > 0),
+               ExcInternalError());
+
+      const auto process_cells = [&](const auto &fu) {
+        for (const auto &cell_coarse :
+             dof_handler_coarse.active_cell_iterators())
           {
             if (!cell_coarse->is_locally_owned())
               continue;
 
-            fu(cell_coarse, cell_fine);
+            const auto cell_coarse_on_fine_mesh = view.get_cell(cell_coarse);
+
+            fu(cell_coarse, &cell_coarse_on_fine_mesh);
           }
       };
 
@@ -1655,22 +1777,17 @@ namespace internal
             dof_handler_coarse.get_fe(fe_index_pair.first.first).degree;
           transfer.schemes[fe_index_pair.second].degree_fine =
             dof_handler_fine.get_fe(fe_index_pair.first.second).degree;
-
-          transfer.schemes[fe_index_pair.second].fine_element_is_continuous =
-            dof_handler_fine.get_fe(fe_index_pair.first.second)
-              .dofs_per_vertex > 0;
         }
 
       precompute_constraints(dof_handler_coarse, constraint_coarse, transfer);
 
       const auto comm = dof_handler_coarse.get_communicator();
       {
-        IndexSet locally_relevant_dofs;
-        DoFTools::extract_locally_relevant_dofs(dof_handler_fine,
-                                                locally_relevant_dofs);
-
-        transfer.partitioner_fine.reset(new Utilities::MPI::Partitioner(
-          dof_handler_fine.locally_owned_dofs(), locally_relevant_dofs, comm));
+        transfer.partitioner_fine =
+          std::make_shared<Utilities::MPI::Partitioner>(
+            view.locally_owned_dofs(),
+            view.locally_relevant_dofs(),
+            dof_handler_fine.get_communicator());
         transfer.vec_fine.reinit(transfer.partitioner_fine);
       }
       {
@@ -1678,10 +1795,11 @@ namespace internal
         DoFTools::extract_locally_relevant_dofs(dof_handler_coarse,
                                                 locally_relevant_dofs);
 
-        transfer.partitioner_coarse.reset(new Utilities::MPI::Partitioner(
-          dof_handler_coarse.locally_owned_dofs(),
-          locally_relevant_dofs,
-          comm));
+        transfer.partitioner_coarse =
+          std::make_shared<Utilities::MPI::Partitioner>(
+            dof_handler_coarse.locally_owned_dofs(),
+            locally_relevant_dofs,
+            comm);
         transfer.vec_coarse.reinit(transfer.partitioner_coarse);
         precompute_restriction_constraints(transfer.partitioner_coarse,
                                            constraint_coarse,
@@ -1774,10 +1892,13 @@ namespace internal
         for (unsigned int i = 0; i < fe_index_pairs.size(); i++)
           {
             level_dof_indices_coarse_[i] =
-              &transfer.schemes[i].level_dof_indices_coarse[0];
+              transfer.schemes[i].level_dof_indices_coarse.data();
             level_dof_indices_fine_[i] =
-              &transfer.schemes[i].level_dof_indices_fine[0];
+              transfer.schemes[i].level_dof_indices_fine.data();
           }
+
+        bool     fine_indices_touch_remote_dofs = false;
+        IndexSet locally_owned_dofs = dof_handler_fine.locally_owned_dofs();
 
         process_cells([&](const auto &cell_coarse, const auto &cell_fine) {
           const auto fe_pair_no =
@@ -1793,22 +1914,34 @@ namespace internal
                 local_dof_indices_coarse
                   [fe_pair_no][lexicographic_numbering_coarse[fe_pair_no][i]]);
 
-
           cell_fine->get_dof_indices(local_dof_indices_fine[fe_pair_no]);
           for (unsigned int i = 0;
                i < transfer.schemes[fe_pair_no].dofs_per_cell_fine;
                i++)
-            level_dof_indices_fine_[fe_pair_no][i] =
-              transfer.partitioner_fine->global_to_local(
-                local_dof_indices_fine
-                  [fe_pair_no][lexicographic_numbering_fine[fe_pair_no][i]]);
-
+            {
+              level_dof_indices_fine_[fe_pair_no][i] =
+                transfer.partitioner_fine->global_to_local(
+                  local_dof_indices_fine
+                    [fe_pair_no][lexicographic_numbering_fine[fe_pair_no][i]]);
+              if (!locally_owned_dofs.is_element(
+                    local_dof_indices_fine
+                      [fe_pair_no]
+                      [lexicographic_numbering_fine[fe_pair_no][i]]))
+                fine_indices_touch_remote_dofs = true;
+            }
 
           level_dof_indices_coarse_[fe_pair_no] +=
             transfer.schemes[fe_pair_no].dofs_per_cell_coarse;
           level_dof_indices_fine_[fe_pair_no] +=
             transfer.schemes[fe_pair_no].dofs_per_cell_fine;
         });
+
+        // if all access goes to the locally owned dofs on all ranks, we do
+        // not need the vec_fine vector
+        if (Utilities::MPI::max(static_cast<unsigned int>(
+                                  fine_indices_touch_remote_dofs),
+                                comm) == 0)
+          transfer.vec_fine.reinit(0);
       }
 
       // ------------------------- prolongation matrix -------------------------
@@ -1939,49 +2072,23 @@ namespace internal
         }
 
       // ------------------------------- weights -------------------------------
-      const bool fine_element_is_continuous = Utilities::MPI::max(
-        static_cast<unsigned int>(
-          transfer.schemes.size() > 0 ?
-            transfer.schemes.front().fine_element_is_continuous :
-            false),
-        comm);
-      if (fine_element_is_continuous)
+      if (transfer.fine_element_is_continuous)
         {
+          // compute weights globally
+          LinearAlgebra::distributed::Vector<Number> weight_vector;
+          compute_weights(dof_handler_fine,
+                          constraint_fine,
+                          transfer,
+                          weight_vector);
+
+          // ... and store them cell-wise a DG format
           for (auto &scheme : transfer.schemes)
             scheme.weights.resize(scheme.n_coarse_cells *
                                   scheme.dofs_per_cell_fine);
 
-          LinearAlgebra::distributed::Vector<Number> touch_count;
-          touch_count.reinit(transfer.partitioner_fine);
-
           std::vector<unsigned int *> level_dof_indices_fine_(
             fe_index_pairs.size());
           std::vector<Number *> weights_(fe_index_pairs.size());
-
-          for (unsigned int i = 0; i < fe_index_pairs.size(); i++)
-            level_dof_indices_fine_[i] =
-              &transfer.schemes[i].level_dof_indices_fine[0];
-
-          process_cells([&](const auto &cell_coarse, const auto &cell_fine) {
-            const auto fe_pair_no =
-              fe_index_pairs[std::pair<unsigned int, unsigned int>(
-                cell_coarse->active_fe_index(), cell_fine->active_fe_index())];
-
-            for (unsigned int i = 0;
-                 i < transfer.schemes[fe_pair_no].dofs_per_cell_fine;
-                 i++)
-              if (constraint_fine.is_constrained(
-                    transfer.partitioner_fine->local_to_global(
-                      level_dof_indices_fine_[fe_pair_no][i])) == false)
-                touch_count.local_element(
-                  level_dof_indices_fine_[fe_pair_no][i]) += 1;
-
-            level_dof_indices_fine_[fe_pair_no] +=
-              transfer.schemes[fe_pair_no].dofs_per_cell_fine;
-          });
-
-          touch_count.compress(VectorOperation::add);
-          touch_count.update_ghost_values();
 
           for (unsigned int i = 0; i < fe_index_pairs.size(); i++)
             {
@@ -1998,14 +2105,8 @@ namespace internal
             for (unsigned int i = 0;
                  i < transfer.schemes[fe_pair_no].dofs_per_cell_fine;
                  i++)
-              if (constraint_fine.is_constrained(
-                    transfer.partitioner_fine->local_to_global(
-                      level_dof_indices_fine_[fe_pair_no][i])) == true)
-                weights_[fe_pair_no][i] = Number(0.);
-              else
-                weights_[fe_pair_no][i] =
-                  Number(1.) / touch_count.local_element(
-                                 level_dof_indices_fine_[fe_pair_no][i]);
+              weights_[fe_pair_no][i] = weight_vector.local_element(
+                level_dof_indices_fine_[fe_pair_no][i]);
 
             level_dof_indices_fine_[fe_pair_no] +=
               transfer.schemes[fe_pair_no].dofs_per_cell_fine;
@@ -2022,45 +2123,6 @@ namespace internal
 
 namespace MGTransferGlobalCoarseningTools
 {
-  unsigned int
-  create_next_polynomial_coarsening_degree(
-    const unsigned int                      previous_fe_degree,
-    const PolynomialCoarseningSequenceType &p_sequence)
-  {
-    switch (p_sequence)
-      {
-        case PolynomialCoarseningSequenceType::bisect:
-          return std::max(previous_fe_degree / 2, 1u);
-        case PolynomialCoarseningSequenceType::decrease_by_one:
-          return std::max(previous_fe_degree - 1, 1u);
-        case PolynomialCoarseningSequenceType::go_to_one:
-          return 1u;
-        default:
-          Assert(false, StandardExceptions::ExcNotImplemented());
-          return 1u;
-      }
-  }
-
-
-
-  std::vector<unsigned int>
-  create_polynomial_coarsening_sequence(
-    const unsigned int                      max_degree,
-    const PolynomialCoarseningSequenceType &p_sequence)
-  {
-    std::vector<unsigned int> degrees{max_degree};
-
-    while (degrees.back() > 1)
-      degrees.push_back(
-        create_next_polynomial_coarsening_degree(degrees.back(), p_sequence));
-
-    std::reverse(degrees.begin(), degrees.end());
-
-    return degrees;
-  }
-
-
-
   template <int dim, int spacedim>
   std::vector<std::shared_ptr<const Triangulation<dim, spacedim>>>
   create_geometric_coarsening_sequence(
@@ -2124,6 +2186,10 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::prolongate(
 
   const unsigned int n_lanes = VectorizedArrayType::size();
 
+  const bool use_dst_inplace = this->vec_fine.size() == 0;
+
+  const auto vec_fine_ptr = use_dst_inplace ? &dst : &this->vec_fine;
+
   // the following code is equivalent to:
   // this->constraint_coarse.distribute(this->vec_coarse);
   {
@@ -2155,7 +2221,8 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::prolongate(
   this->vec_coarse
     .update_ghost_values(); // note: make sure that ghost values are set
 
-  this->vec_fine = Number(0.);
+  if (fine_element_is_continuous)
+    *vec_fine_ptr = Number(0.);
 
   AlignedVector<VectorizedArrayType> evaluation_data_fine;
   AlignedVector<VectorizedArrayType> evaluation_data_coarse;
@@ -2171,20 +2238,25 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::prolongate(
             scheme.level_dof_indices_coarse.data();
           const Number *weights = nullptr;
 
-          if (scheme.fine_element_is_continuous)
+          if (fine_element_is_continuous)
             weights = scheme.weights.data();
 
           for (unsigned int cell = 0; cell < scheme.n_coarse_cells; ++cell)
             {
-              for (unsigned int i = 0; i < scheme.dofs_per_cell_fine; ++i)
-                this->vec_fine.local_element(indices_fine[i]) +=
-                  this->vec_coarse.local_element(indices_coarse[i]) *
-                  (scheme.fine_element_is_continuous ? weights[i] : 1.0);
+              if (fine_element_is_continuous)
+                for (unsigned int i = 0; i < scheme.dofs_per_cell_fine; ++i)
+                  vec_fine_ptr->local_element(indices_fine[i]) +=
+                    this->vec_coarse.local_element(indices_coarse[i]) *
+                    weights[i];
+              else
+                for (unsigned int i = 0; i < scheme.dofs_per_cell_fine; ++i)
+                  vec_fine_ptr->local_element(indices_fine[i]) =
+                    this->vec_coarse.local_element(indices_coarse[i]);
 
               indices_fine += scheme.dofs_per_cell_fine;
               indices_coarse += scheme.dofs_per_cell_coarse;
 
-              if (scheme.fine_element_is_continuous)
+              if (fine_element_is_continuous)
                 weights += scheme.dofs_per_cell_fine;
             }
 
@@ -2247,19 +2319,23 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::prolongate(
               &scheme.level_dof_indices_fine[cell * scheme.dofs_per_cell_fine];
             const Number *weights = nullptr;
 
-            if (scheme.fine_element_is_continuous)
+            if (fine_element_is_continuous)
               weights = &scheme.weights[cell * scheme.dofs_per_cell_fine];
 
             for (unsigned int v = 0; v < n_lanes_filled; ++v)
               {
-                for (unsigned int i = 0; i < scheme.dofs_per_cell_fine; ++i)
-                  this->vec_fine.local_element(indices[i]) +=
-                    evaluation_data_fine[i][v] *
-                    (scheme.fine_element_is_continuous ? weights[i] : 1.0);
+                if (fine_element_is_continuous)
+                  for (unsigned int i = 0; i < scheme.dofs_per_cell_fine; ++i)
+                    vec_fine_ptr->local_element(indices[i]) +=
+                      evaluation_data_fine[i][v] * weights[i];
+                else
+                  for (unsigned int i = 0; i < scheme.dofs_per_cell_fine; ++i)
+                    vec_fine_ptr->local_element(indices[i]) =
+                      evaluation_data_fine[i][v];
 
                 indices += scheme.dofs_per_cell_fine;
 
-                if (scheme.fine_element_is_continuous)
+                if (fine_element_is_continuous)
                   weights += scheme.dofs_per_cell_fine;
               }
           }
@@ -2269,10 +2345,11 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::prolongate(
   this->vec_coarse.zero_out_ghost_values(); // clear ghost values; else compress
                                             // in do_restrict_add does not work
 
-  if (schemes.size() > 0 && schemes.front().fine_element_is_continuous)
-    this->vec_fine.compress(VectorOperation::add);
+  if (fine_element_is_continuous || use_dst_inplace == false)
+    vec_fine_ptr->compress(VectorOperation::add);
 
-  dst.copy_locally_owned_data_from(this->vec_fine);
+  if (use_dst_inplace == false)
+    dst.copy_locally_owned_data_from(this->vec_fine);
 }
 
 
@@ -2287,8 +2364,14 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
 
   const unsigned int n_lanes = VectorizedArrayType::size();
 
-  this->vec_fine.copy_locally_owned_data_from(src);
-  this->vec_fine.update_ghost_values();
+  const bool use_src_inplace = this->vec_fine.size() == 0;
+  const auto vec_fine_ptr    = use_src_inplace ? &src : &this->vec_fine;
+
+  if (use_src_inplace == false)
+    this->vec_fine.copy_locally_owned_data_from(src);
+
+  if (fine_element_is_continuous || use_src_inplace == false)
+    vec_fine_ptr->update_ghost_values();
 
   this->vec_coarse.copy_locally_owned_data_from(dst);
 
@@ -2325,22 +2408,28 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
             scheme.level_dof_indices_coarse.data();
           const Number *weights = nullptr;
 
-          if (scheme.fine_element_is_continuous)
+          if (fine_element_is_continuous)
             weights = scheme.weights.data();
 
           for (unsigned int cell = 0; cell < scheme.n_coarse_cells; ++cell)
             {
-              for (unsigned int i = 0; i < scheme.dofs_per_cell_fine; ++i)
-                distribute_local_to_global(
-                  indices_coarse[i],
-                  this->vec_fine.local_element(indices_fine[i]) *
-                    (scheme.fine_element_is_continuous ? weights[i] : 1.0),
-                  this->vec_coarse);
+              if (fine_element_is_continuous)
+                for (unsigned int i = 0; i < scheme.dofs_per_cell_fine; ++i)
+                  distribute_local_to_global(
+                    indices_coarse[i],
+                    vec_fine_ptr->local_element(indices_fine[i]) * weights[i],
+                    this->vec_coarse);
+              else
+                for (unsigned int i = 0; i < scheme.dofs_per_cell_fine; ++i)
+                  distribute_local_to_global(indices_coarse[i],
+                                             vec_fine_ptr->local_element(
+                                               indices_fine[i]),
+                                             this->vec_coarse);
 
               indices_fine += scheme.dofs_per_cell_fine;
               indices_coarse += scheme.dofs_per_cell_coarse;
 
-              if (scheme.fine_element_is_continuous)
+              if (fine_element_is_continuous)
                 weights += scheme.dofs_per_cell_fine;
             }
 
@@ -2372,19 +2461,23 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
               &scheme.level_dof_indices_fine[cell * scheme.dofs_per_cell_fine];
             const Number *weights = nullptr;
 
-            if (scheme.fine_element_is_continuous)
+            if (fine_element_is_continuous)
               weights = &scheme.weights[cell * scheme.dofs_per_cell_fine];
 
             for (unsigned int v = 0; v < n_lanes_filled; ++v)
               {
-                for (unsigned int i = 0; i < scheme.dofs_per_cell_fine; ++i)
-                  evaluation_data_fine[i][v] =
-                    this->vec_fine.local_element(indices[i]) *
-                    (scheme.fine_element_is_continuous ? weights[i] : 1.0);
+                if (fine_element_is_continuous)
+                  for (unsigned int i = 0; i < scheme.dofs_per_cell_fine; ++i)
+                    evaluation_data_fine[i][v] =
+                      vec_fine_ptr->local_element(indices[i]) * weights[i];
+                else
+                  for (unsigned int i = 0; i < scheme.dofs_per_cell_fine; ++i)
+                    evaluation_data_fine[i][v] =
+                      vec_fine_ptr->local_element(indices[i]);
 
                 indices += scheme.dofs_per_cell_fine;
 
-                if (scheme.fine_element_is_continuous)
+                if (fine_element_is_continuous)
                   weights += scheme.dofs_per_cell_fine;
               }
           }
@@ -2440,8 +2533,10 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
 
   const unsigned int n_lanes = VectorizedArrayType::size();
 
-  this->vec_fine.copy_locally_owned_data_from(src);
-  this->vec_fine.update_ghost_values();
+  const bool use_src_inplace = this->vec_fine.size() == 0;
+  const auto vec_fine_ptr    = use_src_inplace ? &src : &this->vec_fine;
+  if (fine_element_is_continuous || use_src_inplace == false)
+    vec_fine_ptr->update_ghost_values();
 
   this->vec_coarse = 0.0;
 
@@ -2462,7 +2557,7 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
             {
               for (unsigned int i = 0; i < scheme.dofs_per_cell_fine; ++i)
                 this->vec_coarse.local_element(indices_coarse[i]) =
-                  this->vec_fine.local_element(indices_fine[i]);
+                  vec_fine_ptr->local_element(indices_fine[i]);
 
               indices_fine += scheme.dofs_per_cell_fine;
               indices_coarse += scheme.dofs_per_cell_coarse;
@@ -2499,7 +2594,7 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
               {
                 for (unsigned int i = 0; i < scheme.dofs_per_cell_fine; ++i)
                   evaluation_data_fine[i][v] =
-                    this->vec_fine.local_element(indices[i]);
+                    vec_fine_ptr->local_element(indices[i]);
 
                 indices += scheme.dofs_per_cell_fine;
               }

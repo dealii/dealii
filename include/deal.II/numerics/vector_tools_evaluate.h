@@ -23,7 +23,7 @@
 
 #include <deal.II/dofs/dof_handler.h>
 
-#include <deal.II/fe/fe_point_evaluation.h>
+#include <deal.II/matrix_free/fe_point_evaluation.h>
 
 #include <map>
 
@@ -189,16 +189,17 @@ namespace VectorTools
 
     Assert(cache.is_ready(),
            ExcMessage(
-             "Utilties::MPI::RemotePointEvaluation is not ready yet! "
-             "Please call Utilties::MPI::RemotePointEvaluation::reinit() "
+             "Utilities::MPI::RemotePointEvaluation is not ready yet! "
+             "Please call Utilities::MPI::RemotePointEvaluation::reinit() "
              "yourself or the other evaluate_at_points(), which does this for"
              "you."));
 
-    Assert(&dof_handler.get_triangulation() == &cache.get_triangulation(),
-           ExcMessage(
-             "The provided Utilties::MPI::RemotePointEvaluation and DoFHandler "
-             "object have been set up with different Triangulation objects, "
-             "a scenario not supported!"));
+    Assert(
+      &dof_handler.get_triangulation() == &cache.get_triangulation(),
+      ExcMessage(
+        "The provided Utilities::MPI::RemotePointEvaluation and DoFHandler "
+        "object have been set up with different Triangulation objects, "
+        "a scenario not supported!"));
 
     // evaluate values at points if possible
     const auto evaluation_point_results = [&]() {
@@ -216,7 +217,9 @@ namespace VectorTools
           if (evaluators[active_fe_index] == nullptr)
             evaluators[active_fe_index] =
               std::make_unique<FEPointEvaluation<n_components, dim>>(
-                cache.get_mapping(), dof_handler.get_fe(active_fe_index));
+                cache.get_mapping(),
+                dof_handler.get_fe(active_fe_index),
+                update_values);
 
           return *evaluators[active_fe_index];
         };
@@ -243,9 +246,8 @@ namespace VectorTools
 
             auto &evaluator = get_evaluator(cell->active_fe_index());
 
-            evaluator.evaluate(cell,
-                               unit_points,
-                               solution_values,
+            evaluator.reinit(cell, unit_points);
+            evaluator.evaluate(solution_values,
                                dealii::EvaluationFlags::values);
 
             for (unsigned int q = 0; q < unit_points.size(); ++q)

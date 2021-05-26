@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,6 +20,3 @@
 This is the list of changes made since the last release of deal.II.
 All entries are signed with the names of the authors.
 </p>
-
-
-

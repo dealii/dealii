@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2020 by the deal.II authors
+// Copyright (C) 2016 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,6 +17,8 @@
 // test IncrementalFunction
 
 #include <deal.II/base/incremental_function.h>
+
+#include <deal.II/lac/vector.h>
 
 #include "../tests.h"
 

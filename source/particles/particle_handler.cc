@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2020 by the deal.II authors
+// Copyright (C) 2017 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,6 +15,8 @@
 
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/grid_tools_cache.h>
+
+#include <deal.II/numerics/vector_tools.h>
 
 #include <deal.II/particles/particle_handler.h>
 
@@ -437,11 +439,19 @@ namespace Particles
     local_start_index += local_next_particle_index;
 
     auto point_locations =
-      GridTools::compute_point_locations(*triangulation_cache, positions);
+      GridTools::compute_point_locations_try_all(*triangulation_cache,
+                                                 positions);
 
     auto &cells           = std::get<0>(point_locations);
     auto &local_positions = std::get<1>(point_locations);
     auto &index_map       = std::get<2>(point_locations);
+    auto &missing_points  = std::get<3>(point_locations);
+    // If a point was not found, throwing an error, as the old
+    // implementation of compute_point_locations would have done
+    AssertThrow(missing_points.size() == 0,
+                VectorTools::ExcPointNotAvailableHere());
+
+    (void)missing_points;
 
     if (cells.size() == 0)
       return;
@@ -794,7 +804,7 @@ namespace Particles
 
   template <int dim, int spacedim>
   IndexSet
-  ParticleHandler<dim, spacedim>::locally_relevant_ids() const
+  ParticleHandler<dim, spacedim>::locally_owned_particle_ids() const
   {
     IndexSet set(get_next_free_particle_index());
     for (const auto &p : *this)
@@ -1057,6 +1067,11 @@ namespace Particles
                                                           cell_centers);
                     });
 
+          // make a copy of the current cell, since we will modify the variable
+          // current_cell in the following but we need a backup in the case
+          // the particle is not found
+          const auto previous_cell_of_particle = current_cell;
+
           // Search all of the cells adjacent to the closest vertex of the
           // previous cell Most likely we will find the particle in them.
           for (unsigned int i = 0; i < n_neighbor_cells; ++i)
@@ -1088,23 +1103,22 @@ namespace Particles
               // The particle is not in a neighbor of the old cell.
               // Look for the new cell in the whole local domain.
               // This case is rare.
-              try
-                {
-                  const std::pair<const typename Triangulation<dim, spacedim>::
-                                    active_cell_iterator,
-                                  Point<dim>>
-                    current_cell_and_position =
-                      GridTools::find_active_cell_around_point<>(
-                        *mapping, *triangulation, out_particle->get_location());
-                  current_cell               = current_cell_and_position.first;
-                  current_reference_position = current_cell_and_position.second;
-                }
-              catch (GridTools::ExcPointNotFound<spacedim> &)
+              const std::pair<const typename Triangulation<dim, spacedim>::
+                                active_cell_iterator,
+                              Point<dim>>
+                current_cell_and_position =
+                  GridTools::find_active_cell_around_point<>(
+                    *triangulation_cache, out_particle->get_location());
+              current_cell               = current_cell_and_position.first;
+              current_reference_position = current_cell_and_position.second;
+
+              if (current_cell.state() != IteratorState::valid)
                 {
                   // We can find no cell for this particle. It has left the
                   // domain due to an integration error or an open boundary.
                   // Signal the loss and move on.
-                  signals.particle_lost(out_particle, current_cell);
+                  signals.particle_lost(out_particle,
+                                        previous_cell_of_particle);
                   continue;
                 }
             }

@@ -22,6 +22,7 @@
 #include <deal.II/numerics/vector_tools_boundary.h>
 #include <deal.II/numerics/vector_tools_common.h>
 #include <deal.II/numerics/vector_tools_constraints.h>
+#include <deal.II/numerics/vector_tools_evaluate.h>
 #include <deal.II/numerics/vector_tools_integrate_difference.h>
 #include <deal.II/numerics/vector_tools_interpolate.h>
 #include <deal.II/numerics/vector_tools_mean_value.h>

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 - 2020 by the deal.II authors
+// Copyright (C) 2019 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -184,7 +184,9 @@ namespace parallel
             }
 
           // 4b) set actual (level_)subdomain_ids
-          for (unsigned int level = 0; level < cell_infos.size(); ++level)
+          for (unsigned int level = 0;
+               level < cell_infos.size() && !cell_infos[level].empty();
+               ++level)
             {
               auto cell      = this->begin(level);
               auto cell_info = cell_infos[level].begin();

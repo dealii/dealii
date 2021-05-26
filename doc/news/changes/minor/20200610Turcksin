@@ -1,5 +1,0 @@
-Fixed: Fix a bug where CUDAWrappers::MatrixFree::cell_loop() would set the
-destination vector to zero if the partitioner of the MatrixFree object was
-different from the partitioner of the source or destination vector.
-<br>
-(Bruno Turcksin, 2020/06/10)

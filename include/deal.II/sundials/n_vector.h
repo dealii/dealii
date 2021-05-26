@@ -1,6 +1,6 @@
 //-----------------------------------------------------------
 //
-//    Copyright (C) 2020 by the deal.II authors
+//    Copyright (C) 2020 - 2021 by the deal.II authors
 //
 //    This file is part of the deal.II library.
 //
@@ -98,7 +98,7 @@ namespace SUNDIALS
     /**
      * A view to a vector which can be used whenever a N_Vector is required.
      *
-     * Objects of this class should preferrably be created by
+     * Objects of this class should preferably be created by
      * make_nvector_view() as
      *
      * @code

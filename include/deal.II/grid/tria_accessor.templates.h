@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2020 by the deal.II authors
+// Copyright (C) 1999 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1112,8 +1112,23 @@ TriaAccessor<structdim, dim, spacedim>::vertex_index(
 {
   AssertIndexRange(corner, this->n_vertices());
 
-  return dealii::internal::TriaAccessorImplementation::Implementation::
-    vertex_index(*this, corner);
+  if (structdim == dim)
+    {
+      constexpr unsigned int max_vertices_per_cell = 1 << dim;
+      const std::size_t      my_index =
+        static_cast<std::size_t>(this->present_index) * max_vertices_per_cell;
+      AssertIndexRange(my_index + corner,
+                       this->tria->levels[this->present_level]
+                         ->cell_vertex_indices_cache.size());
+      const unsigned int vertex_index =
+        this->tria->levels[this->present_level]
+          ->cell_vertex_indices_cache[my_index + corner];
+      Assert(vertex_index != numbers::invalid_unsigned_int, ExcInternalError());
+      return vertex_index;
+    }
+  else
+    return dealii::internal::TriaAccessorImplementation::Implementation::
+      vertex_index(*this, corner);
 }
 
 
@@ -1801,13 +1816,22 @@ template <int structdim, int dim, int spacedim>
 unsigned int
 TriaAccessor<structdim, dim, spacedim>::number_of_children() const
 {
+  return n_active_descendants();
+}
+
+
+
+template <int structdim, int dim, int spacedim>
+unsigned int
+TriaAccessor<structdim, dim, spacedim>::n_active_descendants() const
+{
   if (!this->has_children())
     return 1;
   else
     {
       unsigned int sum = 0;
       for (unsigned int c = 0; c < n_children(); ++c)
-        sum += this->child(c)->number_of_children();
+        sum += this->child(c)->n_active_descendants();
       return sum;
     }
 }
@@ -2568,6 +2592,15 @@ TriaAccessor<0, dim, spacedim>::number_of_children()
 
 template <int dim, int spacedim>
 inline unsigned int
+TriaAccessor<0, dim, spacedim>::n_active_descendants()
+{
+  return 0;
+}
+
+
+
+template <int dim, int spacedim>
+inline unsigned int
 TriaAccessor<0, dim, spacedim>::max_refinement_depth()
 {
   return 0;
@@ -2991,6 +3024,15 @@ TriaAccessor<0, 1, spacedim>::number_of_children()
 
 template <int spacedim>
 inline unsigned int
+TriaAccessor<0, 1, spacedim>::n_active_descendants()
+{
+  return 0;
+}
+
+
+
+template <int spacedim>
+inline unsigned int
 TriaAccessor<0, 1, spacedim>::max_refinement_depth()
 {
   return 0;
@@ -3179,7 +3221,8 @@ namespace internal
            ((i == 1) && cell.at_boundary(1) ?
               dealii::TriaAccessor<0, 1, spacedim>::right_vertex :
               dealii::TriaAccessor<0, 1, spacedim>::interior_vertex)),
-        cell.vertex_index(i));
+        dealii::internal::TriaAccessorImplementation::Implementation::
+          vertex_index(cell, i));
       return dealii::TriaIterator<dealii::TriaAccessor<0, 1, spacedim>>(a);
     }
 

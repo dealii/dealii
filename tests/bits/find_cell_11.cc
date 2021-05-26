@@ -56,14 +56,9 @@ test()
 
   MappingQ<2> mapping(1);
 
-  try
-    {
-      GridTools::find_active_cell_around_point(mapping, tr, p);
-    }
-  catch (GridTools::ExcPointNotFound<2> &e)
-    {
-      deallog << "outside" << std::endl;
-    }
+  auto c = GridTools::find_active_cell_around_point(mapping, tr, p);
+  if (c.first.state() != IteratorState::valid)
+    deallog << "outside" << std::endl;
   deallog << "done" << std::endl;
 }
 

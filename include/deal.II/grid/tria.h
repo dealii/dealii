@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2020 by the deal.II authors
+// Copyright (C) 1998 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1532,7 +1532,7 @@ public:
      * automatically generated destructor would have a different one due to
      * member objects.
      */
-    virtual ~DistortedCellList() noexcept override = default;
+    virtual ~DistortedCellList() noexcept override;
 
     /**
      * A list of those cells among the coarse mesh cells that are deformed or
@@ -1875,6 +1875,7 @@ public:
    * @note This function internally calls create_triangulation and therefore
    * can throw the same exception as the other function.
    */
+  DEAL_II_DEPRECATED
   virtual void
   create_triangulation_compatibility(
     const std::vector<Point<spacedim>> &vertices,
@@ -3897,6 +3898,12 @@ private:
   reset_global_cell_indices();
 
   /**
+   * Reset cache for the cells' vertex indices.
+   */
+  void
+  reset_cell_vertex_indices_cache();
+
+  /**
    * Refine all cells on all levels which were previously flagged for
    * refinement.
    *
@@ -4254,6 +4261,7 @@ Triangulation<dim, spacedim>::load(Archive &ar, const unsigned int)
         level->global_active_cell_indices.resize(level->refine_flags.size());
         level->global_level_cell_indices.resize(level->refine_flags.size());
       }
+    reset_cell_vertex_indices_cache();
     reset_active_cell_indices();
     reset_global_cell_indices();
   }

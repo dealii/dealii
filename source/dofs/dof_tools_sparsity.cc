@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2020 by the deal.II authors
+// Copyright (C) 1999 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -608,7 +608,7 @@ namespace DoFTools
                   if (neighbor->has_children())
                     {
                       for (unsigned int sub_nr = 0;
-                           sub_nr != cell_face->number_of_children();
+                           sub_nr != cell_face->n_active_descendants();
                            ++sub_nr)
                         {
                           const typename DoFHandler<dim, spacedim>::

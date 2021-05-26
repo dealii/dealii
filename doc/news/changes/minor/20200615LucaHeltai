@@ -1,3 +1,0 @@
-New: Particles::Particle and Particles::ParticleAccessor can now be used as
-indexable in boost::rtree objects. 
-<br> (Luca Heltai, 2020/06/15)

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2020 by the deal.II authors
+// Copyright (C) 2016 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -587,6 +587,16 @@ namespace internal
     template <int dim>
     typename types<dim>::connectivity *
     copy_connectivity(const typename types<dim>::connectivity *connectivity);
+
+#  ifndef DOXYGEN
+    template <>
+    typename types<2>::connectivity *
+    copy_connectivity<2>(const typename types<2>::connectivity *connectivity);
+
+    template <>
+    typename types<3>::connectivity *
+    copy_connectivity<3>(const typename types<3>::connectivity *connectivity);
+#  endif
   } // namespace p4est
 } // namespace internal
 

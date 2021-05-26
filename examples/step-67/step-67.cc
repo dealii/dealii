@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2020 by the deal.II authors
+ * Copyright (C) 2020 - 2021 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -768,13 +768,13 @@ namespace Euler_DG
       const MatrixFree<dim, Number> &                   data,
       LinearAlgebra::distributed::Vector<Number> &      dst,
       const LinearAlgebra::distributed::Vector<Number> &src,
-      const std::pair<unsigned int, unsigned int> &     cell_range) const;
+      const std::pair<unsigned int, unsigned int> &     face_range) const;
 
     void local_apply_boundary_face(
       const MatrixFree<dim, Number> &                   data,
       LinearAlgebra::distributed::Vector<Number> &      dst,
       const LinearAlgebra::distributed::Vector<Number> &src,
-      const std::pair<unsigned int, unsigned int> &     cell_range) const;
+      const std::pair<unsigned int, unsigned int> &     face_range) const;
   };
 
 

@@ -1,0 +1,20 @@
+
+DEAL::Evaluating the solution at u=(0.500000,1.23400)
+DEAL::Setting up Jacobian system at u=(0.500000,1.23400)
+DEAL::Solving Jacobian system with rhs=(0.162480,-1.79816)
+DEAL::Evaluating the solution at u=(0.500000,1.23400)
+DEAL::Evaluating the solution at u=(0.581240,-0.645395)
+DEAL::Solving Jacobian system with rhs=(-1.16042,0.349431)
+DEAL::Evaluating the solution at u=(0.581240,-0.645395)
+DEAL::Evaluating the solution at u=(0.00102861,0.284248)
+DEAL::Solving Jacobian system with rhs=(0.0383589,-0.289047)
+DEAL::Evaluating the solution at u=(0.00102861,0.284248)
+DEAL::Evaluating the solution at u=(0.0202080,-0.0239792)
+DEAL::Solving Jacobian system with rhs=(-0.0404090,0.00378553)
+DEAL::Evaluating the solution at u=(0.0202081,-0.0239792)
+DEAL::Evaluating the solution at u=(3.55540e-06,1.08225e-05)
+DEAL::Solving Jacobian system with rhs=(-7.11070e-06,-1.43779e-05)
+DEAL::Evaluating the solution at u=(3.56127e-06,1.08404e-05)
+DEAL::Evaluating the solution at u=(5.16813e-11,-5.16814e-11)
+5.168e-11 -5.168e-11 
+DEAL::Converged in 5 iterations.

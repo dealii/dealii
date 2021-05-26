@@ -19,6 +19,26 @@
  *
  * @brief This module describes the experimental simplex support in deal.II.
  *
+ * Simplex and mixed meshes in deal.II are still experimental, i.e., work
+ * in progress. Large parts of the library have been ported to be able to
+ * operate on such kind of meshes. However, there are still many functions
+ * that need to be generalized. You can get a good overview of the ported
+ * functionalities by taking a look at the tests in the folder
+ * "tests/simplex". In the following, we provide two very basic examples
+ * to get started and provide some implementation details.
+ *
+ * @section simplex_reference_example_simplex Example: simplex mesh
+ *
+ * The following code shows how to work with simplex meshes:
+ *
+ * @include step_3_simplex.cc
+ *
+ * @section simplex_reference_example_mixed Example: mixed mesh
+ *
+ * The following code shows how to work with mixed meshes:
+ *
+ * @include step_3_mixed.cc
+ *
  * @section simplex_reference_cells Reference cells
  *
  * In 2D, we provide triangles and quadrilaterals with the following possible

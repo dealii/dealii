@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2020 by the deal.II authors
+// Copyright (C) 2017 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -491,15 +491,17 @@
  * - Classes designed to operate at the quadrature point level (or any general continuum point):
  *   - Differentiation::AD::ScalarFunction: %Differentiation of a scalar-valued function.
  *       One typical use would be the the development of constitutive laws directly from a strain
- *       energy function.
+ *       energy function. An example of this exact use case is given in step-71.
  *   - Differentiation::AD::VectorFunction: %Differentiation of a vector-valued function.
  *       This could be used to linearize the kinematic variables of a constitutive law, or assist
  *       in solving the evolution equations of local internal variables.
  * - Classes designed to operate at the cell level:
  *   - Differentiation::AD::EnergyFunctional: %Differentiation of a scalar-valued energy functional,
- *       such as might arise from variational formulations.
+ *       such as might arise from variational formulations. An example of where this class is used
+ *       is in step-72.
  *   - Differentiation::AD::ResidualLinearization: %Differentiation of a vector-valued finite element
- *       residual, leading to its consistent linearization.
+ *       residual, leading to its consistent linearization. step-72 also provides a demonstration
+ *       of how this class can be used.
  *
  * Naturally, it is also possible for users to manage the initialization and derivative
  * computations themselves.
@@ -591,6 +593,7 @@
  * expressions using methods such as common subexpression elimination (CSE), as well as by generating
  * high performance code-paths to evaluate these expressions through the use of a custom-generated
  * `std::function` or by compiling the expression using the LLVM JIT compiler.
+ * The usage of the Differentiation::SD::BatchOptimizer class is exemplified in step-71.
  *
  * As a final note, it is important to recognize the remaining major deficiencies in deal.II's current
  * implementation of the interface to the supported symbolic library.
@@ -598,6 +601,7 @@
  * symbolic algebra to the traditional use case (i.e. scalar and tensor algebra, as might be useful to
  * define constitutive relations or complex functions for application as boundary conditions or
  * source terms).
+ * In fact, step-71 demonstrates how it can be used to implement challenging constitutive models.
  * In the future we will also implement classes to assist in performing assembly operations in
  * the same spirit as that which has been done in the Differentiation::AD namespace.
  *

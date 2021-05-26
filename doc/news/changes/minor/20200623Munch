@@ -1,7 +1,0 @@
-New: The class TriaAccessor provides now the capability to query
-the number of vertices, lines, and faces (with n_vertices(), 
-n_lines(), n_faces(), vertex_indices(), 
-line_indices(), face_indices()). The new methods can be used as an 
-alternative to the methods in GeometryInfo.
-<br>
-(Peter Munch, 2020/06/23)

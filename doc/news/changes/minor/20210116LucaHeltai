@@ -1,4 +1,0 @@
-New: Mapping::get_bounding_box() now returns the bounding box of the support points, when the mapping
-is of type MappingQ, MappingQGeneric, and MappingQEulerian.
-<br>
-(Luca Heltai, 2021/01/16)

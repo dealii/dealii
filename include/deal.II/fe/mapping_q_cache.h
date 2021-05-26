@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 - 2020 by the deal.II authors
+// Copyright (C) 2019 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -102,7 +102,7 @@ public:
    *
    * @deprecated Use initialize() version above instead.
    */
-  DEAL_II_DEPRECATED_EARLY void
+  DEAL_II_DEPRECATED void
   initialize(const Triangulation<dim, spacedim> &  triangulation,
              const MappingQGeneric<dim, spacedim> &mapping);
 
@@ -232,6 +232,12 @@ private:
    * this class goes out of scope.
    */
   boost::signals2::connection clear_signal;
+
+  /**
+   * Specifies if support_point_cache has been set up for the cells on the
+   * levels.
+   */
+  bool uses_level_info;
 };
 
 /*@}*/

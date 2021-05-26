@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2017 by the deal.II authors
+## Copyright (C) 2012 - 2021 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -18,7 +18,6 @@ INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 SET(_src
   arkode.cc
   ida.cc
-  copy.cc
   kinsol.cc
   n_vector.cc
   sunlinsol_wrapper.cc

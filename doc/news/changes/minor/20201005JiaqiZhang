@@ -1,5 +1,0 @@
-New: SSP_THIRD_ORDER is added to the namespace TimeStepping to 
-implement the explicit third order Strong Stability Preserving (SSP) Runge-Kutta method, 
-which is also called the third order Total Variation Diminishing (TVD) Runge-Kutta method, see @cite gottlieb2001strong.
-<br>
-(Jiaqi Zhang, 2020/10/05)

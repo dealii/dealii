@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2020 by the deal.II authors
+// Copyright (C) 2008 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -2244,7 +2244,7 @@ namespace parallel
     void
     Triangulation<dim, spacedim>::copy_local_forest_to_triangulation()
     {
-      // disable mesh smoothing for recreating the deal.II triangulation,
+      // Disable mesh smoothing for recreating the deal.II triangulation,
       // otherwise we might not be able to reproduce the p4est mesh
       // exactly. We restore the original smoothing at the end of this
       // function. Note that the smoothing flag is used in the normal
@@ -2270,21 +2270,25 @@ namespace parallel
 
       bool mesh_changed = false;
 
-      // remove all deal.II refinements. Note that we could skip this and
+      // Remove all deal.II refinements. Note that we could skip this and
       // start from our current state, because the algorithm later coarsens as
       // necessary. This has the advantage of being faster when large parts
       // of the local partition changes (likely) and gives a deterministic
       // ordering of the cells (useful for snapshot/resume).
       // TODO: is there a more efficient way to do this?
       if (settings & mesh_reconstruction_after_repartitioning)
-        while (this->begin_active()->level() > 0)
+        while (this->n_levels() > 1)
           {
-            for (const auto &cell : this->active_cell_iterators())
+            // Instead of marking all active cells, we slice off the finest
+            // level, one level at a time. This takes the same number of
+            // iterations but solves an issue where not all cells on a
+            // periodic boundary are indeed coarsened and we run into an
+            // irrelevant Assert() in update_periodic_face_map().
+            for (const auto &cell :
+                 this->active_cell_iterators_on_level(this->n_levels() - 1))
               {
                 cell->set_coarsen_flag();
               }
-
-            this->prepare_coarsening_and_refinement();
             try
               {
                 dealii::Triangulation<dim, spacedim>::
@@ -3556,6 +3560,89 @@ namespace parallel
 
 
 #endif // DEAL_II_WITH_P4EST
+
+
+
+namespace parallel
+{
+  namespace distributed
+  {
+    template <int dim, int spacedim>
+    TemporarilyMatchRefineFlags<dim, spacedim>::TemporarilyMatchRefineFlags(
+      dealii::Triangulation<dim, spacedim> &tria)
+      : distributed_tria(
+          dynamic_cast<
+            dealii::parallel::distributed::Triangulation<dim, spacedim> *>(
+            &tria))
+    {
+#ifdef DEAL_II_WITH_P4EST
+      if (distributed_tria != nullptr)
+        {
+          // Save the current set of refinement flags, and adjust the
+          // refinement flags to be consistent with the p4est oracle.
+          distributed_tria->save_coarsen_flags(saved_coarsen_flags);
+          distributed_tria->save_refine_flags(saved_refine_flags);
+
+          for (const auto &pair : distributed_tria->local_cell_relations)
+            {
+              const auto &cell   = pair.first;
+              const auto &status = pair.second;
+
+              switch (status)
+                {
+                  case dealii::Triangulation<dim, spacedim>::CELL_PERSIST:
+                    // cell remains unchanged
+                    cell->clear_refine_flag();
+                    cell->clear_coarsen_flag();
+                    break;
+
+                  case dealii::Triangulation<dim, spacedim>::CELL_REFINE:
+                    // cell will be refined
+                    cell->clear_coarsen_flag();
+                    cell->set_refine_flag();
+                    break;
+
+                  case dealii::Triangulation<dim, spacedim>::CELL_COARSEN:
+                    // children of this cell will be coarsened
+                    for (const auto &child : cell->child_iterators())
+                      {
+                        child->clear_refine_flag();
+                        child->set_coarsen_flag();
+                      }
+                    break;
+
+                  case dealii::Triangulation<dim, spacedim>::CELL_INVALID:
+                    // do nothing as cell does not exist yet
+                    break;
+
+                  default:
+                    Assert(false, ExcInternalError());
+                    break;
+                }
+            }
+        }
+#endif
+    }
+
+
+
+    template <int dim, int spacedim>
+    TemporarilyMatchRefineFlags<dim, spacedim>::~TemporarilyMatchRefineFlags()
+    {
+#ifdef DEAL_II_WITH_P4EST
+      if (distributed_tria)
+        {
+          // Undo the refinement flags modification.
+          distributed_tria->load_coarsen_flags(saved_coarsen_flags);
+          distributed_tria->load_refine_flags(saved_refine_flags);
+        }
+#else
+      // pretend that this destructor does something to silence clang-tidy
+      (void)distributed_tria;
+#endif
+    }
+  } // namespace distributed
+} // namespace parallel
 
 
 

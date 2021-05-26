@@ -1,8 +1,0 @@
-Fixed: GridOut::write_vtk output the vertices of hexahedra in the wrong order,
-which resulted in visualization programs computing all cell volumes as negative.
-Fixing this required that we significantly update the way VTK input is read in
-to deal.II as well (so that GridOut composed with GridIn remains idempotent). As
-a result, the order of cells, faces, and edges is now different for meshes read
-from VTK files.
-<br>
-(David Wells, 2021/02/20)

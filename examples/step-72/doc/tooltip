@@ -1,0 +1,3 @@
+Newton's method for a nonlinear elliptic problem. Automatic differentiation
+is used to linearize the residual, or compute the full linear system from an
+energy functional.

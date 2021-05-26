@@ -1,5 +1,0 @@
-New: Function hp::Refinement::limit_p_level_difference()
-restricts the maximal level difference of neighboring cells with respect
-to the finite element hierarchy of the registered hp::FECollection.
-<br>
-(Marc Fehling, 2021/02/23)

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 - 2020 by the deal.II authors
+// Copyright (C) 2019 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,6 +17,7 @@
 
 // validate combination of error prediction and cell data transfer algorithms
 // for hp-adaptive methods
+// test either h- or p-adaptation
 
 
 #include <deal.II/dofs/dof_handler.h>
@@ -25,12 +26,10 @@
 
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/refinement.h>
 
 #include <deal.II/lac/vector.h>
 
-#include <deal.II/numerics/adaptation_strategies.h>
 #include <deal.II/numerics/cell_data_transfer.h>
 
 #include "../tests.h"
@@ -54,6 +53,11 @@ test()
     fes.push_back(FE_Q<dim>(d));
 
   DoFHandler<dim> dh(tria);
+  for (const auto &cell : dh.active_cell_iterators())
+    {
+      // set active FE index
+      cell->set_active_fe_index(1);
+    }
   for (auto cell = dh.begin(0); cell != dh.end(0); ++cell)
     {
       if (cell->id().to_string() == "0_0:")
@@ -72,16 +76,20 @@ test()
           // p-refinement
           cell->set_future_fe_index(2);
         }
+      else if (cell->id().to_string() == "3_0:")
+        {
+          // p-coarsening
+          cell->set_future_fe_index(0);
+        }
     }
   dh.distribute_dofs(fes);
 
   // ----- predict -----
-  Vector<float> error_indicators, predicted_error_indicators;
-  error_indicators.reinit(tria.n_active_cells());
-  predicted_error_indicators.reinit(tria.n_active_cells());
+  Vector<float> error_indicators(tria.n_active_cells());
   for (unsigned int i = 0; i < tria.n_active_cells(); ++i)
     error_indicators[i] = 10.;
 
+  Vector<float> predicted_error_indicators(tria.n_active_cells());
   hp::Refinement::predict_error(dh,
                                 error_indicators,
                                 predicted_error_indicators,
@@ -104,9 +112,9 @@ test()
         deallog << " refining";
       else if (cell->coarsen_flag_set())
         deallog << " coarsening";
-      else if (cell->future_fe_index_set())
-        deallog << " future_fe_deg:"
-                << dh.get_fe_collection()[cell->future_fe_index()].degree;
+
+      if (cell->future_fe_index_set())
+        deallog << " future_fe_deg:" << fes[cell->future_fe_index()].degree;
 
       deallog << std::endl;
     }

@@ -108,7 +108,7 @@ test()
 int
 main()
 {
-  initlog(1);
+  initlog(true);
 
   test<1, Functions::CutOffFunctionLinfty>();
   test<2, Functions::CutOffFunctionLinfty>();

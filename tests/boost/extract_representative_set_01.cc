@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2020 by the deal.II authors
+// Copyright (C) 2018 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -29,7 +29,7 @@
 int
 main()
 {
-  initlog(1);
+  initlog(true);
 
   const unsigned int    N = 20;
   std::vector<Point<2>> points(N);

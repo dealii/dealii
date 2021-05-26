@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2020 by the deal.II authors
+// Copyright (C) 2015 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -148,7 +148,7 @@ FE_NedelecSZ<dim, spacedim>::get_data(
 
   const unsigned int n_line_dofs = this->n_dofs_per_line() * lines_per_cell;
 
-  // we assume that all quads have the same numer of dofs
+  // we assume that all quads have the same number of dofs
   const unsigned int n_face_dofs = this->n_dofs_per_quad(0) * faces_per_cell;
 
   const UpdateFlags  flags(data.update_each);
@@ -420,7 +420,7 @@ FE_NedelecSZ<dim, spacedim>::get_data(
                   // point (x,y): polyx = L_{i+2}(2x-1), polyy = L_{j+2}(2y-1),
                   //
                   // for each polyc[d], c=x,y, contains the d-th derivative with
-                  // respect to the co-ordinate c.
+                  // respect to the coordinate c.
 
                   // We only need poly values and 1st derivative for
                   // update_values, but need the 2nd derivative too for
@@ -864,7 +864,7 @@ FE_NedelecSZ<dim, spacedim>::get_data(
                       // L_{j+2}(2y-1), polyz = L_{k+2}(2z-1).
                       //
                       // for each polyc[d], c=x,y,z, contains the d-th
-                      // derivative with respect to the co-ordinate c.
+                      // derivative with respect to the coordinate c.
                       std::vector<std::vector<double>> polyx(
                         degree, std::vector<double>(poly_length));
                       std::vector<std::vector<double>> polyy(
@@ -1697,7 +1697,7 @@ FE_NedelecSZ<dim, spacedim>::fill_face_values(
           // Loop through quad points:
           for (unsigned int m = 0; m < faces_per_cell; ++m)
             {
-              // we assume that all quads have the same numer of dofs
+              // we assume that all quads have the same number of dofs
               const unsigned int shift_m(m * this->n_dofs_per_quad(0));
               // Calculate the offsets for each face-based shape function:
               //
@@ -2240,14 +2240,15 @@ FE_NedelecSZ<dim, spacedim>::get_dpo_vector(const unsigned int degree)
   // 1 = edge
   // 2 = face (which is a cell in 2D)
   // 3 = cell
-  std::vector<unsigned int> dpo(dim + 1);
-  dpo[0] = 0;
-  dpo[1] = degree + 1;
-  dpo[2] = 2 * degree * (degree + 1);
-  if (dim == 3)
-    {
-      dpo[3] = 3 * degree * degree * (degree + 1);
-    }
+  std::vector<unsigned int> dpo;
+
+  dpo.push_back(0);
+  dpo.push_back(degree + 1);
+  if (dim > 1)
+    dpo.push_back(2 * degree * (degree + 1));
+  if (dim > 2)
+    dpo.push_back(3 * degree * degree * (degree + 1));
+
   return dpo;
 }
 

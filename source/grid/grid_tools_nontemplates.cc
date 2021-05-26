@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2020 by the deal.II authors
+// Copyright (C) 2001 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -251,12 +251,7 @@ namespace GridTools
       }
 
     AssertDimension(vertex_indices.size(), GeometryInfo<3>::vertices_per_cell);
-    // note that this is the
-    // cell_measure based on the new
-    // deal.II numbering. When called
-    // from inside GridReordering make
-    // sure that you reorder the
-    // vertex_indices before
+
     const double x[8] = {all_vertices[vertex_indices[0]](0),
                          all_vertices[vertex_indices[1]](0),
                          all_vertices[vertex_indices[2]](0),

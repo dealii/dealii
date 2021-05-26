@@ -1,6 +1,0 @@
-New: The function GridGenerator::convert_hypercube_to_simplex_mesh allows to
-convert a given triangulation based on quadrilaterals (2D) or hexahedra (3D)
-to a triangulation based on simplices or tetraedra, respectively. Thereby,
-material_IDs and boundary_IDs are inherited from the given triangulation.
-<br>
-(Elias Dejene, Peter Munch, 2020/11/23)

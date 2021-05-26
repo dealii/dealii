@@ -170,7 +170,7 @@ Riemann solvers. For the Euler equations, there exist so-called exact Riemann
 solvers -- meaning that the states from both sides are combined in a way that
 is consistent with the Euler equations along a discontinuity -- and
 approximate Riemann solvers, which violate some physical properties and rely
-on other mechanisms to render the scheme accurate overall. Approxiate Riemann
+on other mechanisms to render the scheme accurate overall. Approximate Riemann
 solvers have the advantage of beging cheaper to compute. Most flux functions
 have their origin in the finite volume community, which are similar to DG
 methods with polynomial degree 0 within the cells (called volumes). As the

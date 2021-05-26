@@ -87,7 +87,7 @@ test()
 int
 main()
 {
-  initlog(1);
+  initlog(true);
 
   test<1>();
   test<2>();

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2020 by the deal.II authors
+// Copyright (C) 1999 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1139,7 +1139,7 @@ namespace DoFTools
 
                 if (dof_handler.has_hp_capabilities())
                   for (unsigned int c = 0;
-                       c < cell->face(face)->number_of_children();
+                       c < cell->face(face)->n_active_descendants();
                        ++c)
                     {
                       const auto subcell =

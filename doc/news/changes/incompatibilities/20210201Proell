@@ -1,3 +1,0 @@
-Deprecated: ARKode does no longer need a `reinit_vector` function.
-<br>
-(Sebastian Proell, 2021/02/01)

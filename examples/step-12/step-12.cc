@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2009 - 2020 by the deal.II authors
+ * Copyright (C) 2009 - 2021 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -120,9 +120,9 @@ namespace Step12
   {
     Assert(dim >= 2, ExcNotImplemented());
 
-    Point<dim> wind_field;
-    wind_field(0) = -p(1);
-    wind_field(1) = p(0);
+    Tensor<1, dim> wind_field;
+    wind_field[0] = -p[1];
+    wind_field[1] = p[0];
 
     if (wind_field.norm() > 1e-10)
       wind_field /= wind_field.norm();

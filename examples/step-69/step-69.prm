@@ -63,5 +63,3 @@ subsection F - SchlierenPostprocessor
   # plot
   set schlieren index = 0
 end
-
-

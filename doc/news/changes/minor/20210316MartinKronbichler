@@ -1,5 +1,0 @@
-Fixed: MatrixFree::get_boundary_id() would previously only support boundary ids
-between 0 and 255 via an `unsigned char` type. This has now been changed to
-the correct types::boundary_id type, supporting also larger boundary ids.
-<br>
-(Martin Kronbichler, 2021/03/16)

@@ -1,4 +1,0 @@
-New: A new class LowStorageRungeKutta is added to the namespace TimeStepping to 
-implement the explicit low-storage Runge-Kutta methods, see @cite KennedyCarpenterLewis2000 and step-67.
-<br>
-(Jiaqi Zhang, 2020/11/18)

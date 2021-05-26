@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2020 by the deal.II authors
+// Copyright (C) 2008 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -73,6 +73,15 @@ namespace GridTools
   template <typename CellIterator>
   struct PeriodicFacePair;
 }
+
+namespace parallel
+{
+  namespace distributed
+  {
+    template <int, int>
+    class TemporarilyMatchRefineFlags;
+  }
+} // namespace parallel
 #  endif
 
 namespace parallel
@@ -803,6 +812,9 @@ namespace parallel
 
       template <int, int, class>
       friend class dealii::FETools::internal::ExtrapolateImplementation;
+
+      template <int, int>
+      friend class TemporarilyMatchRefineFlags;
     };
 
 
@@ -910,6 +922,9 @@ namespace parallel
       virtual types::coarse_cell_id
       coarse_cell_index_to_coarse_cell_id(
         const unsigned int coarse_cell_index) const override;
+
+      template <int, int>
+      friend class TemporarilyMatchRefineFlags;
     };
   } // namespace distributed
 } // namespace parallel
@@ -934,20 +949,139 @@ namespace parallel
      */
     template <int dim, int spacedim = dim>
     class Triangulation
-      : public dealii::parallel::TriangulationBase<dim, spacedim>
+      : public dealii::parallel::DistributedTriangulationBase<dim, spacedim>
     {
     public:
+      /**
+       * Dummy settings to allow defining the deleted constructor.
+       */
+      enum Settings
+      {
+        default_setting                          = 0x0,
+        mesh_reconstruction_after_repartitioning = 0x1,
+        construct_multigrid_hierarchy            = 0x2,
+        no_automatic_repartitioning              = 0x4
+      };
+
       /**
        * Constructor. Deleted to make sure that objects of this type cannot be
        * constructed (see also the class documentation).
        */
-      Triangulation() = delete;
+      explicit Triangulation(
+        const MPI_Comm & /*mpi_communicator*/,
+        const typename dealii::Triangulation<dim, spacedim>::MeshSmoothing
+        /*smooth_grid*/
+        = (dealii::Triangulation<dim, spacedim>::none),
+        const Settings /*settings*/ = default_setting) = delete;
+
+      /**
+       * Dummy replacement to allow for better error messages when compiling
+       * this class.
+       */
+      virtual bool
+      is_multilevel_hierarchy_constructed() const override
+      {
+        return false;
+      }
+
+      /**
+       * Dummy replacement to allow for better error messages when compiling
+       * this class.
+       */
+      virtual void
+      save(const std::string & /*filename*/) const override
+      {}
+
+      /**
+       * Dummy replacement to allow for better error messages when compiling
+       * this class.
+       */
+      virtual void
+      load(const std::string & /*filename*/,
+           const bool /*autopartition*/ = true) override
+      {}
+
+      /**
+       * Dummy replacement to allow for better error messages when compiling
+       * this class.
+       */
+      virtual void
+      update_cell_relations() override
+      {}
     };
   } // namespace distributed
 } // namespace parallel
 
 
 #endif
+
+
+namespace parallel
+{
+  namespace distributed
+  {
+    /**
+     * This class temporarily modifies the refine and coarsen flags of all
+     * active cells to match the p4est oracle.
+     *
+     * The modification only happens on parallel::distributed::Triangulation
+     * objects, and persists for the lifetime of an instantiation of this
+     * class.
+     *
+     * The TemporarilyMatchRefineFlags class should only be used in
+     * combination with the Triangulation::Signals::post_p4est_refinement
+     * signal. At this stage, the p4est oracle already has been refined, but
+     * the triangulation is still unchanged. After the modification, all
+     * refine and coarsen flags describe how the traingulation will actually
+     * be refined.
+     *
+     * The use of this class is demonstrated in step-75.
+     */
+    template <int dim, int spacedim = dim>
+    class TemporarilyMatchRefineFlags : public Subscriptor
+    {
+    public:
+      /**
+       * Constructor.
+       *
+       * Stores the refine and coarsen flags of all active cells if the
+       * provided Triangulation is of type
+       * parallel::distributed::Triangulation.
+       *
+       * Adjusts them to be consistent with the p4est oracle.
+       */
+      TemporarilyMatchRefineFlags(dealii::Triangulation<dim, spacedim> &tria);
+
+      /**
+       * Destructor.
+       *
+       * Returns the refine and coarsen flags of all active cells on the
+       * parallel::distributed::Triangulation into their previous state.
+       */
+      ~TemporarilyMatchRefineFlags();
+
+    private:
+      /**
+       * The modified parallel::distributed::Triangulation.
+       */
+      const SmartPointer<
+        dealii::parallel::distributed::Triangulation<dim, spacedim>>
+        distributed_tria;
+
+      /**
+       * A vector that temporarily stores the refine flags before they have
+       * been modified on the parallel::distributed::Triangulation.
+       */
+      std::vector<bool> saved_refine_flags;
+
+      /**
+       * A vector that temporarily stores the coarsen flags before they have
+       * been modified on the parallel::distributed::Triangulation.
+       */
+      std::vector<bool> saved_coarsen_flags;
+    };
+  } // namespace distributed
+} // namespace parallel
 
 
 DEAL_II_NAMESPACE_CLOSE

@@ -38,7 +38,7 @@
 int
 main()
 {
-  initlog(1);
+  initlog(true);
 
   ParsedConvergenceTable table({"u", "u", "p"}, {{VectorTools::H1_norm}, {}});
 

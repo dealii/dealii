@@ -1,5 +1,0 @@
-New: BoundingBox::real_to_unit() and BoundingBox::unit_to_real() allow one to
-apply both the direct and the inverse transformation that are needed to map the
-unit bounding box to the current box, and viceversa.
-<br>
-(Luca Heltai, 2020/06/29)

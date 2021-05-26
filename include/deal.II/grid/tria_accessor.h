@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2020 by the deal.II authors
+// Copyright (C) 1998 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -721,6 +721,17 @@ public:
                const AccessorData *                local_data = nullptr);
 
   /**
+   * The copy constructor is not deleted but copied constructed elements should
+   * not be modified, also the comments to the copy assignment operator.
+   */
+  TriaAccessor(const TriaAccessor &) = default;
+
+  /**
+   * Move constructor.
+   */
+  TriaAccessor(TriaAccessor &&) noexcept = default;
+
+  /**
    * Conversion constructor. This constructor exists to make certain
    * constructs simpler to write in dimension independent code. For example,
    * it allows assigning a face iterator to a line iterator, an operation that
@@ -751,8 +762,19 @@ public:
    * this operation is not useful for iterators on triangulations.
    * Consequently, this operator is declared as deleted and can not be used.
    */
-  void
+  TriaAccessor &
   operator=(const TriaAccessor &) = delete;
+
+  /**
+   * Move assignment operator. Moving is allowed.
+   */
+  TriaAccessor &
+  operator=(TriaAccessor &&) noexcept = default;
+
+  /**
+   * Defaulted destructor.
+   */
+  ~TriaAccessor() = default;
 
   /**
    * Test for the element being used or not.  The return value is @p true for
@@ -954,6 +976,13 @@ public:
   n_children() const;
 
   /**
+   * @deprecated Use n_active_descendants() instead.
+   */
+  DEAL_II_DEPRECATED
+  unsigned int
+  number_of_children() const;
+
+  /**
    * Compute and return the number of active descendants of this objects. For
    * example, if all of the eight children of a hex are further refined
    * isotropically exactly once, the returned number will be 64, not 80.
@@ -967,7 +996,7 @@ public:
    * current object is not further refined, the answer is one.
    */
   unsigned int
-  number_of_children() const;
+  n_active_descendants() const;
 
   /**
    * Return the number of times that this object is refined. Note that not all
@@ -2128,7 +2157,15 @@ public:
    * Always zero.
    */
   static unsigned int
+  n_active_descendants();
+
+  /**
+   * @deprecated Use n_active_descendants() instead.
+   */
+  DEAL_II_DEPRECATED
+  static unsigned int
   number_of_children();
+
 
   /**
    * Return the number of times that this object is refined. Always 0.
@@ -2586,7 +2623,15 @@ public:
    * Always zero.
    */
   static unsigned int
+  n_active_descendants();
+
+  /**
+   * @deprecated Use n_active_descendants() instead.
+   */
+  DEAL_II_DEPRECATED
+  static unsigned int
   number_of_children();
+
 
   /**
    * Return the number of times that this object is refined. Always 0.

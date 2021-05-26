@@ -15,7 +15,7 @@
 
 
 // verify restrictions on level differences imposed by
-// DoFHandler::prepare_coarsening_and_refinement()
+// hp::Refinement::limit_p_level_difference()
 //
 // set the center cell to the highest p-level in a hyper_cross geometry
 // and verify that all other cells comply to the level difference
@@ -75,13 +75,20 @@ test(const unsigned int fes_size, const unsigned int max_difference)
     if (cell->is_locally_owned() && cell->center() == Point<dim>())
       cell->set_active_fe_index(sequence.back());
 
-  const bool fe_indices_changed =
-    hp::Refinement::limit_p_level_difference(dofh,
-                                             max_difference,
-                                             contains_fe_index);
+  bool fe_indices_changed = false;
+  tria.signals.post_p4est_refinement.connect(
+    [&]() {
+      const parallel::distributed::TemporarilyMatchRefineFlags<dim>
+        refine_modifier(tria);
+      fe_indices_changed =
+        hp::Refinement::limit_p_level_difference(dofh,
+                                                 max_difference,
+                                                 contains_fe_index);
+    },
+    boost::signals2::at_front);
+
   tria.execute_coarsening_and_refinement();
 
-  (void)fe_indices_changed;
   Assert(fe_indices_changed, ExcInternalError());
 
   // display number of cells for each FE index

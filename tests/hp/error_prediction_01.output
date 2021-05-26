@@ -1,71 +1,71 @@
 
 DEAL:1d::pre_adaptation
 DEAL:1d:: ncells:5
-DEAL:1d:: cell:1_0: fe_deg:1 error:10.0000 predicted:5.00000 refining
-DEAL:1d:: cell:2_0: fe_deg:1 error:10.0000 predicted:2.50000 future_fe_deg:3
-DEAL:1d:: cell:3_0: fe_deg:1 error:10.0000 predicted:10.0000
-DEAL:1d:: cell:0_1:0 fe_deg:1 error:10.0000 predicted:20.0000 coarsening
-DEAL:1d:: cell:0_1:1 fe_deg:1 error:10.0000 predicted:20.0000 coarsening
+DEAL:1d:: cell:1_0: fe_deg:2 error:10.0000 predicted:2.50000 refining
+DEAL:1d:: cell:2_0: fe_deg:2 error:10.0000 predicted:5.00000 future_fe_deg:3
+DEAL:1d:: cell:3_0: fe_deg:2 error:10.0000 predicted:20.0000 future_fe_deg:1
+DEAL:1d:: cell:0_1:0 fe_deg:2 error:10.0000 predicted:40.0000 coarsening
+DEAL:1d:: cell:0_1:1 fe_deg:2 error:10.0000 predicted:40.0000 coarsening
 DEAL:1d::post_adaptation
 DEAL:1d:: ncells:5
-DEAL:1d:: cell:0_0: fe_deg:1 transferred:28.2843
-DEAL:1d:: cell:2_0: fe_deg:3 transferred:2.50000
-DEAL:1d:: cell:3_0: fe_deg:1 transferred:10.0000
-DEAL:1d:: cell:1_1:0 fe_deg:1 transferred:3.53553
-DEAL:1d:: cell:1_1:1 fe_deg:1 transferred:3.53553
+DEAL:1d:: cell:0_0: fe_deg:2 transferred:56.5685
+DEAL:1d:: cell:2_0: fe_deg:3 transferred:5.00000
+DEAL:1d:: cell:3_0: fe_deg:1 transferred:20.0000
+DEAL:1d:: cell:1_1:0 fe_deg:2 transferred:1.76777
+DEAL:1d:: cell:1_1:1 fe_deg:2 transferred:1.76777
 DEAL:1d::predicted_error_norms
-DEAL:1d:: pre_adaptation:30.5164
-DEAL:1d:: post_adaptation:30.5164
+DEAL:1d:: pre_adaptation:60.2599
+DEAL:1d:: post_adaptation:60.2599
 DEAL:1d::OK
 DEAL:2d::pre_adaptation
 DEAL:2d:: ncells:7
-DEAL:2d:: cell:1_0: fe_deg:1 error:10.0000 predicted:5.00000 refining
-DEAL:2d:: cell:2_0: fe_deg:1 error:10.0000 predicted:2.50000 future_fe_deg:3
-DEAL:2d:: cell:3_0: fe_deg:1 error:10.0000 predicted:10.0000
-DEAL:2d:: cell:0_1:0 fe_deg:1 error:10.0000 predicted:20.0000 coarsening
-DEAL:2d:: cell:0_1:1 fe_deg:1 error:10.0000 predicted:20.0000 coarsening
-DEAL:2d:: cell:0_1:2 fe_deg:1 error:10.0000 predicted:20.0000 coarsening
-DEAL:2d:: cell:0_1:3 fe_deg:1 error:10.0000 predicted:20.0000 coarsening
+DEAL:2d:: cell:1_0: fe_deg:2 error:10.0000 predicted:2.50000 refining
+DEAL:2d:: cell:2_0: fe_deg:2 error:10.0000 predicted:5.00000 future_fe_deg:3
+DEAL:2d:: cell:3_0: fe_deg:2 error:10.0000 predicted:20.0000 future_fe_deg:1
+DEAL:2d:: cell:0_1:0 fe_deg:2 error:10.0000 predicted:40.0000 coarsening
+DEAL:2d:: cell:0_1:1 fe_deg:2 error:10.0000 predicted:40.0000 coarsening
+DEAL:2d:: cell:0_1:2 fe_deg:2 error:10.0000 predicted:40.0000 coarsening
+DEAL:2d:: cell:0_1:3 fe_deg:2 error:10.0000 predicted:40.0000 coarsening
 DEAL:2d::post_adaptation
 DEAL:2d:: ncells:7
-DEAL:2d:: cell:0_0: fe_deg:1 transferred:40.0000
-DEAL:2d:: cell:2_0: fe_deg:3 transferred:2.50000
-DEAL:2d:: cell:3_0: fe_deg:1 transferred:10.0000
-DEAL:2d:: cell:1_1:0 fe_deg:1 transferred:2.50000
-DEAL:2d:: cell:1_1:1 fe_deg:1 transferred:2.50000
-DEAL:2d:: cell:1_1:2 fe_deg:1 transferred:2.50000
-DEAL:2d:: cell:1_1:3 fe_deg:1 transferred:2.50000
+DEAL:2d:: cell:0_0: fe_deg:2 transferred:80.0000
+DEAL:2d:: cell:2_0: fe_deg:3 transferred:5.00000
+DEAL:2d:: cell:3_0: fe_deg:1 transferred:20.0000
+DEAL:2d:: cell:1_1:0 fe_deg:2 transferred:1.25000
+DEAL:2d:: cell:1_1:1 fe_deg:2 transferred:1.25000
+DEAL:2d:: cell:1_1:2 fe_deg:2 transferred:1.25000
+DEAL:2d:: cell:1_1:3 fe_deg:2 transferred:1.25000
 DEAL:2d::predicted_error_norms
-DEAL:2d:: pre_adaptation:41.6083
-DEAL:2d:: post_adaptation:41.6083
+DEAL:2d:: pre_adaptation:82.6514
+DEAL:2d:: post_adaptation:82.6514
 DEAL:2d::OK
 DEAL:3d::pre_adaptation
 DEAL:3d:: ncells:11
-DEAL:3d:: cell:1_0: fe_deg:1 error:10.0000 predicted:5.00000 refining
-DEAL:3d:: cell:2_0: fe_deg:1 error:10.0000 predicted:2.50000 future_fe_deg:3
-DEAL:3d:: cell:3_0: fe_deg:1 error:10.0000 predicted:10.0000
-DEAL:3d:: cell:0_1:0 fe_deg:1 error:10.0000 predicted:20.0000 coarsening
-DEAL:3d:: cell:0_1:1 fe_deg:1 error:10.0000 predicted:20.0000 coarsening
-DEAL:3d:: cell:0_1:2 fe_deg:1 error:10.0000 predicted:20.0000 coarsening
-DEAL:3d:: cell:0_1:3 fe_deg:1 error:10.0000 predicted:20.0000 coarsening
-DEAL:3d:: cell:0_1:4 fe_deg:1 error:10.0000 predicted:20.0000 coarsening
-DEAL:3d:: cell:0_1:5 fe_deg:1 error:10.0000 predicted:20.0000 coarsening
-DEAL:3d:: cell:0_1:6 fe_deg:1 error:10.0000 predicted:20.0000 coarsening
-DEAL:3d:: cell:0_1:7 fe_deg:1 error:10.0000 predicted:20.0000 coarsening
+DEAL:3d:: cell:1_0: fe_deg:2 error:10.0000 predicted:2.50000 refining
+DEAL:3d:: cell:2_0: fe_deg:2 error:10.0000 predicted:5.00000 future_fe_deg:3
+DEAL:3d:: cell:3_0: fe_deg:2 error:10.0000 predicted:20.0000 future_fe_deg:1
+DEAL:3d:: cell:0_1:0 fe_deg:2 error:10.0000 predicted:40.0000 coarsening
+DEAL:3d:: cell:0_1:1 fe_deg:2 error:10.0000 predicted:40.0000 coarsening
+DEAL:3d:: cell:0_1:2 fe_deg:2 error:10.0000 predicted:40.0000 coarsening
+DEAL:3d:: cell:0_1:3 fe_deg:2 error:10.0000 predicted:40.0000 coarsening
+DEAL:3d:: cell:0_1:4 fe_deg:2 error:10.0000 predicted:40.0000 coarsening
+DEAL:3d:: cell:0_1:5 fe_deg:2 error:10.0000 predicted:40.0000 coarsening
+DEAL:3d:: cell:0_1:6 fe_deg:2 error:10.0000 predicted:40.0000 coarsening
+DEAL:3d:: cell:0_1:7 fe_deg:2 error:10.0000 predicted:40.0000 coarsening
 DEAL:3d::post_adaptation
 DEAL:3d:: ncells:11
-DEAL:3d:: cell:0_0: fe_deg:1 transferred:56.5685
-DEAL:3d:: cell:2_0: fe_deg:3 transferred:2.50000
-DEAL:3d:: cell:3_0: fe_deg:1 transferred:10.0000
-DEAL:3d:: cell:1_1:0 fe_deg:1 transferred:1.76777
-DEAL:3d:: cell:1_1:1 fe_deg:1 transferred:1.76777
-DEAL:3d:: cell:1_1:2 fe_deg:1 transferred:1.76777
-DEAL:3d:: cell:1_1:3 fe_deg:1 transferred:1.76777
-DEAL:3d:: cell:1_1:4 fe_deg:1 transferred:1.76777
-DEAL:3d:: cell:1_1:5 fe_deg:1 transferred:1.76777
-DEAL:3d:: cell:1_1:6 fe_deg:1 transferred:1.76777
-DEAL:3d:: cell:1_1:7 fe_deg:1 transferred:1.76777
+DEAL:3d:: cell:0_0: fe_deg:2 transferred:113.137
+DEAL:3d:: cell:2_0: fe_deg:3 transferred:5.00000
+DEAL:3d:: cell:3_0: fe_deg:1 transferred:20.0000
+DEAL:3d:: cell:1_1:0 fe_deg:2 transferred:0.883883
+DEAL:3d:: cell:1_1:1 fe_deg:2 transferred:0.883883
+DEAL:3d:: cell:1_1:2 fe_deg:2 transferred:0.883883
+DEAL:3d:: cell:1_1:3 fe_deg:2 transferred:0.883883
+DEAL:3d:: cell:1_1:4 fe_deg:2 transferred:0.883883
+DEAL:3d:: cell:1_1:5 fe_deg:2 transferred:0.883883
+DEAL:3d:: cell:1_1:6 fe_deg:2 transferred:0.883883
+DEAL:3d:: cell:1_1:7 fe_deg:2 transferred:0.883883
 DEAL:3d::predicted_error_norms
-DEAL:3d:: pre_adaptation:57.7170
-DEAL:3d:: post_adaptation:57.7170
+DEAL:3d:: pre_adaptation:115.027
+DEAL:3d:: post_adaptation:115.027
 DEAL:3d::OK

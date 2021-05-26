@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -51,6 +51,8 @@ namespace GeometricUtilities
      *  \theta &= {\rm atan}(y/x) \\
      *  \phi &= {\rm acos} (z/r)
      * @f}
+     *
+     * The use of this function is demonstrated in step-75.
      */
     template <int dim>
     std::array<double, dim>

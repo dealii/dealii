@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2020 by the deal.II authors
+// Copyright (C) 2020 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -939,7 +939,7 @@ namespace internal
      *
      * @p con_cf connectivity cell-face
      * @p con_cc connectivity cell-cell (for each cell-face it contains the
-     *   the index of the neighboring cell or -1 for boundary face)
+     *   index of the neighboring cell or -1 for boundary face)
      */
     template <typename T>
     void
@@ -977,7 +977,7 @@ namespace internal
                 {
                   // face is visited the second time -> now we know the cells
                   // on both sides of the face and we can determine for both
-                  // cells the neigbor
+                  // cells the neighbor
                   col_cc[j_0] = neighbors[col_cf[j_0]].first;
                   col_cc[neighbors[col_cf[j_0]].second] = i_0;
                 }
@@ -1240,7 +1240,7 @@ namespace internal
      *
      * Furthermore, the type of the quad is determined.
      */
-    void
+    inline void
     build_intersection(
       const std::vector<std::shared_ptr<CellTypeBase>> &cell_types,
       const std::vector<dealii::ReferenceCell> &        cell_types_index,

@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2018 - 2020 by the deal.II authors
+ * Copyright (C) 2018 - 2021 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -168,7 +168,7 @@ test()
 int
 main()
 {
-  initlog(1);
+  initlog(true);
   MultithreadInfo::set_thread_limit(1); // to make output deterministic
 
   test<2, 2>();

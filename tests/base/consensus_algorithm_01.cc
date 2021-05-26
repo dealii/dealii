@@ -54,8 +54,14 @@ test(const MPI_Comm &comm)
       deallog << "ConsensusAlgorithmProcess::function_read_answer() passed!"
               << std::endl;
     });
-  dealii::Utilities::MPI::ConsensusAlgorithms::Selector<T1, T2>(process, comm)
-    .run();
+
+  const auto sources =
+    dealii::Utilities::MPI::ConsensusAlgorithms::Selector<T1, T2>(process, comm)
+      .run();
+
+  for (const auto &i : sources)
+    deallog << i << " ";
+  deallog << std::endl;
 }
 
 int

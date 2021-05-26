@@ -1,4 +1,0 @@
-New: Geometric objects of a Triangulation are assigned a ReferenceCell::Type. The value
-can be queried via TriaAccessor::reference_cell_type().
-<br>
-(Peter Munch, 2020/06/30)

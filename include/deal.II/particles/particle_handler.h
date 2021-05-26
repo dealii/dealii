@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2020 by the deal.II authors
+// Copyright (C) 2017 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -335,7 +335,7 @@ namespace Particles
      * Create and insert a number of particles into the collection of particles.
      * This function takes a list of positions and creates a set of particles
      * at these positions, which are then distributed and added to the local
-     * particle collection of a procesor. Note that this function uses
+     * particle collection of a processor. Note that this function uses
      * GridTools::distributed_compute_point_locations(). Consequently, it can
      * require intense communications between the processors. This function
      * is used in step-70.
@@ -374,7 +374,7 @@ namespace Particles
      *
      * @param[in] properties (Optional) A vector of vector of properties
      * associated with each local point. The size of the vector should be either
-     * zero (no properties will be transfered nor attached to the generated
+     * zero (no properties will be transferred nor attached to the generated
      * particles) or it should be a vector of `positions.size()` vectors of size
      * `n_properties_per_particle()`. Notice that this function call will
      * transfer the properties from the local mpi process to the final mpi
@@ -403,7 +403,7 @@ namespace Particles
      * Insert a number of particles into the collection of particles. This
      * function takes a list of particles for which we don't know the associated
      * cell iterator, and distributes them to the correct local particle
-     * collection of a procesor, by unpacking the locations, figuring out where
+     * collection of a processor, by unpacking the locations, figuring out where
      * to send the particles by calling
      * GridTools::distributed_compute_point_locations(), and sending the
      * particles to the corresponding process.
@@ -444,10 +444,10 @@ namespace Particles
      *
      * The vector @p input_vector should have read access to the indices
      * created by extracting the locally relevant ids with
-     * locally_relevant_ids(), and taking its tensor
+     * locally_owned_particle_ids(), and taking its tensor
      * product with the index set representing the range `[0, spacedim)`, i.e.:
      * @code
-     * IndexSet ids = particle_handler.locally_relevant_ids().
+     * IndexSet ids = particle_handler.locally_owned_particle_ids().
      *  tensor_product(complete_index_set(spacedim));
      * @endcode
      *
@@ -513,7 +513,7 @@ namespace Particles
     /**
      * Set the position of the particles within the particle handler using a
      * function with spacedim components. The new set of point defined by the
-     * fuction has to be sufficiently close to the original one to ensure that
+     * function has to be sufficiently close to the original one to ensure that
      * the sort_particles_into_subdomains_and_cells algorithm manages to find
      * the new cells in which the particles belong.
      *
@@ -666,9 +666,30 @@ namespace Particles
      *
      * @return An IndexSet of size get_next_free_particle_index(), containing
      * n_locally_owned_particle() indices.
+     *
+     * @deprecated Use locally_owned_particle_ids() instead.
+     */
+    DEAL_II_DEPRECATED IndexSet
+                       locally_relevant_ids() const;
+
+    /**
+     * Extract an IndexSet with global dimensions equal to
+     * get_next_free_particle_index(), containing the locally owned
+     * particle indices.
+     *
+     * This function can be used to construct distributed vectors and matrices
+     * to manipulate particles using linear algebra operations.
+     *
+     * Notice that it is the user's responsibility to guarantee that particle
+     * indices are unique, and no check is performed to verify that this is the
+     * case, nor that the union of all IndexSet objects on each mpi process is
+     * complete.
+     *
+     * @return An IndexSet of size get_next_free_particle_index(), containing
+     * n_locally_owned_particle() indices.
      */
     IndexSet
-    locally_relevant_ids() const;
+    locally_owned_particle_ids() const;
 
     /**
      * Return the number of properties each particle has.
@@ -974,7 +995,7 @@ namespace Particles
 
     /**
      * Cache structure used to store the elements which are required to
-     * exchange the particle information (location and properties) accross
+     * exchange the particle information (location and properties) across
      * processors in order to update the ghost particles. This structure
      * is only used to update the ghost particles.
      */
@@ -1144,6 +1165,15 @@ namespace Particles
       output_vector.compress(VectorOperation::add);
     else
       output_vector.compress(VectorOperation::insert);
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline IndexSet
+  ParticleHandler<dim, spacedim>::locally_relevant_ids() const
+  {
+    return this->locally_owned_particle_ids();
   }
 
 } // namespace Particles

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2020 by the deal.II authors
+// Copyright (C) 2016 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -166,6 +166,8 @@ public:
    *
    * If an inner vector of @p dst is empty or has incorrect locally owned size,
    * it will be resized to locally relevant degrees of freedom on each level.
+   *
+   * The use of this function is demonstrated in step-66.
    */
   template <typename Number2, int spacedim>
   void
