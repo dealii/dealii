@@ -723,7 +723,7 @@ namespace internal
         for (unsigned int i = 0; i < ranks.size(); ++i)
           {
             MPI_Status status;
-            const auto ierr_1 = MPI_Probe(
+            const int  ierr_1 = MPI_Probe(
               MPI_ANY_SOURCE,
               Utilities::MPI::internal::Tags::fine_dof_handler_view_reinit,
               communicator,
@@ -732,8 +732,8 @@ namespace internal
 
             std::vector<types::global_dof_index> buffer;
 
-            int        message_length;
-            const auto ierr_2 =
+            int       message_length;
+            const int ierr_2 =
               MPI_Get_count(&status,
                             Utilities::MPI::internal::mpi_type_id(
                               buffer.data()),
@@ -742,7 +742,7 @@ namespace internal
 
             buffer.resize(message_length);
 
-            const auto ierr_3 = MPI_Recv(
+            const int ierr_3 = MPI_Recv(
               buffer.data(),
               buffer.size(),
               Utilities::MPI::internal::mpi_type_id(buffer.data()),
@@ -779,7 +779,7 @@ namespace internal
               }
           }
 
-        const auto ierr_1 =
+        const int ierr_1 =
           MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
         AssertThrowMPI(ierr_1);
       }

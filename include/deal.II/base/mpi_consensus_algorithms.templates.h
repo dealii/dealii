@@ -346,19 +346,20 @@ namespace Utilities
             }
 
 
-          const int ierr = MPI_Wait(&barrier_request, MPI_STATUS_IGNORE);
+          int ierr = MPI_Wait(&barrier_request, MPI_STATUS_IGNORE);
           AssertThrowMPI(ierr);
 
           for (auto &i : request_requests)
             {
-              const auto ierr = MPI_Wait(i.get(), MPI_STATUS_IGNORE);
+              ierr = MPI_Wait(i.get(), MPI_STATUS_IGNORE);
               AssertThrowMPI(ierr);
             }
 
 #  ifdef DEBUG
           // note: IBarrier seems to make problem during testing, this
           // additional Barrier seems to help
-          MPI_Barrier(this->comm);
+          ierr = MPI_Barrier(this->comm);
+          AssertThrowMPI(ierr);
 #  endif
         }
 

@@ -3741,7 +3741,11 @@ namespace internal
             }
 
           if (Utilities::MPI::job_supports_mpi())
-            MPI_Barrier(matrix_free.get_task_info().communicator_sm);
+            {
+              const int ierr =
+                MPI_Barrier(matrix_free.get_task_info().communicator_sm);
+              AssertThrowMPI(ierr);
+            }
 #  endif
         }
     }

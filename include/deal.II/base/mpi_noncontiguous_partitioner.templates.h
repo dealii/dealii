@@ -106,7 +106,7 @@ namespace Utilities
       AssertIndexRange(recv_ranks.size(), recv_ptr.size());
       for (types::global_dof_index i = 0; i < recv_ranks.size(); i++)
         {
-          const auto ierr =
+          const int ierr =
             MPI_Irecv(buffers.data() + recv_ptr[i],
                       recv_ptr[i + 1] - recv_ptr[i],
                       Utilities::MPI::internal::mpi_type_id(buffers.data()),
@@ -135,7 +135,7 @@ namespace Utilities
                    (send_ptr[i] == buffers.size() &&
                     send_ptr[i + 1] == send_ptr[i]),
                  ExcMessage("The input buffer doesn't contain enough entries"));
-          const auto ierr =
+          const int ierr =
             MPI_Isend(buffers.data() + send_ptr[i],
                       send_ptr[i + 1] - send_ptr[i],
                       Utilities::MPI::internal::mpi_type_id(buffers.data()),
@@ -182,7 +182,7 @@ namespace Utilities
         }
 
       // wait that all data packages have been sent
-      const auto ierr =
+      const int ierr =
         MPI_Waitall(send_ranks.size(), requests.data(), MPI_STATUSES_IGNORE);
       AssertThrowMPI(ierr);
 #endif

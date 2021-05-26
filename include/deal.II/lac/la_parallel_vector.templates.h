@@ -164,9 +164,11 @@ namespace LinearAlgebra
               std::vector<Number *> others(size_sm);
 
               MPI_Info info;
-              MPI_Info_create(&info);
+              int      ierr = MPI_Info_create(&info);
+              AssertThrowMPI(ierr);
 
-              MPI_Info_set(info, "alloc_shared_noncontig", "true");
+              ierr = MPI_Info_set(info, "alloc_shared_noncontig", "true");
+              AssertThrowMPI(ierr);
 
               const std::size_t align_by = 64;
 
@@ -175,7 +177,7 @@ namespace LinearAlgebra
                  sizeof(Number)) *
                 sizeof(Number);
 
-              auto ierr = MPI_Win_allocate_shared(
+              ierr = MPI_Win_allocate_shared(
                 s, sizeof(Number), info, comm_shared, &data_this, &mpi_window);
               AssertThrowMPI(ierr);
 

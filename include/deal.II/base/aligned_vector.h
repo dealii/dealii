@@ -1536,7 +1536,8 @@ AlignedVector<T>::replicate_across_communicator(const MPI_Comm &   communicator,
 
   // Make sure that the shared memory host has copied the data before we try to
   // access it.
-  MPI_Barrier(shmem_group_communicator);
+  const int ierr = MPI_Barrier(shmem_group_communicator);
+  AssertThrowMPI(ierr);
 
   // **** Step 7 ****
   // Finally, we need to set the pointers of this object to what we just
