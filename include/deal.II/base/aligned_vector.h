@@ -1237,8 +1237,8 @@ AlignedVector<T>::replicate_across_communicator(const MPI_Comm &   communicator,
                                    /* key */ 0,
                                    MPI_INFO_NULL,
                                    &shmem_group_communicator_temp);
-
     AssertThrowMPI(ierr);
+
     const int key =
       (Utilities::MPI::this_mpi_process(communicator) == root_process ? 0 : 1);
     ierr = MPI_Comm_split(shmem_group_communicator_temp,
@@ -1254,6 +1254,7 @@ AlignedVector<T>::replicate_across_communicator(const MPI_Comm &   communicator,
 
     // And get rid of the temporary communicator
     ierr = MPI_Comm_free(&shmem_group_communicator_temp);
+    AssertThrowMPI(ierr);
   }
   const bool is_shmem_root =
     Utilities::MPI::this_mpi_process(shmem_group_communicator) == 0;
