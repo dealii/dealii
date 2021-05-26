@@ -1,0 +1,4 @@
+Removed: The deprecated parallel::Triangulation class has been removed.
+Use parallel::TriangulationBase instead.
+<br>
+(Daniel Arndt, 2021/05/26)

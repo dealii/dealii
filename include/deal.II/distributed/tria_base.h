@@ -388,13 +388,6 @@ namespace parallel
     reset_global_cell_indices();
   };
 
-  /**
-   *  Using directive for backwards-compatibility.
-   *  @deprecated Use TriangulationBase instead of Triangulation.
-   */
-  template <int dim, int spacedim = dim>
-  using Triangulation DEAL_II_DEPRECATED = TriangulationBase<dim, spacedim>;
-
 
 
   /**
