@@ -1,0 +1,5 @@
+Removed: The overloads in CUDAWrappers::FEEvaluation that take a local dof index
+or a quadrature point as arguement have been removed.
+Use the ones that don't use these arguments in their interface instead.
+<br>
+(Daniel Arndt, 2021/05/26)
