@@ -134,6 +134,9 @@ test(const unsigned int degree_center,
   constraints.close();
 
   // ------ verify -----
+  std::vector<IndexSet> locally_owned_dofs_per_processor =
+    Utilities::MPI::all_gather(dh.get_communicator(), dh.locally_owned_dofs());
+
   IndexSet locally_active_dofs;
   DoFTools::extract_locally_active_dofs(dh, locally_active_dofs);
 
@@ -142,13 +145,13 @@ test(const unsigned int degree_center,
       deallog << "constraints:" << std::endl;
       constraints.print(deallog.get_file_stream());
     }
-  deallog << "consistent? "
-          << constraints.is_consistent_in_parallel(
-               dh.locally_owned_dofs_per_processor(),
-               locally_active_dofs,
-               MPI_COMM_WORLD,
-               true)
-          << std::endl;
+  deallog
+    << "consistent? "
+    << constraints.is_consistent_in_parallel(locally_owned_dofs_per_processor,
+                                             locally_active_dofs,
+                                             MPI_COMM_WORLD,
+                                             true)
+    << std::endl;
 
   deallog << "OK" << std::endl;
 }
