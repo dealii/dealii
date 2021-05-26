@@ -1,0 +1,5 @@
+Removed: The deprecated
+parallel::distributed::CellDataTransfer::CoarseningStrategies struct has been removed.
+Use AdaptationStrategies::Coarsening instead.
+<br>
+(Daniel Arndt, 2021/05/25)

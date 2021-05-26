@@ -89,56 +89,6 @@ namespace parallel
       , handle(numbers::invalid_unsigned_int)
     {}
 
-    template <int dim, int spacedim, typename VectorType>
-    DEAL_II_DEPRECATED
-    CellDataTransfer<dim, spacedim, VectorType>::CellDataTransfer(
-      const parallel::distributed::Triangulation<dim, spacedim> &triangulation,
-      const bool transfer_variable_size_data,
-      const std::function<
-        value_type(const typename parallel::distributed::
-                     Triangulation<dim, spacedim>::cell_iterator &parent,
-                   const VectorType &input_vector)> coarsening_strategy)
-      : triangulation(&triangulation, typeid(*this).name())
-      , transfer_variable_size_data(transfer_variable_size_data)
-      , refinement_strategy(&dealii::AdaptationStrategies::Refinement::
-                              preserve<dim, spacedim, value_type>)
-      , handle(numbers::invalid_unsigned_int)
-    {
-      value_type (*const *old_strategy)(
-        const typename parallel::distributed::Triangulation<dim, spacedim>::
-          cell_iterator &,
-        const VectorType &) =
-        coarsening_strategy.template target<
-          value_type (*)(const typename parallel::distributed::
-                           Triangulation<dim, spacedim>::cell_iterator &,
-                         const VectorType &)>();
-
-      if (*old_strategy == CoarseningStrategies::check_equality)
-        const_cast<std::function<value_type(
-          const typename dealii::Triangulation<dim, spacedim>::cell_iterator &,
-          const std::vector<value_type> &)> &>(this->coarsening_strategy) =
-          &dealii::AdaptationStrategies::Coarsening::
-            check_equality<dim, spacedim, value_type>;
-      else if (*old_strategy == CoarseningStrategies::sum)
-        const_cast<std::function<value_type(
-          const typename dealii::Triangulation<dim, spacedim>::cell_iterator &,
-          const std::vector<value_type> &)> &>(this->coarsening_strategy) =
-          &dealii::AdaptationStrategies::Coarsening::
-            sum<dim, spacedim, value_type>;
-      else if (*old_strategy == CoarseningStrategies::mean)
-        const_cast<std::function<value_type(
-          const typename dealii::Triangulation<dim, spacedim>::cell_iterator &,
-          const std::vector<value_type> &)> &>(this->coarsening_strategy) =
-          &dealii::AdaptationStrategies::Coarsening::
-            mean<dim, spacedim, value_type>;
-      else
-        Assert(
-          false,
-          ExcMessage(
-            "The constructor using the former function type of the "
-            "coarsening_strategy parameter is no longer supported. Please use "
-            "the latest function type instead"));
-    }
 
 
     // Interface for packing
