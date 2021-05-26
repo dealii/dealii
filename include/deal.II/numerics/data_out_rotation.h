@@ -118,29 +118,16 @@ namespace internal
  *
  * @ingroup output
  */
-template <int dim, typename DoFHandlerType = DoFHandler<dim>>
-class DataOutRotation
-  : public DataOut_DoFData<DoFHandlerType, DoFHandlerType::dimension + 1>
+template <int dim, int spacedim = dim>
+class DataOutRotation : public DataOut_DoFData<dim, dim + 1, spacedim, dim + 1>
 {
 public:
-  /**
-   * An abbreviation for the dimension of the DoFHandler object we work with.
-   * Faces are then <code>dimension-1</code> dimensional objects.
-   */
-  static const unsigned int dimension = DoFHandlerType::dimension;
-
-  /**
-   * An abbreviation for the spatial dimension within which the triangulation
-   * and DoFHandler are embedded in.
-   */
-  static const unsigned int space_dimension = DoFHandlerType::space_dimension;
-
   /**
    * Typedef to the iterator type of the dof handler class under
    * consideration.
    */
   using cell_iterator =
-    typename DataOut_DoFData<DoFHandlerType, dimension + 1>::cell_iterator;
+    typename DataOut_DoFData<dim, dim + 1, spacedim, dim + 1>::cell_iterator;
 
   /**
    * This is the central function of this class since it builds the list of
@@ -207,24 +194,20 @@ private:
    */
   void
   build_one_patch(
-    const cell_iterator *cell,
-    internal::DataOutRotationImplementation::ParallelData<dimension,
-                                                          space_dimension>
-      &data,
-    std::vector<DataOutBase::Patch<dimension + 1, space_dimension + 1>>
-      &my_patches);
+    const cell_iterator *                                                 cell,
+    internal::DataOutRotationImplementation::ParallelData<dim, spacedim> &data,
+    std::vector<DataOutBase::Patch<dim + 1, spacedim + 1>> &my_patches);
 };
 
 namespace Legacy
 {
   /**
-   * The template arguments of the original dealii::DataOutRotation class will
-   * change in a future release. If for some reason, you need a code that is
-   * compatible with deal.II 9.3 and the subsequent release, use this alias
-   * instead.
+   * @deprecated Use dealii::DataOutRotation without the DoFHandlerType
+   * template instead.
    */
   template <int dim, typename DoFHandlerType = DoFHandler<dim>>
-  using DataOutRotation = dealii::DataOutRotation<dim, DoFHandlerType>;
+  using DataOutRotation DEAL_II_DEPRECATED =
+    dealii::DataOutRotation<dim, DoFHandlerType::space_dimension>;
 } // namespace Legacy
 
 

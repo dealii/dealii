@@ -80,22 +80,19 @@ namespace internal
 
 
 
-template <int dim, typename DoFHandlerType>
-DataOutFaces<dim, DoFHandlerType>::DataOutFaces(const bool so)
+template <int dim, int spacedim>
+DataOutFaces<dim, spacedim>::DataOutFaces(const bool so)
   : surface_only(so)
-{
-  Assert(dim == DoFHandlerType::dimension, ExcNotImplemented());
-}
+{}
 
 
 
-template <int dim, typename DoFHandlerType>
+template <int dim, int spacedim>
 void
-DataOutFaces<dim, DoFHandlerType>::build_one_patch(
-  const FaceDescriptor *cell_and_face,
-  internal::DataOutFacesImplementation::ParallelData<dimension, dimension>
-    &                                                 data,
-  DataOutBase::Patch<dimension - 1, space_dimension> &patch)
+DataOutFaces<dim, spacedim>::build_one_patch(
+  const FaceDescriptor *                                        cell_and_face,
+  internal::DataOutFacesImplementation::ParallelData<dim, dim> &data,
+  DataOutBase::Patch<dim - 1, spacedim> &                       patch)
 {
   Assert(cell_and_face->first->is_locally_owned(), ExcNotImplemented());
 
@@ -104,12 +101,12 @@ DataOutFaces<dim, DoFHandlerType>::build_one_patch(
   // to a unit cell vertex and then, finally, that to the mapped vertex. In
   // most cases this complicated procedure will be the identity.
   for (unsigned int vertex = 0;
-       vertex < GeometryInfo<dimension - 1>::vertices_per_cell;
+       vertex < GeometryInfo<dim - 1>::vertices_per_cell;
        ++vertex)
     patch.vertices[vertex] =
       data.mapping_collection[0].transform_unit_to_real_cell(
         cell_and_face->first,
-        GeometryInfo<dimension>::unit_cell_vertex(
+        GeometryInfo<dim>::unit_cell_vertex(
           GeometryInfo<dim>::face_to_cell_vertices(
             cell_and_face->second,
             vertex,
@@ -122,25 +119,24 @@ DataOutFaces<dim, DoFHandlerType>::build_one_patch(
       data.reinit_all_fe_values(this->dof_data,
                                 cell_and_face->first,
                                 cell_and_face->second);
-      const FEValuesBase<dimension> &fe_patch_values =
-        data.get_present_fe_values(0);
+      const FEValuesBase<dim> &fe_patch_values = data.get_present_fe_values(0);
 
       const unsigned int n_q_points = fe_patch_values.n_quadrature_points;
 
       // store the intermediate points
-      Assert(patch.space_dim == dimension, ExcInternalError());
-      const std::vector<Point<dimension>> &q_points =
+      Assert(patch.space_dim == dim, ExcInternalError());
+      const std::vector<Point<dim>> &q_points =
         fe_patch_values.get_quadrature_points();
       // resize the patch.data member in order to have enough memory for the
       // quadrature points as well
-      patch.data.reinit(data.n_datasets + dimension, patch.data.size(1));
+      patch.data.reinit(data.n_datasets + dim, patch.data.size(1));
       // set the flag indicating that for this cell the points are explicitly
       // given
       patch.points_are_available = true;
       // copy points to patch.data
-      for (unsigned int i = 0; i < dimension; ++i)
+      for (unsigned int i = 0; i < dim; ++i)
         for (unsigned int q = 0; q < n_q_points; ++q)
-          patch.data(patch.data.size(0) - dimension + i, q) = q_points[q][i];
+          patch.data(patch.data.size(0) - dim + i, q) = q_points[q][i];
 
       // counter for data records
       unsigned int offset = 0;
@@ -148,7 +144,7 @@ DataOutFaces<dim, DoFHandlerType>::build_one_patch(
       // first fill dof_data
       for (unsigned int dataset = 0; dataset < this->dof_data.size(); ++dataset)
         {
-          const FEValuesBase<dimension> &this_fe_patch_values =
+          const FEValuesBase<dim> &this_fe_patch_values =
             data.get_present_fe_values(dataset);
           const unsigned int n_components =
             this_fe_patch_values.get_fe().n_components();
@@ -192,13 +188,12 @@ DataOutFaces<dim, DoFHandlerType>::build_one_patch(
                     data.patch_values_scalar.normals =
                       this_fe_patch_values.get_normal_vectors();
 
-                  const typename DoFHandlerType::active_cell_iterator dh_cell(
-                    &cell_and_face->first->get_triangulation(),
-                    cell_and_face->first->level(),
-                    cell_and_face->first->index(),
-                    this->dof_data[dataset]->dof_handler);
-                  data.patch_values_scalar.template set_cell<DoFHandlerType>(
-                    dh_cell);
+                  const typename DoFHandler<dim, spacedim>::active_cell_iterator
+                    dh_cell(&cell_and_face->first->get_triangulation(),
+                            cell_and_face->first->level(),
+                            cell_and_face->first->index(),
+                            this->dof_data[dataset]->dof_handler);
+                  data.patch_values_scalar.template set_cell<dim>(dh_cell);
 
                   postprocessor->evaluate_scalar_field(
                     data.patch_values_scalar,
@@ -236,13 +231,12 @@ DataOutFaces<dim, DoFHandlerType>::build_one_patch(
                     data.patch_values_system.normals =
                       this_fe_patch_values.get_normal_vectors();
 
-                  const typename DoFHandlerType::active_cell_iterator dh_cell(
-                    &cell_and_face->first->get_triangulation(),
-                    cell_and_face->first->level(),
-                    cell_and_face->first->index(),
-                    this->dof_data[dataset]->dof_handler);
-                  data.patch_values_system.template set_cell<DoFHandlerType>(
-                    dh_cell);
+                  const typename DoFHandler<dim, spacedim>::active_cell_iterator
+                    dh_cell(&cell_and_face->first->get_triangulation(),
+                            cell_and_face->first->level(),
+                            cell_and_face->first->index(),
+                            this->dof_data[dataset]->dof_handler);
+                  data.patch_values_system.template set_cell<dim>(dh_cell);
 
                   postprocessor->evaluate_vector_field(
                     data.patch_values_system,
@@ -300,10 +294,10 @@ DataOutFaces<dim, DoFHandlerType>::build_one_patch(
               "The current function is trying to generate cell-data output "
               "for a face that does not belong to an active cell. This is "
               "not supported."));
-          const unsigned int cell_number =
-            std::distance(this->triangulation->begin_active(),
-                          typename Triangulation<dimension, space_dimension>::
-                            active_cell_iterator(cell_and_face->first));
+          const unsigned int cell_number = std::distance(
+            this->triangulation->begin_active(),
+            typename Triangulation<dim, spacedim>::active_cell_iterator(
+              cell_and_face->first));
 
           const double value = this->cell_data[dataset]->get_cell_data_value(
             cell_number,
@@ -316,25 +310,20 @@ DataOutFaces<dim, DoFHandlerType>::build_one_patch(
 
 
 
-template <int dim, typename DoFHandlerType>
+template <int dim, int spacedim>
 void
-DataOutFaces<dim, DoFHandlerType>::build_patches(
-  const unsigned int n_subdivisions_)
+DataOutFaces<dim, spacedim>::build_patches(const unsigned int n_subdivisions_)
 {
-  build_patches(StaticMappingQ1<dimension>::mapping, n_subdivisions_);
+  build_patches(StaticMappingQ1<dim>::mapping, n_subdivisions_);
 }
 
 
 
-template <int dim, typename DoFHandlerType>
+template <int dim, int spacedim>
 void
-DataOutFaces<dim, DoFHandlerType>::build_patches(
-  const Mapping<dimension> &mapping,
-  const unsigned int        n_subdivisions_)
+DataOutFaces<dim, spacedim>::build_patches(const Mapping<dim> &mapping,
+                                           const unsigned int  n_subdivisions_)
 {
-  // Check consistency of redundant template parameter
-  Assert(dim == dimension, ExcDimensionMismatch(dim, dimension));
-
   const unsigned int n_subdivisions =
     (n_subdivisions_ != 0) ? n_subdivisions_ : this->default_subdivisions;
 
@@ -383,31 +372,30 @@ DataOutFaces<dim, DoFHandlerType>::build_patches(
         this->dof_data[i]->postprocessor->get_needed_update_flags();
   update_flags |= update_quadrature_points;
 
-  internal::DataOutFacesImplementation::ParallelData<dimension, space_dimension>
-                                                     thread_data(n_datasets,
-                n_subdivisions,
-                n_postprocessor_outputs,
-                mapping,
-                this->get_fes(),
-                update_flags);
-  DataOutBase::Patch<dimension - 1, space_dimension> sample_patch;
+  internal::DataOutFacesImplementation::ParallelData<dim, spacedim> thread_data(
+    n_datasets,
+    n_subdivisions,
+    n_postprocessor_outputs,
+    mapping,
+    this->get_fes(),
+    update_flags);
+  DataOutBase::Patch<dim - 1, spacedim> sample_patch;
   sample_patch.n_subdivisions = n_subdivisions;
-  sample_patch.data.reinit(
-    n_datasets, Utilities::fixed_power<dimension - 1>(n_subdivisions + 1));
+  sample_patch.data.reinit(n_datasets,
+                           Utilities::fixed_power<dim - 1>(n_subdivisions + 1));
 
   // now build the patches in parallel
   WorkStream::run(
     all_faces.data(),
     all_faces.data() + all_faces.size(),
     [this](const FaceDescriptor *cell_and_face,
-           internal::DataOutFacesImplementation::ParallelData<dimension,
-                                                              dimension> &data,
-           DataOutBase::Patch<dimension - 1, space_dimension> &patch) {
+           internal::DataOutFacesImplementation::ParallelData<dim, dim> &data,
+           DataOutBase::Patch<dim - 1, spacedim> &patch) {
       this->build_one_patch(cell_and_face, data, patch);
     },
-    [this](const DataOutBase::Patch<dim - 1, space_dimension> &patch) {
-      internal::DataOutFacesImplementation::
-        append_patch_to_list<dim, space_dimension>(patch, this->patches);
+    [this](const DataOutBase::Patch<dim - 1, spacedim> &patch) {
+      internal::DataOutFacesImplementation::append_patch_to_list<dim, spacedim>(
+        patch, this->patches);
     },
     thread_data,
     sample_patch);
@@ -415,16 +403,14 @@ DataOutFaces<dim, DoFHandlerType>::build_patches(
 
 
 
-template <int dim, typename DoFHandlerType>
-typename DataOutFaces<dim, DoFHandlerType>::FaceDescriptor
-DataOutFaces<dim, DoFHandlerType>::first_face()
+template <int dim, int spacedim>
+typename DataOutFaces<dim, spacedim>::FaceDescriptor
+DataOutFaces<dim, spacedim>::first_face()
 {
   // simply find first active cell with a face on the boundary
-  typename Triangulation<dimension, space_dimension>::active_cell_iterator
-    cell = this->triangulation->begin_active();
-  for (; cell != this->triangulation->end(); ++cell)
+  for (const auto &cell : this->triangulation->active_cell_iterators())
     if (cell->is_locally_owned())
-      for (const unsigned int f : GeometryInfo<dimension>::face_indices())
+      for (const unsigned int f : GeometryInfo<dim>::face_indices())
         if (!surface_only || cell->face(f)->at_boundary())
           return FaceDescriptor(cell, f);
 
@@ -436,17 +422,16 @@ DataOutFaces<dim, DoFHandlerType>::first_face()
 
 
 
-template <int dim, typename DoFHandlerType>
-typename DataOutFaces<dim, DoFHandlerType>::FaceDescriptor
-DataOutFaces<dim, DoFHandlerType>::next_face(const FaceDescriptor &old_face)
+template <int dim, int spacedim>
+typename DataOutFaces<dim, spacedim>::FaceDescriptor
+DataOutFaces<dim, spacedim>::next_face(const FaceDescriptor &old_face)
 {
   FaceDescriptor face = old_face;
 
   // first check whether the present cell has more faces on the boundary. since
   // we started with this face, its cell must clearly be locally owned
   Assert(face.first->is_locally_owned(), ExcInternalError());
-  for (unsigned int f = face.second + 1;
-       f < GeometryInfo<dimension>::faces_per_cell;
+  for (unsigned int f = face.second + 1; f < GeometryInfo<dim>::faces_per_cell;
        ++f)
     if (!surface_only || face.first->face(f)->at_boundary())
       // yup, that is so, so return it
@@ -459,8 +444,8 @@ DataOutFaces<dim, DoFHandlerType>::next_face(const FaceDescriptor &old_face)
 
   // convert the iterator to an active_iterator and advance this to the next
   // active cell
-  typename Triangulation<dimension, space_dimension>::active_cell_iterator
-    active_cell = face.first;
+  typename Triangulation<dim, spacedim>::active_cell_iterator active_cell =
+    face.first;
 
   // increase face pointer by one
   ++active_cell;
@@ -471,7 +456,7 @@ DataOutFaces<dim, DoFHandlerType>::next_face(const FaceDescriptor &old_face)
       // check all the faces of this active cell. but skip it altogether
       // if it isn't locally owned
       if (active_cell->is_locally_owned())
-        for (const unsigned int f : GeometryInfo<dimension>::face_indices())
+        for (const unsigned int f : GeometryInfo<dim>::face_indices())
           if (!surface_only || active_cell->face(f)->at_boundary())
             {
               face.first  = active_cell;

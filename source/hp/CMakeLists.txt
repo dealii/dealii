@@ -23,7 +23,6 @@ SET(_unity_include_src
   )
 
 SET(_separate_src
-  dof_handler.cc
   )
 
 # concatenate all unity inclusion files in one file
@@ -36,7 +35,6 @@ SETUP_SOURCE_LIST("${_unity_include_src}"
   )
 
 SET(_inst
-  dof_handler.inst.in
   fe_collection.inst.in
   fe_values.inst.in
   mapping_collection.inst.in

@@ -112,17 +112,6 @@ namespace internal
       TriaActiveIterator<dealii::DoFCellAccessor<dim, spacedim, false>>;
   };
 #  endif
-
-
-#  ifdef _MSC_VER
-  template <int dim, int spacedim>
-  class ActiveCellIterator<dim, spacedim, dealii::hp::DoFHandler<dim, spacedim>>
-  {
-  public:
-    using type =
-      TriaActiveIterator<dealii::DoFCellAccessor<dim, spacedim, false>>;
-  };
-#  endif
 } // namespace internal
 
 /**

@@ -108,12 +108,6 @@ namespace internal
     struct Implementation;
   }
 } // namespace internal
-
-namespace hp
-{
-  template <int dim, int spacedim>
-  class DoFHandler;
-}
 #endif
 
 

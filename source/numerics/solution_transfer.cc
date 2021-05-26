@@ -42,37 +42,36 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int dim, typename VectorType, typename DoFHandlerType>
-SolutionTransfer<dim, VectorType, DoFHandlerType>::SolutionTransfer(
-  const DoFHandlerType &dof)
+template <int dim, typename VectorType, int spacedim>
+SolutionTransfer<dim, VectorType, spacedim>::SolutionTransfer(
+  const DoFHandler<dim, spacedim> &dof)
   : dof_handler(&dof, typeid(*this).name())
   , n_dofs_old(0)
   , prepared_for(none)
 {
-  Assert((dynamic_cast<const parallel::distributed::Triangulation<
-            DoFHandlerType::dimension,
-            DoFHandlerType::space_dimension> *>(
-            &dof_handler->get_triangulation()) == nullptr),
-         ExcMessage("You are calling the dealii::SolutionTransfer class "
-                    "with a DoF handler that is built on a "
-                    "parallel::distributed::Triangulation. This will not "
-                    "work for parallel computations. You probably want to "
-                    "use the parallel::distributed::SolutionTransfer class."));
+  Assert(
+    (dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim> *>(
+       &dof_handler->get_triangulation()) == nullptr),
+    ExcMessage("You are calling the dealii::SolutionTransfer class "
+               "with a DoFHandler that is built on a "
+               "parallel::distributed::Triangulation. This will not "
+               "work for parallel computations. You probably want to "
+               "use the parallel::distributed::SolutionTransfer class."));
 }
 
 
 
-template <int dim, typename VectorType, typename DoFHandlerType>
-SolutionTransfer<dim, VectorType, DoFHandlerType>::~SolutionTransfer()
+template <int dim, typename VectorType, int spacedim>
+SolutionTransfer<dim, VectorType, spacedim>::~SolutionTransfer()
 {
   clear();
 }
 
 
 
-template <int dim, typename VectorType, typename DoFHandlerType>
+template <int dim, typename VectorType, int spacedim>
 void
-SolutionTransfer<dim, VectorType, DoFHandlerType>::clear()
+SolutionTransfer<dim, VectorType, spacedim>::clear()
 {
   indices_on_cell.clear();
   dof_values_on_cell.clear();
@@ -83,9 +82,9 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::clear()
 
 
 
-template <int dim, typename VectorType, typename DoFHandlerType>
+template <int dim, typename VectorType, int spacedim>
 void
-SolutionTransfer<dim, VectorType, DoFHandlerType>::prepare_for_pure_refinement()
+SolutionTransfer<dim, VectorType, spacedim>::prepare_for_pure_refinement()
 {
   Assert(prepared_for != pure_refinement, ExcAlreadyPrepForRef());
   Assert(prepared_for != coarsening_and_refinement,
@@ -101,9 +100,9 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::prepare_for_pure_refinement()
   // the current set of subdomain ids, set subdomain ids to the "true" owner of
   // each cell upon construction of the TemporarilyRestoreSubdomainIds object,
   // and later restore these flags when it is destroyed.
-  const internal::parallel::shared::
-    TemporarilyRestoreSubdomainIds<dim, DoFHandlerType::space_dimension>
-      subdomain_modifier(dof_handler->get_triangulation());
+  const internal::parallel::shared::TemporarilyRestoreSubdomainIds<dim,
+                                                                   spacedim>
+    subdomain_modifier(dof_handler->get_triangulation());
 
   const unsigned int n_active_cells =
     dof_handler->get_triangulation().n_active_cells();
@@ -132,9 +131,9 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::prepare_for_pure_refinement()
 
 
 
-template <int dim, typename VectorType, typename DoFHandlerType>
+template <int dim, typename VectorType, int spacedim>
 void
-SolutionTransfer<dim, VectorType, DoFHandlerType>::refine_interpolate(
+SolutionTransfer<dim, VectorType, spacedim>::refine_interpolate(
   const VectorType &in,
   VectorType &      out) const
 {
@@ -154,9 +153,9 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::refine_interpolate(
   // the current set of subdomain ids, set subdomain ids to the "true" owner of
   // each cell upon construction of the TemporarilyRestoreSubdomainIds object,
   // and later restore these flags when it is destroyed.
-  const internal::parallel::shared::
-    TemporarilyRestoreSubdomainIds<dim, DoFHandlerType::space_dimension>
-      subdomain_modifier(dof_handler->get_triangulation());
+  const internal::parallel::shared::TemporarilyRestoreSubdomainIds<dim,
+                                                                   spacedim>
+    subdomain_modifier(dof_handler->get_triangulation());
 
   Vector<typename VectorType::value_type> local_values(0);
 
@@ -275,9 +274,9 @@ namespace internal
 
 
 
-template <int dim, typename VectorType, typename DoFHandlerType>
+template <int dim, typename VectorType, int spacedim>
 void
-SolutionTransfer<dim, VectorType, DoFHandlerType>::
+SolutionTransfer<dim, VectorType, spacedim>::
   prepare_for_coarsening_and_refinement(const std::vector<VectorType> &all_in)
 {
   Assert(prepared_for != pure_refinement, ExcAlreadyPrepForRef());
@@ -307,9 +306,9 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::
   // the current set of subdomain ids, set subdomain ids to the "true" owner of
   // each cell upon construction of the TemporarilyRestoreSubdomainIds object,
   // and later restore these flags when it is destroyed.
-  const internal::parallel::shared::
-    TemporarilyRestoreSubdomainIds<dim, DoFHandlerType::space_dimension>
-      subdomain_modifier(dof_handler->get_triangulation());
+  const internal::parallel::shared::TemporarilyRestoreSubdomainIds<dim,
+                                                                   spacedim>
+    subdomain_modifier(dof_handler->get_triangulation());
 
   // first count the number
   // of cells that will be coarsened
@@ -430,9 +429,9 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::
 
 
 
-template <int dim, typename VectorType, typename DoFHandlerType>
+template <int dim, typename VectorType, int spacedim>
 void
-SolutionTransfer<dim, VectorType, DoFHandlerType>::
+SolutionTransfer<dim, VectorType, spacedim>::
   prepare_for_coarsening_and_refinement(const VectorType &in)
 {
   std::vector<VectorType> all_in(1, in);
@@ -441,9 +440,9 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::
 
 
 
-template <int dim, typename VectorType, typename DoFHandlerType>
+template <int dim, typename VectorType, int spacedim>
 void
-SolutionTransfer<dim, VectorType, DoFHandlerType>::interpolate(
+SolutionTransfer<dim, VectorType, spacedim>::interpolate(
   const std::vector<VectorType> &all_in,
   std::vector<VectorType> &      all_out) const
 {
@@ -472,9 +471,9 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::interpolate(
   // the current set of subdomain ids, set subdomain ids to the "true" owner of
   // each cell upon construction of the TemporarilyRestoreSubdomainIds object,
   // and later restore these flags when it is destroyed.
-  const internal::parallel::shared::
-    TemporarilyRestoreSubdomainIds<dim, DoFHandlerType::space_dimension>
-      subdomain_modifier(dof_handler->get_triangulation());
+  const internal::parallel::shared::TemporarilyRestoreSubdomainIds<dim,
+                                                                   spacedim>
+    subdomain_modifier(dof_handler->get_triangulation());
 
   Vector<typename VectorType::value_type> local_values;
   std::vector<types::global_dof_index>    dofs;
@@ -585,11 +584,10 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::interpolate(
 
 
 
-template <int dim, typename VectorType, typename DoFHandlerType>
+template <int dim, typename VectorType, int spacedim>
 void
-SolutionTransfer<dim, VectorType, DoFHandlerType>::interpolate(
-  const VectorType &in,
-  VectorType &      out) const
+SolutionTransfer<dim, VectorType, spacedim>::interpolate(const VectorType &in,
+                                                         VectorType &out) const
 {
   Assert(in.size() == n_dofs_old, ExcDimensionMismatch(in.size(), n_dofs_old));
   Assert(out.size() == dof_handler->n_dofs(),
@@ -605,9 +603,9 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::interpolate(
 
 
 
-template <int dim, typename VectorType, typename DoFHandlerType>
+template <int dim, typename VectorType, int spacedim>
 std::size_t
-SolutionTransfer<dim, VectorType, DoFHandlerType>::memory_consumption() const
+SolutionTransfer<dim, VectorType, spacedim>::memory_consumption() const
 {
   // at the moment we do not include the memory
   // consumption of the cell_map as we have no
@@ -622,10 +620,10 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::memory_consumption() const
 
 
 
-template <int dim, typename VectorType, typename DoFHandlerType>
+template <int dim, typename VectorType, int spacedim>
 std::size_t
-SolutionTransfer<dim, VectorType, DoFHandlerType>::Pointerstruct::
-  memory_consumption() const
+SolutionTransfer<dim, VectorType, spacedim>::Pointerstruct::memory_consumption()
+  const
 {
   return sizeof(*this);
 }

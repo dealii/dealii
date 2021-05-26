@@ -1010,7 +1010,7 @@ plot_shape_function(DoFHandler<dim> &dof_handler, unsigned int patches = 5)
       std::cout << "...finished printing support points" << std::endl;
     }
 
-  DataOut<dim, DoFHandler<dim>> data_out;
+  DataOut<dim> data_out;
   data_out.attach_dof_handler(dof_handler);
 
   // get material ids:
@@ -1668,7 +1668,7 @@ LaplaceProblem<dim>::output_results(const unsigned int cycle)
       filename += ".vtk";
       std::ofstream output(filename.c_str());
 
-      DataOut<dim, DoFHandler<dim>> data_out;
+      DataOut<dim> data_out;
       data_out.attach_dof_handler(dof_handler);
       data_out.add_data_vector(localized_solution, "solution");
       if (prm.exact_soln_expr != "")

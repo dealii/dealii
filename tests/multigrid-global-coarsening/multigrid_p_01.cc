@@ -172,7 +172,7 @@ test(const unsigned int n_refinements,
       data_out.add_data_vector(
         results[l],
         "solution",
-        DataOut_DoFData<DoFHandler<dim>, dim>::DataVectorType::type_dof_data);
+        DataOut_DoFData<dim, dim>::DataVectorType::type_dof_data);
       data_out.build_patches(*mapping_, 2);
 
       std::ofstream output("test." + std::to_string(dim) + "." +

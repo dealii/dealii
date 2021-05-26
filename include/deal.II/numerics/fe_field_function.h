@@ -142,7 +142,7 @@ namespace Functions
    * for example, evaluating the solution at the origin (here using a parallel
    * TrilinosWrappers vector to hold the solution):
    * @code
-   *   Functions::FEFieldFunction<dim,DoFHandler<dim>,TrilinosWrappers::MPI::Vector>
+   *   Functions::FEFieldFunction<dim,TrilinosWrappers::MPI::Vector>
    *     solution_function (dof_handler, solution);
    *   Point<dim> origin = Point<dim>();
    *
@@ -163,9 +163,7 @@ namespace Functions
    *
    * @ingroup functions
    */
-  template <int dim,
-            typename DoFHandlerType = DoFHandler<dim>,
-            typename VectorType     = Vector<double>>
+  template <int dim, typename VectorType = Vector<double>, int spacedim = dim>
   class FEFieldFunction : public Function<dim, typename VectorType::value_type>
   {
   public:
@@ -178,9 +176,9 @@ namespace Functions
      * lay. Otherwise the standard Q1 mapping is used.
      */
     FEFieldFunction(
-      const DoFHandlerType &dh,
-      const VectorType &    data_vector,
-      const Mapping<dim> &  mapping = StaticMappingQ1<dim>::mapping);
+      const DoFHandler<dim, spacedim> &dh,
+      const VectorType &               data_vector,
+      const Mapping<dim> &             mapping = StaticMappingQ1<dim>::mapping);
 
     /**
      * Set the current cell. If you know in advance where your points lie, you
@@ -189,7 +187,7 @@ namespace Functions
      */
     void
     set_active_cell(
-      const typename DoFHandlerType::active_cell_iterator &newcell);
+      const typename DoFHandler<dim, spacedim>::active_cell_iterator &newcell);
 
     /**
      * Get one vector value at the given point. It is inefficient to use
@@ -438,23 +436,24 @@ namespace Functions
      */
     unsigned int
     compute_point_locations(
-      const std::vector<Point<dim>> &                             points,
-      std::vector<typename DoFHandlerType::active_cell_iterator> &cells,
-      std::vector<std::vector<Point<dim>>> &                      qpoints,
-      std::vector<std::vector<unsigned int>> &                    maps) const;
+      const std::vector<Point<dim>> &points,
+      std::vector<typename DoFHandler<dim, spacedim>::active_cell_iterator>
+        &                                     cells,
+      std::vector<std::vector<Point<dim>>> &  qpoints,
+      std::vector<std::vector<unsigned int>> &maps) const;
 
   private:
     /**
      * Typedef holding the local cell_hint.
      */
     using cell_hint_t = Threads::ThreadLocalStorage<
-      typename DoFHandlerType::active_cell_iterator>;
+      typename DoFHandler<dim, spacedim>::active_cell_iterator>;
 
     /**
      * Pointer to the dof handler.
      */
-    SmartPointer<const DoFHandlerType,
-                 FEFieldFunction<dim, DoFHandlerType, VectorType>>
+    SmartPointer<const DoFHandler<dim, spacedim>,
+                 FEFieldFunction<dim, VectorType, spacedim>>
       dh;
 
     /**
@@ -470,7 +469,7 @@ namespace Functions
     /**
      * The Cache object
      */
-    GridTools::Cache<dim, DoFHandlerType::space_dimension> cache;
+    GridTools::Cache<dim, spacedim> cache;
 
     /**
      * The latest cell hint.
@@ -484,8 +483,8 @@ namespace Functions
      */
     std_cxx17::optional<Point<dim>>
     get_reference_coordinates(
-      const typename DoFHandlerType::active_cell_iterator &cell,
-      const Point<dim> &                                   point) const;
+      const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
+      const Point<dim> &point) const;
   };
 } // namespace Functions
 
@@ -494,16 +493,14 @@ namespace Legacy
   namespace Functions
   {
     /**
-     * The template arguments of the original dealii::Functions::FEFieldFunction
-     * class will change in a future release. If for some reason, you need a
-     * code that is compatible with deal.II 9.3 and the subsequent release, use
-     * this alias instead.
+     * @deprecated Use dealii::Functions::FEFieldFunction without the
+     * DoFHandlerType template instead.
      */
     template <int dim,
               typename DoFHandlerType = DoFHandler<dim>,
               typename VectorType     = Vector<double>>
-    using FEFieldFunction =
-      dealii::Functions::FEFieldFunction<dim, DoFHandlerType, VectorType>;
+    using FEFieldFunction DEAL_II_DEPRECATED = dealii::Functions::
+      FEFieldFunction<dim, VectorType, DoFHandlerType::space_dimension>;
   } // namespace Functions
 } // namespace Legacy
 

@@ -141,7 +141,7 @@ plot_shape_function(DoFHandler<dim> &dof_handler, unsigned int patches = 5)
       deallog << "...finished printing support points" << std::endl;
     }
 
-  DataOut<dim, DoFHandler<dim>> data_out;
+  DataOut<dim> data_out;
   data_out.attach_dof_handler(dof_handler);
 
   // get material ids:

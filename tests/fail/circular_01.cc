@@ -556,7 +556,7 @@ LaplaceProblem<dim>::output_results(const unsigned int cycle) const
 
     const std::string filename =
       "solution-" + Utilities::int_to_string(cycle, 2) + ".vtk";
-    DataOut<dim, DoFHandler<dim>> data_out;
+    DataOut<dim> data_out;
 
     data_out.attach_dof_handler(dof_handler);
     data_out.add_data_vector(solution, "solution");

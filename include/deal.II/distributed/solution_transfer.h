@@ -218,17 +218,9 @@ namespace parallel
      *
      * @ingroup distributed
      */
-    template <int dim,
-              typename VectorType,
-              typename DoFHandlerType = DoFHandler<dim>>
+    template <int dim, typename VectorType, int spacedim = dim>
     class SolutionTransfer
     {
-#ifndef DEAL_II_MSVC
-      static_assert(dim == DoFHandlerType::dimension,
-                    "The dimension explicitly provided as a template "
-                    "argument, and the dimension of the DoFHandlerType "
-                    "template argument must match.");
-#endif
     public:
       /**
        * Constructor.
@@ -238,7 +230,7 @@ namespace parallel
        *   points to the Triangulation before the refinement in question
        *   happens.
        */
-      SolutionTransfer(const DoFHandlerType &dof);
+      SolutionTransfer(const DoFHandler<dim, spacedim> &dof);
 
       /**
        * Destructor.
@@ -320,8 +312,8 @@ namespace parallel
       /**
        * Pointer to the degree of freedom handler to work with.
        */
-      SmartPointer<const DoFHandlerType,
-                   SolutionTransfer<dim, VectorType, DoFHandlerType>>
+      SmartPointer<const DoFHandler<dim, spacedim>,
+                   SolutionTransfer<dim, VectorType, spacedim>>
         dof_handler;
 
       /**
@@ -343,10 +335,8 @@ namespace parallel
        */
       std::vector<char>
       pack_callback(
-        const typename Triangulation<dim, DoFHandlerType::space_dimension>::
-          cell_iterator &cell,
-        const typename Triangulation<dim, DoFHandlerType::space_dimension>::
-          CellStatus status);
+        const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+        const typename Triangulation<dim, spacedim>::CellStatus     status);
 
       /**
        * A callback function used to unpack the data on the current mesh that
@@ -355,10 +345,8 @@ namespace parallel
        */
       void
       unpack_callback(
-        const typename Triangulation<dim, DoFHandlerType::space_dimension>::
-          cell_iterator &cell,
-        const typename Triangulation<dim, DoFHandlerType::space_dimension>::
-          CellStatus status,
+        const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+        const typename Triangulation<dim, spacedim>::CellStatus     status,
         const boost::iterator_range<std::vector<char>::const_iterator>
           &                        data_range,
         std::vector<VectorType *> &all_out);
@@ -382,16 +370,15 @@ namespace Legacy
     namespace distributed
     {
       /**
-       * The template arguments of the original
-       * dealii::parallel::distributed::SolutionTransfer class will change in a
-       * future release. If for some reason, you need a code that is compatible
-       * with deal.II 9.3 and the subsequent release, use this alias instead.
+       * @deprecated Use dealii::parallel::distributed::SolutionTransfer
+       * without the DoFHandlerType template instead.
        */
       template <int dim,
                 typename VectorType,
                 typename DoFHandlerType = DoFHandler<dim>>
-      using SolutionTransfer = dealii::parallel::distributed::
-        SolutionTransfer<dim, VectorType, DoFHandlerType>;
+      using SolutionTransfer DEAL_II_DEPRECATED =
+        dealii::parallel::distributed::
+          SolutionTransfer<dim, VectorType, DoFHandlerType::space_dimension>;
     } // namespace distributed
   }   // namespace parallel
 } // namespace Legacy

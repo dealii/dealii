@@ -39,8 +39,6 @@ class Vector;
 namespace hp
 {
   template <int dim, int spacedim>
-  class DoFHandler;
-  template <int dim, int spacedim>
   class MappingCollection;
 } // namespace hp
 

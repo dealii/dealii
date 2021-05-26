@@ -188,7 +188,7 @@ output(const std::string                   name,
       fe_degrees(index) = dof_handler.get_fe(cell->active_fe_index()).degree;
   }
 
-  dealii::DataOut<dim, dealii::DoFHandler<dim>> data_out;
+  dealii::DataOut<dim> data_out;
   data_out.attach_dof_handler(dof_handler);
   data_out.add_data_vector(values, std::string("function_interpolation"));
   data_out.add_data_vector(fe_degrees, std::string("fe_degree"));

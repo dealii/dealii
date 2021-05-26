@@ -999,19 +999,16 @@ namespace Step34
   template <int dim>
   void BEMProblem<dim>::output_results(const unsigned int cycle)
   {
-    DataOut<dim - 1, DoFHandler<dim - 1, dim>> dataout;
+    DataOut<dim - 1, dim> dataout;
 
     dataout.attach_dof_handler(dof_handler);
-    dataout.add_data_vector(
-      phi, "phi", DataOut<dim - 1, DoFHandler<dim - 1, dim>>::type_dof_data);
-    dataout.add_data_vector(
-      alpha,
-      "alpha",
-      DataOut<dim - 1, DoFHandler<dim - 1, dim>>::type_dof_data);
-    dataout.build_patches(
-      mapping,
-      mapping.get_degree(),
-      DataOut<dim - 1, DoFHandler<dim - 1, dim>>::curved_inner_cells);
+    dataout.add_data_vector(phi, "phi", DataOut<dim - 1, dim>::type_dof_data);
+    dataout.add_data_vector(alpha,
+                            "alpha",
+                            DataOut<dim - 1, dim>::type_dof_data);
+    dataout.build_patches(mapping,
+                          mapping.get_degree(),
+                          DataOut<dim - 1, dim>::curved_inner_cells);
 
     const std::string filename = std::to_string(dim) + "d_boundary_solution_" +
                                  std::to_string(cycle) + ".vtk";

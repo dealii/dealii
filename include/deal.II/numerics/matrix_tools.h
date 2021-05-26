@@ -62,8 +62,6 @@ namespace hp
   class QCollection;
   template <int, int>
   class MappingCollection;
-  template <int, int>
-  class DoFHandler;
 } // namespace hp
 
 

@@ -49,7 +49,7 @@ DEAL_II_NAMESPACE_OPEN
  * <li> If the grid will only be refined (i.e. no cells are coarsened) then
  * use @p SolutionTransfer as follows:
  * @code
- * SolutionTransfer<dim, double> soltrans(*dof_handler);
+ * SolutionTransfer<dim, Vector<double> > soltrans(*dof_handler);
  *
  * // flag some cells for refinement, e.g.
  * GridRefinement::refine_and_coarsen_fixed_fraction(*tria,
@@ -151,10 +151,10 @@ DEAL_II_NAMESPACE_OPEN
  * soltrans.refine_interpolate(old_solution, solution);
  * @endcode
  *
- * Multiple calls to the function <code>interpolate (const Vector<number> &in,
- * Vector<number> &out)</code> are NOT allowed. Interpolating several
+ * Multiple calls to the function <code>interpolate (const VectorType &in,
+ * VectorType &out)</code> are NOT allowed. Interpolating several
  * functions can be performed in one step by using <tt>void interpolate (const
- * vector<Vector<number> >&all_in, vector<Vector<number> >&all_out)
+ * vector<VectorType> &all_in, vector<VectorType> &all_out)
  * const</tt>, and using the respective @p
  * prepare_for_coarsening_and_refinement function taking several vectors as
  * input before actually refining and coarsening the triangulation (see
@@ -164,7 +164,7 @@ DEAL_II_NAMESPACE_OPEN
  * For deleting all stored data in @p SolutionTransfer and reinitializing it
  * use the <tt>clear()</tt> function.
  *
- * The template argument @p number denotes the data type of the vectors you
+ * The template argument @p VectorType denotes the type of data container you
  * want to transfer.
  *
  *
@@ -221,17 +221,17 @@ DEAL_II_NAMESPACE_OPEN
  * will not be coarsened need to be stored according to the solution transfer
  * with pure refinement (cf there). All this is performed by
  * <tt>prepare_for_coarsening_and_refinement(all_in)</tt> where the
- * <tt>vector<Vector<number> > all_in</tt> includes all discrete
+ * <tt>vector<VectorType> all_in</tt> includes all discrete
  * functions to be interpolated onto the new grid.
  *
  * As we need two different kinds of pointers (<tt>vector<unsigned int> *</tt>
- * for the Dof indices and <tt>vector<Vector<number> > *</tt> for the
+ * for the Dof indices and <tt>vector<VectorType> *</tt> for the
  * interpolated DoF values) we use the @p Pointerstruct that includes both of
  * these pointers and the pointer for each cell points to these @p
  * Pointerstructs. On each cell only one of the two different pointers is used
  * at one time hence we could use a <tt>void * pointer</tt> as
  * <tt>vector<unsigned int> *</tt> at one time and as
- * <tt>vector<Vector<number> > *</tt> at the other but using this @p
+ * <tt>vector<VectorType> *</tt> at the other but using this @p
  * Pointerstruct in between makes the use of these pointers more safe and
  * gives better possibility to expand their usage.
  *
@@ -239,10 +239,10 @@ DEAL_II_NAMESPACE_OPEN
  * according to the solution transfer while pure refinement. Additionally, on
  * each cell that is coarsened (hence previously was a father cell), the
  * values of the discrete functions in @p all_out are set to the stored local
- * interpolated values that are accessible due to the 'vector<Vector<number> >
+ * interpolated values that are accessible due to the 'vector<VectorType>
  * *' pointer in @p Pointerstruct that is pointed to by the pointer of that
  * cell. It is clear that <tt>interpolate(all_in, all_out)</tt> only can be
- * called with the <tt>vector<Vector<number> > all_in</tt> that previously was
+ * called with the <tt>vector<VectorType> all_in</tt> that previously was
  * the parameter of the <tt>prepare_for_coarsening_and_refinement(all_in)</tt>
  * function. Hence <tt>interpolate(all_in, all_out)</tt> can (in contrast to
  * <tt>refine_interpolate(in, out)</tt>) only be called once.
@@ -332,22 +332,14 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @ingroup numerics
  */
-template <int dim,
-          typename VectorType     = Vector<double>,
-          typename DoFHandlerType = DoFHandler<dim>>
+template <int dim, typename VectorType = Vector<double>, int spacedim = dim>
 class SolutionTransfer
 {
-#  ifndef DEAL_II_MSVC
-  static_assert(dim == DoFHandlerType::dimension,
-                "The dimension explicitly provided as a template "
-                "argument, and the dimension of the DoFHandlerType "
-                "template argument must match.");
-#  endif
 public:
   /**
    * Constructor, takes the current DoFHandler as argument.
    */
-  SolutionTransfer(const DoFHandlerType &dof);
+  SolutionTransfer(const DoFHandler<dim, spacedim> &dof);
 
   /**
    * Destructor
@@ -476,8 +468,8 @@ private:
   /**
    * Pointer to the degree of freedom handler to work with.
    */
-  SmartPointer<const DoFHandlerType,
-               SolutionTransfer<dim, VectorType, DoFHandlerType>>
+  SmartPointer<const DoFHandler<dim, spacedim>,
+               SolutionTransfer<dim, VectorType, spacedim>>
     dof_handler;
 
   /**
@@ -577,16 +569,14 @@ private:
 namespace Legacy
 {
   /**
-   * The template arguments of the original dealii::SolutionTransfer class will
-   * change in a future release. If for some reason, you need a code that is
-   * compatible with deal.II 9.3 and the subsequent release, use this alias
-   * instead.
+   * @deprecated Use dealii::SolutionTransfer without the DoFHandlerType
+   * template instead.
    */
   template <int dim,
             typename VectorType     = Vector<double>,
             typename DoFHandlerType = DoFHandler<dim>>
-  using SolutionTransfer =
-    dealii::SolutionTransfer<dim, VectorType, DoFHandlerType>;
+  using SolutionTransfer DEAL_II_DEPRECATED =
+    dealii::SolutionTransfer<dim, VectorType, DoFHandlerType::space_dimension>;
 } // namespace Legacy
 
 
