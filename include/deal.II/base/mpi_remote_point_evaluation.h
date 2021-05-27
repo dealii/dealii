@@ -68,6 +68,9 @@ namespace Utilities
        * Set up internal data structures and communication pattern based on
        * a list of points @p points and mesh description (@p tria and @p
        * mapping).
+       *
+       * @warning This is a collective call that needs to be executed by all
+       *   processors in the communicator.
        */
       void
       reinit(const std::vector<Point<spacedim>> &points,
@@ -106,6 +109,9 @@ namespace Utilities
        *   might be the case if a point coincides with a geometric entity (e.g.,
        *   vertex) that is shared by multiple cells or a point is outside of the
        *   computational domain.
+       *
+       * @warning This is a collective call that needs to be executed by all
+       *   processors in the communicator.
        */
       template <typename T>
       void
@@ -119,6 +125,9 @@ namespace Utilities
        * This method is the inverse of the method evaluate_and_process(). It
        * makes the data at the points, provided by @p input, available in the
        * function @p evaluation_function.
+       *
+       * @warning This is a collective call that needs to be executed by all
+       *   processors in the communicator.
        */
       template <typename T>
       void
