@@ -3514,16 +3514,21 @@ public:
    */
 
   /**
-   * Return globally unique cell index for a non-artificial active cell. The
-   * value is identical to active_cell_index() in the context of a serial
+   * Return a globally unique cell index for the current cell,
+   * assuming it is not artificial. The value is identical to
+   * active_cell_index() if the cell is part of a serial
    * triangulation.
    *
-   * In the context of parallel triangulations, locally-owned cells are
-   * enumerated contiguously within each subdomain of the mesh.
-   *
-   * If a cell-data vector has been set up with
-   * parallel::TriangulationBase::global_active_cell_index_partitioner(), the
-   * returned index can be used to access the correct vector entry.
+   * In the context of parallel triangulations, locally-owned cells
+   * are enumerated contiguously within each subdomain of the
+   * mesh. This ensures that the index returned by this function can
+   * be used as the index into vectors with a total of
+   * Triangulation::n_globally_active_cells() entries, and for which
+   * every process stores a contiguous part.  If such a cell-data
+   * vector has been set up with
+   * parallel::TriangulationBase::global_active_cell_index_partitioner(),
+   * the index returned by this function can then be used to access
+   * the correct vector entry.
    */
   types::global_cell_index
   global_active_cell_index() const;
