@@ -69,7 +69,6 @@ main(int argc, char **argv)
         MPI_Comm_size(mpi_communicator, &n_jobs);
         const unsigned int n_mpi_processes = static_cast<unsigned int>(n_jobs);
         Assert(n_dofs % n_mpi_processes == 0, ExcInternalError());
-        const unsigned int n_local_dofs = n_dofs / n_mpi_processes;
         PETScWrappers::MPI::SparseMatrix v2;
         {
           FDMatrix               fd_matrix(N, N);
