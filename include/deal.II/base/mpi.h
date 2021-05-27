@@ -1126,6 +1126,25 @@ namespace Utilities
 
     /**
      * A function that combines values @p local_value from all processes
+     * via a user-specified binary operation @p combiner on the @p root_process.
+     * As such this function is similar to MPI_Reduce (and
+     * Utilities::MPI::min/max()): however on the one hand due to the
+     * user-specified binary operation it is slower for built-in types but
+     * on the other hand general object types, including ones that store
+     * variable amounts of data, can be handled.
+     *
+     * In contrast to all_reduce, the result will be only available on a
+     * single rank. On all other processes, the returned value is undefined.
+     */
+    template <typename T>
+    T
+    reduce(const T &                                     local_value,
+           const MPI_Comm &                              comm,
+           const std::function<T(const T &, const T &)> &combiner,
+           const unsigned int                            root_process = 0);
+
+    /**
+     * A function that combines values @p local_value from all processes
      * via a user-specified binary operation @p combiner and distributes the
      * result back to all processes. As such this function is similar to
      * MPI_Allreduce (if it were implemented by a global reduction followed

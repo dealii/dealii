@@ -35,6 +35,21 @@ check(const std::function<std::vector<T>(const std::vector<T> &,
   for (const auto r : result)
     deallog << r << " ";
   deallog << std::endl;
+
+  for (unsigned int rank = 0;
+       rank < Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
+       ++rank)
+    {
+      const auto result = Utilities::MPI::reduce(
+        std::vector<T>{Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)},
+        MPI_COMM_WORLD,
+        fu,
+        rank);
+
+      for (const auto r : result)
+        deallog << r << " ";
+      deallog << std::endl;
+    }
 }
 
 

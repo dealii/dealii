@@ -530,12 +530,13 @@ namespace Utilities
 
     template <typename T>
     T
-    all_reduce(const T &                                     vec,
-               const MPI_Comm &                              comm,
-               const std::function<T(const T &, const T &)> &combiner)
+    reduce(const T &                                     vec,
+           const MPI_Comm &                              comm,
+           const std::function<T(const T &, const T &)> &combiner,
+           const unsigned int                            root_process)
     {
 #ifdef DEAL_II_WITH_MPI
-      if (job_supports_mpi())
+      if (job_supports_mpi() && n_mpi_processes(comm) > 1)
         {
           // 1) perform custom reduction
           T result = vec;
@@ -545,12 +546,17 @@ namespace Utilities
 
           for (unsigned int stride = 1; stride < nproc; stride *= 2)
             {
-              const unsigned int rank_recv =
-                (2 * stride) * (rank / (2 * stride));
-              const unsigned int rank_send = rank_recv + stride;
+              unsigned int rank_recv =
+                (2 * stride) *
+                  ((rank + nproc - root_process) % nproc / (2 * stride)) +
+                root_process;
+              unsigned int rank_send = rank_recv + stride;
 
-              if (rank_send >= nproc) // nothing to do
+              if (rank_send >= nproc + root_process) // nothing to do
                 continue;
+
+              rank_recv = rank_recv % nproc;
+              rank_send = rank_send % nproc;
 
               if (rank_recv == rank) // process receives data
                 {
@@ -592,13 +598,36 @@ namespace Utilities
                 }
             }
 
-          // 2) broadcast result
-          return Utilities::MPI::broadcast(comm, result);
+          if (rank == root_process)
+            return result;
+          else
+            return {};
         }
 #endif
       (void)comm;
       (void)combiner;
+      (void)root_process;
       return vec;
+    }
+
+
+
+    template <typename T>
+    T
+    all_reduce(const T &                                     vec,
+               const MPI_Comm &                              comm,
+               const std::function<T(const T &, const T &)> &combiner)
+    {
+      if (job_supports_mpi() && n_mpi_processes(comm) > 1)
+        {
+          // 1) perform reduction
+          const auto result = reduce(vec, comm, combiner);
+
+          // 2) broadcast result
+          return Utilities::MPI::broadcast(comm, result);
+        }
+      else
+        return vec;
     }
 
 
