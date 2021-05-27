@@ -1,0 +1,4 @@
+Removed: The deprecated varibale MatrixFree::level_mg_handler has been removed.
+Use MatrixFree::mg_level instead.
+<br>
+(Daniel Arndt, 2021/05/27)

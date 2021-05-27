@@ -36,7 +36,6 @@ operator==(const T &lhs, const T &rhs)
          lhs.mapping_update_flags_faces_by_cells ==
            rhs.mapping_update_flags_faces_by_cells &&
          lhs.mg_level == rhs.mg_level &&
-         lhs.level_mg_handler == rhs.level_mg_handler &&
          lhs.store_plain_indices == rhs.store_plain_indices &&
          lhs.initialize_indices == rhs.initialize_indices &&
          lhs.initialize_mapping == rhs.initialize_mapping &&
