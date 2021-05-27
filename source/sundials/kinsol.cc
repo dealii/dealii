@@ -64,7 +64,8 @@ namespace SUNDIALS
     const double            maximum_newton_step,
     const double            dq_relative_error,
     const unsigned int      maximum_beta_failures,
-    const unsigned int      anderson_subspace_size)
+    const unsigned int      anderson_subspace_size,
+    const int               print_level)
     : strategy(strategy)
     , maximum_non_linear_iterations(maximum_non_linear_iterations)
     , function_tolerance(function_tolerance)
@@ -75,6 +76,7 @@ namespace SUNDIALS
     , dq_relative_error(dq_relative_error)
     , maximum_beta_failures(maximum_beta_failures)
     , anderson_subspace_size(anderson_subspace_size)
+    , print_level(print_level)
   {}
 
 
@@ -105,6 +107,7 @@ namespace SUNDIALS
                       maximum_non_linear_iterations);
     prm.add_parameter("Function norm stopping tolerance", function_tolerance);
     prm.add_parameter("Scaled step stopping tolerance", step_tolerance);
+    prm.add_parameter("Verbosity of KINSOL output", print_level);
 
     prm.enter_subsection("Newton parameters");
     prm.add_parameter("No initial matrix setup", no_init_setup);
@@ -390,6 +393,9 @@ namespace SUNDIALS
     int status = 0;
     (void)status;
 
+    status = KINSetPrintLevel(kinsol_mem, data.print_level);
+    AssertKINSOL(status);
+
     status = KINSetUserData(kinsol_mem, static_cast<void *>(this));
     AssertKINSOL(status);
 
@@ -428,7 +434,9 @@ namespace SUNDIALS
     status = KINSetRelErrFunc(kinsol_mem, data.dq_relative_error);
     AssertKINSOL(status);
 
-    if (get_constraints)
+    if ((data.strategy == AdditionalData::newton ||
+         data.strategy == AdditionalData::linesearch) &&
+        get_constraints)
       {
         status = KINSetConstraints(kinsol_mem, constraints);
         AssertKINSOL(status);

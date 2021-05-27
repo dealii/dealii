@@ -242,6 +242,7 @@ namespace SUNDIALS
        * iterations
        * @param function_tolerance %Function norm stopping tolerance
        * @param step_tolerance Scaled step stopping tolerance
+       * @param print_level Verbosity of KINSOL output
        *
        * Newton parameters:
        *
@@ -269,7 +270,8 @@ namespace SUNDIALS
                      const double       maximum_newton_step           = 0.0,
                      const double       dq_relative_error             = 0.0,
                      const unsigned int maximum_beta_failures         = 0,
-                     const unsigned int anderson_subspace_size        = 0);
+                     const unsigned int anderson_subspace_size        = 0,
+                     const int          print_level                   = 0);
 
       /**
        * Add all AdditionalData() parameters to the given ParameterHandler
@@ -392,6 +394,15 @@ namespace SUNDIALS
        * If you set this to 0, no acceleration is used.
        */
       unsigned int anderson_subspace_size;
+
+      /**
+       * An integer used to set the verbosity of the KINSOL solver
+       *
+       * 0 No extra information are printed.
+       * 1 Medium verbosity.
+       * 2 High verbosity.
+       */
+      int print_level;
     };
 
     /**
@@ -658,7 +669,8 @@ namespace SUNDIALS
      * A function object that users may supply and that is intended to return a
      * vector whose components are used to impose inequality constraints on the
      * solution. The implementation of this function is optional, and it is used
-     * only if implemented.
+     * only if implemented, and only if Newton or linesearch methods are
+     * requested.
      *
      * KINSOL permits the application of inequality
      * constraints, $u_i > 0$ and $u_i < 0$, as well as $u_i \geq 0$ and $u_i

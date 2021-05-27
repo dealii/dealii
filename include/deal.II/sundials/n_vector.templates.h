@@ -713,11 +713,11 @@ SUNDIALS::internal::NVectorOperations::constraint_mask(N_Vector c,
         {
           if ((*x_dealii)[i] >= 0)
             {
-              (*mask_dealii)[i] = true;
+              (*mask_dealii)[i] = 0.0;
             }
           else
             {
-              (*mask_dealii)[i] = false;
+              (*mask_dealii)[i] = 1.0;
               everything_ok     = false;
             }
         }
@@ -725,11 +725,11 @@ SUNDIALS::internal::NVectorOperations::constraint_mask(N_Vector c,
         {
           if ((*x_dealii)[i] > 0)
             {
-              (*mask_dealii)[i] = true;
+              (*mask_dealii)[i] = 0.0;
             }
           else
             {
-              (*mask_dealii)[i] = false;
+              (*mask_dealii)[i] = 1.0;
               everything_ok     = false;
             }
         }
@@ -737,11 +737,11 @@ SUNDIALS::internal::NVectorOperations::constraint_mask(N_Vector c,
         {
           if ((*x_dealii)[i] <= 0)
             {
-              (*mask_dealii)[i] = true;
+              (*mask_dealii)[i] = 0.0;
             }
           else
             {
-              (*mask_dealii)[i] = false;
+              (*mask_dealii)[i] = 1.0;
               everything_ok     = false;
             }
         }
@@ -749,11 +749,11 @@ SUNDIALS::internal::NVectorOperations::constraint_mask(N_Vector c,
         {
           if ((*x_dealii)[i] < 0)
             {
-              (*mask_dealii)[i] = true;
+              (*mask_dealii)[i] = 0.0;
             }
           else
             {
-              (*mask_dealii)[i] = false;
+              (*mask_dealii)[i] = 1.0;
               everything_ok     = false;
             }
         }
@@ -761,6 +761,7 @@ SUNDIALS::internal::NVectorOperations::constraint_mask(N_Vector c,
         {
           Assert((*c_dealii)[i] == 0,
                  ExcMessage("KINSOL constraints value is not admissible"));
+          (*mask_dealii)[i] = 0.0;
         }
     }
   if (everything_ok)

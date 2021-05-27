@@ -133,7 +133,7 @@ main(int argc, char **argv)
   };
   VectorType c(N), scale(N);
   c[0]                   = 0;
-  c[1]                   = 0;
+  c[1]                   = 1;
   scale[0]               = 1.0;
   scale[1]               = 1.0;
   kinsol.get_constraints = [&c]() -> VectorType & { return c; };
