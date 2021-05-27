@@ -386,8 +386,9 @@ private:
    * data in the form of Patch structures (declared in the base class
    * DataOutBase) to the actual output function.
    */
-  virtual const std::vector<
-    dealii::DataOutBase::Patch<patch_dim, patch_spacedim>> &
+  virtual const std::vector<dealii::DataOutBase::Patch<
+    DataOutStack<dim, spacedim, void>::patch_dim,
+    DataOutStack<dim, spacedim, void>::patch_spacedim>> &
   get_patches() const override;
 
 
