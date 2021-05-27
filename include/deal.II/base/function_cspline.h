@@ -25,6 +25,8 @@
 
 #  include <gsl/gsl_spline.h>
 
+#  include <memory>
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace Functions
@@ -82,11 +84,6 @@ namespace Functions
     CSpline(const std::vector<double> &interpolation_points,
             const std::vector<double> &interpolation_values);
 
-    /**
-     * Virtual destructor.
-     */
-    virtual ~CSpline() override;
-
     virtual double
     value(const Point<dim> & point,
           const unsigned int component = 0) const override;
@@ -123,12 +120,12 @@ namespace Functions
     /**
      * GSL accelerator for spline interpolation
      */
-    gsl_interp_accel *acc;
+    std::unique_ptr<gsl_interp_accel, void (*)(gsl_interp_accel *)> acc;
 
     /**
      * GSL cubic spline interpolator
      */
-    gsl_spline *cspline;
+    std::unique_ptr<gsl_spline, void (*)(gsl_spline *)> cspline;
 
     /**
      * A mutex for accelerator object.
