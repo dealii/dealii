@@ -316,6 +316,18 @@ namespace Step47
     CopyData(const CopyData &) = default;
 
 
+    CopyData(CopyData &&) = default;
+
+
+    ~CopyData() = default;
+
+
+    CopyData &operator=(const CopyData &) = default;
+
+
+    CopyData &operator=(CopyData &&) = default;
+
+
     struct FaceData
     {
       FullMatrix<double>                   cell_matrix;
