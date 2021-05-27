@@ -67,6 +67,9 @@ namespace VectorTools
   /**
    * Given a (distributed) solution vector @p vector, evaluate the values at
    * the (arbitrary and even remote) points specified by @p evaluation_points.
+   *
+   * @warning This is a collective call that needs to be executed by all
+   *   processors in the communicator.
    */
   template <int n_components, int dim, int spacedim, typename VectorType>
   std::vector<typename FEPointEvaluation<n_components, dim>::value_type>
@@ -85,6 +88,9 @@ namespace VectorTools
    *
    * @note Refinement/coarsening/repartitioning leads to the invalidation of the
    *   cache so that the above function has to be called again.
+   *
+   * @warning This is a collective call that needs to be executed by all
+   *   processors in the communicator.
    */
   template <int n_components, int dim, int spacedim, typename VectorType>
   std::vector<typename FEPointEvaluation<n_components, dim>::value_type>
