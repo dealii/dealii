@@ -84,8 +84,14 @@ namespace internal
     template <int dim, int spacedim>
     void
     append_patch_to_list(
-      const std::vector<DataOutBase::Patch<dim + 1, spacedim + 1>> &new_patches,
-      std::vector<DataOutBase::Patch<dim + 1, spacedim + 1>> &      patches)
+      const std::vector<
+        DataOutBase::Patch<DataOutRotation<dim, spacedim>::patch_dim,
+                           DataOutRotation<dim, spacedim>::patch_spacedim>>
+        &new_patches,
+      std::vector<
+        DataOutBase::Patch<DataOutRotation<dim, spacedim>::patch_dim,
+                           DataOutRotation<dim, spacedim>::patch_spacedim>>
+        &patches)
     {
       for (unsigned int i = 0; i < new_patches.size(); ++i)
         {
@@ -103,7 +109,7 @@ void
 DataOutRotation<dim, spacedim>::build_one_patch(
   const cell_iterator *                                                 cell,
   internal::DataOutRotationImplementation::ParallelData<dim, spacedim> &data,
-  std::vector<DataOutBase::Patch<dim + 1, spacedim + 1>> &my_patches)
+  std::vector<DataOutBase::Patch<patch_dim, patch_spacedim>> &my_patches)
 {
   if (dim == 3)
     {
@@ -506,33 +512,34 @@ DataOutRotation<dim, spacedim>::build_patches(
       n_postprocessor_outputs[dataset] = 0;
 
   internal::DataOutRotationImplementation::ParallelData<dim, spacedim>
-                                                         thread_data(n_datasets,
+                                                             thread_data(n_datasets,
                 n_subdivisions,
                 n_patches_per_circle,
                 n_postprocessor_outputs,
                 StaticMappingQ1<dim, spacedim>::mapping,
                 this->get_fes(),
                 update_flags);
-  std::vector<DataOutBase::Patch<dim + 1, spacedim + 1>> new_patches(
+  std::vector<DataOutBase::Patch<patch_dim, patch_spacedim>> new_patches(
     n_patches_per_circle);
   for (unsigned int i = 0; i < new_patches.size(); ++i)
     {
       new_patches[i].n_subdivisions = n_subdivisions;
       new_patches[i].data.reinit(
-        n_datasets, Utilities::fixed_power<dim + 1>(n_subdivisions + 1));
+        n_datasets, Utilities::fixed_power<patch_dim>(n_subdivisions + 1));
     }
 
   // now build the patches in parallel
   WorkStream::run(
     all_cells.data(),
     all_cells.data() + all_cells.size(),
-    [this](const cell_iterator *cell,
-           internal::DataOutRotationImplementation::ParallelData<dim, spacedim>
-             &                                                     data,
-           std::vector<DataOutBase::Patch<dim + 1, spacedim + 1>> &my_patches) {
+    [this](
+      const cell_iterator *cell,
+      internal::DataOutRotationImplementation::ParallelData<dim, spacedim>
+        &                                                         data,
+      std::vector<DataOutBase::Patch<patch_dim, patch_spacedim>> &my_patches) {
       this->build_one_patch(cell, data, my_patches);
     },
-    [this](const std::vector<DataOutBase::Patch<dim + 1, spacedim + 1>>
+    [this](const std::vector<DataOutBase::Patch<patch_dim, patch_spacedim>>
              &new_patches) {
       internal::DataOutRotationImplementation::append_patch_to_list<dim,
                                                                     spacedim>(

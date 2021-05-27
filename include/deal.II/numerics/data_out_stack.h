@@ -131,9 +131,18 @@ public:
  * @ingroup output
  */
 template <int dim, int spacedim>
-class DataOutStack<dim, spacedim, void> : public DataOutInterface<dim + 1>
+class DataOutStack<dim, spacedim, void>
+  : public DataOutInterface<dim + 1, spacedim + 1>
 {
+  static_assert(dim == spacedim, "Not implemented for dim != spacedim.");
+
 public:
+  /**
+   * Dimension parameters for the patches.
+   */
+  static constexpr int patch_dim      = dim + 1;
+  static constexpr int patch_spacedim = spacedim + 1;
+
   /**
    * Data type declaring the two types of vectors which are used in this
    * class.
@@ -336,7 +345,7 @@ private:
   /**
    * List of patches of all past and present parameter value data sets.
    */
-  std::vector<dealii::DataOutBase::Patch<dim + 1, dim + 1>> patches;
+  std::vector<dealii::DataOutBase::Patch<patch_dim, patch_spacedim>> patches;
 
   /**
    * Structure holding data vectors (cell and dof data) for the present
@@ -377,7 +386,9 @@ private:
    * data in the form of Patch structures (declared in the base class
    * DataOutBase) to the actual output function.
    */
-  virtual const std::vector<dealii::DataOutBase::Patch<dim + 1, dim + 1>> &
+  virtual const std::vector<dealii::DataOutBase::Patch<
+    DataOutStack<dim, spacedim, void>::patch_dim,
+    DataOutStack<dim, spacedim, void>::patch_spacedim>> &
   get_patches() const override;
 
 

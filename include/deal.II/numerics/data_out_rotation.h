@@ -109,25 +109,28 @@ namespace internal
  * It is in the responsibility of the user to make sure that the radial
  * variable attains only non-negative values.
  *
- * @pre This class only makes sense if the first template argument,
- * <code>dim</code> equals the dimension of the DoFHandler type given as the
- * second template argument, i.e., if <code>dim ==
- * DoFHandlerType::dimension</code>. This redundancy is a historical relic
- * from the time where the library had only a single DoFHandler class and this
- * class consequently only a single template argument.
- *
  * @ingroup output
  */
 template <int dim, int spacedim = dim>
-class DataOutRotation : public DataOut_DoFData<dim, dim + 1, spacedim, dim + 1>
+class DataOutRotation
+  : public DataOut_DoFData<dim, dim + 1, spacedim, spacedim + 1>
 {
+  static_assert(dim == spacedim, "Not implemented for dim != spacedim.");
+
 public:
+  /**
+   * Dimension parameters for the patches.
+   */
+  static constexpr int patch_dim      = dim + 1;
+  static constexpr int patch_spacedim = spacedim + 1;
+
   /**
    * Typedef to the iterator type of the dof handler class under
    * consideration.
    */
   using cell_iterator =
-    typename DataOut_DoFData<dim, dim + 1, spacedim, dim + 1>::cell_iterator;
+    typename DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::
+      cell_iterator;
 
   /**
    * This is the central function of this class since it builds the list of
@@ -196,7 +199,7 @@ private:
   build_one_patch(
     const cell_iterator *                                                 cell,
     internal::DataOutRotationImplementation::ParallelData<dim, spacedim> &data,
-    std::vector<DataOutBase::Patch<dim + 1, spacedim + 1>> &my_patches);
+    std::vector<DataOutBase::Patch<patch_dim, patch_spacedim>> &my_patches);
 };
 
 namespace Legacy

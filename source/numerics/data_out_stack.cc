@@ -308,15 +308,16 @@ DataOutStack<dim, spacedim, void>::build_patches(
   // patch with n_q_points (in the plane
   // of the cells) times n_subdivisions+1 (in
   // the time direction) points
-  dealii::DataOutBase::Patch<dim + 1, dim + 1> default_patch;
+  dealii::DataOutBase::Patch<patch_dim, patch_spacedim> default_patch;
   default_patch.n_subdivisions = n_subdivisions;
   default_patch.data.reinit(n_datasets, n_q_points * (n_subdivisions + 1));
   patches.insert(patches.end(), n_patches, default_patch);
 
   // now loop over all cells and
   // actually create the patches
-  typename std::vector<dealii::DataOutBase::Patch<dim + 1, dim + 1>>::iterator
-               patch       = patches.begin() + (patches.size() - n_patches);
+  typename std::vector<
+    dealii::DataOutBase::Patch<patch_dim, patch_spacedim>>::iterator patch =
+    patches.begin() + (patches.size() - n_patches);
   unsigned int cell_number = 0;
   for (typename DoFHandler<dim, spacedim>::active_cell_iterator cell =
          dof_handler->begin_active();
@@ -451,7 +452,7 @@ template <int dim, int spacedim>
 std::size_t
 DataOutStack<dim, spacedim, void>::memory_consumption() const
 {
-  return (DataOutInterface<dim + 1>::memory_consumption() +
+  return (DataOutInterface<patch_dim, patch_spacedim>::memory_consumption() +
           MemoryConsumption::memory_consumption(parameter) +
           MemoryConsumption::memory_consumption(parameter_step) +
           MemoryConsumption::memory_consumption(dof_handler) +
@@ -463,8 +464,11 @@ DataOutStack<dim, spacedim, void>::memory_consumption() const
 
 
 template <int dim, int spacedim>
-const std::vector<dealii::DataOutBase::Patch<dim + 1, dim + 1>> &
-DataOutStack<dim, spacedim, void>::get_patches() const
+const std::vector<
+  dealii::DataOutBase::Patch<DataOutStack<dim, spacedim, void>::patch_dim,
+                             DataOutStack<dim, spacedim, void>::patch_spacedim>>
+  &
+  DataOutStack<dim, spacedim, void>::get_patches() const
 {
   return patches;
 }

@@ -100,28 +100,30 @@ namespace internal
  * applications certainly exist, for which the author is not imaginative
  * enough.
  *
- * @pre This class only makes sense if the first template argument,
- * <code>dim</code> equals the dimension of the DoFHandler type given as the
- * second template argument, i.e., if <code>dim ==
- * DoFHandlerType::dimension</code>. This redundancy is a historical relic
- * from the time where the library had only a single DoFHandler class and this
- * class consequently only a single template argument.
- *
  * @todo Reimplement this whole class using actual FEFaceValues and
  * MeshWorker.
  *
  * @ingroup output
  */
 template <int dim, int spacedim = dim>
-class DataOutFaces : public DataOut_DoFData<dim, dim - 1, spacedim, dim>
+class DataOutFaces : public DataOut_DoFData<dim, dim - 1, spacedim, spacedim>
 {
+  static_assert(dim == spacedim, "Not implemented for dim != spacedim.");
+
 public:
+  /**
+   * Dimension parameters for the patches.
+   */
+  static constexpr int patch_dim      = dim - 1;
+  static constexpr int patch_spacedim = spacedim;
+
   /**
    * Alias to the iterator type of the dof handler class under
    * consideration.
    */
   using cell_iterator =
-    typename DataOut_DoFData<dim, dim - 1, spacedim, dim>::cell_iterator;
+    typename DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::
+      cell_iterator;
 
   /**
    * Constructor determining whether a surface mesh (default) or the whole
@@ -167,8 +169,8 @@ public:
    * hp::MappingCollection in case of a DoFHandler with hp-capabilities.
    */
   virtual void
-  build_patches(const Mapping<dim> &mapping,
-                const unsigned int  n_subdivisions = 0);
+  build_patches(const Mapping<dim, spacedim> &mapping,
+                const unsigned int            n_subdivisions = 0);
 
   /**
    * Declare a way to describe a face which we would like to generate output
@@ -229,9 +231,9 @@ private:
    */
   void
   build_one_patch(
-    const FaceDescriptor *                                        cell_and_face,
-    internal::DataOutFacesImplementation::ParallelData<dim, dim> &data,
-    DataOutBase::Patch<dim - 1, spacedim> &                       patch);
+    const FaceDescriptor *cell_and_face,
+    internal::DataOutFacesImplementation::ParallelData<dim, spacedim> &data,
+    DataOutBase::Patch<patch_dim, patch_spacedim> &                    patch);
 };
 
 namespace Legacy
