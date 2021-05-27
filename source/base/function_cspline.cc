@@ -28,6 +28,10 @@ namespace Functions
                         const std::vector<double> &y_)
     : interpolation_points(x_)
     , interpolation_values(y_)
+    , acc(gsl_interp_accel_alloc(),
+          [](gsl_interp_accel *p) { gsl_interp_accel_free(p); })
+    , cspline(gsl_spline_alloc(gsl_interp_cspline, interpolation_points.size()),
+              [](gsl_spline *p) { gsl_spline_free(p); })
   {
     Assert(interpolation_points.size() > 0,
            ExcCSplineEmpty(interpolation_points.size()));
@@ -43,25 +47,12 @@ namespace Functions
                                   interpolation_points[i],
                                   interpolation_points[i + 1]));
 
-    acc                  = gsl_interp_accel_alloc();
     const unsigned int n = interpolation_points.size();
-    cspline              = gsl_spline_alloc(gsl_interp_cspline, n);
     // gsl_spline_init returns something but it seems nobody knows what
-    gsl_spline_init(cspline,
+    gsl_spline_init(cspline.get(),
                     interpolation_points.data(),
                     interpolation_values.data(),
                     n);
-  }
-
-
-
-  template <int dim>
-  CSpline<dim>::~CSpline()
-  {
-    gsl_interp_accel_free(acc);
-    gsl_spline_free(cspline);
-    acc     = nullptr;
-    cspline = nullptr;
   }
 
 
@@ -82,7 +73,7 @@ namespace Functions
                            interpolation_points.front(),
                            interpolation_points.back()));
 
-    return gsl_spline_eval(cspline, x, acc);
+    return gsl_spline_eval(cspline.get(), x, acc.get());
   }
 
 
@@ -103,7 +94,7 @@ namespace Functions
                            interpolation_points.front(),
                            interpolation_points.back()));
 
-    const double   deriv = gsl_spline_eval_deriv(cspline, x, acc);
+    const double   deriv = gsl_spline_eval_deriv(cspline.get(), x, acc.get());
     Tensor<1, dim> res;
     res[0] = deriv;
     return res;
@@ -127,7 +118,7 @@ namespace Functions
                            interpolation_points.front(),
                            interpolation_points.back()));
 
-    return gsl_spline_eval_deriv2(cspline, x, acc);
+    return gsl_spline_eval_deriv2(cspline.get(), x, acc.get());
   }
 
 
