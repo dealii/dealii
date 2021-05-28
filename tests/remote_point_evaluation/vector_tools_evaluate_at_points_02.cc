@@ -180,11 +180,11 @@ public:
       solution_other.update_ghost_values();
       Utilities::MPI::RemotePointEvaluation<dim> evaluation_cache;
       const auto                                 evaluation_point_results =
-        VectorTools::evaluate_at_points<1>(mapping_other,
-                                           dof_handler_other,
-                                           solution_other,
-                                           evaluation_points,
-                                           evaluation_cache);
+        VectorTools::point_values<1>(mapping_other,
+                                     dof_handler_other,
+                                     solution_other,
+                                     evaluation_points,
+                                     evaluation_cache);
       solution_other.zero_out_ghosts();
       for (unsigned int i = 0; i < evaluation_points.size(); ++i)
         {

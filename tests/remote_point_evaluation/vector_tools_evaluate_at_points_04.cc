@@ -153,7 +153,7 @@ test()
 
   vector_1.update_ghost_values();
   Utilities::MPI::RemotePointEvaluation<dim> evaluation_cache;
-  const auto evaluation_point_results = VectorTools::evaluate_at_points<1>(
+  const auto evaluation_point_results = VectorTools::point_values<1>(
     mapping_1, dof_handler_1, vector_1, evaluation_points, evaluation_cache);
   vector_1.zero_out_ghosts();
 

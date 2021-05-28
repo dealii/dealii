@@ -62,17 +62,17 @@ test(const bool enforce_unique_map)
   Utilities::MPI::RemotePointEvaluation<dim> eval(1e-6, enforce_unique_map);
 
   const auto result_avg =
-    VectorTools::evaluate_at_points<1>(mapping,
-                                       dof_handler,
-                                       vec,
-                                       evaluation_points,
-                                       eval,
-                                       VectorTools::EvaluationFlags::avg);
-  const auto result_min = VectorTools::evaluate_at_points<1>(
+    VectorTools::point_values<1>(mapping,
+                                 dof_handler,
+                                 vec,
+                                 evaluation_points,
+                                 eval,
+                                 VectorTools::EvaluationFlags::avg);
+  const auto result_min = VectorTools::point_values<1>(
     eval, dof_handler, vec, VectorTools::EvaluationFlags::min);
-  const auto result_max = VectorTools::evaluate_at_points<1>(
+  const auto result_max = VectorTools::point_values<1>(
     eval, dof_handler, vec, VectorTools::EvaluationFlags::max);
-  const auto result_insert = VectorTools::evaluate_at_points<1>(
+  const auto result_insert = VectorTools::point_values<1>(
     eval, dof_handler, vec, VectorTools::EvaluationFlags::insert);
 
   for (unsigned int i = 0; i < evaluation_points.size(); ++i)
