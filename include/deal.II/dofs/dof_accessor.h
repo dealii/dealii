@@ -277,8 +277,9 @@ public:
   /**
    * Move constructor.
    */
-  DoFAccessor(DoFAccessor<structdim, dim, spacedim, level_dof_access>
-                &&) noexcept = default;
+  DoFAccessor(                                                    // NOLINT
+    DoFAccessor<structdim, dim, spacedim, level_dof_access> &&) = // NOLINT
+    default;                                                      // NOLINT
 
   /**
    * Destructor.
@@ -330,9 +331,10 @@ public:
   /**
    * Move assignment operator.
    */
-  DoFAccessor<structdim, dim, spacedim, level_dof_access> &
-  operator=(DoFAccessor<structdim, dim, spacedim, level_dof_access>
-              &&) noexcept = default;
+  DoFAccessor<structdim, dim, spacedim, level_dof_access> &       // NOLINT
+  operator=(                                                      // NOLINT
+    DoFAccessor<structdim, dim, spacedim, level_dof_access> &&) = // NOLINT
+    default;                                                      // NOLINT
 
   /**
    * @}
@@ -1455,9 +1457,9 @@ public:
   /**
    * Move constructor.
    */
-  DoFCellAccessor(
-    DoFCellAccessor<dimension_, space_dimension_, level_dof_access>
-      &&) noexcept = default;
+  DoFCellAccessor(                                                  // NOLINT
+    DoFCellAccessor<dimension_, space_dimension_, level_dof_access> // NOLINT
+      &&) = default;                                                // NOLINT
 
   /**
    * Destructor
@@ -1481,9 +1483,10 @@ public:
   /**
    * Move assignment operator.
    */
-  DoFCellAccessor<dimension_, space_dimension_, level_dof_access> &
-  operator=(DoFCellAccessor<dimension_, space_dimension_, level_dof_access>
-              &&) noexcept = default;
+  DoFCellAccessor<dimension_, space_dimension_, level_dof_access> & // NOLINT
+  operator=(                                                        // NOLINT
+    DoFCellAccessor<dimension_, space_dimension_, level_dof_access> // NOLINT
+      &&) = default;                                                // NOLINT
 
   /**
    * @}
