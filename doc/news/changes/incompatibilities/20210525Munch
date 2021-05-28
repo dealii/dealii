@@ -1,0 +1,4 @@
+Removed: The deprecated member field 
+MatrixFree::AdditionalData::level_mg_handler.
+<br>
+(Peter Munch, 2021/05/25)
