@@ -389,53 +389,6 @@ namespace DoFTools
 
 
   template <int dim, int spacedim>
-  void
-  extract_dofs(const DoFHandler<dim, spacedim> &dof,
-               const ComponentMask &            component_mask,
-               std::vector<bool> &              selected_dofs)
-  {
-    Assert(component_mask.represents_n_components(
-             dof.get_fe_collection().n_components()),
-           ExcMessage(
-             "The given component mask is not sized correctly to represent the "
-             "components of the given finite element."));
-    Assert(selected_dofs.size() == dof.n_locally_owned_dofs(),
-           ExcDimensionMismatch(selected_dofs.size(),
-                                dof.n_locally_owned_dofs()));
-
-    // two special cases: no component is selected, and all components are
-    // selected; both rather stupid, but easy to catch
-    if (component_mask.n_selected_components(
-          dof.get_fe_collection().n_components()) == 0)
-      {
-        std::fill_n(selected_dofs.begin(), dof.n_locally_owned_dofs(), false);
-        return;
-      }
-    else if (component_mask.n_selected_components(
-               dof.get_fe_collection().n_components()) ==
-             dof.get_fe_collection().n_components())
-      {
-        std::fill_n(selected_dofs.begin(), dof.n_locally_owned_dofs(), true);
-        return;
-      }
-
-
-    // preset all values by false
-    std::fill_n(selected_dofs.begin(), dof.n_locally_owned_dofs(), false);
-
-    // get the component association of each DoF and then select the ones
-    // that match the given set of components
-    std::vector<unsigned char> dofs_by_component(dof.n_locally_owned_dofs());
-    internal::get_component_association(dof, component_mask, dofs_by_component);
-
-    for (types::global_dof_index i = 0; i < dof.n_locally_owned_dofs(); ++i)
-      if (component_mask[dofs_by_component[i]] == true)
-        selected_dofs[i] = true;
-  }
-
-
-
-  template <int dim, int spacedim>
   IndexSet
   extract_dofs(const DoFHandler<dim, spacedim> &dof,
                const ComponentMask &            component_mask)
@@ -472,19 +425,6 @@ namespace DoFTools
     IndexSet result(dof.n_dofs());
     result.add_indices(selected_dofs.begin(), selected_dofs.end());
     return result;
-  }
-
-
-
-  template <int dim, int spacedim>
-  void
-  extract_dofs(const DoFHandler<dim, spacedim> &dof,
-               const BlockMask &                block_mask,
-               std::vector<bool> &              selected_dofs)
-  {
-    // simply forward to the function that works based on a component mask
-    extract_dofs<dim, spacedim>(
-      dof, dof.get_fe_collection().component_mask(block_mask), selected_dofs);
   }
 
 
@@ -1071,23 +1011,6 @@ namespace DoFTools
       }
     } // namespace
   }   // namespace internal
-
-
-
-  template <int dim, int spacedim>
-  void
-  extract_hanging_node_dofs(const DoFHandler<dim, spacedim> &dof_handler,
-                            std::vector<bool> &              selected_dofs)
-  {
-    const IndexSet selected_dofs_as_index_set =
-      extract_hanging_node_dofs(dof_handler);
-    Assert(selected_dofs.size() == dof_handler.n_dofs(),
-           ExcDimensionMismatch(selected_dofs.size(), dof_handler.n_dofs()));
-    // preset all values by false
-    std::fill(selected_dofs.begin(), selected_dofs.end(), false);
-    for (const auto index : selected_dofs_as_index_set)
-      selected_dofs[index] = true;
-  }
 
 
 

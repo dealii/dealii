@@ -93,22 +93,6 @@ for (deal_II_dimension, deal_II_space_dimension : DIMENSIONS)
           DoFHandler<deal_II_dimension,
                      deal_II_space_dimension>::active_cell_iterator> &patch);
 
-      // extract_dofs(): Deprecated versions that return information through
-      // the last argument
-      template void
-      extract_dofs<deal_II_dimension, deal_II_space_dimension>(
-        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
-        const ComponentMask &,
-        std::vector<bool> &);
-
-      template void
-      extract_dofs<deal_II_dimension, deal_II_space_dimension>(
-        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
-        const BlockMask &,
-        std::vector<bool> &);
-
-
-      // extract_dofs(): New versions that return information as an IndexSet
       template IndexSet
       extract_dofs<deal_II_dimension, deal_II_space_dimension>(
         const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
@@ -203,9 +187,6 @@ for (deal_II_dimension : DIMENSIONS)
 
     template IndexSet DoFTools::extract_hanging_node_dofs(
       const DoFHandler<deal_II_dimension> &);
-
-    template void DoFTools::extract_hanging_node_dofs(
-      const DoFHandler<deal_II_dimension> &, std::vector<bool> &);
 
     template void DoFTools::extract_subdomain_dofs<deal_II_dimension>(
       const DoFHandler<deal_II_dimension> &dof_handler,
@@ -361,10 +342,6 @@ for (deal_II_dimension : DIMENSIONS)
     template IndexSet DoFTools::extract_hanging_node_dofs(
       const DoFHandler<deal_II_dimension, deal_II_dimension + 1> &);
 
-    template void DoFTools::extract_hanging_node_dofs(
-      const DoFHandler<deal_II_dimension, deal_II_dimension + 1> &,
-      std::vector<bool> &);
-
 #endif
 
 #if deal_II_dimension == 3
@@ -379,9 +356,6 @@ for (deal_II_dimension : DIMENSIONS)
 
     template IndexSet DoFTools::extract_hanging_node_dofs(
       const DoFHandler<1, 3> &);
-
-    template void DoFTools::extract_hanging_node_dofs(const DoFHandler<1, 3> &,
-                                                      std::vector<bool> &);
 
 #endif
   }
