@@ -518,7 +518,7 @@ inconvenience this causes.
 
  <li>
   New: The class Utilities::MPI::RemotePointEvaluation and the function
-  VectorTools::evaluate_at_points() allow to work on arbitrary distributed
+  VectorTools::point_values() allow to work on arbitrary distributed
   points.
   <br>
   (Peter Munch, Martin Kronbichler, Magdalena Schreter, Niklas Fehn, 2021/02/28)
