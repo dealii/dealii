@@ -37,10 +37,12 @@ namespace Utilities
   {
     template <int dim, int spacedim>
     RemotePointEvaluation<dim, spacedim>::RemotePointEvaluation(
-      const double tolerance,
-      const bool   enforce_unique_mapping)
+      const double       tolerance,
+      const bool         enforce_unique_mapping,
+      const unsigned int rtree_level)
       : tolerance(tolerance)
       , enforce_unique_mapping(enforce_unique_mapping)
+      , rtree_level(rtree_level)
       , ready_flag(false)
     {}
 
@@ -86,7 +88,8 @@ namespace Utilities
       const auto local_tree = pack_rtree(local_boxes);
 
       // compress r-tree to a minimal set of bounding boxes
-      const auto local_reduced_box = extract_rtree_level(local_tree, 0);
+      const auto local_reduced_box =
+        extract_rtree_level(local_tree, rtree_level);
 
       // gather bounding boxes of other processes
       const auto global_bboxes =
