@@ -22,6 +22,10 @@
 #include <deal.II/base/mpi_compute_index_owner_internal.h>
 #include <deal.II/base/mpi_consensus_algorithms.h>
 
+#include <deal.II/distributed/fully_distributed_tria.h>
+#include <deal.II/distributed/shared_tria.h>
+#include <deal.II/distributed/tria.h>
+
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
@@ -2140,25 +2144,47 @@ namespace MGTransferGlobalCoarseningTools
     if (fine_triangulation_in.n_global_levels() == 1)
       return coarse_grid_triangulations;
 
-#ifndef DEAL_II_WITH_P4EST
-    Assert(false, ExcNotImplemented());
-#else
-    const auto fine_triangulation =
-      dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim> *>(
-        &fine_triangulation_in);
+    Assert(
+      (dynamic_cast<
+         const parallel::fullydistributed::Triangulation<dim, spacedim> *>(
+         &fine_triangulation_in) == nullptr),
+      ExcMessage(
+        "Triangulations of type parallel::fullydistributed::Triangulation are "
+        "not supported by this function!"));
 
-    Assert(fine_triangulation, ExcNotImplemented());
+    const auto create_new_empty_triangulation =
+      [&]() -> std::shared_ptr<Triangulation<dim, spacedim>> {
+#ifdef DEAL_II_WITH_P4EST
+      if (const auto fine_triangulation = dynamic_cast<
+            const parallel::distributed::Triangulation<dim, spacedim> *>(
+            &fine_triangulation_in))
+        return std::make_shared<
+          parallel::distributed::Triangulation<dim, spacedim>>(
+          fine_triangulation->get_communicator(),
+          fine_triangulation->get_mesh_smoothing());
+      else
+#endif
+#ifdef DEAL_II_WITH_MPI
+        if (const auto fine_triangulation = dynamic_cast<
+              const parallel::shared::Triangulation<dim, spacedim> *>(
+              &fine_triangulation_in))
+        return std::make_shared<parallel::shared::Triangulation<dim, spacedim>>(
+          fine_triangulation->get_communicator(),
+          fine_triangulation->get_mesh_smoothing(),
+          fine_triangulation->with_artificial_cells());
+      else
+#endif
+        return std::make_shared<Triangulation<dim, spacedim>>(
+          fine_triangulation_in.get_mesh_smoothing());
+    };
 
-    const unsigned int max_level = fine_triangulation->n_global_levels() - 1;
+    const unsigned int max_level = fine_triangulation_in.n_global_levels() - 1;
 
     // create coarse meshes
     for (unsigned int l = max_level; l > 0; --l)
       {
         // copy triangulation
-        auto new_tria =
-          std::make_shared<parallel::distributed::Triangulation<dim, spacedim>>(
-            fine_triangulation->get_communicator(),
-            fine_triangulation->get_mesh_smoothing());
+        auto new_tria = create_new_empty_triangulation();
 
         new_tria->copy_triangulation(*coarse_grid_triangulations[l]);
 
@@ -2168,7 +2194,6 @@ namespace MGTransferGlobalCoarseningTools
         // save mesh
         coarse_grid_triangulations[l - 1] = new_tria;
       }
-#endif
 
     return coarse_grid_triangulations;
   }
