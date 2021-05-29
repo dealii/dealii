@@ -166,6 +166,8 @@ test(const unsigned int n_refinements,
 
   for (unsigned int l = min_level; l <= max_level; ++l)
     {
+      deallog << "Norm interpolated solution on level " << l << ": "
+              << results[l].l2_norm() << std::endl;
       DataOut<dim> data_out;
 
       data_out.attach_dof_handler(dof_handlers[l]);

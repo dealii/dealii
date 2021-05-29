@@ -2535,6 +2535,10 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
 
   const bool use_src_inplace = this->vec_fine.size() == 0;
   const auto vec_fine_ptr    = use_src_inplace ? &src : &this->vec_fine;
+
+  if (use_src_inplace == false)
+    this->vec_fine.copy_locally_owned_data_from(src);
+
   if (fine_element_is_continuous || use_src_inplace == false)
     vec_fine_ptr->update_ghost_values();
 
