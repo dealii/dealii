@@ -21,9 +21,7 @@
 
 template <int dim, int spacedim>
 void
-print_statistics(
-  const parallel::fullydistributed::Triangulation<dim, spacedim> &tria,
-  bool                                                            do_mg = false)
+print_statistics(const Triangulation<dim, spacedim> &tria, bool do_mg = false)
 {
   deallog << "n_levels:                  " << tria.n_levels() << std::endl;
   deallog << "n_cells:                   " << tria.n_cells() << std::endl;
