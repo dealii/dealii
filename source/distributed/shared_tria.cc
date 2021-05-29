@@ -409,8 +409,8 @@ namespace parallel
     {
       Assert(
         (dynamic_cast<
-           const dealii::parallel::distributed::Triangulation<dim, spacedim> *>(
-           &other_tria) == nullptr),
+           const dealii::parallel::DistributedTriangulationBase<dim, spacedim>
+             *>(&other_tria) == nullptr),
         ExcMessage(
           "Cannot use this function on parallel::distributed::Triangulation."));
 
