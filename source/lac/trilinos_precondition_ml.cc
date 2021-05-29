@@ -297,7 +297,11 @@ namespace TrilinosWrappers
     trilinos_matrix->reinit(distributor,
                             distributor,
                             deal_ii_sparse_matrix,
+#ifdef DEAL_II_WITH_MPI
                             communicator.Comm(),
+#else
+                            MPI_COMM_WORLD,
+#endif
                             drop_tolerance,
                             true,
                             use_this_sparsity);

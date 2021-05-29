@@ -566,7 +566,7 @@ IndexSet::make_tpetra_map(const MPI_Comm &communicator,
 #    ifdef DEAL_II_WITH_MPI
       Teuchos::rcp(new Teuchos::MpiComm<int>(communicator))
 #    else
-      Teuchos::rcp(new Teuchos::Comm<int>())
+      Teuchos::rcp(new Teuchos::SerialComm<int>())
 #    endif
     );
   else
@@ -583,7 +583,7 @@ IndexSet::make_tpetra_map(const MPI_Comm &communicator,
 #    ifdef DEAL_II_WITH_MPI
         Teuchos::rcp(new Teuchos::MpiComm<int>(communicator))
 #    else
-        Teuchos::rcp(new Teuchos::Comm<int>())
+        Teuchos::rcp(new Teuchos::SerialComm<int>())
 #    endif
       );
     }

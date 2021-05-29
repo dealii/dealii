@@ -481,6 +481,7 @@ namespace FETools
 
 
 
+#  ifdef DEAL_II_WITH_MPI
     template <int dim, int spacedim>
     void
     back_interpolate(
@@ -496,7 +497,9 @@ namespace FETools
       AssertThrow(false, ExcNotImplemented());
     }
 
-#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+
+
+#    ifdef DEAL_II_TRILINOS_WITH_TPETRA
     template <int dim, int spacedim, typename Number>
     void
     back_interpolate(
@@ -511,6 +514,7 @@ namespace FETools
     {
       AssertThrow(false, ExcNotImplemented());
     }
+#    endif
 #  endif
 #endif
 

@@ -225,7 +225,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const Function<deal_II_space_dimension> *,
         const double);
 
-#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+#  if defined(DEAL_II_TRILINOS_WITH_TPETRA) && defined(DEAL_II_WITH_MPI)
       template void
       integrate_difference<deal_II_dimension,
                            LinearAlgebra::TpetraWrappers::Vector<float>,
@@ -312,7 +312,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const Function<deal_II_space_dimension> *,
         const double);
 
-#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+#  if defined(DEAL_II_TRILINOS_WITH_TPETRA) && defined(DEAL_II_WITH_MPI)
       template void
       integrate_difference<deal_II_dimension,
                            LinearAlgebra::TpetraWrappers::Vector<float>,
@@ -389,7 +389,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const Function<deal_II_space_dimension> *,
         const double);
 
-#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+#  if defined(DEAL_II_TRILINOS_WITH_TPETRA) && defined(DEAL_II_WITH_MPI)
       template void
       integrate_difference<deal_II_dimension,
                            LinearAlgebra::TpetraWrappers::Vector<float>,
@@ -462,7 +462,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const Function<deal_II_space_dimension> *,
         const double);
 
-#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+#  if defined(DEAL_II_TRILINOS_WITH_TPETRA) && defined(DEAL_II_WITH_MPI)
       template void
       integrate_difference<deal_II_dimension,
                            LinearAlgebra::TpetraWrappers::Vector<float>,
@@ -542,7 +542,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const Function<deal_II_space_dimension> *,
         const double);
 
-#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+#  if defined(DEAL_II_TRILINOS_WITH_TPETRA) && defined(DEAL_II_WITH_MPI)
       template void
       integrate_difference<deal_II_dimension,
                            LinearAlgebra::TpetraWrappers::Vector<float>,
@@ -616,7 +616,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const Function<deal_II_space_dimension> *,
         const double);
 
-#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+#  if defined(DEAL_II_TRILINOS_WITH_TPETRA) && defined(DEAL_II_WITH_MPI)
       template void
       integrate_difference<deal_II_dimension,
                            LinearAlgebra::TpetraWrappers::Vector<float>,
@@ -696,7 +696,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const Function<deal_II_space_dimension> *,
         const double);
 
-#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+#  if defined(DEAL_II_TRILINOS_WITH_TPETRA) && defined(DEAL_II_WITH_MPI)
       template void
       integrate_difference<deal_II_dimension,
                            LinearAlgebra::TpetraWrappers::Vector<float>,
@@ -770,7 +770,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const Function<deal_II_space_dimension> *,
         const double);
 
-#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+#  if defined(DEAL_II_TRILINOS_WITH_TPETRA) && defined(DEAL_II_WITH_MPI)
       template void
       integrate_difference<deal_II_dimension,
                            LinearAlgebra::TpetraWrappers::Vector<float>,

@@ -53,7 +53,7 @@ namespace LinearAlgebra
   {
     // In the import_from_ghosted_array_finish we need to calculate the
     // maximal and minimal value for the given number type, which is not
-    // straight forward for complex numbers. Therefore, comparison of complex
+    // straightforward for complex numbers. Therefore, comparison of complex
     // numbers is prohibited and throws an assert.
     template <typename Number>
     Number
@@ -299,7 +299,7 @@ namespace LinearAlgebra
 
 
 
-#if defined(DEAL_II_WITH_TRILINOS) && defined(DEAL_II_WITH_MPI)
+#ifdef DEAL_II_WITH_TRILINOS
   template <typename Number>
   void
   ReadWriteVector<Number>::reinit(
@@ -828,8 +828,11 @@ namespace LinearAlgebra
     else
       AssertThrow(false, ExcNotImplemented());
   }
+#endif
 
 
+
+#ifdef DEAL_II_WITH_TRILINOS
   template <typename Number>
   void
   ReadWriteVector<Number>::import(
@@ -851,9 +854,11 @@ namespace LinearAlgebra
            trilinos_vec.get_mpi_communicator(),
            communication_pattern);
   }
+#endif
 
 
 
+#if defined(DEAL_II_WITH_TRILINOS) && defined(DEAL_II_WITH_MPI)
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
   template <typename Number>
   void

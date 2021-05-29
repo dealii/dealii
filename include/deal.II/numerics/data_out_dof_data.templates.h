@@ -649,7 +649,7 @@ namespace internal
 
 
 
-#ifdef DEAL_II_WITH_TRILINOS
+#if defined(DEAL_II_WITH_TRILINOS) && defined(DEAL_II_WITH_MPI)
     template <>
     inline void
     VectorHelper<LinearAlgebra::EpetraWrappers::Vector>::extract(
@@ -661,11 +661,10 @@ namespace internal
       // TODO: we don't have element access
       Assert(false, ExcNotImplemented());
     }
-#endif
 
 
 
-#if defined(DEAL_II_TRILINOS_WITH_TPETRA) && defined(DEAL_II_WITH_MPI)
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
     template <>
     inline void
     VectorHelper<LinearAlgebra::TpetraWrappers::Vector<double>>::extract(
@@ -689,6 +688,7 @@ namespace internal
       // TODO: we don't have element access
       Assert(false, ExcNotImplemented());
     }
+#  endif
 #endif
 
 

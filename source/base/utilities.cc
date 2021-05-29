@@ -70,10 +70,9 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #    include <deal.II/lac/vector_memory.h>
 
 #    include <Epetra_MpiComm.h>
-#    include <Teuchos_DefaultComm.hpp>
 #  endif
 #  include <Epetra_SerialComm.h>
-#  include <Teuchos_RCP.hpp>
+#  include <Teuchos_DefaultComm.hpp>
 #endif
 
 DEAL_II_NAMESPACE_OPEN
@@ -1101,7 +1100,7 @@ namespace Utilities
         new Teuchos::MpiComm<int>(MPI_COMM_SELF));
 #  else
       static auto communicator =
-        Teuchos::RCP<const Teuchos::Comm<int>>(new Teuchos::Comm<int>());
+        Teuchos::RCP<const Teuchos::Comm<int>>(new Teuchos::SerialComm<int>());
 #  endif
 
       return communicator;
