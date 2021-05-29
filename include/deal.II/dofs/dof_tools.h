@@ -1199,8 +1199,12 @@ namespace DoFTools
    */
 
   /**
-   * Same as above but return the selected DoFs as IndexSet. In particular,
-   * for parallel::TriangulationBase objects this function should be preferred.
+   * Return an IndexSet describing all dofs that will be constrained by
+   * interface constraints, i.e. all hanging nodes.
+   *
+   * In case of a parallel::shared::Triangulation or a
+   * parallel::distributed::Triangulation only locally relevant dofs are
+   * considered.
    */
   template <int dim, int spacedim>
   IndexSet
