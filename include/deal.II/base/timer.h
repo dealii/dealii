@@ -759,27 +759,11 @@ public:
   enter_subsection(const std::string &section_name);
 
   /**
-   * Same as @p enter_subsection.
-   *
-   * @deprecated Use enter_subsection() instead.
-   */
-  DEAL_II_DEPRECATED void
-  enter_section(const std::string &section_name);
-
-  /**
    * Leave a section. If no name is given, the last section that was entered
    * is left.
    */
   void
   leave_subsection(const std::string &section_name = "");
-
-  /**
-   * Same as @p leave_subsection.
-   *
-   * @deprecated Use leave_subsection() instead.
-   */
-  DEAL_II_DEPRECATED void
-  exit_section(const std::string &section_name = "");
 
   /**
    * Get a map with the collected data of the specified type for each subsection
@@ -888,7 +872,7 @@ private:
   /**
    * A list of the sections that have been entered and not exited. The list is
    * kept in the order in which sections have been entered, but elements may
-   * be removed in the middle if an argument is given to the exit_section()
+   * be removed in the middle if an argument is given to the leave_section()
    * function.
    */
   std::list<std::string> active_sections;
@@ -958,20 +942,6 @@ Timer::print_accumulated_wall_time_data(StreamType &stream) const
 }
 
 
-
-inline void
-TimerOutput::enter_section(const std::string &section_name)
-{
-  enter_subsection(section_name);
-}
-
-
-
-inline void
-TimerOutput::exit_section(const std::string &section_name)
-{
-  leave_subsection(section_name);
-}
 
 inline TimerOutput::Scope::Scope(dealii::TimerOutput &timer_,
                                  const std::string &  section_name_)
