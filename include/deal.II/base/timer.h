@@ -872,7 +872,7 @@ private:
   /**
    * A list of the sections that have been entered and not exited. The list is
    * kept in the order in which sections have been entered, but elements may
-   * be removed in the middle if an argument is given to the leave_section()
+   * be removed in the middle if an argument is given to the leave_subsection()
    * function.
    */
   std::list<std::string> active_sections;
