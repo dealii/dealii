@@ -124,9 +124,48 @@ IF(NOT DEFINED MPI_VERSION OR MPI_VERSION STREQUAL ".")
   SET(MPI_VERSION_MINOR "0")
 ENDIF()
 
+#
+# Make sure that we do not run into underlinking on Debian/Ubuntu systems with
+# lld / ld.gold and missing libopen-pal.so on the link line:
+#
+
+CHECK_COMPILER_SETUP(
+  "${DEAL_II_CXX_FLAGS_SAVED} ${DEAL_II_CXX_FLAGS}"
+  "${DEAL_II_LINKER_FLAGS_SAVED} ${DEAL_II_LINKER_FLAGS}"
+  MPI_UNDERLINKAGE_OK
+  ${MPI_CXX_LIBRARIES} ${MPI_Fortran_LIBRARIES} ${MPI_C_LIBRARIES}
+  )
+
+IF(NOT MPI_UNDERLINKAGE_OK)
+  MESSAGE(STATUS "Trying to avoid underlinkage by expliclitly adding libopen-pal to link line")
+
+  LIST(GET MPI_CXX_LIBRARIES 0 _lib)
+  GET_FILENAME_COMPONENT(_hint ${_lib} DIRECTORY)
+  DEAL_II_FIND_LIBRARY(_mpi_libopen_pal_library
+    NAMES open-pal
+    HINTS ${_hint}
+    NO_DEFAULT_PATH
+    NO_CMAKE_ENVIRONMENT_PATH
+    NO_CMAKE_PATH
+    NO_SYSTEM_ENVIRONMENT_PATH
+    NO_CMAKE_SYSTEM_PATH
+    NO_CMAKE_FIND_ROOT_PATH
+    )
+
+  #
+  # Note: We don't need to check whether the find library call is
+  # successful: If libopen-pal cannot be found then the
+  # DEAL_II_PACKAGE_HANDLE will drop the library automatically.
+  #
+  # In this case the sanity check in cmake/setup_finalize.cmake will fail
+  # and we start dropping -fuse-ld=lld and -fuse-ld=ld.gold from the
+  # command line.
+  #
+ENDIF()
+
 DEAL_II_PACKAGE_HANDLE(MPI
   LIBRARIES
-    OPTIONAL MPI_CXX_LIBRARIES MPI_Fortran_LIBRARIES MPI_C_LIBRARIES
+    OPTIONAL MPI_CXX_LIBRARIES MPI_Fortran_LIBRARIES MPI_C_LIBRARIES _mpi_libopen_pal_library
   INCLUDE_DIRS
     OPTIONAL MPI_CXX_INCLUDE_PATH MPI_C_INCLUDE_PATH
   USER_INCLUDE_DIRS
@@ -145,4 +184,3 @@ DEAL_II_PACKAGE_HANDLE(MPI
     MPI_MPI_H
     MPI_HAVE_MPI_SEEK_SET
   )
-
