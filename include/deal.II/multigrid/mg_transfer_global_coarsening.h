@@ -33,6 +33,12 @@ namespace internal
 {
   class MGTwoLevelTransferImplementation;
 }
+
+namespace RepartitioningPolicyTools
+{
+  template <int dim, int spacedim>
+  class Base;
+}
 #endif
 
 
@@ -101,6 +107,22 @@ namespace MGTransferGlobalCoarseningTools
   std::vector<std::shared_ptr<const Triangulation<dim, spacedim>>>
   create_geometric_coarsening_sequence(
     const Triangulation<dim, spacedim> &tria);
+
+  /**
+   * Similar to the above function but also taking a @p policy for
+   * repartitioning the triangulations on the coarser levels.
+   *
+   * @note For convenience, a reference to the input triangulation is stored in
+   *   the last entry of the return vector.
+   * @note The type of the returned triangulations is
+   *   parallel::fullydistributed::Triangulation.
+   * @note Currently, only implemented for parallel::distributed::Triangulation.
+   */
+  template <int dim, int spacedim>
+  std::vector<std::shared_ptr<const Triangulation<dim, spacedim>>>
+  create_geometric_coarsening_sequence(
+    const Triangulation<dim, spacedim> &                  tria,
+    const RepartitioningPolicyTools::Base<dim, spacedim> &policy);
 
 } // namespace MGTransferGlobalCoarseningTools
 
