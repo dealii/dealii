@@ -33,9 +33,20 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
     template std::vector<std::shared_ptr<
       const Triangulation<deal_II_dimension, deal_II_space_dimension>>>
     MGTransferGlobalCoarseningTools::create_geometric_coarsening_sequence(
+      Triangulation<deal_II_dimension, deal_II_space_dimension> &
+        fine_triangulation_in,
+      const RepartitioningPolicyTools::Base<deal_II_dimension,
+                                            deal_II_space_dimension> &policy,
+      const bool keep_fine_triangulation,
+      const bool repartition_fine_triangulation);
+
+    template std::vector<std::shared_ptr<
+      const Triangulation<deal_II_dimension, deal_II_space_dimension>>>
+    MGTransferGlobalCoarseningTools::create_geometric_coarsening_sequence(
       const Triangulation<deal_II_dimension, deal_II_space_dimension>
         &fine_triangulation_in,
       const RepartitioningPolicyTools::Base<deal_II_dimension,
-                                            deal_II_space_dimension> &policy);
+                                            deal_II_space_dimension> &policy,
+      const bool repartition_fine_triangulation);
 #endif
   }
