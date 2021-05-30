@@ -119,11 +119,11 @@ namespace TriangulationDescription
       if (auto tria_pdt = dynamic_cast<
             const parallel::distributed::Triangulation<dim, spacedim> *>(&tria))
         {
-          Assert(
-            my_rank == numbers::invalid_unsigned_int ||
-              my_rank == dealii::Utilities::MPI::this_mpi_process(comm),
-            ExcMessage(
-              "If parallel::distributed::Triangulation as source triangulation, my_rank has to equal global rank."));
+          Assert(my_rank == numbers::invalid_unsigned_int ||
+                   my_rank == dealii::Utilities::MPI::this_mpi_process(comm),
+                 ExcMessage(
+                   "For creation from a parallel::distributed::Triangulation, "
+                   "my_rank has to equal global rank."));
 
           my_rank = dealii::Utilities::MPI::this_mpi_process(comm);
         }
@@ -145,7 +145,6 @@ namespace TriangulationDescription
       // store the communicator
       construction_data.comm = comm;
 
-
       std::map<unsigned int, std::vector<unsigned int>>
                                            coinciding_vertex_groups;
       std::map<unsigned int, unsigned int> vertex_to_coinciding_vertex_group;
@@ -156,9 +155,9 @@ namespace TriangulationDescription
 
       // helper function, which collects all vertices belonging to a cell
       // (also taking into account periodicity)
-      auto add_vertices_of_cell_to_vertices_owned_by_locally_owned_cells =
-        [coinciding_vertex_groups, vertex_to_coinciding_vertex_group](
-          TriaIterator<CellAccessor<dim, spacedim>> &cell,
+      const auto add_vertices_of_cell_to_vertices_owned_by_locally_owned_cells =
+        [&coinciding_vertex_groups, &vertex_to_coinciding_vertex_group](
+          const auto &       cell,
           std::vector<bool> &vertices_owned_by_locally_owned_cells) {
           // add local vertices
           for (const auto v : cell->vertex_indices())
@@ -188,7 +187,9 @@ namespace TriangulationDescription
           (tria.get_mesh_smoothing() &
            Triangulation<dim, spacedim>::limit_level_difference_at_vertices),
         ExcMessage(
-          "Source triangulation has to be setup with limit_level_difference_at_vertices if the construction of the multigrid hierarchy is requested!"));
+          "Source triangulation has to be set up with "
+          "limit_level_difference_at_vertices if the construction of the "
+          "multigrid hierarchy is requested!"));
 
       // 1) collect locally relevant cells (set user_flag)
       std::vector<bool> old_user_flags;
@@ -208,14 +209,14 @@ namespace TriangulationDescription
           // cell
           std::vector<bool> vertices_owned_by_locally_owned_cells_on_level(
             tria.n_vertices());
-          for (auto cell : tria.cell_iterators_on_level(level))
+          for (const auto &cell : tria.cell_iterators_on_level(level))
             if ((construct_multigrid &&
                  (cell->level_subdomain_id() == my_rank)) ||
                 (cell->is_active() && cell->subdomain_id() == my_rank))
               add_vertices_of_cell_to_vertices_owned_by_locally_owned_cells(
                 cell, vertices_owned_by_locally_owned_cells_on_level);
 
-          for (auto cell : tria.active_cell_iterators())
+          for (const auto &cell : tria.active_cell_iterators())
             if (cell->subdomain_id() == my_rank)
               add_vertices_of_cell_to_vertices_owned_by_locally_owned_cells(
                 cell, vertices_owned_by_locally_owned_cells_on_level);
@@ -223,17 +224,16 @@ namespace TriangulationDescription
           // helper function to determine if cell is locally relevant
           // (i.e. a cell which is connected to a vertex via a locally
           // owned cell)
-          const auto is_locally_relevant_on_level =
-            [&](TriaIterator<CellAccessor<dim, spacedim>> &cell) {
-              for (const auto v : cell->vertex_indices())
-                if (vertices_owned_by_locally_owned_cells_on_level
-                      [cell->vertex_index(v)])
-                  return true;
-              return false;
-            };
+          const auto is_locally_relevant_on_level = [&](const auto &cell) {
+            for (const auto v : cell->vertex_indices())
+              if (vertices_owned_by_locally_owned_cells_on_level
+                    [cell->vertex_index(v)])
+                return true;
+            return false;
+          };
 
           // mark all locally relevant cells
-          for (auto cell : tria.cell_iterators_on_level(level))
+          for (const auto &cell : tria.cell_iterators_on_level(level))
             if (is_locally_relevant_on_level(cell))
               set_user_flag_and_of_its_parents(cell);
         }
@@ -243,7 +243,7 @@ namespace TriangulationDescription
         std::map<unsigned int, unsigned int> vertices_locally_relevant;
 
         // a) loop over all cells
-        for (auto cell : tria.cell_iterators_on_level(0))
+        for (const auto &cell : tria.cell_iterators_on_level(0))
           {
             if (!cell->user_flag_set())
               continue;
@@ -289,22 +289,21 @@ namespace TriangulationDescription
       // collect local vertices on active level
       std::vector<bool> vertices_owned_by_locally_owned_active_cells(
         tria.n_vertices());
-      for (auto cell : tria.active_cell_iterators())
+      for (const auto &cell : tria.active_cell_iterators())
         if (cell->subdomain_id() == my_rank)
           add_vertices_of_cell_to_vertices_owned_by_locally_owned_cells(
             cell, vertices_owned_by_locally_owned_active_cells);
 
       // helper function to determine if cell is locally relevant
       // on active level
-      const auto is_locally_relevant_on_active_level =
-        [&](TriaIterator<CellAccessor<dim, spacedim>> &cell) {
-          if (cell->is_active())
-            for (const auto v : cell->vertex_indices())
-              if (vertices_owned_by_locally_owned_active_cells
-                    [cell->vertex_index(v)])
-                return true;
-          return false;
-        };
+      const auto is_locally_relevant_on_active_level = [&](const auto &cell) {
+        if (cell->is_active())
+          for (const auto v : cell->vertex_indices())
+            if (vertices_owned_by_locally_owned_active_cells[cell->vertex_index(
+                  v)])
+              return true;
+        return false;
+      };
 
       for (unsigned int level = 0;
            level < tria.get_triangulation().n_global_levels();
@@ -313,7 +312,7 @@ namespace TriangulationDescription
           // collect local vertices on level
           std::vector<bool> vertices_owned_by_locally_owned_cells_on_level(
             tria.n_vertices());
-          for (auto cell : tria.cell_iterators_on_level(level))
+          for (const auto &cell : tria.cell_iterators_on_level(level))
             if ((construct_multigrid &&
                  (cell->level_subdomain_id() == my_rank)) ||
                 (cell->is_active() && cell->subdomain_id() == my_rank))
@@ -322,17 +321,16 @@ namespace TriangulationDescription
 
           // helper function to determine if cell is locally relevant
           // on level
-          const auto is_locally_relevant_on_level =
-            [&](TriaIterator<CellAccessor<dim, spacedim>> &cell) {
-              for (const auto v : cell->vertex_indices())
-                if (vertices_owned_by_locally_owned_cells_on_level
-                      [cell->vertex_index(v)])
-                  return true;
-              return false;
-            };
+          const auto is_locally_relevant_on_level = [&](const auto &cell) {
+            for (const auto v : cell->vertex_indices())
+              if (vertices_owned_by_locally_owned_cells_on_level
+                    [cell->vertex_index(v)])
+                return true;
+            return false;
+          };
 
           auto &level_cell_infos = construction_data.cell_infos[level];
-          for (auto cell : tria.cell_iterators_on_level(level))
+          for (const auto &cell : tria.cell_iterators_on_level(level))
             {
               // check if cell is locally relevant
               if (!(cell->user_flag_set()))
