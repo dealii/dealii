@@ -32,12 +32,12 @@ DEAL_II_NAMESPACE_OPEN
 namespace VectorTools
 {
   /**
-   * Namespace for the flags for evaluate_at_points().
+   * Namespace for the flags for point_values().
    */
   namespace EvaluationFlags
   {
     /**
-     * Flags for evaluate_at_points().
+     * Flags for point_values().
      */
     enum EvaluationFlags
     {
@@ -70,7 +70,7 @@ namespace VectorTools
    */
   template <int n_components, int dim, int spacedim, typename VectorType>
   std::vector<typename FEPointEvaluation<n_components, dim>::value_type>
-  evaluate_at_points(
+  point_values(
     const Mapping<dim> &                                  mapping,
     const DoFHandler<dim, spacedim> &                     dof_handler,
     const VectorType &                                    vector,
@@ -88,7 +88,7 @@ namespace VectorTools
    */
   template <int n_components, int dim, int spacedim, typename VectorType>
   std::vector<typename FEPointEvaluation<n_components, dim>::value_type>
-  evaluate_at_points(
+  point_values(
     const Utilities::MPI::RemotePointEvaluation<dim, spacedim> &cache,
     const DoFHandler<dim, spacedim> &                           dof_handler,
     const VectorType &                                          vector,
@@ -102,17 +102,16 @@ namespace VectorTools
 #ifndef DOXYGEN
   template <int n_components, int dim, int spacedim, typename VectorType>
   inline std::vector<typename FEPointEvaluation<n_components, dim>::value_type>
-  evaluate_at_points(
-    const Mapping<dim> &                                  mapping,
-    const DoFHandler<dim, spacedim> &                     dof_handler,
-    const VectorType &                                    vector,
-    const std::vector<Point<spacedim>> &                  evaluation_points,
-    Utilities::MPI::RemotePointEvaluation<dim, spacedim> &cache,
-    const EvaluationFlags::EvaluationFlags                flags)
+  point_values(const Mapping<dim> &                mapping,
+               const DoFHandler<dim, spacedim> &   dof_handler,
+               const VectorType &                  vector,
+               const std::vector<Point<spacedim>> &evaluation_points,
+               Utilities::MPI::RemotePointEvaluation<dim, spacedim> &cache,
+               const EvaluationFlags::EvaluationFlags                flags)
   {
     cache.reinit(evaluation_points, dof_handler.get_triangulation(), mapping);
 
-    return evaluate_at_points<n_components>(cache, dof_handler, vector, flags);
+    return point_values<n_components>(cache, dof_handler, vector, flags);
   }
 
 
@@ -178,7 +177,7 @@ namespace VectorTools
 
   template <int n_components, int dim, int spacedim, typename VectorType>
   inline std::vector<typename FEPointEvaluation<n_components, dim>::value_type>
-  evaluate_at_points(
+  point_values(
     const Utilities::MPI::RemotePointEvaluation<dim, spacedim> &cache,
     const DoFHandler<dim, spacedim> &                           dof_handler,
     const VectorType &                                          vector,
@@ -191,7 +190,7 @@ namespace VectorTools
            ExcMessage(
              "Utilities::MPI::RemotePointEvaluation is not ready yet! "
              "Please call Utilities::MPI::RemotePointEvaluation::reinit() "
-             "yourself or the other evaluate_at_points(), which does this for"
+             "yourself or the other point_values(), which does this for"
              "you."));
 
     Assert(
