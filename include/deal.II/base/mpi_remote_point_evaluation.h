@@ -55,9 +55,11 @@ namespace Utilities
        *   lie exactly on a vertex, edge, or face.
        * @param enforce_unique_mapping Enforce unique mapping, i.e.,
        *   (one-to-one) relation of points and cells.
+       * @param rtree_level RTree level to be used during the construction of the bounding boxes.
        */
-      RemotePointEvaluation(const double tolerance              = 1e-6,
-                            const bool   enforce_unique_mapping = false);
+      RemotePointEvaluation(const double       tolerance              = 1e-6,
+                            const bool         enforce_unique_mapping = false,
+                            const unsigned int rtree_level            = 0);
 
       /**
        * Destructor.
@@ -185,6 +187,11 @@ namespace Utilities
        * cells.
        */
       const bool enforce_unique_mapping;
+
+      /**
+       * RTree level to be used during the construction of the bounding boxes.
+       */
+      const unsigned int rtree_level;
 
       /**
        * Storage for the status of the triangulation signal.
