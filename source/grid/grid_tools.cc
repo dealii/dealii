@@ -2767,7 +2767,11 @@ namespace GridTools
     const typename MeshType<dim, spacedim>::active_cell_iterator &cell_hint,
     const std::vector<bool> &                              marked_vertices,
     const RTree<std::pair<Point<spacedim>, unsigned int>> &used_vertices_rtree,
-    const double                                           tolerance)
+    const double                                           tolerance,
+    const RTree<
+      std::pair<BoundingBox<spacedim>,
+                typename Triangulation<dim, spacedim>::active_cell_iterator>>
+      *relevant_cell_bounding_boxes_rtree)
   {
     std::pair<typename MeshType<dim, spacedim>::active_cell_iterator,
               Point<dim>>
@@ -2777,6 +2781,21 @@ namespace GridTools
     std::pair<typename MeshType<dim, spacedim>::active_cell_iterator,
               Point<dim>>
       cell_and_position_approx;
+
+    if (relevant_cell_bounding_boxes_rtree != nullptr &&
+        !relevant_cell_bounding_boxes_rtree->empty())
+      {
+        using point_t = boost::geometry::model::
+          point<double, spacedim, boost::geometry::cs::cartesian>;
+        const auto pt =
+          spacedim == 1 ?
+            point_t(p[0]) :
+            (spacedim == 2 ? point_t(p[0], p[1]) : point_t(p[0], p[1], p[2]));
+        if (relevant_cell_bounding_boxes_rtree->qbegin(
+              boost::geometry::index::intersects(pt)) ==
+            relevant_cell_bounding_boxes_rtree->qend())
+          return cell_and_position;
+      }
 
     bool found_cell  = false;
     bool approx_cell = false;
@@ -5744,7 +5763,16 @@ namespace GridTools
         locally_owned_active_cells_around_point;
 
       const auto first_cell = GridTools::find_active_cell_around_point(
-        cache, point, cell_hint, marked_vertices, tolerance);
+        cache.get_mapping(),
+        cache.get_triangulation(),
+        point,
+        cache.get_vertex_to_cell_map(),
+        cache.get_vertex_to_cell_centers_directions(),
+        cell_hint,
+        marked_vertices,
+        cache.get_used_vertices_rtree(),
+        tolerance,
+        &cache.get_locally_owned_cell_bounding_boxes_rtree());
 
       cell_hint = first_cell.first;
       if (cell_hint.state() == IteratorState::valid)

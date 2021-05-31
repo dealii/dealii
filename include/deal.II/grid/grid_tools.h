@@ -1501,7 +1501,11 @@ namespace GridTools
     const std::vector<bool> &                              marked_vertices = {},
     const RTree<std::pair<Point<spacedim>, unsigned int>> &used_vertices_rtree =
       RTree<std::pair<Point<spacedim>, unsigned int>>{},
-    const double tolerance = 1.e-10);
+    const double tolerance = 1.e-10,
+    const RTree<
+      std::pair<BoundingBox<spacedim>,
+                typename Triangulation<dim, spacedim>::active_cell_iterator>>
+      *relevant_cell_bounding_boxes_rtree = nullptr);
 
   /**
    * As compared to the functions above, this function identifies all active
