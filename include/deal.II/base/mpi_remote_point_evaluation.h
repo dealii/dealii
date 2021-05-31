@@ -266,6 +266,9 @@ namespace Utilities
       (void)buffer;
       (void)evaluation_function;
 #else
+      static CollectiveMutex      mutex;
+      CollectiveMutex::ScopedLock lock(mutex, tria->get_communicator());
+
       output.resize(point_ptrs.back());
       buffer.resize(send_permutation.size() * 2);
       ArrayView<T> buffer_1(buffer.data(), buffer.size() / 2);
@@ -377,6 +380,9 @@ namespace Utilities
       (void)buffer;
       (void)evaluation_function;
 #else
+      static CollectiveMutex      mutex;
+      CollectiveMutex::ScopedLock lock(mutex, tria->get_communicator());
+
       const auto &ptr = this->get_point_ptrs();
 
       std::map<unsigned int, std::vector<T>> temp_recv_map;
