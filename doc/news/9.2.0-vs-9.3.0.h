@@ -563,6 +563,14 @@ inconvenience this causes.
  </li>
 
  <li>
+  New: The step-74 tutorial implements the symmetric interior penalty Galerkin
+  (SIPG) method for Poisson's equation using the FEInterfaceValues class (for
+  interface terms) in conjunction with the MeshWorker::mesh_loop() concept.
+  <br>
+  (Timo Heister, Jiaqi Zhang, 2021/01/04)
+ </li>
+
+ <li>
   Improved: Update SUNDIALS ARKODE interface to support versions > 4.0.0 and add preconditioner support
   <br>
   (Sebastian Proell, 2020/12/11)
