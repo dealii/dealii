@@ -745,17 +745,20 @@ namespace Step75
             auto cell_other = dof_handler_fine.begin_active();
             for (auto &cell : dof_handler_coarse.active_cell_iterators())
               {
-                const unsigned int next_degree =
-                  MGTransferGlobalCoarseningTools::
-                    create_next_polynomial_coarsening_degree(
-                      cell_other->get_fe().degree, mg_data.transfer.p_sequence);
-                Assert(fe_index_for_degree.find(next_degree) !=
-                         fe_index_for_degree.end(),
-                       ExcMessage("Next polynomial degree in sequence "
-                                  "does not exist in FECollection."));
-
                 if (cell->is_locally_owned())
-                  cell->set_active_fe_index(fe_index_for_degree[next_degree]);
+                  {
+                    const unsigned int next_degree =
+                      MGTransferGlobalCoarseningTools::
+                        create_next_polynomial_coarsening_degree(
+                          cell_other->get_fe().degree,
+                          mg_data.transfer.p_sequence);
+                    Assert(fe_index_for_degree.find(next_degree) !=
+                             fe_index_for_degree.end(),
+                           ExcMessage("Next polynomial degree in sequence "
+                                      "does not exist in FECollection."));
+
+                    cell->set_active_fe_index(fe_index_for_degree[next_degree]);
+                  }
                 cell_other++;
               }
           }
