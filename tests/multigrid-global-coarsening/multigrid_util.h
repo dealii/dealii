@@ -73,7 +73,8 @@ public:
   reinit(const Mapping<dim> &             mapping,
          const DoFHandler<dim> &          dof_handler,
          const Quadrature<dim> &          quad,
-         const AffineConstraints<number> &constraints)
+         const AffineConstraints<number> &constraints,
+         const unsigned int mg_level = numbers::invalid_unsigned_int)
   {
     // Clear internal data structures (if operator is reused).
     this->system_matrix.clear();
@@ -87,6 +88,7 @@ public:
     // functions so that we only need to set the flag `update_gradients`.
     typename MatrixFree<dim, number>::AdditionalData data;
     data.mapping_update_flags = update_gradients;
+    data.mg_level             = mg_level;
 
     matrix_free.reinit(mapping, dof_handler, constraints, quad, data);
   }

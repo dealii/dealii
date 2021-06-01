@@ -537,9 +537,12 @@ namespace internal
   class FineDoFHandlerView
   {
   public:
-    FineDoFHandlerView(const MeshType &mesh_fine, const MeshType &mesh_coarse)
+    FineDoFHandlerView(const MeshType &   mesh_fine,
+                       const MeshType &   mesh_coarse,
+                       const unsigned int mg_level_fine)
       : mesh_fine(mesh_fine)
       , mesh_coarse(mesh_coarse)
+      , mg_level_fine(mg_level_fine)
       , communicator(
           mesh_fine.get_communicator() /*TODO: fix for different comms*/)
       , cell_id_translator(n_coarse_cells(mesh_fine),
@@ -661,7 +664,11 @@ namespace internal
 
                 indices.resize(cell->get_fe().n_dofs_per_cell());
 
-                cell->get_dof_indices(indices);
+                if (mg_level_fine == numbers::invalid_unsigned_int)
+                  cell->get_dof_indices(indices);
+                else
+                  cell->get_mg_dof_indices(indices);
+
                 buffer.push_back(cell->active_fe_index());
                 buffer.insert(buffer.end(), indices.begin(), indices.end());
               }
@@ -695,7 +702,10 @@ namespace internal
 
             indices.resize(cell_->get_fe().n_dofs_per_cell());
 
-            cell_->get_dof_indices(indices);
+            if (mg_level_fine == numbers::invalid_unsigned_int)
+              cell_->get_dof_indices(indices);
+            else
+              cell_->get_mg_dof_indices(indices);
 
             ghost_indices.insert(ghost_indices.end(),
                                  indices.begin(),
@@ -831,11 +841,13 @@ namespace internal
           auto &dof_indices) {
           if (is_cell_locally_owned)
             {
-              (typename MeshType::cell_iterator(
-                 *mesh_fine.get_triangulation().create_cell_iterator(
-                   cell->id()),
-                 &mesh_fine))
-                ->get_dof_indices(dof_indices);
+              typename MeshType::cell_iterator cell_fine(
+                *mesh_fine.get_triangulation().create_cell_iterator(cell->id()),
+                &mesh_fine);
+              if (mg_level_fine == numbers::invalid_unsigned_int)
+                cell_fine->get_dof_indices(dof_indices);
+              else
+                cell_fine->get_mg_dof_indices(dof_indices);
             }
           else if (is_cell_remotly_owned)
             {
@@ -889,12 +901,17 @@ namespace internal
           auto &dof_indices) {
           if (is_cell_locally_owned)
             {
-              (typename MeshType::cell_iterator(
-                 *mesh_fine.get_triangulation().create_cell_iterator(
-                   cell->id()),
-                 &mesh_fine))
-                ->child(c)
-                ->get_dof_indices(dof_indices);
+              const auto cell_fine =
+                (typename MeshType::cell_iterator(
+                   *mesh_fine.get_triangulation().create_cell_iterator(
+                     cell->id()),
+                   &mesh_fine))
+                  ->child(c);
+
+              if (mg_level_fine == numbers::invalid_unsigned_int)
+                cell_fine->get_dof_indices(dof_indices);
+              else
+                cell_fine->get_mg_dof_indices(dof_indices);
             }
           else if (is_cell_remotly_owned)
             {
@@ -927,9 +944,10 @@ namespace internal
     }
 
   private:
-    const MeshType &mesh_fine;
-    const MeshType &mesh_coarse;
-    const MPI_Comm  communicator;
+    const MeshType &   mesh_fine;
+    const MeshType &   mesh_coarse;
+    const unsigned int mg_level_fine;
+    const MPI_Comm     communicator;
 
   protected:
     const CellIDTranslator<MeshType::dimension> cell_id_translator;
@@ -973,7 +991,8 @@ namespace internal
   public:
     GlobalCoarseningFineDoFHandlerView(const MeshType &dof_handler_dst,
                                        const MeshType &dof_handler_src)
-      : FineDoFHandlerView<MeshType>(dof_handler_dst, dof_handler_src)
+      : FineDoFHandlerView<
+          MeshType>(dof_handler_dst, dof_handler_src, numbers::invalid_unsigned_int /*global coarsening only possible on active levels*/)
     {
       // get reference to triangulations
       const auto &tria_dst = dof_handler_dst.get_triangulation();
@@ -1019,9 +1038,13 @@ namespace internal
     : public internal::FineDoFHandlerView<MeshType>
   {
   public:
-    PermutationFineDoFHandlerView(const MeshType &dof_handler_dst,
-                                  const MeshType &dof_handler_src)
-      : internal::FineDoFHandlerView<MeshType>(dof_handler_dst, dof_handler_src)
+    PermutationFineDoFHandlerView(const MeshType &   dof_handler_dst,
+                                  const MeshType &   dof_handler_src,
+                                  const unsigned int mg_level_fine,
+                                  const unsigned int mg_level_coarse)
+      : internal::FineDoFHandlerView<MeshType>(dof_handler_dst,
+                                               dof_handler_src,
+                                               mg_level_fine)
     {
       // get reference to triangulations
       const auto &tria_dst = dof_handler_dst.get_triangulation();
@@ -1032,19 +1055,36 @@ namespace internal
       IndexSet is_dst_remote(this->cell_id_translator.size());
       IndexSet is_src_locally_owned(this->cell_id_translator.size());
 
-      for (const auto &cell : tria_dst.active_cell_iterators())
-        if (!cell->is_artificial() && cell->is_locally_owned())
-          is_dst_locally_owned.add_index(
-            this->cell_id_translator.translate(cell));
+      const auto fine_operation = [&](const auto &cell) {
+        is_dst_locally_owned.add_index(
+          this->cell_id_translator.translate(cell));
+      };
 
+      const auto coarse_operation = [&](const auto &cell) {
+        is_src_locally_owned.add_index(
+          this->cell_id_translator.translate(cell));
+        is_dst_remote.add_index(this->cell_id_translator.translate(cell));
+      };
 
-      for (const auto &cell : tria_src.active_cell_iterators())
-        if (!cell->is_artificial() && cell->is_locally_owned())
+      const auto loop = [&](const auto &tria,
+                            const auto  level,
+                            const auto &op) {
+        if (level == numbers::invalid_unsigned_int)
           {
-            is_src_locally_owned.add_index(
-              this->cell_id_translator.translate(cell));
-            is_dst_remote.add_index(this->cell_id_translator.translate(cell));
+            for (const auto &cell : tria.active_cell_iterators())
+              if (!cell->is_artificial() && cell->is_locally_owned())
+                op(cell);
           }
+        else
+          {
+            for (const auto &cell : tria.cell_iterators_on_level(level))
+              if (cell->level_subdomain_id() == tria.locally_owned_subdomain())
+                op(cell);
+          }
+      };
+
+      loop(tria_dst, mg_level_fine, fine_operation);
+      loop(tria_src, mg_level_coarse, coarse_operation);
 
       this->reinit(is_dst_locally_owned,
                    is_dst_remote,
@@ -1184,6 +1224,7 @@ namespace internal
     static void
     compute_weights(
       const MeshType &                         dof_handler_fine,
+      const unsigned int                       mg_level_fine,
       const dealii::AffineConstraints<Number> &constraint_fine,
       const MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>
         &                                         transfer,
@@ -1193,12 +1234,19 @@ namespace internal
       touch_count.reinit(transfer.partitioner_fine);
 
       IndexSet locally_relevant_dofs;
-      DoFTools::extract_locally_relevant_dofs(dof_handler_fine,
-                                              locally_relevant_dofs);
+      if (mg_level_fine == numbers::invalid_unsigned_int)
+        DoFTools::extract_locally_relevant_dofs(dof_handler_fine,
+                                                locally_relevant_dofs);
+      else
+        DoFTools::extract_locally_relevant_level_dofs(dof_handler_fine,
+                                                      mg_level_fine,
+                                                      locally_relevant_dofs);
 
       const auto partitioner_fine_ =
         std::make_shared<Utilities::MPI::Partitioner>(
-          dof_handler_fine.locally_owned_dofs(),
+          mg_level_fine == numbers::invalid_unsigned_int ?
+            dof_handler_fine.locally_owned_dofs() :
+            dof_handler_fine.locally_owned_mg_dofs(mg_level_fine),
           locally_relevant_dofs,
           dof_handler_fine.get_communicator());
       transfer.vec_fine.reinit(transfer.partitioner_fine);
@@ -1207,18 +1255,40 @@ namespace internal
 
       std::vector<types::global_dof_index> local_dof_indices;
 
-      for (const auto &cell : dof_handler_fine.active_cell_iterators())
+      if (mg_level_fine == numbers::invalid_unsigned_int)
         {
-          if (cell->is_locally_owned() == false)
-            continue;
+          for (const auto &cell : dof_handler_fine.active_cell_iterators())
+            {
+              if (cell->is_locally_owned() == false)
+                continue;
 
-          local_dof_indices.resize(cell->get_fe().n_dofs_per_cell());
+              local_dof_indices.resize(cell->get_fe().n_dofs_per_cell());
 
-          cell->get_dof_indices(local_dof_indices);
+              cell->get_dof_indices(local_dof_indices);
 
-          for (auto i : local_dof_indices)
-            if (constraint_fine.is_constrained(i) == false)
-              touch_count_[i] += 1;
+              for (auto i : local_dof_indices)
+                if (constraint_fine.is_constrained(i) == false)
+                  touch_count_[i] += 1;
+            }
+        }
+      else
+        {
+          for (const auto &cell :
+               dof_handler_fine.mg_cell_iterators_on_level(mg_level_fine))
+            {
+              if (cell->level_subdomain_id() !=
+                  dof_handler_fine.get_triangulation()
+                    .locally_owned_subdomain())
+                continue;
+
+              local_dof_indices.resize(cell->get_fe().n_dofs_per_cell());
+
+              cell->get_mg_dof_indices(local_dof_indices);
+
+              for (auto i : local_dof_indices)
+                if (constraint_fine.is_constrained(i) == false)
+                  touch_count_[i] += 1;
+            }
         }
 
       touch_count_.compress(VectorOperation::add);
@@ -1642,6 +1712,7 @@ namespace internal
           // compute weights globally
           LinearAlgebra::distributed::Vector<Number> weight_vector;
           compute_weights(dof_handler_fine,
+                          numbers::invalid_unsigned_int /*active level*/,
                           constraint_fine,
                           transfer,
                           weight_vector);
@@ -1699,12 +1770,29 @@ namespace internal
       const MeshType &                         dof_handler_coarse,
       const dealii::AffineConstraints<Number> &constraint_fine,
       const dealii::AffineConstraints<Number> &constraint_coarse,
+      const unsigned int                       mg_level_fine,
+      const unsigned int                       mg_level_coarse,
       MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>
         &transfer)
     {
-      const PermutationFineDoFHandlerView<MeshType> view(dof_handler_fine,
-                                                         dof_handler_coarse);
+      Assert(
+        mg_level_fine == 0 || mg_level_fine == numbers::invalid_unsigned_int,
+        ExcMessage(
+          "Polynomial transfer is only allowed on the active level "
+          "(numbers::invalid_unsigned_int) or the coarse-grid level (0)."));
+      Assert(
+        mg_level_coarse == 0 ||
+          mg_level_coarse == numbers::invalid_unsigned_int,
+        ExcMessage(
+          "Polynomial transfer is only allowed on the active level "
+          "(numbers::invalid_unsigned_int) or the coarse-grid level (0)."));
 
+      const PermutationFineDoFHandlerView<MeshType> view(dof_handler_fine,
+                                                         dof_handler_coarse,
+                                                         mg_level_fine,
+                                                         mg_level_coarse);
+
+      // TODO: adjust assert
       AssertDimension(
         dof_handler_fine.get_triangulation().n_global_active_cells(),
         dof_handler_coarse.get_triangulation().n_global_active_cells());
@@ -1726,15 +1814,35 @@ namespace internal
                ExcInternalError());
 
       const auto process_cells = [&](const auto &fu) {
-        for (const auto &cell_coarse :
-             dof_handler_coarse.active_cell_iterators())
+        if (mg_level_coarse == numbers::invalid_unsigned_int)
           {
-            if (!cell_coarse->is_locally_owned())
-              continue;
+            for (const auto &cell_coarse :
+                 dof_handler_coarse.active_cell_iterators())
+              {
+                if (!cell_coarse->is_locally_owned())
+                  continue;
 
-            const auto cell_coarse_on_fine_mesh = view.get_cell(cell_coarse);
+                const auto cell_coarse_on_fine_mesh =
+                  view.get_cell(cell_coarse);
 
-            fu(cell_coarse, &cell_coarse_on_fine_mesh);
+                fu(cell_coarse, &cell_coarse_on_fine_mesh);
+              }
+          }
+        else
+          {
+            for (const auto &cell_coarse :
+                 dof_handler_coarse.mg_cell_iterators_on_level(mg_level_coarse))
+              {
+                if (cell_coarse->level_subdomain_id() !=
+                    dof_handler_coarse.get_triangulation()
+                      .locally_owned_subdomain())
+                  continue;
+
+                const auto cell_coarse_on_fine_mesh =
+                  view.get_cell(cell_coarse);
+
+                fu(cell_coarse, &cell_coarse_on_fine_mesh);
+              }
           }
       };
 
@@ -1905,7 +2013,12 @@ namespace internal
             fe_index_pairs[std::pair<unsigned int, unsigned int>(
               cell_coarse->active_fe_index(), cell_fine->active_fe_index())];
 
-          cell_coarse->get_dof_indices(local_dof_indices_coarse[fe_pair_no]);
+          if (mg_level_coarse == numbers::invalid_unsigned_int)
+            cell_coarse->get_dof_indices(local_dof_indices_coarse[fe_pair_no]);
+          else
+            cell_coarse->get_mg_dof_indices(
+              local_dof_indices_coarse[fe_pair_no]);
+
           for (unsigned int i = 0;
                i < transfer.schemes[fe_pair_no].dofs_per_cell_coarse;
                i++)
@@ -2077,6 +2190,7 @@ namespace internal
           // compute weights globally
           LinearAlgebra::distributed::Vector<Number> weight_vector;
           compute_weights(dof_handler_fine,
+                          mg_level_fine,
                           constraint_fine,
                           transfer,
                           weight_vector);
@@ -2666,13 +2780,17 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
   reinit_polynomial_transfer(const DoFHandler<dim> &dof_handler_fine,
                              const DoFHandler<dim> &dof_handler_coarse,
                              const AffineConstraints<Number> &constraint_fine,
-                             const AffineConstraints<Number> &constraint_coarse)
+                             const AffineConstraints<Number> &constraint_coarse,
+                             const unsigned int               mg_level_fine,
+                             const unsigned int               mg_level_coarse)
 {
   internal::MGTwoLevelTransferImplementation::reinit_polynomial_transfer(
     dof_handler_fine,
     dof_handler_coarse,
     constraint_fine,
     constraint_coarse,
+    mg_level_fine,
+    mg_level_coarse,
     *this);
 }
 
