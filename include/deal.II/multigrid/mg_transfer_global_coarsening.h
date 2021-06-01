@@ -93,7 +93,9 @@ namespace MGTransferGlobalCoarseningTools
    *
    * @note For convenience, a reference to the input triangulation is stored in
    *   the last entry of the return vector.
-   * @note Currently, only implemented for parallel::distributed::Triangulation.
+   * @note Currently, not implemented for parallel::fullydistributed::Triangulation.
+   * @note The type of the returned triangulations is the same as of the input
+   *   triangulation.
    */
   template <int dim, int spacedim>
   std::vector<std::shared_ptr<const Triangulation<dim, spacedim>>>
