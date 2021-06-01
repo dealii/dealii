@@ -533,13 +533,13 @@ namespace internal
     std::vector<types::global_cell_index> tree_sizes;
   };
 
-  template <typename MeshType>
+  template <int dim>
   class FineDoFHandlerView
   {
   public:
-    FineDoFHandlerView(const MeshType &   mesh_fine,
-                       const MeshType &   mesh_coarse,
-                       const unsigned int mg_level_fine)
+    FineDoFHandlerView(const DoFHandler<dim> &mesh_fine,
+                       const DoFHandler<dim> &mesh_coarse,
+                       const unsigned int     mg_level_fine)
       : mesh_fine(mesh_fine)
       , mesh_coarse(mesh_coarse)
       , mg_level_fine(mg_level_fine)
@@ -657,7 +657,7 @@ namespace internal
 
             for (auto cell_id : i.second)
               {
-                typename MeshType::cell_iterator cell(
+                typename DoFHandler<dim>::cell_iterator cell(
                   *tria_dst.create_cell_iterator(
                     cell_id_translator.to_cell_id(cell_id)),
                   &dof_handler_dst);
@@ -697,7 +697,7 @@ namespace internal
           {
             const auto cell_id = cell_id_translator.to_cell_id(id);
 
-            typename MeshType::cell_iterator cell_(
+            typename DoFHandler<dim>::cell_iterator cell_(
               *tria_dst.create_cell_iterator(cell_id), &dof_handler_dst);
 
             indices.resize(cell_->get_fe().n_dofs_per_cell());
@@ -810,7 +810,7 @@ namespace internal
     }
 
     FineDoFHandlerViewCell
-    get_cell(const typename MeshType::cell_iterator &cell) const
+    get_cell(const typename DoFHandler<dim>::cell_iterator &cell) const
     {
       const auto id = this->cell_id_translator.translate(cell);
 
@@ -819,8 +819,7 @@ namespace internal
       const bool is_cell_remotly_owned = this->is_dst_remote.is_element(id);
 
       const bool has_cell_any_children = [&]() {
-        for (unsigned int i = 0;
-             i < GeometryInfo<MeshType::dimension>::max_children_per_cell;
+        for (unsigned int i = 0; i < GeometryInfo<dim>::max_children_per_cell;
              ++i)
           {
             const auto j = this->cell_id_translator.translate(cell, i);
@@ -841,7 +840,7 @@ namespace internal
           auto &dof_indices) {
           if (is_cell_locally_owned)
             {
-              typename MeshType::cell_iterator cell_fine(
+              typename DoFHandler<dim>::cell_iterator cell_fine(
                 *mesh_fine.get_triangulation().create_cell_iterator(cell->id()),
                 &mesh_fine);
               if (mg_level_fine == numbers::invalid_unsigned_int)
@@ -862,7 +861,7 @@ namespace internal
           -> unsigned int {
           if (is_cell_locally_owned)
             {
-              return (typename MeshType::cell_iterator(
+              return (typename DoFHandler<dim>::cell_iterator(
                         *mesh_fine.get_triangulation().create_cell_iterator(
                           cell->id()),
                         &mesh_fine))
@@ -881,8 +880,8 @@ namespace internal
     }
 
     FineDoFHandlerViewCell
-    get_cell(const typename MeshType::cell_iterator &cell,
-             const unsigned int                      c) const
+    get_cell(const typename DoFHandler<dim>::cell_iterator &cell,
+             const unsigned int                             c) const
     {
       const auto id = this->cell_id_translator.translate(cell, c);
 
@@ -902,7 +901,7 @@ namespace internal
           if (is_cell_locally_owned)
             {
               const auto cell_fine =
-                (typename MeshType::cell_iterator(
+                (typename DoFHandler<dim>::cell_iterator(
                    *mesh_fine.get_triangulation().create_cell_iterator(
                      cell->id()),
                    &mesh_fine))
@@ -944,13 +943,13 @@ namespace internal
     }
 
   private:
-    const MeshType &   mesh_fine;
-    const MeshType &   mesh_coarse;
-    const unsigned int mg_level_fine;
-    const MPI_Comm     communicator;
+    const DoFHandler<dim> &mesh_fine;
+    const DoFHandler<dim> &mesh_coarse;
+    const unsigned int     mg_level_fine;
+    const MPI_Comm         communicator;
 
   protected:
-    const CellIDTranslator<MeshType::dimension> cell_id_translator;
+    const CellIDTranslator<dim> cell_id_translator;
 
   private:
     IndexSet is_dst_locally_owned;
@@ -966,7 +965,7 @@ namespace internal
       map;
 
     static unsigned int
-    n_coarse_cells(const MeshType &mesh)
+    n_coarse_cells(const DoFHandler<dim> &mesh)
     {
       types::coarse_cell_id n_coarse_cells = 0;
 
@@ -979,20 +978,20 @@ namespace internal
     }
 
     static unsigned int
-    n_global_levels(const MeshType &mesh)
+    n_global_levels(const DoFHandler<dim> &mesh)
     {
       return mesh.get_triangulation().n_global_levels();
     }
   };
 
-  template <typename MeshType>
-  class GlobalCoarseningFineDoFHandlerView : public FineDoFHandlerView<MeshType>
+  template <int dim>
+  class GlobalCoarseningFineDoFHandlerView : public FineDoFHandlerView<dim>
   {
   public:
-    GlobalCoarseningFineDoFHandlerView(const MeshType &dof_handler_dst,
-                                       const MeshType &dof_handler_src)
+    GlobalCoarseningFineDoFHandlerView(const DoFHandler<dim> &dof_handler_dst,
+                                       const DoFHandler<dim> &dof_handler_src)
       : FineDoFHandlerView<
-          MeshType>(dof_handler_dst, dof_handler_src, numbers::invalid_unsigned_int /*global coarsening only possible on active levels*/)
+          dim>(dof_handler_dst, dof_handler_src, numbers::invalid_unsigned_int /*global coarsening only possible on active levels*/)
     {
       // get reference to triangulations
       const auto &tria_dst = dof_handler_dst.get_triangulation();
@@ -1020,7 +1019,7 @@ namespace internal
               continue;
 
             for (unsigned int i = 0;
-                 i < GeometryInfo<MeshType::dimension>::max_children_per_cell;
+                 i < GeometryInfo<dim>::max_children_per_cell;
                  ++i)
               is_dst_remote.add_index(
                 this->cell_id_translator.translate(cell, i));
@@ -1033,18 +1032,17 @@ namespace internal
     }
   };
 
-  template <typename MeshType>
-  class PermutationFineDoFHandlerView
-    : public internal::FineDoFHandlerView<MeshType>
+  template <int dim>
+  class PermutationFineDoFHandlerView : public internal::FineDoFHandlerView<dim>
   {
   public:
-    PermutationFineDoFHandlerView(const MeshType &   dof_handler_dst,
-                                  const MeshType &   dof_handler_src,
-                                  const unsigned int mg_level_fine,
-                                  const unsigned int mg_level_coarse)
-      : internal::FineDoFHandlerView<MeshType>(dof_handler_dst,
-                                               dof_handler_src,
-                                               mg_level_fine)
+    PermutationFineDoFHandlerView(const DoFHandler<dim> &dof_handler_dst,
+                                  const DoFHandler<dim> &dof_handler_src,
+                                  const unsigned int     mg_level_fine,
+                                  const unsigned int     mg_level_coarse)
+      : internal::FineDoFHandlerView<dim>(dof_handler_dst,
+                                          dof_handler_src,
+                                          mg_level_fine)
     {
       // get reference to triangulations
       const auto &tria_dst = dof_handler_dst.get_triangulation();
@@ -1095,10 +1093,10 @@ namespace internal
 
   class MGTwoLevelTransferImplementation
   {
-    template <int dim, typename Number, typename MeshType>
+    template <int dim, typename Number>
     static void
     precompute_constraints(
-      const MeshType &                         dof_handler_coarse,
+      const DoFHandler<dim> &                  dof_handler_coarse,
       const dealii::AffineConstraints<Number> &constraint_coarse,
       MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>
         &transfer)
@@ -1220,10 +1218,10 @@ namespace internal
 
 
 
-    template <int dim, typename Number, typename MeshType>
+    template <int dim, typename Number>
     static void
     compute_weights(
-      const MeshType &                         dof_handler_fine,
+      const DoFHandler<dim> &                  dof_handler_fine,
       const unsigned int                       mg_level_fine,
       const dealii::AffineConstraints<Number> &constraint_fine,
       const MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>
@@ -1310,18 +1308,18 @@ namespace internal
 
 
   public:
-    template <int dim, typename Number, typename MeshType>
+    template <int dim, typename Number>
     static void
     reinit_geometric_transfer(
-      const MeshType &                         dof_handler_fine,
-      const MeshType &                         dof_handler_coarse,
+      const DoFHandler<dim> &                  dof_handler_fine,
+      const DoFHandler<dim> &                  dof_handler_coarse,
       const dealii::AffineConstraints<Number> &constraint_fine,
       const dealii::AffineConstraints<Number> &constraint_coarse,
       MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>
         &transfer)
     {
-      const GlobalCoarseningFineDoFHandlerView<MeshType> view(
-        dof_handler_fine, dof_handler_coarse);
+      const GlobalCoarseningFineDoFHandlerView<dim> view(dof_handler_fine,
+                                                         dof_handler_coarse);
 
       // copy constrain matrix; TODO: why only for the coarse level?
       precompute_constraints(dof_handler_coarse, constraint_coarse, transfer);
@@ -1763,11 +1761,11 @@ namespace internal
 
 
 
-    template <int dim, typename Number, typename MeshType>
+    template <int dim, typename Number>
     static void
     reinit_polynomial_transfer(
-      const MeshType &                         dof_handler_fine,
-      const MeshType &                         dof_handler_coarse,
+      const DoFHandler<dim> &                  dof_handler_fine,
+      const DoFHandler<dim> &                  dof_handler_coarse,
       const dealii::AffineConstraints<Number> &constraint_fine,
       const dealii::AffineConstraints<Number> &constraint_coarse,
       const unsigned int                       mg_level_fine,
@@ -1787,10 +1785,10 @@ namespace internal
           "Polynomial transfer is only allowed on the active level "
           "(numbers::invalid_unsigned_int) or the coarse-grid level (0)."));
 
-      const PermutationFineDoFHandlerView<MeshType> view(dof_handler_fine,
-                                                         dof_handler_coarse,
-                                                         mg_level_fine,
-                                                         mg_level_coarse);
+      const PermutationFineDoFHandlerView<dim> view(dof_handler_fine,
+                                                    dof_handler_coarse,
+                                                    mg_level_fine,
+                                                    mg_level_coarse);
 
       // TODO: adjust assert
       AssertDimension(
