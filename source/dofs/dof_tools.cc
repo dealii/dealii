@@ -1846,21 +1846,6 @@ namespace DoFTools
 
 
 
-  // deprecated function
-  template <int dim, int spacedim>
-  void
-  count_dofs_per_component(
-    const DoFHandler<dim, spacedim> &     dof_handler,
-    std::vector<types::global_dof_index> &dofs_per_component,
-    const bool                            only_once,
-    const std::vector<unsigned int> &     target_component)
-  {
-    dofs_per_component =
-      count_dofs_per_fe_component(dof_handler, only_once, target_component);
-  }
-
-
-
   template <int dim, int spacedim>
   std::vector<types::global_dof_index>
   count_dofs_per_fe_component(
@@ -1949,18 +1934,6 @@ namespace DoFTools
 #endif
 
     return dofs_per_component;
-  }
-
-
-
-  // deprecated function
-  template <int dim, int spacedim>
-  void
-  count_dofs_per_block(const DoFHandler<dim, spacedim> &     dof_handler,
-                       std::vector<types::global_dof_index> &dofs_per_block,
-                       const std::vector<unsigned int> &     target_block)
-  {
-    dofs_per_block = count_dofs_per_fe_block(dof_handler, target_block);
   }
 
 

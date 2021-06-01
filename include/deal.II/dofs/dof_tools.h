@@ -2077,18 +2077,6 @@ namespace DoFTools
     const std::vector<unsigned int> &target_component   = {});
 
   /**
-   * @deprecated A version of the previous function that returns its
-   * information through the non-`const` second argument.
-   */
-  template <int dim, int spacedim>
-  DEAL_II_DEPRECATED void
-  count_dofs_per_component(
-    const DoFHandler<dim, spacedim> &     dof_handler,
-    std::vector<types::global_dof_index> &dofs_per_component,
-    const bool                            vector_valued_once = false,
-    const std::vector<unsigned int> &     target_component   = {});
-
-  /**
    * Count the degrees of freedom in each block. This function is similar to
    * count_dofs_per_component(), with the difference that the counting is done
    * by blocks. See
@@ -2109,17 +2097,6 @@ namespace DoFTools
   count_dofs_per_fe_block(const DoFHandler<dim, spacedim> &dof,
                           const std::vector<unsigned int> &target_block =
                             std::vector<unsigned int>());
-
-  /**
-   * @deprecated A version of the previous function that returns its
-   * information through the non-`const` second argument.
-   */
-  template <int dim, int spacedim>
-  DEAL_II_DEPRECATED void
-  count_dofs_per_block(const DoFHandler<dim, spacedim> &     dof,
-                       std::vector<types::global_dof_index> &dofs_per_block,
-                       const std::vector<unsigned int> &     target_block =
-                         std::vector<unsigned int>());
 
   /**
    * For each active cell of a DoFHandler, extract the active finite element
