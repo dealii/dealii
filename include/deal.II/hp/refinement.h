@@ -543,6 +543,7 @@ namespace hp
      * // perform adaptation
      * CellDataTransfer<dim, spacedim, Vector<float>> cell_data_transfer(
      *   triangulation,
+     *   false,
      *   &AdaptationStrategies::Refinement::l2_norm<dim, spacedim, float>,
      *   &AdaptationStrategies::Coarsening::l2_norm<dim, spacedim, float>);
      * cell_data_transfer.prepare_coarsening_and_refinement();
@@ -574,7 +575,7 @@ namespace hp
      * @code
      * Vector<float> predicted_errors;
      * triangulation.signals.post_p4est_refinement.connect([&]() {
-     *   const internal::parallel::distributed::TemporarilyMatchRefineFlags<dim>
+     *   const parallel::distributed::TemporarilyMatchRefineFlags<dim>
      *     refine_modifier(triangulation);
      *   predicted_errors.reinit(triangulation.n_active_cells());
      *   hp::Refinement::predict_error(dof_handler,
