@@ -29,7 +29,7 @@ test()
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria);
   tria.clear_user_data();
-  deallog << 'Cleared user data in ' << dim << 'D' << std::endl;
+  deallog << "Cleared user data in " << dim << 'D' << std::endl;
 }
 
 
