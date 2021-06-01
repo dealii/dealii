@@ -90,20 +90,6 @@ protected:
   build(const DoFHandler<dim, spacedim> &dof_handler);
 
   /**
-   * Actually build the prolongation matrices for each level.
-   *
-   * This function is only called by derived classes. These can also set the
-   * member variables #selected and others to restrict the transfer matrices
-   * to certain blocks.
-   *
-   * @deprecated Use build() instead.
-   */
-  template <int dim, int spacedim>
-  DEAL_II_DEPRECATED void
-  build_matrices(const DoFHandler<dim, spacedim> &dof,
-                 const DoFHandler<dim, spacedim> &mg_dof);
-
-  /**
    * Flag of selected blocks.
    *
    * The transfer operators only act on the blocks having a <tt>true</tt>
@@ -227,20 +213,6 @@ public:
   build(const DoFHandler<dim, spacedim> &dof_handler,
         const std::vector<bool> &        selected);
 
-  /**
-   * Build the prolongation matrices for each level.
-   *
-   * This function is a front-end for the same function in
-   * MGTransferBlockBase.
-   *
-   * @deprecated Use the build() function instead.
-   */
-  template <int dim, int spacedim>
-  DEAL_II_DEPRECATED void
-  build_matrices(const DoFHandler<dim, spacedim> &dof,
-                 const DoFHandler<dim, spacedim> &mg_dof,
-                 const std::vector<bool> &        selected);
-
   virtual void
   prolongate(const unsigned int         to_level,
              BlockVector<number> &      dst,
@@ -354,25 +326,6 @@ public:
   template <int dim, int spacedim>
   void
   build(const DoFHandler<dim, spacedim> &dof_handler, unsigned int selected);
-
-  /**
-   * Actually build the prolongation matrices for grouped blocks.
-   *
-   * This function is a front-end for the same function in
-   * MGTransferBlockBase.
-   *
-   * @param dof The DoFHandler for the active degrees of freedom to use.
-   * @param mg_dof The DoFHandler for the level degrees of freedom to use.
-   * @param selected Number of the block of the global vector to be copied from
-   * and to the multilevel vector.
-   *
-   * @deprecated Use build() instead.
-   */
-  template <int dim, int spacedim>
-  DEAL_II_DEPRECATED void
-  build_matrices(const DoFHandler<dim, spacedim> &dof,
-                 const DoFHandler<dim, spacedim> &mg_dof,
-                 unsigned int                     selected);
 
   /**
    * Change selected block. Handle with care!

@@ -29,30 +29,6 @@ for (deal_II_dimension : DIMENSIONS)
     template void MGTransferBlockSelect<double>::build<deal_II_dimension>(
       const DoFHandler<deal_II_dimension> &, const unsigned int);
 
-    // deprecated:
-    template void MGTransferBlock<float>::build_matrices<deal_II_dimension>(
-      const DoFHandler<deal_II_dimension> &,
-      const DoFHandler<deal_II_dimension> &,
-      const std::vector<bool> &);
-
-    // deprecated:
-    template void MGTransferBlock<double>::build_matrices<deal_II_dimension>(
-      const DoFHandler<deal_II_dimension> &,
-      const DoFHandler<deal_II_dimension> &,
-      const std::vector<bool> &);
-
-    // deprecated:
-    template void MGTransferBlockSelect<float>::build_matrices<
-      deal_II_dimension>(const DoFHandler<deal_II_dimension> &,
-                         const DoFHandler<deal_II_dimension> &,
-                         const unsigned int);
-
-    // deprecated:
-    template void MGTransferBlockSelect<double>::build_matrices<
-      deal_II_dimension>(const DoFHandler<deal_II_dimension> &,
-                         const DoFHandler<deal_II_dimension> &,
-                         const unsigned int);
-
     template void MGTransferBlock<float>::copy_to_mg(
       const DoFHandler<deal_II_dimension> &,
       MGLevelObject<BlockVector<float>> &,
