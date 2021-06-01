@@ -195,15 +195,13 @@ FE_Bernstein<dim, spacedim>::get_subface_interpolation_matrix(
           Assert(std::fabs(sum - 1) < eps, ExcInternalError());
         }
     }
-  else if (dynamic_cast<const FE_Nothing<dim> *>(&x_source_fe) != nullptr)
-    {
-      // nothing to do here, the FE_Nothing has no degrees of freedom anyway
-    }
   else
-    AssertThrow(
-      false,
-      (typename FiniteElement<dim,
-                              spacedim>::ExcInterpolationNotImplemented()));
+    {
+      // When the incoming element is not FE_Bernstein we can just delegate to
+      // the base class to create the interpolation matrix.
+      FE_Q_Base<dim, spacedim>::get_subface_interpolation_matrix(
+        x_source_fe, subface, interpolation_matrix, face_no);
+    }
 }
 
 

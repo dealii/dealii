@@ -1,0 +1,10 @@
+
+DEAL::dim = 2, order = 1
+DEAL::1.0  0.0  
+DEAL::0.0  1.0  
+DEAL::
+DEAL::dim = 2, order = 2
+DEAL::1.0  0.0  0.0  
+DEAL::0.0  1.0  0.0  
+DEAL::0.25 0.25 0.50 
+DEAL::
