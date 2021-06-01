@@ -110,8 +110,8 @@ public:
    * the neighboring element.  The size of the matrix is then
    * <tt>source.dofs_per_face</tt> times <tt>this->dofs_per_face</tt>. The
    * FE_Bernstein element family only provides interpolation matrices for
-   * elements of the same type and FE_Nothing. For all other elements, an
-   * exception of type
+   * elements of the same type, for elements that have support points, and
+   * FE_Nothing. For all other elements, an exception of type
    * FiniteElement<dim,spacedim>::ExcInterpolationNotImplemented is thrown.
    */
   virtual void
@@ -124,8 +124,8 @@ public:
    * the neighboring element.  The size of the matrix is then
    * <tt>source.dofs_per_face</tt> times <tt>this->dofs_per_face</tt>. The
    * FE_Bernstein element family only provides interpolation matrices for
-   * elements of the same type and FE_Nothing. For all other elements, an
-   * exception of type
+   * elements of the same type, for elements that have support points, and
+   * FE_Nothing. For all other elements, an exception of type
    * FiniteElement<dim,spacedim>::ExcInterpolationNotImplemented is thrown.
    */
   virtual void
