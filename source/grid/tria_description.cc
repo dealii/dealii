@@ -745,6 +745,11 @@ namespace TriangulationDescription
       const Triangulation<dim, spacedim> &              tria,
       const LinearAlgebra::distributed::Vector<double> &partition)
     {
+#ifdef DEAL_II_WITH_MPI
+      if (tria.get_communicator() == MPI_COMM_NULL)
+        AssertDimension(partition.local_size(), 0);
+#endif
+
       // 1) determine processes owning locally owned cells
       const std::vector<unsigned int> relevant_processes = [&]() {
         std::set<unsigned int> relevant_processes;
@@ -893,14 +898,14 @@ namespace TriangulationDescription
                 });
 
       dealii::Utilities::MPI::ConsensusAlgorithms::Selector<char, char>(
-        process, tria.get_communicator())
+        process, partition.get_mpi_communicator())
         .run();
 
       // remove redundant entries
       description_merged.reduce();
 
       // convert to actual description
-      return description_merged.convert(tria.get_communicator(),
+      return description_merged.convert(partition.get_mpi_communicator(),
                                         tria.get_mesh_smoothing());
     }
 

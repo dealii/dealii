@@ -455,7 +455,12 @@ namespace TriangulationDescription
      * CellAccessor::global_active_cell_index()). This function allows to
      * repartition distributed Triangulation objects.
      *
-     * @note The communicator is extracted from the Triangulation @p tria.
+     * @note The communicator is extracted from the vector @p partition.
+     *
+     * @note The triangulation @p tria can be set up on a subcommunicator of the
+     *   communicator of @p partitioner. All processes that are not part of that
+     *   subcommunicator need to set up the local triangulation with the
+     *   special-purpose communicator MPI_COMM_NULL.
      *
      * @note The multgrid levels are currently not constructed, since
      *   @p partition only describes the partitioning of the active level.
