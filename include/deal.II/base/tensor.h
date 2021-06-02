@@ -1050,7 +1050,7 @@ template <typename OtherNumber>
 constexpr inline bool
 Tensor<0, dim, Number>::operator==(const Tensor<0, dim, OtherNumber> &p) const
 {
-#  if defined(DEAL_II_ADOLC_WITH_ADVANCED_BRANCHING)
+#  ifdef DEAL_II_ADOLC_WITH_ADVANCED_BRANCHING
   Assert(!(std::is_same<Number, adouble>::value ||
            std::is_same<OtherNumber, adouble>::value),
          ExcMessage(

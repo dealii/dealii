@@ -693,7 +693,7 @@ namespace LinearAlgebra
     void
     resize_val(const size_type new_allocated_size);
 
-#if defined(DEAL_II_WITH_TRILINOS)
+#ifdef DEAL_II_WITH_TRILINOS
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
     /**
      * Return a TpetraWrappers::CommunicationPattern and store it for future

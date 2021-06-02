@@ -19,7 +19,7 @@
 
 #include <deal.II/base/config.h>
 
-#if defined(DEAL_II_TRILINOS_WITH_TPETRA)
+#ifdef DEAL_II_TRILINOS_WITH_TPETRA
 
 #  include <deal.II/base/index_set.h>
 #  include <deal.II/base/subscriptor.h>

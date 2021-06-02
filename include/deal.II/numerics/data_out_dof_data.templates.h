@@ -665,7 +665,7 @@ namespace internal
 
 
 
-#if defined(DEAL_II_TRILINOS_WITH_TPETRA)
+#ifdef DEAL_II_TRILINOS_WITH_TPETRA
     template <>
     inline void
     VectorHelper<LinearAlgebra::TpetraWrappers::Vector<double>>::extract(

@@ -226,7 +226,7 @@ namespace Utilities
                     }
                   else
                     {
-#    if defined(DEAL_II_COMPILER_CUDA_AWARE)
+#    ifdef DEAL_II_COMPILER_CUDA_AWARE
                       cudaError_t cuda_error =
                         cudaMemcpy(ghost_array.data() + ghost_range.first,
                                    ghost_array.data() + offset,
@@ -376,7 +376,7 @@ namespace Utilities
                         }
                       else
                         {
-#    if defined(DEAL_II_COMPILER_CUDA_AWARE)
+#    ifdef DEAL_II_COMPILER_CUDA_AWARE
                           cudaError_t cuda_error =
                             cudaMemcpy(ghost_array_ptr + offset,
                                        ghost_array.data() + my_ghosts->first,
@@ -525,7 +525,7 @@ namespace Utilities
                    "import_from_ghosted_array_start as is passed "
                    "to import_from_ghosted_array_finish."));
 
-#      if defined(DEAL_II_COMPILER_CUDA_AWARE)
+#      ifdef DEAL_II_COMPILER_CUDA_AWARE
           if (std::is_same<MemorySpaceType, MemorySpace::CUDA>::value)
             {
               cudaMemset(ghost_array.data(),

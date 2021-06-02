@@ -259,7 +259,7 @@ namespace TrilinosWrappers
 
           last_action = Insert;
         }
-#  if defined(DEBUG)
+#  ifdef DEBUG
       const Epetra_MpiComm *comm_ptr =
         dynamic_cast<const Epetra_MpiComm *>(&(v.vector->Comm()));
       Assert(comm_ptr != nullptr, ExcInternalError());
@@ -335,7 +335,7 @@ namespace TrilinosWrappers
         }
       else
         vector = std::move(actual_vec);
-#  if defined(DEBUG)
+#  ifdef DEBUG
       const Epetra_MpiComm *comm_ptr =
         dynamic_cast<const Epetra_MpiComm *>(&(vector->Comm()));
       Assert(comm_ptr != nullptr, ExcInternalError());

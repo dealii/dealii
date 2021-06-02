@@ -1017,7 +1017,7 @@ namespace Utilities
         release_unused_memory();
 
       // Next with Trilinos:
-#  if defined(DEAL_II_WITH_TRILINOS)
+#  ifdef DEAL_II_WITH_TRILINOS
       GrowingVectorMemory<
         TrilinosWrappers::MPI::Vector>::release_unused_memory();
       GrowingVectorMemory<

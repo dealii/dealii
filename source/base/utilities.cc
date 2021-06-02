@@ -914,7 +914,7 @@ namespace Utilities
 
   namespace System
   {
-#if defined(__linux__)
+#ifdef __linux__
 
     double
     get_cpu_load()
@@ -974,7 +974,7 @@ namespace Utilities
       // parsing /proc/self/stat would be a
       // lot easier, but it does not contain
       // VmHWM, so we use /status instead.
-#if defined(__linux__)
+#ifdef __linux__
       std::ifstream file("/proc/self/status");
       std::string   line;
       std::string   name;
