@@ -50,7 +50,7 @@ DEAL::blocks=1:[2]->2
 DEAL::degree=1
 DEAL::conformity= Hcurl Hdiv H1
 DEAL::unit_support_points=2
-DEAL::unit_face_support_points=0
+DEAL::unit_face_support_points=1
 DEAL::generalized_support_points=2
 DEAL::face_to_equivalent_cell_index: 0
 DEAL::face_to_cell_index: 0
@@ -76,7 +76,7 @@ DEAL::blocks=1:[3]->3
 DEAL::degree=2
 DEAL::conformity= Hcurl Hdiv H1
 DEAL::unit_support_points=3
-DEAL::unit_face_support_points=0
+DEAL::unit_face_support_points=1
 DEAL::generalized_support_points=3
 DEAL::face_to_equivalent_cell_index: 0
 DEAL::face_to_cell_index: 0
@@ -102,7 +102,7 @@ DEAL::blocks=1:[5]->5
 DEAL::degree=4
 DEAL::conformity= Hcurl Hdiv H1
 DEAL::unit_support_points=5
-DEAL::unit_face_support_points=0
+DEAL::unit_face_support_points=1
 DEAL::generalized_support_points=5
 DEAL::face_to_equivalent_cell_index: 0
 DEAL::face_to_cell_index: 0

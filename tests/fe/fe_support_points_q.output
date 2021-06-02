@@ -1,4 +1,14 @@
 
+DEAL::Q1<1> cell support points
+DEAL::0.00
+DEAL::1.00
+DEAL::Q1<1> face 0 support points
+DEAL::0.00
+DEAL::Q1<1> face 1 support points
+DEAL::1.00
+DEAL::Q1<1> cell generalized support points
+DEAL::0.00
+DEAL::1.00
 DEAL::Q1<2> cell support points
 DEAL::0.00 0.00
 DEAL::1.00 0.00
