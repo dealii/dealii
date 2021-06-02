@@ -210,7 +210,10 @@ Quadrature<0>::Quadrature(const Quadrature<1> &)
   // quadrature_points(1),
   weights(1, 1.)
   , is_tensor_product_flag(false)
-{}
+{
+  Assert(false, ExcImpossibleInDim(0));
+}
+
 
 
 template <>
