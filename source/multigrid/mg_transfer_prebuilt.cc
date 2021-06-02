@@ -346,17 +346,6 @@ MGTransferPrebuilt<VectorType>::build(
 
 
 template <typename VectorType>
-template <int dim, int spacedim>
-void
-MGTransferPrebuilt<VectorType>::build_matrices(
-  const DoFHandler<dim, spacedim> &dof_handler)
-{
-  build(dof_handler);
-}
-
-
-
-template <typename VectorType>
 void
 MGTransferPrebuilt<VectorType>::print_matrices(std::ostream &os) const
 {

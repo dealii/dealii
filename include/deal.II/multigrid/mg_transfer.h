@@ -674,15 +674,6 @@ public:
   build(const DoFHandler<dim, spacedim> &dof_handler);
 
   /**
-   * Actually build the prolongation matrices for each level.
-   *
-   * @deprecated use build() instead.
-   */
-  template <int dim, int spacedim>
-  DEAL_II_DEPRECATED void
-  build_matrices(const DoFHandler<dim, spacedim> &dof_handler);
-
-  /**
    * Prolongate a vector from level <tt>to_level-1</tt> to level
    * <tt>to_level</tt> using the embedding matrices of the underlying finite
    * element. The previous content of <tt>dst</tt> is overwritten.
