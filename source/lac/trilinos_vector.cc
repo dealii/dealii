@@ -140,11 +140,7 @@ namespace TrilinosWrappers
     {
       // When we clear the vector, reset the pointer and generate an empty
       // vector.
-#  ifdef DEAL_II_WITH_MPI
       Epetra_Map map(0, 0, Epetra_MpiComm(MPI_COMM_SELF));
-#  else
-      Epetra_Map map(0, 0, Epetra_SerialComm());
-#  endif
 
       has_ghosts  = false;
       vector      = std::make_unique<Epetra_FEVector>(map);
@@ -210,7 +206,6 @@ namespace TrilinosWrappers
           // version in case the underlying Epetra_MpiComm object is the same,
           // otherwise we might access an MPI_Comm object that has been
           // deleted
-#  ifdef DEAL_II_WITH_MPI
           const Epetra_MpiComm *my_comm =
             dynamic_cast<const Epetra_MpiComm *>(&vector->Comm());
           const Epetra_MpiComm *v_comm =
@@ -218,9 +213,6 @@ namespace TrilinosWrappers
           const bool same_communicators =
             my_comm != nullptr && v_comm != nullptr &&
             my_comm->DataPtr() == v_comm->DataPtr();
-#  else
-          const bool same_communicators = true;
-#  endif
           if (!same_communicators ||
               vector->Map().SameAs(v.vector->Map()) == false)
             {
@@ -267,7 +259,7 @@ namespace TrilinosWrappers
 
           last_action = Insert;
         }
-#  if defined(DEBUG) && defined(DEAL_II_WITH_MPI)
+#  if defined(DEBUG)
       const Epetra_MpiComm *comm_ptr =
         dynamic_cast<const Epetra_MpiComm *>(&(v.vector->Comm()));
       Assert(comm_ptr != nullptr, ExcInternalError());
@@ -343,7 +335,7 @@ namespace TrilinosWrappers
         }
       else
         vector = std::move(actual_vec);
-#  if defined(DEBUG) && defined(DEAL_II_WITH_MPI)
+#  if defined(DEBUG)
       const Epetra_MpiComm *comm_ptr =
         dynamic_cast<const Epetra_MpiComm *>(&(vector->Comm()));
       Assert(comm_ptr != nullptr, ExcInternalError());
@@ -422,7 +414,6 @@ namespace TrilinosWrappers
 
       // check equality for MPI communicators to avoid accessing a possibly
       // invalid MPI_Comm object
-#  ifdef DEAL_II_WITH_MPI
       const Epetra_MpiComm *my_comm =
         dynamic_cast<const Epetra_MpiComm *>(&vector->Comm());
       const Epetra_MpiComm *v_comm =
@@ -450,9 +441,6 @@ namespace TrilinosWrappers
       //    else
       //      same_communicators = true;
       //  }
-#  else
-      const bool same_communicators = true;
-#  endif
 
       // distinguish three cases. First case: both vectors have the same
       // layout (just need to copy the local data, not reset the memory and
@@ -612,7 +600,6 @@ namespace TrilinosWrappers
 
 
 #  ifdef DEBUG
-#    ifdef DEAL_II_WITH_MPI
       // check that every process has decided to use the same mode. This will
       // otherwise result in undefined behavior in the call to
       // GlobalAssemble().
@@ -628,7 +615,6 @@ namespace TrilinosWrappers
                "this vector was an addition or a set operation. This will "
                "prevent the compress() operation from succeeding."));
 
-#    endif
 #  endif
 
       // Now pass over the information about what we did last to the vector.
@@ -756,7 +742,6 @@ namespace TrilinosWrappers
           ++ptr;
         }
 
-#  ifdef DEAL_II_WITH_MPI
       // in parallel, check that the vector
       // is zero on _all_ processors.
       const Epetra_MpiComm *mpi_comm =
@@ -764,9 +749,6 @@ namespace TrilinosWrappers
       Assert(mpi_comm != nullptr, ExcInternalError());
       unsigned int num_nonzero = Utilities::MPI::sum(flag, mpi_comm->Comm());
       return num_nonzero == 0;
-#  else
-      return flag == 0;
-#  endif
     }
 
 
@@ -774,14 +756,12 @@ namespace TrilinosWrappers
     bool
     Vector::is_non_negative() const
     {
-#  ifdef DEAL_II_WITH_MPI
       // if this vector is a parallel one, then
       // we need to communicate to determine
       // the answer to the current
       // function. this still has to be
       // implemented
       AssertThrow(local_size() == size(), ExcNotImplemented());
-#  endif
       // get a representation of the vector and
       // loop over all the elements
       TrilinosScalar *start_ptr;

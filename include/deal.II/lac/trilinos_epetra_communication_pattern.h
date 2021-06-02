@@ -21,13 +21,11 @@
 
 #ifdef DEAL_II_WITH_TRILINOS
 
-#  ifdef DEAL_II_WITH_MPI
+#  include <deal.II/base/communication_pattern_base.h>
 
-#    include <deal.II/base/communication_pattern_base.h>
+#  include <Epetra_Import.h>
 
-#    include <Epetra_Import.h>
-
-#    include <memory>
+#  include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -89,8 +87,6 @@ namespace LinearAlgebra
 } // end of namespace LinearAlgebra
 
 DEAL_II_NAMESPACE_CLOSE
-
-#  endif
 
 #endif
 

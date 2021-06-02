@@ -26,18 +26,14 @@
 #    include <deal.II/lac/la_parallel_vector.h>
 #    include <deal.II/lac/trilinos_vector.h>
 
-#    include <memory>
-
-#    ifdef DEAL_II_WITH_MPI
-#      include <Epetra_MpiComm.h>
-#    else
-#      include <Epetra_SerialComm.h>
-#    endif
 #    include <Epetra_Map.h>
+#    include <Epetra_MpiComm.h>
 #    include <Epetra_MultiVector.h>
 #    include <Epetra_RowMatrix.h>
 #    include <Epetra_Vector.h>
 #    include <Teuchos_ParameterList.hpp>
+
+#    include <memory>
 
 // forward declarations
 #    ifndef DOXYGEN
@@ -239,11 +235,7 @@ namespace TrilinosWrappers
      * Internal communication pattern in case the matrix needs to be copied
      * from deal.II format.
      */
-#    ifdef DEAL_II_WITH_MPI
     Epetra_MpiComm communicator;
-#    else
-    Epetra_SerialComm communicator;
-#    endif
 
     /**
      * Internal Trilinos map in case the matrix needs to be copied from

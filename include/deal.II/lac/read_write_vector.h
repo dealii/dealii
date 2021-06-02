@@ -218,7 +218,6 @@ namespace LinearAlgebra
 
 
 #ifdef DEAL_II_WITH_TRILINOS
-#  ifdef DEAL_II_WITH_MPI
     /**
      * Initialize this ReadWriteVector by supplying access to all locally
      * available entries in the given ghosted or non-ghosted vector.
@@ -232,7 +231,6 @@ namespace LinearAlgebra
      */
     void
     reinit(const TrilinosWrappers::MPI::Vector &trilinos_vec);
-#  endif
 #endif
 
     /**
@@ -365,8 +363,7 @@ namespace LinearAlgebra
            const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
              &communication_pattern = {});
 
-#  ifdef DEAL_II_WITH_MPI
-#    ifdef DEAL_II_TRILINOS_WITH_TPETRA
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
     /**
      * Imports all the elements present in the vector's IndexSet from the input
      * vector @p tpetra_vec. VectorOperation::values @p operation is used to
@@ -380,7 +377,7 @@ namespace LinearAlgebra
            VectorOperation::values               operation,
            const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
              &communication_pattern = {});
-#    endif
+#  endif
 
     /**
      * Imports all the elements present in the vector's IndexSet from the input
@@ -395,7 +392,6 @@ namespace LinearAlgebra
            VectorOperation::values       operation,
            const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
              &communication_pattern = {});
-#  endif
 #endif
 
 #ifdef DEAL_II_WITH_CUDA
@@ -697,7 +693,7 @@ namespace LinearAlgebra
     void
     resize_val(const size_type new_allocated_size);
 
-#if defined(DEAL_II_WITH_TRILINOS) && defined(DEAL_II_WITH_MPI)
+#if defined(DEAL_II_WITH_TRILINOS)
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
     /**
      * Return a TpetraWrappers::CommunicationPattern and store it for future

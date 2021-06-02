@@ -17,6 +17,7 @@
 # Configuration for the trilinos library:
 #
 
+SET(FEATURE_TRILINOS_DEPENDS MPI)
 
 MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
   FIND_PACKAGE(TRILINOS)
@@ -87,37 +88,15 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
     # Trilinos has to be configured with the same MPI configuration as
     # deal.II.
     #
-    IF( (TRILINOS_WITH_MPI AND NOT DEAL_II_WITH_MPI)
-         OR
-         (NOT TRILINOS_WITH_MPI AND DEAL_II_WITH_MPI))
+    IF(NOT TRILINOS_WITH_MPI)
       MESSAGE(STATUS "Could not find a sufficient Trilinos installation: "
-        "Trilinos has to be configured with the same MPI configuration as deal.II."
+        "Trilinos has to have MPI support enabled."
         )
       SET(TRILINOS_ADDITIONAL_ERROR_STRING
         ${TRILINOS_ADDITIONAL_ERROR_STRING}
         "The Trilinos installation (found at \"${TRILINOS_DIR}\")\n"
-        "has to be configured with the same MPI configuration as deal.II, but found:\n"
-        "  DEAL_II_WITH_MPI = ${DEAL_II_WITH_MPI}\n"
+        "has to be configured with MPI support, but found:\n"
         "  TRILINOS_WITH_MPI = ${TRILINOS_WITH_MPI}\n"
-        )
-      SET(${var} FALSE)
-    ENDIF()
-
-    #
-    # deal.II has to be configured with MPI if both Trilinos and PETSc are
-    # enabled.
-    #
-    IF(DEAL_II_WITH_TRILINOS AND DEAL_II_WITH_PETSC AND NOT DEAL_II_WITH_MPI)
-      MESSAGE(STATUS "Incompatible configuration settings: "
-        "MPI must be enabled to use both Trilinos and PETSc, as both libraries "
-        "provide mutually incompatible MPI stubs."
-        )
-      SET(TRILINOS_ADDITIONAL_ERROR_STRING
-        ${TRILINOS_ADDITIONAL_ERROR_STRING}
-        "Incompatible Trilinos and PETSc libraries found. Both libraries were "
-        "configured without MPI support and cannot be used at the same time due "
-        "to incompatible MPI stub files. Either reconfigure deal.II, Trilinos, "
-        "and PETSc with MPI support, or disable one of the libraries.\n"
         )
       SET(${var} FALSE)
     ENDIF()
@@ -391,15 +370,13 @@ MACRO(FEATURE_TRILINOS_CONFIGURE_EXTERNAL)
       "TrilinosWrappers::BlockSparseMatrix")
   SET(DEAL_II_EXPAND_TRILINOS_MPI_BLOCKVECTOR "TrilinosWrappers::MPI::BlockVector")
   SET(DEAL_II_EXPAND_TRILINOS_MPI_VECTOR "TrilinosWrappers::MPI::Vector")
-  IF (TRILINOS_WITH_MPI)
-    SET(DEAL_II_EXPAND_EPETRA_VECTOR "LinearAlgebra::EpetraWrappers::Vector")
-    IF (${DEAL_II_TRILINOS_WITH_TPETRA})
-      SET(DEAL_II_EXPAND_TPETRA_VECTOR_DOUBLE "LinearAlgebra::TpetraWrappers::Vector<double>")
-      SET(DEAL_II_EXPAND_TPETRA_VECTOR_FLOAT "LinearAlgebra::TpetraWrappers::Vector<float>")
-      IF (${DEAL_II_WITH_COMPLEX_NUMBERS})
-        SET(DEAL_II_EXPAND_TPETRA_VECTOR_COMPLEX_DOUBLE "LinearAlgebra::TpetraWrappers::Vector<std::complex<double>>")
-        SET(DEAL_II_EXPAND_TPETRA_VECTOR_COMPLEX_FLOAT "LinearAlgebra::TpetraWrappers::Vector<std::complex<float>>")
-      ENDIF()
+  SET(DEAL_II_EXPAND_EPETRA_VECTOR "LinearAlgebra::EpetraWrappers::Vector")
+  IF (${DEAL_II_TRILINOS_WITH_TPETRA})
+    SET(DEAL_II_EXPAND_TPETRA_VECTOR_DOUBLE "LinearAlgebra::TpetraWrappers::Vector<double>")
+    SET(DEAL_II_EXPAND_TPETRA_VECTOR_FLOAT "LinearAlgebra::TpetraWrappers::Vector<float>")
+    IF (${DEAL_II_WITH_COMPLEX_NUMBERS})
+      SET(DEAL_II_EXPAND_TPETRA_VECTOR_COMPLEX_DOUBLE "LinearAlgebra::TpetraWrappers::Vector<std::complex<double>>")
+      SET(DEAL_II_EXPAND_TPETRA_VECTOR_COMPLEX_FLOAT "LinearAlgebra::TpetraWrappers::Vector<std::complex<float>>")
     ENDIF()
   ENDIF()
   IF(${DEAL_II_TRILINOS_WITH_SACADO})

@@ -38,19 +38,15 @@
 #    include <Epetra_Export.h>
 #    include <Epetra_FECrsMatrix.h>
 #    include <Epetra_Map.h>
+#    include <Epetra_MpiComm.h>
 #    include <Epetra_MultiVector.h>
 #    include <Epetra_Operator.h>
+#    include <mpi.h>
 
 #    include <cmath>
 #    include <memory>
 #    include <type_traits>
 #    include <vector>
-#    ifdef DEAL_II_WITH_MPI
-#      include <Epetra_MpiComm.h>
-#      include <mpi.h>
-#    else
-#      include <Epetra_SerialComm.h>
-#    endif
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -2348,11 +2344,7 @@ namespace TrilinosWrappers
          * Internal communication pattern in case the matrix needs to be copied
          * from deal.II format.
          */
-#    ifdef DEAL_II_WITH_MPI
         Epetra_MpiComm communicator;
-#    else
-        Epetra_SerialComm communicator;
-#    endif
 
         /**
          * Epetra_Map that sets the partitioning of the domain space of

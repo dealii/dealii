@@ -32,9 +32,7 @@ DEAL_II_NAMESPACE_OPEN
 namespace TrilinosWrappers
 {
   PreconditionBase::PreconditionBase()
-#  ifdef DEAL_II_WITH_MPI
     : communicator(MPI_COMM_SELF)
-#  endif
   {}
 
 
@@ -42,12 +40,8 @@ namespace TrilinosWrappers
   PreconditionBase::PreconditionBase(const PreconditionBase &base)
     : Subscriptor()
     , preconditioner(base.preconditioner)
-    ,
-#  ifdef DEAL_II_WITH_MPI
-    communicator(base.communicator)
-    ,
-#  endif
-    vector_distributor(new Epetra_Map(*base.vector_distributor))
+    , communicator(base.communicator)
+    , vector_distributor(new Epetra_Map(*base.vector_distributor))
   {}
 
 
@@ -56,9 +50,7 @@ namespace TrilinosWrappers
   PreconditionBase::clear()
   {
     preconditioner.reset();
-#  ifdef DEAL_II_WITH_MPI
     communicator = MPI_COMM_SELF;
-#  endif
     vector_distributor.reset();
   }
 
@@ -66,11 +58,7 @@ namespace TrilinosWrappers
   MPI_Comm
   PreconditionBase::get_mpi_communicator() const
   {
-#  ifdef DEAL_II_WITH_MPI
     return communicator.Comm();
-#  else
-    return MPI_COMM_SELF;
-#  endif
   }
 
 

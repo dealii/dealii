@@ -299,7 +299,7 @@ namespace LinearAlgebra
 
 
 
-#if defined(DEAL_II_WITH_TRILINOS) && defined(DEAL_II_WITH_MPI)
+#if defined(DEAL_II_WITH_TRILINOS)
   template <typename Number>
   void
   ReadWriteVector<Number>::reinit(
@@ -570,7 +570,7 @@ namespace LinearAlgebra
 
 
 
-#if defined(DEAL_II_WITH_TRILINOS) && defined(DEAL_II_WITH_MPI)
+#if defined(DEAL_II_WITH_TRILINOS)
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
   template <typename Number>
   void
@@ -1033,7 +1033,7 @@ namespace LinearAlgebra
 
 
 
-#if defined(DEAL_II_WITH_TRILINOS) && defined(DEAL_II_WITH_MPI)
+#if defined(DEAL_II_WITH_TRILINOS)
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
   template <typename Number>
   TpetraWrappers::CommunicationPattern

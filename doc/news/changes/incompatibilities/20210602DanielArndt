@@ -1,0 +1,4 @@
+Changed: Trilinos support in deal.II requires both deal.II and Trilinos to be
+configured with MPI support.
+<br>
+(Daniel Arndt, 2021/06/02)
