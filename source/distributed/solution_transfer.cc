@@ -404,6 +404,14 @@ namespace parallel
           unpack_dof_values<typename VectorType::value_type>(data_range,
                                                              dofs_per_cell);
 
+      if (std::accumulate(dof_values.begin(),
+                          dof_values.end(),
+                          0,
+                          [](const auto &a, const auto &b) {
+                            return a + b.size();
+                          }) == 0)
+        return; // no data to interpolate if all sizes equal to zero
+
       // check if sizes match
       Assert(dof_values.size() == all_out.size(), ExcInternalError());
 
