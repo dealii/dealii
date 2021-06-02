@@ -118,16 +118,16 @@ namespace internal
  * small to be seen individually) or because you only want to see a certain
  * region of the domain (for example only in the fluid part of the domain in
  * step-46), or for some other reason.
- *
- * For this, internally build_patches() does not generate the sequence of
- * cells to be converted into patches itself, but relies on the two function
- * that we'll call first_cell() and next_cell(). By default, they return the
- * first active cell, and the next active cell, respectively. But this can
- * be changed using the set_cell_selection() function that allows you to
- * replace this behavior. What set_cell_selection() wants to know is how
- * you want to pick out the first cell on which output should be generated,
- * and how given one cell on which output is generated you want to pick the
- * next cell.
+
+ * For this, internally build_patches() does not generate the sequence of cells
+ * to be converted into patches itself, but relies on the two private
+ * std::function objects first_cell_function() and next_cell_function(). By
+ * default, they return the first active cell, and the next active cell,
+ * respectively. But this can be changed using the set_cell_selection() function
+ * that allows you to replace this behavior. What set_cell_selection() wants to
+ * know is how you want to pick out the first cell on which output should be
+ * generated, and how given one cell on which output is generated you want to
+ * pick the next cell.
  *
  * This may,
  * for example, include only cells that are in parts of a domain (e.g., if you
@@ -416,35 +416,6 @@ public:
   const std::pair<FirstCellFunctionType, NextCellFunctionType>
   get_cell_selection() const;
 
-  /**
-   * Return the first cell which we want output for. The default
-   * implementation returns the first active cell, but you might want to
-   * return other cells in a derived class.
-   *
-   * @deprecated Use the set_cell_selection() function instead.
-   */
-  DEAL_II_DEPRECATED
-  virtual cell_iterator
-  first_cell();
-
-  /**
-   * Return the next cell after @p cell which we want output for.  If there
-   * are no more cells, any implementation of this function should return
-   * <tt>dof_handler->end()</tt>.
-   *
-   * The default implementation returns the next active cell, but you might
-   * want to return other cells in a derived class. Note that the default
-   * implementation assumes that the given @p cell is active, which is
-   * guaranteed as long as first_cell() is also used from the default
-   * implementation. Overloading only one of the two functions might not be a
-   * good idea.
-   *
-   * @deprecated Use the set_cell_selection() function instead.
-   */
-  DEAL_II_DEPRECATED
-  virtual cell_iterator
-  next_cell(const cell_iterator &cell);
-
 private:
   /**
    * A function object that is used to select what the first cell is going to
@@ -462,28 +433,6 @@ private:
   std::function<cell_iterator(const Triangulation<dim, spacedim> &,
                               const cell_iterator &)>
     next_cell_function;
-
-  /**
-   * Return the first cell produced by the first_cell()/next_cell() function
-   * pair that is locally owned. If this object operates on a non-distributed
-   * triangulation, the result equals what first_cell() returns.
-   *
-   * @deprecated Use the set_cell_selection() function instead.
-   */
-  DEAL_II_DEPRECATED
-  virtual cell_iterator
-  first_locally_owned_cell();
-
-  /**
-   * Return the next cell produced by the next_cell() function that is locally
-   * owned. If this object operates on a non-distributed triangulation, the
-   * result equals what first_cell() returns.
-   *
-   * @deprecated Use the set_cell_selection() function instead.
-   */
-  DEAL_II_DEPRECATED
-  virtual cell_iterator
-  next_locally_owned_cell(const cell_iterator &cell);
 
   /**
    * Build one patch. This function is called in a WorkStream context.
