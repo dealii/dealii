@@ -3153,66 +3153,12 @@ namespace FETools
 
 
   template <int dim>
-  void
-  hierarchic_to_lexicographic_numbering(const unsigned int         degree,
-                                        std::vector<unsigned int> &h2l)
-  {
-    AssertDimension(h2l.size(), Utilities::fixed_power<dim>(degree + 1));
-    h2l = hierarchic_to_lexicographic_numbering<dim>(degree);
-  }
-
-
-
-  template <int dim>
-  void
-  hierarchic_to_lexicographic_numbering(const FiniteElementData<dim> &fe,
-                                        std::vector<unsigned int> &   h2l)
-  {
-    Assert(h2l.size() == fe.n_dofs_per_cell(),
-           ExcDimensionMismatch(h2l.size(), fe.n_dofs_per_cell()));
-    hierarchic_to_lexicographic_numbering<dim>(fe.n_dofs_per_line() + 1, h2l);
-  }
-
-
-
-  template <int dim>
-  std::vector<unsigned int>
-  hierarchic_to_lexicographic_numbering(const FiniteElementData<dim> &fe)
-  {
-    Assert(fe.n_components() == 1, ExcInvalidFE());
-    return hierarchic_to_lexicographic_numbering<dim>(fe.n_dofs_per_line() + 1);
-  }
-
-
-
-  template <int dim>
   std::vector<unsigned int>
   lexicographic_to_hierarchic_numbering(const unsigned int degree)
   {
     return Utilities::invert_permutation(
       hierarchic_to_lexicographic_numbering<dim>(degree));
   }
-
-
-
-  template <int dim>
-  void
-  lexicographic_to_hierarchic_numbering(const FiniteElementData<dim> &fe,
-                                        std::vector<unsigned int> &   l2h)
-  {
-    l2h = lexicographic_to_hierarchic_numbering(fe);
-  }
-
-
-
-  template <int dim>
-  std::vector<unsigned int>
-  lexicographic_to_hierarchic_numbering(const FiniteElementData<dim> &fe)
-  {
-    return Utilities::invert_permutation(
-      hierarchic_to_lexicographic_numbering(fe));
-  }
-
 } // namespace FETools
 
 

@@ -881,38 +881,6 @@ namespace FETools
   hierarchic_to_lexicographic_numbering(unsigned int degree);
 
   /**
-   * Like the previous function but instead of returning its result as a value
-   * return it through the last argument.
-   *
-   * @deprecated Use the function that returns the renumbering in a vector
-   * instead.
-   */
-  template <int dim>
-  DEAL_II_DEPRECATED void
-  hierarchic_to_lexicographic_numbering(unsigned int               degree,
-                                        std::vector<unsigned int> &h2l);
-
-  /**
-   * Like the previous functions but using a FiniteElementData instead of the
-   * polynomial degree.
-   *
-   * @deprecated Use the function that returns the renumbering in a vector and
-   * uses the degree of the basis as an argument instead.
-   */
-  template <int dim>
-  DEAL_II_DEPRECATED void
-  hierarchic_to_lexicographic_numbering(const FiniteElementData<dim> &fe_data,
-                                        std::vector<unsigned int> &   h2l);
-
-  /**
-   * @deprecated Use the function that uses the degree of the basis as an
-   * argument instead.
-   */
-  template <int dim>
-  DEAL_II_DEPRECATED std::vector<unsigned int>
-                     hierarchic_to_lexicographic_numbering(const FiniteElementData<dim> &fe_data);
-
-  /**
    * This is the reverse function to the above one, generating the map from
    * the lexicographic to the hierarchical numbering for a given polynomial
    * degree of a continuous finite element. All the remarks made about the
@@ -921,24 +889,6 @@ namespace FETools
   template <int dim>
   std::vector<unsigned int>
   lexicographic_to_hierarchic_numbering(unsigned int degree);
-
-  /**
-   * @deprecated Use the function that returns the renumbering in a vector and
-   * uses the degree of the basis as an argument instead.
-   */
-  template <int dim>
-  DEAL_II_DEPRECATED void
-  lexicographic_to_hierarchic_numbering(const FiniteElementData<dim> &fe_data,
-                                        std::vector<unsigned int> &   l2h);
-
-  /**
-   * @deprecated Use the function that uses the degree of the basis as an
-   * argument instead.
-   */
-  template <int dim>
-  DEAL_II_DEPRECATED std::vector<unsigned int>
-                     lexicographic_to_hierarchic_numbering(const FiniteElementData<dim> &fe_data);
-
 
   /**
    * A namespace that contains functions that help setting up internal
