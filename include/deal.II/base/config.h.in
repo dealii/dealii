@@ -163,7 +163,10 @@
  * deprecated prior to a release until <em>after</em> that release has been
  * finalized - see DEAL_II_EARLY_DEPRECATIONS for more information.
  */
+#ifndef DEAL_II_DEPRECATED_EARLY
+// guard to allow user to override DEAL_II_DEPRECATED_EARLY
 #cmakedefine DEAL_II_DEPRECATED_EARLY @DEAL_II_DEPRECATED_EARLY@
+#endif
 #cmakedefine DEAL_II_FALLTHROUGH @DEAL_II_FALLTHROUGH@
 #cmakedefine DEAL_II_CONSTEXPR @DEAL_II_CONSTEXPR@
 
