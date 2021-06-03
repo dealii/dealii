@@ -395,15 +395,6 @@ public:
    */
   using value_type = Number;
 
-  /**
-   * This gives the number of elements collected in this class. In the general
-   * case, there is only one element. Specializations use SIMD intrinsics and
-   * can work on multiple elements at the same time.
-   *
-   * @deprecated Use VectorizedArrayBase::size() instead.
-   */
-  DEAL_II_DEPRECATED static const unsigned int n_array_elements = 1;
-
   static_assert(width == 1,
                 "You specified an illegal width that is not supported.");
 
@@ -696,12 +687,6 @@ private:
 
 
 
-// We need to have a separate declaration for static const members
-template <typename Number, std::size_t width>
-const unsigned int VectorizedArray<Number, width>::n_array_elements;
-
-
-
 /**
  * @name Packing and unpacking of a VectorizedArray
  */
@@ -940,13 +925,6 @@ public:
    * This gives the type of the array elements.
    */
   using value_type = double;
-
-  /**
-   * This gives the number of vectors collected in this class.
-   *
-   * @deprecated Use VectorizedArrayBase::size() instead.
-   */
-  DEAL_II_DEPRECATED static const unsigned int n_array_elements = 8;
 
   /**
    * Default empty constructor, leaving the data in an uninitialized state
@@ -1494,13 +1472,6 @@ public:
    * This gives the type of the array elements.
    */
   using value_type = float;
-
-  /**
-   * This gives the number of vectors collected in this class.
-   *
-   * @deprecated Use VectorizedArrayBase::size() instead.
-   */
-  DEAL_II_DEPRECATED static const unsigned int n_array_elements = 16;
 
   /**
    * Default empty constructor, leaving the data in an uninitialized state
@@ -2146,13 +2117,6 @@ public:
   using value_type = double;
 
   /**
-   * This gives the number of vectors collected in this class.
-   *
-   * @deprecated Use VectorizedArrayBase::size() instead.
-   */
-  DEAL_II_DEPRECATED static const unsigned int n_array_elements = 4;
-
-  /**
    * Default empty constructor, leaving the data in an uninitialized state
    * similar to float/double.
    */
@@ -2657,13 +2621,6 @@ public:
    * This gives the type of the array elements.
    */
   using value_type = float;
-
-  /**
-   * This gives the number of vectors collected in this class.
-   *
-   * @deprecated Use VectorizedArrayBase::size() instead.
-   */
-  DEAL_II_DEPRECATED static const unsigned int n_array_elements = 8;
 
   /**
    * Default empty constructor, leaving the data in an uninitialized state
@@ -3206,13 +3163,6 @@ public:
   using value_type = double;
 
   /**
-   * This gives the number of vectors collected in this class.
-   *
-   * @deprecated Use VectorizedArrayBase::size() instead.
-   */
-  DEAL_II_DEPRECATED static const unsigned int n_array_elements = 2;
-
-  /**
    * Default empty constructor, leaving the data in an uninitialized state
    * similar to float/double.
    */
@@ -3647,13 +3597,6 @@ public:
    * This gives the type of the array elements.
    */
   using value_type = float;
-
-  /**
-   * This gives the number of vectors collected in this class.
-   *
-   * @deprecated Use VectorizedArrayBase::size() instead.
-   */
-  DEAL_II_DEPRECATED static const unsigned int n_array_elements = 4;
 
   /**
    * This function can be used to set all data fields to a given scalar.
@@ -4130,13 +4073,6 @@ public:
   using value_type = double;
 
   /**
-   * This gives the number of vectors collected in this class.
-   *
-   * @deprecated Use VectorizedArrayBase::size() instead.
-   */
-  DEAL_II_DEPRECATED static const unsigned int n_array_elements = 2;
-
-  /**
    * Default empty constructor, leaving the data in an uninitialized state
    * similar to float/double.
    */
@@ -4369,13 +4305,6 @@ public:
    * This gives the type of the array elements.
    */
   using value_type = float;
-
-  /**
-   * This gives the number of vectors collected in this class.
-   *
-   * @deprecated Use VectorizedArrayBase::size() instead.
-   */
-  DEAL_II_DEPRECATED static const unsigned int n_array_elements = 4;
 
   /**
    * Default empty constructor, leaving the data in an uninitialized state
