@@ -1,0 +1,4 @@
+Removed: The deprecated member functions DataOut::first_cell() and DataOut::next_cell()
+have been removed.
+<br>
+(Daniel Arndt, 2021/06/02)

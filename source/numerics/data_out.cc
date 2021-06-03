@@ -68,16 +68,25 @@ namespace internal
 template <int dim, int spacedim>
 DataOut<dim, spacedim>::DataOut()
 {
-  // For the moment, just call the existing virtual functions. This
-  // preserves backward compatibility. When these deprecated functions are
-  // removed, we'll just inline their functionality into the lambda
-  // functions created here.
   set_cell_selection(
     [this](const Triangulation<dim, spacedim> &) {
-      return this->first_locally_owned_cell();
+      typename Triangulation<dim, spacedim>::active_cell_iterator cell =
+        this->triangulation->begin_active();
+
+      // skip cells if the current one has no children (is active) and is a
+      // ghost or artificial cell
+      while ((cell != this->triangulation->end()) && !cell->is_locally_owned())
+        ++cell;
+      return cell;
     },
-    [this](const Triangulation<dim, spacedim> &, const cell_iterator &cell) {
-      return this->next_locally_owned_cell(cell);
+    [this](const Triangulation<dim, spacedim> &,
+           const cell_iterator &old_cell) {
+      typename Triangulation<dim, spacedim>::active_cell_iterator cell =
+        old_cell;
+      ++cell;
+      while ((cell != this->triangulation->end()) && !cell->is_locally_owned())
+        ++cell;
+      return cell;
     });
 }
 
@@ -1331,60 +1340,6 @@ DataOut<dim, spacedim>::get_cell_selection() const
   return std::make_pair(first_cell_function, next_cell_function);
 }
 
-
-
-template <int dim, int spacedim>
-typename DataOut<dim, spacedim>::cell_iterator
-DataOut<dim, spacedim>::first_cell()
-{
-  return this->triangulation->begin_active();
-}
-
-
-
-template <int dim, int spacedim>
-typename DataOut<dim, spacedim>::cell_iterator
-DataOut<dim, spacedim>::next_cell(
-  const typename DataOut<dim, spacedim>::cell_iterator &cell)
-{
-  // convert the iterator to an active_iterator and advance this to the next
-  // active cell
-  typename Triangulation<dim, spacedim>::active_cell_iterator active_cell =
-    cell;
-  ++active_cell;
-  return active_cell;
-}
-
-
-
-template <int dim, int spacedim>
-typename DataOut<dim, spacedim>::cell_iterator
-DataOut<dim, spacedim>::first_locally_owned_cell()
-{
-  typename DataOut<dim, spacedim>::cell_iterator cell = first_cell();
-
-  // skip cells if the current one has no children (is active) and is a ghost
-  // or artificial cell
-  while ((cell != this->triangulation->end()) && cell->is_active() &&
-         !cell->is_locally_owned())
-    cell = next_cell(cell);
-
-  return cell;
-}
-
-
-
-template <int dim, int spacedim>
-typename DataOut<dim, spacedim>::cell_iterator
-DataOut<dim, spacedim>::next_locally_owned_cell(
-  const typename DataOut<dim, spacedim>::cell_iterator &old_cell)
-{
-  typename DataOut<dim, spacedim>::cell_iterator cell = next_cell(old_cell);
-  while ((cell != this->triangulation->end()) && cell->is_active() &&
-         !cell->is_locally_owned())
-    cell = next_cell(cell);
-  return cell;
-}
 
 
 // explicit instantiations
