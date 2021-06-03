@@ -37,7 +37,8 @@ print(DataOut<dim> &data_out, const Triangulation<dim> &tria)
   for (auto cell = p.first(tria); cell.state() == IteratorState::valid;
        cell      = p.second(tria, cell))
     {
-      deallog << " cell lvl=" << cell->level() << " active=" << cell->active()
+      deallog << " cell lvl=" << cell->level()
+              << " active=" << cell->is_active()
               << " owner=" << static_cast<int>(cell->level_subdomain_id())
               << " id=" << cell->id().to_string() << std::endl;
     }

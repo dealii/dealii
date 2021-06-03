@@ -55,7 +55,7 @@ do_test(const FiniteElement<dim> &fe_fine, const FiniteElement<dim> &fe_coarse)
     tria.refine_global();
 
     for (auto &cell : tria.active_cell_iterators())
-      if (cell->active() && cell->center()[0] < 0.5)
+      if (cell->is_active() && cell->center()[0] < 0.5)
         cell->set_refine_flag();
     tria.execute_coarsening_and_refinement();
   };
