@@ -25,6 +25,8 @@ main()
 {
   initlog();
 
+  CHECK_ALL(Q, 1, 1);
+
   CHECK_ALL(Q, 1, 2);
   CHECK_ALL(Q, 2, 2);
   CHECK_ALL(Q, 3, 2);

@@ -978,10 +978,6 @@ void
 FE_Q_Base<dim, spacedim>::initialize_unit_face_support_points(
   const std::vector<Point<1>> &points)
 {
-  // no faces in 1d, so nothing to do
-  if (dim == 1)
-    return;
-
   // TODO: the implementation makes the assumption that all faces have the
   // same number of dofs
   AssertDimension(this->n_unique_faces(), 1);
@@ -989,6 +985,11 @@ FE_Q_Base<dim, spacedim>::initialize_unit_face_support_points(
 
   this->unit_face_support_points[face_no].resize(
     Utilities::fixed_power<dim - 1>(q_degree + 1));
+
+  // In 1D, there is only one 0-dimensional support point, so there is nothing
+  // more to be done.
+  if (dim == 1)
+    return;
 
   // find renumbering of faces and assign from values of quadrature
   const std::vector<unsigned int> face_index_map =
