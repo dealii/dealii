@@ -233,22 +233,6 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
 
 #  if deal_II_dimension != 1
       template void
-      project_boundary_values_curl_conforming<deal_II_dimension>(
-        const DoFHandler<deal_II_dimension> &,
-        const unsigned int,
-        const Function<deal_II_dimension> &,
-        const types::boundary_id,
-        AffineConstraints<double> &,
-        const Mapping<deal_II_dimension> &);
-      template void
-      project_boundary_values_curl_conforming<deal_II_dimension>(
-        const DoFHandler<deal_II_dimension> &,
-        const unsigned int,
-        const Function<deal_II_dimension> &,
-        const types::boundary_id,
-        AffineConstraints<double> &,
-        const hp::MappingCollection<deal_II_dimension> &);
-      template void
       project_boundary_values_curl_conforming_l2(
         const DoFHandler<deal_II_dimension> &,
         const unsigned int,
