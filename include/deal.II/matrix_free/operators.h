@@ -1067,9 +1067,7 @@ namespace MatrixFreeOperators
     internal::CellwiseInverseMassMatrixImplTransformFromQPoints<
       dim,
       VectorizedArrayType>::template run<fe_degree>(n_actual_components,
-                                                    fe_eval.get_shape_info()
-                                                      .data.front()
-                                                      .inverse_shape_values_eo,
+                                                    fe_eval,
                                                     in_array,
                                                     out_array);
   }
