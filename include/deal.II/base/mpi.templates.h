@@ -621,7 +621,7 @@ namespace Utilities
       if (job_supports_mpi() && n_mpi_processes(comm) > 1)
         {
           // 1) perform reduction
-          const auto result = reduce(vec, comm, combiner);
+          const auto result = Utilities::MPI::reduce<T>(vec, comm, combiner);
 
           // 2) broadcast result
           return Utilities::MPI::broadcast(comm, result);
