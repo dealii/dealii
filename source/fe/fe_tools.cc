@@ -133,10 +133,6 @@ namespace FETools
     return std::make_unique<FE_DGQArbitraryNodes<3>>(quad);
   }
 
-  template void
-  hierarchic_to_lexicographic_numbering<0>(unsigned int,
-                                           std::vector<unsigned int> &);
-
   template std::vector<unsigned int>
   hierarchic_to_lexicographic_numbering<0>(unsigned int);
 
