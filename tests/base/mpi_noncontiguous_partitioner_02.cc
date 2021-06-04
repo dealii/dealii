@@ -75,7 +75,7 @@ test(const MPI_Comm &comm, const bool do_revert, const unsigned int dir)
 
   // ... has (symm)
   for (const auto &cell : dof_handler.active_cell_iterators())
-    if (cell->active() && cell->is_locally_owned())
+    if (cell->is_active() && cell->is_locally_owned())
       {
         auto c = cell->center();
         for (unsigned int i = 0; i < dim; i++)

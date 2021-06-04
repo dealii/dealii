@@ -679,11 +679,11 @@ namespace python
   CellAccessorWrapper::active() const
   {
     if ((dim == 2) && (spacedim == 2))
-      return internal::cell_cast<2, 2>(cell_accessor)->active();
+      return internal::cell_cast<2, 2>(cell_accessor)->is_active();
     else if ((dim == 2) && (spacedim == 3))
-      return internal::cell_cast<2, 3>(cell_accessor)->active();
+      return internal::cell_cast<2, 3>(cell_accessor)->is_active();
     else
-      return internal::cell_cast<3, 3>(cell_accessor)->active();
+      return internal::cell_cast<3, 3>(cell_accessor)->is_active();
   }
 
 
