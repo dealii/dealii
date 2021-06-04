@@ -691,6 +691,9 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::FEPointEvaluation(
   , update_flags(update_flags)
   , update_flags_mapping(update_default)
 {
+  AssertIndexRange(first_selected_component + n_components,
+                   fe.n_components() + 1);
+
   bool         same_base_element   = true;
   unsigned int base_element_number = 0;
   unsigned int component           = 0;
