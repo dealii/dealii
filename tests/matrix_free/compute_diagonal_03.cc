@@ -76,9 +76,7 @@ test()
                auto                quadrature_point = phi.quadrature_point(q);
                VectorizedArrayType coefficient;
 
-               for (unsigned int v = 0;
-                    v < VectorizedArrayType::n_array_elements;
-                    v++)
+               for (unsigned int v = 0; v < VectorizedArrayType::size(); v++)
                  {
                    Point<dim, Number> point;
                    for (unsigned int d = 0; d < dim; d++)

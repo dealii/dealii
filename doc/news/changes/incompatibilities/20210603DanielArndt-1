@@ -1,0 +1,4 @@
+Removed: The deprecated member variable VectorizedArray::n_array_elements has
+been removed.
+<br>
+(Daniel Arndt, 2021/06/03)
