@@ -135,7 +135,8 @@ namespace hp
   template <int dim, int q_dim, class FEValuesType>
   FEValuesBase<dim, q_dim, FEValuesType>::FEValuesBase(
     const FEValuesBase<dim, q_dim, FEValuesType> &other)
-    : fe_collection(other.fe_collection)
+    : Subscriptor(other)
+    , fe_collection(other.fe_collection)
     , mapping_collection(other.mapping_collection)
     , q_collection(other.q_collection)
     , q_collections(other.q_collections)

@@ -66,7 +66,7 @@ namespace hp
    * @ingroup hp
    */
   template <int dim, int q_dim, class FEValuesType>
-  class FEValuesBase
+  class FEValuesBase : public Subscriptor
   {
   public:
     /**
