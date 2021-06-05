@@ -178,11 +178,12 @@ namespace internal
 
     static void
     transform_from_q_points_to_basis(
-      const unsigned int                        n_components,
-      const unsigned int                        fe_degree,
-      const AlignedVector<VectorizedArrayType> &inverse_shape,
-      const VectorizedArrayType *               in_array,
-      VectorizedArrayType *                     out_array);
+      const unsigned int n_components,
+      const unsigned int fe_degree,
+      const FEEvaluationBaseData<dim, Number, false, VectorizedArrayType>
+        &                        fe_eval,
+      const VectorizedArrayType *in_array,
+      VectorizedArrayType *      out_array);
   };
 
 } // end of namespace internal

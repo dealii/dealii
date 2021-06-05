@@ -4351,12 +4351,18 @@ namespace internal
   {
     template <int fe_degree, int = 0>
     static bool
-    run(const unsigned int           n_desired_components,
-        const AlignedVector<Number> &inverse_shape,
-        const Number *               in_array,
-        Number *                     out_array,
+    run(const unsigned int                  n_desired_components,
+        const FEEvaluationBaseData<dim,
+                                   typename Number::value_type,
+                                   false,
+                                   Number> &fe_eval,
+        const Number *                      in_array,
+        Number *                            out_array,
         typename std::enable_if<fe_degree != -1>::type * = nullptr)
     {
+      const AlignedVector<Number> &inverse_shape =
+        fe_eval.get_shape_info().data.front().inverse_shape_values_eo;
+
       constexpr unsigned int dofs_per_cell = Utilities::pow(fe_degree + 1, dim);
       internal::EvaluatorTensorProduct<internal::evaluate_evenodd,
                                        dim,
@@ -4391,14 +4397,54 @@ namespace internal
 
     template <int fe_degree, int = 0>
     static bool
-    run(const unsigned int,
-        const AlignedVector<Number> &,
-        const Number *,
-        Number *,
+    run(const unsigned int                  n_desired_components,
+        const FEEvaluationBaseData<dim,
+                                   typename Number::value_type,
+                                   false,
+                                   Number> &fe_eval,
+        const Number *                      in_array,
+        Number *                            out_array,
         typename std::enable_if<fe_degree == -1>::type * = nullptr)
     {
       static_assert(fe_degree == -1, "Only usable for degree -1");
-      Assert(false, ExcNotImplemented());
+
+      const AlignedVector<Number> &inverse_shape =
+        fe_eval.get_shape_info().data.front().inverse_shape_values;
+
+      const unsigned int dofs_per_component =
+        fe_eval.get_shape_info().dofs_per_component_on_cell;
+      const unsigned int n_q_points = fe_eval.get_shape_info().n_q_points;
+
+      internal::
+        EvaluatorTensorProduct<internal::evaluate_general, dim, 0, 0, Number>
+          evaluator(inverse_shape,
+                    AlignedVector<Number>(),
+                    AlignedVector<Number>(),
+                    fe_eval.get_shape_info().data.front().fe_degree + 1,
+                    fe_eval.get_shape_info().data.front().n_q_points_1d);
+
+      auto temp_1 = fe_eval.get_scratch_data().begin();
+      auto temp_2 = temp_1 + std::max(n_q_points, dofs_per_component);
+
+      for (unsigned int d = 0; d < n_desired_components; ++d)
+        {
+          const Number *in  = in_array + d * n_q_points;
+          Number *      out = out_array + d * dofs_per_component;
+
+          if (dim == 3)
+            {
+              evaluator.template values<2, false, false>(in, temp_1);
+              evaluator.template values<1, false, false>(temp_1, temp_2);
+              evaluator.template values<0, false, false>(temp_2, out);
+            }
+          if (dim == 2)
+            {
+              evaluator.template values<1, false, false>(in, temp_1);
+              evaluator.template values<0, false, false>(temp_1, out);
+            }
+          if (dim == 1)
+            evaluator.template values<0, false, false>(in, out);
+        }
       return false;
     }
   };
