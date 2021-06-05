@@ -152,8 +152,6 @@ namespace RepartitioningPolicyTools
           owning_ranks_of_coarse_cells[is_coarse.index_within_set(
             cell_id_translator.translate(cell))];
 
-    partition.update_ghost_values();
-
     return partition;
   }
 
@@ -218,8 +216,6 @@ namespace RepartitioningPolicyTools
 
     for (const auto i : partition.locally_owned_elements())
       partition[i] = convert(i);
-
-    partition.update_ghost_values();
 
     return partition;
   }

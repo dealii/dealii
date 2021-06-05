@@ -750,6 +750,12 @@ namespace TriangulationDescription
         AssertDimension(partition.local_size(), 0);
 #endif
 
+      if (partition.size() == 0)
+        return create_description_from_triangulation(tria,
+                                                     tria.get_communicator());
+
+      partition.update_ghost_values();
+
       // 1) determine processes owning locally owned cells
       const std::vector<unsigned int> relevant_processes = [&]() {
         std::set<unsigned int> relevant_processes;

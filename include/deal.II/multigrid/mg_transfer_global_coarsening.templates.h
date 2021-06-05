@@ -2357,26 +2357,13 @@ namespace MGTransferGlobalCoarseningTools
     else
       {
         // create triangulation description
-        TriangulationDescription::Description<dim, spacedim> construction_data;
-
-        if (repartition_fine_triangulation == true)
-          {
-            const auto partition = policy.partition(*fine_triangulation);
-
-            construction_data =
-              (partition.size() == 0) ?
-                TriangulationDescription::Utilities::
-                  create_description_from_triangulation(*fine_triangulation,
-                                                        comm) :
-                construction_data = TriangulationDescription::Utilities::
-                  create_description_from_triangulation(*fine_triangulation,
-                                                        partition);
-          }
-        else
-          {
-            construction_data = TriangulationDescription::Utilities::
+        const auto construction_data =
+          repartition_fine_triangulation ?
+            TriangulationDescription::Utilities::
+              create_description_from_triangulation(
+                *fine_triangulation, policy.partition(*fine_triangulation)) :
+            TriangulationDescription::Utilities::
               create_description_from_triangulation(*fine_triangulation, comm);
-          }
 
         // create new triangulation
         const auto new_fine_triangulation = std::make_shared<
@@ -2411,19 +2398,10 @@ namespace MGTransferGlobalCoarseningTools
         // coarsen mesh
         temp_triangulation_ptr->coarsen_global();
 
-        // perform partition
-        const auto partition = policy.partition(*temp_triangulation_ptr);
-        partition.update_ghost_values();
-
         // create triangulation description
-        const auto construction_data =
-          partition.size() == 0 ?
-            TriangulationDescription::Utilities::
-              create_description_from_triangulation(*temp_triangulation_ptr,
-                                                    comm) :
-            TriangulationDescription::Utilities::
-              create_description_from_triangulation(*temp_triangulation_ptr,
-                                                    partition);
+        const auto construction_data = TriangulationDescription::Utilities::
+          create_description_from_triangulation(
+            *temp_triangulation_ptr, policy.partition(*temp_triangulation_ptr));
 
         // create new triangulation
         const auto level_triangulation = std::make_shared<
