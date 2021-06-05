@@ -110,7 +110,13 @@ namespace MGTransferGlobalCoarseningTools
 
   /**
    * Similar to the above function but also taking a @p policy for
-   * repartitioning the triangulations on the coarser levels.
+   * repartitioning the triangulations on the coarser levels. If
+   * @p preserve_fine_triangulation is set, the input triangulation is not
+   * altered,
+   * else the triangulation is coarsened. If @p repartition_fine_triangulation
+   * is set, the triangulation on the finest level is repartitioned as well. If
+   * the flags are set to true/false, the input triangulation is simply used as
+   * the finest triangulation.
    *
    * @note For convenience, a reference to the input triangulation is stored in
    *   the last entry of the return vector.
@@ -121,8 +127,22 @@ namespace MGTransferGlobalCoarseningTools
   template <int dim, int spacedim>
   std::vector<std::shared_ptr<const Triangulation<dim, spacedim>>>
   create_geometric_coarsening_sequence(
+    Triangulation<dim, spacedim> &                        tria,
+    const RepartitioningPolicyTools::Base<dim, spacedim> &policy,
+    const bool preserve_fine_triangulation,
+    const bool repartition_fine_triangulation);
+
+  /**
+   * Similar to the above function but taking in a constant version of
+   * @p tria and as a consequence not allowing to directly use it for
+   * coarsening, requiring that internally a temporal copy is created.
+   */
+  template <int dim, int spacedim>
+  std::vector<std::shared_ptr<const Triangulation<dim, spacedim>>>
+  create_geometric_coarsening_sequence(
     const Triangulation<dim, spacedim> &                  tria,
-    const RepartitioningPolicyTools::Base<dim, spacedim> &policy);
+    const RepartitioningPolicyTools::Base<dim, spacedim> &policy,
+    const bool repartition_fine_triangulation = false);
 
 } // namespace MGTransferGlobalCoarseningTools
 

@@ -2317,27 +2317,22 @@ namespace MGTransferGlobalCoarseningTools
   template <int dim, int spacedim>
   std::vector<std::shared_ptr<const Triangulation<dim, spacedim>>>
   create_geometric_coarsening_sequence(
-    const Triangulation<dim, spacedim> &                  fine_triangulation_in,
-    const RepartitioningPolicyTools::Base<dim, spacedim> &policy)
+    Triangulation<dim, spacedim> &                        fine_triangulation_in,
+    const RepartitioningPolicyTools::Base<dim, spacedim> &policy,
+    const bool keep_fine_triangulation,
+    const bool repartition_fine_triangulation)
   {
     std::vector<std::shared_ptr<const Triangulation<dim, spacedim>>>
       coarse_grid_triangulations(fine_triangulation_in.n_global_levels());
 
-    coarse_grid_triangulations.back().reset(&fine_triangulation_in, [](auto *) {
-      // empty deleter, since fine_triangulation_in is an external field and its
-      // destructor is called somewhere else
-    });
-
-    // for a single level nothing has to be done
-    if (fine_triangulation_in.n_global_levels() == 1)
-      return coarse_grid_triangulations;
-
 #ifndef DEAL_II_WITH_P4EST
     Assert(false, ExcNotImplemented());
     (void)policy;
+    (void)keep_fine_triangulation;
+    (void)repartition_fine_triangulation;
 #else
     const auto fine_triangulation =
-      dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim> *>(
+      dynamic_cast<parallel::distributed::Triangulation<dim, spacedim> *>(
         &fine_triangulation_in);
 
     Assert(fine_triangulation, ExcNotImplemented());
@@ -2347,7 +2342,66 @@ namespace MGTransferGlobalCoarseningTools
     parallel::distributed::Triangulation<dim, spacedim> temp_triangulation(
       comm, fine_triangulation->get_mesh_smoothing());
 
-    temp_triangulation.copy_triangulation(*fine_triangulation);
+    if (keep_fine_triangulation == true &&
+        repartition_fine_triangulation == false)
+      {
+        coarse_grid_triangulations.back().reset(&fine_triangulation_in,
+                                                [](auto *) {
+                                                  // empty deleter, since
+                                                  // fine_triangulation_in is an
+                                                  // external field and its
+                                                  // destructor is called
+                                                  // somewhere else
+                                                });
+      }
+    else
+      {
+        // create triangulation description
+        TriangulationDescription::Description<dim, spacedim> construction_data;
+
+        if (repartition_fine_triangulation == true)
+          {
+            const auto partition = policy.partition(*fine_triangulation);
+
+            construction_data =
+              (partition.size() == 0) ?
+                TriangulationDescription::Utilities::
+                  create_description_from_triangulation(*fine_triangulation,
+                                                        comm) :
+                construction_data = TriangulationDescription::Utilities::
+                  create_description_from_triangulation(*fine_triangulation,
+                                                        partition);
+          }
+        else
+          {
+            construction_data = TriangulationDescription::Utilities::
+              create_description_from_triangulation(*fine_triangulation, comm);
+          }
+
+        // create new triangulation
+        const auto new_fine_triangulation = std::make_shared<
+          parallel::fullydistributed::Triangulation<dim, spacedim>>(comm);
+
+        for (const auto i : fine_triangulation->get_manifold_ids())
+          if (i != numbers::flat_manifold_id)
+            new_fine_triangulation->set_manifold(
+              i, fine_triangulation->get_manifold(i));
+
+        new_fine_triangulation->create_triangulation(construction_data);
+
+        // save mesh
+        coarse_grid_triangulations.back() = new_fine_triangulation;
+      }
+
+    // for a single level nothing has to be done
+    if (fine_triangulation_in.n_global_levels() == 1)
+      return coarse_grid_triangulations;
+
+    if (keep_fine_triangulation == true)
+      temp_triangulation.copy_triangulation(*fine_triangulation);
+
+    auto *temp_triangulation_ptr =
+      keep_fine_triangulation ? &temp_triangulation : fine_triangulation;
 
     const unsigned int max_level = fine_triangulation->n_global_levels() - 1;
 
@@ -2355,19 +2409,20 @@ namespace MGTransferGlobalCoarseningTools
     for (unsigned int l = max_level; l > 0; --l)
       {
         // coarsen mesh
-        temp_triangulation.coarsen_global();
+        temp_triangulation_ptr->coarsen_global();
 
         // perform partition
-        const auto partition = policy.partition(temp_triangulation);
+        const auto partition = policy.partition(*temp_triangulation_ptr);
         partition.update_ghost_values();
 
         // create triangulation description
         const auto construction_data =
           partition.size() == 0 ?
             TriangulationDescription::Utilities::
-              create_description_from_triangulation(temp_triangulation, comm) :
+              create_description_from_triangulation(*temp_triangulation_ptr,
+                                                    comm) :
             TriangulationDescription::Utilities::
-              create_description_from_triangulation(temp_triangulation,
+              create_description_from_triangulation(*temp_triangulation_ptr,
                                                     partition);
 
         // create new triangulation
@@ -2388,6 +2443,24 @@ namespace MGTransferGlobalCoarseningTools
 
     return coarse_grid_triangulations;
   }
+
+
+
+  template <int dim, int spacedim>
+  std::vector<std::shared_ptr<const Triangulation<dim, spacedim>>>
+  create_geometric_coarsening_sequence(
+    const Triangulation<dim, spacedim> &                  fine_triangulation_in,
+    const RepartitioningPolicyTools::Base<dim, spacedim> &policy,
+    const bool repartition_fine_triangulation)
+  {
+    // remove const and convert it to flag
+    return create_geometric_coarsening_sequence(
+      const_cast<Triangulation<dim, spacedim> &>(fine_triangulation_in),
+      policy,
+      true,
+      repartition_fine_triangulation);
+  }
+
 } // namespace MGTransferGlobalCoarseningTools
 
 
