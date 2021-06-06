@@ -1064,12 +1064,24 @@ namespace MatrixFreeOperators
                                      const VectorizedArrayType *in_array,
                                      VectorizedArrayType *      out_array) const
   {
-    internal::CellwiseInverseMassMatrixImplTransformFromQPoints<
-      dim,
-      VectorizedArrayType>::template run<fe_degree>(n_actual_components,
-                                                    fe_eval,
-                                                    in_array,
-                                                    out_array);
+    const auto n_q_points_1d = fe_eval.get_shape_info().data[0].n_q_points_1d;
+
+    if (fe_degree > -1 && (fe_degree + 1 == n_q_points_1d))
+      internal::CellwiseInverseMassMatrixImplTransformFromQPoints<
+        dim,
+        VectorizedArrayType>::template run<fe_degree,
+                                           fe_degree + 1>(n_actual_components,
+                                                          fe_eval,
+                                                          in_array,
+                                                          out_array);
+    else
+      internal::CellwiseInverseMassFactory<dim, Number, VectorizedArrayType>::
+        transform_from_q_points_to_basis(n_actual_components,
+                                         fe_degree,
+                                         n_q_points_1d,
+                                         fe_eval,
+                                         in_array,
+                                         out_array);
   }
 
 

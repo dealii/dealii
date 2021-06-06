@@ -389,6 +389,7 @@ namespace internal
     transform_from_q_points_to_basis(
       const unsigned int n_components,
       const unsigned int fe_degree,
+      const unsigned int n_q_points_1d,
       const FEEvaluationBaseData<dim, Number, false, VectorizedArrayType>
         &                        fe_eval,
       const VectorizedArrayType *in_array,
@@ -398,7 +399,7 @@ namespace internal
       1,
       CellwiseInverseMassMatrixImplTransformFromQPoints<dim,
                                                         VectorizedArrayType>>(
-      fe_degree, fe_degree + 1, n_components, fe_eval, in_array, out_array);
+      fe_degree, n_q_points_1d, n_components, fe_eval, in_array, out_array);
   }
 
 } // end of namespace internal
