@@ -378,16 +378,18 @@ namespace Particles
   {
     const unsigned int active_cell_index = particle->active_cell_index;
 
-    if (particles[active_cell_index].size() > 1)
+    particle_container &container = *(particle->particles);
+
+    if (container[active_cell_index].size() > 1)
       {
-        particles[active_cell_index][particle->particle_index_within_cell] =
+        container[active_cell_index][particle->particle_index_within_cell] =
           std::move(particles[active_cell_index].back());
-        particles[active_cell_index].resize(
+        container[active_cell_index].resize(
           particles[active_cell_index].size() - 1);
       }
     else
       {
-        particles[active_cell_index].clear();
+        container[active_cell_index].clear();
       }
 
     --local_number_of_particles;
@@ -1031,6 +1033,9 @@ namespace Particles
 
     std::vector<particle_iterator> particles_out_of_cell;
 
+    // Reserve some space for particles that need sorting to avoid frequent
+    // re-allocation. Guess 25% of particles need sorting. Balance memory
+    // overhead and performance.
     particles_out_of_cell.reserve(n_locally_owned_particles() / 4);
 
     // Now update the reference locations of the moved particles
@@ -1109,12 +1114,13 @@ namespace Particles
             &*triangulation))
       ghost_owners = parallel_triangulation->ghost_owners();
 
+    // Reserve some space for particles that need communication to avoid
+    // frequent re-allocation. Guess 25% of particles out of their old cell need
+    // communication. Balance memory overhead and performance.
     for (const auto &ghost_owner : ghost_owners)
-      moved_particles[ghost_owner].reserve(
-        static_cast<vector_size>(particles_out_of_cell.size() * 0.25));
+      moved_particles[ghost_owner].reserve(particles_out_of_cell.size() / 4);
     for (const auto &ghost_owner : ghost_owners)
-      moved_cells[ghost_owner].reserve(
-        static_cast<vector_size>(particles_out_of_cell.size() * 0.25));
+      moved_cells[ghost_owner].reserve(particles_out_of_cell.size() / 4);
 
     {
       // Create a map from vertices to adjacent cells using grid cache
