@@ -35,26 +35,38 @@ namespace
   std::vector<unsigned int>
   get_dpo_vector_fe_p(const unsigned int dim, const unsigned int degree)
   {
-    std::vector<unsigned int> dpo(dim + 1, 0U);
+    Assert(degree == 1 || degree == 2, ExcNotImplemented());
 
-    if (degree == 1)
+    switch (dim)
       {
-        // one dof at each vertex
-        dpo[0] = 1;
-      }
-    else if (degree == 2)
-      {
-        // one dof at each vertex and in the middle of each line
-        dpo[0] = 1;
-        dpo[1] = 1;
-        dpo[2] = 0;
-      }
-    else
-      {
-        Assert(false, ExcNotImplemented());
+        case 1:
+          switch (degree)
+            {
+              case 1:
+                return {1, 0};
+              case 2:
+                return {1, 1};
+            }
+        case 2:
+          switch (degree)
+            {
+              case 1:
+                return {1, 0, 0};
+              case 2:
+                return {1, 1, 0};
+            }
+        case 3:
+          switch (degree)
+            {
+              case 1:
+                return {1, 0, 0, 0};
+              case 2:
+                return {1, 1, 0, 0};
+            }
       }
 
-    return dpo;
+    Assert(false, ExcNotImplemented());
+    return {};
   }
 
   /**
