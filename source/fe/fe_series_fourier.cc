@@ -223,20 +223,6 @@ namespace FESeries
 
 
   template <int dim, int spacedim>
-  Fourier<dim, spacedim>::Fourier(
-    const unsigned int                     n_coefficients_per_direction,
-    const hp::FECollection<dim, spacedim> &fe_collection,
-    const hp::QCollection<dim> &           q_collection)
-    : Fourier<dim, spacedim>(
-        std::vector<unsigned int>(fe_collection.size(),
-                                  n_coefficients_per_direction),
-        fe_collection,
-        q_collection)
-  {}
-
-
-
-  template <int dim, int spacedim>
   inline bool
   Fourier<dim, spacedim>::
   operator==(const Fourier<dim, spacedim> &fourier) const
