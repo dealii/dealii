@@ -103,11 +103,18 @@ namespace MGTools
    * and
    * @ref DoFTools
    */
-  template <int dim, typename SparsityPatternType, int spacedim>
+  template <int dim,
+            int spacedim,
+            typename SparsityPatternType,
+            typename number = double>
   void
-  make_flux_sparsity_pattern(const DoFHandler<dim, spacedim> &dof_handler,
-                             SparsityPatternType &            sparsity,
-                             const unsigned int               level);
+  make_flux_sparsity_pattern(
+    const DoFHandler<dim, spacedim> &dof_handler,
+    SparsityPatternType &            sparsity,
+    const unsigned int               level,
+    const AffineConstraints<number> &constraints = AffineConstraints<number>(),
+    const bool                       keep_constrained_dofs = true);
+
 
   /**
    * Create sparsity pattern for the fluxes at refinement edges. The matrix
