@@ -295,66 +295,6 @@ namespace Utilities
 
 
 
-    /**
-     * A re-implementation of compute_point_to_point_communication_pattern
-     * using a ConsensusAlgorithm.
-     */
-    class ConsensusAlgorithmsProcessTargets
-      : public ConsensusAlgorithms::Process<unsigned int, unsigned int>
-    {
-    public:
-      ConsensusAlgorithmsProcessTargets(const std::vector<unsigned int> &target)
-        : target(target)
-      {}
-
-      using T1 = unsigned int;
-      using T2 = unsigned int;
-
-      virtual void
-      answer_request(const unsigned int other_rank,
-                     const std::vector<T1> &,
-                     std::vector<T2> &) override
-      {
-        this->sources.push_back(other_rank);
-      }
-
-      /**
-       * Simply return the user-provided list.
-       *
-       * @return List of processes this process wants to send requests to.
-       */
-      virtual std::vector<unsigned int>
-      compute_targets() override
-      {
-        return target;
-      }
-
-      /**
-       * The result of the consensus algorithm.
-       * @return Sorted list of ranks of processes wanting to send a request to
-       *         this process.
-       */
-      std::vector<unsigned int>
-      get_result()
-      {
-        std::sort(sources.begin(), sources.end());
-        return sources;
-      }
-
-    private:
-      /**
-       * List of processes this process wants to send requests to.
-       */
-      const std::vector<unsigned int> &target;
-
-      /**
-       * List of ranks of processes wanting to send a request to this process.
-       */
-      std::vector<unsigned int> sources;
-    };
-
-
-
     std::vector<unsigned int>
     compute_point_to_point_communication_pattern(
       const MPI_Comm &                 mpi_comm,
@@ -373,12 +313,11 @@ namespace Utilities
 
 #  if DEAL_II_MPI_VERSION_GTE(3, 0)
 
-      ConsensusAlgorithmsProcessTargets process(destinations);
-      ConsensusAlgorithms::NBX<ConsensusAlgorithmsProcessTargets::T1,
-                               ConsensusAlgorithmsProcessTargets::T2>
-        consensus_algorithm(process, mpi_comm);
-      consensus_algorithm.run();
-      return process.get_result();
+      ConsensusAlgorithms::AnonymousProcess<char, char> process(
+        [&]() { return destinations; });
+      ConsensusAlgorithms::NBX<char, char> consensus_algorithm(process,
+                                                               mpi_comm);
+      return consensus_algorithm.run();
 
 #  elif DEAL_II_MPI_VERSION_GTE(2, 2)
 
@@ -498,60 +437,9 @@ namespace Utilities
       const MPI_Comm &                 mpi_comm,
       const std::vector<unsigned int> &destinations)
     {
-      const unsigned int n_procs = Utilities::MPI::n_mpi_processes(mpi_comm);
-
-      for (const unsigned int destination : destinations)
-        {
-          (void)destination;
-          AssertIndexRange(destination, n_procs);
-          Assert(destination != Utilities::MPI::this_mpi_process(mpi_comm),
-                 ExcMessage(
-                   "There is no point in communicating with ourselves."));
-        }
-
-      // Calculate the number of messages to send to each process
-      std::vector<unsigned int> dest_vector(n_procs);
-      for (const auto &el : destinations)
-        ++dest_vector[el];
-
-#  if DEAL_II_MPI_VERSION_GTE(2, 2)
-      // Find out how many processes will send to this one
-      // MPI_Reduce_scatter(_block) does exactly this
-      unsigned int n_recv_from = 0;
-
-      const int ierr = MPI_Reduce_scatter_block(
-        dest_vector.data(), &n_recv_from, 1, MPI_UNSIGNED, MPI_SUM, mpi_comm);
-
-      AssertThrowMPI(ierr);
-
-      return n_recv_from;
-#  else
-      // Find out how many processes will send to this one
-      // by reducing with sum and then scattering the
-      // results over all processes
-      std::vector<unsigned int> buffer(dest_vector.size());
-      unsigned int              n_recv_from = 0;
-
-      int ierr = MPI_Reduce(dest_vector.data(),
-                            buffer.data(),
-                            dest_vector.size(),
-                            MPI_UNSIGNED,
-                            MPI_SUM,
-                            0,
-                            mpi_comm);
-      AssertThrowMPI(ierr);
-      ierr = MPI_Scatter(buffer.data(),
-                         1,
-                         MPI_UNSIGNED,
-                         &n_recv_from,
-                         1,
-                         MPI_UNSIGNED,
-                         0,
-                         mpi_comm);
-      AssertThrowMPI(ierr);
-
-      return n_recv_from;
-#  endif
+      return compute_point_to_point_communication_pattern(mpi_comm,
+                                                          destinations)
+        .size();
     }
 
 
