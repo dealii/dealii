@@ -51,6 +51,11 @@ namespace RepartitioningPolicyTools
      */
     virtual LinearAlgebra::distributed::Vector<double>
     partition(const Triangulation<dim, spacedim> &tria_coarse_in) const = 0;
+
+    /**
+     * Destructor.
+     */
+    virtual ~Base() = default;
   };
 
   /**
