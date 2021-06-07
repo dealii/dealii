@@ -31,19 +31,15 @@
 #  include <deal.II/lac/vector_type_traits.h>
 
 #  include <Epetra_ConfigDefs.h>
+#  include <Epetra_FEVector.h>
+#  include <Epetra_LocalMap.h>
+#  include <Epetra_Map.h>
+#  include <Epetra_MpiComm.h>
+#  include <mpi.h>
 
 #  include <memory>
 #  include <utility>
 #  include <vector>
-#  ifdef DEAL_II_WITH_MPI // only if MPI is installed
-#    include <Epetra_MpiComm.h>
-#    include <mpi.h>
-#  else
-#    include <Epetra_SerialComm.h>
-#  endif
-#  include <Epetra_FEVector.h>
-#  include <Epetra_LocalMap.h>
-#  include <Epetra_Map.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -2167,17 +2163,9 @@ namespace TrilinosWrappers
     {
       static MPI_Comm comm;
 
-#    ifdef DEAL_II_WITH_MPI
-
       const Epetra_MpiComm *mpi_comm =
         dynamic_cast<const Epetra_MpiComm *>(&vector->Map().Comm());
       comm = mpi_comm->Comm();
-
-#    else
-
-      comm = MPI_COMM_SELF;
-
-#    endif
 
       return comm;
     }

@@ -16,7 +16,6 @@
 #include <deal.II/lac/trilinos_tpetra_vector.templates.h>
 
 #ifdef DEAL_II_TRILINOS_WITH_TPETRA
-#  ifdef DEAL_II_WITH_MPI
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -26,14 +25,13 @@ namespace LinearAlgebra
   {
     template class Vector<float>;
     template class Vector<double>;
-#    ifdef DEAL_II_WITH_COMPLEX_VALUES
+#  ifdef DEAL_II_WITH_COMPLEX_VALUES
     template class Vector<std::complex<float>>;
     template class Vector<std::complex<double>>;
-#    endif
+#  endif
   } // namespace TpetraWrappers
 } // namespace LinearAlgebra
 
 DEAL_II_NAMESPACE_CLOSE
 
-#  endif
 #endif

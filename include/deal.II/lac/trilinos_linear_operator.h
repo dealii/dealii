@@ -18,7 +18,7 @@
 
 #include <deal.II/base/config.h>
 
-#if defined(DEAL_II_WITH_TRILINOS)
+#ifdef DEAL_II_WITH_TRILINOS
 
 #  include <deal.II/lac/block_linear_operator.h>
 #  include <deal.II/lac/linear_operator.h>

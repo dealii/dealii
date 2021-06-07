@@ -942,17 +942,10 @@ namespace TrilinosWrappers
   MPI_Comm
   SparsityPattern::get_mpi_communicator() const
   {
-#  ifdef DEAL_II_WITH_MPI
-
     const Epetra_MpiComm *mpi_comm =
       dynamic_cast<const Epetra_MpiComm *>(&graph->RangeMap().Comm());
     Assert(mpi_comm != nullptr, ExcInternalError());
     return mpi_comm->Comm();
-#  else
-
-    return MPI_COMM_SELF;
-
-#  endif
   }
 
 

@@ -22,19 +22,17 @@
 
 #ifdef DEAL_II_TRILINOS_WITH_TPETRA
 
-#  ifdef DEAL_II_WITH_MPI
+#  include <deal.II/base/index_set.h>
 
-#    include <deal.II/base/index_set.h>
+#  include <deal.II/lac/read_write_vector.h>
 
-#    include <deal.II/lac/read_write_vector.h>
+#  include <boost/io/ios_state.hpp>
 
-#    include <boost/io/ios_state.hpp>
+#  include <Teuchos_DefaultMpiComm.hpp>
+#  include <Tpetra_Import_def.hpp>
+#  include <Tpetra_Map_def.hpp>
 
-#    include <Teuchos_DefaultMpiComm.hpp>
-#    include <Tpetra_Import_def.hpp>
-#    include <Tpetra_Map_def.hpp>
-
-#    include <memory>
+#  include <memory>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -683,8 +681,6 @@ namespace LinearAlgebra
 } // namespace LinearAlgebra
 
 DEAL_II_NAMESPACE_CLOSE
-
-#  endif
 
 #endif
 

@@ -28,16 +28,12 @@
 
 #    include <Epetra_FECrsGraph.h>
 #    include <Epetra_Map.h>
+#    include <Epetra_MpiComm.h>
+#    include <mpi.h>
 
 #    include <cmath>
 #    include <memory>
 #    include <vector>
-#    ifdef DEAL_II_WITH_MPI
-#      include <Epetra_MpiComm.h>
-#      include <mpi.h>
-#    else
-#      include <Epetra_SerialComm.h>
-#    endif
 
 
 DEAL_II_NAMESPACE_OPEN

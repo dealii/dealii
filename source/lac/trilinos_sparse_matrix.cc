@@ -76,7 +76,6 @@ namespace TrilinosWrappers
       return V.end();
     }
 
-#  ifdef DEAL_II_WITH_MPI
     template <>
     double *
     begin(LinearAlgebra::EpetraWrappers::Vector &V)
@@ -105,7 +104,7 @@ namespace TrilinosWrappers
       return V.trilinos_vector()[0] + V.trilinos_vector().MyLength();
     }
 
-#    ifdef DEAL_II_TRILINOS_WITH_TPETRA
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
     template <typename Number>
     Number *
     begin(LinearAlgebra::TpetraWrappers::Vector<Number> &V)
@@ -135,7 +134,6 @@ namespace TrilinosWrappers
       return V.trilinos_vector().getData().get() +
              V.trilinos_vector().getLocalLength();
     }
-#    endif
 #  endif
   } // namespace internal
 
@@ -2306,17 +2304,10 @@ namespace TrilinosWrappers
   MPI_Comm
   SparseMatrix::get_mpi_communicator() const
   {
-#  ifdef DEAL_II_WITH_MPI
-
     const Epetra_MpiComm *mpi_comm =
       dynamic_cast<const Epetra_MpiComm *>(&matrix->RangeMap().Comm());
     Assert(mpi_comm != nullptr, ExcInternalError());
     return mpi_comm->Comm();
-#  else
-
-    return MPI_COMM_SELF;
-
-#  endif
   }
 } // namespace TrilinosWrappers
 
@@ -2325,35 +2316,13 @@ namespace TrilinosWrappers
 {
   namespace internal
   {
-    namespace
-    {
-#  ifndef DEAL_II_WITH_MPI
-      Epetra_Map
-      make_serial_Epetra_map(const IndexSet &serial_partitioning)
-      {
-        // See IndexSet::make_trilinos_map
-        return Epetra_Map(
-          TrilinosWrappers::types::int_type(serial_partitioning.size()),
-          TrilinosWrappers::types::int_type(serial_partitioning.n_elements()),
-          0,
-          Epetra_SerialComm());
-      }
-#  endif
-    } // namespace
-
     namespace LinearOperatorImplementation
     {
       TrilinosPayload::TrilinosPayload()
         : use_transpose(false)
-        ,
-#  ifdef DEAL_II_WITH_MPI
-        communicator(MPI_COMM_SELF)
+        , communicator(MPI_COMM_SELF)
         , domain_map(IndexSet().make_trilinos_map(communicator.Comm()))
         , range_map(IndexSet().make_trilinos_map(communicator.Comm()))
-#  else
-        domain_map(internal::make_serial_Epetra_map(IndexSet()))
-        , range_map(internal::make_serial_Epetra_map(IndexSet()))
-#  endif
       {
         vmult = [](Range &, const Domain &) {
           Assert(false,
@@ -2386,21 +2355,13 @@ namespace TrilinosWrappers
         const TrilinosWrappers::SparseMatrix &matrix_exemplar,
         const TrilinosWrappers::SparseMatrix &matrix)
         : use_transpose(matrix_exemplar.trilinos_matrix().UseTranspose())
-        ,
-#  ifdef DEAL_II_WITH_MPI
-        communicator(matrix_exemplar.get_mpi_communicator())
+        , communicator(matrix_exemplar.get_mpi_communicator())
         , domain_map(
             matrix_exemplar.locally_owned_domain_indices().make_trilinos_map(
               communicator.Comm()))
         , range_map(
             matrix_exemplar.locally_owned_range_indices().make_trilinos_map(
               communicator.Comm()))
-#  else
-        domain_map(internal::make_serial_Epetra_map(
-          matrix_exemplar.locally_owned_domain_indices()))
-        , range_map(internal::make_serial_Epetra_map(
-            matrix_exemplar.locally_owned_range_indices()))
-#  endif
       {
         vmult = [&matrix_exemplar, &matrix](Range &       tril_dst,
                                             const Domain &tril_src) {
@@ -2471,21 +2432,13 @@ namespace TrilinosWrappers
         const TrilinosWrappers::SparseMatrix &    matrix_exemplar,
         const TrilinosWrappers::PreconditionBase &preconditioner)
         : use_transpose(matrix_exemplar.trilinos_matrix().UseTranspose())
-        ,
-#  ifdef DEAL_II_WITH_MPI
-        communicator(matrix_exemplar.get_mpi_communicator())
+        , communicator(matrix_exemplar.get_mpi_communicator())
         , domain_map(
             matrix_exemplar.locally_owned_domain_indices().make_trilinos_map(
               communicator.Comm()))
         , range_map(
             matrix_exemplar.locally_owned_range_indices().make_trilinos_map(
               communicator.Comm()))
-#  else
-        domain_map(internal::make_serial_Epetra_map(
-          matrix_exemplar.locally_owned_domain_indices()))
-        , range_map(internal::make_serial_Epetra_map(
-            matrix_exemplar.locally_owned_range_indices()))
-#  endif
       {
         vmult = [&matrix_exemplar, &preconditioner](Range &       tril_dst,
                                                     const Domain &tril_src) {
@@ -2592,19 +2545,11 @@ namespace TrilinosWrappers
         const TrilinosWrappers::PreconditionBase &preconditioner)
         : use_transpose(
             preconditioner_exemplar.trilinos_operator().UseTranspose())
-        ,
-#  ifdef DEAL_II_WITH_MPI
-        communicator(preconditioner_exemplar.get_mpi_communicator())
+        , communicator(preconditioner_exemplar.get_mpi_communicator())
         , domain_map(preconditioner_exemplar.locally_owned_domain_indices()
                        .make_trilinos_map(communicator.Comm()))
         , range_map(preconditioner_exemplar.locally_owned_range_indices()
                       .make_trilinos_map(communicator.Comm()))
-#  else
-        domain_map(internal::make_serial_Epetra_map(
-          preconditioner_exemplar.locally_owned_domain_indices()))
-        , range_map(internal::make_serial_Epetra_map(
-            preconditioner_exemplar.locally_owned_range_indices()))
-#  endif
       {
         vmult = [&preconditioner_exemplar,
                  &preconditioner](Range &tril_dst, const Domain &tril_src) {
@@ -2828,11 +2773,7 @@ namespace TrilinosWrappers
       MPI_Comm
       TrilinosPayload::get_mpi_communicator() const
       {
-#  ifdef DEAL_II_WITH_MPI
         return communicator.Comm();
-#  else
-        return MPI_COMM_SELF;
-#  endif
       }
 
 
@@ -3330,8 +3271,7 @@ namespace TrilinosWrappers
     dealii::LinearAlgebra::distributed::Vector<double> &,
     const dealii::LinearAlgebra::distributed::Vector<double> &) const;
 
-#    ifdef DEAL_II_WITH_MPI
-#      ifdef DEAL_II_TRILINOS_WITH_TPETRA
+#    ifdef DEAL_II_TRILINOS_WITH_TPETRA
   template void
   SparseMatrix::vmult(
     dealii::LinearAlgebra::TpetraWrappers::Vector<double> &,
@@ -3341,13 +3281,12 @@ namespace TrilinosWrappers
   SparseMatrix::vmult(
     dealii::LinearAlgebra::TpetraWrappers::Vector<float> &,
     const dealii::LinearAlgebra::TpetraWrappers::Vector<float> &) const;
-#      endif
+#    endif
 
   template void
   SparseMatrix::vmult(
     dealii::LinearAlgebra::EpetraWrappers::Vector &,
     const dealii::LinearAlgebra::EpetraWrappers::Vector &) const;
-#    endif
 
   template void
   SparseMatrix::Tvmult(MPI::Vector &, const MPI::Vector &) const;
@@ -3361,8 +3300,7 @@ namespace TrilinosWrappers
     dealii::LinearAlgebra::distributed::Vector<double> &,
     const dealii::LinearAlgebra::distributed::Vector<double> &) const;
 
-#    ifdef DEAL_II_WITH_MPI
-#      ifdef DEAL_II_TRILINOS_WITH_TPETRA
+#    ifdef DEAL_II_TRILINOS_WITH_TPETRA
   template void
   SparseMatrix::Tvmult(
     dealii::LinearAlgebra::TpetraWrappers::Vector<double> &,
@@ -3372,13 +3310,12 @@ namespace TrilinosWrappers
   SparseMatrix::Tvmult(
     dealii::LinearAlgebra::TpetraWrappers::Vector<float> &,
     const dealii::LinearAlgebra::TpetraWrappers::Vector<float> &) const;
-#      endif
+#    endif
 
   template void
   SparseMatrix::Tvmult(
     dealii::LinearAlgebra::EpetraWrappers::Vector &,
     const dealii::LinearAlgebra::EpetraWrappers::Vector &) const;
-#    endif
 
   template void
   SparseMatrix::vmult_add(MPI::Vector &, const MPI::Vector &) const;
@@ -3392,8 +3329,7 @@ namespace TrilinosWrappers
     dealii::LinearAlgebra::distributed::Vector<double> &,
     const dealii::LinearAlgebra::distributed::Vector<double> &) const;
 
-#    ifdef DEAL_II_WITH_MPI
-#      ifdef DEAL_II_TRILINOS_WITH_TPETRA
+#    ifdef DEAL_II_TRILINOS_WITH_TPETRA
   template void
   SparseMatrix::vmult_add(
     dealii::LinearAlgebra::TpetraWrappers::Vector<double> &,
@@ -3403,13 +3339,12 @@ namespace TrilinosWrappers
   SparseMatrix::vmult_add(
     dealii::LinearAlgebra::TpetraWrappers::Vector<float> &,
     const dealii::LinearAlgebra::TpetraWrappers::Vector<float> &) const;
-#      endif
+#    endif
 
   template void
   SparseMatrix::vmult_add(
     dealii::LinearAlgebra::EpetraWrappers::Vector &,
     const dealii::LinearAlgebra::EpetraWrappers::Vector &) const;
-#    endif
 
   template void
   SparseMatrix::Tvmult_add(MPI::Vector &, const MPI::Vector &) const;
@@ -3423,8 +3358,7 @@ namespace TrilinosWrappers
     dealii::LinearAlgebra::distributed::Vector<double> &,
     const dealii::LinearAlgebra::distributed::Vector<double> &) const;
 
-#    ifdef DEAL_II_WITH_MPI
-#      ifdef DEAL_II_TRILINOS_WITH_TPETRA
+#    ifdef DEAL_II_TRILINOS_WITH_TPETRA
   template void
   SparseMatrix::Tvmult_add(
     dealii::LinearAlgebra::TpetraWrappers::Vector<double> &,
@@ -3434,13 +3368,12 @@ namespace TrilinosWrappers
   SparseMatrix::Tvmult_add(
     dealii::LinearAlgebra::TpetraWrappers::Vector<float> &,
     const dealii::LinearAlgebra::TpetraWrappers::Vector<float> &) const;
-#      endif
+#    endif
 
   template void
   SparseMatrix::Tvmult_add(
     dealii::LinearAlgebra::EpetraWrappers::Vector &,
     const dealii::LinearAlgebra::EpetraWrappers::Vector &) const;
-#    endif
 } // namespace TrilinosWrappers
 #  endif // DOXYGEN
 

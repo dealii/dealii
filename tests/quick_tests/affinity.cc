@@ -24,7 +24,7 @@
 
 #include <deal.II/grid/tria.h>
 
-#if defined(__linux__)
+#ifdef __linux__
 #  include <sched.h>
 #  include <sys/sysinfo.h>
 #endif
@@ -35,7 +35,7 @@ getaffinity(unsigned int &bits_set, unsigned int &mask)
   bits_set = 0;
   mask     = 0x00;
 
-#if defined(__linux__)
+#ifdef __linux__
   cpu_set_t my_set;
   CPU_ZERO(&my_set);
 

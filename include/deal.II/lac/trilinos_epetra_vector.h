@@ -19,7 +19,7 @@
 
 #include <deal.II/base/config.h>
 
-#if defined(DEAL_II_WITH_TRILINOS) && defined(DEAL_II_WITH_MPI)
+#ifdef DEAL_II_WITH_TRILINOS
 
 #  include <deal.II/base/index_set.h>
 #  include <deal.II/base/subscriptor.h>
