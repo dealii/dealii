@@ -349,16 +349,6 @@ namespace SparsityTools
                           const MPI_Comm &        mpi_comm,
                           const IndexSet &        locally_relevant_rows);
 
-  /**
-   * @deprecated Use the gather_sparsity_pattern() method with the index set
-   * for the present processor only.
-   */
-  DEAL_II_DEPRECATED void
-  gather_sparsity_pattern(DynamicSparsityPattern &     dsp,
-                          const std::vector<IndexSet> &owned_rows_per_processor,
-                          const MPI_Comm &             mpi_comm,
-                          const IndexSet &             ghost_range);
-
 #endif
 
 
