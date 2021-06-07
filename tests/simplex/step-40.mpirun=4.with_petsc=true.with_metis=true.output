@@ -1,4 +1,6 @@
-Running with PETSc on 4 MPI rank(s)...
-   Number of active cells:       512
-   Number of degrees of freedom: 1089
-0.0124965
+
+DEAL::Running with PETSc on 4 MPI rank(s)...
+DEAL::   Number of active cells:       512
+DEAL::   Number of degrees of freedom: 1089
+DEAL::Solver stopped within 5 - 9 iterations
+DEAL::0.0124965

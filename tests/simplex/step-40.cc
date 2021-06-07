@@ -85,6 +85,8 @@ namespace LA
 #include <fstream>
 #include <iostream>
 
+#include "../tests.h"
+
 // Flag to toggle between hex and simplex.
 // #define HEX
 
@@ -136,8 +138,6 @@ namespace Step40
     LA::MPI::SparseMatrix system_matrix;
     LA::MPI::Vector       locally_relevant_solution;
     LA::MPI::Vector       system_rhs;
-
-    ConditionalOStream pcout;
   };
 
   template <int dim>
@@ -155,8 +155,6 @@ namespace Step40
 #endif
     , fe(2)
     , dof_handler(triangulation)
-    , pcout(std::cout,
-            (Utilities::MPI::this_mpi_process(mpi_communicator) == 0))
   {}
 
   template <int dim>
@@ -287,10 +285,13 @@ namespace Step40
 #endif
     preconditioner.initialize(system_matrix, data);
 
-    solver.solve(system_matrix,
-                 completely_distributed_solution,
-                 system_rhs,
-                 preconditioner);
+    check_solver_within_range(solver.solve(system_matrix,
+                                           completely_distributed_solution,
+                                           system_rhs,
+                                           preconditioner),
+                              solver_control.last_step(),
+                              5,
+                              9);
 
     constraints.distribute(completely_distributed_solution);
 
@@ -312,10 +313,10 @@ namespace Step40
                                       quadrature_formula,
                                       VectorTools::NormType::L2_norm);
 
-    pcout << VectorTools::compute_global_error(triangulation,
-                                               difference,
-                                               VectorTools::NormType::L2_norm)
-          << std::endl;
+    deallog << VectorTools::compute_global_error(triangulation,
+                                                 difference,
+                                                 VectorTools::NormType::L2_norm)
+            << std::endl;
   }
 
   template <int dim>
@@ -341,14 +342,14 @@ namespace Step40
   void
   LaplaceProblem<dim>::run()
   {
-    pcout << "Running with "
+    deallog << "Running with "
 #ifdef USE_PETSC_LA
-          << "PETSc"
+            << "PETSc"
 #else
-          << "Trilinos"
+            << "Trilinos"
 #endif
-          << " on " << Utilities::MPI::n_mpi_processes(mpi_communicator)
-          << " MPI rank(s)..." << std::endl;
+            << " on " << Utilities::MPI::n_mpi_processes(mpi_communicator)
+            << " MPI rank(s)..." << std::endl;
 
     const unsigned int n_subdivisions = 16;
     Point<dim>         a, b;
@@ -394,10 +395,10 @@ namespace Step40
 
     setup_system();
 
-    pcout << "   Number of active cells:       "
-          << triangulation.n_global_active_cells() << std::endl
-          << "   Number of degrees of freedom: " << dof_handler.n_dofs()
-          << std::endl;
+    deallog << "   Number of active cells:       "
+            << triangulation.n_global_active_cells() << std::endl
+            << "   Number of degrees of freedom: " << dof_handler.n_dofs()
+            << std::endl;
 
     assemble_system();
     solve();
@@ -413,12 +414,14 @@ namespace Step40
 int
 main(int argc, char *argv[])
 {
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  mpi_initlog();
+
   try
     {
       using namespace dealii;
       using namespace Step40;
 
-      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
       LaplaceProblem<2> laplace_problem_2d;
       laplace_problem_2d.run();

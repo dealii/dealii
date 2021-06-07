@@ -74,6 +74,8 @@
 
 #include <deal.II/grid/grid_generator.h>
 
+#include "../tests.h"
+
 // Flag to toggle between hexes and simplices.
 // #define HEX
 
@@ -106,8 +108,6 @@ namespace Step17
 
     const unsigned int n_mpi_processes;
     const unsigned int this_mpi_process;
-
-    ConditionalOStream pcout;
 
 #ifdef HEX
     MappingQGeneric<dim, dim> mapping;
@@ -174,7 +174,6 @@ namespace Step17
     : mpi_communicator(MPI_COMM_WORLD)
     , n_mpi_processes(Utilities::MPI::n_mpi_processes(mpi_communicator))
     , this_mpi_process(Utilities::MPI::this_mpi_process(mpi_communicator))
-    , pcout(std::cout, (this_mpi_process == 0))
 #ifdef HEX
     , mapping(1)
     , fe(FE_Q<dim>(1), dim)
@@ -329,9 +328,17 @@ namespace Step17
     SolverControl solver_control(solution.size(), 1e-8 * system_rhs.l2_norm());
     PETScWrappers::SolverCG cg(solver_control, mpi_communicator);
 
+    // PreconditionBlockJacobi depends on the processor count
     PETScWrappers::PreconditionBlockJacobi preconditioner(system_matrix);
+    const unsigned int lower = n_mpi_processes == 1 ? 8 : 26;
+    const unsigned int upper = n_mpi_processes == 1 ? 12 : 30;
 
-    cg.solve(system_matrix, solution, system_rhs, preconditioner);
+    check_solver_within_range(
+      cg.solve(system_matrix, solution, system_rhs, preconditioner),
+      solver_control.last_step(),
+      lower,
+      upper);
+
 
     Vector<double> localized_solution(solution);
     hanging_node_constraints.distribute(localized_solution);
@@ -420,25 +427,21 @@ namespace Step17
       triangulation, std::vector<unsigned int>(dim, n_subdivisions), a, b);
 #endif
 
-    pcout << "   Number of active cells:       "
-          << triangulation.n_active_cells() << std::endl;
+    deallog << "   Number of active cells:       "
+            << triangulation.n_active_cells() << std::endl;
 
     setup_system();
 
-    pcout << "   Number of degrees of freedom: " << dof_handler.n_dofs()
-          << " (by partition:";
+    deallog << "   Number of degrees of freedom: " << dof_handler.n_dofs()
+            << " (by partition:";
     for (unsigned int p = 0; p < n_mpi_processes; ++p)
-      pcout << (p == 0 ? ' ' : '+')
-            << (DoFTools::count_dofs_with_subdomain_association(dof_handler,
-                                                                p));
-    pcout << ")" << std::endl;
+      deallog << (p == 0 ? ' ' : '+')
+              << (DoFTools::count_dofs_with_subdomain_association(dof_handler,
+                                                                  p));
+    deallog << ")" << std::endl;
 
     assemble_system();
-    const unsigned int n_iterations = solve();
-
-    pcout << "   Solver converged in " << n_iterations << " iterations."
-          << std::endl;
-
+    solve();
     output_results();
   }
 } // namespace Step17
@@ -447,12 +450,13 @@ namespace Step17
 int
 main(int argc, char **argv)
 {
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  mpi_initlog();
+
   try
     {
       using namespace dealii;
       using namespace Step17;
-
-      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
       ElasticProblem<2> elastic_problem;
       elastic_problem.run();
