@@ -103,18 +103,18 @@ identified with a vector $U\in\mathbb{R}^N$ via the representation formula:
 $u_h = \sum_{i=1}^N U_i \varphi_i$. So using this we can give an expression for
 the discrete Jacobian and the residual:
 @f{align*}{
- A_{i,j} = \bigl( F'(u_h^n) \bigr)_{i,j}
+ A_{ij} = \bigl( F'(u_h^n) \bigr)_{ij}
  &=
  \int_\Omega \nabla\varphi_i \cdot \nabla \varphi_j \,\mathrm{d} x
  -
- \int_\Omega \varphi_i \, \exp( u_h ) \varphi_j \,\mathrm{d} x,\\
+ \int_\Omega \varphi_i \, \exp( u_h^n ) \varphi_j \,\mathrm{d} x,\\
  b_{i} = \bigl( F(u_h^n) \bigr)_{i}
  &=
  \int_\Omega \nabla\varphi_i \cdot \nabla u_h^n \,\mathrm{d} x
  -
  \int_\Omega \varphi_i \, \exp( u_h^n ) \,\mathrm{d} x.
 @f}
-Compared to step-15 we could also have formed the Frech{\'e}t derivative of the
+Compared to step-15 we could also have formed the Fréchet derivative of the
 nonlinear function corresponding to the strong formulation of the problem and
 discretized it afterwards. However, in the end we would get the same set of
 discrete equations.
@@ -127,7 +127,9 @@ the system matrix about the solution at the last Newton step. In an
 implementation with a classical <code>assemble_system()</code> function we
 would gather this information from the last Newton step during assembly by the
 use of the member functions FEValuesBase::get_function_values() and
-FEValuesBase::get_function_gradients(). The <code>assemble_system()</code>
+FEValuesBase::get_function_gradients(). This is how step-15, for
+example, does things.
+The <code>assemble_system()</code>
 function would then looks like:
 @code
 template <int dim>
@@ -272,8 +274,8 @@ void JacobianOperator<dim, fe_degree, number>::evaluate_newton_step(
 @endcode
 
 
-<h3>Triangulation</h3>
-As said in step-37 the matrix-free method gets more efficient if we choose a
+<h3>%Triangulation</h3>
+As said in step-37, the matrix-free method gets more efficient if we choose a
 higher order finite element space. Since we want to solve the problem on the
 $d$-dimensional unit ball, it would be good to have an appropriate boundary
 approximation to overcome convergence issues. For this reason we use an
