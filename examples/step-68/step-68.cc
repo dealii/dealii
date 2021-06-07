@@ -566,8 +566,7 @@ namespace Step68
     auto particle = particle_handler.begin();
     while (particle != particle_handler.end())
       {
-        const auto cell =
-          particle->get_surrounding_cell(background_triangulation);
+        const auto cell = particle->get_surrounding_cell();
         const auto dh_cell =
           typename DoFHandler<dim>::cell_iterator(*cell, &fluid_dh);
 

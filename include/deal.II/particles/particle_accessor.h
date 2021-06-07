@@ -21,6 +21,7 @@
 #include <deal.II/base/array_view.h>
 
 #include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_iterator_base.h>
 
 #include <deal.II/particles/particle.h>
 
@@ -43,6 +44,12 @@ namespace Particles
   class ParticleAccessor
   {
   public:
+    /**
+     * A type for the storage container for particles.
+     */
+    using particle_container =
+      std::vector<std::vector<Particle<dim, spacedim>>>;
+
     /**
      * @copydoc Particle::write_particle_data_to_memory
      */
@@ -203,7 +210,15 @@ namespace Particles
      * but the triangulation itself is not stored in the particle this
      * operation requires a reference to the triangulation.
      */
-    typename Triangulation<dim, spacedim>::cell_iterator
+    const typename Triangulation<dim, spacedim>::cell_iterator &
+    get_surrounding_cell() const;
+
+    /**
+     * @deprecated: Deprecated version of the function with the same
+     * name above.
+     */
+    DEAL_II_DEPRECATED
+    const typename Triangulation<dim, spacedim>::cell_iterator &
     get_surrounding_cell(
       const Triangulation<dim, spacedim> &triangulation) const;
 
@@ -239,6 +254,12 @@ namespace Particles
     bool
     operator==(const ParticleAccessor<dim, spacedim> &other) const;
 
+    /**
+     * Return the state of the accessor.
+     */
+    IteratorState::IteratorStates
+    state() const;
+
   private:
     /**
      * Construct an invalid accessor. Such an object is not usable.
@@ -246,29 +267,52 @@ namespace Particles
     ParticleAccessor();
 
     /**
-     * Construct an accessor from a reference to a map and an iterator to the
-     * map. This constructor is `private` so that it can only be accessed by
+     * Construct an accessor from a reference to a container, an iterator to the
+     * current cell, and the particle index within that cell.
+     * This constructor is `private` so that it can only be accessed by
      * friend classes.
      */
     ParticleAccessor(
-      const std::multimap<internal::LevelInd, Particle<dim, spacedim>> &map,
-      const typename std::multimap<internal::LevelInd,
-                                   Particle<dim, spacedim>>::iterator
-        &particle);
+      const particle_container &particles,
+      const typename Triangulation<dim, spacedim>::active_cell_iterator &cell,
+      const unsigned int particle_index_within_cell);
 
-  private:
+    /**
+     * Returns a reference to the current Particle. Because the
+     * internal structure may change this is not intended for public use and
+     * only a convenience function for internal purposes.
+     */
+    const Particle<dim, spacedim> &
+    get_particle() const;
+
+    /**
+     * Non-@p const version of the function with the same name above.
+     */
+    Particle<dim, spacedim> &
+    get_particle();
+
     /**
      * A pointer to the container that stores the particles. Obviously,
      * this accessor is invalidated if the container changes.
      */
-    std::multimap<internal::LevelInd, Particle<dim, spacedim>> *map;
+    particle_container *particles;
 
     /**
-     * An iterator into the container of particles. Obviously,
-     * this accessor is invalidated if the container changes.
+     * Cell iterator to the cell of the current particle.
      */
-    typename std::multimap<internal::LevelInd,
-                           Particle<dim, spacedim>>::iterator particle;
+    typename Triangulation<dim, spacedim>::active_cell_iterator cell;
+
+    /**
+     * Index to the cell this particle is stored in at the moment. This could be
+     * read from the member variable cell, but is used in many performance
+     * critical functions and is therefore stored and updated separately.
+     */
+    unsigned int active_cell_index;
+
+    /**
+     * Local index of the particle within its current cell.
+     */
+    unsigned int particle_index_within_cell;
 
     // Make ParticleIterator a friend to allow it constructing
     // ParticleAccessors.
@@ -286,7 +330,7 @@ namespace Particles
   ParticleAccessor<dim, spacedim>::serialize(Archive &          ar,
                                              const unsigned int version)
   {
-    return particle->second.serialize(ar, version);
+    return get_particle().serialize(ar, version);
   }
 
 
@@ -294,21 +338,30 @@ namespace Particles
 
   template <int dim, int spacedim>
   inline ParticleAccessor<dim, spacedim>::ParticleAccessor()
-    : map(nullptr)
-    , particle()
+    : particles(nullptr)
+    , cell()
+    , active_cell_index(numbers::invalid_unsigned_int)
+    , particle_index_within_cell(numbers::invalid_unsigned_int)
   {}
 
 
 
   template <int dim, int spacedim>
   inline ParticleAccessor<dim, spacedim>::ParticleAccessor(
-    const std::multimap<internal::LevelInd, Particle<dim, spacedim>> &map,
-    const typename std::multimap<internal::LevelInd,
-                                 Particle<dim, spacedim>>::iterator & particle)
-    : map(const_cast<
-          std::multimap<internal::LevelInd, Particle<dim, spacedim>> *>(&map))
-    , particle(particle)
-  {}
+    const particle_container &particles,
+    const typename Triangulation<dim, spacedim>::active_cell_iterator &cell,
+    const unsigned int particle_index_within_cell)
+    : particles(const_cast<particle_container *>(&particles))
+    , cell(cell)
+    , particle_index_within_cell(particle_index_within_cell)
+  {
+    if (cell.state() == IteratorState::valid)
+      active_cell_index = cell->active_cell_index();
+    else if (cell.state() == IteratorState::past_the_end)
+      active_cell_index = particles.size();
+    else
+      active_cell_index = numbers::invalid_unsigned_int;
+  }
 
 
 
@@ -317,9 +370,9 @@ namespace Particles
   ParticleAccessor<dim, spacedim>::read_particle_data_from_memory(
     const void *data)
   {
-    Assert(particle != map->end(), ExcInternalError());
+    Assert(state() == IteratorState::valid, ExcInternalError());
 
-    return particle->second.read_particle_data_from_memory(data);
+    return get_particle().read_particle_data_from_memory(data);
   }
 
 
@@ -329,9 +382,9 @@ namespace Particles
   ParticleAccessor<dim, spacedim>::write_particle_data_to_memory(
     void *data) const
   {
-    Assert(particle != map->end(), ExcInternalError());
+    Assert(state() == IteratorState::valid, ExcInternalError());
 
-    return particle->second.write_particle_data_to_memory(data);
+    return get_particle().write_particle_data_to_memory(data);
   }
 
 
@@ -340,9 +393,9 @@ namespace Particles
   inline void
   ParticleAccessor<dim, spacedim>::set_location(const Point<spacedim> &new_loc)
   {
-    Assert(particle != map->end(), ExcInternalError());
+    Assert(state() == IteratorState::valid, ExcInternalError());
 
-    particle->second.set_location(new_loc);
+    get_particle().set_location(new_loc);
   }
 
 
@@ -351,9 +404,9 @@ namespace Particles
   inline const Point<spacedim> &
   ParticleAccessor<dim, spacedim>::get_location() const
   {
-    Assert(particle != map->end(), ExcInternalError());
+    Assert(state() == IteratorState::valid, ExcInternalError());
 
-    return particle->second.get_location();
+    return get_particle().get_location();
   }
 
 
@@ -363,9 +416,9 @@ namespace Particles
   ParticleAccessor<dim, spacedim>::set_reference_location(
     const Point<dim> &new_loc)
   {
-    Assert(particle != map->end(), ExcInternalError());
+    Assert(state() == IteratorState::valid, ExcInternalError());
 
-    particle->second.set_reference_location(new_loc);
+    get_particle().set_reference_location(new_loc);
   }
 
 
@@ -374,9 +427,9 @@ namespace Particles
   inline const Point<dim> &
   ParticleAccessor<dim, spacedim>::get_reference_location() const
   {
-    Assert(particle != map->end(), ExcInternalError());
+    Assert(state() == IteratorState::valid, ExcInternalError());
 
-    return particle->second.get_reference_location();
+    return get_particle().get_reference_location();
   }
 
 
@@ -385,9 +438,9 @@ namespace Particles
   inline types::particle_index
   ParticleAccessor<dim, spacedim>::get_id() const
   {
-    Assert(particle != map->end(), ExcInternalError());
+    Assert(state() == IteratorState::valid, ExcInternalError());
 
-    return particle->second.get_id();
+    return get_particle().get_id();
   }
 
 
@@ -397,9 +450,9 @@ namespace Particles
   ParticleAccessor<dim, spacedim>::set_property_pool(
     PropertyPool<dim, spacedim> &new_property_pool)
   {
-    Assert(particle != map->end(), ExcInternalError());
+    Assert(state() == IteratorState::valid, ExcInternalError());
 
-    particle->second.set_property_pool(new_property_pool);
+    get_particle().set_property_pool(new_property_pool);
   }
 
 
@@ -408,9 +461,9 @@ namespace Particles
   inline bool
   ParticleAccessor<dim, spacedim>::has_properties() const
   {
-    Assert(particle != map->end(), ExcInternalError());
+    Assert(state() == IteratorState::valid, ExcInternalError());
 
-    return particle->second.has_properties();
+    return get_particle().has_properties();
   }
 
 
@@ -420,9 +473,9 @@ namespace Particles
   ParticleAccessor<dim, spacedim>::set_properties(
     const std::vector<double> &new_properties)
   {
-    Assert(particle != map->end(), ExcInternalError());
+    Assert(state() == IteratorState::valid, ExcInternalError());
 
-    particle->second.set_properties(new_properties);
+    get_particle().set_properties(new_properties);
   }
 
 
@@ -432,9 +485,9 @@ namespace Particles
   ParticleAccessor<dim, spacedim>::set_properties(
     const ArrayView<const double> &new_properties)
   {
-    Assert(particle != map->end(), ExcInternalError());
+    Assert(state() == IteratorState::valid, ExcInternalError());
 
-    particle->second.set_properties(new_properties);
+    get_particle().set_properties(new_properties);
   }
 
 
@@ -443,22 +496,31 @@ namespace Particles
   inline const ArrayView<const double>
   ParticleAccessor<dim, spacedim>::get_properties() const
   {
-    Assert(particle != map->end(), ExcInternalError());
+    Assert(state() == IteratorState::valid, ExcInternalError());
 
-    return particle->second.get_properties();
+    return get_particle().get_properties();
   }
 
 
 
   template <int dim, int spacedim>
-  inline typename Triangulation<dim, spacedim>::cell_iterator
-  ParticleAccessor<dim, spacedim>::get_surrounding_cell(
-    const Triangulation<dim, spacedim> &triangulation) const
+  inline const typename Triangulation<dim, spacedim>::cell_iterator &
+  ParticleAccessor<dim, spacedim>::get_surrounding_cell() const
   {
-    Assert(particle != map->end(), ExcInternalError());
+    Assert(state() == IteratorState::valid, ExcInternalError());
 
-    const typename Triangulation<dim, spacedim>::cell_iterator cell(
-      &triangulation, particle->first.first, particle->first.second);
+    return cell;
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline const typename Triangulation<dim, spacedim>::cell_iterator &
+  ParticleAccessor<dim, spacedim>::get_surrounding_cell(
+    const Triangulation<dim, spacedim> & /*triangulation*/) const
+  {
+    Assert(state() == IteratorState::valid, ExcInternalError());
+
     return cell;
   }
 
@@ -468,9 +530,9 @@ namespace Particles
   inline const ArrayView<double>
   ParticleAccessor<dim, spacedim>::get_properties()
   {
-    Assert(particle != map->end(), ExcInternalError());
+    Assert(state() == IteratorState::valid, ExcInternalError());
 
-    return particle->second.get_properties();
+    return get_particle().get_properties();
   }
 
 
@@ -479,9 +541,9 @@ namespace Particles
   inline std::size_t
   ParticleAccessor<dim, spacedim>::serialized_size_in_bytes() const
   {
-    Assert(particle != map->end(), ExcInternalError());
+    Assert(state() == IteratorState::valid, ExcInternalError());
 
-    return particle->second.serialized_size_in_bytes();
+    return get_particle().serialized_size_in_bytes();
   }
 
 
@@ -490,8 +552,22 @@ namespace Particles
   inline void
   ParticleAccessor<dim, spacedim>::next()
   {
-    Assert(particle != map->end(), ExcInternalError());
-    ++particle;
+    Assert(state() == IteratorState::valid, ExcInternalError());
+
+    ++particle_index_within_cell;
+
+    if (particle_index_within_cell > (*particles)[active_cell_index].size() - 1)
+      {
+        particle_index_within_cell = 0;
+
+        do
+          {
+            ++cell;
+            ++active_cell_index;
+          }
+        while (cell.state() == IteratorState::valid &&
+               (*particles)[active_cell_index].size() == 0);
+      }
   }
 
 
@@ -500,8 +576,32 @@ namespace Particles
   inline void
   ParticleAccessor<dim, spacedim>::prev()
   {
-    Assert(particle != map->begin(), ExcInternalError());
-    --particle;
+    Assert(state() == IteratorState::valid, ExcInternalError());
+
+    if (particle_index_within_cell > 0)
+      --particle_index_within_cell;
+    else
+      {
+        do
+          {
+            --cell;
+            --active_cell_index;
+
+            if (cell.state() != IteratorState::valid)
+              {
+                active_cell_index = particles->size();
+                break;
+              }
+
+            if ((*particles)[active_cell_index].size() > 0)
+              {
+                particle_index_within_cell =
+                  (*particles)[active_cell_index].size() - 1;
+                break;
+              }
+          }
+        while ((*particles)[active_cell_index].size() == 0);
+      }
   }
 
 
@@ -511,7 +611,7 @@ namespace Particles
   ParticleAccessor<dim, spacedim>::
   operator!=(const ParticleAccessor<dim, spacedim> &other) const
   {
-    return (map != other.map) || (particle != other.particle);
+    return !(*this == other);
   }
 
 
@@ -521,9 +621,46 @@ namespace Particles
   ParticleAccessor<dim, spacedim>::
   operator==(const ParticleAccessor<dim, spacedim> &other) const
   {
-    return (map == other.map) && (particle == other.particle);
+    return (particles == other.particles) && (cell == other.cell) &&
+           (particle_index_within_cell == other.particle_index_within_cell);
   }
 
+
+
+  template <int dim, int spacedim>
+  inline IteratorState::IteratorStates
+  ParticleAccessor<dim, spacedim>::state() const
+  {
+    if (particles != nullptr && cell.state() == IteratorState::valid &&
+        particle_index_within_cell < (*particles)[active_cell_index].size())
+      return IteratorState::valid;
+    else if (particles != nullptr &&
+             cell.state() == IteratorState::past_the_end &&
+             particle_index_within_cell == 0)
+      return IteratorState::past_the_end;
+    else
+      return IteratorState::invalid;
+
+    return IteratorState::invalid;
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline Particle<dim, spacedim> &
+  ParticleAccessor<dim, spacedim>::get_particle()
+  {
+    return (*particles)[active_cell_index][particle_index_within_cell];
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline const Particle<dim, spacedim> &
+  ParticleAccessor<dim, spacedim>::get_particle() const
+  {
+    return (*particles)[active_cell_index][particle_index_within_cell];
+  }
 
 } // namespace Particles
 
