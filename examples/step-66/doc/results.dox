@@ -196,11 +196,12 @@ present code as well as a deeper numerical investigation of the Gelfand problem.
 
 <h4>More sophisticated Newton iteration</h4>
 Beside a step size controlled version of the Newton iteration as mentioned
-already in step-15, one could also implement a more flexible stopping criterion
+already in step-15 (and actually implemented, with many more bells and
+whistles, in step-77), one could also implement a more flexible stopping criterion
 for the Newton iteration. For example one could replace the fixed tolerances
 for the residual <code>TOLf</code> and for the Newton updated <code>TOLx</code>
 and implement a mixed error control with a given absolute and relative
-tolerance, such that the Newton iteration exists with success as, e.g.,
+tolerance, such that the Newton iteration exits with success as, e.g.,
 @f{align*}{
   \|F(u_h^{n+1})\| \leq \texttt{RelTol} \|u_h^{n+1}\| + \texttt{AbsTol}.
 @f}
@@ -237,13 +238,16 @@ Analogously to step-50 and the mentioned possible extension of step-75, you can
 convince yourself which method is faster.
 
 <h4>Eigenvalue problem</h4>
-One can consider the corresponding eigenvalue problem, which is called Bratu
-problem. For example, if we define a fixed eigenvalue $\lambda\in[0,6]$, we can
+One can consider the corresponding eigenvalue problem, which is called
+<a
+href="https://en.wikipedia.org/wiki/Liouville%E2%80%93Bratu%E2%80%93Gelfand_equation">Bratu
+problem</a>. For example, if we define a fixed eigenvalue $\lambda\in[0,6]$, we can
 compute the corresponding discrete eigenfunction. You will notice that the
 number of Newton steps will increase with increasing $\lambda$. To reduce the
 number of Newton steps you can use the following trick: start from a certain
 $\lambda$, compute the eigenfunction, increase $\lambda=\lambda +
 \delta_\lambda$, and then use the previous solution as an initial guess for the
-Newton iteration. In the end you can plot the $H^1(\Omega)$-norm over the
+Newton iteration -- this approach is called a "continuation
+method". In the end you can plot the $H^1(\Omega)$-norm over the
 eigenvalue $\lambda \mapsto \|u_h\|_{H^1(\Omega)}$. What do you observe for
 further increasing $\lambda>7$?
