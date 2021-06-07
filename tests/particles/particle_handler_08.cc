@@ -125,23 +125,19 @@ test()
 
     create_regular_particle_distribution(particle_handler, tr);
 
-    for (auto particle = particle_handler.begin();
-         particle != particle_handler.end();
-         ++particle)
-      deallog << "Before refinement particle id " << particle->get_id()
-              << " has first property " << particle->get_properties()[0]
-              << " and second property " << particle->get_properties()[1]
+    for (const auto &particle : particle_handler)
+      deallog << "Before refinement particle id " << particle.get_id()
+              << " has first property " << particle.get_properties()[0]
+              << " and second property " << particle.get_properties()[1]
               << std::endl;
 
     // Check that all particles are moved to children
     tr.refine_global(1);
 
-    for (auto particle = particle_handler.begin();
-         particle != particle_handler.end();
-         ++particle)
-      deallog << "After refinement particle id " << particle->get_id()
-              << " has first property " << particle->get_properties()[0]
-              << " and second property " << particle->get_properties()[1]
+    for (const auto &particle : particle_handler)
+      deallog << "After refinement particle id " << particle.get_id()
+              << " has first property " << particle.get_properties()[0]
+              << " and second property " << particle.get_properties()[1]
               << std::endl;
 
     // Reverse the refinement and check again
@@ -150,12 +146,10 @@ test()
 
     tr.execute_coarsening_and_refinement();
 
-    for (auto particle = particle_handler.begin();
-         particle != particle_handler.end();
-         ++particle)
-      deallog << "After coarsening particle id " << particle->get_id()
-              << " has first property " << particle->get_properties()[0]
-              << " and second property " << particle->get_properties()[1]
+    for (const auto &particle : particle_handler)
+      deallog << "After coarsening particle id " << particle.get_id()
+              << " has first property " << particle.get_properties()[0]
+              << " and second property " << particle.get_properties()[1]
               << std::endl;
   }
 

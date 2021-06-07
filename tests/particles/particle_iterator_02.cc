@@ -25,7 +25,9 @@
 #include <deal.II/grid/tria.h>
 
 #include <deal.II/particles/particle.h>
+#include <deal.II/particles/particle_handler.h>
 #include <deal.II/particles/particle_iterator.h>
+#include <deal.II/particles/property_pool.h>
 
 #include "../tests.h"
 
@@ -59,26 +61,36 @@ test()
 
     std::vector<double> properties = {0.15, 0.45, 0.75};
 
-    Particles::Particle<dim> particle(position, reference_position, index);
-    particle.set_property_pool(pool);
-    particle.set_properties(
-      ArrayView<double>(&properties[0], properties.size()));
-
-    std::vector<std::vector<Particles::Particle<dim>>> particle_container;
+    typename Particles::ParticleHandler<dim>::particle_container
+      particle_container;
     particle_container.resize(1);
 
+    auto particle = pool.register_particle();
     particle_container[0].push_back(particle);
 
+    pool.set_location(particle, position);
+    pool.set_reference_location(particle, reference_position);
+    pool.set_id(particle, index);
+    auto particle_properties = pool.get_properties(particle);
+
+    std::copy(properties.begin(),
+              properties.end(),
+              particle_properties.begin());
+
     Particles::ParticleIterator<dim> particle_begin(particle_container,
+                                                    pool,
                                                     tr.begin(),
                                                     0);
     Particles::ParticleIterator<dim> particle_end(particle_container,
+                                                  pool,
                                                   tr.end(),
                                                   0);
     Particles::ParticleIterator<dim> particle_nonexistent1(particle_container,
+                                                           pool,
                                                            tr.begin(),
                                                            1);
     Particles::ParticleIterator<dim> particle_nonexistent2(particle_container,
+                                                           pool,
                                                            tr.end(),
                                                            1);
     Particles::ParticleIterator<dim> particle_invalid;
@@ -116,6 +128,8 @@ test()
 
     Assert(particle_iterator->state() == IteratorState::past_the_end,
            ExcInternalError());
+
+    pool.deregister_particle(particle);
   }
 
   deallog << "OK" << std::endl;

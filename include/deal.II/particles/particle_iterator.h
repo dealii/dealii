@@ -40,6 +40,12 @@ namespace Particles
   {
   public:
     /**
+     * A type for the storage container for particles.
+     */
+    using particle_container =
+      std::vector<std::vector<typename PropertyPool<dim, spacedim>::Handle>>;
+
+    /**
      * Empty constructor. Such an object is not usable!
      */
     ParticleIterator() = default;
@@ -50,7 +56,8 @@ namespace Particles
      * cell.
      */
     ParticleIterator(
-      const std::vector<std::vector<Particle<dim, spacedim>>> &   particles,
+      const particle_container &                                  particles,
+      const PropertyPool<dim, spacedim> &                         property_pool,
       const typename Triangulation<dim, spacedim>::cell_iterator &cell,
       const unsigned int particle_index_within_cell);
 
@@ -152,10 +159,11 @@ namespace Particles
 
   template <int dim, int spacedim>
   inline ParticleIterator<dim, spacedim>::ParticleIterator(
-    const std::vector<std::vector<Particle<dim, spacedim>>> &   particles,
+    const particle_container &                                  particles,
+    const PropertyPool<dim, spacedim> &                         property_pool,
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const unsigned int particle_index_within_cell)
-    : accessor(particles, cell, particle_index_within_cell)
+    : accessor(particles, property_pool, cell, particle_index_within_cell)
   {}
 
 

@@ -26,6 +26,7 @@
 #include <deal.II/grid/tria.h>
 
 #include <deal.II/particles/particle.h>
+#include <deal.II/particles/particle_handler.h>
 #include <deal.II/particles/particle_iterator.h>
 
 #include "../tests.h"
@@ -39,10 +40,12 @@ test()
     Triangulation<dim> tr;
 
     GridGenerator::hyper_cube(tr);
-    MappingQ<dim> mapping(1);
+    MappingQ<dim>      mapping(1);
+    const unsigned int n_properties_per_particle = 3;
 
-    const unsigned int           n_properties_per_particle = 3;
-    Particles::PropertyPool<dim> pool(n_properties_per_particle);
+    Particles::ParticleHandler<dim> particle_handler(tr,
+                                                     mapping,
+                                                     n_properties_per_particle);
 
     Point<dim> position;
     position(0) = 0.3;
@@ -61,32 +64,26 @@ test()
     std::vector<double> properties = {0.15, 0.45, 0.75};
 
     Particles::Particle<dim> particle(position, reference_position, index);
-    particle.set_property_pool(pool);
-    particle.set_properties(
+
+    // Insert two identical particles
+    Particles::ParticleIterator<dim> particle_it =
+      particle_handler.insert_particle(particle, tr.begin());
+    particle_it->set_properties(
       ArrayView<double>(&properties[0], properties.size()));
 
-    std::vector<std::vector<Particles::Particle<dim>>> particle_container;
-    particle_container.resize(1);
+    particle_it = particle_handler.insert_particle(particle, tr.begin());
+    particle_it->set_properties(
+      ArrayView<double>(&properties[0], properties.size()));
 
-    particle_container[0].push_back(particle);
+    // Modify the properties of the second particle
+    particle_it->get_properties()[0] = 0.05;
 
-    particle.get_properties()[0] = 0.05;
-    particle_container[0].push_back(particle);
-
-    Particles::ParticleIterator<dim> particle_it(particle_container,
-                                                 tr.begin(),
-                                                 0);
-    Particles::ParticleIterator<dim> particle_end(particle_container,
-                                                  tr.end(),
-                                                  0);
-
-    for (; particle_it != particle_end; ++particle_it)
+    for (const auto &particle : particle_handler)
       {
-        deallog << "Particle position: " << (*particle_it).get_location()
-                << std::endl
+        deallog << "Particle position: " << particle.get_location() << std::endl
                 << "Particle properties: "
-                << std::vector<double>(particle_it->get_properties().begin(),
-                                       particle_it->get_properties().end())
+                << std::vector<double>(particle.get_properties().begin(),
+                                       particle.get_properties().end())
                 << std::endl;
       }
   }
