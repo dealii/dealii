@@ -343,16 +343,6 @@ namespace parallel
 
 
   template <int dim, int spacedim>
-  std::map<unsigned int, std::set<dealii::types::subdomain_id>>
-  TriangulationBase<dim, spacedim>::compute_vertices_with_ghost_neighbors()
-    const
-  {
-    return GridTools::compute_vertices_with_ghost_neighbors(*this);
-  }
-
-
-
-  template <int dim, int spacedim>
   std::vector<types::boundary_id>
   TriangulationBase<dim, spacedim>::get_boundary_ids() const
   {

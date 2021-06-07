@@ -216,18 +216,6 @@ namespace parallel
     global_level_cell_index_partitioner(const unsigned int level) const;
 
     /**
-     * Return a map that, for each vertex, lists all the processors whose
-     * subdomains are adjacent to that vertex.
-     *
-     * @deprecated Use GridTools::compute_vertices_with_ghost_neighbors()
-     * instead of
-     * parallel::TriangulationBase::compute_vertices_with_ghost_neighbors().
-     */
-    DEAL_II_DEPRECATED virtual std::map<unsigned int,
-                                        std::set<dealii::types::subdomain_id>>
-    compute_vertices_with_ghost_neighbors() const;
-
-    /**
      * @copydoc dealii::Triangulation::get_boundary_ids()
      *
      * @note This function involves a global communication gathering all current
