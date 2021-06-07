@@ -204,6 +204,14 @@ public:
              const bool vector_describes_relative_displacement);
 
   /**
+   * @copydoc Mapping<dim,spacedim>::get_vertices()
+   */
+  virtual boost::container::small_vector<Point<spacedim>,
+                                         GeometryInfo<dim>::vertices_per_cell>
+  get_vertices(const typename Triangulation<dim, spacedim>::cell_iterator &cell)
+    const override;
+
+  /**
    * Return the memory consumption (in bytes) of the cache.
    */
   std::size_t
