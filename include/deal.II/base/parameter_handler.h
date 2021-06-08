@@ -1700,16 +1700,6 @@ public:
                    "ParameterHandler description.");
 
   /**
-   * Exception for when an entry in an XML parameter file does not match the
-   * provided pattern. The arguments are, in order, the entry value, entry
-   * name, and a description of the pattern.
-   *
-   * @deprecated Use ExcValueDoesNotMatchPattern instead of ExcInvalidEntryForPatternXML.
-   */
-  using ExcInvalidEntryForPatternXML DEAL_II_DEPRECATED =
-    ExcValueDoesNotMatchPattern;
-
-  /**
    * Exception for when the file given in an include statement cannot be
    * open. The arguments are, in order, the line number of the include
    * statement, current parameter file name, and the name of the file intended

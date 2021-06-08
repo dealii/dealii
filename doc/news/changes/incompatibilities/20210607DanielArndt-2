@@ -1,0 +1,5 @@
+Removed: The deprecated exception ParameterHandler::ExcInvalidEntryForPatternXML
+and the deprecated overload of SparsityTools::gather_sparsity_pattern()
+have been removed.
+<br>
+(Daniel Arndt, 2021/06/07)

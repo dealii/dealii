@@ -913,21 +913,6 @@ namespace SparsityTools
 #ifdef DEAL_II_WITH_MPI
 
   void
-  gather_sparsity_pattern(DynamicSparsityPattern &     dsp,
-                          const std::vector<IndexSet> &owned_rows_per_processor,
-                          const MPI_Comm &             mpi_comm,
-                          const IndexSet &             ghost_range)
-  {
-    const unsigned int myid = Utilities::MPI::this_mpi_process(mpi_comm);
-    gather_sparsity_pattern(dsp,
-                            owned_rows_per_processor[myid],
-                            mpi_comm,
-                            ghost_range);
-  }
-
-
-
-  void
   gather_sparsity_pattern(DynamicSparsityPattern &dsp,
                           const IndexSet &        locally_owned_rows,
                           const MPI_Comm &        mpi_comm,
