@@ -301,6 +301,16 @@ namespace FEInterfaceViews
      * @p interface_dof_index in the quadrature point @p q_point.
      */
     value_type
+    jump_value(const unsigned int interface_dof_index,
+               const unsigned int q_point) const;
+
+    /**
+     * The same as above.
+     *
+     * @deprecated Use the jump_value() function instead.
+     */
+    DEAL_II_DEPRECATED
+    value_type
     jump(const unsigned int interface_dof_index,
          const unsigned int q_point) const;
 
@@ -309,6 +319,16 @@ namespace FEInterfaceViews
      * \mathbf{u_2})$ on the interface for the shape
      * function @p interface_dof_index in the quadrature point @p q_point.
      */
+    value_type
+    average_value(const unsigned int interface_dof_index,
+                  const unsigned int q_point) const;
+
+    /**
+     * The same as above.
+     *
+     * @deprecated Use the average_value() function instead.
+     */
+    DEAL_II_DEPRECATED
     value_type
     average(const unsigned int interface_dof_index,
             const unsigned int q_point) const;
@@ -358,6 +378,16 @@ namespace FEInterfaceViews
      * shape function @p interface_dof_index at the quadrature point @p q_point of
      * the component selected by this view.
      */
+    third_derivative_type
+    jump_third_derivative(const unsigned int interface_dof_index,
+                          const unsigned int q_point) const;
+
+    /**
+     * The same as above.
+     *
+     * @deprecated Use the jump_third_derivative() function instead.
+     */
+    DEAL_II_DEPRECATED
     third_derivative_type
     jump_3rd_derivative(const unsigned int interface_dof_index,
                         const unsigned int q_point) const;
@@ -1897,8 +1927,8 @@ namespace FEInterfaceViews
 
   template <int dim, int spacedim>
   typename Vector<dim, spacedim>::value_type
-  Vector<dim, spacedim>::jump(const unsigned int interface_dof_index,
-                              const unsigned int q_point) const
+  Vector<dim, spacedim>::jump_value(const unsigned int interface_dof_index,
+                                    const unsigned int q_point) const
   {
     const auto dof_pair = this->fe_interface->dofmap[interface_dof_index];
 
@@ -1921,8 +1951,18 @@ namespace FEInterfaceViews
 
   template <int dim, int spacedim>
   typename Vector<dim, spacedim>::value_type
-  Vector<dim, spacedim>::average(const unsigned int interface_dof_index,
-                                 const unsigned int q_point) const
+  Vector<dim, spacedim>::jump(const unsigned int interface_dof_index,
+                              const unsigned int q_point) const
+  {
+    return jump_value(interface_dof_index, q_point);
+  }
+
+
+
+  template <int dim, int spacedim>
+  typename Vector<dim, spacedim>::value_type
+  Vector<dim, spacedim>::average_value(const unsigned int interface_dof_index,
+                                       const unsigned int q_point) const
   {
     const auto dof_pair = this->fe_interface->dofmap[interface_dof_index];
 
@@ -1944,6 +1984,16 @@ namespace FEInterfaceViews
                 dof_pair[1], q_point);
 
     return value;
+  }
+
+
+
+  template <int dim, int spacedim>
+  typename Vector<dim, spacedim>::value_type
+  Vector<dim, spacedim>::average(const unsigned int interface_dof_index,
+                                 const unsigned int q_point) const
+  {
+    return average_value(interface_dof_index, q_point);
   }
 
 
@@ -2063,7 +2113,7 @@ namespace FEInterfaceViews
 
   template <int dim, int spacedim>
   typename Vector<dim, spacedim>::third_derivative_type
-  Vector<dim, spacedim>::jump_3rd_derivative(
+  Vector<dim, spacedim>::jump_third_derivative(
     const unsigned int interface_dof_index,
     const unsigned int q_point) const
   {
@@ -2085,6 +2135,17 @@ namespace FEInterfaceViews
                  .third_derivative(dof_pair[1], q_point);
 
     return value;
+  }
+
+
+
+  template <int dim, int spacedim>
+  typename Vector<dim, spacedim>::third_derivative_type
+  Vector<dim, spacedim>::jump_3rd_derivative(
+    const unsigned int interface_dof_index,
+    const unsigned int q_point) const
+  {
+    return jump_third_derivative(interface_dof_index, q_point);
   }
 } // namespace FEInterfaceViews
 
