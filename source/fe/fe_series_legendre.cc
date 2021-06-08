@@ -232,20 +232,6 @@ namespace FESeries
 
 
   template <int dim, int spacedim>
-  Legendre<dim, spacedim>::Legendre(
-    const unsigned int                     n_coefficients_per_direction,
-    const hp::FECollection<dim, spacedim> &fe_collection,
-    const hp::QCollection<dim> &           q_collection)
-    : Legendre<dim, spacedim>(
-        std::vector<unsigned int>(fe_collection.size(),
-                                  n_coefficients_per_direction),
-        fe_collection,
-        q_collection)
-  {}
-
-
-
-  template <int dim, int spacedim>
   inline bool
   Legendre<dim, spacedim>::
   operator==(const Legendre<dim, spacedim> &legendre) const

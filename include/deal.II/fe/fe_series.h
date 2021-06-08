@@ -114,20 +114,6 @@ namespace FESeries
             const unsigned int component = numbers::invalid_unsigned_int);
 
     /**
-     * A non-default constructor. The @p n_coefficients_per_direction defines the
-     * number of modes in each direction, @p fe_collection is the hp::FECollection
-     * for which expansion will be used and @p q_collection is the hp::QCollection
-     * used to integrate the expansion for each FiniteElement
-     * in @p fe_collection.
-     *
-     * @deprecated Use a different constructor instead.
-     */
-    DEAL_II_DEPRECATED
-    Fourier(const unsigned int                     n_coefficients_per_direction,
-            const hp::FECollection<dim, spacedim> &fe_collection,
-            const hp::QCollection<dim> &           q_collection);
-
-    /**
      * Calculate @p fourier_coefficients of the cell vector field given by
      * @p local_dof_values corresponding to FiniteElement with
      * @p cell_active_fe_index .
@@ -296,19 +282,6 @@ namespace FESeries
              const hp::FECollection<dim, spacedim> &fe_collection,
              const hp::QCollection<dim> &           q_collection,
              const unsigned int component = numbers::invalid_unsigned_int);
-
-    /**
-     * A non-default constructor. The @p size_in_each_direction defines the number
-     * of coefficients in each direction, @p fe_collection is the hp::FECollection
-     * for which expansion will be used and @p q_collection is the hp::QCollection
-     * used to integrate the expansion for each FiniteElement in @p fe_collection.
-     *
-     * @deprecated Use a different constructor instead.
-     */
-    DEAL_II_DEPRECATED
-    Legendre(const unsigned int n_coefficients_per_direction,
-             const hp::FECollection<dim, spacedim> &fe_collection,
-             const hp::QCollection<dim> &           q_collection);
 
     /**
      * Calculate @p legendre_coefficients of the cell vector field given by
