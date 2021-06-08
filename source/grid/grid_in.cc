@@ -3251,6 +3251,8 @@ GridIn<dim, spacedim>::read_exodusii(
   ierr = ex_get_ids(ex_id, EX_ELEM_BLOCK, element_block_ids.data());
   AssertThrowExodusII(ierr);
 
+  bool is_only_quad_or_hex = true;
+
   std::vector<CellData<dim>> cells;
   // Elements are grouped together by same reference cell type in element
   // blocks. There may be multiple blocks for a single reference cell type,
@@ -3277,6 +3279,9 @@ GridIn<dim, spacedim>::read_exodusii(
       AssertThrowExodusII(ierr);
       const ReferenceCell type =
         exodusii_name_to_type(string_temp.data(), n_nodes_per_element);
+
+      if (type.is_simplex())
+        is_only_quad_or_hex = false;
 
       // The number of nodes per element may be larger than what we want to
       // read - for example, if the Exodus file contains a QUAD9 element, we
@@ -3311,6 +3316,16 @@ GridIn<dim, spacedim>::read_exodusii(
     ex_id, n_side_sets, cells, apply_all_indicators_to_manifolds);
   ierr = ex_close(ex_id);
   AssertThrowExodusII(ierr);
+
+  if (is_only_quad_or_hex)
+    {
+      // do some clean-up on vertices...
+      GridTools::delete_unused_vertices(vertices, cells, pair.first);
+      // ... and cells
+      if (dim == spacedim)
+        GridTools::invert_all_negative_measure_cells(vertices, cells);
+      GridTools::consistently_order_cells(cells);
+    }
 
   tria->create_triangulation(vertices, cells, pair.first);
   ExodusIIData out;
