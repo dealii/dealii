@@ -58,10 +58,13 @@ test()
       reference_position,
       Utilities::MPI::this_mpi_process(tr.get_communicator()));
 
-    // We give a random cell hint to check that sorting and
+    // We give a local random cell hint to check that sorting and
     // transferring ghost particles works.
     typename Triangulation<dim, spacedim>::active_cell_iterator cell =
       tr.begin_active();
+    while (!cell->is_locally_owned())
+      ++cell;
+
     particle_handler.insert_particle(particle, cell);
 
     particle_handler.sort_particles_into_subdomains_and_cells();

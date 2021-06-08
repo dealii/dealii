@@ -468,6 +468,10 @@ namespace Particles
   {
     Assert(triangulation != nullptr, ExcInternalError());
     Assert(cell.state() == IteratorState::valid, ExcInternalError());
+    Assert(
+      cell->is_locally_owned(),
+      ExcMessage(
+        "You can't insert particles in a cell that is not locally owned."));
 
     if (particles.size() == 0)
       particles.resize(triangulation->n_active_cells());
@@ -1070,11 +1074,6 @@ namespace Particles
         // not locally owned cells have to be resorted or transferred.
         if (cell->is_locally_owned() == false)
           {
-            for (unsigned int i = 0; i < n_pic; ++i)
-              {
-                particles_out_of_cell.push_back(
-                  particle_iterator(particles, *property_pool, cell, i));
-              }
             continue;
           }
 
