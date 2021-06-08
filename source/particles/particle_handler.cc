@@ -378,7 +378,8 @@ namespace Particles
   {
     const unsigned int active_cell_index = particle->active_cell_index;
 
-    particle_container &container = *(particle->particles);
+    Assert(particle->particles == &particles, ExcInternalError());
+    particle_container &container = particles;
 
     if (container[active_cell_index].size() > 1)
       {
