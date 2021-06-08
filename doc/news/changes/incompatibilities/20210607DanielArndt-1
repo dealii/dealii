@@ -1,0 +1,4 @@
+Removed: The deprecated member function
+TriangulationBase::compute_vertices_with_ghost_neighbors() has been removed.
+<br>
+(Daniel Arndt, 2021/06/07)
