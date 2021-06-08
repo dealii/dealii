@@ -27,9 +27,6 @@ template <int dim>
 void
 check_this(const FiniteElement<dim> &fe1, const FiniteElement<dim> &fe2)
 {
-  if (dim == 1)
-    return;
-
   // check all combinations of fe1 and fe2
   FullMatrix<double> face_constraints;
   try

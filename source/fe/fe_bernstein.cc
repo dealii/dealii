@@ -98,7 +98,6 @@ FE_Bernstein<dim, spacedim>::get_face_interpolation_matrix(
   FullMatrix<double> &                interpolation_matrix,
   const unsigned int                  face_no) const
 {
-  Assert(dim > 1, ExcImpossibleInDim(1));
   get_subface_interpolation_matrix(source_fe,
                                    numbers::invalid_unsigned_int,
                                    interpolation_matrix,
@@ -145,8 +144,8 @@ FE_Bernstein<dim, spacedim>::get_subface_interpolation_matrix(
       // Rule of thumb for FP accuracy, that can be expected for a given
       // polynomial degree.  This value is used to cut off values close to
       // zero.
-      double eps =
-        2e-13 * std::max(this->degree, source_fe->degree) * (dim - 1);
+      const double eps = 2e-13 * std::max(this->degree, source_fe->degree) *
+                         std::max(dim - 1, 1);
 
       // compute the interpolation matrix by simply taking the value at the
       // support points.

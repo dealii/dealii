@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 // Test that we can use FE_Bernstein::get_face_interpolation_matrix to create
-// an interpolation matrix between FE_Bernstein and an element that has support
-// points.
+// an interpolation matrix when the incoming element is either FE_Bernstein or
+// FE_Q.
 
 #include <deal.II/fe/fe_bernstein.h>
 #include <deal.II/fe/fe_q.h>
@@ -25,29 +25,43 @@
 #include "../tests.h"
 
 
-// Set up an FE_Q element and an FE_Bernstein element with the incoming order.
 // Call get_face_interpolation_matrix to create the interpolation matrix
-// between these and write it to deallog.
+// between the two incoming elements and write it to deallog.
 template <int dim>
 void
-create_and_print_face_interpolation_matrix(const unsigned int order)
+create_and_print_face_interpolation_matrix(
+  const FiniteElement<dim> &fe_destination,
+  const FiniteElement<dim> &fe_source)
 {
-  deallog << "dim = " << dim << ", order = " << order << std::endl;
-
-  const FE_Q<dim>         fe_q(order);
-  const FE_Bernstein<dim> fe_bernstein(order);
-
-  FullMatrix<double> interpolation_matrix(fe_q.n_dofs_per_face(),
-                                          fe_bernstein.n_dofs_per_face());
+  deallog << fe_source.get_name() << " to " << fe_destination.get_name()
+          << std::endl;
+  FullMatrix<double> interpolation_matrix(fe_destination.n_dofs_per_face(),
+                                          fe_source.n_dofs_per_face());
   const unsigned int face_index = 0;
 
-
-  fe_bernstein.get_face_interpolation_matrix(fe_q,
-                                             interpolation_matrix,
-                                             face_index);
+  fe_source.get_face_interpolation_matrix(fe_destination,
+                                          interpolation_matrix,
+                                          face_index);
 
   interpolation_matrix.print(deallog);
   deallog << std::endl;
+}
+
+
+
+template <int dim>
+void
+run_test()
+{
+  const std::vector<unsigned int> orders = {1, 2};
+  for (const unsigned int order : orders)
+    {
+      const FE_Q<dim>         fe_q(order);
+      const FE_Bernstein<dim> fe_bernstein(order);
+      create_and_print_face_interpolation_matrix<dim>(fe_q, fe_bernstein);
+      create_and_print_face_interpolation_matrix<dim>(fe_bernstein,
+                                                      fe_bernstein);
+    }
 }
 
 
@@ -57,9 +71,6 @@ main()
 {
   initlog();
 
-  const int dim = 2;
-
-  const std::vector<unsigned int> orders = {1, 2};
-  for (const unsigned int order : orders)
-    create_and_print_face_interpolation_matrix<dim>(order);
+  run_test<1>();
+  run_test<2>();
 }
