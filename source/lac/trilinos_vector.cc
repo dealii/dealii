@@ -603,13 +603,14 @@ namespace TrilinosWrappers
       // check that every process has decided to use the same mode. This will
       // otherwise result in undefined behavior in the call to
       // GlobalAssemble().
-      double                double_mode = mode;
+      const double          double_mode = mode;
       const Epetra_MpiComm *comm_ptr =
         dynamic_cast<const Epetra_MpiComm *>(&(trilinos_partitioner().Comm()));
       Assert(comm_ptr != nullptr, ExcInternalError());
-      Utilities::MPI::MinMaxAvg result =
+
+      const Utilities::MPI::MinMaxAvg result =
         Utilities::MPI::min_max_avg(double_mode, comm_ptr->GetMpiComm());
-      Assert(result.max - result.min < 1e-5,
+      Assert(result.max == result.min,
              ExcMessage(
                "Not all processors agree whether the last operation on "
                "this vector was an addition or a set operation. This will "
