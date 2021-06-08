@@ -35,8 +35,6 @@ namespace
   std::vector<unsigned int>
   get_dpo_vector_fe_p(const unsigned int dim, const unsigned int degree)
   {
-    Assert(degree == 1 || degree == 2, ExcNotImplemented());
-
     switch (dim)
       {
         case 1:
@@ -46,6 +44,8 @@ namespace
                 return {1, 0};
               case 2:
                 return {1, 1};
+              default:
+                Assert(false, ExcNotImplemented());
             }
         case 2:
           switch (degree)
@@ -54,6 +54,8 @@ namespace
                 return {1, 0, 0};
               case 2:
                 return {1, 1, 0};
+              default:
+                Assert(false, ExcNotImplemented());
             }
         case 3:
           switch (degree)
@@ -62,6 +64,8 @@ namespace
                 return {1, 0, 0, 0};
               case 2:
                 return {1, 1, 0, 0};
+              default:
+                Assert(false, ExcNotImplemented());
             }
       }
 
