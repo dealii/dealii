@@ -258,39 +258,51 @@ namespace
   std::vector<unsigned int>
   get_dpo_vector_fe_dgp(const unsigned int dim, const unsigned int degree)
   {
-    // This element has the same degrees of freedom as the continuous one,
-    // but they are all counted for the interior of the cell because
-    // it is continuous. Rather than hard-code how many DoFs the element
-    // has, we just get the numbers from the continuous case and add them
-    // up
-    const auto continuous_dpo = get_dpo_vector_fe_p(dim, degree);
-
-    switch (dim)
+    // First treat the case of piecewise constant elements:
+    if (degree == 0)
       {
-        case 1:
-          return {0U,
-                  ReferenceCells::Line.n_vertices() * continuous_dpo[0] +
-                    continuous_dpo[dim]};
-
-        case 2:
-          return {0U,
-                  0U,
-                  ReferenceCells::Triangle.n_vertices() * continuous_dpo[0] +
-                    ReferenceCells::Triangle.n_lines() * continuous_dpo[1] +
-                    continuous_dpo[dim]};
-
-        case 3:
-          return {0U,
-                  0U,
-                  0U,
-                  ReferenceCells::Tetrahedron.n_vertices() * continuous_dpo[0] +
-                    ReferenceCells::Tetrahedron.n_lines() * continuous_dpo[1] +
-                    ReferenceCells::Tetrahedron.n_faces() * continuous_dpo[2] +
-                    continuous_dpo[dim]};
+        std::vector<unsigned int> dpo(dim + 1, 0U);
+        dpo[dim] = 1;
+        return dpo;
       }
+    else
+      {
+        // This element has the same degrees of freedom as the continuous one,
+        // but they are all counted for the interior of the cell because
+        // it is continuous. Rather than hard-code how many DoFs the element
+        // has, we just get the numbers from the continuous case and add them
+        // up
+        const auto continuous_dpo = get_dpo_vector_fe_p(dim, degree);
 
-    Assert(false, ExcNotImplemented());
-    return {};
+        switch (dim)
+          {
+            case 1:
+              return {0U,
+                      ReferenceCells::Line.n_vertices() * continuous_dpo[0] +
+                        continuous_dpo[dim]};
+
+            case 2:
+              return {0U,
+                      0U,
+                      ReferenceCells::Triangle.n_vertices() *
+                          continuous_dpo[0] +
+                        ReferenceCells::Triangle.n_lines() * continuous_dpo[1] +
+                        continuous_dpo[dim]};
+
+            case 3:
+              return {
+                0U,
+                0U,
+                0U,
+                ReferenceCells::Tetrahedron.n_vertices() * continuous_dpo[0] +
+                  ReferenceCells::Tetrahedron.n_lines() * continuous_dpo[1] +
+                  ReferenceCells::Tetrahedron.n_faces() * continuous_dpo[2] +
+                  continuous_dpo[dim]};
+          }
+
+        Assert(false, ExcNotImplemented());
+        return {};
+      }
   }
 } // namespace
 
