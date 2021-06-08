@@ -123,6 +123,13 @@ namespace Particles
       ExcMessage(
         "This handle is invalid and cannot be deallocated. This can happen if the "
         "handle was deallocated already before calling this function."));
+
+    Assert(
+      currently_available_handles.size() < locations.size(),
+      ExcMessage(
+        "Trying to deallocate a particle when none are allocated. This can happen if all "
+        "handles were deallocated already before calling this function."));
+
     currently_available_handles.push_back(handle);
     handle = invalid_handle;
 

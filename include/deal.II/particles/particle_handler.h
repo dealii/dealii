@@ -75,7 +75,7 @@ namespace Particles
      * A type for the storage container for particles.
      */
     using particle_container =
-      std::vector<std::vector<Particle<dim, spacedim>>>;
+      std::vector<std::vector<typename PropertyPool<dim, spacedim>::Handle>>;
 
     /**
      * Default constructor.
@@ -97,7 +97,7 @@ namespace Particles
     /**
      * Destructor.
      */
-    virtual ~ParticleHandler() override = default;
+    virtual ~ParticleHandler();
 
     /**
      * Initialize the particle handler. This function does not clear the
@@ -975,8 +975,8 @@ namespace Particles
     void
     send_recv_particles(
       const std::map<types::subdomain_id, std::vector<particle_iterator>>
-        &                                                particles_to_send,
-      std::vector<std::vector<Particle<dim, spacedim>>> &received_particles,
+        &                 particles_to_send,
+      particle_container &received_particles,
       const std::map<
         types::subdomain_id,
         std::vector<
@@ -1007,8 +1007,8 @@ namespace Particles
     void
     send_recv_particles_properties_and_location(
       const std::map<types::subdomain_id, std::vector<particle_iterator>>
-        &                                                particles_to_send,
-      std::vector<std::vector<Particle<dim, spacedim>>> &received_particles);
+        &                 particles_to_send,
+      particle_container &received_particles);
 
 
 #endif
@@ -1067,7 +1067,7 @@ namespace Particles
     for (const auto &cell : triangulation->active_cell_iterators())
       if (cell->is_locally_owned() &&
           particles[cell->active_cell_index()].size() != 0)
-        return particle_iterator(particles, cell, 0);
+        return particle_iterator(particles, *property_pool, cell, 0);
 
     return end();
   }
@@ -1087,7 +1087,10 @@ namespace Particles
   inline typename ParticleHandler<dim, spacedim>::particle_iterator
   ParticleHandler<dim, spacedim>::end()
   {
-    return particle_iterator(particles, triangulation->end(), 0);
+    return particle_iterator(particles,
+                             *property_pool,
+                             triangulation->end(),
+                             0);
   }
 
 
@@ -1111,7 +1114,7 @@ namespace Particles
     for (const auto &cell : triangulation->active_cell_iterators())
       if (cell->is_locally_owned() == false &&
           ghost_particles[cell->active_cell_index()].size() != 0)
-        return particle_iterator(ghost_particles, cell, 0);
+        return particle_iterator(ghost_particles, *property_pool, cell, 0);
 
     return end_ghost();
   }
@@ -1131,7 +1134,10 @@ namespace Particles
   inline typename ParticleHandler<dim, spacedim>::particle_iterator
   ParticleHandler<dim, spacedim>::end_ghost()
   {
-    return particle_iterator(ghost_particles, triangulation->end(), 0);
+    return particle_iterator(ghost_particles,
+                             *property_pool,
+                             triangulation->end(),
+                             0);
   }
 
 
