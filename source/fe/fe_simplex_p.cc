@@ -73,6 +73,8 @@ namespace
     return {};
   }
 
+
+
   /**
    * Set up a vector that contains the unit (reference) cell support points
    * for FE_SimplexPoly and sufficiently similar elements.
@@ -247,30 +249,48 @@ namespace
     return interface_constraints;
   }
 
+
+
   /**
-   * Helper function to set up the dpo vector of FE_SimplexDGP for a given @p dim and
-   * @p degree.
+   * Helper function to set up the dpo vector of FE_SimplexDGP for a given
+   * @p dim and @p degree.
    */
   std::vector<unsigned int>
   get_dpo_vector_fe_dgp(const unsigned int dim, const unsigned int degree)
   {
-    std::vector<unsigned int> dpo(dim + 1, 0U);
+    // This element has the same degrees of freedom as the continuous one,
+    // but they are all counted for the interior of the cell because
+    // it is continuous. Rather than hard-code how many DoFs the element
+    // has, we just get the numbers from the continuous case and add them
+    // up
+    const auto continuous_dpo = get_dpo_vector_fe_p(dim, degree);
 
-    // all dofs are internal
-    if (dim == 2 && degree == 1)
-      dpo[dim] = 3;
-    else if (dim == 2 && degree == 2)
-      dpo[dim] = 6;
-    else if (dim == 3 && degree == 1)
-      dpo[dim] = 4;
-    else if (dim == 3 && degree == 2)
-      dpo[dim] = 10;
-    else
+    switch (dim)
       {
-        Assert(false, ExcNotImplemented());
+        case 1:
+          return {0U,
+                  ReferenceCells::Line.n_vertices() * continuous_dpo[0] +
+                    continuous_dpo[dim]};
+
+        case 2:
+          return {0U,
+                  0U,
+                  ReferenceCells::Triangle.n_vertices() * continuous_dpo[0] +
+                    ReferenceCells::Triangle.n_lines() * continuous_dpo[1] +
+                    continuous_dpo[dim]};
+
+        case 3:
+          return {0U,
+                  0U,
+                  0U,
+                  ReferenceCells::Tetrahedron.n_vertices() * continuous_dpo[0] +
+                    ReferenceCells::Tetrahedron.n_lines() * continuous_dpo[1] +
+                    ReferenceCells::Tetrahedron.n_faces() * continuous_dpo[2] +
+                    continuous_dpo[dim]};
       }
 
-    return dpo;
+    Assert(false, ExcNotImplemented());
+    return {};
   }
 } // namespace
 
