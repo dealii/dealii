@@ -335,21 +335,19 @@ namespace Particles
 
     if (cell->is_artificial() == false)
       {
-        particle_container &container = particles;
-
-        if (container[active_cell_index].size() == 0)
+        if (particles[active_cell_index].size() == 0)
           {
             return boost::make_iterator_range(
-              particle_iterator(container, *property_pool, cell, 0),
-              particle_iterator(container, *property_pool, cell, 0));
+              particle_iterator(particles, *property_pool, cell, 0),
+              particle_iterator(particles, *property_pool, cell, 0));
           }
         else
           {
-            particle_iterator begin(container, *property_pool, cell, 0);
-            particle_iterator end(container,
+            particle_iterator begin(particles, *property_pool, cell, 0);
+            particle_iterator end(particles,
                                   *property_pool,
                                   cell,
-                                  container[active_cell_index].size() - 1);
+                                  particles[active_cell_index].size() - 1);
             // end needs to point to the particle after the last one in the
             // cell.
             ++end;
@@ -1354,8 +1352,6 @@ namespace Particles
           }
       }
 
-
-    // TODO - To fix
     send_recv_particles(
       ghost_particles_cache.ghost_particles_by_domain,
       particles,

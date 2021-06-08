@@ -716,7 +716,7 @@ namespace Particles
 
     if (particle_index_within_cell > (*particles)[active_cell_index].size() - 1)
       {
-        const bool initial_cell_is_owned = cell->is_locally_owned();
+        const bool particle_is_locally_owned = cell->is_locally_owned();
 
         particle_index_within_cell = 0;
 
@@ -727,7 +727,7 @@ namespace Particles
           }
         while (cell.state() == IteratorState::valid &&
                ((*particles)[active_cell_index].size() == 0 ||
-                cell->is_locally_owned() != initial_cell_is_owned));
+                cell->is_locally_owned() != particle_is_locally_owned));
       }
   }
 
@@ -743,7 +743,7 @@ namespace Particles
       --particle_index_within_cell;
     else
       {
-        const bool initial_cell_is_owned = cell->is_locally_owned();
+        const bool particle_is_locally_owned = cell->is_locally_owned();
 
         do
           {
@@ -757,15 +757,15 @@ namespace Particles
               }
 
             if ((*particles)[active_cell_index].size() > 0 &&
-                cell->is_locally_owned() == initial_cell_is_owned)
+                cell->is_locally_owned() == particle_is_locally_owned)
               {
                 particle_index_within_cell =
                   (*particles)[active_cell_index].size() - 1;
                 break;
               }
           }
-        while ((*particles)[active_cell_index].size() == 0 &&
-               cell->is_locally_owned() != initial_cell_is_owned);
+        while ((*particles)[active_cell_index].size() == 0 ||
+               cell->is_locally_owned() != particle_is_locally_owned);
       }
   }
 

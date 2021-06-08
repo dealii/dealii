@@ -273,25 +273,6 @@ namespace Particles
      *
      * The number of elements in the returned range equals what the
      * n_particles_in_cell() function returns.
-     *
-     * @note While this function is used in step-19, it is not an efficient
-     *   function to use if the number of particles is large. That is because
-     *   to find the particles that are located in one cell costs
-     *   ${\cal O}(\log N)$ where $N$ is the number of overall particles. Since
-     *   you will likely do this for every cell, and assuming that the number
-     *   of particles and the number of cells are roughly proportional,
-     *   you end up with an ${\cal O}(N \log N)$ algorithm. A better approach
-     *   is to use the fact that internally, particles are arranged in the
-     *   order of the active cells they are in. In other words, if you iterate
-     *   over all particles, you will encounter them in the same order as
-     *   you walk over the active cells. You can exploit this by keeping an
-     *   iterator to the first particle of the first cell, and when you move
-     *   to the next cell, you increment the particle iterator as well until
-     *   you find a particle located on that next cell. This is the approach
-     *   used in step-70, for example, and has an overall cost of
-     *   ${\cal O}(\log N)$ when accumulated over all cells. The approach is
-     *   also detailed in the "Possibilities for extensions section"
-     *   of step-19.
      */
     particle_iterator_range
     particles_in_cell(
@@ -850,7 +831,7 @@ namespace Particles
 
     /**
      * Set of particles currently living in the local domain including ghost
-     * cells , organized by the level/index of the cell they are in.
+     * cells , organized by the active cell of the cell they are in.
      */
     particle_container particles;
 
