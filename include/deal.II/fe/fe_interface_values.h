@@ -543,6 +543,16 @@ public:
   get_normal_vectors() const;
 
   /**
+   * Return an object that can be thought of as an array containing all
+   * indices from zero to `n_quadrature_points`. This allows to write code
+   * using range-based `for` loops.
+   *
+   * @see CPP11
+   */
+  std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+  quadrature_point_indices() const;
+
+  /**
    * Return a reference to the quadrature points in real space.
    *
    * @dealiiRequiresUpdateFlags{update_quadrature_points}
@@ -1059,6 +1069,15 @@ const Quadrature<dim - 1> &
 FEInterfaceValues<dim, spacedim>::get_quadrature() const
 {
   return internal_fe_face_values.get_quadrature();
+}
+
+
+
+template <int dim, int spacedim>
+inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+FEInterfaceValues<dim, spacedim>::quadrature_point_indices() const
+{
+  return {0U, n_quadrature_points};
 }
 
 
