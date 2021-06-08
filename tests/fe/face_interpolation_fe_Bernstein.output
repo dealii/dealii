@@ -1,0 +1,31 @@
+
+DEAL::FE_Bernstein<1>(1) to FE_Q<1>(1)
+DEAL::1.0  
+DEAL::
+DEAL::FE_Bernstein<1>(1) to FE_Bernstein<1>(1)
+DEAL::1.0  
+DEAL::
+DEAL::FE_Bernstein<1>(2) to FE_Q<1>(2)
+DEAL::1.0  
+DEAL::
+DEAL::FE_Bernstein<1>(2) to FE_Bernstein<1>(2)
+DEAL::1.0  
+DEAL::
+DEAL::FE_Bernstein<2>(1) to FE_Q<2>(1)
+DEAL::1.0  0.0  
+DEAL::0.0  1.0  
+DEAL::
+DEAL::FE_Bernstein<2>(1) to FE_Bernstein<2>(1)
+DEAL::1.0  0.0  
+DEAL::0.0  1.0  
+DEAL::
+DEAL::FE_Bernstein<2>(2) to FE_Q<2>(2)
+DEAL::1.0  0.0  0.0  
+DEAL::0.0  1.0  0.0  
+DEAL::0.25 0.25 0.50 
+DEAL::
+DEAL::FE_Bernstein<2>(2) to FE_Bernstein<2>(2)
+DEAL::1.0  0.0  0.0  
+DEAL::0.0  1.0  0.0  
+DEAL::0.25 0.25 0.50 
+DEAL::
