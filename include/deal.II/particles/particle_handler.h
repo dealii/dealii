@@ -208,7 +208,9 @@ namespace Particles
     /**
      * Return the number of particles that live on the given cell.
      *
-     * @note While this function is used in step-19, it is not an efficient
+     * @note
+     *  //TODO this not true now no?
+     *  While this function is used in step-19, it is not an efficient
      *   function to use if the number of particles is large. That is because
      *   to find the particles that are located in one cell costs
      *   ${\cal O}(\log N)$ where $N$ is the number of overall particles. Since
@@ -847,16 +849,10 @@ namespace Particles
     std::unique_ptr<PropertyPool<dim, spacedim>> property_pool;
 
     /**
-     * Set of particles currently living in the local domain, organized by
-     * the level/index of the cell they are in.
+     * Set of particles currently living in the local domain including ghost
+     * cells , organized by the level/index of the cell they are in.
      */
     particle_container particles;
-
-    /**
-     * Set of particles currently living in the local domain, organized by
-     * the level/index of the cell they are in.
-     */
-    particle_container ghost_particles;
 
     /**
      * This variable stores how many particles are stored globally. It is
@@ -1113,8 +1109,8 @@ namespace Particles
 
     for (const auto &cell : triangulation->active_cell_iterators())
       if (cell->is_locally_owned() == false &&
-          ghost_particles[cell->active_cell_index()].size() != 0)
-        return particle_iterator(ghost_particles, *property_pool, cell, 0);
+          particles[cell->active_cell_index()].size() != 0)
+        return particle_iterator(particles, *property_pool, cell, 0);
 
     return end_ghost();
   }
@@ -1134,7 +1130,7 @@ namespace Particles
   inline typename ParticleHandler<dim, spacedim>::particle_iterator
   ParticleHandler<dim, spacedim>::end_ghost()
   {
-    return particle_iterator(ghost_particles,
+    return particle_iterator(particles,
                              *property_pool,
                              triangulation->end(),
                              0);

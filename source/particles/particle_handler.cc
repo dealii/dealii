@@ -94,7 +94,6 @@ namespace Particles
     , mapping()
     , property_pool(std::make_unique<PropertyPool<dim, spacedim>>(0))
     , particles()
-    , ghost_particles()
     , global_number_of_particles(0)
     , local_number_of_particles(0)
     , global_max_particles_per_cell(0)
@@ -116,7 +115,6 @@ namespace Particles
     , mapping(&mapping, typeid(*this).name())
     , property_pool(std::make_unique<PropertyPool<dim, spacedim>>(n_properties))
     , particles(triangulation.n_active_cells())
-    , ghost_particles(triangulation.n_active_cells())
     , global_number_of_particles(0)
     , local_number_of_particles(0)
     , global_max_particles_per_cell(0)
@@ -160,7 +158,6 @@ namespace Particles
                                                         new_mapping);
 
     particles.resize(triangulation->n_active_cells());
-    ghost_particles.resize(triangulation->n_active_cells());
   }
 
 
@@ -189,7 +186,6 @@ namespace Particles
       particle_handler.global_max_particles_per_cell;
     next_free_particle_index = particle_handler.next_free_particle_index;
     particles                = particle_handler.particles;
-    ghost_particles          = particle_handler.ghost_particles;
 
     ghost_particles_cache.ghost_particles_by_domain =
       particle_handler.ghost_particles_cache.ghost_particles_by_domain;
@@ -223,15 +219,6 @@ namespace Particles
     particles.clear();
     if (triangulation != nullptr)
       particles.resize(triangulation->n_active_cells());
-
-    for (auto &particles_in_cell : ghost_particles)
-      for (auto &particle : particles_in_cell)
-        if (particle != PropertyPool<dim, spacedim>::invalid_handle)
-          property_pool->deregister_particle(particle);
-
-    ghost_particles.clear();
-    if (triangulation != nullptr)
-      ghost_particles.resize(triangulation->n_active_cells());
 
     // the particle properties have already been deleted by their destructor,
     // but the memory is still allocated. Return the memory as well.
@@ -314,10 +301,7 @@ namespace Particles
 
     if (cell->is_artificial() == false)
       {
-        if (cell->is_locally_owned() == true)
-          return particles[cell->active_cell_index()].size();
-        else
-          return ghost_particles[cell->active_cell_index()].size();
+        return particles[cell->active_cell_index()].size();
       }
     else
       AssertThrow(false,
@@ -351,8 +335,7 @@ namespace Particles
 
     if (cell->is_artificial() == false)
       {
-        particle_container &container =
-          (cell->is_locally_owned() == true) ? particles : ghost_particles;
+        particle_container &container = particles;
 
         if (container[active_cell_index].size() == 0)
           {
@@ -1328,15 +1311,6 @@ namespace Particles
 #ifndef DEAL_II_WITH_MPI
     (void)enable_cache;
 #else
-    // First clear the current ghost_particle information
-    for (auto &particles_in_cell : ghost_particles)
-      for (auto &particle : particles_in_cell)
-        if (particle != PropertyPool<dim, spacedim>::invalid_handle)
-          property_pool->deregister_particle(particle);
-    ghost_particles.clear();
-    ghost_particles.resize(triangulation->n_active_cells());
-
-    // Clear ghost particles data structures and invalidate cache
     ghost_particles_cache.ghost_particles_by_domain.clear();
     ghost_particles_cache.valid = false;
 
@@ -1381,9 +1355,11 @@ namespace Particles
           }
       }
 
+
+    // TODO - To fix
     send_recv_particles(
       ghost_particles_cache.ghost_particles_by_domain,
-      ghost_particles,
+      particles,
       std::map<
         types::subdomain_id,
         std::vector<
@@ -1418,7 +1394,7 @@ namespace Particles
 
 
     send_recv_particles_properties_and_location(
-      ghost_particles_cache.ghost_particles_by_domain, ghost_particles);
+      ghost_particles_cache.ghost_particles_by_domain, particles);
 #endif
   }
 
