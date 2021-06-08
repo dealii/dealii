@@ -18,8 +18,8 @@ INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 SET(_unity_include_src
   data_out.cc
   data_out_faces.cc
-  data_out_stack.cc
   data_out_rotation.cc
+  data_out_stack.cc
   data_postprocessor.cc
   dof_output_operator.cc
   histogram.cc
@@ -38,6 +38,7 @@ SET(_separate_src
   data_out_dof_data.cc
   data_out_dof_data_inst2.cc
   data_out_dof_data_codim.cc
+  data_out_resample.cc
   derivative_approximation.cc
   error_estimator_1d.cc
   error_estimator.cc
@@ -77,6 +78,7 @@ SET(_inst
   data_out_dof_data_codim.inst.in
   data_out_faces.inst.in
   data_out.inst.in
+  data_out_resample.inst.in
   data_out_rotation.inst.in
   data_out_stack.inst.in
   data_postprocessor.inst.in

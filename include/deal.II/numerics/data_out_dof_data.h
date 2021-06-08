@@ -1001,6 +1001,7 @@ public:
   virtual const std::vector<Patch> &
   get_patches() const override;
 
+protected:
   /**
    * Virtual function through which the names of data sets are obtained by the
    * output functions of the base class.
