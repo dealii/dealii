@@ -824,6 +824,17 @@ namespace Particles
 
   private:
     /**
+     * Insert a particle into the collection of particles from a raw
+     * data pointer. This function is used for shipping particles
+     * during serialization and refinement and not intended for use outside
+     * of this class. Return an iterator to the new position of the particle.
+     */
+    particle_iterator
+    insert_particle(
+      const void *&                                                      data,
+      const typename Triangulation<dim, spacedim>::active_cell_iterator &cell);
+
+    /**
      * Address of the triangulation to work on.
      */
     SmartPointer<const Triangulation<dim, spacedim>,
