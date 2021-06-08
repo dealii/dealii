@@ -207,28 +207,6 @@ namespace Particles
 
     /**
      * Return the number of particles that live on the given cell.
-     *
-     * @note
-     *  //TODO this not true now no?
-     *  While this function is used in step-19, it is not an efficient
-     *   function to use if the number of particles is large. That is because
-     *   to find the particles that are located in one cell costs
-     *   ${\cal O}(\log N)$ where $N$ is the number of overall particles. Since
-     *   you will likely do this for every cell, and assuming that the number
-     *   of particles and the number of cells are roughly proportional,
-     *   you end up with an ${\cal O}(N \log N)$ algorithm. A better approach
-     *   is to use the fact that internally, particles are arranged in the
-     *   order of the active cells they are in. In other words, if you iterate
-     *   over all particles, you will encounter them in the same order as
-     *   you walk over the active cells. You can exploit this by keeping an
-     *   iterator to the first particle of the first cell, and when you move
-     *   to the next cell, you increment the particle iterator as well until
-     *   you find a particle located on that next cell. Counting how many
-     *   steps this took will then give you the number you are looking for,
-     *   at a cost of ${\cal O}(\log N)$ when accumulated over all cells.
-     *   This is the approach used in step-70, for example. The approach is
-     *   also detailed in the "Possibilities for extensions section"
-     *   of step-19.
      */
     types::particle_index
     n_particles_in_cell(
