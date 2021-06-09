@@ -1722,6 +1722,13 @@ namespace internal
   Assert(dealii::numbers::is_finite(number), \
          dealii::ExcNumberNotFinite(std::complex<double>(number)))
 
+/**
+ * Assert that a geometric object is not used. This assertion is used when
+ * constructing triangulations and should normally not be used inside user
+ * codes.
+ */
+#define AssertIsNotUsed(obj) Assert((obj)->used() == false, ExcInternalError())
+
 #ifdef DEAL_II_WITH_MPI
 /**
  * An assertion that checks whether or not an error code returned by an MPI
