@@ -741,6 +741,28 @@ MappingQCache<dim, spacedim>::compute_mapping_support_points(
 
 
 
+template <int dim, int spacedim>
+boost::container::small_vector<Point<spacedim>,
+                               GeometryInfo<dim>::vertices_per_cell>
+MappingQCache<dim, spacedim>::get_vertices(
+  const typename Triangulation<dim, spacedim>::cell_iterator &cell) const
+{
+  Assert(support_point_cache.get() != nullptr,
+         ExcMessage("Must call MappingQCache::initialize() before "
+                    "using it or after mesh has changed!"));
+
+  Assert(uses_level_info || cell->is_active(), ExcInternalError());
+
+  AssertIndexRange(cell->level(), support_point_cache->size());
+  AssertIndexRange(cell->index(), (*support_point_cache)[cell->level()].size());
+  const auto ptr = (*support_point_cache)[cell->level()][cell->index()].begin();
+  return boost::container::small_vector<Point<spacedim>,
+                                        GeometryInfo<dim>::vertices_per_cell>(
+    ptr, ptr + cell->n_vertices());
+}
+
+
+
 //--------------------------- Explicit instantiations -----------------------
 #include "mapping_q_cache.inst"
 
