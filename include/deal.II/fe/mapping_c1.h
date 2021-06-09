@@ -28,14 +28,14 @@ DEAL_II_NAMESPACE_OPEN
 
 /**
  * Mapping class that uses C1 (continuously differentiable) cubic mappings of
- * the boundary. This class is built atop of MappingQ by simply determining
- * the interpolation points for a cubic mapping of the boundary differently:
- * MappingQ chooses them such that they interpolate the boundary, while this
- * class chooses them such that the discretized boundary is globally
- * continuously differentiable.
+ * the boundary. This class is built atop of MappingQGeneric by simply
+ * determining the interpolation points for a cubic mapping of the boundary
+ * differently: MappingQ chooses them such that they interpolate the boundary,
+ * while this class chooses them such that the discretized boundary is
+ * globally continuously differentiable.
  */
 template <int dim, int spacedim = dim>
-class MappingC1 : public MappingQ<dim, spacedim>
+class MappingC1 : public MappingQGeneric<dim, spacedim>
 {
 public:
   /**
@@ -51,48 +51,33 @@ public:
   virtual std::unique_ptr<Mapping<dim, spacedim>>
   clone() const override;
 
-protected:
   /**
-   * A class derived from MappingQGeneric that provides the generic mapping
-   * with support points on boundary objects so that the corresponding Q3
-   * mapping ends up being C1.
+   * For <tt>dim=2,3</tt>. Append the support points of all shape functions
+   * located on bounding lines to the vector @p a. Points located on the
+   * line but on vertices are not included.
+   *
+   * This function chooses the respective points not such that they are
+   * interpolating the boundary (as does the base class), but rather such
+   * that the resulting cubic mapping is a continuous one.
    */
-  class MappingC1Generic : public MappingQGeneric<dim, spacedim>
-  {
-  public:
-    /**
-     * Constructor.
-     */
-    MappingC1Generic();
+  virtual void
+  add_line_support_points(
+    const typename Triangulation<dim>::cell_iterator &cell,
+    std::vector<Point<dim>> &                         a) const override;
 
-    /**
-     * For <tt>dim=2,3</tt>. Append the support points of all shape functions
-     * located on bounding lines to the vector @p a. Points located on the
-     * line but on vertices are not included.
-     *
-     * This function chooses the respective points not such that they are
-     * interpolating the boundary (as does the base class), but rather such
-     * that the resulting cubic mapping is a continuous one.
-     */
-    virtual void
-    add_line_support_points(
-      const typename Triangulation<dim>::cell_iterator &cell,
-      std::vector<Point<dim>> &                         a) const override;
-
-    /**
-     * For <tt>dim=3</tt>. Append the support points of all shape functions
-     * located on bounding faces (quads in 3d) to the vector @p a. Points
-     * located on the line but on vertices are not included.
-     *
-     * This function chooses the respective points not such that they are
-     * interpolating the boundary (as does the base class), but rather such
-     * that the resulting cubic mapping is a continuous one.
-     */
-    virtual void
-    add_quad_support_points(
-      const typename Triangulation<dim>::cell_iterator &cell,
-      std::vector<Point<dim>> &                         a) const override;
-  };
+  /**
+   * For <tt>dim=3</tt>. Append the support points of all shape functions
+   * located on bounding faces (quads in 3d) to the vector @p a. Points
+   * located on the line but on vertices are not included.
+   *
+   * This function chooses the respective points not such that they are
+   * interpolating the boundary (as does the base class), but rather such
+   * that the resulting cubic mapping is a continuous one.
+   */
+  virtual void
+  add_quad_support_points(
+    const typename Triangulation<dim>::cell_iterator &cell,
+    std::vector<Point<dim>> &                         a) const override;
 };
 
 /*@}*/
@@ -103,25 +88,22 @@ protected:
 
 template <>
 void
-MappingC1<1>::MappingC1Generic::add_line_support_points(
-  const Triangulation<1>::cell_iterator &,
-  std::vector<Point<1>> &) const;
+MappingC1<1>::add_line_support_points(const Triangulation<1>::cell_iterator &,
+                                      std::vector<Point<1>> &) const;
 template <>
 void
-MappingC1<2>::MappingC1Generic::add_line_support_points(
+MappingC1<2>::add_line_support_points(
   const Triangulation<2>::cell_iterator &cell,
   std::vector<Point<2>> &                a) const;
 
 template <>
 void
-MappingC1<1>::MappingC1Generic::add_quad_support_points(
-  const Triangulation<1>::cell_iterator &,
-  std::vector<Point<1>> &) const;
+MappingC1<1>::add_quad_support_points(const Triangulation<1>::cell_iterator &,
+                                      std::vector<Point<1>> &) const;
 template <>
 void
-MappingC1<2>::MappingC1Generic::add_quad_support_points(
-  const Triangulation<2>::cell_iterator &,
-  std::vector<Point<2>> &) const;
+MappingC1<2>::add_quad_support_points(const Triangulation<2>::cell_iterator &,
+                                      std::vector<Point<2>> &) const;
 
 
 #endif // DOXYGEN
