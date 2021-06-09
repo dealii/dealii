@@ -809,7 +809,7 @@ namespace Particles
 
     /**
      * Set of particles currently living in the local domain including ghost
-     * cells , organized by the active cell of the cell they are in.
+     * cells, organized by the active cell of the cell they are in.
      */
     particle_container particles;
 

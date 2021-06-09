@@ -1066,10 +1066,10 @@ namespace Particles
         const unsigned int n_pic = particles[active_cell_index].size();
 
         // Particles can be inserted into arbitrary cells, e.g. if their cell is
-        // not known. However, for artificial cells we can not check evaluate
-        // the reference position of particles and particles in ghost cells
-        // should not be owned by this process. Assume all particles that are in
-        // not locally owned cells have to be resorted or transferred.
+        // not known. However, for artificial cells we can not evaluate
+        // the reference position of particles. Do not sort particles that are
+        // not locally owned, because they will be sorted by the process that
+        // owns them.
         if (cell->is_locally_owned() == false)
           {
             continue;
@@ -1308,6 +1308,19 @@ namespace Particles
 #ifndef DEAL_II_WITH_MPI
     (void)enable_cache;
 #else
+    // Clear ghost particles and their properties
+    for (const auto &cell : triangulation->active_cell_iterators())
+      if (cell->is_locally_owned() == false)
+        {
+          // Clear particle properties
+          for (auto &ghost_particle : particles[cell->active_cell_index()])
+            property_pool->deregister_particle(ghost_particle);
+
+          // Clear particles themselves
+          particles[cell->active_cell_index()].clear();
+        }
+
+    // Clear ghost particles cache and invalidate it
     ghost_particles_cache.ghost_particles_by_domain.clear();
     ghost_particles_cache.valid = false;
 
