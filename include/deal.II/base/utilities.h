@@ -1334,7 +1334,11 @@ namespace Utilities
     // see if the object is small and copyable via memcpy. if so, use
     // this fast path. otherwise, we have to go through the BOOST
     // serialization machinery
+#ifdef DEAL_II_HAVE_CXX17
+    if constexpr (std::is_trivially_copyable<T>() && sizeof(T) < 256)
+#else
     if (std::is_trivially_copyable<T>() && sizeof(T) * N < 256)
+#endif
       {
         Assert(std::distance(cbegin, cend) == sizeof(T) * N,
                ExcInternalError());
