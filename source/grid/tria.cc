@@ -2445,9 +2445,11 @@ namespace internal
 
                   // set face orientation if needed
                   if (orientation_needed)
-                    level.face_orientations
-                      [cell * GeometryInfo<dim>::faces_per_cell + j] =
-                      connectivity.entity_orientations(dim - 1)[i];
+                    {
+                      level.face_orientations
+                        [cell * GeometryInfo<dim>::faces_per_cell + j] =
+                        connectivity.entity_orientations(dim - 1)[i];
+                    }
                 }
             }
         }
@@ -5112,6 +5114,1218 @@ namespace internal
       }
 
 
+      template <int spacedim>
+      static typename Triangulation<3, spacedim>::DistortedCellList
+        execute_refinement_isotropic(Triangulation<3, spacedim> &triangulation,
+                                     const bool check_for_distorted_cells)
+      {
+        static const int          dim = 3;
+        static const unsigned int X   = numbers::invalid_unsigned_int;
+
+        Assert(spacedim == 3, ExcNotImplemented());
+
+        {
+          typename Triangulation<dim, spacedim>::raw_cell_iterator
+            cell = triangulation.begin_active(triangulation.levels.size() - 1),
+            endc = triangulation.end();
+          for (; cell != endc; ++cell)
+            if (cell->used())
+              if (cell->refine_flag_set())
+                {
+                  triangulation.levels.push_back(
+                    std::make_unique<
+                      internal::TriangulationImplementation::TriaLevel>(dim));
+                  break;
+                }
+        }
+
+
+        triangulation.faces->quads.clear_user_data();
+
+        for (typename Triangulation<dim, spacedim>::line_iterator line =
+               triangulation.begin_line();
+             line != triangulation.end_line();
+             ++line)
+          line->clear_user_flag();
+
+        for (typename Triangulation<dim, spacedim>::quad_iterator quad =
+               triangulation.begin_quad();
+             quad != triangulation.end_quad();
+             ++quad)
+          quad->clear_user_flag();
+
+        unsigned int needed_vertices     = 0;
+        unsigned int needed_lines_single = 0;
+        unsigned int needed_quads_single = 0;
+        unsigned int needed_lines_pair   = 0;
+        unsigned int needed_quads_pair   = 0;
+        for (int level = triangulation.levels.size() - 2; level >= 0; --level)
+          {
+            unsigned int new_cells = 0;
+
+            for (const auto &acell :
+                 triangulation.active_cell_iterators_on_level(level))
+              if (acell->refine_flag_set())
+                {
+                  Assert(acell->refine_flag_set() ==
+                           RefinementCase<dim>::cut_xyz,
+                         ExcInternalError());
+
+                  if (acell->reference_cell() == ReferenceCells::Hexahedron)
+                    {
+                      ++needed_vertices;
+                      needed_lines_single += 6;
+                      needed_quads_single += 12;
+                      new_cells += 8;
+                    }
+                  else if (acell->reference_cell() ==
+                           ReferenceCells::Tetrahedron)
+                    {
+                      needed_lines_single += 1;
+                      needed_quads_single += 8;
+                      new_cells += 8;
+                    }
+                  else
+                    {
+                      Assert(false, ExcInternalError());
+                    }
+
+                  for (const auto face : acell->face_indices())
+                    if (acell->face(face)->number_of_children() < 4)
+                      acell->face(face)->set_user_flag();
+
+                  for (const auto line : acell->line_indices())
+                    if (acell->line(line)->has_children() == false)
+                      acell->line(line)->set_user_flag();
+                }
+
+            const unsigned int used_cells =
+              std::count(triangulation.levels[level + 1]->cells.used.begin(),
+                         triangulation.levels[level + 1]->cells.used.end(),
+                         true);
+
+            reserve_space(*triangulation.levels[level + 1],
+                          used_cells + new_cells,
+                          3,
+                          spacedim);
+
+            reserve_space(triangulation.levels[level + 1]->cells, new_cells);
+          }
+
+        for (typename Triangulation<dim, spacedim>::quad_iterator quad =
+               triangulation.begin_quad();
+             quad != triangulation.end_quad();
+             ++quad)
+          {
+            if (quad->user_flag_set() == false)
+              continue;
+
+            if (quad->reference_cell() == ReferenceCells::Quadrilateral)
+              {
+                needed_quads_pair += 4;
+                needed_lines_pair += 4;
+                needed_vertices += 1;
+              }
+            else if (quad->reference_cell() == ReferenceCells::Triangle)
+              {
+                needed_quads_pair += 4;
+                needed_lines_single += 3;
+              }
+            else
+              {
+                Assert(false, ExcInternalError());
+              }
+          }
+
+        for (typename Triangulation<dim, spacedim>::line_iterator line =
+               triangulation.begin_line();
+             line != triangulation.end_line();
+             ++line)
+          {
+            if (line->user_flag_set() == false)
+              continue;
+
+            needed_lines_pair += 2;
+            needed_vertices += 1;
+          }
+
+        reserve_space(triangulation.faces->lines,
+                      needed_lines_pair,
+                      needed_lines_single);
+        reserve_space(*triangulation.faces,
+                      needed_quads_pair,
+                      needed_quads_single);
+        reserve_space(triangulation.faces->quads,
+                      needed_quads_pair,
+                      needed_quads_single);
+
+
+        needed_vertices += std::count(triangulation.vertices_used.begin(),
+                                      triangulation.vertices_used.end(),
+                                      true);
+
+        if (needed_vertices > triangulation.vertices.size())
+          {
+            triangulation.vertices.resize(needed_vertices, Point<spacedim>());
+            triangulation.vertices_used.resize(needed_vertices, false);
+          }
+
+        unsigned int next_unused_vertex = 0;
+
+        // LINES
+        {
+          typename Triangulation<dim, spacedim>::active_line_iterator
+            line = triangulation.begin_active_line(),
+            endl = triangulation.end_line();
+          typename Triangulation<dim, spacedim>::raw_line_iterator
+            next_unused_line = triangulation.begin_raw_line();
+
+          for (; line != endl; ++line)
+            {
+              if (line->user_flag_set() == false)
+                continue;
+
+              while (triangulation.vertices_used[next_unused_vertex] == true)
+                ++next_unused_vertex;
+              Assert(
+                next_unused_vertex < triangulation.vertices.size(),
+                ExcMessage(
+                  "Internal error: During refinement, the triangulation wants to access an element of the 'vertices' array but it turns out that the array is not large enough."));
+              triangulation.vertices_used[next_unused_vertex] = true;
+
+              triangulation.vertices[next_unused_vertex] = line->center(true);
+
+              next_unused_line =
+                triangulation.faces->lines.template next_free_pair_object<1>(
+                  triangulation);
+              Assert(next_unused_line.state() == IteratorState::valid,
+                     ExcInternalError());
+
+              line->set_children(0, next_unused_line->index());
+
+              const typename Triangulation<dim, spacedim>::raw_line_iterator
+                children[2] = {next_unused_line, ++next_unused_line};
+
+              Assert(
+                children[0]->used() == false,
+                ExcMessage(
+                  "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
+              Assert(
+                children[1]->used() == false,
+                ExcMessage(
+                  "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
+
+              children[0]->set_bounding_object_indices(
+                {line->vertex_index(0), next_unused_vertex});
+              children[1]->set_bounding_object_indices(
+                {next_unused_vertex, line->vertex_index(1)});
+
+              children[0]->set_used_flag();
+              children[1]->set_used_flag();
+              children[0]->clear_children();
+              children[1]->clear_children();
+              children[0]->clear_user_data();
+              children[1]->clear_user_data();
+              children[0]->clear_user_flag();
+              children[1]->clear_user_flag();
+
+              children[0]->set_boundary_id_internal(line->boundary_id());
+              children[1]->set_boundary_id_internal(line->boundary_id());
+
+              children[0]->set_manifold_id(line->manifold_id());
+              children[1]->set_manifold_id(line->manifold_id());
+
+              line->clear_user_flag();
+            }
+        }
+
+        // QUADS
+        {
+          typename Triangulation<dim, spacedim>::quad_iterator
+            quad = triangulation.begin_quad(),
+            endq = triangulation.end_quad();
+          typename Triangulation<dim, spacedim>::raw_line_iterator
+            next_unused_line = triangulation.begin_raw_line();
+          typename Triangulation<dim, spacedim>::raw_quad_iterator
+            next_unused_quad = triangulation.begin_raw_quad();
+
+          for (; quad != endq; ++quad)
+            {
+              if (quad->user_flag_set() == false)
+                continue;
+
+              const auto &reference_cell_type = quad->reference_cell();
+
+              // 1) create new vertex (at the center of the face)
+              if (reference_cell_type == ReferenceCells::Quadrilateral)
+                {
+                  while (triangulation.vertices_used[next_unused_vertex] ==
+                         true)
+                    ++next_unused_vertex;
+                  Assert(
+                    next_unused_vertex < triangulation.vertices.size(),
+                    ExcMessage(
+                      "Internal error: During refinement, the triangulation wants to access an element of the 'vertices' array but it turns out that the array is not large enough."));
+
+                  triangulation.vertices[next_unused_vertex] =
+                    quad->center(true, true);
+                  triangulation.vertices_used[next_unused_vertex] = true;
+                }
+
+              // 2) create new lines (property is set later)
+              boost::container::small_vector<
+                typename Triangulation<dim, spacedim>::raw_line_iterator,
+                4>
+                new_lines(quad->n_lines());
+              {
+                for (unsigned int i = 0; i < new_lines.size(); ++i)
+                  {
+                    if (quad->n_lines() % 2 == 0)
+                      {
+                        Assert(reference_cell_type ==
+                                 ReferenceCells::Quadrilateral,
+                               ExcNotImplemented());
+                        if (i % 2 == 0)
+                          next_unused_line =
+                            triangulation.faces->lines
+                              .template next_free_pair_object<1>(triangulation);
+                      }
+                    else
+                      {
+                        Assert(reference_cell_type == ReferenceCells::Triangle,
+                               ExcNotImplemented());
+                        next_unused_line =
+                          triangulation.faces->lines
+                            .template next_free_single_object<1>(triangulation);
+                      }
+
+                    new_lines[i] = next_unused_line;
+                    ++next_unused_line;
+
+                    Assert(
+                      new_lines[i]->used() == false,
+                      ExcMessage(
+                        "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
+                  }
+              }
+
+              // 3) create new quads (properties are set below)
+              std::array<
+                typename Triangulation<dim, spacedim>::raw_quad_iterator,
+                4>
+                new_quads;
+              {
+                next_unused_quad =
+                  triangulation.faces->quads.template next_free_pair_object<2>(
+                    triangulation);
+
+                new_quads[0] = next_unused_quad;
+                Assert(
+                  new_quads[0]->used() == false,
+                  ExcMessage(
+                    "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
+
+                ++next_unused_quad;
+                new_quads[1] = next_unused_quad;
+                Assert(
+                  new_quads[1]->used() == false,
+                  ExcMessage(
+                    "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
+
+                next_unused_quad =
+                  triangulation.faces->quads.template next_free_pair_object<2>(
+                    triangulation);
+                new_quads[2] = next_unused_quad;
+                Assert(
+                  new_quads[2]->used() == false,
+                  ExcMessage(
+                    "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
+
+                ++next_unused_quad;
+                new_quads[3] = next_unused_quad;
+                Assert(
+                  new_quads[3]->used() == false,
+                  ExcMessage(
+                    "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
+
+                quad->set_children(0, new_quads[0]->index());
+                quad->set_children(2, new_quads[2]->index());
+                quad->set_refinement_case(RefinementCase<2>::cut_xy);
+              }
+
+              std::array<unsigned int, 9> vertex_indices;
+              {
+                for (auto &i : vertex_indices)
+                  i = 0.0;
+
+                unsigned int k = 0;
+                for (const auto i : quad->vertex_indices())
+                  vertex_indices[k++] = quad->vertex_index(i);
+
+                for (const auto i : quad->line_indices())
+                  vertex_indices[k++] =
+                    quad->line(i)->child(0)->vertex_index(1);
+
+                vertex_indices[k++] = next_unused_vertex;
+              }
+
+              boost::container::small_vector<
+                typename Triangulation<dim, spacedim>::raw_line_iterator,
+                12>
+                lines(quad->n_lines() * 3);
+
+              {
+                unsigned int k = 0;
+
+                for (unsigned int l = 0; l < quad->n_lines(); ++l)
+                  for (unsigned int c = 0; c < 2; ++c)
+                    {
+                      static constexpr std::array<std::array<unsigned int, 2>,
+                                                  2>
+                        index = {
+                          {{{1, 0}}, // child 0, line_orientation=false and true
+                           {{0,
+                             1}}}}; // child 1, line_orientation=false and true
+
+                      lines[k++] = quad->line(l)->child(
+                        index[c][quad->line_orientation(l)]);
+                    }
+
+                for (unsigned int l = 0; l < new_lines.size(); ++l)
+                  lines[k++] = new_lines[l];
+              }
+
+              boost::container::small_vector<int, 12> line_indices(
+                lines.size());
+              for (unsigned int i = 0; i < line_indices.size(); ++i)
+                line_indices[i] = lines[i]->index();
+
+              static constexpr std::array<std::array<unsigned int, 2>, 12>
+                line_vertices_quad{{{{0, 4}},
+                                    {{4, 2}},
+                                    {{1, 5}},
+                                    {{5, 3}},
+                                    {{0, 6}},
+                                    {{6, 1}},
+                                    {{2, 7}},
+                                    {{7, 3}},
+                                    {{6, 8}},
+                                    {{8, 7}},
+                                    {{4, 8}},
+                                    {{8, 5}}}};
+
+              static constexpr std::array<std::array<unsigned int, 4>, 4>
+                quad_lines_quad{{{{0, 8, 4, 10}},
+                                 {{8, 2, 5, 11}},
+                                 {{1, 9, 10, 6}},
+                                 {{9, 3, 11, 7}}}};
+
+              static constexpr std::
+                array<std::array<std::array<unsigned int, 2>, 4>, 4>
+                  quad_line_vertices_quad{
+                    {{{{{0, 4}}, {{6, 8}}, {{0, 6}}, {{4, 8}}}},
+                     {{{{6, 8}}, {{1, 5}}, {{6, 1}}, {{8, 5}}}},
+                     {{{{4, 2}}, {{8, 7}}, {{4, 8}}, {{2, 7}}}},
+                     {{{{8, 7}}, {{5, 3}}, {{8, 5}}, {{7, 3}}}}}};
+
+              static constexpr std::array<std::array<unsigned int, 2>, 12>
+                line_vertices_tri{{{{0, 3}},
+                                   {{3, 1}},
+                                   {{1, 4}},
+                                   {{4, 2}},
+                                   {{2, 5}},
+                                   {{5, 0}},
+                                   {{3, 4}},
+                                   {{4, 5}},
+                                   {{3, 5}},
+                                   {{X, X}},
+                                   {{X, X}},
+                                   {{X, X}}}};
+
+              static constexpr std::array<std::array<unsigned int, 4>, 4>
+                quad_lines_tri{{{{0, 8, 5, X}},
+                                {{1, 2, 6, X}},
+                                {{7, 3, 4, X}},
+                                {{6, 7, 8, X}}}};
+
+              static constexpr std::
+                array<std::array<std::array<unsigned int, 2>, 4>, 4>
+                  quad_line_vertices_tri{
+                    {{{{{0, 3}}, {{3, 5}}, {{5, 0}}, {{X, X}}}},
+                     {{{{3, 1}}, {{1, 4}}, {{4, 3}}, {{X, X}}}},
+                     {{{{5, 4}}, {{4, 2}}, {{2, 5}}, {{X, X}}}},
+                     {{{{3, 4}}, {{4, 5}}, {{5, 3}}, {{X, X}}}}}};
+
+              const auto &line_vertices =
+                (reference_cell_type == ReferenceCells::Quadrilateral) ?
+                  line_vertices_quad :
+                  line_vertices_tri;
+              const auto &quad_lines =
+                (reference_cell_type == ReferenceCells::Quadrilateral) ?
+                  quad_lines_quad :
+                  quad_lines_tri;
+              const auto &quad_line_vertices =
+                (reference_cell_type == ReferenceCells::Quadrilateral) ?
+                  quad_line_vertices_quad :
+                  quad_line_vertices_tri;
+
+              // 4) set properties of lines
+              for (unsigned int i = 0, j = lines.size() - new_lines.size();
+                   i < new_lines.size();
+                   ++i, ++j)
+                {
+                  auto &new_line = new_lines[i];
+                  new_line->set_bounding_object_indices(
+                    {vertex_indices[line_vertices[j][0]],
+                     vertex_indices[line_vertices[j][1]]});
+                  new_line->set_used_flag();
+                  new_line->clear_user_flag();
+                  new_line->clear_user_data();
+                  new_line->clear_children();
+                  new_line->set_boundary_id_internal(quad->boundary_id());
+                  new_line->set_manifold_id(quad->manifold_id());
+                }
+
+              // 5) set properties of quads
+              for (unsigned int i = 0; i < new_quads.size(); ++i)
+                {
+                  auto &new_quad = new_quads[i];
+
+                  // TODO: we assume here that all children have the same type
+                  // as the parent
+                  triangulation.faces->quad_reference_cell[new_quad->index()] =
+                    reference_cell_type;
+
+                  if (new_quad->n_lines() == 3)
+                    new_quad->set_bounding_object_indices(
+                      {line_indices[quad_lines[i][0]],
+                       line_indices[quad_lines[i][1]],
+                       line_indices[quad_lines[i][2]]});
+                  else if (new_quad->n_lines() == 4)
+                    new_quad->set_bounding_object_indices(
+                      {line_indices[quad_lines[i][0]],
+                       line_indices[quad_lines[i][1]],
+                       line_indices[quad_lines[i][2]],
+                       line_indices[quad_lines[i][3]]});
+                  else
+                    Assert(false, ExcNotImplemented());
+
+                  new_quad->set_used_flag();
+                  new_quad->clear_user_flag();
+                  new_quad->clear_user_data();
+                  new_quad->clear_children();
+                  new_quad->set_boundary_id_internal(quad->boundary_id());
+                  new_quad->set_manifold_id(quad->manifold_id());
+
+#ifdef DEBUG
+                  std::set<unsigned int> s;
+#endif
+
+                  // ... and fix orientation of faces (lines) of quad
+                  for (const auto f : new_quad->line_indices())
+                    {
+                      std::array<unsigned int, 2> vertices_0, vertices_1;
+
+                      for (unsigned int v = 0; v < 2; ++v)
+                        vertices_0[v] =
+                          lines[quad_lines[i][f]]->vertex_index(v);
+
+                      for (unsigned int v = 0; v < 2; ++v)
+                        vertices_1[v] =
+                          vertex_indices[quad_line_vertices[i][f][v]];
+
+                      const auto orientation =
+                        ReferenceCells::Line.compute_orientation(vertices_0,
+                                                                 vertices_1);
+
+#ifdef DEBUG
+                      for (const auto i : vertices_0)
+                        s.insert(i);
+                      for (const auto i : vertices_1)
+                        s.insert(i);
+#endif
+
+                      new_quad->set_line_orientation(f, orientation);
+                    }
+#ifdef DEBUG
+                  AssertDimension(
+                    s.size(),
+                    (reference_cell_type == ReferenceCells::Quadrilateral ? 4 :
+                                                                            3));
+#endif
+                }
+
+              quad->clear_user_flag();
+            }
+        }
+
+        typename Triangulation<3, spacedim>::DistortedCellList
+          cells_with_distorted_children;
+
+        for (unsigned int level = 0; level != triangulation.levels.size() - 1;
+             ++level)
+          {
+            typename Triangulation<dim, spacedim>::active_hex_iterator
+              hex  = triangulation.begin_active_hex(level),
+              endh = triangulation.begin_active_hex(level + 1);
+            typename Triangulation<dim, spacedim>::raw_hex_iterator
+              next_unused_hex = triangulation.begin_raw_hex(level + 1);
+
+            for (; hex != endh; ++hex)
+              {
+                if (hex->refine_flag_set() ==
+                    RefinementCase<dim>::no_refinement)
+                  continue;
+
+                const auto &reference_cell_type = hex->reference_cell();
+
+                const RefinementCase<dim> ref_case = hex->refine_flag_set();
+                hex->clear_refine_flag();
+                hex->set_refinement_case(ref_case);
+
+                unsigned int n_new_lines = 0;
+                unsigned int n_new_quads = 0;
+                unsigned int n_new_hexes = 0;
+
+                if (reference_cell_type == ReferenceCells::Hexahedron)
+                  {
+                    n_new_lines = 6;
+                    n_new_quads = 12;
+                    n_new_hexes = 8;
+                  }
+                else if (reference_cell_type == ReferenceCells::Tetrahedron)
+                  {
+                    n_new_lines = 1;
+                    n_new_quads = 8;
+                    n_new_hexes = 8;
+                  }
+                else
+                  Assert(false, ExcNotImplemented());
+
+                if (reference_cell_type == ReferenceCells::Hexahedron)
+                  {
+                    while (triangulation.vertices_used[next_unused_vertex] ==
+                           true)
+                      ++next_unused_vertex;
+                    Assert(
+                      next_unused_vertex < triangulation.vertices.size(),
+                      ExcMessage(
+                        "Internal error: During refinement, the triangulation wants to access an element of the 'vertices' array but it turns out that the array is not large enough."));
+                    triangulation.vertices_used[next_unused_vertex] = true;
+
+                    triangulation.vertices[next_unused_vertex] =
+                      hex->center(true, true);
+                  }
+
+                std::vector<
+                  typename Triangulation<dim, spacedim>::raw_line_iterator>
+                  new_lines(n_new_lines);
+                for (unsigned int i = 0; i < n_new_lines; ++i)
+                  {
+                    new_lines[i] =
+                      triangulation.faces->lines
+                        .template next_free_single_object<1>(triangulation);
+
+                    Assert(
+                      new_lines[i]->used() == false,
+                      ExcMessage(
+                        "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
+                    new_lines[i]->set_used_flag();
+                    new_lines[i]->clear_user_flag();
+                    new_lines[i]->clear_user_data();
+                    new_lines[i]->clear_children();
+                    new_lines[i]->set_boundary_id_internal(
+                      numbers::internal_face_boundary_id);
+                    new_lines[i]->set_manifold_id(hex->manifold_id());
+                  }
+
+                std::vector<
+                  typename Triangulation<dim, spacedim>::raw_quad_iterator>
+                  new_quads(n_new_quads);
+                for (unsigned int i = 0; i < n_new_quads; ++i)
+                  {
+                    new_quads[i] =
+                      triangulation.faces->quads
+                        .template next_free_single_object<2>(triangulation);
+
+                    auto &new_quad = new_quads[i];
+
+                    // TODO: faces of children have the same type as the faces
+                    //  of the parent
+                    triangulation.faces
+                      ->quad_reference_cell[new_quad->index()] =
+                      (reference_cell_type == ReferenceCells::Hexahedron) ?
+                        ReferenceCells::Quadrilateral :
+                        ReferenceCells::Triangle;
+
+                    Assert(
+                      new_quad->used() == false,
+                      ExcMessage(
+                        "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
+                    new_quad->set_used_flag();
+                    new_quad->clear_user_flag();
+                    new_quad->clear_user_data();
+                    new_quad->clear_children();
+                    new_quad->set_boundary_id_internal(
+                      numbers::internal_face_boundary_id);
+                    new_quad->set_manifold_id(hex->manifold_id());
+                    for (const auto j : new_quads[i]->line_indices())
+                      new_quad->set_line_orientation(j, true);
+                  }
+
+                std::vector<
+                  typename Triangulation<dim, spacedim>::raw_hex_iterator>
+                  new_hexes(n_new_hexes);
+                {
+                  for (unsigned int i = 0; i < n_new_hexes; ++i)
+                    {
+                      if (i % 2 == 0)
+                        next_unused_hex =
+                          triangulation.levels[level + 1]->cells.next_free_hex(
+                            triangulation, level + 1);
+                      else
+                        ++next_unused_hex;
+
+                      new_hexes[i] = next_unused_hex;
+
+                      auto &new_hex = new_hexes[i];
+
+                      // TODO: children have the same type as the parent
+                      triangulation.levels[new_hex->level()]
+                        ->reference_cell[new_hex->index()] =
+                        reference_cell_type;
+
+                      Assert(
+                        new_hex->used() == false,
+                        ExcMessage(
+                          "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
+                      new_hex->set_used_flag();
+                      new_hex->clear_user_flag();
+                      new_hex->clear_user_data();
+                      new_hex->clear_children();
+                      new_hex->set_material_id(hex->material_id());
+                      new_hex->set_manifold_id(hex->manifold_id());
+                      new_hex->set_subdomain_id(hex->subdomain_id());
+
+                      if (i % 2)
+                        new_hex->set_parent(hex->index());
+                      for (const auto f : new_hex->face_indices())
+                        {
+                          new_hex->set_face_orientation(f, true);
+                          new_hex->set_face_flip(f, false);
+                          new_hex->set_face_rotation(f, false);
+                        }
+                    }
+                  // note these hexes as children to the present cell
+                  for (unsigned int i = 0; i < n_new_hexes / 2; ++i)
+                    hex->set_children(2 * i, new_hexes[2 * i]->index());
+                }
+
+                {
+                  // load vertex indices
+                  std::array<unsigned int, 27> vertex_indices;
+                  for (auto &i : vertex_indices)
+                    i = 0;
+
+                  {
+                    unsigned int k = 0;
+
+                    for (const unsigned int i : hex->vertex_indices())
+                      vertex_indices[k++] = hex->vertex_index(i);
+
+                    for (const unsigned int i : hex->line_indices())
+                      vertex_indices[k++] =
+                        hex->line(i)->child(0)->vertex_index(1);
+
+                    if (reference_cell_type == ReferenceCells::Hexahedron)
+                      {
+                        for (const unsigned int i : hex->face_indices())
+                          vertex_indices[k++] =
+                            middle_vertex_index<dim, spacedim>(hex->face(i));
+
+                        vertex_indices[k++] = next_unused_vertex;
+                      }
+                  }
+
+                  // set up new lines
+                  {
+                    static constexpr std::array<std::array<unsigned int, 2>, 6>
+                      new_line_vertices_hex = {{{{22, 26}},
+                                                {{26, 23}},
+                                                {{20, 26}},
+                                                {{26, 21}},
+                                                {{24, 26}},
+                                                {{26, 25}}}};
+
+                    static constexpr std::array<std::array<unsigned int, 2>, 6>
+                      new_line_vertices_tet = {{{{6, 8}},
+                                                {{X, X}},
+                                                {{X, X}},
+                                                {{X, X}},
+                                                {{X, X}},
+                                                {{X, X}}}};
+
+                    const auto &new_line_vertices =
+                      (reference_cell_type == ReferenceCells::Hexahedron) ?
+                        new_line_vertices_hex :
+                        new_line_vertices_tet;
+
+                    for (unsigned int i = 0; i < new_lines.size(); ++i)
+                      new_lines[i]->set_bounding_object_indices(
+                        {vertex_indices[new_line_vertices[i][0]],
+                         vertex_indices[new_line_vertices[i][1]]});
+                  }
+
+                  // set up new quads
+                  {
+                    boost::container::small_vector<
+                      typename Triangulation<dim, spacedim>::raw_line_iterator,
+                      30>
+                      relevant_lines(0);
+
+                    if (reference_cell_type == ReferenceCells::Hexahedron)
+                      {
+                        relevant_lines.resize(30);
+                        for (unsigned int f = 0, k = 0; f < 6; ++f)
+                          for (unsigned int c = 0; c < 4; ++c, ++k)
+                            {
+                              static constexpr std::
+                                array<std::array<unsigned int, 2>, 4>
+                                  temp = {
+                                    {{{0, 1}}, {{3, 0}}, {{0, 3}}, {{3, 2}}}};
+
+                              relevant_lines[k] =
+                                hex->face(f)
+                                  ->isotropic_child(
+                                    GeometryInfo<dim>::
+                                      standard_to_real_face_vertex(
+                                        temp[c][0],
+                                        hex->face_orientation(f),
+                                        hex->face_flip(f),
+                                        hex->face_rotation(f)))
+                                  ->line(GeometryInfo<dim>::
+                                           standard_to_real_face_line(
+                                             temp[c][1],
+                                             hex->face_orientation(f),
+                                             hex->face_flip(f),
+                                             hex->face_rotation(f)));
+                            }
+
+                        for (unsigned int i = 0, k = 24; i < 6; ++i, ++k)
+                          relevant_lines[k] = new_lines[i];
+                      }
+                    else if (reference_cell_type == ReferenceCells::Tetrahedron)
+                      {
+                        relevant_lines.resize(13);
+
+                        unsigned int k = 0;
+                        for (unsigned int f = 0; f < 4; ++f)
+                          for (unsigned int l = 0; l < 3; ++l, ++k)
+                            {
+                              // TODO: add comment
+                              static const std::
+                                array<std::array<unsigned int, 3>, 6>
+                                  table = {{{{1, 0, 2}}, // 0
+                                            {{0, 1, 2}},
+                                            {{0, 2, 1}}, // 2
+                                            {{1, 2, 0}},
+                                            {{2, 1, 0}}, // 4
+                                            {{2, 0, 1}}}};
+
+                              relevant_lines[k] =
+                                hex->face(f)
+                                  ->child(3 /*center triangle*/)
+                                  ->line(
+                                    table[triangulation.levels[hex->level()]
+                                            ->face_orientations
+                                              [hex->index() *
+                                                 GeometryInfo<
+                                                   dim>::faces_per_cell +
+                                               f]][l]);
+                            }
+
+                        relevant_lines[k++] = new_lines[0];
+
+                        AssertDimension(k, 13);
+                      }
+                    else
+                      Assert(false, ExcNotImplemented());
+
+                    boost::container::small_vector<unsigned int, 30>
+                      relevant_line_indices(relevant_lines.size());
+                    for (unsigned int i = 0; i < relevant_line_indices.size();
+                         ++i)
+                      relevant_line_indices[i] = relevant_lines[i]->index();
+
+                    static constexpr std::array<std::array<unsigned int, 4>, 12>
+                      new_quad_lines_hex = {{{{10, 28, 16, 24}},
+                                             {{28, 14, 17, 25}},
+                                             {{11, 29, 24, 20}},
+                                             {{29, 15, 25, 21}},
+                                             {{18, 26, 0, 28}},
+                                             {{26, 22, 1, 29}},
+                                             {{19, 27, 28, 4}},
+                                             {{27, 23, 29, 5}},
+                                             {{2, 24, 8, 26}},
+                                             {{24, 6, 9, 27}},
+                                             {{3, 25, 26, 12}},
+                                             {{25, 7, 27, 13}}}};
+
+                    static constexpr std::array<std::array<unsigned int, 4>, 12>
+                      new_quad_lines_tet = {{{{2, 3, 8, X}},
+                                             {{0, 9, 5, X}},
+                                             {{1, 6, 11, X}},
+                                             {{4, 10, 7, X}},
+                                             {{2, 12, 5, X}},
+                                             {{1, 9, 12, X}},
+                                             {{4, 8, 12, X}},
+                                             {{6, 12, 10, X}},
+                                             {{X, X, X, X}},
+                                             {{X, X, X, X}},
+                                             {{X, X, X, X}},
+                                             {{X, X, X, X}}}};
+
+                    static constexpr std::
+                      array<std::array<std::array<unsigned int, 2>, 4>, 12>
+                        table_hex = {
+                          {{{{{10, 22}}, {{24, 26}}, {{10, 24}}, {{22, 26}}}},
+                           {{{{24, 26}}, {{11, 23}}, {{24, 11}}, {{26, 23}}}},
+                           {{{{22, 14}}, {{26, 25}}, {{22, 26}}, {{14, 25}}}},
+                           {{{{26, 25}}, {{23, 15}}, {{26, 23}}, {{25, 15}}}},
+                           {{{{8, 24}}, {{20, 26}}, {{8, 20}}, {{24, 26}}}},
+                           {{{{20, 26}}, {{12, 25}}, {{20, 12}}, {{26, 25}}}},
+                           {{{{24, 9}}, {{26, 21}}, {{24, 26}}, {{9, 21}}}},
+                           {{{{26, 21}}, {{25, 13}}, {{26, 25}}, {{21, 13}}}},
+                           {{{{16, 20}}, {{22, 26}}, {{16, 22}}, {{20, 26}}}},
+                           {{{{22, 26}}, {{17, 21}}, {{22, 17}}, {{26, 21}}}},
+                           {{{{20, 18}}, {{26, 23}}, {{20, 26}}, {{18, 23}}}},
+                           {{{{26, 23}}, {{21, 19}}, {{26, 21}}, {{23, 19}}}}}};
+
+                    static constexpr std::
+                      array<std::array<std::array<unsigned int, 2>, 4>, 12>
+                        table_tet = {
+                          {{{{{6, 4}}, {{4, 7}}, {{7, 6}}, {{X, X}}}},
+                           {{{{4, 5}}, {{5, 8}}, {{8, 4}}, {{X, X}}}},
+                           {{{{5, 6}}, {{6, 9}}, {{9, 5}}, {{X, X}}}},
+                           {{{{7, 8}}, {{8, 9}}, {{9, 7}}, {{X, X}}}},
+                           {{{{4, 6}}, {{6, 8}}, {{8, 4}}, {{X, X}}}},
+                           {{{{6, 5}}, {{5, 8}}, {{8, 6}}, {{X, X}}}},
+                           {{{{8, 7}}, {{7, 6}}, {{6, 8}}, {{X, X}}}},
+                           {{{{9, 6}}, {{6, 8}}, {{8, 9}}, {{X, X}}}},
+                           {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+                           {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+                           {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+                           {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}}}};
+
+                    const auto &new_quad_lines =
+                      (reference_cell_type == ReferenceCells::Hexahedron) ?
+                        new_quad_lines_hex :
+                        new_quad_lines_tet;
+
+                    const auto &table =
+                      (reference_cell_type == ReferenceCells::Hexahedron) ?
+                        table_hex :
+                        table_tet;
+
+                    for (unsigned int q = 0; q < new_quads.size(); ++q)
+                      {
+                        for (unsigned int l = 0; l < 3; ++l)
+                          {
+                            std::array<unsigned int, 2> vertices_0, vertices_1;
+
+                            for (unsigned int v = 0; v < 2; ++v)
+                              vertices_0[v] =
+                                relevant_lines[new_quad_lines[q][l]]
+                                  ->vertex_index(v);
+
+                            for (unsigned int v = 0; v < 2; ++v)
+                              vertices_1[v] = vertex_indices[table[q][l][v]];
+                          }
+                      }
+
+                    for (unsigned int q = 0; q < new_quads.size(); ++q)
+                      {
+                        auto &new_quad = new_quads[q];
+
+                        if (new_quad->n_lines() == 3)
+                          new_quad->set_bounding_object_indices(
+                            {relevant_line_indices[new_quad_lines[q][0]],
+                             relevant_line_indices[new_quad_lines[q][1]],
+                             relevant_line_indices[new_quad_lines[q][2]]});
+                        else if (new_quad->n_lines() == 4)
+                          new_quad->set_bounding_object_indices(
+                            {relevant_line_indices[new_quad_lines[q][0]],
+                             relevant_line_indices[new_quad_lines[q][1]],
+                             relevant_line_indices[new_quad_lines[q][2]],
+                             relevant_line_indices[new_quad_lines[q][3]]});
+                        else
+                          Assert(false, ExcNotImplemented());
+
+                        for (const auto l : new_quad->line_indices())
+                          {
+                            std::array<unsigned int, 2> vertices_0, vertices_1;
+
+                            for (unsigned int v = 0; v < 2; ++v)
+                              vertices_0[v] =
+                                relevant_lines[new_quad_lines[q][l]]
+                                  ->vertex_index(v);
+
+                            for (unsigned int v = 0; v < 2; ++v)
+                              vertices_1[v] = vertex_indices[table[q][l][v]];
+
+                            const auto orientation =
+                              ReferenceCells::Line.compute_orientation(
+                                vertices_0, vertices_1);
+
+                            new_quad->set_line_orientation(l, orientation);
+                          }
+                      }
+                  }
+
+                  // set up new hex
+                  {
+                    std::array<int, 36> quad_indices;
+
+                    if (reference_cell_type == ReferenceCells::Hexahedron)
+                      {
+                        for (unsigned int i = 0; i < new_quads.size(); ++i)
+                          quad_indices[i] = new_quads[i]->index();
+
+                        for (unsigned int f = 0, k = new_quads.size(); f < 6;
+                             ++f)
+                          for (unsigned int c = 0; c < 4; ++c, ++k)
+                            quad_indices[k] =
+                              hex->face(f)->isotropic_child_index(
+                                GeometryInfo<dim>::standard_to_real_face_vertex(
+                                  c,
+                                  hex->face_orientation(f),
+                                  hex->face_flip(f),
+                                  hex->face_rotation(f)));
+                      }
+                    else if (reference_cell_type == ReferenceCells::Tetrahedron)
+                      {
+                        for (unsigned int i = 0; i < new_quads.size(); ++i)
+                          quad_indices[i] = new_quads[i]->index();
+
+                        for (unsigned int f = 0, k = new_quads.size(); f < 4;
+                             ++f)
+                          for (unsigned int c = 0; c < 4; ++c, ++k)
+                            {
+                              quad_indices[k] = hex->face(f)->child_index(
+                                (c == 3) ?
+                                  3 :
+                                  reference_cell_type
+                                    .standard_to_real_face_vertex(
+                                      c,
+                                      f,
+                                      triangulation.levels[hex->level()]
+                                        ->face_orientations
+                                          [hex->index() *
+                                             GeometryInfo<dim>::faces_per_cell +
+                                           f]));
+                            }
+                      }
+                    else
+                      {
+                        Assert(false, ExcNotImplemented());
+                      }
+
+                    static constexpr std::array<std::array<unsigned int, 6>, 8>
+                      cell_quads_hex = {{
+                        {{12, 0, 20, 4, 28, 8}},  // bottom children
+                        {{0, 16, 22, 6, 29, 9}},  //
+                        {{13, 1, 4, 24, 30, 10}}, //
+                        {{1, 17, 6, 26, 31, 11}}, //
+                        {{14, 2, 21, 5, 8, 32}},  // top children
+                        {{2, 18, 23, 7, 9, 33}},  //
+                        {{15, 3, 5, 25, 10, 34}}, //
+                        {{3, 19, 7, 27, 11, 35}}  //
+                      }};
+
+                    static constexpr std::array<std::array<unsigned int, 6>, 8>
+                      cell_quads_tet{{{{8, 13, 16, 0, X, X}},
+                                      {{9, 12, 1, 21, X, X}},
+                                      {{10, 2, 17, 20, X, X}},
+                                      {{3, 14, 18, 22, X, X}},
+                                      {{11, 1, 4, 5, X, X}},
+                                      {{15, 0, 4, 6, X, X}},
+                                      {{19, 7, 6, 3, X, X}},
+                                      {{23, 5, 2, 7, X, X}}}};
+
+                    static constexpr std::
+                      array<std::array<std::array<unsigned int, 4>, 6>, 8>
+                        cell_face_vertices_hex{{{{{{0, 8, 16, 20}},
+                                                  {{10, 24, 22, 26}},
+                                                  {{0, 16, 10, 22}},
+                                                  {{8, 20, 24, 26}},
+                                                  {{0, 10, 8, 24}},
+                                                  {{16, 22, 20, 26}}}},
+                                                {{{{10, 24, 22, 26}},
+                                                  {{1, 9, 17, 21}},
+                                                  {{10, 22, 1, 17}},
+                                                  {{24, 26, 9, 21}},
+                                                  {{10, 1, 24, 9}},
+                                                  {{22, 17, 26, 21}}}},
+                                                {{{{8, 2, 20, 18}},
+                                                  {{24, 11, 26, 23}},
+                                                  {{8, 20, 24, 26}},
+                                                  {{2, 18, 11, 23}},
+                                                  {{8, 24, 2, 11}},
+                                                  {{20, 26, 18, 23}}}},
+                                                {{{{24, 11, 26, 23}},
+                                                  {{9, 3, 21, 19}},
+                                                  {{24, 26, 9, 21}},
+                                                  {{11, 23, 3, 19}},
+                                                  {{24, 9, 11, 3}},
+                                                  {{26, 21, 23, 19}}}},
+                                                {{{{16, 20, 4, 12}},
+                                                  {{22, 26, 14, 25}},
+                                                  {{16, 4, 22, 14}},
+                                                  {{20, 12, 26, 25}},
+                                                  {{16, 22, 20, 26}},
+                                                  {{4, 14, 12, 25}}}},
+                                                {{{{22, 26, 14, 25}},
+                                                  {{17, 21, 5, 13}},
+                                                  {{22, 14, 17, 5}},
+                                                  {{26, 25, 21, 13}},
+                                                  {{22, 17, 26, 21}},
+                                                  {{14, 5, 25, 13}}}},
+                                                {{{{20, 18, 12, 6}},
+                                                  {{26, 23, 25, 15}},
+                                                  {{20, 12, 26, 25}},
+                                                  {{18, 6, 23, 15}},
+                                                  {{20, 26, 18, 23}},
+                                                  {{12, 25, 6, 15}}}},
+                                                {{{{26, 23, 25, 15}},
+                                                  {{21, 19, 13, 7}},
+                                                  {{26, 25, 21, 13}},
+                                                  {{23, 15, 19, 7}},
+                                                  {{26, 21, 23, 19}},
+                                                  {{25, 13, 15, 7}}}}}};
+
+                    static constexpr std::
+                      array<std::array<std::array<unsigned int, 4>, 6>, 8>
+                        cell_face_vertices_tet{{{{{{0, 4, 6, X}},
+                                                  {{4, 0, 7, X}},
+                                                  {{0, 6, 7, X}},
+                                                  {{6, 4, 7, X}},
+                                                  {{X, X, X, X}},
+                                                  {{X, X, X, X}}}},
+                                                {{{{4, 1, 5, X}},
+                                                  {{1, 4, 8, X}},
+                                                  {{4, 5, 8, X}},
+                                                  {{5, 1, 8, X}},
+                                                  {{X, X, X, X}},
+                                                  {{X, X, X, X}}}},
+                                                {{{{6, 5, 2, X}},
+                                                  {{5, 6, 9, X}},
+                                                  {{6, 2, 9, X}},
+                                                  {{2, 5, 9, X}},
+                                                  {{X, X, X, X}},
+                                                  {{X, X, X, X}}}},
+                                                {{{{7, 8, 9, X}},
+                                                  {{8, 7, 3, X}},
+                                                  {{7, 9, 3, X}},
+                                                  {{9, 8, 3, X}},
+                                                  {{X, X, X, X}},
+                                                  {{X, X, X, X}}}},
+                                                {{{{4, 5, 6, X}},
+                                                  {{5, 4, 8, X}},
+                                                  {{4, 6, 8, X}},
+                                                  {{6, 5, 8, X}},
+                                                  {{X, X, X, X}},
+                                                  {{X, X, X, X}}}},
+                                                {{{{4, 7, 8, X}},
+                                                  {{7, 4, 6, X}},
+                                                  {{4, 8, 6, X}},
+                                                  {{8, 7, 6, X}},
+                                                  {{X, X, X, X}},
+                                                  {{X, X, X, X}}}},
+                                                {{{{6, 9, 7, X}},
+                                                  {{9, 6, 8, X}},
+                                                  {{6, 7, 8, X}},
+                                                  {{7, 9, 8, X}},
+                                                  {{X, X, X, X}},
+                                                  {{X, X, X, X}}}},
+                                                {{{{5, 8, 9, X}},
+                                                  {{8, 5, 6, X}},
+                                                  {{5, 9, 6, X}},
+                                                  {{9, 8, 6, X}},
+                                                  {{X, X, X, X}},
+                                                  {{X, X, X, X}}}}}};
+
+                    const auto &cell_quads =
+                      (reference_cell_type == ReferenceCells::Hexahedron) ?
+                        cell_quads_hex :
+                        cell_quads_tet;
+
+                    const auto &cell_face_vertices =
+                      (reference_cell_type == ReferenceCells::Hexahedron) ?
+                        cell_face_vertices_hex :
+                        cell_face_vertices_tet;
+
+                    for (unsigned int c = 0; c < 8; ++c)
+                      {
+                        auto &new_hex = new_hexes[c];
+
+                        if (new_hex->n_faces() == 4)
+                          new_hex->set_bounding_object_indices(
+                            {quad_indices[cell_quads[c][0]],
+                             quad_indices[cell_quads[c][1]],
+                             quad_indices[cell_quads[c][2]],
+                             quad_indices[cell_quads[c][3]]});
+                        else if (new_hex->n_faces() == 6)
+                          new_hex->set_bounding_object_indices(
+                            {quad_indices[cell_quads[c][0]],
+                             quad_indices[cell_quads[c][1]],
+                             quad_indices[cell_quads[c][2]],
+                             quad_indices[cell_quads[c][3]],
+                             quad_indices[cell_quads[c][4]],
+                             quad_indices[cell_quads[c][5]]});
+                        else
+                          Assert(false, ExcNotImplemented());
+
+                        for (const auto f : new_hex->face_indices())
+                          {
+                            std::array<unsigned int, 4> vertices_0, vertices_1;
+
+                            const auto &face = new_hex->face(f);
+
+                            for (const auto i : face->vertex_indices())
+                              vertices_0[i] = face->vertex_index(i);
+
+                            for (const auto i : face->vertex_indices())
+                              vertices_1[i] =
+                                vertex_indices[cell_face_vertices[c][f][i]];
+
+                            const auto orientation =
+                              face->reference_cell().compute_orientation(
+                                vertices_1, vertices_0);
+
+                            new_hex->set_face_orientation(
+                              f, Utilities::get_bit(orientation, 0));
+                            new_hex->set_face_flip(
+                              f, Utilities::get_bit(orientation, 2));
+                            new_hex->set_face_rotation(
+                              f, Utilities::get_bit(orientation, 1));
+                          }
+                      }
+                  }
+                }
+
+                if (check_for_distorted_cells &&
+                    has_distorted_children<dim, spacedim>(hex))
+                  cells_with_distorted_children.distorted_cells.push_back(hex);
+
+                triangulation.signals.post_refinement_on_cell(hex);
+              }
+          }
+
+        triangulation.faces->quads.clear_user_data();
+
+        return cells_with_distorted_children;
+      }
+
       /**
        * A function that performs the refinement of a triangulation in
        * 3d.
@@ -5122,6 +6336,30 @@ namespace internal
                            const bool check_for_distorted_cells)
       {
         const unsigned int dim = 3;
+
+        {
+          bool flag_isotropic_mesh = true;
+          typename Triangulation<dim, spacedim>::raw_cell_iterator
+            cell = triangulation.begin(),
+            endc = triangulation.end();
+          for (; cell != endc; ++cell)
+            if (cell->used())
+              if (triangulation.get_anisotropic_refinement_flag() ||
+                  cell->refine_flag_set() == RefinementCase<dim>::cut_x ||
+                  cell->refine_flag_set() == RefinementCase<dim>::cut_y ||
+                  cell->refine_flag_set() == RefinementCase<dim>::cut_z ||
+                  cell->refine_flag_set() == RefinementCase<dim>::cut_xy ||
+                  cell->refine_flag_set() == RefinementCase<dim>::cut_xz ||
+                  cell->refine_flag_set() == RefinementCase<dim>::cut_yz)
+                {
+                  flag_isotropic_mesh = false;
+                  break;
+                }
+
+          if (flag_isotropic_mesh)
+            return execute_refinement_isotropic(triangulation,
+                                                check_for_distorted_cells);
+        }
 
         // this function probably also works for spacedim>3 but it
         // isn't tested. it will probably be necessary to pull new
@@ -9635,9 +10873,7 @@ namespace internal
               else if (cell->has_children() &&
                        !cell->child(0)->coarsen_flag_set())
                 {
-                  for (unsigned int line = 0;
-                       line < GeometryInfo<dim>::lines_per_cell;
-                       ++line)
+                  for (unsigned int line = 0; line < cell->n_lines(); ++line)
                     if (GeometryInfo<dim>::line_refinement_case(
                           cell->refinement_case(), line) ==
                         RefinementCase<1>::cut_x)
@@ -9695,9 +10931,7 @@ namespace internal
                               else
                                 cell->set_refine_flag();
 
-                              for (unsigned int l = 0;
-                                   l < GeometryInfo<dim>::lines_per_cell;
-                                   ++l)
+                              for (unsigned int l = 0; l < cell->n_lines(); ++l)
                                 if (GeometryInfo<dim>::line_refinement_case(
                                       cell->refine_flag_set(), line) ==
                                     RefinementCase<1>::cut_x)
@@ -9711,9 +10945,7 @@ namespace internal
                               // iterations if we flag all lines of
                               // this cell now (and not at the outset
                               // of the next iteration) for refinement
-                              for (unsigned int l = 0;
-                                   l < GeometryInfo<dim>::lines_per_cell;
-                                   ++l)
+                              for (unsigned int l = 0; l < cell->n_lines(); ++l)
                                 if (!cell->line(l)->has_children() &&
                                     (GeometryInfo<dim>::line_refinement_case(
                                        cell->refine_flag_set(), l) !=
@@ -9749,9 +10981,7 @@ namespace internal
                  --cell)
               {
                 if (cell->user_flag_set())
-                  for (unsigned int line = 0;
-                       line < GeometryInfo<dim>::lines_per_cell;
-                       ++line)
+                  for (unsigned int line = 0; line < cell->n_lines(); ++line)
                     if (cell->line(line)->has_children() &&
                         (cell->line(line)->child(0)->user_flag_set() ||
                          cell->line(line)->child(1)->user_flag_set()))
@@ -9759,9 +10989,7 @@ namespace internal
                         for (unsigned int c = 0; c < cell->n_children(); ++c)
                           cell->child(c)->clear_coarsen_flag();
                         cell->clear_user_flag();
-                        for (unsigned int l = 0;
-                             l < GeometryInfo<dim>::lines_per_cell;
-                             ++l)
+                        for (unsigned int l = 0; l < cell->n_lines(); ++l)
                           if (GeometryInfo<dim>::line_refinement_case(
                                 cell->refinement_case(), l) ==
                               RefinementCase<1>::cut_x)
