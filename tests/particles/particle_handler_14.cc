@@ -46,7 +46,12 @@ test()
                                               Point<dim>(),
                                               0);
 
-  particle_handler.insert_particle(particle, tr.begin_active());
+  typename Triangulation<dim, spacedim>::active_cell_iterator cell =
+    tr.begin_active();
+  while (!cell->is_locally_owned())
+    ++cell;
+
+  particle_handler.insert_particle(particle, cell);
   particle_handler.update_cached_numbers();
 
   // initiate data transfer
