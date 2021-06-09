@@ -713,7 +713,6 @@ namespace Particles
 
     ++particle_index_within_cell;
 
-
     if (particle_index_within_cell > (*particles)[active_cell_index].size() - 1)
       {
         const bool particle_is_locally_owned = cell->is_locally_owned();

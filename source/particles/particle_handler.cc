@@ -1310,7 +1310,7 @@ namespace Particles
 #else
     // Clear ghost particles and their properties
     for (const auto &cell : triangulation->active_cell_iterators())
-      if (cell->is_locally_owned() == false)
+      if (cell->is_ghost())
         {
           // Clear particle properties
           for (auto &ghost_particle : particles[cell->active_cell_index()])
