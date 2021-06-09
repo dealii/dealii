@@ -46,7 +46,7 @@ test()
 
   FE_Q<dim - 1, dim>       fe(1);
   DoFHandler<dim - 1, dim> dh(tria);
-  MappingQ<dim - 1, dim>   mapping(1, true);
+  MappingQ<dim - 1, dim>   mapping(1);
 
   dh.distribute_dofs(fe);
 

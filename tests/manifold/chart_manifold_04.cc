@@ -134,8 +134,7 @@ main()
 {
   initlog();
 
-  test<2, 2>(2, MappingQ<2>(4, false));
-  test<2, 2>(2, MappingQ<2>(4, true));
+  test<2, 2>(2, MappingQ<2>(4));
 
 
   return 0;
