@@ -5097,6 +5097,10 @@ namespace internal
 
         Assert(spacedim == 3, ExcNotImplemented());
 
+        Assert(triangulation.vertices.size() ==
+                 triangulation.vertices_used.size(),
+               ExcInternalError());
+
         {
           typename Triangulation<dim, spacedim>::raw_cell_iterator
             cell = triangulation.begin_active(triangulation.levels.size() - 1),
@@ -5243,7 +5247,21 @@ namespace internal
             triangulation.vertices_used.resize(needed_vertices, false);
           }
 
-        unsigned int next_unused_vertex = 0;
+        unsigned int current_vertex = 0;
+
+        // helper function - find the next available vertex number and mark it
+        // as used.
+        auto get_next_unused_vertex = [](const unsigned int current_vertex,
+                                         std::vector<bool> &vertices_used) {
+          unsigned int next_vertex = current_vertex;
+          while (next_vertex < vertices_used.size() &&
+                 vertices_used[next_vertex] == true)
+            ++next_vertex;
+          Assert(next_vertex < vertices_used.size(), ExcInternalError());
+          vertices_used[next_vertex] = true;
+
+          return next_vertex;
+        };
 
         // LINES
         {
@@ -5258,15 +5276,10 @@ namespace internal
               if (line->user_flag_set() == false)
                 continue;
 
-              while (triangulation.vertices_used[next_unused_vertex] == true)
-                ++next_unused_vertex;
-              Assert(
-                next_unused_vertex < triangulation.vertices.size(),
-                ExcMessage(
-                  "Internal error: During refinement, the triangulation wants to access an element of the 'vertices' array but it turns out that the array is not large enough."));
-              triangulation.vertices_used[next_unused_vertex] = true;
-
-              triangulation.vertices[next_unused_vertex] = line->center(true);
+              current_vertex =
+                get_next_unused_vertex(current_vertex,
+                                       triangulation.vertices_used);
+              triangulation.vertices[current_vertex] = line->center(true);
 
               next_unused_line =
                 triangulation.faces->lines.template next_free_pair_object<1>(
@@ -5283,9 +5296,9 @@ namespace internal
               AssertIsNotUsed(children[1]);
 
               children[0]->set_bounding_object_indices(
-                {line->vertex_index(0), next_unused_vertex});
+                {line->vertex_index(0), current_vertex});
               children[1]->set_bounding_object_indices(
-                {next_unused_vertex, line->vertex_index(1)});
+                {current_vertex, line->vertex_index(1)});
 
               children[0]->set_used_flag();
               children[1]->set_used_flag();
@@ -5326,17 +5339,11 @@ namespace internal
               // 1) create new vertex (at the center of the face)
               if (reference_cell_type == ReferenceCells::Quadrilateral)
                 {
-                  while (triangulation.vertices_used[next_unused_vertex] ==
-                         true)
-                    ++next_unused_vertex;
-                  Assert(
-                    next_unused_vertex < triangulation.vertices.size(),
-                    ExcMessage(
-                      "Internal error: During refinement, the triangulation wants to access an element of the 'vertices' array but it turns out that the array is not large enough."));
-
-                  triangulation.vertices[next_unused_vertex] =
+                  current_vertex =
+                    get_next_unused_vertex(current_vertex,
+                                           triangulation.vertices_used);
+                  triangulation.vertices[current_vertex] =
                     quad->center(true, true);
-                  triangulation.vertices_used[next_unused_vertex] = true;
                 }
 
               // 2) create new lines (property is set later)
@@ -5417,7 +5424,7 @@ namespace internal
                   vertex_indices[k++] =
                     quad->line(i)->child(0)->vertex_index(1);
 
-                vertex_indices[k++] = next_unused_vertex;
+                vertex_indices[k++] = current_vertex;
               }
 
               boost::container::small_vector<
@@ -5654,18 +5661,13 @@ namespace internal
                 else
                   Assert(false, ExcNotImplemented());
 
+                // Hexes add a single new internal vertex
                 if (reference_cell_type == ReferenceCells::Hexahedron)
                   {
-                    while (triangulation.vertices_used[next_unused_vertex] ==
-                           true)
-                      ++next_unused_vertex;
-                    Assert(
-                      next_unused_vertex < triangulation.vertices.size(),
-                      ExcMessage(
-                        "Internal error: During refinement, the triangulation wants to access an element of the 'vertices' array but it turns out that the array is not large enough."));
-                    triangulation.vertices_used[next_unused_vertex] = true;
-
-                    triangulation.vertices[next_unused_vertex] =
+                    current_vertex =
+                      get_next_unused_vertex(current_vertex,
+                                             triangulation.vertices_used);
+                    triangulation.vertices[current_vertex] =
                       hex->center(true, true);
                   }
 
@@ -5786,7 +5788,7 @@ namespace internal
                           vertex_indices[k++] =
                             middle_vertex_index<dim, spacedim>(hex->face(i));
 
-                        vertex_indices[k++] = next_unused_vertex;
+                        vertex_indices[k++] = current_vertex;
                       }
                   }
 
