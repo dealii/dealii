@@ -5342,7 +5342,7 @@ namespace internal
               // 2) create new lines (property is set later)
               boost::container::small_vector<
                 typename Triangulation<dim, spacedim>::raw_line_iterator,
-                4>
+                GeometryInfo<dim>::lines_per_cell>
                 new_lines(quad->n_lines());
               {
                 for (unsigned int i = 0; i < new_lines.size(); ++i)
@@ -5423,8 +5423,9 @@ namespace internal
               boost::container::small_vector<
                 typename Triangulation<dim, spacedim>::raw_line_iterator,
                 12>
-                lines(quad->n_lines() * 3);
-
+                lines(reference_face_type == ReferenceCells::Quadrilateral ?
+                        12 :
+                        9);
               {
                 unsigned int k = 0;
 
@@ -6206,7 +6207,9 @@ namespace internal
                         cell_face_vertices_hex :
                         cell_face_vertices_tet;
 
-                    for (unsigned int c = 0; c < 8; ++c)
+                    for (unsigned int c = 0;
+                         c < GeometryInfo<dim>::max_children_per_cell;
+                         ++c)
                       {
                         auto &new_hex = new_hexes[c];
 
