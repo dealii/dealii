@@ -1007,6 +1007,7 @@ protected:
    * %Function by which the base class's functions get to know what patches
    * they shall write to a file.
    */
+public:
   virtual const std::vector<Patch> &
   get_patches() const override;
 
@@ -1018,13 +1019,6 @@ protected:
   get_dataset_names() const override;
 
   /**
-   * Extracts the finite elements stored in the dof_data object, including a
-   * dummy object of FE_DGQ<dim>(0) in case only the triangulation is used.
-   */
-  std::vector<std::shared_ptr<dealii::hp::FECollection<dim, spacedim>>>
-  get_fes() const;
-
-  /**
    * Overload of the respective DataOutInterface::get_nonscalar_data_ranges()
    * function. See there for a more extensive documentation.
    */
@@ -1034,6 +1028,14 @@ protected:
                std::string,
                DataComponentInterpretation::DataComponentInterpretation>>
   get_nonscalar_data_ranges() const override;
+
+protected:
+  /**
+   * Extracts the finite elements stored in the dof_data object, including a
+   * dummy object of FE_DGQ<dim>(0) in case only the triangulation is used.
+   */
+  std::vector<std::shared_ptr<dealii::hp::FECollection<dim, spacedim>>>
+  get_fes() const;
 
   // Make all template siblings friends. Needed for the merge_patches()
   // function.

@@ -885,7 +885,6 @@ namespace internal
       virtual std::size_t
       memory_consumption() const override;
 
-    private:
       /**
        * Pointer to the data vector. Note that ownership of the vector pointed
        * to remains with the caller of this class.
