@@ -5334,10 +5334,10 @@ namespace internal
               if (quad->user_flag_set() == false)
                 continue;
 
-              const auto &reference_cell_type = quad->reference_cell();
+              const auto reference_face_type = quad->reference_cell();
 
               // 1) create new vertex (at the center of the face)
-              if (reference_cell_type == ReferenceCells::Quadrilateral)
+              if (reference_face_type == ReferenceCells::Quadrilateral)
                 {
                   current_vertex =
                     get_next_unused_vertex(current_vertex,
@@ -5354,23 +5354,22 @@ namespace internal
               {
                 for (unsigned int i = 0; i < new_lines.size(); ++i)
                   {
-                    if (quad->n_lines() % 2 == 0)
+                    if (reference_face_type == ReferenceCells::Quadrilateral)
                       {
-                        Assert(reference_cell_type ==
-                                 ReferenceCells::Quadrilateral,
-                               ExcNotImplemented());
                         if (i % 2 == 0)
                           next_unused_line =
                             triangulation.faces->lines
                               .template next_free_pair_object<1>(triangulation);
                       }
-                    else
+                    else if (reference_face_type == ReferenceCells::Triangle)
                       {
-                        Assert(reference_cell_type == ReferenceCells::Triangle,
-                               ExcNotImplemented());
                         next_unused_line =
                           triangulation.faces->lines
                             .template next_free_single_object<1>(triangulation);
+                      }
+                    else
+                      {
+                        Assert(false, ExcNotImplemented());
                       }
 
                     new_lines[i] = next_unused_line;
@@ -5516,15 +5515,15 @@ namespace internal
                      {{{{3, 4}}, {{4, 5}}, {{5, 3}}, {{X, X}}}}}};
 
               const auto &line_vertices =
-                (reference_cell_type == ReferenceCells::Quadrilateral) ?
+                (reference_face_type == ReferenceCells::Quadrilateral) ?
                   line_vertices_quad :
                   line_vertices_tri;
               const auto &quad_lines =
-                (reference_cell_type == ReferenceCells::Quadrilateral) ?
+                (reference_face_type == ReferenceCells::Quadrilateral) ?
                   quad_lines_quad :
                   quad_lines_tri;
               const auto &quad_line_vertices =
-                (reference_cell_type == ReferenceCells::Quadrilateral) ?
+                (reference_face_type == ReferenceCells::Quadrilateral) ?
                   quad_line_vertices_quad :
                   quad_line_vertices_tri;
 
@@ -5553,7 +5552,7 @@ namespace internal
                   // TODO: we assume here that all children have the same type
                   // as the parent
                   triangulation.faces->quad_reference_cell[new_quad->index()] =
-                    reference_cell_type;
+                    reference_face_type;
 
                   if (new_quad->n_lines() == 3)
                     new_quad->set_bounding_object_indices(
@@ -5609,7 +5608,7 @@ namespace internal
 #ifdef DEBUG
                   AssertDimension(
                     s.size(),
-                    (reference_cell_type == ReferenceCells::Quadrilateral ? 4 :
+                    (reference_face_type == ReferenceCells::Quadrilateral ? 4 :
                                                                             3));
 #endif
                 }
