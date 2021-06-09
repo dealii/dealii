@@ -350,9 +350,6 @@ namespace SUNDIALS
       IDA_mem->ida_lsolve = solve_with_jacobian_callback<VectorType>;
     else
       AssertThrow(false, ExcFunctionNotProvided("solve_jacobian_system"));
-#    if DEAL_II_SUNDIALS_VERSION_LT(3, 0, 0)
-    IDA_mem->ida_setupNonNull = true;
-#    endif
 #  else
     SUNMatrix       J  = nullptr;
     SUNLinearSolver LS = nullptr;
