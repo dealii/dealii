@@ -475,7 +475,7 @@ namespace Particles
     const Point<dim> &          reference_position,
     const types::particle_index particle_index,
     const typename Triangulation<dim, spacedim>::active_cell_iterator &cell,
-    const ArrayView<const double>     &properties)
+    const ArrayView<const double> &properties)
   {
     Assert(triangulation != nullptr, ExcInternalError());
     Assert(cell.state() == IteratorState::valid, ExcInternalError());
