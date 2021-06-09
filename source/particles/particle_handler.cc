@@ -1291,7 +1291,35 @@ namespace Particles
 
     // remove_particles also calls update_cached_numbers()
     remove_particles(particles_out_of_cell);
-    property_pool->sort_memory_slots(particles);
+
+    // Sort the particle memory if we noticed during sorting
+    // the particles above that more than 10% of particle
+    // handles are non-consecutive. We do not want to do this
+    // if it is not necessary, because it involves a copy of
+    // all particle memory.
+    types::particle_index                        n_fragmented_handles = 0;
+    typename PropertyPool<dim, spacedim>::Handle last_handle =
+      PropertyPool<dim, spacedim>::invalid_handle;
+    for (const auto &particles_in_cell : particles)
+      for (const auto &particle : particles_in_cell)
+        {
+          if (last_handle == PropertyPool<dim, spacedim>::invalid_handle)
+            {
+              last_handle = particle;
+              continue;
+            }
+
+          if (particle != last_handle + 1)
+            ++n_fragmented_handles;
+
+          last_handle = particle;
+        }
+
+    if (n_fragmented_handles > n_locally_owned_particles() / 3)
+      {
+        property_pool->sort_memory_slots(particles);
+      }
+
   } // namespace Particles
 
 
