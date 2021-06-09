@@ -427,6 +427,21 @@ namespace Particles
     const Particle<dim, spacedim> &                                    particle,
     const typename Triangulation<dim, spacedim>::active_cell_iterator &cell)
   {
+    return insert_particle(particle.get_location(),
+                           particle.get_reference_location(),
+                           particle.get_id(),
+                           cell,
+                           particle.get_properties());
+  }
+
+
+
+  template <int dim, int spacedim>
+  typename ParticleHandler<dim, spacedim>::particle_iterator
+  ParticleHandler<dim, spacedim>::insert_particle(
+    const void *&                                                      data,
+    const typename Triangulation<dim, spacedim>::active_cell_iterator &cell)
+  {
     Assert(triangulation != nullptr, ExcInternalError());
     Assert(cell.state() == IteratorState::valid, ExcInternalError());
     Assert(
@@ -444,13 +459,7 @@ namespace Particles
                                   cell,
                                   particles[active_cell_index].size() - 1);
 
-    particle_it->set_reference_location(particle.get_reference_location());
-    particle_it->set_location(particle.get_location());
-    particle_it->set_id(particle.get_id());
-
-    if (particle.has_properties())
-      particle_it->set_properties(particle.get_properties());
-
+    data = particle_it->read_particle_data_from_memory(data);
 
     ++local_number_of_particles;
 
@@ -462,11 +471,18 @@ namespace Particles
   template <int dim, int spacedim>
   typename ParticleHandler<dim, spacedim>::particle_iterator
   ParticleHandler<dim, spacedim>::insert_particle(
-    const void *&                                                      data,
-    const typename Triangulation<dim, spacedim>::active_cell_iterator &cell)
+    const Point<spacedim> &     position,
+    const Point<dim> &          reference_position,
+    const types::particle_index particle_index,
+    const typename Triangulation<dim, spacedim>::active_cell_iterator &cell,
+    const ArrayView<const double>     &properties)
   {
     Assert(triangulation != nullptr, ExcInternalError());
     Assert(cell.state() == IteratorState::valid, ExcInternalError());
+    Assert(
+      cell->is_locally_owned(),
+      ExcMessage(
+        "You tried to insert a particle into a cell that is not locally owned. This is not supported."));
 
     if (particles.size() == 0)
       particles.resize(triangulation->n_active_cells());
@@ -478,7 +494,12 @@ namespace Particles
                                   cell,
                                   particles[active_cell_index].size() - 1);
 
-    data = particle_it->read_particle_data_from_memory(data);
+    particle_it->set_location(position);
+    particle_it->set_reference_location(reference_position);
+    particle_it->set_id(particle_index);
+
+    if (properties.size() != 0)
+      particle_it->set_properties(properties);
 
     ++local_number_of_particles;
 
@@ -563,26 +584,11 @@ namespace Particles
       return;
 
     for (unsigned int i = 0; i < cells.size(); ++i)
-      {
-        const unsigned int active_cell_index = cells[i]->active_cell_index();
-
-        for (unsigned int p = 0; p < local_positions[i].size(); ++p)
-          {
-            particles[active_cell_index].push_back(
-              property_pool->register_particle());
-            ++local_number_of_particles;
-
-            particle_iterator particle_it(particles,
-                                          *property_pool,
-                                          cells[i],
-                                          particles[active_cell_index].size() -
-                                            1);
-
-            particle_it->set_location(positions[index_map[i][p]]);
-            particle_it->set_reference_location(local_positions[i][p]);
-            particle_it->set_id(local_start_index + index_map[i][p]);
-          }
-      }
+      for (unsigned int p = 0; p < local_positions[i].size(); ++p)
+        insert_particle(positions[index_map[i][p]],
+                        local_positions[i][p],
+                        local_start_index + index_map[i][p],
+                        cells[i]);
 
     update_cached_numbers();
   }
@@ -774,9 +780,6 @@ namespace Particles
          i_cell < local_cells_containing_particles.size();
          ++i_cell)
       {
-        const unsigned int active_cell_index =
-          local_cells_containing_particles[i_cell]->active_cell_index();
-
         for (unsigned int i_particle = 0;
              i_particle < local_positions[i_cell].size();
              ++i_particle)
@@ -798,28 +801,17 @@ namespace Particles
                 locally_owned_ids_from_other_processes[calling_process]
                                                       [index_within_set];
 
-            particles[active_cell_index].push_back(
-              property_pool->register_particle());
-            ++local_number_of_particles;
-
-            particle_iterator particle_it(
-              particles,
-              *property_pool,
-              local_cells_containing_particles[i_cell],
-              particles[active_cell_index].size() - 1);
-
-            particle_it->set_location(local_positions[i_cell][i_particle]);
-            particle_it->set_reference_location(
-              local_reference_positions[i_cell][i_particle]);
-            particle_it->set_id(particle_id);
+            auto particle_it =
+              insert_particle(local_positions[i_cell][i_particle],
+                              local_reference_positions[i_cell][i_particle],
+                              particle_id,
+                              local_cells_containing_particles[i_cell]);
 
             if (n_global_properties > 0)
               {
-                const auto &this_particle_properties =
+                particle_it->set_properties(
                   locally_owned_properties_from_other_processes
-                    [calling_process][index_within_set];
-
-                particle_it->set_properties(this_particle_properties);
+                    [calling_process][index_within_set]);
               }
           }
       }
