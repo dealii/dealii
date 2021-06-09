@@ -149,6 +149,10 @@ namespace Utilities
           // GridTools::internal::distributed_compute_point_locations
           distributed_compute_point_locations,
 
+          // AffineConstraints::make_consistent_in_parallel()
+          affine_constraints_make_consistent_in_parallel_0,
+          affine_constraints_make_consistent_in_parallel_1,
+
         };
       } // namespace Tags
     }   // namespace internal
