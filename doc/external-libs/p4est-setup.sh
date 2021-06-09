@@ -72,11 +72,6 @@ else
     fi
 fi
 
-# extract version number from file name
-VERSION=`echo $TGZ | sed 's/^p4est-\(.*\).tar.gz$/\1/g'`
-VERSION_MAJOR=`echo $VERSION | cut -d. -f1`
-VERSION_MINOR=`echo $VERSION | cut -d. -f2`
-
 # choose names for fast and debug installation directories
 INSTALL_DIR="$1"; shift
 if test -z "$INSTALL_DIR" ; then
@@ -127,14 +122,9 @@ cd "$BUILD_FAST"
 make -C sc -j 8 > make.output || bdie "Error in make sc"
 make -j 8 >> make.output || bdie "Error in make p4est"
 # ensure that we built p4est with zlib
-if test "$VERSION_MAJOR" -gt 2 || \
-   ( test "$VERSION_MAJOR" -eq 2 && test "$VERSION_MINOR" -gt 2 ) ; then
-    grep -q 'P4EST_HAVE_ZLIB *1' "$BUILD_FAST/config/p4est_config.h" \
-        || bdie "$MISSING_ZLIB_MESSAGE"
-else
-    grep -q 'P4EST_HAVE_ZLIB *1' "$BUILD_FAST/src/p4est_config.h" \
-        || bdie "$MISSING_ZLIB_MESSAGE"
-fi
+find "$BUILD_FAST" -name "p4est_config.h" -type f -exec \
+    grep -q "P4EST_HAVE_ZLIB *1" {} \; \
+    || bdie "$MISSING_ZLIB_MESSAGE"
 make install >> make.output || bdie "Error in make install"
 echo "FAST version installed in $INSTALL_FAST"
 
@@ -150,14 +140,9 @@ cd "$BUILD_DEBUG"
 make -C sc -j 8 > make.output || bdie "Error in make sc"
 make -j 8 >> make.output || bdie "Error in make p4est"
 # ensure that we built p4est with zlib
-if test "$VERSION_MAJOR" -gt 2 || \
-   ( test "$VERSION_MAJOR" -eq 2 && test "$VERSION_MINOR" -gt 2 ) ; then
-    grep -q 'P4EST_HAVE_ZLIB *1' "$BUILD_FAST/config/p4est_config.h" \
-        || bdie "$MISSING_ZLIB_MESSAGE"
-else
-    grep -q 'P4EST_HAVE_ZLIB *1' "$BUILD_FAST/src/p4est_config.h" \
-        || bdie "$MISSING_ZLIB_MESSAGE"
-fi
+find "$BUILD_DEBUG" -name "p4est_config.h" -type f -exec \
+    grep -q "P4EST_HAVE_ZLIB *1" {} \; \
+    || bdie "$MISSING_ZLIB_MESSAGE"
 make install >> make.output || bdie "Error in make install"
 echo "DEBUG version installed in $INSTALL_DEBUG"
 echo
