@@ -635,11 +635,7 @@ program if we are already using higher order finite elements for the
 velocity. Consequently, we will introduce a member variable of type
 MappingQ that
 denotes such a mapping (step-10 and step-11 introduce such mappings
-for the first time) and that we will use in all computations on cells
-that are adjacent to the boundary. Since this only affects a
-relatively small fraction of cells, the additional effort is not very
-large and we will take the luxury of using a quartic mapping for these
-cells.
+for the first time) and that we will use in all computations.
 
 
 <h3> Parallelization on clusters </h3>

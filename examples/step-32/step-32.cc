@@ -815,9 +815,7 @@ namespace Step32
     //
     // - The <code>mapping</code> variable is used to denote a higher-order
     // polynomial mapping. As mentioned in the introduction, we use this
-    // mapping when forming integrals through quadrature for all cells that
-    // are adjacent to either the inner or outer boundaries of our domain
-    // where the boundary is curved.
+    // mapping when forming integrals through quadrature for all cells.
     //
     // - In a bit of naming confusion, you will notice below that some of the
     // variables from namespace TrilinosWrappers are taken from namespace
