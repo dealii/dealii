@@ -211,6 +211,9 @@ namespace Particles
     unsigned int
     n_properties_per_slot() const;
 
+    void
+    sort_memory_slots(std::vector<std::vector<Handle>> &sorted_handles);
+
   private:
     /**
      * The number of properties that are reserved per particle.

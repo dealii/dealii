@@ -1291,6 +1291,7 @@ namespace Particles
 
     // remove_particles also calls update_cached_numbers()
     remove_particles(particles_out_of_cell);
+    property_pool->sort_memory_slots(particles);
   } // namespace Particles
 
 

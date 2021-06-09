@@ -167,6 +167,60 @@ namespace Particles
     return n_properties;
   }
 
+  template <int dim, int spacedim>
+  void
+  PropertyPool<dim, spacedim>::sort_memory_slots(
+    std::vector<std::vector<Handle>> &sorted_handles)
+  {
+    std::vector<Point<spacedim>> sorted_locations(locations.size());
+    std::vector<Point<dim>>      sorted_reference_locations(
+      reference_locations.size());
+    std::vector<types::particle_index> sorted_ids(ids.size());
+    std::vector<double>                sorted_properties(properties.size());
+
+    unsigned int i = 0;
+    for (auto &handles_in_cell : sorted_handles)
+      for (auto &handle : handles_in_cell)
+        {
+          Assert(handle != invalid_handle,
+                 ExcMessage(
+                   "Invalid handle detected during sorting particle memory."));
+
+          sorted_locations[i]           = locations[handle];
+          sorted_reference_locations[i] = reference_locations[handle];
+          sorted_ids[i]                 = ids[handle];
+
+          for (unsigned int j = 0; j < n_properties; ++j)
+            sorted_properties[i * n_properties + j] =
+              properties[handle * n_properties + j];
+
+          handle = i;
+          ++i;
+        }
+
+    Assert(i == locations.size() - currently_available_handles.size(),
+           ExcMessage(
+             "Number of sorted property handles is not equal to number "
+             "of currently registered handles."));
+
+    locations.swap(sorted_locations);
+    reference_locations.swap(sorted_reference_locations);
+    ids.swap(sorted_ids);
+    properties.swap(sorted_properties);
+
+    // Now update the available handles
+    for (auto &available_handle : currently_available_handles)
+      {
+        available_handle = i;
+        ++i;
+      }
+
+    Assert(i == locations.size(),
+           ExcMessage("Number of allocated handles does not match number "
+                      "of registered handles plus number of unregistered "
+                      "but available handles."));
+  }
+
 
   // Instantiate the class for all reasonable template arguments
   template class PropertyPool<1, 1>;
