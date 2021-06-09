@@ -14,3 +14,364 @@ Award No. EAR-1550901 and The University of California-Davis.
 <a name="Intro"></a>
 <h1>Introduction</h1>
 
+
+<h3>Checkpoint/restart</h3>
+
+A common problem in scientific computing is that a program runs such a
+long time that one would like to be able to periodically save the
+state of the program, and then have the possibility to restart at the
+same point where the program was when the state was saved. There are a
+number of reasons why one would want to do that:
+
+- On machines that are shared with many other users, say on
+  supercomputers, it is common to use queues that have a time limit on
+  how long programs can run. For example, one can only run programs
+  that run at most 48 hours. But what if a simulation hasn't done the
+  requisite number of time steps when those 48 hours are up, or for
+  some other reason isn't finished yet? If we could save the state of
+  the program every hour, that wouldn't matter so much: If the queuing
+  system terminates the program after 48 hours, we could simply let
+  the program run again and pick up where the last state was saved
+  somewhere between hour 47 and 48 -- at most an hour of run time
+  would have been lost.
+
+- For some of the very largest computations one can do today, with
+  tens or hundreds of thousands of processors (this being written in
+  2021), it is not entirely uncommon that one has to expect that a
+  node in a supercomputer dies over the course of long run. This could
+  be because of hardware failures, system software failures, power
+  failures, or any other reason that might affect the stability of the
+  system. It is not entirely unreasonable that one would have to
+  expect that: A computation with, say, 100,000 cores on machines with
+  32 cores each uses 3,000 nodes; a computation that takes 24 hours on
+  such a machine uses nearly 10 years of machine time, a time frame
+  within which we would certainly expect that a typical machine might
+  die. In such cases, losing a simulation bears a very substsntial
+  cost, given how expensive it is to get 100,000 cores for a whole
+  day, and being able to periodically save the state will guard
+  against the loss of this investment.
+
+- There are sometimes cases where one would like to compute an
+  expensive step once and then do many inexpensive computations on top
+  of it. For example, one might be interested in an expensive
+  simulation of the weather pattern today, and then consider where
+  rain falls by looking at many stochastic perturbations. In such a
+  case, one would save the state at the end of the expensive
+  computation, and re-start from it many times over with different
+  perturbations.
+
+The ability to save the state of a program and restart from it is
+often called *checkpoint/restart*. "Checkpointing" refers to the step
+of writing the current state of the program into one or several files
+on disk (or, in more general schemes, into some kind of temporary
+storage: disk files may be one option, but it could also be
+non-volatile memory on other nodes of a parallel
+machine). "Restarting" means starting a program not from scratch, but
+from a previously stored "checkpoint". This tutorial discusses both how
+one should *conceptually* think about checkpoint/restart, as well as
+how this is typically implemented.
+
+The program is informed by how this has been implemented in the
+[ASPECT](https://aspect.geodynamics.org) code, in which we have used
+this strategy for many years successfully. Many of the ideas that can
+be found in ASPECT are based on approaches that other codes have used
+long before that.
+
+
+<h3>Serialization/deserialization</h3>
+
+The second term that we should introduce is "serialization" and
+"deserialization". A key piece of checkpoint/restart is that we need
+to "dump" the state of the program -- i.e., the data structures
+currently stored in memory, and where the program currently is in the
+sequence of what operations it is doing one after the other -- into a
+file or some other temporary storage.
+
+The thing, however, is that we are often using very complicated data
+structures. Think, for example, of a `std::map<unsigned
+int,std::string>` object: This isn't just an array of `double`
+numbers, but is in general stored as a tree data structure where every
+node will have to consist of the key (an integer) and the value (a
+string, which is itself a non-trivial object). How would one store
+this on disk?
+
+The solution is that one has to convert *every* piece of data that
+corresponds to a *linear array of bytes* that can then be saved in a
+file -- because what files store are ultimately just a sequence of
+bytes. This process is called "serialization": It converts the data
+that represents the program into a series of bytes. The way this
+conceptually works is that one has to define bottom-up serialization
+functions: If we have a function that converts an `unsigned int` into
+a series of bytes (for example by just storing the four bytes that
+represent an integer on most current architectures) and a function
+that converts a `std::string` into a series of bytes (for example, by
+storing first the length of the string as an `unsigned int` in the way
+described before, and then the individual characters that make up that
+string), then we can define a function that stores a `std::map`: For
+example, we could first store the number of entries in the map, and
+then for each key/value pair, we first serialize the key and then the
+value. We can do this for the larger-and-large classes and eventually
+the whole program: We convert each member variable in turn into a
+sequence of bytes if we have already defined how each of the member
+variables individually would do that.
+
+From this kind of information, we can then also re-load the state of
+the program: Starting with the top-level object of our program, we
+read each member variable in turn from the file, where each member
+variable may again be a class of its own that read its member
+variables, etc. This process is then called "deserialization":
+Building data structures from a serial representation.
+
+It seems like a monumental task to write functions that serialize and
+again deserialize all possible data structures. One would have to do
+this for built-in types like `double`, `int`, etc., but then also for
+all of the C++ containers such as `std::vector`, `std::list`,
+`std::map` along with C-style arrays. From there, one might work one's
+way up to classes such as Tensor, Point, and eventually Triangulation,
+Vector, or ParticleHandler. This would be a lot of work.
+
+Fortunately, help exists: There are a number of external libraries
+that make this task relatively straightforward. The one that deal.II
+uses for serialization and deserialization is the
+[BOOST serialization
+library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html)
+that has everything related to (de)serialization of built-in and
+`std::` data types already available. One then only has to write
+functions for each class that needs to be (de)serialized, but this is
+also made relatively simple by BOOST serialization: One only has to
+add a single function in which one can use operator overloading. For
+example, here is a very short excerpt of the Tensor class with
+everything that is not of interest to us in the current context
+stripped out:
+@code
+template <int rank, int dim, typename Number>
+class Tensor
+{
+public:
+  /**
+   * Read or write the data of this object to or from a stream for the purpose
+   * of serialization using the BOOST serialization
+   * library.
+   */
+  template <class Archive>
+  void
+  serialize(Archive &ar, const unsigned int version);
+
+private:
+  /**
+   * Array of tensors holding the subelements.
+   */
+  Tensor<rank-1, dim, Number> values[dim];
+};
+
+
+template <int rank, int dim, typename Number>
+template <class Archive>
+inline void
+Tensor<rank, dim, Number>::serialize(Archive &ar, const unsigned int /*version*/)
+{
+  ar & values;
+}
+@endcode
+
+In other words, the Tensor class stores an array of `dim` objects of a
+tensor of one rank lower, and in order to serialize this array, the
+function simply uses the overloaded `operator&` which recognizes that
+`values` is a C-style array of fixed length, and what the data type of
+the elements of this array are. It will then in turn call the
+`serialize()` member function of `Tensor<rank-1,dim>`. (The recursion
+has a stopping point which is not of importance for this discussion.)
+
+Depending on whether the `Archive` type used for the first argument of
+this function is an input or output archive, `operator&` reads from or
+writes into the `values` member variable. If the class had more member
+variables, one would list them one after the other. The same is true
+if a class has base classes. For example, here is the corresponding
+function for the Quadrature class that stores quadrature points and
+weights, and is derived from the Subscriptor base class:
+@code
+template <int dim>
+template <class Archive>
+inline void
+Quadrature<dim>::serialize(Archive &ar, const unsigned int)
+{
+  // Forward to serialization function in the base class:
+  ar & static_cast<Subscriptor &>(*this);
+
+  // Then (de)serialize the member variables:
+  ar & quadrature_points & weights;
+}
+@endcode
+
+The BOOST serialization library also has mechanisms if one wants to
+write separate save and load functions. This is useful if a class
+stores a lot of data in one array and then has a cache of commonly
+accessed data on the side for fast access; one would then only store
+and load the large array, and in the load function re-build the cache
+from the large array. (See also the discussion below on what one
+actually wants to save.)
+
+In the end, serialization has put everything into an "Archive" from
+which one can extract a (sometimes very long) string that one can save
+in bulk into a file. BOOST serialization offers different archives,
+including ones that store the data in ASCII format, in binary format,
+or already compressed with something like gzip to minimize the amount
+of space necessary. The specific type of archive to be used is
+selected at the place where one initiates serialization, and the
+concrete mechanism will become clear when we show the actual
+implementation below.
+
+
+<h3>Checkpointing strategies</h3>
+
+Having discussed the general idea of checkpoint/restart, let us turn
+to some more specific questions one has to answer: (i) What do we
+actually want to save/restore? (ii) How often do we want to write
+checkpoints?
+
+
+<h4>What to save/restore</h4>
+
+We will base this tutorial on step-19, and so let us use it as an
+example in this section. If you think of a program such as step-19,
+then there are a lot of member variables one might want to
+(de)serialize:
+@code
+  template <int dim>
+  class CathodeRaySimulator
+  {
+  public:
+    CathodeRaySimulator();
+
+    void run();
+
+  private:
+    void make_grid();
+    void setup_system();
+    void assemble_system();
+    void solve_field();
+    void refine_grid();
+
+    void create_particles();
+    void move_particles();
+    void track_lost_particle(const typename Particles::ParticleIterator<dim> &        particle,
+                             const typename Triangulation<dim>::active_cell_iterator &cell);
+
+
+    void update_timestep_size();
+    void output_results() const;
+
+    Triangulation<dim>        triangulation;
+    MappingQGeneric<dim>      mapping;
+    FE_Q<dim>                 fe;
+    DoFHandler<dim>           dof_handler;
+    AffineConstraints<double> constraints;
+
+    SparseMatrix<double>      system_matrix;
+    SparsityPattern           sparsity_pattern;
+
+    Vector<double>            solution;
+    Vector<double>            system_rhs;
+
+    Particles::ParticleHandler<dim> particle_handler;
+    types::particle_index           next_unused_particle_id;
+    types::particle_index           n_recently_lost_particles;
+    types::particle_index           n_total_lost_particles;
+    types::particle_index           n_particles_lost_through_anode;
+
+    DiscreteTime time;
+  };
+@endcode
+Do we really need to save all of these to disk? That would presumably
+lead to quite a lot of data that needs to be stored and, if necessary,
+re-loaded.
+
+In practice, one does not save all of this information, but only what
+cannot be reasonably re-computed in different ways. What is saved
+should also depend on also where in the program's algorithm one
+currently is, and one generally finds a convenient point. For the
+current example of step-19, a time dependent problem, one could apply
+the following considerations:
+
+- The program runs with the same finite element every time, so there
+  is no need to actually save the element: We know what polynomial
+  degree we want, and can just re-generate the the element upon
+  restart. If the polynomial degree was a run-time parameter, then
+  maybe we should serialize the polynomial degree rather than all of
+  the myriad data structures that characterize a FE_Q object, given
+  that we can always re-generate the object by just knowing its
+  polynomial degree. This is the classical trade-off of space vs time:
+  We can achieve the same outcome by saving far less data if we are
+  willing to offer a bit of CPU time to regenerate all of the internal
+  data structures of the FE_Q given the polynomial degree.
+
+- We rebuild the matrix and sparsity pattern in each time step from
+  the DoFHandler and the finite element. These are quite large data
+  structures, but they are conceptually easy to assemble again as
+  necessary. So they do not need to be saved to disk, and this is
+  going to save quite a lot of space. Furthermore, we really only need
+  the matrix for the linear solve; once we are done with the linear
+  solve in the `solve_field()` function, the contents of the matrix
+  are no longer used and are, indeed, overwritten in the next time
+  step. As a consequence, there would really only be a point in saving
+  the matrix if we did the checkpointing between the assembly and the
+  linear solve -- but maybe that is just not a convenient point for
+  this operation, and we should pick a better location. In practice,
+  one generally puts the checkpointing at either the very end or the
+  very beginning of the time stepping loop, given that this is the
+  point where the number of variables whose values are currently
+  active is minimal.
+
+- We also do not need to save the DoFHandler object: If we know the
+  triangulation, we can always just create a DoFHandler object during
+  restart to enumerate degrees of freedom in the same way as we did
+  the last time before a previous program run was checkpointed. On the
+  other hand, we probably do want to save the Triangulation here given
+  that the triangulation is not statically generated once at the
+  beginning of the program and then never changed, but is dynamically
+  adapted every few time steps. In order to re-generate the
+  triangulation, we would therefore have to save which cells were
+  refined/coarsened and when (i.e., the *history* of the
+  triangulation), and this would likely cost substantially more disk
+  space for long-running computations than just saving the
+  triangulation itself.
+
+Similar considerations can be applied to all member variables: Can we
+re-generate their values with relatively little effort (in which case
+they do not have to be saved) or is their state difficult or
+impossible to re-generate if it is not saved to disk (in which case
+the variable needs to be serialized).
+
+
+<h4>How often to save/restore</h4>
+
+Now that we know *what* we want to save and how we want to restore it,
+we need to answer the question *how often* we want to checkpoint the
+program. At least theoretically, this question has been answered many
+decades ago already, see @cite Young1974 and @cite Daly2006. In
+practice (as actually also in these theoretical derivations), it comes
+down to (i) how long it takes to checkpoint data, and (ii) how
+frequently we expect that the stored data will have to be used, i.e.,
+how often the system crashes.
+
+For example, if it takes five minutes to save the state of the
+program, then we probably do not want to write a checkpoint every ten
+minutes. On the other hand, if it only takes five seconds, then maybe
+ten minutes is a reasonable frequency if we run on a modest 100 cores
+and the machine does not crash very often, given that in that case the
+overhead is only approximately 1%. Finally, if it takes five seconds
+to save the state, but we are running on 100,000 processes (i.e., a
+very expensive simulation) and the machine frequently crashes, then
+maybe we are willing to offer a 5% penalty in the overall run time and
+write a checkpoint every minute and a half given that we lose far less
+work this way on average if the machine crashes at an unpredictable
+moment in our computations. The papers cited above essentially just
+formalize this sort of consideration. In the program, we will not
+dwell on this and simply choose an ad-hoc value of saving the state
+every few time steps.
+
+
+
+<h3>About this program</h3>
+
+step-19. talk about generalization to the parallel case
