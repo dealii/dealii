@@ -89,6 +89,14 @@ namespace Particles
   {
     triangulation_cache =
       std::make_unique<GridTools::Cache<dim, spacedim>>(triangulation, mapping);
+
+    triangulation.signals.create.connect([&]() { this->clear_particles(); });
+    triangulation.signals.post_refinement.connect(
+      [&]() { this->clear_particles(); });
+    triangulation.signals.post_distributed_repartition.connect(
+      [&]() { this->clear_particles(); });
+    triangulation.signals.post_distributed_load.connect(
+      [&]() { this->clear_particles(); });
   }
 
 
@@ -110,6 +118,19 @@ namespace Particles
   {
     triangulation = &new_triangulation;
     mapping       = &new_mapping;
+
+    // Note that we connect all signals 'at_front' in case user code
+    // connected the register_store_callback_function and
+    // register_load_callback_function functions already to the new
+    // triangulation. We want to clear before loading.
+    triangulation->signals.create.connect([&]() { this->clear_particles(); },
+                                          boost::signals2::at_front);
+    triangulation->signals.post_distributed_refinement.connect(
+      [&]() { this->clear_particles(); }, boost::signals2::at_front);
+    triangulation->signals.post_distributed_repartition.connect(
+      [&]() { this->clear_particles(); }, boost::signals2::at_front);
+    triangulation->signals.post_distributed_load.connect(
+      [&]() { this->clear_particles(); }, boost::signals2::at_front);
 
     // Create the memory pool that will store all particle properties
     property_pool = std::make_unique<PropertyPool<dim, spacedim>>(n_properties);
@@ -443,14 +464,10 @@ namespace Particles
     const typename Triangulation<dim, spacedim>::active_cell_iterator &cell)
   {
     Assert(triangulation != nullptr, ExcInternalError());
-    Assert(cell.state() == IteratorState::valid, ExcInternalError());
     Assert(
       cell->is_locally_owned(),
       ExcMessage(
         "You can't insert particles in a cell that is not locally owned."));
-
-    if (particles.size() == 0)
-      particles.resize(triangulation->n_active_cells());
 
     const unsigned int active_cell_index = cell->active_cell_index();
     particles[active_cell_index].push_back(property_pool->register_particle());
@@ -484,9 +501,6 @@ namespace Particles
       ExcMessage(
         "You tried to insert a particle into a cell that is not locally owned. This is not supported."));
 
-    if (particles.size() == 0)
-      particles.resize(triangulation->n_active_cells());
-
     const unsigned int active_cell_index = cell->active_cell_index();
     particles[active_cell_index].push_back(property_pool->register_particle());
     particle_iterator particle_it(particles,
@@ -516,8 +530,6 @@ namespace Particles
       Particle<dim, spacedim>> &new_particles)
   {
     Assert(triangulation != nullptr, ExcInternalError());
-    if (particles.size() == 0)
-      particles.resize(triangulation->n_active_cells());
 
     for (const auto &cell_and_particle : new_particles)
       insert_particle(cell_and_particle.second, cell_and_particle.first);
@@ -533,8 +545,6 @@ namespace Particles
     const std::vector<Point<spacedim>> &positions)
   {
     Assert(triangulation != nullptr, ExcInternalError());
-    if (particles.size() == 0)
-      particles.resize(triangulation->n_active_cells());
 
     update_cached_numbers();
 
@@ -1426,9 +1436,6 @@ namespace Particles
         "This function is only implemented for parallel::TriangulationBase "
         "objects."));
 
-    if (received_particles.size() == 0)
-      received_particles.resize(triangulation->n_active_cells());
-
     // Determine the communication pattern
     const std::set<types::subdomain_id> ghost_owners =
       parallel_triangulation->ghost_owners();
@@ -1870,10 +1877,6 @@ namespace Particles
   ParticleHandler<dim, spacedim>::register_load_callback_function(
     const bool serialization)
   {
-    // All particles have been stored, when we reach this point. Empty the
-    // particle data.
-    clear_particles();
-
     parallel::distributed::Triangulation<dim, spacedim>
       *non_const_triangulation =
         const_cast<parallel::distributed::Triangulation<dim, spacedim> *>(
