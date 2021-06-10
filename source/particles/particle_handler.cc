@@ -464,6 +464,7 @@ namespace Particles
     const typename Triangulation<dim, spacedim>::active_cell_iterator &cell)
   {
     Assert(triangulation != nullptr, ExcInternalError());
+    Assert(particles.size() == triangulation->n_active_cells(),ExcInternalError());
     Assert(
       cell->is_locally_owned(),
       ExcMessage(
@@ -495,6 +496,7 @@ namespace Particles
     const ArrayView<const double> &properties)
   {
     Assert(triangulation != nullptr, ExcInternalError());
+    Assert(particles.size() == triangulation->n_active_cells(),ExcInternalError());
     Assert(cell.state() == IteratorState::valid, ExcInternalError());
     Assert(
       cell->is_locally_owned(),
@@ -529,8 +531,6 @@ namespace Particles
       typename Triangulation<dim, spacedim>::active_cell_iterator,
       Particle<dim, spacedim>> &new_particles)
   {
-    Assert(triangulation != nullptr, ExcInternalError());
-
     for (const auto &cell_and_particle : new_particles)
       insert_particle(cell_and_particle.second, cell_and_particle.first);
 
