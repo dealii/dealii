@@ -28,6 +28,7 @@
 #include <deal.II/fe/fe_system.h>
 
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
@@ -49,7 +50,20 @@ check()
   constexpr unsigned int min_level{0}, max_level{2};
 
   Triangulation<dim> tr(Triangulation<dim>::limit_level_difference_at_vertices);
-  GridGenerator::hyper_cube(tr);
+  GridGenerator::hyper_cube(tr, -1., 1., true);
+
+  // create periodicity constraints
+  std::vector<
+    GridTools::PeriodicFacePair<typename Triangulation<dim>::cell_iterator>>
+    periodicity_vector;
+
+  GridTools::collect_periodic_faces(tr,
+                                    /*b_id1*/ 0,
+                                    /*b_id2*/ 1,
+                                    /*direction*/ 0,
+                                    periodicity_vector);
+
+  tr.add_periodicity(periodicity_vector);
   tr.refine_global(max_level);
 
   // create a system element composed
@@ -59,36 +73,24 @@ check()
   dof.distribute_dofs(element);
   dof.distribute_mg_dofs();
 
-  MGLevelObject<AffineConstraints<double>> mg_constraints(min_level, max_level);
-
   MGConstrainedDoFs mg_constrained_dofs;
   mg_constrained_dofs.initialize(dof);
-
-  std::set<types::boundary_id> set_dirichlet;
-  set_dirichlet.insert(0);
-  mg_constrained_dofs.make_zero_boundary_constraints(dof, set_dirichlet);
 
   // test sparsity patterns on each MG level
   for (unsigned int l = min_level; l < max_level; ++l)
     {
-      mg_constraints[l].reinit(dof.locally_owned_mg_dofs(l));
-      mg_constraints[l].add_lines(
-        mg_constrained_dofs.get_refinement_edge_indices(l));
-      mg_constraints[l].add_lines(mg_constrained_dofs.get_boundary_indices(l));
-      mg_constraints[l].close();
-
       //--------------- Regular sparsity pattern checks -----------------
       // first way: directly
       SparsityPattern sparsity_1(dof.n_dofs(l), dof.n_dofs(l));
       MGTools::make_flux_sparsity_pattern(dof, sparsity_1, l);
-      mg_constraints[l].condense(sparsity_1);
+      mg_constrained_dofs.get_level_constraints(l).condense(sparsity_1);
       sparsity_1.compress();
 
-      // second way: via direct elimination of
-      // constraints
+      // second way: via direct elimination of constraints
       SparsityPattern        sparsity_2;
       DynamicSparsityPattern dsp_2(dof.locally_owned_mg_dofs(l));
-      MGTools::make_flux_sparsity_pattern(dof, dsp_2, l, mg_constraints[l]);
+      MGTools::make_flux_sparsity_pattern(
+        dof, dsp_2, l, mg_constrained_dofs.get_level_constraints(l));
       sparsity_2.copy_from(dsp_2);
 
       // tests if sparsity_[12] are equal
