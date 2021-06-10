@@ -522,11 +522,6 @@ namespace internal
  * @ref step_22 "step-22"
  * tutorial program).
  *
- * This class does not copy the vector given to it through the
- * add_data_vector() functions, for memory consumption reasons. It only stores
- * a reference to it, so it is in your responsibility to make sure that the
- * data vectors exist long enough.
- *
  * After adding all data vectors, you need to call a function which generates
  * the patches (i.e., some intermediate data representation) for output from
  * the stored data. Derived classes name this function build_patches().
@@ -726,11 +721,6 @@ public:
    * @note The actual type for the vector argument may be any vector type from
    * which FEValues can extract values on a cell using the
    * FEValuesBase::get_function_values() function.
-   *
-   * @note When working in parallel, the vector to be written needs to be ghosted
-   * with read access to all degrees of freedom on the locally owned cells, see
-   * the step-40 or step-37 tutorial programs for details, i.e., it might be
-   * necessary to call data.update_ghost_values().
    */
   template <class VectorType>
   void
@@ -897,13 +887,13 @@ public:
   clear_data_vectors();
 
   /**
-   * Release pointers to all input data elements, i.e. pointers to data
-   * vectors and to the DoF handler object. This function may be useful when
+   * Release pointers to all input data elements, i.e. pointers to
+   * to the DoF handler object. This function may be useful when
    * you have called the @p build_patches function of derived class, since
    * then the patches are built and the input data is no more needed, nor is
    * there a need to reference it. You can then output the patches detached
    * from the main thread and need not make sure anymore that the DoF handler
-   * object and vectors must not be deleted before the output thread is
+   * object must not be deleted before the output thread is
    * finished.
    */
   void

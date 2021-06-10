@@ -28,6 +28,7 @@
 
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_pyramid_p.h>
@@ -44,6 +45,8 @@
 #include <deal.II/hp/fe_values.h>
 #include <deal.II/hp/q_collection.h>
 
+#include <deal.II/lac/block_vector_base.h>
+#include <deal.II/lac/read_write_vector.h>
 #include <deal.II/lac/vector.h>
 
 #include <deal.II/numerics/data_out.h>
@@ -765,6 +768,152 @@ namespace internal
 
 
 
+    namespace
+    {
+      /**
+       * Copy the data from an arbitrary non-block vector to a
+       * LinearAlgebra::distributed::Vector.
+       */
+      template <typename VectorType>
+      void
+      copy_locally_owned_data_from(
+        const VectorType &src,
+        LinearAlgebra::distributed::Vector<typename VectorType::value_type>
+          &dst)
+      {
+        LinearAlgebra::ReadWriteVector<typename VectorType::value_type> temp;
+        temp.reinit(src.locally_owned_elements());
+        temp.import(src, VectorOperation::insert);
+        dst.import(temp, VectorOperation::insert);
+      }
+
+      /**
+       * Create a ghosted-copy of a block dof vector.
+       */
+      template <int dim,
+                int spacedim,
+                typename VectorType,
+                typename std::enable_if<IsBlockVector<VectorType>::value,
+                                        VectorType>::type * = nullptr>
+      void
+      create_dof_vector(
+        const DoFHandler<dim, spacedim> &dof_handler,
+        const VectorType &               src,
+        LinearAlgebra::distributed::BlockVector<typename VectorType::value_type>
+          &dst)
+      {
+        IndexSet locally_relevant_dofs;
+        DoFTools::extract_locally_relevant_dofs(dof_handler,
+                                                locally_relevant_dofs);
+
+        const IndexSet &locally_owned_dofs = dof_handler.locally_owned_dofs();
+
+        std::vector<types::global_dof_index> n_indices_per_block(
+          src.n_blocks());
+
+        for (unsigned int b = 0; b < src.n_blocks(); ++b)
+          n_indices_per_block[b] = src.get_block_indices().block_size(b);
+
+        const auto locally_owned_dofs_b =
+          locally_owned_dofs.split_by_block(n_indices_per_block);
+        const auto locally_relevant_dofs_b =
+          locally_relevant_dofs.split_by_block(n_indices_per_block);
+
+        dst.reinit(src.n_blocks());
+
+        for (unsigned int b = 0; b < src.n_blocks(); ++b)
+          {
+            dst.block(b).reinit(locally_owned_dofs_b[b],
+                                locally_relevant_dofs_b[b],
+                                dof_handler.get_communicator());
+            copy_locally_owned_data_from(src.block(b), dst.block(b));
+          }
+
+        dst.collect_sizes();
+
+        dst.update_ghost_values();
+      }
+
+      /**
+       * Create a ghosted-copy of a non-block dof vector.
+       */
+      template <int dim,
+                int spacedim,
+                typename VectorType,
+                typename std::enable_if<!IsBlockVector<VectorType>::value,
+                                        VectorType>::type * = nullptr>
+      void
+      create_dof_vector(
+        const DoFHandler<dim, spacedim> &dof_handler,
+        const VectorType &               src,
+        LinearAlgebra::distributed::BlockVector<typename VectorType::value_type>
+          &dst)
+      {
+        IndexSet locally_relevant_dofs;
+        DoFTools::extract_locally_relevant_dofs(dof_handler,
+                                                locally_relevant_dofs);
+
+        dst.reinit(1);
+
+        dst.block(0).reinit(dof_handler.locally_owned_dofs(),
+                            locally_relevant_dofs,
+                            dof_handler.get_communicator());
+        copy_locally_owned_data_from(src, dst.block(0));
+
+        dst.collect_sizes();
+
+        dst.update_ghost_values();
+      }
+
+      /**
+       * Create a ghosted-copy of a block cell vector.
+       */
+      template <typename VectorType,
+                typename std::enable_if<IsBlockVector<VectorType>::value,
+                                        VectorType>::type * = nullptr>
+      void
+      create_cell_vector(
+        const VectorType &src,
+        LinearAlgebra::distributed::BlockVector<typename VectorType::value_type>
+          &dst)
+      {
+        dst.reinit(src.n_blocks());
+
+        for (unsigned int b = 0; b < src.n_blocks(); ++b)
+          {
+            dst.block(b).reinit(src.get_block_indices().block_size(b));
+            copy_locally_owned_data_from(src.block(b), dst.block(b));
+          }
+
+        dst.collect_sizes();
+      }
+
+
+      /**
+       * Create a ghosted-copy of a non-block cell vector.
+       */
+      template <typename VectorType,
+                typename std::enable_if<!IsBlockVector<VectorType>::value,
+                                        VectorType>::type * = nullptr>
+      void
+      create_cell_vector(
+        const VectorType &src,
+        LinearAlgebra::distributed::BlockVector<typename VectorType::value_type>
+          &dst)
+      {
+        dst.reinit(1);
+
+        dst.block(0).reinit(src.size());
+        copy_locally_owned_data_from(src, dst.block(0));
+
+        dst.collect_sizes();
+
+        dst.update_ghost_values();
+      }
+    } // namespace
+
+
+
     /**
      * Class that stores a pointer to a vector of type equal to the template
      * argument, and provides the functions to extract data from it.
@@ -778,12 +927,14 @@ namespace internal
        * the vector and their interpretation as scalar or vector data. This
        * constructor assumes that no postprocessor is going to be used.
        */
+      template <typename DataVectorType>
       DataEntry(const DoFHandler<dim, spacedim> *dofs,
                 const VectorType *               data,
                 const std::vector<std::string> & names,
                 const std::vector<
                   DataComponentInterpretation::DataComponentInterpretation>
-                  &data_component_interpretation);
+                  &                  data_component_interpretation,
+                const DataVectorType actual_type);
 
       /**
        * Constructor when a data postprocessor is going to be used. In that
@@ -889,22 +1040,31 @@ namespace internal
        * Pointer to the data vector. Note that ownership of the vector pointed
        * to remains with the caller of this class.
        */
-      const VectorType *vector;
+      LinearAlgebra::distributed::BlockVector<typename VectorType::value_type>
+        vector;
     };
 
 
 
     template <int dim, int spacedim, typename VectorType>
+    template <typename DataVectorType>
     DataEntry<dim, spacedim, VectorType>::DataEntry(
       const DoFHandler<dim, spacedim> *dofs,
       const VectorType *               data,
       const std::vector<std::string> & names,
       const std::vector<
         DataComponentInterpretation::DataComponentInterpretation>
-        &data_component_interpretation)
+        &                  data_component_interpretation,
+      const DataVectorType actual_type)
       : DataEntryBase<dim, spacedim>(dofs, names, data_component_interpretation)
-      , vector(data)
-    {}
+    {
+      if (actual_type == DataVectorType::type_dof_data)
+        create_dof_vector(*dofs, *data, vector);
+      else if (actual_type == DataVectorType::type_cell_data)
+        create_cell_vector(*data, vector);
+      else
+        Assert(false, ExcInternalError());
+    }
 
 
 
@@ -914,8 +1074,9 @@ namespace internal
       const VectorType *                 data,
       const DataPostprocessor<spacedim> *data_postprocessor)
       : DataEntryBase<dim, spacedim>(dofs, data_postprocessor)
-      , vector(data)
-    {}
+    {
+      create_dof_vector(*dofs, *data, vector);
+    }
 
 
 
@@ -926,7 +1087,8 @@ namespace internal
       const ComponentExtractor extract_component) const
     {
       return get_component(
-        internal::ElementAccess<VectorType>::get(*vector, cell_number),
+        internal::ElementAccess<LinearAlgebra::distributed::BlockVector<
+          typename VectorType::value_type>>::get(vector, cell_number),
         extract_component);
     }
 
@@ -946,7 +1108,7 @@ namespace internal
                             "part from a real number."));
 
           fe_patch_values.get_function_values(
-            *vector,
+            vector,
             // reinterpret output argument type; because of the 'if' statement
             // above, this is the identity cast whenever the code is executed,
             // but the cast is necessary to allow compilation even if we don't
@@ -972,7 +1134,7 @@ namespace internal
           for (unsigned int i = 0; i < n_eval_points; i++)
             tmp[i].reinit(n_components);
 
-          fe_patch_values.get_function_values(*vector, tmp);
+          fe_patch_values.get_function_values(vector, tmp);
 
           AssertDimension(patch_values_system.size(), n_eval_points);
           for (unsigned int i = 0; i < n_eval_points; i++)
@@ -1002,7 +1164,7 @@ namespace internal
                             "part from a real number."));
 
           fe_patch_values.get_function_values(
-            *vector,
+            vector,
             // reinterpret output argument type; because of the 'if' statement
             // above, this is the identity cast whenever the code is executed,
             // but the cast is necessary to allow compilation even if we don't
@@ -1014,7 +1176,7 @@ namespace internal
         {
           std::vector<typename VectorType::value_type> tmp(patch_values.size());
 
-          fe_patch_values.get_function_values(*vector, tmp);
+          fe_patch_values.get_function_values(vector, tmp);
 
           for (unsigned int i = 0; i < tmp.size(); i++)
             patch_values[i] = get_component(tmp[i], extract_component);
@@ -1038,7 +1200,7 @@ namespace internal
                             "part from a real number."));
 
           fe_patch_values.get_function_gradients(
-            *vector,
+            vector,
             // reinterpret output argument type; because of the 'if' statement
             // above, this is the identity cast whenever the code is executed,
             // but the cast is necessary to allow compilation even if we don't
@@ -1065,7 +1227,7 @@ namespace internal
           for (unsigned int i = 0; i < n_eval_points; i++)
             tmp[i].resize(n_components);
 
-          fe_patch_values.get_function_gradients(*vector, tmp);
+          fe_patch_values.get_function_gradients(vector, tmp);
 
           AssertDimension(patch_gradients_system.size(), n_eval_points);
           for (unsigned int i = 0; i < n_eval_points; i++)
@@ -1095,7 +1257,7 @@ namespace internal
                             "part from a real number."));
 
           fe_patch_values.get_function_gradients(
-            *vector,
+            vector,
             // reinterpret output argument type; because of the 'if' statement
             // above, this is the identity cast whenever the code is executed,
             // but the cast is necessary to allow compilation even if we don't
@@ -1109,7 +1271,7 @@ namespace internal
           std::vector<Tensor<1, spacedim, typename VectorType::value_type>> tmp;
           tmp.resize(patch_gradients.size());
 
-          fe_patch_values.get_function_gradients(*vector, tmp);
+          fe_patch_values.get_function_gradients(vector, tmp);
 
           for (unsigned int i = 0; i < tmp.size(); i++)
             patch_gradients[i] = get_component(tmp[i], extract_component);
@@ -1133,7 +1295,7 @@ namespace internal
                             "part from a real number."));
 
           fe_patch_values.get_function_hessians(
-            *vector,
+            vector,
             // reinterpret output argument type; because of the 'if' statement
             // above, this is the identity cast whenever the code is executed,
             // but the cast is necessary to allow compilation even if we don't
@@ -1160,7 +1322,7 @@ namespace internal
           for (unsigned int i = 0; i < n_eval_points; i++)
             tmp[i].resize(n_components);
 
-          fe_patch_values.get_function_hessians(*vector, tmp);
+          fe_patch_values.get_function_hessians(vector, tmp);
 
           AssertDimension(patch_hessians_system.size(), n_eval_points);
           for (unsigned int i = 0; i < n_eval_points; i++)
@@ -1190,7 +1352,7 @@ namespace internal
                             "part from a real number."));
 
           fe_patch_values.get_function_hessians(
-            *vector,
+            vector,
             // reinterpret output argument type; because of the 'if' statement
             // above, this is the identity cast whenever the code is executed,
             // but the cast is necessary to allow compilation even if we don't
@@ -1204,7 +1366,7 @@ namespace internal
           std::vector<Tensor<2, spacedim, typename VectorType::value_type>> tmp(
             patch_hessians.size());
 
-          fe_patch_values.get_function_hessians(*vector, tmp);
+          fe_patch_values.get_function_hessians(vector, tmp);
 
           for (unsigned int i = 0; i < tmp.size(); i++)
             patch_hessians[i] = get_component(tmp[i], extract_component);
@@ -1226,7 +1388,7 @@ namespace internal
     std::size_t
     DataEntry<dim, spacedim, VectorType>::memory_consumption() const
     {
-      return (sizeof(vector) +
+      return (vector.memory_consumption() +
               MemoryConsumption::memory_consumption(this->names));
     }
 
@@ -1236,7 +1398,6 @@ namespace internal
     void
     DataEntry<dim, spacedim, VectorType>::clear()
     {
-      vector            = nullptr;
       this->dof_handler = nullptr;
     }
 
@@ -1693,7 +1854,11 @@ DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::
   // finally, add the data vector:
   auto new_entry = std::make_unique<
     internal::DataOutImplementation::DataEntry<dim, spacedim, VectorType>>(
-    dof_handler, &data_vector, deduced_names, data_component_interpretation);
+    dof_handler,
+    &data_vector,
+    deduced_names,
+    data_component_interpretation,
+    actual_type);
 
   if (actual_type == type_dof_data)
     dof_data.emplace_back(std::move(new_entry));
