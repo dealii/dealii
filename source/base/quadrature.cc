@@ -206,9 +206,8 @@ Quadrature<1>::Quadrature(const SubQuadrature &, const Quadrature<1> &q2)
 template <>
 Quadrature<0>::Quadrature(const Quadrature<1> &)
   : Subscriptor()
-  ,
-  // quadrature_points(1),
-  weights(1, 1.)
+  , quadrature_points(1)
+  , weights(1, 1.)
   , is_tensor_product_flag(false)
 {}
 
