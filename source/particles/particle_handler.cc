@@ -334,9 +334,7 @@ namespace Particles
   ParticleHandler<dim, spacedim>::remove_particle(
     const ParticleHandler<dim, spacedim>::particle_iterator &particle)
   {
-    const unsigned int active_cell_index = particle->active_cell_index;
-
-    particle_container &container = *(particle->particles);
+    auto &container = *(particle->particles_on_cell);
 
     // if the particle has an invalid handle (e.g. because it has
     // been duplicated before calling this function) do not try
@@ -347,16 +345,15 @@ namespace Particles
         property_pool->deregister_particle(handle);
       }
 
-    if (container[active_cell_index].size() > 1)
+    if (container.size() > 1)
       {
-        container[active_cell_index][particle->particle_index_within_cell] =
-          std::move(particles[active_cell_index].back());
-        container[active_cell_index].resize(
-          particles[active_cell_index].size() - 1);
+        container[particle->particle_index_within_cell] =
+          std::move(particles[particle->cell->active_cell_index()].back());
+        container.resize(particles.size() - 1);
       }
     else
       {
-        container[active_cell_index].clear();
+        container.clear();
       }
 
     --local_number_of_particles;
@@ -380,8 +377,8 @@ namespace Particles
           break;
 
         // Skip cells where there is nothing to remove
-        if (particles_to_remove[n_particles_removed]->active_cell_index !=
-            cell_index)
+        if (particles_to_remove[n_particles_removed]
+              ->cell->active_cell_index() != cell_index)
           continue;
 
         const unsigned int n_particles_in_cell = particles[cell_index].size();
@@ -390,8 +387,8 @@ namespace Particles
              ++move_from)
           {
             if (n_particles_removed != particles_to_remove.size() &&
-                particles_to_remove[n_particles_removed]->active_cell_index ==
-                  cell_index &&
+                particles_to_remove[n_particles_removed]
+                    ->cell->active_cell_index() == cell_index &&
                 particles_to_remove[n_particles_removed]
                     ->particle_index_within_cell == move_from)
               {
@@ -1254,11 +1251,11 @@ namespace Particles
                 current_cell->active_cell_index();
 
               particles[active_cell_index].push_back(
-                particles[out_particle->active_cell_index]
+                particles[out_particle->cell->active_cell_index()]
                          [out_particle->particle_index_within_cell]);
 
               // Avoid deallocating the memory of this particle
-              particles[out_particle->active_cell_index]
+              particles[out_particle->cell->active_cell_index()]
                        [out_particle->particle_index_within_cell] =
                          PropertyPool<dim, spacedim>::invalid_handle;
             }
