@@ -124,6 +124,9 @@ public:
    * This constructor does not require that constant functions are integrated
    * exactly. Therefore, it is appropriate if the one-dimensional formula
    * is defined with respect to a weighting function.
+   *
+   * If dim == 0, the resulting quadrature formula will be a single Point<0>
+   * having unit weight.
    */
   explicit Quadrature(const Quadrature<dim != 1 ? 1 : 0> &quadrature_1d);
 
