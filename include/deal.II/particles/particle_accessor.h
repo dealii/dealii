@@ -713,7 +713,7 @@ namespace Particles
 
     ++particle_index_within_cell;
 
-    if (particle_index_within_cell > (*particles)[active_cell_index].size() - 1)
+    if (particle_index_within_cell >= (*particles)[active_cell_index].size())
       {
         const bool particle_is_locally_owned = cell->is_locally_owned();
 
@@ -725,7 +725,7 @@ namespace Particles
             ++active_cell_index;
           }
         while (cell.state() == IteratorState::valid &&
-               ((*particles)[active_cell_index].size() == 0 ||
+               ((*particles)[active_cell_index].empty() ||
                 cell->is_locally_owned() != particle_is_locally_owned));
       }
   }
