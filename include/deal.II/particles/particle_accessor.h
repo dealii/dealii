@@ -409,7 +409,7 @@ namespace Particles
 
   template <int dim, int spacedim>
   inline ParticleAccessor<dim, spacedim>::ParticleAccessor()
-    : particles_on_cell({})
+    : particles_on_cell(typename particle_container::iterator())
     , property_pool(nullptr)
     , cell()
     , particle_index_within_cell(numbers::invalid_unsigned_int)
@@ -432,7 +432,7 @@ namespace Particles
         const_cast<particle_container *>(&particles)->begin() +
         cell->active_cell_index();
     else
-      particles_on_cell = {};
+      particles_on_cell = typename particle_container::iterator();
   }
 
 
