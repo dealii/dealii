@@ -796,6 +796,20 @@ namespace Particles
       const typename Triangulation<dim, spacedim>::active_cell_iterator &cell);
 
     /**
+     * Insert a particle into the collection of particles given all the
+     * properties necessary for a particle. This function is used internally to
+     * efficiently generate particles without the detour through a Particle
+     * object.
+     */
+    particle_iterator
+    insert_particle(
+      const Point<spacedim> &     position,
+      const Point<dim> &          reference_position,
+      const types::particle_index particle_index,
+      const typename Triangulation<dim, spacedim>::active_cell_iterator &cell,
+      const ArrayView<const double> &properties = {});
+
+    /**
      * Address of the triangulation to work on.
      */
     SmartPointer<const Triangulation<dim, spacedim>,
