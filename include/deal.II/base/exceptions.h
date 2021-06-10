@@ -923,7 +923,19 @@ namespace StandardExceptions
   DeclException2(ExcDimensionMismatch,
                  std::size_t,
                  std::size_t,
-                 << "Dimension " << arg1 << " not equal to " << arg2 << ".");
+                 << "This assertion checks that the size or dimension "
+                    "of one object equals a specific value or the size "
+                    "or another object. Here, the sizes being compared are <"
+                 << arg1 << "> and <" << arg2
+                 << ">, but these are not the same."
+                    "\n\n"
+                    "Examples where this happens is if one tries to add "
+                    "two vectors of different sizes, or if one tries to "
+                    "access a vector element that has not been initialized "
+                    "and consequently has size zero. Indeed, if one of the "
+                    "two sizes shown above are zero, then the most common "
+                    "case is access to objects that have not been "
+                    "initialized to the correct size.");
 
   /**
    * The first dimension should be either equal to the second or the third,
@@ -933,8 +945,9 @@ namespace StandardExceptions
                  int,
                  int,
                  int,
-                 << "Dimension " << arg1 << " neither equal to " << arg2
-                 << " nor to " << arg3 << ".");
+                 << "The size of one object, " << arg1
+                 << ", is supposed to be equal to either " << arg2 << " or "
+                 << arg3 << ", but it is not.");
 
   /**
    * This exception indicates that an index is not within the expected range.
