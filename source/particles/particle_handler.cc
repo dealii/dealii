@@ -334,9 +334,7 @@ namespace Particles
   ParticleHandler<dim, spacedim>::remove_particle(
     const ParticleHandler<dim, spacedim>::particle_iterator &particle)
   {
-    const unsigned int active_cell_index = particle->active_cell_index;
-
-    particle_container &container = *(particle->particles);
+    auto &container = *(particle->particles_on_cell);
 
     // if the particle has an invalid handle (e.g. because it has
     // been duplicated before calling this function) do not try
@@ -347,16 +345,15 @@ namespace Particles
         property_pool->deregister_particle(handle);
       }
 
-    if (container[active_cell_index].size() > 1)
+    if (container.size() > 1)
       {
-        container[active_cell_index][particle->particle_index_within_cell] =
-          std::move(particles[active_cell_index].back());
-        container[active_cell_index].resize(
-          particles[active_cell_index].size() - 1);
+        container[particle->particle_index_within_cell] =
+          std::move(container.back());
+        container.resize(particles.size() - 1);
       }
     else
       {
-        container[active_cell_index].clear();
+        container.clear();
       }
 
     --local_number_of_particles;
@@ -372,26 +369,27 @@ namespace Particles
   {
     unsigned int n_particles_removed = 0;
 
-    for (unsigned int cell_index = 0; cell_index < particles.size();
-         ++cell_index)
+    for (auto particles_on_cell = particles.begin();
+         particles_on_cell != particles.end();
+         ++particles_on_cell)
       {
         // If there is nothing left to remove, break and return
         if (n_particles_removed == particles_to_remove.size())
           break;
 
         // Skip cells where there is nothing to remove
-        if (particles_to_remove[n_particles_removed]->active_cell_index !=
-            cell_index)
+        if (particles_to_remove[n_particles_removed]->particles_on_cell !=
+            particles_on_cell)
           continue;
 
-        const unsigned int n_particles_in_cell = particles[cell_index].size();
+        const unsigned int n_particles_in_cell = particles_on_cell->size();
         unsigned int       move_to             = 0;
         for (unsigned int move_from = 0; move_from < n_particles_in_cell;
              ++move_from)
           {
             if (n_particles_removed != particles_to_remove.size() &&
-                particles_to_remove[n_particles_removed]->active_cell_index ==
-                  cell_index &&
+                particles_to_remove[n_particles_removed]->particles_on_cell ==
+                  particles_on_cell &&
                 particles_to_remove[n_particles_removed]
                     ->particle_index_within_cell == move_from)
               {
@@ -408,12 +406,12 @@ namespace Particles
               }
             else
               {
-                particles[cell_index][move_to] =
-                  std::move(particles[cell_index][move_from]);
+                (*particles_on_cell)[move_to] =
+                  std::move((*particles_on_cell)[move_from]);
                 ++move_to;
               }
           }
-        particles[cell_index].resize(move_to);
+        particles_on_cell->resize(move_to);
       }
 
     update_cached_numbers();
@@ -1246,13 +1244,13 @@ namespace Particles
                 current_cell->active_cell_index();
 
               particles[active_cell_index].push_back(
-                particles[out_particle->active_cell_index]
-                         [out_particle->particle_index_within_cell]);
+                (*out_particle->particles_on_cell)
+                  [out_particle->particle_index_within_cell]);
 
               // Avoid deallocating the memory of this particle
-              particles[out_particle->active_cell_index]
-                       [out_particle->particle_index_within_cell] =
-                         PropertyPool<dim, spacedim>::invalid_handle;
+              (*out_particle->particles_on_cell)
+                [out_particle->particle_index_within_cell] =
+                  PropertyPool<dim, spacedim>::invalid_handle;
             }
           else
             {
