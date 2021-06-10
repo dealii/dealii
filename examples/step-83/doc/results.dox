@@ -1,1 +1,63 @@
 <h1>Results</h1>
+
+
+
+<a name="extensions"></a>
+<h3>Possibilities for extensions</h3>
+
+While the techniques we have shown here are fully sufficient for what
+we want to do, namely checkpoint and restart computations, and are in
+fact also fully sufficient for much larger code bases such as
+[ASPECT](https://aspect.geodynamics.org), one could go beyond what is
+still a relatively simple scheme.
+
+Specifically, among the things we need to recognize is that writing
+large amounts of data to disk is expensive and can take a good long
+time to finish -- for example, for large parallel computations with,
+say, a billion unknowns, checkpoints can run into hundred gigabyte
+range or beyond. One may ask whether that could be avoided, or at
+least whether we can mitigate the cost.
+
+One way to do that is to first serialize the state of the program into
+a buffer in memory (like the `Archive` objects the `serialize()`
+functions write to and read from), and once that is done, let the
+program continue. We can then on a separate thread do the
+writing. This is useful because writing the data to disk often takes a
+long time but not a lot of CPU power: It just takes time to move the
+data through the network to the file server, and from there onto the
+actual disks. This is something that might as well happen while we are
+doing something useful again (namely, solving more time steps). Should
+the machine crash during this phase, nothing is lost: We are writing
+the checkpoint into a temporary file (which will be lost in the case
+of a machine failure), but we have kept the previous checkpoint around
+until we know that the temporary file is complete and can be moved
+over the old one.
+
+The only thing we have to pay attention in this background-writing
+scheme is that we cannot start with creating a new checkpoint while
+the previous one is still being written in the background.
+
+A variation of this general approach is that each process writes its
+data immediately, but into files that are held on fast file systems --
+say, a node-local SSD rather than a file server shared by the entire
+cluster. One would then just tell the operating system to move this
+file to the centeral file server in a second step, and this step can
+happen in the background at whatever speed the operating system can
+provide.
+
+In all of these cases, the logic quickly becomes quite complicated. As
+usual, the solution is not to re-invent the wheel: Libraries such as
+[VeloC](https://www.anl.gov/mcs/veloc-very-low-overhead-transparent-multilevel-checkpointrestart),
+developed by the Exascale Computing Project (ECP) already do all of
+this and more, for codes that are orders of magnitude more complex
+than the little example here.
+
+Separately, one might want to try to reduce the amount of time it
+takes to serialize objects into a buffer in memory. As mentioned
+above, we use the
+[BOOST serialization
+library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html)
+for this task, but it is not the only player in town. One could, for
+example, use the [bitsery](https://github.com/fraillt/bitsery) or
+[zpp](https://github.com/eyalz800/serializer) projects instead, both
+of which are said to be substantially faster than BOOST.
