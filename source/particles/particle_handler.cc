@@ -464,7 +464,8 @@ namespace Particles
     const typename Triangulation<dim, spacedim>::active_cell_iterator &cell)
   {
     Assert(triangulation != nullptr, ExcInternalError());
-    Assert(particles.size() == triangulation->n_active_cells(),ExcInternalError());
+    Assert(particles.size() == triangulation->n_active_cells(),
+           ExcInternalError());
     Assert(
       cell->is_locally_owned(),
       ExcMessage(
@@ -496,7 +497,8 @@ namespace Particles
     const ArrayView<const double> &properties)
   {
     Assert(triangulation != nullptr, ExcInternalError());
-    Assert(particles.size() == triangulation->n_active_cells(),ExcInternalError());
+    Assert(particles.size() == triangulation->n_active_cells(),
+           ExcInternalError());
     Assert(cell.state() == IteratorState::valid, ExcInternalError());
     Assert(
       cell->is_locally_owned(),
@@ -1043,6 +1045,10 @@ namespace Particles
   void
   ParticleHandler<dim, spacedim>::sort_particles_into_subdomains_and_cells()
   {
+    Assert(triangulation != nullptr, ExcInternalError());
+    Assert(particles.size() == triangulation->n_active_cells(),
+           ExcInternalError());
+
     // TODO: The current algorithm only works for particles that are in
     // the local domain or in ghost cells, because it only knows the
     // subdomain_id of ghost cells, but not of artificial cells. This
@@ -1425,6 +1431,10 @@ namespace Particles
       &        send_cells,
     const bool build_cache)
   {
+    Assert(triangulation != nullptr, ExcInternalError());
+    Assert(received_particles.size() == triangulation->n_active_cells(),
+           ExcInternalError());
+
     ghost_particles_cache.valid = build_cache;
 
     const auto parallel_triangulation =
@@ -1714,10 +1724,6 @@ namespace Particles
       &                 particles_to_send,
     particle_container &updated_particles)
   {
-    const auto &neighbors     = ghost_particles_cache.neighbors;
-    const auto &send_pointers = ghost_particles_cache.send_pointers;
-    const auto &recv_pointers = ghost_particles_cache.recv_pointers;
-
     const auto parallel_triangulation =
       dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
         &*triangulation);
@@ -1726,6 +1732,13 @@ namespace Particles
       ExcMessage(
         "This function is only implemented for parallel::TriangulationBase "
         "objects."));
+
+    Assert(updated_particles.size() == parallel_triangulation->n_active_cells(),
+           ExcInternalError());
+
+    const auto &neighbors     = ghost_particles_cache.neighbors;
+    const auto &send_pointers = ghost_particles_cache.send_pointers;
+    const auto &recv_pointers = ghost_particles_cache.recv_pointers;
 
     std::vector<char> &send_data = ghost_particles_cache.send_data;
 
