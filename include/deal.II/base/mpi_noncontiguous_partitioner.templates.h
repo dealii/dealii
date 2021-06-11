@@ -275,6 +275,7 @@ namespace Utilities
       // sizes.resize(this->temporary_storage_size());
 
 
+      // pack data, transfer sizes
       // post recv
       for (types::global_dof_index i = 0; i < recv_ranks.size(); i++)
         {
@@ -307,24 +308,14 @@ namespace Utilities
               ++k;
             }
 
-          // send data
-          auto ierr = MPI_Isend(buffers[send_ranks[i]].data(),
-                                buffers[send_ranks[i]].size(),
-                                MPI_CHAR,
-                                send_ranks[i],
-                                tag,
-                                communicator,
-                                &requests[i]);
-          AssertThrowMPI(ierr);
-
           // send buffer sizes
-          ierr = MPI_Isend(sizes.data() + send_ptr[i],
-                           send_ptr[i + 1] - send_ptr[i],
-                           MPI_UNSIGNED,
-                           send_ranks[i],
-                           tag + 1,
-                           communicator,
-                           &requests[i]);
+          const auto ierr = MPI_Isend(sizes.data() + send_ptr[i],
+                                      send_ptr[i + 1] - send_ptr[i],
+                                      MPI_UNSIGNED,
+                                      send_ranks[i],
+                                      tag + 1,
+                                      communicator,
+                                      &requests[i]);
           AssertThrowMPI(ierr);
         }
 
@@ -336,8 +327,8 @@ namespace Utilities
         AssertThrowMPI(ierr);
       }
 
+      // transfer buffers
       // post recv
-      // requires that sizes_sum has correct values
       for (types::global_dof_index i = 0; i < recv_ranks.size(); i++)
         {
           auto buffer_size = std::accumulate(sizes.begin() + send_ptr[i],
@@ -353,6 +344,20 @@ namespace Utilities
                                       &requests[i + send_ranks.size()]);
           AssertThrowMPI(ierr);
         }
+
+      // post send
+      for (types::global_dof_index i = 0; i < send_ranks.size(); i++)
+        {
+          const auto ierr = MPI_Isend(buffers[send_ranks[i]].data(),
+                                      buffers[send_ranks[i]].size(),
+                                      MPI_CHAR,
+                                      send_ranks[i],
+                                      tag,
+                                      communicator,
+                                      &requests[i]);
+          AssertThrowMPI(ierr);
+        }
+
 #endif
     }
 
