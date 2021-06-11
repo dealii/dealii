@@ -199,6 +199,10 @@ namespace Utilities
       std::vector<unsigned int> &                sizes,
       const ArrayView<Number> &                  ghost_array) const
     {
+      // allocate internal memory since needed
+      if (requests.size() != send_ranks.size() + recv_ranks.size())
+        requests.resize(send_ranks.size() + recv_ranks.size());
+
       this->template export_to_ghosted_array_start<Number>(
         communication_channel,
         locally_owned_array,
