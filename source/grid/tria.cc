@@ -4558,7 +4558,7 @@ namespace internal
             }
 
 
-        // check how much space is needed on every level we need not
+        // check how much space is needed on every level. We need not
         // check the highest level since either - on the highest level
         // no cells are flagged for refinement - there are, but
         // prepare_refinement added another empty level
@@ -4825,7 +4825,7 @@ namespace internal
         // pairs (the children of lines must be stored in pairs)
         unsigned int n_lines_in_pairs = 0;
 
-        // check how much space is needed on every level we need not
+        // check how much space is needed on every level. We need not
         // check the highest level since either - on the highest level
         // no cells are flagged for refinement - there are, but
         // prepare_refinement added another empty level
@@ -5097,22 +5097,24 @@ namespace internal
 
         Assert(spacedim == 3, ExcNotImplemented());
 
-        {
-          typename Triangulation<dim, spacedim>::raw_cell_iterator
-            cell = triangulation.begin_active(triangulation.levels.size() - 1),
-            endc = triangulation.end();
-          for (; cell != endc; ++cell)
-            if (cell->used())
-              if (cell->refine_flag_set())
-                {
-                  triangulation.levels.push_back(
-                    std::make_unique<
-                      internal::TriangulationImplementation::TriaLevel>(dim));
-                  break;
-                }
-        }
+        Assert(triangulation.vertices.size() ==
+                 triangulation.vertices_used.size(),
+               ExcInternalError());
 
+        // Check whether a new level is needed. We have to check for
+        // this on the highest level only
+        for (const auto &cell : triangulation.active_cell_iterators_on_level(
+               triangulation.levels.size() - 1))
+          if (cell->refine_flag_set())
+            {
+              triangulation.levels.push_back(
+                std::make_unique<
+                  internal::TriangulationImplementation::TriaLevel>(dim));
+              break;
+            }
 
+        // first clear user flags for quads and lines; we're going to
+        // use them to flag which lines and quads need refinement
         triangulation.faces->quads.clear_user_data();
 
         for (typename Triangulation<dim, spacedim>::line_iterator line =
@@ -5127,6 +5129,18 @@ namespace internal
              ++quad)
           quad->clear_user_flag();
 
+        // check how much space is needed on every level. We need not
+        // check the highest level since either
+        // - on the highest level no cells are flagged for refinement
+        // - there are, but prepare_refinement added another empty
+        //   level which then is the highest level
+
+        // variables to hold the number of newly to be created
+        // vertices, lines and quads. as these are stored globally,
+        // declare them outside the loop over al levels. we need lines
+        // and quads in pairs for refinement of old ones and lines and
+        // quads, that can be stored as single ones, as they are newly
+        // created in the inside of an existing cell
         unsigned int needed_vertices     = 0;
         unsigned int needed_lines_single = 0;
         unsigned int needed_quads_single = 0;
@@ -5136,22 +5150,22 @@ namespace internal
           {
             unsigned int new_cells = 0;
 
-            for (const auto &acell :
+            for (const auto &cell :
                  triangulation.active_cell_iterators_on_level(level))
-              if (acell->refine_flag_set())
+              if (cell->refine_flag_set())
                 {
-                  Assert(acell->refine_flag_set() ==
+                  Assert(cell->refine_flag_set() ==
                            RefinementCase<dim>::cut_xyz,
                          ExcInternalError());
 
-                  if (acell->reference_cell() == ReferenceCells::Hexahedron)
+                  if (cell->reference_cell() == ReferenceCells::Hexahedron)
                     {
                       ++needed_vertices;
                       needed_lines_single += 6;
                       needed_quads_single += 12;
                       new_cells += 8;
                     }
-                  else if (acell->reference_cell() ==
+                  else if (cell->reference_cell() ==
                            ReferenceCells::Tetrahedron)
                     {
                       needed_lines_single += 1;
@@ -5163,13 +5177,13 @@ namespace internal
                       Assert(false, ExcInternalError());
                     }
 
-                  for (const auto face : acell->face_indices())
-                    if (acell->face(face)->number_of_children() < 4)
-                      acell->face(face)->set_user_flag();
+                  for (const auto face : cell->face_indices())
+                    if (cell->face(face)->number_of_children() < 4)
+                      cell->face(face)->set_user_flag();
 
-                  for (const auto line : acell->line_indices())
-                    if (acell->line(line)->has_children() == false)
-                      acell->line(line)->set_user_flag();
+                  for (const auto line : cell->line_indices())
+                    if (cell->line(line)->has_children() == false)
+                      cell->line(line)->set_user_flag();
                 }
 
             const unsigned int used_cells =
@@ -5185,6 +5199,8 @@ namespace internal
             reserve_space(triangulation.levels[level + 1]->cells, new_cells);
           }
 
+        // now count the quads and lines which were flagged for
+        // refinement
         for (typename Triangulation<dim, spacedim>::quad_iterator quad =
                triangulation.begin_quad();
              quad != triangulation.end_quad();
@@ -5233,6 +5249,7 @@ namespace internal
                       needed_quads_single);
 
 
+        // add to needed vertices how many vertices are already in use
         needed_vertices += std::count(triangulation.vertices_used.begin(),
                                       triangulation.vertices_used.end(),
                                       true);
@@ -5243,7 +5260,41 @@ namespace internal
             triangulation.vertices_used.resize(needed_vertices, false);
           }
 
-        unsigned int next_unused_vertex = 0;
+          ///////////////////////////////////////////
+          // Before we start with the actual refinement, we do some
+          // sanity checks if in debug mode. especially, we try to catch
+          // the notorious problem with lines being twice refined,
+          // i.e. there are cells adjacent at one line ("around the
+          // edge", but not at a face), with two cells differing by more
+          // than one refinement level
+          //
+          // this check is very simple to implement here, since we have
+          // all lines flagged if they shall be refined
+#ifdef DEBUG
+        for (const auto &cell : triangulation.active_cell_iterators())
+          if (!cell->refine_flag_set())
+            for (unsigned int line_n = 0; line_n < cell->n_lines(); ++line_n)
+              if (cell->line(line_n)->has_children())
+                for (unsigned int c = 0; c < 2; ++c)
+                  Assert(cell->line(line_n)->child(c)->user_flag_set() == false,
+                         ExcInternalError());
+#endif
+
+        unsigned int current_vertex = 0;
+
+        // helper function - find the next available vertex number and mark it
+        // as used.
+        auto get_next_unused_vertex = [](const unsigned int current_vertex,
+                                         std::vector<bool> &vertices_used) {
+          unsigned int next_vertex = current_vertex;
+          while (next_vertex < vertices_used.size() &&
+                 vertices_used[next_vertex] == true)
+            ++next_vertex;
+          Assert(next_vertex < vertices_used.size(), ExcInternalError());
+          vertices_used[next_vertex] = true;
+
+          return next_vertex;
+        };
 
         // LINES
         {
@@ -5258,15 +5309,10 @@ namespace internal
               if (line->user_flag_set() == false)
                 continue;
 
-              while (triangulation.vertices_used[next_unused_vertex] == true)
-                ++next_unused_vertex;
-              Assert(
-                next_unused_vertex < triangulation.vertices.size(),
-                ExcMessage(
-                  "Internal error: During refinement, the triangulation wants to access an element of the 'vertices' array but it turns out that the array is not large enough."));
-              triangulation.vertices_used[next_unused_vertex] = true;
-
-              triangulation.vertices[next_unused_vertex] = line->center(true);
+              current_vertex =
+                get_next_unused_vertex(current_vertex,
+                                       triangulation.vertices_used);
+              triangulation.vertices[current_vertex] = line->center(true);
 
               next_unused_line =
                 triangulation.faces->lines.template next_free_pair_object<1>(
@@ -5274,6 +5320,9 @@ namespace internal
               Assert(next_unused_line.state() == IteratorState::valid,
                      ExcInternalError());
 
+              // now we found two consecutive unused lines, such
+              // that the children of a line will be consecutive.
+              // then set the child pointer of the present line
               line->set_children(0, next_unused_line->index());
 
               const typename Triangulation<dim, spacedim>::raw_line_iterator
@@ -5283,9 +5332,9 @@ namespace internal
               AssertIsNotUsed(children[1]);
 
               children[0]->set_bounding_object_indices(
-                {line->vertex_index(0), next_unused_vertex});
+                {line->vertex_index(0), current_vertex});
               children[1]->set_bounding_object_indices(
-                {next_unused_vertex, line->vertex_index(1)});
+                {current_vertex, line->vertex_index(1)});
 
               children[0]->set_used_flag();
               children[1]->set_used_flag();
@@ -5321,49 +5370,42 @@ namespace internal
               if (quad->user_flag_set() == false)
                 continue;
 
-              const auto &reference_cell_type = quad->reference_cell();
+              const auto reference_face_type = quad->reference_cell();
 
               // 1) create new vertex (at the center of the face)
-              if (reference_cell_type == ReferenceCells::Quadrilateral)
+              if (reference_face_type == ReferenceCells::Quadrilateral)
                 {
-                  while (triangulation.vertices_used[next_unused_vertex] ==
-                         true)
-                    ++next_unused_vertex;
-                  Assert(
-                    next_unused_vertex < triangulation.vertices.size(),
-                    ExcMessage(
-                      "Internal error: During refinement, the triangulation wants to access an element of the 'vertices' array but it turns out that the array is not large enough."));
-
-                  triangulation.vertices[next_unused_vertex] =
+                  current_vertex =
+                    get_next_unused_vertex(current_vertex,
+                                           triangulation.vertices_used);
+                  triangulation.vertices[current_vertex] =
                     quad->center(true, true);
-                  triangulation.vertices_used[next_unused_vertex] = true;
                 }
 
               // 2) create new lines (property is set later)
               boost::container::small_vector<
                 typename Triangulation<dim, spacedim>::raw_line_iterator,
-                4>
+                GeometryInfo<dim>::lines_per_cell>
                 new_lines(quad->n_lines());
               {
                 for (unsigned int i = 0; i < new_lines.size(); ++i)
                   {
-                    if (quad->n_lines() % 2 == 0)
+                    if (reference_face_type == ReferenceCells::Quadrilateral)
                       {
-                        Assert(reference_cell_type ==
-                                 ReferenceCells::Quadrilateral,
-                               ExcNotImplemented());
                         if (i % 2 == 0)
                           next_unused_line =
                             triangulation.faces->lines
                               .template next_free_pair_object<1>(triangulation);
                       }
-                    else
+                    else if (reference_face_type == ReferenceCells::Triangle)
                       {
-                        Assert(reference_cell_type == ReferenceCells::Triangle,
-                               ExcNotImplemented());
                         next_unused_line =
                           triangulation.faces->lines
                             .template next_free_single_object<1>(triangulation);
+                      }
+                    else
+                      {
+                        Assert(false, ExcNotImplemented());
                       }
 
                     new_lines[i] = next_unused_line;
@@ -5372,7 +5414,8 @@ namespace internal
                   }
               }
 
-              // 3) create new quads (properties are set below)
+              // 3) create new quads (properties are set below). Both triangles
+              // and quads are divided in four.
               std::array<
                 typename Triangulation<dim, spacedim>::raw_quad_iterator,
                 4>
@@ -5404,11 +5447,10 @@ namespace internal
                 quad->set_refinement_case(RefinementCase<2>::cut_xy);
               }
 
-              std::array<unsigned int, 9> vertex_indices;
+              // Maximum of 9 vertices per refined quad (9 for Quadrilateral, 6
+              // for Triangle)
+              std::array<unsigned int, 9> vertex_indices = {};
               {
-                for (auto &i : vertex_indices)
-                  i = 0.0;
-
                 unsigned int k = 0;
                 for (const auto i : quad->vertex_indices())
                   vertex_indices[k++] = quad->vertex_index(i);
@@ -5417,14 +5459,15 @@ namespace internal
                   vertex_indices[k++] =
                     quad->line(i)->child(0)->vertex_index(1);
 
-                vertex_indices[k++] = next_unused_vertex;
+                vertex_indices[k++] = current_vertex;
               }
 
               boost::container::small_vector<
                 typename Triangulation<dim, spacedim>::raw_line_iterator,
                 12>
-                lines(quad->n_lines() * 3);
-
+                lines(reference_face_type == ReferenceCells::Quadrilateral ?
+                        12 :
+                        9);
               {
                 unsigned int k = 0;
 
@@ -5433,10 +5476,10 @@ namespace internal
                     {
                       static constexpr std::array<std::array<unsigned int, 2>,
                                                   2>
-                        index = {
-                          {{{1, 0}}, // child 0, line_orientation=false and true
-                           {{0,
-                             1}}}}; // child 1, line_orientation=false and true
+                        index = {// child 0, line_orientation=false and true
+                                 {{{1, 0}},
+                                  // child 1, line_orientation=false and true
+                                  {{0, 1}}}};
 
                       lines[k++] = quad->line(l)->child(
                         index[c][quad->line_orientation(l)]);
@@ -5508,15 +5551,15 @@ namespace internal
                      {{{{3, 4}}, {{4, 5}}, {{5, 3}}, {{X, X}}}}}};
 
               const auto &line_vertices =
-                (reference_cell_type == ReferenceCells::Quadrilateral) ?
+                (reference_face_type == ReferenceCells::Quadrilateral) ?
                   line_vertices_quad :
                   line_vertices_tri;
               const auto &quad_lines =
-                (reference_cell_type == ReferenceCells::Quadrilateral) ?
+                (reference_face_type == ReferenceCells::Quadrilateral) ?
                   quad_lines_quad :
                   quad_lines_tri;
               const auto &quad_line_vertices =
-                (reference_cell_type == ReferenceCells::Quadrilateral) ?
+                (reference_face_type == ReferenceCells::Quadrilateral) ?
                   quad_line_vertices_quad :
                   quad_line_vertices_tri;
 
@@ -5545,7 +5588,7 @@ namespace internal
                   // TODO: we assume here that all children have the same type
                   // as the parent
                   triangulation.faces->quad_reference_cell[new_quad->index()] =
-                    reference_cell_type;
+                    reference_face_type;
 
                   if (new_quad->n_lines() == 3)
                     new_quad->set_bounding_object_indices(
@@ -5601,7 +5644,7 @@ namespace internal
 #ifdef DEBUG
                   AssertDimension(
                     s.size(),
-                    (reference_cell_type == ReferenceCells::Quadrilateral ? 4 :
+                    (reference_face_type == ReferenceCells::Quadrilateral ? 4 :
                                                                             3));
 #endif
                 }
@@ -5653,23 +5696,19 @@ namespace internal
                 else
                   Assert(false, ExcNotImplemented());
 
+                // Hexes add a single new internal vertex
                 if (reference_cell_type == ReferenceCells::Hexahedron)
                   {
-                    while (triangulation.vertices_used[next_unused_vertex] ==
-                           true)
-                      ++next_unused_vertex;
-                    Assert(
-                      next_unused_vertex < triangulation.vertices.size(),
-                      ExcMessage(
-                        "Internal error: During refinement, the triangulation wants to access an element of the 'vertices' array but it turns out that the array is not large enough."));
-                    triangulation.vertices_used[next_unused_vertex] = true;
-
-                    triangulation.vertices[next_unused_vertex] =
+                    current_vertex =
+                      get_next_unused_vertex(current_vertex,
+                                             triangulation.vertices_used);
+                    triangulation.vertices[current_vertex] =
                       hex->center(true, true);
                   }
 
-                std::vector<
-                  typename Triangulation<dim, spacedim>::raw_line_iterator>
+                boost::container::small_vector<
+                  typename Triangulation<dim, spacedim>::raw_line_iterator,
+                  6>
                   new_lines(n_new_lines);
                 for (unsigned int i = 0; i < n_new_lines; ++i)
                   {
@@ -5687,8 +5726,9 @@ namespace internal
                     new_lines[i]->set_manifold_id(hex->manifold_id());
                   }
 
-                std::vector<
-                  typename Triangulation<dim, spacedim>::raw_quad_iterator>
+                boost::container::small_vector<
+                  typename Triangulation<dim, spacedim>::raw_quad_iterator,
+                  12>
                   new_quads(n_new_quads);
                 for (unsigned int i = 0; i < n_new_quads; ++i)
                   {
@@ -5718,9 +5758,11 @@ namespace internal
                       new_quad->set_line_orientation(j, true);
                   }
 
-                std::vector<
-                  typename Triangulation<dim, spacedim>::raw_hex_iterator>
-                  new_hexes(n_new_hexes);
+                // we always get 8 children per refined cell
+                std::array<
+                  typename Triangulation<dim, spacedim>::raw_hex_iterator,
+                  8>
+                  new_hexes;
                 {
                   for (unsigned int i = 0; i < n_new_hexes; ++i)
                     {
@@ -5751,6 +5793,17 @@ namespace internal
 
                       if (i % 2)
                         new_hex->set_parent(hex->index());
+                      // set the face_orientation flag to true for all
+                      // faces initially, as this is the default value
+                      // which is true for all faces interior to the
+                      // hex. later on go the other way round and
+                      // reset faces that are at the boundary of the
+                      // mother cube
+                      //
+                      // the same is true for the face_flip and
+                      // face_rotation flags. however, the latter two
+                      // are set to false by default as this is the
+                      // standard value
                       for (const auto f : new_hex->face_indices())
                         {
                           new_hex->set_face_orientation(f, true);
@@ -5758,16 +5811,13 @@ namespace internal
                           new_hex->set_face_rotation(f, false);
                         }
                     }
-                  // note these hexes as children to the present cell
                   for (unsigned int i = 0; i < n_new_hexes / 2; ++i)
                     hex->set_children(2 * i, new_hexes[2 * i]->index());
                 }
 
                 {
                   // load vertex indices
-                  std::array<unsigned int, 27> vertex_indices;
-                  for (auto &i : vertex_indices)
-                    i = 0;
+                  std::array<unsigned int, 27> vertex_indices = {};
 
                   {
                     unsigned int k = 0;
@@ -5785,7 +5835,7 @@ namespace internal
                           vertex_indices[k++] =
                             middle_vertex_index<dim, spacedim>(hex->face(i));
 
-                        vertex_indices[k++] = next_unused_vertex;
+                        vertex_indices[k++] = current_vertex;
                       }
                   }
 
@@ -6206,7 +6256,9 @@ namespace internal
                         cell_face_vertices_hex :
                         cell_face_vertices_tet;
 
-                    for (unsigned int c = 0; c < 8; ++c)
+                    for (unsigned int c = 0;
+                         c < GeometryInfo<dim>::max_children_per_cell;
+                         ++c)
                       {
                         auto &new_hex = new_hexes[c];
 
@@ -6346,11 +6398,11 @@ namespace internal
           RefinementCase<dim - 1>::cut_y,
           RefinementCase<dim - 1>::cut_xy};
 
-        // check how much space is needed on every level we need not
+        // check how much space is needed on every level. We need not
         // check the highest level since either
         // - on the highest level no cells are flagged for refinement
         // - there are, but prepare_refinement added another empty
-        // level which then is the highest level
+        //   level which then is the highest level
 
         // variables to hold the number of newly to be created
         // vertices, lines and quads. as these are stored globally,
