@@ -2367,6 +2367,24 @@ namespace GridGenerator
    * the surface mesh. If left at its default, i.e., if the set is empty, then
    * the function operates on <i>all</i> boundary faces.
    *
+   * To prevent printing a very long type in the doxygen documentation the
+   * actual return type of this function is
+   *
+   * @code
+   * std::map<typename DoFHandler<dim - 1, spacedim>::cell_iterator,
+   *          typename DoFHandler<dim, spacedim>::face_iterator>
+   * @endcode
+   *
+   * when <tt>MeshType</tt> is DoFHandler and
+   *
+   * @code
+   * std::map<typename Triangulation<dim - 1, spacedim>::cell_iterator,
+   *          typename Triangulation<dim, spacedim>::face_iterator>
+   * @endcode
+   *
+   * when <tt>MeshType</tt> is Triangulation and and not the shorter stub
+   * provided here.
+   *
    * @return A map that for each cell of the surface mesh (key) returns an
    * iterator to the corresponding face of a cell of the volume mesh (value).
    * The keys include both active and non-active cells of the surface mesh.
@@ -2389,13 +2407,18 @@ namespace GridGenerator
    * @note Since @p volume_mesh and @p surface_mesh have different spatial
    * dimensions no manifold objects are copied by this function: you must
    * attach new manifold objects to @p surface_mesh.
+   *
    */
   template <template <int, int> class MeshType, int dim, int spacedim>
-#ifndef _MSC_VER
+#ifdef DOXYGEN
+  return_type
+#else
+#  ifndef _MSC_VER
   std::map<typename MeshType<dim - 1, spacedim>::cell_iterator,
            typename MeshType<dim, spacedim>::face_iterator>
-#else
+#  else
   typename ExtractBoundaryMesh<MeshType, dim, spacedim>::return_type
+#  endif
 #endif
   extract_boundary_mesh(const MeshType<dim, spacedim> &     volume_mesh,
                         MeshType<dim - 1, spacedim> &       surface_mesh,
