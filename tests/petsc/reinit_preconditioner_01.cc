@@ -98,7 +98,6 @@ main(int argc, char **argv)
 
   test<PETScWrappers::PreconditionJacobi>();
   test<PETScWrappers::PreconditionBlockJacobi>();
-  test<PETScWrappers::PreconditionEisenstat>();
   test<PETScWrappers::PreconditionBoomerAMG>();
   test<PETScWrappers::PreconditionParaSails>();
   test<PETScWrappers::PreconditionNone>();
