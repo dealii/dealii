@@ -107,16 +107,6 @@ test()
             << " is in cell " << particle->get_surrounding_cell(tr)
             << std::endl;
 
-  // TODO: Move this into the Particle handler class. Unfortunately, there are
-  // some interactions with the SolutionTransfer class that prevent us from
-  // doing this at the moment. When doing this, check that transferring a
-  // solution and particles during the same refinement is possible (in
-  // particular that the order of serialization/deserialization is preserved).
-  tr.signals.pre_distributed_save.connect(std::bind(
-    &Particles::ParticleHandler<dim,
-                                spacedim>::register_store_callback_function,
-    &particle_handler));
-
   // save data to archive
   std::ostringstream oss;
   {
@@ -136,6 +126,7 @@ test()
           oa << particle;
       }
 
+    particle_handler.prepare_for_serialization();
     tr.save("checkpoint");
 
     // archive and stream closed when
@@ -158,17 +149,6 @@ test()
     deallog << "In between particle id " << particle->get_id() << " is in cell "
             << particle->get_surrounding_cell(tr) << std::endl;
 
-
-  // TODO: Move this into the Particle handler class. Unfortunately, there are
-  // some interactions with the SolutionTransfer class that prevent us from
-  // doing this at the moment. When doing this, check that transferring a
-  // solution and particles during the same refinement is possible (in
-  // particular that the order of serialization/deserialization is preserved).
-  tr.signals.post_distributed_load.connect(std::bind(
-    &Particles::ParticleHandler<dim, spacedim>::register_load_callback_function,
-    &particle_handler,
-    true));
-
   // verify correctness of the serialization. Note that the deserialization of
   // the particle handler has to happen before the triangulation (otherwise it
   // does not know if something was stored in the user data of the
@@ -180,6 +160,7 @@ test()
     ia >> particle_handler;
 
     tr.load("checkpoint");
+    particle_handler.deserialize();
 
     // now also read the particles by hand into the stream. the same
     // comment applied as where we were writing them

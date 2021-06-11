@@ -1082,25 +1082,6 @@ namespace Step70
     // would be coupled to what is occurring in the fluid domain.
     locally_relevant_tracer_particle_coordinates =
       locally_owned_tracer_particle_coordinates;
-
-    // Finally, we make sure that upon refinement, particles are correctly
-    // transferred. When performing local refinement or coarsening, particles
-    // will land in another cell. We could in principle redistribute all
-    // particles after refining, however this would be overly expensive.
-    //
-    // The Particles::ParticleHandler class has a way to transfer information
-    // from a cell to its children or to its parent upon refinement, without the
-    // need to reconstruct the entire data structure. This is done by
-    // registering two callback functions to the triangulation. These
-    // functions will receive a signal when refinement is about to happen, and
-    // when it has just happened, and will take care of transferring all
-    // information to the newly refined grid with minimal computational cost.
-    fluid_tria.signals.pre_distributed_refinement.connect(
-      [&]() { tracer_particle_handler.register_store_callback_function(); });
-
-    fluid_tria.signals.post_distributed_refinement.connect([&]() {
-      tracer_particle_handler.register_load_callback_function(false);
-    });
   }
 
 
@@ -1184,15 +1165,6 @@ namespace Step70
     solid_particle_handler.insert_global_particles(quadrature_points_vec,
                                                    global_fluid_bounding_boxes,
                                                    properties);
-
-
-    // As in the previous function, we end by making sure that upon refinement,
-    // particles are correctly transferred:
-    fluid_tria.signals.pre_distributed_refinement.connect(
-      [&]() { solid_particle_handler.register_store_callback_function(); });
-
-    fluid_tria.signals.post_distributed_refinement.connect(
-      [&]() { solid_particle_handler.register_load_callback_function(false); });
 
     pcout << "Solid particles: " << solid_particle_handler.n_global_particles()
           << std::endl;
@@ -1634,7 +1606,18 @@ namespace Step70
 
   // @sect4{Mesh refinement}
 
-  // We deal with mesh refinement in a completely standard way:
+  // We deal with mesh refinement in a completely standard way, except
+  // we now also transfer the particles of the two particle handlers from the
+  // existing to the refined mesh. When performing local refinement or
+  // coarsening, particles will land in another cell. We could in principle
+  // redistribute all particles after refining, however this would be overly
+  // expensive.
+  //
+  // The Particles::ParticleHandler class has a way to transfer information
+  // from a cell to its children or to its parent upon refinement, without the
+  // need to reconstruct the entire data structure. This is done similarly
+  // to the SolutionTransfer class by calling two functions, one to prepare
+  // for refinement, and one to transfer the information after refinement.
   template <int dim, int spacedim>
   void StokesImmersedProblem<dim, spacedim>::refine_and_transfer()
   {
@@ -1680,13 +1663,20 @@ namespace Step70
 
     parallel::distributed::SolutionTransfer<spacedim, LA::MPI::BlockVector>
       transfer(fluid_dh);
+
     fluid_tria.prepare_coarsening_and_refinement();
     transfer.prepare_for_coarsening_and_refinement(locally_relevant_solution);
+    tracer_particle_handler.prepare_for_coarsening_and_refinement();
+    solid_particle_handler.prepare_for_coarsening_and_refinement();
+
     fluid_tria.execute_coarsening_and_refinement();
 
     setup_dofs();
 
     transfer.interpolate(solution);
+    tracer_particle_handler.unpack_after_coarsening_and_refinement();
+    solid_particle_handler.unpack_after_coarsening_and_refinement();
+
     constraints.distribute(solution);
     locally_relevant_solution = solution;
   }
