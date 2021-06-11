@@ -1612,6 +1612,27 @@ namespace deal_II_exceptions
     }
 #endif /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
 
+
+namespace deal_II_exceptions
+{
+  namespace internals
+  {
+    /**
+     * A function that compares two values for equality, after converting to a
+     * common type to avoid compiler warnings when comparing objects of
+     * different types (e.g., unsigned and signed variables).
+     */
+    template <typename T, typename U>
+    inline bool
+    compare_for_equality(const T &dim1, const U &dim2)
+    {
+      using common_type = typename std::common_type<T, U>::type;
+      return static_cast<common_type>(dim1) == static_cast<common_type>(dim2);
+    }
+  } // namespace internals
+} // namespace deal_II_exceptions
+
+
 /**
  * Special assertion for dimension mismatch.
  *
@@ -1632,13 +1653,9 @@ namespace deal_II_exceptions
  *
  * @ingroup Exceptions
  */
-#define AssertDimension(dim1, dim2)                                            \
-  Assert(static_cast<typename ::dealii::internal::argument_type<void(          \
-             typename std::common_type<decltype(dim1),                         \
-                                       decltype(dim2)>::type)>::type>(dim1) == \
-           static_cast<typename ::dealii::internal::argument_type<void(        \
-             typename std::common_type<decltype(dim1),                         \
-                                       decltype(dim2)>::type)>::type>(dim2),   \
+#define AssertDimension(dim1, dim2)                                           \
+  Assert(::dealii::deal_II_exceptions::internals::compare_for_equality(dim1,  \
+                                                                       dim2), \
          dealii::ExcDimensionMismatch((dim1), (dim2)))
 
 
@@ -1674,6 +1691,7 @@ namespace internal
   // https://stackoverflow.com/questions/13842468/comma-in-c-c-macro
   template <typename T>
   struct argument_type;
+
   template <typename T, typename U>
   struct argument_type<T(U)>
   {

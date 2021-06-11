@@ -41,8 +41,13 @@
 DEAL_II_NAMESPACE_OPEN
 
 template <int dim, int spacedim>
+const unsigned int DoFHandler<dim, spacedim>::default_fe_index;
+
+
+template <int dim, int spacedim>
 const typename DoFHandler<dim, spacedim>::active_fe_index_type
   DoFHandler<dim, spacedim>::invalid_active_fe_index;
+
 
 namespace internal
 {
