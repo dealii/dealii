@@ -1,0 +1,74 @@
+// ---------------------------------------------------------------------
+//
+// Copyright (C) 2021 - 2021 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
+//
+// ---------------------------------------------------------------------
+
+
+for (deal_II_dimension : DIMENSIONS)
+  {
+    namespace NonMatching
+    \{
+      template class QuadratureGenerator<deal_II_dimension>;
+
+      namespace internal
+      \{
+        namespace QuadratureGeneratorImplementation
+        \{
+          template struct FunctionBounds<deal_II_dimension>;
+
+          template std::pair<double, double>
+          find_extreme_values(
+            const std::vector<FunctionBounds<deal_II_dimension>> &);
+
+          template void
+          estimate_function_bounds(
+            const std::vector<
+              std::reference_wrapper<const Function<deal_II_dimension>>> &,
+            const BoundingBox<deal_II_dimension> &,
+            std::vector<FunctionBounds<deal_II_dimension>> &);
+
+// gcc gives a maybe-uninitialized warning in this function when dim = 1, but
+// gcc is wrong. We don't need the function when dim = 1, so we avoid
+// instantiating it.
+#if 1 < deal_II_dimension
+          template std_cxx17::optional<HeightDirectionData>
+          find_best_height_direction(
+            const std::vector<FunctionBounds<deal_II_dimension>> &);
+#endif
+
+          template void
+          map_quadrature_to_box(const Quadrature<deal_II_dimension> &,
+                                const BoundingBox<deal_II_dimension> &,
+                                ExtendableQuadrature<deal_II_dimension> &);
+
+          template void
+          tensor_point_with_1D_quadrature(
+            const Point<deal_II_dimension - 1> &,
+            const double,
+            const Quadrature<1> &,
+            const double,
+            const double,
+            const unsigned int,
+            ExtendableQuadrature<deal_II_dimension> &q);
+        \}
+      \}
+    \}
+  }
+
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : DIMENSIONS)
+  {
+#if 1 < deal_II_dimension
+    template class NonMatching::internal::QuadratureGeneratorImplementation::
+      UpThroughDimensionCreator<deal_II_dimension, deal_II_space_dimension>;
+#endif
+  }

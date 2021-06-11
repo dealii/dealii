@@ -1,0 +1,7 @@
+
+DEAL::test_ignores_definite_functions
+DEAL::OK
+DEAL::
+DEAL::test_find_best_height_direction
+DEAL::height direction = 1
+DEAL::min_abs_dfdx = 5.00000
