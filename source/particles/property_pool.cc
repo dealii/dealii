@@ -178,7 +178,7 @@ namespace Particles
     std::vector<types::particle_index> sorted_ids(ids.size());
     std::vector<double>                sorted_properties(properties.size());
 
-    Handle i = 0;
+    unsigned int i = 0;
     for (auto &handles_in_cell : sorted_handles)
       for (auto &handle : handles_in_cell)
         {
