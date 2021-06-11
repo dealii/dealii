@@ -429,6 +429,11 @@ namespace numbers
     using real_type = number;
 
     /**
+     * For this data type, alias the corresponding double type.
+     */
+    using double_type = double;
+
+    /**
      * Return the complex-conjugate of the given number. Since the general
      * template is selected if number is not a complex data type, this
      * function simply returns the given number.
@@ -489,6 +494,11 @@ namespace numbers
      * two components of the complex number.
      */
     using real_type = number;
+
+    /**
+     * For this data type, alias the corresponding double type.
+     */
+    using double_type = std::complex<double>;
 
     /**
      * Return the complex-conjugate of the given number.
