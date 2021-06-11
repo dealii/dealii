@@ -289,11 +289,11 @@ if __name__ == "__main__":
 
     #
     # If clang-format-binary is not found, search again in
-    # contrib/utlitlies/programs/clang-6/bin
+    # contrib/utlitlies/programs/clang-11/bin
     #
     if not PARSED_ARGUMENTS.clang_format_binary:
         os.environ["PATH"] += ':' + \
-            os.getcwd() + "/contrib/utilities/programs/clang-6/bin"
+            os.getcwd() + "/contrib/utilities/programs/clang-11/bin"
         PARSED_ARGUMENTS.clang_format_binary = distutils.spawn.find_executable(
             "clang-format")
 
