@@ -188,6 +188,220 @@ namespace Utilities
 #endif
     }
 
+
+
+    template <typename Number>
+    void
+    NoncontiguousPartitioner::export_to_ghosted_array(
+      const unsigned int                         communication_channel,
+      const ArrayView<const Number> &            locally_owned_array,
+      std::map<unsigned int, std::vector<char>> &temporary_storage,
+      std::vector<unsigned int> &                sizes,
+      const ArrayView<Number> &                  ghost_array) const
+    {
+      this->template export_to_ghosted_array_start<Number>(
+        communication_channel,
+        locally_owned_array,
+        temporary_storage,
+        sizes,
+        this->requests);
+      this->template export_to_ghosted_array_finish<Number>(temporary_storage,
+                                                            sizes,
+                                                            ghost_array,
+                                                            this->requests);
+    }
+
+
+
+    template <typename Number>
+    void
+    NoncontiguousPartitioner::export_to_ghosted_array(
+      const unsigned int                         communication_channel,
+      const ArrayView<const Number> &            locally_owned_array,
+      std::map<unsigned int, std::vector<char>> &temporary_storage,
+      std::vector<unsigned int> &                sizes,
+      const ArrayView<Number> &                  ghost_array,
+      std::vector<MPI_Request> &                 requests) const
+    {
+      this->template export_to_ghosted_array_start<Number>(
+        communication_channel,
+        locally_owned_array,
+        temporary_storage,
+        sizes,
+        requests);
+      this->template export_to_ghosted_array_finish<Number>(temporary_storage,
+                                                            sizes,
+                                                            ghost_array,
+                                                            requests);
+    }
+
+
+
+    template <typename Number>
+    void
+    NoncontiguousPartitioner::export_to_ghosted_array_start(
+      const unsigned int                         communication_channel,
+      const ArrayView<const Number> &            src,
+      std::map<unsigned int, std::vector<char>> &buffers,
+      std::vector<unsigned int> &                sizes,
+      std::vector<MPI_Request> &                 requests) const
+    {
+#ifndef DEAL_II_WITH_MPI
+      (void)communication_channel;
+      (void)src;
+      (void)buffers;
+      (void)requests;
+      Assert(false, ExcNeedsMPI());
+#else
+      // check that maps are empty
+      AssertDimension(requests.size(), recv_ranks.size() + send_ranks.size());
+
+      const auto tag =
+        communication_channel +
+        internal::Tags::noncontiguous_partitioner_update_ghost_values_start;
+
+      AssertIndexRange(
+        tag,
+        internal::Tags::noncontiguous_partitioner_update_ghost_values_end + 1);
+
+
+      // TODO: this should be the duty of the user
+      // buffers.clear();
+      // sizes.clear();
+      // sizes.resize(this->temporary_storage_size());
+
+
+      // post recv
+      for (types::global_dof_index i = 0; i < recv_ranks.size(); i++)
+        {
+          const unsigned int ierr = MPI_Irecv(sizes.data() + recv_ptr[i],
+                                              recv_ptr[i + 1] - recv_ptr[i],
+                                              MPI_UNSIGNED,
+                                              recv_ranks[i],
+                                              tag + 1,
+                                              communicator,
+                                              &requests[i + send_ranks.size()]);
+          AssertThrowMPI(ierr);
+        }
+
+
+      // post send
+      AssertIndexRange(send_ranks.size(), send_ptr.size());
+      for (types::global_dof_index i = 0, k = 0; i < send_ranks.size(); i++)
+        {
+          // intialize (necessary?)
+          buffers[send_ranks[i]] = std::vector<char>();
+
+          // collect data to be send
+          for (types::global_dof_index j = send_ptr[i]; j < send_ptr[i + 1];
+               j++)
+            {
+              AssertIndexRange(k, send_indices.size());
+              sizes[j] = Utilities::pack(src[send_indices[k]],
+                                         buffers[send_ranks[i]],
+                                         /*allow_compression=*/false);
+              ++k;
+            }
+
+          // send data
+          auto ierr = MPI_Isend(buffers[send_ranks[i]].data(),
+                                buffers[send_ranks[i]].size(),
+                                MPI_CHAR,
+                                send_ranks[i],
+                                tag,
+                                communicator,
+                                &requests[i]);
+          AssertThrowMPI(ierr);
+
+          // send buffer sizes
+          ierr = MPI_Isend(sizes.data() + send_ptr[i],
+                           send_ptr[i + 1] - send_ptr[i],
+                           MPI_UNSIGNED,
+                           send_ranks[i],
+                           tag + 1,
+                           communicator,
+                           &requests[i]);
+          AssertThrowMPI(ierr);
+        }
+
+      // wait until size exchange is finished
+      {
+        const auto ierr = MPI_Waitall(recv_ranks.size(),
+                                      requests.data() + send_ranks.size(),
+                                      MPI_STATUSES_IGNORE);
+        AssertThrowMPI(ierr);
+      }
+
+      // post recv
+      // requires that sizes_sum has correct values
+      for (types::global_dof_index i = 0; i < recv_ranks.size(); i++)
+        {
+          auto buffer_size = std::accumulate(sizes.begin() + send_ptr[i],
+                                             sizes.begin() + send_ptr[i + 1],
+                                             0);
+
+          const auto ierr = MPI_Irecv(buffers[recv_ranks[i]].data(),
+                                      buffer_size,
+                                      MPI_CHAR,
+                                      recv_ranks[i],
+                                      tag,
+                                      communicator,
+                                      &requests[i + send_ranks.size()]);
+          AssertThrowMPI(ierr);
+        }
+#endif
+    }
+
+
+
+    template <typename Number>
+    void
+    NoncontiguousPartitioner::export_to_ghosted_array_finish(
+      std::map<unsigned int, std::vector<char>> &buffers,
+      std::vector<unsigned int> &                sizes,
+      const ArrayView<Number> &                  dst,
+      std::vector<MPI_Request> &                 requests) const
+    {
+#ifndef DEAL_II_WITH_MPI
+      (void)buffers;
+      (void)dst;
+      (void)requests;
+      Assert(false, ExcNeedsMPI());
+#else
+      // receive all data packages and copy data from buffers
+      for (types::global_dof_index proc = 0; proc < recv_ranks.size(); proc++)
+        {
+          int        i;
+          MPI_Status status;
+          const auto ierr = MPI_Waitany(recv_ranks.size(),
+                                        requests.data() + send_ranks.size(),
+                                        &i,
+                                        &status);
+          AssertThrowMPI(ierr);
+
+          AssertIndexRange(i + 1, recv_ptr.size());
+
+          auto buffer_start = buffers[recv_ranks[i]].cbegin();
+          auto buffer_end   = buffers[recv_ranks[i]].cbegin();
+          for (types::global_dof_index j = recv_ptr[i]; j < recv_ptr[i + 1];
+               j++)
+            {
+              buffer_end += sizes[j];
+              dst[recv_indices[j]] =
+                Utilities::unpack<Number>(buffer_start,
+                                          buffer_end,
+                                          /*allow_compression=*/false);
+              buffer_start = buffer_end;
+            }
+        }
+
+      // wait that all data packages have been sent
+      const int ierr =
+        MPI_Waitall(send_ranks.size(), requests.data(), MPI_STATUSES_IGNORE);
+      AssertThrowMPI(ierr);
+#endif
+    }
+
   } // namespace MPI
 } // namespace Utilities
 
