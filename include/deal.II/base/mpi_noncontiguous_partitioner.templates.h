@@ -331,8 +331,8 @@ namespace Utilities
       // post recv
       for (types::global_dof_index i = 0; i < recv_ranks.size(); i++)
         {
-          auto buffer_size = std::accumulate(sizes.begin() + send_ptr[i],
-                                             sizes.begin() + send_ptr[i + 1],
+          auto buffer_size = std::accumulate(sizes.begin() + recv_ptr[i],
+                                             sizes.begin() + recv_ptr[i + 1],
                                              0);
 
           const auto ierr = MPI_Irecv(buffers[recv_ranks[i]].data(),
