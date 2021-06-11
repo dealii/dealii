@@ -51,9 +51,20 @@ namespace Particles
    * is designed in a similar way as the triangulation class. In particular,
    * we call particles in the domain of the local process local particles,
    * and particles that belong to neighbor processes and live in the ghost cells
-   * around the locally owned domain "ghost particles".
+   * around the locally owned domain "ghost particles". The class also includes
+   * functionality that is similar to the DoFHandler() class (it knows which
+   * particles live on which cells) and the SolutionTransfer() class (it know
+   * how to transfer particles between cells and subdomains).
    *
-   * This class is used in step-70.
+   * @note: While the class can be used in any kind of triangulation, transfer
+   * of particles during mesh refinement is currently only implemented for
+   * distributed triangulations. You can still use the class for serial
+   * triangulations, but you cannot change the mesh while particles
+   * exist inside the particle handler.
+   *
+   * For examples on how to use this class to track particles, store properties
+   * on particles, and let the properties on the particles influence the
+   * finite-element solution see step-19, step-68, and step-70.
    *
    * @ingroup Particle
    */
@@ -84,7 +95,7 @@ namespace Particles
 
     /**
      * Constructor that initializes the particle handler with
-     * a given triangulation and mapping. Since particles are stored in
+     * a given triangulation and mapping. Since particles are stored with
      * respect to their surrounding cells this information is necessary to
      * correctly organize the particle collection.
      * This constructor is equivalent to calling the default constructor and
@@ -100,8 +111,8 @@ namespace Particles
     virtual ~ParticleHandler();
 
     /**
-     * Initialize the particle handler. This function does not clear the
-     * internal data structures, it just sets the triangulation and the
+     * Initialize the particle handler. This function does clear the
+     * internal data structures, and sets the triangulation and the
      * mapping to be used.
      */
     void
@@ -133,7 +144,7 @@ namespace Particles
     copy_from(const ParticleHandler<dim, spacedim> &particle_handler);
 
     /**
-     * Clear all particle related data.
+     * Clear all particle related data but keep the handler initialized.
      */
     void
     clear();
@@ -158,13 +169,13 @@ namespace Particles
     update_cached_numbers();
 
     /**
-     * Return an iterator to the first particle.
+     * Return an iterator to the first locally owned particle.
      */
     particle_iterator
     begin() const;
 
     /**
-     * Return an iterator to the first particle.
+     * Return an iterator to the first locally owned particle.
      */
     particle_iterator
     begin();
@@ -220,25 +231,6 @@ namespace Particles
      *
      * The number of elements in the returned range equals what the
      * n_particles_in_cell() function returns.
-     *
-     * @note While this function is used in step-19, it is not an efficient
-     *   function to use if the number of particles is large. That is because
-     *   to find the particles that are located in one cell costs
-     *   ${\cal O}(\log N)$ where $N$ is the number of overall particles. Since
-     *   you will likely do this for every cell, and assuming that the number
-     *   of particles and the number of cells are roughly proportional,
-     *   you end up with an ${\cal O}(N \log N)$ algorithm. A better approach
-     *   is to use the fact that internally, particles are arranged in the
-     *   order of the active cells they are in. In other words, if you iterate
-     *   over all particles, you will encounter them in the same order as
-     *   you walk over the active cells. You can exploit this by keeping an
-     *   iterator to the first particle of the first cell, and when you move
-     *   to the next cell, you increment the particle iterator as well until
-     *   you find a particle located on that next cell. This is the approach
-     *   used in step-70, for example, and has an overall cost of
-     *   ${\cal O}(\log N)$ when accumulated over all cells. The approach is
-     *   also detailed in the "Possibilities for extensions section"
-     *   of step-19.
      */
     particle_iterator_range
     particles_in_cell(
@@ -258,18 +250,17 @@ namespace Particles
       const;
 
     /**
-     * Remove a particle pointed to by the iterator. Afterwards the iterator
-     * will point to one of the remaining particles in the cell. Note that
-     * particle iterators that point to other particles in the same cell as @p particle
-     * may not longer be valid after this function call.
+     * Remove a particle pointed to by the iterator. Note that @p particle
+     * and all iterators that point to other particles in the same cell
+     * as @p particle will be invalidated during this call.
      */
     void
     remove_particle(const particle_iterator &particle);
 
     /**
      * Remove a vector of particles indicated by the particle iterators.
-     * The iterators and all other iterators are invalidated during the
-     * function call.
+     * The iterators and all other particle iterators are invalidated
+     * during the function call.
      */
     void
     remove_particles(const std::vector<particle_iterator> &particles);
@@ -595,7 +586,7 @@ namespace Particles
         &load_callback);
 
     /**
-     * Return the total number of particles that were managed by this class
+     * Return the total number of particles that are managed by this class
      * the last time the update_cached_numbers() function was called.
      * The actual number of particles may have changed since then if
      * particles have been added or removed.
@@ -827,14 +818,14 @@ namespace Particles
      * properties. Since particles reference the property pool, the
      * latter has to be destroyed *after* the particles are destroyed.
      * This is achieved by making sure the `property_pool` member variable
-     * precedes the declaration of the `particles` and `ghost_particles`
-     * members.
+     * precedes the declaration of the `particles`
+     * member variable.
      */
     std::unique_ptr<PropertyPool<dim, spacedim>> property_pool;
 
     /**
      * Set of particles currently living in the local domain including ghost
-     * cells, organized by the active cell of the cell they are in.
+     * cells, organized by the active cell index of the cell they are in.
      */
     particle_container particles;
 
@@ -933,10 +924,9 @@ namespace Particles
      * @param [in] particles_to_send All particles that should be sent and
      * their new subdomain_ids are in this map.
      *
-     * @param [in,out] received_particles Vector that stores all received
-     * particles. Note that it is not required nor checked that the list
-     * is empty, received particles are simply attached to the end of
-     * the vector.
+     * @param [in,out] received_particles Particle container that stores all received
+     * particles. Note that it is not required nor checked that the container
+     * is empty, received particles are simply inserted into the container.
      *
      * @param [in] new_cells_for_particles Optional vector of cell
      * iterators with the same structure as @p particles_to_send. If this
@@ -968,12 +958,11 @@ namespace Particles
       const bool enable_cache = false);
 
     /**
-     * Transfer particles position and properties assuming that
+     * Transfer ghost particles position and properties assuming that
      * the particles have not changed cells. This routine uses the
-     * GhostParticlePartitioner as a caching structure to update the particles.
+     * GhostParticlePartitioner as a caching structure to know which particles
+     * are ghost to other processes, and where they need to be send.
      * It inherently assumes that particles cannot have changed cell.
-     * All updated particles will be appended to the
-     * @p received_particles container.
      *
      * @param [in] particles_to_send All particles for which information
      * should be sent and their new subdomain_ids are in this map.
@@ -981,7 +970,7 @@ namespace Particles
      * @param [in,out] received_particles A map with all received
      * particles. Note that it is not required nor checked that the container
      * is empty, received particles are simply inserted into
-     * the map.
+     * the container.
      *
      */
     void
@@ -1012,8 +1001,8 @@ namespace Particles
       const typename Triangulation<dim, spacedim>::CellStatus     status) const;
 
     /**
-     * Called by listener functions after a refinement step. The local map
-     * of particles has to be read from the triangulation user_pointer.
+     * Called by listener functions after a refinement step to receive
+     * particles and insert them into the particle container.
      */
     void
     load_particles(

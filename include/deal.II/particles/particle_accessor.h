@@ -194,6 +194,14 @@ namespace Particles
     get_properties() const;
 
     /**
+     * @deprecated: This function is only kept for backward compatibility
+     * and has no meaning any more. ParticleAccessors always use the
+     * property pool of the owning particle handler.
+     */
+    void
+    set_property_pool(PropertyPool<dim, spacedim> &property_pool);
+
+    /**
      * Return the size in bytes this particle occupies if all of its data is
      * serialized (i.e. the number of bytes that is written by the write_data
      * function of this class).
@@ -640,6 +648,16 @@ namespace Particles
     Assert(state() == IteratorState::valid, ExcInternalError());
 
     return property_pool->get_properties(get_handle());
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline void
+  ParticleAccessor<dim, spacedim>::set_property_pool(
+    PropertyPool<dim, spacedim> & /*new_property_pool*/)
+  {
+    /* nothing to do */
   }
 
 
