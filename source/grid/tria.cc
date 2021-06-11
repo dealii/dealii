@@ -4558,7 +4558,7 @@ namespace internal
             }
 
 
-        // check how much space is needed on every level we need not
+        // check how much space is needed on every level. We need not
         // check the highest level since either - on the highest level
         // no cells are flagged for refinement - there are, but
         // prepare_refinement added another empty level
@@ -4825,7 +4825,7 @@ namespace internal
         // pairs (the children of lines must be stored in pairs)
         unsigned int n_lines_in_pairs = 0;
 
-        // check how much space is needed on every level we need not
+        // check how much space is needed on every level. We need not
         // check the highest level since either - on the highest level
         // no cells are flagged for refinement - there are, but
         // prepare_refinement added another empty level
@@ -5129,11 +5129,11 @@ namespace internal
              ++quad)
           quad->clear_user_flag();
 
-        // check how much space is needed on every level we need not
+        // check how much space is needed on every level. We need not
         // check the highest level since either
         // - on the highest level no cells are flagged for refinement
         // - there are, but prepare_refinement added another empty
-        // level which then is the highest level
+        //   level which then is the highest level
 
         // variables to hold the number of newly to be created
         // vertices, lines and quads. as these are stored globally,
@@ -6398,11 +6398,11 @@ namespace internal
           RefinementCase<dim - 1>::cut_y,
           RefinementCase<dim - 1>::cut_xy};
 
-        // check how much space is needed on every level we need not
+        // check how much space is needed on every level. We need not
         // check the highest level since either
         // - on the highest level no cells are flagged for refinement
         // - there are, but prepare_refinement added another empty
-        // level which then is the highest level
+        //   level which then is the highest level
 
         // variables to hold the number of newly to be created
         // vertices, lines and quads. as these are stored globally,
