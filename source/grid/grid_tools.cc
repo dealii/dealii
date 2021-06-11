@@ -2746,29 +2746,6 @@ namespace GridTools
       // return if the scalar product of a is larger.
       return (scalar_product_a > scalar_product_b);
     }
-
-
-
-    boost::geometry::model::point<double, 1, boost::geometry::cs::cartesian>
-    create_boost_point(const Point<1> &p)
-    {
-      return boost::geometry::model::
-        point<double, 1, boost::geometry::cs::cartesian>(p[0]);
-    }
-
-    boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>
-    create_boost_point(const Point<2> &p)
-    {
-      return {p[0], p[1]};
-    }
-
-    boost::geometry::model::point<double, 3, boost::geometry::cs::cartesian>
-    create_boost_point(const Point<3> &p)
-    {
-      return {p[0], p[1], p[2]};
-    }
-
-
   } // namespace internal
 
   template <int dim, template <int, int> class MeshType, int spacedim>
@@ -2809,8 +2786,8 @@ namespace GridTools
         !relevant_cell_bounding_boxes_rtree->empty())
       {
         if (relevant_cell_bounding_boxes_rtree->qbegin(
-              boost::geometry::index::intersects(internal::create_boost_point(
-                p))) == relevant_cell_bounding_boxes_rtree->qend())
+              boost::geometry::index::intersects(p)) ==
+            relevant_cell_bounding_boxes_rtree->qend())
           return cell_and_position;
       }
 
