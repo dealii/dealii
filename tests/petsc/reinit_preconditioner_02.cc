@@ -89,7 +89,6 @@ main(int argc, char **argv)
   test<PETScWrappers::PreconditionBlockJacobi>();
   test<PETScWrappers::PreconditionSOR>();
   test<PETScWrappers::PreconditionSSOR>();
-  // todo: this crashes test<PETScWrappers::PreconditionEisenstat> ();
   test<PETScWrappers::PreconditionICC>();
   test<PETScWrappers::PreconditionILU>();
   test<PETScWrappers::PreconditionLU>();
