@@ -35,60 +35,62 @@ test()
     const unsigned int                     n_properties = 3;
     Particles::PropertyPool<dim, spacedim> pool(n_properties);
 
-    std::vector<
-      std::vector<typename Particles::PropertyPool<dim, spacedim>::Handle>>
+    std::vector<typename Particles::PropertyPool<dim, spacedim>::Handle>
       particle_handles;
-    particle_handles.resize(2);
 
     // Allocate some space in non-contigous locations
-    particle_handles[1].push_back(pool.register_particle());
-    particle_handles[0].push_back(pool.register_particle());
-    particle_handles[1].push_back(pool.register_particle());
-    particle_handles[0].push_back(pool.register_particle());
-    particle_handles[1].push_back(pool.register_particle());
-    particle_handles[0].push_back(pool.register_particle());
+    particle_handles.push_back(pool.register_particle());
+    particle_handles.insert(particle_handles.begin(), pool.register_particle());
+    particle_handles.push_back(pool.register_particle());
+    particle_handles.insert(particle_handles.begin(), pool.register_particle());
+    particle_handles.push_back(pool.register_particle());
+    particle_handles.insert(particle_handles.begin(), pool.register_particle());
 
     unsigned int i = 0;
-    for (auto &particles_in_cell : particle_handles)
-      for (auto &particle : particles_in_cell)
-        pool.set_id(particle, i++);
+    for (auto &particle : particle_handles)
+      pool.set_id(particle, i++);
 
-    for (const auto &particles_in_cell : particle_handles)
-      for (const auto &particle : particles_in_cell)
-        deallog << "Before removal unsorted ID: " << pool.get_id(particle)
-                << ". Handle: " << particle << std::endl;
+    for (const auto &particle : particle_handles)
+      deallog << "Before removal unsorted ID: " << pool.get_id(particle)
+              << ". Handle: " << particle << std::endl;
 
     pool.sort_memory_slots(particle_handles);
 
-    for (const auto &particles_in_cell : particle_handles)
-      for (const auto &particle : particles_in_cell)
-        deallog << "Before removal sorted ID: " << pool.get_id(particle)
-                << ". Handle: " << particle << std::endl;
+    typename Particles::PropertyPool<dim, spacedim>::Handle h = 0;
+    for (auto &particle : particle_handles)
+      particle = h++;
+
+    for (const auto &particle : particle_handles)
+      deallog << "Before removal sorted ID: " << pool.get_id(particle)
+              << ". Handle: " << particle << std::endl;
 
     // Deallocate some space in the same way the particle handler would
     // remove particles
-    pool.deregister_particle(particle_handles[1][1]);
-    pool.deregister_particle(particle_handles[0][2]);
+    pool.deregister_particle(particle_handles[2]);
+    pool.deregister_particle(particle_handles[3]);
 
-    particle_handles[1][1] = particle_handles[1].back();
-    particle_handles[1].resize(particle_handles[1].size() - 1);
-    particle_handles[0].resize(particle_handles[0].size() - 1);
+    particle_handles[2] = particle_handles.back();
+    particle_handles.resize(particle_handles.size() - 1);
 
-    for (const auto &particles_in_cell : particle_handles)
-      for (const auto &particle : particles_in_cell)
-        deallog << "After removal unsorted ID: " << pool.get_id(particle)
-                << ". Handle: " << particle << std::endl;
+    particle_handles[3] = particle_handles.back();
+    particle_handles.resize(particle_handles.size() - 1);
+
+    for (const auto &particle : particle_handles)
+      deallog << "After removal unsorted ID: " << pool.get_id(particle)
+              << ". Handle: " << particle << std::endl;
 
     pool.sort_memory_slots(particle_handles);
 
-    for (const auto &particles_in_cell : particle_handles)
-      for (const auto &particle : particles_in_cell)
-        deallog << "After removal sorted ID: " << pool.get_id(particle)
-                << ". Handle: " << particle << std::endl;
+    h = 0;
+    for (auto &particle : particle_handles)
+      particle = h++;
 
-    for (auto &particles_in_cell : particle_handles)
-      for (auto &particle : particles_in_cell)
-        pool.deregister_particle(particle);
+    for (const auto &particle : particle_handles)
+      deallog << "After removal sorted ID: " << pool.get_id(particle)
+              << ". Handle: " << particle << std::endl;
+
+    for (auto &particle : particle_handles)
+      pool.deregister_particle(particle);
   }
 
   deallog << "OK" << std::endl;

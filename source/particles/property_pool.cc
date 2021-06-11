@@ -170,7 +170,7 @@ namespace Particles
   template <int dim, int spacedim>
   void
   PropertyPool<dim, spacedim>::sort_memory_slots(
-    std::vector<std::vector<Handle>> &handles_to_sort)
+    const std::vector<Handle> &handles_to_sort)
   {
     std::vector<Point<spacedim>>       sorted_locations;
     std::vector<Point<dim>>            sorted_reference_locations;
@@ -182,24 +182,19 @@ namespace Particles
     sorted_ids.reserve(ids.size());
     sorted_properties.reserve(properties.size());
 
-    Handle i = 0;
-    for (auto &handles_in_cell : handles_to_sort)
-      for (auto &handle : handles_in_cell)
-        {
-          Assert(handle != invalid_handle,
-                 ExcMessage(
-                   "Invalid handle detected during sorting particle memory."));
+    for (auto &handle : handles_to_sort)
+      {
+        Assert(handle != invalid_handle,
+               ExcMessage(
+                 "Invalid handle detected during sorting particle memory."));
 
-          sorted_locations.push_back(locations[handle]);
-          sorted_reference_locations.push_back(reference_locations[handle]);
-          sorted_ids.push_back(ids[handle]);
+        sorted_locations.push_back(locations[handle]);
+        sorted_reference_locations.push_back(reference_locations[handle]);
+        sorted_ids.push_back(ids[handle]);
 
-          for (unsigned int j = 0; j < n_properties; ++j)
-            sorted_properties.push_back(properties[handle * n_properties + j]);
-
-          handle = i;
-          ++i;
-        }
+        for (unsigned int j = 0; j < n_properties; ++j)
+          sorted_properties.push_back(properties[handle * n_properties + j]);
+      }
 
     Assert(sorted_locations.size() ==
              locations.size() - currently_available_handles.size(),
@@ -207,10 +202,10 @@ namespace Particles
              "Number of sorted property handles is not equal to number "
              "of currently registered handles."));
 
-    locations.swap(sorted_locations);
-    reference_locations.swap(sorted_reference_locations);
-    ids.swap(sorted_ids);
-    properties.swap(sorted_properties);
+    locations           = std::move(sorted_locations);
+    reference_locations = std::move(sorted_reference_locations);
+    ids                 = std::move(sorted_ids);
+    properties          = std::move(sorted_properties);
 
     currently_available_handles.clear();
   }
