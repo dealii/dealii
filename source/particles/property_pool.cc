@@ -59,7 +59,7 @@ namespace Particles
                                " open handles to memory that was allocated "
                                "via allocate_properties_array() but that has "
                                "not been returned via "
-                               "deallocate_properties_array()."));
+                               "deregister_particle()."));
       }
 
     // Clear vectors and ensure deallocation of memory
@@ -170,35 +170,39 @@ namespace Particles
   template <int dim, int spacedim>
   void
   PropertyPool<dim, spacedim>::sort_memory_slots(
-    std::vector<std::vector<Handle>> &sorted_handles)
+    std::vector<std::vector<Handle>> &handles_to_sort)
   {
-    std::vector<Point<spacedim>> sorted_locations(locations.size());
-    std::vector<Point<dim>>      sorted_reference_locations(
-      reference_locations.size());
-    std::vector<types::particle_index> sorted_ids(ids.size());
-    std::vector<double>                sorted_properties(properties.size());
+    std::vector<Point<spacedim>>       sorted_locations;
+    std::vector<Point<dim>>            sorted_reference_locations;
+    std::vector<types::particle_index> sorted_ids;
+    std::vector<double>                sorted_properties;
 
-    unsigned int i = 0;
-    for (auto &handles_in_cell : sorted_handles)
+    sorted_locations.reserve(locations.size());
+    sorted_reference_locations.reserve(reference_locations.size());
+    sorted_ids.reserve(ids.size());
+    sorted_properties.reserve(properties.size());
+
+    Handle i = 0;
+    for (auto &handles_in_cell : handles_to_sort)
       for (auto &handle : handles_in_cell)
         {
           Assert(handle != invalid_handle,
                  ExcMessage(
                    "Invalid handle detected during sorting particle memory."));
 
-          sorted_locations[i]           = locations[handle];
-          sorted_reference_locations[i] = reference_locations[handle];
-          sorted_ids[i]                 = ids[handle];
+          sorted_locations.push_back(locations[handle]);
+          sorted_reference_locations.push_back(reference_locations[handle]);
+          sorted_ids.push_back(ids[handle]);
 
           for (unsigned int j = 0; j < n_properties; ++j)
-            sorted_properties[i * n_properties + j] =
-              properties[handle * n_properties + j];
+            sorted_properties.push_back(properties[handle * n_properties + j]);
 
           handle = i;
           ++i;
         }
 
-    Assert(i == locations.size() - currently_available_handles.size(),
+    Assert(sorted_locations.size() ==
+             locations.size() - currently_available_handles.size(),
            ExcMessage(
              "Number of sorted property handles is not equal to number "
              "of currently registered handles."));
@@ -208,17 +212,7 @@ namespace Particles
     ids.swap(sorted_ids);
     properties.swap(sorted_properties);
 
-    // Now update the available handles
-    for (auto &available_handle : currently_available_handles)
-      {
-        available_handle = i;
-        ++i;
-      }
-
-    Assert(i == locations.size(),
-           ExcMessage("Number of allocated handles does not match number "
-                      "of registered handles plus number of unregistered "
-                      "but available handles."));
+    currently_available_handles.clear();
   }
 
 

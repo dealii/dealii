@@ -211,8 +211,17 @@ namespace Particles
     unsigned int
     n_properties_per_slot() const;
 
+    /**
+     * This function makes sure that all internally stored memory blocks
+     * are sorted in the same order as one would loop over the @p handles_to_sort
+     * container. This makes sure memory access is contiguous with actual
+     * memory location. Because the ordering is given in the input argumet
+     * the complexity of this function is $O(N)$ where N is the number of
+     * elements in the input argument. This function creates a temporary copy of
+     * all currently registered memory blocks.
+     */
     void
-    sort_memory_slots(std::vector<std::vector<Handle>> &sorted_handles);
+    sort_memory_slots(std::vector<std::vector<Handle>> &handles_to_sort);
 
   private:
     /**
