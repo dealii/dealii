@@ -343,6 +343,11 @@ impossible to re-generate if it is not saved to disk (in which case
 the variable needs to be serialized).
 
 
+<h4>How precisely should we save the data of a checkpoint</h4>
+
+TODO. write separate checkpoint file, then move over
+
+
 <h4>How often to save/restore</h4>
 
 Now that we know *what* we want to save and how we want to restore it,
