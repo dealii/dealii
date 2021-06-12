@@ -355,12 +355,13 @@ namespace LinearAlgebra
     if (n_elements() != in_vector.n_elements())
       reinit(in_vector, true);
 
-    dealii::internal::VectorOperations::Vector_copy<Number, Number> copier(
-      in_vector.values.get(), values.get());
-    dealii::internal::VectorOperations::parallel_for(copier,
-                                                     0,
-                                                     n_elements(),
-                                                     thread_loop_partitioner);
+    if (n_elements() > 0)
+      {
+        dealii::internal::VectorOperations::Vector_copy<Number, Number> copier(
+          in_vector.values.get(), values.get());
+        dealii::internal::VectorOperations::parallel_for(
+          copier, 0, n_elements(), thread_loop_partitioner);
+      }
 
     return *this;
   }
@@ -376,12 +377,13 @@ namespace LinearAlgebra
     if (n_elements() != in_vector.n_elements())
       reinit(in_vector, true);
 
-    dealii::internal::VectorOperations::Vector_copy<Number, Number2> copier(
-      in_vector.values.get(), values.get());
-    dealii::internal::VectorOperations::parallel_for(copier,
-                                                     0,
-                                                     n_elements(),
-                                                     thread_loop_partitioner);
+    if (n_elements() > 0)
+      {
+        dealii::internal::VectorOperations::Vector_copy<Number, Number2> copier(
+          in_vector.values.get(), values.get());
+        dealii::internal::VectorOperations::parallel_for(
+          copier, 0, n_elements(), thread_loop_partitioner);
+      }
 
     return *this;
   }
