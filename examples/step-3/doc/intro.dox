@@ -171,7 +171,8 @@ takes to make that happen:
     \approx
     \sum_q \varphi_i(\mathbf x^K_q) f(\mathbf x^K_q) w^K_q,
   @f}
-  where $\mathbf x^K_q$ is the $q$th quadrature point on cell $K$, and $w^K_q$
+  where $\mathbb{T} \approx \Omega$ is a Triangulation approximating the domain,
+  $\mathbf x^K_q$ is the $q$th quadrature point on cell $K$, and $w^K_q$
   the $q$th quadrature weight. There are different parts to what is needed in
   doing this, and we will discuss them in turn next.
 - First, we need a way to describe the location $\mathbf x_q^K$ of quadrature
