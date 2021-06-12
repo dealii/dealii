@@ -18,11 +18,7 @@
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/base/geometry_info.h>
-#include <deal.II/base/polynomial.h>
-#include <deal.II/base/polynomials_raviart_thomas.h>
 #include <deal.II/base/table.h>
-#include <deal.II/base/tensor_product_polynomials.h>
 
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/fe_poly_tensor.h>
@@ -309,29 +305,23 @@ private:
  * For this Raviart-Thomas element, the node values are not cell and face
  * moments with respect to certain polynomials, but the values in quadrature
  * points. Following the general scheme for numbering degrees of freedom, the
- * node values on edges are first, edge by edge, according to the natural
- * ordering of the edges of a cell. The interior degrees of freedom are last.
+ * node values on faces (edges in 2D, quads in 3D) are first, face by face,
+ * according to the natural ordering of the faces of a cell. The interior
+ * degrees of freedom are last.
  *
  * For an RT-element of degree <i>k</i>, we choose <i>(k+1)<sup>d-1</sup></i>
  * Gauss points on each face. These points are ordered lexicographically with
  * respect to the orientation of the face. This way, the normal component
- * which is in <i>Q<sub>k</sub></i> is uniquely determined. Furthermore, since
- * this Gauss-formula is exact on <i>Q<sub>2k+1</sub></i>, these node values
- * correspond to the exact integration of the moments of the RT-space.
+ * which is in <i>Q<sub>k</sub></i>, is uniquely determined. Furthermore,
+ * since this Gauss-formula is exact for polynomials of degree <i>2k+1</i>,
+ * these node values correspond to the exact integration of the moments of the
+ * RT-space.
  *
- * In the interior of the cells, the moments are with respect to an
- * anisotropic <i>Q<sub>k</sub></i> space, where the test functions are one
- * degree lower in the direction corresponding to the vector component under
- * consideration. This is emulated by using an anisotropic Gauss formula for
- * integration.
- *
- * @todo The current implementation is for Cartesian meshes only. You must use
- * MappingCartesian.
- *
- * @todo Even if this element is implemented for two and three space
- * dimensions, the definition of the node values relies on consistently
- * oriented faces in 3D. Therefore, care should be taken on complicated
- * meshes.
+ * These face polynomials are extended into the interior by the means of a
+ * QGaussLobatto formula for the normal direction. In other words, the
+ * polynomials are the tensor product of Lagrange polynomials on the points of
+ * a QGaussLobatto formula in the normal direction with Lagrange polynomials
+ * on the points of a QGauss quadrature formula.
  *
  * @note The degree stored in the member variable
  * FiniteElementData<dim>::degree is higher by one than the constructor
@@ -359,11 +349,6 @@ public:
   clone() const override;
 
   virtual void
-  convert_generalized_support_point_values_to_dof_values(
-    const std::vector<Vector<double>> &support_point_values,
-    std::vector<double> &              nodal_values) const override;
-
-  virtual void
   get_face_interpolation_matrix(const FiniteElement<dim> &source,
                                 FullMatrix<double> &      matrix,
                                 const unsigned int face_no = 0) const override;
@@ -374,6 +359,12 @@ public:
     const unsigned int        subface,
     FullMatrix<double> &      matrix,
     const unsigned int        face_no = 0) const override;
+
+  virtual void
+  convert_generalized_support_point_values_to_dof_values(
+    const std::vector<Vector<double>> &support_point_values,
+    std::vector<double> &              nodal_values) const override;
+
   virtual bool
   hp_constraints_are_implemented() const override;
 
@@ -394,51 +385,37 @@ public:
   compare_for_domination(const FiniteElement<dim> &fe_other,
                          const unsigned int codim = 0) const override final;
 
+  virtual const FullMatrix<double> &
+  get_restriction_matrix(
+    const unsigned int         child,
+    const RefinementCase<dim> &refinement_case =
+      RefinementCase<dim>::isotropic_refinement) const override;
+
+  virtual const FullMatrix<double> &
+  get_prolongation_matrix(
+    const unsigned int         child,
+    const RefinementCase<dim> &refinement_case =
+      RefinementCase<dim>::isotropic_refinement) const override;
+
 private:
-  /**
-   * Only for internal use. Its full name is @p get_dofs_per_object_vector
-   * function and it creates the @p dofs_per_object vector that is needed
-   * within the constructor to be passed to the constructor of @p
-   * FiniteElementData.
-   */
-  static std::vector<unsigned int>
-  get_dpo_vector(const unsigned int degree);
-
-  /**
-   * Compute the vector used for the @p restriction_is_additive field passed
-   * to the base class's constructor.
-   */
-  static std::vector<bool>
-  get_ria_vector(const unsigned int degree);
-
   /**
    * This function returns @p true, if the shape function @p shape_index has
    * non-zero function values somewhere on the face @p face_index.
-   *
-   * Right now, this is only implemented for RT0 in 1D. Otherwise, returns
-   * always @p true.
    */
   virtual bool
   has_support_on_face(const unsigned int shape_index,
                       const unsigned int face_index) const override;
 
   /**
-   * Initialize the FiniteElement<dim>::generalized_support_points and
-   * FiniteElement<dim>::generalized_face_support_points fields. Called from
-   * the constructor.
-   *
-   * See the
-   * @ref GlossGeneralizedSupport "glossary entry on generalized support points"
-   * for more information.
-   */
-  void
-  initialize_support_points(const unsigned int rt_degree);
-
-  /**
    * Initialize the permutation pattern and the pattern of sign change.
    */
   void
   initialize_quad_dof_index_permutation_and_sign_change();
+
+  /*
+   * Mutex for protecting initialization of restriction and embedding matrix.
+   */
+  mutable Threads::Mutex mutex;
 };
 
 
