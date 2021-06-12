@@ -24,17 +24,23 @@
 # This can be done with the compile_clang_format script.
 #
 
+VERSION=11
 PRG="$(cd "$(dirname "$0")" && pwd)/programs"
-CLANG_PATH="${PRG}/clang-11"
+CLANG_PATH="${PRG}/clang-${VERSION}"
 
-URL="https://github.com/dealii/dealii/releases/download/v9.0.0"
+URL="https://github.com/dealii/dealii/releases/download/v9.3.0"
 
 # Find out which kind of OS we are running and set the appropriate settings
 case "${OSTYPE}" in
   linux*)
-    FILENAME="clang-format-11-linux.tar.gz"
+    FILENAME="clang-format-${VERSION}-linux.tar.gz"
     CHECKSUM_CMD="sha256sum"
-    CHECKSUM="a25874e0d5691aa6472061eb843890a8ad09094fb0ab2aab3f412d8762d494b3 $FILENAME"
+    CHECKSUM="9420c4ed80268500ef357eb42b2e77dc55e807e559d6d9851f4808a9939fa47b  $FILENAME"
+    ;;
+  darwin*)
+    FILENAME="clang-format-${VERSION}-darwin.tar.gz"
+    CHECKSUM_CMD="shasum"
+    CHECKSUM="8eaf852cc96947245de706f1059e764b7086a82e8bd769da2654936acb1d63e0  $FILENAME"
     ;;
   *)
     echo "unknown: ${OSTYPE}"
@@ -54,7 +60,7 @@ then
     exit 1
 fi
 
-echo "Downloading and installing clang-format-11 from ${URL}/${FILENAME}"
+echo "Downloading and installing clang-format-${VERSION} from ${URL}/${FILENAME}"
 mkdir "${CLANG_PATH}"
 
 tmpdir="${TMPDIR:-/tmp}/dealiiclang${RANDOM}${RANDOM}"
