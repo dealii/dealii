@@ -1038,8 +1038,7 @@ namespace internal
       memory_consumption() const override;
 
       /**
-       * Pointer to the data vector. Note that ownership of the vector pointed
-       * to remains with the caller of this class.
+       * Temporal storage for the data.
        */
       LinearAlgebra::distributed::BlockVector<ScalarType> vector;
     };
@@ -1392,6 +1391,7 @@ namespace internal
     void
     DataEntry<dim, spacedim, ScalarType>::clear()
     {
+      vector.reinit(0, 0);
       this->dof_handler = nullptr;
     }
 
