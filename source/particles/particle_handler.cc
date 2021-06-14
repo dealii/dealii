@@ -1291,6 +1291,21 @@ namespace Particles
 
     // remove_particles also calls update_cached_numbers()
     remove_particles(particles_out_of_cell);
+
+    // now make sure particle data is sorted in order of iteration
+    std::vector<typename PropertyPool<dim, spacedim>::Handle> unsorted_handles;
+    unsorted_handles.reserve(local_number_of_particles);
+
+    typename PropertyPool<dim, spacedim>::Handle sorted_handle = 0;
+    for (auto &particles_in_cell : particles)
+      for (auto &particle : particles_in_cell)
+        {
+          unsorted_handles.push_back(particle);
+          particle = sorted_handle++;
+        }
+
+    property_pool->sort_memory_slots(unsorted_handles);
+
   } // namespace Particles
 
 

@@ -1,0 +1,22 @@
+
+DEAL::Before removal unsorted ID: 0. Handle: 5
+DEAL::Before removal unsorted ID: 1. Handle: 3
+DEAL::Before removal unsorted ID: 2. Handle: 1
+DEAL::Before removal unsorted ID: 3. Handle: 0
+DEAL::Before removal unsorted ID: 4. Handle: 2
+DEAL::Before removal unsorted ID: 5. Handle: 4
+DEAL::Before removal sorted ID: 0. Handle: 0
+DEAL::Before removal sorted ID: 1. Handle: 1
+DEAL::Before removal sorted ID: 2. Handle: 2
+DEAL::Before removal sorted ID: 3. Handle: 3
+DEAL::Before removal sorted ID: 4. Handle: 4
+DEAL::Before removal sorted ID: 5. Handle: 5
+DEAL::After removal unsorted ID: 0. Handle: 0
+DEAL::After removal unsorted ID: 1. Handle: 1
+DEAL::After removal unsorted ID: 5. Handle: 5
+DEAL::After removal unsorted ID: 4. Handle: 4
+DEAL::After removal sorted ID: 0. Handle: 0
+DEAL::After removal sorted ID: 1. Handle: 1
+DEAL::After removal sorted ID: 5. Handle: 2
+DEAL::After removal sorted ID: 4. Handle: 3
+DEAL::OK

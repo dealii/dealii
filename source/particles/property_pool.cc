@@ -59,7 +59,7 @@ namespace Particles
                                " open handles to memory that was allocated "
                                "via allocate_properties_array() but that has "
                                "not been returned via "
-                               "deallocate_properties_array()."));
+                               "deregister_particle()."));
       }
 
     // Clear vectors and ensure deallocation of memory
@@ -165,6 +165,49 @@ namespace Particles
   PropertyPool<dim, spacedim>::n_properties_per_slot() const
   {
     return n_properties;
+  }
+
+  template <int dim, int spacedim>
+  void
+  PropertyPool<dim, spacedim>::sort_memory_slots(
+    const std::vector<Handle> &handles_to_sort)
+  {
+    std::vector<Point<spacedim>>       sorted_locations;
+    std::vector<Point<dim>>            sorted_reference_locations;
+    std::vector<types::particle_index> sorted_ids;
+    std::vector<double>                sorted_properties;
+
+    sorted_locations.reserve(locations.size());
+    sorted_reference_locations.reserve(reference_locations.size());
+    sorted_ids.reserve(ids.size());
+    sorted_properties.reserve(properties.size());
+
+    for (auto &handle : handles_to_sort)
+      {
+        Assert(handle != invalid_handle,
+               ExcMessage(
+                 "Invalid handle detected during sorting particle memory."));
+
+        sorted_locations.push_back(locations[handle]);
+        sorted_reference_locations.push_back(reference_locations[handle]);
+        sorted_ids.push_back(ids[handle]);
+
+        for (unsigned int j = 0; j < n_properties; ++j)
+          sorted_properties.push_back(properties[handle * n_properties + j]);
+      }
+
+    Assert(sorted_locations.size() ==
+             locations.size() - currently_available_handles.size(),
+           ExcMessage(
+             "Number of sorted property handles is not equal to number "
+             "of currently registered handles."));
+
+    locations           = std::move(sorted_locations);
+    reference_locations = std::move(sorted_reference_locations);
+    ids                 = std::move(sorted_ids);
+    properties          = std::move(sorted_properties);
+
+    currently_available_handles.clear();
   }
 
 
