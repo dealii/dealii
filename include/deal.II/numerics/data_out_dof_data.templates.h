@@ -791,6 +791,21 @@ namespace internal
         dst.import(temp2, VectorOperation::insert);
       }
 
+#ifdef DEAL_II_WITH_TRILINOS
+      template <typename Number>
+      void
+      copy_locally_owned_data_from(
+        const TrilinosWrappers::MPI::Vector &       src,
+        LinearAlgebra::distributed::Vector<Number> &dst)
+      {
+        // ReadWriteVector does not work for ghosted
+        // TrilinosWrappers::MPI::Vector objects. Fall back to copy the
+        // entries manually.
+        for (const auto i : dst.locally_owned_elements())
+          dst[i] = src[i];
+      }
+#endif
+
       /**
        * Create a ghosted-copy of a block dof vector.
        */
