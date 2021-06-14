@@ -677,7 +677,6 @@
   \right)_\Omega
   +
   2
-  \sum_{i,j}
   \left(
   \mu \varepsilon(\mathbf u), \varepsilon(\mathbf v)
   \right)_\Omega,
