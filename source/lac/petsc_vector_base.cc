@@ -73,6 +73,11 @@ namespace PETScWrappers
           else
             {
               // ghost entry
+              Assert(vector.ghost_indices.is_element(index),
+                     ExcMessage(
+                       "You are trying to access an element of a vector "
+                       "that is neither a locally owned element nor a "
+                       "ghost element of the vector."));
               const size_type ghostidx =
                 vector.ghost_indices.index_within_set(index);
 
