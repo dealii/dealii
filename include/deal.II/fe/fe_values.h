@@ -1984,8 +1984,8 @@ namespace FEValuesViews
     /**
      * Move assignment operator.
      */
-    // NOLINTNEXTLINE
-    Tensor &operator=(Tensor<2, dim, spacedim> &&) = default;
+    Tensor &
+    operator=(Tensor<2, dim, spacedim> &&) = default; // NOLINT
 
     /**
      * Return the value of the vector components selected by this view, for
