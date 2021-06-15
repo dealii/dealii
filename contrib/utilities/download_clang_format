@@ -38,9 +38,9 @@ case "${OSTYPE}" in
     CHECKSUM="9420c4ed80268500ef357eb42b2e77dc55e807e559d6d9851f4808a9939fa47b  $FILENAME"
     ;;
   darwin*)
-    FILENAME="clang-format-${VERSION}-darwin.tar.gz"
+    FILENAME="clang-format-${VERSION}-darwin-intel.tar.gz"
     CHECKSUM_CMD="shasum"
-    CHECKSUM="8eaf852cc96947245de706f1059e764b7086a82e8bd769da2654936acb1d63e0  $FILENAME"
+    CHECKSUM="5b8c310a660102a1aa46cc0242294fb14271797a4027883a698651411f8e51bf  $FILENAME"
     ;;
   *)
     echo "unknown: ${OSTYPE}"
