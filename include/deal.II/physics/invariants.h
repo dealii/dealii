@@ -997,6 +997,9 @@ namespace Physics
                                C_inv[A][D] * dC_inv_dC[B][C][E][F]);
 
                 // d/dC of [(I3 * (C_inv * G)) * C_inv + (dC_inv_dC * (I3*G))]
+                // TODO[JPP]: Check if the analytical result is just the zero tensor.
+                // The result of the test invariants_02 seems to be just that,
+                // for a number of tested inputs.
                 return I3 *
                        (outer_product(C_inv_G * C_inv + dC_inv_dC * G, C_inv) +
                         outer_product(C_inv, d_C_inv_ddot_G_dC) +
