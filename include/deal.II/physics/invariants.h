@@ -792,6 +792,7 @@ namespace Physics
                 // I5 = C^{2} : G
                 return Invariants::internal::compute_ST_squared(C) * G;
               }
+              break;
             case pI5:
               {
                 // pI5 = I3 C^{-1} : G
@@ -820,6 +821,7 @@ namespace Physics
        * $\mathbf{C}$. If it is known that the required invariant derivative
        * does not require this value (that is typically expensive to compute),
        * then any other value (such as the identity tensor) can be used instead.
+       * @param[in] G The rank-2 symmetric structure tensor $\mathbf{G}$
        */
       template <int dim, typename ScalarType>
       SymmetricTensor<2, dim, ScalarType>
@@ -903,6 +905,7 @@ namespace Physics
        * $\mathbf{C}$. If it is known that the required invariant derivative
        * does not require this value (that is typically expensive to compute),
        * then any other value (such as the identity tensor) can be used instead.
+       * @param[in] G The rank-2 symmetric structure tensor $\mathbf{G}$
        */
       template <int dim, typename ScalarType>
       SymmetricTensor<4, dim, ScalarType>
@@ -997,9 +1000,9 @@ namespace Physics
                                C_inv[A][D] * dC_inv_dC[B][C][E][F]);
 
                 // d/dC of [(I3 * (C_inv * G)) * C_inv + (dC_inv_dC * (I3*G))]
-                // TODO[JPP]: Check if the analytical result is just the zero tensor.
-                // The result of the test invariants_02 seems to be just that,
-                // for a number of tested inputs.
+                // TODO[JPP]: Check if the analytical result is just the zero
+                // tensor. The result of the test invariants_02 seems to be just
+                // that, for a number of tested inputs.
                 return I3 *
                        (outer_product(C_inv_G * C_inv + dC_inv_dC * G, C_inv) +
                         outer_product(C_inv, d_C_inv_ddot_G_dC) +
@@ -1015,6 +1018,324 @@ namespace Physics
         return SymmetricTensor<4, dim, ScalarType>();
       }
     } // namespace Transverse_Isotropic
+
+
+
+    namespace Orthotropic
+    {
+      /**
+       * Get the set of invariants that are valid for orthotropic media.
+       */
+      std::set<InvariantList>
+      valid_invariants()
+      {
+        return {I1, I2, I3, pI3, I4, I5, pI5, I6, I7, pI7, I8};
+      }
+
+
+      /**
+       * Returns the selected invariant/pseudo-invariant value.
+       *
+       * @param[in] i The invariant value to be computed
+       * @param[in] C The rank-2 symmetric field tensor $\mathbf{C}$
+       * @param[in] G1 The rank-2 symmetric structure tensor $\mathbf{G}$
+       * @param[in] G2 The rank-2 symmetric structure tensor $\mathbf{G}'$
+       */
+      template <int dim, typename ScalarType>
+      ScalarType
+      Ii(const enum InvariantList &                 i,
+         const SymmetricTensor<2, dim, ScalarType> &C,
+         const SymmetricTensor<2, dim, ScalarType> &C_inv,
+         const SymmetricTensor<2, dim, ScalarType> &G1,
+         const SymmetricTensor<2, dim, ScalarType> &G2)
+      {
+        Assert(
+          valid_invariants().count(i) != 0,
+          ExcMessage(
+            "The selected invariant is not a valid transverse isotropic invariant."));
+
+        switch (i)
+          {
+            case I1:
+              {
+                return Isotropic::Ii(i, C);
+              }
+              break;
+            case I2:
+              {
+                return Isotropic::Ii(i, C);
+              }
+              break;
+            case I3:
+              {
+                return Isotropic::Ii(i, C);
+              }
+              break;
+            case pI3:
+              {
+                return Isotropic::Ii(i, C);
+              }
+              break;
+            case I4:
+              {
+                return Transverse_Isotropic::Ii(i, C, C_inv, G1);
+              }
+              break;
+            case I5:
+              {
+                return Transverse_Isotropic::Ii(i, C, C_inv, G1);
+              }
+              break;
+            case pI5:
+              {
+                return Transverse_Isotropic::Ii(i, C, C_inv, G1);
+              }
+              break;
+            case I6:
+              {
+                // I6 = C : G2 == I4(G2)
+                return Transverse_Isotropic::Ii(I4, C, C_inv, G2);
+              }
+              break;
+            case I7:
+              {
+                // I7 = C^{2} : G2 == I5(G2)
+                return Transverse_Isotropic::Ii(I5, C, C_inv, G2);
+              }
+              break;
+            case pI7:
+              {
+                // pI7 = I3 C^{-1} : G2 == pI5(G2)
+                return Transverse_Isotropic::Ii(pI5, C, C_inv, G2);
+              }
+              break;
+            case I8:
+              {
+                // I8 = I : [G . C . G']
+                ScalarType I8 =
+                  dealii::internal::NumberType<ScalarType>::value(0.0);
+
+                for (unsigned int A = 0; A < dim; ++A)
+                  for (unsigned int B = 0; B < dim; ++B)
+                    for (unsigned int D = 0; D < dim; ++D)
+                      I8 += G1[D][A] * C[A][B] * G2[B][D];
+
+                return I8;
+              }
+              break;
+            default:
+              break;
+          }
+
+        AssertThrow(false,
+                    ExcMessage("This (pseudo-)invariant is not defined."));
+        return ScalarType();
+      }
+
+
+      /**
+       * Returns the selected invariant/pseudo-invariant first
+       * derivative with respect to the rank-2 symmetric field tensor
+       * $\mathbf{C}$.
+       *
+       * @param[in] i The invariant value to be computed
+       * @param[in] C The rank-2 symmetric field tensor $\mathbf{C}$
+       * @param[in] C_inv The inverse of the rank-2 symmetric field tensor
+       * $\mathbf{C}$. If it is known that the required invariant derivative
+       * does not require this value (that is typically expensive to compute),
+       * then any other value (such as the identity tensor) can be used instead.
+       * @param[in] G1 The rank-2 symmetric structure tensor $\mathbf{G}$
+       * @param[in] G2 The rank-2 symmetric structure tensor $\mathbf{G}'$
+       */
+      template <int dim, typename ScalarType>
+      SymmetricTensor<2, dim, ScalarType>
+      dIi_dC(const enum InvariantList &                 i,
+             const SymmetricTensor<2, dim, ScalarType> &C,
+             const SymmetricTensor<2, dim, ScalarType> &C_inv,
+             const SymmetricTensor<2, dim, ScalarType> &G1,
+             const SymmetricTensor<2, dim, ScalarType> &G2)
+      {
+        Assert(
+          valid_invariants().count(i) != 0,
+          ExcMessage(
+            "The selected invariant is not a valid transverse isotropic invariant."));
+
+        switch (i)
+          {
+            case I1:
+              {
+                return Isotropic::dIi_dC(i, C, C_inv);
+              }
+              break;
+            case I2:
+              {
+                return Isotropic::dIi_dC(i, C, C_inv);
+              }
+              break;
+            case I3:
+              {
+                return Isotropic::dIi_dC(i, C, C_inv);
+              }
+              break;
+            case pI3:
+              {
+                return Isotropic::dIi_dC(i, C, C_inv);
+              }
+              break;
+            case I4:
+              {
+                return Transverse_Isotropic::dIi_dC(i, C, C_inv, G1);
+              }
+              break;
+            case I5:
+              {
+                return Transverse_Isotropic::dIi_dC(i, C, C_inv, G1);
+              }
+              break;
+            case pI5:
+              {
+                return Transverse_Isotropic::dIi_dC(i, C, C_inv, G1);
+              }
+              break;
+            case I6:
+              {
+                // I6 = C : G2 == I4(G2)
+                return Transverse_Isotropic::dIi_dC(I4, C, C_inv, G2);
+              }
+              break;
+            case I7:
+              {
+                // I7 = C^{2} : G2 == I5(G2)
+                return Transverse_Isotropic::dIi_dC(I5, C, C_inv, G2);
+              }
+              break;
+            case pI7:
+              {
+                // pI7 = I3 C^{-1} : G2 == pI5(G2)
+                return Transverse_Isotropic::dIi_dC(pI5, C, C_inv, G2);
+              }
+              break;
+            case I8:
+              {
+                // I8 = I : [G . C . G']
+                SymmetricTensor<2, dim, ScalarType> dI8_dC;
+
+                for (unsigned int A = 0; A < dim; ++A)
+                  for (unsigned int B = A; B < dim; ++B)
+                    for (unsigned int D = 0; D < dim; ++D)
+                      dI8_dC[A][B] +=
+                        0.5 * (G1[D][A] * G2[B][D] + G1[D][B] * G2[A][D]);
+
+                return dI8_dC;
+              }
+              break;
+            default:
+              break;
+          }
+
+        AssertThrow(false,
+                    ExcMessage("This (pseudo-)invariant is not defined."));
+        return SymmetricTensor<2, dim, ScalarType>();
+      }
+
+
+      /**
+       * Returns the selected invariant/pseudo-invariant second
+       * derivative with respect to the rank-2 symmetric field tensor
+       * $\mathbf{C}$.
+       *
+       * @param[in] i The invariant value to be computed
+       * @param[in] C The rank-2 symmetric field tensor $\mathbf{C}$
+       * @param[in] C_inv The inverse of the rank-2 symmetric field tensor
+       * $\mathbf{C}$. If it is known that the required invariant derivative
+       * does not require this value (that is typically expensive to compute),
+       * then any other value (such as the identity tensor) can be used instead.
+       * @param[in] G1 The rank-2 symmetric structure tensor $\mathbf{G}$
+       * @param[in] G2 The rank-2 symmetric structure tensor $\mathbf{G}'$
+       */
+      template <int dim, typename ScalarType>
+      SymmetricTensor<4, dim, ScalarType>
+      d2Ii_dC_dC(const enum InvariantList &                 i,
+                 const SymmetricTensor<2, dim, ScalarType> &C,
+                 const SymmetricTensor<2, dim, ScalarType> &C_inv,
+                 const SymmetricTensor<2, dim, ScalarType> &G1,
+                 const SymmetricTensor<2, dim, ScalarType> &G2)
+      {
+        Assert(
+          valid_invariants().count(i) != 0,
+          ExcMessage(
+            "The selected invariant is not a valid transverse isotropic invariant."));
+
+        switch (i)
+          {
+            case I1:
+              {
+                return Isotropic::d2Ii_dC_dC(i, C, C_inv);
+              }
+              break;
+            case I2:
+              {
+                return Isotropic::d2Ii_dC_dC(i, C, C_inv);
+              }
+              break;
+            case I3:
+              {
+                return Isotropic::d2Ii_dC_dC(i, C, C_inv);
+              }
+              break;
+            case pI3:
+              {
+                return Isotropic::d2Ii_dC_dC(i, C, C_inv);
+              }
+              break;
+            case I4:
+              {
+                return Transverse_Isotropic::d2Ii_dC_dC(i, C, C_inv, G1);
+              }
+              break;
+            case I5:
+              {
+                return Transverse_Isotropic::d2Ii_dC_dC(i, C, C_inv, G1);
+              }
+              break;
+            case pI5:
+              {
+                return Transverse_Isotropic::d2Ii_dC_dC(i, C, C_inv, G1);
+              }
+              break;
+            case I6:
+              {
+                // I6 = C : G2 == I4(G2)
+                return Transverse_Isotropic::d2Ii_dC_dC(I4, C, C_inv, G2);
+              }
+              break;
+            case I7:
+              {
+                // I7 = C^{2} : G2 == I5(G2)
+                return Transverse_Isotropic::d2Ii_dC_dC(I5, C, C_inv, G2);
+              }
+              break;
+            case pI7:
+              {
+                // pI7 = I3 C^{-1} : G2 == pI5(G2)
+                return Transverse_Isotropic::d2Ii_dC_dC(pI5, C, C_inv, G2);
+              }
+              break;
+            case I8:
+              {
+                // I8 = I : [G . C . G']
+                return SymmetricTensor<4, dim, ScalarType>();
+              }
+              break;
+            default:
+              break;
+          }
+
+        AssertThrow(false,
+                    ExcMessage("This (pseudo-)invariant is not defined."));
+        return SymmetricTensor<4, dim, ScalarType>();
+      }
+    } // namespace Orthotropic
 
 
 
