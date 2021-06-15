@@ -40,7 +40,7 @@ case "${OSTYPE}" in
   darwin*)
     FILENAME="clang-format-${VERSION}-darwin-intel.tar.gz"
     CHECKSUM_CMD="shasum"
-    CHECKSUM="8b6eed46680d556c6ba9dcf971ad97d1c6a7a543c807dabd7931ea57830398ef  $FILENAME"
+    CHECKSUM="5b8c310a660102a1aa46cc0242294fb14271797a4027883a698651411f8e51bf  $FILENAME"
     ;;
   *)
     echo "unknown: ${OSTYPE}"
