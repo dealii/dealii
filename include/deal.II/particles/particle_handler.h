@@ -52,15 +52,9 @@ namespace Particles
    * we call particles in the domain of the local process local particles,
    * and particles that belong to neighbor processes and live in the ghost cells
    * around the locally owned domain "ghost particles". The class also includes
-   * functionality that is similar to the DoFHandler() class (it knows which
-   * particles live on which cells) and the SolutionTransfer() class (it know
+   * functionality that is similar to the DoFHandler class (it knows which
+   * particles live on which cells) and the SolutionTransfer class (it knows
    * how to transfer particles between cells and subdomains).
-   *
-   * @note: While the class can be used in any kind of triangulation, transfer
-   * of particles during mesh refinement is currently only implemented for
-   * distributed triangulations. You can still use the class for serial
-   * triangulations, but you cannot change the mesh while particles
-   * exist inside the particle handler.
    *
    * For examples on how to use this class to track particles, store properties
    * on particles, and let the properties on the particles influence the
@@ -111,7 +105,7 @@ namespace Particles
     virtual ~ParticleHandler();
 
     /**
-     * Initialize the particle handler. This function does clear the
+     * Initialize the particle handler. This function clears the
      * internal data structures, and sets the triangulation and the
      * mapping to be used.
      */
@@ -586,7 +580,7 @@ namespace Particles
         &load_callback);
 
     /**
-     * Return the total number of particles that are managed by this class
+     * Return the total number of particles that were managed by this class
      * the last time the update_cached_numbers() function was called.
      * The actual number of particles may have changed since then if
      * particles have been added or removed.
@@ -958,10 +952,10 @@ namespace Particles
       const bool enable_cache = false);
 
     /**
-     * Transfer ghost particles position and properties assuming that
+     * Transfer ghost particles' position and properties assuming that
      * the particles have not changed cells. This routine uses the
      * GhostParticlePartitioner as a caching structure to know which particles
-     * are ghost to other processes, and where they need to be send.
+     * are ghost to other processes, and where they need to be sent.
      * It inherently assumes that particles cannot have changed cell.
      *
      * @param [in] particles_to_send All particles for which information
