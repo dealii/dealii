@@ -109,45 +109,61 @@ run()
   // First invariant
   {
     std::cout << "Checking I1" << std::endl;
+    const enum InvariantList invariant = I1;
+
     const psi_function_type<dim> get_psi_ad =
-      [](const SymmetricTensor<2, dim, ADNumberType> &C_ad) -> ADNumberType {
-      const ADNumberType psi_ad = TestInvariants::Ii(I1, C_ad);
+      [invariant](
+        const SymmetricTensor<2, dim, ADNumberType> &C_ad) -> ADNumberType {
+      const ADNumberType psi_ad = TestInvariants::Ii(invariant, C_ad);
       return psi_ad;
     };
-    test_invariant(I1, get_psi_ad);
+
+    test_invariant(invariant, get_psi_ad);
   }
 
   // Second invariant
   {
     std::cout << "Checking I2" << std::endl;
+    const enum InvariantList invariant = I2;
+
     const psi_function_type<dim> get_psi_ad =
-      [](const SymmetricTensor<2, dim, ADNumberType> &C_ad) -> ADNumberType {
-      const ADNumberType psi_ad = TestInvariants::Ii(I2, C_ad);
+      [invariant](
+        const SymmetricTensor<2, dim, ADNumberType> &C_ad) -> ADNumberType {
+      const ADNumberType psi_ad = TestInvariants::Ii(invariant, C_ad);
       return psi_ad;
     };
-    test_invariant(I2, get_psi_ad);
+
+    test_invariant(invariant, get_psi_ad);
   }
 
   // Third invariant
   {
     std::cout << "Checking I3" << std::endl;
+    const enum InvariantList invariant = I3;
+
     const psi_function_type<dim> get_psi_ad =
-      [](const SymmetricTensor<2, dim, ADNumberType> &C_ad) -> ADNumberType {
-      const ADNumberType psi_ad = TestInvariants::Ii(I3, C_ad);
+      [invariant](
+        const SymmetricTensor<2, dim, ADNumberType> &C_ad) -> ADNumberType {
+      const ADNumberType psi_ad = TestInvariants::Ii(invariant, C_ad);
       return psi_ad;
     };
-    test_invariant(I3, get_psi_ad);
+
+    test_invariant(invariant, get_psi_ad);
   }
 
   // Pseudo third invariant
   {
     std::cout << "Checking pI3" << std::endl;
+    const enum InvariantList invariant = pI3;
+
     const psi_function_type<dim> get_psi_ad =
-      [](const SymmetricTensor<2, dim, ADNumberType> &C_ad) -> ADNumberType {
-      const ADNumberType psi_ad = TestInvariants::Ii(pI3, C_ad);
+      [invariant](
+        const SymmetricTensor<2, dim, ADNumberType> &C_ad) -> ADNumberType {
+      const ADNumberType psi_ad = TestInvariants::Ii(invariant, C_ad);
       return psi_ad;
     };
-    test_invariant(pI3, get_psi_ad);
+
+    test_invariant(invariant, get_psi_ad);
   }
 
   deallog << "OK" << std::endl;
@@ -157,7 +173,6 @@ int
 main()
 {
   initlog();
-  //   deallog << std::setprecision(3);
 
   run<2>();
   run<3>();
