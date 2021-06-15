@@ -158,7 +158,7 @@ namespace Functions
      * Construct an object for the given channel radius <tt>r</tt> and the
      * Reynolds number <tt>Re</tt>.
      */
-    PoisseuilleFlow<dim>(const double r, const double Re);
+    PoisseuilleFlow(const double r, const double Re);
 
     virtual ~PoisseuilleFlow() override = default;
 
