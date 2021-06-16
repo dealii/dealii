@@ -18,11 +18,11 @@
 DEAL_II_NAMESPACE_OPEN
 namespace NonMatching
 {
-  template <int dim>
-  ImmersedSurfaceQuadrature<dim>::ImmersedSurfaceQuadrature(
-    const std::vector<Point<dim>> &    points,
-    const std::vector<double> &        weights,
-    const std::vector<Tensor<1, dim>> &normals)
+  template <int dim, int spacedim>
+  ImmersedSurfaceQuadrature<dim, spacedim>::ImmersedSurfaceQuadrature(
+    const std::vector<Point<dim>> &         points,
+    const std::vector<double> &             weights,
+    const std::vector<Tensor<1, spacedim>> &normals)
     : Quadrature<dim>(points, weights)
     , normals(normals)
   {
@@ -38,11 +38,12 @@ namespace NonMatching
 
 
 
-  template <int dim>
+  template <int dim, int spacedim>
   void
-  ImmersedSurfaceQuadrature<dim>::push_back(const Point<dim> &    point,
-                                            const double          weight,
-                                            const Tensor<1, dim> &normal)
+  ImmersedSurfaceQuadrature<dim, spacedim>::push_back(
+    const Point<dim> &         point,
+    const double               weight,
+    const Tensor<1, spacedim> &normal)
   {
     this->quadrature_points.push_back(point);
     this->weights.push_back(weight);
@@ -53,9 +54,10 @@ namespace NonMatching
 
 
 
-  template <int dim>
-  const Tensor<1, dim> &
-  ImmersedSurfaceQuadrature<dim>::normal_vector(const unsigned int i) const
+  template <int dim, int spacedim>
+  const Tensor<1, spacedim> &
+  ImmersedSurfaceQuadrature<dim, spacedim>::normal_vector(
+    const unsigned int i) const
   {
     AssertIndexRange(i, this->size());
     return normals[i];
@@ -63,18 +65,20 @@ namespace NonMatching
 
 
 
-  template <int dim>
-  const std::vector<Tensor<1, dim>> &
-  ImmersedSurfaceQuadrature<dim>::get_normal_vectors() const
+  template <int dim, int spacedim>
+  const std::vector<Tensor<1, spacedim>> &
+  ImmersedSurfaceQuadrature<dim, spacedim>::get_normal_vectors() const
   {
     return normals;
   }
 
 
 
-  template class ImmersedSurfaceQuadrature<1>;
-  template class ImmersedSurfaceQuadrature<2>;
-  template class ImmersedSurfaceQuadrature<3>;
+  template class ImmersedSurfaceQuadrature<1, 1>;
+  template class ImmersedSurfaceQuadrature<2, 2>;
+  template class ImmersedSurfaceQuadrature<3, 3>;
+  template class ImmersedSurfaceQuadrature<1, 2>;
+  template class ImmersedSurfaceQuadrature<2, 3>;
 
 } // namespace NonMatching
 DEAL_II_NAMESPACE_CLOSE
