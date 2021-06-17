@@ -1,0 +1,5 @@
+Fixed: Removed some pointers in MappingQGeneric and MappingFE that could cause
+segmentation faults at high optimization levels due to compiler assumptions
+about data alignment.
+<br>
+(David Wells, 2021/06/17)
