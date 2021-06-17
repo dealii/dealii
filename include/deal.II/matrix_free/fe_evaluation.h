@@ -549,6 +549,8 @@ public:
   using value_type  = Tensor<1, n_components_, VectorizedArrayType>;
   using gradient_type =
     Tensor<1, n_components_, Tensor<1, dim, VectorizedArrayType>>;
+  using hessian_type =
+    Tensor<1, n_components_, Tensor<2, dim, VectorizedArrayType>>;
   static constexpr unsigned int dimension    = dim;
   static constexpr unsigned int n_components = n_components_;
 
@@ -854,6 +856,21 @@ public:
   void
   submit_normal_derivative(const value_type   grad_in,
                            const unsigned int q_point);
+
+  /**
+   * Write a contribution that is tested by the Hessian to the field
+   * containing the values at quadrature points with component @p q_point.
+   * Access to the same field as through get_hessian(). If applied before the
+   * function FEEvaluation::integrate(EvaluationFlags::hessians) is called,
+   * this specifies what is tested by the Hessians of all basis functions on the
+   * current cell and integrated over.
+   *
+   * Note that the derived class FEEvaluationAccess overloads this operation
+   * with specializations for the scalar case (n_components == 1) and for the
+   * vector-valued case (n_components == dim).
+   */
+  void
+  submit_hessian(const hessian_type hessian_in, const unsigned int q_point);
 
   /**
    * Return the Hessian of a finite element function at quadrature point
@@ -1360,6 +1377,13 @@ protected:
   bool gradients_quad_submitted;
 
   /**
+   * Debug information to track whether hessians on quadrature points have
+   * been submitted for integration before the integration is actually stared.
+   * Used to control exceptions when uninitialized data is used.
+   */
+  bool hessians_quad_submitted;
+
+  /**
    * For a FiniteElement with more than one base element, select at which
    * component this data structure should start.
    */
@@ -1481,6 +1505,7 @@ public:
   using number_type                       = Number;
   using value_type                        = VectorizedArrayType;
   using gradient_type                     = Tensor<1, dim, VectorizedArrayType>;
+  using hessian_type                      = Tensor<2, dim, VectorizedArrayType>;
   static constexpr unsigned int dimension = dim;
   using BaseClass =
     FEEvaluationBase<dim, 1, Number, is_face, VectorizedArrayType>;
@@ -1544,7 +1569,7 @@ public:
   /**
    * @copydoc FEEvaluationBase<dim,1,Number,is_face>::get_hessian()
    */
-  Tensor<2, dim, VectorizedArrayType>
+  hessian_type
   get_hessian(unsigned int q_point) const;
 
   /**
@@ -1552,6 +1577,12 @@ public:
    */
   gradient_type
   get_hessian_diagonal(const unsigned int q_point) const;
+
+  /**
+   * @copydoc FEEvaluationBase<dim,1,Number,is_face>::submit_hessian()
+   */
+  void
+  submit_hessian(const hessian_type hessian_in, const unsigned int q_point);
 
   /**
    * @copydoc FEEvaluationBase<dim,1,Number,is_face>::get_laplacian()
@@ -1797,6 +1828,7 @@ public:
   using number_type                       = Number;
   using value_type                        = VectorizedArrayType;
   using gradient_type                     = Tensor<1, 1, VectorizedArrayType>;
+  using hessian_type                      = Tensor<2, 1, VectorizedArrayType>;
   static constexpr unsigned int dimension = 1;
   using BaseClass =
     FEEvaluationBase<1, 1, Number, is_face, VectorizedArrayType>;
@@ -1885,7 +1917,7 @@ public:
   /**
    * @copydoc FEEvaluationBase<1,1,Number,is_face>::get_hessian()
    */
-  Tensor<2, 1, VectorizedArrayType>
+  hessian_type
   get_hessian(unsigned int q_point) const;
 
   /**
@@ -1893,6 +1925,12 @@ public:
    */
   gradient_type
   get_hessian_diagonal(const unsigned int q_point) const;
+
+  /**
+   * @copydoc FEEvaluationBase<1,1,Number,is_face>::submit_hessian()
+   */
+  void
+  submit_hessian(const hessian_type hessian_in, const unsigned int q_point);
 
   /**
    * @copydoc FEEvaluationBase<1,1,Number,is_face>::get_laplacian()
@@ -5774,7 +5812,6 @@ inline Tensor<1, n_components_, Tensor<2, dim, VectorizedArrayType>>
 FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   get_hessian(const unsigned int q_point) const
 {
-  Assert(!is_face, ExcNotImplemented());
 #  ifdef DEBUG
   Assert(this->hessians_quad_initialized == true,
          internal::ExcAccessToUninitializedField());
@@ -5795,7 +5832,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   constexpr unsigned int hdim = (dim * (dim + 1)) / 2;
 
   // Cartesian cell
-  if (this->cell_type == internal::MatrixFreeFunctions::cartesian)
+  if (!is_face && this->cell_type == internal::MatrixFreeFunctions::cartesian)
     {
       for (unsigned int comp = 0; comp < n_components; comp++)
         {
@@ -5832,7 +5869,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
         }
     }
   // cell with general Jacobian, but constant within the cell
-  else if (this->cell_type == internal::MatrixFreeFunctions::affine)
+  else if (this->cell_type <= internal::MatrixFreeFunctions::affine)
     {
       for (unsigned int comp = 0; comp < n_components; comp++)
         {
@@ -6190,6 +6227,110 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
           for (unsigned int d = 0; d < dim; ++d)
             gradients_quad[(comp * dim + d) * nqp + q_point] = factor * jac[d];
         }
+    }
+}
+
+
+
+template <int dim,
+          int n_components_,
+          typename Number,
+          bool is_face,
+          typename VectorizedArrayType>
+inline DEAL_II_ALWAYS_INLINE void
+FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
+  submit_hessian(
+    const Tensor<1, n_components_, Tensor<2, dim, VectorizedArrayType>>
+                       hessian_in,
+    const unsigned int q_point)
+{
+  Assert(this->cell != numbers::invalid_unsigned_int, ExcNotInitialized());
+  AssertIndexRange(q_point, this->n_quadrature_points);
+  Assert(this->J_value != nullptr,
+         internal::ExcMatrixFreeAccessToUninitializedMappingField(
+           "update_hessians"));
+  Assert(this->jacobian != nullptr,
+         internal::ExcMatrixFreeAccessToUninitializedMappingField(
+           "update_hessians"));
+#  ifdef DEBUG
+  this->hessians_quad_submitted = true;
+#  endif
+
+  // compute hessian_unit = J^T * hessian_in(u) * J
+  const std::size_t      nqp  = this->n_quadrature_points;
+  constexpr unsigned int hdim = (dim * (dim + 1)) / 2;
+  if (!is_face && this->cell_type == internal::MatrixFreeFunctions::cartesian)
+    {
+      const VectorizedArrayType JxW =
+        this->J_value[0] * this->quadrature_weights[q_point];
+
+      // diagonal part
+      for (unsigned int d = 0; d < dim; ++d)
+        {
+          const auto                jac_d  = this->jacobian[0][d][d];
+          const VectorizedArrayType factor = jac_d * jac_d * JxW;
+          for (unsigned int comp = 0; comp < n_components; comp++)
+            hessians_quad[(comp * hdim + d) * nqp + q_point] =
+              hessian_in[comp][d][d] * factor;
+        }
+
+      // off diagonal part (use symmetry)
+      for (unsigned int d = 1, off_dia = dim; d < dim; ++d)
+        for (unsigned int e = 0; e < d; ++e, ++off_dia)
+          {
+            const auto                jac_d  = this->jacobian[0][d][d];
+            const auto                jac_e  = this->jacobian[0][e][e];
+            const VectorizedArrayType factor = jac_d * jac_e * JxW;
+            for (unsigned int comp = 0; comp < n_components; comp++)
+              hessians_quad[(comp * hdim + off_dia) * nqp + q_point] =
+                2.0 * hessian_in[comp][d][e] * factor;
+          }
+    }
+  // cell with general Jacobian, but constant within the cell
+  else if (this->cell_type <= internal::MatrixFreeFunctions::affine)
+    {
+      const Tensor<2, dim, VectorizedArrayType> jac = this->jacobian[0];
+      const VectorizedArrayType                 JxW =
+        this->J_value[0] * this->quadrature_weights[q_point];
+      for (unsigned int comp = 0; comp < n_components; ++comp)
+        {
+          // 1. tmp = hessian_in(u) * J
+          VectorizedArrayType tmp[dim][dim];
+          for (unsigned int i = 0; i < dim; ++i)
+            for (unsigned int j = 0; j < dim; ++j)
+              tmp[i][j] = 0.;
+
+          for (unsigned int i = 0; i < dim; ++i)
+            for (unsigned int j = 0; j < dim; ++j)
+              for (unsigned int k = 0; k < dim; ++k)
+                tmp[i][j] += hessian_in[comp][i][k] * jac[k][j] * JxW;
+
+          // 2. hessian_unit = J^T * tmp
+
+          // diagonal part
+          for (unsigned int d = 0; d < dim; ++d)
+            {
+              hessians_quad[(comp * hdim + d) * nqp + q_point] = 0;
+              for (unsigned int i = 0; i < dim; ++i)
+                hessians_quad[(comp * hdim + d) * nqp + q_point] +=
+                  jac[i][d] * tmp[i][d];
+            }
+
+          // off diagonal part (use symmetry)
+          for (unsigned int d = 1, off_dia = dim; d < dim; ++d)
+            for (unsigned int e = 0; e < d; ++e, ++off_dia)
+              {
+                hessians_quad[(comp * hdim + off_dia) * nqp + q_point] = 0;
+                for (unsigned int i = 0; i < dim; ++i)
+                  hessians_quad[(comp * hdim + off_dia) * nqp + q_point] +=
+                    2.0 * jac[i][e] * tmp[i][d];
+              }
+        }
+    }
+  else
+    {
+      // TODO: implement general path submit_hessian
+      AssertThrow(false, ExcNotImplemented());
     }
 }
 
@@ -6636,6 +6777,19 @@ FEEvaluationAccess<dim, 1, Number, is_face, VectorizedArrayType>::
           this->gradients_quad[d * nqp + q_point] = new_val * JxW;
         }
     }
+}
+
+
+
+template <int dim, typename Number, bool is_face, typename VectorizedArrayType>
+inline DEAL_II_ALWAYS_INLINE void
+FEEvaluationAccess<dim, 1, Number, is_face, VectorizedArrayType>::
+  submit_hessian(const Tensor<2, dim, VectorizedArrayType> hessian_in,
+                 const unsigned int                        q_point)
+{
+  Tensor<1, 1, Tensor<2, dim, VectorizedArrayType>> hessian;
+  hessian[0] = hessian_in;
+  BaseClass::submit_hessian(hessian, q_point);
 }
 
 
@@ -7358,6 +7512,17 @@ FEEvaluationAccess<1, 1, Number, is_face, VectorizedArrayType>::
   BaseClass::submit_normal_derivative(grad_in, q_point);
 }
 
+
+template <typename Number, bool is_face, typename VectorizedArrayType>
+inline DEAL_II_ALWAYS_INLINE void
+FEEvaluationAccess<1, 1, Number, is_face, VectorizedArrayType>::submit_hessian(
+  const Tensor<2, 1, VectorizedArrayType> hessian_in,
+  const unsigned int                      q_point)
+{
+  Tensor<1, 1, Tensor<2, 1, VectorizedArrayType>> hessian;
+  hessian[0] = hessian_in;
+  BaseClass::submit_hessian(hessian, q_point);
+}
 
 
 template <typename Number, bool is_face, typename VectorizedArrayType>
@@ -8173,6 +8338,7 @@ namespace internal
     const internal::MatrixFreeFunctions::DoFInfo *dof_info,
     VectorizedArrayType *                         values_quad,
     VectorizedArrayType *                         gradients_quad,
+    VectorizedArrayType *                         hessians_quad,
     VectorizedArrayType *                         scratch_data,
     const internal::MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> *data,
     const EvaluationFlags::EvaluationFlags integration_flag)
@@ -8212,6 +8378,7 @@ namespace internal
                       vec_values,
                       values_quad,
                       gradients_quad,
+                      hessians_quad,
                       scratch_data,
                       true);
         else
@@ -8222,6 +8389,7 @@ namespace internal
             vec_values,
             values_quad,
             gradients_quad,
+            hessians_quad,
             scratch_data,
             true);
 
@@ -8253,6 +8421,7 @@ namespace internal
     const unsigned int,
     const unsigned int,
     const internal::MatrixFreeFunctions::DoFInfo *,
+    const VectorizedArrayType *,
     const VectorizedArrayType *,
     const VectorizedArrayType *,
     const VectorizedArrayType *,
@@ -8400,10 +8569,10 @@ FEEvaluation<dim,
          ExcNotInitialized());
 
   Assert(
-    (integration_flag &
-     ~(EvaluationFlags::values | EvaluationFlags::gradients)) == 0,
-    ExcMessage(
-      "Only EvaluationFlags::values and EvaluationFlags::gradients are supported."));
+    (integration_flag & ~(EvaluationFlags::values | EvaluationFlags::gradients |
+                          EvaluationFlags::hessians)) == 0,
+    ExcMessage("Only EvaluationFlags::values, EvaluationFlags::gradients, and "
+               "EvaluationFlags::hessians are supported."));
 
   if (fe_degree > -1)
     SelectEvaluator<dim, fe_degree, n_q_points_1d, VectorizedArrayType>::
@@ -8413,6 +8582,7 @@ FEEvaluation<dim,
                 values_array,
                 this->values_quad,
                 this->gradients_quad,
+                this->hessians_quad,
                 this->scratch_data,
                 false);
   else
@@ -8423,6 +8593,7 @@ FEEvaluation<dim,
       values_array,
       this->values_quad,
       this->gradients_quad,
+      this->hessians_quad,
       this->scratch_data,
       false);
 
@@ -8491,6 +8662,7 @@ FEEvaluation<dim,
         this->dof_info,
         this->values_quad,
         this->gradients_quad,
+        this->hessians_quad,
         this->scratch_data,
         this->data,
         integration_flag) == false)
@@ -8815,13 +8987,14 @@ FEFaceEvaluation<dim,
            const EvaluationFlags::EvaluationFlags evaluation_flag)
 {
   Assert(
-    (evaluation_flag &
-     ~(EvaluationFlags::values | EvaluationFlags::gradients)) == 0,
+    (evaluation_flag & ~(EvaluationFlags::values | EvaluationFlags::gradients |
+                         EvaluationFlags::hessians)) == 0,
     ExcMessage(
-      "Only EvaluationFlags::values and EvaluationFlags::gradients are supported."));
+      "Only EvaluationFlags::values, EvaluationFlags::gradients, and EvaluationFlags::hessians are supported."));
 
   if (!(evaluation_flag & EvaluationFlags::values) &&
-      !(evaluation_flag & EvaluationFlags::gradients))
+      !(evaluation_flag & EvaluationFlags::gradients) &&
+      !(evaluation_flag & EvaluationFlags::hessians))
     return;
 
   if (this->dof_access_index ==
@@ -8850,9 +9023,11 @@ FEFaceEvaluation<dim,
           values_array,
           this->begin_values(),
           this->begin_gradients(),
+          this->begin_hessians(),
           this->scratch_data,
           evaluation_flag & EvaluationFlags::values,
           evaluation_flag & EvaluationFlags::gradients,
+          evaluation_flag & EvaluationFlags::hessians,
           face_nos[0],
           this->subface_index,
           face_orientations[0],
@@ -8869,9 +9044,11 @@ FEFaceEvaluation<dim,
             values_array,
             this->begin_values(),
             this->begin_gradients(),
+            this->begin_hessians(),
             this->scratch_data,
             evaluation_flag & EvaluationFlags::values,
             evaluation_flag & EvaluationFlags::gradients,
+            evaluation_flag & EvaluationFlags::hessians,
             this->face_no,
             this->subface_index,
             this->face_orientation,
@@ -8883,9 +9060,11 @@ FEFaceEvaluation<dim,
                    values_array,
                    this->begin_values(),
                    this->begin_gradients(),
+                   this->begin_hessians(),
                    this->scratch_data,
                    evaluation_flag & EvaluationFlags::values,
                    evaluation_flag & EvaluationFlags::gradients,
+                   evaluation_flag & EvaluationFlags::hessians,
                    this->face_no,
                    this->subface_index,
                    this->face_orientation,
@@ -8897,6 +9076,8 @@ FEFaceEvaluation<dim,
     this->values_quad_initialized = true;
   if (evaluation_flag & EvaluationFlags::gradients)
     this->gradients_quad_initialized = true;
+  if (evaluation_flag & EvaluationFlags::hessians)
+    this->hessians_quad_initialized = true;
 #  endif
 }
 
@@ -8994,13 +9175,14 @@ FEFaceEvaluation<dim,
             VectorizedArrayType *                  values_array)
 {
   Assert(
-    (evaluation_flag &
-     ~(EvaluationFlags::values | EvaluationFlags::gradients)) == 0,
+    (evaluation_flag & ~(EvaluationFlags::values | EvaluationFlags::gradients |
+                         EvaluationFlags::hessians)) == 0,
     ExcMessage(
-      "Only EvaluationFlags::values and EvaluationFlags::gradients are supported."));
+      "Only EvaluationFlags::values, EvaluationFlags::gradients, and EvaluationFlags::hessians are supported."));
 
   if (!(evaluation_flag & EvaluationFlags::values) &&
-      !(evaluation_flag & EvaluationFlags::gradients))
+      !(evaluation_flag & EvaluationFlags::gradients) &&
+      !(evaluation_flag & EvaluationFlags::hessians))
     return;
 
   if (fe_degree > -1)
@@ -9011,9 +9193,11 @@ FEFaceEvaluation<dim,
         values_array,
         this->begin_values(),
         this->begin_gradients(),
+        this->begin_hessians(),
         this->scratch_data,
         evaluation_flag & EvaluationFlags::values,
         evaluation_flag & EvaluationFlags::gradients,
+        evaluation_flag & EvaluationFlags::hessians,
         this->face_no,
         this->subface_index,
         this->face_orientation,
@@ -9025,9 +9209,11 @@ FEFaceEvaluation<dim,
                 values_array,
                 this->begin_values(),
                 this->begin_gradients(),
+                this->begin_hessians(),
                 this->scratch_data,
                 evaluation_flag & EvaluationFlags::values,
                 evaluation_flag & EvaluationFlags::gradients,
+                evaluation_flag & EvaluationFlags::hessians,
                 this->face_no,
                 this->subface_index,
                 this->face_orientation,
@@ -9082,10 +9268,10 @@ FEFaceEvaluation<dim,
                   const EvaluationFlags::EvaluationFlags evaluation_flag)
 {
   Assert(
-    (evaluation_flag &
-     ~(EvaluationFlags::values | EvaluationFlags::gradients)) == 0,
+    (evaluation_flag & ~(EvaluationFlags::values | EvaluationFlags::gradients |
+                         EvaluationFlags::hessians)) == 0,
     ExcMessage(
-      "Only EvaluationFlags::values and EvaluationFlags::gradients are supported."));
+      "Only EvaluationFlags::values, EvaluationFlags::gradients, and EvaluationFlags::hessians are supported."));
 
   const auto fu = [&]() {
     const auto shared_vector_data = internal::get_shared_vector_data(
@@ -9116,9 +9302,11 @@ FEFaceEvaluation<dim,
           *this->dof_info,
           this->begin_values(),
           this->begin_gradients(),
+          this->begin_hessians(),
           this->scratch_data,
           evaluation_flag & EvaluationFlags::values,
           evaluation_flag & EvaluationFlags::gradients,
+          evaluation_flag & EvaluationFlags::hessians,
           this->active_fe_index,
           this->first_selected_component,
           cells,
@@ -9156,9 +9344,11 @@ FEFaceEvaluation<dim,
               *this->dof_info,
               this->begin_values(),
               this->begin_gradients(),
+              this->begin_hessians(),
               this->scratch_data,
               evaluation_flag & EvaluationFlags::values,
               evaluation_flag & EvaluationFlags::gradients,
+              evaluation_flag & EvaluationFlags::hessians,
               this->active_fe_index,
               this->first_selected_component,
               cells_,
@@ -9179,9 +9369,11 @@ FEFaceEvaluation<dim,
                               *this->dof_info,
                               this->begin_values(),
                               this->begin_gradients(),
+                              this->begin_hessians(),
                               this->scratch_data,
                               evaluation_flag & EvaluationFlags::values,
                               evaluation_flag & EvaluationFlags::gradients,
+                              evaluation_flag & EvaluationFlags::hessians,
                               this->active_fe_index,
                               this->first_selected_component,
                               cells_,
@@ -9204,6 +9396,8 @@ FEFaceEvaluation<dim,
     this->values_quad_initialized = true;
   if (evaluation_flag & EvaluationFlags::gradients)
     this->gradients_quad_initialized = true;
+  if (evaluation_flag & EvaluationFlags::hessians)
+    this->hessians_quad_initialized = true;
 #  endif
 }
 
@@ -9292,9 +9486,11 @@ FEFaceEvaluation<dim,
             this->begin_dof_values(),
             this->begin_values(),
             this->begin_gradients(),
+            this->begin_hessians(),
             this->scratch_data,
             evaluation_flag & EvaluationFlags::values,
             evaluation_flag & EvaluationFlags::gradients,
+            evaluation_flag & EvaluationFlags::hessians,
             this->active_fe_index,
             this->first_selected_component,
             cells_,
@@ -9323,9 +9519,11 @@ FEFaceEvaluation<dim,
                               this->begin_dof_values(),
                               this->begin_values(),
                               this->begin_gradients(),
+                              this->begin_hessians(),
                               this->scratch_data,
                               evaluation_flag & EvaluationFlags::values,
                               evaluation_flag & EvaluationFlags::gradients,
+                              evaluation_flag & EvaluationFlags::hessians,
                               this->active_fe_index,
                               this->first_selected_component,
                               cells_,

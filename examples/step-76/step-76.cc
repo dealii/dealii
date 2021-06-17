@@ -794,6 +794,7 @@ namespace Euler_DG
                     buffer.data(),
                     phi_m.begin_values(),
                     false,
+                    false,
                     face);
 
                 // Check if the face is an internal or a boundary face and
@@ -895,6 +896,7 @@ namespace Euler_DG
                     data.get_shape_info(),
                     phi_m.begin_values(),
                     phi.begin_values(),
+                    false,
                     false,
                     face);
               }

@@ -124,6 +124,7 @@ test(const unsigned int n_refinements = 1)
                   phi.begin_values(),
                   temp.data(),
                   false,
+                  false,
                   face);
 
 
