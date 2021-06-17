@@ -1881,7 +1881,7 @@ namespace internal
                                         GeometryInfo<dim>::faces_per_cell * d]),
                 mapping_contravariant,
                 data,
-                make_array_view(data.aux[d]));
+                make_array_view(data.aux[d].begin(), data.aux[d].end()));
             }
 
           if (update_flags & update_boundary_forms)
