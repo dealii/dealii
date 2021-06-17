@@ -123,6 +123,12 @@ run()
               << "\nExpt dVal: " << values.dPsi_dH << std::endl;
     std::cout << "\nCmpd ddVal: " << TestInvariants::d2Ii_dC_dC(i, C, C_inv, H)
               << "\nExpt ddVal: " << values.d2Psi_dC_dC << std::endl;
+    std::cout << "\nCmpd ddVal: " << TestInvariants::d2Ii_dH_dH(i, C, C_inv, H)
+              << "\nExpt ddVal: " << values.d2Psi_dH_dH << std::endl;
+    std::cout << "\nCmpd ddVal: " << TestInvariants::d2Ii_dC_dH(i, C, C_inv, H)
+              << "\nExpt ddVal: " << values.d2Psi_dC_dH << std::endl;
+    std::cout << "\nCmpd ddVal: " << TestInvariants::d2Ii_dH_dC(i, C, C_inv, H)
+              << "\nExpt ddVal: " << values.d2Psi_dH_dC << std::endl;
 
     const double tol = (dim == 2 ? 1e-12 : 1e-9);
     Assert(std::abs(TestInvariants::Ii(i, C, C_inv, H) - values.Psi) < tol,
@@ -134,6 +140,15 @@ run()
              tol,
            ExcMessage("No match in first derivative."));
     Assert((TestInvariants::d2Ii_dC_dC(i, C, C_inv, H) - values.d2Psi_dC_dC)
+               .norm() < tol,
+           ExcMessage("No match in second derivative."));
+    Assert((TestInvariants::d2Ii_dH_dH(i, C, C_inv, H) - values.d2Psi_dH_dH)
+               .norm() < tol,
+           ExcMessage("No match in second derivative."));
+    Assert((TestInvariants::d2Ii_dC_dH(i, C, C_inv, H) - values.d2Psi_dC_dH)
+               .norm() < tol,
+           ExcMessage("No match in second derivative."));
+    Assert((TestInvariants::d2Ii_dH_dC(i, C, C_inv, H) - values.d2Psi_dH_dC)
                .norm() < tol,
            ExcMessage("No match in second derivative."));
   };
