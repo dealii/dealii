@@ -36,15 +36,86 @@ template <int rank, int dim, typename Number = double>
 class SymmetricTensor;
 #endif
 
-template <int dim, typename Number>
+/**
+ * Return a unit symmetric tensor of rank 2, i.e., the
+ * $\text{dim}\times\text{dim}$ identity matrix $\mathbf I$.
+ *
+ * @relatesalso SymmetricTensor
+ */
+template <int dim, typename Number = double>
 DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE SymmetricTensor<2, dim, Number>
                                                unit_symmetric_tensor();
 
-template <int dim, typename Number>
+/**
+ * Return the tensor of rank 4 that, when multiplied by a symmetric rank 2
+ * tensor $\mathbf T$ returns the deviator $\text{dev}\ \mathbf T$. It is the
+ * operator representation of the linear deviator operator $\mathbb P$, also
+ * known as the volumetric projection tensor, calculated as:
+ * \f{align*}{
+ *   \mathbb{P} &=\mathbb{I} -\frac{1}{\text{dim}} \mathbf I \otimes \mathbf I
+ *   \\
+ *   \mathcal{P}_{ijkl} &= \frac 12 \left(\delta_{ik} \delta_{jl} +
+ *                                        \delta_{il} \delta_{jk} \right)
+ *                         - \frac{1}{\text{dim}} \delta_{ij} \delta_{kl}
+ * \f}
+ *
+ * For every tensor <tt>T</tt>, there holds the identity
+ * <tt>deviator<dim,Number>(T) == deviator_tensor<dim,Number>() * T</tt>,
+ * up to numerical round-off.
+ * \f[
+ *   \text{dev}\mathbf T = \mathbb P : \mathbf T
+ * \f]
+ *
+ * @note The reason this operator representation is provided is to simplify
+ * taking derivatives of the deviatoric part of tensors:
+ * \f[
+ *   \frac{\partial \text{dev}\mathbf{T}}{\partial \mathbf T} = \mathbb P.
+ * \f]
+ *
+ * @relatesalso SymmetricTensor
+ */
+template <int dim, typename Number = double>
 DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE SymmetricTensor<4, dim, Number>
                                                deviator_tensor();
 
-template <int dim, typename Number>
+/**
+ * Return the fourth-order symmetric identity tensor $\mathbb I$ which maps
+ * symmetric second-order tensors, such as  $\mathbf A$, to themselves.
+ * \f[
+ *   \mathbb I : \mathbf A = \mathbf A
+ * \f]
+ *
+ * Note that this tensor, even though it is the identity, has a somewhat funny
+ * form, and in particular does not only consist of zeros and ones. For
+ * example, for <tt>dim=2</tt>, the identity tensor has all zero entries
+ * except for
+ * \f[
+ *   \mathcal{I}_{0000} = \mathcal{I}_{1111} = 1
+ * \f]
+ * \f[
+ *   \mathcal{I}_{0101} = \mathcal{I}_{0110} = \mathcal{I}_{1001}
+ *                      = \mathcal{I}_{1010} = \frac 12.
+ * \f]
+ * In index notation, we can write the general form
+ * \f[
+ *   \mathcal{I}_{ijkl} = \frac 12 \left( \delta_{ik} \delta_{jl} +
+ *                                        \delta_{il} \delta_{jl} \right).
+ * \f]
+ * To see why this factor of $1 / 2$ is necessary, consider computing
+ * $\mathbf A= \mathbb I : \mathbf B$.
+ * For the element $A_{01}$ we have $A_{01} = \mathcal{I}_{0100} B_{00} +
+ * \mathcal{I}_{0111} B_{11} + \mathcal{I}_{0101} B_{01} +
+ * \mathcal{I}_{0110} B_{10}$. On the other hand, we need
+ * to have $A_{01} = B_{01}$, and symmetry implies $B_{01}=B_{10}$,
+ * leading to $A_{01} = (\mathcal{I}_{0101} + \mathcal{I}_{0110}) B_{01}$, or,
+ * again by symmetry, $\mathcal{I}_{0101} = \mathcal{I}_{0110} = \frac 12$.
+ * Similar considerations hold for the three-dimensional case.
+ *
+ * This issue is also explained in the introduction to step-44.
+ *
+ * @relatesalso SymmetricTensor
+ */
+template <int dim, typename Number = double>
 DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE SymmetricTensor<4, dim, Number>
                                                identity_tensor();
 
@@ -3200,12 +3271,6 @@ constexpr inline DEAL_II_ALWAYS_INLINE SymmetricTensor<2, dim, Number>
 
 
 
-/**
- * Return a unit symmetric tensor of rank 2, i.e., the
- * $\text{dim}\times\text{dim}$ identity matrix $\mathbf I$.
- *
- * @relatesalso SymmetricTensor
- */
 template <int dim, typename Number>
 DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE SymmetricTensor<2, dim, Number>
                                                unit_symmetric_tensor()
@@ -3234,50 +3299,6 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE SymmetricTensor<2, dim, Number>
 
 
 
-/**
- * unit_symmetric_tensor<dim>() is the specialization of the function
- * unit_symmetric_tensor<dim,Number>() which
- * uses <code>double</code> as the data type for the elements.
- *
- * @relatesalso SymmetricTensor
- */
-template <int dim>
-DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE SymmetricTensor<2, dim>
-                                               unit_symmetric_tensor()
-{
-  return unit_symmetric_tensor<dim, double>();
-}
-
-
-
-/**
- * Return the tensor of rank 4 that, when multiplied by a symmetric rank 2
- * tensor $\mathbf T$ returns the deviator $\text{dev}\ \mathbf T$. It is the
- * operator representation of the linear deviator operator $\mathbb P$, also
- * known as the volumetric projection tensor, calculated as:
- * \f{align*}{
- *   \mathbb{P} &=\mathbb{I} -\frac{1}{\text{dim}} \mathbf I \otimes \mathbf I
- *   \\
- *   \mathcal{P}_{ijkl} &= \frac 12 \left(\delta_{ik} \delta_{jl} +
- *                                        \delta_{il} \delta_{jk} \right)
- *                         - \frac{1}{\text{dim}} \delta_{ij} \delta_{kl}
- * \f}
- *
- * For every tensor <tt>T</tt>, there holds the identity
- * <tt>deviator<dim,Number>(T) == deviator_tensor<dim,Number>() * T</tt>,
- * up to numerical round-off.
- * \f[
- *   \text{dev}\mathbf T = \mathbb P : \mathbf T
- * \f]
- *
- * @note The reason this operator representation is provided is to simplify
- * taking derivatives of the deviatoric part of tensors:
- * \f[
- *   \frac{\partial \text{dev}\mathbf{T}}{\partial \mathbf T} = \mathbb P.
- * \f]
- *
- * @relatesalso SymmetricTensor
- */
 template <int dim, typename Number>
 DEAL_II_CONSTEXPR inline SymmetricTensor<4, dim, Number>
 deviator_tensor()
@@ -3306,59 +3327,6 @@ deviator_tensor()
 
 
 
-/**
- * This version of the deviator_tensor<dim>() function is a specialization of
- * deviator_tensor<dim,Number>() that uses <tt>double</tt> as the
- * data type for the elements of the tensor.
- *
- * @relatesalso SymmetricTensor
- */
-template <int dim>
-DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE SymmetricTensor<4, dim>
-                                               deviator_tensor()
-{
-  return deviator_tensor<dim, double>();
-}
-
-
-
-/**
- * Return the fourth-order symmetric identity tensor $\mathbb I$ which maps
- * symmetric second-order tensors, such as  $\mathbf A$, to themselves.
- * \f[
- *   \mathbb I : \mathbf A = \mathbf A
- * \f]
- *
- * Note that this tensor, even though it is the identity, has a somewhat funny
- * form, and in particular does not only consist of zeros and ones. For
- * example, for <tt>dim=2</tt>, the identity tensor has all zero entries
- * except for
- * \f[
- *   \mathcal{I}_{0000} = \mathcal{I}_{1111} = 1
- * \f]
- * \f[
- *   \mathcal{I}_{0101} = \mathcal{I}_{0110} = \mathcal{I}_{1001}
- *                      = \mathcal{I}_{1010} = \frac 12.
- * \f]
- * In index notation, we can write the general form
- * \f[
- *   \mathcal{I}_{ijkl} = \frac 12 \left( \delta_{ik} \delta_{jl} +
- *                                        \delta_{il} \delta_{jl} \right).
- * \f]
- * To see why this factor of $1 / 2$ is necessary, consider computing
- * $\mathbf A= \mathbb I : \mathbf B$.
- * For the element $A_{01}$ we have $A_{01} = \mathcal{I}_{0100} B_{00} +
- * \mathcal{I}_{0111} B_{11} + \mathcal{I}_{0101} B_{01} +
- * \mathcal{I}_{0110} B_{10}$. On the other hand, we need
- * to have $A_{01} = B_{01}$, and symmetry implies $B_{01}=B_{10}$,
- * leading to $A_{01} = (\mathcal{I}_{0101} + \mathcal{I}_{0110}) B_{01}$, or,
- * again by symmetry, $\mathcal{I}_{0101} = \mathcal{I}_{0110} = \frac 12$.
- * Similar considerations hold for the three-dimensional case.
- *
- * This issue is also explained in the introduction to step-44.
- *
- * @relatesalso SymmetricTensor
- */
 template <int dim, typename Number>
 DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE SymmetricTensor<4, dim, Number>
                                                identity_tensor()
@@ -3381,22 +3349,6 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE SymmetricTensor<4, dim, Number>
     tmp.data[i][i] = internal::NumberType<Number>::value(0.5);
 
   return tmp;
-}
-
-
-
-/**
- * This version of the identity_tensor<dim>() function is the specialization of
- * identity_tensor<dim,Number>() which uses <tt>double</tt> as the
- * data type for the elements of the tensor.
- *
- * @relatesalso SymmetricTensor
- */
-template <int dim>
-DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE SymmetricTensor<4, dim>
-                                               identity_tensor()
-{
-  return identity_tensor<dim, double>();
 }
 
 
