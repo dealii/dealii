@@ -98,7 +98,8 @@ void
 run()
 {
   using namespace Physics::Invariants;
-  namespace TestInvariants = Coupled_Isotropic;
+  using TestInvariants   = CoupledIsotropic<dim, double>;
+  using TestInvariantsAD = CoupledIsotropic<dim, ADNumberType>;
 
   SymmetricTensor<2, dim> C = unit_symmetric_tensor<dim>();
   for (unsigned int e = 0; e < C.n_independent_components; ++e)
@@ -109,49 +110,52 @@ run()
   for (unsigned int i = 0; i < H.n_independent_components; ++i)
     H[i] = 10 * (1 + i);
 
-  const auto test_invariant = [&C,
-                               &C_inv,
-                               &H](const enum InvariantList &    i,
-                                   const psi_function_type<dim> &get_psi_ad) {
-    const Values<dim> values = compute_derivatives_using_AD(C, H, get_psi_ad);
+  const auto test_invariant =
+    [&C, &C_inv, &H](const enum InvariantList &    i,
+                     const psi_function_type<dim> &get_psi_ad) {
+      const Values<dim> values = compute_derivatives_using_AD(C, H, get_psi_ad);
 
-    std::cout << "\nCmpd Val: " << TestInvariants::Ii(i, C, C_inv, H)
-              << "\nExpt Val: " << values.Psi << std::endl;
-    std::cout << "\nCmpd dVal: " << TestInvariants::dIi_dC(i, C, C_inv, H)
-              << "\nExpt dVal: " << values.dPsi_dC << std::endl;
-    std::cout << "\nCmpd dVal: " << TestInvariants::dIi_dH(i, C, C_inv, H)
-              << "\nExpt dVal: " << values.dPsi_dH << std::endl;
-    std::cout << "\nCmpd ddVal: " << TestInvariants::d2Ii_dC_dC(i, C, C_inv, H)
-              << "\nExpt ddVal: " << values.d2Psi_dC_dC << std::endl;
-    std::cout << "\nCmpd ddVal: " << TestInvariants::d2Ii_dH_dH(i, C, C_inv, H)
-              << "\nExpt ddVal: " << values.d2Psi_dH_dH << std::endl;
-    std::cout << "\nCmpd ddVal: " << TestInvariants::d2Ii_dC_dH(i, C, C_inv, H)
-              << "\nExpt ddVal: " << values.d2Psi_dC_dH << std::endl;
-    std::cout << "\nCmpd ddVal: " << TestInvariants::d2Ii_dH_dC(i, C, C_inv, H)
-              << "\nExpt ddVal: " << values.d2Psi_dH_dC << std::endl;
+      std::cout << "\nCmpd Ii: " << TestInvariants::Ii(i, C, C_inv, H)
+                << "\nExpt Ii: " << values.Psi << std::endl;
+      std::cout << "\nCmpd dIi_dC: " << TestInvariants::dIi_dC(i, C, C_inv, H)
+                << "\nExpt dIi_dC: " << values.dPsi_dC << std::endl;
+      std::cout << "\nCmpd dIi_dH: " << TestInvariants::dIi_dH(i, C, C_inv, H)
+                << "\nExpt dIi_dH: " << values.dPsi_dH << std::endl;
+      std::cout << "\nCmpd d2Ii_dC_dC: "
+                << TestInvariants::d2Ii_dC_dC(i, C, C_inv, H)
+                << "\nExpt d2Ii_dC_dC: " << values.d2Psi_dC_dC << std::endl;
+      std::cout << "\nCmpd d2Ii_dH_dH: "
+                << TestInvariants::d2Ii_dH_dH(i, C, C_inv, H)
+                << "\nExpt d2Ii_dH_dH: " << values.d2Psi_dH_dH << std::endl;
+      std::cout << "\nCmpd d2Ii_dC_dH: "
+                << TestInvariants::d2Ii_dC_dH(i, C, C_inv, H)
+                << "\nExpt d2Ii_dC_dH: " << values.d2Psi_dC_dH << std::endl;
+      std::cout << "\nCmpd d2Ii_dH_dC: "
+                << TestInvariants::d2Ii_dH_dC(i, C, C_inv, H)
+                << "\nExpt d2Ii_dH_dC: " << values.d2Psi_dH_dC << std::endl;
 
-    const double tol = (dim == 2 ? 1e-12 : 1e-9);
-    Assert(std::abs(TestInvariants::Ii(i, C, C_inv, H) - values.Psi) < tol,
-           ExcMessage("No match in value."));
-    Assert((TestInvariants::dIi_dC(i, C, C_inv, H) - values.dPsi_dC).norm() <
-             tol,
-           ExcMessage("No match in first derivative."));
-    Assert((TestInvariants::dIi_dH(i, C, C_inv, H) - values.dPsi_dH).norm() <
-             tol,
-           ExcMessage("No match in first derivative."));
-    Assert((TestInvariants::d2Ii_dC_dC(i, C, C_inv, H) - values.d2Psi_dC_dC)
-               .norm() < tol,
-           ExcMessage("No match in second derivative."));
-    Assert((TestInvariants::d2Ii_dH_dH(i, C, C_inv, H) - values.d2Psi_dH_dH)
-               .norm() < tol,
-           ExcMessage("No match in second derivative."));
-    Assert((TestInvariants::d2Ii_dC_dH(i, C, C_inv, H) - values.d2Psi_dC_dH)
-               .norm() < tol,
-           ExcMessage("No match in second derivative."));
-    Assert((TestInvariants::d2Ii_dH_dC(i, C, C_inv, H) - values.d2Psi_dH_dC)
-               .norm() < tol,
-           ExcMessage("No match in second derivative."));
-  };
+      const double tol = (dim == 2 ? 1e-12 : 1e-9);
+      Assert(std::abs(TestInvariants::Ii(i, C, C_inv, H) - values.Psi) < tol,
+             ExcMessage("No match in value."));
+      Assert((TestInvariants::dIi_dC(i, C, C_inv, H) - values.dPsi_dC).norm() <
+               tol,
+             ExcMessage("No match in first derivative."));
+      Assert((TestInvariants::dIi_dH(i, C, C_inv, H) - values.dPsi_dH).norm() <
+               tol,
+             ExcMessage("No match in first derivative."));
+      Assert((TestInvariants::d2Ii_dC_dC(i, C, C_inv, H) - values.d2Psi_dC_dC)
+                 .norm() < tol,
+             ExcMessage("No match in second derivative."));
+      Assert((TestInvariants::d2Ii_dH_dH(i, C, C_inv, H) - values.d2Psi_dH_dH)
+                 .norm() < tol,
+             ExcMessage("No match in second derivative."));
+      Assert((TestInvariants::d2Ii_dC_dH(i, C, C_inv, H) - values.d2Psi_dC_dH)
+                 .norm() < tol,
+             ExcMessage("No match in second derivative."));
+      Assert((TestInvariants::d2Ii_dH_dC(i, C, C_inv, H) - values.d2Psi_dH_dC)
+                 .norm() < tol,
+             ExcMessage("No match in second derivative."));
+    };
 
   // First invariant
   {
@@ -163,7 +167,7 @@ run()
                   const Tensor<1, dim, ADNumberType> &H_ad) -> ADNumberType {
       const SymmetricTensor<2, dim, ADNumberType> C_inv_ad = invert(C_ad);
       const ADNumberType                          psi_ad =
-        TestInvariants::Ii(invariant, C_ad, C_inv_ad, H_ad);
+        TestInvariantsAD::Ii(invariant, C_ad, C_inv_ad, H_ad);
       return psi_ad;
     };
 
@@ -180,7 +184,7 @@ run()
                   const Tensor<1, dim, ADNumberType> &H_ad) -> ADNumberType {
       const SymmetricTensor<2, dim, ADNumberType> C_inv_ad = invert(C_ad);
       const ADNumberType                          psi_ad =
-        TestInvariants::Ii(invariant, C_ad, C_inv_ad, H_ad);
+        TestInvariantsAD::Ii(invariant, C_ad, C_inv_ad, H_ad);
       return psi_ad;
     };
 
@@ -197,7 +201,7 @@ run()
                   const Tensor<1, dim, ADNumberType> &H_ad) -> ADNumberType {
       const SymmetricTensor<2, dim, ADNumberType> C_inv_ad = invert(C_ad);
       const ADNumberType                          psi_ad =
-        TestInvariants::Ii(invariant, C_ad, C_inv_ad, H_ad);
+        TestInvariantsAD::Ii(invariant, C_ad, C_inv_ad, H_ad);
       return psi_ad;
     };
 
@@ -214,7 +218,7 @@ run()
                   const Tensor<1, dim, ADNumberType> &H_ad) -> ADNumberType {
       const SymmetricTensor<2, dim, ADNumberType> C_inv_ad = invert(C_ad);
       const ADNumberType                          psi_ad =
-        TestInvariants::Ii(invariant, C_ad, C_inv_ad, H_ad);
+        TestInvariantsAD::Ii(invariant, C_ad, C_inv_ad, H_ad);
       return psi_ad;
     };
 
@@ -231,7 +235,7 @@ run()
                   const Tensor<1, dim, ADNumberType> &H_ad) -> ADNumberType {
       const SymmetricTensor<2, dim, ADNumberType> C_inv_ad = invert(C_ad);
       const ADNumberType                          psi_ad =
-        TestInvariants::Ii(invariant, C_ad, C_inv_ad, H_ad);
+        TestInvariantsAD::Ii(invariant, C_ad, C_inv_ad, H_ad);
       return psi_ad;
     };
 
@@ -248,7 +252,7 @@ run()
                   const Tensor<1, dim, ADNumberType> &H_ad) -> ADNumberType {
       const SymmetricTensor<2, dim, ADNumberType> C_inv_ad = invert(C_ad);
       const ADNumberType                          psi_ad =
-        TestInvariants::Ii(invariant, C_ad, C_inv_ad, H_ad);
+        TestInvariantsAD::Ii(invariant, C_ad, C_inv_ad, H_ad);
       return psi_ad;
     };
 
@@ -265,7 +269,7 @@ run()
                   const Tensor<1, dim, ADNumberType> &H_ad) -> ADNumberType {
       const SymmetricTensor<2, dim, ADNumberType> C_inv_ad = invert(C_ad);
       const ADNumberType                          psi_ad =
-        TestInvariants::Ii(invariant, C_ad, C_inv_ad, H_ad);
+        TestInvariantsAD::Ii(invariant, C_ad, C_inv_ad, H_ad);
       return psi_ad;
     };
 
@@ -282,7 +286,7 @@ run()
                   const Tensor<1, dim, ADNumberType> &H_ad) -> ADNumberType {
       const SymmetricTensor<2, dim, ADNumberType> C_inv_ad = invert(C_ad);
       const ADNumberType                          psi_ad =
-        TestInvariants::Ii(invariant, C_ad, C_inv_ad, H_ad);
+        TestInvariantsAD::Ii(invariant, C_ad, C_inv_ad, H_ad);
       return psi_ad;
     };
 
@@ -299,7 +303,7 @@ run()
                   const Tensor<1, dim, ADNumberType> &H_ad) -> ADNumberType {
       const SymmetricTensor<2, dim, ADNumberType> C_inv_ad = invert(C_ad);
       const ADNumberType                          psi_ad =
-        TestInvariants::Ii(invariant, C_ad, C_inv_ad, H_ad);
+        TestInvariantsAD::Ii(invariant, C_ad, C_inv_ad, H_ad);
       return psi_ad;
     };
 

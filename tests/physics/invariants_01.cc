@@ -83,7 +83,8 @@ void
 run()
 {
   using namespace Physics::Invariants;
-  namespace TestInvariants = Isotropic;
+  using TestInvariants   = Isotropic<dim, double>;
+  using TestInvariantsAD = Isotropic<dim, ADNumberType>;
 
   SymmetricTensor<2, dim> C = unit_symmetric_tensor<dim>();
   for (unsigned int e = 0; e < C.n_independent_components; ++e)
@@ -114,7 +115,7 @@ run()
     const psi_function_type<dim> get_psi_ad =
       [invariant](
         const SymmetricTensor<2, dim, ADNumberType> &C_ad) -> ADNumberType {
-      const ADNumberType psi_ad = TestInvariants::Ii(invariant, C_ad);
+      const ADNumberType psi_ad = TestInvariantsAD::Ii(invariant, C_ad);
       return psi_ad;
     };
 
@@ -129,7 +130,7 @@ run()
     const psi_function_type<dim> get_psi_ad =
       [invariant](
         const SymmetricTensor<2, dim, ADNumberType> &C_ad) -> ADNumberType {
-      const ADNumberType psi_ad = TestInvariants::Ii(invariant, C_ad);
+      const ADNumberType psi_ad = TestInvariantsAD::Ii(invariant, C_ad);
       return psi_ad;
     };
 
@@ -144,7 +145,7 @@ run()
     const psi_function_type<dim> get_psi_ad =
       [invariant](
         const SymmetricTensor<2, dim, ADNumberType> &C_ad) -> ADNumberType {
-      const ADNumberType psi_ad = TestInvariants::Ii(invariant, C_ad);
+      const ADNumberType psi_ad = TestInvariantsAD::Ii(invariant, C_ad);
       return psi_ad;
     };
 
@@ -159,7 +160,7 @@ run()
     const psi_function_type<dim> get_psi_ad =
       [invariant](
         const SymmetricTensor<2, dim, ADNumberType> &C_ad) -> ADNumberType {
-      const ADNumberType psi_ad = TestInvariants::Ii(invariant, C_ad);
+      const ADNumberType psi_ad = TestInvariantsAD::Ii(invariant, C_ad);
       return psi_ad;
     };
 
