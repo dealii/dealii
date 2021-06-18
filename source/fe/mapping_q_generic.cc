@@ -239,7 +239,7 @@ MappingQGeneric<dim, spacedim>::InternalData::initialize_face(
            update_JxW_values | update_inverse_jacobians))
         {
           aux.resize(dim - 1,
-                     std::vector<Tensor<1, spacedim>>(n_original_q_points));
+                     AlignedVector<Tensor<1, spacedim>>(n_original_q_points));
 
           // Compute tangentials to the unit cell.
           for (const unsigned int i : GeometryInfo<dim>::face_indices())

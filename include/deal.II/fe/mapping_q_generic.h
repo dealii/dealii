@@ -386,14 +386,14 @@ public:
      *
      * Computed once.
      */
-    std::vector<double> shape_values;
+    AlignedVector<double> shape_values;
 
     /**
      * Values of shape function derivatives. Access by function @p derivative.
      *
      * Computed once.
      */
-    std::vector<Tensor<1, dim>> shape_derivatives;
+    AlignedVector<Tensor<1, dim>> shape_derivatives;
 
     /**
      * Values of shape function second derivatives. Access by function @p
@@ -401,7 +401,7 @@ public:
      *
      * Computed once.
      */
-    std::vector<Tensor<2, dim>> shape_second_derivatives;
+    AlignedVector<Tensor<2, dim>> shape_second_derivatives;
 
     /**
      * Values of shape function third derivatives. Access by function @p
@@ -409,7 +409,7 @@ public:
      *
      * Computed once.
      */
-    std::vector<Tensor<3, dim>> shape_third_derivatives;
+    AlignedVector<Tensor<3, dim>> shape_third_derivatives;
 
     /**
      * Values of shape function fourth derivatives. Access by function @p
@@ -417,7 +417,7 @@ public:
      *
      * Computed once.
      */
-    std::vector<Tensor<4, dim>> shape_fourth_derivatives;
+    AlignedVector<Tensor<4, dim>> shape_fourth_derivatives;
 
     /**
      * Unit tangential vectors. Used for the computation of boundary forms and
@@ -515,7 +515,7 @@ public:
      *
      * Computed on each cell.
      */
-    mutable std::vector<DerivativeForm<1, dim, spacedim>> covariant;
+    mutable AlignedVector<DerivativeForm<1, dim, spacedim>> covariant;
 
     /**
      * Tensors of contravariant transformation at each of the quadrature
@@ -524,12 +524,12 @@ public:
      *
      * Computed on each cell.
      */
-    mutable std::vector<DerivativeForm<1, dim, spacedim>> contravariant;
+    mutable AlignedVector<DerivativeForm<1, dim, spacedim>> contravariant;
 
     /**
      * Auxiliary vectors for internal use.
      */
-    mutable std::vector<std::vector<Tensor<1, spacedim>>> aux;
+    mutable std::vector<AlignedVector<Tensor<1, spacedim>>> aux;
 
     /**
      * Stores the support points of the mapping shape functions on the @p
@@ -547,7 +547,7 @@ public:
      * The determinant of the Jacobian in each quadrature point. Filled if
      * #update_volume_elements.
      */
-    mutable std::vector<double> volume_elements;
+    mutable AlignedVector<double> volume_elements;
   };
 
 

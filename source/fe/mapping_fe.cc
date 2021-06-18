@@ -329,25 +329,22 @@ namespace internal
 
               Assert(data.n_shape_functions > 0, ExcInternalError());
 
-              const Tensor<1, spacedim> *supp_pts =
-                data.mapping_support_points.data();
-
               for (unsigned int point = 0; point < n_q_points; ++point)
                 {
-                  const Tensor<1, dim> *data_derv =
-                    &data.derivative(point + data_set, 0);
-
                   double result[spacedim][dim];
 
                   // peel away part of sum to avoid zeroing the
                   // entries and adding for the first time
                   for (unsigned int i = 0; i < spacedim; ++i)
                     for (unsigned int j = 0; j < dim; ++j)
-                      result[i][j] = data_derv[0][j] * supp_pts[0][i];
+                      result[i][j] = data.derivative(point + data_set, 0)[j] *
+                                     data.mapping_support_points[0][i];
                   for (unsigned int k = 1; k < data.n_shape_functions; ++k)
                     for (unsigned int i = 0; i < spacedim; ++i)
                       for (unsigned int j = 0; j < dim; ++j)
-                        result[i][j] += data_derv[k][j] * supp_pts[k][i];
+                        result[i][j] +=
+                          data.derivative(point + data_set, k)[j] *
+                          data.mapping_support_points[k][i];
 
                   // write result into contravariant data. for
                   // j=dim in the case dim<spacedim, there will
