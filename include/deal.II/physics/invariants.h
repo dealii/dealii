@@ -274,7 +274,7 @@ namespace Physics
       pI11b,
       // === COUPLED TRANSVERSE ISOTROPIC MATERIALS (1 preferred direction) ===
       /**
-       * Invariant $I_{13} \left( \mathrm{H}, \mathbf{G} \right) = \left[
+       * Invariant $I_{12} \left( \mathrm{H}, \mathbf{G} \right) = \left[
        * \mathrm{H} \otimes \mathrm{H} \right] : \mathbf{G} = \mathrm{H}
        * \cdot \mathbf{G} \cdot \mathrm{H}$ where $\mathrm{H}$ is a rank-1
        * field tensor and $\mathbf{G}$ is a rank-2 symmetric structure
@@ -352,9 +352,30 @@ namespace Physics
 
       /**
        * Returns the value of the tensor product a symmetric tensor
+       * with another symmetric tensor.
+       *
+       * @param[in] S A rank-2 symmetric tensor
+       * @param[in] T A rank-2 symmetric tensor
+       * @return The symmetric tensor $\mathbf{S} \cdot \mathbf{T}$
+       */
+      template <int dim, typename ScalarType>
+      Tensor<2, dim, ScalarType>
+      compute_ST_dot_ST(const SymmetricTensor<2, dim, ScalarType> &S,
+                        const SymmetricTensor<2, dim, ScalarType> &T)
+      {
+        Tensor<2, dim, ScalarType> S_dot_T;
+        for (unsigned int i = 0; i < dim; ++i)
+          for (unsigned int j = 0; j < dim; ++j)
+            for (unsigned int k = 0; k < dim; ++k)
+              S_dot_T[i][j] += S[i][k] * T[k][j];
+        return S_dot_T;
+      }
+
+      /**
+       * Returns the value of the tensor product a symmetric tensor
        * with itself.
        *
-       * @param[in] C A symmetric tensor
+       * @param[in] C A rank-2 symmetric tensor
        * @return The symmetric tensor $\mathbf{C} \cdot \mathbf{C}$
        */
       template <int dim, typename ScalarType>
@@ -747,12 +768,12 @@ namespace Physics
        * @param[in] C The rank-2 symmetric field tensor $\mathbf{C}$
        * @param[in] G The rank-2 symmetric structure tensor $\mathbf{G}$
        */
-      template <int dim, typename ScalarType>
+      template <int dim, typename ScalarType, typename ScalarType2>
       ScalarType
-      Ii(const enum InvariantList &                 i,
-         const SymmetricTensor<2, dim, ScalarType> &C,
-         const SymmetricTensor<2, dim, ScalarType> &C_inv,
-         const SymmetricTensor<2, dim, ScalarType> &G)
+      Ii(const enum InvariantList &                  i,
+         const SymmetricTensor<2, dim, ScalarType> & C,
+         const SymmetricTensor<2, dim, ScalarType> & C_inv,
+         const SymmetricTensor<2, dim, ScalarType2> &G)
       {
         Assert(
           valid_invariants().count(i) != 0,
@@ -823,12 +844,12 @@ namespace Physics
        * then any other value (such as the identity tensor) can be used instead.
        * @param[in] G The rank-2 symmetric structure tensor $\mathbf{G}$
        */
-      template <int dim, typename ScalarType>
+      template <int dim, typename ScalarType, typename ScalarType2>
       SymmetricTensor<2, dim, ScalarType>
-      dIi_dC(const enum InvariantList &                 i,
-             const SymmetricTensor<2, dim, ScalarType> &C,
-             const SymmetricTensor<2, dim, ScalarType> &C_inv,
-             const SymmetricTensor<2, dim, ScalarType> &G)
+      dIi_dC(const enum InvariantList &                  i,
+             const SymmetricTensor<2, dim, ScalarType> & C,
+             const SymmetricTensor<2, dim, ScalarType> & C_inv,
+             const SymmetricTensor<2, dim, ScalarType2> &G)
       {
         Assert(
           valid_invariants().count(i) != 0,
@@ -907,12 +928,12 @@ namespace Physics
        * then any other value (such as the identity tensor) can be used instead.
        * @param[in] G The rank-2 symmetric structure tensor $\mathbf{G}$
        */
-      template <int dim, typename ScalarType>
+      template <int dim, typename ScalarType, typename ScalarType2>
       SymmetricTensor<4, dim, ScalarType>
-      d2Ii_dC_dC(const enum InvariantList &                 i,
-                 const SymmetricTensor<2, dim, ScalarType> &C,
-                 const SymmetricTensor<2, dim, ScalarType> &C_inv,
-                 const SymmetricTensor<2, dim, ScalarType> &G)
+      d2Ii_dC_dC(const enum InvariantList &                  i,
+                 const SymmetricTensor<2, dim, ScalarType> & C,
+                 const SymmetricTensor<2, dim, ScalarType> & C_inv,
+                 const SymmetricTensor<2, dim, ScalarType2> &G)
       {
         Assert(
           valid_invariants().count(i) != 0,
@@ -1041,13 +1062,13 @@ namespace Physics
        * @param[in] G1 The rank-2 symmetric structure tensor $\mathbf{G}$
        * @param[in] G2 The rank-2 symmetric structure tensor $\mathbf{G}'$
        */
-      template <int dim, typename ScalarType>
+      template <int dim, typename ScalarType, typename ScalarType2>
       ScalarType
-      Ii(const enum InvariantList &                 i,
-         const SymmetricTensor<2, dim, ScalarType> &C,
-         const SymmetricTensor<2, dim, ScalarType> &C_inv,
-         const SymmetricTensor<2, dim, ScalarType> &G1,
-         const SymmetricTensor<2, dim, ScalarType> &G2)
+      Ii(const enum InvariantList &                  i,
+         const SymmetricTensor<2, dim, ScalarType> & C,
+         const SymmetricTensor<2, dim, ScalarType> & C_inv,
+         const SymmetricTensor<2, dim, ScalarType2> &G1,
+         const SymmetricTensor<2, dim, ScalarType2> &G2)
       {
         Assert(
           valid_invariants().count(i) != 0,
@@ -1147,13 +1168,13 @@ namespace Physics
        * @param[in] G1 The rank-2 symmetric structure tensor $\mathbf{G}$
        * @param[in] G2 The rank-2 symmetric structure tensor $\mathbf{G}'$
        */
-      template <int dim, typename ScalarType>
+      template <int dim, typename ScalarType, typename ScalarType2>
       SymmetricTensor<2, dim, ScalarType>
-      dIi_dC(const enum InvariantList &                 i,
-             const SymmetricTensor<2, dim, ScalarType> &C,
-             const SymmetricTensor<2, dim, ScalarType> &C_inv,
-             const SymmetricTensor<2, dim, ScalarType> &G1,
-             const SymmetricTensor<2, dim, ScalarType> &G2)
+      dIi_dC(const enum InvariantList &                  i,
+             const SymmetricTensor<2, dim, ScalarType> & C,
+             const SymmetricTensor<2, dim, ScalarType> & C_inv,
+             const SymmetricTensor<2, dim, ScalarType2> &G1,
+             const SymmetricTensor<2, dim, ScalarType2> &G2)
       {
         Assert(
           valid_invariants().count(i) != 0,
@@ -1253,13 +1274,13 @@ namespace Physics
        * @param[in] G1 The rank-2 symmetric structure tensor $\mathbf{G}$
        * @param[in] G2 The rank-2 symmetric structure tensor $\mathbf{G}'$
        */
-      template <int dim, typename ScalarType>
+      template <int dim, typename ScalarType, typename ScalarType2>
       SymmetricTensor<4, dim, ScalarType>
-      d2Ii_dC_dC(const enum InvariantList &                 i,
-                 const SymmetricTensor<2, dim, ScalarType> &C,
-                 const SymmetricTensor<2, dim, ScalarType> &C_inv,
-                 const SymmetricTensor<2, dim, ScalarType> &G1,
-                 const SymmetricTensor<2, dim, ScalarType> &G2)
+      d2Ii_dC_dC(const enum InvariantList &                  i,
+                 const SymmetricTensor<2, dim, ScalarType> & C,
+                 const SymmetricTensor<2, dim, ScalarType> & C_inv,
+                 const SymmetricTensor<2, dim, ScalarType2> &G1,
+                 const SymmetricTensor<2, dim, ScalarType2> &G2)
       {
         Assert(
           valid_invariants().count(i) != 0,
@@ -1547,6 +1568,11 @@ namespace Physics
              const SymmetricTensor<2, dim, ScalarType> &C_inv,
              const Tensor<1, dim, ScalarType> &         H)
       {
+        Assert(
+          valid_invariants().count(i) != 0,
+          ExcMessage(
+            "The selected invariant is not a valid coupled isotropic invariant."));
+
         switch (i)
           {
             case I1:
@@ -1960,6 +1986,7 @@ namespace Physics
         return Tensor<3, dim, ScalarType>();
       }
 
+
       /**
        * Returns the selected invariant/pseudo-invariant second
        * derivative, with the derivatives first taken with respect to the rank-1
@@ -1981,6 +2008,11 @@ namespace Physics
                  const SymmetricTensor<2, dim, ScalarType> &C_inv,
                  const Tensor<1, dim, ScalarType> &         H)
       {
+        Assert(
+          valid_invariants().count(i) != 0,
+          ExcMessage(
+            "The selected invariant is not a valid coupled isotropic invariant."));
+
         const Tensor<3, dim, ScalarType> d2Ii_dC_dH =
           Coupled_Isotropic::d2Ii_dC_dH(i, C, C_inv, H);
 
@@ -1996,767 +2028,754 @@ namespace Physics
 
 
 
-    // namespace Coupled_Isotropic
-    // {
-    //   /**
-    //    * Get an object that returns an iterator to all
-    //    * invariants.
-    //    *
-    //    * @return std_cxx20::ranges::iota_view
-    //    */
-    //   std_cxx20::ranges::iota_view
-    //   get_invariant_range()
-    //   {
-    //     return {I1, pI7b + 1};
-    //   }
+    namespace Coupled_Transverse_Isotropic
+    {
+      /**
+       * Get the set of invariants that are valid for field-coupled transverse
+       * isotropic media.
+       */
+      std::set<InvariantList>
+      valid_invariants()
+      {
+        return {
+          I1, I2, I3, pI3, I4, I5, pI5, I9, I10, I11, pI11a, pI11b, I12, I13};
+      }
 
 
-    //   /**
-    //    * Returns the selected invariant/pseudo-invariant value
-    //    *
-    //    * @param[in] i The invariant value to be computed
-    //    * @param[in] H The magnetic field vector
-    //    * @param[in] C The rank-2 symmetric field tensor $\mathbf{C}$
-    //    * @param[in] C_inv The inverse of the rank-2 symmetric field tensor
-    //    $\mathbf{C}$. If it is known that the required invariant derivative
-    //    does not require this value (that is typically expensive to compute),
-    //    then any other value (such as the identity tensor) can be used
-    //    instead.
-    //    */
-    //   template <int dim, typename ScalarType>
-    //   ScalarType
-    //   Ii(const enum Invariants &                    i,
-    //      const Tensor<1, dim, ScalarType> &         H,
-    //      const SymmetricTensor<2, dim, ScalarType> &C,
-    //      const SymmetricTensor<2, dim, ScalarType> &C_inv)
-    //   {
-    //     switch (i)
-    //       {
-    //         case I1:
-    //           {
-    //             // I1 = tr(C)
-    //             return Isotropic::Ii(Isotropic::I1, C);
-    //           }
-    //           break;
-    //         case I2:
-    //           {
-    //             // I2 = 0.5*(tr(C)*tr(C) - tr(C*C))
-    //             return Isotropic::Ii(Isotropic::I2, C);
-    //           }
-    //           break;
-    //         case I3:
-    //           {
-    //             // I3 = det(C)
-    //             return Isotropic::Ii(Isotropic::I3, C);
-    //           }
-    //           break;
-    //         case pI3:
-    //           {
-    //             // pI3 = sqrt(det(C))
-    //             return Isotropic::Ii(Isotropic::pI3, C);
-    //           }
-    //           break;
-    //         case I4:
-    //           {
-    //             // I4 = [HxH]:I
-    //             return H * H;
-    //           }
-    //           break;
-    //         case I5:
-    //           {
-    //             // I5 = [HxH]:C
-    //             //          return H*C*H; // Breaks CSE!
-    //             return contract3(H, C, H);
-    //           }
-    //           break;
-    //         case I6:
-    //           {
-    //             // I6 = [HxH]:C^2 = [CxH].[CxH]
-    //             //          return H*(C*C)*H; // Breaks CSE!
-    //             const Tensor<1, dim, ScalarType> Z = C * H;
-    //             return Z * Z;
-    //           }
-    //           break;
-    //         case pI7a:
-    //           {
-    //             // I7 = [HxH]:C^{-1}
-    //             //          return H*C_inv*H; // Breaks CSE!
-    //             return contract3(H, C_inv, H);
-    //           }
-    //           break;
-    //         default:
-    //           break;
-    //       }
+      /**
+       * Returns the selected invariant/pseudo-invariant value.
+       *
+       * @param[in] i The invariant value to be computed
+       * @param[in] C The rank-2 symmetric field tensor $\mathbf{C}$
+       * @param[in] H The rank-1 field tensor $\mathrm{H}$
+       * @param[in] G The rank-2 symmetric structure tensor $\mathbf{G}$
+       */
+      template <int dim, typename ScalarType, typename ScalarType2>
+      ScalarType
+      Ii(const enum InvariantList &                  i,
+         const SymmetricTensor<2, dim, ScalarType> & C,
+         const SymmetricTensor<2, dim, ScalarType> & C_inv,
+         const Tensor<1, dim, ScalarType> &          H,
+         const SymmetricTensor<2, dim, ScalarType2> &G)
+      {
+        Assert(
+          valid_invariants().count(i) != 0,
+          ExcMessage(
+            "The selected invariant is not a valid coupled transverse isotropic invariant."));
 
-    //     AssertThrow(false,
-    //                 ExcMessage("This (pseudo-)invariant is not defined."));
-    //     return ScalarType();
-    //   }
+        switch (i)
+          {
+            case I1:
+              {
+                return Isotropic::Ii(i, C);
+              }
+              break;
+            case I2:
+              {
+                return Isotropic::Ii(i, C);
+              }
+              break;
+            case I3:
+              {
+                return Isotropic::Ii(i, C);
+              }
+              break;
+            case pI3:
+              {
+                return Isotropic::Ii(i, C);
+              }
+              break;
+            case I4:
+              {
+                return Transverse_Isotropic::Ii(i, C, C_inv, G);
+              }
+              break;
+            case I5:
+              {
+                return Transverse_Isotropic::Ii(i, C, C_inv, G);
+              }
+              break;
+            case pI5:
+              {
+                return Transverse_Isotropic::Ii(i, C, C_inv, G);
+              }
+              break;
+            case I9:
+              {
+                return Coupled_Isotropic::Ii(i, C, C_inv, H);
+              }
+              break;
+            case I10:
+              {
+                return Coupled_Isotropic::Ii(i, C, C_inv, H);
+              }
+              break;
+            case I11:
+              {
+                return Coupled_Isotropic::Ii(i, C, C_inv, H);
+              }
+              break;
+            case pI11a:
+              {
+                return Coupled_Isotropic::Ii(i, C, C_inv, H);
+              }
+              break;
+            case pI11b:
+              {
+                return Coupled_Isotropic::Ii(i, C, C_inv, H);
+              }
+              break;
+            case I12:
+              {
+                // I12 = [HxH]:G
+                return contract3(H, G, H);
+              }
+              break;
+            case I13:
+              {
+                // I13 = [HxH]:[C.G.C]
+                const Tensor<1, dim, ScalarType> Z = C * H;
+                return contract3(Z, G, Z);
+              }
+              break;
+            default:
+              break;
+          }
 
-    //   /**
-    //    * @name Invariant first derivatives
-    //    */
-
-    //   /**
-    //    * Returns the selected invariant/pseudo-invariant first
-    //    * derivative with respect to the
-    //    * right Cauchy-Green deformation tensor
-    //    *
-    //    * @param[in] i The invariant value to be computed
-    //    * @param[in] H The magnetic field vector
-    //    * @param[in] C The rank-2 symmetric field tensor $\mathbf{C}$
-    //    * @param[in] C_inv The inverse of the rank-2 symmetric field tensor
-    //    $\mathbf{C}$. If it is known that the required invariant derivative
-    //    does not require this value (that is typically expensive to compute),
-    //    then any other value (such as the identity tensor) can be used
-    //    instead.
-    //    */
-    //   template <int dim, typename ScalarType>
-    //   SymmetricTensor<2, dim, ScalarType>
-    //   dIi_dC(const enum Invariants &                    i,
-    //          const Tensor<1, dim, ScalarType> &         H,
-    //          const SymmetricTensor<2, dim, ScalarType> &C,
-    //          const SymmetricTensor<2, dim, ScalarType> &C_inv)
-    //   {
-    //     switch (i)
-    //       {
-    //         case I1:
-    //           {
-    //             // I1 = tr(C)
-    //             return static_cast<SymmetricTensor<2, dim, ScalarType>>(
-    //               Physics::Elasticity::StandardTensors<dim>::I);
-    //           }
-    //           break;
-    //         case I2:
-    //           {
-    //             // I2 = 0.5*(tr(C)*tr(C) - tr(C*C))
-    //             const ScalarType I1 = Ii(Invariants::I1, H, C, C_inv);
-    //             return I1 * Physics::Elasticity::StandardTensors<dim>::I - C;
-    //           }
-    //           break;
-    //         case I3:
-    //           {
-    //             // I3 = det(C)
-    //             const ScalarType I3 = Ii(Invariants::I3, H, C, C_inv);
-    //             return I3 * C_inv;
-    //           }
-    //           break;
-    //         case pI3:
-    //           {
-    //             // pI3 = sqrt(det(C)) = sqrt(I3)
-    //             const ScalarType pI3 = Ii(Invariants::pI3, H, C, C_inv);
-    //             return 0.5 * pI3 * C_inv;
-    //           }
-    //           break;
-    //         case I4:
-    //           {
-    //             // I4= [HxH]:I
-    //             return SymmetricTensor<2, dim, ScalarType>();
-    //           }
-    //           break;
-    //         case I5:
-    //           {
-    //             // I5 = [HxH]:C
-    //             return symmetrize(outer_product(H, H));
-    //           }
-    //           break;
-    //         case I6:
-    //           {
-    //             // I6 = [HxH]:C^2 = [CxH].[CxH]
-    //             const Tensor<1, dim, ScalarType> Z = C * H;
-    //             return symmetrize(outer_product(Z, H) + outer_product(H, Z));
-    //           }
-    //           break;
-    //         case pI7a:
-    //           {
-    //             // I7 = [HxH]:C^{-1}
-    //             const Tensor<1, dim, ScalarType> Y = C_inv * H;
-    //             return -symmetrize(outer_product(Y, Y));
-    //           }
-    //           break;
-    //         default:
-    //           break;
-    //       }
-
-    //     AssertThrow(false,
-    //                 ExcMessage("This (pseudo-)invariant is not defined."));
-    //     return SymmetricTensor<2, dim, ScalarType>();
-    //   }
-
-    //   /**
-    //    * Returns the selected invariant/pseudo-invariant first
-    //    * derivative with respect to the
-    //    * magnetic field vector
-    //    *
-    //    * @param[in] i The invariant value to be computed
-    //    * @param[in] H The magnetic field vector
-    //    * @param[in] C The rank-2 symmetric field tensor $\mathbf{C}$
-    //    * @param[in] C_inv The inverse of the rank-2 symmetric field tensor
-    //    $\mathbf{C}$. If it is known that the required invariant derivative
-    //    does not require this value (that is typically expensive to compute),
-    //    then any other value (such as the identity tensor) can be used
-    //    instead.
-    //    */
-    //   template <int dim, typename ScalarType>
-    //   Tensor<1, dim, ScalarType>
-    //   dIi_dH(const enum Invariants &                    i,
-    //          const Tensor<1, dim, ScalarType> &         H,
-    //          const SymmetricTensor<2, dim, ScalarType> &C,
-    //          const SymmetricTensor<2, dim, ScalarType> &C_inv)
-    //   {
-    //     switch (i)
-    //       {
-    //         case I1:
-    //           {
-    //             // I1 = tr(C)
-    //             return Tensor<1, dim, ScalarType>();
-    //           }
-    //           break;
-    //         case I2:
-    //           {
-    //             // I2 = 0.5*(tr(C)*tr(C) - tr(C*C))
-    //             return Tensor<1, dim, ScalarType>();
-    //           }
-    //           break;
-    //         case I3:
-    //           {
-    //             // I3 = det(C) = J*J
-    //             return Tensor<1, dim, ScalarType>();
-    //           }
-    //           break;
-    //         case I4:
-    //           {
-    //             // I4= [HxH]:I
-    //             return 2.0 * H;
-    //           }
-    //           break;
-    //         case I5:
-    //           {
-    //             // I5 = [HxH]:C
-    //             return 2.0 * (C * H);
-    //           }
-    //           break;
-    //         case I6:
-    //           {
-    //             // I6 = [HxH]:C^2 = [CxH].[CxH]
-    //             return 2.0 * (C * (C * H));
-    //           }
-    //           break;
-    //         case pI7a:
-    //           {
-    //             // I7 = [HxH]:C^{-1}
-    //             return 2.0 * (C_inv * H);
-    //           }
-    //           break;
-    //         default:
-    //           break;
-    //       }
-
-    //     AssertThrow(false,
-    //                 ExcMessage("This (pseudo-)invariant is not defined."));
-    //     return Tensor<1, dim, ScalarType>();
-    //   }
-
-    //   /**
-    //    * @name Invariant second derivatives
-    //    */
-
-    //   /**
-    //    * Returns the selected invariant/pseudo-invariant second
-    //    * derivative with respect to the
-    //    * right Cauchy-Green deformation tensor
-    //    *
-    //    * @param[in] i The invariant value to be computed
-    //    * @param[in] H The magnetic field vector
-    //    * @param[in] C The rank-2 symmetric field tensor $\mathbf{C}$
-    //    * @param[in] C_inv The inverse of the rank-2 symmetric field tensor
-    //    $\mathbf{C}$. If it is known that the required invariant derivative
-    //    does not require this value (that is typically expensive to compute),
-    //    then any other value (such as the identity tensor) can be used
-    //    instead.
-    //    */
-    //   template <int dim, typename ScalarType>
-    //   SymmetricTensor<4, dim, ScalarType>
-    //   d2Ii_dC_dC(const enum Invariants &                    i,
-    //              const Tensor<1, dim, ScalarType> &         H,
-    //              const SymmetricTensor<2, dim, ScalarType> &C,
-    //              const SymmetricTensor<2, dim, ScalarType> &C_inv)
-    //   {
-    //     switch (i)
-    //       {
-    //         case I1:
-    //           {
-    //             // I1 = tr(C)
-    //             return SymmetricTensor<4, dim, ScalarType>();
-    //           }
-    //           break;
-    //         case I2:
-    //           {
-    //             // I2 = 0.5*(tr(C)*tr(C) - tr(C*C))
-    //             return static_cast<SymmetricTensor<4, dim, ScalarType>>(
-    //               Physics::Elasticity::StandardTensors<dim>::IxI -
-    //               Physics::Elasticity::StandardTensors<dim>::S);
-    //           }
-    //           break;
-    //         case I3:
-    //           {
-    //             // I3 = det(C) = J*J
-    //             return determinant(C) *
-    //                    (outer_product(C_inv, C_inv) +
-    //                     Coupled_Material_Values<dim, ScalarType>::dC_inv_dC(
-    //                       C_inv));
-    //           }
-    //           break;
-    //         case I4:
-    //           {
-    //             // I4= [HxH]:I
-    //             return SymmetricTensor<4, dim, ScalarType>();
-    //           }
-    //           break;
-    //         case I5:
-    //           {
-    //             // I5 = [HxH]:C
-    //             return SymmetricTensor<4, dim, ScalarType>();
-    //           }
-    //           break;
-    //         case I6:
-    //           {
-    //             // I6 = [HxH]:C^2 = [CxH].[CxH]
-    //             const SymmetricTensor<2, dim, double> &I =
-    //               Physics::Elasticity::StandardTensors<dim>::I;
-
-    //             SymmetricTensor<4, dim, ScalarType> d2I6_dC_dC;
-    //             for (unsigned int A = 0; A < dim; ++A)
-    //               for (unsigned int B = A; B < dim; ++B)
-    //                 for (unsigned int C = 0; C < dim; ++C)
-    //                   for (unsigned int D = C; D < dim; ++D)
-    //                     {
-    //                       // Need to ensure symmetries of (A,B) and (C,D)
-    //                       d2I6_dC_dC[A][B][C][D] =
-    //                         0.5 *
-    //                         (H[A] * H[D] * I[B][C] + H[A] * H[C] * I[B][D] +
-    //                          H[B] * H[D] * I[A][C] + H[B] * H[C] * I[A][D]);
-    //                     }
-
-    //             return d2I6_dC_dC;
-    //           }
-    //           break;
-    //         case pI7a:
-    //           {
-    //             // I7 = [HxH]:C^{-1}
-    //             const Tensor<1, dim, ScalarType> Y = C_inv * H;
-
-    //             SymmetricTensor<4, dim, ScalarType> d2I7_dC_dC;
-    //             for (unsigned int A = 0; A < dim; ++A)
-    //               for (unsigned int B = A; B < dim; ++B)
-    //                 for (unsigned int C = 0; C < dim; ++C)
-    //                   for (unsigned int D = C; D < dim; ++D)
-    //                     {
-    //                       // Need to ensure symmetries of (A,B) and (C,D)
-    //                       d2I7_dC_dC[A][B][C][D] =
-    //                         0.5 * (Y[A] * Y[C] * C_inv[B][D] +
-    //                                Y[B] * Y[C] * C_inv[A][D] +
-    //                                Y[A] * Y[D] * C_inv[B][C] +
-    //                                Y[B] * Y[D] * C_inv[A][C]);
-    //                     }
-
-    //             return d2I7_dC_dC;
-    //           }
-    //           break;
-    //         default:
-    //           break;
-    //       }
-
-    //     AssertThrow(false,
-    //                 ExcMessage("This (pseudo-)invariant is not defined."));
-    //     return SymmetricTensor<4, dim, ScalarType>();
-    //   }
-
-    //   /**
-    //    * Returns the selected invariant/pseudo-invariant second
-    //    * derivative with respect to the
-    //    * magnetic field vector
-    //    *
-    //    * @param[in] i The invariant value to be computed
-    //    * @param[in] H The magnetic field vector
-    //    * @param[in] C The rank-2 symmetric field tensor $\mathbf{C}$
-    //    * @param[in] C_inv The inverse of the rank-2 symmetric field tensor
-    //    $\mathbf{C}$. If it is known that the required invariant derivative
-    //    does not require this value (that is typically expensive to compute),
-    //    then any other value (such as the identity tensor) can be used
-    //    instead.
-    //    */
-    //   template <int dim, typename ScalarType>
-    //   SymmetricTensor<2, dim, ScalarType>
-    //   d2Ii_dH_dH(const enum Invariants &i,
-    //              const Tensor<1, dim, ScalarType> & /*H*/,
-    //              const SymmetricTensor<2, dim, ScalarType> &C,
-    //              const SymmetricTensor<2, dim, ScalarType> &C_inv)
-    //   {
-    //     switch (i)
-    //       {
-    //         case I1:
-    //           {
-    //             // I1 = tr(C)
-    //             return SymmetricTensor<2, dim, ScalarType>();
-    //           }
-    //           break;
-    //         case I2:
-    //           {
-    //             // I2 = 0.5*(tr(C)*tr(C) - tr(C*C))
-    //             return SymmetricTensor<2, dim, ScalarType>();
-    //           }
-    //           break;
-    //         case I3:
-    //           {
-    //             // I3 = det(C) = J*J
-    //             return SymmetricTensor<2, dim, ScalarType>();
-    //           }
-    //           break;
-    //         case I4:
-    //           {
-    //             // I4= [HxH]:I
-    //             return static_cast<SymmetricTensor<2, dim, ScalarType>>(
-    //               2.0 * unit_symmetric_tensor<dim>());
-    //           }
-    //           break;
-    //         case I5:
-    //           {
-    //             // I5 = [HxH]:C
-    //             return 2.0 * C;
-    //           }
-    //           break;
-    //         case I6:
-    //           {
-    //             // I6 = [HxH]:C^2 = [CxH].[CxH]
-    //             return 2.0 *
-    //                    dealii::Invariants::internal::compute_ST_squared(C);
-    //           }
-    //           break;
-    //         case pI7a:
-    //           {
-    //             // I7 = [HxH]:C^{-1}
-    //             return 2.0 * C_inv;
-    //           }
-    //           break;
-    //         default:
-    //           break;
-    //       }
-
-    //     AssertThrow(false,
-    //                 ExcMessage("This (pseudo-)invariant is not defined."));
-    //     return SymmetricTensor<2, dim, ScalarType>();
-    //   }
-
-    //   /**
-    //    * Returns the selected invariant/pseudo-invariant second
-    //    * derivative with respect to the
-    //    * right Cauchy-Green deformation tensor and the
-    //    * magnetic field vector
-    //    *
-    //    * @param[in] i The invariant value to be computed
-    //    * @param[in] H The magnetic field vector
-    //    * @param[in] C The rank-2 symmetric field tensor $\mathbf{C}$
-    //    * @param[in] C_inv The inverse of the rank-2 symmetric field tensor
-    //    $\mathbf{C}$. If it is known that the required invariant derivative
-    //    does not require this value (that is typically expensive to compute),
-    //    then any other value (such as the identity tensor) can be used
-    //    instead.
-    //    */
-    //   template <int dim, typename ScalarType>
-    //   Tensor<3, dim, ScalarType>
-    //   d2Ii_dH_dC(const enum Invariants &                    i,
-    //              const Tensor<1, dim, ScalarType> &         H,
-    //              const SymmetricTensor<2, dim, ScalarType> &C,
-    //              const SymmetricTensor<2, dim, ScalarType> &C_inv)
-    //   {
-    //     switch (i)
-    //       {
-    //         case I1:
-    //           {
-    //             // I1 = tr(C)
-    //             return Tensor<3, dim, ScalarType>();
-    //           }
-    //           break;
-    //         case I2:
-    //           {
-    //             // I2 = 0.5*(tr(C)*tr(C) - tr(C*C))
-    //             return Tensor<3, dim, ScalarType>();
-    //           }
-    //           break;
-    //         case I3:
-    //           {
-    //             // I3 = det(C) = J*J
-    //             return Tensor<3, dim, ScalarType>();
-    //           }
-    //           break;
-    //         case I4:
-    //           {
-    //             // I4= [HxH]:I
-    //             return Tensor<3, dim, ScalarType>();
-    //           }
-    //           break;
-    //         case I5:
-    //           {
-    //             // I5 = [HxH]:C
-    //             const SymmetricTensor<2, dim, double> &I =
-    //               Physics::Elasticity::StandardTensors<dim>::I;
-
-    //             Tensor<3, dim, ScalarType> d2I5_dH_dC;
-    //             for (unsigned int A = 0; A < dim; ++A)
-    //               for (unsigned int B = 0; B < dim; ++B)
-    //                 for (unsigned int C = 0; C < dim; ++C)
-    //                   d2I5_dH_dC[A][B][C] += I[C][A] * H[B] + I[C][B] * H[A];
-
-    //             return d2I5_dH_dC;
-    //           }
-    //           break;
-    //         case I6:
-    //           {
-    //             // I6 = [HxH]:C^2 = [CxH].[CxH]
-    //             const SymmetricTensor<2, dim, double> &I =
-    //               Physics::Elasticity::StandardTensors<dim>::I;
-    //             const Tensor<1, dim, ScalarType>           Z = C * H;
-    //             const SymmetricTensor<2, dim, ScalarType> &Ct =
-    //               C; // Poor choice of indices used below...
-
-    //             Tensor<3, dim, ScalarType> d2I6_dH_dC;
-    //             for (unsigned int A = 0; A < dim; ++A)
-    //               for (unsigned int B = 0; B < dim; ++B)
-    //                 for (unsigned int C = 0; C < dim; ++C)
-    //                   d2I6_dH_dC[A][B][C] += I[A][C] * Z[B] + I[B][C] * Z[A]
-    //                   +
-    //                                          Ct[B][C] * H[A] + Ct[A][C] *
-    //                                          H[B];
-
-    //             return d2I6_dH_dC;
-    //           }
-    //           break;
-    //         case pI7a:
-    //           {
-    //             // I7 = [HxH]:C^{-1}
-    //             const Tensor<1, dim, ScalarType> Y = C_inv * H;
-
-    //             Tensor<3, dim, ScalarType> d2I7_dH_dC;
-    //             for (unsigned int A = 0; A < dim; ++A)
-    //               for (unsigned int B = 0; B < dim; ++B)
-    //                 for (unsigned int C = 0; C < dim; ++C)
-    //                   d2I7_dH_dC[A][B][C] -=
-    //                     C_inv[C][A] * Y[B] + C_inv[C][B] * Y[A];
-
-    //             return d2I7_dH_dC;
-    //           }
-    //           break;
-    //         default:
-    //           break;
-    //       }
-
-    //     AssertThrow(false,
-    //                 ExcMessage("This (pseudo-)invariant is not defined."));
-    //     return Tensor<3, dim, ScalarType>();
-    //   }
+        AssertThrow(false,
+                    ExcMessage("This (pseudo-)invariant is not defined."));
+        return ScalarType();
+      }
 
 
-    // ======================
+      /**
+       * Returns the selected invariant/pseudo-invariant first
+       * derivative with respect to the rank-2 symmetric field tensor
+       * $\mathbf{C}$.
+       *
+       * @param[in] i The invariant value to be computed
+       * @param[in] C The rank-2 symmetric field tensor $\mathbf{C}$
+       * @param[in] C_inv The inverse of the rank-2 symmetric field tensor
+       * $\mathbf{C}$. If it is known that the required invariant derivative
+       * does not require this value (that is typically expensive to compute),
+       * then any other value (such as the identity tensor) can be used instead.
+       * @param[in] H The rank-1 field tensor $\mathrm{H}$
+       * @param[in] G The rank-2 symmetric structure tensor $\mathbf{G}$
+       */
+      template <int dim, typename ScalarType, typename ScalarType2>
+      SymmetricTensor<2, dim, ScalarType>
+      dIi_dC(const enum InvariantList &                  i,
+             const SymmetricTensor<2, dim, ScalarType> & C,
+             const SymmetricTensor<2, dim, ScalarType> & C_inv,
+             const Tensor<1, dim, ScalarType> &          H,
+             const SymmetricTensor<2, dim, ScalarType2> &G)
+      {
+        Assert(
+          valid_invariants().count(i) != 0,
+          ExcMessage(
+            "The selected invariant is not a valid coupled transverse isotropic invariant."));
+
+        switch (i)
+          {
+            case I1:
+              {
+                return Isotropic::dIi_dC(i, C, C_inv);
+              }
+              break;
+            case I2:
+              {
+                return Isotropic::dIi_dC(i, C, C_inv);
+              }
+              break;
+            case I3:
+              {
+                return Isotropic::dIi_dC(i, C, C_inv);
+              }
+              break;
+            case pI3:
+              {
+                return Isotropic::dIi_dC(i, C, C_inv);
+              }
+              break;
+            case I4:
+              {
+                return Transverse_Isotropic::dIi_dC(i, C, C_inv, G);
+              }
+              break;
+            case I5:
+              {
+                return Transverse_Isotropic::dIi_dC(i, C, C_inv, G);
+              }
+              break;
+            case pI5:
+              {
+                return Transverse_Isotropic::dIi_dC(i, C, C_inv, G);
+              }
+              break;
+            case I9:
+              {
+                return Coupled_Isotropic::dIi_dC(i, C, C_inv, H);
+              }
+              break;
+            case I10:
+              {
+                return Coupled_Isotropic::dIi_dC(i, C, C_inv, H);
+              }
+              break;
+            case I11:
+              {
+                return Coupled_Isotropic::dIi_dC(i, C, C_inv, H);
+              }
+              break;
+            case pI11a:
+              {
+                return Coupled_Isotropic::dIi_dC(i, C, C_inv, H);
+              }
+              break;
+            case pI11b:
+              {
+                return Coupled_Isotropic::dIi_dC(i, C, C_inv, H);
+              }
+              break;
+            case I12:
+              {
+                // I12 = [HxH]:G
+                return SymmetricTensor<2, dim, ScalarType>();
+              }
+              break;
+            case I13:
+              {
+                // I13 = [HxH]:[C.G.C]
+                const Tensor<1, dim, ScalarType> Z  = C * H;
+                const Tensor<1, dim, ScalarType> GZ = G * Z;
+                return 2.0 * symmetrize(outer_product(H, GZ));
+              }
+              break;
+            default:
+              break;
+          }
+
+        AssertThrow(false,
+                    ExcMessage("This (pseudo-)invariant is not defined."));
+        return SymmetricTensor<2, dim, ScalarType>();
+      }
 
 
+      /**
+       * Returns the selected invariant/pseudo-invariant first
+       * derivative with respect to the rank-1 field tensor
+       * $\mathrm{H}$.
+       *
+       * @param[in] i The invariant value to be computed
+       * @param[in] C The rank-2 symmetric field tensor $\mathbf{C}$
+       * @param[in] C_inv The inverse of the rank-2 symmetric field tensor
+       * $\mathbf{C}$. If it is known that the required invariant derivative
+       * does not require this value (that is typically expensive to compute),
+       * then any other value (such as the identity tensor) can be used instead.
+       * @param[in] H The rank-1 field tensor $\mathrm{H}$
+       * @param[in] G The rank-2 symmetric structure tensor $\mathbf{G}$
+       */
+      template <int dim, typename ScalarType, typename ScalarType2>
+      Tensor<1, dim, ScalarType>
+      dIi_dH(const enum InvariantList &                  i,
+             const SymmetricTensor<2, dim, ScalarType> & C,
+             const SymmetricTensor<2, dim, ScalarType> & C_inv,
+             const Tensor<1, dim, ScalarType> &          H,
+             const SymmetricTensor<2, dim, ScalarType2> &G)
+      {
+        Assert(
+          valid_invariants().count(i) != 0,
+          ExcMessage(
+            "The selected invariant is not a valid coupled transverse isotropic invariant."));
 
-    // virtual SymmetricTensor<2, dim, ScalarType>
-    // get_dPsi_dC(const Coupled_Material_Values<dim, ScalarType> &values)
-    // const
-    // {
-    //   SymmetricTensor<2, dim, ScalarType> dPsi_dC;
+        switch (i)
+          {
+            case I1:
+              {
+                return Tensor<1, dim, ScalarType>();
+              }
+              break;
+            case I2:
+              {
+                return Tensor<1, dim, ScalarType>();
+              }
+              break;
+            case I3:
+              {
+                return Tensor<1, dim, ScalarType>();
+              }
+              break;
+            case pI3:
+              {
+                return Tensor<1, dim, ScalarType>();
+              }
+              break;
+            case I4:
+              {
+                return Tensor<1, dim, ScalarType>();
+              }
+              break;
+            case I5:
+              {
+                return Tensor<1, dim, ScalarType>();
+              }
+              break;
+            case pI5:
+              {
+                return Tensor<1, dim, ScalarType>();
+              }
+              break;
+            case I9:
+              {
+                return Coupled_Isotropic::dIi_dH(i, C, C_inv, H);
+              }
+              break;
+            case I10:
+              {
+                return Coupled_Isotropic::dIi_dH(i, C, C_inv, H);
+              }
+              break;
+            case I11:
+              {
+                return Coupled_Isotropic::dIi_dH(i, C, C_inv, H);
+              }
+              break;
+            case pI11a:
+              {
+                return Coupled_Isotropic::dIi_dH(i, C, C_inv, H);
+              }
+              break;
+            case pI11b:
+              {
+                return Coupled_Isotropic::dIi_dH(i, C, C_inv, H);
+              }
+              break;
+            case I12:
+              {
+                // I12 = [HxH]:G
+                return 2.0 * (G * H);
+              }
+              break;
+            case I13:
+              {
+                // I13 = [HxH]:[C.G.C]
+                const Tensor<1, dim, ScalarType> Z = C * H;
+                return 2.0 * ((Z * G) * C);
+              }
+              break;
+            default:
+              break;
+          }
 
-    //   for (typename std::vector<int>::const_iterator it =
-    //   Coupled_Material_Invariants::invariants.begin();
-    //        it != Coupled_Material_Invariants::invariants.end();
-    //        ++it)
-    //     {
-    //       const int &      i        = *it;
-    //       const ScalarType dPsi_dIi = get_dPsi_dIi(i, values);
+        AssertThrow(false,
+                    ExcMessage("This (pseudo-)invariant is not defined."));
+        return Tensor<1, dim, ScalarType>();
+      }
 
-    //       // Since computing tensor derivatives is really expensive, we
-    //       // only do so if the scalar coefficient is non-zero. But we
-    //       // can only do this optimisation for floating point types!
-    //       // We need to ensure that we track ALL sensitivities for
-    //       // AD and SD types
-    //       if (add_invariant_contribution(dPsi_dIi) == true)
-    //         dPsi_dC += dPsi_dIi *
-    //         Coupled_Material_Invariants::dIi_dC<dim>(i, values.H, values.C,
-    //         values.C_inv);
-    //     }
 
-    //   return dPsi_dC;
-    // }
+      /**
+       * Returns the selected invariant/pseudo-invariant second
+       * derivative with respect to the rank-2 symmetric field tensor
+       * $\mathbf{C}$.
+       *
+       * @param[in] i The invariant value to be computed
+       * @param[in] C The rank-2 symmetric field tensor $\mathbf{C}$
+       * @param[in] C_inv The inverse of the rank-2 symmetric field tensor
+       * $\mathbf{C}$. If it is known that the required invariant derivative
+       * does not require this value (that is typically expensive to compute),
+       * then any other value (such as the identity tensor) can be used instead.
+       * @param[in] H The rank-1 field tensor $\mathrm{H}$
+       * @param[in] G The rank-2 symmetric structure tensor $\mathbf{G}$
+       */
+      template <int dim, typename ScalarType, typename ScalarType2>
+      SymmetricTensor<4, dim, ScalarType>
+      d2Ii_dC_dC(const enum InvariantList &                  i,
+                 const SymmetricTensor<2, dim, ScalarType> & C,
+                 const SymmetricTensor<2, dim, ScalarType> & C_inv,
+                 const Tensor<1, dim, ScalarType> &          H,
+                 const SymmetricTensor<2, dim, ScalarType2> &G)
+      {
+        Assert(
+          valid_invariants().count(i) != 0,
+          ExcMessage(
+            "The selected invariant is not a valid coupled transverse isotropic invariant."));
 
-    // /**
-    //  * @copydoc Coupled_ME_Constitutive_Law_Base::get_d2Psi_dC_dC()
-    //  *
-    //  * @note In the current implementation, it is assumed that there are no cross-terms
-    //  * involving invariants (e.g. Psi += I1*I4*I7) and that the energy is
-    //  linear
-    //  * in terms of the invariants.
-    //  */
-    // virtual SymmetricTensor<4, dim, ScalarType>
-    // get_d2Psi_dC_dC(const Coupled_Material_Values<dim, ScalarType> &values)
-    // const
-    // {
-    //   SymmetricTensor<4, dim, ScalarType> d2Psi_dC_dC;
+        switch (i)
+          {
+            case I1:
+              {
+                return Isotropic::d2Ii_dC_dC(i, C, C_inv);
+              }
+              break;
+            case I2:
+              {
+                return Isotropic::d2Ii_dC_dC(i, C, C_inv);
+              }
+              break;
+            case I3:
+              {
+                return Isotropic::d2Ii_dC_dC(i, C, C_inv);
+              }
+              break;
+            case pI3:
+              {
+                return Isotropic::d2Ii_dC_dC(i, C, C_inv);
+              }
+              break;
+            case I4:
+              {
+                return Transverse_Isotropic::d2Ii_dC_dC(i, C, C_inv, G);
+              }
+              break;
+            case I5:
+              {
+                return Transverse_Isotropic::d2Ii_dC_dC(i, C, C_inv, G);
+              }
+              break;
+            case pI5:
+              {
+                return Transverse_Isotropic::d2Ii_dC_dC(i, C, C_inv, G);
+              }
+              break;
+            case I9:
+              {
+                return Coupled_Isotropic::d2Ii_dC_dC(i, C, C_inv, H);
+              }
+              break;
+            case I10:
+              {
+                return Coupled_Isotropic::d2Ii_dC_dC(i, C, C_inv, H);
+              }
+              break;
+            case I11:
+              {
+                return Coupled_Isotropic::d2Ii_dC_dC(i, C, C_inv, H);
+              }
+              break;
+            case pI11a:
+              {
+                return Coupled_Isotropic::d2Ii_dC_dC(i, C, C_inv, H);
+              }
+              break;
+            case pI11b:
+              {
+                return Coupled_Isotropic::d2Ii_dC_dC(i, C, C_inv, H);
+              }
+              break;
+            case I12:
+              {
+                // I12 = [HxH]:G
+                return SymmetricTensor<4, dim, ScalarType>();
+              }
+              break;
+            case I13:
+              {
+                // I13 = [HxH]:[C.G.C]
+                SymmetricTensor<4, dim, ScalarType> d2I13_dC_dC;
+                for (unsigned int A = 0; A < dim; ++A)
+                  for (unsigned int B = A; B < dim; ++B)
+                    for (unsigned int C = 0; C < dim; ++C)
+                      for (unsigned int D = C; D < dim; ++D)
+                        {
+                          d2I13_dC_dC[A][B][C][D] =
+                            0.5 *
+                            (H[A] * G[B][C] * H[D] + H[A] * G[B][D] * H[C]);
+                          d2I13_dC_dC[A][B][C][D] += G[A][B] * H[C] * H[D];
+                        }
 
-    //   for (typename std::vector<int>::const_iterator it1 =
-    //   Coupled_Material_Invariants::invariants.begin();
-    //        it1 != Coupled_Material_Invariants::invariants.end();
-    //        ++it1)
-    //     {
-    //       const int &      i        = *it1;
-    //       const ScalarType dPsi_dIi = get_dPsi_dIi(i, values);
+                return d2I13_dC_dC;
+              }
+              break;
+            default:
+              break;
+          }
 
-    //       if (add_invariant_contribution(dPsi_dIi) == true)
-    //         d2Psi_dC_dC += dPsi_dIi *
-    //         Coupled_Material_Invariants::d2Ii_dC_dC<dim>(i, values.H,
-    //         values.C, values.C_inv);
+        AssertThrow(false,
+                    ExcMessage("This (pseudo-)invariant is not defined."));
+        return SymmetricTensor<4, dim, ScalarType>();
+      }
 
-    //       for (typename std::vector<int>::const_iterator it2 =
-    //       Coupled_Material_Invariants::invariants.begin();
-    //            it2 != Coupled_Material_Invariants::invariants.end();
-    //            ++it2)
-    //         {
-    //           const int &      j             = *it2;
-    //           const ScalarType d2Psi_dIi_dIj = get_d2Psi_dIi_dIj(i, j,
-    //           values);
 
-    //           if (add_invariant_contribution(d2Psi_dIi_dIj) == true)
-    //             d2Psi_dC_dC += d2Psi_dIi_dIj *
-    //             outer_product(Coupled_Material_Invariants::dIi_dC<dim>(i,
-    //             values.H, values.C, values.C_inv),
-    //                                                          Coupled_Material_Invariants::dIi_dC<dim>(j,
-    //                                                          values.H,
-    //                                                          values.C,
-    //                                                          values.C_inv));
-    //         }
-    //     }
+      /**
+       * Returns the selected invariant/pseudo-invariant second
+       * derivative with respect to the rank-1 field tensor
+       * $\mathrm{H}$.
+       *
+       * @param[in] i The invariant value to be computed
+       * @param[in] C The rank-2 symmetric field tensor $\mathbf{C}$
+       * @param[in] C_inv The inverse of the rank-2 symmetric field tensor
+       * $\mathbf{C}$. If it is known that the required invariant derivative
+       * does not require this value (that is typically expensive to compute),
+       * then any other value (such as the identity tensor) can be used instead.
+       * @param[in] H The rank-1 field tensor $\mathrm{H}$
+       * @param[in] G The rank-2 symmetric structure tensor $\mathbf{G}$
+       */
+      template <int dim, typename ScalarType, typename ScalarType2>
+      SymmetricTensor<2, dim, ScalarType>
+      d2Ii_dH_dH(const enum InvariantList &                  i,
+                 const SymmetricTensor<2, dim, ScalarType> & C,
+                 const SymmetricTensor<2, dim, ScalarType> & C_inv,
+                 const Tensor<1, dim, ScalarType> &          H,
+                 const SymmetricTensor<2, dim, ScalarType2> &G)
+      {
+        Assert(
+          valid_invariants().count(i) != 0,
+          ExcMessage(
+            "The selected invariant is not a valid coupled transverse isotropic invariant."));
 
-    //   return d2Psi_dC_dC;
-    // }
+        switch (i)
+          {
+            case I1:
+              {
+                return SymmetricTensor<2, dim, ScalarType>();
+              }
+              break;
+            case I2:
+              {
+                return SymmetricTensor<2, dim, ScalarType>();
+              }
+              break;
+            case I3:
+              {
+                return SymmetricTensor<2, dim, ScalarType>();
+              }
+              break;
+            case pI3:
+              {
+                return SymmetricTensor<2, dim, ScalarType>();
+              }
+              break;
+            case I4:
+              {
+                return SymmetricTensor<2, dim, ScalarType>();
+              }
+              break;
+            case I5:
+              {
+                return SymmetricTensor<2, dim, ScalarType>();
+              }
+              break;
+            case pI5:
+              {
+                return SymmetricTensor<2, dim, ScalarType>();
+              }
+              break;
+            case I9:
+              {
+                return Coupled_Isotropic::d2Ii_dH_dH(i, C, C_inv, H);
+              }
+              break;
+            case I10:
+              {
+                return Coupled_Isotropic::d2Ii_dH_dH(i, C, C_inv, H);
+              }
+              break;
+            case I11:
+              {
+                return Coupled_Isotropic::d2Ii_dH_dH(i, C, C_inv, H);
+              }
+              break;
+            case pI11a:
+              {
+                return Coupled_Isotropic::d2Ii_dH_dH(i, C, C_inv, H);
+              }
+              break;
+            case pI11b:
+              {
+                return Coupled_Isotropic::d2Ii_dH_dH(i, C, C_inv, H);
+              }
+              break;
+            case I12:
+              {
+                // I12 = [HxH]:G
+                return 2.0 * G;
+              }
+              break;
+            case I13:
+              {
+                // I13 = [HxH]:[C.G.C]
+                const Tensor<2, dim, ScalarType> G_dot_C =
+                  internal::compute_ST_dot_ST(G, C);
+                return 2.0 * symmetrize(C * G_dot_C);
+              }
+              break;
+            default:
+              break;
+          }
 
-    // /**
-    //  * @copydoc Coupled_ME_Constitutive_Law_Base::get_dPsi_dH()
-    //  */
-    // virtual Tensor<1, dim, ScalarType>
-    // get_dPsi_dH(const Coupled_Material_Values<dim, ScalarType> &values)
-    // const
-    // {
-    //   Tensor<1, dim, ScalarType> dPsi_dH;
+        AssertThrow(false,
+                    ExcMessage("This (pseudo-)invariant is not defined."));
+        return SymmetricTensor<2, dim, ScalarType>();
+      }
 
-    //   for (typename std::vector<int>::const_iterator it =
-    //   Coupled_Material_Invariants::invariants.begin();
-    //        it != Coupled_Material_Invariants::invariants.end();
-    //        ++it)
-    //     {
-    //       const int &      i        = *it;
-    //       const ScalarType dPsi_dIi = get_dPsi_dIi(i, values);
 
-    //       if (add_invariant_contribution(dPsi_dIi) == true)
-    //         dPsi_dH += dPsi_dIi *
-    //         Coupled_Material_Invariants::dIi_dH<dim>(i, values.H, values.C,
-    //         values.C_inv);
-    //     }
+      /**
+       * Returns the selected invariant/pseudo-invariant second
+       * derivative, with the derivatives first taken with respect to the rank-2
+       * symmetric field tensor
+       * $\mathbf{C}$ followed by the rank-1 field tensor $\mathrm{H}$.
+       *
+       * @param[in] i The invariant value to be computed
+       * @param[in] C The rank-2 symmetric field tensor $\mathbf{C}$
+       * @param[in] C_inv The inverse of the rank-2 symmetric field tensor
+       * $\mathbf{C}$. If it is known that the required invariant derivative
+       * does not require this value (that is typically expensive to compute),
+       * then any other value (such as the identity tensor) can be used instead.
+       * @param[in] H The rank-1 field tensor $\mathrm{H}$
+       * @param[in] G The rank-2 symmetric structure tensor $\mathbf{G}$
+       */
+      template <int dim, typename ScalarType, typename ScalarType2>
+      Tensor<3, dim, ScalarType>
+      d2Ii_dC_dH(const enum InvariantList &                  i,
+                 const SymmetricTensor<2, dim, ScalarType> & C,
+                 const SymmetricTensor<2, dim, ScalarType> & C_inv,
+                 const Tensor<1, dim, ScalarType> &          H,
+                 const SymmetricTensor<2, dim, ScalarType2> &G)
+      {
+        Assert(
+          valid_invariants().count(i) != 0,
+          ExcMessage(
+            "The selected invariant is not a valid coupled transverse isotropic invariant."));
 
-    //   return dPsi_dH;
-    // }
+        switch (i)
+          {
+            case I1:
+              {
+                return Tensor<3, dim, ScalarType>();
+              }
+              break;
+            case I2:
+              {
+                return Tensor<3, dim, ScalarType>();
+              }
+              break;
+            case I3:
+              {
+                return Tensor<3, dim, ScalarType>();
+              }
+              break;
+            case pI3:
+              {
+                return Tensor<3, dim, ScalarType>();
+              }
+              break;
+            case I4:
+              {
+                return Tensor<3, dim, ScalarType>();
+              }
+              break;
+            case I5:
+              {
+                return Tensor<3, dim, ScalarType>();
+              }
+              break;
+            case pI5:
+              {
+                return Tensor<3, dim, ScalarType>();
+              }
+              break;
+            case I9:
+              {
+                return Coupled_Isotropic::d2Ii_dC_dH(i, C, C_inv, H);
+              }
+              break;
+            case I10:
+              {
+                return Coupled_Isotropic::d2Ii_dC_dH(i, C, C_inv, H);
+              }
+              break;
+            case I11:
+              {
+                return Coupled_Isotropic::d2Ii_dC_dH(i, C, C_inv, H);
+              }
+              break;
+            case pI11a:
+              {
+                return Coupled_Isotropic::d2Ii_dC_dH(i, C, C_inv, H);
+              }
+              break;
+            case pI11b:
+              {
+                return Coupled_Isotropic::d2Ii_dC_dH(i, C, C_inv, H);
+              }
+              break;
+            case I12:
+              {
+                // I12 = [HxH]:G
+                return Tensor<3, dim, ScalarType>();
+              }
+              break;
+            case I13:
+              {
+                // I13 = [HxH]:[C.G.C]
+                const Tensor<1, dim, ScalarType> Z  = C * H;
+                const Tensor<1, dim, ScalarType> GZ = G * Z;
+                const Tensor<2, dim, ScalarType> GC =
+                  internal::compute_ST_dot_ST(G, C);
+                const SymmetricTensor<2, dim, double> &I =
+                  Physics::Elasticity::StandardTensors<dim>::I;
 
-    // /**
-    //  * @copydoc Coupled_ME_Constitutive_Law_Base::get_d2Psi_dH_dH()
-    //  */
-    // virtual SymmetricTensor<2, dim, ScalarType>
-    // get_d2Psi_dH_dH(const Coupled_Material_Values<dim, ScalarType> &values)
-    // const
-    // {
-    //   SymmetricTensor<2, dim, ScalarType> d2Psi_dH_dH;
+                Tensor<3, dim, ScalarType> d2I13_dC_dH;
+                for (unsigned int A = 0; A < dim; ++A)
+                  for (unsigned int B = 0; B < dim; ++B)
+                    for (unsigned int D = 0; D < dim; ++D)
+                      d2I13_dC_dH[A][B][D] = I[A][D] * GZ[B] + GZ[A] * I[B][D] +
+                                             GC[A][D] * H[B] + H[A] * GC[B][D];
 
-    //   for (typename std::vector<int>::const_iterator it1 =
-    //   Coupled_Material_Invariants::invariants.begin();
-    //        it1 != Coupled_Material_Invariants::invariants.end();
-    //        ++it1)
-    //     {
-    //       const int &      i        = *it1;
-    //       const ScalarType dPsi_dIi = get_dPsi_dIi(i, values);
+                // return 2.0 * symmetrize(outer_product(H,GZ));
+                return d2I13_dC_dH;
+              }
+              break;
+            default:
+              break;
+          }
 
-    //       if (add_invariant_contribution(dPsi_dIi) == true)
-    //         d2Psi_dH_dH += dPsi_dIi *
-    //         Coupled_Material_Invariants::d2Ii_dH_dH<dim>(i, values.H,
-    //         values.C, values.C_inv);
+        AssertThrow(false,
+                    ExcMessage("This (pseudo-)invariant is not defined."));
+        return Tensor<3, dim, ScalarType>();
+      }
 
-    //       for (typename std::vector<int>::const_iterator it2 =
-    //       Coupled_Material_Invariants::invariants.begin();
-    //            it2 != Coupled_Material_Invariants::invariants.end();
-    //            ++it2)
-    //         {
-    //           const int &      j             = *it2;
-    //           const ScalarType d2Psi_dIi_dIj = get_d2Psi_dIi_dIj(i, j,
-    //           values);
 
-    //           if (add_invariant_contribution(d2Psi_dIi_dIj) == true)
-    //             d2Psi_dH_dH += d2Psi_dIi_dIj *
-    //             symmetrize(outer_product(Coupled_Material_Invariants::dIi_dH<dim>(i,
-    //             values.H, values.C, values.C_inv),
-    //                                                                     Coupled_Material_Invariants::dIi_dH<dim>(j,
-    //                                                                     values.H,
-    //                                                                     values.C,
-    //                                                                     values.C_inv)));
-    //         }
-    //     }
+      /**
+       * Returns the selected invariant/pseudo-invariant second
+       * derivative, with the derivatives first taken with respect to the rank-1
+       * field tensor $\mathrm{H}$ followed by the rank-2 symmetric field tensor
+       * $\mathbf{C}$ .
+       *
+       * @param[in] i The invariant value to be computed
+       * @param[in] C The rank-2 symmetric field tensor $\mathbf{C}$
+       * @param[in] C_inv The inverse of the rank-2 symmetric field tensor
+       * $\mathbf{C}$. If it is known that the required invariant derivative
+       * does not require this value (that is typically expensive to compute),
+       * then any other value (such as the identity tensor) can be used instead.
+       * @param[in] H The rank-1 field tensor $\mathrm{H}$
+       * @param[in] G The rank-2 symmetric structure tensor $\mathbf{G}$
+       */
+      template <int dim, typename ScalarType, typename ScalarType2>
+      Tensor<3, dim, ScalarType>
+      d2Ii_dH_dC(const enum InvariantList &                  i,
+                 const SymmetricTensor<2, dim, ScalarType> & C,
+                 const SymmetricTensor<2, dim, ScalarType> & C_inv,
+                 const Tensor<1, dim, ScalarType> &          H,
+                 const SymmetricTensor<2, dim, ScalarType2> &G)
+      {
+        Assert(
+          valid_invariants().count(i) != 0,
+          ExcMessage(
+            "The selected invariant is not a valid coupled transverse isotropic invariant."));
 
-    //   return d2Psi_dH_dH;
-    // }
+        const Tensor<3, dim, ScalarType> d2Ii_dC_dH =
+          Coupled_Transverse_Isotropic::d2Ii_dC_dH(i, C, C_inv, H, G);
 
-    // /**
-    //  * @copydoc Coupled_ME_Constitutive_Law_Base::get_d2Psi_dH_dC()
-    //  */
-    // virtual Tensor<3, dim, ScalarType>
-    // get_d2Psi_dH_dC(const Coupled_Material_Values<dim, ScalarType> &values)
-    // const
-    // {
-    //   Tensor<3, dim, ScalarType> d2Psi_dH_dC;
+        Tensor<3, dim, ScalarType> d2Ii_dH_dC;
+        for (unsigned int A = 0; A < dim; ++A)
+          for (unsigned int B = 0; B < dim; ++B)
+            for (unsigned int C = 0; C < dim; ++C)
+              d2Ii_dH_dC[A][B][C] = d2Ii_dC_dH[C][B][A];
 
-    //   for (typename std::vector<int>::const_iterator it1 =
-    //   Coupled_Material_Invariants::invariants.begin();
-    //        it1 != Coupled_Material_Invariants::invariants.end();
-    //        ++it1)
-    //     {
-    //       const int &      i        = *it1;
-    //       const ScalarType dPsi_dIi = get_dPsi_dIi(i, values);
-
-    //       if (add_invariant_contribution(dPsi_dIi) == true)
-    //         d2Psi_dH_dC += dPsi_dIi *
-    //         Coupled_Material_Invariants::d2Ii_dH_dC<dim>(i, values.H,
-    //         values.C, values.C_inv);
-
-    //       for (typename std::vector<int>::const_iterator it2 =
-    //       Coupled_Material_Invariants::invariants.begin();
-    //            it2 != Coupled_Material_Invariants::invariants.end();
-    //            ++it2)
-    //         {
-    //           const int &      j             = *it2;
-    //           const ScalarType d2Psi_dIi_dIj = get_d2Psi_dIi_dIj(i, j,
-    //           values);
-
-    //           if (add_invariant_contribution(d2Psi_dIi_dIj) == true)
-    //             d2Psi_dH_dC +=
-    //               d2Psi_dIi_dIj *
-    //               outer_product(static_cast<Tensor<2, dim,
-    //               ScalarType>>(Coupled_Material_Invariants::dIi_dC<dim>(i,
-    //               values.H, values.C, values.C_inv)),
-    //                             Coupled_Material_Invariants::dIi_dH<dim>(j,
-    //                             values.H, values.C, values.C_inv));
-    //         }
-    //     }
-
-    //   return d2Psi_dH_dC;
-    // }
-
-    // namespace Coupled_Transverse_Isotropic
-    // {} // namespace Coupled_Transverse_Isotropic
+        return d2Ii_dH_dC;
+      }
+    } // namespace Coupled_Transverse_Isotropic
 
   } // namespace Invariants
 } // namespace Physics

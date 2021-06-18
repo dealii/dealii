@@ -138,10 +138,8 @@ run()
       [&G1, &G2, invariant](
         const SymmetricTensor<2, dim, ADNumberType> &C_ad) -> ADNumberType {
       const SymmetricTensor<2, dim, ADNumberType> C_inv_ad = invert(C_ad);
-      const SymmetricTensor<2, dim, ADNumberType> G1_ad(G1);
-      const SymmetricTensor<2, dim, ADNumberType> G2_ad(G2);
       const ADNumberType                          psi_ad =
-        TestInvariants::Ii(invariant, C_ad, C_inv_ad, G1_ad, G2_ad);
+        TestInvariants::Ii(invariant, C_ad, C_inv_ad, G1, G2);
       return psi_ad;
     };
 
@@ -157,10 +155,8 @@ run()
       [&G1, &G2, invariant](
         const SymmetricTensor<2, dim, ADNumberType> &C_ad) -> ADNumberType {
       const SymmetricTensor<2, dim, ADNumberType> C_inv_ad = invert(C_ad);
-      const SymmetricTensor<2, dim, ADNumberType> G1_ad(G1);
-      const SymmetricTensor<2, dim, ADNumberType> G2_ad(G2);
       const ADNumberType                          psi_ad =
-        TestInvariants::Ii(invariant, C_ad, C_inv_ad, G1_ad, G2_ad);
+        TestInvariants::Ii(invariant, C_ad, C_inv_ad, G1, G2);
       return psi_ad;
     };
 
@@ -176,10 +172,8 @@ run()
       [&G1, &G2, invariant](
         const SymmetricTensor<2, dim, ADNumberType> &C_ad) -> ADNumberType {
       const SymmetricTensor<2, dim, ADNumberType> C_inv_ad = invert(C_ad);
-      const SymmetricTensor<2, dim, ADNumberType> G1_ad(G1);
-      const SymmetricTensor<2, dim, ADNumberType> G2_ad(G2);
       const ADNumberType                          psi_ad =
-        TestInvariants::Ii(invariant, C_ad, C_inv_ad, G1_ad, G2_ad);
+        TestInvariants::Ii(invariant, C_ad, C_inv_ad, G1, G2);
       return psi_ad;
     };
 
@@ -195,10 +189,8 @@ run()
       [&G1, &G2, invariant](
         const SymmetricTensor<2, dim, ADNumberType> &C_ad) -> ADNumberType {
       const SymmetricTensor<2, dim, ADNumberType> C_inv_ad = invert(C_ad);
-      const SymmetricTensor<2, dim, ADNumberType> G1_ad(G1);
-      const SymmetricTensor<2, dim, ADNumberType> G2_ad(G2);
       const ADNumberType                          psi_ad =
-        TestInvariants::Ii(invariant, C_ad, C_inv_ad, G1_ad, G2_ad);
+        TestInvariants::Ii(invariant, C_ad, C_inv_ad, G1, G2);
       return psi_ad;
     };
 
@@ -214,10 +206,8 @@ run()
       [&G1, &G2, invariant](
         const SymmetricTensor<2, dim, ADNumberType> &C_ad) -> ADNumberType {
       const SymmetricTensor<2, dim, ADNumberType> C_inv_ad = invert(C_ad);
-      const SymmetricTensor<2, dim, ADNumberType> G1_ad(G1);
-      const SymmetricTensor<2, dim, ADNumberType> G2_ad(G2);
       const ADNumberType                          psi_ad =
-        TestInvariants::Ii(invariant, C_ad, C_inv_ad, G1_ad, G2_ad);
+        TestInvariants::Ii(invariant, C_ad, C_inv_ad, G1, G2);
       return psi_ad;
     };
 
@@ -233,10 +223,8 @@ run()
       [&G1, &G2, invariant](
         const SymmetricTensor<2, dim, ADNumberType> &C_ad) -> ADNumberType {
       const SymmetricTensor<2, dim, ADNumberType> C_inv_ad = invert(C_ad);
-      const SymmetricTensor<2, dim, ADNumberType> G1_ad(G1);
-      const SymmetricTensor<2, dim, ADNumberType> G2_ad(G2);
       const ADNumberType                          psi_ad =
-        TestInvariants::Ii(invariant, C_ad, C_inv_ad, G1_ad, G2_ad);
+        TestInvariants::Ii(invariant, C_ad, C_inv_ad, G1, G2);
       return psi_ad;
     };
 
@@ -252,10 +240,8 @@ run()
       [&G1, &G2, invariant](
         const SymmetricTensor<2, dim, ADNumberType> &C_ad) -> ADNumberType {
       const SymmetricTensor<2, dim, ADNumberType> C_inv_ad = invert(C_ad);
-      const SymmetricTensor<2, dim, ADNumberType> G1_ad(G1);
-      const SymmetricTensor<2, dim, ADNumberType> G2_ad(G2);
       const ADNumberType                          psi_ad =
-        TestInvariants::Ii(invariant, C_ad, C_inv_ad, G1_ad, G2_ad);
+        TestInvariants::Ii(invariant, C_ad, C_inv_ad, G1, G2);
       return psi_ad;
     };
 
@@ -271,10 +257,8 @@ run()
       [&G1, &G2, invariant](
         const SymmetricTensor<2, dim, ADNumberType> &C_ad) -> ADNumberType {
       const SymmetricTensor<2, dim, ADNumberType> C_inv_ad = invert(C_ad);
-      const SymmetricTensor<2, dim, ADNumberType> G1_ad(G1);
-      const SymmetricTensor<2, dim, ADNumberType> G2_ad(G2);
       const ADNumberType                          psi_ad =
-        TestInvariants::Ii(invariant, C_ad, C_inv_ad, G1_ad, G2_ad);
+        TestInvariants::Ii(invariant, C_ad, C_inv_ad, G1, G2);
       return psi_ad;
     };
 
@@ -290,10 +274,8 @@ run()
       [&G1, &G2, invariant](
         const SymmetricTensor<2, dim, ADNumberType> &C_ad) -> ADNumberType {
       const SymmetricTensor<2, dim, ADNumberType> C_inv_ad = invert(C_ad);
-      const SymmetricTensor<2, dim, ADNumberType> G1_ad(G1);
-      const SymmetricTensor<2, dim, ADNumberType> G2_ad(G2);
       const ADNumberType                          psi_ad =
-        TestInvariants::Ii(invariant, C_ad, C_inv_ad, G1_ad, G2_ad);
+        TestInvariants::Ii(invariant, C_ad, C_inv_ad, G1, G2);
       return psi_ad;
     };
 
@@ -309,10 +291,8 @@ run()
       [&G1, &G2, invariant](
         const SymmetricTensor<2, dim, ADNumberType> &C_ad) -> ADNumberType {
       const SymmetricTensor<2, dim, ADNumberType> C_inv_ad = invert(C_ad);
-      const SymmetricTensor<2, dim, ADNumberType> G1_ad(G1);
-      const SymmetricTensor<2, dim, ADNumberType> G2_ad(G2);
       const ADNumberType                          psi_ad =
-        TestInvariants::Ii(invariant, C_ad, C_inv_ad, G1_ad, G2_ad);
+        TestInvariants::Ii(invariant, C_ad, C_inv_ad, G1, G2);
       return psi_ad;
     };
 
@@ -328,10 +308,8 @@ run()
       [&G1, &G2, invariant](
         const SymmetricTensor<2, dim, ADNumberType> &C_ad) -> ADNumberType {
       const SymmetricTensor<2, dim, ADNumberType> C_inv_ad = invert(C_ad);
-      const SymmetricTensor<2, dim, ADNumberType> G1_ad(G1);
-      const SymmetricTensor<2, dim, ADNumberType> G2_ad(G2);
       const ADNumberType                          psi_ad =
-        TestInvariants::Ii(invariant, C_ad, C_inv_ad, G1_ad, G2_ad);
+        TestInvariants::Ii(invariant, C_ad, C_inv_ad, G1, G2);
       return psi_ad;
     };
 
