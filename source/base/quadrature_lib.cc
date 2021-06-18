@@ -1388,25 +1388,30 @@ QGaussSimplex<dim>::QGaussSimplex(const unsigned int n_points_1D)
         }
       else if (n_points_1D == 3)
         {
+          // The Hammer-Marlowe-Stroud 5 Scheme, as communicated by quadpy
+          const double p0 = 2.0 / 7.0 - std::sqrt(15.0) / 21.0;
+          const double p1 = 2.0 / 7.0 + std::sqrt(15.0) / 21.0;
+          const double p2 = 3.0 / 7.0 - 2.0 * std::sqrt(15.0) / 21.0;
+          const double p3 = 3.0 / 7.0 + 2.0 * std::sqrt(15.0) / 21.0;
+          this->quadrature_points.emplace_back(1.0 / 3.0, 1.0 / 3.0);
+          this->quadrature_points.emplace_back(p3, p0);
+          this->quadrature_points.emplace_back(p0, p3);
+          this->quadrature_points.emplace_back(p0, p0);
+          this->quadrature_points.emplace_back(p2, p1);
+          this->quadrature_points.emplace_back(p1, p2);
+          this->quadrature_points.emplace_back(p1, p1);
+
           const double q12 = 0.5;
-
-          // clang-format off
-            this->quadrature_points.emplace_back(0.3333333333330, 0.3333333333330);
-            this->quadrature_points.emplace_back(0.7974269853530, 0.1012865073230);
-            this->quadrature_points.emplace_back(0.1012865073230, 0.7974269853530);
-            this->quadrature_points.emplace_back(0.1012865073230, 0.1012865073230);
-            this->quadrature_points.emplace_back(0.0597158717898, 0.4701420641050);
-            this->quadrature_points.emplace_back(0.4701420641050, 0.0597158717898);
-            this->quadrature_points.emplace_back(0.4701420641050, 0.4701420641050);
-          // clang-format on
-
-          this->weights.emplace_back(q12 * 0.225);
-          this->weights.emplace_back(q12 * 0.125939180545);
-          this->weights.emplace_back(q12 * 0.125939180545);
-          this->weights.emplace_back(q12 * 0.125939180545);
-          this->weights.emplace_back(q12 * 0.132394152789);
-          this->weights.emplace_back(q12 * 0.132394152789);
-          this->weights.emplace_back(q12 * 0.132394152789);
+          const double w0  = 9.0 / 40.0;
+          const double w1  = 31.0 / 240.0 - std::sqrt(15.0) / 1200.0;
+          const double w2  = 31.0 / 240.0 + std::sqrt(15.0) / 1200.0;
+          this->weights.emplace_back(q12 * w0);
+          this->weights.emplace_back(q12 * w1);
+          this->weights.emplace_back(q12 * w1);
+          this->weights.emplace_back(q12 * w1);
+          this->weights.emplace_back(q12 * w2);
+          this->weights.emplace_back(q12 * w2);
+          this->weights.emplace_back(q12 * w2);
         }
       else if (n_points_1D == 4)
         {

@@ -1,25 +1,25 @@
 
-DEAL:0::Solve problem on TRI mesh:
-DEAL:0::   on parallel::fullydistributed::Triangulation
-DEAL:0:cg::Starting value 0.245798
-DEAL:0:cg::Convergence step 114 value 6.62438e-13
-DEAL:0::   with 114 CG iterations needed to obtain convergence
-DEAL:0::
-DEAL:0::Solve problem on QUAD mesh:
-DEAL:0::   on parallel::distributed::Triangulation
-DEAL:0:cg::Starting value 0.244628
-DEAL:0:cg::Convergence step 98 value 8.55703e-13
-DEAL:0::   with 98 CG iterations needed to obtain convergence
-DEAL:0::
-DEAL:0::Solve problem on TET mesh:
-DEAL:0::   on parallel::fullydistributed::Triangulation
-DEAL:0:cg::Starting value 0.0607616
-DEAL:0:cg::Convergence step 156 value 9.07624e-13
-DEAL:0::   with 156 CG iterations needed to obtain convergence
-DEAL:0::
-DEAL:0::Solve problem on HEX mesh:
-DEAL:0::   on parallel::distributed::Triangulation
-DEAL:0:cg::Starting value 0.0573704
-DEAL:0:cg::Convergence step 134 value 8.23917e-13
-DEAL:0::   with 134 CG iterations needed to obtain convergence
-DEAL:0::
+DEAL::Solve problem on TRI mesh:
+DEAL::   on parallel::fullydistributed::Triangulation
+DEAL::Solver stopped within 111 - 115 iterations
+DEAL::
+DEAL::Solve problem on QUAD mesh:
+DEAL::   on parallel::distributed::Triangulation
+DEAL::Solver stopped within 96 - 100 iterations
+DEAL::
+DEAL::Solve problem on TET mesh:
+DEAL::   on parallel::fullydistributed::Triangulation
+DEAL::Solver stopped within 154 - 158 iterations
+DEAL::
+DEAL::Solve problem on HEX mesh:
+DEAL::   on parallel::distributed::Triangulation
+DEAL::Solver stopped within 132 - 136 iterations
+DEAL::
+DEAL::Solve problem on WEDGE mesh:
+DEAL::   on parallel::fullydistributed::Triangulation
+DEAL::Solver stopped within 194 - 198 iterations
+DEAL::
+DEAL::Solve problem on PYRAMID mesh:
+DEAL::   on parallel::fullydistributed::Triangulation
+DEAL::Solver stopped within 81 - 85 iterations
+DEAL::

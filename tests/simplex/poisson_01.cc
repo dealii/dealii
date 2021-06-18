@@ -252,12 +252,46 @@ test(const Triangulation<dim, spacedim> &tria,
 
   SolverControl        solver_control(1000, 1e-12);
   SolverCG<VectorType> solver(solver_control);
-  solver.solve(system_matrix, solution, system_rhs, PreconditionIdentity());
 
-  // deallog << solution.l2_norm() << " " << system_rhs.l2_norm() << std::endl;
+  const std::vector<ReferenceCell> reference_cells = tria.get_reference_cells();
+  Assert(reference_cells.size() == 1, ExcNotImplemented());
+  unsigned int lower = 0;
+  unsigned int upper = 0;
+  switch (reference_cells[0])
+    {
+      case ReferenceCells::Triangle:
+        lower = 111;
+        upper = 115;
+        break;
+      case ReferenceCells::Quadrilateral:
+        lower = 96;
+        upper = 100;
+        break;
+      case ReferenceCells::Tetrahedron:
+        lower = 154;
+        upper = 158;
+        break;
+      case ReferenceCells::Hexahedron:
+        lower = 132;
+        upper = 136;
+        break;
+      case ReferenceCells::Wedge:
+        lower = 194;
+        upper = 198;
+        break;
+      case ReferenceCells::Pyramid:
+        lower = 81;
+        upper = 85;
+        break;
+      default:
+        Assert(false, ExcInternalError());
+    }
 
-  deallog << "   with " << solver_control.last_step()
-          << " CG iterations needed to obtain convergence" << std::endl;
+  check_solver_within_range(
+    solver.solve(system_matrix, solution, system_rhs, PreconditionIdentity()),
+    solver_control.last_step(),
+    lower,
+    upper);
 
   // system_rhs.print(std::cout);
   // solution.print(std::cout);
