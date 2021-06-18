@@ -194,6 +194,21 @@ namespace Particles
     get_properties() const;
 
     /**
+     * Tell the particle where to store its properties (even if it does not
+     * own properties). Usually this is only done once per particle, but
+     * since the particle generator does not know about the properties
+     * we want to do it not at construction time. Another use for this
+     * function is after particle transfer to a new process.
+     *
+     * @deprecated This function is only kept for backward compatibility
+     * and has no meaning any more. ParticleAccessors always use the
+     * property pool of the owning particle handler.
+     */
+    DEAL_II_DEPRECATED_EARLY
+    void
+    set_property_pool(PropertyPool<dim, spacedim> &property_pool);
+
+    /**
      * Return the size in bytes this particle occupies if all of its data is
      * serialized (i.e. the number of bytes that is written by the write_data
      * function of this class).
@@ -211,10 +226,10 @@ namespace Particles
     get_surrounding_cell() const;
 
     /**
-     * @deprecated: Deprecated version of the function with the same
+     * @deprecated Deprecated version of the function with the same
      * name above.
      */
-    DEAL_II_DEPRECATED
+    DEAL_II_DEPRECATED_EARLY
     const typename Triangulation<dim, spacedim>::cell_iterator &
     get_surrounding_cell(
       const Triangulation<dim, spacedim> &triangulation) const;
@@ -640,6 +655,17 @@ namespace Particles
     Assert(state() == IteratorState::valid, ExcInternalError());
 
     return property_pool->get_properties(get_handle());
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline void
+  ParticleAccessor<dim, spacedim>::set_property_pool(
+    PropertyPool<dim, spacedim> &new_property_pool)
+  {
+    Assert(&new_property_pool = property_pool, ExcInternalError());
+    (void)new_property_pool;
   }
 
 

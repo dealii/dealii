@@ -116,6 +116,8 @@ namespace Particles
     const Mapping<dim, spacedim> &      new_mapping,
     const unsigned int                  n_properties)
   {
+    clear();
+
     triangulation = &new_triangulation;
     mapping       = &new_mapping;
 
