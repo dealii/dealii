@@ -111,7 +111,7 @@ run()
     H[i] = 10 * (1 + i);
 
   const auto test_invariant =
-    [&C, &C_inv, &H](const enum InvariantList &    i,
+    [&C, &C_inv, &H](const enum AllInvariants &    i,
                      const psi_function_type<dim> &get_psi_ad) {
       const Values<dim> values = compute_derivatives_using_AD(C, H, get_psi_ad);
 
@@ -160,7 +160,7 @@ run()
   // First invariant
   {
     std::cout << "Checking I1" << std::endl;
-    const enum InvariantList invariant = I1;
+    const enum AllInvariants invariant = I1;
 
     const psi_function_type<dim> get_psi_ad =
       [invariant](const SymmetricTensor<2, dim, ADNumberType> &C_ad,
@@ -177,7 +177,7 @@ run()
   // Second invariant
   {
     std::cout << "Checking I2" << std::endl;
-    const enum InvariantList invariant = I2;
+    const enum AllInvariants invariant = I2;
 
     const psi_function_type<dim> get_psi_ad =
       [invariant](const SymmetricTensor<2, dim, ADNumberType> &C_ad,
@@ -194,7 +194,7 @@ run()
   // Third invariant
   {
     std::cout << "Checking I3" << std::endl;
-    const enum InvariantList invariant = I3;
+    const enum AllInvariants invariant = I3;
 
     const psi_function_type<dim> get_psi_ad =
       [invariant](const SymmetricTensor<2, dim, ADNumberType> &C_ad,
@@ -211,7 +211,7 @@ run()
   // Pseudo third invariant
   {
     std::cout << "Checking pI3" << std::endl;
-    const enum InvariantList invariant = pI3;
+    const enum AllInvariants invariant = pI3;
 
     const psi_function_type<dim> get_psi_ad =
       [invariant](const SymmetricTensor<2, dim, ADNumberType> &C_ad,
@@ -228,7 +228,7 @@ run()
   // Ninth invariant
   {
     std::cout << "Checking I9" << std::endl;
-    const enum InvariantList invariant = I9;
+    const enum AllInvariants invariant = I9;
 
     const psi_function_type<dim> get_psi_ad =
       [invariant](const SymmetricTensor<2, dim, ADNumberType> &C_ad,
@@ -245,7 +245,7 @@ run()
   // Tenth invariant
   {
     std::cout << "Checking I10" << std::endl;
-    const enum InvariantList invariant = I10;
+    const enum AllInvariants invariant = I10;
 
     const psi_function_type<dim> get_psi_ad =
       [invariant](const SymmetricTensor<2, dim, ADNumberType> &C_ad,
@@ -262,7 +262,7 @@ run()
   // Eleventh invariant
   {
     std::cout << "Checking 11" << std::endl;
-    const enum InvariantList invariant = I11;
+    const enum AllInvariants invariant = I11;
 
     const psi_function_type<dim> get_psi_ad =
       [invariant](const SymmetricTensor<2, dim, ADNumberType> &C_ad,
@@ -279,7 +279,7 @@ run()
   // Pseudo eleventh invariant (a)
   {
     std::cout << "Checking pI11a" << std::endl;
-    const enum InvariantList invariant = pI11a;
+    const enum AllInvariants invariant = pI11a;
 
     const psi_function_type<dim> get_psi_ad =
       [invariant](const SymmetricTensor<2, dim, ADNumberType> &C_ad,
@@ -296,7 +296,7 @@ run()
   // Pseudo eleventh invariant (b)
   {
     std::cout << "Checking pI11b" << std::endl;
-    const enum InvariantList invariant = pI11b;
+    const enum AllInvariants invariant = pI11b;
 
     const psi_function_type<dim> get_psi_ad =
       [invariant](const SymmetricTensor<2, dim, ADNumberType> &C_ad,

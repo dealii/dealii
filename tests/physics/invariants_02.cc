@@ -98,7 +98,7 @@ run()
   const SymmetricTensor<2, dim> G = symmetrize(outer_product(N, N));
 
   const auto test_invariant =
-    [&C, &C_inv, &G](const enum InvariantList &    i,
+    [&C, &C_inv, &G](const enum AllInvariants &    i,
                      const psi_function_type<dim> &get_psi_ad) {
       const Values<dim> values = compute_derivatives_using_AD(C, get_psi_ad);
 
@@ -124,7 +124,7 @@ run()
   // First invariant
   {
     std::cout << "Checking I1" << std::endl;
-    const enum InvariantList invariant = I1;
+    const enum AllInvariants invariant = I1;
 
     const psi_function_type<dim> get_psi_ad =
       [&G, invariant](
@@ -141,7 +141,7 @@ run()
   // Second invariant
   {
     std::cout << "Checking I2" << std::endl;
-    const enum InvariantList invariant = I2;
+    const enum AllInvariants invariant = I2;
 
     const psi_function_type<dim> get_psi_ad =
       [&G, invariant](
@@ -158,7 +158,7 @@ run()
   // Third invariant
   {
     std::cout << "Checking I3" << std::endl;
-    const enum InvariantList invariant = I3;
+    const enum AllInvariants invariant = I3;
 
     const psi_function_type<dim> get_psi_ad =
       [&G, invariant](
@@ -175,7 +175,7 @@ run()
   // Pseudo third invariant
   {
     std::cout << "Checking pI3" << std::endl;
-    const enum InvariantList invariant = pI3;
+    const enum AllInvariants invariant = pI3;
 
     const psi_function_type<dim> get_psi_ad =
       [&G, invariant](
@@ -192,7 +192,7 @@ run()
   // Fourth invariant
   {
     std::cout << "Checking I4" << std::endl;
-    const enum InvariantList invariant = I4;
+    const enum AllInvariants invariant = I4;
 
     const psi_function_type<dim> get_psi_ad =
       [&G, invariant](
@@ -209,7 +209,7 @@ run()
   // Fifth invariant
   {
     std::cout << "Checking I5" << std::endl;
-    const enum InvariantList invariant = I5;
+    const enum AllInvariants invariant = I5;
 
     const psi_function_type<dim> get_psi_ad =
       [&G, invariant](
@@ -226,7 +226,7 @@ run()
   // Pseudo fifth invariant
   {
     std::cout << "Checking pI5" << std::endl;
-    const enum InvariantList invariant = pI5;
+    const enum AllInvariants invariant = pI5;
 
     const psi_function_type<dim> get_psi_ad =
       [&G, invariant](

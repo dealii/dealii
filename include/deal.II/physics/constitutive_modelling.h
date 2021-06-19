@@ -18,13 +18,12 @@
 
 #include <deal.II/base/config.h>
 
-// #include <deal.II/base/exceptions.h>
-// #include <deal.II/base/numbers.h>
-#include <deal.II/base/std_cxx20/iota_view.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/ndarray.h>
+#include <deal.II/base/numbers.h>
 #include <deal.II/base/symmetric_tensor.h>
-#include <deal.II/base/tensor.h>
 
-#include <deal.II/physics/elasticity/standard_tensors.h>
+#include <deal.II/physics/invariants.h>
 
 #include <type_traits>
 
@@ -33,35 +32,143 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace Physics
 {
-  /**
-   * @brief
-   *
-   * References:
-   *
-   * Isotropic
-   * Chadwick
-   * Holzapfel
-   * Ogden
-   *
-   * Transverse iso:
-   *  - [470, 472]
-   *  - [205, 416]
-   *  - [68, 105, 470]
-   *
-   * Coupled:
-   * Pelteret (p124)
-   *   - [496]
-   *   - [573]
-   *   - Steinmann CISM notes?
-   *    - Khoi habilitation?
-   *
-   * Coupled trans iso
-   * Pelteret
-   *   - [68]
-   */
   namespace ConstitutiveModelling
   {
+    // /**
+    //  * A simple container to hold the first derivatives of some function,
+    //  * expressed in terms of a set of invariants. Each directional derivative
+    //  * $i$ is
+    //  * paired against a @p coefficient value.
+    //  *
+    //  * Consider the function $f\left( I_{1}, I_{2}, ..., I_{n} \right)$ that
+    //  is
+    //  * parameterised by a set of invariants. The first derivative of this
+    //  * function with respect to some general tensor $\mathbf{A}$ would then
+    //  be
+    //  * @f[
+    //  *   \frac{d f}{d \mathbf{A}}
+    //  *     = \frac{d f}{d I_{1}} \frac{d I_{1}}{d \mathbf{A}}
+    //  *     + \frac{d f}{d I_{2}} \frac{d I_{2}}{d \mathbf{A}}
+    //  *     + ...
+    //  *     + \frac{d f}{d I_{n}} \frac{d I_{n}}{d \mathbf{A}}
+    //  *     = \sum_{\alpha}
+    //  *         \frac{d f}{d I_{\alpha}} \frac{d I_{\alpha}}{d \mathbf{A}} .
+    //  * @f]
+    //  *
+    //  * This data structure may be used to hold the coefficients $\frac{d f}{d
+    //  * I_{\alpha}}$ (associated to the derivative in the direction of the
+    //  * $I_{\alpha}$-th invariant).
+    //  *
+    //  * @tparam InvariantType An enumeration type for the invariant.
+    //  * @tparam ScalarType The scalar type for the derivative coefficient.
+    //  */
+    // template <enum InvariantType, typename ScalarType = double>
+    // struct FirstDerivative
+    // {
+    //   /**
+    //    * @brief Constructor.
+    //    */
+    //   FirstDerivative(const InvariantType direction_i,
+    //                   const ScalarType    coefficient)
+    //     : direction_i(direction_i)
+    //     , coefficient(coefficient)
+    //   {}
 
+    //   /**
+    //    * The directional derivative that this structure holds the coefficient
+    //    * of, i.e., the selected "$\alpha$".
+    //    */
+    //   const InvariantType direction_i;
+    //   /**
+    //    * The coefficient of the first derivative term, i.e., the value of
+    //    * $\frac{d f}{d I_{\alpha}}$.
+    //    */
+    //   const ScalarType coefficient;
+    // };
+
+
+
+    // /**
+    //  * A simple container to hold the second derivatives of some function,
+    //  * expressed in terms of a set of invariants. Each directional derivative
+    //  * $ij$ is
+    //  * paired against a @p coefficient value.
+    //  *
+    //  * Consider the function $f\left( I_{1}, I_{2}, ..., I_{n} \right)$ that
+    //  is
+    //  * parameterised by a set of invariants. The first derivative of this
+    //  * function with respect to some general tensor $\mathbf{A}$ would then
+    //  be
+    //  * @f[
+    //  *   \frac{d f}{d \mathbf{A}}
+    //  *     = \frac{d f}{d I_{1}} \frac{d I_{1}}{d \mathbf{A}}
+    //  *     + \frac{d f}{d I_{2}} \frac{d I_{2}}{d \mathbf{A}}
+    //  *     + ...
+    //  *     + \frac{d f}{d I_{n}} \frac{d I_{n}}{d \mathbf{A}}
+    //  *     = \sum_{\alpha}
+    //  *         \frac{d f}{d I_{\alpha}} \frac{d I_{\alpha}}{d \mathbf{A}} .
+    //  * @f]
+    //  * By application of the chain rule, the second derivatives of the
+    //  * function would then be
+    //  * @f[
+    //  *   \frac{d^{2} f}{d \mathbf{A} \otimes d \mathbf{A}}
+    //  *     = \frac{d I_{1}}{d \mathbf{A}} \otimes \left[
+    //  *         \frac{d^{2} f}{d I_{1}^{2}} \frac{d I_{1}}{d \mathbf{A}}
+    //  *       + \frac{d^{2} f}{d I_{1} d I_{1}} \frac{d I_{2}}{d \mathbf{A}}
+    //  *       + ...
+    //  *       + \frac{d^{2} f}{d I_{1} d I_{n}} \frac{d I_{n}}{d \mathbf{A}}
+    //  *     \right]
+    //  *     + \frac{d f}{d I_{1}}
+    //  *         \frac{d^{2} I_{1}}{d \mathbf{A} \otimes d \mathbf{A}}
+    //  *     + ...
+    //  *     = \sum_{\alpha} \left[
+    //  *         \sum_{\beta} \frac{d^{2} f}{d I_{\beta} d I_{\alpha}}
+    //  *           \frac{d I_{\alpha}}{d \mathbf{A}}
+    //  *             \otimes \frac{d I_{\beta}}{d \mathbf{A}}
+    //  *         + \frac{d f}{d I_{\alpha}}
+    //  *             \frac{d^{2} I_{\alpha}}{d \mathbf{A} \otimes d \mathbf{A}}
+    //  *       \right] .
+    //  * @f]
+    //  *
+    //  * This data structure may be used to hold the coefficients $\frac{d^{2}
+    //  * f}{d I_{\beta} d I_{\alpha}} = \frac{d}{dI_{\beta}} \left[ \frac{d
+    //  f}{d
+    //  * I_{\alpha}} \right]$ (associated to the derivative in the direction of
+    //  * the $I_{\beta}$-th invariant of the first derivative that is already
+    //  * taken in the direction of the $I_{\alpha}$-th invariant).
+    //  *
+    //  * @tparam InvariantType An enumeration type for the invariant.
+    //  * @tparam ScalarType The scalar type for the derivative coefficient.
+    //  */
+    // template <enum InvariantType, typename ScalarType = double>
+    // struct SecondDerivative
+    // {
+    //   SecondDerivative(const InvariantType direction_i,
+    //                    const InvariantType direction_j,
+    //                    const ScalarType    coefficient)
+    //     : direction_i(direction_i)
+    //     , direction_j(direction_j)
+    //     , coefficient(coefficient)
+    //   {}
+
+    //   /**
+    //    * The first direction for the directional derivative that this
+    //    structure
+    //    * holds the coefficient of, i.e., the selected "$\beta$".
+    //    */
+    //   const InvariantType direction_i;
+    //   /**
+    //    * The second direction for the directional derivative that this
+    //    structure
+    //    * holds the coefficient of, i.e., the selected "$\alpha$".
+    //    */
+    //   const InvariantType direction_j;
+    //   /**
+    //    * The coefficient of the second derivative term, i.e., the value of
+    //    * $\frac{d^{2} f}{d I_{\beta} d I_{\alpha}}$.
+    //    */
+    //   const ScalarType coefficient;
+    // };
 
 
     // /**
@@ -200,143 +307,8 @@ namespace Physics
     //   const ScalarType coefficient;
     // };
 
-    
-    // /**
-    //  * A simple container to hold the first derivatives of some function,
-    //  * expressed in terms of a set of invariants. Each directional derivative
-    //  * $i$ is
-    //  * paired against a @p coefficient value.
-    //  *
-    //  * Consider the function $f\left( I_{1}, I_{2}, ..., I_{n} \right)$ that
-    //  is
-    //  * parameterised by a set of invariants. The first derivative of this
-    //  * function with respect to some general tensor $\mathbf{A}$ would then
-    //  be
-    //  * @f[
-    //  *   \frac{d f}{d \mathbf{A}}
-    //  *     = \frac{d f}{d I_{1}} \frac{d I_{1}}{d \mathbf{A}}
-    //  *     + \frac{d f}{d I_{2}} \frac{d I_{2}}{d \mathbf{A}}
-    //  *     + ...
-    //  *     + \frac{d f}{d I_{n}} \frac{d I_{n}}{d \mathbf{A}}
-    //  *     = \sum_{\alpha}
-    //  *         \frac{d f}{d I_{\alpha}} \frac{d I_{\alpha}}{d \mathbf{A}} .
-    //  * @f]
-    //  *
-    //  * This data structure may be used to hold the coefficients $\frac{d f}{d
-    //  * I_{\alpha}}$ (associated to the derivative in the direction of the
-    //  * $I_{\alpha}$-th invariant).
-    //  *
-    //  * @tparam InvariantType An enumeration type for the invariant.
-    //  * @tparam ScalarType The scalar type for the derivative coefficient.
-    //  */
-    // template <enum InvariantType, typename ScalarType = double>
-    // struct FirstDerivative
-    // {
-    //   /**
-    //    * @brief Constructor.
-    //    */
-    //   FirstDerivative(const InvariantType direction_i,
-    //                   const ScalarType    coefficient)
-    //     : direction_i(direction_i)
-    //     , coefficient(coefficient)
-    //   {}
 
-    //   /**
-    //    * The directional derivative that this structure holds the coefficient
-    //    * of, i.e., the selected "$\alpha$".
-    //    */
-    //   const InvariantType direction_i;
-    //   /**
-    //    * The coefficient of the first derivative term, i.e., the value of
-    //    * $\frac{d f}{d I_{\alpha}}$.
-    //    */
-    //   const ScalarType coefficient;
-    // };
-
-
-
-    // /**
-    //  * A simple container to hold the second derivatives of some function,
-    //  * expressed in terms of a set of invariants. Each directional derivative
-    //  * $ij$ is
-    //  * paired against a @p coefficient value.
-    //  *
-    //  * Consider the function $f\left( I_{1}, I_{2}, ..., I_{n} \right)$ that
-    //  is
-    //  * parameterised by a set of invariants. The first derivative of this
-    //  * function with respect to some general tensor $\mathbf{A}$ would then
-    //  be
-    //  * @f[
-    //  *   \frac{d f}{d \mathbf{A}}
-    //  *     = \frac{d f}{d I_{1}} \frac{d I_{1}}{d \mathbf{A}}
-    //  *     + \frac{d f}{d I_{2}} \frac{d I_{2}}{d \mathbf{A}}
-    //  *     + ...
-    //  *     + \frac{d f}{d I_{n}} \frac{d I_{n}}{d \mathbf{A}}
-    //  *     = \sum_{\alpha}
-    //  *         \frac{d f}{d I_{\alpha}} \frac{d I_{\alpha}}{d \mathbf{A}} .
-    //  * @f]
-    //  * By application of the chain rule, the second derivatives of the
-    //  * function would then be
-    //  * @f[
-    //  *   \frac{d^{2} f}{d \mathbf{A} \otimes d \mathbf{A}}
-    //  *     = \frac{d I_{1}}{d \mathbf{A}} \otimes \left[
-    //  *         \frac{d^{2} f}{d I_{1}^{2}} \frac{d I_{1}}{d \mathbf{A}}
-    //  *       + \frac{d^{2} f}{d I_{1} d I_{1}} \frac{d I_{2}}{d \mathbf{A}}
-    //  *       + ...
-    //  *       + \frac{d^{2} f}{d I_{1} d I_{n}} \frac{d I_{n}}{d \mathbf{A}}
-    //  *     \right]
-    //  *     + \frac{d f}{d I_{1}}
-    //  *         \frac{d^{2} I_{1}}{d \mathbf{A} \otimes d \mathbf{A}}
-    //  *     + ...
-    //  *     = \sum_{\alpha} \left[
-    //  *         \sum_{\beta} \frac{d^{2} f}{d I_{\beta} d I_{\alpha}}
-    //  *           \frac{d I_{\alpha}}{d \mathbf{A}}
-    //  *             \otimes \frac{d I_{\beta}}{d \mathbf{A}}
-    //  *         + \frac{d f}{d I_{\alpha}}
-    //  *             \frac{d^{2} I_{\alpha}}{d \mathbf{A} \otimes d \mathbf{A}}
-    //  *       \right] .
-    //  * @f]
-    //  *
-    //  * This data structure may be used to hold the coefficients $\frac{d^{2}
-    //  * f}{d I_{\beta} d I_{\alpha}} = \frac{d}{dI_{\beta}} \left[ \frac{d
-    //  f}{d
-    //  * I_{\alpha}} \right]$ (associated to the derivative in the direction of
-    //  * the $I_{\beta}$-th invariant of the first derivative that is already
-    //  * taken in the direction of the $I_{\alpha}$-th invariant).
-    //  *
-    //  * @tparam InvariantType An enumeration type for the invariant.
-    //  * @tparam ScalarType The scalar type for the derivative coefficient.
-    //  */
-    // template <enum InvariantType, typename ScalarType = double>
-    // struct SecondDerivative
-    // {
-    //   SecondDerivative(const InvariantType direction_i,
-    //                    const InvariantType direction_j,
-    //                    const ScalarType    coefficient)
-    //     : direction_i(direction_i)
-    //     , direction_j(direction_j)
-    //     , coefficient(coefficient)
-    //   {}
-
-    //   /**
-    //    * The first direction for the directional derivative that this
-    //    structure
-    //    * holds the coefficient of, i.e., the selected "$\beta$".
-    //    */
-    //   const InvariantType direction_i;
-    //   /**
-    //    * The second direction for the directional derivative that this
-    //    structure
-    //    * holds the coefficient of, i.e., the selected "$\alpha$".
-    //    */
-    //   const InvariantType direction_j;
-    //   /**
-    //    * The coefficient of the second derivative term, i.e., the value of
-    //    * $\frac{d^{2} f}{d I_{\beta} d I_{\alpha}}$.
-    //    */
-    //   const ScalarType coefficient;
-    // };
-
+#ifdef DOXYGEN
 
     namespace internal
     {
@@ -347,122 +319,134 @@ namespace Physics
        * computation while not losing track of the sensitivities
        * necessary to perform efficient SD/AD computations.
        */
-      template <typename ScalarType, typename T = void>
+      template <typename ScalarType>
       bool
-      add_invariant_contribution(const ScalarType &value);
-
-
-      template <
-        typename ScalarType,
-        typename std::enable_if<std::is_arithmetic<ScalarType>::value>::type>
-      bool
-      add_invariant_contribution(const ScalarType &value)
-      {
-        // Add the (floating point) contribution only if its
-        // non-zero valued.
-        return value != ScalarType(0.0);
-      }
-
-
-      template <
-        typename ScalarType,
-        typename std::enable_if<!std::is_arithmetic<ScalarType>::value>::type>
-      bool
-      add_invariant_contribution(const ScalarType &value)
-      {
-        // Always add the contribution if the ScalarType a not a
-        // floating point type. This way, if ScalarType is an AD
-        // or SD type, then we ensure that we always track the
-        // sensitivities and later compute the correct derivatives
-        // of this contribution.
-        return true;
-      }
-
-
-      template <
-        typename ScalarType,
-        typename std::enable_if<std::is_arithmetic<ScalarType>::value>::type>
-      bool
-      add_invariant_contribution(const VectorizedArray<ScalarType> &values)
-      {
-        // Add the (floating point) contribution only all of the
-        // data is non-zero valued.
-        return values != VectorizedArray<ScalarType>(0.0);
-      }
+      add_invariant_contribution(const ScalarType &value, void * = nullptr);
     } // namespace internal
 
+#endif
 
 
-    namespace Isotropic
+
+    template <typename InvariantClassification>
+    class UncoupledConstitutiveModel
     {
-      SymmetricTensor<2, dim, ScalarType>
-      get_dPsi_dC(const Coupled_Material_Values<dim, ScalarType> &values) const
-      {
-        SymmetricTensor<2, dim, ScalarType> dPsi_dC;
+    public:
+      using InvariantsType = InvariantClassification;
+      static const unsigned int dimension = InvariantClassification::dimension;
+      using ScalarType = typename InvariantClassification::ScalarType;
 
-        for (typename std::vector<int>::const_iterator it =
-               Coupled_Material_Invariants::invariants.begin();
-             it != Coupled_Material_Invariants::invariants.end();
-             ++it)
-          {
-            const int &      i        = *it;
-            const ScalarType dPsi_dIi = get_dPsi_dIi(i, values);
+      static_assert(
+        std::is_same<InvariantClassification,
+                     Physics::Invariants::Isotropic<dimension, ScalarType>>::value ||
+                     std::is_same<InvariantClassification,
+                     Physics::Invariants::TransverseIsotropic<dimension, ScalarType>>::value ||
+                     std::is_same<InvariantClassification,
+                     Physics::Invariants::Orthotropic<dimension, ScalarType>>::value,
+        "Incompatible invariant class. This constitutive model class only supports " \
+        "invariants of Isotropic, TransverseIsotropic and Orthotropic materials.");
 
-            // Since computing tensor derivatives is really expensive, we
-            // only do so if the scalar coefficient is non-zero. But we
-            // can only do this optimisation for floating point types!
-            // We need to ensure that we track ALL sensitivities for
-            // AD and SD types
-            if (add_invariant_contribution(dPsi_dIi) == true)
-              dPsi_dC += dPsi_dIi * Coupled_Material_Invariants::dIi_dC<dim>(
-                                      i, values.H, values.C, values.C_inv);
-          }
+      UncoupledConstitutiveModel();
 
-        return dPsi_dC;
-      }
+      void
+      clear();
 
-      SymmetricTensor<4, dim, ScalarType>
-      get_d2Psi_dC_dC(
-        const Coupled_Material_Values<dim, ScalarType> &values) const
-      {
-        SymmetricTensor<4, dim, ScalarType> d2Psi_dC_dC;
+      void
+      set_first_derivative_coefficient(const enum Invariants::AllInvariants &i,
+                                       const ScalarType &value);
 
-        for (typename std::vector<int>::const_iterator it1 =
-               Coupled_Material_Invariants::invariants.begin();
-             it1 != Coupled_Material_Invariants::invariants.end();
-             ++it1)
-          {
-            const int &      i        = *it1;
-            const ScalarType dPsi_dIi = get_dPsi_dIi(i, values);
+      void
+      set_second_derivative_coefficient(const enum Invariants::AllInvariants &i,
+                                        const enum Invariants::AllInvariants &j,
+                                        const ScalarType &value);
 
-            if (add_invariant_contribution(dPsi_dIi) == true)
-              d2Psi_dC_dC +=
-                dPsi_dIi * Coupled_Material_Invariants::d2Ii_dC_dC<dim>(
-                             i, values.H, values.C, values.C_inv);
+      template <typename... Args>
+      SymmetricTensor<2, dimension, ScalarType>
+      get_dPsi_dC(const Args &... args) const;
 
-            for (typename std::vector<int>::const_iterator it2 =
-                   Coupled_Material_Invariants::invariants.begin();
-                 it2 != Coupled_Material_Invariants::invariants.end();
-                 ++it2)
-              {
-                const int &      j = *it2;
-                const ScalarType d2Psi_dIi_dIj =
-                  get_d2Psi_dIi_dIj(i, j, values);
+      template <typename... Args>
+      SymmetricTensor<4, dimension, ScalarType>
+      get_d2Psi_dC_dC(const Args &... args) const;
 
-                if (add_invariant_contribution(d2Psi_dIi_dIj) == true)
-                  d2Psi_dC_dC +=
-                    d2Psi_dIi_dIj *
-                    outer_product(Coupled_Material_Invariants::dIi_dC<dim>(
-                                    i, values.H, values.C, values.C_inv),
-                                  Coupled_Material_Invariants::dIi_dC<dim>(
-                                    j, values.H, values.C, values.C_inv));
-              }
-          }
+    private:
+      static const unsigned int n_invariants = InvariantClassification::n_invariants();
+      const std::set<Invariants::AllInvariants> invariants;
 
-        return d2Psi_dC_dC;
-      }
+      /**
+       * A one-dimensional array to hold the first derivatives of some function,
+       * expressed in terms of a set of invariants. Each directional derivative
+       * $i$ is paired against a @p coefficient value.
+       *
+       * Consider the function $f\left( I_{1}, I_{2}, ..., I_{n} \right)$ that
+       * is parameterised by a set of invariants. The first derivative of this
+       * function with respect to some general tensor $\mathbf{A}$ would then be
+       * @f[
+       *   \frac{d f}{d \mathbf{A}}
+       *     = \frac{d f}{d I_{1}} \frac{d I_{1}}{d \mathbf{A}}
+       *     + \frac{d f}{d I_{2}} \frac{d I_{2}}{d \mathbf{A}}
+       *     + ...
+       *     + \frac{d f}{d I_{n}} \frac{d I_{n}}{d \mathbf{A}}
+       *     = \sum_{\alpha}
+       *         \frac{d f}{d I_{\alpha}} \frac{d I_{\alpha}}{d \mathbf{A}} .
+       * @f]
+       *
+       * This data structure may be used to hold the coefficients $\frac{d f}{d
+       * I_{\alpha}}$ (associated to the derivative in the direction of the
+       * $I_{\alpha}$-th invariant).
+       */
+      std::array<ScalarType, n_invariants> dPsi_dIi;
 
-    } // namespace Isotropic
+      /**
+       * A two-dimensional array to hold the second derivatives of some
+       * function, expressed in terms of a set of invariants. Each directional
+       * derivative
+       * $ij$ is paired against a @p coefficient value.
+       *
+       * Consider the function $f\left( I_{1}, I_{2}, ..., I_{n} \right)$ that
+       * is parameterised by a set of invariants. The first derivative of this
+       * function with respect to some general tensor $\mathbf{A}$ would then be
+       * @f[
+       *   \frac{d f}{d \mathbf{A}}
+       *     = \frac{d f}{d I_{1}} \frac{d I_{1}}{d \mathbf{A}}
+       *     + \frac{d f}{d I_{2}} \frac{d I_{2}}{d \mathbf{A}}
+       *     + ...
+       *     + \frac{d f}{d I_{n}} \frac{d I_{n}}{d \mathbf{A}}
+       *     = \sum_{\alpha}
+       *         \frac{d f}{d I_{\alpha}} \frac{d I_{\alpha}}{d \mathbf{A}} .
+       * @f]
+       * By application of the chain rule, the second derivatives of the
+       * function would then be
+       * @f[
+       *   \frac{d^{2} f}{d \mathbf{A} \otimes d \mathbf{A}}
+       *     = \frac{d I_{1}}{d \mathbf{A}} \otimes \left[
+       *         \frac{d^{2} f}{d I_{1}^{2}} \frac{d I_{1}}{d \mathbf{A}}
+       *       + \frac{d^{2} f}{d I_{1} d I_{1}} \frac{d I_{2}}{d \mathbf{A}}
+       *       + ...
+       *       + \frac{d^{2} f}{d I_{1} d I_{n}} \frac{d I_{n}}{d \mathbf{A}}
+       *     \right]
+       *     + \frac{d f}{d I_{1}}
+       *         \frac{d^{2} I_{1}}{d \mathbf{A} \otimes d \mathbf{A}}
+       *     + ...
+       *     = \sum_{\alpha} \left[
+       *         \sum_{\beta} \frac{d^{2} f}{d I_{\beta} d I_{\alpha}}
+       *           \frac{d I_{\alpha}}{d \mathbf{A}}
+       *             \otimes \frac{d I_{\beta}}{d \mathbf{A}}
+       *         + \frac{d f}{d I_{\alpha}}
+       *             \frac{d^{2} I_{\alpha}}{d \mathbf{A} \otimes d \mathbf{A}}
+       *       \right] .
+       * @f]
+       *
+       * This data structure may be used to hold the coefficients $\frac{d^{2}
+       * f}{d I_{\beta} d I_{\alpha}} = \frac{d}{dI_{\beta}} \left[ \frac{d f}{d
+       * I_{\alpha}} \right]$ (associated to the derivative in the direction of
+       * the $I_{\beta}$-th invariant of the first derivative that is already
+       * taken in the direction of the $I_{\alpha}$-th invariant).
+       */
+      ndarray<ScalarType, n_invariants, n_invariants> d2Psi_dIi_dIj;
+
+      unsigned int
+      invariant_to_local_index(const enum Invariants::AllInvariants &i) const;
+    };
 
 
     //   // virtual SymmetricTensor<2, dim, ScalarType>
@@ -674,6 +658,194 @@ namespace Physics
 
   } // namespace ConstitutiveModelling
 } // namespace Physics
+
+
+/* ----------------- inline and template functions ----------------- */
+
+
+#ifndef DOXYGEN
+
+namespace Physics
+{
+  namespace ConstitutiveModelling
+  {
+    namespace internal
+    {
+      template <typename ScalarType>
+      bool
+      add_invariant_contribution(
+        const ScalarType &value,
+        typename std::enable_if<std::is_arithmetic<ScalarType>::value>::type * =
+          nullptr)
+      {
+        // Add the (floating point) contribution only if its
+        // non-zero valued.
+        return value != ScalarType(0.0);
+      }
+
+
+      template <typename ScalarType>
+      bool
+      add_invariant_contribution(
+        const ScalarType &value,
+        typename std::enable_if<!std::is_arithmetic<ScalarType>::value>::type
+          * = nullptr)
+      {
+        // Always add the contribution if the ScalarType a not a
+        // floating point type. This way, if ScalarType is an AD
+        // or SD type, then we ensure that we always track the
+        // sensitivities and later compute the correct derivatives
+        // of this contribution.
+        return true;
+      }
+
+
+      template <typename ScalarType>
+      bool
+      add_invariant_contribution(
+        const VectorizedArray<ScalarType> &values,
+        typename std::enable_if<std::is_arithmetic<ScalarType>::value>::type * =
+          nullptr)
+      {
+        // Add the (floating point) contribution only all of the
+        // data is non-zero valued.
+        return values != VectorizedArray<ScalarType>(0.0);
+      }
+    } // namespace internal
+
+
+
+    template <typename InvariantClassification>
+    UncoupledConstitutiveModel<InvariantClassification>::
+      UncoupledConstitutiveModel()
+      : invariants(InvariantClassification::valid_invariants())
+    {}
+
+
+
+    template <typename InvariantClassification>
+    void
+    UncoupledConstitutiveModel<InvariantClassification>::
+      clear()
+    {
+      for (auto &e : dPsi_dIi)
+        e = dealii::internal::NumberType<ScalarType>::value(0.0);
+
+      for (auto &row : d2Psi_dIi_dIj)
+        for (auto &e : row)
+          e = dealii::internal::NumberType<ScalarType>::value(0.0);
+    }
+
+
+
+    template <typename InvariantClassification>
+    void
+    UncoupledConstitutiveModel<InvariantClassification>::
+      set_first_derivative_coefficient(const enum Invariants::AllInvariants &i,
+                                       const ScalarType &value)
+    {
+      const unsigned int local_i = invariant_to_local_index(i);
+      Assert(local_i < dPsi_dIi.size(),
+             ExcIndexRange(local_i, 0, dPsi_dIi.size()));
+      dPsi_dIi[local_i] = value;
+    }
+
+
+
+    template <typename InvariantClassification>
+    void
+    UncoupledConstitutiveModel<InvariantClassification>::
+      set_second_derivative_coefficient(const enum Invariants::AllInvariants &i,
+                                        const enum Invariants::AllInvariants &j,
+                                        const ScalarType &value)
+    {
+      const unsigned int local_i = invariant_to_local_index(i);
+      Assert(local_i < d2Psi_dIi_dIj.size(),
+             ExcIndexRange(local_i, 0, d2Psi_dIi_dIj.size()));
+      const unsigned int local_j = invariant_to_local_index(j);
+      Assert(local_j < d2Psi_dIi_dIj[local_i].size(),
+             ExcIndexRange(local_j, 0, d2Psi_dIi_dIj[local_i].size()));
+      d2Psi_dIi_dIj[local_i][local_j] = value;
+    }
+
+
+
+    template <typename InvariantClassification>
+    template <typename... Args>
+    auto
+    UncoupledConstitutiveModel<InvariantClassification>::
+      get_dPsi_dC(const Args &... args) const
+      -> SymmetricTensor<2, dimension, ScalarType>
+    {
+      SymmetricTensor<2, dimension, ScalarType> dPsi_dC;
+
+      for (const auto i : invariants)
+        {
+          const unsigned int local_i = invariant_to_local_index(i);
+
+          // Since computing tensor derivatives is really expensive, we
+          // only do so if the scalar coefficient is non-zero. But we
+          // can only do this optimisation for floating point types!
+          // We need to ensure that we track ALL sensitivities for
+          // AD and SD types
+          if (internal::add_invariant_contribution(dPsi_dIi[local_i]) == true)
+            dPsi_dC += dPsi_dIi[local_i] * InvariantClassification::dIi_dC(i, args...);
+        }
+
+      return dPsi_dC;
+    }
+
+
+
+    template <typename InvariantClassification>
+    template <typename... Args>
+    auto
+    UncoupledConstitutiveModel<InvariantClassification>::
+      get_d2Psi_dC_dC(const Args &... args) const
+      -> SymmetricTensor<4, dimension, ScalarType>
+    {
+      SymmetricTensor<4, dimension, ScalarType> d2Psi_dC_dC;
+
+      for (const auto i : invariants)
+        {
+          const unsigned int local_i = invariant_to_local_index(i);
+          if (internal::add_invariant_contribution(dPsi_dIi[local_i]) == true)
+            d2Psi_dC_dC +=
+              dPsi_dIi[local_i] * InvariantClassification::d2Ii_dC_dC(i, args...);
+
+          for (const auto j : invariants)
+            {
+              const unsigned int local_j = invariant_to_local_index(j);
+              if (internal::add_invariant_contribution(
+                    d2Psi_dIi_dIj[local_i][local_j]) == true)
+                d2Psi_dC_dC +=
+                  d2Psi_dIi_dIj[local_i][local_j] *
+                  outer_product(InvariantClassification::dIi_dC(i, args...),
+                                InvariantClassification::dIi_dC(j, args...));
+            }
+        }
+
+      return d2Psi_dC_dC;
+    }
+
+
+
+    template <typename InvariantClassification>
+    unsigned int
+    UncoupledConstitutiveModel<InvariantClassification>::
+      invariant_to_local_index(const enum Invariants::AllInvariants &i) const
+    {
+      const auto it = invariants.find(i);
+      Assert(it != invariants.end(),
+             ExcMessage("Invariant not found in invariant list."));
+      return std::distance(invariants.begin(), it);
+    }
+
+  } // namespace ConstitutiveModelling
+} // namespace Physics
+
+
+#endif // DOXYGEN
 
 
 DEAL_II_NAMESPACE_CLOSE

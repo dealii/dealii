@@ -66,7 +66,7 @@ namespace Physics
    */
   namespace Invariants
   {
-    enum InvariantList
+    enum AllInvariants
     {
       // === ISOTROPIC MATERIALS ===
       /**
@@ -295,14 +295,24 @@ namespace Physics
 
 
 
-    template <int dim, typename ScalarType>
+    template <int dim, typename ScalarType_>
     struct Isotropic
     {
+      static const unsigned int dimension = dim;
+      using ScalarType = ScalarType_;
+
       /**
        * Get the set of invariants that are valid for isotropic media.
        */
-      static std::set<InvariantList>
+      static std::set<AllInvariants>
       valid_invariants();
+
+
+      /**
+       * The number of invariants for this material type.
+       */
+      static constexpr unsigned int
+      n_invariants();
 
 
       /**
@@ -312,7 +322,7 @@ namespace Physics
        * @param[in] C The rank-2 symmetric field tensor $\mathbf{C}$
        */
       static ScalarType
-      Ii(const enum InvariantList &                 i,
+      Ii(const enum AllInvariants &                 i,
          const SymmetricTensor<2, dim, ScalarType> &C);
 
 
@@ -329,7 +339,7 @@ namespace Physics
        * then any other value (such as the identity tensor) can be used instead.
        */
       static SymmetricTensor<2, dim, ScalarType>
-      dIi_dC(const enum InvariantList &                 i,
+      dIi_dC(const enum AllInvariants &                 i,
              const SymmetricTensor<2, dim, ScalarType> &C,
              const SymmetricTensor<2, dim, ScalarType> &C_inv);
 
@@ -347,22 +357,32 @@ namespace Physics
        * then any other value (such as the identity tensor) can be used instead.
        */
       static SymmetricTensor<4, dim, ScalarType>
-      d2Ii_dC_dC(const enum InvariantList &                 i,
+      d2Ii_dC_dC(const enum AllInvariants &                 i,
                  const SymmetricTensor<2, dim, ScalarType> &C,
                  const SymmetricTensor<2, dim, ScalarType> &C_inv);
     };
 
 
 
-    template <int dim, typename ScalarType>
+    template <int dim, typename ScalarType_>
     struct TransverseIsotropic
     {
+      static const unsigned int dimension = dim;
+      using ScalarType = ScalarType_;
+
       /**
        * Get the set of invariants that are valid for transverse isotropic
        * media.
        */
-      static std::set<InvariantList>
+      static std::set<AllInvariants>
       valid_invariants();
+
+
+      /**
+       * The number of invariants for this material type.
+       */
+      static constexpr unsigned int
+      n_invariants();
 
 
       /**
@@ -374,7 +394,7 @@ namespace Physics
        */
       template <typename ScalarType2>
       static ScalarType
-      Ii(const enum InvariantList &                  i,
+      Ii(const enum AllInvariants &                  i,
          const SymmetricTensor<2, dim, ScalarType> & C,
          const SymmetricTensor<2, dim, ScalarType> & C_inv,
          const SymmetricTensor<2, dim, ScalarType2> &G);
@@ -395,7 +415,7 @@ namespace Physics
        */
       template <typename ScalarType2>
       static SymmetricTensor<2, dim, ScalarType>
-      dIi_dC(const enum InvariantList &                  i,
+      dIi_dC(const enum AllInvariants &                  i,
              const SymmetricTensor<2, dim, ScalarType> & C,
              const SymmetricTensor<2, dim, ScalarType> & C_inv,
              const SymmetricTensor<2, dim, ScalarType2> &G);
@@ -416,7 +436,7 @@ namespace Physics
        */
       template <typename ScalarType2>
       static SymmetricTensor<4, dim, ScalarType>
-      d2Ii_dC_dC(const enum InvariantList &                  i,
+      d2Ii_dC_dC(const enum AllInvariants &                  i,
                  const SymmetricTensor<2, dim, ScalarType> & C,
                  const SymmetricTensor<2, dim, ScalarType> & C_inv,
                  const SymmetricTensor<2, dim, ScalarType2> &G);
@@ -424,14 +444,24 @@ namespace Physics
 
 
 
-    template <int dim, typename ScalarType>
+    template <int dim, typename ScalarType_>
     struct Orthotropic
     {
+      static const unsigned int dimension = dim;
+      using ScalarType = ScalarType_;
+
       /**
        * Get the set of invariants that are valid for orthotropic media.
        */
-      static std::set<InvariantList>
+      static std::set<AllInvariants>
       valid_invariants();
+
+
+      /**
+       * The number of invariants for this material type.
+       */
+      static constexpr unsigned int
+      n_invariants();
 
 
       /**
@@ -444,7 +474,7 @@ namespace Physics
        */
       template <typename ScalarType2>
       static ScalarType
-      Ii(const enum InvariantList &                  i,
+      Ii(const enum AllInvariants &                  i,
          const SymmetricTensor<2, dim, ScalarType> & C,
          const SymmetricTensor<2, dim, ScalarType> & C_inv,
          const SymmetricTensor<2, dim, ScalarType2> &G1,
@@ -467,7 +497,7 @@ namespace Physics
        */
       template <typename ScalarType2>
       static SymmetricTensor<2, dim, ScalarType>
-      dIi_dC(const enum InvariantList &                  i,
+      dIi_dC(const enum AllInvariants &                  i,
              const SymmetricTensor<2, dim, ScalarType> & C,
              const SymmetricTensor<2, dim, ScalarType> & C_inv,
              const SymmetricTensor<2, dim, ScalarType2> &G1,
@@ -490,7 +520,7 @@ namespace Physics
        */
       template <typename ScalarType2>
       static SymmetricTensor<4, dim, ScalarType>
-      d2Ii_dC_dC(const enum InvariantList &                  i,
+      d2Ii_dC_dC(const enum AllInvariants &                  i,
                  const SymmetricTensor<2, dim, ScalarType> & C,
                  const SymmetricTensor<2, dim, ScalarType> & C_inv,
                  const SymmetricTensor<2, dim, ScalarType2> &G1,
@@ -499,15 +529,25 @@ namespace Physics
 
 
 
-    template <int dim, typename ScalarType>
+    template <int dim, typename ScalarType_>
     struct CoupledIsotropic
     {
+      static const unsigned int dimension = dim;
+      using ScalarType = ScalarType_;
+
       /**
        * Get the set of invariants that are valid for field-coupled isotropic
        * media.
        */
-      static std::set<InvariantList>
+      static std::set<AllInvariants>
       valid_invariants();
+
+
+      /**
+       * The number of invariants for this material type.
+       */
+      static constexpr unsigned int
+      n_invariants();
 
 
       /**
@@ -518,7 +558,7 @@ namespace Physics
        * @param[in] H The rank-1 field tensor $\mathrm{H}$
        */
       static ScalarType
-      Ii(const enum InvariantList &                 i,
+      Ii(const enum AllInvariants &                 i,
          const SymmetricTensor<2, dim, ScalarType> &C,
          const SymmetricTensor<2, dim, ScalarType> &C_inv,
          const Tensor<1, dim, ScalarType> &         H);
@@ -538,7 +578,7 @@ namespace Physics
        * @param[in] H The rank-1 field tensor $\mathrm{H}$
        */
       static SymmetricTensor<2, dim, ScalarType>
-      dIi_dC(const enum InvariantList &                 i,
+      dIi_dC(const enum AllInvariants &                 i,
              const SymmetricTensor<2, dim, ScalarType> &C,
              const SymmetricTensor<2, dim, ScalarType> &C_inv,
              const Tensor<1, dim, ScalarType> &         H);
@@ -558,7 +598,7 @@ namespace Physics
        * @param[in] H The rank-1 field tensor $\mathrm{H}$
        */
       static Tensor<1, dim, ScalarType>
-      dIi_dH(const enum InvariantList &                 i,
+      dIi_dH(const enum AllInvariants &                 i,
              const SymmetricTensor<2, dim, ScalarType> &C,
              const SymmetricTensor<2, dim, ScalarType> &C_inv,
              const Tensor<1, dim, ScalarType> &         H);
@@ -578,7 +618,7 @@ namespace Physics
        * @param[in] H The rank-1 field tensor $\mathrm{H}$
        */
       static SymmetricTensor<4, dim, ScalarType>
-      d2Ii_dC_dC(const enum InvariantList &                 i,
+      d2Ii_dC_dC(const enum AllInvariants &                 i,
                  const SymmetricTensor<2, dim, ScalarType> &C,
                  const SymmetricTensor<2, dim, ScalarType> &C_inv,
                  const Tensor<1, dim, ScalarType> &         H);
@@ -598,7 +638,7 @@ namespace Physics
        * @param[in] H The rank-1 field tensor $\mathrm{H}$
        */
       static SymmetricTensor<2, dim, ScalarType>
-      d2Ii_dH_dH(const enum InvariantList &                 i,
+      d2Ii_dH_dH(const enum AllInvariants &                 i,
                  const SymmetricTensor<2, dim, ScalarType> &C,
                  const SymmetricTensor<2, dim, ScalarType> &C_inv,
                  const Tensor<1, dim, ScalarType> &         H);
@@ -619,7 +659,7 @@ namespace Physics
        * @param[in] H The rank-1 field tensor $\mathrm{H}$
        */
       static Tensor<3, dim, ScalarType>
-      d2Ii_dC_dH(const enum InvariantList &                 i,
+      d2Ii_dC_dH(const enum AllInvariants &                 i,
                  const SymmetricTensor<2, dim, ScalarType> &C,
                  const SymmetricTensor<2, dim, ScalarType> &C_inv,
                  const Tensor<1, dim, ScalarType> &         H);
@@ -640,7 +680,7 @@ namespace Physics
        * @param[in] H The rank-1 field tensor $\mathrm{H}$
        */
       static Tensor<3, dim, ScalarType>
-      d2Ii_dH_dC(const enum InvariantList &                 i,
+      d2Ii_dH_dC(const enum AllInvariants &                 i,
                  const SymmetricTensor<2, dim, ScalarType> &C,
                  const SymmetricTensor<2, dim, ScalarType> &C_inv,
                  const Tensor<1, dim, ScalarType> &         H);
@@ -648,15 +688,25 @@ namespace Physics
 
 
 
-    template <int dim, typename ScalarType>
+    template <int dim, typename ScalarType_>
     struct CoupledTransverseIsotropic
     {
+      static const unsigned int dimension = dim;
+      using ScalarType = ScalarType_;
+
       /**
        * Get the set of invariants that are valid for field-coupled transverse
        * isotropic media.
        */
-      static std::set<InvariantList>
+      static std::set<AllInvariants>
       valid_invariants();
+
+
+      /**
+       * The number of invariants for this material type.
+       */
+      static constexpr unsigned int
+      n_invariants();
 
 
       /**
@@ -669,7 +719,7 @@ namespace Physics
        */
       template <typename ScalarType2>
       static ScalarType
-      Ii(const enum InvariantList &                  i,
+      Ii(const enum AllInvariants &                  i,
          const SymmetricTensor<2, dim, ScalarType> & C,
          const SymmetricTensor<2, dim, ScalarType> & C_inv,
          const Tensor<1, dim, ScalarType> &          H,
@@ -692,7 +742,7 @@ namespace Physics
        */
       template <typename ScalarType2>
       static SymmetricTensor<2, dim, ScalarType>
-      dIi_dC(const enum InvariantList &                  i,
+      dIi_dC(const enum AllInvariants &                  i,
              const SymmetricTensor<2, dim, ScalarType> & C,
              const SymmetricTensor<2, dim, ScalarType> & C_inv,
              const Tensor<1, dim, ScalarType> &          H,
@@ -715,7 +765,7 @@ namespace Physics
        */
       template <typename ScalarType2>
       static Tensor<1, dim, ScalarType>
-      dIi_dH(const enum InvariantList &                  i,
+      dIi_dH(const enum AllInvariants &                  i,
              const SymmetricTensor<2, dim, ScalarType> & C,
              const SymmetricTensor<2, dim, ScalarType> & C_inv,
              const Tensor<1, dim, ScalarType> &          H,
@@ -738,7 +788,7 @@ namespace Physics
        */
       template <typename ScalarType2>
       static SymmetricTensor<4, dim, ScalarType>
-      d2Ii_dC_dC(const enum InvariantList &                  i,
+      d2Ii_dC_dC(const enum AllInvariants &                  i,
                  const SymmetricTensor<2, dim, ScalarType> & C,
                  const SymmetricTensor<2, dim, ScalarType> & C_inv,
                  const Tensor<1, dim, ScalarType> &          H,
@@ -761,7 +811,7 @@ namespace Physics
        */
       template <typename ScalarType2>
       static SymmetricTensor<2, dim, ScalarType>
-      d2Ii_dH_dH(const enum InvariantList &                  i,
+      d2Ii_dH_dH(const enum AllInvariants &                  i,
                  const SymmetricTensor<2, dim, ScalarType> & C,
                  const SymmetricTensor<2, dim, ScalarType> & C_inv,
                  const Tensor<1, dim, ScalarType> &          H,
@@ -785,7 +835,7 @@ namespace Physics
        */
       template <typename ScalarType2>
       static Tensor<3, dim, ScalarType>
-      d2Ii_dC_dH(const enum InvariantList &                  i,
+      d2Ii_dC_dH(const enum AllInvariants &                  i,
                  const SymmetricTensor<2, dim, ScalarType> & C,
                  const SymmetricTensor<2, dim, ScalarType> & C_inv,
                  const Tensor<1, dim, ScalarType> &          H,
@@ -809,7 +859,7 @@ namespace Physics
        */
       template <typename ScalarType2>
       static Tensor<3, dim, ScalarType>
-      d2Ii_dH_dC(const enum InvariantList &                  i,
+      d2Ii_dH_dC(const enum AllInvariants &                  i,
                  const SymmetricTensor<2, dim, ScalarType> & C,
                  const SymmetricTensor<2, dim, ScalarType> & C_inv,
                  const Tensor<1, dim, ScalarType> &          H,
@@ -902,7 +952,7 @@ namespace Physics
 
 
     template <int dim, typename ScalarType>
-    std::set<InvariantList>
+    std::set<AllInvariants>
     Isotropic<dim, ScalarType>::valid_invariants()
     {
       return {I1, I2, I3, pI3};
@@ -911,8 +961,17 @@ namespace Physics
 
 
     template <int dim, typename ScalarType>
+    DEAL_II_CONSTEXPR unsigned int
+    Isotropic<dim, ScalarType>::n_invariants()
+    {
+      return 4;
+    }
+
+
+
+    template <int dim, typename ScalarType>
     ScalarType
-    Isotropic<dim, ScalarType>::Ii(const enum InvariantList &                 i,
+    Isotropic<dim, ScalarType>::Ii(const enum AllInvariants &                 i,
                                    const SymmetricTensor<2, dim, ScalarType> &C)
     {
       Assert(valid_invariants().count(i) != 0,
@@ -961,7 +1020,7 @@ namespace Physics
     template <int dim, typename ScalarType>
     SymmetricTensor<2, dim, ScalarType>
     Isotropic<dim, ScalarType>::dIi_dC(
-      const enum InvariantList &                 i,
+      const enum AllInvariants &                 i,
       const SymmetricTensor<2, dim, ScalarType> &C,
       const SymmetricTensor<2, dim, ScalarType> &C_inv)
     {
@@ -1012,7 +1071,7 @@ namespace Physics
     template <int dim, typename ScalarType>
     SymmetricTensor<4, dim, ScalarType>
     Isotropic<dim, ScalarType>::d2Ii_dC_dC(
-      const enum InvariantList &                 i,
+      const enum AllInvariants &                 i,
       const SymmetricTensor<2, dim, ScalarType> &C,
       const SymmetricTensor<2, dim, ScalarType> &C_inv)
     {
@@ -1063,7 +1122,7 @@ namespace Physics
 
 
     template <int dim, typename ScalarType>
-    std::set<InvariantList>
+    std::set<AllInvariants>
     TransverseIsotropic<dim, ScalarType>::valid_invariants()
     {
       return {I1, I2, I3, pI3, I4, I5, pI5};
@@ -1072,10 +1131,19 @@ namespace Physics
 
 
     template <int dim, typename ScalarType>
+    DEAL_II_CONSTEXPR unsigned int
+    TransverseIsotropic<dim, ScalarType>::n_invariants()
+    {
+      return 7;
+    }
+
+
+
+    template <int dim, typename ScalarType>
     template <typename ScalarType2>
     ScalarType
     TransverseIsotropic<dim, ScalarType>::Ii(
-      const enum InvariantList &                  i,
+      const enum AllInvariants &                  i,
       const SymmetricTensor<2, dim, ScalarType> & C,
       const SymmetricTensor<2, dim, ScalarType> & C_inv,
       const SymmetricTensor<2, dim, ScalarType2> &G)
@@ -1141,7 +1209,7 @@ namespace Physics
     template <typename ScalarType2>
     SymmetricTensor<2, dim, ScalarType>
     TransverseIsotropic<dim, ScalarType>::dIi_dC(
-      const enum InvariantList &                  i,
+      const enum AllInvariants &                  i,
       const SymmetricTensor<2, dim, ScalarType> & C,
       const SymmetricTensor<2, dim, ScalarType> & C_inv,
       const SymmetricTensor<2, dim, ScalarType2> &G)
@@ -1215,7 +1283,7 @@ namespace Physics
     template <typename ScalarType2>
     SymmetricTensor<4, dim, ScalarType>
     TransverseIsotropic<dim, ScalarType>::d2Ii_dC_dC(
-      const enum InvariantList &                  i,
+      const enum AllInvariants &                  i,
       const SymmetricTensor<2, dim, ScalarType> & C,
       const SymmetricTensor<2, dim, ScalarType> & C_inv,
       const SymmetricTensor<2, dim, ScalarType2> &G)
@@ -1327,7 +1395,7 @@ namespace Physics
 
 
     template <int dim, typename ScalarType>
-    std::set<InvariantList>
+    std::set<AllInvariants>
     Orthotropic<dim, ScalarType>::valid_invariants()
     {
       return {I1, I2, I3, pI3, I4, I5, pI5, I6, I7, pI7, I8};
@@ -1336,10 +1404,19 @@ namespace Physics
 
 
     template <int dim, typename ScalarType>
+    DEAL_II_CONSTEXPR unsigned int
+    Orthotropic<dim, ScalarType>::n_invariants()
+    {
+      return 11;
+    }
+
+
+
+    template <int dim, typename ScalarType>
     template <typename ScalarType2>
     ScalarType
     Orthotropic<dim, ScalarType>::Ii(
-      const enum InvariantList &                  i,
+      const enum AllInvariants &                  i,
       const SymmetricTensor<2, dim, ScalarType> & C,
       const SymmetricTensor<2, dim, ScalarType> & C_inv,
       const SymmetricTensor<2, dim, ScalarType2> &G1,
@@ -1435,7 +1512,7 @@ namespace Physics
     template <typename ScalarType2>
     SymmetricTensor<2, dim, ScalarType>
     Orthotropic<dim, ScalarType>::dIi_dC(
-      const enum InvariantList &                  i,
+      const enum AllInvariants &                  i,
       const SymmetricTensor<2, dim, ScalarType> & C,
       const SymmetricTensor<2, dim, ScalarType> & C_inv,
       const SymmetricTensor<2, dim, ScalarType2> &G1,
@@ -1546,7 +1623,7 @@ namespace Physics
     template <typename ScalarType2>
     SymmetricTensor<4, dim, ScalarType>
     Orthotropic<dim, ScalarType>::d2Ii_dC_dC(
-      const enum InvariantList &                  i,
+      const enum AllInvariants &                  i,
       const SymmetricTensor<2, dim, ScalarType> & C,
       const SymmetricTensor<2, dim, ScalarType> & C_inv,
       const SymmetricTensor<2, dim, ScalarType2> &G1,
@@ -1646,7 +1723,7 @@ namespace Physics
 
 
     template <int dim, typename ScalarType>
-    std::set<InvariantList>
+    std::set<AllInvariants>
     CoupledIsotropic<dim, ScalarType>::valid_invariants()
     {
       return {I1, I2, I3, pI3, I9, I10, I11, pI11a, pI11b};
@@ -1655,9 +1732,18 @@ namespace Physics
 
 
     template <int dim, typename ScalarType>
+    DEAL_II_CONSTEXPR unsigned int
+    CoupledIsotropic<dim, ScalarType>::n_invariants()
+    {
+      return 9;
+    }
+
+
+
+    template <int dim, typename ScalarType>
     ScalarType
     CoupledIsotropic<dim, ScalarType>::Ii(
-      const enum InvariantList &                 i,
+      const enum AllInvariants &                 i,
       const SymmetricTensor<2, dim, ScalarType> &C,
       const SymmetricTensor<2, dim, ScalarType> &C_inv,
       const Tensor<1, dim, ScalarType> &         H)
@@ -1735,7 +1821,7 @@ namespace Physics
     template <int dim, typename ScalarType>
     SymmetricTensor<2, dim, ScalarType>
     CoupledIsotropic<dim, ScalarType>::dIi_dC(
-      const enum InvariantList &                 i,
+      const enum AllInvariants &                 i,
       const SymmetricTensor<2, dim, ScalarType> &C,
       const SymmetricTensor<2, dim, ScalarType> &C_inv,
       const Tensor<1, dim, ScalarType> &         H)
@@ -1816,7 +1902,7 @@ namespace Physics
     template <int dim, typename ScalarType>
     Tensor<1, dim, ScalarType>
     CoupledIsotropic<dim, ScalarType>::dIi_dH(
-      const enum InvariantList &                 i,
+      const enum AllInvariants &                 i,
       const SymmetricTensor<2, dim, ScalarType> &C,
       const SymmetricTensor<2, dim, ScalarType> &C_inv,
       const Tensor<1, dim, ScalarType> &         H)
@@ -1893,7 +1979,7 @@ namespace Physics
     template <int dim, typename ScalarType>
     SymmetricTensor<4, dim, ScalarType>
     CoupledIsotropic<dim, ScalarType>::d2Ii_dC_dC(
-      const enum InvariantList &                 i,
+      const enum AllInvariants &                 i,
       const SymmetricTensor<2, dim, ScalarType> &C,
       const SymmetricTensor<2, dim, ScalarType> &C_inv,
       const Tensor<1, dim, ScalarType> &         H)
@@ -2018,7 +2104,7 @@ namespace Physics
     template <int dim, typename ScalarType>
     SymmetricTensor<2, dim, ScalarType>
     CoupledIsotropic<dim, ScalarType>::d2Ii_dH_dH(
-      const enum InvariantList &                 i,
+      const enum AllInvariants &                 i,
       const SymmetricTensor<2, dim, ScalarType> &C,
       const SymmetricTensor<2, dim, ScalarType> &C_inv,
       const Tensor<1, dim, ScalarType> &         H)
@@ -2095,7 +2181,7 @@ namespace Physics
     template <int dim, typename ScalarType>
     Tensor<3, dim, ScalarType>
     CoupledIsotropic<dim, ScalarType>::d2Ii_dC_dH(
-      const enum InvariantList &                 i,
+      const enum AllInvariants &                 i,
       const SymmetricTensor<2, dim, ScalarType> &C,
       const SymmetricTensor<2, dim, ScalarType> &C_inv,
       const Tensor<1, dim, ScalarType> &         H)
@@ -2228,7 +2314,7 @@ namespace Physics
     template <int dim, typename ScalarType>
     Tensor<3, dim, ScalarType>
     CoupledIsotropic<dim, ScalarType>::d2Ii_dH_dC(
-      const enum InvariantList &                 i,
+      const enum AllInvariants &                 i,
       const SymmetricTensor<2, dim, ScalarType> &C,
       const SymmetricTensor<2, dim, ScalarType> &C_inv,
       const Tensor<1, dim, ScalarType> &         H)
@@ -2253,7 +2339,7 @@ namespace Physics
 
 
     template <int dim, typename ScalarType>
-    std::set<InvariantList>
+    std::set<AllInvariants>
     CoupledTransverseIsotropic<dim, ScalarType>::valid_invariants()
     {
       return {
@@ -2263,10 +2349,19 @@ namespace Physics
 
 
     template <int dim, typename ScalarType>
+    DEAL_II_CONSTEXPR unsigned int
+    CoupledTransverseIsotropic<dim, ScalarType>::n_invariants()
+    {
+      return 14;
+    }
+
+
+
+    template <int dim, typename ScalarType>
     template <typename ScalarType2>
     ScalarType
     CoupledTransverseIsotropic<dim, ScalarType>::Ii(
-      const enum InvariantList &                  i,
+      const enum AllInvariants &                  i,
       const SymmetricTensor<2, dim, ScalarType> & C,
       const SymmetricTensor<2, dim, ScalarType> & C_inv,
       const Tensor<1, dim, ScalarType> &          H,
@@ -2366,7 +2461,7 @@ namespace Physics
     template <typename ScalarType2>
     SymmetricTensor<2, dim, ScalarType>
     CoupledTransverseIsotropic<dim, ScalarType>::dIi_dC(
-      const enum InvariantList &                  i,
+      const enum AllInvariants &                  i,
       const SymmetricTensor<2, dim, ScalarType> & C,
       const SymmetricTensor<2, dim, ScalarType> & C_inv,
       const Tensor<1, dim, ScalarType> &          H,
@@ -2476,7 +2571,7 @@ namespace Physics
     template <typename ScalarType2>
     Tensor<1, dim, ScalarType>
     CoupledTransverseIsotropic<dim, ScalarType>::dIi_dH(
-      const enum InvariantList &                  i,
+      const enum AllInvariants &                  i,
       const SymmetricTensor<2, dim, ScalarType> & C,
       const SymmetricTensor<2, dim, ScalarType> & C_inv,
       const Tensor<1, dim, ScalarType> &          H,
@@ -2576,7 +2671,7 @@ namespace Physics
     template <typename ScalarType2>
     SymmetricTensor<4, dim, ScalarType>
     CoupledTransverseIsotropic<dim, ScalarType>::d2Ii_dC_dC(
-      const enum InvariantList &                  i,
+      const enum AllInvariants &                  i,
       const SymmetricTensor<2, dim, ScalarType> & C,
       const SymmetricTensor<2, dim, ScalarType> & C_inv,
       const Tensor<1, dim, ScalarType> &          H,
@@ -2710,7 +2805,7 @@ namespace Physics
     template <typename ScalarType2>
     SymmetricTensor<2, dim, ScalarType>
     CoupledTransverseIsotropic<dim, ScalarType>::d2Ii_dH_dH(
-      const enum InvariantList &                  i,
+      const enum AllInvariants &                  i,
       const SymmetricTensor<2, dim, ScalarType> & C,
       const SymmetricTensor<2, dim, ScalarType> & C_inv,
       const Tensor<1, dim, ScalarType> &          H,
@@ -2826,7 +2921,7 @@ namespace Physics
     template <typename ScalarType2>
     Tensor<3, dim, ScalarType>
     CoupledTransverseIsotropic<dim, ScalarType>::d2Ii_dC_dH(
-      const enum InvariantList &                  i,
+      const enum AllInvariants &                  i,
       const SymmetricTensor<2, dim, ScalarType> & C,
       const SymmetricTensor<2, dim, ScalarType> & C_inv,
       const Tensor<1, dim, ScalarType> &          H,
@@ -2955,7 +3050,7 @@ namespace Physics
     template <typename ScalarType2>
     Tensor<3, dim, ScalarType>
     CoupledTransverseIsotropic<dim, ScalarType>::d2Ii_dH_dC(
-      const enum InvariantList &                  i,
+      const enum AllInvariants &                  i,
       const SymmetricTensor<2, dim, ScalarType> & C,
       const SymmetricTensor<2, dim, ScalarType> & C_inv,
       const Tensor<1, dim, ScalarType> &          H,
