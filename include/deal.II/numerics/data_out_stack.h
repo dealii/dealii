@@ -64,7 +64,7 @@ public:
  * example to connect the results of solutions of a parameter dependent
  * equation for several parameter value together into one. The interface is
  * mostly modelled after the DataOut class, see there for some more
- * documentation.
+ * documentation. The class is used in step-78.
  *
  * We will explain the concept for a time dependent problem, but instead of
  * the time any parameter can be substituted. In our example, a solution of an
@@ -83,7 +83,7 @@ public:
  * added in the future.
  *
  *
- * <h3>Example of Use</h3>
+ * <h3>Example of use</h3>
  *
  * The following little example shall illustrate the different steps of use of
  * this class. It is assumed that the finite element used is composed of two
