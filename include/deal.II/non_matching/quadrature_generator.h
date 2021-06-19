@@ -250,6 +250,118 @@ namespace NonMatching
       q_generator;
   };
 
+
+  /**
+   * This class creates immersed quadrature rules over a face, $F$, of a
+   * BoundingBox, when the domain is described by a level set function, $\psi$.
+   *
+   * In the same way as in the QuadratureGenerator class, this class generates
+   * quadrature rules to integrate over 3 different regions of the face,
+   * $F \subset \mathbb{R}^{dim}$:
+   * @f[
+   * N = \{x \in F : \psi(x) < 0 \}, \\
+   * P = \{x \in F : \psi(x) > 0 \}, \\
+   * S = \{x \in F : \psi(x) = 0 \},
+   * @f]
+   * which are again referred to as the "inside", $N$, "outside", $P$,
+   * and "surface" region, $S$. These type of quadrature rules are in general
+   * needed in immersed discontinuous Galerkin methods.
+   *
+   * Under the hood, this class uses the QuadratureGenerator class to build
+   * these rules. This is done by restricting the dim-dimensional level set
+   * function to the face, thus creating a (dim-1)-dimensional level set
+   * function, $\phi$. It then creates the (dim-1)-dimensional quadratures by
+   * calling QuadratureGenerator with $\phi$. This means that what holds for the
+   * QuadratureGenerator class in general also holds for this class. In
+   * particular, if the 1D-quadrature that is used as base contains $n$ points,
+   * the number of points will be proportional to $n^{dim-1}$ in the in the
+   * inside/outside quadratures and to $n^{dim-2}$ in the surface quadrature.
+   */
+  template <int dim>
+  class FaceQuadratureGenerator
+  {
+  public:
+    using AdditionalData = AdditionalQGeneratorData;
+
+    /**
+     * Constructor. Each Quadrature<1> in @p quadratures1D can be chosen as base
+     * for generating the immersed quadrature rules.
+     *
+     * @note It is important that each 1D-quadrature rule in the
+     * hp::QCollection does not contain the points 0 and 1.
+     */
+    FaceQuadratureGenerator(
+      const hp::QCollection<1> &quadratures1D,
+      const AdditionalData &    additional_data = AdditionalData());
+
+    /**
+     * Construct immersed quadratures rules for the incoming level set
+     * function on a given face of the BoundingBox.
+     *
+     * To get the constructed quadratures, use the functions
+     * get_inside_quadrature(),
+     * get_outside_quadrature(),
+     * get_surface_quadrature().
+     *
+     * @note Both value, gradient and hessian need to be implemented on the
+     * incoming function.
+     */
+    void
+    generate(const Function<dim> &   level_set,
+             const BoundingBox<dim> &box,
+             const unsigned int      face_index);
+
+    /**
+     * Return the quadrature rule for the region
+     * $\{x \in F : \psi(x) < 0 \}$
+     * created in the previous call to generate().
+     * Here, $F$ is the face of the BoundingBox passed to generate().
+     */
+    const Quadrature<dim - 1> &
+    get_inside_quadrature() const;
+
+    /**
+     * Return the quadrature rule for the region
+     * $\{x \in F : \psi(x) > 0 \}$
+     * created in the previous call to generate().
+     * Here, $F$ is the face of the BoundingBox passed to generate().
+     */
+    const Quadrature<dim - 1> &
+    get_outside_quadrature() const;
+
+    /**
+     * Return the quadrature rule for the region
+     * $\{x \in F : \psi(x) = 0 \}$
+     * created in the previous call to generate().
+     * Here, $F$ is the face of the BoundingBox passed to generate().
+     *
+     * @note The normal at the quadrature points will be parallel to $\nabla \psi$.
+     */
+    const ImmersedSurfaceQuadrature<dim - 1, dim> &
+    get_surface_quadrature() const;
+
+    /**
+     * Set which 1D-quadrature in the collection passed to the constructor
+     * should be used to create the immersed quadratures.
+     */
+    void
+    set_1D_quadrature(const unsigned int q_index);
+
+  private:
+    /**
+     * Lower-dimensional quadrature generator used to build the quadratures over
+     * the face.
+     */
+    QuadratureGenerator<dim - 1> quadrature_generator;
+
+    /**
+     * The same surface quadrature as created by the quadrature_generator,
+     * but having dim-dimensional normals.
+     */
+    ImmersedSurfaceQuadrature<dim - 1, dim> surface_quadrature;
+  };
+
+
   namespace internal
   {
     namespace QuadratureGeneratorImplementation

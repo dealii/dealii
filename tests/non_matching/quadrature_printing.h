@@ -45,12 +45,12 @@ print_quadrature(const Quadrature<dim> &quadrature)
 
 /*
  * Print the incoming surface quadrature to deallog as comma separated values:
- * p[0], ..., p[dim-1], weight, normal[0], ..., normal[dim-1]
+ * p[0], ..., p[dim-1], weight, normal[0], ..., normal[spacedim-1]
  */
-template <int dim>
+template <int dim, int spacedim>
 void
 print_surface_quadrature(
-  const NonMatching::ImmersedSurfaceQuadrature<dim> &quadrature)
+  const NonMatching::ImmersedSurfaceQuadrature<dim, spacedim> &quadrature)
 {
   for (unsigned int i = 0; i < quadrature.size(); ++i)
     {
@@ -60,11 +60,12 @@ print_surface_quadrature(
 
       deallog << quadrature.weight(i);
 
-      const Tensor<1, dim> &normal = quadrature.normal_vector(i);
-      for (int d = 0; d < dim; d++)
+      const Tensor<1, spacedim> &normal = quadrature.normal_vector(i);
+      for (int d = 0; d < spacedim; d++)
         deallog << ", " << normal[d];
       deallog << std::endl;
     }
 }
+
 
 #endif

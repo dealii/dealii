@@ -1353,6 +1353,102 @@ namespace NonMatching
     q_generator.set_1D_quadrature(q_index);
   }
 
+
+
+  template <int dim>
+  FaceQuadratureGenerator<dim>::FaceQuadratureGenerator(
+    const hp::QCollection<1> &quadratures1D,
+    const AdditionalData &    additional_data)
+    : quadrature_generator(quadratures1D, additional_data)
+  {}
+
+
+
+  template <int dim>
+  void
+  FaceQuadratureGenerator<dim>::generate(const Function<dim> &   level_set,
+                                         const BoundingBox<dim> &box,
+                                         const unsigned int      face_index)
+  {
+    AssertIndexRange(face_index, GeometryInfo<dim>::faces_per_cell);
+
+    // We restrict the level set function to the face, by locking the coordinate
+    // that is constant over the face. This will be the same as the direction of
+    // the face normal.
+    const unsigned int face_normal_direction =
+      GeometryInfo<dim>::unit_normal_direction[face_index];
+
+    const Point<dim> vertex0 =
+      box.vertex(GeometryInfo<dim>::face_to_cell_vertices(face_index, 0));
+    const double coordinate_value = vertex0(face_normal_direction);
+
+    const Functions::CoordinateRestriction<dim - 1> face_restriction(
+      level_set, face_normal_direction, coordinate_value);
+
+    // Reuse the lower dimensional QuadratureGenerator on the face.
+    const BoundingBox<dim - 1> cross_section =
+      box.cross_section(face_normal_direction);
+    quadrature_generator.generate(face_restriction, cross_section);
+
+    // We need the dim-dimensional normals of the zero-contour.
+    // Recompute these.
+    const ImmersedSurfaceQuadrature<dim - 1, dim - 1>
+      &surface_quadrature_wrong_normal =
+        quadrature_generator.get_surface_quadrature();
+
+    std::vector<Tensor<1, dim>> normals;
+    normals.reserve(surface_quadrature_wrong_normal.size());
+    for (unsigned int i = 0; i < surface_quadrature_wrong_normal.size(); i++)
+      {
+        const Point<dim> point = dealii::internal::create_higher_dim_point(
+          surface_quadrature_wrong_normal.point(i),
+          face_normal_direction,
+          coordinate_value);
+
+        Tensor<1, dim> normal = level_set.gradient(point);
+        normal /= normal.norm();
+        normals.push_back(normal);
+      }
+    surface_quadrature = ImmersedSurfaceQuadrature<dim - 1, dim>(
+      surface_quadrature_wrong_normal.get_points(),
+      surface_quadrature_wrong_normal.get_weights(),
+      normals);
+  }
+
+
+
+  template <int dim>
+  void
+  FaceQuadratureGenerator<dim>::set_1D_quadrature(const unsigned int q_index)
+  {
+    quadrature_generator.set_1D_quadrature(q_index);
+  }
+
+
+
+  template <int dim>
+  const Quadrature<dim - 1> &
+  FaceQuadratureGenerator<dim>::get_inside_quadrature() const
+  {
+    return quadrature_generator.get_inside_quadrature();
+  }
+
+
+  template <int dim>
+  const Quadrature<dim - 1> &
+  FaceQuadratureGenerator<dim>::get_outside_quadrature() const
+  {
+    return quadrature_generator.get_outside_quadrature();
+  }
+
+
+
+  template <int dim>
+  const ImmersedSurfaceQuadrature<dim - 1, dim> &
+  FaceQuadratureGenerator<dim>::get_surface_quadrature() const
+  {
+    return surface_quadrature;
+  }
 } // namespace NonMatching
 #include "quadrature_generator.inst"
 DEAL_II_NAMESPACE_CLOSE

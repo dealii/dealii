@@ -20,6 +20,10 @@ for (deal_II_dimension : DIMENSIONS)
     \{
       template class QuadratureGenerator<deal_II_dimension>;
 
+#if 1 < deal_II_dimension
+      template class FaceQuadratureGenerator<deal_II_dimension>;
+#endif
+
       namespace internal
       \{
         namespace QuadratureGeneratorImplementation
