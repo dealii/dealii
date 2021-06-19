@@ -457,6 +457,18 @@ inconvenience this causes.
 <ol>
 
  <li>
+  New: The step-78 tutorial program solves the Black-Scholes equations.
+  <br>
+  (Tylor Anderson, 2021/05/19)
+ </li>
+
+ <li>
+  New: The step-79 tutorial program demonstrates solution of a topology optimization problem.
+  <br>
+  (Justin O'Connor, 2021/05/19)
+ </li>
+
+ <li>
   New: The step-66 tutorial program shows how to solve a nonlinear PDE in parallel
   with MatrixFree methods.
   <br>
