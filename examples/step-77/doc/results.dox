@@ -48,7 +48,7 @@ Mesh refinement step 0
   Computing residual vector... norm=0.0157967
   Computing residual vector... norm=0.0141572
   Computing residual vector... norm=0.012657
- Solving linear system
+  Solving linear system
   Computing residual vector... norm=0.012657
   Computing residual vector... norm=0.0116863
   Computing residual vector... norm=0.0107696
