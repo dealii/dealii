@@ -110,13 +110,14 @@ run()
   // ensures that the invariant value remains in the coefficient when twice
   // differentiated.
   const psi_function_type<dim> get_psi_ad =
-    [&G1,&G2](const SymmetricTensor<2, dim, ADNumberType> &C_ad) -> ADNumberType {
-      const SymmetricTensor<2, dim, ADNumberType> C_inv_ad = invert(C_ad);
+    [&G1,
+     &G2](const SymmetricTensor<2, dim, ADNumberType> &C_ad) -> ADNumberType {
+    const SymmetricTensor<2, dim, ADNumberType> C_inv_ad = invert(C_ad);
 
     ADNumberType psi_ad = 1.0;
 
     for (const auto i : TestInvariantsAD::valid_invariants())
-      psi_ad *= std::pow(TestInvariantsAD::Ii(i, C_ad, C_inv_ad,G1,G2), 3);
+      psi_ad *= std::pow(TestInvariantsAD::Ii(i, C_ad, C_inv_ad, G1, G2), 3);
 
     return psi_ad;
   };
@@ -134,8 +135,7 @@ run()
   {
     const Values<dim> values = compute_derivatives_using_AD(C, get_psi_ad);
 
-    using ConstitutiveModel =
-      UncoupledConstitutiveModel<TestInvariants>;
+    using ConstitutiveModel = UncoupledConstitutiveModel<TestInvariants>;
     ConstitutiveModel cm;
 
     for (const auto i : TestInvariants::valid_invariants())
@@ -145,11 +145,12 @@ run()
         for (const auto kk : TestInvariants::valid_invariants())
           {
             if (kk == i)
-              dPsi_dIi *=
-                3.0 * std::pow(ConstitutiveModel::InvariantsType::Ii(kk, C, C_inv,G1,G2), 2);
+              dPsi_dIi *= 3.0 * std::pow(ConstitutiveModel::InvariantsType::Ii(
+                                           kk, C, C_inv, G1, G2),
+                                         2);
             else
-              dPsi_dIi *=
-                std::pow(ConstitutiveModel::InvariantsType::Ii(kk, C, C_inv,G1,G2), 3);
+              dPsi_dIi *= std::pow(
+                ConstitutiveModel::InvariantsType::Ii(kk, C, C_inv, G1, G2), 3);
           }
         cm.set_first_derivative_coefficient(i, dPsi_dIi);
 
@@ -164,22 +165,25 @@ run()
                   {
                     if (kk == i)
                       d2Psi_dIi_dIj *=
-                        6.0 * ConstitutiveModel::InvariantsType::Ii(kk, C, C_inv,G1,G2);
+                        6.0 * ConstitutiveModel::InvariantsType::Ii(
+                                kk, C, C_inv, G1, G2);
                     else
                       d2Psi_dIi_dIj *=
-                        std::pow(ConstitutiveModel::InvariantsType::Ii(kk, C, C_inv,G1,G2),
+                        std::pow(ConstitutiveModel::InvariantsType::Ii(
+                                   kk, C, C_inv, G1, G2),
                                  3);
                   }
                 else
                   {
                     if (kk == i || kk == j)
                       d2Psi_dIi_dIj *=
-                        3.0 *
-                        std::pow(ConstitutiveModel::InvariantsType::Ii(kk, C, C_inv,G1,G2),
-                                 2);
+                        3.0 * std::pow(ConstitutiveModel::InvariantsType::Ii(
+                                         kk, C, C_inv, G1, G2),
+                                       2);
                     else
                       d2Psi_dIi_dIj *=
-                        std::pow(ConstitutiveModel::InvariantsType::Ii(kk, C, C_inv,G1,G2),
+                        std::pow(ConstitutiveModel::InvariantsType::Ii(
+                                   kk, C, C_inv, G1, G2),
                                  3);
                   }
               }
@@ -188,19 +192,20 @@ run()
           }
       }
 
-    std::cout << "\nCmpd dPsi_dC: " << cm.get_dPsi_dC(C, C_inv,G1,G2)
+    std::cout << "\nCmpd dPsi_dC: " << cm.get_dPsi_dC(C, C_inv, G1, G2)
               << "\nExpt dPsi_dC: " << values.dPsi_dC << std::endl;
-    std::cout << "\nCmpd d2Psi_dC_dC: " << cm.get_d2Psi_dC_dC(C, C_inv,G1,G2)
+    std::cout << "\nCmpd d2Psi_dC_dC: " << cm.get_d2Psi_dC_dC(C, C_inv, G1, G2)
               << "\nExpt d2Psi_dC_dC: " << values.d2Psi_dC_dC << std::endl;
 
     const double tol = (dim == 2 ? 1e-6 : 1e-3);
-    Assert((cm.get_dPsi_dC(C, C_inv,G1,G2) - values.dPsi_dC).norm() < tol,
+    Assert((cm.get_dPsi_dC(C, C_inv, G1, G2) - values.dPsi_dC).norm() < tol,
            ExcMessage("No match in first derivative."));
-    Assert((cm.get_d2Psi_dC_dC(C, C_inv,G1,G2) - values.d2Psi_dC_dC).norm() < tol,
+    Assert((cm.get_d2Psi_dC_dC(C, C_inv, G1, G2) - values.d2Psi_dC_dC).norm() <
+             tol,
            ExcMessage("No match in second derivative."));
 
-    // Check that we clear with no errors.
-    cm.clear();
+    // Check that we reset with no errors.
+    cm.reset();
   }
 
   deallog << "OK" << std::endl;

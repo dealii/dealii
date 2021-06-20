@@ -329,27 +329,20 @@ namespace Physics
 
 
     template <typename InvariantClassification>
-    class UncoupledConstitutiveModel
+    class InvariantBasedConstitutiveModel
     {
     public:
       using InvariantsType = InvariantClassification;
+      using ScalarType     = typename InvariantClassification::ScalarType;
       static const unsigned int dimension = InvariantClassification::dimension;
-      using ScalarType = typename InvariantClassification::ScalarType;
+      static const unsigned int n_invariants;
 
-      static_assert(
-        std::is_same<InvariantClassification,
-                     Physics::Invariants::Isotropic<dimension, ScalarType>>::value ||
-                     std::is_same<InvariantClassification,
-                     Physics::Invariants::TransverseIsotropic<dimension, ScalarType>>::value ||
-                     std::is_same<InvariantClassification,
-                     Physics::Invariants::Orthotropic<dimension, ScalarType>>::value,
-        "Incompatible invariant class. This constitutive model class only supports " \
-        "invariants of Isotropic, TransverseIsotropic and Orthotropic materials.");
+      InvariantBasedConstitutiveModel();
 
-      UncoupledConstitutiveModel();
+      virtual ~InvariantBasedConstitutiveModel() = default;
 
       void
-      clear();
+      reset();
 
       void
       set_first_derivative_coefficient(const enum Invariants::AllInvariants &i,
@@ -360,16 +353,18 @@ namespace Physics
                                         const enum Invariants::AllInvariants &j,
                                         const ScalarType &value);
 
-      template <typename... Args>
-      SymmetricTensor<2, dimension, ScalarType>
-      get_dPsi_dC(const Args &... args) const;
+    protected:
+      const std::set<Invariants::AllInvariants> &
+      get_invariants() const;
 
-      template <typename... Args>
-      SymmetricTensor<4, dimension, ScalarType>
-      get_d2Psi_dC_dC(const Args &... args) const;
+      ScalarType
+      get_dPsi_dIi(const enum Invariants::AllInvariants &i) const;
+
+      ScalarType
+      get_d2Psi_dIi_dIj(const enum Invariants::AllInvariants &i,
+                        const enum Invariants::AllInvariants &j) const;
 
     private:
-      static const unsigned int n_invariants = InvariantClassification::n_invariants();
       const std::set<Invariants::AllInvariants> invariants;
 
       /**
@@ -446,6 +441,44 @@ namespace Physics
 
       unsigned int
       invariant_to_local_index(const enum Invariants::AllInvariants &i) const;
+    };
+
+
+
+    template <typename InvariantClassification>
+    class UncoupledConstitutiveModel
+      : public InvariantBasedConstitutiveModel<InvariantClassification>
+    {
+    public:
+      using typename InvariantBasedConstitutiveModel<
+        InvariantClassification>::InvariantsType;
+      using typename InvariantBasedConstitutiveModel<
+        InvariantClassification>::ScalarType;
+      static const unsigned int dimension =
+        InvariantBasedConstitutiveModel<InvariantClassification>::dimension;
+
+      static_assert(
+        std::is_same<
+          InvariantClassification,
+          Physics::Invariants::Isotropic<dimension, ScalarType>>::value ||
+          std::is_same<InvariantClassification,
+                       Physics::Invariants::
+                         TransverseIsotropic<dimension, ScalarType>>::value ||
+          std::is_same<
+            InvariantClassification,
+            Physics::Invariants::Orthotropic<dimension, ScalarType>>::value,
+        "Incompatible invariant class: This constitutive model class only supports "
+        "invariants of Isotropic, TransverseIsotropic and Orthotropic materials.");
+
+      UncoupledConstitutiveModel();
+
+      template <typename... Args>
+      SymmetricTensor<2, dimension, ScalarType>
+      get_dPsi_dC(const Args &... args) const;
+
+      template <typename... Args>
+      SymmetricTensor<4, dimension, ScalarType>
+      get_d2Psi_dC_dC(const Args &... args) const;
     };
 
 
@@ -716,17 +749,23 @@ namespace Physics
 
 
     template <typename InvariantClassification>
-    UncoupledConstitutiveModel<InvariantClassification>::
-      UncoupledConstitutiveModel()
+    InvariantBasedConstitutiveModel<
+      InvariantClassification>::InvariantBasedConstitutiveModel()
       : invariants(InvariantClassification::valid_invariants())
     {}
 
 
 
     template <typename InvariantClassification>
+    const unsigned int
+      InvariantBasedConstitutiveModel<InvariantClassification>::n_invariants =
+        InvariantClassification::n_invariants();
+
+
+
+    template <typename InvariantClassification>
     void
-    UncoupledConstitutiveModel<InvariantClassification>::
-      clear()
+    InvariantBasedConstitutiveModel<InvariantClassification>::reset()
     {
       for (auto &e : dPsi_dIi)
         e = dealii::internal::NumberType<ScalarType>::value(0.0);
@@ -740,7 +779,7 @@ namespace Physics
 
     template <typename InvariantClassification>
     void
-    UncoupledConstitutiveModel<InvariantClassification>::
+    InvariantBasedConstitutiveModel<InvariantClassification>::
       set_first_derivative_coefficient(const enum Invariants::AllInvariants &i,
                                        const ScalarType &value)
     {
@@ -754,7 +793,7 @@ namespace Physics
 
     template <typename InvariantClassification>
     void
-    UncoupledConstitutiveModel<InvariantClassification>::
+    InvariantBasedConstitutiveModel<InvariantClassification>::
       set_second_derivative_coefficient(const enum Invariants::AllInvariants &i,
                                         const enum Invariants::AllInvariants &j,
                                         const ScalarType &value)
@@ -771,25 +810,79 @@ namespace Physics
 
 
     template <typename InvariantClassification>
+    const std::set<Invariants::AllInvariants> &
+    InvariantBasedConstitutiveModel<InvariantClassification>::get_invariants()
+      const
+    {
+      return invariants;
+    }
+
+
+
+    template <typename InvariantClassification>
+    auto
+    InvariantBasedConstitutiveModel<InvariantClassification>::get_dPsi_dIi(
+      const enum Invariants::AllInvariants &i) const -> ScalarType
+    {
+      const unsigned int local_i = invariant_to_local_index(i);
+      return dPsi_dIi[local_i];
+    }
+
+
+
+    template <typename InvariantClassification>
+    auto
+    InvariantBasedConstitutiveModel<InvariantClassification>::get_d2Psi_dIi_dIj(
+      const enum Invariants::AllInvariants &i,
+      const enum Invariants::AllInvariants &j) const -> ScalarType
+    {
+      const unsigned int local_i = invariant_to_local_index(i);
+      const unsigned int local_j = invariant_to_local_index(j);
+      return d2Psi_dIi_dIj[local_i][local_j];
+    }
+
+
+
+    template <typename InvariantClassification>
+    unsigned int
+    InvariantBasedConstitutiveModel<InvariantClassification>::
+      invariant_to_local_index(const enum Invariants::AllInvariants &i) const
+    {
+      const auto it = invariants.find(i);
+      Assert(it != invariants.end(),
+             ExcMessage("Invariant not found in invariant list."));
+      return std::distance(invariants.begin(), it);
+    }
+
+
+
+    template <typename InvariantClassification>
+    UncoupledConstitutiveModel<
+      InvariantClassification>::UncoupledConstitutiveModel()
+      : InvariantBasedConstitutiveModel<InvariantClassification>()
+    {}
+
+
+
+    template <typename InvariantClassification>
     template <typename... Args>
     auto
-    UncoupledConstitutiveModel<InvariantClassification>::
-      get_dPsi_dC(const Args &... args) const
-      -> SymmetricTensor<2, dimension, ScalarType>
+    UncoupledConstitutiveModel<InvariantClassification>::get_dPsi_dC(
+      const Args &... args) const -> SymmetricTensor<2, dimension, ScalarType>
     {
       SymmetricTensor<2, dimension, ScalarType> dPsi_dC;
 
-      for (const auto i : invariants)
+      for (const auto i : this->get_invariants())
         {
-          const unsigned int local_i = invariant_to_local_index(i);
+          const ScalarType dPsi_dIi = this->get_dPsi_dIi(i);
 
           // Since computing tensor derivatives is really expensive, we
           // only do so if the scalar coefficient is non-zero. But we
           // can only do this optimisation for floating point types!
           // We need to ensure that we track ALL sensitivities for
           // AD and SD types
-          if (internal::add_invariant_contribution(dPsi_dIi[local_i]) == true)
-            dPsi_dC += dPsi_dIi[local_i] * InvariantClassification::dIi_dC(i, args...);
+          if (internal::add_invariant_contribution(dPsi_dIi) == true)
+            dPsi_dC += dPsi_dIi * InvariantClassification::dIi_dC(i, args...);
         }
 
       return dPsi_dC;
@@ -800,45 +893,32 @@ namespace Physics
     template <typename InvariantClassification>
     template <typename... Args>
     auto
-    UncoupledConstitutiveModel<InvariantClassification>::
-      get_d2Psi_dC_dC(const Args &... args) const
-      -> SymmetricTensor<4, dimension, ScalarType>
+    UncoupledConstitutiveModel<InvariantClassification>::get_d2Psi_dC_dC(
+      const Args &... args) const -> SymmetricTensor<4, dimension, ScalarType>
     {
       SymmetricTensor<4, dimension, ScalarType> d2Psi_dC_dC;
 
-      for (const auto i : invariants)
+      for (const auto i : this->get_invariants())
         {
-          const unsigned int local_i = invariant_to_local_index(i);
-          if (internal::add_invariant_contribution(dPsi_dIi[local_i]) == true)
-            d2Psi_dC_dC +=
-              dPsi_dIi[local_i] * InvariantClassification::d2Ii_dC_dC(i, args...);
+          const ScalarType dPsi_dIi = this->get_dPsi_dIi(i);
 
-          for (const auto j : invariants)
+          if (internal::add_invariant_contribution(dPsi_dIi) == true)
+            d2Psi_dC_dC +=
+              dPsi_dIi * InvariantClassification::d2Ii_dC_dC(i, args...);
+
+          for (const auto j : this->get_invariants())
             {
-              const unsigned int local_j = invariant_to_local_index(j);
-              if (internal::add_invariant_contribution(
-                    d2Psi_dIi_dIj[local_i][local_j]) == true)
+              const ScalarType d2Psi_dIi_dIj = this->get_d2Psi_dIi_dIj(i, j);
+
+              if (internal::add_invariant_contribution(d2Psi_dIi_dIj) == true)
                 d2Psi_dC_dC +=
-                  d2Psi_dIi_dIj[local_i][local_j] *
+                  d2Psi_dIi_dIj *
                   outer_product(InvariantClassification::dIi_dC(i, args...),
                                 InvariantClassification::dIi_dC(j, args...));
             }
         }
 
       return d2Psi_dC_dC;
-    }
-
-
-
-    template <typename InvariantClassification>
-    unsigned int
-    UncoupledConstitutiveModel<InvariantClassification>::
-      invariant_to_local_index(const enum Invariants::AllInvariants &i) const
-    {
-      const auto it = invariants.find(i);
-      Assert(it != invariants.end(),
-             ExcMessage("Invariant not found in invariant list."));
-      return std::distance(invariants.begin(), it);
     }
 
   } // namespace ConstitutiveModelling

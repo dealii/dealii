@@ -299,7 +299,7 @@ namespace Physics
     struct Isotropic
     {
       static const unsigned int dimension = dim;
-      using ScalarType = ScalarType_;
+      using ScalarType                    = ScalarType_;
 
       /**
        * Get the set of invariants that are valid for isotropic media.
@@ -368,7 +368,7 @@ namespace Physics
     struct TransverseIsotropic
     {
       static const unsigned int dimension = dim;
-      using ScalarType = ScalarType_;
+      using ScalarType                    = ScalarType_;
 
       /**
        * Get the set of invariants that are valid for transverse isotropic
@@ -448,7 +448,7 @@ namespace Physics
     struct Orthotropic
     {
       static const unsigned int dimension = dim;
-      using ScalarType = ScalarType_;
+      using ScalarType                    = ScalarType_;
 
       /**
        * Get the set of invariants that are valid for orthotropic media.
@@ -533,7 +533,7 @@ namespace Physics
     struct CoupledIsotropic
     {
       static const unsigned int dimension = dim;
-      using ScalarType = ScalarType_;
+      using ScalarType                    = ScalarType_;
 
       /**
        * Get the set of invariants that are valid for field-coupled isotropic
@@ -692,7 +692,7 @@ namespace Physics
     struct CoupledTransverseIsotropic
     {
       static const unsigned int dimension = dim;
-      using ScalarType = ScalarType_;
+      using ScalarType                    = ScalarType_;
 
       /**
        * Get the set of invariants that are valid for field-coupled transverse

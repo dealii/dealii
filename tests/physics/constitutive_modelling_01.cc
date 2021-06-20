@@ -120,8 +120,7 @@ run()
   {
     const Values<dim> values = compute_derivatives_using_AD(C, get_psi_ad);
 
-    using ConstitutiveModel =
-      UncoupledConstitutiveModel<TestInvariants>;
+    using ConstitutiveModel = UncoupledConstitutiveModel<TestInvariants>;
     ConstitutiveModel cm;
 
     for (const auto i : TestInvariants::valid_invariants())
@@ -185,8 +184,8 @@ run()
     Assert((cm.get_d2Psi_dC_dC(C, C_inv) - values.d2Psi_dC_dC).norm() < tol,
            ExcMessage("No match in second derivative."));
 
-    // Check that we clear with no errors.
-    cm.clear();
+    // Check that we reset with no errors.
+    cm.reset();
   }
 
   deallog << "OK" << std::endl;

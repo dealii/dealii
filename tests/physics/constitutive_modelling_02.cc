@@ -105,7 +105,7 @@ run()
   // differentiated.
   const psi_function_type<dim> get_psi_ad =
     [&G](const SymmetricTensor<2, dim, ADNumberType> &C_ad) -> ADNumberType {
-      const SymmetricTensor<2, dim, ADNumberType> C_inv_ad = invert(C_ad);
+    const SymmetricTensor<2, dim, ADNumberType> C_inv_ad = invert(C_ad);
 
     ADNumberType psi_ad = 1.0;
 
@@ -128,8 +128,7 @@ run()
   {
     const Values<dim> values = compute_derivatives_using_AD(C, get_psi_ad);
 
-    using ConstitutiveModel =
-      UncoupledConstitutiveModel<TestInvariants>;
+    using ConstitutiveModel = UncoupledConstitutiveModel<TestInvariants>;
     ConstitutiveModel cm;
 
     for (const auto i : TestInvariants::valid_invariants())
@@ -140,10 +139,13 @@ run()
           {
             if (kk == i)
               dPsi_dIi *=
-                3.0 * std::pow(ConstitutiveModel::InvariantsType::Ii(kk, C, C_inv, G), 2);
+                3.0 *
+                std::pow(ConstitutiveModel::InvariantsType::Ii(kk, C, C_inv, G),
+                         2);
             else
               dPsi_dIi *=
-                std::pow(ConstitutiveModel::InvariantsType::Ii(kk, C, C_inv, G), 3);
+                std::pow(ConstitutiveModel::InvariantsType::Ii(kk, C, C_inv, G),
+                         3);
           }
         cm.set_first_derivative_coefficient(i, dPsi_dIi);
 
@@ -158,23 +160,24 @@ run()
                   {
                     if (kk == i)
                       d2Psi_dIi_dIj *=
-                        6.0 * ConstitutiveModel::InvariantsType::Ii(kk, C, C_inv, G);
+                        6.0 *
+                        ConstitutiveModel::InvariantsType::Ii(kk, C, C_inv, G);
                     else
-                      d2Psi_dIi_dIj *=
-                        std::pow(ConstitutiveModel::InvariantsType::Ii(kk, C, C_inv, G),
-                                 3);
+                      d2Psi_dIi_dIj *= std::pow(
+                        ConstitutiveModel::InvariantsType::Ii(kk, C, C_inv, G),
+                        3);
                   }
                 else
                   {
                     if (kk == i || kk == j)
                       d2Psi_dIi_dIj *=
-                        3.0 *
-                        std::pow(ConstitutiveModel::InvariantsType::Ii(kk, C, C_inv, G),
-                                 2);
+                        3.0 * std::pow(ConstitutiveModel::InvariantsType::Ii(
+                                         kk, C, C_inv, G),
+                                       2);
                     else
-                      d2Psi_dIi_dIj *=
-                        std::pow(ConstitutiveModel::InvariantsType::Ii(kk, C, C_inv, G),
-                                 3);
+                      d2Psi_dIi_dIj *= std::pow(
+                        ConstitutiveModel::InvariantsType::Ii(kk, C, C_inv, G),
+                        3);
                   }
               }
 
@@ -193,8 +196,8 @@ run()
     Assert((cm.get_d2Psi_dC_dC(C, C_inv, G) - values.d2Psi_dC_dC).norm() < tol,
            ExcMessage("No match in second derivative."));
 
-    // Check that we clear with no errors.
-    cm.clear();
+    // Check that we reset with no errors.
+    cm.reset();
   }
 
   deallog << "OK" << std::endl;
