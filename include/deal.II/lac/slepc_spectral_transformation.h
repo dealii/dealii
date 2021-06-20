@@ -93,7 +93,7 @@ namespace SLEPcWrappers
      *
      * The possible values are given by the enumerator STMatMode in the SLEPc
      * library
-     * http://www.grycap.upv.es/slepc/documentation/current/docs/manualpages/ST/STMatMode.html
+     * https://slepc.upv.es/documentation/current/docs/manualpages/ST/STMatMode.html
      */
     void
     set_matrix_mode(const STMatMode mode);
