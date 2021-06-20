@@ -44,7 +44,7 @@ eigenspectrum and how many solutions we want to solve for.
 
 In this program, the eigenspectrum solvers we use are classes provided
 by deal.II that wrap around the linear algebra implementation of the
-<a href="http://www.grycap.upv.es/slepc/" target="_top">SLEPc</a>
+<a href="https://slepc.upv.es/" target="_top">SLEPc</a>
 library; SLEPc itself builds on the <a
 href="http://www.mcs.anl.gov/petsc/" target="_top">PETSc</a> library
 for linear algebra contents.
