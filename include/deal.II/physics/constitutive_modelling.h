@@ -468,7 +468,7 @@ namespace Physics
             InvariantClassification,
             Physics::Invariants::Orthotropic<dimension, ScalarType>>::value,
         "Incompatible invariant class: This constitutive model class only supports "
-        "invariants of Isotropic, TransverseIsotropic and Orthotropic materials.");
+        "invariants of isotropic, transverse isotropic and orthotropic materials.");
 
       UncoupledConstitutiveModel();
 
@@ -482,86 +482,57 @@ namespace Physics
     };
 
 
-    //   // virtual SymmetricTensor<2, dim, ScalarType>
-    //   // get_dPsi_dC(const Coupled_Material_Values<dim, ScalarType> &values)
-    //   // const
-    //   // {
-    //   //   SymmetricTensor<2, dim, ScalarType> dPsi_dC;
 
-    //   //   for (typename std::vector<int>::const_iterator it =
-    //   //   Coupled_Material_Invariants::invariants.begin();
-    //   //        it != Coupled_Material_Invariants::invariants.end();
-    //   //        ++it)
-    //   //     {
-    //   //       const int &      i        = *it;
-    //   //       const ScalarType dPsi_dIi = get_dPsi_dIi(i, values);
+    template <typename InvariantClassification>
+    class OneVectorFieldCoupledConstitutiveModel
+      : public InvariantBasedConstitutiveModel<InvariantClassification>
+    {
+    public:
+      using typename InvariantBasedConstitutiveModel<
+        InvariantClassification>::InvariantsType;
+      using typename InvariantBasedConstitutiveModel<
+        InvariantClassification>::ScalarType;
+      static const unsigned int dimension =
+        InvariantBasedConstitutiveModel<InvariantClassification>::dimension;
 
-    //   //       // Since computing tensor derivatives is really expensive, we
-    //   //       // only do so if the scalar coefficient is non-zero. But we
-    //   //       // can only do this optimisation for floating point types!
-    //   //       // We need to ensure that we track ALL sensitivities for
-    //   //       // AD and SD types
-    //   //       if (add_invariant_contribution(dPsi_dIi) == true)
-    //   //         dPsi_dC += dPsi_dIi *
-    //   //         Coupled_Material_Invariants::dIi_dC<dim>(i, values.H,
-    //   values.C,
-    //   //         values.C_inv);
-    //   //     }
+      static_assert(
+        std::is_same<InvariantClassification,
+                     Physics::Invariants::
+                       CoupledIsotropic<dimension, ScalarType>>::value ||
+          std::is_same<
+            InvariantClassification,
+            Physics::Invariants::CoupledTransverseIsotropic<dimension,
+                                                            ScalarType>>::value,
+        "Incompatible invariant class: This constitutive model class only supports "
+        "invariants of coupled isotropic and coupled transverse isotropic materials.");
 
-    //   //   return dPsi_dC;
-    //   // }
+      OneVectorFieldCoupledConstitutiveModel();
 
-    //   // /**
-    //   //  * @copydoc Coupled_ME_Constitutive_Law_Base::get_d2Psi_dC_dC()
-    //   //  *
-    //   //  * @note In the current implementation, it is assumed that there are no cross-terms
-    //   //  * involving invariants (e.g. Psi += I1*I4*I7) and that the energy
-    //   is
-    //   //  linear
-    //   //  * in terms of the invariants.
-    //   //  */
-    //   // virtual SymmetricTensor<4, dim, ScalarType>
-    //   // get_d2Psi_dC_dC(const Coupled_Material_Values<dim, ScalarType>
-    //   &values)
-    //   // const
-    //   // {
-    //   //   SymmetricTensor<4, dim, ScalarType> d2Psi_dC_dC;
+      template <typename... Args>
+      SymmetricTensor<2, dimension, ScalarType>
+      get_dPsi_dC(const Args &... args) const;
 
-    //   //   for (typename std::vector<int>::const_iterator it1 =
-    //   //   Coupled_Material_Invariants::invariants.begin();
-    //   //        it1 != Coupled_Material_Invariants::invariants.end();
-    //   //        ++it1)
-    //   //     {
-    //   //       const int &      i        = *it1;
-    //   //       const ScalarType dPsi_dIi = get_dPsi_dIi(i, values);
+      template <typename... Args>
+      Tensor<1, dimension, ScalarType>
+      get_dPsi_dH(const Args &... args) const;
 
-    //   //       if (add_invariant_contribution(dPsi_dIi) == true)
-    //   //         d2Psi_dC_dC += dPsi_dIi *
-    //   //         Coupled_Material_Invariants::d2Ii_dC_dC<dim>(i, values.H,
-    //   //         values.C, values.C_inv);
+      template <typename... Args>
+      SymmetricTensor<4, dimension, ScalarType>
+      get_d2Psi_dC_dC(const Args &... args) const;
 
-    //   //       for (typename std::vector<int>::const_iterator it2 =
-    //   //       Coupled_Material_Invariants::invariants.begin();
-    //   //            it2 != Coupled_Material_Invariants::invariants.end();
-    //   //            ++it2)
-    //   //         {
-    //   //           const int &      j             = *it2;
-    //   //           const ScalarType d2Psi_dIi_dIj = get_d2Psi_dIi_dIj(i, j,
-    //   //           values);
+      template <typename... Args>
+      SymmetricTensor<2, dimension, ScalarType>
+      get_d2Psi_dH_dH(const Args &... args) const;
 
-    //   //           if (add_invariant_contribution(d2Psi_dIi_dIj) == true)
-    //   //             d2Psi_dC_dC += d2Psi_dIi_dIj *
-    //   // outer_product(Coupled_Material_Invariants::dIi_dC<dim>(i,
-    //   //             values.H, values.C, values.C_inv),
-    //   // Coupled_Material_Invariants::dIi_dC<dim>(j,
-    //   //                                                          values.H,
-    //   //                                                          values.C,
-    //   // values.C_inv));
-    //   //         }
-    //   //     }
+      template <typename... Args>
+      Tensor<3, dimension, ScalarType>
+      get_d2Psi_dC_dH(const Args &... args) const;
 
-    //   //   return d2Psi_dC_dC;
-    //   // }
+      template <typename... Args>
+      Tensor<3, dimension, ScalarType>
+      get_d2Psi_dH_dC(const Args &... args) const;
+    };
+
 
     //   // /**
     //   //  * @copydoc Coupled_ME_Constitutive_Law_Base::get_dPsi_dH()
@@ -919,6 +890,188 @@ namespace Physics
         }
 
       return d2Psi_dC_dC;
+    }
+
+
+
+    template <typename InvariantClassification>
+    OneVectorFieldCoupledConstitutiveModel<
+      InvariantClassification>::OneVectorFieldCoupledConstitutiveModel()
+      : InvariantBasedConstitutiveModel<InvariantClassification>()
+    {}
+
+
+
+    template <typename InvariantClassification>
+    template <typename... Args>
+    auto
+    OneVectorFieldCoupledConstitutiveModel<
+      InvariantClassification>::get_dPsi_dC(const Args &... args) const
+      -> SymmetricTensor<2, dimension, ScalarType>
+    {
+      SymmetricTensor<2, dimension, ScalarType> dPsi_dC;
+
+      for (const auto i : this->get_invariants())
+        {
+          const ScalarType dPsi_dIi = this->get_dPsi_dIi(i);
+
+          // Since computing tensor derivatives is really expensive, we
+          // only do so if the scalar coefficient is non-zero. But we
+          // can only do this optimisation for floating point types!
+          // We need to ensure that we track ALL sensitivities for
+          // AD and SD types
+          if (internal::add_invariant_contribution(dPsi_dIi) == true)
+            dPsi_dC += dPsi_dIi * InvariantClassification::dIi_dC(i, args...);
+        }
+
+      return dPsi_dC;
+    }
+
+
+
+    template <typename InvariantClassification>
+    template <typename... Args>
+    auto
+    OneVectorFieldCoupledConstitutiveModel<
+      InvariantClassification>::get_dPsi_dH(const Args &... args) const
+      -> Tensor<1, dimension, ScalarType>
+    {
+      Tensor<1, dimension, ScalarType> dPsi_dH;
+
+      for (const auto i : this->get_invariants())
+        {
+          const ScalarType dPsi_dIi = this->get_dPsi_dIi(i);
+
+          if (internal::add_invariant_contribution(dPsi_dIi) == true)
+            dPsi_dH += dPsi_dIi * InvariantClassification::dIi_dH(i, args...);
+        }
+
+      return dPsi_dH;
+    }
+
+
+
+    template <typename InvariantClassification>
+    template <typename... Args>
+    auto
+    OneVectorFieldCoupledConstitutiveModel<
+      InvariantClassification>::get_d2Psi_dC_dC(const Args &... args) const
+      -> SymmetricTensor<4, dimension, ScalarType>
+    {
+      SymmetricTensor<4, dimension, ScalarType> d2Psi_dC_dC;
+
+      for (const auto i : this->get_invariants())
+        {
+          const ScalarType dPsi_dIi = this->get_dPsi_dIi(i);
+
+          if (internal::add_invariant_contribution(dPsi_dIi) == true)
+            d2Psi_dC_dC +=
+              dPsi_dIi * InvariantClassification::d2Ii_dC_dC(i, args...);
+
+          for (const auto j : this->get_invariants())
+            {
+              const ScalarType d2Psi_dIi_dIj = this->get_d2Psi_dIi_dIj(i, j);
+
+              if (internal::add_invariant_contribution(d2Psi_dIi_dIj) == true)
+                d2Psi_dC_dC +=
+                  d2Psi_dIi_dIj *
+                  outer_product(InvariantClassification::dIi_dC(i, args...),
+                                InvariantClassification::dIi_dC(j, args...));
+            }
+        }
+
+      return d2Psi_dC_dC;
+    }
+
+
+
+    template <typename InvariantClassification>
+    template <typename... Args>
+    auto
+    OneVectorFieldCoupledConstitutiveModel<
+      InvariantClassification>::get_d2Psi_dH_dH(const Args &... args) const
+      -> SymmetricTensor<2, dimension, ScalarType>
+    {
+      SymmetricTensor<2, dimension, ScalarType> d2Psi_dH_dH;
+
+      for (const auto i : this->get_invariants())
+        {
+          const ScalarType dPsi_dIi = this->get_dPsi_dIi(i);
+
+          if (internal::add_invariant_contribution(dPsi_dIi) == true)
+            d2Psi_dH_dH +=
+              dPsi_dIi * InvariantClassification::d2Ii_dH_dH(i, args...);
+
+          for (const auto j : this->get_invariants())
+            {
+              const ScalarType d2Psi_dIi_dIj = this->get_d2Psi_dIi_dIj(i, j);
+
+              if (internal::add_invariant_contribution(d2Psi_dIi_dIj) == true)
+                d2Psi_dH_dH +=
+                  d2Psi_dIi_dIj *
+                  symmetrize(
+                    outer_product(InvariantClassification::dIi_dH(i, args...),
+                                  InvariantClassification::dIi_dH(j, args...)));
+            }
+        }
+
+      return d2Psi_dH_dH;
+    }
+
+
+
+    template <typename InvariantClassification>
+    template <typename... Args>
+    auto
+    OneVectorFieldCoupledConstitutiveModel<
+      InvariantClassification>::get_d2Psi_dC_dH(const Args &... args) const
+      -> Tensor<3, dimension, ScalarType>
+    {
+      Tensor<3, dimension, ScalarType> d2Psi_dC_dH;
+
+      for (const auto i : this->get_invariants())
+        {
+          const ScalarType dPsi_dIi = this->get_dPsi_dIi(i);
+
+          if (internal::add_invariant_contribution(dPsi_dIi) == true)
+            d2Psi_dC_dH +=
+              dPsi_dIi * InvariantClassification::d2Ii_dC_dH(i, args...);
+
+          for (const auto j : this->get_invariants())
+            {
+              const ScalarType d2Psi_dIi_dIj = this->get_d2Psi_dIi_dIj(i, j);
+
+              if (internal::add_invariant_contribution(d2Psi_dIi_dIj) == true)
+                d2Psi_dC_dH +=
+                  d2Psi_dIi_dIj *
+                  outer_product(static_cast<Tensor<2, dimension, ScalarType>>(
+                                  InvariantClassification::dIi_dC(i, args...)),
+                                InvariantClassification::dIi_dH(j, args...));
+            }
+        }
+
+      return d2Psi_dC_dH;
+    }
+
+
+
+    template <typename InvariantClassification>
+    template <typename... Args>
+    auto
+    OneVectorFieldCoupledConstitutiveModel<
+      InvariantClassification>::get_d2Psi_dH_dC(const Args &... args) const
+      -> Tensor<3, dimension, ScalarType>
+    {
+      const Tensor<3, dimension, ScalarType> d2Psi_dC_dH =
+        get_d2Psi_dC_dH(args...);
+      Tensor<3, dimension, ScalarType> d2Psi_dH_dC;
+
+      for (unsigned int A = 0; A < dimension; ++A)
+        for (unsigned int B = 0; B < dimension; ++B)
+          for (unsigned int C = 0; C < dimension; ++C)
+            d2Psi_dH_dC[A][B][C] = d2Psi_dC_dH[C][B][A];
+
+      return d2Psi_dH_dC;
     }
 
   } // namespace ConstitutiveModelling
