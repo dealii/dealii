@@ -923,19 +923,7 @@ namespace StandardExceptions
   DeclException2(ExcDimensionMismatch,
                  std::size_t,
                  std::size_t,
-                 << "This assertion checks that the size or dimension "
-                    "of one object equals a specific value or the size "
-                    "or another object. Here, the sizes being compared are <"
-                 << arg1 << "> and <" << arg2
-                 << ">, but these are not the same."
-                    "\n\n"
-                    "Examples where this happens is if one tries to add "
-                    "two vectors of different sizes, or if one tries to "
-                    "access a vector element that has not been initialized "
-                    "and consequently has size zero. Indeed, if one of the "
-                    "two sizes shown above are zero, then the most common "
-                    "case is access to objects that have not been "
-                    "initialized to the correct size.");
+                 << "Dimension " << arg1 << " not equal to " << arg2 << ".");
 
   /**
    * The first dimension should be either equal to the second or the third,
@@ -945,9 +933,8 @@ namespace StandardExceptions
                  int,
                  int,
                  int,
-                 << "The size of one object, " << arg1
-                 << ", is supposed to be equal to either " << arg2 << " or "
-                 << arg3 << ", but it is not.");
+                 << "Dimension " << arg1 << " neither equal to " << arg2
+                 << " nor to " << arg3 << ".");
 
   /**
    * This exception indicates that an index is not within the expected range.
@@ -1623,11 +1610,25 @@ namespace deal_II_exceptions
      * different types (e.g., unsigned and signed variables).
      */
     template <typename T, typename U>
-    inline bool
-    compare_for_equality(const T &dim1, const U &dim2)
+    inline constexpr bool
+    compare_for_equality(const T &t, const U &u)
     {
       using common_type = typename std::common_type<T, U>::type;
-      return static_cast<common_type>(dim1) == static_cast<common_type>(dim2);
+      return static_cast<common_type>(t) == static_cast<common_type>(u);
+    }
+
+
+    /**
+     * A function that compares two values with `operator<`, after converting to
+     * a common type to avoid compiler warnings when comparing objects of
+     * different types (e.g., unsigned and signed variables).
+     */
+    template <typename T, typename U>
+    inline constexpr bool
+    compare_less_than(const T &t, const U &u)
+    {
+      using common_type = typename std::common_type<T, U>::type;
+      return (static_cast<common_type>(t) < static_cast<common_type>(u));
     }
   } // namespace internals
 } // namespace deal_II_exceptions
@@ -1720,12 +1721,7 @@ namespace internal
  */
 #define AssertIndexRange(index, range)                                         \
   Assert(                                                                      \
-    static_cast<typename ::dealii::internal::argument_type<void(               \
-        typename std::common_type<decltype(index), decltype(range)>::type)>::  \
-                  type>(index) <                                               \
-      static_cast<typename ::dealii::internal::argument_type<void(             \
-        typename std::common_type<decltype(index), decltype(range)>::type)>::  \
-                    type>(range),                                              \
+    ::dealii::deal_II_exceptions::internals::compare_less_than(index, range),  \
     dealii::ExcIndexRangeType<typename ::dealii::internal::argument_type<void( \
       typename std::common_type<decltype(index), decltype(range)>::type)>::    \
                                 type>((index), 0, (range)))
