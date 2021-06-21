@@ -208,10 +208,17 @@ namespace RepartitioningPolicyTools
       // the same number of cells; if there is a remainder, we assign the
       // first processes an additional cell (so that the difference of number of
       // locally owned cells is never larger than one between processes).
-      if (i < (i / min_cells) * min_cells + (n_global_active_cells % min_cells))
-        return i / (min_cells + 1);
-      else
-        return (i - (n_global_active_cells % min_cells)) / min_cells;
+      const unsigned int n_partitions_with_additional_cell =
+        n_global_active_cells - min_cells * n_partitions;
+
+      const unsigned int rank =
+        (i < (min_cells + 1) * n_partitions_with_additional_cell) ?
+          (i / (min_cells + 1)) :
+          ((i - n_partitions_with_additional_cell) / min_cells);
+
+      AssertIndexRange(rank, n_partitions);
+
+      return rank;
     };
 
     for (const auto i : partition.locally_owned_elements())
