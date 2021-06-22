@@ -1376,15 +1376,24 @@ QGaussSimplex<dim>::QGaussSimplex(const unsigned int n_points_1D)
         }
       else if (n_points_1D == 2)
         {
-          const double Q23 = 2.0 / 3.0;
-          const double Q16 = 1.0 / 6.0;
+          // The Hillion 7 scheme, as communicated by quadpy
+          //
+          // See: Numerical Integration on a Triangle, International Journal for
+          // Numerical Methods in Engineering, 1977
+          const double Q12 = 1.0 / 2.0;
+          this->quadrature_points.emplace_back(0.17855872826361643,
+                                               0.1550510257216822);
+          this->quadrature_points.emplace_back(0.07503111022260812,
+                                               0.6449489742783178);
+          this->quadrature_points.emplace_back(0.6663902460147014,
+                                               0.1550510257216822);
+          this->quadrature_points.emplace_back(0.28001991549907407,
+                                               0.6449489742783178);
 
-          this->quadrature_points.emplace_back(Q23, Q16);
-          this->quadrature_points.emplace_back(Q16, Q23);
-          this->quadrature_points.emplace_back(Q16, Q16);
-          this->weights.emplace_back(Q16);
-          this->weights.emplace_back(Q16);
-          this->weights.emplace_back(Q16);
+          this->weights.emplace_back(0.31804138174397717 * Q12);
+          this->weights.emplace_back(0.18195861825602283 * Q12);
+          this->weights.emplace_back(0.31804138174397717 * Q12);
+          this->weights.emplace_back(0.18195861825602283 * Q12);
         }
       else if (n_points_1D == 3)
         {
@@ -1429,48 +1438,46 @@ QGaussSimplex<dim>::QGaussSimplex(const unsigned int n_points_1D)
           this->quadrature_points.emplace_back(Q14, Q14, Q14);
           this->weights.emplace_back(Q16);
         }
+      // The Xiao Gimbutas 03 scheme, as communicated by quadpy
+      //
+      // See: A numerical algorithm for the construction of efficient quadrature
+      // rules in two and higher dimensions, Computers & Mathematics with
+      // Applications, 2010
       else if (n_points_1D == 2)
         {
-          const double Q124 = 1.0 / 6.0 / 4.0;
+          const double Q16 = 1.0 / 6.0;
+          this->weights.emplace_back(0.1223220027573451 * Q16);
+          this->weights.emplace_back(0.1280664127107469 * Q16);
+          this->weights.emplace_back(0.1325680271444452 * Q16);
+          this->weights.emplace_back(0.1406244096604032 * Q16);
+          this->weights.emplace_back(0.2244151669175574 * Q16);
+          this->weights.emplace_back(0.2520039808095023 * Q16);
 
-          const double palpha = (5.0 + 3.0 * sqrt(5.0)) / 20.0;
-          const double pbeta  = (5.0 - sqrt(5.0)) / 20.0;
-          this->quadrature_points.emplace_back(pbeta, pbeta, pbeta);
-          this->quadrature_points.emplace_back(palpha, pbeta, pbeta);
-          this->quadrature_points.emplace_back(pbeta, palpha, pbeta);
-          this->quadrature_points.emplace_back(pbeta, pbeta, palpha);
-          this->weights.emplace_back(Q124);
-          this->weights.emplace_back(Q124);
-          this->weights.emplace_back(Q124);
-          this->weights.emplace_back(Q124);
+          this->quadrature_points.emplace_back(0.1620014916985245,
+                                               0.1838503504920977,
+                                               0.01271836631368145);
+          this->quadrature_points.emplace_back(0.01090521221118924,
+                                               0.2815238021235462,
+                                               0.3621268299455338);
+          this->quadrature_points.emplace_back(0.1901170024392839,
+                                               0.01140332944455717,
+                                               0.3586207204668839);
+          this->quadrature_points.emplace_back(0.170816925164989,
+                                               0.1528181430909273,
+                                               0.6384932999617267);
+          this->quadrature_points.emplace_back(0.1586851632274406,
+                                               0.5856628056552158,
+                                               0.1308471689520965);
+          this->quadrature_points.emplace_back(0.5712260521491151,
+                                               0.1469183900871696,
+                                               0.1403728057942107);
         }
+      // Past this point the best rules (positive weights, minimal number of
+      // points) we have right now are the Witherden-Vincent ones
       else if (n_points_1D == 3)
         {
-          const double Q16 = 1.0 / 6.0;
-
-          // clang-format off
-            this->quadrature_points.emplace_back(0.5684305841968444, 0.1438564719343852, 0.1438564719343852);
-            this->quadrature_points.emplace_back(0.1438564719343852, 0.1438564719343852, 0.1438564719343852);
-            this->quadrature_points.emplace_back(0.1438564719343852, 0.1438564719343852, 0.5684305841968444);
-            this->quadrature_points.emplace_back(0.1438564719343852, 0.5684305841968444, 0.1438564719343852);
-            this->quadrature_points.emplace_back(0.0000000000000000, 0.5000000000000000, 0.5000000000000000);
-            this->quadrature_points.emplace_back(0.5000000000000000, 0.0000000000000000, 0.5000000000000000);
-            this->quadrature_points.emplace_back(0.5000000000000000, 0.5000000000000000, 0.0000000000000000);
-            this->quadrature_points.emplace_back(0.5000000000000000, 0.0000000000000000, 0.0000000000000000);
-            this->quadrature_points.emplace_back(0.0000000000000000, 0.5000000000000000, 0.0000000000000000);
-            this->quadrature_points.emplace_back(0.0000000000000000, 0.0000000000000000, 0.5000000000000000);
-          // clang-format on
-
-          this->weights.emplace_back(0.2177650698804054 * Q16);
-          this->weights.emplace_back(0.2177650698804054 * Q16);
-          this->weights.emplace_back(0.2177650698804054 * Q16);
-          this->weights.emplace_back(0.2177650698804054 * Q16);
-          this->weights.emplace_back(0.0214899534130631 * Q16);
-          this->weights.emplace_back(0.0214899534130631 * Q16);
-          this->weights.emplace_back(0.0214899534130631 * Q16);
-          this->weights.emplace_back(0.0214899534130631 * Q16);
-          this->weights.emplace_back(0.0214899534130631 * Q16);
-          this->weights.emplace_back(0.0214899534130631 * Q16);
+          Quadrature<dim>::operator=(
+            QWitherdenVincentSimplex<dim>(n_points_1D));
         }
       else if (n_points_1D == 4)
         {
