@@ -54,18 +54,42 @@
 # resulting output can be piped into a data file and then be visualized
 # by importing into a spreadsheet, or using the following GNUPLOT script:
 #
-#    set xdata time
-#    set timefmt "%Y-%m-%d"
-#    set xrange ["1997-11-01":"2018-08-01"]
-#    set format x "%Y"
-#    set style data lines
-#    set key top left
-#    
-#    set terminal png
-#    set output "line-count.png"
-#    
-#    plot "< cat line-count.dat | sort" using 1:2 title "Lines of code in source files", \
-#         "" using 1:3 title "Lines of code in tests"
+#  set xdata time
+#  set timefmt "%Y-%m-%d"
+#  set xrange ["1997-11-01":"2021-12-31"]
+#  set yrange [0:1000000]
+#  set format x "%Y"
+#  set style data lines
+#  set key top left
+#  
+#  unset arrow
+#  unset label
+#  
+#  set arrow from "2021-06-18",400000 to "2021-06-18",700000 head
+#  set label "9.3" at "2021-06-18",375000
+#  
+#  set arrow from "2020-05-20",350000 to "2020-05-20",650000 head
+#  set label "9.2" at "2020-05-20",325000
+#  
+#  set arrow from "2019-05-21",300000 to "2019-05-21",600000 head
+#  set label "9.1" at "2019-05-21",275000
+#  
+#  set arrow from "2018-05-11",250000 to "2018-05-11",550000 head lw 2
+#  set label "9.0" at "2018-05-11",225000
+#  
+#  set arrow from "2013-07-24",150000 to "2013-07-24",450000 head lw 2
+#  set label "8.0" at "2013-07-24",125000
+#  
+#  set arrow from "2011-01-09",100000 to "2011-01-09",400000 head lw 2
+#  set label "7.0" at "2011-01-09",75000
+#  
+#  
+#  set terminal png
+#  set output "line-count.png"
+#      
+#  plot "< cat line-count.dat | sort" using 1:2 title "Lines of code in source files", \
+#       "" using 1:3 title "Lines of code in tests", \
+#       "< echo 2018-01-01 700000 ; echo 2022-01-01 900000" using 1:2 title "50,000 lines per year"
 #
 #
 
