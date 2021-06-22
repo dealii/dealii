@@ -1,0 +1,53 @@
+
+DEAL:2d/2d::Particle number: 12
+DEAL:2d/2d::Cell index: 0. N Particles: 3
+DEAL:2d/2d::Removing particle index: 4. Advanced by: 1
+DEAL:2d/2d::Cell index: 1. N Particles: 2
+DEAL:2d/2d::Removing particle index: 7. Advanced by: 1
+DEAL:2d/2d::Removing particle index: 8. Advanced by: 1
+DEAL:2d/2d::Cell index: 2. N Particles: 1
+DEAL:2d/2d::Removing particle index: 10. Advanced by: 1
+DEAL:2d/2d::Removing particle index: 11. Advanced by: 1
+DEAL:2d/2d::Removing particle index: 9. Advanced by: 0
+DEAL:2d/2d::Cell index: 3. N Particles: 0
+DEAL:2d/2d::Particle id: 0
+DEAL:2d/2d::Particle id: 1
+DEAL:2d/2d::Particle id: 2
+DEAL:2d/2d::Particle id: 3
+DEAL:2d/2d::Particle id: 5
+DEAL:2d/2d::Particle id: 6
+DEAL:2d/2d::OK
+DEAL:3d/3d::Particle number: 24
+DEAL:3d/3d::Cell index: 0. N Particles: 3
+DEAL:3d/3d::Removing particle index: 4. Advanced by: 1
+DEAL:3d/3d::Cell index: 1. N Particles: 2
+DEAL:3d/3d::Removing particle index: 6. Advanced by: 0
+DEAL:3d/3d::Removing particle index: 7. Advanced by: 1
+DEAL:3d/3d::Cell index: 2. N Particles: 1
+DEAL:3d/3d::Removing particle index: 10. Advanced by: 1
+DEAL:3d/3d::Removing particle index: 9. Advanced by: 0
+DEAL:3d/3d::Removing particle index: 11. Advanced by: 0
+DEAL:3d/3d::Cell index: 3. N Particles: 0
+DEAL:3d/3d::Cell index: 4. N Particles: 3
+DEAL:3d/3d::Removing particle index: 17. Advanced by: 2
+DEAL:3d/3d::Cell index: 5. N Particles: 2
+DEAL:3d/3d::Removing particle index: 19. Advanced by: 1
+DEAL:3d/3d::Removing particle index: 20. Advanced by: 1
+DEAL:3d/3d::Cell index: 6. N Particles: 1
+DEAL:3d/3d::Removing particle index: 22. Advanced by: 1
+DEAL:3d/3d::Removing particle index: 21. Advanced by: 0
+DEAL:3d/3d::Removing particle index: 23. Advanced by: 0
+DEAL:3d/3d::Cell index: 7. N Particles: 0
+DEAL:3d/3d::Particle id: 0
+DEAL:3d/3d::Particle id: 1
+DEAL:3d/3d::Particle id: 2
+DEAL:3d/3d::Particle id: 3
+DEAL:3d/3d::Particle id: 5
+DEAL:3d/3d::Particle id: 8
+DEAL:3d/3d::Particle id: 12
+DEAL:3d/3d::Particle id: 13
+DEAL:3d/3d::Particle id: 14
+DEAL:3d/3d::Particle id: 15
+DEAL:3d/3d::Particle id: 16
+DEAL:3d/3d::Particle id: 18
+DEAL:3d/3d::OK

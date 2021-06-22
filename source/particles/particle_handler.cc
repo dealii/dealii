@@ -357,7 +357,7 @@ namespace Particles
   ParticleHandler<dim, spacedim>::remove_particle(
     const ParticleHandler<dim, spacedim>::particle_iterator &particle)
   {
-    auto &container = *(particle->particles_on_cell);
+    auto &particles_on_cell = *(particle->particles_on_cell);
 
     // if the particle has an invalid handle (e.g. because it has
     // been duplicated before calling this function) do not try
@@ -368,15 +368,15 @@ namespace Particles
         property_pool->deregister_particle(handle);
       }
 
-    if (container.size() > 1)
+    if (particles_on_cell.size() > 1)
       {
-        container[particle->particle_index_within_cell] =
-          std::move(container.back());
-        container.resize(particles.size() - 1);
+        particles_on_cell[particle->particle_index_within_cell] =
+          std::move(particles_on_cell.back());
+        particles_on_cell.resize(particles_on_cell.size() - 1);
       }
     else
       {
-        container.clear();
+        particles_on_cell.clear();
       }
 
     --local_number_of_particles;
