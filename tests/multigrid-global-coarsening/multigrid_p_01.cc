@@ -123,10 +123,10 @@ test(const unsigned int n_refinements,
 
   // set up transfer operator
   for (unsigned int l = min_level; l < max_level; ++l)
-    transfers[l + 1].reinit_polynomial_transfer(dof_handlers[l + 1],
-                                                dof_handlers[l],
-                                                constraints[l + 1],
-                                                constraints[l]);
+    transfers[l + 1].reinit(dof_handlers[l + 1],
+                            dof_handlers[l],
+                            constraints[l + 1],
+                            constraints[l]);
 
   MGTransferGlobalCoarsening<dim, VectorType> transfer(
     transfers,

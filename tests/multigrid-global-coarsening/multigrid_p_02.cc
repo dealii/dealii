@@ -98,12 +98,12 @@ test(const unsigned int n_refinements, const unsigned int fe_degree_fine)
 
   // set up transfer operator
   for (unsigned int l = min_level; l < max_level; ++l)
-    transfers[l + 1].reinit_polynomial_transfer(dof_handlers[l + 1],
-                                                dof_handlers[l],
-                                                constraints[l + 1],
-                                                constraints[l],
-                                                0 /*level*/,
-                                                0 /*level*/);
+    transfers[l + 1].reinit(dof_handlers[l + 1],
+                            dof_handlers[l],
+                            constraints[l + 1],
+                            constraints[l],
+                            0 /*level*/,
+                            0 /*level*/);
 
   MGTransferGlobalCoarsening<dim, VectorType> transfer(
     transfers,
