@@ -58,7 +58,7 @@ namespace Particles
     , property_pool(std::make_unique<PropertyPool<dim, spacedim>>(0))
     , particles()
     , global_number_of_particles(0)
-    , local_number_of_particles(0)
+    , number_of_locally_owned_particles(0)
     , global_max_particles_per_cell(0)
     , next_free_particle_index(0)
     , size_callback()
@@ -79,7 +79,7 @@ namespace Particles
     , property_pool(std::make_unique<PropertyPool<dim, spacedim>>(n_properties))
     , particles(triangulation.n_active_cells())
     , global_number_of_particles(0)
-    , local_number_of_particles(0)
+    , number_of_locally_owned_particles(0)
     , global_max_particles_per_cell(0)
     , next_free_particle_index(0)
     , size_callback()
@@ -167,7 +167,9 @@ namespace Particles
 
     // copy static members
     global_number_of_particles = particle_handler.global_number_of_particles;
-    local_number_of_particles  = particle_handler.local_number_of_particles;
+    number_of_locally_owned_particles =
+      particle_handler.number_of_locally_owned_particles;
+
     global_max_particles_per_cell =
       particle_handler.global_max_particles_per_cell;
     next_free_particle_index = particle_handler.next_free_particle_index;
@@ -185,10 +187,10 @@ namespace Particles
   ParticleHandler<dim, spacedim>::clear()
   {
     clear_particles();
-    global_number_of_particles    = 0;
-    local_number_of_particles     = 0;
-    next_free_particle_index      = 0;
-    global_max_particles_per_cell = 0;
+    global_number_of_particles        = 0;
+    number_of_locally_owned_particles = 0;
+    next_free_particle_index          = 0;
+    global_max_particles_per_cell     = 0;
   }
 
 
@@ -217,18 +219,22 @@ namespace Particles
   void
   ParticleHandler<dim, spacedim>::update_cached_numbers()
   {
-    local_number_of_particles                          = 0;
+    number_of_locally_owned_particles                  = 0;
     types::particle_index local_max_particle_index     = 0;
     types::particle_index local_max_particles_per_cell = 0;
 
-    for (const auto &particles_in_cell : particles)
+    for (const auto &cell : triangulation->active_cell_iterators())
       {
+        const auto &particles_in_cell = particles[cell->active_cell_index()];
+
         const types::particle_index n_particles_in_cell =
           particles_in_cell.size();
 
         local_max_particles_per_cell =
           std::max(local_max_particles_per_cell, n_particles_in_cell);
-        local_number_of_particles += n_particles_in_cell;
+
+        if (cell->is_locally_owned())
+          number_of_locally_owned_particles += n_particles_in_cell;
 
         for (const auto &particle : particles_in_cell)
           {
@@ -243,7 +249,7 @@ namespace Particles
             &*triangulation))
       {
         global_number_of_particles = dealii::Utilities::MPI::sum(
-          local_number_of_particles,
+          number_of_locally_owned_particles,
           parallel_triangulation->get_communicator());
 
         if (global_number_of_particles == 0)
@@ -267,7 +273,7 @@ namespace Particles
       }
     else
       {
-        global_number_of_particles = local_number_of_particles;
+        global_number_of_particles = number_of_locally_owned_particles;
         next_free_particle_index =
           global_number_of_particles == 0 ? 0 : local_max_particle_index + 1;
         global_max_particles_per_cell = local_max_particles_per_cell;
@@ -368,6 +374,12 @@ namespace Particles
         property_pool->deregister_particle(handle);
       }
 
+    // need to reduce the cached number before deleting, because the iterator
+    // may be invalid after removing the particle even if only
+    // accessing the cell
+    if (particle->get_surrounding_cell()->is_locally_owned())
+      --number_of_locally_owned_particles;
+
     if (particles_on_cell.size() > 1)
       {
         particles_on_cell[particle->particle_index_within_cell] =
@@ -378,8 +390,6 @@ namespace Particles
       {
         particles_on_cell.clear();
       }
-
-    --local_number_of_particles;
   }
 
 
@@ -480,7 +490,7 @@ namespace Particles
 
     data = particle_it->read_particle_data_from_memory(data);
 
-    ++local_number_of_particles;
+    ++number_of_locally_owned_particles;
 
     return particle_it;
   }
@@ -519,7 +529,7 @@ namespace Particles
     if (properties.size() != 0)
       particle_it->set_properties(properties);
 
-    ++local_number_of_particles;
+    ++number_of_locally_owned_particles;
 
     return particle_it;
   }
@@ -894,7 +904,7 @@ namespace Particles
   types::particle_index
   ParticleHandler<dim, spacedim>::n_locally_owned_particles() const
   {
-    return local_number_of_particles;
+    return number_of_locally_owned_particles;
   }
 
 
@@ -1296,7 +1306,7 @@ namespace Particles
 
     // now make sure particle data is sorted in order of iteration
     std::vector<typename PropertyPool<dim, spacedim>::Handle> unsorted_handles;
-    unsorted_handles.reserve(local_number_of_particles);
+    unsorted_handles.reserve(property_pool->n_registered_slots());
 
     typename PropertyPool<dim, spacedim>::Handle sorted_handle = 0;
     for (auto &particles_in_cell : particles)
@@ -1354,8 +1364,7 @@ namespace Particles
       parallel_triangulation->ghost_owners();
     for (const auto ghost_owner : ghost_owners)
       ghost_particles_cache.ghost_particles_by_domain[ghost_owner].reserve(
-        static_cast<typename std::vector<particle_iterator>::size_type>(
-          local_number_of_particles * 0.25));
+        n_locally_owned_particles() / 4);
 
     const std::vector<std::set<unsigned int>> vertex_to_neighbor_subdomain =
       triangulation_cache->get_vertex_to_neighbor_subdomain();

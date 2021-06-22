@@ -212,6 +212,12 @@ namespace Particles
     n_properties_per_slot() const;
 
     /**
+     * Return how many slots are currently registered in the pool.
+     */
+    unsigned int
+    n_registered_slots() const;
+
+    /**
      * This function makes sure that all internally stored memory blocks
      * are sorted in the same order as one would loop over the @p handles_to_sort
      * container. This makes sure memory access is contiguous with actual
