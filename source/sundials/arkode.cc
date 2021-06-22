@@ -129,11 +129,7 @@ namespace SUNDIALS
                                       *src_ypred,
                                       *src_fpred,
                                       jcurPtr_tmp);
-#    if DEAL_II_SUNDIALS_VERSION_GTE(2, 0, 0)
-      *jcurPtr = jcurPtr_tmp ? SUNTRUE : SUNFALSE;
-#    else
-      *jcurPtr = jcurPtr_tmp ? TRUE : FALSE;
-#    endif
+      *jcurPtr         = jcurPtr_tmp ? SUNTRUE : SUNFALSE;
 
       return err;
     }
@@ -144,11 +140,8 @@ namespace SUNDIALS
     int
     solve_with_jacobian_callback(ARKodeMem arkode_mem,
                                  N_Vector  b,
-#    if DEAL_II_SUNDIALS_VERSION_LT(3, 0, 0)
-                                 N_Vector,
-#    endif
-                                 N_Vector ycur,
-                                 N_Vector fcur)
+                                 N_Vector  ycur,
+                                 N_Vector  fcur)
     {
       Assert(arkode_mem->ark_user_data != nullptr, ExcInternalError());
       ARKode<VectorType> &solver =
@@ -192,14 +185,7 @@ namespace SUNDIALS
 
     template <typename VectorType>
     int
-    solve_with_mass_matrix_callback(ARKodeMem arkode_mem,
-#    if DEAL_II_SUNDIALS_VERSION_LT(3, 0, 0)
-                                    N_Vector b,
-                                    N_Vector
-#    else
-                                    N_Vector b
-#    endif
-    )
+    solve_with_mass_matrix_callback(ARKodeMem arkode_mem, N_Vector b)
     {
       Assert(arkode_mem->ark_user_data != nullptr, ExcInternalError());
       ARKode<VectorType> &solver =
@@ -580,9 +566,6 @@ namespace SUNDIALS
         if (setup_jacobian)
           {
             ARKode_mem->ark_lsetup = setup_jacobian_callback<VectorType>;
-#    if DEAL_II_SUNDIALS_VERSION_LT(3, 0, 0)
-            ARKode_mem->ark_setupNonNull = true;
-#    endif
           }
       }
     else
@@ -600,9 +583,6 @@ namespace SUNDIALS
         if (setup_mass)
           {
             ARKode_mem->ark_msetup = setup_mass_matrix_callback<VectorType>;
-#    if DEAL_II_SUNDIALS_VERSION_LT(3, 0, 0)
-            ARKode_mem->ark_MassSetupNonNull = true;
-#    endif
           }
       }
 
