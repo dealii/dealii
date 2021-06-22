@@ -4128,28 +4128,24 @@ namespace GridTools
       }
   }
 
-
-
-  template <int dim, int spacedim>
-  std::vector<types::subdomain_id>
-  get_subdomain_association(const Triangulation<dim, spacedim> &triangulation,
-                            const std::vector<CellId> &         cell_ids)
+  namespace internal
   {
-    std::vector<types::subdomain_id> subdomain_ids;
-    subdomain_ids.reserve(cell_ids.size());
-
-    if (dynamic_cast<
-          const parallel::fullydistributed::Triangulation<dim, spacedim> *>(
-          &triangulation) != nullptr)
-      {
-        Assert(false, ExcNotImplemented());
-      }
-    else if (const parallel::distributed::Triangulation<dim, spacedim>
-               *parallel_tria = dynamic_cast<
-                 const parallel::distributed::Triangulation<dim, spacedim> *>(
-                 &triangulation))
+    namespace
+    {
+      // Split get_subdomain_association() for p::d::T since we want to compile
+      // it in 1D but none of the p4est stuff is available in 1D.
+      template <int dim, int spacedim>
+      void
+      get_subdomain_association(
+        const parallel::distributed::Triangulation<dim, spacedim>
+          &                               triangulation,
+        const std::vector<CellId> &       cell_ids,
+        std::vector<types::subdomain_id> &subdomain_ids)
       {
 #ifndef DEAL_II_WITH_P4EST
+        (void)triangulation;
+        (void)cell_ids;
+        (void)subdomain_ids;
         Assert(
           false,
           ExcMessage(
@@ -4179,17 +4175,57 @@ namespace GridTools
             const int owner =
               dealii::internal::p4est::functions<dim>::comm_find_owner(
                 const_cast<typename dealii::internal::p4est::types<dim>::forest
-                             *>(parallel_tria->get_p4est()),
+                             *>(triangulation.get_p4est()),
                 cell_id.get_coarse_cell_id(),
                 &p4est_cell,
                 Utilities::MPI::this_mpi_process(
-                  parallel_tria->get_communicator()));
+                  triangulation.get_communicator()));
 
             Assert(owner >= 0, ExcMessage("p4est should know the owner."));
 
             subdomain_ids.push_back(owner);
           }
 #endif
+      }
+
+
+
+      template <int spacedim>
+      void
+      get_subdomain_association(
+        const parallel::distributed::Triangulation<1, spacedim> &,
+        const std::vector<CellId> &,
+        std::vector<types::subdomain_id> &)
+      {
+        Assert(false, ExcNotImplemented());
+      }
+    } // anonymous namespace
+  }   // namespace internal
+
+
+
+  template <int dim, int spacedim>
+  std::vector<types::subdomain_id>
+  get_subdomain_association(const Triangulation<dim, spacedim> &triangulation,
+                            const std::vector<CellId> &         cell_ids)
+  {
+    std::vector<types::subdomain_id> subdomain_ids;
+    subdomain_ids.reserve(cell_ids.size());
+
+    if (dynamic_cast<
+          const parallel::fullydistributed::Triangulation<dim, spacedim> *>(
+          &triangulation) != nullptr)
+      {
+        Assert(false, ExcNotImplemented());
+      }
+    else if (const parallel::distributed::Triangulation<dim, spacedim>
+               *parallel_tria = dynamic_cast<
+                 const parallel::distributed::Triangulation<dim, spacedim> *>(
+                 &triangulation))
+      {
+        internal::get_subdomain_association(*parallel_tria,
+                                            cell_ids,
+                                            subdomain_ids);
       }
     else if (const parallel::shared::Triangulation<dim, spacedim> *shared_tria =
                dynamic_cast<const parallel::shared::Triangulation<dim, spacedim>
