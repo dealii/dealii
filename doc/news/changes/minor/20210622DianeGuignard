@@ -1,4 +1,4 @@
-Improved: i) Standarized the format of the references in the file
+Improved: i) Standardized the format of the references in the file
              doc/doxygen/references.bib using in particular the convention
              "M. Mo" or "R.B. Kellogg" for names and the full name for journals.
          ii) Fixed the display of some titles (e.g., upper case for proper noun).
