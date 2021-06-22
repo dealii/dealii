@@ -136,7 +136,9 @@ CHECK_COMPILER_SETUP(
   ${MPI_CXX_LIBRARIES} ${MPI_Fortran_LIBRARIES} ${MPI_C_LIBRARIES}
   )
 
-IF(NOT MPI_UNDERLINKAGE_OK)
+IF(NOT MPI_UNDERLINKAGE_OK AND NOT "${MPI_CXX_LIBRARIES}" STREQUAL "")
+  # This check only works if MPI_CXX_LIBRARIES is non-empty, otherwise we will just give up
+  # and hope for the best...
   MESSAGE(STATUS "Trying to avoid underlinkage by expliclitly adding libopen-pal to link line")
 
   LIST(GET MPI_CXX_LIBRARIES 0 _lib)
