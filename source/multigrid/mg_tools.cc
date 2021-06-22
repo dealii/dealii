@@ -623,11 +623,16 @@ namespace MGTools
 
 
 
-  template <int dim, typename SparsityPatternType, int spacedim>
+  template <int dim,
+            int spacedim,
+            typename SparsityPatternType,
+            typename number>
   void
   make_flux_sparsity_pattern(const DoFHandler<dim, spacedim> &dof,
                              SparsityPatternType &            sparsity,
-                             const unsigned int               level)
+                             const unsigned int               level,
+                             const AffineConstraints<number> &constraints,
+                             const bool keep_constrained_dofs)
   {
     const types::global_dof_index n_dofs = dof.n_dofs(level);
     (void)n_dofs;
@@ -649,9 +654,9 @@ namespace MGTools
 
         cell->get_mg_dof_indices(dofs_on_this_cell);
         // make sparsity pattern for this cell
-        for (unsigned int i = 0; i < dofs_per_cell; ++i)
-          for (unsigned int j = 0; j < dofs_per_cell; ++j)
-            sparsity.add(dofs_on_this_cell[i], dofs_on_this_cell[j]);
+        constraints.add_entries_local_to_global(dofs_on_this_cell,
+                                                sparsity,
+                                                keep_constrained_dofs);
 
         // Loop over all interior neighbors
         for (const unsigned int face : GeometryInfo<dim>::face_indices())
@@ -674,23 +679,22 @@ namespace MGTools
                 // only add one direction The other is taken care of by
                 // neighbor (except when the neighbor is not owned by the same
                 // processor)
-                for (unsigned int i = 0; i < dofs_per_cell; ++i)
-                  {
-                    for (unsigned int j = 0; j < dofs_per_cell; ++j)
-                      {
-                        sparsity.add(dofs_on_this_cell[i],
-                                     dofs_on_other_cell[j]);
-                      }
-                  }
+                constraints.add_entries_local_to_global(dofs_on_this_cell,
+                                                        dofs_on_other_cell,
+                                                        sparsity,
+                                                        keep_constrained_dofs);
+
                 if (neighbor->is_locally_owned_on_level() == false)
-                  for (unsigned int i = 0; i < dofs_per_cell; ++i)
-                    for (unsigned int j = 0; j < dofs_per_cell; ++j)
-                      {
-                        sparsity.add(dofs_on_other_cell[i],
-                                     dofs_on_other_cell[j]);
-                        sparsity.add(dofs_on_other_cell[i],
-                                     dofs_on_this_cell[j]);
-                      }
+                  {
+                    constraints.add_entries_local_to_global(
+                      dofs_on_other_cell, sparsity, keep_constrained_dofs);
+
+                    constraints.add_entries_local_to_global(
+                      dofs_on_other_cell,
+                      dofs_on_this_cell,
+                      sparsity,
+                      keep_constrained_dofs);
+                  }
               }
           }
       }
