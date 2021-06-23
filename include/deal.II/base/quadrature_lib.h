@@ -800,13 +800,21 @@ public:
  * QGauss quadrature object, even though the present quadrature formula is not
  * a tensor product. The given value is translated for n_points_1D=1,2,3,4 to
  * following number of quadrature points for 2D and 3D:
- *   - 2D: 1, 3, 7, 15
- *   - 3D: 1, 4, 10, 35
+ * - 2D: 1, 4, 7, 15
+ * - 3D: 1, 6, 14, 35
  *
  * For 1D, the quadrature rule degenerates to a
  * `dealii::QGauss<1>(n_points_1D)`.
  *
  * @ingroup simplex
+ *
+ * @note The quadrature rules implemented by this class come from a variety of
+ * sources, but all of them have positive quadrature weights.
+ *
+ * @note Several of the schemes implemented by this class are not symmetric with
+ * respect to the vertices - i.e., the locations of the mapped quadrature points
+ * depends on the numbering of the cell vertices. If you need rules that are
+ * independent of the vertex numbering then use QWitherdenVincentSimplex.
  */
 template <int dim>
 class QGaussSimplex : public QSimplex<dim>
