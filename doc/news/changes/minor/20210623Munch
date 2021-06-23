@@ -1,0 +1,4 @@
+New: The new function CellAccessor::is_ghost_on_level() allows to 
+check if a cell is a ghost cell on a multigrid level.
+<br>
+(Peter Munch, 2021/06/23)
