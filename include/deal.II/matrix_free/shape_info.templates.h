@@ -328,9 +328,12 @@ namespace internal
               {
                 this->n_q_points_face = quad_face[0].size();
 
-                n_q_points_faces.resize(quad_face.size());
-                for (unsigned int i = 0; i < quad_face.size(); ++i)
-                  n_q_points_faces[i] = quad_face[i].size();
+                const unsigned int n_faces = temp.first.n_faces();
+
+                n_q_points_faces.resize(n_faces);
+                for (unsigned int i = 0; i < n_faces; ++i)
+                  n_q_points_faces[i] =
+                    quad_face[quad_face.size() == 1 ? 0 : i].size();
 
                 unsigned int n_q_points_face_max = 0;
 
@@ -340,8 +343,7 @@ namespace internal
 
                 unsigned int n_max_vertices = 0;
 
-                for (unsigned int face_no = 0; face_no < quad_face.size();
-                     ++face_no)
+                for (unsigned int face_no = 0; face_no < n_faces; ++face_no)
                   n_max_vertices = std::max(
                     n_max_vertices,
                     reference_cell.face_reference_cell(face_no).n_vertices());
@@ -353,16 +355,16 @@ namespace internal
                 const unsigned int n_max_face_orientations =
                   dim == 2 ? 2 : (2 * n_max_vertices);
 
-                shape_values_face.reinit({quad_face.size(),
+                shape_values_face.reinit({n_faces,
                                           n_max_face_orientations,
                                           n_dofs * n_q_points_face_max});
 
-                shape_gradients_face.reinit({quad_face.size(),
+                shape_gradients_face.reinit({n_faces,
                                              n_max_face_orientations,
                                              dim,
                                              n_dofs * n_q_points_face_max});
 
-                for (unsigned int f = 0; f < quad_face.size(); ++f)
+                for (unsigned int f = 0; f < n_faces; ++f)
                   {
                     const unsigned int n_face_orientations =
                       dim == 2 ?
@@ -370,7 +372,8 @@ namespace internal
                         (2 *
                          reference_cell.face_reference_cell(f).n_vertices());
 
-                    const unsigned int n_q_points_face = quad_face[f].size();
+                    const unsigned int n_q_points_face =
+                      quad_face[quad_face.size() == 1 ? 0 : f].size();
 
                     for (unsigned int o = 0; o < n_face_orientations; ++o)
                       {

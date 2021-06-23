@@ -34,6 +34,11 @@ namespace internal
 {
   namespace MatrixFreeFunctions
   {
+    /**
+     * Given a quadrature rule @p quad defined on a cell, return the type of
+     * the cell and a collection of lower-dimensional quadrature rules that
+     * are defined on each face.
+     */
     template <int dim>
     inline std::pair<dealii::ReferenceCell, dealii::hp::QCollection<dim - 1>>
     get_face_quadrature_collection(const Quadrature<dim> &quad,
@@ -43,29 +48,15 @@ namespace internal
         {
           for (unsigned int i = 1; i <= 4; ++i)
             if (quad == QGaussSimplex<dim>(i))
-              {
-                QGaussSimplex<dim - 1> tri(i);
-
-                if (dim == 2)
-                  return {ReferenceCells::Triangle,
-                          dealii::hp::QCollection<dim - 1>(tri, tri, tri)};
-                else
-                  return {ReferenceCells::Tetrahedron,
-                          dealii::hp::QCollection<dim - 1>(tri, tri, tri, tri)};
-              }
+              return {ReferenceCells::get_simplex<dim>(),
+                      dealii::hp::QCollection<dim - 1>(
+                        QGaussSimplex<dim - 1>(i))};
 
           for (unsigned int i = 1; i <= 5; ++i)
             if (quad == QWitherdenVincentSimplex<dim>(i))
-              {
-                QWitherdenVincentSimplex<dim - 1> tri(i);
-
-                if (dim == 2)
-                  return {ReferenceCells::Triangle,
-                          dealii::hp::QCollection<dim - 1>(tri, tri, tri)};
-                else
-                  return {ReferenceCells::Tetrahedron,
-                          dealii::hp::QCollection<dim - 1>(tri, tri, tri, tri)};
-              }
+              return {ReferenceCells::get_simplex<dim>(),
+                      dealii::hp::QCollection<dim - 1>(
+                        QWitherdenVincentSimplex<dim - 1>(i))};
         }
 
       if (dim == 3)
@@ -92,6 +83,13 @@ namespace internal
                 dealii::hp::QCollection<dim - 1>(quad, tri, tri, tri, tri)};
             }
 
+      // note: handle hypercubes last since normally this function is not
+      // called for hypercubes
+      for (unsigned int i = 1; i <= 5; ++i)
+        if (quad == QGauss<dim>(i))
+          return {ReferenceCells::get_hypercube<dim>(),
+                  dealii::hp::QCollection<dim - 1>(QGauss<dim - 1>(i))};
+
       if (do_assert)
         AssertThrow(false, ExcNotImplemented());
 
@@ -100,19 +98,41 @@ namespace internal
 
 
 
+    /**
+     * Return face quadrature rules. In contrast to
+     * get_face_quadrature_collection(), it does not return the quadrature
+     * face for each face but returns one of each type. The first entry
+     * of the returned pair might contain a quadrature rule defined on lines and
+     * quadrilaterals, while the second entry might contain a quadrature rule
+     * defined on a triangle.
+     */
     template <int dim>
     inline std::pair<Quadrature<dim - 1>, Quadrature<dim - 1>>
     get_unique_face_quadratures(const Quadrature<dim> &quad)
     {
       if (dim == 2 || dim == 3)
-        for (unsigned int i = 1; i <= 3; ++i)
-          if (quad == QGaussSimplex<dim>(i))
-            {
-              if (dim == 2)
-                return {QGaussSimplex<dim - 1>(i), Quadrature<dim - 1>()};
-              else
-                return {Quadrature<dim - 1>(), QGaussSimplex<dim - 1>(i)};
-            }
+        {
+          for (unsigned int i = 1; i <= 4; ++i)
+            if (quad == QGaussSimplex<dim>(i))
+              {
+                if (dim == 2)
+                  return {QGaussSimplex<dim - 1>(i), // line!
+                          Quadrature<dim - 1>()};
+                else
+                  return {Quadrature<dim - 1>(), QGaussSimplex<dim - 1>(i)};
+              }
+
+          for (unsigned int i = 1; i <= 5; ++i)
+            if (quad == QWitherdenVincentSimplex<dim>(i))
+              {
+                if (dim == 2)
+                  return {QWitherdenVincentSimplex<dim - 1>(i), // line!
+                          Quadrature<dim - 1>()};
+                else
+                  return {Quadrature<dim - 1>(),
+                          QWitherdenVincentSimplex<dim - 1>(i)};
+              }
+        }
 
       if (dim == 3)
         for (unsigned int i = 1; i <= 3; ++i)
@@ -124,9 +144,15 @@ namespace internal
           if (quad == QGaussPyramid<dim>(i))
             return {QGauss<dim - 1>(i), QGaussSimplex<dim - 1>(i)};
 
+      // note: handle hypercubes last since normally this function is not
+      // called for hypercubes
+      for (unsigned int i = 1; i <= 5; ++i)
+        if (quad == QGauss<dim>(i))
+          return {QGauss<dim - 1>(i), Quadrature<dim - 1>()};
+
       AssertThrow(false, ExcNotImplemented());
 
-      return {QGauss<dim - 1>(1), QGauss<dim - 1>(1)};
+      return {Quadrature<dim - 1>(), Quadrature<dim - 1>()};
     }
   } // end of namespace MatrixFreeFunctions
 } // end of namespace internal
