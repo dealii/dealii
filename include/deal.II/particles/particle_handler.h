@@ -830,10 +830,10 @@ namespace Particles
     types::particle_index global_number_of_particles;
 
     /**
-     * This variable stores how many particles are stored locally. It is
+     * This variable stores how many particles are locally owned. It is
      * calculated by update_cached_numbers().
      */
-    types::particle_index local_number_of_particles;
+    types::particle_index number_of_locally_owned_particles;
 
     /**
      * The maximum number of particles per cell in the global domain. This

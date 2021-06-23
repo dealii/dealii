@@ -167,6 +167,29 @@ namespace Particles
     return n_properties;
   }
 
+
+
+  template <int dim, int spacedim>
+  unsigned int
+  PropertyPool<dim, spacedim>::n_registered_slots() const
+  {
+    Assert(locations.size() == reference_locations.size(),
+           ExcMessage("Number of registered locations is not equal to number "
+                      "of registered reference locations."));
+
+    Assert(locations.size() == ids.size(),
+           ExcMessage("Number of registered locations is not equal to number "
+                      "of registered ids."));
+
+    Assert(locations.size() * n_properties == properties.size(),
+           ExcMessage("Number of registered locations is not equal to number "
+                      "of registered property slots."));
+
+    return locations.size() - currently_available_handles.size();
+  }
+
+
+
   template <int dim, int spacedim>
   void
   PropertyPool<dim, spacedim>::sort_memory_slots(

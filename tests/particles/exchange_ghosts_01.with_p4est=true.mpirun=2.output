@@ -1,0 +1,23 @@
+
+DEAL:0:2d/2d::Before ghost exchange: 1 locally owned particles on process 0
+DEAL:0:2d/2d::Before ghost exchange: 1 stored particles on process 0
+DEAL:0:2d/2d::After ghost exchange: 1 locally owned particles on process 0
+DEAL:0:2d/2d::After ghost exchange: 2 stored particles on process 0
+DEAL:0:2d/2d::OK
+DEAL:0:3d/3d::Before ghost exchange: 1 locally owned particles on process 0
+DEAL:0:3d/3d::Before ghost exchange: 1 stored particles on process 0
+DEAL:0:3d/3d::After ghost exchange: 1 locally owned particles on process 0
+DEAL:0:3d/3d::After ghost exchange: 2 stored particles on process 0
+DEAL:0:3d/3d::OK
+
+DEAL:1:2d/2d::Before ghost exchange: 1 locally owned particles on process 1
+DEAL:1:2d/2d::Before ghost exchange: 1 stored particles on process 1
+DEAL:1:2d/2d::After ghost exchange: 1 locally owned particles on process 1
+DEAL:1:2d/2d::After ghost exchange: 2 stored particles on process 1
+DEAL:1:2d/2d::OK
+DEAL:1:3d/3d::Before ghost exchange: 1 locally owned particles on process 1
+DEAL:1:3d/3d::Before ghost exchange: 1 stored particles on process 1
+DEAL:1:3d/3d::After ghost exchange: 1 locally owned particles on process 1
+DEAL:1:3d/3d::After ghost exchange: 2 stored particles on process 1
+DEAL:1:3d/3d::OK
+
