@@ -805,9 +805,15 @@ namespace internal
                                       ghost_indices.end()),
                           ghost_indices.end());
 
-      this->is_extended_locally_owned = dof_handler_dst.locally_owned_dofs();
+      this->is_extended_locally_owned =
+        mg_level_fine == numbers::invalid_unsigned_int ?
+          dof_handler_dst.locally_owned_dofs() :
+          dof_handler_dst.locally_owned_mg_dofs(mg_level_fine);
 
-      this->is_extended_ghosts = IndexSet(dof_handler_dst.n_dofs());
+      this->is_extended_ghosts =
+        IndexSet(mg_level_fine == numbers::invalid_unsigned_int ?
+                   dof_handler_dst.n_dofs() :
+                   dof_handler_dst.n_dofs(mg_level_fine));
       this->is_extended_ghosts.add_indices(ghost_indices.begin(),
                                            ghost_indices.end());
       this->is_extended_ghosts.subtract_set(this->is_extended_locally_owned);
@@ -1000,6 +1006,11 @@ namespace internal
                                        const unsigned int     mg_level_coarse)
       : FineDoFHandlerView<dim>(dof_handler_dst, dof_handler_src, mg_level_fine)
     {
+      Assert((mg_level_fine == numbers::invalid_unsigned_int &&
+              mg_level_coarse == numbers::invalid_unsigned_int) ||
+               (mg_level_coarse + 1 == mg_level_fine),
+             ExcNotImplemented());
+
       // get reference to triangulations
       const auto &tria_dst = dof_handler_dst.get_triangulation();
       const auto &tria_src = dof_handler_src.get_triangulation();
@@ -1017,7 +1028,10 @@ namespace internal
       const auto coarse_operation = [&](const auto &cell) {
         is_src_locally_owned.add_index(
           this->cell_id_translator.translate(cell));
-        is_dst_remote.add_index(this->cell_id_translator.translate(cell));
+
+        // in the case of global coarsening identity transfer is possible
+        // if(mg_level_coarse == numbers::invalid_unsigned_int)
+        //  is_dst_remote.add_index(this->cell_id_translator.translate(cell));
 
         if (cell->level() + 1u == tria_dst.n_global_levels())
           return;
@@ -1298,7 +1312,7 @@ namespace internal
       else
         {
           for (const auto &cell :
-               dof_handler_fine.mg_cell_iterators_on_level(mg_level_fine))
+               dof_handler_fine.cell_iterators_on_level(mg_level_fine))
             {
               if (cell->level_subdomain_id() !=
                   dof_handler_fine.get_triangulation()
@@ -1347,7 +1361,7 @@ namespace internal
         &transfer)
     {
       Assert((mg_level_fine == numbers::invalid_unsigned_int &&
-              mg_level_coarse == numbers::invalid_unsigned_int) &&
+              mg_level_coarse == numbers::invalid_unsigned_int) ||
                (mg_level_coarse + 1 == mg_level_fine),
              ExcNotImplemented());
 
@@ -1369,44 +1383,52 @@ namespace internal
       std::array<unsigned int, 2> max_active_fe_indices = {{0, 0}};
 
       if (mg_level_fine == numbers::invalid_unsigned_int)
-        for (const auto &cell : dof_handler_fine.active_cell_iterators())
-          if (cell->is_locally_owned())
-            {
-              min_active_fe_indices[0] =
-                std::min(min_active_fe_indices[0], cell->active_fe_index());
-              max_active_fe_indices[0] =
-                std::max(max_active_fe_indices[0], cell->active_fe_index());
-            }
-          else
-            for (const auto &cell :
-                 dof_handler_fine.mg_cell_iterators_on_level(mg_level_fine))
-              if (cell->is_locally_owned_on_level())
-                {
-                  min_active_fe_indices[0] =
-                    std::min(min_active_fe_indices[0], cell->active_fe_index());
-                  max_active_fe_indices[0] =
-                    std::max(max_active_fe_indices[0], cell->active_fe_index());
-                }
+        {
+          for (const auto &cell : dof_handler_fine.active_cell_iterators())
+            if (cell->is_locally_owned())
+              {
+                min_active_fe_indices[0] =
+                  std::min(min_active_fe_indices[0], cell->active_fe_index());
+                max_active_fe_indices[0] =
+                  std::max(max_active_fe_indices[0], cell->active_fe_index());
+              }
+        }
+      else
+        {
+          for (const auto &cell :
+               dof_handler_fine.mg_cell_iterators_on_level(mg_level_fine))
+            if (cell->is_locally_owned_on_level())
+              {
+                min_active_fe_indices[0] =
+                  std::min(min_active_fe_indices[0], cell->active_fe_index());
+                max_active_fe_indices[0] =
+                  std::max(max_active_fe_indices[0], cell->active_fe_index());
+              }
+        }
 
       if (mg_level_fine == numbers::invalid_unsigned_int)
-        for (const auto &cell : dof_handler_coarse.active_cell_iterators())
-          if (cell->is_locally_owned())
-            {
-              min_active_fe_indices[1] =
-                std::min(min_active_fe_indices[1], cell->active_fe_index());
-              max_active_fe_indices[1] =
-                std::max(max_active_fe_indices[1], cell->active_fe_index());
-            }
-          else
-            for (const auto &cell :
-                 dof_handler_coarse.mg_cell_iterators_on_level(mg_level_coarse))
-              if (cell->is_locally_owned_on_level())
-                {
-                  min_active_fe_indices[1] =
-                    std::min(min_active_fe_indices[1], cell->active_fe_index());
-                  max_active_fe_indices[1] =
-                    std::max(max_active_fe_indices[1], cell->active_fe_index());
-                }
+        {
+          for (const auto &cell : dof_handler_coarse.active_cell_iterators())
+            if (cell->is_locally_owned())
+              {
+                min_active_fe_indices[1] =
+                  std::min(min_active_fe_indices[1], cell->active_fe_index());
+                max_active_fe_indices[1] =
+                  std::max(max_active_fe_indices[1], cell->active_fe_index());
+              }
+        }
+      else
+        {
+          for (const auto &cell :
+               dof_handler_coarse.mg_cell_iterators_on_level(mg_level_coarse))
+            if (cell->is_locally_owned_on_level())
+              {
+                min_active_fe_indices[1] =
+                  std::min(min_active_fe_indices[1], cell->active_fe_index());
+                max_active_fe_indices[1] =
+                  std::max(max_active_fe_indices[1], cell->active_fe_index());
+              }
+        }
 
       const auto comm = dof_handler_fine.get_communicator();
 
@@ -1449,12 +1471,19 @@ namespace internal
         // ... coarse mesh (needed since user vector might be const)
         {
           IndexSet locally_relevant_dofs;
-          DoFTools::extract_locally_relevant_dofs(dof_handler_coarse,
-                                                  locally_relevant_dofs);
+
+          if (mg_level_coarse == numbers::invalid_unsigned_int)
+            DoFTools::extract_locally_relevant_dofs(dof_handler_coarse,
+                                                    locally_relevant_dofs);
+          else
+            DoFTools::extract_locally_relevant_level_dofs(
+              dof_handler_coarse, mg_level_coarse, locally_relevant_dofs);
 
           transfer.partitioner_coarse =
             std::make_shared<Utilities::MPI::Partitioner>(
-              dof_handler_coarse.locally_owned_dofs(),
+              mg_level_coarse == numbers::invalid_unsigned_int ?
+                dof_handler_coarse.locally_owned_dofs() :
+                dof_handler_coarse.locally_owned_mg_dofs(mg_level_coarse),
               locally_relevant_dofs,
               dof_handler_coarse.get_communicator());
           transfer.vec_coarse.reinit(transfer.partitioner_coarse);
@@ -1500,24 +1529,23 @@ namespace internal
             for (const auto &cell_coarse :
                  dof_handler_coarse.mg_cell_iterators_on_level(mg_level_coarse))
               {
-                if (cell_coarse->is_artificial() == true ||
-                    cell_coarse->is_locally_owned_on_level() == false)
+                if (cell_coarse->is_locally_owned_on_level() == false)
                   continue;
 
                 // get a reference to the equivalent cell on the fine
                 // triangulation
-                const auto cell_coarse_on_fine_mesh =
-                  view.get_cell(cell_coarse);
+                // const auto cell_coarse_on_fine_mesh =
+                //  view.get_cell(cell_coarse);
 
                 // check if cell has children
-                if (cell_coarse_on_fine_mesh.has_children())
+                if (cell_coarse->has_children())
                   // ... cell has children -> process children
                   for (unsigned int c = 0;
                        c < GeometryInfo<dim>::max_children_per_cell;
                        c++)
                     fu_refined(cell_coarse, view.get_cell(cell_coarse, c), c);
-                else // ... cell has no children -> process cell
-                  fu_non_refined(cell_coarse, cell_coarse_on_fine_mesh);
+                // else // ... cell has no children -> process cell
+                //  fu_non_refined(cell_coarse, cell_coarse_on_fine_mesh);
               }
           }
       };
@@ -1624,7 +1652,12 @@ namespace internal
           [&](const auto &cell_coarse, const auto &cell_fine) {
             // parent
             {
-              cell_coarse->get_dof_indices(local_dof_indices);
+              if (mg_level_coarse == numbers::invalid_unsigned_int)
+                cell_coarse->get_dof_indices(local_dof_indices);
+              else
+                cell_coarse->get_mg_dof_indices(local_dof_indices);
+
+
               for (unsigned int i = 0;
                    i < transfer.schemes[0].dofs_per_cell_coarse;
                    i++)
@@ -1656,7 +1689,11 @@ namespace internal
             // parent (only once at the beginning)
             if (c == 0)
               {
-                cell_coarse->get_dof_indices(local_dof_indices);
+                if (mg_level_coarse == numbers::invalid_unsigned_int)
+                  cell_coarse->get_dof_indices(local_dof_indices);
+                else
+                  cell_coarse->get_mg_dof_indices(local_dof_indices);
+
                 for (unsigned int i = 0;
                      i < transfer.schemes[1].dofs_per_cell_coarse;
                      i++)
@@ -1798,7 +1835,7 @@ namespace internal
           // compute weights globally
           LinearAlgebra::distributed::Vector<Number> weight_vector;
           compute_weights(dof_handler_fine,
-                          numbers::invalid_unsigned_int /*active level*/,
+                          mg_level_fine,
                           constraint_fine,
                           transfer,
                           weight_vector);
