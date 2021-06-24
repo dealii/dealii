@@ -24,7 +24,7 @@
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/work_stream.h>
 
-#include <deal.II/distributed/tria.h>
+#include <deal.II/distributed/tria_base.h>
 
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_handler.h>
@@ -1160,30 +1160,23 @@ KellyErrorEstimator<dim, spacedim>::estimate(
   const types::material_id  material_id,
   const Strategy            strategy)
 {
-#ifdef DEAL_II_WITH_P4EST
-  if (dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim> *>(
-        &dof_handler.get_triangulation()) != nullptr)
-    Assert((subdomain_id_ == numbers::invalid_subdomain_id) ||
-             (subdomain_id_ ==
-              dynamic_cast<
-                const parallel::distributed::Triangulation<dim, spacedim> &>(
-                dof_handler.get_triangulation())
-                .locally_owned_subdomain()),
-           ExcMessage(
-             "For parallel distributed triangulations, the only "
-             "valid subdomain_id that can be passed here is the "
-             "one that corresponds to the locally owned subdomain id."));
-
-  const types::subdomain_id subdomain_id =
-    ((dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim> *>(
-        &dof_handler.get_triangulation()) != nullptr) ?
-       dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim>
-                      &>(dof_handler.get_triangulation())
-         .locally_owned_subdomain() :
-       subdomain_id_);
-#else
-  const types::subdomain_id subdomain_id = subdomain_id_;
-#endif
+  types::subdomain_id subdomain_id = numbers::invalid_subdomain_id;
+  if (const auto *triangulation = dynamic_cast<
+        const parallel::DistributedTriangulationBase<dim, spacedim> *>(
+        &dof_handler.get_triangulation()))
+    {
+      Assert((subdomain_id_ == numbers::invalid_subdomain_id) ||
+               (subdomain_id_ == triangulation->locally_owned_subdomain()),
+             ExcMessage(
+               "For distributed Triangulation objects and associated "
+               "DoFHandler objects, asking for any subdomain other than the "
+               "locally owned one does not make sense."));
+      subdomain_id = triangulation->locally_owned_subdomain();
+    }
+  else
+    {
+      subdomain_id = subdomain_id_;
+    }
 
   const unsigned int n_components = dof_handler.get_fe(0).n_components();
   (void)n_components;

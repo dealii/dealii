@@ -75,18 +75,20 @@ namespace DoFTools
     Assert(sparsity.n_cols() == n_dofs,
            ExcDimensionMismatch(sparsity.n_cols(), n_dofs));
 
-    // If we have a distributed::Triangulation only allow locally_owned
+    // If we have a distributed Triangulation only allow locally_owned
     // subdomain. Not setting a subdomain is also okay, because we skip
     // ghost cells in the loop below.
-    Assert((dof.get_triangulation().locally_owned_subdomain() ==
-            numbers::invalid_subdomain_id) ||
-             (subdomain_id == numbers::invalid_subdomain_id) ||
-             (subdomain_id ==
-              dof.get_triangulation().locally_owned_subdomain()),
-           ExcMessage(
-             "For parallel::distributed::Triangulation objects and "
-             "associated DoF handler objects, asking for any subdomain other "
-             "than the locally owned one does not make sense."));
+    if (const auto *triangulation = dynamic_cast<
+          const parallel::DistributedTriangulationBase<dim, spacedim> *>(
+          &dof.get_triangulation()))
+      {
+        Assert((subdomain_id == numbers::invalid_subdomain_id) ||
+                 (subdomain_id == triangulation->locally_owned_subdomain()),
+               ExcMessage(
+                 "For distributed Triangulation objects and associated "
+                 "DoFHandler objects, asking for any subdomain other than the "
+                 "locally owned one does not make sense."));
+      }
 
     std::vector<types::global_dof_index> dofs_on_this_cell;
     dofs_on_this_cell.reserve(dof.get_fe_collection().max_dofs_per_cell());
@@ -143,18 +145,20 @@ namespace DoFTools
            ExcDimensionMismatch(couplings.n_cols(),
                                 dof.get_fe(0).n_components()));
 
-    // If we have a distributed::Triangulation only allow locally_owned
+    // If we have a distributed Triangulation only allow locally_owned
     // subdomain. Not setting a subdomain is also okay, because we skip
     // ghost cells in the loop below.
-    Assert((dof.get_triangulation().locally_owned_subdomain() ==
-            numbers::invalid_subdomain_id) ||
-             (subdomain_id == numbers::invalid_subdomain_id) ||
-             (subdomain_id ==
-              dof.get_triangulation().locally_owned_subdomain()),
-           ExcMessage(
-             "For parallel::distributed::Triangulation objects and "
-             "associated DoF handler objects, asking for any subdomain other "
-             "than the locally owned one does not make sense."));
+    if (const auto *triangulation = dynamic_cast<
+          const parallel::DistributedTriangulationBase<dim, spacedim> *>(
+          &dof.get_triangulation()))
+      {
+        Assert((subdomain_id == numbers::invalid_subdomain_id) ||
+                 (subdomain_id == triangulation->locally_owned_subdomain()),
+               ExcMessage(
+                 "For distributed Triangulation objects and associated "
+                 "DoFHandler objects, asking for any subdomain other than the "
+                 "locally owned one does not make sense."));
+      }
 
     const hp::FECollection<dim, spacedim> &fe_collection =
       dof.get_fe_collection();
@@ -541,18 +545,20 @@ namespace DoFTools
     AssertDimension(sparsity.n_rows(), n_dofs);
     AssertDimension(sparsity.n_cols(), n_dofs);
 
-    // If we have a distributed::Triangulation only allow locally_owned
+    // If we have a distributed Triangulation only allow locally_owned
     // subdomain. Not setting a subdomain is also okay, because we skip
     // ghost cells in the loop below.
-    Assert((dof.get_triangulation().locally_owned_subdomain() ==
-            numbers::invalid_subdomain_id) ||
-             (subdomain_id == numbers::invalid_subdomain_id) ||
-             (subdomain_id ==
-              dof.get_triangulation().locally_owned_subdomain()),
-           ExcMessage(
-             "For parallel::distributed::Triangulation objects and "
-             "associated DoF handler objects, asking for any subdomain other "
-             "than the locally owned one does not make sense."));
+    if (const auto *triangulation = dynamic_cast<
+          const parallel::DistributedTriangulationBase<dim, spacedim> *>(
+          &dof.get_triangulation()))
+      {
+        Assert((subdomain_id == numbers::invalid_subdomain_id) ||
+                 (subdomain_id == triangulation->locally_owned_subdomain()),
+               ExcMessage(
+                 "For distributed Triangulation objects and associated "
+                 "DoFHandler objects, asking for any subdomain other than the "
+                 "locally owned one does not make sense."));
+      }
 
     std::vector<types::global_dof_index> dofs_on_this_cell;
     std::vector<types::global_dof_index> dofs_on_other_cell;
@@ -1428,18 +1434,20 @@ namespace DoFTools
     Assert(flux_mask.n_cols() == n_comp,
            ExcDimensionMismatch(flux_mask.n_cols(), n_comp));
 
-    // If we have a distributed::Triangulation only allow locally_owned
+    // If we have a distributed Triangulation only allow locally_owned
     // subdomain. Not setting a subdomain is also okay, because we skip
     // ghost cells in the loop below.
-    Assert((dof.get_triangulation().locally_owned_subdomain() ==
-            numbers::invalid_subdomain_id) ||
-             (subdomain_id == numbers::invalid_subdomain_id) ||
-             (subdomain_id ==
-              dof.get_triangulation().locally_owned_subdomain()),
-           ExcMessage(
-             "For parallel::distributed::Triangulation objects and "
-             "associated DoF handler objects, asking for any subdomain other "
-             "than the locally owned one does not make sense."));
+    if (const auto *triangulation = dynamic_cast<
+          const parallel::DistributedTriangulationBase<dim, spacedim> *>(
+          &dof.get_triangulation()))
+      {
+        Assert((subdomain_id == numbers::invalid_subdomain_id) ||
+                 (subdomain_id == triangulation->locally_owned_subdomain()),
+               ExcMessage(
+                 "For distributed Triangulation objects and associated "
+                 "DoFHandler objects, asking for any subdomain other than the "
+                 "locally owned one does not make sense."));
+      }
 
     Assert(
       face_has_flux_coupling,
