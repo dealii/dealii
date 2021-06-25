@@ -284,8 +284,12 @@ namespace LinearAlgebra
 
       /**
        * Move constructor. Uses the swap method.
+       *
+       * @note In order for this constructor to leave the moved-from object in a
+       * valid state it must allocate memory (in this case, an empty
+       * partitioner) - hence it cannot be marked as noexcept.
        */
-      Vector(Vector<Number, MemorySpace> &&in_vector);
+      Vector(Vector<Number, MemorySpace> &&in_vector); // NOLINT
 
       /**
        * Construct a parallel vector of the given global size without any
