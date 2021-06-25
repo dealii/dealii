@@ -342,12 +342,10 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
       partition_multigrid_levels(
         Triangulation<deal_II_dimension, deal_II_space_dimension> &);
 
-#  if deal_II_dimension >= 2
       template std::vector<types::subdomain_id>
       get_subdomain_association(
         const Triangulation<deal_II_dimension, deal_II_space_dimension> &,
         const std::vector<CellId> &);
-#  endif
 
       template void
       get_subdomain_association(
