@@ -5640,7 +5640,7 @@ namespace GridTools
   {
     // run internal function ...
     const auto all = internal::distributed_compute_point_locations(
-                       cache, points, global_bboxes, tolerance, false)
+                       cache, points, global_bboxes, tolerance, false, true)
                        .send_components;
 
     // ... and reshuffle the data
@@ -5749,7 +5749,8 @@ namespace GridTools
       const Point<spacedim> &                                      point,
       typename Triangulation<dim, spacedim>::active_cell_iterator &cell_hint,
       const std::vector<bool> &marked_vertices,
-      const double             tolerance)
+      const double             tolerance,
+      const bool               enforce_unique_mapping)
     {
       std::vector<
         std::pair<typename Triangulation<dim, spacedim>::active_cell_iterator,
@@ -5768,6 +5769,9 @@ namespace GridTools
         tolerance,
         &cache.get_locally_owned_cell_bounding_boxes_rtree());
 
+      const unsigned int my_rank = Utilities::MPI::this_mpi_process(
+        cache.get_triangulation().get_communicator());
+
       cell_hint = first_cell.first;
       if (cell_hint.state() == IteratorState::valid)
         {
@@ -5778,6 +5782,20 @@ namespace GridTools
               point,
               tolerance,
               first_cell);
+
+          if (enforce_unique_mapping)
+            {
+              // check if the rank of this process is the lowest of all cells
+              // if not, the other process will handle this cell and we don't
+              // have to do here anything in the case of unique mapping
+              unsigned int lowes_rank = numbers::invalid_unsigned_int;
+
+              for (const auto &cell : active_cells_around_point)
+                lowes_rank = std::min(lowes_rank, cell.first->subdomain_id());
+
+              if (lowes_rank != my_rank)
+                return {};
+            }
 
           locally_owned_active_cells_around_point.reserve(
             active_cells_around_point.size());
@@ -5791,7 +5809,12 @@ namespace GridTools
                 locally_owned_active_cells_around_point.end(),
                 [](const auto &a, const auto &b) { return a.first < b.first; });
 
-      return locally_owned_active_cells_around_point;
+      if (enforce_unique_mapping &&
+          locally_owned_active_cells_around_point.size() > 1)
+        // in the case of unique mapping, we only need a single cell
+        return {locally_owned_active_cells_around_point.front()};
+      else
+        return locally_owned_active_cells_around_point;
     }
 
 
@@ -5806,8 +5829,6 @@ namespace GridTools
       const bool                                             perform_handshake,
       const bool enforce_unique_mapping)
     {
-      Assert(!enforce_unique_mapping || perform_handshake, ExcInternalError());
-
       DistributedComputePointLocationsInternal<dim, spacedim> result;
 
       auto &send_components = result.send_components;
@@ -5879,7 +5900,8 @@ namespace GridTools
                   index_and_point.second,
                   cell_hint,
                   marked_vertices,
-                  tolerance);
+                  tolerance,
+                  enforce_unique_mapping);
 
               for (const auto &cell_and_reference_position :
                    cells_and_reference_positions)
@@ -5893,18 +5915,9 @@ namespace GridTools
                     cell_and_reference_position.second,
                     index_and_point.second,
                     numbers::invalid_unsigned_int);
-
-                  if (enforce_unique_mapping)
-                    break; // in the case of unique mapping, we only need a
-                           // single cell (we take the first)
                 }
 
-              if (perform_handshake)
-                request_buffer_temp[i] =
-                  enforce_unique_mapping ?
-                    std::min<unsigned int>(
-                      1, cells_and_reference_positions.size()) :
-                    cells_and_reference_positions.size();
+              request_buffer_temp[i] = cells_and_reference_positions.size();
             }
 
           if (perform_handshake)
@@ -5945,143 +5958,6 @@ namespace GridTools
       Utilities::MPI::ConsensusAlgorithms::Selector<char, char>(
         process, cache.get_triangulation().get_communicator())
         .run();
-
-      // for unique mapping, we need to modify recv_components and
-      // send_components consistently
-      if (enforce_unique_mapping)
-        {
-          std::vector<unsigned int> mask_recv(recv_components.size());
-          std::vector<unsigned int> mask_send(send_components.size());
-
-          // set up new recv_components and monitor which entries (we keep
-          // the entry of the lowest rank) have been eliminated so that we can
-          // communicate it
-          auto recv_components_copy = recv_components;
-          recv_components.clear();
-
-          for (unsigned int i = 0; i < recv_components_copy.size(); ++i)
-            std::get<2>(recv_components_copy[i]) = i;
-
-          std::sort(recv_components_copy.begin(),
-                    recv_components_copy.end(),
-                    [&](const auto &a, const auto &b) {
-                      if (std::get<0>(a) != std::get<0>(b)) // rank
-                        return std::get<0>(a) < std::get<0>(b);
-
-                      return std::get<2>(a) < std::get<2>(b); // enumeration
-                    });
-
-          std::vector<bool> unique(points.size(), false);
-
-          std::vector<unsigned int> recv_ranks;
-          std::vector<unsigned int> recv_ptrs;
-
-          for (unsigned int i = 0, dummy = numbers::invalid_unsigned_int;
-               i < recv_components_copy.size();
-               ++i)
-            {
-              if (dummy != std::get<0>(recv_components_copy[i]))
-                {
-                  dummy = std::get<0>(recv_components_copy[i]);
-                  recv_ranks.push_back(dummy);
-                  recv_ptrs.push_back(i);
-                }
-
-              if (unique[std::get<1>(recv_components_copy[i])] == false)
-                {
-                  recv_components.emplace_back(recv_components_copy[i]);
-                  mask_recv[i]                                 = 1;
-                  unique[std::get<1>(recv_components_copy[i])] = true;
-                }
-              else
-                {
-                  mask_recv[i] = 0;
-                }
-            }
-          recv_ptrs.push_back(recv_components_copy.size());
-
-          Assert(std::all_of(unique.begin(),
-                             unique.end(),
-                             [](const auto &v) { return v; }),
-                 ExcInternalError());
-
-
-          // prepare send_components so that not needed entries can be
-          // eliminated later on
-          auto send_components_copy = send_components;
-          send_components.clear();
-
-          for (unsigned int i = 0; i < send_components_copy.size(); ++i)
-            std::get<5>(send_components_copy[i]) = i;
-
-          std::sort(send_components_copy.begin(),
-                    send_components_copy.end(),
-                    [&](const auto &a, const auto &b) {
-                      if (std::get<1>(a) != std::get<1>(b)) // rank
-                        return std::get<1>(a) < std::get<1>(b);
-
-                      return std::get<5>(a) < std::get<5>(b); // enumeration
-                    });
-
-          std::vector<unsigned int> send_ranks;
-          std::vector<unsigned int> send_ptrs;
-
-          for (unsigned int i = 0, dummy = numbers::invalid_unsigned_int;
-               i < send_components_copy.size();
-               ++i)
-            {
-              if (dummy != std::get<1>(send_components_copy[i]))
-                {
-                  dummy = std::get<1>(send_components_copy[i]);
-                  send_ranks.push_back(dummy);
-                  send_ptrs.push_back(i);
-                }
-            }
-          send_ptrs.push_back(send_components_copy.size());
-
-          // perform communication
-#ifdef DEAL_II_WITH_MPI
-          std::vector<MPI_Request> req(send_ranks.size() + recv_ranks.size());
-
-          for (unsigned int i = 0; i < send_ranks.size(); ++i)
-            {
-              const auto ierr =
-                MPI_Irecv(mask_send.data() + send_ptrs[i],
-                          send_ptrs[i + 1] - send_ptrs[i],
-                          MPI_UNSIGNED,
-                          send_ranks[i],
-                          Utilities::MPI::internal::Tags::
-                            distributed_compute_point_locations,
-                          cache.get_triangulation().get_communicator(),
-                          &req[i]);
-              AssertThrowMPI(ierr);
-            }
-
-          for (unsigned int i = 0; i < recv_ranks.size(); ++i)
-            {
-              const auto ierr =
-                MPI_Isend(mask_recv.data() + recv_ptrs[i],
-                          recv_ptrs[i + 1] - recv_ptrs[i],
-                          MPI_UNSIGNED,
-                          recv_ranks[i],
-                          Utilities::MPI::internal::Tags::
-                            distributed_compute_point_locations,
-                          cache.get_triangulation().get_communicator(),
-                          &req[i] + send_ranks.size());
-              AssertThrowMPI(ierr);
-            }
-
-          auto ierr = MPI_Waitall(req.size(), req.data(), MPI_STATUSES_IGNORE);
-          AssertThrowMPI(ierr);
-#else
-          mask_send = mask_recv;
-#endif
-
-          // eliminate not needed entries
-          for (unsigned int i = 0; i < send_components_copy.size(); ++i)
-            if (mask_send[i] == 1)
-              send_components.emplace_back(send_components_copy[i]);
-        }
 
       if (true)
         {
