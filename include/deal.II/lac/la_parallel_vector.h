@@ -283,6 +283,11 @@ namespace LinearAlgebra
       Vector(const Vector<Number, MemorySpace> &in_vector);
 
       /**
+       * Move constructor. Uses the swap method.
+       */
+      Vector(Vector<Number, MemorySpace> &&in_vector);
+
+      /**
        * Construct a parallel vector of the given global size without any
        * actual parallel distribution.
        */
