@@ -18,8 +18,9 @@
 #include <deal.II/base/mpi_consensus_algorithms.h>
 
 #include <deal.II/distributed/repartitioning_policy_tools.h>
+#include <deal.II/distributed/tria_base.h>
 
-#include <deal.II/multigrid/mg_transfer_global_coarsening.templates.h>
+#include <deal.II/grid/cell_id_translator.h>
 
 DEAL_II_NAMESPACE_OPEN
 
