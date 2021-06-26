@@ -295,7 +295,7 @@ namespace FEInterfaceViews
 
     /**
      * This is the type returned for gradients, for example from
-     * average_gradient().
+     * average_of_gradients().
      */
     using gradient_type =
       typename FEValuesViews::Vector<dim, spacedim>::gradient_type;
@@ -352,13 +352,13 @@ namespace FEInterfaceViews
      * @p interface_dof_index in the quadrature point @p q_point.
      */
     value_type
-    jump_value(const unsigned int interface_dof_index,
-               const unsigned int q_point) const;
+    jump_in_values(const unsigned int interface_dof_index,
+                   const unsigned int q_point) const;
 
     /**
      * The same as above.
      *
-     * @deprecated Use the jump_value() function instead.
+     * @deprecated Use the jump_in_values() function instead.
      */
     DEAL_II_DEPRECATED
     value_type
@@ -371,13 +371,13 @@ namespace FEInterfaceViews
      * function @p interface_dof_index in the quadrature point @p q_point.
      */
     value_type
-    average_value(const unsigned int interface_dof_index,
-                  const unsigned int q_point) const;
+    average_of_values(const unsigned int interface_dof_index,
+                      const unsigned int q_point) const;
 
     /**
      * The same as above.
      *
-     * @deprecated Use the average_value() function instead.
+     * @deprecated Use the average_of_values() function instead.
      */
     DEAL_II_DEPRECATED
     value_type
@@ -390,6 +390,16 @@ namespace FEInterfaceViews
      * function @p interface_dof_index in the quadrature point @p q_point.
      */
     gradient_type
+    average_of_gradients(const unsigned int interface_dof_index,
+                         const unsigned int q_point) const;
+
+    /**
+     * The same as above.
+     *
+     * @deprecated Use the average_of_gradients() function instead.
+     */
+    DEAL_II_DEPRECATED
+    gradient_type
     average_gradient(const unsigned int interface_dof_index,
                      const unsigned int q_point) const;
 
@@ -397,6 +407,15 @@ namespace FEInterfaceViews
      * Return the jump of the gradient (a tensor of rank 2) $\jump{\nabla
      * \mathbf{u}}$ on the interface for the shape
      * function @p interface_dof_index in the quadrature point @p q_point.
+     */
+    gradient_type
+    jump_in_gradients(const unsigned int interface_dof_index,
+                      const unsigned int q_point) const;
+
+    /**
+     * The same as above.
+     *
+     * @deprecated Use the average_of_gradients() function instead.
      */
     gradient_type
     jump_gradient(const unsigned int interface_dof_index,
@@ -410,6 +429,15 @@ namespace FEInterfaceViews
      * q_point of the component selected by this view.
      */
     hessian_type
+    average_of_hessians(const unsigned int interface_dof_index,
+                        const unsigned int q_point) const;
+
+    /**
+     * The same as above.
+     *
+     * @deprecated Use the average_of_hessians() function instead.
+     */
+    hessian_type
     average_hessian(const unsigned int interface_dof_index,
                     const unsigned int q_point) const;
 
@@ -418,6 +446,15 @@ namespace FEInterfaceViews
      * - \nabla u_{\text{cell1}}$ on the interface for the shape function @p
      * interface_dof_index at the quadrature point @p q_point of
      * the component selected by this view.
+     */
+    hessian_type
+    jump_in_hessians(const unsigned int interface_dof_index,
+                     const unsigned int q_point) const;
+
+    /**
+     * The same as above.
+     *
+     * @deprecated Use the average_of_hessians() function instead.
      */
     hessian_type
     jump_hessian(const unsigned int interface_dof_index,
@@ -430,13 +467,13 @@ namespace FEInterfaceViews
      * the component selected by this view.
      */
     third_derivative_type
-    jump_third_derivative(const unsigned int interface_dof_index,
-                          const unsigned int q_point) const;
+    jump_in_third_derivatives(const unsigned int interface_dof_index,
+                              const unsigned int q_point) const;
 
     /**
      * The same as above.
      *
-     * @deprecated Use the jump_third_derivative() function instead.
+     * @deprecated Use the jump_in_third_derivatives() function instead.
      */
     DEAL_II_DEPRECATED
     third_derivative_type
@@ -2022,8 +2059,8 @@ namespace FEInterfaceViews
 
   template <int dim, int spacedim>
   typename Vector<dim, spacedim>::value_type
-  Vector<dim, spacedim>::jump_value(const unsigned int interface_dof_index,
-                                    const unsigned int q_point) const
+  Vector<dim, spacedim>::jump_in_values(const unsigned int interface_dof_index,
+                                        const unsigned int q_point) const
   {
     const auto dof_pair = this->fe_interface->dofmap[interface_dof_index];
 
@@ -2049,15 +2086,16 @@ namespace FEInterfaceViews
   Vector<dim, spacedim>::jump(const unsigned int interface_dof_index,
                               const unsigned int q_point) const
   {
-    return jump_value(interface_dof_index, q_point);
+    return jump_in_values(interface_dof_index, q_point);
   }
 
 
 
   template <int dim, int spacedim>
   typename Vector<dim, spacedim>::value_type
-  Vector<dim, spacedim>::average_value(const unsigned int interface_dof_index,
-                                       const unsigned int q_point) const
+  Vector<dim, spacedim>::average_of_values(
+    const unsigned int interface_dof_index,
+    const unsigned int q_point) const
   {
     const auto dof_pair = this->fe_interface->dofmap[interface_dof_index];
 
@@ -2088,14 +2126,14 @@ namespace FEInterfaceViews
   Vector<dim, spacedim>::average(const unsigned int interface_dof_index,
                                  const unsigned int q_point) const
   {
-    return average_value(interface_dof_index, q_point);
+    return average_of_values(interface_dof_index, q_point);
   }
 
 
 
   template <int dim, int spacedim>
   typename Vector<dim, spacedim>::gradient_type
-  Vector<dim, spacedim>::average_gradient(
+  Vector<dim, spacedim>::average_of_gradients(
     const unsigned int interface_dof_index,
     const unsigned int q_point) const
   {
@@ -2124,8 +2162,20 @@ namespace FEInterfaceViews
 
   template <int dim, int spacedim>
   typename Vector<dim, spacedim>::gradient_type
-  Vector<dim, spacedim>::jump_gradient(const unsigned int interface_dof_index,
-                                       const unsigned int q_point) const
+  Vector<dim, spacedim>::average_gradient(
+    const unsigned int interface_dof_index,
+    const unsigned int q_point) const
+  {
+    return average_of_gradients(interface_dof_index, q_point);
+  }
+
+
+
+  template <int dim, int spacedim>
+  typename Vector<dim, spacedim>::gradient_type
+  Vector<dim, spacedim>::jump_in_gradients(
+    const unsigned int interface_dof_index,
+    const unsigned int q_point) const
   {
     const auto dof_pair = this->fe_interface->dofmap[interface_dof_index];
 
@@ -2151,9 +2201,20 @@ namespace FEInterfaceViews
 
 
   template <int dim, int spacedim>
+  typename Vector<dim, spacedim>::gradient_type
+  Vector<dim, spacedim>::jump_gradient(const unsigned int interface_dof_index,
+                                       const unsigned int q_point) const
+  {
+    return jump_in_gradients(interface_dof_index, q_point);
+  }
+
+
+
+  template <int dim, int spacedim>
   typename Vector<dim, spacedim>::hessian_type
-  Vector<dim, spacedim>::average_hessian(const unsigned int interface_dof_index,
-                                         const unsigned int q_point) const
+  Vector<dim, spacedim>::average_of_hessians(
+    const unsigned int interface_dof_index,
+    const unsigned int q_point) const
   {
     const auto dof_pair = this->fe_interface->dofmap[interface_dof_index];
 
@@ -2180,8 +2241,19 @@ namespace FEInterfaceViews
 
   template <int dim, int spacedim>
   typename Vector<dim, spacedim>::hessian_type
-  Vector<dim, spacedim>::jump_hessian(const unsigned int interface_dof_index,
-                                      const unsigned int q_point) const
+  Vector<dim, spacedim>::average_hessian(const unsigned int interface_dof_index,
+                                         const unsigned int q_point) const
+  {
+    return average_of_hessians(interface_dof_index, q_point);
+  }
+
+
+
+  template <int dim, int spacedim>
+  typename Vector<dim, spacedim>::hessian_type
+  Vector<dim, spacedim>::jump_in_hessians(
+    const unsigned int interface_dof_index,
+    const unsigned int q_point) const
   {
     const auto dof_pair = this->fe_interface->dofmap[interface_dof_index];
 
@@ -2207,8 +2279,18 @@ namespace FEInterfaceViews
 
 
   template <int dim, int spacedim>
+  typename Vector<dim, spacedim>::hessian_type
+  Vector<dim, spacedim>::jump_hessian(const unsigned int interface_dof_index,
+                                      const unsigned int q_point) const
+  {
+    return jump_in_hessians(interface_dof_index, q_point);
+  }
+
+
+
+  template <int dim, int spacedim>
   typename Vector<dim, spacedim>::third_derivative_type
-  Vector<dim, spacedim>::jump_third_derivative(
+  Vector<dim, spacedim>::jump_in_third_derivatives(
     const unsigned int interface_dof_index,
     const unsigned int q_point) const
   {
@@ -2240,7 +2322,7 @@ namespace FEInterfaceViews
     const unsigned int interface_dof_index,
     const unsigned int q_point) const
   {
-    return jump_third_derivative(interface_dof_index, q_point);
+    return jump_in_third_derivatives(interface_dof_index, q_point);
   }
 } // namespace FEInterfaceViews
 
