@@ -551,12 +551,14 @@ namespace internal
       , mg_level_fine(mg_level_fine)
       , communicator(
           mesh_fine.get_communicator() /*TODO: fix for different comms*/)
-      , cell_id_translator(n_coarse_cells(mesh_fine),
-                           n_global_levels(mesh_fine))
+      , cell_id_translator(
+          mesh_fine.get_triangulation().n_global_coarse_cells(),
+          mesh_fine.get_triangulation().n_global_levels())
     {
-      AssertDimension(n_coarse_cells(mesh_fine), n_coarse_cells(mesh_coarse));
-      AssertIndexRange(n_global_levels(mesh_coarse),
-                       n_global_levels(mesh_fine) + 1);
+      AssertDimension(mesh_fine.get_triangulation().n_global_coarse_cells(),
+                      mesh_coarse.get_triangulation().n_global_coarse_cells());
+      AssertIndexRange(mesh_coarse.get_triangulation().n_global_levels(),
+                       mesh_fine.get_triangulation().n_global_levels() + 1);
     }
 
     void
@@ -969,25 +971,6 @@ namespace internal
     std::map<unsigned int,
              std::pair<unsigned int, std::vector<types::global_dof_index>>>
       map;
-
-    static unsigned int
-    n_coarse_cells(const DoFHandler<dim> &mesh)
-    {
-      types::coarse_cell_id n_coarse_cells = 0;
-
-      for (const auto &cell : mesh.get_triangulation().active_cell_iterators())
-        if (!cell->is_artificial())
-          n_coarse_cells =
-            std::max(n_coarse_cells, cell->id().get_coarse_cell_id());
-
-      return Utilities::MPI::max(n_coarse_cells, mesh.get_communicator()) + 1;
-    }
-
-    static unsigned int
-    n_global_levels(const DoFHandler<dim> &mesh)
-    {
-      return mesh.get_triangulation().n_global_levels();
-    }
   };
 
   template <int dim>

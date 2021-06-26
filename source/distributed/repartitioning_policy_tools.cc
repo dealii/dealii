@@ -28,31 +28,6 @@ namespace RepartitioningPolicyTools
 {
   namespace
   {
-    template <typename MeshType>
-    unsigned int
-    compute_n_coarse_cells(const MeshType &mesh)
-    {
-      types::coarse_cell_id n_coarse_cells = 0;
-
-      for (const auto &cell :
-           mesh.get_triangulation().cell_iterators_on_level(0))
-        n_coarse_cells =
-          std::max(n_coarse_cells, cell->id().get_coarse_cell_id());
-
-      return Utilities::MPI::max(n_coarse_cells, mesh.get_communicator()) + 1;
-    }
-
-
-
-    template <typename MeshType>
-    unsigned int
-    compute_n_global_levels(const MeshType &mesh)
-    {
-      return mesh.get_triangulation().n_global_levels();
-    }
-
-
-
     template <int dim, int spacedim>
     void
     add_indices_recursevly_for_first_child_policy(
@@ -83,8 +58,8 @@ namespace RepartitioningPolicyTools
   template <int dim, int spacedim>
   FirstChildPolicy<dim, spacedim>::FirstChildPolicy(
     const Triangulation<dim, spacedim> &tria_fine)
-    : n_coarse_cells(compute_n_coarse_cells(tria_fine))
-    , n_global_levels(compute_n_global_levels(tria_fine))
+    : n_coarse_cells(tria_fine.n_global_coarse_cells())
+    , n_global_levels(tria_fine.n_global_levels())
   {
     Assert(
       tria_fine.all_reference_cells_are_hyper_cube(),

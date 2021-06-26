@@ -289,6 +289,9 @@ namespace parallel
     communicate_locally_moved_vertices(
       const std::vector<bool> &vertex_locally_moved);
 
+    virtual types::coarse_cell_id
+    n_global_coarse_cells() const override;
+
   protected:
     /**
      * MPI communicator to be used for the triangulation. We create a unique
@@ -318,22 +321,31 @@ namespace parallel
        * Number of locally owned active cells of this MPI rank.
        */
       unsigned int n_locally_owned_active_cells;
+
       /**
        * The total number of active cells (sum of @p
        * n_locally_owned_active_cells).
        */
       types::global_cell_index n_global_active_cells;
+
+      /**
+       * Number of global coarse cells.
+       */
+      types::coarse_cell_id number_of_global_coarse_cells;
+
       /**
        * The global number of levels computed as the maximum number of levels
        * taken over all MPI ranks, so <tt>n_levels()<=n_global_levels =
        * max(n_levels() on proc i)</tt>.
        */
       unsigned int n_global_levels;
+
       /**
        * A set containing the subdomain_id (MPI rank) of the owners of the
        * ghost cells on this processor.
        */
       std::set<types::subdomain_id> ghost_owners;
+
       /**
        * A set containing the MPI ranks of the owners of the level ghost cells
        * on this processor (for all levels).
