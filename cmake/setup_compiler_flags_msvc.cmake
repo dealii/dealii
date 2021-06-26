@@ -99,6 +99,13 @@ IF (CMAKE_BUILD_TYPE MATCHES "Release")
   # General optimization flags: (very basic for now)
   #
   ADD_FLAGS(DEAL_II_CXX_FLAGS_RELEASE "/O2")
+
+  #
+  # Disable assert() in deal.II and user projects in release mode
+  #
+  LIST(APPEND DEAL_II_DEFINITIONS_RELEASE "NDEBUG")
+  LIST(APPEND DEAL_II_USER_DEFINITIONS_RELEASE "NDEBUG")
+
 ENDIF()
 
 
