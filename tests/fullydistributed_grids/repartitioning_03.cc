@@ -133,4 +133,14 @@ main(int argc, char **argv)
   // first-child policy
   test(RepartitioningPolicyTools::MinimalGranularityPolicy<dim>(4),
        "grid_policy_minimal");
+
+  // cell-weight policy
+  test(RepartitioningPolicyTools::CellWeightPolicy<dim>(
+         [](const auto &cell, const auto) {
+           return (cell->global_active_cell_index() <
+                   cell->get_triangulation().n_global_active_cells() / 2) ?
+                    1.0 :
+                    2.0;
+         }),
+       "grid_policy_weight");
 }

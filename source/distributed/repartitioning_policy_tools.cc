@@ -228,6 +228,91 @@ namespace RepartitioningPolicyTools
   }
 
 
+
+  template <int dim, int spacedim>
+  CellWeightPolicy<dim, spacedim>::CellWeightPolicy(
+    const std::function<
+      unsigned int(const typename Triangulation<dim, spacedim>::cell_iterator &,
+                   const typename Triangulation<dim, spacedim>::CellStatus)>
+      &weighting_function)
+    : weighting_function(weighting_function)
+  {}
+
+
+
+  template <int dim, int spacedim>
+  LinearAlgebra::distributed::Vector<double>
+  CellWeightPolicy<dim, spacedim>::partition(
+    const Triangulation<dim, spacedim> &tria_in) const
+  {
+#ifndef DEAL_II_WITH_MPI
+    (void)tria_in;
+    return {};
+#else
+
+    const auto tria =
+      dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
+        &tria_in);
+
+    Assert(tria, ExcNotImplemented());
+
+    const auto partitioner =
+      tria->global_active_cell_index_partitioner().lock();
+
+    std::vector<unsigned int> weights(partitioner->local_size());
+
+    const auto mpi_communicator = tria_in.get_communicator();
+    const auto n_subdomains = Utilities::MPI::n_mpi_processes(mpi_communicator);
+
+    // determine weight of each cell
+    for (const auto &cell : tria->active_cell_iterators())
+      if (cell->is_locally_owned())
+        weights[partitioner->global_to_local(
+          cell->global_active_cell_index())] =
+          weighting_function(
+            cell, Triangulation<dim, spacedim>::CellStatus::CELL_PERSIST);
+
+    // determine weight of all the cells locally owned by this process
+    types::global_cell_index process_local_weight = 0;
+    for (const auto &weight : weights)
+      process_local_weight += weight;
+
+    // determine partial sum of weights of this process
+    types::global_cell_index process_local_weight_offset = 0;
+
+    int ierr =
+      MPI_Exscan(&process_local_weight,
+                 &process_local_weight_offset,
+                 1,
+                 Utilities::MPI::internal::mpi_type_id(&process_local_weight),
+                 MPI_SUM,
+                 tria->get_communicator());
+    AssertThrowMPI(ierr);
+
+    // total weight of all processes
+    types::global_cell_index total_weight =
+      process_local_weight_offset + process_local_weight;
+
+    ierr = MPI_Bcast(&total_weight,
+                     1,
+                     Utilities::MPI::internal::mpi_type_id(&total_weight),
+                     n_subdomains - 1,
+                     mpi_communicator);
+
+    // setup partition
+    LinearAlgebra::distributed::Vector<double> partition(partitioner);
+
+    for (types::global_cell_index i = 0, weight = process_local_weight_offset;
+         i < partition.locally_owned_size();
+         weight += weights[i], ++i)
+      partition.local_element(i) =
+        static_cast<double>(weight * n_subdomains / total_weight);
+
+    return partition;
+#endif
+  }
+
+
 } // namespace RepartitioningPolicyTools
 
 
