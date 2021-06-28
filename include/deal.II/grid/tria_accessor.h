@@ -3704,6 +3704,14 @@ public:
   is_ghost() const;
 
   /**
+   * Return true if either the Triangulation is not distributed or if the
+   * cell is not artificial and the level_subdomain_id() is not equal to the id
+   * of the current processor.
+   */
+  bool
+  is_ghost_on_level() const;
+
+  /**
    * Return whether this cell is artificial, i.e. it isn't one of the cells
    * owned by the current processor, and it also doesn't border on one. As a
    * consequence, it exists in the mesh to ensure that each processor has all

@@ -3737,6 +3737,27 @@ CellAccessor<dim, spacedim>::is_ghost() const
 }
 
 
+template <int dim, int spacedim>
+inline bool
+CellAccessor<dim, spacedim>::is_ghost_on_level() const
+{
+#ifndef DEAL_II_WITH_MPI
+  return true;
+#else
+
+  // Serial triangulations report invalid_subdomain_id as their locally owned
+  // subdomain, so the first condition checks whether we have a serial
+  // triangulation, in which case all cells are locally owned. The second
+  // condition compares the subdomain id in the parallel case.
+  return (
+    this->tria->locally_owned_subdomain() == numbers::invalid_subdomain_id ||
+    (this->level_subdomain_id() != this->tria->locally_owned_subdomain() &&
+     this->level_subdomain_id() != numbers::artificial_subdomain_id));
+
+#endif
+}
+
+
 
 template <int dim, int spacedim>
 inline bool
