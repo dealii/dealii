@@ -32,6 +32,7 @@
 
 #include <deal.II/fe/fe_tools.h>
 
+#include <deal.II/grid/cell_id_translator.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria_description.h>
 
@@ -326,52 +327,6 @@ namespace internal
       return cell_local_chilren_indices;
     }
 
-    template <int dim>
-    types::coarse_cell_id
-    convert_cell_id_binary_type_to_level_coarse_cell_id(
-      const typename CellId::binary_type &binary_representation)
-    {
-      // exploiting the structure of CellId::binary_type
-      // see also the documentation of CellId
-
-      // actual coarse-grid id
-      const unsigned int coarse_cell_id  = binary_representation[0];
-      const unsigned int n_child_indices = binary_representation[1] >> 2;
-
-      const unsigned int children_per_value =
-        sizeof(CellId::binary_type::value_type) * 8 / dim;
-      unsigned int child_level  = 0;
-      unsigned int binary_entry = 2;
-
-      // path to the get to the cell
-      std::vector<unsigned int> cell_indices;
-      while (child_level < n_child_indices)
-        {
-          Assert(binary_entry < binary_representation.size(),
-                 ExcInternalError());
-
-          for (unsigned int j = 0; j < children_per_value; ++j)
-            {
-              unsigned int cell_index =
-                (((binary_representation[binary_entry] >> (j * dim))) &
-                 (GeometryInfo<dim>::max_children_per_cell - 1));
-              cell_indices.push_back(cell_index);
-              ++child_level;
-              if (child_level == n_child_indices)
-                break;
-            }
-          ++binary_entry;
-        }
-
-      // compute new coarse-grid id: c_{i+1} = c_{i}*2^dim + q;
-      types::coarse_cell_id level_coarse_cell_id = coarse_cell_id;
-      for (auto i : cell_indices)
-        level_coarse_cell_id =
-          level_coarse_cell_id * GeometryInfo<dim>::max_children_per_cell + i;
-
-      return level_coarse_cell_id;
-    }
-
     template <int dim, int spacedim>
     std::unique_ptr<FiniteElement<1>>
     create_1D_fe(const FiniteElement<dim, spacedim> &fe)
@@ -454,89 +409,6 @@ namespace internal
     const std::function<void(std::vector<types::global_dof_index> &)>
                                         get_dof_indices_function;
     const std::function<unsigned int()> active_fe_index_function;
-  };
-
-  template <int dim>
-  class CellIDTranslator
-  {
-  public:
-    CellIDTranslator(const types::global_cell_index n_coarse_cells,
-                     const types::global_cell_index n_global_levels)
-      : n_coarse_cells(n_coarse_cells)
-      , n_global_levels(n_global_levels)
-    {
-      tree_sizes.push_back(0);
-      for (unsigned int i = 0; i < n_global_levels; ++i)
-        tree_sizes.push_back(
-          tree_sizes.back() +
-          Utilities::pow(GeometryInfo<dim>::max_children_per_cell, i) *
-            n_coarse_cells);
-    }
-
-    types::global_cell_index
-    size() const
-    {
-      return n_coarse_cells *
-             (Utilities::pow(GeometryInfo<dim>::max_children_per_cell,
-                             n_global_levels) -
-              1);
-    }
-
-    template <typename T>
-    types::global_cell_index
-    translate(const T &cell) const
-    {
-      types::global_cell_index id = 0;
-
-      id += convert_cell_id_binary_type_to_level_coarse_cell_id<dim>(
-        cell->id().template to_binary<dim>());
-
-      id += tree_sizes[cell->level()];
-
-      return id;
-    }
-
-    template <typename T>
-    types::global_cell_index
-    translate(const T &cell, const types::global_cell_index i) const
-    {
-      return (translate(cell) - tree_sizes[cell->level()]) *
-               GeometryInfo<dim>::max_children_per_cell +
-             i + tree_sizes[cell->level() + 1];
-    }
-
-    CellId
-    to_cell_id(const types::global_cell_index id) const
-    {
-      std::vector<std::uint8_t> child_indices;
-
-      types::global_cell_index id_temp = id;
-
-      types::global_cell_index level = 0;
-
-      for (; level < n_global_levels; ++level)
-        if (id < tree_sizes[level])
-          break;
-      level -= 1;
-
-      id_temp -= tree_sizes[level];
-
-      for (types::global_cell_index l = 0; l < level; ++l)
-        {
-          child_indices.push_back(id_temp %
-                                  GeometryInfo<dim>::max_children_per_cell);
-          id_temp /= GeometryInfo<dim>::max_children_per_cell;
-        }
-
-      std::reverse(child_indices.begin(), child_indices.end());
-
-      return {id_temp, child_indices}; // TODO
-    }
-
-  private:
-    const types::global_cell_index        n_coarse_cells;
-    const types::global_cell_index        n_global_levels;
-    std::vector<types::global_cell_index> tree_sizes;
   };
 
   template <int dim>
