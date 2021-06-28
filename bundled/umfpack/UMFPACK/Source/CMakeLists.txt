@@ -315,7 +315,7 @@ SET(src_umfpack_DL_AND_ZL
   umf_assemble.cc umf_blas3_update.cc umf_build_tuples.cc umf_create_element.cc
   umf_dump.cc umf_extend_front.cc umf_garbage_collection.cc umf_get_memory.cc
   umf_init_front.cc umf_kernel.cc umf_kernel_init.cc umf_kernel_wrapup.cc
-  umf_local_search.cc umf_lsolve.cc umf_ltsolve umf_mem_alloc_element.cc
+  umf_local_search.cc umf_lsolve.cc umf_ltsolve.cc umf_mem_alloc_element.cc
   umf_mem_alloc_head_block.cc umf_mem_alloc_tail_block.cc
   umf_mem_free_tail_block.cc umf_mem_init_memoryspace.cc
   umf_report_vector.cc umf_row_search.cc umf_scale_column.cc
