@@ -1712,6 +1712,16 @@ public:
                             const bool                   verbose = false) const;
 
   /**
+   * Make the current object consistent on all processors
+   * in a distributed computation. One should call this function before
+   * calling close().
+   */
+  void
+  make_consistent_in_parallel(const IndexSet &locally_owned_dofs,
+                              const IndexSet &locally_relevant_dofs,
+                              const MPI_Comm  mpi_communicator);
+
+  /**
    * Exception
    *
    * @ingroup Exceptions
