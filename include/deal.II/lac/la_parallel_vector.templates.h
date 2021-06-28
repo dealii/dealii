@@ -713,7 +713,7 @@ namespace LinearAlgebra
 
     template <typename Number, typename MemorySpaceType>
     Vector<Number, MemorySpaceType>::Vector( // NOLINT
-      Vector<Number, MemorySpaceType> &&v) // NOLINT
+      Vector<Number, MemorySpaceType> &&v)
       : Vector()
     {
       static_cast<Subscriptor &>(*this) = static_cast<Subscriptor &&>(v);
