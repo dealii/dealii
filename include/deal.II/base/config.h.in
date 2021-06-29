@@ -81,6 +81,8 @@
  * For documentation see cmake/checks/check_03_compiler_bugs.cmake
  */
 
+#cmakedefine DEAL_II_DELETED_MOVE_CONSTRUCTOR_BUG
+
 /***********************************************************************
  * Compiler features:
  *
