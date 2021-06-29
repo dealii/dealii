@@ -21,6 +21,8 @@
 
 #include <deal.II/grid/cell_id.h>
 
+#include <cstdint>
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace internal
@@ -119,6 +121,30 @@ namespace internal
     : n_coarse_cells(n_coarse_cells)
     , n_global_levels(n_global_levels)
   {
+    std::uint64_t max_cell_index = 0;
+
+    for (unsigned int i = 0; i < n_global_levels; ++i)
+      max_cell_index +=
+        Utilities::pow<std::uint64_t>(GeometryInfo<dim>::max_children_per_cell,
+                                      i) *
+        n_coarse_cells;
+
+    max_cell_index -= 1;
+
+    Assert(
+      max_cell_index <= std::numeric_limits<types::global_cell_index>::max(),
+      ExcMessage(
+        "You have exceeded the maximal number of possible indices this function "
+        "can handle. The current setup (n_coarse_cells=" +
+        std::to_string(n_coarse_cells) +
+        ", n_global_levels=" + std::to_string(n_global_levels) + ") requires " +
+        std::to_string(max_cell_index + 1) +
+        " indices but the current deal.II configuration only supports " +
+        std::to_string(std::numeric_limits<types::global_cell_index>::max()) +
+        " indices. You may want to consider to build deal.II with 64bit "
+        "indeces (-D DEAL_II_WITH_64BIT_INDICES=\"ON\") to increase the limit "
+        "of indices."));
+
     tree_sizes.push_back(0);
     for (unsigned int i = 0; i < n_global_levels; ++i)
       tree_sizes.push_back(
