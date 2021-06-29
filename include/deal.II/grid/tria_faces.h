@@ -110,12 +110,8 @@ namespace internal
     TriaFaces::serialize(Archive &ar, const unsigned int)
     {
       ar &dim;
-
-      if (dim == 2)
-        ar &lines;
-
-      if (dim == 3)
-        ar &quads &lines &quads_line_orientations &quad_reference_cell;
+      ar &lines;
+      ar &quads &lines &quads_line_orientations &quad_reference_cell;
     }
   } // namespace TriangulationImplementation
 } // namespace internal

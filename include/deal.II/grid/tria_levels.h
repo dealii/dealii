@@ -268,12 +268,8 @@ namespace internal
       ar &parents;
       ar &direction_flags;
       ar &cells;
-
-      if (dim == 3)
-        ar &face_orientations;
-
-      if (dim == 2 || dim == 3)
-        ar &reference_cell;
+      ar &face_orientations;
+      ar &reference_cell;
     }
 
   } // namespace TriangulationImplementation
