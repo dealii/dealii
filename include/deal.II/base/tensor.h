@@ -166,7 +166,7 @@ public:
   constexpr DEAL_II_CUDA_HOST_DEV
   Tensor(const OtherNumber &initializer);
 
-#if __GNUC__ >= 11 || defined __INTEL_COMPILER
+#ifdef DEAL_II_DELETED_MOVE_CONSTRUCTOR_BUG
   /**
    * Copy constructor
    */
@@ -174,22 +174,10 @@ public:
   Tensor(const Tensor<0, dim, Number> &other);
 
   /**
-   * Copy assignment operator
-   */
-  constexpr DEAL_II_CUDA_HOST_DEV Tensor<0, dim, Number> &
-                                  operator=(const Tensor<0, dim, Number> &other);
-
-  /**
    * Move constructor
    */
   constexpr DEAL_II_CUDA_HOST_DEV
     Tensor(Tensor<0, dim, Number> &&other) noexcept;
-
-  /**
-   * Move assignment operator
-   */
-  constexpr DEAL_II_CUDA_HOST_DEV Tensor<0, dim, Number> &
-                                  operator=(Tensor<0, dim, Number> &&other) noexcept;
 #endif
 
   /**
@@ -248,6 +236,27 @@ public:
   template <typename OtherNumber>
   constexpr DEAL_II_CUDA_HOST_DEV Tensor &
                                   operator=(const Tensor<0, dim, OtherNumber> &rhs);
+
+#if defined(__INTEL_COMPILER) || defined(DEAL_II_DELETED_MOVE_CONSTRUCTOR_BUG)
+  /**
+   * Assignment from tensors with same underlying scalar type.
+   * This is needed for ICC15 because it can't generate a suitable
+   * copy constructor for Sacado::Rad::ADvar types automatically.
+   * See https://github.com/dealii/dealii/pull/5865.
+   *
+   * @note This function can also be used in CUDA device code.
+   */
+  constexpr DEAL_II_CUDA_HOST_DEV Tensor &
+                                  operator=(const Tensor<0, dim, Number> &rhs);
+#endif
+
+#ifdef DEAL_II_DELETED_MOVE_CONSTRUCTOR_BUG
+  /**
+   * Move assignment operator
+   */
+  constexpr DEAL_II_CUDA_HOST_DEV Tensor<0, dim, Number> &
+                                  operator=(Tensor<0, dim, Number> &&other) noexcept;
+#endif
 
   /**
    * This operator assigns a scalar to a tensor. This obviously requires
@@ -560,28 +569,16 @@ public:
   constexpr
   operator Tensor<1, dim, Tensor<rank_ - 1, dim, OtherNumber>>() const;
 
-#if __GNUC__ >= 11 || defined __INTEL_COMPILER
+#ifdef DEAL_II_DELETED_MOVE_CONSTRUCTOR_BUG
   /**
    * Copy constructor
    */
   constexpr Tensor(const Tensor<rank_, dim, Number> &);
 
   /**
-   * Copy assignment operator
-   */
-  constexpr Tensor<rank_, dim, Number> &
-  operator=(const Tensor<rank_, dim, Number> &);
-
-  /**
    * Move constructor
    */
   constexpr Tensor(Tensor<rank_, dim, Number> &&) noexcept;
-
-  /**
-   * Move assignment operator
-   */
-  constexpr Tensor<rank_, dim, Number> &
-  operator=(Tensor<rank_, dim, Number> &&) noexcept;
 #endif
 
   /**
@@ -652,6 +649,20 @@ public:
    */
   constexpr Tensor &
   operator=(const Number &d);
+
+#ifdef DEAL_II_DELETED_MOVE_CONSTRUCTOR_BUG
+  /**
+   * Copy assignment operator
+   */
+  constexpr Tensor<rank_, dim, Number> &
+  operator=(const Tensor<rank_, dim, Number> &);
+
+  /**
+   * Move assignment operator
+   */
+  constexpr Tensor<rank_, dim, Number> &
+  operator=(Tensor<rank_, dim, Number> &&) noexcept;
+#endif
 
   /**
    * Test for equality of two tensors.
@@ -922,8 +933,7 @@ constexpr DEAL_II_ALWAYS_INLINE DEAL_II_CUDA_HOST_DEV
 {}
 
 
-
-#  if __GNUC__ >= 11 || defined __INTEL_COMPILER
+#  ifdef DEAL_II_DELETED_MOVE_CONSTRUCTOR_BUG
 template <int dim, typename Number>
 constexpr DEAL_II_ALWAYS_INLINE DEAL_II_CUDA_HOST_DEV
                                 Tensor<0, dim, Number>::Tensor(const Tensor<0, dim, Number> &other)
@@ -933,32 +943,11 @@ constexpr DEAL_II_ALWAYS_INLINE DEAL_II_CUDA_HOST_DEV
 
 
 template <int dim, typename Number>
-constexpr DEAL_II_ALWAYS_INLINE DEAL_II_CUDA_HOST_DEV Tensor<0, dim, Number> &
-Tensor<0, dim, Number>::operator=(const Tensor<0, dim, Number> &other)
-{
-  value = other.value;
-  return *this;
-}
-
-
-
-template <int dim, typename Number>
 constexpr DEAL_II_ALWAYS_INLINE DEAL_II_CUDA_HOST_DEV
                                 Tensor<0, dim, Number>::Tensor(Tensor<0, dim, Number> &&other) noexcept
   : value{std::move(other.value)}
 {}
-
-
-
-template <int dim, typename Number>
-constexpr DEAL_II_ALWAYS_INLINE DEAL_II_CUDA_HOST_DEV Tensor<0, dim, Number> &
-  Tensor<0, dim, Number>::operator=(Tensor<0, dim, Number> &&other) noexcept
-{
-  value = std::move(other.value);
-  return *this;
-}
 #  endif
-
 
 
 template <int dim, typename Number>
@@ -1032,6 +1021,29 @@ constexpr inline DEAL_II_ALWAYS_INLINE
   value = internal::NumberType<Number>::value(p);
   return *this;
 }
+
+
+#  if defined(__INTEL_COMPILER) || defined(DEAL_II_DELETED_MOVE_CONSTRUCTOR_BUG)
+template <int dim, typename Number>
+constexpr inline DEAL_II_ALWAYS_INLINE
+  DEAL_II_CUDA_HOST_DEV Tensor<0, dim, Number> &
+  Tensor<0, dim, Number>::operator=(const Tensor<0, dim, Number> &p)
+{
+  value = p.value;
+  return *this;
+}
+#  endif
+
+#  ifdef DEAL_II_DELETED_MOVE_CONSTRUCTOR_BUG
+template <int dim, typename Number>
+constexpr DEAL_II_ALWAYS_INLINE DEAL_II_CUDA_HOST_DEV Tensor<0, dim, Number> &
+  Tensor<0, dim, Number>::operator=(Tensor<0, dim, Number> &&other) noexcept
+{
+  value = std::move(other.value);
+  return *this;
+}
+#  endif
+
 
 
 template <int dim, typename Number>
@@ -1264,6 +1276,7 @@ constexpr DEAL_II_ALWAYS_INLINE DEAL_II_CUDA_HOST_DEV
 {}
 
 
+
 template <int rank_, int dim, typename Number>
 template <typename OtherNumber>
 constexpr DEAL_II_ALWAYS_INLINE
@@ -1271,6 +1284,7 @@ Tensor<rank_, dim, Number>::Tensor(
   const Tensor<1, dim, Tensor<rank_ - 1, dim, OtherNumber>> &initializer)
   : Tensor(initializer, std::make_index_sequence<dim>{})
 {}
+
 
 
 template <int rank_, int dim, typename Number>
@@ -1282,7 +1296,7 @@ constexpr DEAL_II_ALWAYS_INLINE Tensor<rank_, dim, Number>::
 }
 
 
-#  if __GNUC__ >= 11 || defined __INTEL_COMPILER
+#  ifdef DEAL_II_DELETED_MOVE_CONSTRUCTOR_BUG
 template <int rank_, int dim, typename Number>
 constexpr DEAL_II_ALWAYS_INLINE
 Tensor<rank_, dim, Number>::Tensor(const Tensor<rank_, dim, Number> &other)
@@ -1292,15 +1306,6 @@ Tensor<rank_, dim, Number>::Tensor(const Tensor<rank_, dim, Number> &other)
 }
 
 
-template <int rank_, int dim, typename Number>
-constexpr DEAL_II_ALWAYS_INLINE Tensor<rank_, dim, Number> &
-Tensor<rank_, dim, Number>::operator=(const Tensor<rank_, dim, Number> &other)
-{
-  for (unsigned int i = 0; i < dim; ++i)
-    values[i] = other.values[i];
-  return *this;
-}
-
 
 template <int rank_, int dim, typename Number>
 constexpr DEAL_II_ALWAYS_INLINE
@@ -1308,17 +1313,6 @@ Tensor<rank_, dim, Number>::Tensor(Tensor<rank_, dim, Number> &&other) noexcept
 {
   for (unsigned int i = 0; i < dim; ++i)
     values[i] = other.values[i];
-}
-
-
-template <int rank_, int dim, typename Number>
-constexpr DEAL_II_ALWAYS_INLINE Tensor<rank_, dim, Number> &
-                                Tensor<rank_, dim, Number>::
-                                operator=(Tensor<rank_, dim, Number> &&other) noexcept
-{
-  for (unsigned int i = 0; i < dim; ++i)
-    values[i] = other.values[i];
-  return *this;
 }
 #  endif
 
@@ -1478,6 +1472,7 @@ Tensor<rank_, dim, Number>::operator=(const Tensor<rank_, dim, OtherNumber> &t)
 }
 
 
+
 template <int rank_, int dim, typename Number>
 constexpr inline DEAL_II_ALWAYS_INLINE Tensor<rank_, dim, Number> &
 Tensor<rank_, dim, Number>::operator=(const Number &d)
@@ -1489,6 +1484,30 @@ Tensor<rank_, dim, Number>::operator=(const Number &d)
     values[i] = internal::NumberType<Number>::value(0.0);
   return *this;
 }
+
+
+#  ifdef DEAL_II_DELETED_MOVE_CONSTRUCTOR_BUG
+template <int rank_, int dim, typename Number>
+constexpr DEAL_II_ALWAYS_INLINE Tensor<rank_, dim, Number> &
+Tensor<rank_, dim, Number>::operator=(const Tensor<rank_, dim, Number> &other)
+{
+  for (unsigned int i = 0; i < dim; ++i)
+    values[i] = other.values[i];
+  return *this;
+}
+
+
+
+template <int rank_, int dim, typename Number>
+constexpr DEAL_II_ALWAYS_INLINE Tensor<rank_, dim, Number> &
+                                Tensor<rank_, dim, Number>::
+                                operator=(Tensor<rank_, dim, Number> &&other) noexcept
+{
+  for (unsigned int i = 0; i < dim; ++i)
+    values[i] = other.values[i];
+  return *this;
+}
+#  endif
 
 
 template <int rank_, int dim, typename Number>
