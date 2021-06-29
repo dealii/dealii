@@ -1,0 +1,6 @@
+New: The new function Triangulation::n_global_coarse_cells() allows to
+query the global number of coarse cells. This function is particularly useful
+for parallel::fullydistributed::Triangulation, since in this case the coarse 
+cells might differ on each process.
+<br>
+(Peter Munch, 2021/06/26)

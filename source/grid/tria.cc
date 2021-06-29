@@ -13830,7 +13830,12 @@ Triangulation<dim, spacedim>::n_global_active_cells() const
   return n_active_cells();
 }
 
-
+template <int dim, int spacedim>
+types::coarse_cell_id
+Triangulation<dim, spacedim>::n_global_coarse_cells() const
+{
+  return n_cells(0);
+}
 
 template <int dim, int spacedim>
 unsigned int

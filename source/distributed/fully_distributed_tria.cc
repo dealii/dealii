@@ -701,6 +701,32 @@ namespace parallel
     }
 
 
+
+    template <int dim, int spacedim>
+    void
+    Triangulation<dim, spacedim>::update_number_cache()
+    {
+      dealii::parallel::TriangulationBase<dim, spacedim>::update_number_cache();
+
+      // additionally update the number of global coarse cells
+      types::coarse_cell_id number_of_global_coarse_cells = 0;
+
+      for (const auto &cell : this->active_cell_iterators())
+        if (!cell->is_artificial())
+          number_of_global_coarse_cells =
+            std::max(number_of_global_coarse_cells,
+                     cell->id().get_coarse_cell_id());
+
+      number_of_global_coarse_cells =
+        Utilities::MPI::max(number_of_global_coarse_cells,
+                            this->mpi_communicator) +
+        1;
+
+      this->number_cache.number_of_global_coarse_cells =
+        number_of_global_coarse_cells;
+    }
+
+
   } // namespace fullydistributed
 } // namespace parallel
 

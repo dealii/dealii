@@ -3083,6 +3083,13 @@ public:
   n_active_cells(const unsigned int level) const;
 
   /**
+   * Return the total number of coarse cells. If the coarse mesh is replicated
+   * on each process, this simply returns <tt>n_cells(0)</tt>.
+   */
+  virtual types::coarse_cell_id
+  n_global_coarse_cells() const;
+
+  /**
    * Return the total number of used faces, active or not.  In 2D, the result
    * equals n_lines(), in 3D it equals n_quads(), while in 1D it equals
    * the number of used vertices.

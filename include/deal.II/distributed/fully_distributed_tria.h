@@ -278,6 +278,9 @@ namespace parallel
       virtual void
       update_cell_relations() override;
 
+      virtual void
+      update_number_cache() override;
+
       /**
        * store the Settings.
        */

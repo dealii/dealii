@@ -111,6 +111,7 @@ namespace parallel
   template <int dim, int spacedim>
   TriangulationBase<dim, spacedim>::NumberCache::NumberCache()
     : n_locally_owned_active_cells(0)
+    , number_of_global_coarse_cells(0)
     , n_global_levels(0)
   {}
 
@@ -272,6 +273,8 @@ namespace parallel
                  Utilities::MPI::n_mpi_processes(this->mpi_communicator),
                ExcInternalError());
       }
+
+    this->number_cache.number_of_global_coarse_cells = this->n_cells(0);
 
     // reset global cell ids
     this->reset_global_cell_indices();
@@ -645,6 +648,15 @@ namespace parallel
     AssertIndexRange(level, this->n_global_levels());
 
     return number_cache.level_cell_index_partitioners[level];
+  }
+
+
+
+  template <int dim, int spacedim>
+  types::coarse_cell_id
+  TriangulationBase<dim, spacedim>::n_global_coarse_cells() const
+  {
+    return number_cache.number_of_global_coarse_cells;
   }
 
 
