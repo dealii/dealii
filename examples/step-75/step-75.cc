@@ -700,9 +700,8 @@ namespace Step75
         fe_index_for_degree[degree] = i;
       }
 
-    unsigned int minlevel   = 0;
-    unsigned int minlevel_p = n_h_levels;
-    unsigned int maxlevel   = n_h_levels + n_p_levels - 1;
+    unsigned int minlevel = 0;
+    unsigned int maxlevel = n_h_levels + n_p_levels - 1;
 
     dof_handlers.resize(minlevel, maxlevel);
     operators.resize(minlevel, maxlevel);
@@ -802,17 +801,11 @@ namespace Step75
 
     // Set up intergrid operators and collect transfer operators within a single
     // operator as needed by the Multigrid solver class.
-    for (unsigned int level = minlevel; level < minlevel_p; ++level)
-      transfers[level + 1].reinit_geometric_transfer(dof_handlers[level + 1],
-                                                     dof_handlers[level],
-                                                     constraints[level + 1],
-                                                     constraints[level]);
-
-    for (unsigned int level = minlevel_p; level < maxlevel; ++level)
-      transfers[level + 1].reinit_polynomial_transfer(dof_handlers[level + 1],
-                                                      dof_handlers[level],
-                                                      constraints[level + 1],
-                                                      constraints[level]);
+    for (unsigned int level = minlevel; level < maxlevel; ++level)
+      transfers[level + 1].reinit(dof_handlers[level + 1],
+                                  dof_handlers[level],
+                                  constraints[level + 1],
+                                  constraints[level]);
 
     MGTransferGlobalCoarsening<dim, VectorType> transfer(
       transfers, [&](const auto l, auto &vec) {

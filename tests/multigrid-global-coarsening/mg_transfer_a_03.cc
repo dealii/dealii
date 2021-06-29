@@ -102,10 +102,10 @@ do_test(const FiniteElement<dim> &fe_fine, const FiniteElement<dim> &fe_coarse)
 
   // setup transfer operator
   MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>> transfer;
-  transfer.reinit_geometric_transfer(dof_handler_fine,
-                                     dof_handler_coarse,
-                                     constraint_fine,
-                                     constraint_coarse);
+  transfer.reinit(dof_handler_fine,
+                  dof_handler_coarse,
+                  constraint_fine,
+                  constraint_coarse);
 
   test_transfer_operator(transfer, dof_handler_fine, dof_handler_coarse);
 }

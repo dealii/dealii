@@ -92,12 +92,12 @@ do_test(const FiniteElement<dim> &fe_fine, const FiniteElement<dim> &fe_coarse)
     deallog.push("coarse");
     MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>
       transfer;
-    transfer.reinit_polynomial_transfer(dof_handler_fine,
-                                        dof_handler_coarse,
-                                        constraint_fine,
-                                        constraint_coarse,
-                                        0,
-                                        0);
+    transfer.reinit(dof_handler_fine,
+                    dof_handler_coarse,
+                    constraint_fine,
+                    constraint_coarse,
+                    0,
+                    0);
 
     test_transfer_operator(transfer, dof_handler_fine, dof_handler_coarse);
     deallog.pop();
@@ -106,10 +106,10 @@ do_test(const FiniteElement<dim> &fe_fine, const FiniteElement<dim> &fe_coarse)
     deallog.push("active");
     MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>
       transfer;
-    transfer.reinit_polynomial_transfer(dof_handler_fine,
-                                        dof_handler_coarse,
-                                        constraint_fine,
-                                        constraint_coarse);
+    transfer.reinit(dof_handler_fine,
+                    dof_handler_coarse,
+                    constraint_fine,
+                    constraint_coarse);
 
     test_transfer_operator(transfer, dof_handler_fine, dof_handler_coarse);
     deallog.pop();
