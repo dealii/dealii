@@ -3678,14 +3678,18 @@ public:
   is_locally_owned_on_level() const;
 
   /**
-   * Return whether this cell exists in the global mesh but (i) is owned by
-   * another processor, i.e. has a subdomain_id different from the one the
-   * current processor owns and (ii) is adjacent to a cell owned by the
-   * current processor.
+   * Return true if:
+   * <ol>
+   * <li>This cell exists in the global mesh (i.e., it is not artificial),
+   * and</li>
+   * <li>This cell is owned by another processor (i.e., has a subdomain_id
+   * different from Triangulation::locally_owned_subdomain())</li>
+   * </ol>
    *
-   * This function only makes sense if the triangulation used is of kind
-   * parallel::distributed::Triangulation. In all other cases, the returned
-   * value is always false.
+   * In all other cases the returned value is false. In particular, only
+   * parallel Triangulations (i.e., Triangulations inheriting from
+   * parallel::TriangulationBase) can have ghost cells, so for a serial
+   * Triangulation the returned value is false.
    *
    * See the
    * @ref GlossGhostCell "glossary"
@@ -3696,7 +3700,13 @@ public:
    * @post The returned value is equal to <code>!is_locally_owned() &&
    * !is_artificial()</code>.
    *
-   * @note Whether a cell is a ghost cell, artificial, or is locally owned or
+   * @note For parallel::distributed::Triangulation and
+   * parallel::fullydistributed::Triangulation, ghost cells are always adjacent
+   * to locally owned cells. For parallel::shared::Triangulation they may not
+   * be, dependent on whether or not the triangulation uses artificial cells -
+   * see parallel::shared::Triangulation::Triangulation() for more information.
+   *
+   * @note Whether a cell is a ghost cell, artificial, or is locally owned
    * is a property that only pertains to cells that are active. Consequently,
    * you can only call this function if the cell it refers to has no children.
    */
