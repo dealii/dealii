@@ -132,6 +132,36 @@ namespace RepartitioningPolicyTools
     const unsigned int n_min_cells;
   };
 
+  /**
+   * A policy that allows to specify a weight of each cell. The underlying
+   * algorithm will try to distribute the weights equally among the processes.
+   */
+  template <int dim, int spacedim = dim>
+  class CellWeightPolicy : public Base<dim, spacedim>
+  {
+  public:
+    /**
+     * Constructor taking a function that gives a weight to each cell.
+     */
+    CellWeightPolicy(
+      const std::function<unsigned int(
+        const typename Triangulation<dim, spacedim>::cell_iterator &,
+        const typename Triangulation<dim, spacedim>::CellStatus)>
+        &weighting_function);
+
+    virtual LinearAlgebra::distributed::Vector<double>
+    partition(const Triangulation<dim, spacedim> &tria_in) const override;
+
+  private:
+    /**
+     * A function that gives a weight to each cell.
+     */
+    const std::function<
+      unsigned int(const typename Triangulation<dim, spacedim>::cell_iterator &,
+                   const typename Triangulation<dim, spacedim>::CellStatus)>
+      weighting_function;
+  };
+
 } // namespace RepartitioningPolicyTools
 
 DEAL_II_NAMESPACE_CLOSE
