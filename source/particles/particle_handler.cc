@@ -1914,7 +1914,7 @@ namespace Particles
     (void)distributed_triangulation;
 
     Assert(
-      distributed_triangulation || local_number_of_particles == 0,
+      distributed_triangulation || number_of_locally_owned_particles == 0,
       ExcMessage(
         "Mesh refinement in a non-distributed triangulation is not supported "
         "by the ParticleHandler class. Either insert particles after mesh "
@@ -1922,7 +1922,7 @@ namespace Particles
 
     // Resize the container if it is possible without
     // transferring particles
-    if (local_number_of_particles == 0)
+    if (number_of_locally_owned_particles == 0)
       particles.resize(triangulation->n_active_cells());
   }
 
