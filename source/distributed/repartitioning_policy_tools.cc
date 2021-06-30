@@ -249,12 +249,12 @@ namespace RepartitioningPolicyTools
             cell, Triangulation<dim, spacedim>::CellStatus::CELL_PERSIST);
 
     // determine weight of all the cells locally owned by this process
-    types::global_cell_index process_local_weight = 0;
+    uint64_t process_local_weight = 0;
     for (const auto &weight : weights)
       process_local_weight += weight;
 
     // determine partial sum of weights of this process
-    types::global_cell_index process_local_weight_offset = 0;
+    uint64_t process_local_weight_offset = 0;
 
     int ierr =
       MPI_Exscan(&process_local_weight,
@@ -266,8 +266,7 @@ namespace RepartitioningPolicyTools
     AssertThrowMPI(ierr);
 
     // total weight of all processes
-    types::global_cell_index total_weight =
-      process_local_weight_offset + process_local_weight;
+    uint64_t total_weight = process_local_weight_offset + process_local_weight;
 
     ierr = MPI_Bcast(&total_weight,
                      1,
@@ -278,7 +277,7 @@ namespace RepartitioningPolicyTools
     // setup partition
     LinearAlgebra::distributed::Vector<double> partition(partitioner);
 
-    for (types::global_cell_index i = 0, weight = process_local_weight_offset;
+    for (uint64_t i = 0, weight = process_local_weight_offset;
          i < partition.locally_owned_size();
          weight += weights[i], ++i)
       partition.local_element(i) =
