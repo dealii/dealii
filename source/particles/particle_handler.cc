@@ -65,6 +65,7 @@ namespace Particles
     , store_callback()
     , load_callback()
     , handle(numbers::invalid_unsigned_int)
+    , tria_listeners()
   {}
 
 
@@ -86,17 +87,12 @@ namespace Particles
     , store_callback()
     , load_callback()
     , handle(numbers::invalid_unsigned_int)
+    , triangulation_cache(
+        std::make_unique<GridTools::Cache<dim, spacedim>>(triangulation,
+                                                          mapping))
+    , tria_listeners()
   {
-    triangulation_cache =
-      std::make_unique<GridTools::Cache<dim, spacedim>>(triangulation, mapping);
-
-    triangulation.signals.create.connect([&]() { this->clear_particles(); });
-    triangulation.signals.post_refinement.connect(
-      [&]() { this->clear_particles(); });
-    triangulation.signals.post_distributed_repartition.connect(
-      [&]() { this->clear_particles(); });
-    triangulation.signals.post_distributed_load.connect(
-      [&]() { this->clear_particles(); });
+    connect_to_triangulation_signals();
   }
 
 
@@ -105,6 +101,9 @@ namespace Particles
   ParticleHandler<dim, spacedim>::~ParticleHandler()
   {
     clear_particles();
+
+    for (const auto &connection : tria_listeners)
+      connection.disconnect();
   }
 
 
@@ -121,19 +120,6 @@ namespace Particles
     triangulation = &new_triangulation;
     mapping       = &new_mapping;
 
-    // Note that we connect all signals 'at_front' in case user code
-    // connected the register_store_callback_function and
-    // register_load_callback_function functions already to the new
-    // triangulation. We want to clear before loading.
-    triangulation->signals.create.connect([&]() { this->clear_particles(); },
-                                          boost::signals2::at_front);
-    triangulation->signals.post_distributed_refinement.connect(
-      [&]() { this->clear_particles(); }, boost::signals2::at_front);
-    triangulation->signals.post_distributed_repartition.connect(
-      [&]() { this->clear_particles(); }, boost::signals2::at_front);
-    triangulation->signals.post_distributed_load.connect(
-      [&]() { this->clear_particles(); }, boost::signals2::at_front);
-
     // Create the memory pool that will store all particle properties
     property_pool = std::make_unique<PropertyPool<dim, spacedim>>(n_properties);
 
@@ -144,6 +130,8 @@ namespace Particles
                                                         new_mapping);
 
     particles.resize(triangulation->n_active_cells());
+
+    connect_to_triangulation_signals();
   }
 
 
@@ -1871,39 +1859,131 @@ namespace Particles
   }
 
 
+  template <int dim, int spacedim>
+  void
+  ParticleHandler<dim, spacedim>::connect_to_triangulation_signals()
+  {
+    // First disconnect existing connections
+    for (const auto &connection : tria_listeners)
+      connection.disconnect();
+
+    tria_listeners.clear();
+
+    tria_listeners.push_back(triangulation->signals.create.connect([&]() {
+      this->initialize(*(this->triangulation),
+                       *(this->mapping),
+                       this->property_pool->n_properties_per_slot());
+    }));
+
+    this->tria_listeners.push_back(
+      this->triangulation->signals.clear.connect([&]() { this->clear(); }));
+
+    // for distributed triangulations, connect to distributed signals
+    if (dynamic_cast<const parallel::DistributedTriangulationBase<dim, spacedim>
+                       *>(&(*triangulation)) != nullptr)
+      {
+        tria_listeners.push_back(
+          triangulation->signals.post_distributed_refinement.connect(
+            [&]() { this->post_mesh_change_action(); }));
+        tria_listeners.push_back(
+          triangulation->signals.post_distributed_repartition.connect(
+            [&]() { this->post_mesh_change_action(); }));
+        tria_listeners.push_back(
+          triangulation->signals.post_distributed_load.connect(
+            [&]() { this->post_mesh_change_action(); }));
+      }
+    else
+      {
+        tria_listeners.push_back(triangulation->signals.post_refinement.connect(
+          [&]() { this->post_mesh_change_action(); }));
+      }
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
+  ParticleHandler<dim, spacedim>::post_mesh_change_action()
+  {
+    Assert(triangulation != nullptr, ExcInternalError());
+
+    const bool distributed_triangulation =
+      dynamic_cast<
+        const parallel::DistributedTriangulationBase<dim, spacedim> *>(
+        &(*triangulation)) != nullptr;
+    (void)distributed_triangulation;
+
+    Assert(
+      distributed_triangulation || local_number_of_particles == 0,
+      ExcMessage(
+        "Mesh refinement in a non-distributed triangulation is not supported "
+        "by the ParticleHandler class. Either insert particles after mesh "
+        "creation, or use a distributed triangulation."));
+
+    // Resize the container if it is possible without
+    // transferring particles
+    if (local_number_of_particles == 0)
+      particles.resize(triangulation->n_active_cells());
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
+  ParticleHandler<dim, spacedim>::prepare_for_coarsening_and_refinement()
+  {
+    register_data_attach();
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
+  ParticleHandler<dim, spacedim>::prepare_for_serialization()
+  {
+    register_data_attach();
+  }
+
+
 
   template <int dim, int spacedim>
   void
   ParticleHandler<dim, spacedim>::register_store_callback_function()
   {
+    register_data_attach();
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
+  ParticleHandler<dim, spacedim>::register_data_attach()
+  {
     parallel::distributed::Triangulation<dim, spacedim>
-      *non_const_triangulation =
+      *distributed_triangulation =
         const_cast<parallel::distributed::Triangulation<dim, spacedim> *>(
           dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim>
                          *>(&(*triangulation)));
-    (void)non_const_triangulation;
+    (void)distributed_triangulation;
 
-    Assert(non_const_triangulation != nullptr, dealii::ExcNotImplemented());
+    Assert(
+      distributed_triangulation != nullptr,
+      ExcMessage(
+        "Mesh refinement in a non-distributed triangulation is not supported "
+        "by the ParticleHandler class. Either insert particles after mesh "
+        "creation and do not refine afterwards, or use a distributed triangulation."));
 
 #ifdef DEAL_II_WITH_P4EST
-    // Only save and load particles if there are any, we might get here for
-    // example if somebody created a ParticleHandler but generated 0
-    // particles.
-    update_cached_numbers();
+    const auto callback_function =
+      [this](
+        const typename Triangulation<dim, spacedim>::cell_iterator
+          &                                                     cell_iterator,
+        const typename Triangulation<dim, spacedim>::CellStatus cell_status) {
+        return this->pack_callback(cell_iterator, cell_status);
+      };
 
-    if (global_max_particles_per_cell > 0)
-      {
-        const auto callback_function =
-          [this](const typename Triangulation<dim, spacedim>::cell_iterator
-                   &cell_iterator,
-                 const typename Triangulation<dim, spacedim>::CellStatus
-                   cell_status) {
-            return this->store_particles(cell_iterator, cell_status);
-          };
-
-        handle = non_const_triangulation->register_data_attach(
-          callback_function, /*returns_variable_size_data=*/true);
-      }
+    handle = distributed_triangulation->register_data_attach(
+      callback_function, /*returns_variable_size_data=*/true);
 #endif
   }
 
@@ -1911,36 +1991,62 @@ namespace Particles
 
   template <int dim, int spacedim>
   void
+  ParticleHandler<dim, spacedim>::unpack_after_coarsening_and_refinement()
+  {
+    const bool serialization = false;
+    notify_ready_to_unpack(serialization);
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
+  ParticleHandler<dim, spacedim>::deserialize()
+  {
+    const bool serialization = true;
+    notify_ready_to_unpack(serialization);
+  }
+
+
+  template <int dim, int spacedim>
+  void
   ParticleHandler<dim, spacedim>::register_load_callback_function(
     const bool serialization)
   {
+    notify_ready_to_unpack(serialization);
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
+  ParticleHandler<dim, spacedim>::notify_ready_to_unpack(
+    const bool serialization)
+  {
     parallel::distributed::Triangulation<dim, spacedim>
-      *non_const_triangulation =
+      *distributed_triangulation =
         const_cast<parallel::distributed::Triangulation<dim, spacedim> *>(
           dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim>
                          *>(&(*triangulation)));
-    (void)non_const_triangulation;
+    (void)distributed_triangulation;
 
-    Assert(non_const_triangulation != nullptr, dealii::ExcNotImplemented());
+    Assert(
+      distributed_triangulation != nullptr,
+      ExcMessage(
+        "Mesh refinement in a non-distributed triangulation is not supported "
+        "by the ParticleHandler class. Either insert particles after mesh "
+        "creation and do not refine afterwards, or use a distributed triangulation."));
+
+    // First prepare container for insertion
+    clear();
 
 #ifdef DEAL_II_WITH_P4EST
     // If we are resuming from a checkpoint, we first have to register the
-    // store function again, to set the triangulation in the same state as
-    // before the serialization. Only by this it knows how to deserialize the
-    // data correctly. Only do this if something was actually stored.
-    if (serialization && (global_max_particles_per_cell > 0))
-      {
-        const auto callback_function =
-          [this](const typename Triangulation<dim, spacedim>::cell_iterator
-                   &cell_iterator,
-                 const typename Triangulation<dim, spacedim>::CellStatus
-                   cell_status) {
-            return this->store_particles(cell_iterator, cell_status);
-          };
-
-        handle = non_const_triangulation->register_data_attach(
-          callback_function, /*returns_variable_size_data=*/true);
-      }
+    // store function again, to set the triangulation to the same state as
+    // before the serialization. Only afterwards we know how to deserialize the
+    // data correctly.
+    if (serialization)
+      register_data_attach();
 
     // Check if something was stored and load it
     if (handle != numbers::invalid_unsigned_int)
@@ -1952,14 +2058,13 @@ namespace Particles
             const typename Triangulation<dim, spacedim>::CellStatus cell_status,
             const boost::iterator_range<std::vector<char>::const_iterator>
               &range_iterator) {
-            this->load_particles(cell_iterator, cell_status, range_iterator);
+            this->unpack_callback(cell_iterator, cell_status, range_iterator);
           };
 
-        non_const_triangulation->notify_ready_to_unpack(handle,
-                                                        callback_function);
+        distributed_triangulation->notify_ready_to_unpack(handle,
+                                                          callback_function);
 
-        // Reset handle and update global number of particles. The number
-        // can change because of discarded or newly generated particles
+        // Reset handle and update global numbers.
         handle = numbers::invalid_unsigned_int;
         update_cached_numbers();
       }
@@ -1972,7 +2077,7 @@ namespace Particles
 
   template <int dim, int spacedim>
   std::vector<char>
-  ParticleHandler<dim, spacedim>::store_particles(
+  ParticleHandler<dim, spacedim>::pack_callback(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const typename Triangulation<dim, spacedim>::CellStatus     status) const
   {
@@ -2025,7 +2130,7 @@ namespace Particles
 
   template <int dim, int spacedim>
   void
-  ParticleHandler<dim, spacedim>::load_particles(
+  ParticleHandler<dim, spacedim>::unpack_callback(
     const typename Triangulation<dim, spacedim>::cell_iterator &    cell,
     const typename Triangulation<dim, spacedim>::CellStatus         status,
     const boost::iterator_range<std::vector<char>::const_iterator> &data_range)

@@ -321,17 +321,13 @@ namespace Step68
     background_triangulation.refine_global(fluid_refinement);
 
     // In order to consider the particles when repartitioning the triangulation
-    // the algorithm needs to know three things:
+    // the algorithm needs to know how much weight to assign to each cell
+    // (how many particles are in there).
     //
-    // 1. How much weight to assign to each cell (how many particles are in
-    // there);
-    // 2. How to pack the particles before shipping data around;
-    // 3. How to unpack the particles after repartitioning.
-    //
-    // We attach the correct functions to the signals inside
-    // parallel::distributed::Triangulation. These signal will be called every
-    // time the repartition() function is called. These connections only need to
-    // be created once, so we might as well have set them up in the constructor
+    // We attach a weight function to the signal inside
+    // parallel::distributed::Triangulation. This signal will be called every
+    // time the repartition() function is called. This connection only needs to
+    // be created once, so we might as well have set it up in the constructor
     // of this class, but for the purpose of this example we want to group the
     // particle related instructions.
     background_triangulation.signals.cell_weight.connect(
@@ -340,12 +336,6 @@ namespace Step68
           &cell,
         const typename parallel::distributed::Triangulation<dim>::CellStatus
           status) -> unsigned int { return this->cell_weight(cell, status); });
-
-    background_triangulation.signals.pre_distributed_repartition.connect(
-      [this]() { this->particle_handler.register_store_callback_function(); });
-
-    background_triangulation.signals.post_distributed_repartition.connect(
-      [&]() { this->particle_handler.register_load_callback_function(false); });
 
     // This initializes the background triangulation where the particles are
     // living and the number of properties of the particles.
@@ -644,7 +634,10 @@ namespace Step68
     if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
       deallog << "Repartitioning triangulation after particle generation"
               << std::endl;
+
+    particle_handler.prepare_for_coarsening_and_refinement();
     background_triangulation.repartition();
+    particle_handler.unpack_after_coarsening_and_refinement();
 
     // We set the initial property of the particles by doing an
     // explicit Euler iteration with a time-step of 0 both in the case
@@ -670,7 +663,10 @@ namespace Step68
 
         if ((discrete_time.get_step_number() % repartition_frequency) == 0)
           {
+            particle_handler.prepare_for_coarsening_and_refinement();
             background_triangulation.repartition();
+            particle_handler.unpack_after_coarsening_and_refinement();
+
             if (interpolated_velocity)
               setup_background_dofs();
           }

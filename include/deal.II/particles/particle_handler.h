@@ -703,20 +703,88 @@ namespace Particles
     update_ghost_particles();
 
     /**
+     * This function prepares the particle handler for a coarsening and
+     * refinement cycle, by storing the necessary information to transfer
+     * particles to their new cells. The implementation depends on the
+     * triangulation type that is connected to the particle handler and differs
+     * between shared and distributed triangulations. This function should be
+     * used like the corresponding function with the same name in the
+     * SolutionTransfer() class.
+     */
+    void
+    prepare_for_coarsening_and_refinement();
+
+    /**
+     * This function unpacks the particle data after a coarsening and
+     * refinement cycle, by reading the necessary information to transfer
+     * particles to their new cells. This function should be
+     * used like the SolutionTransfer::interpolate() function after mesh
+     * refinement has finished. Note that this function requires a working
+     * mapping, i.e. if you use a mapping class that requires setup after
+     * a mesh refinement (e.g. MappingQCache(), or MappingEulerian()), the
+     * mapping has to be ready before you can call this function.
+     *
+     * @note It is important to note, that if you do not call this function
+     * after a refinement/coarsening operation (and a repartitioning operation
+     * in a distributed triangulation) and the particle handler contained
+     * particles before, the particle handler will not be usable any more. Not
+     * calling this function after refinement would be similar to trying to
+     * access a solution vector after mesh refinement without first using a
+     * SolutionTransfer class to transfer the vector to the new mesh.
+     */
+    void
+    unpack_after_coarsening_and_refinement();
+
+    /**
+     * This function prepares the particle handler for serialization. This needs
+     * to be done before calling Triangulation::save(). This function should be
+     * used like the corresponding function with the same name in the
+     * SolutionTransfer() class.
+     *
+     * @note It is important to note, that if you do not call this function
+     * before a serialization operation in a distributed triangulation, the
+     * particles will not be serialized, and therefore will disappear after
+     * deserialization.
+     */
+    void
+    prepare_for_serialization();
+
+    /**
+     * Execute the deserialization of the particle data. This needs to be
+     * done after calling Triangulation::load(). The data must have been stored
+     * before the serialization of the triangulation using the
+     * prepare_for_serialization() function. This function should be used like
+     * the corresponding function with the same name in the SolutionTransfer
+     * class.
+     */
+    void
+    deserialize();
+
+    /**
      * Callback function that should be called before every refinement
      * and when writing checkpoints. This function is used to
-     * register store_particles() with the triangulation. This function
+     * register pack_callback() with the triangulation. This function
      * is used in step-70.
+     *
+     * @deprecated Please use prepare_for_coarsening_and_refinement() or
+     * prepare_for_serialization() instead. See there for further information
+     * about the purpose of this function.
      */
+    DEAL_II_DEPRECATED_EARLY
     void
     register_store_callback_function();
 
     /**
      * Callback function that should be called after every refinement
      * and after resuming from a checkpoint.  This function is used to
-     * register load_particles() with the triangulation. This function
+     * register unpack_callback() with the triangulation. This function
      * is used in step-70.
+     *
+     * @deprecated Please use unpack_after_coarsening_and_refinement() or
+     * deserialize() instead. See there for further information about the
+     * purpose of this function.
      */
+    DEAL_II_DEPRECATED_EARLY
     void
     register_load_callback_function(const bool serialization);
 
@@ -890,8 +958,8 @@ namespace Particles
       load_callback;
 
     /**
-     * This variable is set by the register_store_callback_function()
-     * function and used by the register_load_callback_function() function
+     * This variable is set by the register_data_attach()
+     * function and used by the notify_ready_to_unpack() function
      * to check where the particle data was registered in the corresponding
      * triangulation object.
      */
@@ -985,21 +1053,63 @@ namespace Particles
     internal::GhostParticlePartitioner<dim, spacedim> ghost_particles_cache;
 
     /**
+     * Connect the particle handler to the relevant triangulation signals to
+     * appropriately react to changes in the underlying triangulation.
+     */
+    void
+    connect_to_triangulation_signals();
+
+    /**
+     * A list of connections with which this object connects to the
+     * triangulation to get information about when the triangulation changes.
+     */
+    std::vector<boost::signals2::connection> tria_listeners;
+
+    /**
+     * Function that gets called by the triangulation signals if
+     * the structure of the mesh has changed. This function is
+     * responsible for resizing the particle container if no
+     * particles are stored, i.e. if the usual call to
+     * prepare_for_..., and transfer_particles_after_... functions
+     * is not necessary.
+     */
+    void
+    post_mesh_change_action();
+
+    /**
+     * Function that should be called before every refinement
+     * and when writing checkpoints. This function is used to
+     * register pack_callback() with the triangulation.
+     */
+    void
+    register_data_attach();
+
+    /**
+     * Callback function that should be called after every refinement
+     * and after resuming from a checkpoint.  This function is used to
+     * call the notify_ready_to_unpack() function of the triangulation
+     * and hand over the unpack_callback() function, which will
+     * unpack the particle data for each cell.
+     */
+    void
+    notify_ready_to_unpack(const bool serialization);
+
+    /**
      * Called by listener functions from Triangulation for every cell
      * before a refinement step. All particles have to be attached to their
-     * cell to be sent around to the new processes.
+     * cell to be sent around to the new cell and owning process.
      */
     std::vector<char>
-    store_particles(
+    pack_callback(
       const typename Triangulation<dim, spacedim>::cell_iterator &cell,
       const typename Triangulation<dim, spacedim>::CellStatus     status) const;
 
     /**
-     * Called by listener functions after a refinement step to receive
-     * particles and insert them into the particle container.
+     * Called by listener functions after a refinement step for each cell
+     * to unpack the particle data and transfer it to the local container.
      */
     void
-    load_particles(
+    unpack_callback(
       const typename Triangulation<dim, spacedim>::cell_iterator &cell,
       const typename Triangulation<dim, spacedim>::CellStatus     status,
       const boost::iterator_range<std::vector<char>::const_iterator>
