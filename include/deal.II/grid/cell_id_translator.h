@@ -142,7 +142,7 @@ namespace internal
         " indices but the current deal.II configuration only supports " +
         std::to_string(std::numeric_limits<types::global_cell_index>::max()) +
         " indices. You may want to consider to build deal.II with 64bit "
-        "indeces (-D DEAL_II_WITH_64BIT_INDICES=\"ON\") to increase the limit "
+        "indices (-D DEAL_II_WITH_64BIT_INDICES=\"ON\") to increase the limit "
         "of indices."));
 
     tree_sizes.push_back(0);
