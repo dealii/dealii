@@ -351,7 +351,7 @@ namespace parallel
       get_true_level_subdomain_ids_of_cells(const unsigned int level) const;
 
       /**
-       * Return allow_artificial_cells , namely true if artificial cells are
+       * Return allow_artificial_cells, namely true if artificial cells are
        * allowed.
        */
       bool
