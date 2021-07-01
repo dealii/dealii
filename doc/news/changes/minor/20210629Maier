@@ -1,5 +1,0 @@
-Fixed: Added a proper configuration guard for a gcc 11 compiler bug. This
-fixes a compilation issue with Intel compilers versions 18 and 19.
-<br>
-(Matthias Maier, 2021/06/29)
-
