@@ -712,6 +712,17 @@ namespace LinearAlgebra
 
 
     template <typename Number, typename MemorySpaceType>
+    Vector<Number, MemorySpaceType>::Vector( // NOLINT
+      Vector<Number, MemorySpaceType> &&v)
+      : Vector()
+    {
+      static_cast<Subscriptor &>(*this) = static_cast<Subscriptor &&>(v);
+      this->swap(v);
+    }
+
+
+
+    template <typename Number, typename MemorySpaceType>
     Vector<Number, MemorySpaceType>::Vector(const IndexSet &local_range,
                                             const IndexSet &ghost_indices,
                                             const MPI_Comm &communicator)
@@ -1411,6 +1422,7 @@ namespace LinearAlgebra
 
       std::swap(compress_requests, v.compress_requests);
       std::swap(update_ghost_values_requests, v.update_ghost_values_requests);
+      std::swap(comm_sm, v.comm_sm);
 #endif
 
       std::swap(partitioner, v.partitioner);
