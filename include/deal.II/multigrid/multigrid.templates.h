@@ -139,10 +139,8 @@ Multigrid<VectorType>::level_v_step(const unsigned int level)
 
   // do coarse grid correction
   this->signals.prolongation(true, level);
-  transfer->prolongate(level, t[level], solution[level - 1]);
+  transfer->prolongate_and_add(level, solution[level], solution[level - 1]);
   this->signals.prolongation(false, level);
-
-  solution[level] += t[level];
 
   // get in contribution from edge matrices to the defect
   if (edge_in != nullptr)
