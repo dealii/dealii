@@ -132,6 +132,21 @@ test_cycles(unsigned int minlevel, unsigned int maxlevel)
         }
     };
 
+    auto print_residual_step = [](const bool start, const unsigned int level) {
+      if (start)
+        {
+          deallog << "Residual step    level " << level << std::endl;
+        }
+    };
+
+    auto print_edge_prolongation = [](const bool         start,
+                                      const unsigned int level) {
+      if (start)
+        {
+          deallog << "Edge prol. level       " << level << std::endl;
+        }
+    };
+
     const auto coarse_connection = mg1.connect_coarse_solve(print_coarse_solve);
     const auto restriction_connection =
       mg1.connect_restriction(print_restriction);
@@ -141,6 +156,10 @@ test_cycles(unsigned int minlevel, unsigned int maxlevel)
       mg1.connect_pre_smoother_step(print_pre_smoother_step);
     const auto post_smoother_connection =
       mg1.connect_post_smoother_step(print_post_smoother_step);
+    const auto residual_step_connection =
+      mg1.connect_residual_step(print_residual_step);
+    const auto edge_prolongation_connection =
+      mg1.connect_residual_step(print_edge_prolongation);
 
     mg1.cycle();
     deallog << std::endl;
@@ -150,6 +169,8 @@ test_cycles(unsigned int minlevel, unsigned int maxlevel)
     prolongation_connection.disconnect();
     pre_smoother_connection.disconnect();
     post_smoother_connection.disconnect();
+    residual_step_connection.disconnect();
+    edge_prolongation_connection.disconnect();
   }
 
   {
@@ -198,6 +219,22 @@ test_cycles(unsigned int minlevel, unsigned int maxlevel)
         }
     };
 
+    auto print_residual_step_w = [](const bool         start,
+                                    const unsigned int level) {
+      if (start)
+        {
+          deallog << "W-cycle Res. step level " << level << std::endl;
+        }
+    };
+
+    auto print_edge_prolongation_w = [](const bool         start,
+                                        const unsigned int level) {
+      if (start)
+        {
+          deallog << "W-cycle Edge pro. level " << level << std::endl;
+        }
+    };
+
     const auto coarse_connection =
       mg1.connect_coarse_solve(print_coarse_solve_w);
     const auto restriction_connection =
@@ -208,6 +245,10 @@ test_cycles(unsigned int minlevel, unsigned int maxlevel)
       mg1.connect_pre_smoother_step(print_pre_smoother_step_w);
     const auto post_smoother_connection =
       mg1.connect_post_smoother_step(print_post_smoother_step_w);
+    const auto residual_step_connection =
+      mg1.connect_residual_step(print_residual_step_w);
+    const auto edge_prolongation_connection =
+      mg1.connect_residual_step(print_edge_prolongation_w);
 
     mg1.set_cycle(Multigrid<VectorType>::w_cycle);
     mg1.cycle();
@@ -218,6 +259,8 @@ test_cycles(unsigned int minlevel, unsigned int maxlevel)
     prolongation_connection.disconnect();
     pre_smoother_connection.disconnect();
     post_smoother_connection.disconnect();
+    residual_step_connection.disconnect();
+    edge_prolongation_connection.disconnect();
   }
 
   {
@@ -266,11 +309,29 @@ test_cycles(unsigned int minlevel, unsigned int maxlevel)
         }
     };
 
+    auto print_residual_step_f = [](const bool         start,
+                                    const unsigned int level) {
+      if (start)
+        {
+          deallog << "F-cycle Res. step level " << level << std::endl;
+        }
+    };
+
+    auto print_edge_prolongation_f = [](const bool         start,
+                                        const unsigned int level) {
+      if (start)
+        {
+          deallog << "F-cycle Edge pro. level " << level << std::endl;
+        }
+    };
+
     mg1.connect_coarse_solve(print_coarse_solve_f);
     mg1.connect_restriction(print_restriction_f);
     mg1.connect_prolongation(print_prolongation_f);
     mg1.connect_pre_smoother_step(print_pre_smoother_step_f);
     mg1.connect_post_smoother_step(print_post_smoother_step_f);
+    mg1.connect_residual_step(print_residual_step_f);
+    mg1.connect_residual_step(print_edge_prolongation_f);
 
     mg1.set_cycle(Multigrid<VectorType>::f_cycle);
     mg1.cycle();
