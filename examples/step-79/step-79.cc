@@ -279,11 +279,11 @@ namespace SAND
   SANDTopOpt<dim>::SANDTopOpt()
     : fe(FE_DGQ<dim>(0),
          1,
-         (FESystem<dim>(FE_Q<dim>(1) ^ dim)),
+         FESystem<dim>(FE_Q<dim>(1), dim),
          1,
          FE_DGQ<dim>(0),
          1,
-         (FESystem<dim>(FE_Q<dim>(1) ^ dim)),
+         FESystem<dim>(FE_Q<dim>(1), dim),
          1,
          FE_DGQ<dim>(0),
          5)
