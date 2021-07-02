@@ -2173,7 +2173,7 @@ GridIn<dim, spacedim>::read_msh(const std::string &fname)
 #  ifdef DEBUG
         // Make sure the embedded dimension is right
         for (unsigned int d = spacedim; d < 3; ++d)
-          Assert(coord[i * 3 + d] == 0,
+          Assert(std::abs(coord[i * 3 + d]) < 1e-10,
                  ExcMessage("The grid you are reading contains nodes that are "
                             "nonzero in the coordinate with index " +
                             std::to_string(d) +
