@@ -295,7 +295,9 @@ namespace internal
 
         Assert(ptr != dof_handler.hp_object_fe_indices[structdim].begin() +
                         dof_handler.hp_object_fe_ptr[structdim][obj_index + 1],
-               ExcNotImplemented());
+               ExcMessage(
+                 "You are requesting an active_fe_index that is not assigned "
+                 "to any of the cells connected to this entity."));
 
         const unsigned int fe_index_ =
           std::distance(dof_handler.hp_object_fe_indices[structdim].begin() +
