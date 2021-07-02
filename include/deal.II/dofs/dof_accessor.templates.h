@@ -224,10 +224,15 @@ namespace internal
        * Process the @p local_index-th degree of freedom corresponding to the
        * finite element specified by @p fe_index on the vertex with global
        * number @p vertex_index to @p global_index.
+       *
+       * The template argument `structdim` indicates the
+       * dimensionality of the object on which we seek to know the DoF
+       * index. For example, if `structdim==0`, then we are looking to
+       * get a DoF index on a vertex of the indicated cell.
        */
       template <int dim,
                 int spacedim,
-                int d,
+                int structdim,
                 typename GlobalIndexType,
                 typename DoFPProcessor>
       static void
@@ -236,11 +241,11 @@ namespace internal
                         const unsigned int               obj_index,
                         const unsigned int               fe_index,
                         const unsigned int               local_index,
-                        const std::integral_constant<int, d> &,
+                        const std::integral_constant<int, structdim> &,
                         GlobalIndexType &    global_index,
                         const DoFPProcessor &process)
       {
-        Assert(d == dim || obj_level == 0, ExcNotImplemented());
+        Assert(structdim == dim || obj_level == 0, ExcNotImplemented());
 
         // 1) no hp used -> fe_index == 0
         if (dof_handler.hp_capability_enabled == false)
@@ -248,98 +253,107 @@ namespace internal
             AssertDimension(fe_index,
                             (DoFHandler<dim, spacedim>::default_fe_index));
 
-            process(dof_handler.object_dof_indices
-                      [obj_level][d]
-                      [dof_handler.object_dof_ptr[obj_level][d][obj_index] +
-                       local_index],
-                    global_index);
+            process(
+              dof_handler.object_dof_indices
+                [obj_level][structdim]
+                [dof_handler.object_dof_ptr[obj_level][structdim][obj_index] +
+                 local_index],
+              global_index);
 
             return;
           }
 
         // 2) cell and hp is used -> there is only one fe_index
-        if (d == dim)
+        if (structdim == dim)
           {
-            process(dof_handler.object_dof_indices
-                      [obj_level][d]
-                      [dof_handler.object_dof_ptr[obj_level][d][obj_index] +
-                       local_index],
-                    global_index);
+            process(
+              dof_handler.object_dof_indices
+                [obj_level][structdim]
+                [dof_handler.object_dof_ptr[obj_level][structdim][obj_index] +
+                 local_index],
+              global_index);
             return;
           }
 
         // 3) general entity and hp is used
         AssertIndexRange(obj_level, dof_handler.object_dof_indices.size());
-        AssertIndexRange(d, dof_handler.object_dof_indices[obj_level].size());
+        AssertIndexRange(structdim,
+                         dof_handler.object_dof_indices[obj_level].size());
 
         Assert(dof_handler.hp_capability_enabled, ExcInternalError());
 
-        AssertIndexRange(d, dof_handler.hp_object_fe_ptr.size());
-        AssertIndexRange(obj_index, dof_handler.hp_object_fe_ptr[d].size());
+        AssertIndexRange(structdim, dof_handler.hp_object_fe_ptr.size());
+        AssertIndexRange(obj_index,
+                         dof_handler.hp_object_fe_ptr[structdim].size());
 
         const auto ptr =
-          std::find(dof_handler.hp_object_fe_indices[d].begin() +
-                      dof_handler.hp_object_fe_ptr[d][obj_index],
-                    dof_handler.hp_object_fe_indices[d].begin() +
-                      dof_handler.hp_object_fe_ptr[d][obj_index + 1],
+          std::find(dof_handler.hp_object_fe_indices[structdim].begin() +
+                      dof_handler.hp_object_fe_ptr[structdim][obj_index],
+                    dof_handler.hp_object_fe_indices[structdim].begin() +
+                      dof_handler.hp_object_fe_ptr[structdim][obj_index + 1],
                     fe_index);
 
-        Assert(ptr != dof_handler.hp_object_fe_indices[d].begin() +
-                        dof_handler.hp_object_fe_ptr[d][obj_index + 1],
+        Assert(ptr != dof_handler.hp_object_fe_indices[structdim].begin() +
+                        dof_handler.hp_object_fe_ptr[structdim][obj_index + 1],
                ExcNotImplemented());
 
         const unsigned int fe_index_ =
-          std::distance(dof_handler.hp_object_fe_indices[d].begin() +
-                          dof_handler.hp_object_fe_ptr[d][obj_index],
+          std::distance(dof_handler.hp_object_fe_indices[structdim].begin() +
+                          dof_handler.hp_object_fe_ptr[structdim][obj_index],
                         ptr);
 
-        AssertIndexRange(dof_handler.hp_capability_enabled ?
-                           (dof_handler.hp_object_fe_ptr[d][obj_index] +
-                            fe_index_) :
-                           obj_index,
-                         dof_handler.object_dof_ptr[obj_level][d].size());
+        AssertIndexRange(
+          dof_handler.hp_capability_enabled ?
+            (dof_handler.hp_object_fe_ptr[structdim][obj_index] + fe_index_) :
+            obj_index,
+          dof_handler.object_dof_ptr[obj_level][structdim].size());
 
         AssertIndexRange(
-          dof_handler
-              .object_dof_ptr[obj_level][d]
-                             [dof_handler.hp_capability_enabled ?
-                                (dof_handler.hp_object_fe_ptr[d][obj_index] +
-                                 fe_index_) :
-                                obj_index] +
+          dof_handler.object_dof_ptr
+              [obj_level][structdim]
+              [dof_handler.hp_capability_enabled ?
+                 (dof_handler.hp_object_fe_ptr[structdim][obj_index] +
+                  fe_index_) :
+                 obj_index] +
             local_index,
-          dof_handler.object_dof_indices[obj_level][d].size());
+          dof_handler.object_dof_indices[obj_level][structdim].size());
 
-        process(
-          dof_handler.object_dof_indices
-            [obj_level][d]
-            [dof_handler.object_dof_ptr
-               [obj_level][d]
-               [dof_handler.hp_capability_enabled ?
-                  (dof_handler.hp_object_fe_ptr[d][obj_index] + fe_index_) :
-                  obj_index] +
-             local_index],
-          global_index);
+        process(dof_handler.object_dof_indices
+                  [obj_level][structdim]
+                  [dof_handler.object_dof_ptr
+                     [obj_level][structdim]
+                     [dof_handler.hp_capability_enabled ?
+                        (dof_handler.hp_object_fe_ptr[structdim][obj_index] +
+                         fe_index_) :
+                        obj_index] +
+                   local_index],
+                global_index);
       }
 
       /**
        * Determine range of dofs of object in global data structure.
+       *
+       * The template argument `structdim` indicates the
+       * dimensionality of the object on which we seek to know the DoF
+       * index. For example, if `structdim==0`, then we are looking to
+       * get a DoF index on a vertex of the indicated cell.
        */
-      template <int dim, int spacedim, int d>
+      template <int dim, int spacedim, int structdim>
       static std::pair<unsigned int, unsigned int>
       process_object_range(const DoFHandler<dim, spacedim> &dof_handler,
                            const unsigned int               obj_level,
                            const unsigned int               obj_index,
                            const unsigned int               fe_index,
-                           const std::integral_constant<int, d> &)
+                           const std::integral_constant<int, structdim> &)
       {
-        Assert(d == dim || obj_level == 0, ExcNotImplemented());
+        Assert(structdim == dim || obj_level == 0, ExcNotImplemented());
 
         // determine range of dofs in global data structure
         // 1) cell
-        if (d == dim)
+        if (structdim == dim)
           {
             const unsigned int ptr_0 =
-              dof_handler.object_dof_ptr[obj_level][d][obj_index];
+              dof_handler.object_dof_ptr[obj_level][structdim][obj_index];
             const unsigned int ptr_1 =
               ptr_0 +
               dof_handler.get_fe(fe_index).template n_dofs_per_object<dim>(0);
@@ -354,50 +368,52 @@ namespace internal
                             (DoFHandler<dim, spacedim>::default_fe_index));
 
             const unsigned int ptr_0 =
-              dof_handler.object_dof_ptr[obj_level][d][obj_index];
+              dof_handler.object_dof_ptr[obj_level][structdim][obj_index];
             const unsigned int ptr_1 =
-              dof_handler.object_dof_ptr[obj_level][d][obj_index + 1];
+              dof_handler.object_dof_ptr[obj_level][structdim][obj_index + 1];
 
             return {ptr_0, ptr_1};
           }
 
         // 3) hp is used
         AssertIndexRange(obj_level, dof_handler.object_dof_indices.size());
-        AssertIndexRange(d, dof_handler.object_dof_indices[obj_level].size());
+        AssertIndexRange(structdim,
+                         dof_handler.object_dof_indices[obj_level].size());
 
-        AssertIndexRange(d, dof_handler.hp_object_fe_ptr.size());
-        AssertIndexRange(obj_index, dof_handler.hp_object_fe_ptr[d].size());
+        AssertIndexRange(structdim, dof_handler.hp_object_fe_ptr.size());
+        AssertIndexRange(obj_index,
+                         dof_handler.hp_object_fe_ptr[structdim].size());
 
         const auto fe_index_local_ptr =
-          std::find(dof_handler.hp_object_fe_indices[d].begin() +
-                      dof_handler.hp_object_fe_ptr[d][obj_index],
-                    dof_handler.hp_object_fe_indices[d].begin() +
-                      dof_handler.hp_object_fe_ptr[d][obj_index + 1],
+          std::find(dof_handler.hp_object_fe_indices[structdim].begin() +
+                      dof_handler.hp_object_fe_ptr[structdim][obj_index],
+                    dof_handler.hp_object_fe_indices[structdim].begin() +
+                      dof_handler.hp_object_fe_ptr[structdim][obj_index + 1],
                     fe_index);
 
         Assert(fe_index_local_ptr !=
-                 dof_handler.hp_object_fe_indices[d].begin() +
-                   dof_handler.hp_object_fe_ptr[d][obj_index + 1],
+                 dof_handler.hp_object_fe_indices[structdim].begin() +
+                   dof_handler.hp_object_fe_ptr[structdim][obj_index + 1],
                ExcNotImplemented());
 
         const unsigned int fe_index_local =
-          std::distance(dof_handler.hp_object_fe_indices[d].begin() +
-                          dof_handler.hp_object_fe_ptr[d][obj_index],
+          std::distance(dof_handler.hp_object_fe_indices[structdim].begin() +
+                          dof_handler.hp_object_fe_ptr[structdim][obj_index],
                         fe_index_local_ptr);
 
-        AssertIndexRange(dof_handler.hp_object_fe_ptr[d][obj_index] +
-                           fe_index_local,
-                         dof_handler.object_dof_ptr[obj_level][d].size());
+        AssertIndexRange(
+          dof_handler.hp_object_fe_ptr[structdim][obj_index] + fe_index_local,
+          dof_handler.object_dof_ptr[obj_level][structdim].size());
 
         const unsigned int ptr_0 =
           dof_handler
-            .object_dof_ptr[obj_level][d]
-                           [dof_handler.hp_object_fe_ptr[d][obj_index] +
+            .object_dof_ptr[obj_level][structdim]
+                           [dof_handler.hp_object_fe_ptr[structdim][obj_index] +
                             fe_index_local];
         const unsigned int ptr_1 =
           dof_handler
-            .object_dof_ptr[obj_level][d]
-                           [dof_handler.hp_object_fe_ptr[d][obj_index] +
+            .object_dof_ptr[obj_level][structdim]
+                           [dof_handler.hp_object_fe_ptr[structdim][obj_index] +
                             fe_index_local + 1];
 
         return {ptr_0, ptr_1};
@@ -429,25 +445,30 @@ namespace internal
 
       /**
        * Process all dofs of an object.
+       *
+       * The template argument `structdim` indicates the
+       * dimensionality of the object on which we seek to know the DoF
+       * index. For example, if `structdim==0`, then we are looking to
+       * get a DoF index on a vertex of the indicated cell.
        */
       template <int dim,
                 int spacedim,
-                int d,
+                int structdim,
                 typename GlobalIndexType,
                 typename DoFPProcessor,
                 typename DoFMapping>
       static void
-      process_object(const DoFHandler<dim, spacedim> &     dof_handler,
-                     const unsigned int                    obj_level,
-                     const unsigned int                    obj_index,
-                     const unsigned int                    fe_index,
-                     const DoFMapping &                    mapping,
-                     const std::integral_constant<int, d> &dd,
-                     GlobalIndexType &                     local_indices,
-                     unsigned int &                        index,
-                     const DoFPProcessor &                 process)
+      process_object(const DoFHandler<dim, spacedim> &             dof_handler,
+                     const unsigned int                            obj_level,
+                     const unsigned int                            obj_index,
+                     const unsigned int                            fe_index,
+                     const DoFMapping &                            mapping,
+                     const std::integral_constant<int, structdim> &dd,
+                     GlobalIndexType &    local_indices,
+                     unsigned int &       index,
+                     const DoFPProcessor &process)
       {
-        Assert(d == dim || obj_level == 0, ExcNotImplemented());
+        Assert(structdim == dim || obj_level == 0, ExcNotImplemented());
 
         // determine range of dofs in global data structure
         const auto range =
@@ -457,8 +478,9 @@ namespace internal
         for (unsigned int i = 0, k = range.first; k < range.second;
              ++i, ++k, ++index)
           process(dof_handler.object_dof_indices
-                    [d < dim ? 0 : obj_level][d]
-                    [range.first + ((d == 0 || d == dim) ? i : mapping(i))],
+                    [structdim < dim ? 0 : obj_level][structdim]
+                    [range.first +
+                     ((structdim == 0 || structdim == dim) ? i : mapping(i))],
                   local_indices[index]);
       }
 
@@ -468,16 +490,21 @@ namespace internal
        * Set the @p local_index-th degree of freedom corresponding to the
        * finite element specified by @p fe_index on the vertex with global
        * number @p vertex_index to @p global_index.
+       *
+       * The template argument `structdim` indicates the
+       * dimensionality of the object on which we seek to know the DoF
+       * index. For example, if `structdim==0`, then we are looking to
+       * get a DoF index on a vertex of the indicated cell.
        */
-      template <int dim, int spacedim, int d>
+      template <int dim, int spacedim, int structdim>
       static void
-      set_dof_index(const DoFHandler<dim, spacedim> &     dof_handler,
-                    const unsigned int                    obj_level,
-                    const unsigned int                    obj_index,
-                    const unsigned int                    fe_index,
-                    const unsigned int                    local_index,
-                    const std::integral_constant<int, d> &dd,
-                    const types::global_dof_index         global_index)
+      set_dof_index(const DoFHandler<dim, spacedim> &             dof_handler,
+                    const unsigned int                            obj_level,
+                    const unsigned int                            obj_index,
+                    const unsigned int                            fe_index,
+                    const unsigned int                            local_index,
+                    const std::integral_constant<int, structdim> &dd,
+                    const types::global_dof_index                 global_index)
       {
         process_dof_index(dof_handler,
                           obj_level,
@@ -494,15 +521,20 @@ namespace internal
        * Get the @p local_index-th degree of freedom corresponding to the
        * finite element specified by @p fe_index on the vertex with global
        * number @p vertex_index to @p global_index.
+       *
+       * The template argument `structdim` indicates the
+       * dimensionality of the object on which we seek to know the DoF
+       * index. For example, if `structdim==0`, then we are looking to
+       * get a DoF index on a vertex of the indicated cell.
        */
-      template <int dim, int spacedim, int d>
+      template <int dim, int spacedim, int structdim>
       static types::global_dof_index
-      get_dof_index(const DoFHandler<dim, spacedim> &     dof_handler,
-                    const unsigned int                    obj_level,
-                    const unsigned int                    obj_index,
-                    const unsigned int                    fe_index,
-                    const unsigned int                    local_index,
-                    const std::integral_constant<int, d> &dd)
+      get_dof_index(const DoFHandler<dim, spacedim> &             dof_handler,
+                    const unsigned int                            obj_level,
+                    const unsigned int                            obj_index,
+                    const unsigned int                            fe_index,
+                    const unsigned int                            local_index,
+                    const std::integral_constant<int, structdim> &dd)
       {
         types::global_dof_index global_index;
         process_dof_index(dof_handler,
@@ -553,53 +585,64 @@ namespace internal
 
       /**
        * Return the number of different finite elements that are active on a
-       * given vertex.
+       * given object such as a vertex, line, or cell.
+       *
+       * The template argument `structdim` indicates the
+       * dimensionality of the object on which we seek to know the DoF
+       * index. For example, if `structdim==0`, then we are looking to
+       * get a DoF index on a vertex of the indicated cell.
        */
-      template <int dim, int spacedim, int d>
+      template <int dim, int spacedim, int structdim>
       static unsigned int
       n_active_fe_indices(const DoFHandler<dim, spacedim> &dof_handler,
                           const unsigned int               obj_level,
                           const unsigned int               obj_index,
-                          const std::integral_constant<int, d> &)
+                          const std::integral_constant<int, structdim> &)
       {
         (void)obj_level;
 
-        Assert(d == dim || obj_level == 0, ExcNotImplemented());
+        Assert(structdim == dim || obj_level == 0, ExcNotImplemented());
 
         // 1) no hp used -> fe_index == 0
         if (dof_handler.hp_capability_enabled == false)
           return 1;
 
         // 2) cell and hp is used -> there is only one fe_index
-        if (d == dim)
+        if (structdim == dim)
           return 1;
 
         // 3) general entity and hp is used
-        AssertIndexRange(d, dof_handler.hp_object_fe_ptr.size());
-        AssertIndexRange(obj_index + 1, dof_handler.hp_object_fe_ptr[d].size());
+        AssertIndexRange(structdim, dof_handler.hp_object_fe_ptr.size());
+        AssertIndexRange(obj_index + 1,
+                         dof_handler.hp_object_fe_ptr[structdim].size());
 
-        return dof_handler.hp_object_fe_ptr[d][obj_index + 1] -
-               dof_handler.hp_object_fe_ptr[d][obj_index];
+        return dof_handler.hp_object_fe_ptr[structdim][obj_index + 1] -
+               dof_handler.hp_object_fe_ptr[structdim][obj_index];
       }
 
 
 
       /**
        * Return the FE index of the n-th finite element active on a given
-       * vertex.
+       * object such as a vertex, line, or cell.
+       *
+       * The template argument `structdim` indicates the
+       * dimensionality of the object on which we seek to know the DoF
+       * index. For example, if `structdim==0`, then we are looking to
+       * get a DoF index on a vertex of the indicated cell.
        */
-      template <int dim, int spacedim, int d>
+      template <int dim, int spacedim, int structdim>
       static unsigned int
       nth_active_fe_index(const DoFHandler<dim, spacedim> &dof_handler,
                           const unsigned int               obj_level,
                           const unsigned int               obj_index,
                           const unsigned int               local_index,
-                          const std::integral_constant<int, d> &)
+                          const std::integral_constant<int, structdim> &)
       {
-        Assert(d == dim || obj_level == 0, ExcNotImplemented());
+        Assert(structdim == dim || obj_level == 0, ExcNotImplemented());
 
         // for cells only one active FE index available
-        Assert(((d == dim) &&
+        Assert(((structdim == dim) &&
                 (local_index != DoFHandler<dim, spacedim>::default_fe_index)) ==
                  false,
                ExcNotImplemented());
@@ -609,45 +652,52 @@ namespace internal
           return DoFHandler<dim, spacedim>::default_fe_index;
 
         // 2) cell and hp is used -> there is only one fe_index
-        if (d == dim)
+        if (structdim == dim)
           return dof_handler.hp_cell_active_fe_indices[obj_level][obj_index];
 
         // 3) general entity and hp is used
-        AssertIndexRange(d, dof_handler.hp_object_fe_indices.size());
-        AssertIndexRange(d, dof_handler.hp_object_fe_ptr.size());
-        AssertIndexRange(obj_index, dof_handler.hp_object_fe_ptr[d].size());
-        AssertIndexRange(dof_handler.hp_object_fe_ptr[d][obj_index] +
+        AssertIndexRange(structdim, dof_handler.hp_object_fe_indices.size());
+        AssertIndexRange(structdim, dof_handler.hp_object_fe_ptr.size());
+        AssertIndexRange(obj_index,
+                         dof_handler.hp_object_fe_ptr[structdim].size());
+        AssertIndexRange(dof_handler.hp_object_fe_ptr[structdim][obj_index] +
                            local_index,
-                         dof_handler.hp_object_fe_indices[d].size());
+                         dof_handler.hp_object_fe_indices[structdim].size());
 
-        return dof_handler
-          .hp_object_fe_indices[d][dof_handler.hp_object_fe_ptr[d][obj_index] +
-                                   local_index];
+        return dof_handler.hp_object_fe_indices
+          [structdim]
+          [dof_handler.hp_object_fe_ptr[structdim][obj_index] + local_index];
       }
 
 
 
       /**
-       * Returns all active FE indices on a given vertex.
+       * Returns all active FE indices on a given object such as a
+       * vertex, line, or cell.
        *
        * The size of the returned set equals the number of finite elements that
        * are active on this vertex.
+       *
+       * The template argument `structdim` indicates the
+       * dimensionality of the object on which we seek to know the DoF
+       * index. For example, if `structdim==0`, then we are looking to
+       * get a DoF index on a vertex of the indicated cell.
        */
-      template <int dim, int spacedim, int d>
+      template <int dim, int spacedim, int structdim>
       static std::set<unsigned int>
-      get_active_fe_indices(const DoFHandler<dim, spacedim> &     dof_handler,
-                            const unsigned int                    obj_level,
-                            const unsigned int                    obj_index,
-                            const std::integral_constant<int, d> &t)
+      get_active_fe_indices(const DoFHandler<dim, spacedim> &dof_handler,
+                            const unsigned int               obj_level,
+                            const unsigned int               obj_index,
+                            const std::integral_constant<int, structdim> &t)
       {
-        Assert(d == dim || obj_level == 0, ExcNotImplemented());
+        Assert(structdim == dim || obj_level == 0, ExcNotImplemented());
 
         // 1) no hp used -> fe_index == 0
         if (dof_handler.hp_capability_enabled == false)
           return {DoFHandler<dim, spacedim>::default_fe_index};
 
         // 2) cell and hp is used -> there is only one fe_index
-        if (d == dim)
+        if (structdim == dim)
           return {dof_handler.hp_cell_active_fe_indices[obj_level][obj_index]};
 
         // 3) general entity and hp is used
@@ -662,33 +712,34 @@ namespace internal
 
 
 
-      template <int dim, int spacedim, int d>
+      template <int dim, int spacedim, int structdim>
       static bool
       fe_index_is_active(const DoFHandler<dim, spacedim> &dof_handler,
                          const unsigned int               obj_level,
                          const unsigned int               obj_index,
                          const unsigned int               fe_index,
-                         const std::integral_constant<int, d> &)
+                         const std::integral_constant<int, structdim> &)
       {
-        Assert(d == dim || obj_level == 0, ExcNotImplemented());
+        Assert(structdim == dim || obj_level == 0, ExcNotImplemented());
 
         // 1) no hp used -> fe_index == 0
         if (dof_handler.hp_capability_enabled == false)
           return (fe_index == DoFHandler<dim, spacedim>::default_fe_index);
 
         // 2) cell and hp is used -> there is only one fe_index
-        if (d == dim)
+        if (structdim == dim)
           return dof_handler.hp_cell_active_fe_indices[obj_level][obj_index] ==
                  fe_index;
 
         // 3) general entity and hp is used
-        return std::find(dof_handler.hp_object_fe_indices[d].begin() +
-                           dof_handler.hp_object_fe_ptr[d][obj_index],
-                         dof_handler.hp_object_fe_indices[d].begin() +
-                           dof_handler.hp_object_fe_ptr[d][obj_index + 1],
-                         fe_index) !=
-               (dof_handler.hp_object_fe_indices[d].begin() +
-                dof_handler.hp_object_fe_ptr[d][obj_index + 1]);
+        return std::find(
+                 dof_handler.hp_object_fe_indices[structdim].begin() +
+                   dof_handler.hp_object_fe_ptr[structdim][obj_index],
+                 dof_handler.hp_object_fe_indices[structdim].begin() +
+                   dof_handler.hp_object_fe_ptr[structdim][obj_index + 1],
+                 fe_index) !=
+               (dof_handler.hp_object_fe_indices[structdim].begin() +
+                dof_handler.hp_object_fe_ptr[structdim][obj_index + 1]);
       }
 
 
