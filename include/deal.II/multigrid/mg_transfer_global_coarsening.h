@@ -24,6 +24,8 @@
 #include <deal.II/lac/la_parallel_vector.h>
 
 #include <deal.II/multigrid/mg_base.h>
+#include <deal.II/multigrid/mg_constrained_dofs.h>
+#include <deal.II/multigrid/mg_transfer_matrix_free.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -193,10 +195,13 @@ public:
    * can be only performed on active levels.
    */
   void
-  reinit_geometric_transfer(const DoFHandler<dim> &          dof_handler_fine,
-                            const DoFHandler<dim> &          dof_handler_coarse,
-                            const AffineConstraints<Number> &constraint_fine,
-                            const AffineConstraints<Number> &constraint_coarse);
+  reinit_geometric_transfer(
+    const DoFHandler<dim> &          dof_handler_fine,
+    const DoFHandler<dim> &          dof_handler_coarse,
+    const AffineConstraints<Number> &constraint_fine,
+    const AffineConstraints<Number> &constraint_coarse,
+    const unsigned int mg_level_fine   = numbers::invalid_unsigned_int,
+    const unsigned int mg_level_coarse = numbers::invalid_unsigned_int);
 
   /**
    * Set up polynomial coarsening between the given DoFHandler objects (
@@ -467,6 +472,16 @@ public:
     const std::function<void(const unsigned int, VectorType &)>
       &initialize_dof_vector = {});
 
+  void
+  build(const DoFHandler<dim> &  dof_handler,
+        const MGConstrainedDoFs &mg_constrained_dofs)
+  {
+    this->mg_transfer =
+      std::make_shared<MGTransferMatrixFree<dim, Number>>(mg_constrained_dofs);
+    this->mg_transfer->build(dof_handler);
+  }
+
+
   /**
    * Perform prolongation.
    */
@@ -538,6 +553,11 @@ private:
    */
   const std::function<void(const unsigned int, VectorType &)>
     initialize_dof_vector;
+
+  /**
+   * TODO
+   */
+  std::shared_ptr<MGTransferMatrixFree<dim, Number>> mg_transfer;
 };
 
 
@@ -603,7 +623,10 @@ MGTransferGlobalCoarsening<dim, VectorType>::copy_to_mg(
   for (unsigned int level = dst.min_level(); level <= dst.max_level(); ++level)
     initialize_dof_vector(level, dst[level]);
 
-  dst[dst.max_level()].copy_locally_owned_data_from(src);
+  if (mg_transfer)
+    mg_transfer->copy_to_mg(dof_handler, dst, src);
+  else
+    dst[dst.max_level()].copy_locally_owned_data_from(src);
 }
 
 
@@ -618,7 +641,10 @@ MGTransferGlobalCoarsening<dim, VectorType>::copy_from_mg(
 {
   (void)dof_handler;
 
-  dst.copy_locally_owned_data_from(src[src.max_level()]);
+  if (mg_transfer)
+    mg_transfer->copy_from_mg(dof_handler, dst, src);
+  else
+    dst.copy_locally_owned_data_from(src[src.max_level()]);
 }
 
 
@@ -649,10 +675,17 @@ MGTransferGlobalCoarsening<dim, VectorType>::interpolate_to_mg(
   for (unsigned int level = min_level; level <= max_level; ++level)
     initialize_dof_vector(level, dst[level]);
 
-  dst[transfer.max_level()].copy_locally_owned_data_from(src);
+  if (mg_transfer)
+    {
+      mg_transfer->interpolate_to_mg(dof_handler, dst, src);
+    }
+  else
+    {
+      dst[transfer.max_level()].copy_locally_owned_data_from(src);
 
-  for (unsigned int l = max_level; l > min_level; --l)
-    this->transfer[l].interpolate(dst[l - 1], dst[l]);
+      for (unsigned int l = max_level; l > min_level; --l)
+        this->transfer[l].interpolate(dst[l - 1], dst[l]);
+    }
 }
 
 #endif
