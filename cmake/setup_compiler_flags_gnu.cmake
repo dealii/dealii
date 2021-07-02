@@ -188,6 +188,12 @@ IF (CMAKE_BUILD_TYPE MATCHES "Release")
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-fstrict-aliasing")
 
   #
+  # Disable assert() in deal.II and user projects in release mode
+  #
+  LIST(APPEND DEAL_II_DEFINITIONS_RELEASE "NDEBUG")
+  LIST(APPEND DEAL_II_USER_DEFINITIONS_RELEASE "NDEBUG")
+
+  #
   # There are many places in the library where we create a new typedef and then
   # immediately use it in an Assert. Hence, only ignore unused typedefs in Release
   # mode.
