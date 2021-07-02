@@ -1,0 +1,5 @@
+New: The new postprocessing class DataOutResample is similar to
+DataOut but allows to interpolate the result onto a second 
+triangulation.
+<br>
+(Peter Munch, Martin Kronbichler, Magdalena Schreter, 2021/06/08)
