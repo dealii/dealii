@@ -1402,8 +1402,8 @@ namespace Patterns
     DeclException2(ExcNoMatch,
                    std::string,
                    std::string,
-                   << "The string " << arg1 << " does not match the pattern \""
-                   << arg2 << "\"");
+                   << "The string \"" << arg1
+                   << "\" does not match the pattern \"" << arg2 << "\"");
     //@}
   } // namespace Tools
 } // namespace Patterns
