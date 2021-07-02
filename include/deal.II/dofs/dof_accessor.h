@@ -477,14 +477,18 @@ public:
    * ::DoFHandler class, this value must be equal to its default value since
    * that class only supports the same finite element on all cells anyway.
    *
-   * However, when hp-capabilities are enabled, different finite element
-   * objects may be used on different cells. On faces between two cells, as
-   * well as vertices, there may therefore be two sets of degrees of freedom,
-   * one for each of the finite elements used on the adjacent cells.  In order
-   * to specify which set of degrees of freedom to work on, the last argument
-   * is used to disambiguate. Finally, if this function is called for a cell
+   * However, when hp-capabilities are enabled, different finite
+   * element objects may be used on different cells. On faces between
+   * two cells, as well as vertices, there may therefore be two sets
+   * of degrees of freedom, one for each of the finite elements used
+   * on the adjacent cells.  In order to specify which set of degrees
+   * of freedom to work on, the last argument is used to
+   * disambiguate. Finally, if this function is called for a cell
    * object, there can only be a single set of degrees of freedom, and
-   * fe_index has to match the result of active_fe_index().
+   * `fe_index` has to match the result of
+   * `cell->active_fe_index()`. Alternatively, if `fe_index` is left
+   * to its default value when this function is called on a cell, then
+   * this is interpreted as equal to `cell->active_fe_index()`.
    */
   types::global_dof_index
   vertex_dof_index(const unsigned int vertex,
