@@ -20,7 +20,7 @@
 
 #include <deal.II/base/polynomials_barycentric.h>
 
-#include <deal.II/fe/fe_poly.h>
+#include <deal.II/fe/fe_simplex_p.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -68,7 +68,7 @@ DEAL_II_NAMESPACE_OPEN
  * are not yet implemented in this class.
  */
 template <int dim, int spacedim = dim>
-class FE_SimplexP_Bubbles : public dealii::FE_Poly<dim, spacedim>
+class FE_SimplexP_Bubbles : public FE_SimplexPoly<dim, spacedim>
 {
 public:
   /**
@@ -77,7 +77,8 @@ public:
    * space for this element: see the general documentation of this class for
    * more information.
    *
-   * @note For <code>degree == 1</code> this element is equivalent to FE_P(1).
+   * @note For <code>degree == 1</code> this element is equivalent to
+   * FE_SimplexP(1).
    */
   FE_SimplexP_Bubbles(const unsigned int degree);
 
@@ -95,14 +96,6 @@ public:
    */
   virtual std::string
   get_name() const override;
-
-  /**
-   * @copydoc dealii::FiniteElement::convert_generalized_support_point_values_to_dof_values()
-   */
-  virtual void
-  convert_generalized_support_point_values_to_dof_values(
-    const std::vector<Vector<double>> &support_point_values,
-    std::vector<double> &              nodal_values) const override;
 
 protected:
   /**
