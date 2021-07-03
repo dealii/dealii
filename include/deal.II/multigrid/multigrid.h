@@ -118,11 +118,25 @@ namespace mg
     /**
      * This signal is triggered before (@p before is true) and after (@p before
      * is false) the call to a post-smoothing step via MGPostSmoother::apply()
-     * on
-     * @p level.
+     * on @p level.
      */
     boost::signals2::signal<void(const bool before, const unsigned int level)>
       post_smoother_step;
+
+    /**
+     * This signal is triggered before (@p before is true) and after (@p before
+     * is false) the computation of the residual vector on @p level, including
+     * the result of edge_out and edge_down.
+     */
+    boost::signals2::signal<void(const bool before, const unsigned int level)>
+      residual_step;
+
+    /**
+     * This signal is triggered before (@p before is true) and after (@p before
+     * is false) the execution of edge_in and edge_up.
+     */
+    boost::signals2::signal<void(const bool before, const unsigned int level)>
+      edge_prolongation;
   };
 } // namespace mg
 
@@ -288,10 +302,17 @@ public:
   void set_cycle(Cycle);
 
   /**
-   * Connect a function to mg::Signals::coarse_solve.
+   * Connect a function to mg::Signals::pre_smoother_step.
    */
   boost::signals2::connection
-  connect_coarse_solve(
+  connect_pre_smoother_step(
+    const std::function<void(const bool, const unsigned int)> &slot);
+
+  /**
+   * Connect a function to mg::Signals::residual_step.
+   */
+  boost::signals2::connection
+  connect_residual_step(
     const std::function<void(const bool, const unsigned int)> &slot);
 
   /**
@@ -302,6 +323,13 @@ public:
     const std::function<void(const bool, const unsigned int)> &slot);
 
   /**
+   * Connect a function to mg::Signals::coarse_solve.
+   */
+  boost::signals2::connection
+  connect_coarse_solve(
+    const std::function<void(const bool, const unsigned int)> &slot);
+
+  /**
    * Connect a function to mg::Signals::prolongation.
    */
   boost::signals2::connection
@@ -309,10 +337,10 @@ public:
     const std::function<void(const bool, const unsigned int)> &slot);
 
   /**
-   * Connect a function to mg::Signals::pre_smoother_step.
+   * Connect a function to mg::Signals::edge_prolongation.
    */
   boost::signals2::connection
-  connect_pre_smoother_step(
+  connect_edge_prolongation(
     const std::function<void(const bool, const unsigned int)> &slot);
 
   /**
