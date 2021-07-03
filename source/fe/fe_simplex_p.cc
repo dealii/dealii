@@ -84,6 +84,12 @@ namespace
   unit_support_points_fe_p(const unsigned int degree)
   {
     std::vector<Point<dim>> unit_points;
+    // If we do dim - 1 we can get here in dim = 0:
+    if (dim == 0)
+      {
+        unit_points.emplace_back();
+        return unit_points;
+      }
 
     // Piecewise constants are a special case: use a support point at the
     // centroid and only the centroid
@@ -178,9 +184,7 @@ namespace
     std::vector<std::vector<Point<dim - 1>>> unit_face_points;
 
     // all faces have the same support points
-    for (auto face_n :
-         (dim == 2 ? ReferenceCells::Triangle : ReferenceCells::Tetrahedron)
-           .face_indices())
+    for (auto face_n : ReferenceCells::get_simplex<dim>().face_indices())
       {
         (void)face_n;
         unit_face_points.emplace_back(
@@ -610,8 +614,7 @@ FE_SimplexP<dim, spacedim>::FE_SimplexP(const unsigned int degree)
   : FE_SimplexPoly<dim, spacedim>(
       BarycentricPolynomials<dim>::get_fe_p_basis(degree),
       FiniteElementData<dim>(get_dpo_vector_fe_p(dim, degree),
-                             dim == 2 ? ReferenceCells::Triangle :
-                                        ReferenceCells::Tetrahedron,
+                             ReferenceCells::get_simplex<dim>(),
                              1,
                              degree,
                              FiniteElementData<dim>::H1),
@@ -838,8 +841,7 @@ FE_SimplexDGP<dim, spacedim>::FE_SimplexDGP(const unsigned int degree)
   : FE_SimplexPoly<dim, spacedim>(
       BarycentricPolynomials<dim>::get_fe_p_basis(degree),
       FiniteElementData<dim>(get_dpo_vector_fe_dgp(dim, degree),
-                             dim == 2 ? ReferenceCells::Triangle :
-                                        ReferenceCells::Tetrahedron,
+                             ReferenceCells::get_simplex<dim>(),
                              1,
                              degree,
                              FiniteElementData<dim>::L2),

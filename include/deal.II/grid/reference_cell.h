@@ -656,7 +656,7 @@ namespace ReferenceCells
   /**
    * Return the correct simplex reference cell type for the given dimension
    * `dim`. Depending on the template argument `dim`, this function returns a
-   * reference to either Vertex, Triangle, or Tetrahedron.
+   * reference to either Vertex, Line, Triangle, or Tetrahedron.
    */
   template <int dim>
   constexpr const ReferenceCell &
