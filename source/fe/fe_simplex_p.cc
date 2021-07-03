@@ -163,8 +163,14 @@ namespace
    */
   template <int dim>
   std::vector<std::vector<Point<dim - 1>>>
-  unit_face_support_points_fe_poly(const unsigned int degree)
+  unit_face_support_points_fe_poly(
+    const unsigned int                          degree,
+    typename FiniteElementData<dim>::Conformity conformity)
   {
+    // Discontinuous elements don't have face support points
+    if (conformity == FiniteElementData<dim>::Conformity::L2)
+      return {};
+
     // this concept doesn't exist in 1D so just return an empty vector
     if (dim == 1)
       return {};
@@ -313,37 +319,38 @@ FE_SimplexPoly<dim, spacedim>::FE_SimplexPoly(
   const unsigned int                                degree,
   const std::vector<unsigned int> &                 dpo_vector,
   const typename FiniteElementData<dim>::Conformity conformity)
+  : FE_SimplexPoly(BarycentricPolynomials<dim>::get_fe_p_basis(degree),
+                   FiniteElementData<dim>(dpo_vector,
+                                          dim == 2 ?
+                                            ReferenceCells::Triangle :
+                                            ReferenceCells::Tetrahedron,
+                                          1,
+                                          degree,
+                                          conformity),
+                   unit_support_points_fe_poly<dim>(degree),
+                   unit_face_support_points_fe_poly<dim>(degree, conformity),
+                   constraints_fe_poly<dim>(degree))
+{}
+
+
+
+template <int dim, int spacedim>
+FE_SimplexPoly<dim, spacedim>::FE_SimplexPoly(
+  const BarycentricPolynomials<dim>              polynomials,
+  const FiniteElementData<dim> &                 fe_data,
+  const std::vector<Point<dim>> &                unit_support_points,
+  const std::vector<std::vector<Point<dim - 1>>> unit_face_support_points,
+  const FullMatrix<double> &                     interface_constraints)
   : dealii::FE_Poly<dim, spacedim>(
-      BarycentricPolynomials<dim>::get_fe_p_basis(degree),
-      FiniteElementData<dim>(dpo_vector,
-                             dim == 2 ? ReferenceCells::Triangle :
-                                        ReferenceCells::Tetrahedron,
-                             1,
-                             degree,
-                             conformity),
-      std::vector<bool>(FiniteElementData<dim>(dpo_vector,
-                                               dim == 2 ?
-                                                 ReferenceCells::Triangle :
-                                                 ReferenceCells::Tetrahedron,
-                                               1,
-                                               degree)
-                          .dofs_per_cell,
-                        true),
-      std::vector<ComponentMask>(
-        FiniteElementData<dim>(dpo_vector,
-                               dim == 2 ? ReferenceCells::Triangle :
-                                          ReferenceCells::Tetrahedron,
-                               1,
-                               degree)
-          .dofs_per_cell,
-        std::vector<bool>(1, true)))
+      polynomials,
+      fe_data,
+      std::vector<bool>(fe_data.dofs_per_cell),
+      std::vector<ComponentMask>(fe_data.dofs_per_cell,
+                                 std::vector<bool>(1, true)))
 {
-  this->unit_support_points = unit_support_points_fe_poly<dim>(degree);
-  // Discontinuous elements don't have face support points
-  if (conformity == FiniteElementData<dim>::Conformity::H1)
-    this->unit_face_support_points =
-      unit_face_support_points_fe_poly<dim>(degree);
-  this->interface_constraints = constraints_fe_poly<dim>(degree);
+  this->unit_support_points      = unit_support_points;
+  this->unit_face_support_points = unit_face_support_points;
+  this->interface_constraints    = interface_constraints;
 }
 
 

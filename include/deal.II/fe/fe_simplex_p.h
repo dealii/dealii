@@ -25,7 +25,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 /**
- * Base class of FE_SimplexP and FE_SimplexDGP.
+ * Base class of FE_SimplexP, FE_SimplexDGP, and FE_SimplexP_Bubbles.
  *
  * @note Only implemented for 2D and 3D.
  *
@@ -41,6 +41,16 @@ public:
   FE_SimplexPoly(const unsigned int                                degree,
                  const std::vector<unsigned int> &                 dpo_vector,
                  const typename FiniteElementData<dim>::Conformity conformity);
+
+  /**
+   * Constructor.
+   */
+  FE_SimplexPoly(
+    const BarycentricPolynomials<dim>              polynomials,
+    const FiniteElementData<dim> &                 fe_data,
+    const std::vector<Point<dim>> &                unit_support_points,
+    const std::vector<std::vector<Point<dim - 1>>> unit_face_support_points,
+    const FullMatrix<double> &                     interface_constraints);
 
   /**
    * Return a list of constant modes of the element. For this element, the
@@ -103,6 +113,10 @@ public:
     const std::vector<Vector<double>> &support_point_values,
     std::vector<double> &              nodal_values) const override;
 
+protected:
+  /**
+   * Mutex used to guard computation of some internal lookup tables.
+   */
   mutable Threads::Mutex mutex;
 };
 
