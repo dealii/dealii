@@ -866,13 +866,13 @@ namespace internal
       IndexSet is_src_locally_owned(this->cell_id_translator.size());
 
       for (const auto &cell : tria_dst.active_cell_iterators())
-        if (!cell->is_artificial() && cell->is_locally_owned())
+        if (cell->is_locally_owned())
           is_dst_locally_owned.add_index(
             this->cell_id_translator.translate(cell));
 
 
       for (const auto &cell : tria_src.active_cell_iterators())
-        if (!cell->is_artificial() && cell->is_locally_owned())
+        if (cell->is_locally_owned())
           {
             is_src_locally_owned.add_index(
               this->cell_id_translator.translate(cell));
@@ -927,22 +927,21 @@ namespace internal
         is_dst_remote.add_index(this->cell_id_translator.translate(cell));
       };
 
-      const auto loop = [&](const auto &tria,
-                            const auto  level,
-                            const auto &op) {
-        if (level == numbers::invalid_unsigned_int)
-          {
-            for (const auto &cell : tria.active_cell_iterators())
-              if (!cell->is_artificial() && cell->is_locally_owned())
-                op(cell);
-          }
-        else
-          {
-            for (const auto &cell : tria.cell_iterators_on_level(level))
-              if (cell->level_subdomain_id() == tria.locally_owned_subdomain())
-                op(cell);
-          }
-      };
+      const auto loop =
+        [&](const auto &tria, const auto level, const auto &op) {
+          if (level == numbers::invalid_unsigned_int)
+            {
+              for (const auto &cell : tria.active_cell_iterators())
+                if (cell->is_locally_owned())
+                  op(cell);
+            }
+          else
+            {
+              for (const auto &cell : tria.cell_iterators_on_level(level))
+                if (cell->is_locally_owned_on_level())
+                  op(cell);
+            }
+        };
 
       loop(tria_dst, mg_level_fine, fine_operation);
       loop(tria_src, mg_level_coarse, coarse_operation);
@@ -1137,9 +1136,7 @@ namespace internal
           for (const auto &cell :
                dof_handler_fine.mg_cell_iterators_on_level(mg_level_fine))
             {
-              if (cell->level_subdomain_id() !=
-                  dof_handler_fine.get_triangulation()
-                    .locally_owned_subdomain())
+              if (!cell->is_locally_owned_on_level())
                 continue;
 
               local_dof_indices.resize(cell->get_fe().n_dofs_per_cell());
@@ -1277,8 +1274,7 @@ namespace internal
           for (const auto &cell_coarse :
                dof_handler_coarse.active_cell_iterators())
             {
-              if (cell_coarse->is_artificial() == true ||
-                  cell_coarse->is_locally_owned() == false)
+              if (!cell_coarse->is_locally_owned())
                 continue;
 
               // get a reference to the equivalent cell on the fine
@@ -1694,9 +1690,7 @@ namespace internal
             for (const auto &cell_coarse :
                  dof_handler_coarse.mg_cell_iterators_on_level(mg_level_coarse))
               {
-                if (cell_coarse->level_subdomain_id() !=
-                    dof_handler_coarse.get_triangulation()
-                      .locally_owned_subdomain())
+                if (!cell_coarse->is_locally_owned_on_level())
                   continue;
 
                 const auto cell_coarse_on_fine_mesh =
@@ -2841,11 +2835,11 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::reinit(
       IndexSet is_locally_owned_coarse(cell_id_translator.size());
 
       for (const auto &cell : dof_handler_fine.active_cell_iterators())
-        if (!cell->is_artificial() && cell->is_locally_owned())
+        if (cell->is_locally_owned())
           is_locally_owned_fine.add_index(cell_id_translator.translate(cell));
 
       for (const auto &cell : dof_handler_coarse.active_cell_iterators())
-        if (!cell->is_artificial() && cell->is_locally_owned())
+        if (cell->is_locally_owned())
           is_locally_owned_coarse.add_index(cell_id_translator.translate(cell));
 
       const MPI_Comm communicator = dof_handler_fine.get_communicator();
