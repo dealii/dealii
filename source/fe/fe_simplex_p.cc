@@ -316,26 +316,6 @@ namespace
 
 template <int dim, int spacedim>
 FE_SimplexPoly<dim, spacedim>::FE_SimplexPoly(
-  const unsigned int                                degree,
-  const std::vector<unsigned int> &                 dpo_vector,
-  const typename FiniteElementData<dim>::Conformity conformity)
-  : FE_SimplexPoly(BarycentricPolynomials<dim>::get_fe_p_basis(degree),
-                   FiniteElementData<dim>(dpo_vector,
-                                          dim == 2 ?
-                                            ReferenceCells::Triangle :
-                                            ReferenceCells::Tetrahedron,
-                                          1,
-                                          degree,
-                                          conformity),
-                   unit_support_points_fe_p<dim>(degree),
-                   unit_face_support_points_fe_p<dim>(degree, conformity),
-                   constraints_fe_p<dim>(degree))
-{}
-
-
-
-template <int dim, int spacedim>
-FE_SimplexPoly<dim, spacedim>::FE_SimplexPoly(
   const BarycentricPolynomials<dim>              polynomials,
   const FiniteElementData<dim> &                 fe_data,
   const std::vector<Point<dim>> &                unit_support_points,
@@ -627,9 +607,17 @@ FE_SimplexPoly<dim, spacedim>::
 
 template <int dim, int spacedim>
 FE_SimplexP<dim, spacedim>::FE_SimplexP(const unsigned int degree)
-  : FE_SimplexPoly<dim, spacedim>(degree,
-                                  get_dpo_vector_fe_p(dim, degree),
-                                  FiniteElementData<dim>::H1)
+  : FE_SimplexPoly<dim, spacedim>(
+      BarycentricPolynomials<dim>::get_fe_p_basis(degree),
+      FiniteElementData<dim>(get_dpo_vector_fe_p(dim, degree),
+                             dim == 2 ? ReferenceCells::Triangle :
+                                        ReferenceCells::Tetrahedron,
+                             1,
+                             degree,
+                             FiniteElementData<dim>::H1),
+      unit_support_points_fe_p<dim>(degree),
+      unit_face_support_points_fe_p<dim>(degree, FiniteElementData<dim>::H1),
+      constraints_fe_p<dim>(degree))
 {}
 
 
@@ -847,9 +835,17 @@ FE_SimplexP<dim, spacedim>::hp_line_dof_identities(
 
 template <int dim, int spacedim>
 FE_SimplexDGP<dim, spacedim>::FE_SimplexDGP(const unsigned int degree)
-  : FE_SimplexPoly<dim, spacedim>(degree,
-                                  get_dpo_vector_fe_dgp(dim, degree),
-                                  FiniteElementData<dim>::L2)
+  : FE_SimplexPoly<dim, spacedim>(
+      BarycentricPolynomials<dim>::get_fe_p_basis(degree),
+      FiniteElementData<dim>(get_dpo_vector_fe_dgp(dim, degree),
+                             dim == 2 ? ReferenceCells::Triangle :
+                                        ReferenceCells::Tetrahedron,
+                             1,
+                             degree,
+                             FiniteElementData<dim>::L2),
+      unit_support_points_fe_p<dim>(degree),
+      unit_face_support_points_fe_p<dim>(degree, FiniteElementData<dim>::H1),
+      constraints_fe_p<dim>(degree))
 {}
 
 

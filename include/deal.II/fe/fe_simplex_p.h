@@ -38,13 +38,6 @@ public:
   /**
    * Constructor.
    */
-  FE_SimplexPoly(const unsigned int                                degree,
-                 const std::vector<unsigned int> &                 dpo_vector,
-                 const typename FiniteElementData<dim>::Conformity conformity);
-
-  /**
-   * Constructor.
-   */
   FE_SimplexPoly(
     const BarycentricPolynomials<dim>              polynomials,
     const FiniteElementData<dim> &                 fe_data,
