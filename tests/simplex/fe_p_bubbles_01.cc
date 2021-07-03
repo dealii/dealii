@@ -58,7 +58,7 @@ test_unit_support_points()
 {
   deallog << "Test support points for dim = " << dim
           << " and spacedim = " << spacedim << std::endl;
-  for (unsigned int degree = 0; degree < 3; ++degree)
+  for (unsigned int degree = 1; degree < 3; ++degree)
     {
       deallog << "approximation degree = " << degree << std::endl;
       FE_SimplexP_Bubbles<dim, spacedim> fe(degree);

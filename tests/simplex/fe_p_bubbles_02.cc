@@ -100,7 +100,7 @@ test_interpolate()
     }
 
   deallog << "dim = " << dim << std::endl;
-  for (unsigned int degree = 0; degree < 3; ++degree)
+  for (unsigned int degree = 1; degree < 3; ++degree)
     {
       deallog << "degree = " << degree << std::endl;
       double old_error = -1.0;
@@ -165,7 +165,7 @@ test_lumped_project()
 
 
   deallog << "dim = " << dim << std::endl;
-  for (unsigned int degree = 0; degree < 3; ++degree)
+  for (unsigned int degree = 1; degree < 3; ++degree)
     {
       deallog << "degree = " << degree << std::endl;
       double old_error = -1.0;
