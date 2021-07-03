@@ -81,7 +81,7 @@ namespace
    */
   template <int dim>
   std::vector<Point<dim>>
-  unit_support_points_fe_poly(const unsigned int degree)
+  unit_support_points_fe_p(const unsigned int degree)
   {
     std::vector<Point<dim>> unit_points;
 
@@ -159,11 +159,11 @@ namespace
 
   /**
    * Set up a vector that contains the unit (reference) cell's faces support
-   * points for FE_SimplexPoly and sufficiently similar elements.
+   * points for FE_SimplexP and sufficiently similar elements.
    */
   template <int dim>
   std::vector<std::vector<Point<dim - 1>>>
-  unit_face_support_points_fe_poly(
+  unit_face_support_points_fe_p(
     const unsigned int                          degree,
     typename FiniteElementData<dim>::Conformity conformity)
   {
@@ -184,7 +184,7 @@ namespace
       {
         (void)face_n;
         unit_face_points.emplace_back(
-          unit_support_points_fe_poly<dim - 1>(degree));
+          unit_support_points_fe_p<dim - 1>(degree));
       }
 
     return unit_face_points;
@@ -197,7 +197,7 @@ namespace
    */
   template <int dim>
   FullMatrix<double>
-  constraints_fe_poly(const unsigned int /*degree*/)
+  constraints_fe_p(const unsigned int /*degree*/)
   {
     // no constraints in 1d
     // constraints in 3d not implemented yet
@@ -206,7 +206,7 @@ namespace
 
   template <>
   FullMatrix<double>
-  constraints_fe_poly<2>(const unsigned int degree)
+  constraints_fe_p<2>(const unsigned int degree)
   {
     const unsigned int dim = 2;
 
@@ -327,9 +327,9 @@ FE_SimplexPoly<dim, spacedim>::FE_SimplexPoly(
                                           1,
                                           degree,
                                           conformity),
-                   unit_support_points_fe_poly<dim>(degree),
-                   unit_face_support_points_fe_poly<dim>(degree, conformity),
-                   constraints_fe_poly<dim>(degree))
+                   unit_support_points_fe_p<dim>(degree),
+                   unit_face_support_points_fe_p<dim>(degree, conformity),
+                   constraints_fe_p<dim>(degree))
 {}
 
 
