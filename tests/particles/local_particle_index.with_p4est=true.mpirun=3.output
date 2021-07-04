@@ -1,0 +1,71 @@
+
+DEAL:0::Number of global particles: 384
+DEAL:0::Number of locally owned particles: 96
+DEAL:0::Maximal local particle index: 96
+DEAL:0::Set information of 96 particles
+DEAL:0::Number of particles not set: 0
+DEAL:0::Number of global particles: 384
+DEAL:0::Number of locally owned particles: 96
+DEAL:0::Maximal local particle index: 263
+DEAL:0::Set information of 262 particles
+DEAL:0::Number of particles not set: 1
+DEAL:0::OK
+DEAL:0::Number of global particles: 384
+DEAL:0::Number of locally owned particles: 96
+DEAL:0::Maximal local particle index: 96
+DEAL:0::Set information of 96 particles
+DEAL:0::Number of particles not set: 0
+DEAL:0::Number of global particles: 384
+DEAL:0::Number of locally owned particles: 96
+DEAL:0::Maximal local particle index: 385
+DEAL:0::Set information of 384 particles
+DEAL:0::Number of particles not set: 1
+DEAL:0::OK
+
+DEAL:1::Number of global particles: 384
+DEAL:1::Number of locally owned particles: 192
+DEAL:1::Maximal local particle index: 192
+DEAL:1::Set information of 192 particles
+DEAL:1::Number of particles not set: 0
+DEAL:1::Number of global particles: 384
+DEAL:1::Number of locally owned particles: 192
+DEAL:1::Maximal local particle index: 365
+DEAL:1::Set information of 364 particles
+DEAL:1::Number of particles not set: 1
+DEAL:1::OK
+DEAL:1::Number of global particles: 384
+DEAL:1::Number of locally owned particles: 192
+DEAL:1::Maximal local particle index: 192
+DEAL:1::Set information of 192 particles
+DEAL:1::Number of particles not set: 0
+DEAL:1::Number of global particles: 384
+DEAL:1::Number of locally owned particles: 192
+DEAL:1::Maximal local particle index: 385
+DEAL:1::Set information of 384 particles
+DEAL:1::Number of particles not set: 1
+DEAL:1::OK
+
+
+DEAL:2::Number of global particles: 384
+DEAL:2::Number of locally owned particles: 96
+DEAL:2::Maximal local particle index: 96
+DEAL:2::Set information of 96 particles
+DEAL:2::Number of particles not set: 0
+DEAL:2::Number of global particles: 384
+DEAL:2::Number of locally owned particles: 96
+DEAL:2::Maximal local particle index: 263
+DEAL:2::Set information of 262 particles
+DEAL:2::Number of particles not set: 1
+DEAL:2::OK
+DEAL:2::Number of global particles: 384
+DEAL:2::Number of locally owned particles: 96
+DEAL:2::Maximal local particle index: 96
+DEAL:2::Set information of 96 particles
+DEAL:2::Number of particles not set: 0
+DEAL:2::Number of global particles: 384
+DEAL:2::Number of locally owned particles: 96
+DEAL:2::Maximal local particle index: 385
+DEAL:2::Set information of 384 particles
+DEAL:2::Number of particles not set: 1
+DEAL:2::OK
+
