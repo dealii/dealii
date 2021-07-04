@@ -137,7 +137,7 @@ namespace Particles
 
     /**
      * Return a new handle that allows a particle to store information such as
-     * properties and locations. This also allocated memory in this PropertyPool
+     * properties and locations. This also allocates memory in this PropertyPool
      * variable.
      */
     Handle
@@ -210,6 +210,13 @@ namespace Particles
      */
     unsigned int
     n_properties_per_slot() const;
+
+    /**
+     * Return the total number of slots in the pool, including both registered
+     * and unregistered ones.
+     */
+    unsigned int
+    n_slots() const;
 
     /**
      * Return how many slots are currently registered in the pool.
@@ -437,6 +444,15 @@ namespace Particles
                       "before trying to access the properties."));
 
     return ArrayView<double>(properties.data() + data_index, n_properties);
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline unsigned int
+  PropertyPool<dim, spacedim>::n_slots() const
+  {
+    return locations.size();
   }
 
 
