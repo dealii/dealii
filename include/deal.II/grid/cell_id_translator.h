@@ -20,6 +20,7 @@
 #include <deal.II/base/geometry_info.h>
 
 #include <deal.II/grid/cell_id.h>
+#include <deal.II/grid/tria_accessor.h>
 
 #include <cstdint>
 
@@ -28,11 +29,11 @@ DEAL_II_NAMESPACE_OPEN
 namespace internal
 {
   /**
-   * A class that helps to translate between CellIDs and globally uniquely
+   * A class that helps to translate between CellIDs and globally unique
    * indices. The resulting index space might be non-contiguous in the case
    * of locally refined meshes.
    *
-   * The following code snippet how to set up an IndexSet object for active
+   * The following code snippet shows how to set up an IndexSet for active
    * cells, using this class:
    * @code
    * // set up translator
@@ -62,25 +63,26 @@ namespace internal
 
     /**
      * Return maximum number of cells, i.e., in the case the triangulation
-     * would be refined globally.
+     * were globally refined `n_global_levels - 1` times.
      */
     types::global_cell_index
     size() const;
 
     /**
-     * Convert a @p cell of type CellAccessor or DoFCellAccessor to an index.
+     * Convert a @p cell of type TriaAccessor, CellAccessor, DoFAccessor, or
+     * DoFCellAccessor to an index.
      */
-    template <typename T>
+    template <typename Accessor>
     types::global_cell_index
-    translate(const T &cell) const;
+    translate(const TriaIterator<Accessor> &cell) const;
 
     /**
-     * Convert the @p i-th @p cell of type CellAccessor or DoFCellAccessor to
-     * an index.
+     * Convert the @p i-th child of @p to an index.
      */
-    template <typename T>
+    template <typename Accessor>
     types::global_cell_index
-    translate(const T &cell, const types::global_cell_index i) const;
+    translate(const TriaIterator<Accessor> & cell,
+              const types::global_cell_index i) const;
 
     /**
      * Convert an index to a CellId.
@@ -168,14 +170,20 @@ namespace internal
 
 
   template <int dim>
-  template <typename T>
+  template <typename Accessor>
   types::global_cell_index
-  CellIDTranslator<dim>::translate(const T &cell) const
+  CellIDTranslator<dim>::translate(const TriaIterator<Accessor> &cell) const
   {
+    static_assert(dim == Accessor::dimension &&
+                    dim == Accessor::structure_dimension,
+                  "The information can only be queried for cells.");
+
     types::global_cell_index id = 0;
 
     id += convert_cell_id_binary_type_to_level_coarse_cell_id(
-      cell->id().template to_binary<dim>());
+      CellAccessor<Accessor::dimension, Accessor::space_dimension>(*cell)
+        .id()
+        .template to_binary<dim>());
 
     id += tree_sizes[cell->level()];
 
@@ -185,11 +193,15 @@ namespace internal
 
 
   template <int dim>
-  template <typename T>
+  template <typename Accessor>
   types::global_cell_index
-  CellIDTranslator<dim>::translate(const T &                      cell,
+  CellIDTranslator<dim>::translate(const TriaIterator<Accessor> & cell,
                                    const types::global_cell_index i) const
   {
+    static_assert(dim == Accessor::dimension &&
+                    dim == Accessor::structure_dimension,
+                  "The information can only be queried for cells.");
+
     return (translate(cell) - tree_sizes[cell->level()]) *
              GeometryInfo<dim>::max_children_per_cell +
            i + tree_sizes[cell->level() + 1];
