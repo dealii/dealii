@@ -212,7 +212,7 @@ namespace Step34
     // To allow for dimension independent programming, we specialize this
     // single function to extract the singular quadrature formula needed to
     // integrate the singular kernels in the interior of the cells.
-    const Quadrature<dim - 1> &get_singular_quadrature(
+    Quadrature<dim - 1> get_singular_quadrature(
       const typename DoFHandler<dim - 1, dim>::active_cell_iterator &cell,
       const unsigned int index) const;
 
@@ -661,12 +661,12 @@ namespace Step34
                 // against a singular weight on the reference cell.
                 //
                 // The correct quadrature formula is selected by the
-                // get_singular_quadrature function, which is explained in
+                // `get_singular_quadrature()` function, which is explained in
                 // detail below.
                 Assert(singular_index != numbers::invalid_unsigned_int,
                        ExcInternalError());
 
-                const Quadrature<dim - 1> &singular_quadrature =
+                const Quadrature<dim - 1> singular_quadrature =
                   get_singular_quadrature(cell, singular_index);
 
                 FEValues<dim - 1, dim> fe_v_singular(
@@ -860,7 +860,7 @@ namespace Step34
   // singularity is located.
 
   template <>
-  const Quadrature<2> &BEMProblem<3>::get_singular_quadrature(
+  Quadrature<2> BEMProblem<3>::get_singular_quadrature(
     const DoFHandler<2, 3>::active_cell_iterator &,
     const unsigned int index) const
   {
@@ -878,22 +878,17 @@ namespace Step34
 
 
   template <>
-  const Quadrature<1> &BEMProblem<2>::get_singular_quadrature(
+  Quadrature<1> BEMProblem<2>::get_singular_quadrature(
     const DoFHandler<1, 2>::active_cell_iterator &cell,
     const unsigned int                            index) const
   {
     Assert(index < fe.n_dofs_per_cell(),
            ExcIndexRange(0, fe.n_dofs_per_cell(), index));
 
-    static Quadrature<1> *q_pointer = nullptr;
-    if (q_pointer)
-      delete q_pointer;
-
-    q_pointer = new QGaussLogR<1>(singular_quadrature_order,
-                                  fe.get_unit_support_points()[index],
-                                  1. / cell->measure(),
-                                  true);
-    return (*q_pointer);
+    return QGaussLogR<1>(singular_quadrature_order,
+                         fe.get_unit_support_points()[index],
+                         1. / cell->measure(),
+                         true);
   }
 
 
