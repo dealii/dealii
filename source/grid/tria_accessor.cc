@@ -72,7 +72,7 @@ namespace
     // which is 0 or 1 in an anisotropic case
     // (case_x, case_y, casex2y or casey2x) or
     // 0...3 in an isotropic case (case_xy)
-    return subface_no + first_child_has_children;
+    return subface_no + static_cast<unsigned int>(first_child_has_children);
   }
 
 

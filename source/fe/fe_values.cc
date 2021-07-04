@@ -2872,55 +2872,55 @@ namespace internal
       const unsigned int n_quadrature_points,
       const UpdateFlags  flags)
     {
-      if (flags & update_quadrature_points)
+      if ((flags & update_quadrature_points) != 0u)
         this->quadrature_points.resize(
           n_quadrature_points,
           Point<spacedim>(numbers::signaling_nan<Tensor<1, spacedim>>()));
 
-      if (flags & update_JxW_values)
+      if ((flags & update_JxW_values) != 0u)
         this->JxW_values.resize(n_quadrature_points,
                                 numbers::signaling_nan<double>());
 
-      if (flags & update_jacobians)
+      if ((flags & update_jacobians) != 0u)
         this->jacobians.resize(
           n_quadrature_points,
           numbers::signaling_nan<DerivativeForm<1, dim, spacedim>>());
 
-      if (flags & update_jacobian_grads)
+      if ((flags & update_jacobian_grads) != 0u)
         this->jacobian_grads.resize(
           n_quadrature_points,
           numbers::signaling_nan<DerivativeForm<2, dim, spacedim>>());
 
-      if (flags & update_jacobian_pushed_forward_grads)
+      if ((flags & update_jacobian_pushed_forward_grads) != 0u)
         this->jacobian_pushed_forward_grads.resize(
           n_quadrature_points, numbers::signaling_nan<Tensor<3, spacedim>>());
 
-      if (flags & update_jacobian_2nd_derivatives)
+      if ((flags & update_jacobian_2nd_derivatives) != 0u)
         this->jacobian_2nd_derivatives.resize(
           n_quadrature_points,
           numbers::signaling_nan<DerivativeForm<3, dim, spacedim>>());
 
-      if (flags & update_jacobian_pushed_forward_2nd_derivatives)
+      if ((flags & update_jacobian_pushed_forward_2nd_derivatives) != 0u)
         this->jacobian_pushed_forward_2nd_derivatives.resize(
           n_quadrature_points, numbers::signaling_nan<Tensor<4, spacedim>>());
 
-      if (flags & update_jacobian_3rd_derivatives)
+      if ((flags & update_jacobian_3rd_derivatives) != 0u)
         this->jacobian_3rd_derivatives.resize(n_quadrature_points);
 
-      if (flags & update_jacobian_pushed_forward_3rd_derivatives)
+      if ((flags & update_jacobian_pushed_forward_3rd_derivatives) != 0u)
         this->jacobian_pushed_forward_3rd_derivatives.resize(
           n_quadrature_points, numbers::signaling_nan<Tensor<5, spacedim>>());
 
-      if (flags & update_inverse_jacobians)
+      if ((flags & update_inverse_jacobians) != 0u)
         this->inverse_jacobians.resize(
           n_quadrature_points,
           numbers::signaling_nan<DerivativeForm<1, spacedim, dim>>());
 
-      if (flags & update_boundary_forms)
+      if ((flags & update_boundary_forms) != 0u)
         this->boundary_forms.resize(
           n_quadrature_points, numbers::signaling_nan<Tensor<1, spacedim>>());
 
-      if (flags & update_normal_vectors)
+      if ((flags & update_normal_vectors) != 0u)
         this->normal_vectors.resize(
           n_quadrature_points, numbers::signaling_nan<Tensor<1, spacedim>>());
     }
@@ -2973,14 +2973,14 @@ namespace internal
 
       // with the number of rows now known, initialize those fields
       // that we will need to their correct size
-      if (flags & update_values)
+      if ((flags & update_values) != 0u)
         {
           this->shape_values.reinit(n_nonzero_shape_components,
                                     n_quadrature_points);
           this->shape_values.fill(numbers::signaling_nan<double>());
         }
 
-      if (flags & update_gradients)
+      if ((flags & update_gradients) != 0u)
         {
           this->shape_gradients.reinit(n_nonzero_shape_components,
                                        n_quadrature_points);
@@ -2988,7 +2988,7 @@ namespace internal
             numbers::signaling_nan<Tensor<1, spacedim>>());
         }
 
-      if (flags & update_hessians)
+      if ((flags & update_hessians) != 0u)
         {
           this->shape_hessians.reinit(n_nonzero_shape_components,
                                       n_quadrature_points);
@@ -2996,7 +2996,7 @@ namespace internal
             numbers::signaling_nan<Tensor<2, spacedim>>());
         }
 
-      if (flags & update_3rd_derivatives)
+      if ((flags & update_3rd_derivatives) != 0u)
         {
           this->shape_3rd_derivatives.reinit(n_nonzero_shape_components,
                                              n_quadrature_points);
@@ -4412,7 +4412,7 @@ FEValues<dim, spacedim>::initialize(const UpdateFlags update_flags)
   const UpdateFlags flags = this->compute_update_flags(update_flags);
 
   // initialize the base classes
-  if (flags & update_mapping)
+  if ((flags & update_mapping) != 0u)
     this->mapping_output.initialize(this->max_n_quadrature_points, flags);
   this->finite_element_output.initialize(this->max_n_quadrature_points,
                                          *this->fe,
@@ -4432,7 +4432,7 @@ FEValues<dim, spacedim>::initialize(const UpdateFlags update_flags)
   Threads::Task<
     std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase>>
     mapping_get_data;
-  if (flags & update_mapping)
+  if ((flags & update_mapping) != 0u)
     mapping_get_data = Threads::new_task(
       [&]() { return this->mapping->get_data(flags, quadrature); });
 
@@ -4440,7 +4440,7 @@ FEValues<dim, spacedim>::initialize(const UpdateFlags update_flags)
 
   // then collect answers from the two task above
   this->fe_data = std::move(fe_get_data.return_value());
-  if (flags & update_mapping)
+  if ((flags & update_mapping) != 0u)
     this->mapping_data = std::move(mapping_get_data.return_value());
   else
     this->mapping_data =
@@ -4728,7 +4728,7 @@ FEFaceValues<dim, spacedim>::initialize(const UpdateFlags update_flags)
   const UpdateFlags flags = this->compute_update_flags(update_flags);
 
   // initialize the base classes
-  if (flags & update_mapping)
+  if ((flags & update_mapping) != 0u)
     this->mapping_output.initialize(this->max_n_quadrature_points, flags);
   this->finite_element_output.initialize(this->max_n_quadrature_points,
                                          *this->fe,
@@ -4763,7 +4763,7 @@ FEFaceValues<dim, spacedim>::initialize(const UpdateFlags update_flags)
   Threads::Task<
     std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase>>
     mapping_get_data;
-  if (flags & update_mapping)
+  if ((flags & update_mapping) != 0u)
     mapping_get_data = Threads::new_task(mapping_get_face_data,
                                          *this->mapping,
                                          flags,
@@ -4773,7 +4773,7 @@ FEFaceValues<dim, spacedim>::initialize(const UpdateFlags update_flags)
 
   // then collect answers from the two task above
   this->fe_data = std::move(fe_get_data.return_value());
-  if (flags & update_mapping)
+  if ((flags & update_mapping) != 0u)
     this->mapping_data = std::move(mapping_get_data.return_value());
   else
     this->mapping_data =
@@ -4971,7 +4971,7 @@ FESubfaceValues<dim, spacedim>::initialize(const UpdateFlags update_flags)
   const UpdateFlags flags = this->compute_update_flags(update_flags);
 
   // initialize the base classes
-  if (flags & update_mapping)
+  if ((flags & update_mapping) != 0u)
     this->mapping_output.initialize(this->max_n_quadrature_points, flags);
   this->finite_element_output.initialize(this->max_n_quadrature_points,
                                          *this->fe,
@@ -4992,7 +4992,7 @@ FESubfaceValues<dim, spacedim>::initialize(const UpdateFlags update_flags)
   Threads::Task<
     std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase>>
     mapping_get_data;
-  if (flags & update_mapping)
+  if ((flags & update_mapping) != 0u)
     mapping_get_data =
       Threads::new_task(&Mapping<dim, spacedim>::get_subface_data,
                         *this->mapping,
@@ -5003,7 +5003,7 @@ FESubfaceValues<dim, spacedim>::initialize(const UpdateFlags update_flags)
 
   // then collect answers from the two task above
   this->fe_data = std::move(fe_get_data.return_value());
-  if (flags & update_mapping)
+  if ((flags & update_mapping) != 0u)
     this->mapping_data = std::move(mapping_get_data.return_value());
   else
     this->mapping_data =

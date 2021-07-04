@@ -161,8 +161,8 @@ namespace TrilinosWrappers
                 constant_modes_are_global ?
                   TrilinosWrappers::global_index(domain_map, row) :
                   row;
-              distributed_constant_modes[d][row] =
-                additional_data.constant_modes[d][global_row_id];
+              distributed_constant_modes[d][row] = static_cast<double>(
+                additional_data.constant_modes[d][global_row_id]);
             }
 
         parameter_list.set("null space: type", "pre-computed");

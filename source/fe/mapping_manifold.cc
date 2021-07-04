@@ -225,18 +225,18 @@ MappingManifold<dim, spacedim>::requires_update_flags(
       // update_boundary_forms is simply
       // ignored for the interior of a
       // cell.
-      if (out & (update_JxW_values | update_normal_vectors))
+      if ((out & (update_JxW_values | update_normal_vectors)) != 0u)
         out |= update_boundary_forms;
 
-      if (out & (update_covariant_transformation | update_JxW_values |
-                 update_jacobians | update_jacobian_grads |
-                 update_boundary_forms | update_normal_vectors))
+      if ((out & (update_covariant_transformation | update_JxW_values |
+                  update_jacobians | update_jacobian_grads |
+                  update_boundary_forms | update_normal_vectors)) != 0u)
         out |= update_contravariant_transformation;
 
-      if (out &
-          (update_inverse_jacobians | update_jacobian_pushed_forward_grads |
-           update_jacobian_pushed_forward_2nd_derivatives |
-           update_jacobian_pushed_forward_3rd_derivatives))
+      if ((out &
+           (update_inverse_jacobians | update_jacobian_pushed_forward_grads |
+            update_jacobian_pushed_forward_2nd_derivatives |
+            update_jacobian_pushed_forward_3rd_derivatives)) != 0u)
         out |= update_covariant_transformation;
 
       // The contravariant transformation used in the Piola
@@ -245,10 +245,10 @@ MappingManifold<dim, spacedim>::requires_update_flags(
       // knowing here whether the finite elements wants to use the
       // contravariant of the Piola transforms, we add the JxW values
       // to the list of flags to be updated for each cell.
-      if (out & update_contravariant_transformation)
+      if ((out & update_contravariant_transformation) != 0u)
         out |= update_JxW_values;
 
-      if (out & update_normal_vectors)
+      if ((out & update_normal_vectors) != 0u)
         out |= update_JxW_values;
     }
 
@@ -497,7 +497,7 @@ MappingManifold<dim, spacedim>::fill_fe_values(
   // Multiply quadrature weights by absolute value of Jacobian determinants or
   // the area element g=sqrt(DX^t DX) in case of codim > 0
 
-  if (update_flags & (update_normal_vectors | update_JxW_values))
+  if ((update_flags & (update_normal_vectors | update_JxW_values)) != 0u)
     {
       AssertDimension(output_data.JxW_values.size(), n_q_points);
 
@@ -543,7 +543,7 @@ MappingManifold<dim, spacedim>::fill_fe_values(
               output_data.JxW_values[point] =
                 std::sqrt(determinant(G)) * weights[point];
 
-              if (update_flags & update_normal_vectors)
+              if ((update_flags & update_normal_vectors) != 0u)
                 {
                   Assert(spacedim == dim + 1,
                          ExcMessage(
@@ -575,7 +575,7 @@ MappingManifold<dim, spacedim>::fill_fe_values(
 
 
   // copy values from InternalData to vector given by reference
-  if (update_flags & update_jacobians)
+  if ((update_flags & update_jacobians) != 0u)
     {
       AssertDimension(output_data.jacobians.size(), n_q_points);
       for (unsigned int point = 0; point < n_q_points; ++point)
@@ -583,7 +583,7 @@ MappingManifold<dim, spacedim>::fill_fe_values(
     }
 
   // copy values from InternalData to vector given by reference
-  if (update_flags & update_inverse_jacobians)
+  if ((update_flags & update_inverse_jacobians) != 0u)
     {
       AssertDimension(output_data.inverse_jacobians.size(), n_q_points);
       for (unsigned int point = 0; point < n_q_points; ++point)

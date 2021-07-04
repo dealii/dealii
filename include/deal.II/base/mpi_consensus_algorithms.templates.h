@@ -144,7 +144,7 @@ namespace Utilities
                                       MPI_STATUSES_IGNORE);
         AssertThrowMPI(ierr);
 
-        return all_receive_requests_are_done;
+        return all_receive_requests_are_done != 0;
 #else
         return true;
 #endif
@@ -181,7 +181,7 @@ namespace Utilities
                                    &all_ranks_reached_barrier,
                                    MPI_STATUSES_IGNORE);
         AssertThrowMPI(ierr);
-        return all_ranks_reached_barrier;
+        return all_ranks_reached_barrier != 0;
 #else
         return true;
 #endif
@@ -210,7 +210,7 @@ namespace Utilities
                                      &status);
         AssertThrowMPI(ierr);
 
-        if (request_is_pending) // request is pending
+        if (request_is_pending != 0) // request is pending
           {
             // get rank of requesting process
             const auto other_rank = status.MPI_SOURCE;

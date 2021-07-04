@@ -3498,7 +3498,7 @@ inline FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
   ,
   // select the correct base element from the given FE component
   data(new internal::MatrixFreeFunctions::ShapeInfo<VectorizedArrayType>(
-    Quadrature<dim - is_face>(quadrature),
+    Quadrature<dim - static_cast<int>(is_face)>(quadrature),
     fe,
     fe.component_to_base_index(first_selected_component).first))
   , jacobian(nullptr)
@@ -8021,11 +8021,11 @@ FEEvaluation<dim,
       this->scratch_data);
 
 #  ifdef DEBUG
-  if (evaluation_flags & EvaluationFlags::values)
+  if ((evaluation_flags & EvaluationFlags::values) != 0u)
     this->values_quad_initialized = true;
-  if (evaluation_flags & EvaluationFlags::gradients)
+  if ((evaluation_flags & EvaluationFlags::gradients) != 0u)
     this->gradients_quad_initialized = true;
-  if (evaluation_flags & EvaluationFlags::hessians)
+  if ((evaluation_flags & EvaluationFlags::hessians) != 0u)
     this->hessians_quad_initialized = true;
 #  endif
 }
@@ -8384,10 +8384,10 @@ FEEvaluation<dim,
             VectorizedArrayType *                  values_array)
 {
 #  ifdef DEBUG
-  if (integration_flag & EvaluationFlags::values)
+  if ((integration_flag & EvaluationFlags::values) != 0u)
     Assert(this->values_quad_submitted == true,
            internal::ExcAccessToUninitializedField());
-  if (integration_flag & EvaluationFlags::gradients)
+  if ((integration_flag & EvaluationFlags::gradients) != 0u)
     Assert(this->gradients_quad_submitted == true,
            internal::ExcAccessToUninitializedField());
 #  endif
@@ -8816,8 +8816,8 @@ FEFaceEvaluation<dim,
     ExcMessage(
       "Only EvaluationFlags::values and EvaluationFlags::gradients are supported."));
 
-  if (!(evaluation_flag & EvaluationFlags::values) &&
-      !(evaluation_flag & EvaluationFlags::gradients))
+  if (((evaluation_flag & EvaluationFlags::values) == 0u) &&
+      ((evaluation_flag & EvaluationFlags::gradients) == 0u))
     return;
 
   if (this->dof_access_index ==
@@ -8889,9 +8889,9 @@ FEFaceEvaluation<dim,
     }
 
 #  ifdef DEBUG
-  if (evaluation_flag & EvaluationFlags::values)
+  if ((evaluation_flag & EvaluationFlags::values) != 0u)
     this->values_quad_initialized = true;
-  if (evaluation_flag & EvaluationFlags::gradients)
+  if ((evaluation_flag & EvaluationFlags::gradients) != 0u)
     this->gradients_quad_initialized = true;
 #  endif
 }
@@ -8995,8 +8995,8 @@ FEFaceEvaluation<dim,
     ExcMessage(
       "Only EvaluationFlags::values and EvaluationFlags::gradients are supported."));
 
-  if (!(evaluation_flag & EvaluationFlags::values) &&
-      !(evaluation_flag & EvaluationFlags::gradients))
+  if (((evaluation_flag & EvaluationFlags::values) == 0u) &&
+      ((evaluation_flag & EvaluationFlags::gradients) == 0u))
     return;
 
   if (fe_degree > -1)

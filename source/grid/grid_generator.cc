@@ -5116,7 +5116,8 @@ namespace GridGenerator
                                               {1, 4, 3, 5}}; // shifted cube
 
     // all 4 true-false combinations of (rotate_left_square | rotate_right_square) to a number 0..3
-    unsigned int this_case = 2 * rotate_left_square + rotate_right_square;
+    unsigned int this_case = 2 * static_cast<int>(rotate_left_square) +
+                             static_cast<int>(rotate_right_square);
 
     switch (this_case)
       {
@@ -5203,8 +5204,9 @@ namespace GridGenerator
       {1, 8, 3, 9, 5, 10, 7, 11}}; // shifted cube
 
     // binary to case number
-    const unsigned int this_case =
-      4 * face_orientation + 2 * face_flip + face_rotation;
+    const unsigned int this_case = 4 * static_cast<int>(face_orientation) +
+                                   2 * static_cast<int>(face_flip) +
+                                   static_cast<int>(face_rotation);
 
     if (manipulate_left_cube)
       {

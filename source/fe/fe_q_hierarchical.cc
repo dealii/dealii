@@ -1094,7 +1094,7 @@ FE_Q_Hierarchical<dim>::get_subface_interpolation_matrix(
                           factorial_ij *= j - i;
                           factorial_j *= j;
 
-                          if ((i + j) & 1)
+                          if (((i + j) & 1) != 0u)
                             interpolation_matrix(i, j) =
                               -1.0 * std::pow(0.5, j) * factorial_j /
                               (factorial_i * factorial_ij);
@@ -1237,7 +1237,7 @@ FE_Q_Hierarchical<dim>::get_subface_interpolation_matrix(
                               factorial_kl *= k - j;
                               factorial_l *= k;
 
-                              if ((j + k) & 1)
+                              if (((j + k) & 1) != 0u)
                                 interpolation_matrix(
                                   i + (j + 2) * source_fe.degree - j,
                                   i + (k + 2) * this->degree - k) =
@@ -1262,7 +1262,7 @@ FE_Q_Hierarchical<dim>::get_subface_interpolation_matrix(
                           factorial_ij *= j - i;
                           factorial_j *= j;
 
-                          if ((i + j) & 1)
+                          if (((i + j) & 1) != 0u)
                             {
                               tmp = -1.0 * std::pow(0.5, j) * factorial_j /
                                     (factorial_i * factorial_ij);
@@ -1288,7 +1288,7 @@ FE_Q_Hierarchical<dim>::get_subface_interpolation_matrix(
                                       factorial_kl *= l - k;
                                       factorial_l *= l;
 
-                                      if ((k + l) & 1)
+                                      if (((k + l) & 1) != 0u)
                                         interpolation_matrix(
                                           i + (k + 2) * source_fe.degree - k,
                                           j + (l + 2) * this->degree - l) =
@@ -1354,7 +1354,7 @@ FE_Q_Hierarchical<dim>::get_subface_interpolation_matrix(
                                       factorial_kl *= l - k;
                                       factorial_l *= l;
 
-                                      if ((k + l) & 1)
+                                      if (((k + l) & 1) != 0u)
                                         interpolation_matrix(
                                           i + (k + 2) * source_fe.degree - k,
                                           j + (l + 2) * this->degree - l) =
@@ -1495,7 +1495,7 @@ FE_Q_Hierarchical<dim>::get_subface_interpolation_matrix(
                                   factorial_kl *= l - k;
                                   factorial_l *= l;
 
-                                  if ((k + l) & 1)
+                                  if (((k + l) & 1) != 0u)
                                     interpolation_matrix(
                                       i + (k + 2) * source_fe.degree - k,
                                       j + (l + 2) * this->degree - l) =
@@ -1528,7 +1528,7 @@ FE_Q_Hierarchical<dim>::get_subface_interpolation_matrix(
                           interpolation_matrix(i + 3 * source_fe.degree - 1,
                                                j + 3 * this->degree - 1) = tmp;
 
-                          if ((i + j) & 1)
+                          if (((i + j) & 1) != 0u)
                             tmp *= -1.0;
 
                           interpolation_matrix(i + 2, j + 2) = tmp;
@@ -1565,7 +1565,7 @@ FE_Q_Hierarchical<dim>::get_subface_interpolation_matrix(
                               factorial_kl *= k - j;
                               factorial_l *= k;
 
-                              if ((j + k) & 1)
+                              if (((j + k) & 1) != 0u)
                                 interpolation_matrix(
                                   i + (j + 2) * source_fe.degree - j,
                                   i + (k + 2) * this->degree - k) =
@@ -1701,7 +1701,7 @@ FE_Q_Hierarchical<dim>::get_subface_interpolation_matrix(
                           interpolation_matrix(i + source_fe.degree + 1,
                                                j + this->degree + 1) = tmp;
 
-                          if ((i + j) & 1)
+                          if (((i + j) & 1) != 0u)
                             tmp *= -1.0;
 
                           interpolation_matrix(i + 2 * source_fe.degree,

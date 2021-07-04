@@ -2106,7 +2106,7 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
       additional_width = static_cast<unsigned int>(
         .5 + height * .4); // additional width for legend
     }
-  else if (svg_flags.draw_colorbar && svg_flags.coloring)
+  else if (svg_flags.draw_colorbar && (svg_flags.coloring != 0u))
     {
       additional_width = static_cast<unsigned int>(
         .5 + height * .175); // additional width for colorbar
@@ -2163,7 +2163,7 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
       << '\n';
 
   // polygon styles with respect to the chosen cell coloring
-  if (svg_flags.coloring)
+  if (svg_flags.coloring != 0u)
     {
       unsigned int labeling_index      = 0;
       auto         materials_it        = materials.begin();
@@ -2307,7 +2307,7 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
           // draw the current cell
           out << "  <path";
 
-          if (svg_flags.coloring)
+          if (svg_flags.coloring != 0u)
             {
               out << " class=\"p";
 
@@ -2578,7 +2578,7 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
 
           // if the current cell lies at the boundary of the triangulation, draw
           // the additional boundary line
-          if (svg_flags.boundary_line_thickness)
+          if (svg_flags.boundary_line_thickness != 0u)
             {
               for (auto faceIndex : cell->face_indices())
                 {
@@ -2903,7 +2903,7 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
 
 
   // draw the colorbar
-  if (svg_flags.draw_colorbar && svg_flags.coloring)
+  if (svg_flags.draw_colorbar && (svg_flags.coloring != 0u))
     {
       out << '\n' << " <!-- colorbar -->" << '\n';
 

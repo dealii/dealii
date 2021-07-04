@@ -191,32 +191,32 @@ namespace MeshWorker
     face_flags |= boundary_flags;
     neighbor_flags |= neighbor_geometry ? boundary_flags : update_default;
 
-    if (cell_selector.has_values() != 0)
+    if (cell_selector.has_values())
       cell_flags |= update_values;
-    if (cell_selector.has_gradients() != 0)
+    if (cell_selector.has_gradients())
       cell_flags |= update_gradients;
-    if (cell_selector.has_hessians() != 0)
+    if (cell_selector.has_hessians())
       cell_flags |= update_hessians;
 
-    if (boundary_selector.has_values() != 0)
+    if (boundary_selector.has_values())
       boundary_flags |= update_values;
-    if (boundary_selector.has_gradients() != 0)
+    if (boundary_selector.has_gradients())
       boundary_flags |= update_gradients;
-    if (boundary_selector.has_hessians() != 0)
+    if (boundary_selector.has_hessians())
       boundary_flags |= update_hessians;
 
-    if (face_selector.has_values() != 0)
+    if (face_selector.has_values())
       face_flags |= update_values;
-    if (face_selector.has_gradients() != 0)
+    if (face_selector.has_gradients())
       face_flags |= update_gradients;
-    if (face_selector.has_hessians() != 0)
+    if (face_selector.has_hessians())
       face_flags |= update_hessians;
 
-    if (face_selector.has_values() != 0)
+    if (face_selector.has_values())
       neighbor_flags |= update_values;
-    if (face_selector.has_gradients() != 0)
+    if (face_selector.has_gradients())
       neighbor_flags |= update_gradients;
-    if (face_selector.has_hessians() != 0)
+    if (face_selector.has_hessians())
       neighbor_flags |= update_hessians;
   }
 

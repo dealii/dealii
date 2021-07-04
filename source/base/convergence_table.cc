@@ -108,7 +108,7 @@ ConvergenceTable::evaluate_convergence_rates(
   set_precision(rate_key, 2);
 
   const std::string &superkey = data_column_key;
-  if (!supercolumns.count(superkey))
+  if (supercolumns.count(superkey) == 0u)
     {
       add_column_to_supercolumn(data_column_key, superkey);
       set_tex_supercaption(superkey, columns[data_column_key].tex_caption);
@@ -199,7 +199,7 @@ ConvergenceTable::evaluate_convergence_rates(const std::string &data_column_key,
   const std::string &superkey = data_column_key;
   // and set the tex caption of the supercolumn to the tex caption of the
   // data_column.
-  if (!supercolumns.count(superkey))
+  if (supercolumns.count(superkey) == 0u)
     {
       add_column_to_supercolumn(data_column_key, superkey);
       set_tex_supercaption(superkey, columns[data_column_key].tex_caption);
@@ -234,7 +234,7 @@ ConvergenceTable::evaluate_all_convergence_rates(
   for (std::map<std::string, Column>::const_iterator col_iter = columns.begin();
        col_iter != columns.end();
        ++col_iter)
-    if (!col_iter->second.flag)
+    if (col_iter->second.flag == 0u)
       evaluate_convergence_rates(col_iter->first,
                                  reference_column_key,
                                  rate_mode);
@@ -248,7 +248,7 @@ ConvergenceTable::evaluate_all_convergence_rates(const RateMode rate_mode)
   for (std::map<std::string, Column>::const_iterator col_iter = columns.begin();
        col_iter != columns.end();
        ++col_iter)
-    if (!col_iter->second.flag)
+    if (col_iter->second.flag == 0u)
       evaluate_convergence_rates(col_iter->first, rate_mode);
 }
 

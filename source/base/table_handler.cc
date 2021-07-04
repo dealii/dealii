@@ -254,7 +254,7 @@ TableHandler::add_column_to_supercolumn(const std::string &key,
 {
   Assert(columns.count(key), ExcColumnNotExistent(key));
 
-  if (!supercolumns.count(superkey))
+  if (supercolumns.count(superkey) == 0u)
     {
       std::pair<std::string, std::vector<std::string>> new_column(
         superkey, std::vector<std::string>());
@@ -277,7 +277,7 @@ TableHandler::add_column_to_supercolumn(const std::string &key,
         column_order.erase(order_iter);
     }
 
-  if (supercolumns.count(superkey))
+  if (supercolumns.count(superkey) != 0u)
     {
       supercolumns[superkey].push_back(key);
       // By default set the
