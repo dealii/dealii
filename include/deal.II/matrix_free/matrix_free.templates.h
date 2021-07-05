@@ -401,6 +401,9 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
       AssertDimension(dof_handler.size(), constraint.size());
       AssertDimension(dof_handler.size(), locally_owned_dofs.size());
 
+      task_info.allow_ghosted_vectors_in_loops =
+        additional_data.allow_ghosted_vectors_in_loops;
+
       // set variables that are independent of FE
       if (Utilities::MPI::job_supports_mpi() == true)
         {

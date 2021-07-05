@@ -615,6 +615,11 @@ namespace internal
       MPI_Comm communicator_sm;
 
       /**
+       * Assert that vectors passed to the MatrixFree loops are not ghosted.
+       */
+      bool allow_ghosted_vectors_in_loops;
+
+      /**
        * Rank of MPI process
        */
       unsigned int my_pid;

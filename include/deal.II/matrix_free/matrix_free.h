@@ -225,7 +225,8 @@ public:
       const bool         initialize_mapping  = true,
       const bool         overlap_communication_computation    = true,
       const bool         hold_all_faces_to_owned_cells        = false,
-      const bool         cell_vectorization_categories_strict = false)
+      const bool         cell_vectorization_categories_strict = false,
+      const bool         allow_ghosted_vectors_in_loops       = true)
       : tasks_parallel_scheme(tasks_parallel_scheme)
       , tasks_block_size(tasks_block_size)
       , mapping_update_flags(mapping_update_flags)
@@ -240,6 +241,7 @@ public:
       , hold_all_faces_to_owned_cells(hold_all_faces_to_owned_cells)
       , cell_vectorization_categories_strict(
           cell_vectorization_categories_strict)
+      , allow_ghosted_vectors_in_loops(allow_ghosted_vectors_in_loops)
       , communicator_sm(MPI_COMM_SELF)
     {}
 
@@ -265,6 +267,7 @@ public:
       , cell_vectorization_category(other.cell_vectorization_category)
       , cell_vectorization_categories_strict(
           other.cell_vectorization_categories_strict)
+      , allow_ghosted_vectors_in_loops(other.allow_ghosted_vectors_in_loops)
       , communicator_sm(other.communicator_sm)
     {}
 
@@ -292,7 +295,8 @@ public:
       cell_vectorization_category   = other.cell_vectorization_category;
       cell_vectorization_categories_strict =
         other.cell_vectorization_categories_strict;
-      communicator_sm = other.communicator_sm;
+      allow_ghosted_vectors_in_loops = other.allow_ghosted_vectors_in_loops;
+      communicator_sm                = other.communicator_sm;
 
       return *this;
     }
@@ -518,6 +522,18 @@ public:
      * them in a single vectorized array.
      */
     bool cell_vectorization_categories_strict;
+
+    /**
+     * Assert that vectors passed to the MatrixFree loops are not ghosted.
+     * This variable is primarily intended to reveal bugs or performance
+     * problems caused by vectors that are involuntarily in ghosted mode,
+     * by adding a check that this is not the case. In terms of correctness,
+     * the MatrixFree::loop() and MatrixFree::cell_loop() methods support
+     * both cases and perform similar operations. In particular, ghost values
+     * are always updated on the source vector within the loop, and the
+     * difference is only in whether the initial non-ghosted state is restored.
+     */
+    bool allow_ghosted_vectors_in_loops;
 
     /**
      * Shared-memory MPI communicator. Default: MPI_COMM_SELF.
@@ -3355,6 +3371,11 @@ namespace internal
     {
       (void)component_in_block_vector;
       bool ghosts_set = vec.has_ghost_elements();
+
+      Assert(matrix_free.get_task_info().allow_ghosted_vectors_in_loops ||
+               ghosts_set == false,
+             ExcNotImplemented());
+
       if (ghosts_set)
         ghosts_were_set = true;
 
@@ -3379,6 +3400,11 @@ namespace internal
     {
       (void)component_in_block_vector;
       bool ghosts_set = vec.has_ghost_elements();
+
+      Assert(matrix_free.get_task_info().allow_ghosted_vectors_in_loops ||
+               ghosts_set == false,
+             ExcNotImplemented());
+
       if (ghosts_set)
         ghosts_were_set = true;
 
@@ -3407,6 +3433,11 @@ namespace internal
         "Type mismatch between VectorType and VectorDataExchange");
       (void)component_in_block_vector;
       bool ghosts_set = vec.has_ghost_elements();
+
+      Assert(matrix_free.get_task_info().allow_ghosted_vectors_in_loops ||
+               ghosts_set == false,
+             ExcNotImplemented());
+
       if (ghosts_set)
         ghosts_were_set = true;
 
