@@ -26,91 +26,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-namespace
-{
-  /**
-   * Set up a vector that contains the unit (reference) cell support points
-   * for FE_Poly and sufficiently similar elements.
-   */
-  template <int dim>
-  std::vector<Point<dim>>
-  unit_support_points_fe_poly_bubbles(const unsigned int degree)
-  {
-    std::vector<Point<dim>> unit_points;
-
-    // Piecewise constants are a special case: use a support point at the
-    // centroid and only the centroid
-    if (degree == 0)
-      {
-        Point<dim> centroid;
-        std::fill(centroid.begin_raw(),
-                  centroid.end_raw(),
-                  1.0 / double(dim + 1));
-        unit_points.emplace_back(centroid);
-        return unit_points;
-      }
-
-    if (dim == 1)
-      {
-        // We don't really have dim = 1 support for simplex elements yet, but
-        // its convenient for populating the face array
-        Assert(degree <= 2, ExcNotImplemented());
-        if (degree >= 1)
-          {
-            unit_points.emplace_back(0.0);
-            unit_points.emplace_back(1.0);
-
-            if (degree == 2)
-              unit_points.emplace_back(0.5);
-          }
-      }
-    else if (dim == 2)
-      {
-        Assert(degree <= 2, ExcNotImplemented());
-        if (degree >= 1)
-          {
-            unit_points.emplace_back(0.0, 0.0);
-            unit_points.emplace_back(1.0, 0.0);
-            unit_points.emplace_back(0.0, 1.0);
-
-            if (degree == 2)
-              {
-                unit_points.emplace_back(0.5, 0.0);
-                unit_points.emplace_back(0.5, 0.5);
-                unit_points.emplace_back(0.0, 0.5);
-              }
-          }
-      }
-    else if (dim == 3)
-      {
-        Assert(degree <= 2, ExcNotImplemented());
-        if (degree >= 1)
-          {
-            unit_points.emplace_back(0.0, 0.0, 0.0);
-            unit_points.emplace_back(1.0, 0.0, 0.0);
-            unit_points.emplace_back(0.0, 1.0, 0.0);
-            unit_points.emplace_back(0.0, 0.0, 1.0);
-
-            if (degree == 2)
-              {
-                unit_points.emplace_back(0.5, 0.0, 0.0);
-                unit_points.emplace_back(0.5, 0.5, 0.0);
-                unit_points.emplace_back(0.0, 0.5, 0.0);
-                unit_points.emplace_back(0.0, 0.0, 0.5);
-                unit_points.emplace_back(0.5, 0.0, 0.5);
-                unit_points.emplace_back(0.0, 0.5, 0.5);
-              }
-          }
-      }
-    else
-      {
-        Assert(false, ExcNotImplemented());
-      }
-
-    return unit_points;
-  }
-} // namespace
-
 namespace FE_P_BubblesImplementation
 {
   template <int dim>
@@ -148,8 +63,9 @@ namespace FE_P_BubblesImplementation
   unit_support_points(const unsigned int degree)
   {
     Assert(degree < 3, ExcNotImplemented());
-    std::vector<Point<dim>> points =
-      unit_support_points_fe_poly_bubbles<dim>(degree);
+    // Start with the points used by FE_SimplexP, and then add bubbles.
+    FE_SimplexP<dim>        fe_p(degree);
+    std::vector<Point<dim>> points = fe_p.get_unit_support_points();
 
     Point<dim> centroid;
     std::fill(centroid.begin_raw(), centroid.end_raw(), 1.0 / double(dim + 1));
@@ -181,6 +97,17 @@ namespace FE_P_BubblesImplementation
         default:
           Assert(false, ExcNotImplemented());
       }
+    return points;
+  }
+
+
+
+  template <>
+  std::vector<Point<0>>
+  unit_support_points<0>(const unsigned int /*degree*/)
+  {
+    std::vector<Point<0>> points;
+    points.emplace_back();
     return points;
   }
 
@@ -314,24 +241,15 @@ namespace FE_P_BubblesImplementation
 template <int dim, int spacedim>
 FE_SimplexP_Bubbles<dim, spacedim>::FE_SimplexP_Bubbles(
   const unsigned int degree)
-  : dealii::FE_Poly<dim, spacedim>(
+  : FE_SimplexPoly<dim, spacedim>(
       FE_P_BubblesImplementation::get_basis<dim>(degree),
       FE_P_BubblesImplementation::get_fe_data<dim>(degree),
-      std::vector<bool>(
-        FE_P_BubblesImplementation::get_fe_data<dim>(degree).dofs_per_cell,
-        true),
-      std::vector<ComponentMask>(
-        FE_P_BubblesImplementation::get_fe_data<dim>(degree).dofs_per_cell,
-        std::vector<bool>(1, true)))
+      FE_P_BubblesImplementation::unit_support_points<dim>(degree),
+      {FE_P_BubblesImplementation::unit_support_points<dim - 1>(degree)},
+      // Interface contraints are not yet implemented
+      FullMatrix<double>())
   , approximation_degree(degree)
-{
-  this->unit_support_points =
-    FE_P_BubblesImplementation::unit_support_points<dim>(degree);
-
-  // TODO
-  // this->unit_face_support_points =
-  //   unit_face_support_points_fe_poly<dim>(degree);
-}
+{}
 
 
 
@@ -341,28 +259,6 @@ FE_SimplexP_Bubbles<dim, spacedim>::get_name() const
 {
   return "FE_SimplexP_Bubbles<" + Utilities::dim_string(dim, spacedim) + ">" +
          "(" + std::to_string(approximation_degree) + ")";
-}
-
-
-
-template <int dim, int spacedim>
-void
-FE_SimplexP_Bubbles<dim, spacedim>::
-  convert_generalized_support_point_values_to_dof_values(
-    const std::vector<Vector<double>> &support_point_values,
-    std::vector<double> &              nodal_values) const
-{
-  AssertDimension(support_point_values.size(),
-                  this->get_unit_support_points().size());
-  AssertDimension(support_point_values.size(), nodal_values.size());
-  AssertDimension(this->dofs_per_cell, nodal_values.size());
-
-  for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
-    {
-      AssertDimension(support_point_values[i].size(), 1);
-
-      nodal_values[i] = support_point_values[i](0);
-    }
 }
 
 
