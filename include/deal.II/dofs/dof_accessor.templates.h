@@ -1627,10 +1627,20 @@ DoFAccessor<structdim, dim, spacedim, level_dof_access>::vertex_dof_index(
   const unsigned int fe_index_) const
 {
   const unsigned int fe_index =
-    (this->dof_handler->hp_capability_enabled == false &&
-     fe_index_ == DoFHandler<dim, spacedim>::invalid_fe_index) ?
-      DoFHandler<dim, spacedim>::default_fe_index :
-      fe_index_;
+    (((this->dof_handler->hp_capability_enabled == false) &&
+      (fe_index_ == DoFHandler<dim, spacedim>::invalid_fe_index)) ?
+       // No hp enabled, and the argument is at its default value -> we
+       // can translate to the default active fe index
+       DoFHandler<dim, spacedim>::default_fe_index :
+       // Otherwise: If anything other than the default is provided by
+       // the caller, then we should take just that. As an exception, if
+       // we are on a cell (rather than a face/edge/vertex), then we know
+       // that there is only one active fe index on this cell and we can
+       // use that:
+       ((dim == structdim) &&
+            (fe_index_ == DoFHandler<dim, spacedim>::invalid_fe_index) ?
+          this->nth_active_fe_index(0) :
+          fe_index_));
 
   return dealii::internal::DoFAccessorImplementation::Implementation::
     get_dof_index(*this->dof_handler,
