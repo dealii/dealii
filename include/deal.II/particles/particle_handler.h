@@ -661,12 +661,17 @@ namespace Particles
     n_properties_per_particle() const;
 
     /**
-     * Return the maximal local index (in MPI-local index space) returned by
-     * ParticleAccessor::get_local_index(). More precisely, the returned value
-     * is one larger than the largest index that will be returned, which makes
-     * this value useful for resizing vectors. This number can be larger than
-     * locally_owned_particle_ids().n_elements(), because local indices can
-     * contain gaps in the range 0 to get_max_local_particle_index().
+     * Return one past the largest local index (in MPI-local index space)
+     * returned by ParticleAccessor::get_local_index(). This number can be
+     * larger than locally_owned_particle_ids().n_elements(), because local
+     * indices are not necessarily forming a contiguous range and can contain
+     * gaps in the range 0 to get_max_local_particle_index(). As a
+     * consequence, the number is not updated upon calls to remove_particle()
+     * or similar functions, and refreshed only as new particles get added or
+     * in sort_particles_into_subdomains_and_cells().
+     *
+     * This function is appropriate for resizing vectors working with
+     * ParticleAccessor::get_local_index().
      */
     types::particle_index
     get_max_local_particle_index() const;

@@ -135,13 +135,18 @@ namespace Particles
      * enables the direct array access (similar to
      * LinearAlgebra::distributed::Vector::local_element()) to quantities used
      * for local computations. Use
-     * ParticleHandler::get_max_local_particle_index() to query the largest
-     * index for suitable array sizes.
+     * ParticleHandler::get_max_local_particle_index() to query suitable array
+     * sizes.
      *
      * @note The number returned by this function is not stable between calls
      * of ParticleHandler::sort_particles_into_subdomains_and_cells() and
-     * therefore it cannot be used to track quantities across those calls. Use
-     * particle properties for storing persistent information.
+     * therefore it cannot be used to track quantities across those
+     * calls. Furthermore, the numbers returned by this function are typically
+     * not refreshed in case individual particles are removed from the
+     * underlying ParticleHandler object, which means that the returned
+     * indices of all particles on an MPI process typically do not form a
+     * contiguous interval of numbers. Use particle properties for storing
+     * persistent information and checkpointing the actual data.
      */
     types::particle_index
     get_local_index() const;
