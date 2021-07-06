@@ -435,7 +435,8 @@ namespace Differentiation
     }
 
 
-    Expression operator!(const Expression &expression)
+    Expression
+    operator!(const Expression &expression)
     {
       Assert(SE::is_a_Boolean(expression.get_value()),
              ExcMessage("The expression must return a boolean type."));
@@ -447,7 +448,8 @@ namespace Differentiation
     }
 
 
-    Expression operator&(const Expression &lhs, const Expression &rhs)
+    Expression
+    operator&(const Expression &lhs, const Expression &rhs)
     {
       Assert(SE::is_a_Boolean(lhs.get_value()),
              ExcMessage("The lhs expression must return a boolean type."));
@@ -527,7 +529,8 @@ namespace Differentiation
     }
 
 
-    Expression operator*(Expression lhs, const Expression &rhs)
+    Expression
+    operator*(Expression lhs, const Expression &rhs)
     {
       lhs *= rhs;
       return lhs;

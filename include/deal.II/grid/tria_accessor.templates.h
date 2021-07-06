@@ -176,8 +176,8 @@ TriaAccessorBase<structdim, dim, spacedim>::copy_from(
 
 template <int structdim, int dim, int spacedim>
 inline TriaAccessorBase<structdim, dim, spacedim> &
-TriaAccessorBase<structdim, dim, spacedim>::
-operator=(const TriaAccessorBase<structdim, dim, spacedim> &a)
+TriaAccessorBase<structdim, dim, spacedim>::operator=(
+  const TriaAccessorBase<structdim, dim, spacedim> &a)
 {
   present_level = a.present_level;
   present_index = a.present_index;
@@ -196,8 +196,8 @@ operator=(const TriaAccessorBase<structdim, dim, spacedim> &a)
 
 template <int structdim, int dim, int spacedim>
 inline bool
-TriaAccessorBase<structdim, dim, spacedim>::
-operator==(const TriaAccessorBase<structdim, dim, spacedim> &a) const
+TriaAccessorBase<structdim, dim, spacedim>::operator==(
+  const TriaAccessorBase<structdim, dim, spacedim> &a) const
 {
   Assert(tria == a.tria || tria == nullptr || a.tria == nullptr,
          TriaAccessorExceptions::ExcCantCompareIterators());
@@ -209,8 +209,8 @@ operator==(const TriaAccessorBase<structdim, dim, spacedim> &a) const
 
 template <int structdim, int dim, int spacedim>
 inline bool
-TriaAccessorBase<structdim, dim, spacedim>::
-operator!=(const TriaAccessorBase<structdim, dim, spacedim> &a) const
+TriaAccessorBase<structdim, dim, spacedim>::operator!=(
+  const TriaAccessorBase<structdim, dim, spacedim> &a) const
 {
   Assert(tria == a.tria || tria == nullptr || a.tria == nullptr,
          TriaAccessorExceptions::ExcCantCompareIterators());
@@ -222,8 +222,8 @@ operator!=(const TriaAccessorBase<structdim, dim, spacedim> &a) const
 
 template <int structdim, int dim, int spacedim>
 inline bool
-TriaAccessorBase<structdim, dim, spacedim>::
-operator<(const TriaAccessorBase<structdim, dim, spacedim> &other) const
+TriaAccessorBase<structdim, dim, spacedim>::operator<(
+  const TriaAccessorBase<structdim, dim, spacedim> &other) const
 {
   Assert(tria == other.tria, TriaAccessorExceptions::ExcCantCompareIterators());
 
@@ -423,8 +423,8 @@ InvalidAccessor<structdim, dim, spacedim>::copy_from(const InvalidAccessor &)
 
 template <int structdim, int dim, int spacedim>
 bool
-InvalidAccessor<structdim, dim, spacedim>::
-operator==(const InvalidAccessor &) const
+InvalidAccessor<structdim, dim, spacedim>::operator==(
+  const InvalidAccessor &) const
 {
   // nothing to do here. we could
   // throw an exception but we can't
@@ -438,8 +438,8 @@ operator==(const InvalidAccessor &) const
 
 template <int structdim, int dim, int spacedim>
 bool
-InvalidAccessor<structdim, dim, spacedim>::
-operator!=(const InvalidAccessor &) const
+InvalidAccessor<structdim, dim, spacedim>::operator!=(
+  const InvalidAccessor &) const
 {
   // nothing to do here. we could
   // throw an exception but we can't
@@ -2334,8 +2334,8 @@ TriaAccessor<0, dim, spacedim>::copy_from(const TriaAccessor &t)
 
 template <int dim, int spacedim>
 inline bool
-TriaAccessor<0, dim, spacedim>::
-operator<(const TriaAccessor<0, dim, spacedim> &other) const
+TriaAccessor<0, dim, spacedim>::operator<(
+  const TriaAccessor<0, dim, spacedim> &other) const
 {
   Assert(tria == other.tria, TriaAccessorExceptions::ExcCantCompareIterators());
 
@@ -2749,8 +2749,8 @@ TriaAccessor<0, 1, spacedim>::copy_from(const TriaAccessor &t)
 
 template <int spacedim>
 inline bool
-TriaAccessor<0, 1, spacedim>::
-operator<(const TriaAccessor<0, 1, spacedim> &other) const
+TriaAccessor<0, 1, spacedim>::operator<(
+  const TriaAccessor<0, 1, spacedim> &other) const
 {
   Assert(tria == other.tria, TriaAccessorExceptions::ExcCantCompareIterators());
 

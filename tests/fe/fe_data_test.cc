@@ -89,7 +89,8 @@ test_2d_3d(std::vector<FiniteElement<dim> *> &fe_datas)
 
 
 
-void test_2d_3d(std::vector<FiniteElement<1> *> &fe_datas)
+void
+test_2d_3d(std::vector<FiniteElement<1> *> &fe_datas)
 {}
 
 

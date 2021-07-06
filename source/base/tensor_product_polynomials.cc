@@ -549,8 +549,7 @@ AnisotropicPolynomials<dim>::compute_index(
 #endif
 
   if (dim == 0)
-    {
-    }
+    {}
   else if (dim == 1)
     internal::compute_tensor_index(i,
                                    polynomials[0].size(),

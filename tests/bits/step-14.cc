@@ -177,9 +177,9 @@ namespace Evaluation
 
   template <int dim>
   void
-  PointXDerivativeEvaluation<dim>::
-  operator()(const DoFHandler<dim> &dof_handler,
-             const Vector<double> & solution) const
+  PointXDerivativeEvaluation<dim>::operator()(
+    const DoFHandler<dim> &dof_handler,
+    const Vector<double> & solution) const
   {
     double point_derivative = 0;
 
@@ -1031,7 +1031,8 @@ namespace Data
 
 
   template <>
-  void Exercise_2_3<2>::create_coarse_grid(Triangulation<2> &coarse_grid)
+  void
+  Exercise_2_3<2>::create_coarse_grid(Triangulation<2> &coarse_grid)
   {
     const unsigned int dim = 2;
 
@@ -1686,8 +1687,7 @@ namespace LaplaceSolver
     for (unsigned int t = 0;
          (t < this_thread) && (cell != dual_solver.dof_handler.end());
          ++t, ++cell)
-      {
-      }
+      {}
 
 
     if (cell == dual_solver.dof_handler.end())
@@ -1739,8 +1739,7 @@ namespace LaplaceSolver
         for (unsigned int t = 0;
              ((t < n_threads) && (cell != dual_solver.dof_handler.end()));
              ++t, ++cell, ++cell_index)
-          {
-          }
+          {}
 
         if (cell == dual_solver.dof_handler.end())
           break;

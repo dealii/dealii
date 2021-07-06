@@ -63,7 +63,8 @@ do_rotate(Triangulation<dim> &tria)
 }
 
 
-void do_rotate(Triangulation<1> &)
+void
+do_rotate(Triangulation<1> &)
 {}
 
 

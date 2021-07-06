@@ -298,7 +298,8 @@ namespace python
 
 
 
-  double PointWrapper::operator*(const PointWrapper &p) const
+  double
+  PointWrapper::operator*(const PointWrapper &p) const
   {
     AssertThrow(p.get_dim() == dim,
                 ExcMessage("The points do not have the same dimension."));
@@ -378,7 +379,8 @@ namespace python
   }
 
 
-  PointWrapper PointWrapper::operator*(const double factor) const
+  PointWrapper
+  PointWrapper::operator*(const double factor) const
   {
     if (dim == 2)
       return PointWrapper(

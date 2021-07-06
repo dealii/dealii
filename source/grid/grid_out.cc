@@ -964,8 +964,7 @@ GridOut::write_dx(const Triangulation<dim, spacedim> &tria,
   // Write additional face information
 
   if (write_faces)
-    {
-    }
+    {}
   else
     {}
 

@@ -290,13 +290,15 @@ struct ParameterCollection
   void
   print();
 
-  void set_enrichment_point(Point<2> &p, const unsigned int i)
+  void
+  set_enrichment_point(Point<2> &p, const unsigned int i)
   {
     AssertDimension(dim, 2);
     p(0) = points_enrichments[2 * i];
     p(1) = points_enrichments[2 * i + 1];
   }
-  void set_enrichment_point(Point<3> &p, const unsigned int i)
+  void
+  set_enrichment_point(Point<3> &p, const unsigned int i)
   {
     AssertDimension(dim, 3);
     p(0) = points_enrichments[3 * i];

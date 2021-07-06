@@ -1912,7 +1912,8 @@ namespace GridTools
 
     // overload of the function above for 1d -- there is nothing
     // to orient in that case
-    void reorient(std::vector<CellData<1>> &)
+    void
+    reorient(std::vector<CellData<1>> &)
     {}
   } // namespace
 

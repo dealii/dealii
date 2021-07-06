@@ -84,11 +84,12 @@ namespace
   //
   // Eccentricity must be in range ]0,1[
   //
-  void build_simple_hyper_shell(Triangulation<2, 2> &grid,
-                                const Point<2> &     center,
-                                const double         inner_radius,
-                                const double         outer_radius,
-                                const double         eccentricity)
+  void
+  build_simple_hyper_shell(Triangulation<2, 2> &grid,
+                           const Point<2> &     center,
+                           const double         inner_radius,
+                           const double         outer_radius,
+                           const double         eccentricity)
   {
     unsigned int          cell[][4] = {{5, 6, 0, 1},
                               {6, 7, 1, 2},

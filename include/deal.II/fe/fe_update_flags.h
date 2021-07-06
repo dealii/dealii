@@ -325,7 +325,8 @@ operator|=(UpdateFlags &f1, const UpdateFlags f2)
  *
  * @ref UpdateFlags
  */
-inline UpdateFlags operator&(const UpdateFlags f1, const UpdateFlags f2)
+inline UpdateFlags
+operator&(const UpdateFlags f1, const UpdateFlags f2)
 {
   return static_cast<UpdateFlags>(static_cast<unsigned int>(f1) &
                                   static_cast<unsigned int>(f2));

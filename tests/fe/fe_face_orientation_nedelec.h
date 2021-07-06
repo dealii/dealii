@@ -33,7 +33,8 @@
 
 #include "../tests.h"
 
-void create_reference_triangulation(Triangulation<3> &tria)
+void
+create_reference_triangulation(Triangulation<3> &tria)
 {
   std::vector<unsigned int> repetitions(3, 1);
 
@@ -44,10 +45,11 @@ void create_reference_triangulation(Triangulation<3> &tria)
                                             Point<3>(1.0, 1.0, 1.0));
 }
 
-void create_triangulation(Triangulation<3> &tria,
-                          const bool        face_orientation,
-                          const bool        face_flip,
-                          const bool        face_rotation)
+void
+create_triangulation(Triangulation<3> &tria,
+                     const bool        face_orientation,
+                     const bool        face_flip,
+                     const bool        face_rotation)
 {
   std::vector<CellData<3>> cells(2);
 

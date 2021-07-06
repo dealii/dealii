@@ -912,8 +912,9 @@ public:
   /**
    * Move assignment operator.
    */
-  DoFAccessor<0, 1, spacedim, level_dof_access> &operator      =(
-    DoFAccessor<0, 1, spacedim, level_dof_access> &&) noexcept = default;
+  DoFAccessor<0, 1, spacedim, level_dof_access> &
+  operator=(DoFAccessor<0, 1, spacedim, level_dof_access> &&) noexcept =
+    default;
 
   /**
    * @}
@@ -1199,7 +1200,8 @@ protected:
   /**
    * Reset the DoF handler pointer.
    */
-  void set_dof_handler(DoFHandler<1, spacedim> *dh);
+  void
+  set_dof_handler(DoFHandler<1, spacedim> *dh);
 
   /**
    * Set the index of the <i>i</i>th degree of freedom of this object to @p

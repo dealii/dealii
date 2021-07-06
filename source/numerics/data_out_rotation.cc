@@ -512,7 +512,7 @@ DataOutRotation<dim, spacedim>::build_patches(
       n_postprocessor_outputs[dataset] = 0;
 
   internal::DataOutRotationImplementation::ParallelData<dim, spacedim>
-                                                             thread_data(n_datasets,
+    thread_data(n_datasets,
                 n_subdivisions,
                 n_patches_per_circle,
                 n_postprocessor_outputs,

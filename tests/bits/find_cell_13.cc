@@ -33,7 +33,8 @@
 #include "../tests.h"
 
 
-void check(Triangulation<2> &tria)
+void
+check(Triangulation<2> &tria)
 {
   // generate some random points bounded by [0., 0.2)^2 in R^2 space
   // any point in this domain should be inside one of the cells

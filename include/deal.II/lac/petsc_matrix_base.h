@@ -202,12 +202,14 @@ namespace PETScWrappers
       /**
        * Dereferencing operator.
        */
-      const Accessor &operator*() const;
+      const Accessor &
+      operator*() const;
 
       /**
        * Dereferencing operator.
        */
-      const Accessor *operator->() const;
+      const Accessor *
+      operator->() const;
 
       /**
        * Comparison. True, if both iterators point to the same matrix
@@ -1160,13 +1162,15 @@ namespace PETScWrappers
     }
 
 
-    inline const const_iterator::Accessor &const_iterator::operator*() const
+    inline const const_iterator::Accessor &
+    const_iterator::operator*() const
     {
       return accessor;
     }
 
 
-    inline const const_iterator::Accessor *const_iterator::operator->() const
+    inline const const_iterator::Accessor *
+    const_iterator::operator->() const
     {
       return &accessor;
     }

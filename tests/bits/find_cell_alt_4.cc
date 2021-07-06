@@ -30,7 +30,8 @@
 #include "../tests.h"
 
 
-void check(Triangulation<3> &tria)
+void
+check(Triangulation<3> &tria)
 {
   MappingQGeneric<3> map(1);
 

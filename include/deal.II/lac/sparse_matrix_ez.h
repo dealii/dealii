@@ -253,12 +253,14 @@ public:
     /**
      * Dereferencing operator.
      */
-    const Accessor &operator*() const;
+    const Accessor &
+    operator*() const;
 
     /**
      * Dereferencing operator.
      */
-    const Accessor *operator->() const;
+    const Accessor *
+    operator->() const;
 
     /**
      * Comparison. True, if both iterators point to the same matrix position.
@@ -1042,7 +1044,7 @@ SparseMatrixEZ<number>::const_iterator::operator++()
 
 template <typename number>
 inline const typename SparseMatrixEZ<number>::const_iterator::Accessor &
-  SparseMatrixEZ<number>::const_iterator::operator*() const
+SparseMatrixEZ<number>::const_iterator::operator*() const
 {
   return accessor;
 }
@@ -1050,7 +1052,7 @@ inline const typename SparseMatrixEZ<number>::const_iterator::Accessor &
 
 template <typename number>
 inline const typename SparseMatrixEZ<number>::const_iterator::Accessor *
-  SparseMatrixEZ<number>::const_iterator::operator->() const
+SparseMatrixEZ<number>::const_iterator::operator->() const
 {
   return &accessor;
 }
@@ -1058,8 +1060,8 @@ inline const typename SparseMatrixEZ<number>::const_iterator::Accessor *
 
 template <typename number>
 inline bool
-SparseMatrixEZ<number>::const_iterator::
-operator==(const const_iterator &other) const
+SparseMatrixEZ<number>::const_iterator::operator==(
+  const const_iterator &other) const
 {
   return (accessor.row() == other.accessor.row() &&
           accessor.index() == other.accessor.index());
@@ -1068,8 +1070,8 @@ operator==(const const_iterator &other) const
 
 template <typename number>
 inline bool
-SparseMatrixEZ<number>::const_iterator::
-operator!=(const const_iterator &other) const
+SparseMatrixEZ<number>::const_iterator::operator!=(
+  const const_iterator &other) const
 {
   return !(*this == other);
 }
@@ -1077,8 +1079,8 @@ operator!=(const const_iterator &other) const
 
 template <typename number>
 inline bool
-SparseMatrixEZ<number>::const_iterator::
-operator<(const const_iterator &other) const
+SparseMatrixEZ<number>::const_iterator::operator<(
+  const const_iterator &other) const
 {
   return (accessor.row() < other.accessor.row() ||
           (accessor.row() == other.accessor.row() &&

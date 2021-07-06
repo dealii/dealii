@@ -41,7 +41,8 @@ check(const Triangulation<dim> &tria)
     Assert(cell->active_cell_index() == index, ExcInternalError());
 }
 
-void do_refine(Triangulation<1> &tria)
+void
+do_refine(Triangulation<1> &tria)
 {
   const int dim = 1;
 
@@ -51,7 +52,8 @@ void do_refine(Triangulation<1> &tria)
 }
 
 
-void do_refine(Triangulation<2> &tria)
+void
+do_refine(Triangulation<2> &tria)
 {
   const int dim = 2;
 
@@ -65,7 +67,8 @@ void do_refine(Triangulation<2> &tria)
 }
 
 
-void do_refine(Triangulation<3> &tria)
+void
+do_refine(Triangulation<3> &tria)
 {
   const int dim = 3;
 

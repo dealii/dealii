@@ -986,7 +986,8 @@ namespace Differentiation
      * @note This operator can only be applied on boolean and conditional
      * expressions.
      */
-    Expression operator!(const Expression &expression);
+    Expression
+    operator!(const Expression &expression);
 
     /**
      * Logical and operator.
@@ -994,7 +995,8 @@ namespace Differentiation
      * @note This operator can only be applied on boolean and conditional
      * expressions.
      */
-    Expression operator&(const Expression &lhs, const Expression &rhs);
+    Expression
+    operator&(const Expression &lhs, const Expression &rhs);
 
     /**
      * Logical inclusive or operator.
@@ -1062,7 +1064,8 @@ namespace Differentiation
      *
      * Return the result of multiplying the @p lhs by the @p rhs.
      */
-    Expression operator*(Expression lhs, const Expression &rhs);
+    Expression
+    operator*(Expression lhs, const Expression &rhs);
 
     /**
      * Division operator.
@@ -1151,7 +1154,8 @@ namespace Differentiation
     template <typename NumberType,
               typename = typename std::enable_if<
                 std::is_constructible<Expression, NumberType>::value>::type>
-    inline Expression operator*(const NumberType &lhs, const Expression &rhs)
+    inline Expression
+    operator*(const NumberType &lhs, const Expression &rhs)
     {
       return Expression(lhs) * rhs;
     }
@@ -1167,7 +1171,8 @@ namespace Differentiation
     template <typename NumberType,
               typename = typename std::enable_if<
                 std::is_constructible<Expression, NumberType>::value>::type>
-    inline Expression operator*(const Expression &lhs, const NumberType &rhs)
+    inline Expression
+    operator*(const Expression &lhs, const NumberType &rhs)
     {
       return lhs * Expression(rhs);
     }

@@ -39,7 +39,8 @@ test_cpu()
   deallog << "norm_square: " << t.norm_square() << std::endl;
 }
 
-__global__ void init_kernel(Tensor<2, 3> *t, const unsigned int N)
+__global__ void
+init_kernel(Tensor<2, 3> *t, const unsigned int N)
 {
   const unsigned int i = threadIdx.y;
   const unsigned int j = threadIdx.x;
@@ -47,7 +48,8 @@ __global__ void init_kernel(Tensor<2, 3> *t, const unsigned int N)
     (*t)[i][j] = j + i * N + 1.;
 }
 
-__global__ void norm_kernel(Tensor<2, 3> *t, double *norm, double *norm_square)
+__global__ void
+norm_kernel(Tensor<2, 3> *t, double *norm, double *norm_square)
 {
   if (threadIdx.x == 0)
     {

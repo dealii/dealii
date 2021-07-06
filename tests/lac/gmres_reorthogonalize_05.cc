@@ -32,7 +32,8 @@ namespace dealii
 {
   template <typename Number>
   template <typename Number2>
-  Number Vector<Number>::operator*(const Vector<Number2> &v) const
+  Number
+  Vector<Number>::operator*(const Vector<Number2> &v) const
   {
     Number sum = 0;
     for (unsigned int i = 0; i < size(); ++i)

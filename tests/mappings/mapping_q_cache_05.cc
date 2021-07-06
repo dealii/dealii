@@ -88,28 +88,29 @@ main()
   initlog();
   do_test<2>(3, Solution<2>(true), true);
   do_test<2>(3, Solution<2>(false), false);
-  do_test<2>(3,
-             [](const typename Triangulation<2>::cell_iterator &,
-                const Point<2> &p) -> Point<2> {
-               Point<2> result;
+  do_test<2>(
+    3,
+    [](const typename Triangulation<2>::cell_iterator &,
+       const Point<2> &p) -> Point<2> {
+      Point<2> result;
 
-               for (unsigned int compontent = 0; compontent < 2; ++compontent)
-                 result[compontent] =
-                   std::sin(p[compontent] * 0.5 * numbers::PI) - p[compontent];
+      for (unsigned int compontent = 0; compontent < 2; ++compontent)
+        result[compontent] =
+          std::sin(p[compontent] * 0.5 * numbers::PI) - p[compontent];
 
-               return result;
-             },
-             true);
-  do_test<2>(3,
-             [](const typename Triangulation<2>::cell_iterator &,
-                const Point<2> &p) -> Point<2> {
-               Point<2> result;
+      return result;
+    },
+    true);
+  do_test<2>(
+    3,
+    [](const typename Triangulation<2>::cell_iterator &,
+       const Point<2> &p) -> Point<2> {
+      Point<2> result;
 
-               for (unsigned int compontent = 0; compontent < 2; ++compontent)
-                 result[compontent] =
-                   std::sin(p[compontent] * 0.5 * numbers::PI);
+      for (unsigned int compontent = 0; compontent < 2; ++compontent)
+        result[compontent] = std::sin(p[compontent] * 0.5 * numbers::PI);
 
-               return result;
-             },
-             false);
+      return result;
+    },
+    false);
 }

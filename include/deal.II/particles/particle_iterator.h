@@ -65,12 +65,14 @@ namespace Particles
      * Dereferencing operator, returns a reference to an accessor. Usage is thus
      * like <tt>(*i).get_id ();</tt>
      */
-    const ParticleAccessor<dim, spacedim> &operator*() const;
+    const ParticleAccessor<dim, spacedim> &
+    operator*() const;
 
     /**
      * Dereferencing operator, non-@p const version.
      */
-    ParticleAccessor<dim, spacedim> &operator*();
+    ParticleAccessor<dim, spacedim> &
+    operator*();
 
     /**
      * Dereferencing operator, returns a pointer of the particle pointed to.
@@ -78,12 +80,14 @@ namespace Particles
      *
      * There is a @p const and a non-@p const version.
      */
-    const ParticleAccessor<dim, spacedim> *operator->() const;
+    const ParticleAccessor<dim, spacedim> *
+    operator->() const;
 
     /**
      * Dereferencing operator, non-@p const version.
      */
-    ParticleAccessor<dim, spacedim> *operator->();
+    ParticleAccessor<dim, spacedim> *
+    operator->();
 
     /**
      * Compare for equality.
@@ -169,8 +173,8 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  inline ParticleAccessor<dim, spacedim> &ParticleIterator<dim, spacedim>::
-                                          operator*()
+  inline ParticleAccessor<dim, spacedim> &
+  ParticleIterator<dim, spacedim>::operator*()
   {
     return accessor;
   }
@@ -178,8 +182,8 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  inline ParticleAccessor<dim, spacedim> *ParticleIterator<dim, spacedim>::
-                                          operator->()
+  inline ParticleAccessor<dim, spacedim> *
+  ParticleIterator<dim, spacedim>::operator->()
   {
     return &(this->operator*());
   }
@@ -188,7 +192,7 @@ namespace Particles
 
   template <int dim, int spacedim>
   inline const ParticleAccessor<dim, spacedim> &
-    ParticleIterator<dim, spacedim>::operator*() const
+  ParticleIterator<dim, spacedim>::operator*() const
   {
     return accessor;
   }
@@ -197,7 +201,7 @@ namespace Particles
 
   template <int dim, int spacedim>
   inline const ParticleAccessor<dim, spacedim> *
-    ParticleIterator<dim, spacedim>::operator->() const
+  ParticleIterator<dim, spacedim>::operator->() const
   {
     return &(this->operator*());
   }
@@ -206,8 +210,8 @@ namespace Particles
 
   template <int dim, int spacedim>
   inline bool
-  ParticleIterator<dim, spacedim>::
-  operator!=(const ParticleIterator<dim, spacedim> &other) const
+  ParticleIterator<dim, spacedim>::operator!=(
+    const ParticleIterator<dim, spacedim> &other) const
   {
     return accessor != other.accessor;
   }
@@ -216,8 +220,8 @@ namespace Particles
 
   template <int dim, int spacedim>
   inline bool
-  ParticleIterator<dim, spacedim>::
-  operator==(const ParticleIterator<dim, spacedim> &other) const
+  ParticleIterator<dim, spacedim>::operator==(
+    const ParticleIterator<dim, spacedim> &other) const
   {
     return accessor == other.accessor;
   }

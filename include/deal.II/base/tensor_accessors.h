@@ -412,7 +412,7 @@ namespace TensorAccessors
 
       // Recurse by applying index j directly:
       constexpr DEAL_II_ALWAYS_INLINE value_type
-                                      operator[](unsigned int j) const
+      operator[](unsigned int j) const
       {
         return value_type(t_[j]);
       }
@@ -443,7 +443,7 @@ namespace TensorAccessors
       using value_type = StoreIndex<rank - 1, internal::Identity<T>>;
 
       constexpr DEAL_II_ALWAYS_INLINE value_type
-                                      operator[](unsigned int j) const
+      operator[](unsigned int j) const
       {
         return value_type(Identity<T>(t_), j);
       }
@@ -467,7 +467,7 @@ namespace TensorAccessors
         typename ReferenceType<typename ValueType<T>::value_type>::type;
 
       constexpr DEAL_II_ALWAYS_INLINE value_type
-                                      operator[](unsigned int j) const
+      operator[](unsigned int j) const
       {
         return t_[j];
       }
@@ -521,7 +521,7 @@ namespace TensorAccessors
       using value_type = StoreIndex<rank - 1, StoreIndex<rank, S>>;
 
       constexpr DEAL_II_ALWAYS_INLINE value_type
-                                      operator[](unsigned int j) const
+      operator[](unsigned int j) const
       {
         return value_type(*this, j);
       }

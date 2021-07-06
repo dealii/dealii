@@ -52,7 +52,8 @@ namespace VectorTools
     template <int dim,
               int spacedim,
               typename number,
-              template <int, int> class M_or_MC>
+              template <int, int>
+              class M_or_MC>
     static inline void
     do_interpolate_boundary_values(
       const M_or_MC<dim, spacedim> &   mapping,
@@ -690,8 +691,10 @@ namespace VectorTools
 
     template <int dim,
               int spacedim,
-              template <int, int> class M_or_MC,
-              template <int> class Q_or_QC,
+              template <int, int>
+              class M_or_MC,
+              template <int>
+              class Q_or_QC,
               typename number>
     void
     do_project_boundary_values(
@@ -1528,9 +1531,8 @@ namespace VectorTools
               const unsigned int lines_per_face =
                 GeometryInfo<dim>::lines_per_face;
               std::vector<std::vector<unsigned int>>
-                                        associated_edge_dof_to_face_dof(lines_per_face,
-                                                                        std::vector<unsigned int>(degree +
-                                                                        1));
+                associated_edge_dof_to_face_dof(
+                  lines_per_face, std::vector<unsigned int>(degree + 1));
               std::vector<unsigned int> associated_edge_dofs(lines_per_face);
 
               for (unsigned int line = 0; line < lines_per_face; ++line)
@@ -2170,7 +2172,7 @@ namespace VectorTools
       const FiniteElement<2> &         fe      = cell->get_fe();
       const std::vector<Tensor<1, 2>> &normals = fe_values.get_normal_vectors();
       const unsigned int
-                                  face_coordinate_direction[GeometryInfo<2>::faces_per_cell] = {1,
+        face_coordinate_direction[GeometryInfo<2>::faces_per_cell] = {1,
                                                                       1,
                                                                       0,
                                                                       0};

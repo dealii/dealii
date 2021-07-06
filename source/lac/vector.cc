@@ -28,17 +28,18 @@ template class Vector<std::complex<double>>;
 
 // instantiate for integers:
 template class Vector<int>;
-template Vector<double> &Vector<double>::
-                         operator=<int>(const dealii::Vector<int> &);
-template bool Vector<int>::operator==<int>(dealii::Vector<int> const &) const;
+template Vector<double> &
+Vector<double>::operator=<int>(const dealii::Vector<int> &);
+template bool
+Vector<int>::operator==<int>(dealii::Vector<int> const &) const;
 
 template void
 Vector<int>::reinit<double>(const Vector<double> &, const bool);
 
 // instantiate for long double manually because we use it in a few places:
 template class Vector<long double>;
-template long double Vector<long double>::
-                     operator*<long double>(const Vector<long double> &) const;
+template long double
+Vector<long double>::operator*<long double>(const Vector<long double> &) const;
 
 // do a few functions that currently don't fit the scheme because they have
 // two template arguments that need to be different (the case of same

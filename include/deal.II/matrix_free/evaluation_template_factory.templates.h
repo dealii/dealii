@@ -37,7 +37,7 @@ namespace internal
   bool
   instantiation_helper_run(const unsigned int given_degree,
                            const unsigned int n_q_points_1d,
-                           Args &... args)
+                           Args &...args)
   {
     if (given_degree == degree)
       {

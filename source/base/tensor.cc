@@ -23,8 +23,9 @@ DEAL_II_NAMESPACE_OPEN
 namespace
 {
   template <int dim, typename Number>
-  void calculate_svd_in_place(Tensor<2, dim, Number> &A_in_VT_out,
-                              Tensor<2, dim, Number> &U)
+  void
+  calculate_svd_in_place(Tensor<2, dim, Number> &A_in_VT_out,
+                         Tensor<2, dim, Number> &U)
   {
     // inputs: A
     // outputs: V^T, U

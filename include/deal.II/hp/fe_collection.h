@@ -116,7 +116,7 @@ namespace hp
      * from class FiniteElement<dim,spacedim>.
      */
     template <class... FETypes>
-    explicit FECollection(const FETypes &... fes);
+    explicit FECollection(const FETypes &...fes);
 
     /**
      * Constructor. Same as above but for any number of elements. Pointers to
@@ -765,7 +765,7 @@ namespace hp
 
   template <int dim, int spacedim>
   template <class... FETypes>
-  FECollection<dim, spacedim>::FECollection(const FETypes &... fes)
+  FECollection<dim, spacedim>::FECollection(const FETypes &...fes)
   {
     static_assert(
       is_base_of_all<FiniteElement<dim, spacedim>, FETypes...>::value,
@@ -804,8 +804,8 @@ namespace hp
 
   template <int dim, int spacedim>
   inline bool
-  FECollection<dim, spacedim>::
-  operator==(const FECollection<dim, spacedim> &fe_collection) const
+  FECollection<dim, spacedim>::operator==(
+    const FECollection<dim, spacedim> &fe_collection) const
   {
     const unsigned int n_elements = this->size();
     if (n_elements != fe_collection.size())
@@ -822,8 +822,8 @@ namespace hp
 
   template <int dim, int spacedim>
   inline bool
-  FECollection<dim, spacedim>::
-  operator!=(const FECollection<dim, spacedim> &fe_collection) const
+  FECollection<dim, spacedim>::operator!=(
+    const FECollection<dim, spacedim> &fe_collection) const
   {
     return !(*this == fe_collection);
   }

@@ -30,7 +30,8 @@
 // from NumberType2
 template <int rank,
           int dim,
-          template <int, int, typename> class TensorType,
+          template <int, int, typename>
+          class TensorType,
           typename NumberType1,
           typename NumberType2>
 typename std::enable_if<!std::is_constructible<NumberType1, NumberType2>::value,
@@ -40,7 +41,8 @@ test_tensor_constructor(const std::string &, const std::string &)
 
 template <int rank,
           int dim,
-          template <int, int, typename> class TensorType,
+          template <int, int, typename>
+          class TensorType,
           typename NumberType1,
           typename NumberType2>
 typename std::enable_if<std::is_constructible<NumberType1, NumberType2>::value,
@@ -57,7 +59,8 @@ test_tensor_constructor(const std::string &type1, const std::string &type2)
 
 template <int rank,
           int dim,
-          template <int, int, typename> class TensorType,
+          template <int, int, typename>
+          class TensorType,
           typename NumberType1>
 void
 test_fixed_NT_2(const std::string &type1)

@@ -278,9 +278,10 @@ TestDef3<dim>::vector_value(const Point<dim> &p,
  * Check the value of the derivative field.
  */
 
-double EvaluateDiver(Mapping<2> &    mapping,
-                     DoFHandler<2> & dof_handler,
-                     Vector<double> &solution)
+double
+EvaluateDiver(Mapping<2> &    mapping,
+              DoFHandler<2> & dof_handler,
+              Vector<double> &solution)
 {
   // Use a high order quadrature.
   QGauss<2>   quad(6);

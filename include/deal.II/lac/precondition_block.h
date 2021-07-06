@@ -475,12 +475,14 @@ public:
     /**
      * Dereferencing operator.
      */
-    const Accessor &operator*() const;
+    const Accessor &
+    operator*() const;
 
     /**
      * Dereferencing operator.
      */
-    const Accessor *operator->() const;
+    const Accessor *
+    operator->() const;
 
     /**
      * Comparison. True, if both iterators point to the same matrix position.
@@ -993,10 +995,9 @@ inline PreconditionBlockJacobi<MatrixType, inverse_type>::const_iterator::
 
 
 template <typename MatrixType, typename inverse_type>
-inline
-  typename PreconditionBlockJacobi<MatrixType, inverse_type>::const_iterator &
-  PreconditionBlockJacobi<MatrixType, inverse_type>::const_iterator::
-  operator++()
+inline typename PreconditionBlockJacobi<MatrixType,
+                                        inverse_type>::const_iterator &
+PreconditionBlockJacobi<MatrixType, inverse_type>::const_iterator::operator++()
 {
   Assert(*this != accessor.matrix->end(), ExcIteratorPastEnd());
 
@@ -1019,8 +1020,8 @@ inline
 template <typename MatrixType, typename inverse_type>
 inline const typename PreconditionBlockJacobi<MatrixType, inverse_type>::
   const_iterator::Accessor &
-    PreconditionBlockJacobi<MatrixType, inverse_type>::const_iterator::
-    operator*() const
+  PreconditionBlockJacobi<MatrixType, inverse_type>::const_iterator::operator*()
+    const
 {
   return accessor;
 }
@@ -1029,8 +1030,8 @@ inline const typename PreconditionBlockJacobi<MatrixType, inverse_type>::
 template <typename MatrixType, typename inverse_type>
 inline const typename PreconditionBlockJacobi<MatrixType, inverse_type>::
   const_iterator::Accessor *
-    PreconditionBlockJacobi<MatrixType, inverse_type>::const_iterator::
-    operator->() const
+  PreconditionBlockJacobi<MatrixType,
+                          inverse_type>::const_iterator::operator->() const
 {
   return &accessor;
 }
@@ -1038,8 +1039,8 @@ inline const typename PreconditionBlockJacobi<MatrixType, inverse_type>::
 
 template <typename MatrixType, typename inverse_type>
 inline bool
-PreconditionBlockJacobi<MatrixType, inverse_type>::const_iterator::
-operator==(const const_iterator &other) const
+PreconditionBlockJacobi<MatrixType, inverse_type>::const_iterator::operator==(
+  const const_iterator &other) const
 {
   if (accessor.a_block == accessor.matrix->size() &&
       accessor.a_block == other.accessor.a_block)
@@ -1055,8 +1056,8 @@ operator==(const const_iterator &other) const
 
 template <typename MatrixType, typename inverse_type>
 inline bool
-PreconditionBlockJacobi<MatrixType, inverse_type>::const_iterator::
-operator!=(const const_iterator &other) const
+PreconditionBlockJacobi<MatrixType, inverse_type>::const_iterator::operator!=(
+  const const_iterator &other) const
 {
   return !(*this == other);
 }
@@ -1064,8 +1065,8 @@ operator!=(const const_iterator &other) const
 
 template <typename MatrixType, typename inverse_type>
 inline bool
-PreconditionBlockJacobi<MatrixType, inverse_type>::const_iterator::
-operator<(const const_iterator &other) const
+PreconditionBlockJacobi<MatrixType, inverse_type>::const_iterator::operator<(
+  const const_iterator &other) const
 {
   return (accessor.row() < other.accessor.row() ||
           (accessor.row() == other.accessor.row() &&

@@ -77,7 +77,8 @@ set_boundary_ids(Triangulation<dim> &tria)
 }
 
 
-void set_boundary_ids(Triangulation<1> &)
+void
+set_boundary_ids(Triangulation<1> &)
 {}
 
 

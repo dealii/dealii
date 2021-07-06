@@ -26,7 +26,8 @@
 // match up for the standard orientation of the normals. we thus have
 // to store the face orientation in each cell
 
-void create_two_cubes(Triangulation<3> &coarse_grid)
+void
+create_two_cubes(Triangulation<3> &coarse_grid)
 {
   const Point<3>        points[6] = {Point<3>(0, 0, 0),
                               Point<3>(1, 0, 0),
@@ -68,8 +69,9 @@ void create_two_cubes(Triangulation<3> &coarse_grid)
 // the edges are not all ok and the common face is rotated. we thus have
 // to store the face rotation (and face flip) in each cell
 
-void create_two_cubes_rotation(Triangulation<3> & coarse_grid,
-                               const unsigned int n_rotations)
+void
+create_two_cubes_rotation(Triangulation<3> & coarse_grid,
+                          const unsigned int n_rotations)
 {
   Assert(n_rotations < 4, ExcNotImplemented());
 
@@ -112,7 +114,8 @@ void create_two_cubes_rotation(Triangulation<3> & coarse_grid,
 
 
 
-void create_L_shape(Triangulation<3> &coarse_grid)
+void
+create_L_shape(Triangulation<3> &coarse_grid)
 {
   std::vector<Point<3>>    vertices;
   std::vector<CellData<3>> cells;
@@ -163,7 +166,8 @@ void create_L_shape(Triangulation<3> &coarse_grid)
 }
 
 
-void coarsen_global(Triangulation<3> &grid)
+void
+coarsen_global(Triangulation<3> &grid)
 {
   for (Triangulation<3>::active_cell_iterator c = grid.begin_active();
        c != grid.end();

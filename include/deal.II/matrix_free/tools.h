@@ -761,7 +761,7 @@ namespace MatrixFreeTools
     const unsigned int first_selected_component)
   {
     std::unique_ptr<AffineConstraints<typename MatrixType::value_type>>
-                                                              constraints_for_matrix;
+      constraints_for_matrix;
     const AffineConstraints<typename MatrixType::value_type> &constraints =
       internal::create_new_affine_constraints_if_needed(matrix,
                                                         constraints_in,
@@ -879,15 +879,14 @@ namespace MatrixFreeTools
                    n_components,
                    Number,
                    VectorizedArrayType,
-                   MatrixType>(matrix_free,
-                               constraints,
-                               matrix,
-                               [&](auto &feeval) {
-                                 (owning_class->*cell_operation)(feeval);
-                               },
-                               dof_no,
-                               quad_no,
-                               first_selected_component);
+                   MatrixType>(
+      matrix_free,
+      constraints,
+      matrix,
+      [&](auto &feeval) { (owning_class->*cell_operation)(feeval); },
+      dof_no,
+      quad_no,
+      first_selected_component);
   }
 
 #endif // DOXYGEN

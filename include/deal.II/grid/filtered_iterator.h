@@ -1131,8 +1131,8 @@ inline FilteredIterator<BaseIterator>::PredicateTemplate<
 template <typename BaseIterator>
 template <typename Predicate>
 bool
-FilteredIterator<BaseIterator>::PredicateTemplate<Predicate>::
-operator()(const BaseIterator &bi) const
+FilteredIterator<BaseIterator>::PredicateTemplate<Predicate>::operator()(
+  const BaseIterator &bi) const
 {
   return predicate(bi);
 }

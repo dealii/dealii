@@ -73,7 +73,7 @@ public:
   template <class... Args>
   MGLevelObject(const unsigned int minlevel,
                 const unsigned int maxlevel,
-                Args &&... args);
+                Args &&...args);
 
   /**
    * Constructor. Same as above but without arguments to be forwarded to the
@@ -85,7 +85,8 @@ public:
   /**
    * Access object on level @p level.
    */
-  Object &operator[](const unsigned int level);
+  Object &
+  operator[](const unsigned int level);
 
   /**
    * Access object on level @p level.
@@ -93,7 +94,8 @@ public:
    * This function can be called on a @p const object, and
    * consequently returns a @p const reference.
    */
-  const Object &operator[](const unsigned int level) const;
+  const Object &
+  operator[](const unsigned int level) const;
 
   /**
    * Delete all previous contents of this object and reset its size according
@@ -112,7 +114,7 @@ public:
   void
   resize(const unsigned int new_minlevel,
          const unsigned int new_maxlevel,
-         Args &&... args);
+         Args &&...args);
 
   /**
    * Call <tt>operator = (s)</tt> on all objects stored by this object.
@@ -186,7 +188,7 @@ template <class Object>
 template <class... Args>
 MGLevelObject<Object>::MGLevelObject(const unsigned int min,
                                      const unsigned int max,
-                                     Args &&... args)
+                                     Args &&...args)
   : minlevel(0)
 {
   resize(min, max, std::forward<Args>(args)...);
@@ -203,7 +205,8 @@ MGLevelObject<Object>::MGLevelObject(const unsigned int min,
 
 
 template <class Object>
-Object &MGLevelObject<Object>::operator[](const unsigned int i)
+Object &
+MGLevelObject<Object>::operator[](const unsigned int i)
 {
   Assert((i >= minlevel) && (i < minlevel + objects.size()),
          ExcIndexRange(i, minlevel, minlevel + objects.size()));
@@ -212,7 +215,8 @@ Object &MGLevelObject<Object>::operator[](const unsigned int i)
 
 
 template <class Object>
-const Object &MGLevelObject<Object>::operator[](const unsigned int i) const
+const Object &
+MGLevelObject<Object>::operator[](const unsigned int i) const
 {
   Assert((i >= minlevel) && (i < minlevel + objects.size()),
          ExcIndexRange(i, minlevel, minlevel + objects.size()));
@@ -225,7 +229,7 @@ template <class... Args>
 void
 MGLevelObject<Object>::resize(const unsigned int new_minlevel,
                               const unsigned int new_maxlevel,
-                              Args &&... args)
+                              Args &&...args)
 {
   Assert(new_minlevel <= new_maxlevel, ExcInternalError());
   // note that on clear(), the

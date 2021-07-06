@@ -40,7 +40,8 @@
 #include "../grid/mesh_3d.h"
 
 
-void check_this(Triangulation<3> &tria)
+void
+check_this(Triangulation<3> &tria)
 {
   QTrapezoid<2>   quadrature;
   FE_Q<3>         fe(1);
@@ -100,7 +101,8 @@ void check_this(Triangulation<3> &tria)
 }
 
 
-void check(Triangulation<3> &tria)
+void
+check(Triangulation<3> &tria)
 {
   deallog << "Initial check" << std::endl;
   check_this(tria);

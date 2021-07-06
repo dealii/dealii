@@ -663,10 +663,12 @@ namespace CUDAWrappers
 
       if (local_line < 8)
         {
-          x =
-            (local_line % 4 == 0) ? 0 : (local_line % 4 == 1) ? fe_degree : dof;
-          y =
-            (local_line % 4 == 2) ? 0 : (local_line % 4 == 3) ? fe_degree : dof;
+          x = (local_line % 4 == 0) ? 0 :
+              (local_line % 4 == 1) ? fe_degree :
+                                      dof;
+          y = (local_line % 4 == 2) ? 0 :
+              (local_line % 4 == 3) ? fe_degree :
+                                      dof;
           z = (local_line / 4) * fe_degree;
         }
       else
@@ -854,40 +856,40 @@ namespace CUDAWrappers
 
         const unsigned int this_type =
           (direction == 0) ? internal::constr_type_x :
-                             (direction == 1) ? internal::constr_type_y :
-                                                internal::constr_type_z;
+          (direction == 1) ? internal::constr_type_y :
+                             internal::constr_type_z;
         const unsigned int face1_type =
           (direction == 0) ? internal::constr_type_y :
-                             (direction == 1) ? internal::constr_type_z :
-                                                internal::constr_type_x;
+          (direction == 1) ? internal::constr_type_z :
+                             internal::constr_type_x;
         const unsigned int face2_type =
           (direction == 0) ? internal::constr_type_z :
-                             (direction == 1) ? internal::constr_type_x :
-                                                internal::constr_type_y;
+          (direction == 1) ? internal::constr_type_x :
+                             internal::constr_type_y;
 
         // If computing in x-direction, need to match against constr_face_y or
         // constr_face_z
         const unsigned int face1 = (direction == 0) ? internal::constr_face_y :
-                                                      (direction == 1) ?
-                                                      internal::constr_face_z :
+                                   (direction == 1) ? internal::constr_face_z :
                                                       internal::constr_face_x;
         const unsigned int face2 = (direction == 0) ? internal::constr_face_z :
-                                                      (direction == 1) ?
-                                                      internal::constr_face_x :
+                                   (direction == 1) ? internal::constr_face_x :
                                                       internal::constr_face_y;
-        const unsigned int edge = (direction == 0) ? internal::constr_edge_yz :
-                                                     (direction == 1) ?
-                                                     internal::constr_edge_zx :
-                                                     internal::constr_edge_xy;
+        const unsigned int edge  = (direction == 0) ? internal::constr_edge_yz :
+                                   (direction == 1) ? internal::constr_edge_zx :
+                                                      internal::constr_edge_xy;
         const unsigned int constrained_face =
           constraint_mask & (face1 | face2 | edge);
 
-        const unsigned int interp_idx =
-          (direction == 0) ? x_idx : (direction == 1) ? y_idx : z_idx;
-        const unsigned int face1_idx =
-          (direction == 0) ? y_idx : (direction == 1) ? z_idx : x_idx;
-        const unsigned int face2_idx =
-          (direction == 0) ? z_idx : (direction == 1) ? x_idx : y_idx;
+        const unsigned int interp_idx = (direction == 0) ? x_idx :
+                                        (direction == 1) ? y_idx :
+                                                           z_idx;
+        const unsigned int face1_idx  = (direction == 0) ? y_idx :
+                                        (direction == 1) ? z_idx :
+                                                           x_idx;
+        const unsigned int face2_idx  = (direction == 0) ? z_idx :
+                                        (direction == 1) ? x_idx :
+                                                           y_idx;
 
         Number     t        = 0;
         const bool on_face1 = (constraint_mask & face1_type) ?
@@ -911,7 +913,7 @@ namespace CUDAWrappers
                     const unsigned int real_idx =
                       (direction == 0) ?
                         index3<fe_degree + 1>(i, y_idx, z_idx) :
-                        (direction == 1) ?
+                      (direction == 1) ?
                         index3<fe_degree + 1>(x_idx, i, z_idx) :
                         index3<fe_degree + 1>(x_idx, y_idx, i);
 
@@ -932,7 +934,7 @@ namespace CUDAWrappers
                     const unsigned int real_idx =
                       (direction == 0) ?
                         index3<fe_degree + 1>(i, y_idx, z_idx) :
-                        (direction == 1) ?
+                      (direction == 1) ?
                         index3<fe_degree + 1>(x_idx, i, z_idx) :
                         index3<fe_degree + 1>(x_idx, y_idx, i);
 

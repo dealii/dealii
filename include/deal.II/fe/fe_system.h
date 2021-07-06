@@ -549,7 +549,7 @@ public:
                               unsigned int>>::value ||
        std::is_base_of<FiniteElement<dim, spacedim>,
                        typename std::decay<FEPairs>::type>::value)...>::type>
-  FESystem(FEPairs &&... fe_pairs);
+  FESystem(FEPairs &&...fe_pairs);
 
   /**
    * Same as above allowing the following syntax:
@@ -1358,7 +1358,7 @@ namespace internal
 // of the std::enable_if.
 template <int dim, int spacedim>
 template <class... FEPairs, typename>
-FESystem<dim, spacedim>::FESystem(FEPairs &&... fe_pairs)
+FESystem<dim, spacedim>::FESystem(FEPairs &&...fe_pairs)
   : FESystem<dim, spacedim>(
       {internal::FESystemImplementation::promote_to_fe_pair<dim, spacedim>(
         std::forward<FEPairs>(fe_pairs))...})

@@ -396,9 +396,9 @@ KellyErrorEstimator<1, spacedim>::estimate(
   std::vector<std::vector<std::vector<Tensor<1, spacedim, number>>>>
     gradients_neighbor(gradients_here);
   std::vector<Vector<typename ProductType<number, double>::type>>
-  grad_dot_n_neighbor(n_solution_vectors,
-                      Vector<typename ProductType<number, double>::type>(
-                        n_components));
+    grad_dot_n_neighbor(n_solution_vectors,
+                        Vector<typename ProductType<number, double>::type>(
+                          n_components));
 
   // reserve some space for coefficient values at one point.  if there is no
   // coefficient, then we fill it by unity once and for all and don't set it

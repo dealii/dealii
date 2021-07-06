@@ -899,7 +899,7 @@ namespace Step31
       const LinearSolvers::BlockSchurPreconditioner<
         TrilinosWrappers::PreconditionAMG,
         TrilinosWrappers::PreconditionIC>
-                    preconditioner(stokes_matrix, mp_inverse, *Amg_preconditioner);
+        preconditioner(stokes_matrix, mp_inverse, *Amg_preconditioner);
       SolverControl solver_control(stokes_matrix.m(),
                                    1e-6 * stokes_rhs.l2_norm());
       SolverGMRES<TrilinosWrappers::MPI::BlockVector> gmres(

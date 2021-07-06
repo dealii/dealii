@@ -141,8 +141,9 @@ VectorFunction<dim>::vector_value(const Point<dim> &p,
     values(i) = value(p, i);
 }
 
-void create_tria(Triangulation<2> &triangulation,
-                 const Point<2> *  vertices_parallelograms)
+void
+create_tria(Triangulation<2> &triangulation,
+            const Point<2> *  vertices_parallelograms)
 {
   const std::vector<Point<2>> vertices(&vertices_parallelograms[0],
                                        &vertices_parallelograms[n_vertices]);

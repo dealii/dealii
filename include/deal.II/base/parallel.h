@@ -456,13 +456,13 @@ namespace parallel
 
     f(begin, end);
 #else
-    internal::parallel_for(begin,
-                           end,
-                           [&f](const tbb::blocked_range<RangeType> &range) {
-                             internal::apply_to_subranges<RangeType, Function>(
-                               range, f);
-                           },
-                           grainsize);
+    internal::parallel_for(
+      begin,
+      end,
+      [&f](const tbb::blocked_range<RangeType> &range) {
+        internal::apply_to_subranges<RangeType, Function>(range, f);
+      },
+      grainsize);
 #endif
   }
 

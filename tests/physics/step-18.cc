@@ -406,7 +406,7 @@ namespace Step18
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
     BodyForce<dim>                       body_force;
     std::vector<Vector<double>>          body_force_values(n_q_points,
-                                                           Vector<double>(dim));
+                                                  Vector<double>(dim));
     typename DoFHandler<dim>::active_cell_iterator cell =
                                                      dof_handler.begin_active(),
                                                    endc = dof_handler.end();

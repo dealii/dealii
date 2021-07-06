@@ -30,7 +30,8 @@
 
 
 
-void check(Triangulation<2> &tria)
+void
+check(Triangulation<2> &tria)
 {
   for (unsigned i = 0; i < tria.n_vertices(); i++)
     {

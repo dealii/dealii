@@ -45,7 +45,8 @@
 
 using namespace dealii;
 
-void make_grid(Triangulation<2> &triangulation)
+void
+make_grid(Triangulation<2> &triangulation)
 {
   Triangulation<2> triangulation_temp;
 
@@ -60,7 +61,8 @@ void make_grid(Triangulation<2> &triangulation)
   triangulation.refine_global(); // WARNING: no local refinement is performed
 }
 
-void distribute_dofs(DoFHandler<2> &dof_handler)
+void
+distribute_dofs(DoFHandler<2> &dof_handler)
 {
   const FE_SimplexP<2> finite_element(1);
   dof_handler.distribute_dofs(finite_element);
@@ -76,7 +78,8 @@ void distribute_dofs(DoFHandler<2> &dof_handler)
   sparsity_pattern.print_svg(deallog.get_file_stream());
 }
 
-void renumber_dofs(DoFHandler<2> &dof_handler)
+void
+renumber_dofs(DoFHandler<2> &dof_handler)
 {
   DoFRenumbering::Cuthill_McKee(dof_handler);
 

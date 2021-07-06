@@ -32,7 +32,8 @@ namespace Threads
   namespace internal
   {
     [[noreturn]] void
-    handle_std_exception(const std::exception &exc) {
+    handle_std_exception(const std::exception &exc)
+    {
       // lock the following context
       // to ensure that we don't
       // print things over each other
@@ -70,7 +71,8 @@ namespace Threads
 
 
 
-      [[noreturn]] void handle_unknown_exception()
+    [[noreturn]] void
+    handle_unknown_exception()
     {
       // lock the following context
       // to ensure that we don't

@@ -154,7 +154,8 @@ do_boundary(Triangulation<dim, spacedim> &t1)
 
 
 template <int spacedim>
-void do_boundary(Triangulation<1, spacedim> &)
+void
+do_boundary(Triangulation<1, spacedim> &)
 {}
 
 

@@ -56,7 +56,8 @@ const double Y_C = 0.2; // center
 const unsigned int MANIFOLD_ID = 1;
 
 
-void create_triangulation(Triangulation<2> &tria)
+void
+create_triangulation(Triangulation<2> &tria)
 {
   AssertThrow(std::abs((X_2 - X_1) - 2.0 * (X_C - X_1)) < 1.0e-12,
               ExcMessage("Geometry parameters X_1,X_2,X_C invalid!"));
@@ -165,7 +166,8 @@ void create_triangulation(Triangulation<2> &tria)
     }
 }
 
-void create_triangulation(Triangulation<3> &tria)
+void
+create_triangulation(Triangulation<3> &tria)
 {
   Triangulation<2> tria_2d;
   create_triangulation(tria_2d);

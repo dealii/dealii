@@ -177,19 +177,21 @@ plot_subfaces(Mapping<dim> &                           mapping,
 
 
 template <>
-inline void plot_faces(Mapping<1> &,
-                       FiniteElement<1> &,
-                       DoFHandler<1>::cell_iterator &,
-                       const std::string &)
+inline void
+plot_faces(Mapping<1> &,
+           FiniteElement<1> &,
+           DoFHandler<1>::cell_iterator &,
+           const std::string &)
 {}
 
 
 
 template <>
-inline void plot_subfaces(Mapping<1> &,
-                          FiniteElement<1> &,
-                          DoFHandler<1>::cell_iterator &,
-                          const std::string &)
+inline void
+plot_subfaces(Mapping<1> &,
+              FiniteElement<1> &,
+              DoFHandler<1>::cell_iterator &,
+              const std::string &)
 {}
 
 
@@ -228,9 +230,10 @@ unsigned int                           mapping_size;
 
 
 template <>
-void create_triangulations(std::vector<Triangulation<1> *> &tria_ptr,
-                           std::vector<Manifold<1> *> &,
-                           std::vector<double> &exact_areas)
+void
+create_triangulations(std::vector<Triangulation<1> *> &tria_ptr,
+                      std::vector<Manifold<1> *> &,
+                      std::vector<double> &exact_areas)
 {
   show.resize(1, std::vector<unsigned int>(mapping_size, 0));
   Triangulation<1> *tria = new Triangulation<1>();
@@ -245,9 +248,10 @@ void create_triangulations(std::vector<Triangulation<1> *> &tria_ptr,
 
 
 template <>
-void create_triangulations(std::vector<Triangulation<2> *> &tria_ptr,
-                           std::vector<Manifold<2> *> &     boundary_ptr,
-                           std::vector<double> &            exact_areas)
+void
+create_triangulations(std::vector<Triangulation<2> *> &tria_ptr,
+                      std::vector<Manifold<2> *> &     boundary_ptr,
+                      std::vector<double> &            exact_areas)
 {
   Triangulation<2> *tria;
   show.clear();
@@ -358,9 +362,10 @@ void create_triangulations(std::vector<Triangulation<2> *> &tria_ptr,
 
 
 template <>
-void create_triangulations(std::vector<Triangulation<3> *> &tria_ptr,
-                           std::vector<Manifold<3> *> &     boundary_ptr,
-                           std::vector<double> &            exact_areas)
+void
+create_triangulations(std::vector<Triangulation<3> *> &tria_ptr,
+                      std::vector<Manifold<3> *> &     boundary_ptr,
+                      std::vector<double> &            exact_areas)
 {
   Triangulation<3> *tria;
   show.clear();

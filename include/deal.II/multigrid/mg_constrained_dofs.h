@@ -247,7 +247,7 @@ MGConstrainedDoFs::initialize(
   const unsigned int max_level = (level_relevant_dofs.max_level() == 0) ?
                                    nlevels - 1 :
                                    level_relevant_dofs.max_level();
-  const bool user_level_dofs =
+  const bool         user_level_dofs =
     (level_relevant_dofs.max_level() == 0) ? false : true;
 
   // At this point level_constraint and refinement_edge_indices are empty.

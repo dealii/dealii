@@ -407,8 +407,7 @@ namespace Step50
                          local_dof_indices[j]) // ( boundary(i) && boundary(j)
                                                // && i==j )
                    ))
-                {
-                }
+                {}
               else
                 {
                   cell_matrix(i, j) = 0;

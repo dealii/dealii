@@ -54,7 +54,8 @@ public:
 
 
 
-void generate_grid(Triangulation<3> &triangulation, int orientation)
+void
+generate_grid(Triangulation<3> &triangulation, int orientation)
 {
   Point<3>              vertices_1[] = {Point<3>(-0., -0., -0.),
                            Point<3>(+1., -0., -0.),

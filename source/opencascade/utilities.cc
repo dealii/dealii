@@ -90,14 +90,11 @@ namespace OpenCASCADE
     TopExp_Explorer exp;
     unsigned int    n_faces = 0, n_edges = 0, n_vertices = 0;
     for (exp.Init(shape, TopAbs_FACE); exp.More(); exp.Next(), ++n_faces)
-      {
-      }
+      {}
     for (exp.Init(shape, TopAbs_EDGE); exp.More(); exp.Next(), ++n_edges)
-      {
-      }
+      {}
     for (exp.Init(shape, TopAbs_VERTEX); exp.More(); exp.Next(), ++n_vertices)
-      {
-      }
+      {}
     return std::tuple<unsigned int, unsigned int, unsigned int>(n_faces,
                                                                 n_edges,
                                                                 n_vertices);

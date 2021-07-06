@@ -24,7 +24,8 @@
 
 
 
-void setup_tria(Triangulation<1> &tria)
+void
+setup_tria(Triangulation<1> &tria)
 {
   GridGenerator::subdivided_hyper_rectangle(
     tria, std::vector<unsigned int>(5u, 1), Point<1>(), Point<1>(1.5), true);
