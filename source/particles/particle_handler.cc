@@ -919,11 +919,23 @@ namespace Particles
   IndexSet
   ParticleHandler<dim, spacedim>::locally_owned_particle_ids() const
   {
-    IndexSet set(get_next_free_particle_index());
+    IndexSet                           set(get_next_free_particle_index());
+    std::vector<types::particle_index> indices;
+    indices.reserve(n_locally_owned_particles());
     for (const auto &p : *this)
-      set.add_index(p.get_id());
+      indices.push_back(p.get_id());
+    set.add_indices(indices.begin(), indices.end());
     set.compress();
     return set;
+  }
+
+
+
+  template <int dim, int spacedim>
+  types::particle_index
+  ParticleHandler<dim, spacedim>::get_max_local_particle_index() const
+  {
+    return property_pool->n_slots();
   }
 
 

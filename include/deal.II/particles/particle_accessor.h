@@ -131,6 +131,27 @@ namespace Particles
     get_id() const;
 
     /**
+     * Return a particle ID number local to each MPI process. This number
+     * enables the direct array access (similar to
+     * LinearAlgebra::distributed::Vector::local_element()) to quantities used
+     * for local computations. Use
+     * ParticleHandler::get_max_local_particle_index() to query suitable array
+     * sizes.
+     *
+     * @note The number returned by this function is not stable between calls
+     * of ParticleHandler::sort_particles_into_subdomains_and_cells() and
+     * therefore it cannot be used to track quantities across those
+     * calls. Furthermore, the numbers returned by this function are typically
+     * not refreshed in case individual particles are removed from the
+     * underlying ParticleHandler object, which means that the returned
+     * indices of all particles on an MPI process typically do not form a
+     * contiguous interval of numbers. Use particle properties for storing
+     * persistent information and checkpointing the actual data.
+     */
+    types::particle_index
+    get_local_index() const;
+
+    /**
      * Return whether this particle has a valid property pool and a valid
      * handle to properties.
      */
@@ -575,6 +596,17 @@ namespace Particles
     Assert(state() == IteratorState::valid, ExcInternalError());
 
     return property_pool->get_id(get_handle());
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline types::particle_index
+  ParticleAccessor<dim, spacedim>::get_local_index() const
+  {
+    Assert(state() == IteratorState::valid, ExcInternalError());
+
+    return get_handle();
   }
 
 
