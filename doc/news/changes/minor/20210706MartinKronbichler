@@ -1,0 +1,5 @@
+New: ParticleAccessor::get_local_index() is a new function returning particle
+indices local to each MPI process, which is useful for direct access into
+arrays with temporary results associated to particles.
+<br>
+(Martin Kronbichler, 2021/07/06)
