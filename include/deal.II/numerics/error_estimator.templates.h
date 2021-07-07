@@ -514,7 +514,7 @@ namespace internal
         default:
           {
             Assert(false, ExcNotImplemented());
-            return -std::numeric_limits<double>::max();
+            return std::numeric_limits<double>::lowest();
           }
       }
   }
@@ -558,7 +558,7 @@ namespace internal
         default:
           {
             Assert(false, ExcNotImplemented());
-            return -std::numeric_limits<double>::max();
+            return std::numeric_limits<double>::lowest();
           }
       }
   }
@@ -604,7 +604,7 @@ namespace internal
         default:
           {
             Assert(false, ExcNotImplemented());
-            return -std::numeric_limits<double>::max();
+            return std::numeric_limits<double>::lowest();
           }
       }
   }
@@ -639,7 +639,7 @@ namespace internal
         default:
           {
             Assert(false, ExcNotImplemented());
-            return -std::numeric_limits<double>::max();
+            return std::numeric_limits<double>::lowest();
           }
       }
   }

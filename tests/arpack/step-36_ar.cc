@@ -198,7 +198,7 @@ namespace Step36
 
 
     double min_spurious_eigenvalue = std::numeric_limits<double>::max(),
-           max_spurious_eigenvalue = -std::numeric_limits<double>::max();
+           max_spurious_eigenvalue = std::numeric_limits<double>::lowest();
 
     for (unsigned int i = 0; i < dof_handler.n_dofs(); ++i)
       if (constraints.is_constrained(i))

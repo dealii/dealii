@@ -359,7 +359,7 @@ namespace Step31
     if (timestep_number != 0)
       {
         double min_temperature = std::numeric_limits<double>::max(),
-               max_temperature = -std::numeric_limits<double>::max();
+               max_temperature = std::numeric_limits<double>::lowest();
         for (const auto &cell : temperature_dof_handler.active_cell_iterators())
           {
             fe_values.reinit(cell);
@@ -381,7 +381,7 @@ namespace Step31
     else
       {
         double min_temperature = std::numeric_limits<double>::max(),
-               max_temperature = -std::numeric_limits<double>::max();
+               max_temperature = std::numeric_limits<double>::lowest();
         for (const auto &cell : temperature_dof_handler.active_cell_iterators())
           {
             fe_values.reinit(cell);

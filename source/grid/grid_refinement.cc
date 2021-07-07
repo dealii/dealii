@@ -354,7 +354,7 @@ GridRefinement::refine_and_coarsen_fixed_number(
       if (refine_cells)
         {
           if (static_cast<size_t>(refine_cells) == criteria.size())
-            refine(tria, criteria, -std::numeric_limits<double>::max());
+            refine(tria, criteria, std::numeric_limits<double>::lowest());
           else
             {
               std::nth_element(tmp.begin(),

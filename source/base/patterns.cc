@@ -344,7 +344,7 @@ namespace Patterns
 
 
 
-  const double Double::min_double_value = -std::numeric_limits<double>::max();
+  const double Double::min_double_value = std::numeric_limits<double>::lowest();
   const double Double::max_double_value = std::numeric_limits<double>::max();
 
   const char *Double::description_init = "[Double";
