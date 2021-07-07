@@ -96,7 +96,7 @@ main()
   GridGenerator::extract_boundary_mesh(volume_mesh, tria, boundary_ids);
 
   // test for the position
-  MappingQ<2, 3> mapping(mapping_degree, true);
+  MappingQ<2, 3> mapping(mapping_degree);
 
   FESystem<2, 3>   fe_test(FE_Q<2, 3>(fe_degree), 3);
   DoFHandler<2, 3> dh_test(tria);

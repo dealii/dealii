@@ -193,7 +193,7 @@ test(const FiniteElement<dim> &fe)
 
   for (unsigned mapping_p = 1; mapping_p <= 5; ++mapping_p)
     {
-      MappingQ<dim> mapping(mapping_p, true);
+      MappingQ<dim> mapping(mapping_p);
 
       AffineConstraints<double> constraints;
       DoFTools::make_hanging_node_constraints(dof_handler, constraints);

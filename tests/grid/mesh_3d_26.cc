@@ -76,7 +76,7 @@ test(Triangulation<dim> &triangulation)
 {
   // create a MappingQ(3) which is used on ALL
   // cells
-  MappingQ<3> mapping(3, true);
+  MappingQ<3> mapping(3);
   for (unsigned int p = 1; p < 7 - dim; ++p)
     {
       FE_Q<dim>       fe(p);

@@ -57,7 +57,7 @@ main()
       Triangulation<2> triangulation;
       GridGenerator::hyper_ball(triangulation, Point<2>(0.0, 0.0), 1.0);
 
-      const MappingQ<2> mapping(degree, true);
+      const MappingQ<2> mapping(degree);
       const FE_Q<2>     dummy_fe(1);
       DoFHandler<2>     dof_handler(triangulation);
 

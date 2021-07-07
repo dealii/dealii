@@ -213,7 +213,7 @@ test(const FiniteElement<dim> &fe)
       std::vector<double> log_refinements;
       std::vector<double> log_l2_errors;
 
-      MappingQ<dim> mapping(mapping_p, true);
+      MappingQ<dim> mapping(mapping_p);
       for (unsigned int refinement_n = 1; refinement_n < 4; ++refinement_n)
         {
           triangulation.refine_global(1);

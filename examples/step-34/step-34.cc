@@ -229,7 +229,7 @@ namespace Step34
     // examples.
     //
     // The class is constructed in a way to allow for arbitrary order of
-    // approximation of both the domain (through high order mapping) and the
+    // approximation of both the domain (through high order mappings) and the
     // finite element space. The order of the finite element space and of the
     // mapping can be selected in the constructor of the class.
 
@@ -315,7 +315,7 @@ namespace Step34
                               const unsigned int mapping_degree)
     : fe(fe_degree)
     , dof_handler(tria)
-    , mapping(mapping_degree, true)
+    , mapping(mapping_degree)
     , wind(dim)
     , singular_quadrature_order(5)
     , n_cycles(4)

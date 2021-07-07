@@ -51,7 +51,7 @@ main()
       Triangulation<3> triangulation;
       GridGenerator::cylinder(triangulation);
 
-      const MappingQ<3> mapping(degree, true);
+      const MappingQ<3> mapping(degree);
       const FE_Q<3>     dummy_fe(1);
       DoFHandler<3>     dof_handler(triangulation);
 
