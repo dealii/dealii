@@ -62,9 +62,11 @@ test(const unsigned int max_difference, const bool allow_artificial_cells)
   // after prepare_coarsening_and_refinement(), the p-levels should propagate
   // through the central cells as if they were already coarsened
 
-  parallel::shared::Triangulation<dim> tria(MPI_COMM_WORLD,
-                                            Triangulation<dim>::none,
-                                            allow_artificial_cells);
+  parallel::shared::Triangulation<dim> tria(
+    MPI_COMM_WORLD,
+    Triangulation<dim>::none,
+    allow_artificial_cells,
+    parallel::shared::Triangulation<dim>::Settings::partition_zoltan);
   TestGrids::hyper_line(tria, 3);
 
   // refine the central cell
