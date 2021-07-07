@@ -39,6 +39,8 @@ BoundingBox<spacedim, Number>::point_inside(const Point<spacedim, Number> &p,
   return true;
 }
 
+
+
 template <int spacedim, typename Number>
 void
 BoundingBox<spacedim, Number>::merge_with(
@@ -54,6 +56,8 @@ BoundingBox<spacedim, Number>::merge_with(
                  other_bbox.boundary_points.second[i]);
     }
 }
+
+
 
 template <int spacedim, typename Number>
 NeighborType
