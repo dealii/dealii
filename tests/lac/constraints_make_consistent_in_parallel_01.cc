@@ -104,7 +104,7 @@ main(int argc, char **argv)
   parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
   GridGenerator::subdivided_hyper_cube(tria, 2);
 
-  DoFHandler dof_handler(tria);
+  DoFHandler<dim> dof_handler(tria);
   dof_handler.distribute_dofs(FE_Q<dim>(1));
 
   for (const auto &cell : tria.active_cell_iterators())
