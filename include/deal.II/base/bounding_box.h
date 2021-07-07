@@ -66,14 +66,14 @@ enum class NeighborType
 /**
  * A class that represents a box of arbitrary dimension <tt>spacedim</tt> and
  * with sides parallel to the coordinate axes, that is, a region
- *
  * @f[
  * [x_0^L, x_0^U] \times ... \times [x_{spacedim-1}^L, x_{spacedim-1}^U],
  * @f]
- *
- * where $(x_0^L , ..., x_{spacedim-1}^L) and $(x_0^U , ..., x_{spacedim-1}^U)
+ * where $(x_0^L , ..., x_{spacedim-1}^L)$ and $(x_0^U , ..., x_{spacedim-1}^U)$
  * denote the two vertices (bottom left and top right) which are used to
- * represent the box.
+ * represent the box. The quantities $x_k^L$ and $x_k^U$ denote the "lower"
+ * and "upper" bounds of values that are within the box for each coordinate
+ * direction $k$.
  *
  * Geometrically, a bounding box is thus:
  * - 1D: a segment (represented by its vertices in the proper order)
@@ -96,7 +96,17 @@ enum class NeighborType
  * @endcode
  *
  * Bounding boxes are, for example, useful in parallel distributed meshes to
- * give a general description of the owners of each portion of the mesh.
+ * give a general description of the owners of each portion of the mesh. More
+ * generally, bounding boxes are often used to roughly describe a region of
+ * space in which an object is contained; if a candidate point is not within
+ * the bounding box (a test that is cheap to execute), then it is not necessary
+ * to perform an expensive test whether the candidate point is in fact inside
+ * the object itself. Bounding boxes are therefore often used as a first,
+ * cheap rejection test before more detailed checks. As such, bounding boxes
+ * serve many of the same purposes as the
+ * [convex hull](https://en.wikipedia.org/wiki/Convex_hull), for which it is
+ * also relatively straightforward to compute whether a point is inside or
+ * outside, though not quite as cheap as for the bounding box.
  *
  * Taking the cross section of a BoundingBox<spacedim> orthogonal to a given
  * direction gives a box in one dimension lower: BoundingBox<spacedim - 1>.
