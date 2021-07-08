@@ -218,7 +218,7 @@ public:
    * an assertion.
    */
   void
-  extend(const Number &amount);
+  extend(const Number amount);
 
   /**
    * Compute the volume (i.e. the dim-dimensional measure) of the BoundingBox.
@@ -487,7 +487,7 @@ operator!=(const BoundingBox<spacedim, Number> &box) const
 
 template <int spacedim, typename Number>
 inline void
-BoundingBox<spacedim, Number>::extend(const Number &amount)
+BoundingBox<spacedim, Number>::extend(const Number amount)
 {
   for (unsigned int d = 0; d < spacedim; ++d)
     {
