@@ -1901,13 +1901,17 @@ namespace Euler_DG
 #ifdef DEAL_II_WITH_P4EST
 #  ifdef HEX
     parallel::distributed::Triangulation<dim> triangulation;
-    MappingQGeneric<dim>                      mapping;
 #  else
     parallel::fullydistributed::Triangulation<dim> triangulation;
-    MappingFE<dim>                                 mapping;
 #  endif
 #else
     Triangulation<dim>                                  triangulation;
+#endif
+
+#ifdef HEX
+    MappingQGeneric<dim> mapping;
+#else
+    MappingFE<dim>                                      mapping;
 #endif
 
     FESystem<dim>   fe;

@@ -340,7 +340,10 @@ test()
   const unsigned int n_refinements  = 5;
 
   parallel::shared::Triangulation<dim, spacedim> tria(
-    MPI_COMM_WORLD, Triangulation<dim, spacedim>::none, true);
+    MPI_COMM_WORLD,
+    Triangulation<dim, spacedim>::none,
+    true,
+    parallel::shared::Triangulation<dim, spacedim>::Settings::partition_zoltan);
 #if false
   GridGenerator::hyper_sphere(tria, Point<spacedim>(), 0.5);
 #else
@@ -377,7 +380,10 @@ test()
   const unsigned int background_fe_degree = 2;
 
   parallel::shared::Triangulation<spacedim> background_tria(
-    MPI_COMM_WORLD, Triangulation<spacedim>::none, true);
+    MPI_COMM_WORLD,
+    Triangulation<spacedim>::none,
+    true,
+    parallel::shared::Triangulation<spacedim>::Settings::partition_zoltan);
 #if false
   GridGenerator::hyper_cube(background_tria, -1.0, +1.0);
 #else
