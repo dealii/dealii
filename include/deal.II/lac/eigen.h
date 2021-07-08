@@ -321,7 +321,7 @@ EigenInverse<VectorType>::solve(double &          value,
   x *= 1. / length;
 
   // Main loop
-  double    res  = -std::numeric_limits<double>::max();
+  double    res  = std::numeric_limits<double>::lowest();
   size_type iter = 0;
   for (; conv == SolverControl::iterate; iter++)
     {

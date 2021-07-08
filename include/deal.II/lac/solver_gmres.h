@@ -825,7 +825,7 @@ SolverGMRES<VectorType>::solve(const MatrixType &        A,
   unsigned int dim = 0;
 
   SolverControl::State iteration_state = SolverControl::iterate;
-  double               last_res        = -std::numeric_limits<double>::max();
+  double               last_res        = std::numeric_limits<double>::lowest();
 
   // switch to determine whether we want a left or a right preconditioner. at
   // present, left is default, but both ways are implemented
@@ -1216,7 +1216,7 @@ SolverFGMRES<VectorType>::solve(const MatrixType &        A,
   Vector<double> y;
 
   // Iteration starts here
-  double res = -std::numeric_limits<double>::max();
+  double res = std::numeric_limits<double>::lowest();
 
   typename VectorMemory<VectorType>::Pointer aux(this->memory);
   aux->reinit(x);

@@ -197,7 +197,7 @@ SolverRichardson<VectorType>::solve(const MatrixType &        A,
 {
   SolverControl::State conv = SolverControl::iterate;
 
-  double last_criterion = -std::numeric_limits<double>::max();
+  double last_criterion = std::numeric_limits<double>::lowest();
 
   unsigned int iter = 0;
 
@@ -253,7 +253,7 @@ SolverRichardson<VectorType>::Tsolve(const MatrixType &        A,
                                      const PreconditionerType &preconditioner)
 {
   SolverControl::State conv           = SolverControl::iterate;
-  double               last_criterion = -std::numeric_limits<double>::max();
+  double               last_criterion = std::numeric_limits<double>::lowest();
 
   unsigned int iter = 0;
 

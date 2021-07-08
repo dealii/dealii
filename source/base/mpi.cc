@@ -576,7 +576,7 @@ namespace Utilities
       // result with a default value already...
       MinMaxAvg dummy = {0.,
                          std::numeric_limits<double>::max(),
-                         -std::numeric_limits<double>::max(),
+                         std::numeric_limits<double>::lowest(),
                          0,
                          0,
                          0.};
