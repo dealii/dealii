@@ -5466,7 +5466,7 @@ namespace DataOutBase
     // quote characters as this would make the VTU file invalid XML and
     // probably lead to all sorts of difficult error messages. Other than that,
     // trust the user that whatever they provide makes sense somehow.
-    for (const auto unit : flags.physical_units)
+    for (const auto &unit : flags.physical_units)
       Assert(
         unit.second.find('\"') == std::string::npos,
         ExcMessage(
@@ -5906,7 +5906,7 @@ namespace DataOutBase
     // quote characters as this would make the VTU file invalid XML and
     // probably lead to all sorts of difficult error messages. Other than that,
     // trust the user that whatever they provide makes sense somehow.
-    for (const auto unit : flags.physical_units)
+    for (const auto &unit : flags.physical_units)
       Assert(
         unit.second.find('\"') == std::string::npos,
         ExcMessage(
@@ -5966,7 +5966,7 @@ namespace DataOutBase
         // underscores unless a vector name has been specified
         out << "    <PDataArray type=\"Float32\" Name=\"";
 
-        const std::string name = std::get<2>(nonscalar_data_range);
+        const std::string &name = std::get<2>(nonscalar_data_range);
         if (!name.empty())
           out << name;
         else
