@@ -2579,12 +2579,14 @@ namespace DataOutBase
                      const unsigned int                   cycle,
                      const bool                           print_date_and_time,
                      const VtkFlags::ZlibCompressionLevel compression_level,
-                     const bool write_higher_order_cells)
+                     const bool write_higher_order_cells,
+                     const std::map<std::string, std::string> &physical_units)
     : time(time)
     , cycle(cycle)
     , print_date_and_time(print_date_and_time)
     , compression_level(compression_level)
     , write_higher_order_cells(write_higher_order_cells)
+    , physical_units(physical_units)
   {}
 
 
@@ -5735,7 +5737,24 @@ namespace DataOutBase
           }
 
         out << "\" NumberOfComponents=\"" << n_components << "\" format=\""
-            << ascii_or_binary << "\">\n";
+            << ascii_or_binary << "\"";
+        // If present, also list the physical units for this quantity. Look this
+        // up for either the name of the whole vector/tensor, or if that isn't
+        // listed, via its first component.
+        if (!name.empty())
+          {
+            if (flags.physical_units.find(name) != flags.physical_units.end())
+              out << " units=\"" << flags.physical_units.at(name) << "\"";
+          }
+        else
+          {
+            if (flags.physical_units.find(data_names[first_component]) !=
+                flags.physical_units.end())
+              out << " units=\""
+                  << flags.physical_units.at(data_names[first_component])
+                  << "\"";
+          }
+        out << ">\n";
 
         // now write data. pad all vectors to have three components
         std::vector<float> data;
@@ -5828,7 +5847,14 @@ namespace DataOutBase
         {
           out << "    <DataArray type=\"Float32\" Name=\""
               << data_names[data_set] << "\" format=\"" << ascii_or_binary
-              << "\">\n";
+              << "\"";
+          // If present, also list the physical units for this quantity.
+          if (flags.physical_units.find(data_names[data_set]) !=
+              flags.physical_units.end())
+            out << " units=\"" << flags.physical_units.at(data_names[data_set])
+                << "\"";
+
+          out << ">\n";
 
           std::vector<float> data(data_vectors[data_set].begin(),
                                   data_vectors[data_set].end());
@@ -5860,7 +5886,8 @@ namespace DataOutBase
                  unsigned int,
                  std::string,
                  DataComponentInterpretation::DataComponentInterpretation>>
-      &nonscalar_data_ranges)
+      &             nonscalar_data_ranges,
+    const VtkFlags &flags)
   {
     AssertThrow(out, ExcIO());
 
@@ -5917,8 +5944,9 @@ namespace DataOutBase
         // underscores unless a vector name has been specified
         out << "    <PDataArray type=\"Float32\" Name=\"";
 
-        if (!std::get<2>(nonscalar_data_range).empty())
-          out << std::get<2>(nonscalar_data_range);
+        const std::string name = std::get<2>(nonscalar_data_range);
+        if (!name.empty())
+          out << name;
         else
           {
             for (unsigned int i = std::get<0>(nonscalar_data_range);
@@ -5929,14 +5957,42 @@ namespace DataOutBase
           }
 
         out << "\" NumberOfComponents=\"" << n_components
-            << "\" format=\"ascii\"/>\n";
+            << "\" format=\"ascii\"";
+        // If present, also list the physical units for this quantity. Look this
+        // up for either the name of the whole vector/tensor, or if that isn't
+        // listed, via its first component.
+        if (!name.empty())
+          {
+            if (flags.physical_units.find(name) != flags.physical_units.end())
+              out << " units=\"" << flags.physical_units.at(name) << "\"";
+          }
+        else
+          {
+            if (flags.physical_units.find(
+                  data_names[std::get<1>(nonscalar_data_range)]) !=
+                flags.physical_units.end())
+              out << " units=\""
+                  << flags.physical_units.at(
+                       data_names[std::get<1>(nonscalar_data_range)])
+                  << "\"";
+          }
+
+        out << "/>\n";
       }
 
+    // Now for the scalar fields
     for (unsigned int data_set = 0; data_set < n_data_sets; ++data_set)
       if (data_set_written[data_set] == false)
         {
           out << "    <PDataArray type=\"Float32\" Name=\""
-              << data_names[data_set] << "\" format=\"ascii\"/>\n";
+              << data_names[data_set] << "\" format=\"ascii\"";
+
+          if (flags.physical_units.find(data_names[data_set]) !=
+              flags.physical_units.end())
+            out << " units=\"" << flags.physical_units.at(data_names[data_set])
+                << "\"";
+
+          out << "/>\n";
         }
 
     out << "    </PPointData>\n";
@@ -7352,6 +7408,7 @@ DataOutInterface<dim, spacedim>::write_vtu_in_parallel(
 }
 
 
+
 template <int dim, int spacedim>
 void
 DataOutInterface<dim, spacedim>::write_pvtu_record(
@@ -7361,8 +7418,10 @@ DataOutInterface<dim, spacedim>::write_pvtu_record(
   DataOutBase::write_pvtu_record(out,
                                  piece_names,
                                  get_dataset_names(),
-                                 get_nonscalar_data_ranges());
+                                 get_nonscalar_data_ranges(),
+                                 vtk_flags);
 }
+
 
 
 template <int dim, int spacedim>
