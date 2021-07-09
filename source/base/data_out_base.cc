@@ -5462,6 +5462,17 @@ namespace DataOutBase
   {
     AssertThrow(out, ExcIO());
 
+    // If the user provided physical units, make sure that they don't contain
+    // quote characters as this would make the VTU file invalid XML and
+    // probably lead to all sorts of difficult error messages. Other than that,
+    // trust the user that whatever they provide makes sense somehow.
+    for (const auto unit : flags.physical_units)
+      Assert(
+        unit.second.find('\"') == std::string::npos,
+        ExcMessage(
+          "A physical unit you provided, <" + unit.second +
+          ">, contained a quotation mark character. This is not allowed."));
+
 #ifndef DEAL_II_WITH_MPI
     // verify that there are indeed patches to be written out. most of the
     // times, people just forget to call build_patches when there are no
@@ -5709,14 +5720,14 @@ namespace DataOutBase
             AssertThrow((last_component + 1 - first_component <= 9),
                         ExcMessage(
                           "Can't declare a tensor with more than 9 components "
-                          "in VTK"));
+                          "in VTK/VTU format."));
           }
         else
           {
             AssertThrow((last_component + 1 - first_component <= 3),
                         ExcMessage(
                           "Can't declare a vector with more than 3 components "
-                          "in VTK"));
+                          "in VTK/VTU format."));
           }
 
         // mark these components as already written:
@@ -5890,6 +5901,17 @@ namespace DataOutBase
     const VtkFlags &flags)
   {
     AssertThrow(out, ExcIO());
+
+    // If the user provided physical units, make sure that they don't contain
+    // quote characters as this would make the VTU file invalid XML and
+    // probably lead to all sorts of difficult error messages. Other than that,
+    // trust the user that whatever they provide makes sense somehow.
+    for (const auto unit : flags.physical_units)
+      Assert(
+        unit.second.find('\"') == std::string::npos,
+        ExcMessage(
+          "A physical unit you provided, <" + unit.second +
+          ">, contained a quotation mark character. This is not allowed."));
 
     const unsigned int n_data_sets = data_names.size();
 
