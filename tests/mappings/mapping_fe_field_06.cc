@@ -30,7 +30,7 @@
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_fe_field.h>
-#include <deal.II/fe/mapping_q_generic.h>
+#include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/grid/grid_generator.h>
 
@@ -67,8 +67,8 @@ test()
   // Create a Mapping
   std::vector<LinearAlgebra::distributed::Vector<double>> level_vectors(
     tria.n_global_levels());
-  MappingQGeneric<dim, spacedim> mapping_ref(fe.degree);
-  FEValues<dim>                  fe_values_setup(mapping_ref,
+  MappingQ<dim, spacedim> mapping_ref(fe.degree);
+  FEValues<dim>           fe_values_setup(mapping_ref,
                                 dh.get_fe(),
                                 Quadrature<dim>(
                                   dh.get_fe().get_unit_support_points()),

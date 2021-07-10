@@ -194,7 +194,7 @@ namespace VectorTools
 
   /**
    * Call the other interpolate_boundary_values() function, see above, with
-   * <tt>mapping=MappingQGeneric@<dim,spacedim@>(1)</tt>. The same comments
+   * <tt>mapping=MappingQ@<dim,spacedim@>(1)</tt>. The same comments
    * apply as for the previous function, in particular about the use of the
    * component mask and the requires size of the function object.
    *
@@ -213,7 +213,7 @@ namespace VectorTools
 
   /**
    * Call the other interpolate_boundary_values() function, see above, with
-   * <tt>mapping=MappingQGeneric@<dim,spacedim@>(1)</tt>. The same comments
+   * <tt>mapping=MappingQ@<dim,spacedim@>(1)</tt>. The same comments
    * apply as for the previous function, in particular about the use of the
    * component mask and the requires size of the function object.
    */
@@ -316,7 +316,7 @@ namespace VectorTools
 
   /**
    * Call the other interpolate_boundary_values() function, see above, with
-   * <tt>mapping=MappingQGeneric@<dim,spacedim@>(1)</tt>. The same comments
+   * <tt>mapping=MappingQ@<dim,spacedim@>(1)</tt>. The same comments
    * apply as for the previous function, in particular about the use of the
    * component mask and the requires size of the function object.
    *
@@ -337,7 +337,7 @@ namespace VectorTools
 
   /**
    * Call the other interpolate_boundary_values() function, see above, with
-   * <tt>mapping=MappingQGeneric@<dim,spacedim@>(1)</tt>. The same comments
+   * <tt>mapping=MappingQ@<dim,spacedim@>(1)</tt>. The same comments
    * apply as for the previous function, in particular about the use of the
    * component mask and the requires size of the function object.
    *
@@ -443,7 +443,7 @@ namespace VectorTools
 
   /**
    * Call the project_boundary_values() function, see above, with
-   * <tt>mapping=MappingQGeneric@<dim,spacedim@>(1)</tt>.
+   * <tt>mapping=MappingQ@<dim,spacedim@>(1)</tt>.
    */
   template <int dim, int spacedim, typename number>
   void
@@ -471,7 +471,7 @@ namespace VectorTools
 
   /**
    * Call the project_boundary_values() function, see above, with
-   * <tt>mapping=MappingQGeneric@<dim,spacedim@>(1)</tt>.
+   * <tt>mapping=MappingQ@<dim,spacedim@>(1)</tt>.
    */
   template <int dim, int spacedim, typename number>
   void
@@ -534,7 +534,7 @@ namespace VectorTools
 
   /**
    * Call the project_boundary_values() function, see above, with
-   * <tt>mapping=MappingQGeneric@<dim,spacedim@>(1)</tt>.
+   * <tt>mapping=MappingQ@<dim,spacedim@>(1)</tt>.
    *
    * @ingroup constraints
    */

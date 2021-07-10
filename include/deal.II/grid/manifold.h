@@ -378,7 +378,7 @@ public:
    * In its default implementation, this function simply calls get_new_point()
    * on each row of @p weights and writes those points into the output array
    * @p new_points. However, this function is more efficient if multiple new
-   * points need to be generated like in MappingQGeneric and the manifold does
+   * points need to be generated like in MappingQ and the manifold does
    * expensive transformations between a chart space and the physical space,
    * such as ChartManifold. For this function, the surrounding points need to
    * be transformed back to the chart sparse only once, rather than for every

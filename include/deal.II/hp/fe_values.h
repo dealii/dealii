@@ -95,7 +95,7 @@ namespace hp
     /**
      * Constructor. This constructor is equivalent to the other one except
      * that it makes the object use a $Q_1$ mapping (i.e., an object of type
-     * MappingQGeneric(1)) implicitly.
+     * MappingQ(1)) implicitly.
      */
     FEValuesBase(
       const FECollection<dim, FEValuesType::space_dimension> &fe_collection,
@@ -332,7 +332,7 @@ namespace hp
     /**
      * Constructor. This constructor is equivalent to the other one except
      * that it makes the object use a $Q_1$ mapping (i.e., an object of type
-     * MappingQGeneric(1)) implicitly.
+     * MappingQ(1)) implicitly.
      */
     FEValues(const FECollection<dim, spacedim> &fe_collection,
              const QCollection<dim> &           q_collection,
@@ -466,7 +466,7 @@ namespace hp
     /**
      * Constructor. This constructor is equivalent to the other one except
      * that it makes the object use a $Q_1$ mapping (i.e., an object of type
-     * MappingQGeneric(1)) implicitly.
+     * MappingQ(1)) implicitly.
      */
     FEFaceValues(const hp::FECollection<dim, spacedim> &fe_collection,
                  const hp::QCollection<dim - 1> &       q_collection,
@@ -610,7 +610,7 @@ namespace hp
     /**
      * Constructor. This constructor is equivalent to the other one except
      * that it makes the object use a $Q_1$ mapping (i.e., an object of type
-     * MappingQGeneric(1)) implicitly.
+     * MappingQ(1)) implicitly.
      */
     FESubfaceValues(const hp::FECollection<dim, spacedim> &fe_collection,
                     const hp::QCollection<dim - 1> &       q_collection,

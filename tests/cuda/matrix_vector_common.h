@@ -84,7 +84,7 @@ do_test(const DoFHandler<dim> &          dof,
 {
   deallog << "Testing " << dof.get_fe().get_name() << std::endl;
 
-  MappingQGeneric<dim>                  mapping(fe_degree);
+  MappingQ<dim>                         mapping(fe_degree);
   CUDAWrappers::MatrixFree<dim, Number> mf_data;
   typename CUDAWrappers::MatrixFree<dim, Number>::AdditionalData
     additional_data;

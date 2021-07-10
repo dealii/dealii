@@ -202,8 +202,8 @@ main()
 {
   initlog();
 
-  Triangulation<2>   tria;
-  MappingQGeneric<2> mapping(1);
+  Triangulation<2> tria;
+  MappingQ<2>      mapping(1);
 
   make_grid(tria);
 

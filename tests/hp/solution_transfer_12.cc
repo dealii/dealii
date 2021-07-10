@@ -85,9 +85,9 @@ transfer(std::ostream &out)
     {
       fe_q.push_back(FE_Q_Hierarchical<dim>(deg));
     }
-  DoFHandler<dim>      q_dof_handler(tria);
-  Vector<double>       q_solution;
-  MappingQGeneric<dim> mapping(1);
+  DoFHandler<dim> q_dof_handler(tria);
+  Vector<double>  q_solution;
+  MappingQ<dim>   mapping(1);
 
   // refine a few cells
   typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(),

@@ -218,7 +218,7 @@ check(const unsigned int orientation, bool reverse)
   unsigned int n_local_constraints = 0;
 
   std::map<types::global_dof_index, Point<dim>> support_points;
-  DoFTools::map_dofs_to_support_points(MappingQGeneric<dim>(1),
+  DoFTools::map_dofs_to_support_points(MappingQ<dim>(1),
                                        dof_handler,
                                        support_points);
   IndexSet constraints_lines = constraints.get_local_lines();

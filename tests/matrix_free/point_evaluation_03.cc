@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// check FEPointEvaluation for vector-valued FE_Q and MappingQGeneric by
+// check FEPointEvaluation for vector-valued FE_Q and MappingQ by
 // comparing to the output of FEValues with the same settings
 
 #include <deal.II/base/function_lib.h>
@@ -24,7 +24,7 @@
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_values.h>
-#include <deal.II/fe/mapping_q_generic.h>
+#include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
@@ -70,7 +70,7 @@ test(const unsigned int degree)
   else
     GridGenerator::subdivided_hyper_cube(tria, 2, 0, 1);
 
-  MappingQGeneric<dim> mapping(degree);
+  MappingQ<dim> mapping(degree);
   deallog << "Mapping of degree " << degree << std::endl;
 
   std::vector<Point<dim>> unit_points;

@@ -18,8 +18,8 @@
 #include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/mapping_q.h>
 #include <deal.II/fe/mapping_q_cache.h>
-#include <deal.II/fe/mapping_q_generic.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
@@ -36,9 +36,9 @@ do_test(const unsigned int degree)
   else
     GridGenerator::hyper_cube(tria, -1, 1);
 
-  MappingQGeneric<dim> mapping(degree);
-  MappingQCache<dim>   mapping_cache(degree);
-  Point<dim>           shift;
+  MappingQ<dim>      mapping(degree);
+  MappingQCache<dim> mapping_cache(degree);
+  Point<dim>         shift;
   for (unsigned int d = 0; d < dim; ++d)
     shift[d] = -0.5 + 0.1 * d;
 

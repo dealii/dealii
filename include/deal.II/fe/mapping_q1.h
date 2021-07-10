@@ -19,7 +19,7 @@
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/fe/mapping_q_generic.h>
+#include <deal.II/fe/mapping_q.h>
 
 #include <cmath>
 
@@ -40,7 +40,7 @@ DEAL_II_NAMESPACE_OPEN
  * polyhedral domains. It is also the mapping used throughout deal.II for many
  * functions that come in two variants, one that allows to pass a mapping
  * argument explicitly and one that simply falls back to the MappingQ1 class
- * declared here. (Or, in fact, to an object of kind MappingQGeneric(1), which
+ * declared here. (Or, in fact, to an object of kind MappingQ(1), which
  * implements exactly the functionality of this class.)
  *
  * The shape functions for this mapping are the same as for the finite element
@@ -48,10 +48,10 @@ DEAL_II_NAMESPACE_OPEN
  * isoparametric element.
  *
  * @note This class is, in all reality, nothing more than a different name for
- * calling MappingQGeneric with a polynomial degree of one as argument.
+ * calling MappingQ with a polynomial degree of one as argument.
  */
 template <int dim, int spacedim = dim>
-class MappingQ1 : public MappingQGeneric<dim, spacedim>
+class MappingQ1 : public MappingQ<dim, spacedim>
 {
 public:
   /**
@@ -70,7 +70,7 @@ public:
  * Many places in the library by default use (bi-,tri-)linear mappings unless
  * users explicitly provide a different mapping to use. In these cases, the
  * called function has to create a $Q_1$ mapping object, i.e., an object of
- * kind MappingQGeneric(1). This is costly. It would also be costly to create
+ * kind MappingQ(1). This is costly. It would also be costly to create
  * such objects as static objects in the affected functions, because static
  * objects are never destroyed throughout the lifetime of a program, even
  * though they only have to be created once the first time code runs through a
@@ -94,7 +94,7 @@ struct StaticMappingQ1
    * The static $Q_1$ mapping object discussed in the documentation of this
    * class.
    */
-  static MappingQGeneric<dim, spacedim> mapping;
+  static MappingQ<dim, spacedim> mapping;
 };
 
 

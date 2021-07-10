@@ -744,7 +744,7 @@ check(const FiniteElement<2> &           fe,
       DoFTools::make_hanging_node_constraints(*dof_handler, hn_constraints);
       hn_constraints.close();
 
-      MappingQGeneric<2> map_default(1);
+      MappingQ<2> map_default(1);
 
       project(map_default,
               *dof_handler,

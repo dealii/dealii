@@ -1909,7 +1909,7 @@ namespace Euler_DG
 #endif
 
 #ifdef HEX
-    MappingQGeneric<dim> mapping;
+    MappingQ<dim> mapping;
 #else
     MappingFE<dim>                                      mapping;
 #endif

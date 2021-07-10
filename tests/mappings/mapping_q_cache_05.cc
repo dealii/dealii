@@ -18,8 +18,8 @@
 #include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/mapping_q.h>
 #include <deal.II/fe/mapping_q_cache.h>
-#include <deal.II/fe/mapping_q_generic.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
@@ -59,8 +59,8 @@ do_test(const unsigned int degree,
   Triangulation<dim> tria;
   GridGenerator::subdivided_hyper_cube(tria, 4);
 
-  MappingQGeneric<dim> mapping(degree);
-  MappingQCache<dim>   mapping_cache(degree);
+  MappingQ<dim>      mapping(degree);
+  MappingQCache<dim> mapping_cache(degree);
   mapping_cache.initialize(mapping, tria, fu, is_displacement_function);
 
   {

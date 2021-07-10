@@ -88,8 +88,8 @@ template <int dim>
 void
 plot_FE_Q_shape_functions()
 {
-  MappingQGeneric<dim> m(1);
-  FE_Q<dim>            q1(1);
+  MappingQ<dim> m(1);
+  FE_Q<dim>     q1(1);
   plot_derivatives(m, q1, "Q1");
   //  plot_face_shape_functions(m, q1, "Q1");
   FE_Q<dim> q2(2);
@@ -120,8 +120,8 @@ template <int dim>
 void
 plot_FE_DGQ_shape_functions()
 {
-  MappingQGeneric<dim> m(1);
-  FE_DGQ<dim>          q1(1);
+  MappingQ<dim> m(1);
+  FE_DGQ<dim>   q1(1);
   plot_derivatives(m, q1, "DGQ1");
   //  plot_face_shape_functions(m, q1, "DGQ1");
   FE_DGQ<dim> q2(2);
@@ -169,8 +169,8 @@ main()
 
 
   // FESystem test.
-  MappingQGeneric<2> m(1);
-  FESystem<2>        q2_q3(FE_Q<2>(2),
+  MappingQ<2> m(1);
+  FESystem<2> q2_q3(FE_Q<2>(2),
                     1,
                     FE_Q<2>(QIterated<1>(QTrapezoid<1>(), 3)),
                     1);

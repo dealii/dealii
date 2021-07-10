@@ -279,6 +279,6 @@ As said in step-37, the matrix-free method gets more efficient if we choose a
 higher order finite element space. Since we want to solve the problem on the
 $d$-dimensional unit ball, it would be good to have an appropriate boundary
 approximation to overcome convergence issues. For this reason we use an
-isoparametric approach with the MappingQGeneric class to recover the smooth
+isoparametric approach with the MappingQ class to recover the smooth
 boundary as well as the mapping for inner cells. In addition, to get a good
 triangulation in total we make use of the TransfiniteInterpolationManifold.

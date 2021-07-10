@@ -30,8 +30,8 @@ namespace python
                                 void *cell_accessor_ptr,
                                 void *point_ptr)
     {
-      const MappingQGeneric<dim, spacedim> *mapping =
-        static_cast<const MappingQGeneric<dim, spacedim> *>(mapping_ptr);
+      const MappingQ<dim, spacedim> *mapping =
+        static_cast<const MappingQ<dim, spacedim> *>(mapping_ptr);
 
       const CellAccessor<dim, spacedim> *cell_accessor =
         static_cast<const CellAccessor<dim, spacedim> *>(cell_accessor_ptr);
@@ -61,8 +61,8 @@ namespace python
                                 void *cell_accessor_ptr,
                                 void *point_ptr)
     {
-      const MappingQGeneric<dim, spacedim> *mapping =
-        static_cast<const MappingQGeneric<dim, spacedim> *>(mapping_ptr);
+      const MappingQ<dim, spacedim> *mapping =
+        static_cast<const MappingQ<dim, spacedim> *>(mapping_ptr);
 
       const CellAccessor<dim, spacedim> *cell_accessor =
         static_cast<const CellAccessor<dim, spacedim> *>(cell_accessor_ptr);
@@ -93,8 +93,8 @@ namespace python
                                              const unsigned int face_no,
                                              void *             point_ptr)
     {
-      const MappingQGeneric<dim, spacedim> *mapping =
-        static_cast<const MappingQGeneric<dim, spacedim> *>(mapping_ptr);
+      const MappingQ<dim, spacedim> *mapping =
+        static_cast<const MappingQ<dim, spacedim> *>(mapping_ptr);
 
       const CellAccessor<dim, spacedim> *cell_accessor =
         static_cast<const CellAccessor<dim, spacedim> *>(cell_accessor_ptr);
@@ -142,15 +142,15 @@ namespace python
   {
     if ((dim == 2) && (spacedim == 2))
       {
-        mapping_ptr = new MappingQGeneric<2, 2>(degree);
+        mapping_ptr = new MappingQ<2, 2>(degree);
       }
     else if ((dim == 2) && (spacedim == 3))
       {
-        mapping_ptr = new MappingQGeneric<2, 3>(degree);
+        mapping_ptr = new MappingQ<2, 3>(degree);
       }
     else if ((dim == 3) && (spacedim == 3))
       {
-        mapping_ptr = new MappingQGeneric<3, 3>(degree);
+        mapping_ptr = new MappingQ<3, 3>(degree);
       }
     else
       AssertThrow(false, ExcMessage("Wrong dim-spacedim combination."));
@@ -170,15 +170,15 @@ namespace python
 
     if ((dim == 2) && (spacedim == 2))
       {
-        mapping_ptr = new MappingQGeneric<2, 2>(other.degree);
+        mapping_ptr = new MappingQ<2, 2>(other.degree);
       }
     else if ((dim == 2) && (spacedim == 3))
       {
-        mapping_ptr = new MappingQGeneric<2, 3>(other.degree);
+        mapping_ptr = new MappingQ<2, 3>(other.degree);
       }
     else if ((dim == 3) && (spacedim == 3))
       {
-        mapping_ptr = new MappingQGeneric<3, 3>(other.degree);
+        mapping_ptr = new MappingQ<3, 3>(other.degree);
       }
     else
       AssertThrow(false, ExcMessage("Wrong dim-spacedim combination."));
@@ -194,20 +194,17 @@ namespace python
           {
             // We cannot call delete on a void pointer so cast the void pointer
             // back first.
-            MappingQGeneric<2, 2> *tmp =
-              static_cast<MappingQGeneric<2, 2> *>(mapping_ptr);
+            MappingQ<2, 2> *tmp = static_cast<MappingQ<2, 2> *>(mapping_ptr);
             delete tmp;
           }
         else if ((dim == 2) && (spacedim == 3))
           {
-            MappingQGeneric<2, 3> *tmp =
-              static_cast<MappingQGeneric<2, 3> *>(mapping_ptr);
+            MappingQ<2, 3> *tmp = static_cast<MappingQ<2, 3> *>(mapping_ptr);
             delete tmp;
           }
         else
           {
-            MappingQGeneric<3, 3> *tmp =
-              static_cast<MappingQGeneric<3, 3> *>(mapping_ptr);
+            MappingQ<3, 3> *tmp = static_cast<MappingQ<3, 3> *>(mapping_ptr);
             delete tmp;
           }
 

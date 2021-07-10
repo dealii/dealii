@@ -32,7 +32,7 @@ template <int dim>
 void
 plot_FE_FaceQ_shape_functions()
 {
-  MappingQGeneric<dim> m(1);
+  MappingQ<dim> m(1);
 
   FE_FaceQ<dim> q0(0);
   FE_FaceQ<dim> q1(1);

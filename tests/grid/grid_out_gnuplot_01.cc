@@ -20,7 +20,7 @@
 // and also that we can do output in dim = 2, spacedim = 3.
 
 
-#include <deal.II/fe/mapping_q_generic.h>
+#include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
@@ -57,7 +57,7 @@ gnuplot_output(const GridOutFlags::Gnuplot &flags)
   Triangulation<dim, spacedim> triangulation;
   make_grid(triangulation);
 
-  MappingQGeneric<dim, spacedim> mapping(3);
+  MappingQ<dim, spacedim> mapping(3);
 
   auto cell = triangulation.begin_active();
   cell->set_refine_flag(); // 0

@@ -119,7 +119,7 @@ namespace Step40
     MPI_Comm mpi_communicator;
 
 #ifdef HEX
-    MappingQGeneric<dim, dim>                 mapping;
+    MappingQ<dim, dim>                        mapping;
     parallel::distributed::Triangulation<dim> triangulation;
     FE_Q<dim>                                 fe;
 #else

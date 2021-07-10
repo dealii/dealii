@@ -136,7 +136,7 @@ namespace VectorTools
    * </p>
    *
    * Here, we have two cells that use a bilinear mapping (i.e.,
-   * MappingQGeneric(1)). Consequently, for each of the cells, the normal
+   * MappingQ(1)). Consequently, for each of the cells, the normal
    * vector is perpendicular to the straight edge. If the two edges at the top
    * and right are meant to approximate a curved boundary (as indicated by the
    * dashed line), then neither of the two computed normal vectors are equal

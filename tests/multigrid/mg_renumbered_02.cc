@@ -195,10 +195,10 @@ private:
   void
   refine_local();
 
-  Triangulation<dim>         triangulation;
-  const MappingQGeneric<dim> mapping;
-  FESystem<dim>              fe;
-  DoFHandler<dim>            mg_dof_handler_renumbered;
+  Triangulation<dim>  triangulation;
+  const MappingQ<dim> mapping;
+  FESystem<dim>       fe;
+  DoFHandler<dim>     mg_dof_handler_renumbered;
 
   const unsigned int                             degree;
   std::vector<std::set<types::global_dof_index>> boundary_indices_renumbered;

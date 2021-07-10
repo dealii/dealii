@@ -67,7 +67,7 @@ namespace VectorTools
 
   /**
    * Call the create_right_hand_side() function, see above, with
-   * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
+   * <tt>mapping=MappingQ@<dim@>(1)</tt>.
    */
   template <int dim, int spacedim, typename VectorType>
   void
@@ -128,7 +128,7 @@ namespace VectorTools
 
   /**
    * Call the create_boundary_right_hand_side() function, see above, with
-   * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
+   * <tt>mapping=MappingQ@<dim@>(1)</tt>.
    *
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"

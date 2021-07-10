@@ -35,7 +35,7 @@ template <int dim>
 void
 plot_FE_System_shape_functions()
 {
-  MappingQGeneric<dim> m(1);
+  MappingQ<dim> m(1);
 
   FESystem<dim> p3(FE_Q<dim>(1), 1, FESystem<dim>(FE_Q<dim>(1), 2), 2);
   test_compute_functions(m, p3, "System_1");

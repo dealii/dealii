@@ -15,7 +15,7 @@
 
 
 // Check InverseQuadraticApproximation used for the initial guess in
-// MappingQGeneric::transform_points_real_to_unit_cell
+// MappingQ::transform_points_real_to_unit_cell
 
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/polynomial.h>
@@ -27,7 +27,6 @@
 #include <deal.II/fe/fe_tools.h>
 #include <deal.II/fe/mapping_fe_field.h>
 #include <deal.II/fe/mapping_q.h>
-#include <deal.II/fe/mapping_q_generic.h>
 #include <deal.II/fe/mapping_q_internal.h>
 
 #include <deal.II/grid/grid_generator.h>
@@ -47,8 +46,8 @@ print_result(const unsigned int                  mapping_degree,
 {
   deallog << "Testing " << dim << "D with point " << p << std::endl;
 
-  FE_Q<dim>            dummy(mapping_degree);
-  MappingQGeneric<dim> mapping(mapping_degree);
+  FE_Q<dim>     dummy(mapping_degree);
+  MappingQ<dim> mapping(mapping_degree);
 
   FEValues<dim> fe_values(mapping,
                           dummy,
@@ -60,8 +59,8 @@ print_result(const unsigned int                  mapping_degree,
   std::vector<unsigned int> renumber =
     FETools::lexicographic_to_hierarchic_numbering<dim>(mapping_degree);
   std::vector<Point<dim>> mapping_unit_support_points =
-    internal::MappingQGenericImplementation::unit_support_points<dim>(
-      mapping_points, renumber);
+    internal::MappingQImplementation::unit_support_points<dim>(mapping_points,
+                                                               renumber);
 
   for (const auto &cell : tria.active_cell_iterators())
     {
@@ -76,7 +75,7 @@ print_result(const unsigned int                  mapping_degree,
           deallog << "Affine approximation:            "
                   << cell->real_to_unit_cell_affine_approximation(p)
                   << std::endl;
-          internal::MappingQGenericImplementation::
+          internal::MappingQImplementation::
             InverseQuadraticApproximation<dim, spacedim>
               approx(fe_values.get_quadrature_points(),
                      mapping_unit_support_points);

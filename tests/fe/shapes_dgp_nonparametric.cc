@@ -30,7 +30,7 @@ template <int dim>
 void
 plot_FE_DGPNonparametric_shape_functions()
 {
-  MappingQGeneric<dim> m(1);
+  MappingQ<dim> m(1);
 
   FE_DGPNonparametric<dim> p0(0);
   plot_shape_functions(m, p0, "DGPNonparametric0");

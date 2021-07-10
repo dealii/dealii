@@ -136,9 +136,9 @@ curved_grid(std::ostream &out)
   // now provide everything that is
   // needed for solving a Laplace
   // equation.
-  MappingQGeneric<2> mapping_q1(1);
-  FE_Q<2>            fe(2);
-  DoFHandler<2>      dof_handler(triangulation);
+  MappingQ<2>   mapping_q1(1);
+  FE_Q<2>       fe(2);
+  DoFHandler<2> dof_handler(triangulation);
   dof_handler.distribute_dofs(fe);
   SparsityPattern sparsity_pattern(dof_handler.n_dofs(),
                                    dof_handler.n_dofs(),

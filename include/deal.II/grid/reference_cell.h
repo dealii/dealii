@@ -163,7 +163,7 @@ public:
   /**
    * Return a default mapping of degree @p degree matching the current
    * reference cell. If this reference cell is a hypercube, then the returned
-   * mapping is a MappingQGeneric; otherwise, it is an object of type
+   * mapping is a MappingQ; otherwise, it is an object of type
    * MappingFE initialized with FE_SimplexP (if the reference cell is a
    * triangle or tetrahedron), with FE_PyramidP (if the reference
    * cell is a pyramid), or with FE_WedgeP (if the reference cell is

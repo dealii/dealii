@@ -19,7 +19,7 @@
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/fe/mapping_manifold.h>
-#include <deal.II/fe/mapping_q_generic.h>
+#include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/manifold_lib.h>
@@ -43,7 +43,7 @@ test()
   std::vector<Point<dim>> q_points = quadrature.get_points();
 
   MappingManifold<dim, spacedim> map_manifold;
-  MappingQGeneric<dim, spacedim> map_q1(1);
+  MappingQ<dim, spacedim>        map_q1(1);
 
   typename Triangulation<dim, spacedim>::active_cell_iterator
     cell = triangulation.begin_active(),

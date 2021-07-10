@@ -69,8 +69,8 @@ test()
   transfer.build(dh);
   transfer.interpolate_to_mg(dh, level_vectors, map_vector);
   MappingFEField<dim, spacedim, LinearAlgebra::distributed::Vector<double>>
-                       mapping(dh, level_vectors);
-  MappingQGeneric<dim> mapping_ref(fe.degree);
+                mapping(dh, level_vectors);
+  MappingQ<dim> mapping_ref(fe.degree);
 
   QGauss<dim>   quad(1);
   FEValues<dim> fe_values_ref(mapping_ref,

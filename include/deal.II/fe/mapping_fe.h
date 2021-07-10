@@ -46,7 +46,7 @@ DEAL_II_NAMESPACE_OPEN
  * discretization, one obtains an iso-parametric mapping.
  *
  * If one initializes this class with an FE_Q(degree) object, then this class is
- * equivalent to MappingQGeneric(degree). Please note that no optimizations
+ * equivalent to MappingQ(degree). Please note that no optimizations
  * exploiting tensor-product structures of finite elements have been added here.
  *
  * @note Currently, only implemented for elements with tensor_degree==1 and

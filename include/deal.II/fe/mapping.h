@@ -395,8 +395,8 @@ public:
    * triangulation).
    *
    * For example, implementations in derived classes return @p true for
-   * MappingQ, MappingQGeneric, MappingCartesian, but @p false for
-   * MappingQEulerian, MappingQ1Eulerian, and MappingFEField.
+   * MappingQ, MappingCartesian, but @p false for MappingQEulerian,
+   * MappingQ1Eulerian, and MappingFEField.
    */
   virtual bool
   preserves_vertex_locations() const = 0;
@@ -468,7 +468,7 @@ public:
    * points and calling the Mapping::transform_real_to_unit_cell() function
    * for each point individually, but it can be much faster for certain
    * mappings that implement a more specialized version such as
-   * MappingQGeneric. The only difference in behavior is that this function
+   * MappingQ. The only difference in behavior is that this function
    * will never throw an ExcTransformationFailed() exception. If the
    * transformation fails for `real_points[i]`, the returned `unit_points[i]`
    * contains std::numeric_limits<double>::infinity() as the first entry.

@@ -26,7 +26,7 @@
 #include <deal.II/base/vectorization.h>
 
 #include <deal.II/fe/fe_values.h>
-#include <deal.II/fe/mapping_q_generic.h>
+#include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/matrix_free/evaluation_flags.h>
 #include <deal.II/matrix_free/shape_info.h>
@@ -381,7 +381,7 @@ namespace internal
  * realizations, however, there is a much more efficient implementation that
  * avoids the memory allocation and other expensive start-up cost of
  * FEValues. Currently, the functionality is specialized for mappings derived
- * from MappingQGeneric and for finite elements with tensor product structure
+ * from MappingQ and for finite elements with tensor product structure
  * that work with the @ref matrixfree module. In those cases, the cost implied
  * by this class is similar (or sometimes even somewhat lower) than using
  * `FEValues::reinit(cell)` followed by `FEValues::get_function_gradients`.
@@ -572,10 +572,10 @@ private:
   SmartPointer<const Mapping<dim, spacedim>> mapping;
 
   /**
-   * Pointer to MappingQGeneric class that enables the fast path of this
+   * Pointer to MappingQ class that enables the fast path of this
    * class.
    */
-  const MappingQGeneric<dim, spacedim> *mapping_q_generic;
+  const MappingQ<dim, spacedim> *mapping_q;
 
   /**
    * Pointer to the FiniteElement object passed to the constructor.
@@ -685,8 +685,7 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::FEPointEvaluation(
   const UpdateFlags         update_flags,
   const unsigned int        first_selected_component)
   : mapping(&mapping)
-  , mapping_q_generic(
-      dynamic_cast<const MappingQGeneric<dim, spacedim> *>(&mapping))
+  , mapping_q(dynamic_cast<const MappingQ<dim, spacedim> *>(&mapping))
   , fe(&fe)
   , update_flags(update_flags)
   , update_flags_mapping(update_default)
@@ -708,7 +707,7 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::FEPointEvaluation(
       }
     else
       component += fe.element_multiplicity(base_element_number);
-  if (mapping_q_generic != nullptr &&
+  if (mapping_q != nullptr &&
       internal::FEPointEvaluation::is_fast_path_supported(
         fe, base_element_number) &&
       same_base_element)
@@ -767,8 +766,10 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::reinit(
   std::copy(unit_points.begin(), unit_points.end(), this->unit_points.begin());
 
   if (!poly.empty())
-    mapping_q_generic->fill_mapping_data_for_generic_points(
-      cell, unit_points, update_flags_mapping, mapping_data);
+    mapping_q->fill_mapping_data_for_generic_points(cell,
+                                                    unit_points,
+                                                    update_flags_mapping,
+                                                    mapping_data);
   else
     {
       fe_values = std::make_shared<FEValues<dim, spacedim>>(
@@ -1123,7 +1124,7 @@ inline const typename FEPointEvaluation<n_components, dim, spacedim, Number>::
 {
   Assert(!poly.empty(),
          ExcMessage("Unit gradients are currently only implemented for tensor "
-                    "product finite elements combined with MappingQGeneric "
+                    "product finite elements combined with MappingQ "
                     "mappings"));
   AssertIndexRange(point_index, unit_gradients.size());
   return unit_gradients[point_index];

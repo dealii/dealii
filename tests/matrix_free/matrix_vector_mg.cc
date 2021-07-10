@@ -66,9 +66,9 @@ test()
   // of degrees of freedom: " << dof.n_dofs() << std::endl;
 
   // set up MatrixFree
-  MappingQGeneric<dim> mapping(fe_degree);
-  QGauss<1>            quad(fe_degree + 1);
-  MatrixFree<dim>      mf_data;
+  MappingQ<dim>   mapping(fe_degree);
+  QGauss<1>       quad(fe_degree + 1);
+  MatrixFree<dim> mf_data;
   mf_data.reinit(mapping, dof, constraints, quad);
   SparsityPattern      sparsity;
   SparseMatrix<double> system_matrix;

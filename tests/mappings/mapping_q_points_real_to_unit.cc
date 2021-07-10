@@ -14,12 +14,12 @@
 // ---------------------------------------------------------------------
 
 
-// check MappingQGeneric::transform_real_to_unit_points on a set of
+// check MappingQ::transform_real_to_unit_points on a set of
 // challenging points, especially with vectorization because we have nearby
 // points that succeed and others in the regime of negative Jacobian
 // determinants, respectively
 
-#include <deal.II/fe/mapping_q_generic.h>
+#include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
@@ -42,7 +42,7 @@ test(const unsigned int degree)
     real_points.push_back(
       (i % 2 ? 0.05 * (static_cast<double>(i) - 10.) : 0.05 * i) * p);
   std::vector<Point<dim>> unit_points(real_points.size());
-  MappingQGeneric<dim>    mapping(degree);
+  MappingQ<dim>           mapping(degree);
   mapping.transform_points_real_to_unit_cell(tria.begin(),
                                              real_points,
                                              unit_points);

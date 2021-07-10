@@ -67,7 +67,7 @@ do_test(const DoFHandler<dim> &          dof,
   // of degrees of freedom: " << dof.n_dofs() << std::endl; std::cout << "Number
   // of constraints: " << constraints.n_constraints() << std::endl;
 
-  MappingQGeneric<dim>    mapping(dof.get_fe().degree);
+  MappingQ<dim>           mapping(dof.get_fe().degree);
   MatrixFree<dim, number> mf_data;
   {
     const QGauss<1>                                  quad(n_q_points_1d);

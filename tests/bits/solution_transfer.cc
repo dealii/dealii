@@ -77,7 +77,7 @@ transfer(std::ostream &out)
   DoFHandler<dim>           dgq_dof_handler(tria);
   Vector<double>            q_solution;
   Vector<double>            dgq_solution;
-  MappingQGeneric<dim>      mapping(1);
+  MappingQ<dim>             mapping(1);
   DataOut<dim>              q_data_out, dgq_data_out;
   AffineConstraints<double> cm;
   cm.close();

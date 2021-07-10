@@ -23,7 +23,7 @@
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
-#include <deal.II/fe/mapping_q_generic.h>
+#include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/grid/grid_generator.h>
 
@@ -46,7 +46,7 @@ test()
   dofh.distribute_dofs(fe);
 
   std::map<types::global_dof_index, Point<dim>> points;
-  DoFTools::map_dofs_to_support_points(MappingQGeneric<dim>(1), dofh, points);
+  DoFTools::map_dofs_to_support_points(MappingQ<dim>(1), dofh, points);
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     {
       for (typename std::map<types::global_dof_index,

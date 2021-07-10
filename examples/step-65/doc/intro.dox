@@ -191,7 +191,7 @@ above. This class adheres to the general manifold interfaces, i.e., given any
 set of points within its domain of definition, it can compute weighted
 averages conforming to the manifold (using a formula that will be given in a
 minute). These weighted averages are used whenever the mesh is refined, or
-when a higher order mapping (such as MappingQGeneric or MappingC1)
+when a higher order mapping (such as MappingQ or MappingC1)
 is evaluated on a given cell
 subject to this manifold. Using this manifold on the shaded cells of the
 coarse grid of the disk (i.e., not only in the outer-most layer of
@@ -374,7 +374,7 @@ curved mesh elements is the same as the degree of the polynomials for the
 numerical solution. If the degree of the geometry is higher or lower than the
 solution, one calls that a super- or sub-parametric geometry representation,
 respectively. In deal.II, the standard class for polynomial representation is
-MappingQGeneric. If, for example, this class is used with polynomial degree $4$ in 3D, a
+MappingQ. If, for example, this class is used with polynomial degree $4$ in 3D, a
 total of 125 (i.e., $(4+1)^3$) points are needed for the
 interpolation. Among these points, 8 are the cell's vertices and already
 available from the mesh, but the other 117 need to be provided by the
@@ -447,6 +447,6 @@ linear system for solving the Poisson equation with a jumping coefficient, its
 solution with a simple iterative method, computation of some numerical error
 with VectorTools::integrate_difference() as well as an error estimator. We
 record timings for each section and run the code twice. In the first run, we
-hand a MappingQGeneric object to each stage of the program separately, where
+hand a MappingQ object to each stage of the program separately, where
 points get re-computed over and over again. In the second run, we use
 MappingQCache instead.

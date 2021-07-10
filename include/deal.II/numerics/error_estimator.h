@@ -355,7 +355,7 @@ public:
 
   /**
    * Call the @p estimate function, see above, with
-   * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
+   * <tt>mapping=MappingQ@<dim@>(1)</tt>.
    */
   template <typename InputVector>
   static void
@@ -407,7 +407,7 @@ public:
 
   /**
    * Call the @p estimate function, see above, with
-   * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
+   * <tt>mapping=MappingQ@<dim@>(1)</tt>.
    */
   template <typename InputVector>
   static void
@@ -641,7 +641,7 @@ public:
 
   /**
    * Call the @p estimate function, see above, with
-   * <tt>mapping=MappingQGeneric1<1>()</tt>.
+   * <tt>mapping=MappingQ1<1>()</tt>.
    */
   template <typename InputVector>
   static void
@@ -693,7 +693,7 @@ public:
 
   /**
    * Call the @p estimate function, see above, with
-   * <tt>mapping=MappingQGeneric1<1>()</tt>.
+   * <tt>mapping=MappingQ1<1>()</tt>.
    */
   template <typename InputVector>
   static void

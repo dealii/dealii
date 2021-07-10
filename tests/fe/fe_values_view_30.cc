@@ -118,7 +118,7 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
 
   VectorFunction<dim> fe_function;
 
-  MappingQGeneric<dim> mapping(1);
+  MappingQ<dim> mapping(1);
 
   const QGauss<dim> quadrature(fe.degree + 2);
   FEValues<dim>     fe_values(mapping,

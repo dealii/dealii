@@ -107,7 +107,7 @@ test()
 
   deallog << "Testing " << dof.get_fe().get_name() << std::endl;
 
-  MappingQGeneric<dim>                  mapping(fe_degree);
+  MappingQ<dim>                         mapping(fe_degree);
   CUDAWrappers::MatrixFree<dim, Number> mf_data;
   const QGauss<1>                       quad(fe_degree + 1);
   typename CUDAWrappers::MatrixFree<dim, Number>::AdditionalData

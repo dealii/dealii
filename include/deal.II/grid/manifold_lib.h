@@ -29,7 +29,7 @@ DEAL_II_NAMESPACE_OPEN
 // forward declaration
 namespace internal
 {
-  namespace MappingQGenericImplementation
+  namespace MappingQImplementation
   {
     template <int, int>
     class InverseQuadraticApproximation;
@@ -863,7 +863,7 @@ private:
  * nature of the manifold that is originally contained in one <i>coarse</i>
  * mesh layer will be applied to more than one <i>fine</i> mesh layer once the
  * mesh gets refined. Note that the mechanisms of
- * TransfiniteInterpolationManifold are also built into the MappingQGeneric
+ * TransfiniteInterpolationManifold are also built into the MappingQ
  * class when only a surface of a cell is subject to a curved description,
  * ensuring that even the default case without this manifold gets optimal
  * convergence rates when applying curved boundary descriptions.
@@ -1148,7 +1148,7 @@ private:
    * A vector of quadratic approximations to the inverse map from real points
    * to chart points for each of the coarse mesh cells.
    */
-  std::vector<internal::MappingQGenericImplementation::
+  std::vector<internal::MappingQImplementation::
                 InverseQuadraticApproximation<dim, spacedim>>
     quadratic_approximation;
 

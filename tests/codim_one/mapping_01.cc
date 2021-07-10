@@ -16,7 +16,7 @@
 
 
 // test mapping surfaces in higher dimensions. when we use the
-// MappingQGeneric(1) class, each 1d cell in 2d space is mapped to a straight
+// MappingQ(1) class, each 1d cell in 2d space is mapped to a straight
 // line and so all cell normals should be parallel. likewise, if the four
 // vertices of a 2d cell in 3d space are in a plane, then the cell normal
 // vectors at all quadrature points of the same cell should be parallel, even
@@ -52,9 +52,9 @@ test()
 
   GridGenerator::extract_boundary_mesh(volume_mesh, boundary_mesh);
 
-  QGauss<dim - 1>               quadrature(2);
-  MappingQGeneric<dim - 1, dim> mapping(1);
-  FE_Q<dim - 1, dim>            fe(1);
+  QGauss<dim - 1>        quadrature(2);
+  MappingQ<dim - 1, dim> mapping(1);
+  FE_Q<dim - 1, dim>     fe(1);
 
   FEValues<dim - 1, dim> fe_values(mapping,
                                    fe,

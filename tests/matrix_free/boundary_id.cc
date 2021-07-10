@@ -22,7 +22,7 @@
 #include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/fe_q.h>
-#include <deal.II/fe/mapping_q_generic.h>
+#include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
@@ -45,9 +45,9 @@ test()
       count += 100000;
     }
 
-  MappingQGeneric<dim> mapping(1);
-  FE_Q<dim>            fe(1);
-  DoFHandler<dim>      dof(tria);
+  MappingQ<dim>   mapping(1);
+  FE_Q<dim>       fe(1);
+  DoFHandler<dim> dof(tria);
   dof.distribute_dofs(fe);
   AffineConstraints<double> constraints;
   constraints.close();

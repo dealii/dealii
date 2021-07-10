@@ -154,7 +154,7 @@ void
 assemble(const DoFHandler<dim> &dof_handler, SparseMatrix<double> &matrix)
 {
   const FiniteElement<dim> &fe = dof_handler.get_fe();
-  MappingQGeneric<dim>      mapping(1);
+  MappingQ<dim>             mapping(1);
 
   MeshWorker::IntegrationInfoBox<dim> info_box;
   const unsigned int n_gauss_points = dof_handler.get_fe().tensor_degree() + 1;
@@ -194,7 +194,7 @@ assemble(const DoFHandler<dim> &             dof_handler,
          MGLevelObject<SparseMatrix<double>> dg_down)
 {
   const FiniteElement<dim> &fe = dof_handler.get_fe();
-  MappingQGeneric<dim>      mapping(1);
+  MappingQ<dim>             mapping(1);
 
   MeshWorker::IntegrationInfoBox<dim> info_box;
   const unsigned int n_gauss_points = dof_handler.get_fe().tensor_degree() + 1;

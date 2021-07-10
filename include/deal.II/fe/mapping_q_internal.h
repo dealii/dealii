@@ -29,7 +29,7 @@
 #include <deal.II/fe/fe_tools.h>
 #include <deal.II/fe/fe_update_flags.h>
 #include <deal.II/fe/fe_values.h>
-#include <deal.II/fe/mapping_q_generic.h>
+#include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/grid/grid_tools.h>
 
@@ -200,11 +200,11 @@ namespace internal
 
 
   /**
-   * Internal namespace to implement methods of MappingQGeneric, such as the
+   * Internal namespace to implement methods of MappingQ, such as the
    * evaluation of the mapping and the transformation between real and unit
    * cell.
    */
-  namespace MappingQGenericImplementation
+  namespace MappingQImplementation
   {
     /**
      * This function generates the reference cell support points from the 1d
@@ -451,7 +451,7 @@ namespace internal
     template <int dim, int spacedim>
     inline Point<spacedim>
     compute_mapped_location_of_point(
-      const typename dealii::MappingQGeneric<dim, spacedim>::InternalData &data)
+      const typename dealii::MappingQ<dim, spacedim>::InternalData &data)
     {
       AssertDimension(data.shape_values.size(),
                       data.mapping_support_points.size());
@@ -725,8 +725,8 @@ namespace internal
     do_transform_real_to_unit_cell_internal_codim1(
       const typename dealii::Triangulation<dim, dim + 1>::cell_iterator &cell,
       const Point<dim + 1> &                                             p,
-      const Point<dim> &initial_p_unit,
-      typename dealii::MappingQGeneric<dim, dim + 1>::InternalData &mdata)
+      const Point<dim> &                                     initial_p_unit,
+      typename dealii::MappingQ<dim, dim + 1>::InternalData &mdata)
     {
       const unsigned int spacedim = dim + 1;
 
@@ -848,7 +848,7 @@ namespace internal
      * real to unit points by a least-squares fit along the mapping support
      * points. The least squares fit is special in the sense that the
      * approximation is constructed for the inverse function of a
-     * MappingQGeneric, which is generally a rational function. This allows
+     * MappingQ, which is generally a rational function. This allows
      * for a very cheap evaluation of the inverse map by a simple polynomial
      * interpolation, which can be used as a better initial guess for
      * transforming points from real to unit coordinates than an affine
@@ -875,7 +875,7 @@ namespace internal
        *
        * @param real_support_points The position of the mapping support points
        * in real space, queried by
-       * MappingQGeneric::compute_mapping_support_points().
+       * MappingQ::compute_mapping_support_points().
        *
        * @param unit_support_points The location of the support points in
        * reference coordinates $[0, 1]^d$ that map to the mapping support
@@ -1073,7 +1073,7 @@ namespace internal
     inline void
     maybe_update_q_points_Jacobians_and_grads_tensor(
       const CellSimilarity::Similarity cell_similarity,
-      const typename dealii::MappingQGeneric<dim, spacedim>::InternalData &data,
+      const typename dealii::MappingQ<dim, spacedim>::InternalData &data,
       std::vector<Point<spacedim>> &                 quadrature_points,
       std::vector<DerivativeForm<2, dim, spacedim>> &jacobian_grads)
     {
@@ -1256,8 +1256,8 @@ namespace internal
     template <int dim, int spacedim>
     inline void
     maybe_compute_q_points(
-      const typename QProjector<dim>::DataSetDescriptor data_set,
-      const typename dealii::MappingQGeneric<dim, spacedim>::InternalData &data,
+      const typename QProjector<dim>::DataSetDescriptor             data_set,
+      const typename dealii::MappingQ<dim, spacedim>::InternalData &data,
       std::vector<Point<spacedim>> &quadrature_points)
     {
       const UpdateFlags update_flags = data.update_each;
@@ -1290,7 +1290,7 @@ namespace internal
     maybe_update_Jacobians(
       const CellSimilarity::Similarity                          cell_similarity,
       const typename dealii::QProjector<dim>::DataSetDescriptor data_set,
-      const typename dealii::MappingQGeneric<dim, spacedim>::InternalData &data)
+      const typename dealii::MappingQ<dim, spacedim>::InternalData &data)
     {
       const UpdateFlags update_flags = data.update_each;
 
@@ -1369,7 +1369,7 @@ namespace internal
     maybe_update_jacobian_grads(
       const CellSimilarity::Similarity                  cell_similarity,
       const typename QProjector<dim>::DataSetDescriptor data_set,
-      const typename dealii::MappingQGeneric<dim, spacedim>::InternalData &data,
+      const typename dealii::MappingQ<dim, spacedim>::InternalData &data,
       std::vector<DerivativeForm<2, dim, spacedim>> &jacobian_grads)
     {
       const UpdateFlags update_flags = data.update_each;
@@ -1416,7 +1416,7 @@ namespace internal
     maybe_update_jacobian_pushed_forward_grads(
       const CellSimilarity::Similarity                  cell_similarity,
       const typename QProjector<dim>::DataSetDescriptor data_set,
-      const typename dealii::MappingQGeneric<dim, spacedim>::InternalData &data,
+      const typename dealii::MappingQ<dim, spacedim>::InternalData &data,
       std::vector<Tensor<3, spacedim>> &jacobian_pushed_forward_grads)
     {
       const UpdateFlags update_flags = data.update_each;
@@ -1490,7 +1490,7 @@ namespace internal
     maybe_update_jacobian_2nd_derivatives(
       const CellSimilarity::Similarity                  cell_similarity,
       const typename QProjector<dim>::DataSetDescriptor data_set,
-      const typename dealii::MappingQGeneric<dim, spacedim>::InternalData &data,
+      const typename dealii::MappingQ<dim, spacedim>::InternalData &data,
       std::vector<DerivativeForm<3, dim, spacedim>> &jacobian_2nd_derivatives)
     {
       const UpdateFlags update_flags = data.update_each;
@@ -1546,7 +1546,7 @@ namespace internal
     maybe_update_jacobian_pushed_forward_2nd_derivatives(
       const CellSimilarity::Similarity                  cell_similarity,
       const typename QProjector<dim>::DataSetDescriptor data_set,
-      const typename dealii::MappingQGeneric<dim, spacedim>::InternalData &data,
+      const typename dealii::MappingQ<dim, spacedim>::InternalData &data,
       std::vector<Tensor<4, spacedim>> &jacobian_pushed_forward_2nd_derivatives)
     {
       const UpdateFlags update_flags = data.update_each;
@@ -1647,7 +1647,7 @@ namespace internal
     maybe_update_jacobian_3rd_derivatives(
       const CellSimilarity::Similarity                  cell_similarity,
       const typename QProjector<dim>::DataSetDescriptor data_set,
-      const typename dealii::MappingQGeneric<dim, spacedim>::InternalData &data,
+      const typename dealii::MappingQ<dim, spacedim>::InternalData &data,
       std::vector<DerivativeForm<4, dim, spacedim>> &jacobian_3rd_derivatives)
     {
       const UpdateFlags update_flags = data.update_each;
@@ -1706,7 +1706,7 @@ namespace internal
     maybe_update_jacobian_pushed_forward_3rd_derivatives(
       const CellSimilarity::Similarity                  cell_similarity,
       const typename QProjector<dim>::DataSetDescriptor data_set,
-      const typename dealii::MappingQGeneric<dim, spacedim>::InternalData &data,
+      const typename dealii::MappingQ<dim, spacedim>::InternalData &data,
       std::vector<Tensor<5, spacedim>> &jacobian_pushed_forward_3rd_derivatives)
     {
       const UpdateFlags update_flags = data.update_each;
@@ -1831,13 +1831,13 @@ namespace internal
     template <int dim, int spacedim>
     inline void
     maybe_compute_face_data(
-      const dealii::MappingQGeneric<dim, spacedim> &mapping,
+      const dealii::MappingQ<dim, spacedim> &mapping,
       const typename dealii::Triangulation<dim, spacedim>::cell_iterator &cell,
-      const unsigned int         face_no,
-      const unsigned int         subface_no,
-      const unsigned int         n_q_points,
-      const std::vector<double> &weights,
-      const typename dealii::MappingQGeneric<dim, spacedim>::InternalData &data,
+      const unsigned int                                            face_no,
+      const unsigned int                                            subface_no,
+      const unsigned int                                            n_q_points,
+      const std::vector<double> &                                   weights,
+      const typename dealii::MappingQ<dim, spacedim>::InternalData &data,
       internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
         &output_data)
     {
@@ -1987,21 +1987,21 @@ namespace internal
 
 
     /**
-     * Do the work of MappingQGeneric::fill_fe_face_values() and
-     * MappingQGeneric::fill_fe_subface_values() in a generic way,
+     * Do the work of MappingQ::fill_fe_face_values() and
+     * MappingQ::fill_fe_subface_values() in a generic way,
      * using the 'data_set' to differentiate whether we will
      * work on a face (and if so, which one) or subface.
      */
     template <int dim, int spacedim>
     inline void
     do_fill_fe_face_values(
-      const dealii::MappingQGeneric<dim, spacedim> &mapping,
+      const dealii::MappingQ<dim, spacedim> &mapping,
       const typename dealii::Triangulation<dim, spacedim>::cell_iterator &cell,
-      const unsigned int                                face_no,
-      const unsigned int                                subface_no,
-      const typename QProjector<dim>::DataSetDescriptor data_set,
-      const Quadrature<dim - 1> &                       quadrature,
-      const typename dealii::MappingQGeneric<dim, spacedim>::InternalData &data,
+      const unsigned int                                            face_no,
+      const unsigned int                                            subface_no,
+      const typename QProjector<dim>::DataSetDescriptor             data_set,
+      const Quadrature<dim - 1> &                                   quadrature,
+      const typename dealii::MappingQ<dim, spacedim>::InternalData &data,
       internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
         &output_data)
     {
@@ -2063,7 +2063,7 @@ namespace internal
 
 
     /**
-     * Implementation of MappingQGeneric::transform() for generic tensors.
+     * Implementation of MappingQ::transform() for generic tensors.
      */
     template <int dim, int spacedim, int rank>
     inline void
@@ -2074,14 +2074,14 @@ namespace internal
       const ArrayView<Tensor<rank, spacedim>> &                output)
     {
       AssertDimension(input.size(), output.size());
-      Assert((dynamic_cast<const typename dealii::
-                             MappingQGeneric<dim, spacedim>::InternalData *>(
+      Assert((dynamic_cast<
+                const typename dealii::MappingQ<dim, spacedim>::InternalData *>(
                 &mapping_data) != nullptr),
              ExcInternalError());
-      const typename dealii::MappingQGeneric<dim, spacedim>::InternalData
-        &data =
-          static_cast<const typename dealii::MappingQGeneric<dim, spacedim>::
-                        InternalData &>(mapping_data);
+      const typename dealii::MappingQ<dim, spacedim>::InternalData &data =
+        static_cast<
+          const typename dealii::MappingQ<dim, spacedim>::InternalData &>(
+          mapping_data);
 
       switch (mapping_kind)
         {
@@ -2141,7 +2141,7 @@ namespace internal
 
 
     /**
-     * Implementation of MappingQGeneric::transform() for gradients.
+     * Implementation of MappingQ::transform() for gradients.
      */
     template <int dim, int spacedim, int rank>
     inline void
@@ -2152,14 +2152,14 @@ namespace internal
       const ArrayView<Tensor<rank, spacedim>> &                output)
     {
       AssertDimension(input.size(), output.size());
-      Assert((dynamic_cast<const typename dealii::
-                             MappingQGeneric<dim, spacedim>::InternalData *>(
+      Assert((dynamic_cast<
+                const typename dealii::MappingQ<dim, spacedim>::InternalData *>(
                 &mapping_data) != nullptr),
              ExcInternalError());
-      const typename dealii::MappingQGeneric<dim, spacedim>::InternalData
-        &data =
-          static_cast<const typename dealii::MappingQGeneric<dim, spacedim>::
-                        InternalData &>(mapping_data);
+      const typename dealii::MappingQ<dim, spacedim>::InternalData &data =
+        static_cast<
+          const typename dealii::MappingQ<dim, spacedim>::InternalData &>(
+          mapping_data);
 
       switch (mapping_kind)
         {
@@ -2239,7 +2239,7 @@ namespace internal
 
 
     /**
-     * Implementation of MappingQGeneric::transform() for hessians.
+     * Implementation of MappingQ::transform() for hessians.
      */
     template <int dim, int spacedim>
     inline void
@@ -2250,14 +2250,14 @@ namespace internal
       const ArrayView<Tensor<3, spacedim>> &                   output)
     {
       AssertDimension(input.size(), output.size());
-      Assert((dynamic_cast<const typename dealii::
-                             MappingQGeneric<dim, spacedim>::InternalData *>(
+      Assert((dynamic_cast<
+                const typename dealii::MappingQ<dim, spacedim>::InternalData *>(
                 &mapping_data) != nullptr),
              ExcInternalError());
-      const typename dealii::MappingQGeneric<dim, spacedim>::InternalData
-        &data =
-          static_cast<const typename dealii::MappingQGeneric<dim, spacedim>::
-                        InternalData &>(mapping_data);
+      const typename dealii::MappingQ<dim, spacedim>::InternalData &data =
+        static_cast<
+          const typename dealii::MappingQ<dim, spacedim>::InternalData &>(
+          mapping_data);
 
       switch (mapping_kind)
         {
@@ -2405,7 +2405,7 @@ namespace internal
 
 
     /**
-     * Implementation of MappingQGeneric::transform() for DerivativeForm
+     * Implementation of MappingQ::transform() for DerivativeForm
      * arguments.
      */
     template <int dim, int spacedim, int rank>
@@ -2417,14 +2417,14 @@ namespace internal
       const ArrayView<Tensor<rank + 1, spacedim>> &               output)
     {
       AssertDimension(input.size(), output.size());
-      Assert((dynamic_cast<const typename dealii::
-                             MappingQGeneric<dim, spacedim>::InternalData *>(
+      Assert((dynamic_cast<
+                const typename dealii::MappingQ<dim, spacedim>::InternalData *>(
                 &mapping_data) != nullptr),
              ExcInternalError());
-      const typename dealii::MappingQGeneric<dim, spacedim>::InternalData
-        &data =
-          static_cast<const typename dealii::MappingQGeneric<dim, spacedim>::
-                        InternalData &>(mapping_data);
+      const typename dealii::MappingQ<dim, spacedim>::InternalData &data =
+        static_cast<
+          const typename dealii::MappingQ<dim, spacedim>::InternalData &>(
+          mapping_data);
 
       switch (mapping_kind)
         {
@@ -2443,7 +2443,7 @@ namespace internal
             Assert(false, ExcNotImplemented());
         }
     }
-  } // namespace MappingQGenericImplementation
+  } // namespace MappingQImplementation
 } // namespace internal
 
 DEAL_II_NAMESPACE_CLOSE

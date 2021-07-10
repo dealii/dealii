@@ -74,8 +74,8 @@ check2()
   deallog << inside(tria, p2) << std::endl;
 
   hp::MappingCollection<3> mappings;
-  mappings.push_back(MappingQGeneric<3>(1));
-  mappings.push_back(MappingQGeneric<3>(1));
+  mappings.push_back(MappingQ<3>(1));
+  mappings.push_back(MappingQ<3>(1));
 
   hp::FECollection<3> fes;
   fes.push_back(FE_Q<3>(1));

@@ -37,8 +37,8 @@ test_real_to_unit_cell()
   Triangulation<dim> triangulation;
   GridGenerator::hyper_ball(triangulation);
 
-  Point<dim>           point;
-  MappingQGeneric<dim> mapping(1);
+  Point<dim>    point;
+  MappingQ<dim> mapping(1);
 
   point[1] = -1. / (1 + std::sqrt(2.0)) / std::sqrt(2);
 

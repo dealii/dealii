@@ -22,7 +22,7 @@
 #include <deal.II/base/function.h>
 #include <deal.II/base/mg_level_object.h>
 
-#include <deal.II/fe/mapping_q_generic.h>
+#include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/grid/tria.h>
 
@@ -42,14 +42,14 @@ class DoFHandler;
 
 /**
  * This class implements a caching strategy for objects of the MappingQ family
- * in terms of the MappingQGeneric::compute_mapping_support_points() function,
- * which is used in all operations of MappingQGeneric. The information of the
+ * in terms of the MappingQ::compute_mapping_support_points() function,
+ * which is used in all operations of MappingQ. The information of the
  * mapping is pre-computed by the MappingQCache::initialize() function.
  *
  * The use of this class is discussed extensively in step-65.
  */
 template <int dim, int spacedim = dim>
-class MappingQCache : public MappingQGeneric<dim, spacedim>
+class MappingQCache : public MappingQ<dim, spacedim>
 {
 public:
   /**
@@ -103,8 +103,8 @@ public:
    * @deprecated Use initialize() version above instead.
    */
   DEAL_II_DEPRECATED void
-  initialize(const Triangulation<dim, spacedim> &  triangulation,
-             const MappingQGeneric<dim, spacedim> &mapping);
+  initialize(const Triangulation<dim, spacedim> &triangulation,
+             const MappingQ<dim, spacedim> &     mapping);
 
   /**
    * Initialize the data cache by letting the function given as an argument
@@ -219,7 +219,7 @@ public:
 
 protected:
   /**
-   * This is the main function overridden from the base class MappingQGeneric.
+   * This is the main function overridden from the base class MappingQ.
    */
   virtual std::vector<Point<spacedim>>
   compute_mapping_support_points(

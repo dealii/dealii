@@ -90,7 +90,7 @@ class Vector;
  * the documentation of FiniteElement or the one of Triangulation.
  */
 template <int dim, typename VectorType = Vector<double>, int spacedim = dim>
-class MappingQ1Eulerian : public MappingQGeneric<dim, spacedim>
+class MappingQ1Eulerian : public MappingQ<dim, spacedim>
 {
 public:
   /**
@@ -164,7 +164,7 @@ protected:
   /**
    * Compute the support points of the mapping. For the current class, these
    * are the vertices, as obtained by calling Mapping::get_vertices(). See the
-   * documentation of MappingQGeneric::compute_mapping_support_points() for
+   * documentation of MappingQ::compute_mapping_support_points() for
    * more information.
    */
   virtual std::vector<Point<spacedim>>

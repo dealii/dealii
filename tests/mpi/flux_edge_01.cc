@@ -78,7 +78,7 @@ namespace Step39
     setup_system();
 
     parallel::distributed::Triangulation<dim> triangulation;
-    const MappingQGeneric<dim>                mapping;
+    const MappingQ<dim>                       mapping;
     const FiniteElement<dim> &                fe;
     DoFHandler<dim>                           dof_handler;
 

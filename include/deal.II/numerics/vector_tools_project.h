@@ -152,7 +152,7 @@ namespace VectorTools
 
   /**
    * Call the project() function above, with
-   * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
+   * <tt>mapping=MappingQ@<dim@>(1)</tt>.
    */
   template <int dim, typename VectorType, int spacedim>
   void

@@ -23,7 +23,7 @@
 
 #include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_values.h>
-#include <deal.II/fe/mapping_q_generic.h>
+#include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
@@ -84,7 +84,7 @@ test()
   FE_Nothing<dim> fe;
   for (unsigned int degree = 6; degree < 7; ++degree)
     {
-      MappingQGeneric<dim> mapping(degree);
+      MappingQ<dim> mapping(degree);
 
       QGauss<dim>   quad(degree + 1);
       FEValues<dim> fe_values(mapping, fe, quad, update_JxW_values);

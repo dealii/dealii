@@ -74,10 +74,9 @@ test()
 
   Point<2> test_point(250, 195);
   std::cout << "Checking Point " << test_point << std::endl;
-  auto current_cell =
-    GridTools::find_active_cell_around_point(MappingQGeneric<2>(1),
-                                             triangulation,
-                                             test_point);
+  auto current_cell = GridTools::find_active_cell_around_point(MappingQ<2>(1),
+                                                               triangulation,
+                                                               test_point);
   if (current_cell.first.state() == IteratorState::valid)
     {
       deallog << "cell: index = " << current_cell.first->index()

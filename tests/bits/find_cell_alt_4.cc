@@ -32,7 +32,7 @@
 
 void check(Triangulation<3> &tria)
 {
-  MappingQGeneric<3> map(1);
+  MappingQ<3> map(1);
 
   Point<3> p(0.75, 0, 0);
 

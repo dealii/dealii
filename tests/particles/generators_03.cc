@@ -43,7 +43,7 @@ test()
 
     GridGenerator::hyper_shell(tr, Point<dim>(), 0.5, 1.0);
 
-    MappingQGeneric<dim, spacedim> mapping(4);
+    MappingQ<dim, spacedim> mapping(4);
 
     Particles::ParticleHandler<dim, spacedim> particle_handler(tr, mapping);
 

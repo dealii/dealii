@@ -28,14 +28,14 @@ DEAL_II_NAMESPACE_OPEN
 
 /**
  * Mapping class that uses C1 (continuously differentiable) cubic mappings of
- * the boundary. This class is built atop of MappingQGeneric by simply
+ * the boundary. This class is built atop of MappingQ by simply
  * determining the interpolation points for a cubic mapping of the boundary
  * differently: MappingQ chooses them such that they interpolate the boundary,
  * while this class chooses them such that the discretized boundary is
  * globally continuously differentiable.
  */
 template <int dim, int spacedim = dim>
-class MappingC1 : public MappingQGeneric<dim, spacedim>
+class MappingC1 : public MappingQ<dim, spacedim>
 {
 public:
   /**

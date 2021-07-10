@@ -104,7 +104,7 @@ namespace TrilinosWrappers
  * There exist two versions of almost all functions, one that takes an
  * explicit Mapping argument and one that does not. The second one generally
  * calls the first with an implicit $Q_1$ argument (i.e., with an argument of
- * kind MappingQGeneric(1)). If your intend your code to use a different
+ * kind MappingQ(1)). If your intend your code to use a different
  * mapping than a (bi-/tri-)linear one, then you need to call the functions
  * <b>with</b> mapping argument should be used.
  *
@@ -258,7 +258,7 @@ namespace MatrixCreator
 
   /**
    * Call the create_mass_matrix() function, see above, with
-   * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
+   * <tt>mapping=MappingQ@<dim@>(1)</tt>.
    */
   template <int dim, int spacedim, typename number>
   void
@@ -302,7 +302,7 @@ namespace MatrixCreator
 
   /**
    * Call the create_mass_matrix() function, see above, with
-   * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
+   * <tt>mapping=MappingQ@<dim@>(1)</tt>.
    */
   template <int dim, int spacedim, typename number>
   void
@@ -412,7 +412,7 @@ namespace MatrixCreator
 
   /**
    * Call the create_boundary_mass_matrix() function, see above, with
-   * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
+   * <tt>mapping=MappingQ@<dim@>(1)</tt>.
    */
   template <int dim, int spacedim, typename number>
   void
@@ -491,7 +491,7 @@ namespace MatrixCreator
 
   /**
    * Call the create_laplace_matrix() function, see above, with
-   * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
+   * <tt>mapping=MappingQ@<dim@>(1)</tt>.
    */
   template <int dim, int spacedim>
   void
@@ -534,7 +534,7 @@ namespace MatrixCreator
 
   /**
    * Call the create_laplace_matrix() function, see above, with
-   * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
+   * <tt>mapping=MappingQ@<dim@>(1)</tt>.
    */
   template <int dim, int spacedim>
   void

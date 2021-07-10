@@ -117,7 +117,7 @@ test()
   constraints.close();
 
   // Computation on the device
-  MappingQGeneric<dim>                  mapping(fe_degree);
+  MappingQ<dim>                         mapping(fe_degree);
   CUDAWrappers::MatrixFree<dim, double> mf_data;
   typename CUDAWrappers::MatrixFree<dim, double>::AdditionalData
     additional_data;

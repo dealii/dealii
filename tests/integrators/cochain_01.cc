@@ -99,7 +99,7 @@ template <int dim>
 void
 test_cochain(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
 {
-  MappingQGeneric<dim> mapping(1);
+  MappingQ<dim> mapping(1);
   // Initialize DofHandler for a
   // block system with local blocks
   DoFHandler<dim> dof(tr);

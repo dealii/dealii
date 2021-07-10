@@ -24,8 +24,8 @@
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_handler.h>
 
+#include <deal.II/fe/mapping_q.h>
 #include <deal.II/fe/mapping_q1.h>
-#include <deal.II/fe/mapping_q_generic.h>
 
 #include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_tools.h>
@@ -512,8 +512,7 @@ namespace GridTools
                       }
                   }
                 catch (
-                  typename MappingQGeneric<dim,
-                                           spacedim>::ExcTransformationFailed &)
+                  typename MappingQ<dim, spacedim>::ExcTransformationFailed &)
                   {
                     // ok, the transformation
                     // failed presumably
@@ -1347,8 +1346,7 @@ namespace GridTools
                       }
                   }
                 catch (
-                  typename MappingQGeneric<dim,
-                                           spacedim>::ExcTransformationFailed &)
+                  typename MappingQ<dim, spacedim>::ExcTransformationFailed &)
                   {
                     // ok, the transformation
                     // failed presumably

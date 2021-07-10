@@ -30,7 +30,7 @@
 #include <deal.II/fe/fe_q_iso_q1.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/mapping_fe_field.h>
-#include <deal.II/fe/mapping_q_generic.h>
+#include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
@@ -362,8 +362,7 @@ test(const MPI_Comm comm)
   Vector<double> euler_vector(dof_handler_dim.n_dofs());
   VectorTools::get_position_vector(dof_handler_dim,
                                    euler_vector,
-                                   MappingQGeneric<dim, spacedim>(
-                                     mapping_degree));
+                                   MappingQ<dim, spacedim>(mapping_degree));
   MappingFEField<dim, spacedim> mapping(dof_handler_dim, euler_vector);
 
 

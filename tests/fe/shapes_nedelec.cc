@@ -30,8 +30,8 @@ template <int dim>
 void
 plot_FE_Nedelec_shape_functions()
 {
-  MappingQGeneric<dim> m(1);
-  FE_Nedelec<dim>      p0(0);
+  MappingQ<dim>   m(1);
+  FE_Nedelec<dim> p0(0);
   //   plot_shape_functions(m, p1, "Nedelec1");
   //   plot_face_shape_functions(m, p1, "Nedelec1");
   test_compute_functions(m, p0, "Nedelec0");

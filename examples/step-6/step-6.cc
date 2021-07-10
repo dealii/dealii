@@ -478,7 +478,7 @@ void Step6<dim>::output_results(const unsigned int cycle) const
     std::ofstream         output("grid-" + std::to_string(cycle) + ".gnuplot");
     GridOutFlags::Gnuplot gnuplot_flags(false, 5);
     grid_out.set_flags(gnuplot_flags);
-    MappingQGeneric<dim> mapping(3);
+    MappingQ<dim> mapping(3);
     grid_out.write_gnuplot(triangulation, output, &mapping);
   }
 

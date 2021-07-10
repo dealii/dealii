@@ -72,9 +72,9 @@ test(const FiniteElement<dim, spacedim> &fe_0,
   hp::QCollection<dim> quadrature(QGaussSimplex<dim>(degree + 1),
                                   QGauss<dim>(degree + 1));
 
-  hp::MappingCollection<dim, spacedim> mapping(
-    MappingFE<dim, spacedim>(FE_SimplexP<dim, spacedim>(1)),
-    MappingQGeneric<dim, spacedim>(1));
+  hp::MappingCollection<dim, spacedim> mapping(MappingFE<dim, spacedim>(
+                                                 FE_SimplexP<dim, spacedim>(1)),
+                                               MappingQ<dim, spacedim>(1));
 
   Triangulation<dim, spacedim> tria;
   GridGenerator::subdivided_hyper_cube_with_simplices_mix(tria,

@@ -173,7 +173,7 @@ MappingTest<dim>::run_test()
       dof_handler.distribute_dofs(fe);
       displacements.reinit(dof_handler.n_dofs());
 
-      VectorTools::interpolate(MappingQGeneric<dim>(1),
+      VectorTools::interpolate(MappingQ<dim>(1),
                                dof_handler,
                                imposed_displacement,
                                displacements);
@@ -244,7 +244,7 @@ MappingTest<dim>::graphical_output()
   dof_handler.distribute_dofs(fe);
   displacements.reinit(dof_handler.n_dofs());
 
-  VectorTools::interpolate(MappingQGeneric<dim>(1),
+  VectorTools::interpolate(MappingQ<dim>(1),
                            dof_handler,
                            imposed_displacement,
                            displacements);

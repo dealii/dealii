@@ -79,7 +79,7 @@ test()
       deallog << " on " << dof.n_dofs() << " DoFs";
       deallog << std::endl;
 
-      MappingQGeneric<dim> mapping(dof.get_fe().degree + 1);
+      MappingQ<dim> mapping(dof.get_fe().degree + 1);
 
       LinearAlgebra::distributed::BlockVector<double> in(1);
       LinearAlgebra::distributed::BlockVector<double> out(1);
