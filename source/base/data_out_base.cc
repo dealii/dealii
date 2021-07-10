@@ -5467,11 +5467,14 @@ namespace DataOutBase
     // probably lead to all sorts of difficult error messages. Other than that,
     // trust the user that whatever they provide makes sense somehow.
     for (const auto &unit : flags.physical_units)
-      Assert(
-        unit.second.find('\"') == std::string::npos,
-        ExcMessage(
-          "A physical unit you provided, <" + unit.second +
-          ">, contained a quotation mark character. This is not allowed."));
+      {
+        (void)unit;
+        Assert(
+          unit.second.find('\"') == std::string::npos,
+          ExcMessage(
+            "A physical unit you provided, <" + unit.second +
+            ">, contained a quotation mark character. This is not allowed."));
+      }
 
 #ifndef DEAL_II_WITH_MPI
     // verify that there are indeed patches to be written out. most of the
@@ -5907,11 +5910,14 @@ namespace DataOutBase
     // probably lead to all sorts of difficult error messages. Other than that,
     // trust the user that whatever they provide makes sense somehow.
     for (const auto &unit : flags.physical_units)
-      Assert(
-        unit.second.find('\"') == std::string::npos,
-        ExcMessage(
-          "A physical unit you provided, <" + unit.second +
-          ">, contained a quotation mark character. This is not allowed."));
+      {
+        (void)unit;
+        Assert(
+          unit.second.find('\"') == std::string::npos,
+          ExcMessage(
+            "A physical unit you provided, <" + unit.second +
+            ">, contained a quotation mark character. This is not allowed."));
+      }
 
     const unsigned int n_data_sets = data_names.size();
 
