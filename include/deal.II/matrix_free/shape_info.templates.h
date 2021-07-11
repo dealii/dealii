@@ -30,9 +30,11 @@
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_poly.h>
 #include <deal.II/fe/fe_pyramid_p.h>
+#include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_q_dg0.h>
 #include <deal.II/fe/fe_simplex_p.h>
 #include <deal.II/fe/fe_simplex_p_bubbles.h>
+#include <deal.II/fe/fe_tools.h>
 #include <deal.II/fe/fe_wedge_p.h>
 
 #include <deal.II/grid/reference_cell.h>
@@ -167,6 +169,29 @@ namespace internal
                 lexicographic_numbering[lexicographic[i]] = i;
               }
         }
+    }
+
+
+
+    template <int dim_to, int dim, int spacedim>
+    std::unique_ptr<FiniteElement<dim_to, dim_to>>
+    create_fe(const FiniteElement<dim, spacedim> &fe)
+    {
+      std::string fe_name = fe.get_name();
+
+      Assert(
+        fe_name.find("FESystem") == std::string::npos,
+        ExcMessage(
+          "This function can not accept FESystem but only base elements."));
+
+      {
+        const std::size_t template_starts = fe_name.find_first_of('<');
+        Assert(fe_name[template_starts + 1] ==
+                 (dim == 1 ? '1' : (dim == 2 ? '2' : '3')),
+               ExcInternalError());
+        fe_name[template_starts + 1] = std::to_string(dim_to).c_str()[0];
+      }
+      return FETools::get_fe_by_name<dim_to, dim_to>(fe_name);
     }
 
 
@@ -598,6 +623,43 @@ namespace internal
               q_point[0]                    = 1;
               quadrature_data_on_face[1][i] = fe_quad.shape_value(i, q_point);
             }
+        }
+
+      if (dim > 1 && dynamic_cast<const FE_Q<dim> *>(&fe))
+        {
+          auto &subface_interpolation_matrix =
+            univariate_shape_data.subface_interpolation_matrix;
+
+          const auto fe_1d = create_fe<1>(fe);
+          const auto fe_2d = create_fe<2>(fe);
+
+          FullMatrix<double> interpolation_matrix(fe_2d->n_dofs_per_face(0),
+                                                  fe_2d->n_dofs_per_face(0));
+
+          fe_2d->get_subface_interpolation_matrix(*fe_2d,
+                                                  0,
+                                                  interpolation_matrix,
+                                                  0);
+
+          ElementType               element_type;
+          std::vector<unsigned int> scalar_lexicographic;
+          std::vector<unsigned int> lexicographic_numbering;
+
+          get_element_type_specific_information(*fe_1d,
+                                                *fe_1d,
+                                                0,
+                                                element_type,
+                                                scalar_lexicographic,
+                                                lexicographic_numbering);
+
+          subface_interpolation_matrix.resize(fe_1d->n_dofs_per_cell() *
+                                              fe_1d->n_dofs_per_cell());
+
+          for (unsigned int i = 0, c = 0; i < fe_1d->n_dofs_per_cell(); ++i)
+            for (unsigned int j = 0; j < fe_1d->n_dofs_per_cell(); ++j, ++c)
+              subface_interpolation_matrix[c] =
+                interpolation_matrix(scalar_lexicographic[i],
+                                     scalar_lexicographic[j]);
         }
 
       // get gradient and Hessian transformation matrix for the polynomial
