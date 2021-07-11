@@ -356,6 +356,58 @@ MGCoarseGridIterativeSolver<VectorType,
 
 
 
+namespace internal
+{
+  namespace MGCoarseGridIterativeSolver
+  {
+    template <
+      class VectorType,
+      class SolverType,
+      class MatrixType,
+      class PreconditionerType,
+      typename std::enable_if<
+        std::is_same<VectorType, typename SolverType::vector_type>::value,
+        VectorType>::type * = nullptr>
+    void
+    solve(SolverType &              solver,
+          const MatrixType &        matrix,
+          const PreconditionerType &preconditioner,
+          VectorType &              dst,
+          const VectorType &        src)
+    {
+      solver.solve(matrix, dst, src, preconditioner);
+    }
+
+    template <
+      class VectorType,
+      class SolverType,
+      class MatrixType,
+      class PreconditionerType,
+      typename std::enable_if<
+        !std::is_same<VectorType, typename SolverType::vector_type>::value,
+        VectorType>::type * = nullptr>
+    void
+    solve(SolverType &              solver,
+          const MatrixType &        matrix,
+          const PreconditionerType &preconditioner,
+          VectorType &              dst,
+          const VectorType &        src)
+    {
+      typename SolverType::vector_type src_;
+      typename SolverType::vector_type dst_;
+
+      src_ = src;
+      dst_ = dst;
+
+      solver.solve(matrix, dst_, src_, preconditioner);
+
+      dst = dst_;
+    }
+  } // namespace MGCoarseGridIterativeSolver
+} // namespace internal
+
+
+
 template <class VectorType,
           class SolverType,
           class MatrixType,
@@ -372,7 +424,9 @@ operator()(const unsigned int /*level*/,
   Assert(solver != nullptr, ExcNotInitialized());
   Assert(matrix != nullptr, ExcNotInitialized());
   Assert(preconditioner != nullptr, ExcNotInitialized());
-  solver->solve(*matrix, dst, src, *preconditioner);
+
+  internal::MGCoarseGridIterativeSolver::solve(
+    *solver, *matrix, *preconditioner, dst, src);
 }
 
 
