@@ -822,7 +822,17 @@ public:
                  << "15 Point (1 node, ignored when read)");
 
 
-  DeclException0(ExcGmshNoCellInformation);
+  DeclException2(
+    ExcGmshNoCellInformation,
+    unsigned int,
+    unsigned int,
+    "While reading a gmsh file, the reader function did not find "
+    "any cells. This sometimes happens if the file only contains a "
+    "surface mesh, but not a volume mesh."
+    "\n\n"
+    "The reader function did find " +
+      std::to_string(arg1) + " lines and " + std::to_string(arg2) +
+      " facets (surface triangles or quadrilaterals).");
 
 protected:
   /**
