@@ -1836,7 +1836,7 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
                 else if (cell_type == 5) // hex
                   nod_num = 8;
               }
-            else
+            else // file format version 4.0 and later
               {
                 // ignore tag
                 int tag;
@@ -1876,11 +1876,11 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
                      Point (1 node).
             */
 
-            if (((cell_type == 1) && (dim == 1)) ||
-                ((cell_type == 2) && (dim == 2)) ||
-                ((cell_type == 3) && (dim == 2)) ||
-                ((cell_type == 4) && (dim == 3)) ||
-                ((cell_type == 5) && (dim == 3)))
+            if (((cell_type == 1) && (dim == 1)) || // a line in 1d
+                ((cell_type == 2) && (dim == 2)) || // a triangle in 2d
+                ((cell_type == 3) && (dim == 2)) || // a quadrilateral in 2d
+                ((cell_type == 4) && (dim == 3)) || // a tet in 3d
+                ((cell_type == 5) && (dim == 3)))   // a hex in 3d
               // found a cell
               {
                 unsigned int vertices_per_cell = 0;
@@ -1958,7 +1958,8 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
                       vertex_indices[cells.back().vertices[i]];
                   }
               }
-            else if ((cell_type == 1) && ((dim == 2) || (dim == 3)))
+            else if ((cell_type == 1) &&
+                     ((dim == 2) || (dim == 3))) // a line in 2d or 3d
               // boundary info
               {
                 subcelldata.boundary_lines.emplace_back();
@@ -1996,7 +1997,8 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
                       vertex = numbers::invalid_unsigned_int;
                     }
               }
-            else if ((cell_type == 2 || cell_type == 3) && (dim == 3))
+            else if ((cell_type == 2 || cell_type == 3) &&
+                     (dim == 3)) // a triangle or a quad in 3d
               // boundary info
               {
                 unsigned int vertices_per_cell = 0;
@@ -2080,7 +2082,7 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
       }
     AssertDimension(global_cell, n_cells);
   }
-  // Assert we reached the end of the block
+  // Assert that we reached the end of the block
   in >> line;
   static const std::string end_elements_marker[] = {"$ENDELM", "$EndElements"};
   AssertThrow(line == end_elements_marker[gmsh_file_format == 10 ? 0 : 1],
@@ -2092,7 +2094,9 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
   AssertThrow(in, ExcIO());
 
   // check that we actually read some cells.
-  AssertThrow(cells.size() > 0, ExcGmshNoCellInformation());
+  AssertThrow(cells.size() > 0,
+              ExcGmshNoCellInformation(subcelldata.boundary_lines.size(),
+                                       subcelldata.boundary_quads.size()));
 
   // TODO: the functions below (GridTools::delete_unused_vertices(),
   // GridTools::invert_all_negative_measure_cells(),
