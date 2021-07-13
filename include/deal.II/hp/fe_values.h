@@ -89,7 +89,7 @@ namespace hp
       const MappingCollection<dim, FEValuesType::space_dimension>
         &mapping_collection,
       const FECollection<dim, FEValuesType::space_dimension> &fe_collection,
-      const std::vector<QCollection<q_dim>> &                 q_collection,
+      const QCollection<q_dim, 2> &                           q_collection,
       const UpdateFlags                                       update_flags);
 
     /**
@@ -109,7 +109,7 @@ namespace hp
      */
     FEValuesBase(
       const FECollection<dim, FEValuesType::space_dimension> &fe_collection,
-      const std::vector<QCollection<q_dim>> &                 q_collection,
+      const QCollection<q_dim, 2> &                           q_collection,
       const UpdateFlags                                       update_flags);
 
     /**
@@ -229,7 +229,7 @@ namespace hp
      * The variable q_collection collects the first quadrature rule of each
      * quadrature collection of the vector.
      */
-    const std::vector<QCollection<q_dim>> q_collections;
+    const QCollection<q_dim, 2> q_collections;
 
   private:
     /**
@@ -459,8 +459,8 @@ namespace hp
      */
     FEFaceValues(const hp::MappingCollection<dim, spacedim> &mapping_collection,
                  const hp::FECollection<dim, spacedim> &     fe_collection,
-                 const std::vector<hp::QCollection<dim - 1>> &q_collections,
-                 const UpdateFlags                            update_flags);
+                 const hp::QCollection<dim - 1, 2> &         q_collections,
+                 const UpdateFlags                           update_flags);
 
 
     /**
@@ -481,9 +481,9 @@ namespace hp
      * In the case that the collections only contains a single face quadrature,
      * this quadrature rule is use on all faces.
      */
-    FEFaceValues(const hp::FECollection<dim, spacedim> &      fe_collection,
-                 const std::vector<hp::QCollection<dim - 1>> &q_collections,
-                 const UpdateFlags                            update_flags);
+    FEFaceValues(const hp::FECollection<dim, spacedim> &fe_collection,
+                 const hp::QCollection<dim - 1, 2> &    q_collections,
+                 const UpdateFlags                      update_flags);
 
     /**
      * Reinitialize the object for the given cell and face.

@@ -18,6 +18,8 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/hp/q_collection.h>
+
 #include <set>
 
 DEAL_II_NAMESPACE_OPEN
@@ -36,8 +38,6 @@ namespace hp
 {
   template <int dim, int spacedim>
   class MappingCollection;
-  template <int dim>
-  class QCollection;
 } // namespace hp
 
 

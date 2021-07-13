@@ -281,7 +281,7 @@ namespace hp
            ExcMessage("All elements inside a collection need to have the "
                       "same number of vector components!"));
 
-    Collection<FiniteElement<dim, spacedim>>::push_back(new_fe.clone());
+    Collection<FiniteElement<dim, spacedim>, 1>::push_back(new_fe.clone());
   }
 
 

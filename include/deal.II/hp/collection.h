@@ -36,8 +36,68 @@ namespace hp
    *
    * @ingroup hp hpcollection
    */
-  template <typename T>
-  class Collection : public Subscriptor
+  template <typename T, int N>
+  class CollectionBase : public Subscriptor
+  {
+  public:
+    /**
+     * Default constructor. Leads to an empty collection that can later be
+     * filled using push_back().
+     */
+    CollectionBase() = default;
+
+    /**
+     * TODO.
+     */
+    CollectionBase(const Table<N, std::shared_ptr<const T>> &entries);
+
+    /**
+     * Determine an estimate for the memory consumption (in bytes) of this
+     * object.
+     */
+    std::size_t
+    memory_consumption() const;
+
+    /**
+     * TODO
+     */
+    Table<N, std::shared_ptr<const T>> &
+    get_entries();
+
+    /**
+     * TODO
+     */
+    const Table<N, std::shared_ptr<const T>> &
+    get_entries() const;
+
+  protected:
+    /**
+     * The real container, which stores pointers to the different objects.
+     */
+    Table<N, std::shared_ptr<const T>> entries;
+  };
+
+
+
+  template <typename T, int N, typename U = T>
+  class Collection;
+
+
+
+  template <typename T, typename U>
+  class Collection<T, 0, U>
+  {
+  public:
+    /**
+     * TODO.
+     */
+    Collection() = default;
+  };
+
+
+
+  template <typename T, typename U>
+  class Collection<T, 1, U> : public CollectionBase<T, 1>
   {
   public:
     /**
@@ -45,6 +105,11 @@ namespace hp
      * filled using push_back().
      */
     Collection() = default;
+
+    /**
+     * TODO.
+     */
+    Collection(const Table<1, std::shared_ptr<const T>> &entries);
 
     /**
      * Add a new object.
@@ -66,19 +131,34 @@ namespace hp
      */
     unsigned int
     size() const;
+  };
+
+
+
+  template <typename T, typename U>
+  class Collection<T, 2, U> : public CollectionBase<T, 2>
+  {
+  public:
+    /**
+     * TODO
+     */
+    Collection() = default;
 
     /**
-     * Determine an estimate for the memory consumption (in bytes) of this
-     * object.
+     * TODO.
      */
-    std::size_t
-    memory_consumption() const;
+    Collection(const Table<2, std::shared_ptr<const T>> &entries);
 
-  private:
     /**
-     * The real container, which stores pointers to the different objects.
+     * TODO
      */
-    std::vector<std::shared_ptr<const T>> entries;
+    const U operator[](const unsigned int index) const;
+
+    /**
+     * TODO
+     */
+    unsigned int
+    size() const;
   };
 
 
@@ -86,38 +166,111 @@ namespace hp
 
 
 
-  template <typename T>
+  template <typename T, int N>
+  CollectionBase<T, N>::CollectionBase(
+    const Table<N, std::shared_ptr<const T>> &entries)
+    : entries(entries)
+  {}
+
+
+
+  template <typename T, int N>
   std::size_t
-  Collection<T>::memory_consumption() const
+  CollectionBase<T, N>::memory_consumption() const
   {
     return (sizeof(*this) + MemoryConsumption::memory_consumption(entries));
   }
 
 
 
-  template <typename T>
+  template <typename T, int N>
+  Table<N, std::shared_ptr<const T>> &
+  CollectionBase<T, N>::get_entries()
+  {
+    return entries;
+  }
+
+
+
+  template <typename T, int N>
+  const Table<N, std::shared_ptr<const T>> &
+  CollectionBase<T, N>::get_entries() const
+  {
+    return entries;
+  }
+
+
+
+  template <typename T, typename U>
+  Collection<T, 1, U>::Collection(
+    const Table<1, std::shared_ptr<const T>> &entries)
+    : CollectionBase<T, 1>(entries)
+  {}
+
+
+
+  template <typename T, typename U>
   void
-  Collection<T>::push_back(const std::shared_ptr<const T> &new_entry)
+  Collection<T, 1, U>::push_back(const std::shared_ptr<const T> &new_entry)
   {
-    entries.push_back(new_entry);
+    const auto         temp     = this->entries;
+    const unsigned int old_size = this->size();
+
+    this->entries = Table<1, std::shared_ptr<const T>>(old_size + 1);
+
+    for (unsigned int i = 0; i < old_size; ++i)
+      this->entries[i] = temp[i];
+
+    this->entries[old_size] = new_entry;
   }
 
 
 
-  template <typename T>
+  template <typename T, typename U>
   inline unsigned int
-  Collection<T>::size() const
+  Collection<T, 1, U>::size() const
   {
-    return entries.size();
+    return this->entries.size()[0];
   }
 
 
 
-  template <typename T>
-  inline const T &Collection<T>::operator[](const unsigned int index) const
+  template <typename T, typename U>
+  inline const T &Collection<T, 1, U>::
+                  operator[](const unsigned int index) const
   {
-    AssertIndexRange(index, entries.size());
-    return *entries[index];
+    AssertIndexRange(index, this->size());
+    return *this->entries[index];
+  }
+
+
+
+  template <typename T, typename U>
+  Collection<T, 2, U>::Collection(
+    const Table<2, std::shared_ptr<const T>> &entries)
+    : CollectionBase<T, 2>(entries)
+  {}
+
+
+
+  template <typename T, typename U>
+  const U Collection<T, 2, U>::operator[](const unsigned int index) const
+  {
+    Table<1, std::shared_ptr<const T>> new_enties(this->entries.size()[1]);
+
+    for (unsigned int i = 0; i < this->entries.size()[1]; ++i)
+      new_enties[i] = this->entries[index][i];
+
+    return U(new_enties);
+  }
+
+
+
+  template <typename T, typename U>
+  unsigned int
+  Collection<T, 2, U>::size() const
+  {
+    return this->entries.size()[0];
   }
 
 } // namespace hp

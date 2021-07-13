@@ -42,8 +42,9 @@ namespace hp
    *
    * @ingroup hp hpcollection
    */
-  template <int dim>
-  class QCollection : public Collection<Quadrature<dim>>
+  template <int dim, int N = 1>
+  class QCollection
+    : public Collection<Quadrature<dim>, N, QCollection<dim, N - 1>>
   {
   public:
     /**
@@ -56,7 +57,14 @@ namespace hp
      * Copy constructor.
      */
     template <int dim_in>
-    QCollection(const QCollection<dim_in> &other);
+    QCollection(const QCollection<dim_in, N> &other);
+
+    /**
+     * Copy constructor.
+     */
+    QCollection(const Table<N, std::shared_ptr<const Quadrature<dim>>> entries)
+      : Collection<Quadrature<dim>, N, QCollection<dim, N - 1>>(entries)
+    {}
 
     /**
      * Conversion constructor. This constructor creates a QCollection from a
@@ -137,19 +145,43 @@ namespace hp
 
   /* --------------- inline functions ------------------- */
 
-  template <int dim>
-  template <int dim_in>
-  QCollection<dim>::QCollection(const QCollection<dim_in> &other)
+  namespace internal
   {
-    for (unsigned int i = 0; i < other.size(); ++i)
-      push_back(other[i]);
+    template <int N, int dim, int dim_in>
+    void
+    copy(const QCollection<dim_in, N> &other, QCollection<dim, N> &result)
+    {
+      Assert(false, ExcNotImplemented());
+
+      (void)other;
+      (void)result;
+    }
+
+    template <int dim, int dim_in>
+    void
+    copy(const QCollection<dim_in, 1> &other, QCollection<dim, 1> &result)
+    {
+      result.entries().resize(other.size());
+
+      for (unsigned int i = 0; i < other.size(); ++i)
+        result.entries()[i] = other.entries()[i];
+    }
+  } // namespace internal
+
+
+
+  template <int dim, int N>
+  template <int dim_in>
+  QCollection<dim, N>::QCollection(const QCollection<dim_in, N> &other)
+  {
+    internal::copy(other, *this);
   }
 
 
 
-  template <int dim>
+  template <int dim, int N>
   template <class... QTypes>
-  QCollection<dim>::QCollection(const QTypes &... quadrature_objects)
+  QCollection<dim, N>::QCollection(const QTypes &... quadrature_objects)
   {
     // loop over all of the given arguments and add the quadrature objects to
     // this collection. Inlining the definition of q_pointers causes internal
@@ -176,9 +208,9 @@ namespace hp
 
 
 
-  template <int dim>
+  template <int dim, int N>
   inline unsigned int
-  QCollection<dim>::max_n_quadrature_points() const
+  QCollection<dim, N>::max_n_quadrature_points() const
   {
     Assert(this->size() > 0,
            ExcMessage("You can't call this function for an empty collection"));
@@ -192,9 +224,9 @@ namespace hp
 
 
 
-  template <int dim>
+  template <int dim, int N>
   inline bool
-  QCollection<dim>::operator==(const QCollection<dim> &q_collection) const
+  QCollection<dim, N>::operator==(const QCollection<dim> &q_collection) const
   {
     const unsigned int n_quadratures = this->size();
     if (n_quadratures != q_collection.size())
@@ -209,20 +241,21 @@ namespace hp
 
 
 
-  template <int dim>
+  template <int dim, int N>
   template <int dim_in>
-  inline QCollection<dim>::QCollection(const Quadrature<dim_in> &quadrature)
+  inline QCollection<dim, N>::QCollection(const Quadrature<dim_in> &quadrature)
   {
     this->push_back(quadrature);
   }
 
 
-  template <int dim>
+
+  template <int dim, int N>
   template <int dim_in>
   inline void
-  QCollection<dim>::push_back(const Quadrature<dim_in> &new_quadrature)
+  QCollection<dim, N>::push_back(const Quadrature<dim_in> &new_quadrature)
   {
-    Collection<Quadrature<dim>>::push_back(
+    Collection<Quadrature<dim>, N, QCollection<dim, N - 1>>::push_back(
       std::make_shared<const Quadrature<dim>>(new_quadrature));
   }
 

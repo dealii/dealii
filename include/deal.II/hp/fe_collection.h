@@ -50,7 +50,7 @@ namespace hp
    * @ingroup hp hpcollection
    */
   template <int dim, int spacedim = dim>
-  class FECollection : public Collection<FiniteElement<dim, spacedim>>
+  class FECollection : public Collection<FiniteElement<dim, spacedim>, 1>
   {
   public:
     /**

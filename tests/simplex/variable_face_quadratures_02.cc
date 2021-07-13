@@ -69,15 +69,13 @@ test<2>()
 
   // test FEFaceValues for FE_System(FE_Q)
   {
-    const std::vector<hp::QCollection<dim - 1>> quad_ref = {
-      hp::QCollection<dim - 1>(QGauss<dim - 1>(1),
-                               QGauss<dim - 1>(2),
-                               QGauss<dim - 1>(3),
-                               QGauss<dim - 1>(4)),
-      hp::QCollection<dim - 1>(QGauss<dim - 1>(5),
-                               QGauss<dim - 1>(6),
-                               QGauss<dim - 1>(7),
-                               QGauss<dim - 1>(8))};
+    Table<2, std::shared_ptr<const Quadrature<dim - 1>>> entries(2, 4);
+
+    for (unsigned int i = 0, c = 1; i < 2; ++i)
+      for (unsigned int j = 0; j < 4; ++j, ++c)
+        entries[i][j] = std::make_shared<QGauss<dim - 1>>(c);
+
+    hp::QCollection<dim - 1, 2> quad_ref(entries);
 
     hp::MappingCollection<dim> mapping(MappingFE<dim>(FE_Q<dim>(1)));
     hp::FECollection<dim>      fe(FESystem<dim>(FE_Q<dim>{3}, dim));

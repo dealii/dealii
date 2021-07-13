@@ -104,7 +104,7 @@ namespace VectorTools
     template <int dim,
               int spacedim,
               template <int, int> class M_or_MC,
-              template <int> class Q_or_QC,
+              typename Q_or_QC,
               typename number>
     void
     project_compute_b_v(
@@ -112,7 +112,7 @@ namespace VectorTools
       const DoFHandler<dim, spacedim> &          dof,
       const Function<spacedim, number> &         function,
       const bool                                 enforce_zero_boundary,
-      const Q_or_QC<dim - 1> &                   q_boundary,
+      const Q_or_QC &                            q_boundary,
       const bool                                 project_to_boundary_first,
       std::map<types::global_dof_index, number> &boundary_values)
     {
@@ -408,18 +408,19 @@ namespace VectorTools
               int spacedim,
               typename VectorType,
               template <int, int> class M_or_MC,
-              template <int> class Q_or_QC>
+              typename Q_or_QC_cell,
+              typename Q_or_QC_face>
     void
     do_project(
       const M_or_MC<dim, spacedim> &                             mapping,
       const DoFHandler<dim, spacedim> &                          dof,
       const AffineConstraints<typename VectorType::value_type> & constraints,
-      const Q_or_QC<dim> &                                       quadrature,
+      const Q_or_QC_cell &                                       quadrature,
       const Function<spacedim, typename VectorType::value_type> &function,
       VectorType &                                               vec_result,
-      const bool              enforce_zero_boundary,
-      const Q_or_QC<dim - 1> &q_boundary,
-      const bool              project_to_boundary_first)
+      const bool          enforce_zero_boundary,
+      const Q_or_QC_face &q_boundary,
+      const bool          project_to_boundary_first)
     {
       using number = typename VectorType::value_type;
       Assert(dof.get_fe(0).n_components() == function.n_components,

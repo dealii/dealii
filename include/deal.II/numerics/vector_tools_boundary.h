@@ -22,6 +22,7 @@
 #include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/hp/mapping_collection.h>
+#include <deal.II/hp/q_collection.h>
 
 #include <map>
 
@@ -33,11 +34,6 @@ template <int dim, int spacedim>
 class DoFHandler;
 template <int dim, typename Number>
 class Function;
-namespace hp
-{
-  template <int dim>
-  class QCollection;
-} // namespace hp
 
 namespace VectorTools
 {

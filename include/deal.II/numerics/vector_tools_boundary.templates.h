@@ -691,7 +691,7 @@ namespace VectorTools
     template <int dim,
               int spacedim,
               template <int, int> class M_or_MC,
-              template <int> class Q_or_QC,
+              typename Q_or_QC,
               typename number>
     void
     do_project_boundary_values(
@@ -699,7 +699,7 @@ namespace VectorTools
       const DoFHandler<dim, spacedim> &dof,
       const std::map<types::boundary_id, const Function<spacedim, number> *>
         &                                        boundary_functions,
-      const Q_or_QC<dim - 1> &                   q,
+      const Q_or_QC &                            q,
       std::map<types::global_dof_index, number> &boundary_values,
       std::vector<unsigned int>                  component_mapping)
     {
