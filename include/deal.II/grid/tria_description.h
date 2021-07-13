@@ -213,7 +213,11 @@ struct SubCellData
 
   /**
    * A vector of CellData<2> objects that describe boundary and manifold
-   * information for quads of 3d triangulations.
+   * information for triangles and quads of 3d triangulations. The name of
+   * the variable is historical and dates back to a time when deal.II only
+   * supported hexahedral meshes in 3d, where then all boundary faces were
+   * necessarily quadrilaterals. However, the variable is now also used to
+   * describe boundary triangles for tetrahedral and mixed meshes.
    *
    * This vector may not be used in the creation of 1d or 2d triangulations.
    */
