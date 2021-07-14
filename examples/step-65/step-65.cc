@@ -37,7 +37,7 @@
 
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
-#include <deal.II/fe/mapping_q_generic.h>
+#include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
@@ -582,7 +582,7 @@ namespace Step65
   // solver chain, starting from the setup of the equations, the assembly of
   // the linear system, its solution with a simple iterative solver, and the
   // postprocessing discussed above. The two instances differ in the way they
-  // use the mapping. The first uses a conventional MappingQGeneric mapping
+  // use the mapping. The first uses a conventional MappingQ mapping
   // object which we initialize to a degree one more than we use for the
   // finite element &ndash; after all, we expect the geometry representation
   // to be the bottleneck as the analytic solution is only a quadratic
@@ -600,11 +600,11 @@ namespace Step65
 
     {
       std::cout << std::endl
-                << "====== Running with the basic MappingQGeneric class ====== "
+                << "====== Running with the basic MappingQ class ====== "
                 << std::endl
                 << std::endl;
 
-      MappingQGeneric<dim> mapping(fe.degree + 1);
+      MappingQ<dim> mapping(fe.degree + 1);
       setup_system(mapping);
       assemble_system(mapping);
       solve();
@@ -619,7 +619,7 @@ namespace Step65
     // we want it to show the correct degree functionality in other contexts),
     // we fill the cache via the MappingQCache::initialize() function. At this
     // stage, we specify which mapping we want to use (obviously, the same
-    // MappingQGeneric as previously in order to repeat the same computations)
+    // MappingQ as previously in order to repeat the same computations)
     // for the cache, and then run through the same functions again, now
     // handing in the modified mapping. In the end, we again print the
     // accumulated wall times since the reset to see how the times compare to
@@ -633,7 +633,7 @@ namespace Step65
       MappingQCache<dim> mapping(fe.degree + 1);
       {
         TimerOutput::Scope scope(timer, "Initialize mapping cache");
-        mapping.initialize(MappingQGeneric<dim>(fe.degree + 1), triangulation);
+        mapping.initialize(MappingQ<dim>(fe.degree + 1), triangulation);
       }
       std::cout << "   Memory consumption cache:     "
                 << 1e-6 * mapping.memory_consumption() << " MB" << std::endl;

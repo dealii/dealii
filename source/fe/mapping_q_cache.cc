@@ -39,7 +39,7 @@ DEAL_II_NAMESPACE_OPEN
 template <int dim, int spacedim>
 MappingQCache<dim, spacedim>::MappingQCache(
   const unsigned int polynomial_degree)
-  : MappingQGeneric<dim, spacedim>(polynomial_degree)
+  : MappingQ<dim, spacedim>(polynomial_degree)
   , uses_level_info(false)
 {}
 
@@ -48,7 +48,7 @@ MappingQCache<dim, spacedim>::MappingQCache(
 template <int dim, int spacedim>
 MappingQCache<dim, spacedim>::MappingQCache(
   const MappingQCache<dim, spacedim> &mapping)
-  : MappingQGeneric<dim, spacedim>(mapping)
+  : MappingQ<dim, spacedim>(mapping)
   , support_point_cache(mapping.support_point_cache)
   , uses_level_info(mapping.uses_level_info)
 {}
@@ -100,12 +100,11 @@ MappingQCache<dim, spacedim>::initialize(
   this->initialize(
     triangulation,
     [&](const typename Triangulation<dim, spacedim>::cell_iterator &cell) {
-      const auto mapping_q_generic =
-        dynamic_cast<const MappingQGeneric<dim, spacedim> *>(&mapping);
-      if (mapping_q_generic != nullptr &&
-          this->get_degree() == mapping_q_generic->get_degree())
+      const auto mapping_q =
+        dynamic_cast<const MappingQ<dim, spacedim> *>(&mapping);
+      if (mapping_q != nullptr && this->get_degree() == mapping_q->get_degree())
         {
-          return mapping_q_generic->compute_mapping_support_points(cell);
+          return mapping_q->compute_mapping_support_points(cell);
         }
       else
         {
@@ -139,8 +138,8 @@ MappingQCache<dim, spacedim>::initialize(
 template <int dim, int spacedim>
 void
 MappingQCache<dim, spacedim>::initialize(
-  const Triangulation<dim, spacedim> &  triangulation,
-  const MappingQGeneric<dim, spacedim> &mapping)
+  const Triangulation<dim, spacedim> &triangulation,
+  const MappingQ<dim, spacedim> &     mapping)
 {
   this->initialize(mapping, triangulation);
 }
@@ -208,13 +207,12 @@ MappingQCache<dim, spacedim>::initialize(
     [&](const typename Triangulation<dim, spacedim>::cell_iterator &cell) {
       std::vector<Point<spacedim>> points;
 
-      const auto mapping_q_generic =
-        dynamic_cast<const MappingQGeneric<dim, spacedim> *>(&mapping);
+      const auto mapping_q =
+        dynamic_cast<const MappingQ<dim, spacedim> *>(&mapping);
 
-      if (mapping_q_generic != nullptr &&
-          this->get_degree() == mapping_q_generic->get_degree())
+      if (mapping_q != nullptr && this->get_degree() == mapping_q->get_degree())
         {
-          points = mapping_q_generic->compute_mapping_support_points(cell);
+          points = mapping_q->compute_mapping_support_points(cell);
         }
       else
         {
@@ -360,15 +358,15 @@ MappingQCache<dim, spacedim>::initialize(
         cell_tria->index(),
         &dof_handler);
 
-      const auto mapping_q_generic =
-        dynamic_cast<const MappingQGeneric<dim, spacedim> *>(&mapping);
+      const auto mapping_q =
+        dynamic_cast<const MappingQ<dim, spacedim> *>(&mapping);
 
       // Step 2a) set up and reinit FEValues (if needed)
       if (
         ((vector_describes_relative_displacement ||
           (is_active_non_artificial_cell == false)) &&
-         ((mapping_q_generic != nullptr &&
-           this->get_degree() == mapping_q_generic->get_degree()) ==
+         ((mapping_q != nullptr &&
+           this->get_degree() == mapping_q->get_degree()) ==
           false)) /*condition 1: points need to be computed via FEValues*/
         ||
         (is_active_non_artificial_cell && interpolation_of_values_is_needed) /*condition 2: interpolation of values is needed*/)
@@ -411,10 +409,9 @@ MappingQCache<dim, spacedim>::initialize(
       if (vector_describes_relative_displacement ||
           is_active_non_artificial_cell == false)
         {
-          if (mapping_q_generic != nullptr &&
-              this->get_degree() == mapping_q_generic->get_degree())
-            result =
-              mapping_q_generic->compute_mapping_support_points(cell_tria);
+          if (mapping_q != nullptr &&
+              this->get_degree() == mapping_q->get_degree())
+            result = mapping_q->compute_mapping_support_points(cell_tria);
           else
             result = fe_values_all.get()->get_quadrature_points();
 
@@ -566,15 +563,15 @@ MappingQCache<dim, spacedim>::initialize(
         cell_tria->index(),
         &dof_handler);
 
-      const auto mapping_q_generic =
-        dynamic_cast<const MappingQGeneric<dim, spacedim> *>(&mapping);
+      const auto mapping_q =
+        dynamic_cast<const MappingQ<dim, spacedim> *>(&mapping);
 
       // Step 2a) set up and reinit FEValues (if needed)
       if (
         ((vector_describes_relative_displacement ||
           (is_non_artificial_cell == false)) &&
-         ((mapping_q_generic != nullptr &&
-           this->get_degree() == mapping_q_generic->get_degree()) ==
+         ((mapping_q != nullptr &&
+           this->get_degree() == mapping_q->get_degree()) ==
           false)) /*condition 1: points need to be computed via FEValues*/
         ||
         (is_non_artificial_cell == true && interpolation_of_values_is_needed) /*condition 2: interpolation of values is needed*/)
@@ -617,10 +614,9 @@ MappingQCache<dim, spacedim>::initialize(
       if (vector_describes_relative_displacement ||
           (is_non_artificial_cell == false))
         {
-          if (mapping_q_generic != nullptr &&
-              this->get_degree() == mapping_q_generic->get_degree())
-            result =
-              mapping_q_generic->compute_mapping_support_points(cell_tria);
+          if (mapping_q != nullptr &&
+              this->get_degree() == mapping_q->get_degree())
+            result = mapping_q->compute_mapping_support_points(cell_tria);
           else
             result = fe_values_all.get()->get_quadrature_points();
 

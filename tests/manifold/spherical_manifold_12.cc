@@ -21,7 +21,7 @@
 
 #include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_values.h>
-#include <deal.II/fe/mapping_q_generic.h>
+#include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/manifold_lib.h>
@@ -48,7 +48,7 @@ main()
 
   tria.refine_global(1);
 
-  MappingQGeneric<dim>   mapping(4);
+  MappingQ<dim>          mapping(4);
   QGaussLobatto<dim - 1> quadrature(4);
   FE_Nothing<dim>        dummy;
   FEFaceValues<dim>      fe_values(mapping,

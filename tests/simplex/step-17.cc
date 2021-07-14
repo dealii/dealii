@@ -110,7 +110,7 @@ namespace Step17
     const unsigned int this_mpi_process;
 
 #ifdef HEX
-    MappingQGeneric<dim, dim> mapping;
+    MappingQ<dim, dim> mapping;
 #else
     MappingFE<dim, dim> mapping;
 #endif

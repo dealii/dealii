@@ -19,7 +19,7 @@
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
 
-#include <deal.II/fe/mapping_q_generic.h>
+#include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
@@ -55,7 +55,7 @@ test(unsigned int n_ref)
   Triangulation<dim, spacedim> tria;
   GridGenerator::hyper_cube(tria);
   tria.refine_global(n_ref);
-  MappingQGeneric<dim, spacedim> mapping(3);
+  MappingQ<dim, spacedim> mapping(3);
 
   Point<dim> p;
   {

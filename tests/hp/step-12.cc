@@ -439,7 +439,7 @@ private:
 
 template <int dim>
 DGMethod<dim>::DGMethod()
-  : mapping(MappingQGeneric<dim>(1))
+  : mapping(MappingQ<dim>(1))
   , fe(FE_DGQ<dim>(1))
   , dof_handler(triangulation)
   , quadrature(QGauss<dim>(4))

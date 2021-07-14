@@ -47,8 +47,8 @@ test(std::string filename)
   grid_out.set_flags(GridOutFlags::Ucd(true));
   grid_out.write_ucd(tria, deallog.get_file_stream());
 
-  QTrapezoid<dim>                quad;
-  MappingQGeneric<dim, spacedim> mapping(1);
+  QTrapezoid<dim>         quad;
+  MappingQ<dim, spacedim> mapping(1);
   typename Triangulation<dim, spacedim>::active_cell_iterator
     cell = tria.begin_active(),
     endc = tria.end();

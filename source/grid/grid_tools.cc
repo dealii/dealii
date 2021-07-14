@@ -33,7 +33,6 @@
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_q.h>
 #include <deal.II/fe/mapping_q1.h>
-#include <deal.II/fe/mapping_q_generic.h>
 
 #include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_reordering.h>
@@ -139,8 +138,7 @@ namespace GridTools
   {
     // get the degree of the mapping if possible. if not, just assume 1
     unsigned int mapping_degree = 1;
-    if (const auto *p =
-          dynamic_cast<const MappingQGeneric<dim, spacedim> *>(&mapping))
+    if (const auto *p = dynamic_cast<const MappingQ<dim, spacedim> *>(&mapping))
       mapping_degree = p->get_degree();
     else if (const auto *p =
                dynamic_cast<const MappingQ<dim, spacedim> *>(&mapping))

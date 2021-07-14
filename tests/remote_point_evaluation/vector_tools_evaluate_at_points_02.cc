@@ -26,7 +26,7 @@
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/mapping_fe.h>
-#include <deal.II/fe/mapping_q_generic.h>
+#include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_in.h>
@@ -294,18 +294,18 @@ test()
   const unsigned int n_refinements_1 = 4;
   const unsigned int n_refinements_2 = 4;
 
-  const MappingQGeneric<dim> mapping_1(1);
-  const FE_Q<dim>            fe_1(2);
-  const QGauss<dim>          quad_1(3);
+  const MappingQ<dim> mapping_1(1);
+  const FE_Q<dim>     fe_1(2);
+  const QGauss<dim>   quad_1(3);
 
 #if false
   const MappingFE<dim>     mapping_2(Simplex::FE_P<dim>(1));
   const Simplex::FE_P<dim> fe_2(2);
   const Simplex::QGauss<dim>        quad_2(3);
 #else
-  const MappingQGeneric<dim> mapping_2(1);
-  const FE_Q<dim>            fe_2(2);
-  const QGauss<dim>          quad_2(3);
+  const MappingQ<dim> mapping_2(1);
+  const FE_Q<dim>     fe_2(2);
+  const QGauss<dim>   quad_2(3);
 #endif
 
   parallel::distributed::Triangulation<dim> tria_1(MPI_COMM_WORLD);

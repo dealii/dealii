@@ -51,7 +51,7 @@ MappingQEulerian<dim, VectorType, spacedim>::MappingQEulerian(
   const DoFHandler<dim, spacedim> &euler_dof_handler,
   const VectorType &               euler_vector,
   const unsigned int               level)
-  : MappingQGeneric<dim, spacedim>(degree)
+  : MappingQ<dim, spacedim>(degree)
   , euler_vector(&euler_vector)
   , euler_dof_handler(&euler_dof_handler)
   , level(level)
@@ -205,12 +205,11 @@ MappingQEulerian<dim, VectorType, spacedim>::fill_fe_values(
   // call the function of the base class, but ignoring
   // any potentially detected cell similarity between
   // the current and the previous cell
-  MappingQGeneric<dim, spacedim>::fill_fe_values(
-    cell,
-    CellSimilarity::invalid_next_cell,
-    quadrature,
-    internal_data,
-    output_data);
+  MappingQ<dim, spacedim>::fill_fe_values(cell,
+                                          CellSimilarity::invalid_next_cell,
+                                          quadrature,
+                                          internal_data,
+                                          output_data);
   // also return the updated flag since any detected
   // similarity wasn't based on the mapped field, but
   // the original vertices which are meaningless

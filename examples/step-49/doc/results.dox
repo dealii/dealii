@@ -28,7 +28,7 @@ to use a curved geometry. The way to do this requires three steps:
 - Create an object that describes the desired geometry. This object will be
   queried when refining the Triangulation for new point placement. It will also
   be used to calculate shape function values if a high degree mapping, like
-  MappingQ or MappingQGeneric, is used during system assembly.
+  MappingQ, is used during system assembly.
   In deal.II the Manifold class and classes inheriting from it (e.g.,
   PolarManifold and FlatManifold) perform these calculations.
 - Notify the Triangulation object which Manifold classes to use. By default, a

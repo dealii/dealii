@@ -144,7 +144,7 @@ namespace Step19
     void output_results() const;
 
     Triangulation<dim>        triangulation;
-    MappingQGeneric<dim>      mapping;
+    MappingQ<dim>             mapping;
     FE_Q<dim>                 fe;
     DoFHandler<dim>           dof_handler;
     AffineConstraints<double> constraints;

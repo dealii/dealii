@@ -20,7 +20,7 @@
 
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
-#include <deal.II/fe/mapping_q_generic.h>
+#include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
@@ -53,9 +53,9 @@ main()
   GridGenerator::hyper_cube(triangulation);
   triangulation.refine_global(2);
 
-  MappingQGeneric<dim> mapping_q1(1);
-  FESystem<dim>        fe(FE_Q<dim>(2), 1, FE_Q<dim>(1), 1, FE_Q<dim>(3), 1);
-  DoFHandler<dim>      dof_handler(triangulation);
+  MappingQ<dim>   mapping_q1(1);
+  FESystem<dim>   fe(FE_Q<dim>(2), 1, FE_Q<dim>(1), 1, FE_Q<dim>(3), 1);
+  DoFHandler<dim> dof_handler(triangulation);
 
   dof_handler.distribute_dofs(fe);
 

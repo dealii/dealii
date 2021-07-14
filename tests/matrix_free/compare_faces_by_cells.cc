@@ -29,7 +29,7 @@
 
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_values.h>
-#include <deal.II/fe/mapping_q_generic.h>
+#include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
@@ -342,7 +342,7 @@ test()
   dof.distribute_mg_dofs();
   deallog << "Number of DoFs: " << dof.n_dofs() << std::endl;
 
-  MappingQGeneric<dim>                                   mapping(fe_degree + 1);
+  MappingQ<dim>                                          mapping(fe_degree + 1);
   LaplaceOperator<dim, fe_degree, n_q_points_1d, number> fine_matrix;
   fine_matrix.initialize(mapping, dof);
 

@@ -241,7 +241,7 @@ namespace Step18
     const Quadrature<dim> quadrature_formula;
 
 #ifdef HEX
-    MappingQGeneric<dim, dim> mapping;
+    MappingQ<dim, dim> mapping;
 #else
     MappingFE<dim, dim>  mapping;
 #endif

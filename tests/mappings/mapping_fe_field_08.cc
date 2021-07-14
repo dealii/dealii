@@ -23,7 +23,6 @@
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/mapping_fe_field.h>
 #include <deal.II/fe/mapping_q.h>
-#include <deal.II/fe/mapping_q_generic.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
@@ -169,8 +168,8 @@ test(unsigned int n_ref)
   Triangulation<dim, spacedim> tria;
   GridGenerator::hyper_shell(tria, Point<dim>(), 0.8, 1., dim == 2 ? 3 : 6);
   tria.refine_global(n_ref);
-  const unsigned int             fe_degree = dim == 2 ? 8 : 4;
-  MappingQGeneric<dim, spacedim> mapping_q(fe_degree);
+  const unsigned int      fe_degree = dim == 2 ? 8 : 4;
+  MappingQ<dim, spacedim> mapping_q(fe_degree);
 
   FE_Q<dim>               fe_q(fe_degree);
   FESystem<dim, dim>      fe_system(fe_q, dim);
@@ -184,8 +183,8 @@ test(unsigned int n_ref)
   VectorTools::get_position_vector(dofh, nodes, mask);
   MappingFEField<dim, dim, Vector<double>> mapping(dofh, nodes, mask);
 
-  deallog << "Test with MappingQGeneric in " << dim << "D on "
-          << tria.n_active_cells() << " cells:" << std::endl;
+  deallog << "Test with MappingQ in " << dim << "D on " << tria.n_active_cells()
+          << " cells:" << std::endl;
   do_test(mapping_q, tria);
   deallog << std::endl;
   deallog << "Test with MappingFEField in " << dim << "D on "

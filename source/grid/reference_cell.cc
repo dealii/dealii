@@ -23,8 +23,8 @@
 #include <deal.II/fe/fe_simplex_p_bubbles.h>
 #include <deal.II/fe/fe_wedge_p.h>
 #include <deal.II/fe/mapping_fe.h>
+#include <deal.II/fe/mapping_q.h>
 #include <deal.II/fe/mapping_q1.h>
-#include <deal.II/fe/mapping_q_generic.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/reference_cell.h>
@@ -112,7 +112,7 @@ ReferenceCell::get_default_mapping(const unsigned int degree) const
   AssertDimension(dim, get_dimension());
 
   if (is_hyper_cube())
-    return std::make_unique<MappingQGeneric<dim, spacedim>>(degree);
+    return std::make_unique<MappingQ<dim, spacedim>>(degree);
   else if (is_simplex())
     return std::make_unique<MappingFE<dim, spacedim>>(
       FE_SimplexP<dim, spacedim>(degree));
@@ -127,7 +127,7 @@ ReferenceCell::get_default_mapping(const unsigned int degree) const
       Assert(false, ExcNotImplemented());
     }
 
-  return std::make_unique<MappingQGeneric<dim, spacedim>>(degree);
+  return std::make_unique<MappingQ<dim, spacedim>>(degree);
 }
 
 

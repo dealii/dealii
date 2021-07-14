@@ -30,7 +30,7 @@
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
-#include <deal.II/fe/mapping_q_generic.h>
+#include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
@@ -403,13 +403,10 @@ namespace Step66
     // SphericalManifold for boundary cells a TransfiniteInterpolationManifold
     // object for the mapping of the inner cells, which takes care of the inner
     // cells. In this example we use an isoparametric finite element approach
-    // and thus use the MappingQGeneric class. Note, that we could also create
-    // an instance of the MappingQ class and set the
-    // <code>use_mapping_q_on_all_cells</code> flags in the contructor call to
-    // <code>true</code>. For further details on the connection of MappingQ and
-    // MappingQGeneric you may read the detailed description of these classes.
+    // and thus use the MappingQ class. For further details you may read the
+    // detailed description of this class.
     parallel::distributed::Triangulation<dim> triangulation;
-    const MappingQGeneric<dim>                mapping;
+    const MappingQ<dim>                       mapping;
 
 
     // As usual we then define the Lagrangian finite elements FE_Q and a

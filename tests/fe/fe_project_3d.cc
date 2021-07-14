@@ -247,7 +247,7 @@ test(const FiniteElement<dim> &fe,
   const unsigned int               n_q_points      = quadrature.size();
   const unsigned int               n_face_q_points = face_quadrature.size();
   // MappingQ<dim> mapping(2);
-  MappingQGeneric<dim>                                        mapping(1);
+  MappingQ<dim>                                               mapping(1);
   std::vector<double>                                         div_v(n_q_points);
   std::vector<typename FEValuesViews::Vector<dim>::curl_type> curl_v(
     n_q_points);

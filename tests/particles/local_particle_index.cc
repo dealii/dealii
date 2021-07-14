@@ -23,7 +23,7 @@
 
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
-#include <deal.II/fe/mapping_q_generic.h>
+#include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_generator.h>
@@ -50,7 +50,7 @@ test()
   GridGenerator::hyper_cube(background_triangulation, 0, 1);
   background_triangulation.refine_global(6 - dim);
 
-  const MappingQGeneric<dim> mapping(1);
+  const MappingQ<dim> mapping(1);
 
   Particles::ParticleHandler<dim> particle_handler;
   particle_handler.initialize(background_triangulation, mapping, 1);

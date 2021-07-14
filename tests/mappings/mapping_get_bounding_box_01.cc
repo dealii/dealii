@@ -19,7 +19,6 @@
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/fe/mapping_q.h>
-#include <deal.II/fe/mapping_q_generic.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools_cache.h>
@@ -73,8 +72,8 @@ main()
     test_bounding_boxes(mapping, degree);
   }
   {
-    unsigned int       degree = 2;
-    MappingQGeneric<2> mapping(degree);
+    unsigned int degree = 2;
+    MappingQ<2>  mapping(degree);
     test_bounding_boxes(mapping, degree);
   }
 }

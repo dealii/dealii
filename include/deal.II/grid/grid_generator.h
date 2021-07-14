@@ -1511,7 +1511,7 @@ namespace GridGenerator
    * to visualize GNUPLOT output)
    *
    * @code
-   * #include <deal.II/fe/mapping_q_generic.h>
+   * #include <deal.II/fe/mapping_q.h>
    *
    * #include <deal.II/grid/grid_generator.h>
    * #include <deal.II/grid/grid_out.h>
@@ -1535,7 +1535,7 @@ namespace GridGenerator
    *   GridOutFlags::Gnuplot gnuplot_flags(false, 10, true);
    *   grid_out.set_flags(gnuplot_flags);
    *
-   *   const MappingQGeneric<2> mapping(3);
+   *   const MappingQ<2> mapping(3);
    *   std::ofstream out("out.gpl");
    *   grid_out.write_gnuplot(triangulation, out, &mapping);
    * }

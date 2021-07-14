@@ -88,9 +88,9 @@ namespace Step23
 
     Triangulation<dim> triangulation;
 #ifdef HEX
-    MappingQGeneric<dim, dim> mapping;
-    FE_Q<dim>                 fe;
-    QGauss<dim>               quadrature;
+    MappingQ<dim, dim> mapping;
+    FE_Q<dim>          fe;
+    QGauss<dim>        quadrature;
 #else
     MappingFE<dim, dim> mapping;
     FE_SimplexP<dim>    fe;

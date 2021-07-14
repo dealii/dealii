@@ -14,10 +14,10 @@
 // ---------------------------------------------------------------------
 
 
-// Show positions of quadrature points with various degrees of MappingQGeneric
+// Show positions of quadrature points with various degrees of MappingQ
 // and quadrature formulas, including the collocation case where quadrature
 // points coincide with the mapping support points and going to the tensor
-// product and non-tensor product path of MappingQGeneric
+// product and non-tensor product path of MappingQ
 
 #include <deal.II/base/quadrature_lib.h>
 
@@ -35,10 +35,10 @@ template <int dim>
 void
 test(const unsigned int degree, const unsigned int n_q_points)
 {
-  MappingQGeneric<dim> mapping(degree);
-  FE_Nothing<dim>      dummy;
-  QGaussLobatto<dim>   quadrature(n_q_points);
-  Quadrature<dim>      quadrature_copy(quadrature.get_points());
+  MappingQ<dim>      mapping(degree);
+  FE_Nothing<dim>    dummy;
+  QGaussLobatto<dim> quadrature(n_q_points);
+  Quadrature<dim>    quadrature_copy(quadrature.get_points());
 
   Triangulation<dim> tria;
   GridGenerator::hyper_ball(tria);
@@ -47,7 +47,7 @@ test(const unsigned int degree, const unsigned int n_q_points)
           << " with " << n_q_points << " points per coordinate direction"
           << std::endl;
 
-  // for QGaussLobatto, MappingQGeneric will choose the tensor product code
+  // for QGaussLobatto, MappingQ will choose the tensor product code
   // path, whereas for the copy it will not as we do not know the tensor
   // product property on general points
   FEValues<dim> fe_val(mapping, dummy, quadrature, update_quadrature_points);

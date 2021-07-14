@@ -31,7 +31,7 @@ template <int dim>
 void
 plot_FE_Bernstein_shape_functions()
 {
-  MappingQGeneric<dim> m(1);
+  MappingQ<dim> m(1);
 
   FE_Bernstein<dim> b1(1);
   plot_shape_functions(m, b1, "B1");

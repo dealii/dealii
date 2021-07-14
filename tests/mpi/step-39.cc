@@ -422,7 +422,7 @@ namespace Step39
     output_results(const unsigned int cycle) const;
 
     parallel::distributed::Triangulation<dim> triangulation;
-    const MappingQGeneric<dim>                mapping;
+    const MappingQ<dim>                       mapping;
     const FiniteElement<dim> &                fe;
     DoFHandler<dim>                           dof_handler;
 

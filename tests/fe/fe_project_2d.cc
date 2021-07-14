@@ -182,7 +182,7 @@ test(const FiniteElement<dim> &fe,
   const QGauss<dim>                quadrature(fe.degree + 1);
   const unsigned int               n_q_points = quadrature.size();
   MappingQ<dim>                    mapping(1);
-  // MappingQGeneric<dim> mapping(1);
+  // MappingQ<dim> mapping(1);
   std::vector<double>                                         div_v(n_q_points);
   std::vector<typename FEValuesViews::Vector<dim>::curl_type> curl_v(
     n_q_points);

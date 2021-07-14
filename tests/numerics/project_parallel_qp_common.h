@@ -156,7 +156,7 @@ do_project(const parallel::distributed::Triangulation<dim> &triangulation,
 
         VectorType field(dof_handler.locally_owned_dofs(), MPI_COMM_WORLD);
         VectorTools::project<dim, VectorType, dim>(
-          MappingQGeneric<dim>(1),
+          MappingQ<dim>(1),
           dof_handler,
           constraints,
           quadrature_formula,

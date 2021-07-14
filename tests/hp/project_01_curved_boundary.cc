@@ -100,7 +100,7 @@ test()
 
   // use an explicit Q1 mapping. this will yield a zero solution
   {
-    VectorTools::project(hp::MappingCollection<dim>(MappingQGeneric<dim>(1)),
+    VectorTools::project(hp::MappingCollection<dim>(MappingQ<dim>(1)),
                          dh,
                          cm,
                          hp::QCollection<dim>(QGauss<dim>(3)),

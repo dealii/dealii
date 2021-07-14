@@ -47,7 +47,7 @@ test()
   GridGenerator::subdivided_hyper_cube(tria, 4);
 
   hp::FECollection<dim> fe{FE_Q<2>(degree), FE_Q<2>(degree)};
-  MappingQGeneric<dim>  mapping(1);
+  MappingQ<dim>         mapping(1);
   QGauss<dim>           quadrature(degree + 1);
 
   DoFHandler<dim> dof_handler(tria);

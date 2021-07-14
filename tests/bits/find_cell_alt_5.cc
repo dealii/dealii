@@ -32,8 +32,8 @@
 
 void check(Triangulation<3> &tria)
 {
-  MappingQGeneric<3> map(1);
-  Point<3>           p(0.75, 0.75, 0.75);
+  MappingQ<3> map(1);
+  Point<3>    p(0.75, 0.75, 0.75);
 
   std::pair<Triangulation<3>::active_cell_iterator, Point<3>> cell =
     GridTools::find_active_cell_around_point(map, tria, p);

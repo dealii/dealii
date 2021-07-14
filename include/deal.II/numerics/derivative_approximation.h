@@ -184,7 +184,7 @@ namespace DerivativeApproximation
                        const unsigned int               component = 0);
 
   /**
-   * Call the function above with <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
+   * Call the function above with <tt>mapping=MappingQ@<dim@>(1)</tt>.
    */
   template <int dim, class InputVector, int spacedim>
   void
@@ -219,7 +219,7 @@ namespace DerivativeApproximation
                                 const unsigned int component = 0);
 
   /**
-   * Call the function above with <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
+   * Call the function above with <tt>mapping=MappingQ@<dim@>(1)</tt>.
    */
   template <int dim, class InputVector, int spacedim>
   void
@@ -257,7 +257,7 @@ namespace DerivativeApproximation
     const unsigned int  component = 0);
 
   /**
-   * Same as above, with <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
+   * Same as above, with <tt>mapping=MappingQ@<dim@>(1)</tt>.
    */
   template <int dim, int spacedim, class InputVector, int order>
   void

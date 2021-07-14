@@ -116,8 +116,8 @@ template <int dim>
 void
 check()
 {
-  MappingQGeneric<dim> mapping(1);
-  Triangulation<dim>   tria;
+  MappingQ<dim>      mapping(1);
+  Triangulation<dim> tria;
   make_mesh(tria);
 
   FE_Q<dim>       element(QIterated<1>(QTrapezoid<1>(), 3));

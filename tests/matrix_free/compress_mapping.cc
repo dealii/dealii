@@ -25,7 +25,7 @@
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
-#include <deal.II/fe/mapping_q_generic.h>
+#include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
@@ -256,7 +256,7 @@ test_deformed_cube()
 
   // check again, now using a mapping that displaces points
   {
-    MappingQGeneric<dim> mapping(3);
+    MappingQ<dim> mapping(3);
     mf.reinit(mapping, dof, constraints, quad, data);
 
     std::vector<unsigned int> n_cell_types(4, 0);

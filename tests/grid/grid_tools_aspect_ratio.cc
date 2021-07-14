@@ -26,7 +26,7 @@
 #include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/fe_dgq.h>
-#include <deal.II/fe/mapping_q_generic.h>
+#include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
@@ -72,8 +72,8 @@ compute_aspect_ratio_hyper_rectangle(
       tria.begin_active()->vertex(0) += shift;
     }
 
-  MappingQGeneric<dim> const mapping(degree);
-  QGauss<dim> const          gauss(n_q_points);
+  MappingQ<dim> const mapping(degree);
+  QGauss<dim> const   gauss(n_q_points);
 
   Vector<double> ratios =
     GridTools::compute_aspect_ratio_of_cells(mapping, tria, gauss);

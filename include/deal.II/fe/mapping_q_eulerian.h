@@ -90,7 +90,7 @@ class Vector;
  * of the vector can be specified as template parameter <tt>VectorType</tt>.
  */
 template <int dim, typename VectorType = Vector<double>, int spacedim = dim>
-class MappingQEulerian : public MappingQGeneric<dim, spacedim>
+class MappingQEulerian : public MappingQ<dim, spacedim>
 {
 public:
   /**

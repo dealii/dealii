@@ -21,8 +21,8 @@
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/mapping_q.h>
 #include <deal.II/fe/mapping_q_cache.h>
-#include <deal.II/fe/mapping_q_generic.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
@@ -86,8 +86,8 @@ do_test(const unsigned int degree,
   VectorTools::interpolate(dof_handler, fu, vector);
 
   {
-    MappingQGeneric<dim> mapping(mapping_degree);
-    MappingQCache<dim>   mapping_cache(mapping_degree);
+    MappingQ<dim>      mapping(mapping_degree);
+    MappingQCache<dim> mapping_cache(mapping_degree);
     mapping_cache.initialize(mapping,
                              dof_handler,
                              vector,
@@ -120,8 +120,8 @@ do_test(const unsigned int degree,
     transfer.build(dof_handler);
     transfer.interpolate_to_mg(dof_handler, vectors, vector);
 
-    MappingQGeneric<dim> mapping(mapping_degree);
-    MappingQCache<dim>   mapping_cache(mapping_degree);
+    MappingQ<dim>      mapping(mapping_degree);
+    MappingQCache<dim> mapping_cache(mapping_degree);
     mapping_cache.initialize(mapping,
                              dof_handler,
                              vectors,

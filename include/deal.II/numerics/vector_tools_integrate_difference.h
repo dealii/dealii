@@ -151,7 +151,7 @@ namespace VectorTools
 
   /**
    * Call the integrate_difference() function, see above, with
-   * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
+   * <tt>mapping=MappingQ@<dim@>(1)</tt>.
    */
   template <int dim, class InVector, class OutVector, int spacedim>
   void
@@ -183,7 +183,7 @@ namespace VectorTools
 
   /**
    * Call the integrate_difference() function, see above, with
-   * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
+   * <tt>mapping=MappingQ@<dim@>(1)</tt>.
    */
   template <int dim, class InVector, class OutVector, int spacedim>
   void

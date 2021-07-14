@@ -87,7 +87,7 @@ namespace VectorTools
 
   /**
    * Call the @p interpolate() function above with
-   * <tt>mapping=MappingQGeneric@<dim,spacedim@>(1)</tt>.
+   * <tt>mapping=MappingQ@<dim,spacedim@>(1)</tt>.
    */
   template <int dim, int spacedim, typename VectorType>
   void

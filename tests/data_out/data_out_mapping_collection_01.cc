@@ -65,7 +65,7 @@ test()
   MappingFEField<dim, spacedim> mapping_1(dhq, eulerq, mask);
 
   // create first mapping class, that does preserve position of vertices
-  MappingQGeneric<dim, spacedim> mapping_2(1);
+  MappingQ<dim, spacedim> mapping_2(1);
 
   // create mapping collection
   hp::FECollection<dim>      fe_collection(FE_Q<dim>(1), FE_Q<dim>(1));

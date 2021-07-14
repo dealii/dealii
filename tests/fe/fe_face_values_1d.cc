@@ -144,8 +144,8 @@ mapping_test()
   std::vector<Mapping<dim> *> mapping_ptr;
   std::vector<std::string>    mapping_strings;
 
-  MappingQGeneric<dim> mapping(1);
-  std::string          mapping_name = "MappingQ1";
+  MappingQ<dim> mapping(1);
+  std::string   mapping_name = "MappingQ1";
 
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria);

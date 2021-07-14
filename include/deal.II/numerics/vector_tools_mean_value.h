@@ -120,7 +120,7 @@ namespace VectorTools
 
   /**
    * Call the other compute_mean_value() function, see above, with
-   * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
+   * <tt>mapping=MappingQ@<dim@>(1)</tt>.
    */
   template <int dim, typename VectorType, int spacedim>
   typename VectorType::value_type

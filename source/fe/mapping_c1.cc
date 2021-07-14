@@ -29,7 +29,7 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim, int spacedim>
 MappingC1<dim, spacedim>::MappingC1()
-  : MappingQGeneric<dim, spacedim>(3)
+  : MappingQ<dim, spacedim>(3)
 {
   Assert(dim > 1, ExcImpossibleInDim(dim));
 }

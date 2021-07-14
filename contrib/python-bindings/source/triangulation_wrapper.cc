@@ -651,8 +651,8 @@ namespace python
 
       if (mapping_wrapper.get_mapping() != nullptr)
         {
-          const MappingQGeneric<dim, spacedim> *mapping =
-            static_cast<const MappingQGeneric<dim, spacedim> *>(
+          const MappingQ<dim, spacedim> *mapping =
+            static_cast<const MappingQ<dim, spacedim> *>(
               mapping_wrapper.get_mapping());
 
           auto cell_pair =
@@ -682,8 +682,8 @@ namespace python
       const Quadrature<dim> *quad = static_cast<const Quadrature<dim> *>(
         quadrature_wrapper.get_quadrature());
 
-      const MappingQGeneric<dim, spacedim> *mapping =
-        static_cast<const MappingQGeneric<dim, spacedim> *>(
+      const MappingQ<dim, spacedim> *mapping =
+        static_cast<const MappingQ<dim, spacedim> *>(
           mapping_wrapper.get_mapping());
 
       auto aspect_ratios =

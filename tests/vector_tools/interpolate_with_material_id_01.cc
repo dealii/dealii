@@ -144,7 +144,7 @@ namespace PhaseField
     const Functions::ConstantFunction<dim> constant_function_1(1.0);
     function_map[1] = &constant_function_1;
 
-    VectorTools::interpolate_based_on_material_id(MappingQGeneric<dim>(1),
+    VectorTools::interpolate_based_on_material_id(MappingQ<dim>(1),
                                                   dof_handler,
                                                   function_map,
                                                   dst);

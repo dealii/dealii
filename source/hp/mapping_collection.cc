@@ -66,7 +66,7 @@ namespace hp
      * this function is called.
      */
     template <int dim, int spacedim>
-    MappingQGeneric<dim, spacedim> &
+    MappingQ<dim, spacedim> &
     get_static_mapping_q1()
     {
       static MappingQ1<dim, spacedim> mapping;

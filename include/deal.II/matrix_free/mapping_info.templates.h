@@ -26,7 +26,7 @@
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_values.h>
-#include <deal.II/fe/mapping_q_generic.h>
+#include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/matrix_free/evaluation_template_factory.h>
 #include <deal.II/matrix_free/mapping_info.h>
@@ -440,10 +440,10 @@ namespace internal
         }
 
       // In case we have no hp-adaptivity (active_fe_index is empty), we have
-      // cells, and the mapping is MappingQGeneric or a derived class, we can
+      // cells, and the mapping is MappingQ or a derived class, we can
       // use the fast method.
       if (active_fe_index.empty() && !cells.empty() && mapping->size() == 1 &&
-          dynamic_cast<const MappingQGeneric<dim> *>(&mapping->operator[](0)))
+          dynamic_cast<const MappingQ<dim> *>(&mapping->operator[](0)))
         compute_mapping_q(tria, cells, face_info.faces);
       else
         {
@@ -481,7 +481,7 @@ namespace internal
       this->mapping            = &mapping->operator[](0);
 
       if (active_fe_index.empty() && !cells.empty() && mapping->size() == 1 &&
-          dynamic_cast<const MappingQGeneric<dim> *>(&mapping->operator[](0)))
+          dynamic_cast<const MappingQ<dim> *>(&mapping->operator[](0)))
         compute_mapping_q(tria, cells, face_info.faces);
       else
         {
@@ -1213,7 +1213,7 @@ namespace internal
       mapping_q_query_fe_values(
         const unsigned int                                        begin_cell,
         const unsigned int                                        end_cell,
-        const MappingQGeneric<dim> &                              mapping_q,
+        const MappingQ<dim> &                                     mapping_q,
         const dealii::Triangulation<dim> &                        tria,
         const std::vector<std::pair<unsigned int, unsigned int>> &cell_array,
         const double                                              jacobian_size,
@@ -2695,12 +2695,11 @@ namespace internal
       const std::vector<FaceToCellTopology<VectorizedArrayType::size()>> &faces)
     {
       // step 1: extract quadrature point data with the data appropriate for
-      // MappingQGeneric
+      // MappingQ
       AssertDimension(this->mapping_collection->size(), 1);
 
-      const MappingQGeneric<dim> *mapping_q =
-        dynamic_cast<const MappingQGeneric<dim> *>(
-          &this->mapping_collection->operator[](0));
+      const MappingQ<dim> *mapping_q = dynamic_cast<const MappingQ<dim> *>(
+        &this->mapping_collection->operator[](0));
       Assert(mapping_q != nullptr, ExcInternalError());
 
       const unsigned int mapping_degree = mapping_q->get_degree();

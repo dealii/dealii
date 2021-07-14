@@ -45,7 +45,7 @@ test2()
   GridGenerator::hyper_ball(triangulation);
   triangulation.set_manifold(0, boundary_description);
   triangulation.refine_global(1);
-  MappingQGeneric<dim> mapping(1);
+  MappingQ<dim> mapping(1);
 
 
   Point<dim> p(-0.27999999999999992, -0.62999999999999989);

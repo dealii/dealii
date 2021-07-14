@@ -15,7 +15,7 @@
 
 
 // Check internal implementation of
-// MappingQGeneric::transform_real_to_unit_point by printing Newton iteration
+// MappingQ::transform_real_to_unit_point by printing Newton iteration
 // information. This test is sensitive to roundoff errors by the nature of
 // what gets tested, which can cause one more or one less iteration,
 // especially due to FMA
@@ -30,7 +30,6 @@
 #include <deal.II/fe/fe_tools.h>
 #include <deal.II/fe/mapping_fe_field.h>
 #include <deal.II/fe/mapping_q.h>
-#include <deal.II/fe/mapping_q_generic.h>
 #include <deal.II/fe/mapping_q_internal.h>
 
 #include <deal.II/grid/grid_generator.h>
@@ -50,8 +49,8 @@ print_result(const unsigned int                  mapping_degree,
 {
   deallog << "Testing " << dim << "D with point " << p << std::endl;
 
-  FE_Q<dim>            dummy(mapping_degree);
-  MappingQGeneric<dim> mapping(mapping_degree);
+  FE_Q<dim>     dummy(mapping_degree);
+  MappingQ<dim> mapping(mapping_degree);
 
   FEValues<dim> fe_values(mapping,
                           dummy,
@@ -72,7 +71,7 @@ print_result(const unsigned int                  mapping_degree,
       if (GeometryInfo<dim>::distance_to_unit_cell(
             cell->real_to_unit_cell_affine_approximation(p)) <
           (-0.6 + 1.3 * dim))
-        internal::MappingQGenericImplementation::
+        internal::MappingQImplementation::
           do_transform_real_to_unit_cell_internal(
             p,
             cell->real_to_unit_cell_affine_approximation(p),

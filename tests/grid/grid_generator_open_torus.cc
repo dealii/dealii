@@ -26,7 +26,7 @@
 
 #include <deal.II/distributed/tria.h>
 
-#include <deal.II/fe/mapping_q_generic.h>
+#include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
@@ -48,8 +48,8 @@ test()
   GridGenerator::torus(
     tria_open, R, r, n_cells_toroidal / factor, angle / (double)factor);
 
-  MappingQGeneric<3> const mapping(3);
-  QGauss<3> const          gauss(4);
+  MappingQ<3> const mapping(3);
+  QGauss<3> const   gauss(4);
 
   double const ar_full_torus =
     GridTools::compute_maximum_aspect_ratio(mapping, tria, gauss);

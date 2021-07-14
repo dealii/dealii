@@ -53,7 +53,7 @@ refine_and_transfer(const Function<dim> &function, Triangulation<dim> &tria)
   tria.prepare_coarsening_and_refinement();
 
   Vector<double> sol_old(dh.n_dofs());
-  VectorTools::interpolate(MappingQGeneric<dim>(1), dh, function, sol_old);
+  VectorTools::interpolate(MappingQ<dim>(1), dh, function, sol_old);
 
   SolutionTransfer<dim> soltrans(dh);
   soltrans.prepare_for_pure_refinement();

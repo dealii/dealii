@@ -112,8 +112,8 @@ private:
   void
   test_mapping()
   {
-    const double               tol = 1e-8;
-    const MappingQGeneric<dim> mapping(1);
+    const double        tol = 1e-8;
+    const MappingQ<dim> mapping(1);
 
     deallog << "Number of active cells: " << triangulation.n_active_cells()
             << std::endl;

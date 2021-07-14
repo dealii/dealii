@@ -86,8 +86,8 @@ test()
   TrilinosWrappers::MPI::Vector vec_rel(locally_relevant_set);
   vec_rel = vec;
 
-  MappingQGeneric<dim> mapping(1);
-  Vector<float>        indicators(tr.n_active_cells());
+  MappingQ<dim> mapping(1);
+  Vector<float> indicators(tr.n_active_cells());
   DerivativeApproximation::approximate_gradient(mapping,
                                                 dofh,
                                                 vec_rel,
