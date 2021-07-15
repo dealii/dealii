@@ -263,8 +263,8 @@ public:
   get_current_cell_index() const;
 
   /**
-   * Return the active FE index for this class for efficient indexing in the hp-
-   * case.
+   * Return the active FE index for this class for efficient indexing in the
+   * hp-case.
    */
   unsigned int
   get_active_fe_index() const;
@@ -1091,8 +1091,8 @@ public:
   /**
    * Return a read-only pointer to the first field of function hessians on
    * quadrature points. First comes the xx-component of the hessian for the
-   * first component on all quadrature points, then the yy-component, zz-
-   * component in (3D), then the xy-component, and so on. Next comes the xx-
+   * first component on all quadrature points, then the yy-component,
+   * zz-component in (3D), then the xy-component, and so on. Next comes the xx-
    * component of the second component, and so on. This is related to the
    * internal data structures used in this class. The raw data after a call to
    * @p evaluate only contains unit cell operations, so possible
@@ -1106,9 +1106,9 @@ public:
   /**
    * Return a read and write pointer to the first field of function hessians
    * on quadrature points. First comes the xx-component of the hessian for the
-   * first component on all quadrature points, then the yy-component, zz-
-   * component in (3D), then the xy-component, and so on. Next comes the xx-
-   * component of the second component, and so on. This is related to the
+   * first component on all quadrature points, then the yy-component,
+   * zz-component in (3D), then the xy-component, and so on. Next comes the
+   * xx-component of the second component, and so on. This is related to the
    * internal data structures used in this class. The raw data after a call to
    * @p evaluate only contains unit cell operations, so possible
    * transformations, quadrature weights etc. must be applied manually. In
@@ -1150,8 +1150,9 @@ protected:
   /**
    * Constructor that comes with reduced functionality and works similar as
    * FEValues. The arguments are similar to the ones passed to the constructor
-   * of FEValues, with the notable difference that FEEvaluation expects a one-
-   * dimensional quadrature formula, Quadrature<1>, instead of a @p dim
+   * of FEValues, with the notable difference that FEEvaluation expects a
+   * one-dimensional
+   * quadrature formula, Quadrature<1>, instead of a @p dim
    * dimensional one. The finite element can be both scalar or vector valued,
    * but this method always only selects a scalar base element at a time (with
    * @p n_components copies as specified by the class template argument). For
@@ -2655,12 +2656,14 @@ public:
   /**
    * Constructor that comes with reduced functionality and works similar as
    * FEValues. The arguments are similar to the ones passed to the constructor
-   * of FEValues, with the notable difference that FEEvaluation expects a one-
-   * dimensional quadrature formula, Quadrature<1>, instead of a @p dim
+   * of FEValues, with the notable difference that FEEvaluation expects a
+   * one-dimensional
+   * quadrature formula, Quadrature<1>, instead of a @p dim
    * dimensional one. The finite element can be both scalar or vector valued,
    * but this method always only selects a scalar base element at a time (with
-   * @p n_components copies as specified by the class template). For vector-
-   * valued elements, the optional argument @p first_selected_component allows
+   * @p n_components copies as specified by the class template). For
+   * vector-valued
+   * elements, the optional argument @p first_selected_component allows
    * to specify the index of the base element to be used for evaluation. Note
    * that the internal data structures always assume that the base element is
    * primitive, non-primitive are not supported currently.
