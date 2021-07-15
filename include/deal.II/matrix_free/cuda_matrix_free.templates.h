@@ -31,7 +31,7 @@
 #  include <deal.II/fe/fe_dgq.h>
 #  include <deal.II/fe/fe_values.h>
 
-#  include <deal.II/matrix_free/cuda_hanging_nodes_internal.h>
+#  include <deal.II/matrix_free/hanging_nodes_internal.h>
 #  include <deal.II/matrix_free/shape_info.h>
 
 #  include <cuda_runtime_api.h>
@@ -242,7 +242,7 @@ namespace CUDAWrappers
       const unsigned int                   q_points_per_cell;
       const UpdateFlags &                  update_flags;
       const unsigned int                   padding_length;
-      HangingNodes<dim>                    hanging_nodes;
+      dealii::internal::MatrixFreeFunctions::HangingNodes<dim> hanging_nodes;
     };
 
 
