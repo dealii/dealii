@@ -17,6 +17,13 @@
 #include <deal.II/base/polynomial.h>
 #include <deal.II/base/quadrature_lib.h>
 
+#include <deal.II/fe/fe_nothing.h>
+#include <deal.II/fe/fe_values.h>
+
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/reference_cell.h>
+#include <deal.II/grid/tria.h>
+
 #include <algorithm>
 #include <cmath>
 #include <functional>
@@ -1739,6 +1746,81 @@ QWitherdenVincentSimplex<dim>::QWitherdenVincentSimplex(
 
 
 
+namespace
+{
+  template <int dim>
+  Quadrature<dim>
+  setup_qiterated_1D(const Quadrature<dim> &, const unsigned int)
+  {
+    Assert(false, ExcInternalError());
+    return Quadrature<dim>();
+  }
+
+
+
+  Quadrature<1>
+  setup_qiterated_1D(const Quadrature<1> &base_quad,
+                     const unsigned int   n_copies)
+  {
+    return QIterated<1>(base_quad, n_copies);
+  }
+} // namespace
+
+
+
+template <int dim>
+QIteratedSimplex<dim>::QIteratedSimplex(const Quadrature<dim> &base_quad,
+                                        const unsigned int     n_copies)
+{
+  switch (dim)
+    {
+      case 1:
+        static_cast<Quadrature<dim> &>(*this) =
+          setup_qiterated_1D(base_quad, n_copies);
+        break;
+      case 2:
+      case 3:
+        {
+          const auto n_refinements =
+            static_cast<unsigned int>(std::round(std::log2(n_copies)));
+          Assert((1u << n_refinements) == n_copies,
+                 ExcMessage("The number of copies must be a power of 2."));
+          Triangulation<dim> tria;
+          const auto reference_cell = ReferenceCells::get_simplex<dim>();
+          GridGenerator::reference_cell(tria, reference_cell);
+          tria.refine_global(n_refinements);
+          const Mapping<dim> &mapping =
+            reference_cell.template get_default_linear_mapping<dim>();
+          FE_Nothing<dim> fe(reference_cell);
+
+          FEValues<dim>           fe_values(mapping,
+                                  fe,
+                                  base_quad,
+                                  update_quadrature_points | update_JxW_values);
+          std::vector<Point<dim>> points;
+          std::vector<double>     weights;
+          for (const auto &cell : tria.active_cell_iterators())
+            {
+              fe_values.reinit(cell);
+              for (unsigned int qp = 0; qp < base_quad.size(); ++qp)
+                {
+                  points.push_back(fe_values.quadrature_point(qp));
+                  weights.push_back(fe_values.JxW(qp));
+                }
+            }
+
+          static_cast<Quadrature<dim> &>(*this) =
+            Quadrature<dim>(points, weights);
+
+          break;
+        }
+      default:
+        Assert(false, ExcNotImplemented());
+    }
+}
+
+
+
 template <int dim>
 QGaussWedge<dim>::QGaussWedge(const unsigned int n_points)
   : Quadrature<dim>()
@@ -1849,6 +1931,10 @@ template class QGaussLobattoChebyshev<3>;
 template class QSimplex<1>;
 template class QSimplex<2>;
 template class QSimplex<3>;
+
+template class QIteratedSimplex<1>;
+template class QIteratedSimplex<2>;
+template class QIteratedSimplex<3>;
 
 template class QSplit<1>;
 template class QSplit<2>;

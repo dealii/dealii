@@ -859,6 +859,21 @@ public:
 };
 
 /**
+ * Iterated quadrature for simplices. Since simplex cannot be described as
+ * tensor products the base quadrature has equal dimension.
+ *
+ * At the moment @p n_copies must be a power of 2 due to the complexity of
+ * subdividing a simplex.
+ */
+template <int dim>
+class QIteratedSimplex : public Quadrature<dim>
+{
+public:
+  QIteratedSimplex(const Quadrature<dim> &base_quadrature,
+                   const unsigned int     n_copies);
+};
+
+/**
  * Integration rule for wedge entities.
  */
 template <int dim>
