@@ -28,6 +28,7 @@
 #include <deal.II/lac/sparsity_pattern.h>
 
 #include <deal.II/matrix_free/dof_info.h>
+#include <deal.II/matrix_free/hanging_nodes_internal.h>
 #include <deal.II/matrix_free/mapping_info.h>
 #include <deal.II/matrix_free/task_info.h>
 
@@ -106,6 +107,7 @@ namespace internal
     DoFInfo::read_dof_indices(
       const std::vector<types::global_dof_index> &local_indices_resolved,
       const std::vector<types::global_dof_index> &local_indices,
+      const bool                                  cell_has_hanging_nodes,
       const dealii::AffineConstraints<number> &   constraints,
       const unsigned int                          cell_number,
       ConstraintValues<double> &                  constraint_values,
@@ -246,6 +248,7 @@ namespace internal
               (row_starts.size() - 1) / n_components + 1);
           row_starts_plain_indices[cell_number] = plain_dof_indices.size();
           const bool cell_has_constraints =
+            cell_has_hanging_nodes ||
             (row_starts[(cell_number + 1) * n_components].second >
              row_starts[cell_number * n_components].second);
           if (cell_has_constraints == true)
@@ -267,6 +270,26 @@ namespace internal
                 }
             }
         }
+    }
+
+
+
+    template <int dim>
+    bool
+    DoFInfo::process_hanging_node_constraints(
+      const HangingNodes<dim> &        hanging_nodes,
+      const std::vector<unsigned int> &lexicographic_mapping,
+      const unsigned int               cell_number,
+      const TriaIterator<DoFCellAccessor<dim, dim, false>> &cell,
+      std::vector<types::global_dof_index> &                dof_indices)
+    {
+      const ArrayView<unsigned int> mask_view(
+        hanging_node_constraint_masks.data() +
+          cell_number * cell->get_fe().n_components(),
+        cell->get_fe().n_components());
+
+      return hanging_nodes.setup_constraints(
+        cell, {}, lexicographic_mapping, dof_indices, mask_view);
     }
 
 

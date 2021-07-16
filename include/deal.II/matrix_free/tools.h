@@ -421,16 +421,16 @@ namespace MatrixFreeTools
                   }
               }
 
-            // STEP 2b: transpose COO
+            // STEP 2b: sort and make unique
 
-            // presort vector for transposed access
+            // sort vector
             std::sort(locally_relevant_constrains.begin(),
                       locally_relevant_constrains.end(),
                       [](const auto &a, const auto &b) {
-                        if (std::get<1>(a) < std::get<1>(b))
+                        if (std::get<0>(a) < std::get<0>(b))
                           return true;
-                        return (std::get<1>(a) == std::get<1>(b)) &&
-                               (std::get<0>(a) < std::get<0>(b));
+                        return (std::get<0>(a) == std::get<0>(b)) &&
+                               (std::get<1>(a) < std::get<1>(b));
                       });
 
             // make sure that all entries are unique
@@ -443,7 +443,189 @@ namespace MatrixFreeTools
                      }),
               locally_relevant_constrains.end());
 
-            // STEP 2c: translate COO to CRS
+            // STEP 2c: apply hanging-node constraints
+            if (dof_info.hanging_node_constraint_masks.size() > 0)
+              {
+                const auto mask =
+                  dof_info
+                    .hanging_node_constraint_masks[(cell * n_lanes + v) *
+                                                     n_fe_components +
+                                                   first_selected_component];
+
+                // cell has hanging nodes
+                if (mask != 0)
+                  {
+                    // check if hanging node internpolation matrix has been set
+                    // up
+                    if (locally_relevant_constrains_hn_map.find(mask) ==
+                        locally_relevant_constrains_hn_map.end())
+                      {
+                        // 1) collect hanging-node constraints for cell assuming
+                        // scalar finite element
+                        AlignedVector<VectorizedArrayType> values_dofs(
+                          dofs_per_component);
+
+                        std::array<unsigned int, VectorizedArrayType::size()>
+                          constraint_mask;
+                        constraint_mask[0] = mask;
+
+                        std::vector<
+                          std::tuple<unsigned int, unsigned int, Number>>
+                          locally_relevant_constrains_hn;
+
+                        for (unsigned int i = 0; i < dofs_per_component; ++i)
+                          {
+                            for (unsigned int j = 0; j < dofs_per_component;
+                                 ++j)
+                              values_dofs[j][0] = static_cast<Number>(i == j);
+
+                            dealii::internal::FEEvaluationHangingNodesFactory<
+                              dim,
+                              Number,
+                              VectorizedArrayType>::apply(1,
+                                                          phi.get_shape_info()
+                                                            .data.front()
+                                                            .fe_degree,
+                                                          phi,
+                                                          false,
+                                                          constraint_mask,
+                                                          values_dofs.data());
+
+                            for (unsigned int j = 0; j < dofs_per_component;
+                                 ++j)
+                              if (1e-10 <
+                                  std::abs(values_dofs[j][0] &&
+                                           (j != i ||
+                                            1e-10 < std::abs(values_dofs[j][0] -
+                                                             1.0))))
+                                locally_relevant_constrains_hn.emplace_back(
+                                  j, i, values_dofs[j][0]);
+                          }
+
+
+                        std::sort(locally_relevant_constrains_hn.begin(),
+                                  locally_relevant_constrains_hn.end(),
+                                  [](const auto &a, const auto &b) {
+                                    if (std::get<0>(a) < std::get<0>(b))
+                                      return true;
+                                    return (std::get<0>(a) == std::get<0>(b)) &&
+                                           (std::get<1>(a) < std::get<1>(b));
+                                  });
+
+                        // 1b) extend for multiple components
+                        const unsigned int n_hn_constraints =
+                          locally_relevant_constrains_hn.size();
+                        locally_relevant_constrains_hn.resize(n_hn_constraints *
+                                                              n_components);
+
+                        for (unsigned int c = 0; c < n_components; ++c)
+                          for (unsigned int i = 0; i < n_hn_constraints; ++i)
+                            locally_relevant_constrains_hn[c *
+                                                             n_hn_constraints +
+                                                           i] =
+                              std::tuple<unsigned int, unsigned int, Number>{
+                                std::get<0>(locally_relevant_constrains_hn[i]) +
+                                  c * dofs_per_component,
+                                std::get<1>(locally_relevant_constrains_hn[i]) +
+                                  c * dofs_per_component,
+                                std::get<2>(locally_relevant_constrains_hn[i])};
+
+
+                        locally_relevant_constrains_hn_map[mask] =
+                          locally_relevant_constrains_hn;
+                      }
+
+                    const auto &locally_relevant_constrains_hn =
+                      locally_relevant_constrains_hn_map[mask];
+
+                    // 2) perform vmult with other constraints
+                    std::vector<std::tuple<unsigned int, unsigned int, Number>>
+                      locally_relevant_constrains_temp;
+
+                    for (unsigned int i = 0;
+                         i < dofs_per_component * n_components;
+                         ++i)
+                      {
+                        const auto lower_bound_fu = [](const auto &a,
+                                                       const auto &b) {
+                          return std::get<0>(a) < b;
+                        };
+
+                        const auto upper_bound_fu = [](const auto &a,
+                                                       const auto &b) {
+                          return a < std::get<0>(b);
+                        };
+
+                        const auto i_begin = std::lower_bound(
+                          locally_relevant_constrains_hn.begin(),
+                          locally_relevant_constrains_hn.end(),
+                          i,
+                          lower_bound_fu);
+                        const auto i_end = std::upper_bound(
+                          locally_relevant_constrains_hn.begin(),
+                          locally_relevant_constrains_hn.end(),
+                          i,
+                          upper_bound_fu);
+
+                        if (i_begin == i_end)
+                          {
+                            // dof is not constrained by hanging-node constraint
+                            // (identity matrix): simply copy constraints
+                            const auto j_begin = std::lower_bound(
+                              locally_relevant_constrains.begin(),
+                              locally_relevant_constrains.end(),
+                              i,
+                              lower_bound_fu);
+                            const auto j_end = std::upper_bound(
+                              locally_relevant_constrains.begin(),
+                              locally_relevant_constrains.end(),
+                              i,
+                              upper_bound_fu);
+
+                            for (auto v = j_begin; v != j_end; ++v)
+                              locally_relevant_constrains_temp.emplace_back(*v);
+                          }
+                        else
+                          {
+                            // dof is constrained: build transitive closure
+                            for (auto v0 = i_begin; v0 != i_end; ++v0)
+                              {
+                                const auto j_begin = std::lower_bound(
+                                  locally_relevant_constrains.begin(),
+                                  locally_relevant_constrains.end(),
+                                  std::get<1>(*v0),
+                                  lower_bound_fu);
+                                const auto j_end = std::upper_bound(
+                                  locally_relevant_constrains.begin(),
+                                  locally_relevant_constrains.end(),
+                                  std::get<1>(*v0),
+                                  upper_bound_fu);
+
+                                for (auto v1 = j_begin; v1 != j_end; ++v1)
+                                  locally_relevant_constrains_temp.emplace_back(
+                                    std::get<0>(*v0),
+                                    std::get<1>(*v1),
+                                    std::get<2>(*v0) * std::get<2>(*v1));
+                              }
+                          }
+                      }
+
+                    locally_relevant_constrains =
+                      locally_relevant_constrains_temp;
+                  }
+              }
+
+            // STEP 2d: transpose COO
+            std::sort(locally_relevant_constrains.begin(),
+                      locally_relevant_constrains.end(),
+                      [](const auto &a, const auto &b) {
+                        if (std::get<1>(a) < std::get<1>(b))
+                          return true;
+                        return (std::get<1>(a) == std::get<1>(b)) &&
+                               (std::get<0>(a) < std::get<0>(b));
+                      });
+
+            // STEP 2e: translate COO to CRS
             auto &c_pool = c_pools[v];
             {
               if (locally_relevant_constrains.size() > 0)
@@ -582,6 +764,10 @@ namespace MatrixFreeTools
       // note: may be larger then dofs_per_cell in the presence of
       // constraints!
       std::array<std::vector<Number>, n_lanes> diagonals_local_constrained;
+
+      std::map<unsigned int,
+               std::vector<std::tuple<unsigned int, unsigned int, Number>>>
+        locally_relevant_constrains_hn_map;
     };
 
   } // namespace internal

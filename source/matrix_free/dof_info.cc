@@ -103,7 +103,9 @@ namespace internal
           // shift for this cell within the block as compared to the next
           // one
           const bool has_constraints =
-            row_starts[ib].second != row_starts[ib + n_fe_components].second;
+            (hanging_node_constraint_masks.size() != 0 &&
+             hanging_node_constraint_masks[ib] != 0) ||
+            (row_starts[ib].second != row_starts[ib + n_fe_components].second);
 
           auto do_copy = [&](const unsigned int *begin,
                              const unsigned int *end) {
@@ -221,8 +223,19 @@ namespace internal
               // now the same procedure for plain indices
               if (store_plain_indices == true)
                 {
-                  if (row_starts[boundary_cells[i] * n_components].second !=
-                      row_starts[(boundary_cells[i] + 1) * n_components].second)
+                  bool has_hanging_nodes = false;
+
+                  if (hanging_node_constraint_masks.size() > 0)
+                    for (unsigned int comp = 0; comp < n_components; ++comp)
+                      has_hanging_nodes |=
+                        hanging_node_constraint_masks[boundary_cells[i] *
+                                                        n_components +
+                                                      comp] > 0;
+
+                  if (has_hanging_nodes ||
+                      row_starts[boundary_cells[i] * n_components].second !=
+                        row_starts[(boundary_cells[i] + 1) * n_components]
+                          .second)
                     {
                       unsigned int *data_ptr =
                         plain_dof_indices.data() +
@@ -322,6 +335,11 @@ namespace internal
       unsigned int              position_cell = 0;
       new_dof_indices.reserve(dof_indices.size());
       new_constraint_indicator.reserve(constraint_indicator.size());
+
+      std::vector<unsigned int> new_hanging_node_constraint_masks;
+      new_hanging_node_constraint_masks.reserve(
+        new_hanging_node_constraint_masks.size());
+
       if (store_plain_indices == true)
         {
           new_rowstart_plain.resize(vectorization_length *
@@ -350,6 +368,9 @@ namespace internal
             {
               const unsigned int cell_no =
                 renumbering[position_cell + j] * n_components;
+
+              bool has_hanging_nodes = false;
+
               for (unsigned int comp = 0; comp < n_components; ++comp)
                 {
                   new_row_starts[(i * vectorization_length + j) * n_components +
@@ -358,6 +379,14 @@ namespace internal
                   new_row_starts[(i * vectorization_length + j) * n_components +
                                  comp]
                     .second = new_constraint_indicator.size();
+
+                  if (hanging_node_constraint_masks.size() > 0)
+                    {
+                      const auto mask =
+                        hanging_node_constraint_masks[cell_no + comp];
+                      new_hanging_node_constraint_masks.push_back(mask);
+                      has_hanging_nodes |= mask > 0;
+                    }
 
                   new_dof_indices.insert(
                     new_dof_indices.end(),
@@ -370,8 +399,9 @@ namespace internal
                       constraint_indicator[index]);
                 }
               if (store_plain_indices &&
-                  row_starts[cell_no].second !=
-                    row_starts[cell_no + n_components].second)
+                  ((row_starts[cell_no].second !=
+                    row_starts[cell_no + n_components].second) ||
+                   has_hanging_nodes))
                 {
                   new_rowstart_plain[i * vectorization_length + j] =
                     new_plain_indices.size();
@@ -393,6 +423,9 @@ namespace internal
                 new_row_starts[(i * vectorization_length + j) * n_components +
                                comp]
                   .second = new_constraint_indicator.size();
+
+                if (hanging_node_constraint_masks.size() > 0)
+                  new_hanging_node_constraint_masks.push_back(0);
               }
           position_cell += n_vect;
         }
@@ -414,6 +447,7 @@ namespace internal
       new_constraint_indicator.swap(constraint_indicator);
       new_plain_indices.swap(plain_dof_indices);
       new_rowstart_plain.swap(row_starts_plain_indices);
+      new_hanging_node_constraint_masks.swap(hanging_node_constraint_masks);
 
 #ifdef DEBUG
       // sanity check 1: all indices should be smaller than the number of dofs
@@ -1460,6 +1494,7 @@ namespace internal
     DoFInfo::read_dof_indices<double>(
       const std::vector<types::global_dof_index> &,
       const std::vector<types::global_dof_index> &,
+      const bool cell_has_hanging_node_constraints,
       const dealii::AffineConstraints<double> &,
       const unsigned int,
       ConstraintValues<double> &,
@@ -1469,10 +1504,33 @@ namespace internal
     DoFInfo::read_dof_indices<float>(
       const std::vector<types::global_dof_index> &,
       const std::vector<types::global_dof_index> &,
+      const bool cell_has_hanging_node_constraints,
       const dealii::AffineConstraints<float> &,
       const unsigned int,
       ConstraintValues<double> &,
       bool &);
+
+    template bool
+    DoFInfo::process_hanging_node_constraints<1>(
+      const HangingNodes<1> &                           hanging_nodes,
+      const std::vector<unsigned int> &                 lexicographic_mapping,
+      const unsigned int                                cell_number,
+      const TriaIterator<DoFCellAccessor<1, 1, false>> &cell,
+      std::vector<types::global_dof_index> &            dof_indices);
+    template bool
+    DoFInfo::process_hanging_node_constraints<2>(
+      const HangingNodes<2> &                           hanging_nodes,
+      const std::vector<unsigned int> &                 lexicographic_mapping,
+      const unsigned int                                cell_number,
+      const TriaIterator<DoFCellAccessor<2, 2, false>> &cell,
+      std::vector<types::global_dof_index> &            dof_indices);
+    template bool
+    DoFInfo::process_hanging_node_constraints<3>(
+      const HangingNodes<3> &                           hanging_nodes,
+      const std::vector<unsigned int> &                 lexicographic_mapping,
+      const unsigned int                                cell_number,
+      const TriaIterator<DoFCellAccessor<3, 3, false>> &cell,
+      std::vector<types::global_dof_index> &            dof_indices);
 
     template void
     DoFInfo::compute_face_index_compression<1>(
