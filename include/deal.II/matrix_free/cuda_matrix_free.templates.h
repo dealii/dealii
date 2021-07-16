@@ -269,7 +269,7 @@ namespace CUDAWrappers
       , lexicographic_inv(shape_info.lexicographic_numbering)
       , update_flags(update_flags)
       , padding_length(data->get_padding_length())
-      , hanging_nodes(fe_degree, dof_handler, lexicographic_inv)
+      , hanging_nodes(dof_handler.get_triangulation())
     {
       cudaError_t error_code = cudaMemcpyToSymbol(
         constraint_weights,
@@ -378,10 +378,13 @@ namespace CUDAWrappers
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         lexicographic_dof_indices[i] = local_dof_indices[lexicographic_inv[i]];
 
-      hanging_nodes.setup_constraints(lexicographic_dof_indices,
-                                      cell,
+      const ArrayView<unsigned int> cell_id_view(constraint_mask_host[cell_id]);
+
+      hanging_nodes.setup_constraints(cell,
                                       partitioner,
-                                      constraint_mask_host[cell_id]);
+                                      lexicographic_inv,
+                                      lexicographic_dof_indices,
+                                      cell_id_view);
 
       memcpy(&local_to_global_host[cell_id * padding_length],
              lexicographic_dof_indices.data(),
