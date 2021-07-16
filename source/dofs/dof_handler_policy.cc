@@ -35,6 +35,7 @@
 #include <deal.II/grid/tria_iterator.h>
 
 #include <algorithm>
+#include <limits>
 #include <memory>
 #include <numeric>
 #include <set>
@@ -1720,7 +1721,22 @@ namespace internal
 
                   for (auto &dof_index : dof_indices)
                     if (dof_index == numbers::invalid_dof_index)
-                      dof_index = next_free_dof++;
+                      {
+                        dof_index = next_free_dof;
+
+                        Assert(
+                          next_free_dof !=
+                            std::numeric_limits<types::global_dof_index>::max(),
+                          ExcMessage(
+                            "You have reached the maximal number of degrees of "
+                            "freedom that can be stored in the chosen data type. "
+                            "In practice, this can only happen if you are using "
+                            "32-bit data types. You will have to re-compile "
+                            "deal.II with the `DEAL_II_WITH_64BIT_INDICES' "
+                            "flag set to `ON'."));
+                        ++next_free_dof;
+                      }
+
 
                   cell->set_dof_indices(dof_indices);
                 }
@@ -1806,7 +1822,21 @@ namespace internal
 
                 for (auto &dof_index : dof_indices)
                   if (dof_index == numbers::invalid_dof_index)
-                    dof_index = next_free_dof++;
+                    {
+                      dof_index = next_free_dof;
+
+                      Assert(
+                        next_free_dof !=
+                          std::numeric_limits<types::global_dof_index>::max(),
+                        ExcMessage(
+                          "You have reached the maximal number of degrees of "
+                          "freedom that can be stored in the chosen data type. "
+                          "In practice, this can only happen if you are using "
+                          "32-bit data types. You will have to re-compile "
+                          "deal.II with the `DEAL_II_WITH_64BIT_INDICES' "
+                          "flag set to `ON'."));
+                      ++next_free_dof;
+                    }
 
                 cell->set_mg_dof_indices(dof_indices);
               }
