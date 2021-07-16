@@ -271,6 +271,11 @@ namespace CUDAWrappers
       , padding_length(data->get_padding_length())
       , hanging_nodes(fe_degree, dof_handler, lexicographic_inv)
     {
+      cudaError_t error_code = cudaMemcpyToSymbol(
+        constraint_weights,
+        &shape_info.data.front().subface_interpolation_matrix[0][0],
+        sizeof(double) * fe.n_dofs_per_face(0) * fe.n_dofs_per_face(0));
+
       local_dof_indices.resize(data->dofs_per_cell);
       lexicographic_dof_indices.resize(dofs_per_cell);
     }
