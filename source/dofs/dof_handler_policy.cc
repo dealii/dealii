@@ -1708,6 +1708,7 @@ namespace internal
                 {
                   dof_indices.resize(cell->get_fe().n_dofs_per_cell());
 
+                  // the cache is not assigned yet, so we must bypass it
                   internal::DoFAccessorImplementation::Implementation::
                     get_dof_indices(*cell,
                                     dof_indices,
@@ -1755,7 +1756,7 @@ namespace internal
 
                 // delete all dofs that live there and that we have
                 // previously assigned a number to (i.e. the ones on
-                // the interface)
+                // the interface); make sure to not use the cache
                 local_dof_indices.resize(cell->get_fe().n_dofs_per_cell());
                 internal::DoFAccessorImplementation::Implementation::
                   get_dof_indices(*cell,
@@ -2905,7 +2906,8 @@ namespace internal
             {
               // get the owner of the cell; note that we have made sure above
               // that all cells are either locally owned or ghosts (not
-              // artificial), so this call will always yield the true owner
+              // artificial), so this call will always yield the true owner;
+              // note that the cache is not assigned yet, so we must bypass it
               const types::subdomain_id subdomain_id = cell->subdomain_id();
               const unsigned int        dofs_per_cell =
                 cell->get_fe().n_dofs_per_cell();
@@ -3632,6 +3634,8 @@ namespace internal
 
             std::vector<dealii::types::global_dof_index> data(
               cell->get_fe().n_dofs_per_cell());
+
+            // bypass the cache which is not filled yet
             internal::DoFAccessorImplementation::Implementation::
               get_dof_indices(*cell, data, cell->active_fe_index());
 
