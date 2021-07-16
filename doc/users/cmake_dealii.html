@@ -814,9 +814,9 @@ cmake -DLAPACK_FOUND=true \
       Compilers can be switched either by command line or by setting
       <code>CMAKE_(C|CXX|Fortran)_COMPILER</code>:
 <pre class="cmake">
-CC=mpicc CXX=mpicxx FC=mpif90 cmake &lt;...&gt;
+CC=my_c_compiler CXX=my_cxx_compiler FC=my_fortran_compiler cmake &lt;...&gt;
 
-cmake -DCMAKE_C_COMPILER="mpicc" -DCMAKE_CXX_COMPILER="mpicxx" -DCMAKE_Fortran_COMPILER="mpif90" &lt;...&gt;
+cmake -DCMAKE_C_COMPILER=my_c_compiler -DCMAKE_CXX_COMPILER=my_cxx_compiler -DCMAKE_Fortran_COMPILER=my_fortran_compiler &lt;...&gt;
 </pre>
       Please note that
       <ul>

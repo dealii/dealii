@@ -65,14 +65,12 @@ MACRO(FEATURE_MPI_ERROR_MESSAGE)
     "Could not find any suitable mpi library!\n"
     ${MPI_ADDITIONAL_ERROR_STRING}
     "\nPlease ensure that an mpi library is installed on your computer\n"
-    "and set CMAKE_CXX_COMPILER to the appropriate mpi wrappers:\n"
-    "    $ CXX=\".../mpicxx\" cmake <...>\n"
-    "    $ cmake -DCMAKE_CXX_COMPILER=\".../mpicxx\" <...>\n"
+    "and set MPI_CXX_COMPILER to the appropriate mpi wrappers:\n"
+    "    $ cmake -DMPI_CXX_COMPILER=\".../mpicxx\" <...>\n"
     "Or with additional C and Fortran wrappers (recommended!):\n"
-    "    $ CC=\".../mpicc\" CXX=\".../mpicxx\" F90=\".../mpif90\" cmake <...>\n"
-    "    $ cmake -DCMAKE_C_COMPILER=\".../mpicc\"\\\n"
-    "            -DCMAKE_CXX_COMPILER=\".../mpicxx\"\\\n"
-    "            -DCMAKE_Fortran_COMPILER=\".../mpif90\"\\\n"
+    "    $ cmake -DMPI_C_COMPILER=\".../mpicc\"\\\n"
+    "            -DMPI_CXX_COMPILER=\".../mpicxx\"\\\n"
+    "            -DMPI_Fortran_COMPILER=\".../mpif90\"\\\n"
     "            <...>\n"
     )
 ENDMACRO()
