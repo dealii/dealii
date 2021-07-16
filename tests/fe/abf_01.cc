@@ -15,10 +15,8 @@
 
 
 
-// Show the shape functions of the Raviart-Thomas element on the unit cell
+// Show the shape functions of the ABF element on the unit cell
 // Plots are gnuplot compatible if lines with desired prefix are selected.
-
-#include <deal.II/fe/fe_raviart_thomas.h>
 
 #include "../tests.h"
 
@@ -30,11 +28,7 @@
 
 #include <deal.II/dofs/dof_tools.h>
 
-#include <deal.II/fe/fe.h>
 #include <deal.II/fe/fe_abf.h>
-#include <deal.II/fe/fe_dgq.h>
-#include <deal.II/fe/fe_q.h>
-#include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_q.h>
 

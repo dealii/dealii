@@ -28,6 +28,7 @@
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_cartesian.h>
 
+#include <deal.II/grid/cell_id.h>
 #include <deal.II/grid/tria.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -50,6 +51,7 @@ namespace internal
       }
 
 
+
       // TODO: This function is not a consistent fix of the orientation issue
       // like in 3D. It is rather kept not to break legacy behavior in 2D but
       // should be replaced. See also the implementation of
@@ -67,17 +69,23 @@ namespace internal
         const unsigned int dim = 2;
         // const unsigned int spacedim = 2;
 
-        for (unsigned int f = GeometryInfo<dim>::faces_per_cell / 2;
-             f < GeometryInfo<dim>::faces_per_cell;
-             ++f)
+        const CellId this_cell_id = cell->id();
+
+        for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
           {
             typename dealii::Triangulation<dim, spacedim>::face_iterator face =
               cell->face(f);
             if (!face->at_boundary())
               {
                 const unsigned int nn = cell->neighbor_face_no(f);
+                const typename dealii::Triangulation<dim,
+                                                     spacedim>::cell_iterator
+                             neighbor_cell_at_face = cell->neighbor(f);
+                const CellId neigbor_cell_id = neighbor_cell_at_face->id();
 
-                if (nn < GeometryInfo<dim>::faces_per_cell / 2)
+                // Only fix sign if the orientation is opposite and only do so
+                // on the face dofs on the cell with smaller cell_id.
+                if (((nn + f) % 2 == 0) && this_cell_id < neigbor_cell_id)
                   for (unsigned int j = 0; j < fe.n_dofs_per_face(f); ++j)
                     {
                       const unsigned int cell_j = fe.face_to_cell_index(j, f);
@@ -131,13 +139,17 @@ namespace internal
       template <int spacedim>
       void
       get_dof_sign_change_nedelec(
-        const typename dealii::Triangulation<2, spacedim>::cell_iterator
-          & /*cell*/,
+        const typename dealii::Triangulation<2, spacedim>::cell_iterator &cell,
         const FiniteElement<2, spacedim> & /*fe*/,
-        const std::vector<MappingKind> & /*mapping_kind*/,
-        std::vector<double> & /*line_dof_sign*/)
+        const std::vector<MappingKind> &mapping_kind,
+        std::vector<double> &           line_dof_sign)
       {
-        // TODO: think about what it would take here
+        const unsigned int dim = 2;
+        // TODO: This fixes only lowest order
+        for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell; ++l)
+          if (!(cell->line_orientation(l)) &&
+              mapping_kind[0] == mapping_nedelec)
+            line_dof_sign[l] = -1.0;
       }
 
 

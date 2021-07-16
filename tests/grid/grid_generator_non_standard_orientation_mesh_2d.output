@@ -16,8 +16,7 @@ DEAL::      {2 -> 1}
 DEAL::      {3 -> 1} 
 DEAL::   line orientation: {  1  1  1  1  }
 DEAL::
-DEAL::****************
-DEAL::CellId = 0_0:
+DEAL::CellId = 2_0:
 DEAL::   {line_index -> face_orientation}: 
 DEAL::      {0 -> 1} 
 DEAL::      {1 -> 1} 
@@ -25,7 +24,7 @@ DEAL::      {2 -> 1}
 DEAL::      {3 -> 1} 
 DEAL::   line orientation: {  1  1  1  1  }
 DEAL::
-DEAL::CellId = 1_0:
+DEAL::CellId = 3_0:
 DEAL::   {line_index -> face_orientation}: 
 DEAL::      {0 -> 1} 
 DEAL::      {1 -> 1} 
@@ -33,16 +32,7 @@ DEAL::      {2 -> 1}
 DEAL::      {3 -> 1} 
 DEAL::   line orientation: {  1  1  1  1  }
 DEAL::
-DEAL::****************
-DEAL::CellId = 0_0:
-DEAL::   {line_index -> face_orientation}: 
-DEAL::      {0 -> 1} 
-DEAL::      {1 -> 1} 
-DEAL::      {2 -> 1} 
-DEAL::      {3 -> 1} 
-DEAL::   line orientation: {  1  1  1  1  }
-DEAL::
-DEAL::CellId = 1_0:
+DEAL::CellId = 4_0:
 DEAL::   {line_index -> face_orientation}: 
 DEAL::      {0 -> 1} 
 DEAL::      {1 -> 1} 
@@ -60,6 +50,112 @@ DEAL::      {3 -> 1}
 DEAL::   line orientation: {  1  1  1  1  }
 DEAL::
 DEAL::CellId = 1_0:
+DEAL::   {line_index -> face_orientation}: 
+DEAL::      {0 -> 1} 
+DEAL::      {1 -> 1} 
+DEAL::      {2 -> 1} 
+DEAL::      {3 -> 1} 
+DEAL::   line orientation: {  1  1  1  1  }
+DEAL::
+DEAL::CellId = 2_0:
+DEAL::   {line_index -> face_orientation}: 
+DEAL::      {0 -> 1} 
+DEAL::      {1 -> 1} 
+DEAL::      {2 -> 1} 
+DEAL::      {3 -> 0} 
+DEAL::   line orientation: {  1  1  1  0  }
+DEAL::
+DEAL::CellId = 3_0:
+DEAL::   {line_index -> face_orientation}: 
+DEAL::      {0 -> 1} 
+DEAL::      {1 -> 1} 
+DEAL::      {2 -> 1} 
+DEAL::      {3 -> 1} 
+DEAL::   line orientation: {  1  1  1  1  }
+DEAL::
+DEAL::CellId = 4_0:
+DEAL::   {line_index -> face_orientation}: 
+DEAL::      {0 -> 1} 
+DEAL::      {1 -> 1} 
+DEAL::      {2 -> 0} 
+DEAL::      {3 -> 1} 
+DEAL::   line orientation: {  1  1  0  1  }
+DEAL::
+DEAL::****************
+DEAL::CellId = 0_0:
+DEAL::   {line_index -> face_orientation}: 
+DEAL::      {0 -> 1} 
+DEAL::      {1 -> 1} 
+DEAL::      {2 -> 1} 
+DEAL::      {3 -> 1} 
+DEAL::   line orientation: {  1  1  1  1  }
+DEAL::
+DEAL::CellId = 1_0:
+DEAL::   {line_index -> face_orientation}: 
+DEAL::      {0 -> 1} 
+DEAL::      {1 -> 0} 
+DEAL::      {2 -> 1} 
+DEAL::      {3 -> 1} 
+DEAL::   line orientation: {  1  0  1  1  }
+DEAL::
+DEAL::CellId = 2_0:
+DEAL::   {line_index -> face_orientation}: 
+DEAL::      {0 -> 1} 
+DEAL::      {1 -> 1} 
+DEAL::      {2 -> 1} 
+DEAL::      {3 -> 0} 
+DEAL::   line orientation: {  1  1  1  0  }
+DEAL::
+DEAL::CellId = 3_0:
+DEAL::   {line_index -> face_orientation}: 
+DEAL::      {0 -> 0} 
+DEAL::      {1 -> 1} 
+DEAL::      {2 -> 1} 
+DEAL::      {3 -> 1} 
+DEAL::   line orientation: {  0  1  1  1  }
+DEAL::
+DEAL::CellId = 4_0:
+DEAL::   {line_index -> face_orientation}: 
+DEAL::      {0 -> 1} 
+DEAL::      {1 -> 1} 
+DEAL::      {2 -> 0} 
+DEAL::      {3 -> 1} 
+DEAL::   line orientation: {  1  1  0  1  }
+DEAL::
+DEAL::****************
+DEAL::CellId = 0_0:
+DEAL::   {line_index -> face_orientation}: 
+DEAL::      {0 -> 1} 
+DEAL::      {1 -> 1} 
+DEAL::      {2 -> 1} 
+DEAL::      {3 -> 1} 
+DEAL::   line orientation: {  1  1  1  1  }
+DEAL::
+DEAL::CellId = 1_0:
+DEAL::   {line_index -> face_orientation}: 
+DEAL::      {0 -> 1} 
+DEAL::      {1 -> 1} 
+DEAL::      {2 -> 0} 
+DEAL::      {3 -> 1} 
+DEAL::   line orientation: {  1  1  0  1  }
+DEAL::
+DEAL::CellId = 2_0:
+DEAL::   {line_index -> face_orientation}: 
+DEAL::      {0 -> 1} 
+DEAL::      {1 -> 1} 
+DEAL::      {2 -> 1} 
+DEAL::      {3 -> 1} 
+DEAL::   line orientation: {  1  1  1  1  }
+DEAL::
+DEAL::CellId = 3_0:
+DEAL::   {line_index -> face_orientation}: 
+DEAL::      {0 -> 0} 
+DEAL::      {1 -> 1} 
+DEAL::      {2 -> 1} 
+DEAL::      {3 -> 1} 
+DEAL::   line orientation: {  0  1  1  1  }
+DEAL::
+DEAL::CellId = 4_0:
 DEAL::   {line_index -> face_orientation}: 
 DEAL::      {0 -> 1} 
 DEAL::      {1 -> 1} 
