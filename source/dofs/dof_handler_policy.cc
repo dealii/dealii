@@ -1047,8 +1047,6 @@ namespace internal
 
           renumber_dofs(renumbering, IndexSet(0), dof_handler, check_validity);
 
-          update_all_active_cell_dof_indices_caches(dof_handler);
-
           return n_dofs;
         }
 
@@ -1680,8 +1678,6 @@ namespace internal
 
             tasks.join_all();
           }
-
-          update_all_active_cell_dof_indices_caches(dof_handler);
         }
 
 
@@ -1713,7 +1709,7 @@ namespace internal
                 {
                   dof_indices.resize(cell->get_fe().n_dofs_per_cell());
 
-                  // circumvent cache
+                  // the cache is not assigned yet, so we must bypass it
                   internal::DoFAccessorImplementation::Implementation::
                     get_dof_indices(*cell,
                                     dof_indices,
@@ -1740,8 +1736,6 @@ namespace internal
 
                   cell->set_dof_indices(dof_indices);
                 }
-
-          update_all_active_cell_dof_indices_caches(dof_handler);
 
           return next_free_dof;
         }
@@ -1778,9 +1772,12 @@ namespace internal
 
                 // delete all dofs that live there and that we have
                 // previously assigned a number to (i.e. the ones on
-                // the interface)
+                // the interface); make sure to not use the cache
                 local_dof_indices.resize(cell->get_fe().n_dofs_per_cell());
-                cell->get_dof_indices(local_dof_indices);
+                internal::DoFAccessorImplementation::Implementation::
+                  get_dof_indices(*cell,
+                                  local_dof_indices,
+                                  cell->active_fe_index());
                 for (const auto &local_dof_index : local_dof_indices)
                   if (local_dof_index != numbers::invalid_dof_index)
                     renumbering[local_dof_index] = numbers::invalid_dof_index;
@@ -2427,7 +2424,8 @@ namespace internal
         renumber_dofs(const std::vector<types::global_dof_index> &new_numbers,
                       const IndexSet &                  indices_we_care_about,
                       const DoFHandler<dim, space_dim> &dof_handler,
-                      const bool                        check_validity)
+                      const bool                        check_validity,
+                      const bool                        update_cache = true)
         {
           if (dim == 1)
             Assert(indices_we_care_about == IndexSet(0), ExcNotImplemented());
@@ -2457,9 +2455,8 @@ namespace internal
           });
           tasks.join_all();
 
-          // update the cache used for cell dof indices
-          update_all_active_cell_dof_indices_caches(
-            const_cast<DoFHandler<dim, space_dim> &>(dof_handler));
+          if (update_cache)
+            update_all_active_cell_dof_indices_caches(dof_handler);
         }
 
 
@@ -2817,6 +2814,8 @@ namespace internal
                                             n_initial_dofs,
                                             /*check_validity=*/true);
 
+        update_all_active_cell_dof_indices_caches(*dof_handler);
+
         // return a sequential, complete index set
         return NumberCache(n_dofs);
       }
@@ -2937,12 +2936,16 @@ namespace internal
             {
               // get the owner of the cell; note that we have made sure above
               // that all cells are either locally owned or ghosts (not
-              // artificial), so this call will always yield the true owner
+              // artificial), so this call will always yield the true owner;
+              // note that the cache is not assigned yet, so we must bypass it
               const types::subdomain_id subdomain_id = cell->subdomain_id();
               const unsigned int        dofs_per_cell =
                 cell->get_fe().n_dofs_per_cell();
               local_dof_indices.resize(dofs_per_cell);
-              cell->get_dof_indices(local_dof_indices);
+              internal::DoFAccessorImplementation::Implementation::
+                get_dof_indices(*cell,
+                                local_dof_indices,
+                                cell->active_fe_index());
 
               // set subdomain ids. if dofs already have their values set then
               // they must be on partition interfaces. In that case assign them
@@ -3661,7 +3664,10 @@ namespace internal
 
             std::vector<dealii::types::global_dof_index> data(
               cell->get_fe().n_dofs_per_cell());
-            cell->get_dof_indices(data);
+
+            // bypass the cache which is not filled yet
+            internal::DoFAccessorImplementation::Implementation::
+              get_dof_indices(*cell, data, cell->active_fe_index());
 
             return data;
           };
@@ -3674,8 +3680,8 @@ namespace internal
 
             std::vector<dealii::types::global_dof_index> dof_indices(
               cell->get_fe().n_dofs_per_cell());
-            cell->update_cell_dof_indices_cache();
-            cell->get_dof_indices(dof_indices);
+            internal::DoFAccessorImplementation::Implementation::
+              get_dof_indices(*cell, dof_indices, cell->active_fe_index());
 
             bool complete = true;
             for (unsigned int i = 0; i < dof_indices.size(); ++i)
@@ -3712,11 +3718,6 @@ namespace internal
           GridTools::exchange_cell_data_to_ghosts<
             std::vector<types::global_dof_index>,
             DoFHandler<dim, spacedim>>(dof_handler, pack, unpack, filter);
-
-          // finally update the cell DoF indices caches to make sure
-          // our internal data structures are consistent
-          update_all_active_cell_dof_indices_caches(dof_handler);
-
 
           // have a barrier so that sends between two calls to this
           // function are not mixed up.
@@ -3872,7 +3873,8 @@ namespace internal
         Implementation::renumber_dofs(renumbering,
                                       IndexSet(0),
                                       *dof_handler,
-                                      /*check_validity=*/false);
+                                      /*check_validity=*/false,
+                                      /*update_cache=*/false);
 
         // now a little bit of housekeeping
         const dealii::types::global_dof_index n_global_dofs =
@@ -3937,6 +3939,8 @@ namespace internal
 
           triangulation->load_user_flags(user_flags);
         }
+
+        update_all_active_cell_dof_indices_caches(*this->dof_handler);
 
 #  ifdef DEBUG
         // check that we are really done
@@ -4402,7 +4406,8 @@ namespace internal
               Implementation::renumber_dofs(new_numbers,
                                             dof_handler->locally_owned_dofs(),
                                             *dof_handler,
-                                            /*check_validity=*/false);
+                                            /*check_validity=*/false,
+                                            /*update_cache=*/false);
 
             // Communicate newly assigned DoF indices to other processors
             // and get the same information for our own ghost cells.
@@ -4440,6 +4445,7 @@ namespace internal
               communicate_dof_indices_on_marked_cells(*dof_handler);
 
               triangulation->load_user_flags(user_flags);
+              update_all_active_cell_dof_indices_caches(*this->dof_handler);
             }
 
             NumberCache number_cache;
