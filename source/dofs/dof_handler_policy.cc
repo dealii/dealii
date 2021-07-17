@@ -3675,22 +3675,28 @@ namespace internal
 
             Assert(cell->is_ghost(), ExcInternalError());
 
-            std::vector<dealii::types::global_dof_index> dof_indices(
-              cell->get_fe().n_dofs_per_cell());
-            internal::DoFAccessorImplementation::Implementation::
-              get_dof_indices(*cell, dof_indices, cell->active_fe_index());
-
+            // Use a combined read/set function on the entities of the dof
+            // indices to speed things up against get_dof_indices +
+            // set_dof_indices
             bool complete = true;
-            for (unsigned int i = 0; i < dof_indices.size(); ++i)
-              if (dofs[i] != numbers::invalid_dof_index)
-                {
-                  Assert((dof_indices[i] == (numbers::invalid_dof_index)) ||
-                           (dof_indices[i] == dofs[i]),
-                         ExcInternalError());
-                  dof_indices[i] = dofs[i];
-                }
-              else
-                complete = false;
+            DoFAccessorImplementation::Implementation::process_dof_indices(
+              *cell,
+              dofs,
+              cell->active_fe_index(),
+              DoFAccessorImplementation::Implementation::
+                DoFIndexProcessor<dim, spacedim, false>(),
+              [&complete](auto &stored_index, auto &received_index) {
+                if (received_index != numbers::invalid_unsigned_int)
+                  {
+                    Assert((stored_index == (numbers::invalid_dof_index)) ||
+                             (stored_index == received_index),
+                           ExcInternalError());
+                    stored_index = received_index;
+                  }
+                else
+                  complete = false;
+              },
+              false);
 
             if (!complete)
               const_cast<
@@ -3702,10 +3708,6 @@ namespace internal
                 typename DoFHandler<dim, spacedim>::active_cell_iterator &>(
                 cell)
                 ->clear_user_flag();
-
-            const_cast<
-              typename DoFHandler<dim, spacedim>::active_cell_iterator &>(cell)
-              ->set_dof_indices(dof_indices);
           };
 
           const auto filter = [](const auto &cell) {
