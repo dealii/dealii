@@ -640,9 +640,9 @@ namespace python
 
     template <int dim, int spacedim>
     std::pair<int, int>
-    find_active_cell_around_point(PointWrapper &          p,
-                                  MappingQGenericWrapper &mapping_wrapper,
-                                  void *                  triangulation)
+    find_active_cell_around_point(PointWrapper &   p,
+                                  MappingQWrapper &mapping_wrapper,
+                                  void *           triangulation)
     {
       Triangulation<dim, spacedim> *tria =
         static_cast<Triangulation<dim, spacedim> *>(triangulation);
@@ -671,9 +671,9 @@ namespace python
     template <int dim, int spacedim>
     boost::python::list
     compute_aspect_ratio_of_cells(
-      const MappingQGenericWrapper &mapping_wrapper,
-      const QuadratureWrapper &     quadrature_wrapper,
-      const TriangulationWrapper &  triangulation_wrapper)
+      const MappingQWrapper &     mapping_wrapper,
+      const QuadratureWrapper &   quadrature_wrapper,
+      const TriangulationWrapper &triangulation_wrapper)
     {
       const Triangulation<dim, spacedim> *tria =
         static_cast<const Triangulation<dim, spacedim> *>(
@@ -1655,9 +1655,8 @@ namespace python
 
 
   CellAccessorWrapper
-  TriangulationWrapper::find_active_cell_around_point(
-    PointWrapper &         p,
-    MappingQGenericWrapper mapping)
+  TriangulationWrapper::find_active_cell_around_point(PointWrapper &  p,
+                                                      MappingQWrapper mapping)
   {
     std::pair<int, int> level_index_pair;
     if ((dim == 2) && (spacedim == 2))
@@ -1699,8 +1698,8 @@ namespace python
 
   boost::python::list
   TriangulationWrapper::compute_aspect_ratio_of_cells(
-    const MappingQGenericWrapper &mapping,
-    const QuadratureWrapper &     quadrature)
+    const MappingQWrapper &  mapping,
+    const QuadratureWrapper &quadrature)
   {
     if ((dim == 2) && (spacedim == 2))
       return internal::compute_aspect_ratio_of_cells<2, 2>(mapping,
