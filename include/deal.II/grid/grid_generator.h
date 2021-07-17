@@ -798,9 +798,10 @@ namespace GridGenerator
    * @param[in] rotate_right_square <code>true</code> if the right square is
    * rotated by $\pi/2$.
    */
-  void non_standard_orientation_mesh(Triangulation<2> &tria,
-                                     const bool        rotate_left_square,
-                                     const bool        rotate_right_square);
+  void
+  non_standard_orientation_mesh(Triangulation<2> &tria,
+                                const bool        rotate_left_square,
+                                const bool        rotate_right_square);
 
   /**
    * Generate a 3D mesh consisting of the unit cube joined with a copy shifted
@@ -823,11 +824,12 @@ namespace GridGenerator
    * @param[in] manipulate_left_cube <code>true</code> if the left cube is
    * to be re-ordered. If `false`, it is the right cube.
    */
-  void non_standard_orientation_mesh(Triangulation<3> &tria,
-                                     const bool        face_orientation,
-                                     const bool        face_flip,
-                                     const bool        face_rotation,
-                                     const bool        manipulate_left_cube);
+  void
+  non_standard_orientation_mesh(Triangulation<3> &tria,
+                                const bool        face_orientation,
+                                const bool        face_flip,
+                                const bool        face_rotation,
+                                const bool        manipulate_left_cube);
 
 
   /**
@@ -856,9 +858,10 @@ namespace GridGenerator
    * this function.
    */
   template <int spacedim>
-  void hyper_sphere(Triangulation<spacedim - 1, spacedim> &tria,
-                    const Point<spacedim> &center = Point<spacedim>(),
-                    const double           radius = 1.);
+  void
+  hyper_sphere(Triangulation<spacedim - 1, spacedim> &tria,
+               const Point<spacedim> &center = Point<spacedim>(),
+               const double           radius = 1.);
 
   /**
    * This function produces a hyper-ball intersected with the positive orthant
@@ -1569,11 +1572,12 @@ namespace GridGenerator
    * of the torus containing the loop of cells. Must be greater than @p r.
    * @param r           The radius of the cylinder bent together as a loop.
    */
-  void moebius(Triangulation<3, 3> &tria,
-               const unsigned int   n_cells,
-               const unsigned int   n_rotations,
-               const double         R,
-               const double         r);
+  void
+  moebius(Triangulation<3, 3> &tria,
+          const unsigned int   n_cells,
+          const unsigned int   n_rotations,
+          const double         R,
+          const double         r);
 
   /**
    * Call one of the other GridGenerator functions, parsing the name of the
@@ -2464,49 +2468,55 @@ namespace GridGenerator
   // These functions are only implemented with specializations; declare them
   // here
   template <>
-  void hyper_cube_with_cylindrical_hole(Triangulation<1> &,
-                                        const double,
-                                        const double,
-                                        const double,
-                                        const unsigned int,
-                                        const bool);
+  void
+  hyper_cube_with_cylindrical_hole(Triangulation<1> &,
+                                   const double,
+                                   const double,
+                                   const double,
+                                   const unsigned int,
+                                   const bool);
 
   template <>
-  void hyper_cube_with_cylindrical_hole(Triangulation<2> &,
-                                        const double,
-                                        const double,
-                                        const double,
-                                        const unsigned int,
-                                        const bool);
+  void
+  hyper_cube_with_cylindrical_hole(Triangulation<2> &,
+                                   const double,
+                                   const double,
+                                   const double,
+                                   const unsigned int,
+                                   const bool);
 
   template <>
-  void hyper_cube_with_cylindrical_hole(Triangulation<3> &,
-                                        const double,
-                                        const double,
-                                        const double,
-                                        const unsigned int,
-                                        const bool);
+  void
+  hyper_cube_with_cylindrical_hole(Triangulation<3> &,
+                                   const double,
+                                   const double,
+                                   const double,
+                                   const unsigned int,
+                                   const bool);
 
   template <>
-  void channel_with_cylinder(Triangulation<1> &,
-                             const double,
-                             const unsigned int,
-                             const double,
-                             const bool);
+  void
+  channel_with_cylinder(Triangulation<1> &,
+                        const double,
+                        const unsigned int,
+                        const double,
+                        const bool);
 
   template <>
-  void channel_with_cylinder(Triangulation<2> &,
-                             const double,
-                             const unsigned int,
-                             const double,
-                             const bool);
+  void
+  channel_with_cylinder(Triangulation<2> &,
+                        const double,
+                        const unsigned int,
+                        const double,
+                        const bool);
 
   template <>
-  void channel_with_cylinder(Triangulation<3> &,
-                             const double,
-                             const unsigned int,
-                             const double,
-                             const bool);
+  void
+  channel_with_cylinder(Triangulation<3> &,
+                        const double,
+                        const unsigned int,
+                        const double,
+                        const bool);
 #endif
 } // namespace GridGenerator
 

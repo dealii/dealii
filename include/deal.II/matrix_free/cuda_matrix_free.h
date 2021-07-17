@@ -690,7 +690,7 @@ namespace CUDAWrappers
   // time (by virtue of being 'constexpr')
   // TODO this function should be rewritten using meta-programming
   __host__ __device__ constexpr unsigned int
-           cells_per_block_shmem(int dim, int fe_degree)
+  cells_per_block_shmem(int dim, int fe_degree)
   {
     /* clang-format off */
     // We are limiting the number of threads according to the
@@ -719,12 +719,11 @@ namespace CUDAWrappers
   __device__ inline unsigned int
   q_point_id_in_cell(const unsigned int n_q_points_1d)
   {
-    return (dim == 1 ?
-              threadIdx.x % n_q_points_1d :
-              dim == 2 ?
-              threadIdx.x % n_q_points_1d + n_q_points_1d * threadIdx.y :
-              threadIdx.x % n_q_points_1d +
-                  n_q_points_1d * (threadIdx.y + n_q_points_1d * threadIdx.z));
+    return (
+      dim == 1 ? threadIdx.x % n_q_points_1d :
+      dim == 2 ? threadIdx.x % n_q_points_1d + n_q_points_1d * threadIdx.y :
+                 threadIdx.x % n_q_points_1d +
+                   n_q_points_1d * (threadIdx.y + n_q_points_1d * threadIdx.z));
   }
 
 

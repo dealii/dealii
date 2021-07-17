@@ -147,10 +147,11 @@ test()
 
     const unsigned int num_arnoldi_vectors = 2 * eigenvalues.size() + 2;
     PArpackSolver<LinearAlgebra::distributed::Vector<double>>::AdditionalData
-    additional_data(num_arnoldi_vectors,
-                    PArpackSolver<LinearAlgebra::distributed::Vector<double>>::
-                      largest_magnitude,
-                    true);
+      additional_data(
+        num_arnoldi_vectors,
+        PArpackSolver<
+          LinearAlgebra::distributed::Vector<double>>::largest_magnitude,
+        true);
 
     SolverControl solver_control(dof_handler.n_dofs(),
                                  1e-9,

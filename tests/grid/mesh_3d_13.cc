@@ -38,7 +38,8 @@
 
 
 
-void check_this(Triangulation<3> &tria)
+void
+check_this(Triangulation<3> &tria)
 {
   Triangulation<3>::active_cell_iterator cell = tria.begin_active();
   for (; cell != tria.end(); ++cell)
@@ -79,7 +80,8 @@ void check_this(Triangulation<3> &tria)
 
 
 
-void check(Triangulation<3> &tria)
+void
+check(Triangulation<3> &tria)
 {
   (++tria.begin_active())->set_refine_flag();
   tria.execute_coarsening_and_refinement();

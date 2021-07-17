@@ -338,7 +338,8 @@ TestPoly<dim>::vector_value(const Point<dim> &p,
  * Check the value of the derivative field.
  */
 
-double TestProjection(Mapping<2> &mapping, DoFHandler<2> *dof_handler)
+double
+TestProjection(Mapping<2> &mapping, DoFHandler<2> *dof_handler)
 {
   Vector<double> solution;
   solution.reinit(dof_handler->n_dofs());

@@ -2196,7 +2196,7 @@ template <typename MatrixType, class VectorType, typename PreconditionerType>
 inline typename PreconditionChebyshev<MatrixType,
                                       VectorType,
                                       PreconditionerType>::AdditionalData &
-                  PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
+PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
   AdditionalData::operator=(const AdditionalData &other_data)
 {
   degree              = other_data.degree;

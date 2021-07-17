@@ -59,7 +59,8 @@ namespace hp
      * @pre @p index must be between zero and the number of elements of the
      * collection.
      */
-    const T &operator[](const unsigned int index) const;
+    const T &
+    operator[](const unsigned int index) const;
 
     /**
      * Return the number of objects stored in this container.
@@ -114,7 +115,8 @@ namespace hp
 
 
   template <typename T>
-  inline const T &Collection<T>::operator[](const unsigned int index) const
+  inline const T &
+  Collection<T>::operator[](const unsigned int index) const
   {
     AssertIndexRange(index, entries.size());
     return *entries[index];

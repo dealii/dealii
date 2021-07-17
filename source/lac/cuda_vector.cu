@@ -268,7 +268,8 @@ namespace LinearAlgebra
 
 
     template <typename Number>
-    Number Vector<Number>::operator*(const VectorSpaceVector<Number> &V) const
+    Number
+    Vector<Number>::operator*(const VectorSpaceVector<Number> &V) const
     {
       // Check that casting will work
       Assert(dynamic_cast<const Vector<Number> *>(&V) != nullptr,

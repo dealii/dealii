@@ -44,7 +44,8 @@
 // not a, as it should. Simply looking at the identity of the neighboring cell
 // is not enough, we have to look at the (index of the) face instead.
 
-void create_grid(Triangulation<2> &tria)
+void
+create_grid(Triangulation<2> &tria)
 {
   const unsigned int n_points = 5;
 

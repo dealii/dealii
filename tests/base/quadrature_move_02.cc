@@ -21,7 +21,7 @@
 
 template <template <int dim> class Quad, int dim, typename... Args>
 std::string
-check_q_assign_move(Args &&... args)
+check_q_assign_move(Args &&...args)
 {
   Quad<dim>                     quad1(args...);
   const unsigned int            size1    = quad1.size();
@@ -52,7 +52,7 @@ check_q_assign_move(Args &&... args)
 
 template <template <int dim> class Quad, typename... Args>
 void
-check_quadrature_assign_move(Args &&... args)
+check_quadrature_assign_move(Args &&...args)
 {
   deallog << check_q_assign_move<Quad, 1>(std::forward<Args>(args)...) << 1
           << " " << check_q_assign_move<Quad, 2>(std::forward<Args>(args)...)

@@ -1984,8 +1984,8 @@ namespace FEValuesViews
     /**
      * Move assignment operator.
      */
-    // NOLINTNEXTLINE
-    Tensor &operator=(Tensor<2, dim, spacedim> &&) = default;
+    Tensor &
+    operator=(Tensor<2, dim, spacedim> &&) = default; // NOLINT
 
     /**
      * Return the value of the vector components selected by this view, for
@@ -5439,8 +5439,9 @@ namespace FEValuesViews
 
 
 template <int dim, int spacedim>
-inline const FEValuesViews::Scalar<dim, spacedim> &FEValuesBase<dim, spacedim>::
-                                                   operator[](const FEValuesExtractors::Scalar &scalar) const
+inline const FEValuesViews::Scalar<dim, spacedim> &
+FEValuesBase<dim, spacedim>::operator[](
+  const FEValuesExtractors::Scalar &scalar) const
 {
   AssertIndexRange(scalar.component, fe_values_views_cache.scalars.size());
 
@@ -5450,8 +5451,9 @@ inline const FEValuesViews::Scalar<dim, spacedim> &FEValuesBase<dim, spacedim>::
 
 
 template <int dim, int spacedim>
-inline const FEValuesViews::Vector<dim, spacedim> &FEValuesBase<dim, spacedim>::
-                                                   operator[](const FEValuesExtractors::Vector &vector) const
+inline const FEValuesViews::Vector<dim, spacedim> &
+FEValuesBase<dim, spacedim>::operator[](
+  const FEValuesExtractors::Vector &vector) const
 {
   AssertIndexRange(vector.first_vector_component,
                    fe_values_views_cache.vectors.size());
@@ -5463,8 +5465,8 @@ inline const FEValuesViews::Vector<dim, spacedim> &FEValuesBase<dim, spacedim>::
 
 template <int dim, int spacedim>
 inline const FEValuesViews::SymmetricTensor<2, dim, spacedim> &
-  FEValuesBase<dim, spacedim>::
-  operator[](const FEValuesExtractors::SymmetricTensor<2> &tensor) const
+FEValuesBase<dim, spacedim>::operator[](
+  const FEValuesExtractors::SymmetricTensor<2> &tensor) const
 {
   Assert(
     tensor.first_tensor_component <
@@ -5481,8 +5483,8 @@ inline const FEValuesViews::SymmetricTensor<2, dim, spacedim> &
 
 template <int dim, int spacedim>
 inline const FEValuesViews::Tensor<2, dim, spacedim> &
-  FEValuesBase<dim, spacedim>::
-  operator[](const FEValuesExtractors::Tensor<2> &tensor) const
+FEValuesBase<dim, spacedim>::operator[](
+  const FEValuesExtractors::Tensor<2> &tensor) const
 {
   AssertIndexRange(tensor.first_tensor_component,
                    fe_values_views_cache.second_order_tensors.size());

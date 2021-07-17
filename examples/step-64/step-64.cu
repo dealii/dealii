@@ -149,8 +149,8 @@ namespace Step64
   // the two terms on the left-hand side correspond to the two function calls
   // here:
   template <int dim, int fe_degree>
-  __device__ void HelmholtzOperatorQuad<dim, fe_degree>::
-                  operator()(CUDAWrappers::FEEvaluation<dim, fe_degree> *fe_eval) const
+  __device__ void HelmholtzOperatorQuad<dim, fe_degree>::operator()(
+    CUDAWrappers::FEEvaluation<dim, fe_degree> *fe_eval) const
   {
     fe_eval->submit_value(coef * fe_eval->get_value());
     fe_eval->submit_gradient(fe_eval->get_gradient());
@@ -366,7 +366,7 @@ namespace Step64
     // In addition, we also keep a solution vector with CPU storage such that we
     // can view and display the solution as usual.
     LinearAlgebra::distributed::Vector<double, MemorySpace::Host>
-                                                                  ghost_solution_host;
+      ghost_solution_host;
     LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA> solution_dev;
     LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA>
       system_rhs_dev;

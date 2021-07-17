@@ -881,7 +881,7 @@ namespace GridTools
     const double layer_thickness)
   {
     std::vector<typename MeshType::active_cell_iterator>
-                      subdomain_boundary_cells, active_cell_layer_within_distance;
+      subdomain_boundary_cells, active_cell_layer_within_distance;
     std::vector<bool> vertices_outside_subdomain(
       mesh.get_triangulation().n_vertices(), false);
 
@@ -2409,7 +2409,8 @@ namespace GridTools
 
 
   template <typename FaceIterator>
-  inline bool orthogonal_equality(
+  inline bool
+  orthogonal_equality(
     std::bitset<3> &                                              orientation,
     const FaceIterator &                                          face1,
     const FaceIterator &                                          face2,

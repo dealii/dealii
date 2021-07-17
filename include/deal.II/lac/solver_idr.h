@@ -65,7 +65,8 @@ namespace internal
        * Get vector number @p i. If this vector was unused before, an error
        * occurs.
        */
-      VectorType &operator[](const unsigned int i) const;
+      VectorType &
+      operator[](const unsigned int i) const;
 
       /**
        * Get vector number @p i. Allocate it if necessary.
@@ -199,8 +200,8 @@ namespace internal
 
 
     template <class VectorType>
-    inline VectorType &TmpVectors<VectorType>::
-                       operator[](const unsigned int i) const
+    inline VectorType &
+    TmpVectors<VectorType>::operator[](const unsigned int i) const
     {
       AssertIndexRange(i, data.size());
 

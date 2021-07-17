@@ -35,7 +35,8 @@ public:
     : coef(coef)
   {}
 
-  __device__ void operator()(
+  __device__ void
+  operator()(
     CUDAWrappers::FEEvaluation<dim, fe_degree, n_q_points_1d, 1, Number>
       *fe_eval) const;
 
@@ -46,9 +47,10 @@ private:
 
 
 template <int dim, int fe_degree, typename Number, int n_q_points_1d>
-__device__ void HelmholtzOperatorQuad<dim, fe_degree, Number, n_q_points_1d>::
-                operator()(CUDAWrappers::FEEvaluation<dim, fe_degree, n_q_points_1d, 1, Number>
-             *fe_eval) const
+__device__ void
+HelmholtzOperatorQuad<dim, fe_degree, Number, n_q_points_1d>::operator()(
+  CUDAWrappers::FEEvaluation<dim, fe_degree, n_q_points_1d, 1, Number> *fe_eval)
+  const
 {
   fe_eval->submit_value(coef * fe_eval->get_value());
   fe_eval->submit_gradient(fe_eval->get_gradient());
@@ -85,12 +87,12 @@ public:
 
 template <int dim, int fe_degree, typename Number, int n_q_points_1d>
 __device__ void
-HelmholtzOperator<dim, fe_degree, Number, n_q_points_1d>::
-operator()(const unsigned int                                          cell,
-           const typename CUDAWrappers::MatrixFree<dim, Number>::Data *gpu_data,
-           CUDAWrappers::SharedData<dim, Number> *shared_data,
-           const Number *                         src,
-           Number *                               dst) const
+HelmholtzOperator<dim, fe_degree, Number, n_q_points_1d>::operator()(
+  const unsigned int                                          cell,
+  const typename CUDAWrappers::MatrixFree<dim, Number>::Data *gpu_data,
+  CUDAWrappers::SharedData<dim, Number> *                     shared_data,
+  const Number *                                              src,
+  Number *                                                    dst) const
 {
   const unsigned int pos = CUDAWrappers::local_q_point_id<dim, Number>(
     cell, gpu_data, n_dofs_1d, n_q_points);
@@ -134,9 +136,9 @@ private:
 
 template <int dim, int fe_degree, typename Number, int n_q_points_1d>
 __device__ void
-VaryingCoefficientFunctor<dim, fe_degree, Number, n_q_points_1d>::
-operator()(const unsigned int                                          cell,
-           const typename CUDAWrappers::MatrixFree<dim, Number>::Data *gpu_data)
+VaryingCoefficientFunctor<dim, fe_degree, Number, n_q_points_1d>::operator()(
+  const unsigned int                                          cell,
+  const typename CUDAWrappers::MatrixFree<dim, Number>::Data *gpu_data)
 {
   const unsigned int pos = CUDAWrappers::local_q_point_id<dim, Number>(
     cell, gpu_data, n_dofs_1d, n_q_points);

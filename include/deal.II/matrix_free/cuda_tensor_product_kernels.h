@@ -212,9 +212,9 @@ namespace CUDAWrappers
     {
       const unsigned int i = (dim == 1) ? 0 : threadIdx.x % n_q_points_1d;
       const unsigned int j = (dim == 3) ? threadIdx.y : 0;
-      const unsigned int q = (dim == 1) ?
-                               (threadIdx.x % n_q_points_1d) :
-                               (dim == 2) ? threadIdx.y : threadIdx.z;
+      const unsigned int q = (dim == 1) ? (threadIdx.x % n_q_points_1d) :
+                             (dim == 2) ? threadIdx.y :
+                                          threadIdx.z;
 
       // This loop simply multiply the shape function at the quadrature point by
       // the value finite element coefficient.
@@ -224,10 +224,9 @@ namespace CUDAWrappers
           const unsigned int shape_idx =
             dof_to_quad ? (q + k * n_q_points_1d) : (k + q * n_q_points_1d);
           const unsigned int source_idx =
-            (direction == 0) ?
-              (k + n_q_points_1d * (i + n_q_points_1d * j)) :
-              (direction == 1) ? (i + n_q_points_1d * (k + n_q_points_1d * j)) :
-                                 (i + n_q_points_1d * (j + n_q_points_1d * k));
+            (direction == 0) ? (k + n_q_points_1d * (i + n_q_points_1d * j)) :
+            (direction == 1) ? (i + n_q_points_1d * (k + n_q_points_1d * j)) :
+                               (i + n_q_points_1d * (j + n_q_points_1d * k));
           t += shape_data[shape_idx] *
                (in_place ? out[source_idx] : in[source_idx]);
         }
@@ -236,10 +235,9 @@ namespace CUDAWrappers
         __syncthreads();
 
       const unsigned int destination_idx =
-        (direction == 0) ?
-          (q + n_q_points_1d * (i + n_q_points_1d * j)) :
-          (direction == 1) ? (i + n_q_points_1d * (q + n_q_points_1d * j)) :
-                             (i + n_q_points_1d * (j + n_q_points_1d * q));
+        (direction == 0) ? (q + n_q_points_1d * (i + n_q_points_1d * j)) :
+        (direction == 1) ? (i + n_q_points_1d * (q + n_q_points_1d * j)) :
+                           (i + n_q_points_1d * (j + n_q_points_1d * q));
 
       if (add)
         out[destination_idx] += t;

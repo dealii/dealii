@@ -3238,7 +3238,7 @@ FE_Nedelec<dim>::convert_generalized_support_point_values_to_dof_values(
               system_matrix_inv.invert(system_matrix);
 
               const unsigned int
-                             line_coordinate[GeometryInfo<2>::lines_per_cell] = {1, 1, 0, 0};
+                line_coordinate[GeometryInfo<2>::lines_per_cell] = {1, 1, 0, 0};
               Vector<double> system_rhs(system_matrix.m());
               Vector<double> solution(system_rhs.size());
 

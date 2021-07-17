@@ -84,7 +84,8 @@ create_and_print_flux_sparsity_pattern(const DoFHandler<dim> &dof_handler)
  * Create the 3-cells-triangulation (described at the top) by first creating 2
  * cells one the same level and then refining the right one.
  */
-void create_3_elements_on_2_different_levels(Triangulation<1> &triangulation)
+void
+create_3_elements_on_2_different_levels(Triangulation<1> &triangulation)
 {
   const unsigned int n_elements = 3;
   GridGenerator::subdivided_hyper_cube(triangulation, n_elements - 1);

@@ -322,7 +322,8 @@ public:
    * This function is only allowed to be called if the underlying data is indeed
    * stored in CPU memory.
    */
-  value_type &operator[](const std::size_t i) const;
+  value_type &
+  operator[](const std::size_t i) const;
 
 private:
   /**
@@ -515,8 +516,8 @@ inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
 
 template <typename ElementType, typename MemorySpaceType>
 inline bool
-ArrayView<ElementType, MemorySpaceType>::
-operator==(const ArrayView<const value_type, MemorySpaceType> &other_view) const
+ArrayView<ElementType, MemorySpaceType>::operator==(
+  const ArrayView<const value_type, MemorySpaceType> &other_view) const
 {
   return (other_view.data() == starting_element) &&
          (other_view.size() == n_elements);
@@ -526,9 +527,9 @@ operator==(const ArrayView<const value_type, MemorySpaceType> &other_view) const
 
 template <typename ElementType, typename MemorySpaceType>
 inline bool
-ArrayView<ElementType, MemorySpaceType>::
-operator==(const ArrayView<typename std::remove_cv<value_type>::type,
-                           MemorySpaceType> &other_view) const
+ArrayView<ElementType, MemorySpaceType>::operator==(
+  const ArrayView<typename std::remove_cv<value_type>::type, MemorySpaceType>
+    &other_view) const
 {
   return (other_view.data() == starting_element) &&
          (other_view.size() == n_elements);
@@ -538,8 +539,8 @@ operator==(const ArrayView<typename std::remove_cv<value_type>::type,
 
 template <typename ElementType, typename MemorySpaceType>
 inline bool
-ArrayView<ElementType, MemorySpaceType>::
-operator!=(const ArrayView<const value_type, MemorySpaceType> &other_view) const
+ArrayView<ElementType, MemorySpaceType>::operator!=(
+  const ArrayView<const value_type, MemorySpaceType> &other_view) const
 {
   return !(*this == other_view);
 }
@@ -560,9 +561,9 @@ ArrayView<ElementType, MemorySpaceType>::data() const noexcept
 
 template <typename ElementType, typename MemorySpaceType>
 inline bool
-ArrayView<ElementType, MemorySpaceType>::
-operator!=(const ArrayView<typename std::remove_cv<value_type>::type,
-                           MemorySpaceType> &other_view) const
+ArrayView<ElementType, MemorySpaceType>::operator!=(
+  const ArrayView<typename std::remove_cv<value_type>::type, MemorySpaceType>
+    &other_view) const
 {
   return !(*this == other_view);
 }
@@ -616,7 +617,7 @@ ArrayView<ElementType, MemorySpaceType>::cend() const
 
 template <typename ElementType, typename MemorySpaceType>
 inline typename ArrayView<ElementType, MemorySpaceType>::value_type &
-  ArrayView<ElementType, MemorySpaceType>::operator[](const std::size_t i) const
+ArrayView<ElementType, MemorySpaceType>::operator[](const std::size_t i) const
 {
   AssertIndexRange(i, n_elements);
   Assert(
@@ -1072,8 +1073,8 @@ make_array_view(const std::vector<ElementType> &vector,
  */
 template <typename ElementType>
 inline ArrayView<ElementType>
-  make_array_view(Table<2, ElementType> &                         table,
-                  const typename Table<2, ElementType>::size_type row)
+make_array_view(Table<2, ElementType> &                         table,
+                const typename Table<2, ElementType>::size_type row)
 {
   AssertIndexRange(row, table.size()[0]);
   return ArrayView<ElementType>(&table[row][0], table.size()[1]);
@@ -1098,7 +1099,8 @@ inline ArrayView<ElementType>
  * @relatesalso ArrayView
  */
 template <typename ElementType>
-inline ArrayView<ElementType> make_array_view(Table<2, ElementType> &table)
+inline ArrayView<ElementType>
+make_array_view(Table<2, ElementType> &table)
 {
   return ArrayView<ElementType>(&table[0][0], table.n_elements());
 }
@@ -1227,11 +1229,11 @@ make_array_view(const Table<2, ElementType> &                   table,
  * @relatesalso ArrayView
  */
 template <typename ElementType>
-inline ArrayView<ElementType> make_array_view(
-  Table<2, ElementType> &                         table,
-  const typename Table<2, ElementType>::size_type row,
-  const typename Table<2, ElementType>::size_type starting_column,
-  const std::size_t                               size_of_view)
+inline ArrayView<ElementType>
+make_array_view(Table<2, ElementType> &                         table,
+                const typename Table<2, ElementType>::size_type row,
+                const typename Table<2, ElementType>::size_type starting_column,
+                const std::size_t                               size_of_view)
 {
   AssertIndexRange(row, table.size()[0]);
   AssertIndexRange(starting_column, table.size()[1]);

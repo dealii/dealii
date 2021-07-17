@@ -1463,7 +1463,7 @@ namespace GridTools
     const Cache<dim, spacedim> &cache,
     const Point<spacedim> &     p,
     const typename Triangulation<dim, spacedim>::active_cell_iterator &
-                             cell_hint = typename Triangulation<dim, spacedim>::active_cell_iterator(),
+      cell_hint = typename Triangulation<dim, spacedim>::active_cell_iterator(),
     const std::vector<bool> &marked_vertices = {},
     const double             tolerance       = 1.e-10);
 
@@ -2737,7 +2737,8 @@ namespace GridTools
    * article.
    */
   template <typename FaceIterator>
-  bool orthogonal_equality(
+  bool
+  orthogonal_equality(
     std::bitset<3> &                                              orientation,
     const FaceIterator &                                          face1,
     const FaceIterator &                                          face2,
@@ -4352,7 +4353,7 @@ namespace GridTools
       std::vector<std::vector<typename CellId::binary_type>> cell_data_to_send(
         ghost_owners.size());
       std::vector<std::vector<types::global_dof_index>>
-                                     send_dof_numbers_and_indices(ghost_owners.size());
+        send_dof_numbers_and_indices(ghost_owners.size());
       std::vector<MPI_Request>       reply_requests(ghost_owners.size());
       std::vector<std::vector<char>> sendbuffers(ghost_owners.size());
 

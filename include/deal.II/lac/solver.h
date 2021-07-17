@@ -478,9 +478,9 @@ protected:
 
 template <class VectorType>
 inline SolverControl::State
-SolverBase<VectorType>::StateCombiner::
-operator()(const SolverControl::State state1,
-           const SolverControl::State state2) const
+SolverBase<VectorType>::StateCombiner::operator()(
+  const SolverControl::State state1,
+  const SolverControl::State state2) const
 {
   if ((state1 == SolverControl::failure) || (state2 == SolverControl::failure))
     return SolverControl::failure;

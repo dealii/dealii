@@ -339,12 +339,14 @@ namespace ChunkSparseMatrixIterators
     /**
      * Dereferencing operator.
      */
-    const Accessor<number, Constness> &operator*() const;
+    const Accessor<number, Constness> &
+    operator*() const;
 
     /**
      * Dereferencing operator.
      */
-    const Accessor<number, Constness> *operator->() const;
+    const Accessor<number, Constness> *
+    operator->() const;
 
     /**
      * Comparison. True, if both iterators point to the same matrix position.
@@ -1874,16 +1876,16 @@ namespace ChunkSparseMatrixIterators
 
 
   template <typename number, bool Constness>
-  inline const Accessor<number, Constness> &Iterator<number, Constness>::
-                                            operator*() const
+  inline const Accessor<number, Constness> &
+  Iterator<number, Constness>::operator*() const
   {
     return accessor;
   }
 
 
   template <typename number, bool Constness>
-  inline const Accessor<number, Constness> *Iterator<number, Constness>::
-                                            operator->() const
+  inline const Accessor<number, Constness> *
+  Iterator<number, Constness>::operator->() const
   {
     return &accessor;
   }

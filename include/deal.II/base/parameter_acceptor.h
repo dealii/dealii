@@ -401,7 +401,7 @@ public:
   initialize(const std::string &filename        = "",
              const std::string &output_filename = "",
              const ParameterHandler::OutputStyle
-                                                 output_style_for_output_filename = ParameterHandler::Short,
+               output_style_for_output_filename      = ParameterHandler::Short,
              ParameterHandler &                  prm = ParameterAcceptor::prm,
              const ParameterHandler::OutputStyle output_style_for_filename =
                ParameterHandler::DefaultStyle);

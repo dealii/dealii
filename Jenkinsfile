@@ -60,34 +60,6 @@ pipeline
             githubNotify context: 'CI', description: 'running tests...',  status: 'PENDING'
           }
         }
-
-        stage("indent")
-        {
-          post {
-            failure {
-              githubNotify context: 'indent', description: 'failed',  status: 'FAILURE'
-            }
-          }
-
-          steps
-          {
-            // we are finally running, so we can mark the 'ready' context from Jenkinsfile.mark as success:
-            githubNotify context: 'ready', description: ':-)',  status: 'SUCCESS'
-
-            // We can not use 'indent' because we are missing the master branch:
-            // "fatal: ambiguous argument 'master': unknown revision or path"
-            sh '''
-               ./contrib/utilities/indent-all
-            '''
-            sh 'git diff > changes.diff'
-            archiveArtifacts artifacts: 'changes.diff', fingerprint: true
-            sh '''
-               git diff --exit-code || \
-               { echo "Please check indentation, see artifacts at the top right!"; exit 1; }
-            '''
-            githubNotify context: 'indent', description: '',  status: 'SUCCESS'
-          }
-        }
       }
     }
 

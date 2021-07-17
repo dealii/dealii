@@ -199,9 +199,9 @@ namespace Step13
     // Now for the function that is mainly of interest in this class, the
     // computation of the point value:
     template <int dim>
-    void PointValueEvaluation<dim>::
-         operator()(const DoFHandler<dim> &dof_handler,
-               const Vector<double> & solution) const
+    void
+    PointValueEvaluation<dim>::operator()(const DoFHandler<dim> &dof_handler,
+                                          const Vector<double> & solution) const
     {
       // First allocate a variable that will hold the point value. Initialize
       // it with a value that is clearly bogus, so that if we fail to set it

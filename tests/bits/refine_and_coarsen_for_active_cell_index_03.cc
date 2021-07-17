@@ -44,7 +44,8 @@ check(const Triangulation<dim> &tria)
 
 
 
-void do_refine(Triangulation<1> &tria)
+void
+do_refine(Triangulation<1> &tria)
 {
   tria.refine_global(2);
   tria.begin_active()->set_refine_flag();
@@ -52,7 +53,8 @@ void do_refine(Triangulation<1> &tria)
 }
 
 
-void do_refine(Triangulation<2> &tria)
+void
+do_refine(Triangulation<2> &tria)
 {
   const int dim = 2;
 
@@ -66,7 +68,8 @@ void do_refine(Triangulation<2> &tria)
 }
 
 
-void do_refine(Triangulation<3> &tria)
+void
+do_refine(Triangulation<3> &tria)
 {
   const int dim = 3;
 

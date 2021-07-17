@@ -190,8 +190,9 @@ VectorFunction<3>::gradient(const Point<3> &   p,
   return val;
 }
 
-void create_tria(Triangulation<3> &triangulation,
-                 const Point<3> *  vertices_parallelograms)
+void
+create_tria(Triangulation<3> &triangulation,
+            const Point<3> *  vertices_parallelograms)
 {
   const std::vector<Point<3>> vertices(&vertices_parallelograms[0],
                                        &vertices_parallelograms[n_vertices]);

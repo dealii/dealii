@@ -71,12 +71,13 @@ test2()
   for (unsigned int i = 0; i < v.size(); ++i)
     v[i] = i + 1;
   int result = 0;
-  WorkStream::run(v.begin(),
-                  v.end(),
-                  &assemble,
-                  [&result](const copy_data &data) { copy(result, data); },
-                  scratch_data(),
-                  copy_data());
+  WorkStream::run(
+    v.begin(),
+    v.end(),
+    &assemble,
+    [&result](const copy_data &data) { copy(result, data); },
+    scratch_data(),
+    copy_data());
   std::cout << "result: " << result << std::endl;
 
   if (result != maxi * (maxi + 1) / 2)

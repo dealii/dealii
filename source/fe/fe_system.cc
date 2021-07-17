@@ -1242,8 +1242,8 @@ FESystem<dim, spacedim>::compute_fill(
         const hp::QCollection<dim - 1> *face_quadrature     = nullptr;
         const Quadrature<dim - 1> *     sub_face_quadrature = nullptr;
         const unsigned int              n_q_points = quadrature.size() == 1 ?
-                                          quadrature[0].size() :
-                                          quadrature[face_no].size();
+                                                       quadrature[0].size() :
+                                                       quadrature[face_no].size();
 
         // static cast to the common base class of quadrature being either
         // Quadrature<dim> or Quadrature<dim-1>:

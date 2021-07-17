@@ -183,9 +183,9 @@ namespace Evaluation
 
   template <int dim>
   void
-  PointXDerivativeEvaluation<dim>::
-  operator()(const DoFHandler<dim> &dof_handler,
-             const Vector<double> & solution) const
+  PointXDerivativeEvaluation<dim>::operator()(
+    const DoFHandler<dim> &dof_handler,
+    const Vector<double> & solution) const
   {
     double point_derivative = 0;
 
@@ -1047,7 +1047,8 @@ namespace Data
 
 
   template <>
-  void Exercise_2_3<2>::create_coarse_grid(Triangulation<2> &coarse_grid)
+  void
+  Exercise_2_3<2>::create_coarse_grid(Triangulation<2> &coarse_grid)
   {
     const unsigned int dim = 2;
 

@@ -870,7 +870,7 @@ QTelles<dim>::QTelles(const Quadrature<1> &base_quad,
     dim == 2 ?
       QAnisotropic<dim>(QTelles<1>(base_quad, Point<1>(singularity[0])),
                         QTelles<1>(base_quad, Point<1>(singularity[1]))) :
-      dim == 3 ?
+    dim == 3 ?
       QAnisotropic<dim>(QTelles<1>(base_quad, Point<1>(singularity[0])),
                         QTelles<1>(base_quad, Point<1>(singularity[1])),
                         QTelles<1>(base_quad, Point<1>(singularity[2]))) :

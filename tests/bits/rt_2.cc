@@ -52,7 +52,8 @@
 #include "../tests.h"
 
 
-void evaluate_normal(DoFHandler<2> &dof_handler, Vector<double> &solution)
+void
+evaluate_normal(DoFHandler<2> &dof_handler, Vector<double> &solution)
 {
   // This quadrature rule determines
   // the points, where the continuity

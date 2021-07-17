@@ -75,12 +75,14 @@ public:
   /**
    * Dereferencing operator.
    */
-  const ACCESSOR &operator*() const;
+  const ACCESSOR &
+  operator*() const;
 
   /**
    * Dereferencing operator.
    */
-  const ACCESSOR *operator->() const;
+  const ACCESSOR *
+  operator->() const;
 
   /**
    * Comparison. True, if both accessors are equal.
@@ -160,14 +162,16 @@ MatrixIterator<ACCESSOR>::operator++(int)
 
 
 template <class ACCESSOR>
-inline const ACCESSOR &MatrixIterator<ACCESSOR>::operator*() const
+inline const ACCESSOR &
+MatrixIterator<ACCESSOR>::operator*() const
 {
   return accessor;
 }
 
 
 template <class ACCESSOR>
-inline const ACCESSOR *MatrixIterator<ACCESSOR>::operator->() const
+inline const ACCESSOR *
+MatrixIterator<ACCESSOR>::operator->() const
 {
   return &accessor;
 }

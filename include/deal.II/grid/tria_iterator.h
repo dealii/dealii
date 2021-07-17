@@ -332,12 +332,14 @@ public:
    *
    * You must not dereference invalid or past the end iterators.
    */
-  const Accessor &operator*() const;
+  const Accessor &
+  operator*() const;
 
   /**
    * Dereferencing operator, non-@p const version.
    */
-  Accessor &operator*();
+  Accessor &
+  operator*();
 
   /**
    * Dereferencing operator, returns a reference of the cell pointed to. Usage
@@ -345,12 +347,14 @@ public:
    *
    * There is a @p const and a non-@p const version.
    */
-  const Accessor *operator->() const;
+  const Accessor *
+  operator->() const;
 
   /**
    * Dereferencing operator, non-@p const version.
    */
-  Accessor *operator->();
+  Accessor *
+  operator->();
 
 
   /**
@@ -991,7 +995,8 @@ inline TriaRawIterator<Accessor>::TriaRawIterator(
 
 
 template <typename Accessor>
-inline const Accessor &TriaRawIterator<Accessor>::operator*() const
+inline const Accessor &
+TriaRawIterator<Accessor>::operator*() const
 {
   Assert(Accessor::structure_dimension != Accessor::dimension ||
            state() == IteratorState::valid,
@@ -1006,7 +1011,8 @@ inline const Accessor &TriaRawIterator<Accessor>::operator*() const
 
 
 template <typename Accessor>
-inline Accessor &TriaRawIterator<Accessor>::operator*()
+inline Accessor &
+TriaRawIterator<Accessor>::operator*()
 {
   Assert(Accessor::structure_dimension != Accessor::dimension ||
            state() == IteratorState::valid,
@@ -1030,7 +1036,8 @@ TriaRawIterator<Accessor>::access_any() const
 
 
 template <typename Accessor>
-inline const Accessor *TriaRawIterator<Accessor>::operator->() const
+inline const Accessor *
+TriaRawIterator<Accessor>::operator->() const
 {
   return &(this->operator*());
 }
@@ -1038,7 +1045,8 @@ inline const Accessor *TriaRawIterator<Accessor>::operator->() const
 
 
 template <typename Accessor>
-inline Accessor *TriaRawIterator<Accessor>::operator->()
+inline Accessor *
+TriaRawIterator<Accessor>::operator->()
 {
   return &(this->operator*());
 }
@@ -1056,8 +1064,8 @@ TriaRawIterator<Accessor>::state() const
 
 template <typename Accessor>
 inline bool
-TriaRawIterator<Accessor>::
-operator<(const TriaRawIterator<Accessor> &other) const
+TriaRawIterator<Accessor>::operator<(
+  const TriaRawIterator<Accessor> &other) const
 {
   Assert(state() != IteratorState::invalid,
          ExcDereferenceInvalidObject(accessor));
@@ -1080,8 +1088,8 @@ operator<(const TriaRawIterator<Accessor> &other) const
 
 template <typename Accessor>
 inline bool
-TriaRawIterator<Accessor>::
-operator>(const TriaRawIterator<Accessor> &other) const
+TriaRawIterator<Accessor>::operator>(
+  const TriaRawIterator<Accessor> &other) const
 {
   return (other < *this);
 }

@@ -126,19 +126,20 @@ namespace taskflow_v1
       const unsigned int chunk_size   = 8)
   {
     // forward to the other function
-    run(begin,
-        end,
-        [&main_object, worker](const Iterator &iterator,
-                               ScratchData &   scratch_data,
-                               CopyData &      copy_data) {
-          (main_object.*worker)(iterator, scratch_data, copy_data);
-        },
-        [&main_object, copier](const CopyData &copy_data) {
-          (main_object.*copier)(copy_data);
-        },
-        sample_scratch_data,
-        sample_copy_data,
-        queue_length,
-        chunk_size);
+    run(
+      begin,
+      end,
+      [&main_object, worker](const Iterator &iterator,
+                             ScratchData &   scratch_data,
+                             CopyData &      copy_data) {
+        (main_object.*worker)(iterator, scratch_data, copy_data);
+      },
+      [&main_object, copier](const CopyData &copy_data) {
+        (main_object.*copier)(copy_data);
+      },
+      sample_scratch_data,
+      sample_copy_data,
+      queue_length,
+      chunk_size);
   }
 } // namespace taskflow_v1

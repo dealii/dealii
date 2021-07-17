@@ -612,7 +612,7 @@ namespace Step42
     void compute_dirichlet_constraints();
     void update_solution_and_constraints();
     void
-         assemble_mass_matrix_diagonal(TrilinosWrappers::SparseMatrix &mass_matrix);
+    assemble_mass_matrix_diagonal(TrilinosWrappers::SparseMatrix &mass_matrix);
     void assemble_newton_system(
       const TrilinosWrappers::MPI::Vector &linearization_point);
     void compute_nonlinear_residual(

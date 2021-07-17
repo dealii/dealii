@@ -477,8 +477,8 @@ namespace
   }
 
 
-  void reorder_compatibility(std::vector<CellData<2>> &cells,
-                             const SubCellData &)
+  void
+  reorder_compatibility(std::vector<CellData<2>> &cells, const SubCellData &)
   {
     for (auto &cell : cells)
       if (cell.vertices.size() == GeometryInfo<2>::vertices_per_cell)
@@ -486,8 +486,9 @@ namespace
   }
 
 
-  void reorder_compatibility(std::vector<CellData<3>> &cells,
-                             SubCellData &             subcelldata)
+  void
+  reorder_compatibility(std::vector<CellData<3>> &cells,
+                        SubCellData &             subcelldata)
   {
     unsigned int tmp[GeometryInfo<3>::vertices_per_cell];
     for (auto &cell : cells)
@@ -2107,7 +2108,8 @@ namespace internal
 
 
       template <int spacedim>
-      static void update_neighbors(Triangulation<1, spacedim> &)
+      static void
+      update_neighbors(Triangulation<1, spacedim> &)
       {}
 
 
@@ -2728,11 +2730,11 @@ namespace internal
        * argument and quads instead of lines.
        */
       template <int spacedim>
-      static void delete_children(
-        Triangulation<1, spacedim> &                        triangulation,
-        typename Triangulation<1, spacedim>::cell_iterator &cell,
-        std::vector<unsigned int> &,
-        std::vector<unsigned int> &)
+      static void
+      delete_children(Triangulation<1, spacedim> &triangulation,
+                      typename Triangulation<1, spacedim>::cell_iterator &cell,
+                      std::vector<unsigned int> &,
+                      std::vector<unsigned int> &)
       {
         const unsigned int dim = 1;
 
@@ -2832,11 +2834,11 @@ namespace internal
 
 
       template <int spacedim>
-      static void delete_children(
-        Triangulation<2, spacedim> &                        triangulation,
-        typename Triangulation<2, spacedim>::cell_iterator &cell,
-        std::vector<unsigned int> &                         line_cell_count,
-        std::vector<unsigned int> &)
+      static void
+      delete_children(Triangulation<2, spacedim> &triangulation,
+                      typename Triangulation<2, spacedim>::cell_iterator &cell,
+                      std::vector<unsigned int> &line_cell_count,
+                      std::vector<unsigned int> &)
       {
         const unsigned int        dim      = 2;
         const RefinementCase<dim> ref_case = cell->refinement_case();
@@ -2970,11 +2972,11 @@ namespace internal
 
 
       template <int spacedim>
-      static void delete_children(
-        Triangulation<3, spacedim> &                        triangulation,
-        typename Triangulation<3, spacedim>::cell_iterator &cell,
-        std::vector<unsigned int> &                         line_cell_count,
-        std::vector<unsigned int> &                         quad_cell_count)
+      static void
+      delete_children(Triangulation<3, spacedim> &triangulation,
+                      typename Triangulation<3, spacedim>::cell_iterator &cell,
+                      std::vector<unsigned int> &line_cell_count,
+                      std::vector<unsigned int> &quad_cell_count)
       {
         const unsigned int dim = 3;
 
@@ -3600,7 +3602,8 @@ namespace internal
        * "before") the reserved space.
        */
       template <int spacedim>
-      static void create_children(
+      static void
+      create_children(
         Triangulation<2, spacedim> &triangulation,
         unsigned int &              next_unused_vertex,
         typename Triangulation<2, spacedim>::raw_line_iterator
@@ -4540,8 +4543,8 @@ namespace internal
        */
       template <int spacedim>
       static typename Triangulation<1, spacedim>::DistortedCellList
-        execute_refinement(Triangulation<1, spacedim> &triangulation,
-                           const bool /*check_for_distorted_cells*/)
+      execute_refinement(Triangulation<1, spacedim> &triangulation,
+                         const bool /*check_for_distorted_cells*/)
       {
         const unsigned int dim = 1;
 
@@ -4771,8 +4774,8 @@ namespace internal
        */
       template <int spacedim>
       static typename Triangulation<2, spacedim>::DistortedCellList
-        execute_refinement(Triangulation<2, spacedim> &triangulation,
-                           const bool check_for_distorted_cells)
+      execute_refinement(Triangulation<2, spacedim> &triangulation,
+                         const bool                  check_for_distorted_cells)
       {
         const unsigned int dim = 2;
 
@@ -5089,8 +5092,8 @@ namespace internal
 
       template <int spacedim>
       static typename Triangulation<3, spacedim>::DistortedCellList
-        execute_refinement_isotropic(Triangulation<3, spacedim> &triangulation,
-                                     const bool check_for_distorted_cells)
+      execute_refinement_isotropic(Triangulation<3, spacedim> &triangulation,
+                                   const bool check_for_distorted_cells)
       {
         static const int          dim = 3;
         static const unsigned int X   = numbers::invalid_unsigned_int;
@@ -6326,8 +6329,8 @@ namespace internal
        */
       template <int spacedim>
       static typename Triangulation<3, spacedim>::DistortedCellList
-        execute_refinement(Triangulation<3, spacedim> &triangulation,
-                           const bool check_for_distorted_cells)
+      execute_refinement(Triangulation<3, spacedim> &triangulation,
+                         const bool                  check_for_distorted_cells)
       {
         const unsigned int dim = 3;
 
@@ -10681,7 +10684,8 @@ namespace internal
        * specialization).
        */
       template <int spacedim>
-      static void prevent_distorted_boundary_cells(Triangulation<1, spacedim> &)
+      static void
+      prevent_distorted_boundary_cells(Triangulation<1, spacedim> &)
       {}
 
 
@@ -10778,7 +10782,8 @@ namespace internal
 
 
       template <int spacedim>
-      static void prepare_refinement_dim_dependent(
+      static void
+      prepare_refinement_dim_dependent(
         Triangulation<3, spacedim> &triangulation)
       {
         const unsigned int dim = 3;
@@ -11031,7 +11036,8 @@ namespace internal
     struct ImplementationMixedMesh
     {
       template <int spacedim>
-      static void update_neighbors(Triangulation<1, spacedim> &)
+      static void
+      update_neighbors(Triangulation<1, spacedim> &)
       {}
 
       template <int dim, int spacedim>
@@ -11223,8 +11229,8 @@ Triangulation<dim, spacedim>::Triangulation(
 
 template <int dim, int spacedim>
 Triangulation<dim, spacedim> &
-Triangulation<dim, spacedim>::
-operator=(Triangulation<dim, spacedim> &&tria) noexcept
+Triangulation<dim, spacedim>::operator=(
+  Triangulation<dim, spacedim> &&tria) noexcept
 {
   Subscriptor::operator=(std::move(tria));
 

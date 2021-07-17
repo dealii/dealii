@@ -99,13 +99,13 @@ RelaxationBlock<MatrixType, InverseNumberType, VectorType>::invert_diagblocks()
   else
     {
       // compute blocks in parallel
-      parallel::apply_to_subranges(0,
-                                   this->additional_data->block_list.n_rows(),
-                                   [this](const size_type block_begin,
-                                          const size_type block_end) {
-                                     this->block_kernel(block_begin, block_end);
-                                   },
-                                   16);
+      parallel::apply_to_subranges(
+        0,
+        this->additional_data->block_list.n_rows(),
+        [this](const size_type block_begin, const size_type block_end) {
+          this->block_kernel(block_begin, block_end);
+        },
+        16);
     }
   this->inverses_computed(true);
 }

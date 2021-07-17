@@ -30,7 +30,8 @@
 #include "../tests.h"
 
 
-void check(Triangulation<3> &tria)
+void
+check(Triangulation<3> &tria)
 {
   MappingQ<3> map(1);
   Point<3>    p(0.75, 0.75, 0.75);

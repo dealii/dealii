@@ -41,7 +41,8 @@
 
 
 
-void check(Triangulation<2> &tria)
+void
+check(Triangulation<2> &tria)
 {
   const std::vector<Point<2>> &v = tria.get_vertices();
   MappingQ<2>                  map(1);

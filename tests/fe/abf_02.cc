@@ -60,7 +60,8 @@
  * Check the value of the derivative field.
  */
 
-void EvaluateDerivative(DoFHandler<3> &dof_handler, Vector<double> &solution)
+void
+EvaluateDerivative(DoFHandler<3> &dof_handler, Vector<double> &solution)
 {
   // This quadrature rule determines the points, where the
   // derivative will be evaluated.

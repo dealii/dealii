@@ -82,7 +82,7 @@ namespace Step41
     void setup_system();
     void assemble_system();
     void
-         assemble_mass_matrix_diagonal(TrilinosWrappers::SparseMatrix &mass_matrix);
+    assemble_mass_matrix_diagonal(TrilinosWrappers::SparseMatrix &mass_matrix);
     void update_solution_and_constraints();
     void solve();
     void output_results(const unsigned int iteration) const;

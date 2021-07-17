@@ -72,7 +72,8 @@ void
 make_2_cells(Triangulation<dim> &tria);
 
 template <>
-void make_2_cells<2>(Triangulation<2> &tria)
+void
+make_2_cells<2>(Triangulation<2> &tria)
 {
   const unsigned int        dim         = 2;
   std::vector<unsigned int> repetitions = {2, 1};
@@ -83,7 +84,8 @@ void make_2_cells<2>(Triangulation<2> &tria)
 }
 
 template <>
-void make_2_cells<3>(Triangulation<3> &tria)
+void
+make_2_cells<3>(Triangulation<3> &tria)
 {
   const unsigned int        dim         = 3;
   std::vector<unsigned int> repetitions = {2, 1, 1};

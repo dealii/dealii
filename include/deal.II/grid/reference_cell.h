@@ -569,7 +569,7 @@ private:
    * called by anyone, but at least hidden in an internal namespace.
    */
   friend DEAL_II_CONSTEXPR ReferenceCell
-                           internal::ReferenceCell::make_reference_cell_from_int(const std::uint8_t);
+  internal::ReferenceCell::make_reference_cell_from_int(const std::uint8_t);
 };
 
 
@@ -608,7 +608,7 @@ namespace internal
   namespace ReferenceCell
   {
     inline DEAL_II_CONSTEXPR dealii::ReferenceCell
-                             make_reference_cell_from_int(const std::uint8_t kind)
+    make_reference_cell_from_int(const std::uint8_t kind)
     {
       // Make sure these are the only indices from which objects can be
       // created.

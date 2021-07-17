@@ -376,7 +376,7 @@ namespace internal
 
     template <int dim, typename Number>
     std::array<std::pair<Number, Tensor<1, dim, Number>>, dim>
-      jacobi(dealii::SymmetricTensor<2, dim, Number> A)
+    jacobi(dealii::SymmetricTensor<2, dim, Number> A)
     {
       static_assert(numbers::NumberTraits<Number>::is_complex == false,
                     "This implementation of the Jacobi algorithm does "

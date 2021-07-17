@@ -59,7 +59,8 @@ std::ofstream logfile("output");
  * Check if the normal component is continuous over element edges.
  */
 
-void EvaluateNormal2(DoFHandler<2> *dof_handler, Vector<double> &solution)
+void
+EvaluateNormal2(DoFHandler<2> *dof_handler, Vector<double> &solution)
 {
   // This quadrature rule determines the points, where the
   // continuity will be tested.
@@ -168,7 +169,8 @@ void EvaluateNormal2(DoFHandler<2> *dof_handler, Vector<double> &solution)
  * Check if the normal component is continuous over element edges.
  */
 
-void EvaluateNormal(DoFHandler<2> *dof_handler, Vector<double> &solution)
+void
+EvaluateNormal(DoFHandler<2> *dof_handler, Vector<double> &solution)
 {
   // This quadrature rule determines the points, where the
   // continuity will be tested.

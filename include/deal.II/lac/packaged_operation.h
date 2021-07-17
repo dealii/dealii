@@ -360,8 +360,9 @@ operator-(const PackagedOperation<Range> &first_comp,
  * @ingroup LAOperators
  */
 template <typename Range>
-PackagedOperation<Range> operator*(const PackagedOperation<Range> &comp,
-                                   typename Range::value_type      number)
+PackagedOperation<Range>
+operator*(const PackagedOperation<Range> &comp,
+          typename Range::value_type      number)
 {
   PackagedOperation<Range> return_comp;
 
@@ -400,8 +401,9 @@ PackagedOperation<Range> operator*(const PackagedOperation<Range> &comp,
  * @ingroup LAOperators
  */
 template <typename Range>
-PackagedOperation<Range> operator*(typename Range::value_type      number,
-                                   const PackagedOperation<Range> &comp)
+PackagedOperation<Range>
+operator*(typename Range::value_type      number,
+          const PackagedOperation<Range> &comp)
 {
   return comp * number;
 }
@@ -614,8 +616,8 @@ template <typename Range,
           typename = typename std::enable_if<
             internal::PackagedOperationImplementation::has_vector_interface<
               Range>::type::value>::type>
-PackagedOperation<Range> operator*(const Range &              u,
-                                   typename Range::value_type number)
+PackagedOperation<Range>
+operator*(const Range &u, typename Range::value_type number)
 {
   return PackagedOperation<Range>(u) * number;
 }
@@ -639,8 +641,8 @@ template <typename Range,
           typename = typename std::enable_if<
             internal::PackagedOperationImplementation::has_vector_interface<
               Range>::type::value>::type>
-PackagedOperation<Range> operator*(typename Range::value_type number,
-                                   const Range &              u)
+PackagedOperation<Range>
+operator*(typename Range::value_type number, const Range &u)
 {
   return number * PackagedOperation<Range>(u);
 }

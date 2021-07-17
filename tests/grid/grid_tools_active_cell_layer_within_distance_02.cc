@@ -82,9 +82,9 @@ test()
     step_sizes.push_back(step_sizes_i);
 
   const Point<dim> bottom_left;
-  const Point<dim> upper_right =
-    dim == 1 ? Point<dim>(size) :
-               dim == 2 ? Point<dim>(size, size) : Point<dim>(size, size, size);
+  const Point<dim> upper_right = dim == 1 ? Point<dim>(size) :
+                                 dim == 2 ? Point<dim>(size, size) :
+                                            Point<dim>(size, size, size);
 
   Triangulation<dim> tria;
   GridGenerator::subdivided_hyper_rectangle(

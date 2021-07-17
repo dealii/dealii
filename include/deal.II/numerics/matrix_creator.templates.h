@@ -719,7 +719,7 @@ namespace MatrixCreator
     hp::QCollection<dim>                 q_collection(q);
     hp::MappingCollection<dim, spacedim> mapping_collection(mapping);
     MatrixCreator::internal::AssemblerData::Scratch<dim, spacedim, number>
-                                                             assembler_data(fe_collection,
+      assembler_data(fe_collection,
                      update_values | update_JxW_values |
                        update_quadrature_points,
                      coefficient,
@@ -793,7 +793,7 @@ namespace MatrixCreator
            ExcDimensionMismatch(matrix.n(), dof.n_dofs()));
 
     MatrixCreator::internal::AssemblerData::Scratch<dim, spacedim, number>
-                                                             assembler_data(dof.get_fe_collection(),
+      assembler_data(dof.get_fe_collection(),
                      update_values | update_JxW_values |
                        (coefficient != nullptr ? update_quadrature_points :
                                                  UpdateFlags(0)),
@@ -864,7 +864,7 @@ namespace MatrixCreator
            ExcDimensionMismatch(matrix.n(), dof.n_dofs()));
 
     MatrixCreator::internal::AssemblerData::Scratch<dim, spacedim, number>
-                                                             assembler_data(dof.get_fe_collection(),
+      assembler_data(dof.get_fe_collection(),
                      update_values | update_JxW_values |
                        update_quadrature_points,
                      coefficient,
@@ -1875,7 +1875,7 @@ namespace MatrixCreator
     hp::QCollection<dim>                 q_collection(q);
     hp::MappingCollection<dim, spacedim> mapping_collection(mapping);
     MatrixCreator::internal::AssemblerData::Scratch<dim, spacedim, double>
-                                                             assembler_data(fe_collection,
+      assembler_data(fe_collection,
                      update_gradients | update_JxW_values |
                        (coefficient != nullptr ? update_quadrature_points :
                                                  UpdateFlags(0)),
@@ -1948,7 +1948,7 @@ namespace MatrixCreator
     hp::QCollection<dim>                 q_collection(q);
     hp::MappingCollection<dim, spacedim> mapping_collection(mapping);
     MatrixCreator::internal::AssemblerData::Scratch<dim, spacedim, double>
-                                                             assembler_data(fe_collection,
+      assembler_data(fe_collection,
                      update_gradients | update_values | update_JxW_values |
                        update_quadrature_points,
                      coefficient,
@@ -2021,7 +2021,7 @@ namespace MatrixCreator
            ExcDimensionMismatch(matrix.n(), dof.n_dofs()));
 
     MatrixCreator::internal::AssemblerData::Scratch<dim, spacedim, double>
-                                                             assembler_data(dof.get_fe_collection(),
+      assembler_data(dof.get_fe_collection(),
                      update_gradients | update_JxW_values |
                        (coefficient != nullptr ? update_quadrature_points :
                                                  UpdateFlags(0)),
@@ -2092,7 +2092,7 @@ namespace MatrixCreator
            ExcDimensionMismatch(matrix.n(), dof.n_dofs()));
 
     MatrixCreator::internal::AssemblerData::Scratch<dim, spacedim, double>
-                                                             assembler_data(dof.get_fe_collection(),
+      assembler_data(dof.get_fe_collection(),
                      update_gradients | update_values | update_JxW_values |
                        update_quadrature_points,
                      coefficient,

@@ -115,7 +115,8 @@ namespace LinearAlgebra
     /**
      * Return the scalar product of two vectors.
      */
-    virtual Number operator*(const VectorSpaceVector<Number> &V) const = 0;
+    virtual Number
+    operator*(const VectorSpaceVector<Number> &V) const = 0;
 
     /**
      * Add @p a to all components. Note that @p a is a scalar not a vector.

@@ -647,7 +647,7 @@ namespace Step21
     std::vector<Tensor<2, dim>> k_inverse_values(n_q_points);
 
     std::vector<Vector<double>>              old_solution_values(n_q_points,
-                                                                 Vector<double>(dim + 2));
+                                                    Vector<double>(dim + 2));
     std::vector<std::vector<Tensor<1, dim>>> old_solution_grads(
       n_q_points, std::vector<Tensor<1, dim>>(dim + 2));
 

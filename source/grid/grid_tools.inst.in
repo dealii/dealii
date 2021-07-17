@@ -484,16 +484,16 @@ for (deal_II_dimension : DIMENSIONS)
                       deal_II_dimension + 1>::active_cell_iterator);
 
     template void
-      GridTools::remove_hanging_nodes<deal_II_dimension, deal_II_dimension + 1>(
-        Triangulation<deal_II_dimension, deal_II_dimension + 1> & tria,
-        bool,
-        unsigned int);
+    GridTools::remove_hanging_nodes<deal_II_dimension, deal_II_dimension + 1>(
+      Triangulation<deal_II_dimension, deal_II_dimension + 1> & tria,
+      bool,
+      unsigned int);
 
     template void
-      GridTools::remove_anisotropy<deal_II_dimension, deal_II_dimension + 1>(
-        Triangulation<deal_II_dimension, deal_II_dimension + 1> &,
-        double,
-        unsigned int);
+    GridTools::remove_anisotropy<deal_II_dimension, deal_II_dimension + 1>(
+      Triangulation<deal_II_dimension, deal_II_dimension + 1> &,
+      double,
+      unsigned int);
 #endif
   }
 
