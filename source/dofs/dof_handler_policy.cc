@@ -3686,7 +3686,7 @@ namespace internal
               DoFAccessorImplementation::Implementation::
                 DoFIndexProcessor<dim, spacedim, false>(),
               [&complete](auto &stored_index, auto &received_index) {
-                if (received_index != numbers::invalid_unsigned_int)
+                if (received_index != numbers::invalid_dof_index)
                   {
                     Assert((stored_index == (numbers::invalid_dof_index)) ||
                              (stored_index == received_index),
