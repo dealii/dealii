@@ -1696,46 +1696,43 @@ namespace internal
           Assert(dof_handler.get_triangulation().n_levels() > 0,
                  ExcMessage("Empty triangulation"));
 
-          // Step 1: distribute dofs on all cells, but definitely
-          // exclude artificial cells
+          // distribute dofs on all cells excluding artificial ones
           types::global_dof_index next_free_dof = 0;
 
           std::vector<types::global_dof_index> dof_indices;
 
           for (auto cell : dof_handler.active_cell_iterators())
-            if (!cell->is_artificial())
-              if ((subdomain_id == numbers::invalid_subdomain_id) ||
-                  (cell->subdomain_id() == subdomain_id))
-                {
-                  dof_indices.resize(cell->get_fe().n_dofs_per_cell());
+            if (!cell->is_artificial() &&
+                ((subdomain_id == numbers::invalid_subdomain_id) ||
+                 (cell->subdomain_id() == subdomain_id)))
+              {
+                dof_indices.resize(cell->get_fe().n_dofs_per_cell());
 
-                  // the cache is not assigned yet, so we must bypass it
-                  internal::DoFAccessorImplementation::Implementation::
-                    get_dof_indices(*cell,
-                                    dof_indices,
-                                    cell->active_fe_index());
-
-                  for (auto &dof_index : dof_indices)
-                    if (dof_index == numbers::invalid_dof_index)
+                DoFAccessorImplementation::Implementation::process_dof_indices(
+                  *cell,
+                  dof_indices,
+                  cell->active_fe_index(),
+                  DoFAccessorImplementation::Implementation::
+                    DoFIndexProcessor<dim, spacedim, false>(),
+                  [&next_free_dof](auto &stored_index, auto &) {
+                    if (stored_index == numbers::invalid_dof_index)
                       {
-                        dof_index = next_free_dof;
-
+                        stored_index = next_free_dof;
                         Assert(
                           next_free_dof !=
                             std::numeric_limits<types::global_dof_index>::max(),
                           ExcMessage(
                             "You have reached the maximal number of degrees of "
-                            "freedom that can be stored in the chosen data type. "
-                            "In practice, this can only happen if you are using "
-                            "32-bit data types. You will have to re-compile "
-                            "deal.II with the `DEAL_II_WITH_64BIT_INDICES' "
-                            "flag set to `ON'."));
+                            "freedom that can be stored in the chosen data "
+                            "type. In practice, this can only happen if you "
+                            "are using 32-bit data types. You will have to "
+                            "re-compile deal.II with the "
+                            "`DEAL_II_WITH_64BIT_INDICES' flag set to `ON'."));
                         ++next_free_dof;
                       }
-
-
-                  cell->set_dof_indices(dof_indices);
-                }
+                  },
+                  false);
+              }
 
           return next_free_dof;
         }
@@ -3678,22 +3675,28 @@ namespace internal
 
             Assert(cell->is_ghost(), ExcInternalError());
 
-            std::vector<dealii::types::global_dof_index> dof_indices(
-              cell->get_fe().n_dofs_per_cell());
-            internal::DoFAccessorImplementation::Implementation::
-              get_dof_indices(*cell, dof_indices, cell->active_fe_index());
-
+            // Use a combined read/set function on the entities of the dof
+            // indices to speed things up against get_dof_indices +
+            // set_dof_indices
             bool complete = true;
-            for (unsigned int i = 0; i < dof_indices.size(); ++i)
-              if (dofs[i] != numbers::invalid_dof_index)
-                {
-                  Assert((dof_indices[i] == (numbers::invalid_dof_index)) ||
-                           (dof_indices[i] == dofs[i]),
-                         ExcInternalError());
-                  dof_indices[i] = dofs[i];
-                }
-              else
-                complete = false;
+            DoFAccessorImplementation::Implementation::process_dof_indices(
+              *cell,
+              dofs,
+              cell->active_fe_index(),
+              DoFAccessorImplementation::Implementation::
+                DoFIndexProcessor<dim, spacedim, false>(),
+              [&complete](auto &stored_index, auto &received_index) {
+                if (received_index != numbers::invalid_unsigned_int)
+                  {
+                    Assert((stored_index == (numbers::invalid_dof_index)) ||
+                             (stored_index == received_index),
+                           ExcInternalError());
+                    stored_index = received_index;
+                  }
+                else
+                  complete = false;
+              },
+              false);
 
             if (!complete)
               const_cast<
@@ -3705,10 +3708,6 @@ namespace internal
                 typename DoFHandler<dim, spacedim>::active_cell_iterator &>(
                 cell)
                 ->clear_user_flag();
-
-            const_cast<
-              typename DoFHandler<dim, spacedim>::active_cell_iterator &>(cell)
-              ->set_dof_indices(dof_indices);
           };
 
           const auto filter = [](const auto &cell) {
