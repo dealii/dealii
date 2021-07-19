@@ -638,8 +638,7 @@ MappingFEField<dim, spacedim, VectorType, void>::get_face_data(
     std::make_unique<InternalData>(euler_dof_handler->get_fe(), fe_mask);
   auto &                data = dynamic_cast<InternalData &>(*data_ptr);
   const Quadrature<dim> q(
-    QProjector<dim>::project_to_all_faces(ReferenceCells::get_hypercube<dim>(),
-                                          quadrature[0]));
+    QProjector<dim>::project_to_all_faces(reference_cell, quadrature[0]));
   this->compute_face_data(update_flags, q, quadrature[0].size(), data);
 
   return data_ptr;
@@ -656,7 +655,7 @@ MappingFEField<dim, spacedim, VectorType, void>::get_subface_data(
     std::make_unique<InternalData>(euler_dof_handler->get_fe(), fe_mask);
   auto &                data = dynamic_cast<InternalData &>(*data_ptr);
   const Quadrature<dim> q(QProjector<dim>::project_to_all_subfaces(
-    ReferenceCells::get_hypercube<dim>(), quadrature));
+    reference_cell, quadrature));
   this->compute_face_data(update_flags, q, quadrature.size(), data);
 
   return data_ptr;
@@ -1720,7 +1719,7 @@ MappingFEField<dim, spacedim, VectorType, void>::fill_fe_face_values(
       face_no,
       numbers::invalid_unsigned_int,
       QProjector<dim>::DataSetDescriptor::face(
-        ReferenceCells::get_hypercube<dim>(),
+        reference_cell,
         face_no,
         cell->face_orientation(face_no),
         cell->face_flip(face_no),
@@ -1761,7 +1760,7 @@ MappingFEField<dim, spacedim, VectorType, void>::fill_fe_subface_values(
       face_no,
       numbers::invalid_unsigned_int,
       QProjector<dim>::DataSetDescriptor::subface(
-        ReferenceCells::get_hypercube<dim>(),
+        reference_cell,
         face_no,
         subface_no,
         cell->face_orientation(face_no),
