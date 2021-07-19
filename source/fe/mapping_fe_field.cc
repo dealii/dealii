@@ -563,6 +563,10 @@ MappingFEField<dim, spacedim, VectorType, void>::compute_data(
     data.shape_fourth_derivatives.resize(data.n_shape_functions * n_q_points);
 
   compute_shapes_virtual(q.get_points(), data);
+
+  // This (for face values and simplices) can be different for different calls,
+  // so always copy
+  data.quadrature_weights = q.get_weights();
 }
 
 
@@ -654,8 +658,8 @@ MappingFEField<dim, spacedim, VectorType, void>::get_subface_data(
   std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase> data_ptr =
     std::make_unique<InternalData>(euler_dof_handler->get_fe(), fe_mask);
   auto &                data = dynamic_cast<InternalData &>(*data_ptr);
-  const Quadrature<dim> q(QProjector<dim>::project_to_all_subfaces(
-    reference_cell, quadrature));
+  const Quadrature<dim> q(
+    QProjector<dim>::project_to_all_subfaces(reference_cell, quadrature));
   this->compute_face_data(update_flags, q, quadrature.size(), data);
 
   return data_ptr;
@@ -1248,10 +1252,10 @@ namespace internal
       maybe_compute_face_data(
         const dealii::Mapping<dim, spacedim> &mapping,
         const typename dealii::Triangulation<dim, spacedim>::cell_iterator
-          &                        cell,
-        const unsigned int         face_no,
-        const unsigned int         subface_no,
-        const std::vector<double> &weights,
+          &                                               cell,
+        const unsigned int                                face_no,
+        const unsigned int                                subface_no,
+        const typename QProjector<dim>::DataSetDescriptor data_set,
         const typename dealii::MappingFEField<dim, spacedim, VectorType, void>::
           InternalData &data,
         internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
@@ -1361,7 +1365,8 @@ namespace internal
                   if (update_flags & update_JxW_values)
                     {
                       output_data.JxW_values[i] =
-                        output_data.boundary_forms[i].norm() * weights[i];
+                        output_data.boundary_forms[i].norm() *
+                        data.quadrature_weights[i + data_set];
 
                       if (subface_no != numbers::invalid_unsigned_int)
                         {
@@ -1405,7 +1410,6 @@ namespace internal
         const unsigned int                                        face_no,
         const unsigned int                                        subface_no,
         const typename dealii::QProjector<dim>::DataSetDescriptor data_set,
-        const Quadrature<dim - 1> &                               quadrature,
         const typename dealii::MappingFEField<dim, spacedim, VectorType, void>::
           InternalData &                    data,
         const FiniteElement<dim, spacedim> &fe,
@@ -1473,13 +1477,7 @@ namespace internal
           output_data.jacobian_pushed_forward_3rd_derivatives);
 
         maybe_compute_face_data<dim, spacedim, VectorType>(
-          mapping,
-          cell,
-          face_no,
-          subface_no,
-          quadrature.get_weights(),
-          data,
-          output_data);
+          mapping, cell, face_no, subface_no, data_set, data, output_data);
       }
     } // namespace
   }   // namespace MappingFEFieldImplementation
@@ -1718,14 +1716,12 @@ MappingFEField<dim, spacedim, VectorType, void>::fill_fe_face_values(
       cell,
       face_no,
       numbers::invalid_unsigned_int,
-      QProjector<dim>::DataSetDescriptor::face(
-        reference_cell,
-        face_no,
-        cell->face_orientation(face_no),
-        cell->face_flip(face_no),
-        cell->face_rotation(face_no),
-        quadrature[0].size()),
-      quadrature[0],
+      QProjector<dim>::DataSetDescriptor::face(reference_cell,
+                                               face_no,
+                                               cell->face_orientation(face_no),
+                                               cell->face_flip(face_no),
+                                               cell->face_rotation(face_no),
+                                               quadrature[0].size()),
       data,
       euler_dof_handler->get_fe(),
       fe_mask,
@@ -1753,27 +1749,26 @@ MappingFEField<dim, spacedim, VectorType, void>::fill_fe_subface_values(
 
   update_internal_dofs(cell, data);
 
-  internal::MappingFEFieldImplementation::
-    do_fill_fe_face_values<dim, spacedim, VectorType>(
-      *this,
-      cell,
-      face_no,
-      numbers::invalid_unsigned_int,
-      QProjector<dim>::DataSetDescriptor::subface(
-        reference_cell,
-        face_no,
-        subface_no,
-        cell->face_orientation(face_no),
-        cell->face_flip(face_no),
-        cell->face_rotation(face_no),
-        quadrature.size(),
-        cell->subface_case(face_no)),
-      quadrature,
-      data,
-      euler_dof_handler->get_fe(),
-      fe_mask,
-      fe_to_real,
-      output_data);
+  internal::MappingFEFieldImplementation::do_fill_fe_face_values<dim,
+                                                                 spacedim,
+                                                                 VectorType>(
+    *this,
+    cell,
+    face_no,
+    numbers::invalid_unsigned_int,
+    QProjector<dim>::DataSetDescriptor::subface(reference_cell,
+                                                face_no,
+                                                subface_no,
+                                                cell->face_orientation(face_no),
+                                                cell->face_flip(face_no),
+                                                cell->face_rotation(face_no),
+                                                quadrature.size(),
+                                                cell->subface_case(face_no)),
+    data,
+    euler_dof_handler->get_fe(),
+    fe_mask,
+    fe_to_real,
+    output_data);
 }
 
 
