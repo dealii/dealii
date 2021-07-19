@@ -104,8 +104,8 @@ namespace internal
     template <typename number>
     void
     DoFInfo::read_dof_indices(
+      const std::vector<types::global_dof_index> &local_indices_resolved,
       const std::vector<types::global_dof_index> &local_indices,
-      const std::vector<unsigned int> &           lexicographic_inv,
       const dealii::AffineConstraints<number> &   constraints,
       const unsigned int                          cell_number,
       ConstraintValues<double> &                  constraint_values,
@@ -137,9 +137,8 @@ namespace internal
                i < component_dof_indices_offset[fe_index][comp + 1];
                i++)
             {
-              types::global_dof_index current_dof =
-                local_indices[lexicographic_inv[i]];
-              const auto *entries_ptr =
+              types::global_dof_index current_dof = local_indices_resolved[i];
+              const auto *            entries_ptr =
                 constraints.get_constraint_entries(current_dof);
 
               // dof is constrained
@@ -253,8 +252,7 @@ namespace internal
             {
               for (unsigned int i = 0; i < dofs_this_cell; ++i)
                 {
-                  types::global_dof_index current_dof =
-                    local_indices[lexicographic_inv[i]];
+                  types::global_dof_index current_dof = local_indices[i];
                   if (n_mpi_procs > 1 &&
                       (current_dof < first_owned || current_dof >= last_owned))
                     {
