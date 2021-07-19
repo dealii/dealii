@@ -584,6 +584,12 @@ private:
    */
 
   /**
+   * Reference cell over which the mapping is defined. This class does not yet
+   * support mixed meshes.
+   */
+  ReferenceCell reference_cell;
+
+  /**
    * Specifies whether we access unknowns on the active dofs (with a single
    * Euler vector) or on the level dofs (via a vector of Euler vectors).
    */

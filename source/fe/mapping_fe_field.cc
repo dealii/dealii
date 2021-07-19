@@ -197,7 +197,8 @@ MappingFEField<dim, spacedim, VectorType, void>::MappingFEField(
   const DoFHandler<dim, spacedim> &euler_dof_handler,
   const VectorType &               euler_vector,
   const ComponentMask &            mask)
-  : uses_level_dofs(false)
+  : reference_cell(euler_dof_handler.get_fe().reference_cell())
+  , uses_level_dofs(false)
   , euler_vector({&euler_vector})
   , euler_dof_handler(&euler_dof_handler)
   , fe_mask(mask.size() ?
@@ -207,9 +208,7 @@ MappingFEField<dim, spacedim, VectorType, void>::MappingFEField(
                 true))
   , fe_to_real(fe_mask.size(), numbers::invalid_unsigned_int)
   , fe_values(this->euler_dof_handler->get_fe(),
-              this->euler_dof_handler->get_fe()
-                .reference_cell()
-                .template get_nodal_type_quadrature<dim>(),
+              reference_cell.template get_nodal_type_quadrature<dim>(),
               update_values)
 {
   unsigned int size = 0;
@@ -228,7 +227,8 @@ MappingFEField<dim, spacedim, VectorType, void>::MappingFEField(
   const DoFHandler<dim, spacedim> &euler_dof_handler,
   const std::vector<VectorType> &  euler_vector,
   const ComponentMask &            mask)
-  : uses_level_dofs(true)
+  : reference_cell(euler_dof_handler.get_fe().reference_cell())
+  , uses_level_dofs(true)
   , euler_dof_handler(&euler_dof_handler)
   , fe_mask(mask.size() ?
               mask :
@@ -237,9 +237,7 @@ MappingFEField<dim, spacedim, VectorType, void>::MappingFEField(
                 true))
   , fe_to_real(fe_mask.size(), numbers::invalid_unsigned_int)
   , fe_values(this->euler_dof_handler->get_fe(),
-              this->euler_dof_handler->get_fe()
-                .reference_cell()
-                .template get_nodal_type_quadrature<dim>(),
+              reference_cell.template get_nodal_type_quadrature<dim>(),
               update_values)
 {
   unsigned int size = 0;
@@ -269,7 +267,8 @@ MappingFEField<dim, spacedim, VectorType, void>::MappingFEField(
   const DoFHandler<dim, spacedim> &euler_dof_handler,
   const MGLevelObject<VectorType> &euler_vector,
   const ComponentMask &            mask)
-  : uses_level_dofs(true)
+  : reference_cell(euler_dof_handler.get_fe().reference_cell())
+  , uses_level_dofs(true)
   , euler_dof_handler(&euler_dof_handler)
   , fe_mask(mask.size() ?
               mask :
@@ -278,9 +277,7 @@ MappingFEField<dim, spacedim, VectorType, void>::MappingFEField(
                 true))
   , fe_to_real(fe_mask.size(), numbers::invalid_unsigned_int)
   , fe_values(this->euler_dof_handler->get_fe(),
-              this->euler_dof_handler->get_fe()
-                .reference_cell()
-                .template get_nodal_type_quadrature<dim>(),
+              reference_cell.template get_nodal_type_quadrature<dim>(),
               update_values)
 {
   unsigned int size = 0;
@@ -310,15 +307,14 @@ MappingFEField<dim, spacedim, VectorType, void>::MappingFEField(
 template <int dim, int spacedim, typename VectorType>
 MappingFEField<dim, spacedim, VectorType, void>::MappingFEField(
   const MappingFEField<dim, spacedim, VectorType, void> &mapping)
-  : uses_level_dofs(mapping.uses_level_dofs)
+  : reference_cell(mapping.reference_cell)
+  , uses_level_dofs(mapping.uses_level_dofs)
   , euler_vector(mapping.euler_vector)
   , euler_dof_handler(mapping.euler_dof_handler)
   , fe_mask(mapping.fe_mask)
   , fe_to_real(mapping.fe_to_real)
   , fe_values(mapping.euler_dof_handler->get_fe(),
-              this->euler_dof_handler->get_fe()
-                .reference_cell()
-                .template get_nodal_type_quadrature<dim>(),
+              reference_cell.template get_nodal_type_quadrature<dim>(),
               update_values)
 {}
 
@@ -358,7 +354,7 @@ MappingFEField<dim, spacedim, VectorType, void>::is_compatible_with(
                     Utilities::to_string(reference_cell.get_dimension()) +
                     " ) do not agree."));
 
-  return euler_dof_handler->get_fe().reference_cell() == reference_cell;
+  return this->reference_cell == reference_cell;
 }
 
 
@@ -589,8 +585,6 @@ MappingFEField<dim, spacedim, VectorType, void>::compute_face_data(
 
 
           // TODO: only a single reference cell type possible...
-          const auto reference_cell =
-            this->euler_dof_handler->get_fe().reference_cell();
           const auto n_faces = reference_cell.n_faces();
 
           // Compute tangentials to the unit cell.
