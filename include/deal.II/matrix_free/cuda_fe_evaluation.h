@@ -26,10 +26,10 @@
 #  include <deal.II/lac/cuda_atomic.h>
 #  include <deal.II/lac/cuda_vector.h>
 
-#  include <deal.II/matrix_free/cuda_hanging_nodes_internal.h>
 #  include <deal.II/matrix_free/cuda_matrix_free.h>
 #  include <deal.II/matrix_free/cuda_matrix_free.templates.h>
 #  include <deal.II/matrix_free/cuda_tensor_product_kernels.h>
+#  include <deal.II/matrix_free/hanging_nodes_internal.h>
 
 DEAL_II_NAMESPACE_OPEN
 

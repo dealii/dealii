@@ -31,7 +31,7 @@
 #  include <deal.II/fe/fe_dgq.h>
 #  include <deal.II/fe/fe_values.h>
 
-#  include <deal.II/matrix_free/cuda_hanging_nodes_internal.h>
+#  include <deal.II/matrix_free/hanging_nodes_internal.h>
 #  include <deal.II/matrix_free/shape_info.h>
 
 #  include <cuda_runtime_api.h>
@@ -242,7 +242,7 @@ namespace CUDAWrappers
       const unsigned int                   q_points_per_cell;
       const UpdateFlags &                  update_flags;
       const unsigned int                   padding_length;
-      HangingNodes<dim>                    hanging_nodes;
+      dealii::internal::MatrixFreeFunctions::HangingNodes<dim> hanging_nodes;
     };
 
 
@@ -271,6 +271,11 @@ namespace CUDAWrappers
       , padding_length(data->get_padding_length())
       , hanging_nodes(fe_degree, dof_handler, lexicographic_inv)
     {
+      cudaError_t error_code = cudaMemcpyToSymbol(
+        constraint_weights,
+        shape_info.data.front().subface_interpolation_matrix.data(),
+        sizeof(double) * fe.n_dofs_per_face(0) * fe.n_dofs_per_face(0));
+
       local_dof_indices.resize(data->dofs_per_cell);
       lexicographic_dof_indices.resize(dofs_per_cell);
     }
