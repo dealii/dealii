@@ -184,18 +184,19 @@ namespace internal
                                     const bool with_constraints = true) const;
 
       /**
-       * This internal method takes the local indices on a cell and fills them
-       * into this class. It resolves the constraints and distributes the
-       * results. Ghost indices, i.e., indices that are located on another
-       * processor, get a temporary number by this function, and will later be
-       * assigned the correct index after all the ghost indices have been
-       * collected by the call to @p assign_ghosts.
+       * This internal method takes the local indices on a cell (two versions:
+       * hanging-node constraints resolved if possible and plain, i.e., not
+       * resolved) and fills them into this class. It resolves the constraints
+       * and distributes the results. Ghost indices, i.e., indices that are
+       * located on another processor, get a temporary number by this function,
+       * and will later be assigned the correct index after all the ghost
+       * indices have been collected by the call to @p assign_ghosts.
        */
       template <typename number>
       void
       read_dof_indices(
+        const std::vector<types::global_dof_index> &local_indices_resolved,
         const std::vector<types::global_dof_index> &local_indices,
-        const std::vector<unsigned int> &           lexicographic_inv,
         const dealii::AffineConstraints<number> &   constraints,
         const unsigned int                          cell_number,
         ConstraintValues<double> &                  constraint_values,
@@ -496,6 +497,12 @@ namespace internal
        * in the variable @p row_starts.
        */
       std::vector<unsigned int> dof_indices;
+
+      /**
+       * Masks indicating for each cell and component if the optimized
+       * hanging-node constraint is applicable and if yes which type.
+       */
+      std::vector<unsigned int> hanging_node_constraint_masks;
 
       /**
        * This variable describes the position of constraints in terms of the

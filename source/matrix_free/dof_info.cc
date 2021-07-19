@@ -1459,7 +1459,7 @@ namespace internal
     template void
     DoFInfo::read_dof_indices<double>(
       const std::vector<types::global_dof_index> &,
-      const std::vector<unsigned int> &,
+      const std::vector<types::global_dof_index> &,
       const dealii::AffineConstraints<double> &,
       const unsigned int,
       ConstraintValues<double> &,
@@ -1468,7 +1468,7 @@ namespace internal
     template void
     DoFInfo::read_dof_indices<float>(
       const std::vector<types::global_dof_index> &,
-      const std::vector<unsigned int> &,
+      const std::vector<types::global_dof_index> &,
       const dealii::AffineConstraints<float> &,
       const unsigned int,
       ConstraintValues<double> &,

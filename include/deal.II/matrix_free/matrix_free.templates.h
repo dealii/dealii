@@ -1050,7 +1050,8 @@ namespace internal
     AssertDimension(n_dof_handlers, locally_owned_dofs.size());
     AssertDimension(n_dof_handlers, constraint.size());
 
-    std::vector<types::global_dof_index>                local_dof_indices;
+    std::vector<types::global_dof_index> local_dof_indices_resolved;
+    std::vector<types::global_dof_index> local_dof_indices;
     std::vector<std::vector<std::vector<unsigned int>>> lexicographic(
       n_dof_handlers);
 
@@ -1196,10 +1197,18 @@ namespace internal
                     0;
                 if (dofh->get_fe_collection().size() > 1)
                   dof_info[no].cell_active_fe_index[counter] = fe_index;
-                local_dof_indices.resize(dof_info[no].dofs_per_cell[fe_index]);
-                cell_it->get_dof_indices(local_dof_indices);
+                local_dof_indices_resolved.resize(
+                  dof_info[no].dofs_per_cell[fe_index]);
+                cell_it->get_dof_indices(local_dof_indices_resolved);
+
+                local_dof_indices.resize(local_dof_indices_resolved.size());
+                for (unsigned int i = 0; i < local_dof_indices_resolved.size();
+                     ++i)
+                  local_dof_indices[i] =
+                    local_dof_indices_resolved[lexicographic[no][fe_index][i]];
+
                 dof_info[no].read_dof_indices(local_dof_indices,
-                                              lexicographic[no][fe_index],
+                                              local_dof_indices,
                                               *constraint[no],
                                               counter,
                                               constraint_values,
@@ -1223,10 +1232,18 @@ namespace internal
                   cell_level_index[counter].first,
                   cell_level_index[counter].second,
                   dofh);
-                local_dof_indices.resize(dof_info[no].dofs_per_cell[0]);
-                cell_it->get_mg_dof_indices(local_dof_indices);
+                local_dof_indices_resolved.resize(
+                  dof_info[no].dofs_per_cell[0]);
+                cell_it->get_mg_dof_indices(local_dof_indices_resolved);
+
+                local_dof_indices.resize(local_dof_indices_resolved.size());
+                for (unsigned int i = 0; i < local_dof_indices_resolved.size();
+                     ++i)
+                  local_dof_indices[i] =
+                    local_dof_indices_resolved[lexicographic[no][0][i]];
+
                 dof_info[no].read_dof_indices(local_dof_indices,
-                                              lexicographic[no][0],
+                                              local_dof_indices,
                                               *constraint[no],
                                               counter,
                                               constraint_values,
