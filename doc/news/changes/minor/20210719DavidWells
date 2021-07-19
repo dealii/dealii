@@ -1,0 +1,3 @@
+Fixed: MappingFEField now works with simplex faces correctly.
+<br>
+(David Wells, 2021/07/19)
