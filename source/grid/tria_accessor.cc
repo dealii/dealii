@@ -1324,123 +1324,152 @@ namespace
   double
   measure(const TriaAccessor<2, dim, 3> &accessor)
   {
-    // If the face is planar, the diagonal from vertex 0 to vertex 3,
-    // v_03, should be in the plane P_012 of vertices 0, 1 and 2.  Get
-    // the normal vector of P_012 and test if v_03 is orthogonal to
-    // that. If so, the face is planar and computing its area is simple.
-    const Tensor<1, 3> v01 = accessor.vertex(1) - accessor.vertex(0);
-    const Tensor<1, 3> v02 = accessor.vertex(2) - accessor.vertex(0);
-
-    const Tensor<1, 3> normal = cross_product_3d(v01, v02);
-
-    const Tensor<1, 3> v03 = accessor.vertex(3) - accessor.vertex(0);
-
-    // check whether v03 does not lie in the plane of v01 and v02
-    // (i.e., whether the face is not planar). we do so by checking
-    // whether the triple product (v01 x v02) * v03 forms a positive
-    // volume relative to |v01|*|v02|*|v03|. the test checks the
-    // squares of these to avoid taking norms/square roots:
-    if (std::abs((v03 * normal) * (v03 * normal) /
-                 ((v03 * v03) * (v01 * v01) * (v02 * v02))) >= 1e-24)
+    if (accessor.reference_cell() == ReferenceCells::Quadrilateral)
       {
-        // If the vectors are non planar we integrate the norm of the normal
-        // vector using a numerical Gauss scheme of order 4. In particular we
-        // consider a bilinear quad x(u,v) = (1-v)((1-u)v_0 + u v_1) +
-        // v((1-u)v_2 + u v_3), consequently we compute the normal vector as
-        // n(u,v) = t_u x t_v = w_1 + u w_2 + v w_3. The integrand function is
-        // || n(u,v) || = sqrt(a + b u^2 + c v^2 + d u + e v + f uv).
-        // We integrate it using a QGauss<2> (4) computed explicitly.
-        const Tensor<1, 3> w_1 =
-          cross_product_3d(accessor.vertex(1) - accessor.vertex(0),
-                           accessor.vertex(2) - accessor.vertex(0));
-        const Tensor<1, 3> w_2 =
-          cross_product_3d(accessor.vertex(1) - accessor.vertex(0),
-                           accessor.vertex(3) - accessor.vertex(2) -
-                             accessor.vertex(1) + accessor.vertex(0));
-        const Tensor<1, 3> w_3 =
-          cross_product_3d(accessor.vertex(3) - accessor.vertex(2) -
-                             accessor.vertex(1) + accessor.vertex(0),
-                           accessor.vertex(2) - accessor.vertex(0));
+        // If the face is planar, the diagonal from vertex 0 to vertex 3,
+        // v_03, should be in the plane P_012 of vertices 0, 1 and 2.  Get
+        // the normal vector of P_012 and test if v_03 is orthogonal to
+        // that. If so, the face is planar and computing its area is simple.
+        const Tensor<1, 3> v01 = accessor.vertex(1) - accessor.vertex(0);
+        const Tensor<1, 3> v02 = accessor.vertex(2) - accessor.vertex(0);
 
-        double a = scalar_product(w_1, w_1);
-        double b = scalar_product(w_2, w_2);
-        double c = scalar_product(w_3, w_3);
-        double d = scalar_product(w_1, w_2);
-        double e = scalar_product(w_1, w_3);
-        double f = scalar_product(w_2, w_3);
+        const Tensor<1, 3> normal = cross_product_3d(v01, v02);
 
-        return 0.03025074832140047 *
-                 std::sqrt(a + 0.0048207809894260144 * b +
-                           0.0048207809894260144 * c + 0.13886368840594743 * d +
-                           0.13886368840594743 * e +
-                           0.0096415619788520288 * f) +
-               0.056712962962962937 *
-                 std::sqrt(a + 0.0048207809894260144 * b +
-                           0.10890625570683385 * c + 0.13886368840594743 * d +
-                           0.66001895641514374 * e + 0.045826333352825557 * f) +
-               0.056712962962962937 *
-                 std::sqrt(a + 0.0048207809894260144 * b +
-                           0.44888729929169013 * c + 0.13886368840594743 * d +
-                           1.3399810435848563 * e + 0.09303735505312187 * f) +
-               0.03025074832140047 *
-                 std::sqrt(a + 0.0048207809894260144 * b +
-                           0.86595709258347853 * c + 0.13886368840594743 * d +
-                           1.8611363115940525 * e + 0.12922212642709538 * f) +
-               0.056712962962962937 *
-                 std::sqrt(a + 0.10890625570683385 * b +
-                           0.0048207809894260144 * c + 0.66001895641514374 * d +
-                           0.13886368840594743 * e + 0.045826333352825557 * f) +
-               0.10632332575267359 *
-                 std::sqrt(a + 0.10890625570683385 * b +
-                           0.10890625570683385 * c + 0.66001895641514374 * d +
-                           0.66001895641514374 * e + 0.2178125114136677 * f) +
-               0.10632332575267359 *
-                 std::sqrt(a + 0.10890625570683385 * b +
-                           0.44888729929169013 * c + 0.66001895641514374 * d +
-                           1.3399810435848563 * e + 0.44220644500147605 * f) +
-               0.056712962962962937 *
-                 std::sqrt(a + 0.10890625570683385 * b +
-                           0.86595709258347853 * c + 0.66001895641514374 * d +
-                           1.8611363115940525 * e + 0.61419262306231814 * f) +
-               0.056712962962962937 *
-                 std::sqrt(a + 0.44888729929169013 * b +
-                           0.0048207809894260144 * c + 1.3399810435848563 * d +
-                           0.13886368840594743 * e + 0.09303735505312187 * f) +
-               0.10632332575267359 *
-                 std::sqrt(a + 0.44888729929169013 * b +
-                           0.10890625570683385 * c + 1.3399810435848563 * d +
-                           0.66001895641514374 * e + 0.44220644500147605 * f) +
-               0.10632332575267359 *
-                 std::sqrt(a + 0.44888729929169013 * b +
-                           0.44888729929169013 * c + 1.3399810435848563 * d +
-                           1.3399810435848563 * e + 0.89777459858338027 * f) +
-               0.056712962962962937 *
-                 std::sqrt(a + 0.44888729929169013 * b +
-                           0.86595709258347853 * c + 1.3399810435848563 * d +
-                           1.8611363115940525 * e + 1.2469436885317342 * f) +
-               0.03025074832140047 *
-                 std::sqrt(a + 0.86595709258347853 * b +
-                           0.0048207809894260144 * c + 1.8611363115940525 * d +
-                           0.13886368840594743 * e + 0.12922212642709538 * f) +
-               0.056712962962962937 *
-                 std::sqrt(a + 0.86595709258347853 * b +
-                           0.10890625570683385 * c + 1.8611363115940525 * d +
-                           0.66001895641514374 * e + 0.61419262306231814 * f) +
-               0.056712962962962937 *
-                 std::sqrt(a + 0.86595709258347853 * b +
-                           0.44888729929169013 * c + 1.8611363115940525 * d +
-                           1.3399810435848563 * e + 1.2469436885317342 * f) +
-               0.03025074832140047 *
-                 std::sqrt(a + 0.86595709258347853 * b +
-                           0.86595709258347853 * c + 1.8611363115940525 * d +
-                           1.8611363115940525 * e + 1.7319141851669571 * f);
+        const Tensor<1, 3> v03 = accessor.vertex(3) - accessor.vertex(0);
+
+        // check whether v03 does not lie in the plane of v01 and v02
+        // (i.e., whether the face is not planar). we do so by checking
+        // whether the triple product (v01 x v02) * v03 forms a positive
+        // volume relative to |v01|*|v02|*|v03|. the test checks the
+        // squares of these to avoid taking norms/square roots:
+        if (std::abs((v03 * normal) * (v03 * normal) /
+                     ((v03 * v03) * (v01 * v01) * (v02 * v02))) >= 1e-24)
+          {
+            // If the vectors are non planar we integrate the norm of the normal
+            // vector using a numerical Gauss scheme of order 4. In particular
+            // we consider a bilinear quad x(u,v) = (1-v)((1-u)v_0 + u v_1) +
+            // v((1-u)v_2 + u v_3), consequently we compute the normal vector as
+            // n(u,v) = t_u x t_v = w_1 + u w_2 + v w_3. The integrand function
+            // is
+            // || n(u,v) || = sqrt(a + b u^2 + c v^2 + d u + e v + f uv).
+            // We integrate it using a QGauss<2> (4) computed explicitly.
+            const Tensor<1, 3> w_1 =
+              cross_product_3d(accessor.vertex(1) - accessor.vertex(0),
+                               accessor.vertex(2) - accessor.vertex(0));
+            const Tensor<1, 3> w_2 =
+              cross_product_3d(accessor.vertex(1) - accessor.vertex(0),
+                               accessor.vertex(3) - accessor.vertex(2) -
+                                 accessor.vertex(1) + accessor.vertex(0));
+            const Tensor<1, 3> w_3 =
+              cross_product_3d(accessor.vertex(3) - accessor.vertex(2) -
+                                 accessor.vertex(1) + accessor.vertex(0),
+                               accessor.vertex(2) - accessor.vertex(0));
+
+            double a = scalar_product(w_1, w_1);
+            double b = scalar_product(w_2, w_2);
+            double c = scalar_product(w_3, w_3);
+            double d = scalar_product(w_1, w_2);
+            double e = scalar_product(w_1, w_3);
+            double f = scalar_product(w_2, w_3);
+
+            return 0.03025074832140047 *
+                     std::sqrt(
+                       a + 0.0048207809894260144 * b +
+                       0.0048207809894260144 * c + 0.13886368840594743 * d +
+                       0.13886368840594743 * e + 0.0096415619788520288 * f) +
+                   0.056712962962962937 *
+                     std::sqrt(
+                       a + 0.0048207809894260144 * b + 0.10890625570683385 * c +
+                       0.13886368840594743 * d + 0.66001895641514374 * e +
+                       0.045826333352825557 * f) +
+                   0.056712962962962937 *
+                     std::sqrt(
+                       a + 0.0048207809894260144 * b + 0.44888729929169013 * c +
+                       0.13886368840594743 * d + 1.3399810435848563 * e +
+                       0.09303735505312187 * f) +
+                   0.03025074832140047 *
+                     std::sqrt(
+                       a + 0.0048207809894260144 * b + 0.86595709258347853 * c +
+                       0.13886368840594743 * d + 1.8611363115940525 * e +
+                       0.12922212642709538 * f) +
+                   0.056712962962962937 *
+                     std::sqrt(
+                       a + 0.10890625570683385 * b + 0.0048207809894260144 * c +
+                       0.66001895641514374 * d + 0.13886368840594743 * e +
+                       0.045826333352825557 * f) +
+                   0.10632332575267359 * std::sqrt(a + 0.10890625570683385 * b +
+                                                   0.10890625570683385 * c +
+                                                   0.66001895641514374 * d +
+                                                   0.66001895641514374 * e +
+                                                   0.2178125114136677 * f) +
+                   0.10632332575267359 * std::sqrt(a + 0.10890625570683385 * b +
+                                                   0.44888729929169013 * c +
+                                                   0.66001895641514374 * d +
+                                                   1.3399810435848563 * e +
+                                                   0.44220644500147605 * f) +
+                   0.056712962962962937 *
+                     std::sqrt(
+                       a + 0.10890625570683385 * b + 0.86595709258347853 * c +
+                       0.66001895641514374 * d + 1.8611363115940525 * e +
+                       0.61419262306231814 * f) +
+                   0.056712962962962937 *
+                     std::sqrt(
+                       a + 0.44888729929169013 * b + 0.0048207809894260144 * c +
+                       1.3399810435848563 * d + 0.13886368840594743 * e +
+                       0.09303735505312187 * f) +
+                   0.10632332575267359 * std::sqrt(a + 0.44888729929169013 * b +
+                                                   0.10890625570683385 * c +
+                                                   1.3399810435848563 * d +
+                                                   0.66001895641514374 * e +
+                                                   0.44220644500147605 * f) +
+                   0.10632332575267359 *
+                     std::sqrt(a + 0.44888729929169013 * b +
+                               0.44888729929169013 * c +
+                               1.3399810435848563 * d + 1.3399810435848563 * e +
+                               0.89777459858338027 * f) +
+                   0.056712962962962937 *
+                     std::sqrt(a + 0.44888729929169013 * b +
+                               0.86595709258347853 * c +
+                               1.3399810435848563 * d + 1.8611363115940525 * e +
+                               1.2469436885317342 * f) +
+                   0.03025074832140047 * std::sqrt(a + 0.86595709258347853 * b +
+                                                   0.0048207809894260144 * c +
+                                                   1.8611363115940525 * d +
+                                                   0.13886368840594743 * e +
+                                                   0.12922212642709538 * f) +
+                   0.056712962962962937 *
+                     std::sqrt(
+                       a + 0.86595709258347853 * b + 0.10890625570683385 * c +
+                       1.8611363115940525 * d + 0.66001895641514374 * e +
+                       0.61419262306231814 * f) +
+                   0.056712962962962937 *
+                     std::sqrt(a + 0.86595709258347853 * b +
+                               0.44888729929169013 * c +
+                               1.8611363115940525 * d + 1.3399810435848563 * e +
+                               1.2469436885317342 * f) +
+                   0.03025074832140047 *
+                     std::sqrt(a + 0.86595709258347853 * b +
+                               0.86595709258347853 * c +
+                               1.8611363115940525 * d + 1.8611363115940525 * e +
+                               1.7319141851669571 * f);
+          }
+
+        // the face is planar. then its area is 1/2 of the norm of the
+        // cross product of the two diagonals
+        const Tensor<1, 3> v12        = accessor.vertex(2) - accessor.vertex(1);
+        const Tensor<1, 3> twice_area = cross_product_3d(v03, v12);
+        return 0.5 * twice_area.norm();
+      }
+    else if (accessor.reference_cell() == ReferenceCells::Triangle)
+      {
+        // We can just use the normal triangle area formula without issue
+        const Tensor<1, 3> v01 = accessor.vertex(1) - accessor.vertex(0);
+        const Tensor<1, 3> v02 = accessor.vertex(2) - accessor.vertex(0);
+        return 0.5 * cross_product_3d(v01, v02).norm();
       }
 
-    // the face is planar. then its area is 1/2 of the norm of the
-    // cross product of the two diagonals
-    const Tensor<1, 3> v12        = accessor.vertex(2) - accessor.vertex(1);
-    const Tensor<1, 3> twice_area = cross_product_3d(v03, v12);
-    return 0.5 * twice_area.norm();
+    Assert(false, ExcNotImplemented());
+    return 0.0;
   }
 
 

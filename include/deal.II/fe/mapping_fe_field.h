@@ -514,6 +514,11 @@ public:
     mutable std::vector<double> volume_elements;
 
     /**
+     * Projected quadrature weights.
+     */
+    mutable std::vector<double> quadrature_weights;
+
+    /**
      * Auxiliary vectors for internal use.
      */
     mutable std::vector<std::vector<Tensor<1, spacedim>>> aux;
@@ -582,6 +587,12 @@ private:
   /**
    * @}
    */
+
+  /**
+   * Reference cell over which the mapping is defined. This class does not yet
+   * support mixed meshes.
+   */
+  ReferenceCell reference_cell;
 
   /**
    * Specifies whether we access unknowns on the active dofs (with a single
