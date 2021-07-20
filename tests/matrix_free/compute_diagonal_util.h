@@ -82,8 +82,9 @@ public:
     SparseMatrix<Number> A1, A2, A_ref;
     SparsityPattern      sparsity_pattern;
 
-    const bool test_matrix = Utilities::MPI::n_mpi_processes(
-                               matrix_free.get_task_info().communicator) == 1;
+    const bool test_matrix = (Utilities::MPI::job_supports_mpi() == false) ||
+                             (Utilities::MPI::n_mpi_processes(
+                                matrix_free.get_task_info().communicator) == 1);
 
     if (test_matrix)
       {
@@ -97,6 +98,8 @@ public:
         A_ref.reinit(sparsity_pattern);
       }
 
+    double error_local_1, error_local_2, error_global;
+
     {
       MatrixFreeTools::compute_diagonal<dim,
                                         fe_degree,
@@ -109,7 +112,8 @@ public:
         });
 
       diagonal_global.print(deallog.get_file_stream());
-      deallog << diagonal_global.l2_norm() << std::endl;
+      error_local_1 = diagonal_global.l2_norm();
+      deallog << error_local_1 << std::endl;
     }
 
     {
@@ -120,8 +124,11 @@ public:
                                         this);
 
       diagonal_global.print(deallog.get_file_stream());
-      deallog << diagonal_global.l2_norm() << std::endl;
+      error_local_2 = diagonal_global.l2_norm();
+      deallog << error_local_2 << std::endl;
     }
+
+    Assert(std::abs(error_local_1 - error_local_2) < 1e-10, ExcInternalError());
 
     if (test_matrix)
       {
@@ -177,8 +184,12 @@ public:
         }
 
       diagonal_global_reference.print(deallog.get_file_stream());
+
+      error_global = diagonal_global_reference.l2_norm();
       deallog << diagonal_global_reference.l2_norm() << std::endl;
     }
+
+    Assert(std::abs(error_local_1 - error_global) < 1e-10, ExcInternalError());
 
     if (test_matrix)
       {
