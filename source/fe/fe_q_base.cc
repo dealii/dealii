@@ -568,6 +568,7 @@ FE_Q_Base<dim, spacedim>::get_interpolation_matrix(
           if (std::fabs(interpolation_matrix(i, j)) < eps)
             interpolation_matrix(i, j) = 0.;
 
+#ifdef DEBUG
       // make sure that the row sum of each of the matrices is 1 at this
       // point. this must be so since the shape functions sum up to 1
       for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
@@ -578,6 +579,7 @@ FE_Q_Base<dim, spacedim>::get_interpolation_matrix(
 
           Assert(std::fabs(sum - 1) < eps, ExcInternalError());
         }
+#endif
     }
   else if (dynamic_cast<const FE_Nothing<dim> *>(&x_source_fe))
     {

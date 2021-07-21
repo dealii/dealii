@@ -920,6 +920,7 @@ FE_RaviartThomasNodal<dim>::get_face_interpolation_matrix(
         }
     }
 
+#ifdef DEBUG
   // make sure that the row sum of each of the matrices is 1 at this
   // point. this must be so since the shape functions sum up to 1
   for (unsigned int j = 0; j < source_fe.n_dofs_per_face(face_no); ++j)
@@ -932,6 +933,7 @@ FE_RaviartThomasNodal<dim>::get_face_interpolation_matrix(
       Assert(std::fabs(sum - 1) < 2e-13 * this->degree * (dim - 1),
              ExcInternalError());
     }
+#endif
 }
 
 
@@ -1009,6 +1011,7 @@ FE_RaviartThomasNodal<dim>::get_subface_interpolation_matrix(
         }
     }
 
+#ifdef DEBUG
   // make sure that the row sum of each of the matrices is 1 at this
   // point. this must be so since the shape functions sum up to 1
   for (unsigned int j = 0; j < source_fe.n_dofs_per_face(face_no); ++j)
@@ -1021,6 +1024,7 @@ FE_RaviartThomasNodal<dim>::get_subface_interpolation_matrix(
       Assert(std::fabs(sum - 1) < 2e-13 * this->degree * (dim - 1),
              ExcInternalError());
     }
+#endif
 }
 
 

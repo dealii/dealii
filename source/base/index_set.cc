@@ -243,14 +243,21 @@ IndexSet::split_by_block(
 
   partitioned.reserve(n_blocks);
   types::global_dof_index start = 0;
-  types::global_dof_index sum   = 0;
   for (const auto n_block_indices : n_indices_per_block)
     {
       partitioned.push_back(this->get_view(start, start + n_block_indices));
       start += n_block_indices;
-      sum += partitioned.back().size();
+    }
+
+#ifdef DEBUG
+  types::global_dof_index sum = 0;
+  for (const auto &partition : partitioned)
+    {
+      sum += partition.size();
     }
   AssertDimension(sum, this->size());
+#endif
+
   return partitioned;
 }
 
