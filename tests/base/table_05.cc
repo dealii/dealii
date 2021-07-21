@@ -31,6 +31,9 @@ test()
   dealii::Table<dim, int> unrolled;
   unrolled.reinit(new_size);
 
+  unrolled.clear();
+  Assert(unrolled.empty() == true, ExcInternalError());
+
   deallog << "OK" << std::endl;
 }
 

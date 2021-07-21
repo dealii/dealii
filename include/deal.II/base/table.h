@@ -544,6 +544,12 @@ public:
          const bool             omit_default_initialization = false);
 
   /**
+   * Set all dimensions to zero.
+   */
+  void
+  clear();
+
+  /**
    * Size of the table in direction <tt>i</tt>.
    */
   size_type
@@ -2417,6 +2423,16 @@ TableBase<N, T>::reinit(const TableIndices<N> &new_sizes,
     }
   else
     values.resize_fast(new_size);
+}
+
+
+
+template <int N, typename T>
+inline void
+TableBase<N, T>::clear()
+{
+  values.resize(0);
+  table_size = TableIndices<N>();
 }
 
 
