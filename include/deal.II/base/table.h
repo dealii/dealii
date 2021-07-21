@@ -2431,7 +2431,7 @@ template <int N, typename T>
 inline void
 TableBase<N, T>::clear()
 {
-  values.resize(0);
+  values.clear();
   table_size = TableIndices<N>();
 }
 
