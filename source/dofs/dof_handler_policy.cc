@@ -18,6 +18,7 @@
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/partitioner.h>
 #include <deal.II/base/thread_management.h>
+#include <deal.II/base/types.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/work_stream.h>
 
