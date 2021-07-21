@@ -330,6 +330,7 @@ FE_DGQ<dim, spacedim>::get_interpolation_matrix(
       if (std::fabs(interpolation_matrix(i, j)) < 1e-15)
         interpolation_matrix(i, j) = 0.;
 
+#ifdef DEBUG
   // make sure that the row sum of
   // each of the matrices is 1 at
   // this point. this must be so
@@ -344,6 +345,7 @@ FE_DGQ<dim, spacedim>::get_interpolation_matrix(
       Assert(std::fabs(sum - 1) < 5e-14 * std::max(this->degree, 1U) * dim,
              ExcInternalError());
     }
+#endif
 }
 
 

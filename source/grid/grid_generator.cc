@@ -2961,12 +2961,10 @@ namespace GridGenerator
     Assert(spacing.size() == 2, ExcInvalidRepetitionsDimension(2));
 
     std::vector<unsigned int> repetitions(2);
-    unsigned int              n_cells = 1;
-    double                    delta   = std::numeric_limits<double>::max();
+    double                    delta = std::numeric_limits<double>::max();
     for (unsigned int i = 0; i < 2; i++)
       {
         repetitions[i] = spacing[i].size();
-        n_cells *= repetitions[i];
         for (unsigned int j = 0; j < repetitions[i]; j++)
           {
             Assert(spacing[i][j] >= 0, ExcInvalidRepetitions(-1));
@@ -3057,12 +3055,10 @@ namespace GridGenerator
     Assert(spacing.size() == dim, ExcInvalidRepetitionsDimension(dim));
 
     std::vector<unsigned int> repetitions(dim);
-    unsigned int              n_cells = 1;
-    double                    delta   = std::numeric_limits<double>::max();
+    double                    delta = std::numeric_limits<double>::max();
     for (unsigned int i = 0; i < dim; i++)
       {
         repetitions[i] = spacing[i].size();
-        n_cells *= repetitions[i];
         for (unsigned int j = 0; j < repetitions[i]; j++)
           {
             Assert(spacing[i][j] >= 0, ExcInvalidRepetitions(-1));

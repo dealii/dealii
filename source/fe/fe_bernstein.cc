@@ -182,6 +182,7 @@ FE_Bernstein<dim, spacedim>::get_subface_interpolation_matrix(
             }
         }
 
+#ifdef DEBUG
       // make sure that the row sum of each of the matrices is 1 at this
       // point. this must be so since the shape functions sum up to 1
       for (unsigned int j = 0; j < source_fe->n_dofs_per_face(face_no); ++j)
@@ -193,6 +194,7 @@ FE_Bernstein<dim, spacedim>::get_subface_interpolation_matrix(
 
           Assert(std::fabs(sum - 1) < eps, ExcInternalError());
         }
+#endif
     }
   else
     {
