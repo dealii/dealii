@@ -22,8 +22,11 @@
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/vectorization.h>
 
+#include <deal.II/fe/fe_q.h>
+
 #include <deal.II/matrix_free/dof_info.h>
 #include <deal.II/matrix_free/evaluation_flags.h>
+#include <deal.II/matrix_free/hanging_nodes_internal.h>
 #include <deal.II/matrix_free/shape_info.h>
 #include <deal.II/matrix_free/tensor_product_kernels.h>
 #include <deal.II/matrix_free/type_traits.h>
@@ -4417,6 +4420,637 @@ namespace internal
       return false;
     }
   };
+
+
+
+  template <int dim, typename Number, bool is_face>
+  struct FEEvaluationImplHangingNodes
+  {
+    template <int fe_degree, int n_q_points_1d>
+    static bool
+    run(const unsigned int                              n_desired_components,
+        const FEEvaluationBaseData<dim,
+                                   typename Number::value_type,
+                                   is_face,
+                                   Number> &            fe_eval,
+        const bool                                      transpose,
+        const std::array<unsigned int, Number::size()> &c_mask,
+        Number *                                        values)
+    {
+      Assert(is_face == false, ExcInternalError());
+
+      if (transpose)
+        run_internal<fe_degree, true>(n_desired_components,
+                                      fe_eval,
+                                      c_mask,
+                                      values);
+      else
+        run_internal<fe_degree, false>(n_desired_components,
+                                       fe_eval,
+                                       c_mask,
+                                       values);
+
+      return false; // TODO
+    }
+
+  private:
+    template <int fe_degree_, unsigned int side, bool transpose>
+    static void
+    interpolate_2D(const unsigned int fe_degree,
+                   bool               type,
+                   const unsigned int v,
+                   const Number *     weight,
+                   Number *           values)
+    {
+      if (type)
+        interpolate_2D<fe_degree_, side, transpose, true>(fe_degree,
+                                                          v,
+                                                          weight,
+                                                          values);
+      else
+        interpolate_2D<fe_degree_, side, transpose, false>(fe_degree,
+                                                           v,
+                                                           weight,
+                                                           values);
+    }
+
+    template <int fe_degree_, unsigned int side, bool transpose, bool type>
+    static void
+    interpolate_2D(const unsigned int fe_degree,
+                   const unsigned int v,
+                   const Number *     weight,
+                   Number *           values)
+    {
+      typename Number::value_type temp[10 /*TODO*/];
+
+      const unsigned int points =
+        (fe_degree_ != -1 ? fe_degree_ : fe_degree) + 1;
+
+      const unsigned int d = side / 2; // direction
+      const unsigned int s = side % 2; // left or right surface
+
+      const unsigned int b1 = dealii::Utilities::pow(points, d + 1);
+      const unsigned int b2 =
+        (s == 0 ? 0 : (points - 1)) * dealii::Utilities::pow(points, d);
+
+      const unsigned int r1 = dealii::Utilities::pow(points, dim - d - 1);
+      const unsigned int r2 = dealii::Utilities::pow(points, d);
+
+      // perform interpolation point by point
+      for (unsigned int h = 0; h < points; ++h)
+        for (unsigned int i = 0, k = 0; i < r1; ++i)
+          for (unsigned int j = 0; j < r2; ++j, ++k)
+            {
+              const unsigned int index_v = i * b1 + b2 + j;
+              const unsigned int index_w =
+                ((transpose ? 1 : points) * (type ? h : (points - 1 - h))) +
+                ((transpose ? points : 1) * (type ? k : (points - 1 - k)));
+              if (k == 0)
+                temp[h] = weight[index_w][v] * values[index_v][v];
+              else
+                temp[h] += weight[index_w][v] * values[index_v][v];
+            }
+
+      // copy result back
+      for (unsigned int i = 0, k = 0; i < r1; ++i)
+        for (unsigned int j = 0; j < r2; ++j, ++k)
+          values[i * b1 + b2 + j][v] = temp[k];
+    }
+
+    template <int          fe_degree_,
+              unsigned int direction,
+              unsigned int side,
+              bool         transpose>
+    static void
+    interpolate_3D_face(const unsigned int p,
+                        const unsigned int fe_degree,
+                        bool               type,
+                        const unsigned int v,
+                        const Number *     weight,
+                        Number *           values)
+    {
+      if (type)
+        interpolate_3D_face<fe_degree_, direction, side, transpose, true>(
+          p, fe_degree, v, weight, values);
+      else
+        interpolate_3D_face<fe_degree_, direction, side, transpose, false>(
+          p, fe_degree, v, weight, values);
+    }
+
+    template <int          fe_degree_,
+              unsigned int direction,
+              unsigned int side,
+              bool         transpose,
+              bool         type>
+    static void
+    interpolate_3D_face(const unsigned int p,
+                        const unsigned int fe_degree,
+                        const unsigned int v,
+                        const Number *     weight,
+                        Number *           values)
+    {
+      typename Number::value_type temp[10 /*TODO*/];
+
+      const unsigned int points =
+        (fe_degree_ != -1 ? fe_degree_ : fe_degree) + 1;
+      const unsigned int stride = Utilities::pow(points, direction);
+      const unsigned int d      = side / 2;
+
+      // direction   side0   side1   side2
+      // 0             -      p^2      p
+      // 1            p^2      -       1
+      // 2             p       -       1
+      const unsigned int stride2 =
+        ((direction == 0 && d == 1) || (direction == 1 && d == 0)) ?
+          (points * points) :
+          (((direction == 0 && d == 2) || (direction == 2 && d == 0)) ? points :
+                                                                        1);
+
+      // perform interpolation point by point
+      for (unsigned int g = 1; g < points - 1; ++g)
+        {
+          for (unsigned int h = 0; h < points; ++h)
+            for (unsigned int k = 0; k < points; ++k)
+              {
+                const unsigned int index_v = p + k * stride + stride2 * g;
+                const unsigned int index_w =
+                  ((transpose ? 1 : points) * (type ? h : (points - 1 - h))) +
+                  ((transpose ? points : 1) * (type ? k : (points - 1 - k)));
+                if (k == 0)
+                  temp[h] = weight[index_w][v] * values[index_v][v];
+                else
+                  temp[h] += weight[index_w][v] * values[index_v][v];
+              }
+
+          // copy result back
+          for (unsigned int k = 0; k < points; ++k)
+            values[p + k * stride + stride2 * g][v] = temp[k];
+        }
+    }
+
+    template <int fe_degree_, unsigned int direction, bool transpose>
+    static void
+    interpolate_3D_edge(const unsigned int p,
+                        const unsigned int fe_degree,
+                        bool               type,
+                        const unsigned int v,
+                        const Number *     weight,
+                        Number *           values)
+    {
+      if (type)
+        interpolate_3D_edge<fe_degree_, direction, transpose, true>(
+          p, fe_degree, v, weight, values);
+      else
+        interpolate_3D_edge<fe_degree_, direction, transpose, false>(
+          p, fe_degree, v, weight, values);
+    }
+
+    template <int fe_degree_, unsigned int direction, bool transpose, bool type>
+    static void
+    interpolate_3D_edge(const unsigned int p,
+                        const unsigned int fe_degree,
+                        const unsigned int v,
+                        const Number *     weight,
+                        Number *           values)
+    {
+      typename Number::value_type temp[10 /*TODO*/];
+
+      const unsigned int points =
+        (fe_degree_ != -1 ? fe_degree_ : fe_degree) + 1;
+      const unsigned int stride = Utilities::pow(points, direction);
+
+      // perform interpolation point by point
+      for (unsigned int h = 0; h < points; ++h)
+        for (unsigned int k = 0; k < points; ++k)
+          {
+            const unsigned int index_v = p + k * stride;
+            const unsigned int index_w =
+              ((transpose ? 1 : points) * (type ? h : (points - 1 - h))) +
+              ((transpose ? points : 1) * (type ? k : (points - 1 - k)));
+            if (k == 0)
+              temp[h] = weight[index_w][v] * values[index_v][v];
+            else
+              temp[h] += weight[index_w][v] * values[index_v][v];
+          }
+
+      // copy result back
+      for (unsigned int k = 0; k < points; ++k)
+        values[p + k * stride][v] = temp[k];
+    }
+
+    template <int fe_degree_, bool transpose>
+    static void
+    run_internal(
+      const unsigned int                              n_desired_components,
+      const FEEvaluationBaseData<dim,
+                                 typename Number::value_type,
+                                 is_face,
+                                 Number> &            fe_eval,
+      const std::array<unsigned int, Number::size()> &constraint_mask,
+      Number *                                        values)
+    {
+      const Number *weights = fe_eval.get_shape_info()
+                                .data.front()
+                                .subface_interpolation_matrix.data();
+
+      const unsigned int fe_degree =
+        fe_degree_ != -1 ? fe_degree_ :
+                           fe_eval.get_shape_info().data.front().fe_degree;
+
+      const auto is_set = [](const unsigned int a, const unsigned int b) {
+        return (a & b) == b;
+      };
+
+      const auto not_set = [](const unsigned int a, const unsigned int b) {
+        return (a & b) == 0;
+      };
+
+      const unsigned int points = fe_degree + 1;
+
+      for (unsigned int c = 0; c < n_desired_components; ++c)
+        {
+          for (unsigned int v = 0; v < Number::size(); ++v)
+            {
+              if (constraint_mask[v] == 0)
+                continue;
+
+              const auto mask = constraint_mask[v];
+
+              if (dim == 2) // 2D: only faces
+                {
+                  // direction 0:
+                  if (mask & MatrixFreeFunctions::ConstraintTypes::face_y)
+                    {
+                      const bool not_flipped =
+                        mask & MatrixFreeFunctions::ConstraintTypes::type_x;
+                      if (is_set(mask,
+                                 MatrixFreeFunctions::ConstraintTypes::type_y))
+                        interpolate_2D<fe_degree_, 2, transpose>(
+                          fe_degree, not_flipped, v, weights, values); // face 2
+                      else
+                        interpolate_2D<fe_degree_, 3, transpose>(
+                          fe_degree, not_flipped, v, weights, values); // face 3
+                    }
+
+                  // direction 1:
+                  if (mask & MatrixFreeFunctions::ConstraintTypes::face_x)
+                    {
+                      const bool not_flipped =
+                        mask & MatrixFreeFunctions::ConstraintTypes::type_y;
+                      if (is_set(mask,
+                                 MatrixFreeFunctions::ConstraintTypes::type_x))
+                        interpolate_2D<fe_degree_, 0, transpose>(
+                          fe_degree, not_flipped, v, weights, values); // face 0
+                      else
+                        interpolate_2D<fe_degree_, 1, transpose>(
+                          fe_degree, not_flipped, v, weights, values); // face 1
+                    }
+                }
+              else if (dim == 3) // 3D faces and edges
+                {
+                  const unsigned int p0 = 0;
+                  const unsigned int p1 = points - 1;
+                  const unsigned int p2 = points * points - points;
+                  const unsigned int p3 = points * points - 1;
+                  const unsigned int p4 =
+                    points * points * points - points * points;
+                  const unsigned int p5 =
+                    points * points * points - points * points + points - 1;
+                  const unsigned int p6 = points * points * points - points;
+
+                  const bool is_face_0 =
+                    is_set(mask,
+                           MatrixFreeFunctions::ConstraintTypes::face_x) &&
+                    is_set(mask, MatrixFreeFunctions::ConstraintTypes::type_x);
+                  const bool is_face_1 =
+                    is_set(mask,
+                           MatrixFreeFunctions::ConstraintTypes::face_x) &&
+                    not_set(mask, MatrixFreeFunctions::ConstraintTypes::type_x);
+                  const bool is_face_2 =
+                    is_set(mask,
+                           MatrixFreeFunctions::ConstraintTypes::face_y) &&
+                    is_set(mask, MatrixFreeFunctions::ConstraintTypes::type_y);
+                  const bool is_face_3 =
+                    is_set(mask,
+                           MatrixFreeFunctions::ConstraintTypes::face_y) &&
+                    not_set(mask, MatrixFreeFunctions::ConstraintTypes::type_y);
+                  const bool is_face_4 =
+                    is_set(mask,
+                           MatrixFreeFunctions::ConstraintTypes::face_z) &&
+                    is_set(mask, MatrixFreeFunctions::ConstraintTypes::type_z);
+                  const bool is_face_5 =
+                    is_set(mask,
+                           MatrixFreeFunctions::ConstraintTypes::face_z) &&
+                    not_set(mask, MatrixFreeFunctions::ConstraintTypes::type_z);
+
+                  const bool is_edge_2 =
+                    is_set(mask,
+                           MatrixFreeFunctions::ConstraintTypes::edge_yz) &&
+                    is_set(mask,
+                           MatrixFreeFunctions::ConstraintTypes::type_y) &&
+                    is_set(mask, MatrixFreeFunctions::ConstraintTypes::type_z);
+                  const bool is_edge_3 =
+                    is_set(mask,
+                           MatrixFreeFunctions::ConstraintTypes::edge_yz) &&
+                    not_set(mask,
+                            MatrixFreeFunctions::ConstraintTypes::type_y) &&
+                    is_set(mask, MatrixFreeFunctions::ConstraintTypes::type_z);
+                  const bool is_edge_6 =
+                    is_set(mask,
+                           MatrixFreeFunctions::ConstraintTypes::edge_yz) &&
+                    is_set(mask,
+                           MatrixFreeFunctions::ConstraintTypes::type_y) &&
+                    not_set(mask, MatrixFreeFunctions::ConstraintTypes::type_z);
+                  const bool is_edge_7 =
+                    is_set(mask,
+                           MatrixFreeFunctions::ConstraintTypes::edge_yz) &&
+                    not_set(mask,
+                            MatrixFreeFunctions::ConstraintTypes::type_y) &&
+                    not_set(mask, MatrixFreeFunctions::ConstraintTypes::type_z);
+
+                  const bool is_edge_0 =
+                    is_set(mask,
+                           MatrixFreeFunctions::ConstraintTypes::edge_zx) &&
+                    is_set(mask,
+                           MatrixFreeFunctions::ConstraintTypes::type_x) &&
+                    is_set(mask, MatrixFreeFunctions::ConstraintTypes::type_z);
+                  const bool is_edge_1 =
+                    is_set(mask,
+                           MatrixFreeFunctions::ConstraintTypes::edge_zx) &&
+                    not_set(mask,
+                            MatrixFreeFunctions::ConstraintTypes::type_x) &&
+                    is_set(mask, MatrixFreeFunctions::ConstraintTypes::type_z);
+                  const bool is_edge_4 =
+                    is_set(mask,
+                           MatrixFreeFunctions::ConstraintTypes::edge_zx) &&
+                    is_set(mask,
+                           MatrixFreeFunctions::ConstraintTypes::type_x) &&
+                    not_set(mask, MatrixFreeFunctions::ConstraintTypes::type_z);
+                  const bool is_edge_5 =
+                    is_set(mask,
+                           MatrixFreeFunctions::ConstraintTypes::edge_zx) &&
+                    not_set(mask,
+                            MatrixFreeFunctions::ConstraintTypes::type_x) &&
+                    not_set(mask, MatrixFreeFunctions::ConstraintTypes::type_z);
+
+                  const bool is_edge_8 =
+                    is_set(mask,
+                           MatrixFreeFunctions::ConstraintTypes::edge_xy) &&
+                    is_set(mask,
+                           MatrixFreeFunctions::ConstraintTypes::type_x) &&
+                    is_set(mask, MatrixFreeFunctions::ConstraintTypes::type_y);
+                  const bool is_edge_9 =
+                    is_set(mask,
+                           MatrixFreeFunctions::ConstraintTypes::edge_xy) &&
+                    not_set(mask,
+                            MatrixFreeFunctions::ConstraintTypes::type_x) &&
+                    is_set(mask, MatrixFreeFunctions::ConstraintTypes::type_y);
+                  const bool is_edge_10 =
+                    is_set(mask,
+                           MatrixFreeFunctions::ConstraintTypes::edge_xy) &&
+                    is_set(mask,
+                           MatrixFreeFunctions::ConstraintTypes::type_x) &&
+                    not_set(mask, MatrixFreeFunctions::ConstraintTypes::type_y);
+                  const bool is_edge_11 =
+                    is_set(mask,
+                           MatrixFreeFunctions::ConstraintTypes::edge_xy) &&
+                    not_set(mask,
+                            MatrixFreeFunctions::ConstraintTypes::type_x) &&
+                    not_set(mask, MatrixFreeFunctions::ConstraintTypes::type_y);
+
+                  // direction 0:
+                  {
+                    const bool not_flipped =
+                      mask & MatrixFreeFunctions::ConstraintTypes::type_x;
+
+                    // ... faces
+                    if (is_face_2)
+                      interpolate_3D_face<fe_degree_, 0, 2, transpose>(
+                        p0,
+                        fe_degree,
+                        not_flipped,
+                        v,
+                        weights,
+                        values); // face 2
+                    else if (is_face_3)
+                      interpolate_3D_face<fe_degree_, 0, 3, transpose>(
+                        p2,
+                        fe_degree,
+                        not_flipped,
+                        v,
+                        weights,
+                        values); // face 3
+                    if (is_face_4)
+                      interpolate_3D_face<fe_degree_, 0, 4, transpose>(
+                        p0,
+                        fe_degree,
+                        not_flipped,
+                        v,
+                        weights,
+                        values); // face 4
+                    else if (is_face_5)
+                      interpolate_3D_face<fe_degree_, 0, 5, transpose>(
+                        p4,
+                        fe_degree,
+                        not_flipped,
+                        v,
+                        weights,
+                        values); // face 5
+
+                    // ... edges
+                    if (is_face_2 || is_face_4 || is_edge_2)
+                      interpolate_3D_edge<fe_degree_, 0, transpose>(
+                        p0,
+                        fe_degree,
+                        not_flipped,
+                        v,
+                        weights,
+                        values); // edge 2
+                    if (is_face_3 || is_face_4 || is_edge_3)
+                      interpolate_3D_edge<fe_degree_, 0, transpose>(
+                        p2,
+                        fe_degree,
+                        not_flipped,
+                        v,
+                        weights,
+                        values); // edge 3
+                    if (is_face_2 || is_face_5 || is_edge_6)
+                      interpolate_3D_edge<fe_degree_, 0, transpose>(
+                        p4,
+                        fe_degree,
+                        not_flipped,
+                        v,
+                        weights,
+                        values); // edge 6
+                    if (is_face_3 || is_face_5 || is_edge_7)
+                      interpolate_3D_edge<fe_degree_, 0, transpose>(
+                        p6,
+                        fe_degree,
+                        not_flipped,
+                        v,
+                        weights,
+                        values); // edge 7
+                  }
+
+                  // direction 1:
+                  {
+                    const bool not_flipped =
+                      mask & MatrixFreeFunctions::ConstraintTypes::type_y;
+
+                    // ... faces
+                    if (is_face_0)
+                      interpolate_3D_face<fe_degree_, 1, 0, transpose>(
+                        p0,
+                        fe_degree,
+                        not_flipped,
+                        v,
+                        weights,
+                        values); // face 0
+                    else if (is_face_1)
+                      interpolate_3D_face<fe_degree_, 1, 1, transpose>(
+                        p1,
+                        fe_degree,
+                        not_flipped,
+                        v,
+                        weights,
+                        values); // face 1
+                    if (is_face_4)
+                      interpolate_3D_face<fe_degree_, 1, 4, transpose>(
+                        p0,
+                        fe_degree,
+                        not_flipped,
+                        v,
+                        weights,
+                        values); // face 4
+                    else if (is_face_5)
+                      interpolate_3D_face<fe_degree_, 1, 5, transpose>(
+                        p4,
+                        fe_degree,
+                        not_flipped,
+                        v,
+                        weights,
+                        values); // face 5
+
+                    // ... edges
+                    if (is_face_0 || is_face_4 || is_edge_0)
+                      interpolate_3D_edge<fe_degree_, 1, transpose>(
+                        p0,
+                        fe_degree,
+                        not_flipped,
+                        v,
+                        weights,
+                        values); // edge 0
+                    if (is_face_1 || is_face_4 || is_edge_1)
+                      interpolate_3D_edge<fe_degree_, 1, transpose>(
+                        p1,
+                        fe_degree,
+                        not_flipped,
+                        v,
+                        weights,
+                        values); // edge 1
+                    if (is_face_0 || is_face_5 || is_edge_4)
+                      interpolate_3D_edge<fe_degree_, 1, transpose>(
+                        p4,
+                        fe_degree,
+                        not_flipped,
+                        v,
+                        weights,
+                        values); // edge 4
+                    if (is_face_1 || is_face_5 || is_edge_5)
+                      interpolate_3D_edge<fe_degree_, 1, transpose>(
+                        p5,
+                        fe_degree,
+                        not_flipped,
+                        v,
+                        weights,
+                        values); // edge 5
+                  }
+
+                  // direction 2:
+                  {
+                    const bool not_flipped =
+                      mask & MatrixFreeFunctions::ConstraintTypes::type_z;
+
+                    // ... faces
+                    if (is_face_0)
+                      interpolate_3D_face<fe_degree_, 2, 0, transpose>(
+                        p0,
+                        fe_degree,
+                        not_flipped,
+                        v,
+                        weights,
+                        values); // face 0
+                    else if (is_face_1)
+                      interpolate_3D_face<fe_degree_, 2, 1, transpose>(
+                        p1,
+                        fe_degree,
+                        not_flipped,
+                        v,
+                        weights,
+                        values); // face 1
+                    if (is_face_2)
+                      interpolate_3D_face<fe_degree_, 2, 2, transpose>(
+                        p0,
+                        fe_degree,
+                        not_flipped,
+                        v,
+                        weights,
+                        values); // face 2
+                    else if (is_face_3)
+                      interpolate_3D_face<fe_degree_, 2, 3, transpose>(
+                        p2,
+                        fe_degree,
+                        not_flipped,
+                        v,
+                        weights,
+                        values); // face 3
+
+                    // ... edges
+                    if (is_face_0 || is_face_2 || is_edge_8)
+                      interpolate_3D_edge<fe_degree_, 2, transpose>(
+                        p0,
+                        fe_degree,
+                        not_flipped,
+                        v,
+                        weights,
+                        values); // edge 8
+                    if (is_face_1 || is_face_2 || is_edge_9)
+                      interpolate_3D_edge<fe_degree_, 2, transpose>(
+                        p1,
+                        fe_degree,
+                        not_flipped,
+                        v,
+                        weights,
+                        values); // edge 9
+                    if (is_face_0 || is_face_3 || is_edge_10)
+                      interpolate_3D_edge<fe_degree_, 2, transpose>(
+                        p2,
+                        fe_degree,
+                        not_flipped,
+                        v,
+                        weights,
+                        values); // edge 10
+                    if (is_face_1 || is_face_3 || is_edge_11)
+                      interpolate_3D_edge<fe_degree_, 2, transpose>(
+                        p3,
+                        fe_degree,
+                        not_flipped,
+                        v,
+                        weights,
+                        values); // edge 11
+                  }
+                }
+              else
+                {
+                  Assert(false, ExcNotImplemented());
+                }
+            }
+
+          values += fe_eval.get_shape_info().dofs_per_component_on_cell;
+        }
+    }
+  };
+
 
 } // end of namespace internal
 

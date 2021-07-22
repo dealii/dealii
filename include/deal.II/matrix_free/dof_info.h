@@ -41,6 +41,17 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+#ifndef DOXYGEN
+namespace internal
+{
+  namespace MatrixFreeFunctions
+  {
+    template <int dim>
+    class HangingNodes;
+  }
+} // namespace internal
+#endif
+
 namespace internal
 {
   namespace MatrixFreeFunctions
@@ -197,10 +208,24 @@ namespace internal
       read_dof_indices(
         const std::vector<types::global_dof_index> &local_indices_resolved,
         const std::vector<types::global_dof_index> &local_indices,
+        const bool                                  cell_has_hanging_nodes,
         const dealii::AffineConstraints<number> &   constraints,
         const unsigned int                          cell_number,
         ConstraintValues<double> &                  constraint_values,
         bool &                                      cell_at_boundary);
+
+      /**
+       * For a given cell, determine if it has hanging node constraints. If yes,
+       * adjust the dof indices, store the mask, and return true as indication.
+       */
+      template <int dim>
+      bool
+      process_hanging_node_constraints(
+        const HangingNodes<dim> &        hanging_nodes,
+        const std::vector<unsigned int> &lexicographic_mapping,
+        const unsigned int               cell_number,
+        const TriaIterator<DoFCellAccessor<dim, dim, false>> &cell,
+        std::vector<types::global_dof_index> &                dof_indices);
 
       /**
        * This method assigns the correct indices to ghost indices from the

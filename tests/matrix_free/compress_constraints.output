@@ -1,5 +1,5 @@
 
 DEAL:2d::Number of hanging nodes: 2211
-DEAL:2d::Number of different constraint weights: 4
+DEAL:2d::Number of different constraint weights: 1
 DEAL:3d::Number of hanging nodes: 9295
-DEAL:3d::Number of different constraint weights: 10
+DEAL:3d::Number of different constraint weights: 1
