@@ -128,7 +128,7 @@ public:
       deallog << error_local_2 << std::endl;
     }
 
-    Assert(std::abs(error_local_1 - error_local_2) < 1e-10, ExcInternalError());
+    Assert(std::abs(error_local_1 - error_local_2) < 1e-7, ExcInternalError());
 
     if (test_matrix)
       {
@@ -189,7 +189,7 @@ public:
       deallog << diagonal_global_reference.l2_norm() << std::endl;
     }
 
-    Assert(std::abs(error_local_1 - error_global) < 1e-10, ExcInternalError());
+    Assert(std::abs(error_local_1 - error_global) < 1e-7, ExcInternalError());
 
     if (test_matrix)
       {
