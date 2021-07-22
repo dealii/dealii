@@ -395,6 +395,16 @@ MGLevelGlobalTransfer<VectorType>::assert_built(
 /* --------- MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector> -------
  */
 
+
+template <typename Number>
+MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::
+  MGLevelGlobalTransfer(
+    const std::function<void(const unsigned int,
+                             LinearAlgebra::distributed::Vector<Number> &)>
+      &initialize_dof_vector)
+  : initialize_dof_vector(initialize_dof_vector)
+{}
+
 template <typename Number>
 template <int dim, typename Number2, int spacedim>
 void
@@ -438,14 +448,15 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::copy_to_mg(
         // In case a ghosted level vector has been initialized, we can simply
         // use that as a template for the vector partitioning. If not, we
         // resort to the locally owned range of the dof handler.
-        if (level <= ghosted_level_vector.max_level() &&
-            ghosted_level_vector[level].size() == dof_handler.n_dofs(level))
+        if (initialize_dof_vector)
+          initialize_dof_vector(level, dst[level]);
+        else if (level <= ghosted_level_vector.max_level() &&
+                 ghosted_level_vector[level].size() ==
+                   dof_handler.n_dofs(level))
           dst[level].reinit(ghosted_level_vector[level], false);
         else
-          {
-            dst[level].reinit(dof_handler.locally_owned_mg_dofs(level),
-                              dof_handler.get_communicator());
-          }
+          dst[level].reinit(dof_handler.locally_owned_mg_dofs(level),
+                            dof_handler.get_communicator());
       }
     else if ((perform_plain_copy == false &&
               perform_renumbered_plain_copy == false) ||

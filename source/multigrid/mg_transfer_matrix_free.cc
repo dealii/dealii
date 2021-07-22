@@ -40,8 +40,13 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template <int dim, typename Number>
-MGTransferMatrixFree<dim, Number>::MGTransferMatrixFree()
-  : fe_degree(0)
+MGTransferMatrixFree<dim, Number>::MGTransferMatrixFree(
+  const std::function<void(const unsigned int,
+                           LinearAlgebra::distributed::Vector<Number> &)>
+    &initialize_dof_vector)
+  : MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>(
+      initialize_dof_vector)
+  , fe_degree(0)
   , element_is_continuous(false)
   , n_components(0)
   , n_child_cell_dofs(0)
@@ -51,8 +56,13 @@ MGTransferMatrixFree<dim, Number>::MGTransferMatrixFree()
 
 template <int dim, typename Number>
 MGTransferMatrixFree<dim, Number>::MGTransferMatrixFree(
-  const MGConstrainedDoFs &mg_c)
-  : fe_degree(0)
+  const MGConstrainedDoFs &mg_c,
+  const std::function<void(const unsigned int,
+                           LinearAlgebra::distributed::Vector<Number> &)>
+    &initialize_dof_vector)
+  : MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>(
+      initialize_dof_vector)
+  , fe_degree(0)
   , element_is_continuous(false)
   , n_components(0)
   , n_child_cell_dofs(0)

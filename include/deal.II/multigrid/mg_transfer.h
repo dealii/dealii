@@ -414,6 +414,14 @@ class MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>
 {
 public:
   /**
+   * Constructor.
+   */
+  MGLevelGlobalTransfer(
+    const std::function<void(const unsigned int,
+                             LinearAlgebra::distributed::Vector<Number> &)>
+      &initialize_dof_vector = {});
+
+  /**
    * Reset the object to the state it had right after the default constructor.
    */
   void
@@ -618,6 +626,13 @@ private:
   template <int dim, int spacedim>
   void
   assert_built(const DoFHandler<dim, spacedim> &dof_handler) const;
+
+  /**
+   * Function to initialize internal level vectors.
+   */
+  const std::function<void(const unsigned int,
+                           LinearAlgebra::distributed::Vector<Number> &)>
+    initialize_dof_vector;
 };
 
 
