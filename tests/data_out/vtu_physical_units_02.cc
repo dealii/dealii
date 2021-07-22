@@ -53,10 +53,11 @@ check(DataOutBase::VtkFlags flags, std::ostream &out)
                unsigned int,
                std::string,
                DataComponentInterpretation::DataComponentInterpretation>>
-    vectors{{1,
+    vectors(1,
+            {1,
              1 + dim - 1,
              "v",
-             DataComponentInterpretation::component_is_part_of_vector}};
+             DataComponentInterpretation::component_is_part_of_vector});
   DataOutBase::write_vtu(patches, names, vectors, flags, out);
 }
 
