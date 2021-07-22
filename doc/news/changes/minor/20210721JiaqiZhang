@@ -1,0 +1,4 @@
+New: The new function TableBase::clear() allows to 
+empty a Table object.
+<br>
+(Jiaqi Zhang, 2021/07/21)
