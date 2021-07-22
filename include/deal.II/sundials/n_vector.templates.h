@@ -363,7 +363,8 @@ SUNDIALS::internal::unwrap_nvector(N_Vector v)
 {
   Assert(v != nullptr, ExcInternalError());
   Assert(v->content != nullptr, ExcInternalError());
-  auto *pContent = reinterpret_cast<NVectorContent<VectorType> *>(v->content);
+  NVectorContent<VectorType> *pContent =
+    reinterpret_cast<NVectorContent<VectorType> *>(v->content);
   return pContent->get();
 }
 
@@ -375,7 +376,7 @@ SUNDIALS::internal::unwrap_nvector_const(N_Vector v)
 {
   Assert(v != nullptr, ExcInternalError());
   Assert(v->content != nullptr, ExcInternalError());
-  auto *pContent =
+  const NVectorContent<VectorType> *pContent =
     reinterpret_cast<const NVectorContent<VectorType> *>(v->content);
   return pContent->get();
 }
@@ -939,34 +940,34 @@ SUNDIALS::internal::create_empty_nvector()
   Assert(v != nullptr, ExcInternalError());
 
   /* constructors, destructors, and utility operations */
-  v->ops->nvgetvectorid = NVectorOperations::get_vector_id;
-  v->ops->nvclone       = NVectorOperations::clone<VectorType>;
-  v->ops->nvcloneempty  = NVectorOperations::clone_empty;
-  v->ops->nvdestroy     = NVectorOperations::destroy<VectorType>;
+  v->ops->nvgetvectorid = &NVectorOperations::get_vector_id;
+  v->ops->nvclone       = &NVectorOperations::clone<VectorType>;
+  v->ops->nvcloneempty  = &NVectorOperations::clone_empty;
+  v->ops->nvdestroy     = &NVectorOperations::destroy<VectorType>;
   //  v->ops->nvspace           = undef;
 #  if DEAL_II_SUNDIALS_VERSION_GTE(5, 0, 0)
   v->ops->nvgetcommunicator =
     NVectorOperations::get_communicator_as_void_ptr<VectorType>;
-  v->ops->nvgetlength = NVectorOperations::get_global_length<VectorType>;
+  v->ops->nvgetlength = &NVectorOperations::get_global_length<VectorType>;
 #  endif
 
   /* standard vector operations */
-  v->ops->nvlinearsum = NVectorOperations::linear_sum<VectorType>;
-  v->ops->nvconst     = NVectorOperations::set_constant<VectorType>;
-  v->ops->nvprod      = NVectorOperations::elementwise_product<VectorType>;
-  v->ops->nvdiv       = NVectorOperations::elementwise_div<VectorType>;
-  v->ops->nvscale     = NVectorOperations::scale<VectorType>;
-  v->ops->nvabs       = NVectorOperations::elementwise_abs<VectorType>;
-  v->ops->nvinv       = NVectorOperations::elementwise_inv<VectorType>;
-  v->ops->nvaddconst  = NVectorOperations::add_constant<VectorType>;
-  v->ops->nvdotprod   = NVectorOperations::dot_product<VectorType>;
-  v->ops->nvmaxnorm   = NVectorOperations::max_norm<VectorType>;
-  v->ops->nvwrmsnorm  = NVectorOperations::weighted_rms_norm<VectorType>;
-  v->ops->nvmin       = NVectorOperations::min_element<VectorType>;
-  v->ops->nvwl2norm   = NVectorOperations::weighted_l2_norm<VectorType>;
-  v->ops->nvl1norm    = NVectorOperations::l1_norm<VectorType>;
+  v->ops->nvlinearsum = &NVectorOperations::linear_sum<VectorType>;
+  v->ops->nvconst     = &NVectorOperations::set_constant<VectorType>;
+  v->ops->nvprod      = &NVectorOperations::elementwise_product<VectorType>;
+  v->ops->nvdiv       = &NVectorOperations::elementwise_div<VectorType>;
+  v->ops->nvscale     = &NVectorOperations::scale<VectorType>;
+  v->ops->nvabs       = &NVectorOperations::elementwise_abs<VectorType>;
+  v->ops->nvinv       = &NVectorOperations::elementwise_inv<VectorType>;
+  v->ops->nvaddconst  = &NVectorOperations::add_constant<VectorType>;
+  v->ops->nvdotprod   = &NVectorOperations::dot_product<VectorType>;
+  v->ops->nvmaxnorm   = &NVectorOperations::max_norm<VectorType>;
+  v->ops->nvwrmsnorm  = &NVectorOperations::weighted_rms_norm<VectorType>;
+  v->ops->nvmin       = &NVectorOperations::min_element<VectorType>;
+  v->ops->nvwl2norm   = &NVectorOperations::weighted_l2_norm<VectorType>;
+  v->ops->nvl1norm    = &NVectorOperations::l1_norm<VectorType>;
   v->ops->nvwrmsnormmask =
-    NVectorOperations::weighted_rms_norm_mask<VectorType>;
+    &NVectorOperations::weighted_rms_norm_mask<VectorType>;
   //  v->ops->nvcompare      = undef;
   //  v->ops->nvinvtest      = undef;
   //  v->ops->nvconstrmask   = undef;
@@ -984,7 +985,7 @@ SUNDIALS::internal::create_empty_nvector()
   //  v->ops->nvminquotientlocal = undef;
   //  v->ops->nvwsqrsumlocal     = undef;
   //  v->ops->nvwsqrsummasklocal = undef;
-  return (v);
+  return v;
 }
 
 DEAL_II_NAMESPACE_CLOSE
