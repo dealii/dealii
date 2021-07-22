@@ -115,6 +115,7 @@ main()
 
   PolarManifold<2> polar_manifold(Point<2>(0.2, 0.2));
   result_2.set_manifold(polar_id, polar_manifold);
+  result_2.set_manifold(tfi_id, FlatManifold<2>());
   TransfiniteInterpolationManifold<2> inner_manifold;
   inner_manifold.initialize(result_2);
   result_2.set_manifold(tfi_id, inner_manifold);

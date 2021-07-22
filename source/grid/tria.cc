@@ -11345,7 +11345,10 @@ Triangulation<dim, spacedim>::reset_manifold(const types::manifold_id m_number)
   AssertIndexRange(m_number, numbers::flat_manifold_id);
 
   // delete the entry located at number.
-  manifold.erase(m_number);
+  manifold[m_number] =
+    internal::TriangulationImplementation::get_default_flat_manifold<dim,
+                                                                     spacedim>()
+      .clone();
 }
 
 
@@ -11353,7 +11356,10 @@ template <int dim, int spacedim>
 void
 Triangulation<dim, spacedim>::reset_all_manifolds()
 {
-  manifold.clear();
+  for (auto &m : manifold)
+    m.second = internal::TriangulationImplementation::
+                 get_default_flat_manifold<dim, spacedim>()
+                   .clone();
 }
 
 
@@ -11435,6 +11441,11 @@ const Manifold<dim, spacedim> &
 Triangulation<dim, spacedim>::get_manifold(
   const types::manifold_id m_number) const
 {
+  // check if flat manifold has been queried
+  if (m_number == numbers::flat_manifold_id)
+    return internal::TriangulationImplementation::
+      get_default_flat_manifold<dim, spacedim>();
+
   // look, if there is a manifold stored at
   // manifold_id number.
   const auto it = manifold.find(m_number);
@@ -11445,10 +11456,15 @@ Triangulation<dim, spacedim>::get_manifold(
       return *(it->second);
     }
 
-  // if we have not found an entry connected with number, we return
-  // the default (flat) manifold
+  Assert(
+    false,
+    ExcMessage(
+      "No manifold of the manifold id " + std::to_string(m_number) +
+      " has been attached to the triangulation. "
+      "Please attach the right manifold with Triangulation::set_manifold()."));
+
   return internal::TriangulationImplementation::
-    get_default_flat_manifold<dim, spacedim>();
+    get_default_flat_manifold<dim, spacedim>(); // never reached
 }
 
 

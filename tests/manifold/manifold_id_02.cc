@@ -48,6 +48,8 @@ test(unsigned int ref = 1)
   typename Triangulation<dim, spacedim>::active_cell_iterator cell;
 
   tria.begin_active()->set_all_manifold_ids(1);
+  tria.set_manifold(1, FlatManifold<dim, spacedim>());
+
   tria.refine_global(ref);
 
   for (cell = tria.begin_active(); cell != tria.end(); ++cell)

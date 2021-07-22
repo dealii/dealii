@@ -25,6 +25,7 @@
 #include <deal.II/fe/mapping_fe.h>
 
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
@@ -46,6 +47,7 @@ void make_grid(Triangulation<2> &triangulation)
 
   GridGenerator::convert_hypercube_to_simplex_mesh(triangulation_temp,
                                                    triangulation);
+  triangulation.set_manifold(0, FlatManifold<2>());
 }
 
 int

@@ -163,6 +163,7 @@ void create_triangulation(Triangulation<2> &tria)
       if (Point<2>(X_C, Y_C).distance(cell->center()) <= R_2)
         cell->set_all_manifold_ids(MANIFOLD_ID);
     }
+  tria.set_manifold(MANIFOLD_ID, FlatManifold<2>());
 }
 
 void create_triangulation(Triangulation<3> &tria)
@@ -180,6 +181,8 @@ void create_triangulation(Triangulation<3> &tria)
       if (Point<3>(X_C, Y_C, cell->center()[2]).distance(cell->center()) <= R_2)
         cell->set_all_manifold_ids(MANIFOLD_ID);
     }
+  tria.set_manifold(0, FlatManifold<3>());
+  tria.set_manifold(MANIFOLD_ID, FlatManifold<3>());
 }
 
 template <int dim>

@@ -28,8 +28,14 @@ template <int dim>
 void
 print_tria_info(const Triangulation<dim> &tria)
 {
+  const std::vector<types::manifold_id> bids =
+    tria.n_active_cells() == 0 ? std::vector<types::manifold_id>() :
+                                 tria.get_manifold_ids();
+
   const bool manifold_0_is_flat =
+    (std::find(bids.begin(), bids.end(), 0) == bids.end()) ||
     dynamic_cast<const FlatManifold<dim> *>(&tria.get_manifold(0)) != nullptr;
+
   deallog << (tria.n_active_cells() != 0) << ", " << (tria.n_active_hexs() != 0)
           << ", " << (tria.n_active_quads() != 0) << ", "
           << (tria.n_active_lines() != 0) << ", " << (tria.n_levels() != 0)

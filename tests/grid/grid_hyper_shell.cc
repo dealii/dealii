@@ -47,6 +47,10 @@ check(double r1, double r2, unsigned int n)
   tria.reset_manifold(0);
   tria.set_all_manifold_ids(numbers::flat_manifold_id);
   GridTools::copy_boundary_to_manifold_id(tria);
+
+  for (const auto bid : tria.get_boundary_ids())
+    tria.set_manifold(bid, FlatManifold<dim>());
+
   if (dim == 3)
     for (typename Triangulation<dim>::active_cell_iterator c =
            tria.begin_active();

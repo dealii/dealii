@@ -18,6 +18,7 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/manifold.h>
 #include <deal.II/grid/tria.h>
 
 #include "../tests.h"
@@ -37,6 +38,10 @@ void setup_tria(Triangulation<1> &tria)
   for (auto &cell : tria.active_cell_iterators())
     cell->set_manifold_id(
       static_cast<types::material_id>(10.0 * (2.0 + cell->center()[0])));
+
+  for (const auto bid : tria.get_manifold_ids())
+    if (bid != numbers::flat_manifold_id)
+      tria.set_manifold(bid, FlatManifold<1>());
 }
 
 
@@ -70,6 +75,10 @@ setup_tria(Triangulation<dim> &tria)
         cell->set_manifold_id(
           static_cast<types::material_id>(361 - angle * 180.0 / numbers::PI));
       }
+
+  for (const auto bid : tria.get_manifold_ids())
+    if (bid != numbers::flat_manifold_id)
+      tria.set_manifold(bid, FlatManifold<dim>());
 }
 
 
@@ -91,6 +100,10 @@ test()
     Triangulation<dim> tria_2;
     tria_2.create_triangulation(vertices, cells, subcell_data);
     Assert(GridTools::have_same_coarse_mesh(tria, tria_2), ExcInternalError());
+
+    for (const auto bid : tria_2.get_manifold_ids())
+      if (bid != numbers::flat_manifold_id)
+        tria_2.set_manifold(bid, FlatManifold<dim>());
 
     GridOut grid_out;
     deallog << "Original Triangulation:" << std::endl;
