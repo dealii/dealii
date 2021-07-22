@@ -2,6 +2,7 @@
 
 #include "error.hpp"
 #include "../declarations.hpp"
+#include "../utility/iterator.hpp"
 #include "../utility/object_pool.hpp"
 #include "../utility/traits.hpp"
 #include "../utility/passive_vector.hpp"
@@ -51,6 +52,8 @@ class Graph {
     Graph& operator = (Graph&&);
     
     void clear();
+    void clear_detached();
+    void merge(Graph&&);
 
     bool empty() const;
 
@@ -72,7 +75,8 @@ class Graph {
 
 // Class: Node
 class Node {
-
+  
+  friend class Graph;
   friend class Task;
   friend class TaskView;
   friend class Topology;
@@ -84,7 +88,8 @@ class Node {
   TF_ENABLE_POOLABLE_ON_THIS;
 
   // state bit flag
-  constexpr static int BRANCH  = 0x1;
+  constexpr static int BRANCHED = 0x1;
+  constexpr static int DETACHED = 0x2;
   
   // static work handle
   struct StaticWork {
@@ -122,6 +127,15 @@ class Node {
 
     Taskflow* module {nullptr};
   };
+
+  // Async work
+  struct AsyncWork {
+
+    template <typename T>
+    AsyncWork(T&&);
+
+    std::function<void()> work;
+  };
   
   // cudaFlow work handle
 #ifdef TF_ENABLE_CUDA
@@ -144,7 +158,8 @@ class Node {
     StaticWork,       // static tasking
     DynamicWork,      // dynamic tasking
     ConditionWork,    // conditional tasking
-    ModuleWork        // composable tasking
+    ModuleWork,       // composable tasking
+    AsyncWork         // async work
   >;
   
   public:
@@ -155,12 +170,13 @@ class Node {
   constexpr static auto DYNAMIC_WORK     = get_index_v<DynamicWork, handle_t>;
   constexpr static auto CONDITION_WORK   = get_index_v<ConditionWork, handle_t>; 
   constexpr static auto MODULE_WORK      = get_index_v<ModuleWork, handle_t>; 
+  constexpr static auto ASYNC_WORK       = get_index_v<AsyncWork, handle_t>; 
 
 #ifdef TF_ENABLE_CUDA
-  constexpr static auto CUDAFLOW_WORK  = get_index_v<cudaFlowWork, handle_t>; 
+  constexpr static auto CUDAFLOW_WORK = get_index_v<cudaFlowWork, handle_t>; 
 #endif
 
-    template <typename ...Args>
+    template <typename... Args>
     Node(Args&&... args);
 
     ~Node();
@@ -238,11 +254,20 @@ Node::ModuleWork::ModuleWork(T&& tf) : module {tf} {
 }
 
 // ----------------------------------------------------------------------------
+// Definition for Node::AsyncWork
+// ----------------------------------------------------------------------------
+    
+// Constructor
+template <typename C>
+Node::AsyncWork::AsyncWork(C&& c) : work {std::forward<C>(c)} {
+}
+
+// ----------------------------------------------------------------------------
 // Definition for Node
 // ----------------------------------------------------------------------------
 
 // Constructor
-template <typename ...Args>
+template <typename... Args>
 Node::Node(Args&&... args): _handle{std::forward<Args>(args)...} {
 } 
 
@@ -257,7 +282,7 @@ inline Node::~Node() {
     std::vector<Node*> nodes;
 
     std::move(
-     subgraph._nodes.begin(), subgraph._nodes.end(), std::back_inserter(nodes)
+      subgraph._nodes.begin(), subgraph._nodes.end(), std::back_inserter(nodes)
     );
     subgraph._nodes.clear();
 
@@ -336,6 +361,7 @@ inline Domain Node::domain() const {
     case DYNAMIC_WORK:
     case CONDITION_WORK:
     case MODULE_WORK:
+    case ASYNC_WORK:
       domain = Domain::HOST;
     break;
 
@@ -429,7 +455,7 @@ inline void Node::_set_up_join_counter() {
 
   for(auto p : _dependents) {
     if(p->_handle.index() == Node::CONDITION_WORK) {
-      _set_state(Node::BRANCH);
+      _set_state(Node::BRANCHED);
     }
     else {
       c++;
@@ -484,6 +510,28 @@ inline void Graph::clear() {
     np.recycle(node);
   }
   _nodes.clear();
+}
+
+// Procedure: clear_detached
+inline void Graph::clear_detached() {
+
+  auto mid = std::partition(_nodes.begin(), _nodes.end(), [] (Node* node) {
+    return !(node->_has_state(Node::DETACHED));
+  });
+  
+  auto& np = _node_pool();
+  for(auto itr = mid; itr != _nodes.end(); ++itr) {
+    np.recycle(*itr);
+  }
+  _nodes.resize(std::distance(_nodes.begin(), mid));
+}
+
+// Procedure: merge
+inline void Graph::merge(Graph&& g) {
+  for(auto n : g._nodes) {
+    _nodes.push_back(n);
+  }
+  g._nodes.clear();
 }
 
 // Function: size

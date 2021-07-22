@@ -9,8 +9,6 @@
 
 Taskflow helps you quickly write parallel tasks programs in modern C++
 
-:exclamation: Starting from [v2.5.0](https://github.com/taskflow/taskflow/releases/tag/2.5.0), we have renamed cpp-taskflow to ***taskflow*** to broaden its support and future application scopes. The core codebase remains *unchanged*. You may only need to [change the remote URL](https://help.github.com/en/github/using-git/changing-a-remotes-url) to this new repository. Thank your for the support!
-
 # Why Taskflow?
 
 Taskflow is faster, more expressive, and easier for drop-in integration
@@ -483,55 +481,29 @@ A.precede(B);
 B.work([](){ /* do something */ });
 ```
 
-### *parallel_for*
+### *for_each/for_each_index*
 
-The method `parallel_for` creates a subgraph that applies the callable to each item in the given range of a container.
-
-<img align="right" width="35%" src="image/parallel_for.svg">
+The method `for_each` creates a subflow to perform parallel iterations over a range of elements
+specified by `[beg, end)`.
 
 ```cpp
 auto v = {'A', 'B', 'C', 'D'};
-auto [S, T] = taskflow.parallel_for(
-  v.begin(),    // iterator to the beginning
-  v.end(),      // iterator to the end
-  [] (int i) { 
-    std::cout << "parallel " << i << '\n';
+auto t = taskflow.for_each(v.begin(), v.end(),
+  [] (char i) { 
+    std::cout << "parallel iteration on character " << i << '\n';
   }
 );
-// add dependencies via S and T.
 ```
 
-You can specify a *chunk* size (default one) in the last argument to force a task to include a certain number of items.
-
-<img align="right" width="18%" src="image/parallel_for_2.svg">
+You can also specify an *index-based* range with the given step size.
 
 ```cpp
-auto v = {'A', 'B', 'C', 'D'};
-auto [S, T] = taskflow.parallel_for(
-  v.begin(),    // iterator to the beginning
-  v.end(),      // iterator to the end
-  [] (int i) { 
-    std::cout << "AB and CD run in parallel" << '\n';
-  },
-  2  // at least two items at a time
-);
-```
-
-In addition to iterator-based construction, 
-`parallel_for` has another overload of index-based loop.
-The first three argument of this overload indicates 
-starting index, ending index (exclusive), and step size.
-
-```cpp
-// [0, 11) with a step size of 2
-auto [S, T] = taskflow.parallel_for(
-  0, 11, 2, 
+// [0, 11) with a step size of 2, i.e., 0, 2, 4, 6, 8, 10
+auto t = taskflow.for_each_index(0, 11, 2, 
   [] (int i) {
-    std::cout << "parallel_for on index " << i << std::endl;
-  }, 
-  2  // at least two items at a time
+    std::cout << "parallel iteration on index " << i << std::endl;
+  } 
 );
-// will print 0, 2, 4, 6, 8, 10 (three partitions, {0, 2}, {4, 6}, {8, 10})
 ```
 
 ## Task API
@@ -637,7 +609,7 @@ The folder `examples/` contains several examples and is a great place to learn t
 | Example |  Description |
 | ------- |  ----------- | 
 | [simple.cpp](./examples/simple.cpp) | uses basic task building blocks to create a trivial taskflow  graph |
-| [debug.cpp](./examples/debug.cpp)| inspects a taskflow through the dump method |
+| [visualization.cpp](./examples/visualization.cpp)| inspects a taskflow through the dump method |
 | [parallel_for.cpp](./examples/parallel_for.cpp)| parallelizes a for loop with unbalanced workload |
 | [subflow.cpp](./examples/subflow.cpp)| demonstrates how to create a subflow graph that spawns three dynamic tasks |
 | [run_variants.cpp](./examples/run_variants.cpp)| shows multiple ways to run a taskflow graph |
@@ -660,17 +632,15 @@ Taskflow is being used in both industry and academic projects to scale up existi
 that incorporate complex task dependencies. 
 
 - [OpenTimer][OpenTimer]: A High-performance Timing Analysis Tool for Very Large Scale Integration (VLSI) Systems
-- [DtCraft][DtCraft]: A General-purpose Distributed Programming Systems using Data-parallel Streams
-- [Firestorm][Firestorm]: Fighting Game Engine with Asynchronous Resource Loaders (developed by [ForgeMistress][ForgeMistress])
-- [Shiva][Shiva]: An extensible engine via an entity component system through scripts, DLLs, and header-only (C++)
-- [PID Framework][PID Framework]: A Global Development Methodology Supported by a CMake API and Dedicated C++ Projects 
 - [NovusCore][NovusCore]: An emulating project for World of Warraft (Wrath of the Lich King 3.3.5a 12340 client build)
 - [SA-PCB][SA-PCB]: Annealing-based Printed Circuit Board (PCB) Placement Tool
 - [LPMP](https://github.com/LPMP/LPMP): A C++ framework for developing scalable Lagrangian decomposition solvers for discrete optimization problems
-- [Heteroflow](https://github.com/Heteroflow/Heteroflow): A Modern C++ Parallel CPU-GPU Task Programming Library
 - [OpenPhySyn](https://github.com/The-OpenROAD-Project/OpenPhySyn): A plugin-based physical synthesis optimization kit as part of the OpenRoad flow
 - [OSSIA](https://ossia.io/): Open-source Software System for Interactive Applications
 - [deal.II](https://github.com/dealii/dealii): A C++ software library to support the creation of finite element code
+- [PyRepScan](https://github.com/Intsights/PyRepScan): A Git Repository Leaks Scanner Python Library written in C++
+- [MyDataModels](https://www.mydatamodels.com/): An online platform for self-service machine learning fro small data
+- [revealtech.ai](http://www.revealtech.ai/): Mobile application that provides focused, intelligent analytics on the edge
 
 [More...](https://github.com/search?q=taskflow&type=Code)
 
@@ -743,5 +713,4 @@ Taskflow is licensed under the [MIT License](./LICENSE).
 [SA-PCB]:                https://github.com/choltz95/SA-PCB
 
 [Presentation]:          https://taskflow.github.io/
-[chrome://tracing]:      chrome://tracing
 

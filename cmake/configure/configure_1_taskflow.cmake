@@ -26,19 +26,19 @@ MACRO(FEATURE_TASKFLOW_FIND_EXTERNAL var)
     SET(${var} TRUE)
   ENDIF()
 
-  IF(TASKFLOW_VERSION VERSION_LESS "2.4")
+  IF(TASKFLOW_VERSION VERSION_LESS "2.7")
     # Clear the previously determined version numbers to avoid confusion
     SET(TASKFLOW_VERSION "bundled")
     SET(TASKFLOW_VERSION_MAJOR "")
     SET(TASKFLOW_VERSION_MINOR "")
 
     MESSAGE(STATUS
-      "The externally provided Taskflow library is older than version 2.4, "
+      "The externally provided Taskflow library is older than version 2.7, "
       "which cannot be used with deal.II."
       )
     SET(TASKFLOW_ADDITIONAL_ERROR_STRING
       "The externally provided Taskflow library is older than version\n"
-      "2.4, which is the oldest version compatible with deal.II."
+      "2.7, which is the oldest version compatible with deal.II."
       )
     SET(${var} FALSE)
   ENDIF()
