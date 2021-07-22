@@ -603,6 +603,90 @@ MappingCartesian<dim, spacedim>::fill_fe_subface_values(
 
 template <int dim, int spacedim>
 void
+MappingCartesian<dim, spacedim>::fill_fe_immersed_surface_values(
+  const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+  const NonMatching::ImmersedSurfaceQuadrature<dim> &         quadrature,
+  const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
+  dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
+    &output_data) const
+{
+  Assert(dim == spacedim, ExcNotImplemented());
+
+  // Convert data object to internal data for this class. Fails with an
+  // exception if that is not possible.
+  Assert(dynamic_cast<const InternalData *>(&internal_data) != nullptr,
+         ExcInternalError());
+  const InternalData &data = static_cast<const InternalData &>(internal_data);
+
+
+  update_cell_extents(cell, CellSimilarity::none, data);
+
+  maybe_update_cell_quadrature_points(cell,
+                                      data,
+                                      output_data.quadrature_points);
+
+  if (data.update_each & update_volume_elements)
+    {
+      double det_jacobian = 1.;
+      for (unsigned int d = 0; d < dim; ++d)
+        det_jacobian *= data.cell_extents[d];
+      data.volume_element = det_jacobian;
+    }
+
+  if (data.update_each & update_jacobians)
+    for (unsigned int i = 0; i < output_data.jacobians.size(); ++i)
+      {
+        output_data.jacobians[i] = DerivativeForm<1, dim, spacedim>();
+        for (unsigned int d = 0; d < dim; ++d)
+          output_data.jacobians[i][d][d] = data.cell_extents[d];
+      }
+
+  if (data.update_each & update_inverse_jacobians)
+    for (unsigned int i = 0; i < output_data.inverse_jacobians.size(); ++i)
+      {
+        output_data.inverse_jacobians[i] = DerivativeForm<1, dim, spacedim>();
+        for (unsigned int d = 0; d < dim; ++d)
+          output_data.inverse_jacobians[i][d][d] = 1. / data.cell_extents[d];
+      }
+
+  if (data.update_each & update_normal_vectors)
+    for (unsigned int i = 0; i < output_data.normal_vectors.size(); ++i)
+      {
+        // The normals are n = J^{-T} * \hat{n} before normalizing.
+        Tensor<1, dim>        normal;
+        const Tensor<1, dim> &ref_space_normal = quadrature.normal_vector(i);
+        for (unsigned int d = 0; d < dim; ++d)
+          {
+            normal[d] = ref_space_normal[d] / data.cell_extents[d];
+          }
+        normal /= normal.norm();
+        output_data.normal_vectors[i] = normal;
+      }
+
+  if (data.update_each & update_JxW_values)
+    for (unsigned int i = 0; i < output_data.JxW_values.size(); ++i)
+      {
+        const Tensor<1, dim> &ref_space_normal = quadrature.normal_vector(i);
+
+        // J^{-T} \times \hat{n}
+        Tensor<1, dim> invJTxNormal;
+        double         det_jacobian = 1.;
+        for (unsigned int d = 0; d < dim; ++d)
+          {
+            det_jacobian *= data.cell_extents[d];
+            invJTxNormal[d] = ref_space_normal[d] / data.cell_extents[d];
+          }
+        output_data.JxW_values[i] =
+          det_jacobian * invJTxNormal.norm() * quadrature.weight(i);
+      }
+
+  maybe_update_jacobian_derivatives(data, CellSimilarity::none, output_data);
+}
+
+
+
+template <int dim, int spacedim>
+void
 MappingCartesian<dim, spacedim>::transform(
   const ArrayView<const Tensor<1, dim>> &                  input,
   const MappingKind                                        mapping_kind,

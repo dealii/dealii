@@ -93,7 +93,17 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
 #endif
   }
 
+for (deal_II_dimension : DIMENSIONS)
+  {
+    template class FEImmersedSurfaceValues<deal_II_dimension>;
+  }
 
+for (deal_II_dimension : DIMENSIONS; lda : BOOL)
+  {
+    template void FEImmersedSurfaceValues<deal_II_dimension>::reinit(
+      const TriaIterator<
+        DoFCellAccessor<deal_II_dimension, deal_II_dimension, lda>> &);
+  }
 
 for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
      deal_II_space_dimension : SPACE_DIMENSIONS)

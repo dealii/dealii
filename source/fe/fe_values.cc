@@ -5220,6 +5220,163 @@ FESubfaceValues<dim, spacedim>::do_reinit(const unsigned int face_no,
 }
 
 
+
+template <int dim>
+FEImmersedSurfaceValues<dim>::FEImmersedSurfaceValues(
+  const Mapping<dim> &                               mapping,
+  const FiniteElement<dim> &                         element,
+  const NonMatching::ImmersedSurfaceQuadrature<dim> &quadrature,
+  const UpdateFlags                                  update_flags)
+  : FEValuesBase<dim, dim>(quadrature.size(),
+                           element.dofs_per_cell,
+                           update_default,
+                           mapping,
+                           element)
+  , quadrature(quadrature)
+{
+  initialize(update_flags);
+}
+
+
+
+template <int dim>
+template <bool level_dof_access>
+void
+FEImmersedSurfaceValues<dim>::reinit(
+  const TriaIterator<DoFCellAccessor<dim, dim, level_dof_access>> &cell)
+{
+  // Assert that the finite elements passed to the constructor and used by the
+  // DoFHandler used by this cell, are the same
+  Assert(static_cast<const FiniteElementData<dim> &>(*this->fe) ==
+           static_cast<const FiniteElementData<dim> &>(cell->get_fe()),
+         (typename FEValuesBase<dim>::ExcFEDontMatch()));
+
+  this->maybe_invalidate_previous_present_cell(cell);
+  this->check_cell_similarity(cell);
+
+  reset_pointer_in_place_if_possible<
+    typename FEValuesBase<dim, dim>::template CellIterator<
+      TriaIterator<DoFCellAccessor<dim, dim, level_dof_access>>>>(
+    this->present_cell, cell);
+
+  // This was the part of the work that is dependent on the actual data type of
+  // the iterator. Now pass on to the function doing the real work.
+  do_reinit();
+}
+
+
+
+template <int dim>
+void
+FEImmersedSurfaceValues<dim>::do_reinit()
+{
+  // First call the mapping and let it generate the data specific to the
+  // mapping.
+  if (this->update_flags & update_mapping)
+    {
+      this->get_mapping().fill_fe_immersed_surface_values(*this->present_cell,
+                                                          quadrature,
+                                                          *this->mapping_data,
+                                                          this->mapping_output);
+    }
+
+  // Call the finite element and, with the data already filled by the mapping,
+  // let it compute the data for the mapped shape function values, gradients
+  // etc.
+  this->get_fe().fill_fe_values(*this->present_cell,
+                                CellSimilarity::none,
+                                this->quadrature,
+                                this->get_mapping(),
+                                *this->mapping_data,
+                                this->mapping_output,
+                                *this->fe_data,
+                                this->finite_element_output);
+}
+
+
+
+template <int dim>
+Tensor<1, dim>
+FEImmersedSurfaceValues<dim>::shape_surface_grad(
+  const unsigned int function_no,
+  const unsigned int quadrature_point) const
+{
+  const unsigned int component = 0;
+  return shape_surface_grad_component(function_no, quadrature_point, component);
+}
+
+
+
+template <int dim>
+Tensor<1, dim>
+FEImmersedSurfaceValues<dim>::shape_surface_grad_component(
+  const unsigned int function_no,
+  const unsigned int quadrature_point,
+  const unsigned int component) const
+{
+  const Tensor<1, dim> gradient =
+    this->shape_grad_component(function_no, quadrature_point, component);
+  const Tensor<1, dim> &normal = this->normal_vector(quadrature_point);
+
+  return gradient - (normal * gradient) * normal;
+}
+
+
+
+template <int dim>
+const NonMatching::ImmersedSurfaceQuadrature<dim> &
+FEImmersedSurfaceValues<dim>::get_quadrature() const
+{
+  return quadrature;
+}
+
+
+
+template <int dim>
+inline void
+FEImmersedSurfaceValues<dim>::initialize(const UpdateFlags update_flags)
+{
+  const UpdateFlags flags = this->compute_update_flags(update_flags);
+
+  // Initialize the base classes.
+  if (flags & update_mapping)
+    this->mapping_output.initialize(this->n_quadrature_points, flags);
+  this->finite_element_output.initialize(this->n_quadrature_points,
+                                         *this->fe,
+                                         flags);
+
+  // Then get objects into which the FE and the Mapping can store
+  // intermediate data used across calls to reinit. We can do this in parallel.
+  Threads::Task<
+    std::unique_ptr<typename FiniteElement<dim, dim>::InternalDataBase>>
+    fe_get_data = Threads::new_task(&FiniteElement<dim, dim>::get_data,
+                                    *this->fe,
+                                    flags,
+                                    *this->mapping,
+                                    this->quadrature,
+                                    this->finite_element_output);
+
+  Threads::Task<std::unique_ptr<typename Mapping<dim>::InternalDataBase>>
+    mapping_get_data;
+  if (flags & update_mapping)
+    mapping_get_data = Threads::new_task(&Mapping<dim>::get_data,
+                                         *this->mapping,
+                                         flags,
+                                         this->quadrature);
+
+  this->update_flags = flags;
+
+  // Then collect answers from the two task above.
+  this->fe_data = std::move(fe_get_data.return_value());
+  if (flags & update_mapping)
+    this->mapping_data = std::move(mapping_get_data.return_value());
+  else
+    this->mapping_data =
+      std::make_unique<typename Mapping<dim>::InternalDataBase>();
+}
+
+
+
 /*------------------------------- Explicit Instantiations -------------*/
 #define SPLIT_INSTANTIATIONS_COUNT 6
 #ifndef SPLIT_INSTANTIATIONS_INDEX

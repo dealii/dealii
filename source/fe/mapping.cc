@@ -84,6 +84,20 @@ Mapping<dim, spacedim>::get_bounding_box(
 
 template <int dim, int spacedim>
 void
+Mapping<dim, spacedim>::fill_fe_immersed_surface_values(
+  const typename Triangulation<dim, spacedim>::cell_iterator &,
+  const NonMatching::ImmersedSurfaceQuadrature<dim> &,
+  const typename Mapping<dim, spacedim>::InternalDataBase &,
+  dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &)
+  const
+{
+  AssertThrow(false, ExcNotImplemented());
+}
+
+
+
+template <int dim, int spacedim>
+void
 Mapping<dim, spacedim>::transform_points_real_to_unit_cell(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const ArrayView<const Point<spacedim>> &                    real_points,
