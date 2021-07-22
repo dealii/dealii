@@ -1,0 +1,29 @@
+
+DEAL:0:2D-Test:: Point search on subdivided hyper cube...
+DEAL:0:2D-Test::   Number of cells = 256
+DEAL:0:2D-Test::   Number of levels = 4
+DEAL:0:2D-Test::   Number of global levels = 4
+DEAL:0:2D-Test::   Triangulation checksum = 1754413825
+DEAL:0:2D-Test::   point = 0.230000 0.770000
+DEAL:0:2D-Test::   rank of point owner = 1
+DEAL:0:2D-Test::   >>> Reached end of test <<<
+
+DEAL:1:2D-Test:: Point search on subdivided hyper cube...
+DEAL:1:2D-Test::   Number of cells = 256
+DEAL:1:2D-Test::   Number of levels = 4
+DEAL:1:2D-Test::   Number of global levels = 4
+DEAL:1:2D-Test::   Triangulation checksum = 0
+DEAL:1:2D-Test::   point = 0.230000 0.770000
+DEAL:1:2D-Test::   rank of point owner = 1
+DEAL:1:2D-Test::   >>> Reached end of test <<<
+
+
+DEAL:2:2D-Test:: Point search on subdivided hyper cube...
+DEAL:2:2D-Test::   Number of cells = 256
+DEAL:2:2D-Test::   Number of levels = 4
+DEAL:2:2D-Test::   Number of global levels = 4
+DEAL:2:2D-Test::   Triangulation checksum = 0
+DEAL:2:2D-Test::   point = 0.230000 0.770000
+DEAL:2:2D-Test::   rank of point owner = 1
+DEAL:2:2D-Test::   >>> Reached end of test <<<
+

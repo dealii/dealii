@@ -1,0 +1,9 @@
+
+DEAL:0:3D-Test:: Point search on subdivided hyper cube...
+DEAL:0:3D-Test::   Number of cells = 4096
+DEAL:0:3D-Test::   Number of levels = 4
+DEAL:0:3D-Test::   Number of global levels = 4
+DEAL:0:3D-Test::   Triangulation checksum = 544659457
+DEAL:0:3D-Test::   point = 0.230000 0.770000 0.770000
+DEAL:0:3D-Test::   rank of point owner = 0
+DEAL:0:3D-Test::   >>> Reached end of test <<<

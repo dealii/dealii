@@ -442,6 +442,30 @@ namespace parallel
           &construction_data) override;
 
       /**
+       * Find the MPI rank of the cell that contains this point in a distributed
+       * mesh.
+       *
+       * @note This function calls the `find_point_owner_rank(const std::vector<Point<dim>> &points)`
+       */
+      unsigned int
+      find_point_owner_rank(const Point<dim> &p);
+
+      /**
+       * Find the MPI rank of the cell that contains the input points in a
+       * distributed mesh. If any point is not owned by any mesh cell its return
+       * value will be the maximum unsigned int.
+       *
+       * @note The query points do not need to be owned locally or in the ghost layer.
+       *
+       * @note The algorithm is free of communication.
+       *
+       * @param[in] points a list of query points
+       * @return list of owner ranks
+       */
+      std::vector<unsigned int>
+      find_point_owner_rank(const std::vector<Point<dim>> &points);
+
+      /**
        * Coarsen and refine the mesh according to refinement and coarsening
        * flags set.
        *
