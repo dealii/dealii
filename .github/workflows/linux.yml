@@ -150,3 +150,56 @@ jobs:
     - name: build
       run: |
         make -j 2
+
+
+  linux-debug-intel-oneapi:
+    # parallel debug build with Intel oneAPI including MPI and MKL
+
+    name: linux debug intel oneapi
+    runs-on: [ubuntu-18.04]
+
+    steps:
+    - name: modules
+      run: |
+        # Based on https://github.com/oneapi-src/oneapi-ci
+        # Setup Intel repository
+        # oneapi-ci/scripts/setup_apt_repo_linux.sh
+        wget https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS-2023.PUB
+        sudo apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS-2023.PUB
+        echo "deb https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
+        sudo apt-get update -o Dir::Etc::sourcelist="sources.list.d/oneAPI.list" -o APT::Get::List-Cleanup="0"
+        # Install Intel packages -- see https://oneapi-src.github.io/oneapi-ci/#linux-apt
+        # oneapi-ci/scripts/install_linux_apt.sh
+        sudo apt-get install -y intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic \
+                                intel-oneapi-mpi-devel \
+                                intel-oneapi-mkl-devel
+        sudo apt-get clean
+    - name: info
+      run: |
+        source /opt/intel/oneapi/setvars.sh
+        mpiicpc -v
+        cmake --version
+    - name: checkout
+      uses: actions/checkout@v2
+    - name: configure
+      run: |
+        source /opt/intel/oneapi/setvars.sh
+        cmake -D CMAKE_BUILD_TYPE=Debug \
+              -D CMAKE_CXX_COMPILER=icpc \
+              -D DEAL_II_CXX_FLAGS='-Werror' \
+              -D DEAL_II_EARLY_DEPRECATIONS=ON \
+              -D DEAL_II_WITH_MPI=ON \
+              -D DEAL_II_WITH_LAPACK=ON \
+              -D MPI_DIR=${I_MPI_ROOT} \
+              -D BLAS_DIR=${MKLROOT} \
+              -D LAPACK_DIR=${MKLROOT} \
+              .
+    - name: archive
+      uses: actions/upload-artifact@v1
+      with:
+        name: linux-intel-detailed.log
+        path: detailed.log
+    - name: build
+      run: |
+        source /opt/intel/oneapi/setvars.sh
+        make -j 2
