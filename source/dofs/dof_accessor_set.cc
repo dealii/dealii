@@ -41,6 +41,33 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+template <typename Number>
+DeclException2(ExcNonMatchingElementsSetDofValuesByInterpolation,
+               Number,
+               Number,
+               << "Called set_dof_values_by_interpolation(), but"
+               << " the element to be set, value " << std::setprecision(16)
+               << arg1 << ", does not match with the value "
+               << std::setprecision(16) << arg2 << " already set before.");
+
+namespace
+{
+  template <typename Number>
+  typename std::enable_if<
+    !std::is_unsigned<Number>::value,
+    typename numbers::NumberTraits<Number>::real_type>::type
+  get_abs(const Number a)
+  {
+    return std::abs(a);
+  }
+
+  template <typename Number>
+  typename std::enable_if<std::is_unsigned<Number>::value, Number>::type
+  get_abs(const Number a)
+  {
+    return a;
+  }
+} // namespace
 
 template <int dim, int spacedim, bool lda>
 template <class OutputVector, typename number>
@@ -64,8 +91,26 @@ DoFCellAccessor<dim, spacedim, lda>::set_dof_values_by_interpolation(
           // or that you specify the correct one
           (fe_index == this->active_fe_index()) ||
           (fe_index == DoFHandler<dim, spacedim>::invalid_fe_index))
-        // simply set the values on this cell
-        this->set_dof_values(local_values, values);
+        {
+#ifdef DEBUG
+          Vector<number> tmp(this->get_fe().n_dofs_per_cell());
+          this->get_dof_values(values, tmp);
+
+          for (unsigned int i = 0; i < this->get_fe().n_dofs_per_cell(); ++i)
+            {
+              Assert(tmp[i] == number() ||
+                       get_abs(tmp[i] - local_values[i]) <=
+                         get_abs(tmp[i] + local_values[i]) * 100000. *
+                           std::numeric_limits<typename numbers::NumberTraits<
+                             number>::real_type>::epsilon(),
+                     ExcNonMatchingElementsSetDofValuesByInterpolation(
+                       local_values[i], tmp[i]));
+            }
+#endif
+
+          // simply set the values on this cell
+          this->set_dof_values(local_values, values);
+        }
       else
         {
           Assert(local_values.size() ==
