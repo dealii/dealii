@@ -710,7 +710,7 @@ namespace step62
                       Triangulation<dim>::smoothing_on_refinement |
                       Triangulation<dim>::smoothing_on_coarsening))
     , quadrature_formula(2)
-    , fe(FE_Q<dim>(1), dim)
+    , fe(FE_Q<dim>(1) ^ dim)
     , dof_handler(triangulation)
     , frequency(parameters.nb_frequency_points)
     , probe_positions(parameters.nb_probe_points, dim)

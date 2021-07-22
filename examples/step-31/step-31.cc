@@ -526,7 +526,7 @@ namespace Step31
   // The constructor of this class is an extension of the constructor in
   // step-22. We need to add the various variables that concern the
   // temperature. As discussed in the introduction, we are going to use
-  // $Q_2\times Q_1$ (Taylor-Hood) elements again for the Stokes part, and
+  // $Q_2^d\times Q_1$ (Taylor-Hood) elements again for the Stokes part, and
   // $Q_2$ elements for the temperature. However, by using variables that
   // store the polynomial degree of the Stokes and temperature finite
   // elements, it is easy to consistently modify the degree of the elements as
@@ -538,7 +538,7 @@ namespace Step31
     : triangulation(Triangulation<dim>::maximum_smoothing)
     , global_Omega_diameter(std::numeric_limits<double>::quiet_NaN())
     , stokes_degree(1)
-    , stokes_fe(FE_Q<dim>(stokes_degree + 1), dim, FE_Q<dim>(stokes_degree), 1)
+    , stokes_fe(FE_Q<dim>(stokes_degree + 1) ^ dim, FE_Q<dim>(stokes_degree))
     , stokes_dof_handler(triangulation)
     ,
 

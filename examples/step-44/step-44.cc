@@ -1042,14 +1042,10 @@ namespace Step44
     // condition, while $Q_1 \times DGPM_0 \times DGPM_0$ elements do
     // not. However, it has been shown that the latter demonstrate good
     // convergence characteristics nonetheless.
-    fe(FE_Q<dim>(parameters.poly_degree),
-       dim, // displacement
-       FE_DGPMonomial<dim>(parameters.poly_degree - 1),
-       1, // pressure
-       FE_DGPMonomial<dim>(parameters.poly_degree - 1),
-       1)
-    , // dilatation
-    dof_handler(triangulation)
+    fe(FE_Q<dim>(parameters.poly_degree) ^ dim,         // displacement
+       FE_DGPMonomial<dim>(parameters.poly_degree - 1), // pressure
+       FE_DGPMonomial<dim>(parameters.poly_degree - 1)) // dilatation
+    , dof_handler(triangulation)
     , dofs_per_cell(fe.n_dofs_per_cell())
     , u_fe(first_u_component)
     , p_fe(p_component)

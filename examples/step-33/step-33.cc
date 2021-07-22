@@ -1377,7 +1377,7 @@ namespace Step33
   template <int dim>
   ConservationLaw<dim>::ConservationLaw(const char *input_filename)
     : mapping()
-    , fe(FE_Q<dim>(1), EulerEquations<dim>::n_components)
+    , fe(FE_Q<dim>(1) ^ EulerEquations<dim>::n_components)
     , dof_handler(triangulation)
     , quadrature(fe.degree + 1)
     , face_quadrature(fe.degree + 1)
