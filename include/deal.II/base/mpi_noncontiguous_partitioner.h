@@ -160,6 +160,54 @@ namespace Utilities
         std::vector<MPI_Request> &     requests) const;
 
       /**
+       * TODO
+       */
+      template <typename Number>
+      void
+      export_to_ghosted_array(
+        const unsigned int                         communication_channel,
+        const ArrayView<const Number> &            locally_owned_array,
+        std::map<unsigned int, std::vector<char>> &temporary_storage,
+        std::vector<unsigned int> &                sizes,
+        const ArrayView<Number> &                  ghost_array) const;
+
+      /**
+       * TODO
+       */
+      template <typename Number>
+      void
+      export_to_ghosted_array(
+        const unsigned int                         communication_channel,
+        const ArrayView<const Number> &            locally_owned_array,
+        std::map<unsigned int, std::vector<char>> &temporary_storage,
+        std::vector<unsigned int> &                sizes,
+        const ArrayView<Number> &                  ghost_array,
+        std::vector<MPI_Request> &                 requests) const;
+
+      /**
+       * TODO
+       */
+      template <typename Number>
+      void
+      export_to_ghosted_array_start(
+        const unsigned int                         communication_channel,
+        const ArrayView<const Number> &            locally_owned_array,
+        std::map<unsigned int, std::vector<char>> &temporary_storage,
+        std::vector<unsigned int> &                sizes,
+        std::vector<MPI_Request> &                 requests) const;
+
+      /**
+       * TODO
+       */
+      template <typename Number>
+      void
+      export_to_ghosted_array_finish(
+        std::map<unsigned int, std::vector<char>> &temporary_storage,
+        std::vector<unsigned int> &                sizes,
+        const ArrayView<Number> &                  ghost_array,
+        std::vector<MPI_Request> &                 requests) const;
+
+      /**
        * Returns the number of processes this process sends data to and the
        * number of processes this process receives data from.
        */
