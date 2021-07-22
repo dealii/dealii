@@ -1,0 +1,16 @@
+
+DEAL::dim = 1
+DEAL::value = 2.50000
+DEAL::gradient = 3.00000
+DEAL::hessian = 0.00000
+DEAL::
+DEAL::dim = 2
+DEAL::value = 7.50000
+DEAL::gradient = 5.00000 10.0000
+DEAL::hessian = 0.00000 4.00000 4.00000 0.00000
+DEAL::
+DEAL::dim = 3
+DEAL::value = 25.5000
+DEAL::gradient = 9.00000 18.0000 36.0000
+DEAL::hessian = 0.00000 4.00000 8.00000 4.00000 0.00000 16.0000 8.00000 16.0000 0.00000
+DEAL::

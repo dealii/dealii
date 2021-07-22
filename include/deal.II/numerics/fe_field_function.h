@@ -486,6 +486,125 @@ namespace Functions
       const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
       const Point<dim> &point) const;
   };
+
+
+  /**
+   * This class evaluates a function defined by a solution vector and a
+   * DoFHandler transformed to reference space. To be precise, if we let
+   * $\hat{x}$ be a point on the reference cell, this class implements the
+   * function
+   *
+   * $\hat{f}(\hat{x}) = \sum_{j=0}^{n-1} f_j \hat{\phi}_j(\hat{x})$,
+   *
+   * where $f_j$ are the local solution values and $\hat{\phi}_j(\hat(x))$ are
+   * the local reference space shape functions. The gradient and Hessian of this
+   * function are thus derivatives with respect to the reference space
+   * coordinates, $\hat{x}_0, \hat{x}_1, \ldots$.
+   *
+   * Note that this class is similar to FEFieldFunction, but that
+   * FEFieldFunction implements the following function on a given cell, $K$,
+   *
+   * $f(x) = \sum_{j=0}^{n-1} f_j \hat{\phi}_j(F_K^{-1}(x))$,
+   *
+   * which has the same coefficients but uses real space basis functions.
+   * Here, $F_K$ is the mapping from the reference cell to the real cell.
+   *
+   * Before calling the value/gradient/hessian function, the set_active_cell
+   * function must be called to specify which cell the function should be
+   * evaluated on.
+   *
+   * @ingroup functions
+   */
+  template <int dim, class VECTOR = Vector<double>>
+  class RefSpaceFEFieldFunction : public Function<dim>
+  {
+  public:
+    /**
+     * Constructor. Takes the solution vector and the associated DoFHandler.
+     *
+     * Pointers to the input arguments are stored internally, so they must have
+     * a longer lifetime than the created RefSpaceFEFieldFunction object.
+     */
+    RefSpaceFEFieldFunction(const DoFHandler<dim> &dof_handler,
+                            const VECTOR &         dof_values);
+
+    /**
+     * Set the cell that the function should be evaluated on.
+     *
+     * The cell must belong to the same triangulation as the one associated with
+     * the DoFHandler passed to the constructor.
+     */
+    void
+    set_active_cell(
+      const typename Triangulation<dim>::active_cell_iterator &cell);
+
+    /**
+     * @copydoc Function::value()
+     *
+     * @note The set_active_cell function must be called before this function.
+     * The incoming point should be on the reference cell, but this is not
+     * checked.
+     */
+    double
+    value(const Point<dim> & point,
+          const unsigned int component = 0) const override;
+
+    /**
+     * @copydoc Function::gradient()
+     *
+     * @note The set_active_cell function must be called before this function.
+     * The incoming point should be on the reference cell, but this is not
+     * checked.
+     */
+    Tensor<1, dim>
+    gradient(const Point<dim> & point,
+             const unsigned int component = 0) const override;
+
+    /**
+     * @copydoc Function::hessian()
+     *
+     * @note The set_active_cell function must be called before this function.
+     * The incoming point should be on the reference cell, but this is not
+     * checked.
+     */
+    SymmetricTensor<2, dim>
+    hessian(const Point<dim> & point,
+            const unsigned int component = 0) const override;
+
+  private:
+    /**
+     * Assert that the set_active_cell function has been called.
+     */
+    void
+    assert_cell_is_set() const;
+
+    /**
+     * Pointer to the DoFHandler passed to the constructor.
+     */
+    const SmartPointer<const DoFHandler<dim>> dof_handler;
+
+    /**
+     * Pointer to the vector of solution coefficients passed to the
+     * constructor.
+     */
+    const SmartPointer<const VECTOR> global_dof_values;
+
+    /**
+     * Pointer to the element associated with the cell in the last call to
+     * set_active_cell().
+     */
+    SmartPointer<const FiniteElement<dim>> element;
+
+    /**
+     * DOF-indices of the cell in the last call to set_active_cell()
+     */
+    std::vector<types::global_dof_index> local_dof_indices;
+
+    /**
+     * Local solution values of the cell in the last call to set_active_cell()
+     */
+    std::vector<typename VECTOR::value_type> local_dof_values;
+  };
 } // namespace Functions
 
 namespace Legacy

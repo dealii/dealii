@@ -571,6 +571,124 @@ namespace Functions
       }
   }
 
+
+
+  template <int dim, class VECTOR>
+  RefSpaceFEFieldFunction<dim, VECTOR>::RefSpaceFEFieldFunction(
+    const DoFHandler<dim> &dof_handler,
+    const VECTOR &         dof_values)
+    : Function<dim>(dof_handler.get_fe_collection().n_components())
+    , dof_handler(&dof_handler)
+    , global_dof_values(&dof_values)
+  {
+    Assert(dof_handler.n_dofs() == dof_values.size(),
+           ExcDimensionMismatch(dof_handler.n_dofs(), dof_values.size()));
+  }
+
+
+
+  template <int dim, class VECTOR>
+  void
+  RefSpaceFEFieldFunction<dim, VECTOR>::set_active_cell(
+    const typename Triangulation<dim>::active_cell_iterator &cell)
+  {
+    Assert(
+      &cell->get_triangulation() == &dof_handler->get_triangulation(),
+      ExcMessage(
+        "The incoming cell must belong to the triangulation associated with "
+        "the DoFHandler passed to the constructor."));
+
+    const typename DoFHandler<dim>::active_cell_iterator dof_handler_cell(
+      &dof_handler->get_triangulation(),
+      cell->level(),
+      cell->index(),
+      dof_handler);
+
+    // Save the element and the local dof values, since this is what we need to
+    // evaluate the function.
+    element = &dof_handler_cell->get_fe();
+
+    local_dof_indices.resize(element->dofs_per_cell);
+    dof_handler_cell->get_dof_indices(local_dof_indices);
+
+    local_dof_values.resize(element->dofs_per_cell);
+
+    for (unsigned int i = 0; i < local_dof_indices.size(); i++)
+      local_dof_values[i] =
+        dealii::internal::ElementAccess<VECTOR>::get(*global_dof_values,
+                                                     local_dof_indices[i]);
+  }
+
+
+
+  template <int dim, class VECTOR>
+  void
+  RefSpaceFEFieldFunction<dim, VECTOR>::assert_cell_is_set() const
+  {
+    // If set cell hasn't been called the size of local_dof_values will be zero.
+    Assert(
+      local_dof_values.size() > 0,
+      ExcMessage(
+        "The set_active_cell function has to be called before calling this function."))
+  }
+
+
+
+  template <int dim, class VECTOR>
+  double
+  RefSpaceFEFieldFunction<dim, VECTOR>::value(
+    const Point<dim> & point,
+    const unsigned int component) const
+  {
+    AssertIndexRange(component, this->n_components);
+    assert_cell_is_set();
+
+    double value = 0;
+    for (unsigned int i = 0; i < local_dof_indices.size(); ++i)
+      value += local_dof_values[i] *
+               element->shape_value_component(i, point, component);
+
+    return value;
+  }
+
+
+
+  template <int dim, class VECTOR>
+  Tensor<1, dim>
+  RefSpaceFEFieldFunction<dim, VECTOR>::gradient(
+    const Point<dim> & point,
+    const unsigned int component) const
+  {
+    AssertIndexRange(component, this->n_components);
+    assert_cell_is_set();
+
+    Tensor<1, dim> gradient;
+    for (unsigned int i = 0; i < local_dof_indices.size(); ++i)
+      gradient += local_dof_values[i] *
+                  element->shape_grad_component(i, point, component);
+
+    return gradient;
+  }
+
+
+
+  template <int dim, class VECTOR>
+  SymmetricTensor<2, dim>
+  RefSpaceFEFieldFunction<dim, VECTOR>::hessian(
+    const Point<dim> & point,
+    const unsigned int component) const
+  {
+    AssertIndexRange(component, this->n_components);
+    assert_cell_is_set();
+
+    Tensor<2, dim> hessian;
+    for (unsigned int i = 0; i < local_dof_indices.size(); ++i)
+      hessian += local_dof_values[i] *
+                 element->shape_grad_grad_component(i, point, component);
+
+    return symmetrize(hessian);
+  }
+
 } // namespace Functions
 
 DEAL_II_NAMESPACE_CLOSE
