@@ -124,7 +124,7 @@ namespace python
 
 
 
-  MappingQGenericWrapper::MappingQGenericWrapper()
+  MappingQWrapper::MappingQWrapper()
     : dim(-1)
     , spacedim(-1)
     , degree(-1)
@@ -133,9 +133,9 @@ namespace python
 
 
 
-  MappingQGenericWrapper::MappingQGenericWrapper(const int dim,
-                                                 const int spacedim,
-                                                 const int degree)
+  MappingQWrapper::MappingQWrapper(const int dim,
+                                   const int spacedim,
+                                   const int degree)
     : dim(dim)
     , spacedim(spacedim)
     , degree(degree)
@@ -158,8 +158,7 @@ namespace python
 
 
 
-  MappingQGenericWrapper::MappingQGenericWrapper(
-    const MappingQGenericWrapper &other)
+  MappingQWrapper::MappingQWrapper(const MappingQWrapper &other)
   {
     dim      = other.dim;
     spacedim = other.spacedim;
@@ -186,7 +185,7 @@ namespace python
 
 
 
-  MappingQGenericWrapper::~MappingQGenericWrapper()
+  MappingQWrapper::~MappingQWrapper()
   {
     if (dim != -1)
       {
@@ -218,8 +217,8 @@ namespace python
 
 
   PointWrapper
-  MappingQGenericWrapper::transform_unit_to_real_cell(CellAccessorWrapper &cell,
-                                                      PointWrapper &       p)
+  MappingQWrapper::transform_unit_to_real_cell(CellAccessorWrapper &cell,
+                                               PointWrapper &       p)
   {
     AssertThrow(
       dim == p.get_dim(),
@@ -243,8 +242,8 @@ namespace python
 
 
   PointWrapper
-  MappingQGenericWrapper::transform_real_to_unit_cell(CellAccessorWrapper &cell,
-                                                      PointWrapper &       p)
+  MappingQWrapper::transform_real_to_unit_cell(CellAccessorWrapper &cell,
+                                               PointWrapper &       p)
   {
     AssertThrow(
       spacedim == p.get_dim(),
@@ -268,7 +267,7 @@ namespace python
 
 
   PointWrapper
-  MappingQGenericWrapper::project_real_point_to_unit_point_on_face(
+  MappingQWrapper::project_real_point_to_unit_point_on_face(
     CellAccessorWrapper &cell,
     const unsigned int   face_no,
     PointWrapper &       p)
@@ -292,7 +291,7 @@ namespace python
 
 
   void *
-  MappingQGenericWrapper::get_mapping() const
+  MappingQWrapper::get_mapping() const
   {
     return mapping_ptr;
   }

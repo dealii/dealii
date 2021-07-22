@@ -242,7 +242,7 @@ namespace python
      */
     void *cell_accessor;
 
-    friend class MappingQGenericWrapper;
+    friend class MappingQWrapper;
   };
 
 

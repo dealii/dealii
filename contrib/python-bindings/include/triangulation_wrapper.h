@@ -282,9 +282,8 @@ namespace python
     /*! @copydoc GridTools::find_active_cell_around_point
      */
     CellAccessorWrapper
-    find_active_cell_around_point(
-      PointWrapper &         p,
-      MappingQGenericWrapper mapping = MappingQGenericWrapper());
+    find_active_cell_around_point(PointWrapper &  p,
+                                  MappingQWrapper mapping = MappingQWrapper());
 
     /*! @copydoc GridTools::find_cells_adjacent_to_vertex
      */
@@ -338,8 +337,8 @@ namespace python
     /*! @copydoc GridTools::compute_aspect_ratio_of_cells
      */
     boost::python::list
-    compute_aspect_ratio_of_cells(const MappingQGenericWrapper &mapping,
-                                  const QuadratureWrapper &     quadrature);
+    compute_aspect_ratio_of_cells(const MappingQWrapper &  mapping,
+                                  const QuadratureWrapper &quadrature);
 
     /**
      * Write mesh to the output file @filename according to the given data
