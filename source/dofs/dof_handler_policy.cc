@@ -3689,9 +3689,11 @@ namespace internal
               [&complete](auto &stored_index, auto &received_index) {
                 if (received_index != numbers::invalid_dof_index)
                   {
+#    if !defined(__INTEL_COMPILER) || __INTEL_COMPILER >= 1900
                     Assert((stored_index == (numbers::invalid_dof_index)) ||
                              (stored_index == received_index),
                            ExcInternalError());
+#    endif
                     stored_index = received_index;
                   }
                 else
