@@ -1,0 +1,61 @@
+
+<br>
+
+<i>
+This program was contributed by Peter Munch. This work and the required
+generalizations of the internal data structures of deal.II form part of the
+project "Virtual Materials Design" funded by the Helmholtz Association of German
+Research Centres.
+</i>
+
+
+<a name="Intro"></a>
+<h1>Introduction</h1>
+
+<h3>Motivation</h3>
+
+Many freely available mesh-generation tools produce meshes that consist of
+simplices (triangles in 2D; tetrahedra in 3D). The reason for this is that
+generating such kind of meshes for complex geometries is simpler than the
+generation of hex-only meshes. This tutorial shows how to work on such kind of
+meshes with the experimental simplex features in deal.II. For this purpose, we
+solve the Poisson problem from step-3 in 2D with a mesh only consisting of
+triangles.
+
+
+<h3>Working on simplex meshes</h3>
+
+To be able to work on simplex meshes, one has to select appropriate finite
+elements, quadrature rules, and mapping objects. In step-3, we used FE_Q,
+QGauss, and (implicitly by not specifying a mapping) MappingQ1. The equivalent
+classes for the first two classes in the context of simplices are FE_SimplexP
+and QGaussSimplex, which we will utilize here. For mapping purposes, we use the
+class MappingFE, which implements an isoparametric mapping. We initialize it
+with an FE_SimplexP object so that it can be applied on simplex meshes.
+
+
+<h3>Mesh generation</h3>
+
+In contrast to step-3, we do not use a function from the GridGenerator
+namespace, but rather read an externally generated mesh. For this tutorial, we
+have created the mesh (square with width and height of one) with Gmsh with the
+following journal file "box_2D_tri.geo":
+
+@code
+Rectangle(1) = {0, 0, 0, 1, 1, 0};
+Mesh 2;
+Save "box_2D_tri.msh";
+@endcode
+
+The journal file can be processed by Gmsh generating the actual mesh with the
+ending ".geo":
+
+@code
+gmsh box_2D_tri.geo
+@endcode
+
+We have included in the tutorial folder both the journal file and the mesh file
+in the event that one does not have access to Gmsh.
+
+The mesh can be simply read by deal.II with methods provided by the GridIn
+class, as shown below.
