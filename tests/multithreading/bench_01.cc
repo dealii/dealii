@@ -496,6 +496,45 @@ assemble()
   }
 #endif
 
+
+#ifdef DEAL_II_WITH_TASKFLOW
+  {
+    std::cout << "** TASKFLOW v4 **" << std::endl;
+
+    for (unsigned int n_cores = n_phys_cores; n_cores > 0; n_cores /= 2)
+      {
+        MultithreadInfo::set_thread_limit(n_cores);
+
+        std::cout << "n_cores " << n_cores;
+        std::cout << ' ' << std::flush;
+        double avg = 0.;
+
+        for (unsigned int c = 0; c < n_runs; ++c)
+          {
+            system_rhs = 0.;
+            timer.reset();
+            timer.start();
+
+            WorkStream::internal::taskflow_v4::run(dof_handler.begin_active(),
+                                                   dof_handler.end(),
+                                                   worker,
+                                                   copier,
+                                                   AssemblyScratchData<dim>(fe),
+                                                   AssemblyCopyData());
+
+            timer.stop();
+            const double time = timer.last_wall_time();
+            avg += time;
+            std::cout << time << " " << std::flush;
+            Assert(abs(reference_l2 - system_rhs.l2_norm()) < 1e-10,
+                   ExcInternalError());
+          }
+        avg /= n_runs;
+        std::cout << " avg: " << avg << std::endl;
+      }
+  }
+#endif
+
 #ifdef DEAL_II_WITH_TBB
   {
     std::cout << "** TBB **" << std::endl;
@@ -570,6 +609,42 @@ assemble()
       }
   }
 
+#endif
+
+#ifdef DEAL_II_WITH_TASKFLOW
+  {
+    std::cout << "** taskflow colored **" << std::endl;
+    for (unsigned int n_cores = n_phys_cores; n_cores > 0; n_cores /= 2)
+      {
+        MultithreadInfo::set_thread_limit(n_cores);
+
+        std::cout << "n_cores " << n_cores;
+        std::cout << ' ' << std::flush;
+        double avg = 0.;
+
+        for (unsigned int c = 0; c < n_runs; ++c)
+          {
+            system_rhs = 0.;
+            timer.reset();
+            timer.start();
+
+            WorkStream::internal::taskflow_v4::run(graph,
+                                                   worker,
+                                                   copier,
+                                                   AssemblyScratchData<dim>(fe),
+                                                   AssemblyCopyData());
+
+            timer.stop();
+            const double time = timer.last_wall_time();
+            avg += time;
+            std::cout << time << " " << std::flush;
+            Assert(abs(reference_l2 - system_rhs.l2_norm()) < 1e-10,
+                   ExcInternalError());
+          }
+        avg /= n_runs;
+        std::cout << " avg: " << avg << std::endl;
+      }
+  }
 #endif
 
   {
