@@ -87,7 +87,6 @@ main(int argc, char **argv)
     dst = rhs;
     return 0;
   };
-
   VectorType v(N);
 
   auto niter = kinsol.solve(v);
