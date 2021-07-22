@@ -29,6 +29,8 @@
 // @sect3{Include files}
 
 #include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/manifold_lib.h>
@@ -55,6 +57,7 @@ using namespace dealii;
 //
 // Finally, the function outputs the mesh in VTU format that can easily be
 // visualized in Paraview or VisIt.
+
 template <int dim>
 void print_mesh_info(const Triangulation<dim> &triangulation,
                      const std::string &       filename)
@@ -99,14 +102,40 @@ void print_mesh_info(const Triangulation<dim> &triangulation,
 // discussed in the introduction how to generate it. This follows the same
 // pattern as used in step-5 to load a mesh, although there it was written in
 // a different file format (UCD instead of MSH).
+//
+// We will be utilizing the SphericalManifold class for the holes. We need to
+// assign manifold IDs for this purpose. As physical IDs from Gmsh are assigned
+// to boundary IDs in deal.II, we will assign manifold IDs based on the boundary IDs loaded
+// from the file.
 void grid_1()
 {
+  const Point<2> Top_right_hole_origin(0.42, 2.0);
+  const Point<2> Bottom_left_hole_origin(-2.1, -1.54);
+
+  const SphericalManifold<2> Top_right_manifold(Top_right_hole_origin);
+  const SphericalManifold<2> Bottom_left_manifold(Bottom_left_hole_origin);
+
   Triangulation<2> triangulation;
 
   GridIn<2> gridin;
   gridin.attach_triangulation(triangulation);
   std::ifstream f("example.msh");
   gridin.read_msh(f);
+
+  // Here is where we get the boundary IDs made in gmsh, which are in the first
+  // coordinate position, and assign them to manifold ids.  With our example, we
+  // have boundary ID 1 on the top right hole and 2 and 3 for the bottom left
+  // hole. We assign both of these boundary IDs 2 because together they make a
+  // circle to match the manifold we assign it later.
+  triangulation.set_all_manifold_ids_on_boundary(1, 1); // top right hole
+  triangulation.set_all_manifold_ids_on_boundary(2, 2); // top of bottom left hole
+  triangulation.set_all_manifold_ids_on_boundary(3, 2); // bottom of bottom left hole
+
+  // Now also assign manifold IDs to cells adjacent to the boundaries
+  triangulation.set_manifold(1, Top_right_manifold);
+  triangulation.set_manifold(2, Bottom_left_manifold);
+
+  triangulation.refine_global(2);
 
   print_mesh_info(triangulation, "grid-1.vtu");
 }
@@ -166,7 +195,7 @@ void grid_3()
 
   for (const auto &cell : triangulation.active_cell_iterators())
     {
-      for (const auto i : cell->vertex_indices())
+      for (unsigned int i = 0; i < GeometryInfo<2>::vertices_per_cell; ++i)
         {
           Point<2> &v = cell->vertex(i);
           if (std::abs(v(1) - 1.0) < 1e-5)
@@ -319,8 +348,6 @@ void grid_7()
   print_mesh_info(triangulation, "grid-7.vtu");
 }
 
-
-// @sect3{The main function}
 
 // Finally, the main function. There isn't much to do here, only to call all the
 // various functions we wrote above.
