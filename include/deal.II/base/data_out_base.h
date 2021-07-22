@@ -1170,14 +1170,39 @@ namespace DataOutBase
     bool write_higher_order_cells;
 
     /**
-     * Constructor.
+     * A map that describes for (some or all) of the output quantities what
+     * the physical units are. This field is ignored for VTK file format, but
+     * used for VTU format where it is attached to the individual scalar,
+     * vector, or tensor fields for use by visualization or other postprocessing
+     * tools. The default is to not attach any physical units to fields at all,
+     * i.e., an empty map.
+     *
+     * If the map does not contain an entry for a specific output variable, then
+     * no unit will be written into the output file. In other words, it is not
+     * an error to provide units for only some variables.
+     *
+     * step-19, step-44 and step-69 all demonstrate how to use this variable.
+     *
+     * @note While the functions that make use of this information do not care
+     *   about how physical units are specified, downstream postprocessing tools
+     *   should and do. As a consequence, these units should be specified in a
+     *   format that is understandable to these postprocessing tools. As an
+     *   example, the [unyt project](https://unyt.readthedocs.io/en/stable/)
+     *   describes a standard for describing and converting units.
+     */
+    std::map<std::string, std::string> physical_units;
+
+    /**
+     * Constructor. Initializes the member variables with names corresponding
+     * to the argument names of this function.
      */
     VtkFlags(
       const double       time  = std::numeric_limits<double>::min(),
       const unsigned int cycle = std::numeric_limits<unsigned int>::min(),
       const bool         print_date_and_time              = true,
       const ZlibCompressionLevel compression_level        = best_compression,
-      const bool                 write_higher_order_cells = false);
+      const bool                 write_higher_order_cells = false,
+      const std::map<std::string, std::string> &physical_units = {});
   };
 
 
@@ -2077,7 +2102,8 @@ namespace DataOutBase
                  unsigned int,
                  std::string,
                  DataComponentInterpretation::DataComponentInterpretation>>
-      &nonscalar_data_ranges);
+      &             nonscalar_data_ranges,
+    const VtkFlags &flags);
 
   /**
    * In ParaView it is possible to visualize time-dependent data tagged with

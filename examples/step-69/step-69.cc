@@ -258,6 +258,7 @@ namespace Step69
   //   $[\rho,\textbf{m},E]$.
   //
   // The purpose of the class members <code>component_names</code>,
+  // <code>component_physical_units</code>,
   // <code>pressure</code>, and <code>speed_of_sound</code> is evident from
   // their names. We also provide a function
   // <code>compute_lambda_max()</code>, that computes the wave speed
@@ -292,6 +293,8 @@ namespace Step69
     using flux_type  = Tensor<1, problem_dimension, Tensor<1, dim>>;
 
     const static std::array<std::string, problem_dimension> component_names;
+    const static std::array<std::string, problem_dimension>
+      component_physical_units;
 
     static constexpr double gamma = 7. / 5.;
 
@@ -1597,22 +1600,42 @@ namespace Step69
   }
 
   // We conclude this section by defining static arrays
-  // <code>component_names</code> that contain strings describing the
-  // component names of our state vector. We have template specializations
-  // for dimensions one, two and three, that are used later in DataOut for
-  // naming the corresponding components:
+  // <code>component_names</code> and <code>component_physical_units</code>
+  // that contain strings describing the
+  // components of our state vector, as well as the physical units of
+  // these quantities that can be used to annotate the VTU output
+  // files we generate for visualization and postprocessing. We have
+  // template specializations for dimensions one, two and three, that
+  // are used later in DataOut for naming the corresponding
+  // components:
 
   template <>
   const std::array<std::string, 3> ProblemDescription<1>::component_names{
     {"rho", "m", "E"}};
 
   template <>
+  const std::array<std::string, 3>
+    ProblemDescription<1>::component_physical_units{
+      {"kg/m", "kg*m/s/m", "J/m"}};
+
+
+  template <>
   const std::array<std::string, 4> ProblemDescription<2>::component_names{
     {"rho", "m_1", "m_2", "E"}};
 
   template <>
+  const std::array<std::string, 4>
+    ProblemDescription<2>::component_physical_units{
+      {"kg/m/m", "kg*m/s/m/m", "kg*m/s/m/m", "J/m/m"}};
+
+  template <>
   const std::array<std::string, 5> ProblemDescription<3>::component_names{
     {"rho", "m_1", "m_2", "m_3", "E"}};
+
+  template <>
+  const std::array<std::string, 5>
+    ProblemDescription<3>::component_physical_units{
+      {"kg/m/m/m", "kg*m/s/m/m/m", "kg*m/s/m/m/m", "kg*m/s/m/m/m", "J/m/m/m"}};
 
   // @sect4{Initial values}
 
@@ -2733,11 +2756,18 @@ namespace Step69
               oa << it2;
         }
 
-      DataOutBase::VtkFlags flags(t,
-                                  cycle,
-                                  true,
-                                  DataOutBase::VtkFlags::best_speed);
-      data_out->set_flags(flags);
+      DataOutBase::VtkFlags output_flags;
+      output_flags.time              = t;
+      output_flags.cycle             = cycle;
+      output_flags.compression_level = DataOutBase::VtkFlags::best_speed;
+      for (unsigned int i = 0;
+           i < ProblemDescription<dim>::component_names.size();
+           ++i)
+        output_flags
+          .physical_units[ProblemDescription<dim>::component_names[i]] =
+          ProblemDescription<dim>::component_physical_units[i];
+
+      data_out->set_flags(output_flags);
 
       data_out->write_vtu_with_pvtu_record(
         "", name + "-solution", cycle, mpi_communicator, 6);

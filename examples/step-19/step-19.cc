@@ -903,12 +903,14 @@ namespace Step19
 
 
   // With this, the `output_results()` function becomes relatively
-  // straightforward: We use the DataOut class as we have in almost every one of
-  // the previous tutorial programs to output the solution (the "electric
-  // potential") and we use the postprocessor defined above to also output its
-  // gradient (the "electric field"). This all is then written into a file in
-  // VTU format after also associating the current time and time step number
-  // with this file.
+  // straightforward: We use the DataOut class as we have in almost
+  // every one of the previous tutorial programs to output the
+  // solution (the "electric potential") and we use the postprocessor
+  // defined above to also output its gradient (the "electric
+  // field"). This all is then written into a file in VTU format after
+  // also associating the current time and time step number with this
+  // file, and providing physical units for the two fields to be
+  // output.
   template <int dim>
   void CathodeRaySimulator<dim>::output_results() const
   {
@@ -920,8 +922,13 @@ namespace Step19
       data_out.add_data_vector(solution, electric_field);
       data_out.build_patches();
 
-      data_out.set_flags(
-        DataOutBase::VtkFlags(time.get_current_time(), time.get_step_number()));
+      DataOutBase::VtkFlags output_flags;
+      output_flags.time  = time.get_current_time();
+      output_flags.cycle = time.get_step_number();
+      output_flags.physical_units["electric_potential"] = "V";
+      output_flags.physical_units["electric_field"]     = "V/m";
+
+      data_out.set_flags(output_flags);
 
       std::ofstream output("solution-" +
                            Utilities::int_to_string(time.get_step_number(), 4) +
@@ -943,8 +950,12 @@ namespace Step19
         std::vector<DataComponentInterpretation::DataComponentInterpretation>(
           dim, DataComponentInterpretation::component_is_part_of_vector));
 
-      particle_out.set_flags(
-        DataOutBase::VtkFlags(time.get_current_time(), time.get_step_number()));
+      DataOutBase::VtkFlags output_flags;
+      output_flags.time                       = time.get_current_time();
+      output_flags.cycle                      = time.get_step_number();
+      output_flags.physical_units["velocity"] = "m/s";
+
+      particle_out.set_flags(output_flags);
 
       std::ofstream output("particles-" +
                            Utilities::int_to_string(time.get_step_number(), 4) +

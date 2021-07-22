@@ -3216,7 +3216,8 @@ namespace Step44
     solution_name.emplace_back("dilatation");
 
     DataOutBase::VtkFlags output_flags;
-    output_flags.write_higher_order_cells = true;
+    output_flags.write_higher_order_cells       = true;
+    output_flags.physical_units["displacement"] = "m";
     data_out.set_flags(output_flags);
 
     data_out.attach_dof_handler(dof_handler);
