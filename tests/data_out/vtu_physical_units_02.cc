@@ -48,15 +48,17 @@ check(DataOutBase::VtkFlags flags, std::ostream &out)
   for (unsigned int i = 1; i < 1 + dim; ++i)
     names[i] = "v";
 
-  std::vector<
+  using Descriptor =
     std::tuple<unsigned int,
                unsigned int,
                std::string,
-               DataComponentInterpretation::DataComponentInterpretation>>
-    vectors{{1,
-             1 + dim - 1,
-             "v",
-             DataComponentInterpretation::component_is_part_of_vector}};
+               DataComponentInterpretation::DataComponentInterpretation>;
+  std::vector<Descriptor> vectors(
+    1,
+    Descriptor{1,
+               1 + dim - 1,
+               "v",
+               DataComponentInterpretation::component_is_part_of_vector});
   DataOutBase::write_vtu(patches, names, vectors, flags, out);
 }
 
