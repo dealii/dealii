@@ -1558,6 +1558,19 @@ namespace parallel
             }
           else
             {
+              // first, align both dealii and p4est meshes, which is a
+              // requirement of our internal cell weights algorithm
+              try
+                {
+                  copy_local_forest_to_triangulation();
+                }
+              catch (const typename Triangulation<dim>::DistortedCellList &)
+                {
+                  // the underlying triangulation should not be checking for
+                  // distorted cells
+                  Assert(false, ExcInternalError());
+                }
+
               // get cell weights for a weighted repartitioning.
               const std::vector<unsigned int> cell_weights = get_cell_weights();
 
@@ -1585,10 +1598,8 @@ namespace parallel
         }
       catch (const typename Triangulation<dim>::DistortedCellList &)
         {
-          // the underlying
-          // triangulation should not
-          // be checking for
-          // distorted cells
+          // the underlying triangulation should not be checking for distorted
+          // cells
           Assert(false, ExcInternalError());
         }
 
