@@ -591,11 +591,12 @@ public:
    * the two cells. If an interface DoF is only active on one of the
    * cells, the other index will be numbers::invalid_unsigned_int.
    *
-   * For discontinuous finite elements each interface dof will correspond to
-   * exactly one DoF index.
+   * For discontinuous finite elements, each interface dof is located on exactly
+   * one side of the interface and, consequently, only one of the two values
+   * returned is valid (i.e., different from numbers::invalid_unsigned_int).
    *
-   * @note This function is only available after a call to reinit() and can
-   * change from one call to reinit() to the next.
+   * @note This function is only available after a call to reinit() and the
+   * returned values may change from one call to reinit() to the next.
    */
   std::array<unsigned int, 2>
   interface_dof_to_dof_indices(const unsigned int interface_dof_index) const;
@@ -782,7 +783,7 @@ private:
 
   /**
    * The mapping from interface dof to the two local dof indices of the
-   * FeFaceValues objects. If an interface DoF is only active on one of the
+   * FEFaceValues objects. If an interface DoF is only active on one of the
    * cells, the other one will have numbers::invalid_unsigned_int.
    */
   std::vector<std::array<unsigned int, 2>> dofmap;
