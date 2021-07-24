@@ -1,0 +1,6 @@
+Changed: Custom repartitioning via Triangulation::Signals::cell_weight
+is no longer part of parallel::distributed::Triangulation::load(). If
+desired, call parallel::distributed::Triangulation::repartition()
+manually after load().
+<br>
+(Marc Fehling, 2021/07/23)

@@ -594,17 +594,22 @@ namespace parallel
        * You do not need to load with the same number of MPI processes that
        * you saved with. Rather, if a mesh is loaded with a different number
        * of MPI processes than used at the time of saving, the mesh is
-       * repartitioned appropriately. Cell-based data that was saved with
+       * repartitioned that the number of cells is balanced among all processes.
+       * Individual repartitioning, e.g., based on the number of dofs or
+       * particles per cell, needs to be invoked manually by calling
+       * repartition() afterwards.
+       *
+       * Cell-based data that was saved with
        * DistributedTriangulationBase::DataTransfer::register_data_attach() can
        * be read in with
        * DistributedTriangulationBase::DataTransfer::notify_ready_to_unpack()
        * after calling load().
        *
-       * If you use p4est version > 0.3.4.2 the @p autopartition flag tells
-       * p4est to ignore the partitioning that the triangulation had when it
-       * was saved and make it uniform upon loading. If @p autopartition is
-       * set to false, the triangulation is only repartitioned if needed (i.e.
-       * if a different number of MPI processes is encountered).
+       * The @p autopartition flag tells p4est to ignore the partitioning that
+       * the triangulation had when it was saved and make it uniform upon
+       * loading. If @p autopartition is set to true, the triangulation will
+       * always be repartitioned. If set to false, it is only repartitioned if
+       * needed (i.e., if a different number of MPI processes is encountered).
        */
       virtual void
       load(const std::string &filename,
