@@ -1,0 +1,5 @@
+New: The functions DoFHandler::set_fe() have been taken from the
+deprecation list. They register a FECollection with a DoFHandler object.
+No communication of active or future FE indices will occur.
+<br>
+(Marc Fehling, 2021/07/23)

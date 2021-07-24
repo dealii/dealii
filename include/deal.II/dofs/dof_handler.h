@@ -614,19 +614,13 @@ public:
    * either not been distributed yet, or are distributed using a previously set
    * element. In both cases, accessing degrees of freedom will lead to invalid
    * results. To restore consistency, call distribute_dofs().
-   *
-   * @deprecated Use distribute_dofs() instead.
    */
-  DEAL_II_DEPRECATED
   void
   set_fe(const FiniteElement<dim, spacedim> &fe);
 
   /**
    * Same as above but taking an hp::FECollection object.
-   *
-   * @deprecated Use distribute_dofs() instead.
    */
-  DEAL_II_DEPRECATED
   void
   set_fe(const hp::FECollection<dim, spacedim> &fe);
 
