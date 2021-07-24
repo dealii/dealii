@@ -96,7 +96,8 @@ namespace VectorTools
    * - dim==spacedim
    *
    * In this case, this function performs numerical quadrature using the given
-   * quadrature formula for integration of the right hand side $\Phi_i$ while a
+   * quadrature formula for integration of the right hand side $\Phi_i$ and
+   * for the mass operator. In the case of hypercube cells, a
    * QGauss(fe_degree+2) object is used for the mass operator. You should
    * therefore make sure that the given quadrature formula is sufficiently
    * accurate for creating the right-hand side.
