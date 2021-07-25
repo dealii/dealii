@@ -2774,6 +2774,8 @@ namespace GridTools
     std::pair<typename MeshType<dim, spacedim>::active_cell_iterator,
               Point<dim>>
       cell_and_position;
+    cell_and_position.first = mesh.end();
+
     // To handle points at the border we keep track of points which are close to
     // the unit cell:
     std::pair<typename MeshType<dim, spacedim>::active_cell_iterator,
