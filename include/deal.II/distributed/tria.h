@@ -604,16 +604,18 @@ namespace parallel
        * be read in with
        * DistributedTriangulationBase::DataTransfer::notify_ready_to_unpack()
        * after calling load().
-       *
-       * The @p autopartition flag tells p4est to ignore the partitioning that
-       * the triangulation had when it was saved and make it uniform upon
-       * loading. If @p autopartition is set to true, the triangulation will
-       * always be repartitioned. If set to false, it is only repartitioned if
-       * needed (i.e., if a different number of MPI processes is encountered).
        */
       virtual void
-      load(const std::string &filename,
-           const bool         autopartition = true) override;
+      load(const std::string &filename) override;
+
+      /**
+       * @copydoc load()
+       *
+       * @deprecated The autopartition parameter has been removed.
+       */
+      DEAL_II_DEPRECATED_EARLY
+      virtual void
+      load(const std::string &filename, const bool autopartition) override;
 
       /**
        * Load the refinement information from a given parallel forest. This
@@ -870,8 +872,15 @@ namespace parallel
        * compiler.
        */
       virtual void
-      load(const std::string &filename,
-           const bool         autopartition = true) override;
+      load(const std::string &filename) override;
+
+      /**
+       * This function is not implemented, but needs to be present for the
+       * compiler.
+       */
+      DEAL_II_DEPRECATED_EARLY
+      virtual void
+      load(const std::string &filename, const bool autopartition) override;
 
       /**
        * This function is not implemented, but needs to be present for the
@@ -1000,8 +1009,17 @@ namespace parallel
        * this class.
        */
       virtual void
+      load(const std::string & /*filename*/) override
+      {}
+
+      /**
+       * Dummy replacement to allow for better error messages when compiling
+       * this class.
+       */
+      DEAL_II_DEPRECATED_EARLY
+      virtual void
       load(const std::string & /*filename*/,
-           const bool /*autopartition*/ = true) override
+           const bool /*autopartition*/) override
       {}
 
       /**
