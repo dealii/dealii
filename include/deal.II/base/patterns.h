@@ -1902,7 +1902,7 @@ namespace Patterns
             AssertDimension(key_val.size(), 2);
             t.insert(std::make_pair(
               Convert<typename T::key_type>::to_value(key_val[0], *key_p),
-              Convert<typename T::mapped_type>::to_value(key_val[1])));
+              Convert<typename T::mapped_type>::to_value(key_val[1], *val_p)));
           }
 
         return t;
