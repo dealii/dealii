@@ -43,20 +43,20 @@ namespace python
   void
   export_mapping()
   {
-    boost::python::class_<MappingQGenericWrapper>(
-      "MappingQGeneric",
+    boost::python::class_<MappingQWrapper>(
+      "MappingQ",
       boost::python::init<const int, const int, const int>(
         boost::python::args("dim", "spacedim", "degree")))
       .def("transform_real_to_unit_cell",
-           &MappingQGenericWrapper::transform_real_to_unit_cell,
+           &MappingQWrapper::transform_real_to_unit_cell,
            transform_real_to_unit_cell_docstring,
            boost::python::args("self", "cell", "point"))
       .def("transform_unit_to_real_cell",
-           &MappingQGenericWrapper::transform_unit_to_real_cell,
+           &MappingQWrapper::transform_unit_to_real_cell,
            transform_unit_to_real_cell_docstring,
            boost::python::args("self", "cell", "point"))
       .def("project_real_point_to_unit_point_on_face",
-           &MappingQGenericWrapper::project_real_point_to_unit_point_on_face,
+           &MappingQWrapper::project_real_point_to_unit_point_on_face,
            project_real_point_to_unit_point_on_face_docstring,
            boost::python::args("self", "cell", "face_no", "point"));
   }

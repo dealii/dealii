@@ -233,7 +233,7 @@ namespace python
      */
     void *point;
 
-    friend class MappingQGenericWrapper;
+    friend class MappingQWrapper;
   };
 
 
