@@ -38,7 +38,8 @@
 
 
 
-void create_two_cubes(Triangulation<3> &coarse_grid)
+void
+create_two_cubes(Triangulation<3> &coarse_grid)
 {
   const Point<3>        points[6] = {Point<3>(0, 0, 0),
                               Point<3>(1, 0, 0),
@@ -75,7 +76,8 @@ void create_two_cubes(Triangulation<3> &coarse_grid)
 }
 
 
-void check(Triangulation<3> &tria)
+void
+check(Triangulation<3> &tria)
 {
   QGauss<2>       quadrature(3);
   FE_Q<3>         fe(1);

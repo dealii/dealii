@@ -403,7 +403,8 @@ SUNDIALS::internal::NVectorView<VectorType>::operator N_Vector() const
 
 
 template <typename VectorType>
-N_Vector SUNDIALS::internal::NVectorView<VectorType>::operator->() const
+N_Vector
+SUNDIALS::internal::NVectorView<VectorType>::operator->() const
 {
   Assert(vector_ptr != nullptr, ExcNotInitialized());
   return vector_ptr.get();

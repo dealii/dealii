@@ -124,10 +124,11 @@ namespace Functions
      * calculates out[i][j] += v*(in1[i]*in2[j]+in1[j]*in2[i])
      */
     template <int dim>
-    void add_outer_product(SymmetricTensor<2, dim> &out,
-                           const double             val,
-                           const Tensor<1, dim> &   in1,
-                           const Tensor<1, dim> &   in2)
+    void
+    add_outer_product(SymmetricTensor<2, dim> &out,
+                      const double             val,
+                      const Tensor<1, dim> &   in1,
+                      const Tensor<1, dim> &   in2)
     {
       if (val != 0.)
         for (unsigned int i = 0; i < dim; i++)
@@ -139,9 +140,10 @@ namespace Functions
      * calculates out[i][j] += v*in[i]in[j]
      */
     template <int dim>
-    void add_outer_product(SymmetricTensor<2, dim> &out,
-                           const double             val,
-                           const Tensor<1, dim> &   in)
+    void
+    add_outer_product(SymmetricTensor<2, dim> &out,
+                      const double             val,
+                      const Tensor<1, dim> &   in)
     {
       if (val != 0.)
         for (unsigned int i = 0; i < dim; i++)

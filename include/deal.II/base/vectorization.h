@@ -142,7 +142,8 @@ public:
    * Dereferencing operator (const version): returns the value of the current
    * lane.
    */
-  const typename T::value_type &operator*() const
+  const typename T::value_type &
+  operator*() const
   {
     AssertIndexRange(lane, T::size());
     return (*data)[lane];
@@ -428,7 +429,8 @@ public:
    * specialization).
    */
   DEAL_II_ALWAYS_INLINE
-  Number &operator[](const unsigned int comp)
+  Number &
+  operator[](const unsigned int comp)
   {
     (void)comp;
     AssertIndexRange(comp, 1);
@@ -440,7 +442,8 @@ public:
    * without specialization).
    */
   DEAL_II_ALWAYS_INLINE
-  const Number &operator[](const unsigned int comp) const
+  const Number &
+  operator[](const unsigned int comp) const
   {
     (void)comp;
     AssertIndexRange(comp, 1);
@@ -719,7 +722,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
  */
 template <typename VectorizedArrayType>
 inline DEAL_II_ALWAYS_INLINE VectorizedArrayType
-                             make_vectorized_array(const typename VectorizedArrayType::value_type &u)
+make_vectorized_array(const typename VectorizedArrayType::value_type &u)
 {
   static_assert(
     std::is_same<VectorizedArrayType,
@@ -955,7 +958,8 @@ public:
    * Access operator.
    */
   DEAL_II_ALWAYS_INLINE
-  double &operator[](const unsigned int comp)
+  double &
+  operator[](const unsigned int comp)
   {
     AssertIndexRange(comp, 8);
     return *(reinterpret_cast<double *>(&data) + comp);
@@ -965,7 +969,8 @@ public:
    * Constant access operator.
    */
   DEAL_II_ALWAYS_INLINE
-  const double &operator[](const unsigned int comp) const
+  const double &
+  operator[](const unsigned int comp) const
   {
     AssertIndexRange(comp, 8);
     return *(reinterpret_cast<const double *>(&data) + comp);
@@ -1502,7 +1507,8 @@ public:
    * Access operator.
    */
   DEAL_II_ALWAYS_INLINE
-  float &operator[](const unsigned int comp)
+  float &
+  operator[](const unsigned int comp)
   {
     AssertIndexRange(comp, 16);
     return *(reinterpret_cast<float *>(&data) + comp);
@@ -1512,7 +1518,8 @@ public:
    * Constant access operator.
    */
   DEAL_II_ALWAYS_INLINE
-  const float &operator[](const unsigned int comp) const
+  const float &
+  operator[](const unsigned int comp) const
   {
     AssertIndexRange(comp, 16);
     return *(reinterpret_cast<const float *>(&data) + comp);
@@ -2145,7 +2152,8 @@ public:
    * Access operator.
    */
   DEAL_II_ALWAYS_INLINE
-  double &operator[](const unsigned int comp)
+  double &
+  operator[](const unsigned int comp)
   {
     AssertIndexRange(comp, 4);
     return *(reinterpret_cast<double *>(&data) + comp);
@@ -2155,7 +2163,8 @@ public:
    * Constant access operator.
    */
   DEAL_II_ALWAYS_INLINE
-  const double &operator[](const unsigned int comp) const
+  const double &
+  operator[](const unsigned int comp) const
   {
     AssertIndexRange(comp, 4);
     return *(reinterpret_cast<const double *>(&data) + comp);
@@ -2651,7 +2660,8 @@ public:
    * Access operator.
    */
   DEAL_II_ALWAYS_INLINE
-  float &operator[](const unsigned int comp)
+  float &
+  operator[](const unsigned int comp)
   {
     AssertIndexRange(comp, 8);
     return *(reinterpret_cast<float *>(&data) + comp);
@@ -2661,7 +2671,8 @@ public:
    * Constant access operator.
    */
   DEAL_II_ALWAYS_INLINE
-  const float &operator[](const unsigned int comp) const
+  const float &
+  operator[](const unsigned int comp) const
   {
     AssertIndexRange(comp, 8);
     return *(reinterpret_cast<const float *>(&data) + comp);
@@ -3191,7 +3202,8 @@ public:
    * Access operator.
    */
   DEAL_II_ALWAYS_INLINE
-  double &operator[](const unsigned int comp)
+  double &
+  operator[](const unsigned int comp)
   {
     AssertIndexRange(comp, 2);
     return *(reinterpret_cast<double *>(&data) + comp);
@@ -3201,7 +3213,8 @@ public:
    * Constant access operator.
    */
   DEAL_II_ALWAYS_INLINE
-  const double &operator[](const unsigned int comp) const
+  const double &
+  operator[](const unsigned int comp) const
   {
     AssertIndexRange(comp, 2);
     return *(reinterpret_cast<const double *>(&data) + comp);
@@ -3628,7 +3641,8 @@ public:
    * Access operator.
    */
   DEAL_II_ALWAYS_INLINE
-  float &operator[](const unsigned int comp)
+  float &
+  operator[](const unsigned int comp)
   {
     AssertIndexRange(comp, 4);
     return *(reinterpret_cast<float *>(&data) + comp);
@@ -3638,7 +3652,8 @@ public:
    * Constant access operator.
    */
   DEAL_II_ALWAYS_INLINE
-  const float &operator[](const unsigned int comp) const
+  const float &
+  operator[](const unsigned int comp) const
   {
     AssertIndexRange(comp, 4);
     return *(reinterpret_cast<const float *>(&data) + comp);
@@ -4106,7 +4121,8 @@ public:
    * Access operator. The component must be either 0 or 1.
    */
   DEAL_II_ALWAYS_INLINE
-  double &operator[](const unsigned int comp)
+  double &
+  operator[](const unsigned int comp)
   {
     AssertIndexRange(comp, 2);
     return *(reinterpret_cast<double *>(&data) + comp);
@@ -4116,7 +4132,8 @@ public:
    * Constant access operator.
    */
   DEAL_II_ALWAYS_INLINE
-  const double &operator[](const unsigned int comp) const
+  const double &
+  operator[](const unsigned int comp) const
   {
     AssertIndexRange(comp, 2);
     return *(reinterpret_cast<const double *>(&data) + comp);
@@ -4340,7 +4357,8 @@ public:
    * Access operator. The component must be between 0 and 3.
    */
   DEAL_II_ALWAYS_INLINE
-  float &operator[](const unsigned int comp)
+  float &
+  operator[](const unsigned int comp)
   {
     AssertIndexRange(comp, 4);
     return *(reinterpret_cast<float *>(&data) + comp);
@@ -4350,7 +4368,8 @@ public:
    * Constant access operator.
    */
   DEAL_II_ALWAYS_INLINE
-  const float &operator[](const unsigned int comp) const
+  const float &
+  operator[](const unsigned int comp) const
   {
     AssertIndexRange(comp, 4);
     return *(reinterpret_cast<const float *>(&data) + comp);
@@ -4621,7 +4640,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
  */
 template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
-                             operator+(const Number &u, const VectorizedArray<Number, width> &v)
+operator+(const Number &u, const VectorizedArray<Number, width> &v)
 {
   VectorizedArray<Number, width> tmp = u;
   return tmp += v;
@@ -4637,7 +4656,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
  */
 template <std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
-                             operator+(const double u, const VectorizedArray<float, width> &v)
+operator+(const double u, const VectorizedArray<float, width> &v)
 {
   VectorizedArray<float, width> tmp = u;
   return tmp += v;
@@ -4651,7 +4670,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
  */
 template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
-                             operator+(const VectorizedArray<Number, width> &v, const Number &u)
+operator+(const VectorizedArray<Number, width> &v, const Number &u)
 {
   return u + v;
 }
@@ -4666,7 +4685,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
  */
 template <std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
-                             operator+(const VectorizedArray<float, width> &v, const double u)
+operator+(const VectorizedArray<float, width> &v, const double u)
 {
   return u + v;
 }
@@ -4679,7 +4698,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
  */
 template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
-                             operator-(const Number &u, const VectorizedArray<Number, width> &v)
+operator-(const Number &u, const VectorizedArray<Number, width> &v)
 {
   VectorizedArray<Number, width> tmp = u;
   return tmp -= v;
@@ -4695,7 +4714,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
  */
 template <std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
-                             operator-(const double u, const VectorizedArray<float, width> &v)
+operator-(const double u, const VectorizedArray<float, width> &v)
 {
   VectorizedArray<float, width> tmp = static_cast<float>(u);
   return tmp -= v;
@@ -4709,7 +4728,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
  */
 template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
-                             operator-(const VectorizedArray<Number, width> &v, const Number &u)
+operator-(const VectorizedArray<Number, width> &v, const Number &u)
 {
   VectorizedArray<Number, width> tmp = u;
   return v - tmp;
@@ -4725,7 +4744,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
  */
 template <std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
-                             operator-(const VectorizedArray<float, width> &v, const double u)
+operator-(const VectorizedArray<float, width> &v, const double u)
 {
   VectorizedArray<float, width> tmp = static_cast<float>(u);
   return v - tmp;
@@ -4739,7 +4758,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
  */
 template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
-                             operator*(const Number &u, const VectorizedArray<Number, width> &v)
+operator*(const Number &u, const VectorizedArray<Number, width> &v)
 {
   VectorizedArray<Number, width> tmp = u;
   return tmp *= v;
@@ -4755,7 +4774,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
  */
 template <std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
-                             operator*(const double u, const VectorizedArray<float, width> &v)
+operator*(const double u, const VectorizedArray<float, width> &v)
 {
   VectorizedArray<float, width> tmp = static_cast<float>(u);
   return tmp *= v;
@@ -4769,7 +4788,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
  */
 template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
-                             operator*(const VectorizedArray<Number, width> &v, const Number &u)
+operator*(const VectorizedArray<Number, width> &v, const Number &u)
 {
   return u * v;
 }
@@ -4784,7 +4803,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
  */
 template <std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
-                             operator*(const VectorizedArray<float, width> &v, const double u)
+operator*(const VectorizedArray<float, width> &v, const double u)
 {
   return u * v;
 }
@@ -4797,7 +4816,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
  */
 template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
-                             operator/(const Number &u, const VectorizedArray<Number, width> &v)
+operator/(const Number &u, const VectorizedArray<Number, width> &v)
 {
   VectorizedArray<Number, width> tmp = u;
   return tmp /= v;
@@ -4813,7 +4832,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
  */
 template <std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
-                             operator/(const double u, const VectorizedArray<float, width> &v)
+operator/(const double u, const VectorizedArray<float, width> &v)
 {
   VectorizedArray<float, width> tmp = static_cast<float>(u);
   return tmp /= v;
@@ -4827,7 +4846,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
  */
 template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
-                             operator/(const VectorizedArray<Number, width> &v, const Number &u)
+operator/(const VectorizedArray<Number, width> &v, const Number &u)
 {
   VectorizedArray<Number, width> tmp = u;
   return v / tmp;
@@ -4843,7 +4862,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
  */
 template <std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
-                             operator/(const VectorizedArray<float, width> &v, const double u)
+operator/(const VectorizedArray<float, width> &v, const double u)
 {
   VectorizedArray<float, width> tmp = static_cast<float>(u);
   return v / tmp;

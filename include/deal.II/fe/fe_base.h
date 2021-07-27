@@ -125,7 +125,8 @@ namespace FiniteElementDomination
    * <code>other_element_dominates</code>, then the returned value is
    * <code>neither_element_dominates</code>.
    */
-  inline Domination operator&(const Domination d1, const Domination d2);
+  inline Domination
+  operator&(const Domination d1, const Domination d2);
 } // namespace FiniteElementDomination
 
 namespace internal
@@ -698,7 +699,8 @@ namespace internal
 
 namespace FiniteElementDomination
 {
-  inline Domination operator&(const Domination d1, const Domination d2)
+  inline Domination
+  operator&(const Domination d1, const Domination d2)
   {
     // go through the entire list of possibilities. note that if we were into
     // speed, obfuscation and cared enough, we could implement this operator

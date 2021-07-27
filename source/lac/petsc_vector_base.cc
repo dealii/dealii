@@ -342,7 +342,8 @@ namespace PETScWrappers
 
 
 
-  PetscScalar VectorBase::operator*(const VectorBase &vec) const
+  PetscScalar
+  VectorBase::operator*(const VectorBase &vec) const
   {
     Assert(size() == vec.size(), ExcDimensionMismatch(size(), vec.size()));
 

@@ -1009,12 +1009,13 @@ namespace internal
               dof_processor);
 
         // 4) INNER dofs
-        dof_operation.process_dofs(accessor,
-                                   [&](const auto d) { return d; },
-                                   index,
-                                   dof_indices,
-                                   fe_index,
-                                   dof_processor);
+        dof_operation.process_dofs(
+          accessor,
+          [&](const auto d) { return d; },
+          index,
+          dof_indices,
+          fe_index,
+          dof_processor);
 
         AssertDimension(n_dof_indices(accessor, fe_index, count_level_dofs),
                         index);
@@ -1059,18 +1060,19 @@ namespace internal
               DoFHandler<dim, spacedim>::default_fe_index :
               fe_index_;
 
-          process_object(accessor.get_dof_handler(),
-                         0,
-                         accessor.vertex_index(vertex),
-                         fe_index,
-                         [](const auto d) {
-                           Assert(false, ExcInternalError());
-                           return d;
-                         },
-                         std::integral_constant<int, 0>(),
-                         index_value,
-                         index,
-                         dof_processor);
+          process_object(
+            accessor.get_dof_handler(),
+            0,
+            accessor.vertex_index(vertex),
+            fe_index,
+            [](const auto d) {
+              Assert(false, ExcInternalError());
+              return d;
+            },
+            std::integral_constant<int, 0>(),
+            index_value,
+            index,
+            dof_processor);
         }
 
         /**
@@ -1868,7 +1870,8 @@ inline DoFAccessor<0, 1, spacedim, level_dof_access>::DoFAccessor(
 
 
 template <int spacedim, bool level_dof_access>
-inline void DoFAccessor<0, 1, spacedim, level_dof_access>::set_dof_handler(
+inline void
+DoFAccessor<0, 1, spacedim, level_dof_access>::set_dof_handler(
   DoFHandler<1, spacedim> *dh)
 {
   Assert(dh != nullptr, ExcInvalidObject());

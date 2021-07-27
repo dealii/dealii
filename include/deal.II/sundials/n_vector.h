@@ -170,7 +170,8 @@ namespace SUNDIALS
       /**
        * Access the N_Vector that is viewed by this object.
        */
-      N_Vector operator->() const;
+      N_Vector
+      operator->() const;
 
     private:
       /**

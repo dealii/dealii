@@ -185,7 +185,7 @@ public:
    * @note This function can also be used in CUDA device code.
    */
   DEAL_II_CUDA_HOST_DEV Number
-                        operator()(const unsigned int index) const;
+  operator()(const unsigned int index) const;
 
   /**
    * Read and write access to the <tt>index</tt>th coordinate.
@@ -288,7 +288,8 @@ public:
    *
    * @note This function can also be used in CUDA device code.
    */
-  DEAL_II_CUDA_HOST_DEV Number operator*(const Tensor<1, dim, Number> &p) const;
+  DEAL_II_CUDA_HOST_DEV Number
+  operator*(const Tensor<1, dim, Number> &p) const;
 
   /**
    * Return the scalar product of this point vector with itself, i.e. the
@@ -548,10 +549,10 @@ Point<dim, Number>::operator-() const
 template <int dim, typename Number>
 template <typename OtherNumber>
 inline DEAL_II_CUDA_HOST_DEV
-    Point<dim,
+  Point<dim,
         typename ProductType<Number,
                              typename EnableIfScalar<OtherNumber>::type>::type>
-    Point<dim, Number>::operator*(const OtherNumber factor) const
+  Point<dim, Number>::operator*(const OtherNumber factor) const
 {
   Point<dim, typename ProductType<Number, OtherNumber>::type> tmp;
   for (unsigned int i = 0; i < dim; ++i)
@@ -580,8 +581,8 @@ inline DEAL_II_CUDA_HOST_DEV
 
 
 template <int dim, typename Number>
-inline DEAL_II_CUDA_HOST_DEV Number Point<dim, Number>::
-                                    operator*(const Tensor<1, dim, Number> &p) const
+inline DEAL_II_CUDA_HOST_DEV Number
+Point<dim, Number>::operator*(const Tensor<1, dim, Number> &p) const
 {
   Number res = Number();
   for (unsigned int i = 0; i < dim; ++i)

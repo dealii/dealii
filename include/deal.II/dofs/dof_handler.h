@@ -2018,14 +2018,14 @@ DoFHandler<dim, spacedim>::save(Archive &ar, const unsigned int) const
 {
   if (this->hp_capability_enabled)
     {
-      ar & this->object_dof_indices;
-      ar & this->object_dof_ptr;
+      ar &this->object_dof_indices;
+      ar &this->object_dof_ptr;
 
-      ar & this->cell_dof_cache_indices;
-      ar & this->cell_dof_cache_ptr;
+      ar &this->cell_dof_cache_indices;
+      ar &this->cell_dof_cache_ptr;
 
-      ar & this->hp_cell_active_fe_indices;
-      ar & this->hp_cell_future_fe_indices;
+      ar &this->hp_cell_active_fe_indices;
+      ar &this->hp_cell_future_fe_indices;
 
       ar &hp_object_fe_ptr;
       ar &hp_object_fe_indices;
@@ -2045,14 +2045,14 @@ DoFHandler<dim, spacedim>::save(Archive &ar, const unsigned int) const
     }
   else
     {
-      ar & this->block_info_object;
+      ar &this->block_info_object;
       ar &number_cache;
 
-      ar & this->object_dof_indices;
-      ar & this->object_dof_ptr;
+      ar &this->object_dof_indices;
+      ar &this->object_dof_ptr;
 
-      ar & this->cell_dof_cache_indices;
-      ar & this->cell_dof_cache_ptr;
+      ar &this->cell_dof_cache_indices;
+      ar &this->cell_dof_cache_ptr;
 
       // write out the number of triangulation cells and later check during
       // loading that this number is indeed correct; same with something that
@@ -2074,14 +2074,14 @@ DoFHandler<dim, spacedim>::load(Archive &ar, const unsigned int)
 {
   if (this->hp_capability_enabled)
     {
-      ar & this->object_dof_indices;
-      ar & this->object_dof_ptr;
+      ar &this->object_dof_indices;
+      ar &this->object_dof_ptr;
 
-      ar & this->cell_dof_cache_indices;
-      ar & this->cell_dof_cache_ptr;
+      ar &this->cell_dof_cache_indices;
+      ar &this->cell_dof_cache_ptr;
 
-      ar & this->hp_cell_active_fe_indices;
-      ar & this->hp_cell_future_fe_indices;
+      ar &this->hp_cell_active_fe_indices;
+      ar &this->hp_cell_future_fe_indices;
 
       ar &hp_object_fe_ptr;
       ar &hp_object_fe_indices;
@@ -2112,18 +2112,18 @@ DoFHandler<dim, spacedim>::load(Archive &ar, const unsigned int)
     }
   else
     {
-      ar & this->block_info_object;
+      ar &this->block_info_object;
       ar &number_cache;
 
       object_dof_indices.clear();
 
       object_dof_ptr.clear();
 
-      ar & this->object_dof_indices;
-      ar & this->object_dof_ptr;
+      ar &this->object_dof_indices;
+      ar &this->object_dof_ptr;
 
-      ar & this->cell_dof_cache_indices;
-      ar & this->cell_dof_cache_ptr;
+      ar &this->cell_dof_cache_indices;
+      ar &this->cell_dof_cache_ptr;
 
       // these are the checks that correspond to the last block in the save()
       // function

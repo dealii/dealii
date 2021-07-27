@@ -69,7 +69,8 @@ TestFunction::value(const Point<2> &p, const unsigned int component) const
 
 
 
-void make_grid(Triangulation<2> &triangulation)
+void
+make_grid(Triangulation<2> &triangulation)
 {
   GridGenerator::hyper_cube(triangulation);
 

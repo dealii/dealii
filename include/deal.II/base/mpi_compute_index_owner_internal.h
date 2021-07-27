@@ -268,7 +268,7 @@ namespace Utilities
                 // ranks. Here, we process the interval by breaking into
                 // smaller pieces in terms of the dictionary number.
                 std::pair<types::global_dof_index, types::global_dof_index>
-                                   index_range(*interval->begin(), interval->last() + 1);
+                  index_range(*interval->begin(), interval->last() + 1);
                 const unsigned int owner_last =
                   dof_to_dict_rank(interval->last());
                 unsigned int owner_first = numbers::invalid_unsigned_int;

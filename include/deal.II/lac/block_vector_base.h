@@ -211,13 +211,15 @@ namespace internal
        * is <tt>true</tt>, then no writing to the result is possible, making
        * this a const_iterator.
        */
-      dereference_type operator*() const;
+      dereference_type
+      operator*() const;
 
       /**
        * Random access operator, grant access to arbitrary elements relative
        * to the one presently pointed to.
        */
-      dereference_type operator[](const difference_type d) const;
+      dereference_type
+      operator[](const difference_type d) const;
 
       /**
        * Prefix increment operator. This operator advances the iterator to the
@@ -614,14 +616,16 @@ public:
    *
    * Exactly the same as operator().
    */
-  value_type operator[](const size_type i) const;
+  value_type
+  operator[](const size_type i) const;
 
   /**
    * Access components, returns U(i) as a writeable reference.
    *
    * Exactly the same as operator().
    */
-  reference operator[](const size_type i);
+  reference
+  operator[](const size_type i);
 
   /**
    * Instead of getting individual elements of a vector via operator(),
@@ -721,7 +725,8 @@ public:
   /**
    * $U = U * V$: scalar product.
    */
-  value_type operator*(const BlockVectorBase &V) const;
+  value_type
+  operator*(const BlockVectorBase &V) const;
 
   /**
    * Return the square of the $l_2$-norm.
@@ -1042,7 +1047,7 @@ namespace internal
 
     template <class BlockVectorType, bool Constness>
     inline typename Iterator<BlockVectorType, Constness>::dereference_type
-      Iterator<BlockVectorType, Constness>::operator*() const
+    Iterator<BlockVectorType, Constness>::operator*() const
     {
       return parent->block(current_block)(index_within_block);
     }
@@ -1051,8 +1056,8 @@ namespace internal
 
     template <class BlockVectorType, bool Constness>
     inline typename Iterator<BlockVectorType, Constness>::dereference_type
-      Iterator<BlockVectorType, Constness>::
-      operator[](const difference_type d) const
+    Iterator<BlockVectorType, Constness>::operator[](
+      const difference_type d) const
     {
       // if the index pointed to is
       // still within the block we
@@ -1120,8 +1125,8 @@ namespace internal
     template <class BlockVectorType, bool Constness>
     template <bool OtherConstness>
     inline bool
-    Iterator<BlockVectorType, Constness>::
-    operator==(const Iterator<BlockVectorType, OtherConstness> &i) const
+    Iterator<BlockVectorType, Constness>::operator==(
+      const Iterator<BlockVectorType, OtherConstness> &i) const
     {
       Assert(parent == i.parent, ExcPointerToDifferentVectors());
 
@@ -1133,8 +1138,8 @@ namespace internal
     template <class BlockVectorType, bool Constness>
     template <bool OtherConstness>
     inline bool
-    Iterator<BlockVectorType, Constness>::
-    operator!=(const Iterator<BlockVectorType, OtherConstness> &i) const
+    Iterator<BlockVectorType, Constness>::operator!=(
+      const Iterator<BlockVectorType, OtherConstness> &i) const
     {
       Assert(parent == i.parent, ExcPointerToDifferentVectors());
 
@@ -1146,8 +1151,8 @@ namespace internal
     template <class BlockVectorType, bool Constness>
     template <bool OtherConstness>
     inline bool
-    Iterator<BlockVectorType, Constness>::
-    operator<(const Iterator<BlockVectorType, OtherConstness> &i) const
+    Iterator<BlockVectorType, Constness>::operator<(
+      const Iterator<BlockVectorType, OtherConstness> &i) const
     {
       Assert(parent == i.parent, ExcPointerToDifferentVectors());
 
@@ -1159,8 +1164,8 @@ namespace internal
     template <class BlockVectorType, bool Constness>
     template <bool OtherConstness>
     inline bool
-    Iterator<BlockVectorType, Constness>::
-    operator<=(const Iterator<BlockVectorType, OtherConstness> &i) const
+    Iterator<BlockVectorType, Constness>::operator<=(
+      const Iterator<BlockVectorType, OtherConstness> &i) const
     {
       Assert(parent == i.parent, ExcPointerToDifferentVectors());
 
@@ -1172,8 +1177,8 @@ namespace internal
     template <class BlockVectorType, bool Constness>
     template <bool OtherConstness>
     inline bool
-    Iterator<BlockVectorType, Constness>::
-    operator>(const Iterator<BlockVectorType, OtherConstness> &i) const
+    Iterator<BlockVectorType, Constness>::operator>(
+      const Iterator<BlockVectorType, OtherConstness> &i) const
     {
       Assert(parent == i.parent, ExcPointerToDifferentVectors());
 
@@ -1185,8 +1190,8 @@ namespace internal
     template <class BlockVectorType, bool Constness>
     template <bool OtherConstness>
     inline bool
-    Iterator<BlockVectorType, Constness>::
-    operator>=(const Iterator<BlockVectorType, OtherConstness> &i) const
+    Iterator<BlockVectorType, Constness>::operator>=(
+      const Iterator<BlockVectorType, OtherConstness> &i) const
     {
       Assert(parent == i.parent, ExcPointerToDifferentVectors());
 
@@ -1198,8 +1203,8 @@ namespace internal
     template <class BlockVectorType, bool Constness>
     template <bool OtherConstness>
     inline typename Iterator<BlockVectorType, Constness>::difference_type
-    Iterator<BlockVectorType, Constness>::
-    operator-(const Iterator<BlockVectorType, OtherConstness> &i) const
+    Iterator<BlockVectorType, Constness>::operator-(
+      const Iterator<BlockVectorType, OtherConstness> &i) const
     {
       Assert(parent == i.parent, ExcPointerToDifferentVectors());
 
@@ -1211,8 +1216,8 @@ namespace internal
 
     template <class BlockVectorType, bool Constness>
     inline Iterator<BlockVectorType, Constness>
-    Iterator<BlockVectorType, Constness>::
-    operator+(const difference_type &d) const
+    Iterator<BlockVectorType, Constness>::operator+(
+      const difference_type &d) const
     {
       // if the index pointed to is
       // still within the block we
@@ -1238,8 +1243,8 @@ namespace internal
 
     template <class BlockVectorType, bool Constness>
     inline Iterator<BlockVectorType, Constness>
-    Iterator<BlockVectorType, Constness>::
-    operator-(const difference_type &d) const
+    Iterator<BlockVectorType, Constness>::operator-(
+      const difference_type &d) const
     {
       // if the index pointed to is
       // still within the block we
@@ -1606,8 +1611,9 @@ BlockVectorBase<VectorType>::is_non_negative() const
 
 
 template <class VectorType>
-typename BlockVectorBase<VectorType>::value_type BlockVectorBase<VectorType>::
-                                                 operator*(const BlockVectorBase<VectorType> &v) const
+typename BlockVectorBase<VectorType>::value_type
+BlockVectorBase<VectorType>::operator*(
+  const BlockVectorBase<VectorType> &v) const
 {
   Assert(n_blocks() == v.n_blocks(),
          ExcDimensionMismatch(n_blocks(), v.n_blocks()));
@@ -2040,8 +2046,8 @@ BlockVectorBase<VectorType>::operator=(const VectorType &v)
 template <class VectorType>
 template <class VectorType2>
 inline bool
-BlockVectorBase<VectorType>::
-operator==(const BlockVectorBase<VectorType2> &v) const
+BlockVectorBase<VectorType>::operator==(
+  const BlockVectorBase<VectorType2> &v) const
 {
   Assert(block_indices == v.block_indices, ExcDifferentBlockIndices());
 
@@ -2108,7 +2114,7 @@ BlockVectorBase<VectorType>::operator()(const size_type i)
 
 template <class VectorType>
 inline typename BlockVectorBase<VectorType>::value_type
-  BlockVectorBase<VectorType>::operator[](const size_type i) const
+BlockVectorBase<VectorType>::operator[](const size_type i) const
 {
   return operator()(i);
 }
@@ -2117,7 +2123,7 @@ inline typename BlockVectorBase<VectorType>::value_type
 
 template <class VectorType>
 inline typename BlockVectorBase<VectorType>::reference
-  BlockVectorBase<VectorType>::operator[](const size_type i)
+BlockVectorBase<VectorType>::operator[](const size_type i)
 {
   return operator()(i);
 }

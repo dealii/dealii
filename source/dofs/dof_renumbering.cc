@@ -601,7 +601,7 @@ namespace DoFRenumbering
               my_new_indices.size());
             {
               std::set<types::global_dof_index>::const_iterator
-                                      next_erased_index = erase_these_indices.begin();
+                next_erased_index = erase_these_indices.begin();
               types::global_dof_index next_new_index = 0;
               for (unsigned int i = 0; i < translate_indices.size(); ++i)
                 if ((next_erased_index != erase_these_indices.end()) &&

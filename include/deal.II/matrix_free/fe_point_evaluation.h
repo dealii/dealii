@@ -78,7 +78,8 @@ namespace internal
             result[i][d] = value[d][i][vector_lane];
       }
 
-      static void get_gradient(
+      static void
+      get_gradient(
         Tensor<1, dim, Tensor<1, n_components, VectorizedArray<Number>>> &value,
         const unsigned int   vector_lane,
         const gradient_type &result)
@@ -98,17 +99,18 @@ namespace internal
       }
 
       static void
-        get_value(Tensor<1, n_components, VectorizedArray<Number>> &value,
-                  const unsigned int                                vector_lane,
-                  const value_type &                                result)
+      get_value(Tensor<1, n_components, VectorizedArray<Number>> &value,
+                const unsigned int                                vector_lane,
+                const value_type &                                result)
       {
         for (unsigned int i = 0; i < n_components; ++i)
           value[i][vector_lane] = result[i];
       }
 
       template <typename Number2>
-      static Number2 &access(Tensor<1, n_components, Number2> &value,
-                             const unsigned int                component)
+      static Number2 &
+      access(Tensor<1, n_components, Number2> &value,
+             const unsigned int                component)
       {
         return value[component];
       }
@@ -153,9 +155,10 @@ namespace internal
           result[d] = value[d][vector_lane];
       }
 
-      static void get_gradient(Tensor<1, dim, VectorizedArray<Number>> &value,
-                               const unsigned int   vector_lane,
-                               const gradient_type &result)
+      static void
+      get_gradient(Tensor<1, dim, VectorizedArray<Number>> &value,
+                   const unsigned int                       vector_lane,
+                   const gradient_type &                    result)
       {
         for (unsigned int d = 0; d < dim; ++d)
           value[d][vector_lane] = result[d];
@@ -225,7 +228,8 @@ namespace internal
             result[i][d] = value[d][i][vector_lane];
       }
 
-      static void get_gradient(
+      static void
+      get_gradient(
         Tensor<1, dim, Tensor<1, dim, VectorizedArray<Number>>> &value,
         const unsigned int                                       vector_lane,
         const gradient_type &                                    result)
@@ -244,9 +248,10 @@ namespace internal
           result[i] = value[i][vector_lane];
       }
 
-      static void get_value(Tensor<1, dim, VectorizedArray<Number>> &value,
-                            const unsigned int vector_lane,
-                            const value_type & result)
+      static void
+      get_value(Tensor<1, dim, VectorizedArray<Number>> &value,
+                const unsigned int                       vector_lane,
+                const value_type &                       result)
       {
         for (unsigned int i = 0; i < dim; ++i)
           value[i][vector_lane] = result[i];
@@ -307,9 +312,10 @@ namespace internal
         result[0] = value[0][vector_lane];
       }
 
-      static void get_gradient(Tensor<1, 1, VectorizedArray<Number>> &value,
-                               const unsigned int   vector_lane,
-                               const gradient_type &result)
+      static void
+      get_gradient(Tensor<1, 1, VectorizedArray<Number>> &value,
+                   const unsigned int                     vector_lane,
+                   const gradient_type &                  result)
       {
         value[0][vector_lane] = result[0];
       }

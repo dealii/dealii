@@ -173,7 +173,8 @@ namespace MeshWorker
    *
    * @ref AssembleFlags
    */
-  inline AssembleFlags operator&(AssembleFlags f1, AssembleFlags f2)
+  inline AssembleFlags
+  operator&(AssembleFlags f1, AssembleFlags f2)
   {
     return static_cast<AssembleFlags>(static_cast<unsigned int>(f1) &
                                       static_cast<unsigned int>(f2));

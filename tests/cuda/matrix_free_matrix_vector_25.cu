@@ -124,7 +124,7 @@ test()
                  fe_degree,
                  Number,
                  LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA>>
-                                                                mf(mf_data, coef_size);
+    mf(mf_data, coef_size);
   LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> in_dev;
   LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> out_dev;
   mf_data.initialize_dof_vector(in_dev);

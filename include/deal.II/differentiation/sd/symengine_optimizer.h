@@ -208,8 +208,8 @@ namespace Differentiation
     // <tt>operator |</tt> would be an integer which would in turn trigger a
     // compiler warning when we tried to assign it to an object of type
     // OptimizationFlags.
-    inline OptimizationFlags operator&(const OptimizationFlags f1,
-                                       const OptimizationFlags f2)
+    inline OptimizationFlags
+    operator&(const OptimizationFlags f1, const OptimizationFlags f2)
     {
       return static_cast<OptimizationFlags>(static_cast<unsigned int>(f1) &
                                             static_cast<unsigned int>(f2));
@@ -1137,7 +1137,8 @@ namespace Differentiation
       template <typename NumberType,
                 int rank,
                 int dim,
-                template <int, int, typename> class TensorType>
+                template <int, int, typename>
+                class TensorType>
       TensorType<rank, dim, NumberType>
       tensor_evaluate_optimized(
         const TensorType<rank, dim, Expression> &symbol_tensor,
@@ -1278,7 +1279,7 @@ namespace Differentiation
       void
       register_functions(BatchOptimizer<NumberType> &optimizer,
                          const T &                   function,
-                         const Args &... other_functions)
+                         const Args &...other_functions)
       {
         register_functions(optimizer, function);
         register_functions(optimizer, other_functions...);
@@ -1298,7 +1299,8 @@ namespace Differentiation
        */
       template <int rank,
                 int dim,
-                template <int, int, typename> class TensorType>
+                template <int, int, typename>
+                class TensorType>
       types::symbol_vector
       unroll_to_expression_vector(
         const TensorType<rank, dim, Expression> &symbol_tensor)
@@ -1704,7 +1706,7 @@ namespace Differentiation
        */
       template <typename T, typename... Args>
       void
-      register_functions(const T &functions, const Args &... other_functions);
+      register_functions(const T &functions, const Args &...other_functions);
 
       /**
        * Return a vector of expressions that have been registered as dependent
@@ -2489,7 +2491,7 @@ namespace Differentiation
     void
     BatchOptimizer<ReturnType>::register_functions(
       const T &functions,
-      const Args &... other_functions)
+      const Args &...other_functions)
     {
       internal::register_functions(*this, functions);
       internal::register_functions(*this, other_functions...);

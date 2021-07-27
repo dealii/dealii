@@ -387,12 +387,14 @@ namespace TrilinosWrappers
       /**
        * Dereferencing operator.
        */
-      const Accessor<Constness> &operator*() const;
+      const Accessor<Constness> &
+      operator*() const;
 
       /**
        * Dereferencing operator.
        */
-      const Accessor<Constness> *operator->() const;
+      const Accessor<Constness> *
+      operator->() const;
 
       /**
        * Comparison. True, if both iterators point to the same matrix
@@ -2392,8 +2394,9 @@ namespace TrilinosWrappers
        * Return an operator that returns a payload configured to support the
        * multiplication of two LinearOperators
        */
-      TrilinosPayload operator*(const TrilinosPayload &first_op,
-                                const TrilinosPayload &second_op);
+      TrilinosPayload
+      operator*(const TrilinosPayload &first_op,
+                const TrilinosPayload &second_op);
 
     } // namespace LinearOperatorImplementation
   }   /* namespace internal */
@@ -2598,7 +2601,8 @@ namespace TrilinosWrappers
 
 
     template <bool Constness>
-    inline const Accessor<Constness> &Iterator<Constness>::operator*() const
+    inline const Accessor<Constness> &
+    Iterator<Constness>::operator*() const
     {
       return accessor;
     }
@@ -2606,7 +2610,8 @@ namespace TrilinosWrappers
 
 
     template <bool Constness>
-    inline const Accessor<Constness> *Iterator<Constness>::operator->() const
+    inline const Accessor<Constness> *
+    Iterator<Constness>::operator->() const
     {
       return &accessor;
     }

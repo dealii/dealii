@@ -30,14 +30,16 @@
 using namespace dealii::Physics;
 
 template <int dim, typename Number>
-void initialize(Tensor<1, dim, Number> &x)
+void
+initialize(Tensor<1, dim, Number> &x)
 {
   for (unsigned int i = 0; i < x.n_independent_components; ++i)
     x[i] = i + 1;
 }
 
 template <int dim, typename Number>
-void initialize(Tensor<2, dim, Number> &x)
+void
+initialize(Tensor<2, dim, Number> &x)
 {
   unsigned int c = 1;
   for (unsigned int i = 0; i < dim; ++i)
@@ -48,7 +50,8 @@ void initialize(Tensor<2, dim, Number> &x)
 }
 
 template <int dim, typename Number>
-void initialize(SymmetricTensor<2, dim, Number> &x)
+void
+initialize(SymmetricTensor<2, dim, Number> &x)
 {
   unsigned int c = 1;
   for (unsigned int i = 0; i < dim; ++i)
@@ -59,7 +62,8 @@ void initialize(SymmetricTensor<2, dim, Number> &x)
 }
 
 template <int dim, typename Number>
-void initialize(Tensor<3, dim, Number> &x)
+void
+initialize(Tensor<3, dim, Number> &x)
 {
   unsigned int c = 1;
   for (unsigned int i = 0; i < dim; ++i)
@@ -73,8 +77,8 @@ void initialize(Tensor<3, dim, Number> &x)
 // A specialised constructor mimicking the construction
 // of a rank-3 tensor with two symmetric components
 template <int dim, typename Number>
-void initialize(Tensor<3, dim, Number> &x,
-                const bool              left_components_are_symmetric)
+void
+initialize(Tensor<3, dim, Number> &x, const bool left_components_are_symmetric)
 {
   Tensor<1, dim, Number> v;
   initialize(v);
@@ -88,7 +92,8 @@ void initialize(Tensor<3, dim, Number> &x,
 }
 
 template <int dim, typename Number>
-void initialize(Tensor<4, dim, Number> &x)
+void
+initialize(Tensor<4, dim, Number> &x)
 {
   unsigned int c = 1;
   for (unsigned int i = 0; i < dim; ++i)
@@ -101,7 +106,8 @@ void initialize(Tensor<4, dim, Number> &x)
 }
 
 template <int dim, typename Number>
-void initialize(SymmetricTensor<4, dim, Number> &x)
+void
+initialize(SymmetricTensor<4, dim, Number> &x)
 {
   unsigned int c = 1;
   for (unsigned int i = 0; i < dim; ++i)

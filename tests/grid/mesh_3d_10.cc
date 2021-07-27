@@ -40,7 +40,8 @@
 
 #include "mesh_3d.h"
 
-void check_this(Triangulation<3> &tria)
+void
+check_this(Triangulation<3> &tria)
 {
   for (Triangulation<3>::cell_iterator cell = tria.begin(); cell != tria.end();
        ++cell)
@@ -59,7 +60,8 @@ void check_this(Triangulation<3> &tria)
 }
 
 
-void check(Triangulation<3> &tria)
+void
+check(Triangulation<3> &tria)
 {
   deallog << "Initial check" << std::endl;
   check_this(tria);

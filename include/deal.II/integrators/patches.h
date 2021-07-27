@@ -38,9 +38,9 @@ namespace LocalIntegrators
   {
     template <int dim>
     inline void
-      points_and_values(Table<2, double> &                          result,
-                        const FEValuesBase<dim> &                   fe,
-                        const ArrayView<const std::vector<double>> &input)
+    points_and_values(Table<2, double> &                          result,
+                      const FEValuesBase<dim> &                   fe,
+                      const ArrayView<const std::vector<double>> &input)
     {
       const unsigned int n_comp = fe.get_fe().n_components();
       AssertVectorVectorDimension(input, n_comp, fe.n_quadrature_points);

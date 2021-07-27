@@ -2216,8 +2216,8 @@ namespace FETools
     // finally loop over all possible refinement cases
     Threads::TaskGroup<> tasks;
     unsigned int         ref_case = (isotropic_only) ?
-                              RefinementCase<dim>::isotropic_refinement :
-                              RefinementCase<dim>::cut_x;
+                                      RefinementCase<dim>::isotropic_refinement :
+                                      RefinementCase<dim>::cut_x;
     for (; ref_case <= RefinementCase<dim>::isotropic_refinement; ++ref_case)
       tasks += Threads::new_task([&, ref_case]() {
         compute_one_case(ref_case, mass, matrices[ref_case - 1]);

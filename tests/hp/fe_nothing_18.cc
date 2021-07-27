@@ -97,7 +97,7 @@ private:
   std::vector<types::global_dof_index> dofs_per_block;
 
   Triangulation<dim>
-                  triangulation; // a triangulation object of the "dim"-dimensional domain;
+    triangulation; // a triangulation object of the "dim"-dimensional domain;
   DoFHandler<dim> dof_handler; // is associated with triangulation;
 
   FESystem<dim>         elasticity_fe;

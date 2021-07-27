@@ -502,7 +502,8 @@ namespace LinearAlgebra
      *
      * This function does the same thing as operator().
      */
-    Number operator[](const size_type global_index) const;
+    Number
+    operator[](const size_type global_index) const;
 
     /**
      * Read and write access to the data in the position corresponding to @p
@@ -511,7 +512,8 @@ namespace LinearAlgebra
      *
      * This function does the same thing as operator().
      */
-    Number &operator[](const size_type global_index);
+    Number &
+    operator[](const size_type global_index);
 
     /**
      * Instead of getting individual elements of a vector via operator(),
@@ -928,8 +930,8 @@ namespace LinearAlgebra
 
 
   template <typename Number>
-  inline Number ReadWriteVector<Number>::
-                operator[](const size_type global_index) const
+  inline Number
+  ReadWriteVector<Number>::operator[](const size_type global_index) const
   {
     return operator()(global_index);
   }
@@ -937,8 +939,8 @@ namespace LinearAlgebra
 
 
   template <typename Number>
-  inline Number &ReadWriteVector<Number>::
-                 operator[](const size_type global_index)
+  inline Number &
+  ReadWriteVector<Number>::operator[](const size_type global_index)
   {
     return operator()(global_index);
   }
@@ -1062,8 +1064,9 @@ namespace LinearAlgebra
   template <typename Number>
   template <typename Functor>
   void
-  ReadWriteVector<Number>::FunctorTemplate<Functor>::
-  operator()(const size_type begin, const size_type end)
+  ReadWriteVector<Number>::FunctorTemplate<Functor>::operator()(
+    const size_type begin,
+    const size_type end)
   {
     for (size_type i = begin; i < end; ++i)
       functor(parent.values[i]);

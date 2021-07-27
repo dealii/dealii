@@ -821,7 +821,8 @@ namespace TrilinosWrappers
        * Return the scalar (inner) product of two vectors. The vectors must have
        * the same size.
        */
-      TrilinosScalar operator*(const Vector &vec) const;
+      TrilinosScalar
+      operator*(const Vector &vec) const;
 
       /**
        * Return the square of the $l_2$-norm.
@@ -943,14 +944,16 @@ namespace TrilinosWrappers
        *
        * Exactly the same as operator().
        */
-      reference operator[](const size_type index);
+      reference
+      operator[](const size_type index);
 
       /**
        * Provide read-only access to an element.
        *
        * Exactly the same as operator().
        */
-      TrilinosScalar operator[](const size_type index) const;
+      TrilinosScalar
+      operator[](const size_type index) const;
 
       /**
        * Instead of getting individual elements of a vector via operator(),
@@ -1494,14 +1497,16 @@ namespace TrilinosWrappers
 
 
 
-    inline internal::VectorReference Vector::operator[](const size_type index)
+    inline internal::VectorReference
+    Vector::operator[](const size_type index)
     {
       return operator()(index);
     }
 
 
 
-    inline TrilinosScalar Vector::operator[](const size_type index) const
+    inline TrilinosScalar
+    Vector::operator[](const size_type index) const
     {
       return operator()(index);
     }
@@ -1775,7 +1780,8 @@ namespace TrilinosWrappers
 
 
 
-    inline TrilinosScalar Vector::operator*(const Vector &vec) const
+    inline TrilinosScalar
+    Vector::operator*(const Vector &vec) const
     {
       Assert(vector->Map().SameAs(vec.vector->Map()),
              ExcDifferentParallelPartitioning());

@@ -89,13 +89,13 @@ test()
   // ----- transfer -----
   parallel::distributed::
     CellDataTransfer<dim, spacedim, std::vector<std::vector<int>>>
-    cell_data_transfer(
-      tria,
-      /*transfer_variable_size_data=*/true,
-      /*refinement_strategy=*/
-      &dealii::AdaptationStrategies::Refinement::
-        preserve<dim, spacedim, std::vector<int>>,
-      /*coarsening_strategy=*/&get_data_of_first_child<dim, spacedim>);
+      cell_data_transfer(
+        tria,
+        /*transfer_variable_size_data=*/true,
+        /*refinement_strategy=*/
+        &dealii::AdaptationStrategies::Refinement::
+          preserve<dim, spacedim, std::vector<int>>,
+        /*coarsening_strategy=*/&get_data_of_first_child<dim, spacedim>);
 
   cell_data_transfer.prepare_for_coarsening_and_refinement(cell_data);
   tria.execute_coarsening_and_refinement();

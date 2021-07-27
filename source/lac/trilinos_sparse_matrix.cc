@@ -1739,8 +1739,8 @@ namespace TrilinosWrappers
           (nonlocal_matrix.get() != nullptr &&
            matrix->RowMap().MyGID(
              static_cast<TrilinosWrappers::types::int_type>(row)) == false) ?
-            &nonlocal_matrix->Graph() :
-            &matrix->Graph();
+                                    &nonlocal_matrix->Graph() :
+                                    &matrix->Graph();
 
         indices.resize(graph->NumGlobalIndices(row));
         int n_indices = 0;
@@ -3060,8 +3060,9 @@ namespace TrilinosWrappers
 
 
 
-      TrilinosPayload operator*(const TrilinosPayload &first_op,
-                                const TrilinosPayload &second_op)
+      TrilinosPayload
+      operator*(const TrilinosPayload &first_op,
+                const TrilinosPayload &second_op)
       {
         using Domain        = typename TrilinosPayload::Domain;
         using Range         = typename TrilinosPayload::Range;

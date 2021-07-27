@@ -51,18 +51,21 @@ public:
 };
 
 // overloads to get multiple grids for multiple dim and spacedim combinations
-void make_grid(Triangulation<2, 2> &triangulation)
+void
+make_grid(Triangulation<2, 2> &triangulation)
 {
   GridGenerator::hyper_shell(triangulation, Point<2>(), 2.0, 6.0, 12);
 }
 
-void make_grid(Triangulation<2, 3> &triangulation)
+void
+make_grid(Triangulation<2, 3> &triangulation)
 {
   GridGenerator::hyper_sphere(triangulation, Point<3>(), 6.0);
   triangulation.refine_global(1); // need more cells
 }
 
-void make_grid(Triangulation<3, 3> &triangulation)
+void
+make_grid(Triangulation<3, 3> &triangulation)
 {
   GridGenerator::hyper_shell(triangulation, Point<3>(), 2.0, 6.0, 12);
   triangulation.refine_global(0);

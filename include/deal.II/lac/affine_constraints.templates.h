@@ -65,8 +65,8 @@ DEAL_II_NAMESPACE_OPEN
 
 template <typename number>
 bool
-AffineConstraints<number>::ConstraintLine::
-operator<(const ConstraintLine &a) const
+AffineConstraints<number>::ConstraintLine::operator<(
+  const ConstraintLine &a) const
 {
   return index < a.index;
 }
@@ -75,8 +75,8 @@ operator<(const ConstraintLine &a) const
 
 template <typename number>
 bool
-AffineConstraints<number>::ConstraintLine::
-operator==(const ConstraintLine &a) const
+AffineConstraints<number>::ConstraintLine::operator==(
+  const ConstraintLine &a) const
 {
   return index == a.index;
 }
@@ -3117,7 +3117,8 @@ namespace internal
       /**
        * Dereferencing operator.
        */
-      ScratchData<number> &operator*()
+      ScratchData<number> &
+      operator*()
       {
         return *my_scratch_data;
       }
@@ -3125,7 +3126,8 @@ namespace internal
       /**
        * Dereferencing operator.
        */
-      ScratchData<number> *operator->()
+      ScratchData<number> *
+      operator->()
       {
         return my_scratch_data;
       }

@@ -377,12 +377,14 @@ public:
   /**
    * Read-write access to entry @p index in the vector.
    */
-  reference operator[](const size_type index);
+  reference
+  operator[](const size_type index);
 
   /**
    * Read-only access to entry @p index in the vector.
    */
-  const_reference operator[](const size_type index) const;
+  const_reference
+  operator[](const size_type index) const;
 
   /**
    * Return a pointer to the underlying data buffer.
@@ -1683,8 +1685,8 @@ AlignedVector<T>::capacity() const
 
 
 template <class T>
-inline typename AlignedVector<T>::reference AlignedVector<T>::
-                                            operator[](const size_type index)
+inline typename AlignedVector<T>::reference
+AlignedVector<T>::operator[](const size_type index)
 {
   AssertIndexRange(index, size());
   return elements[index];
@@ -1693,8 +1695,8 @@ inline typename AlignedVector<T>::reference AlignedVector<T>::
 
 
 template <class T>
-inline typename AlignedVector<T>::const_reference AlignedVector<T>::
-                                                  operator[](const size_type index) const
+inline typename AlignedVector<T>::const_reference
+AlignedVector<T>::operator[](const size_type index) const
 {
   AssertIndexRange(index, size());
   return elements[index];

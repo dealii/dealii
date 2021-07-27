@@ -249,7 +249,8 @@ for (X : SEQUENTIAL_TRIANGULATION_AND_DOFHANDLER;
     namespace GridTools
     \{
 
-      template bool orthogonal_equality<X::active_face_iterator>(
+      template bool
+      orthogonal_equality<X::active_face_iterator>(
         std::bitset<3> &,
         const X::active_face_iterator &,
         const X::active_face_iterator &,
@@ -257,7 +258,8 @@ for (X : SEQUENTIAL_TRIANGULATION_AND_DOFHANDLER;
         const Tensor<1, deal_II_space_dimension> &,
         const FullMatrix<double> &);
 
-      template bool orthogonal_equality<X::face_iterator>(
+      template bool
+      orthogonal_equality<X::face_iterator>(
         std::bitset<3> &,
         const X::face_iterator &,
         const X::face_iterator &,

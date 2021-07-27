@@ -1697,13 +1697,14 @@ FullMatrix<number>::copy_from(const Tensor<2, dim> &T,
 
 template <typename number>
 template <int dim>
-void FullMatrix<number>::copy_to(Tensor<2, dim> &   T,
-                                 const size_type    src_r_i,
-                                 const size_type    src_r_j,
-                                 const size_type    src_c_i,
-                                 const size_type    src_c_j,
-                                 const unsigned int dst_r,
-                                 const unsigned int dst_c) const
+void
+FullMatrix<number>::copy_to(Tensor<2, dim> &   T,
+                            const size_type    src_r_i,
+                            const size_type    src_r_j,
+                            const size_type    src_c_i,
+                            const size_type    src_c_j,
+                            const unsigned int dst_r,
+                            const unsigned int dst_c) const
 {
   Assert(!this->empty(), ExcEmptyMatrix());
   AssertIndexRange(src_r_j - src_r_i, dim - dst_r);

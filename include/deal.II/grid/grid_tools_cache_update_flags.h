@@ -168,8 +168,8 @@ namespace GridTools
    *
    * @ref CacheUpdateFlags
    */
-  inline CacheUpdateFlags operator&(const CacheUpdateFlags f1,
-                                    const CacheUpdateFlags f2)
+  inline CacheUpdateFlags
+  operator&(const CacheUpdateFlags f1, const CacheUpdateFlags f2)
   {
     return static_cast<CacheUpdateFlags>(static_cast<unsigned int>(f1) &
                                          static_cast<unsigned int>(f2));

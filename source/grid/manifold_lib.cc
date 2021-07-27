@@ -626,7 +626,7 @@ SphericalManifold<dim, spacedim>::get_new_points(
     }
 
   boost::container::small_vector<std::pair<double, Tensor<1, spacedim>>, 100>
-                                                           new_candidates(new_points.size());
+    new_candidates(new_points.size());
   boost::container::small_vector<Tensor<1, spacedim>, 100> directions(
     surrounding_points.size(), Point<spacedim>());
   boost::container::small_vector<double, 100> distances(

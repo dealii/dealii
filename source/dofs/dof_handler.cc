@@ -444,7 +444,8 @@ namespace internal
       }
 
       template <int spacedim>
-      static void reserve_space_mg(DoFHandler<1, spacedim> &dof_handler)
+      static void
+      reserve_space_mg(DoFHandler<1, spacedim> &dof_handler)
       {
         Assert(dof_handler.get_triangulation().n_levels() > 0,
                ExcMessage("Invalid triangulation"));
@@ -513,7 +514,8 @@ namespace internal
       }
 
       template <int spacedim>
-      static void reserve_space_mg(DoFHandler<2, spacedim> &dof_handler)
+      static void
+      reserve_space_mg(DoFHandler<2, spacedim> &dof_handler)
       {
         Assert(dof_handler.get_triangulation().n_levels() > 0,
                ExcMessage("Invalid triangulation"));
@@ -589,7 +591,8 @@ namespace internal
       }
 
       template <int spacedim>
-      static void reserve_space_mg(DoFHandler<3, spacedim> &dof_handler)
+      static void
+      reserve_space_mg(DoFHandler<3, spacedim> &dof_handler)
       {
         Assert(dof_handler.get_triangulation().n_levels() > 0,
                ExcMessage("Invalid triangulation"));
@@ -1451,7 +1454,8 @@ namespace internal
          * selected when calling @p distribute_dofs the last time.
          */
         template <int spacedim>
-        static void reserve_space(dealii::DoFHandler<1, spacedim> &dof_handler)
+        static void
+        reserve_space(dealii::DoFHandler<1, spacedim> &dof_handler)
         {
           Assert(dof_handler.fe_collection.size() > 0,
                  (typename dealii::DoFHandler<1, spacedim>::ExcNoFESelected()));
@@ -1475,7 +1479,8 @@ namespace internal
 
 
         template <int spacedim>
-        static void reserve_space(dealii::DoFHandler<2, spacedim> &dof_handler)
+        static void
+        reserve_space(dealii::DoFHandler<2, spacedim> &dof_handler)
         {
           Assert(dof_handler.fe_collection.size() > 0,
                  (typename dealii::DoFHandler<1, spacedim>::ExcNoFESelected()));
@@ -1501,7 +1506,8 @@ namespace internal
 
 
         template <int spacedim>
-        static void reserve_space(dealii::DoFHandler<3, spacedim> &dof_handler)
+        static void
+        reserve_space(dealii::DoFHandler<3, spacedim> &dof_handler)
         {
           Assert(dof_handler.fe_collection.size() > 0,
                  (typename dealii::DoFHandler<1, spacedim>::ExcNoFESelected()));

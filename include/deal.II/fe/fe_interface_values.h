@@ -1399,8 +1399,8 @@ FEInterfaceValues<dim, spacedim>::jump_3rd_derivative(
 /*------------ Inline functions: FEInterfaceValues------------*/
 template <int dim, int spacedim>
 inline const FEInterfaceViews::Scalar<dim, spacedim>
-  FEInterfaceValues<dim, spacedim>::
-  operator[](const FEValuesExtractors::Scalar &scalar) const
+FEInterfaceValues<dim, spacedim>::operator[](
+  const FEValuesExtractors::Scalar &scalar) const
 {
   AssertIndexRange(scalar.component, this->get_fe().n_components());
   return FEInterfaceViews::Scalar<dim, spacedim>(*this, scalar.component);
@@ -1410,8 +1410,8 @@ inline const FEInterfaceViews::Scalar<dim, spacedim>
 
 template <int dim, int spacedim>
 inline const FEInterfaceViews::Vector<dim, spacedim>
-  FEInterfaceValues<dim, spacedim>::
-  operator[](const FEValuesExtractors::Vector &vector) const
+FEInterfaceValues<dim, spacedim>::operator[](
+  const FEValuesExtractors::Vector &vector) const
 {
   const FiniteElement<dim, spacedim> &fe = this->get_fe();
   const unsigned int                  n_vectors =

@@ -246,7 +246,7 @@ public:
   Type &
   get_or_add_object_with_name(const std::string &name,
                               Arg &              argument,
-                              Args &... arguments);
+                              Args &...arguments);
 
   /**
    * Return a reference to the object with given name. If the object does
@@ -273,7 +273,7 @@ public:
   Type &
   get_or_add_object_with_name(const std::string &name,
                               Arg &&             argument,
-                              Args &&... arguments);
+                              Args &&...arguments);
 
   /**
    * Return a reference to the object with given name. If the object does
@@ -492,7 +492,7 @@ template <typename Type, typename Arg, typename... Args>
 Type &
 GeneralDataStorage::get_or_add_object_with_name(const std::string &name,
                                                 Arg &              argument,
-                                                Args &... arguments)
+                                                Args &...arguments)
 {
   if (!stores_object_with_name(name))
     add_unique_copy(name, Type(argument, arguments...));
@@ -519,7 +519,7 @@ template <typename Type, typename Arg, typename... Args>
 Type &
 GeneralDataStorage::get_or_add_object_with_name(const std::string &name,
                                                 Arg &&             argument,
-                                                Args &&... arguments)
+                                                Args &&...arguments)
 {
   if (!stores_object_with_name(name))
     add_unique_copy(name,

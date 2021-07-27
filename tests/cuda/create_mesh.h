@@ -27,7 +27,8 @@
 #include <iostream>
 
 
-void create_mesh(Triangulation<2> &tria, const double scale_grid = 1.)
+void
+create_mesh(Triangulation<2> &tria, const double scale_grid = 1.)
 {
   const unsigned int      dim = 2;
   std::vector<Point<dim>> points(12);
@@ -78,7 +79,8 @@ void create_mesh(Triangulation<2> &tria, const double scale_grid = 1.)
 
 
 
-void create_mesh(Triangulation<3> &tria, const double scale_grid = 1.)
+void
+create_mesh(Triangulation<3> &tria, const double scale_grid = 1.)
 {
   const unsigned int      dim = 3;
   std::vector<Point<dim>> points(24);

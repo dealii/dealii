@@ -28,7 +28,8 @@
 
 
 
-void check(Triangulation<3> &tria)
+void
+check(Triangulation<3> &tria)
 {
   Point<3> p(1. / 3., 1. / 2., 1. / 5.);
 

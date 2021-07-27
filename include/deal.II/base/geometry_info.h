@@ -832,7 +832,8 @@ public:
    * Return the intersection of the refinement flags represented by the
    * current object and the one given as argument.
    */
-  RefinementCase operator&(const RefinementCase &r) const;
+  RefinementCase
+  operator&(const RefinementCase &r) const;
 
   /**
    * Return the negation of the refinement flags represented by the current
@@ -2826,8 +2827,8 @@ RefinementCase<dim>::operator|(const RefinementCase<dim> &r) const
 
 
 template <int dim>
-inline RefinementCase<dim> RefinementCase<dim>::
-                           operator&(const RefinementCase<dim> &r) const
+inline RefinementCase<dim>
+RefinementCase<dim>::operator&(const RefinementCase<dim> &r) const
 {
   return RefinementCase<dim>(static_cast<std::uint8_t>(value & r.value));
 }

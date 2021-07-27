@@ -324,8 +324,8 @@ namespace Functions
         {
           const double d = this->center.distance(points[i]);
           values[i]      = ((d < this->radius) ?
-                         (this->radius - d) / this->radius * this->rescaling :
-                         0.);
+                              (this->radius - d) / this->radius * this->rescaling :
+                              0.);
         }
     else
       std::fill(values.begin(), values.end(), 0.);

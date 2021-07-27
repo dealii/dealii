@@ -86,7 +86,7 @@ check_function(const Functions::FlowFunction<dim> &f,
         }
 
   std::vector<Vector<double>>      values(points.size(),
-                                          Vector<double>(f.n_components));
+                                     Vector<double>(f.n_components));
   std::vector<std::vector<double>> values2(f.n_components,
                                            std::vector<double>(points.size()));
   f.vector_value_list(points, values);

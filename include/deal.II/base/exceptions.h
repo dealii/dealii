@@ -1355,7 +1355,8 @@ namespace deal_II_exceptions
                          const char *      function,
                          const char *      cond,
                          const char *      exc_name,
-                         ExceptionType     e) {
+                         ExceptionType     e)
+    {
       // Fill the fields of the exception object
       e.set_fields(file, line, function, cond, exc_name);
 
@@ -1385,7 +1386,8 @@ namespace deal_II_exceptions
     /**
      * Internal function that does the work of issue_error_nothrow.
      */
-    void do_issue_error_nothrow(const ExceptionBase &e) noexcept;
+    void
+    do_issue_error_nothrow(const ExceptionBase &e) noexcept;
 
     /**
      * Exception generation mechanism in case we must not throw.

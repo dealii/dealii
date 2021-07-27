@@ -2330,9 +2330,9 @@ namespace internal
                   n_points_1d,
                   0);
 
-          const unsigned int in_stride = do_evaluate ?
-                                           dofs_per_component_on_cell :
-                                           dofs_per_component_on_face;
+          const unsigned int in_stride  = do_evaluate ?
+                                            dofs_per_component_on_cell :
+                                            dofs_per_component_on_face;
           const unsigned int out_stride = do_evaluate ?
                                             dofs_per_component_on_face :
                                             dofs_per_component_on_cell;

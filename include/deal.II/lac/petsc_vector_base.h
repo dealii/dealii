@@ -444,14 +444,16 @@ namespace PETScWrappers
      *
      * Exactly the same as operator().
      */
-    reference operator[](const size_type index);
+    reference
+    operator[](const size_type index);
 
     /**
      * Provide read-only access to an element.
      *
      * Exactly the same as operator().
      */
-    PetscScalar operator[](const size_type index) const;
+    PetscScalar
+    operator[](const size_type index) const;
 
     /**
      * A collective set operation: instead of setting individual elements of a
@@ -547,7 +549,8 @@ namespace PETScWrappers
      *
      * For complex valued vector, this gives$\left(v^\ast,vec\right)$.
      */
-    PetscScalar operator*(const VectorBase &vec) const;
+    PetscScalar
+    operator*(const VectorBase &vec) const;
 
     /**
      * Return the square of the $l_2$-norm.
@@ -1128,14 +1131,16 @@ namespace PETScWrappers
 
 
 
-  inline internal::VectorReference VectorBase::operator[](const size_type index)
+  inline internal::VectorReference
+  VectorBase::operator[](const size_type index)
   {
     return operator()(index);
   }
 
 
 
-  inline PetscScalar VectorBase::operator[](const size_type index) const
+  inline PetscScalar
+  VectorBase::operator[](const size_type index) const
   {
     return operator()(index);
   }

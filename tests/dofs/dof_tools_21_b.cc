@@ -56,7 +56,8 @@ std::ofstream logfile("output");
  */
 
 /* The 2D case */
-void generate_grid(Triangulation<2> &triangulation, int orientation)
+void
+generate_grid(Triangulation<2> &triangulation, int orientation)
 {
   Point<2> vertices_1[] = {
     Point<2>(-1., -3.),
@@ -111,7 +112,8 @@ void generate_grid(Triangulation<2> &triangulation, int orientation)
 }
 
 /* The 2D in 3D case */
-void generate_grid(Triangulation<2, 3> &triangulation, int orientation)
+void
+generate_grid(Triangulation<2, 3> &triangulation, int orientation)
 {
   Point<3> vertices_1[] = {
     Point<3>(-1., -3., 0.),
@@ -166,7 +168,8 @@ void generate_grid(Triangulation<2, 3> &triangulation, int orientation)
 }
 
 /* The 3D case */
-void generate_grid(Triangulation<3> &triangulation, int orientation)
+void
+generate_grid(Triangulation<3> &triangulation, int orientation)
 {
   Point<3>              vertices_1[] = {Point<3>(-1., -1., -3.),
                            Point<3>(+1., -1., -3.),

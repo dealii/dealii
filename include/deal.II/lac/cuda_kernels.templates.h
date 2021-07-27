@@ -82,7 +82,7 @@ namespace LinearAlgebra
 
       template <typename Number>
       __device__ Number
-                 ElemSum<Number>::reduction_op(const Number a, const Number b)
+      ElemSum<Number>::reduction_op(const Number a, const Number b)
       {
         return (a + b);
       }
@@ -91,7 +91,7 @@ namespace LinearAlgebra
 
       template <typename Number>
       __device__ Number
-                 ElemSum<Number>::atomic_op(Number *dst, const Number a)
+      ElemSum<Number>::atomic_op(Number *dst, const Number a)
       {
         return atomicAdd(dst, a);
       }
@@ -100,7 +100,7 @@ namespace LinearAlgebra
 
       template <typename Number>
       __device__ Number
-                 ElemSum<Number>::element_wise_op(const Number a)
+      ElemSum<Number>::element_wise_op(const Number a)
       {
         return a;
       }
@@ -109,7 +109,7 @@ namespace LinearAlgebra
 
       template <typename Number>
       __device__ Number
-                 ElemSum<Number>::null_value()
+      ElemSum<Number>::null_value()
       {
         return Number();
       }
@@ -118,7 +118,7 @@ namespace LinearAlgebra
 
       template <typename Number>
       __device__ Number
-                 L1Norm<Number>::reduction_op(const Number a, const Number b)
+      L1Norm<Number>::reduction_op(const Number a, const Number b)
       {
         return (a + b);
       }
@@ -127,7 +127,7 @@ namespace LinearAlgebra
 
       template <typename Number>
       __device__ Number
-                 L1Norm<Number>::atomic_op(Number *dst, const Number a)
+      L1Norm<Number>::atomic_op(Number *dst, const Number a)
       {
         return atomicAdd(dst, a);
       }
@@ -136,7 +136,7 @@ namespace LinearAlgebra
 
       template <typename Number>
       __device__ Number
-                 L1Norm<Number>::element_wise_op(const Number a)
+      L1Norm<Number>::element_wise_op(const Number a)
       {
         return std::fabs(a);
       }
@@ -145,7 +145,7 @@ namespace LinearAlgebra
 
       template <typename Number>
       __device__ Number
-                 L1Norm<Number>::null_value()
+      L1Norm<Number>::null_value()
       {
         return Number();
       }
@@ -154,7 +154,7 @@ namespace LinearAlgebra
 
       template <typename Number>
       __device__ Number
-                 LInfty<Number>::reduction_op(const Number a, const Number b)
+      LInfty<Number>::reduction_op(const Number a, const Number b)
       {
         if (a > b)
           return a;
@@ -166,7 +166,7 @@ namespace LinearAlgebra
 
       template <typename Number>
       __device__ Number
-                 LInfty<Number>::atomic_op(Number *dst, const Number a)
+      LInfty<Number>::atomic_op(Number *dst, const Number a)
       {
         return atomicMax_wrapper(dst, a);
       }
@@ -175,7 +175,7 @@ namespace LinearAlgebra
 
       template <typename Number>
       __device__ Number
-                 LInfty<Number>::element_wise_op(const Number a)
+      LInfty<Number>::element_wise_op(const Number a)
       {
         return std::fabs(a);
       }
@@ -184,7 +184,7 @@ namespace LinearAlgebra
 
       template <typename Number>
       __device__ Number
-                 LInfty<Number>::null_value()
+      LInfty<Number>::null_value()
       {
         return Number();
       }
@@ -249,7 +249,7 @@ namespace LinearAlgebra
 
       template <typename Number>
       __device__ Number
-                 DotProduct<Number>::binary_op(const Number a, const Number b)
+      DotProduct<Number>::binary_op(const Number a, const Number b)
       {
         return a * b;
       }
@@ -258,7 +258,7 @@ namespace LinearAlgebra
 
       template <typename Number>
       __device__ Number
-                 DotProduct<Number>::reduction_op(const Number a, const Number b)
+      DotProduct<Number>::reduction_op(const Number a, const Number b)
       {
         return a + b;
       }
@@ -267,7 +267,7 @@ namespace LinearAlgebra
 
       template <typename Number>
       __device__ Number
-                 DotProduct<Number>::atomic_op(Number *dst, const Number a)
+      DotProduct<Number>::atomic_op(Number *dst, const Number a)
       {
         return atomicAdd(dst, a);
       }
@@ -276,7 +276,7 @@ namespace LinearAlgebra
 
       template <typename Number>
       __device__ Number
-                 DotProduct<Number>::null_value()
+      DotProduct<Number>::null_value()
       {
         return Number();
       }

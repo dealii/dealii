@@ -148,13 +148,15 @@ public:
    * Dereferencing operator. This operator throws an ExcNotInitialized() if the
    * pointer is a null pointer.
    */
-  T &operator*() const;
+  T &
+  operator*() const;
 
   /**
    * Dereferencing operator. This operator throws an ExcNotInitializedi() if the
    * pointer is a null pointer.
    */
-  T *operator->() const;
+  T *
+  operator->() const;
 
   /**
    * Exchange the pointers of this object and the argument. Since both the
@@ -363,7 +365,8 @@ inline SmartPointer<T, P>::operator T *() const
 
 
 template <typename T, typename P>
-inline T &SmartPointer<T, P>::operator*() const
+inline T &
+SmartPointer<T, P>::operator*() const
 {
   Assert(t != nullptr, ExcNotInitialized());
   Assert(pointed_to_object_is_alive,
@@ -374,7 +377,8 @@ inline T &SmartPointer<T, P>::operator*() const
 
 
 template <typename T, typename P>
-inline T *SmartPointer<T, P>::operator->() const
+inline T *
+SmartPointer<T, P>::operator->() const
 {
   Assert(t != nullptr, ExcNotInitialized());
   Assert(pointed_to_object_is_alive,

@@ -87,11 +87,11 @@ private:
 
 template <int dim, int fe_degree, typename Number>
 void
-MatrixFreeTest<dim, fe_degree, Number>::
-operator()(const MatrixFree<dim, Number> &data,
-           std::vector<Vector<Number> *> &dst,
-           const std::vector<Vector<Number> *> &,
-           const std::pair<unsigned int, unsigned int> &cell_range) const
+MatrixFreeTest<dim, fe_degree, Number>::operator()(
+  const MatrixFree<dim, Number> &data,
+  std::vector<Vector<Number> *> &dst,
+  const std::vector<Vector<Number> *> &,
+  const std::pair<unsigned int, unsigned int> &cell_range) const
 {
   FEEvaluation<dim, fe_degree, fe_degree + 1, 1, Number> fe_eval(data);
   const unsigned int                     n_q_points    = fe_eval.n_q_points;

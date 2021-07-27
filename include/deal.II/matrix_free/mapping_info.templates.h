@@ -3368,9 +3368,9 @@ namespace internal
 
     template <typename Number, typename VectorizedArrayType>
     bool
-    FPArrayComparator<Number, VectorizedArrayType>::
-    operator()(const std::vector<Number> &v1,
-               const std::vector<Number> &v2) const
+    FPArrayComparator<Number, VectorizedArrayType>::operator()(
+      const std::vector<Number> &v1,
+      const std::vector<Number> &v2) const
     {
       const unsigned int s1 = v1.size(), s2 = v2.size();
       if (s1 < s2)
@@ -3390,9 +3390,9 @@ namespace internal
 
     template <typename Number, typename VectorizedArrayType>
     bool
-    FPArrayComparator<Number, VectorizedArrayType>::
-    operator()(const Tensor<1, VectorizedArrayType::size(), Number> &t1,
-               const Tensor<1, VectorizedArrayType::size(), Number> &t2) const
+    FPArrayComparator<Number, VectorizedArrayType>::operator()(
+      const Tensor<1, VectorizedArrayType::size(), Number> &t1,
+      const Tensor<1, VectorizedArrayType::size(), Number> &t2) const
     {
       for (unsigned int k = 0; k < VectorizedArrayType::size(); ++k)
         if (t1[k] < t2[k] - tolerance)
@@ -3446,9 +3446,9 @@ namespace internal
     template <typename Number, typename VectorizedArrayType>
     template <int dim>
     bool
-    FPArrayComparator<Number, VectorizedArrayType>::
-    operator()(const std::array<Tensor<2, dim, Number>, dim + 1> &t1,
-               const std::array<Tensor<2, dim, Number>, dim + 1> &t2) const
+    FPArrayComparator<Number, VectorizedArrayType>::operator()(
+      const std::array<Tensor<2, dim, Number>, dim + 1> &t1,
+      const std::array<Tensor<2, dim, Number>, dim + 1> &t2) const
     {
       for (unsigned int i = 0; i < t1.size(); ++i)
         for (unsigned int d = 0; d < dim; ++d)

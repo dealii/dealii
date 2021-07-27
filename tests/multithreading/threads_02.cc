@@ -370,19 +370,22 @@ struct U
     static X<0> x;
     return x;
   }
-  X<0> foo_ref_1(X<1> &)
+  X<0>
+  foo_ref_1(X<1> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  static X<0> static_foo_ref_1(X<1> &)
+  static X<0>
+  static_foo_ref_1(X<1> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  X<0> &ref_foo_ref_1(X<1> &)
+  X<0> &
+  ref_foo_ref_1(X<1> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -394,13 +397,15 @@ struct U
     static X<0> x;
     return x;
   }
-  const X<0> &const_ref_foo_ref_1(X<1> &)
+  const X<0> &
+  const_ref_foo_ref_1(X<1> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  const X<0> &const_ref_foo_const_ref_1(X<1> &)
+  const X<0> &
+  const_ref_foo_const_ref_1(X<1> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -412,13 +417,15 @@ struct U
     static X<0> x;
     return x;
   }
-  const X<0> &const_ref_foo_ref_1_const(X<1> &) const
+  const X<0> &
+  const_ref_foo_ref_1_const(X<1> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  const X<0> &const_ref_foo_const_ref_1_const(X<1> &) const
+  const X<0> &
+  const_ref_foo_const_ref_1_const(X<1> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -430,13 +437,15 @@ struct U
     static X<0> x;
     return x;
   }
-  virtual const X<0> &virtual_const_ref_foo_ref_1(X<1> &)
+  virtual const X<0> &
+  virtual_const_ref_foo_ref_1(X<1> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  virtual const X<0> &virtual_const_ref_foo_const_ref_1(X<1> &)
+  virtual const X<0> &
+  virtual_const_ref_foo_const_ref_1(X<1> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -448,25 +457,29 @@ struct U
     static X<0> x;
     return x;
   }
-  virtual const X<0> &virtual_const_ref_foo_ref_1_const(X<1> &) const
+  virtual const X<0> &
+  virtual_const_ref_foo_ref_1_const(X<1> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  virtual const X<0> &virtual_const_ref_foo_const_ref_1_const(X<1> &) const
+  virtual const X<0> &
+  virtual_const_ref_foo_const_ref_1_const(X<1> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  static X<0> &static_ref_foo_ref_1(X<1> &)
+  static X<0> &
+  static_ref_foo_ref_1(X<1> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  static const X<0> &static_const_ref_foo_ref_1(X<1> &)
+  static const X<0> &
+  static_const_ref_foo_ref_1(X<1> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -519,13 +532,15 @@ struct U
     static X<0> x;
     return x;
   }
-  X<0> foo_ref_1_const(X<1> &) const
+  X<0>
+  foo_ref_1_const(X<1> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  X<0> &ref_foo_ref_1_const(X<1> &) const
+  X<0> &
+  ref_foo_ref_1_const(X<1> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -557,13 +572,15 @@ struct U
     static X<0> x;
     return x;
   }
-  virtual X<0> virtual_foo_ref_1_const(X<1> &) const
+  virtual X<0>
+  virtual_foo_ref_1_const(X<1> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  virtual X<0> &virtual_ref_foo_ref_1_const(X<1> &) const
+  virtual X<0> &
+  virtual_ref_foo_ref_1_const(X<1> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -595,13 +612,15 @@ struct U
     static X<0> x;
     return x;
   }
-  virtual X<0> virtual_foo_ref_1(X<1> &)
+  virtual X<0>
+  virtual_foo_ref_1(X<1> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  virtual X<0> &virtual_ref_foo_ref_1(X<1> &)
+  virtual X<0> &
+  virtual_ref_foo_ref_1(X<1> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -651,19 +670,22 @@ struct U
     static X<0> x;
     return x;
   }
-  X<0> foo_ref_2(X<1> &, X<2> &)
+  X<0>
+  foo_ref_2(X<1> &, X<2> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  static X<0> static_foo_ref_2(X<1> &, X<2> &)
+  static X<0>
+  static_foo_ref_2(X<1> &, X<2> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  X<0> &ref_foo_ref_2(X<1> &, X<2> &)
+  X<0> &
+  ref_foo_ref_2(X<1> &, X<2> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -675,13 +697,15 @@ struct U
     static X<0> x;
     return x;
   }
-  const X<0> &const_ref_foo_ref_2(X<1> &, X<2> &)
+  const X<0> &
+  const_ref_foo_ref_2(X<1> &, X<2> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  const X<0> &const_ref_foo_const_ref_2(X<1> &, X<2> &)
+  const X<0> &
+  const_ref_foo_const_ref_2(X<1> &, X<2> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -693,13 +717,15 @@ struct U
     static X<0> x;
     return x;
   }
-  const X<0> &const_ref_foo_ref_2_const(X<1> &, X<2> &) const
+  const X<0> &
+  const_ref_foo_ref_2_const(X<1> &, X<2> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  const X<0> &const_ref_foo_const_ref_2_const(X<1> &, X<2> &) const
+  const X<0> &
+  const_ref_foo_const_ref_2_const(X<1> &, X<2> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -711,13 +737,15 @@ struct U
     static X<0> x;
     return x;
   }
-  virtual const X<0> &virtual_const_ref_foo_ref_2(X<1> &, X<2> &)
+  virtual const X<0> &
+  virtual_const_ref_foo_ref_2(X<1> &, X<2> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  virtual const X<0> &virtual_const_ref_foo_const_ref_2(X<1> &, X<2> &)
+  virtual const X<0> &
+  virtual_const_ref_foo_const_ref_2(X<1> &, X<2> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -729,26 +757,29 @@ struct U
     static X<0> x;
     return x;
   }
-  virtual const X<0> &virtual_const_ref_foo_ref_2_const(X<1> &, X<2> &) const
+  virtual const X<0> &
+  virtual_const_ref_foo_ref_2_const(X<1> &, X<2> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  virtual const X<0> &virtual_const_ref_foo_const_ref_2_const(X<1> &,
-                                                              X<2> &) const
+  virtual const X<0> &
+  virtual_const_ref_foo_const_ref_2_const(X<1> &, X<2> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  static X<0> &static_ref_foo_ref_2(X<1> &, X<2> &)
+  static X<0> &
+  static_ref_foo_ref_2(X<1> &, X<2> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  static const X<0> &static_const_ref_foo_ref_2(X<1> &, X<2> &)
+  static const X<0> &
+  static_const_ref_foo_ref_2(X<1> &, X<2> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -801,13 +832,15 @@ struct U
     static X<0> x;
     return x;
   }
-  X<0> foo_ref_2_const(X<1> &, X<2> &) const
+  X<0>
+  foo_ref_2_const(X<1> &, X<2> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  X<0> &ref_foo_ref_2_const(X<1> &, X<2> &) const
+  X<0> &
+  ref_foo_ref_2_const(X<1> &, X<2> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -839,13 +872,15 @@ struct U
     static X<0> x;
     return x;
   }
-  virtual X<0> virtual_foo_ref_2_const(X<1> &, X<2> &) const
+  virtual X<0>
+  virtual_foo_ref_2_const(X<1> &, X<2> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  virtual X<0> &virtual_ref_foo_ref_2_const(X<1> &, X<2> &) const
+  virtual X<0> &
+  virtual_ref_foo_ref_2_const(X<1> &, X<2> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -877,13 +912,15 @@ struct U
     static X<0> x;
     return x;
   }
-  virtual X<0> virtual_foo_ref_2(X<1> &, X<2> &)
+  virtual X<0>
+  virtual_foo_ref_2(X<1> &, X<2> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  virtual X<0> &virtual_ref_foo_ref_2(X<1> &, X<2> &)
+  virtual X<0> &
+  virtual_ref_foo_ref_2(X<1> &, X<2> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -933,19 +970,22 @@ struct U
     static X<0> x;
     return x;
   }
-  X<0> foo_ref_3(X<1> &, X<2> &, X<3> &)
+  X<0>
+  foo_ref_3(X<1> &, X<2> &, X<3> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  static X<0> static_foo_ref_3(X<1> &, X<2> &, X<3> &)
+  static X<0>
+  static_foo_ref_3(X<1> &, X<2> &, X<3> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  X<0> &ref_foo_ref_3(X<1> &, X<2> &, X<3> &)
+  X<0> &
+  ref_foo_ref_3(X<1> &, X<2> &, X<3> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -957,13 +997,15 @@ struct U
     static X<0> x;
     return x;
   }
-  const X<0> &const_ref_foo_ref_3(X<1> &, X<2> &, X<3> &)
+  const X<0> &
+  const_ref_foo_ref_3(X<1> &, X<2> &, X<3> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  const X<0> &const_ref_foo_const_ref_3(X<1> &, X<2> &, X<3> &)
+  const X<0> &
+  const_ref_foo_const_ref_3(X<1> &, X<2> &, X<3> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -975,13 +1017,15 @@ struct U
     static X<0> x;
     return x;
   }
-  const X<0> &const_ref_foo_ref_3_const(X<1> &, X<2> &, X<3> &) const
+  const X<0> &
+  const_ref_foo_ref_3_const(X<1> &, X<2> &, X<3> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  const X<0> &const_ref_foo_const_ref_3_const(X<1> &, X<2> &, X<3> &) const
+  const X<0> &
+  const_ref_foo_const_ref_3_const(X<1> &, X<2> &, X<3> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -993,13 +1037,15 @@ struct U
     static X<0> x;
     return x;
   }
-  virtual const X<0> &virtual_const_ref_foo_ref_3(X<1> &, X<2> &, X<3> &)
+  virtual const X<0> &
+  virtual_const_ref_foo_ref_3(X<1> &, X<2> &, X<3> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  virtual const X<0> &virtual_const_ref_foo_const_ref_3(X<1> &, X<2> &, X<3> &)
+  virtual const X<0> &
+  virtual_const_ref_foo_const_ref_3(X<1> &, X<2> &, X<3> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -1012,26 +1058,28 @@ struct U
     return x;
   }
   virtual const X<0> &
-    virtual_const_ref_foo_ref_3_const(X<1> &, X<2> &, X<3> &) const
+  virtual_const_ref_foo_ref_3_const(X<1> &, X<2> &, X<3> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
   virtual const X<0> &
-    virtual_const_ref_foo_const_ref_3_const(X<1> &, X<2> &, X<3> &) const
+  virtual_const_ref_foo_const_ref_3_const(X<1> &, X<2> &, X<3> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  static X<0> &static_ref_foo_ref_3(X<1> &, X<2> &, X<3> &)
+  static X<0> &
+  static_ref_foo_ref_3(X<1> &, X<2> &, X<3> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  static const X<0> &static_const_ref_foo_ref_3(X<1> &, X<2> &, X<3> &)
+  static const X<0> &
+  static_const_ref_foo_ref_3(X<1> &, X<2> &, X<3> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -1084,13 +1132,15 @@ struct U
     static X<0> x;
     return x;
   }
-  X<0> foo_ref_3_const(X<1> &, X<2> &, X<3> &) const
+  X<0>
+  foo_ref_3_const(X<1> &, X<2> &, X<3> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  X<0> &ref_foo_ref_3_const(X<1> &, X<2> &, X<3> &) const
+  X<0> &
+  ref_foo_ref_3_const(X<1> &, X<2> &, X<3> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -1122,13 +1172,15 @@ struct U
     static X<0> x;
     return x;
   }
-  virtual X<0> virtual_foo_ref_3_const(X<1> &, X<2> &, X<3> &) const
+  virtual X<0>
+  virtual_foo_ref_3_const(X<1> &, X<2> &, X<3> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  virtual X<0> &virtual_ref_foo_ref_3_const(X<1> &, X<2> &, X<3> &) const
+  virtual X<0> &
+  virtual_ref_foo_ref_3_const(X<1> &, X<2> &, X<3> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -1162,13 +1214,15 @@ struct U
     static X<0> x;
     return x;
   }
-  virtual X<0> virtual_foo_ref_3(X<1> &, X<2> &, X<3> &)
+  virtual X<0>
+  virtual_foo_ref_3(X<1> &, X<2> &, X<3> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  virtual X<0> &virtual_ref_foo_ref_3(X<1> &, X<2> &, X<3> &)
+  virtual X<0> &
+  virtual_ref_foo_ref_3(X<1> &, X<2> &, X<3> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -1218,19 +1272,22 @@ struct U
     static X<0> x;
     return x;
   }
-  X<0> foo_ref_4(X<1> &, X<2> &, X<3> &, X<4> &)
+  X<0>
+  foo_ref_4(X<1> &, X<2> &, X<3> &, X<4> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  static X<0> static_foo_ref_4(X<1> &, X<2> &, X<3> &, X<4> &)
+  static X<0>
+  static_foo_ref_4(X<1> &, X<2> &, X<3> &, X<4> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  X<0> &ref_foo_ref_4(X<1> &, X<2> &, X<3> &, X<4> &)
+  X<0> &
+  ref_foo_ref_4(X<1> &, X<2> &, X<3> &, X<4> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -1242,13 +1299,15 @@ struct U
     static X<0> x;
     return x;
   }
-  const X<0> &const_ref_foo_ref_4(X<1> &, X<2> &, X<3> &, X<4> &)
+  const X<0> &
+  const_ref_foo_ref_4(X<1> &, X<2> &, X<3> &, X<4> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  const X<0> &const_ref_foo_const_ref_4(X<1> &, X<2> &, X<3> &, X<4> &)
+  const X<0> &
+  const_ref_foo_const_ref_4(X<1> &, X<2> &, X<3> &, X<4> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -1260,14 +1319,15 @@ struct U
     static X<0> x;
     return x;
   }
-  const X<0> &const_ref_foo_ref_4_const(X<1> &, X<2> &, X<3> &, X<4> &) const
+  const X<0> &
+  const_ref_foo_ref_4_const(X<1> &, X<2> &, X<3> &, X<4> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
   const X<0> &
-    const_ref_foo_const_ref_4_const(X<1> &, X<2> &, X<3> &, X<4> &) const
+  const_ref_foo_const_ref_4_const(X<1> &, X<2> &, X<3> &, X<4> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -1280,14 +1340,14 @@ struct U
     return x;
   }
   virtual const X<0> &
-    virtual_const_ref_foo_ref_4(X<1> &, X<2> &, X<3> &, X<4> &)
+  virtual_const_ref_foo_ref_4(X<1> &, X<2> &, X<3> &, X<4> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
   virtual const X<0> &
-    virtual_const_ref_foo_const_ref_4(X<1> &, X<2> &, X<3> &, X<4> &)
+  virtual_const_ref_foo_const_ref_4(X<1> &, X<2> &, X<3> &, X<4> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -1301,28 +1361,28 @@ struct U
     return x;
   }
   virtual const X<0> &
-    virtual_const_ref_foo_ref_4_const(X<1> &, X<2> &, X<3> &, X<4> &) const
+  virtual_const_ref_foo_ref_4_const(X<1> &, X<2> &, X<3> &, X<4> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  virtual const X<0> &virtual_const_ref_foo_const_ref_4_const(X<1> &,
-                                                              X<2> &,
-                                                              X<3> &,
-                                                              X<4> &) const
+  virtual const X<0> &
+  virtual_const_ref_foo_const_ref_4_const(X<1> &, X<2> &, X<3> &, X<4> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  static X<0> &static_ref_foo_ref_4(X<1> &, X<2> &, X<3> &, X<4> &)
+  static X<0> &
+  static_ref_foo_ref_4(X<1> &, X<2> &, X<3> &, X<4> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  static const X<0> &static_const_ref_foo_ref_4(X<1> &, X<2> &, X<3> &, X<4> &)
+  static const X<0> &
+  static_const_ref_foo_ref_4(X<1> &, X<2> &, X<3> &, X<4> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -1381,13 +1441,15 @@ struct U
     static X<0> x;
     return x;
   }
-  X<0> foo_ref_4_const(X<1> &, X<2> &, X<3> &, X<4> &) const
+  X<0>
+  foo_ref_4_const(X<1> &, X<2> &, X<3> &, X<4> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  X<0> &ref_foo_ref_4_const(X<1> &, X<2> &, X<3> &, X<4> &) const
+  X<0> &
+  ref_foo_ref_4_const(X<1> &, X<2> &, X<3> &, X<4> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -1425,14 +1487,15 @@ struct U
     static X<0> x;
     return x;
   }
-  virtual X<0> virtual_foo_ref_4_const(X<1> &, X<2> &, X<3> &, X<4> &) const
+  virtual X<0>
+  virtual_foo_ref_4_const(X<1> &, X<2> &, X<3> &, X<4> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
   virtual X<0> &
-    virtual_ref_foo_ref_4_const(X<1> &, X<2> &, X<3> &, X<4> &) const
+  virtual_ref_foo_ref_4_const(X<1> &, X<2> &, X<3> &, X<4> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -1470,13 +1533,15 @@ struct U
     static X<0> x;
     return x;
   }
-  virtual X<0> virtual_foo_ref_4(X<1> &, X<2> &, X<3> &, X<4> &)
+  virtual X<0>
+  virtual_foo_ref_4(X<1> &, X<2> &, X<3> &, X<4> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  virtual X<0> &virtual_ref_foo_ref_4(X<1> &, X<2> &, X<3> &, X<4> &)
+  virtual X<0> &
+  virtual_ref_foo_ref_4(X<1> &, X<2> &, X<3> &, X<4> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -1532,19 +1597,22 @@ struct U
     static X<0> x;
     return x;
   }
-  X<0> foo_ref_5(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &)
+  X<0>
+  foo_ref_5(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  static X<0> static_foo_ref_5(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &)
+  static X<0>
+  static_foo_ref_5(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  X<0> &ref_foo_ref_5(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &)
+  X<0> &
+  ref_foo_ref_5(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -1556,13 +1624,15 @@ struct U
     static X<0> x;
     return x;
   }
-  const X<0> &const_ref_foo_ref_5(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &)
+  const X<0> &
+  const_ref_foo_ref_5(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  const X<0> &const_ref_foo_const_ref_5(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &)
+  const X<0> &
+  const_ref_foo_const_ref_5(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -1575,17 +1645,14 @@ struct U
     return x;
   }
   const X<0> &
-    const_ref_foo_ref_5_const(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &) const
+  const_ref_foo_ref_5_const(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  const X<0> &const_ref_foo_const_ref_5_const(X<1> &,
-                                              X<2> &,
-                                              X<3> &,
-                                              X<4> &,
-                                              X<5> &) const
+  const X<0> &
+  const_ref_foo_const_ref_5_const(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -1598,14 +1665,14 @@ struct U
     return x;
   }
   virtual const X<0> &
-    virtual_const_ref_foo_ref_5(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &)
+  virtual_const_ref_foo_ref_5(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
   virtual const X<0> &
-    virtual_const_ref_foo_const_ref_5(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &)
+  virtual_const_ref_foo_const_ref_5(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -1618,34 +1685,34 @@ struct U
     static X<0> x;
     return x;
   }
-  virtual const X<0> &virtual_const_ref_foo_ref_5_const(X<1> &,
-                                                        X<2> &,
-                                                        X<3> &,
-                                                        X<4> &,
-                                                        X<5> &) const
+  virtual const X<0> &
+  virtual_const_ref_foo_ref_5_const(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &)
+    const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  virtual const X<0> &virtual_const_ref_foo_const_ref_5_const(X<1> &,
-                                                              X<2> &,
-                                                              X<3> &,
-                                                              X<4> &,
-                                                              X<5> &) const
+  virtual const X<0> &
+  virtual_const_ref_foo_const_ref_5_const(X<1> &,
+                                          X<2> &,
+                                          X<3> &,
+                                          X<4> &,
+                                          X<5> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  static X<0> &static_ref_foo_ref_5(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &)
+  static X<0> &
+  static_ref_foo_ref_5(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
   static const X<0> &
-    static_const_ref_foo_ref_5(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &)
+  static_const_ref_foo_ref_5(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -1718,13 +1785,15 @@ struct U
     static X<0> x;
     return x;
   }
-  X<0> foo_ref_5_const(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &) const
+  X<0>
+  foo_ref_5_const(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  X<0> &ref_foo_ref_5_const(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &) const
+  X<0> &
+  ref_foo_ref_5_const(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -1765,14 +1834,14 @@ struct U
     return x;
   }
   virtual X<0>
-    virtual_foo_ref_5_const(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &) const
+  virtual_foo_ref_5_const(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
   virtual X<0> &
-    virtual_ref_foo_ref_5_const(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &) const
+  virtual_ref_foo_ref_5_const(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -1812,13 +1881,15 @@ struct U
     static X<0> x;
     return x;
   }
-  virtual X<0> virtual_foo_ref_5(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &)
+  virtual X<0>
+  virtual_foo_ref_5(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  virtual X<0> &virtual_ref_foo_ref_5(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &)
+  virtual X<0> &
+  virtual_ref_foo_ref_5(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -1876,19 +1947,22 @@ struct U
     static X<0> x;
     return x;
   }
-  X<0> foo_ref_6(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &, X<6> &)
+  X<0>
+  foo_ref_6(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &, X<6> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  static X<0> static_foo_ref_6(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &, X<6> &)
+  static X<0>
+  static_foo_ref_6(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &, X<6> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  X<0> &ref_foo_ref_6(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &, X<6> &)
+  X<0> &
+  ref_foo_ref_6(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &, X<6> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -1901,14 +1975,14 @@ struct U
     return x;
   }
   const X<0> &
-    const_ref_foo_ref_6(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &, X<6> &)
+  const_ref_foo_ref_6(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &, X<6> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
   const X<0> &
-    const_ref_foo_const_ref_6(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &, X<6> &)
+  const_ref_foo_const_ref_6(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &, X<6> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -1920,23 +1994,21 @@ struct U
     static X<0> x;
     return x;
   }
-  const X<0> &const_ref_foo_ref_6_const(X<1> &,
-                                        X<2> &,
-                                        X<3> &,
-                                        X<4> &,
-                                        X<5> &,
-                                        X<6> &) const
+  const X<0> &
+  const_ref_foo_ref_6_const(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &, X<6> &)
+    const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  const X<0> &const_ref_foo_const_ref_6_const(X<1> &,
-                                              X<2> &,
-                                              X<3> &,
-                                              X<4> &,
-                                              X<5> &,
-                                              X<6> &) const
+  const X<0> &
+  const_ref_foo_const_ref_6_const(X<1> &,
+                                  X<2> &,
+                                  X<3> &,
+                                  X<4> &,
+                                  X<5> &,
+                                  X<6> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -1950,18 +2022,19 @@ struct U
     return x;
   }
   virtual const X<0> &
-    virtual_const_ref_foo_ref_6(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &, X<6> &)
+  virtual_const_ref_foo_ref_6(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &, X<6> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  virtual const X<0> &virtual_const_ref_foo_const_ref_6(X<1> &,
-                                                        X<2> &,
-                                                        X<3> &,
-                                                        X<4> &,
-                                                        X<5> &,
-                                                        X<6> &)
+  virtual const X<0> &
+  virtual_const_ref_foo_const_ref_6(X<1> &,
+                                    X<2> &,
+                                    X<3> &,
+                                    X<4> &,
+                                    X<5> &,
+                                    X<6> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -1974,37 +2047,39 @@ struct U
     static X<0> x;
     return x;
   }
-  virtual const X<0> &virtual_const_ref_foo_ref_6_const(X<1> &,
-                                                        X<2> &,
-                                                        X<3> &,
-                                                        X<4> &,
-                                                        X<5> &,
-                                                        X<6> &) const
+  virtual const X<0> &
+  virtual_const_ref_foo_ref_6_const(X<1> &,
+                                    X<2> &,
+                                    X<3> &,
+                                    X<4> &,
+                                    X<5> &,
+                                    X<6> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  virtual const X<0> &virtual_const_ref_foo_const_ref_6_const(X<1> &,
-                                                              X<2> &,
-                                                              X<3> &,
-                                                              X<4> &,
-                                                              X<5> &,
-                                                              X<6> &) const
+  virtual const X<0> &
+  virtual_const_ref_foo_const_ref_6_const(X<1> &,
+                                          X<2> &,
+                                          X<3> &,
+                                          X<4> &,
+                                          X<5> &,
+                                          X<6> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
   static X<0> &
-    static_ref_foo_ref_6(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &, X<6> &)
+  static_ref_foo_ref_6(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &, X<6> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
   static const X<0> &
-    static_const_ref_foo_ref_6(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &, X<6> &)
+  static_const_ref_foo_ref_6(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &, X<6> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -2082,14 +2157,15 @@ struct U
     static X<0> x;
     return x;
   }
-  X<0> foo_ref_6_const(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &, X<6> &) const
+  X<0>
+  foo_ref_6_const(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &, X<6> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
   X<0> &
-    ref_foo_ref_6_const(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &, X<6> &) const
+  ref_foo_ref_6_const(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &, X<6> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -2132,23 +2208,16 @@ struct U
     static X<0> x;
     return x;
   }
-  virtual X<0> virtual_foo_ref_6_const(X<1> &,
-                                       X<2> &,
-                                       X<3> &,
-                                       X<4> &,
-                                       X<5> &,
-                                       X<6> &) const
+  virtual X<0>
+  virtual_foo_ref_6_const(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &, X<6> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  virtual X<0> &virtual_ref_foo_ref_6_const(X<1> &,
-                                            X<2> &,
-                                            X<3> &,
-                                            X<4> &,
-                                            X<5> &,
-                                            X<6> &) const
+  virtual X<0> &
+  virtual_ref_foo_ref_6_const(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &, X<6> &)
+    const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -2190,14 +2259,15 @@ struct U
     static X<0> x;
     return x;
   }
-  virtual X<0> virtual_foo_ref_6(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &, X<6> &)
+  virtual X<0>
+  virtual_foo_ref_6(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &, X<6> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
   virtual X<0> &
-    virtual_ref_foo_ref_6(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &, X<6> &)
+  virtual_ref_foo_ref_6(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &, X<6> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -2258,20 +2328,22 @@ struct U
     static X<0> x;
     return x;
   }
-  X<0> foo_ref_7(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &, X<6> &, X<7> &)
+  X<0>
+  foo_ref_7(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &, X<6> &, X<7> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
   static X<0>
-    static_foo_ref_7(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &, X<6> &, X<7> &)
+  static_foo_ref_7(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &, X<6> &, X<7> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  X<0> &ref_foo_ref_7(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &, X<6> &, X<7> &)
+  X<0> &
+  ref_foo_ref_7(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &, X<6> &, X<7> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -2284,19 +2356,20 @@ struct U
     return x;
   }
   const X<0> &
-    const_ref_foo_ref_7(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &, X<6> &, X<7> &)
+  const_ref_foo_ref_7(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &, X<6> &, X<7> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  const X<0> &const_ref_foo_const_ref_7(X<1> &,
-                                        X<2> &,
-                                        X<3> &,
-                                        X<4> &,
-                                        X<5> &,
-                                        X<6> &,
-                                        X<7> &)
+  const X<0> &
+  const_ref_foo_const_ref_7(X<1> &,
+                            X<2> &,
+                            X<3> &,
+                            X<4> &,
+                            X<5> &,
+                            X<6> &,
+                            X<7> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -2309,25 +2382,27 @@ struct U
     static X<0> x;
     return x;
   }
-  const X<0> &const_ref_foo_ref_7_const(X<1> &,
-                                        X<2> &,
-                                        X<3> &,
-                                        X<4> &,
-                                        X<5> &,
-                                        X<6> &,
-                                        X<7> &) const
+  const X<0> &
+  const_ref_foo_ref_7_const(X<1> &,
+                            X<2> &,
+                            X<3> &,
+                            X<4> &,
+                            X<5> &,
+                            X<6> &,
+                            X<7> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  const X<0> &const_ref_foo_const_ref_7_const(X<1> &,
-                                              X<2> &,
-                                              X<3> &,
-                                              X<4> &,
-                                              X<5> &,
-                                              X<6> &,
-                                              X<7> &) const
+  const X<0> &
+  const_ref_foo_const_ref_7_const(X<1> &,
+                                  X<2> &,
+                                  X<3> &,
+                                  X<4> &,
+                                  X<5> &,
+                                  X<6> &,
+                                  X<7> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -2340,25 +2415,27 @@ struct U
     static X<0> x;
     return x;
   }
-  virtual const X<0> &virtual_const_ref_foo_ref_7(X<1> &,
-                                                  X<2> &,
-                                                  X<3> &,
-                                                  X<4> &,
-                                                  X<5> &,
-                                                  X<6> &,
-                                                  X<7> &)
+  virtual const X<0> &
+  virtual_const_ref_foo_ref_7(X<1> &,
+                              X<2> &,
+                              X<3> &,
+                              X<4> &,
+                              X<5> &,
+                              X<6> &,
+                              X<7> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  virtual const X<0> &virtual_const_ref_foo_const_ref_7(X<1> &,
-                                                        X<2> &,
-                                                        X<3> &,
-                                                        X<4> &,
-                                                        X<5> &,
-                                                        X<6> &,
-                                                        X<7> &)
+  virtual const X<0> &
+  virtual_const_ref_foo_const_ref_7(X<1> &,
+                                    X<2> &,
+                                    X<3> &,
+                                    X<4> &,
+                                    X<5> &,
+                                    X<6> &,
+                                    X<7> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -2376,44 +2453,47 @@ struct U
     static X<0> x;
     return x;
   }
-  virtual const X<0> &virtual_const_ref_foo_ref_7_const(X<1> &,
-                                                        X<2> &,
-                                                        X<3> &,
-                                                        X<4> &,
-                                                        X<5> &,
-                                                        X<6> &,
-                                                        X<7> &) const
+  virtual const X<0> &
+  virtual_const_ref_foo_ref_7_const(X<1> &,
+                                    X<2> &,
+                                    X<3> &,
+                                    X<4> &,
+                                    X<5> &,
+                                    X<6> &,
+                                    X<7> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  virtual const X<0> &virtual_const_ref_foo_const_ref_7_const(X<1> &,
-                                                              X<2> &,
-                                                              X<3> &,
-                                                              X<4> &,
-                                                              X<5> &,
-                                                              X<6> &,
-                                                              X<7> &) const
+  virtual const X<0> &
+  virtual_const_ref_foo_const_ref_7_const(X<1> &,
+                                          X<2> &,
+                                          X<3> &,
+                                          X<4> &,
+                                          X<5> &,
+                                          X<6> &,
+                                          X<7> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
   static X<0> &
-    static_ref_foo_ref_7(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &, X<6> &, X<7> &)
+  static_ref_foo_ref_7(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &, X<6> &, X<7> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  static const X<0> &static_const_ref_foo_ref_7(X<1> &,
-                                                X<2> &,
-                                                X<3> &,
-                                                X<4> &,
-                                                X<5> &,
-                                                X<6> &,
-                                                X<7> &)
+  static const X<0> &
+  static_const_ref_foo_ref_7(X<1> &,
+                             X<2> &,
+                             X<3> &,
+                             X<4> &,
+                             X<5> &,
+                             X<6> &,
+                             X<7> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -2496,20 +2576,16 @@ struct U
     static X<0> x;
     return x;
   }
-  X<0> foo_ref_7_const(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &, X<6> &, X<7> &)
-    const
+  X<0>
+  foo_ref_7_const(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &, X<6> &, X<7> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  X<0> &ref_foo_ref_7_const(X<1> &,
-                            X<2> &,
-                            X<3> &,
-                            X<4> &,
-                            X<5> &,
-                            X<6> &,
-                            X<7> &) const
+  X<0> &
+  ref_foo_ref_7_const(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &, X<6> &, X<7> &)
+    const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -2555,25 +2631,27 @@ struct U
     static X<0> x;
     return x;
   }
-  virtual X<0> virtual_foo_ref_7_const(X<1> &,
-                                       X<2> &,
-                                       X<3> &,
-                                       X<4> &,
-                                       X<5> &,
-                                       X<6> &,
-                                       X<7> &) const
+  virtual X<0>
+  virtual_foo_ref_7_const(X<1> &,
+                          X<2> &,
+                          X<3> &,
+                          X<4> &,
+                          X<5> &,
+                          X<6> &,
+                          X<7> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  virtual X<0> &virtual_ref_foo_ref_7_const(X<1> &,
-                                            X<2> &,
-                                            X<3> &,
-                                            X<4> &,
-                                            X<5> &,
-                                            X<6> &,
-                                            X<7> &) const
+  virtual X<0> &
+  virtual_ref_foo_ref_7_const(X<1> &,
+                              X<2> &,
+                              X<3> &,
+                              X<4> &,
+                              X<5> &,
+                              X<6> &,
+                              X<7> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -2618,19 +2696,14 @@ struct U
     return x;
   }
   virtual X<0>
-    virtual_foo_ref_7(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &, X<6> &, X<7> &)
+  virtual_foo_ref_7(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &, X<6> &, X<7> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  virtual X<0> &virtual_ref_foo_ref_7(X<1> &,
-                                      X<2> &,
-                                      X<3> &,
-                                      X<4> &,
-                                      X<5> &,
-                                      X<6> &,
-                                      X<7> &)
+  virtual X<0> &
+  virtual_ref_foo_ref_7(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &, X<6> &, X<7> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -2693,26 +2766,42 @@ struct U
     static X<0> x;
     return x;
   }
-  X<0> foo_ref_8(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &, X<6> &, X<7> &, X<8> &)
+  X<0>
+  foo_ref_8(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &, X<6> &, X<7> &, X<8> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  static X<0> static_foo_ref_8(X<1> &,
-                               X<2> &,
-                               X<3> &,
-                               X<4> &,
-                               X<5> &,
-                               X<6> &,
-                               X<7> &,
-                               X<8> &)
+  static X<0>
+  static_foo_ref_8(X<1> &,
+                   X<2> &,
+                   X<3> &,
+                   X<4> &,
+                   X<5> &,
+                   X<6> &,
+                   X<7> &,
+                   X<8> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  X<0> &ref_foo_ref_8(X<1> &,
+  X<0> &
+  ref_foo_ref_8(X<1> &, X<2> &, X<3> &, X<4> &, X<5> &, X<6> &, X<7> &, X<8> &)
+  {
+    deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
+    static X<0> x;
+    return x;
+  }
+  const X<0> &const_ref_foo_8(X<1>, X<2>, X<3>, X<4>, X<5>, X<6>, X<7>, X<8>)
+  {
+    deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
+    static X<0> x;
+    return x;
+  }
+  const X<0> &
+  const_ref_foo_ref_8(X<1> &,
                       X<2> &,
                       X<3> &,
                       X<4> &,
@@ -2725,33 +2814,15 @@ struct U
     static X<0> x;
     return x;
   }
-  const X<0> &const_ref_foo_8(X<1>, X<2>, X<3>, X<4>, X<5>, X<6>, X<7>, X<8>)
-  {
-    deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
-    static X<0> x;
-    return x;
-  }
-  const X<0> &const_ref_foo_ref_8(X<1> &,
-                                  X<2> &,
-                                  X<3> &,
-                                  X<4> &,
-                                  X<5> &,
-                                  X<6> &,
-                                  X<7> &,
-                                  X<8> &)
-  {
-    deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
-    static X<0> x;
-    return x;
-  }
-  const X<0> &const_ref_foo_const_ref_8(X<1> &,
-                                        X<2> &,
-                                        X<3> &,
-                                        X<4> &,
-                                        X<5> &,
-                                        X<6> &,
-                                        X<7> &,
-                                        X<8> &)
+  const X<0> &
+  const_ref_foo_const_ref_8(X<1> &,
+                            X<2> &,
+                            X<3> &,
+                            X<4> &,
+                            X<5> &,
+                            X<6> &,
+                            X<7> &,
+                            X<8> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -2764,27 +2835,29 @@ struct U
     static X<0> x;
     return x;
   }
-  const X<0> &const_ref_foo_ref_8_const(X<1> &,
-                                        X<2> &,
-                                        X<3> &,
-                                        X<4> &,
-                                        X<5> &,
-                                        X<6> &,
-                                        X<7> &,
-                                        X<8> &) const
+  const X<0> &
+  const_ref_foo_ref_8_const(X<1> &,
+                            X<2> &,
+                            X<3> &,
+                            X<4> &,
+                            X<5> &,
+                            X<6> &,
+                            X<7> &,
+                            X<8> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  const X<0> &const_ref_foo_const_ref_8_const(X<1> &,
-                                              X<2> &,
-                                              X<3> &,
-                                              X<4> &,
-                                              X<5> &,
-                                              X<6> &,
-                                              X<7> &,
-                                              X<8> &) const
+  const X<0> &
+  const_ref_foo_const_ref_8_const(X<1> &,
+                                  X<2> &,
+                                  X<3> &,
+                                  X<4> &,
+                                  X<5> &,
+                                  X<6> &,
+                                  X<7> &,
+                                  X<8> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -2797,27 +2870,29 @@ struct U
     static X<0> x;
     return x;
   }
-  virtual const X<0> &virtual_const_ref_foo_ref_8(X<1> &,
-                                                  X<2> &,
-                                                  X<3> &,
-                                                  X<4> &,
-                                                  X<5> &,
-                                                  X<6> &,
-                                                  X<7> &,
-                                                  X<8> &)
+  virtual const X<0> &
+  virtual_const_ref_foo_ref_8(X<1> &,
+                              X<2> &,
+                              X<3> &,
+                              X<4> &,
+                              X<5> &,
+                              X<6> &,
+                              X<7> &,
+                              X<8> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  virtual const X<0> &virtual_const_ref_foo_const_ref_8(X<1> &,
-                                                        X<2> &,
-                                                        X<3> &,
-                                                        X<4> &,
-                                                        X<5> &,
-                                                        X<6> &,
-                                                        X<7> &,
-                                                        X<8> &)
+  virtual const X<0> &
+  virtual_const_ref_foo_const_ref_8(X<1> &,
+                                    X<2> &,
+                                    X<3> &,
+                                    X<4> &,
+                                    X<5> &,
+                                    X<6> &,
+                                    X<7> &,
+                                    X<8> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -2836,53 +2911,57 @@ struct U
     static X<0> x;
     return x;
   }
-  virtual const X<0> &virtual_const_ref_foo_ref_8_const(X<1> &,
-                                                        X<2> &,
-                                                        X<3> &,
-                                                        X<4> &,
-                                                        X<5> &,
-                                                        X<6> &,
-                                                        X<7> &,
-                                                        X<8> &) const
-  {
-    deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
-    static X<0> x;
-    return x;
-  }
-  virtual const X<0> &virtual_const_ref_foo_const_ref_8_const(X<1> &,
-                                                              X<2> &,
-                                                              X<3> &,
-                                                              X<4> &,
-                                                              X<5> &,
-                                                              X<6> &,
-                                                              X<7> &,
-                                                              X<8> &) const
-  {
-    deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
-    static X<0> x;
-    return x;
-  }
-  static X<0> &static_ref_foo_ref_8(X<1> &,
+  virtual const X<0> &
+  virtual_const_ref_foo_ref_8_const(X<1> &,
                                     X<2> &,
                                     X<3> &,
                                     X<4> &,
                                     X<5> &,
                                     X<6> &,
                                     X<7> &,
-                                    X<8> &)
+                                    X<8> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  static const X<0> &static_const_ref_foo_ref_8(X<1> &,
-                                                X<2> &,
-                                                X<3> &,
-                                                X<4> &,
-                                                X<5> &,
-                                                X<6> &,
-                                                X<7> &,
-                                                X<8> &)
+  virtual const X<0> &
+  virtual_const_ref_foo_const_ref_8_const(X<1> &,
+                                          X<2> &,
+                                          X<3> &,
+                                          X<4> &,
+                                          X<5> &,
+                                          X<6> &,
+                                          X<7> &,
+                                          X<8> &) const
+  {
+    deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
+    static X<0> x;
+    return x;
+  }
+  static X<0> &
+  static_ref_foo_ref_8(X<1> &,
+                       X<2> &,
+                       X<3> &,
+                       X<4> &,
+                       X<5> &,
+                       X<6> &,
+                       X<7> &,
+                       X<8> &)
+  {
+    deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
+    static X<0> x;
+    return x;
+  }
+  static const X<0> &
+  static_const_ref_foo_ref_8(X<1> &,
+                             X<2> &,
+                             X<3> &,
+                             X<4> &,
+                             X<5> &,
+                             X<6> &,
+                             X<7> &,
+                             X<8> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -2970,27 +3049,29 @@ struct U
     static X<0> x;
     return x;
   }
-  X<0> foo_ref_8_const(X<1> &,
-                       X<2> &,
-                       X<3> &,
-                       X<4> &,
-                       X<5> &,
-                       X<6> &,
-                       X<7> &,
-                       X<8> &) const
+  X<0>
+  foo_ref_8_const(X<1> &,
+                  X<2> &,
+                  X<3> &,
+                  X<4> &,
+                  X<5> &,
+                  X<6> &,
+                  X<7> &,
+                  X<8> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  X<0> &ref_foo_ref_8_const(X<1> &,
-                            X<2> &,
-                            X<3> &,
-                            X<4> &,
-                            X<5> &,
-                            X<6> &,
-                            X<7> &,
-                            X<8> &) const
+  X<0> &
+  ref_foo_ref_8_const(X<1> &,
+                      X<2> &,
+                      X<3> &,
+                      X<4> &,
+                      X<5> &,
+                      X<6> &,
+                      X<7> &,
+                      X<8> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -3039,27 +3120,29 @@ struct U
     static X<0> x;
     return x;
   }
-  virtual X<0> virtual_foo_ref_8_const(X<1> &,
-                                       X<2> &,
-                                       X<3> &,
-                                       X<4> &,
-                                       X<5> &,
-                                       X<6> &,
-                                       X<7> &,
-                                       X<8> &) const
+  virtual X<0>
+  virtual_foo_ref_8_const(X<1> &,
+                          X<2> &,
+                          X<3> &,
+                          X<4> &,
+                          X<5> &,
+                          X<6> &,
+                          X<7> &,
+                          X<8> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  virtual X<0> &virtual_ref_foo_ref_8_const(X<1> &,
-                                            X<2> &,
-                                            X<3> &,
-                                            X<4> &,
-                                            X<5> &,
-                                            X<6> &,
-                                            X<7> &,
-                                            X<8> &) const
+  virtual X<0> &
+  virtual_ref_foo_ref_8_const(X<1> &,
+                              X<2> &,
+                              X<3> &,
+                              X<4> &,
+                              X<5> &,
+                              X<6> &,
+                              X<7> &,
+                              X<8> &) const
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
@@ -3106,27 +3189,29 @@ struct U
     static X<0> x;
     return x;
   }
-  virtual X<0> virtual_foo_ref_8(X<1> &,
-                                 X<2> &,
-                                 X<3> &,
-                                 X<4> &,
-                                 X<5> &,
-                                 X<6> &,
-                                 X<7> &,
-                                 X<8> &)
+  virtual X<0>
+  virtual_foo_ref_8(X<1> &,
+                    X<2> &,
+                    X<3> &,
+                    X<4> &,
+                    X<5> &,
+                    X<6> &,
+                    X<7> &,
+                    X<8> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
     return x;
   }
-  virtual X<0> &virtual_ref_foo_ref_8(X<1> &,
-                                      X<2> &,
-                                      X<3> &,
-                                      X<4> &,
-                                      X<5> &,
-                                      X<6> &,
-                                      X<7> &,
-                                      X<8> &)
+  virtual X<0> &
+  virtual_ref_foo_ref_8(X<1> &,
+                        X<2> &,
+                        X<3> &,
+                        X<4> &,
+                        X<5> &,
+                        X<6> &,
+                        X<7> &,
+                        X<8> &)
   {
     deallog << unify_pretty_function(__PRETTY_FUNCTION__) << std::endl;
     static X<0> x;
