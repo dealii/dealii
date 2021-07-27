@@ -582,8 +582,8 @@ namespace TriangulationDescription
 
   template <int dim, int spacedim>
   bool
-  Description<dim, spacedim>::
-  operator==(const Description<dim, spacedim> &other) const
+  Description<dim, spacedim>::operator==(
+    const Description<dim, spacedim> &other) const
   {
     if (this->coarse_cells != other.coarse_cells)
       return false;

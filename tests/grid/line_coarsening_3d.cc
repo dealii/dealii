@@ -28,8 +28,9 @@
 // to all cells, thus n_cells are neighboring at this line. in delete_children,
 // this is not accounted for (for n_cells>5) and the child lines are deleted,
 // although they are still needed.
-void create_star_structured_cylinder(Triangulation<3> & coarse_grid,
-                                     const unsigned int n_cells)
+void
+create_star_structured_cylinder(Triangulation<3> & coarse_grid,
+                                const unsigned int n_cells)
 {
   Assert(n_cells > 1, ExcNotImplemented());
 

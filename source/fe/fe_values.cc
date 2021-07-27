@@ -2765,8 +2765,8 @@ FEValuesBase<dim, spacedim>::CellIterator<CI>::CellIterator(const CI &cell)
 
 template <int dim, int spacedim>
 template <typename CI>
-FEValuesBase<dim, spacedim>::CellIterator<CI>::
-operator typename Triangulation<dim, spacedim>::cell_iterator() const
+FEValuesBase<dim, spacedim>::CellIterator<
+  CI>::operator typename Triangulation<dim, spacedim>::cell_iterator() const
 {
   return cell;
 }

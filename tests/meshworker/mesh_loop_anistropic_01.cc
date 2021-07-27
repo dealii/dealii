@@ -31,7 +31,8 @@
 
 
 // Create 2d grid
-void create_grid(Triangulation<2> &tria)
+void
+create_grid(Triangulation<2> &tria)
 {
   GridGenerator::hyper_cube(tria);
 
@@ -71,7 +72,8 @@ void create_grid(Triangulation<2> &tria)
 
 
 // Create 3d grid
-void create_grid(Triangulation<3> &tria)
+void
+create_grid(Triangulation<3> &tria)
 {
   GridGenerator::hyper_cube<3>(tria);
   tria.begin_active()->set_refine_flag(dealii::RefinementCase<3>::cut_x);

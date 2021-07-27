@@ -263,15 +263,16 @@ MappingQCache<dim, spacedim>::initialize(
 {
   AssertDimension(transformation_function.n_components, spacedim);
 
-  this->initialize(mapping,
-                   tria,
-                   [&](const auto &, const auto &point) {
-                     Point<spacedim> new_point;
-                     for (int c = 0; c < spacedim; ++c)
-                       new_point[c] = transformation_function.value(point, c);
-                     return new_point;
-                   },
-                   function_describes_relative_displacement);
+  this->initialize(
+    mapping,
+    tria,
+    [&](const auto &, const auto &point) {
+      Point<spacedim> new_point;
+      for (int c = 0; c < spacedim; ++c)
+        new_point[c] = transformation_function.value(point, c);
+      return new_point;
+    },
+    function_describes_relative_displacement);
 
   uses_level_info = true;
 }

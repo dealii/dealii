@@ -1146,7 +1146,8 @@ namespace internal
      * Operator that returns a payload configured to support the
      * multiplication of two LinearOperators
      */
-    inline EmptyPayload operator*(const EmptyPayload &, const EmptyPayload &)
+    inline EmptyPayload
+    operator*(const EmptyPayload &, const EmptyPayload &)
     {
       return {};
     }

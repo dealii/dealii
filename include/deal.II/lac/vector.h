@@ -474,7 +474,8 @@ public:
    * repeatable results from one run to another.
    */
   template <typename Number2>
-  Number operator*(const Vector<Number2> &V) const;
+  Number
+  operator*(const Vector<Number2> &V) const;
 
   /**
    * Return the square of the $l_2$-norm.
@@ -625,14 +626,16 @@ public:
    *
    * Exactly the same as operator().
    */
-  Number operator[](const size_type i) const;
+  Number
+  operator[](const size_type i) const;
 
   /**
    * Access the @p ith component as a writeable reference.
    *
    * Exactly the same as operator().
    */
-  Number &operator[](const size_type i);
+  Number &
+  operator[](const size_type i);
 
   /**
    * Instead of getting individual elements of a vector via operator(),
@@ -1192,7 +1195,8 @@ Vector<Number>::operator()(const size_type i)
 
 
 template <typename Number>
-inline Number Vector<Number>::operator[](const size_type i) const
+inline Number
+Vector<Number>::operator[](const size_type i) const
 {
   return operator()(i);
 }
@@ -1200,7 +1204,8 @@ inline Number Vector<Number>::operator[](const size_type i) const
 
 
 template <typename Number>
-inline Number &Vector<Number>::operator[](const size_type i)
+inline Number &
+Vector<Number>::operator[](const size_type i)
 {
   return operator()(i);
 }

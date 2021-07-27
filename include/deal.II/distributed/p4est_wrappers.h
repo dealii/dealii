@@ -261,9 +261,9 @@ namespace internal
 
       template <int spacedim>
       static void
-        iterate(dealii::internal::p4est::types<2>::forest *parallel_forest,
-                dealii::internal::p4est::types<2>::ghost * parallel_ghost,
-                void *                                     user_data);
+      iterate(dealii::internal::p4est::types<2>::forest *parallel_forest,
+              dealii::internal::p4est::types<2>::ghost * parallel_ghost,
+              void *                                     user_data);
 
       static constexpr unsigned int max_level = P4EST_MAXLEVEL;
 

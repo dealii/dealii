@@ -1726,7 +1726,7 @@ public:
    */
   template <typename DoFHandlerType>
   DEAL_II_DEPRECATED const DoFHandlerType &
-                           get_dof_handler(const unsigned int dof_handler_index = 0) const;
+  get_dof_handler(const unsigned int dof_handler_index = 0) const;
 
   /**
    * Return the cell iterator in deal.II speak to a given cell batch

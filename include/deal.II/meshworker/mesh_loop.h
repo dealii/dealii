@@ -911,19 +911,20 @@ namespace MeshWorker
                                   copy_data);
       };
 
-    mesh_loop(begin,
-              end,
-              f_cell_worker,
-              [&main_class, copier](const CopyData &copy_data) {
-                (main_class.*copier)(copy_data);
-              },
-              sample_scratch_data,
-              sample_copy_data,
-              flags,
-              f_boundary_worker,
-              f_face_worker,
-              queue_length,
-              chunk_size);
+    mesh_loop(
+      begin,
+      end,
+      f_cell_worker,
+      [&main_class, copier](const CopyData &copy_data) {
+        (main_class.*copier)(copy_data);
+      },
+      sample_scratch_data,
+      sample_copy_data,
+      flags,
+      f_boundary_worker,
+      f_face_worker,
+      queue_length,
+      chunk_size);
   }
 
   /**

@@ -282,7 +282,7 @@ namespace Step70
     std::string arguments_for_solid_grid = spacedim == 2 ?
                                              "-.5, -.1: .5, .1: false" :
                                              "-.5, -.1, -.1: .5, .1, .1: false";
-    std::string name_of_particle_grid = "hyper_ball";
+    std::string name_of_particle_grid    = "hyper_ball";
     std::string arguments_for_particle_grid =
       spacedim == 2 ? "0.3, 0.3: 0.1: false" : "0.3, 0.3, 0.3 : 0.1: false";
 

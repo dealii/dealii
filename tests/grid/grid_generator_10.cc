@@ -26,9 +26,10 @@
 
 
 
-void my_cylinder(Triangulation<3> &tria,
-                 const double      radius,
-                 const double      half_length)
+void
+my_cylinder(Triangulation<3> &tria,
+            const double      radius,
+            const double      half_length)
 {
   // Copy the base from hyper_ball<3>
   // and transform it to yz

@@ -474,7 +474,7 @@ namespace NonMatching
 
     std::vector<
       std::vector<typename Triangulation<dim0, spacedim>::active_cell_iterator>>
-                                                       cell_container(n_active_c);
+      cell_container(n_active_c);
     std::vector<std::vector<std::vector<Point<dim0>>>> qpoints_container(
       n_active_c);
     std::vector<std::vector<std::vector<unsigned int>>> maps_container(

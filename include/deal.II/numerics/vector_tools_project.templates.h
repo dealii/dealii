@@ -103,8 +103,10 @@ namespace VectorTools
      */
     template <int dim,
               int spacedim,
-              template <int, int> class M_or_MC,
-              template <int> class Q_or_QC,
+              template <int, int>
+              class M_or_MC,
+              template <int>
+              class Q_or_QC,
               typename number>
     void
     project_compute_b_v(
@@ -407,8 +409,10 @@ namespace VectorTools
     template <int dim,
               int spacedim,
               typename VectorType,
-              template <int, int> class M_or_MC,
-              template <int> class Q_or_QC>
+              template <int, int>
+              class M_or_MC,
+              template <int>
+              class Q_or_QC>
     void
     do_project(
       const M_or_MC<dim, spacedim> &                             mapping,

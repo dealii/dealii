@@ -55,7 +55,8 @@ namespace dealii
   namespace GridGenerator
   {
     template <int dim, typename VectorType>
-    void create_triangulation_with_marching_cube_algorithm(
+    void
+    create_triangulation_with_marching_cube_algorithm(
       Triangulation<dim - 1, dim> &tria,
       const Mapping<dim> &         mapping,
       const DoFHandler<dim> &      background_dof_handler,

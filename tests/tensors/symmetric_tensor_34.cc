@@ -21,7 +21,8 @@
 
 
 template <int dim>
-void initialize(SymmetricTensor<2, dim> &st)
+void
+initialize(SymmetricTensor<2, dim> &st)
 {
   for (unsigned int i = 0; i < dim; ++i)
     for (unsigned int j = i; j < dim; ++j)
@@ -30,7 +31,8 @@ void initialize(SymmetricTensor<2, dim> &st)
 
 
 template <int dim>
-void initialize(SymmetricTensor<4, dim> &st)
+void
+initialize(SymmetricTensor<4, dim> &st)
 {
   for (unsigned int i = 0; i < dim; ++i)
     for (unsigned int j = i; j < dim; ++j)

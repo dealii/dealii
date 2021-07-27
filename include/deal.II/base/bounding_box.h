@@ -467,8 +467,8 @@ BoundingBox<spacedim, Number>::get_boundary_points() const
 
 template <int spacedim, typename Number>
 inline bool
-BoundingBox<spacedim, Number>::
-operator==(const BoundingBox<spacedim, Number> &box) const
+BoundingBox<spacedim, Number>::operator==(
+  const BoundingBox<spacedim, Number> &box) const
 {
   return boundary_points == box.boundary_points;
 }
@@ -477,8 +477,8 @@ operator==(const BoundingBox<spacedim, Number> &box) const
 
 template <int spacedim, typename Number>
 inline bool
-BoundingBox<spacedim, Number>::
-operator!=(const BoundingBox<spacedim, Number> &box) const
+BoundingBox<spacedim, Number>::operator!=(
+  const BoundingBox<spacedim, Number> &box) const
 {
   return boundary_points != box.boundary_points;
 }

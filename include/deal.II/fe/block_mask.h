@@ -125,7 +125,8 @@ public:
    * given index needs to be between zero and the number of blocks that this
    * mask represents.
    */
-  bool operator[](const unsigned int block_index) const;
+  bool
+  operator[](const unsigned int block_index) const;
 
   /**
    * Return whether this block mask represents a mask with exactly
@@ -185,7 +186,8 @@ public:
    * Return a block mask that has only those elements set that are set both in
    * the current object as well as the one passed as an argument.
    */
-  BlockMask operator&(const BlockMask &mask) const;
+  BlockMask
+  operator&(const BlockMask &mask) const;
 
   /**
    * Return whether this object and the argument are identical.
@@ -253,7 +255,8 @@ BlockMask::size() const
 }
 
 
-inline bool BlockMask::operator[](const unsigned int block_index) const
+inline bool
+BlockMask::operator[](const unsigned int block_index) const
 {
   // if the mask represents the all-block mask
   // then always return true
@@ -347,7 +350,8 @@ BlockMask::operator|(const BlockMask &mask) const
 }
 
 
-inline BlockMask BlockMask::operator&(const BlockMask &mask) const
+inline BlockMask
+BlockMask::operator&(const BlockMask &mask) const
 {
   // if one of the two masks denotes the all-block mask,
   // then return the other one

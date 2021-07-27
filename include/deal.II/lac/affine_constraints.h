@@ -2549,8 +2549,8 @@ inline AffineConstraints<number>::ConstraintLine::ConstraintLine(
 template <typename number>
 template <typename ConstraintLineType>
 inline typename AffineConstraints<number>::ConstraintLine &
-AffineConstraints<number>::ConstraintLine::
-operator=(const ConstraintLineType &other)
+AffineConstraints<number>::ConstraintLine::operator=(
+  const ConstraintLineType &other)
 {
   this->index = other.index;
 

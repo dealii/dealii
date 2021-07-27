@@ -203,12 +203,14 @@ namespace TrilinosWrappers
       /**
        * Dereferencing operator.
        */
-      const Accessor &operator*() const;
+      const Accessor &
+      operator*() const;
 
       /**
        * Dereferencing operator.
        */
-      const Accessor *operator->() const;
+      const Accessor *
+      operator->() const;
 
       /**
        * Comparison. True, if both iterators point to the same matrix
@@ -1114,14 +1116,16 @@ namespace TrilinosWrappers
 
 
 
-    inline const Accessor &Iterator::operator*() const
+    inline const Accessor &
+    Iterator::operator*() const
     {
       return accessor;
     }
 
 
 
-    inline const Accessor *Iterator::operator->() const
+    inline const Accessor *
+    Iterator::operator->() const
     {
       return &accessor;
     }

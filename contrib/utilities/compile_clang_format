@@ -1,7 +1,7 @@
 #!/bin/bash
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2018 by the deal.II authors
+## Copyright (C) 2018 - 2021 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -29,14 +29,13 @@ set -u
 
 PRG="$(cd "$(dirname "$0")" && pwd)/programs"
 
-CLANG_PATH="${PRG}/clang-6"
+VERSION="11"
+RELEASE_DATE="2021-02-03"
+LLVM_COMMIT="1fdec59bffc11ae37eb51a1b9869f0696bfd5312"
 
-RELEASE_DATE="2018-04-06"
-RELEASE_BRANCH="release_60"
-LLVM_REPOSITORY="https://github.com/llvm-mirror/llvm"
-CLANG_REPOSITORY="https://github.com/llvm-mirror/clang"
-LLVM_COMMIT="1a0dddf879aadfcfea409b3c0a9aa3c9da306945"
-CLANG_COMMIT="d5f48a217f404c3462537527f4169bb45eed3904"
+CLANG_PATH="${PRG}/clang-${VERSION}"
+RELEASE_BRANCH="release/${VERSION}.x"
+LLVM_REPOSITORY="https://github.com/llvm/llvm-project"
 
 if [ ! -d "${PRG}" ]
 then
@@ -50,7 +49,7 @@ then
     exit 1
 fi
 
-echo "Downloading and compiling clang-format-6."
+echo "Downloading and compiling clang-format-${VERSION}."
 mkdir -p "${CLANG_PATH}/bin"
 
 tmpdir="${TMPDIR:-/tmp}/dealiiclang${RANDOM}${RANDOM}"
@@ -80,23 +79,11 @@ else
 fi
 git reset --hard "${LLVM_COMMIT}"
 
-git init tools/clang
-cd tools/clang
-git remote add origin "${CLANG_REPOSITORY}"
-if [ "$GIT_SHALLOW_SINCE_AVAILABLE" = true ]; then
-  git fetch --shallow-since="${RELEASE_DATE}" origin "${RELEASE_BRANCH}"
-else
-  git fetch --depth=1 origin "${RELEASE_BRANCH}"
-  i=1;
-  while ! git cat-file -e ${CLANG_COMMIT} 2> /dev/null; do
-    git fetch --depth=$((i+=10)) origin "${RELEASE_BRANCH}";
-  done
-fi
-git reset --hard "${CLANG_COMMIT}"
+# move clang directory into right place for the build system
+mv clang llvm/tools
 
-cd ../../
-mkdir build
-cd build
+mkdir llvm/build
+cd llvm/build
 
 case "${OSTYPE}" in
   darwin*)

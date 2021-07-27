@@ -498,8 +498,8 @@ template <typename Value,
           typename Box,
           typename Allocators>
 void
-ExtractLevelVisitor<Value, Options, Translator, Box, Allocators>::
-operator()(const ExtractLevelVisitor::InternalNode &node)
+ExtractLevelVisitor<Value, Options, Translator, Box, Allocators>::operator()(
+  const ExtractLevelVisitor::InternalNode &node)
 {
   using ElmentsType =
     typename boost::geometry::index::detail::rtree::elements_type<
@@ -542,8 +542,8 @@ template <typename Value,
           typename Box,
           typename Allocators>
 void
-ExtractLevelVisitor<Value, Options, Translator, Box, Allocators>::
-operator()(const ExtractLevelVisitor::Leaf &)
+ExtractLevelVisitor<Value, Options, Translator, Box, Allocators>::operator()(
+  const ExtractLevelVisitor::Leaf &)
 {}
 
 

@@ -46,9 +46,8 @@ is_unit_vector(const Tensor<1, dim> &v)
 }
 
 template <int dim>
-bool check_orientation(Tensor<1, dim> v1,
-                       Tensor<1, dim> v2,
-                       const double   tol = 1e-9)
+bool
+check_orientation(Tensor<1, dim> v1, Tensor<1, dim> v2, const double tol = 1e-9)
 {
   v1 /= v1.norm();
   v2 /= v2.norm();

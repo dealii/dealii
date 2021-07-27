@@ -102,7 +102,7 @@ test(Utilities::CUDA::Handle &cuda_handle)
   CUDAWrappers::SparseMatrix<double> A_diagonal_inverse_dev(cuda_handle,
                                                             A_diagonal_inverse);
   RelaxationOperator<CUDAWrappers::SparseMatrix<double>>
-                                              relaxation_operator_dev(A_dev, A_diagonal_inverse_dev);
+    relaxation_operator_dev(A_dev, A_diagonal_inverse_dev);
   LinearAlgebra::CUDAWrappers::Vector<double> sol_dev(size);
   LinearAlgebra::CUDAWrappers::Vector<double> rhs_dev(size);
   LinearAlgebra::ReadWriteVector<double>      rw_vector(size);

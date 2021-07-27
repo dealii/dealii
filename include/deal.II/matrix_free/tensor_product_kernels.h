@@ -313,7 +313,7 @@ namespace internal
               bool lex_faces = false>
     void
     apply_face(const Number *DEAL_II_RESTRICT in,
-               Number *DEAL_II_RESTRICT out) const;
+               Number *DEAL_II_RESTRICT       out) const;
 
     const Number2 *shape_values;
     const Number2 *shape_gradients;
@@ -335,9 +335,9 @@ namespace internal
                          n_columns,
                          Number,
                          Number2>::apply(const Number2 *DEAL_II_RESTRICT
-                                                        shape_data,
-                                         const Number * in,
-                                         Number *       out)
+                                                       shape_data,
+                                         const Number *in,
+                                         Number *      out)
   {
     static_assert(one_line == false || direction == dim - 1,
                   "Single-line evaluation only works for direction=dim-1.");
@@ -420,7 +420,7 @@ namespace internal
                          Number,
                          Number2>::apply_face(const Number *DEAL_II_RESTRICT in,
                                               Number *DEAL_II_RESTRICT
-                                                      out) const
+                                                out) const
   {
     Assert(dim > 0 && (lex_faces || dim < 4),
            ExcMessage("Only dim=1,2,3 supported"));
@@ -701,7 +701,7 @@ namespace internal
               bool lex_faces = false>
     void
     apply_face(const Number *DEAL_II_RESTRICT in,
-               Number *DEAL_II_RESTRICT out) const;
+               Number *DEAL_II_RESTRICT       out) const;
 
     const Number2 *    shape_values;
     const Number2 *    shape_gradients;
@@ -867,7 +867,7 @@ namespace internal
   inline void
   EvaluatorTensorProduct<evaluate_general, dim, 0, 0, Number, Number2>::
     apply_face(const Number *DEAL_II_RESTRICT in,
-               Number *DEAL_II_RESTRICT out) const
+               Number *DEAL_II_RESTRICT       out) const
   {
     static_assert(lex_faces == false, "Not implemented yet.");
 

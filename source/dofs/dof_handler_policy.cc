@@ -1217,7 +1217,8 @@ namespace internal
          * by a dominating valid one.
          */
         template <int spacedim>
-        static void merge_invalid_line_dofs_on_ghost_interfaces(
+        static void
+        merge_invalid_line_dofs_on_ghost_interfaces(
           DoFHandler<1, spacedim> &dof_handler)
         {
           (void)dof_handler;
@@ -1506,7 +1507,8 @@ namespace internal
 
 
         template <int spacedim>
-        static void merge_invalid_quad_dofs_on_ghost_interfaces(
+        static void
+        merge_invalid_quad_dofs_on_ghost_interfaces(
           DoFHandler<3, spacedim> &dof_handler)
         {
           Assert(dof_handler.hp_capability_enabled == true,

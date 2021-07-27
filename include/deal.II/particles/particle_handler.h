@@ -633,7 +633,7 @@ namespace Particles
      * @deprecated Use locally_owned_particle_ids() instead.
      */
     DEAL_II_DEPRECATED IndexSet
-                       locally_relevant_ids() const;
+    locally_relevant_ids() const;
 
     /**
      * Extract an IndexSet with global dimensions equal to
@@ -1261,7 +1261,7 @@ namespace Particles
     for (auto &p : *this)
       {
         auto       new_point(displace_particles ? p.get_location() :
-                                            Point<spacedim>());
+                                                  Point<spacedim>());
         const auto id = p.get_id();
         for (unsigned int i = 0; i < spacedim; ++i)
           new_point[i] += input_vector[id * spacedim + i];

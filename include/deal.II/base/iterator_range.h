@@ -217,13 +217,15 @@ public:
    * Dereferencing operator.
    * @return The iterator within the collection currently pointed to.
    */
-  const BaseIterator &operator*() const;
+  const BaseIterator &
+  operator*() const;
 
   /**
    * Dereferencing operator.
    * @return The iterator within the collection currently pointed to.
    */
-  const BaseIterator *operator->() const;
+  const BaseIterator *
+  operator->() const;
 
   /**
    * Prefix increment operator. Move the current iterator to the next
@@ -311,7 +313,7 @@ inline IteratorOverIterators<Iterator>::IteratorOverIterators(
 
 template <typename Iterator>
 inline const typename IteratorOverIterators<Iterator>::BaseIterator &
-  IteratorOverIterators<Iterator>::operator*() const
+IteratorOverIterators<Iterator>::operator*() const
 {
   return element_of_iterator_collection;
 }
@@ -320,7 +322,7 @@ inline const typename IteratorOverIterators<Iterator>::BaseIterator &
 
 template <typename Iterator>
 inline const typename IteratorOverIterators<Iterator>::BaseIterator *
-  IteratorOverIterators<Iterator>::operator->() const
+IteratorOverIterators<Iterator>::operator->() const
 {
   return &element_of_iterator_collection;
 }
@@ -350,8 +352,8 @@ IteratorOverIterators<Iterator>::operator++(int)
 
 template <typename Iterator>
 inline bool
-IteratorOverIterators<Iterator>::
-operator!=(const IteratorOverIterators &i_o_i) const
+IteratorOverIterators<Iterator>::operator!=(
+  const IteratorOverIterators &i_o_i) const
 {
   return element_of_iterator_collection != i_o_i.element_of_iterator_collection;
 }

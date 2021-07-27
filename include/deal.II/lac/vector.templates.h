@@ -367,7 +367,8 @@ Vector<Number>::sadd(const Number x, const Number a, const Vector<Number> &v)
 
 template <typename Number>
 template <typename Number2>
-Number Vector<Number>::operator*(const Vector<Number2> &v) const
+Number
+Vector<Number>::operator*(const Vector<Number2> &v) const
 {
   Assert(size() != 0, ExcEmptyObject());
 

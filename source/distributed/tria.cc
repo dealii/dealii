@@ -1706,8 +1706,7 @@ namespace parallel
 #  ifndef DOXYGEN
 
     template <>
-    void
-    Triangulation<2, 2>::copy_new_triangulation_to_p4est(
+    void Triangulation<2, 2>::copy_new_triangulation_to_p4est(
       std::integral_constant<int, 2>)
     {
       const unsigned int dim = 2, spacedim = 2;
@@ -1773,8 +1772,7 @@ namespace parallel
     // TODO: This is a verbatim copy of the 2,2 case. However, we can't just
     // specialize the dim template argument, but let spacedim open
     template <>
-    void
-    Triangulation<2, 3>::copy_new_triangulation_to_p4est(
+    void Triangulation<2, 3>::copy_new_triangulation_to_p4est(
       std::integral_constant<int, 2>)
     {
       const unsigned int dim = 2, spacedim = 3;
@@ -1838,8 +1836,7 @@ namespace parallel
 
 
     template <>
-    void
-    Triangulation<3, 3>::copy_new_triangulation_to_p4est(
+    void Triangulation<3, 3>::copy_new_triangulation_to_p4est(
       std::integral_constant<int, 3>)
     {
       const int dim = 3, spacedim = 3;
@@ -2349,7 +2346,7 @@ namespace parallel
                   // comes out of this cell.
 
                   typename dealii::internal::p4est::types<dim>::quadrant
-                                                                      p4est_coarse_cell;
+                    p4est_coarse_cell;
                   typename dealii::internal::p4est::types<dim>::tree *tree =
                     init_tree(cell->index());
 
@@ -3144,7 +3141,7 @@ namespace parallel
               const unsigned int     second_dealii_idx_on_face =
                 lower_idx == 0 ? left_to_right[face_pair.orientation.to_ulong()]
                                               [first_dealii_idx_on_face] :
-                                 right_to_left[face_pair.orientation.to_ulong()]
+                                     right_to_left[face_pair.orientation.to_ulong()]
                                               [first_dealii_idx_on_face];
               const unsigned int second_dealii_idx_on_cell =
                 GeometryInfo<dim>::face_to_cell_vertices(

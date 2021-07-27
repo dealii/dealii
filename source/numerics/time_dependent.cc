@@ -226,13 +226,13 @@ TimeDependent::start_sweep(const unsigned int s)
 void
 TimeDependent::end_sweep()
 {
-  parallel::apply_to_subranges(0U,
-                               timesteps.size(),
-                               [this](const unsigned int begin,
-                                      const unsigned int end) {
-                                 this->end_sweep(begin, end);
-                               },
-                               1);
+  parallel::apply_to_subranges(
+    0U,
+    timesteps.size(),
+    [this](const unsigned int begin, const unsigned int end) {
+      this->end_sweep(begin, end);
+    },
+    1);
 }
 
 

@@ -799,7 +799,7 @@ namespace Patterns
      * @param patterns The list of patterns to use
      */
     template <class... PatternTypes>
-    Tuple(const std::string &separator, const PatternTypes &... patterns);
+    Tuple(const std::string &separator, const PatternTypes &...patterns);
 
     /**
      * Constructor. This is needed to allow users to specify
@@ -809,7 +809,7 @@ namespace Patterns
      * specialization, the compiler will fail with cryptic errors.
      */
     template <class... PatternTypes>
-    Tuple(const char *separator, const PatternTypes &... patterns);
+    Tuple(const char *separator, const PatternTypes &...patterns);
 
     /**
      * Constructor. Same as above, using the default separator.
@@ -817,7 +817,7 @@ namespace Patterns
      * @param patterns The list of patterns to use
      */
     template <typename... Patterns>
-    Tuple(const Patterns &... patterns);
+    Tuple(const Patterns &...patterns);
 
     /**
      * Copy constructor.
@@ -1413,7 +1413,7 @@ namespace Patterns
 namespace Patterns
 {
   template <class... PatternTypes>
-  Tuple::Tuple(const char *separator, const PatternTypes &... ps)
+  Tuple::Tuple(const char *separator, const PatternTypes &...ps)
     : // forward to the version with std::string argument
     Tuple(std::string(separator), ps...)
   {}
@@ -1421,7 +1421,7 @@ namespace Patterns
 
 
   template <class... PatternTypes>
-  Tuple::Tuple(const std::string &separator, const PatternTypes &... ps)
+  Tuple::Tuple(const std::string &separator, const PatternTypes &...ps)
     : separator(separator)
   {
     static_assert(is_base_of_all<PatternBase, PatternTypes...>::value,
@@ -1437,7 +1437,7 @@ namespace Patterns
 
 
   template <class... PatternTypes>
-  Tuple::Tuple(const PatternTypes &... ps)
+  Tuple::Tuple(const PatternTypes &...ps)
     : // forward to the version with the separator argument
     Tuple(std::string(":"), ps...)
   {}

@@ -2094,7 +2094,8 @@ namespace DataOutBase
 
 
   template <int spacedim>
-  void Patch<0, spacedim>::swap(Patch<0, spacedim> &other_patch)
+  void
+  Patch<0, spacedim>::swap(Patch<0, spacedim> &other_patch)
   {
     std::swap(vertices, other_patch.vertices);
     std::swap(patch_index, other_patch.patch_index);
@@ -2904,11 +2905,12 @@ namespace DataOutBase
      * camera_horizontal, necessary for the correct alignment of the
      * later images), and the focus of the camera (float camera_focus).
      */
-    Point<2> svg_project_point(Point<3> point,
-                               Point<3> camera_position,
-                               Point<3> camera_direction,
-                               Point<3> camera_horizontal,
-                               float    camera_focus)
+    Point<2>
+    svg_project_point(Point<3> point,
+                      Point<3> camera_position,
+                      Point<3> camera_direction,
+                      Point<3> camera_horizontal,
+                      float    camera_focus)
     {
       Point<3> camera_vertical;
       camera_vertical[0] = camera_horizontal[1] * camera_direction[2] -
@@ -2961,7 +2963,8 @@ namespace DataOutBase
      * Function to compute the gradient parameters for a triangle with given
      * values for the vertices.
      */
-    Point<6> svg_get_gradient_parameters(Point<3> points[])
+    Point<6>
+    svg_get_gradient_parameters(Point<3> points[])
     {
       Point<3> v_min, v_max, v_inter;
 

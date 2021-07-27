@@ -48,12 +48,11 @@ namespace CUDAWrappers
     __device__ inline unsigned int
     compute_index()
     {
-      return (dim == 1 ?
-                threadIdx.x % n_points_1d :
-                dim == 2 ?
-                threadIdx.x % n_points_1d + n_points_1d * threadIdx.y :
-                threadIdx.x % n_points_1d +
-                    n_points_1d * (threadIdx.y + n_points_1d * threadIdx.z));
+      return (dim == 1 ? threadIdx.x % n_points_1d :
+              dim == 2 ? threadIdx.x % n_points_1d + n_points_1d * threadIdx.y :
+                         threadIdx.x % n_points_1d +
+                           n_points_1d *
+                             (threadIdx.y + n_points_1d * threadIdx.z));
     }
   } // namespace internal
 
@@ -180,14 +179,14 @@ namespace CUDAWrappers
      * id.
      */
     __device__ value_type
-               get_value() const;
+    get_value() const;
 
     /**
      * Same as above, except that the local dof index is computed from the
      * thread id.
      */
     __device__ value_type
-               get_dof_value() const;
+    get_dof_value() const;
 
     /**
      * Same as above, except that the quadrature point is computed from the
@@ -208,7 +207,7 @@ namespace CUDAWrappers
      * thread id.
      */
     __device__ gradient_type
-               get_gradient() const;
+    get_gradient() const;
 
     /**
      * Same as above, except that the quadrature point is computed from the

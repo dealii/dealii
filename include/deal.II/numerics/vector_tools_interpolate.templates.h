@@ -492,10 +492,10 @@ namespace VectorTools
 
     // Create a small lambda capture wrapping function and call the
     // internal implementation
-    const auto function_map = [&function](
-      const typename DoFHandler<dim, spacedim>::active_cell_iterator &)
-      -> const Function<spacedim, typename VectorType::value_type> *
-    {
+    const auto function_map =
+      [&function](
+        const typename DoFHandler<dim, spacedim>::active_cell_iterator &)
+      -> const Function<spacedim, typename VectorType::value_type> * {
       return &function;
     };
 
@@ -824,10 +824,10 @@ namespace VectorTools
   {
     // Create a small lambda capture wrapping the function map and call the
     // internal implementation
-    const auto function_map = [&functions](
-      const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell)
-      -> const Function<spacedim, typename VectorType::value_type> *
-    {
+    const auto function_map =
+      [&functions](
+        const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell)
+      -> const Function<spacedim, typename VectorType::value_type> * {
       const auto function = functions.find(cell->material_id());
       if (function != functions.end())
         return function->second;

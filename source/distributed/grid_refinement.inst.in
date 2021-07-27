@@ -93,9 +93,10 @@ for (S : REAL_SCALARS; deal_II_dimension : DIMENSIONS)
       \{
         namespace GridRefinement
         \{
-          template void refine_and_coarsen_fixed_number<deal_II_dimension - 1,
-                                                        S,
-                                                        deal_II_dimension>(
+          template void
+          refine_and_coarsen_fixed_number<deal_II_dimension - 1,
+                                          S,
+                                          deal_II_dimension>(
             parallel::distributed::Triangulation<deal_II_dimension - 1,
                                                  deal_II_dimension> &,
             const dealii::Vector<S> &,
@@ -103,9 +104,10 @@ for (S : REAL_SCALARS; deal_II_dimension : DIMENSIONS)
             const double,
             const types::global_cell_index);
 
-          template void refine_and_coarsen_fixed_fraction<deal_II_dimension - 1,
-                                                          S,
-                                                          deal_II_dimension>(
+          template void
+          refine_and_coarsen_fixed_fraction<deal_II_dimension - 1,
+                                            S,
+                                            deal_II_dimension>(
             parallel::distributed::Triangulation<deal_II_dimension - 1,
                                                  deal_II_dimension> &,
             const dealii::Vector<S> &,

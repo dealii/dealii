@@ -41,7 +41,8 @@
 std::ofstream logfile("output");
 
 
-void make_tria(Triangulation<3> &tria, int step)
+void
+make_tria(Triangulation<3> &tria, int step)
 {
   switch (step)
     {

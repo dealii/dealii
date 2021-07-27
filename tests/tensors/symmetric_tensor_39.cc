@@ -26,8 +26,8 @@
 // in clang-3.7.0 and clang-3.9.1 in release mode. Hence, use a separate
 // function.
 template <int dim, typename Number>
-void fill_tensor(
-  dealii::SymmetricTensor<2, dim, dealii::VectorizedArray<Number>> &A)
+void
+fill_tensor(dealii::SymmetricTensor<2, dim, dealii::VectorizedArray<Number>> &A)
 {
   Number counter = 0.0;
   for (unsigned int i = 0; i < dim; ++i)

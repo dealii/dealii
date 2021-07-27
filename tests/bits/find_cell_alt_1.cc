@@ -32,7 +32,8 @@
 
 
 
-void check(Triangulation<2> &tria)
+void
+check(Triangulation<2> &tria)
 {
   MappingQ<2> map(3); // Let's take a higher order mapping
 

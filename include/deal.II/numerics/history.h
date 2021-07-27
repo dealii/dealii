@@ -83,14 +83,16 @@ public:
    * counting from the last added element.
    * `index==0` therefore corresponds to the newset element.
    */
-  T &operator[](const std::size_t index);
+  T &
+  operator[](const std::size_t index);
 
   /**
    * Read access to an element with index @p index,
    * counting from the last added element.
    * `index==0` therefore corresponds to the newset element.
    */
-  const T &operator[](const std::size_t index) const;
+  const T &
+  operator[](const std::size_t index) const;
 
   /**
    * Return the current size of the history.
@@ -203,7 +205,8 @@ FiniteSizeHistory<T>::add(const T &element)
 
 
 template <typename T>
-T &FiniteSizeHistory<T>::operator[](const std::size_t ind)
+T &
+FiniteSizeHistory<T>::operator[](const std::size_t ind)
 {
   AssertIndexRange(ind, data.size());
   return *data[ind];
@@ -212,7 +215,8 @@ T &FiniteSizeHistory<T>::operator[](const std::size_t ind)
 
 
 template <typename T>
-const T &FiniteSizeHistory<T>::operator[](const std::size_t ind) const
+const T &
+FiniteSizeHistory<T>::operator[](const std::size_t ind) const
 {
   AssertIndexRange(ind, data.size());
   return *data[ind];

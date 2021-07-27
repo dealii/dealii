@@ -1033,7 +1033,8 @@ namespace LinearAlgebra
        *
        * This function does the same thing as operator().
        */
-      Number operator[](const size_type global_index) const;
+      Number
+      operator[](const size_type global_index) const;
       /**
        * Read and write access to the data in the position corresponding to @p
        * global_index. The index must be either in the local range of the
@@ -1041,7 +1042,8 @@ namespace LinearAlgebra
        *
        * This function does the same thing as operator().
        */
-      Number &operator[](const size_type global_index);
+      Number &
+      operator[](const size_type global_index);
 
       /**
        * Read access to the data field specified by @p local_index. Locally
@@ -1676,8 +1678,8 @@ namespace LinearAlgebra
 
 
     template <typename Number, typename MemorySpace>
-    inline Number Vector<Number, MemorySpace>::
-                  operator[](const size_type global_index) const
+    inline Number
+    Vector<Number, MemorySpace>::operator[](const size_type global_index) const
     {
       return operator()(global_index);
     }
@@ -1685,8 +1687,8 @@ namespace LinearAlgebra
 
 
     template <typename Number, typename MemorySpace>
-    inline Number &Vector<Number, MemorySpace>::
-                   operator[](const size_type global_index)
+    inline Number &
+    Vector<Number, MemorySpace>::operator[](const size_type global_index)
     {
       return operator()(global_index);
     }

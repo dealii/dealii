@@ -107,8 +107,8 @@ BlockSparsityPatternBase<SparsityPatternBase>::reinit(
 
 template <class SparsityPatternBase>
 BlockSparsityPatternBase<SparsityPatternBase> &
-BlockSparsityPatternBase<SparsityPatternBase>::
-operator=(const BlockSparsityPatternBase<SparsityPatternBase> &bsp)
+BlockSparsityPatternBase<SparsityPatternBase>::operator=(
+  const BlockSparsityPatternBase<SparsityPatternBase> &bsp)
 {
   Assert(rows == bsp.rows, ExcDimensionMismatch(rows, bsp.rows));
   Assert(columns == bsp.columns, ExcDimensionMismatch(columns, bsp.columns));

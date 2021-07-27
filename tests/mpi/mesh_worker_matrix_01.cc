@@ -274,7 +274,7 @@ test(const FiniteElement<dim> &fe)
             {
               std::ofstream                        f("ordering",
                               (myid > 0) ? std::ofstream::app :
-                                           std::ofstream::out);
+                                                                  std::ofstream::out);
               std::vector<types::global_dof_index> local_dof_indices(
                 fe.dofs_per_cell);
               for (typename DoFHandler<dim>::active_cell_iterator cell =

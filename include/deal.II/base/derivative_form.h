@@ -76,12 +76,14 @@ public:
   /**
    * Read-Write access operator.
    */
-  Tensor<order, dim, Number> &operator[](const unsigned int i);
+  Tensor<order, dim, Number> &
+  operator[](const unsigned int i);
 
   /**
    * Read-only access operator.
    */
-  const Tensor<order, dim, Number> &operator[](const unsigned int i) const;
+  const Tensor<order, dim, Number> &
+  operator[](const unsigned int i) const;
 
   /**
    * Assignment operator.
@@ -207,8 +209,8 @@ inline DerivativeForm<order, dim, spacedim, Number>::DerivativeForm(
 
 template <int order, int dim, int spacedim, typename Number>
 inline DerivativeForm<order, dim, spacedim, Number> &
-DerivativeForm<order, dim, spacedim, Number>::
-operator=(const Tensor<order + 1, dim, Number> &ta)
+DerivativeForm<order, dim, spacedim, Number>::operator=(
+  const Tensor<order + 1, dim, Number> &ta)
 {
   Assert((dim == spacedim), ExcMessage("Only allowed when dim==spacedim."));
 
@@ -222,8 +224,8 @@ operator=(const Tensor<order + 1, dim, Number> &ta)
 
 template <int order, int dim, int spacedim, typename Number>
 inline DerivativeForm<order, dim, spacedim, Number> &
-DerivativeForm<order, dim, spacedim, Number>::
-operator=(const Tensor<order, spacedim, Tensor<1, dim, Number>> &T)
+DerivativeForm<order, dim, spacedim, Number>::operator=(
+  const Tensor<order, spacedim, Tensor<1, dim, Number>> &T)
 {
   for (unsigned int j = 0; j < spacedim; ++j)
     (*this)[j] = T[j];
@@ -234,8 +236,8 @@ operator=(const Tensor<order, spacedim, Tensor<1, dim, Number>> &T)
 
 template <int order, int dim, int spacedim, typename Number>
 inline DerivativeForm<order, dim, spacedim, Number> &
-DerivativeForm<order, dim, spacedim, Number>::
-operator=(const Tensor<1, dim, Number> &T)
+DerivativeForm<order, dim, spacedim, Number>::operator=(
+  const Tensor<1, dim, Number> &T)
 {
   Assert((1 == spacedim) && (order == 1),
          ExcMessage("Only allowed for spacedim==1 and order==1."));
@@ -249,7 +251,7 @@ operator=(const Tensor<1, dim, Number> &T)
 
 template <int order, int dim, int spacedim, typename Number>
 inline Tensor<order, dim, Number> &
-  DerivativeForm<order, dim, spacedim, Number>::operator[](const unsigned int i)
+DerivativeForm<order, dim, spacedim, Number>::operator[](const unsigned int i)
 {
   AssertIndexRange(i, spacedim);
 
@@ -260,8 +262,8 @@ inline Tensor<order, dim, Number> &
 
 template <int order, int dim, int spacedim, typename Number>
 inline const Tensor<order, dim, Number> &
-  DerivativeForm<order, dim, spacedim, Number>::
-  operator[](const unsigned int i) const
+DerivativeForm<order, dim, spacedim, Number>::operator[](
+  const unsigned int i) const
 {
   AssertIndexRange(i, spacedim);
 

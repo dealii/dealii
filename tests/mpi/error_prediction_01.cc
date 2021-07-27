@@ -120,10 +120,10 @@ test()
 
   // ----- execute adaptation -----
   parallel::distributed::CellDataTransfer<dim, dim, Vector<float>>
-  data_transfer(tria,
-                /*transfer_variable_size_data=*/false,
-                &AdaptationStrategies::Refinement::l2_norm<dim, dim, float>,
-                &AdaptationStrategies::Coarsening::l2_norm<dim, dim, float>);
+    data_transfer(tria,
+                  /*transfer_variable_size_data=*/false,
+                  &AdaptationStrategies::Refinement::l2_norm<dim, dim, float>,
+                  &AdaptationStrategies::Coarsening::l2_norm<dim, dim, float>);
 
   data_transfer.prepare_for_coarsening_and_refinement(predicted_errors);
   tria.execute_coarsening_and_refinement();

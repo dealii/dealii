@@ -1387,12 +1387,12 @@ namespace Step44
                                    &ls_minimization_function_ptrb,
                                    &use_ptrb]() {
           const auto res_0 = (use_ptrb ? ls_minimization_function_ptrb(0.0) :
-                                         ls_minimization_function(0.0));
+                                               ls_minimization_function(0.0));
           Assert(res_0.second < 0.0,
                  ExcMessage("Gradient should be negative. Current value: " +
                             std::to_string(res_0.second)));
           const auto res_1 = (use_ptrb ? ls_minimization_function_ptrb(1.0) :
-                                         ls_minimization_function(1.0));
+                                               ls_minimization_function(1.0));
 
           // Wriggers discussion after 5.14
           if (res_0.second * res_1.second > 0.0)
@@ -1417,7 +1417,7 @@ namespace Step44
                                          a_max,
                                          max_evals,
                                          debug_linesearch) :
-                                       LineMinimization::line_search<double>(
+                                             LineMinimization::line_search<double>(
                                          ls_minimization_function,
                                          res_0.first,
                                          res_0.second,

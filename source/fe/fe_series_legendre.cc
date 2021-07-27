@@ -233,8 +233,8 @@ namespace FESeries
 
   template <int dim, int spacedim>
   inline bool
-  Legendre<dim, spacedim>::
-  operator==(const Legendre<dim, spacedim> &legendre) const
+  Legendre<dim, spacedim>::operator==(
+    const Legendre<dim, spacedim> &legendre) const
   {
     return (
       (n_coefficients_per_direction == legendre.n_coefficients_per_direction) &&

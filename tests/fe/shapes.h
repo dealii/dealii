@@ -377,10 +377,11 @@ plot_face_shape_functions(Mapping<dim> &      mapping,
 
 
 template <>
-void plot_face_shape_functions(Mapping<1> &,
-                               FiniteElement<1> &,
-                               const char *,
-                               UpdateFlags)
+void
+plot_face_shape_functions(Mapping<1> &,
+                          FiniteElement<1> &,
+                          const char *,
+                          UpdateFlags)
 {}
 
 

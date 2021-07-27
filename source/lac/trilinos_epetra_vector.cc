@@ -282,7 +282,8 @@ namespace LinearAlgebra
 
 
 
-    double Vector::operator*(const VectorSpaceVector<double> &V) const
+    double
+    Vector::operator*(const VectorSpaceVector<double> &V) const
     {
       // Check that casting will work.
       Assert(dynamic_cast<const Vector *>(&V) != nullptr,

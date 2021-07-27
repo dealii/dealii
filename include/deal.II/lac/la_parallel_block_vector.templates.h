@@ -247,8 +247,8 @@ namespace LinearAlgebra
 
     template <typename Number>
     BlockVector<Number> &
-    BlockVector<Number>::
-    operator=(const PETScWrappers::MPI::BlockVector &petsc_vec)
+    BlockVector<Number>::operator=(
+      const PETScWrappers::MPI::BlockVector &petsc_vec)
     {
       AssertDimension(this->n_blocks(), petsc_vec.n_blocks());
       for (unsigned int i = 0; i < this->n_blocks(); ++i)
@@ -296,8 +296,8 @@ namespace LinearAlgebra
 
     template <typename Number>
     BlockVector<Number> &
-    BlockVector<Number>::
-    operator=(const TrilinosWrappers::MPI::BlockVector &trilinos_vec)
+    BlockVector<Number>::operator=(
+      const TrilinosWrappers::MPI::BlockVector &trilinos_vec)
     {
       AssertDimension(this->n_blocks(), trilinos_vec.n_blocks());
       for (unsigned int i = 0; i < this->n_blocks(); ++i)
@@ -641,8 +641,8 @@ namespace LinearAlgebra
 
 
     template <typename Number>
-    Number BlockVector<Number>::
-           operator*(const VectorSpaceVector<Number> &vv) const
+    Number
+    BlockVector<Number>::operator*(const VectorSpaceVector<Number> &vv) const
     {
       Assert(this->n_blocks() > 0, ExcEmptyObject());
 

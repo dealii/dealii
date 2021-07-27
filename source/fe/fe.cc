@@ -1021,8 +1021,8 @@ FiniteElement<dim, spacedim>::compare_for_domination(
 
 template <int dim, int spacedim>
 bool
-FiniteElement<dim, spacedim>::
-operator==(const FiniteElement<dim, spacedim> &f) const
+FiniteElement<dim, spacedim>::operator==(
+  const FiniteElement<dim, spacedim> &f) const
 {
   // Compare fields in roughly increasing order of how expensive the
   // comparison is
@@ -1036,8 +1036,8 @@ operator==(const FiniteElement<dim, spacedim> &f) const
 
 template <int dim, int spacedim>
 bool
-FiniteElement<dim, spacedim>::
-operator!=(const FiniteElement<dim, spacedim> &f) const
+FiniteElement<dim, spacedim>::operator!=(
+  const FiniteElement<dim, spacedim> &f) const
 {
   return !(*this == f);
 }

@@ -83,7 +83,7 @@ namespace hp
      * from class Mapping<dim,spacedim>.
      */
     template <class... MappingTypes>
-    explicit MappingCollection(const MappingTypes &... mappings);
+    explicit MappingCollection(const MappingTypes &...mappings);
 
     /**
      * Add a new mapping to the MappingCollection. Generally, you will
@@ -134,7 +134,7 @@ namespace hp
   template <int dim, int spacedim>
   template <class... MappingTypes>
   MappingCollection<dim, spacedim>::MappingCollection(
-    const MappingTypes &... mappings)
+    const MappingTypes &...mappings)
   {
     static_assert(
       is_base_of_all<Mapping<dim, spacedim>, MappingTypes...>::value,

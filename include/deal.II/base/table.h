@@ -189,7 +189,8 @@ namespace internal
       /**
        * Index operator. Performs a range check.
        */
-      Accessor<N, T, C, P - 1> operator[](const size_type i) const;
+      Accessor<N, T, C, P - 1>
+      operator[](const size_type i) const;
 
       /**
        * Exception for range check. Do not use global exception since this way
@@ -285,7 +286,8 @@ namespace internal
       /**
        * Index operator. Performs a range check.
        */
-      reference operator[](const size_type) const;
+      reference
+      operator[](const size_type) const;
 
       /**
        * Return the length of one row, i.e. the number of elements
@@ -899,7 +901,8 @@ public:
    * Access operator. Since this is a one-dimensional object, this simply
    * accesses the requested data element. Returns a read-write reference.
    */
-  typename AlignedVector<T>::reference operator[](const size_type i);
+  typename AlignedVector<T>::reference
+  operator[](const size_type i);
 
   /**
    * Access operator. Since this is a one-dimensional object, this simply
@@ -2214,8 +2217,8 @@ namespace internal
 
 
     template <int N, typename T, bool C, unsigned int P>
-    inline Accessor<N, T, C, P - 1> Accessor<N, T, C, P>::
-                                    operator[](const size_type i) const
+    inline Accessor<N, T, C, P - 1>
+    Accessor<N, T, C, P>::operator[](const size_type i) const
     {
       AssertIndexRange(i, table.size()[N - P]);
 
@@ -2257,8 +2260,8 @@ namespace internal
 
 
     template <int N, typename T, bool C>
-    inline typename Accessor<N, T, C, 1>::reference Accessor<N, T, C, 1>::
-                                                    operator[](const size_type i) const
+    inline typename Accessor<N, T, C, 1>::reference
+    Accessor<N, T, C, 1>::operator[](const size_type i) const
     {
       AssertIndexRange(i, table.size()[N - 1]);
       return *(data + i);
@@ -2651,8 +2654,8 @@ inline Table<1, T>::Table(const size_type size,
 
 
 template <typename T>
-inline typename AlignedVector<T>::const_reference Table<1, T>::
-                                                  operator[](const size_type i) const
+inline typename AlignedVector<T>::const_reference
+Table<1, T>::operator[](const size_type i) const
 {
   AssertIndexRange(i, this->table_size[0]);
   return this->values[i];
@@ -2661,8 +2664,8 @@ inline typename AlignedVector<T>::const_reference Table<1, T>::
 
 
 template <typename T>
-inline typename AlignedVector<T>::reference Table<1, T>::
-                                            operator[](const size_type i)
+inline typename AlignedVector<T>::reference
+Table<1, T>::operator[](const size_type i)
 {
   AssertIndexRange(i, this->table_size[0]);
   return this->values[i];
@@ -2725,7 +2728,7 @@ Table<2, T>::reinit(const size_type size1,
 
 template <typename T>
 inline dealii::internal::TableBaseAccessors::Accessor<2, T, true, 1>
-  Table<2, T>::operator[](const size_type i) const
+Table<2, T>::operator[](const size_type i) const
 {
   AssertIndexRange(i, this->table_size[0]);
   return dealii::internal::TableBaseAccessors::Accessor<2, T, true, 1>(
@@ -2736,7 +2739,7 @@ inline dealii::internal::TableBaseAccessors::Accessor<2, T, true, 1>
 
 template <typename T>
 inline dealii::internal::TableBaseAccessors::Accessor<2, T, false, 1>
-  Table<2, T>::operator[](const size_type i)
+Table<2, T>::operator[](const size_type i)
 {
   AssertIndexRange(i, this->table_size[0]);
   return dealii::internal::TableBaseAccessors::Accessor<2, T, false, 1>(
@@ -3238,7 +3241,7 @@ inline Table<3, T>::Table(const size_type size1,
 
 template <typename T>
 inline dealii::internal::TableBaseAccessors::Accessor<3, T, true, 2>
-  Table<3, T>::operator[](const size_type i) const
+Table<3, T>::operator[](const size_type i) const
 {
   AssertIndexRange(i, this->table_size[0]);
   const size_type subobject_size =
@@ -3251,7 +3254,7 @@ inline dealii::internal::TableBaseAccessors::Accessor<3, T, true, 2>
 
 template <typename T>
 inline dealii::internal::TableBaseAccessors::Accessor<3, T, false, 2>
-  Table<3, T>::operator[](const size_type i)
+Table<3, T>::operator[](const size_type i)
 {
   AssertIndexRange(i, this->table_size[0]);
   const size_type subobject_size =
@@ -3264,8 +3267,9 @@ inline dealii::internal::TableBaseAccessors::Accessor<3, T, false, 2>
 
 template <typename T>
 inline typename AlignedVector<T>::const_reference
-Table<3, T>::
-operator()(const size_type i, const size_type j, const size_type k) const
+Table<3, T>::operator()(const size_type i,
+                        const size_type j,
+                        const size_type k) const
 {
   AssertIndexRange(i, this->table_size[0]);
   AssertIndexRange(j, this->table_size[1]);
@@ -3303,7 +3307,7 @@ inline Table<4, T>::Table(const size_type size1,
 
 template <typename T>
 inline dealii::internal::TableBaseAccessors::Accessor<4, T, true, 3>
-  Table<4, T>::operator[](const size_type i) const
+Table<4, T>::operator[](const size_type i) const
 {
   AssertIndexRange(i, this->table_size[0]);
   const size_type subobject_size =
@@ -3316,7 +3320,7 @@ inline dealii::internal::TableBaseAccessors::Accessor<4, T, true, 3>
 
 template <typename T>
 inline dealii::internal::TableBaseAccessors::Accessor<4, T, false, 3>
-  Table<4, T>::operator[](const size_type i)
+Table<4, T>::operator[](const size_type i)
 {
   AssertIndexRange(i, this->table_size[0]);
   const size_type subobject_size =
@@ -3380,7 +3384,7 @@ inline Table<5, T>::Table(const size_type size1,
 
 template <typename T>
 inline dealii::internal::TableBaseAccessors::Accessor<5, T, true, 4>
-  Table<5, T>::operator[](const size_type i) const
+Table<5, T>::operator[](const size_type i) const
 {
   AssertIndexRange(i, this->table_size[0]);
   const size_type subobject_size = size_type(this->table_size[1]) *
@@ -3394,7 +3398,7 @@ inline dealii::internal::TableBaseAccessors::Accessor<5, T, true, 4>
 
 template <typename T>
 inline dealii::internal::TableBaseAccessors::Accessor<5, T, false, 4>
-  Table<5, T>::operator[](const size_type i)
+Table<5, T>::operator[](const size_type i)
 {
   AssertIndexRange(i, this->table_size[0]);
   const size_type subobject_size = size_type(this->table_size[1]) *
@@ -3478,7 +3482,7 @@ inline Table<6, T>::Table(const size_type size1,
 
 template <typename T>
 inline dealii::internal::TableBaseAccessors::Accessor<6, T, true, 5>
-  Table<6, T>::operator[](const size_type i) const
+Table<6, T>::operator[](const size_type i) const
 {
   AssertIndexRange(i, this->table_size[0]);
   const size_type subobject_size = size_type(this->table_size[1]) *
@@ -3492,7 +3496,7 @@ inline dealii::internal::TableBaseAccessors::Accessor<6, T, true, 5>
 
 template <typename T>
 inline dealii::internal::TableBaseAccessors::Accessor<6, T, false, 5>
-  Table<6, T>::operator[](const size_type i)
+Table<6, T>::operator[](const size_type i)
 {
   AssertIndexRange(i, this->table_size[0]);
   const size_type subobject_size = size_type(this->table_size[1]) *
@@ -3586,7 +3590,7 @@ inline Table<7, T>::Table(const size_type size1,
 
 template <typename T>
 inline dealii::internal::TableBaseAccessors::Accessor<7, T, true, 6>
-  Table<7, T>::operator[](const size_type i) const
+Table<7, T>::operator[](const size_type i) const
 {
   AssertIndexRange(i, this->table_size[0]);
   const size_type subobject_size =
@@ -3600,7 +3604,7 @@ inline dealii::internal::TableBaseAccessors::Accessor<7, T, true, 6>
 
 template <typename T>
 inline dealii::internal::TableBaseAccessors::Accessor<7, T, false, 6>
-  Table<7, T>::operator[](const size_type i)
+Table<7, T>::operator[](const size_type i)
 {
   AssertIndexRange(i, this->table_size[0]);
   const size_type subobject_size =

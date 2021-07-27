@@ -60,7 +60,8 @@ output_bool_vector(std::vector<bool> &v)
 
 
 
-void set_boundary_ids(Triangulation<1> &)
+void
+set_boundary_ids(Triangulation<1> &)
 {}
 
 

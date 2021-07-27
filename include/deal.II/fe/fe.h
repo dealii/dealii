@@ -3084,8 +3084,8 @@ protected:
 
 
 template <int dim, int spacedim>
-inline const FiniteElement<dim, spacedim> &FiniteElement<dim, spacedim>::
-                                           operator[](const unsigned int fe_index) const
+inline const FiniteElement<dim, spacedim> &
+FiniteElement<dim, spacedim>::operator[](const unsigned int fe_index) const
 {
   (void)fe_index;
   Assert(fe_index == 0,

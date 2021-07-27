@@ -100,7 +100,8 @@ namespace python
     /**
      * Return the scalar product of the vectors representing two points.
      */
-    double operator*(const PointWrapper &p) const;
+    double
+    operator*(const PointWrapper &p) const;
 
     /**
      * Add an offset to a point.
@@ -129,7 +130,8 @@ namespace python
     /**
      * Multiply the coordinates of the point by a factor.
      */
-    PointWrapper operator*(const double factor) const;
+    PointWrapper
+    operator*(const double factor) const;
 
     /**
      * Add another point.

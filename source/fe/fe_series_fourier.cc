@@ -27,14 +27,16 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace
 {
-  void set_k_vectors(Table<1, Tensor<1, 1>> &k_vectors, const unsigned int N)
+  void
+  set_k_vectors(Table<1, Tensor<1, 1>> &k_vectors, const unsigned int N)
   {
     k_vectors.reinit(TableIndices<1>(N));
     for (unsigned int i = 0; i < N; ++i)
       k_vectors(i)[0] = 2. * numbers::PI * i;
   }
 
-  void set_k_vectors(Table<2, Tensor<1, 2>> &k_vectors, const unsigned int N)
+  void
+  set_k_vectors(Table<2, Tensor<1, 2>> &k_vectors, const unsigned int N)
   {
     k_vectors.reinit(TableIndices<2>(N, N));
     for (unsigned int i = 0; i < N; ++i)
@@ -45,7 +47,8 @@ namespace
         }
   }
 
-  void set_k_vectors(Table<3, Tensor<1, 3>> &k_vectors, const unsigned int N)
+  void
+  set_k_vectors(Table<3, Tensor<1, 3>> &k_vectors, const unsigned int N)
   {
     k_vectors.reinit(TableIndices<3>(N, N, N));
     for (unsigned int i = 0; i < N; ++i)
@@ -224,8 +227,8 @@ namespace FESeries
 
   template <int dim, int spacedim>
   inline bool
-  Fourier<dim, spacedim>::
-  operator==(const Fourier<dim, spacedim> &fourier) const
+  Fourier<dim, spacedim>::operator==(
+    const Fourier<dim, spacedim> &fourier) const
   {
     return (
       (n_coefficients_per_direction == fourier.n_coefficients_per_direction) &&

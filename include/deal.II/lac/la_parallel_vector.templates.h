@@ -785,8 +785,8 @@ namespace LinearAlgebra
 
     template <typename Number, typename MemorySpaceType>
     inline Vector<Number, MemorySpaceType> &
-    Vector<Number, MemorySpaceType>::
-    operator=(const Vector<Number, MemorySpaceType> &c)
+    Vector<Number, MemorySpaceType>::operator=(
+      const Vector<Number, MemorySpaceType> &c)
     {
 #ifdef _MSC_VER
       return this->operator=<Number>(c);
@@ -800,8 +800,8 @@ namespace LinearAlgebra
     template <typename Number, typename MemorySpaceType>
     template <typename Number2>
     inline Vector<Number, MemorySpaceType> &
-    Vector<Number, MemorySpaceType>::
-    operator=(const Vector<Number2, MemorySpaceType> &c)
+    Vector<Number, MemorySpaceType>::operator=(
+      const Vector<Number2, MemorySpaceType> &c)
     {
       Assert(c.partitioner.get() != nullptr, ExcNotInitialized());
 
@@ -1475,8 +1475,8 @@ namespace LinearAlgebra
 
     template <typename Number, typename MemorySpaceType>
     Vector<Number, MemorySpaceType> &
-    Vector<Number, MemorySpaceType>::
-    operator+=(const VectorSpaceVector<Number> &vv)
+    Vector<Number, MemorySpaceType>::operator+=(
+      const VectorSpaceVector<Number> &vv)
     {
       // Downcast. Throws an exception if invalid.
       using VectorType = Vector<Number, MemorySpaceType>;
@@ -1503,8 +1503,8 @@ namespace LinearAlgebra
 
     template <typename Number, typename MemorySpaceType>
     Vector<Number, MemorySpaceType> &
-    Vector<Number, MemorySpaceType>::
-    operator-=(const VectorSpaceVector<Number> &vv)
+    Vector<Number, MemorySpaceType>::operator-=(
+      const VectorSpaceVector<Number> &vv)
     {
       // Downcast. Throws an exception if invalid.
       using VectorType = Vector<Number, MemorySpaceType>;
@@ -1819,8 +1819,9 @@ namespace LinearAlgebra
 
 
     template <typename Number, typename MemorySpaceType>
-    Number Vector<Number, MemorySpaceType>::
-           operator*(const VectorSpaceVector<Number> &vv) const
+    Number
+    Vector<Number, MemorySpaceType>::operator*(
+      const VectorSpaceVector<Number> &vv) const
     {
       // Downcast. Throws an exception if invalid.
       using VectorType = Vector<Number, MemorySpaceType>;

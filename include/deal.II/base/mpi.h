@@ -285,7 +285,8 @@ namespace Utilities
       /**
        * Access the stored communicator.
        */
-      const MPI_Comm &operator*() const
+      const MPI_Comm &
+      operator*() const
       {
         return comm;
       }

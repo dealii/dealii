@@ -35,7 +35,8 @@
 
 using namespace dealii;
 
-void make_grid(Triangulation<2> &triangulation)
+void
+make_grid(Triangulation<2> &triangulation)
 {
   Triangulation<2> triangulation_temp;
 

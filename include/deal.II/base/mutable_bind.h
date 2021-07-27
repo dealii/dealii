@@ -94,7 +94,7 @@ namespace Utilities
      * each arguments separately.
      */
     template <class FunctionType>
-    MutableBind(FunctionType function, FunctionArgs &&... arguments);
+    MutableBind(FunctionType function, FunctionArgs &&...arguments);
 
     /**
      * Construct a MutableBind object specifying the function, and
@@ -129,7 +129,7 @@ namespace Utilities
      * operator()() is called, using move semantic.
      */
     void
-    set_arguments(FunctionArgs &&... arguments);
+    set_arguments(FunctionArgs &&...arguments);
 
     /**
      * Parse the arguments to use in @p function from a string, for next time
@@ -186,7 +186,7 @@ namespace Utilities
   template <typename ReturnType, class... FunctionArgs>
   MutableBind<ReturnType, FunctionArgs...>
   mutable_bind(ReturnType (*function)(FunctionArgs...),
-               typename identity<FunctionArgs>::type &&... arguments);
+               typename identity<FunctionArgs>::type &&...arguments);
 
   /**
    * Same as above, using a std::function object.
@@ -194,7 +194,7 @@ namespace Utilities
   template <typename ReturnType, class... FunctionArgs>
   MutableBind<ReturnType, FunctionArgs...>
   mutable_bind(std::function<ReturnType(FunctionArgs...)>,
-               typename identity<FunctionArgs>::type &&... arguments);
+               typename identity<FunctionArgs>::type &&...arguments);
 
   /**
    * Create a MutableBind object from a function pointer, with uninitialized
@@ -224,7 +224,7 @@ namespace Utilities
   template <class FunctionType>
   MutableBind<ReturnType, FunctionArgs...>::MutableBind(
     FunctionType function,
-    FunctionArgs &&... arguments)
+    FunctionArgs &&...arguments)
     : function(function)
     , arguments(std::make_tuple(std::move(arguments)...))
   {}
@@ -261,7 +261,7 @@ namespace Utilities
   template <typename ReturnType, class... FunctionArgs>
   void
   MutableBind<ReturnType, FunctionArgs...>::set_arguments(
-    FunctionArgs &&... args)
+    FunctionArgs &&...args)
   {
     arguments = std::make_tuple(std::move(args)...);
   }
@@ -292,7 +292,7 @@ namespace Utilities
   template <typename ReturnType, class... FunctionArgs>
   MutableBind<ReturnType, FunctionArgs...>
   mutable_bind(ReturnType (*function)(FunctionArgs...),
-               typename identity<FunctionArgs>::type &&... arguments)
+               typename identity<FunctionArgs>::type &&...arguments)
   {
     return MutableBind<ReturnType, FunctionArgs...>(function,
                                                     std::move(arguments)...);
@@ -312,7 +312,7 @@ namespace Utilities
   template <typename ReturnType, class... FunctionArgs>
   MutableBind<ReturnType, FunctionArgs...>
   mutable_bind(std::function<ReturnType(FunctionArgs...)> function,
-               typename identity<FunctionArgs>::type &&... arguments)
+               typename identity<FunctionArgs>::type &&...arguments)
   {
     return MutableBind<ReturnType, FunctionArgs...>(function,
                                                     std::move(arguments)...);

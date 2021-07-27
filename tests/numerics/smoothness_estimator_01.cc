@@ -149,12 +149,14 @@ compare(const Table<3, double> &coeff1, const Table<3, double> &coeff2)
 
 
 
-void resize(Table<2, double> &coeff, const unsigned int N)
+void
+resize(Table<2, double> &coeff, const unsigned int N)
 {
   coeff.reinit(N, N);
 }
 
-void resize(Table<3, double> &coeff, const unsigned int N)
+void
+resize(Table<3, double> &coeff, const unsigned int N)
 {
   TableIndices<3> size;
   for (unsigned int d = 0; d < 3; d++)

@@ -58,13 +58,15 @@ struct SynchronousIterators
    * Dereference const operator. Returns a const reference to the iterators
    * represented by the current class.
    */
-  const Iterators &operator*() const;
+  const Iterators &
+  operator*() const;
 
   /**
    * Dereference operator. Returns a reference to the iterators
    * represented by the current class.
    */
-  Iterators &operator*();
+  Iterators &
+  operator*();
 
 private:
   /**
@@ -83,7 +85,8 @@ inline SynchronousIterators<Iterators>::SynchronousIterators(const Iterators &i)
 
 
 template <typename Iterators>
-inline const Iterators &SynchronousIterators<Iterators>::operator*() const
+inline const Iterators &
+SynchronousIterators<Iterators>::operator*() const
 {
   return iterators;
 }
@@ -91,7 +94,8 @@ inline const Iterators &SynchronousIterators<Iterators>::operator*() const
 
 
 template <typename Iterators>
-inline Iterators &SynchronousIterators<Iterators>::operator*()
+inline Iterators &
+SynchronousIterators<Iterators>::operator*()
 {
   return iterators;
 }

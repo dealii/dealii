@@ -878,8 +878,9 @@ namespace internal
 
 
     template <>
-    bool quadrant_is_ancestor<1>(types<1>::quadrant const &q1,
-                                 types<1>::quadrant const &q2)
+    bool
+    quadrant_is_ancestor<1>(types<1>::quadrant const &q1,
+                            types<1>::quadrant const &q2)
     {
       // determine level of quadrants
       const int level_1 = (q1 << types<1>::max_n_child_indices_bits) >>
@@ -926,7 +927,8 @@ namespace internal
 
 
     template <>
-    void init_coarse_quadrant<1>(typename types<1>::quadrant &quad)
+    void
+    init_coarse_quadrant<1>(typename types<1>::quadrant &quad)
     {
       quad = 0;
     }

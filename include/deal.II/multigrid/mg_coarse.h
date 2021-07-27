@@ -413,13 +413,13 @@ template <class VectorType,
           class MatrixType,
           class PreconditionerType>
 void
-MGCoarseGridIterativeSolver<VectorType,
-                            SolverType,
-                            MatrixType,
-                            PreconditionerType>::
-operator()(const unsigned int /*level*/,
-           VectorType &      dst,
-           const VectorType &src) const
+                       MGCoarseGridIterativeSolver<
+                         VectorType,
+                         SolverType,
+                         MatrixType,
+                         PreconditionerType>::operator()(const unsigned int /*level*/,
+                                  VectorType &      dst,
+                                  const VectorType &src) const
 {
   Assert(solver != nullptr, ExcNotInitialized());
   Assert(matrix != nullptr, ExcNotInitialized());
@@ -455,10 +455,10 @@ MGCoarseGridHouseholder<number, VectorType>::initialize(
 
 template <typename number, class VectorType>
 void
-MGCoarseGridHouseholder<number, VectorType>::
-operator()(const unsigned int /*level*/,
-           VectorType &      dst,
-           const VectorType &src) const
+MGCoarseGridHouseholder<number, VectorType>::operator()(
+  const unsigned int /*level*/,
+  VectorType &      dst,
+  const VectorType &src) const
 {
   householder.least_squares(dst, src);
 }

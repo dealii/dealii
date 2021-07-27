@@ -61,7 +61,8 @@ test()
 
   std::string s = ss.str();
   std::replace_if(s.begin(), s.end(), ::isdigit, ' ');
-  std::replace_if(s.begin(), s.end(), [](char x) { return x == '.'; }, ' ');
+  std::replace_if(
+    s.begin(), s.end(), [](char x) { return x == '.'; }, ' ');
 
   deallog << s << std::endl << std::endl;
 }

@@ -39,7 +39,8 @@
 
 
 
-void check(Triangulation<3> &tria)
+void
+check(Triangulation<3> &tria)
 {
   FE_Q<3>       fe(1);
   DoFHandler<3> dof_handler(tria);

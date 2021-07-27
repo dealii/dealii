@@ -820,8 +820,8 @@ namespace Particles
 
   template <int dim, int spacedim>
   inline bool
-  ParticleAccessor<dim, spacedim>::
-  operator!=(const ParticleAccessor<dim, spacedim> &other) const
+  ParticleAccessor<dim, spacedim>::operator!=(
+    const ParticleAccessor<dim, spacedim> &other) const
   {
     return !(*this == other);
   }
@@ -830,8 +830,8 @@ namespace Particles
 
   template <int dim, int spacedim>
   inline bool
-  ParticleAccessor<dim, spacedim>::
-  operator==(const ParticleAccessor<dim, spacedim> &other) const
+  ParticleAccessor<dim, spacedim>::operator==(
+    const ParticleAccessor<dim, spacedim> &other) const
   {
     return (property_pool == other.property_pool) && (cell == other.cell) &&
            (particle_index_within_cell == other.particle_index_within_cell);

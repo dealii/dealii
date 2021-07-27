@@ -44,7 +44,8 @@ rotate_to_z(const Point<dim> &p)
   return Point<dim>(-p[2], p[1], p[0]);
 }
 
-void set_manifold(Triangulation<3> &triangulation)
+void
+set_manifold(Triangulation<3> &triangulation)
 {
   static const CylindricalManifold<3> boundary(2);
   triangulation.set_manifold(0, boundary);

@@ -41,18 +41,21 @@ namespace
    * do the reordering of their
    * arguments in-place.
    */
-  void reorder_new_to_old_style(std::vector<CellData<1>> &)
+  void
+  reorder_new_to_old_style(std::vector<CellData<1>> &)
   {}
 
 
-  void reorder_new_to_old_style(std::vector<CellData<2>> &cells)
+  void
+  reorder_new_to_old_style(std::vector<CellData<2>> &cells)
   {
     for (auto &cell : cells)
       std::swap(cell.vertices[2], cell.vertices[3]);
   }
 
 
-  void reorder_new_to_old_style(std::vector<CellData<3>> &cells)
+  void
+  reorder_new_to_old_style(std::vector<CellData<3>> &cells)
   {
     unsigned int tmp[GeometryInfo<3>::vertices_per_cell];
     for (auto &cell : cells)
@@ -68,18 +71,21 @@ namespace
   /**
    * And now also in the opposite direction.
    */
-  void reorder_old_to_new_style(std::vector<CellData<1>> &)
+  void
+  reorder_old_to_new_style(std::vector<CellData<1>> &)
   {}
 
 
-  void reorder_old_to_new_style(std::vector<CellData<2>> &cells)
+  void
+  reorder_old_to_new_style(std::vector<CellData<2>> &cells)
   {
     // just invert the permutation:
     reorder_new_to_old_style(cells);
   }
 
 
-  void reorder_old_to_new_style(std::vector<CellData<3>> &cells)
+  void
+  reorder_old_to_new_style(std::vector<CellData<3>> &cells)
   {
     // undo the ordering above
     unsigned int tmp[GeometryInfo<3>::vertices_per_cell];

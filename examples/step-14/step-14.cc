@@ -123,9 +123,9 @@ namespace Step14
 
 
     template <int dim>
-    void PointValueEvaluation<dim>::
-         operator()(const DoFHandler<dim> &dof_handler,
-               const Vector<double> & solution) const
+    void
+    PointValueEvaluation<dim>::operator()(const DoFHandler<dim> &dof_handler,
+                                          const Vector<double> & solution) const
     {
       double point_value = 1e20;
 
@@ -192,9 +192,9 @@ namespace Step14
     // The more interesting things happen inside the function doing the actual
     // evaluation:
     template <int dim>
-    void PointXDerivativeEvaluation<dim>::
-         operator()(const DoFHandler<dim> &dof_handler,
-               const Vector<double> & solution) const
+    void PointXDerivativeEvaluation<dim>::operator()(
+      const DoFHandler<dim> &dof_handler,
+      const Vector<double> & solution) const
     {
       // This time initialize the return value with something useful, since we
       // will have to add up a number of contributions and take the mean value

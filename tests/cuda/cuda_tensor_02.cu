@@ -89,14 +89,16 @@ division_kernel(Tensor<rank, dim, Number> *t,
 }
 
 template <int dim, typename Number>
-__global__ void init_kernel(Tensor<0, dim, Number> *t)
+__global__ void
+init_kernel(Tensor<0, dim, Number> *t)
 {
   if (threadIdx.x == 0)
     *t = 1.;
 }
 
 template <int dim, typename Number>
-__global__ void init_kernel(Tensor<1, dim, Number> *t)
+__global__ void
+init_kernel(Tensor<1, dim, Number> *t)
 {
   const unsigned int i = threadIdx.x;
   if (i < dim)
@@ -104,7 +106,8 @@ __global__ void init_kernel(Tensor<1, dim, Number> *t)
 }
 
 template <int dim, typename Number>
-__global__ void init_kernel(Tensor<2, dim, Number> *t)
+__global__ void
+init_kernel(Tensor<2, dim, Number> *t)
 {
   const unsigned int i = threadIdx.y;
   const unsigned int j = threadIdx.x;

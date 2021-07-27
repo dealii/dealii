@@ -74,7 +74,7 @@ namespace hp
      * from class Quadrature<dim>.
      */
     template <class... QTypes>
-    explicit QCollection(const QTypes &... quadrature_objects);
+    explicit QCollection(const QTypes &...quadrature_objects);
 
     /**
      * Add a new quadrature rule to the QCollection. In most cases, you will
@@ -149,7 +149,7 @@ namespace hp
 
   template <int dim>
   template <class... QTypes>
-  QCollection<dim>::QCollection(const QTypes &... quadrature_objects)
+  QCollection<dim>::QCollection(const QTypes &...quadrature_objects)
   {
     // loop over all of the given arguments and add the quadrature objects to
     // this collection. Inlining the definition of q_pointers causes internal
