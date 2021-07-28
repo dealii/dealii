@@ -1,0 +1,11 @@
+New: VTU files have traditionally been used for visualization
+purposes, but more recently they have also been used for more general
+postprocessing tasks since they can easily be imported into Python,
+for example. By setting the DataOutBase::VtkFlags::physical_units
+variable and attaching such a flags object to a DataOut,
+Particles::DataOut, or MatrixOut object, one can now specify the
+physical units associated with variables that are written into VTU
+files, so that they can be parsed by scripts that do further
+postprocessing.
+<br>
+(Wolfgang Bangerth, 2021/07/09)
