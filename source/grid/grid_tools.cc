@@ -2786,8 +2786,20 @@ namespace GridTools
     if (relevant_cell_bounding_boxes_rtree != nullptr &&
         !relevant_cell_bounding_boxes_rtree->empty())
       {
+        // create a bounding box around point p with 2*tolerance as side length.
+        auto p1 = p;
+        auto p2 = p;
+
+        for (int d = 0; d < spacedim; ++d)
+          {
+            p1[d] = p1[d] - tolerance;
+            p2[d] = p2[d] + tolerance;
+          }
+
+        BoundingBox<spacedim> bb({p1, p2});
+
         if (relevant_cell_bounding_boxes_rtree->qbegin(
-              boost::geometry::index::intersects(p)) ==
+              boost::geometry::index::intersects(bb)) ==
             relevant_cell_bounding_boxes_rtree->qend())
           return cell_and_position;
       }
@@ -5731,7 +5743,8 @@ namespace GridTools
                std::vector<unsigned int>>
     guess_point_owner(
       const std::vector<std::vector<BoundingBox<spacedim>>> &global_bboxes,
-      const std::vector<Point<spacedim>> &                   points)
+      const std::vector<Point<spacedim>> &                   points,
+      const double                                           tolerance)
     {
       std::vector<std::pair<unsigned int, unsigned int>> ranks_and_indices;
       ranks_and_indices.reserve(points.size());
@@ -5741,7 +5754,7 @@ namespace GridTools
           const auto &point = points[i];
           for (unsigned rank = 0; rank < global_bboxes.size(); ++rank)
             for (const auto &box : global_bboxes[rank])
-              if (box.point_inside(point))
+              if (box.point_inside(point, tolerance))
                 {
                   ranks_and_indices.emplace_back(rank, i);
                   break;
@@ -5876,7 +5889,7 @@ namespace GridTools
       auto &recv_ptrs       = result.recv_ptrs;
 
       const auto potential_owners =
-        internal::guess_point_owner(global_bboxes, points);
+        internal::guess_point_owner(global_bboxes, points, tolerance);
 
       const auto &potential_owners_ranks   = std::get<0>(potential_owners);
       const auto &potential_owners_ptrs    = std::get<1>(potential_owners);

@@ -134,6 +134,9 @@ namespace Utilities
           this->point_ptrs[i + 1] += this->point_ptrs[i];
         }
 
+      Assert(enforce_unique_mapping == false || unique_mapping,
+             ExcInternalError());
+
       cell_data        = {};
       send_permutation = {};
 
