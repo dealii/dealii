@@ -123,7 +123,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * Segment<2> segment(Point<2>(0,0), Point<2>(1,1));
  *
- * std::vector<Point<2>> nearest;
+ * std::vector<Point<2>> intersection;
  * tree.query(bgi::nearest(segment,3), std::back_inserter(intersection));
  * // Returns the 3 closest points to the Segment defined above.
  * @endcode
