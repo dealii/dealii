@@ -1589,141 +1589,131 @@ QWitherdenVincentSimplex<dim>::QWitherdenVincentSimplex(
     b_point_permutations.push_back(all_permutations(b_point));
   };
 
-  if (n_points_1D == 1)
+  switch (n_points_1D)
     {
-      b_point_permutations.push_back({centroid});
-      b_weights.push_back(1.0);
-    }
-  else if (n_points_1D == 2)
-    {
-      // This is WV-4 in 2D and WV-3 in 3D
-      if (dim == 2)
-        {
-          process_point_1(9.1576213509770743e-02, 1.0995174365532187e-01);
-          process_point_1(4.4594849091596489e-01, 2.2338158967801147e-01);
-        }
-      else if (dim == 3)
-        {
-          process_point_1(3.281633025163817e-01, 1.362178425370874e-01);
-          process_point_1(1.080472498984286e-01, 1.137821574629126e-01);
-        }
-    }
-  else if (n_points_1D == 3)
-    {
-      // This is the WV-5 rule in both 2D and 3D
-      if (dim == 2)
-        {
-          b_weights.push_back(0.225);
-          b_point_permutations.push_back({centroid});
+      case 1:
+        b_point_permutations.push_back({centroid});
+        b_weights.push_back(1.0);
+        break;
+      case 2:
+        // This is WV-4 in 2D and WV-3 in 3D
+        if (dim == 2)
+          {
+            process_point_1(9.1576213509770743e-02, 1.0995174365532187e-01);
+            process_point_1(4.4594849091596489e-01, 2.2338158967801147e-01);
+          }
+        else if (dim == 3)
+          {
+            process_point_1(3.281633025163817e-01, 1.362178425370874e-01);
+            process_point_1(1.080472498984286e-01, 1.137821574629126e-01);
+          }
+        break;
+      case 3:
+        // This is the WV-5 rule in both 2D and 3D
+        if (dim == 2)
+          {
+            b_weights.push_back(0.225);
+            b_point_permutations.push_back({centroid});
 
-          process_point_1(1.0128650732345634e-01, 1.2593918054482714e-01);
-          process_point_1(4.7014206410511511e-01, 1.3239415278850619e-01);
-        }
-      else if (dim == 3)
-        {
-          process_point_1(3.108859192633006e-01, 1.126879257180159e-01);
-          process_point_1(9.273525031089125e-02, 7.349304311636196e-02);
+            process_point_1(1.0128650732345634e-01, 1.2593918054482714e-01);
+            process_point_1(4.7014206410511511e-01, 1.3239415278850619e-01);
+          }
+        else if (dim == 3)
+          {
+            process_point_1(3.108859192633006e-01, 1.126879257180159e-01);
+            process_point_1(9.273525031089125e-02, 7.349304311636196e-02);
 
-          process_point_2(4.550370412564964e-02, 4.254602077708147e-02);
-        }
-    }
-  else if (n_points_1D == 4)
-    {
-      // This is the WV-7 rule in both 2D and 3D
-      if (dim == 2)
-        {
-          process_point_1(3.3730648554587850e-02, 1.6545050110792131e-02);
-          process_point_1(4.7430969250471822e-01, 7.7086646185986069e-02);
-          process_point_1(2.4157738259540357e-01, 1.2794417123015558e-01);
-          process_point_3(4.7036644652595216e-02,
-                          1.9868331479735168e-01,
-                          5.5878732903199779e-02);
-        }
-      else if (dim == 3)
-        {
-          b_point_permutations.push_back({centroid});
-          b_weights.push_back(9.548528946413085e-02);
+            process_point_2(4.550370412564964e-02, 4.254602077708147e-02);
+          }
+        break;
+      case 4:
+        // This is the WV-7 rule in both 2D and 3D
+        if (dim == 2)
+          {
+            process_point_1(3.3730648554587850e-02, 1.6545050110792131e-02);
+            process_point_1(4.7430969250471822e-01, 7.7086646185986069e-02);
+            process_point_1(2.4157738259540357e-01, 1.2794417123015558e-01);
+            process_point_3(4.7036644652595216e-02,
+                            1.9868331479735168e-01,
+                            5.5878732903199779e-02);
+          }
+        else if (dim == 3)
+          {
+            b_point_permutations.push_back({centroid});
+            b_weights.push_back(9.548528946413085e-02);
 
-          process_point_1(3.157011497782028e-01, 4.232958120996703e-02);
-          process_point_2(5.048982259839635e-02, 3.189692783285758e-02);
+            process_point_1(3.157011497782028e-01, 4.232958120996703e-02);
+            process_point_2(5.048982259839635e-02, 3.189692783285758e-02);
 
-          process_point_3(1.888338310260010e-01,
-                          5.751716375870000e-01,
-                          3.720713072833462e-02);
-          process_point_3(2.126547254148314e-02,
-                          8.108302410985486e-01,
-                          8.110770829903342e-03);
-        }
-    }
-  else if (n_points_1D == 5)
-    {
-      // This is the WV-9 rule in both 2D and 3D
-      if (dim == 2)
-        {
-          b_point_permutations.push_back({centroid});
-          b_weights.push_back(9.7135796282798836e-02);
+            process_point_3(1.888338310260010e-01,
+                            5.751716375870000e-01,
+                            3.720713072833462e-02);
+            process_point_3(2.126547254148314e-02,
+                            8.108302410985486e-01,
+                            8.110770829903342e-03);
+          }
+        break;
+      case 5:
+        // This is the WV-9 rule in both 2D and 3D
+        if (dim == 2)
+          {
+            b_point_permutations.push_back({centroid});
+            b_weights.push_back(9.7135796282798836e-02);
 
-          process_point_1(4.4729513394452691e-02, 2.5577675658698031e-02);
-          process_point_1(4.8968251919873762e-01, 3.1334700227139071e-02);
-          process_point_1(4.3708959149293664e-01, 7.7827541004774278e-02);
-          process_point_1(1.8820353561903275e-01, 7.9647738927210249e-02);
+            process_point_1(4.4729513394452691e-02, 2.5577675658698031e-02);
+            process_point_1(4.8968251919873762e-01, 3.1334700227139071e-02);
+            process_point_1(4.3708959149293664e-01, 7.7827541004774278e-02);
+            process_point_1(1.8820353561903275e-01, 7.9647738927210249e-02);
 
-          process_point_3(3.6838412054736258e-02,
-                          2.2196298916076568e-01,
-                          4.3283539377289376e-02);
-        }
-      else if (dim == 3)
-        {
-          b_point_permutations.push_back({centroid});
-          b_weights.push_back(5.801054891248025e-02);
+            process_point_3(3.6838412054736258e-02,
+                            2.2196298916076568e-01,
+                            4.3283539377289376e-02);
+          }
+        else if (dim == 3)
+          {
+            b_point_permutations.push_back({centroid});
+            b_weights.push_back(5.801054891248025e-02);
 
-          process_point_1(6.198169755222693e-10, 6.431928175925639e-05);
-          process_point_1(1.607745353952616e-01, 2.317333846242546e-02);
-          process_point_1(3.222765218214210e-01, 2.956291233542929e-02);
-          process_point_1(4.510891834541358e-02, 8.063979979616182e-03);
+            process_point_1(6.198169755222693e-10, 6.431928175925639e-05);
+            process_point_1(1.607745353952616e-01, 2.317333846242546e-02);
+            process_point_1(3.222765218214210e-01, 2.956291233542929e-02);
+            process_point_1(4.510891834541358e-02, 8.063979979616182e-03);
 
-          process_point_2(1.122965460043761e-01, 3.813408010370246e-02);
+            process_point_2(1.122965460043761e-01, 3.813408010370246e-02);
 
-          process_point_3(4.588714487524592e-01,
-                          2.554579233041310e-03,
-                          8.384422198298552e-03);
-          process_point_3(3.377587068533860e-02,
-                          7.183503264420745e-01,
-                          1.023455935274533e-02);
-          process_point_3(1.836413698099279e-01,
-                          3.441591057817528e-02,
-                          2.052491596798814e-02);
-        }
-    }
-  else if (n_points_1D == 6)
-    {
-      // There is no WV-11 rule in 3D yet
-      if (dim == 2)
-        {
-          b_point_permutations.push_back({centroid});
-          b_weights.push_back(8.5761179732224219e-02);
+            process_point_3(4.588714487524592e-01,
+                            2.554579233041310e-03,
+                            8.384422198298552e-03);
+            process_point_3(3.377587068533860e-02,
+                            7.183503264420745e-01,
+                            1.023455935274533e-02);
+            process_point_3(1.836413698099279e-01,
+                            3.441591057817528e-02,
+                            2.052491596798814e-02);
+          }
+        break;
+      case 6:
+        // There is no WV-11 rule in 3D yet
+        Assert(dim == 2, ExcNotImplemented());
+        b_point_permutations.push_back({centroid});
+        b_weights.push_back(8.5761179732224219e-02);
 
-          process_point_1(2.8485417614371900e-02, 1.0431870512894697e-02);
-          process_point_1(4.9589190096589092e-01, 1.6606273054585369e-02);
-          process_point_1(1.0263548271224643e-01, 3.8630759237019321e-02);
-          process_point_1(4.3846592676435220e-01, 6.7316154079468296e-02);
-          process_point_1(2.1021995670317828e-01, 7.0515684111716576e-02);
+        process_point_1(2.8485417614371900e-02, 1.0431870512894697e-02);
+        process_point_1(4.9589190096589092e-01, 1.6606273054585369e-02);
+        process_point_1(1.0263548271224643e-01, 3.8630759237019321e-02);
+        process_point_1(4.3846592676435220e-01, 6.7316154079468296e-02);
+        process_point_1(2.1021995670317828e-01, 7.0515684111716576e-02);
 
-          process_point_3(7.3254276860644785e-03,
-                          1.4932478865208237e-01,
-                          1.0290289572953278e-02);
-          process_point_3(4.6010500165429957e-02,
-                          2.8958112563770588e-01,
-                          4.0332476640500554e-02);
-        }
-      else if (dim == 3)
-        {
-          Assert(false, ExcNotImplemented());
-        }
-    }
-  else
-    {
-      Assert(false, ExcNotImplemented());
+        process_point_3(7.3254276860644785e-03,
+                        1.4932478865208237e-01,
+                        1.0290289572953278e-02);
+        process_point_3(4.6010500165429957e-02,
+                        2.8958112563770588e-01,
+                        4.0332476640500554e-02);
+        break;
+      case 7:
+        Assert(dim == 2, ExcNotImplemented());
+        break;
     }
 
   Assert(b_point_permutations.size() == b_weights.size(), ExcInternalError());
