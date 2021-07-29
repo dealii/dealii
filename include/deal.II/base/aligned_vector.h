@@ -524,6 +524,36 @@ private:
    * - In move operations, the only thing that needs to be done is to tell
    *   the deleter about the change of owning AlignedVector object, which we
    *   can achieve via the reset_owning_object() function.
+   *
+   * This scheme can be further optimized in the following way: In the most
+   * common case, memory is allocated via `posix_memalign()` and needs to
+   * destroyed via `std::free()`. Rather than derive an action class for
+   * this common case, dynamically allocate an object for this case, and
+   * call it, we can just special case this situation: If the pointer to the
+   * action object is `nullptr`, then we just execute the default action.
+   * This means that for the most common case, we do not need any dynamic
+   * memory allocation at all, and in that case the deleter object truly
+   * only uses 16 bytes: One pointer to the owning AlignedVector object,
+   * and a pointer to the action object that happens to be a `nullptr`.
+   * Only in the case of the MPI shared memory data management does the
+   * action pointer point somewhere, but this case is expensive anyway and so
+   * the extra dynamic memory allocation does little harm.
+   *
+   * (One could in that case go even further: There is no really only one
+   * possible non-default action left, namely the MPI-based destruction of
+   * the shared-memory window. Instead of having the Deleter::DeleterActionBase
+   * class below, and the derived Deleter::MPISharedMemDeleterAction class, both
+   * with `virtual` functions, we could just get rid of the base class and make
+   * the member functions of the derived class non-`virtual`. We would then
+   * either store a pointer to an MPISharedMemDeleterAction object if the
+   * non-default action is requested, or a `nullptr` for the default action.
+   * Avoiding `virtual` functions would make these objects smaller by a few
+   * bytes, and the call to the `delete_array()` function marginally faster.
+   * That said, given that the Deleter::MPISharedMemDeleterAction object already
+   * stores all sorts of stuff and its execution is not cheap, these additional
+   * optimizations are probably not worth it. Instead, we kept the class
+   * hierarchy so that one could define other non-standard actions in the future
+   * through other derived classes.)
    */
   class Deleter
   {
@@ -587,22 +617,6 @@ private:
        */
       virtual void
       delete_array(const AlignedVector<T> *owning_aligned_vector, T *ptr) = 0;
-    };
-
-    /**
-     * A class that implements the deleter action for "regularly" allocated
-     * memory.
-     */
-    class DefaultDeleterAction : public DeleterActionBase
-    {
-    public:
-      /**
-       * The function that implements the action of de-allocating memory.
-       * It receives as arguments a pointer to the owning AlignedVector object
-       * as well as a pointer to the memory being de-allocated.
-       */
-      virtual void
-      delete_array(const AlignedVector<T> *aligned_vector, T *ptr);
     };
 
     /**
@@ -1030,7 +1044,7 @@ namespace internal
 
 template <typename T>
 inline AlignedVector<T>::Deleter::Deleter(AlignedVector<T> *owning_object)
-  : deleter_action_object(std::make_unique<DefaultDeleterAction>())
+  : deleter_action_object(nullptr) // encode default action by using a nullptr
   , owning_aligned_vector(owning_object)
 {}
 
@@ -1058,8 +1072,26 @@ template <typename T>
 inline void
 AlignedVector<T>::Deleter::operator()(T *ptr)
 {
-  Assert(deleter_action_object != nullptr, ExcInternalError());
-  deleter_action_object->delete_array(owning_aligned_vector, ptr);
+  // If no special action has been registered (i.e., if the action pointer is
+  // nullptr), then just perform the default action right here.
+  if (deleter_action_object == nullptr)
+    {
+      if (ptr != nullptr)
+        {
+          Assert(owning_aligned_vector->used_elements_end != nullptr,
+                 ExcInternalError());
+
+          if (std::is_trivial<T>::value == false)
+            for (T *p = owning_aligned_vector->used_elements_end - 1; p >= ptr;
+                 --p)
+              p->~T();
+
+          std::free(ptr);
+        }
+    }
+  else
+    // Otherwise, let the action object do what is necessary
+    deleter_action_object->delete_array(owning_aligned_vector, ptr);
 }
 
 
@@ -1070,26 +1102,6 @@ AlignedVector<T>::Deleter::reset_owning_object(
   const AlignedVector<T> *new_aligned_vector_ptr)
 {
   owning_aligned_vector = new_aligned_vector_ptr;
-}
-
-
-
-template <typename T>
-inline void
-AlignedVector<T>::Deleter::DefaultDeleterAction::delete_array(
-  const AlignedVector<T> *aligned_vector,
-  T *                     ptr)
-{
-  if (ptr != nullptr)
-    {
-      Assert(aligned_vector->used_elements_end != nullptr, ExcInternalError());
-
-      if (std::is_trivial<T>::value == false)
-        for (T *p = aligned_vector->used_elements_end - 1; p >= ptr; --p)
-          p->~T();
-    }
-
-  std::free(ptr);
 }
 
 
