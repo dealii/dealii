@@ -29,6 +29,7 @@
 
 #include <deal.II/matrix_free/fe_evaluation.h>
 #include <deal.II/matrix_free/matrix_free.h>
+#include <deal.II/matrix_free/tools.h>
 
 #include <deal.II/multigrid/mg_constrained_dofs.h>
 
@@ -40,7 +41,7 @@ namespace MatrixFreeOperators
 {
   namespace BlockHelper
   {
-    // workaroud for unifying non-block vector and block vector implementations
+    // workaround for unifying non-block vector and block vector implementations
     // a non-block vector has one block and the only subblock is the vector
     // itself
     template <typename VectorType>
@@ -357,6 +358,11 @@ namespace MatrixFreeOperators
      * A derived class needs to implement this function and resize and fill
      * the protected member inverse_diagonal_entries and/or diagonal_entries
      * accordingly.
+     *
+     * @note Since the diagonal is frequently used as a smoother or
+     * preconditioner, entries corresponding to constrained DoFs are set to 1
+     * (instead of the correct value of 0) so that the diagonal matrix is
+     * invertible.
      */
     virtual void
     compute_diagonal() = 0;
@@ -1793,6 +1799,9 @@ namespace MatrixFreeOperators
       typename Base<dim, VectorType, VectorizedArrayType>::value_type;
     Assert((Base<dim, VectorType, VectorizedArrayType>::data.get() != nullptr),
            ExcNotInitialized());
+    Assert(this->selected_rows == this->selected_columns,
+           ExcMessage("This function is only implemented for square (not "
+                      "rectangular) operators."));
 
     this->inverse_diagonal_entries =
       std::make_shared<DiagonalMatrix<VectorType>>();
@@ -1802,17 +1811,49 @@ namespace MatrixFreeOperators
     VectorType &diagonal_vector = this->diagonal_entries->get_vector();
     this->initialize_dof_vector(inverse_diagonal_vector);
     this->initialize_dof_vector(diagonal_vector);
-    inverse_diagonal_vector = Number(1.);
-    apply_add(diagonal_vector, inverse_diagonal_vector);
 
+    // Set up the action of the mass matrix in a way that's compatible with
+    // MatrixFreeTools::compute_diagonal:
+    auto diagonal_evaluation = [](auto &integrator) {
+      integrator.evaluate(EvaluationFlags::values);
+      for (unsigned int q = 0; q < integrator.n_q_points; ++q)
+        integrator.submit_value(integrator.get_value(q), q);
+      integrator.integrate(EvaluationFlags::values);
+    };
+
+    std::function<void(
+      FEEvaluation<
+        dim,
+        fe_degree,
+        n_q_points_1d,
+        n_components,
+        typename Base<dim, VectorType, VectorizedArrayType>::value_type,
+        VectorizedArrayType> &)>
+      diagonal_evaluation_f(diagonal_evaluation);
+
+    Assert(this->selected_rows.size() > 0, ExcInternalError());
+    for (unsigned int block_n = 0; block_n < this->selected_rows.size();
+         ++block_n)
+      MatrixFreeTools::compute_diagonal(*this->data,
+                                        BlockHelper::subblock(diagonal_vector,
+                                                              block_n),
+                                        diagonal_evaluation_f,
+                                        this->selected_rows[block_n]);
+
+    // Constrained entries will create zeros on the main diagonal, which we
+    // don't want
     this->set_constrained_entries_to_one(diagonal_vector);
+
     inverse_diagonal_vector = diagonal_vector;
 
-    const unsigned int locally_owned_size =
-      inverse_diagonal_vector.locally_owned_size();
-    for (unsigned int i = 0; i < locally_owned_size; ++i)
-      inverse_diagonal_vector.local_element(i) =
-        Number(1.) / inverse_diagonal_vector.local_element(i);
+    for (unsigned int i = 0; i < inverse_diagonal_vector.locally_owned_size();
+         ++i)
+      {
+        Assert(diagonal_vector.local_element(i) > Number(0),
+               ExcInternalError());
+        inverse_diagonal_vector.local_element(i) =
+          1. / inverse_diagonal_vector.local_element(i);
+      }
 
     inverse_diagonal_vector.update_ghost_values();
     diagonal_vector.update_ghost_values();
