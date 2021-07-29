@@ -2242,10 +2242,10 @@ namespace
   check_all_manifold_ids_identical(
     const TriaIterator<CellAccessor<2, spacedim>> &cell)
   {
-    const auto b_id = cell->manifold_id();
+    const auto m_id = cell->manifold_id();
 
     for (const auto f : cell->face_indices())
-      if (b_id != cell->face(f)->manifold_id())
+      if (m_id != cell->face(f)->manifold_id())
         return false;
 
     return true;
@@ -2258,14 +2258,14 @@ namespace
   check_all_manifold_ids_identical(
     const TriaIterator<CellAccessor<3, spacedim>> &cell)
   {
-    const auto b_id = cell->manifold_id();
+    const auto m_id = cell->manifold_id();
 
     for (const auto f : cell->face_indices())
-      if (b_id != cell->face(f)->manifold_id())
+      if (m_id != cell->face(f)->manifold_id())
         return false;
 
     for (const auto l : cell->line_indices())
-      if (b_id != cell->line(l)->manifold_id())
+      if (m_id != cell->line(l)->manifold_id())
         return false;
 
     return true;
@@ -2282,7 +2282,7 @@ MappingFE<dim, spacedim>::compute_mapping_support_points(
   Assert(
     check_all_manifold_ids_identical(cell),
     ExcMessage(
-      "All entities of a cell need to have the same boundary id as the cell has."));
+      "All entities of a cell need to have the same manifold id as the cell has."));
 
   std::vector<Point<spacedim>> vertices(cell->n_vertices());
 
