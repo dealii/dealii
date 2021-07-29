@@ -1161,7 +1161,7 @@ template <typename ForwardIterator>
 inline void
 AlignedVector<T>::insert_back(ForwardIterator begin, ForwardIterator end)
 {
-  const unsigned int old_size = size();
+  const size_type old_size = size();
   reserve(old_size + (end - begin));
   for (; begin != end; ++begin, ++used_elements_end)
     {
@@ -1461,8 +1461,7 @@ AlignedVector<T>::replicate_across_communicator(const MPI_Comm &   communicator,
   // We don't need to do this on the shmem root process: This process has
   // already gotten its base_ptr correctly set above, and we can determine the
   // array size by just calling size().
-  unsigned int array_size =
-    (is_shmem_root ? size() : numbers::invalid_unsigned_int);
+  size_type array_size = (is_shmem_root ? size() : size_type(0));
   if (is_shmem_root == false)
     {
       int       disp_unit;
@@ -1559,24 +1558,24 @@ AlignedVector<T>::replicate_across_communicator(const MPI_Comm &   communicator,
   // the shmem root!) but also destroy the MPI_Win and the communicator. All of
   // that is encapsulated in the following call where the deleter makes copies
   // of the arguments in the lambda capture.
-  elements =
-    decltype(elements)(aligned_shmem_pointer,
-                       [is_shmem_root,
-                        array_size,
-                        aligned_shmem_pointer,
-                        shmem_group_communicator,
-                        shmem_window](T *) mutable {
-                         if (is_shmem_root)
-                           for (unsigned int i = 0; i < array_size; ++i)
-                             aligned_shmem_pointer[i].~T();
+  elements = decltype(elements)(aligned_shmem_pointer,
+                                [is_shmem_root,
+                                 array_size,
+                                 aligned_shmem_pointer,
+                                 shmem_group_communicator,
+                                 shmem_window](T *) mutable {
+                                  if (is_shmem_root)
+                                    for (size_type i = 0; i < array_size; ++i)
+                                      aligned_shmem_pointer[i].~T();
 
-                         int ierr;
-                         ierr = MPI_Win_free(&shmem_window);
-                         AssertThrowMPI(ierr);
+                                  int ierr;
+                                  ierr = MPI_Win_free(&shmem_window);
+                                  AssertThrowMPI(ierr);
 
-                         ierr = MPI_Comm_free(&shmem_group_communicator);
-                         AssertThrowMPI(ierr);
-                       });
+                                  ierr =
+                                    MPI_Comm_free(&shmem_group_communicator);
+                                  AssertThrowMPI(ierr);
+                                });
 
   // We then also have to set the other two pointers that define the state of
   // the current object. Note that the new buffer size is exactly as large as
