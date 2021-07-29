@@ -575,7 +575,6 @@ private:
      */
     Deleter(AlignedVector<T> *owning_object,
             const bool        is_shmem_root,
-            const size_type   array_size,
             T *               aligned_shmem_pointer,
             MPI_Comm          shmem_group_communicator,
             MPI_Win           shmem_window);
@@ -633,11 +632,10 @@ private:
        * Constructor. Store the various pieces of information necessary to
        * identify the MPI window in which the data resides.
        */
-      MPISharedMemDeleterAction(const bool      is_shmem_root,
-                                const size_type array_size,
-                                T *             aligned_shmem_pointer,
-                                MPI_Comm        shmem_group_communicator,
-                                MPI_Win         shmem_window);
+      MPISharedMemDeleterAction(const bool is_shmem_root,
+                                T *        aligned_shmem_pointer,
+                                MPI_Comm   shmem_group_communicator,
+                                MPI_Win    shmem_window);
 
       /**
        * The function that implements the action of de-allocating memory.
@@ -652,11 +650,10 @@ private:
        * Variables necessary to identify the MPI shared-memory window plus
        * all ancillary information to destroy this window.
        */
-      const bool      is_shmem_root;
-      const size_type array_size;
-      T *             aligned_shmem_pointer;
-      MPI_Comm        shmem_group_communicator;
-      MPI_Win         shmem_window;
+      const bool is_shmem_root;
+      T *        aligned_shmem_pointer;
+      MPI_Comm   shmem_group_communicator;
+      MPI_Win    shmem_window;
     };
 #endif
 
@@ -1058,13 +1055,11 @@ inline AlignedVector<T>::Deleter::Deleter(AlignedVector<T> *owning_object)
 template <typename T>
 inline AlignedVector<T>::Deleter::Deleter(AlignedVector<T> *owning_object,
                                           const bool        is_shmem_root,
-                                          const size_type   array_size,
                                           T *      aligned_shmem_pointer,
                                           MPI_Comm shmem_group_communicator,
                                           MPI_Win  shmem_window)
   : deleter_action_object(
       std::make_unique<MPISharedMemDeleterAction>(is_shmem_root,
-                                                  array_size,
                                                   aligned_shmem_pointer,
                                                   shmem_group_communicator,
                                                   shmem_window))
@@ -1114,13 +1109,11 @@ AlignedVector<T>::Deleter::reset_owning_object(
 
 template <typename T>
 inline AlignedVector<T>::Deleter::MPISharedMemDeleterAction::
-  MPISharedMemDeleterAction(const bool      is_shmem_root,
-                            const size_type array_size,
-                            T *             aligned_shmem_pointer,
-                            MPI_Comm        shmem_group_communicator,
-                            MPI_Win         shmem_window)
+  MPISharedMemDeleterAction(const bool is_shmem_root,
+                            T *        aligned_shmem_pointer,
+                            MPI_Comm   shmem_group_communicator,
+                            MPI_Win    shmem_window)
   : is_shmem_root(is_shmem_root)
-  , array_size(array_size)
   , aligned_shmem_pointer(aligned_shmem_pointer)
   , shmem_group_communicator(shmem_group_communicator)
   , shmem_window(shmem_window)
@@ -1134,9 +1127,15 @@ AlignedVector<T>::Deleter::MPISharedMemDeleterAction::delete_array(
   const AlignedVector<T> *aligned_vector,
   T *                     ptr)
 {
+  (void)ptr;
+  Assert(aligned_vector->elements.get() == ptr, ExcInternalError());
+
   if (is_shmem_root)
-    for (unsigned int i = 0; i < array_size; ++i)
-      aligned_shmem_pointer[i].~T();
+    if (std::is_trivial<T>::value == false)
+      for (T *p = aligned_vector->used_elements_end - 1;
+           p >= aligned_vector->elements.get();
+           --p)
+        p->~T();
 
   int ierr;
   ierr = MPI_Win_free(&shmem_window);
@@ -1854,7 +1853,6 @@ AlignedVector<T>::replicate_across_communicator(const MPI_Comm &   communicator,
   elements = decltype(elements)(aligned_shmem_pointer,
                                 Deleter(this,
                                         is_shmem_root,
-                                        array_size,
                                         aligned_shmem_pointer,
                                         shmem_group_communicator,
                                         shmem_window));
