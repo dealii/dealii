@@ -1537,7 +1537,7 @@ QWitherdenVincentSimplex<dim>::QWitherdenVincentSimplex(
   // reasonable equivalent for generic programming.
   if (dim == 1)
     {
-      Quadrature<dim>::operator=(dealii::QGauss<dim>(n_points_1D));
+      Quadrature<dim>::operator=(QGauss<dim>(n_points_1D));
       return;
     }
 
