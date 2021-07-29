@@ -1888,42 +1888,13 @@ template <class T>
 inline void
 AlignedVector<T>::swap(AlignedVector<T> &vec)
 {
-  // Swap the data in the 'elements' objects. One problem is that this
-  // also moves the deleter object, but the deleter object is a lambda function
-  // that references 'this' (i.e., the 'this' pointer of the *moved-from*
-  // object). So what we actually do is steal the pointer via
-  // std::unique_ptr::release() and then install our own deleter object that
-  // mirrors the one used in reserve() below.
-  //
-  // We have to do the same for the other object
-  T *this_element_pointer = elements.release();
+  // Swap the data in the 'elements' objects. Then also make sure that
+  // their respective deleter objects point to the right place.
+  std::swap(elements, vec.elements);
+  elements.get_deleter().reset_owning_object(this);
+  vec.elements.get_deleter().reset_owning_object(&vec);
 
-  elements = decltype(elements)(vec.elements.release(), [this](T *ptr) {
-    if (ptr != nullptr)
-      {
-        Assert(this->used_elements_end != nullptr, ExcInternalError());
-
-        if (std::is_trivial<T>::value == false)
-          for (T *p = this->used_elements_end - 1; p >= ptr; --p)
-            p->~T();
-      }
-
-    std::free(ptr);
-  });
-
-  vec.elements = decltype(vec.elements)(this_element_pointer, [&vec](T *ptr) {
-    if (ptr != nullptr)
-      {
-        Assert(vec.used_elements_end != nullptr, ExcInternalError());
-
-        if (std::is_trivial<T>::value == false)
-          for (T *p = vec.used_elements_end - 1; p >= ptr; --p)
-            p->~T();
-      }
-
-    std::free(ptr);
-  });
-
+  // Now also swap the remaining members.
   std::swap(used_elements_end, vec.used_elements_end);
   std::swap(allocated_elements_end, vec.allocated_elements_end);
 }
