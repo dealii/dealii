@@ -565,6 +565,7 @@ private:
      */
     Deleter(AlignedVector<T> *owning_object);
 
+#ifdef DEAL_II_WITH_MPI
     /**
      * Constructor. When this constructor is called, it installs an
      * action that corresponds to MPI-based shared memory allocation that
@@ -578,7 +579,7 @@ private:
             T *               aligned_shmem_pointer,
             MPI_Comm          shmem_group_communicator,
             MPI_Win           shmem_window);
-
+#endif
 
     /**
      * The operator called by `std::unique_ptr` to destroy the data it
@@ -619,6 +620,8 @@ private:
       delete_array(const AlignedVector<T> *owning_aligned_vector, T *ptr) = 0;
     };
 
+#ifdef DEAL_II_WITH_MPI
+
     /**
      * A class that implements the deleter action for MPI shared-memory
      * allocated data.
@@ -655,6 +658,7 @@ private:
       MPI_Comm        shmem_group_communicator;
       MPI_Win         shmem_window;
     };
+#endif
 
     /**
      * A pointer to the object that facilitates the actual action of
@@ -1049,6 +1053,7 @@ inline AlignedVector<T>::Deleter::Deleter(AlignedVector<T> *owning_object)
 {}
 
 
+#  ifdef DEAL_II_WITH_MPI
 
 template <typename T>
 inline AlignedVector<T>::Deleter::Deleter(AlignedVector<T> *owning_object,
@@ -1065,7 +1070,7 @@ inline AlignedVector<T>::Deleter::Deleter(AlignedVector<T> *owning_object,
                                                   shmem_window))
   , owning_aligned_vector(owning_object)
 {}
-
+#  endif
 
 
 template <typename T>
@@ -1105,6 +1110,7 @@ AlignedVector<T>::Deleter::reset_owning_object(
 }
 
 
+#  ifdef DEAL_II_WITH_MPI
 
 template <typename T>
 inline AlignedVector<T>::Deleter::MPISharedMemDeleterAction::
@@ -1139,6 +1145,8 @@ AlignedVector<T>::Deleter::MPISharedMemDeleterAction::delete_array(
   ierr = MPI_Comm_free(&shmem_group_communicator);
   AssertThrowMPI(ierr);
 }
+
+#  endif
 
 
 template <class T>
