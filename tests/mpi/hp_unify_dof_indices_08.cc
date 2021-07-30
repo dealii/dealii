@@ -89,7 +89,7 @@ test()
   // that to build a hash value from it that is then used to assign an
   // active_fe_index
   DoFHandler<dim> dof_handler(triangulation);
-  for (auto &cell : dof_handler.active_cell_iterators())
+  for (const auto &cell : dof_handler.active_cell_iterators())
     if (cell->is_locally_owned())
       cell->set_active_fe_index(
         (cell->active_cell_index() +
@@ -97,13 +97,11 @@ test()
         fe.size());
   dof_handler.distribute_dofs(fe);
 
-  deallog << "Processor: " << Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)
-          << std::endl;
-  deallog << "  n_globally_active_cells: "
+  deallog << "n_globally_active_cells: "
           << triangulation.n_global_active_cells() << std::endl;
-  deallog << "  n_locally_owned_dofs: " << dof_handler.n_locally_owned_dofs()
+  deallog << "n_locally_owned_dofs: " << dof_handler.n_locally_owned_dofs()
           << std::endl;
-  deallog << "  n_global_dofs: " << dof_handler.n_dofs() << std::endl;
+  deallog << "n_global_dofs: " << dof_handler.n_dofs() << std::endl;
 }
 
 

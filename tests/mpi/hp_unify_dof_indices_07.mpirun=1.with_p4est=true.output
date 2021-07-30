@@ -1,7 +1,5 @@
 
-DEAL:0:2d::Processor: 0
 DEAL:0:2d::n_dofs: 15
 DEAL:0:2d::n_constraints: 0
-DEAL:0:3d::Processor: 0
 DEAL:0:3d::n_dofs: 45
 DEAL:0:3d::n_constraints: 0

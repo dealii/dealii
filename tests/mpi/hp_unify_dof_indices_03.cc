@@ -43,6 +43,8 @@
 
 #include "../tests.h"
 
+#include "hp_unify_dof_indices.h"
+
 
 template <int dim>
 void
@@ -69,27 +71,21 @@ test()
   fe.push_back(FE_Q<dim>(2));
 
   DoFHandler<dim> dof_handler(triangulation);
-  for (auto &cell : dof_handler.active_cell_iterators())
-    {
-      if (cell->is_locally_owned())
-        {
-          if (cell->id().to_string() == "0_0:")
-            cell->set_active_fe_index(0);
-          if (cell->id().to_string() == "1_0:")
-            cell->set_active_fe_index(1);
-          if (cell->id().to_string() == "2_0:")
-            cell->set_active_fe_index(1);
-          if (cell->id().to_string() == "3_0:")
-            cell->set_active_fe_index(0);
-        }
-    }
+  for (const auto &cell : dof_handler.active_cell_iterators())
+    if (cell->is_locally_owned())
+      {
+        if (cell->id().to_string() == "0_0:")
+          cell->set_active_fe_index(0);
+        if (cell->id().to_string() == "1_0:")
+          cell->set_active_fe_index(1);
+        if (cell->id().to_string() == "2_0:")
+          cell->set_active_fe_index(1);
+        if (cell->id().to_string() == "3_0:")
+          cell->set_active_fe_index(0);
+      }
   dof_handler.distribute_dofs(fe);
 
-  deallog << "Processor: " << Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)
-          << std::endl;
-  deallog << "  n_locally_owned_dofs: " << dof_handler.n_locally_owned_dofs()
-          << std::endl;
-  deallog << "  n_global_dofs: " << dof_handler.n_dofs() << std::endl;
+  log_dof_diagnostics(dof_handler);
 }
 
 

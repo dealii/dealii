@@ -1,15 +1,19 @@
 
-DEAL:0:2d::Processor: 0
-DEAL:0:2d::  Cell: 0.0
-DEAL:0:2d::    0 1 2 3 4 5 6 7 8 
-DEAL:0:2d::  Cell: 0.1
-DEAL:0:2d::    1 9 3 10 5 11 12 13 14 
-DEAL:0:2d::  n_locally_owned_dofs: 15
-DEAL:0:2d::  n_global_dofs: 15
-DEAL:0:3d::Processor: 0
-DEAL:0:3d::  Cell: 0.0
-DEAL:0:3d::    0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 
-DEAL:0:3d::  Cell: 0.1
-DEAL:0:3d::    1 27 3 28 5 29 7 30 9 31 32 33 13 34 35 36 17 37 19 38 21 39 40 41 42 43 44 
-DEAL:0:3d::  n_locally_owned_dofs: 45
-DEAL:0:3d::  n_global_dofs: 45
+DEAL:0:2d::Cell: 0.0
+DEAL:0:2d::  locally owned
+DEAL:0:2d::  0 1 2 3 4 5 6 7 8
+DEAL:0:2d::Cell: 0.1
+DEAL:0:2d::  locally owned
+DEAL:0:2d::  1 9 3 10 5 11 12 13 14
+DEAL:0:2d::locally_owned_dofs: {[0,14]}
+DEAL:0:2d::n_locally_owned_dofs: 15
+DEAL:0:2d::n_global_dofs: 15
+DEAL:0:3d::Cell: 0.0
+DEAL:0:3d::  locally owned
+DEAL:0:3d::  0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26
+DEAL:0:3d::Cell: 0.1
+DEAL:0:3d::  locally owned
+DEAL:0:3d::  1 27 3 28 5 29 7 30 9 31 32 33 13 34 35 36 17 37 19 38 21 39 40 41 42 43 44
+DEAL:0:3d::locally_owned_dofs: {[0,44]}
+DEAL:0:3d::n_locally_owned_dofs: 45
+DEAL:0:3d::n_global_dofs: 45
