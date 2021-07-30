@@ -1687,7 +1687,7 @@ public:
   /**
    * Number of faces.
    *
-   * @note Only implemented for cells (dim==spacedim).
+   * @note Only implemented for cells (structdim==dim).
    */
   unsigned int
   n_faces() const;
@@ -1710,7 +1710,7 @@ public:
    * Return an object that can be thought of as an array containing all indices
    * from zero to n_faces().
    *
-   * @note Only implemented for cells (dim==spacedim).
+   * @note Only implemented for cells (structdim==dim).
    */
   std_cxx20::ranges::iota_view<unsigned int, unsigned int>
   face_indices() const;
