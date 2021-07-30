@@ -402,6 +402,55 @@ namespace internal
       fe_degree, n_q_points_1d, n_components, fe_eval, in_array, out_array);
   }
 
+
+
+  template <int dim, typename Number, typename VectorizedArrayType>
+  void
+  FEEvaluationHangingNodesFactory<dim, Number, VectorizedArrayType>::apply(
+    const unsigned int n_components,
+    const unsigned int fe_degree,
+    const FEEvaluationBaseData<dim, Number, false, VectorizedArrayType>
+      &                                                          fe_eval,
+    const bool                                                   transpose,
+    const std::array<unsigned int, VectorizedArrayType::size()> &c_mask,
+    VectorizedArrayType *                                        values)
+  {
+    instantiation_helper_run<
+      1,
+      FEEvaluationImplHangingNodes<dim, VectorizedArrayType, false>>(
+      fe_degree,
+      fe_degree + 1,
+      n_components,
+      fe_eval,
+      transpose,
+      c_mask,
+      values);
+  }
+
+
+
+  template <int dim, typename Number, typename VectorizedArrayType>
+  void
+  FEEvaluationHangingNodesFactory<dim, Number, VectorizedArrayType>::apply(
+    const unsigned int n_components,
+    const unsigned int fe_degree,
+    const FEEvaluationBaseData<dim, Number, true, VectorizedArrayType> &fe_eval,
+    const bool                                                   transpose,
+    const std::array<unsigned int, VectorizedArrayType::size()> &c_mask,
+    VectorizedArrayType *                                        values)
+  {
+    instantiation_helper_run<
+      1,
+      FEEvaluationImplHangingNodes<dim, VectorizedArrayType, true>>(
+      fe_degree,
+      fe_degree + 1,
+      n_components,
+      fe_eval,
+      transpose,
+      c_mask,
+      values);
+  }
+
 } // end of namespace internal
 
 DEAL_II_NAMESPACE_CLOSE

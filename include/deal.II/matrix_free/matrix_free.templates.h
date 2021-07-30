@@ -40,6 +40,7 @@
 
 #include <deal.II/matrix_free/face_info.h>
 #include <deal.II/matrix_free/face_setup_internal.h>
+#include <deal.II/matrix_free/hanging_nodes_internal.h>
 #include <deal.II/matrix_free/matrix_free.h>
 
 #ifdef DEAL_II_WITH_TBB
@@ -1173,6 +1174,19 @@ namespace internal
     // extract all the global indices associated with the computation, and form
     // the ghost indices
     std::vector<unsigned int> subdomain_boundary_cells;
+    std::unique_ptr<dealii::internal::MatrixFreeFunctions::HangingNodes<dim>>
+      hanging_nodes;
+
+    if (dim > 1 && mg_level == numbers::invalid_unsigned_int)
+      {
+        hanging_nodes = std::make_unique<
+          dealii::internal::MatrixFreeFunctions::HangingNodes<dim>>(tria);
+        for (unsigned int no = 0; no < n_dof_handlers; ++no)
+          if (dof_handler[no]->get_fe_collection().size() == 1)
+            dof_info[no].hanging_node_constraint_masks.resize(
+              n_active_cells * dof_handler[no]->get_fe().n_components());
+      }
+
     for (unsigned int counter = 0; counter < n_active_cells; ++counter)
       {
         bool cell_at_subdomain_boundary =
@@ -1207,12 +1221,31 @@ namespace internal
                   local_dof_indices[i] =
                     local_dof_indices_resolved[lexicographic[no][fe_index][i]];
 
-                dof_info[no].read_dof_indices(local_dof_indices,
-                                              local_dof_indices,
-                                              *constraint[no],
-                                              counter,
-                                              constraint_values,
-                                              cell_at_subdomain_boundary);
+                bool cell_has_hanging_node_constraints = false;
+
+                if (dim > 1 && dofh->get_fe_collection().size() == 1)
+                  {
+                    local_dof_indices_resolved = local_dof_indices;
+
+                    cell_has_hanging_node_constraints =
+                      dof_info[no].process_hanging_node_constraints(
+                        *hanging_nodes,
+                        lexicographic[no][0],
+                        counter,
+                        cell_it,
+                        local_dof_indices_resolved);
+                  }
+
+                dof_info[no].read_dof_indices(
+                  cell_has_hanging_node_constraints ?
+                    local_dof_indices_resolved :
+                    local_dof_indices,
+                  local_dof_indices,
+                  cell_has_hanging_node_constraints,
+                  *constraint[no],
+                  counter,
+                  constraint_values,
+                  cell_at_subdomain_boundary);
                 if (dofh->get_fe_collection().size() == 1 &&
                     cell_categorization_enabled)
                   {
@@ -1244,6 +1277,7 @@ namespace internal
 
                 dof_info[no].read_dof_indices(local_dof_indices,
                                               local_dof_indices,
+                                              false,
                                               *constraint[no],
                                               counter,
                                               constraint_values,
@@ -1265,6 +1299,17 @@ namespace internal
             counter < cell_level_index_end_local)
           subdomain_boundary_cells.push_back(counter);
       }
+
+    // clear hanging_node_constraint_masks if there are no hanging nodes
+    if (dim > 1 && mg_level == numbers::invalid_unsigned_int)
+      for (unsigned int no = 0; no < n_dof_handlers; ++no)
+        {
+          auto &vec = dof_info[no].hanging_node_constraint_masks;
+          if (std::all_of(vec.begin(), vec.end(), [](const auto i) {
+                return i == 0;
+              }))
+            vec.clear();
+        }
 
     task_info.n_active_cells = cell_level_index_end_local;
     task_info.n_ghost_cells  = n_active_cells - cell_level_index_end_local;

@@ -947,7 +947,7 @@ namespace CUDAWrappers
         Assert(
           my_id < static_cast<int>(mf_n_concurrent_objects),
           ExcMessage(
-            "Maximum number of concurrents MatrixFree objects reached. Increase mf_n_concurrent_objects"));
+            "Maximum number of concurrent MatrixFree objects reached. Increase mf_n_concurrent_objects"));
         bool f = false;
         found_id =
           internal::used_objects[my_id].compare_exchange_strong(f, true);
