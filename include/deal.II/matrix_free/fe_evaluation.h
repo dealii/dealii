@@ -5312,8 +5312,9 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
     this->dof_info
       ->n_vectorization_lanes_filled[this->dof_access_index][this->cell];
 
-  constexpr unsigned int            n_lanes = VectorizedArrayType::size();
-  std::array<unsigned int, n_lanes> constraint_mask;
+  constexpr unsigned int n_lanes = VectorizedArrayType::size();
+  std::array<internal::MatrixFreeFunctions::ConstraintTypes, n_lanes>
+    constraint_mask;
 
   bool hn_available = false;
 
@@ -5346,14 +5347,16 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
         this->dof_info->hanging_node_constraint_masks[cell_dof_index];
       constraint_mask[v] = mask;
 
-      hn_available |= (mask != 0);
+      hn_available |=
+        (mask != internal::MatrixFreeFunctions::ConstraintTypes::unconstrained);
     }
 
   if (hn_available == false)
     return; // no hanging node on cell batch -> nothing to do
 
   for (unsigned int v = n_vectorization_actual; v < n_lanes; ++v)
-    constraint_mask[v] = 0;
+    constraint_mask[v] =
+      internal::MatrixFreeFunctions::ConstraintTypes::unconstrained;
 
   internal::FEEvaluationHangingNodesFactory<dim, Number, VectorizedArrayType>::
     apply(n_components,

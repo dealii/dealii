@@ -4428,14 +4428,15 @@ namespace internal
   {
     template <int fe_degree, int n_q_points_1d>
     static bool
-    run(const unsigned int                              n_desired_components,
+    run(const unsigned int                  n_desired_components,
         const FEEvaluationBaseData<dim,
                                    typename Number::value_type,
                                    is_face,
-                                   Number> &            fe_eval,
-        const bool                                      transpose,
-        const std::array<unsigned int, Number::size()> &c_mask,
-        Number *                                        values)
+                                   Number> &fe_eval,
+        const bool                          transpose,
+        const std::array<MatrixFreeFunctions::ConstraintTypes, Number::size()>
+          &     c_mask,
+        Number *values)
     {
       if (transpose)
         run_internal<fe_degree, true>(n_desired_components,
@@ -4649,14 +4650,14 @@ namespace internal
 
     template <int fe_degree, bool transpose>
     static void
-    run_internal(
-      const unsigned int                              n_desired_components,
-      const FEEvaluationBaseData<dim,
-                                 typename Number::value_type,
-                                 is_face,
-                                 Number> &            fe_eval,
-      const std::array<unsigned int, Number::size()> &constraint_mask,
-      Number *                                        values)
+    run_internal(const unsigned int                  n_desired_components,
+                 const FEEvaluationBaseData<dim,
+                                            typename Number::value_type,
+                                            is_face,
+                                            Number> &fe_eval,
+                 const std::array<MatrixFreeFunctions::ConstraintTypes,
+                                  Number::size()> &  constraint_mask,
+                 Number *                            values)
     {
       const Number *weights = fe_eval.get_shape_info()
                                 .data.front()
@@ -4680,10 +4681,10 @@ namespace internal
         {
           for (unsigned int v = 0; v < Number::size(); ++v)
             {
-              if (constraint_mask[v] == 0)
-                continue;
-
               const auto mask = constraint_mask[v];
+
+              if (mask == MatrixFreeFunctions::ConstraintTypes::unconstrained)
+                continue;
 
               if (dim == 2) // 2D: only faces
                 {

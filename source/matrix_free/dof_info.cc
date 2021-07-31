@@ -336,7 +336,7 @@ namespace internal
       new_dof_indices.reserve(dof_indices.size());
       new_constraint_indicator.reserve(constraint_indicator.size());
 
-      std::vector<unsigned int> new_hanging_node_constraint_masks;
+      std::vector<ConstraintTypes> new_hanging_node_constraint_masks;
       new_hanging_node_constraint_masks.reserve(
         new_hanging_node_constraint_masks.size());
 
@@ -425,7 +425,8 @@ namespace internal
                   .second = new_constraint_indicator.size();
 
                 if (hanging_node_constraint_masks.size() > 0)
-                  new_hanging_node_constraint_masks.push_back(0);
+                  new_hanging_node_constraint_masks.push_back(
+                    ConstraintTypes::unconstrained);
               }
           position_cell += n_vect;
         }

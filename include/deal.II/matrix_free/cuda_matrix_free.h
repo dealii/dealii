@@ -38,6 +38,8 @@
 #  include <deal.II/lac/cuda_vector.h>
 #  include <deal.II/lac/la_parallel_vector.h>
 
+#  include <deal.II/matrix_free/hanging_nodes_internal.h>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -210,7 +212,7 @@ namespace CUDAWrappers
       /**
        * Mask deciding where constraints are set on a given cell.
        */
-      unsigned int *constraint_mask;
+      dealii::internal::MatrixFreeFunctions::ConstraintTypes *constraint_mask;
 
       /**
        * If true, use graph coloring has been used and we can simply add into
@@ -589,7 +591,8 @@ namespace CUDAWrappers
     /**
      * Mask deciding where constraints are set on a given cell.
      */
-    std::vector<unsigned int *> constraint_mask;
+    std::vector<dealii::internal::MatrixFreeFunctions::ConstraintTypes *>
+      constraint_mask;
 
     /**
      * Grid dimensions associated to the different colors. The grid dimensions
@@ -815,7 +818,8 @@ namespace CUDAWrappers
     /**
      * Mask deciding where constraints are set on a given cell.
      */
-    std::vector<unsigned int> constraint_mask;
+    std::vector<dealii::internal::MatrixFreeFunctions::ConstraintTypes>
+      constraint_mask;
 
     /**
      * If true, use graph coloring has been used and we can simply add into

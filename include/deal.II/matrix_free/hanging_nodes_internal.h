@@ -34,6 +34,93 @@ namespace internal
   namespace MatrixFreeFunctions
   {
     /**
+     * Here is the system for how we store constraint types in a binary mask.
+     * This is not a complete contradiction-free system, i.e., there are
+     * invalid states that we just assume that we never get.
+     *
+     * If the mask is zero, there are no constraints. Then, there are three
+     * different fields with one bit per dimension. The first field determines
+     * the type, or the position of an element along each direction. The
+     * second field determines if there is a constrained face with that
+     * direction as normal. The last field determines if there is a
+     * constrained edge of a given pair of coordinate planes, but where
+     * neither of the corresponding faces are constrained (only valid in 3D).
+     *
+     * The element is placed in the 'first position' along *-axis. These also
+     * determine which face is constrained. For example, in 2D, if
+     * face_x and type are set, then x = 0 is constrained.
+     */
+    enum ConstraintTypes : unsigned short
+    {
+      unconstrained = 0,
+
+      type_x = 1 << 0,
+      type_y = 1 << 1,
+      type_z = 1 << 2,
+
+      // Element has as a constraint at * = 0 or * = fe_degree face
+      face_x = 1 << 3,
+      face_y = 1 << 4,
+      face_z = 1 << 5,
+
+      // Element has as a constraint at * = 0 or * = fe_degree edge
+      edge_xy = 1 << 6,
+      edge_yz = 1 << 7,
+      edge_zx = 1 << 8
+    };
+
+
+
+    /**
+     * Global operator which returns an object in which all bits are set which
+     * are either set in the first or the second argument. This operator exists
+     * since if it did not then the result of the bit-or <tt>operator |</tt>
+     * would be an integer which would in turn trigger a compiler warning when
+     * we tried to assign it to an object of type UpdateFlags.
+     */
+    inline ConstraintTypes
+    operator|(const ConstraintTypes f1, const ConstraintTypes f2)
+    {
+      return static_cast<ConstraintTypes>(static_cast<unsigned short>(f1) |
+                                          static_cast<unsigned short>(f2));
+    }
+
+
+
+    /**
+     * Global operator which sets the bits from the second argument also in the
+     * first one.
+     */
+    inline ConstraintTypes &
+    operator|=(ConstraintTypes &f1, const ConstraintTypes f2)
+    {
+      f1 = f1 | f2;
+      return f1;
+    }
+
+
+
+#ifdef DEAL_II_COMPILER_CUDA_AWARE
+    __device__ inline ConstraintTypes
+    operator|(const ConstraintTypes f1, const ConstraintTypes f2)
+    {
+      return static_cast<ConstraintTypes>(static_cast<unsigned short>(f1) |
+                                          static_cast<unsigned short>(f2));
+    }
+
+
+
+    __device__ inline ConstraintTypes &
+    operator|=(ConstraintTypes &f1, const ConstraintTypes f2)
+    {
+      f1 = f1 | f2;
+      return f1;
+    }
+#endif
+
+
+
+    /**
      * This class creates the mask used in the treatment of hanging nodes in
      * CUDAWrappers::MatrixFree.
      * The implementation of this class is explained in <em>Section 3 of
@@ -60,7 +147,7 @@ namespace internal
         const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner,
         const std::vector<unsigned int> &     lexicographic_mapping,
         std::vector<types::global_dof_index> &dof_indices,
-        const ArrayView<unsigned int> &       mask) const;
+        const ArrayView<ConstraintTypes> &    mask) const;
 
     private:
       /**
@@ -94,41 +181,6 @@ namespace internal
         line_to_cells;
     };
 
-    /**
-     * Here is the system for how we store constraint types in a binary mask.
-     * This is not a complete contradiction-free system, i.e., there are
-     * invalid states that we just assume that we never get.
-     *
-     * If the mask is zero, there are no constraints. Then, there are three
-     * different fields with one bit per dimension. The first field determines
-     * the type, or the position of an element along each direction. The
-     * second field determines if there is a constrained face with that
-     * direction as normal. The last field determines if there is a
-     * constrained edge of a given pair of coordinate planes, but where
-     * neither of the corresponding faces are constrained (only valid in 3D).
-     *
-     * The element is placed in the 'first position' along *-axis. These also
-     * determine which face is constrained. For example, in 2D, if
-     * face_x and type are set, then x = 0 is constrained.
-     */
-    enum ConstraintTypes : unsigned int
-    {
-      unconstrained = 0,
-
-      type_x = 1 << 0,
-      type_y = 1 << 1,
-      type_z = 1 << 2,
-
-      // Element has as a constraint at * = 0 or * = fe_degree face
-      face_x = 1 << 3,
-      face_y = 1 << 4,
-      face_z = 1 << 5,
-
-      // Element has as a constraint at * = 0 or * = fe_degree edge
-      edge_xy = 1 << 6,
-      edge_yz = 1 << 7,
-      edge_zx = 1 << 8
-    };
 
 
     template <int dim>
@@ -238,7 +290,7 @@ namespace internal
       const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner,
       const std::vector<unsigned int> &     lexicographic_mapping,
       std::vector<types::global_dof_index> &dof_indices,
-      const ArrayView<unsigned int> &       masks) const
+      const ArrayView<ConstraintTypes> &    masks) const
     {
       bool cell_has_hanging_node_constraints = false;
 
@@ -277,7 +329,7 @@ namespace internal
              ++c, ++comp)
           {
             auto &mask = masks[comp];
-            mask       = 0;
+            mask       = ConstraintTypes::unconstrained;
 
             const auto &fe = cell->get_fe().base_element(base_element_index);
 
@@ -478,7 +530,7 @@ namespace internal
                 // For each line on cell, which faces does it belong to, what is
                 // the edge mask, what is the types of the faces it belong to,
                 // and what is the type along the edge.
-                const unsigned int line_to_edge[12][4] = {
+                const ConstraintTypes line_to_edge[12][4] = {
                   {ConstraintTypes::face_x | ConstraintTypes::face_z,
                    ConstraintTypes::edge_zx,
                    ConstraintTypes::type_x | ConstraintTypes::type_z,
@@ -501,7 +553,7 @@ namespace internal
                    ConstraintTypes::type_y},
                   {ConstraintTypes::face_x | ConstraintTypes::face_z,
                    ConstraintTypes::edge_zx,
-                   0,
+                   ConstraintTypes::unconstrained,
                    ConstraintTypes::type_y},
                   {ConstraintTypes::face_y | ConstraintTypes::face_z,
                    ConstraintTypes::edge_yz,
@@ -509,7 +561,7 @@ namespace internal
                    ConstraintTypes::type_x},
                   {ConstraintTypes::face_y | ConstraintTypes::face_z,
                    ConstraintTypes::edge_yz,
-                   0,
+                   ConstraintTypes::unconstrained,
                    ConstraintTypes::type_x},
                   {ConstraintTypes::face_x | ConstraintTypes::face_y,
                    ConstraintTypes::edge_xy,
@@ -525,7 +577,7 @@ namespace internal
                    ConstraintTypes::type_z},
                   {ConstraintTypes::face_x | ConstraintTypes::face_y,
                    ConstraintTypes::edge_xy,
-                   0,
+                   ConstraintTypes::unconstrained,
                    ConstraintTypes::type_z}};
 
                 for (unsigned int local_line = 0;
@@ -817,7 +869,10 @@ namespace CUDAWrappers
               bool         transpose,
               typename Number>
     __device__ inline void
-    interpolate_boundary_2d(const unsigned int constraint_mask, Number *values)
+    interpolate_boundary_2d(
+      const dealii::internal::MatrixFreeFunctions::ConstraintTypes
+              constraint_mask,
+      Number *values)
     {
       const unsigned int x_idx = threadIdx.x % (fe_degree + 1);
       const unsigned int y_idx = threadIdx.y;
@@ -836,10 +891,12 @@ namespace CUDAWrappers
         (constraint_mask &
          (((direction == 0) ?
              dealii::internal::MatrixFreeFunctions::ConstraintTypes::face_y :
-             0) |
+             dealii::internal::MatrixFreeFunctions::ConstraintTypes::
+               unconstrained) |
           ((direction == 1) ?
              dealii::internal::MatrixFreeFunctions::ConstraintTypes::face_x :
-             0)));
+             dealii::internal::MatrixFreeFunctions::ConstraintTypes::
+               unconstrained)));
 
       // Flag is true if for the given direction, the dof is constrained with
       // the right type and is on the correct side (left (= 0) or right (=
@@ -911,7 +968,10 @@ namespace CUDAWrappers
               bool         transpose,
               typename Number>
     __device__ inline void
-    interpolate_boundary_3d(const unsigned int constraint_mask, Number *values)
+    interpolate_boundary_3d(
+      const dealii::internal::MatrixFreeFunctions::ConstraintTypes
+              constraint_mask,
+      Number *values)
     {
       const unsigned int x_idx = threadIdx.x % (fe_degree + 1);
       const unsigned int y_idx = threadIdx.y;
@@ -1043,7 +1103,10 @@ namespace CUDAWrappers
      */
     template <int dim, int fe_degree, bool transpose, typename Number>
     __device__ void
-    resolve_hanging_nodes(const unsigned int constraint_mask, Number *values)
+    resolve_hanging_nodes(
+      const dealii::internal::MatrixFreeFunctions::ConstraintTypes
+              constraint_mask,
+      Number *values)
     {
       if (dim == 2)
         {

@@ -465,7 +465,9 @@ namespace MatrixFreeTools
                         AlignedVector<VectorizedArrayType> values_dofs(
                           dofs_per_component);
 
-                        std::array<unsigned int, VectorizedArrayType::size()>
+                        std::array<dealii::internal::MatrixFreeFunctions::
+                                     ConstraintTypes,
+                                   VectorizedArrayType::size()>
                           constraint_mask;
                         constraint_mask[0] = mask;
 

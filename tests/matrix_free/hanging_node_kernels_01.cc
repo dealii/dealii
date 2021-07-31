@@ -45,13 +45,15 @@ namespace dealii
     {
       template <int fe_degree, int n_q_points_1d>
       static bool
-      run(const FEEvaluationBaseData<dim,
-                                     typename Number::value_type,
-                                     is_face,
-                                     Number> &            fe_eval,
-          const bool                                      transpose,
-          const std::array<unsigned int, Number::size()> &c_mask,
-          Number *                                        values)
+      run(
+        const FEEvaluationBaseData<dim,
+                                   typename Number::value_type,
+                                   is_face,
+                                   Number> &fe_eval,
+        const bool                          transpose,
+        const std::array<dealii::internal::MatrixFreeFunctions::ConstraintTypes,
+                         Number::size()> &  c_mask,
+        Number *                            values)
       {
         Assert(is_face == false, ExcInternalError());
 
@@ -102,12 +104,14 @@ namespace dealii
 
       template <int fe_degree_, unsigned int direction, bool transpose>
       static void
-      run_2D(const FEEvaluationBaseData<dim,
-                                        typename Number::value_type,
-                                        is_face,
-                                        Number> &            fe_eval,
-             const std::array<unsigned int, Number::size()> &constraint_mask,
-             Number *                                        values)
+      run_2D(
+        const FEEvaluationBaseData<dim,
+                                   typename Number::value_type,
+                                   is_face,
+                                   Number> &fe_eval,
+        const std::array<dealii::internal::MatrixFreeFunctions::ConstraintTypes,
+                         Number::size()> &  constraint_mask,
+        Number *                            values)
       {
         const auto &constraint_weights =
           fe_eval.get_shape_info().data.front().subface_interpolation_matrix;
@@ -232,12 +236,14 @@ namespace dealii
 
       template <int fe_degree_, unsigned int direction, bool transpose>
       static void
-      run_3D(const FEEvaluationBaseData<dim,
-                                        typename Number::value_type,
-                                        is_face,
-                                        Number> &            fe_eval,
-             const std::array<unsigned int, Number::size()> &constraint_mask,
-             Number *                                        values)
+      run_3D(
+        const FEEvaluationBaseData<dim,
+                                   typename Number::value_type,
+                                   is_face,
+                                   Number> &fe_eval,
+        const std::array<dealii::internal::MatrixFreeFunctions::ConstraintTypes,
+                         Number::size()> &  constraint_mask,
+        Number *                            values)
       {
         const auto &constraint_weights =
           fe_eval.get_shape_info().data.front().subface_interpolation_matrix;
@@ -391,7 +397,8 @@ namespace dealii
 
 template <int dim>
 void
-test(const unsigned int degree, const unsigned int mask_value)
+test(const unsigned int                                           degree,
+     const dealii::internal::MatrixFreeFunctions::ConstraintTypes mask_value)
 {
   Triangulation<dim> tria;
   GridGenerator::subdivided_hyper_cube(tria, 2);
@@ -420,8 +427,13 @@ test(const unsigned int degree, const unsigned int mask_value)
   FEEvaluation<dim, -1, 0, 1, double> eval(matrix_free);
   eval.reinit(0);
 
-  std::array<unsigned int, VectorizedArray<double>::size()> cmask;
-  std::fill(cmask.begin(), cmask.end(), 0);
+  std::array<dealii::internal::MatrixFreeFunctions::ConstraintTypes,
+             VectorizedArray<double>::size()>
+    cmask;
+  std::fill(
+    cmask.begin(),
+    cmask.end(),
+    dealii::internal::MatrixFreeFunctions::ConstraintTypes::unconstrained);
   cmask[0] = mask_value;
 
   for (unsigned int b = 0; b < 2; ++b)
@@ -473,49 +485,47 @@ main(int argc, char **argv)
 
   for (unsigned int degree = 1; degree <= 3; ++degree)
     {
-      test<2>(degree, 0);
+      test<2>(
+        degree,
+        dealii::internal::MatrixFreeFunctions::ConstraintTypes::unconstrained);
       deallog << std::endl;
 
       test<2>(degree,
-              0 |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::face_x |
+              dealii::internal::MatrixFreeFunctions::ConstraintTypes::face_x |
                 dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_x |
                 dealii::internal::MatrixFreeFunctions::ConstraintTypes::
                   type_y); // face 0/0
       test<2>(degree,
-              0 |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::face_x |
+              dealii::internal::MatrixFreeFunctions::ConstraintTypes::face_x |
                 dealii::internal::MatrixFreeFunctions::ConstraintTypes::
                   type_x); // face 0/1
       test<2>(degree,
-              0 |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::face_x |
+              dealii::internal::MatrixFreeFunctions::ConstraintTypes::face_x |
                 dealii::internal::MatrixFreeFunctions::ConstraintTypes::
                   type_y); // face 1/0
-      test<2>(degree,
-              0 | dealii::internal::MatrixFreeFunctions::ConstraintTypes::
-                    face_x); // face 1/1
+      test<2>(
+        degree,
+        dealii::internal::MatrixFreeFunctions::ConstraintTypes::face_x); // face
+                                                                         // 1/1
       deallog << std::endl;
 
       test<2>(degree,
-              0 |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::face_y |
+              dealii::internal::MatrixFreeFunctions::ConstraintTypes::face_y |
                 dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_y |
                 dealii::internal::MatrixFreeFunctions::ConstraintTypes::
                   type_x); // face 2/0
       test<2>(degree,
-              0 |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::face_y |
+              dealii::internal::MatrixFreeFunctions::ConstraintTypes::face_y |
                 dealii::internal::MatrixFreeFunctions::ConstraintTypes::
                   type_y); // face 2/1
       test<2>(degree,
-              0 |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::face_y |
+              dealii::internal::MatrixFreeFunctions::ConstraintTypes::face_y |
                 dealii::internal::MatrixFreeFunctions::ConstraintTypes::
                   type_x); // face 3/0
-      test<2>(degree,
-              0 | dealii::internal::MatrixFreeFunctions::ConstraintTypes::
-                    face_y); // face 3/1
+      test<2>(
+        degree,
+        dealii::internal::MatrixFreeFunctions::ConstraintTypes::face_y); // face
+                                                                         // 3/1
       deallog << std::endl;
     }
 
