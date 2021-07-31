@@ -439,18 +439,19 @@ DGHeat<dim>::assemble_system()
             for (unsigned int j = 0; j < n_dofs; ++j)
               {
                 copy_data_face.cell_matrix(i, j) +=
-                  -normals[qpoint] * fe_iv.average_gradient(i, qpoint) *
-                  fe_iv.jump(j, qpoint) * JxW[qpoint];
+                  -normals[qpoint] *
+                  fe_iv.average_of_shape_gradients(i, qpoint) *
+                  fe_iv.jump_in_shape_values(j, qpoint) * JxW[qpoint];
 
                 copy_data_face.cell_matrix(i, j) +=
-                  -fe_iv.jump(i, qpoint) // \phi_i
-                  * fe_iv.average_gradient(j, qpoint) *
+                  -fe_iv.jump_in_shape_values(i, qpoint) // \phi_i
+                  * fe_iv.average_of_shape_gradients(j, qpoint) *
                   normals[qpoint] // n*\nabla \phi_j
                   * JxW[qpoint];  // dx
 
                 copy_data_face.cell_matrix(i, j) +=
-                  beta * 1. / h * fe_iv.jump(i, qpoint) *
-                  fe_iv.jump(j, qpoint) * JxW[qpoint];
+                  beta * 1. / h * fe_iv.jump_in_shape_values(i, qpoint) *
+                  fe_iv.jump_in_shape_values(j, qpoint) * JxW[qpoint];
               }
           }
       }

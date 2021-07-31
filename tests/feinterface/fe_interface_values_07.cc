@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-// evaluate jump(), average(), shape_value() of FEInterfaceValues
-// like fe_interface_values_02, but for a continuous element
+// evaluate jump_in_shape_values(), average_of_shape_values(), shape_value() of
+// FEInterfaceValues like fe_interface_values_02, but for a continuous element
 
 #include <deal.II/base/quadrature_lib.h>
 
@@ -116,16 +116,16 @@ test(unsigned int fe_degree)
         cell_vector = 0.0;
         for (unsigned int qpoint = 0; qpoint < q_points.size(); ++qpoint)
           for (unsigned int i = 0; i < n_dofs; ++i)
-            cell_vector(i) +=
-              fiv.jump(i, qpoint) * fiv.get_JxW_values()[qpoint];
-        deallog << "jump(): " << cell_vector << std::endl;
+            cell_vector(i) += fiv.jump_in_shape_values(i, qpoint) *
+                              fiv.get_JxW_values()[qpoint];
+        deallog << "jump_in_shape_values(): " << cell_vector << std::endl;
 
         cell_vector = 0.0;
         for (unsigned int qpoint = 0; qpoint < q_points.size(); ++qpoint)
           for (unsigned int i = 0; i < n_dofs; ++i)
-            cell_vector(i) +=
-              fiv.average(i, qpoint) * fiv.get_JxW_values()[qpoint];
-        deallog << "average(): " << cell_vector << std::endl;
+            cell_vector(i) += fiv.average_of_shape_values(i, qpoint) *
+                              fiv.get_JxW_values()[qpoint];
+        deallog << "average_of_shape_values(): " << cell_vector << std::endl;
       }
 }
 

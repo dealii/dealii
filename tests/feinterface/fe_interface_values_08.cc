@@ -14,7 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-// evaluate average_gradient average_hessian jump_gradient of FEInterfaceValues
+// evaluate average_gradient average_of_shape_hessians( jump_gradient of
+// FEInterfaceValues
 
 #include <deal.II/base/quadrature_lib.h>
 
@@ -97,23 +98,24 @@ test(const FiniteElement<dim> &fe)
     cell_vector = 0.0;
     for (unsigned int qpoint = 0; qpoint < q_points.size(); ++qpoint)
       for (unsigned int i = 0; i < n_dofs; ++i)
-        cell_vector(i) +=
-          fiv.average_gradient(i, qpoint).norm() * fiv.get_JxW_values()[qpoint];
-    deallog << "average_gradient.norm(): " << cell_vector << std::endl;
+        cell_vector(i) += fiv.average_of_shape_gradients(i, qpoint).norm() *
+                          fiv.get_JxW_values()[qpoint];
+    deallog << "average_of_shape_gradients.norm(): " << cell_vector
+            << std::endl;
 
     cell_vector = 0.0;
     for (unsigned int qpoint = 0; qpoint < q_points.size(); ++qpoint)
       for (unsigned int i = 0; i < n_dofs; ++i)
-        cell_vector(i) +=
-          fiv.average_hessian(i, qpoint).norm() * fiv.get_JxW_values()[qpoint];
-    deallog << "average_hessian.norm(): " << cell_vector << std::endl;
+        cell_vector(i) += fiv.average_of_shape_hessians(i, qpoint).norm() *
+                          fiv.get_JxW_values()[qpoint];
+    deallog << "average_of_shape_hessians.norm(): " << cell_vector << std::endl;
 
     cell_vector = 0.0;
     for (unsigned int qpoint = 0; qpoint < q_points.size(); ++qpoint)
       for (unsigned int i = 0; i < n_dofs; ++i)
-        cell_vector(i) +=
-          fiv.jump_gradient(i, qpoint).norm() * fiv.get_JxW_values()[qpoint];
-    deallog << "jump_gradient.norm(): " << cell_vector << std::endl;
+        cell_vector(i) += fiv.jump_in_shape_gradients(i, qpoint).norm() *
+                          fiv.get_JxW_values()[qpoint];
+    deallog << "jump_in_shape_gradients.norm(): " << cell_vector << std::endl;
   }
 
 
@@ -135,23 +137,26 @@ test(const FiniteElement<dim> &fe)
         cell_vector = 0.0;
         for (unsigned int qpoint = 0; qpoint < q_points.size(); ++qpoint)
           for (unsigned int i = 0; i < n_dofs; ++i)
-            cell_vector(i) += fiv.average_gradient(i, qpoint).norm() *
+            cell_vector(i) += fiv.average_of_shape_gradients(i, qpoint).norm() *
                               fiv.get_JxW_values()[qpoint];
-        deallog << "average_gradient.norm(): " << cell_vector << std::endl;
+        deallog << "average_of_shape_gradients.norm(): " << cell_vector
+                << std::endl;
 
         cell_vector = 0.0;
         for (unsigned int qpoint = 0; qpoint < q_points.size(); ++qpoint)
           for (unsigned int i = 0; i < n_dofs; ++i)
-            cell_vector(i) += fiv.average_hessian(i, qpoint).norm() *
+            cell_vector(i) += fiv.average_of_shape_hessians(i, qpoint).norm() *
                               fiv.get_JxW_values()[qpoint];
-        deallog << "average_hessian.norm(): " << cell_vector << std::endl;
+        deallog << "average_of_shape_hessians.norm(): " << cell_vector
+                << std::endl;
 
         cell_vector = 0.0;
         for (unsigned int qpoint = 0; qpoint < q_points.size(); ++qpoint)
           for (unsigned int i = 0; i < n_dofs; ++i)
-            cell_vector(i) += fiv.jump_gradient(i, qpoint).norm() *
+            cell_vector(i) += fiv.jump_in_shape_gradients(i, qpoint).norm() *
                               fiv.get_JxW_values()[qpoint];
-        deallog << "jump_gradient.norm(): " << cell_vector << std::endl;
+        deallog << "jump_in_shape_gradients.norm(): " << cell_vector
+                << std::endl;
       }
 }
 
