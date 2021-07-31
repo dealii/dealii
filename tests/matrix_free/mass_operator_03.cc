@@ -165,15 +165,13 @@ test()
   }
   sparse_matrix.compress(VectorOperation::add);
 
-  sparse_matrix.vmult(ref, in);
-
   for (unsigned int i = 0; i < ref.local_size(); ++i)
     {
-      const unsigned int glob_index = owned_set.nth_index_in_set(i);
+      const auto glob_index = owned_set.nth_index_in_set(i);
       if (constraints.is_constrained(glob_index))
         ref.local_element(i) = 1.;
       else
-        ref.local_element(i) = 1. / ref.local_element(i);
+        ref.local_element(i) = 1. / sparse_matrix(glob_index, glob_index);
     }
   ref.compress(VectorOperation::insert);
 
