@@ -46,6 +46,7 @@
 #include <deal.II/base/timer.h>
 #include <deal.II/base/work_stream.h>
 
+#include <deal.II/distributed/solution_transfer.h>
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/dofs/dof_handler.h>
@@ -162,6 +163,8 @@ namespace Step69
     const QGauss<dim>     quadrature;
     const QGauss<dim - 1> face_quadrature;
 
+    unsigned int refinement;
+
   private:
     TimerOutput &computing_timer;
 
@@ -169,8 +172,6 @@ namespace Step69
     double height;
     double disk_position;
     double disk_diameter;
-
-    unsigned int refinement;
   };
 
   // @sect4{The <code>OfflineData</code> class}
@@ -258,7 +259,6 @@ namespace Step69
   //   $[\rho,\textbf{m},E]$.
   //
   // The purpose of the class members <code>component_names</code>,
-  // <code>component_physical_units</code>,
   // <code>pressure</code>, and <code>speed_of_sound</code> is evident from
   // their names. We also provide a function
   // <code>compute_lambda_max()</code>, that computes the wave speed
@@ -293,8 +293,6 @@ namespace Step69
     using flux_type  = Tensor<1, problem_dimension, Tensor<1, dim>>;
 
     const static std::array<std::string, problem_dimension> component_names;
-    const static std::array<std::string, problem_dimension>
-      component_physical_units;
 
     static constexpr double gamma = 7. / 5.;
 
@@ -486,11 +484,15 @@ namespace Step69
   private:
     vector_type interpolate_initial_values(const double t = 0);
 
+    void checkpoint(const vector_type &U,
+                    const std::string &name,
+                    double             t,
+                    unsigned int       cycle);
+
     void output(const vector_type &U,
                 const std::string &name,
                 double             t,
-                unsigned int       cycle,
-                bool               checkpoint = false);
+                unsigned int       cycle);
 
     const MPI_Comm     mpi_communicator;
     std::ostringstream timer_output;
@@ -673,8 +675,6 @@ namespace Step69
               }
           }
       }
-
-    triangulation.refine_global(refinement);
   }
 
   // @sect4{Assembly of offline matrices}
@@ -1600,42 +1600,22 @@ namespace Step69
   }
 
   // We conclude this section by defining static arrays
-  // <code>component_names</code> and <code>component_physical_units</code>
-  // that contain strings describing the
-  // components of our state vector, as well as the physical units of
-  // these quantities that can be used to annotate the VTU output
-  // files we generate for visualization and postprocessing. We have
-  // template specializations for dimensions one, two and three, that
-  // are used later in DataOut for naming the corresponding
-  // components:
+  // <code>component_names</code> that contain strings describing the
+  // component names of our state vector. We have template specializations
+  // for dimensions one, two and three, that are used later in DataOut for
+  // naming the corresponding components:
 
   template <>
   const std::array<std::string, 3> ProblemDescription<1>::component_names{
     {"rho", "m", "E"}};
 
   template <>
-  const std::array<std::string, 3>
-    ProblemDescription<1>::component_physical_units{
-      {"kg/m", "kg*m/s/m", "J/m"}};
-
-
-  template <>
   const std::array<std::string, 4> ProblemDescription<2>::component_names{
     {"rho", "m_1", "m_2", "E"}};
 
   template <>
-  const std::array<std::string, 4>
-    ProblemDescription<2>::component_physical_units{
-      {"kg/m/m", "kg*m/s/m/m", "kg*m/s/m/m", "J/m/m"}};
-
-  template <>
   const std::array<std::string, 5> ProblemDescription<3>::component_names{
     {"rho", "m_1", "m_2", "m_3", "E"}};
-
-  template <>
-  const std::array<std::string, 5>
-    ProblemDescription<3>::component_physical_units{
-      {"kg/m/m/m", "kg*m/s/m/m/m", "kg*m/s/m/m/m", "kg*m/s/m/m/m", "J/m/m/m"}};
 
   // @sect4{Initial values}
 
@@ -2487,11 +2467,19 @@ namespace Step69
     pcout << "done" << std::endl;
 
     // Next we create the triangulation, assemble all matrices, set up
-    // scratch space, and initialize the DataOut<dim> object:
+    // scratch space, and initialize the DataOut<dim> object. All of these
+    // operations are pretty standard and discussed in detail in the
+    // Discretization and OfflineData classes.
 
     {
       print_head(pcout, "create triangulation");
+
       discretization.setup();
+
+      if (resume)
+        discretization.triangulation.load(base_name + "-checkpoint.mesh");
+      else
+        discretization.triangulation.refine_global(discretization.refinement);
 
       pcout << "Number of active cells:       "
             << discretization.triangulation.n_global_active_cells()
@@ -2515,8 +2503,9 @@ namespace Step69
     double       t            = 0.;
     unsigned int output_cycle = 0;
 
-    print_head(pcout, "interpolate initial values");
-    vector_type U = interpolate_initial_values();
+    vector_type U;
+    for (auto &it : U)
+      it.reinit(offline_data.partitioner);
 
     // @sect5{Resume}
     //
@@ -2525,36 +2514,48 @@ namespace Step69
     // <code>resume==true</code> we indicate that we have indeed an
     // interrupted computation and the program shall restart by reading in
     // an old state consisting of <code>t</code>,
-    // <code>output_cycle</code>, and <code>U</code> from a checkpoint
-    // file. These checkpoint files will be created in the
-    // <code>output()</code> routine discussed below.
+    // <code>output_cycle</code>, and the state vector <code>U</code> from
+    // checkpoint files.
+    //
+    // A this point we have already read in the stored refinement history
+    // of our parallel distributed mesh. What is missing are the actual
+    // state vector <code>U</code>, the time and output cycle. We use the
+    // SolutionTransfer class in combination with the
+    // distributed::Triangulation::load() /
+    // distributed::Triangulation::save() mechanism to read in the state
+    // vector. A separate <code>boost::archive</code> is used to retrieve
+    // <code>t</code> and <code>output_cycle</code>. The checkpoint files
+    // will be created in the <code>output()</code> routine discussed
+    // below.
 
     if (resume)
       {
-        print_head(pcout, "restore interrupted computation");
+        print_head(pcout, "resume interrupted computation");
 
-        const unsigned int i =
-          discretization.triangulation.locally_owned_subdomain();
+        parallel::distributed::
+          SolutionTransfer<dim, LinearAlgebra::distributed::Vector<double>>
+            solution_transfer(offline_data.dof_handler);
 
-        const std::string name = base_name + "-checkpoint-" +
-                                 Utilities::int_to_string(i, 4) + ".archive";
-        std::ifstream file(name, std::ios::binary);
+        std::vector<LinearAlgebra::distributed::Vector<double> *> vectors;
+        std::transform(U.begin(),
+                       U.end(),
+                       std::back_inserter(vectors),
+                       [](auto &it) { return &it; });
+        solution_transfer.deserialize(vectors);
 
-        // We use a <code>boost::archive</code> to store and read in the
-        // contents the checkpointed state.
+        for (auto &it : U)
+          it.update_ghost_values();
+
+        std::ifstream file(base_name + "-checkpoint.metadata",
+                           std::ios::binary);
 
         boost::archive::binary_iarchive ia(file);
         ia >> t >> output_cycle;
-
-        for (auto &it1 : U)
-          {
-            // <code>it1</code> iterates over all components of the state
-            // vector <code>U</code>. We read in every entry of the
-            // component in sequence and update the ghost layer afterwards:
-            for (auto &it2 : it1)
-              ia >> it2;
-            it1.update_ghost_values();
-          }
+      }
+    else
+      {
+        print_head(pcout, "interpolate initial values");
+        U = interpolate_initial_values();
       }
 
     // With either the initial state set up, or an interrupted state
@@ -2594,7 +2595,8 @@ namespace Step69
 
         if (t > output_cycle * output_granularity)
           {
-            output(U, base_name, t, output_cycle, true);
+            checkpoint(U, base_name, t, output_cycle);
+            output(U, base_name, t, output_cycle);
             ++output_cycle;
           }
       }
@@ -2652,7 +2654,41 @@ namespace Step69
   }
 
   // @sect5{Output and checkpointing}
-  //
+
+  // We checkpoint the current state by doing the precise inverse
+  // operation to what we discussed for the <a href="Resume">resume
+  // logic</a>:
+
+  template <int dim>
+  void MainLoop<dim>::checkpoint(const typename MainLoop<dim>::vector_type &U,
+                                 const std::string &name,
+                                 const double       t,
+                                 const unsigned int cycle)
+  {
+    print_head(pcout, "checkpoint computation");
+
+    parallel::distributed::
+      SolutionTransfer<dim, LinearAlgebra::distributed::Vector<double>>
+        solution_transfer(offline_data.dof_handler);
+
+    std::vector<const LinearAlgebra::distributed::Vector<double> *> vectors;
+    std::transform(U.begin(),
+                   U.end(),
+                   std::back_inserter(vectors),
+                   [](auto &it) { return &it; });
+
+    solution_transfer.prepare_for_serialization(vectors);
+
+    discretization.triangulation.save(name + "-checkpoint.mesh");
+
+    if (dealii::Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
+      {
+        std::ofstream file(name + "-checkpoint.metadata", std::ios::binary);
+        boost::archive::binary_oarchive oa(file);
+        oa << t << cycle;
+      }
+  }
+
   // Writing out the final vtk files is quite an IO intensive task that can
   // stall the main loop for a while. In order to avoid this we use an <a
   // href="https://en.wikipedia.org/wiki/Asynchronous_I/O">asynchronous
@@ -2670,11 +2706,9 @@ namespace Step69
   void MainLoop<dim>::output(const typename MainLoop<dim>::vector_type &U,
                              const std::string &                        name,
                              const double                               t,
-                             const unsigned int                         cycle,
-                             const bool checkpoint)
+                             const unsigned int                         cycle)
   {
-    pcout << "MainLoop<dim>::output(t = " << t
-          << ", checkpoint = " << checkpoint << ")" << std::endl;
+    pcout << "MainLoop<dim>::output(t = " << t << ")" << std::endl;
 
     // If the asynchronous writeback option is set we launch a background
     // thread performing all the slow IO to disc. In that case we have to
@@ -2735,39 +2769,12 @@ namespace Step69
     // the <code>this</code> pointer as well as most of the arguments of
     // the output function by value so that we have access to them inside
     // the lambda function.
-    const auto output_worker = [this, name, t, cycle, checkpoint, data_out]() {
-      if (checkpoint)
-        {
-          // We checkpoint the current state by doing the precise inverse
-          // operation to what we discussed for the <a href="Resume">resume
-          // logic</a>:
-
-          const unsigned int i =
-            discretization.triangulation.locally_owned_subdomain();
-          std::string filename =
-            name + "-checkpoint-" + Utilities::int_to_string(i, 4) + ".archive";
-
-          std::ofstream file(filename, std::ios::binary | std::ios::trunc);
-
-          boost::archive::binary_oarchive oa(file);
-          oa << t << cycle;
-          for (const auto &it1 : output_vector)
-            for (const auto &it2 : it1)
-              oa << it2;
-        }
-
-      DataOutBase::VtkFlags output_flags;
-      output_flags.time              = t;
-      output_flags.cycle             = cycle;
-      output_flags.compression_level = DataOutBase::VtkFlags::best_speed;
-      for (unsigned int i = 0;
-           i < ProblemDescription<dim>::component_names.size();
-           ++i)
-        output_flags
-          .physical_units[ProblemDescription<dim>::component_names[i]] =
-          ProblemDescription<dim>::component_physical_units[i];
-
-      data_out->set_flags(output_flags);
+    const auto output_worker = [this, name, t, cycle, data_out]() {
+      DataOutBase::VtkFlags flags(t,
+                                  cycle,
+                                  true,
+                                  DataOutBase::VtkFlags::best_speed);
+      data_out->set_flags(flags);
 
       data_out->write_vtu_with_pvtu_record(
         "", name + "-solution", cycle, mpi_communicator, 6);
