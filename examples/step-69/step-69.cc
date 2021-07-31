@@ -675,8 +675,6 @@ namespace Step69
               }
           }
       }
-
-    triangulation.refine_global(refinement);
   }
 
   // @sect4{Assembly of offline matrices}
@@ -2472,25 +2470,16 @@ namespace Step69
     // scratch space, and initialize the DataOut<dim> object. All of these
     // operations are pretty standard and discussed in detail in the
     // Discretization and OfflineData classes.
-    //
-    // We have to make take care of a special case when resuming an
-    // interrupted computation though: In order to be able to read in the
-    // saved mesh and associated state vector we have to make sure to
-    // not refine the coarse mesh:
 
     {
       print_head(pcout, "create triangulation");
 
+      discretization.setup();
+
       if (resume)
-        {
-          discretization.refinement = 0;
-          discretization.setup();
-          discretization.triangulation.load(base_name + "-checkpoint.mesh");
-        }
+        discretization.triangulation.load(base_name + "-checkpoint.mesh");
       else
-        {
-          discretization.setup();
-        }
+        discretization.triangulation.refine_global(discretization.refinement);
 
       pcout << "Number of active cells:       "
             << discretization.triangulation.n_global_active_cells()
