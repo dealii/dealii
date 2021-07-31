@@ -1,0 +1,4 @@
+Fixed: Use tolerances consistently in RemotePointEvaluation, 
+VectorTools::point_values(), and GridTools::distributed_compute_point_locations().
+<br>
+(Peter Munch, Magdalena Schreter, 2021/07/31)
