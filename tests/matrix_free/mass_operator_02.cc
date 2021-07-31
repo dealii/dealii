@@ -168,6 +168,7 @@ test()
   }
   sparse_matrix.compress(VectorOperation::add);
 
+  // Check the diagonal:
   for (unsigned int i = 0; i < ref.local_size(); ++i)
     {
       const auto glob_index = owned_set.nth_index_in_set(i);
@@ -179,13 +180,32 @@ test()
   ref.compress(VectorOperation::insert);
 
   out -= ref;
-  const double diff_norm = out.linfty_norm();
 
-  deallog << "Norm of difference: " << diff_norm << std::endl;
-  deallog << "l2_norm: " << inverse_diagonal.l2_norm() << std::endl;
-  deallog << "l1_norm: " << inverse_diagonal.l1_norm() << std::endl;
-  deallog << "linfty_norm: " << inverse_diagonal.linfty_norm() << std::endl
-          << std::endl;
+  deallog << "Norm of difference: " << out.linfty_norm() << std::endl;
+  deallog << "l2_norm: " << ref.l2_norm() << std::endl;
+  deallog << "l1_norm: " << ref.l1_norm() << std::endl;
+  deallog << "linfty_norm: " << ref.linfty_norm() << std::endl << std::endl;
+
+  // Check the lumped diagonal:
+  mf.compute_lumped_diagonal();
+  out = mf.get_matrix_lumped_diagonal_inverse()->get_vector();
+  sparse_matrix.vmult(ref, in);
+  for (unsigned int i = 0; i < ref.local_size(); ++i)
+    {
+      const auto glob_index = owned_set.nth_index_in_set(i);
+      if (constraints.is_constrained(glob_index))
+        ref.local_element(i) = 1.;
+      else
+        ref.local_element(i) = 1. / ref.local_element(i);
+    }
+  ref.compress(VectorOperation::insert);
+
+  out -= ref;
+
+  deallog << "Norm of difference: " << out.linfty_norm() << std::endl;
+  deallog << "l2_norm: " << ref.l2_norm() << std::endl;
+  deallog << "l1_norm: " << ref.l1_norm() << std::endl;
+  deallog << "linfty_norm: " << ref.linfty_norm() << std::endl << std::endl;
 }
 
 
