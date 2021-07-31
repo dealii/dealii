@@ -549,16 +549,19 @@ namespace Step47
           for (unsigned int i = 0; i < n_interface_dofs; ++i)
             {
               const double av_hessian_i_dot_n_dot_n =
-                (fe_interface_values.average_hessian(i, qpoint) * n * n);
+                (fe_interface_values.average_of_shape_hessians(i, qpoint) * n *
+                 n);
               const double jump_grad_i_dot_n =
-                (fe_interface_values.jump_gradient(i, qpoint) * n);
+                (fe_interface_values.jump_in_shape_gradients(i, qpoint) * n);
 
               for (unsigned int j = 0; j < n_interface_dofs; ++j)
                 {
                   const double av_hessian_j_dot_n_dot_n =
-                    (fe_interface_values.average_hessian(j, qpoint) * n * n);
+                    (fe_interface_values.average_of_shape_hessians(j, qpoint) *
+                     n * n);
                   const double jump_grad_j_dot_n =
-                    (fe_interface_values.jump_gradient(j, qpoint) * n);
+                    (fe_interface_values.jump_in_shape_gradients(j, qpoint) *
+                     n);
 
                   copy_data_face.cell_matrix(i, j) +=
                     (-av_hessian_i_dot_n_dot_n       // - {grad^2 v n n }
@@ -641,16 +644,19 @@ namespace Step47
           for (unsigned int i = 0; i < n_dofs; ++i)
             {
               const double av_hessian_i_dot_n_dot_n =
-                (fe_interface_values.average_hessian(i, qpoint) * n * n);
+                (fe_interface_values.average_of_shape_hessians(i, qpoint) * n *
+                 n);
               const double jump_grad_i_dot_n =
-                (fe_interface_values.jump_gradient(i, qpoint) * n);
+                (fe_interface_values.jump_in_shape_gradients(i, qpoint) * n);
 
               for (unsigned int j = 0; j < n_dofs; ++j)
                 {
                   const double av_hessian_j_dot_n_dot_n =
-                    (fe_interface_values.average_hessian(j, qpoint) * n * n);
+                    (fe_interface_values.average_of_shape_hessians(j, qpoint) *
+                     n * n);
                   const double jump_grad_j_dot_n =
-                    (fe_interface_values.jump_gradient(j, qpoint) * n);
+                    (fe_interface_values.jump_in_shape_gradients(j, qpoint) *
+                     n);
 
                   copy_data_face.cell_matrix(i, j) +=
                     (-av_hessian_i_dot_n_dot_n  // - {grad^2 v n n}
