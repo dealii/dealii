@@ -493,11 +493,9 @@ namespace MatrixFreeTools
 
                             for (unsigned int j = 0; j < dofs_per_component;
                                  ++j)
-                              if (1e-10 <
-                                  std::abs(values_dofs[j][0] &&
-                                           (j != i ||
-                                            1e-10 < std::abs(values_dofs[j][0] -
-                                                             1.0))))
+                              if (1e-10 < std::abs(values_dofs[j][0]) &&
+                                  (j != i ||
+                                   1e-10 < std::abs(values_dofs[j][0] - 1.0)))
                                 locally_relevant_constrains_hn.emplace_back(
                                   j, i, values_dofs[j][0]);
                           }
