@@ -832,18 +832,28 @@ public:
  *
  * Like QGauss, users should specify a number `n_points_1D` as an indication
  * of what polynomial degree to be integrated exactly (e.g., for $n$ points,
- * the rule can integrate polynomials of degree $2 n - 1$ exactly). The given
- * value for n_points_1D = 1, 2, 3, 4, 5 results in the following number of
- * quadrature points in 2D and 3D:
- * - 2D: 1, 6, 7, 15, 19
- * - 3D: 1, 8, 14, 35, 59
+ * the rule can integrate polynomials of degree $2 n - 1$ exactly).
+ * Additionally, since these rules were derived for simplices, there are
+ * also even-ordered rules (i.e., they integrate polynomials of degree $2 n$)
+ * available which do not have analogous 1D rules.
+ *
+ * The given value for n_points_1D = 1, 2, 3, 4, 5, 6, 7 (where the last two are
+ * only implemented in 2D) results in the following number of quadrature points
+ * in 2D and 3D:
+ * - 2D: odd (default): 1, 6, 7, 15, 19, 28, 37
+ * - 2D: even: 3, 6, 12, 16, 25, 33, 42
+ * - 3D: odd (default): 1, 8, 14, 35, 59
+ * - 3D: even: 4, 14, 24, 46, 81
  *
  * For 1D, the quadrature rule degenerates to a
- * `dealii::QGauss<1>(n_points_1D)`.
+ * `dealii::QGauss<1>(n_points_1D)` and @p use_odd_order is ignored.
  *
  * These rules match the ones listed for Witherden-Vincent in the quadpy
  * @cite quadpy library and were first described in
  * @cite witherden2015identification.
+ *
+ * @note Some rules (2D 2 odd and 3D 2 even) do not yet exist and instead a
+ * higher-order rule is used in their place.
  *
  * @ingroup simplex
  */
@@ -852,10 +862,13 @@ class QWitherdenVincentSimplex : public QSimplex<dim>
 {
 public:
   /**
-   * Constructor taking the number of quadrature points in 1D direction
-   * @p n_points_1D.
+   * Constructor taking the equivalent number of quadrature points in 1D
+   * @p n_points_1D and boolean indicating whether the rule should be order
+   * $2 n - 1$ or $2 n$: see the general documentation of this class for more
+   * information.
    */
-  explicit QWitherdenVincentSimplex(const unsigned int n_points_1D);
+  explicit QWitherdenVincentSimplex(const unsigned int n_points_1D,
+                                    const bool         use_odd_order = true);
 };
 
 /**

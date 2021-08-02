@@ -36,9 +36,11 @@ print(const unsigned int n_points_1D)
 
 template <int dim>
 void
-check_accuracy_1D(const unsigned int n_points_1D)
+check_accuracy_1D(const unsigned int n_points_1D,
+                  const bool         use_odd_order = true)
 {
-  const unsigned int accuracy = 2 * n_points_1D - 1;
+  const unsigned int accuracy =
+    use_odd_order ? 2 * n_points_1D - 1 : 2 * n_points_1D;
 
   Tensor<1, dim> monomial_powers;
   unsigned int   sum = 0;
@@ -53,7 +55,7 @@ check_accuracy_1D(const unsigned int n_points_1D)
   monomial_powers[dim - 1] += accuracy - sum;
 
   const Functions::Monomial<dim>      func(monomial_powers);
-  const QWitherdenVincentSimplex<dim> quad(n_points_1D);
+  const QWitherdenVincentSimplex<dim> quad(n_points_1D, use_odd_order);
 
   deallog << "Monomial powers = " << monomial_powers << std::endl;
   double integrand = 0.0;
@@ -81,16 +83,33 @@ main()
   print<3>(4);
 
   deallog << std::endl << std::endl;
+  deallog << "check odd orders" << std::endl;
   check_accuracy_1D<2>(1);
   check_accuracy_1D<2>(2);
   check_accuracy_1D<2>(3);
   check_accuracy_1D<2>(4);
   check_accuracy_1D<2>(5);
   check_accuracy_1D<2>(6);
+  check_accuracy_1D<2>(7);
 
   check_accuracy_1D<3>(1);
   check_accuracy_1D<3>(2);
   check_accuracy_1D<3>(3);
   check_accuracy_1D<3>(4);
   check_accuracy_1D<3>(5);
+
+  deallog << "check even orders" << std::endl;
+  check_accuracy_1D<2>(1, false);
+  check_accuracy_1D<2>(2, false);
+  check_accuracy_1D<2>(3, false);
+  check_accuracy_1D<2>(4, false);
+  check_accuracy_1D<2>(5, false);
+  check_accuracy_1D<2>(6, false);
+  check_accuracy_1D<2>(7, false);
+
+  check_accuracy_1D<3>(1, false);
+  check_accuracy_1D<3>(2, false);
+  check_accuracy_1D<3>(3, false);
+  check_accuracy_1D<3>(4, false);
+  check_accuracy_1D<3>(5, false);
 }
