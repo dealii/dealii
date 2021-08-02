@@ -580,6 +580,15 @@ FE_SimplexPoly<dim, spacedim>::get_subface_interpolation_matrix(
 
 template <int dim, int spacedim>
 bool
+FE_SimplexPoly<dim, spacedim>::supports_mass_lumping() const
+{
+  return this->degree == 0 || this->degree == 1;
+}
+
+
+
+template <int dim, int spacedim>
+bool
 FE_SimplexPoly<dim, spacedim>::hp_constraints_are_implemented() const
 {
   return true;

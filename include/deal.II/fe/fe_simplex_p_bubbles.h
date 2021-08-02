@@ -97,6 +97,13 @@ public:
   virtual std::string
   get_name() const override;
 
+  /**
+   * By construction this element supports mass lumping for all degrees so this
+   * function always returns true.
+   */
+  virtual bool
+  supports_mass_lumping() const override;
+
 protected:
   /**
    * Degree of the approximation (i.e., the constructor argument).

@@ -158,6 +158,12 @@ public:
       RefinementCase<dim>::isotropic_refinement) const override;
 
   /**
+   * These elements support mass lumping, so this function always returns true.
+   */
+  virtual bool
+  supports_mass_lumping() const override;
+
+  /**
    * Given an index in the natural ordering of indices on a face, return the
    * index of the same degree of freedom on the cell.
    *

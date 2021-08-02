@@ -853,6 +853,15 @@ FiniteElement<dim, spacedim>::constraints_are_implemented(
 
 template <int dim, int spacedim>
 bool
+FiniteElement<dim, spacedim>::supports_mass_lumping() const
+{
+  return false;
+}
+
+
+
+template <int dim, int spacedim>
+bool
 FiniteElement<dim, spacedim>::hp_constraints_are_implemented() const
 {
   return false;

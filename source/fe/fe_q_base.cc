@@ -1435,6 +1435,15 @@ FE_Q_Base<dim, spacedim>::get_prolongation_matrix(
 
 
 template <int dim, int spacedim>
+bool
+FE_Q_Base<dim, spacedim>::supports_mass_lumping() const
+{
+  return true;
+}
+
+
+
+template <int dim, int spacedim>
 const FullMatrix<double> &
 FE_Q_Base<dim, spacedim>::get_restriction_matrix(
   const unsigned int         child,

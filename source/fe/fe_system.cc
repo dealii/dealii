@@ -690,6 +690,17 @@ FESystem<dim, spacedim>::get_interpolation_matrix(
 
 
 template <int dim, int spacedim>
+bool
+FESytem<dim, spacedim>::supports_mass_lumping() const
+{
+  return std::all_of(
+    base_elements.begin(), base_elements.end(),
+    [](const auto &pair) {return pair.first->supports_mass_lumping();});
+}
+
+
+
+template <int dim, int spacedim>
 const FullMatrix<double> &
 FESystem<dim, spacedim>::get_restriction_matrix(
   const unsigned int         child,

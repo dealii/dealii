@@ -270,6 +270,15 @@ FE_SimplexP_Bubbles<dim, spacedim>::clone() const
   return std::make_unique<FE_SimplexP_Bubbles<dim, spacedim>>(*this);
 }
 
+
+
+template <int dim, int spacedim>
+bool
+FE_SimplexP_Bubbles<dim, spacedim>::supports_mass_lumping() const
+{
+  return true;
+}
+
 // explicit instantiations
 #include "fe_simplex_p_bubbles.inst"
 

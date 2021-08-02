@@ -1180,6 +1180,18 @@ public:
   bool
   isotropic_restriction_is_implemented() const;
 
+  /**
+   * Boolean indicating whether or not the finite element supports <em>mass
+   * lumping</em>: i.e., whether or not the approximate mass matrix we get when
+   * combining this element and a nodal quadrature scheme can be used as an
+   * acceptably accurate replacement for the mass matrix itself. For example:
+   * FE_Q can be generally used with mass lumping while FE_SimplexP can only be
+   * used with mass lumping with linear elements.
+   *
+   * The default implementation returns false.
+   */
+  virtual bool
+  supports_mass_lumping() const;
 
   /**
    * Access the #restriction_is_additive_flags field. See the discussion about

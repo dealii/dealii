@@ -863,6 +863,12 @@ public:
       RefinementCase<dim>::isotropic_refinement) const override;
 
   /**
+   * Return whether or not all base elements support mass lumping.
+   */
+  virtual bool
+  supports_mass_lumping() const override;
+
+  /**
    * Given an index in the natural ordering of indices on a face, return the
    * index of the same degree of freedom on the cell.
    *

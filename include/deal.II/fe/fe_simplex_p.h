@@ -75,6 +75,12 @@ public:
       RefinementCase<dim>::isotropic_refinement) const override;
 
   /**
+   * FE_SimplexP and FE_SimplexDGP only support mass lumping for degrees 0 and 1.
+   */
+  virtual bool
+  supports_mass_lumping() const override;
+
+  /**
    * @copydoc dealii::FiniteElement::get_face_interpolation_matrix()
    */
   void
