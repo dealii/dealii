@@ -4475,7 +4475,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                 ->hanging_node_constraint_masks[(this->cell * n_lanes + v) *
                                                   n_fe_components +
                                                 first_selected_component] !=
-              internal::MatrixFreeFunctions::ConstraintTypes::unconstrained)
+              internal::MatrixFreeFunctions::ConstraintKinds::unconstrained)
           has_hn_constraints = true;
     }
 
@@ -4582,7 +4582,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                   ->hanging_node_constraint_masks[(this->cell * n_lanes + v) *
                                                     n_fe_components +
                                                   first_selected_component] !=
-                internal::MatrixFreeFunctions::ConstraintTypes::unconstrained)
+                internal::MatrixFreeFunctions::ConstraintKinds::unconstrained)
             has_hn_constraints = true;
 
           Assert(my_index_start[n_components_read].first ==
@@ -4658,7 +4658,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                .second ||
            (this->dof_info->hanging_node_constraint_masks.size() > 0 &&
             this->dof_info->hanging_node_constraint_masks[cell_dof_index] !=
-              internal::MatrixFreeFunctions::ConstraintTypes::unconstrained)))
+              internal::MatrixFreeFunctions::ConstraintKinds::unconstrained)))
         {
           Assert(this->dof_info->row_starts_plain_indices[cell_index] !=
                    numbers::invalid_unsigned_int,
@@ -5315,7 +5315,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
       ->n_vectorization_lanes_filled[this->dof_access_index][this->cell];
 
   constexpr unsigned int n_lanes = VectorizedArrayType::size();
-  std::array<internal::MatrixFreeFunctions::ConstraintTypes, n_lanes>
+  std::array<internal::MatrixFreeFunctions::ConstraintKinds, n_lanes>
     constraint_mask;
 
   bool hn_available = false;
@@ -5350,7 +5350,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
       constraint_mask[v] = mask;
 
       hn_available |=
-        (mask != internal::MatrixFreeFunctions::ConstraintTypes::unconstrained);
+        (mask != internal::MatrixFreeFunctions::ConstraintKinds::unconstrained);
     }
 
   if (hn_available == false)
@@ -5358,7 +5358,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
 
   for (unsigned int v = n_vectorization_actual; v < n_lanes; ++v)
     constraint_mask[v] =
-      internal::MatrixFreeFunctions::ConstraintTypes::unconstrained;
+      internal::MatrixFreeFunctions::ConstraintKinds::unconstrained;
 
   internal::FEEvaluationHangingNodesFactory<dim, Number, VectorizedArrayType>::
     apply(n_components,

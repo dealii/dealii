@@ -283,7 +283,7 @@ namespace internal
       const TriaIterator<DoFCellAccessor<dim, dim, false>> &cell,
       std::vector<types::global_dof_index> &                dof_indices)
     {
-      const ArrayView<ConstraintTypes> mask_view(
+      const ArrayView<ConstraintKinds> mask_view(
         hanging_node_constraint_masks.data() +
           cell_number * cell->get_fe().n_components(),
         cell->get_fe().n_components());

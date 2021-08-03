@@ -229,7 +229,7 @@ namespace CUDAWrappers
       std::vector<Point<dim, Number>>      q_points_host;
       std::vector<Number>                  JxW_host;
       std::vector<Number>                  inv_jacobian_host;
-      std::vector<dealii::internal::MatrixFreeFunctions::ConstraintTypes>
+      std::vector<dealii::internal::MatrixFreeFunctions::ConstraintKinds>
         constraint_mask_host;
       // Local buffer
       std::vector<types::global_dof_index> local_dof_indices;
@@ -378,7 +378,7 @@ namespace CUDAWrappers
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         lexicographic_dof_indices[i] = local_dof_indices[lexicographic_inv[i]];
 
-      const ArrayView<dealii::internal::MatrixFreeFunctions::ConstraintTypes>
+      const ArrayView<dealii::internal::MatrixFreeFunctions::ConstraintKinds>
         cell_id_view(constraint_mask_host[cell_id]);
 
       hanging_nodes.setup_constraints(cell,
@@ -496,7 +496,7 @@ namespace CUDAWrappers
 
       alloc_and_copy(
         &data->constraint_mask[color],
-        ArrayView<const dealii::internal::MatrixFreeFunctions::ConstraintTypes>(
+        ArrayView<const dealii::internal::MatrixFreeFunctions::ConstraintKinds>(
           constraint_mask_host.data(), constraint_mask_host.size()),
         n_cells);
     }

@@ -238,7 +238,7 @@ namespace CUDAWrappers
     unsigned int             padding_length;
     const unsigned int       mf_object_id;
 
-    const dealii::internal::MatrixFreeFunctions::ConstraintTypes
+    const dealii::internal::MatrixFreeFunctions::ConstraintKinds
       constraint_mask;
 
     const bool use_coloring;

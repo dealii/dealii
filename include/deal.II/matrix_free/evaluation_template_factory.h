@@ -202,7 +202,7 @@ namespace internal
           const FEEvaluationBaseData<dim, Number, false, VectorizedArrayType>
             &                                            fe_eval,
           const bool                                     transpose,
-          const std::array<MatrixFreeFunctions::ConstraintTypes,
+          const std::array<MatrixFreeFunctions::ConstraintKinds,
                            VectorizedArrayType::size()> &c_mask,
           VectorizedArrayType *                          values);
 
@@ -217,7 +217,7 @@ namespace internal
           const FEEvaluationBaseData<dim, Number, true, VectorizedArrayType>
             &                                            fe_eval,
           const bool                                     transpose,
-          const std::array<MatrixFreeFunctions::ConstraintTypes,
+          const std::array<MatrixFreeFunctions::ConstraintKinds,
                            VectorizedArrayType::size()> &c_mask,
           VectorizedArrayType *                          values);
   };

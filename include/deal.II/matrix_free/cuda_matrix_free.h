@@ -212,7 +212,7 @@ namespace CUDAWrappers
       /**
        * Mask deciding where constraints are set on a given cell.
        */
-      dealii::internal::MatrixFreeFunctions::ConstraintTypes *constraint_mask;
+      dealii::internal::MatrixFreeFunctions::ConstraintKinds *constraint_mask;
 
       /**
        * If true, use graph coloring has been used and we can simply add into
@@ -591,7 +591,7 @@ namespace CUDAWrappers
     /**
      * Mask deciding where constraints are set on a given cell.
      */
-    std::vector<dealii::internal::MatrixFreeFunctions::ConstraintTypes *>
+    std::vector<dealii::internal::MatrixFreeFunctions::ConstraintKinds *>
       constraint_mask;
 
     /**
@@ -818,7 +818,7 @@ namespace CUDAWrappers
     /**
      * Mask deciding where constraints are set on a given cell.
      */
-    std::vector<dealii::internal::MatrixFreeFunctions::ConstraintTypes>
+    std::vector<dealii::internal::MatrixFreeFunctions::ConstraintKinds>
       constraint_mask;
 
     /**
