@@ -894,7 +894,7 @@ namespace CUDAWrappers
       const unsigned int x_idx = threadIdx.x % (fe_degree + 1);
       const unsigned int y_idx = threadIdx.y;
 
-      const unsigned int this_type =
+      const auto this_type =
         (direction == 0) ?
           dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_x :
           dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_y;
@@ -1074,7 +1074,9 @@ namespace CUDAWrappers
                                          ConstraintKinds::unconstrained) &&
           on_face1 && on_face2));
 
-      if (constrained_face && constrained_dof)
+      if ((constrained_face != dealii::internal::MatrixFreeFunctions::
+                                 ConstraintKinds::unconstrained) &&
+          constrained_dof)
         {
           const bool type = (constraint_mask & this_type) !=
                             dealii::internal::MatrixFreeFunctions::
@@ -1120,7 +1122,9 @@ namespace CUDAWrappers
       // each block being assigned to one element.
       __syncthreads();
 
-      if (constrained_face && constrained_dof)
+      if ((constrained_face != dealii::internal::MatrixFreeFunctions::
+                                 ConstraintKinds::unconstrained) &&
+          constrained_dof)
         values[index3<fe_degree + 1>(x_idx, y_idx, z_idx)] = t;
 
       __syncthreads();
