@@ -453,7 +453,8 @@ namespace MatrixFreeTools
                                                    first_selected_component];
 
                 // cell has hanging nodes
-                if (mask != 0)
+                if (mask != dealii::internal::MatrixFreeFunctions::
+                              ConstraintTypes::unconstrained)
                   {
                     // check if hanging node internpolation matrix has been set
                     // up
@@ -767,7 +768,7 @@ namespace MatrixFreeTools
       // constraints!
       std::array<std::vector<Number>, n_lanes> diagonals_local_constrained;
 
-      std::map<unsigned int,
+      std::map<dealii::internal::MatrixFreeFunctions::ConstraintTypes,
                std::vector<std::tuple<unsigned int, unsigned int, Number>>>
         locally_relevant_constrains_hn_map;
     };

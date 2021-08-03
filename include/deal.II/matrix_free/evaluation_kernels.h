@@ -4667,12 +4667,12 @@ namespace internal
         fe_degree != -1 ? fe_degree :
                           fe_eval.get_shape_info().data.front().fe_degree;
 
-      const auto is_set = [](const unsigned int a, const unsigned int b) {
+      const auto is_set = [](const auto a, const auto b) -> bool {
         return (a & b) == b;
       };
 
-      const auto not_set = [](const unsigned int a, const unsigned int b) {
-        return (a & b) == 0;
+      const auto not_set = [](const auto a, const auto b) -> bool {
+        return (a & b) == MatrixFreeFunctions::ConstraintTypes::unconstrained;
       };
 
       const unsigned int points = given_degree + 1;
@@ -4689,10 +4689,12 @@ namespace internal
               if (dim == 2) // 2D: only faces
                 {
                   // direction 0:
-                  if (mask & MatrixFreeFunctions::ConstraintTypes::face_y)
+                  if ((mask & MatrixFreeFunctions::ConstraintTypes::face_y) !=
+                      MatrixFreeFunctions::ConstraintTypes::unconstrained)
                     {
                       const bool is_subface_0 =
-                        mask & MatrixFreeFunctions::ConstraintTypes::type_x;
+                        (mask & MatrixFreeFunctions::ConstraintTypes::type_x) !=
+                        MatrixFreeFunctions::ConstraintTypes::unconstrained;
                       if (is_set(mask,
                                  MatrixFreeFunctions::ConstraintTypes::type_y))
                         interpolate_2D<fe_degree, 2, transpose>(
@@ -4711,10 +4713,12 @@ namespace internal
                     }
 
                   // direction 1:
-                  if (mask & MatrixFreeFunctions::ConstraintTypes::face_x)
+                  if ((mask & MatrixFreeFunctions::ConstraintTypes::face_x) !=
+                      MatrixFreeFunctions::ConstraintTypes::unconstrained)
                     {
                       const bool is_subface_0 =
-                        mask & MatrixFreeFunctions::ConstraintTypes::type_y;
+                        (mask & MatrixFreeFunctions::ConstraintTypes::type_y) !=
+                        MatrixFreeFunctions::ConstraintTypes::unconstrained;
                       if (is_set(mask,
                                  MatrixFreeFunctions::ConstraintTypes::type_x))
                         interpolate_2D<fe_degree, 0, transpose>(
@@ -4847,7 +4851,8 @@ namespace internal
                   // direction 0:
                   {
                     const bool is_subface_0 =
-                      mask & MatrixFreeFunctions::ConstraintTypes::type_x;
+                      (mask & MatrixFreeFunctions::ConstraintTypes::type_x) !=
+                      MatrixFreeFunctions::ConstraintTypes::unconstrained;
 
                     // ... faces
                     if (is_face_2)
@@ -4921,7 +4926,8 @@ namespace internal
                   // direction 1:
                   {
                     const bool is_subface_0 =
-                      mask & MatrixFreeFunctions::ConstraintTypes::type_y;
+                      (mask & MatrixFreeFunctions::ConstraintTypes::type_y) !=
+                      MatrixFreeFunctions::ConstraintTypes::unconstrained;
 
                     // ... faces
                     if (is_face_0)
@@ -4995,7 +5001,8 @@ namespace internal
                   // direction 2:
                   {
                     const bool is_subface_0 =
-                      mask & MatrixFreeFunctions::ConstraintTypes::type_z;
+                      (mask & MatrixFreeFunctions::ConstraintTypes::type_z) !=
+                      MatrixFreeFunctions::ConstraintTypes::unconstrained;
 
                     // ... faces
                     if (is_face_0)

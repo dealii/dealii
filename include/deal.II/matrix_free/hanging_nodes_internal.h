@@ -50,7 +50,7 @@ namespace internal
      * determine which face is constrained. For example, in 2D, if
      * face_x and type are set, then x = 0 is constrained.
      */
-    enum ConstraintTypes : unsigned short
+    enum class ConstraintTypes : std::uint16_t
     {
       unconstrained = 0,
 
@@ -78,11 +78,11 @@ namespace internal
      * would be an integer which would in turn trigger a compiler warning when
      * we tried to assign it to an object of type UpdateFlags.
      */
-    inline ConstraintTypes
+    DEAL_II_CUDA_HOST_DEV inline ConstraintTypes
     operator|(const ConstraintTypes f1, const ConstraintTypes f2)
     {
-      return static_cast<ConstraintTypes>(static_cast<unsigned short>(f1) |
-                                          static_cast<unsigned short>(f2));
+      return static_cast<ConstraintTypes>(static_cast<std::uint16_t>(f1) |
+                                          static_cast<std::uint16_t>(f2));
     }
 
 
@@ -91,7 +91,7 @@ namespace internal
      * Global operator which sets the bits from the second argument also in the
      * first one.
      */
-    inline ConstraintTypes &
+    DEAL_II_CUDA_HOST_DEV inline ConstraintTypes &
     operator|=(ConstraintTypes &f1, const ConstraintTypes f2)
     {
       f1 = f1 | f2;
@@ -100,23 +100,38 @@ namespace internal
 
 
 
-#ifdef DEAL_II_COMPILER_CUDA_AWARE
-    __device__ inline ConstraintTypes
-    operator|(const ConstraintTypes f1, const ConstraintTypes f2)
+    /**
+     * Global operator which checks inequality.
+     */
+    DEAL_II_CUDA_HOST_DEV inline bool
+    operator!=(const ConstraintTypes f1, const ConstraintTypes f2)
     {
-      return static_cast<ConstraintTypes>(static_cast<unsigned short>(f1) |
-                                          static_cast<unsigned short>(f2));
+      return static_cast<std::uint16_t>(f1) != static_cast<std::uint16_t>(f2);
     }
 
 
 
-    __device__ inline ConstraintTypes &
-    operator|=(ConstraintTypes &f1, const ConstraintTypes f2)
+    /**
+     * Global operator which checks if the first argument is less than the
+     * second.
+     */
+    DEAL_II_CUDA_HOST_DEV inline bool
+    operator<(const ConstraintTypes f1, const ConstraintTypes f2)
     {
-      f1 = f1 | f2;
-      return f1;
+      return static_cast<std::uint16_t>(f1) < static_cast<std::uint16_t>(f2);
     }
-#endif
+
+
+
+    /**
+     * Global operator which performs a binary and for the provided arguments.
+     */
+    DEAL_II_CUDA_HOST_DEV inline ConstraintTypes
+    operator&(const ConstraintTypes f1, const ConstraintTypes f2)
+    {
+      return static_cast<ConstraintTypes>(static_cast<std::uint16_t>(f1) &
+                                          static_cast<std::uint16_t>(f2));
+    }
 
 
 
@@ -586,7 +601,8 @@ namespace internal
                   {
                     // If we don't already have a constraint for as part of a
                     // face
-                    if (!(mask & line_to_edge[local_line][0]))
+                    if ((mask & line_to_edge[local_line][0]) ==
+                        ConstraintTypes::unconstrained)
                       {
                         // For each cell which share that edge
                         const unsigned int line =
@@ -681,7 +697,8 @@ namespace internal
                       }
                   }
               }
-            cell_has_hanging_node_constraints |= mask != 0;
+            cell_has_hanging_node_constraints |=
+              mask != ConstraintTypes::unconstrained;
           }
       return cell_has_hanging_node_constraints;
     }

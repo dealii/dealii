@@ -1306,7 +1306,8 @@ namespace internal
         {
           auto &vec = dof_info[no].hanging_node_constraint_masks;
           if (std::all_of(vec.begin(), vec.end(), [](const auto i) {
-                return i == 0;
+                return i == internal::MatrixFreeFunctions::ConstraintTypes::
+                              unconstrained;
               }))
             vec.clear();
         }

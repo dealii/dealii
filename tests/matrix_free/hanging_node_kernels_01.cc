@@ -130,10 +130,11 @@ namespace dealii
 
         for (unsigned int v = 0; v < Number::size(); ++v)
           {
-            if (constraint_mask[v] == 0)
+            if (constraint_mask[v] == dealii::internal::MatrixFreeFunctions::
+                                        ConstraintTypes::unconstrained)
               continue;
 
-            const unsigned int this_type =
+            const auto this_type =
               (direction == 0) ?
                 dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_x :
                 dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_y;
@@ -147,9 +148,13 @@ namespace dealii
                 ((direction == 1) ? dealii::internal::MatrixFreeFunctions::
                                       ConstraintTypes::face_x :
                                     dealii::internal::MatrixFreeFunctions::
-                                      ConstraintTypes::unconstrained)));
+                                      ConstraintTypes::unconstrained))) !=
+              dealii::internal::MatrixFreeFunctions::ConstraintTypes::
+                unconstrained;
 
-            const bool type = constraint_mask[v] & this_type;
+            const bool type = (constraint_mask[v] & this_type) !=
+                              dealii::internal::MatrixFreeFunctions::
+                                ConstraintTypes::unconstrained;
 
             for (unsigned int x_idx = 0; x_idx < fe_degree + 1; ++x_idx)
               for (unsigned int y_idx = 0; y_idx < fe_degree + 1; ++y_idx)
@@ -166,15 +171,17 @@ namespace dealii
                   // (left (= 0) or right (= fe_degree))
                   const bool constrained_dof =
                     ((direction == 0) &&
-                     ((constraint_mask[v] &
-                       dealii::internal::MatrixFreeFunctions::ConstraintTypes::
-                         type_y) ?
+                     (((constraint_mask[v] &
+                        dealii::internal::MatrixFreeFunctions::ConstraintTypes::
+                          type_y) != dealii::internal::MatrixFreeFunctions::
+                                       ConstraintTypes::unconstrained) ?
                         (y_idx == 0) :
                         (y_idx == fe_degree))) ||
                     ((direction == 1) &&
-                     ((constraint_mask[v] &
-                       dealii::internal::MatrixFreeFunctions::ConstraintTypes::
-                         type_x) ?
+                     (((constraint_mask[v] &
+                        dealii::internal::MatrixFreeFunctions::ConstraintTypes::
+                          type_x) != dealii::internal::MatrixFreeFunctions::
+                                       ConstraintTypes::unconstrained) ?
                         (x_idx == 0) :
                         (x_idx == fe_degree)));
 
@@ -260,19 +267,19 @@ namespace dealii
         for (unsigned int i = 0; i < n_dofs; ++i)
           values_temp[i] = values[i];
 
-        const unsigned int this_type =
+        const auto this_type =
           (direction == 0) ?
             dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_x :
           (direction == 1) ?
             dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_y :
             dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_z;
-        const unsigned int face1_type =
+        const auto face1_type =
           (direction == 0) ?
             dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_y :
           (direction == 1) ?
             dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_z :
             dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_x;
-        const unsigned int face2_type =
+        const auto face2_type =
           (direction == 0) ?
             dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_z :
           (direction == 1) ?
@@ -282,19 +289,19 @@ namespace dealii
         // If computing in x-direction, need to match against
         // dealii::internal::MatrixFreeFunctions::ConstraintTypes::face_y or
         // dealii::internal::MatrixFreeFunctions::ConstraintTypes::face_z
-        const unsigned int face1 =
+        const auto face1 =
           (direction == 0) ?
             dealii::internal::MatrixFreeFunctions::ConstraintTypes::face_y :
           (direction == 1) ?
             dealii::internal::MatrixFreeFunctions::ConstraintTypes::face_z :
             dealii::internal::MatrixFreeFunctions::ConstraintTypes::face_x;
-        const unsigned int face2 =
+        const auto face2 =
           (direction == 0) ?
             dealii::internal::MatrixFreeFunctions::ConstraintTypes::face_z :
           (direction == 1) ?
             dealii::internal::MatrixFreeFunctions::ConstraintTypes::face_x :
             dealii::internal::MatrixFreeFunctions::ConstraintTypes::face_y;
-        const unsigned int edge =
+        const auto edge =
           (direction == 0) ?
             dealii::internal::MatrixFreeFunctions::ConstraintTypes::edge_yz :
           (direction == 1) ?
@@ -303,13 +310,16 @@ namespace dealii
 
         for (unsigned int v = 0; v < Number::size(); ++v)
           {
-            if (constraint_mask[v] == 0)
+            if (constraint_mask[v] == dealii::internal::MatrixFreeFunctions::
+                                        ConstraintTypes::unconstrained)
               continue;
 
-            const unsigned int constrained_face =
+            const auto constrained_face =
               constraint_mask[v] & (face1 | face2 | edge);
 
-            const bool type = constraint_mask[v] & this_type;
+            const bool type = (constraint_mask[v] & this_type) !=
+                              dealii::internal::MatrixFreeFunctions::
+                                ConstraintTypes::unconstrained;
 
             for (unsigned int x_idx = 0; x_idx < fe_degree + 1; ++x_idx)
               for (unsigned int y_idx = 0; y_idx < fe_degree + 1; ++y_idx)
@@ -326,18 +336,36 @@ namespace dealii
                                                                        y_idx;
 
                     typename Number::value_type t = 0;
-                    const bool on_face1 = (constraint_mask[v] & face1_type) ?
-                                            (face1_idx == 0) :
-                                            (face1_idx == fe_degree);
-                    const bool on_face2 = (constraint_mask[v] & face2_type) ?
-                                            (face2_idx == 0) :
-                                            (face2_idx == fe_degree);
+                    const bool                  on_face1 =
+                      ((constraint_mask[v] & face1_type) !=
+                       dealii::internal::MatrixFreeFunctions::ConstraintTypes::
+                         unconstrained) ?
+                                         (face1_idx == 0) :
+                                         (face1_idx == fe_degree);
+                    const bool on_face2 =
+                      ((constraint_mask[v] & face2_type) !=
+                       dealii::internal::MatrixFreeFunctions::ConstraintTypes::
+                         unconstrained) ?
+                        (face2_idx == 0) :
+                        (face2_idx == fe_degree);
                     const bool constrained_dof =
-                      (((constraint_mask[v] & face1) && on_face1) ||
-                       ((constraint_mask[v] & face2) && on_face2) ||
-                       ((constraint_mask[v] & edge) && on_face1 && on_face2));
+                      ((((constraint_mask[v] & face1) !=
+                         dealii::internal::MatrixFreeFunctions::
+                           ConstraintTypes::unconstrained) &&
+                        on_face1) ||
+                       (((constraint_mask[v] & face2) !=
+                         dealii::internal::MatrixFreeFunctions::
+                           ConstraintTypes::unconstrained) &&
+                        on_face2) ||
+                       (((constraint_mask[v] & edge) !=
+                         dealii::internal::MatrixFreeFunctions::
+                           ConstraintTypes::unconstrained) &&
+                        on_face1 && on_face2));
 
-                    if (constrained_face && constrained_dof)
+                    if ((constrained_face !=
+                         dealii::internal::MatrixFreeFunctions::
+                           ConstraintTypes::unconstrained) &&
+                        constrained_dof)
                       {
                         if (type)
                           {
