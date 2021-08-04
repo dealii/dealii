@@ -1,0 +1,15 @@
+
+DEAL::FE degrees: 1 - 4
+DEAL:2d::Total constraints:          8
+DEAL:2d::  Inhomogenous constraints: 0
+DEAL:2d::  Identity constraints:     0
+DEAL:3d::Total constraints:          55
+DEAL:3d::  Inhomogenous constraints: 0
+DEAL:3d::  Identity constraints:     3
+DEAL::FE degrees: 2 - 5
+DEAL:2d::Total constraints:          12
+DEAL:2d::  Inhomogenous constraints: 0
+DEAL:2d::  Identity constraints:     0
+DEAL:3d::Total constraints:          92
+DEAL:3d::  Inhomogenous constraints: 0
+DEAL:3d::  Identity constraints:     4

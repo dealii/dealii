@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2020 by the deal.II authors
+// Copyright (C) 2009 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -635,7 +635,11 @@ LaplaceProblem<dim>::run()
               << "   Number of hanging node constraints: "
               << hanging_nodes_only.n_constraints() << std::endl
               << "   Total number of constraints:        "
-              << test_all_constraints.n_constraints() << std::endl;
+              << test_all_constraints.n_constraints() << std::endl
+              << "   Number of inhomogenous constraints: "
+              << test_all_constraints.n_inhomogeneities() << std::endl
+              << "   Number of identity constraints:     "
+              << test_all_constraints.n_identities() << std::endl;
 
       assemble_reference();
       assemble_test_1();

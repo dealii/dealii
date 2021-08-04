@@ -5,6 +5,8 @@ DEAL:2d::   Number of active cells:             192
 DEAL:2d::   Number of degrees of freedom:       864
 DEAL:2d::   Number of hanging node constraints: 0
 DEAL:2d::   Total number of constraints:        192
+DEAL:2d::   Number of inhomogenous constraints: 188
+DEAL:2d::   Number of identity constraints:     0
 DEAL:2d::  Reference matrix nonzeros: 12672, actually: 8480
 DEAL:2d::  Test matrix 1 nonzeros: 12672, actually: 8480
 DEAL:2d::  Matrix difference norm: 0
@@ -21,6 +23,8 @@ DEAL:2d::   Number of active cells:             360
 DEAL:2d::   Number of degrees of freedom:       1588
 DEAL:2d::   Number of hanging node constraints: 36
 DEAL:2d::   Total number of constraints:        284
+DEAL:2d::   Number of inhomogenous constraints: 254
+DEAL:2d::   Number of identity constraints:     12
 DEAL:2d::  Reference matrix nonzeros: 24092, actually: 17520
 DEAL:2d::  Test matrix 1 nonzeros: 24092, actually: 17520
 DEAL:2d::  Matrix difference norm: 0
@@ -37,6 +41,8 @@ DEAL:2d::   Number of active cells:             690
 DEAL:2d::   Number of degrees of freedom:       2982
 DEAL:2d::   Number of hanging node constraints: 108
 DEAL:2d::   Total number of constraints:        408
+DEAL:2d::   Number of inhomogenous constraints: 314
+DEAL:2d::   Number of identity constraints:     36
 DEAL:2d::  Reference matrix nonzeros: 46420, actually: 36248
 DEAL:2d::  Test matrix 1 nonzeros: 46420, actually: 36248
 DEAL:2d::  Matrix difference norm: 0
@@ -53,6 +59,8 @@ DEAL:3d::   Number of active cells:             8
 DEAL:3d::   Number of degrees of freedom:       27
 DEAL:3d::   Number of hanging node constraints: 0
 DEAL:3d::   Total number of constraints:        26
+DEAL:3d::   Number of inhomogenous constraints: 25
+DEAL:3d::   Number of identity constraints:     0
 DEAL:3d::  Reference matrix nonzeros: 343, actually: 27
 DEAL:3d::  Test matrix 1 nonzeros: 343, actually: 27
 DEAL:3d::  Matrix difference norm: 0
@@ -69,6 +77,8 @@ DEAL:3d::   Number of active cells:             22
 DEAL:3d::   Number of degrees of freedom:       60
 DEAL:3d::   Number of hanging node constraints: 16
 DEAL:3d::   Total number of constraints:        56
+DEAL:3d::   Number of inhomogenous constraints: 55
+DEAL:3d::   Number of identity constraints:     0
 DEAL:3d::  Reference matrix nonzeros: 1006, actually: 66
 DEAL:3d::  Test matrix 1 nonzeros: 1006, actually: 66
 DEAL:3d::  Matrix difference norm: 0
@@ -85,6 +95,8 @@ DEAL:3d::   Number of active cells:             92
 DEAL:3d::   Number of degrees of freedom:       189
 DEAL:3d::   Number of hanging node constraints: 55
 DEAL:3d::   Total number of constraints:        158
+DEAL:3d::   Number of inhomogenous constraints: 148
+DEAL:3d::   Number of identity constraints:     0
 DEAL:3d::  Reference matrix nonzeros: 3767, actually: 415
 DEAL:3d::  Test matrix 1 nonzeros: 3767, actually: 415
 DEAL:3d::  Matrix difference norm: 0
