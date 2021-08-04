@@ -761,6 +761,62 @@ protected:
  * @endcode
  * The savings in work to write this are apparent.
  *
+ * Finally, these lambda functions can be used as a way to map points in
+ * different ways. As an example, let us assume that we have computed
+ * the solution to a one-dimensional problem and that that solution
+ * resides in the following variables:
+ * @code
+ *   DoFHandler<1>  dof_handler_1d;
+ *   Vector<double> solution_1d;
+ * @endcode
+ * We will denote this solution function described by this DoFHandler
+ * and vector object by $u_h(x)$ where $x$ is a vector with just one
+ * component, and consequently is not shown in boldface. Then assume
+ * that we want this $u_h(x)$ to be used as a boundary condition for a 2d
+ * problem at the line $y=0$. Let's say that this line corresponds to
+ * @ref GlossBoundaryIndicator "boundary indicator" 123.
+ * If we say that the 2d problem is associated with
+ * @code
+ *   DoFHandler<2> dof_handler_2d;
+ * @endcode
+ * then in order to evaluate the boundary conditions for this 2d problem,
+ * we would want to call VectorTools::interpolate_boundary_values()
+ * via
+ * @code
+ *   AffineConstraints<double> boundary_values_2d;
+ *   VectorTools::interpolate_boundary_values (dof_handler_2d,
+ *                                             123,
+ *                                             ???,
+ *                                             boundary_values_2d);
+ * @endcode
+ * The question here is what to use as the Function object that can be passed
+ * as third argument. It needs to be a Function<2> object, i.e., it
+ * receives a 2d input point and is supposed to return the value at that
+ * point. What we *want* it to do is to just take the $x$ component of the
+ * input point and evaluate the 1d solution at that point, knowing that at
+ * the boundary with indicator 123, the $y$ component of the input point
+ * must be zero. This all can be achieved via the following function
+ * object:
+ * @code
+ *   Functions::FEFieldFunction<1>
+ *     solution_1d_as_function_object (dof_handler_1d, solution_1d);
+ *   auto boundary_evaluator
+ *     = [&] (const Point<2> &p)
+ *       {
+ *          // First extract the x component of the input point:
+ *          const Point<1> point_on_axis (p[0]);
+ *
+ *          // Then evaluate the 1d solution at that point:
+ *          return solution_1d_as_function_object.value(point_on_axis);
+ *       }
+ *
+ *   AffineConstraints<double> boundary_values_2d;
+ *   VectorTools::interpolate_boundary_values (dof_handler_2d,
+ *                                             123,
+ *                                             ScalarFunctionFromFunctionObject<2>(boundary_evaluator),
+ *                                             boundary_values_2d);
+ * @endcode
+ *
  * @ingroup functions
  */
 template <int dim, typename RangeNumberType = double>
