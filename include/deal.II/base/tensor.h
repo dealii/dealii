@@ -1428,8 +1428,11 @@ template <int rank_, int dim, typename Number>
 inline Number *
 Tensor<rank_, dim, Number>::begin_raw()
 {
+  // Recursively get at the address of the underlying objects
   return std::addressof(
-    this->operator[](this->unrolled_to_component_indices(0)));
+    (*reinterpret_cast<
+      Number(*)[(n_independent_components > 0) ? n_independent_components : 1]>(
+      values[0].begin_raw()))[0]);
 }
 
 
@@ -1438,8 +1441,11 @@ template <int rank_, int dim, typename Number>
 inline const Number *
 Tensor<rank_, dim, Number>::begin_raw() const
 {
+  // Recursively get at the address of the underlying objects
   return std::addressof(
-    this->operator[](this->unrolled_to_component_indices(0)));
+    (*reinterpret_cast<const Number(
+         *)[(n_independent_components > 0) ? n_independent_components : 1]>(
+      values[0].begin_raw()))[0]);
 }
 
 
