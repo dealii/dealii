@@ -30,6 +30,7 @@
 
 #include <boost/range/iterator_range.hpp>
 
+#include <algorithm>
 #include <set>
 #include <type_traits>
 #include <utility>
@@ -842,6 +843,21 @@ public:
    */
   size_type
   n_constraints() const;
+
+  /**
+   * Return number of constraints stored in this matrix that are identities,
+   * i.e., those constraints with only one degree of freedom and weight one.
+   */
+  size_type
+  n_identities() const;
+
+  /**
+   * Return number of constraints stored in this matrix that have an
+   * inhomogenity, i.e., those constraints with a non-trivial inhomogeneous
+   * value.
+   */
+  size_type
+  n_inhomogeneities() const;
 
   /**
    * Return whether the degree of freedom with number @p line_n is a
@@ -2128,6 +2144,29 @@ AffineConstraints<number>::n_constraints() const
 }
 
 template <typename number>
+inline types::global_dof_index
+AffineConstraints<number>::n_identities() const
+{
+  return std::count_if(lines.begin(),
+                       lines.end(),
+                       [](const ConstraintLine &line) {
+                         return (line.entries.size() == 1) &&
+                                (line.entries[0].second == number(1.));
+                       });
+}
+
+template <typename number>
+inline types::global_dof_index
+AffineConstraints<number>::n_inhomogeneities() const
+{
+  return std::count_if(lines.begin(),
+                       lines.end(),
+                       [](const ConstraintLine &line) {
+                         return (line.inhomogeneity != number(0.));
+                       });
+}
+
+template <typename number>
 inline bool
 AffineConstraints<number>::is_constrained(const size_type index) const
 {
@@ -2150,7 +2189,7 @@ AffineConstraints<number>::is_inhomogeneously_constrained(
   else
     {
       Assert(lines_cache[line_index] < lines.size(), ExcInternalError());
-      return !(lines[lines_cache[line_index]].inhomogeneity == number(0.));
+      return (lines[lines_cache[line_index]].inhomogeneity != number(0.));
     }
 }
 
