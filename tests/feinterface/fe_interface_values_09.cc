@@ -76,16 +76,17 @@ print_norm_of_average_over_quadrature_points(const FEInterfaceValues<dim> &fiv)
   cell_vector = 0.0;
   for (unsigned int qpoint = 0; qpoint < fiv.n_quadrature_points; ++qpoint)
     for (unsigned int i = 0; i < n_dofs; ++i)
-      cell_vector(i) +=
-        fiv.jump_hessian(i, qpoint).norm() * fiv.get_JxW_values()[qpoint];
-  deallog << "jump_hessian.norm(): " << cell_vector << std::endl;
+      cell_vector(i) += fiv.jump_in_shape_hessians(i, qpoint).norm() *
+                        fiv.get_JxW_values()[qpoint];
+  deallog << "jump_in_shape_hessians.norm(): " << cell_vector << std::endl;
 
   cell_vector = 0.0;
   for (unsigned int qpoint = 0; qpoint < fiv.n_quadrature_points; ++qpoint)
     for (unsigned int i = 0; i < n_dofs; ++i)
-      cell_vector(i) += fiv.jump_3rd_derivative(i, qpoint).norm() *
+      cell_vector(i) += fiv.jump_in_shape_3rd_derivatives(i, qpoint).norm() *
                         fiv.get_JxW_values()[qpoint];
-  deallog << "jump_3rd_derivative.norm(): " << cell_vector << std::endl;
+  deallog << "jump_in_shape_3rd_derivatives.norm(): " << cell_vector
+          << std::endl;
 }
 
 

@@ -79,17 +79,22 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
                   if (fe_iv[single_component].value(false, i, q) != 0)
                     deallog << fe_iv[single_component].value(false, i, q)
                             << "  ";
-                  if (fe_iv[single_component].jump(i, q) != 0)
-                    deallog << fe_iv[single_component].jump(i, q) << "  ";
-                  if (fe_iv[single_component].average(i, q) != 0)
-                    deallog << fe_iv[single_component].average(i, q) << "  ";
-                  if (fe_iv[single_component].jump_gradient(i, q).norm() != 0)
-                    deallog << fe_iv[single_component].jump_gradient(i, q)
+                  if (fe_iv[single_component].jump_in_values(i, q) != 0)
+                    deallog << fe_iv[single_component].jump_in_values(i, q)
                             << "  ";
-                  if (fe_iv[single_component].average_gradient(i, q).norm() !=
+                  if (fe_iv[single_component].average_of_values(i, q) != 0)
+                    deallog << fe_iv[single_component].average_of_values(i, q)
+                            << "  ";
+                  if (fe_iv[single_component].jump_in_gradients(i, q).norm() !=
                       0)
-                    deallog << fe_iv[single_component].average_gradient(i, q)
-                            << std::endl;
+                    deallog << fe_iv[single_component].jump_in_gradients(i, q)
+                            << "  ";
+                  if (fe_iv[single_component]
+                        .average_of_gradients(i, q)
+                        .norm() != 0)
+                    deallog
+                      << fe_iv[single_component].average_of_gradients(i, q)
+                      << std::endl;
 
 
                   Assert(fe_iv[single_component].value(true, i, q) ==
@@ -98,24 +103,23 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
                   Assert(fe_iv[single_component].value(false, i, q) ==
                            fe_iv.shape_value(false, i, q, c),
                          ExcInternalError());
-                  Assert(fe_iv[single_component].jump(i, q) ==
-                           fe_iv.jump(i, q, c),
+                  Assert(fe_iv[single_component].jump_in_values(i, q) ==
+                           fe_iv.jump_in_shape_values(i, q, c),
                          ExcInternalError());
-                  Assert(fe_iv[single_component].average(i, q) ==
-                           fe_iv.average(i, q, c),
+                  Assert(fe_iv[single_component].average_of_values(i, q) ==
+                           fe_iv.average_of_shape_values(i, q, c),
                          ExcInternalError());
-                  Assert(fe_iv[single_component].average_hessian(i, q) ==
-                           fe_iv.average_hessian(i, q, c),
+                  Assert(fe_iv[single_component].average_of_hessians(i, q) ==
+                           fe_iv.average_of_shape_hessians(i, q, c),
                          ExcInternalError());
-                  Assert(fe_iv[single_component].jump_hessian(i, q) ==
-                           fe_iv.jump_hessian(i, q, c),
-                         ExcInternalError());
-
-                  Assert(fe_iv[single_component].jump_3rd_derivative(i, q) ==
-                           fe_iv.jump_3rd_derivative(i, q, c),
+                  Assert(fe_iv[single_component].jump_in_hessians(i, q) ==
+                           fe_iv.jump_in_shape_hessians(i, q, c),
                          ExcInternalError());
 
-
+                  Assert(fe_iv[single_component].jump_in_third_derivatives(i,
+                                                                           q) ==
+                           fe_iv.jump_in_shape_3rd_derivatives(i, q, c),
+                         ExcInternalError());
 
                 } // q loop
 

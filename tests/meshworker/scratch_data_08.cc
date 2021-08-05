@@ -210,9 +210,10 @@ test()
         for (unsigned int j = 0; j < n_dofs; ++j)
           {
             face_matrix(i, j) +=
-              (-fev.jump_gradient(i, q) * n[q] * fev.average(j, q) -
-               fev.average(i, q) * fev.jump_gradient(j, q) * n[q] +
-               gh * fev.jump(i, q) * fev.jump(j, q)) *
+              (-fev.jump_in_shape_gradients(i, q) * n[q] * fev.average(j, q) -
+               fev.average(i, q) * fev.jump_in_shape_gradients(j, q) * n[q] +
+               gh * fev.jump_in_shape_values(i, q) *
+                 fev.jump_in_shape_values(j, q)) *
               JxW[q];
           }
   };

@@ -89,17 +89,26 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
                       if (fe_iv[vec_components].value(false, i, q).norm() != 0)
                         deallog << fe_iv[vec_components].value(false, i, q)
                                 << "  ";
-                      if (fe_iv[vec_components].jump(i, q).norm() != 0)
-                        deallog << fe_iv[vec_components].jump(i, q) << "  ";
-                      if (fe_iv[vec_components].average(i, q).norm() != 0)
-                        deallog << fe_iv[vec_components].average(i, q) << "  ";
-                      if (fe_iv[vec_components].jump_gradient(i, q).norm() != 0)
-                        deallog << fe_iv[vec_components].jump_gradient(i, q)
-                                << "  ";
-                      if (fe_iv[vec_components].average_gradient(i, q).norm() !=
+                      if (fe_iv[vec_components].jump_in_values(i, q).norm() !=
                           0)
-                        deallog << fe_iv[vec_components].average_gradient(i, q)
-                                << std::endl;
+                        deallog << fe_iv[vec_components].jump_in_values(i, q)
+                                << "  ";
+                      if (fe_iv[vec_components]
+                            .average_of_values(i, q)
+                            .norm() != 0)
+                        deallog << fe_iv[vec_components].average_of_values(i, q)
+                                << "  ";
+                      if (fe_iv[vec_components]
+                            .jump_in_gradients(i, q)
+                            .norm() != 0)
+                        deallog << fe_iv[vec_components].jump_in_gradients(i, q)
+                                << "  ";
+                      if (fe_iv[vec_components]
+                            .average_of_gradients(i, q)
+                            .norm() != 0)
+                        deallog
+                          << fe_iv[vec_components].average_of_gradients(i, q)
+                          << std::endl;
 
                       for (unsigned int d = 0; d < dim; ++d)
                         {
@@ -109,24 +118,28 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
                           Assert(fe_iv[vec_components].value(false, i, q)[d] ==
                                    fe_iv.shape_value(false, i, q, c + d),
                                  ExcInternalError());
-                          Assert(fe_iv[vec_components].jump(i, q)[d] ==
-                                   fe_iv.jump(i, q, c + d),
+                          Assert(fe_iv[vec_components].jump_in_values(i,
+                                                                      q)[d] ==
+                                   fe_iv.jump_in_shape_values(i, q, c + d),
                                  ExcInternalError());
-                          Assert(fe_iv[vec_components].average(i, q)[d] ==
-                                   fe_iv.average(i, q, c + d),
+                          Assert(
+                            fe_iv[vec_components].average_of_values(i, q)[d] ==
+                              fe_iv.average_of_shape_values(i, q, c + d),
+                            ExcInternalError());
+                          Assert(fe_iv[vec_components].average_of_hessians(
+                                   i, q)[d] ==
+                                   fe_iv.average_of_shape_hessians(i, q, c + d),
                                  ExcInternalError());
-                          Assert(fe_iv[vec_components].average_hessian(i,
-                                                                       q)[d] ==
-                                   fe_iv.average_hessian(i, q, c + d),
-                                 ExcInternalError());
-                          Assert(fe_iv[vec_components].jump_hessian(i, q)[d] ==
-                                   fe_iv.jump_hessian(i, q, c + d),
+                          Assert(fe_iv[vec_components].jump_in_hessians(i,
+                                                                        q)[d] ==
+                                   fe_iv.jump_in_shape_hessians(i, q, c + d),
                                  ExcInternalError());
 
-                          Assert(fe_iv[vec_components].jump_3rd_derivative(
-                                   i, q)[d] ==
-                                   fe_iv.jump_3rd_derivative(i, q, c + d),
-                                 ExcInternalError());
+                          Assert(
+                            fe_iv[vec_components].jump_in_third_derivatives(
+                              i, q)[d] ==
+                              fe_iv.jump_in_shape_3rd_derivatives(i, q, c + d),
+                            ExcInternalError());
                         }
                     }
               }

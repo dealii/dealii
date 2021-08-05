@@ -365,7 +365,7 @@ namespace Step12
           for (unsigned int i = 0; i < n_dofs; ++i)
             for (unsigned int j = 0; j < n_dofs; ++j)
               copy_data_face.cell_matrix(i, j) +=
-                fe_facet.jump(i, qpoint)                        // [\phi_i]
+                fe_facet.jump_in_shape_values(i, qpoint)        // [\phi_i]
                 * fe_facet.shape_value((beta_n > 0), j, qpoint) // phi_j^{UP}
                 * beta_n                                        // (\beta . n)
                 * JxW[qpoint];                                  // dx
