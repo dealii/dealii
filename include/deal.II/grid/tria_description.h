@@ -430,6 +430,48 @@ namespace TriangulationDescription
      * dealii::parallel::distributed::Triangulation, where the partitioning is
      * adopted unaltered.
      *
+     * Example for a serial Triangulation:
+     *
+     * @code
+     * Triangulation<dim, spacedim> tria_base;
+     *
+     * // fill serial triangulation (e.g., read external mesh)
+     * GridIn<dim, spacedim> grid_in;
+     * grid_in.attach_triangulation(tria_base);
+     * grid_in.read(file_name);
+     *
+     * // partition serial triangulation
+     * GridTools::partition_triangulation(
+     *   Utilities::MPI::n_mpi_processes(comm), tria_base);
+     *
+     * // create description
+     * const TriangulationDescription::Description<dim, spacedim> description =
+     *   TriangulationDescription::Utilities::
+     *     create_description_from_triangulation(tria_base, comm);
+     *
+     * // create triangulation
+     * parallel::fullydistributed::Triangulation<dim, spacedim> tria_pft(comm);
+     * tria_pft.create_triangulation(description);
+     * @endcode
+     *
+     * Example for parallel::distributed::Triangulation (partitioning can be
+     * skipped, since the trianguation has already been partitioned by p4est):
+     *
+     * @code
+     * parallel::distributed::Triangulation<dim, spacedim> tria_base(comm);
+     *
+     * // fill tria_base (not shown)
+     *
+     * // create triangulation
+     * const TriangulationDescription::Description<dim, spacedim> description =
+     *   TriangulationDescription::Utilities::
+     *     create_description_from_triangulation(tria_base, comm);
+     *
+     * // create triangulation
+     * parallel::fullydistributed::Triangulation<dim, spacedim> tria_pft(comm);
+     * tria_pft.create_triangulation(description);
+     * @endcode
+     *
      * @param tria Partitioned input triangulation.
      * @param comm MPI_Communicator to be used. In the case
      *   of dealii::parallel::distributed::Triangulation, the communicators have
@@ -484,6 +526,35 @@ namespace TriangulationDescription
      * every n-th/each root of a group of size group_size) create a serial
      * triangulation and the TriangulationDescription::Description for all
      * processes in its group, which is communicated.
+     *
+     * This function can also be used to read an external mesh only once (by
+     * the root process and a group consisting all processes). The following
+     * code snippet shows a modified version of the example provided in the
+     * documentation of create_description_from_triangulation().
+     * Function calls that only need to be performed by the root process
+     * (read and partition mesh) have been moved into `std::function` objects.
+     *
+     * @code
+     * // create and partition serial triangulation and create description
+     * const TriangulationDescription::Description<dim, spacedim> description =
+     *   TriangulationDescription::Utilities::
+     *     create_description_from_triangulation_in_groups<dim, spacedim>(
+     *       [file_name](auto &tria_base) {
+     *         GridIn<dim, spacedim> grid_in;
+     *         grid_in.attach_triangulation(tria_base);
+     *         grid_in.read(file_name);
+     *       },
+     *       [](auto &tria_base, const auto comm, const auto group_size) {
+     *         GridTools::partition_triangulation(
+     *           Utilities::MPI::n_mpi_processes(comm), tria_base);
+     *       },
+     *       comm,
+     *       Utilities::MPI::n_mpi_processes(comm));
+     *
+     * // create triangulation
+     * parallel::fullydistributed::Triangulation<dim, spacedim> tria_pft(comm);
+     * tria_pft.create_triangulation(description);
+     * @endcode
      *
      * @note A reasonable group size is the size of a NUMA domain or the
      * size of a compute node.
