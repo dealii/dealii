@@ -468,11 +468,6 @@ namespace internal
     Number *                                      scratch_data,
     const bool                                    add_into_values_array)
   {
-    // TODO: implement hessians
-    (void)hessians_quad;
-    AssertThrow(!(integration_flag & EvaluationFlags::hessians),
-                ExcNotImplemented());
-
     const EvaluatorVariant variant =
       EvaluatorSelector<type, (fe_degree + n_q_points_1d > 4)>::variant;
     using Eval = EvaluatorTensorProduct<variant,
@@ -549,11 +544,23 @@ namespace internal
                     eval.template gradients<0, false, false>(gradients_quad,
                                                              values_dofs);
                 }
+              if (integration_flag & EvaluationFlags::hessians)
+                {
+                  if (integration_flag & EvaluationFlags::values ||
+                      integration_flag & EvaluationFlags::gradients ||
+                      add_into_values_array == true)
+                    eval.template hessians<0, false, true>(hessians_quad,
+                                                           values_dofs);
+                  else
+                    eval.template hessians<0, false, false>(hessians_quad,
+                                                            values_dofs);
+                }
 
               // advance to the next component in 1D array
               values_dofs += dofs_per_comp;
               values_quad += n_q_points;
               gradients_quad += n_q_points;
+              hessians_quad += n_q_points;
             }
           break;
 
@@ -583,11 +590,36 @@ namespace internal
                   eval.template values<1, false, false>(gradients_quad, temp1);
                   eval.template gradients<0, false, true>(temp1, values_dofs);
                 }
+              if (integration_flag & EvaluationFlags::hessians)
+                {
+                  // grad xx
+                  eval.template values<1, false, false>(hessians_quad, temp1);
+
+                  if (integration_flag & EvaluationFlags::values ||
+                      integration_flag & EvaluationFlags::gradients ||
+                      add_into_values_array == true)
+                    eval.template hessians<0, false, true>(temp1, values_dofs);
+                  else
+                    eval.template hessians<0, false, false>(temp1, values_dofs);
+
+                  // grad yy
+                  eval.template hessians<1, false, false>(hessians_quad +
+                                                            n_q_points,
+                                                          temp1);
+                  eval.template values<0, false, true>(temp1, values_dofs);
+
+                  // grad xy
+                  eval.template gradients<1, false, false>(hessians_quad +
+                                                             2 * n_q_points,
+                                                           temp1);
+                  eval.template gradients<0, false, true>(temp1, values_dofs);
+                }
 
               // advance to the next component in 1D array
               values_dofs += dofs_per_comp;
               values_quad += n_q_points;
               gradients_quad += 2 * n_q_points;
+              hessians_quad += 3 * n_q_points;
             }
           break;
 
@@ -624,11 +656,60 @@ namespace internal
                   eval.template values<1, false, false>(temp1, temp2);
                   eval.template gradients<0, false, true>(temp2, values_dofs);
                 }
+              if (integration_flag & EvaluationFlags::hessians)
+                {
+                  // grad xx
+                  eval.template values<2, false, false>(hessians_quad, temp1);
+                  eval.template values<1, false, false>(temp1, temp2);
+
+                  if (integration_flag & EvaluationFlags::values ||
+                      integration_flag & EvaluationFlags::gradients ||
+                      add_into_values_array == true)
+                    eval.template hessians<0, false, true>(temp2, values_dofs);
+                  else
+                    eval.template hessians<0, false, false>(temp2, values_dofs);
+
+                  // grad yy
+                  eval.template values<2, false, false>(hessians_quad +
+                                                          n_q_points,
+                                                        temp1);
+                  eval.template hessians<1, false, false>(temp1, temp2);
+                  eval.template values<0, false, true>(temp2, values_dofs);
+
+                  // grad zz
+                  eval.template hessians<2, false, false>(hessians_quad +
+                                                            2 * n_q_points,
+                                                          temp1);
+                  eval.template values<1, false, false>(temp1, temp2);
+                  eval.template values<0, false, true>(temp2, values_dofs);
+
+                  // grad xy
+                  eval.template values<2, false, false>(hessians_quad +
+                                                          3 * n_q_points,
+                                                        temp1);
+                  eval.template gradients<1, false, false>(temp1, temp2);
+                  eval.template gradients<0, false, true>(temp2, values_dofs);
+
+                  // grad xz
+                  eval.template gradients<2, false, false>(hessians_quad +
+                                                             4 * n_q_points,
+                                                           temp1);
+                  eval.template values<1, false, false>(temp1, temp2);
+                  eval.template gradients<0, false, true>(temp2, values_dofs);
+
+                  // grad yz
+                  eval.template gradients<2, false, false>(hessians_quad +
+                                                             5 * n_q_points,
+                                                           temp1);
+                  eval.template gradients<1, false, false>(temp1, temp2);
+                  eval.template values<0, false, true>(temp2, values_dofs);
+                }
 
               // advance to the next component in 1D array
               values_dofs += dofs_per_comp;
               values_quad += n_q_points;
               gradients_quad += 3 * n_q_points;
+              hessians_quad += 6 * n_q_points;
             }
           break;
 
@@ -1374,15 +1455,9 @@ namespace internal
     Number *                                      values_quad,
     Number *                                      gradients_quad,
     Number *                                      hessians_quad,
-    Number *,
-    const bool add_into_values_array)
+    Number *                                      scratch_data,
+    const bool                                    add_into_values_array)
   {
-    // TODO: implement hessians
-    (void)hessians_quad;
-    AssertThrow(!(integration_flag & EvaluationFlags::hessians),
-                ExcNotImplemented());
-
-
     AssertDimension(
       shape_info.data.front().shape_gradients_collocation_eo.size(),
       (fe_degree + 2) / 2 * (fe_degree + 1));
@@ -1396,6 +1471,7 @@ namespace internal
            shape_info.data.front().shape_gradients_collocation_eo,
            shape_info.data.front().shape_hessians_collocation_eo);
     constexpr unsigned int n_q_points = Utilities::pow(fe_degree + 1, dim);
+    constexpr unsigned int hdim       = (dim * (dim + 1)) / 2;
 
     for (unsigned int c = 0; c < n_components; c++)
       {
@@ -1425,6 +1501,60 @@ namespace internal
               eval.template gradients<2, false, true>(gradients_quad +
                                                         2 * n_q_points,
                                                       values_dofs);
+          }
+        if (integration_flag & EvaluationFlags::hessians)
+          {
+            // diagonal
+            // grad xx
+            if (integration_flag & EvaluationFlags::values ||
+                integration_flag & EvaluationFlags::gradients ||
+                add_into_values_array == true)
+              eval.template hessians<0, false, true>(hessians_quad,
+                                                     values_dofs);
+            else
+              eval.template hessians<0, false, false>(hessians_quad,
+                                                      values_dofs);
+            // grad yy
+            if (dim > 1)
+              eval.template hessians<1, false, true>(hessians_quad + n_q_points,
+                                                     values_dofs);
+            // grad zz
+            if (dim > 2)
+              eval.template hessians<2, false, true>(hessians_quad +
+                                                       2 * n_q_points,
+                                                     values_dofs);
+            // off-diagonal
+            if (dim == 2)
+              {
+                // grad xy
+                eval.template gradients<0, false, false>(hessians_quad +
+                                                           2 * n_q_points,
+                                                         scratch_data);
+                eval.template gradients<1, false, true>(scratch_data,
+                                                        values_dofs);
+              }
+            if (dim == 3)
+              {
+                // grad xy
+                eval.template gradients<0, false, false>(hessians_quad +
+                                                           3 * n_q_points,
+                                                         scratch_data);
+                eval.template gradients<1, false, true>(scratch_data,
+                                                        values_dofs);
+                // grad xz
+                eval.template gradients<0, false, false>(hessians_quad +
+                                                           4 * n_q_points,
+                                                         scratch_data);
+                eval.template gradients<2, false, true>(scratch_data,
+                                                        values_dofs);
+                // grad yz
+                eval.template gradients<1, false, false>(hessians_quad +
+                                                           5 * n_q_points,
+                                                         scratch_data);
+                eval.template gradients<2, false, true>(scratch_data,
+                                                        values_dofs);
+              }
+            hessians_quad += hdim * n_q_points;
           }
         gradients_quad += dim * n_q_points;
         values_quad += n_q_points;
@@ -1539,11 +1669,11 @@ namespace internal
     Number>::integrate(const unsigned int                     n_components,
                        const EvaluationFlags::EvaluationFlags integration_flag,
                        const MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
-                       Number *values_dofs,
-                       Number *values_quad,
-                       Number *gradients_quad,
-                       Number *hessians_quad,
-                       Number *,
+                       Number *   values_dofs,
+                       Number *   values_quad,
+                       Number *   gradients_quad,
+                       Number *   hessians_quad,
+                       Number *   scratch_data,
                        const bool add_into_values_array)
   {
     Assert(n_q_points_1d > fe_degree,
@@ -1555,11 +1685,13 @@ namespace internal
       shape_info.data.front().shape_gradients_collocation_eo.size(),
       (n_q_points_1d + 1) / 2 * n_q_points_1d);
     constexpr unsigned int n_q_points = Utilities::pow(n_q_points_1d, dim);
+    constexpr unsigned int hdim       = (dim * (dim + 1)) / 2;
 
     for (unsigned int c = 0; c < n_components; c++)
       {
         // apply derivatives in collocation space
-        if (integration_flag & EvaluationFlags::gradients)
+        if (integration_flag &
+            (EvaluationFlags::gradients | EvaluationFlags::hessians))
           FEEvaluationImplCollocation<dim, n_q_points_1d - 1, Number>::
             integrate(1,
                       integration_flag & (EvaluationFlags::gradients |
@@ -1569,7 +1701,7 @@ namespace internal
                       nullptr,
                       gradients_quad,
                       hessians_quad,
-                      nullptr,
+                      scratch_data,
                       /*add_into_values_array=*/integration_flag &
                         EvaluationFlags::values);
 
@@ -1586,6 +1718,7 @@ namespace internal
                                add_into_values_array,
                                values_quad,
                                values_dofs);
+        hessians_quad += hdim * n_q_points;
         gradients_quad += dim * n_q_points;
         values_quad += n_q_points;
         values_dofs += shape_info.dofs_per_component_on_cell;
