@@ -488,9 +488,6 @@ namespace Step74
       const FEInterfaceValues<dim> &fe_iv =
         scratch_data.reinit(cell, f, sf, ncell, nf, nsf);
 
-      const auto &       q_points   = fe_iv.get_quadrature_points();
-      const unsigned int n_q_points = q_points.size();
-
       copy_data.face_data.emplace_back();
       CopyDataFace &     copy_data_face = copy_data.face_data.back();
       const unsigned int n_dofs_face    = fe_iv.n_current_interface_dofs();
@@ -504,10 +501,10 @@ namespace Step74
       const double extent2 = ncell->measure() / ncell->face(nf)->measure();
       const double penalty = get_penalty_factor(degree, extent1, extent2);
 
-      for (unsigned int point = 0; point < n_q_points; ++point)
+      for (const unsigned int point : fe_iv.quadrature_point_indices())
         {
-          for (unsigned int i = 0; i < n_dofs_face; ++i)
-            for (unsigned int j = 0; j < n_dofs_face; ++j)
+          for (const unsigned int i : fe_iv.dof_indices())
+            for (const unsigned int j : fe_iv.dof_indices())
               copy_data_face.cell_matrix(i, j) +=
                 (-diffusion_coefficient *                     // - nu
                    fe_iv.jump_in_shape_values(i, point) *     // [v_h]
