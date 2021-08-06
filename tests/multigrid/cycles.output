@@ -3,24 +3,32 @@ DEAL::V-cycle entering level 4
 DEAL::V-cycle  Defect norm   0
 DEAL::Smoothing on     level 4
 DEAL::Solution norm          0
+DEAL::Residual step    level 4
+DEAL::Edge prol. level       4
 DEAL::Residual on      level 4
 DEAL::Residual norm          0
 DEAL::V-cycle entering level 3
 DEAL::V-cycle  Defect norm   0
 DEAL::Smoothing on     level 3
 DEAL::Solution norm          0
+DEAL::Residual step    level 3
+DEAL::Edge prol. level       3
 DEAL::Residual on      level 3
 DEAL::Residual norm          0
 DEAL::V-cycle entering level 2
 DEAL::V-cycle  Defect norm   0
 DEAL::Smoothing on     level 2
 DEAL::Solution norm          0
+DEAL::Residual step    level 2
+DEAL::Edge prol. level       2
 DEAL::Residual on      level 2
 DEAL::Residual norm          0
 DEAL::V-cycle entering level 1
 DEAL::V-cycle  Defect norm   0
 DEAL::Smoothing on     level 1
 DEAL::Solution norm          0
+DEAL::Residual step    level 1
+DEAL::Edge prol. level       1
 DEAL::Residual on      level 1
 DEAL::Residual norm          0
 DEAL::V-cycle entering level 0
@@ -31,52 +39,52 @@ DEAL::V-cycle  Defect norm   0
 DEAL::Smoothing on     level 1
 DEAL::Solution norm          0
 DEAL::V-cycle leaving  level 1
-DEAL::Residual step    level 1
-DEAL::Edge prol. level       1
 DEAL::Prolongate norm        0
 DEAL::V-cycle  Defect norm   0
 DEAL::Smoothing on     level 2
 DEAL::Solution norm          0
 DEAL::V-cycle leaving  level 2
-DEAL::Residual step    level 2
-DEAL::Edge prol. level       2
 DEAL::Prolongate norm        0
 DEAL::V-cycle  Defect norm   0
 DEAL::Smoothing on     level 3
 DEAL::Solution norm          0
 DEAL::V-cycle leaving  level 3
-DEAL::Residual step    level 3
-DEAL::Edge prol. level       3
 DEAL::Prolongate norm        0
 DEAL::V-cycle  Defect norm   0
 DEAL::Smoothing on     level 4
 DEAL::Solution norm          0
 DEAL::V-cycle leaving  level 4
-DEAL::Residual step    level 4
-DEAL::Edge prol. level       4
 DEAL::
 DEAL::W-cycle entering level  4
 DEAL::W-cycle defect norm     0
 DEAL::W-cycle smoothing level 4
 DEAL::W-cycle solution norm   0
+DEAL::W-cycle Res. step level 4
+DEAL::W-cycle Edge pro. level 4
 DEAL::W-cycle residual level  4
 DEAL::W-cycle residual norm   0
 DEAL::W-cycle entering level  3
 DEAL::W-cycle defect norm     0
 DEAL::W-cycle smoothing level 3
 DEAL::W-cycle solution norm   0
+DEAL::W-cycle Res. step level 3
+DEAL::W-cycle Edge pro. level 3
 DEAL::W-cycle residual level  3
 DEAL::W-cycle residual norm   0
 DEAL::W-cycle entering level  2
 DEAL::W-cycle defect norm     0
 DEAL::W-cycle smoothing level 2
 DEAL::W-cycle solution norm   0
+DEAL::W-cycle Res. step level 2
+DEAL::W-cycle Edge pro. level 2
 DEAL::W-cycle residual level  2
 DEAL::W-cycle residual norm   0
 DEAL::W-cycle entering level  1
 DEAL::W-cycle defect norm     0
 DEAL::W-cycle smoothing level 1
 DEAL::W-cycle solution norm   0
+DEAL::W-cycle Res. step level 1
+DEAL::W-cycle Edge pro. level 1
 DEAL::W-cycle residual level  1
 DEAL::W-cycle residual norm   0
 DEAL::W-cycle entering level  0
@@ -86,12 +94,12 @@ DEAL::W-cycle  Defect norm    0
 DEAL::W-cycle smoothing level 1
 DEAL::W-cycle solution norm   0
 DEAL::W-cycle leaving level   1
-DEAL::W-cycle Res. step level 1
-DEAL::W-cycle Edge pro. level 1
 DEAL::W-cycle entering level  1
 DEAL::W-cycle defect norm     0
 DEAL::W-cycle smoothing level 1
 DEAL::W-cycle solution norm   0
+DEAL::W-cycle Res. step level 1
+DEAL::W-cycle Edge pro. level 1
 DEAL::W-cycle residual level  1
 DEAL::W-cycle residual norm   0
 DEAL::W-cycle entering level  0
@@ -101,24 +109,24 @@ DEAL::W-cycle  Defect norm    0
 DEAL::W-cycle smoothing level 1
 DEAL::W-cycle solution norm   0
 DEAL::W-cycle leaving level   1
-DEAL::W-cycle Res. step level 1
-DEAL::W-cycle Edge pro. level 1
 DEAL::W-cycle  Defect norm    0
 DEAL::W-cycle smoothing level 2
 DEAL::W-cycle solution norm   0
 DEAL::W-cycle leaving level   2
-DEAL::W-cycle Res. step level 2
-DEAL::W-cycle Edge pro. level 2
 DEAL::W-cycle entering level  2
 DEAL::W-cycle defect norm     0
 DEAL::W-cycle smoothing level 2
 DEAL::W-cycle solution norm   0
+DEAL::W-cycle Res. step level 2
+DEAL::W-cycle Edge pro. level 2
 DEAL::W-cycle residual level  2
 DEAL::W-cycle residual norm   0
 DEAL::W-cycle entering level  1
 DEAL::W-cycle defect norm     0
 DEAL::W-cycle smoothing level 1
 DEAL::W-cycle solution norm   0
+DEAL::W-cycle Res. step level 1
+DEAL::W-cycle Edge pro. level 1
 DEAL::W-cycle residual level  1
 DEAL::W-cycle residual norm   0
 DEAL::W-cycle entering level  0
@@ -128,12 +136,12 @@ DEAL::W-cycle  Defect norm    0
 DEAL::W-cycle smoothing level 1
 DEAL::W-cycle solution norm   0
 DEAL::W-cycle leaving level   1
-DEAL::W-cycle Res. step level 1
-DEAL::W-cycle Edge pro. level 1
 DEAL::W-cycle entering level  1
 DEAL::W-cycle defect norm     0
 DEAL::W-cycle smoothing level 1
 DEAL::W-cycle solution norm   0
+DEAL::W-cycle Res. step level 1
+DEAL::W-cycle Edge pro. level 1
 DEAL::W-cycle residual level  1
 DEAL::W-cycle residual norm   0
 DEAL::W-cycle entering level  0
@@ -143,36 +151,36 @@ DEAL::W-cycle  Defect norm    0
 DEAL::W-cycle smoothing level 1
 DEAL::W-cycle solution norm   0
 DEAL::W-cycle leaving level   1
-DEAL::W-cycle Res. step level 1
-DEAL::W-cycle Edge pro. level 1
 DEAL::W-cycle  Defect norm    0
 DEAL::W-cycle smoothing level 2
 DEAL::W-cycle solution norm   0
 DEAL::W-cycle leaving level   2
-DEAL::W-cycle Res. step level 2
-DEAL::W-cycle Edge pro. level 2
 DEAL::W-cycle  Defect norm    0
 DEAL::W-cycle smoothing level 3
 DEAL::W-cycle solution norm   0
 DEAL::W-cycle leaving level   3
-DEAL::W-cycle Res. step level 3
-DEAL::W-cycle Edge pro. level 3
 DEAL::W-cycle entering level  3
 DEAL::W-cycle defect norm     0
 DEAL::W-cycle smoothing level 3
 DEAL::W-cycle solution norm   0
+DEAL::W-cycle Res. step level 3
+DEAL::W-cycle Edge pro. level 3
 DEAL::W-cycle residual level  3
 DEAL::W-cycle residual norm   0
 DEAL::W-cycle entering level  2
 DEAL::W-cycle defect norm     0
 DEAL::W-cycle smoothing level 2
 DEAL::W-cycle solution norm   0
+DEAL::W-cycle Res. step level 2
+DEAL::W-cycle Edge pro. level 2
 DEAL::W-cycle residual level  2
 DEAL::W-cycle residual norm   0
 DEAL::W-cycle entering level  1
 DEAL::W-cycle defect norm     0
 DEAL::W-cycle smoothing level 1
 DEAL::W-cycle solution norm   0
+DEAL::W-cycle Res. step level 1
+DEAL::W-cycle Edge pro. level 1
 DEAL::W-cycle residual level  1
 DEAL::W-cycle residual norm   0
 DEAL::W-cycle entering level  0
@@ -182,12 +190,12 @@ DEAL::W-cycle  Defect norm    0
 DEAL::W-cycle smoothing level 1
 DEAL::W-cycle solution norm   0
 DEAL::W-cycle leaving level   1
-DEAL::W-cycle Res. step level 1
-DEAL::W-cycle Edge pro. level 1
 DEAL::W-cycle entering level  1
 DEAL::W-cycle defect norm     0
 DEAL::W-cycle smoothing level 1
 DEAL::W-cycle solution norm   0
+DEAL::W-cycle Res. step level 1
+DEAL::W-cycle Edge pro. level 1
 DEAL::W-cycle residual level  1
 DEAL::W-cycle residual norm   0
 DEAL::W-cycle entering level  0
@@ -197,24 +205,24 @@ DEAL::W-cycle  Defect norm    0
 DEAL::W-cycle smoothing level 1
 DEAL::W-cycle solution norm   0
 DEAL::W-cycle leaving level   1
-DEAL::W-cycle Res. step level 1
-DEAL::W-cycle Edge pro. level 1
 DEAL::W-cycle  Defect norm    0
 DEAL::W-cycle smoothing level 2
 DEAL::W-cycle solution norm   0
 DEAL::W-cycle leaving level   2
-DEAL::W-cycle Res. step level 2
-DEAL::W-cycle Edge pro. level 2
 DEAL::W-cycle entering level  2
 DEAL::W-cycle defect norm     0
 DEAL::W-cycle smoothing level 2
 DEAL::W-cycle solution norm   0
+DEAL::W-cycle Res. step level 2
+DEAL::W-cycle Edge pro. level 2
 DEAL::W-cycle residual level  2
 DEAL::W-cycle residual norm   0
 DEAL::W-cycle entering level  1
 DEAL::W-cycle defect norm     0
 DEAL::W-cycle smoothing level 1
 DEAL::W-cycle solution norm   0
+DEAL::W-cycle Res. step level 1
+DEAL::W-cycle Edge pro. level 1
 DEAL::W-cycle residual level  1
 DEAL::W-cycle residual norm   0
 DEAL::W-cycle entering level  0
@@ -224,12 +232,12 @@ DEAL::W-cycle  Defect norm    0
 DEAL::W-cycle smoothing level 1
 DEAL::W-cycle solution norm   0
 DEAL::W-cycle leaving level   1
-DEAL::W-cycle Res. step level 1
-DEAL::W-cycle Edge pro. level 1
 DEAL::W-cycle entering level  1
 DEAL::W-cycle defect norm     0
 DEAL::W-cycle smoothing level 1
 DEAL::W-cycle solution norm   0
+DEAL::W-cycle Res. step level 1
+DEAL::W-cycle Edge pro. level 1
 DEAL::W-cycle residual level  1
 DEAL::W-cycle residual norm   0
 DEAL::W-cycle entering level  0
@@ -239,49 +247,49 @@ DEAL::W-cycle  Defect norm    0
 DEAL::W-cycle smoothing level 1
 DEAL::W-cycle solution norm   0
 DEAL::W-cycle leaving level   1
-DEAL::W-cycle Res. step level 1
-DEAL::W-cycle Edge pro. level 1
 DEAL::W-cycle  Defect norm    0
 DEAL::W-cycle smoothing level 2
 DEAL::W-cycle solution norm   0
 DEAL::W-cycle leaving level   2
-DEAL::W-cycle Res. step level 2
-DEAL::W-cycle Edge pro. level 2
 DEAL::W-cycle  Defect norm    0
 DEAL::W-cycle smoothing level 3
 DEAL::W-cycle solution norm   0
 DEAL::W-cycle leaving level   3
-DEAL::W-cycle Res. step level 3
-DEAL::W-cycle Edge pro. level 3
 DEAL::W-cycle  Defect norm    0
 DEAL::W-cycle smoothing level 4
 DEAL::W-cycle solution norm   0
 DEAL::W-cycle leaving level   4
-DEAL::W-cycle Res. step level 4
-DEAL::W-cycle Edge pro. level 4
 DEAL::
 DEAL::F-cycle entering level  4
 DEAL::F-cycle defect norm     0
 DEAL::F-cycle smoothing level 4
 DEAL::F-cycle solution norm   0
+DEAL::F-cycle Res. step level 4
+DEAL::F-cycle Edge pro. level 4
 DEAL::F-cycle residual level  4
 DEAL::F-cycle residual norm   0
 DEAL::F-cycle entering level  3
 DEAL::F-cycle defect norm     0
 DEAL::F-cycle smoothing level 3
 DEAL::F-cycle solution norm   0
+DEAL::F-cycle Res. step level 3
+DEAL::F-cycle Edge pro. level 3
 DEAL::F-cycle residual level  3
 DEAL::F-cycle residual norm   0
 DEAL::F-cycle entering level  2
 DEAL::F-cycle defect norm     0
 DEAL::F-cycle smoothing level 2
 DEAL::F-cycle solution norm   0
+DEAL::F-cycle Res. step level 2
+DEAL::F-cycle Edge pro. level 2
 DEAL::F-cycle residual level  2
 DEAL::F-cycle residual norm   0
 DEAL::F-cycle entering level  1
 DEAL::F-cycle defect norm     0
 DEAL::F-cycle smoothing level 1
 DEAL::F-cycle solution norm   0
+DEAL::F-cycle Res. step level 1
+DEAL::F-cycle Edge pro. level 1
 DEAL::F-cycle residual level  1
 DEAL::F-cycle residual norm   0
 DEAL::F-cycle entering level  0
@@ -291,12 +299,12 @@ DEAL::F-cycle  Defect norm    0
 DEAL::F-cycle smoothing level 1
 DEAL::F-cycle solution norm   0
 DEAL::F-cycle leaving level   1
-DEAL::F-cycle Res. step level 1
-DEAL::F-cycle Edge pro. level 1
 DEAL::F-cycle entering level  1
 DEAL::F-cycle defect norm     0
 DEAL::F-cycle smoothing level 1
 DEAL::F-cycle solution norm   0
+DEAL::F-cycle Res. step level 1
+DEAL::F-cycle Edge pro. level 1
 DEAL::F-cycle residual level  1
 DEAL::F-cycle residual norm   0
 DEAL::F-cycle entering level  0
@@ -306,24 +314,24 @@ DEAL::F-cycle  Defect norm    0
 DEAL::F-cycle smoothing level 1
 DEAL::F-cycle solution norm   0
 DEAL::F-cycle leaving level   1
-DEAL::F-cycle Res. step level 1
-DEAL::F-cycle Edge pro. level 1
 DEAL::F-cycle  Defect norm    0
 DEAL::F-cycle smoothing level 2
 DEAL::F-cycle solution norm   0
 DEAL::F-cycle leaving level   2
-DEAL::F-cycle Res. step level 2
-DEAL::F-cycle Edge pro. level 2
 DEAL::F-cycle entering level  2
 DEAL::F-cycle defect norm     0
 DEAL::F-cycle smoothing level 2
 DEAL::F-cycle solution norm   0
+DEAL::F-cycle Res. step level 2
+DEAL::F-cycle Edge pro. level 2
 DEAL::F-cycle residual level  2
 DEAL::F-cycle residual norm   0
 DEAL::F-cycle entering level  1
 DEAL::F-cycle defect norm     0
 DEAL::F-cycle smoothing level 1
 DEAL::F-cycle solution norm   0
+DEAL::F-cycle Res. step level 1
+DEAL::F-cycle Edge pro. level 1
 DEAL::F-cycle residual level  1
 DEAL::F-cycle residual norm   0
 DEAL::F-cycle entering level  0
@@ -333,36 +341,36 @@ DEAL::F-cycle  Defect norm    0
 DEAL::F-cycle smoothing level 1
 DEAL::F-cycle solution norm   0
 DEAL::F-cycle leaving level   1
-DEAL::F-cycle Res. step level 1
-DEAL::F-cycle Edge pro. level 1
 DEAL::F-cycle  Defect norm    0
 DEAL::F-cycle smoothing level 2
 DEAL::F-cycle solution norm   0
 DEAL::F-cycle leaving level   2
-DEAL::F-cycle Res. step level 2
-DEAL::F-cycle Edge pro. level 2
 DEAL::F-cycle  Defect norm    0
 DEAL::F-cycle smoothing level 3
 DEAL::F-cycle solution norm   0
 DEAL::F-cycle leaving level   3
-DEAL::F-cycle Res. step level 3
-DEAL::F-cycle Edge pro. level 3
 DEAL::F-cycle entering level  3
 DEAL::F-cycle defect norm     0
 DEAL::F-cycle smoothing level 3
 DEAL::F-cycle solution norm   0
+DEAL::F-cycle Res. step level 3
+DEAL::F-cycle Edge pro. level 3
 DEAL::F-cycle residual level  3
 DEAL::F-cycle residual norm   0
 DEAL::F-cycle entering level  2
 DEAL::F-cycle defect norm     0
 DEAL::F-cycle smoothing level 2
 DEAL::F-cycle solution norm   0
+DEAL::F-cycle Res. step level 2
+DEAL::F-cycle Edge pro. level 2
 DEAL::F-cycle residual level  2
 DEAL::F-cycle residual norm   0
 DEAL::F-cycle entering level  1
 DEAL::F-cycle defect norm     0
 DEAL::F-cycle smoothing level 1
 DEAL::F-cycle solution norm   0
+DEAL::F-cycle Res. step level 1
+DEAL::F-cycle Edge pro. level 1
 DEAL::F-cycle residual level  1
 DEAL::F-cycle residual norm   0
 DEAL::F-cycle entering level  0
@@ -372,42 +380,40 @@ DEAL::F-cycle  Defect norm    0
 DEAL::F-cycle smoothing level 1
 DEAL::F-cycle solution norm   0
 DEAL::F-cycle leaving level   1
-DEAL::F-cycle Res. step level 1
-DEAL::F-cycle Edge pro. level 1
 DEAL::F-cycle  Defect norm    0
 DEAL::F-cycle smoothing level 2
 DEAL::F-cycle solution norm   0
 DEAL::F-cycle leaving level   2
-DEAL::F-cycle Res. step level 2
-DEAL::F-cycle Edge pro. level 2
 DEAL::F-cycle  Defect norm    0
 DEAL::F-cycle smoothing level 3
 DEAL::F-cycle solution norm   0
 DEAL::F-cycle leaving level   3
-DEAL::F-cycle Res. step level 3
-DEAL::F-cycle Edge pro. level 3
 DEAL::F-cycle  Defect norm    0
 DEAL::F-cycle smoothing level 4
 DEAL::F-cycle solution norm   0
 DEAL::F-cycle leaving level   4
-DEAL::F-cycle Res. step level 4
-DEAL::F-cycle Edge pro. level 4
 DEAL::V-cycle entering level 5
 DEAL::V-cycle  Defect norm   0
 DEAL::Smoothing on     level 5
 DEAL::Solution norm          0
+DEAL::Residual step    level 5
+DEAL::Edge prol. level       5
 DEAL::Residual on      level 5
 DEAL::Residual norm          0
 DEAL::V-cycle entering level 4
 DEAL::V-cycle  Defect norm   0
 DEAL::Smoothing on     level 4
 DEAL::Solution norm          0
+DEAL::Residual step    level 4
+DEAL::Edge prol. level       4
 DEAL::Residual on      level 4
 DEAL::Residual norm          0
 DEAL::V-cycle entering level 3
 DEAL::V-cycle  Defect norm   0
 DEAL::Smoothing on     level 3
 DEAL::Solution norm          0
+DEAL::Residual step    level 3
+DEAL::Edge prol. level       3
 DEAL::Residual on      level 3
 DEAL::Residual norm          0
 DEAL::V-cycle entering level 2
@@ -418,39 +424,39 @@ DEAL::V-cycle  Defect norm   0
 DEAL::Smoothing on     level 3
 DEAL::Solution norm          0
 DEAL::V-cycle leaving  level 3
-DEAL::Residual step    level 3
-DEAL::Edge prol. level       3
 DEAL::Prolongate norm        0
 DEAL::V-cycle  Defect norm   0
 DEAL::Smoothing on     level 4
 DEAL::Solution norm          0
 DEAL::V-cycle leaving  level 4
-DEAL::Residual step    level 4
-DEAL::Edge prol. level       4
 DEAL::Prolongate norm        0
 DEAL::V-cycle  Defect norm   0
 DEAL::Smoothing on     level 5
 DEAL::Solution norm          0
 DEAL::V-cycle leaving  level 5
-DEAL::Residual step    level 5
-DEAL::Edge prol. level       5
 DEAL::
 DEAL::W-cycle entering level  5
 DEAL::W-cycle defect norm     0
 DEAL::W-cycle smoothing level 5
 DEAL::W-cycle solution norm   0
+DEAL::W-cycle Res. step level 5
+DEAL::W-cycle Edge pro. level 5
 DEAL::W-cycle residual level  5
 DEAL::W-cycle residual norm   0
 DEAL::W-cycle entering level  4
 DEAL::W-cycle defect norm     0
 DEAL::W-cycle smoothing level 4
 DEAL::W-cycle solution norm   0
+DEAL::W-cycle Res. step level 4
+DEAL::W-cycle Edge pro. level 4
 DEAL::W-cycle residual level  4
 DEAL::W-cycle residual norm   0
 DEAL::W-cycle entering level  3
 DEAL::W-cycle defect norm     0
 DEAL::W-cycle smoothing level 3
 DEAL::W-cycle solution norm   0
+DEAL::W-cycle Res. step level 3
+DEAL::W-cycle Edge pro. level 3
 DEAL::W-cycle residual level  3
 DEAL::W-cycle residual norm   0
 DEAL::W-cycle entering level  2
@@ -460,12 +466,12 @@ DEAL::W-cycle  Defect norm    0
 DEAL::W-cycle smoothing level 3
 DEAL::W-cycle solution norm   0
 DEAL::W-cycle leaving level   3
-DEAL::W-cycle Res. step level 3
-DEAL::W-cycle Edge pro. level 3
 DEAL::W-cycle entering level  3
 DEAL::W-cycle defect norm     0
 DEAL::W-cycle smoothing level 3
 DEAL::W-cycle solution norm   0
+DEAL::W-cycle Res. step level 3
+DEAL::W-cycle Edge pro. level 3
 DEAL::W-cycle residual level  3
 DEAL::W-cycle residual norm   0
 DEAL::W-cycle entering level  2
@@ -475,24 +481,24 @@ DEAL::W-cycle  Defect norm    0
 DEAL::W-cycle smoothing level 3
 DEAL::W-cycle solution norm   0
 DEAL::W-cycle leaving level   3
-DEAL::W-cycle Res. step level 3
-DEAL::W-cycle Edge pro. level 3
 DEAL::W-cycle  Defect norm    0
 DEAL::W-cycle smoothing level 4
 DEAL::W-cycle solution norm   0
 DEAL::W-cycle leaving level   4
-DEAL::W-cycle Res. step level 4
-DEAL::W-cycle Edge pro. level 4
 DEAL::W-cycle entering level  4
 DEAL::W-cycle defect norm     0
 DEAL::W-cycle smoothing level 4
 DEAL::W-cycle solution norm   0
+DEAL::W-cycle Res. step level 4
+DEAL::W-cycle Edge pro. level 4
 DEAL::W-cycle residual level  4
 DEAL::W-cycle residual norm   0
 DEAL::W-cycle entering level  3
 DEAL::W-cycle defect norm     0
 DEAL::W-cycle smoothing level 3
 DEAL::W-cycle solution norm   0
+DEAL::W-cycle Res. step level 3
+DEAL::W-cycle Edge pro. level 3
 DEAL::W-cycle residual level  3
 DEAL::W-cycle residual norm   0
 DEAL::W-cycle entering level  2
@@ -502,12 +508,12 @@ DEAL::W-cycle  Defect norm    0
 DEAL::W-cycle smoothing level 3
 DEAL::W-cycle solution norm   0
 DEAL::W-cycle leaving level   3
-DEAL::W-cycle Res. step level 3
-DEAL::W-cycle Edge pro. level 3
 DEAL::W-cycle entering level  3
 DEAL::W-cycle defect norm     0
 DEAL::W-cycle smoothing level 3
 DEAL::W-cycle solution norm   0
+DEAL::W-cycle Res. step level 3
+DEAL::W-cycle Edge pro. level 3
 DEAL::W-cycle residual level  3
 DEAL::W-cycle residual norm   0
 DEAL::W-cycle entering level  2
@@ -517,37 +523,37 @@ DEAL::W-cycle  Defect norm    0
 DEAL::W-cycle smoothing level 3
 DEAL::W-cycle solution norm   0
 DEAL::W-cycle leaving level   3
-DEAL::W-cycle Res. step level 3
-DEAL::W-cycle Edge pro. level 3
 DEAL::W-cycle  Defect norm    0
 DEAL::W-cycle smoothing level 4
 DEAL::W-cycle solution norm   0
 DEAL::W-cycle leaving level   4
-DEAL::W-cycle Res. step level 4
-DEAL::W-cycle Edge pro. level 4
 DEAL::W-cycle  Defect norm    0
 DEAL::W-cycle smoothing level 5
 DEAL::W-cycle solution norm   0
 DEAL::W-cycle leaving level   5
-DEAL::W-cycle Res. step level 5
-DEAL::W-cycle Edge pro. level 5
 DEAL::
 DEAL::F-cycle entering level  5
 DEAL::F-cycle defect norm     0
 DEAL::F-cycle smoothing level 5
 DEAL::F-cycle solution norm   0
+DEAL::F-cycle Res. step level 5
+DEAL::F-cycle Edge pro. level 5
 DEAL::F-cycle residual level  5
 DEAL::F-cycle residual norm   0
 DEAL::F-cycle entering level  4
 DEAL::F-cycle defect norm     0
 DEAL::F-cycle smoothing level 4
 DEAL::F-cycle solution norm   0
+DEAL::F-cycle Res. step level 4
+DEAL::F-cycle Edge pro. level 4
 DEAL::F-cycle residual level  4
 DEAL::F-cycle residual norm   0
 DEAL::F-cycle entering level  3
 DEAL::F-cycle defect norm     0
 DEAL::F-cycle smoothing level 3
 DEAL::F-cycle solution norm   0
+DEAL::F-cycle Res. step level 3
+DEAL::F-cycle Edge pro. level 3
 DEAL::F-cycle residual level  3
 DEAL::F-cycle residual norm   0
 DEAL::F-cycle entering level  2
@@ -557,12 +563,12 @@ DEAL::F-cycle  Defect norm    0
 DEAL::F-cycle smoothing level 3
 DEAL::F-cycle solution norm   0
 DEAL::F-cycle leaving level   3
-DEAL::F-cycle Res. step level 3
-DEAL::F-cycle Edge pro. level 3
 DEAL::F-cycle entering level  3
 DEAL::F-cycle defect norm     0
 DEAL::F-cycle smoothing level 3
 DEAL::F-cycle solution norm   0
+DEAL::F-cycle Res. step level 3
+DEAL::F-cycle Edge pro. level 3
 DEAL::F-cycle residual level  3
 DEAL::F-cycle residual norm   0
 DEAL::F-cycle entering level  2
@@ -572,24 +578,24 @@ DEAL::F-cycle  Defect norm    0
 DEAL::F-cycle smoothing level 3
 DEAL::F-cycle solution norm   0
 DEAL::F-cycle leaving level   3
-DEAL::F-cycle Res. step level 3
-DEAL::F-cycle Edge pro. level 3
 DEAL::F-cycle  Defect norm    0
 DEAL::F-cycle smoothing level 4
 DEAL::F-cycle solution norm   0
 DEAL::F-cycle leaving level   4
-DEAL::F-cycle Res. step level 4
-DEAL::F-cycle Edge pro. level 4
 DEAL::F-cycle entering level  4
 DEAL::F-cycle defect norm     0
 DEAL::F-cycle smoothing level 4
 DEAL::F-cycle solution norm   0
+DEAL::F-cycle Res. step level 4
+DEAL::F-cycle Edge pro. level 4
 DEAL::F-cycle residual level  4
 DEAL::F-cycle residual norm   0
 DEAL::F-cycle entering level  3
 DEAL::F-cycle defect norm     0
 DEAL::F-cycle smoothing level 3
 DEAL::F-cycle solution norm   0
+DEAL::F-cycle Res. step level 3
+DEAL::F-cycle Edge pro. level 3
 DEAL::F-cycle residual level  3
 DEAL::F-cycle residual norm   0
 DEAL::F-cycle entering level  2
@@ -599,17 +605,11 @@ DEAL::F-cycle  Defect norm    0
 DEAL::F-cycle smoothing level 3
 DEAL::F-cycle solution norm   0
 DEAL::F-cycle leaving level   3
-DEAL::F-cycle Res. step level 3
-DEAL::F-cycle Edge pro. level 3
 DEAL::F-cycle  Defect norm    0
 DEAL::F-cycle smoothing level 4
 DEAL::F-cycle solution norm   0
 DEAL::F-cycle leaving level   4
-DEAL::F-cycle Res. step level 4
-DEAL::F-cycle Edge pro. level 4
 DEAL::F-cycle  Defect norm    0
 DEAL::F-cycle smoothing level 5
 DEAL::F-cycle solution norm   0
 DEAL::F-cycle leaving level   5
-DEAL::F-cycle Res. step level 5
-DEAL::F-cycle Edge pro. level 5

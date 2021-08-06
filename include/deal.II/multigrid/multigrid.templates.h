@@ -365,7 +365,7 @@ boost::signals2::connection
 Multigrid<VectorType>::connect_residual_step(
   const std::function<void(const bool, const unsigned int)> &slot)
 {
-  return this->signals.post_smoother_step.connect(slot);
+  return this->signals.residual_step.connect(slot);
 }
 
 
