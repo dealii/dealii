@@ -18,6 +18,8 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/std_cxx20/iota_view.h>
+
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_q1.h>
 
@@ -722,6 +724,36 @@ public:
   n_current_interface_dofs() const;
 
   /**
+   * Return an object that can be thought of as an array containing all
+   * indices from zero (inclusive) to `n_current_interface_dofs()` (exclusive).
+   * This allows one to write code using range-based `for` loops of the
+   * following kind:
+   * @code
+   *   FEInterfaceValues<dim> fe_iv (...);
+   *   FullMatrix<double>     cell_matrix (...);
+   *
+   *   for (auto &cell : dof_handler.active_cell_iterators())
+   *     {
+   *       cell_matrix = 0;
+   *       for (const auto &face : cell->face_iterators())
+   *         {
+   *           fe_iv.values.reinit(cell, face, ...);
+   *           for (const auto q : fe_iv.quadrature_point_indices())
+   *             for (const auto i : fe_iv.dof_indices())
+   *               for (const auto j : fe_iv.dof_indices())
+   *                 cell_matrix(i,j) += ...; // Do something for DoF indices
+   *                                          // (i,j) at quadrature point q
+   *         }
+   *     }
+   * @endcode
+   * Here, we are looping over all degrees of freedom on all cell interfaces,
+   * with `i` and `j` taking on all valid indices for interface degrees of
+   * freedom, as defined by the finite element passed to `fe_iv`.
+   */
+  std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+  dof_indices() const;
+
+  /**
    * Return the set of joint DoF indices. This includes indices from both cells.
    * If reinit was called with an active cell iterator, the indices are based
    * on the active indices (returned by `DoFCellAccessor::get_dof_indices()` ),
@@ -1337,6 +1369,15 @@ FEInterfaceValues<dim, spacedim>::n_current_interface_dofs() const
     ExcMessage(
       "n_current_interface_dofs() is only available after a call to reinit()."));
   return interface_dof_indices.size();
+}
+
+
+
+template <int dim, int spacedim>
+inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+FEInterfaceValues<dim, spacedim>::dof_indices() const
+{
+  return {0U, n_current_interface_dofs()};
 }
 
 
