@@ -395,6 +395,9 @@ namespace Step74
                                      auto &              copy_data) {
       const FEFaceValuesBase<dim> &fe_fv = scratch_data.reinit(cell, face_no);
 
+      Assert(fe_fv.get_cell() == cell, ExcInternalError());
+      Assert(fe_fv.get_face_number() == face_no, ExcInternalError());
+
       const auto &       q_points      = scratch_data.get_quadrature_points();
       const unsigned int n_q_points    = q_points.size();
       const unsigned int dofs_per_cell = fe_fv.dofs_per_cell;
@@ -457,6 +460,11 @@ namespace Step74
                                  auto &              copy_data) {
       const FEInterfaceValues<dim> &fe_iv =
         scratch_data.reinit(cell, f, sf, ncell, nf, nsf);
+
+      Assert(fe_iv.get_cell(0) == cell, ExcInternalError());
+      Assert(fe_iv.get_face_number(0) == f, ExcInternalError());
+      Assert(fe_iv.get_cell(1) == ncell, ExcInternalError());
+      Assert(fe_iv.get_face_number(1) == nf, ExcInternalError());
 
       copy_data.face_data.emplace_back();
       CopyDataFace &     copy_data_face = copy_data.face_data.back();
