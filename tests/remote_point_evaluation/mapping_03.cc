@@ -40,7 +40,6 @@ test(const bool enforce_unique_map)
 {
   parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
   GridGenerator::subdivided_hyper_cube(tria, 2);
-  tria.refine_global(1);
 
   FE_Q<dim>       fe(1);
   DoFHandler<dim> dof_handler(tria);
@@ -54,8 +53,9 @@ test(const bool enforce_unique_map)
 
   std::vector<Point<dim>> evaluation_points;
 
-  evaluation_points.emplace_back(0.5, 0.5 + 1e-7); // should be assigned to rank
-                                                   // 0 for unique mapping
+  for (int i = 1; i < 15; ++i)
+    // should be assigned to rank 0 for unique mapping
+    evaluation_points.emplace_back(0.5, 0.5 + std::pow<double>(10.0, -i));
 
   Utilities::MPI::RemotePointEvaluation<dim> eval(1e-6, enforce_unique_map);
 
@@ -74,8 +74,8 @@ test(const bool enforce_unique_map)
     eval, dof_handler, vec, VectorTools::EvaluationFlags::insert);
 
   for (unsigned int i = 0; i < evaluation_points.size(); ++i)
-    deallog << i << " " << result_avg[i] << " " << result_min[i] << " "
-            << result_max[i] << " " << result_insert[i] << " "
+    deallog << "1e-" << (i + 1) << " " << result_avg[i] << " " << result_min[i]
+            << " " << result_max[i] << " " << result_insert[i] << " "
             << eval.get_point_ptrs()[i + 1] - eval.get_point_ptrs()[i]
             << std::endl;
 }
