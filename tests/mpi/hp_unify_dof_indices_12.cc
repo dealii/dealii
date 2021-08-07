@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2020 by the deal.II authors
+// Copyright (C) 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,29 +15,24 @@
 
 
 
-// have a 2x1 coarse mesh (or 2x1x1) and verify DoF indices in the hp-
-// case with an FECollection that contains multiple copies of the same
-// FE_Q(2) element. the hp-code will unify DoF indices on boundaries
-// between all subdomains.
+// have a 2x2 coarse mesh (or 2x2x1) and verify DoF indices in the hp-
+// case with an FECollection that contains a FE_Q(4) and a FE_Q(2) element.
+// the hp-code will unify DoF indices on boundaries between all subdomains.
+//
+// same as hp_unify_dof_indices_03, but with inverted active FE indices. same
+// scenario is for the demonstration in the parallel-hp-paper.
 
-
-#include <deal.II/base/tensor.h>
-#include <deal.II/base/utilities.h>
 
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_system.h>
 
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/intergrid_map.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 
 #include <deal.II/hp/fe_collection.h>
-
-#include <numeric>
 
 #include "../tests.h"
 
@@ -53,6 +48,7 @@ test()
 
   std::vector<unsigned int> reps(dim, 1U);
   reps[0] = 2;
+  reps[1] = 2;
   Point<dim> top_right;
   for (unsigned int d = 0; d < dim; ++d)
     top_right[d] = (d == 0 ? 2 : 1);
@@ -60,18 +56,26 @@ test()
                                             reps,
                                             Point<dim>(),
                                             top_right);
-  Assert(triangulation.n_global_active_cells() == 2, ExcInternalError());
-  Assert(triangulation.n_active_cells() == 2, ExcInternalError());
+  Assert(triangulation.n_global_active_cells() == 4, ExcInternalError());
+  Assert(triangulation.n_active_cells() == 4, ExcInternalError());
 
   hp::FECollection<dim> fe;
-  fe.push_back(FE_Q<dim>(2));
+  fe.push_back(FE_Q<dim>(4));
   fe.push_back(FE_Q<dim>(2));
 
   DoFHandler<dim> dof_handler(triangulation);
-  if (dof_handler.begin_active()->is_locally_owned())
-    dof_handler.begin_active()->set_active_fe_index(0);
-  if ((++dof_handler.begin_active())->is_locally_owned())
-    (++dof_handler.begin_active())->set_active_fe_index(1);
+  for (const auto &cell : dof_handler.active_cell_iterators())
+    if (cell->is_locally_owned())
+      {
+        if (cell->id().to_string() == "0_0:")
+          cell->set_active_fe_index(1);
+        if (cell->id().to_string() == "1_0:")
+          cell->set_active_fe_index(0);
+        if (cell->id().to_string() == "2_0:")
+          cell->set_active_fe_index(0);
+        if (cell->id().to_string() == "3_0:")
+          cell->set_active_fe_index(1);
+      }
   dof_handler.distribute_dofs(fe);
 
   log_dof_diagnostics(dof_handler);

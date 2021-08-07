@@ -66,7 +66,7 @@ test(MPI_Comm mpi_communicator)
   dof_handler.distribute_dofs(fe);
 
   if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
-    deallog << "   n_procs/n_dofs: "
+    deallog << "n_procs/n_dofs: "
             << Utilities::MPI::n_mpi_processes(mpi_communicator) << '/'
             << dof_handler.n_dofs() << std::endl;
 }

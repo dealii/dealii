@@ -83,8 +83,6 @@ test()
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
   constraints.close();
 
-  deallog << "Processor: " << Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)
-          << std::endl;
   deallog << "n_dofs: " << dof_handler.n_dofs() << std::endl;
   deallog << "n_constraints: " << constraints.n_constraints() << std::endl;
   constraints.print(deallog.get_file_stream());
