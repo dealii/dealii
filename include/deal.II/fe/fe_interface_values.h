@@ -645,6 +645,25 @@ public:
   get_update_flags() const;
 
   /**
+   * Return a triangulation iterator to the current cell of the interface.
+   *
+   * The @p cell_index is either 0 or 1 and corresponds to the cell index
+   * returned by interface_dof_to_cell_and_dof_index().
+   */
+  const typename Triangulation<dim, spacedim>::cell_iterator
+  get_cell(const unsigned int cell_index) const;
+
+  /**
+   * Return the number of the face on the interface selected the last time
+   * the reinit() function was called.
+   *
+   * The @p cell_index is either 0 or 1 and corresponds to the cell index
+   * returned by interface_dof_to_cell_and_dof_index().
+   */
+  unsigned int
+  get_face_number(const unsigned int cell_index) const;
+
+  /**
    * @name Functions to query information on a given interface
    * @{
    */
@@ -1356,6 +1375,25 @@ UpdateFlags
 FEInterfaceValues<dim, spacedim>::get_update_flags() const
 {
   return internal_fe_face_values.get_update_flags();
+}
+
+
+
+template <int dim, int spacedim>
+const typename Triangulation<dim, spacedim>::cell_iterator
+FEInterfaceValues<dim, spacedim>::get_cell(const unsigned int cell_index) const
+{
+  return get_fe_face_values(cell_index).get_cell();
+}
+
+
+
+template <int dim, int spacedim>
+inline unsigned int
+FEInterfaceValues<dim, spacedim>::get_face_number(
+  const unsigned int cell_index) const
+{
+  return get_fe_face_values(cell_index).get_face_number();
 }
 
 

@@ -4187,6 +4187,13 @@ public:
   get_boundary_forms() const;
 
   /**
+   * Return the number of the face selected the last time the reinit() function
+   * was called.
+   */
+  unsigned int
+  get_face_number() const;
+
+  /**
    * Return the index of the face selected the last time the reinit() function
    * was called.
    */
@@ -6139,6 +6146,14 @@ FEValues<dim, spacedim>::get_present_fe_values() const
 
 
 /*---------------------- Inline functions: FEFaceValuesBase -----------------*/
+
+
+template <int dim, int spacedim>
+inline unsigned int
+FEFaceValuesBase<dim, spacedim>::get_face_number() const
+{
+  return present_face_no;
+}
 
 
 template <int dim, int spacedim>
