@@ -31,7 +31,6 @@
 #  include <deal.II/fe/fe_dgq.h>
 #  include <deal.II/fe/fe_values.h>
 
-#  include <deal.II/matrix_free/hanging_nodes_internal.h>
 #  include <deal.II/matrix_free/shape_info.h>
 
 #  include <cuda_runtime_api.h>
@@ -230,7 +229,8 @@ namespace CUDAWrappers
       std::vector<Point<dim, Number>>      q_points_host;
       std::vector<Number>                  JxW_host;
       std::vector<Number>                  inv_jacobian_host;
-      std::vector<unsigned int>            constraint_mask_host;
+      std::vector<dealii::internal::MatrixFreeFunctions::ConstraintKinds>
+        constraint_mask_host;
       // Local buffer
       std::vector<types::global_dof_index> local_dof_indices;
       FEValues<dim>                        fe_values;
@@ -378,7 +378,8 @@ namespace CUDAWrappers
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         lexicographic_dof_indices[i] = local_dof_indices[lexicographic_inv[i]];
 
-      const ArrayView<unsigned int> cell_id_view(constraint_mask_host[cell_id]);
+      const ArrayView<dealii::internal::MatrixFreeFunctions::ConstraintKinds>
+        cell_id_view(constraint_mask_host[cell_id]);
 
       hanging_nodes.setup_constraints(cell,
                                       partitioner,
@@ -493,10 +494,11 @@ namespace CUDAWrappers
                          n_cells * dim * dim * padding_length);
         }
 
-      alloc_and_copy(&data->constraint_mask[color],
-                     ArrayView<const unsigned int>(constraint_mask_host.data(),
-                                                   constraint_mask_host.size()),
-                     n_cells);
+      alloc_and_copy(
+        &data->constraint_mask[color],
+        ArrayView<const dealii::internal::MatrixFreeFunctions::ConstraintKinds>(
+          constraint_mask_host.data(), constraint_mask_host.size()),
+        n_cells);
     }
 
 

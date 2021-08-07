@@ -410,10 +410,11 @@ namespace internal
     const unsigned int n_components,
     const unsigned int fe_degree,
     const FEEvaluationBaseData<dim, Number, false, VectorizedArrayType>
-      &                                                          fe_eval,
-    const bool                                                   transpose,
-    const std::array<unsigned int, VectorizedArrayType::size()> &c_mask,
-    VectorizedArrayType *                                        values)
+      &                                            fe_eval,
+    const bool                                     transpose,
+    const std::array<MatrixFreeFunctions::ConstraintKinds,
+                     VectorizedArrayType::size()> &c_mask,
+    VectorizedArrayType *                          values)
   {
     instantiation_helper_run<
       1,
@@ -435,9 +436,10 @@ namespace internal
     const unsigned int n_components,
     const unsigned int fe_degree,
     const FEEvaluationBaseData<dim, Number, true, VectorizedArrayType> &fe_eval,
-    const bool                                                   transpose,
-    const std::array<unsigned int, VectorizedArrayType::size()> &c_mask,
-    VectorizedArrayType *                                        values)
+    const bool                                     transpose,
+    const std::array<MatrixFreeFunctions::ConstraintKinds,
+                     VectorizedArrayType::size()> &c_mask,
+    VectorizedArrayType *                          values)
   {
     instantiation_helper_run<
       1,

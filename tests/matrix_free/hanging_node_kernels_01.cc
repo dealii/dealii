@@ -45,13 +45,15 @@ namespace dealii
     {
       template <int fe_degree, int n_q_points_1d>
       static bool
-      run(const FEEvaluationBaseData<dim,
-                                     typename Number::value_type,
-                                     is_face,
-                                     Number> &            fe_eval,
-          const bool                                      transpose,
-          const std::array<unsigned int, Number::size()> &c_mask,
-          Number *                                        values)
+      run(
+        const FEEvaluationBaseData<dim,
+                                   typename Number::value_type,
+                                   is_face,
+                                   Number> &fe_eval,
+        const bool                          transpose,
+        const std::array<dealii::internal::MatrixFreeFunctions::ConstraintKinds,
+                         Number::size()> &  c_mask,
+        Number *                            values)
       {
         Assert(is_face == false, ExcInternalError());
 
@@ -102,12 +104,14 @@ namespace dealii
 
       template <int fe_degree_, unsigned int direction, bool transpose>
       static void
-      run_2D(const FEEvaluationBaseData<dim,
-                                        typename Number::value_type,
-                                        is_face,
-                                        Number> &            fe_eval,
-             const std::array<unsigned int, Number::size()> &constraint_mask,
-             Number *                                        values)
+      run_2D(
+        const FEEvaluationBaseData<dim,
+                                   typename Number::value_type,
+                                   is_face,
+                                   Number> &fe_eval,
+        const std::array<dealii::internal::MatrixFreeFunctions::ConstraintKinds,
+                         Number::size()> &  constraint_mask,
+        Number *                            values)
       {
         const auto &constraint_weights =
           fe_eval.get_shape_info().data.front().subface_interpolation_matrix;
@@ -126,26 +130,31 @@ namespace dealii
 
         for (unsigned int v = 0; v < Number::size(); ++v)
           {
-            if (constraint_mask[v] == 0)
+            if (constraint_mask[v] == dealii::internal::MatrixFreeFunctions::
+                                        ConstraintKinds::unconstrained)
               continue;
 
-            const unsigned int this_type =
+            const auto this_type =
               (direction == 0) ?
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_x :
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_y;
+                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_x :
+                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_y;
 
             const bool constrained_face =
               (constraint_mask[v] &
                (((direction == 0) ? dealii::internal::MatrixFreeFunctions::
-                                      ConstraintTypes::face_y :
+                                      ConstraintKinds::face_y :
                                     dealii::internal::MatrixFreeFunctions::
-                                      ConstraintTypes::unconstrained) |
+                                      ConstraintKinds::unconstrained) |
                 ((direction == 1) ? dealii::internal::MatrixFreeFunctions::
-                                      ConstraintTypes::face_x :
+                                      ConstraintKinds::face_x :
                                     dealii::internal::MatrixFreeFunctions::
-                                      ConstraintTypes::unconstrained)));
+                                      ConstraintKinds::unconstrained))) !=
+              dealii::internal::MatrixFreeFunctions::ConstraintKinds::
+                unconstrained;
 
-            const bool type = constraint_mask[v] & this_type;
+            const bool type = (constraint_mask[v] & this_type) !=
+                              dealii::internal::MatrixFreeFunctions::
+                                ConstraintKinds::unconstrained;
 
             for (unsigned int x_idx = 0; x_idx < fe_degree + 1; ++x_idx)
               for (unsigned int y_idx = 0; y_idx < fe_degree + 1; ++y_idx)
@@ -162,15 +171,17 @@ namespace dealii
                   // (left (= 0) or right (= fe_degree))
                   const bool constrained_dof =
                     ((direction == 0) &&
-                     ((constraint_mask[v] &
-                       dealii::internal::MatrixFreeFunctions::ConstraintTypes::
-                         type_y) ?
+                     (((constraint_mask[v] &
+                        dealii::internal::MatrixFreeFunctions::ConstraintKinds::
+                          type_y) != dealii::internal::MatrixFreeFunctions::
+                                       ConstraintKinds::unconstrained) ?
                         (y_idx == 0) :
                         (y_idx == fe_degree))) ||
                     ((direction == 1) &&
-                     ((constraint_mask[v] &
-                       dealii::internal::MatrixFreeFunctions::ConstraintTypes::
-                         type_x) ?
+                     (((constraint_mask[v] &
+                        dealii::internal::MatrixFreeFunctions::ConstraintKinds::
+                          type_x) != dealii::internal::MatrixFreeFunctions::
+                                       ConstraintKinds::unconstrained) ?
                         (x_idx == 0) :
                         (x_idx == fe_degree)));
 
@@ -232,12 +243,14 @@ namespace dealii
 
       template <int fe_degree_, unsigned int direction, bool transpose>
       static void
-      run_3D(const FEEvaluationBaseData<dim,
-                                        typename Number::value_type,
-                                        is_face,
-                                        Number> &            fe_eval,
-             const std::array<unsigned int, Number::size()> &constraint_mask,
-             Number *                                        values)
+      run_3D(
+        const FEEvaluationBaseData<dim,
+                                   typename Number::value_type,
+                                   is_face,
+                                   Number> &fe_eval,
+        const std::array<dealii::internal::MatrixFreeFunctions::ConstraintKinds,
+                         Number::size()> &  constraint_mask,
+        Number *                            values)
       {
         const auto &constraint_weights =
           fe_eval.get_shape_info().data.front().subface_interpolation_matrix;
@@ -254,56 +267,59 @@ namespace dealii
         for (unsigned int i = 0; i < n_dofs; ++i)
           values_temp[i] = values[i];
 
-        const unsigned int this_type =
+        const auto this_type =
           (direction == 0) ?
-            dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_x :
+            dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_x :
           (direction == 1) ?
-            dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_y :
-            dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_z;
-        const unsigned int face1_type =
+            dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_y :
+            dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_z;
+        const auto face1_type =
           (direction == 0) ?
-            dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_y :
+            dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_y :
           (direction == 1) ?
-            dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_z :
-            dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_x;
-        const unsigned int face2_type =
+            dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_z :
+            dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_x;
+        const auto face2_type =
           (direction == 0) ?
-            dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_z :
+            dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_z :
           (direction == 1) ?
-            dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_x :
-            dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_y;
+            dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_x :
+            dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_y;
 
         // If computing in x-direction, need to match against
-        // dealii::internal::MatrixFreeFunctions::ConstraintTypes::face_y or
-        // dealii::internal::MatrixFreeFunctions::ConstraintTypes::face_z
-        const unsigned int face1 =
+        // dealii::internal::MatrixFreeFunctions::ConstraintKinds::face_y or
+        // dealii::internal::MatrixFreeFunctions::ConstraintKinds::face_z
+        const auto face1 =
           (direction == 0) ?
-            dealii::internal::MatrixFreeFunctions::ConstraintTypes::face_y :
+            dealii::internal::MatrixFreeFunctions::ConstraintKinds::face_y :
           (direction == 1) ?
-            dealii::internal::MatrixFreeFunctions::ConstraintTypes::face_z :
-            dealii::internal::MatrixFreeFunctions::ConstraintTypes::face_x;
-        const unsigned int face2 =
+            dealii::internal::MatrixFreeFunctions::ConstraintKinds::face_z :
+            dealii::internal::MatrixFreeFunctions::ConstraintKinds::face_x;
+        const auto face2 =
           (direction == 0) ?
-            dealii::internal::MatrixFreeFunctions::ConstraintTypes::face_z :
+            dealii::internal::MatrixFreeFunctions::ConstraintKinds::face_z :
           (direction == 1) ?
-            dealii::internal::MatrixFreeFunctions::ConstraintTypes::face_x :
-            dealii::internal::MatrixFreeFunctions::ConstraintTypes::face_y;
-        const unsigned int edge =
+            dealii::internal::MatrixFreeFunctions::ConstraintKinds::face_x :
+            dealii::internal::MatrixFreeFunctions::ConstraintKinds::face_y;
+        const auto edge =
           (direction == 0) ?
-            dealii::internal::MatrixFreeFunctions::ConstraintTypes::edge_yz :
+            dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_yz :
           (direction == 1) ?
-            dealii::internal::MatrixFreeFunctions::ConstraintTypes::edge_zx :
-            dealii::internal::MatrixFreeFunctions::ConstraintTypes::edge_xy;
+            dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_zx :
+            dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_xy;
 
         for (unsigned int v = 0; v < Number::size(); ++v)
           {
-            if (constraint_mask[v] == 0)
+            if (constraint_mask[v] == dealii::internal::MatrixFreeFunctions::
+                                        ConstraintKinds::unconstrained)
               continue;
 
-            const unsigned int constrained_face =
+            const auto constrained_face =
               constraint_mask[v] & (face1 | face2 | edge);
 
-            const bool type = constraint_mask[v] & this_type;
+            const bool type = (constraint_mask[v] & this_type) !=
+                              dealii::internal::MatrixFreeFunctions::
+                                ConstraintKinds::unconstrained;
 
             for (unsigned int x_idx = 0; x_idx < fe_degree + 1; ++x_idx)
               for (unsigned int y_idx = 0; y_idx < fe_degree + 1; ++y_idx)
@@ -320,18 +336,36 @@ namespace dealii
                                                                        y_idx;
 
                     typename Number::value_type t = 0;
-                    const bool on_face1 = (constraint_mask[v] & face1_type) ?
-                                            (face1_idx == 0) :
-                                            (face1_idx == fe_degree);
-                    const bool on_face2 = (constraint_mask[v] & face2_type) ?
-                                            (face2_idx == 0) :
-                                            (face2_idx == fe_degree);
+                    const bool                  on_face1 =
+                      ((constraint_mask[v] & face1_type) !=
+                       dealii::internal::MatrixFreeFunctions::ConstraintKinds::
+                         unconstrained) ?
+                                         (face1_idx == 0) :
+                                         (face1_idx == fe_degree);
+                    const bool on_face2 =
+                      ((constraint_mask[v] & face2_type) !=
+                       dealii::internal::MatrixFreeFunctions::ConstraintKinds::
+                         unconstrained) ?
+                        (face2_idx == 0) :
+                        (face2_idx == fe_degree);
                     const bool constrained_dof =
-                      (((constraint_mask[v] & face1) && on_face1) ||
-                       ((constraint_mask[v] & face2) && on_face2) ||
-                       ((constraint_mask[v] & edge) && on_face1 && on_face2));
+                      ((((constraint_mask[v] & face1) !=
+                         dealii::internal::MatrixFreeFunctions::
+                           ConstraintKinds::unconstrained) &&
+                        on_face1) ||
+                       (((constraint_mask[v] & face2) !=
+                         dealii::internal::MatrixFreeFunctions::
+                           ConstraintKinds::unconstrained) &&
+                        on_face2) ||
+                       (((constraint_mask[v] & edge) !=
+                         dealii::internal::MatrixFreeFunctions::
+                           ConstraintKinds::unconstrained) &&
+                        on_face1 && on_face2));
 
-                    if (constrained_face && constrained_dof)
+                    if ((constrained_face !=
+                         dealii::internal::MatrixFreeFunctions::
+                           ConstraintKinds::unconstrained) &&
+                        constrained_dof)
                       {
                         if (type)
                           {
@@ -391,7 +425,8 @@ namespace dealii
 
 template <int dim>
 void
-test(const unsigned int degree, const unsigned int mask_value)
+test(const unsigned int                                           degree,
+     const dealii::internal::MatrixFreeFunctions::ConstraintKinds mask_value)
 {
   Triangulation<dim> tria;
   GridGenerator::subdivided_hyper_cube(tria, 2);
@@ -420,8 +455,13 @@ test(const unsigned int degree, const unsigned int mask_value)
   FEEvaluation<dim, -1, 0, 1, double> eval(matrix_free);
   eval.reinit(0);
 
-  std::array<unsigned int, VectorizedArray<double>::size()> cmask;
-  std::fill(cmask.begin(), cmask.end(), 0);
+  std::array<dealii::internal::MatrixFreeFunctions::ConstraintKinds,
+             VectorizedArray<double>::size()>
+    cmask;
+  std::fill(
+    cmask.begin(),
+    cmask.end(),
+    dealii::internal::MatrixFreeFunctions::ConstraintKinds::unconstrained);
   cmask[0] = mask_value;
 
   for (unsigned int b = 0; b < 2; ++b)
@@ -473,49 +513,47 @@ main(int argc, char **argv)
 
   for (unsigned int degree = 1; degree <= 3; ++degree)
     {
-      test<2>(degree, 0);
+      test<2>(
+        degree,
+        dealii::internal::MatrixFreeFunctions::ConstraintKinds::unconstrained);
       deallog << std::endl;
 
       test<2>(degree,
-              0 |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::face_x |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_x |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::
+              dealii::internal::MatrixFreeFunctions::ConstraintKinds::face_x |
+                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_x |
+                dealii::internal::MatrixFreeFunctions::ConstraintKinds::
                   type_y); // face 0/0
       test<2>(degree,
-              0 |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::face_x |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::
+              dealii::internal::MatrixFreeFunctions::ConstraintKinds::face_x |
+                dealii::internal::MatrixFreeFunctions::ConstraintKinds::
                   type_x); // face 0/1
       test<2>(degree,
-              0 |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::face_x |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::
+              dealii::internal::MatrixFreeFunctions::ConstraintKinds::face_x |
+                dealii::internal::MatrixFreeFunctions::ConstraintKinds::
                   type_y); // face 1/0
-      test<2>(degree,
-              0 | dealii::internal::MatrixFreeFunctions::ConstraintTypes::
-                    face_x); // face 1/1
+      test<2>(
+        degree,
+        dealii::internal::MatrixFreeFunctions::ConstraintKinds::face_x); // face
+                                                                         // 1/1
       deallog << std::endl;
 
       test<2>(degree,
-              0 |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::face_y |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_y |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::
+              dealii::internal::MatrixFreeFunctions::ConstraintKinds::face_y |
+                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_y |
+                dealii::internal::MatrixFreeFunctions::ConstraintKinds::
                   type_x); // face 2/0
       test<2>(degree,
-              0 |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::face_y |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::
+              dealii::internal::MatrixFreeFunctions::ConstraintKinds::face_y |
+                dealii::internal::MatrixFreeFunctions::ConstraintKinds::
                   type_y); // face 2/1
       test<2>(degree,
-              0 |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::face_y |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::
+              dealii::internal::MatrixFreeFunctions::ConstraintKinds::face_y |
+                dealii::internal::MatrixFreeFunctions::ConstraintKinds::
                   type_x); // face 3/0
-      test<2>(degree,
-              0 | dealii::internal::MatrixFreeFunctions::ConstraintTypes::
-                    face_y); // face 3/1
+      test<2>(
+        degree,
+        dealii::internal::MatrixFreeFunctions::ConstraintKinds::face_y); // face
+                                                                         // 3/1
       deallog << std::endl;
     }
 
@@ -523,140 +561,140 @@ main(int argc, char **argv)
     {
       // edge 2
       test<3>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintTypes::edge_yz |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_y |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_z);
+              dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_yz |
+                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_y |
+                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_z);
       test<3>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintTypes::edge_yz |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_y |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_z |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_x);
+              dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_yz |
+                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_y |
+                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_z |
+                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_x);
 
       // edge 3
       test<3>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintTypes::edge_yz |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_z);
+              dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_yz |
+                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_z);
       test<3>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintTypes::edge_yz |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_z |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_x);
+              dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_yz |
+                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_z |
+                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_x);
 
       // edge 6
       test<3>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintTypes::edge_yz |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_y);
+              dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_yz |
+                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_y);
       test<3>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintTypes::edge_yz |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_y |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_x);
+              dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_yz |
+                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_y |
+                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_x);
 
       // edge 7
       test<3>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintTypes::edge_yz);
+              dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_yz);
       test<3>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintTypes::edge_yz |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_x);
+              dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_yz |
+                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_x);
 
 
       // edge 0
       test<3>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintTypes::edge_zx |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_x |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_z);
+              dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_zx |
+                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_x |
+                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_z);
       test<3>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintTypes::edge_zx |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_x |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_z |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_y);
+              dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_zx |
+                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_x |
+                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_z |
+                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_y);
 
       // edge 1
       test<3>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintTypes::edge_zx |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_z);
+              dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_zx |
+                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_z);
       test<3>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintTypes::edge_zx |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_z |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_y);
+              dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_zx |
+                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_z |
+                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_y);
 
       // edge 4
       test<3>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintTypes::edge_zx |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_x);
+              dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_zx |
+                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_x);
       test<3>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintTypes::edge_zx |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_x |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_y);
+              dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_zx |
+                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_x |
+                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_y);
 
       // edge 5
       test<3>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintTypes::edge_zx);
+              dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_zx);
       test<3>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintTypes::edge_zx |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_y);
+              dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_zx |
+                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_y);
 
 
       // edge 8
       test<3>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintTypes::edge_xy |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_x |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_y);
+              dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_xy |
+                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_x |
+                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_y);
       test<3>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintTypes::edge_xy |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_x |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_y |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_z);
+              dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_xy |
+                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_x |
+                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_y |
+                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_z);
 
       // edge 9
       test<3>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintTypes::edge_xy |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_y);
+              dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_xy |
+                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_y);
       test<3>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintTypes::edge_xy |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_y |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_z);
+              dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_xy |
+                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_y |
+                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_z);
 
       // edge 10
       test<3>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintTypes::edge_xy |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_x);
+              dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_xy |
+                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_x);
       test<3>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintTypes::edge_xy |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_x |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_z);
+              dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_xy |
+                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_x |
+                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_z);
 
       // edge 11
       test<3>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintTypes::edge_xy);
+              dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_xy);
       test<3>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintTypes::edge_xy |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_z);
+              dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_xy |
+                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_z);
 
 
       // face 0
       test<3>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintTypes::face_x |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_x);
+              dealii::internal::MatrixFreeFunctions::ConstraintKinds::face_x |
+                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_x);
 
       // face 1
       test<3>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintTypes::face_x);
+              dealii::internal::MatrixFreeFunctions::ConstraintKinds::face_x);
 
       // face 2
       test<3>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintTypes::face_y |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_y);
+              dealii::internal::MatrixFreeFunctions::ConstraintKinds::face_y |
+                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_y);
 
       // face 3
       test<3>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintTypes::face_y);
+              dealii::internal::MatrixFreeFunctions::ConstraintKinds::face_y);
 
       // face 4
       test<3>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintTypes::face_z |
-                dealii::internal::MatrixFreeFunctions::ConstraintTypes::type_z);
+              dealii::internal::MatrixFreeFunctions::ConstraintKinds::face_z |
+                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_z);
 
       // face 5
       test<3>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintTypes::face_z);
+              dealii::internal::MatrixFreeFunctions::ConstraintKinds::face_z);
     }
 }

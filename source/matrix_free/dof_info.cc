@@ -104,7 +104,8 @@ namespace internal
           // one
           const bool has_constraints =
             (hanging_node_constraint_masks.size() != 0 &&
-             hanging_node_constraint_masks[ib] != 0) ||
+             hanging_node_constraint_masks[ib] !=
+               ConstraintKinds::unconstrained) ||
             (row_starts[ib].second != row_starts[ib + n_fe_components].second);
 
           auto do_copy = [&](const unsigned int *begin,
@@ -230,7 +231,8 @@ namespace internal
                       has_hanging_nodes |=
                         hanging_node_constraint_masks[boundary_cells[i] *
                                                         n_components +
-                                                      comp] > 0;
+                                                      comp] !=
+                        ConstraintKinds::unconstrained;
 
                   if (has_hanging_nodes ||
                       row_starts[boundary_cells[i] * n_components].second !=
@@ -336,7 +338,7 @@ namespace internal
       new_dof_indices.reserve(dof_indices.size());
       new_constraint_indicator.reserve(constraint_indicator.size());
 
-      std::vector<unsigned int> new_hanging_node_constraint_masks;
+      std::vector<ConstraintKinds> new_hanging_node_constraint_masks;
       new_hanging_node_constraint_masks.reserve(
         new_hanging_node_constraint_masks.size());
 
@@ -385,7 +387,8 @@ namespace internal
                       const auto mask =
                         hanging_node_constraint_masks[cell_no + comp];
                       new_hanging_node_constraint_masks.push_back(mask);
-                      has_hanging_nodes |= mask > 0;
+                      has_hanging_nodes |=
+                        mask != ConstraintKinds::unconstrained;
                     }
 
                   new_dof_indices.insert(
@@ -425,7 +428,8 @@ namespace internal
                   .second = new_constraint_indicator.size();
 
                 if (hanging_node_constraint_masks.size() > 0)
-                  new_hanging_node_constraint_masks.push_back(0);
+                  new_hanging_node_constraint_masks.push_back(
+                    ConstraintKinds::unconstrained);
               }
           position_cell += n_vect;
         }

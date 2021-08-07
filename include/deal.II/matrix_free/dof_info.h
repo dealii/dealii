@@ -30,6 +30,7 @@
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 
 #include <deal.II/matrix_free/face_info.h>
+#include <deal.II/matrix_free/hanging_nodes_internal.h>
 #include <deal.II/matrix_free/mapping_info.h>
 #include <deal.II/matrix_free/shape_info.h>
 #include <deal.II/matrix_free/task_info.h>
@@ -527,7 +528,7 @@ namespace internal
        * Masks indicating for each cell and component if the optimized
        * hanging-node constraint is applicable and if yes which type.
        */
-      std::vector<unsigned int> hanging_node_constraint_masks;
+      std::vector<ConstraintKinds> hanging_node_constraint_masks;
 
       /**
        * This variable describes the position of constraints in terms of the

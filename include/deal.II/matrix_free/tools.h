@@ -453,7 +453,8 @@ namespace MatrixFreeTools
                                                    first_selected_component];
 
                 // cell has hanging nodes
-                if (mask != 0)
+                if (mask != dealii::internal::MatrixFreeFunctions::
+                              ConstraintKinds::unconstrained)
                   {
                     // check if hanging node internpolation matrix has been set
                     // up
@@ -465,7 +466,9 @@ namespace MatrixFreeTools
                         AlignedVector<VectorizedArrayType> values_dofs(
                           dofs_per_component);
 
-                        std::array<unsigned int, VectorizedArrayType::size()>
+                        std::array<dealii::internal::MatrixFreeFunctions::
+                                     ConstraintKinds,
+                                   VectorizedArrayType::size()>
                           constraint_mask;
                         constraint_mask[0] = mask;
 
@@ -763,7 +766,7 @@ namespace MatrixFreeTools
       // constraints!
       std::array<std::vector<Number>, n_lanes> diagonals_local_constrained;
 
-      std::map<unsigned int,
+      std::map<dealii::internal::MatrixFreeFunctions::ConstraintKinds,
                std::vector<std::tuple<unsigned int, unsigned int, Number>>>
         locally_relevant_constrains_hn_map;
     };

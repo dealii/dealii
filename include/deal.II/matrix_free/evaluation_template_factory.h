@@ -22,6 +22,7 @@
 
 #include <deal.II/matrix_free/dof_info.h>
 #include <deal.II/matrix_free/evaluation_flags.h>
+#include <deal.II/matrix_free/hanging_nodes_internal.h>
 #include <deal.II/matrix_free/shape_info.h>
 
 
@@ -199,10 +200,11 @@ namespace internal
     apply(const unsigned int n_components,
           const unsigned int fe_degree,
           const FEEvaluationBaseData<dim, Number, false, VectorizedArrayType>
-            &        fe_eval,
-          const bool transpose,
-          const std::array<unsigned int, VectorizedArrayType::size()> &c_mask,
-          VectorizedArrayType *                                        values);
+            &                                            fe_eval,
+          const bool                                     transpose,
+          const std::array<MatrixFreeFunctions::ConstraintKinds,
+                           VectorizedArrayType::size()> &c_mask,
+          VectorizedArrayType *                          values);
 
     /**
      * For faces.
@@ -213,10 +215,11 @@ namespace internal
     apply(const unsigned int n_components,
           const unsigned int fe_degree,
           const FEEvaluationBaseData<dim, Number, true, VectorizedArrayType>
-            &        fe_eval,
-          const bool transpose,
-          const std::array<unsigned int, VectorizedArrayType::size()> &c_mask,
-          VectorizedArrayType *                                        values);
+            &                                            fe_eval,
+          const bool                                     transpose,
+          const std::array<MatrixFreeFunctions::ConstraintKinds,
+                           VectorizedArrayType::size()> &c_mask,
+          VectorizedArrayType *                          values);
   };
 
 } // end of namespace internal
