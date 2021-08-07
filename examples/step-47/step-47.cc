@@ -853,7 +853,10 @@ namespace Step47
           error_per_cell[cell->active_cell_index()] = std::sqrt(local_error);
         }
 
-      const double error_norm = error_per_cell.l2_norm();
+      const double error_norm =
+        VectorTools::compute_global_error(triangulation,
+                                          error_per_cell,
+                                          VectorTools::L2_norm);
       std::cout << "   Error in the broken H2 seminorm: " << error_norm
                 << std::endl;
     }
