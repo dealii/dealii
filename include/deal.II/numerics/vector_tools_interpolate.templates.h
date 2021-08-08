@@ -228,8 +228,7 @@ namespace VectorTools
                "zero or equal to the number of components in the finite "
                "element."));
 
-      Assert(vec.size() == dof_handler.n_dofs(),
-             ExcDimensionMismatch(vec.size(), dof_handler.n_dofs()));
+      AssertDimension(vec.size(), dof_handler.n_dofs());
 
       Assert(component_mask.n_selected_components(
                dof_handler.get_fe_collection().n_components()) > 0,
@@ -361,10 +360,7 @@ namespace VectorTools
           dof_values.resize(n_dofs);
 
           // Get all function values:
-          Assert(
-            n_components == function(cell)->n_components,
-            ExcDimensionMismatch(dof_handler.get_fe_collection().n_components(),
-                                 function(cell)->n_components));
+          Assert(n_components, function(cell)->n_components);
           function(cell)->vector_value_list(generalized_support_points,
                                             function_values);
 
@@ -485,10 +481,8 @@ namespace VectorTools
     VectorType &                                               vec,
     const ComponentMask &                                      component_mask)
   {
-    Assert(dof_handler.get_fe_collection().n_components() ==
-             function.n_components,
-           ExcDimensionMismatch(dof_handler.get_fe_collection().n_components(),
-                                function.n_components));
+    AssertDimension(dof_handler.get_fe_collection().n_components(),
+                    function.n_components);
 
     // Create a small lambda capture wrapping function and call the
     // internal implementation
@@ -918,10 +912,8 @@ namespace VectorTools
     Assert(dof1.get_fe_collection() == dof2.get_fe_collection(),
            ExcMessage(
              "The FECollections of both DoFHandler objects must match"));
-    Assert(u1.size() == dof1.n_dofs(),
-           ExcDimensionMismatch(u1.size(), dof1.n_dofs()));
-    Assert(u2.size() == dof2.n_dofs(),
-           ExcDimensionMismatch(u2.size(), dof2.n_dofs()));
+    AssertDimension(u1.size(), dof1.n_dofs());
+    AssertDimension(u2.size(), dof2.n_dofs());
 
     Vector<typename VectorType::value_type> cache;
 
