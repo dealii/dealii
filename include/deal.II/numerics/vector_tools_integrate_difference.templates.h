@@ -451,8 +451,7 @@ namespace VectorTools
 
       const unsigned int n_components = dof.get_fe(0).n_components();
 
-      Assert(exact_solution.n_components == n_components,
-             ExcDimensionMismatch(exact_solution.n_components, n_components));
+      AssertDimension(exact_solution.n_components, n_components);
 
       if (weight != nullptr)
         {
