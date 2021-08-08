@@ -165,13 +165,13 @@ namespace VectorTools
             {
               weight->value_list(fe_values.get_quadrature_points(),
                                  data.weight_values);
-              for (unsigned int k = 0; k < n_q_points; ++k)
+              for (const auto k : fe_values.quadrature_point_indices())
                 data.weight_vectors[k] = data.weight_values[k];
             }
         }
       else
         {
-          for (unsigned int k = 0; k < n_q_points; ++k)
+          for (const auto k : fe_values.quadrature_point_indices())
             data.weight_vectors[k] = 1.;
         }
 
@@ -192,19 +192,19 @@ namespace VectorTools
             {
               exact_solution.vector_value_list(
                 fe_values.get_quadrature_points(), data.tmp_vector_values);
-              for (unsigned int i = 0; i < n_q_points; ++i)
+              for (const auto i : fe_values.quadrature_point_indices())
                 data.psi_values[i] = data.tmp_vector_values[i];
             }
           else
             {
               exact_solution.value_list(fe_values.get_quadrature_points(),
                                         data.tmp_values);
-              for (unsigned int i = 0; i < n_q_points; ++i)
+              for (const auto i : fe_values.quadrature_point_indices())
                 data.psi_values[i](0) = data.tmp_values[i];
             }
 
           // then subtract finite element fe_function
-          for (unsigned int q = 0; q < n_q_points; ++q)
+          for (const auto q : fe_values.quadrature_point_indices())
             for (unsigned int i = 0; i < data.psi_values[q].size(); ++i)
               data.psi_values[q][i] -= data.function_values[q][i];
         }
@@ -219,7 +219,7 @@ namespace VectorTools
             {
               exact_solution.vector_gradient_list(
                 fe_values.get_quadrature_points(), data.tmp_vector_gradients);
-              for (unsigned int i = 0; i < n_q_points; ++i)
+              for (const auto i : fe_values.quadrature_point_indices())
                 for (unsigned int comp = 0; comp < data.psi_grads[i].size();
                      ++comp)
                   data.psi_grads[i][comp] = data.tmp_vector_gradients[i][comp];
@@ -228,7 +228,7 @@ namespace VectorTools
             {
               exact_solution.gradient_list(fe_values.get_quadrature_points(),
                                            data.tmp_gradients);
-              for (unsigned int i = 0; i < n_q_points; ++i)
+              for (const auto i : fe_values.quadrature_point_indices())
                 data.psi_grads[i][0] = data.tmp_gradients[i];
             }
 
@@ -239,7 +239,7 @@ namespace VectorTools
           // component of the gradient from the exact function.
           if (update_flags & update_normal_vectors)
             for (unsigned int k = 0; k < n_components; ++k)
-              for (unsigned int q = 0; q < n_q_points; ++q)
+              for (const auto q : fe_values.quadrature_point_indices())
                 {
                   // compute (f.n) n
                   const typename ProductType<Number, double>::type f_dot_n =
@@ -252,7 +252,7 @@ namespace VectorTools
                 }
           else
             for (unsigned int k = 0; k < n_components; ++k)
-              for (unsigned int q = 0; q < n_q_points; ++q)
+              for (const auto q : fe_values.quadrature_point_indices())
                 for (unsigned int d = 0; d < spacedim; ++d)
                   data.psi_grads[q][k][d] -= data.function_grads[q][k][d];
         }
@@ -265,7 +265,7 @@ namespace VectorTools
         {
           case mean:
             // Compute values in quadrature points and integrate
-            for (unsigned int q = 0; q < n_q_points; ++q)
+            for (const auto q : fe_values.quadrature_point_indices())
               {
                 Number sum = 0;
                 for (unsigned int k = 0; k < n_components; ++k)
@@ -279,7 +279,7 @@ namespace VectorTools
           case L1_norm:
           case W1p_norm:
             // Compute values in quadrature points and integrate
-            for (unsigned int q = 0; q < n_q_points; ++q)
+            for (const auto q : fe_values.quadrature_point_indices())
               {
                 double sum = 0;
                 for (unsigned int k = 0; k < n_components; ++k)
@@ -300,7 +300,7 @@ namespace VectorTools
           case L2_norm:
           case H1_norm:
             // Compute values in quadrature points and integrate
-            for (unsigned int q = 0; q < n_q_points; ++q)
+            for (const auto q : fe_values.quadrature_point_indices())
               {
                 double sum = 0;
                 for (unsigned int k = 0; k < n_components; ++k)
@@ -317,7 +317,7 @@ namespace VectorTools
 
           case Linfty_norm:
           case W1infty_norm:
-            for (unsigned int q = 0; q < n_q_points; ++q)
+            for (const auto q : fe_values.quadrature_point_indices())
               for (unsigned int k = 0; k < n_components; ++k)
                 if (data.weight_vectors[q](k) != 0)
                   diff = std::max(diff,
@@ -342,7 +342,7 @@ namespace VectorTools
         {
           case W1p_seminorm:
           case W1p_norm:
-            for (unsigned int q = 0; q < n_q_points; ++q)
+            for (const auto q : fe_values.quadrature_point_indices())
               {
                 double sum = 0;
                 for (unsigned int k = 0; k < n_components; ++k)
@@ -357,7 +357,7 @@ namespace VectorTools
 
           case H1_seminorm:
           case H1_norm:
-            for (unsigned int q = 0; q < n_q_points; ++q)
+            for (const auto q : fe_values.quadrature_point_indices())
               {
                 double sum = 0;
                 for (unsigned int k = 0; k < n_components; ++k)
@@ -370,7 +370,7 @@ namespace VectorTools
             break;
 
           case Hdiv_seminorm:
-            for (unsigned int q = 0; q < n_q_points; ++q)
+            for (const auto q : fe_values.quadrature_point_indices())
               {
                 unsigned int idx = 0;
                 if (weight != nullptr)
@@ -403,7 +403,7 @@ namespace VectorTools
           case W1infty_norm:
             {
               double t = 0;
-              for (unsigned int q = 0; q < n_q_points; ++q)
+              for (const auto q : fe_values.quadrature_point_indices())
                 for (unsigned int k = 0; k < n_components; ++k)
                   if (data.weight_vectors[q](k) != 0)
                     for (unsigned int d = 0; d < dim; ++d)
