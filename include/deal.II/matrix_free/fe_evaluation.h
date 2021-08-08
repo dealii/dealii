@@ -2025,10 +2025,10 @@ protected:
  *     phi.reinit(cell_index);
  *     for (unsigned int q=0; q<phi.n_q_points; ++q)
  *       {
- *         Point<dim,VectorizedArray<double> > p_vect =
+ *         const Point<dim,VectorizedArray<double> > p_vect =
  *           phi.quadrature_point(q);
  *         // Need to evaluate function for each component in VectorizedArray
- *         VectorizedArray<double> f_value;
+ *         VectorizedArray<double> f_value = 0.0;
  *         for (unsigned int v=0; v<VectorizedArray<double>::size(); ++v)
  *           {
  *             Point<dim> p;
