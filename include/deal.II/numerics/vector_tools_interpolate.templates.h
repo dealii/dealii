@@ -310,7 +310,7 @@ namespace VectorTools
 
       // An FEValues object to evaluate (generalized) support point
       // locations as well as Jacobians and their inverses.
-      // the latter are only needed for Hcurl or Hdiv conforming elements,
+      // The latter are only needed for Hcurl or Hdiv conforming elements,
       // but we'll just always include them.
       hp::FEValues<dim, spacedim> fe_values(mapping_collection,
                                             fe,
