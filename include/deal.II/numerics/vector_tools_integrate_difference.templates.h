@@ -613,8 +613,7 @@ namespace VectorTools
     const Function<spacedim> *                               weight,
     const double                                             exponent)
   {
-    internal::do_integrate_difference(hp::MappingCollection<dim, spacedim>(
-                                        mapping),
+    internal::do_integrate_difference(mapping,
                                       dof,
                                       fe_function,
                                       exact_solution,
