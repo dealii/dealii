@@ -1,0 +1,7 @@
+
+DEAL:Float:FEInterfaceViews Scalar::OK
+DEAL:Float:FEInterfaceViews Vector::OK
+DEAL:Double:FEInterfaceViews Scalar::OK
+DEAL:Double:FEInterfaceViews Vector::OK
+DEAL:Test jump functions::OK
+DEAL::OK

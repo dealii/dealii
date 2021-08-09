@@ -55,6 +55,15 @@ namespace FEInterfaceViews
      * Store a pointer to the FEInterfaceValues instance.
      */
     const FEInterfaceValues<dim, spacedim> *fe_interface;
+
+    /**
+     * Get the local degree-of-freedom values associated with the internally
+     * initialized cell interface.
+     */
+    template <class InputVector, class OutputVector>
+    void
+    get_local_dof_values(const InputVector &dof_values,
+                         OutputVector &     local_dof_values) const;
   };
 
 
@@ -91,6 +100,45 @@ namespace FEInterfaceViews
      */
     using third_derivative_type =
       typename FEValuesViews::Scalar<dim, spacedim>::third_derivative_type;
+
+    /**
+     * An alias for the data type of the product of a @p Number and the
+     * values of the view this class provides. This is the data type of
+     * scalar components of a finite element field whose degrees of
+     * freedom are described by a vector with elements of type @p Number.
+     */
+    template <typename Number>
+    using solution_value_type = typename ProductType<Number, value_type>::type;
+
+    /**
+     * An alias for the data type of the product of a @p Number and the
+     * gradients of the view this class provides. This is the data type of
+     * scalar components of a finite element field whose degrees of
+     * freedom are described by a vector with elements of type @p Number.
+     */
+    template <typename Number>
+    using solution_gradient_type =
+      typename ProductType<Number, gradient_type>::type;
+
+    /**
+     * An alias for the data type of the product of a @p Number and the
+     * Hessians of the view this class provides. This is the data type of
+     * scalar components of a finite element field whose degrees of
+     * freedom are described by a vector with elements of type @p Number.
+     */
+    template <typename Number>
+    using solution_hessian_type =
+      typename ProductType<Number, hessian_type>::type;
+
+    /**
+     * An alias for the data type of the product of a @p Number and the
+     * third derivatives of the view this class provides. This is the data type
+     * of scalar components of a finite element field whose degrees of
+     * freedom are described by a vector with elements of type @p Number.
+     */
+    template <typename Number>
+    using solution_third_derivative_type =
+      typename ProductType<Number, third_derivative_type>::type;
 
     /**
      * Constructor for an object that represents a single scalar component
@@ -272,6 +320,304 @@ namespace FEInterfaceViews
     third_derivative_type
     jump_3rd_derivative(const unsigned int interface_dof_index,
                         const unsigned int q_point) const;
+
+    /**
+     * Return the values of the selected scalar component of the finite
+     * element function characterized by <tt>fe_function</tt> at the
+     * quadrature points of the cell interface selected the last time
+     * the <tt>reinit</tt> function of the FEInterfaceValues object was called.
+     *
+     * The argument @p here_or_there selects between the value on cell 0 (here, @p true)
+     * and cell 1 (there, @p false). You can also interpret it as "upstream" (@p true)
+     * and "downstream" (@p false) as defined by the direction of the normal
+     * vector in this quadrature point. If @p here_or_there is true, the values
+     * from the first cell of the interface is used.
+     *
+     * The data type stored by the output vector must be what you get when you
+     * multiply the values of shape functions (i.e., @p value_type) times the
+     * type used to store the values of the unknowns $U_j$ of your finite
+     * element vector $U$ (represented by the @p fe_function argument).
+     *
+     * @dealiiRequiresUpdateFlags{update_values}
+     */
+    template <class InputVector>
+    void
+    get_function_values(
+      const bool         here_or_there,
+      const InputVector &fe_function,
+      std::vector<solution_value_type<typename InputVector::value_type>>
+        &values) const;
+
+    /**
+     * Same as above, but using a vector of local degree-of-freedom values. In
+     * other words, instead of extracting the nodal values of the degrees of
+     * freedom located on the current cell interface from a global vector
+     * associated with a DoFHandler object (as the function above does), this
+     * function instead takes these local nodal values through its first
+     * argument.
+     *
+     * @param[in] here_or_there Same as the one in the above function.
+     *
+     * @param[in] local_dof_values A vector of local nodal values. This vector
+     *   must have a length equal to number of DoFs on the current cell, and
+     * must be ordered in the same order as degrees of freedom are numbered on
+     *   the reference cell.
+     *
+     * @param[out] values A vector of values of the given finite element field,
+     *   at the quadrature points on the current object.
+     *
+     * @tparam InputVector The @p InputVector type must allow creation
+     *   of an ArrayView object from it; this is satisfied by the
+     *   `std::vector` class, among others.
+     */
+    template <class InputVector>
+    void
+    get_function_values_from_local_dof_values(
+      const bool         here_or_there,
+      const InputVector &local_dof_values,
+      std::vector<solution_value_type<typename InputVector::value_type>>
+        &values) const;
+
+    /**
+     * Return the jump in the values of the selected scalar component of the
+     * finite element function characterized by <tt>fe_function</tt> at the
+     * quadrature points of the cell interface selected the last time
+     * the <tt>reinit</tt> function of the FEInterfaceValues object was called.
+     *
+     * The data type stored by the output vector must be what you get when you
+     * multiply the values of shape functions (i.e., @p value_type) times the
+     * type used to store the values of the unknowns $U_j$ of your finite
+     * element vector $U$ (represented by the @p fe_function argument).
+     *
+     * @dealiiRequiresUpdateFlags{update_values}
+     */
+    template <class InputVector>
+    void
+    get_jump_in_function_values(
+      const InputVector &fe_function,
+      std::vector<solution_value_type<typename InputVector::value_type>>
+        &values) const;
+
+    /**
+     * This function relates to get_jump_in_function_values() in the same way
+     * as get_function_values_from_local_dof_values() relates to
+     * get_function_values(). See the documentation of
+     * get_function_values_from_local_dof_values() for more
+     * information.
+     */
+    template <class InputVector>
+    void
+    get_jump_in_function_values_from_local_dof_values(
+      const InputVector &local_dof_values,
+      std::vector<solution_value_type<typename InputVector::value_type>>
+        &values) const;
+
+    /**
+     * Return the average of the values of the selected scalar component of the
+     * finite element function characterized by <tt>fe_function</tt> at the
+     * quadrature points of the cell interface selected the last time
+     * the <tt>reinit</tt> function of the FEInterfaceValues object was called.
+     *
+     * The data type stored by the output vector must be what you get when you
+     * multiply the values of shape functions (i.e., @p value_type) times the
+     * type used to store the values of the unknowns $U_j$ of your finite
+     * element vector $U$ (represented by the @p fe_function argument).
+     *
+     * @dealiiRequiresUpdateFlags{update_values}
+     */
+    template <class InputVector>
+    void
+    get_average_of_function_values(
+      const InputVector &fe_function,
+      std::vector<solution_value_type<typename InputVector::value_type>>
+        &values) const;
+
+    /**
+     * This function relates to get_average_of_function_values() in the same way
+     * as get_function_values_from_local_dof_values() relates to
+     * get_function_values(). See the documentation of
+     * get_function_values_from_local_dof_values() for more
+     * information.
+     */
+    template <class InputVector>
+    void
+    get_average_of_function_values_from_local_dof_values(
+      const InputVector &local_dof_values,
+      std::vector<solution_value_type<typename InputVector::value_type>>
+        &values) const;
+
+    /**
+     * Return the jump in the gradients of the selected scalar components of the
+     * finite element function characterized by <tt>fe_function</tt> at the
+     * quadrature points of the cell interface selected the last time
+     * the <tt>reinit</tt> function of the FEInterfaceValues object was called.
+     *
+     * The data type stored by the output vector must be what you get when you
+     * multiply the gradients of shape functions (i.e., @p gradient_type)
+     * times the type used to store the values of the unknowns $U_j$ of your
+     * finite element vector $U$ (represented by the @p fe_function argument).
+     *
+     * @dealiiRequiresUpdateFlags{update_gradients}
+     */
+    template <class InputVector>
+    void
+    get_jump_in_function_gradients(
+      const InputVector &fe_function,
+      std::vector<solution_gradient_type<typename InputVector::value_type>>
+        &gradients) const;
+
+    /**
+     * This function relates to get_jump_in_function_gradients() in the same way
+     * as get_function_values_from_local_dof_values() relates to
+     * get_function_values(). See the documentation of
+     * get_function_values_from_local_dof_values() for more
+     * information.
+     */
+    template <class InputVector>
+    void
+    get_jump_in_function_gradients_from_local_dof_values(
+      const InputVector &local_dof_values,
+      std::vector<solution_gradient_type<typename InputVector::value_type>>
+        &gradients) const;
+
+    /**
+     * Return the average of the gradients of the selected scalar components of
+     * the finite element function characterized by <tt>fe_function</tt> at the
+     * quadrature points of the cell interface selected the last time
+     * the <tt>reinit</tt> function of the FEInterfaceValues object was called.
+     *
+     * The data type stored by the output vector must be what you get when you
+     * multiply the gradients of shape functions (i.e., @p gradient_type)
+     * times the type used to store the values of the unknowns $U_j$ of your
+     * finite element vector $U$ (represented by the @p fe_function argument).
+     *
+     * @dealiiRequiresUpdateFlags{update_gradients}
+     */
+    template <class InputVector>
+    void
+    get_average_of_function_gradients(
+      const InputVector &fe_function,
+      std::vector<solution_gradient_type<typename InputVector::value_type>>
+        &gradients) const;
+
+    /**
+     * This function relates to get_average_of_function_gradients() in the same
+     * way as get_function_values_from_local_dof_values() relates to
+     * get_function_values(). See the documentation of
+     * get_function_values_from_local_dof_values() for more
+     * information.
+     */
+    template <class InputVector>
+    void
+    get_average_of_function_gradients_from_local_dof_values(
+      const InputVector &local_dof_values,
+      std::vector<solution_gradient_type<typename InputVector::value_type>>
+        &gradients) const;
+
+    /**
+     * Return the average of the Hessians of the selected scalar component of
+     * the finite element function characterized by <tt>fe_function</tt> at the
+     * quadrature points of the cell, face or subface selected the last time
+     * the <tt>reinit</tt> function of the FEInterfaceValues object was called.
+     *
+     * The data type stored by the output vector must be what you get when you
+     * multiply the Hessians of shape functions (i.e., @p hessian_type) times
+     * the type used to store the values of the unknowns $U_j$ of your finite
+     * element vector $U$ (represented by the @p fe_function argument).
+     *
+     * @dealiiRequiresUpdateFlags{update_hessians}
+     */
+    template <class InputVector>
+    void
+    get_average_of_function_hessians(
+      const InputVector &fe_function,
+      std::vector<solution_hessian_type<typename InputVector::value_type>>
+        &hessians) const;
+
+    /**
+     * This function relates to get_average_of_function_hessians() in the same
+     * way as get_function_values_from_local_dof_values() relates to
+     * get_function_values(). See the documentation of
+     * get_function_values_from_local_dof_values() for more
+     * information.
+     */
+    template <class InputVector>
+    void
+    get_average_of_function_hessians_from_local_dof_values(
+      const InputVector &local_dof_values,
+      std::vector<solution_hessian_type<typename InputVector::value_type>>
+        &hessians) const;
+
+    /**
+     * Return the jump in the Hessians of the selected scalar component of the
+     * finite element function characterized by <tt>fe_function</tt> at the
+     * quadrature points of the cell, face or subface selected the last time
+     * the <tt>reinit</tt> function of the FEInterfaceValues object was called.
+     *
+     * The data type stored by the output vector must be what you get when you
+     * multiply the Hessians of shape functions (i.e., @p hessian_type) times
+     * the type used to store the values of the unknowns $U_j$ of your finite
+     * element vector $U$ (represented by the @p fe_function argument).
+     *
+     * @dealiiRequiresUpdateFlags{update_hessians}
+     */
+    template <class InputVector>
+    void
+    get_jump_in_function_hessians(
+      const InputVector &fe_function,
+      std::vector<solution_hessian_type<typename InputVector::value_type>>
+        &hessians) const;
+
+    /**
+     * This function relates to get_jump_in_function_hessians() in the same way
+     * as get_function_values_from_local_dof_values() relates to
+     * get_function_values(). See the documentation of
+     * get_function_values_from_local_dof_values() for more
+     * information.
+     */
+    template <class InputVector>
+    void
+    get_jump_in_function_hessians_from_local_dof_values(
+      const InputVector &local_dof_values,
+      std::vector<solution_hessian_type<typename InputVector::value_type>>
+        &hessians) const;
+
+    /**
+     * Return the jump in the third derivatives of the selected scalar component
+     * of the finite element function characterized by <tt>fe_function</tt> at
+     * the quadrature points of the cell, face or subface selected the last time
+     * the <tt>reinit</tt> function of the FEInterfaceValues object was called.
+     *
+     * The data type stored by the output vector must be what you get when you
+     * multiply the third derivatives of shape functions (i.e., @p
+     * third_derivative_type) times the type used to store the values of the
+     * unknowns $U_j$ of your finite element vector $U$ (represented by the @p
+     * fe_function argument).
+     *
+     * @dealiiRequiresUpdateFlags{update_third_derivatives}
+     */
+    template <class InputVector>
+    void
+    get_jump_in_function_third_derivatives(
+      const InputVector &fe_function,
+      std::vector<
+        solution_third_derivative_type<typename InputVector::value_type>>
+        &third_derivatives) const;
+
+    /**
+     * This function relates to get_jump_in_function_third_derivatives() in the
+     * same way as get_function_values_from_local_dof_values() relates
+     * to get_function_values(). See the documentation of
+     * get_function_values_from_local_dof_values() for more
+     * information.
+     */
+    template <class InputVector>
+    void
+    get_jump_in_function_third_derivatives_from_local_dof_values(
+      const InputVector &local_dof_values,
+      std::vector<
+        solution_third_derivative_type<typename InputVector::value_type>>
+        &third_derivatives) const;
 
   private:
     /**
@@ -481,6 +827,344 @@ namespace FEInterfaceViews
     third_derivative_type
     jump_3rd_derivative(const unsigned int interface_dof_index,
                         const unsigned int q_point) const;
+
+    /**
+     * An alias for the data type of the product of a @p Number and the
+     * values of the view this class provides. This is the data type of
+     * vector components of a finite element field whose degrees of
+     * freedom are described by a vector with elements of type @p Number.
+     */
+    template <typename Number>
+    using solution_value_type = typename ProductType<Number, value_type>::type;
+
+    /**
+     * An alias for the data type of the product of a @p Number and the
+     * gradients of the view this class provides. This is the data type of
+     * vector components of a finite element field whose degrees of
+     * freedom are described by a vector with elements of type @p Number.
+     */
+    template <typename Number>
+    using solution_gradient_type =
+      typename ProductType<Number, gradient_type>::type;
+
+    /**
+     * An alias for the data type of the product of a @p Number and the
+     * Hessians of the view this class provides. This is the data type of
+     * vector components of a finite element field whose degrees of
+     * freedom are described by a vector with elements of type @p Number.
+     */
+    template <typename Number>
+    using solution_hessian_type =
+      typename ProductType<Number, hessian_type>::type;
+
+    /**
+     * An alias for the data type of the product of a @p Number and the
+     * third derivatives of the view this class provides. This is the data type
+     * of vector components of a finite element field whose degrees of
+     * freedom are described by a vector with elements of type @p Number.
+     */
+    template <typename Number>
+    using solution_third_derivative_type =
+      typename ProductType<Number, third_derivative_type>::type;
+
+    /**
+     * Return the values of the selected vector component of the finite
+     * element function characterized by <tt>fe_function</tt> at the
+     * quadrature points of the cell interface selected the last time
+     * the <tt>reinit</tt> function of the FEInterfaceValues object was called.
+     *
+     * The argument @p here_or_there selects between the value on cell 0 (here, @p true)
+     * and cell 1 (there, @p false). You can also interpret it as "upstream" (@p true)
+     * and "downstream" (@p false) as defined by the direction of the normal
+     * vector in this quadrature point. If @p here_or_there is true, the values
+     * from the first cell of the interface is used.
+     *
+     * The data type stored by the output vector must be what you get when you
+     * multiply the values of shape functions (i.e., @p value_type) times the
+     * type used to store the values of the unknowns $U_j$ of your finite
+     * element vector $U$ (represented by the @p fe_function argument).
+     *
+     * @dealiiRequiresUpdateFlags{update_values}
+     */
+    template <class InputVector>
+    void
+    get_function_values(
+      const bool         here_or_there,
+      const InputVector &fe_function,
+      std::vector<solution_value_type<typename InputVector::value_type>>
+        &values) const;
+
+    /**
+     * Same as above, but using a vector of local degree-of-freedom values. In
+     * other words, instead of extracting the nodal values of the degrees of
+     * freedom located on the current cell interface from a global vector
+     * associated with a DoFHandler object (as the function above does), this
+     * function instead takes these local nodal values through its first
+     * argument.
+     *
+     * @param[in] here_or_there Same as the one in the above function.
+     *
+     * @param[in] local_dof_values A vector of local nodal values. This vector
+     *   must have a length equal to number of DoFs on the current cell, and
+     * must be ordered in the same order as degrees of freedom are numbered on
+     *   the reference cell.
+     *
+     * @param[out] values A vector of values of the given finite element field,
+     *   at the quadrature points on the current object.
+     *
+     * @tparam InputVector The @p InputVector type must allow creation
+     *   of an ArrayView object from it; this is satisfied by the
+     *   `std::vector` class, among others.
+     */
+    template <class InputVector>
+    void
+    get_function_values_from_local_dof_values(
+      const bool         here_or_there,
+      const InputVector &local_dof_values,
+      std::vector<solution_value_type<typename InputVector::value_type>>
+        &values) const;
+
+    /**
+     * Return the jump in the values of the selected vector component of the
+     * finite element function characterized by <tt>fe_function</tt> at the
+     * quadrature points of the cell interface selected the last time
+     * the <tt>reinit</tt> function of the FEInterfaceValues object was called.
+     *
+     * The data type stored by the output vector must be what you get when you
+     * multiply the values of shape functions (i.e., @p value_type) times the
+     * type used to store the values of the unknowns $U_j$ of your finite
+     * element vector $U$ (represented by the @p fe_function argument).
+     *
+     * @dealiiRequiresUpdateFlags{update_values}
+     */
+    template <class InputVector>
+    void
+    get_jump_in_function_values(
+      const InputVector &fe_function,
+      std::vector<solution_value_type<typename InputVector::value_type>>
+        &values) const;
+
+    /**
+     * This function relates to get_jump_in_function_values() in the same way
+     * as get_function_values_from_local_dof_values() relates to
+     * get_function_values(). See the documentation of
+     * get_function_values_from_local_dof_values() for more
+     * information.
+     */
+    template <class InputVector>
+    void
+    get_jump_in_function_values_from_local_dof_values(
+      const InputVector &local_dof_values,
+      std::vector<solution_value_type<typename InputVector::value_type>>
+        &values) const;
+
+    /**
+     * Return the average of the values of the selected vector component of the
+     * finite element function characterized by <tt>fe_function</tt> at the
+     * quadrature points of the cell interface selected the last time
+     * the <tt>reinit</tt> function of the FEInterfaceValues object was called.
+     *
+     * The data type stored by the output vector must be what you get when you
+     * multiply the values of shape functions (i.e., @p value_type) times the
+     * type used to store the values of the unknowns $U_j$ of your finite
+     * element vector $U$ (represented by the @p fe_function argument).
+     *
+     * @dealiiRequiresUpdateFlags{update_values}
+     */
+    template <class InputVector>
+    void
+    get_average_of_function_values(
+      const InputVector &fe_function,
+      std::vector<solution_value_type<typename InputVector::value_type>>
+        &values) const;
+
+    /**
+     * This function relates to get_average_of_function_values() in the same way
+     * as get_function_values_from_local_dof_values() relates to
+     * get_function_values(). See the documentation of
+     * get_function_values_from_local_dof_values() for more
+     * information.
+     */
+    template <class InputVector>
+    void
+    get_average_of_function_values_from_local_dof_values(
+      const InputVector &local_dof_values,
+      std::vector<solution_value_type<typename InputVector::value_type>>
+        &values) const;
+
+    /**
+     * Return the jump in the gradients of the selected vector components of the
+     * finite element function characterized by <tt>fe_function</tt> at the
+     * quadrature points of the cell interface selected the last time
+     * the <tt>reinit</tt> function of the FEInterfaceValues object was called.
+     *
+     * The data type stored by the output vector must be what you get when you
+     * multiply the gradients of shape functions (i.e., @p gradient_type)
+     * times the type used to store the values of the unknowns $U_j$ of your
+     * finite element vector $U$ (represented by the @p fe_function argument).
+     *
+     * @dealiiRequiresUpdateFlags{update_gradients}
+     */
+    template <class InputVector>
+    void
+    get_jump_in_function_gradients(
+      const InputVector &fe_function,
+      std::vector<solution_gradient_type<typename InputVector::value_type>>
+        &gradients) const;
+
+    /**
+     * This function relates to get_jump_in_function_gradients() in the same way
+     * as get_function_values_from_local_dof_values() relates to
+     * get_function_values(). See the documentation of
+     * get_function_values_from_local_dof_values() for more
+     * information.
+     */
+    template <class InputVector>
+    void
+    get_jump_in_function_gradients_from_local_dof_values(
+      const InputVector &local_dof_values,
+      std::vector<solution_gradient_type<typename InputVector::value_type>>
+        &gradients) const;
+
+    /**
+     * Return the average of the gradients of the selected vector components of
+     * the finite element function characterized by <tt>fe_function</tt> at the
+     * quadrature points of the cell interface selected the last time
+     * the <tt>reinit</tt> function of the FEInterfaceValues object was called.
+     *
+     * The data type stored by the output vector must be what you get when you
+     * multiply the gradients of shape functions (i.e., @p gradient_type)
+     * times the type used to store the values of the unknowns $U_j$ of your
+     * finite element vector $U$ (represented by the @p fe_function argument).
+     *
+     * @dealiiRequiresUpdateFlags{update_gradients}
+     */
+    template <class InputVector>
+    void
+    get_average_of_function_gradients(
+      const InputVector &fe_function,
+      std::vector<solution_gradient_type<typename InputVector::value_type>>
+        &gradients) const;
+
+    /**
+     * This function relates to get_average_of_function_gradients() in the same
+     * way as get_function_values_from_local_dof_values() relates to
+     * get_function_values(). See the documentation of
+     * get_function_values_from_local_dof_values() for more
+     * information.
+     */
+    template <class InputVector>
+    void
+    get_average_of_function_gradients_from_local_dof_values(
+      const InputVector &local_dof_values,
+      std::vector<solution_gradient_type<typename InputVector::value_type>>
+        &gradients) const;
+
+    /**
+     * Return the average of the Hessians of the selected vector component of
+     * the finite element function characterized by <tt>fe_function</tt> at the
+     * quadrature points of the cell, face or subface selected the last time
+     * the <tt>reinit</tt> function of the FEInterfaceValues object was called.
+     *
+     * The data type stored by the output vector must be what you get when you
+     * multiply the Hessians of shape functions (i.e., @p hessian_type) times
+     * the type used to store the values of the unknowns $U_j$ of your finite
+     * element vector $U$ (represented by the @p fe_function argument).
+     *
+     * @dealiiRequiresUpdateFlags{update_hessians}
+     */
+    template <class InputVector>
+    void
+    get_average_of_function_hessians(
+      const InputVector &fe_function,
+      std::vector<solution_hessian_type<typename InputVector::value_type>>
+        &hessians) const;
+
+    /**
+     * This function relates to get_average_of_function_hessians() in the same
+     * way as get_function_values_from_local_dof_values() relates to
+     * get_function_values(). See the documentation of
+     * get_function_values_from_local_dof_values() for more
+     * information.
+     */
+    template <class InputVector>
+    void
+    get_average_of_function_hessians_from_local_dof_values(
+      const InputVector &local_dof_values,
+      std::vector<solution_hessian_type<typename InputVector::value_type>>
+        &hessians) const;
+
+    /**
+     * Return the jump in the Hessians of the selected vector component of the
+     * finite element function characterized by <tt>fe_function</tt> at the
+     * quadrature points of the cell, face or subface selected the last time
+     * the <tt>reinit</tt> function of the FEInterfaceValues object was called.
+     *
+     * The data type stored by the output vector must be what you get when you
+     * multiply the Hessians of shape functions (i.e., @p hessian_type) times
+     * the type used to store the values of the unknowns $U_j$ of your finite
+     * element vector $U$ (represented by the @p fe_function argument).
+     *
+     * @dealiiRequiresUpdateFlags{update_hessians}
+     */
+    template <class InputVector>
+    void
+    get_jump_in_function_hessians(
+      const InputVector &fe_function,
+      std::vector<solution_hessian_type<typename InputVector::value_type>>
+        &hessians) const;
+
+    /**
+     * This function relates to get_jump_in_function_hessians() in the same way
+     * as get_function_values_from_local_dof_values() relates to
+     * get_function_values(). See the documentation of
+     * get_function_values_from_local_dof_values() for more
+     * information.
+     */
+    template <class InputVector>
+    void
+    get_jump_in_function_hessians_from_local_dof_values(
+      const InputVector &local_dof_values,
+      std::vector<solution_hessian_type<typename InputVector::value_type>>
+        &hessians) const;
+
+    /**
+     * Return the jump in the third derivatives of the selected vector component
+     * of the finite element function characterized by <tt>fe_function</tt> at
+     * the quadrature points of the cell, face or subface selected the last time
+     * the <tt>reinit</tt> function of the FEInterfaceValues object was called.
+     *
+     * The data type stored by the output vector must be what you get when you
+     * multiply the third derivatives of shape functions (i.e., @p
+     * third_derivative_type) times the type used to store the values of the
+     * unknowns $U_j$ of your finite element vector $U$ (represented by the @p
+     * fe_function argument).
+     *
+     * @dealiiRequiresUpdateFlags{update_third_derivatives}
+     */
+    template <class InputVector>
+    void
+    get_jump_in_function_third_derivatives(
+      const InputVector &fe_function,
+      std::vector<
+        solution_third_derivative_type<typename InputVector::value_type>>
+        &third_derivatives) const;
+
+    /**
+     * This function relates to get_jump_in_function_third_derivatives() in the
+     * same way as get_function_values_from_local_dof_values() relates
+     * to get_function_values(). See the documentation of
+     * get_function_values_from_local_dof_values() for more
+     * information.
+     */
+    template <class InputVector>
+    void
+    get_jump_in_function_third_derivatives_from_local_dof_values(
+      const InputVector &local_dof_values,
+      std::vector<
+        solution_third_derivative_type<typename InputVector::value_type>>
+        &third_derivatives) const;
+
 
   private:
     /**
@@ -1836,6 +2520,24 @@ namespace FEInterfaceViews
 
 
   template <int dim, int spacedim>
+  template <class InputVector, class OutputVector>
+  void
+  Base<dim, spacedim>::get_local_dof_values(
+    const InputVector &dof_values,
+    OutputVector &     local_dof_values) const
+  {
+    const auto &interface_dof_indices =
+      this->fe_interface->get_interface_dof_indices();
+
+    AssertDimension(interface_dof_indices.size(), local_dof_values.size());
+
+    for (unsigned int i = 0; i < interface_dof_indices.size(); ++i)
+      local_dof_values[i] = dof_values(interface_dof_indices[i]);
+  }
+
+
+
+  template <int dim, int spacedim>
   typename Scalar<dim, spacedim>::value_type
   Scalar<dim, spacedim>::value(const bool         here_or_there,
                                const unsigned int interface_dof_index,
@@ -2121,6 +2823,375 @@ namespace FEInterfaceViews
                                       const unsigned int q_point) const
   {
     return jump_in_hessians(interface_dof_index, q_point);
+  }
+
+
+
+  template <int dim, int spacedim>
+  template <class InputVector>
+  void
+  Scalar<dim, spacedim>::get_function_values_from_local_dof_values(
+    const bool         here_or_there,
+    const InputVector &local_dof_values,
+    std::vector<solution_value_type<typename InputVector::value_type>> &values)
+    const
+  {
+    Assert(values.size() == this->fe_interface->n_quadrature_points,
+           ExcNotImplemented());
+
+    const auto &interface_dof_indices =
+      this->fe_interface->get_interface_dof_indices();
+
+    for (const auto dof_index : this->fe_interface->dof_indices())
+      for (const auto q_index : this->fe_interface->quadrature_point_indices())
+        {
+          if (dof_index == 0)
+            values[q_index] = 0.;
+
+          values[q_index] += local_dof_values[dof_index] *
+                             value(here_or_there, dof_index, q_index);
+        }
+  }
+
+
+
+  template <int dim, int spacedim>
+  template <class InputVector>
+  void
+  Scalar<dim, spacedim>::get_function_values(
+    const bool         here_or_there,
+    const InputVector &fe_function,
+    std::vector<solution_value_type<typename InputVector::value_type>> &values)
+    const
+  {
+    std::vector<typename InputVector::value_type> local_dof_values(
+      this->fe_interface->n_current_interface_dofs());
+    this->get_local_dof_values(fe_function, local_dof_values);
+
+    get_function_values_from_local_dof_values(here_or_there,
+                                              local_dof_values,
+                                              values);
+  }
+
+
+
+  template <int dim, int spacedim>
+  template <class InputVector>
+  void
+  Scalar<dim, spacedim>::get_jump_in_function_values_from_local_dof_values(
+    const InputVector &local_dof_values,
+    std::vector<solution_value_type<typename InputVector::value_type>> &values)
+    const
+  {
+    Assert(values.size() == this->fe_interface->n_quadrature_points,
+           ExcNotImplemented());
+
+    const auto &interface_dof_indices =
+      this->fe_interface->get_interface_dof_indices();
+
+    for (const auto dof_index : this->fe_interface->dof_indices())
+      for (const auto q_index : this->fe_interface->quadrature_point_indices())
+        {
+          if (dof_index == 0)
+            values[q_index] = 0.;
+
+          values[q_index] +=
+            local_dof_values[dof_index] * jump_in_values(dof_index, q_index);
+        }
+  }
+
+
+
+  template <int dim, int spacedim>
+  template <class InputVector>
+  void
+  Scalar<dim, spacedim>::get_jump_in_function_values(
+    const InputVector &fe_function,
+    std::vector<solution_value_type<typename InputVector::value_type>> &values)
+    const
+  {
+    std::vector<typename InputVector::value_type> local_dof_values(
+      this->fe_interface->n_current_interface_dofs());
+    this->get_local_dof_values(fe_function, local_dof_values);
+
+    get_jump_in_function_values_from_local_dof_values(local_dof_values, values);
+  }
+
+
+
+  template <int dim, int spacedim>
+  template <class InputVector>
+  void
+  Scalar<dim, spacedim>::get_jump_in_function_gradients_from_local_dof_values(
+    const InputVector &local_dof_values,
+    std::vector<solution_gradient_type<typename InputVector::value_type>>
+      &gradients) const
+  {
+    Assert(gradients.size() == this->fe_interface->n_quadrature_points,
+           ExcNotImplemented());
+
+    const auto &interface_dof_indices =
+      this->fe_interface->get_interface_dof_indices();
+
+    for (const auto dof_index : this->fe_interface->dof_indices())
+      for (const auto q_index : this->fe_interface->quadrature_point_indices())
+        {
+          if (dof_index == 0)
+            gradients[q_index] = 0.;
+
+          gradients[q_index] +=
+            local_dof_values[dof_index] * jump_in_gradients(dof_index, q_index);
+        }
+  }
+
+
+
+  template <int dim, int spacedim>
+  template <class InputVector>
+  void
+  Scalar<dim, spacedim>::get_jump_in_function_gradients(
+    const InputVector &fe_function,
+    std::vector<solution_gradient_type<typename InputVector::value_type>>
+      &gradients) const
+  {
+    std::vector<typename InputVector::value_type> local_dof_values(
+      this->fe_interface->n_current_interface_dofs());
+    this->get_local_dof_values(fe_function, local_dof_values);
+
+    get_jump_in_function_gradients_from_local_dof_values(local_dof_values,
+                                                         gradients);
+  }
+
+
+
+  template <int dim, int spacedim>
+  template <class InputVector>
+  void
+  Scalar<dim, spacedim>::get_average_of_function_values_from_local_dof_values(
+    const InputVector &local_dof_values,
+    std::vector<solution_value_type<typename InputVector::value_type>> &values)
+    const
+  {
+    Assert(values.size() == this->fe_interface->n_quadrature_points,
+           ExcNotImplemented());
+
+    const auto &interface_dof_indices =
+      this->fe_interface->get_interface_dof_indices();
+
+    for (const auto dof_index : this->fe_interface->dof_indices())
+      for (const auto q_index : this->fe_interface->quadrature_point_indices())
+        {
+          if (dof_index == 0)
+            values[q_index] = 0.;
+
+          values[q_index] +=
+            local_dof_values[dof_index] * average_of_values(dof_index, q_index);
+        }
+  }
+
+
+
+  template <int dim, int spacedim>
+  template <class InputVector>
+  void
+  Scalar<dim, spacedim>::get_average_of_function_values(
+    const InputVector &fe_function,
+    std::vector<solution_value_type<typename InputVector::value_type>> &values)
+    const
+  {
+    std::vector<typename InputVector::value_type> local_dof_values(
+      this->fe_interface->n_current_interface_dofs());
+    this->get_local_dof_values(fe_function, local_dof_values);
+
+    get_average_of_function_values_from_local_dof_values(local_dof_values,
+                                                         values);
+  }
+
+
+
+  template <int dim, int spacedim>
+  template <class InputVector>
+  void
+  Scalar<dim, spacedim>::
+    get_average_of_function_gradients_from_local_dof_values(
+      const InputVector &local_dof_values,
+      std::vector<solution_gradient_type<typename InputVector::value_type>>
+        &gradients) const
+  {
+    Assert(gradients.size() == this->fe_interface->n_quadrature_points,
+           ExcNotImplemented());
+
+    const auto &interface_dof_indices =
+      this->fe_interface->get_interface_dof_indices();
+
+    for (const auto dof_index : this->fe_interface->dof_indices())
+      for (const auto q_index : this->fe_interface->quadrature_point_indices())
+        {
+          if (dof_index == 0)
+            gradients[q_index] = 0.;
+
+          gradients[q_index] += local_dof_values[dof_index] *
+                                average_of_gradients(dof_index, q_index);
+        }
+  }
+
+
+
+  template <int dim, int spacedim>
+  template <class InputVector>
+  void
+  Scalar<dim, spacedim>::get_average_of_function_gradients(
+    const InputVector &fe_function,
+    std::vector<solution_gradient_type<typename InputVector::value_type>>
+      &gradients) const
+  {
+    std::vector<typename InputVector::value_type> local_dof_values(
+      this->fe_interface->n_current_interface_dofs());
+    this->get_local_dof_values(fe_function, local_dof_values);
+
+    get_average_of_function_gradients_from_local_dof_values(local_dof_values,
+                                                            gradients);
+  }
+
+
+
+  template <int dim, int spacedim>
+  template <class InputVector>
+  void
+  Scalar<dim, spacedim>::get_jump_in_function_hessians_from_local_dof_values(
+    const InputVector &local_dof_values,
+    std::vector<solution_hessian_type<typename InputVector::value_type>>
+      &hessians) const
+  {
+    Assert(hessians.size() == this->fe_interface->n_quadrature_points,
+           ExcNotImplemented());
+
+    const auto &interface_dof_indices =
+      this->fe_interface->get_interface_dof_indices();
+
+    for (const auto dof_index : this->fe_interface->dof_indices())
+      for (const auto q_index : this->fe_interface->quadrature_point_indices())
+        {
+          if (dof_index == 0)
+            hessians[q_index] = 0.;
+
+          hessians[q_index] +=
+            local_dof_values[dof_index] * jump_in_hessians(dof_index, q_index);
+        }
+  }
+
+
+
+  template <int dim, int spacedim>
+  template <class InputVector>
+  void
+  Scalar<dim, spacedim>::get_jump_in_function_hessians(
+    const InputVector &fe_function,
+    std::vector<solution_hessian_type<typename InputVector::value_type>>
+      &hessians) const
+  {
+    std::vector<typename InputVector::value_type> local_dof_values(
+      this->fe_interface->n_current_interface_dofs());
+    this->get_local_dof_values(fe_function, local_dof_values);
+
+    get_jump_in_function_hessians_from_local_dof_values(local_dof_values,
+                                                        hessians);
+  }
+
+
+
+  template <int dim, int spacedim>
+  template <class InputVector>
+  void
+  Scalar<dim, spacedim>::get_average_of_function_hessians_from_local_dof_values(
+    const InputVector &local_dof_values,
+    std::vector<solution_hessian_type<typename InputVector::value_type>>
+      &hessians) const
+  {
+    Assert(hessians.size() == this->fe_interface->n_quadrature_points,
+           ExcNotImplemented());
+
+    const auto &interface_dof_indices =
+      this->fe_interface->get_interface_dof_indices();
+
+    for (unsigned int dof_index = 0; dof_index < interface_dof_indices.size();
+         ++dof_index)
+      for (const auto q_index : this->fe_interface->quadrature_point_indices())
+        {
+          if (dof_index == 0)
+            hessians[q_index] = 0.;
+
+          hessians[q_index] += local_dof_values[dof_index] *
+                               average_of_hessians(dof_index, q_index);
+        }
+  }
+
+
+
+  template <int dim, int spacedim>
+  template <class InputVector>
+  void
+  Scalar<dim, spacedim>::get_average_of_function_hessians(
+    const InputVector &fe_function,
+    std::vector<solution_hessian_type<typename InputVector::value_type>>
+      &hessians) const
+  {
+    std::vector<typename InputVector::value_type> local_dof_values(
+      this->fe_interface->n_current_interface_dofs());
+    this->get_local_dof_values(fe_function, local_dof_values);
+
+    get_average_of_function_hessians_from_local_dof_values(local_dof_values,
+                                                           hessians);
+  }
+
+
+
+  template <int dim, int spacedim>
+  template <class InputVector>
+  void
+  Scalar<dim, spacedim>::
+    get_jump_in_function_third_derivatives_from_local_dof_values(
+      const InputVector &local_dof_values,
+      std::vector<
+        solution_third_derivative_type<typename InputVector::value_type>>
+        &third_derivatives) const
+  {
+    Assert(third_derivatives.size() == this->fe_interface->n_quadrature_points,
+           ExcNotImplemented());
+
+    const auto &interface_dof_indices =
+      this->fe_interface->get_interface_dof_indices();
+
+    for (unsigned int dof_index = 0; dof_index < interface_dof_indices.size();
+         ++dof_index)
+      for (const auto q_index : this->fe_interface->quadrature_point_indices())
+        {
+          if (dof_index == 0)
+            third_derivatives[q_index] = 0.;
+
+          third_derivatives[q_index] +=
+            local_dof_values[dof_index] *
+            jump_in_third_derivatives(dof_index, q_index);
+        }
+  }
+
+
+
+  template <int dim, int spacedim>
+  template <class InputVector>
+  void
+  Scalar<dim, spacedim>::get_jump_in_function_third_derivatives(
+    const InputVector &fe_function,
+    std::vector<
+      solution_third_derivative_type<typename InputVector::value_type>>
+      &third_derivatives) const
+  {
+    std::vector<typename InputVector::value_type> local_dof_values(
+      this->fe_interface->n_current_interface_dofs());
+    this->get_local_dof_values(fe_function, local_dof_values);
+
+    get_jump_in_function_third_derivatives_from_local_dof_values(
+      local_dof_values, third_derivatives);
   }
 
 
@@ -2422,6 +3493,375 @@ namespace FEInterfaceViews
     const unsigned int q_point) const
   {
     return jump_in_third_derivatives(interface_dof_index, q_point);
+  }
+
+
+
+  template <int dim, int spacedim>
+  template <class InputVector>
+  void
+  Vector<dim, spacedim>::get_function_values_from_local_dof_values(
+    const bool         here_or_there,
+    const InputVector &local_dof_values,
+    std::vector<solution_value_type<typename InputVector::value_type>> &values)
+    const
+  {
+    Assert(values.size() == this->fe_interface->n_quadrature_points,
+           ExcNotImplemented());
+
+    const auto &interface_dof_indices =
+      this->fe_interface->get_interface_dof_indices();
+
+    for (const auto dof_index : this->fe_interface->dof_indices())
+      for (const auto q_index : this->fe_interface->quadrature_point_indices())
+        {
+          if (dof_index == 0)
+            values[q_index] = 0.;
+
+          values[q_index] += local_dof_values[dof_index] *
+                             value(here_or_there, dof_index, q_index);
+        }
+  }
+
+
+
+  template <int dim, int spacedim>
+  template <class InputVector>
+  void
+  Vector<dim, spacedim>::get_function_values(
+    const bool         here_or_there,
+    const InputVector &fe_function,
+    std::vector<solution_value_type<typename InputVector::value_type>> &values)
+    const
+  {
+    std::vector<typename InputVector::value_type> local_dof_values(
+      this->fe_interface->n_current_interface_dofs());
+    this->get_local_dof_values(fe_function, local_dof_values);
+
+    get_function_values_from_local_dof_values(here_or_there,
+                                              local_dof_values,
+                                              values);
+  }
+
+
+
+  template <int dim, int spacedim>
+  template <class InputVector>
+  void
+  Vector<dim, spacedim>::get_jump_in_function_values_from_local_dof_values(
+    const InputVector &local_dof_values,
+    std::vector<solution_value_type<typename InputVector::value_type>> &values)
+    const
+  {
+    Assert(values.size() == this->fe_interface->n_quadrature_points,
+           ExcNotImplemented());
+
+    const auto &interface_dof_indices =
+      this->fe_interface->get_interface_dof_indices();
+
+    for (const auto dof_index : this->fe_interface->dof_indices())
+      for (const auto q_index : this->fe_interface->quadrature_point_indices())
+        {
+          if (dof_index == 0)
+            values[q_index] = 0.;
+
+          values[q_index] +=
+            local_dof_values[dof_index] * jump_in_values(dof_index, q_index);
+        }
+  }
+
+
+
+  template <int dim, int spacedim>
+  template <class InputVector>
+  void
+  Vector<dim, spacedim>::get_jump_in_function_values(
+    const InputVector &fe_function,
+    std::vector<solution_value_type<typename InputVector::value_type>> &values)
+    const
+  {
+    std::vector<typename InputVector::value_type> local_dof_values(
+      this->fe_interface->n_current_interface_dofs());
+    this->get_local_dof_values(fe_function, local_dof_values);
+
+    get_jump_in_function_values_from_local_dof_values(local_dof_values, values);
+  }
+
+
+
+  template <int dim, int spacedim>
+  template <class InputVector>
+  void
+  Vector<dim, spacedim>::get_jump_in_function_gradients_from_local_dof_values(
+    const InputVector &local_dof_values,
+    std::vector<solution_gradient_type<typename InputVector::value_type>>
+      &gradients) const
+  {
+    Assert(gradients.size() == this->fe_interface->n_quadrature_points,
+           ExcNotImplemented());
+
+    const auto &interface_dof_indices =
+      this->fe_interface->get_interface_dof_indices();
+
+    for (const auto dof_index : this->fe_interface->dof_indices())
+      for (const auto q_index : this->fe_interface->quadrature_point_indices())
+        {
+          if (dof_index == 0)
+            gradients[q_index] = 0.;
+
+          gradients[q_index] +=
+            local_dof_values[dof_index] * jump_in_gradients(dof_index, q_index);
+        }
+  }
+
+
+
+  template <int dim, int spacedim>
+  template <class InputVector>
+  void
+  Vector<dim, spacedim>::get_jump_in_function_gradients(
+    const InputVector &fe_function,
+    std::vector<solution_gradient_type<typename InputVector::value_type>>
+      &gradients) const
+  {
+    std::vector<typename InputVector::value_type> local_dof_values(
+      this->fe_interface->n_current_interface_dofs());
+    this->get_local_dof_values(fe_function, local_dof_values);
+
+    get_jump_in_function_gradients_from_local_dof_values(local_dof_values,
+                                                         gradients);
+  }
+
+
+
+  template <int dim, int spacedim>
+  template <class InputVector>
+  void
+  Vector<dim, spacedim>::get_average_of_function_values_from_local_dof_values(
+    const InputVector &local_dof_values,
+    std::vector<solution_value_type<typename InputVector::value_type>> &values)
+    const
+  {
+    Assert(values.size() == this->fe_interface->n_quadrature_points,
+           ExcNotImplemented());
+
+    const auto &interface_dof_indices =
+      this->fe_interface->get_interface_dof_indices();
+
+    for (const auto dof_index : this->fe_interface->dof_indices())
+      for (const auto q_index : this->fe_interface->quadrature_point_indices())
+        {
+          if (dof_index == 0)
+            values[q_index] = 0.;
+
+          values[q_index] +=
+            local_dof_values[dof_index] * average_of_values(dof_index, q_index);
+        }
+  }
+
+
+
+  template <int dim, int spacedim>
+  template <class InputVector>
+  void
+  Vector<dim, spacedim>::get_average_of_function_values(
+    const InputVector &fe_function,
+    std::vector<solution_value_type<typename InputVector::value_type>> &values)
+    const
+  {
+    std::vector<typename InputVector::value_type> local_dof_values(
+      this->fe_interface->n_current_interface_dofs());
+    this->get_local_dof_values(fe_function, local_dof_values);
+
+    get_average_of_function_values_from_local_dof_values(local_dof_values,
+                                                         values);
+  }
+
+
+
+  template <int dim, int spacedim>
+  template <class InputVector>
+  void
+  Vector<dim, spacedim>::
+    get_average_of_function_gradients_from_local_dof_values(
+      const InputVector &local_dof_values,
+      std::vector<solution_gradient_type<typename InputVector::value_type>>
+        &gradients) const
+  {
+    Assert(gradients.size() == this->fe_interface->n_quadrature_points,
+           ExcNotImplemented());
+
+    const auto &interface_dof_indices =
+      this->fe_interface->get_interface_dof_indices();
+
+    for (const auto dof_index : this->fe_interface->dof_indices())
+      for (const auto q_index : this->fe_interface->quadrature_point_indices())
+        {
+          if (dof_index == 0)
+            gradients[q_index] = 0.;
+
+          gradients[q_index] += local_dof_values[dof_index] *
+                                average_of_gradients(dof_index, q_index);
+        }
+  }
+
+
+
+  template <int dim, int spacedim>
+  template <class InputVector>
+  void
+  Vector<dim, spacedim>::get_average_of_function_gradients(
+    const InputVector &fe_function,
+    std::vector<solution_gradient_type<typename InputVector::value_type>>
+      &gradients) const
+  {
+    std::vector<typename InputVector::value_type> local_dof_values(
+      this->fe_interface->n_current_interface_dofs());
+    this->get_local_dof_values(fe_function, local_dof_values);
+
+    get_average_of_function_gradients_from_local_dof_values(local_dof_values,
+                                                            gradients);
+  }
+
+
+
+  template <int dim, int spacedim>
+  template <class InputVector>
+  void
+  Vector<dim, spacedim>::get_jump_in_function_hessians_from_local_dof_values(
+    const InputVector &local_dof_values,
+    std::vector<solution_hessian_type<typename InputVector::value_type>>
+      &hessians) const
+  {
+    Assert(hessians.size() == this->fe_interface->n_quadrature_points,
+           ExcNotImplemented());
+
+    const auto &interface_dof_indices =
+      this->fe_interface->get_interface_dof_indices();
+
+    for (const auto dof_index : this->fe_interface->dof_indices())
+      for (const auto q_index : this->fe_interface->quadrature_point_indices())
+        {
+          if (dof_index == 0)
+            hessians[q_index] = 0.;
+
+          hessians[q_index] +=
+            local_dof_values[dof_index] * jump_in_hessians(dof_index, q_index);
+        }
+  }
+
+
+
+  template <int dim, int spacedim>
+  template <class InputVector>
+  void
+  Vector<dim, spacedim>::get_jump_in_function_hessians(
+    const InputVector &fe_function,
+    std::vector<solution_hessian_type<typename InputVector::value_type>>
+      &hessians) const
+  {
+    std::vector<typename InputVector::value_type> local_dof_values(
+      this->fe_interface->n_current_interface_dofs());
+    this->get_local_dof_values(fe_function, local_dof_values);
+
+    get_jump_in_function_hessians_from_local_dof_values(local_dof_values,
+                                                        hessians);
+  }
+
+
+
+  template <int dim, int spacedim>
+  template <class InputVector>
+  void
+  Vector<dim, spacedim>::get_average_of_function_hessians_from_local_dof_values(
+    const InputVector &local_dof_values,
+    std::vector<solution_hessian_type<typename InputVector::value_type>>
+      &hessians) const
+  {
+    Assert(hessians.size() == this->fe_interface->n_quadrature_points,
+           ExcNotImplemented());
+
+    const auto &interface_dof_indices =
+      this->fe_interface->get_interface_dof_indices();
+
+    for (unsigned int dof_index = 0; dof_index < interface_dof_indices.size();
+         ++dof_index)
+      for (const auto q_index : this->fe_interface->quadrature_point_indices())
+        {
+          if (dof_index == 0)
+            hessians[q_index] = 0.;
+
+          hessians[q_index] += local_dof_values[dof_index] *
+                               average_of_hessians(dof_index, q_index);
+        }
+  }
+
+
+
+  template <int dim, int spacedim>
+  template <class InputVector>
+  void
+  Vector<dim, spacedim>::get_average_of_function_hessians(
+    const InputVector &fe_function,
+    std::vector<solution_hessian_type<typename InputVector::value_type>>
+      &hessians) const
+  {
+    std::vector<typename InputVector::value_type> local_dof_values(
+      this->fe_interface->n_current_interface_dofs());
+    this->get_local_dof_values(fe_function, local_dof_values);
+
+    get_average_of_function_hessians_from_local_dof_values(local_dof_values,
+                                                           hessians);
+  }
+
+
+
+  template <int dim, int spacedim>
+  template <class InputVector>
+  void
+  Vector<dim, spacedim>::
+    get_jump_in_function_third_derivatives_from_local_dof_values(
+      const InputVector &local_dof_values,
+      std::vector<
+        solution_third_derivative_type<typename InputVector::value_type>>
+        &third_derivatives) const
+  {
+    Assert(third_derivatives.size() == this->fe_interface->n_quadrature_points,
+           ExcNotImplemented());
+
+    const auto &interface_dof_indices =
+      this->fe_interface->get_interface_dof_indices();
+
+    for (unsigned int dof_index = 0; dof_index < interface_dof_indices.size();
+         ++dof_index)
+      for (const auto q_index : this->fe_interface->quadrature_point_indices())
+        {
+          if (dof_index == 0)
+            third_derivatives[q_index] = 0.;
+
+          third_derivatives[q_index] +=
+            local_dof_values[dof_index] *
+            jump_in_third_derivatives(dof_index, q_index);
+        }
+  }
+
+
+
+  template <int dim, int spacedim>
+  template <class InputVector>
+  void
+  Vector<dim, spacedim>::get_jump_in_function_third_derivatives(
+    const InputVector &fe_function,
+    std::vector<
+      solution_third_derivative_type<typename InputVector::value_type>>
+      &third_derivatives) const
+  {
+    std::vector<typename InputVector::value_type> local_dof_values(
+      this->fe_interface->n_current_interface_dofs());
+    this->get_local_dof_values(fe_function, local_dof_values);
+
+    get_jump_in_function_third_derivatives_from_local_dof_values(
+      local_dof_values, third_derivatives);
   }
 } // namespace FEInterfaceViews
 
