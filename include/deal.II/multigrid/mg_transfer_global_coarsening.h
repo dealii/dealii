@@ -159,7 +159,7 @@ public:
    * Perform prolongation.
    */
   void
-  prolongate(VectorType &dst, const VectorType &src) const;
+  prolongate_and_add(VectorType &dst, const VectorType &src) const;
 
   /**
    * Perform restriction.
@@ -253,8 +253,9 @@ public:
    * Perform prolongation.
    */
   void
-  prolongate(LinearAlgebra::distributed::Vector<Number> &      dst,
-             const LinearAlgebra::distributed::Vector<Number> &src) const;
+  prolongate_and_add(
+    LinearAlgebra::distributed::Vector<Number> &      dst,
+    const LinearAlgebra::distributed::Vector<Number> &src) const;
 
   /**
    * Perform restriction.
@@ -476,6 +477,14 @@ public:
              const VectorType & src) const override;
 
   /**
+   * Perform prolongation.
+   */
+  void
+  prolongate_and_add(const unsigned int to_level,
+                     VectorType &       dst,
+                     const VectorType & src) const override;
+
+  /**
    * Perform restriction.
    */
   virtual void
@@ -566,7 +575,20 @@ MGTransferGlobalCoarsening<dim, VectorType>::prolongate(
   VectorType &       dst,
   const VectorType & src) const
 {
-  this->transfer[to_level].prolongate(dst, src);
+  dst = 0;
+  prolongate_and_add(to_level, dst, src);
+}
+
+
+
+template <int dim, typename VectorType>
+void
+MGTransferGlobalCoarsening<dim, VectorType>::prolongate_and_add(
+  const unsigned int to_level,
+  VectorType &       dst,
+  const VectorType & src) const
+{
+  this->transfer[to_level].prolongate_and_add(dst, src);
 }
 
 

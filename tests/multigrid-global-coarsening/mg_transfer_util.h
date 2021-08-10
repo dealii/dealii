@@ -85,7 +85,8 @@ test_transfer_operator(
   {
     src = 0.0;
     src = 1.0;
-    transfer.prolongate(dst, src);
+    dst = 0.0;
+    transfer.prolongate_and_add(dst, src);
 
     // transfer operator sets only non-constrained dofs -> update the rest
     // via constraint matrix
@@ -114,7 +115,7 @@ test_transfer_operator(
             src[i] = 1.0;
             dst    = 0.0;
 
-            transfer.prolongate(dst, src);
+            transfer.prolongate_and_add(dst, src);
 
             for (unsigned int j = 0; j < dst.size(); j++)
               prolongation_matrix[j][i] = dst[j];

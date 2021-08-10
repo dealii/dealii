@@ -2296,9 +2296,10 @@ namespace MGTransferGlobalCoarseningTools
 
 template <int dim, typename Number>
 void
-MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::prolongate(
-  LinearAlgebra::distributed::Vector<Number> &      dst,
-  const LinearAlgebra::distributed::Vector<Number> &src) const
+MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
+  prolongate_and_add(
+    LinearAlgebra::distributed::Vector<Number> &      dst,
+    const LinearAlgebra::distributed::Vector<Number> &src) const
 {
   using VectorizedArrayType = VectorizedArray<Number>;
 
@@ -2339,7 +2340,7 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::prolongate(
   this->vec_coarse
     .update_ghost_values(); // note: make sure that ghost values are set
 
-  if (fine_element_is_continuous)
+  if (fine_element_is_continuous && (use_dst_inplace == false))
     *vec_fine_ptr = Number(0.);
 
   AlignedVector<VectorizedArrayType> evaluation_data_fine;
@@ -2368,7 +2369,7 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::prolongate(
                     weights[i];
               else
                 for (unsigned int i = 0; i < scheme.dofs_per_cell_fine; ++i)
-                  vec_fine_ptr->local_element(indices_fine[i]) =
+                  vec_fine_ptr->local_element(indices_fine[i]) +=
                     this->vec_coarse.local_element(indices_coarse[i]);
 
               indices_fine += scheme.dofs_per_cell_fine;
@@ -2448,7 +2449,7 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::prolongate(
                       evaluation_data_fine[i][v] * weights[i];
                 else
                   for (unsigned int i = 0; i < scheme.dofs_per_cell_fine; ++i)
-                    vec_fine_ptr->local_element(indices[i]) =
+                    vec_fine_ptr->local_element(indices[i]) +=
                       evaluation_data_fine[i][v];
 
                 indices += scheme.dofs_per_cell_fine;
@@ -2467,7 +2468,7 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::prolongate(
     vec_fine_ptr->compress(VectorOperation::add);
 
   if (use_dst_inplace == false)
-    dst.copy_locally_owned_data_from(this->vec_fine);
+    dst += this->vec_fine;
 }
 
 
