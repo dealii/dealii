@@ -866,6 +866,12 @@ namespace internal
                         const VectorType &               src,
                         LinearAlgebra::distributed::BlockVector<Number> &dst)
       {
+        Assert(dof_handler.locally_owned_dofs().is_contiguous(),
+               ExcMessage(
+                 "You are trying to add a non-block vector with non-contiguous "
+                 "locally-owned index sets. This is not possible. Please "
+                 "consider to use an adequate block vector!"));
+
         IndexSet locally_relevant_dofs;
         DoFTools::extract_locally_relevant_dofs(dof_handler,
                                                 locally_relevant_dofs);
