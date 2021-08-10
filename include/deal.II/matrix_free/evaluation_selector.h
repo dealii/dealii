@@ -64,6 +64,7 @@ struct SelectEvaluator
             Number *   values_dofs_actual,
             Number *   values_quad,
             Number *   gradients_quad,
+            Number *   hessians_quad,
             Number *   scratch_data,
             const bool sum_into_values_array = false);
 };
@@ -107,6 +108,7 @@ SelectEvaluator<dim, fe_degree, n_q_points_1d, Number>::integrate(
   Number *                                                values_dofs_actual,
   Number *                                                values_quad,
   Number *                                                gradients_quad,
+  Number *                                                hessians_quad,
   Number *                                                scratch_data,
   const bool                                              sum_into_values_array)
 {
@@ -119,6 +121,7 @@ SelectEvaluator<dim, fe_degree, n_q_points_1d, Number>::integrate(
                                            values_dofs_actual,
                                            values_quad,
                                            gradients_quad,
+                                           hessians_quad,
                                            scratch_data,
                                            sum_into_values_array);
 }
