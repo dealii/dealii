@@ -154,7 +154,6 @@ namespace VectorTools
       const bool                             fe_is_system = (n_components != 1);
       const dealii::FEValues<dim, spacedim> &fe_values =
         data.x_fe_values.get_present_fe_values();
-      const unsigned int n_q_points = fe_values.n_quadrature_points;
 
       if (weight != nullptr)
         {
