@@ -360,7 +360,7 @@ namespace VectorTools
           dof_values.resize(n_dofs);
 
           // Get all function values:
-          Assert(n_components, function(cell)->n_components);
+          AssertDimension(n_components, function(cell)->n_components);
           function(cell)->vector_value_list(generalized_support_points,
                                             function_values);
 
