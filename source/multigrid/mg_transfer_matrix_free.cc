@@ -99,6 +99,12 @@ MGTransferMatrixFree<dim, Number>::build(
   const std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
     &external_partitioners)
 {
+  Assert(dof_handler.has_level_dofs(),
+         ExcMessage(
+           "The underlying DoFHandler object did not call "
+           "distribute_mg_dofs(). This is a prerequisite for multigrid "
+           "transfers."));
+
   this->fill_and_communicate_copy_indices(dof_handler);
 
   vector_partitioners.resize(0,
