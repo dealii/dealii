@@ -147,6 +147,11 @@ namespace FEInterfaceViews
            const unsigned int                      component);
 
     /**
+     * @name Functions to evaluate quantities
+     */
+    //@{
+
+    /**
      * Return the value of the shape function
      * with interface dof index @p interface_dof_index in
      * quadrature point @p q_point of the component selected by this view.
@@ -169,157 +174,6 @@ namespace FEInterfaceViews
     value(const bool         here_or_there,
           const unsigned int interface_dof_index,
           const unsigned int q_point) const;
-
-    /**
-     * Return the jump $\jump{u}=u_1 - u_2$ on the interface for the shape
-     * function
-     * @p interface_dof_index in the quadrature point @p q_point
-     * of the component selected by this view.
-     */
-    value_type
-    jump_in_values(const unsigned int interface_dof_index,
-                   const unsigned int q_point) const;
-
-    /**
-     * The same as above.
-     *
-     * @deprecated Use the jump_in_values() function instead.
-     */
-    DEAL_II_DEPRECATED
-    value_type
-    jump(const unsigned int interface_dof_index,
-         const unsigned int q_point) const;
-
-    /**
-     * Return the average value $\average{u}=\frac{1}{2}(u_1 + u_2)$ on the
-     * interface for the shape
-     * function @p interface_dof_index in the quadrature point @p q_point
-     * of the component selected by this view.
-     */
-    value_type
-    average_of_values(const unsigned int interface_dof_index,
-                      const unsigned int q_point) const;
-
-    /**
-     * The same as above.
-     *
-     * @deprecated Use the average_of_values() function instead.
-     */
-    DEAL_II_DEPRECATED
-    value_type
-    average_value(const unsigned int interface_dof_index,
-                  const unsigned int q_point) const;
-
-    /**
-     * The same as above.
-     *
-     * @deprecated Use the average_of_values() function instead.
-     */
-    DEAL_II_DEPRECATED
-    value_type
-    average(const unsigned int interface_dof_index,
-            const unsigned int q_point) const;
-
-    /**
-     * Return the average of the gradient $\average{\nabla u}$ on the interface
-     * for the shape
-     * function @p interface_dof_index in the quadrature point @p q_point
-     * of the component selected by this view.
-     */
-    gradient_type
-    average_of_gradients(const unsigned int interface_dof_index,
-                         const unsigned int q_point) const;
-
-    /**
-     * The same as above.
-     *
-     * @deprecated Use the average_of_gradients() function instead.
-     */
-    DEAL_II_DEPRECATED
-    gradient_type
-    average_gradient(const unsigned int interface_dof_index,
-                     const unsigned int q_point) const;
-
-    /**
-     * Return the jump of the gradient $\jump{nabla u}$ on the interface for
-     * the shape
-     * function @p interface_dof_index in the quadrature point @p q_point
-     * of the component selected by this view.
-     */
-    gradient_type
-    jump_in_gradients(const unsigned int interface_dof_index,
-                      const unsigned int q_point) const;
-
-    /**
-     * The same as above.
-     *
-     * @deprecated Use the jump_in_gradients() function instead.
-     */
-    DEAL_II_DEPRECATED
-    gradient_type
-    jump_gradient(const unsigned int interface_dof_index,
-                  const unsigned int q_point) const;
-
-    /**
-     * Return the average of the Hessian $\average{\nabla^2 u} =
-     * \frac{1}{2}\nabla^2 u_{\text{cell0}} + \frac{1}{2} \nabla^2
-     * u_{\text{cell1}}$ on the interface
-     * for the shape function @p interface_dof_index at the quadrature point @p
-     * q_point of the component selected by this view.
-     */
-    hessian_type
-    average_of_hessians(const unsigned int interface_dof_index,
-                        const unsigned int q_point) const;
-
-    /**
-     * The same as above.
-     *
-     * @deprecated Use the average_of_hessians() function instead.
-     */
-    DEAL_II_DEPRECATED
-    hessian_type
-    average_hessian(const unsigned int interface_dof_index,
-                    const unsigned int q_point) const;
-
-    /**
-     * Return the jump in the gradient $\jump{\nabla u}=\nabla u_{\text{cell0}}
-     * - \nabla u_{\text{cell1}}$ on the interface for the shape function @p
-     * interface_dof_index at the quadrature point @p q_point of
-     * the component selected by this view.
-     */
-    hessian_type
-    jump_in_hessians(const unsigned int interface_dof_index,
-                     const unsigned int q_point) const;
-
-    /**
-     * The same as above.
-     *
-     * @deprecated Use the jump_in_hessians() function instead.
-     */
-    DEAL_II_DEPRECATED
-    hessian_type
-    jump_hessian(const unsigned int interface_dof_index,
-                 const unsigned int q_point) const;
-
-    /**
-     * Return the jump in the third derivative $\jump{\nabla^3 u} = \nabla^3
-     * u_{\text{cell0}} - \nabla^3 u_{\text{cell1}}$ on the interface for the
-     * shape function @p interface_dof_index at the quadrature point @p q_point of
-     * the component selected by this view.
-     */
-    third_derivative_type
-    jump_in_third_derivatives(const unsigned int interface_dof_index,
-                              const unsigned int q_point) const;
-
-    /**
-     * The same as above.
-     *
-     * @deprecated Use the jump_in_third_derivatives() function instead.
-     */
-    DEAL_II_DEPRECATED
-    third_derivative_type
-    jump_3rd_derivative(const unsigned int interface_dof_index,
-                        const unsigned int q_point) const;
 
     /**
      * Return the values of the selected scalar component of the finite
@@ -378,6 +232,93 @@ namespace FEInterfaceViews
       std::vector<solution_value_type<typename InputVector::value_type>>
         &values) const;
 
+    //@}
+
+    /**
+     * @name Functions to evaluate jumps in quantities
+     */
+    //@{
+
+    /**
+     * Return the jump $\jump{u}=u_1 - u_2$ on the interface for the shape
+     * function
+     * @p interface_dof_index in the quadrature point @p q_point
+     * of the component selected by this view.
+     */
+    value_type
+    jump_in_values(const unsigned int interface_dof_index,
+                   const unsigned int q_point) const;
+
+    /**
+     * The same as above.
+     *
+     * @deprecated Use the jump_in_values() function instead.
+     */
+    DEAL_II_DEPRECATED
+    value_type
+    jump(const unsigned int interface_dof_index,
+         const unsigned int q_point) const;
+
+    /**
+     * Return the jump of the gradient $\jump{nabla u}$ on the interface for
+     * the shape
+     * function @p interface_dof_index in the quadrature point @p q_point
+     * of the component selected by this view.
+     */
+    gradient_type
+    jump_in_gradients(const unsigned int interface_dof_index,
+                      const unsigned int q_point) const;
+
+    /**
+     * The same as above.
+     *
+     * @deprecated Use the jump_in_gradients() function instead.
+     */
+    DEAL_II_DEPRECATED
+    gradient_type
+    jump_gradient(const unsigned int interface_dof_index,
+                  const unsigned int q_point) const;
+
+    /**
+     * Return the jump in the gradient $\jump{\nabla u}=\nabla u_{\text{cell0}}
+     * - \nabla u_{\text{cell1}}$ on the interface for the shape function @p
+     * interface_dof_index at the quadrature point @p q_point of
+     * the component selected by this view.
+     */
+    hessian_type
+    jump_in_hessians(const unsigned int interface_dof_index,
+                     const unsigned int q_point) const;
+
+    /**
+     * The same as above.
+     *
+     * @deprecated Use the jump_in_hessians() function instead.
+     */
+    DEAL_II_DEPRECATED
+    hessian_type
+    jump_hessian(const unsigned int interface_dof_index,
+                 const unsigned int q_point) const;
+
+    /**
+     * Return the jump in the third derivative $\jump{\nabla^3 u} = \nabla^3
+     * u_{\text{cell0}} - \nabla^3 u_{\text{cell1}}$ on the interface for the
+     * shape function @p interface_dof_index at the quadrature point @p q_point of
+     * the component selected by this view.
+     */
+    third_derivative_type
+    jump_in_third_derivatives(const unsigned int interface_dof_index,
+                              const unsigned int q_point) const;
+
+    /**
+     * The same as above.
+     *
+     * @deprecated Use the jump_in_third_derivatives() function instead.
+     */
+    DEAL_II_DEPRECATED
+    third_derivative_type
+    jump_3rd_derivative(const unsigned int interface_dof_index,
+                        const unsigned int q_point) const;
+
     /**
      * Return the jump in the values of the selected scalar component of the
      * finite element function characterized by <tt>fe_function</tt> at the
@@ -408,40 +349,6 @@ namespace FEInterfaceViews
     template <class InputVector>
     void
     get_jump_in_function_values_from_local_dof_values(
-      const InputVector &local_dof_values,
-      std::vector<solution_value_type<typename InputVector::value_type>>
-        &values) const;
-
-    /**
-     * Return the average of the values of the selected scalar component of the
-     * finite element function characterized by <tt>fe_function</tt> at the
-     * quadrature points of the cell interface selected the last time
-     * the <tt>reinit</tt> function of the FEInterfaceValues object was called.
-     *
-     * The data type stored by the output vector must be what you get when you
-     * multiply the values of shape functions (i.e., @p value_type) times the
-     * type used to store the values of the unknowns $U_j$ of your finite
-     * element vector $U$ (represented by the @p fe_function argument).
-     *
-     * @dealiiRequiresUpdateFlags{update_values}
-     */
-    template <class InputVector>
-    void
-    get_average_of_function_values(
-      const InputVector &fe_function,
-      std::vector<solution_value_type<typename InputVector::value_type>>
-        &values) const;
-
-    /**
-     * This function relates to get_average_of_function_values() in the same way
-     * as get_function_values_from_local_dof_values() relates to
-     * get_function_values(). See the documentation of
-     * get_function_values_from_local_dof_values() for more
-     * information.
-     */
-    template <class InputVector>
-    void
-    get_average_of_function_values_from_local_dof_values(
       const InputVector &local_dof_values,
       std::vector<solution_value_type<typename InputVector::value_type>>
         &values) const;
@@ -479,74 +386,6 @@ namespace FEInterfaceViews
       const InputVector &local_dof_values,
       std::vector<solution_gradient_type<typename InputVector::value_type>>
         &gradients) const;
-
-    /**
-     * Return the average of the gradients of the selected scalar components of
-     * the finite element function characterized by <tt>fe_function</tt> at the
-     * quadrature points of the cell interface selected the last time
-     * the <tt>reinit</tt> function of the FEInterfaceValues object was called.
-     *
-     * The data type stored by the output vector must be what you get when you
-     * multiply the gradients of shape functions (i.e., @p gradient_type)
-     * times the type used to store the values of the unknowns $U_j$ of your
-     * finite element vector $U$ (represented by the @p fe_function argument).
-     *
-     * @dealiiRequiresUpdateFlags{update_gradients}
-     */
-    template <class InputVector>
-    void
-    get_average_of_function_gradients(
-      const InputVector &fe_function,
-      std::vector<solution_gradient_type<typename InputVector::value_type>>
-        &gradients) const;
-
-    /**
-     * This function relates to get_average_of_function_gradients() in the same
-     * way as get_function_values_from_local_dof_values() relates to
-     * get_function_values(). See the documentation of
-     * get_function_values_from_local_dof_values() for more
-     * information.
-     */
-    template <class InputVector>
-    void
-    get_average_of_function_gradients_from_local_dof_values(
-      const InputVector &local_dof_values,
-      std::vector<solution_gradient_type<typename InputVector::value_type>>
-        &gradients) const;
-
-    /**
-     * Return the average of the Hessians of the selected scalar component of
-     * the finite element function characterized by <tt>fe_function</tt> at the
-     * quadrature points of the cell, face or subface selected the last time
-     * the <tt>reinit</tt> function of the FEInterfaceValues object was called.
-     *
-     * The data type stored by the output vector must be what you get when you
-     * multiply the Hessians of shape functions (i.e., @p hessian_type) times
-     * the type used to store the values of the unknowns $U_j$ of your finite
-     * element vector $U$ (represented by the @p fe_function argument).
-     *
-     * @dealiiRequiresUpdateFlags{update_hessians}
-     */
-    template <class InputVector>
-    void
-    get_average_of_function_hessians(
-      const InputVector &fe_function,
-      std::vector<solution_hessian_type<typename InputVector::value_type>>
-        &hessians) const;
-
-    /**
-     * This function relates to get_average_of_function_hessians() in the same
-     * way as get_function_values_from_local_dof_values() relates to
-     * get_function_values(). See the documentation of
-     * get_function_values_from_local_dof_values() for more
-     * information.
-     */
-    template <class InputVector>
-    void
-    get_average_of_function_hessians_from_local_dof_values(
-      const InputVector &local_dof_values,
-      std::vector<solution_hessian_type<typename InputVector::value_type>>
-        &hessians) const;
 
     /**
      * Return the jump in the Hessians of the selected scalar component of the
@@ -619,6 +458,188 @@ namespace FEInterfaceViews
         solution_third_derivative_type<typename InputVector::value_type>>
         &third_derivatives) const;
 
+    //@}
+
+    /**
+     * @name Functions to evaluate the average of quantities
+     */
+    //@{
+
+    /**
+     * Return the average value $\average{u}=\frac{1}{2}(u_1 + u_2)$ on the
+     * interface for the shape
+     * function @p interface_dof_index in the quadrature point @p q_point
+     * of the component selected by this view.
+     */
+    value_type
+    average_of_values(const unsigned int interface_dof_index,
+                      const unsigned int q_point) const;
+
+    /**
+     * The same as above.
+     *
+     * @deprecated Use the average_of_values() function instead.
+     */
+    DEAL_II_DEPRECATED
+    value_type
+    average_value(const unsigned int interface_dof_index,
+                  const unsigned int q_point) const;
+
+    /**
+     * The same as above.
+     *
+     * @deprecated Use the average_of_values() function instead.
+     */
+    DEAL_II_DEPRECATED
+    value_type
+    average(const unsigned int interface_dof_index,
+            const unsigned int q_point) const;
+
+    /**
+     * Return the average of the gradient $\average{\nabla u}$ on the interface
+     * for the shape
+     * function @p interface_dof_index in the quadrature point @p q_point
+     * of the component selected by this view.
+     */
+    gradient_type
+    average_of_gradients(const unsigned int interface_dof_index,
+                         const unsigned int q_point) const;
+
+    /**
+     * The same as above.
+     *
+     * @deprecated Use the average_of_gradients() function instead.
+     */
+    DEAL_II_DEPRECATED
+    gradient_type
+    average_gradient(const unsigned int interface_dof_index,
+                     const unsigned int q_point) const;
+
+    /**
+     * Return the average of the Hessian $\average{\nabla^2 u} =
+     * \frac{1}{2}\nabla^2 u_{\text{cell0}} + \frac{1}{2} \nabla^2
+     * u_{\text{cell1}}$ on the interface
+     * for the shape function @p interface_dof_index at the quadrature point @p
+     * q_point of the component selected by this view.
+     */
+    hessian_type
+    average_of_hessians(const unsigned int interface_dof_index,
+                        const unsigned int q_point) const;
+
+    /**
+     * The same as above.
+     *
+     * @deprecated Use the average_of_hessians() function instead.
+     */
+    DEAL_II_DEPRECATED
+    hessian_type
+    average_hessian(const unsigned int interface_dof_index,
+                    const unsigned int q_point) const;
+
+    /**
+     * Return the average of the values of the selected scalar component of the
+     * finite element function characterized by <tt>fe_function</tt> at the
+     * quadrature points of the cell interface selected the last time
+     * the <tt>reinit</tt> function of the FEInterfaceValues object was called.
+     *
+     * The data type stored by the output vector must be what you get when you
+     * multiply the values of shape functions (i.e., @p value_type) times the
+     * type used to store the values of the unknowns $U_j$ of your finite
+     * element vector $U$ (represented by the @p fe_function argument).
+     *
+     * @dealiiRequiresUpdateFlags{update_values}
+     */
+    template <class InputVector>
+    void
+    get_average_of_function_values(
+      const InputVector &fe_function,
+      std::vector<solution_value_type<typename InputVector::value_type>>
+        &values) const;
+
+    /**
+     * This function relates to get_average_of_function_values() in the same way
+     * as get_function_values_from_local_dof_values() relates to
+     * get_function_values(). See the documentation of
+     * get_function_values_from_local_dof_values() for more
+     * information.
+     */
+    template <class InputVector>
+    void
+    get_average_of_function_values_from_local_dof_values(
+      const InputVector &local_dof_values,
+      std::vector<solution_value_type<typename InputVector::value_type>>
+        &values) const;
+
+    /**
+     * Return the average of the gradients of the selected scalar components of
+     * the finite element function characterized by <tt>fe_function</tt> at the
+     * quadrature points of the cell interface selected the last time
+     * the <tt>reinit</tt> function of the FEInterfaceValues object was called.
+     *
+     * The data type stored by the output vector must be what you get when you
+     * multiply the gradients of shape functions (i.e., @p gradient_type)
+     * times the type used to store the values of the unknowns $U_j$ of your
+     * finite element vector $U$ (represented by the @p fe_function argument).
+     *
+     * @dealiiRequiresUpdateFlags{update_gradients}
+     */
+    template <class InputVector>
+    void
+    get_average_of_function_gradients(
+      const InputVector &fe_function,
+      std::vector<solution_gradient_type<typename InputVector::value_type>>
+        &gradients) const;
+
+    /**
+     * This function relates to get_average_of_function_gradients() in the same
+     * way as get_function_values_from_local_dof_values() relates to
+     * get_function_values(). See the documentation of
+     * get_function_values_from_local_dof_values() for more
+     * information.
+     */
+    template <class InputVector>
+    void
+    get_average_of_function_gradients_from_local_dof_values(
+      const InputVector &local_dof_values,
+      std::vector<solution_gradient_type<typename InputVector::value_type>>
+        &gradients) const;
+
+    /**
+     * Return the average of the Hessians of the selected scalar component of
+     * the finite element function characterized by <tt>fe_function</tt> at the
+     * quadrature points of the cell, face or subface selected the last time
+     * the <tt>reinit</tt> function of the FEInterfaceValues object was called.
+     *
+     * The data type stored by the output vector must be what you get when you
+     * multiply the Hessians of shape functions (i.e., @p hessian_type) times
+     * the type used to store the values of the unknowns $U_j$ of your finite
+     * element vector $U$ (represented by the @p fe_function argument).
+     *
+     * @dealiiRequiresUpdateFlags{update_hessians}
+     */
+    template <class InputVector>
+    void
+    get_average_of_function_hessians(
+      const InputVector &fe_function,
+      std::vector<solution_hessian_type<typename InputVector::value_type>>
+        &hessians) const;
+
+    /**
+     * This function relates to get_average_of_function_hessians() in the same
+     * way as get_function_values_from_local_dof_values() relates to
+     * get_function_values(). See the documentation of
+     * get_function_values_from_local_dof_values() for more
+     * information.
+     */
+    template <class InputVector>
+    void
+    get_average_of_function_hessians_from_local_dof_values(
+      const InputVector &local_dof_values,
+      std::vector<solution_hessian_type<typename InputVector::value_type>>
+        &hessians) const;
+
+    //@}
+
   private:
     /**
      * The extractor for this view.
@@ -665,170 +686,6 @@ namespace FEInterfaceViews
       typename FEValuesViews::Vector<dim, spacedim>::third_derivative_type;
 
     /**
-     * Constructor for an object that represents a vector component
-     */
-    Vector(const FEInterfaceValues<dim, spacedim> &fe_interface,
-           const unsigned int                      first_vector_component);
-
-    /**
-     * Return the value of the vector components selected by this view
-     * with interface dof index @p interface_dof_index in
-     * quadrature point @p q_point.
-     *
-     * The argument @p here_or_there selects between the upstream value and
-     * the downstream value as defined by the direction of the normal vector
-     * in this quadrature point. If @p here_or_there is true, the shape
-     * functions from the first cell of the interface is used.
-     *
-     * In other words, this function returns the limit of the value of the shape
-     * function in the given quadrature point when approaching it from one of
-     * the two cells of the interface.
-     *
-     * @note This function is typically used to pick the upstream or downstream
-     * value based on a direction. This can be achieved by using
-     * <code>(direction * normal)>0</code> as the first argument of this
-     * function.
-     */
-    value_type
-    value(const bool         here_or_there,
-          const unsigned int interface_dof_index,
-          const unsigned int q_point) const;
-
-    /**
-     * Return the jump vector $[\mathbf{u}]=\mathbf{u_1} - \mathbf{u_2}$ on the
-     * interface for the shape function
-     * @p interface_dof_index in the quadrature point @p q_point.
-     */
-    value_type
-    jump_in_values(const unsigned int interface_dof_index,
-                   const unsigned int q_point) const;
-
-    /**
-     * The same as above.
-     *
-     * @deprecated Use the jump_in_values() function instead.
-     */
-    DEAL_II_DEPRECATED
-    value_type
-    jump(const unsigned int interface_dof_index,
-         const unsigned int q_point) const;
-
-    /**
-     * Return the average vector $\average{\mathbf{u}}=\frac{1}{2}(\matbf{u_1} +
-     * \mathbf{u_2})$ on the interface for the shape
-     * function @p interface_dof_index in the quadrature point @p q_point.
-     */
-    value_type
-    average_of_values(const unsigned int interface_dof_index,
-                      const unsigned int q_point) const;
-
-    /**
-     * The same as above.
-     *
-     * @deprecated Use the average_of_values() function instead.
-     */
-    DEAL_II_DEPRECATED
-    value_type
-    average(const unsigned int interface_dof_index,
-            const unsigned int q_point) const;
-
-    /**
-     * Return the average of the gradient (a tensor of rank 2) $\average{\nabla
-     * \mathbf{u}}$ on the interface for the shape
-     * function @p interface_dof_index in the quadrature point @p q_point.
-     */
-    gradient_type
-    average_of_gradients(const unsigned int interface_dof_index,
-                         const unsigned int q_point) const;
-
-    /**
-     * The same as above.
-     *
-     * @deprecated Use the average_of_gradients() function instead.
-     */
-    DEAL_II_DEPRECATED
-    gradient_type
-    average_gradient(const unsigned int interface_dof_index,
-                     const unsigned int q_point) const;
-
-    /**
-     * Return the jump of the gradient (a tensor of rank 2) $\jump{\nabla
-     * \mathbf{u}}$ on the interface for the shape
-     * function @p interface_dof_index in the quadrature point @p q_point.
-     */
-    gradient_type
-    jump_in_gradients(const unsigned int interface_dof_index,
-                      const unsigned int q_point) const;
-
-    /**
-     * The same as above.
-     *
-     * @deprecated Use the average_of_gradients() function instead.
-     */
-    gradient_type
-    jump_gradient(const unsigned int interface_dof_index,
-                  const unsigned int q_point) const;
-
-    /**
-     * Return the average of the Hessian $\average{\nabla^2 u} =
-     * \frac{1}{2}\nabla^2 u_{\text{cell0}} + \frac{1}{2} \nabla^2
-     * u_{\text{cell1}}$ on the interface
-     * for the shape function @p interface_dof_index at the quadrature point @p
-     * q_point of the component selected by this view.
-     */
-    hessian_type
-    average_of_hessians(const unsigned int interface_dof_index,
-                        const unsigned int q_point) const;
-
-    /**
-     * The same as above.
-     *
-     * @deprecated Use the average_of_hessians() function instead.
-     */
-    hessian_type
-    average_hessian(const unsigned int interface_dof_index,
-                    const unsigned int q_point) const;
-
-    /**
-     * Return the jump in the gradient $\jump{\nabla u}=\nabla u_{\text{cell0}}
-     * - \nabla u_{\text{cell1}}$ on the interface for the shape function @p
-     * interface_dof_index at the quadrature point @p q_point of
-     * the component selected by this view.
-     */
-    hessian_type
-    jump_in_hessians(const unsigned int interface_dof_index,
-                     const unsigned int q_point) const;
-
-    /**
-     * The same as above.
-     *
-     * @deprecated Use the average_of_hessians() function instead.
-     */
-    hessian_type
-    jump_hessian(const unsigned int interface_dof_index,
-                 const unsigned int q_point) const;
-
-    /**
-     * Return the jump in the third derivative $\jump{\nabla^3 u} = \nabla^3
-     * u_{\text{cell0}} - \nabla^3 u_{\text{cell1}}$ on the interface for the
-     * shape function @p interface_dof_index at the quadrature point @p q_point of
-     * the component selected by this view.
-     */
-    third_derivative_type
-    jump_in_third_derivatives(const unsigned int interface_dof_index,
-                              const unsigned int q_point) const;
-
-    /**
-     * The same as above.
-     *
-     * @deprecated Use the jump_in_third_derivatives() function instead.
-     */
-    DEAL_II_DEPRECATED
-    third_derivative_type
-    jump_3rd_derivative(const unsigned int interface_dof_index,
-                        const unsigned int q_point) const;
-
-    /**
      * An alias for the data type of the product of a @p Number and the
      * values of the view this class provides. This is the data type of
      * vector components of a finite element field whose degrees of
@@ -866,6 +723,41 @@ namespace FEInterfaceViews
     template <typename Number>
     using solution_third_derivative_type =
       typename ProductType<Number, third_derivative_type>::type;
+
+    /**
+     * Constructor for an object that represents a vector component
+     */
+    Vector(const FEInterfaceValues<dim, spacedim> &fe_interface,
+           const unsigned int                      first_vector_component);
+
+    /**
+     * @name Functions to evaluate quantities
+     */
+    //@{
+
+    /**
+     * Return the value of the vector components selected by this view
+     * with interface dof index @p interface_dof_index in
+     * quadrature point @p q_point.
+     *
+     * The argument @p here_or_there selects between the upstream value and
+     * the downstream value as defined by the direction of the normal vector
+     * in this quadrature point. If @p here_or_there is true, the shape
+     * functions from the first cell of the interface is used.
+     *
+     * In other words, this function returns the limit of the value of the shape
+     * function in the given quadrature point when approaching it from one of
+     * the two cells of the interface.
+     *
+     * @note This function is typically used to pick the upstream or downstream
+     * value based on a direction. This can be achieved by using
+     * <code>(direction * normal)>0</code> as the first argument of this
+     * function.
+     */
+    value_type
+    value(const bool         here_or_there,
+          const unsigned int interface_dof_index,
+          const unsigned int q_point) const;
 
     /**
      * Return the values of the selected vector component of the finite
@@ -924,6 +816,89 @@ namespace FEInterfaceViews
       std::vector<solution_value_type<typename InputVector::value_type>>
         &values) const;
 
+    //@}
+
+    /**
+     * @name Functions to evaluate jumps in quantities
+     */
+    //@{
+
+    /**
+     * Return the jump vector $[\mathbf{u}]=\mathbf{u_1} - \mathbf{u_2}$ on the
+     * interface for the shape function
+     * @p interface_dof_index in the quadrature point @p q_point.
+     */
+    value_type
+    jump_in_values(const unsigned int interface_dof_index,
+                   const unsigned int q_point) const;
+
+    /**
+     * The same as above.
+     *
+     * @deprecated Use the jump_in_values() function instead.
+     */
+    DEAL_II_DEPRECATED
+    value_type
+    jump(const unsigned int interface_dof_index,
+         const unsigned int q_point) const;
+
+    /**
+     * Return the jump of the gradient (a tensor of rank 2) $\jump{\nabla
+     * \mathbf{u}}$ on the interface for the shape
+     * function @p interface_dof_index in the quadrature point @p q_point.
+     */
+    gradient_type
+    jump_in_gradients(const unsigned int interface_dof_index,
+                      const unsigned int q_point) const;
+
+    /**
+     * The same as above.
+     *
+     * @deprecated Use the average_of_gradients() function instead.
+     */
+    gradient_type
+    jump_gradient(const unsigned int interface_dof_index,
+                  const unsigned int q_point) const;
+
+    /**
+     * Return the jump in the gradient $\jump{\nabla u}=\nabla u_{\text{cell0}}
+     * - \nabla u_{\text{cell1}}$ on the interface for the shape function @p
+     * interface_dof_index at the quadrature point @p q_point of
+     * the component selected by this view.
+     */
+    hessian_type
+    jump_in_hessians(const unsigned int interface_dof_index,
+                     const unsigned int q_point) const;
+
+    /**
+     * The same as above.
+     *
+     * @deprecated Use the average_of_hessians() function instead.
+     */
+    hessian_type
+    jump_hessian(const unsigned int interface_dof_index,
+                 const unsigned int q_point) const;
+
+    /**
+     * Return the jump in the third derivative $\jump{\nabla^3 u} = \nabla^3
+     * u_{\text{cell0}} - \nabla^3 u_{\text{cell1}}$ on the interface for the
+     * shape function @p interface_dof_index at the quadrature point @p q_point of
+     * the component selected by this view.
+     */
+    third_derivative_type
+    jump_in_third_derivatives(const unsigned int interface_dof_index,
+                              const unsigned int q_point) const;
+
+    /**
+     * The same as above.
+     *
+     * @deprecated Use the jump_in_third_derivatives() function instead.
+     */
+    DEAL_II_DEPRECATED
+    third_derivative_type
+    jump_3rd_derivative(const unsigned int interface_dof_index,
+                        const unsigned int q_point) const;
+
     /**
      * Return the jump in the values of the selected vector component of the
      * finite element function characterized by <tt>fe_function</tt> at the
@@ -954,40 +929,6 @@ namespace FEInterfaceViews
     template <class InputVector>
     void
     get_jump_in_function_values_from_local_dof_values(
-      const InputVector &local_dof_values,
-      std::vector<solution_value_type<typename InputVector::value_type>>
-        &values) const;
-
-    /**
-     * Return the average of the values of the selected vector component of the
-     * finite element function characterized by <tt>fe_function</tt> at the
-     * quadrature points of the cell interface selected the last time
-     * the <tt>reinit</tt> function of the FEInterfaceValues object was called.
-     *
-     * The data type stored by the output vector must be what you get when you
-     * multiply the values of shape functions (i.e., @p value_type) times the
-     * type used to store the values of the unknowns $U_j$ of your finite
-     * element vector $U$ (represented by the @p fe_function argument).
-     *
-     * @dealiiRequiresUpdateFlags{update_values}
-     */
-    template <class InputVector>
-    void
-    get_average_of_function_values(
-      const InputVector &fe_function,
-      std::vector<solution_value_type<typename InputVector::value_type>>
-        &values) const;
-
-    /**
-     * This function relates to get_average_of_function_values() in the same way
-     * as get_function_values_from_local_dof_values() relates to
-     * get_function_values(). See the documentation of
-     * get_function_values_from_local_dof_values() for more
-     * information.
-     */
-    template <class InputVector>
-    void
-    get_average_of_function_values_from_local_dof_values(
       const InputVector &local_dof_values,
       std::vector<solution_value_type<typename InputVector::value_type>>
         &values) const;
@@ -1025,74 +966,6 @@ namespace FEInterfaceViews
       const InputVector &local_dof_values,
       std::vector<solution_gradient_type<typename InputVector::value_type>>
         &gradients) const;
-
-    /**
-     * Return the average of the gradients of the selected vector components of
-     * the finite element function characterized by <tt>fe_function</tt> at the
-     * quadrature points of the cell interface selected the last time
-     * the <tt>reinit</tt> function of the FEInterfaceValues object was called.
-     *
-     * The data type stored by the output vector must be what you get when you
-     * multiply the gradients of shape functions (i.e., @p gradient_type)
-     * times the type used to store the values of the unknowns $U_j$ of your
-     * finite element vector $U$ (represented by the @p fe_function argument).
-     *
-     * @dealiiRequiresUpdateFlags{update_gradients}
-     */
-    template <class InputVector>
-    void
-    get_average_of_function_gradients(
-      const InputVector &fe_function,
-      std::vector<solution_gradient_type<typename InputVector::value_type>>
-        &gradients) const;
-
-    /**
-     * This function relates to get_average_of_function_gradients() in the same
-     * way as get_function_values_from_local_dof_values() relates to
-     * get_function_values(). See the documentation of
-     * get_function_values_from_local_dof_values() for more
-     * information.
-     */
-    template <class InputVector>
-    void
-    get_average_of_function_gradients_from_local_dof_values(
-      const InputVector &local_dof_values,
-      std::vector<solution_gradient_type<typename InputVector::value_type>>
-        &gradients) const;
-
-    /**
-     * Return the average of the Hessians of the selected vector component of
-     * the finite element function characterized by <tt>fe_function</tt> at the
-     * quadrature points of the cell, face or subface selected the last time
-     * the <tt>reinit</tt> function of the FEInterfaceValues object was called.
-     *
-     * The data type stored by the output vector must be what you get when you
-     * multiply the Hessians of shape functions (i.e., @p hessian_type) times
-     * the type used to store the values of the unknowns $U_j$ of your finite
-     * element vector $U$ (represented by the @p fe_function argument).
-     *
-     * @dealiiRequiresUpdateFlags{update_hessians}
-     */
-    template <class InputVector>
-    void
-    get_average_of_function_hessians(
-      const InputVector &fe_function,
-      std::vector<solution_hessian_type<typename InputVector::value_type>>
-        &hessians) const;
-
-    /**
-     * This function relates to get_average_of_function_hessians() in the same
-     * way as get_function_values_from_local_dof_values() relates to
-     * get_function_values(). See the documentation of
-     * get_function_values_from_local_dof_values() for more
-     * information.
-     */
-    template <class InputVector>
-    void
-    get_average_of_function_hessians_from_local_dof_values(
-      const InputVector &local_dof_values,
-      std::vector<solution_hessian_type<typename InputVector::value_type>>
-        &hessians) const;
 
     /**
      * Return the jump in the Hessians of the selected vector component of the
@@ -1165,6 +1038,174 @@ namespace FEInterfaceViews
         solution_third_derivative_type<typename InputVector::value_type>>
         &third_derivatives) const;
 
+    //@}
+
+    /**
+     * @name Functions to evaluate the average of quantities
+     */
+    //@{
+
+    /**
+     * Return the average vector $\average{\mathbf{u}}=\frac{1}{2}(\matbf{u_1} +
+     * \mathbf{u_2})$ on the interface for the shape
+     * function @p interface_dof_index in the quadrature point @p q_point.
+     */
+    value_type
+    average_of_values(const unsigned int interface_dof_index,
+                      const unsigned int q_point) const;
+
+    /**
+     * The same as above.
+     *
+     * @deprecated Use the average_of_values() function instead.
+     */
+    DEAL_II_DEPRECATED
+    value_type
+    average(const unsigned int interface_dof_index,
+            const unsigned int q_point) const;
+
+    /**
+     * Return the average of the gradient (a tensor of rank 2) $\average{\nabla
+     * \mathbf{u}}$ on the interface for the shape
+     * function @p interface_dof_index in the quadrature point @p q_point.
+     */
+    gradient_type
+    average_of_gradients(const unsigned int interface_dof_index,
+                         const unsigned int q_point) const;
+
+    /**
+     * The same as above.
+     *
+     * @deprecated Use the average_of_gradients() function instead.
+     */
+    DEAL_II_DEPRECATED
+    gradient_type
+    average_gradient(const unsigned int interface_dof_index,
+                     const unsigned int q_point) const;
+
+    /**
+     * Return the average of the Hessian $\average{\nabla^2 u} =
+     * \frac{1}{2}\nabla^2 u_{\text{cell0}} + \frac{1}{2} \nabla^2
+     * u_{\text{cell1}}$ on the interface
+     * for the shape function @p interface_dof_index at the quadrature point @p
+     * q_point of the component selected by this view.
+     */
+    hessian_type
+    average_of_hessians(const unsigned int interface_dof_index,
+                        const unsigned int q_point) const;
+
+    /**
+     * The same as above.
+     *
+     * @deprecated Use the average_of_hessians() function instead.
+     */
+    hessian_type
+    average_hessian(const unsigned int interface_dof_index,
+                    const unsigned int q_point) const;
+
+    /**
+     * Return the average of the values of the selected vector component of the
+     * finite element function characterized by <tt>fe_function</tt> at the
+     * quadrature points of the cell interface selected the last time
+     * the <tt>reinit</tt> function of the FEInterfaceValues object was called.
+     *
+     * The data type stored by the output vector must be what you get when you
+     * multiply the values of shape functions (i.e., @p value_type) times the
+     * type used to store the values of the unknowns $U_j$ of your finite
+     * element vector $U$ (represented by the @p fe_function argument).
+     *
+     * @dealiiRequiresUpdateFlags{update_values}
+     */
+    template <class InputVector>
+    void
+    get_average_of_function_values(
+      const InputVector &fe_function,
+      std::vector<solution_value_type<typename InputVector::value_type>>
+        &values) const;
+
+    /**
+     * This function relates to get_average_of_function_values() in the same way
+     * as get_function_values_from_local_dof_values() relates to
+     * get_function_values(). See the documentation of
+     * get_function_values_from_local_dof_values() for more
+     * information.
+     */
+    template <class InputVector>
+    void
+    get_average_of_function_values_from_local_dof_values(
+      const InputVector &local_dof_values,
+      std::vector<solution_value_type<typename InputVector::value_type>>
+        &values) const;
+
+    /**
+     * Return the average of the gradients of the selected vector components of
+     * the finite element function characterized by <tt>fe_function</tt> at the
+     * quadrature points of the cell interface selected the last time
+     * the <tt>reinit</tt> function of the FEInterfaceValues object was called.
+     *
+     * The data type stored by the output vector must be what you get when you
+     * multiply the gradients of shape functions (i.e., @p gradient_type)
+     * times the type used to store the values of the unknowns $U_j$ of your
+     * finite element vector $U$ (represented by the @p fe_function argument).
+     *
+     * @dealiiRequiresUpdateFlags{update_gradients}
+     */
+    template <class InputVector>
+    void
+    get_average_of_function_gradients(
+      const InputVector &fe_function,
+      std::vector<solution_gradient_type<typename InputVector::value_type>>
+        &gradients) const;
+
+    /**
+     * This function relates to get_average_of_function_gradients() in the same
+     * way as get_function_values_from_local_dof_values() relates to
+     * get_function_values(). See the documentation of
+     * get_function_values_from_local_dof_values() for more
+     * information.
+     */
+    template <class InputVector>
+    void
+    get_average_of_function_gradients_from_local_dof_values(
+      const InputVector &local_dof_values,
+      std::vector<solution_gradient_type<typename InputVector::value_type>>
+        &gradients) const;
+
+    /**
+     * Return the average of the Hessians of the selected vector component of
+     * the finite element function characterized by <tt>fe_function</tt> at the
+     * quadrature points of the cell, face or subface selected the last time
+     * the <tt>reinit</tt> function of the FEInterfaceValues object was called.
+     *
+     * The data type stored by the output vector must be what you get when you
+     * multiply the Hessians of shape functions (i.e., @p hessian_type) times
+     * the type used to store the values of the unknowns $U_j$ of your finite
+     * element vector $U$ (represented by the @p fe_function argument).
+     *
+     * @dealiiRequiresUpdateFlags{update_hessians}
+     */
+    template <class InputVector>
+    void
+    get_average_of_function_hessians(
+      const InputVector &fe_function,
+      std::vector<solution_hessian_type<typename InputVector::value_type>>
+        &hessians) const;
+
+    /**
+     * This function relates to get_average_of_function_hessians() in the same
+     * way as get_function_values_from_local_dof_values() relates to
+     * get_function_values(). See the documentation of
+     * get_function_values_from_local_dof_values() for more
+     * information.
+     */
+    template <class InputVector>
+    void
+    get_average_of_function_hessians_from_local_dof_values(
+      const InputVector &local_dof_values,
+      std::vector<solution_hessian_type<typename InputVector::value_type>>
+        &hessians) const;
+
+    //@}
 
   private:
     /**
@@ -1500,7 +1541,7 @@ public:
    */
 
   /**
-   * @name Functions to evaluate data of the shape functions
+   * @name Functions to evaluate shape functions
    * @{
    */
 
@@ -1532,6 +1573,15 @@ public:
               const unsigned int component = 0) const;
 
   /**
+   * @}
+   */
+
+  /**
+   * @name Functions to evaluate jumps in shape functions
+   * @{
+   */
+
+  /**
    * Return the jump $\jump{u}=u_{\text{cell0}} - u_{\text{cell1}}$ on the
    * interface
    * for the shape function @p interface_dof_index at the quadrature point
@@ -1560,6 +1610,91 @@ public:
   jump(const unsigned int interface_dof_index,
        const unsigned int q_point,
        const unsigned int component = 0) const;
+
+  /**
+   * Return the jump in the gradient $\jump{\nabla u}=\nabla u_{\text{cell0}} -
+   * \nabla u_{\text{cell1}}$ on the interface for the shape function @p
+   * interface_dof_index at the quadrature point @p q_point of component @p
+   * component.
+   *
+   * If this is a boundary face (at_boundary() returns true), then
+   * $\jump{\nabla u}=\nabla u_{\text{cell0}}$.
+   */
+  Tensor<1, spacedim>
+  jump_in_shape_gradients(const unsigned int interface_dof_index,
+                          const unsigned int q_point,
+                          const unsigned int component = 0) const;
+
+  /**
+   * The same as above.
+   *
+   * @deprecated Use the jump_in_shape_gradients() function instead.
+   */
+  DEAL_II_DEPRECATED
+  Tensor<1, spacedim>
+  jump_gradient(const unsigned int interface_dof_index,
+                const unsigned int q_point,
+                const unsigned int component = 0) const;
+
+  /**
+   * Return the jump in the Hessian $\jump{\nabla^2 u} = \nabla^2
+   * u_{\text{cell0}} - \nabla^2 u_{\text{cell1}}$ on the interface for the
+   * shape function
+   * @p interface_dof_index at the quadrature point @p q_point of component
+   * @p component.
+   *
+   * If this is a boundary face (at_boundary() returns true), then
+   * $\jump{\nabla^2 u} = \nabla^2 u_{\text{cell0}}$.
+   */
+  Tensor<2, spacedim>
+  jump_in_shape_hessians(const unsigned int interface_dof_index,
+                         const unsigned int q_point,
+                         const unsigned int component = 0) const;
+
+  /**
+   * The same as above.
+   *
+   * @deprecated Use the jump_in_shape_hessians() function instead.
+   */
+  DEAL_II_DEPRECATED
+  Tensor<2, spacedim>
+  jump_hessian(const unsigned int interface_dof_index,
+               const unsigned int q_point,
+               const unsigned int component = 0) const;
+
+  /**
+   * Return the jump in the third derivative $\jump{\nabla^3 u} = \nabla^3
+   * u_{\text{cell0}} - \nabla^3 u_{\text{cell1}}$ on the interface for the
+   * shape function @p interface_dof_index at the quadrature point @p q_point of
+   * component @p component.
+   *
+   * If this is a boundary face (at_boundary() returns true), then
+   * $\jump{\nabla^3 u} = \nabla^3 u_{\text{cell0}}$.
+   */
+  Tensor<3, spacedim>
+  jump_in_shape_3rd_derivatives(const unsigned int interface_dof_index,
+                                const unsigned int q_point,
+                                const unsigned int component = 0) const;
+
+  /**
+   * The same as above.
+   *
+   * @deprecated Use the jump_in_shape_3rd_derivatives() function instead.
+   */
+  DEAL_II_DEPRECATED
+  Tensor<3, spacedim>
+  jump_3rd_derivative(const unsigned int interface_dof_index,
+                      const unsigned int q_point,
+                      const unsigned int component = 0) const;
+
+  /**
+   * @}
+   */
+
+  /**
+   * @name Functions to evaluate the average of shape functions
+   * @{
+   */
 
   /**
    * Return the average $\average{u}=\frac{1}{2}u_{\text{cell0}} +
@@ -1638,80 +1773,13 @@ public:
                   const unsigned int component = 0) const;
 
   /**
-   * Return the jump in the gradient $\jump{\nabla u}=\nabla u_{\text{cell0}} -
-   * \nabla u_{\text{cell1}}$ on the interface for the shape function @p
-   * interface_dof_index at the quadrature point @p q_point of component @p
-   * component.
-   *
-   * If this is a boundary face (at_boundary() returns true), then
-   * $\jump{\nabla u}=\nabla u_{\text{cell0}}$.
+   * @}
    */
-  Tensor<1, spacedim>
-  jump_in_shape_gradients(const unsigned int interface_dof_index,
-                          const unsigned int q_point,
-                          const unsigned int component = 0) const;
 
   /**
-   * The same as above.
-   *
-   * @deprecated Use the jump_in_shape_gradients() function instead.
+   * @name Extractors Methods to extract individual components
+   * @{
    */
-  DEAL_II_DEPRECATED
-  Tensor<1, spacedim>
-  jump_gradient(const unsigned int interface_dof_index,
-                const unsigned int q_point,
-                const unsigned int component = 0) const;
-
-  /**
-   * Return the jump in the Hessian $\jump{\nabla^2 u} = \nabla^2
-   * u_{\text{cell0}} - \nabla^2 u_{\text{cell1}}$ on the interface for the
-   * shape function
-   * @p interface_dof_index at the quadrature point @p q_point of component
-   * @p component.
-   *
-   * If this is a boundary face (at_boundary() returns true), then
-   * $\jump{\nabla^2 u} = \nabla^2 u_{\text{cell0}}$.
-   */
-  Tensor<2, spacedim>
-  jump_in_shape_hessians(const unsigned int interface_dof_index,
-                         const unsigned int q_point,
-                         const unsigned int component = 0) const;
-
-  /**
-   * The same as above.
-   *
-   * @deprecated Use the jump_in_shape_hessians() function instead.
-   */
-  DEAL_II_DEPRECATED
-  Tensor<2, spacedim>
-  jump_hessian(const unsigned int interface_dof_index,
-               const unsigned int q_point,
-               const unsigned int component = 0) const;
-
-  /**
-   * Return the jump in the third derivative $\jump{\nabla^3 u} = \nabla^3
-   * u_{\text{cell0}} - \nabla^3 u_{\text{cell1}}$ on the interface for the
-   * shape function @p interface_dof_index at the quadrature point @p q_point of
-   * component @p component.
-   *
-   * If this is a boundary face (at_boundary() returns true), then
-   * $\jump{\nabla^3 u} = \nabla^3 u_{\text{cell0}}$.
-   */
-  Tensor<3, spacedim>
-  jump_in_shape_3rd_derivatives(const unsigned int interface_dof_index,
-                                const unsigned int q_point,
-                                const unsigned int component = 0) const;
-
-  /**
-   * The same as above.
-   *
-   * @deprecated Use the jump_in_shape_3rd_derivatives() function instead.
-   */
-  DEAL_II_DEPRECATED
-  Tensor<3, spacedim>
-  jump_3rd_derivative(const unsigned int interface_dof_index,
-                      const unsigned int q_point,
-                      const unsigned int component = 0) const;
 
   /**
    * Create a view of the current FEInterfaceValues object that represents a
