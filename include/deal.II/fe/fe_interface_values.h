@@ -2836,8 +2836,7 @@ namespace FEInterfaceViews
     std::vector<solution_value_type<typename InputVector::value_type>> &values)
     const
   {
-    Assert(values.size() == this->fe_interface->n_quadrature_points,
-           ExcNotImplemented());
+    AssertDimension(values.size(), this->fe_interface->n_quadrature_points);
 
     const auto &interface_dof_indices =
       this->fe_interface->get_interface_dof_indices();
@@ -2883,8 +2882,7 @@ namespace FEInterfaceViews
     std::vector<solution_value_type<typename InputVector::value_type>> &values)
     const
   {
-    Assert(values.size() == this->fe_interface->n_quadrature_points,
-           ExcNotImplemented());
+    AssertDimension(values.size(), this->fe_interface->n_quadrature_points);
 
     const auto &interface_dof_indices =
       this->fe_interface->get_interface_dof_indices();
@@ -2927,8 +2925,7 @@ namespace FEInterfaceViews
     std::vector<solution_gradient_type<typename InputVector::value_type>>
       &gradients) const
   {
-    Assert(gradients.size() == this->fe_interface->n_quadrature_points,
-           ExcNotImplemented());
+    AssertDimension(gradients.size(), this->fe_interface->n_quadrature_points);
 
     const auto &interface_dof_indices =
       this->fe_interface->get_interface_dof_indices();
@@ -2972,8 +2969,7 @@ namespace FEInterfaceViews
     std::vector<solution_value_type<typename InputVector::value_type>> &values)
     const
   {
-    Assert(values.size() == this->fe_interface->n_quadrature_points,
-           ExcNotImplemented());
+    AssertDimension(values.size(), this->fe_interface->n_quadrature_points);
 
     const auto &interface_dof_indices =
       this->fe_interface->get_interface_dof_indices();
@@ -3018,8 +3014,7 @@ namespace FEInterfaceViews
       std::vector<solution_gradient_type<typename InputVector::value_type>>
         &gradients) const
   {
-    Assert(gradients.size() == this->fe_interface->n_quadrature_points,
-           ExcNotImplemented());
+    AssertDimension(gradients.size(), this->fe_interface->n_quadrature_points);
 
     const auto &interface_dof_indices =
       this->fe_interface->get_interface_dof_indices();
@@ -3063,8 +3058,7 @@ namespace FEInterfaceViews
     std::vector<solution_hessian_type<typename InputVector::value_type>>
       &hessians) const
   {
-    Assert(hessians.size() == this->fe_interface->n_quadrature_points,
-           ExcNotImplemented());
+    AssertDimension(hessians.size(), this->fe_interface->n_quadrature_points);
 
     const auto &interface_dof_indices =
       this->fe_interface->get_interface_dof_indices();
@@ -3108,8 +3102,7 @@ namespace FEInterfaceViews
     std::vector<solution_hessian_type<typename InputVector::value_type>>
       &hessians) const
   {
-    Assert(hessians.size() == this->fe_interface->n_quadrature_points,
-           ExcNotImplemented());
+    AssertDimension(hessians.size(), this->fe_interface->n_quadrature_points);
 
     const auto &interface_dof_indices =
       this->fe_interface->get_interface_dof_indices();
@@ -3156,8 +3149,8 @@ namespace FEInterfaceViews
         solution_third_derivative_type<typename InputVector::value_type>>
         &third_derivatives) const
   {
-    Assert(third_derivatives.size() == this->fe_interface->n_quadrature_points,
-           ExcNotImplemented());
+    AssertDimension(third_derivatives.size(),
+                    this->fe_interface->n_quadrature_points);
 
     const auto &interface_dof_indices =
       this->fe_interface->get_interface_dof_indices();
@@ -3506,8 +3499,7 @@ namespace FEInterfaceViews
     std::vector<solution_value_type<typename InputVector::value_type>> &values)
     const
   {
-    Assert(values.size() == this->fe_interface->n_quadrature_points,
-           ExcNotImplemented());
+    AssertDimension(values.size(), this->fe_interface->n_quadrature_points);
 
     const auto &interface_dof_indices =
       this->fe_interface->get_interface_dof_indices();
@@ -3553,8 +3545,7 @@ namespace FEInterfaceViews
     std::vector<solution_value_type<typename InputVector::value_type>> &values)
     const
   {
-    Assert(values.size() == this->fe_interface->n_quadrature_points,
-           ExcNotImplemented());
+    AssertDimension(values.size(), this->fe_interface->n_quadrature_points);
 
     const auto &interface_dof_indices =
       this->fe_interface->get_interface_dof_indices();
@@ -3597,8 +3588,7 @@ namespace FEInterfaceViews
     std::vector<solution_gradient_type<typename InputVector::value_type>>
       &gradients) const
   {
-    Assert(gradients.size() == this->fe_interface->n_quadrature_points,
-           ExcNotImplemented());
+    AssertDimension(gradients.size(), this->fe_interface->n_quadrature_points);
 
     const auto &interface_dof_indices =
       this->fe_interface->get_interface_dof_indices();
@@ -3642,8 +3632,7 @@ namespace FEInterfaceViews
     std::vector<solution_value_type<typename InputVector::value_type>> &values)
     const
   {
-    Assert(values.size() == this->fe_interface->n_quadrature_points,
-           ExcNotImplemented());
+    AssertDimension(values.size(), this->fe_interface->n_quadrature_points);
 
     const auto &interface_dof_indices =
       this->fe_interface->get_interface_dof_indices();
@@ -3688,8 +3677,7 @@ namespace FEInterfaceViews
       std::vector<solution_gradient_type<typename InputVector::value_type>>
         &gradients) const
   {
-    Assert(gradients.size() == this->fe_interface->n_quadrature_points,
-           ExcNotImplemented());
+    AssertDimension(gradients.size(), this->fe_interface->n_quadrature_points);
 
     const auto &interface_dof_indices =
       this->fe_interface->get_interface_dof_indices();
@@ -3733,8 +3721,7 @@ namespace FEInterfaceViews
     std::vector<solution_hessian_type<typename InputVector::value_type>>
       &hessians) const
   {
-    Assert(hessians.size() == this->fe_interface->n_quadrature_points,
-           ExcNotImplemented());
+    AssertDimension(hessians.size(), this->fe_interface->n_quadrature_points);
 
     const auto &interface_dof_indices =
       this->fe_interface->get_interface_dof_indices();
@@ -3778,8 +3765,7 @@ namespace FEInterfaceViews
     std::vector<solution_hessian_type<typename InputVector::value_type>>
       &hessians) const
   {
-    Assert(hessians.size() == this->fe_interface->n_quadrature_points,
-           ExcNotImplemented());
+    AssertDimension(hessians.size(), this->fe_interface->n_quadrature_points);
 
     const auto &interface_dof_indices =
       this->fe_interface->get_interface_dof_indices();
@@ -3826,8 +3812,8 @@ namespace FEInterfaceViews
         solution_third_derivative_type<typename InputVector::value_type>>
         &third_derivatives) const
   {
-    Assert(third_derivatives.size() == this->fe_interface->n_quadrature_points,
-           ExcNotImplemented());
+    AssertDimension(third_derivatives.size(),
+                    this->fe_interface->n_quadrature_points);
 
     const auto &interface_dof_indices =
       this->fe_interface->get_interface_dof_indices();
