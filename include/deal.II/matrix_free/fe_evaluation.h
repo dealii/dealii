@@ -3854,7 +3854,7 @@ FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::get_cell_ids()
       // look into the FaceInfo field that collects information from both
       // sides of a face once for the global mesh, and pick the face id that
       // is not the local one (cell_this).
-      for (unsigned int i = 0; i < n_lanes; i++)
+      for (unsigned int i = 0; i < n_lanes; ++i)
         {
           // compute actual (non vectorized) cell ID
           const unsigned int cell_this = this->cell * n_lanes + i;
@@ -3950,7 +3950,7 @@ FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
       this->is_interior_face == false)
     {
       // cell-based face-loop: plus face
-      for (unsigned int i = 0; i < v_len; i++)
+      for (unsigned int i = 0; i < v_len; ++i)
         {
           // compute actual (non vectorized) cell ID
           const unsigned int cell_this = this->cell * v_len + i;
@@ -5738,7 +5738,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
 {
   AssertIndexRange(dof, this->data->dofs_per_component_on_cell);
   Tensor<1, n_components_, VectorizedArrayType> return_value;
-  for (unsigned int comp = 0; comp < n_components; comp++)
+  for (unsigned int comp = 0; comp < n_components; ++comp)
     return_value[comp] = this->values_dofs[comp][dof];
   return return_value;
 }
@@ -5762,7 +5762,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   AssertIndexRange(q_point, this->n_quadrature_points);
   const std::size_t                             nqp = this->n_quadrature_points;
   Tensor<1, n_components_, VectorizedArrayType> return_value;
-  for (unsigned int comp = 0; comp < n_components; comp++)
+  for (unsigned int comp = 0; comp < n_components; ++comp)
     return_value[comp] = values_quad[comp * nqp + q_point];
   return return_value;
 }
@@ -5795,7 +5795,7 @@ inline DEAL_II_ALWAYS_INLINE
   if (!is_face && this->cell_type == internal::MatrixFreeFunctions::cartesian)
     {
       for (unsigned int d = 0; d < dim; ++d)
-        for (unsigned int comp = 0; comp < n_components; comp++)
+        for (unsigned int comp = 0; comp < n_components; ++comp)
           grad_out[comp][d] = gradients_quad[(comp * dim + d) * nqp + q_point] *
                               this->jacobian[0][d][d];
     }
@@ -5806,7 +5806,7 @@ inline DEAL_II_ALWAYS_INLINE
         this->jacobian[this->cell_type > internal::MatrixFreeFunctions::affine ?
                          q_point :
                          0];
-      for (unsigned int comp = 0; comp < n_components; comp++)
+      for (unsigned int comp = 0; comp < n_components; ++comp)
         for (unsigned int d = 0; d < dim; ++d)
           {
             grad_out[comp][d] =
@@ -5844,14 +5844,14 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   Tensor<1, n_components, VectorizedArrayType> grad_out;
 
   if (this->cell_type == internal::MatrixFreeFunctions::cartesian)
-    for (unsigned int comp = 0; comp < n_components; comp++)
+    for (unsigned int comp = 0; comp < n_components; ++comp)
       grad_out[comp] = gradients_quad[(comp * dim + dim - 1) * nqp + q_point] *
                        (this->normal_x_jacobian[0][dim - 1]);
   else
     {
       const std::size_t index =
         this->cell_type <= internal::MatrixFreeFunctions::affine ? 0 : q_point;
-      for (unsigned int comp = 0; comp < n_components; comp++)
+      for (unsigned int comp = 0; comp < n_components; ++comp)
         {
           grad_out[comp] = gradients_quad[comp * dim * nqp + q_point] *
                            this->normal_x_jacobian[index][0];
@@ -5949,7 +5949,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   // Cartesian cell
   if (!is_face && this->cell_type == internal::MatrixFreeFunctions::cartesian)
     {
-      for (unsigned int comp = 0; comp < n_components; comp++)
+      for (unsigned int comp = 0; comp < n_components; ++comp)
         {
           for (unsigned int d = 0; d < dim; ++d)
             hessian_out[comp][d][d] =
@@ -5986,7 +5986,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   // cell with general Jacobian, but constant within the cell
   else if (this->cell_type <= internal::MatrixFreeFunctions::affine)
     {
-      for (unsigned int comp = 0; comp < n_components; comp++)
+      for (unsigned int comp = 0; comp < n_components; ++comp)
         {
           VectorizedArrayType tmp[dim][dim];
           internal::hessian_unit_times_jac(
@@ -6017,7 +6017,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
         this->mapping_data->jacobian_gradients
           [1 - this->is_interior_face]
           [this->mapping_data->data_index_offsets[this->cell] + q_point];
-      for (unsigned int comp = 0; comp < n_components; comp++)
+      for (unsigned int comp = 0; comp < n_components; ++comp)
         {
           // compute laplacian before the gradient because it needs to access
           // unscaled gradient data
@@ -6089,7 +6089,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   // Cartesian cell
   if (this->cell_type == internal::MatrixFreeFunctions::cartesian)
     {
-      for (unsigned int comp = 0; comp < n_components; comp++)
+      for (unsigned int comp = 0; comp < n_components; ++comp)
         for (unsigned int d = 0; d < dim; ++d)
           hessian_out[comp][d] =
             hessians_quad[(comp * hdim + d) * nqp + q_point] *
@@ -6098,7 +6098,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   // cell with general Jacobian, but constant within the cell
   else if (this->cell_type == internal::MatrixFreeFunctions::affine)
     {
-      for (unsigned int comp = 0; comp < n_components; comp++)
+      for (unsigned int comp = 0; comp < n_components; ++comp)
         {
           // compute laplacian before the gradient because it needs to access
           // unscaled gradient data
@@ -6123,7 +6123,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
         &jac_grad =
           this->mapping_data->jacobian_gradients
             [0][this->mapping_data->data_index_offsets[this->cell] + q_point];
-      for (unsigned int comp = 0; comp < n_components; comp++)
+      for (unsigned int comp = 0; comp < n_components; ++comp)
         {
           // compute laplacian before the gradient because it needs to access
           // unscaled gradient data
@@ -6195,7 +6195,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   this->dof_values_initialized = true;
 #  endif
   AssertIndexRange(dof, this->data->dofs_per_component_on_cell);
-  for (unsigned int comp = 0; comp < n_components; comp++)
+  for (unsigned int comp = 0; comp < n_components; ++comp)
     this->values_dofs[comp][dof] = val_in[comp];
 }
 
@@ -6269,7 +6269,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
       for (unsigned int d = 0; d < dim; ++d)
         {
           const VectorizedArrayType factor = this->jacobian[0][d][d] * JxW;
-          for (unsigned int comp = 0; comp < n_components; comp++)
+          for (unsigned int comp = 0; comp < n_components; ++comp)
             gradients_quad[(comp * dim + d) * nqp + q_point] =
               grad_in[comp][d] * factor;
         }
@@ -6318,7 +6318,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
 
   const std::size_t nqp = this->n_quadrature_points;
   if (this->cell_type == internal::MatrixFreeFunctions::cartesian)
-    for (unsigned int comp = 0; comp < n_components; comp++)
+    for (unsigned int comp = 0; comp < n_components; ++comp)
       {
         for (unsigned int d = 0; d < dim - 1; ++d)
           gradients_quad[(comp * dim + d) * nqp + q_point] =
@@ -6334,7 +6334,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
         this->cell_type <= internal::MatrixFreeFunctions::affine ? 0 : q_point;
       const Tensor<1, dim, VectorizedArrayType> jac =
         this->normal_x_jacobian[index];
-      for (unsigned int comp = 0; comp < n_components; comp++)
+      for (unsigned int comp = 0; comp < n_components; ++comp)
         {
           VectorizedArrayType factor = grad_in[comp] * this->J_value[index];
           if (this->cell_type <= internal::MatrixFreeFunctions::affine)
@@ -6384,7 +6384,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
         {
           const auto                jac_d  = this->jacobian[0][d][d];
           const VectorizedArrayType factor = jac_d * jac_d * JxW;
-          for (unsigned int comp = 0; comp < n_components; comp++)
+          for (unsigned int comp = 0; comp < n_components; ++comp)
             hessians_quad[(comp * hdim + d) * nqp + q_point] =
               hessian_in[comp][d][d] * factor;
         }
@@ -6396,7 +6396,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
             const auto                jac_d  = this->jacobian[0][d][d];
             const auto                jac_e  = this->jacobian[0][e][e];
             const VectorizedArrayType factor = jac_d * jac_e * JxW;
-            for (unsigned int comp = 0; comp < n_components; comp++)
+            for (unsigned int comp = 0; comp < n_components; ++comp)
               hessians_quad[(comp * hdim + off_dia) * nqp + q_point] =
                 2.0 * hessian_in[comp][d][e] * factor;
           }
@@ -9742,7 +9742,7 @@ FEFaceEvaluation<dim,
            i < this->dof_info->n_vectorization_lanes_filled
                  [internal::MatrixFreeFunctions::DoFInfo::dof_access_cell]
                  [this->cell];
-           i++)
+           ++i)
         {
           // compute actual (non vectorized) cell ID
           const unsigned int cell_this =
@@ -9813,7 +9813,7 @@ FEFaceEvaluation<dim,
                i < this->dof_info->n_vectorization_lanes_filled
                      [internal::MatrixFreeFunctions::DoFInfo::dof_access_cell]
                      [this->cell];
-               i++)
+               ++i)
             {
               // compute actual (non vectorized) cell ID
               const unsigned int cell_this =
