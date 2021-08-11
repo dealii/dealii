@@ -1,0 +1,10 @@
+
+DEAL:Sacado::Fad::DFad<float>:FEInterfaceViews Scalar::OK
+DEAL:Sacado::Fad::DFad<float>:FEInterfaceViews Vector::OK
+DEAL:Sacado::Fad::DFad<Sacado::Fad::DFad<float>>:FEInterfaceViews Scalar::OK
+DEAL:Sacado::Fad::DFad<Sacado::Fad::DFad<float>>:FEInterfaceViews Vector::OK
+DEAL:Sacado::Fad::DFad<double>:FEInterfaceViews Scalar::OK
+DEAL:Sacado::Fad::DFad<double>:FEInterfaceViews Vector::OK
+DEAL:Sacado::Fad::DFad<Sacado::Fad::DFad<double>>:FEInterfaceViews Scalar::OK
+DEAL:Sacado::Fad::DFad<Sacado::Fad::DFad<double>>:FEInterfaceViews Vector::OK
+DEAL::OK
