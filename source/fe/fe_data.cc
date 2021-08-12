@@ -142,6 +142,7 @@ FiniteElementData<dim>::FiniteElementData(
   const Conformity                      conformity,
   const BlockIndices &                  block_indices)
   : reference_cell_kind(reference_cell)
+  , data(data)
   , number_unique_quads(data.dofs_per_object_inclusive[2].size())
   , number_unique_faces(data.dofs_per_object_inclusive[dim - 1].size())
   , dofs_per_vertex(data.dofs_per_object_exclusive[0][0])

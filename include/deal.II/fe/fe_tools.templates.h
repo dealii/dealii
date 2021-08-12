@@ -85,10 +85,7 @@ namespace FETools
     {
       AssertDimension(fes.size(), multiplicities.size());
 
-      unsigned int multiplied_dofs_per_vertex = 0;
-      unsigned int multiplied_dofs_per_line   = 0;
-      unsigned int multiplied_dofs_per_quad   = 0;
-      unsigned int multiplied_dofs_per_hex    = 0;
+      dealii::internal::GenericDoFsPerObject dpo;
 
       unsigned int multiplied_n_components = 0;
 
@@ -103,22 +100,78 @@ namespace FETools
             break;
           }
 
+      bool initialized = false;
+
       for (unsigned int i = 0; i < fes.size(); i++)
         if (multiplicities[i] > 0)
           {
-            // TODO: the implementation makes the assumption that all faces have
-            // the same number of dofs -> don't construct DPO but
-            // PrecomputedFiniteElementData
-            AssertDimension(fes[i]->n_unique_quads(), 1);
+            if (initialized == false)
+              {
+                dpo.dofs_per_object_exclusive.resize(
+                  fes[i]->data.dofs_per_object_exclusive.size());
+                for (unsigned int j = 0;
+                     j < fes[i]->data.dofs_per_object_exclusive.size();
+                     ++j)
+                  dpo.dofs_per_object_exclusive[j].resize(
+                    fes[i]->data.dofs_per_object_exclusive[j].size());
 
-            multiplied_dofs_per_vertex +=
-              fes[i]->n_dofs_per_vertex() * multiplicities[i];
-            multiplied_dofs_per_line +=
-              fes[i]->n_dofs_per_line() * multiplicities[i];
-            multiplied_dofs_per_quad +=
-              fes[i]->n_dofs_per_quad(0) * multiplicities[i];
-            multiplied_dofs_per_hex +=
-              fes[i]->n_dofs_per_hex() * multiplicities[i];
+                dpo.dofs_per_object_inclusive.resize(
+                  fes[i]->data.dofs_per_object_inclusive.size());
+                for (unsigned int j = 0;
+                     j < fes[i]->data.dofs_per_object_inclusive.size();
+                     ++j)
+                  dpo.dofs_per_object_inclusive[j].resize(
+                    fes[i]->data.dofs_per_object_inclusive[j].size());
+
+                dpo.object_index.resize(fes[i]->data.object_index.size());
+                for (unsigned int j = 0; j < fes[i]->data.object_index.size();
+                     ++j)
+                  dpo.object_index[j].resize(
+                    fes[i]->data.object_index[j].size());
+
+                dpo.first_object_index_on_face.resize(
+                  fes[i]->data.first_object_index_on_face.size());
+                for (unsigned int j = 0;
+                     j < fes[i]->data.first_object_index_on_face.size();
+                     ++j)
+                  dpo.first_object_index_on_face[j].resize(
+                    fes[i]->data.first_object_index_on_face[j].size());
+
+                initialized = true;
+              }
+
+            for (unsigned int j = 0;
+                 j < fes[i]->data.dofs_per_object_exclusive.size();
+                 ++j)
+              for (unsigned int k = 0;
+                   k < fes[i]->data.dofs_per_object_exclusive[j].size();
+                   ++k)
+                dpo.dofs_per_object_exclusive[j][k] +=
+                  fes[i]->data.dofs_per_object_exclusive[j][k] *
+                  multiplicities[i];
+            for (unsigned int j = 0;
+                 j < fes[i]->data.dofs_per_object_inclusive.size();
+                 ++j)
+              for (unsigned int k = 0;
+                   k < fes[i]->data.dofs_per_object_inclusive[j].size();
+                   ++k)
+                dpo.dofs_per_object_inclusive[j][k] +=
+                  fes[i]->data.dofs_per_object_inclusive[j][k] *
+                  multiplicities[i];
+            for (unsigned int j = 0; j < fes[i]->data.object_index.size(); ++j)
+              for (unsigned int k = 0; k < fes[i]->data.object_index[j].size();
+                   ++k)
+                dpo.object_index[j][k] +=
+                  fes[i]->data.object_index[j][k] * multiplicities[i];
+            for (unsigned int j = 0;
+                 j < fes[i]->data.first_object_index_on_face.size();
+                 ++j)
+              for (unsigned int k = 0;
+                   k < fes[i]->data.first_object_index_on_face[j].size();
+                   ++k)
+                dpo.first_object_index_on_face[j][k] +=
+                  fes[i]->data.first_object_index_on_face[j][k] *
+                  multiplicities[i];
 
             multiplied_n_components +=
               fes[i]->n_components() * multiplicities[i];
@@ -149,14 +202,6 @@ namespace FETools
             total_conformity = typename FiniteElementData<dim>::Conformity(
               total_conformity & fes[index]->conforming_space);
       }
-
-      std::vector<unsigned int> dpo;
-      dpo.push_back(multiplied_dofs_per_vertex);
-      dpo.push_back(multiplied_dofs_per_line);
-      if (dim > 1)
-        dpo.push_back(multiplied_dofs_per_quad);
-      if (dim > 2)
-        dpo.push_back(multiplied_dofs_per_hex);
 
       BlockIndices block_indices(0, 0);
 

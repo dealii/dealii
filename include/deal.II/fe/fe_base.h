@@ -291,6 +291,13 @@ private:
    */
   const ReferenceCell reference_cell_kind;
 
+public:
+  /**
+   * GenericDoFsPerObject object this class was initialized with.
+   */
+  const internal::GenericDoFsPerObject data;
+
+private:
   /**
    * Number of unique quads. If all quads have the same type, the value is
    * one; else it equals the number of quads.

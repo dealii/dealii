@@ -1140,6 +1140,8 @@ ReferenceCell::face_to_cell_lines(const unsigned int  face,
   AssertIndexRange(face, n_faces());
   AssertIndexRange(line, face_reference_cell(face).n_lines());
 
+  static unsigned int X = numbers::invalid_unsigned_int;
+
   if (*this == ReferenceCells::Vertex)
     {
       Assert(false, ExcNotImplemented());
@@ -1176,11 +1178,25 @@ ReferenceCell::face_to_cell_lines(const unsigned int  face,
     }
   else if (*this == ReferenceCells::Pyramid)
     {
-      Assert(false, ExcNotImplemented());
+      const static ndarray<unsigned int, 5, 4> table = {{{{0, 1, 2, 3}},
+                                                         {{0, 6, 4, X}},
+                                                         {{1, 5, 7, X}},
+                                                         {{2, 4, 5, X}},
+                                                         {{3, 7, 6, 2}}}};
+
+      return table[face]
+                  [standard_to_real_face_line(line, face, face_orientation)];
     }
   else if (*this == ReferenceCells::Wedge)
     {
-      Assert(false, ExcNotImplemented());
+      const static ndarray<unsigned int, 5, 4> table = {{{{0, 2, 1, X}},
+                                                         {{3, 4, 5, X}},
+                                                         {{6, 7, 0, 3}},
+                                                         {{7, 8, 1, 4}},
+                                                         {{8, 6, 5, 2}}}};
+
+      return table[face]
+                  [standard_to_real_face_line(line, face, face_orientation)];
     }
   else if (*this == ReferenceCells::Hexahedron)
     {
