@@ -48,6 +48,10 @@ public:
  * the finite element space of continuous, piecewise polynomials of
  * degree $k$.
  *
+ * @note Currently, only linear (degree=1) and quadratic polynomials
+ *   (degree=2) are implemented. See also the documentation of
+ *   ScalarLagrangePolynomialWedge.
+ *
  * @ingroup simplex
  */
 template <int dim, int spacedim = dim>
@@ -106,6 +110,10 @@ public:
  * Implementation of a scalar Lagrange finite element on a wedge that yields
  * the finite element space of discontinuous, piecewise polynomials of
  * degree $k$.
+ *
+ * @note Currently, only linear (degree=1) and quadratic polynomials
+ *   (degree=2) are implemented. See also the documentation of
+ *   ScalarLagrangePolynomialWedge.
  *
  * @ingroup simplex
  */
