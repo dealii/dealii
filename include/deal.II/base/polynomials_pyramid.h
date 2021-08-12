@@ -24,12 +24,6 @@
 DEAL_II_NAMESPACE_OPEN
 
 /**
- * A namespace for functions and classes that provide support for simplex
- * reference cell entities, i.e., triangles and tetrahedrons.
- *
- *  @ingroup simplex
- */
-/**
  * Polynomials defined on pyramid entities. This class is basis of
  * FE_PyramidP.
  */
