@@ -32,7 +32,7 @@ code is written, without having to look up the exact definition of something.
 
 <h3>Notes on deal.II indentation</h3>
 
-<p>deal.II uses <code>clang-format</code> 6.0 to normalize indentation. A
+<p>deal.II uses <code>clang-format</code> 11.1 to normalize indentation. A
 style file is provided at
 @code
   \${SOURCE_DIR}/.clang-format
@@ -61,7 +61,7 @@ If the system you are working on has more than one version of
 <code>clang-format</code> installed (or if it is not in the path)
 you should replace the above <code>make indent</code> command with
 @code
-  make DEAL_II_CLANG_FORMAT=/path/to/clang-6.0/clang-format indent
+  make DEAL_II_CLANG_FORMAT=/path/to/clang-11.1/clang-format indent
 @endcode
 to point to the correct executable.
 </p>

@@ -1,5 +1,5 @@
 #
-# The clang-format (Clang 6) style file used by deal.II for the examples.
+# The clang-format (Clang 11) style file used by deal.II for the examples.
 # In contrast to the general one, header files are not sorted and we do
 # not require return types to be on a separate line.
 #
