@@ -152,6 +152,12 @@ void
 MGTransferPrebuilt<VectorType>::build(
   const DoFHandler<dim, spacedim> &dof_handler)
 {
+  Assert(dof_handler.has_level_dofs(),
+         ExcMessage(
+           "The underlying DoFHandler object did not call "
+           "distribute_mg_dofs(). This is a prerequisite for multigrid "
+           "transfers."));
+
   const unsigned int n_levels =
     dof_handler.get_triangulation().n_global_levels();
   const unsigned int dofs_per_cell = dof_handler.get_fe().n_dofs_per_cell();
