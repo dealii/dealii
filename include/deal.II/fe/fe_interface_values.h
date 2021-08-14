@@ -147,7 +147,7 @@ namespace FEInterfaceViews
            const unsigned int                      component);
 
     /**
-     * @name Functions to evaluate quantities
+     * @name Access to shape functions
      */
     //@{
 
@@ -175,67 +175,10 @@ namespace FEInterfaceViews
           const unsigned int interface_dof_index,
           const unsigned int q_point) const;
 
-    /**
-     * Return the values of the selected scalar component of the finite
-     * element function characterized by <tt>fe_function</tt> at the
-     * quadrature points of the cell interface selected the last time
-     * the <tt>reinit</tt> function of the FEInterfaceValues object was called.
-     *
-     * The argument @p here_or_there selects between the value on cell 0 (here, @p true)
-     * and cell 1 (there, @p false). You can also interpret it as "upstream" (@p true)
-     * and "downstream" (@p false) as defined by the direction of the normal
-     * vector in this quadrature point. If @p here_or_there is true, the values
-     * from the first cell of the interface is used.
-     *
-     * The data type stored by the output vector must be what you get when you
-     * multiply the values of shape functions (i.e., @p value_type) times the
-     * type used to store the values of the unknowns $U_j$ of your finite
-     * element vector $U$ (represented by the @p fe_function argument).
-     *
-     * @dealiiRequiresUpdateFlags{update_values}
-     */
-    template <class InputVector>
-    void
-    get_function_values(
-      const bool         here_or_there,
-      const InputVector &fe_function,
-      std::vector<solution_value_type<typename InputVector::value_type>>
-        &values) const;
-
-    /**
-     * Same as above, but using a vector of local degree-of-freedom values. In
-     * other words, instead of extracting the nodal values of the degrees of
-     * freedom located on the current cell interface from a global vector
-     * associated with a DoFHandler object (as the function above does), this
-     * function instead takes these local nodal values through its first
-     * argument.
-     *
-     * @param[in] here_or_there Same as the one in the above function.
-     *
-     * @param[in] local_dof_values A vector of local nodal values. This vector
-     *   must have a length equal to number of DoFs on the current cell, and
-     * must be ordered in the same order as degrees of freedom are numbered on
-     *   the reference cell.
-     *
-     * @param[out] values A vector of values of the given finite element field,
-     *   at the quadrature points on the current object.
-     *
-     * @tparam InputVector The @p InputVector type must allow creation
-     *   of an ArrayView object from it; this is satisfied by the
-     *   `std::vector` class, among others.
-     */
-    template <class InputVector>
-    void
-    get_function_values_from_local_dof_values(
-      const bool         here_or_there,
-      const InputVector &local_dof_values,
-      std::vector<solution_value_type<typename InputVector::value_type>>
-        &values) const;
-
     //@}
 
     /**
-     * @name Functions to evaluate jumps in quantities
+     * @name Access to jumps in shape functions and their derivatives
      */
     //@{
 
@@ -318,6 +261,155 @@ namespace FEInterfaceViews
     third_derivative_type
     jump_3rd_derivative(const unsigned int interface_dof_index,
                         const unsigned int q_point) const;
+
+    //@}
+
+    /**
+     * @name Access to the average of shape functions and their derivatives
+     */
+    //@{
+
+    /**
+     * Return the average value $\average{u}=\frac{1}{2}(u_1 + u_2)$ on the
+     * interface for the shape
+     * function @p interface_dof_index in the quadrature point @p q_point
+     * of the component selected by this view.
+     */
+    value_type
+    average_of_values(const unsigned int interface_dof_index,
+                      const unsigned int q_point) const;
+
+    /**
+     * The same as above.
+     *
+     * @deprecated Use the average_of_values() function instead.
+     */
+    DEAL_II_DEPRECATED
+    value_type
+    average_value(const unsigned int interface_dof_index,
+                  const unsigned int q_point) const;
+
+    /**
+     * The same as above.
+     *
+     * @deprecated Use the average_of_values() function instead.
+     */
+    DEAL_II_DEPRECATED
+    value_type
+    average(const unsigned int interface_dof_index,
+            const unsigned int q_point) const;
+
+    /**
+     * Return the average of the gradient $\average{\nabla u}$ on the interface
+     * for the shape
+     * function @p interface_dof_index in the quadrature point @p q_point
+     * of the component selected by this view.
+     */
+    gradient_type
+    average_of_gradients(const unsigned int interface_dof_index,
+                         const unsigned int q_point) const;
+
+    /**
+     * The same as above.
+     *
+     * @deprecated Use the average_of_gradients() function instead.
+     */
+    DEAL_II_DEPRECATED
+    gradient_type
+    average_gradient(const unsigned int interface_dof_index,
+                     const unsigned int q_point) const;
+
+    /**
+     * Return the average of the Hessian $\average{\nabla^2 u} =
+     * \frac{1}{2}\nabla^2 u_{\text{cell0}} + \frac{1}{2} \nabla^2
+     * u_{\text{cell1}}$ on the interface
+     * for the shape function @p interface_dof_index at the quadrature point @p
+     * q_point of the component selected by this view.
+     */
+    hessian_type
+    average_of_hessians(const unsigned int interface_dof_index,
+                        const unsigned int q_point) const;
+
+    /**
+     * The same as above.
+     *
+     * @deprecated Use the average_of_hessians() function instead.
+     */
+    DEAL_II_DEPRECATED
+    hessian_type
+    average_hessian(const unsigned int interface_dof_index,
+                    const unsigned int q_point) const;
+
+    //@}
+
+    /**
+     * @name Access to values of global finite element fields
+     */
+    //@{
+
+    /**
+     * Return the values of the selected scalar component of the finite
+     * element function characterized by <tt>fe_function</tt> at the
+     * quadrature points of the cell interface selected the last time
+     * the <tt>reinit</tt> function of the FEInterfaceValues object was called.
+     *
+     * The argument @p here_or_there selects between the value on cell 0 (here, @p true)
+     * and cell 1 (there, @p false). You can also interpret it as "upstream" (@p true)
+     * and "downstream" (@p false) as defined by the direction of the normal
+     * vector in this quadrature point. If @p here_or_there is true, the values
+     * from the first cell of the interface is used.
+     *
+     * The data type stored by the output vector must be what you get when you
+     * multiply the values of shape functions (i.e., @p value_type) times the
+     * type used to store the values of the unknowns $U_j$ of your finite
+     * element vector $U$ (represented by the @p fe_function argument).
+     *
+     * @dealiiRequiresUpdateFlags{update_values}
+     */
+    template <class InputVector>
+    void
+    get_function_values(
+      const bool         here_or_there,
+      const InputVector &fe_function,
+      std::vector<solution_value_type<typename InputVector::value_type>>
+        &values) const;
+
+    /**
+     * Same as above, but using a vector of local degree-of-freedom values. In
+     * other words, instead of extracting the nodal values of the degrees of
+     * freedom located on the current cell interface from a global vector
+     * associated with a DoFHandler object (as the function above does), this
+     * function instead takes these local nodal values through its first
+     * argument.
+     *
+     * @param[in] here_or_there Same as the one in the above function.
+     *
+     * @param[in] local_dof_values A vector of local nodal values. This vector
+     *   must have a length equal to number of DoFs on the current cell, and
+     * must be ordered in the same order as degrees of freedom are numbered on
+     *   the reference cell.
+     *
+     * @param[out] values A vector of values of the given finite element field,
+     *   at the quadrature points on the current object.
+     *
+     * @tparam InputVector The @p InputVector type must allow creation
+     *   of an ArrayView object from it; this is satisfied by the
+     *   `std::vector` class, among others.
+     */
+    template <class InputVector>
+    void
+    get_function_values_from_local_dof_values(
+      const bool         here_or_there,
+      const InputVector &local_dof_values,
+      std::vector<solution_value_type<typename InputVector::value_type>>
+        &values) const;
+
+    //@}
+
+    /**
+     * @name Access to jumps in global finite element fields
+     */
+    //@{
 
     /**
      * Return the jump in the values of the selected scalar component of the
@@ -461,80 +553,9 @@ namespace FEInterfaceViews
     //@}
 
     /**
-     * @name Functions to evaluate the average of quantities
+     * @name Access to the average of global finite element fields
      */
     //@{
-
-    /**
-     * Return the average value $\average{u}=\frac{1}{2}(u_1 + u_2)$ on the
-     * interface for the shape
-     * function @p interface_dof_index in the quadrature point @p q_point
-     * of the component selected by this view.
-     */
-    value_type
-    average_of_values(const unsigned int interface_dof_index,
-                      const unsigned int q_point) const;
-
-    /**
-     * The same as above.
-     *
-     * @deprecated Use the average_of_values() function instead.
-     */
-    DEAL_II_DEPRECATED
-    value_type
-    average_value(const unsigned int interface_dof_index,
-                  const unsigned int q_point) const;
-
-    /**
-     * The same as above.
-     *
-     * @deprecated Use the average_of_values() function instead.
-     */
-    DEAL_II_DEPRECATED
-    value_type
-    average(const unsigned int interface_dof_index,
-            const unsigned int q_point) const;
-
-    /**
-     * Return the average of the gradient $\average{\nabla u}$ on the interface
-     * for the shape
-     * function @p interface_dof_index in the quadrature point @p q_point
-     * of the component selected by this view.
-     */
-    gradient_type
-    average_of_gradients(const unsigned int interface_dof_index,
-                         const unsigned int q_point) const;
-
-    /**
-     * The same as above.
-     *
-     * @deprecated Use the average_of_gradients() function instead.
-     */
-    DEAL_II_DEPRECATED
-    gradient_type
-    average_gradient(const unsigned int interface_dof_index,
-                     const unsigned int q_point) const;
-
-    /**
-     * Return the average of the Hessian $\average{\nabla^2 u} =
-     * \frac{1}{2}\nabla^2 u_{\text{cell0}} + \frac{1}{2} \nabla^2
-     * u_{\text{cell1}}$ on the interface
-     * for the shape function @p interface_dof_index at the quadrature point @p
-     * q_point of the component selected by this view.
-     */
-    hessian_type
-    average_of_hessians(const unsigned int interface_dof_index,
-                        const unsigned int q_point) const;
-
-    /**
-     * The same as above.
-     *
-     * @deprecated Use the average_of_hessians() function instead.
-     */
-    DEAL_II_DEPRECATED
-    hessian_type
-    average_hessian(const unsigned int interface_dof_index,
-                    const unsigned int q_point) const;
 
     /**
      * Return the average of the values of the selected scalar component of the
@@ -731,7 +752,7 @@ namespace FEInterfaceViews
            const unsigned int                      first_vector_component);
 
     /**
-     * @name Functions to evaluate quantities
+     * @name Access to shape functions
      */
     //@{
 
@@ -759,67 +780,10 @@ namespace FEInterfaceViews
           const unsigned int interface_dof_index,
           const unsigned int q_point) const;
 
-    /**
-     * Return the values of the selected vector component of the finite
-     * element function characterized by <tt>fe_function</tt> at the
-     * quadrature points of the cell interface selected the last time
-     * the <tt>reinit</tt> function of the FEInterfaceValues object was called.
-     *
-     * The argument @p here_or_there selects between the value on cell 0 (here, @p true)
-     * and cell 1 (there, @p false). You can also interpret it as "upstream" (@p true)
-     * and "downstream" (@p false) as defined by the direction of the normal
-     * vector in this quadrature point. If @p here_or_there is true, the values
-     * from the first cell of the interface is used.
-     *
-     * The data type stored by the output vector must be what you get when you
-     * multiply the values of shape functions (i.e., @p value_type) times the
-     * type used to store the values of the unknowns $U_j$ of your finite
-     * element vector $U$ (represented by the @p fe_function argument).
-     *
-     * @dealiiRequiresUpdateFlags{update_values}
-     */
-    template <class InputVector>
-    void
-    get_function_values(
-      const bool         here_or_there,
-      const InputVector &fe_function,
-      std::vector<solution_value_type<typename InputVector::value_type>>
-        &values) const;
-
-    /**
-     * Same as above, but using a vector of local degree-of-freedom values. In
-     * other words, instead of extracting the nodal values of the degrees of
-     * freedom located on the current cell interface from a global vector
-     * associated with a DoFHandler object (as the function above does), this
-     * function instead takes these local nodal values through its first
-     * argument.
-     *
-     * @param[in] here_or_there Same as the one in the above function.
-     *
-     * @param[in] local_dof_values A vector of local nodal values. This vector
-     *   must have a length equal to number of DoFs on the current cell, and
-     * must be ordered in the same order as degrees of freedom are numbered on
-     *   the reference cell.
-     *
-     * @param[out] values A vector of values of the given finite element field,
-     *   at the quadrature points on the current object.
-     *
-     * @tparam InputVector The @p InputVector type must allow creation
-     *   of an ArrayView object from it; this is satisfied by the
-     *   `std::vector` class, among others.
-     */
-    template <class InputVector>
-    void
-    get_function_values_from_local_dof_values(
-      const bool         here_or_there,
-      const InputVector &local_dof_values,
-      std::vector<solution_value_type<typename InputVector::value_type>>
-        &values) const;
-
     //@}
 
     /**
-     * @name Functions to evaluate jumps in quantities
+     * @name Access to jumps in shape functions and their derivatives
      */
     //@{
 
@@ -898,6 +862,142 @@ namespace FEInterfaceViews
     third_derivative_type
     jump_3rd_derivative(const unsigned int interface_dof_index,
                         const unsigned int q_point) const;
+
+    //@}
+
+    /**
+     * @name Access to the average of shape functions and their derivatives
+     */
+    //@{
+
+    /**
+     * Return the average vector $\average{\mathbf{u}}=\frac{1}{2}(\matbf{u_1} +
+     * \mathbf{u_2})$ on the interface for the shape
+     * function @p interface_dof_index in the quadrature point @p q_point.
+     */
+    value_type
+    average_of_values(const unsigned int interface_dof_index,
+                      const unsigned int q_point) const;
+
+    /**
+     * The same as above.
+     *
+     * @deprecated Use the average_of_values() function instead.
+     */
+    DEAL_II_DEPRECATED
+    value_type
+    average(const unsigned int interface_dof_index,
+            const unsigned int q_point) const;
+
+    /**
+     * Return the average of the gradient (a tensor of rank 2) $\average{\nabla
+     * \mathbf{u}}$ on the interface for the shape
+     * function @p interface_dof_index in the quadrature point @p q_point.
+     */
+    gradient_type
+    average_of_gradients(const unsigned int interface_dof_index,
+                         const unsigned int q_point) const;
+
+    /**
+     * The same as above.
+     *
+     * @deprecated Use the average_of_gradients() function instead.
+     */
+    DEAL_II_DEPRECATED
+    gradient_type
+    average_gradient(const unsigned int interface_dof_index,
+                     const unsigned int q_point) const;
+
+    /**
+     * Return the average of the Hessian $\average{\nabla^2 u} =
+     * \frac{1}{2}\nabla^2 u_{\text{cell0}} + \frac{1}{2} \nabla^2
+     * u_{\text{cell1}}$ on the interface
+     * for the shape function @p interface_dof_index at the quadrature point @p
+     * q_point of the component selected by this view.
+     */
+    hessian_type
+    average_of_hessians(const unsigned int interface_dof_index,
+                        const unsigned int q_point) const;
+
+    /**
+     * The same as above.
+     *
+     * @deprecated Use the average_of_hessians() function instead.
+     */
+    hessian_type
+    average_hessian(const unsigned int interface_dof_index,
+                    const unsigned int q_point) const;
+
+    //@}
+
+    /**
+     * @name Access to values of global finite element fields
+     */
+    //@{
+
+    /**
+     * Return the values of the selected vector component of the finite
+     * element function characterized by <tt>fe_function</tt> at the
+     * quadrature points of the cell interface selected the last time
+     * the <tt>reinit</tt> function of the FEInterfaceValues object was called.
+     *
+     * The argument @p here_or_there selects between the value on cell 0 (here, @p true)
+     * and cell 1 (there, @p false). You can also interpret it as "upstream" (@p true)
+     * and "downstream" (@p false) as defined by the direction of the normal
+     * vector in this quadrature point. If @p here_or_there is true, the values
+     * from the first cell of the interface is used.
+     *
+     * The data type stored by the output vector must be what you get when you
+     * multiply the values of shape functions (i.e., @p value_type) times the
+     * type used to store the values of the unknowns $U_j$ of your finite
+     * element vector $U$ (represented by the @p fe_function argument).
+     *
+     * @dealiiRequiresUpdateFlags{update_values}
+     */
+    template <class InputVector>
+    void
+    get_function_values(
+      const bool         here_or_there,
+      const InputVector &fe_function,
+      std::vector<solution_value_type<typename InputVector::value_type>>
+        &values) const;
+
+    /**
+     * Same as above, but using a vector of local degree-of-freedom values. In
+     * other words, instead of extracting the nodal values of the degrees of
+     * freedom located on the current cell interface from a global vector
+     * associated with a DoFHandler object (as the function above does), this
+     * function instead takes these local nodal values through its first
+     * argument.
+     *
+     * @param[in] here_or_there Same as the one in the above function.
+     *
+     * @param[in] local_dof_values A vector of local nodal values. This vector
+     *   must have a length equal to number of DoFs on the current cell, and
+     * must be ordered in the same order as degrees of freedom are numbered on
+     *   the reference cell.
+     *
+     * @param[out] values A vector of values of the given finite element field,
+     *   at the quadrature points on the current object.
+     *
+     * @tparam InputVector The @p InputVector type must allow creation
+     *   of an ArrayView object from it; this is satisfied by the
+     *   `std::vector` class, among others.
+     */
+    template <class InputVector>
+    void
+    get_function_values_from_local_dof_values(
+      const bool         here_or_there,
+      const InputVector &local_dof_values,
+      std::vector<solution_value_type<typename InputVector::value_type>>
+        &values) const;
+
+    //@}
+
+    /**
+     * @name Access to jumps in global finite element fields
+     */
+    //@{
 
     /**
      * Return the jump in the values of the selected vector component of the
@@ -1041,67 +1141,9 @@ namespace FEInterfaceViews
     //@}
 
     /**
-     * @name Functions to evaluate the average of quantities
+     * @name Access to the average of global finite element fields
      */
     //@{
-
-    /**
-     * Return the average vector $\average{\mathbf{u}}=\frac{1}{2}(\matbf{u_1} +
-     * \mathbf{u_2})$ on the interface for the shape
-     * function @p interface_dof_index in the quadrature point @p q_point.
-     */
-    value_type
-    average_of_values(const unsigned int interface_dof_index,
-                      const unsigned int q_point) const;
-
-    /**
-     * The same as above.
-     *
-     * @deprecated Use the average_of_values() function instead.
-     */
-    DEAL_II_DEPRECATED
-    value_type
-    average(const unsigned int interface_dof_index,
-            const unsigned int q_point) const;
-
-    /**
-     * Return the average of the gradient (a tensor of rank 2) $\average{\nabla
-     * \mathbf{u}}$ on the interface for the shape
-     * function @p interface_dof_index in the quadrature point @p q_point.
-     */
-    gradient_type
-    average_of_gradients(const unsigned int interface_dof_index,
-                         const unsigned int q_point) const;
-
-    /**
-     * The same as above.
-     *
-     * @deprecated Use the average_of_gradients() function instead.
-     */
-    DEAL_II_DEPRECATED
-    gradient_type
-    average_gradient(const unsigned int interface_dof_index,
-                     const unsigned int q_point) const;
-
-    /**
-     * Return the average of the Hessian $\average{\nabla^2 u} =
-     * \frac{1}{2}\nabla^2 u_{\text{cell0}} + \frac{1}{2} \nabla^2
-     * u_{\text{cell1}}$ on the interface
-     * for the shape function @p interface_dof_index at the quadrature point @p
-     * q_point of the component selected by this view.
-     */
-    hessian_type
-    average_of_hessians(const unsigned int interface_dof_index,
-                        const unsigned int q_point) const;
-
-    /**
-     * The same as above.
-     *
-     * @deprecated Use the average_of_hessians() function instead.
-     */
-    hessian_type
-    average_hessian(const unsigned int interface_dof_index,
-                    const unsigned int q_point) const;
 
     /**
      * Return the average of the values of the selected vector component of the
@@ -1541,7 +1583,7 @@ public:
    */
 
   /**
-   * @name Functions to evaluate shape functions
+   * @name Access to shape functions
    * @{
    */
 
@@ -1577,7 +1619,7 @@ public:
    */
 
   /**
-   * @name Functions to evaluate jumps in shape functions
+   * @name Access to jumps in shape functions and their derivatives
    * @{
    */
 
@@ -1692,7 +1734,7 @@ public:
    */
 
   /**
-   * @name Functions to evaluate the average of shape functions
+   * @name Access to the average of shape functions and their derivatives
    * @{
    */
 
