@@ -1175,6 +1175,58 @@ namespace FEInterfaceViews
 } // namespace FEInterfaceViews
 
 
+namespace internal
+{
+  namespace FEInterfaceViews
+  {
+    /**
+     * A class whose specialization is used to define what FEInterfaceViews
+     * object corresponds to the given FEValuesExtractors object.
+     */
+    template <int dim, int spacedim, typename Extractor>
+    struct ViewType
+    {};
+
+    /**
+     * A class whose specialization is used to define what FEInterfaceViews
+     * object corresponds to the given FEValuesExtractors object.
+     *
+     * When using FEValuesExtractors::Scalar, the corresponding view is an
+     * FEInterfaceViews::Scalar<dim, spacedim>.
+     */
+    template <int dim, int spacedim>
+    struct ViewType<dim, spacedim, FEValuesExtractors::Scalar>
+    {
+      using type = typename dealii::FEInterfaceViews::Scalar<dim, spacedim>;
+    };
+
+    /**
+     * A class whose specialization is used to define what FEInterfaceViews
+     * object corresponds to the given FEValuesExtractors object.
+     *
+     * When using FEValuesExtractors::Vector, the corresponding view is an
+     * FEInterfaceViews::Vector<dim, spacedim>.
+     */
+    template <int dim, int spacedim>
+    struct ViewType<dim, spacedim, FEValuesExtractors::Vector>
+    {
+      using type = typename dealii::FEInterfaceViews::Vector<dim, spacedim>;
+    };
+  } // namespace FEInterfaceViews
+} // namespace internal
+
+namespace FEInterfaceViews
+{
+  /**
+   * A templated alias that associates to a given Extractor class
+   * the corresponding view in FEInterfaceViews.
+   */
+  template <int dim, int spacedim, typename Extractor>
+  using View = typename dealii::internal::FEInterfaceViews::
+    ViewType<dim, spacedim, Extractor>::type;
+} // namespace FEInterfaceViews
+
+
 
 /**
  * FEInterfaceValues is a data structure to access and assemble finite element
