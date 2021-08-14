@@ -106,10 +106,9 @@ Function<dim, RangeNumberType>::vector_value_list(
 {
   // check whether component is in the valid range is up to the derived
   // class
-  Assert(values.size() == points.size(),
-         ExcDimensionMismatch(values.size(), points.size()));
+  // AssertDimension(points.size(), values.size());
 
-  for (unsigned int i = 0; i < points.size(); ++i)
+  for (unsigned int i = 0; i < values.size(); ++i)
     this->vector_value(points[i], values[i]);
 }
 

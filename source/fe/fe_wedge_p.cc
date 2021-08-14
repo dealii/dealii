@@ -103,14 +103,75 @@ FE_WedgePoly<dim, spacedim>::FE_WedgePoly(
 {
   AssertDimension(dim, 3);
 
-  if (degree == 1)
+  Assert(1 <= degree && degree <= 2, ExcNotImplemented())
+
+    for (double z = 0.0; z <= 1.0; z += (degree == 1 ? 1.0 : 0.5))
+  {
+    this->unit_support_points.emplace_back(0.0, 0.0, z);
+    this->unit_support_points.emplace_back(1.0, 0.0, z);
+    this->unit_support_points.emplace_back(0.0, 1.0, z);
+
+    if (degree == 2)
+      {
+        this->unit_support_points.emplace_back(0.5, 0.0, z);
+        this->unit_support_points.emplace_back(0.5, 0.5, z);
+        this->unit_support_points.emplace_back(0.0, 0.5, z);
+      }
+  }
+
+  this->unit_face_support_points.resize(5);
+
+  for (unsigned int f = 0; f < 5; ++f)
     {
-      this->unit_support_points.emplace_back(0.0, 0.0, 0.0);
-      this->unit_support_points.emplace_back(1.0, 0.0, 0.0);
-      this->unit_support_points.emplace_back(0.0, 1.0, 0.0);
-      this->unit_support_points.emplace_back(0.0, 0.0, 1.0);
-      this->unit_support_points.emplace_back(1.0, 0.0, 1.0);
-      this->unit_support_points.emplace_back(0.0, 1.0, 1.0);
+      if (f <= 1)
+        {
+          this->unit_face_support_points[f].emplace_back(0.0, 0.0);
+          this->unit_face_support_points[f].emplace_back(1.0, 0.0);
+          this->unit_face_support_points[f].emplace_back(0.0, 1.0);
+          if (degree == 2)
+            {
+              this->unit_face_support_points[f].emplace_back(0.5, 0.0);
+              this->unit_face_support_points[f].emplace_back(0.5, 0.5);
+              this->unit_face_support_points[f].emplace_back(0.0, 0.5);
+            }
+        }
+      else
+        {
+          this->unit_face_support_points[f].emplace_back(0.0, 0.0);
+          this->unit_face_support_points[f].emplace_back(1.0, 0.0);
+          this->unit_face_support_points[f].emplace_back(0.0, 1.0);
+          this->unit_face_support_points[f].emplace_back(1.0, 1.0);
+        }
+      if (degree == 2)
+        {
+          this->unit_face_support_points[f].emplace_back(0.0, 0.5);
+          this->unit_face_support_points[f].emplace_back(1.0, 0.5);
+          this->unit_face_support_points[f].emplace_back(0.5, 0.0);
+          this->unit_face_support_points[f].emplace_back(0.5, 1.0);
+          this->unit_face_support_points[f].emplace_back(0.5, 0.5);
+        }
+    }
+}
+
+
+
+template <int dim, int spacedim>
+void
+FE_WedgePoly<dim, spacedim>::
+  convert_generalized_support_point_values_to_dof_values(
+    const std::vector<Vector<double>> &support_point_values,
+    std::vector<double> &              nodal_values) const
+{
+  AssertDimension(support_point_values.size(),
+                  this->get_unit_support_points().size());
+  AssertDimension(support_point_values.size(), nodal_values.size());
+  AssertDimension(this->dofs_per_cell, nodal_values.size());
+
+  for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
+    {
+      AssertDimension(support_point_values[i].size(), 1);
+
+      nodal_values[i] = support_point_values[i](0);
     }
 }
 

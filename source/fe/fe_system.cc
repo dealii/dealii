@@ -1684,7 +1684,7 @@ FESystem<dim, spacedim>::initialize(
 
     for (unsigned int face_no = 0; face_no < this->n_unique_faces(); ++face_no)
       {
-        this->face_system_to_component_table[0].resize(
+        this->face_system_to_component_table[face_no].resize(
           this->n_dofs_per_face(face_no));
 
         FETools::Compositing::build_face_tables(
@@ -1777,10 +1777,9 @@ FESystem<dim, spacedim>::initialize(
               const unsigned int index_in_base =
                 this->face_system_to_base_table[face_no][i].second;
 
-              Assert(
-                index_in_base <
-                  base_element(base_i).unit_face_support_points[face_no].size(),
-                ExcInternalError());
+              AssertIndexRange(
+                index_in_base,
+                  base_element(base_i).unit_face_support_points[face_no].size());
 
               this->unit_face_support_points[face_no][i] =
                 base_element(base_i)

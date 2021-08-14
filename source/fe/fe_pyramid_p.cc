@@ -103,6 +103,47 @@ FE_PyramidPoly<dim, spacedim>::FE_PyramidPoly(
       this->unit_support_points.emplace_back(-1.0, +1.0, 0.0);
       this->unit_support_points.emplace_back(+1.0, +1.0, 0.0);
       this->unit_support_points.emplace_back(+0.0, +0.0, 1.0);
+
+      this->unit_face_support_points.resize(5);
+
+      for (unsigned int f = 0; f < 5; ++f)
+        {
+          if (f == 0)
+            {
+              this->unit_face_support_points[f].emplace_back(0.0, 0.0);
+              this->unit_face_support_points[f].emplace_back(1.0, 0.0);
+              this->unit_face_support_points[f].emplace_back(0.0, 1.0);
+              this->unit_face_support_points[f].emplace_back(1.0, 1.0);
+            }
+          else
+            {
+              this->unit_face_support_points[f].emplace_back(0.0, 0.0);
+              this->unit_face_support_points[f].emplace_back(1.0, 0.0);
+              this->unit_face_support_points[f].emplace_back(0.0, 1.0);
+            }
+        }
+    }
+}
+
+
+
+template <int dim, int spacedim>
+void
+FE_PyramidPoly<dim, spacedim>::
+  convert_generalized_support_point_values_to_dof_values(
+    const std::vector<Vector<double>> &support_point_values,
+    std::vector<double> &              nodal_values) const
+{
+  AssertDimension(support_point_values.size(),
+                  this->get_unit_support_points().size());
+  AssertDimension(support_point_values.size(), nodal_values.size());
+  AssertDimension(this->dofs_per_cell, nodal_values.size());
+
+  for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
+    {
+      AssertDimension(support_point_values[i].size(), 1);
+
+      nodal_values[i] = support_point_values[i](0);
     }
 }
 
