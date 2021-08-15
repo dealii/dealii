@@ -39,7 +39,7 @@ namespace internal
         dealii::types::global_dof_index dealii_index =
           triangulation->get_p4est_tree_to_coarse_cell_permutation()[treeidx];
 
-        for (i = 0; i < l; i++)
+        for (i = 0; i < l; ++i)
           {
             typename dealii::Triangulation<dim, spacedim>::cell_iterator cell(
               triangulation, i, dealii_index);
@@ -100,7 +100,7 @@ namespace internal
           *vertices_with_ghost_neighbors = fg->vertices_with_ghost_neighbors;
 
         subids->elem_count = 0;
-        for (i = 0; i < nsides; i++)
+        for (i = 0; i < nsides; ++i)
           {
             if (sides[i].is_ghost)
               {
@@ -127,7 +127,7 @@ namespace internal
         subdomain_ids =
           reinterpret_cast<dealii::types::subdomain_id *>(subids->array);
 
-        for (i = 0; i < nsides; i++)
+        for (i = 0; i < nsides; ++i)
           {
             if (!sides[i].is_ghost)
               {
@@ -140,7 +140,7 @@ namespace internal
                 Assert(!cell->is_ghost(),
                        ExcMessage("local quad found ghost cell"));
 
-                for (j = 0; j < nsubs; j++)
+                for (j = 0; j < nsubs; ++j)
                   {
                     (*vertices_with_ghost_neighbors)[cell->vertex_index(
                                                        sides[i].corner)]
@@ -176,11 +176,11 @@ namespace internal
           *vertices_with_ghost_neighbors = fg->vertices_with_ghost_neighbors;
 
         subids->elem_count = 0;
-        for (i = 0; i < nsides; i++)
+        for (i = 0; i < nsides; ++i)
           {
             if (sides[i].is_hanging)
               {
-                for (j = 0; j < 2; j++)
+                for (j = 0; j < 2; ++j)
                   {
                     if (sides[i].is.hanging.is_ghost[j])
                       {
@@ -207,11 +207,11 @@ namespace internal
         subdomain_ids =
           reinterpret_cast<dealii::types::subdomain_id *>(subids->array);
 
-        for (i = 0; i < nsides; i++)
+        for (i = 0; i < nsides; ++i)
           {
             if (sides[i].is_hanging)
               {
-                for (j = 0; j < 2; j++)
+                for (j = 0; j < 2; ++j)
                   {
                     if (!sides[i].is.hanging.is_ghost[j])
                       {
@@ -221,7 +221,7 @@ namespace internal
                                            sides[i].treeid,
                                            *(sides[i].is.hanging.quad[j]));
 
-                        for (k = 0; k < nsubs; k++)
+                        for (k = 0; k < nsubs; ++k)
                           {
                             (*vertices_with_ghost_neighbors)
                               [cell->vertex_index(
@@ -262,11 +262,11 @@ namespace internal
         int limit                         = (dim == 2) ? 2 : 4;
 
         subids->elem_count = 0;
-        for (i = 0; i < nsides; i++)
+        for (i = 0; i < nsides; ++i)
           {
             if (sides[i].is_hanging)
               {
-                for (j = 0; j < limit; j++)
+                for (j = 0; j < limit; ++j)
                   {
                     if (sides[i].is.hanging.is_ghost[j])
                       {
@@ -293,11 +293,11 @@ namespace internal
         subdomain_ids =
           reinterpret_cast<dealii::types::subdomain_id *>(subids->array);
 
-        for (i = 0; i < nsides; i++)
+        for (i = 0; i < nsides; ++i)
           {
             if (sides[i].is_hanging)
               {
-                for (j = 0; j < limit; j++)
+                for (j = 0; j < limit; ++j)
                   {
                     if (!sides[i].is.hanging.is_ghost[j])
                       {
@@ -307,7 +307,7 @@ namespace internal
                                            sides[i].treeid,
                                            *(sides[i].is.hanging.quad[j]));
 
-                        for (k = 0; k < nsubs; k++)
+                        for (k = 0; k < nsubs; ++k)
                           {
                             if (dim == 2)
                               {

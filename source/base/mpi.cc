@@ -456,7 +456,7 @@ namespace Utilities
         const MinMaxAvg *in_lhs    = static_cast<const MinMaxAvg *>(in_lhs_);
         MinMaxAvg *      inout_rhs = static_cast<MinMaxAvg *>(inout_rhs_);
 
-        for (int i = 0; i < *len; i++)
+        for (int i = 0; i < *len; ++i)
           {
             inout_rhs[i].sum += in_lhs[i].sum;
             if (inout_rhs[i].min > in_lhs[i].min)
@@ -498,7 +498,7 @@ namespace Utilities
       if (job_supports_mpi() == false ||
           Utilities::MPI::n_mpi_processes(mpi_communicator) <= 1)
         {
-          for (unsigned int i = 0; i < my_values.size(); i++)
+          for (unsigned int i = 0; i < my_values.size(); ++i)
             {
               result[i].sum       = my_values[i];
               result[i].avg       = my_values[i];
@@ -591,7 +591,7 @@ namespace Utilities
 
       std::vector<MinMaxAvg> in(my_values.size());
 
-      for (unsigned int i = 0; i < my_values.size(); i++)
+      for (unsigned int i = 0; i < my_values.size(); ++i)
         {
           in[i].sum = in[i].min = in[i].max = my_values[i];
           in[i].min_index = in[i].max_index = my_id;
@@ -669,7 +669,7 @@ namespace Utilities
     {
       AssertDimension(my_values.size(), result.size());
 
-      for (unsigned int i = 0; i < my_values.size(); i++)
+      for (unsigned int i = 0; i < my_values.size(); ++i)
         {
           result[i].sum       = my_values[i];
           result[i].avg       = my_values[i];

@@ -455,7 +455,7 @@ namespace internal
         std::pair<bool, unsigned int>(const TableIndices<1> &)> &predicate,
       std::map<unsigned int, std::vector<CoefficientType>> &     pred_to_values)
     {
-      for (unsigned int i = 0; i < coefficients.size(0); i++)
+      for (unsigned int i = 0; i < coefficients.size(0); ++i)
         {
           const TableIndices<1> ind(i);
           fill_map_index(coefficients, ind, predicate, pred_to_values);
@@ -472,8 +472,8 @@ namespace internal
         std::pair<bool, unsigned int>(const TableIndices<2> &)> &predicate,
       std::map<unsigned int, std::vector<CoefficientType>> &     pred_to_values)
     {
-      for (unsigned int i = 0; i < coefficients.size(0); i++)
-        for (unsigned int j = 0; j < coefficients.size(1); j++)
+      for (unsigned int i = 0; i < coefficients.size(0); ++i)
+        for (unsigned int j = 0; j < coefficients.size(1); ++j)
           {
             const TableIndices<2> ind(i, j);
             fill_map_index(coefficients, ind, predicate, pred_to_values);
@@ -490,9 +490,9 @@ namespace internal
         std::pair<bool, unsigned int>(const TableIndices<3> &)> &predicate,
       std::map<unsigned int, std::vector<CoefficientType>> &     pred_to_values)
     {
-      for (unsigned int i = 0; i < coefficients.size(0); i++)
-        for (unsigned int j = 0; j < coefficients.size(1); j++)
-          for (unsigned int k = 0; k < coefficients.size(2); k++)
+      for (unsigned int i = 0; i < coefficients.size(0); ++i)
+        for (unsigned int j = 0; j < coefficients.size(1); ++j)
+          for (unsigned int k = 0; k < coefficients.size(2); ++k)
             {
               const TableIndices<3> ind(i, j, k);
               fill_map_index(coefficients, ind, predicate, pred_to_values);

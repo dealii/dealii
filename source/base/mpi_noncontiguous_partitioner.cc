@@ -220,7 +220,7 @@ namespace Utilities
         std::vector<types::global_dof_index> temp_map_send(
           index_set_has.n_elements());
 
-        for (types::global_dof_index i = 0; i < indices_has.size(); i++)
+        for (types::global_dof_index i = 0; i < indices_has.size(); ++i)
           if (indices_has[i] != numbers::invalid_dof_index)
             temp_map_send[index_set_has.index_within_set(indices_has[i])] = i;
 
@@ -232,7 +232,7 @@ namespace Utilities
         std::vector<types::global_dof_index> temp_map_recv(
           index_set_want.n_elements());
 
-        for (types::global_dof_index i = 0; i < indices_want.size(); i++)
+        for (types::global_dof_index i = 0; i < indices_want.size(); ++i)
           if (indices_want[i] != numbers::invalid_dof_index)
             temp_map_recv[index_set_want.index_within_set(indices_want[i])] = i;
 

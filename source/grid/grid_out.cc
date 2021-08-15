@@ -2170,7 +2170,7 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
       auto         subdomains_it       = subdomains.begin();
       auto         level_subdomains_it = level_subdomains.begin();
 
-      for (unsigned int index = 0; index < n; index++)
+      for (unsigned int index = 0; index < n; ++index)
         {
           double h;
 
@@ -2944,7 +2944,7 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
       auto subdomains_it       = subdomains.begin();
       auto level_subdomains_it = level_subdomains.begin();
 
-      for (unsigned int index = 0; index < n; index++)
+      for (unsigned int index = 0; index < n; ++index)
         {
           switch (svg_flags.coloring)
             {

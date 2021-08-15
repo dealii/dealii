@@ -160,11 +160,11 @@ ScalarLagrangePolynomialWedge<dim>::evaluate(
   (void)fourth_derivatives;
 
   if (values.size() == this->n())
-    for (unsigned int i = 0; i < this->n(); i++)
+    for (unsigned int i = 0; i < this->n(); ++i)
       values[i] = compute_value(i, unit_point);
 
   if (grads.size() == this->n())
-    for (unsigned int i = 0; i < this->n(); i++)
+    for (unsigned int i = 0; i < this->n(); ++i)
       grads[i] = compute_grad(i, unit_point);
 }
 

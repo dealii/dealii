@@ -443,7 +443,7 @@ namespace Utilities
           for (unsigned int p = 0; p < ghost_targets_data.size(); ++p)
             {
               unsigned int last_index = numbers::invalid_unsigned_int - 1;
-              for (unsigned int ii = 0; ii < ghost_targets_data[p].second; ii++)
+              for (unsigned int ii = 0; ii < ghost_targets_data[p].second; ++ii)
                 {
                   const unsigned int i = shift + ii;
                   if (expanded_numbering[i] == last_index + 1)

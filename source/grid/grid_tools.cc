@@ -342,8 +342,8 @@ namespace GridTools
                 else
                   {
                     LAPACKFullMatrix<double> J = LAPACKFullMatrix<double>(dim);
-                    for (unsigned int i = 0; i < dim; i++)
-                      for (unsigned int j = 0; j < dim; j++)
+                    for (unsigned int i = 0; i < dim; ++i)
+                      for (unsigned int j = 0; j < dim; ++j)
                         J(i, j) = jacobian[i][j];
 
                     J.compute_svd();
@@ -2484,7 +2484,7 @@ namespace GridTools
 
     // For all remaining vertices, test
     // whether they are any closer
-    for (unsigned int j = best_vertex + 1; j < vertices.size(); j++)
+    for (unsigned int j = best_vertex + 1; j < vertices.size(); ++j)
       if (vertices_to_use[j])
         {
           const double dist = (p - vertices[j]).norm_square();
@@ -6709,7 +6709,7 @@ namespace GridTools
       std::array<Point<dim>, n_lines>   vertex_list_reduced;
       std::array<unsigned int, n_lines> local_remap;
       std::fill(local_remap.begin(), local_remap.end(), X);
-      for (int i = 0; new_line_table[configuration][i] != X; i++)
+      for (int i = 0; new_line_table[configuration][i] != X; ++i)
         if (local_remap[new_line_table[configuration][i]] == X)
           {
             vertex_list_reduced[local_vertex_count] =
@@ -6720,7 +6720,7 @@ namespace GridTools
 
       // write back vertices
       const unsigned int n_vertices_old = vertices.size();
-      for (unsigned int i = 0; i < local_vertex_count; i++)
+      for (unsigned int i = 0; i < local_vertex_count; ++i)
         vertices.push_back(vertex_list_reduced[i]);
 
       // write back cells

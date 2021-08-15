@@ -403,7 +403,7 @@ namespace Functions
           {
             const unsigned int s = vgrads[q].size();
             values[maps[i][q]].resize(s);
-            for (unsigned int l = 0; l < s; l++)
+            for (unsigned int l = 0; l < s; ++l)
               values[maps[i][q]][l] = vgrads[q][l];
           }
       }

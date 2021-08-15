@@ -632,7 +632,7 @@ SolverGMRES<VectorType>::givens_rotation(Vector<double> &h,
                                          Vector<double> &si,
                                          int             col) const
 {
-  for (int i = 0; i < col; i++)
+  for (int i = 0; i < col; ++i)
     {
       const double s     = si(i);
       const double c     = ci(i);

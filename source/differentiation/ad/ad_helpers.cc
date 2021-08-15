@@ -322,7 +322,7 @@ namespace Differentiation
 
       stream << "Registered independent variables: "
              << "\n";
-      for (unsigned int i = 0; i < n_independent_variables(); i++)
+      for (unsigned int i = 0; i < n_independent_variables(); ++i)
         stream << registered_independent_variable_values[i]
                << (i < (n_independent_variables() - 1) ? "," : "");
       stream << std::endl;
@@ -333,7 +333,7 @@ namespace Differentiation
 
       stream << "Registered marked independent variables: "
              << "\n";
-      for (unsigned int i = 0; i < n_independent_variables(); i++)
+      for (unsigned int i = 0; i < n_independent_variables(); ++i)
         stream << registered_marked_independent_variables[i]
                << (i < (n_independent_variables() - 1) ? "," : "")
                << std::flush;
@@ -341,14 +341,14 @@ namespace Differentiation
 
       stream << "Dependent variable values: "
              << "\n";
-      for (unsigned int i = 0; i < n_dependent_variables(); i++)
+      for (unsigned int i = 0; i < n_dependent_variables(); ++i)
         stream << dependent_variables[i]
                << (i < (n_dependent_variables() - 1) ? "," : "");
       stream << std::endl;
 
       stream << "Registered dependent variables: "
              << "\n";
-      for (unsigned int i = 0; i < n_dependent_variables(); i++)
+      for (unsigned int i = 0; i < n_dependent_variables(); ++i)
         stream << registered_marked_dependent_variables[i]
                << (i < (n_dependent_variables() - 1) ? "," : "");
       stream << std::endl;
@@ -364,7 +364,7 @@ namespace Differentiation
     HelperBase<ADNumberTypeCode, ScalarType>::print_values(
       std::ostream &stream) const
     {
-      for (unsigned int i = 0; i < n_independent_variables(); i++)
+      for (unsigned int i = 0; i < n_independent_variables(); ++i)
         stream << independent_variable_values[i]
                << (i < (n_independent_variables() - 1) ? "," : "")
                << std::flush;
@@ -1461,7 +1461,7 @@ namespace Differentiation
         }
 
       // Account for symmetries of tensor components
-      for (unsigned int i = 0; i < this->n_independent_variables(); i++)
+      for (unsigned int i = 0; i < this->n_independent_variables(); ++i)
         {
           if (this->is_symmetric_independent_variable(i) == true)
             gradient[i] *= 0.5;
@@ -1541,8 +1541,8 @@ namespace Differentiation
         }
 
       // Account for symmetries of tensor components
-      for (unsigned int i = 0; i < this->n_independent_variables(); i++)
-        for (unsigned int j = 0; j < i + 1; j++)
+      for (unsigned int i = 0; i < this->n_independent_variables(); ++i)
+        for (unsigned int j = 0; j < i + 1; ++j)
           {
             if (this->is_symmetric_independent_variable(i) == true &&
                 this->is_symmetric_independent_variable(j) == true)
@@ -1793,13 +1793,13 @@ namespace Differentiation
                                          jacobian);
         }
 
-      for (unsigned int j = 0; j < this->n_independent_variables(); j++)
+      for (unsigned int j = 0; j < this->n_independent_variables(); ++j)
         {
           // Because we perform just a single differentiation
           // operation with respect to the "column" variables,
           // we only need to consider them for symmetry conditions.
           if (this->is_symmetric_independent_variable(j) == true)
-            for (unsigned int i = 0; i < this->n_dependent_variables(); i++)
+            for (unsigned int i = 0; i < this->n_dependent_variables(); ++i)
               jacobian[i][j] *= 0.5;
         }
     }

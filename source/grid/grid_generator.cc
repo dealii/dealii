@@ -439,7 +439,7 @@ namespace GridGenerator
 
 
             // find index in vector to nose point (min) and tail point (max)
-            for (unsigned int i = 0; i < jouk_points.size(); i++)
+            for (unsigned int i = 0; i < jouk_points.size(); ++i)
               {
                 if (jouk_points[i](0) < nose_x_coordinate)
                   {
@@ -454,9 +454,9 @@ namespace GridGenerator
               }
 
             // copy point on upper side of airfoil
-            for (unsigned int i = tail_index; i < jouk_points.size(); i++)
+            for (unsigned int i = tail_index; i < jouk_points.size(); ++i)
               upper_points.emplace_back(jouk_points[i]);
-            for (unsigned int i = 0; i <= nose_index; i++)
+            for (unsigned int i = 0; i <= nose_index; ++i)
               upper_points.emplace_back(jouk_points[i]);
             std::reverse(upper_points.begin(), upper_points.end());
 
@@ -533,7 +533,7 @@ namespace GridGenerator
           // (number_points) equidistant points.
           const double theta = 2 * numbers::PI / number_points;
           // first point is leading edge then counterclockwise
-          for (unsigned int i = 0; i < number_points; i++)
+          for (unsigned int i = 0; i < number_points; ++i)
             circle_points.emplace_back(center[0] - radius * cos(i * theta),
                                        center[1] - radius * sin(i * theta));
 
@@ -554,7 +554,7 @@ namespace GridGenerator
           std::vector<Point<2>> joukowski_points(circle_points.size());
 
           // transform each point
-          for (unsigned int i = 0; i < circle_points.size(); i++)
+          for (unsigned int i = 0; i < circle_points.size(); ++i)
             {
               const double               chi = circle_points[i](0);
               const double               eta = circle_points[i](1);
@@ -657,7 +657,7 @@ namespace GridGenerator
           std::vector<Point<2>> naca_points;
 
           if (digit_0 == 0 && digit_1 == 0) // is symmetric
-            for (unsigned int i = 0; i < number_points; i++)
+            for (unsigned int i = 0; i < number_points; ++i)
               {
                 const double x = i * 1 / (1.0 * number_points - 1);
                 const double y_t =
@@ -672,7 +672,7 @@ namespace GridGenerator
                   naca_points.emplace_back(x, -y_t);
               }
           else // is asymmetric
-            for (unsigned int i = 0; i < number_points; i++)
+            for (unsigned int i = 0; i < number_points; ++i)
               {
                 const double m = 1.0 * digit_0 / 100; // max. chamber
                 const double p = 1.0 * digit_1 / 10; // location of max. chamber
@@ -770,7 +770,7 @@ namespace GridGenerator
 
           // calculate arclength
           std::vector<double> arclength_L(non_equidistant_points.size(), 0);
-          for (unsigned int i = 0; i < non_equidistant_points.size() - 1; i++)
+          for (unsigned int i = 0; i < non_equidistant_points.size() - 1; ++i)
             arclength_L[i + 1] =
               arclength_L[i] +
               non_equidistant_points[i + 1].distance(non_equidistant_points[i]);
@@ -790,7 +790,7 @@ namespace GridGenerator
 
 
           // loop over all subsections
-          for (unsigned int j = 0, i = 1; j < n_points - 1; j++)
+          for (unsigned int j = 0, i = 1; j < n_points - 1; ++j)
             {
               // get reference left and right end of this section
               const auto Lj  = arclength_L[j];
@@ -2722,7 +2722,7 @@ namespace GridGenerator
           }
 
         double x = 0;
-        for (unsigned int j = 0; j < step_sizes.at(i).size(); j++)
+        for (unsigned int j = 0; j < step_sizes.at(i).size(); ++j)
           x += step_sizes[i][j];
         Assert(std::fabs(x - (p2(i) - p1(i))) <= 1e-12 * std::fabs(x),
                ExcMessage(
@@ -2928,7 +2928,7 @@ namespace GridGenerator
     Assert(spacing[0].size() == n_cells, ExcInvalidRepetitionsDimension(1));
 
     double delta = std::numeric_limits<double>::max();
-    for (unsigned int i = 0; i < n_cells; i++)
+    for (unsigned int i = 0; i < n_cells; ++i)
       {
         Assert(spacing[0][i] >= 0, ExcInvalidRepetitions(-1));
         delta = std::min(delta, spacing[0][i]);
@@ -2945,7 +2945,7 @@ namespace GridGenerator
       }
     // create the cells
     unsigned int n_val_cells = 0;
-    for (unsigned int i = 0; i < n_cells; i++)
+    for (unsigned int i = 0; i < n_cells; ++i)
       if (material_id[i] != numbers::invalid_material_id)
         n_val_cells++;
 
@@ -2983,10 +2983,10 @@ namespace GridGenerator
 
     std::vector<unsigned int> repetitions(2);
     double                    delta = std::numeric_limits<double>::max();
-    for (unsigned int i = 0; i < 2; i++)
+    for (unsigned int i = 0; i < 2; ++i)
       {
         repetitions[i] = spacing[i].size();
-        for (unsigned int j = 0; j < repetitions[i]; j++)
+        for (unsigned int j = 0; j < repetitions[i]; ++j)
           {
             Assert(spacing[i][j] >= 0, ExcInvalidRepetitions(-1));
             delta = std::min(delta, spacing[i][j]);
@@ -3013,8 +3013,8 @@ namespace GridGenerator
 
     // create the cells
     unsigned int n_val_cells = 0;
-    for (unsigned int i = 0; i < material_id.size(0); i++)
-      for (unsigned int j = 0; j < material_id.size(1); j++)
+    for (unsigned int i = 0; i < material_id.size(0); ++i)
+      for (unsigned int j = 0; j < material_id.size(1); ++j)
         if (material_id[i][j] != numbers::invalid_material_id)
           n_val_cells++;
 
@@ -3077,10 +3077,10 @@ namespace GridGenerator
 
     std::vector<unsigned int> repetitions(dim);
     double                    delta = std::numeric_limits<double>::max();
-    for (unsigned int i = 0; i < dim; i++)
+    for (unsigned int i = 0; i < dim; ++i)
       {
         repetitions[i] = spacing[i].size();
-        for (unsigned int j = 0; j < repetitions[i]; j++)
+        for (unsigned int j = 0; j < repetitions[i]; ++j)
           {
             Assert(spacing[i][j] >= 0, ExcInvalidRepetitions(-1));
             delta = std::min(delta, spacing[i][j]);
@@ -3113,9 +3113,9 @@ namespace GridGenerator
 
     // create the cells
     unsigned int n_val_cells = 0;
-    for (unsigned int i = 0; i < material_id.size(0); i++)
-      for (unsigned int j = 0; j < material_id.size(1); j++)
-        for (unsigned int k = 0; k < material_id.size(2); k++)
+    for (unsigned int i = 0; i < material_id.size(0); ++i)
+      for (unsigned int j = 0; j < material_id.size(1); ++j)
+        for (unsigned int k = 0; k < material_id.size(2); ++k)
           if (material_id[i][j][k] != numbers::invalid_material_id)
             n_val_cells++;
 
@@ -8088,7 +8088,7 @@ namespace GridGenerator
     Table<2, unsigned int> swap_matrix(
       GeometryInfo<spacedim>::faces_per_cell,
       GeometryInfo<dim - 1>::vertices_per_cell);
-    for (unsigned int i1 = 0; i1 < GeometryInfo<spacedim>::faces_per_cell; i1++)
+    for (unsigned int i1 = 0; i1 < GeometryInfo<spacedim>::faces_per_cell; ++i1)
       {
         for (unsigned int i2 = 0; i2 < GeometryInfo<dim - 1>::vertices_per_cell;
              i2++)
@@ -8205,7 +8205,7 @@ namespace GridGenerator
     if (dim == 2)
       {
         for (const auto &cell : surface_mesh.active_cell_iterators())
-          for (unsigned int vertex = 0; vertex < 2; vertex++)
+          for (unsigned int vertex = 0; vertex < 2; ++vertex)
             if (cell->face(vertex)->at_boundary())
               cell->face(vertex)->set_boundary_id(0);
       }
@@ -8310,7 +8310,7 @@ namespace GridGenerator
     std::map<typename MeshType<dim - 1, spacedim>::cell_iterator,
              typename MeshType<dim, spacedim>::face_iterator>
       surface_to_volume_mapping;
-    for (unsigned int i = 0; i < temporary_map_boundary_cell_face.size(); i++)
+    for (unsigned int i = 0; i < temporary_map_boundary_cell_face.size(); ++i)
       surface_to_volume_mapping[temporary_map_boundary_cell_face[i].first] =
         temporary_map_boundary_cell_face[i].second.first;
 

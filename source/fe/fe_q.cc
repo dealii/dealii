@@ -107,11 +107,11 @@ FE_Q<dim, spacedim>::get_name() const
     dynamic_cast<TensorProductPolynomials<dim> *>(this->poly_space.get());
   std::vector<unsigned int> lexicographic =
     poly_space_derived_ptr->get_numbering_inverse();
-  for (unsigned int j = 0; j <= this->degree; j++)
+  for (unsigned int j = 0; j <= this->degree; ++j)
     points[j] = this->unit_support_points[lexicographic[j]][0];
 
   // Check whether the support points are equidistant.
-  for (unsigned int j = 0; j <= this->degree; j++)
+  for (unsigned int j = 0; j <= this->degree; ++j)
     if (std::fabs(points[j] - static_cast<double>(j) / this->degree) > 1e-15)
       {
         equidistant = false;
@@ -132,7 +132,7 @@ FE_Q<dim, spacedim>::get_name() const
       // Check whether the support points come from QGaussLobatto.
       const QGaussLobatto<1> points_gl(this->degree + 1);
       bool                   gauss_lobatto = true;
-      for (unsigned int j = 0; j <= this->degree; j++)
+      for (unsigned int j = 0; j <= this->degree; ++j)
         if (points[j] != points_gl.point(j)(0))
           {
             gauss_lobatto = false;

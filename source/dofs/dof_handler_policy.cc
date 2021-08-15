@@ -1860,7 +1860,7 @@ namespace internal
           const IndexSet &                            indices_we_care_about,
           DoFHandler<dim, spacedim> &                 dof_handler)
         {
-          for (unsigned int d = 1; d < dim; d++)
+          for (unsigned int d = 1; d < dim; ++d)
             for (auto &i : dof_handler.object_dof_indices[0][d])
               if (i != numbers::invalid_dof_index)
                 i = ((indices_we_care_about.size() == 0) ?
@@ -2124,7 +2124,7 @@ namespace internal
 
           if (dof_handler.hp_capability_enabled == false)
             {
-              for (unsigned int d = 1; d < dim; d++)
+              for (unsigned int d = 1; d < dim; ++d)
                 for (auto &i : dof_handler.object_dof_indices[0][d])
                   if (i != numbers::invalid_dof_index)
                     i = ((indices_we_care_about.size() == 0) ?
@@ -2233,7 +2233,7 @@ namespace internal
 
           if (dof_handler.hp_capability_enabled == false)
             {
-              for (unsigned int d = 1; d < dim; d++)
+              for (unsigned int d = 1; d < dim; ++d)
                 for (auto &i : dof_handler.object_dof_indices[0][d])
                   if (i != numbers::invalid_dof_index)
                     i = ((indices_we_care_about.size() == 0) ?
@@ -3446,7 +3446,7 @@ namespace internal
               // compute the displacements (relative to recvbuf)
               // at which to place the incoming data from process i
               std::vector<int> displacements(n_cpu);
-              for (unsigned int i = 0; i < n_cpu; i++)
+              for (unsigned int i = 0; i < n_cpu; ++i)
                 {
                   displacements[i] = shift;
                   shift += rcounts[i];
@@ -3479,7 +3479,7 @@ namespace internal
               Utilities::MPI::all_gather(
                 tr->get_communicator(),
                 this->dof_handler->locally_owned_dofs());
-            for (unsigned int i = 0; i < n_cpu; i++)
+            for (unsigned int i = 0; i < n_cpu; ++i)
               {
                 const IndexSet iset = locally_owned_dofs_per_processor[i];
                 for (types::global_dof_index ind = 0; ind < iset.n_elements();

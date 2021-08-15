@@ -1903,7 +1903,7 @@ CellAccessor<3>::point_inside(const Point<3> &p) const
 
   // rule out points outside the
   // bounding box of this cell
-  for (unsigned int d = 0; d < dim; d++)
+  for (unsigned int d = 0; d < dim; ++d)
     if ((p[d] < minp[d]) || (p[d] > maxp[d]))
       return false;
 

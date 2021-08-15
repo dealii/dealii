@@ -153,7 +153,7 @@ namespace internal
           std::vector<CellWork *> blocked_worker(n_blocked_workers);
 
           root->set_ref_count(evens + 1);
-          for (unsigned int j = 0; j < evens; j++)
+          for (unsigned int j = 0; j < evens; ++j)
             {
               worker[j] = new (root->allocate_child())
                 CellWork(function,
@@ -357,7 +357,7 @@ namespace internal
               MPICommunication *worker_compr =
                 new (root->allocate_child()) MPICommunication(funct, true);
               worker_compr->set_ref_count(1);
-              for (unsigned int j = 0; j < evens; j++)
+              for (unsigned int j = 0; j < evens; ++j)
                 {
                   if (j > 0)
                     {
@@ -1232,7 +1232,7 @@ namespace internal
 
       unsigned int mcell_start = 0;
       block_start[0]           = 0;
-      for (unsigned int block = 0; block < n_blocks; block++)
+      for (unsigned int block = 0; block < n_blocks; ++block)
         {
           block_start[block + 1] = block_start[block];
           for (unsigned int mcell = mcell_start;
@@ -1255,7 +1255,7 @@ namespace internal
         block_size_last = block_size;
 
       unsigned int tick = 0;
-      for (unsigned int block = 0; block < n_blocks; block++)
+      for (unsigned int block = 0; block < n_blocks; ++block)
         {
           unsigned int present_block = partition_color_list[block];
           for (unsigned int cell = block_start[present_block];
@@ -1270,7 +1270,7 @@ namespace internal
           if (cell_partition_data[tick] == block)
             cell_partition_data[tick++] = counter_macro;
 
-          for (unsigned int j = 0; j < this_block_size; j++)
+          for (unsigned int j = 0; j < this_block_size; ++j)
             irregular[counter_macro++] =
               irregular_cells[present_block * block_size + j];
         }
@@ -1414,7 +1414,7 @@ namespace internal
           // This is the simple case. The renumbering is just a combination of
           // the renumbering that we were given as an input and the
           // renumbering of partition/coloring given in partition_2layers_list
-          for (unsigned int j = 0; j < renumbering.size(); j++)
+          for (unsigned int j = 0; j < renumbering.size(); ++j)
             renumbering[j] = renumbering_in[partition_2layers_list[j]];
           // Account for the ghost cells, finally.
           for (unsigned int i = 0; i < n_ghost_cells; ++i)
@@ -1430,7 +1430,7 @@ namespace internal
           unsigned int counter     = 0;
           unsigned int mcell_start = 0;
           block_start[0]           = 0;
-          for (unsigned int block = 0; block < n_blocks; block++)
+          for (unsigned int block = 0; block < n_blocks; ++block)
             {
               block_start[block + 1] = block_start[block];
               for (unsigned int mcell = mcell_start;
@@ -1453,7 +1453,7 @@ namespace internal
             block_size_last = block_size;
 
           unsigned int tick = 0;
-          for (unsigned int block = 0; block < n_blocks; block++)
+          for (unsigned int block = 0; block < n_blocks; ++block)
             {
               unsigned int present_block = partition_2layers_list[block];
               for (unsigned int cell = block_start[present_block];
@@ -1468,7 +1468,7 @@ namespace internal
               if (cell_partition_data[tick] == block)
                 cell_partition_data[tick++] = counter_macro;
 
-              for (unsigned int j = 0; j < this_block_size; j++)
+              for (unsigned int j = 0; j < this_block_size; ++j)
                 irregular[counter_macro++] =
                   irregular_cells[present_block * block_size + j];
             }
@@ -1552,7 +1552,7 @@ namespace internal
 
       partition_list.swap(renumbering);
 
-      for (unsigned int j = 0; j < renumbering.size(); j++)
+      for (unsigned int j = 0; j < renumbering.size(); ++j)
         renumbering[j] = partition_list[partition_partition_list[j]];
 
       for (unsigned int i = 0; i < n_ghost_cells; ++i)
@@ -1751,7 +1751,7 @@ namespace internal
                                   .push_back(partition_partition_list[cell]);
                             }
                           // check how many more cells are needed in the lists
-                          for (unsigned int j = 0; j < max_fe_index + 1; j++)
+                          for (unsigned int j = 0; j < max_fe_index + 1; ++j)
                             {
                               remaining_per_cell_batch[j] =
                                 renumbering_fe_index[j].size() %
@@ -1876,7 +1876,7 @@ namespace internal
                           // index within one partition-partition which was
                           // implicitly assumed above
                           cell = counter - partition_counter;
-                          for (unsigned int j = 0; j < max_fe_index + 1; j++)
+                          for (unsigned int j = 0; j < max_fe_index + 1; ++j)
                             {
                               for (const unsigned int jj :
                                    renumbering_fe_index[j])
@@ -1944,7 +1944,7 @@ namespace internal
       partition_row_index.resize(partition + 1);
       cell_partition_data.clear();
       unsigned int color_counter = 0, index_counter = 0;
-      for (unsigned int part = 0; part < partition; part++)
+      for (unsigned int part = 0; part < partition; ++part)
         {
           partition_row_index[part] = index_counter;
           unsigned int max_color    = 0;
@@ -1981,7 +1981,7 @@ namespace internal
           // Reorder within partition: First, all blocks that belong the 0 and
           // then so on until those with color max (Note that the smaller the
           // number the larger the partition)
-          for (unsigned int color = 0; color <= max_color; color++)
+          for (unsigned int color = 0; color <= max_color; ++color)
             {
               cell_partition_data.push_back(color_counter);
               index_counter++;
@@ -2245,7 +2245,7 @@ namespace internal
       partition_odds.resize(partition);
       partition_n_blocked_workers.resize(partition);
       partition_n_workers.resize(partition);
-      for (unsigned int part = 0; part < partition; part++)
+      for (unsigned int part = 0; part < partition; ++part)
         {
           partition_evens[part] =
             (partition_row_index[part + 1] - partition_row_index[part] + 1) / 2;

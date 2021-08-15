@@ -39,7 +39,7 @@ namespace internal
       {
         std::vector<unsigned int> multiplicities;
         multiplicities.push_back(1); // the first one is non-enriched FE
-        for (unsigned int i = 0; i < functions.size(); i++)
+        for (unsigned int i = 0; i < functions.size(); ++i)
           multiplicities.push_back(functions[i].size());
 
         return multiplicities;
@@ -57,7 +57,7 @@ namespace internal
       {
         std::vector<const FiniteElement<dim, spacedim> *> fes;
         fes.push_back(fe_base);
-        for (unsigned int i = 0; i < fe_enriched.size(); i++)
+        for (unsigned int i = 0; i < fe_enriched.size(); ++i)
           fes.push_back(fe_enriched[i]);
 
         return fes;
@@ -91,7 +91,7 @@ namespace internal
         const unsigned int n_comp_base = fes[0]->n_components();
 
         // start from fe=1 as 0th is always non-enriched FE.
-        for (unsigned int fe = 1; fe < fes.size(); fe++)
+        for (unsigned int fe = 1; fe < fes.size(); ++fe)
           {
             const FE_Nothing<dim> *fe_nothing =
               dynamic_cast<const FE_Nothing<dim> *>(fes[fe]);
@@ -120,7 +120,7 @@ namespace internal
         const std::vector<const FiniteElement<dim, spacedim> *> &fes)
       {
         // start from fe=1 as 0th is always non-enriched FE.
-        for (unsigned int fe = 1; fe < fes.size(); fe++)
+        for (unsigned int fe = 1; fe < fes.size(); ++fe)
           if (dynamic_cast<const FE_Nothing<dim> *>(fes[fe]) == nullptr)
             // this is not FE_Nothing => there will be enrichment
             return true;
@@ -203,7 +203,7 @@ FE_Enriched<dim, spacedim>::FE_Enriched(
   // resize to be consistent with all FEs used to construct the FE_Enriched,
   // even though we will never use the 0th element.
   base_no_mult_local_enriched_dofs.resize(fes.size());
-  for (unsigned int fe = 1; fe < fes.size(); fe++)
+  for (unsigned int fe = 1; fe < fes.size(); ++fe)
     base_no_mult_local_enriched_dofs[fe].resize(multiplicities[fe]);
 
   Assert(base_no_mult_local_enriched_dofs.size() == this->n_base_elements(),
@@ -285,7 +285,7 @@ FE_Enriched<dim, spacedim>::clone() const
   std::vector<const FiniteElement<dim, spacedim> *> fes;
   std::vector<unsigned int>                         multiplicities;
 
-  for (unsigned int i = 0; i < this->n_base_elements(); i++)
+  for (unsigned int i = 0; i < this->n_base_elements(); ++i)
     {
       fes.push_back(&base_element(i));
       multiplicities.push_back(this->element_multiplicity(i));
@@ -434,7 +434,7 @@ FE_Enriched<dim, spacedim>::initialize(
   // block of code
   this->base_to_block_indices.reinit(0, 0);
 
-  for (unsigned int i = 0; i < fes.size(); i++)
+  for (unsigned int i = 0; i < fes.size(); ++i)
     if (multiplicities[i] > 0)
       this->base_to_block_indices.push_back(multiplicities[i]);
 
@@ -661,7 +661,7 @@ FE_Enriched<dim, spacedim>::multiply_by_enrichment(
 
   // TODO: do we need it only for dim_1 == dim (i.e. fill_fe_values)?
   if (dim_1 == dim)
-    for (unsigned int base_no = 1; base_no < this->n_base_elements(); base_no++)
+    for (unsigned int base_no = 1; base_no < this->n_base_elements(); ++base_no)
       {
         const FiniteElement<dim, spacedim> &base_fe = base_element(base_no);
         typename FiniteElement<dim, spacedim>::InternalDataBase &base_fe_data =
@@ -725,7 +725,7 @@ FE_Enriched<dim, spacedim>::multiply_by_enrichment(
          ExcDimensionMismatch(base_no_mult_local_enriched_dofs.size(),
                               fe_data.enrichment.size()));
   // calculate hessians, gradients and values for each function
-  for (unsigned int base_no = 1; base_no < this->n_base_elements(); base_no++)
+  for (unsigned int base_no = 1; base_no < this->n_base_elements(); ++base_no)
     {
       Assert(
         base_no_mult_local_enriched_dofs[base_no].size() ==
@@ -757,7 +757,7 @@ FE_Enriched<dim, spacedim>::multiply_by_enrichment(
                      ExcDimensionMismatch(
                        fe_data.enrichment[base_no][m].hessians.size(),
                        n_q_points));
-              for (unsigned int q = 0; q < n_q_points; q++)
+              for (unsigned int q = 0; q < n_q_points; ++q)
                 fe_data.enrichment[base_no][m].hessians[q] =
                   enrichments[base_no - 1][m](cell)->hessian(
                     mapping_data.quadrature_points[q]);
@@ -770,7 +770,7 @@ FE_Enriched<dim, spacedim>::multiply_by_enrichment(
                      ExcDimensionMismatch(
                        fe_data.enrichment[base_no][m].gradients.size(),
                        n_q_points));
-              for (unsigned int q = 0; q < n_q_points; q++)
+              for (unsigned int q = 0; q < n_q_points; ++q)
                 fe_data.enrichment[base_no][m].gradients[q] =
                   enrichments[base_no - 1][m](cell)->gradient(
                     mapping_data.quadrature_points[q]);
@@ -782,7 +782,7 @@ FE_Enriched<dim, spacedim>::multiply_by_enrichment(
                      ExcDimensionMismatch(
                        fe_data.enrichment[base_no][m].values.size(),
                        n_q_points));
-              for (unsigned int q = 0; q < n_q_points; q++)
+              for (unsigned int q = 0; q < n_q_points; ++q)
                 fe_data.enrichment[base_no][m].values[q] =
                   enrichments[base_no - 1][m](cell)->value(
                     mapping_data.quadrature_points[q]);
@@ -830,7 +830,7 @@ FE_Enriched<dim, spacedim>::multiply_by_enrichment(
     }
 
   if (flags & update_gradients)
-    for (unsigned int base_no = 1; base_no < this->n_base_elements(); base_no++)
+    for (unsigned int base_no = 1; base_no < this->n_base_elements(); ++base_no)
       {
         for (unsigned int m = 0;
              m < base_no_mult_local_enriched_dofs[base_no].size();
@@ -853,7 +853,7 @@ FE_Enriched<dim, spacedim>::multiply_by_enrichment(
       }
 
   if (flags & update_values)
-    for (unsigned int base_no = 1; base_no < this->n_base_elements(); base_no++)
+    for (unsigned int base_no = 1; base_no < this->n_base_elements(); ++base_no)
       {
         for (unsigned int m = 0;
              m < base_no_mult_local_enriched_dofs[base_no].size();

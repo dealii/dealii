@@ -1144,13 +1144,13 @@ namespace internal
             fe_patch_values.n_quadrature_points;
 
           std::vector<dealii::Vector<ScalarType>> tmp(n_eval_points);
-          for (unsigned int i = 0; i < n_eval_points; i++)
+          for (unsigned int i = 0; i < n_eval_points; ++i)
             tmp[i].reinit(n_components);
 
           fe_patch_values.get_function_values(vector, tmp);
 
           AssertDimension(patch_values_system.size(), n_eval_points);
-          for (unsigned int i = 0; i < n_eval_points; i++)
+          for (unsigned int i = 0; i < n_eval_points; ++i)
             {
               AssertDimension(patch_values_system[i].size(), n_components);
 
@@ -1190,7 +1190,7 @@ namespace internal
 
           fe_patch_values.get_function_values(vector, tmp);
 
-          for (unsigned int i = 0; i < tmp.size(); i++)
+          for (unsigned int i = 0; i < tmp.size(); ++i)
             patch_values[i] = get_component(tmp[i], extract_component);
         }
     }
@@ -1235,17 +1235,17 @@ namespace internal
 
           std::vector<std::vector<Tensor<1, spacedim, ScalarType>>> tmp(
             n_eval_points);
-          for (unsigned int i = 0; i < n_eval_points; i++)
+          for (unsigned int i = 0; i < n_eval_points; ++i)
             tmp[i].resize(n_components);
 
           fe_patch_values.get_function_gradients(vector, tmp);
 
           AssertDimension(patch_gradients_system.size(), n_eval_points);
-          for (unsigned int i = 0; i < n_eval_points; i++)
+          for (unsigned int i = 0; i < n_eval_points; ++i)
             {
               AssertDimension(patch_gradients_system[i].size(), n_components);
 
-              for (unsigned int j = 0; j < n_components; j++)
+              for (unsigned int j = 0; j < n_components; ++j)
                 patch_gradients_system[i][j] =
                   get_component(tmp[i][j], extract_component);
             }
@@ -1283,7 +1283,7 @@ namespace internal
 
           fe_patch_values.get_function_gradients(vector, tmp);
 
-          for (unsigned int i = 0; i < tmp.size(); i++)
+          for (unsigned int i = 0; i < tmp.size(); ++i)
             patch_gradients[i] = get_component(tmp[i], extract_component);
         }
     }
@@ -1328,17 +1328,17 @@ namespace internal
 
           std::vector<std::vector<Tensor<2, spacedim, ScalarType>>> tmp(
             n_eval_points);
-          for (unsigned int i = 0; i < n_eval_points; i++)
+          for (unsigned int i = 0; i < n_eval_points; ++i)
             tmp[i].resize(n_components);
 
           fe_patch_values.get_function_hessians(vector, tmp);
 
           AssertDimension(patch_hessians_system.size(), n_eval_points);
-          for (unsigned int i = 0; i < n_eval_points; i++)
+          for (unsigned int i = 0; i < n_eval_points; ++i)
             {
               AssertDimension(patch_hessians_system[i].size(), n_components);
 
-              for (unsigned int j = 0; j < n_components; j++)
+              for (unsigned int j = 0; j < n_components; ++j)
                 patch_hessians_system[i][j] =
                   get_component(tmp[i][j], extract_component);
             }
@@ -1376,7 +1376,7 @@ namespace internal
 
           fe_patch_values.get_function_hessians(vector, tmp);
 
-          for (unsigned int i = 0; i < tmp.size(); i++)
+          for (unsigned int i = 0; i < tmp.size(); ++i)
             patch_hessians[i] = get_component(tmp[i], extract_component);
         }
     }
@@ -1638,7 +1638,7 @@ namespace internal
       const unsigned int n_eval_points = fe_patch_values.n_quadrature_points;
 
       AssertDimension(patch_values_system.size(), n_eval_points);
-      for (unsigned int q = 0; q < n_eval_points; q++)
+      for (unsigned int q = 0; q < n_eval_points; ++q)
         {
           AssertDimension(patch_values_system[q].size(), n_components);
           patch_values_system[q] = 0.0;

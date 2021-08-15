@@ -341,7 +341,7 @@ FESystem<dim, spacedim>::clone() const
   std::vector<const FiniteElement<dim, spacedim> *> fes;
   std::vector<unsigned int>                         multiplicities;
 
-  for (unsigned int i = 0; i < this->n_base_elements(); i++)
+  for (unsigned int i = 0; i < this->n_base_elements(); ++i)
     {
       fes.push_back(&base_element(i));
       multiplicities.push_back(this->element_multiplicity(i));
@@ -1645,7 +1645,7 @@ FESystem<dim, spacedim>::initialize(
 
   this->base_to_block_indices.reinit(0, 0);
 
-  for (unsigned int i = 0; i < fes.size(); i++)
+  for (unsigned int i = 0; i < fes.size(); ++i)
     if (multiplicities[i] > 0)
       this->base_to_block_indices.push_back(multiplicities[i]);
 
@@ -1653,7 +1653,7 @@ FESystem<dim, spacedim>::initialize(
     Threads::TaskGroup<> clone_base_elements;
 
     unsigned int ind = 0;
-    for (unsigned int i = 0; i < fes.size(); i++)
+    for (unsigned int i = 0; i < fes.size(); ++i)
       if (multiplicities[i] > 0)
         {
           clone_base_elements += Threads::new_task([&, i, ind]() {

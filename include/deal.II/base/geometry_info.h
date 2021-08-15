@@ -4716,7 +4716,7 @@ inline Point<dim, Number>
 GeometryInfo<dim>::project_to_unit_cell(const Point<dim, Number> &q)
 {
   Point<dim, Number> p;
-  for (unsigned int i = 0; i < dim; i++)
+  for (unsigned int i = 0; i < dim; ++i)
     p[i] = std::min(std::max(q[i], Number(0.)), Number(1.));
 
   return p;
@@ -4730,7 +4730,7 @@ GeometryInfo<dim>::distance_to_unit_cell(const Point<dim> &p)
 {
   double result = 0.0;
 
-  for (unsigned int i = 0; i < dim; i++)
+  for (unsigned int i = 0; i < dim; ++i)
     {
       result = std::max(result, -p[i]);
       result = std::max(result, p[i] - 1.);

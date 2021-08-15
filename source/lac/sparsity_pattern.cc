@@ -708,7 +708,7 @@ SparsityPatternBase::add(const size_type i, const size_type j)
   AssertIndexRange(j, cols);
   Assert(compressed == false, ExcMatrixIsCompressed());
 
-  for (std::size_t k = rowstart[i]; k < rowstart[i + 1]; k++)
+  for (std::size_t k = rowstart[i]; k < rowstart[i + 1]; ++k)
     {
       // entry already exists
       if (colnums[k] == j)
@@ -743,7 +743,7 @@ SparsityPattern::add_entries(const size_type row,
           bool            has_larger_entries = false;
           // skip diagonal
           std::size_t k = rowstart[row] + store_diagonal_first_in_row;
-          for (; k < rowstart[row + 1]; k++)
+          for (; k < rowstart[row + 1]; ++k)
             if (colnums[k] == invalid_entry)
               break;
             else if (colnums[k] >= *it)

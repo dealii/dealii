@@ -274,7 +274,7 @@ namespace internal
     switch (dim)
       {
         case 1:
-          for (unsigned int c = 0; c < n_components; c++)
+          for (unsigned int c = 0; c < n_components; ++c)
             {
               if (evaluation_flag & EvaluationFlags::values)
                 eval.template values<0, true, false>(values_dofs, values_quad);
@@ -294,7 +294,7 @@ namespace internal
           break;
 
         case 2:
-          for (unsigned int c = 0; c < n_components; c++)
+          for (unsigned int c = 0; c < n_components; ++c)
             {
               // grad x
               if (evaluation_flag & EvaluationFlags::gradients)
@@ -342,7 +342,7 @@ namespace internal
           break;
 
         case 3:
-          for (unsigned int c = 0; c < n_components; c++)
+          for (unsigned int c = 0; c < n_components; ++c)
             {
               if (evaluation_flag & EvaluationFlags::gradients)
                 {
@@ -523,7 +523,7 @@ namespace internal
     switch (dim)
       {
         case 1:
-          for (unsigned int c = 0; c < n_components; c++)
+          for (unsigned int c = 0; c < n_components; ++c)
             {
               if (integration_flag & EvaluationFlags::values)
                 {
@@ -565,7 +565,7 @@ namespace internal
           break;
 
         case 2:
-          for (unsigned int c = 0; c < n_components; c++)
+          for (unsigned int c = 0; c < n_components; ++c)
             {
               if ((integration_flag & EvaluationFlags::values) &&
                   !(integration_flag & EvaluationFlags::gradients))
@@ -624,7 +624,7 @@ namespace internal
           break;
 
         case 3:
-          for (unsigned int c = 0; c < n_components; c++)
+          for (unsigned int c = 0; c < n_components; ++c)
             {
               if ((integration_flag & EvaluationFlags::values) &&
                   !(integration_flag & EvaluationFlags::gradients))
@@ -1393,7 +1393,7 @@ namespace internal
            shape_info.data.front().shape_hessians_collocation_eo);
     constexpr unsigned int n_q_points = Utilities::pow(fe_degree + 1, dim);
 
-    for (unsigned int c = 0; c < n_components; c++)
+    for (unsigned int c = 0; c < n_components; ++c)
       {
         if (evaluation_flag & EvaluationFlags::values)
           for (unsigned int i = 0; i < n_q_points; ++i)
@@ -1473,7 +1473,7 @@ namespace internal
     constexpr unsigned int n_q_points = Utilities::pow(fe_degree + 1, dim);
     constexpr unsigned int hdim       = (dim * (dim + 1)) / 2;
 
-    for (unsigned int c = 0; c < n_components; c++)
+    for (unsigned int c = 0; c < n_components; ++c)
       {
         if (integration_flag & EvaluationFlags::values)
           {
@@ -1623,7 +1623,7 @@ namespace internal
                       "operation."));
     constexpr unsigned int n_q_points = Utilities::pow(n_q_points_1d, dim);
 
-    for (unsigned int c = 0; c < n_components; c++)
+    for (unsigned int c = 0; c < n_components; ++c)
       {
         FEEvaluationImplBasisChange<
           evaluate_evenodd,
@@ -1687,7 +1687,7 @@ namespace internal
     constexpr unsigned int n_q_points = Utilities::pow(n_q_points_1d, dim);
     constexpr unsigned int hdim       = (dim * (dim + 1)) / 2;
 
-    for (unsigned int c = 0; c < n_components; c++)
+    for (unsigned int c = 0; c < n_components; ++c)
       {
         // apply derivatives in collocation space
         if (integration_flag &
@@ -2728,7 +2728,7 @@ namespace internal
                                             dofs_per_component_on_face :
                                             dofs_per_component_on_cell;
 
-          for (unsigned int c = 0; c < n_components; c++)
+          for (unsigned int c = 0; c < n_components; ++c)
             {
               if (do_hessians)
                 evalf.template apply_face<face_direction,

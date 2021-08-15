@@ -131,8 +131,8 @@ namespace Functions
                       const Tensor<1, dim> &   in2)
     {
       if (val != 0.)
-        for (unsigned int i = 0; i < dim; i++)
-          for (unsigned int j = i; j < dim; j++)
+        for (unsigned int i = 0; i < dim; ++i)
+          for (unsigned int j = i; j < dim; ++j)
             out[i][j] += (in1[i] * in2[j] + in1[j] * in2[i]) * val;
     }
 
@@ -146,8 +146,8 @@ namespace Functions
                       const Tensor<1, dim> &   in)
     {
       if (val != 0.)
-        for (unsigned int i = 0; i < dim; i++)
-          for (unsigned int j = i; j < dim; j++)
+        for (unsigned int i = 0; i < dim; ++i)
+          for (unsigned int j = i; j < dim; ++j)
             out[i][j] += val * in[i] * in[j];
     }
   } // namespace

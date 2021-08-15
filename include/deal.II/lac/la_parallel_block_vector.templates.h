@@ -936,12 +936,12 @@ namespace LinearAlgebra
         {
           Assert(m == n, ExcDimensionMismatch(m, n));
 
-          for (unsigned int i = 0; i < m; i++)
-            for (unsigned int j = i; j < n; j++)
+          for (unsigned int i = 0; i < m; ++i)
+            for (unsigned int j = i; j < n; ++j)
               matrix(i, j) = this->block(i).inner_product_local(V.block(j));
 
-          for (unsigned int i = 0; i < m; i++)
-            for (unsigned int j = i + 1; j < n; j++)
+          for (unsigned int i = 0; i < m; ++i)
+            for (unsigned int j = i + 1; j < n; ++j)
               matrix(j, i) = matrix(i, j);
         }
       else
@@ -985,19 +985,19 @@ namespace LinearAlgebra
         {
           Assert(m == n, ExcDimensionMismatch(m, n));
 
-          for (unsigned int i = 0; i < m; i++)
+          for (unsigned int i = 0; i < m; ++i)
             {
               res +=
                 matrix(i, i) * this->block(i).inner_product_local(V.block(i));
-              for (unsigned int j = i + 1; j < n; j++)
+              for (unsigned int j = i + 1; j < n; ++j)
                 res += 2. * matrix(i, j) *
                        this->block(i).inner_product_local(V.block(j));
             }
         }
       else
         {
-          for (unsigned int i = 0; i < m; i++)
-            for (unsigned int j = 0; j < n; j++)
+          for (unsigned int i = 0; i < m; ++i)
+            for (unsigned int j = 0; j < n; ++j)
               res +=
                 matrix(i, j) * this->block(i).inner_product_local(V.block(j));
         }
@@ -1028,21 +1028,21 @@ namespace LinearAlgebra
       Assert(matrix.m() == m, ExcDimensionMismatch(matrix.m(), m));
       Assert(matrix.n() == n, ExcDimensionMismatch(matrix.n(), n));
 
-      for (unsigned int i = 0; i < n; i++)
+      for (unsigned int i = 0; i < n; ++i)
         {
           // below we make this work gracefully for identity-like matrices in
           // which case the two loops over j won't do any work as A(j,i)==0
           const unsigned int k = std::min(i, m - 1);
           V.block(i).sadd_local(s, matrix(k, i) * b, this->block(k));
-          for (unsigned int j = 0; j < k; j++)
+          for (unsigned int j = 0; j < k; ++j)
             V.block(i).add_local(matrix(j, i) * b, this->block(j));
-          for (unsigned int j = k + 1; j < m; j++)
+          for (unsigned int j = k + 1; j < m; ++j)
             V.block(i).add_local(matrix(j, i) * b, this->block(j));
         }
 
       if (V.block(0).vector_is_ghosted)
         {
-          for (unsigned int i = 0; i < n; i++)
+          for (unsigned int i = 0; i < n; ++i)
             Assert(V.block(i).vector_is_ghosted,
                    ExcMessage(
                      "All blocks should be either in ghosted state or not."));

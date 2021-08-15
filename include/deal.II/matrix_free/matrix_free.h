@@ -2909,7 +2909,7 @@ namespace internal
     {
       std::vector<IndexSet> locally_owned_set;
       locally_owned_set.reserve(dofh.size());
-      for (unsigned int j = 0; j < dofh.size(); j++)
+      for (unsigned int j = 0; j < dofh.size(); ++j)
         if (level == numbers::invalid_unsigned_int)
           locally_owned_set.push_back(dofh[j]->locally_owned_dofs());
         else
@@ -3964,7 +3964,7 @@ namespace internal
   n_components(const std::vector<VectorStruct> &vec)
   {
     unsigned int components = 0;
-    for (unsigned int comp = 0; comp < vec.size(); comp++)
+    for (unsigned int comp = 0; comp < vec.size(); ++comp)
       components += n_components_block(
         vec[comp],
         std::integral_constant<bool, IsBlockVector<VectorStruct>::value>());
@@ -3976,7 +3976,7 @@ namespace internal
   n_components(const std::vector<VectorStruct *> &vec)
   {
     unsigned int components = 0;
-    for (unsigned int comp = 0; comp < vec.size(); comp++)
+    for (unsigned int comp = 0; comp < vec.size(); ++comp)
       components += n_components_block(
         *vec[comp],
         std::integral_constant<bool, IsBlockVector<VectorStruct>::value>());
@@ -4080,7 +4080,7 @@ namespace internal
     VectorDataExchange<dim, Number, VectorizedArrayType> &exchanger)
   {
     unsigned int component_index = 0;
-    for (unsigned int comp = 0; comp < vec.size(); comp++)
+    for (unsigned int comp = 0; comp < vec.size(); ++comp)
       {
         update_ghost_values_start(vec[comp], exchanger, component_index);
         component_index += n_components(vec[comp]);
@@ -4100,7 +4100,7 @@ namespace internal
     VectorDataExchange<dim, Number, VectorizedArrayType> &exchanger)
   {
     unsigned int component_index = 0;
-    for (unsigned int comp = 0; comp < vec.size(); comp++)
+    for (unsigned int comp = 0; comp < vec.size(); ++comp)
       {
         update_ghost_values_start(*vec[comp], exchanger, component_index);
         component_index += n_components(*vec[comp]);
@@ -4167,7 +4167,7 @@ namespace internal
     VectorDataExchange<dim, Number, VectorizedArrayType> &exchanger)
   {
     unsigned int component_index = 0;
-    for (unsigned int comp = 0; comp < vec.size(); comp++)
+    for (unsigned int comp = 0; comp < vec.size(); ++comp)
       {
         update_ghost_values_finish(vec[comp], exchanger, component_index);
         component_index += n_components(vec[comp]);
@@ -4187,7 +4187,7 @@ namespace internal
     VectorDataExchange<dim, Number, VectorizedArrayType> &exchanger)
   {
     unsigned int component_index = 0;
-    for (unsigned int comp = 0; comp < vec.size(); comp++)
+    for (unsigned int comp = 0; comp < vec.size(); ++comp)
       {
         update_ghost_values_finish(*vec[comp], exchanger, component_index);
         component_index += n_components(*vec[comp]);
@@ -4251,7 +4251,7 @@ namespace internal
     VectorDataExchange<dim, Number, VectorizedArrayType> &exchanger)
   {
     unsigned int component_index = 0;
-    for (unsigned int comp = 0; comp < vec.size(); comp++)
+    for (unsigned int comp = 0; comp < vec.size(); ++comp)
       {
         compress_start(vec[comp], exchanger, component_index);
         component_index += n_components(vec[comp]);
@@ -4271,7 +4271,7 @@ namespace internal
     VectorDataExchange<dim, Number, VectorizedArrayType> &exchanger)
   {
     unsigned int component_index = 0;
-    for (unsigned int comp = 0; comp < vec.size(); comp++)
+    for (unsigned int comp = 0; comp < vec.size(); ++comp)
       {
         compress_start(*vec[comp], exchanger, component_index);
         component_index += n_components(*vec[comp]);
@@ -4338,7 +4338,7 @@ namespace internal
     VectorDataExchange<dim, Number, VectorizedArrayType> &exchanger)
   {
     unsigned int component_index = 0;
-    for (unsigned int comp = 0; comp < vec.size(); comp++)
+    for (unsigned int comp = 0; comp < vec.size(); ++comp)
       {
         compress_finish(vec[comp], exchanger, component_index);
         component_index += n_components(vec[comp]);
@@ -4358,7 +4358,7 @@ namespace internal
     VectorDataExchange<dim, Number, VectorizedArrayType> &exchanger)
   {
     unsigned int component_index = 0;
-    for (unsigned int comp = 0; comp < vec.size(); comp++)
+    for (unsigned int comp = 0; comp < vec.size(); ++comp)
       {
         compress_finish(*vec[comp], exchanger, component_index);
         component_index += n_components(*vec[comp]);
@@ -4428,7 +4428,7 @@ namespace internal
     if (exchanger.ghosts_were_set == true)
       return;
 
-    for (unsigned int comp = 0; comp < vec.size(); comp++)
+    for (unsigned int comp = 0; comp < vec.size(); ++comp)
       reset_ghost_values(vec[comp], exchanger);
   }
 
@@ -4448,7 +4448,7 @@ namespace internal
     if (exchanger.ghosts_were_set == true)
       return;
 
-    for (unsigned int comp = 0; comp < vec.size(); comp++)
+    for (unsigned int comp = 0; comp < vec.size(); ++comp)
       reset_ghost_values(*vec[comp], exchanger);
   }
 
@@ -4506,7 +4506,7 @@ namespace internal
     std::vector<VectorStruct> &                           vec,
     VectorDataExchange<dim, Number, VectorizedArrayType> &exchanger)
   {
-    for (unsigned int comp = 0; comp < vec.size(); comp++)
+    for (unsigned int comp = 0; comp < vec.size(); ++comp)
       zero_vector_region(range_index, vec[comp], exchanger);
   }
 
@@ -4523,7 +4523,7 @@ namespace internal
     std::vector<VectorStruct *> &                         vec,
     VectorDataExchange<dim, Number, VectorizedArrayType> &exchanger)
   {
-    for (unsigned int comp = 0; comp < vec.size(); comp++)
+    for (unsigned int comp = 0; comp < vec.size(); ++comp)
       zero_vector_region(range_index, *vec[comp], exchanger);
   }
 

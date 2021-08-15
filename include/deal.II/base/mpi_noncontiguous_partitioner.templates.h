@@ -104,7 +104,7 @@ namespace Utilities
 
       // post recv
       AssertIndexRange(recv_ranks.size(), recv_ptr.size());
-      for (types::global_dof_index i = 0; i < recv_ranks.size(); i++)
+      for (types::global_dof_index i = 0; i < recv_ranks.size(); ++i)
         {
           const int ierr =
             MPI_Irecv(buffers.data() + recv_ptr[i],
@@ -119,7 +119,7 @@ namespace Utilities
 
       // post send
       AssertIndexRange(send_ranks.size(), send_ptr.size());
-      for (types::global_dof_index i = 0, k = 0; i < send_ranks.size(); i++)
+      for (types::global_dof_index i = 0, k = 0; i < send_ranks.size(); ++i)
         {
           // collect data to be send
           for (types::global_dof_index j = send_ptr[i]; j < send_ptr[i + 1];
@@ -164,7 +164,7 @@ namespace Utilities
       Assert(false, ExcNeedsMPI());
 #else
       // receive all data packages and copy data from buffers
-      for (types::global_dof_index proc = 0; proc < recv_ranks.size(); proc++)
+      for (types::global_dof_index proc = 0; proc < recv_ranks.size(); ++proc)
         {
           int        i;
           MPI_Status status;

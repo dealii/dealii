@@ -210,7 +210,7 @@ namespace SparsityTools
       // set global degrees of freedom
       auto n_dofs = graph->n_rows();
 
-      for (unsigned int i = 0; i < n_dofs; i++)
+      for (unsigned int i = 0; i < n_dofs; ++i)
         {
           globalID[i] = i;
           localID[i]  = i; // Same as global ids.
@@ -388,7 +388,7 @@ namespace SparsityTools
 
       // copy from export_to_part to partition_indices, whose part_ids != 0.
       Assert(export_to_part != nullptr, ExcInternalError());
-      for (int i = 0; i < num_export; i++)
+      for (int i = 0; i < num_export; ++i)
         partition_indices[export_local_ids[i]] = export_to_part[i];
 #endif
     }
@@ -494,7 +494,7 @@ namespace SparsityTools
     std::vector<int> color_exp(num_objects);
 
     // Set ids for which coloring needs to be done
-    for (int i = 0; i < num_objects; i++)
+    for (int i = 0; i < num_objects; ++i)
       global_ids[i] = i;
 
     // Call ZOLTAN coloring algorithm

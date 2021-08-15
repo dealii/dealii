@@ -825,7 +825,7 @@ SphericalManifold<dim, spacedim>::guess_new_point(
 
   // Perform a simple average ...
   double total_weights = 0.;
-  for (unsigned int i = 0; i < directions.size(); i++)
+  for (unsigned int i = 0; i < directions.size(); ++i)
     {
       // if one weight is one, return its direction
       if (std::abs(1 - weights[i]) < tolerance)

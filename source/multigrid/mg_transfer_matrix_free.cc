@@ -151,7 +151,7 @@ MGTransferMatrixFree<dim, Number>::build(
 
   // duplicate and put into vectorized array
   prolongation_matrix_1d.resize(elem_info.prolongation_matrix_1d.size());
-  for (unsigned int i = 0; i < elem_info.prolongation_matrix_1d.size(); i++)
+  for (unsigned int i = 0; i < elem_info.prolongation_matrix_1d.size(); ++i)
     prolongation_matrix_1d[i] = elem_info.prolongation_matrix_1d[i];
 
   // reshuffle into aligned vector of vectorized arrays

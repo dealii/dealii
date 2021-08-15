@@ -735,7 +735,7 @@ namespace internal
     local_face_integrals[face] =
       integrate_over_face(parallel_data, face, fe_face_values_cell);
 
-    for (unsigned int i = 0; i < local_face_integrals[face].size(); i++)
+    for (unsigned int i = 0; i < local_face_integrals[face].size(); ++i)
       local_face_integrals[face][i] *= factor;
   }
 

@@ -106,7 +106,7 @@ FE_Q_DG0<dim, spacedim>::get_name() const
   unsigned int index = 0;
 
   // Decode the support points in one coordinate direction.
-  for (unsigned int j = 0; j < dofs_per_cell; j++)
+  for (unsigned int j = 0; j < dofs_per_cell; ++j)
     {
       if ((dim > 1) ? (unit_support_points[j](1) == 0 &&
                        ((dim > 2) ? unit_support_points[j](2) == 0 : true)) :
@@ -128,7 +128,7 @@ FE_Q_DG0<dim, spacedim>::get_name() const
            "Could not decode support points in one coordinate direction."));
 
   // Check whether the support points are equidistant.
-  for (unsigned int j = 0; j < n_points; j++)
+  for (unsigned int j = 0; j < n_points; ++j)
     if (std::fabs(points[j] - static_cast<double>(j) / this->degree) > 1e-15)
       {
         type = false;
@@ -149,7 +149,7 @@ FE_Q_DG0<dim, spacedim>::get_name() const
       // Check whether the support points come from QGaussLobatto.
       const QGaussLobatto<1> points_gl(n_points);
       type = true;
-      for (unsigned int j = 0; j < n_points; j++)
+      for (unsigned int j = 0; j < n_points; ++j)
         if (points[j] != points_gl.point(j)(0))
           {
             type = false;

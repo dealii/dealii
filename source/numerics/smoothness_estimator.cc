@@ -55,7 +55,7 @@ namespace SmoothnessEstimator
     resize(Table<dim, CoefficientType> &coeff, const unsigned int N)
     {
       TableIndices<dim> size;
-      for (unsigned int d = 0; d < dim; d++)
+      for (unsigned int d = 0; d < dim; ++d)
         size[d] = N;
       coeff.reinit(size);
     }

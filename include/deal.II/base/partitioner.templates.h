@@ -88,7 +88,7 @@ namespace Utilities
                            n_ghost_indices() :
                          ghost_array.data();
 
-      for (unsigned int i = 0; i < n_ghost_targets; i++)
+      for (unsigned int i = 0; i < n_ghost_targets; ++i)
         {
           // allow writing into ghost indices even though we are in a
           // const function
@@ -117,7 +117,7 @@ namespace Utilities
         initialize_import_indices_plain_dev();
 #    endif
 
-      for (unsigned int i = 0; i < n_import_targets; i++)
+      for (unsigned int i = 0; i < n_import_targets; ++i)
         {
 #    if defined(DEAL_II_COMPILER_CUDA_AWARE) && \
       defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
@@ -315,7 +315,7 @@ namespace Utilities
 
       // initiate the receive operations
       Number *temp_array_ptr = temporary_storage.data();
-      for (unsigned int i = 0; i < n_import_targets; i++)
+      for (unsigned int i = 0; i < n_import_targets; ++i)
         {
           AssertThrow(
             static_cast<std::size_t>(import_targets_data[i].second) *
@@ -342,7 +342,7 @@ namespace Utilities
       // move the data to send to the front of the array
       AssertIndexRange(n_ghost_indices(), n_ghost_indices_in_larger_set + 1);
       Number *ghost_array_ptr = ghost_array.data();
-      for (unsigned int i = 0; i < n_ghost_targets; i++)
+      for (unsigned int i = 0; i < n_ghost_targets; ++i)
         {
           // in case we only sent a subset of indices, we now need to move the
           // data to the correct positions and delete the old content
