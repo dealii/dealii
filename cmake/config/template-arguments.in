@@ -60,6 +60,8 @@ ALL_SCALAR_TYPES := {
 
 // scalar types that have a corresponding MPI datatype and that we can
 // therefore use in calls like MPI_Allreduce
+//
+// Since many of our MPI calls use std::vector we cannot include bool here
 MPI_SCALARS     := { int;
                      long int;
                      unsigned int;
