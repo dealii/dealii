@@ -101,9 +101,10 @@ MGTransferMatrixFree<dim, Number>::build(
 {
   Assert(dof_handler.has_level_dofs(),
          ExcMessage(
-           "The underlying DoFHandler object did not call "
-           "distribute_mg_dofs(). This is a prerequisite for multigrid "
-           "transfers."));
+           "The underlying DoFHandler object has not had its "
+           "distribute_mg_dofs() function called, but this is a prerequisite "
+           "for multigrid transfers. You will need to call this function, "
+           "probably close to where you already call distribute_dofs()."));
 
   this->fill_and_communicate_copy_indices(dof_handler);
 
