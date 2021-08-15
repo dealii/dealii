@@ -363,8 +363,7 @@ SUNDIALS::internal::unwrap_nvector(N_Vector v)
 {
   Assert(v != nullptr, ExcInternalError());
   Assert(v->content != nullptr, ExcInternalError());
-  NVectorContent<VectorType> *pContent =
-    reinterpret_cast<NVectorContent<VectorType> *>(v->content);
+  auto *pContent = reinterpret_cast<NVectorContent<VectorType> *>(v->content);
   return pContent->get();
 }
 
@@ -376,7 +375,7 @@ SUNDIALS::internal::unwrap_nvector_const(N_Vector v)
 {
   Assert(v != nullptr, ExcInternalError());
   Assert(v->content != nullptr, ExcInternalError());
-  const NVectorContent<VectorType> *pContent =
+  const auto *pContent =
     reinterpret_cast<const NVectorContent<VectorType> *>(v->content);
   return pContent->get();
 }
