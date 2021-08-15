@@ -158,7 +158,7 @@ public:
       matrix_free.initialize_dof_vector(diagonal_global_reference);
       matrix_free.initialize_dof_vector(temp);
 
-      for (unsigned int i = 0; i < src.size(); i++)
+      for (unsigned int i = 0; i < src.size(); ++i)
         {
           if (src.get_partitioner()->in_local_range(i))
             src[i] = 1.0;
@@ -173,7 +173,7 @@ public:
 
           if (test_matrix)
             {
-              for (unsigned int j = 0; j < src.size(); j++)
+              for (unsigned int j = 0; j < src.size(); ++j)
                 if (temp[j] != 0.0)
                   A_ref(j, i) = temp[j];
                 else if (i == j)
@@ -224,7 +224,7 @@ public:
                  Number,
                  VectorizedArrayType>
       phi(data, pair);
-    for (auto cell = pair.first; cell < pair.second; cell++)
+    for (auto cell = pair.first; cell < pair.second; ++cell)
       {
         phi.reinit(cell);
         phi.read_dof_values(src);

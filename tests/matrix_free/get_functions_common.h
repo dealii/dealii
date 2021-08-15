@@ -108,7 +108,7 @@ public:
             fe_val.get_function_gradients(src, reference_grads);
             fe_val.get_function_hessians(src, reference_hess);
 
-            for (int q = 0; q < (int)fe_eval.n_q_points; q++)
+            for (int q = 0; q < (int)fe_eval.n_q_points; ++q)
               {
                 errors[0] +=
                   std::fabs(fe_eval.get_value(q)[j] - reference_values[q]);

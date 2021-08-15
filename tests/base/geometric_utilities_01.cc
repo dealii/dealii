@@ -49,11 +49,11 @@ test()
   const Point<dim> origin;
 
   std::array<double, dim> sorigin;
-  for (unsigned int d = 0; d < dim; d++)
+  for (unsigned int d = 0; d < dim; ++d)
     sorigin[d] = 0.;
 
   Point<dim> one;
-  for (unsigned int d = 0; d < dim; d++)
+  for (unsigned int d = 0; d < dim; ++d)
     one[d] = 1.;
 
   std::array<double, dim> sone;

@@ -78,7 +78,7 @@ main(int argc, char *argv[])
 
   SE::map_basic_basic dict;
   std::vector<double> vals(v.size());
-  for (unsigned i = 0; i < v.size(); i++)
+  for (unsigned i = 0; i < v.size(); ++i)
     {
       dict[v[i]] = SE::real_double(i);
       vals[i]    = i;
@@ -90,7 +90,7 @@ main(int argc, char *argv[])
   // Standard substitution
 
   auto t1 = std::chrono::high_resolution_clock::now();
-  for (unsigned j = 0; j < n_runs; j++)
+  for (unsigned j = 0; j < n_runs; ++j)
     {
       res += SE::eval_double(*h->subs(dict));
     }
@@ -118,7 +118,7 @@ main(int argc, char *argv[])
     << " us" << std::endl;
 
   t1 = std::chrono::high_resolution_clock::now();
-  for (unsigned j = 0; j < n_runs; j++)
+  for (unsigned j = 0; j < n_runs; ++j)
     {
       res1 += l.call(vals);
     }
@@ -150,7 +150,7 @@ main(int argc, char *argv[])
     << " us" << std::endl;
 
   t1 = std::chrono::high_resolution_clock::now();
-  for (unsigned j = 0; j < n_runs; j++)
+  for (unsigned j = 0; j < n_runs; ++j)
     {
       res2 += l2.call(vals);
     }

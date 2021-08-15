@@ -38,8 +38,8 @@ test()
 
   // build the sparse matrix
   PETScWrappers::SparseMatrix matrix(N * N, N * N, 5);
-  for (unsigned int i = 0; i < N; i++)
-    for (unsigned int j = 0; j < N; j++)
+  for (unsigned int i = 0; i < N; ++i)
+    for (unsigned int j = 0; j < N; ++j)
       {
         const unsigned int global = i * N + j;
         matrix.add(global, global, 4);

@@ -95,7 +95,7 @@ SystemTest<dim>::shape_to_components()
   // (i.e. the first component of the FESystem)
   // 1 for yes, 0 for no.
 
-  for (unsigned int i = 0; i < fe.dofs_per_cell; i++)
+  for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
     deallog << "  shapefunction " << i
             << " is Nedelec:  " << (fe.is_primitive(i) ? "false" : "true")
             << std::endl;
@@ -115,7 +115,7 @@ SystemTest<dim>::check_numbering()
   for (; cell != endc; ++cell)
     {
       cell->get_dof_indices(local_dof_indices);
-      for (unsigned int i = 0; i < fe.dofs_per_cell; i++)
+      for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
         deallog << "  DoF " << local_dof_indices[i]
                 << " belongs to base element "
                 << fe.system_to_base_index(i).first.first << ", instance "
@@ -136,7 +136,7 @@ SystemTest<dim>::check_numbering()
   for (; cell != endc; ++cell)
     {
       cell->get_dof_indices(local_dof_indices);
-      for (unsigned int i = 0; i < fe.dofs_per_cell; i++)
+      for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
         deallog << "  DoF " << local_dof_indices[i] << " belongs to base "
                 << fe.system_to_base_index(i).first.first << ", instance "
                 << fe.system_to_base_index(i).first.second << std::endl;

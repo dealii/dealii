@@ -145,7 +145,7 @@ test(const unsigned int poly_degree = 1)
     mass_matrix.compress(VectorOperation::add);
   }
 
-  for (unsigned int i = 0; i < locally_owned_dofs.n_elements(); i++)
+  for (unsigned int i = 0; i < locally_owned_dofs.n_elements(); ++i)
     {
       double re = 0, im = 0;
       if (i % 2)

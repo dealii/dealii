@@ -101,10 +101,10 @@ test(const unsigned int n_refinements = 1)
     phi_p(matrix_free, false);
 
 
-  for (unsigned int i = 0; i < src.size() / 2; i++)
+  for (unsigned int i = 0; i < src.size() / 2; ++i)
     src[i] = 1;
 
-  for (unsigned int i = src.size() / 2; i < src.size(); i++)
+  for (unsigned int i = src.size() / 2; i < src.size(); ++i)
     src[i] = 2;
 
   dst = 0.0;
@@ -124,23 +124,23 @@ test(const unsigned int n_refinements = 1)
 
               phi_m.read_dof_values(src);
 
-              for (unsigned int i = 0; i < phi_m.static_dofs_per_component; i++)
+              for (unsigned int i = 0; i < phi_m.static_dofs_per_component; ++i)
                 deallog << static_cast<int>(phi_m.begin_dof_values()[i][0])
                         << " ";
               deallog << std::endl;
               phi_m.gather_evaluate(src, EvaluationFlags::values);
-              for (unsigned int i = 0; i < phi_m.static_n_q_points; i++)
+              for (unsigned int i = 0; i < phi_m.static_n_q_points; ++i)
                 deallog << static_cast<int>(phi_m.begin_values()[i][0]) << " ";
               deallog << std::endl;
 
               phi_p.read_dof_values(src);
-              for (unsigned int i = 0; i < phi_p.static_dofs_per_component; i++)
+              for (unsigned int i = 0; i < phi_p.static_dofs_per_component; ++i)
                 deallog << static_cast<int>(phi_p.begin_dof_values()[i][0])
                         << " ";
               deallog << std::endl;
 
               phi_p.gather_evaluate(src, EvaluationFlags::values);
-              for (unsigned int i = 0; i < phi_p.static_n_q_points; i++)
+              for (unsigned int i = 0; i < phi_p.static_n_q_points; ++i)
                 deallog << static_cast<int>(phi_p.begin_values()[i][0]) << " ";
               deallog << std::endl << std::endl;
             }

@@ -31,7 +31,7 @@ do_test(const VectorizedArrayType                      array,
 {
   deallog << "  test " << VectorizedArrayType::size() << " array elements"
           << std::endl;
-  for (unsigned int i = 0; i < VectorizedArrayType::size(); i++)
+  for (unsigned int i = 0; i < VectorizedArrayType::size(); ++i)
     if (array[i] != number)
       deallog << "  problem in element " << i << std::endl;
 }

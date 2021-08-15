@@ -145,7 +145,7 @@ private:
                                 VectorizedArrayType>::value_type;
     const int actual_degree = data.get_dof_handler().get_fe().degree;
 
-    for (unsigned int face = face_range.first; face < face_range.second; face++)
+    for (unsigned int face = face_range.first; face < face_range.second; ++face)
       {
         fe_eval.reinit(face);
         fe_eval_neighbor.reinit(face);
@@ -210,7 +210,7 @@ private:
                                 number,
                                 VectorizedArrayType>::value_type;
     const int actual_degree = data.get_dof_handler().get_fe().degree;
-    for (unsigned int face = face_range.first; face < face_range.second; face++)
+    for (unsigned int face = face_range.first; face < face_range.second; ++face)
       {
         fe_eval.reinit(face);
         fe_eval.read_dof_values(src);
@@ -349,7 +349,7 @@ private:
                                 VectorizedArrayType>::value_type;
     const int actual_degree = data.get_dof_handler().get_fe().degree;
 
-    for (unsigned int face = face_range.first; face < face_range.second; face++)
+    for (unsigned int face = face_range.first; face < face_range.second; ++face)
       {
         fe_eval.reinit(face);
         fe_eval_neighbor.reinit(face);
@@ -416,7 +416,7 @@ private:
                                 number,
                                 VectorizedArrayType>::value_type;
     const int actual_degree = data.get_dof_handler().get_fe().degree;
-    for (unsigned int face = face_range.first; face < face_range.second; face++)
+    for (unsigned int face = face_range.first; face < face_range.second; ++face)
       {
         fe_eval.reinit(face);
         fe_eval.gather_evaluate(src,
@@ -586,7 +586,7 @@ private:
                                 number,
                                 VectorizedArrayType>::value_type;
 
-    for (unsigned int face = face_range.first; face < face_range.second; face++)
+    for (unsigned int face = face_range.first; face < face_range.second; ++face)
       {
         phi_m.reinit(face);
         phi_m.gather_evaluate(src, EvaluationFlags::values);
@@ -636,7 +636,7 @@ private:
     value_type u_plus;
     u_plus = make_vectorized_array<number, VectorizedArrayType::size()>(1.3);
 
-    for (unsigned int face = face_range.first; face < face_range.second; face++)
+    for (unsigned int face = face_range.first; face < face_range.second; ++face)
       {
         fe_eval.reinit(face);
         fe_eval.gather_evaluate(src, EvaluationFlags::values);

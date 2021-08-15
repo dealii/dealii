@@ -70,7 +70,7 @@ test()
   const std::vector<types::global_dof_index> dofs_per_component_hp =
     DoFTools::count_dofs_per_fe_component(hp_dof_handler);
 
-  for (unsigned int i = 0; i < 3; i++)
+  for (unsigned int i = 0; i < 3; ++i)
     {
       deallog << "DoFs in the " << i
               << ". component: " << dofs_per_component_hp.at(i) << std::endl;

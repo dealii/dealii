@@ -114,7 +114,7 @@ test(const bool apply_constrains, const unsigned int hp)
   if (apply_constrains)
     deallog << hp_string << std::endl;
 
-  for (unsigned int i = 0; i < n_dofs; i++)
+  for (unsigned int i = 0; i < n_dofs; ++i)
     {
       v    = 0.;
       v[i] = 1.;

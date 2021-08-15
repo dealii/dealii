@@ -44,7 +44,7 @@ find_and_print_roots(
   RootFinder          root_finder;
   root_finder.find_roots(functions, interval, roots);
 
-  for (unsigned int i = 0; i < roots.size(); i++)
+  for (unsigned int i = 0; i < roots.size(); ++i)
     {
       deallog << roots[i];
       if (i < roots.size() - 1)

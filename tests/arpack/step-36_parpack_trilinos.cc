@@ -103,7 +103,7 @@ locally_owned_dofs_per_subdomain(const DoFHandler<dim> &dof_handler)
       index_sets[this_subdomain].add_range(i_min, subdomain_association.size());
     }
 
-  for (unsigned int i = 0; i < n_subdomains; i++)
+  for (unsigned int i = 0; i < n_subdomains; ++i)
     index_sets[i].compress();
 
   return index_sets;
@@ -183,7 +183,7 @@ test()
                                   constraints,
                                   /* keep constrained dofs */ true);
   std::vector<types::global_dof_index> n_locally_owned_dofs(n_mpi_processes);
-  for (unsigned int i = 0; i < n_mpi_processes; i++)
+  for (unsigned int i = 0; i < n_mpi_processes; ++i)
     n_locally_owned_dofs[i] = locally_owned_dofs_per_processor[i].n_elements();
 
   SparsityTools::distribute_sparsity_pattern(csp,
@@ -270,7 +270,7 @@ test()
     const double                      shift = 4.0;
     std::vector<std::complex<double>> lambda(eigenfunctions.size());
 
-    for (unsigned int i = 0; i < eigenvalues.size(); i++)
+    for (unsigned int i = 0; i < eigenvalues.size(); ++i)
       eigenfunctions[i] = 0.;
 
     static ReductionControl inner_control_c(/*maxiter*/ stiffness_matrix.m(),
@@ -318,10 +318,10 @@ test()
                       eigenvalues.size());
     deallog.depth_file(previous_depth);
 
-    for (unsigned int i = 0; i < lambda.size(); i++)
+    for (unsigned int i = 0; i < lambda.size(); ++i)
       eigenvalues[i] = lambda[i].real();
 
-    for (unsigned int i = 0; i < eigenvalues.size(); i++)
+    for (unsigned int i = 0; i < eigenvalues.size(); ++i)
       deallog << eigenvalues[i] << std::endl;
 
     // make sure that we have eigenvectors and they are mass-orthonormal:
@@ -335,7 +335,7 @@ test()
         {
           mass_matrix.vmult(Bx, eigenfunctions[i]);
 
-          for (unsigned int j = 0; j < eigenfunctions.size(); j++)
+          for (unsigned int j = 0; j < eigenfunctions.size(); ++j)
             Assert(std::abs(eigenfunctions[j] * Bx - (i == j)) < precision,
                    ExcMessage("Eigenvectors " + Utilities::int_to_string(i) +
                               " and " + Utilities::int_to_string(j) +

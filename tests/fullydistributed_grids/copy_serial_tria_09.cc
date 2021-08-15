@@ -46,12 +46,12 @@ test(int                                              n_refinements,
   GridGenerator::hyper_cube(basetria);
   basetria.refine_global(1);
 
-  for (int i = 1; i < n_refinements; i++)
+  for (int i = 1; i < n_refinements; ++i)
     {
       for (auto &cell : basetria.active_cell_iterators())
         {
           bool refinement_flag = true;
-          for (int d = 0; d < dim; d++)
+          for (int d = 0; d < dim; ++d)
             refinement_flag &= cell->center()[d] < 0.5;
 
           if (refinement_flag)
@@ -80,7 +80,7 @@ test(int                                              n_refinements,
     {
       CellId id        = cell->id();
       auto   cell_base = basetria.create_cell_iterator(id);
-      for (unsigned int d = 0; d < dim; d++)
+      for (unsigned int d = 0; d < dim; ++d)
         Assert(std::abs(cell->center()[d] - cell_base->center()[d]) < 1e-9,
                ExcMessage("Cells do not match"));
     }

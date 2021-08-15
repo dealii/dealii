@@ -60,8 +60,8 @@ public:
     Assert(r > 0.0, ExcMessage("r is not positive"));
     dir /= r;
     SymmetricTensor<2, dim> dir_x_dir;
-    for (unsigned int i = 0; i < dim; i++)
-      for (unsigned int j = i; j < dim; j++)
+    for (unsigned int i = 0; i < dim; ++i)
+      for (unsigned int j = i; j < dim; ++j)
         dir_x_dir[i][j] = dir[i] * dir[j];
 
     return Z * std::exp(-Z * r) *
@@ -96,7 +96,7 @@ private:
   {
     std::array<double, dim> res;
     res[0] = -Z * std::exp(-Z * sp[0]);
-    for (unsigned int i = 1; i < dim; i++)
+    for (unsigned int i = 1; i < dim; ++i)
       res[i] = 0.;
     return res;
   }
@@ -106,7 +106,7 @@ private:
   {
     std::array<double, 6> res;
     res[0] = Z * Z * std::exp(-Z * sp[0]);
-    for (unsigned int i = 1; i < 6; i++)
+    for (unsigned int i = 1; i < 6; ++i)
       res[i] = 0.;
     return res;
   }
@@ -136,7 +136,7 @@ check()
           sp[1]        = theta;
           sp[2]        = phi;
           Point<dim> p = GeometricUtilities::Coordinates::from_spherical(sp);
-          for (unsigned int i = 0; i < dim; i++)
+          for (unsigned int i = 0; i < dim; ++i)
             p[i] += center[i];
 
           // check values:

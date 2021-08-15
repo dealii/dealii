@@ -617,10 +617,10 @@ namespace Step22
   StokesProblem<2>::check_periodicity(const unsigned int cycle) const
   {
     unsigned int n_points = 4;
-    for (unsigned int i = 0; i < cycle; i++)
+    for (unsigned int i = 0; i < cycle; ++i)
       n_points *= 2;
 
-    for (unsigned int i = 1; i < n_points; i++)
+    for (unsigned int i = 1; i < n_points; ++i)
       {
         Vector<double> value1(3);
         Vector<double> value2(3);

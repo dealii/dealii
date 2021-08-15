@@ -70,7 +70,7 @@ private:
   {
     FEFaceEvaluation<dim, fe_degree, fe_degree + 1, 1, number> fe_eval(data,
                                                                        true);
-    for (unsigned int face = face_range.first; face < face_range.second; face++)
+    for (unsigned int face = face_range.first; face < face_range.second; ++face)
       {
         fe_eval.reinit(face);
         fe_eval.read_dof_values(src);

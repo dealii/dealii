@@ -98,7 +98,7 @@ check()
   dealii::DoFRenumbering::component_wise(dofhandler);
   deallog << "Finished fine lvl renumbering" << std::endl;
 
-  for (unsigned int lvl = 0; lvl < tria.n_global_levels(); lvl++)
+  for (unsigned int lvl = 0; lvl < tria.n_global_levels(); ++lvl)
     {
       dealii::DoFRenumbering::component_wise(dofhandler, lvl);
       deallog << "Finished renumbering on lvl " << lvl << std::endl;

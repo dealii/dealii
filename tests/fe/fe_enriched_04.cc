@@ -155,7 +155,7 @@ plot_shape_function()
 
   std::vector<Vector<double>> shape_functions(dof_handler.n_dofs());
   std::vector<std::string>    names;
-  for (unsigned int s = 0; s < shape_functions.size(); s++)
+  for (unsigned int s = 0; s < shape_functions.size(); ++s)
     {
       names.push_back(std::string("N_") + dealii::Utilities::int_to_string(s));
 
@@ -175,7 +175,7 @@ plot_shape_function()
   DataOut<dim> data_out;
   data_out.attach_dof_handler(dof_handler);
 
-  for (unsigned int i = 0; i < shape_functions.size(); i++)
+  for (unsigned int i = 0; i < shape_functions.size(); ++i)
     {
       data_out.add_data_vector(shape_functions[i], names[i]);
     }

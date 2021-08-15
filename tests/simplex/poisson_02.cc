@@ -564,7 +564,7 @@ DGHeat<dim>::calculateL2Error()
 
       cell->get_dof_indices(local_dof_indices);
 
-      for (unsigned int q = 0; q < n_q_points; q++)
+      for (unsigned int q = 0; q < n_q_points; ++q)
         {
           const double u_exact =
             dim == 2 ? -std::sin(M_PI * fe_values.quadrature_point(q)[0]) *
@@ -577,7 +577,7 @@ DGHeat<dim>::calculateL2Error()
 
           // Find the values of x and u_h (the finite element solution) at the
           // quadrature points
-          for (unsigned int i = 0; i < dofs_per_cell; i++)
+          for (unsigned int i = 0; i < dofs_per_cell; ++i)
             {
               u_sim +=
                 fe_values.shape_value(i, q) * solution[local_dof_indices[i]];

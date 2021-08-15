@@ -301,7 +301,7 @@ print_matching(DoFHandler<dim, spacedim> &dof_handler,
 
   // Print out all DoF support points on the two faces:
   deallog << "DoFs of face_1:";
-  for (unsigned int c = 0; c < fe.n_components(); c++)
+  for (unsigned int c = 0; c < fe.n_components(); ++c)
     {
       deallog << std::endl << " component " << c << ":";
       for (unsigned int i = 0; i < fe.dofs_per_face; ++i)
@@ -313,7 +313,7 @@ print_matching(DoFHandler<dim, spacedim> &dof_handler,
     }
   deallog << std::endl;
   deallog << "DoFs of face_2:";
-  for (unsigned int c = 0; c < fe.n_components(); c++)
+  for (unsigned int c = 0; c < fe.n_components(); ++c)
     {
       deallog << std::endl << " component " << c << ":";
       for (unsigned int i = 0; i < fe.dofs_per_face; ++i)

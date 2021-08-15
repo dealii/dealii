@@ -104,9 +104,9 @@ template <typename SP>
 inline void
 FDMatrix::five_point_structure(SP &structure) const
 {
-  for (unsigned int i = 0; i <= ny - 2; i++)
+  for (unsigned int i = 0; i <= ny - 2; ++i)
     {
-      for (unsigned int j = 0; j <= nx - 2; j++)
+      for (unsigned int j = 0; j <= nx - 2; ++j)
         {
           // Number of the row to be entered
           unsigned int row = j + (nx - 1) * i;
@@ -141,9 +141,9 @@ template <typename SP>
 inline void
 FDMatrix::nine_point_structure(SP &structure) const
 {
-  for (unsigned int i = 0; i <= ny - 2; i++)
+  for (unsigned int i = 0; i <= ny - 2; ++i)
     {
-      for (unsigned int j = 0; j <= nx - 2; j++)
+      for (unsigned int j = 0; j <= nx - 2; ++j)
         {
           // Number of the row to be entered
           unsigned int row = j + (nx - 1) * i;
@@ -198,9 +198,9 @@ template <typename MatrixType>
 void
 FDMatrix::nine_point(MatrixType &A, bool) const
 {
-  for (unsigned int i = 0; i <= ny - 2; i++)
+  for (unsigned int i = 0; i <= ny - 2; ++i)
     {
-      for (unsigned int j = 0; j <= nx - 2; j++)
+      for (unsigned int j = 0; j <= nx - 2; ++j)
         {
           // Number of the row to be entered
           unsigned int row = j + (nx - 1) * i;
@@ -254,9 +254,9 @@ template <typename MatrixType>
 inline void
 FDMatrix::five_point(MatrixType &A, bool nonsymmetric) const
 {
-  for (unsigned int i = 0; i <= ny - 2; i++)
+  for (unsigned int i = 0; i <= ny - 2; ++i)
     {
-      for (unsigned int j = 0; j <= nx - 2; j++)
+      for (unsigned int j = 0; j <= nx - 2; ++j)
         {
           // Number of the row to be entered
           unsigned int row = j + (nx - 1) * i;
@@ -297,9 +297,9 @@ template <typename MatrixType>
 inline void
 FDMatrix::upwind(MatrixType &A, bool back) const
 {
-  for (unsigned int i = 0; i <= ny - 2; i++)
+  for (unsigned int i = 0; i <= ny - 2; ++i)
     {
-      for (unsigned int j = 0; j <= nx - 2; j++)
+      for (unsigned int j = 0; j <= nx - 2; ++j)
         {
           // Number of the row to be entered
           unsigned int row = j + (nx - 1) * i;
@@ -318,9 +318,9 @@ template <typename number>
 inline void
 FDMatrix::gnuplot_print(std::ostream &s, const Vector<number> &V) const
 {
-  for (unsigned int i = 0; i <= ny - 2; i++)
+  for (unsigned int i = 0; i <= ny - 2; ++i)
     {
-      for (unsigned int j = 0; j <= nx - 2; j++)
+      for (unsigned int j = 0; j <= nx - 2; ++j)
         {
           // Number of the row to be entered
           unsigned int row = j + (nx - 1) * i;

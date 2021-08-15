@@ -231,10 +231,10 @@ test()
     eigensolver.solve(OP, mass, OP, lambda, eigenfunctions, eigenvalues.size());
     deallog.depth_file(previous_depth);
 
-    for (unsigned int i = 0; i < lambda.size(); i++)
+    for (unsigned int i = 0; i < lambda.size(); ++i)
       eigenvalues[i] = lambda[i].real();
 
-    for (unsigned int i = 0; i < eigenvalues.size(); i++)
+    for (unsigned int i = 0; i < eigenvalues.size(); ++i)
       deallog << eigenvalues[i] << std::endl;
 
     // make sure that we have eigenvectors and they are mass-orthonormal:
@@ -245,7 +245,7 @@ test()
       LinearAlgebra::distributed::Vector<double> Ax(eigenfunctions[0]);
       for (unsigned int i = 0; i < eigenfunctions.size(); ++i)
         {
-          for (unsigned int j = 0; j < eigenfunctions.size(); j++)
+          for (unsigned int j = 0; j < eigenfunctions.size(); ++j)
             {
               const double err =
                 std::abs(eigenfunctions[j] * eigenfunctions[i] - (i == j));

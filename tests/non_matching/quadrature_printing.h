@@ -34,7 +34,7 @@ print_quadrature(const Quadrature<dim> &quadrature)
   for (unsigned int i = 0; i < quadrature.size(); ++i)
     {
       const Point<dim> &point = quadrature.point(i);
-      for (int d = 0; d < dim; d++)
+      for (int d = 0; d < dim; ++d)
         deallog << point[d] << ", ";
 
       deallog << quadrature.weight(i) << std::endl;
@@ -55,13 +55,13 @@ print_surface_quadrature(
   for (unsigned int i = 0; i < quadrature.size(); ++i)
     {
       const Point<dim> &point = quadrature.point(i);
-      for (int d = 0; d < dim; d++)
+      for (int d = 0; d < dim; ++d)
         deallog << point[d] << ", ";
 
       deallog << quadrature.weight(i);
 
       const Tensor<1, spacedim> &normal = quadrature.normal_vector(i);
-      for (int d = 0; d < spacedim; d++)
+      for (int d = 0; d < spacedim; ++d)
         deallog << ", " << normal[d];
       deallog << std::endl;
     }

@@ -39,7 +39,7 @@ check(Triangulation<2> &tria)
   MappingQ<2> map(5);
 
   // Test for a number of points, every ten degrees
-  for (unsigned int i = 0; i < 200; i++)
+  for (unsigned int i = 0; i < 200; ++i)
     {
       Point<2> p(std::sin((double)i / 100. * numbers::PI),
                  std::cos((double)i / 100. * numbers::PI));

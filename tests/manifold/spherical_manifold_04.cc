@@ -49,7 +49,7 @@ test(const double R)
 
   // derived
   Point<dim> center;
-  for (unsigned int d = 0; d < dim; d++)
+  for (unsigned int d = 0; d < dim; ++d)
     center[d] = d;
 
   Triangulation<dim> triangulation;

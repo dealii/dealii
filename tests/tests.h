@@ -197,7 +197,7 @@ namespace Testing
         r[0]          = (seed == 0) ? 1 : seed;
         long int word = r[0];
 
-        for (int i = 1; i < 31; i++)
+        for (int i = 1; i < 31; ++i)
           {
             // This does:
             //   r[i] = (16807 * r[i-1]) % 2147483647;
@@ -210,13 +210,13 @@ namespace Testing
             r[i] = word;
           }
         k = 31;
-        for (int i = 31; i < 34; i++)
+        for (int i = 31; i < 34; ++i)
           {
             r[k % 32] = r[(k + 32 - 31) % 32];
             k         = (k + 1) % 32;
           }
 
-        for (int i = 34; i < 344; i++)
+        for (int i = 34; i < 344; ++i)
           {
             r[k % 32] =
               nonoverflow_add(r[(k + 32 - 31) % 32], r[(k + 32 - 3) % 32]);

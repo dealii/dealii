@@ -101,7 +101,7 @@ Postprocess<dim>::evaluate_scalar_field(
          ExcDimensionMismatch(computed_quantities.size(),
                               inputs.solution_values.size()));
 
-  for (unsigned int i = 0; i < computed_quantities.size(); i++)
+  for (unsigned int i = 0; i < computed_quantities.size(); ++i)
     {
       Assert(computed_quantities[i].size() == 2,
              ExcDimensionMismatch(computed_quantities[i].size(), 2));
@@ -195,7 +195,7 @@ TestPointValueHistory<dim>::run()
         cell->get_dof_indices(local_dof_indices);
         dof_locations = fe_values.get_quadrature_points();
 
-        for (unsigned int dof = 0; dof != finite_element.dofs_per_cell; dof++)
+        for (unsigned int dof = 0; dof != finite_element.dofs_per_cell; ++dof)
           {
             unsigned int dof_component =
               finite_element.system_to_component_index(dof).first;

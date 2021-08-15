@@ -25,7 +25,7 @@ void
 test()
 {
   dealii::TableIndices<dim> new_size;
-  for (unsigned int d = 0; d < dim; d++)
+  for (unsigned int d = 0; d < dim; ++d)
     new_size[d] = 5;
 
   dealii::Table<dim, int> unrolled;

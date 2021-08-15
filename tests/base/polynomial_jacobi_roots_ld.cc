@@ -43,7 +43,7 @@ main()
         AssertDimension(roots.size(), degree);
         Vector<double>           roots_reference(degree);
         LAPACKFullMatrix<double> eigenvalue_mat(degree, degree);
-        for (unsigned int k = 1; k < degree; k++)
+        for (unsigned int k = 1; k < degree; ++k)
           {
             eigenvalue_mat(k - 1, k) = std::sqrt(
               4. * k * (k + alpha) * (k + beta) * (k + alpha + beta) /

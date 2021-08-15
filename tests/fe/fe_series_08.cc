@@ -33,7 +33,7 @@ test()
   std::vector<double> x(N), y(N);
 
   // fill the data
-  for (unsigned int i = 0; i < N; i++)
+  for (unsigned int i = 0; i < N; ++i)
     {
       x[i] = 0.1 * i;
       y[i] = k_in * x[i] + b_in;

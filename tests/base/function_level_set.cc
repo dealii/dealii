@@ -71,7 +71,7 @@ namespace
     const Functions::LevelSet::Plane<dim> level_set(point_in_plane, normal);
 
     Point<dim> point;
-    for (unsigned int i = 0; i < dim; i++)
+    for (unsigned int i = 0; i < dim; ++i)
       point[i] = 1;
 
     print_derivatives_at_point(level_set, point);

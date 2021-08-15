@@ -51,7 +51,7 @@ check_solve(SolverType &              solver,
       solver.set_problem_type(EPS_HEP);
       // reset vectors and set them as initial space
       // to avoid dependency on random numbers:
-      for (unsigned int i = 0; i < u.size(); i++)
+      for (unsigned int i = 0; i < u.size(); ++i)
         for (unsigned int j = 0; j < u[i].size(); ++j)
           u[i][j] = random_value<double>();
 
@@ -108,7 +108,7 @@ check_solve(SolverType &              solver,
     }
 
   deallog << "Eigenvalues:";
-  for (unsigned int i = 0; i < v.size(); i++)
+  for (unsigned int i = 0; i < v.size(); ++i)
     {
       deallog << " " << v[i];
       if (i != (v.size() - 1))

@@ -82,9 +82,9 @@ template <typename SP>
 inline void
 FDDiagMatrix::diag_structure(SP &structure) const
 {
-  for (unsigned int i = 0; i <= ny - 2; i++)
+  for (unsigned int i = 0; i <= ny - 2; ++i)
     {
-      for (unsigned int j = 0; j <= nx - 2; j++)
+      for (unsigned int j = 0; j <= nx - 2; ++j)
         {
           // Number of the row to be entered
           unsigned int row = j + (nx - 1) * i;
@@ -98,9 +98,9 @@ template <typename MatrixType>
 inline void
 FDDiagMatrix::diag(MatrixType &A) const
 {
-  for (unsigned int i = 0; i <= ny - 2; i++)
+  for (unsigned int i = 0; i <= ny - 2; ++i)
     {
-      for (unsigned int j = 0; j <= nx - 2; j++)
+      for (unsigned int j = 0; j <= nx - 2; ++j)
         {
           // Number of the row to be entered
           unsigned int row = j + (nx - 1) * i;
@@ -113,9 +113,9 @@ template <typename number>
 inline void
 FDDiagMatrix::gnuplot_print(std::ostream &s, const Vector<number> &V) const
 {
-  for (unsigned int i = 0; i <= ny - 2; i++)
+  for (unsigned int i = 0; i <= ny - 2; ++i)
     {
-      for (unsigned int j = 0; j <= nx - 2; j++)
+      for (unsigned int j = 0; j <= nx - 2; ++j)
         {
           // Number of the row to be entered
           unsigned int row = j + (nx - 1) * i;
@@ -174,7 +174,7 @@ template <typename SP>
 inline void
 FD1DLaplaceMatrix::three_point_structure(SP &structure) const
 {
-  for (unsigned int i = 0; i <= n - 2; i++)
+  for (unsigned int i = 0; i <= n - 2; ++i)
     {
       structure.add(i, i);
       if (i > 0)
@@ -189,7 +189,7 @@ template <typename MatrixType>
 inline void
 FD1DLaplaceMatrix::three_point(MatrixType &A) const
 {
-  for (unsigned int i = 0; i <= n - 2; i++)
+  for (unsigned int i = 0; i <= n - 2; ++i)
     {
       A.set(i, i, 2.0);
       if (i > 0)

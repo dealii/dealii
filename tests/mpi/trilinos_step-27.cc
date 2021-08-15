@@ -158,7 +158,7 @@ namespace Step27
   resize(Table<dim, T> &coeff, const unsigned int N)
   {
     TableIndices<dim> size;
-    for (unsigned int d = 0; d < dim; d++)
+    for (unsigned int d = 0; d < dim; ++d)
       size[d] = N;
     coeff.reinit(size);
   }
@@ -183,7 +183,7 @@ namespace Step27
 
     QGauss<1>      base_quadrature(2);
     QIterated<dim> quadrature(base_quadrature, max_degree);
-    for (unsigned int i = 0; i < fe_collection.size(); i++)
+    for (unsigned int i = 0; i < fe_collection.size(); ++i)
       fourier_q_collection.push_back(quadrature);
 
     const std::vector<unsigned int> n_coefficients_per_direction(

@@ -34,7 +34,7 @@ void
 check(const FiniteElement<dim> &fe)
 {
   for (const unsigned int face : GeometryInfo<dim>::face_indices())
-    for (unsigned int i = 0; i < fe.dofs_per_cell; i++)
+    for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
       if (fe.has_support_on_face(i, face))
         deallog << "Basis function " << i << " has support on face " << face
                 << std::endl;

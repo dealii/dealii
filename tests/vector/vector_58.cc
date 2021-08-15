@@ -28,7 +28,7 @@ void
 fill(Vector<Number> &v)
 {
   v = 0;
-  for (unsigned int i = 0; i < v.size(); i++)
+  for (unsigned int i = 0; i < v.size(); ++i)
     v(i) = counter + i * 2;
 
   ++counter;

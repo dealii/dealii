@@ -67,10 +67,10 @@ test()
 
   std::vector<Point<dim>> points;
 
-  for (int i = 0; i < 2; i++)
-    for (int j = 0; j < 2; j++)
+  for (int i = 0; i < 2; ++i)
+    for (int j = 0; j < 2; ++j)
       if (dim == 3)
-        for (int k = 0; k < 2; k++)
+        for (int k = 0; k < 2; ++k)
           points.push_back(
             Point<dim>(.25 + .5 * i, .25 + .5 * j, .25 + .5 * k));
       else
@@ -82,7 +82,7 @@ test()
 
   Vector<double> value(1);
 
-  for (; point_iterator != points_end; point_iterator++)
+  for (; point_iterator != points_end; ++point_iterator)
     {
       try
         {

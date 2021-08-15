@@ -131,7 +131,7 @@ private:
     FEFaceEvaluation<dim, fe_degree, n_q_points_1d, 1, number> phi_outer(data,
                                                                          false);
 
-    for (unsigned int face = face_range.first; face < face_range.second; face++)
+    for (unsigned int face = face_range.first; face < face_range.second; ++face)
       {
         phi.reinit(face);
         phi_outer.reinit(face);
@@ -223,7 +223,7 @@ private:
   {
     FEFaceEvaluation<dim, fe_degree, n_q_points_1d, 1, number> phi(data);
 
-    for (unsigned int face = face_range.first; face < face_range.second; face++)
+    for (unsigned int face = face_range.first; face < face_range.second; ++face)
       {
         phi.reinit(face);
 

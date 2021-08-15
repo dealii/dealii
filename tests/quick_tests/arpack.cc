@@ -97,7 +97,7 @@ test()
       {
         B.vmult(Bx, eigenvectors[i]);
 
-        for (unsigned int j = 0; j < eigenvectors.size(); j++)
+        for (unsigned int j = 0; j < eigenvectors.size(); ++j)
           Assert(std::abs(eigenvectors[j] * Bx - (i == j)) < precision,
                  ExcMessage("Eigenvectors " + Utilities::int_to_string(i) +
                             " and " + Utilities::int_to_string(j) +

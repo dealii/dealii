@@ -158,7 +158,7 @@ test_compute_pt_loc(unsigned int ref_cube, unsigned int ref_sphere)
     }
 
   unsigned int output_computed_pts = 0;
-  for (unsigned int c = 0; c < output_cells.size(); c++)
+  for (unsigned int c = 0; c < output_cells.size(); ++c)
     {
       output_computed_pts += output_points[c].size();
       const auto &cell = output_cells[c];

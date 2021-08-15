@@ -126,7 +126,7 @@ Problem4<dim>::Problem4(const Function<dim> &force_function,
                  n_cycles,
                  output_name)
 {
-  for (unsigned int p = 1; p <= n_cycles; p++)
+  for (unsigned int p = 1; p <= n_cycles; ++p)
     {
       // Laplace<dim>::fe.push_back(FE_Q_Hierarchical<dim>(p));
       Laplace<dim>::fe.push_back(FE_Q<dim>(p));

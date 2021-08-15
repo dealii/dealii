@@ -69,7 +69,7 @@ ComputeMagnitude<dim>::evaluate_vector_field(
          ExcDimensionMismatch(computed_quantities.size(),
                               inputs.solution_values.size()));
 
-  for (unsigned int i = 0; i < computed_quantities.size(); i++)
+  for (unsigned int i = 0; i < computed_quantities.size(); ++i)
     {
       Assert(computed_quantities[i].size() == 1,
              ExcDimensionMismatch(computed_quantities[i].size(), 1));

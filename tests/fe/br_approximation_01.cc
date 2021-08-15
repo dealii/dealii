@@ -100,7 +100,7 @@ TestMap1<dim>::vector_value(const Point<dim> &p,
   Assert(return_value.size() == this->n_components,
          ExcDimensionMismatch(return_value.size(), this->n_components));
 
-  for (unsigned int iCount = 0; iCount < this->n_components; iCount++)
+  for (unsigned int iCount = 0; iCount < this->n_components; ++iCount)
     return_value(iCount) = value(p, iCount);
 }
 
@@ -156,7 +156,7 @@ TestDef1<dim>::vector_value(const Point<dim> &p,
 {
   Assert(return_value.size() == this->n_components,
          ExcDimensionMismatch(return_value.size(), this->n_components));
-  for (unsigned int iCount = 0; iCount < this->n_components; iCount++)
+  for (unsigned int iCount = 0; iCount < this->n_components; ++iCount)
     return_value(iCount) = value(p, iCount);
 }
 
@@ -207,7 +207,7 @@ TestDef2<dim>::vector_value(const Point<dim> &p,
 {
   Assert(return_value.size() == this->n_components,
          ExcDimensionMismatch(return_value.size(), this->n_components));
-  for (unsigned int iCount = 0; iCount < this->n_components; iCount++)
+  for (unsigned int iCount = 0; iCount < this->n_components; ++iCount)
     return_value(iCount) = value(p, iCount);
 }
 
@@ -259,7 +259,7 @@ TestDef3<dim>::vector_value(const Point<dim> &p,
 {
   Assert(return_value.size() == this->n_components,
          ExcDimensionMismatch(return_value.size(), this->n_components));
-  for (unsigned int iCount = 0; iCount < this->n_components; iCount++)
+  for (unsigned int iCount = 0; iCount < this->n_components; ++iCount)
     return_value(iCount) = value(p, iCount);
 }
 
@@ -316,7 +316,7 @@ TestPoly<dim>::vector_value(const Point<dim> &p,
 {
   Assert(return_value.size() == this->n_components,
          ExcDimensionMismatch(return_value.size(), this->n_components));
-  for (unsigned int iCount = 0; iCount < this->n_components; iCount++)
+  for (unsigned int iCount = 0; iCount < this->n_components; ++iCount)
     return_value(iCount) = value(p, iCount);
 }
 

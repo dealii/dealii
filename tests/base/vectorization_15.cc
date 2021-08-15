@@ -39,7 +39,7 @@ do_test()
     offsets[v] = v * n_numbers;
 
   std::array<Number *, width> other_and_offset;
-  for (unsigned int v = 0; v < width; v++)
+  for (unsigned int v = 0; v < width; ++v)
     other_and_offset[v] = other + offsets[v];
 
   for (unsigned int i = 0; i < n_vectors; ++i)

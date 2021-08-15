@@ -278,7 +278,7 @@ MaxwellProblem<dim>::dotprod(const Tensor<1, dim> &A,
                              const Tensor<1, dim> &B) const
 {
   double return_val = 0;
-  for (unsigned int k = 0; k < dim; k++)
+  for (unsigned int k = 0; k < dim; ++k)
     {
       return_val += A[k] * B[k];
     }
@@ -291,7 +291,7 @@ MaxwellProblem<dim>::dotprod(const Tensor<1, dim> &A,
                              const Vector<double> &B) const
 {
   double return_val = 0;
-  for (unsigned int k = 0; k < dim; k++)
+  for (unsigned int k = 0; k < dim; ++k)
     {
       return_val += A[k] * B(k);
     }

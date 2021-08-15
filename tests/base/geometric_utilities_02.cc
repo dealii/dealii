@@ -49,7 +49,7 @@ test()
           Point<dim> p = GeometricUtilities::Coordinates::from_spherical(sp);
           const std::array<double, dim> sp2 =
             GeometricUtilities::Coordinates::to_spherical(p);
-          for (unsigned int i = 0; i < dim; i++)
+          for (unsigned int i = 0; i < dim; ++i)
             AssertThrow(std::fabs(sp[i] - sp2[i]) <= std::fabs(sp[i]) * 1e-10,
                         DifferentComponent(i, sp[i], sp2[i]));
         }

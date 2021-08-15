@@ -136,7 +136,7 @@ main()
 
   std::vector<unsigned int> block_component(total_dim, 0);
 
-  for (unsigned int comp = 0; comp < total_dim; comp++)
+  for (unsigned int comp = 0; comp < total_dim; ++comp)
     {
       if (comp < solid_dim)
         block_component[comp] = 0;
@@ -320,12 +320,12 @@ main()
 
   // prints out which dofs are coupled
   deallog << "---------------Coupled dofs---------------" << std::endl;
-  for (unsigned int i = 0; i < solid_fluid_pairs.size(); i++)
+  for (unsigned int i = 0; i < solid_fluid_pairs.size(); ++i)
     {
       deallog << "solid dof: " << solid_fluid_pairs[i].first
               << ", fluid dof: " << solid_fluid_pairs[i].second << std::endl;
     }
-  for (unsigned int i = 0; i < solid_fluid_pairs.size(); i++)
+  for (unsigned int i = 0; i < solid_fluid_pairs.size(); ++i)
     {
       deallog << "solid dof: " << solid_mesh_pairs[i].first
               << ", mesh dof: " << solid_mesh_pairs[i].second << std::endl;

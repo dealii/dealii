@@ -109,7 +109,7 @@ test_transfer_operator(
     if (Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD) == 1 && false)
       {
         FullMatrix<Number> prolongation_matrix(dst.size(), src.size());
-        for (unsigned int i = 0; i < src.size(); i++)
+        for (unsigned int i = 0; i < src.size(); ++i)
           {
             src    = 0.0;
             src[i] = 1.0;
@@ -117,7 +117,7 @@ test_transfer_operator(
 
             transfer.prolongate_and_add(dst, src);
 
-            for (unsigned int j = 0; j < dst.size(); j++)
+            for (unsigned int j = 0; j < dst.size(); ++j)
               prolongation_matrix[j][i] = dst[j];
           }
 
@@ -149,7 +149,7 @@ test_transfer_operator(
     if (Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD) == 1 && false)
       {
         FullMatrix<Number> restriction_matrix(src.size(), dst.size());
-        for (unsigned int i = 0; i < dst.size(); i++)
+        for (unsigned int i = 0; i < dst.size(); ++i)
           {
             dst    = 0.0;
             dst[i] = 1.0;
@@ -157,7 +157,7 @@ test_transfer_operator(
 
             transfer.restrict_and_add(src, dst);
 
-            for (unsigned int j = 0; j < src.size(); j++)
+            for (unsigned int j = 0; j < src.size(); ++j)
               restriction_matrix[j][i] = src[j];
           }
 

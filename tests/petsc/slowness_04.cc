@@ -49,8 +49,8 @@ test()
   // An older version of this test relied on PETSc doing dynamic allocation, but
   // we require sparsity patterns in constructors now so we need the sparsity
   // pattern ahead of time - hence this is done twice
-  for (unsigned int i = 0; i < N; i++)
-    for (unsigned int j = 0; j < N; j++)
+  for (unsigned int i = 0; i < N; ++i)
+    for (unsigned int j = 0; j < N; ++j)
       {
         const unsigned int global = i * N + j;
         dsp.add(global, global);
@@ -89,10 +89,10 @@ test()
   std::vector<unsigned int> permutation(N);
   {
     std::vector<unsigned int> unused_indices(N);
-    for (unsigned int i = 0; i < N; i++)
+    for (unsigned int i = 0; i < N; ++i)
       unused_indices[i] = i;
 
-    for (unsigned int i = 0; i < N; i++)
+    for (unsigned int i = 0; i < N; ++i)
       {
         // pick a random element among the
         // unused indices
@@ -107,8 +107,8 @@ test()
   }
 
   // build the sparse matrix
-  for (unsigned int i_ = 0; i_ < N; i_++)
-    for (unsigned int j_ = 0; j_ < N; j_++)
+  for (unsigned int i_ = 0; i_ < N; ++i_)
+    for (unsigned int j_ = 0; j_ < N; ++j_)
       {
         const unsigned int i = permutation[i_];
         const unsigned int j = permutation[j_];

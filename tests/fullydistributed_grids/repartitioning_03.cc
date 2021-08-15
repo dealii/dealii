@@ -56,7 +56,7 @@ create_triangulation(Triangulation<dim, spacedim> &tria)
         if (cell->is_locally_owned())
           {
             bool flag = true;
-            for (unsigned int d = 0; d < dim; d++)
+            for (unsigned int d = 0; d < dim; ++d)
               if (cell->center()[d] > 0.0)
                 flag = false;
             if (flag)

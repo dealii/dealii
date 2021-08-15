@@ -39,11 +39,11 @@ main(void)
   adouble *x  = new adouble[n];
   adouble  y  = 1.0;
 
-  for (unsigned int i = 0; i < n; i++)
+  for (unsigned int i = 0; i < n; ++i)
     xp[i] = (i + 1.0) / (2.0 + i);
 
   trace_on(1);
-  for (unsigned int i = 0; i < n; i++)
+  for (unsigned int i = 0; i < n; ++i)
     {
       x[i] <<= xp[i];
       y *= x[i];
@@ -69,7 +69,7 @@ main(void)
   gradient(1, n, xp, g);
 
   double err_grad = 0;
-  for (unsigned int i = 0; i < n; i++)
+  for (unsigned int i = 0; i < n; ++i)
     err_grad += std::abs(g[i] - yp / xp[i]);
 
   deallog << "Error (gradient): " << err_grad << std::endl;
@@ -83,8 +83,8 @@ main(void)
   hessian(1, n, xp, H);
 
   double error_hess = 0;
-  for (unsigned int i = 0; i < n; i++)
-    for (unsigned int j = 0; j < n; j++)
+  for (unsigned int i = 0; i < n; ++i)
+    for (unsigned int j = 0; j < n; ++j)
       if (i > j)
         error_hess += std::abs(H[i][j] - g[i] / xp[j]);
 
@@ -98,7 +98,7 @@ main(void)
   delete[] g;
   g = nullptr;
 
-  for (unsigned int i = 0; i < n; i++)
+  for (unsigned int i = 0; i < n; ++i)
     delete[] H[i];
   delete[] H;
   H = nullptr;

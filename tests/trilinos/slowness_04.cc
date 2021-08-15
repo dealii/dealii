@@ -49,10 +49,10 @@ test()
   std::vector<unsigned int> permutation(N);
   {
     std::vector<unsigned int> unused_indices(N);
-    for (unsigned int i = 0; i < N; i++)
+    for (unsigned int i = 0; i < N; ++i)
       unused_indices[i] = i;
 
-    for (unsigned int i = 0; i < N; i++)
+    for (unsigned int i = 0; i < N; ++i)
       {
         // pick a random element among the
         // unused indices
@@ -69,8 +69,8 @@ test()
   // build the sparse matrix
   IndexSet                       indices = complete_index_set(N * N);
   TrilinosWrappers::SparseMatrix matrix(indices, MPI_COMM_WORLD, 5);
-  for (unsigned int i_ = 0; i_ < N; i_++)
-    for (unsigned int j_ = 0; j_ < N; j_++)
+  for (unsigned int i_ = 0; i_ < N; ++i_)
+    for (unsigned int j_ = 0; j_ < N; ++j_)
       {
         const unsigned int i = permutation[i_];
         const unsigned int j = permutation[j_];

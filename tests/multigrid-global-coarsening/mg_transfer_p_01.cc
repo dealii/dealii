@@ -137,7 +137,7 @@ main(int argc, char **argv)
 
   deallog.precision(8);
 
-  for (unsigned int fe_degree_fine = 1; fe_degree_fine <= 5; fe_degree_fine++)
+  for (unsigned int fe_degree_fine = 1; fe_degree_fine <= 5; ++fe_degree_fine)
     for (unsigned int fe_degree_coarse = 1; fe_degree_coarse <= fe_degree_fine;
          fe_degree_coarse++)
       test<2, double>(fe_degree_fine, fe_degree_coarse);

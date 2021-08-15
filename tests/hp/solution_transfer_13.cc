@@ -168,7 +168,7 @@ main()
    */
 
   endc = dof_handler.end();
-  for (cell = dof_handler.begin_active(); cell != endc; cell++)
+  for (cell = dof_handler.begin_active(); cell != endc; ++cell)
     if (cell->level() > 1)
       cell->set_coarsen_flag();
 

@@ -44,7 +44,7 @@ main()
   // threshold and so on
   t.unroll(unrolled);
   deallog << "unrolled:";
-  for (unsigned i = 0; i < 9; i++)
+  for (unsigned i = 0; i < 9; ++i)
     deallog << ' ' << static_cast<double>(unrolled(i));
   deallog << std::endl;
 

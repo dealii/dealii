@@ -186,7 +186,7 @@ check()
           sp[1]        = theta;
           sp[2]        = phi;
           Point<dim> p = GeometricUtilities::Coordinates::from_spherical(sp);
-          for (unsigned int i = 0; i < dim; i++)
+          for (unsigned int i = 0; i < dim; ++i)
             p[i] += center[i];
 
           // check values:

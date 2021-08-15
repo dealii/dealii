@@ -30,11 +30,11 @@ print_statistics(const Triangulation<dim, spacedim> &tria, bool do_mg = false)
 
   if (do_mg)
     {
-      for (auto level = 0u; level < tria.n_levels(); level++)
+      for (auto level = 0u; level < tria.n_levels(); ++level)
         deallog << "n_cells on level=" << level << ":        "
                 << tria.n_cells(level) << std::endl;
 
-      for (auto level = 0u; level < tria.n_levels(); level++)
+      for (auto level = 0u; level < tria.n_levels(); ++level)
         deallog << "n_active_cells on level=" << level << ": "
                 << tria.n_active_cells(level) << std::endl;
     }
@@ -56,11 +56,11 @@ print_statistics(const DoFHandler<dim, spacedim> &dof_handler,
 
   if (do_mg)
     {
-      for (auto level = 0u; level < n_levels; level++)
+      for (auto level = 0u; level < n_levels; ++level)
         deallog << "n_dofs on level=" << level << ":                  "
                 << dof_handler.n_dofs(level) << std::endl;
 
-      for (auto level = 0u; level < n_levels; level++)
+      for (auto level = 0u; level < n_levels; ++level)
         deallog << "n_locally_owned_mg_dofs on level=" << level << ": "
                 << dof_handler.locally_owned_mg_dofs(level).n_elements()
                 << std::endl;

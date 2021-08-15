@@ -110,7 +110,7 @@ MixedElastoPlasticity<dim>::make_grid_and_dofs()
   std::vector<unsigned int> block_component(n_stress_components +
                                               n_gamma_components,
                                             1);
-  for (unsigned int ii = 0; ii < n_stress_components; ii++)
+  for (unsigned int ii = 0; ii < n_stress_components; ++ii)
     block_component[ii] = 0;
 
   DoFRenumbering::component_wise(dof_handler);

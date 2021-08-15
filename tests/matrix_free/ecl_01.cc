@@ -146,7 +146,7 @@ test(const unsigned int n_refinements = 1)
         }
     },
     [&](const auto &, auto &dst, const auto &src, const auto range) {
-      for (unsigned int face = range.first; face < range.second; face++)
+      for (unsigned int face = range.first; face < range.second; ++face)
         {
           phi_m.reinit(face);
           phi_p.reinit(face);

@@ -25,7 +25,7 @@ void
 test(
   const MGTransferGlobalCoarseningTools::PolynomialCoarseningSequenceType type)
 {
-  for (unsigned int i = 1; i <= 15; i++)
+  for (unsigned int i = 1; i <= 15; ++i)
     {
       const auto sequence =
         MGTransferGlobalCoarseningTools::create_polynomial_coarsening_sequence(

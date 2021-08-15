@@ -107,7 +107,7 @@ plot_shape_function(DoFHandler<dim> &dof_handler, unsigned int patches = 5)
   // output to check if all is good:
   std::vector<Vector<double>> shape_functions;
   std::vector<std::string>    names;
-  for (unsigned int s = 0; s < dof_handler.n_dofs(); s++)
+  for (unsigned int s = 0; s < dof_handler.n_dofs(); ++s)
     {
       Vector<double> shape_function;
       shape_function.reinit(dof_handler.n_dofs());
@@ -143,7 +143,7 @@ plot_shape_function(DoFHandler<dim> &dof_handler, unsigned int patches = 5)
     }
   data_out.add_data_vector(fe_index, "fe_index");
 
-  for (unsigned int i = 0; i < shape_functions.size(); i++)
+  for (unsigned int i = 0; i < shape_functions.size(); ++i)
     data_out.add_data_vector(shape_functions[i], names[i]);
 
   data_out.build_patches(patches);

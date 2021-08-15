@@ -99,7 +99,7 @@ private:
 
       Point<dim> p1, p2;
 
-      for (unsigned int d = 0; d < dim; d++)
+      for (unsigned int d = 0; d < dim; ++d)
         p2[d] = 1.0;
 
       GridGenerator::subdivided_hyper_rectangle(tria, repetitions, p1, p2);
@@ -137,7 +137,7 @@ private:
     matrix_free.initialize_dof_vector(src);
     matrix_free.initialize_dof_vector(dst);
 
-    for (unsigned int i = 0; i < Utilities::pow(fe_degree + 1, dim); i++)
+    for (unsigned int i = 0; i < Utilities::pow(fe_degree + 1, dim); ++i)
       src.begin()[i] = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) + 1;
 
     matrix_free.loop(&Test::dummy_operation_1,
@@ -155,7 +155,7 @@ private:
          i < 2 * Utilities::pow(fe_degree + 1, dim);
          i++)
       dst.begin()[i] = 0;
-    for (unsigned int i = 0; i < 2 * Utilities::pow(fe_degree + 1, dim); i++)
+    for (unsigned int i = 0; i < 2 * Utilities::pow(fe_degree + 1, dim); ++i)
       deallog << static_cast<int>(dst[i]) << " ";
     deallog << std::endl << std::endl;
   }
@@ -167,7 +167,7 @@ private:
                     const std::pair<unsigned int, unsigned int> &) const
   {
     deallog << "src:" << std::endl;
-    for (unsigned int i = 0; i < 2 * Utilities::pow(fe_degree + 1, dim); i++)
+    for (unsigned int i = 0; i < 2 * Utilities::pow(fe_degree + 1, dim); ++i)
       deallog << static_cast<int>(src[i]) << " ";
     deallog << std::endl;
 

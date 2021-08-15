@@ -137,7 +137,7 @@ private:
                                                  n_components,
                                                  number>::value_type;
 
-    for (unsigned int face = face_range.first; face < face_range.second; face++)
+    for (unsigned int face = face_range.first; face < face_range.second; ++face)
       {
         phi_m.reinit(face);
         phi_m.read_dof_values(src);
@@ -182,7 +182,7 @@ private:
                                                  n_components,
                                                  number>::value_type;
 
-    for (unsigned int face = face_range.first; face < face_range.second; face++)
+    for (unsigned int face = face_range.first; face < face_range.second; ++face)
       {
         fe_eval.reinit(face);
         fe_eval.read_dof_values(src);

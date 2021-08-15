@@ -53,10 +53,10 @@ test(const MPI_Comm comm)
                                                          src.size()),
                                  ArrayView<double>(dst.data(), dst.size()));
 
-  for (size_t i = 0; i < src.size(); i++)
+  for (size_t i = 0; i < src.size(); ++i)
     deallog << static_cast<int>(src[i]) << " ";
   deallog << std::endl;
-  for (size_t i = 0; i < dst.size(); i++)
+  for (size_t i = 0; i < dst.size(); ++i)
     deallog << static_cast<int>(dst[i]) << " ";
   deallog << std::endl;
 }

@@ -129,7 +129,7 @@ private:
                  const VectorType &,
                  const std::pair<unsigned int, unsigned int> &pair) const
   {
-    for (auto cell = pair.first; cell < pair.second; cell++)
+    for (auto cell = pair.first; cell < pair.second; ++cell)
       for (auto lane = 0u; lane < data.n_active_entries_per_cell_batch(cell);
            lane++)
         cells.emplace(data.get_cell_iterator(cell, lane)->id());
@@ -141,7 +141,7 @@ private:
                  const VectorType &,
                  const std::pair<unsigned int, unsigned int> &pair) const
   {
-    for (auto face = pair.first; face < pair.second; face++)
+    for (auto face = pair.first; face < pair.second; ++face)
       for (auto lane = 0u; lane < data.n_active_entries_per_face_batch(face);
            lane++)
         {
@@ -163,7 +163,7 @@ private:
                      const VectorType &,
                      const std::pair<unsigned int, unsigned int> &pair) const
   {
-    for (auto face = pair.first; face < pair.second; face++)
+    for (auto face = pair.first; face < pair.second; ++face)
       for (auto lane = 0u; lane < data.n_active_entries_per_face_batch(face);
            lane++)
         boundaries.emplace(

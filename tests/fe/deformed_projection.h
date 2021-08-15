@@ -104,7 +104,7 @@ TestMap1<dim>::vector_value(const Point<dim> &p,
          ExcDimensionMismatch(return_value.size(), this->n_components));
 
   // Parabolic inflow profile
-  for (unsigned int iCount = 0; iCount < this->n_components; iCount++)
+  for (unsigned int iCount = 0; iCount < this->n_components; ++iCount)
     return_value(iCount) = value(p, iCount);
 }
 
