@@ -930,9 +930,9 @@ namespace StandardExceptions
    * but it is neither.
    */
   DeclException3(ExcDimensionMismatch2,
-                 int,
-                 int,
-                 int,
+                 std::size_t,
+                 std::size_t,
+                 std::size_t,
                  << "Dimension " << arg1 << " neither equal to " << arg2
                  << " nor to " << arg3 << ".");
 
@@ -941,7 +941,7 @@ namespace StandardExceptions
    * For example, it may be that you are trying to access an element of a
    * vector which does not exist.
    *
-   * The constructor takes three <tt>int</tt> arguments, namely
+   * The constructor takes three <tt>std::size_t</tt> arguments, namely
    * <ol>
    * <li> the violating index
    * <li> the lower bound
@@ -950,9 +950,9 @@ namespace StandardExceptions
    */
   DeclException3(
     ExcIndexRange,
-    int,
-    int,
-    int,
+    std::size_t,
+    std::size_t,
+    std::size_t,
     << "Index " << arg1 << " is not in the half-open range [" << arg2 << ","
     << arg3 << ")."
     << (arg2 == arg3 ?
