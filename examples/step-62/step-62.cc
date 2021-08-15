@@ -564,7 +564,7 @@ namespace step62
     // height="200" />
     // where the brown color represents material_a and the green color
     // represents material_b.
-    for (unsigned int idx = 0; idx < nb_mirror_pairs; idx++)
+    for (unsigned int idx = 0; idx < nb_mirror_pairs; ++idx)
       {
         const double layer_transition_center =
           material_a_wavelength / 2 +
@@ -586,7 +586,7 @@ namespace step62
     // [subpixel
     // smoothing](https://meep.readthedocs.io/en/latest/Subpixel_Smoothing/)
     // which improves the precision of the simulation.
-    for (unsigned int idx = 0; idx < nb_mirror_pairs; idx++)
+    for (unsigned int idx = 0; idx < nb_mirror_pairs; ++idx)
       {
         const double layer_transition_center =
           material_a_wavelength / 2 +
@@ -612,7 +612,7 @@ namespace step62
       }
 
     // the material_a layers
-    for (unsigned int idx = 0; idx < nb_mirror_pairs; idx++)
+    for (unsigned int idx = 0; idx < nb_mirror_pairs; ++idx)
       {
         const double layer_center =
           material_a_wavelength / 2 +
@@ -627,7 +627,7 @@ namespace step62
       }
 
     // the material_b layers
-    for (unsigned int idx = 0; idx < nb_mirror_pairs; idx++)
+    for (unsigned int idx = 0; idx < nb_mirror_pairs; ++idx)
       {
         const double layer_center =
           material_a_wavelength / 2 +

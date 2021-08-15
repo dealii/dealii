@@ -246,7 +246,7 @@ namespace Step41
     mass_matrix.reinit(dsp);
     assemble_mass_matrix_diagonal(mass_matrix);
     diagonal_of_mass_matrix.reinit(solution_index_set);
-    for (unsigned int j = 0; j < solution.size(); j++)
+    for (unsigned int j = 0; j < solution.size(); ++j)
       diagonal_of_mass_matrix(j) = mass_matrix.diag_element(j);
   }
 

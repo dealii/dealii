@@ -573,7 +573,7 @@ namespace Step75
     MGLevelObject<typename SmootherType::AdditionalData> smoother_data(
       min_level, max_level);
 
-    for (unsigned int level = min_level; level <= max_level; level++)
+    for (unsigned int level = min_level; level <= max_level; ++level)
       {
         smoother_data[level].preconditioner =
           std::make_shared<SmootherPreconditionerType>();

@@ -527,8 +527,8 @@ general approach to this would go like this:
                  local_history_values_at_qpoints (dim, std::vector< Vector<double> >(dim)),
                  local_history_fe_values (dim, std::vector< Vector<double> >(dim));
 
-    for (unsigned int i=0; i<dim; i++)
-      for (unsigned int j=0; j<dim; j++)
+    for (unsigned int i=0; i<dim; ++i)
+      for (unsigned int j=0; j<dim; ++j)
       {
         history_field[i][j].reinit(history_dof_handler.n_dofs());
         local_history_values_at_qpoints[i][j].reinit(quadrature.size());
@@ -557,8 +557,8 @@ general approach to this would go like this:
         Assert (local_quadrature_points_history < &quadrature_point_history.back(),
                 ExcInternalError());
 
-        for (unsigned int i=0; i<dim; i++)
-          for (unsigned int j=0; j<dim; j++)
+        for (unsigned int i=0; i<dim; ++i)
+          for (unsigned int j=0; j<dim; ++j)
           {
             for (unsigned int q=0; q<quadrature.size(); ++q)
               local_history_values_at_qpoints[i][j](q)
@@ -602,8 +602,8 @@ general approach to this would go like this:
       Assert (local_quadrature_points_history < &quadrature_point_history.back(),
               ExcInternalError());
 
-      for (unsigned int i=0; i<dim; i++)
-        for (unsigned int j=0; j<dim; j++)
+      for (unsigned int i=0; i<dim; ++i)
+        for (unsigned int j=0; j<dim; ++j)
         {
           dg_cell->get_dof_values (history_field[i][j],
                                    local_history_fe_values[i][j]);

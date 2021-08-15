@@ -786,7 +786,7 @@ namespace Step57
         VectorTools::point_value(dof_handler, present_solution, p, tmp_vector);
         f << p(dim - 1);
 
-        for (int j = 0; j < dim; j++)
+        for (int j = 0; j < dim; ++j)
           f << " " << tmp_vector(j);
         f << std::endl;
       }

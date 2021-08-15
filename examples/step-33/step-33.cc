@@ -359,7 +359,7 @@ namespace Step33
                    const Vector<double> &boundary_values,
                    const DataVector &    Wminus)
     {
-      for (unsigned int c = 0; c < n_components; c++)
+      for (unsigned int c = 0; c < n_components; ++c)
         switch (boundary_kind[c])
           {
             case inflow_boundary:
@@ -409,7 +409,7 @@ namespace Step33
                 // orthogonal to the surface normal.  This creates sensitivities
                 // of across the velocity components.
                 typename DataVector::value_type vdotn = 0;
-                for (unsigned int d = 0; d < dim; d++)
+                for (unsigned int d = 0; d < dim; ++d)
                   {
                     vdotn += Wplus[d] * normal_vector[d];
                   }
@@ -1257,7 +1257,7 @@ namespace Step33
       {
         std::vector<std::string> expressions(EulerEquations<dim>::n_components,
                                              "0.0");
-        for (unsigned int di = 0; di < EulerEquations<dim>::n_components; di++)
+        for (unsigned int di = 0; di < EulerEquations<dim>::n_components; ++di)
           expressions[di] =
             prm.get("w_" + Utilities::int_to_string(di) + " value");
         initial_conditions.initialize(
@@ -1756,7 +1756,7 @@ namespace Step33
           W_old[q][c] +=
             old_solution(dof_indices[i]) * fe_v.shape_value_component(i, q, c);
 
-          for (unsigned int d = 0; d < dim; d++)
+          for (unsigned int d = 0; d < dim; ++d)
             {
               grad_W[q][c][d] += independent_local_dof_values[i] *
                                  fe_v.shape_grad_component(i, q, c)[d];
@@ -1855,14 +1855,14 @@ namespace Step33
                      fe_v.shape_value_component(i, point, component_i) *
                      fe_v.JxW(point);
 
-            for (unsigned int d = 0; d < dim; d++)
+            for (unsigned int d = 0; d < dim; ++d)
               R_i -=
                 (parameters.theta * flux[point][component_i][d] +
                  (1.0 - parameters.theta) * flux_old[point][component_i][d]) *
                 fe_v.shape_grad_component(i, point, component_i)[d] *
                 fe_v.JxW(point);
 
-            for (unsigned int d = 0; d < dim; d++)
+            for (unsigned int d = 0; d < dim; ++d)
               R_i +=
                 1.0 *
                 std::pow(fe_v.get_cell()->diameter(),
@@ -1923,14 +1923,14 @@ namespace Step33
     const unsigned int n_independent_variables =
       (external_face == false ? 2 * dofs_per_cell : dofs_per_cell);
 
-    for (unsigned int i = 0; i < dofs_per_cell; i++)
+    for (unsigned int i = 0; i < dofs_per_cell; ++i)
       {
         independent_local_dof_values[i] = current_solution(dof_indices[i]);
         independent_local_dof_values[i].diff(i, n_independent_variables);
       }
 
     if (external_face == false)
-      for (unsigned int i = 0; i < dofs_per_cell; i++)
+      for (unsigned int i = 0; i < dofs_per_cell; ++i)
         {
           independent_neighbor_dof_values[i] =
             current_solution(dof_indices_neighbor[i]);
@@ -2012,7 +2012,7 @@ namespace Step33
         parameters.boundary_conditions[boundary_id].values.vector_value_list(
           fe_v.get_quadrature_points(), boundary_values);
 
-        for (unsigned int q = 0; q < n_q_points; q++)
+        for (unsigned int q = 0; q < n_q_points; ++q)
           {
             EulerEquations<dim>::compute_Wminus(
               parameters.boundary_conditions[boundary_id].kind,
