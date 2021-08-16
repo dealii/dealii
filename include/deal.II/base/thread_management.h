@@ -614,6 +614,11 @@ namespace Threads
      * Join the thread represented by this object, i.e. wait for it to finish.
      * If you have used the default constructor of this class and have not
      * assigned a thread object to it, then this function is a no-op.
+     *
+     * If the function that was called on the thread ended with an (uncaught)
+     * exception being thrown, rather than by returning a value of type `RT`,
+     * then that exception was saved and the call to the current function
+     * will re-throw that exception instead of returning normally.
      */
     void
     join() const
@@ -630,6 +635,11 @@ namespace Threads
      * and expect to get the same return value every time. (With the
      * exception of the case where the returned object has been moved;
      * see below.)
+     *
+     * If the function that was called on the thread ended with an (uncaught)
+     * exception being thrown, rather than by returning a value of type `RT`,
+     * then that exception was saved and the call to the current function
+     * will re-throw that exception instead of returning normally.
      *
      * @note The function returns a <i>non-@p const reference</i> to
      * the returned object, instead of the returned object. This
