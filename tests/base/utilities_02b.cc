@@ -30,13 +30,13 @@ do_test(const VectorizedArrayType array)
 
   auto exponentiated_array = Utilities::fixed_power<3>(array);
 
-  for (unsigned int i = 0; i < VectorizedArrayType::size(); i++)
+  for (unsigned int i = 0; i < VectorizedArrayType::size(); ++i)
     deallog << exponentiated_array[i] << " ";
   deallog << std::endl;
 
   exponentiated_array = Utilities::fixed_power<-3>(array);
 
-  for (unsigned int i = 0; i < VectorizedArrayType::size(); i++)
+  for (unsigned int i = 0; i < VectorizedArrayType::size(); ++i)
     deallog << exponentiated_array[i] << " ";
   deallog << std::endl;
 }

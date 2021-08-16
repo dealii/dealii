@@ -119,7 +119,7 @@ test(const unsigned numRefinementLevels = 2)
     corner[d] = -L;
 
   MappingQ1<dim> mapping;
-  for (unsigned int ilevel = 0; ilevel < numRefinementLevels; ilevel++)
+  for (unsigned int ilevel = 0; ilevel < numRefinementLevels; ++ilevel)
     {
       // pick an corner cell and refine
       for (auto &cell : triangulation.active_cell_iterators())

@@ -155,7 +155,7 @@ public:
         FEFaceIntegrator fe_eval(data, range, true);
         FEFaceIntegrator fe_eval_neighbor(data, range, false);
 
-        for (unsigned int face = range.first; face < range.second; face++)
+        for (unsigned int face = range.first; face < range.second; ++face)
           {
             fe_eval.reinit(face);
             fe_eval_neighbor.reinit(face);
@@ -196,7 +196,7 @@ public:
       [&](const auto &data, auto &dst, const auto &src, const auto range) {
         FEFaceIntegrator fe_eval(data, range, true);
 
-        for (unsigned int face = range.first; face < range.second; face++)
+        for (unsigned int face = range.first; face < range.second; ++face)
           {
             fe_eval.reinit(face);
             fe_eval.gather_evaluate(src,

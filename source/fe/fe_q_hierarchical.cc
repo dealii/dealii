@@ -178,7 +178,7 @@ FE_Q_Hierarchical<dim>::get_interpolation_matrix(
         {
           const std::vector<unsigned int> dof_map =
             this->get_embedding_dofs(source_fe->degree);
-          for (unsigned int j = 0; j < dof_map.size(); j++)
+          for (unsigned int j = 0; j < dof_map.size(); ++j)
             matrix[dof_map[j]][j] = 1.;
         }
       // and when just truncate higher modes.
@@ -186,7 +186,7 @@ FE_Q_Hierarchical<dim>::get_interpolation_matrix(
         {
           const std::vector<unsigned int> dof_map =
             source_fe->get_embedding_dofs(this->degree);
-          for (unsigned int j = 0; j < dof_map.size(); j++)
+          for (unsigned int j = 0; j < dof_map.size(); ++j)
             matrix[j][dof_map[j]] = 1.;
         }
     }
@@ -275,7 +275,7 @@ FE_Q_Hierarchical<dim>::hp_line_dof_identities(
       // increasingly. Thus we return a vector of pairs for the first N-1, where
       // N is minimum number of dofs_per_line for each FE_Q_Hierarchical.
       std::vector<std::pair<unsigned int, unsigned int>> res;
-      for (unsigned int i = 0; i < std::min(this_dpl, other_dpl); i++)
+      for (unsigned int i = 0; i < std::min(this_dpl, other_dpl); ++i)
         res.emplace_back(i, i);
 
       return res;
@@ -319,7 +319,7 @@ FE_Q_Hierarchical<dim>::hp_quad_dof_identities(
       // increasingly. Thus we return a vector of pairs for the first N-1, where
       // N is minimum number of dofs_per_line for each FE_Q_Hierarchical.
       std::vector<std::pair<unsigned int, unsigned int>> res;
-      for (unsigned int i = 0; i < std::min(this_dpq, other_dpq); i++)
+      for (unsigned int i = 0; i < std::min(this_dpq, other_dpq); ++i)
         res.emplace_back(i, i);
 
       return res;
@@ -542,7 +542,7 @@ FE_Q_Hierarchical<dim>::initialize_constraints(
 
       case 3:
         {
-          for (unsigned int i = 0; i < dofs_1d * dofs_1d; i++)
+          for (unsigned int i = 0; i < dofs_1d * dofs_1d; ++i)
             {
               // center vertex node
               this->interface_constraints(0, face_renumber[i]) =
@@ -564,7 +564,7 @@ FE_Q_Hierarchical<dim>::initialize_constraints(
                 dofs_subcell[1](1, (i - (i % dofs_1d)) / dofs_1d);
 
               // interior edges
-              for (unsigned int j = 0; j < (this->degree - 1); j++)
+              for (unsigned int j = 0; j < (this->degree - 1); ++j)
                 {
                   this->interface_constraints(5 + j, face_renumber[i]) =
                     dofs_subcell[0](1, i % dofs_1d) *
@@ -584,7 +584,7 @@ FE_Q_Hierarchical<dim>::initialize_constraints(
                 }
 
               // boundary edges
-              for (unsigned int j = 0; j < (this->degree - 1); j++)
+              for (unsigned int j = 0; j < (this->degree - 1); ++j)
                 {
                   // left edge
                   this->interface_constraints(5 + 4 * (this->degree - 1) + j,
@@ -632,8 +632,8 @@ FE_Q_Hierarchical<dim>::initialize_constraints(
                 }
 
               // interior faces
-              for (unsigned int j = 0; j < (this->degree - 1); j++)
-                for (unsigned int k = 0; k < (this->degree - 1); k++)
+              for (unsigned int j = 0; j < (this->degree - 1); ++j)
+                for (unsigned int k = 0; k < (this->degree - 1); ++k)
                   {
                     // subcell 0
                     this->interface_constraints(5 + 12 * (this->degree - 1) +

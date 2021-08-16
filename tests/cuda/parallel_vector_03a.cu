@@ -89,7 +89,7 @@ test()
   indexset_1.add_index(5);
   indexset_1.compress();
   LinearAlgebra::ReadWriteVector<double> rw_vector(indexset_1);
-  for (unsigned int i = 0; i < local_nonzero.n_elements(); i++)
+  for (unsigned int i = 0; i < local_nonzero.n_elements(); ++i)
     rw_vector(local_nonzero.nth_index_in_set(i)) =
       local_nonzero.nth_index_in_set(i);
 

@@ -37,7 +37,7 @@ check_value(const Function<dim> &f)
     {
       deallog << " d = " << d << std::endl;
       Point<dim> p;
-      for (unsigned int i = 0; i < dim; i++)
+      for (unsigned int i = 0; i < dim; ++i)
         p[i] = i;
 
       deallog << f.value(p, d) << std::endl;
@@ -82,7 +82,7 @@ check_gradient(const Function<dim> &f)
     {
       deallog << " d = " << d << std::endl;
       Point<dim> p;
-      for (unsigned int i = 0; i < dim; i++)
+      for (unsigned int i = 0; i < dim; ++i)
         p[i] = i;
 
       deallog << f.gradient(p, d) << std::endl;
@@ -127,7 +127,7 @@ check_laplacian(const Function<dim> &f)
     {
       deallog << " d = " << d << std::endl;
       Point<dim> p;
-      for (unsigned int i = 0; i < dim; i++)
+      for (unsigned int i = 0; i < dim; ++i)
         p[i] = i;
 
       deallog << f.laplacian(p, d) << std::endl;

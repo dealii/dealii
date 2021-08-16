@@ -110,13 +110,13 @@ test(bool use_constraint_matrix)
     }
   else
     {
-      for (unsigned int i = 0; i < 5; i++)
+      for (unsigned int i = 0; i < 5; ++i)
         {
           mat.add(local_dofs1[i], local_dofs1[i], local_mat(i, i));
           rhs(local_dofs1[i]) += local_vec(i);
         }
 
-      for (unsigned int i = 0; i < 5; i++)
+      for (unsigned int i = 0; i < 5; ++i)
         {
           mat.add(local_dofs2[i], local_dofs2[i], local_mat(i, i));
           rhs(local_dofs2[i]) += local_vec(i);

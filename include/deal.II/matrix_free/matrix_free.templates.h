@@ -383,13 +383,13 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
       n_quad_in_collection = std::max(n_quad_in_collection, quad[q].size());
     shape_info.reinit(TableIndices<4>(
       n_components, n_quad, n_fe_in_collection, n_quad_in_collection));
-    for (unsigned int no = 0, c = 0; no < dof_handler.size(); no++)
+    for (unsigned int no = 0, c = 0; no < dof_handler.size(); ++no)
       for (unsigned int b = 0; b < dof_handler[no]->get_fe(0).n_base_elements();
            ++b, ++c)
         for (unsigned int fe_no = 0;
              fe_no < dof_handler[no]->get_fe_collection().size();
              ++fe_no)
-          for (unsigned int nq = 0; nq < n_quad; nq++)
+          for (unsigned int nq = 0; nq < n_quad; ++nq)
             for (unsigned int q_no = 0; q_no < quad[nq].size(); ++q_no)
               shape_info(c, nq, fe_no, q_no)
                 .reinit(quad[nq][q_no], dof_handler[no]->get_fe(fe_no), b);
@@ -1487,7 +1487,7 @@ namespace internal
                         .push_back(renumbering[counter]);
                   }
                 counter = 0;
-                for (unsigned int j = 0; j < dof_info[0].max_fe_index; j++)
+                for (unsigned int j = 0; j < dof_info[0].max_fe_index; ++j)
                   {
                     for (const auto jj : renumbering_fe_index[j])
                       renumbering[counter++] = jj;
@@ -1510,7 +1510,7 @@ namespace internal
                         .push_back(renumbering[counter]);
                   }
                 counter = start_nonboundary * n_lanes;
-                for (unsigned int j = 0; j < dof_info[0].max_fe_index; j++)
+                for (unsigned int j = 0; j < dof_info[0].max_fe_index; ++j)
                   {
                     for (const auto jj : renumbering_fe_index[j])
                       renumbering[counter++] = jj;
@@ -1708,7 +1708,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
   {
     Quadrature<dim> quad(QGauss<dim>(1));
     Quadrature<dim> quad_simplex(QGaussSimplex<dim>(1));
-    for (unsigned int no = 0, c = 0; no < dof_handlers.size(); no++)
+    for (unsigned int no = 0, c = 0; no < dof_handlers.size(); ++no)
       for (unsigned int b = 0;
            b < dof_handlers[no]->get_fe(0).n_base_elements();
            ++b, ++c)

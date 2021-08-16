@@ -42,13 +42,13 @@ test(const unsigned int n_refinements,
     }
   else if (mesh_type == 1)
     {
-      for (unsigned int i = 1; i < n_refinements; i++)
+      for (unsigned int i = 1; i < n_refinements; ++i)
         {
           for (auto cell : tria.active_cell_iterators())
             if (cell->is_locally_owned())
               {
                 bool flag = true;
-                for (int d = 0; d < dim; d++)
+                for (int d = 0; d < dim; ++d)
                   if (cell->center()[d] > 0.5)
                     flag = false;
                 if (flag)

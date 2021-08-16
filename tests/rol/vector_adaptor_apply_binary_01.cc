@@ -67,10 +67,10 @@ test()
 
   Testing::srand(1);
 
-  for (auto iterator = a.begin(); iterator != a.end(); iterator++)
+  for (auto iterator = a.begin(); iterator != a.end(); ++iterator)
     *iterator = static_cast<double>(Testing::rand()) / RAND_MAX;
 
-  for (auto iterator = b.begin(); iterator != b.end(); iterator++)
+  for (auto iterator = b.begin(); iterator != b.end(); ++iterator)
     *iterator = static_cast<double>(Testing::rand()) / RAND_MAX;
 
   a.compress(VectorOperation::insert);

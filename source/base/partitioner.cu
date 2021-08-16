@@ -29,7 +29,7 @@ namespace Utilities
     {
       const unsigned int n_import_targets = import_targets_data.size();
       import_indices_plain_dev.reserve(n_import_targets);
-      for (unsigned int i = 0; i < n_import_targets; i++)
+      for (unsigned int i = 0; i < n_import_targets; ++i)
         {
           // Expand the indices on the host
           std::vector<std::pair<unsigned int, unsigned int>>::const_iterator

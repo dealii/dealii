@@ -93,8 +93,8 @@ public:
     Assert(r > 0.0, ExcMessage("r is not positive"));
     dir /= r;
     SymmetricTensor<2, dim> dir_x_dir;
-    for (unsigned int i = 0; i < dim; i++)
-      for (unsigned int j = i; j < dim; j++)
+    for (unsigned int i = 0; i < dim; ++i)
+      for (unsigned int j = i; j < dim; ++j)
         dir_x_dir[i][j] = dir[i] * dir[j];
 
     return std::exp(-r) *
@@ -204,7 +204,7 @@ test(const FiniteElement<dim> & fe_base,
   DoFHandler<dim>    dof_handler_system(triangulation);
 
   Point<dim> p1, p2, p3;
-  for (unsigned int d = 0; d < dim; d++)
+  for (unsigned int d = 0; d < dim; ++d)
     {
       p1[d] = 0.0;
       p2[d] = 0.0;
@@ -248,7 +248,7 @@ test(const FiniteElement<dim> & fe_base,
   {
     Point<dim>                p1, p2;
     std::vector<unsigned int> repetitions(dim);
-    for (unsigned int d = 0; d < dim; d++)
+    for (unsigned int d = 0; d < dim; ++d)
       {
         p1[d]          = -1.0;
         p2[d]          = 2.0;

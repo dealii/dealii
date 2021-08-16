@@ -41,11 +41,11 @@ test()
   is1.print(deallog);
 
   deallog << "List of indices: " << std::endl;
-  for (unsigned int i = 0; i < indices.size(); i++)
+  for (unsigned int i = 0; i < indices.size(); ++i)
     deallog << indices[i] << ' ';
   deallog << std::endl;
 
-  for (unsigned int i = 0; i < indices.size(); i++)
+  for (unsigned int i = 0; i < indices.size(); ++i)
     Assert(is1.index_within_set(indices[i]) == i, ExcInternalError());
 
   deallog << "OK" << std::endl;

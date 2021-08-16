@@ -27,7 +27,7 @@ void
 test_bounding_box()
 {
   std::pair<Point<spacedim>, Point<spacedim>> unit;
-  for (int i = 0; i < spacedim; i++)
+  for (int i = 0; i < spacedim; ++i)
     {
       unit.first[i]  = 0.0;
       unit.second[i] = 1.0;
@@ -43,7 +43,7 @@ test_bounding_box()
 
   // This is a simple neighbor
   std::pair<Point<spacedim>, Point<spacedim>> second;
-  for (int i = 0; i < spacedim; i++)
+  for (int i = 0; i < spacedim; ++i)
     {
       second.first[i]  = 1.0;
       second.second[i] = 2.0;
@@ -68,7 +68,7 @@ test_bounding_box()
       std::pair<Point<spacedim>, Point<spacedim>> second_1;
       second_1.first[0]  = 0.0;
       second_1.second[0] = 1.0;
-      for (int i = 1; i < spacedim; i++)
+      for (int i = 1; i < spacedim; ++i)
         {
           second_1.first[i]  = 1.0;
           second_1.second[i] = 2.0;
@@ -160,7 +160,7 @@ test_bounding_box()
   deallog << "Is neighbor D with D: " << (int)d.get_neighbor_type(d)
           << std::endl;
 
-  for (int i = 0; i < spacedim; i++)
+  for (int i = 0; i < spacedim; ++i)
     {
       second.first[i]  = -10.0;
       second.second[i] = -8.0;
@@ -189,7 +189,7 @@ test_bounding_box()
           << std::endl;
 
   // A and F are mergeable because one next to the other
-  for (int i = 0; i < spacedim; i++)
+  for (int i = 0; i < spacedim; ++i)
     {
       second.first[i]  = 0.0;
       second.second[i] = 1.0;

@@ -245,7 +245,7 @@ PointValueHistory<dim>::add_point(const Point<dim> &location)
   // efficient than find_active_cell_around_point
   // because it operates on a set of points.
 
-  for (; cell != endc; cell++)
+  for (; cell != endc; ++cell)
     {
       fe_values.reinit(cell);
 
@@ -394,7 +394,7 @@ PointValueHistory<dim>::add_points(const std::vector<Point<dim>> &locations)
   // may be slightly more
   // efficient than find_active_cell_around_point
   // because it operates on a set of points.
-  for (; cell != endc; cell++)
+  for (; cell != endc; ++cell)
     {
       fe_values.reinit(cell);
       for (unsigned int support_point = 0; support_point < n_support_points;
@@ -406,7 +406,7 @@ PointValueHistory<dim>::add_points(const std::vector<Point<dim>> &locations)
           const Point<dim> &test_point =
             fe_values.quadrature_point(support_point);
 
-          for (unsigned int point = 0; point < locations.size(); point++)
+          for (unsigned int point = 0; point < locations.size(); ++point)
             {
               if (locations[point].distance(test_point) <
                   locations[point].distance(current_points[point][component]))
@@ -422,7 +422,7 @@ PointValueHistory<dim>::add_points(const std::vector<Point<dim>> &locations)
 
   std::vector<types::global_dof_index> local_dof_indices(
     dof_handler->get_fe().n_dofs_per_cell());
-  for (unsigned int point = 0; point < locations.size(); point++)
+  for (unsigned int point = 0; point < locations.size(); ++point)
     {
       current_cell[point]->get_dof_indices(local_dof_indices);
       std::vector<types::global_dof_index> new_solution_indices;
@@ -730,7 +730,7 @@ PointValueHistory<dim>::evaluate_field(
         fe_values.get_quadrature_points();
       double       distance       = cell->diameter();
       unsigned int selected_point = 0;
-      for (unsigned int q_point = 0; q_point < n_quadrature_points; q_point++)
+      for (unsigned int q_point = 0; q_point < n_quadrature_points; ++q_point)
         {
           if (requested_location.distance(quadrature_points[q_point]) <
               distance)
@@ -988,7 +988,7 @@ PointValueHistory<dim>::push_back_independent(
                   static_cast<int>(independent_values[0].size())) < 2,
          ExcDataLostSync());
 
-  for (unsigned int component = 0; component < n_indep; component++)
+  for (unsigned int component = 0; component < n_indep; ++component)
     independent_values[component].push_back(indep_values[component]);
 }
 
@@ -1025,18 +1025,18 @@ PointValueHistory<dim>::write_gnuplot(
         }
       else
         {
-          for (unsigned int component = 0; component < n_indep; component++)
+          for (unsigned int component = 0; component < n_indep; ++component)
             {
               to_gnuplot << "<Indep_" << component << "> ";
             }
           to_gnuplot << "\n";
         }
       // write general data stored
-      for (unsigned int key = 0; key < dataset_key.size(); key++)
+      for (unsigned int key = 0; key < dataset_key.size(); ++key)
         {
           to_gnuplot << dataset_key[key];
 
-          for (unsigned int component = 0; component < n_indep; component++)
+          for (unsigned int component = 0; component < n_indep; ++component)
             {
               to_gnuplot << " " << independent_values[component][key];
             }
@@ -1128,7 +1128,7 @@ PointValueHistory<dim>::write_gnuplot(
             }
           else
             {
-              for (unsigned int component = 0; component < n_indep; component++)
+              for (unsigned int component = 0; component < n_indep; ++component)
                 {
                   to_gnuplot << "<Indep_" << component << "> ";
                 }
@@ -1164,11 +1164,11 @@ PointValueHistory<dim>::write_gnuplot(
           to_gnuplot << "\n";
 
           // write data stored for the point
-          for (unsigned int key = 0; key < dataset_key.size(); key++)
+          for (unsigned int key = 0; key < dataset_key.size(); ++key)
             {
               to_gnuplot << dataset_key[key];
 
-              for (unsigned int component = 0; component < n_indep; component++)
+              for (unsigned int component = 0; component < n_indep; ++component)
                 {
                   to_gnuplot << " " << independent_values[component][key];
                 }
@@ -1287,7 +1287,7 @@ PointValueHistory<dim>::get_postprocessor_locations(
       double       distance       = cell->diameter();
       unsigned int selected_point = 0;
 
-      for (unsigned int q_point = 0; q_point < n_quadrature_points; q_point++)
+      for (unsigned int q_point = 0; q_point < n_quadrature_points; ++q_point)
         {
           if (requested_location.distance(evaluation_points[q_point]) <
               distance)

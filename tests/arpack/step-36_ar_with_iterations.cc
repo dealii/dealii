@@ -241,7 +241,7 @@ namespace Step36
         {
           mass_matrix.vmult(Bx, eigenfunctions[i]);
 
-          for (unsigned int j = 0; j < eigenfunctions.size(); j++)
+          for (unsigned int j = 0; j < eigenfunctions.size(); ++j)
             if (std::abs(eigenfunctions[j] * Bx - (i == j)) > 1e-8)
               deallog << "Eigenvectors " + Utilities::int_to_string(i) +
                            " and " + Utilities::int_to_string(j) +

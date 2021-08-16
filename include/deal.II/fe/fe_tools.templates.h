@@ -96,14 +96,14 @@ namespace FETools
 
       unsigned int n_components = 0;
       // Get the number of components from the first given finite element.
-      for (unsigned int i = 0; i < fes.size(); i++)
+      for (unsigned int i = 0; i < fes.size(); ++i)
         if (multiplicities[i] > 0)
           {
             n_components = fes[i]->n_components();
             break;
           }
 
-      for (unsigned int i = 0; i < fes.size(); i++)
+      for (unsigned int i = 0; i < fes.size(); ++i)
         if (multiplicities[i] > 0)
           {
             // TODO: the implementation makes the assumption that all faces have

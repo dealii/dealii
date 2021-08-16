@@ -63,7 +63,7 @@ test()
     ++it;
     ++it;
     it = triangulation.begin(1);
-    for (unsigned int a = 0; a < 4; a++)
+    for (unsigned int a = 0; a < 4; ++a)
       it->child(a)->set_coarsen_flag();
 
     triangulation.prepare_coarsening_and_refinement();

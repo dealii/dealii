@@ -81,11 +81,11 @@ test_1d()
                     fourier_coefficients);
 
   deallog << "calculated:" << std::endl;
-  for (unsigned int i = 0; i < N; i++)
+  for (unsigned int i = 0; i < N; ++i)
     deallog << fourier_coefficients[i].real() << " "
             << fourier_coefficients[i].imag() << std::endl;
   deallog << "exact:" << std::endl;
-  for (unsigned int i = 0; i < N; i++)
+  for (unsigned int i = 0; i < N; ++i)
     deallog << exact[i].real() << " " << exact[i].imag() << std::endl;
 }
 

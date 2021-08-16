@@ -62,8 +62,8 @@ test2()
   std::vector<double>     m(19 * 19);
 
   if (1) // works if changed to "if (0)"   <<<<<<<<<
-    for (unsigned int i = 0; i < 19; i++)
-      for (unsigned int j = 0; j < 19; j++)
+    for (unsigned int i = 0; i < 19; ++i)
+      for (unsigned int j = 0; j < 19; ++j)
         {
           /// all points are inside
           points[19 * i + j](0) = -0.7 + (i + 1) * .07;

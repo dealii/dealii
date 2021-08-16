@@ -310,7 +310,7 @@ namespace VectorTools
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
     cell_point.first->get_dof_indices(local_dof_indices);
 
-    for (unsigned int i = 0; i < dofs_per_cell; i++)
+    for (unsigned int i = 0; i < dofs_per_cell; ++i)
       rhs_vector(local_dof_indices[i]) = fe_values.shape_value(i, 0);
   }
 
@@ -375,7 +375,7 @@ namespace VectorTools
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
     cell_point.first->get_dof_indices(local_dof_indices);
 
-    for (unsigned int i = 0; i < dofs_per_cell; i++)
+    for (unsigned int i = 0; i < dofs_per_cell; ++i)
       rhs_vector(local_dof_indices[i]) = fe_values.shape_value(i, 0);
   }
 
@@ -420,7 +420,7 @@ namespace VectorTools
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
     cell_point.first->get_dof_indices(local_dof_indices);
 
-    for (unsigned int i = 0; i < dofs_per_cell; i++)
+    for (unsigned int i = 0; i < dofs_per_cell; ++i)
       rhs_vector(local_dof_indices[i]) =
         orientation * fe_values[vec].value(i, 0);
   }
@@ -492,7 +492,7 @@ namespace VectorTools
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
     cell_point.first->get_dof_indices(local_dof_indices);
 
-    for (unsigned int i = 0; i < dofs_per_cell; i++)
+    for (unsigned int i = 0; i < dofs_per_cell; ++i)
       rhs_vector(local_dof_indices[i]) =
         orientation * fe_values[vec].value(i, 0);
   }

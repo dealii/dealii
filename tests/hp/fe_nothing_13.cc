@@ -101,7 +101,7 @@ test()
                                                      dof_handler.begin_active(),
                                                    endc = dof_handler.end();
 
-    for (; cell != endc; cell++)
+    for (; cell != endc; ++cell)
       {
         deallog << cell << ' ' << cell->active_fe_index() << std::endl << "   ";
         std::vector<types::global_dof_index> local_dof_indices(

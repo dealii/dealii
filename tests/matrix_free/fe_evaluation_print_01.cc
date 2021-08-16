@@ -36,18 +36,18 @@ template <int dim>
 void
 test()
 {
-  for (unsigned int i = 1; i < 25; i++)
+  for (unsigned int i = 1; i < 25; ++i)
     {
-      for (unsigned int j = 1; j < 25; j++)
+      for (unsigned int j = 1; j < 25; ++j)
         if (FEEvaluation<dim, -1, 0, 1>::fast_evaluation_supported(i, j))
           deallog << 1 << " ";
         else
           deallog << "  ";
       deallog << std::endl;
     }
-  for (unsigned int i = 1; i < 25; i++)
+  for (unsigned int i = 1; i < 25; ++i)
     {
-      for (unsigned int j = 1; j < 25; j++)
+      for (unsigned int j = 1; j < 25; ++j)
         if (FEFaceEvaluation<dim, -1, 0, 1>::fast_evaluation_supported(i, j))
           deallog << 1 << " ";
         else

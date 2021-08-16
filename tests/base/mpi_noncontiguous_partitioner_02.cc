@@ -78,7 +78,7 @@ test(const MPI_Comm &comm, const bool do_revert, const unsigned int dir)
     if (cell->is_active() && cell->is_locally_owned())
       {
         auto c = cell->center();
-        for (unsigned int i = 0; i < dim; i++)
+        for (unsigned int i = 0; i < dim; ++i)
           c[i] = c[i] / delta;
 
         const auto lid = static_cast<unsigned int>(norm_point_to_lex(c));
@@ -98,14 +98,14 @@ test(const MPI_Comm &comm, const bool do_revert, const unsigned int dir)
 
   if (dim == 2 && dir == 0)
     {
-      for (unsigned int j = 0, c = start * n_points_face; j < end; j++)
-        for (unsigned int i = start; i < n_points_1D; i++)
+      for (unsigned int j = 0, c = start * n_points_face; j < end; ++j)
+        for (unsigned int i = start; i < n_points_1D; ++i)
           indices_want.push_back(c++);
     }
   else if (dim == 2 && dir == 1)
     {
-      for (unsigned int j = 0; j < n_points_1D; j++)
-        for (unsigned int i = start; i < end; i++)
+      for (unsigned int j = 0; j < n_points_1D; ++j)
+        for (unsigned int i = start; i < end; ++i)
           indices_want.push_back(j * n_points_face + i);
     }
   else
@@ -119,7 +119,7 @@ test(const MPI_Comm &comm, const bool do_revert, const unsigned int dir)
                                                   comm);
 
   AlignedVector<double> src(indices_has.size());
-  for (unsigned int i = 0; i < indices_has.size(); i++)
+  for (unsigned int i = 0; i < indices_has.size(); ++i)
     src[i] = indices_has[i];
 
 
@@ -129,15 +129,15 @@ test(const MPI_Comm &comm, const bool do_revert, const unsigned int dir)
                                                          src.size()),
                                  ArrayView<double>(dst.data(), dst.size()));
 
-  for (size_t i = 0; i < src.size(); i++)
+  for (size_t i = 0; i < src.size(); ++i)
     deallog << static_cast<int>(src[i]) << " ";
   deallog << std::endl;
-  for (size_t i = 0; i < dst.size(); i++)
+  for (size_t i = 0; i < dst.size(); ++i)
     deallog << static_cast<int>(dst[i]) << " ";
   deallog << std::endl << std::endl;
 
 
-  for (size_t i = 0; i < dst.size(); i++)
+  for (size_t i = 0; i < dst.size(); ++i)
     AssertDimension(dst[i], indices_want[i]);
 }
 
@@ -145,7 +145,7 @@ template <int dim>
 void
 test_dim(const MPI_Comm &comm, const bool do_revert)
 {
-  for (int dir = 0; dir < dim; dir++)
+  for (int dir = 0; dir < dim; ++dir)
     test<dim>(comm, do_revert, dir);
 }
 

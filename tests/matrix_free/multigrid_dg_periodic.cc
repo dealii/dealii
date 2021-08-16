@@ -197,7 +197,7 @@ private:
     FEFaceEvaluation<dim, -1, 0, 1, number> fe_eval(data, true);
     FEFaceEvaluation<dim, -1, 0, 1, number> fe_eval_neighbor(data, false);
 
-    for (unsigned int face = face_range.first; face < face_range.second; face++)
+    for (unsigned int face = face_range.first; face < face_range.second; ++face)
       {
         fe_eval.reinit(face);
         fe_eval_neighbor.reinit(face);
@@ -244,7 +244,7 @@ private:
     const std::pair<unsigned int, unsigned int> &     face_range) const
   {
     FEFaceEvaluation<dim, -1, 0, 1, number> fe_eval(data, true);
-    for (unsigned int face = face_range.first; face < face_range.second; face++)
+    for (unsigned int face = face_range.first; face < face_range.second; ++face)
       {
         fe_eval.reinit(face);
         fe_eval.read_dof_values(src);
@@ -333,7 +333,7 @@ private:
     AlignedVector<VectorizedArray<number>>  local_diagonal_vector(
       phi.dofs_per_cell);
 
-    for (unsigned int face = face_range.first; face < face_range.second; face++)
+    for (unsigned int face = face_range.first; face < face_range.second; ++face)
       {
         phi.reinit(face);
         phi_outer.reinit(face);
@@ -421,7 +421,7 @@ private:
     AlignedVector<VectorizedArray<number>>  local_diagonal_vector(
       phi.dofs_per_cell);
 
-    for (unsigned int face = face_range.first; face < face_range.second; face++)
+    for (unsigned int face = face_range.first; face < face_range.second; ++face)
       {
         phi.reinit(face);
 

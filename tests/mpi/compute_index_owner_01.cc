@@ -86,7 +86,7 @@ test()
     Utilities::MPI::Partitioner v(local_owned, local_relevant, comm);
 
     for (unsigned int i = 0; i < v.ghost_targets().size(); ++i)
-      for (unsigned int j = 0; j < v.ghost_targets()[i].second; j++)
+      for (unsigned int j = 0; j < v.ghost_targets()[i].second; ++j)
         deallog << v.ghost_targets()[i].first << std::endl;
   }
 }

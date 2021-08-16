@@ -74,7 +74,7 @@ test_find_best_height_direction()
 
   std::vector<FunctionBounds<dim>> bounds(2);
   // Set up so that the bounds correspond to indefinite functions.
-  for (unsigned int i = 0; i < bounds.size(); i++)
+  for (unsigned int i = 0; i < bounds.size(); ++i)
     {
       bounds[i].value.first  = -1;
       bounds[i].value.second = 1;

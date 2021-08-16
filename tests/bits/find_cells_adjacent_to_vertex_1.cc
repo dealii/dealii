@@ -42,7 +42,7 @@
 void
 check(Triangulation<2> &tria)
 {
-  for (unsigned i = 0; i < tria.n_vertices(); i++)
+  for (unsigned i = 0; i < tria.n_vertices(); ++i)
     {
       std::vector<Triangulation<2>::active_cell_iterator> cells =
         GridTools::find_cells_adjacent_to_vertex(tria, i);
@@ -50,7 +50,7 @@ check(Triangulation<2> &tria)
       deallog << "Vertex " << i << " at " << tria.get_vertices()[i] << ": "
               << cells.size() << " cells" << std::endl;
 
-      for (unsigned c = 0; c < cells.size(); c++)
+      for (unsigned c = 0; c < cells.size(); ++c)
         {
           for (const unsigned int v : GeometryInfo<2>::vertex_indices())
             deallog << "<" << cells[c]->vertex(v) << "> ";

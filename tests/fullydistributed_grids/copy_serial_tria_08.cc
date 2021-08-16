@@ -68,7 +68,7 @@ test(int n_refinements, MPI_Comm comm)
       auto   cell_base = basetria.create_cell_iterator(id);
       // Assert(cell->center() == cell_base->center(),
       //       ExcMessage("Cells do not match"));
-      for (unsigned int d = 0; d < dim; d++)
+      for (unsigned int d = 0; d < dim; ++d)
         Assert(std::abs(cell->center()[d] - cell_base->center()[d]) < 1e-9,
                ExcMessage("Cells do not match"));
     }

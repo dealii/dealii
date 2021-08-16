@@ -300,7 +300,7 @@ namespace Utilities
         for (Integer q = M; q > 1; q >>= 1)
           {
             const Integer p = q - 1;
-            for (unsigned int i = 0; i < dim; i++)
+            for (unsigned int i = 0; i < dim; ++i)
               {
                 // invert
                 if (X[i] & q)
@@ -318,14 +318,14 @@ namespace Utilities
           }
 
         // Gray encode (inverse of decode)
-        for (unsigned int i = 1; i < dim; i++)
+        for (unsigned int i = 1; i < dim; ++i)
           X[i] ^= X[i - 1];
 
         Integer t = 0;
         for (Integer q = M; q > 1; q >>= 1)
           if (X[dim - 1] & q)
             t ^= q - 1;
-        for (unsigned int i = 0; i < dim; i++)
+        for (unsigned int i = 0; i < dim; ++i)
           X[i] ^= t;
 
         // now we need to go from index stored in transpose format to

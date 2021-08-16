@@ -61,7 +61,7 @@ test()
                                                    dof_handler.begin_active(),
                                                  endc = dof_handler.end();
 
-  for (; cell != endc; cell++)
+  for (; cell != endc; ++cell)
     {
       Point<dim> center = cell->center();
       if (std::sqrt(center.square()) < 0.5)

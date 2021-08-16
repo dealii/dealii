@@ -66,7 +66,7 @@ test()
   DoFTools::map_dofs_to_support_points(mapping_collection, dof_handler, hp_map);
 
   // output the elements
-  for (unsigned int i = 0; i < hp_map.size(); i++)
+  for (unsigned int i = 0; i < hp_map.size(); ++i)
     {
       // both maps should contain the same
       Assert(hp_map[i] == map[i], ExcInternalError());

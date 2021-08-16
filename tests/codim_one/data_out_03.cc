@@ -57,7 +57,7 @@ public:
   virtual void
   vector_value(const Point<dim> &p, Vector<double> &values) const
   {
-    for (unsigned int i = 0; i < dim; i++)
+    for (unsigned int i = 0; i < dim; ++i)
       values(i) = p(i);
   }
 };

@@ -226,7 +226,7 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
 
       if (dim == 3)
         {
-          for (unsigned int count = 0; count < n_geometric_objects; count++)
+          for (unsigned int count = 0; count < n_geometric_objects; ++count)
             {
               unsigned int n_vertices;
               in >> n_vertices;
@@ -305,7 +305,7 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
         }
       else if (dim == 2)
         {
-          for (unsigned int count = 0; count < n_geometric_objects; count++)
+          for (unsigned int count = 0; count < n_geometric_objects; ++count)
             {
               unsigned int n_vertices;
               in >> n_vertices;
@@ -366,7 +366,7 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
         }
       else if (dim == 1)
         {
-          for (unsigned int count = 0; count < n_geometric_objects; count++)
+          for (unsigned int count = 0; count < n_geometric_objects; ++count)
             {
               unsigned int type;
               in >> type;
@@ -377,7 +377,7 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                   "While reading VTK file, unknown cell type encountered"));
               cells.emplace_back(type);
 
-              for (unsigned int j = 0; j < type; j++) // loop to feed data
+              for (unsigned int j = 0; j < type; ++j) // loop to feed data
                 in >> cells.back().vertices[j];
 
               cells.back().material_id = 0;
@@ -493,7 +493,7 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                       // assumption that cells come before all faces and
                       // lines has been verified above via an assertion, so
                       // the order used in the following blocks makes sense
-                      for (unsigned int i = 0; i < cells.size(); i++)
+                      for (unsigned int i = 0; i < cells.size(); ++i)
                         {
                           int id;
                           in >> id;
@@ -662,7 +662,7 @@ GridIn<dim, spacedim>::read_unv(std::istream &in)
 
       vertices.emplace_back();
 
-      for (unsigned int d = 0; d < spacedim; d++)
+      for (unsigned int d = 0; d < spacedim; ++d)
         vertices.back()(d) = x[d];
 
       vertex_indices[no] = no_vertex;
@@ -825,7 +825,7 @@ GridIn<dim, spacedim>::read_unv(std::istream &in)
           const unsigned int n_lines =
             (n_entities % 2 == 0) ? (n_entities / 2) : ((n_entities + 1) / 2);
 
-          for (unsigned int line = 0; line < n_lines; line++)
+          for (unsigned int line = 0; line < n_lines; ++line)
             {
               unsigned int n_fragments;
 
@@ -1393,7 +1393,7 @@ GridIn<dim, spacedim>::read_xda(std::istream &in)
 
       // XDA happens to use ExodusII's numbering because XDA/XDR is libMesh's
       // native format, and libMesh's node numberings come from ExodusII:
-      for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; i++)
+      for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
         in >> cell.vertices[reference_cell.exodusii_vertex_to_deal_vertex(i)];
     }
 

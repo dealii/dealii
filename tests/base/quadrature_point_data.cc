@@ -123,7 +123,7 @@ check_qph(parallel::distributed::Triangulation<dim> &tr,
           fe_values.get_quadrature_points();
         const std::vector<std::shared_ptr<const DATA>> qpd =
           manager.get_data(cell);
-        for (unsigned int q = 0; q < q_points.size(); q++)
+        for (unsigned int q = 0; q < q_points.size(); ++q)
           {
             const double value  = func.value(q_points[q]);
             const double value2 = qpd[q]->value;
@@ -171,7 +171,7 @@ test()
           data_storage.initialize(cell, rhs.size());
           std::vector<std::shared_ptr<MyQData>> qpd =
             data_storage.get_data(cell);
-          for (unsigned int q = 0; q < rhs.size(); q++)
+          for (unsigned int q = 0; q < rhs.size(); ++q)
             qpd[q]->value = my_func.value(q_points[q]);
         }
     dof_handler.clear();

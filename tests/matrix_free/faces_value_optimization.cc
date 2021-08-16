@@ -75,7 +75,7 @@ private:
     FEFaceEvaluation<dim, fe_degree, fe_degree + 1, 1, number> check(data,
                                                                      true);
 
-    for (unsigned int face = face_range.first; face < face_range.second; face++)
+    for (unsigned int face = face_range.first; face < face_range.second; ++face)
       {
         ref.reinit(face);
         check.reinit(face);

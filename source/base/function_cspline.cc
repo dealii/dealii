@@ -41,7 +41,7 @@ namespace Functions
                                   interpolation_values.size()));
 
     // check that input vector @p interpolation_points is provided in ascending order:
-    for (unsigned int i = 0; i < interpolation_points.size() - 1; i++)
+    for (unsigned int i = 0; i < interpolation_points.size() - 1; ++i)
       AssertThrow(interpolation_points[i] < interpolation_points[i + 1],
                   ExcCSplineOrder(i,
                                   interpolation_points[i],

@@ -3017,13 +3017,13 @@ namespace DataOutBase
           A[1][1]     = temp;
         }
 
-      for (unsigned int k = 0; k < 1; k++)
+      for (unsigned int k = 0; k < 1; ++k)
         {
-          for (unsigned int i = k + 1; i < 2; i++)
+          for (unsigned int i = k + 1; i < 2; ++i)
             {
               x = A[i][k] / A[k][k];
 
-              for (unsigned int j = k + 1; j < 2; j++)
+              for (unsigned int j = k + 1; j < 2; ++j)
                 A[i][j] = A[i][j] - A[k][j] * x;
 
               b[i] = b[i] - b[k] * x;
@@ -3036,7 +3036,7 @@ namespace DataOutBase
         {
           sum = b[i];
 
-          for (unsigned int j = i + 1; j < 2; j++)
+          for (unsigned int j = i + 1; j < 2; ++j)
             sum = sum - A[i][j] * b[j];
 
           b[i] = sum / A[i][i];
@@ -3075,13 +3075,13 @@ namespace DataOutBase
           A[1][1]     = temp;
         }
 
-      for (unsigned int k = 0; k < 1; k++)
+      for (unsigned int k = 0; k < 1; ++k)
         {
-          for (unsigned int i = k + 1; i < 2; i++)
+          for (unsigned int i = k + 1; i < 2; ++i)
             {
               x = A[i][k] / A[k][k];
 
-              for (unsigned int j = k + 1; j < 2; j++)
+              for (unsigned int j = k + 1; j < 2; ++j)
                 A[i][j] = A[i][j] - A[k][j] * x;
 
               b[i] = b[i] - b[k] * x;
@@ -3094,7 +3094,7 @@ namespace DataOutBase
         {
           sum = b[i];
 
-          for (unsigned int j = i + 1; j < 2; j++)
+          for (unsigned int j = i + 1; j < 2; ++j)
             sum = sum - A[i][j] * b[j];
 
           b[i] = sum / A[i][i];
@@ -3133,13 +3133,13 @@ namespace DataOutBase
           A[1][1]     = temp;
         }
 
-      for (unsigned int k = 0; k < 1; k++)
+      for (unsigned int k = 0; k < 1; ++k)
         {
-          for (unsigned int i = k + 1; i < 2; i++)
+          for (unsigned int i = k + 1; i < 2; ++i)
             {
               x = A[i][k] / A[k][k];
 
-              for (unsigned int j = k + 1; j < 2; j++)
+              for (unsigned int j = k + 1; j < 2; ++j)
                 A[i][j] = A[i][j] - A[k][j] * x;
 
               b[i] = b[i] - b[k] * x;
@@ -3152,7 +3152,7 @@ namespace DataOutBase
         {
           sum = b[i];
 
-          for (unsigned int j = i + 1; j < 2; j++)
+          for (unsigned int j = i + 1; j < 2; ++j)
             sum = sum - A[i][j] * b[j];
 
           b[i] = sum / A[i][i];
@@ -6983,7 +6983,7 @@ namespace DataOutBase
           additional_width =
             static_cast<unsigned int>(.5 + (height / 100.) * 2.5);
 
-        for (unsigned int index = 0; index < 4; index++)
+        for (unsigned int index = 0; index < 4; ++index)
           {
             double start_h = .667 - ((index + 1) / 4.) * .667;
             double stop_h  = .667 - (index / 4.) * .667;
@@ -7100,7 +7100,7 @@ namespace DataOutBase
               << index << ")\"/>" << '\n';
           }
 
-        for (unsigned int index = 0; index < 5; index++)
+        for (unsigned int index = 0; index < 5; ++index)
           {
             out
               << "  <text x=\""

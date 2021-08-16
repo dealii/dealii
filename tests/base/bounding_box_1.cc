@@ -33,7 +33,7 @@ test_bounding_box()
 
   std::pair<Point<spacedim>, Point<spacedim>> boundaries;
 
-  for (int i = 0; i < spacedim; i++)
+  for (int i = 0; i < spacedim; ++i)
     {
       boundaries.first[i]  = 0.2 - i * 0.2;
       boundaries.second[i] = 0.8 + i * 0.8;
@@ -111,7 +111,7 @@ test_unitary()
 {
   std::pair<Point<3>, Point<3>> boundaries;
 
-  for (int i = 0; i < 3; i++)
+  for (int i = 0; i < 3; ++i)
     {
       boundaries.second[i] = 1.0;
     }

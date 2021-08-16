@@ -29,7 +29,7 @@ do_test()
           << std::endl;
 
   VectorizedArrayType left;
-  for (unsigned int i = 0; i < VectorizedArrayType::size(); i++)
+  for (unsigned int i = 0; i < VectorizedArrayType::size(); ++i)
     left[i] = i + 1.;
 
   VectorizedArrayType right(3.);

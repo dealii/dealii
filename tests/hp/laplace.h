@@ -335,11 +335,11 @@ Laplace<dim>::assemble()
 
         const unsigned int n_q_points =
           hp_fe_values.get_present_fe_values().n_quadrature_points;
-        for (unsigned int q_index = 0; q_index < n_q_points; q_index++)
+        for (unsigned int q_index = 0; q_index < n_q_points; ++q_index)
           {
-            for (unsigned int i = 0; i < dofs_per_cell; i++)
+            for (unsigned int i = 0; i < dofs_per_cell; ++i)
               {
-                for (unsigned int j = i; j < dofs_per_cell; j++)
+                for (unsigned int j = i; j < dofs_per_cell; ++j)
                   {
                     cell_matrix(i, j) += (fe_values.shape_grad(i, q_index) *
                                           fe_values.shape_grad(j, q_index)) *
@@ -353,8 +353,8 @@ Laplace<dim>::assemble()
           }
 
         // exploit symmetry
-        for (unsigned int i = 0; i < dofs_per_cell; i++)
-          for (unsigned int j = i; j < dofs_per_cell; j++)
+        for (unsigned int i = 0; i < dofs_per_cell; ++i)
+          for (unsigned int j = i; j < dofs_per_cell; ++j)
             cell_matrix(j, i) = cell_matrix(i, j);
 
 
@@ -639,7 +639,7 @@ Laplace<dim>::run()
   setup_geometry();
   setup_system();
 
-  for (unsigned int cycle = 0; cycle <= n_cycles; cycle++)
+  for (unsigned int cycle = 0; cycle <= n_cycles; ++cycle)
     {
       pcout << std::endl << "Cycle " << cycle << std::endl;
 

@@ -753,7 +753,7 @@ gather(VectorizedArray<Number, width> &   out,
        const std::array<Number *, width> &ptrs,
        const unsigned int                 offset)
 {
-  for (unsigned int v = 0; v < width; v++)
+  for (unsigned int v = 0; v < width; ++v)
     out.data[v] = ptrs[v][offset];
 }
 

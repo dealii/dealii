@@ -109,7 +109,7 @@ namespace
   {
     deallog << "dim = " << dim << std::endl;
 
-    for (unsigned int direction = 0; direction < dim; direction++)
+    for (unsigned int direction = 0; direction < dim; ++direction)
       test_truncates_derivatives_correctly<dim>(direction);
   }
 

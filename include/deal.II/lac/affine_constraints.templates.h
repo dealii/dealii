@@ -3043,7 +3043,7 @@ namespace internal
       step = length / 2;
       while (step > 0)
         {
-          for (i = step; i < length; i++)
+          for (i = step; i < length; ++i)
             {
               istep = step;
               j     = i;
@@ -3628,7 +3628,7 @@ namespace internal
                 average_diagonal = static_cast<number>(1.);
             }
 
-          for (size_type i = 0; i < global_rows.n_constraints(); i++)
+          for (size_type i = 0; i < global_rows.n_constraints(); ++i)
             {
               const size_type local_row  = global_rows.constraint_origin(i);
               const size_type global_row = local_dof_indices[local_row];
@@ -3683,7 +3683,7 @@ namespace internal
       // that have been left out above
       if (global_rows.n_constraints() > 0)
         {
-          for (size_type i = 0; i < global_rows.n_constraints(); i++)
+          for (size_type i = 0; i < global_rows.n_constraints(); ++i)
             {
               const size_type local_row  = global_rows.constraint_origin(i);
               const size_type global_row = local_dof_indices[local_row];
@@ -4299,11 +4299,11 @@ AffineConstraints<number>::add_entries_local_to_global(
       // need to add the whole row and column structure in case we keep
       // constrained entries. Unfortunately, we can't use the nice matrix
       // structure we use elsewhere, so manually add those indices one by one.
-      for (size_type i = 0; i < n_local_dofs; i++)
+      for (size_type i = 0; i < n_local_dofs; ++i)
         if (is_constrained(local_dof_indices[i]))
           {
             if (keep_constrained_entries == true)
-              for (size_type j = 0; j < n_local_dofs; j++)
+              for (size_type j = 0; j < n_local_dofs; ++j)
                 {
                   sparsity_pattern.add(local_dof_indices[i],
                                        local_dof_indices[j]);
@@ -4476,11 +4476,11 @@ AffineConstraints<number>::add_entries_local_to_global(
             }
         }
 
-      for (size_type i = 0; i < n_local_dofs; i++)
+      for (size_type i = 0; i < n_local_dofs; ++i)
         if (is_constrained(local_dof_indices[i]))
           {
             if (keep_constrained_entries == true)
-              for (size_type j = 0; j < n_local_dofs; j++)
+              for (size_type j = 0; j < n_local_dofs; ++j)
                 {
                   sparsity_pattern.add(local_dof_indices[i],
                                        local_dof_indices[j]);

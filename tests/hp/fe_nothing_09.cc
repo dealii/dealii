@@ -63,7 +63,7 @@ test()
                                                    dof_handler.begin_active(),
                                                  endc = dof_handler.end();
 
-  for (; cell != endc; cell++)
+  for (; cell != endc; ++cell)
     if (cell->center()[0] > 0)
       cell->set_active_fe_index(1);
     else

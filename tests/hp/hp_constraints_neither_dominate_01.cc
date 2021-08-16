@@ -78,7 +78,7 @@ test2cells(const unsigned int p1 = 2, const unsigned int p2 = 1)
   Triangulation<dim> triangulation;
   {
     Point<dim> p1, p2;
-    for (unsigned int d = 0; d < dim; d++)
+    for (unsigned int d = 0; d < dim; ++d)
       p1[d] = -1;
     p2[0] = 1.0;
     std::vector<unsigned int> repetitoins(dim, 1);
@@ -123,7 +123,7 @@ test2cells(const unsigned int p1 = 2, const unsigned int p2 = 1)
   counter++;
   std::vector<Vector<double>> shape_functions;
   std::vector<std::string>    names;
-  for (unsigned int s = 0; s < dof_handler.n_dofs(); s++)
+  for (unsigned int s = 0; s < dof_handler.n_dofs(); ++s)
     {
       Vector<double> shape_function;
       shape_function.reinit(dof_handler.n_dofs());
@@ -159,7 +159,7 @@ test2cells(const unsigned int p1 = 2, const unsigned int p2 = 1)
     }
   data_out.add_data_vector(fe_index, "fe_index");
 
-  for (unsigned int i = 0; i < shape_functions.size(); i++)
+  for (unsigned int i = 0; i < shape_functions.size(); ++i)
     data_out.add_data_vector(shape_functions[i], names[i]);
 
   data_out.build_patches(0);
@@ -172,7 +172,7 @@ test2cells(const unsigned int p1 = 2, const unsigned int p2 = 1)
 
   // fill some vector
   Vector<double> solution(dof_handler.n_dofs());
-  for (unsigned int dof = 0; dof < dof_handler.n_dofs(); dof++)
+  for (unsigned int dof = 0; dof < dof_handler.n_dofs(); ++dof)
     solution[dof] = 21.0 * (dof % 2) + 0.5 + dof % 3;
 
   constraints.distribute(solution);
@@ -207,7 +207,7 @@ test2cells(const unsigned int p1 = 2, const unsigned int p2 = 1)
             const std::vector<dealii::Point<dim>> &q_points =
               fe_face_values.get_quadrature_points();
 
-            for (unsigned int q = 0; q < n_q_points; q++)
+            for (unsigned int q = 0; q < n_q_points; ++q)
               deallog << "u[" << q_points[q] << "]={" << values[q][0] << ","
                       << values[q][1] << "}" << std::endl;
           }

@@ -287,7 +287,7 @@ namespace internal
               AssertThrow(level_dof_indices.size() == index_owner.size(),
                           ExcMessage("Size does not match!"));
 
-              for (unsigned int i = 0; i < index_owner.size(); i++)
+              for (unsigned int i = 0; i < index_owner.size(); ++i)
                 send_data[index_owner[i]].emplace_back(level,
                                                        global_dof_indices[i],
                                                        level_dof_indices[i]);

@@ -38,7 +38,7 @@ test(const unsigned int degree)
   std::vector<Tensor<3, dim>> third_derivatives;
   std::vector<Tensor<4, dim>> fourth_derivatives;
 
-  for (unsigned int i = 0; i < quad.size(); i++)
+  for (unsigned int i = 0; i < quad.size(); ++i)
     {
       poly.evaluate(quad.point(i),
                     values,

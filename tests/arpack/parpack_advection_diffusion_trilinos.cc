@@ -100,7 +100,7 @@ locally_owned_dofs_per_subdomain(const DoFHandler<dim> &dof_handler)
       index_sets[this_subdomain].add_range(i_min, subdomain_association.size());
     }
 
-  for (unsigned int i = 0; i < n_subdomains; i++)
+  for (unsigned int i = 0; i < n_subdomains; ++i)
     index_sets[i].compress();
 
   return index_sets;
@@ -181,7 +181,7 @@ test()
                                   constraints,
                                   /* keep constrained dofs */ true);
   std::vector<types::global_dof_index> n_locally_owned_dofs(n_mpi_processes);
-  for (unsigned int i = 0; i < n_mpi_processes; i++)
+  for (unsigned int i = 0; i < n_mpi_processes; ++i)
     n_locally_owned_dofs[i] = locally_owned_dofs_per_processor[i].n_elements();
 
   SparsityTools::distribute_sparsity_pattern(csp,
@@ -281,7 +281,7 @@ test()
     const double                      shift = 4.0;
     std::vector<std::complex<double>> lambda(eigenfunctions.size());
 
-    for (unsigned int i = 0; i < eigenvalues.size(); i++)
+    for (unsigned int i = 0; i < eigenvalues.size(); ++i)
       eigenfunctions[i] = 0.;
 
 
@@ -348,7 +348,7 @@ test()
           }
       }
 
-    for (unsigned int i = 0; i < eigenvalues.size(); i++)
+    for (unsigned int i = 0; i < eigenvalues.size(); ++i)
       deallog << eigenvalues[i] << std::endl;
 
     // make sure that we have eigenvectors and they are mass-normal:

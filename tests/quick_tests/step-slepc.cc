@@ -170,7 +170,7 @@ LaplaceEigenspectrumProblem::solve()
       {
         B.vmult(Bx, x[i]);
 
-        for (unsigned int j = 0; j < x.size(); j++)
+        for (unsigned int j = 0; j < x.size(); ++j)
           if (j != i)
             Assert(std::abs(x[j] * Bx) < precision,
                    ExcMessage("Eigenvectors " + Utilities::int_to_string(i) +

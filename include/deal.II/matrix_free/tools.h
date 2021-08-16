@@ -192,7 +192,7 @@ namespace MatrixFreeTools
 
     const auto to_category = [&](const auto &cell) {
       unsigned int c_num = 0;
-      for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; i++)
+      for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
         {
           auto &face = *cell->face(i);
           if (face.at_boundary() && !cell->has_periodic_neighbor(i))

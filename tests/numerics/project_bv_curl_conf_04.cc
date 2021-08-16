@@ -140,7 +140,7 @@ test_boundary_values(DoFHandler<dim> &   dof_handler,
   bool ret = true;
   for (unsigned int bc = 0; bc < 6; ++bc)
     {
-      for (unsigned int basis = 0; basis < dof_handler.n_dofs(); basis++)
+      for (unsigned int basis = 0; basis < dof_handler.n_dofs(); ++basis)
         {
           if (fabs(local_averages[bc](basis)) > 1.e-10)
             {
@@ -208,7 +208,7 @@ main(int /*argc*/, char ** /*argv*/)
     bool equal = (test_vec.size() == test_vec2.size());
     if (equal)
       {
-        for (unsigned int i = 0; i < test_vec.size(); i++)
+        for (unsigned int i = 0; i < test_vec.size(); ++i)
           {
             equal = equal && (test_vec(i) == test_vec2(i));
           }
@@ -264,7 +264,7 @@ main(int /*argc*/, char ** /*argv*/)
     bool equal = (test_vec.size() == test_vec2.size());
     if (equal)
       {
-        for (unsigned int i = 0; i < test_vec.size(); i++)
+        for (unsigned int i = 0; i < test_vec.size(); ++i)
           {
             equal = equal && (test_vec(i) == test_vec2(i));
           }

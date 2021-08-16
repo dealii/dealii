@@ -36,7 +36,7 @@ namespace
   create_box()
   {
     std::pair<Point<dim>, Point<dim>> lower_upper_corner;
-    for (unsigned int i = 0; i < dim; i++)
+    for (unsigned int i = 0; i < dim; ++i)
       {
         lower_upper_corner.first[i]  = -1.0 / (i + 1);
         lower_upper_corner.second[i] = 1.0 / (i + 1);
@@ -72,7 +72,7 @@ namespace
     gradient(const Point<dim> &, const unsigned int) const override
     {
       Tensor<1, dim> grad;
-      for (unsigned int i = 0; i < dim; i++)
+      for (unsigned int i = 0; i < dim; ++i)
         grad[i] = i + 1;
 
       return grad;
@@ -82,8 +82,8 @@ namespace
     hessian(const Point<dim> &, const unsigned int) const
     {
       SymmetricTensor<2, dim> hess;
-      for (unsigned int i = 0; i < dim; i++)
-        for (unsigned int j = 0; j < dim; j++)
+      for (unsigned int i = 0; i < dim; ++i)
+        for (unsigned int j = 0; j < dim; ++j)
           hess[i][j] = (i + 1) * (j + 1);
 
       return hess;
@@ -123,7 +123,7 @@ namespace
     deallog << "value: ";
     print_bounds(value_bounds);
 
-    for (unsigned int i = 0; i < dim; i++)
+    for (unsigned int i = 0; i < dim; ++i)
       {
         deallog << "gradient[" << i << "]: ";
         print_bounds(gradient_bounds[i]);

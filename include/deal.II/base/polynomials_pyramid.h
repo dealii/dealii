@@ -131,7 +131,7 @@ ScalarLagrangePolynomialPyramid<dim>::compute_derivative(
   Assert(order == 1, ExcNotImplemented());
   const auto grad = compute_grad(i, p);
 
-  for (unsigned int i = 0; i < dim; i++)
+  for (unsigned int i = 0; i < dim; ++i)
     der[i] = grad[i];
 
   return der;

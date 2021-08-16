@@ -144,6 +144,6 @@ main(int argc, char **argv)
 
   deallog.precision(8);
 
-  for (unsigned int i = 1; i < 5; i++)
+  for (unsigned int i = 1; i < 5; ++i)
     test<2, double>(i);
 }

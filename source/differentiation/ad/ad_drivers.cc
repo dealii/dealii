@@ -771,8 +771,8 @@ namespace Differentiation
       // ADOL-C builds only the lower-triangular part of the
       // symmetric Hessian, so we should copy the relevant
       // entries into the upper triangular part.
-      for (unsigned int i = 0; i < n_independent_variables; i++)
-        for (unsigned int j = 0; j < i; j++)
+      for (unsigned int i = 0; i < n_independent_variables; ++i)
+        for (unsigned int j = 0; j < i; ++j)
           hessian[j][i] = hessian[i][j]; // Symmetry
     }
 
@@ -1840,7 +1840,7 @@ namespace Differentiation
       internal::reverse_mode_dependent_variable_activation(
         const_cast<ADNumberType &>(dependent_variables[0]));
       const std::size_t n_independent_variables = independent_variables.size();
-      for (unsigned int i = 0; i < n_independent_variables; i++)
+      for (unsigned int i = 0; i < n_independent_variables; ++i)
         gradient[i] = internal::NumberType<ScalarType>::value(
           ADNumberTraits<ADNumberType>::get_directional_derivative(
             independent_variables[i], 0 /*This number doesn't really matter*/));
@@ -1877,7 +1877,7 @@ namespace Differentiation
       internal::reverse_mode_dependent_variable_activation(
         const_cast<ADNumberType &>(dependent_variables[0]));
       const std::size_t n_independent_variables = independent_variables.size();
-      for (unsigned int i = 0; i < n_independent_variables; i++)
+      for (unsigned int i = 0; i < n_independent_variables; ++i)
         {
           using derivative_type =
             typename ADNumberTraits<ADNumberType>::derivative_type;
@@ -1918,7 +1918,7 @@ namespace Differentiation
              ExcDimensionMismatch(values.size(), dependent_variables.size()));
 
       const std::size_t n_dependent_variables = dependent_variables.size();
-      for (unsigned int i = 0; i < n_dependent_variables; i++)
+      for (unsigned int i = 0; i < n_dependent_variables; ++i)
         values[i] = ADNumberTraits<ADNumberType>::get_scalar_value(
           dependent_variables[i]);
     }
@@ -1965,11 +1965,11 @@ namespace Differentiation
         n_independent_variables,
         dealii::internal::NumberType<accumulation_type>::value(0.0));
 
-      for (unsigned int i = 0; i < n_dependent_variables; i++)
+      for (unsigned int i = 0; i < n_dependent_variables; ++i)
         {
           internal::reverse_mode_dependent_variable_activation(
             const_cast<ADNumberType &>(dependent_variables[i]));
-          for (unsigned int j = 0; j < n_independent_variables; j++)
+          for (unsigned int j = 0; j < n_independent_variables; ++j)
             {
               const accumulation_type df_i_dx_j =
                 ADNumberTraits<ADNumberType>::get_directional_derivative(
@@ -2122,7 +2122,7 @@ namespace Differentiation
       // In forward mode, the gradients are computed from the
       // dependent variables
       const std::size_t n_independent_variables = independent_variables.size();
-      for (unsigned int i = 0; i < n_independent_variables; i++)
+      for (unsigned int i = 0; i < n_independent_variables; ++i)
         gradient[i] = internal::NumberType<ScalarType>::value(
           ADNumberTraits<ADNumberType>::get_directional_derivative(
             dependent_variables[0], i));
@@ -2159,7 +2159,7 @@ namespace Differentiation
       // In forward mode, the gradients are computed from the
       // dependent variables
       const std::size_t n_independent_variables = independent_variables.size();
-      for (unsigned int i = 0; i < n_independent_variables; i++)
+      for (unsigned int i = 0; i < n_independent_variables; ++i)
         {
           using derivative_type =
             typename ADNumberTraits<ADNumberType>::derivative_type;
@@ -2202,7 +2202,7 @@ namespace Differentiation
              ExcDimensionMismatch(values.size(), dependent_variables.size()));
 
       const std::size_t n_dependent_variables = dependent_variables.size();
-      for (unsigned int i = 0; i < n_dependent_variables; i++)
+      for (unsigned int i = 0; i < n_dependent_variables; ++i)
         values[i] = ADNumberTraits<ADNumberType>::get_scalar_value(
           dependent_variables[i]);
     }
@@ -2238,8 +2238,8 @@ namespace Differentiation
 
       // In forward mode, the gradients are computed from the
       // dependent variables
-      for (unsigned int i = 0; i < n_dependent_variables; i++)
-        for (unsigned int j = 0; j < n_independent_variables; j++)
+      for (unsigned int i = 0; i < n_dependent_variables; ++i)
+        for (unsigned int j = 0; j < n_independent_variables; ++j)
           jacobian[i][j] = internal::NumberType<ScalarType>::value(
             ADNumberTraits<ADNumberType>::get_directional_derivative(
               dependent_variables[i], j));

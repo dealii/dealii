@@ -123,7 +123,7 @@ test(std::string solver_name, std::string preconditioner_name)
                                           /* keep constrained dofs */ true);
   std::vector<dealii::types::global_dof_index> n_locally_owned_dofs(
     n_mpi_processes);
-  for (unsigned int i = 0; i < n_mpi_processes; i++)
+  for (unsigned int i = 0; i < n_mpi_processes; ++i)
     n_locally_owned_dofs[i] = locally_owned_dofs_per_processor[i].n_elements();
 
   dealii::SparsityTools::distribute_sparsity_pattern(csp,
@@ -323,7 +323,7 @@ test(std::string solver_name, std::string preconditioner_name)
     // dealii::deallog << "outer iterations: "<< solver_control.last_step
     // ()<<std::endl; dealii::deallog << "last inner iterations:
     // "<<linear_solver_control.last_step()<<std::endl;
-    for (unsigned int i = 0; i < eigenvalues.size(); i++)
+    for (unsigned int i = 0; i < eigenvalues.size(); ++i)
       dealii::deallog << eigenvalues[i] << std::endl;
 
     delete preconditioner;
@@ -339,7 +339,7 @@ test(std::string solver_name, std::string preconditioner_name)
         {
           mass_matrix.vmult(Bx, eigenfunctions[i]);
 
-          for (unsigned int j = 0; j < eigenfunctions.size(); j++)
+          for (unsigned int j = 0; j < eigenfunctions.size(); ++j)
             Assert(std::abs(eigenfunctions[j] * Bx - (i == j)) < precision,
                    ExcMessage("Eigenvectors " + Utilities::int_to_string(i) +
                               " and " + Utilities::int_to_string(j) +

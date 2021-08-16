@@ -1852,7 +1852,7 @@ namespace internal
         std::vector<unsigned int *> level_dof_indices_fine_(
           fe_index_pairs.size());
 
-        for (unsigned int i = 0; i < fe_index_pairs.size(); i++)
+        for (unsigned int i = 0; i < fe_index_pairs.size(); ++i)
           {
             level_dof_indices_coarse_[i] =
               transfer.schemes[i].level_dof_indices_coarse.data();
@@ -2059,7 +2059,7 @@ namespace internal
             fe_index_pairs.size());
           std::vector<Number *> weights_(fe_index_pairs.size());
 
-          for (unsigned int i = 0; i < fe_index_pairs.size(); i++)
+          for (unsigned int i = 0; i < fe_index_pairs.size(); ++i)
             {
               level_dof_indices_fine_[i] =
                 &transfer.schemes[i].level_dof_indices_fine[0];

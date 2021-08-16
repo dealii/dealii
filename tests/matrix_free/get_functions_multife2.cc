@@ -115,7 +115,7 @@ public:
             fe_val0.get_function_gradients(src[0], reference_grads0);
             fe_val0.get_function_hessians(src[0], reference_hess0);
 
-            for (int q = 0; q < (int)fe_eval0.n_q_points; q++)
+            for (int q = 0; q < (int)fe_eval0.n_q_points; ++q)
               {
                 errors[0] +=
                   std::fabs(fe_eval0.get_value(q)[j] - reference_values0[q]);
@@ -136,7 +136,7 @@ public:
             fe_val1.get_function_gradients(src[1], reference_grads1);
             fe_val1.get_function_hessians(src[1], reference_hess1);
 
-            for (int q = 0; q < (int)fe_eval1.n_q_points; q++)
+            for (int q = 0; q < (int)fe_eval1.n_q_points; ++q)
               {
                 errors[3] +=
                   std::fabs(fe_eval1.get_value(q)[j] - reference_values1[q]);
@@ -157,7 +157,7 @@ public:
             fe_val2.get_function_gradients(src[2], reference_grads2);
             fe_val2.get_function_hessians(src[2], reference_hess2);
 
-            for (int q = 0; q < (int)fe_eval2.n_q_points; q++)
+            for (int q = 0; q < (int)fe_eval2.n_q_points; ++q)
               {
                 errors[6] +=
                   std::fabs(fe_eval2.get_value(q)[j] - reference_values2[q]);

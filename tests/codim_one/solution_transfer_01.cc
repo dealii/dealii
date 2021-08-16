@@ -69,7 +69,7 @@ main()
   solution = 1.0;
 
   deallog << "Old values:" << std::endl;
-  for (unsigned int i = 0; i < solution.size(); i++)
+  for (unsigned int i = 0; i < solution.size(); ++i)
     deallog << solution(i) << std::endl;
 
 
@@ -92,7 +92,7 @@ main()
   soltrans.interpolate(solution, tmp);
 
   deallog << "New values:" << std::endl;
-  for (unsigned int i = 0; i < tmp.size(); i++)
+  for (unsigned int i = 0; i < tmp.size(); ++i)
     deallog << tmp(i) << std::endl;
 
   return 0;

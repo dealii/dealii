@@ -990,7 +990,7 @@ namespace Polynomials
             if ((k % 2) == 0)
               {
                 double b = 1.; // 8.;
-                // for (unsigned int i=1; i<=k; i++)
+                // for (unsigned int i=1; i<=k; ++i)
                 //  b /= 2.*i;
 
                 ck[1] += b * (*recursive_coefficients[2])[1];
@@ -1296,7 +1296,7 @@ namespace Polynomials
             const double auxiliary_zero =
               find_support_point_x_star(jacobi_roots);
             this->lagrange_support_points[0] = auxiliary_zero;
-            for (unsigned int m = 0; m < degree - 3; m++)
+            for (unsigned int m = 0; m < degree - 3; ++m)
               this->lagrange_support_points[m + 1] = jacobi_roots[m];
             this->lagrange_support_points[degree - 2] = 1.;
             this->lagrange_support_points[degree - 1] = 1.;
@@ -1307,7 +1307,7 @@ namespace Polynomials
         else if (index == 1)
           {
             this->lagrange_support_points[0] = 0.;
-            for (unsigned int m = 0; m < degree - 3; m++)
+            for (unsigned int m = 0; m < degree - 3; ++m)
               this->lagrange_support_points[m + 1] = jacobi_roots[m];
             this->lagrange_support_points[degree - 2] = 1.;
             this->lagrange_support_points[degree - 1] = 1.;
@@ -1344,7 +1344,7 @@ namespace Polynomials
           {
             this->lagrange_support_points[0] = 0.;
             this->lagrange_support_points[1] = 0.;
-            for (unsigned int m = 0, c = 2; m < degree - 3; m++)
+            for (unsigned int m = 0, c = 2; m < degree - 3; ++m)
               if (m + 2 != index)
                 this->lagrange_support_points[c++] = jacobi_roots[m];
             this->lagrange_support_points[degree - 2] = 1.;
@@ -1358,7 +1358,7 @@ namespace Polynomials
           {
             this->lagrange_support_points[0] = 0.;
             this->lagrange_support_points[1] = 0.;
-            for (unsigned int m = 0; m < degree - 3; m++)
+            for (unsigned int m = 0; m < degree - 3; ++m)
               this->lagrange_support_points[m + 2] = jacobi_roots[m];
             this->lagrange_support_points[degree - 1] = 1.;
 
@@ -1388,7 +1388,7 @@ namespace Polynomials
               find_support_point_x_star(jacobi_roots);
             this->lagrange_support_points[0] = 0.;
             this->lagrange_support_points[1] = 0.;
-            for (unsigned int m = 0; m < degree - 3; m++)
+            for (unsigned int m = 0; m < degree - 3; ++m)
               this->lagrange_support_points[m + 2] = jacobi_roots[m];
             this->lagrange_support_points[degree - 1] = 1. - auxiliary_zero;
 

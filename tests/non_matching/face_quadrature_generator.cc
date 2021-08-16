@@ -88,7 +88,7 @@ test_plane_cuts_through_center()
       const Functions::LevelSet::Plane<dim> levelset(center, normal);
 
       // Test all faces that are intersected by the plane.
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; f++)
+      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
         {
           const int normal_direction =
             GeometryInfo<dim>::unit_normal_direction[f];

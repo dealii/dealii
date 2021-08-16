@@ -206,7 +206,7 @@ namespace SLEPcWrappers
       AssertThrow(ierr == 0, ExcSLEPcError(ierr));
 
       // get the maximum of residual norm among converged eigenvectors.
-      for (unsigned int i = 0; i < *n_converged; i++)
+      for (unsigned int i = 0; i < *n_converged; ++i)
         {
           double residual_norm_i = 0.0;
           // EPSComputeError (or, in older versions of SLEPc,

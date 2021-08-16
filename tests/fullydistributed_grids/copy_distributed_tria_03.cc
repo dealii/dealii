@@ -64,7 +64,7 @@ test(int n_refinements, const int n_subdivisions, MPI_Comm comm)
     {
       CellId id        = cell->id();
       auto   cell_base = tria_pdt.create_cell_iterator(id);
-      for (unsigned int d = 0; d < dim; d++)
+      for (unsigned int d = 0; d < dim; ++d)
         Assert(std::abs(cell->center()[d] - cell_base->center()[d]) < 1e-9,
                ExcMessage("Cells do not match"));
     }

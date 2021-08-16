@@ -339,7 +339,7 @@ namespace Step29
     // should return the <i>square</i> of the absolute value --
     // thereby not satisfying the properties mathematicians require of
     // something called a "norm".)
-    for (unsigned int i = 0; i < computed_quantities.size(); i++)
+    for (unsigned int i = 0; i < computed_quantities.size(); ++i)
       {
         Assert(computed_quantities[i].size() == 1,
                ExcDimensionMismatch(computed_quantities[i].size(), 1));

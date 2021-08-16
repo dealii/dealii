@@ -105,7 +105,7 @@ test_int(const unsigned int n_global = 0, const unsigned int n_local = 0)
   tria_distrib.refine_global(n_global);
   tria_sequential.refine_global(n_global);
 
-  for (unsigned int i = 0; i < n_local; i++)
+  for (unsigned int i = 0; i < n_local; ++i)
     {
       // refine both the distributed and the sequential triangulation. the
       // following relies on the fact that the first cell of the "global"

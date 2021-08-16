@@ -39,14 +39,14 @@ main(void)
   adouble *x  = new adouble[n];
   adouble *y  = new adouble[m];
 
-  for (unsigned int i = 0; i < n; i++)
+  for (unsigned int i = 0; i < n; ++i)
     xp[i] = (i + 1.0) / (2.0 + i);
 
   for (unsigned int j = 0; j < m; ++j)
     y[j] = 1.0;
 
   trace_on(1);
-  for (unsigned int i = 0; i < n; i++)
+  for (unsigned int i = 0; i < n; ++i)
     {
       x[i] <<= xp[i];
       for (unsigned int j = 0; j < m; ++j)
@@ -83,9 +83,9 @@ main(void)
   jacobian(1, m, n, xp, J);
 
   deallog << "Function jacobian J:" << std::endl;
-  for (unsigned int j = 0; j < m; j++)
+  for (unsigned int j = 0; j < m; ++j)
     {
-      for (unsigned int i = 0; i < n; i++)
+      for (unsigned int i = 0; i < n; ++i)
         deallog << J[j][i] << (i < n - 1 ? "," : "");
 
       deallog << std::endl;
@@ -99,7 +99,7 @@ main(void)
   delete[] f;
   f = nullptr;
 
-  for (unsigned int j = 0; j < m; j++)
+  for (unsigned int j = 0; j < m; ++j)
     delete[] J[j];
   delete[] J;
   J = nullptr;

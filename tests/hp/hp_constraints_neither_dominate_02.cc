@@ -81,7 +81,7 @@ struct less_than_key
     const Point<dim> &p1        = pair1.first;
     const Point<dim> &p2        = pair2.first;
 
-    for (unsigned int d = 0; d < dim; d++)
+    for (unsigned int d = 0; d < dim; ++d)
       {
         const bool is_equal = (std::abs(p1[d] - p2[d]) < precision);
         if (!is_equal)
@@ -108,7 +108,7 @@ test2cells(const FiniteElement<dim> &fe_0,
   Triangulation<dim> triangulation;
   {
     Point<dim> p1, p2;
-    for (unsigned int d = 0; d < dim; d++)
+    for (unsigned int d = 0; d < dim; ++d)
       p2[d] = 1.0;
     p1[0] = -1.0;
     std::vector<unsigned int> repetitoins(dim, 1);
@@ -170,7 +170,7 @@ test2cells(const FiniteElement<dim> &fe_0,
   counter++;
   std::vector<Vector<double>> shape_functions;
   std::vector<std::string>    names;
-  for (unsigned int s = 0; s < dof_handler.n_dofs(); s++)
+  for (unsigned int s = 0; s < dof_handler.n_dofs(); ++s)
     {
       Vector<double> shape_function;
       shape_function.reinit(dof_handler.n_dofs());
@@ -206,7 +206,7 @@ test2cells(const FiniteElement<dim> &fe_0,
     }
   data_out.add_data_vector(fe_index, "fe_index");
 
-  for (unsigned int i = 0; i < shape_functions.size(); i++)
+  for (unsigned int i = 0; i < shape_functions.size(); ++i)
     data_out.add_data_vector(shape_functions[i], names[i]);
 
   data_out.build_patches(0);
@@ -220,7 +220,7 @@ test2cells(const FiniteElement<dim> &fe_0,
 
   // fill some vector
   Vector<double> solution(dof_handler.n_dofs());
-  for (unsigned int dof = 0; dof < dof_handler.n_dofs(); dof++)
+  for (unsigned int dof = 0; dof < dof_handler.n_dofs(); ++dof)
     solution[dof] = 1.5 * (dof % 7) + 0.5 * dim + 2.0 * (dof % 3);
 
   constraints.distribute(solution);
@@ -258,18 +258,18 @@ test2cells(const FiniteElement<dim> &fe_0,
             const std::vector<dealii::Point<dim>> &q_points =
               fe_face_values.get_quadrature_points();
 
-            for (unsigned int q = 0; q < n_q_points; q++)
+            for (unsigned int q = 0; q < n_q_points; ++q)
               {
                 // since our face is [0,1]^{dim-1}, the quadrature rule
                 // will coincide with quadrature points on mother face.
                 // Use that to limit output of sub-faces at the same quadrature
                 // points only.
                 Point<dim - 1> qpt;
-                for (unsigned int d = 0; d < dim - 1; d++)
+                for (unsigned int d = 0; d < dim - 1; ++d)
                   qpt[d] = q_points[q][d + 1];
 
                 unsigned int q_found = 0;
-                for (; q_found < quad_formula.size(); q_found++)
+                for (; q_found < quad_formula.size(); ++q_found)
                   if (quad_formula.point(q_found).distance(qpt) < 1e-5)
                     break;
 
@@ -291,14 +291,14 @@ test2cells(const FiniteElement<dim> &fe_0,
   std::sort(pairs_point_value.begin(),
             pairs_point_value.end(),
             less_than_key<dim>());
-  for (unsigned int p = 0; p < pairs_point_value.size(); p++)
+  for (unsigned int p = 0; p < pairs_point_value.size(); ++p)
     {
       const Point<dim> &    pt  = pairs_point_value[p].first;
       const Vector<double> &val = pairs_point_value[p].second;
 
       Assert(val.size() == n_comp, ExcInternalError());
       deallog << "@" << pt << " u = {" << val[0];
-      for (unsigned int c = 1; c < n_comp; c++)
+      for (unsigned int c = 1; c < n_comp; ++c)
         deallog << "," << val[c];
       deallog << "}" << std::endl;
     }

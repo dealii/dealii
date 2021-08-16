@@ -1945,7 +1945,7 @@ namespace DoFTools
       // neighbor a face are artificial, we simply test to see if the face
       // does not have a valid dof initialization.
 
-      for (unsigned int i = 0; i < dofs_per_face; i++)
+      for (unsigned int i = 0; i < dofs_per_face; ++i)
         if (dofs_1[i] == numbers::invalid_dof_index ||
             dofs_2[i] == numbers::invalid_dof_index)
           {

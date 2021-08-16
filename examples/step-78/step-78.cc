@@ -707,7 +707,7 @@ namespace BlackScholesSolver
     Vector<double> vmult_result;
     Vector<double> forcing_terms;
 
-    for (unsigned int cycle = 0; cycle < n_cycles; cycle++)
+    for (unsigned int cycle = 0; cycle < n_cycles; ++cycle)
       {
         if (cycle != 0)
           {

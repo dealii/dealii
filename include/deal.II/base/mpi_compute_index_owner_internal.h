@@ -783,7 +783,7 @@ namespace Utilities
             Assert(recv_indices[other_rank].size() == recv_buffer.size(),
                    ExcMessage("Sizes do not match!"));
 
-            for (unsigned int j = 0; j < recv_indices[other_rank].size(); j++)
+            for (unsigned int j = 0; j < recv_indices[other_rank].size(); ++j)
               owning_ranks[recv_indices[other_rank][j]] = recv_buffer[j];
           }
 

@@ -307,7 +307,7 @@ namespace DoFTools
               child_cells =
                 GridTools::get_active_child_cells<DoFHandler<dim, spacedim>>(
                   cell_row);
-            for (unsigned int i = 0; i < child_cells.size(); i++)
+            for (unsigned int i = 0; i < child_cells.size(); ++i)
               {
                 const typename DoFHandler<dim, spacedim>::cell_iterator
                                    cell_row_child = child_cells[i];
@@ -334,7 +334,7 @@ namespace DoFTools
               child_cells =
                 GridTools::get_active_child_cells<DoFHandler<dim, spacedim>>(
                   cell_col);
-            for (unsigned int i = 0; i < child_cells.size(); i++)
+            for (unsigned int i = 0; i < child_cells.size(); ++i)
               {
                 const typename DoFHandler<dim, spacedim>::active_cell_iterator
                                    cell_col_child = child_cells[i];

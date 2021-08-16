@@ -962,10 +962,10 @@ namespace internal
       std::vector<std::pair<T, unsigned int>> neighbors(n_faces, {-1, -1});
 
       // loop over all cells
-      for (unsigned int i_0 = 0; i_0 < ptr_cf.size() - 1; i_0++)
+      for (unsigned int i_0 = 0; i_0 < ptr_cf.size() - 1; ++i_0)
         {
           // ... and all its faces
-          for (std::size_t j_0 = ptr_cf[i_0]; j_0 < ptr_cf[i_0 + 1]; j_0++)
+          for (std::size_t j_0 = ptr_cf[i_0]; j_0 < ptr_cf[i_0 + 1]; ++j_0)
             {
               if (neighbors[col_cf[j_0]].first == static_cast<unsigned int>(-1))
                 {
@@ -1053,7 +1053,7 @@ namespace internal
       static const unsigned int offset = 1;
 
       // loop over all cells
-      for (unsigned int c = 0, counter = 0; c < cell_types_index.size(); c++)
+      for (unsigned int c = 0, counter = 0; c < cell_types_index.size(); ++c)
         {
           const auto &cell_type =
             cell_types[static_cast<types::geometric_entity_type>(
@@ -1065,7 +1065,7 @@ namespace internal
             cell_vertices.data() + cell_ptr[c], cell_ptr[c + 1] - cell_ptr[c]);
 
           // ... loop over all its entities
-          for (unsigned int e = 0; e < cell_type->n_entities(d); e++)
+          for (unsigned int e = 0; e < cell_type->n_entities(d); ++e)
             {
               // ... determine global entity vertices
               const auto &local_entity_vertices =
@@ -1074,7 +1074,7 @@ namespace internal
               std::array<unsigned int, key_length> entity_vertices;
               std::fill(entity_vertices.begin(), entity_vertices.end(), 0);
 
-              for (unsigned int i = 0; i < local_entity_vertices.size(); i++)
+              for (unsigned int i = 0; i < local_entity_vertices.size(); ++i)
                 entity_vertices[i] =
                   cell_vertice[local_entity_vertices[i]] + offset;
 
@@ -1195,7 +1195,7 @@ namespace internal
         {
           const auto &cell_type =
             cell_types[static_cast<types::geometric_entity_type>(c)];
-          for (unsigned int e = 0; e < cell_type->n_entities(d); e++)
+          for (unsigned int e = 0; e < cell_type->n_entities(d); ++e)
             key_length =
               std::max(key_length, cell_type->vertices_of_entity(d, e).size());
         }

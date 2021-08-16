@@ -41,7 +41,7 @@ namespace
   Lh(const Point<dim> &x_q, const TableIndices<dim> &indices)
   {
     double res = 1.0;
-    for (unsigned int d = 0; d < dim; d++)
+    for (unsigned int d = 0; d < dim; ++d)
       {
         const double x = 2.0 * (x_q[d] - 0.5);
         Assert((x_q[d] <= 1.0) && (x_q[d] >= 0.), ExcLegendre(d, x_q[d]));
@@ -61,7 +61,7 @@ namespace
   multiplier(const TableIndices<dim> &indices)
   {
     double res = 1.0;
-    for (unsigned int d = 0; d < dim; d++)
+    for (unsigned int d = 0; d < dim; ++d)
       res *= (0.5 + indices[d]);
 
     return res;
@@ -309,8 +309,8 @@ namespace FESeries
     Assert(local_dof_values.size() == matrix.n(),
            ExcDimensionMismatch(local_dof_values.size(), matrix.n()));
 
-    for (unsigned int i = 0; i < unrolled_coefficients.size(); i++)
-      for (unsigned int j = 0; j < local_dof_values.size(); j++)
+    for (unsigned int i = 0; i < unrolled_coefficients.size(); ++i)
+      for (unsigned int j = 0; j < local_dof_values.size(); ++j)
         unrolled_coefficients[i] += matrix[i][j] * local_dof_values[j];
 
     legendre_coefficients.fill(unrolled_coefficients.begin());

@@ -100,7 +100,7 @@ test5()
 
   std::vector<Vector<double>> shape_functions;
   std::vector<std::string>    names;
-  for (unsigned int s = 0; s < dof_handler.n_dofs(); s++)
+  for (unsigned int s = 0; s < dof_handler.n_dofs(); ++s)
     {
       names.push_back(std::string("N_") + dealii::Utilities::int_to_string(s));
 
@@ -135,7 +135,7 @@ test5()
         // find out which
         unsigned int local_dof = 0;
         cell->get_dof_indices(local_dof_indices);
-        for (; local_dof < dofs_per_cell; local_dof++)
+        for (; local_dof < dofs_per_cell; ++local_dof)
           if (local_dof_indices[local_dof] == global_dof)
             break;
 
@@ -164,7 +164,7 @@ test5()
   DataOut<dim> data_out;
   data_out.attach_dof_handler(dof_handler);
 
-  for (unsigned int i = 0; i < shape_functions.size(); i++)
+  for (unsigned int i = 0; i < shape_functions.size(); ++i)
     data_out.add_data_vector(shape_functions[i], names[i]);
 
   data_out.build_patches(patches);

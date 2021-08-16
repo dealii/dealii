@@ -82,7 +82,7 @@ public:
     Point<dim>              p;
     for (unsigned int v = 0; v < VectorizedArray<double>::size(); ++v)
       {
-        for (unsigned int d = 0; d < dim; d++)
+        for (unsigned int d = 0; d < dim; ++d)
           p[d] = p_vec[d][v];
         res[v] = value(p);
       }

@@ -181,7 +181,7 @@ namespace LinearAlgebra
                 s, sizeof(Number), info, comm_shared, &data_this, &mpi_window);
               AssertThrowMPI(ierr);
 
-              for (unsigned int i = 0; i < size_sm; i++)
+              for (unsigned int i = 0; i < size_sm; ++i)
                 {
                   int        disp_unit;
                   MPI_Aint   ssize;
@@ -211,7 +211,7 @@ namespace LinearAlgebra
                                    comm_shared);
               AssertThrowMPI(ierr);
 
-              for (unsigned int i = 0; i < size_sm; i++)
+              for (unsigned int i = 0; i < size_sm; ++i)
                 others[i] += n_align_sm[i];
 
               std::vector<unsigned int> new_alloc_sizes(size_sm);
@@ -226,7 +226,7 @@ namespace LinearAlgebra
               AssertThrowMPI(ierr);
 
               data.values_sm.resize(size_sm);
-              for (unsigned int i = 0; i < size_sm; i++)
+              for (unsigned int i = 0; i < size_sm; ++i)
                 data.values_sm[i] =
                   ArrayView<const Number>(others[i], new_alloc_sizes[i]);
 
@@ -2127,7 +2127,7 @@ namespace LinearAlgebra
         // turn
 #ifdef DEAL_II_WITH_MPI
       if (partitioner->n_mpi_processes() > 1)
-        for (unsigned int i = 0; i < partitioner->this_mpi_process(); i++)
+        for (unsigned int i = 0; i < partitioner->this_mpi_process(); ++i)
           {
             const int ierr = MPI_Barrier(partitioner->get_mpi_communicator());
             AssertThrowMPI(ierr);

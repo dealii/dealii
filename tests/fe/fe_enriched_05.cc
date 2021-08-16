@@ -110,7 +110,7 @@ test4()
 #ifdef DATA_OUT_FE_ENRICHED
   std::vector<Vector<double>> shape_functions;
   std::vector<std::string>    names;
-  for (unsigned int s = 0; s < dof_handler.n_dofs(); s++)
+  for (unsigned int s = 0; s < dof_handler.n_dofs(); ++s)
     if (!constraints.is_constrained(s))
       {
         names.push_back(std::string("N_") +
@@ -128,7 +128,7 @@ test4()
   DataOut<dim> data_out;
   data_out.attach_dof_handler(dof_handler);
 
-  for (unsigned int i = 0; i < shape_functions.size(); i++)
+  for (unsigned int i = 0; i < shape_functions.size(); ++i)
     data_out.add_data_vector(shape_functions[i], names[i]);
 
   data_out.build_patches(patches);

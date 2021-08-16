@@ -350,7 +350,7 @@ namespace NonMatching
                             const BoundingBox<dim> &   box,
                             ExtendableQuadrature<dim> &quadrature)
       {
-        for (unsigned int i = 0; i < unit_quadrature.size(); i++)
+        for (unsigned int i = 0; i < unit_quadrature.size(); ++i)
           {
             const Point<dim> point = box.unit_to_real(unit_quadrature.point(i));
             const double     weight = unit_quadrature.weight(i) * box.volume();
@@ -846,7 +846,7 @@ namespace NonMatching
         , low_dim_algorithm(q_collection1D, additional_data)
         , up_through_dimension_creator(q_collection1D, additional_data)
       {
-        for (unsigned int i = 0; i < q_collection1D.size(); i++)
+        for (unsigned int i = 0; i < q_collection1D.size(); ++i)
           tensor_products.push_back(Quadrature<dim>(q_collection1D[i]));
       }
 
@@ -945,7 +945,7 @@ namespace NonMatching
       {
         // Get the side lengths for each direction and sort them.
         std::array<std::pair<double, unsigned int>, dim> side_lengths;
-        for (int i = 0; i < dim; i++)
+        for (int i = 0; i < dim; ++i)
           {
             side_lengths[i].first  = box.side_length(i);
             side_lengths[i].second = i;
@@ -1398,7 +1398,7 @@ namespace NonMatching
 
     std::vector<Tensor<1, dim>> normals;
     normals.reserve(surface_quadrature_wrong_normal.size());
-    for (unsigned int i = 0; i < surface_quadrature_wrong_normal.size(); i++)
+    for (unsigned int i = 0; i < surface_quadrature_wrong_normal.size(); ++i)
       {
         const Point<dim> point = dealii::internal::create_higher_dim_point(
           surface_quadrature_wrong_normal.point(i),

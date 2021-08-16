@@ -1421,7 +1421,7 @@ namespace DoFTools
                                              subdomain_association.size());
       }
 
-    for (unsigned int i = 0; i < n_subdomains; i++)
+    for (unsigned int i = 0; i < n_subdomains; ++i)
       index_sets[i].compress();
 
     return index_sets;

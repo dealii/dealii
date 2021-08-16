@@ -176,7 +176,7 @@ namespace internal
 
           types::global_dof_index last_contiguous_start = ghost_origin[0].first;
           ghost_numbering[ghost_origin[0].second]       = 0;
-          for (std::size_t i = 1; i < n_ghosts; i++)
+          for (std::size_t i = 1; i < n_ghosts; ++i)
             {
               if (ghost_origin[i].first > ghost_origin[i - 1].first + 1)
                 {

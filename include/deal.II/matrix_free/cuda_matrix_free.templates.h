@@ -1045,7 +1045,7 @@ namespace CUDAWrappers
                     else
                       inner_cells.emplace_back(cell);
                   }
-                for (unsigned i = 0; i < inner_cells.size(); i++)
+                for (unsigned i = 0; i < inner_cells.size(); ++i)
                   if (i < inner_cells.size() / 2)
                     graph[0].emplace_back(inner_cells[i]);
                   else

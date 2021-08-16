@@ -285,7 +285,7 @@ namespace Utilities
 
         {
           // 4) send and receive
-          for (unsigned int i = 0; i < n_targets; i++)
+          for (unsigned int i = 0; i < n_targets; ++i)
             {
               const unsigned int rank  = targets[i];
               const unsigned int index = i;
@@ -365,7 +365,7 @@ namespace Utilities
 
         // unpack data
         {
-          for (unsigned int i = 0; i < targets.size(); i++)
+          for (unsigned int i = 0; i < targets.size(); ++i)
             this->process.read_answer(targets[i], recv_buffers[i]);
         }
 #endif
@@ -392,7 +392,7 @@ namespace Utilities
         const unsigned int n_requests = start_communication();
 
         // 2) answer requests
-        for (unsigned int request = 0; request < n_requests; request++)
+        for (unsigned int request = 0; request < n_requests; ++request)
           answer_requests(request);
 
         // 3) process answers
@@ -494,7 +494,7 @@ namespace Utilities
         requests_buffers.resize(n_sources);
 
         // 4) send and receive
-        for (unsigned int i = 0; i < n_targets; i++)
+        for (unsigned int i = 0; i < n_targets; ++i)
           {
             const unsigned int rank = targets[i];
 
@@ -556,7 +556,7 @@ namespace Utilities
           }
 
         // unpack received data
-        for (unsigned int i = 0; i < targets.size(); i++)
+        for (unsigned int i = 0; i < targets.size(); ++i)
           this->process.read_answer(targets[i], recv_buffers[i]);
 #endif
       }

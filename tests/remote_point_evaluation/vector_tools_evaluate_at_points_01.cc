@@ -61,7 +61,7 @@ namespace dealii
       if (n_refinements == 0)
         return;
 
-      for (int i = 0; i < static_cast<int>(n_refinements) - 3; i++)
+      for (int i = 0; i < static_cast<int>(n_refinements) - 3; ++i)
         tria.refine_global();
 
       if (n_refinements >= 1)

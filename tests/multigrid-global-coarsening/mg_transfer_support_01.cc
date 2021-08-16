@@ -24,9 +24,9 @@ using namespace dealii;
 void
 test()
 {
-  for (unsigned int i = 1; i < 25; i++)
+  for (unsigned int i = 1; i < 25; ++i)
     {
-      for (unsigned int j = 1; j < 25; j++)
+      for (unsigned int j = 1; j < 25; ++j)
         if (MGTwoLevelTransfer<2, LinearAlgebra::distributed::Vector<double>>::
               fast_polynomial_transfer_supported(i, j))
           deallog << 1 << " ";

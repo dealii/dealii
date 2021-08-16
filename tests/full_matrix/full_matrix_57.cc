@@ -40,7 +40,7 @@ check()
   deallog << "Original Vector V" << std::endl;
   deallog << "=================" << std::endl;
 
-  for (unsigned int i = 0; i < First4.size(); i++)
+  for (unsigned int i = 0; i < First4.size(); ++i)
     {
       First4(i) = ints[i];
       deallog << First4(i) << "  ";
@@ -51,7 +51,7 @@ check()
   deallog << "Original Vector W" << std::endl;
   deallog << "=================" << std::endl;
 
-  for (unsigned int i = 0; i < Second4.size(); i++)
+  for (unsigned int i = 0; i < Second4.size(); ++i)
     {
       Second4(i) = ints[i + 1];
       deallog << Second4(i) << "  ";
@@ -90,7 +90,7 @@ check()
   deallog << "Vector V" << std::endl;
   deallog << "========" << std::endl;
 
-  for (unsigned int i = 0; i < First9.size(); i++)
+  for (unsigned int i = 0; i < First9.size(); ++i)
     {
       First9(i) = ints[i];
       deallog << First9(i) << "  ";
@@ -111,7 +111,7 @@ check()
   deallog << "Vector V" << std::endl;
   deallog << "========" << std::endl;
 
-  for (unsigned int i = 0; i < First9.size(); i++)
+  for (unsigned int i = 0; i < First9.size(); ++i)
     {
       First9(i) = ints[8 - i];
       deallog << First9(i) << "  ";

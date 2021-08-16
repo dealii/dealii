@@ -1083,7 +1083,7 @@ LaplaceProblem<dim>::run()
   // definitely inside the domain (we here
   // have a circle of radius 1, so find
   // points inside a radius of 0.9)
-  for (int i = 0; i < 1000; i++)
+  for (int i = 0; i < 1000; ++i)
     {
       double   r   = sqrt(.9 * random_value<double>());
       double   phi = 2 * 3.14 * (1.0 * Testing::rand() / RAND_MAX);

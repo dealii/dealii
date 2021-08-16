@@ -43,8 +43,8 @@ test()
   // An older version of this test relied on PETSc doing dynamic allocation, but
   // we require sparsity patterns in constructors now so we need the sparsity
   // pattern ahead of time - hence this is done twice
-  for (unsigned int i = 0; i < N; i++)
-    for (unsigned int j = 0; j < N; j++)
+  for (unsigned int i = 0; i < N; ++i)
+    for (unsigned int j = 0; j < N; ++j)
       {
         const unsigned int global = i * N + j;
         dsp.add(global, global);
@@ -77,8 +77,8 @@ test()
 
   PETScWrappers::MPI::SparseMatrix matrix;
   matrix.reinit(all_dofs, all_dofs, sparsity_pattern, PETSC_COMM_WORLD);
-  for (unsigned int i = 0; i < N; i++)
-    for (unsigned int j = 0; j < N; j++)
+  for (unsigned int i = 0; i < N; ++i)
+    for (unsigned int j = 0; j < N; ++j)
       {
         const unsigned int global = i * N + j;
         matrix.add(global, global, 4);

@@ -65,7 +65,7 @@ concentric_disks(Triangulation<2> &         tria,
   gp.radius[0]       = x[0];
   gp.ball_centers[0] = Point<2>(s, 0.0);
 
-  for (unsigned int k = 1; k < x.size(); k++)
+  for (unsigned int k = 1; k < x.size(); ++k)
     {
       gp.radius[k]       = x[k];
       gp.ball_centers[k] = Point<2>(0.0, 0.0);
@@ -86,7 +86,7 @@ concentric_disks(Triangulation<2> &         tria,
   vertices[8] = Point<2>(.5 * d + s, -.5 * d);
 
   // touching circle
-  for (unsigned int k = 0; k < x.size(); k++)
+  for (unsigned int k = 0; k < x.size(); ++k)
     {
       double z                     = (k == 0) ? s : 0.0;
       r                            = x[k];
@@ -163,7 +163,7 @@ concentric_disks(Triangulation<2> &         tria,
   cell_v[11][3] = 15;
 
   // layer cells
-  for (unsigned int k = 1; k < x.size(); k++)
+  for (unsigned int k = 1; k < x.size(); ++k)
     {
       const unsigned int m = k + 1;
 
@@ -304,13 +304,13 @@ Mygrid<dim>::make_grid()
   const double        s = 0.1;
   std::vector<double> x{1.0, 1.5, 2.0, 2.5, 3.0};
   concentric_disks(triangulation, s, x, gp);
-  for (unsigned int i = 0; i < gp.n_balls; i++)
+  for (unsigned int i = 0; i < gp.n_balls; ++i)
     {
       balls.emplace_back(gp.ball_centers[i]);
     }
 
   // assigning manifolds, with layers 100, 101, 102, 103
-  for (unsigned int i = 0; i < gp.n_balls; i++)
+  for (unsigned int i = 0; i < gp.n_balls; ++i)
     {
       triangulation.set_manifold(100 + i, balls[i]);
     }

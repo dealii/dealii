@@ -51,12 +51,12 @@ main(int argc, char **argv)
 
     // Make matrix
     DynamicSparsityPattern csp(dim, dim);
-    for (unsigned int row = 0; row < dim; row++)
+    for (unsigned int row = 0; row < dim; ++row)
       csp.add(row, row);
 
     TrilinosWrappers::SparseMatrix A;
     A.reinit(csp);
-    for (unsigned int row = 0; row < dim; row++)
+    for (unsigned int row = 0; row < dim; ++row)
       A.set(row, row, 2.0 * (row + 1));
 
     TrilinosWrappers::MPI::Vector f;

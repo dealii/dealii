@@ -258,7 +258,7 @@ namespace Maxwell
         for (const auto q_point : fe_values.quadrature_point_indices())
           {
             // Split exact solution into real/imaginary parts:
-            for (unsigned int component = 0; component < dim; component++)
+            for (unsigned int component = 0; component < dim; ++component)
               {
                 exactsol[component]     = exactsol_list[q_point][component];
                 exactcurlsol[component] = exactcurlsol_list[q_point][component];
@@ -380,7 +380,7 @@ namespace Maxwell
         for (const auto q_point : fe_values.quadrature_point_indices())
           {
             // store rhs value at this q point & turn into tensor
-            for (unsigned int component = 0; component < dim; component++)
+            for (unsigned int component = 0; component < dim; ++component)
               {
                 rhs_value_vector[component] =
                   rhs_value_list[q_point](component);

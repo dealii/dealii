@@ -318,7 +318,7 @@ namespace Step36
                                     /* keep constrained dofs */ false);
 
     std::vector<types::global_dof_index> n_locally_owned_dofs(n_mpi_processes);
-    for (unsigned int i = 0; i < n_mpi_processes; i++)
+    for (unsigned int i = 0; i < n_mpi_processes; ++i)
       n_locally_owned_dofs[i] =
         locally_owned_dofs_per_processor[i].n_elements();
 
@@ -673,7 +673,7 @@ namespace Step36
                       eigenfunctions,
                       eigenfunctions.size());
 
-    for (unsigned int i = 0; i < eigenfunctions.size(); i++)
+    for (unsigned int i = 0; i < eigenfunctions.size(); ++i)
       {
         constraints.distribute(eigenfunctions[i]);
         eigenfunctions_locally_relevant[i] = eigenfunctions[i];
@@ -698,7 +698,7 @@ namespace Step36
         number_of_eigenvalues);
       std::vector<dealii::Vector<float> *> error(number_of_eigenvalues);
 
-      for (unsigned int i = 0; i < number_of_eigenvalues; i++)
+      for (unsigned int i = 0; i < number_of_eigenvalues; ++i)
         {
           sol[i]   = &eigenfunctions_locally_relevant[i];
           error[i] = &vec_estimated_error_per_cell[i];
@@ -717,10 +717,10 @@ namespace Step36
     }
 
     // sum up for a global:
-    for (unsigned int c = 0; c < estimated_error_per_cell.size(); c++)
+    for (unsigned int c = 0; c < estimated_error_per_cell.size(); ++c)
       {
         double er = 0.0;
-        for (unsigned int i = 0; i < number_of_eigenvalues; i++)
+        for (unsigned int i = 0; i < number_of_eigenvalues; ++i)
           er += vec_estimated_error_per_cell[i][c] *
                 vec_estimated_error_per_cell[i][c];
 
@@ -860,7 +860,7 @@ namespace Step36
                << triangulation.n_active_cells() << sep << dof_handler.n_dofs()
                << sep << std::scientific;
 
-        for (unsigned int i = 0; i < eigenvalues.size(); i++)
+        for (unsigned int i = 0; i < eigenvalues.size(); ++i)
           output << eigenvalues[i] << sep;
 
         output << std::endl;
@@ -873,7 +873,7 @@ namespace Step36
   void
   EigenvalueProblem<dim>::run()
   {
-    for (unsigned int cycle = 0; cycle < 2; cycle++)
+    for (unsigned int cycle = 0; cycle < 2; ++cycle)
       {
         pcout << "Cycle " << cycle << std::endl;
         const std::pair<unsigned int, unsigned int> n_cells = setup_system();

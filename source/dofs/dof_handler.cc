@@ -1358,7 +1358,7 @@ namespace internal
                           dof_handler.hp_object_fe_indices[d][offset]  = fe;
                           dof_handler.object_dof_ptr[l][d][offset + 1] = n_dofs;
 
-                          for (unsigned int i = 0; i < n_dofs; i++)
+                          for (unsigned int i = 0; i < n_dofs; ++i)
                             dof_handler.object_dof_indices[l][d].push_back(
                               numbers::invalid_dof_index);
                         }
@@ -1403,7 +1403,7 @@ namespace internal
                             n_dofs_2;
 
 
-                          for (unsigned int i = 0; i < n_dofs_1 + n_dofs_2; i++)
+                          for (unsigned int i = 0; i < n_dofs_1 + n_dofs_2; ++i)
                             dof_handler.object_dof_indices[l][d].push_back(
                               numbers::invalid_dof_index);
                         }

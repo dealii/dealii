@@ -112,7 +112,7 @@ namespace GridTools
 
     // For all remaining vertices, test
     // whether they are any closer
-    for (unsigned int j = best_vertex + 1; j < vertices.size(); j++)
+    for (unsigned int j = best_vertex + 1; j < vertices.size(); ++j)
       if (used[j])
         {
           double dist = (p - vertices[j]).norm_square();

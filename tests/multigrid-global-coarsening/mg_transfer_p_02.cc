@@ -79,7 +79,7 @@ do_test()
 
 
   // loop over levels
-  for (unsigned int l = 0; l < std::numeric_limits<unsigned int>::max(); l++)
+  for (unsigned int l = 0; l < std::numeric_limits<unsigned int>::max(); ++l)
     {
       deallog.push("level" + std::to_string(l));
 
