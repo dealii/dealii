@@ -15,8 +15,7 @@
 
 
 /**
- * Test p-multigrid for a uniformly and locally refined meshes both for
- * simplex and hypercube mesh.
+ * Test p-multigrid so that it also works on refinement level 0.
  */
 
 #include "multigrid_util.h"
