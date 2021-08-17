@@ -5144,14 +5144,18 @@ namespace GridGenerator
   }
 
 
-  void
-  non_standard_orientation_mesh(Triangulation<2> &tria,
-                                const bool        rotate_left_square,
-                                const bool        rotate_right_square)
-  {
-    constexpr unsigned int dim = 2;
 
-    const unsigned int         n_cells = 2;
+  void
+  non_standard_orientation_mesh(Triangulation<2> & tria,
+                                const unsigned int n_rotate_middle_square)
+  {
+    AssertThrow(n_rotate_middle_square < 4,
+                ExcMessage("The number of rotation by pi/2 of the right square "
+                           "must be in the half-open range [0,4)."))
+
+      constexpr unsigned int dim = 2;
+
+    const unsigned int         n_cells = 5;
     std::vector<CellData<dim>> cells(n_cells);
 
     // Corner points of the cube [0,1]^2
@@ -5160,19 +5164,25 @@ namespace GridGenerator
                                               Point<dim>(0, 1),  // 2
                                               Point<dim>(1, 1),  // 3
                                               Point<dim>(2, 0),  // 4
-                                              Point<dim>(2, 1)}; // 5
+                                              Point<dim>(2, 1),  // 5
+                                              Point<dim>(3, 0),  // 6
+                                              Point<dim>(3, 1),  // 7
+                                              Point<dim>(1, -1), // 8
+                                              Point<dim>(2, -1), // 9
+                                              Point<dim>(1, 2),  // 10
+                                              Point<dim>(2, 2)}; // 11
 
 
     // consistent orientation
-    unsigned int cell_vertices[n_cells][4] = {{0, 1, 2, 3},  // unit cube
-                                              {1, 4, 3, 5}}; // shifted cube
+    unsigned int cell_vertices[n_cells][4] = {{0, 1, 2, 3},
+                                              {1, 4, 3, 5}, // rotating cube
+                                              {8, 9, 1, 4},
+                                              {4, 6, 5, 7},
+                                              {3, 5, 10, 11}};
 
-    // all 4 true-false combinations of (rotate_left_square | rotate_right_square) to a number 0..3
-    unsigned int this_case = 2 * rotate_left_square + rotate_right_square;
-
-    switch (this_case)
+    switch (n_rotate_middle_square)
       {
-        case /* rotate only right square */ 1:
+        case /* rotate right square */ 1:
           {
             cell_vertices[1][0] = 4;
             cell_vertices[1][1] = 5;
@@ -5181,26 +5191,21 @@ namespace GridGenerator
             break;
           }
 
-        case /* rotate only left square */ 2:
+        case /* rotate right square */ 2:
           {
-            cell_vertices[0][0] = 1;
-            cell_vertices[0][1] = 3;
-            cell_vertices[0][2] = 0;
-            cell_vertices[0][3] = 2;
+            cell_vertices[1][0] = 5;
+            cell_vertices[1][1] = 3;
+            cell_vertices[1][2] = 4;
+            cell_vertices[1][3] = 1;
             break;
           }
 
-        case /* rotate both squares (again consistent orientation) */ 3:
+        case /* rotate right square */ 3:
           {
-            cell_vertices[0][0] = 1;
-            cell_vertices[0][1] = 3;
-            cell_vertices[0][2] = 0;
-            cell_vertices[0][3] = 2;
-
-            cell_vertices[1][0] = 4;
-            cell_vertices[1][1] = 5;
-            cell_vertices[1][2] = 1;
-            cell_vertices[1][3] = 3;
+            cell_vertices[1][0] = 3;
+            cell_vertices[1][1] = 1;
+            cell_vertices[1][2] = 5;
+            cell_vertices[1][3] = 4;
             break;
           }
 
