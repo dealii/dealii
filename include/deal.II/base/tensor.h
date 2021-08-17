@@ -1428,11 +1428,18 @@ template <int rank_, int dim, typename Number>
 inline Number *
 Tensor<rank_, dim, Number>::begin_raw()
 {
-  // Recursively get at the address of the underlying objects
+  // Recursively get at the address of the underlying objects. Since
+  // begin_raw() in the base class only returns a pointer to the first
+  // element, GCC 8.1 loses track of the fact that this is really the
+  // first element of an array and complains when creating an
+  // ArrayView object that begin_raw() and end_raw() do not belong to
+  // the same object -- which of course they do. We work around this
+  // by ensuring that the compiler sees that the pointer we're taking
+  // is in fact to the beginning of an array.
+  using ElementsArray =
+    Number(*)[(n_independent_components > 0) ? n_independent_components : 1];
   return std::addressof(
-    (*reinterpret_cast<
-      Number(*)[(n_independent_components > 0) ? n_independent_components : 1]>(
-      values[0].begin_raw()))[0]);
+    (*reinterpret_cast<ElementsArray>(values[0].begin_raw()))[0]);
 }
 
 
@@ -1441,11 +1448,18 @@ template <int rank_, int dim, typename Number>
 inline const Number *
 Tensor<rank_, dim, Number>::begin_raw() const
 {
-  // Recursively get at the address of the underlying objects
+  // Recursively get at the address of the underlying objects. Since
+  // begin_raw() in the base class only returns a pointer to the first
+  // element, GCC 8.1 loses track of the fact that this is really the
+  // first element of an array and complains when creating an
+  // ArrayView object that begin_raw() and end_raw() do not belong to
+  // the same object -- which of course they do. We work around this
+  // by ensuring that the compiler sees that the pointer we're taking
+  // is in fact to the beginning of an array.
+  using ElementsArray = const Number(
+      *)[(n_independent_components > 0) ? n_independent_components : 1];
   return std::addressof(
-    (*reinterpret_cast<const Number(
-         *)[(n_independent_components > 0) ? n_independent_components : 1]>(
-      values[0].begin_raw()))[0]);
+    (*reinterpret_cast<ElementsArray>(values[0].begin_raw()))[0]);
 }
 
 
