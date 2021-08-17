@@ -1059,7 +1059,10 @@ namespace internal
       memory_consumption() const override;
 
       /**
-       * Temporal storage for the data.
+       * Copy of the data of the vector passed to DataOutDoFData::add_vector().
+       * This vector imports all elements necessary to create output from the
+       * source vector and stores it until we no longer need it. No reference
+       * to the original source vector is necessary nor stored.
        */
       LinearAlgebra::distributed::BlockVector<ScalarType> vector;
     };
