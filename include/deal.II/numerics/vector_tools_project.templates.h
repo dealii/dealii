@@ -16,6 +16,9 @@
 #ifndef dealii_vector_tools_project_templates_h
 #define dealii_vector_tools_project_templates_h
 
+#include <deal.II/fe/fe_dgq.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_simplex_p_bubbles.h>
 
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/la_parallel_block_vector.h>
@@ -213,7 +216,64 @@ namespace VectorTools
         LinearAlgebra::distributed::Vector<Number>>;
       MatrixType mass_matrix;
       mass_matrix.initialize(matrix_free);
-      mass_matrix.compute_diagonal();
+
+      // For most elements we want to use the lumped mass matrix as the
+      // preconditioner. However, this isn't going to work with a lot of
+      // elements, like almost everything not defined on hypercubes: in that
+      // case use the diagonal.
+      bool        use_lumped = false;
+      const auto &fes        = dof.get_fe_collection();
+      if (dof.get_triangulation().all_reference_cells_are_hyper_cube())
+        {
+          // A few hypercube elements will always work, so avoid the more
+          // expensive check if we have them
+          bool all_support_mass_lumping = true;
+          for (unsigned int i = 0; i < fes.size(); ++i)
+            if (dynamic_cast<const FE_Q<dim, spacedim> *>(&fes[i]) == nullptr &&
+                dynamic_cast<const FE_DGQ<dim, spacedim> *>(&fes[i]) == nullptr)
+              all_support_mass_lumping = false;
+          if (all_support_mass_lumping)
+            use_lumped = true;
+          else
+            {
+              mass_matrix.compute_lumped_diagonal();
+
+              const auto &lumped_diagonal =
+                mass_matrix.get_matrix_lumped_diagonal_inverse()->get_vector();
+              bool all_entries_positive = true;
+              for (const Number &v : lumped_diagonal)
+                if (v < 0.0)
+                  {
+                    all_entries_positive = false;
+                    break;
+                  }
+              if (all_entries_positive)
+                use_lumped = true;
+            }
+        }
+      else
+        {
+          bool all_bubbles   = true;
+          bool all_low_order = true;
+          for (unsigned int i = 0; i < fes.size(); ++i)
+            {
+              if (dynamic_cast<const FE_SimplexP_Bubbles<dim, spacedim> *>(
+                    &fes[i]) == nullptr)
+                all_bubbles = false;
+              if (fes[i].tensor_degree() > 1)
+                all_low_order = false;
+            }
+          if (all_low_order || all_bubbles)
+            use_lumped = true;
+        }
+      use_lumped =
+        bool(Utilities::MPI::min(int(use_lumped),
+                                 work_result.get_mpi_communicator()));
+
+      if (use_lumped)
+        mass_matrix.compute_lumped_diagonal();
+      else
+        mass_matrix.compute_diagonal();
 
       LinearAlgebra::distributed::Vector<Number> rhs, inhomogeneities;
       matrix_free->initialize_dof_vector(work_result);
@@ -249,10 +309,17 @@ namespace VectorTools
       // steps may not be sufficient, since roundoff errors may accumulate for
       // badly conditioned matrices. This behavior can be observed, e.g. for
       // FE_Q_Hierarchical for degree higher than three.
-      ReductionControl control(6 * rhs.size(), 0., 1e-12, false, false);
-      SolverCG<LinearAlgebra::distributed::Vector<Number>> cg(control);
-      PreconditionJacobi<MatrixType>                       preconditioner;
-      preconditioner.initialize(mass_matrix, 1.);
+      ReductionControl        control(6 * rhs.size(), 0., 1e-12, false, false);
+      SolverCG<decltype(rhs)> cg(control);
+      const DiagonalMatrix<decltype(rhs)> &preconditioner =
+        use_lumped ? *mass_matrix.get_matrix_lumped_diagonal_inverse() :
+                     *mass_matrix.get_matrix_diagonal_inverse();
+#ifdef DEBUG
+      // Make sure we picked a valid preconditioner
+      const auto &diagonal = preconditioner.get_vector();
+      for (const Number &v : diagonal)
+        Assert(v > 0.0, ExcInternalError());
+#endif
       cg.solve(mass_matrix, work_result, rhs, preconditioner);
       work_result += inhomogeneities;
 

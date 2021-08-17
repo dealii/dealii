@@ -29,6 +29,7 @@
 
 #include <deal.II/matrix_free/fe_evaluation.h>
 #include <deal.II/matrix_free/matrix_free.h>
+#include <deal.II/matrix_free/tools.h>
 
 #include <deal.II/multigrid/mg_constrained_dofs.h>
 
@@ -40,7 +41,7 @@ namespace MatrixFreeOperators
 {
   namespace BlockHelper
   {
-    // workaroud for unifying non-block vector and block vector implementations
+    // workaround for unifying non-block vector and block vector implementations
     // a non-block vector has one block and the only subblock is the vector
     // itself
     template <typename VectorType>
@@ -357,6 +358,11 @@ namespace MatrixFreeOperators
      * A derived class needs to implement this function and resize and fill
      * the protected member inverse_diagonal_entries and/or diagonal_entries
      * accordingly.
+     *
+     * @note Since the diagonal is frequently used as a smoother or
+     * preconditioner, entries corresponding to constrained DoFs are set to 1
+     * (instead of the correct value of 0) so that the diagonal matrix is
+     * invertible.
      */
     virtual void
     compute_diagonal() = 0;
@@ -757,11 +763,40 @@ namespace MatrixFreeOperators
     MassOperator();
 
     /**
-     * For preconditioning, we store a lumped mass matrix at the diagonal
-     * entries.
+     * Same as the base class.
      */
     virtual void
     compute_diagonal() override;
+
+    /**
+     * Compute the lumped mass matrix. This is equal to the mass matrix times a
+     * vector of all ones and is equivalent to approximating the mass matrix
+     * with a nodal quadrature rule.
+     *
+     * The lumped mass matrix is an excellent preconditioner for mass matrices
+     * corresponding to FE_Q elements on axis-aligned cells. However, some
+     * elements (like FE_SimplexP with degrees higher than 1) have basis
+     * functions whose integrals are zero or negative (and therefore their
+     * lumped mass matrix entries are zero or negative). For such elements a
+     * lumped mass matrix is a very poor approximation of the operator - the
+     * diagonal should be used instead. If you are interested in using mass
+     * lumping with simplices then use FE_SimplexP_Bubbles instead of
+     * FE_SimplexP.
+     */
+    void
+    compute_lumped_diagonal();
+
+    /**
+     * Get read access to the lumped diagonal of this operator.
+     */
+    const std::shared_ptr<DiagonalMatrix<VectorType>> &
+    get_matrix_lumped_diagonal() const;
+
+    /**
+     * Get read access to the inverse lumped diagonal of this operator.
+     */
+    const std::shared_ptr<DiagonalMatrix<VectorType>> &
+    get_matrix_lumped_diagonal_inverse() const;
 
   private:
     /**
@@ -781,6 +816,18 @@ namespace MatrixFreeOperators
       VectorType &                                            dst,
       const VectorType &                                      src,
       const std::pair<unsigned int, unsigned int> &           cell_range) const;
+
+    /**
+     * A shared pointer to a diagonal matrix that stores the
+     * lumped diagonal elements as a vector.
+     */
+    std::shared_ptr<DiagonalMatrix<VectorType>> lumped_diagonal_entries;
+
+    /**
+     * A shared pointer to a diagonal matrix that stores the inverse of
+     * lumped diagonal elements as a vector.
+     */
+    std::shared_ptr<DiagonalMatrix<VectorType>> inverse_lumped_diagonal_entries;
   };
 
 
@@ -1793,6 +1840,9 @@ namespace MatrixFreeOperators
       typename Base<dim, VectorType, VectorizedArrayType>::value_type;
     Assert((Base<dim, VectorType, VectorizedArrayType>::data.get() != nullptr),
            ExcNotInitialized());
+    Assert(this->selected_rows == this->selected_columns,
+           ExcMessage("This function is only implemented for square (not "
+                      "rectangular) operators."));
 
     this->inverse_diagonal_entries =
       std::make_shared<DiagonalMatrix<VectorType>>();
@@ -1802,20 +1852,153 @@ namespace MatrixFreeOperators
     VectorType &diagonal_vector = this->diagonal_entries->get_vector();
     this->initialize_dof_vector(inverse_diagonal_vector);
     this->initialize_dof_vector(diagonal_vector);
-    inverse_diagonal_vector = Number(1.);
-    apply_add(diagonal_vector, inverse_diagonal_vector);
 
+    // Set up the action of the mass matrix in a way that's compatible with
+    // MatrixFreeTools::compute_diagonal:
+    auto diagonal_evaluation = [](auto &integrator) {
+      integrator.evaluate(EvaluationFlags::values);
+      for (unsigned int q = 0; q < integrator.n_q_points; ++q)
+        integrator.submit_value(integrator.get_value(q), q);
+      integrator.integrate(EvaluationFlags::values);
+    };
+
+    std::function<void(
+      FEEvaluation<
+        dim,
+        fe_degree,
+        n_q_points_1d,
+        n_components,
+        typename Base<dim, VectorType, VectorizedArrayType>::value_type,
+        VectorizedArrayType> &)>
+      diagonal_evaluation_f(diagonal_evaluation);
+
+    Assert(this->selected_rows.size() > 0, ExcInternalError());
+    for (unsigned int block_n = 0; block_n < this->selected_rows.size();
+         ++block_n)
+      MatrixFreeTools::compute_diagonal(*this->data,
+                                        BlockHelper::subblock(diagonal_vector,
+                                                              block_n),
+                                        diagonal_evaluation_f,
+                                        this->selected_rows[block_n]);
+
+    // Constrained entries will create zeros on the main diagonal, which we
+    // don't want
     this->set_constrained_entries_to_one(diagonal_vector);
+
     inverse_diagonal_vector = diagonal_vector;
 
-    const unsigned int locally_owned_size =
-      inverse_diagonal_vector.locally_owned_size();
-    for (unsigned int i = 0; i < locally_owned_size; ++i)
-      inverse_diagonal_vector.local_element(i) =
-        Number(1.) / inverse_diagonal_vector.local_element(i);
+    for (unsigned int i = 0; i < inverse_diagonal_vector.locally_owned_size();
+         ++i)
+      {
+        Assert(diagonal_vector.local_element(i) > Number(0),
+               ExcInternalError());
+        inverse_diagonal_vector.local_element(i) =
+          1. / inverse_diagonal_vector.local_element(i);
+      }
 
     inverse_diagonal_vector.update_ghost_values();
     diagonal_vector.update_ghost_values();
+  }
+
+
+
+  template <int dim,
+            int fe_degree,
+            int n_q_points_1d,
+            int n_components,
+            typename VectorType,
+            typename VectorizedArrayType>
+  void
+  MassOperator<dim,
+               fe_degree,
+               n_q_points_1d,
+               n_components,
+               VectorType,
+               VectorizedArrayType>::compute_lumped_diagonal()
+  {
+    using Number =
+      typename Base<dim, VectorType, VectorizedArrayType>::value_type;
+    Assert((Base<dim, VectorType, VectorizedArrayType>::data.get() != nullptr),
+           ExcNotInitialized());
+    Assert(this->selected_rows == this->selected_columns,
+           ExcMessage("This function is only implemented for square (not "
+                      "rectangular) operators."));
+
+    inverse_lumped_diagonal_entries =
+      std::make_shared<DiagonalMatrix<VectorType>>();
+    lumped_diagonal_entries = std::make_shared<DiagonalMatrix<VectorType>>();
+    VectorType &inverse_lumped_diagonal_vector =
+      inverse_lumped_diagonal_entries->get_vector();
+    VectorType &lumped_diagonal_vector = lumped_diagonal_entries->get_vector();
+    this->initialize_dof_vector(inverse_lumped_diagonal_vector);
+    this->initialize_dof_vector(lumped_diagonal_vector);
+
+    // Re-use the inverse_lumped_diagonal_vector as the vector of 1s
+    inverse_lumped_diagonal_vector = Number(1.);
+    apply_add(lumped_diagonal_vector, inverse_lumped_diagonal_vector);
+    this->set_constrained_entries_to_one(lumped_diagonal_vector);
+
+    const size_type locally_owned_size =
+      inverse_lumped_diagonal_vector.locally_owned_size();
+    // A caller may request a lumped diagonal matrix when it doesn't make sense
+    // (e.g., an element with negative-mean basis functions). Avoid division by
+    // zero so we don't cause a floating point exception but permit negative
+    // entries here.
+    for (size_type i = 0; i < locally_owned_size; ++i)
+      {
+        if (inverse_lumped_diagonal_vector.local_element(i) == Number(0.))
+          inverse_lumped_diagonal_vector.local_element(i) = Number(1.);
+        else
+          inverse_lumped_diagonal_vector.local_element(i) =
+            Number(1.) / lumped_diagonal_vector.local_element(i);
+      }
+
+    inverse_lumped_diagonal_vector.update_ghost_values();
+    lumped_diagonal_vector.update_ghost_values();
+  }
+
+
+
+  template <int dim,
+            int fe_degree,
+            int n_q_points_1d,
+            int n_components,
+            typename VectorType,
+            typename VectorizedArrayType>
+  const std::shared_ptr<DiagonalMatrix<VectorType>> &
+  MassOperator<dim,
+               fe_degree,
+               n_q_points_1d,
+               n_components,
+               VectorType,
+               VectorizedArrayType>::get_matrix_lumped_diagonal_inverse() const
+  {
+    Assert(inverse_lumped_diagonal_entries.get() != nullptr &&
+             inverse_lumped_diagonal_entries->m() > 0,
+           ExcNotInitialized());
+    return inverse_lumped_diagonal_entries;
+  }
+
+
+
+  template <int dim,
+            int fe_degree,
+            int n_q_points_1d,
+            int n_components,
+            typename VectorType,
+            typename VectorizedArrayType>
+  const std::shared_ptr<DiagonalMatrix<VectorType>> &
+  MassOperator<dim,
+               fe_degree,
+               n_q_points_1d,
+               n_components,
+               VectorType,
+               VectorizedArrayType>::get_matrix_lumped_diagonal() const
+  {
+    Assert(lumped_diagonal_entries.get() != nullptr &&
+             lumped_diagonal_entries->m() > 0,
+           ExcNotInitialized());
+    return lumped_diagonal_entries;
   }
 
 
