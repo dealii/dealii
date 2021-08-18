@@ -124,13 +124,6 @@ namespace hp
      * Exception
      */
     DeclException0(ExcNoQuadrature);
-
-  private:
-    /**
-     * The real container, which stores pointers to the different quadrature
-     * objects.
-     */
-    std::vector<std::shared_ptr<const Quadrature<dim>>> quadratures;
   };
 
 
