@@ -112,16 +112,9 @@ DataOut<dim, spacedim>::build_one_patch(
   const FEValuesBase<dim, spacedim> &fe_patch_values =
     scratch_data.get_present_fe_values(0);
 
-  // set the vertices of the patch. if the mapping does not preserve locations
-  // (e.g. MappingQEulerian), we need to compute the offset of the vertex for
-  // the graphical output. Otherwise, we can just use the vertex info.
-  for (const unsigned int vertex : cell_and_index->first->vertex_indices())
-    if (scratch_data.mapping_collection[0].preserves_vertex_locations())
-      patch.vertices[vertex] = cell_and_index->first->vertex(vertex);
-    else
-      patch.vertices[vertex] =
-        fe_patch_values.get_mapping().transform_unit_to_real_cell(
-          cell_and_index->first, GeometryInfo<dim>::unit_cell_vertex(vertex));
+  const auto vertices =
+    fe_patch_values.get_mapping().get_vertices(cell_and_index->first);
+  std::copy(vertices.begin(), vertices.end(), std::begin(patch.vertices));
 
   const unsigned int n_q_points = fe_patch_values.n_quadrature_points;
 
