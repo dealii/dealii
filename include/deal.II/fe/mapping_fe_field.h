@@ -534,7 +534,7 @@ public:
     mutable std::vector<double> local_dof_values;
   };
 
-private:
+protected:
   // documentation can be found in Mapping::get_data()
   virtual std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase>
   get_data(const UpdateFlags, const Quadrature<dim> &quadrature) const override;
