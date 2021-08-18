@@ -1147,14 +1147,14 @@ protected:
    * <tt>sub_no!=invalid_face_no</tt>; and calls @p fill_fe_subface_values if
    * <tt>face_no!=invalid_face_no</tt> and <tt>sub_no!=invalid_face_no</tt>.
    */
-  template <int dim_1>
+  template <class Q_or_QC>
   void
   compute_fill(
     const Mapping<dim, spacedim> &                              mapping,
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const unsigned int                                          face_no,
     const unsigned int                                          sub_no,
-    const hp::QCollection<dim_1> &                              quadrature,
+    const Q_or_QC &                                             quadrature,
     const CellSimilarity::Similarity                            cell_similarity,
     const typename Mapping<dim, spacedim>::InternalDataBase &mapping_internal,
     const typename FiniteElement<dim, spacedim>::InternalDataBase &fe_data,
