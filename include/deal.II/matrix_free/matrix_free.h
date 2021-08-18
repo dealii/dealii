@@ -1758,7 +1758,7 @@ public:
    * Return the cell iterator in deal.II speak to an interior/exterior cell of
    * a face in a pair of a face batch and lane index. The second element of
    * the pair is the face number so that the face iterator can be accessed:
-   * `pair.first()->face(pair.second());`
+   * `pair.first->face(pair.second);`
    *
    * Note that the face iterators in deal.II go through cells differently to
    * what the face/boundary loop of this class does. This is because several
