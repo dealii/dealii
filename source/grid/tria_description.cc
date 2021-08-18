@@ -337,6 +337,9 @@ namespace TriangulationDescription
               if (!(cell->user_flag_set()))
                 continue;
 
+              std::cout << cell->id() << " " << cell->manifold_id()
+                        << std::endl;
+
               CellData<dim> cell_info;
 
               // save coarse-cell id
@@ -347,7 +350,8 @@ namespace TriangulationDescription
                 {
                   types::boundary_id boundary_ind =
                     cell->face(f)->boundary_id();
-                  if (boundary_ind != numbers::internal_face_boundary_id)
+                  if (true ||
+                      boundary_ind != numbers::internal_face_boundary_id)
                     cell_info.boundary_ids.emplace_back(f, boundary_ind);
                 }
 
