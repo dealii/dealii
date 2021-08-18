@@ -136,7 +136,7 @@ constexpr inline DEAL_II_ALWAYS_INLINE SymmetricTensor<2, dim, Number>
 deviator(const SymmetricTensor<2, dim, Number> &);
 
 template <int dim, typename Number>
-constexpr inline DEAL_II_ALWAYS_INLINE Number
+DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE Number
 determinant(const SymmetricTensor<2, dim, Number> &);
 
 
@@ -1031,7 +1031,7 @@ private:
   trace(const SymmetricTensor<2, dim2, Number2> &d);
 
   template <int dim2, typename Number2>
-  friend constexpr Number2
+  friend DEAL_II_CONSTEXPR Number2
   determinant(const SymmetricTensor<2, dim2, Number2> &t);
 
   template <int dim2, typename Number2>
@@ -2693,7 +2693,7 @@ constexpr DEAL_II_ALWAYS_INLINE
  * @relatesalso SymmetricTensor
  */
 template <int dim, typename Number>
-constexpr inline DEAL_II_ALWAYS_INLINE Number
+DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE Number
 determinant(const SymmetricTensor<2, dim, Number> &t)
 {
   switch (dim)
@@ -2733,7 +2733,7 @@ determinant(const SymmetricTensor<2, dim, Number> &t)
  * @relatesalso SymmetricTensor
  */
 template <int dim, typename Number>
-constexpr DEAL_II_ALWAYS_INLINE Number
+DEAL_II_CONSTEXPR DEAL_II_ALWAYS_INLINE Number
 third_invariant(const SymmetricTensor<2, dim, Number> &t)
 {
   return determinant(t);
