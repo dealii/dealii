@@ -558,15 +558,9 @@ namespace parallel
 
     template <int dim, int spacedim>
     void
-    Triangulation<dim, spacedim>::load(const std::string &filename,
-                                       const bool         autopartition)
+    Triangulation<dim, spacedim>::load(const std::string &filename)
     {
 #ifdef DEAL_II_WITH_MPI
-      AssertThrow(
-        autopartition == false,
-        ExcMessage(
-          "load() only works if run with the same number of MPI processes used for saving the triangulation, hence autopartition is disabled."));
-
       Assert(this->n_cells() == 0,
              ExcMessage("load() only works if the Triangulation is empty!"));
 
@@ -694,10 +688,20 @@ namespace parallel
       this->update_number_cache();
 #else
       (void)filename;
-      (void)autopartition;
 
       AssertThrow(false, ExcNeedsMPI());
 #endif
+    }
+
+
+
+    template <int dim, int spacedim>
+    void
+    Triangulation<dim, spacedim>::load(const std::string &filename,
+                                       const bool         autopartition)
+    {
+      (void)autopartition;
+      load(filename);
     }
 
 

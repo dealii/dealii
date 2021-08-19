@@ -252,8 +252,16 @@ namespace parallel
        * in with notify_ready_to_unpack() after calling load().
        */
       virtual void
-      load(const std::string &filename,
-           const bool         autopartition = false) override;
+      load(const std::string &filename) override;
+
+      /**
+       * @copydoc load()
+       *
+       * @deprecated The autopartition parameter has been removed.
+       */
+      DEAL_II_DEPRECATED_EARLY
+      virtual void
+      load(const std::string &filename, const bool autopartition) override;
 
     private:
       virtual unsigned int

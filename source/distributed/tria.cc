@@ -1477,8 +1477,7 @@ namespace parallel
 
     template <int dim, int spacedim>
     void
-    Triangulation<dim, spacedim>::load(const std::string &filename,
-                                       const bool         autopartition)
+    Triangulation<dim, spacedim>::load(const std::string &filename)
     {
       Assert(
         this->n_cells() > 0,
@@ -1535,23 +1534,18 @@ namespace parallel
         this->mpi_communicator,
         0,
         0,
-        static_cast<int>(autopartition),
+        1,
         0,
         this,
         &connectivity);
 
-      if (numcpus != Utilities::MPI::n_mpi_processes(this->mpi_communicator))
-        {
-          // We are changing the number of CPUs so we need to repartition.
-          // Note that p4est actually distributes the cells between the changed
-          // number of CPUs and so everything works without this call, but
-          // this command changes the distribution for some reason, so we
-          // will leave it in here.
-          dealii::internal::p4est::functions<dim>::partition(
-            parallel_forest,
-            /* prepare coarsening */ 1,
-            /* weight_callback */ nullptr);
-        }
+      // We partition the p4est mesh that it conforms to the requirements of the
+      // deal.II mesh, i.e., partition for coarsening.
+      // This function call is optional.
+      dealii::internal::p4est::functions<dim>::partition(
+        parallel_forest,
+        /* prepare coarsening */ 1,
+        /* weight_callback */ nullptr);
 
       try
         {
@@ -1577,6 +1571,17 @@ namespace parallel
 
       this->update_periodic_face_map();
       this->update_number_cache();
+    }
+
+
+
+    template <int dim, int spacedim>
+    void
+    Triangulation<dim, spacedim>::load(const std::string &filename,
+                                       const bool         autopartition)
+    {
+      (void)autopartition;
+      load(filename);
     }
 
 
@@ -3485,6 +3490,15 @@ namespace parallel
     {
       Assert(false, ExcNotImplemented());
       return 0;
+    }
+
+
+
+    template <int spacedim>
+    void
+    Triangulation<1, spacedim>::load(const std::string &)
+    {
+      Assert(false, ExcNotImplemented());
     }
 
 

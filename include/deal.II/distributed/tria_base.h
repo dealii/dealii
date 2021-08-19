@@ -480,7 +480,16 @@ namespace parallel
      * notify_ready_to_unpack() after calling load().
      */
     virtual void
-    load(const std::string &filename, const bool autopartition = true) = 0;
+    load(const std::string &filename) = 0;
+
+    /**
+     * @copydoc load()
+     *
+     * @deprecated The autopartition parameter has been removed.
+     */
+    DEAL_II_DEPRECATED_EARLY
+    virtual void
+    load(const std::string &filename, const bool autopartition) = 0;
 
     /**
      * Register a function that can be used to attach data of fixed size
