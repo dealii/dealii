@@ -3702,14 +3702,10 @@ namespace internal
            |0 | 1|
            .--.--.
         */
-        // collect the
-        // indices of the
-        // eight
-        // surrounding
-        // vertices
+        // collect the indices of the eight surrounding vertices
         //   2--7--3
         //   |  |  |
-        //   4--9--5
+        //   4--8--5
         //   |  |  |
         //   0--6--1
         int new_vertices[9];
@@ -3729,10 +3725,11 @@ namespace internal
             // need here
             while (triangulation.vertices_used[next_unused_vertex] == true)
               ++next_unused_vertex;
-            Assert(
-              next_unused_vertex < triangulation.vertices.size(),
-              ExcMessage(
-                "Internal error: During refinement, the triangulation wants to access an element of the 'vertices' array but it turns out that the array is not large enough."));
+            Assert(next_unused_vertex < triangulation.vertices.size(),
+                   ExcMessage(
+                     "Internal error: During refinement, the triangulation "
+                     "wants to access an element of the 'vertices' array "
+                     "but it turns out that the array is not large enough."));
             triangulation.vertices_used[next_unused_vertex] = true;
 
             new_vertices[8] = next_unused_vertex;
@@ -3980,8 +3977,7 @@ namespace internal
             subcells[i]->clear_user_flag();
             subcells[i]->clear_user_data();
             subcells[i]->clear_children();
-            // inherit material
-            // properties
+            // inherit material properties
             subcells[i]->set_material_id(cell->material_id());
             subcells[i]->set_manifold_id(cell->manifold_id());
             subcells[i]->set_subdomain_id(subdomainid);
@@ -3992,9 +3988,7 @@ namespace internal
 
 
 
-        // set child index for
-        // even children children
-        // i=0,2 (0)
+        // set child index for even children i=0,2 (0)
         for (unsigned int i = 0; i < n_children / 2; ++i)
           cell->set_children(2 * i, subcells[2 * i]->index());
         // set the refine case
