@@ -465,9 +465,215 @@ public:
 
 private:
   /**
-   * Pointer to actual data array.
+   * A class that is used as the "deleter" for a `std::unique_ptr` object that
+   * AlignedVector uses to store the memory used for the elements.
+   *
+   * There are two ways the AlignedVector class can handle memory:
+   * - Allocation via `new[]` in reserve() where we call `posix_memalign()`
+   *   to obtain a chunk of memory and then do placement-`new` to initialize
+   *   memory. If this is what we have done, then we need to call the
+   *   destructors of the currently active elements by hand, and then
+   *   call `std::free()` to return memory. In order to call the destructors
+   *   of currently used elements, the deleter object needs to have access
+   *   to the owning `AlignedVector` object to know which of the allocated
+   *   elements are currently actually used.
+   * - We have called `replicate_across_communicator()`, in which case the
+   *   elements have been moved into a memory "window" managed by MPI.
+   *   In that case, one process (the root process of an MPI communicator
+   *   that ties together all processes on one node) needs to call the
+   *   destructor of all elements in this shared memory space, and then
+   *   all processes on that communicator need to first destroy the
+   *   MPI window object, and then the MPI communicator for the shared
+   *   memory node's processes. In this approach, we need to store the
+   *   following data: A pointer to the owning AlignedVector object to know
+   *   which elements need to be destroyed, copies of the MPI window
+   *   and communicator objects, and a couple of ancillary pieces of data.
+   *
+   * A common idiom towards using `std::unique_ptr` with complex de-allocation
+   * semantics is to use `std::unique_ptr<T, std::function<void (T*)>`
+   * and then use a lambda function to initialize the `std::function`
+   * deleter object. This approach is used in numerous other places in
+   * deal.II, but this has two downsides:
+   * - `std::function` is relatively memory-hungry. It takes 24 bytes by
+   *   itself, but then also needs to allocate memory dynamically, for
+   *   example to store the capture object of a lambda function. This ends
+   *   up to be quite a lot of memory given that we frequently use small
+   *   Vector objects (which build on AlignedVector).
+   * - More importantly, this breaks move operations. In a move constructor
+   *   or move assignment of AlignedVector, we want to steal the memory pointed
+   *   to, but we then need to install a new deleter object because the deleter
+   *   needs to know about the owning object to determine which elements to
+   *   call the destructor for. The problem is that we can't use the old
+   *   deleter (it is a lambda function that still points to the previous
+   *   owner that we are moving *from*) but we also don't know what deleter
+   *   to install otherwise -- we don't know the innards of the lambda function
+   *   that was previously installed; in fact, we don't even know whether it
+   *   was for regular or MPI shared-memory data management.
+   *
+   * The way out of this is to write a custom deleter. It stores a pointer to
+   * the owning AlignedVector object. It then also stores a `std::unique_ptr`
+   * to an object of a class derived from a base class that implements the
+   * concrete action necessary to facilitate the "deleter" action. Based on
+   * the arguments given to the constructor of the Deleter class, the
+   * constructor then either allocates a "regular" or an MPI-based action
+   * object, and the action is facilitated by an overloaded `virtual` function.
+   *
+   * In the end, this solves both of our problems:
+   * - The deleter object only requires 16 bytes (two pointers) plus whatever
+   *   dynamic memory is necessary to store the "action" objects.
+   * - In move operations, the only thing that needs to be done is to tell
+   *   the deleter about the change of owning AlignedVector object, which we
+   *   can achieve via the reset_owning_object() function.
+   *
+   * This scheme can be further optimized in the following way: In the most
+   * common case, memory is allocated via `posix_memalign()` and needs to
+   * destroyed via `std::free()`. Rather than derive an action class for
+   * this common case, dynamically allocate an object for this case, and
+   * call it, we can just special case this situation: If the pointer to the
+   * action object is `nullptr`, then we just execute the default action.
+   * This means that for the most common case, we do not need any dynamic
+   * memory allocation at all, and in that case the deleter object truly
+   * only uses 16 bytes: One pointer to the owning AlignedVector object,
+   * and a pointer to the action object that happens to be a `nullptr`.
+   * Only in the case of the MPI shared memory data management does the
+   * action pointer point somewhere, but this case is expensive anyway and so
+   * the extra dynamic memory allocation does little harm.
+   *
+   * (One could in that case go even further: There is no really only one
+   * possible non-default action left, namely the MPI-based destruction of
+   * the shared-memory window. Instead of having the Deleter::DeleterActionBase
+   * class below, and the derived Deleter::MPISharedMemDeleterAction class, both
+   * with `virtual` functions, we could just get rid of the base class and make
+   * the member functions of the derived class non-`virtual`. We would then
+   * either store a pointer to an MPISharedMemDeleterAction object if the
+   * non-default action is requested, or a `nullptr` for the default action.
+   * Avoiding `virtual` functions would make these objects smaller by a few
+   * bytes, and the call to the `delete_array()` function marginally faster.
+   * That said, given that the Deleter::MPISharedMemDeleterAction object already
+   * stores all sorts of stuff and its execution is not cheap, these additional
+   * optimizations are probably not worth it. Instead, we kept the class
+   * hierarchy so that one could define other non-standard actions in the future
+   * through other derived classes.)
    */
-  std::unique_ptr<T[], std::function<void(T *)>> elements;
+  class Deleter
+  {
+  public:
+    /**
+     * Constructor. When this constructor is called, it installs an
+     * action that corresponds to "regular" memory allocation that
+     * needs to be handled by using `std::free()`.
+     */
+    Deleter(AlignedVector<T> *owning_object);
+
+#ifdef DEAL_II_WITH_MPI
+    /**
+     * Constructor. When this constructor is called, it installs an
+     * action that corresponds to MPI-based shared memory allocation that
+     * needs to be handled by letting MPI de-allocate the shared memory
+     * window, plus destroying the MPI communicator, and doing other
+     * clean-up work.
+     */
+    Deleter(AlignedVector<T> *owning_object,
+            const bool        is_shmem_root,
+            T *               aligned_shmem_pointer,
+            MPI_Comm          shmem_group_communicator,
+            MPI_Win           shmem_window);
+#endif
+
+    /**
+     * The operator called by `std::unique_ptr` to destroy the data it
+     * is storing. This function dispatches to the different actions that
+     * this class implements.
+     */
+    void
+    operator()(T *ptr);
+
+    /**
+     * Reset the pointer to the owning AlignedVector object. This function
+     * is used in move operations when the pointer to the data is transferred
+     * from one AlignedVector object -- i.e., the pointer itself remains
+     * unchanged, but the deleter object needs to be updated to know who
+     * the new owner now is.
+     */
+    void
+    reset_owning_object(const AlignedVector<T> *new_aligned_vector_ptr);
+
+  private:
+    /**
+     * Base class for the action necessary to de-allocate memory.
+     */
+    class DeleterActionBase
+    {
+    public:
+      /**
+       * Destructor, made `virtual` to allow for derived classes.
+       */
+      virtual ~DeleterActionBase() = default;
+
+      /**
+       * The function that implements the action of de-allocating memory.
+       * It receives as arguments a pointer to the owning AlignedVector object
+       * as well as a pointer to the memory being de-allocated.
+       */
+      virtual void
+      delete_array(const AlignedVector<T> *owning_aligned_vector, T *ptr) = 0;
+    };
+
+#ifdef DEAL_II_WITH_MPI
+
+    /**
+     * A class that implements the deleter action for MPI shared-memory
+     * allocated data.
+     */
+    class MPISharedMemDeleterAction : public DeleterActionBase
+    {
+    public:
+      /**
+       * Constructor. Store the various pieces of information necessary to
+       * identify the MPI window in which the data resides.
+       */
+      MPISharedMemDeleterAction(const bool is_shmem_root,
+                                T *        aligned_shmem_pointer,
+                                MPI_Comm   shmem_group_communicator,
+                                MPI_Win    shmem_window);
+
+      /**
+       * The function that implements the action of de-allocating memory.
+       * It receives as arguments a pointer to the owning AlignedVector object
+       * as well as a pointer to the memory being de-allocated.
+       */
+      virtual void
+      delete_array(const AlignedVector<T> *aligned_vector, T *ptr);
+
+    private:
+      /**
+       * Variables necessary to identify the MPI shared-memory window plus
+       * all ancillary information to destroy this window.
+       */
+      const bool is_shmem_root;
+      T *        aligned_shmem_pointer;
+      MPI_Comm   shmem_group_communicator;
+      MPI_Win    shmem_window;
+    };
+#endif
+
+    /**
+     * A pointer to the object that facilitates the actual action of
+     * destroying the memory.
+     */
+    std::unique_ptr<DeleterActionBase> deleter_action_object;
+
+    /**
+     * A (non-owned) pointer to the surrounding AlignedVector object that owns
+     * the memory this deleter object is responsible for deleting.
+     */
+    const AlignedVector<T> *owning_aligned_vector;
+  };
+
+  /**
+   * Pointer to actual data array, using the custom deleter class above.
+   */
+  std::unique_ptr<T[], Deleter> elements;
 
   /**
    * Pointer to one past the last valid value.
@@ -836,9 +1042,115 @@ namespace internal
 #ifndef DOXYGEN
 
 
+
+template <typename T>
+inline AlignedVector<T>::Deleter::Deleter(AlignedVector<T> *owning_object)
+  : deleter_action_object(nullptr) // encode default action by using a nullptr
+  , owning_aligned_vector(owning_object)
+{}
+
+
+#  ifdef DEAL_II_WITH_MPI
+
+template <typename T>
+inline AlignedVector<T>::Deleter::Deleter(AlignedVector<T> *owning_object,
+                                          const bool        is_shmem_root,
+                                          T *      aligned_shmem_pointer,
+                                          MPI_Comm shmem_group_communicator,
+                                          MPI_Win  shmem_window)
+  : deleter_action_object(
+      std::make_unique<MPISharedMemDeleterAction>(is_shmem_root,
+                                                  aligned_shmem_pointer,
+                                                  shmem_group_communicator,
+                                                  shmem_window))
+  , owning_aligned_vector(owning_object)
+{}
+#  endif
+
+
+template <typename T>
+inline void
+AlignedVector<T>::Deleter::operator()(T *ptr)
+{
+  // If no special action has been registered (i.e., if the action pointer is
+  // nullptr), then just perform the default action right here.
+  if (deleter_action_object == nullptr)
+    {
+      if (ptr != nullptr)
+        {
+          Assert(owning_aligned_vector->used_elements_end != nullptr,
+                 ExcInternalError());
+
+          if (std::is_trivial<T>::value == false)
+            for (T *p = owning_aligned_vector->used_elements_end - 1; p >= ptr;
+                 --p)
+              p->~T();
+
+          std::free(ptr);
+        }
+    }
+  else
+    // Otherwise, let the action object do what is necessary
+    deleter_action_object->delete_array(owning_aligned_vector, ptr);
+}
+
+
+
+template <typename T>
+inline void
+AlignedVector<T>::Deleter::reset_owning_object(
+  const AlignedVector<T> *new_aligned_vector_ptr)
+{
+  owning_aligned_vector = new_aligned_vector_ptr;
+}
+
+
+#  ifdef DEAL_II_WITH_MPI
+
+template <typename T>
+inline AlignedVector<T>::Deleter::MPISharedMemDeleterAction::
+  MPISharedMemDeleterAction(const bool is_shmem_root,
+                            T *        aligned_shmem_pointer,
+                            MPI_Comm   shmem_group_communicator,
+                            MPI_Win    shmem_window)
+  : is_shmem_root(is_shmem_root)
+  , aligned_shmem_pointer(aligned_shmem_pointer)
+  , shmem_group_communicator(shmem_group_communicator)
+  , shmem_window(shmem_window)
+{}
+
+
+
+template <typename T>
+inline void
+AlignedVector<T>::Deleter::MPISharedMemDeleterAction::delete_array(
+  const AlignedVector<T> *aligned_vector,
+  T *                     ptr)
+{
+  (void)ptr;
+  Assert(aligned_vector->elements.get() == ptr, ExcInternalError());
+
+  if (is_shmem_root)
+    if (std::is_trivial<T>::value == false)
+      for (T *p = aligned_vector->used_elements_end - 1;
+           p >= aligned_vector->elements.get();
+           --p)
+        p->~T();
+
+  int ierr;
+  ierr = MPI_Win_free(&shmem_window);
+  AssertThrowMPI(ierr);
+
+  ierr = MPI_Comm_free(&shmem_group_communicator);
+  AssertThrowMPI(ierr);
+}
+
+#  endif
+
+
 template <class T>
 inline AlignedVector<T>::AlignedVector()
-  : elements(nullptr, [](T *) { Assert(false, ExcInternalError()); })
+  : elements(nullptr, Deleter(this))
   , used_elements_end(nullptr)
   , allocated_elements_end(nullptr)
 {}
@@ -847,7 +1159,7 @@ inline AlignedVector<T>::AlignedVector()
 
 template <class T>
 inline AlignedVector<T>::AlignedVector(const size_type size, const T &init)
-  : elements(nullptr, [](T *) { Assert(false, ExcInternalError()); })
+  : elements(nullptr, Deleter(this))
   , used_elements_end(nullptr)
   , allocated_elements_end(nullptr)
 {
@@ -859,7 +1171,7 @@ inline AlignedVector<T>::AlignedVector(const size_type size, const T &init)
 
 template <class T>
 inline AlignedVector<T>::AlignedVector(const AlignedVector<T> &vec)
-  : elements(nullptr, [](T *) { Assert(false, ExcInternalError()); })
+  : elements(nullptr, Deleter(this))
   , used_elements_end(nullptr)
   , allocated_elements_end(nullptr)
 {
@@ -904,23 +1216,13 @@ AlignedVector<T>::operator=(AlignedVector<T> &&vec) noexcept
   clear();
 
   // Move the actual data in the 'elements' object. One problem is that this
-  // also moves the deleter object, but the deleter object is a lambda function
-  // that references 'this' (i.e., the 'this' pointer of the *moved-from*
-  // object). So what we actually do is steal the pointer via
-  // std::unique_ptr::release() and then install our own deleter object that
-  // mirrors the one used in reserve() below.
-  elements = decltype(elements)(vec.elements.release(), [this](T *ptr) {
-    if (ptr != nullptr)
-      {
-        Assert(this->used_elements_end != nullptr, ExcInternalError());
-
-        if (std::is_trivial<T>::value == false)
-          for (T *p = this->used_elements_end - 1; p >= ptr; --p)
-            p->~T();
-      }
-
-    std::free(ptr);
-  });
+  // also moves the deleter object, but the deleter object
+  // references 'this' (i.e., the 'this' pointer of the *moved-from*
+  // object). The way this is implemented is that we have to move the
+  // deleter as well, and then reset the pointer inside the deleter
+  // that references the outer object.
+  elements = std::move(vec.elements);
+  elements.get_deleter().reset_owning_object(this);
 
   // Then also steal the other pointers and clear them in the original object:
   used_elements_end      = vec.used_elements_end;
@@ -1063,18 +1365,7 @@ AlignedVector<T>::reserve(const size_type new_allocated_size)
       // reverse order, and then release the memory. Note that we catch the
       // 'this' pointer because the number of elements currently alive might
       // change over time.
-      auto deleter = [this](T *ptr) {
-        if (ptr != nullptr)
-          {
-            Assert(this->used_elements_end != nullptr, ExcInternalError());
-
-            if (std::is_trivial<T>::value == false)
-              for (T *p = this->used_elements_end - 1; p >= ptr; --p)
-                p->~T();
-          }
-
-        std::free(ptr);
-      };
+      Deleter deleter(this);
 
       // copy whatever elements we need to retain
       if (new_allocated_size > 0)
@@ -1088,9 +1379,10 @@ AlignedVector<T>::reserve(const size_type new_allocated_size)
       // Note that at the time of releasing the old memory, 'used_elements_end'
       // still points to its previous value, and this is important for the
       // deleter object of the previously allocated array (see how it loops over
-      // the to-be-destroyed elements a few lines above).
-      elements               = decltype(elements)(new_data_ptr, deleter);
-      used_elements_end      = elements.get() + old_size;
+      // the to-be-destroyed elements a the Deleter::DefaultDeleterAction
+      // class).
+      elements          = decltype(elements)(new_data_ptr, std::move(deleter));
+      used_elements_end = elements.get() + old_size;
       allocated_elements_end = elements.get() + new_size;
     }
   else if (new_allocated_size == 0)
@@ -1559,23 +1851,11 @@ AlignedVector<T>::replicate_across_communicator(const MPI_Comm &   communicator,
   // that is encapsulated in the following call where the deleter makes copies
   // of the arguments in the lambda capture.
   elements = decltype(elements)(aligned_shmem_pointer,
-                                [is_shmem_root,
-                                 array_size,
-                                 aligned_shmem_pointer,
-                                 shmem_group_communicator,
-                                 shmem_window](T *) mutable {
-                                  if (is_shmem_root)
-                                    for (size_type i = 0; i < array_size; ++i)
-                                      aligned_shmem_pointer[i].~T();
-
-                                  int ierr;
-                                  ierr = MPI_Win_free(&shmem_window);
-                                  AssertThrowMPI(ierr);
-
-                                  ierr =
-                                    MPI_Comm_free(&shmem_group_communicator);
-                                  AssertThrowMPI(ierr);
-                                });
+                                Deleter(this,
+                                        is_shmem_root,
+                                        aligned_shmem_pointer,
+                                        shmem_group_communicator,
+                                        shmem_window));
 
   // We then also have to set the other two pointers that define the state of
   // the current object. Note that the new buffer size is exactly as large as
@@ -1614,42 +1894,13 @@ template <class T>
 inline void
 AlignedVector<T>::swap(AlignedVector<T> &vec)
 {
-  // Swap the data in the 'elements' objects. One problem is that this
-  // also moves the deleter object, but the deleter object is a lambda function
-  // that references 'this' (i.e., the 'this' pointer of the *moved-from*
-  // object). So what we actually do is steal the pointer via
-  // std::unique_ptr::release() and then install our own deleter object that
-  // mirrors the one used in reserve() below.
-  //
-  // We have to do the same for the other object
-  T *this_element_pointer = elements.release();
+  // Swap the data in the 'elements' objects. Then also make sure that
+  // their respective deleter objects point to the right place.
+  std::swap(elements, vec.elements);
+  elements.get_deleter().reset_owning_object(this);
+  vec.elements.get_deleter().reset_owning_object(&vec);
 
-  elements = decltype(elements)(vec.elements.release(), [this](T *ptr) {
-    if (ptr != nullptr)
-      {
-        Assert(this->used_elements_end != nullptr, ExcInternalError());
-
-        if (std::is_trivial<T>::value == false)
-          for (T *p = this->used_elements_end - 1; p >= ptr; --p)
-            p->~T();
-      }
-
-    std::free(ptr);
-  });
-
-  vec.elements = decltype(vec.elements)(this_element_pointer, [&vec](T *ptr) {
-    if (ptr != nullptr)
-      {
-        Assert(vec.used_elements_end != nullptr, ExcInternalError());
-
-        if (std::is_trivial<T>::value == false)
-          for (T *p = vec.used_elements_end - 1; p >= ptr; --p)
-            p->~T();
-      }
-
-    std::free(ptr);
-  });
-
+  // Now also swap the remaining members.
   std::swap(used_elements_end, vec.used_elements_end);
   std::swap(allocated_elements_end, vec.allocated_elements_end);
 }
