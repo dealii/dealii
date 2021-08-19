@@ -4512,14 +4512,14 @@ namespace internal
                  triangulation.active_cell_iterators_on_level(level))
               if (cell->refine_flag_set())
                 {
-                  // check if cell is at en EXTERIOR boundary
-                  bool flag = false;
+                  // check if cell is at an EXTERIOR boundary
+                  bool is_not_interior_boundary = false;
 
                   for (const auto &f : cell->face_iterators())
-                    flag |=
+                    is_not_interior_boundary |=
                       (f->boundary_id() != numbers::internal_face_boundary_id);
 
-                  if (flag && cell->at_boundary())
+                  if (is_not_interior_boundary && cell->at_boundary())
                     cell->set_user_flag();
 
                   create_children(triangulation,
@@ -11862,8 +11862,8 @@ Triangulation<dim, spacedim>::create_triangulation(
        level < cell_infos.size() && !cell_infos[level].empty();
        ++level)
     {
-      // a) set manifold ids here (because new vertices have to be
-      //    positioned correctly during each refinement step)
+      // a) set manifold ids and boundary ids here (because new vertices have to
+      //    be positioned correctly during each refinement step)
       {
         auto cell      = this->begin(level);
         auto cell_info = cell_infos[level].begin();
@@ -11882,25 +11882,9 @@ Triangulation<dim, spacedim>::create_triangulation(
                   cell_info->manifold_line_ids[line]);
 
             cell->set_manifold_id(cell_info->manifold_id);
-          }
-      }
 
-      {
-        auto cell      = this->begin(level);
-        auto cell_info = cell_infos[level].begin();
-        for (; cell_info != cell_infos[level].end(); ++cell_info)
-          {
-            // find cell that has the correct cell
-            while (cell_info->id != cell->id().template to_binary<dim>())
-              ++cell;
-
-            // boundary ids
-            for (auto pair : cell_info->boundary_ids)
-              {
-                // Assert(cell->at_boundary(pair.first),
-                //       ExcMessage("Cell face is not on the boundary!"));
-                cell->face(pair.first)->set_boundary_id(pair.second);
-              }
+            for (const auto face : cell->face_indices())
+              cell->face(face)->set_boundary_id(cell_info->boundary_ids[face]);
           }
       }
 
@@ -11930,29 +11914,6 @@ Triangulation<dim, spacedim>::create_triangulation(
                                 spacedim>::execute_coarsening_and_refinement();
         }
     }
-
-  //  // 3) set boundary ids
-  //  for (unsigned int level = 0;
-  //       level < cell_infos.size() && !cell_infos[level].empty();
-  //       ++level)
-  //    {
-  //      auto cell      = this->begin(level);
-  //      auto cell_info = cell_infos[level].begin();
-  //      for (; cell_info != cell_infos[level].end(); ++cell_info)
-  //        {
-  //          // find cell that has the correct cell
-  //          while (cell_info->id != cell->id().template to_binary<dim>())
-  //            ++cell;
-  //
-  //          // boundary ids
-  //          for (auto pair : cell_info->boundary_ids)
-  //            {
-  //              Assert(cell->at_boundary(pair.first),
-  //                     ExcMessage("Cell face is not on the boundary!"));
-  //              cell->face(pair.first)->set_boundary_id(pair.second);
-  //            }
-  //        }
-  //    }
 }
 
 

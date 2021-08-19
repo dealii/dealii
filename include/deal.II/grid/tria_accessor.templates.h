@@ -1859,14 +1859,6 @@ TriaAccessor<structdim, dim, spacedim>::set_boundary_id(
 {
   Assert(structdim < dim, ExcImpossibleInDim(dim));
   Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  /*
-  Assert(boundary_ind != numbers::internal_face_boundary_id,
-         ExcMessage("You are trying to set the boundary_id to an invalid "
-                    "value (numbers::internal_face_boundary_id is reserved)."));
-  Assert(this->at_boundary(),
-         ExcMessage("You are trying to set the boundary_id of an "
-                    "internal object, which is not allowed!"));
-   */
 
   this->objects().boundary_or_material_id[this->present_index].boundary_id =
     boundary_ind;
@@ -3096,11 +3088,14 @@ template <int spacedim>
 inline void
 TriaAccessor<0, 1, spacedim>::set_boundary_id(const types::boundary_id b)
 {
-  Assert(tria->vertex_to_boundary_id_map_1d->find(this->vertex_index()) !=
-           tria->vertex_to_boundary_id_map_1d->end(),
-         ExcInternalError());
+  if (tria->vertex_to_boundary_id_map_1d->find(this->vertex_index()) !=
+      tria->vertex_to_boundary_id_map_1d->end())
+    {
+      (*tria->vertex_to_boundary_id_map_1d)[this->vertex_index()] = b;
+      return;
+    }
 
-  (*tria->vertex_to_boundary_id_map_1d)[this->vertex_index()] = b;
+  Assert(b == numbers::internal_face_boundary_id, ExcInternalError());
 }
 
 

@@ -347,13 +347,7 @@ namespace TriangulationDescription
 
               // save boundary_ids of each face of this cell
               for (const auto f : cell->face_indices())
-                {
-                  types::boundary_id boundary_ind =
-                    cell->face(f)->boundary_id();
-                  if (true ||
-                      boundary_ind != numbers::internal_face_boundary_id)
-                    cell_info.boundary_ids.emplace_back(f, boundary_ind);
-                }
+                cell_info.boundary_ids[f] = cell->face(f)->boundary_id();
 
               // save manifold id
               {
@@ -704,11 +698,7 @@ namespace TriangulationDescription
 
       // save boundary_ids of each face of this cell
       for (const auto f : cell->face_indices())
-        {
-          types::boundary_id boundary_ind = cell->face(f)->boundary_id();
-          if (boundary_ind != numbers::internal_face_boundary_id)
-            cell_info.boundary_ids.emplace_back(f, boundary_ind);
-        }
+        cell_info.boundary_ids[f] = cell->face(f)->boundary_id();
 
       // save manifold id
       {
