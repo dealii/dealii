@@ -185,7 +185,7 @@ We produce one test case for a 2d problem and another one for 3d:
 </li>
 <li>
   In 3d, the domain is again half of the surface of the unit ball, i.e. a half
-  sphere or dome. We choose $u(\mathbf x)=-2\sin(\pi x_1)\cos(\pi x_2)e^z$ as
+  sphere or dome. We choose $u(\mathbf x)=-2\sin(\pi x_1)\cos(\pi x_2)e^{x_3}$ as
   the solution. We can compute the right hand side of the
   equation, $f=-\Delta_\Gamma u$, in the same way as the method above (with $\kappa = 2$), yielding an
   awkward and lengthy expression. You can find the full expression in the
