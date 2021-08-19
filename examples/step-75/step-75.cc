@@ -904,7 +904,7 @@ namespace Step75
             (Utilities::MPI::this_mpi_process(mpi_communicator) == 0))
     , computing_timer(mpi_communicator,
                       pcout,
-                      TimerOutput::summary,
+                      TimerOutput::never,
                       TimerOutput::wall_times)
   {
     Assert(prm.min_h_level <= prm.max_h_level,

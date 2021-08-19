@@ -729,7 +729,7 @@ namespace step62
             (Utilities::MPI::this_mpi_process(mpi_communicator) == 0))
     , computing_timer(mpi_communicator,
                       pcout,
-                      TimerOutput::summary,
+                      TimerOutput::never,
                       TimerOutput::wall_times)
   {}
 
