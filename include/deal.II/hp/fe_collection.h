@@ -181,6 +181,14 @@ namespace hp
     push_back(const FiniteElement<dim, spacedim> &new_fe);
 
     /**
+     * @name Querying information about the elements in the collection
+     */
+
+    /**
+     * @{
+     */
+
+    /**
      * Return the number of vector components of the finite elements in this
      * collection.  This number must be the same for all elements in the
      * collection.
@@ -260,6 +268,17 @@ namespace hp
     unsigned int
     max_dofs_per_cell() const;
 
+    /**
+     * @}
+     */
+
+    /**
+     * @name Functions to support hp-adaptivity
+     */
+
+    /**
+     * @{
+     */
 
     /**
      * Return whether all elements in this collection implement the hanging
@@ -457,6 +476,18 @@ namespace hp
                                const unsigned int            codim = 0) const;
 
     /**
+     * @}
+     */
+
+    /**
+     * @name Describing hierarchical relationships between elements
+     */
+
+    /**
+     * @{
+     */
+
+    /**
      * Set functions determining the hierarchy of finite elements, i.e. a
      * function @p next that returns the index of the finite element following
      * the given one, and a function @p prev returning the preceding one.
@@ -531,6 +562,18 @@ namespace hp
      */
     unsigned int
     previous_in_hierarchy(const unsigned int fe_index) const;
+
+    /**
+     * @}
+     */
+
+    /**
+     * @name Components and blocks of elements
+     */
+
+    /**
+     * @{
+     */
 
     /**
      * Return a component mask with as many elements as this object has vector
@@ -724,6 +767,10 @@ namespace hp
      */
     BlockMask
     block_mask(const ComponentMask &component_mask) const;
+
+    /**
+     * @}
+     */
 
     /**
      * @name Exceptions
