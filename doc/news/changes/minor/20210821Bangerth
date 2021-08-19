@@ -1,0 +1,16 @@
+Changed: For 1d cells, the following code did not compile:
+@code
+    for (const auto &face : cell->face_iterators())
+      if (face->at_boundary())
+        {
+          face->set_boundary_id(1);
+        }
+@endcode
+That was because, unlike in the 2d and 3d case, the class that
+describes the faces of 1d cells had a `set_boundary_id()` function
+that was not marked as `const`. This has now been fixed by adding the
+`const` specification for this function, along with the one on the
+`set_all_boundary_ids()` function.
+<br>
+(Wolfgang Bangerth, Tyler Anderson, 2021/08/21)
+

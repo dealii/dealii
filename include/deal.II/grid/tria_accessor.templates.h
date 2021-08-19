@@ -3092,11 +3092,12 @@ TriaAccessor<0, 1, spacedim>::isotropic_child_index(const unsigned int)
 
 template <int spacedim>
 inline void
-TriaAccessor<0, 1, spacedim>::set_boundary_id(const types::boundary_id b)
+TriaAccessor<0, 1, spacedim>::set_boundary_id(const types::boundary_id b) const
 {
   Assert(tria->vertex_to_boundary_id_map_1d->find(this->vertex_index()) !=
            tria->vertex_to_boundary_id_map_1d->end(),
-         ExcInternalError());
+         ExcMessage("You can't set the boundary_id of a face of a cell that is "
+                    "not actually at the boundary."));
 
   (*tria->vertex_to_boundary_id_map_1d)[this->vertex_index()] = b;
 }
@@ -3114,7 +3115,8 @@ TriaAccessor<0, 1, spacedim>::set_manifold_id(const types::manifold_id b)
 
 template <int spacedim>
 inline void
-TriaAccessor<0, 1, spacedim>::set_all_boundary_ids(const types::boundary_id b)
+TriaAccessor<0, 1, spacedim>::set_all_boundary_ids(
+  const types::boundary_id b) const
 {
   set_boundary_id(b);
 }

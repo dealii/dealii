@@ -2707,7 +2707,7 @@ public:
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   void
-  set_boundary_id(const types::boundary_id);
+  set_boundary_id(const types::boundary_id) const;
 
   /**
    * Set the manifold indicator of this vertex. This does nothing so far since
@@ -2730,7 +2730,7 @@ public:
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   void
-  set_all_boundary_ids(const types::boundary_id);
+  set_all_boundary_ids(const types::boundary_id) const;
 
   /**
    * Set the manifold indicator of this object and all of its lower-
