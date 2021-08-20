@@ -199,6 +199,29 @@ namespace Particles
     set_properties(const ArrayView<const double> &new_properties);
 
     /**
+     * Set the properties of this particle, assuming that the properties
+     * stored on this particle correspond to a rank-1 Tensor object. In
+     * particular, this means that the number of properties stored on
+     * the particle must equal `dim`.
+     *
+     * @param [in] new_properties A Tensor containing the new properties for
+     *   this particle.
+     *
+     * @note In parallel programs, the ParticleHandler class stores particles
+     *   on both the locally owned cells, as well as on ghost cells. The
+     *   particles on the latter are *copies* of particles owned on other
+     *   processors, and should therefore be treated in the same way as
+     *   ghost entries in @ref GlossGhostedVector "vectors with ghost elements"
+     *   or @ref GlossGhostCell "ghost cells": In both cases, one should
+     *   treat the ghost elements or cells as `const` objects that shouldn't
+     *   be modified even if the objects allow for calls that modify
+     *   properties. Rather, properties should only be modified on processors
+     *   that actually *own* the particle.
+     */
+    void
+    set_properties(const Tensor<1, dim> &new_properties);
+
+    /**
      * Get write-access to properties of this particle.
      *
      * @return An ArrayView of the properties of this particle.
@@ -676,6 +699,25 @@ namespace Particles
       std::copy(new_properties.begin(),
                 new_properties.end(),
                 property_values.begin());
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline void
+  ParticleAccessor<dim, spacedim>::set_properties(
+    const Tensor<1, dim> &new_properties)
+  {
+    Assert(state() == IteratorState::valid, ExcInternalError());
+
+    // A Tensor object is not an array, so we cannot just create an
+    // ArrayView object for it. Rather, copy the data into a true
+    // array and make the ArrayView from that.
+    double array[dim];
+    for (unsigned int d = 0; d < dim; ++d)
+      array[d] = new_properties[d];
+
+    set_properties(make_array_view(array));
   }
 
 
