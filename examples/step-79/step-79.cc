@@ -2435,7 +2435,6 @@ namespace SAND
            (iteration_number < max_iterations));
 
     write_as_stl();
-    timer.print_summary();
   }
 } // namespace SAND
 
