@@ -323,12 +323,20 @@ namespace Utilities
 
     template <int rank, int dim, typename Number>
     Tensor<rank, dim, Number>
-    sum(const Tensor<rank, dim, Number> &local,
-        const MPI_Comm &                 mpi_communicator)
+    sum(const Tensor<rank, dim, Number> &t, const MPI_Comm &mpi_communicator)
     {
-      Tensor<rank, dim, Number> sums;
-      sum(local, mpi_communicator, sums);
-      return sums;
+      // Copy the tensor into a C-style array with which we can then
+      // call the other sum() function.
+      Number array[Tensor<rank, dim, Number>::n_independent_components];
+      for (unsigned int i = 0;
+           i < Tensor<rank, dim, Number>::n_independent_components;
+           ++i)
+        array[i] =
+          t[Tensor<rank, dim, Number>::unrolled_to_component_indices(i)];
+
+      sum(array, mpi_communicator, array);
+
+      return Tensor<rank, dim, Number>(make_array_view(array));
     }
 
 
@@ -338,6 +346,8 @@ namespace Utilities
     sum(const SymmetricTensor<rank, dim, Number> &local,
         const MPI_Comm &                          mpi_communicator)
     {
+      // Copy the tensor into a C-style array with which we can then
+      // call the other sum() function.
       const unsigned int n_entries =
         SymmetricTensor<rank, dim, Number>::n_independent_components;
       Number
