@@ -90,7 +90,7 @@ namespace NonMatching
         get_fe_collection() const override;
 
         /**
-         * Return the active_fe_index of the DoFCellAccessor associated with the
+         * Return the active FE index of the DoFCellAccessor associated with the
          * DoFHandler and the the incoming cell in the triangulation.
          */
         unsigned int

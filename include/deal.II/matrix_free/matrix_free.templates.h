@@ -504,7 +504,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
 
 
   // subdivide cell, face and boundary face partitioner data, s.t., all
-  // ranges have the same active_fe_indices
+  // ranges have the same active FE indices
   if (task_info.scheme != internal::MatrixFreeFunctions::TaskInfo::
                             TasksParallelScheme::partition_color)
     {
@@ -754,8 +754,8 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
       if (dof_handler.size() > 1)
         {
           // check if all DoHandlers are in the same hp-mode; and if hp-
-          // capabilities are enabled: check if active_fe_indices of all
-          // DoFHandler are the same.
+          // capabilities are enabled: check if active FE indices of all
+          // DoFHandlers are the same.
           for (unsigned int i = 1; i < dof_handler.size(); ++i)
             {
               Assert(dof_handler[0]->has_hp_capabilities() ==

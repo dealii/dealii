@@ -1473,20 +1473,20 @@ public:
     const unsigned int                           dof_handler_index = 0) const;
 
   /**
-   * In the hp-adaptive case, return number of active_fe_indices.
+   * In the hp-adaptive case, return number of active FE indices.
    */
   unsigned int
   n_active_fe_indices() const;
 
   /**
-   * In the hp-adaptive case, return the active_fe_index of a cell range.
+   * In the hp-adaptive case, return the active FE index of a cell range.
    */
   unsigned int
   get_cell_active_fe_index(
     const std::pair<unsigned int, unsigned int> range) const;
 
   /**
-   * In the hp-adaptive case, return the active_fe_index of a face range.
+   * In the hp-adaptive case, return the active FE index of a face range.
    */
   unsigned int
   get_face_active_fe_index(const std::pair<unsigned int, unsigned int> range,
