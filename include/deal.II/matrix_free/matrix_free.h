@@ -1473,7 +1473,7 @@ public:
     const unsigned int                           dof_handler_index = 0) const;
 
   /**
-   * In the hp adaptive case, return number of active_fe_indices.
+   * In the hp-adaptive case, return number of active_fe_indices.
    */
   unsigned int
   n_active_fe_indices() const;
