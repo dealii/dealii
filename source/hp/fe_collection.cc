@@ -23,6 +23,56 @@ DEAL_II_NAMESPACE_OPEN
 namespace hp
 {
   template <int dim, int spacedim>
+  FECollection<dim, spacedim>::FECollection()
+  {
+    set_default_hierarchy();
+  }
+
+
+
+  template <int dim, int spacedim>
+  FECollection<dim, spacedim>::FECollection(
+    const FiniteElement<dim, spacedim> &fe)
+    : FECollection()
+  {
+    push_back(fe);
+  }
+
+
+
+  template <int dim, int spacedim>
+  FECollection<dim, spacedim>::FECollection(
+    const std::vector<const FiniteElement<dim, spacedim> *> &fes)
+    : FECollection()
+  {
+    Assert(fes.size() > 0,
+           ExcMessage("Need to pass at least one finite element."));
+
+    for (unsigned int i = 0; i < fes.size(); ++i)
+      push_back(*fes[i]);
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
+  FECollection<dim, spacedim>::push_back(
+    const FiniteElement<dim, spacedim> &new_fe)
+  {
+    // check that the new element has the right number of components. only check
+    // with the first element, since all the other elements have already passed
+    // the test against the first element
+    Assert(this->size() == 0 ||
+             new_fe.n_components() == this->operator[](0).n_components(),
+           ExcMessage("All elements inside a collection need to have the "
+                      "same number of vector components!"));
+
+    Collection<FiniteElement<dim, spacedim>>::push_back(new_fe.clone());
+  }
+
+
+
+  template <int dim, int spacedim>
   std::set<unsigned int>
   FECollection<dim, spacedim>::find_common_fes(
     const std::set<unsigned int> &fes,
@@ -232,56 +282,6 @@ namespace hp
       }
 
     return fe_index;
-  }
-
-
-
-  template <int dim, int spacedim>
-  FECollection<dim, spacedim>::FECollection()
-  {
-    set_default_hierarchy();
-  }
-
-
-
-  template <int dim, int spacedim>
-  FECollection<dim, spacedim>::FECollection(
-    const FiniteElement<dim, spacedim> &fe)
-    : FECollection()
-  {
-    push_back(fe);
-  }
-
-
-
-  template <int dim, int spacedim>
-  FECollection<dim, spacedim>::FECollection(
-    const std::vector<const FiniteElement<dim, spacedim> *> &fes)
-    : FECollection()
-  {
-    Assert(fes.size() > 0,
-           ExcMessage("Need to pass at least one finite element."));
-
-    for (unsigned int i = 0; i < fes.size(); ++i)
-      push_back(*fes[i]);
-  }
-
-
-
-  template <int dim, int spacedim>
-  void
-  FECollection<dim, spacedim>::push_back(
-    const FiniteElement<dim, spacedim> &new_fe)
-  {
-    // check that the new element has the right number of components. only check
-    // with the first element, since all the other elements have already passed
-    // the test against the first element
-    Assert(this->size() == 0 ||
-             new_fe.n_components() == this->operator[](0).n_components(),
-           ExcMessage("All elements inside a collection need to have the "
-                      "same number of vector components!"));
-
-    Collection<FiniteElement<dim, spacedim>>::push_back(new_fe.clone());
   }
 
 
