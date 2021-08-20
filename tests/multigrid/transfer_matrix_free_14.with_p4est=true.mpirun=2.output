@@ -1,19 +1,11 @@
 
-DEAL::n_dofs = 50
-DEAL::OK
-DEAL::n_dofs = 18
-DEAL::OK
-DEAL::n_dofs = 8
-DEAL::OK
-DEAL::n_dofs = 8
-DEAL::OK
-DEAL::
-DEAL::n_dofs = 375
-DEAL::OK
-DEAL::n_dofs = 81
-DEAL::OK
-DEAL::n_dofs = 24
-DEAL::OK
-DEAL::n_dofs = 24
-DEAL::OK
-DEAL::
+DEAL:0::n_dofs = 9
+DEAL:0::OK
+DEAL:0::n_dofs = 84
+DEAL:0::OK
+
+DEAL:1::n_dofs = 9
+DEAL:1::OK
+DEAL:1::n_dofs = 84
+DEAL:1::OK
+
