@@ -18,6 +18,10 @@
 
 #include <deal.II/hp/fe_collection.h>
 
+#include <set>
+
+
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace hp
@@ -282,6 +286,206 @@ namespace hp
       }
 
     return fe_index;
+  }
+
+
+
+  namespace
+  {
+    /**
+     * Implement the action of the hp_*_dof_identities() functions
+     * in a generic way.
+     */
+    std::vector<std::set<std::pair<unsigned int, unsigned int>>>
+    compute_hp_dof_identities(
+      const std::set<unsigned int> &fes,
+      const std::function<std::vector<std::pair<unsigned int, unsigned int>>(
+        const unsigned int,
+        const unsigned int)> &      query_identities)
+    {
+      // Consider all degrees of freedom of the identified elements (represented
+      // via (fe_index,dof_index) pairs) as the nodes in a graph. Then draw
+      // edges for all DoFs that are identified based on what the elements
+      // selected in the argument say. Let us first build this graph, where we
+      // only store the edges of the graph, and as a consequence ignore nodes
+      // (DoFs) that simply don't show up at all in any of the identities:
+      using Node  = std::pair<unsigned int, unsigned int>;
+      using Edge  = std::pair<Node, Node>;
+      using Graph = std::set<Edge>;
+
+      Graph identities_graph;
+      for (const unsigned int fe_index_1 : fes)
+        for (const unsigned int fe_index_2 : fes)
+          if (fe_index_1 != fe_index_2)
+            for (const auto &identity :
+                 query_identities(fe_index_1, fe_index_2))
+              identities_graph.emplace(Edge(Node(fe_index_1, identity.first),
+                                            Node(fe_index_2, identity.second)));
+
+#ifdef DEBUG
+      // Now verify that indeed the graph is symmetric: If one element
+      // declares that certain ones of its DoFs are to be unified with those
+      // of the other, then the other one should agree with this. As a
+      // consequence of this test succeeding, we know that the graph is actually
+      // undirected.
+      for (const auto &edge : identities_graph)
+        Assert(identities_graph.find({edge.second, edge.first}) !=
+                 identities_graph.end(),
+               ExcInternalError());
+#endif
+
+      // The next step is that we ought to verify that if there is an identity
+      // between (fe1,dof1) and (fe2,dof2), as well as with (fe2,dof2) and
+      // (fe3,dof3), then there should also be an identity between (fe1,dof1)
+      // and (fe3,dof3). The same logic should apply to chains of four
+      // identities.
+      //
+      // This means that the graph we have built above must be composed of a
+      // collection of complete sub-graphs (complete = each possible edge in the
+      // sub-graph exists) -- or, using a different term, that the graph
+      // consists of a number of "cliques". Each of these cliques is then one
+      // extended identity between two or more DoFs, and these are the ones that
+      // we will want to return.
+      //
+      // To ascertain that this is true, and to figure out what we want to
+      // return, we need to divide the graph into its sub-graphs and then ensure
+      // that each sub-graph is indeed a clique. This is slightly cumbersome,
+      // but can be done as follows:
+      // - pick one edge 'e' of G
+      // - add e=(n1,n2) to the sub-graph SG
+      // - set N={n1,n2}
+      // - loop over the remainder of the edges 'e' of the graph:
+      //   - if 'e' has one or both nodes in N:
+      //     - add 'e' to SG and
+      //     - add its two nodes to N (they may already be in there)
+      //     - remove 'e' from G
+      //
+      // In general, this may not find the entire sub-graph if the edges are
+      // stored in random order. For example, if the graph consisted of the
+      // following edges in this order:
+      //   (a,b)
+      //   (c,d)
+      //   (a,c)
+      //   (a,d)
+      //   (b,c)
+      //   (b,d)
+      // then the graph itself is a clique, but the algorithm outlined above
+      // would skip the edge (c,d) because neither of the nodes are already
+      // in the set N which at that point is still (a,b).
+      //
+      // But, we store the graph with a std::set, which stored edges in sorted
+      // order where the order is the lexicographic order of nodes. This ensures
+      // that we really capture all edges that correspond to a sub-graph (but
+      // we will assert this as well).
+      //
+      // (For programmatic reasons, we skip the removal of 'e' from G in a first
+      // run through because it modifies the graph and thus invalidates
+      // iterators. But because SG stores all of these edges, we can remove them
+      // all from G after collecting the edges in SG.)
+      std::vector<std::set<Node>> identities;
+      while (identities_graph.size() > 0)
+        {
+          Graph          sub_graph;       // SG
+          std::set<Node> sub_graph_nodes; // N
+
+          sub_graph.emplace(*identities_graph.begin());
+          sub_graph_nodes.emplace(identities_graph.begin()->first);
+          sub_graph_nodes.emplace(identities_graph.begin()->second);
+
+          for (const Edge &e : identities_graph)
+            if ((sub_graph_nodes.find(e.first) != sub_graph_nodes.end()) ||
+                (sub_graph_nodes.find(e.second) != sub_graph_nodes.end()))
+              {
+                sub_graph.insert(e);
+                sub_graph_nodes.insert(e.first);
+                sub_graph_nodes.insert(e.second);
+              }
+
+          // We have now obtained a sub-graph from the overall graph.
+          // Now remove it from the bigger graph
+          for (const Edge &e : sub_graph)
+            identities_graph.erase(e);
+
+#if DEBUG
+          // There are three checks we ought to perform:
+          // - That the sub-graph is undirected, i.e. that every edge appears
+          //   in both directions
+          for (const auto &edge : sub_graph)
+            Assert(sub_graph.find({edge.second, edge.first}) != sub_graph.end(),
+                   ExcInternalError());
+
+          // - None of the nodes in the sub-graph should have appeared in
+          //   any of the other sub-graphs. If they did, then we have a bug
+          //   in extracting sub-graphs. This is actually more easily checked
+          //   the other way around: none of the nodes of the sub-graph we
+          //   just extracted should be in any of the edges of the *remaining*
+          //   graph
+          for (const Node &n : sub_graph_nodes)
+            for (const Edge &e : identities_graph)
+              Assert((n != e.first) && (n != e.second), ExcInternalError());
+          // - Second, the sub-graph we just extracted needs to be complete,
+          //   i.e.,
+          //   be a "clique". We check this by counting how many edges it has.
+          //   for 'n' nodes in 'N', we need to have n*(n-1) edges (we store
+          //   both directed edges).
+          Assert(sub_graph.size() ==
+                   sub_graph_nodes.size() * (sub_graph_nodes.size() - 1),
+                 ExcInternalError());
+#endif
+
+          // At this point we're sure that we have extracted a complete
+          // sub-graph ("clique"). The DoFs involved are all identical then, and
+          // we will store this identity so we can return it later.
+          identities.emplace_back(std::move(sub_graph_nodes));
+        }
+
+      return identities;
+    }
+  } // namespace
+
+
+
+  template <int dim, int spacedim>
+  std::vector<std::set<std::pair<unsigned int, unsigned int>>>
+  FECollection<dim, spacedim>::hp_vertex_dof_identities(
+    const std::set<unsigned int> &fes) const
+  {
+    auto query_vertex_dof_identities = [this](const unsigned int fe_index_1,
+                                              const unsigned int fe_index_2) {
+      return (*this)[fe_index_1].hp_vertex_dof_identities((*this)[fe_index_2]);
+    };
+    return compute_hp_dof_identities(fes, query_vertex_dof_identities);
+  }
+
+
+
+  template <int dim, int spacedim>
+  std::vector<std::set<std::pair<unsigned int, unsigned int>>>
+  FECollection<dim, spacedim>::hp_line_dof_identities(
+    const std::set<unsigned int> &fes) const
+  {
+    auto query_line_dof_identities = [this](const unsigned int fe_index_1,
+                                            const unsigned int fe_index_2) {
+      return (*this)[fe_index_1].hp_line_dof_identities((*this)[fe_index_2]);
+    };
+    return compute_hp_dof_identities(fes, query_line_dof_identities);
+  }
+
+
+
+  template <int dim, int spacedim>
+  std::vector<std::set<std::pair<unsigned int, unsigned int>>>
+  FECollection<dim, spacedim>::hp_quad_dof_identities(
+    const std::set<unsigned int> &fes,
+    const unsigned int            face_no) const
+  {
+    auto query_quad_dof_identities = [this,
+                                      face_no](const unsigned int fe_index_1,
+                                               const unsigned int fe_index_2) {
+      return (*this)[fe_index_1].hp_quad_dof_identities((*this)[fe_index_2],
+                                                        face_no);
+    };
+    return compute_hp_dof_identities(fes, query_quad_dof_identities);
   }
 
 
