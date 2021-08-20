@@ -707,7 +707,7 @@ namespace Step19
                 const Tensor<1, dim> new_velocity =
                   old_velocity + acceleration * dt;
 
-                particle->set_properties(make_array_view(new_velocity));
+                particle->set_properties(new_velocity);
 
                 // With the new velocity, we can then also update the location
                 // of the particle and tell the particle about it.
