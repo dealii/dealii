@@ -1270,7 +1270,7 @@ public:
   //@}
 
   /**
-   * @name Functions to support hp
+   * @name Functions to support hp-adaptivity
    * @{
    */
 
@@ -1312,7 +1312,7 @@ public:
 
 
   /**
-   * @name Functions to support hp-
+   * @name Functions to support hp-adaptivity
    * @{
    */
 
