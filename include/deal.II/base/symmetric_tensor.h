@@ -746,26 +746,50 @@ public:
 
   /**
    * Return a pointer to the first element of the underlying storage.
+   *
+   * @deprecated This function suggests that the elements of a SymmetricTensor
+   *   object are stored as a contiguous array, but this is not in fact true
+   *   and one should not pretend that this so. As a consequence, this function
+   *   is deprecated.
    */
+  DEAL_II_DEPRECATED_EARLY
   Number *
   begin_raw();
 
   /**
    * Return a const pointer to the first element of the underlying storage.
+   *
+   * @deprecated This function suggests that the elements of a SymmetricTensor
+   *   object are stored as a contiguous array, but this is not in fact true
+   *   and one should not pretend that this so. As a consequence, this function
+   *   is deprecated.
    */
+  DEAL_II_DEPRECATED_EARLY
   const Number *
   begin_raw() const;
 
   /**
    * Return a pointer to the element past the end of the underlying storage.
+   *
+   * @deprecated This function suggests that the elements of a SymmetricTensor
+   *   object are stored as a contiguous array, but this is not in fact true
+   *   and one should not pretend that this so. As a consequence, this function
+   *   is deprecated.
    */
+  DEAL_II_DEPRECATED_EARLY
   Number *
   end_raw();
 
   /**
    * Return a const pointer to the element past the end of the underlying
    * storage.
+   *
+   * @deprecated This function suggests that the elements of a SymmetricTensor
+   *   object are stored as a contiguous array, but this is not in fact true
+   *   and one should not pretend that this so. As a consequence, this function
+   *   is deprecated.
    */
+  DEAL_II_DEPRECATED_EARLY
   const Number *
   end_raw() const;
 
