@@ -330,16 +330,22 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::
       solution_ghosted_level_vector           = ghosted_level_vector;
     }
 
-  bool my_perform_renumbered_plain_copy =
+  // Check if we can perform a cheaper "plain copy" (with or without
+  // renumbering) instead of having to translate individual entries
+  // using copy_indices*. This only works if a) we don't have to send
+  // or receive any DoFs and we have all locally owned DoFs in our
+  // copy_indices (so no adaptive refinement) and b) all processors
+  // agree on the choice (see below).
+  const bool my_perform_renumbered_plain_copy =
     (this->copy_indices.back().n_cols() ==
-     mg_dof.locally_owned_dofs().n_elements());
+     mg_dof.locally_owned_dofs().n_elements()) &&
+    (this->copy_indices_global_mine.back().n_rows() == 0) &&
+    (this->copy_indices_level_mine.back().n_rows() == 0);
+
   bool my_perform_plain_copy = false;
   if (my_perform_renumbered_plain_copy)
     {
       my_perform_plain_copy = true;
-      AssertDimension(this->copy_indices_global_mine.back().n_rows(), 0);
-      AssertDimension(this->copy_indices_level_mine.back().n_rows(), 0);
-
       // check whether there is a renumbering of degrees of freedom on
       // either the finest level or the global dofs, which means that we
       // cannot apply a plain copy
