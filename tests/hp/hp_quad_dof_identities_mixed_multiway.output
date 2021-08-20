@@ -1,0 +1,9 @@
+
+DEAL::dim=3
+DEAL::Identity set #0
+DEAL::  FE_Q<3>(2): quad dof index 0
+DEAL::  FE_Q<3>(4): quad dof index 4
+DEAL::  FE_Q<3>(6): quad dof index 12
+DEAL::  FE_Q<3>(8): quad dof index 24
+DEAL::
+DEAL::OK
