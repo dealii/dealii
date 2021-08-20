@@ -298,7 +298,7 @@ DEAL_II_NAMESPACE_OPEN
  * DoFHandler, should be considered on cells that are not active (i.e., that
  * have children). This is because degrees of freedom are only allocated for
  * active cells and, in fact, it is not allowed to set an active FE index on
- * non- active cells using DoFAccessor::set_active_fe_index().
+ * non-active cells using DoFAccessor::set_active_fe_index().
  *
  * It is, thus, not entirely natural what should happen if, for example, a few
  * cells are coarsened away. This class then implements the following

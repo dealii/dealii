@@ -84,7 +84,7 @@
  * cell via the method hp::FEValues::get_present_fe_values().
  *
  * For hp::FEValues, to be able to select the right finite element/quadrature
- * rule/ mapping object set, it queries the active_fe_index of the given cell
+ * rule/mapping object set, it queries the active FE index of the given cell
  * during hp::FEValues::reinit(). The indices have to be set - as shown below -
  * before calling DoFHandler::distribute_dofs() by the user.
  *
@@ -241,7 +241,7 @@ void Step3::make_grid()
 // @sect4{Step3::setup_system}
 //
 // In contrast to step-3 and step-3simplex, we need here a preprocessing step
-// that assigns an active_fe_index to each cell consistently according to the
+// that assigns an active FE index to each cell consistently according to the
 // indices in the collections and the cell type.
 void Step3::setup_system()
 {
