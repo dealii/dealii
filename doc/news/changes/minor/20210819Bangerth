@@ -1,0 +1,7 @@
+Fixed: It was not possible to default-construct objects of type
+`DoFHandler::face_iterator` for `dim==1`. As a consequence, one
+could also not call `cell->face_iterators()` for the cells of 1d
+DoFHandler objects. This is now fixed.
+<br>
+(Wolfgang Bangerth, Tyler Anderson, 2021/08/19)
+

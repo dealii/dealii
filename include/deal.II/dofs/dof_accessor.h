@@ -851,7 +851,8 @@ public:
   /**
    * Constructor. This constructor exists in order to maintain interface
    * compatibility with the other accessor classes. However, it doesn't do
-   * anything useful here and so may not actually be called.
+   * anything useful here and so may not actually be called except to
+   * default-construct iterator objects.
    */
   DoFAccessor(const Triangulation<1, spacedim> *,
               const int                                  = 0,

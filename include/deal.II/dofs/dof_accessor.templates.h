@@ -1836,15 +1836,31 @@ inline DoFAccessor<0, 1, spacedim, level_dof_access>::DoFAccessor(
 
 template <int spacedim, bool level_dof_access>
 inline DoFAccessor<0, 1, spacedim, level_dof_access>::DoFAccessor(
-  const Triangulation<1, spacedim> *,
-  const int,
-  const int,
-  const DoFHandler<1, spacedim> *)
-  : dof_handler(nullptr)
+  const Triangulation<1, spacedim> *tria,
+  const int                         level,
+  const int                         index,
+  const DoFHandler<1, spacedim> *   dof_handler)
+  // This is the constructor signature for "ordinary" (non-vertex)
+  // accessors and we shouldn't be calling it altogether. But it is also
+  // the constructor that the default-constructor of TriaRawIterator
+  // calls when default-constructing an iterator object. If so, this
+  // happens with level==-2 and index==-2, and this is the only case we
+  // would like to support. We do this by just forwarding to the
+  // other constructor of this class, and then asserting the condition
+  // on level and index.
+  : DoFAccessor<0, 1, spacedim, level_dof_access>(
+      tria,
+      TriaAccessor<0, 1, spacedim>::interior_vertex,
+      0U,
+      dof_handler)
 {
-  Assert(false,
+  (void)level;
+  (void)index;
+  Assert((tria == nullptr) && (level == -2) && (index == -2) &&
+           (dof_handler == nullptr),
          ExcMessage(
-           "This constructor can not be called for face iterators in 1d."));
+           "This constructor can not be called for face iterators in 1d, "
+           "except to default-construct iterator objects."));
 }
 
 
