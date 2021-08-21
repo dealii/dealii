@@ -96,7 +96,11 @@ public:
   virtual types::global_dof_index
   m() const
   {
-    return matrix_free.get_dof_handler().n_dofs();
+    if (this->matrix_free.get_mg_level() != numbers::invalid_unsigned_int)
+      return this->matrix_free.get_dof_handler().n_dofs(
+        this->matrix_free.get_mg_level());
+    else
+      return this->matrix_free.get_dof_handler().n_dofs();
   }
 
   Number
@@ -149,10 +153,19 @@ public:
         const auto &dof_handler = this->matrix_free.get_dof_handler();
 
         TrilinosWrappers::SparsityPattern dsp(
-          dof_handler.locally_owned_dofs(),
+          this->matrix_free.get_mg_level() != numbers::invalid_unsigned_int ?
+            dof_handler.locally_owned_mg_dofs(
+              this->matrix_free.get_mg_level()) :
+            dof_handler.locally_owned_dofs(),
           matrix_free.get_task_info().communicator);
 
-        DoFTools::make_sparsity_pattern(dof_handler, dsp, this->constraints);
+        if (this->matrix_free.get_mg_level() != numbers::invalid_unsigned_int)
+          MGTools::make_sparsity_pattern(dof_handler,
+                                         dsp,
+                                         this->matrix_free.get_mg_level(),
+                                         this->constraints);
+        else
+          DoFTools::make_sparsity_pattern(dof_handler, dsp, this->constraints);
 
         dsp.compress();
         system_matrix.reinit(dsp);
