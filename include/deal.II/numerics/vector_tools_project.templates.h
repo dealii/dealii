@@ -432,11 +432,9 @@ namespace VectorTools
                                     q_boundary,
                                     project_to_boundary_first);
 
-      const IndexSet &          locally_owned_dofs = dof.locally_owned_dofs();
-      IndexSet::ElementIterator it                 = locally_owned_dofs.begin();
-      for (; it != locally_owned_dofs.end(); ++it)
-        ::dealii::internal::ElementAccess<VectorType>::set(work_result(*it),
-                                                           *it,
+      for (const auto it : dof.locally_owned_dofs())
+        ::dealii::internal::ElementAccess<VectorType>::set(work_result(it),
+                                                           it,
                                                            vec_result);
       vec_result.compress(VectorOperation::insert);
     }
@@ -568,9 +566,9 @@ namespace VectorTools
       // copy vec into vec_result. we can't use vec_result itself above, since
       // it may be of another type than Vector<double> and that wouldn't
       // necessarily go together with the matrix and other functions
-      for (unsigned int i = 0; i < vec.size(); ++i)
-        ::dealii::internal::ElementAccess<VectorType>::set(vec(i),
-                                                           i,
+      for (const auto it : dof.locally_owned_dofs())
+        ::dealii::internal::ElementAccess<VectorType>::set(vec(it),
+                                                           it,
                                                            vec_result);
     }
 
@@ -669,11 +667,9 @@ namespace VectorTools
 
       constraints.distribute(vec);
 
-      const IndexSet &          locally_owned_dofs = dof.locally_owned_dofs();
-      IndexSet::ElementIterator it                 = locally_owned_dofs.begin();
-      for (; it != locally_owned_dofs.end(); ++it)
-        ::dealii::internal::ElementAccess<VectorType>::set(vec(*it),
-                                                           *it,
+      for (const auto it : dof.locally_owned_dofs())
+        ::dealii::internal::ElementAccess<VectorType>::set(vec(it),
+                                                           it,
                                                            vec_result);
       vec_result.compress(VectorOperation::insert);
     }
@@ -748,11 +744,9 @@ namespace VectorTools
 
       constraints.distribute(vec);
 
-      const IndexSet &          locally_owned_dofs = dof.locally_owned_dofs();
-      IndexSet::ElementIterator it                 = locally_owned_dofs.begin();
-      for (; it != locally_owned_dofs.end(); ++it)
-        ::dealii::internal::ElementAccess<VectorType>::set(vec(*it),
-                                                           *it,
+      for (const auto it : dof.locally_owned_dofs())
+        ::dealii::internal::ElementAccess<VectorType>::set(vec(it),
+                                                           it,
                                                            vec_result);
       vec_result.compress(VectorOperation::insert);
     }
