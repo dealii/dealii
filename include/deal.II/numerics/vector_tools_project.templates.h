@@ -78,11 +78,8 @@ namespace VectorTools
       // that is actually wholly on
       // the boundary, not only by
       // one line or one vertex
-      typename DoFHandler<dim, spacedim>::active_cell_iterator
-        cell = dof_handler.begin_active(),
-        endc = dof_handler.end();
       std::vector<types::global_dof_index> face_dof_indices;
-      for (; cell != endc; ++cell)
+      for (const auto &cell : dof_handler.active_cell_iterators())
         for (auto f : GeometryInfo<dim>::face_indices())
           if (cell->at_boundary(f))
             {
@@ -698,10 +695,7 @@ namespace VectorTools
         const unsigned int n_q_points    = quadrature.size();
         Vector<number>     cell_rhs(dofs_per_cell);
         std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
-        typename DoFHandler<dim, spacedim>::active_cell_iterator
-          cell = dof.begin_active(),
-          endc = dof.end();
-        for (; cell != endc; ++cell)
+        for (const auto &cell : dof.active_cell_iterators())
           if (cell->is_locally_owned())
             {
               cell_rhs = 0;
