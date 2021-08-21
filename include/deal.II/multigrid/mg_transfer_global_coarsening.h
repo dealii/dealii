@@ -205,7 +205,7 @@ public:
    * Set up polynomial coarsening between the given DoFHandler objects (
    * @p dof_handler_fine and @p dof_handler_coarse). Polynomial transfers
    * can be only performed on active levels (`numbers::invalid_unsigned_int`)
-   * or on coarse-grid levels.
+   * or on coarse-grid levels, i.e., levels without hanging nodes.
    *
    * @note The function polynomial_transfer_supported() can be used to
    *   check if the given polynomial coarsening strategy is supported.
@@ -227,7 +227,7 @@ public:
    *
    * @note While geometric transfer can be only performed on active levels
    *   (`numbers::invalid_unsigned_int`), polynomial transfers can also be
-   *   performed on coarse-grid levels.
+   *   performed on coarse-grid levels, i.e., levels without hanging nodes.
    *
    * @note The function polynomial_transfer_supported() can be used to
    *   check if the given polynomial coarsening strategy is supported.
