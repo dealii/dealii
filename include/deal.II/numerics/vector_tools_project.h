@@ -91,8 +91,7 @@ namespace VectorTools
    * - @p enforce_zero_boundary is false,
    * - @p project_to_boundary_first is false,
    * - the FiniteElement is supported by the MatrixFree class,
-   * - the FiniteElement has less than five components
-   * - the degree of the FiniteElement is less than nine.
+   * - the FiniteElement has less than five components,
    * - dim==spacedim
    *
    * In this case, this function performs numerical quadrature using the given
