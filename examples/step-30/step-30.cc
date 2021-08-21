@@ -63,8 +63,7 @@ namespace Step30
                             const unsigned int /*component*/ = 0) const override
     {
       (void)points;
-      Assert(values.size() == points.size(),
-             ExcDimensionMismatch(values.size(), points.size()));
+      AssertDimension(values.size(), points.size());
 
       std::fill(values.begin(), values.end(), 0.);
     }
@@ -79,8 +78,7 @@ namespace Step30
                             std::vector<double> &          values,
                             const unsigned int /*component*/ = 0) const override
     {
-      Assert(values.size() == points.size(),
-             ExcDimensionMismatch(values.size(), points.size()));
+      AssertDimension(values.size(), points.size());
 
       for (unsigned int i = 0; i < values.size(); ++i)
         {
@@ -110,8 +108,7 @@ namespace Step30
     void value_list(const std::vector<Point<dim>> &points,
                     std::vector<Point<dim>> &      values) const
     {
-      Assert(values.size() == points.size(),
-             ExcDimensionMismatch(values.size(), points.size()));
+      AssertDimension(values.size(), points.size());
 
       for (unsigned int i = 0; i < points.size(); ++i)
         {

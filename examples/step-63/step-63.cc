@@ -388,8 +388,7 @@ namespace Step63
                                       std::vector<double> &          values,
                                       const unsigned int component) const
   {
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
+    AssertDimension(values.size(), points.size());
 
     for (unsigned int i = 0; i < points.size(); ++i)
       values[i] = RightHandSide<dim>::value(points[i], component);
@@ -439,8 +438,7 @@ namespace Step63
                                        std::vector<double> &          values,
                                        const unsigned int component) const
   {
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
+    AssertDimension(values.size(), points.size());
 
     for (unsigned int i = 0; i < points.size(); ++i)
       values[i] = BoundaryValues<dim>::value(points[i], component);

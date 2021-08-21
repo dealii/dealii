@@ -184,7 +184,7 @@ namespace Step17
     virtual void vector_value(const Point<dim> &p,
                               Vector<double> &  values) const override
     {
-      Assert(values.size() == dim, ExcDimensionMismatch(values.size(), dim));
+      AssertDimension(values.size(), dim);
       Assert(dim >= 2, ExcInternalError());
 
       Point<dim> point_1, point_2;
@@ -209,8 +209,7 @@ namespace Step17
     {
       const unsigned int n_points = points.size();
 
-      Assert(value_list.size() == n_points,
-             ExcDimensionMismatch(value_list.size(), n_points));
+      AssertDimension(value_list.size(), n_points);
 
       for (unsigned int p = 0; p < n_points; ++p)
         RightHandSide<dim>::vector_value(points[p], value_list[p]);

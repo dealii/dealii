@@ -559,7 +559,7 @@ namespace Step18
   inline void BodyForce<dim>::vector_value(const Point<dim> & /*p*/,
                                            Vector<double> &values) const
   {
-    Assert(values.size() == dim, ExcDimensionMismatch(values.size(), dim));
+    AssertDimension(values.size(), dim);
 
     const double g   = 9.81;
     const double rho = 7700;
@@ -577,8 +577,7 @@ namespace Step18
   {
     const unsigned int n_points = points.size();
 
-    Assert(value_list.size() == n_points,
-           ExcDimensionMismatch(value_list.size(), n_points));
+    AssertDimension(value_list.size(), n_points);
 
     for (unsigned int p = 0; p < n_points; ++p)
       BodyForce<dim>::vector_value(points[p], value_list[p]);
@@ -650,7 +649,7 @@ namespace Step18
   IncrementalBoundaryValues<dim>::vector_value(const Point<dim> & /*p*/,
                                                Vector<double> &values) const
   {
-    Assert(values.size() == dim, ExcDimensionMismatch(values.size(), dim));
+    AssertDimension(values.size(), dim);
 
     values    = 0;
     values(2) = -present_timestep * velocity;
@@ -665,8 +664,7 @@ namespace Step18
   {
     const unsigned int n_points = points.size();
 
-    Assert(value_list.size() == n_points,
-           ExcDimensionMismatch(value_list.size(), n_points));
+    AssertDimension(value_list.size(), n_points);
 
     for (unsigned int p = 0; p < n_points; ++p)
       IncrementalBoundaryValues<dim>::vector_value(points[p], value_list[p]);

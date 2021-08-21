@@ -477,16 +477,12 @@ namespace Step58
       const DataPostprocessorInputs::Vector<dim> &inputs,
       std::vector<Vector<double>> &               computed_quantities) const
     {
-      Assert(computed_quantities.size() == inputs.solution_values.size(),
-             ExcDimensionMismatch(computed_quantities.size(),
-                                  inputs.solution_values.size()));
+      AssertDimension(computed_quantities.size(), inputs.solution_values.size());
 
       for (unsigned int q = 0; q < computed_quantities.size(); ++q)
         {
-          Assert(computed_quantities[q].size() == 1,
-                 ExcDimensionMismatch(computed_quantities[q].size(), 1));
-          Assert(inputs.solution_values[q].size() == 2,
-                 ExcDimensionMismatch(inputs.solution_values[q].size(), 2));
+          AssertDimension(computed_quantities[q].size(), 1);
+          AssertDimension(inputs.solution_values[q].size(), 2);
 
           const std::complex<double> psi(inputs.solution_values[q](0),
                                          inputs.solution_values[q](1));
@@ -536,17 +532,13 @@ namespace Step58
       const DataPostprocessorInputs::Vector<dim> &inputs,
       std::vector<Vector<double>> &               computed_quantities) const
     {
-      Assert(computed_quantities.size() == inputs.solution_values.size(),
-             ExcDimensionMismatch(computed_quantities.size(),
-                                  inputs.solution_values.size()));
+      AssertDimension(computed_quantities.size(), inputs.solution_values.size());
 
       double max_phase = -numbers::PI;
       for (unsigned int q = 0; q < computed_quantities.size(); ++q)
         {
-          Assert(computed_quantities[q].size() == 1,
-                 ExcDimensionMismatch(computed_quantities[q].size(), 1));
-          Assert(inputs.solution_values[q].size() == 2,
-                 ExcDimensionMismatch(inputs.solution_values[q].size(), 2));
+          AssertDimension(computed_quantities[q].size(), 1);
+          AssertDimension(inputs.solution_values[q].size(), 2);
 
           max_phase =
             std::max(max_phase,
