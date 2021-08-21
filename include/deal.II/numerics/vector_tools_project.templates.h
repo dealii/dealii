@@ -180,11 +180,8 @@ namespace VectorTools
 
       AssertDimension(dof.get_fe_collection().size(), 1);
 
-      Assert(dof.get_fe(0).n_components() == function.n_components,
-             ExcDimensionMismatch(dof.get_fe(0).n_components(),
-                                  function.n_components));
-      Assert(dof.get_fe(0).n_components() == components,
-             ExcDimensionMismatch(components, dof.get_fe(0).n_components()));
+      AssertDimension(dof.get_fe(0).n_components(), function.n_components);
+      AssertDimension(dof.get_fe(0).n_components(), components);
 
       Quadrature<dim> quadrature_mf;
 
@@ -421,8 +418,7 @@ namespace VectorTools
       const Quadrature<dim - 1> &q_boundary,
       const bool                 project_to_boundary_first)
     {
-      Assert(vec_result.size() == dof.n_dofs(),
-             ExcDimensionMismatch(vec_result.size(), dof.n_dofs()));
+      AssertDimension(vec_result.size(), dof.n_dofs());
 
       LinearAlgebra::distributed::Vector<typename VectorType::value_type>
         work_result;
@@ -493,11 +489,8 @@ namespace VectorTools
       const bool              project_to_boundary_first)
     {
       using number = typename VectorType::value_type;
-      Assert(dof.get_fe(0).n_components() == function.n_components,
-             ExcDimensionMismatch(dof.get_fe(0).n_components(),
-                                  function.n_components));
-      Assert(vec_result.size() == dof.n_dofs(),
-             ExcDimensionMismatch(vec_result.size(), dof.n_dofs()));
+      AssertDimension(dof.get_fe(0).n_components(), function.n_components);
+      AssertDimension(vec_result.size(), dof.n_dofs());
 
       // make up boundary values
       std::map<types::global_dof_index, number> boundary_values;
@@ -594,10 +587,8 @@ namespace VectorTools
       VectorType &                                              vec_result)
     {
       using Number = typename VectorType::value_type;
-      Assert(dof.get_fe(0).n_components() == 1,
-             ExcDimensionMismatch(dof.get_fe(0).n_components(), 1));
-      Assert(vec_result.size() == dof.n_dofs(),
-             ExcDimensionMismatch(vec_result.size(), dof.n_dofs()));
+      AssertDimension(dof.get_fe(0).n_components(), 1);
+      AssertDimension(vec_result.size(), dof.n_dofs());
 
       // set up mass matrix and right hand side
       typename MatrixFree<dim, Number>::AdditionalData additional_data;
@@ -705,10 +696,8 @@ namespace VectorTools
         matrix_free->get_dof_handler(fe_component);
 
       using Number = typename VectorType::value_type;
-      Assert(dof.get_fe(0).n_components() == 1,
-             ExcDimensionMismatch(dof.get_fe(0).n_components(), 1));
-      Assert(vec_result.size() == dof.n_dofs(),
-             ExcDimensionMismatch(vec_result.size(), dof.n_dofs()));
+      AssertDimension(dof.get_fe(0).n_components(), 1);
+      AssertDimension(vec_result.size(), dof.n_dofs());
 
       using MatrixType = MatrixFreeOperators::
         MassOperator<dim, -1, 0, 1, LinearAlgebra::distributed::Vector<Number>>;
