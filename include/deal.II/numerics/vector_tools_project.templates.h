@@ -191,7 +191,7 @@ namespace VectorTools
       else
         // TODO: since we have currently only implemented a handful quadrature
         // rules for non-hypercube objects, we do not construct a new
-        // quadrature rule with degree + 2 here but  use the user-provided
+        // quadrature rule with degree + 2 here but use the user-provided
         // quadrature rule (which is guaranteed to be tabulated).
         quadrature_mf = quadrature;
 
