@@ -59,17 +59,23 @@ namespace deal_II_exceptions
     bool allow_abort_on_exception = true;
   } // namespace internals
 
+
+
   void
   set_additional_assert_output(const std::string &p)
   {
     internals::get_additional_assert_output() = p;
   }
 
+
+
   void
   suppress_stacktrace_in_exceptions()
   {
     internals::show_stacktrace = false;
   }
+
+
 
   void
   disable_abort_on_exception()
@@ -104,13 +110,17 @@ ExceptionBase::ExceptionBase(const ExceptionBase &exc)
   , cond(exc.cond)
   , exc(exc.exc)
   , stacktrace(nullptr)
-  , // don't copy stacktrace to avoid double de-allocation problem
-  n_stacktrace_frames(0)
+  , n_stacktrace_frames(exc.n_stacktrace_frames)
   , what_str("") // don't copy the error message, it gets generated dynamically
                  // by what()
 {
 #ifdef DEAL_II_HAVE_GLIBC_STACKTRACE
-  std::fill(std::begin(raw_stacktrace), std::end(raw_stacktrace), nullptr);
+  // Copy the raw_stacktrace pointers. We don't own them, they just point to the
+  // addresses of symbols in the executable's/library's symbol tables -- and as
+  // a consequence, it is safe to copy these pointers
+  std::copy(std::begin(exc.raw_stacktrace),
+            std::end(exc.raw_stacktrace),
+            std::begin(raw_stacktrace));
 #endif
 }
 
@@ -147,6 +157,8 @@ ExceptionBase::set_fields(const char *f,
 #endif
 }
 
+
+
 const char *
 ExceptionBase::what() const noexcept
 {
@@ -168,6 +180,7 @@ ExceptionBase::what() const noexcept
 
   return what_str.c_str();
 }
+
 
 
 const char *

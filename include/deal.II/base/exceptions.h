@@ -155,7 +155,7 @@ protected:
 
 #ifdef DEAL_II_HAVE_GLIBC_STACKTRACE
   /**
-   * array of pointers that contains the raw stack trace
+   * Array of pointers that contains the raw stack trace.
    */
   void *raw_stacktrace[25];
 #endif
