@@ -98,6 +98,8 @@ namespace VectorTools
             }
     }
 
+
+
     /**
      * Compute the boundary values to be used in the project() functions.
      */
@@ -147,6 +149,7 @@ namespace VectorTools
             mapping, dof, boundary_functions, q_boundary, boundary_values);
         }
     }
+
 
 
     /*
@@ -508,6 +511,8 @@ namespace VectorTools
       vec_result.compress(VectorOperation::insert);
     }
 
+
+
     /**
      * Return whether the boundary values try to constrain a degree of freedom
      * that is already constrained to something else
@@ -640,6 +645,8 @@ namespace VectorTools
                                                            it,
                                                            vec_result);
     }
+
+
 
     template <int dim, typename VectorType, int spacedim>
     void
@@ -817,6 +824,8 @@ namespace VectorTools
       vec_result.compress(VectorOperation::insert);
     }
 
+
+
     /**
      * Specialization of project() for the case dim==spacedim.
      * Check if we can use the MatrixFree implementation or need
@@ -875,7 +884,10 @@ namespace VectorTools
                      project_to_boundary_first);
         }
     }
+  
   } // namespace internal
+
+
 
   template <int dim, typename VectorType, int spacedim>
   void
@@ -1043,6 +1055,7 @@ namespace VectorTools
   }
 
 
+
   template <int dim, typename VectorType, int spacedim>
   void
   project(const DoFHandler<dim, spacedim> &                         dof,
@@ -1064,6 +1077,7 @@ namespace VectorTools
             q_boundary,
             project_to_boundary_first);
   }
+
 } // namespace VectorTools
 
 DEAL_II_NAMESPACE_CLOSE
