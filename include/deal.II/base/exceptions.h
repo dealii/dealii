@@ -61,7 +61,7 @@ public:
   /**
    * Destructor.
    */
-  virtual ~ExceptionBase() noexcept override;
+  virtual ~ExceptionBase() noexcept override = default;
 
   /**
    * Copy operator. This operator is deleted since exception objects
@@ -142,13 +142,7 @@ protected:
   const char *exc;
 
   /**
-   * A backtrace to the position where the problem happened, if the system
-   * supports this.
-   */
-  mutable char **stacktrace;
-
-  /**
-   * The number of stacktrace frames that are stored in the previous variable.
+   * The number of stacktrace frames that are stored in the following variable.
    * Zero if the system does not support stack traces.
    */
   int n_stacktrace_frames;

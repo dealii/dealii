@@ -92,7 +92,6 @@ ExceptionBase::ExceptionBase()
   , function("")
   , cond("")
   , exc("")
-  , stacktrace(nullptr)
   , n_stacktrace_frames(0)
   , what_str("")
 {
@@ -109,7 +108,6 @@ ExceptionBase::ExceptionBase(const ExceptionBase &exc)
   , function(exc.function)
   , cond(exc.cond)
   , exc(exc.exc)
-  , stacktrace(nullptr)
   , n_stacktrace_frames(exc.n_stacktrace_frames)
   , what_str("") // don't copy the error message, it gets generated dynamically
                  // by what()
@@ -122,14 +120,6 @@ ExceptionBase::ExceptionBase(const ExceptionBase &exc)
             std::end(exc.raw_stacktrace),
             std::begin(raw_stacktrace));
 #endif
-}
-
-
-
-ExceptionBase::~ExceptionBase() noexcept
-{
-  free(stacktrace); // free(nullptr) is allowed
-  stacktrace = nullptr;
 }
 
 
@@ -164,19 +154,7 @@ ExceptionBase::what() const noexcept
 {
   // If no error c_string was generated so far, do it now:
   if (what_str.empty())
-    {
-#ifdef DEAL_II_HAVE_GLIBC_STACKTRACE
-      // We have deferred the symbol lookup to this point to avoid costly
-      // runtime penalties due to linkage of external libraries by
-      // backtrace_symbols.
-
-      // first delete old stacktrace if necessary
-      free(stacktrace); // free(nullptr) is allowed
-      stacktrace = backtrace_symbols(raw_stacktrace, n_stacktrace_frames);
-#endif
-
-      generate_message();
-    }
+    generate_message();
 
   return what_str.c_str();
 }
@@ -239,6 +217,15 @@ ExceptionBase::print_stack_trace(std::ostream &out) const
 
   if (deal_II_exceptions::internals::show_stacktrace == false)
     return;
+
+  char **stacktrace = nullptr;
+#ifdef DEAL_II_HAVE_GLIBC_STACKTRACE
+  // We have deferred the symbol lookup to this point to avoid costly
+  // runtime penalties due to linkage of external libraries by
+  // backtrace_symbols.
+  stacktrace = backtrace_symbols(raw_stacktrace, n_stacktrace_frames);
+#endif
+
 
   // if there is a stackframe stored, print it
   out << std::endl;
@@ -316,6 +303,9 @@ ExceptionBase::print_stack_trace(std::ostream &out) const
       if (functionname == "main")
         break;
     }
+
+  free(stacktrace); // free(nullptr) is allowed
+  stacktrace = nullptr;
 }
 
 
