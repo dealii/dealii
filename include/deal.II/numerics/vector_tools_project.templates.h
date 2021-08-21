@@ -393,6 +393,78 @@ namespace VectorTools
                                    project_to_boundary_first);
             break;
 
+          case 5:
+            project_matrix_free<5>(mapping,
+                                   dof,
+                                   constraints,
+                                   quadrature,
+                                   function,
+                                   work_result,
+                                   enforce_zero_boundary,
+                                   q_boundary,
+                                   project_to_boundary_first);
+            break;
+
+          case 6:
+            project_matrix_free<6>(mapping,
+                                   dof,
+                                   constraints,
+                                   quadrature,
+                                   function,
+                                   work_result,
+                                   enforce_zero_boundary,
+                                   q_boundary,
+                                   project_to_boundary_first);
+            break;
+
+          case 7:
+            project_matrix_free<7>(mapping,
+                                   dof,
+                                   constraints,
+                                   quadrature,
+                                   function,
+                                   work_result,
+                                   enforce_zero_boundary,
+                                   q_boundary,
+                                   project_to_boundary_first);
+            break;
+
+          case 8:
+            project_matrix_free<8>(mapping,
+                                   dof,
+                                   constraints,
+                                   quadrature,
+                                   function,
+                                   work_result,
+                                   enforce_zero_boundary,
+                                   q_boundary,
+                                   project_to_boundary_first);
+            break;
+
+          case 9:
+            project_matrix_free<9>(mapping,
+                                   dof,
+                                   constraints,
+                                   quadrature,
+                                   function,
+                                   work_result,
+                                   enforce_zero_boundary,
+                                   q_boundary,
+                                   project_to_boundary_first);
+            break;
+
+          case 10:
+            project_matrix_free<10>(mapping,
+                                   dof,
+                                   constraints,
+                                   quadrature,
+                                   function,
+                                   work_result,
+                                   enforce_zero_boundary,
+                                   q_boundary,
+                                   project_to_boundary_first);
+            break;
+
           default:
             Assert(false, ExcInternalError());
         }
@@ -780,7 +852,7 @@ namespace VectorTools
       // We have explicit instantiations only if
       // the number of components is not too high.
       if (enforce_zero_boundary || project_to_boundary_first ||
-          dof.get_fe(0).n_components() > 4)
+          dof.get_fe(0).n_components() > 10)
         use_matrix_free = false;
 
       if (use_matrix_free)
