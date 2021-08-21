@@ -156,18 +156,18 @@ namespace VectorTools
      * MatrixFree implementation of project() for an arbitrary number of
      * components of the FiniteElement.
      */
-    template <int components, int dim, typename Number, int spacedim>
+    template <int components, int dim, typename number, int spacedim>
     void
     project_matrix_free(
       const Mapping<dim, spacedim> &   mapping,
       const DoFHandler<dim, spacedim> &dof,
-      const AffineConstraints<Number> &constraints,
+      const AffineConstraints<number> &constraints,
       const Quadrature<dim> &          quadrature,
       const Function<
         spacedim,
-        typename LinearAlgebra::distributed::Vector<Number>::value_type>
+        typename LinearAlgebra::distributed::Vector<number>::value_type>
         &                                         function,
-      LinearAlgebra::distributed::Vector<Number> &work_result,
+      LinearAlgebra::distributed::Vector<number> &work_result,
       const bool                                  enforce_zero_boundary,
       const Quadrature<dim - 1> &                 q_boundary,
       const bool                                  project_to_boundary_first)
@@ -196,13 +196,13 @@ namespace VectorTools
         quadrature_mf = quadrature;
 
       // set up mass matrix and right hand side
-      typename MatrixFree<dim, Number>::AdditionalData additional_data;
+      typename MatrixFree<dim, number>::AdditionalData additional_data;
       additional_data.tasks_parallel_scheme =
-        MatrixFree<dim, Number>::AdditionalData::partition_color;
+        MatrixFree<dim, number>::AdditionalData::partition_color;
       additional_data.mapping_update_flags =
         (update_values | update_JxW_values);
-      std::shared_ptr<MatrixFree<dim, Number>> matrix_free(
-        new MatrixFree<dim, Number>());
+      std::shared_ptr<MatrixFree<dim, number>> matrix_free(
+        new MatrixFree<dim, number>());
       matrix_free->reinit(
         mapping, dof, constraints, quadrature_mf, additional_data);
       using MatrixType = MatrixFreeOperators::MassOperator<
@@ -210,7 +210,7 @@ namespace VectorTools
         -1,
         0,
         components,
-        LinearAlgebra::distributed::Vector<Number>>;
+        LinearAlgebra::distributed::Vector<number>>;
       MatrixType mass_matrix;
       mass_matrix.initialize(matrix_free);
 
@@ -238,7 +238,7 @@ namespace VectorTools
               const auto &lumped_diagonal =
                 mass_matrix.get_matrix_lumped_diagonal_inverse()->get_vector();
               bool all_entries_positive = true;
-              for (const Number &v : lumped_diagonal)
+              for (const number &v : lumped_diagonal)
                 if (v < 0.0)
                   {
                     all_entries_positive = false;
@@ -272,7 +272,7 @@ namespace VectorTools
       else
         mass_matrix.compute_diagonal();
 
-      LinearAlgebra::distributed::Vector<Number> rhs, inhomogeneities;
+      LinearAlgebra::distributed::Vector<number> rhs, inhomogeneities;
       matrix_free->initialize_dof_vector(work_result);
       matrix_free->initialize_dof_vector(rhs);
       matrix_free->initialize_dof_vector(inhomogeneities);
@@ -285,7 +285,7 @@ namespace VectorTools
 
         // account for inhomogeneous constraints
         inhomogeneities.update_ghost_values();
-        FEEvaluation<dim, -1, 0, components, Number> phi(*matrix_free);
+        FEEvaluation<dim, -1, 0, components, number> phi(*matrix_free);
         for (unsigned int cell = 0; cell < matrix_free->n_cell_batches();
              ++cell)
           {
@@ -314,7 +314,7 @@ namespace VectorTools
 #ifdef DEBUG
       // Make sure we picked a valid preconditioner
       const auto &diagonal = preconditioner.get_vector();
-      for (const Number &v : diagonal)
+      for (const number &v : diagonal)
         Assert(v > 0.0, ExcInternalError());
 #endif
       cg.solve(mass_matrix, work_result, rhs, preconditioner);
@@ -327,18 +327,18 @@ namespace VectorTools
 
     // Helper interface for the matrix-free implementation of project().
     // Used to determine the number of components.
-    template <int dim, typename Number, int spacedim>
+    template <int dim, typename number, int spacedim>
     void
     project_matrix_free_component(
       const Mapping<dim, spacedim> &   mapping,
       const DoFHandler<dim, spacedim> &dof,
-      const AffineConstraints<Number> &constraints,
+      const AffineConstraints<number> &constraints,
       const Quadrature<dim> &          quadrature,
       const Function<
         spacedim,
-        typename LinearAlgebra::distributed::Vector<Number>::value_type>
+        typename LinearAlgebra::distributed::Vector<number>::value_type>
         &                                         function,
-      LinearAlgebra::distributed::Vector<Number> &work_result,
+      LinearAlgebra::distributed::Vector<number> &work_result,
       const bool                                  enforce_zero_boundary,
       const Quadrature<dim - 1> &                 q_boundary,
       const bool                                  project_to_boundary_first)
@@ -586,30 +586,30 @@ namespace VectorTools
         const unsigned int)> &                                  func,
       VectorType &                                              vec_result)
     {
-      using Number = typename VectorType::value_type;
+      using number = typename VectorType::value_type;
       AssertDimension(dof.get_fe(0).n_components(), 1);
       AssertDimension(vec_result.size(), dof.n_dofs());
 
       // set up mass matrix and right hand side
-      typename MatrixFree<dim, Number>::AdditionalData additional_data;
+      typename MatrixFree<dim, number>::AdditionalData additional_data;
       additional_data.tasks_parallel_scheme =
-        MatrixFree<dim, Number>::AdditionalData::partition_color;
+        MatrixFree<dim, number>::AdditionalData::partition_color;
       additional_data.mapping_update_flags =
         (update_values | update_JxW_values);
-      std::shared_ptr<MatrixFree<dim, Number>> matrix_free(
-        new MatrixFree<dim, Number>());
+      std::shared_ptr<MatrixFree<dim, number>> matrix_free(
+        new MatrixFree<dim, number>());
       matrix_free->reinit(mapping,
                           dof,
                           constraints,
                           QGauss<1>(dof.get_fe().degree + 2),
                           additional_data);
       using MatrixType = MatrixFreeOperators::
-        MassOperator<dim, -1, 0, 1, LinearAlgebra::distributed::Vector<Number>>;
+        MassOperator<dim, -1, 0, 1, LinearAlgebra::distributed::Vector<number>>;
       MatrixType mass_matrix;
       mass_matrix.initialize(matrix_free);
       mass_matrix.compute_diagonal();
 
-      using LocalVectorType = LinearAlgebra::distributed::Vector<Number>;
+      using LocalVectorType = LinearAlgebra::distributed::Vector<number>;
       LocalVectorType vec, rhs, inhomogeneities;
       matrix_free->initialize_dof_vector(vec);
       matrix_free->initialize_dof_vector(rhs);
@@ -626,7 +626,7 @@ namespace VectorTools
 
         const unsigned int dofs_per_cell = dof.get_fe().n_dofs_per_cell();
         const unsigned int n_q_points    = quadrature.size();
-        Vector<Number>     cell_rhs(dofs_per_cell);
+        Vector<number>     cell_rhs(dofs_per_cell);
         std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
         typename DoFHandler<dim, spacedim>::active_cell_iterator
           cell = dof.begin_active(),
@@ -660,7 +660,7 @@ namespace VectorTools
       // badly conditioned matrices. This behavior can be observed, e.g. for
       // FE_Q_Hierarchical for degree higher than three.
       ReductionControl control(5 * rhs.size(), 0., 1e-12, false, false);
-      SolverCG<LinearAlgebra::distributed::Vector<Number>>    cg(control);
+      SolverCG<LinearAlgebra::distributed::Vector<number>>    cg(control);
       typename PreconditionJacobi<MatrixType>::AdditionalData data(0.8);
       PreconditionJacobi<MatrixType>                          preconditioner;
       preconditioner.initialize(mass_matrix, data);
@@ -695,17 +695,17 @@ namespace VectorTools
       const DoFHandler<dim, spacedim> &dof =
         matrix_free->get_dof_handler(fe_component);
 
-      using Number = typename VectorType::value_type;
+      using number = typename VectorType::value_type;
       AssertDimension(dof.get_fe(0).n_components(), 1);
       AssertDimension(vec_result.size(), dof.n_dofs());
 
       using MatrixType = MatrixFreeOperators::
-        MassOperator<dim, -1, 0, 1, LinearAlgebra::distributed::Vector<Number>>;
+        MassOperator<dim, -1, 0, 1, LinearAlgebra::distributed::Vector<number>>;
       MatrixType mass_matrix;
       mass_matrix.initialize(matrix_free, {fe_component});
       mass_matrix.compute_diagonal();
 
-      using LocalVectorType = LinearAlgebra::distributed::Vector<Number>;
+      using LocalVectorType = LinearAlgebra::distributed::Vector<number>;
       LocalVectorType vec, rhs, inhomogeneities;
       matrix_free->initialize_dof_vector(vec, fe_component);
       matrix_free->initialize_dof_vector(rhs, fe_component);
@@ -715,7 +715,7 @@ namespace VectorTools
 
       // assemble right hand side:
       {
-        FEEvaluation<dim, -1, 0, 1, Number> fe_eval(*matrix_free, fe_component);
+        FEEvaluation<dim, -1, 0, 1, number> fe_eval(*matrix_free, fe_component);
         const unsigned int n_cells    = matrix_free->n_cell_batches();
         const unsigned int n_q_points = fe_eval.n_q_points;
 
@@ -739,7 +739,7 @@ namespace VectorTools
       // badly conditioned matrices. This behavior can be observed, e.g. for
       // FE_Q_Hierarchical for degree higher than three.
       ReductionControl control(5 * rhs.size(), 0., 1e-12, false, false);
-      SolverCG<LinearAlgebra::distributed::Vector<Number>>    cg(control);
+      SolverCG<LinearAlgebra::distributed::Vector<number>>    cg(control);
       typename PreconditionJacobi<MatrixType>::AdditionalData data(0.8);
       PreconditionJacobi<MatrixType>                          preconditioner;
       preconditioner.initialize(mass_matrix, data);
