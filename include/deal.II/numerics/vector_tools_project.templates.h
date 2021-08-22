@@ -159,17 +159,17 @@ namespace VectorTools
     template <int components, int dim, typename number, int spacedim>
     void
     project_matrix_free(
-      const Mapping<dim, spacedim> &   mapping,
-      const DoFHandler<dim, spacedim> &dof,
-      const AffineConstraints<number> &constraints,
-      const Quadrature<dim> &          quadrature,
+      const hp::MappingCollection<dim, spacedim> &mapping,
+      const DoFHandler<dim, spacedim> &           dof,
+      const AffineConstraints<number> &           constraints,
+      const hp::QCollection<dim> &                quadrature,
       const Function<
         spacedim,
         typename LinearAlgebra::distributed::Vector<number>::value_type>
         &                                         function,
       LinearAlgebra::distributed::Vector<number> &work_result,
       const bool                                  enforce_zero_boundary,
-      const Quadrature<dim - 1> &                 q_boundary,
+      const hp::QCollection<dim - 1> &            q_boundary,
       const bool                                  project_to_boundary_first)
     {
       Assert(project_to_boundary_first == false, ExcNotImplemented());
@@ -178,22 +178,41 @@ namespace VectorTools
       (void)project_to_boundary_first;
       (void)q_boundary;
 
-      AssertDimension(dof.get_fe_collection().size(), 1);
-
       AssertDimension(dof.get_fe(0).n_components(), function.n_components);
       AssertDimension(dof.get_fe(0).n_components(), components);
 
-      Quadrature<dim> quadrature_mf;
+      hp::QCollection<dim> quadrature_mf;
 
+
+      // Maybe the initialization of the hp::QCollection for the MatrixFree
+      // object can be done in a more elegant way?
       if (dof.get_fe(0).reference_cell() ==
           ReferenceCells::get_hypercube<dim>())
-        quadrature_mf = QGauss<dim>(dof.get_fe().degree + 2);
+        {
+          for (unsigned int fe_index = 0;
+               fe_index < dof.get_fe_collection().size();
+               ++fe_index)
+            {
+              // TODO: Decide if we use a common quadrature degree for all cases
+              // or determine the degree depending on the fe_index by
+              // dof.get_fe_collection()[fe_index].degree + 2
+              quadrature_mf.push_back(
+                QGauss<dim>(dof.get_fe_collection().max_degree() + 2));
+            }
+        }
       else
-        // TODO: since we have currently only implemented a handful quadrature
-        // rules for non-hypercube objects, we do not construct a new
-        // quadrature rule with degree + 2 here but use the user-provided
-        // quadrature rule (which is guaranteed to be tabulated).
-        quadrature_mf = quadrature;
+        {
+          // TODO: since we have currently only implemented a handful quadrature
+          // rules for non-hypercube objects, we do not construct a new
+          // quadrature rule with degree + 2 here but use the user-provided
+          // quadrature rule (which is guaranteed to be tabulated).
+          for (unsigned int fe_index = 0;
+               fe_index < dof.get_fe_collection().size();
+               ++fe_index)
+            {
+              quadrature_mf.push_back(quadrature[fe_index]);
+            }
+        }
 
       // set up mass matrix and right hand side
       typename MatrixFree<dim, number>::AdditionalData additional_data;
@@ -330,17 +349,17 @@ namespace VectorTools
     template <int dim, typename number, int spacedim>
     void
     project_matrix_free_component(
-      const Mapping<dim, spacedim> &   mapping,
-      const DoFHandler<dim, spacedim> &dof,
-      const AffineConstraints<number> &constraints,
-      const Quadrature<dim> &          quadrature,
+      const hp::MappingCollection<dim, spacedim> &mapping,
+      const DoFHandler<dim, spacedim> &           dof,
+      const AffineConstraints<number> &           constraints,
+      const hp::QCollection<dim> &                quadrature,
       const Function<
         spacedim,
         typename LinearAlgebra::distributed::Vector<number>::value_type>
         &                                         function,
       LinearAlgebra::distributed::Vector<number> &work_result,
       const bool                                  enforce_zero_boundary,
-      const Quadrature<dim - 1> &                 q_boundary,
+      const hp::QCollection<dim - 1> &            q_boundary,
       const bool                                  project_to_boundary_first)
     {
       switch (dof.get_fe(0).n_components())
@@ -455,14 +474,14 @@ namespace VectorTools
 
           case 10:
             project_matrix_free<10>(mapping,
-                                   dof,
-                                   constraints,
-                                   quadrature,
-                                   function,
-                                   work_result,
-                                   enforce_zero_boundary,
-                                   q_boundary,
-                                   project_to_boundary_first);
+                                    dof,
+                                    constraints,
+                                    quadrature,
+                                    function,
+                                    work_result,
+                                    enforce_zero_boundary,
+                                    q_boundary,
+                                    project_to_boundary_first);
             break;
 
           default:
@@ -480,15 +499,15 @@ namespace VectorTools
     template <int dim, typename VectorType, int spacedim>
     void
     project_matrix_free_copy_vector(
-      const Mapping<dim, spacedim> &                             mapping,
+      const hp::MappingCollection<dim, spacedim> &               mapping,
       const DoFHandler<dim, spacedim> &                          dof,
       const AffineConstraints<typename VectorType::value_type> & constraints,
-      const Quadrature<dim> &                                    quadrature,
+      const hp::QCollection<dim> &                               quadrature,
       const Function<spacedim, typename VectorType::value_type> &function,
       VectorType &                                               vec_result,
-      const bool                 enforce_zero_boundary,
-      const Quadrature<dim - 1> &q_boundary,
-      const bool                 project_to_boundary_first)
+      const bool                      enforce_zero_boundary,
+      const hp::QCollection<dim - 1> &q_boundary,
+      const bool                      project_to_boundary_first)
     {
       AssertDimension(vec_result.size(), dof.n_dofs());
 
@@ -834,21 +853,33 @@ namespace VectorTools
     template <typename VectorType, int dim>
     void
     project(
-      const Mapping<dim> &                                      mapping,
+      const hp::MappingCollection<dim> &                        mapping,
       const DoFHandler<dim> &                                   dof,
       const AffineConstraints<typename VectorType::value_type> &constraints,
-      const Quadrature<dim> &                                   quadrature,
+      const hp::QCollection<dim> &                              quadrature,
       const Function<dim, typename VectorType::value_type> &    function,
       VectorType &                                              vec_result,
-      const bool                 enforce_zero_boundary,
-      const Quadrature<dim - 1> &q_boundary,
-      const bool                 project_to_boundary_first)
+      const bool                      enforce_zero_boundary,
+      const hp::QCollection<dim - 1> &q_boundary,
+      const bool                      project_to_boundary_first)
     {
-      // If we can, use the matrix-free implementation
-      bool use_matrix_free =
-        MatrixFree<dim, typename VectorType::value_type>::is_supported(
-          dof.get_fe()) &&
-        dof.get_fe().n_base_elements() == 1;
+      // Check if we can use the matrix-free implementation. Therefore, by
+      // default we assume, that it is possible. Then we loop over all fe
+      // indices and check if each finite element is supported by the
+      // matrix-free implementation.
+
+      // TODO: Is the check n_base_elements()==1 already included in
+      // is_supported()?
+      bool use_matrix_free = true;
+      for (unsigned int fe_index = 0; fe_index < dof.get_fe_collection().size();
+           ++fe_index)
+        {
+          use_matrix_free =
+            use_matrix_free &&
+            (MatrixFree<dim, typename VectorType::value_type>::is_supported(
+               dof.get_fe_collection()[fe_index]) &&
+             dof.get_fe_collection()[fe_index].n_base_elements() == 1);
+        }
 
       // enforce_zero_boundary and project_to_boundary_first
       // are not yet supported.
@@ -858,6 +889,9 @@ namespace VectorTools
           dof.get_fe(0).n_components() > 10)
         use_matrix_free = false;
 
+      // So if possible we use the matrix-free implementation. Else we fall back
+      // to the generic matrix-based implementation, which is, however, only
+      // implemented in the serial case.
       if (use_matrix_free)
         project_matrix_free_copy_vector(mapping,
                                         dof,
@@ -884,7 +918,7 @@ namespace VectorTools
                      project_to_boundary_first);
         }
     }
-  
+
   } // namespace internal
 
 
@@ -961,44 +995,15 @@ namespace VectorTools
           const Quadrature<dim - 1> &q_boundary,
           const bool                 project_to_boundary_first)
   {
-    if (dim == spacedim)
-      {
-        const Mapping<dim> *const mapping_ptr =
-          dynamic_cast<const Mapping<dim> *>(&mapping);
-        const DoFHandler<dim> *const dof_ptr =
-          dynamic_cast<const DoFHandler<dim> *>(&dof);
-        const Function<dim,
-                       typename VectorType::value_type> *const function_ptr =
-          dynamic_cast<const Function<dim, typename VectorType::value_type> *>(
-            &function);
-        Assert(mapping_ptr != nullptr, ExcInternalError());
-        Assert(dof_ptr != nullptr, ExcInternalError());
-        internal::project<VectorType, dim>(*mapping_ptr,
-                                           *dof_ptr,
-                                           constraints,
-                                           quadrature,
-                                           *function_ptr,
-                                           vec_result,
-                                           enforce_zero_boundary,
-                                           q_boundary,
-                                           project_to_boundary_first);
-      }
-    else
-      {
-        Assert(
-          (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
-             &(dof.get_triangulation())) == nullptr),
-          ExcNotImplemented());
-        internal::do_project(mapping,
-                             dof,
-                             constraints,
-                             quadrature,
-                             function,
-                             vec_result,
-                             enforce_zero_boundary,
-                             q_boundary,
-                             project_to_boundary_first);
-      }
+    project(hp::MappingCollection<dim, spacedim>(mapping),
+            dof,
+            constraints,
+            hp::QCollection<dim>(quadrature),
+            function,
+            vec_result,
+            enforce_zero_boundary,
+            hp::QCollection<dim - 1>(q_boundary),
+            project_to_boundary_first);
   }
 
 
@@ -1039,19 +1044,44 @@ namespace VectorTools
           const hp::QCollection<dim - 1> &q_boundary,
           const bool                      project_to_boundary_first)
   {
-    Assert((dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
-              &(dof.get_triangulation())) == nullptr),
-           ExcNotImplemented());
-
-    internal::do_project(mapping,
-                         dof,
-                         constraints,
-                         quadrature,
-                         function,
-                         vec_result,
-                         enforce_zero_boundary,
-                         q_boundary,
-                         project_to_boundary_first);
+    if (dim == spacedim)
+      {
+        const hp::MappingCollection<dim> *const mapping_ptr =
+          dynamic_cast<const hp::MappingCollection<dim> *>(&mapping);
+        const DoFHandler<dim> *const dof_ptr =
+          dynamic_cast<const DoFHandler<dim> *>(&dof);
+        const Function<dim,
+                       typename VectorType::value_type> *const function_ptr =
+          dynamic_cast<const Function<dim, typename VectorType::value_type> *>(
+            &function);
+        Assert(mapping_ptr != nullptr, ExcInternalError());
+        Assert(dof_ptr != nullptr, ExcInternalError());
+        internal::project<VectorType, dim>(*mapping_ptr,
+                                           *dof_ptr,
+                                           constraints,
+                                           quadrature,
+                                           *function_ptr,
+                                           vec_result,
+                                           enforce_zero_boundary,
+                                           q_boundary,
+                                           project_to_boundary_first);
+      }
+    else
+      {
+        Assert(
+          (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
+             &(dof.get_triangulation())) == nullptr),
+          ExcNotImplemented());
+        internal::do_project(mapping,
+                             dof,
+                             constraints,
+                             quadrature,
+                             function,
+                             vec_result,
+                             enforce_zero_boundary,
+                             q_boundary,
+                             project_to_boundary_first);
+      }
   }
 
 
