@@ -679,7 +679,8 @@ namespace VectorTools
         const unsigned int)> &                                  func,
       VectorType &                                              vec_result)
     {
-      using number = typename VectorType::value_type;
+      using number          = typename VectorType::value_type;
+      using LocalVectorType = LinearAlgebra::distributed::Vector<number>;
       AssertDimension(dof.get_fe(0).n_components(), 1);
       AssertDimension(vec_result.size(), dof.n_dofs());
 
@@ -696,13 +697,12 @@ namespace VectorTools
                           constraints,
                           QGauss<1>(dof.get_fe().degree + 2),
                           additional_data);
-      using MatrixType = MatrixFreeOperators::
-        MassOperator<dim, -1, 0, 1, LinearAlgebra::distributed::Vector<number>>;
+      using MatrixType =
+        MatrixFreeOperators::MassOperator<dim, -1, 0, 1, LocalVectorType>;
       MatrixType mass_matrix;
       mass_matrix.initialize(matrix_free);
       mass_matrix.compute_diagonal();
 
-      using LocalVectorType = LinearAlgebra::distributed::Vector<number>;
       LocalVectorType vec, rhs, inhomogeneities;
       matrix_free->initialize_dof_vector(vec);
       matrix_free->initialize_dof_vector(rhs);
@@ -750,7 +750,7 @@ namespace VectorTools
       // badly conditioned matrices. This behavior can be observed, e.g. for
       // FE_Q_Hierarchical for degree higher than three.
       ReductionControl control(5 * rhs.size(), 0., 1e-12, false, false);
-      SolverCG<LinearAlgebra::distributed::Vector<number>>    cg(control);
+      SolverCG<LocalVectorType>                               cg(control);
       typename PreconditionJacobi<MatrixType>::AdditionalData data(0.8);
       PreconditionJacobi<MatrixType>                          preconditioner;
       preconditioner.initialize(mass_matrix, data);
