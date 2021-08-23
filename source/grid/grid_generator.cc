@@ -5602,11 +5602,15 @@ namespace GridGenerator
     // above
     tria.set_all_manifold_ids_on_boundary(0);
 
+    // Tolerance is calculated using the minimal length defining
+    // the cylinder
+    const double tolerance = 1e-5 * std::min(radius, half_length);
+
     for (const auto &cell : tria.cell_iterators())
       for (unsigned int i : GeometryInfo<3>::face_indices())
         if (cell->at_boundary(i))
           {
-            if (cell->face(i)->center()(0) > half_length - 1.e-5)
+            if (cell->face(i)->center()(0) > half_length - tolerance)
               {
                 cell->face(i)->set_boundary_id(2);
                 cell->face(i)->set_manifold_id(numbers::flat_manifold_id);
@@ -5623,7 +5627,7 @@ namespace GridGenerator
                         numbers::flat_manifold_id);
                     }
               }
-            else if (cell->face(i)->center()(0) < -half_length + 1.e-5)
+            else if (cell->face(i)->center()(0) < -half_length + tolerance)
               {
                 cell->face(i)->set_boundary_id(1);
                 cell->face(i)->set_manifold_id(numbers::flat_manifold_id);
