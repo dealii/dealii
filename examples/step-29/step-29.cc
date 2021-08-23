@@ -102,7 +102,7 @@ namespace Step29
     virtual void vector_value(const Point<dim> & /*p*/,
                               Vector<double> &values) const override
     {
-      Assert(values.size() == 2, ExcDimensionMismatch(values.size(), 2));
+      AssertDimension(values.size(), 2);
 
       values(0) = 1;
       values(1) = 0;
@@ -112,8 +112,7 @@ namespace Step29
     vector_value_list(const std::vector<Point<dim>> &points,
                       std::vector<Vector<double>> &  value_list) const override
     {
-      Assert(value_list.size() == points.size(),
-             ExcDimensionMismatch(value_list.size(), points.size()));
+      AssertDimension(value_list.size(), points.size());
 
       for (unsigned int p = 0; p < points.size(); ++p)
         DirichletBoundaryValues<dim>::vector_value(points[p], value_list[p]);
@@ -326,9 +325,7 @@ namespace Step29
     const DataPostprocessorInputs::Vector<dim> &inputs,
     std::vector<Vector<double>> &               computed_quantities) const
   {
-    Assert(computed_quantities.size() == inputs.solution_values.size(),
-           ExcDimensionMismatch(computed_quantities.size(),
-                                inputs.solution_values.size()));
+    AssertDimension(computed_quantities.size(), inputs.solution_values.size());
 
     // The computation itself is straightforward: We iterate over each
     // entry in the output vector and compute $|u|$ from the
@@ -341,10 +338,8 @@ namespace Step29
     // something called a "norm".)
     for (unsigned int i = 0; i < computed_quantities.size(); ++i)
       {
-        Assert(computed_quantities[i].size() == 1,
-               ExcDimensionMismatch(computed_quantities[i].size(), 1));
-        Assert(inputs.solution_values[i].size() == 2,
-               ExcDimensionMismatch(inputs.solution_values[i].size(), 2));
+        AssertDimension(computed_quantities[i].size(), 1);
+        AssertDimension(inputs.solution_values[i].size(), 2);
 
         const std::complex<double> u(inputs.solution_values[i](0),
                                      inputs.solution_values[i](1));

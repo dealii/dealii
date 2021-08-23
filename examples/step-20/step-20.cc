@@ -195,8 +195,7 @@ namespace Step20
     void ExactSolution<dim>::vector_value(const Point<dim> &p,
                                           Vector<double> &  values) const
     {
-      Assert(values.size() == dim + 1,
-             ExcDimensionMismatch(values.size(), dim + 1));
+      AssertDimension(values.size(), dim + 1);
 
       values(0) = alpha * p[1] * p[1] / 2 + beta - alpha * p[0] * p[0] / 2;
       values(1) = alpha * p[0] * p[1];

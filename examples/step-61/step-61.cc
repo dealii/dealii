@@ -141,8 +141,7 @@ namespace Step61
   void Coefficient<dim>::value_list(const std::vector<Point<dim>> &points,
                                     std::vector<Tensor<2, dim>> &  values) const
   {
-    Assert(points.size() == values.size(),
-           ExcDimensionMismatch(points.size(), values.size()));
+    AssertDimension(points.size(), values.size());
     for (unsigned int p = 0; p < points.size(); ++p)
       values[p] = unit_symmetric_tensor<dim>();
   }

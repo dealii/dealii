@@ -308,8 +308,7 @@ we list here:
     operator+=(Vector       &lhs,
                const Vector &rhs)
     {
-      Assert (lhs.size() == rhs.size(),
-              ExcDimensionMismatch(lhs.size(), rhs.size());
+      AssertDimension (lhs.size(), rhs.size());
       for (unsigned int i=0; i<lhs.size(); ++i)
         lhs(i) += rhs(i);
       return lhs;

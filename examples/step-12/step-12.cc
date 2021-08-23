@@ -97,8 +97,7 @@ namespace Step12
   {
     (void)component;
     AssertIndexRange(component, 1);
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
+    AssertDimension(values.size(), points.size());
 
     for (unsigned int i = 0; i < values.size(); ++i)
       {

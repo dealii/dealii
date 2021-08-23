@@ -352,8 +352,7 @@ namespace Step35
                                    const unsigned int) const
     {
       const unsigned int n_points = points.size();
-      Assert(values.size() == n_points,
-             ExcDimensionMismatch(values.size(), n_points));
+      AssertDimension(values.size(), n_points);
       for (unsigned int i = 0; i < n_points; ++i)
         values[i] = Velocity<dim>::value(points[i]);
     }
@@ -411,8 +410,7 @@ namespace Step35
       (void)component;
       AssertIndexRange(component, 1);
       const unsigned int n_points = points.size();
-      Assert(values.size() == n_points,
-             ExcDimensionMismatch(values.size(), n_points));
+      AssertDimension(values.size(), n_points);
       for (unsigned int i = 0; i < n_points; ++i)
         values[i] = Pressure<dim>::value(points[i]);
     }

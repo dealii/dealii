@@ -117,6 +117,10 @@ namespace Step9
     // this macro call declares and defines a class
     // <code>ExcDimensionMismatch</code> inheriting from ExceptionBase which
     // implements all necessary error output functions.
+    //
+    // @note This exception is similarly used inside the
+    // <code>AssertDimension</code> macro, which is a handy wrapper to the
+    // check the dimensions of two given objects.
   };
 
   // The following two functions implement the interface described above. The
