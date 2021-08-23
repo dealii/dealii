@@ -120,3 +120,26 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
 #endif
     \}
   }
+
+// Additional insts for the parallel+hp project function.
+for (S : REAL_SCALARS; deal_II_dimension : DIMENSIONS;
+     deal_II_space_dimension : SPACE_DIMENSIONS)
+  {
+    namespace VectorTools
+    \{
+
+#if deal_II_dimension == deal_II_space_dimension
+      template void
+      create_right_hand_side<deal_II_dimension,
+                             deal_II_space_dimension,
+                             LinearAlgebra::distributed::Vector<S>>(
+        const hp::MappingCollection<deal_II_dimension> &,
+        const DoFHandler<deal_II_dimension> &,
+        const hp::QCollection<deal_II_dimension> &,
+        const Function<deal_II_space_dimension,
+                       LinearAlgebra::distributed::Vector<S>::value_type> &,
+        LinearAlgebra::distributed::Vector<S> &,
+        const AffineConstraints<S> &);
+#endif
+    \}
+  }
