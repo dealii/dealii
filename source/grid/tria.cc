@@ -3734,49 +3734,11 @@ namespace internal
 
             new_vertices[8] = next_unused_vertex;
 
-            // if this quad lives
-            // in 2d, then we can
-            // compute the new
-            // central vertex
-            // location just from
-            // the surrounding
-            // ones. If this is
-            // not the case, then
-            // we need to ask a
-            // boundary object
-            if (dim == spacedim)
-              {
-                // triangulation.vertices[next_unused_vertex] = new_point;
-                triangulation.vertices[next_unused_vertex] = cell->center(true);
-
-                // if the user_flag is set, i.e. if the cell is at the
-                // boundary, use a different calculation of the middle vertex
-                // here. this is of advantage if the boundary is strongly
-                // curved (whereas the cell is not) and the cell has a high
-                // aspect ratio.
-                if (cell->user_flag_set())
-                  {
-                    // first reset the user_flag and then refine
-                    cell->clear_user_flag();
-                    triangulation.vertices[next_unused_vertex] =
-                      cell->center(true, true);
-                  }
-              }
-            else
-              {
-                // if this quad lives in a higher dimensional space
-                // then we don't need to worry if it is at the
-                // boundary of the manifold -- we always have to use
-                // the boundary object anyway; so ignore whether the
-                // user flag is set or not
-                cell->clear_user_flag();
-
-                // determine middle vertex by transfinite interpolation to be
-                // consistent with what happens to quads in a Triangulation<3,
-                // 3> when they are refined
-                triangulation.vertices[next_unused_vertex] =
-                  cell->center(true, true);
-              }
+            // determine middle vertex by transfinite interpolation to be
+            // consistent with what happens to quads in a
+            // Triangulation<3,3> when they are refined
+            triangulation.vertices[next_unused_vertex] =
+              cell->center(true, true);
           }
 
 
@@ -4232,25 +4194,8 @@ namespace internal
 
               new_vertices[8] = next_unused_vertex;
 
-              if (dim == spacedim)
-                {
-                  triangulation.vertices[next_unused_vertex] =
-                    cell->center(true);
-
-                  if (cell->user_flag_set())
-                    {
-                      cell->clear_user_flag();
-                      triangulation.vertices[next_unused_vertex] =
-                        cell->center(true, true);
-                    }
-                }
-              else
-                {
-                  cell->clear_user_flag();
-
-                  triangulation.vertices[next_unused_vertex] =
-                    cell->center(true, true);
-                }
+              triangulation.vertices[next_unused_vertex] =
+                cell->center(true, true);
             }
 
           std::array<typename Triangulation<dim, spacedim>::raw_line_iterator,
@@ -4506,9 +4451,6 @@ namespace internal
                  triangulation.active_cell_iterators_on_level(level))
               if (cell->refine_flag_set())
                 {
-                  if (cell->at_boundary())
-                    cell->set_user_flag();
-
                   create_children(triangulation,
                                   next_unused_vertex,
                                   next_unused_line,
@@ -5054,15 +4996,6 @@ namespace internal
                  triangulation.active_cell_iterators_on_level(level))
               if (cell->refine_flag_set())
                 {
-                  // set the user flag to indicate, that at least one
-                  // line is at the boundary
-
-                  // TODO[Tobias Leicht] find a better place to set
-                  // this flag, so that we do not need so much time to
-                  // check each cell here
-                  if (cell->at_boundary())
-                    cell->set_user_flag();
-
                   // actually set up the children and update neighbor
                   // information
                   create_children(triangulation,
