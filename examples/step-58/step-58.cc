@@ -477,7 +477,8 @@ namespace Step58
       const DataPostprocessorInputs::Vector<dim> &inputs,
       std::vector<Vector<double>> &               computed_quantities) const
     {
-      AssertDimension(computed_quantities.size(), inputs.solution_values.size());
+      AssertDimension(computed_quantities.size(),
+                      inputs.solution_values.size());
 
       for (unsigned int q = 0; q < computed_quantities.size(); ++q)
         {
@@ -532,7 +533,8 @@ namespace Step58
       const DataPostprocessorInputs::Vector<dim> &inputs,
       std::vector<Vector<double>> &               computed_quantities) const
     {
-      AssertDimension(computed_quantities.size(), inputs.solution_values.size());
+      AssertDimension(computed_quantities.size(),
+                      inputs.solution_values.size());
 
       double max_phase = -numbers::PI;
       for (unsigned int q = 0; q < computed_quantities.size(); ++q)
