@@ -1763,16 +1763,21 @@ namespace internal
         &transfer)
     {
       Assert(
-        mg_level_fine == 0 || mg_level_fine == numbers::invalid_unsigned_int,
+        mg_level_fine == numbers::invalid_unsigned_int ||
+          mg_level_fine <= MGTools::max_level_for_coarse_mesh(
+                             dof_handler_fine.get_triangulation()),
         ExcMessage(
           "Polynomial transfer is only allowed on the active level "
-          "(numbers::invalid_unsigned_int) or the coarse-grid level (0)."));
+          "(numbers::invalid_unsigned_int) or on refinement levels without "
+          "hanging nodes."));
       Assert(
-        mg_level_coarse == 0 ||
-          mg_level_coarse == numbers::invalid_unsigned_int,
+        mg_level_coarse == numbers::invalid_unsigned_int ||
+          mg_level_coarse <= MGTools::max_level_for_coarse_mesh(
+                               dof_handler_coarse.get_triangulation()),
         ExcMessage(
           "Polynomial transfer is only allowed on the active level "
-          "(numbers::invalid_unsigned_int) or the coarse-grid level (0)."));
+          "(numbers::invalid_unsigned_int) or on refinement levels without "
+          "hanging nodes."));
 
       const PermutationFineDoFHandlerView<dim> view(dof_handler_fine,
                                                     dof_handler_coarse,
@@ -1888,12 +1893,20 @@ namespace internal
       }
       {
         IndexSet locally_relevant_dofs;
-        DoFTools::extract_locally_relevant_dofs(dof_handler_coarse,
-                                                locally_relevant_dofs);
+
+        if (mg_level_coarse == numbers::invalid_unsigned_int)
+          DoFTools::extract_locally_relevant_dofs(dof_handler_coarse,
+                                                  locally_relevant_dofs);
+        else
+          DoFTools::extract_locally_relevant_level_dofs(dof_handler_coarse,
+                                                        mg_level_coarse,
+                                                        locally_relevant_dofs);
 
         transfer.partitioner_coarse =
           std::make_shared<Utilities::MPI::Partitioner>(
-            dof_handler_coarse.locally_owned_dofs(),
+            mg_level_coarse == numbers::invalid_unsigned_int ?
+              dof_handler_coarse.locally_owned_dofs() :
+              dof_handler_coarse.locally_owned_mg_dofs(mg_level_coarse),
             locally_relevant_dofs,
             comm);
         transfer.vec_coarse.reinit(transfer.partitioner_coarse);
@@ -1993,8 +2006,11 @@ namespace internal
               transfer.schemes[i].level_dof_indices_fine.data();
           }
 
-        bool     fine_indices_touch_remote_dofs = false;
-        IndexSet locally_owned_dofs = dof_handler_fine.locally_owned_dofs();
+        bool           fine_indices_touch_remote_dofs = false;
+        const IndexSet locally_owned_dofs =
+          mg_level_fine == numbers::invalid_unsigned_int ?
+            dof_handler_fine.locally_owned_dofs() :
+            dof_handler_fine.locally_owned_mg_dofs(mg_level_fine);
 
         process_cells([&](const auto &cell_coarse, const auto &cell_fine) {
           const auto fe_pair_no =
