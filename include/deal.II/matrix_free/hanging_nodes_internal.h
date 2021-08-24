@@ -346,17 +346,21 @@ namespace internal
             auto &mask = masks[comp];
             mask       = ConstraintKinds::unconstrained;
 
-            const auto &fe = cell->get_fe().base_element(base_element_index);
+            const auto &fe_base =
+              cell->get_fe().base_element(base_element_index);
 
-            if (dim == 1 || dynamic_cast<const FE_Q<dim> *>(&fe) == nullptr)
+            if (dim == 1 ||
+                dynamic_cast<const FE_Q<dim> *>(&fe_base) == nullptr)
               continue;
 
-            const unsigned int fe_degree = fe.tensor_degree();
+            const unsigned int fe_degree = fe_base.tensor_degree();
             const unsigned int n_dofs_1d = fe_degree + 1;
             const unsigned int dofs_per_face =
               Utilities::fixed_power<dim - 1>(n_dofs_1d);
 
             std::vector<types::global_dof_index> neighbor_dofs_all(
+              idx_offset.back());
+            std::vector<types::global_dof_index> neighbor_dofs_all_temp(
               idx_offset.back());
 
             std::vector<types::global_dof_index> neighbor_dofs(dofs_per_face);
@@ -659,19 +663,23 @@ namespace internal
                                   ExcInternalError();
 
                                 // Copy the unconstrained values
-                                neighbor_dofs.resize(n_dofs_1d * n_dofs_1d *
-                                                     n_dofs_1d);
                                 DoFCellAccessor<dim, dim, false>(
                                   &neighbor_cell->get_triangulation(),
                                   neighbor_cell->level(),
                                   neighbor_cell->index(),
                                   &cell->get_dof_handler())
-                                  .get_dof_indices(neighbor_dofs);
+                                  .get_dof_indices(neighbor_dofs_all);
                                 // If the vector is distributed, we need to
                                 // transform the global indices to local ones.
                                 if (partitioner)
-                                  for (auto &index : neighbor_dofs)
+                                  for (auto &index : neighbor_dofs_all)
                                     index = partitioner->global_to_local(index);
+
+                                for (unsigned int i = 0;
+                                     i < neighbor_dofs_all_temp.size();
+                                     ++i)
+                                  neighbor_dofs_all_temp[i] =
+                                    neighbor_dofs_all[lexicographic_mapping[i]];
 
                                 for (unsigned int i = 0; i < n_dofs_1d; ++i)
                                   {
@@ -680,14 +688,12 @@ namespace internal
                                       line_dof_idx(local_line, i, n_dofs_1d);
 
                                     dof_indices[idx + idx_offset[comp]] =
-                                      neighbor_dofs
-                                        [lexicographic_mapping
-                                           [fe.component_to_system_index(
-                                             comp,
-                                             line_dof_idx(
-                                               local_line_neighbor,
-                                               flipped ? fe_degree - i : i,
-                                               n_dofs_1d))]];
+                                      neighbor_dofs_all_temp
+                                        [line_dof_idx(local_line_neighbor,
+                                                      flipped ? fe_degree - i :
+                                                                i,
+                                                      n_dofs_1d) +
+                                         idx_offset[comp]];
                                   }
 
                                 // Stop looping over edge neighbors
