@@ -407,10 +407,9 @@ private:
   /**
    * Internal helper function for unroll.
    */
-  template <typename OtherNumber>
-  void
-  unroll_recursion(Vector<OtherNumber> &result,
-                   unsigned int &       start_index) const;
+  template <typename Iterator>
+  Iterator
+  unroll_recursion(const Iterator current, const Iterator end) const;
 
   // Allow an arbitrary Tensor to access the underlying values.
   template <int, int, typename>
@@ -846,10 +845,9 @@ private:
   /**
    * Internal helper function for unroll.
    */
-  template <typename OtherNumber>
-  void
-  unroll_recursion(Vector<OtherNumber> &result,
-                   unsigned int &       start_index) const;
+  template <typename Iterator>
+  Iterator
+  unroll_recursion(const Iterator current, const Iterator end) const;
 
   /**
    * This constructor is for internal use. It provides a way
@@ -1213,15 +1211,16 @@ constexpr DEAL_II_CUDA_HOST_DEV inline DEAL_II_ALWAYS_INLINE
 
 
 template <int dim, typename Number>
-template <typename OtherNumber>
-inline void
-Tensor<0, dim, Number>::unroll_recursion(Vector<OtherNumber> &result,
-                                         unsigned int &       index) const
+template <typename Iterator>
+Iterator
+Tensor<0, dim, Number>::unroll_recursion(const Iterator current,
+                                         const Iterator end) const
 {
   Assert(dim != 0,
          ExcMessage("Cannot unroll an object of type Tensor<0,0,Number>"));
-  result[index] = value;
-  ++index;
+  Assert(current != end, ExcMessage("Cannot put value in end iterator"));
+  *current = value;
+  return current + 1;
 }
 
 
@@ -1712,19 +1711,20 @@ Tensor<rank_, dim, Number>::unroll(Vector<OtherNumber> &result) const
   AssertDimension(result.size(),
                   (Utilities::fixed_power<rank_, unsigned int>(dim)));
 
-  unsigned int index = 0;
-  unroll_recursion(result, index);
+  unroll_recursion(result.begin(), result.end());
 }
 
 
 template <int rank_, int dim, typename Number>
-template <typename OtherNumber>
-inline void
-Tensor<rank_, dim, Number>::unroll_recursion(Vector<OtherNumber> &result,
-                                             unsigned int &       index) const
+template <typename Iterator>
+Iterator
+Tensor<rank_, dim, Number>::unroll_recursion(const Iterator current,
+                                             const Iterator end) const
 {
+  auto next = current;
   for (unsigned int i = 0; i < dim; ++i)
-    values[i].unroll_recursion(result, index);
+    next = values[i].unroll_recursion(next, end);
+  return next;
 }
 
 
