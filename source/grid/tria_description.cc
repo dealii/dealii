@@ -211,9 +211,7 @@ namespace TriangulationDescription
           std::vector<bool> vertices_owned_by_locally_owned_cells_on_level(
             tria.n_vertices());
           for (const auto &cell : tria.cell_iterators_on_level(level))
-            if ((construct_multigrid &&
-                 (cell->level_subdomain_id() == my_rank)) ||
-                (cell->is_active() && cell->subdomain_id() == my_rank))
+            if (construct_multigrid && (cell->level_subdomain_id() == my_rank))
               add_vertices_of_cell_to_vertices_owned_by_locally_owned_cells(
                 cell, vertices_owned_by_locally_owned_cells_on_level);
 
@@ -688,11 +686,6 @@ namespace TriangulationDescription
                     std::vector<std::vector<CellData<dim>>> &        cell_infos,
                     const LinearAlgebra::distributed::Vector<double> &partition)
     {
-      if (cell->user_flag_set())
-        return; // cell has been already added -> nothing to do
-
-      cell->set_user_flag();
-
       CellData<dim> cell_info;
 
       // save coarse-cell id
@@ -723,7 +716,7 @@ namespace TriangulationDescription
       }
 
       // subdomain and level subdomain id
-      if (cell->is_active())
+      if (cell->is_active() && (cell->is_artificial() == false))
         cell_info.subdomain_id = static_cast<unsigned int>(
           partition[cell->global_active_cell_index()]);
       else
@@ -732,9 +725,6 @@ namespace TriangulationDescription
       cell_info.level_subdomain_id = numbers::artificial_subdomain_id;
 
       cell_infos[cell->level()].emplace_back(cell_info);
-
-      if (cell->level() != 0) // proceed with parent
-        fill_cell_infos(cell->parent(), cell_infos, partition);
     }
 
 
@@ -800,6 +790,10 @@ namespace TriangulationDescription
       std::vector<DescriptionTemp<dim, spacedim>> description_temp(
         relevant_processes.size());
 
+      std::vector<bool> old_user_flags;
+      if (description_temp.size() > 0)
+        tria.save_user_flags(old_user_flags);
+
       for (unsigned int i = 0; i < description_temp.size(); ++i)
         {
           const unsigned int proc               = relevant_processes[i];
@@ -808,35 +802,43 @@ namespace TriangulationDescription
             tria.get_triangulation().n_global_levels());
 
           // clear user_flags
-          std::vector<bool> old_user_flags;
-          tria.save_user_flags(old_user_flags);
-
           const_cast<dealii::Triangulation<dim, spacedim> &>(tria)
             .clear_user_flags();
 
-          // mark all vertices attached to locally owned cells
-          std::vector<bool> vertices_owned_by_locally_owned_cells(
-            tria.n_vertices());
-          for (const auto &cell : tria.active_cell_iterators())
-            if (cell->is_locally_owned() &&
-                static_cast<unsigned int>(
-                  partition[cell->global_active_cell_index()]) == proc)
-              add_vertices_of_cell_to_vertices_owned_by_locally_owned_cells(
-                cell, vertices_owned_by_locally_owned_cells);
+          for (int level = tria.get_triangulation().n_global_levels() - 1;
+               level >= 0;
+               --level)
+            {
+              // mark all vertices attached to locally owned cells
+              std::vector<bool> vertices_owned_by_locally_owned_cells_on_level(
+                tria.n_vertices());
+              for (const auto &cell : tria.active_cell_iterators())
+                if (cell->is_active() && cell->is_locally_owned() &&
+                    static_cast<unsigned int>(
+                      partition[cell->global_active_cell_index()]) == proc)
+                  add_vertices_of_cell_to_vertices_owned_by_locally_owned_cells(
+                    cell, vertices_owned_by_locally_owned_cells_on_level);
 
-          // helper function if a cell is locally relevant (active and
-          // connected to cell via a vertex)
-          const auto is_locally_relevant_on_level = [&](const auto &cell) {
-            for (const auto v : cell->vertex_indices())
-              if (vertices_owned_by_locally_owned_cells[cell->vertex_index(v)])
-                return true;
-            return false;
-          };
+              // helper function if a cell is locally relevant (active and
+              // connected to cell via a vertex)
+              const auto is_locally_relevant_on_level = [&](const auto &cell) {
+                for (const auto v : cell->vertex_indices())
+                  if (vertices_owned_by_locally_owned_cells_on_level
+                        [cell->vertex_index(v)])
+                    return true;
+                return false;
+              };
 
-          // collect locally relevant cells (including their parents)
-          for (const auto &cell : tria.active_cell_iterators())
-            if (is_locally_relevant_on_level(cell))
-              fill_cell_infos(cell, description_temp_i.cell_infos, partition);
+              // collect locally relevant cells (including their parents)
+              for (const auto &cell : tria.cell_iterators_on_level(level))
+                if (is_locally_relevant_on_level(cell))
+                  set_user_flag_and_of_its_parents(cell);
+            }
+
+          for (unsigned int level = 0; level < tria.n_global_levels(); ++level)
+            for (const auto &cell : tria.cell_iterators_on_level(level))
+              if (cell->user_flag_set())
+                fill_cell_infos(cell, description_temp_i.cell_infos, partition);
 
           // collect coarse-grid cells
           std::vector<bool> vertices_locally_relevant(tria.n_vertices(), false);
@@ -868,11 +870,12 @@ namespace TriangulationDescription
             if (vertices_locally_relevant[i])
               description_temp_i.coarse_cell_vertices.emplace_back(
                 i, tria.get_vertices()[i]);
-
-          // restore flags
-          const_cast<dealii::Triangulation<dim, spacedim> &>(tria)
-            .load_user_flags(old_user_flags);
         }
+
+      // restore flags
+      if (description_temp.size() > 0)
+        const_cast<dealii::Triangulation<dim, spacedim> &>(tria)
+          .load_user_flags(old_user_flags);
 
       // collect description from all processes that used to own locally-owned
       // active cells of this process in a single description
