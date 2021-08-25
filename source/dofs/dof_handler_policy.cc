@@ -158,29 +158,30 @@ namespace internal
           // exists
           if (identities.get() == nullptr)
             {
+              std::vector<std::set<std::pair<unsigned int, unsigned int>>>
+                complete_identities;
+
               switch (structdim)
                 {
                   case 0:
                     {
-                      identities = std::make_unique<DoFIdentities>(
-                        fes[fe_index_1].hp_vertex_dof_identities(
-                          fes[fe_index_2]));
+                      complete_identities =
+                        fes.hp_vertex_dof_identities({fe_index_1, fe_index_2});
                       break;
                     }
 
                   case 1:
                     {
-                      identities = std::make_unique<DoFIdentities>(
-                        fes[fe_index_1].hp_line_dof_identities(
-                          fes[fe_index_2]));
+                      complete_identities =
+                        fes.hp_line_dof_identities({fe_index_1, fe_index_2});
                       break;
                     }
 
                   case 2:
                     {
-                      identities = std::make_unique<DoFIdentities>(
-                        fes[fe_index_1].hp_quad_dof_identities(fes[fe_index_2],
-                                                               face_no));
+                      complete_identities =
+                        fes.hp_quad_dof_identities({fe_index_1, fe_index_2},
+                                                   face_no);
                       break;
                     }
 
@@ -188,11 +189,41 @@ namespace internal
                     Assert(false, ExcNotImplemented());
                 }
 
+#ifdef DEBUG
+              // Each entry of 'complete_identities' contains a set of
+              // pairs (fe_index,dof_index). Because we put in exactly
+              // two fe indices, we know that each entry of the outer
+              // vector needs to contain a set of exactly two such
+              // pairs. Check this.
+              for (const auto &complete_identity : complete_identities)
+                Assert(complete_identity.size() == 2, ExcInternalError());
+#endif
+
+              // Next reduce these sets of two pairs by removing the
+              // fe_index parts: We know which indices we have. But we
+              // have to make sure in which order we consider the
+              // pair, by considering whether the fe_index part we are
+              // throwing away matched fe_index_1 or fe_index_2.
+              DoFIdentities reduced_identities;
+              for (const auto &complete_identity : complete_identities)
+                {
+                  std::pair<unsigned int, unsigned int> reduced_identity(
+                    complete_identity.begin()->second,
+                    (++complete_identity.begin())->second);
+                  if (complete_identity.begin()->first == fe_index_1)
+                    reduced_identities.emplace_back(reduced_identity);
+                  else if (complete_identity.begin()->first == fe_index_2)
+                    reduced_identities.emplace_back(reduced_identity.second,
+                                                    reduced_identity.first);
+                  else
+                    Assert(false, ExcInternalError());
+                }
+
+#ifdef DEBUG
               // double check whether the newly created entries make
               // any sense at all
-              for (const auto &identity : *identities)
+              for (const auto &identity : reduced_identities)
                 {
-                  (void)identity;
                   Assert(identity.first <
                            fes[fe_index_1]
                              .template n_dofs_per_object<structdim>(face_no),
@@ -202,6 +233,10 @@ namespace internal
                              .template n_dofs_per_object<structdim>(face_no),
                          ExcInternalError());
                 }
+#endif
+
+              identities =
+                std::make_unique<DoFIdentities>(std::move(reduced_identities));
             }
 
           return identities;
