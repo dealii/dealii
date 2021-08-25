@@ -225,31 +225,26 @@ namespace parallel
           unsigned int dummy       = 0;
           unsigned int req_counter = 0;
 
-          for (std::set<types::subdomain_id>::iterator it =
-                 this->number_cache.level_ghost_owners.begin();
-               it != this->number_cache.level_ghost_owners.end();
-               ++it, ++req_counter)
+          for (const auto &it : this->number_cache.level_ghost_owners)
             {
               ierr = MPI_Isend(&dummy,
                                1,
                                MPI_UNSIGNED,
-                               *it,
+                               it,
                                mpi_tag,
                                this->mpi_communicator,
                                &requests[req_counter]);
               AssertThrowMPI(ierr);
+              ++req_counter;
             }
 
-          for (std::set<types::subdomain_id>::iterator it =
-                 this->number_cache.level_ghost_owners.begin();
-               it != this->number_cache.level_ghost_owners.end();
-               ++it)
+          for (const auto &it : this->number_cache.level_ghost_owners)
             {
               unsigned int dummy;
               ierr = MPI_Recv(&dummy,
                               1,
                               MPI_UNSIGNED,
-                              *it,
+                              it,
                               mpi_tag,
                               this->mpi_communicator,
                               MPI_STATUS_IGNORE);
