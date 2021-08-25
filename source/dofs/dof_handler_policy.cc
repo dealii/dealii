@@ -192,6 +192,7 @@ namespace internal
               // any sense at all
               for (const auto &identity : *identities)
                 {
+                  (void)identity;
                   Assert(identity.first <
                            fes[fe_index_1]
                              .template n_dofs_per_object<structdim>(face_no),
