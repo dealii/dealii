@@ -1,0 +1,88 @@
+
+DEAL::dim=2
+DEAL::Identity set #0
+DEAL::  FE_Q<2>(2): quad dof index 0
+DEAL::  FE_Q<2>(QIterated(QTrapezoid(),4)): quad dof index 4
+DEAL::  FE_Q<2>(QIterated(QTrapezoid(),6)): quad dof index 12
+DEAL::  FE_Q<2>(QIterated(QTrapezoid(),8)): quad dof index 24
+DEAL::Identity set #1
+DEAL::  FE_Q<2>(QIterated(QTrapezoid(),3)): quad dof index 0
+DEAL::  FE_Q<2>(QIterated(QTrapezoid(),6)): quad dof index 6
+DEAL::Identity set #2
+DEAL::  FE_Q<2>(QIterated(QTrapezoid(),3)): quad dof index 1
+DEAL::  FE_Q<2>(QIterated(QTrapezoid(),6)): quad dof index 8
+DEAL::Identity set #3
+DEAL::  FE_Q<2>(QIterated(QTrapezoid(),3)): quad dof index 2
+DEAL::  FE_Q<2>(QIterated(QTrapezoid(),6)): quad dof index 16
+DEAL::Identity set #4
+DEAL::  FE_Q<2>(QIterated(QTrapezoid(),3)): quad dof index 3
+DEAL::  FE_Q<2>(QIterated(QTrapezoid(),6)): quad dof index 18
+DEAL::Identity set #5
+DEAL::  FE_Q<2>(QIterated(QTrapezoid(),4)): quad dof index 0
+DEAL::  FE_Q<2>(QIterated(QTrapezoid(),8)): quad dof index 8
+DEAL::Identity set #6
+DEAL::  FE_Q<2>(QIterated(QTrapezoid(),4)): quad dof index 1
+DEAL::  FE_Q<2>(QIterated(QTrapezoid(),8)): quad dof index 10
+DEAL::Identity set #7
+DEAL::  FE_Q<2>(QIterated(QTrapezoid(),4)): quad dof index 2
+DEAL::  FE_Q<2>(QIterated(QTrapezoid(),8)): quad dof index 12
+DEAL::Identity set #8
+DEAL::  FE_Q<2>(QIterated(QTrapezoid(),4)): quad dof index 3
+DEAL::  FE_Q<2>(QIterated(QTrapezoid(),8)): quad dof index 22
+DEAL::Identity set #9
+DEAL::  FE_Q<2>(QIterated(QTrapezoid(),4)): quad dof index 5
+DEAL::  FE_Q<2>(QIterated(QTrapezoid(),8)): quad dof index 26
+DEAL::Identity set #10
+DEAL::  FE_Q<2>(QIterated(QTrapezoid(),4)): quad dof index 6
+DEAL::  FE_Q<2>(QIterated(QTrapezoid(),8)): quad dof index 36
+DEAL::Identity set #11
+DEAL::  FE_Q<2>(QIterated(QTrapezoid(),4)): quad dof index 7
+DEAL::  FE_Q<2>(QIterated(QTrapezoid(),8)): quad dof index 38
+DEAL::Identity set #12
+DEAL::  FE_Q<2>(QIterated(QTrapezoid(),4)): quad dof index 8
+DEAL::  FE_Q<2>(QIterated(QTrapezoid(),8)): quad dof index 40
+DEAL::
+DEAL::dim=3
+DEAL::Identity set #0
+DEAL::  FE_Q<3>(2): quad dof index 0
+DEAL::  FE_Q<3>(QIterated(QTrapezoid(),4)): quad dof index 4
+DEAL::  FE_Q<3>(QIterated(QTrapezoid(),6)): quad dof index 12
+DEAL::  FE_Q<3>(QIterated(QTrapezoid(),8)): quad dof index 24
+DEAL::Identity set #1
+DEAL::  FE_Q<3>(QIterated(QTrapezoid(),3)): quad dof index 0
+DEAL::  FE_Q<3>(QIterated(QTrapezoid(),6)): quad dof index 6
+DEAL::Identity set #2
+DEAL::  FE_Q<3>(QIterated(QTrapezoid(),3)): quad dof index 1
+DEAL::  FE_Q<3>(QIterated(QTrapezoid(),6)): quad dof index 8
+DEAL::Identity set #3
+DEAL::  FE_Q<3>(QIterated(QTrapezoid(),3)): quad dof index 2
+DEAL::  FE_Q<3>(QIterated(QTrapezoid(),6)): quad dof index 16
+DEAL::Identity set #4
+DEAL::  FE_Q<3>(QIterated(QTrapezoid(),3)): quad dof index 3
+DEAL::  FE_Q<3>(QIterated(QTrapezoid(),6)): quad dof index 18
+DEAL::Identity set #5
+DEAL::  FE_Q<3>(QIterated(QTrapezoid(),4)): quad dof index 0
+DEAL::  FE_Q<3>(QIterated(QTrapezoid(),8)): quad dof index 8
+DEAL::Identity set #6
+DEAL::  FE_Q<3>(QIterated(QTrapezoid(),4)): quad dof index 1
+DEAL::  FE_Q<3>(QIterated(QTrapezoid(),8)): quad dof index 10
+DEAL::Identity set #7
+DEAL::  FE_Q<3>(QIterated(QTrapezoid(),4)): quad dof index 2
+DEAL::  FE_Q<3>(QIterated(QTrapezoid(),8)): quad dof index 12
+DEAL::Identity set #8
+DEAL::  FE_Q<3>(QIterated(QTrapezoid(),4)): quad dof index 3
+DEAL::  FE_Q<3>(QIterated(QTrapezoid(),8)): quad dof index 22
+DEAL::Identity set #9
+DEAL::  FE_Q<3>(QIterated(QTrapezoid(),4)): quad dof index 5
+DEAL::  FE_Q<3>(QIterated(QTrapezoid(),8)): quad dof index 26
+DEAL::Identity set #10
+DEAL::  FE_Q<3>(QIterated(QTrapezoid(),4)): quad dof index 6
+DEAL::  FE_Q<3>(QIterated(QTrapezoid(),8)): quad dof index 36
+DEAL::Identity set #11
+DEAL::  FE_Q<3>(QIterated(QTrapezoid(),4)): quad dof index 7
+DEAL::  FE_Q<3>(QIterated(QTrapezoid(),8)): quad dof index 38
+DEAL::Identity set #12
+DEAL::  FE_Q<3>(QIterated(QTrapezoid(),4)): quad dof index 8
+DEAL::  FE_Q<3>(QIterated(QTrapezoid(),8)): quad dof index 40
+DEAL::
+DEAL::OK

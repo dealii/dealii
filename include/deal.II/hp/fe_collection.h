@@ -301,6 +301,38 @@ namespace hp
     hp_constraints_are_implemented() const;
 
     /**
+     * This function combines the functionality of the
+     * FiniteElement::hp_vertex_dof_identities() into multi-way comparisons.
+     * Given a set of elements (whose indices are provided as argument), this
+     * function determines identities between degrees of freedom of these
+     * elements at a vertex.
+     *
+     * The function returns a vector of such identities, where each element of
+     * the vector is a set of pairs `(fe_index,dof_index)` that identifies
+     * the `fe_index` (an element of the `fes` argument to this function) of
+     * an element and the `dof_index` indicates the how-manyth degree of freedom
+     * of that element on a vertex participates in this identity.
+     */
+    std::vector<std::set<std::pair<unsigned int, unsigned int>>>
+    hp_vertex_dof_identities(const std::set<unsigned int> &fes) const;
+
+    /**
+     * Same as hp_vertex_dof_indices(), except that the function treats degrees
+     * of freedom on lines.
+     */
+    std::vector<std::set<std::pair<unsigned int, unsigned int>>>
+    hp_line_dof_identities(const std::set<unsigned int> &fes) const;
+
+    /**
+     * Same as hp_vertex_dof_indices(), except that the function treats degrees
+     * of freedom on quads.
+     */
+    std::vector<std::set<std::pair<unsigned int, unsigned int>>>
+    hp_quad_dof_identities(const std::set<unsigned int> &fes,
+                           const unsigned int            face_no = 0) const;
+
+
+    /**
      * Return the indices of finite elements in this FECollection that dominate
      * all elements associated with the provided set of indices @p fes.
      *

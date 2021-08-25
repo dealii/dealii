@@ -1,0 +1,14 @@
+
+DEAL::dim=3
+DEAL::Identity set #0
+DEAL::  FESystem<3>[FE_Q<3>(2)^2]: quad dof index 0
+DEAL::  FESystem<3>[FE_Q<3>(4)^2]: quad dof index 4
+DEAL::  FESystem<3>[FE_Q<3>(6)^2]: quad dof index 12
+DEAL::  FESystem<3>[FE_Q<3>(8)^2]: quad dof index 24
+DEAL::Identity set #1
+DEAL::  FESystem<3>[FE_Q<3>(2)^2]: quad dof index 1
+DEAL::  FESystem<3>[FE_Q<3>(4)^2]: quad dof index 13
+DEAL::  FESystem<3>[FE_Q<3>(6)^2]: quad dof index 37
+DEAL::  FESystem<3>[FE_Q<3>(8)^2]: quad dof index 73
+DEAL::
+DEAL::OK
