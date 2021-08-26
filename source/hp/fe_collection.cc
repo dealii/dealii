@@ -303,6 +303,40 @@ namespace hp
         const unsigned int,
         const unsigned int)> &      query_identities)
     {
+      // Let's deal with the easy cases first. If the set of fe indices is empty
+      // or has only one entry, then there are no identities:
+      if (fes.size() <= 1)
+        return {};
+
+      // If the set has two entries, then the
+      // FiniteElement::hp_*_dof_identities() function directly returns what we
+      // need. We just need to prefix its output with the respective fe indices:
+      if (fes.size() == 2)
+        {
+          const unsigned int fe_index_1 = *fes.begin();
+          const unsigned int fe_index_2 = *(++fes.begin());
+          const auto         reduced_identities =
+            query_identities(fe_index_1, fe_index_2);
+
+          std::vector<std::set<std::pair<unsigned int, unsigned int>>>
+            complete_identities;
+
+          for (const auto &reduced_identity : reduced_identities)
+            {
+              // Each identity returned by query_identities() is a pair of
+              // dof indices. Prefix each with its fe index and put the result
+              // into a vector
+              std::set<std::pair<unsigned int, unsigned int>>
+                complete_identity = {{fe_index_1, reduced_identity.first},
+                                     {fe_index_2, reduced_identity.second}};
+              complete_identities.emplace_back(std::move(complete_identity));
+            }
+
+          return complete_identities;
+        }
+
+      // Now for the general case of three or more elements:
+      //
       // Consider all degrees of freedom of the identified elements (represented
       // via (fe_index,dof_index) pairs) as the nodes in a graph. Then draw
       // edges for all DoFs that are identified based on what the elements
