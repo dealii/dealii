@@ -296,7 +296,7 @@ namespace hp
      * Implement the action of the hp_*_dof_identities() functions
      * in a generic way.
      */
-    std::vector<std::set<std::pair<unsigned int, unsigned int>>>
+    std::vector<std::map<unsigned int, unsigned int>>
     compute_hp_dof_identities(
       const std::set<unsigned int> &fes,
       const std::function<std::vector<std::pair<unsigned int, unsigned int>>(
@@ -318,17 +318,16 @@ namespace hp
           const auto         reduced_identities =
             query_identities(fe_index_1, fe_index_2);
 
-          std::vector<std::set<std::pair<unsigned int, unsigned int>>>
-            complete_identities;
+          std::vector<std::map<unsigned int, unsigned int>> complete_identities;
 
           for (const auto &reduced_identity : reduced_identities)
             {
               // Each identity returned by query_identities() is a pair of
               // dof indices. Prefix each with its fe index and put the result
               // into a vector
-              std::set<std::pair<unsigned int, unsigned int>>
-                complete_identity = {{fe_index_1, reduced_identity.first},
-                                     {fe_index_2, reduced_identity.second}};
+              std::map<unsigned int, unsigned int> complete_identity = {
+                {fe_index_1, reduced_identity.first},
+                {fe_index_2, reduced_identity.second}};
               complete_identities.emplace_back(std::move(complete_identity));
             }
 
@@ -416,7 +415,7 @@ namespace hp
       // run through because it modifies the graph and thus invalidates
       // iterators. But because SG stores all of these edges, we can remove them
       // all from G after collecting the edges in SG.)
-      std::vector<std::set<Node>> identities;
+      std::vector<std::map<unsigned int, unsigned int>> identities;
       while (identities_graph.size() > 0)
         {
           Graph          sub_graph;       // SG
@@ -470,7 +469,16 @@ namespace hp
           // At this point we're sure that we have extracted a complete
           // sub-graph ("clique"). The DoFs involved are all identical then, and
           // we will store this identity so we can return it later.
-          identities.emplace_back(std::move(sub_graph_nodes));
+          //
+          // The sub-graph is given as a set of Node objects, which is just
+          // a collection of (fe_index,dof_index) pairs. Because each
+          // fe_index can only appear once there, a better data structure
+          // is a std::map from fe_index to dof_index, which can conveniently
+          // be initialized from a range of iterators to pairs:
+          identities.emplace_back(sub_graph_nodes.begin(),
+                                  sub_graph_nodes.end());
+          Assert(identities.back().size() == sub_graph_nodes.size(),
+                 ExcInternalError());
         }
 
       return identities;
@@ -480,7 +488,7 @@ namespace hp
 
 
   template <int dim, int spacedim>
-  std::vector<std::set<std::pair<unsigned int, unsigned int>>>
+  std::vector<std::map<unsigned int, unsigned int>>
   FECollection<dim, spacedim>::hp_vertex_dof_identities(
     const std::set<unsigned int> &fes) const
   {
@@ -494,7 +502,7 @@ namespace hp
 
 
   template <int dim, int spacedim>
-  std::vector<std::set<std::pair<unsigned int, unsigned int>>>
+  std::vector<std::map<unsigned int, unsigned int>>
   FECollection<dim, spacedim>::hp_line_dof_identities(
     const std::set<unsigned int> &fes) const
   {
@@ -508,7 +516,7 @@ namespace hp
 
 
   template <int dim, int spacedim>
-  std::vector<std::set<std::pair<unsigned int, unsigned int>>>
+  std::vector<std::map<unsigned int, unsigned int>>
   FECollection<dim, spacedim>::hp_quad_dof_identities(
     const std::set<unsigned int> &fes,
     const unsigned int            face_no) const
