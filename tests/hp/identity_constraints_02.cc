@@ -21,12 +21,14 @@
 // On each of the four lines on the interface between the Q2 and Q4 element, the
 // central dofs are identical and will be treated with constraints.
 //
-// If the dominating element in the collection of finite elements on the central
-// line does not have a central dof, the dof duplicates on the elements Q2 and
-// Q4 will not be recognized with constraints.
-// This is the reason why there is one identity constraint less in scenario 1
-// than in scenario 2 -- the dominating Q1 element has no dofs on lines.
-// This is a bug.
+// We put special emphasis on the central line.
+// - In scenario 1, the central dof of the central line will be constrained
+//   against the vertex dofs of the Q1 element. Thus, we only have 3 identity
+//   constraints in total on the remaining lines of the interface between the Q2
+//   and Q4 element.
+// - In scenario 2, the central dof of the central line belongs to the Q2
+//   element and remains unconstrained. Thus, we end up with 4 identity
+//   constraints.
 //
 // Scenario 1:    Scenario 2:
 // +----+----+    +----+----+
