@@ -68,10 +68,11 @@ test()
   std::vector<bool> mask(2, true);
   mask[1] = false;
   AffineConstraints<double> cm;
-  DoFTools::make_periodicity_constraints(dof_handler.begin(0)->face(0),
-                                         (++dof_handler.begin(0))->face(1),
-                                         cm,
-                                         mask);
+  DoFTools::make_periodicity_constraints(
+    dof_handler.begin(0)->face(0),
+    (std::next(dof_handler.begin(0)))->face(1),
+    cm,
+    mask);
   cm.print(deallog.get_file_stream());
 }
 

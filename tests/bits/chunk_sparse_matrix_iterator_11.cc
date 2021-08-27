@@ -20,6 +20,8 @@
 
 #include <deal.II/lac/chunk_sparse_matrix.h>
 
+#include <iterator>
+
 #include "../tests.h"
 
 

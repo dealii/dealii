@@ -20,6 +20,8 @@
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/sparsity_pattern.h>
 
+#include <iterator>
+
 #include "../tests.h"
 
 

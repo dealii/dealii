@@ -78,7 +78,8 @@ check_this(const DoFHandler<dim> &dof_handler)
   unsigned int hash = 0;
   for (unsigned int l = 0; l < sp.n_rows(); ++l)
     hash +=
-      l * (sp.row_length(l) + (sp.begin(l) - sp.begin()) +
-           (sp.row_length(l) > 1 ? ++sp.begin(l) : sp.begin(l))->column());
+      l *
+      (sp.row_length(l) + (sp.begin(l) - sp.begin()) +
+       (sp.row_length(l) > 1 ? std::next(sp.begin(l)) : sp.begin(l))->column());
   deallog << hash << std::endl;
 }
