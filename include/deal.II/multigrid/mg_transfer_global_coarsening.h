@@ -294,28 +294,31 @@ private:
 
     /**
      * Number of degrees of freedom of a coarse cell.
+     *
+     * @note For tensor-product elements, the value equals
+     *   `n_components * (degree_coarse + 1)^dim`.
      */
     unsigned int dofs_per_cell_coarse;
 
     /**
      * Number of degrees of freedom of fine cell.
+     *
+     * @note For tensor-product elements, the value equals
+     *   `n_components * (dofs_per_cell_fine + 1)^dim`.
      */
     unsigned int dofs_per_cell_fine;
 
     /**
-     * Polynomial degree of the finite element of the coarse cells.
+     * Polynomial degree of the finite element of a coarse cell.
      */
     unsigned int degree_coarse;
 
     /**
-     * Polynomial degree of the finite element of the fine cells.
+     * "Polynomial degree" of the finite element of the union of all children
+     * of a coarse cell, i.e., actually `degree_fine * 2 + 1` if a cell is
+     * refined.
      */
     unsigned int degree_fine;
-
-    /**
-     * Weights for continuous elements.
-     */
-    std::vector<Number> weights;
 
     /**
      * Prolongation matrix for non-tensor-product elements.
@@ -336,18 +339,6 @@ private:
      * 1D restriction matrix for tensor-product elements.
      */
     AlignedVector<VectorizedArray<Number>> restriction_matrix_1d;
-
-    /**
-     * DoF indices of the coarse cells, expressed in indices local to the MPI
-     * rank.
-     */
-    std::vector<unsigned int> level_dof_indices_coarse;
-
-    /**
-     * DoF indices of the fine cells, expressed in indices local to the MPI
-     * rank.
-     */
-    std::vector<unsigned int> level_dof_indices_fine;
   };
 
   /**
@@ -429,6 +420,23 @@ private:
    * constraint_coarse.distribute_local_to_global().
    */
   std::vector<unsigned int> distribute_local_to_global_ptr;
+
+  /**
+   * Weights for continuous elements.
+   */
+  std::vector<Number> weights;
+
+  /**
+   * DoF indices of the coarse cells, expressed in indices local to the MPI
+   * rank.
+   */
+  std::vector<unsigned int> level_dof_indices_coarse;
+
+  /**
+   * DoF indices of the fine cells, expressed in indices local to the MPI
+   * rank.
+   */
+  std::vector<unsigned int> level_dof_indices_fine;
 
   /**
    * Number of components.
