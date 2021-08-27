@@ -37,7 +37,7 @@ test()
   // attach a sparse matrix to it
   SparseMatrix<double> A(sparsity);
 
-  SparseMatrix<double>::const_iterator k = A.begin(), j = ++A.begin();
+  SparseMatrix<double>::const_iterator k = A.begin(), j = std::next(A.begin());
 
   AssertThrow(k < j, ExcInternalError());
   AssertThrow(j > k, ExcInternalError());

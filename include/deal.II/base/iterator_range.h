@@ -114,10 +114,11 @@ class IteratorOverIterators;
  * way that if you <i>dereference</i> the result of IteratorRange::begin(),
  * you get the <code>b</code> iterator. Furthermore, you must be able to
  * increment the object returned by IteratorRange::begin() so that
- * <code>*(++begin()) == b+1</code>. In other words, IteratorRange::begin()
- * must return an iterator that when dereferenced returns an iterator of the
- * template type <code>Iterator</code>: It is an iterator over iterators in
- * the same sense as if you had a pointer into an array of pointers.
+ * <code>*(std::next(begin())) == b+1</code>. In other words,
+ * IteratorRange::begin() must return an iterator that when dereferenced returns
+ * an iterator of the template type <code>Iterator</code>: It is an iterator
+ * over iterators in the same sense as if you had a pointer into an array of
+ * pointers.
  *
  * This is implemented in the form of the IteratorRange::IteratorOverIterators
  * class.

@@ -62,8 +62,8 @@ test()
   // assign boundary ids
   triangulation.begin()->face(0)->set_boundary_id(12);
   triangulation.begin()->face(1)->set_boundary_id(13);
-  (++triangulation.begin())->face(0)->set_boundary_id(14);
-  (++triangulation.begin())->face(1)->set_boundary_id(15);
+  std::next(triangulation.begin())->face(0)->set_boundary_id(14);
+  std::next(triangulation.begin())->face(1)->set_boundary_id(15);
 
 
   hp::FECollection<1, spacedim> fe;
