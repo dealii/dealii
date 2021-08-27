@@ -34,7 +34,7 @@ test()
   GridGenerator::hyper_cube(tria);
   tria.refine_global(2);
   tria.begin_active()->set_coarsen_flag();
-  (++(tria.begin_active()))->set_coarsen_flag();
+  (std::next((tria.begin_active())))->set_coarsen_flag();
   tria.execute_coarsening_and_refinement();
 
   std::map<typename Triangulation<dim, spacedim>::face_iterator, unsigned int>

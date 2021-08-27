@@ -193,8 +193,8 @@ test()
   dof_1.begin_active()->set_future_fe_index(0);
   dof_2.begin_active()->set_future_fe_index(0);
 
-  (++dof_1.begin_active())->set_future_fe_index(1);
-  (++dof_2.begin_active())->set_future_fe_index(1);
+  (std::next(dof_1.begin_active()))->set_future_fe_index(1);
+  (std::next(dof_2.begin_active()))->set_future_fe_index(1);
 
   // right now, both hp::DoFHandlers are the same. Renumber one of them
   DoFRenumbering::random(dof_1);

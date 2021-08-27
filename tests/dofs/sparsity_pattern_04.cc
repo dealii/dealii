@@ -69,7 +69,7 @@ check()
   else
     GridGenerator::hyper_cube(triangulation_2, -1, 1);
   triangulation_2.refine_global(1);
-  (++triangulation_2.begin_active())->set_refine_flag();
+  (std::next(triangulation_2.begin_active()))->set_refine_flag();
   triangulation_2.execute_coarsening_and_refinement();
   (++triangulation_2.begin_active(2))->set_refine_flag();
   triangulation_2.execute_coarsening_and_refinement();

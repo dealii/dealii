@@ -341,10 +341,10 @@ test_with_2d_deformed_refined_mesh(const FiniteElement<dim> &fe,
             triangulation.begin_active()->set_refine_flag();
             break;
           case 1:
-            (++(triangulation.begin_active()))->set_refine_flag();
+            (std::next((triangulation.begin_active())))->set_refine_flag();
             break;
           case 2:
-            (++(++(triangulation.begin_active())))->set_refine_flag();
+            (std::next((++(triangulation.begin_active()))))->set_refine_flag();
             break;
           default:
             Assert(false, ExcNotImplemented());

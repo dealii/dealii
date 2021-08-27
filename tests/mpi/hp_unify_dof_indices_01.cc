@@ -61,8 +61,8 @@ test()
   DoFHandler<dim> dof_handler(triangulation);
   if (dof_handler.begin_active()->is_locally_owned())
     dof_handler.begin_active()->set_active_fe_index(0);
-  if ((++dof_handler.begin_active())->is_locally_owned())
-    (++dof_handler.begin_active())->set_active_fe_index(1);
+  if ((std::next(dof_handler.begin_active()))->is_locally_owned())
+    (std::next(dof_handler.begin_active()))->set_active_fe_index(1);
   dof_handler.distribute_dofs(fe);
 
   log_dof_diagnostics(dof_handler);

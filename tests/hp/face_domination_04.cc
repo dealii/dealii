@@ -89,7 +89,7 @@ main()
 
       deallog << "RTNodal of degree " << i << std::endl;
       print_dofs(dof_handler.begin_active());
-      print_dofs(++dof_handler.begin_active());
+      print_dofs(std::next(dof_handler.begin_active()));
 
       AffineConstraints<double> constraints;
       constraints.clear();

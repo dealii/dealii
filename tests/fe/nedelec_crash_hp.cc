@@ -68,7 +68,7 @@ test()
                                             Point<dim>(),
                                             (dim == 3 ? Point<dim>(2, 1, 1) :
                                                         Point<dim>(2, 1)));
-  (++triangulation.begin_active())->set_refine_flag();
+  (std::next(triangulation.begin_active()))->set_refine_flag();
   triangulation.execute_coarsening_and_refinement();
 
   hp::FECollection<dim> fe;

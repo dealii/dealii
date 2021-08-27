@@ -42,7 +42,7 @@ main()
   create_two_cubes(coarse_grid);
 
   const Triangulation<3>::active_cell_iterator cells[2] = {
-    coarse_grid.begin_active(), ++coarse_grid.begin_active()};
+    coarse_grid.begin_active(), std::next(coarse_grid.begin_active())};
 
   // output all vertices
   for (unsigned int c = 0; c < 2; ++c)

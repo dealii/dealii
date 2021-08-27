@@ -69,7 +69,7 @@ test(std::ostream & /*out*/)
   tr.refine_global();
 
   tr.begin_active()->set_refine_flag();
-  (++(tr.begin_active()))->set_refine_flag();
+  (std::next((tr.begin_active())))->set_refine_flag();
 
   tr.execute_coarsening_and_refinement();
 

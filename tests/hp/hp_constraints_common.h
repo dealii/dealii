@@ -304,10 +304,10 @@ test_with_2d_deformed_refined_mesh(const hp::FECollection<dim> &fe)
             triangulation.begin_active()->set_refine_flag();
             break;
           case 1:
-            (++(triangulation.begin_active()))->set_refine_flag();
+            (std::next((triangulation.begin_active())))->set_refine_flag();
             break;
           case 2:
-            (++(++(triangulation.begin_active())))->set_refine_flag();
+            (std::next((++(triangulation.begin_active()))))->set_refine_flag();
             break;
           default:
             Assert(false, ExcNotImplemented());
@@ -349,7 +349,7 @@ test_interpolation_base(const hp::FECollection<dim> &    fe,
 
   if (do_refine)
     {
-      (++triangulation.begin_active())->set_refine_flag();
+      (std::next(triangulation.begin_active()))->set_refine_flag();
       triangulation.execute_coarsening_and_refinement();
     }
 
