@@ -275,6 +275,20 @@ namespace TimeStepping
       double      delta_t,
       VectorType &y) = 0;
 
+    /**
+     * This function is used to advance from time @p t to t+ @p delta_t with
+     * an explicit scheme. It is similar to the previous function, but does not
+     * require id_minus_tau_J_inverse because it is not used for explicit
+     * methods. evolve_one_time_step returns the time at the end of the time
+     * step.
+     */
+    virtual double
+    evolve_one_time_step(
+      const std::function<VectorType(const double, const VectorType &)> &f,
+      double                                                             t,
+      double      delta_t,
+      VectorType &y) = 0;
+
   protected:
     /**
      * Number of stages of the Runge-Kutta method.
@@ -360,7 +374,7 @@ namespace TimeStepping
       const std::function<VectorType(const double, const VectorType &)> &f,
       double                                                             t,
       double      delta_t,
-      VectorType &y);
+      VectorType &y) override;
 
     /**
      * This structure stores the name of the method used.
@@ -749,7 +763,7 @@ namespace TimeStepping
       const std::function<VectorType(const double, const VectorType &)> &f,
       double                                                             t,
       double      delta_t,
-      VectorType &y);
+      VectorType &y) override;
 
     /**
      * Set the parameters necessary for the time adaptation.
