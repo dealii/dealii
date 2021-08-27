@@ -787,10 +787,15 @@ make_array_view(ArrayView<Number, MemorySpaceType> &array_view)
  * order in which the entries are presented in the array is an implementation
  * detail and should not be relied upon.
  *
+ * @deprecated This function suggests that the elements of a Tensor
+ *   object are stored as a contiguous array, but this is not in fact true
+ *   and one should not pretend that this so. As a consequence, this function
+ *   is deprecated.
+ *
  * @relatesalso ArrayView
  */
 template <int rank, int dim, typename Number>
-inline ArrayView<const Number>
+DEAL_II_DEPRECATED_EARLY inline ArrayView<const Number>
 make_array_view(const Tensor<rank, dim, Number> &tensor)
 {
   return make_array_view(tensor.begin_raw(), tensor.end_raw());
@@ -812,10 +817,15 @@ make_array_view(const Tensor<rank, dim, Number> &tensor)
  * order in which the entries are presented in the array is an implementation
  * detail and should not be relied upon.
  *
+ * @deprecated This function suggests that the elements of a Tensor
+ *   object are stored as a contiguous array, but this is not in fact true
+ *   and one should not pretend that this so. As a consequence, this function
+ *   is deprecated.
+ *
  * @relatesalso ArrayView
  */
 template <int rank, int dim, typename Number>
-inline ArrayView<Number>
+DEAL_II_DEPRECATED_EARLY inline ArrayView<Number>
 make_array_view(Tensor<rank, dim, Number> &tensor)
 {
   return make_array_view(tensor.begin_raw(), tensor.end_raw());
@@ -837,10 +847,15 @@ make_array_view(Tensor<rank, dim, Number> &tensor)
  * the order in which the entries are presented in the array is an
  * implementation detail and should not be relied upon.
  *
+ * @deprecated This function suggests that the elements of a SymmetricTensor
+ *   object are stored as a contiguous array, but this is not in fact true
+ *   and one should not pretend that this so. As a consequence, this function
+ *   is deprecated.
+ *
  * @relatesalso ArrayView
  */
 template <int rank, int dim, typename Number>
-inline ArrayView<const Number>
+DEAL_II_DEPRECATED_EARLY inline ArrayView<const Number>
 make_array_view(const SymmetricTensor<rank, dim, Number> &tensor)
 {
   return make_array_view(tensor.begin_raw(), tensor.end_raw());
@@ -863,10 +878,15 @@ make_array_view(const SymmetricTensor<rank, dim, Number> &tensor)
  * the order in which the entries are presented in the array is an
  * implementation detail and should not be relied upon.
  *
+ * @deprecated This function suggests that the elements of a SymmetricTensor
+ *   object are stored as a contiguous array, but this is not in fact true
+ *   and one should not pretend that this so. As a consequence, this function
+ *   is deprecated.
+ *
  * @relatesalso ArrayView
  */
 template <int rank, int dim, typename Number>
-inline ArrayView<Number>
+DEAL_II_DEPRECATED_EARLY inline ArrayView<Number>
 make_array_view(SymmetricTensor<rank, dim, Number> &tensor)
 {
   return make_array_view(tensor.begin_raw(), tensor.end_raw());
