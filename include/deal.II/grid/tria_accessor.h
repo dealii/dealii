@@ -3751,6 +3751,15 @@ public:
   is_artificial() const;
 
   /**
+   * Similar to is_artificial() but checking the conditions on the levels.
+   *
+   * @post The returned value is equal to <code>!is_ghost_on_level() &&
+   * !is_locally_owned_on_level()</code>.
+   */
+  bool
+  is_artificial_on_level() const;
+
+  /**
    * Test whether the point @p p is inside this cell. Points on the boundary
    * are counted as being inside the cell.
    *

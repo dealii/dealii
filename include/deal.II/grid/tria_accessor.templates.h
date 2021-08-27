@@ -3784,6 +3784,19 @@ CellAccessor<dim, spacedim>::is_artificial() const
 
 
 template <int dim, int spacedim>
+inline bool
+CellAccessor<dim, spacedim>::is_artificial_on_level() const
+{
+#ifndef DEAL_II_WITH_MPI
+  return false;
+#else
+  return (is_locally_owned_on_level() || is_ghost_on_level()) == false;
+#endif
+}
+
+
+
+template <int dim, int spacedim>
 inline types::subdomain_id
 CellAccessor<dim, spacedim>::subdomain_id() const
 {
