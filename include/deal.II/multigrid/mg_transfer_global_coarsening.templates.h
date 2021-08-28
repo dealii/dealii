@@ -418,22 +418,24 @@ namespace internal
   class FineDoFHandlerView
   {
   public:
-    FineDoFHandlerView(const DoFHandler<dim> &mesh_fine,
-                       const DoFHandler<dim> &mesh_coarse,
+    FineDoFHandlerView(const DoFHandler<dim> &dof_handler_fine,
+                       const DoFHandler<dim> &dof_handler_coarse,
                        const unsigned int     mg_level_fine)
-      : mesh_fine(mesh_fine)
-      , mesh_coarse(mesh_coarse)
+      : dof_handler_fine(dof_handler_fine)
+      , dof_handler_coarse(dof_handler_coarse)
       , mg_level_fine(mg_level_fine)
       , communicator(
-          mesh_fine.get_communicator() /*TODO: fix for different comms*/)
+          dof_handler_fine.get_communicator() /*TODO: fix for different comms*/)
       , cell_id_translator(
-          mesh_fine.get_triangulation().n_global_coarse_cells(),
-          mesh_fine.get_triangulation().n_global_levels())
+          dof_handler_fine.get_triangulation().n_global_coarse_cells(),
+          dof_handler_fine.get_triangulation().n_global_levels())
     {
-      AssertDimension(mesh_fine.get_triangulation().n_global_coarse_cells(),
-                      mesh_coarse.get_triangulation().n_global_coarse_cells());
-      AssertIndexRange(mesh_coarse.get_triangulation().n_global_levels(),
-                       mesh_fine.get_triangulation().n_global_levels() + 1);
+      AssertDimension(
+        dof_handler_fine.get_triangulation().n_global_coarse_cells(),
+        dof_handler_coarse.get_triangulation().n_global_coarse_cells());
+      AssertIndexRange(dof_handler_coarse.get_triangulation().n_global_levels(),
+                       dof_handler_fine.get_triangulation().n_global_levels() +
+                         1);
     }
 
     void
@@ -506,22 +508,6 @@ namespace internal
       this->is_dst_remote        = is_dst_remote;
       this->is_src_locally_owned = is_src_locally_owned;
 
-#  if false
-        std::cout << "IS_SRC_LOCALLY_OWNED" << std::endl;
-        for (auto i : is_src_locally_owned)
-          std::cout << cell_id_translator.to_cell_id(i) << std::endl;
-        std::cout << std::endl << std::endl << std::endl;
-
-
-        std::cout << "IS_DST_LOCALLY_OWNED" << std::endl;
-        for (auto i : is_dst_locally_owned)
-          std::cout << cell_id_translator.to_cell_id(i) << std::endl;
-        std::cout << std::endl << std::endl << std::endl;
-#  endif
-
-      const auto &dof_handler_dst = mesh_fine; // TODO: remove
-      const auto &tria_dst        = mesh_fine.get_triangulation(); // TODO
-
       const auto targets_with_indexset = process.get_requesters();
 
       std::map<unsigned int, std::vector<types::global_dof_index>>
@@ -541,9 +527,9 @@ namespace internal
             for (auto cell_id : i.second)
               {
                 typename DoFHandler<dim>::cell_iterator cell(
-                  *tria_dst.create_cell_iterator(
+                  *dof_handler_fine.get_triangulation().create_cell_iterator(
                     cell_id_translator.to_cell_id(cell_id)),
-                  &dof_handler_dst);
+                  &dof_handler_fine);
 
                 indices.resize(cell->get_fe().n_dofs_per_cell());
 
@@ -581,7 +567,9 @@ namespace internal
             const auto cell_id = cell_id_translator.to_cell_id(id);
 
             typename DoFHandler<dim>::cell_iterator cell_(
-              *tria_dst.create_cell_iterator(cell_id), &dof_handler_dst);
+              *dof_handler_fine.get_triangulation().create_cell_iterator(
+                cell_id),
+              &dof_handler_fine);
 
             indices.resize(cell_->get_fe().n_dofs_per_cell());
 
@@ -646,12 +634,12 @@ namespace internal
             AssertThrowMPI(ierr_3);
 
             for (unsigned int i = 0; i < buffer.size();
-                 i += dof_handler_dst.get_fe(buffer[i]).n_dofs_per_cell() + 1)
+                 i += dof_handler_fine.get_fe(buffer[i]).n_dofs_per_cell() + 1)
               ghost_indices.insert(
                 ghost_indices.end(),
                 buffer.begin() + i + 1,
                 buffer.begin() + i + 1 +
-                  dof_handler_dst.get_fe(buffer[i]).n_dofs_per_cell());
+                  dof_handler_fine.get_fe(buffer[i]).n_dofs_per_cell());
 
             const unsigned int rank = status.MPI_SOURCE;
 
@@ -664,7 +652,7 @@ namespace internal
                 const unsigned int active_fe_index = buffer[k++];
 
                 indices.resize(
-                  dof_handler_dst.get_fe(active_fe_index).n_dofs_per_cell());
+                  dof_handler_fine.get_fe(active_fe_index).n_dofs_per_cell());
 
                 for (unsigned int j = 0; j < indices.size(); ++j, ++k)
                   indices[j] = buffer[k];
@@ -684,13 +672,13 @@ namespace internal
 
       this->is_extended_locally_owned =
         mg_level_fine == numbers::invalid_unsigned_int ?
-          dof_handler_dst.locally_owned_dofs() :
-          dof_handler_dst.locally_owned_mg_dofs(mg_level_fine);
+          dof_handler_fine.locally_owned_dofs() :
+          dof_handler_fine.locally_owned_mg_dofs(mg_level_fine);
 
       this->is_extended_ghosts =
         IndexSet(mg_level_fine == numbers::invalid_unsigned_int ?
-                   dof_handler_dst.n_dofs() :
-                   dof_handler_dst.n_dofs(mg_level_fine));
+                   dof_handler_fine.n_dofs() :
+                   dof_handler_fine.n_dofs(mg_level_fine));
       this->is_extended_ghosts.add_indices(ghost_indices.begin(),
                                            ghost_indices.end());
       this->is_extended_ghosts.subtract_set(this->is_extended_locally_owned);
@@ -730,8 +718,9 @@ namespace internal
           if (is_cell_locally_owned)
             {
               typename DoFHandler<dim>::cell_iterator cell_fine(
-                *mesh_fine.get_triangulation().create_cell_iterator(cell->id()),
-                &mesh_fine);
+                *dof_handler_fine.get_triangulation().create_cell_iterator(
+                  cell->id()),
+                &dof_handler_fine);
               if (mg_level_fine == numbers::invalid_unsigned_int)
                 cell_fine->get_dof_indices(dof_indices);
               else
@@ -751,9 +740,9 @@ namespace internal
           if (is_cell_locally_owned)
             {
               return (typename DoFHandler<dim>::cell_iterator(
-                        *mesh_fine.get_triangulation().create_cell_iterator(
-                          cell->id()),
-                        &mesh_fine))
+                        *dof_handler_fine.get_triangulation()
+                           .create_cell_iterator(cell->id()),
+                        &dof_handler_fine))
                 ->active_fe_index();
             }
           else if (is_cell_remotly_owned)
@@ -791,9 +780,9 @@ namespace internal
             {
               const auto cell_fine =
                 (typename DoFHandler<dim>::cell_iterator(
-                   *mesh_fine.get_triangulation().create_cell_iterator(
+                   *dof_handler_fine.get_triangulation().create_cell_iterator(
                      cell->id()),
-                   &mesh_fine))
+                   &dof_handler_fine))
                   ->child(c);
 
               if (mg_level_fine == numbers::invalid_unsigned_int)
@@ -832,8 +821,8 @@ namespace internal
     }
 
   private:
-    const DoFHandler<dim> &mesh_fine;
-    const DoFHandler<dim> &mesh_coarse;
+    const DoFHandler<dim> &dof_handler_fine;
+    const DoFHandler<dim> &dof_handler_coarse;
     const unsigned int     mg_level_fine;
     const MPI_Comm         communicator;
 
