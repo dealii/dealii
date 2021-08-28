@@ -1463,22 +1463,29 @@ namespace internal
           get_child_offsets_general<dim>(
             transfer.schemes[0].dofs_per_cell_coarse);
 
+      std::vector<unsigned int> n_dof_indices_fine(transfer.schemes.size() + 1);
+      std::vector<unsigned int> n_dof_indices_coarse(transfer.schemes.size() +
+                                                     1);
+
+      for (unsigned int i = 0; i < transfer.schemes.size(); ++i)
+        {
+          n_dof_indices_fine[i + 1] = transfer.schemes[i].dofs_per_cell_fine *
+                                      transfer.schemes[i].n_coarse_cells;
+          n_dof_indices_coarse[i + 1] =
+            transfer.schemes[i].dofs_per_cell_coarse *
+            transfer.schemes[i].n_coarse_cells;
+        }
+
+      for (unsigned int i = 0; i < transfer.schemes.size(); ++i)
+        {
+          n_dof_indices_fine[i + 1] += n_dof_indices_fine[i];
+          n_dof_indices_coarse[i + 1] += n_dof_indices_coarse[i];
+        }
 
       // indices
       {
-        transfer.schemes[0].level_dof_indices_fine.resize(
-          transfer.schemes[0].dofs_per_cell_fine *
-          transfer.schemes[0].n_coarse_cells);
-        transfer.schemes[0].level_dof_indices_coarse.resize(
-          transfer.schemes[0].dofs_per_cell_coarse *
-          transfer.schemes[0].n_coarse_cells);
-
-        transfer.schemes[1].level_dof_indices_fine.resize(
-          transfer.schemes[1].dofs_per_cell_fine *
-          transfer.schemes[1].n_coarse_cells);
-        transfer.schemes[1].level_dof_indices_coarse.resize(
-          transfer.schemes[1].dofs_per_cell_coarse *
-          transfer.schemes[1].n_coarse_cells);
+        transfer.level_dof_indices_fine.resize(n_dof_indices_fine.back());
+        transfer.level_dof_indices_coarse.resize(n_dof_indices_coarse.back());
 
         std::vector<types::global_dof_index> local_dof_indices(
           transfer.schemes[0].dofs_per_cell_coarse);
@@ -1504,14 +1511,17 @@ namespace internal
 
         // ------------------------------ indices ------------------------------
         unsigned int *level_dof_indices_coarse_0 =
-          &transfer.schemes[0].level_dof_indices_coarse[0];
+          transfer.level_dof_indices_coarse.data();
         unsigned int *level_dof_indices_fine_0 =
-          &transfer.schemes[0].level_dof_indices_fine[0];
+          transfer.level_dof_indices_fine.data();
 
         unsigned int *level_dof_indices_coarse_1 =
-          &transfer.schemes[1].level_dof_indices_coarse[0];
+          level_dof_indices_coarse_0 +
+          transfer.schemes[0].dofs_per_cell_coarse *
+            transfer.schemes[0].n_coarse_cells;
         unsigned int *level_dof_indices_fine_1 =
-          &transfer.schemes[1].level_dof_indices_fine[0];
+          level_dof_indices_fine_0 + transfer.schemes[0].dofs_per_cell_fine *
+                                       transfer.schemes[0].n_coarse_cells;
 
         process_cells(
           [&](const auto &cell_coarse, const auto &cell_fine) {
@@ -1705,19 +1715,14 @@ namespace internal
                           weight_vector);
 
           // ... and store them cell-wise a DG format
-          transfer.schemes[0].weights.resize(
-            transfer.schemes[0].n_coarse_cells *
-            transfer.schemes[0].dofs_per_cell_fine);
-          transfer.schemes[1].weights.resize(
-            transfer.schemes[1].n_coarse_cells *
-            transfer.schemes[1].dofs_per_cell_fine);
+          transfer.weights.resize(n_dof_indices_fine.back());
 
-          Number *      weights_0 = &transfer.schemes[0].weights[0];
-          Number *      weights_1 = &transfer.schemes[1].weights[0];
+          Number *weights_0 = transfer.weights.data() + n_dof_indices_fine[0];
+          Number *weights_1 = transfer.weights.data() + n_dof_indices_fine[1];
           unsigned int *dof_indices_fine_0 =
-            &transfer.schemes[0].level_dof_indices_fine[0];
+            transfer.level_dof_indices_fine.data() + n_dof_indices_fine[0];
           unsigned int *dof_indices_fine_1 =
-            &transfer.schemes[1].level_dof_indices_fine[0];
+            transfer.level_dof_indices_fine.data() + n_dof_indices_fine[1];
 
           process_cells(
             [&](const auto &, const auto &) {
@@ -1915,6 +1920,9 @@ namespace internal
                                            transfer);
       }
 
+      std::vector<unsigned int> n_dof_indices_fine(fe_index_pairs.size() + 1);
+      std::vector<unsigned int> n_dof_indices_coarse(fe_index_pairs.size() + 1);
+
       {
         std::vector<std::vector<unsigned int>> lexicographic_numbering_fine(
           fe_index_pairs.size());
@@ -1932,14 +1940,12 @@ namespace internal
             local_dof_indices_fine[fe_index_pair.second].resize(
               transfer.schemes[fe_index_pair.second].dofs_per_cell_fine);
 
-            transfer.schemes[fe_index_pair.second]
-              .level_dof_indices_fine.resize(
-                transfer.schemes[fe_index_pair.second].dofs_per_cell_fine *
-                transfer.schemes[fe_index_pair.second].n_coarse_cells);
-            transfer.schemes[fe_index_pair.second]
-              .level_dof_indices_coarse.resize(
-                transfer.schemes[fe_index_pair.second].dofs_per_cell_coarse *
-                transfer.schemes[fe_index_pair.second].n_coarse_cells);
+            n_dof_indices_fine[fe_index_pair.second + 1] =
+              transfer.schemes[fe_index_pair.second].dofs_per_cell_fine *
+              transfer.schemes[fe_index_pair.second].n_coarse_cells;
+            n_dof_indices_coarse[fe_index_pair.second + 1] =
+              transfer.schemes[fe_index_pair.second].dofs_per_cell_coarse *
+              transfer.schemes[fe_index_pair.second].n_coarse_cells;
 
             const auto reference_cell =
               dof_handler_fine.get_fe(fe_index_pair.first.second)
@@ -1992,6 +1998,15 @@ namespace internal
               }
           }
 
+        for (unsigned int i = 0; i < fe_index_pairs.size(); ++i)
+          {
+            n_dof_indices_fine[i + 1] += n_dof_indices_fine[i];
+            n_dof_indices_coarse[i + 1] += n_dof_indices_coarse[i];
+          }
+
+        transfer.level_dof_indices_fine.resize(n_dof_indices_fine.back());
+        transfer.level_dof_indices_coarse.resize(n_dof_indices_coarse.back());
+
         // ------------------------------ indices  -----------------------------
         std::vector<unsigned int *> level_dof_indices_coarse_(
           fe_index_pairs.size());
@@ -2000,10 +2015,11 @@ namespace internal
 
         for (unsigned int i = 0; i < fe_index_pairs.size(); ++i)
           {
-            level_dof_indices_coarse_[i] =
-              transfer.schemes[i].level_dof_indices_coarse.data();
             level_dof_indices_fine_[i] =
-              transfer.schemes[i].level_dof_indices_fine.data();
+              transfer.level_dof_indices_fine.data() + n_dof_indices_fine[i];
+            level_dof_indices_coarse_[i] =
+              transfer.level_dof_indices_coarse.data() +
+              n_dof_indices_coarse[i];
           }
 
         bool           fine_indices_touch_remote_dofs = false;
@@ -2200,9 +2216,7 @@ namespace internal
                           weight_vector);
 
           // ... and store them cell-wise a DG format
-          for (auto &scheme : transfer.schemes)
-            scheme.weights.resize(scheme.n_coarse_cells *
-                                  scheme.dofs_per_cell_fine);
+          transfer.weights.resize(n_dof_indices_fine.back());
 
           std::vector<unsigned int *> level_dof_indices_fine_(
             fe_index_pairs.size());
@@ -2211,8 +2225,8 @@ namespace internal
           for (unsigned int i = 0; i < fe_index_pairs.size(); ++i)
             {
               level_dof_indices_fine_[i] =
-                &transfer.schemes[i].level_dof_indices_fine[0];
-              weights_[i] = &transfer.schemes[i].weights[0];
+                transfer.level_dof_indices_fine.data() + n_dof_indices_fine[i];
+              weights_[i] = transfer.weights.data() + n_dof_indices_fine[i];
             }
 
           process_cells([&](const auto &cell_coarse, const auto &cell_fine) {
@@ -2495,20 +2509,18 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
   AlignedVector<VectorizedArrayType> evaluation_data_fine;
   AlignedVector<VectorizedArrayType> evaluation_data_coarse;
 
+  const unsigned int *indices_coarse = level_dof_indices_coarse.data();
+  const unsigned int *indices_fine   = level_dof_indices_fine.data();
+  const Number *      weights        = nullptr;
+
+  if (fine_element_is_continuous)
+    weights = this->weights.data();
+
   for (const auto &scheme : schemes)
     {
       // identity -> take short cut and work directly on global vectors
       if (scheme.degree_fine == scheme.degree_coarse)
         {
-          const unsigned int *indices_fine =
-            scheme.level_dof_indices_fine.data();
-          const unsigned int *indices_coarse =
-            scheme.level_dof_indices_coarse.data();
-          const Number *weights = nullptr;
-
-          if (fine_element_is_continuous)
-            weights = scheme.weights.data();
-
           for (unsigned int cell = 0; cell < scheme.n_coarse_cells; ++cell)
             {
               if (fine_element_is_continuous)
@@ -2551,20 +2563,15 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
               n_lanes;
 
           // read from source vector
-          {
-            const unsigned int *indices =
-              &scheme
-                 .level_dof_indices_coarse[cell * scheme.dofs_per_cell_coarse];
-            for (unsigned int v = 0; v < n_lanes_filled; ++v)
-              {
-                for (unsigned int i = 0; i < scheme.dofs_per_cell_coarse; ++i)
-                  evaluation_data_coarse[i][v] =
-                    this->vec_coarse.local_element(indices[i]);
-                indices += scheme.dofs_per_cell_coarse;
-              }
-          }
+          for (unsigned int v = 0; v < n_lanes_filled; ++v)
+            {
+              for (unsigned int i = 0; i < scheme.dofs_per_cell_coarse; ++i)
+                evaluation_data_coarse[i][v] =
+                  this->vec_coarse.local_element(indices_coarse[i]);
+              indices_coarse += scheme.dofs_per_cell_coarse;
+            }
 
-          // ---------------------------- coarse -----------------------------
+          // ---------------------------- coarse -------------------------------
           for (int c = n_components - 1; c >= 0; --c)
             {
               CellProlongator<dim, VectorizedArrayType> cell_prolongator(
@@ -2579,34 +2586,25 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
                 cell_prolongator.run_full(n_scalar_dofs_fine,
                                           n_scalar_dofs_coarse);
             }
-          // ------------------------------ fine -----------------------------
+          // ------------------------------ fine -------------------------------
 
           // weight and write into dst vector
-          {
-            const unsigned int *indices =
-              &scheme.level_dof_indices_fine[cell * scheme.dofs_per_cell_fine];
-            const Number *weights = nullptr;
+          for (unsigned int v = 0; v < n_lanes_filled; ++v)
+            {
+              if (fine_element_is_continuous)
+                for (unsigned int i = 0; i < scheme.dofs_per_cell_fine; ++i)
+                  vec_fine_ptr->local_element(indices_fine[i]) +=
+                    evaluation_data_fine[i][v] * weights[i];
+              else
+                for (unsigned int i = 0; i < scheme.dofs_per_cell_fine; ++i)
+                  vec_fine_ptr->local_element(indices_fine[i]) +=
+                    evaluation_data_fine[i][v];
 
-            if (fine_element_is_continuous)
-              weights = &scheme.weights[cell * scheme.dofs_per_cell_fine];
+              indices_fine += scheme.dofs_per_cell_fine;
 
-            for (unsigned int v = 0; v < n_lanes_filled; ++v)
-              {
-                if (fine_element_is_continuous)
-                  for (unsigned int i = 0; i < scheme.dofs_per_cell_fine; ++i)
-                    vec_fine_ptr->local_element(indices[i]) +=
-                      evaluation_data_fine[i][v] * weights[i];
-                else
-                  for (unsigned int i = 0; i < scheme.dofs_per_cell_fine; ++i)
-                    vec_fine_ptr->local_element(indices[i]) +=
-                      evaluation_data_fine[i][v];
-
-                indices += scheme.dofs_per_cell_fine;
-
-                if (fine_element_is_continuous)
-                  weights += scheme.dofs_per_cell_fine;
-              }
-          }
+              if (fine_element_is_continuous)
+                weights += scheme.dofs_per_cell_fine;
+            }
         }
     }
 
@@ -2665,20 +2663,18 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
             value * distribute_local_to_global_values[j];
     };
 
+  const unsigned int *indices_coarse = level_dof_indices_coarse.data();
+  const unsigned int *indices_fine   = level_dof_indices_fine.data();
+  const Number *      weights        = nullptr;
+
+  if (fine_element_is_continuous)
+    weights = this->weights.data();
+
   for (const auto &scheme : schemes)
     {
       // identity -> take short cut and work directly on global vectors
       if (scheme.degree_fine == scheme.degree_coarse)
         {
-          const unsigned int *indices_fine =
-            scheme.level_dof_indices_fine.data();
-          const unsigned int *indices_coarse =
-            scheme.level_dof_indices_coarse.data();
-          const Number *weights = nullptr;
-
-          if (fine_element_is_continuous)
-            weights = scheme.weights.data();
-
           for (unsigned int cell = 0; cell < scheme.n_coarse_cells; ++cell)
             {
               if (fine_element_is_continuous)
@@ -2724,33 +2720,24 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
               n_lanes;
 
           // read from source vector and weight
-          {
-            const unsigned int *indices =
-              &scheme.level_dof_indices_fine[cell * scheme.dofs_per_cell_fine];
-            const Number *weights = nullptr;
+          for (unsigned int v = 0; v < n_lanes_filled; ++v)
+            {
+              if (fine_element_is_continuous)
+                for (unsigned int i = 0; i < scheme.dofs_per_cell_fine; ++i)
+                  evaluation_data_fine[i][v] =
+                    vec_fine_ptr->local_element(indices_fine[i]) * weights[i];
+              else
+                for (unsigned int i = 0; i < scheme.dofs_per_cell_fine; ++i)
+                  evaluation_data_fine[i][v] =
+                    vec_fine_ptr->local_element(indices_fine[i]);
 
-            if (fine_element_is_continuous)
-              weights = &scheme.weights[cell * scheme.dofs_per_cell_fine];
+              indices_fine += scheme.dofs_per_cell_fine;
 
-            for (unsigned int v = 0; v < n_lanes_filled; ++v)
-              {
-                if (fine_element_is_continuous)
-                  for (unsigned int i = 0; i < scheme.dofs_per_cell_fine; ++i)
-                    evaluation_data_fine[i][v] =
-                      vec_fine_ptr->local_element(indices[i]) * weights[i];
-                else
-                  for (unsigned int i = 0; i < scheme.dofs_per_cell_fine; ++i)
-                    evaluation_data_fine[i][v] =
-                      vec_fine_ptr->local_element(indices[i]);
+              if (fine_element_is_continuous)
+                weights += scheme.dofs_per_cell_fine;
+            }
 
-                indices += scheme.dofs_per_cell_fine;
-
-                if (fine_element_is_continuous)
-                  weights += scheme.dofs_per_cell_fine;
-              }
-          }
-
-          // ------------------------------ fine -----------------------------
+          // ------------------------------ fine -------------------------------
           for (int c = n_components - 1; c >= 0; --c)
             {
               CellRestrictor<dim, VectorizedArrayType> cell_restrictor(
@@ -2765,22 +2752,17 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
                 cell_restrictor.run_full(n_scalar_dofs_fine,
                                          n_scalar_dofs_coarse);
             }
-          // ----------------------------- coarse ----------------------------
+          // ----------------------------- coarse ------------------------------
 
           // write into dst vector
-          {
-            const unsigned int *indices =
-              &scheme
-                 .level_dof_indices_coarse[cell * scheme.dofs_per_cell_coarse];
-            for (unsigned int v = 0; v < n_lanes_filled; ++v)
-              {
-                for (unsigned int i = 0; i < scheme.dofs_per_cell_coarse; ++i)
-                  distribute_local_to_global(indices[i],
-                                             evaluation_data_coarse[i][v],
-                                             this->vec_coarse);
-                indices += scheme.dofs_per_cell_coarse;
-              }
-          }
+          for (unsigned int v = 0; v < n_lanes_filled; ++v)
+            {
+              for (unsigned int i = 0; i < scheme.dofs_per_cell_coarse; ++i)
+                distribute_local_to_global(indices_coarse[i],
+                                           evaluation_data_coarse[i][v],
+                                           this->vec_coarse);
+              indices_coarse += scheme.dofs_per_cell_coarse;
+            }
         }
     }
 
@@ -2815,16 +2797,14 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
   AlignedVector<VectorizedArrayType> evaluation_data_fine;
   AlignedVector<VectorizedArrayType> evaluation_data_coarse;
 
+  const unsigned int *indices_coarse = level_dof_indices_coarse.data();
+  const unsigned int *indices_fine   = level_dof_indices_fine.data();
+
   for (const auto &scheme : schemes)
     {
       // identity -> take short cut and work directly on global vectors
       if (scheme.degree_fine == scheme.degree_coarse)
         {
-          const unsigned int *indices_fine =
-            scheme.level_dof_indices_fine.data();
-          const unsigned int *indices_coarse =
-            scheme.level_dof_indices_coarse.data();
-
           for (unsigned int cell = 0; cell < scheme.n_coarse_cells; ++cell)
             {
               for (unsigned int i = 0; i < scheme.dofs_per_cell_fine; ++i)
@@ -2858,21 +2838,16 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
               n_lanes;
 
           // read from source vector and weight
-          {
-            const unsigned int *indices =
-              &scheme.level_dof_indices_fine[cell * scheme.dofs_per_cell_fine];
+          for (unsigned int v = 0; v < n_lanes_filled; ++v)
+            {
+              for (unsigned int i = 0; i < scheme.dofs_per_cell_fine; ++i)
+                evaluation_data_fine[i][v] =
+                  vec_fine_ptr->local_element(indices_fine[i]);
 
-            for (unsigned int v = 0; v < n_lanes_filled; ++v)
-              {
-                for (unsigned int i = 0; i < scheme.dofs_per_cell_fine; ++i)
-                  evaluation_data_fine[i][v] =
-                    vec_fine_ptr->local_element(indices[i]);
+              indices_fine += scheme.dofs_per_cell_fine;
+            }
 
-                indices += scheme.dofs_per_cell_fine;
-              }
-          }
-
-          // ------------------------------ fine -----------------------------
+          // ------------------------------ fine -------------------------------
           for (int c = n_components - 1; c >= 0; --c)
             {
               CellRestrictor<dim, VectorizedArrayType> cell_restrictor(
@@ -2887,21 +2862,16 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
                 cell_restrictor.run_full(n_scalar_dofs_fine,
                                          n_scalar_dofs_coarse);
             }
-          // ----------------------------- coarse ----------------------------
+          // ----------------------------- coarse ------------------------------
 
           // write into dst vector
-          {
-            const unsigned int *indices =
-              &scheme
-                 .level_dof_indices_coarse[cell * scheme.dofs_per_cell_coarse];
-            for (unsigned int v = 0; v < n_lanes_filled; ++v)
-              {
-                for (unsigned int i = 0; i < scheme.dofs_per_cell_coarse; ++i)
-                  this->vec_coarse.local_element(indices[i]) =
-                    evaluation_data_coarse[i][v];
-                indices += scheme.dofs_per_cell_coarse;
-              }
-          }
+          for (unsigned int v = 0; v < n_lanes_filled; ++v)
+            {
+              for (unsigned int i = 0; i < scheme.dofs_per_cell_coarse; ++i)
+                this->vec_coarse.local_element(indices_coarse[i]) =
+                  evaluation_data_coarse[i][v];
+              indices_coarse += scheme.dofs_per_cell_coarse;
+            }
         }
     }
 
