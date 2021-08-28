@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2020 by the deal.II authors
+// Copyright (C) 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,12 +15,9 @@
 
 
 
-// have a 2x1 coarse mesh (or 2x1x1) and verify DoF indices in the hp-
-// case with a FECollection that contains two finite elements that do
-// not dominate each other. Here, a (FE_Q(1) x FE_Q(2)) and a
-// (FE_Q(2) x FE_Q(1)) element on two separate subdomains face each
-// other. the hp-code will unify DoF indices on boundaries between all
-// subdomains.
+// have a 2x2 coarse mesh (or 2x2x1) and verify DoF indices in the hp-
+// case with an FECollection that contains FE_Q elements with increasing degree.
+// the hp-code will unify DoF indices on boundaries between all subdomains.
 
 
 #include <deal.II/distributed/tria.h>
@@ -28,7 +25,6 @@
 #include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/fe_q.h>
-#include <deal.II/fe/fe_system.h>
 
 #include <deal.II/grid/grid_generator.h>
 
@@ -36,7 +32,6 @@
 
 #include "../tests.h"
 
-#include "../test_grids.h"
 #include "hp_unify_dof_indices.h"
 
 
@@ -46,12 +41,23 @@ test()
 {
   parallel::distributed::Triangulation<dim> triangulation(
     MPI_COMM_WORLD, Triangulation<dim>::limit_level_difference_at_vertices);
-  TestGrids::hyper_line(triangulation, 2);
-  Assert(triangulation.n_active_cells() == 2, ExcInternalError());
+
+  std::vector<unsigned int> reps(dim, 1U);
+  reps[0] = 2;
+  reps[1] = 2;
+  Point<dim> top_right;
+  for (unsigned int d = 0; d < dim; ++d)
+    top_right[d] = (d == 0 ? 2 : 1);
+  GridGenerator::subdivided_hyper_rectangle(triangulation,
+                                            reps,
+                                            Point<dim>(),
+                                            top_right);
+  Assert(triangulation.n_global_active_cells() == 4, ExcInternalError());
+  Assert(triangulation.n_active_cells() == 4, ExcInternalError());
 
   hp::FECollection<dim> fe;
-  fe.push_back(FESystem<dim>(FE_Q<dim>(1), 1, FE_Q<dim>(2), 1));
-  fe.push_back(FESystem<dim>(FE_Q<dim>(2), 1, FE_Q<dim>(1), 1));
+  for (unsigned int d = 1; d <= 4; ++d)
+    fe.push_back(FE_Q<dim>(d));
 
   DoFHandler<dim> dof_handler(triangulation);
   for (const auto &cell : dof_handler.active_cell_iterators())
@@ -61,6 +67,10 @@ test()
           cell->set_active_fe_index(0);
         if (cell->id().to_string() == "1_0:")
           cell->set_active_fe_index(1);
+        if (cell->id().to_string() == "2_0:")
+          cell->set_active_fe_index(2);
+        if (cell->id().to_string() == "3_0:")
+          cell->set_active_fe_index(3);
       }
   dof_handler.distribute_dofs(fe);
 

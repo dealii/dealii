@@ -144,7 +144,7 @@ namespace TestGrids
    */
   template <int dim, int spacedim>
   void
-  hyper_line(Triangulation<dim, spacedim> &tr, const int n_cells)
+  hyper_line(Triangulation<dim, spacedim> &tr, const unsigned int n_cells)
   {
     std::vector<unsigned int> repetitions(dim, 1);
     repetitions[0] = n_cells;
@@ -155,5 +155,6 @@ namespace TestGrids
         p2[d] = (d == 0) ? n_cells : 1;
       }
     GridGenerator::subdivided_hyper_rectangle(tr, repetitions, p1, p2);
+    Assert(tr.n_global_active_cells() == n_cells, ExcInternalError());
   }
 } // namespace TestGrids
