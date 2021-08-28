@@ -158,7 +158,7 @@ namespace internal
           // exists
           if (identities.get() == nullptr)
             {
-              std::vector<std::set<std::pair<unsigned int, unsigned int>>>
+              std::vector<std::map<unsigned int, unsigned int>>
                 complete_identities;
 
               switch (structdim)
@@ -194,29 +194,37 @@ namespace internal
               // pairs (fe_index,dof_index). Because we put in exactly
               // two fe indices, we know that each entry of the outer
               // vector needs to contain a set of exactly two such
-              // pairs. Check this.
+              // pairs. Check this. While there, also check that
+              // the two entries actually reference fe_index_1 and
+              // fe_index_2:
               for (const auto &complete_identity : complete_identities)
-                Assert(complete_identity.size() == 2, ExcInternalError());
+                {
+                  Assert(complete_identity.size() == 2, ExcInternalError());
+                  Assert(complete_identity.find(fe_index_1) !=
+                           complete_identity.end(),
+                         ExcInternalError());
+                  Assert(complete_identity.find(fe_index_2) !=
+                           complete_identity.end(),
+                         ExcInternalError());
+                }
 #endif
 
               // Next reduce these sets of two pairs by removing the
               // fe_index parts: We know which indices we have. But we
               // have to make sure in which order we consider the
               // pair, by considering whether the fe_index part we are
-              // throwing away matched fe_index_1 or fe_index_2.
+              // throwing away matched fe_index_1 or fe_index_2. Fortunately,
+              // this is easy to do because we can ask the std::map for the
+              // dof_index that matches a given fe_index:
               DoFIdentities reduced_identities;
               for (const auto &complete_identity : complete_identities)
                 {
-                  std::pair<unsigned int, unsigned int> reduced_identity(
-                    complete_identity.begin()->second,
-                    (++complete_identity.begin())->second);
-                  if (complete_identity.begin()->first == fe_index_1)
-                    reduced_identities.emplace_back(reduced_identity);
-                  else if (complete_identity.begin()->first == fe_index_2)
-                    reduced_identities.emplace_back(reduced_identity.second,
-                                                    reduced_identity.first);
-                  else
-                    Assert(false, ExcInternalError());
+                  const unsigned int dof_index_1 =
+                    complete_identity.at(fe_index_1);
+                  const unsigned int dof_index_2 =
+                    complete_identity.at(fe_index_2);
+
+                  reduced_identities.emplace_back(dof_index_1, dof_index_2);
                 }
 
 #ifdef DEBUG
