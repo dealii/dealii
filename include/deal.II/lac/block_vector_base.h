@@ -141,9 +141,10 @@ namespace internal
                                   typename BlockVectorType::value_type>::type;
 
       /**
-       * Declare some alias which are standard for iterators and are used
+       * Declare some aliases that are standard for iterators and are used
        * by algorithms to enquire about the specifics of the iterators they
-       * work on.
+       * work on. (Example: `std::next()`, which needs to know about a local
+       * type named `difference_type`.)
        */
       using iterator_category = std::random_access_iterator_tag;
       using difference_type   = std::ptrdiff_t;

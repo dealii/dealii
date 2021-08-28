@@ -360,6 +360,8 @@ namespace SparseMatrixIterators
      */
     using value_type = const Accessor<number, Constness> &;
 
+    using difference_type = size_type;
+
     /**
      * Constructor. Create an iterator into the matrix @p matrix for the given
      * index in the complete matrix (counting from the zeroth entry).
