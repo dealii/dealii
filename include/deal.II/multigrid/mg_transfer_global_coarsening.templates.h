@@ -246,6 +246,26 @@ namespace internal
 {
   namespace
   {
+    template <typename MeshType, typename OPType>
+    void
+    loop_over_active_or_level_cells(const MeshType &   tria,
+                                    const unsigned int level,
+                                    const OPType &     op)
+    {
+      if (level == numbers::invalid_unsigned_int)
+        {
+          for (const auto &cell : tria.active_cell_iterators())
+            if (cell->is_locally_owned())
+              op(cell);
+        }
+      else
+        {
+          for (const auto &cell : tria.cell_iterators_on_level(level))
+            if (cell->is_locally_owned_on_level())
+              op(cell);
+        }
+    }
+
     template <int dim>
     unsigned int
     compute_shift_within_children(const unsigned int child,
@@ -888,25 +908,10 @@ namespace internal
           is_dst_remote.add_index(this->cell_id_translator.translate(cell, i));
       };
 
-      const auto loop = [&](const auto &tria,
-                            const auto  level,
-                            const auto &op) {
-        if (level == numbers::invalid_unsigned_int)
-          {
-            for (const auto &cell : tria.active_cell_iterators())
-              if (!cell->is_artificial() && cell->is_locally_owned())
-                op(cell);
-          }
-        else
-          {
-            for (const auto &cell : tria.cell_iterators_on_level(level))
-              if (cell->level_subdomain_id() == tria.locally_owned_subdomain())
-                op(cell);
-          }
-      };
-
-      loop(tria_dst, mg_level_fine, fine_operation);
-      loop(tria_src, mg_level_coarse, coarse_operation);
+      loop_over_active_or_level_cells(tria_dst, mg_level_fine, fine_operation);
+      loop_over_active_or_level_cells(tria_src,
+                                      mg_level_coarse,
+                                      coarse_operation);
 
       this->reinit(is_dst_locally_owned,
                    is_dst_remote,
@@ -947,24 +952,10 @@ namespace internal
         is_dst_remote.add_index(this->cell_id_translator.translate(cell));
       };
 
-      const auto loop =
-        [&](const auto &tria, const auto level, const auto &op) {
-          if (level == numbers::invalid_unsigned_int)
-            {
-              for (const auto &cell : tria.active_cell_iterators())
-                if (cell->is_locally_owned())
-                  op(cell);
-            }
-          else
-            {
-              for (const auto &cell : tria.cell_iterators_on_level(level))
-                if (cell->is_locally_owned_on_level())
-                  op(cell);
-            }
-        };
-
-      loop(tria_dst, mg_level_fine, fine_operation);
-      loop(tria_src, mg_level_coarse, coarse_operation);
+      loop_over_active_or_level_cells(tria_dst, mg_level_fine, fine_operation);
+      loop_over_active_or_level_cells(tria_src,
+                                      mg_level_coarse,
+                                      coarse_operation);
 
       this->reinit(is_dst_locally_owned,
                    is_dst_remote,
@@ -1114,9 +1105,6 @@ namespace internal
         &                                         transfer,
       LinearAlgebra::distributed::Vector<Number> &touch_count)
     {
-      LinearAlgebra::distributed::Vector<Number> touch_count_;
-      touch_count.reinit(transfer.partitioner_fine);
-
       IndexSet locally_relevant_dofs;
       if (mg_level_fine == numbers::invalid_unsigned_int)
         DoFTools::extract_locally_relevant_dofs(dof_handler_fine,
@@ -1135,43 +1123,24 @@ namespace internal
           dof_handler_fine.get_communicator());
       transfer.vec_fine.reinit(transfer.partitioner_fine);
 
+      LinearAlgebra::distributed::Vector<Number> touch_count_;
       touch_count_.reinit(partitioner_fine_);
 
       std::vector<types::global_dof_index> local_dof_indices;
 
-      if (mg_level_fine == numbers::invalid_unsigned_int)
-        {
-          for (const auto &cell : dof_handler_fine.active_cell_iterators())
-            {
-              if (cell->is_locally_owned() == false)
-                continue;
+      loop_over_active_or_level_cells(
+        dof_handler_fine, mg_level_fine, [&](const auto &cell) {
+          local_dof_indices.resize(cell->get_fe().n_dofs_per_cell());
 
-              local_dof_indices.resize(cell->get_fe().n_dofs_per_cell());
+          if (mg_level_fine == numbers::invalid_unsigned_int)
+            cell->get_dof_indices(local_dof_indices);
+          else
+            cell->get_mg_dof_indices(local_dof_indices);
 
-              cell->get_dof_indices(local_dof_indices);
-
-              for (auto i : local_dof_indices)
-                if (constraint_fine.is_constrained(i) == false)
-                  touch_count_[i] += 1;
-            }
-        }
-      else
-        {
-          for (const auto &cell :
-               dof_handler_fine.cell_iterators_on_level(mg_level_fine))
-            {
-              if (!cell->is_locally_owned_on_level())
-                continue;
-
-              local_dof_indices.resize(cell->get_fe().n_dofs_per_cell());
-
-              cell->get_mg_dof_indices(local_dof_indices);
-
-              for (auto i : local_dof_indices)
-                if (constraint_fine.is_constrained(i) == false)
-                  touch_count_[i] += 1;
-            }
-        }
+          for (auto i : local_dof_indices)
+            if (constraint_fine.is_constrained(i) == false)
+              touch_count_[i] += 1;
+        });
 
       touch_count_.compress(VectorOperation::add);
 
@@ -1185,6 +1154,7 @@ namespace internal
       touch_count_.update_ghost_values();
 
       // copy weights to other indexset
+      touch_count.reinit(transfer.partitioner_fine);
       touch_count.copy_locally_owned_data_from(touch_count_);
       touch_count.update_ghost_values();
     }
@@ -1238,53 +1208,21 @@ namespace internal
          std::numeric_limits<unsigned int>::max()}};
       std::array<unsigned int, 2> max_active_fe_indices = {{0, 0}};
 
-      if (mg_level_fine == numbers::invalid_unsigned_int)
-        {
-          for (const auto &cell : dof_handler_fine.active_cell_iterators())
-            if (cell->is_locally_owned())
-              {
-                min_active_fe_indices[0] =
-                  std::min(min_active_fe_indices[0], cell->active_fe_index());
-                max_active_fe_indices[0] =
-                  std::max(max_active_fe_indices[0], cell->active_fe_index());
-              }
-        }
-      else
-        {
-          for (const auto &cell :
-               dof_handler_fine.mg_cell_iterators_on_level(mg_level_fine))
-            if (cell->is_locally_owned_on_level())
-              {
-                min_active_fe_indices[0] =
-                  std::min(min_active_fe_indices[0], cell->active_fe_index());
-                max_active_fe_indices[0] =
-                  std::max(max_active_fe_indices[0], cell->active_fe_index());
-              }
-        }
+      loop_over_active_or_level_cells(
+        dof_handler_fine, mg_level_fine, [&](const auto &cell) {
+          min_active_fe_indices[0] =
+            std::min(min_active_fe_indices[0], cell->active_fe_index());
+          max_active_fe_indices[0] =
+            std::max(max_active_fe_indices[0], cell->active_fe_index());
+        });
 
-      if (mg_level_fine == numbers::invalid_unsigned_int)
-        {
-          for (const auto &cell : dof_handler_coarse.active_cell_iterators())
-            if (cell->is_locally_owned())
-              {
-                min_active_fe_indices[1] =
-                  std::min(min_active_fe_indices[1], cell->active_fe_index());
-                max_active_fe_indices[1] =
-                  std::max(max_active_fe_indices[1], cell->active_fe_index());
-              }
-        }
-      else
-        {
-          for (const auto &cell :
-               dof_handler_coarse.mg_cell_iterators_on_level(mg_level_coarse))
-            if (cell->is_locally_owned_on_level())
-              {
-                min_active_fe_indices[1] =
-                  std::min(min_active_fe_indices[1], cell->active_fe_index());
-                max_active_fe_indices[1] =
-                  std::max(max_active_fe_indices[1], cell->active_fe_index());
-              }
-        }
+      loop_over_active_or_level_cells(
+        dof_handler_coarse, mg_level_coarse, [&](const auto &cell) {
+          min_active_fe_indices[1] =
+            std::min(min_active_fe_indices[1], cell->active_fe_index());
+          max_active_fe_indices[1] =
+            std::max(max_active_fe_indices[1], cell->active_fe_index());
+        });
 
       const auto comm = dof_handler_fine.get_communicator();
 
@@ -1354,16 +1292,10 @@ namespace internal
       // children of cells that are refined
       const auto process_cells = [&](const auto &fu_non_refined,
                                      const auto &fu_refined) {
-        // loop over all active locally-owned cells
-        if (mg_level_coarse == numbers::invalid_unsigned_int)
-          {
-            for (const auto &cell_coarse :
-                 dof_handler_coarse.active_cell_iterators())
+        loop_over_active_or_level_cells(
+          dof_handler_coarse, mg_level_coarse, [&](const auto &cell_coarse) {
+            if (mg_level_coarse == numbers::invalid_unsigned_int)
               {
-                if (cell_coarse->is_artificial() == true ||
-                    cell_coarse->is_locally_owned() == false)
-                  continue;
-
                 // get a reference to the equivalent cell on the fine
                 // triangulation
                 const auto cell_coarse_on_fine_mesh =
@@ -1379,20 +1311,8 @@ namespace internal
                 else // ... cell has no children -> process cell
                   fu_non_refined(cell_coarse, cell_coarse_on_fine_mesh);
               }
-          }
-        else
-          {
-            for (const auto &cell_coarse :
-                 dof_handler_coarse.mg_cell_iterators_on_level(mg_level_coarse))
+            else
               {
-                if (cell_coarse->is_locally_owned_on_level() == false)
-                  continue;
-
-                // get a reference to the equivalent cell on the fine
-                // triangulation
-                // const auto cell_coarse_on_fine_mesh =
-                //  view.get_cell(cell_coarse);
-
                 // check if cell has children
                 if (cell_coarse->has_children())
                   // ... cell has children -> process children
@@ -1401,7 +1321,7 @@ namespace internal
                        c++)
                     fu_refined(cell_coarse, view.get_cell(cell_coarse, c), c);
               }
-          }
+          });
       };
 
       // set up two mg-schemes
@@ -1800,34 +1720,11 @@ namespace internal
                ExcInternalError());
 
       const auto process_cells = [&](const auto &fu) {
-        if (mg_level_coarse == numbers::invalid_unsigned_int)
-          {
-            for (const auto &cell_coarse :
-                 dof_handler_coarse.active_cell_iterators())
-              {
-                if (!cell_coarse->is_locally_owned())
-                  continue;
-
-                const auto cell_coarse_on_fine_mesh =
-                  view.get_cell(cell_coarse);
-
-                fu(cell_coarse, &cell_coarse_on_fine_mesh);
-              }
-          }
-        else
-          {
-            for (const auto &cell_coarse :
-                 dof_handler_coarse.mg_cell_iterators_on_level(mg_level_coarse))
-              {
-                if (!cell_coarse->is_locally_owned_on_level())
-                  continue;
-
-                const auto cell_coarse_on_fine_mesh =
-                  view.get_cell(cell_coarse);
-
-                fu(cell_coarse, &cell_coarse_on_fine_mesh);
-              }
-          }
+        loop_over_active_or_level_cells(
+          dof_handler_coarse, mg_level_coarse, [&](const auto &cell_coarse) {
+            const auto cell_coarse_on_fine_mesh = view.get_cell(cell_coarse);
+            fu(cell_coarse, &cell_coarse_on_fine_mesh);
+          });
       };
 
       std::map<std::pair<unsigned int, unsigned int>, unsigned int>
