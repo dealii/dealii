@@ -2597,9 +2597,6 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
         }
     }
 
-  this->vec_coarse.zero_out_ghost_values(); // clear ghost values; else compress
-                                            // in do_restrict_add does not work
-
   if (fine_element_is_continuous || use_dst_inplace == false)
     vec_fine_ptr->compress(VectorOperation::add);
 
@@ -2629,6 +2626,8 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
     vec_fine_ptr->update_ghost_values();
 
   this->vec_coarse.copy_locally_owned_data_from(dst);
+  this->vec_coarse.zero_out_ghost_values(); // since we might add into the
+                                            // ghost values and call compress
 
   AlignedVector<VectorizedArrayType> evaluation_data_fine;
   AlignedVector<VectorizedArrayType> evaluation_data_coarse;
