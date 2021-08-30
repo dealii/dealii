@@ -872,7 +872,77 @@ namespace TriangulationDescription
     Description<dim, spacedim>
     create_description_from_triangulation(
       const Triangulation<dim, spacedim> &              tria,
-      const LinearAlgebra::distributed::Vector<double> &partition)
+      const LinearAlgebra::distributed::Vector<double> &partition,
+      const TriangulationDescription::Settings          settings)
+    {
+      const bool construct_multigrid =
+        (partition.size() > 0) &&
+        (settings &
+         TriangulationDescription::Settings::construct_multigrid_hierarchy);
+
+      Assert(
+        construct_multigrid == false ||
+          (tria.get_mesh_smoothing() &
+           Triangulation<dim, spacedim>::limit_level_difference_at_vertices),
+        ExcMessage(
+          "Source triangulation has to be set up with "
+          "limit_level_difference_at_vertices if the construction of the "
+          "multigrid hierarchy is requested!"));
+
+      std::vector<LinearAlgebra::distributed::Vector<double>> partitions_mg;
+
+      if (construct_multigrid) // perform first child policy
+        {
+          const auto tria_parallel =
+            dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
+              &tria);
+
+          Assert(tria_parallel, ExcInternalError());
+
+          partition.update_ghost_values();
+
+          partitions_mg.resize(tria.n_global_levels());
+
+          for (unsigned int l = 0; l < tria.n_global_levels(); ++l)
+            partitions_mg[l].reinit(
+              tria_parallel->global_level_cell_index_partitioner(l).lock());
+
+          for (int level = tria.n_global_levels() - 1; level >= 0; --level)
+            {
+              for (const auto &cell : tria.cell_iterators_on_level(level))
+                {
+                  if (cell->is_locally_owned_on_level() == false)
+                    continue;
+
+                  if (cell->is_active())
+                    partitions_mg[level][cell->global_level_cell_index()] =
+                      partition[cell->global_active_cell_index()];
+                  else
+                    partitions_mg[level][cell->global_level_cell_index()] =
+                      partitions_mg[level + 1]
+                                   [cell->child(0)->global_level_cell_index()];
+                }
+
+              partitions_mg[level].update_ghost_values();
+            }
+        }
+
+      return create_description_from_triangulation(tria,
+                                                   partition,
+                                                   partitions_mg,
+                                                   settings);
+    }
+
+
+
+    template <int dim, int spacedim>
+    Description<dim, spacedim>
+    create_description_from_triangulation(
+      const Triangulation<dim, spacedim> &              tria,
+      const LinearAlgebra::distributed::Vector<double> &partition,
+      const std::vector<LinearAlgebra::distributed::Vector<double>>
+        &                                      partitions_mg,
+      const TriangulationDescription::Settings settings_in)
     {
 #ifdef DEAL_II_WITH_MPI
       if (tria.get_communicator() == MPI_COMM_NULL)
@@ -881,11 +951,16 @@ namespace TriangulationDescription
 
       if (partition.size() == 0)
         {
+          AssertDimension(partitions_mg.size(), 0);
           return create_description_from_triangulation(tria,
-                                                       tria.get_communicator());
+                                                       tria.get_communicator(),
+                                                       settings_in);
         }
 
       partition.update_ghost_values();
+
+      for (const auto &partition : partitions_mg)
+        partition.update_ghost_values();
 
       // 1) determine processes owning locally owned cells
       const std::vector<unsigned int> relevant_processes = [&]() {
@@ -895,12 +970,23 @@ namespace TriangulationDescription
           relevant_processes.insert(
             static_cast<unsigned int>(partition.local_element(i)));
 
+        for (const auto &partition : partitions_mg)
+          for (unsigned int i = 0; i < partition.local_size(); ++i)
+            relevant_processes.insert(
+              static_cast<unsigned int>(partition.local_element(i)));
+
         return std::vector<unsigned int>(relevant_processes.begin(),
                                          relevant_processes.end());
       }();
 
-      TriangulationDescription::Settings settings =
-        TriangulationDescription::Settings::default_setting;
+      const bool construct_multigrid = partitions_mg.size() > 0;
+
+      TriangulationDescription::Settings settings = settings_in;
+
+      if (construct_multigrid)
+        settings = static_cast<TriangulationDescription::Settings>(
+          settings |
+          TriangulationDescription::Settings::construct_multigrid_hierarchy);
 
       const auto subdomain_id_function = [&partition](const auto &cell) {
         if ((cell->is_active() && (cell->is_artificial() == false)))
@@ -910,9 +996,14 @@ namespace TriangulationDescription
           return numbers::artificial_subdomain_id;
       };
 
-      const auto level_subdomain_id_function = [](const auto & /*cell*/) {
-        return numbers::artificial_subdomain_id;
-      };
+      const auto level_subdomain_id_function =
+        [&construct_multigrid, &partitions_mg](const auto &cell) {
+          if (construct_multigrid && (cell->is_artificial_on_level() == false))
+            return static_cast<unsigned int>(
+              partitions_mg[cell->level()][cell->global_level_cell_index()]);
+          else
+            return numbers::artificial_subdomain_id;
+        };
 
       CreateDescriptionFromTriangulationHelper<dim, spacedim> helper(
         tria,

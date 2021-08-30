@@ -501,6 +501,9 @@ namespace TriangulationDescription
      * CellAccessor::global_active_cell_index()). This function allows to
      * repartition distributed Triangulation objects.
      *
+     * If the setup of multigrid levels is requested, they are partitioned
+     * according to a first-child policy.
+     *
      * @note The communicator is extracted from the vector @p partition.
      *
      * @note The triangulation @p tria can be set up on a subcommunicator of the
@@ -515,8 +518,23 @@ namespace TriangulationDescription
     Description<dim, spacedim>
     create_description_from_triangulation(
       const Triangulation<dim, spacedim> &              tria,
-      const LinearAlgebra::distributed::Vector<double> &partition);
+      const LinearAlgebra::distributed::Vector<double> &partition,
+      const TriangulationDescription::Settings          settings =
+        TriangulationDescription::Settings::default_setting);
 
+    /**
+     * Similar to the above function but allowing the user to prescribe the
+     * partitioning of the multigrid levels.
+     */
+    template <int dim, int spacedim>
+    Description<dim, spacedim>
+    create_description_from_triangulation(
+      const Triangulation<dim, spacedim> &              tria,
+      const LinearAlgebra::distributed::Vector<double> &partition,
+      const std::vector<LinearAlgebra::distributed::Vector<double>>
+        &                                      mg_partitions,
+      const TriangulationDescription::Settings settings =
+        TriangulationDescription::Settings::default_setting);
 
     /**
      * Construct a TriangulationDescription::Description. In contrast

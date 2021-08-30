@@ -49,7 +49,16 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : DIMENSIONS)
         template Description<deal_II_dimension, deal_II_space_dimension>
         create_description_from_triangulation(
           const Triangulation<deal_II_dimension, deal_II_space_dimension> &tria,
-          const LinearAlgebra::distributed::Vector<double> &partition);
+          const LinearAlgebra::distributed::Vector<double> &partition,
+          const TriangulationDescription::Settings          settings);
+
+        template Description<deal_II_dimension, deal_II_space_dimension>
+        create_description_from_triangulation(
+          const Triangulation<deal_II_dimension, deal_II_space_dimension> &tria,
+          const LinearAlgebra::distributed::Vector<double> &partition,
+          const std::vector<LinearAlgebra::distributed::Vector<double>>
+            &                                      mg_partitions,
+          const TriangulationDescription::Settings settings);
 #endif
       \}
     \}

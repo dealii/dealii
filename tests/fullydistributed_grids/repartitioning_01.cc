@@ -67,7 +67,10 @@ template <int dim>
 void
 test(const MPI_Comm comm, const unsigned int n_partitions)
 {
-  parallel::distributed::Triangulation<dim> tria(comm);
+  parallel::distributed::Triangulation<dim> tria(
+    comm,
+    Triangulation<dim>::none,
+    parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy);
   GridGenerator::subdivided_hyper_cube(tria, 4);
   tria.refine_global(3);
 
@@ -77,7 +80,9 @@ test(const MPI_Comm comm, const unsigned int n_partitions)
   // repartition triangulation so that it has strided partitioning
   const auto construction_data =
     TriangulationDescription::Utilities::create_description_from_triangulation(
-      tria, partition_new);
+      tria,
+      partition_new,
+      TriangulationDescription::Settings::construct_multigrid_hierarchy);
 
   parallel::fullydistributed::Triangulation<dim> tria_pft(comm);
   tria_pft.create_triangulation(construction_data);
@@ -85,6 +90,7 @@ test(const MPI_Comm comm, const unsigned int n_partitions)
   FE_Q<dim>       fe(2);
   DoFHandler<dim> dof_handler(tria_pft);
   dof_handler.distribute_dofs(fe);
+  dof_handler.distribute_mg_dofs();
 
   // print statistics
   print_statistics(tria_pft);
