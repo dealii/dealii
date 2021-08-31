@@ -590,9 +590,6 @@ namespace Particles
 
     (void)missing_points;
 
-    if (cells.size() == 0)
-      return;
-
     for (unsigned int i = 0; i < cells.size(); ++i)
       for (unsigned int p = 0; p < local_positions[i].size(); ++p)
         insert_particle(positions[index_map[i][p]],
