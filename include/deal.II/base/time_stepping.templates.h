@@ -479,7 +479,6 @@ namespace TimeStepping
     const unsigned int       max_it,
     const double             tolerance)
     : RungeKutta<VectorType>()
-    , skip_linear_combi(false)
     , max_it(max_it)
     , tolerance(tolerance)
   {
@@ -572,13 +571,9 @@ namespace TimeStepping
     // Compute the different stages needed.
     compute_stages(f, id_minus_tau_J_inverse, t, delta_t, y, f_stages);
 
-    // If necessary, compute the linear combinations of the stages.
-    if (skip_linear_combi == false)
-      {
-        y = old_y;
-        for (unsigned int i = 0; i < this->n_stages; ++i)
-          y.sadd(1., delta_t * this->b[i], f_stages[i]);
-      }
+    y = old_y;
+    for (unsigned int i = 0; i < this->n_stages; ++i)
+      y.sadd(1., delta_t * this->b[i], f_stages[i]);
 
     return (t + delta_t);
   }

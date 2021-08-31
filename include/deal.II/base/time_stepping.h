@@ -261,7 +261,7 @@ namespace TimeStepping
      * the output is value of f at this point. @p id_minus_tau_J_inverse is a
      * function that computes $ inv(I-\tau J)$ where $ I $ is the identity
      * matrix, $ \tau $ is given, and $ J $ is the Jacobian $ \frac{\partial
-     * J}{\partial y} $. The input parameters are the time, $ \tau $, and a
+     * f}{\partial y} $. The input parameters are the time, $ \tau $, and a
      * vector. The output is the value of function at this point.
      * evolve_one_time_step returns the time at the end of the time step.
      */
@@ -333,10 +333,12 @@ namespace TimeStepping
      * parameters are the time t and the vector y and the output is value of f
      * at this point. @p id_minus_tau_J_inverse is a function that computes $
      * inv(I-\tau J)$ where $ I $ is the identity matrix, $ \tau $ is given,
-     * and $ J $ is the Jacobian $ \frac{\partial J}{\partial y} $. The input
+     * and $ J $ is the Jacobian $ \frac{\partial f}{\partial y} $. The input
      * parameter are the time, $ \tau $, and a vector. The output is the value
      * of function at this point. evolve_one_time_step returns the time at the
      * end of the time step.
+     *
+     * @note @p id_minus_tau_J_inverse is ignored since the method is explicit.
      */
     double
     evolve_one_time_step(
@@ -435,7 +437,7 @@ namespace TimeStepping
      * parameters are the time t and the vector y and the output is value of f
      * at this point. @p id_minus_tau_J_inverse is a function that computes $
      * inv(I-\tau J)$ where $ I $ is the identity matrix, $ \tau $ is given,
-     * and $ J $ is the Jacobian $ \frac{\partial J}{\partial y} $. The input
+     * and $ J $ is the Jacobian $ \frac{\partial f}{\partial y} $. The input
      * parameters are the time, $ \tau $, and a vector. The output is the value
      * of function at this point. evolve_one_time_step returns the time at the
      * end of the time step.
@@ -558,7 +560,7 @@ namespace TimeStepping
      * parameters are the time t and the vector y and the output is value of f
      * at this point. @p id_minus_tau_J_inverse is a function that computes $
      * (I-\tau J)^{-1}$ where $ I $ is the identity matrix, $ \tau $ is given,
-     * and $ J $ is the Jacobian $ \frac{\partial J}{\partial y} $. The input
+     * and $ J $ is the Jacobian $ \frac{\partial f}{\partial y} $. The input
      * parameters this function receives are the time, $ \tau $, and a vector.
      * The output is the value of function at this point. evolve_one_time_step
      * returns the time at the end of the time step.
@@ -643,13 +645,6 @@ namespace TimeStepping
       VectorType &      residual) const;
 
     /**
-     * When using SDIRK, there is no need to compute the linear combination of
-     * the stages. Thus, when this flag is true, the linear combination is
-     * skipped.
-     */
-    bool skip_linear_combi;
-
-    /**
      * Maximum number of iterations of the Newton solver.
      */
     unsigned int max_it;
@@ -722,10 +717,12 @@ namespace TimeStepping
      * parameters are the time t and the vector y and the output is value of f
      * at this point. @p id_minus_tau_J_inverse is a function that computes $
      * inv(I-\tau J)$ where $ I $ is the identity matrix, $ \tau $ is given,
-     * and $ J $ is the Jacobian $ \frac{\partial J}{\partial y} $. The input
+     * and $ J $ is the Jacobian $ \frac{\partial f}{\partial y} $. The input
      * parameters are the time, $ \tau $, and a vector. The output is the
      * value of function at this point. evolve_one_time_step returns the time
      * at the end of the time step.
+     *
+     * @note @p id_minus_tau_J_inverse is ignored since the method is explicit.
      */
     double
     evolve_one_time_step(
@@ -833,7 +830,7 @@ namespace TimeStepping
      * If the flag is true, the last stage is the same as the first stage and
      * one evaluation of f can be saved.
      */
-    bool last_same_as_first;
+    bool last_same_as_first = false;
 
     /**
      * Butcher tableau coefficients.
@@ -849,7 +846,7 @@ namespace TimeStepping
      * If the last_same_as_first flag is set to true, the last stage is saved
      * and reused as the first stage of the next time step.
      */
-    VectorType *last_stage;
+    VectorType *last_stage = nullptr;
 
     /**
      * Status structure of the object.
