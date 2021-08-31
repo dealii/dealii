@@ -46,14 +46,35 @@ template <int dim>
 std::vector<std::vector<Polynomials::Polynomial<double>>>
 PolynomialsRaviartThomas<dim>::create_polynomials(const unsigned int k)
 {
+  // Create a vector of polynomial spaces where the first element
+  // has degree k+1 and the rest has degree k. This corresponds to
+  // the space of single-variable polynomials from which we will create the
+  // space for the first component of the RT element by way of tensor
+  // product.
+  //
+  // The other components of the RT space can be created by rotating
+  // this vector of single-variable polynomials.
+  //
   std::vector<std::vector<Polynomials::Polynomial<double>>> pols(dim);
-  pols[0] = Polynomials::LagrangeEquidistant::generate_complete_basis(k + 1);
   if (k == 0)
-    for (unsigned int d = 1; d < dim; ++d)
-      pols[d] = Polynomials::Legendre::generate_complete_basis(0);
+    {
+      // We need to treat the case k=0 differently because there,
+      // the polynomial in x has degree 1 and so has node points
+      // equal to the end points of the interval [0,1] (i.e., it
+      // is a "Lagrange" polynomial), whereas the y- and z-polynomials
+      // only have the interval midpoint as a node (i.e., they are
+      // a "Legendre" polynomial).
+      pols[0] = Polynomials::LagrangeEquidistant::generate_complete_basis(1);
+      for (unsigned int d = 1; d < dim; ++d)
+        pols[d] = Polynomials::Legendre::generate_complete_basis(0);
+    }
   else
-    for (unsigned int d = 1; d < dim; ++d)
-      pols[d] = Polynomials::LagrangeEquidistant::generate_complete_basis(k);
+    {
+      pols[0] =
+        Polynomials::LagrangeEquidistant::generate_complete_basis(k + 1);
+      for (unsigned int d = 1; d < dim; ++d)
+        pols[d] = Polynomials::LagrangeEquidistant::generate_complete_basis(k);
+    }
 
   return pols;
 }
