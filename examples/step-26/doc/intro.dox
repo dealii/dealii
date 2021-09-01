@@ -16,7 +16,7 @@ This program implements the heat equation
   \forall \mathbf x \in \Omega, t\in (0,T),
   \\
   u(\mathbf x, 0) &= u_0(\mathbf x) &&
-  \forall \mathbf x \in \Omega, \\
+  \forall \mathbf x \in \Omega,
   \\
   u(\mathbf x, t) &= g(\mathbf x,t) &&
   \forall \mathbf x \in \partial\Omega, t \in (0,T).
