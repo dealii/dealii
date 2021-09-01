@@ -17,4 +17,31 @@
 # Configuration for the Ginkgo library:
 #
 
+MACRO(FEATURE_GINKGO_FIND_EXTERNAL var)
+  FIND_PACKAGE(GINKGO)
+
+  IF(GINKGO_FOUND)
+    SET(${var} TRUE)
+
+    #
+    # We require at least version 1.4.0
+    # - The interface requires in fact only GINKGO 1.3.0, however, below 1.4.0
+    #   the LD_LIBRARY_PATH has to be set manually by:
+    #   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$GINKGO_DIR/lib
+    #
+    SET(_version_required 1.4.0)
+    IF(GINKGO_VERSION VERSION_LESS ${_version_required})
+      MESSAGE(STATUS "Insufficient ginkgo installation found: "
+        "At least version ${_version_required} is required."
+        )
+      SET(GINKGO_ADDITIONAL_ERROR_STRING
+        "Insufficient ginkgo installation found!\n"
+        "At least version ${_version_required} is required.\n"
+        )
+      SET(${var} FALSE)
+
+    ENDIF()
+  ENDIF()
+ENDMACRO()
+
 CONFIGURE_FEATURE(GINKGO)
