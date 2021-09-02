@@ -134,7 +134,12 @@ template <int dim, int spacedim>
 class DataOutStack<dim, spacedim, void>
   : public DataOutInterface<dim + 1, spacedim + 1>
 {
-  static_assert(dim == spacedim, "Not implemented for dim != spacedim.");
+  static_assert(dim < 3,
+                "Because this class stacks data into the (dim+1)st "
+                "dimension to create graphical output, it only works for "
+                "dim<3.");
+  static_assert(dim == spacedim,
+                "This class is not implemented for dim != spacedim.");
 
 public:
   /**
