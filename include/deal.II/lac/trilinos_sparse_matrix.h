@@ -44,6 +44,7 @@
 #    include <mpi.h>
 
 #    include <cmath>
+#    include <iterator>
 #    include <memory>
 #    include <type_traits>
 #    include <vector>
@@ -209,6 +210,8 @@ namespace TrilinosWrappers
       value();
     };
 
+
+
     /**
      * The specialization for a const Accessor.
      */
@@ -355,6 +358,18 @@ namespace TrilinosWrappers
       using size_type = dealii::types::global_dof_index;
 
       /**
+       * A type that denotes what data types is used to express the difference
+       * between two iterators.
+       */
+      using difference_type = dealii::types::global_dof_index;
+
+      /**
+       * An alias for the type you get when you dereference an iterator of the
+       * current kind.
+       */
+      using value_type = TrilinosScalar;
+
+      /**
        * Typedef for the matrix type (including constness) we are to operate
        * on.
        */
@@ -443,8 +458,31 @@ namespace TrilinosWrappers
     };
 
   } // namespace SparseMatrixIterators
+} // namespace TrilinosWrappers
+
+DEAL_II_NAMESPACE_CLOSE
+
+namespace std
+{
+  template <bool Constness>
+  struct iterator_traits<
+    dealii::TrilinosWrappers::SparseMatrixIterators::Iterator<Constness>>
+  {
+    using iterator_category = forward_iterator_tag;
+    using value_type =
+      typename dealii::TrilinosWrappers::SparseMatrixIterators::Iterator<
+        Constness>::value_type;
+    using difference_type =
+      typename dealii::TrilinosWrappers::SparseMatrixIterators::Iterator<
+        Constness>::difference_type;
+  };
+} // namespace std
+
+DEAL_II_NAMESPACE_OPEN
 
 
+namespace TrilinosWrappers
+{
   /**
    * This class implements a wrapper to use the Trilinos distributed sparse
    * matrix class Epetra_FECrsMatrix. This is precisely the kind of matrix we

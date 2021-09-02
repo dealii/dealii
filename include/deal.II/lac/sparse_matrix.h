@@ -30,6 +30,7 @@
 #    include <mpi.h>
 #  endif
 
+#  include <iterator>
 #  include <memory>
 
 
@@ -360,6 +361,10 @@ namespace SparseMatrixIterators
      */
     using value_type = const Accessor<number, Constness> &;
 
+    /**
+     * A type that denotes what data types is used to express the difference
+     * between two iterators.
+     */
     using difference_type = size_type;
 
     /**
@@ -461,6 +466,25 @@ namespace SparseMatrixIterators
   };
 
 } // namespace SparseMatrixIterators
+
+DEAL_II_NAMESPACE_CLOSE
+
+namespace std
+{
+  template <typename number, bool Constness>
+  struct iterator_traits<
+    dealii::SparseMatrixIterators::Iterator<number, Constness>>
+  {
+    using iterator_category = forward_iterator_tag;
+    using value_type =
+      typename dealii::SparseMatrixIterators::Iterator<number,
+                                                       Constness>::value_type;
+    using difference_type = typename dealii::SparseMatrixIterators::
+      Iterator<number, Constness>::difference_type;
+  };
+} // namespace std
+
+DEAL_II_NAMESPACE_OPEN
 
 /**
  * @}
