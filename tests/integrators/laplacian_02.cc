@@ -104,7 +104,8 @@ test_face(const FiniteElement<dim> &fe, bool diff = false)
   std::vector<types::global_dof_index> indices2(fe.dofs_per_cell);
 
   typename DoFHandler<dim>::active_cell_iterator cell1 = dof.begin_active();
-  typename DoFHandler<dim>::active_cell_iterator cell2 = ++dof.begin_active();
+  typename DoFHandler<dim>::active_cell_iterator cell2 =
+    std::next(dof.begin_active());
 
   cell1->get_dof_indices(indices1);
   cell2->get_dof_indices(indices2);

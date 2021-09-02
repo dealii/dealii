@@ -60,7 +60,7 @@ project(const hp::FECollection<dim> &fe_collection,
   TestGrids::hyper_line(tria, 2);
 
   DoFHandler<dim> dofh(tria);
-  (++(dofh.begin_active()))->set_active_fe_index(1);
+  (std::next((dofh.begin_active())))->set_active_fe_index(1);
   dofh.distribute_dofs(fe_collection);
 
   // make constraints

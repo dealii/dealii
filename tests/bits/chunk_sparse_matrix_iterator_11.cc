@@ -20,6 +20,8 @@
 
 #include <deal.II/lac/chunk_sparse_matrix.h>
 
+#include <iterator>
+
 #include "../tests.h"
 
 
@@ -39,7 +41,7 @@ test(const unsigned int chunk_size)
   // attach a sparse matrix to it
   ChunkSparseMatrix<double> A(sparsity);
 
-  ChunkSparseMatrix<double>::iterator k = A.begin(), j = ++A.begin();
+  ChunkSparseMatrix<double>::iterator k = A.begin(), j = std::next(A.begin());
 
   AssertThrow(k < j, ExcInternalError());
   AssertThrow(j > k, ExcInternalError());

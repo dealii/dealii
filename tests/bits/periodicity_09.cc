@@ -68,16 +68,17 @@ test()
   deallog << dim << " 1/periodicity_factor: " << 1. / periodicity_factor
           << std::endl;
 
-  DoFTools::make_periodicity_constraints(dof_handler.begin(0)->face(0),
-                                         (++dof_handler.begin(0))->face(1),
-                                         cm,
-                                         ComponentMask(),
-                                         true,
-                                         false,
-                                         false,
-                                         FullMatrix<double>(),
-                                         std::vector<unsigned int>(),
-                                         periodicity_factor);
+  DoFTools::make_periodicity_constraints(
+    dof_handler.begin(0)->face(0),
+    (std::next(dof_handler.begin(0)))->face(1),
+    cm,
+    ComponentMask(),
+    true,
+    false,
+    false,
+    FullMatrix<double>(),
+    std::vector<unsigned int>(),
+    periodicity_factor);
   cm.print(deallog.get_file_stream());
 }
 

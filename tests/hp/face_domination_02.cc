@@ -82,7 +82,7 @@ main()
   dof_handler.distribute_dofs(fe_collection);
 
   print_dofs(dof_handler.begin_active());
-  print_dofs(++dof_handler.begin_active());
+  print_dofs(std::next(dof_handler.begin_active()));
 
   AffineConstraints<double> constraints;
   constraints.clear();

@@ -43,7 +43,7 @@ testit(parallel::distributed::Triangulation<dim> &tr)
   GridGenerator::hyper_cube(tr);
   tr.refine_global(1);
 
-  (++tr.begin_active())->set_refine_flag();
+  (std::next(tr.begin_active()))->set_refine_flag();
   tr.execute_coarsening_and_refinement();
 
   tr.begin_active()->set_refine_flag();

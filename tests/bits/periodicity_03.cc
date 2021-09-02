@@ -61,9 +61,10 @@ test()
   dof_handler.distribute_dofs(fe);
 
   AffineConstraints<double> cm;
-  DoFTools::make_periodicity_constraints(dof_handler.begin(0)->face(0),
-                                         (++dof_handler.begin(0))->face(1),
-                                         cm);
+  DoFTools::make_periodicity_constraints(
+    dof_handler.begin(0)->face(0),
+    (std::next(dof_handler.begin(0)))->face(1),
+    cm);
   cm.print(deallog.get_file_stream());
 }
 

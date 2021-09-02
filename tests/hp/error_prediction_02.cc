@@ -46,7 +46,7 @@ test()
   TestGrids::hyper_line(tria, 4);
 
   tria.begin_active()->set_refine_flag();
-  (++tria.begin_active())->set_refine_flag();
+  (std::next(tria.begin_active()))->set_refine_flag();
   tria.execute_coarsening_and_refinement();
 
   hp::FECollection<dim> fes;

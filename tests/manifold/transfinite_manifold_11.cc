@@ -101,7 +101,7 @@ main()
 
   {
     triangulation.set_all_manifold_ids(3);
-    const auto center_cell  = ++triangulation.begin_active();
+    const auto center_cell  = std::next(triangulation.begin_active());
     const auto lower_radial = center_cell->face(2);
     const auto upper_radial = center_cell->face(3);
     lower_radial->set_manifold_id(1);

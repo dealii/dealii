@@ -231,11 +231,11 @@ make_tria(Triangulation<3> &tria, int step)
 
               case 7:
                 tria.begin_active()->set_refine_flag();
-                (++tria.begin_active())->set_refine_flag();
+                (std::next(tria.begin_active()))->set_refine_flag();
                 break;
               case 8:
                 tria.begin_active()->set_refine_flag();
-                (++(++(++tria.begin_active())))->set_refine_flag();
+                (std::next((++(++tria.begin_active()))))->set_refine_flag();
                 break;
             };
 

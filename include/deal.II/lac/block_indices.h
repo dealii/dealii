@@ -25,6 +25,7 @@
 #include <deal.II/base/utilities.h>
 
 #include <cstddef>
+#include <iterator>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -331,8 +332,8 @@ BlockIndices::global_to_local(const size_type i) const
   Assert(n_blocks > 0, ExcLowerRangeType<size_type>(i, size_type(1)));
 
   // start_indices[0] == 0 so we might as well start from the next one
-  const auto it =
-    --std::upper_bound(++start_indices.begin(), start_indices.end(), i);
+  const auto it = std::prev(
+    std::upper_bound(std::next(start_indices.begin()), start_indices.end(), i));
 
   return {std::distance(start_indices.begin(), it), i - *it};
 }

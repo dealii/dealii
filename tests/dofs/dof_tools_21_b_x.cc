@@ -179,7 +179,7 @@ print_matching(DoFHandler<dim, spacedim> &dof_handler)
 
   // Look for the two outermost faces:
   typename DoFHandler<dim, spacedim>::face_iterator face_1 =
-    (++dof_handler.begin(0))->face(2);
+    (std::next(dof_handler.begin(0)))->face(2);
   typename DoFHandler<dim, spacedim>::face_iterator face_2 =
     dof_handler.begin(0)->face(2);
 
