@@ -1,6 +1,6 @@
 <i>
   This program was contributed by Andrea Bonito (Texas A&M University) and Diane Guignard (University of Ottawa).
-  
+
   This material is based upon work supported by the National Science Foundation under Grant No. DMS-1817691.
   Any opinions, findings, and conclusions or recommendations expressed in this material are those of the author(s) and do not necessarily reflect the views of the National Science Foundation.
 </i>
@@ -13,7 +13,7 @@
 In this example, we consider the <i>local discontinuous Galerkin</i> (LDG) method for approximating the solution to the bi-Laplacian problem,
 @f{align*}{
 \Delta^2 u & = f \quad \mbox{in } \Omega, \\
-\nabla u & = \mathbf{0} \quad \mbox{on } \partial\Omega, \\ 
+\nabla u & = \mathbf{0} \quad \mbox{on } \partial\Omega, \\
 u & = 0 \quad \mbox{on } \partial\Omega,
 @f}
 where $\Omega\subset\mathbb{R}^d$ $(d=2,3)$ is an open bounded Lipschitz domain and $f\in L^2(\Omega)$. This is the same problem we have already considered in step-47, but we will here take a different approach towards solving it: Rather than using continuous finite elements and enforcing the necessary continuity via penalty terms, we will use lifting operators to deal with the fact that the usual finite element spaces are not twice continuous.
@@ -23,7 +23,7 @@ The weak formulation of this problem reads as follows: find $u\in H_0^2(\Omega)$
 \int_{\Omega}D^2u:D^2v = \int_{\Omega}fv \qquad \forall \, v\in H_0^2(\Omega),
 @f]
 where $D^2v$ denotes the Hessian of $v$ and $H_0^2(\Omega)\dealcoloneq\{v\in H^2(\Omega): \,\, v=0 \mbox{ and } \nabla v=\mathbf{0} \,\, \mbox{ on } \partial\Omega\}$. Using so-called lifting operators as well as the Nitsche approach to impose the homogeneous Dirichlet boundary conditions, the LDG approximation of this problem consists of replacing the Hessians by discrete Hessians (see below) and adding penalty terms involving properly scaled jump terms.
-In particular, the versatility of the method described below is of particular interest for nonlinear problems or problems with intricate weak formulations for which the design of discrete algorithms is challenging.  
+In particular, the versatility of the method described below is of particular interest for nonlinear problems or problems with intricate weak formulations for which the design of discrete algorithms is challenging.
 
 <h3>Discretization</h3>
 <h4>Finite element spaces</h4>
@@ -35,24 +35,24 @@ where $F_{K}$ is the map from the reference element $\hat{K}$ (unit square/cube)
 
 <h4>Jumps, averages, and discrete reconstruction of differential operators</h4>
 The piecewise differential operators do not have enough information to be accurate approximations of their continuous counterparts.
-They are missing inter-element information. 
+They are missing inter-element information.
 
 This leads to the introductions of jump and average operators:
 @f[
-\jump{v_h}|_e \dealcoloneq 
+\jump{v_h}|_e \dealcoloneq
 \left\{\begin{array}{ll}
 v_h|_{K_1}-v_h|_{K_2} & e\in\mathcal{E}_h^0 \\
 v_h|_{K_1} & e\in\mathcal{E}_h^b
-\end{array}\right. \quad \mbox{and} \quad \average{v_h}|_e \dealcoloneq 
+\end{array}\right. \quad \mbox{and} \quad \average{v_h}|_e \dealcoloneq
 \left\{\begin{array}{ll}
 \frac{1}{2}(v_h|_{K_1}+v_h|_{K_2}) & e\in\mathcal{E}_h^0 \\
 v_h|_{K_1} & e\in\mathcal{E}_h^b,
-\end{array}\right. 
+\end{array}\right.
 @f]
 respectively, where $K_1$ and $K_2$ are the two elements adjacent to $e$ so that $\mathbf{n}_e$ points from $K_1$ to $K_2$ (with obvious modification when $e$ is a boundary edge). These are the same operators that we have previously used not only in step-47, but also in other tutorials related to discontinuous Galerkin methods (e.g., step-12).
 
 With these notations, we are now in position to define the discrete/reconstructed Hessian $H_h(v_h)\in\left[L^2(\Omega)\right]^{d\times d}$ of $v_h\in\mathbb{V}_h$; that is, something that will take the role of $D^2 v$ in the definition of the weak formulation above when moving from the continuous to the discrete formulation. We first consider two <i>local lifting operators</i> $r_e:[L^2(e)]^d\rightarrow[\mathbb{V}_h]^{d\times d}$ and $b_e:L^2(e)\rightarrow[\mathbb{V}_h]^{d\times d}$ defined for $e\in\mathcal{E}_h$ by, respectively,
-@f[ 
+@f[
 r_e\left(\boldsymbol{\phi}\right) \in [\mathbb{V}_h]^{d\times d}: \,
 \int_{\Omega} \tau_h : r_e\left(\boldsymbol{\phi}\right) = \int_e\average{\tau_h}\mathbf{n}_e\cdot\boldsymbol{\phi} \qquad \forall \, \tau_h\in [\mathbb{V}_h]^{d\times d}
 @f]
@@ -168,13 +168,13 @@ As customary, we assemble the matrix $A$ and the right-hand side $\boldsymbol{F}
           <td>&nbsp;</td>
           <td align="left">(stored in <code>stiffness_matrix_n1n2</code> and <code>stiffness_matrix_n2n1</code>)</td>
         </tr>
-      </table>		
+      </table>
     </td>
   </tr>
 </table>
 
 The last of these accounts that the lifted shape functions from one of the neighbor cells may overlap on $K_c$ with the lifted shape functions of *another* neighbor cell, as mentioned above.
-In other words, we need to compute the discrete Hessian of all the basis functions with support on $K_c$ as well as all the basis functions with support on the neighboring cells of $K_c$. This is done in the function <code>compute_discrete_hessians</code>. A cell $K_c$ can have fewer than four neighbors (six when $d=3$) when at least one face $e\subset\partial K_c$ is part of the boundary of the domain. It can also have more neighbors when hanging nodes are present. To simplify the presentation we do not discuss the latter. 
+In other words, we need to compute the discrete Hessian of all the basis functions with support on $K_c$ as well as all the basis functions with support on the neighboring cells of $K_c$. This is done in the function <code>compute_discrete_hessians</code>. A cell $K_c$ can have fewer than four neighbors (six when $d=3$) when at least one face $e\subset\partial K_c$ is part of the boundary of the domain. It can also have more neighbors when hanging nodes are present. To simplify the presentation we do not discuss the latter.
 
 Due to the local support of the basis functions, many of the terms of the discrete Hessian are zero. For any basis function $\varphi^c$ with support on $K_c$ we have $r_e\left(\jump{\nabla_h\varphi^c}\right)\not\equiv 0$ only if $e\subset\partial K_c$, and similarly for $b_e\left(\jump{\varphi^c}\right)$. Therefore, the discrete Hessian of $\varphi^c$ reduces to
 @f[
@@ -188,7 +188,7 @@ where <code>n_dofs = fe_values.dofs_per_cell</code> is the number of degrees of 
 @f[
 H_h(\varphi^n)(x_q)=-r_e\left(\jump{\nabla_h\varphi^n}\right)(x_q)+b_e\left(\jump{\varphi^n}\right)(x_q).
 @f]
-This information is stored in 
+This information is stored in
 @f[
 {\rm compute\_discrete\_hessians\_neigh[face\_no][i][q]}, \qquad 0\leq {\rm face\_no} < {\rm n\_faces}, \,\, 0\leq {\rm i} < {\rm n\_dofs}, \,\, 0\leq {\rm q} < {\rm n\_q\_points},
 @f]
@@ -264,5 +264,3 @@ For different values of $h$, we will report the error $u-u_h$ measured in the di
 \|v\|_{H_h^1(\Omega)}^2 \dealcoloneq \|\nabla_h v\|_{L^2(\Omega)}^2+\sum_{e\in\mathcal{E}_h}h_e^{-1}\|\jump{v}\|_{L^2(e)}^2, \quad v\in \prod_{K\in\mathcal{T}_h}H^1(K),
 @f]
 as well as the $L^2$ metric.
-
-
