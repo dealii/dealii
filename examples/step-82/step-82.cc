@@ -1,4 +1,3 @@
-
 /* ---------------------------------------------------------------------
  *
  * Copyright (C) 2021 by the deal.II authors
@@ -58,7 +57,6 @@
 
 namespace Step82
 {
-
   using namespace dealii;
 
   // @sect3{The <code>BiLaplacianLDGLift</code> class template}
@@ -71,13 +69,13 @@ namespace Step82
   class BiLaplacianLDGLift
   {
   public:
-
-    BiLaplacianLDGLift(const unsigned int fe_degree, double penalty_jump_grad, double penalty_jump_val);
+    BiLaplacianLDGLift(const unsigned int fe_degree,
+                       double             penalty_jump_grad,
+                       double             penalty_jump_val);
 
     void run();
 
   private:
-
     void make_grid();
     void setup_system();
     void assemble_system();
@@ -85,7 +83,7 @@ namespace Step82
     void assemble_rhs();
 
     void solve();
-  
+
     void compute_errors();
     void output_results() const;
 
@@ -93,24 +91,30 @@ namespace Step82
     // is used for the assembly of the (local) mass matrix used to compute the
     // two lifting terms (see the matrix $\boldsymbol{M}_c$ introduced in
     // the introduction when describing the computation of $b_e$). The function
-    // <code>compute_discrete_hessians</code> computes the required discrete Hessians:
-    // the discrete Hessians of the basis functions with support on the current
-    // <code>cell</code> (stored in the output variable <code>discrete_hessians</code>)
-    // and the basis functions with support on a neighbor of the current <code>cell</code>
-    // (stored in the output variable <code>discrete_hessians_neigh</code>).
-    // More precisely, <code>discrete_hessians[i][q_point]</code> stores
-    // $H_h(\varphi_i)(x_q)$, where $\varphi_i$ is a basis function with support
-    // on cell, while <code>discrete_hessians_neigh[face_no][i][q_point]</code> stores
-    // $H_h(\varphi_i)(x_q)$, where $\varphi_i$ is a basis function of the neighboring
-    // cell adjacent to the face <code>face=cell->face(face_no)</code>.
-    void assemble_local_matrix(const FEValues<dim> &fe_values_lift, const unsigned int n_q_points, FullMatrix<double> &local_matrix);
+    // <code>compute_discrete_hessians</code> computes the required discrete
+    // Hessians: the discrete Hessians of the basis functions with support on
+    // the current <code>cell</code> (stored in the output variable
+    // <code>discrete_hessians</code>) and the basis functions with support on a
+    // neighbor of the current <code>cell</code> (stored in the output variable
+    // <code>discrete_hessians_neigh</code>). More precisely,
+    // <code>discrete_hessians[i][q_point]</code> stores $H_h(\varphi_i)(x_q)$,
+    // where $\varphi_i$ is a basis function with support on cell, while
+    // <code>discrete_hessians_neigh[face_no][i][q_point]</code> stores
+    // $H_h(\varphi_i)(x_q)$, where $\varphi_i$ is a basis function of the
+    // neighboring cell adjacent to the face
+    // <code>face=cell->face(face_no)</code>.
+    void assemble_local_matrix(const FEValues<dim> &fe_values_lift,
+                               const unsigned int   n_q_points,
+                               FullMatrix<double> & local_matrix);
 
-    void compute_discrete_hessians(const typename DoFHandler<dim>::active_cell_iterator &cell,
-                                   const typename DoFHandler<dim>::active_cell_iterator &cell_lift,
-				    std::vector<std::vector<Tensor<2,dim>>> &discrete_hessians,
-				    std::vector<std::vector<std::vector<Tensor<2,dim>>>> &discrete_hessians_neigh);
+    void compute_discrete_hessians(
+      const typename DoFHandler<dim>::active_cell_iterator &cell,
+      const typename DoFHandler<dim>::active_cell_iterator &cell_lift,
+      std::vector<std::vector<Tensor<2, dim>>> &            discrete_hessians,
+      std::vector<std::vector<std::vector<Tensor<2, dim>>>>
+        &discrete_hessians_neigh);
 
-    Triangulation<dim>	triangulation;
+    Triangulation<dim> triangulation;
 
     FE_DGQ<dim>     fe;
     DoFHandler<dim> dof_handler;
@@ -131,7 +135,6 @@ namespace Step82
     // respectively.
     double penalty_jump_grad;
     double penalty_jump_val;
-
   };
 
 
@@ -144,33 +147,42 @@ namespace Step82
   class RightHandSide : public Function<dim>
   {
   public:
-    RightHandSide () : Function<dim>() {}
-    virtual double value (const Point<dim>   &p,
-                          const unsigned int  component = 0) const override;
+    RightHandSide()
+      : Function<dim>()
+    {}
+    virtual double value(const Point<dim> & p,
+                         const unsigned int component = 0) const override;
   };
 
   template <int dim>
-  double RightHandSide<dim>::value (const Point<dim> &p,
-                                    const unsigned int /*component*/) const
+  double RightHandSide<dim>::value(const Point<dim> &p,
+                                   const unsigned int /*component*/) const
   {
     double return_value = 0.0;
 
-    if (dim==2){
-
-      return_value = 24.0*std::pow(p(1)*(1.0-p(1)),2)+
-                     +24.0*std::pow(p(0)*(1.0-p(0)),2)
-                     +2.0*(2.0-12.0*p(0)+12.0*p(0)*p(0))*(2.0-12.0*p(1)+12.0*p(1)*p(1));
-
-    } else if (dim==3){
-
-      return_value = 24.0*std::pow(p(1)*(1.0-p(1))*p(2)*(1.0-p(2)),2)
-                     +24.0*std::pow(p(0)*(1.0-p(0))*p(2)*(1.0-p(2)),2)
-                     +24.0*std::pow(p(0)*(1.0-p(0))*p(1)*(1.0-p(1)),2)
-                     +2.0*(2.0-12.0*p(0)+12.0*p(0)*p(0))*(2.0-12.0*p(1)+12.0*p(1)*p(1))*std::pow(p(2)*(1.0-p(2)),2)
-                     +2.0*(2.0-12.0*p(0)+12.0*p(0)*p(0))*(2.0-12.0*p(2)+12.0*p(2)*p(2))*std::pow(p(1)*(1.0-p(1)),2)
-                     +2.0*(2.0-12.0*p(1)+12.0*p(1)*p(1))*(2.0-12.0*p(2)+12.0*p(2)*p(2))*std::pow(p(0)*(1.0-p(0)),2);
-
-    }
+    if (dim == 2)
+      {
+        return_value = 24.0 * std::pow(p(1) * (1.0 - p(1)), 2) +
+                       +24.0 * std::pow(p(0) * (1.0 - p(0)), 2) +
+                       2.0 * (2.0 - 12.0 * p(0) + 12.0 * p(0) * p(0)) *
+                         (2.0 - 12.0 * p(1) + 12.0 * p(1) * p(1));
+      }
+    else if (dim == 3)
+      {
+        return_value =
+          24.0 * std::pow(p(1) * (1.0 - p(1)) * p(2) * (1.0 - p(2)), 2) +
+          24.0 * std::pow(p(0) * (1.0 - p(0)) * p(2) * (1.0 - p(2)), 2) +
+          24.0 * std::pow(p(0) * (1.0 - p(0)) * p(1) * (1.0 - p(1)), 2) +
+          2.0 * (2.0 - 12.0 * p(0) + 12.0 * p(0) * p(0)) *
+            (2.0 - 12.0 * p(1) + 12.0 * p(1) * p(1)) *
+            std::pow(p(2) * (1.0 - p(2)), 2) +
+          2.0 * (2.0 - 12.0 * p(0) + 12.0 * p(0) * p(0)) *
+            (2.0 - 12.0 * p(2) + 12.0 * p(2) * p(2)) *
+            std::pow(p(1) * (1.0 - p(1)), 2) +
+          2.0 * (2.0 - 12.0 * p(1) + 12.0 * p(1) * p(1)) *
+            (2.0 - 12.0 * p(2) + 12.0 * p(2) * p(2)) *
+            std::pow(p(0) * (1.0 - p(0)), 2);
+      }
 
     return return_value;
   }
@@ -178,86 +190,128 @@ namespace Step82
 
 
   // This class implement the manufactured (exact) solution $u$. To compute the
-  // errors, we need the value of $u$ as well as its gradient and its Hessian. 
+  // errors, we need the value of $u$ as well as its gradient and its Hessian.
   template <int dim>
   class ExactSolution : public Function<dim>
   {
   public:
-    ExactSolution () : Function<dim>() {}
+    ExactSolution()
+      : Function<dim>()
+    {}
 
-    virtual double value (const Point<dim>   &p,
-                          const unsigned int  component = 0) const override;
+    virtual double value(const Point<dim> & p,
+                         const unsigned int component = 0) const override;
 
-    virtual Tensor<1,dim> gradient (const Point<dim>   &p,
-                                    const unsigned int  component = 0) const override;
-    
-    virtual SymmetricTensor<2,dim> hessian (const Point<dim>   &p,
-                                            const unsigned int  component = 0) const override;  
+    virtual Tensor<1, dim>
+    gradient(const Point<dim> & p,
+             const unsigned int component = 0) const override;
+
+    virtual SymmetricTensor<2, dim>
+    hessian(const Point<dim> & p,
+            const unsigned int component = 0) const override;
   };
 
 
 
   template <int dim>
-  double ExactSolution<dim>::value (const Point<dim> &p,
-                                    const unsigned int /*component*/) const
+  double ExactSolution<dim>::value(const Point<dim> &p,
+                                   const unsigned int /*component*/) const
   {
     double return_value = 0.0;
-    
-    if (dim==2){
-      return_value = std::pow(p(0)*(1.0-p(0))*p(1)*(1.0-p(1)),2);
-    } else if (dim==3){
-      return_value = std::pow(p(0)*(1.0-p(0))*p(1)*(1.0-p(1))*p(2)*(1.0-p(2)),2);
-    }
-    
+
+    if (dim == 2)
+      {
+        return_value = std::pow(p(0) * (1.0 - p(0)) * p(1) * (1.0 - p(1)), 2);
+      }
+    else if (dim == 3)
+      {
+        return_value = std::pow(p(0) * (1.0 - p(0)) * p(1) * (1.0 - p(1)) *
+                                  p(2) * (1.0 - p(2)),
+                                2);
+      }
+
     return return_value;
   }
 
 
 
   template <int dim>
-  Tensor<1,dim> ExactSolution<dim>::gradient (const Point<dim> &p,
-                                              const unsigned int /*component*/) const
+  Tensor<1, dim>
+  ExactSolution<dim>::gradient(const Point<dim> &p,
+                               const unsigned int /*component*/) const
   {
-    Tensor<1,dim> return_gradient;
+    Tensor<1, dim> return_gradient;
     return_gradient = 0.0;
 
-    if (dim==2){
-      return_gradient[0] = (2.0*p(0)-6.0*std::pow(p(0),2)+4.0*std::pow(p(0),3)) * std::pow(p(1)*(1.0-p(1)),2);
-      return_gradient[1] = (2.0*p(1)-6.0*std::pow(p(1),2)+4.0*std::pow(p(1),3)) * std::pow(p(0)*(1.0-p(0)),2);
-    } else if (dim==3){
-      return_gradient[0] = (2.0*p(0)-6.0*std::pow(p(0),2)+4.0*std::pow(p(0),3)) * std::pow(p(1)*(1.0-p(1))*p(2)*(1.0-p(2)),2);
-      return_gradient[1] = (2.0*p(1)-6.0*std::pow(p(1),2)+4.0*std::pow(p(1),3)) * std::pow(p(0)*(1.0-p(0))*p(2)*(1.0-p(2)),2);
-      return_gradient[2] = (2.0*p(2)-6.0*std::pow(p(2),2)+4.0*std::pow(p(2),3)) * std::pow(p(0)*(1.0-p(0))*p(1)*(1.0-p(1)),2);
-    }
-    
+    if (dim == 2)
+      {
+        return_gradient[0] =
+          (2.0 * p(0) - 6.0 * std::pow(p(0), 2) + 4.0 * std::pow(p(0), 3)) *
+          std::pow(p(1) * (1.0 - p(1)), 2);
+        return_gradient[1] =
+          (2.0 * p(1) - 6.0 * std::pow(p(1), 2) + 4.0 * std::pow(p(1), 3)) *
+          std::pow(p(0) * (1.0 - p(0)), 2);
+      }
+    else if (dim == 3)
+      {
+        return_gradient[0] =
+          (2.0 * p(0) - 6.0 * std::pow(p(0), 2) + 4.0 * std::pow(p(0), 3)) *
+          std::pow(p(1) * (1.0 - p(1)) * p(2) * (1.0 - p(2)), 2);
+        return_gradient[1] =
+          (2.0 * p(1) - 6.0 * std::pow(p(1), 2) + 4.0 * std::pow(p(1), 3)) *
+          std::pow(p(0) * (1.0 - p(0)) * p(2) * (1.0 - p(2)), 2);
+        return_gradient[2] =
+          (2.0 * p(2) - 6.0 * std::pow(p(2), 2) + 4.0 * std::pow(p(2), 3)) *
+          std::pow(p(0) * (1.0 - p(0)) * p(1) * (1.0 - p(1)), 2);
+      }
+
     return return_gradient;
   }
 
 
 
   template <int dim>
-  SymmetricTensor<2,dim> ExactSolution<dim>::hessian (const Point<dim> &p,
-                                                      const unsigned int /*component*/) const
+  SymmetricTensor<2, dim>
+  ExactSolution<dim>::hessian(const Point<dim> &p,
+                              const unsigned int /*component*/) const
   {
-    SymmetricTensor<2,dim> return_hessian;
+    SymmetricTensor<2, dim> return_hessian;
     return_hessian = 0.0;
-    
-    if (dim==2){
-      return_hessian[0][0] = (2.0-12.0*p(0)+12.0*p(0)*p(0)) * std::pow(p(1)*(1.0-p(1)),2);
-      return_hessian[0][1] = (2.0*p(0)-6.0*std::pow(p(0),2)+4.0*std::pow(p(0),3)) * (2.0*p(1)-6.0*std::pow(p(1),2)
-                             +4.0*std::pow(p(1),3));
-      return_hessian[1][1] = (2.0-12.0*p(1)+12.0*p(1)*p(1)) * std::pow(p(0)*(1.0-p(0)),2);
-    } else if (dim==3){
-      return_hessian[0][0] = (2.0-12.0*p(0)+12.0*p(0)*p(0)) * std::pow(p(1)*(1.0-p(1))*p(2)*(1.0-p(2)),2);
-      return_hessian[0][1] = (2.0*p(0)-6.0*std::pow(p(0),2)+4.0*std::pow(p(0),3)) * (2.0*p(1)-6.0*std::pow(p(1),2)
-                             +4.0*std::pow(p(1),3)) * std::pow(p(2)*(1.0-p(2)),2);
-      return_hessian[0][2] = (2.0*p(0)-6.0*std::pow(p(0),2)+4.0*std::pow(p(0),3)) * (2.0*p(2)-6.0*std::pow(p(2),2)
-                             +4.0*std::pow(p(2),3)) * std::pow(p(1)*(1.0-p(1)),2);
-      return_hessian[1][1] = (2.0-12.0*p(1)+12.0*p(1)*p(1)) * std::pow(p(0)*(1.0-p(0))*p(2)*(1.0-p(2)),2);
-      return_hessian[1][2] = (2.0*p(1)-6.0*std::pow(p(1),2)+4.0*std::pow(p(1),3)) * (2.0*p(2)-6.0*std::pow(p(2),2)
-                             +4.0*std::pow(p(2),3)) * std::pow(p(0)*(1.0-p(0)),2);
-      return_hessian[2][2] = (2.0-12.0*p(2)+12.0*p(2)*p(2)) * std::pow(p(0)*(1.0-p(0))*p(1)*(1.0-p(1)),2);
-    }
+
+    if (dim == 2)
+      {
+        return_hessian[0][0] = (2.0 - 12.0 * p(0) + 12.0 * p(0) * p(0)) *
+                               std::pow(p(1) * (1.0 - p(1)), 2);
+        return_hessian[0][1] =
+          (2.0 * p(0) - 6.0 * std::pow(p(0), 2) + 4.0 * std::pow(p(0), 3)) *
+          (2.0 * p(1) - 6.0 * std::pow(p(1), 2) + 4.0 * std::pow(p(1), 3));
+        return_hessian[1][1] = (2.0 - 12.0 * p(1) + 12.0 * p(1) * p(1)) *
+                               std::pow(p(0) * (1.0 - p(0)), 2);
+      }
+    else if (dim == 3)
+      {
+        return_hessian[0][0] =
+          (2.0 - 12.0 * p(0) + 12.0 * p(0) * p(0)) *
+          std::pow(p(1) * (1.0 - p(1)) * p(2) * (1.0 - p(2)), 2);
+        return_hessian[0][1] =
+          (2.0 * p(0) - 6.0 * std::pow(p(0), 2) + 4.0 * std::pow(p(0), 3)) *
+          (2.0 * p(1) - 6.0 * std::pow(p(1), 2) + 4.0 * std::pow(p(1), 3)) *
+          std::pow(p(2) * (1.0 - p(2)), 2);
+        return_hessian[0][2] =
+          (2.0 * p(0) - 6.0 * std::pow(p(0), 2) + 4.0 * std::pow(p(0), 3)) *
+          (2.0 * p(2) - 6.0 * std::pow(p(2), 2) + 4.0 * std::pow(p(2), 3)) *
+          std::pow(p(1) * (1.0 - p(1)), 2);
+        return_hessian[1][1] =
+          (2.0 - 12.0 * p(1) + 12.0 * p(1) * p(1)) *
+          std::pow(p(0) * (1.0 - p(0)) * p(2) * (1.0 - p(2)), 2);
+        return_hessian[1][2] =
+          (2.0 * p(1) - 6.0 * std::pow(p(1), 2) + 4.0 * std::pow(p(1), 3)) *
+          (2.0 * p(2) - 6.0 * std::pow(p(2), 2) + 4.0 * std::pow(p(2), 3)) *
+          std::pow(p(0) * (1.0 - p(0)), 2);
+        return_hessian[2][2] =
+          (2.0 - 12.0 * p(2) + 12.0 * p(2) * p(2)) *
+          std::pow(p(0) * (1.0 - p(0)) * p(1) * (1.0 - p(1)), 2);
+      }
 
     return return_hessian;
   }
@@ -272,13 +326,15 @@ namespace Step82
   // spaces, we associate the corresponding DoF handlers to the triangulation,
   // and we set the two penalty coefficients.
   template <int dim>
-  BiLaplacianLDGLift<dim>::BiLaplacianLDGLift (const unsigned int fe_degree,double penalty_jump_grad, double penalty_jump_val):
-    fe(fe_degree),
-    dof_handler(triangulation),
-    fe_lift(FE_DGQ<dim>(fe_degree),dim*dim),
-    dof_handler_lift(triangulation),
-    penalty_jump_grad(penalty_jump_grad),
-    penalty_jump_val(penalty_jump_val)
+  BiLaplacianLDGLift<dim>::BiLaplacianLDGLift(const unsigned int fe_degree,
+                                              double penalty_jump_grad,
+                                              double penalty_jump_val)
+    : fe(fe_degree)
+    , dof_handler(triangulation)
+    , fe_lift(FE_DGQ<dim>(fe_degree), dim * dim)
+    , dof_handler_lift(triangulation)
+    , penalty_jump_grad(penalty_jump_grad)
+    , penalty_jump_val(penalty_jump_val)
   {}
 
 
@@ -286,7 +342,7 @@ namespace Step82
   // @sect4{BiLaplacianLDGLift::make_grid}
 
   // To build a mesh for $\Omega=(0,1)^d$, we simply call the function
-  // <code>GridGenerator::hyper_cube</code> and then refine it using 
+  // <code>GridGenerator::hyper_cube</code> and then refine it using
   // <code>refine_global</code>. The number of refinements is hard-coded
   // here.
   template <int dim>
@@ -294,67 +350,76 @@ namespace Step82
   {
     std::cout << "Building the mesh............." << std::endl;
 
-    GridGenerator::hyper_cube(triangulation,0.0,1.0);
+    GridGenerator::hyper_cube(triangulation, 0.0, 1.0);
 
     triangulation.refine_global(3);
-  
-    std::cout << "Number of active cells: " << triangulation.n_active_cells() << std::endl;
+
+    std::cout << "Number of active cells: " << triangulation.n_active_cells()
+              << std::endl;
   }
 
 
 
   // @sect4{BiLaplacianLDGLift::setup_system}
 
-  // In the following function, we set up the degrees of freedom, the sparsity pattern,
-  // the size of the matrix $A$, and the size of the solution and right-hand side vectors
-  // $\boldsymbol{U}$ and $\boldsymbol{F}$. For the sparsity pattern, we cannot directly
-  // use the function <code>DoFTools::make_flux_sparsity_pattern</code> (as we would do for
-  // instance for the SIPG method) because we need to take into account the interactions
-  // of a neighboring cell with another neighboring cell as described in the introduction.
-  // The extended sparsity pattern is build by iterating over all the active cells. For
-  // the current cell, we collect all its degrees of freedom as well as the degrees of
-  // freedom of all its neighboring cells, and then couple everything with everything.
+  // In the following function, we set up the degrees of freedom, the sparsity
+  // pattern, the size of the matrix $A$, and the size of the solution and
+  // right-hand side vectors
+  // $\boldsymbol{U}$ and $\boldsymbol{F}$. For the sparsity pattern, we cannot
+  // directly use the function <code>DoFTools::make_flux_sparsity_pattern</code>
+  // (as we would do for instance for the SIPG method) because we need to take
+  // into account the interactions of a neighboring cell with another
+  // neighboring cell as described in the introduction. The extended sparsity
+  // pattern is build by iterating over all the active cells. For the current
+  // cell, we collect all its degrees of freedom as well as the degrees of
+  // freedom of all its neighboring cells, and then couple everything with
+  // everything.
   template <int dim>
   void BiLaplacianLDGLift<dim>::setup_system()
   {
     dof_handler.distribute_dofs(fe);
     dof_handler_lift.distribute_dofs(fe_lift);
-    
-    std::cout << "Number of degrees of freedom: " << dof_handler.n_dofs() << std::endl;
 
-    DynamicSparsityPattern dsp(dof_handler.n_dofs(),dof_handler.n_dofs());
+    std::cout << "Number of degrees of freedom: " << dof_handler.n_dofs()
+              << std::endl;
+
+    DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
 
     const auto dofs_per_cell = fe.dofs_per_cell;
 
-    for (const auto cell : dof_handler.active_cell_iterators()){
+    for (const auto cell : dof_handler.active_cell_iterators())
+      {
+        std::vector<types::global_dof_index> dofs(dofs_per_cell);
+        cell->get_dof_indices(dofs);
 
-      std::vector<types::global_dof_index> dofs(dofs_per_cell);
-      cell->get_dof_indices(dofs);
+        for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+          {
+            if (!cell->face(f)->at_boundary())
+              {
+                const auto neighbor_cell = cell->neighbor(f);
 
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f){
-        if (!cell->face(f)->at_boundary()){
-          const auto neighbor_cell = cell->neighbor(f);
+                std::vector<types::global_dof_index> tmp(dofs_per_cell);
+                neighbor_cell->get_dof_indices(tmp);
 
-          std::vector<types::global_dof_index> tmp(dofs_per_cell);
-          neighbor_cell->get_dof_indices(tmp);
+                dofs.insert(std::end(dofs), std::begin(tmp), std::end(tmp));
+              }
+          }
 
-          dofs.insert(std::end(dofs), std::begin(tmp), std::end(tmp));
-        }
+        for (const auto i : dofs)
+          {
+            for (const auto j : dofs)
+              {
+                dsp.add(i, j);
+                dsp.add(j, i);
+              }
+          }
       }
-
-      for (const auto i : dofs){
-        for (const auto j : dofs){
-          dsp.add(i, j);
-          dsp.add(j, i);
-        }
-      }
-    }
 
     sparsity_pattern.copy_from(dsp);
 
     std::ofstream out("sparsity_pattern.svg");
     sparsity_pattern.print_svg(out);
-  
+
     matrix.reinit(sparsity_pattern);
     rhs.reinit(dof_handler.n_dofs());
 
@@ -374,7 +439,7 @@ namespace Step82
 
     assemble_matrix();
     assemble_rhs();
-  
+
     std::cout << "Done. " << std::endl;
   }
 
@@ -390,285 +455,406 @@ namespace Step82
   {
     matrix = 0;
 
-    QGauss<dim> quad(fe.degree+1);
-    QGauss<dim-1> quad_face(fe.degree+1);
+    QGauss<dim>     quad(fe.degree + 1);
+    QGauss<dim - 1> quad_face(fe.degree + 1);
 
-    const unsigned int   n_q_points = quad.size();
-    const unsigned int   n_q_points_face = quad_face.size();
+    const unsigned int n_q_points      = quad.size();
+    const unsigned int n_q_points_face = quad_face.size();
 
-    FEValues<dim> fe_values (fe, quad, update_hessians |
-                                       update_JxW_values);
+    FEValues<dim> fe_values(fe, quad, update_hessians | update_JxW_values);
 
-    FEFaceValues<dim> fe_face (fe, quad_face, update_values |
-                                              update_gradients |
-                                              update_normal_vectors);
+    FEFaceValues<dim> fe_face(
+      fe, quad_face, update_values | update_gradients | update_normal_vectors);
 
-    FEFaceValues<dim> fe_face_neighbor (fe, quad_face, update_values |
-                                                       update_gradients |
-                                                       update_normal_vectors);
+    FEFaceValues<dim> fe_face_neighbor(
+      fe, quad_face, update_values | update_gradients | update_normal_vectors);
 
-    const unsigned int   n_dofs = fe_values.dofs_per_cell;
+    const unsigned int n_dofs = fe_values.dofs_per_cell;
 
     std::vector<types::global_dof_index> local_dof_indices(n_dofs),
-                                         local_dof_indices_neighbor (n_dofs),
-                                         local_dof_indices_neighbor_2 (n_dofs);
+      local_dof_indices_neighbor(n_dofs), local_dof_indices_neighbor_2(n_dofs);
 
     // As indicated in the introduction, the following matrices are used for
     // the contributions of the products of the discrete Hessians.
-    FullMatrix<double> stiffness_matrix_cc (n_dofs,n_dofs); // interactions cell / cell
-    FullMatrix<double> stiffness_matrix_cn (n_dofs,n_dofs); // interactions cell / neighboor
-    FullMatrix<double> stiffness_matrix_nc (n_dofs,n_dofs); // interactions neighboor / cell
-    FullMatrix<double> stiffness_matrix_nn (n_dofs,n_dofs); // interactions neighboor / neighboor
-    FullMatrix<double> stiffness_matrix_n1n2 (n_dofs,n_dofs); // interactions neighboor_1 / neighboor_2
-    FullMatrix<double> stiffness_matrix_n2n1 (n_dofs,n_dofs); // interactions neighboor_2 / neighboor_1
+    FullMatrix<double> stiffness_matrix_cc(n_dofs,
+                                           n_dofs); // interactions cell / cell
+    FullMatrix<double> stiffness_matrix_cn(
+      n_dofs, n_dofs); // interactions cell / neighboor
+    FullMatrix<double> stiffness_matrix_nc(
+      n_dofs, n_dofs); // interactions neighboor / cell
+    FullMatrix<double> stiffness_matrix_nn(
+      n_dofs, n_dofs); // interactions neighboor / neighboor
+    FullMatrix<double> stiffness_matrix_n1n2(
+      n_dofs, n_dofs); // interactions neighboor_1 / neighboor_2
+    FullMatrix<double> stiffness_matrix_n2n1(
+      n_dofs, n_dofs); // interactions neighboor_2 / neighboor_1
 
     // The following matrices are used for the contributions of the two
     // penalty terms.
-    FullMatrix<double>   ip_matrix_cc (n_dofs,n_dofs); // interactions cell / cell
-    FullMatrix<double>   ip_matrix_cn (n_dofs,n_dofs); // interactions cell / neighboor
-    FullMatrix<double>   ip_matrix_nc (n_dofs,n_dofs); // interactions neighboor / cell
-    FullMatrix<double>   ip_matrix_nn (n_dofs,n_dofs); // interactions neighboor / neighboor
+    FullMatrix<double> ip_matrix_cc(n_dofs, n_dofs); // interactions cell / cell
+    FullMatrix<double> ip_matrix_cn(n_dofs,
+                                    n_dofs); // interactions cell / neighboor
+    FullMatrix<double> ip_matrix_nc(n_dofs,
+                                    n_dofs); // interactions neighboor / cell
+    FullMatrix<double> ip_matrix_nn(
+      n_dofs, n_dofs); // interactions neighboor / neighboor
 
-    std::vector<std::vector<Tensor<2,dim>>> discrete_hessians (n_dofs, std::vector<Tensor<2,dim>>(n_q_points) );
-    std::vector<std::vector<std::vector<Tensor<2,dim>>>> discrete_hessians_neigh (GeometryInfo<dim>::faces_per_cell, discrete_hessians);
+    std::vector<std::vector<Tensor<2, dim>>> discrete_hessians(
+      n_dofs, std::vector<Tensor<2, dim>>(n_q_points));
+    std::vector<std::vector<std::vector<Tensor<2, dim>>>>
+      discrete_hessians_neigh(GeometryInfo<dim>::faces_per_cell,
+                              discrete_hessians);
 
-    Tensor<2,dim> H_i,H_j;
-    Tensor<2,dim> H_i_neigh,H_j_neigh;
-    Tensor<2,dim> H_i_neigh2,H_j_neigh2;
+    Tensor<2, dim> H_i, H_j;
+    Tensor<2, dim> H_i_neigh, H_j_neigh;
+    Tensor<2, dim> H_i_neigh2, H_j_neigh2;
 
-    double mesh_inv,mesh3_inv;
-    bool at_boundary,at_boundary_2;
+    double       mesh_inv, mesh3_inv;
+    bool         at_boundary, at_boundary_2;
     unsigned int face_no_neighbor = 0;
 
-    typename DoFHandler<dim>::active_cell_iterator
-      cell = dof_handler.begin_active(),
-      endc = dof_handler.end();
-  
-    typename DoFHandler<dim>::active_cell_iterator neighbor_cell,neighbor_cell_2;
+    typename DoFHandler<dim>::active_cell_iterator cell =
+                                                     dof_handler.begin_active(),
+                                                   endc = dof_handler.end();
 
-    typename DoFHandler<dim>::active_cell_iterator cell_lift = dof_handler_lift.begin_active();
+    typename DoFHandler<dim>::active_cell_iterator neighbor_cell,
+      neighbor_cell_2;
 
-    for (; cell != endc; ++cell, ++cell_lift){
+    typename DoFHandler<dim>::active_cell_iterator cell_lift =
+      dof_handler_lift.begin_active();
 
-      fe_values.reinit(cell);
-      cell->get_dof_indices (local_dof_indices); 
+    for (; cell != endc; ++cell, ++cell_lift)
+      {
+        fe_values.reinit(cell);
+        cell->get_dof_indices(local_dof_indices);
 
-      // We now compute all the discrete Hessians that are not vanishing
-      // on the current cell, i.e., the discrete Hessian of all the basis
-      // functions with support on the current cell or on one of its neighbors.
-      compute_discrete_hessians(cell,cell_lift,
-                                discrete_hessians,discrete_hessians_neigh);
+        // We now compute all the discrete Hessians that are not vanishing
+        // on the current cell, i.e., the discrete Hessian of all the basis
+        // functions with support on the current cell or on one of its
+        // neighbors.
+        compute_discrete_hessians(cell,
+                                  cell_lift,
+                                  discrete_hessians,
+                                  discrete_hessians_neigh);
 
-      // First, we compute and add the interactions of the degrees of freedom
-      // of the current cell.
-      stiffness_matrix_cc = 0;
-      for (unsigned int q=0; q<n_q_points; ++q){
-        const double dx = fe_values.JxW(q);
-        
-        for (unsigned int i=0; i<n_dofs; ++i){
-          for (unsigned int j=0; j<n_dofs; ++j){
-
-            H_i = discrete_hessians[i][q];
-            H_j = discrete_hessians[j][q];
-            
-            stiffness_matrix_cc(i,j) += dx * scalar_product(H_j,H_i);
-
-          } 
-        }
-      }
-          
-      for (unsigned int i=0; i<n_dofs; ++i){
-        for (unsigned int j=0; j<n_dofs; ++j){
-          matrix(local_dof_indices[i],local_dof_indices[j]) += stiffness_matrix_cc(i,j);
-        }
-      }
-
-      // Next, we compute and add the interactions of the degrees of freedom of the current
-      // cell with those of its neighbors. Note that the interactions of the degrees of
-      // freedom of a neighbor with those of the same neighbor are included here.
-      for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no){
-        const typename DoFHandler<dim>::face_iterator face=cell->face(face_no);
-                
-        at_boundary = face->at_boundary();
-
-	if (!at_boundary){ // nothing to be done if boundary face (the liftings of the Dirichlet BCs are accounted for in the assembly of the RHS; in fact, nothing to be done in this program since we prescribe homogeneous BCs)
-
-          neighbor_cell =cell->neighbor(face_no);
-          neighbor_cell->get_dof_indices (local_dof_indices_neighbor);
-
-          stiffness_matrix_cn=0;
-          stiffness_matrix_nc=0;
-          stiffness_matrix_nn=0;
-          for (unsigned int q=0; q<n_q_points; ++q){
+        // First, we compute and add the interactions of the degrees of freedom
+        // of the current cell.
+        stiffness_matrix_cc = 0;
+        for (unsigned int q = 0; q < n_q_points; ++q)
+          {
             const double dx = fe_values.JxW(q);
-        
-            for (unsigned int i=0; i<n_dofs; ++i){
-              for (unsigned int j=0; j<n_dofs; ++j){
 
-                H_i = discrete_hessians[i][q];
-                H_j = discrete_hessians[j][q];
-              
-                H_i_neigh = discrete_hessians_neigh[face_no][i][q];
-                H_j_neigh = discrete_hessians_neigh[face_no][j][q];
-              
-                stiffness_matrix_cn(i,j) += dx * scalar_product(H_j_neigh,H_i);
-                stiffness_matrix_nc(i,j) += dx * scalar_product(H_j,H_i_neigh);
-                stiffness_matrix_nn(i,j) += dx * scalar_product(H_j_neigh,H_i_neigh);
+            for (unsigned int i = 0; i < n_dofs; ++i)
+              {
+                for (unsigned int j = 0; j < n_dofs; ++j)
+                  {
+                    H_i = discrete_hessians[i][q];
+                    H_j = discrete_hessians[j][q];
 
-	      } 
-	    }
-          }
-          
-          for (unsigned int i=0; i<n_dofs; ++i){
-            for (unsigned int j=0; j<n_dofs; ++j){
-              matrix(local_dof_indices[i],local_dof_indices_neighbor[j]) += stiffness_matrix_cn(i,j);
-              matrix(local_dof_indices_neighbor[i],local_dof_indices[j]) += stiffness_matrix_nc(i,j);
-              matrix(local_dof_indices_neighbor[i],local_dof_indices_neighbor[j]) += stiffness_matrix_nn(i,j);
-            }
-          }
-
-        } // boundary check
-      } // for face
-
-      // We now compute and add the interactions of the degrees of freedom of a
-      // neighboring cells with those of another neighboring cell (this is where we
-      // need the extended sparsity pattern).
-      for (unsigned int face_no=0; face_no < GeometryInfo<dim>::faces_per_cell-1; ++face_no){
-        const typename DoFHandler<dim>::face_iterator face=cell->face(face_no);
-                
-        at_boundary = face->at_boundary();
-
-	if (!at_boundary){ // nothing to be done if boundary face (the liftings of the Dirichlet BCs are accounted for in the assembly of the RHS; in fact, nothing to be done in this program since we prescribe homogeneous BCs)
-
-
-          for (unsigned int face_no_2=face_no+1; face_no_2 < GeometryInfo<dim>::faces_per_cell; ++face_no_2){
-            const typename DoFHandler<dim>::face_iterator face_2=cell->face(face_no_2);
-            at_boundary_2 = face_2->at_boundary();
-
-	    if (!at_boundary_2){
-
-	      neighbor_cell = cell->neighbor(face_no);
-	      neighbor_cell->get_dof_indices (local_dof_indices_neighbor);
-	      neighbor_cell_2 = cell->neighbor(face_no_2);
-	      neighbor_cell_2->get_dof_indices (local_dof_indices_neighbor_2);
-
-              stiffness_matrix_n1n2=0;
-              stiffness_matrix_n2n1=0;
-
-              for (unsigned int q=0; q<n_q_points; ++q){
-                const double dx = fe_values.JxW(q);
-        
-                for (unsigned int i=0; i<n_dofs; ++i){
-                  for (unsigned int j=0; j<n_dofs; ++j){
-
- 		     H_i_neigh = discrete_hessians_neigh[face_no][i][q];
- 		     H_j_neigh = discrete_hessians_neigh[face_no][j][q];
- 		     
- 		     H_i_neigh2 = discrete_hessians_neigh[face_no_2][i][q];
- 		     H_j_neigh2 = discrete_hessians_neigh[face_no_2][j][q];
- 		     
-                    stiffness_matrix_n1n2(i,j) += dx * scalar_product(H_j_neigh2,H_i_neigh);
-                    stiffness_matrix_n2n1(i,j) += dx * scalar_product(H_j_neigh,H_i_neigh2);
-
-	          } 
-	        }
+                    stiffness_matrix_cc(i, j) += dx * scalar_product(H_j, H_i);
+                  }
               }
-          
-              for (unsigned int i=0; i<n_dofs; ++i){
-                for (unsigned int j=0; j<n_dofs; ++j){
-                  matrix(local_dof_indices_neighbor[i],local_dof_indices_neighbor_2[j]) += stiffness_matrix_n1n2(i,j);
-                  matrix(local_dof_indices_neighbor_2[i],local_dof_indices_neighbor[j]) += stiffness_matrix_n2n1(i,j);
-                }
-              }
-            } // boundary check face_2
-          } // for face_2
-        } // boundary check face_1
-      } // for face_1
-
-
-      // Finally, we compute and add the two penalty terms.
-      for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no){
-        const typename DoFHandler<dim>::face_iterator face=cell->face(face_no);
-
-        mesh_inv = 1.0/face->diameter(); // h_e^{-1}
-        mesh3_inv = 1.0/std::pow(face->diameter(),3); // ĥ_e^{-3}
-         
-        fe_face.reinit(cell,face_no);
-
-        ip_matrix_cc = 0; // filled in any case (boundary or interior face)
-        
-        at_boundary = face->at_boundary();
-        if (at_boundary){
-
-          for (unsigned int q=0; q<n_q_points_face; ++q){
-            const double dx = fe_face.JxW(q);
-
-            for (unsigned int i=0; i<n_dofs; ++i){
-              for (unsigned int j=0; j<n_dofs; ++j){
-                ip_matrix_cc(i,j) += penalty_jump_grad * mesh_inv * dx * fe_face.shape_grad(j,q) * fe_face.shape_grad(i,q);
-                ip_matrix_cc(i,j) += penalty_jump_val * mesh3_inv * dx * fe_face.shape_value(j,q) * fe_face.shape_value(i,q);
-              }
-            }
           }
 
-        } else{ // interior face
-   
-          neighbor_cell =cell->neighbor(face_no);        
-          face_no_neighbor = cell->neighbor_of_neighbor (face_no);
-
-          if(neighbor_cell->id().operator<(cell->id())){ //we need to have a global way to compare the cells in order to not calculate the same jump term twice
-            continue; // skip this face (already considered)
-	  } else{
-
-            fe_face_neighbor.reinit(neighbor_cell,face_no_neighbor);
-            neighbor_cell->get_dof_indices (local_dof_indices_neighbor);
-                        
-            ip_matrix_cn = 0;
-            ip_matrix_nc = 0;
-            ip_matrix_nn = 0;
-
-            for (unsigned int q=0; q<n_q_points_face; ++q){
-              const double dx = fe_face.JxW(q);
-
-              for (unsigned int i=0; i<n_dofs; ++i){
-                for (unsigned int j=0; j<n_dofs; ++j){
-                  ip_matrix_cc(i,j) += penalty_jump_grad * mesh_inv * dx * fe_face.shape_grad(j,q) * fe_face.shape_grad(i,q);
-                  ip_matrix_cc(i,j) += penalty_jump_val * mesh3_inv * dx * fe_face.shape_value(j,q) * fe_face.shape_value(i,q);
-                  
-                  ip_matrix_cn(i,j) -= penalty_jump_grad * mesh_inv * dx * fe_face_neighbor.shape_grad(j,q) * fe_face.shape_grad(i,q);
-                  ip_matrix_cn(i,j) -= penalty_jump_val * mesh3_inv * dx * fe_face_neighbor.shape_value(j,q) * fe_face.shape_value(i,q);
-                  
-                  ip_matrix_nc(i,j) -= penalty_jump_grad * mesh_inv * dx * fe_face.shape_grad(j,q) * fe_face_neighbor.shape_grad(i,q);
-                  ip_matrix_nc(i,j) -= penalty_jump_val * mesh3_inv * dx * fe_face.shape_value(j,q) * fe_face_neighbor.shape_value(i,q);
-                  
-                  ip_matrix_nn(i,j) += penalty_jump_grad * mesh_inv * dx * fe_face_neighbor.shape_grad(j,q) * fe_face_neighbor.shape_grad(i,q);
-                  ip_matrix_nn(i,j) += penalty_jump_val * mesh3_inv * dx * fe_face_neighbor.shape_value(j,q) * fe_face_neighbor.shape_value(i,q);
-                }
+        for (unsigned int i = 0; i < n_dofs; ++i)
+          {
+            for (unsigned int j = 0; j < n_dofs; ++j)
+              {
+                matrix(local_dof_indices[i], local_dof_indices[j]) +=
+                  stiffness_matrix_cc(i, j);
               }
-            }
-          } // face not visited yet
-
-        } // boundary check
-
-        for (unsigned int i=0; i<n_dofs; ++i){
-          for (unsigned int j=0; j<n_dofs; ++j){
-            matrix(local_dof_indices[i],local_dof_indices[j]) += ip_matrix_cc(i,j);
           }
-        }
 
-        if (!at_boundary){
+        // Next, we compute and add the interactions of the degrees of freedom
+        // of the current cell with those of its neighbors. Note that the
+        // interactions of the degrees of freedom of a neighbor with those of
+        // the same neighbor are included here.
+        for (unsigned int face_no = 0;
+             face_no < GeometryInfo<dim>::faces_per_cell;
+             ++face_no)
+          {
+            const typename DoFHandler<dim>::face_iterator face =
+              cell->face(face_no);
 
-          for (unsigned int i=0; i<n_dofs; ++i){
-            for (unsigned int j=0; j<n_dofs; ++j){
-              matrix(local_dof_indices[i],local_dof_indices_neighbor[j]) += ip_matrix_cn(i,j);
-              matrix(local_dof_indices_neighbor[i],local_dof_indices[j]) += ip_matrix_nc(i,j);
-              matrix(local_dof_indices_neighbor[i],local_dof_indices_neighbor[j]) += ip_matrix_nn(i,j);
-            }
-          }
-        }
+            at_boundary = face->at_boundary();
 
-      } // for face
-    } // for cell
+            if (!at_boundary)
+              { // nothing to be done if boundary face (the liftings of the
+                // Dirichlet BCs are accounted for in the assembly of the RHS;
+                // in fact, nothing to be done in this program since we
+                // prescribe homogeneous BCs)
+
+                neighbor_cell = cell->neighbor(face_no);
+                neighbor_cell->get_dof_indices(local_dof_indices_neighbor);
+
+                stiffness_matrix_cn = 0;
+                stiffness_matrix_nc = 0;
+                stiffness_matrix_nn = 0;
+                for (unsigned int q = 0; q < n_q_points; ++q)
+                  {
+                    const double dx = fe_values.JxW(q);
+
+                    for (unsigned int i = 0; i < n_dofs; ++i)
+                      {
+                        for (unsigned int j = 0; j < n_dofs; ++j)
+                          {
+                            H_i = discrete_hessians[i][q];
+                            H_j = discrete_hessians[j][q];
+
+                            H_i_neigh = discrete_hessians_neigh[face_no][i][q];
+                            H_j_neigh = discrete_hessians_neigh[face_no][j][q];
+
+                            stiffness_matrix_cn(i, j) +=
+                              dx * scalar_product(H_j_neigh, H_i);
+                            stiffness_matrix_nc(i, j) +=
+                              dx * scalar_product(H_j, H_i_neigh);
+                            stiffness_matrix_nn(i, j) +=
+                              dx * scalar_product(H_j_neigh, H_i_neigh);
+                          }
+                      }
+                  }
+
+                for (unsigned int i = 0; i < n_dofs; ++i)
+                  {
+                    for (unsigned int j = 0; j < n_dofs; ++j)
+                      {
+                        matrix(local_dof_indices[i],
+                               local_dof_indices_neighbor[j]) +=
+                          stiffness_matrix_cn(i, j);
+                        matrix(local_dof_indices_neighbor[i],
+                               local_dof_indices[j]) +=
+                          stiffness_matrix_nc(i, j);
+                        matrix(local_dof_indices_neighbor[i],
+                               local_dof_indices_neighbor[j]) +=
+                          stiffness_matrix_nn(i, j);
+                      }
+                  }
+
+              } // boundary check
+          }     // for face
+
+        // We now compute and add the interactions of the degrees of freedom of
+        // a neighboring cells with those of another neighboring cell (this is
+        // where we need the extended sparsity pattern).
+        for (unsigned int face_no = 0;
+             face_no < GeometryInfo<dim>::faces_per_cell - 1;
+             ++face_no)
+          {
+            const typename DoFHandler<dim>::face_iterator face =
+              cell->face(face_no);
+
+            at_boundary = face->at_boundary();
+
+            if (!at_boundary)
+              { // nothing to be done if boundary face (the liftings of the
+                // Dirichlet BCs are accounted for in the assembly of the RHS;
+                // in fact, nothing to be done in this program since we
+                // prescribe homogeneous BCs)
+
+
+                for (unsigned int face_no_2 = face_no + 1;
+                     face_no_2 < GeometryInfo<dim>::faces_per_cell;
+                     ++face_no_2)
+                  {
+                    const typename DoFHandler<dim>::face_iterator face_2 =
+                      cell->face(face_no_2);
+                    at_boundary_2 = face_2->at_boundary();
+
+                    if (!at_boundary_2)
+                      {
+                        neighbor_cell = cell->neighbor(face_no);
+                        neighbor_cell->get_dof_indices(
+                          local_dof_indices_neighbor);
+                        neighbor_cell_2 = cell->neighbor(face_no_2);
+                        neighbor_cell_2->get_dof_indices(
+                          local_dof_indices_neighbor_2);
+
+                        stiffness_matrix_n1n2 = 0;
+                        stiffness_matrix_n2n1 = 0;
+
+                        for (unsigned int q = 0; q < n_q_points; ++q)
+                          {
+                            const double dx = fe_values.JxW(q);
+
+                            for (unsigned int i = 0; i < n_dofs; ++i)
+                              {
+                                for (unsigned int j = 0; j < n_dofs; ++j)
+                                  {
+                                    H_i_neigh =
+                                      discrete_hessians_neigh[face_no][i][q];
+                                    H_j_neigh =
+                                      discrete_hessians_neigh[face_no][j][q];
+
+                                    H_i_neigh2 =
+                                      discrete_hessians_neigh[face_no_2][i][q];
+                                    H_j_neigh2 =
+                                      discrete_hessians_neigh[face_no_2][j][q];
+
+                                    stiffness_matrix_n1n2(i, j) +=
+                                      dx *
+                                      scalar_product(H_j_neigh2, H_i_neigh);
+                                    stiffness_matrix_n2n1(i, j) +=
+                                      dx *
+                                      scalar_product(H_j_neigh, H_i_neigh2);
+                                  }
+                              }
+                          }
+
+                        for (unsigned int i = 0; i < n_dofs; ++i)
+                          {
+                            for (unsigned int j = 0; j < n_dofs; ++j)
+                              {
+                                matrix(local_dof_indices_neighbor[i],
+                                       local_dof_indices_neighbor_2[j]) +=
+                                  stiffness_matrix_n1n2(i, j);
+                                matrix(local_dof_indices_neighbor_2[i],
+                                       local_dof_indices_neighbor[j]) +=
+                                  stiffness_matrix_n2n1(i, j);
+                              }
+                          }
+                      } // boundary check face_2
+                  }     // for face_2
+              }         // boundary check face_1
+          }             // for face_1
+
+
+        // Finally, we compute and add the two penalty terms.
+        for (unsigned int face_no = 0;
+             face_no < GeometryInfo<dim>::faces_per_cell;
+             ++face_no)
+          {
+            const typename DoFHandler<dim>::face_iterator face =
+              cell->face(face_no);
+
+            mesh_inv  = 1.0 / face->diameter();              // h_e^{-1}
+            mesh3_inv = 1.0 / std::pow(face->diameter(), 3); // ĥ_e^{-3}
+
+            fe_face.reinit(cell, face_no);
+
+            ip_matrix_cc = 0; // filled in any case (boundary or interior face)
+
+            at_boundary = face->at_boundary();
+            if (at_boundary)
+              {
+                for (unsigned int q = 0; q < n_q_points_face; ++q)
+                  {
+                    const double dx = fe_face.JxW(q);
+
+                    for (unsigned int i = 0; i < n_dofs; ++i)
+                      {
+                        for (unsigned int j = 0; j < n_dofs; ++j)
+                          {
+                            ip_matrix_cc(i, j) += penalty_jump_grad * mesh_inv *
+                                                  dx *
+                                                  fe_face.shape_grad(j, q) *
+                                                  fe_face.shape_grad(i, q);
+                            ip_matrix_cc(i, j) += penalty_jump_val * mesh3_inv *
+                                                  dx *
+                                                  fe_face.shape_value(j, q) *
+                                                  fe_face.shape_value(i, q);
+                          }
+                      }
+                  }
+              }
+            else
+              { // interior face
+
+                neighbor_cell    = cell->neighbor(face_no);
+                face_no_neighbor = cell->neighbor_of_neighbor(face_no);
+
+                if (neighbor_cell->id().operator<(cell->id()))
+                  { // we need to have a global way to compare the cells in
+                    // order to not calculate the same jump term twice
+                    continue; // skip this face (already considered)
+                  }
+                else
+                  {
+                    fe_face_neighbor.reinit(neighbor_cell, face_no_neighbor);
+                    neighbor_cell->get_dof_indices(local_dof_indices_neighbor);
+
+                    ip_matrix_cn = 0;
+                    ip_matrix_nc = 0;
+                    ip_matrix_nn = 0;
+
+                    for (unsigned int q = 0; q < n_q_points_face; ++q)
+                      {
+                        const double dx = fe_face.JxW(q);
+
+                        for (unsigned int i = 0; i < n_dofs; ++i)
+                          {
+                            for (unsigned int j = 0; j < n_dofs; ++j)
+                              {
+                                ip_matrix_cc(i, j) += penalty_jump_grad *
+                                                      mesh_inv * dx *
+                                                      fe_face.shape_grad(j, q) *
+                                                      fe_face.shape_grad(i, q);
+                                ip_matrix_cc(i, j) +=
+                                  penalty_jump_val * mesh3_inv * dx *
+                                  fe_face.shape_value(j, q) *
+                                  fe_face.shape_value(i, q);
+
+                                ip_matrix_cn(i, j) -=
+                                  penalty_jump_grad * mesh_inv * dx *
+                                  fe_face_neighbor.shape_grad(j, q) *
+                                  fe_face.shape_grad(i, q);
+                                ip_matrix_cn(i, j) -=
+                                  penalty_jump_val * mesh3_inv * dx *
+                                  fe_face_neighbor.shape_value(j, q) *
+                                  fe_face.shape_value(i, q);
+
+                                ip_matrix_nc(i, j) -=
+                                  penalty_jump_grad * mesh_inv * dx *
+                                  fe_face.shape_grad(j, q) *
+                                  fe_face_neighbor.shape_grad(i, q);
+                                ip_matrix_nc(i, j) -=
+                                  penalty_jump_val * mesh3_inv * dx *
+                                  fe_face.shape_value(j, q) *
+                                  fe_face_neighbor.shape_value(i, q);
+
+                                ip_matrix_nn(i, j) +=
+                                  penalty_jump_grad * mesh_inv * dx *
+                                  fe_face_neighbor.shape_grad(j, q) *
+                                  fe_face_neighbor.shape_grad(i, q);
+                                ip_matrix_nn(i, j) +=
+                                  penalty_jump_val * mesh3_inv * dx *
+                                  fe_face_neighbor.shape_value(j, q) *
+                                  fe_face_neighbor.shape_value(i, q);
+                              }
+                          }
+                      }
+                  } // face not visited yet
+
+              } // boundary check
+
+            for (unsigned int i = 0; i < n_dofs; ++i)
+              {
+                for (unsigned int j = 0; j < n_dofs; ++j)
+                  {
+                    matrix(local_dof_indices[i], local_dof_indices[j]) +=
+                      ip_matrix_cc(i, j);
+                  }
+              }
+
+            if (!at_boundary)
+              {
+                for (unsigned int i = 0; i < n_dofs; ++i)
+                  {
+                    for (unsigned int j = 0; j < n_dofs; ++j)
+                      {
+                        matrix(local_dof_indices[i],
+                               local_dof_indices_neighbor[j]) +=
+                          ip_matrix_cn(i, j);
+                        matrix(local_dof_indices_neighbor[i],
+                               local_dof_indices[j]) += ip_matrix_nc(i, j);
+                        matrix(local_dof_indices_neighbor[i],
+                               local_dof_indices_neighbor[j]) +=
+                          ip_matrix_nn(i, j);
+                      }
+                  }
+              }
+
+          } // for face
+      }     // for cell
   }
 
 
@@ -683,42 +869,46 @@ namespace Step82
   void BiLaplacianLDGLift<dim>::assemble_rhs()
   {
     rhs = 0;
- 
-    QGauss<dim> quad(fe.degree+1);  
-    FEValues<dim> fe_values(fe, quad, update_values |
-                                      update_quadrature_points |
-                                      update_JxW_values);
 
-    const unsigned int n_dofs = fe_values.dofs_per_cell;
+    QGauss<dim>   quad(fe.degree + 1);
+    FEValues<dim> fe_values(
+      fe, quad, update_values | update_quadrature_points | update_JxW_values);
+
+    const unsigned int n_dofs     = fe_values.dofs_per_cell;
     const unsigned int n_quad_pts = quad.size();
 
     const RightHandSide<dim> right_hand_side;
 
-    Vector<double> local_rhs(n_dofs);
+    Vector<double>                       local_rhs(n_dofs);
     std::vector<types::global_dof_index> local_dof_indices(n_dofs);
 
-    typename DoFHandler<dim>::active_cell_iterator
-      cell = dof_handler.begin_active(),
-      endc = dof_handler.end();
+    typename DoFHandler<dim>::active_cell_iterator cell =
+                                                     dof_handler.begin_active(),
+                                                   endc = dof_handler.end();
 
-    for (; cell!=endc; ++cell){
+    for (; cell != endc; ++cell)
+      {
+        fe_values.reinit(cell);
+        cell->get_dof_indices(local_dof_indices);
 
-     fe_values.reinit(cell);
-      cell->get_dof_indices(local_dof_indices);
+        local_rhs = 0;
+        for (unsigned int q = 0; q < n_quad_pts; ++q)
+          {
+            const double dx = fe_values.JxW(q);
 
-      local_rhs = 0;
-      for (unsigned int q=0; q<n_quad_pts; ++q){
-        const double dx = fe_values.JxW(q);
+            for (unsigned int i = 0; i < n_dofs; ++i)
+              {
+                local_rhs(i) +=
+                  dx * right_hand_side.value(fe_values.quadrature_point(q)) *
+                  fe_values.shape_value(i, q);
+              }
+          }
 
-        for (unsigned int i=0; i<n_dofs; ++i){
-          local_rhs(i) += dx * right_hand_side.value(fe_values.quadrature_point(q)) * fe_values.shape_value(i,q);
-        }
+        for (unsigned int i = 0; i < n_dofs; ++i)
+          {
+            rhs(local_dof_indices[i]) += local_rhs(i);
+          }
       }
-
-      for (unsigned int i=0; i<n_dofs; ++i){
-        rhs(local_dof_indices[i]) += local_rhs(i);
-      }
-    }
   }
 
 
@@ -747,140 +937,179 @@ namespace Step82
   // of the norms.
   template <int dim>
   void BiLaplacianLDGLift<dim>::compute_errors()
-  {  
-
-    double error_H2 = 0; // sqrt( ||D_h^2(u-u_h)||_{L^2(Omega)}^2 + ||h^{-1/2}[grad_h(u-u_h)]||_{L^2(Sigma)}^2 + ||h^{-3/2}[u-u_h]||_{L^2(Sigma)}^2 )
-    double error_H1 = 0; // sqrt( ||grad_h(u-u_h)||_{L^2(Omega)}^2 + ||h^{-1/2}[u-u_h]||_{L^2(Sigma)}^2 )
+  {
+    double error_H2 = 0; // sqrt( ||D_h^2(u-u_h)||_{L^2(Omega)}^2 +
+                         // ||h^{-1/2}[grad_h(u-u_h)]||_{L^2(Sigma)}^2 +
+                         // ||h^{-3/2}[u-u_h]||_{L^2(Sigma)}^2 )
+    double error_H1 = 0; // sqrt( ||grad_h(u-u_h)||_{L^2(Omega)}^2 +
+                         // ||h^{-1/2}[u-u_h]||_{L^2(Sigma)}^2 )
     double error_L2 = 0; // ||u-u_h||_{L^2(Omega)}
-    
-    QGauss<dim> quad(fe.degree+1);
-    QGauss<dim-1> quad_face(fe.degree+1);
-    
-    FEValues<dim> fe_values (fe, quad, update_values |
-                                       update_gradients |
-                                       update_hessians |
-                                       update_quadrature_points |
-                                       update_JxW_values);
-    
-    FEFaceValues<dim> fe_face (fe, quad_face, update_values |
-                                              update_gradients |
-                                              update_quadrature_points |
-                                              update_JxW_values);
-    
-    FEFaceValues<dim> fe_face_neighbor (fe, quad_face, update_values |
-                                                       update_gradients);
-    
-    const unsigned int   n_q_points      = quad.size();
-    const unsigned int   n_q_points_face = quad_face.size();
-    
+
+    QGauss<dim>     quad(fe.degree + 1);
+    QGauss<dim - 1> quad_face(fe.degree + 1);
+
+    FEValues<dim> fe_values(fe,
+                            quad,
+                            update_values | update_gradients | update_hessians |
+                              update_quadrature_points | update_JxW_values);
+
+    FEFaceValues<dim> fe_face(fe,
+                              quad_face,
+                              update_values | update_gradients |
+                                update_quadrature_points | update_JxW_values);
+
+    FEFaceValues<dim> fe_face_neighbor(fe,
+                                       quad_face,
+                                       update_values | update_gradients);
+
+    const unsigned int n_q_points      = quad.size();
+    const unsigned int n_q_points_face = quad_face.size();
+
     // We introduce some variables for the exact solution
     const ExactSolution<dim> u_exact;
-    double u_exact_q;
-    Tensor<1,dim> u_exact_grad_q;
-    
-    // and for the approximate solution
-    std::vector<double>        solution_values_cell(n_q_points);
-    std::vector<Tensor<1,dim>> solution_gradients_cell(n_q_points);
-    std::vector<Tensor<2,dim>> solution_hessians_cell(n_q_points);
+    double                   u_exact_q;
+    Tensor<1, dim>           u_exact_grad_q;
 
-    std::vector<double>        solution_values(n_q_points_face);
-    std::vector<double>        solution_values_neigh(n_q_points_face);    
-    std::vector<Tensor<1,dim>> solution_gradients(n_q_points_face);
-    std::vector<Tensor<1,dim>> solution_gradients_neigh(n_q_points_face);
-    
+    // and for the approximate solution
+    std::vector<double>         solution_values_cell(n_q_points);
+    std::vector<Tensor<1, dim>> solution_gradients_cell(n_q_points);
+    std::vector<Tensor<2, dim>> solution_hessians_cell(n_q_points);
+
+    std::vector<double>         solution_values(n_q_points_face);
+    std::vector<double>         solution_values_neigh(n_q_points_face);
+    std::vector<Tensor<1, dim>> solution_gradients(n_q_points_face);
+    std::vector<Tensor<1, dim>> solution_gradients_neigh(n_q_points_face);
+
     double mesh_inv;
     double mesh3_inv;
-    bool at_boundary;
-    
-    typename DoFHandler<dim>::active_cell_iterator
-      cell = dof_handler.begin_active(),
-      endc = dof_handler.end();
-    
+    bool   at_boundary;
+
+    typename DoFHandler<dim>::active_cell_iterator cell =
+                                                     dof_handler.begin_active(),
+                                                   endc = dof_handler.end();
+
     typename DoFHandler<dim>::active_cell_iterator neighbor_cell;
-    unsigned int face_no_neighbor = 0;
-    
-    for (; cell!=endc; ++cell){
-        
-      fe_values.reinit (cell);
-        
-      fe_values.get_function_values(solution,solution_values_cell);
-      fe_values.get_function_gradients(solution,solution_gradients_cell);
-      fe_values.get_function_hessians(solution,solution_hessians_cell);
-                
-      // We first add the <i>bulk</i> terms.          
-      for (unsigned int q=0; q<n_q_points; ++q){
-        const double dx = fe_values.JxW(q);
-            
-        error_H2 += dx * (u_exact.hessian(fe_values.quadrature_point(q))-solution_hessians_cell[q]).norm_square();
-        error_H1 += dx * (u_exact.gradient(fe_values.quadrature_point(q))-solution_gradients_cell[q]).norm_square();
-        error_L2 += dx * std::pow(u_exact.value(fe_values.quadrature_point(q))-solution_values_cell[q],2);
-      } // for quad
-        
-      // We then add the face contributions.
-      for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no){
-        const typename DoFHandler<dim>::face_iterator face=cell->face(face_no);
-            
-        mesh_inv = 1.0/face->diameter(); // h^{-1}
-        mesh3_inv = 1.0/std::pow(face->diameter(),3); // h^{-3}
-            
-        fe_face.reinit(cell,face_no);
-            
-        fe_face.get_function_values(solution,solution_values);
-        fe_face.get_function_gradients(solution,solution_gradients);
-            
-        at_boundary = face->at_boundary();
-        if (at_boundary){
-                
-          for (unsigned int q=0; q<n_q_points_face; ++q){
-            const double dx = fe_face.JxW(q);
-            u_exact_q = u_exact.value(fe_face.quadrature_point(q));
-            u_exact_grad_q = u_exact.gradient(fe_face.quadrature_point(q));
-                    
-            error_H2 += dx * mesh_inv * (u_exact_grad_q-solution_gradients[q]).norm_square();
-            error_H2 += dx * mesh3_inv * std::pow(u_exact_q-solution_values[q],2);
-            error_H1 += dx * mesh_inv * std::pow(u_exact_q-solution_values[q],2);
-          }
-                
-        } else{ // interior face
-                
-          neighbor_cell =cell->neighbor(face_no);
-          face_no_neighbor = cell->neighbor_of_neighbor (face_no);
-                
-          if(neighbor_cell->id().operator<(cell->id())){ // we need to have a global way to compare the cells in order to not calculate the same jump term twice
-            continue; // skip this face (already considered)
-          } else{
-                    
-            fe_face_neighbor.reinit(neighbor_cell,face_no_neighbor);
-                    
-            fe_face.get_function_values(solution,solution_values);
-            fe_face_neighbor.get_function_values(solution,solution_values_neigh);
-            fe_face.get_function_gradients(solution,solution_gradients);
-            fe_face_neighbor.get_function_gradients(solution,solution_gradients_neigh);
-                    
-            for (unsigned int q=0; q<n_q_points_face; ++q){
-              const double dx = fe_face.JxW(q);
-                        
-              // To compute the jump term, we use the fact that $\jump{u}=0$ and
-              // $\jump{\nabla u}=\mathbf{0}$ since $u\in H^2(\Omega)$.
-              error_H2 += dx * mesh_inv * (solution_gradients_neigh[q]-solution_gradients[q]).norm_square();
-              error_H2 += dx * mesh3_inv * std::pow(solution_values_neigh[q]-solution_values[q],2);
-              error_H1 += dx * mesh_inv * std::pow(solution_values_neigh[q]-solution_values[q],2);
-            }
-          } // face not visited yet
-                
-        } // boundary check
-            
-      } // for face
-        
-    } // for cell
-    
+    unsigned int                                   face_no_neighbor = 0;
+
+    for (; cell != endc; ++cell)
+      {
+        fe_values.reinit(cell);
+
+        fe_values.get_function_values(solution, solution_values_cell);
+        fe_values.get_function_gradients(solution, solution_gradients_cell);
+        fe_values.get_function_hessians(solution, solution_hessians_cell);
+
+        // We first add the <i>bulk</i> terms.
+        for (unsigned int q = 0; q < n_q_points; ++q)
+          {
+            const double dx = fe_values.JxW(q);
+
+            error_H2 += dx * (u_exact.hessian(fe_values.quadrature_point(q)) -
+                              solution_hessians_cell[q])
+                               .norm_square();
+            error_H1 += dx * (u_exact.gradient(fe_values.quadrature_point(q)) -
+                              solution_gradients_cell[q])
+                               .norm_square();
+            error_L2 +=
+              dx * std::pow(u_exact.value(fe_values.quadrature_point(q)) -
+                              solution_values_cell[q],
+                            2);
+          } // for quad
+
+        // We then add the face contributions.
+        for (unsigned int face_no = 0;
+             face_no < GeometryInfo<dim>::faces_per_cell;
+             ++face_no)
+          {
+            const typename DoFHandler<dim>::face_iterator face =
+              cell->face(face_no);
+
+            mesh_inv  = 1.0 / face->diameter();              // h^{-1}
+            mesh3_inv = 1.0 / std::pow(face->diameter(), 3); // h^{-3}
+
+            fe_face.reinit(cell, face_no);
+
+            fe_face.get_function_values(solution, solution_values);
+            fe_face.get_function_gradients(solution, solution_gradients);
+
+            at_boundary = face->at_boundary();
+            if (at_boundary)
+              {
+                for (unsigned int q = 0; q < n_q_points_face; ++q)
+                  {
+                    const double dx = fe_face.JxW(q);
+                    u_exact_q = u_exact.value(fe_face.quadrature_point(q));
+                    u_exact_grad_q =
+                      u_exact.gradient(fe_face.quadrature_point(q));
+
+                    error_H2 +=
+                      dx * mesh_inv *
+                      (u_exact_grad_q - solution_gradients[q]).norm_square();
+                    error_H2 += dx * mesh3_inv *
+                                std::pow(u_exact_q - solution_values[q], 2);
+                    error_H1 += dx * mesh_inv *
+                                std::pow(u_exact_q - solution_values[q], 2);
+                  }
+              }
+            else
+              { // interior face
+
+                neighbor_cell    = cell->neighbor(face_no);
+                face_no_neighbor = cell->neighbor_of_neighbor(face_no);
+
+                if (neighbor_cell->id().operator<(cell->id()))
+                  { // we need to have a global way to compare the cells in
+                    // order to not calculate the same jump term twice
+                    continue; // skip this face (already considered)
+                  }
+                else
+                  {
+                    fe_face_neighbor.reinit(neighbor_cell, face_no_neighbor);
+
+                    fe_face.get_function_values(solution, solution_values);
+                    fe_face_neighbor.get_function_values(solution,
+                                                         solution_values_neigh);
+                    fe_face.get_function_gradients(solution,
+                                                   solution_gradients);
+                    fe_face_neighbor.get_function_gradients(
+                      solution, solution_gradients_neigh);
+
+                    for (unsigned int q = 0; q < n_q_points_face; ++q)
+                      {
+                        const double dx = fe_face.JxW(q);
+
+                        // To compute the jump term, we use the fact that
+                        // $\jump{u}=0$ and
+                        // $\jump{\nabla u}=\mathbf{0}$ since $u\in
+                        // H^2(\Omega)$.
+                        error_H2 +=
+                          dx * mesh_inv *
+                          (solution_gradients_neigh[q] - solution_gradients[q])
+                            .norm_square();
+                        error_H2 += dx * mesh3_inv *
+                                    std::pow(solution_values_neigh[q] -
+                                               solution_values[q],
+                                             2);
+                        error_H1 += dx * mesh_inv *
+                                    std::pow(solution_values_neigh[q] -
+                                               solution_values[q],
+                                             2);
+                      }
+                  } // face not visited yet
+
+              } // boundary check
+
+          } // for face
+
+      } // for cell
+
     error_H2 = std::sqrt(error_H2);
     error_H1 = std::sqrt(error_H1);
     error_L2 = std::sqrt(error_L2);
 
     std::cout << "DG H2 norm of the error: " << error_H2 << std::endl;
     std::cout << "DG H1 norm of the error: " << error_H1 << std::endl;
-    std::cout << "   L2 norm of the error: " << error_L2 << std::endl;     
+    std::cout << "   L2 norm of the error: " << error_L2 << std::endl;
   }
 
 
@@ -894,11 +1123,11 @@ namespace Step82
   {
     DataOut<dim> data_out;
     data_out.attach_dof_handler(dof_handler);
-    data_out.add_data_vector(solution, "solution"); 
+    data_out.add_data_vector(solution, "solution");
     data_out.build_patches();
 
-    std::ofstream output ("solution.vtk");
-    data_out.write_vtk (output);
+    std::ofstream output("solution.vtk");
+    data_out.write_vtk(output);
   }
 
 
@@ -910,23 +1139,30 @@ namespace Step82
   // lifting terms. We reiterate that only the basis functions with
   // support on the current cell are accounting for.
   template <int dim>
-  void BiLaplacianLDGLift<dim>::assemble_local_matrix(const FEValues<dim> &fe_values_lift, const unsigned int n_q_points, FullMatrix<double> &local_matrix)
+  void BiLaplacianLDGLift<dim>::assemble_local_matrix(
+    const FEValues<dim> &fe_values_lift,
+    const unsigned int   n_q_points,
+    FullMatrix<double> & local_matrix)
   {
     const FEValuesExtractors::Tensor<2> tau_ext(0);
 
     const unsigned int n_dofs = fe_values_lift.dofs_per_cell;
 
     local_matrix = 0;
-    for (unsigned int q=0; q<n_q_points; ++q){
+    for (unsigned int q = 0; q < n_q_points; ++q)
+      {
+        const double dx = fe_values_lift.JxW(q);
 
-      const double dx = fe_values_lift.JxW(q);
-
-      for (unsigned int m=0; m<n_dofs; ++m){
-        for (unsigned int n=0; n<n_dofs; ++n){
-          local_matrix(m,n) += dx * scalar_product(fe_values_lift[tau_ext].value(n,q),fe_values_lift[tau_ext].value(m,q));
-        }
+        for (unsigned int m = 0; m < n_dofs; ++m)
+          {
+            for (unsigned int n = 0; n < n_dofs; ++n)
+              {
+                local_matrix(m, n) +=
+                  dx * scalar_product(fe_values_lift[tau_ext].value(n, q),
+                                      fe_values_lift[tau_ext].value(m, q));
+              }
+          }
       }
-    }
   }
 
 
@@ -934,22 +1170,25 @@ namespace Step82
   // @sect4{BiLaplacianLDGLift::compute_discrete_hessians}
 
   // This function is the main novelty of this program. It computes the discrete
-  // Hessian $H_h(\varphi)$ for all the basis functions $\varphi$ of $\mathbb{V}_h$
-  // supported on the current cell and those supported on a neighboring cell. The
-  // first two arguments are inputs indicating the current cell (both refer to the
-  // same cell but are attached to different DoF Handlers), while the last two
-  // arguments are output variables that are filled-in in this function. 
+  // Hessian $H_h(\varphi)$ for all the basis functions $\varphi$ of
+  // $\mathbb{V}_h$ supported on the current cell and those supported on a
+  // neighboring cell. The first two arguments are inputs indicating the current
+  // cell (both refer to the same cell but are attached to different DoF
+  // Handlers), while the last two arguments are output variables that are
+  // filled-in in this function.
   template <int dim>
-  void BiLaplacianLDGLift<dim>::compute_discrete_hessians(const typename DoFHandler<dim>::active_cell_iterator &cell,
-                                                          const typename DoFHandler<dim>::active_cell_iterator &cell_lift,
-                                                          std::vector<std::vector<Tensor<2,dim>>> &discrete_hessians,
-                                                          std::vector<std::vector<std::vector<Tensor<2,dim>>>> &discrete_hessians_neigh)
+  void BiLaplacianLDGLift<dim>::compute_discrete_hessians(
+    const typename DoFHandler<dim>::active_cell_iterator &cell,
+    const typename DoFHandler<dim>::active_cell_iterator &cell_lift,
+    std::vector<std::vector<Tensor<2, dim>>> &            discrete_hessians,
+    std::vector<std::vector<std::vector<Tensor<2, dim>>>>
+      &discrete_hessians_neigh)
   {
-    QGauss<dim> quad(fe.degree+1);
-    QGauss<dim-1> quad_face(fe.degree+1);
+    QGauss<dim>     quad(fe.degree + 1);
+    QGauss<dim - 1> quad_face(fe.degree + 1);
 
-    const unsigned int   n_q_points = quad.size();
-    const unsigned int   n_q_points_face = quad_face.size();
+    const unsigned int n_q_points      = quad.size();
+    const unsigned int n_q_points_face = quad_face.size();
 
     // The information we need from the basis functions of
     // $\mathbb{V}_h$: <code>fe_values</code> is needed to add
@@ -957,21 +1196,18 @@ namespace Step82
     // <code>fe_face</code> and <code>fe_face_neighbor</code>
     // are used to compute the right-hand sides for the local
     // problems.
-    FEValues<dim> fe_values (fe, quad, update_hessians |
-                                       update_JxW_values);
+    FEValues<dim> fe_values(fe, quad, update_hessians | update_JxW_values);
 
-    FEFaceValues<dim> fe_face (fe, quad_face, update_values |
-                                              update_gradients |
-                                              update_normal_vectors);
+    FEFaceValues<dim> fe_face(
+      fe, quad_face, update_values | update_gradients | update_normal_vectors);
 
-    FEFaceValues<dim> fe_face_neighbor (fe, quad_face, update_values |
-                                                       update_gradients |
-                                                       update_normal_vectors);
+    FEFaceValues<dim> fe_face_neighbor(
+      fe, quad_face, update_values | update_gradients | update_normal_vectors);
 
     const unsigned int n_dofs = fe_values.dofs_per_cell;
 
-    typename DoFHandler<2,dim>::active_cell_iterator neighbor_cell;
-    unsigned int face_no_neighbor = 0;
+    typename DoFHandler<2, dim>::active_cell_iterator neighbor_cell;
+    unsigned int                                      face_no_neighbor = 0;
 
     // The information needed from the basis functions
     // of the finite element space for the lifting terms:
@@ -979,186 +1215,246 @@ namespace Step82
     // mass matrix (see $\boldsymbol{M}_c$ in the introduction),
     // while <code>fe_face_lift</code> is used to compute the
     // right-hand sides (see $\boldsymbol{G}_c$ for $b_e$).
-    FEValues<dim> fe_values_lift (fe_lift, quad, update_values |
-                                                 update_JxW_values);
+    FEValues<dim> fe_values_lift(fe_lift,
+                                 quad,
+                                 update_values | update_JxW_values);
 
-    FEFaceValues<dim> fe_face_lift (fe_lift, quad_face, update_values |
-                                                        update_gradients |
-                                                        update_JxW_values);
+    FEFaceValues<dim> fe_face_lift(
+      fe_lift, quad_face, update_values | update_gradients | update_JxW_values);
 
     const FEValuesExtractors::Tensor<2> tau_ext(0);
-    
+
     const unsigned int n_dofs_lift = fe_values_lift.dofs_per_cell;
-    FullMatrix<double> local_matrix_lift (n_dofs_lift,n_dofs_lift);
+    FullMatrix<double> local_matrix_lift(n_dofs_lift, n_dofs_lift);
 
     Vector<double> local_rhs_re(n_dofs_lift), local_rhs_be(n_dofs_lift),
-                   coeffs_re(n_dofs_lift), coeffs_be(n_dofs_lift),
-                   coeffs_tmp(n_dofs_lift);
-     
+      coeffs_re(n_dofs_lift), coeffs_be(n_dofs_lift), coeffs_tmp(n_dofs_lift);
+
     SolverControl solver_control(1000, 1e-12);
-    SolverCG<> solver(solver_control);
-    
-    bool at_boundary;    
+    SolverCG<>    solver(solver_control);
+
+    bool   at_boundary;
     double factor_avg; // 0.5 for interior faces, 1.0 for boundary faces
-    
+
     fe_values.reinit(cell);
-    fe_values_lift.reinit(cell_lift);  
- 
+    fe_values_lift.reinit(cell_lift);
+
     // We start by assembling the (local) mass matrix used for the computation
     // of the lifting terms $r_e$ and $b_e$.
-    assemble_local_matrix(fe_values_lift,n_q_points,local_matrix_lift);
+    assemble_local_matrix(fe_values_lift, n_q_points, local_matrix_lift);
 
-    for (unsigned int i=0; i<n_dofs; ++i){
-      for (unsigned int q=0; q<n_q_points; ++q){
-        discrete_hessians[i][q]=0;
+    for (unsigned int i = 0; i < n_dofs; ++i)
+      {
+        for (unsigned int q = 0; q < n_q_points; ++q)
+          {
+            discrete_hessians[i][q] = 0;
 
-        for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no){
-          discrete_hessians_neigh[face_no][i][q]=0;
-        }
-
-      }
-    }
-
-    // In this loop, we compute the discrete Hessian at each quadrature point $x_q$
-    // of <code>cell</code> for each basis function supported on <code>cell</code>,
-    // namely we fill-in the variable <code>discrete_hessians[i][q]</code>.
-    // For the lifting terms, we need to add the contribution of all the faces of
-    // <code>cell</code>.
-    for (unsigned int i=0; i<n_dofs; ++i){
-
-      coeffs_re=0; coeffs_be=0;
-
-      for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no){
-        const typename DoFHandler<dim>::face_iterator face=cell->face(face_no);
-            
-        at_boundary = face->at_boundary();
-        
-        // Recall that by convention, the average of a function accross a boundary
-        // face $e$ reduces to the trace of the function on the only element
-        // adjacent to $e$, namely there is no factor $\frac{1}{2}$. We distinguish
-        // between the two cases (the current face lies in the interior or on
-        // the boundary of the domain) using the variable <code>factor_avg</code>.
-        factor_avg = 0.5;
-        if (at_boundary){
-          factor_avg = 1.0;
-        }
-        
-        fe_face.reinit(cell,face_no);
-        fe_face_lift.reinit(cell_lift,face_no);
-        
-        local_rhs_re=0;
-        for (unsigned int q=0; q<n_q_points_face; ++q){
-          const double dx = fe_face_lift.JxW(q);
-          const Tensor<1,dim> normal = fe_face.normal_vector(q); // same as fe_face_lift.normal_vector(q)
-          
-          for (unsigned int m=0; m<n_dofs_lift; ++m){
-            local_rhs_re(m) += factor_avg * dx * (fe_face_lift[tau_ext].value(m,q)*normal) * fe_face.shape_grad(i,q);
+            for (unsigned int face_no = 0;
+                 face_no < GeometryInfo<dim>::faces_per_cell;
+                 ++face_no)
+              {
+                discrete_hessians_neigh[face_no][i][q] = 0;
+              }
           }
-        }
-
-        // Here, <code>local_rhs_be(m)</code> corresponds to $G_m$ introduced in the
-        // comments about the implementation of the lifting $b_e$ in the case
-        // $\varphi=\varphi^c$.
-        local_rhs_be=0;
-        for (unsigned int q=0; q<n_q_points_face; ++q){
-          const double dx = fe_face_lift.JxW(q);
-          const Tensor<1,dim> normal = fe_face.normal_vector(q); // same as fe_face_lift.normal_vector(q)
-
-          for (unsigned int m=0; m<n_dofs_lift; ++m){
-            local_rhs_be(m) += factor_avg * dx * fe_face_lift[tau_ext].divergence(m,q)*normal * fe_face.shape_value(i,q);
-          }
-        }
-        
-        coeffs_tmp=0;
-        solver.solve(local_matrix_lift,coeffs_tmp,local_rhs_re,PreconditionIdentity());
-        coeffs_re += coeffs_tmp;
-        
-        coeffs_tmp=0;
-        solver.solve(local_matrix_lift,coeffs_tmp,local_rhs_be,PreconditionIdentity());
-        coeffs_be += coeffs_tmp;
-
-      } // for face
-
-      for (unsigned int q=0; q<n_q_points; ++q){
-        discrete_hessians[i][q] += fe_values.shape_hessian(i,q);
-
-	for (unsigned int m=0; m<n_dofs_lift; ++m){
-	  discrete_hessians[i][q] -= coeffs_re[m]*fe_values_lift[tau_ext].value(m,q);
-        }
-
-	for (unsigned int m=0; m<n_dofs_lift; ++m){
-	  discrete_hessians[i][q] += coeffs_be[m]*fe_values_lift[tau_ext].value(m,q);
-        }
       }
-    } // for dof i
+
+    // In this loop, we compute the discrete Hessian at each quadrature point
+    // $x_q$ of <code>cell</code> for each basis function supported on
+    // <code>cell</code>, namely we fill-in the variable
+    // <code>discrete_hessians[i][q]</code>. For the lifting terms, we need to
+    // add the contribution of all the faces of <code>cell</code>.
+    for (unsigned int i = 0; i < n_dofs; ++i)
+      {
+        coeffs_re = 0;
+        coeffs_be = 0;
+
+        for (unsigned int face_no = 0;
+             face_no < GeometryInfo<dim>::faces_per_cell;
+             ++face_no)
+          {
+            const typename DoFHandler<dim>::face_iterator face =
+              cell->face(face_no);
+
+            at_boundary = face->at_boundary();
+
+            // Recall that by convention, the average of a function accross a
+            // boundary face $e$ reduces to the trace of the function on the
+            // only element adjacent to $e$, namely there is no factor
+            // $\frac{1}{2}$. We distinguish between the two cases (the current
+            // face lies in the interior or on the boundary of the domain) using
+            // the variable <code>factor_avg</code>.
+            factor_avg = 0.5;
+            if (at_boundary)
+              {
+                factor_avg = 1.0;
+              }
+
+            fe_face.reinit(cell, face_no);
+            fe_face_lift.reinit(cell_lift, face_no);
+
+            local_rhs_re = 0;
+            for (unsigned int q = 0; q < n_q_points_face; ++q)
+              {
+                const double         dx     = fe_face_lift.JxW(q);
+                const Tensor<1, dim> normal = fe_face.normal_vector(
+                  q); // same as fe_face_lift.normal_vector(q)
+
+                for (unsigned int m = 0; m < n_dofs_lift; ++m)
+                  {
+                    local_rhs_re(m) +=
+                      factor_avg * dx *
+                      (fe_face_lift[tau_ext].value(m, q) * normal) *
+                      fe_face.shape_grad(i, q);
+                  }
+              }
+
+            // Here, <code>local_rhs_be(m)</code> corresponds to $G_m$
+            // introduced in the comments about the implementation of the
+            // lifting $b_e$ in the case
+            // $\varphi=\varphi^c$.
+            local_rhs_be = 0;
+            for (unsigned int q = 0; q < n_q_points_face; ++q)
+              {
+                const double         dx     = fe_face_lift.JxW(q);
+                const Tensor<1, dim> normal = fe_face.normal_vector(
+                  q); // same as fe_face_lift.normal_vector(q)
+
+                for (unsigned int m = 0; m < n_dofs_lift; ++m)
+                  {
+                    local_rhs_be(m) += factor_avg * dx *
+                                       fe_face_lift[tau_ext].divergence(m, q) *
+                                       normal * fe_face.shape_value(i, q);
+                  }
+              }
+
+            coeffs_tmp = 0;
+            solver.solve(local_matrix_lift,
+                         coeffs_tmp,
+                         local_rhs_re,
+                         PreconditionIdentity());
+            coeffs_re += coeffs_tmp;
+
+            coeffs_tmp = 0;
+            solver.solve(local_matrix_lift,
+                         coeffs_tmp,
+                         local_rhs_be,
+                         PreconditionIdentity());
+            coeffs_be += coeffs_tmp;
+
+          } // for face
+
+        for (unsigned int q = 0; q < n_q_points; ++q)
+          {
+            discrete_hessians[i][q] += fe_values.shape_hessian(i, q);
+
+            for (unsigned int m = 0; m < n_dofs_lift; ++m)
+              {
+                discrete_hessians[i][q] -=
+                  coeffs_re[m] * fe_values_lift[tau_ext].value(m, q);
+              }
+
+            for (unsigned int m = 0; m < n_dofs_lift; ++m)
+              {
+                discrete_hessians[i][q] +=
+                  coeffs_be[m] * fe_values_lift[tau_ext].value(m, q);
+              }
+          }
+      } // for dof i
 
 
 
     // In this loop, we compute the discrete Hessian at each quadrature point
-    // $x_q$ of <code>cell</code> for each basis function supported on a neighboring
-    // <code>neighbor_cell</code> of <code>cell</code>, namely we fill-in the
-    // variable <code>discrete_hessians_neigh[face_no][i][q]</code>.
+    // $x_q$ of <code>cell</code> for each basis function supported on a
+    // neighboring <code>neighbor_cell</code> of <code>cell</code>, namely we
+    // fill-in the variable <code>discrete_hessians_neigh[face_no][i][q]</code>.
     // For the lifting terms, we only need to add the contribution of the
-    // face adjecent to <code>cell</code> and <code>neighbor_cell</code>.    
-    for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no){
+    // face adjecent to <code>cell</code> and <code>neighbor_cell</code>.
+    for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell;
+         ++face_no)
+      {
+        const typename DoFHandler<dim>::face_iterator face =
+          cell->face(face_no);
 
-      const typename DoFHandler<dim>::face_iterator face=cell->face(face_no);
-      
-      at_boundary = face->at_boundary();
+        at_boundary = face->at_boundary();
 
-      if (!at_boundary){ // for non-homogeneous Dirichlet BCs, we would need to compute the lifting of the prescribed BC (see Section Possible Extensions for more details)
+        if (!at_boundary)
+          { // for non-homogeneous Dirichlet BCs, we would need to compute the
+            // lifting of the prescribed BC (see Section Possible Extensions for
+            // more details)
 
-        neighbor_cell =cell->neighbor(face_no);                    
-        face_no_neighbor = cell->neighbor_of_neighbor (face_no);
-        fe_face_neighbor.reinit(neighbor_cell,face_no_neighbor);
+            neighbor_cell    = cell->neighbor(face_no);
+            face_no_neighbor = cell->neighbor_of_neighbor(face_no);
+            fe_face_neighbor.reinit(neighbor_cell, face_no_neighbor);
 
-        for (unsigned int i=0; i<n_dofs; ++i){
-	        
-          coeffs_re=0; coeffs_be=0;
-          
-          fe_face_lift.reinit(cell_lift,face_no);
-          
-          local_rhs_re=0;
-          for (unsigned int q=0; q<n_q_points_face; ++q){
-            const double dx = fe_face_lift.JxW(q);
-            const Tensor<1,dim> normal = fe_face_neighbor.normal_vector(q);
+            for (unsigned int i = 0; i < n_dofs; ++i)
+              {
+                coeffs_re = 0;
+                coeffs_be = 0;
 
-            for (unsigned int m=0; m<n_dofs_lift; ++m){
-              local_rhs_re(m) += 0.5 * dx * (fe_face_lift[tau_ext].value(m,q)*normal) * fe_face_neighbor.shape_grad(i,q);
-            }
-          }
+                fe_face_lift.reinit(cell_lift, face_no);
 
-          // Here, <code>local_rhs_be(m)</code> corresponds to $G_m$ introduced in
-          // the comments about the implementation of the lifting $b_e$ in the case
-          // $\varphi=\varphi^n$.
-          local_rhs_be=0;
-          for (unsigned int q=0; q<n_q_points_face; ++q){
-            const double dx = fe_face_lift.JxW(q);
-            const Tensor<1,dim> normal = fe_face_neighbor.normal_vector(q);  
+                local_rhs_re = 0;
+                for (unsigned int q = 0; q < n_q_points_face; ++q)
+                  {
+                    const double         dx = fe_face_lift.JxW(q);
+                    const Tensor<1, dim> normal =
+                      fe_face_neighbor.normal_vector(q);
 
-            for (unsigned int m=0; m<n_dofs_lift; ++m){
-              local_rhs_be(m) += 0.5 * dx * fe_face_lift[tau_ext].divergence(m,q)*normal * fe_face_neighbor.shape_value(i,q);
-            }
-          }
-          
-          solver.solve(local_matrix_lift,coeffs_re,local_rhs_re,PreconditionIdentity());
-          solver.solve(local_matrix_lift,coeffs_be,local_rhs_be,PreconditionIdentity());
+                    for (unsigned int m = 0; m < n_dofs_lift; ++m)
+                      {
+                        local_rhs_re(m) +=
+                          0.5 * dx *
+                          (fe_face_lift[tau_ext].value(m, q) * normal) *
+                          fe_face_neighbor.shape_grad(i, q);
+                      }
+                  }
 
-          for (unsigned int q=0; q<n_q_points; ++q){
+                // Here, <code>local_rhs_be(m)</code> corresponds to $G_m$
+                // introduced in the comments about the implementation of the
+                // lifting $b_e$ in the case
+                // $\varphi=\varphi^n$.
+                local_rhs_be = 0;
+                for (unsigned int q = 0; q < n_q_points_face; ++q)
+                  {
+                    const double         dx = fe_face_lift.JxW(q);
+                    const Tensor<1, dim> normal =
+                      fe_face_neighbor.normal_vector(q);
 
-            for (unsigned int m=0; m<n_dofs_lift; ++m){
-              discrete_hessians_neigh[face_no][i][q] -= coeffs_re[m]*fe_values_lift[tau_ext].value(m,q);
-            }
-            
-            for (unsigned int m=0; m<n_dofs_lift; ++m){
-              discrete_hessians_neigh[face_no][i][q] += coeffs_be[m]*fe_values_lift[tau_ext].value(m,q);
-            }
+                    for (unsigned int m = 0; m < n_dofs_lift; ++m)
+                      {
+                        local_rhs_be(m) +=
+                          0.5 * dx * fe_face_lift[tau_ext].divergence(m, q) *
+                          normal * fe_face_neighbor.shape_value(i, q);
+                      }
+                  }
 
-          }
+                solver.solve(local_matrix_lift,
+                             coeffs_re,
+                             local_rhs_re,
+                             PreconditionIdentity());
+                solver.solve(local_matrix_lift,
+                             coeffs_be,
+                             local_rhs_be,
+                             PreconditionIdentity());
 
-        } // for dof i
-      } // boundary check
-    } // for face
+                for (unsigned int q = 0; q < n_q_points; ++q)
+                  {
+                    for (unsigned int m = 0; m < n_dofs_lift; ++m)
+                      {
+                        discrete_hessians_neigh[face_no][i][q] -=
+                          coeffs_re[m] * fe_values_lift[tau_ext].value(m, q);
+                      }
+
+                    for (unsigned int m = 0; m < n_dofs_lift; ++m)
+                      {
+                        discrete_hessians_neigh[face_no][i][q] +=
+                          coeffs_be[m] * fe_values_lift[tau_ext].value(m, q);
+                      }
+                  }
+
+              } // for dof i
+          }     // boundary check
+      }         // for face
   }
 
 
@@ -1168,7 +1464,7 @@ namespace Step82
   void BiLaplacianLDGLift<dim>::run()
   {
     make_grid();
-    
+
     setup_system();
     assemble_system();
 
@@ -1178,7 +1474,7 @@ namespace Step82
     output_results();
   }
 
-}  // namespace Step82
+} // namespace Step82
 
 
 
@@ -1187,17 +1483,48 @@ namespace Step82
 // The is the <code>main</code> function. We define here the polynomial degree
 // for the two finite element spaces (for the solution and the two liftings) and
 // the two penalty coefficients. We can also change the dimension to run the
-// code in 3D. 
+// code in 3D.
 int main()
 {
-  int degree=2;    // FE degree for u_h and the two lifting terms
+  try
+    {
+      const unsigned int int degree =
+        2; // FE degree for u_h and the two lifting terms
 
-  double penalty_grad=1.0; // penalty coefficient for the jump of the gradients
-  double penalty_val=1.0; // penalty coefficient for the jump of the values
+      const double penalty_grad =
+        1.0; // penalty coefficient for the jump of the gradients
+      const double penalty_val =
+        1.0; // penalty coefficient for the jump of the values
 
-  Step82::BiLaplacianLDGLift<2> problem(degree,penalty_grad,penalty_val);
-  
-  problem.run();
-  
+      Step82::BiLaplacianLDGLift<2> problem(degree, penalty_grad, penalty_val);
+
+      problem.run();
+    }
+  catch (std::exception &exc)
+    {
+      std::cerr << std::endl
+                << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
+      std::cerr << "Exception on processing: " << std::endl
+                << exc.what() << std::endl
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
+      return 1;
+    }
+  catch (...)
+    {
+      std::cerr << std::endl
+                << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
+      std::cerr << "Unknown exception!" << std::endl
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
+      return 1;
+    }
+
   return 0;
 }
