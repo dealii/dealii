@@ -68,6 +68,46 @@ namespace VectorTools
    * Given a (distributed) solution vector @p vector, evaluate the values at
    * the (arbitrary and even remote) points specified by @p evaluation_points.
    *
+   * The following code snippet shows the usage of this function. Given
+   * a Mapping object, a DoFHandler object, and solution vector as well as a
+   * vector filled with points at which the vector should be evaluated, this
+   * function returns a vector with values at those points. Furthermore, the
+   * function initializes the communication pattern within the cache
+   * Utilities::MPI::RemotePointEvaluation, which can be efficiently used in
+   * further function calls (see also the function below).
+   *
+   * @code
+   * // first usage: set up cache
+   * Utilities::MPI::RemotePointEvaluation<dim, spacedim> cache;
+   *
+   * const auto result_1 = VectorToos::point_values(
+   *   mapping, dof_handler_1, vector_1, evaluation_points, cache);
+   *
+   * // further usages: reuse the cache
+   * const auto result_2 = VectorToos::point_values(
+   *   cache, dof_handler_2, vector_2);
+   * @endcode
+   *
+   * Note that different DoFHandler objects can be passed to different
+   * calls of this function. However, the underlying Triangulation object
+   * needs to be the same if the cache should be reused.
+   *
+   * Alternatively, the user can set up the cache via
+   * Utilities::MPI::RemotePointEvaluation::reinit() manually:
+   *
+   * @code
+   * // set up cache manually
+   * Utilities::MPI::RemotePointEvaluation<dim, spacedim> cache;
+   * cache.reinit(evaluation_points, triangulation, mapping);
+   *
+   * // use the cache
+   * const auto result_1 = VectorToos::point_values(
+   *   cache, dof_handler_1, vector_1);
+   *
+   * const auto result_2 = VectorToos::point_values(
+   *   cache, dof_handler_2, vector_2);
+   * @endcode
+   *
    * @warning This is a collective call that needs to be executed by all
    *   processors in the communicator.
    */
@@ -87,7 +127,8 @@ namespace VectorTools
    * above function.
    *
    * @note Refinement/coarsening/repartitioning leads to the invalidation of the
-   *   cache so that the above function has to be called again.
+   *   cache so that the above function has to be called again. See also the
+   *   example above.
    *
    * @warning This is a collective call that needs to be executed by all
    *   processors in the communicator.
@@ -103,6 +144,12 @@ namespace VectorTools
   /**
    * Given a (distributed) solution vector @p vector, evaluate the gradients at
    * the (arbitrary and even remote) points specified by @p evaluation_points.
+   *
+   * @note The same comments as in the case of point_values() are true for this
+   *   function.
+   *
+   * @warning This is a collective call that needs to be executed by all
+   *   processors in the communicator.
    */
   template <int n_components, int dim, int spacedim, typename VectorType>
   std::vector<typename FEPointEvaluation<n_components, dim>::gradient_type>
@@ -119,8 +166,11 @@ namespace VectorTools
    * the points specified by @p cache which might have been set up by the
    * above function.
    *
-   * @note Refinement/coarsening/repartitioning leads to the invalidation of the
-   *   cache so that the above function has to be called again.
+   * @note The same comments as in the case of point_values() are true for this
+   *   function.
+   *
+   * @warning This is a collective call that needs to be executed by all
+   *   processors in the communicator.
    */
   template <int n_components, int dim, int spacedim, typename VectorType>
   std::vector<typename FEPointEvaluation<n_components, dim>::gradient_type>
