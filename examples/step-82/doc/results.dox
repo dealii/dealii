@@ -113,6 +113,20 @@ $H^1$ norms, but is sub-optimal for the $L_2$ norm. Incidentally, this
 also matches the results seen in step-47 when using polynomial degree
 $k=2$.
 
+Indeed, just like in step-47, we can regain the optimal convergence
+order if we set the polynomial degree of the finite elements to $k=3$
+or higher. Here are the numbers for $k=3$:
+
+<table align="center" class="doxtable">
+  <tr> <th> n_ref </th>	<th> n_cells </th>	<th> n_dofs </th>	<th> error H2 </th>	<th> rate </th>	<th> error H1 </th>	<th> rate </th>	<th> error L2 </th>	<th> rate</th> </tr>
+  <tr> <td> 1 </td>	<td> 4 </td>	<td> 36 </td>	<td> 1.451e-02 </td>	<td> -- </td>	<td> 5.494e-04 </td>	<td> -- </td>	<td> 3.035e-05 </td>	<td> --</td> </tr>
+  <tr> <td> 2 </td>	<td> 16 </td>	<td> 144 </td>	<td> 3.565e-03 </td>	<td> 2.02 </td>	<td> 6.870e-05 </td>	<td> 3.00 </td>	<td> 2.091e-06 </td>	<td> 3.86</td> </tr>
+  <tr> <td> 3 </td>	<td> 64 </td>	<td> 576 </td>	<td> 8.891e-04 </td>	<td> 2.00 </td>	<td> 8.584e-06 </td>	<td> 3.00 </td>	<td> 1.352e-07 </td>	<td> 3.95</td> </tr>
+  <tr> <td> 4 </td>	<td> 256 </td>	<td> 2304 </td>	<td> 2.223e-04 </td>	<td> 2.00 </td>	<td> 1.073e-06 </td>	<td> 3.00 </td>	<td> 8.594e-09 </td>	<td> 3.98</td> </tr>
+  <tr> <td> 5 </td>	<td> 1024 </td>	<td> 9216 </td>	<td> 5.560e-05 </td>	<td> 2.00 </td>	<td> 1.341e-07 </td>	<td> 3.00 </td>	<td> 5.418e-10 </td>	<td> 3.99</td> </tr>
+  <tr> <td> 6 </td>	<td> 4096 </td>	<td> 36864 </td>	<td> 1.390e-05 </td>	<td> 2.00 </td>	<td> 1.676e-08 </td>	<td> 3.00 </td>	<td> 3.245e-11 </td>	<td> 4.06</td> </tr>
+</table>
+
 
 <h3>Possible extensions</h3>
 
