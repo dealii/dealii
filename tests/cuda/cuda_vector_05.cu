@@ -18,6 +18,7 @@
 
 #include <deal.II/lac/cuda_vector.h>
 #include <deal.II/lac/read_write_vector.h>
+#include <deal.II/lac/vector.h>
 
 #include <fstream>
 #include <iostream>
