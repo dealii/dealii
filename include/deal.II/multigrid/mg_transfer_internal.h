@@ -137,6 +137,19 @@ namespace internal
       MGLevelObject<std::shared_ptr<const Utilities::MPI::Partitioner>>
         &vector_partitioners);
 
+
+
+    /**
+     * Helper function for setup_transfer. Checks for identity constrained
+     * dofs and replace with the indices of the dofs to which they are
+     * constrained
+     */
+    void
+    resolve_identity_constraints(
+      const MGConstrainedDoFs *             mg_constrained_dofs,
+      const unsigned int                    level,
+      std::vector<types::global_dof_index> &dof_indices);
+
   } // namespace MGTransfer
 } // namespace internal
 
