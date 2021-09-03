@@ -589,6 +589,18 @@ public:
   boost::signals2::connection
   connect_transfer_to_global(const std::function<void(bool)> &slot);
 
+  /**
+   * Return the Multigrid object passed to the constructor.
+   */
+  Multigrid<VectorType> &
+  get_multigrid();
+
+  /**
+   * Return the Multigrid object passed to the constructor.
+   */
+  const Multigrid<VectorType> &
+  get_multigrid() const;
+
 private:
   /**
    * Associated @p DoFHandler.
@@ -961,6 +973,22 @@ PreconditionMG<dim, VectorType, TRANSFER>::Tvmult_add(
   const OtherVectorType &) const
 {
   Assert(false, ExcNotImplemented());
+}
+
+
+template <int dim, typename VectorType, class TRANSFER>
+Multigrid<VectorType> &
+PreconditionMG<dim, VectorType, TRANSFER>::get_multigrid()
+{
+  return *this->multigrid;
+}
+
+
+template <int dim, typename VectorType, class TRANSFER>
+const Multigrid<VectorType> &
+PreconditionMG<dim, VectorType, TRANSFER>::get_multigrid() const
+{
+  return *this->multigrid;
 }
 
 #endif // DOXYGEN
