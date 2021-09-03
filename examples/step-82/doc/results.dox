@@ -8,7 +8,7 @@ When running the program, the sparsity pattern is written to an svg file, the so
 Number of active cells: 64
 Number of degrees of freedom: 576
 Assembling the system.............
-Done. 
+Done.
 DG H2 norm of the error: 0.0151063
 DG H1 norm of the error: 0.000399747
    L2 norm of the error: 5.33856e-05
@@ -108,6 +108,11 @@ This corresponds to the bi-Laplacian problem with the manufactured solution ment
   </tr>
 </table>
 
+This matches the expected optimal convergence rates for the $H^2$ and
+$H^1$ norms, but is sub-optimal for the $L_2$ norm. Incidentally, this
+also matches the results seen in step-47 when using polynomial degree
+$k=2$.
+
 
 <h3>Possible extensions</h3>
 
@@ -119,18 +124,19 @@ The code can be easily adapted to deal with the following cases:
   <li>LDG method for the Poisson problem (use the discrete gradient consisting of the broken gradient and the lifting of the jump of $u_h$).</li>
 </ol>
 
-We give below additional details for the first point.
+We give below additional details for the first of these points.
+
 
 <h4>Non-homogeneous Dirichlet boundary conditions</h4>
 If we prescribe non-homogeneous Dirichlet conditions, say
 @f[
-\nabla u=\mathbf{g} \quad \mbox{and} \quad u=g \qquad \mbox{on } \partial \Omega, 
+\nabla u=\mathbf{g} \quad \mbox{and} \quad u=g \qquad \mbox{on } \partial \Omega,
 @f]
 then the right-hand side $\boldsymbol{F}$ of the linear system needs to be modified as follows
 @f[
 F_i:=\int_{\Omega}f\varphi_i-\sum_{e\in\mathcal{E}_h^b}\int_{\Omega}r_e(\mathbf{g}):H_h(\varphi_i)+\sum_{e\in\mathcal{E}_h^b}\int_{\Omega}b_e(g):H_h(\varphi_i)+\gamma_1\sum_{e\in\mathcal{E}_h^b}h_e^{-1}\int_e\mathbf{g}\cdot\nabla\varphi_i+\gamma_0\sum_{e\in\mathcal{E}_h^b}h_e^{-3}\int_e g\varphi_i, \qquad 1\leq i \leq N_h.
 @f]
-Note that for any given index $i$, many of the terms are zero. Indeed, for $e\in \mathcal{E}_h^b$ we have ${\rm supp}\,(r_e(\mathbf{g}))={\rm supp}\,(b_e(g))=K$, where $K$ is the element for which $e\subset\partial K$. Therefore, the liftings $r_e(\mathbf{g})$ and $b_e(g)$ contributes to $F_i$ only if $\varphi_i$ has support on $K$ or a neighbor of $K$. In other words, when integrating on a cell $K$, we need to add
+Note that for any given index $i$, many of the terms are zero. Indeed, for $e\in \mathcal{E}_h^b$ we have ${\rm supp}\,(r_e(\mathbf{g}))={\rm supp}\,(b_e(g))=K$, where $K$ is the element for which $e\subset\partial K$. Therefore, the liftings $r_e(\mathbf{g})$ and $b_e(g)$ contribute to $F_i$ only if $\varphi_i$ has support on $K$ or a neighbor of $K$. In other words, when integrating on a cell $K$, we need to add
 @f[
 \int_{K}f\varphi_i+\sum_{e\in\mathcal{E}_h^b, e\subset\partial K}\left[-\int_{K}r_e(\mathbf{g}):H_h(\varphi_i)+\int_{K}b_e(g):H_h(\varphi_i)+\gamma_1h_e^{-1}\int_e\mathbf{g}\cdot\nabla\varphi_i+\gamma_0h_e^{-3}\int_e g\varphi_i\right]
 @f]
