@@ -3499,12 +3499,13 @@ namespace internal
         // to use the functions for at least linear functions for values on
         // the faces and quadratic functions for gradients on the faces, so
         // include the switch here
-        if ((do_gradients == false &&
-             data.data.front().nodal_at_cell_boundaries == true &&
-             fe_degree > 0) ||
-            (data.element_type ==
-               MatrixFreeFunctions::tensor_symmetric_hermite &&
-             fe_degree > 1))
+        if (((do_gradients == false &&
+              data.data.front().nodal_at_cell_boundaries == true &&
+              fe_degree > 0) ||
+             (data.element_type ==
+                MatrixFreeFunctions::tensor_symmetric_hermite &&
+              fe_degree > 1)) &&
+            do_hessians == false)
           {
             // case 1: contiguous and interleaved indices
             if (n_face_orientations == 1 &&
@@ -3792,8 +3793,7 @@ namespace internal
             else if ((n_face_orientations > 1 ||
                       dof_info.index_storage_variants[dof_access_index][cell] ==
                         MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
-                          contiguous) &&
-                     !do_hessians)
+                          contiguous))
               {
                 const unsigned int *indices =
                   &dof_info.dof_indices_contiguous[dof_access_index]
