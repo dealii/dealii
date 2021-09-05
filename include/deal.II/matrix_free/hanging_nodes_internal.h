@@ -138,10 +138,9 @@ namespace internal
     /**
      * This class creates the mask used in the treatment of hanging nodes in
      * CUDAWrappers::MatrixFree.
-     * The implementation of this class is explained in <em>Section 3 of
-     * Matrix-Free Finite-Element Computations On Graphics Processors With
-     * Adaptively Refined Unstructured Meshes</em> by Karl Ljungkvist,
-     * SpringSim-HPC, 2017 April 23-26.
+     * The implementation of this class is explained in Section 3 of
+     * @cite ljungkvist2017matrix and in Section 3.4 of
+     * @cite kronbichler2019multigrid.
      */
     template <int dim>
     class HangingNodes
@@ -1141,10 +1140,9 @@ namespace CUDAWrappers
     /**
      * This function resolves the hanging nodes using tensor product.
      *
-     * The implementation of this class is explained in <em>Matrix-Free
-     * Finite-Element Computations On Graphics Processors With Adaptively
-     * Refined Unstructured Meshes</em> by Karl Ljungkvist, SpringSim-HPC, 2017
-     * April 23-26.
+     * The implementation of this class is explained in Section 3 of
+     * @cite ljungkvist2017matrix and in Section 3.4 of
+     * @cite kronbichler2019multigrid.
      */
     template <int dim, int fe_degree, bool transpose, typename Number>
     __device__ void
