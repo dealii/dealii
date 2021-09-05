@@ -19,6 +19,7 @@
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_q.h>
@@ -52,22 +53,20 @@ test_hessians(const unsigned int                             degree,
 
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria);
-  tria.refine_global(3);
+  tria.refine_global(4 - dim);
 
-  // TODO: make Hessians work for adaptive refinement
-
-  //  unsigned int counter = 0;
-  //  for (auto cell = tria.begin_active(); cell != tria.end(); ++cell,
-  //  ++counter)
-  //    if (cell->is_locally_owned() && counter % 3 == 0)
-  //      cell->set_refine_flag();
-  //  tria.execute_coarsening_and_refinement();
+  unsigned int counter = 0;
+  for (auto cell = tria.begin_active(); cell != tria.end(); ++cell, ++counter)
+    if (cell->is_locally_owned() && counter % 3 == 0)
+      cell->set_refine_flag();
+  tria.execute_coarsening_and_refinement();
 
   DoFHandler<dim> dof_handler(tria);
   dof_handler.distribute_dofs(fe);
   MappingQGeneric<dim> mapping(1);
 
   AffineConstraints<double> constraints;
+  DoFTools::make_hanging_node_constraints(dof_handler, constraints);
   VectorTools::interpolate_boundary_values(
     mapping, dof_handler, 0, Functions::ZeroFunction<dim>(), constraints);
   constraints.close();
@@ -95,27 +94,33 @@ test_hessians(const unsigned int                             degree,
   matrix_free.initialize_dof_vector(dst2);
 
   // Setup FEFaceValues
-  QGauss<dim - 1>                      quad(degree + 1);
-  FEFaceValues<dim>                    fe_face_values_m(mapping,
+  QGauss<dim - 1>             quad(degree + 1);
+  FEFaceValues<dim>           fe_face_values_m(mapping,
                                      fe,
                                      quad,
                                      update_values | update_gradients |
                                        update_hessians | update_JxW_values);
-  FEFaceValues<dim>                    fe_face_values_p(mapping,
-                                     fe,
-                                     quad,
-                                     update_values | update_gradients |
-                                       update_hessians | update_JxW_values);
-  Vector<double>                       solution_values_m(fe.dofs_per_cell);
-  Vector<double>                       solution_values_p(fe.dofs_per_cell);
-  std::vector<Tensor<2, dim>>          solution_hessians(quad.size());
-  std::vector<Tensor<1, dim>>          solution_gradients(quad.size());
-  std::vector<double>                  solution_values(quad.size());
+  FEFaceValues<dim>           fe_regface_values_p(mapping,
+                                        fe,
+                                        quad,
+                                        update_values | update_gradients |
+                                          update_hessians | update_JxW_values);
+  FESubfaceValues<dim>        fe_subface_values_p(mapping,
+                                           fe,
+                                           quad,
+                                           update_values | update_gradients |
+                                             update_hessians |
+                                             update_JxW_values);
+  Vector<double>              solution_values_m(fe.dofs_per_cell);
+  Vector<double>              solution_values_p(fe.dofs_per_cell);
+  std::vector<Tensor<2, dim>> solution_hessians(quad.size());
+  std::vector<Tensor<1, dim>> solution_gradients(quad.size());
+  std::vector<double>         solution_values(quad.size());
+
   std::vector<types::global_dof_index> dof_indices_m(fe.dofs_per_cell);
   std::vector<types::global_dof_index> dof_indices_p(fe.dofs_per_cell);
   src.update_ghost_values();
   dst2 = 0;
-
 
 
   matrix_free.template loop<LinearAlgebra::distributed::Vector<double>,
@@ -177,8 +182,22 @@ test_hessians(const unsigned int                             degree,
               fe_face_values_m.reinit(face_accessor_inside.first,
                                       face_accessor_inside.second);
 
-              fe_face_values_p.reinit(face_accessor_outside.first,
-                                      face_accessor_outside.second);
+              const FEValuesBase<dim> *fe_face_values_p = nullptr;
+              if (matrix_free.get_face_info(face).subface_index <
+                  GeometryInfo<dim>::max_children_per_cell)
+                {
+                  fe_subface_values_p.reinit(
+                    face_accessor_outside.first,
+                    face_accessor_outside.second,
+                    matrix_free.get_face_info(face).subface_index);
+                  fe_face_values_p = &fe_subface_values_p;
+                }
+              else
+                {
+                  fe_regface_values_p.reinit(face_accessor_outside.first,
+                                             face_accessor_outside.second);
+                  fe_face_values_p = &fe_regface_values_p;
+                }
 
               face_accessor_inside.first->get_dof_indices(dof_indices_m);
               face_accessor_outside.first->get_dof_indices(dof_indices_p);
@@ -247,17 +266,17 @@ test_hessians(const unsigned int                             degree,
                     {
                       if (evaluation_flags & EvaluationFlags::hessians)
                         hessians += solution_values_p(i) *
-                                    fe_face_values_p.shape_hessian(i, q);
+                                    fe_face_values_p->shape_hessian(i, q);
                       if (evaluation_flags & EvaluationFlags::gradients)
                         gradients += solution_values_p(i) *
-                                     fe_face_values_p.shape_grad(i, q);
+                                     fe_face_values_p->shape_grad(i, q);
                       if (evaluation_flags & EvaluationFlags::values)
                         values += solution_values_p(i) *
-                                  fe_face_values_p.shape_value(i, q);
+                                  fe_face_values_p->shape_value(i, q);
                     }
-                  solution_hessians[q]  = hessians * fe_face_values_p.JxW(q);
-                  solution_gradients[q] = gradients * fe_face_values_p.JxW(q);
-                  solution_values[q]    = values * fe_face_values_p.JxW(q);
+                  solution_hessians[q]  = hessians * fe_face_values_p->JxW(q);
+                  solution_gradients[q] = gradients * fe_face_values_p->JxW(q);
+                  solution_values[q]    = values * fe_face_values_p->JxW(q);
                 }
               for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
                 {
@@ -269,13 +288,13 @@ test_hessians(const unsigned int                             degree,
                       if (evaluation_flags & EvaluationFlags::hessians)
                         sum_hessians += double_contract<0, 0, 1, 1>(
                           solution_hessians[q],
-                          fe_face_values_p.shape_hessian(i, q));
+                          fe_face_values_p->shape_hessian(i, q));
                       if (evaluation_flags & EvaluationFlags::gradients)
                         sum_gradients += solution_gradients[q] *
-                                         fe_face_values_p.shape_grad(i, q);
+                                         fe_face_values_p->shape_grad(i, q);
                       if (evaluation_flags & EvaluationFlags::values)
                         sum_values += solution_values[q] *
-                                      fe_face_values_p.shape_value(i, q);
+                                      fe_face_values_p->shape_value(i, q);
                     }
                   solution_values_p(i) =
                     sum_hessians + sum_gradients + sum_values;
