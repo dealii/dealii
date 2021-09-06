@@ -175,6 +175,12 @@ public:
    */
   void
   interpolate(VectorType &dst, const VectorType &src) const;
+
+  /**
+   * Return the memory consumption of the allocated memory in this class.
+   */
+  std::size_t
+  memory_consumption() const;
 };
 
 
@@ -276,6 +282,12 @@ public:
   void
   interpolate(LinearAlgebra::distributed::Vector<Number> &      dst,
               const LinearAlgebra::distributed::Vector<Number> &src) const;
+
+  /**
+   * Return the memory consumption of the allocated memory in this class.
+   */
+  std::size_t
+  memory_consumption() const;
 
 private:
   /**
@@ -521,6 +533,15 @@ public:
                     MGLevelObject<VectorType> &      dst,
                     const InVector &                 src) const;
 
+  /**
+   * Return the memory consumption of the allocated memory in this class.
+   *
+   * @note Counts also the memory consumption of the underlying two-level
+   *   transfer operators.
+   */
+  std::size_t
+  memory_consumption() const;
+
 private:
   /**
    * Collection of the two-level transfer operators.
@@ -665,6 +686,23 @@ MGTransferGlobalCoarsening<dim, VectorType>::interpolate_to_mg(
 
   for (unsigned int l = max_level; l > min_level; --l)
     this->transfer[l].interpolate(dst[l - 1], dst[l]);
+}
+
+
+
+template <int dim, typename VectorType>
+std::size_t
+MGTransferGlobalCoarsening<dim, VectorType>::memory_consumption() const
+{
+  std::size_t size = 0;
+
+  const unsigned int min_level = transfer.min_level();
+  const unsigned int max_level = transfer.max_level();
+
+  for (unsigned int l = min_level + 1; l <= max_level; ++l)
+    size += this->transfer[l].memory_consumption();
+
+  return size;
 }
 
 #endif

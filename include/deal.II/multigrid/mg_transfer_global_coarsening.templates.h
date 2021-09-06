@@ -2822,6 +2822,39 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
   return cell_transfer.run(cell_transfer_test);
 }
 
+
+
+template <int dim, typename Number>
+std::size_t
+MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
+  memory_consumption() const
+{
+  std::size_t size = 0;
+
+  for (const auto &scheme : schemes)
+    {
+      size += scheme.prolongation_matrix.memory_consumption();
+      size += scheme.prolongation_matrix_1d.memory_consumption();
+      size += scheme.restriction_matrix.memory_consumption();
+      size += scheme.restriction_matrix_1d.memory_consumption();
+    }
+
+  size += partitioner_fine->memory_consumption();
+  size += partitioner_coarse->memory_consumption();
+  size += vec_fine.memory_consumption();
+  size += vec_coarse.memory_consumption();
+  size +=
+    MemoryConsumption::memory_consumption(distribute_local_to_global_indices);
+  size +=
+    MemoryConsumption::memory_consumption(distribute_local_to_global_values);
+  size += MemoryConsumption::memory_consumption(distribute_local_to_global_ptr);
+  size += MemoryConsumption::memory_consumption(weights);
+  size += MemoryConsumption::memory_consumption(level_dof_indices_coarse);
+  size += MemoryConsumption::memory_consumption(level_dof_indices_fine);
+
+  return size;
+}
+
 DEAL_II_NAMESPACE_CLOSE
 
 #endif
