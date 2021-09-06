@@ -608,9 +608,14 @@ MGTransferGlobalCoarsening<dim, VectorType>::copy_to_mg(
       "MGTransferGlobalCoarsening."));
 
   for (unsigned int level = dst.min_level(); level <= dst.max_level(); ++level)
-    initialize_dof_vector(level, dst[level]);
+    {
+      initialize_dof_vector(level, dst[level]);
 
-  dst[dst.max_level()].copy_locally_owned_data_from(src);
+      if (level == dst.max_level())
+        dst[level].copy_locally_owned_data_from(src);
+      else
+        dst[level] = 0.0;
+    }
 }
 
 
