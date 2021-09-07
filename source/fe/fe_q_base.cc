@@ -1520,7 +1520,9 @@ FE_Q_Base<dim, spacedim>::get_restriction_matrix(
                   }
               unsigned int j_indices[dim];
               internal::FE_Q_Base::zero_indices<dim>(j_indices);
+#ifdef DEBUG
               double sum_check = 0;
+#endif
               for (unsigned int j = 0; j < q_dofs_per_cell; j += dofs1d)
                 {
                   double val_extra_dim = 1.;
@@ -1540,7 +1542,9 @@ FE_Q_Base<dim, spacedim>::get_restriction_matrix(
                         my_restriction(mother_dof, child_dof) = 1.;
                       else if (std::fabs(val) > eps)
                         my_restriction(mother_dof, child_dof) = val;
+#ifdef DEBUG
                       sum_check += val;
+#endif
                     }
                   internal::FE_Q_Base::increment_indices<dim>(j_indices,
                                                               dofs1d);

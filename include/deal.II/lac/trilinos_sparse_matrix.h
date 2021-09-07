@@ -2893,13 +2893,15 @@ namespace TrilinosWrappers
         // TODO: fix this (do not run compress here, but fail)
         if (last_action == Insert)
           {
+#      ifdef DEBUG
             int ierr;
-            ierr = matrix->GlobalAssemble(*column_space_map,
-                                          matrix->RowMap(),
-                                          false);
+            ierr =
+#      endif
+              matrix->GlobalAssemble(*column_space_map,
+                                     matrix->RowMap(),
+                                     false);
 
             Assert(ierr == 0, ExcTrilinosError(ierr));
-            (void)ierr; // removes -Wunused-but-set-variable in optimized mode
           }
 
         last_action = Add;
