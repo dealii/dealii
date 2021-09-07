@@ -1609,6 +1609,7 @@ namespace internal
             irregular_cells.back() = task_info.n_ghost_cells % n_lanes;
           }
 
+#ifdef DEBUG
         {
           unsigned int n_cells = 0;
           for (unsigned int i = 0; i < task_info.cell_partition_data.back();
@@ -1622,6 +1623,7 @@ namespace internal
             n_cells += irregular_cells[i] > 0 ? irregular_cells[i] : n_lanes;
           AssertDimension(n_cells, task_info.n_ghost_cells);
         }
+#endif
 
         task_info.cell_partition_data.push_back(
           task_info.cell_partition_data.back() + n_ghost_slots);

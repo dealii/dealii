@@ -2721,6 +2721,7 @@ namespace GridGenerator
             std::reverse(step_sizes[i].begin(), step_sizes[i].end());
           }
 
+#  ifdef DEBUG
         double x = 0;
         for (unsigned int j = 0; j < step_sizes.at(i).size(); ++j)
           x += step_sizes[i][j];
@@ -2730,6 +2731,7 @@ namespace GridGenerator
                  Utilities::int_to_string(i) +
                  " must be equal to the distance of the two given "
                  "points in this coordinate direction."));
+#  endif
       }
 
 
