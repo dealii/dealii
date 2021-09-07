@@ -388,8 +388,7 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                     ExcMessage(
                       "While reading VTK file, failed to find CELLS section"));
 
-      /////////////////////Processing the CELL_TYPES
-      /// section////////////////////////
+      // Processing the CELL_TYPES section
 
       in >> keyword;
 
