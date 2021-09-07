@@ -536,6 +536,7 @@ MGTransferMatrixFree<dim, Number>::interpolate_to_mg(
 
   // do the transfer from level to level-1:
   dst[max_level].update_ghost_values();
+
   for (unsigned int level = max_level; level > min_level; --level)
     {
       // auxiliary vector which always has ghost elements
@@ -569,6 +570,10 @@ MGTransferMatrixFree<dim, Number>::interpolate_to_mg(
             for (unsigned int child = 0; child < cell->n_children(); ++child)
               {
                 cell->child(child)->get_mg_dof_indices(dof_indices);
+
+                internal::MGTransfer::resolve_identity_constraints(
+                  this->mg_constrained_dofs, level, dof_indices);
+
                 for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
                   dof_values_fine(i) = (*input)(dof_indices[i]);
                 fe.get_restriction_matrix(child, cell->refinement_case())
