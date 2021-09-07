@@ -439,9 +439,9 @@ private:
  * other multigrid transfer operators, the user can provide separate
  * transfer operators of type MGTwoLevelTransfer between each level.
  *
- * This class currently only works for tensor-product finite elements based on
- * FE_Q and FE_DGQ elements. Systems involving multiple components of
- * one of these element, as well as, systems with different elements or other
+ * This class currently only works for the tensor-product finite elements
+ * FE_Q and FE_DGQ and simplex elements FE_SimplexP and FE_SimplexDGP as well as
+ * for systems involving multiple components of one of these elements. Other
  * elements are currently not implemented.
  */
 template <int dim, typename VectorType>
