@@ -39,7 +39,7 @@ and get the following convergence rates.
 
 <table align="center" class="doxtable">
   <tr>
-   <th>Number of refinements </th><th>  $\|u-u_h^\circ\|_{L_2}$ </th><th>  Conv. rates  </th><th>  $|u-u_h|_{H^1}$ </th><th> Conv. rates </th><th> $|u-u_h|_{H^2}$ </th><th> Conv. rates </th>
+   <th>Number of refinements </th><th>  $\|u-u_h\|_{L_2}$ </th><th>  Conv. rates  </th><th>  $|u-u_h|_{H^1}$ </th><th> Conv. rates </th><th> $|u-u_h|^\circ_{H^2}$ </th><th> Conv. rates </th>
   </tr>
   <tr>
    <td>   2                  </td><td>   8.780e-03 </td><td>       </td><td>  7.095e-02   </td><td>           </td><td>  1.645 </td><td>   </td>
@@ -67,7 +67,7 @@ in the introduction.
 
 <table align="center" class="doxtable">
   <tr>
-   <th>Number of refinements </th><th>  $\|u-u_h^\circ\|_{L_2}$ </th><th>  Conv. rates  </th><th>  $|u-u_h|_{H^1}$ </th><th> Conv. rates </th><th> $|u-u_h|_{H^2}$ </th><th> Conv. rates </th>
+   <th>Number of refinements </th><th>  $\|u-u_h\|_{L_2}$ </th><th>  Conv. rates  </th><th>  $|u-u_h|_{H^1}$ </th><th> Conv. rates </th><th> $|u-u_h|^\circ_{H^2}$ </th><th> Conv. rates </th>
   </tr>
   <tr>
    <td>   2                  </td><td>    2.045e-04 </td><td>       </td><td>   4.402e-03   </td><td>           </td><td> 1.641e-01 </td><td>   </td>
@@ -92,7 +92,7 @@ This, of course, matches our theoretical expectations.
 
 <table align="center" class="doxtable">
   <tr>
-   <th>Number of refinements </th><th>  $\|u-u_h^\circ\|_{L_2}$ </th><th>  Conv. rates  </th><th>  $|u-u_h|_{H^1}$ </th><th> Conv. rates </th><th> $|u-u_h|_{H^2}$ </th><th> Conv. rates </th>
+   <th>Number of refinements </th><th>  $\|u-u_h\|_{L_2}$ </th><th>  Conv. rates  </th><th>  $|u-u_h|_{H^1}$ </th><th> Conv. rates </th><th> $|u-u_h|^\circ_{H^2}$ </th><th> Conv. rates </th>
   </tr>
   <tr>
    <td>   2                  </td><td>    6.510e-06 </td><td>       </td><td> 2.215e-04   </td><td>           </td><td>  1.275e-02 </td><td>   </td>
@@ -124,7 +124,7 @@ case where we simply choose $\gamma=1$:
 
 <table align="center" class="doxtable">
   <tr>
-   <th>Number of refinements </th><th>  $\|u-u_h^\circ\|_{L_2}$ </th><th>  Conv. rates  </th><th>  $|u-u_h|_{H^1}$ </th><th> Conv. rates </th><th> $|u-u_h|_{H^2}$ </th><th> Conv. rates </th>
+   <th>Number of refinements </th><th>  $\|u-u_h\|_{L_2}$ </th><th>  Conv. rates  </th><th>  $|u-u_h|_{H^1}$ </th><th> Conv. rates </th><th> $|u-u_h|^\circ_{H^2}$ </th><th> Conv. rates </th>
   </tr>
   <tr>
    <td>   2                  </td><td>   7.350e-02 </td><td>       </td><td>   7.323e-01   </td><td>           </td><td> 10.343 </td><td>   </td>
@@ -160,7 +160,7 @@ that case:
 
 <table align="center" class="doxtable">
   <tr>
-   <th>Number of refinements </th><th>  $\|u-u_h^\circ\|_{L_2}$ </th><th>  Conv. rates  </th><th>  $|u-u_h|_{H^1}$ </th><th> Conv. rates </th><th> $|u-u_h|_{H^2}$ </th><th> Conv. rates </th>
+   <th>Number of refinements </th><th>  $\|u-u_h\|_{L_2}$ </th><th>  Conv. rates  </th><th>  $|u-u_h|_{H^1}$ </th><th> Conv. rates </th><th> $|u-u_h|^\circ_{H^2}$ </th><th> Conv. rates </th>
   </tr>
   <tr>
    <td>   2                  </td><td>   4.133e-02 </td><td>       </td><td>  2.517e-01   </td><td>           </td><td> 3.056 </td><td>   </td>
