@@ -498,6 +498,11 @@ class PreconditionJacobi : public PreconditionRelaxation<MatrixType>
 {
 public:
   /**
+   * Declare type for container size.
+   */
+  using size_type = typename PreconditionRelaxation<MatrixType>::size_type;
+
+  /**
    * An alias to the base class AdditionalData.
    */
   using AdditionalData =
@@ -584,6 +589,11 @@ class PreconditionSOR : public PreconditionRelaxation<MatrixType>
 {
 public:
   /**
+   * Declare type for container size.
+   */
+  using size_type = typename PreconditionRelaxation<MatrixType>::size_type;
+
+  /**
    * An alias to the base class AdditionalData.
    */
   using AdditionalData =
@@ -651,15 +661,15 @@ class PreconditionSSOR : public PreconditionRelaxation<MatrixType>
 {
 public:
   /**
+   * Declare type for container size.
+   */
+  using size_type = typename PreconditionRelaxation<MatrixType>::size_type;
+
+  /**
    * An alias to the base class AdditionalData.
    */
   using AdditionalData =
     typename PreconditionRelaxation<MatrixType>::AdditionalData;
-
-  /**
-   * Declare type for container size.
-   */
-  using size_type = typename MatrixType::size_type;
 
   /**
    * An alias to the base class.
@@ -752,7 +762,7 @@ public:
   /**
    * Declare type for container size.
    */
-  using size_type = typename MatrixType::size_type;
+  using size_type = typename PreconditionRelaxation<MatrixType>::size_type;
 
   /**
    * Parameters for PreconditionPSOR.
