@@ -1246,6 +1246,7 @@ Iterator
 Tensor<0, dim, Number>::unroll_recursion(const Iterator current,
                                          const Iterator end) const
 {
+  (void)end;
   Assert(dim != 0,
          ExcMessage("Cannot unroll an object of type Tensor<0,0,Number>"));
   Assert(std::distance(current, end) >= 1,
