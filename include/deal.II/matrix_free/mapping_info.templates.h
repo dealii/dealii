@@ -358,6 +358,10 @@ namespace internal
              update_quadrature_points ?
            update_quadrature_points :
            update_default) |
+        ((update_flags_inner_faces | update_flags_boundary_faces) &
+             (update_jacobian_grads | update_hessians) ?
+           update_jacobian_grads :
+           update_default) |
         update_normal_vectors | update_JxW_values | update_jacobians;
       this->update_flags_inner_faces    = this->update_flags_boundary_faces;
       this->update_flags_faces_by_cells = update_flags_faces_by_cells;
@@ -428,7 +432,7 @@ namespace internal
 
                   const auto quad_face = quad[my_q][hpq].get_tensor_basis()[0];
                   face_data[my_q].descriptor[hpq * scale].initialize(
-                    quad_face, update_flags_boundary_faces);
+                    quad_face, this->update_flags_boundary_faces);
                   face_data[my_q].q_collection[hpq] =
                     dealii::hp::QCollection<dim - 1>(quad_face);
                   face_data_by_cells[my_q].descriptor[hpq * scale].initialize(
@@ -496,8 +500,6 @@ namespace internal
 
 
 
-    /* ------------------------- initialization of cells ------------------- */
-
     // Copy a vectorized array of one type to another type
     template <typename VectorizedArrayType1, typename VectorizedArrayType2>
     inline DEAL_II_ALWAYS_INLINE void
@@ -515,6 +517,76 @@ namespace internal
     }
 
 
+
+    // For second derivatives on the real cell, we need the gradient of the
+    // inverse Jacobian J. This involves some calculus and is done
+    // vectorized. If L is the gradient of the jacobian on the unit cell,
+    // the gradient of the inverse is given by (multidimensional calculus) -
+    // J * (J * L) * J (the third J is because we need to transform the
+    // gradient L from the unit to the real cell, and then apply the inverse
+    // Jacobian). Compare this with 1D with j(x) = 1/k(phi(x)), where j =
+    // phi' is the inverse of the jacobian and k is the derivative of the
+    // jacobian on the unit cell. Then j' = phi' k'/k^2 = j k' j^2.
+    template <int dim, typename Number>
+    Tensor<1, dim *(dim + 1) / 2, Tensor<1, dim, Number>>
+    process_jacobian_gradient(const Tensor<2, dim, Number> &inv_jac_permut,
+                              const Tensor<2, dim, Number> &inv_jac,
+                              const Tensor<3, dim, Number> &jac_grad)
+    {
+      Number inv_jac_grad[dim][dim][dim];
+
+      // compute: inv_jac_grad = inv_jac_permut * grad_unit(jac)
+      for (unsigned int d = 0; d < dim; ++d)
+        for (unsigned int e = 0; e < dim; ++e)
+          for (unsigned int f = 0; f < dim; ++f)
+            {
+              inv_jac_grad[f][e][d] =
+                (inv_jac_permut[f][0] * jac_grad[d][e][0]);
+              for (unsigned int g = 1; g < dim; ++g)
+                inv_jac_grad[f][e][d] +=
+                  (inv_jac_permut[f][g] * jac_grad[d][e][g]);
+            }
+
+      // compute: transpose (-inv_jac_permut * inv_jac_grad[d] * inv_jac)
+      Number tmp[dim];
+      Number grad_jac_inv[dim][dim][dim];
+      for (unsigned int d = 0; d < dim; ++d)
+        for (unsigned int e = 0; e < dim; ++e)
+          {
+            for (unsigned int f = 0; f < dim; ++f)
+              {
+                tmp[f] = -inv_jac_grad[d][f][0] * inv_jac[0][e];
+                for (unsigned int g = 1; g < dim; ++g)
+                  tmp[f] -= inv_jac_grad[d][f][g] * inv_jac[g][e];
+              }
+
+            // needed for non-diagonal part of Jacobian grad
+            for (unsigned int f = 0; f < dim; ++f)
+              {
+                grad_jac_inv[f][d][e] = inv_jac_permut[f][0] * tmp[0];
+                for (unsigned int g = 1; g < dim; ++g)
+                  grad_jac_inv[f][d][e] += inv_jac_permut[f][g] * tmp[g];
+              }
+          }
+
+      Tensor<1, dim *(dim + 1) / 2, Tensor<1, dim, Number>> result;
+
+      // the diagonal part of Jacobian gradient comes first
+      for (unsigned int d = 0; d < dim; ++d)
+        for (unsigned int f = 0; f < dim; ++f)
+          result[d][f] = grad_jac_inv[d][d][f];
+
+      // then the upper-diagonal part
+      for (unsigned int d = 0, count = 0; d < dim; ++d)
+        for (unsigned int e = d + 1; e < dim; ++e, ++count)
+          for (unsigned int f = 0; f < dim; ++f)
+            result[dim + count][f] = grad_jac_inv[d][e][f];
+      return result;
+    }
+
+
+
+    /* ------------------------- initialization of cells ------------------- */
 
     // Namespace with implementation of extraction of values on cell
     // range
@@ -589,68 +661,7 @@ namespace internal
           }
       }
 
-      // For second derivatives on the real cell, we need the gradient of the
-      // inverse Jacobian J. This involves some calculus and is done
-      // vectorized. If L is the gradient of the jacobian on the unit cell,
-      // the gradient of the inverse is given by (multidimensional calculus) -
-      // J * (J * L) * J (the third J is because we need to transform the
-      // gradient L from the unit to the real cell, and then apply the inverse
-      // Jacobian). Compare this with 1D with j(x) = 1/k(phi(x)), where j =
-      // phi' is the inverse of the jacobian and k is the derivative of the
-      // jacobian on the unit cell. Then j' = phi' k'/k^2 = j k' j^2.
-      template <int dim, typename Number>
-      Tensor<1, dim *(dim + 1) / 2, Tensor<1, dim, Number>>
-      process_jacobian_gradient(const Tensor<2, dim, Number> &inv_jac,
-                                const Tensor<3, dim, Number> &jac_grad)
-      {
-        Number inv_jac_grad[dim][dim][dim];
 
-        // compute: inv_jac_grad = J*grad_unit(J^-1)
-        for (unsigned int d = 0; d < dim; ++d)
-          for (unsigned int e = 0; e < dim; ++e)
-            for (unsigned int f = 0; f < dim; ++f)
-              {
-                inv_jac_grad[f][e][d] = (inv_jac[f][0] * jac_grad[d][e][0]);
-                for (unsigned int g = 1; g < dim; ++g)
-                  inv_jac_grad[f][e][d] += (inv_jac[f][g] * jac_grad[d][e][g]);
-              }
-
-        // compute: transpose (-jac * jac_grad[d] * jac)
-        Number tmp[dim];
-        Number grad_jac_inv[dim][dim][dim];
-        for (unsigned int d = 0; d < dim; ++d)
-          for (unsigned int e = 0; e < dim; ++e)
-            {
-              for (unsigned int f = 0; f < dim; ++f)
-                {
-                  tmp[f] = Number();
-                  for (unsigned int g = 0; g < dim; ++g)
-                    tmp[f] -= inv_jac_grad[d][f][g] * inv_jac[g][e];
-                }
-
-              // needed for non-diagonal part of Jacobian grad
-              for (unsigned int f = 0; f < dim; ++f)
-                {
-                  grad_jac_inv[f][d][e] = inv_jac[f][0] * tmp[0];
-                  for (unsigned int g = 1; g < dim; ++g)
-                    grad_jac_inv[f][d][e] += inv_jac[f][g] * tmp[g];
-                }
-            }
-
-        Tensor<1, dim *(dim + 1) / 2, Tensor<1, dim, Number>> result;
-
-        // the diagonal part of Jacobian gradient comes first
-        for (unsigned int d = 0; d < dim; ++d)
-          for (unsigned int e = 0; e < dim; ++e)
-            result[d][e] = grad_jac_inv[d][d][e];
-
-        // then the upper-diagonal part
-        for (unsigned int d = 0, count = 0; d < dim; ++d)
-          for (unsigned int e = d + 1; e < dim; ++e, ++count)
-            for (unsigned int f = 0; f < dim; ++f)
-              result[dim + count][f] = grad_jac_inv[d][e][f];
-        return result;
-      }
 
       /**
        * Helper function called internally during the initialize function.
@@ -1049,7 +1060,9 @@ namespace internal
 
                       if (update_flags & update_jacobian_grads)
                         data.first[my_q].jacobian_gradients[0].push_back(
-                          process_jacobian_gradient(inv_jac, jacobian_grad));
+                          process_jacobian_gradient(inv_jac,
+                                                    inv_jac,
+                                                    jacobian_grad));
                     }
                 }
 
@@ -1504,7 +1517,9 @@ namespace internal
                                   cell_grad_grads[q + (d * hess_dim + c) *
                                                         n_q_points];
                             const auto inv_jac_grad =
-                              process_jacobian_gradient(inv_jac, jac_grad);
+                              process_jacobian_gradient(inv_jac,
+                                                        inv_jac,
+                                                        jac_grad);
                             for (unsigned int d = 0; d < hess_dim; ++d)
                               for (unsigned int e = 0; e < dim; ++e)
                                 store_vectorized_array(
@@ -2355,8 +2370,56 @@ namespace internal
               if (process_face[face] == false)
                 continue;
 
-              // go through the faces and fill the result
               const unsigned int offset = my_data.data_index_offsets[face];
+
+              const auto compute_jacobian_grad =
+                [&](unsigned int                     face_no,
+                    int                              is_exterior,
+                    unsigned int                     q,
+                    Tensor<2, dim, VectorizedDouble> inv_jac) {
+                  Tensor<2, dim, VectorizedDouble> inv_transp_jac_permut;
+                  for (unsigned int d = 0; d < dim; ++d)
+                    for (unsigned int e = 0; e < dim; ++e)
+                      {
+                        const unsigned int ee =
+                          ExtractFaceHelper::reorder_face_derivative_indices<
+                            dim>(face_no, e);
+                        inv_transp_jac_permut[d][e] = inv_jac[ee][d];
+                      }
+                  Tensor<2, dim, VectorizedDouble> jacobi;
+                  for (unsigned int e = 0; e < dim; ++e)
+                    for (unsigned int d = 0; d < dim; ++d)
+                      jacobi[d][e] = face_grads[(d * dim + e) * n_q_points + q];
+                  Tensor<2, dim, VectorizedDouble> inv_transp_jac =
+                    transpose(invert(jacobi));
+                  Tensor<3, dim, VectorizedDouble> jac_grad;
+                  for (unsigned int d = 0; d < dim; ++d)
+                    {
+                      for (unsigned int e = 0; e < dim; ++e)
+                        jac_grad[d][e][e] =
+                          face_grad_grads[q + (d * hess_dim + e) * n_q_points];
+                      for (unsigned int c = dim, e = 0; e < dim; ++e)
+                        for (unsigned int f = e + 1; f < dim; ++f, ++c)
+                          jac_grad[d][e][f] = jac_grad[d][f][e] =
+                            face_grad_grads[q +
+                                            (d * hess_dim + c) * n_q_points];
+                      const auto inv_jac_grad =
+                        process_jacobian_gradient(inv_transp_jac_permut,
+                                                  inv_transp_jac,
+                                                  jac_grad);
+                      for (unsigned int e = 0; e < dim; ++e)
+                        {
+                          for (unsigned int d = 0; d < hess_dim; ++d)
+                            store_vectorized_array(
+                              inv_jac_grad[d][e],
+                              vv,
+                              my_data.jacobian_gradients[is_exterior]
+                                                        [offset + q][d][e]);
+                        }
+                    }
+                };
+
+              // go through the faces and fill the result
               const unsigned int n_points_compute =
                 face_type[face] <= affine ? 1 : n_q_points;
               for (unsigned int q = 0; q < n_points_compute; ++q)
@@ -2385,8 +2448,7 @@ namespace internal
 
                   if (update_flags_faces & update_jacobian_grads)
                     {
-                      // TODO: implement jacobian grads for general path
-                      AssertThrow(false, ExcNotImplemented());
+                      compute_jacobian_grad(face_no, 0, q, inv_jac);
                     }
 
                   std::array<Tensor<1, dim, VectorizedDouble>, dim - 1>
@@ -2494,8 +2556,10 @@ namespace internal
 
                       if (update_flags_faces & update_jacobian_grads)
                         {
-                          // TODO: implement jacobian grads for general path
-                          AssertThrow(false, ExcNotImplemented());
+                          compute_jacobian_grad(faces[face].exterior_face_no,
+                                                1,
+                                                q,
+                                                inv_jac);
                         }
 
                       my_data.normals_times_jacobians[1][offset + q] =
