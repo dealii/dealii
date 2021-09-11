@@ -16,7 +16,7 @@ In this example, we consider the <i>local discontinuous Galerkin</i> (LDG) metho
 \nabla u & = \mathbf{0} \quad \mbox{on } \partial\Omega, \\
 u & = 0 \quad \mbox{on } \partial\Omega,
 @f}
-where $\Omega\subset\mathbb{R}^d$ $(d=2,3)$ is an open bounded Lipschitz domain and $f\in L^2(\Omega)$. This is the same problem we have already considered in step-47, but we will here take a different approach towards solving it: Rather than using continuous finite elements and enforcing the necessary continuity via penalty terms, we will use lifting operators to deal with the fact that the usual finite element spaces are not twice continuous.
+where $\Omega\subset\mathbb{R}^d$ $(d=2,3)$ is an open bounded Lipschitz domain and $f\in L^2(\Omega)$. This is the same problem we have already considered in step-47, but we will take here a different approach towards solving it: Rather than using continuous finite elements and the interior penalty method, we consider discontinuous finite elements and the local discontinous Galerkin method defined using lifting operators.
 
 The weak formulation of this problem reads as follows: find $u\in H_0^2(\Omega)$ such that
 @f[
@@ -129,9 +129,9 @@ The sparsity pattern associated with the above LDG method is slightly larger tha
   @f[
   \|v_h\|_{H_h^2(\Omega)}^2\dealcoloneq\|D_h^2v_h\|_{L^2(\Omega)}^2+\sum_{e\in\mathcal{E}_h}h_e^{-1}\|\jump{\nabla_h v_h}\|_{L^2(e)}^2+\sum_{e\in\mathcal{E}_h}h_e^{-3}\|\jump{v_h}\|_{L^2(e)}^2
   @f]
-for any choice of penalty parameters $\gamma_0,\gamma_1>0$. In other words, the stability of the method is ensured for any positive parameters. This is in contrast with interior penalty methods for which they need to be large enough. (See also the discussions about penalty parameters in the step-39, step-47, and step-74 programs about penalty parameters.)
+for any choice of penalty parameters $\gamma_0,\gamma_1>0$. In other words, the stability of the method is ensured for any positive parameters. This is in contrast with interior penalty methods for which they need to be large enough. (See also the discussions about penalty parameters in the step-39, step-47, and step-74 programs.)
   <li>If $\{v_h\}_{h>0}\subset \mathbb{V}_h$ is a sequence uniformly bounded in the $\|\cdot\|_{H_h^2(\Omega)}$ norm such that $v_h\rightarrow v$ in $L^2(\Omega)$ as $h\rightarrow 0$ for some $v\in H^2(\Omega)$, then the discrete Hessian $H_h(v_h)$ weakly converges to $D^2v$ in $[L^2(\Omega)]^{2\times 2}$ as $h\rightarrow 0$. Note that the uniform boundedness assumption implies that the limit $v$ belongs to $H_0^2(\Omega)$.</li>
-  <li>The use of a reconstructed operator simplifies the design of the numerical algorithm. In particular, no integration by parts is needed to derive the discrete problem. This strategy of replacing differential operators by appropriate discrete counter-parts can be applied to nonlinear and more general problems, for instance variational problems without a readily accessible strong formulation.
+  <li>The use of a reconstructed operator simplifies the design of the numerical algorithm. In particular, no integration by parts is needed to derive the discrete problem. This strategy of replacing differential operators by appropriate discrete counter-parts can be applied to nonlinear and more general problems, for instance variational problems without a readily accessible strong formulation. It has been used for instance in @cite BGNY2020 and @cite BGNY2021 in the context of large bending deformation of plates.
   </li>
 </ol>
 

@@ -95,17 +95,6 @@ This corresponds to the bi-Laplacian problem with the manufactured solution ment
     <td align="center">1.277e-06</td>
     <td align="center">1.91</td>
   </tr>
-  <tr>
-    <td align="center">7</td>
-    <td align="right">16384</td>
-    <td align="right">147456</td>
-    <td align="center">8.870e-04</td>
-    <td align="center">1.01</td>
-    <td align="center">2.001e-06</td>
-    <td align="center">1.97</td>
-    <td align="center">3.298e-07</td>
-    <td align="center">1.95</td>
-  </tr>
 </table>
 
 This matches the expected optimal convergence rates for the $H^2$ and
