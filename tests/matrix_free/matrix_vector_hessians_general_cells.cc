@@ -14,6 +14,11 @@
 // ---------------------------------------------------------------------
 
 
+// Test if applying a matrix vector product with a matrix containing hessians
+// on faces produces the same result with FEEvaluation and FEValues.
+// This is checked for different combinations of EvaluationFlags, FE types and
+// polynomial degrees.
+
 #include <deal.II/base/logstream.h>
 
 #include <deal.II/distributed/tria.h>
@@ -36,10 +41,6 @@
 
 #include "../tests.h"
 
-// Tests if applying a matrix vector product with a matrix containing hessians
-// on faces produces the same result with FEEvaluation and FEValues.
-// This is checked for different combinations of EvaluationFlags, FE types and
-// polynomial degrees.
 
 template <int dim>
 void
@@ -56,7 +57,7 @@ test_hessians(const dealii::FE_Poly<dim> &                   fe,
 
   DoFHandler<dim> dof_handler(tria);
   dof_handler.distribute_dofs(fe);
-  MappingQGeneric<dim> mapping(1);
+  MappingQGeneric<dim> mapping(2);
 
   AffineConstraints<double> constraints;
   VectorTools::interpolate_boundary_values(
@@ -84,12 +85,13 @@ test_hessians(const dealii::FE_Poly<dim> &                   fe,
   matrix_free.initialize_dof_vector(dst);
   matrix_free.initialize_dof_vector(dst2);
 
-  // Setup FEFaceValues
-  FEValues<dim>                        fe_values(mapping,
+  // Setup FEValues
+  FEValues<dim> fe_values(mapping,
                           fe,
                           quad,
                           update_values | update_gradients | update_hessians |
                             update_JxW_values);
+
   Vector<double>                       solution_values_local(fe.dofs_per_cell);
   std::vector<Tensor<2, dim>>          solution_hessians(quad.size());
   std::vector<Tensor<1, dim>>          solution_gradients(quad.size());
@@ -97,8 +99,6 @@ test_hessians(const dealii::FE_Poly<dim> &                   fe,
   std::vector<types::global_dof_index> dof_indices(fe.dofs_per_cell);
   src.update_ghost_values();
   dst2 = 0;
-
-
 
   matrix_free.template loop<LinearAlgebra::distributed::Vector<double>,
                             LinearAlgebra::distributed::Vector<double>>(
@@ -234,21 +234,27 @@ test_hessians(const dealii::FE_Poly<dim> &                   fe,
   }
 }
 
+
+
 void
 test_qiterated(dealii::EvaluationFlags::EvaluationFlags evaluation_flags)
 {
   using namespace dealii;
   deallog << "test_qiterated" << std::endl;
-  for (unsigned int i = 1; i < 4; ++i)
+  for (unsigned int i = 1; i < 3; ++i)
     {
       QIterated<2> quad_2(QGauss<1>(i + 1), 2);
       QIterated<3> quad_3(QGauss<1>(i + 1), 2);
       test_hessians<2>(FE_Q<2>(i), quad_2, evaluation_flags);
-      test_hessians<3>(FE_Q<3>(i), quad_3, evaluation_flags);
+      if (i < 3)
+        test_hessians<3>(FE_Q<3>(i), quad_3, evaluation_flags);
       test_hessians<2>(FE_DGQ<2>(i), quad_2, evaluation_flags);
-      test_hessians<3>(FE_DGQ<3>(i), quad_3, evaluation_flags);
+      if (i < 3)
+        test_hessians<3>(FE_DGQ<3>(i), quad_3, evaluation_flags);
     }
 }
+
+
 
 void
 test_qgauss(dealii::EvaluationFlags::EvaluationFlags evaluation_flags)
@@ -265,6 +271,8 @@ test_qgauss(dealii::EvaluationFlags::EvaluationFlags evaluation_flags)
       test_hessians<3>(FE_DGQ<3>(i), quad_3, evaluation_flags);
     }
 }
+
+
 
 int
 main(int argc, char **argv)
