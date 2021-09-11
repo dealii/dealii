@@ -1444,7 +1444,7 @@ namespace internal
                                              numbers::invalid_dof_index))
                                           line->set_dof_index(j,
                                                               primary_dof_index,
-                                                              fe_index_2);
+                                                              other_fe_index);
                                       }
                                   }
                               }
