@@ -2081,6 +2081,12 @@ namespace TrilinosWrappers
                         const TrilinosWrappers::SparseMatrix &matrix);
 
         /**
+         * Constructor for a sparse matrix based on an exemplary payload
+         */
+        TrilinosPayload(const TrilinosPayload &               payload_exemplar,
+                        const TrilinosWrappers::SparseMatrix &matrix);
+
+        /**
          * Constructor for a preconditioner based on an exemplary matrix
          */
         TrilinosPayload(
@@ -2092,6 +2098,13 @@ namespace TrilinosWrappers
          */
         TrilinosPayload(
           const TrilinosWrappers::PreconditionBase &preconditioner_exemplar,
+          const TrilinosWrappers::PreconditionBase &preconditioner);
+
+        /**
+         * Constructor for a preconditioner based on an exemplary payload
+         */
+        TrilinosPayload(
+          const TrilinosPayload &                   payload_exemplar,
           const TrilinosWrappers::PreconditionBase &preconditioner);
 
         /**
