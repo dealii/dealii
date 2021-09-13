@@ -14,6 +14,11 @@
 // ---------------------------------------------------------------------
 
 
+// Test if applying a matrix vector product with a matrix containing hessians
+// on faces produces the same result with FEFaceEvaluation and FEFaceValues.
+// This is checked for different combinations of EvaluationFlags, FE types and
+// polynomial degrees.
+
 #include <deal.II/base/logstream.h>
 
 #include <deal.II/distributed/tria.h>
@@ -40,10 +45,6 @@
 
 #include "../tests.h"
 
-// Tests if applying a matrix vector product with a matrix containing hessians
-// on faces produces the same result with FEFaceEvaluation and FEFaceValues.
-// This is checked for different combinations of EvaluationFlags, FE types and
-// polynomial degrees.
 
 template <int dim>
 void
@@ -332,7 +333,7 @@ main(int argc, char **argv)
     dealii::EvaluationFlags::EvaluationFlags evaluation_flags =
       EvaluationFlags::hessians;
     deallog << "test_hessians_only" << std::endl;
-    for (unsigned int i = 1; i < 4; ++i)
+    for (unsigned int i = 1; i < 3; ++i)
       {
         test_hessians<2>(i, dealii::FE_Q<2>(i), evaluation_flags);
         test_hessians<3>(i, dealii::FE_Q<3>(i), evaluation_flags);
@@ -345,7 +346,7 @@ main(int argc, char **argv)
     dealii::EvaluationFlags::EvaluationFlags evaluation_flags =
       EvaluationFlags::values | EvaluationFlags::hessians;
     deallog << "test_hessians_with_values" << std::endl;
-    for (unsigned int i = 1; i < 4; ++i)
+    for (unsigned int i = 1; i < 3; ++i)
       {
         test_hessians<2>(i, dealii::FE_Q<2>(i), evaluation_flags);
         test_hessians<3>(i, dealii::FE_Q<3>(i), evaluation_flags);
@@ -358,7 +359,7 @@ main(int argc, char **argv)
     dealii::EvaluationFlags::EvaluationFlags evaluation_flags =
       EvaluationFlags::gradients | EvaluationFlags::hessians;
     deallog << "test_hessians_with_gradients" << std::endl;
-    for (unsigned int i = 1; i < 4; ++i)
+    for (unsigned int i = 1; i < 3; ++i)
       {
         test_hessians<2>(i, dealii::FE_Q<2>(i), evaluation_flags);
         test_hessians<3>(i, dealii::FE_Q<3>(i), evaluation_flags);
@@ -372,6 +373,7 @@ main(int argc, char **argv)
       EvaluationFlags::values | EvaluationFlags::gradients |
       EvaluationFlags::hessians;
     deallog << "test_hessians_with_gradients_and_values" << std::endl;
+    // run the last test also for cubic polynomials
     for (unsigned int i = 1; i < 4; ++i)
       {
         test_hessians<2>(i, dealii::FE_Q<2>(i), evaluation_flags);
