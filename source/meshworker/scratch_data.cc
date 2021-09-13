@@ -292,6 +292,18 @@ namespace MeshWorker
 
 
   template <int dim, int spacedim>
+  const FEInterfaceValues<dim, spacedim> &
+  ScratchData<dim, spacedim>::get_current_interface_fe_values() const
+  {
+    Assert(interface_fe_values != nullptr,
+           ExcMessage("You have to initialize the cache using one of the "
+                      "reinit functions first!"));
+    return *interface_fe_values;
+  }
+
+
+
+  template <int dim, int spacedim>
   const FEValuesBase<dim, spacedim> &
   ScratchData<dim, spacedim>::get_current_neighbor_fe_values() const
   {

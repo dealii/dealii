@@ -372,7 +372,7 @@ namespace MeshWorker
      * get_current_fe_values() will return the FEValuesBase associated to the
      * current cell, while get_neighbor_fe_values() will be associated with the
      * neighbor cell. The method get_local_dof_indices() will return the
-     * same result of FEInterfaceValues::get_interface_dof_to_dof_indices(),
+     * same result of FEInterfaceValues::get_interface_dof_indices(),
      * while the get_neighbor_dof_indices() will return the local dof indices
      * of the neighbor cell.
      */
@@ -397,6 +397,12 @@ namespace MeshWorker
      */
     const FEValuesBase<dim, spacedim> &
     get_current_fe_values() const;
+
+    /**
+     * Get the currently initialized FEInterfaceValues.
+     */
+    const FEInterfaceValues<dim, spacedim> &
+    get_current_interface_fe_values() const;
 
     /**
      * Return the quadrature points of the internal FEValues object.
@@ -519,6 +525,12 @@ namespace MeshWorker
      */
     const GeneralDataStorage &
     get_general_data_storage() const;
+
+    /**
+     * Return a reference to the used mapping.
+     */
+    const Mapping<dim, spacedim> &
+    get_mapping() const;
 
     /**
      * @name Evaluation of finite element fields and their derivatives on the current cell
@@ -716,7 +728,7 @@ namespace MeshWorker
 
     /**
      * For the solution vector identified by @p global_vector_name, compute
-     * the hessians of the function at the quadrature points, and return a
+     * the Hessians of the function at the quadrature points, and return a
      * vector with the correct type deduced by the Extractor you passed as the
      * @p variable argument.
      *
@@ -772,7 +784,7 @@ namespace MeshWorker
 
     /**
      * For the solution vector identified by @p global_vector_name, compute
-     * the third_derivatives of the function at the quadrature points, and
+     * the third derivatives of the function at the quadrature points, and
      * return a vector with the correct type deduced by the Extractor you passed
      * as the @p variable argument.
      *
@@ -801,10 +813,228 @@ namespace MeshWorker
     /** @} */ // CurrentCellEvaluation
 
     /**
-     * Return a reference to the used mapping.
+     * @name Evaluation of jumps in finite element fields and their derivatives on the current interface
      */
-    const Mapping<dim, spacedim> &
-    get_mapping() const;
+    /** @{ */ // CurrentInterfaceJumpEvaluation
+
+    /**
+     * For the solution vector identified by @p global_vector_name, compute
+     * the jumps in the values of the function at the quadrature points, and
+     * return a vector with the correct type deduced by the interface Extractor
+     * you passed as the
+     * @p variable argument.
+     *
+     * Before you can call this method, you need to call the
+     * extract_local_dof_values() method at least once, passing the same
+     * @p global_vector_name string, and the same type for the variable @p dummy.
+     *
+     * If you have not previously called the extract_local_dof_values() method,
+     * this function will throw an exception.
+     *
+     * For this function to work properly, the underlying FEInterfaceValues
+     * object for which you called one of the reinit() functions, must have
+     * computed the information you are requesting. To do so, the update_values
+     * flag must be an element of the list of UpdateFlags that you passed to the
+     * constructor of this object. See "The interplay of UpdateFlags, Mapping,
+     * and FiniteElement" in the documentation of the FEValues class for more
+     * information.
+     */
+    template <typename Extractor, typename Number = double>
+    const std::vector<
+      typename FEInterfaceViews::View<dim, spacedim, Extractor>::
+        template solution_value_type<Number>> &
+    get_jumps_in_values(const std::string &global_vector_name,
+                        const Extractor &  variable,
+                        const Number       dummy = Number(0));
+
+    /**
+     * For the solution vector identified by @p global_vector_name, compute
+     * the jumps in the gradients of the function at the quadrature points, and
+     * return a vector with the correct type deduced by the interface Extractor
+     * you passed as the
+     * @p variable argument.
+     *
+     * Before you can call this method, you need to call the
+     * extract_local_dof_values() method at least once, passing the same
+     * @p global_vector_name string, and the same type for the variable @p dummy.
+     *
+     * If you have not previously called the extract_local_dof_values() method,
+     * this function will throw an exception.
+     *
+     * For this function to work properly, the underlying FEInterfaceValues
+     * object for which you called one of the reinit() functions, must have
+     * computed the information you are requesting. To do so, the
+     * update_gradients flag must be an element of the list of UpdateFlags that
+     * you passed to the constructor of this object. See "The interplay of
+     * UpdateFlags, Mapping, and FiniteElement" in the documentation of the
+     * FEValues class for more information.
+     */
+    template <typename Extractor, typename Number = double>
+    const std::vector<
+      typename FEInterfaceViews::View<dim, spacedim, Extractor>::
+        template solution_gradient_type<Number>> &
+    get_jumps_in_gradients(const std::string &global_vector_name,
+                           const Extractor &  variable,
+                           const Number       dummy = Number(0));
+
+    /**
+     * For the solution vector identified by @p global_vector_name, compute
+     * the jumps in the Hessians of the function at the quadrature points, and
+     * return a vector with the correct type deduced by the interface Extractor
+     * you passed as the
+     * @p variable argument.
+     *
+     * Before you can call this method, you need to call the
+     * extract_local_dof_values() method at least once, passing the same
+     * @p global_vector_name string, and the same type for the variable @p dummy.
+     *
+     * If you have not previously called the extract_local_dof_values() method,
+     * this function will throw an exception.
+     *
+     * For this function to work properly, the underlying FEInterfaceValues
+     * object for which you called one of the reinit() functions, must have
+     * computed the information you are requesting. To do so, the
+     * update_hessians flag must be an element of the list of UpdateFlags that
+     * you passed to the constructor of this object. See "The interplay of
+     * UpdateFlags, Mapping, and FiniteElement" in the documentation of the
+     * FEValues class for more information.
+     */
+    template <typename Extractor, typename Number = double>
+    const std::vector<
+      typename FEInterfaceViews::View<dim, spacedim, Extractor>::
+        template solution_hessian_type<Number>> &
+    get_jumps_in_hessians(const std::string &global_vector_name,
+                          const Extractor &  variable,
+                          const Number       dummy = Number(0));
+
+    /**
+     * For the solution vector identified by @p global_vector_name, compute
+     * the jumps in the third derivatives of the function at the quadrature
+     * points, and return a vector with the correct type deduced by the
+     * interface Extractor you passed
+     * as the @p variable argument.
+     *
+     * Before you can call this method, you need to call the
+     * extract_local_dof_values() method at least once, passing the same
+     * @p global_vector_name string, and the same type for the variable @p dummy.
+     *
+     * If you have not previously called the extract_local_dof_values() method,
+     * this function will throw an exception.
+     *
+     * For this function to work properly, the underlying FEInterfaceValues
+     * object for which you called one of the reinit() functions, must have
+     * computed the information you are requesting. To do so, the
+     * update_3rd_derivatives flag must be an element of the list of UpdateFlags
+     * that you passed to the constructor of this object. See "The interplay of
+     * UpdateFlags, Mapping, and FiniteElement" in the documentation of the
+     * FEValues for more information.
+     */
+    template <typename Extractor, typename Number = double>
+    const std::vector<
+      typename FEInterfaceViews::View<dim, spacedim, Extractor>::
+        template solution_third_derivative_type<Number>> &
+    get_jumps_in_third_derivatives(const std::string &global_vector_name,
+                                   const Extractor &  variable,
+                                   const Number       dummy = Number(0));
+
+    /** @} */ // CurrentInterfaceJumpEvaluation
+
+    /**
+     * @name Evaluation of averages of finite element fields and their derivatives on the current interface
+     */
+    /** @{ */ // CurrentInterfaceAverageEvaluation
+
+    /**
+     * For the solution vector identified by @p global_vector_name, compute
+     * the averages of the values of the function at the quadrature points, and
+     * return a vector with the correct type deduced by the interface Extractor
+     * you passed as the
+     * @p variable argument.
+     *
+     * Before you can call this method, you need to call the
+     * extract_local_dof_values() method at least once, passing the same
+     * @p global_vector_name string, and the same type for the variable @p dummy.
+     *
+     * If you have not previously called the extract_local_dof_values() method,
+     * this function will throw an exception.
+     *
+     * For this function to work properly, the underlying FEInterfaceValues
+     * object for which you called one of the reinit() functions, must have
+     * computed the information you are requesting. To do so, the update_values
+     * flag must be an element of the list of UpdateFlags that you passed to the
+     * constructor of this object. See "The interplay of UpdateFlags, Mapping,
+     * and FiniteElement" in the documentation of the FEValues class for more
+     * information.
+     */
+    template <typename Extractor, typename Number = double>
+    const std::vector<
+      typename FEInterfaceViews::View<dim, spacedim, Extractor>::
+        template solution_value_type<Number>> &
+    get_averages_of_values(const std::string &global_vector_name,
+                           const Extractor &  variable,
+                           const Number       dummy = Number(0));
+
+    /**
+     * For the solution vector identified by @p global_vector_name, compute
+     * the averages of the gradients of the function at the quadrature points,
+     * and return a vector with the correct type deduced by the interface
+     * Extractor you passed as the
+     * @p variable argument.
+     *
+     * Before you can call this method, you need to call the
+     * extract_local_dof_values() method at least once, passing the same
+     * @p global_vector_name string, and the same type for the variable @p dummy.
+     *
+     * If you have not previously called the extract_local_dof_values() method,
+     * this function will throw an exception.
+     *
+     * For this function to work properly, the underlying FEInterfaceValues
+     * object for which you called one of the reinit() functions, must have
+     * computed the information you are requesting. To do so, the
+     * update_gradients flag must be an element of the list of UpdateFlags that
+     * you passed to the constructor of this object. See "The interplay of
+     * UpdateFlags, Mapping, and FiniteElement" in the documentation of the
+     * FEValues class for more information.
+     */
+    template <typename Extractor, typename Number = double>
+    const std::vector<
+      typename FEInterfaceViews::View<dim, spacedim, Extractor>::
+        template solution_gradient_type<Number>> &
+    get_averages_of_gradients(const std::string &global_vector_name,
+                              const Extractor &  variable,
+                              const Number       dummy = Number(0));
+
+    /**
+     * For the solution vector identified by @p global_vector_name, compute
+     * the averages of the Hessians of the function at the quadrature points,
+     * and return a vector with the correct type deduced by the interface
+     * Extractor you passed as the
+     * @p variable argument.
+     *
+     * Before you can call this method, you need to call the
+     * extract_local_dof_values() method at least once, passing the same
+     * @p global_vector_name string, and the same type for the variable @p dummy.
+     *
+     * If you have not previously called the extract_local_dof_values() method,
+     * this function will throw an exception.
+     *
+     * For this function to work properly, the underlying FEInterfaceValues
+     * object for which you called one of the reinit() functions, must have
+     * computed the information you are requesting. To do so, the
+     * update_hessians flag must be an element of the list of UpdateFlags that
+     * you passed to the constructor of this object. See "The interplay of
+     * UpdateFlags, Mapping, and FiniteElement" in the documentation of the
+     * FEValues class for more information.
+     */
+    template <typename Extractor, typename Number = double>
+    const std::vector<
+      typename FEInterfaceViews::View<dim, spacedim, Extractor>::
+        template solution_hessian_type<Number>> &
+    get_averages_of_hessians(const std::string &global_vector_name,
+                             const Extractor &  variable,
+                             const Number       dummy = Number(0));
+
+    /** @} */ // CurrentInterfaceAverageEvaluation
 
   private:
     /**
@@ -1016,8 +1246,7 @@ namespace MeshWorker
     const std::string &global_vector_name,
     Number             dummy) const
   {
-    const unsigned int n_dofs =
-      get_current_fe_values().get_fe().n_dofs_per_cell();
+    const unsigned int n_dofs = local_dof_indices.size();
 
     const std::string dofs_name =
       get_unique_dofs_name(global_vector_name, n_dofs, dummy);
@@ -1329,6 +1558,297 @@ namespace MeshWorker
       independent_local_dofs, ret);
     return ret;
   }
+
+
+
+  template <int dim, int spacedim>
+  template <typename Extractor, typename Number>
+  const std::vector<typename FEInterfaceViews::View<dim, spacedim, Extractor>::
+                      template solution_value_type<Number>> &
+  ScratchData<dim, spacedim>::get_jumps_in_values(
+    const std::string &global_vector_name,
+    const Extractor &  variable,
+    const Number       dummy)
+  {
+    const std::vector<Number> &independent_local_dofs =
+      get_local_dof_values(global_vector_name, dummy);
+
+    const FEInterfaceValues<dim, spacedim> &feiv =
+      get_current_interface_fe_values();
+
+    AssertDimension(independent_local_dofs.size(),
+                    feiv.n_current_interface_dofs());
+
+    const unsigned int n_q_points = feiv.n_quadrature_points;
+
+    const std::string name = get_unique_name(
+      global_vector_name, variable, "_jump_values_q", n_q_points, dummy);
+
+    // Now build the return type
+    using RetType =
+      std::vector<typename FEValuesViews::View<dim, spacedim, Extractor>::
+                    template solution_value_type<Number>>;
+
+    RetType &ret =
+      internal_data_storage.template get_or_add_object_with_name<RetType>(
+        name, n_q_points);
+
+    AssertDimension(ret.size(), n_q_points);
+
+    feiv[variable].get_jump_in_function_values_from_local_dof_values(
+      independent_local_dofs, ret);
+    return ret;
+  }
+
+
+
+  template <int dim, int spacedim>
+  template <typename Extractor, typename Number>
+  const std::vector<typename FEInterfaceViews::View<dim, spacedim, Extractor>::
+                      template solution_gradient_type<Number>> &
+  ScratchData<dim, spacedim>::get_jumps_in_gradients(
+    const std::string &global_vector_name,
+    const Extractor &  variable,
+    const Number       dummy)
+  {
+    const std::vector<Number> &independent_local_dofs =
+      get_local_dof_values(global_vector_name, dummy);
+
+    const FEInterfaceValues<dim, spacedim> &feiv =
+      get_current_interface_fe_values();
+
+    AssertDimension(independent_local_dofs.size(),
+                    feiv.n_current_interface_dofs());
+
+    const unsigned int n_q_points = feiv.n_quadrature_points;
+
+    const std::string name = get_unique_name(
+      global_vector_name, variable, "_jump_gradients_q", n_q_points, dummy);
+
+    // Now build the return type
+    using RetType =
+      std::vector<typename FEValuesViews::View<dim, spacedim, Extractor>::
+                    template solution_gradient_type<Number>>;
+
+    RetType &ret =
+      internal_data_storage.template get_or_add_object_with_name<RetType>(
+        name, n_q_points);
+
+    AssertDimension(ret.size(), n_q_points);
+
+    feiv[variable].get_jump_in_function_gradients_from_local_dof_values(
+      independent_local_dofs, ret);
+    return ret;
+  }
+
+
+
+  template <int dim, int spacedim>
+  template <typename Extractor, typename Number>
+  const std::vector<typename FEInterfaceViews::View<dim, spacedim, Extractor>::
+                      template solution_hessian_type<Number>> &
+  ScratchData<dim, spacedim>::get_jumps_in_hessians(
+    const std::string &global_vector_name,
+    const Extractor &  variable,
+    const Number       dummy)
+  {
+    const std::vector<Number> &independent_local_dofs =
+      get_local_dof_values(global_vector_name, dummy);
+
+    const FEInterfaceValues<dim, spacedim> &feiv =
+      get_current_interface_fe_values();
+
+    AssertDimension(independent_local_dofs.size(),
+                    feiv.n_current_interface_dofs());
+
+    const unsigned int n_q_points = feiv.n_quadrature_points;
+
+    const std::string name = get_unique_name(
+      global_vector_name, variable, "_jump_hessians_q", n_q_points, dummy);
+
+    // Now build the return type
+    using RetType =
+      std::vector<typename FEValuesViews::View<dim, spacedim, Extractor>::
+                    template solution_hessian_type<Number>>;
+
+    RetType &ret =
+      internal_data_storage.template get_or_add_object_with_name<RetType>(
+        name, n_q_points);
+
+    AssertDimension(ret.size(), n_q_points);
+
+    feiv[variable].get_jump_in_function_hessians_from_local_dof_values(
+      independent_local_dofs, ret);
+    return ret;
+  }
+
+
+
+  template <int dim, int spacedim>
+  template <typename Extractor, typename Number>
+  const std::vector<typename FEInterfaceViews::View<dim, spacedim, Extractor>::
+                      template solution_third_derivative_type<Number>> &
+  ScratchData<dim, spacedim>::get_jumps_in_third_derivatives(
+    const std::string &global_vector_name,
+    const Extractor &  variable,
+    const Number       dummy)
+  {
+    const std::vector<Number> &independent_local_dofs =
+      get_local_dof_values(global_vector_name, dummy);
+
+    const FEInterfaceValues<dim, spacedim> &feiv =
+      get_current_interface_fe_values();
+
+    AssertDimension(independent_local_dofs.size(),
+                    feiv.n_current_interface_dofs());
+
+    const unsigned int n_q_points = feiv.n_quadrature_points;
+
+    const std::string name = get_unique_name(global_vector_name,
+                                             variable,
+                                             "_jump_third_derivatives_q",
+                                             n_q_points,
+                                             dummy);
+
+    // Now build the return type
+    using RetType =
+      std::vector<typename FEValuesViews::View<dim, spacedim, Extractor>::
+                    template solution_third_derivative_type<Number>>;
+
+    RetType &ret =
+      internal_data_storage.template get_or_add_object_with_name<RetType>(
+        name, n_q_points);
+
+    AssertDimension(ret.size(), n_q_points);
+
+    feiv[variable].get_jump_in_function_third_derivatives_from_local_dof_values(
+      independent_local_dofs, ret);
+    return ret;
+  }
+
+
+
+  template <int dim, int spacedim>
+  template <typename Extractor, typename Number>
+  const std::vector<typename FEInterfaceViews::View<dim, spacedim, Extractor>::
+                      template solution_value_type<Number>> &
+  ScratchData<dim, spacedim>::get_averages_of_values(
+    const std::string &global_vector_name,
+    const Extractor &  variable,
+    const Number       dummy)
+  {
+    const std::vector<Number> &independent_local_dofs =
+      get_local_dof_values(global_vector_name, dummy);
+
+    const FEInterfaceValues<dim, spacedim> &feiv =
+      get_current_interface_fe_values();
+
+    AssertDimension(independent_local_dofs.size(),
+                    feiv.n_current_interface_dofs());
+
+    const unsigned int n_q_points = feiv.n_quadrature_points;
+
+    const std::string name = get_unique_name(
+      global_vector_name, variable, "_average_values_q", n_q_points, dummy);
+
+    // Now build the return type
+    using RetType =
+      std::vector<typename FEValuesViews::View<dim, spacedim, Extractor>::
+                    template solution_value_type<Number>>;
+
+    RetType &ret =
+      internal_data_storage.template get_or_add_object_with_name<RetType>(
+        name, n_q_points);
+
+    AssertDimension(ret.size(), n_q_points);
+
+    feiv[variable].get_average_of_function_values_from_local_dof_values(
+      independent_local_dofs, ret);
+    return ret;
+  }
+
+
+
+  template <int dim, int spacedim>
+  template <typename Extractor, typename Number>
+  const std::vector<typename FEInterfaceViews::View<dim, spacedim, Extractor>::
+                      template solution_gradient_type<Number>> &
+  ScratchData<dim, spacedim>::get_averages_of_gradients(
+    const std::string &global_vector_name,
+    const Extractor &  variable,
+    const Number       dummy)
+  {
+    const std::vector<Number> &independent_local_dofs =
+      get_local_dof_values(global_vector_name, dummy);
+
+    const FEInterfaceValues<dim, spacedim> &feiv =
+      get_current_interface_fe_values();
+
+    AssertDimension(independent_local_dofs.size(),
+                    feiv.n_current_interface_dofs());
+
+    const unsigned int n_q_points = feiv.n_quadrature_points;
+
+    const std::string name = get_unique_name(
+      global_vector_name, variable, "_average_gradients_q", n_q_points, dummy);
+
+    // Now build the return type
+    using RetType =
+      std::vector<typename FEValuesViews::View<dim, spacedim, Extractor>::
+                    template solution_gradient_type<Number>>;
+
+    RetType &ret =
+      internal_data_storage.template get_or_add_object_with_name<RetType>(
+        name, n_q_points);
+
+    AssertDimension(ret.size(), n_q_points);
+
+    feiv[variable].get_average_of_function_gradients_from_local_dof_values(
+      independent_local_dofs, ret);
+    return ret;
+  }
+
+
+
+  template <int dim, int spacedim>
+  template <typename Extractor, typename Number>
+  const std::vector<typename FEInterfaceViews::View<dim, spacedim, Extractor>::
+                      template solution_hessian_type<Number>> &
+  ScratchData<dim, spacedim>::get_averages_of_hessians(
+    const std::string &global_vector_name,
+    const Extractor &  variable,
+    const Number       dummy)
+  {
+    const std::vector<Number> &independent_local_dofs =
+      get_local_dof_values(global_vector_name, dummy);
+
+    const FEInterfaceValues<dim, spacedim> &feiv =
+      get_current_interface_fe_values();
+
+    AssertDimension(independent_local_dofs.size(),
+                    feiv.n_current_interface_dofs());
+
+    const unsigned int n_q_points = feiv.n_quadrature_points;
+
+    const std::string name = get_unique_name(
+      global_vector_name, variable, "_average_hessians_q", n_q_points, dummy);
+
+    // Now build the return type
+    using RetType =
+      std::vector<typename FEValuesViews::View<dim, spacedim, Extractor>::
+                    template solution_hessian_type<Number>>;
+
+    RetType &ret =
+      internal_data_storage.template get_or_add_object_with_name<RetType>(
+        name, n_q_points);
+
+    AssertDimension(ret.size(), n_q_points);
+
+    feiv[variable].get_average_of_function_hessians_from_local_dof_values(
+      independent_local_dofs, ret);
+    return ret;
+  }
+
 
 #endif
 
