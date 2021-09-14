@@ -2388,6 +2388,23 @@ namespace TrilinosWrappers
 
       private:
         /**
+         * A generic constructor.
+         *
+         * This constructor allows the payload to be configured from any
+         * objects that can be cast to an Epetra operation. The
+         * @p supports_inverse_operations flag indicates that the
+         * @p op can be used to compute inverse operations; preconditioners
+         * have such a facility.
+         */
+        template <typename EpetraOpType>
+        TrilinosPayload(EpetraOpType &  op,
+                        const bool      supports_inverse_operations,
+                        const bool      use_transpose,
+                        const MPI_Comm &mpi_communicator,
+                        const IndexSet &locally_owned_domain_indices,
+                        const IndexSet &locally_owned_range_indices);
+
+        /**
          * A flag recording whether the operator is to perform standard
          * matrix-vector multiplication, or the transpose operation.
          */
@@ -3078,6 +3095,104 @@ namespace TrilinosWrappers
   {
     namespace LinearOperatorImplementation
     {
+      template <typename EpetraOpType>
+      TrilinosPayload::TrilinosPayload(
+        EpetraOpType &  op,
+        const bool      supports_inverse_operations,
+        const bool      use_transpose,
+        const MPI_Comm &mpi_communicator,
+        const IndexSet &locally_owned_domain_indices,
+        const IndexSet &locally_owned_range_indices)
+        : use_transpose(use_transpose)
+        , communicator(mpi_communicator)
+        , domain_map(
+            locally_owned_domain_indices.make_trilinos_map(communicator.Comm()))
+        , range_map(
+            locally_owned_range_indices.make_trilinos_map(communicator.Comm()))
+      {
+        vmult = [&op](Range &tril_dst, const Domain &tril_src) {
+          // Duplicated from TrilinosWrappers::PreconditionBase::vmult
+          // as well as from TrilinosWrappers::SparseMatrix::Tvmult
+          Assert(&tril_src != &tril_dst,
+                 TrilinosWrappers::SparseMatrix::ExcSourceEqualsDestination());
+          internal::check_vector_map_equality(op,
+                                              tril_src,
+                                              tril_dst,
+                                              op.UseTranspose());
+
+          const int ierr = op.Apply(tril_src, tril_dst);
+          AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+        };
+
+        Tvmult = [&op](Domain &tril_dst, const Range &tril_src) {
+          // Duplicated from TrilinosWrappers::PreconditionBase::vmult
+          // as well as from TrilinosWrappers::SparseMatrix::Tvmult
+          Assert(&tril_src != &tril_dst,
+                 TrilinosWrappers::SparseMatrix::ExcSourceEqualsDestination());
+          internal::check_vector_map_equality(op,
+                                              tril_src,
+                                              tril_dst,
+                                              !op.UseTranspose());
+
+          op.SetUseTranspose(!op.UseTranspose());
+          const int ierr = op.Apply(tril_src, tril_dst);
+          AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+          op.SetUseTranspose(!op.UseTranspose());
+        };
+
+        if (supports_inverse_operations)
+          {
+            inv_vmult = [&op](Domain &tril_dst, const Range &tril_src) {
+              // Duplicated from TrilinosWrappers::PreconditionBase::vmult
+              // as well as from TrilinosWrappers::SparseMatrix::Tvmult
+              Assert(
+                &tril_src != &tril_dst,
+                TrilinosWrappers::SparseMatrix::ExcSourceEqualsDestination());
+              internal::check_vector_map_equality(op,
+                                                  tril_src,
+                                                  tril_dst,
+                                                  !op.UseTranspose());
+
+              const int ierr = op.ApplyInverse(tril_src, tril_dst);
+              AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+            };
+
+            inv_Tvmult = [&op](Range &tril_dst, const Domain &tril_src) {
+              // Duplicated from TrilinosWrappers::PreconditionBase::vmult
+              // as well as from TrilinosWrappers::SparseMatrix::Tvmult
+              Assert(
+                &tril_src != &tril_dst,
+                TrilinosWrappers::SparseMatrix::ExcSourceEqualsDestination());
+              internal::check_vector_map_equality(op,
+                                                  tril_src,
+                                                  tril_dst,
+                                                  op.UseTranspose());
+
+              op.SetUseTranspose(!op.UseTranspose());
+              const int ierr = op.ApplyInverse(tril_src, tril_dst);
+              AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+              op.SetUseTranspose(!op.UseTranspose());
+            };
+          }
+        else
+          {
+            inv_vmult = [](Domain &, const Range &) {
+              Assert(false,
+                     ExcMessage(
+                       "Uninitialized TrilinosPayload::inv_vmult called. "
+                       "The operator does not support inverse operations."));
+            };
+
+            inv_Tvmult = [](Range &, const Domain &) {
+              Assert(false,
+                     ExcMessage(
+                       "Uninitialized TrilinosPayload::inv_Tvmult called. "
+                       "The operator does not support inverse operations."));
+            };
+          }
+      }
+
+
       template <typename Solver, typename Preconditioner>
       typename std::enable_if<
         std::is_base_of<TrilinosWrappers::SolverBase, Solver>::value &&
