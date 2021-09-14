@@ -51,9 +51,9 @@ namespace NonMatching
        * vector are negative/positive, otherwise return
        * LocationToLevelSet::intersected.
        */
-      template <class VECTOR>
+      template <class VectorType>
       LocationToLevelSet
-      location_from_dof_signs(const VECTOR &local_levelset_values)
+      location_from_dof_signs(const VectorType &local_levelset_values)
       {
         const auto min_max_element =
           std::minmax_element(local_levelset_values.begin(),
@@ -73,7 +73,7 @@ namespace NonMatching
        * The concrete LevelSetDescription used when the level set function is
        * described as a (DoFHandler, Vector)-pair.
        */
-      template <int dim, class VECTOR>
+      template <int dim, class VectorType>
       class DiscreteLevelSetDescription : public LevelSetDescription<dim>
       {
       public:
@@ -81,7 +81,7 @@ namespace NonMatching
          * Constructor.
          */
         DiscreteLevelSetDescription(const DoFHandler<dim> &dof_handler,
-                                    const VECTOR &         level_set);
+                                    const VectorType &     level_set);
 
         /**
          * Return the FECollection of the DoFHandler passed to the constructor.
@@ -117,33 +117,33 @@ namespace NonMatching
          * Pointer to the vector containing the level set function's global dof
          * values.
          */
-        const SmartPointer<const VECTOR> level_set;
+        const SmartPointer<const VectorType> level_set;
       };
 
 
 
-      template <int dim, class VECTOR>
-      DiscreteLevelSetDescription<dim, VECTOR>::DiscreteLevelSetDescription(
+      template <int dim, class VectorType>
+      DiscreteLevelSetDescription<dim, VectorType>::DiscreteLevelSetDescription(
         const DoFHandler<dim> &dof_handler,
-        const VECTOR &         level_set)
+        const VectorType &     level_set)
         : dof_handler(&dof_handler)
         , level_set(&level_set)
       {}
 
 
 
-      template <int dim, class VECTOR>
+      template <int dim, class VectorType>
       const hp::FECollection<dim> &
-      DiscreteLevelSetDescription<dim, VECTOR>::get_fe_collection() const
+      DiscreteLevelSetDescription<dim, VectorType>::get_fe_collection() const
       {
         return dof_handler->get_fe_collection();
       }
 
 
 
-      template <int dim, class VECTOR>
+      template <int dim, class VectorType>
       void
-      DiscreteLevelSetDescription<dim, VECTOR>::get_local_level_set_values(
+      DiscreteLevelSetDescription<dim, VectorType>::get_local_level_set_values(
         const typename Triangulation<dim>::active_cell_iterator &cell,
         const unsigned int                                       face_index,
         Vector<double> &local_levelset_values)
@@ -163,15 +163,15 @@ namespace NonMatching
 
         for (unsigned int i = 0; i < dof_indices.size(); i++)
           local_levelset_values[i] =
-            dealii::internal::ElementAccess<VECTOR>::get(*level_set,
-                                                         dof_indices[i]);
+            dealii::internal::ElementAccess<VectorType>::get(*level_set,
+                                                             dof_indices[i]);
       }
 
 
 
-      template <int dim, class VECTOR>
+      template <int dim, class VectorType>
       unsigned int
-      DiscreteLevelSetDescription<dim, VECTOR>::active_fe_index(
+      DiscreteLevelSetDescription<dim, VectorType>::active_fe_index(
         const typename Triangulation<dim>::active_cell_iterator &cell) const
       {
         typename DoFHandler<dim>::active_cell_iterator cell_with_dofs(
@@ -301,13 +301,13 @@ namespace NonMatching
 
 
   template <int dim>
-  template <class VECTOR>
+  template <class VectorType>
   MeshClassifier<dim>::MeshClassifier(const DoFHandler<dim> &dof_handler,
-                                      const VECTOR &         level_set)
+                                      const VectorType &     level_set)
     : triangulation(&dof_handler.get_triangulation())
     , level_set_description(
         std::make_unique<internal::MeshClassifierImplementation::
-                           DiscreteLevelSetDescription<dim, VECTOR>>(
+                           DiscreteLevelSetDescription<dim, VectorType>>(
           dof_handler,
           level_set))
   {
