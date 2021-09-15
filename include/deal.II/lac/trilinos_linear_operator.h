@@ -113,6 +113,42 @@ namespace TrilinosWrappers
   }
 
 
+  /**
+   * @relatesalso LinearOperator
+   *
+   * A function that encapsulates generic @p matrix objects, based on an
+   * @p operator_exemplar, that act on a compatible Vector type into a
+   * LinearOperator.
+   *
+   * This function is the equivalent of the dealii::linear_operator, but
+   * ensures full compatibility with Trilinos operations by preselecting the
+   * appropriate template parameters.
+   *
+   *
+   * @ingroup TrilinosWrappers
+   */
+  template <typename Range, typename Domain, typename Matrix>
+  inline LinearOperator<
+    Range,
+    Domain,
+    TrilinosWrappers::internal::LinearOperatorImplementation::TrilinosPayload>
+  linear_operator(
+    const LinearOperator<
+      Range,
+      Domain,
+      TrilinosWrappers::internal::LinearOperatorImplementation::TrilinosPayload>
+      &           operator_exemplar,
+    const Matrix &matrix)
+  {
+    using Payload =
+      TrilinosWrappers::internal::LinearOperatorImplementation::TrilinosPayload;
+    using OperatorExemplar = LinearOperator<Range, Domain, Payload>;
+    return dealii::
+      linear_operator<Range, Domain, Payload, OperatorExemplar, Matrix>(
+        operator_exemplar, matrix);
+  }
+
+
   //@}
   /**
    * @name Creation of a BlockLinearOperator
