@@ -573,7 +573,7 @@ namespace MatrixTools
                     for (unsigned int k = 0; k < n_local_dofs; ++k)
                       if (local_matrix(k, k) != number{})
                         {
-                          average_diagonal += std::fabs(local_matrix(k, k));
+                          average_diagonal += std::abs(local_matrix(k, k));
                           ++nonzero_diagonals;
                         }
                     if (nonzero_diagonals != 0)
@@ -591,7 +591,7 @@ namespace MatrixTools
                 local_matrix(i, i) = average_diagonal;
               }
             else
-              local_matrix(i, i) = std::fabs(local_matrix(i, i));
+              local_matrix(i, i) = std::abs(local_matrix(i, i));
 
             // and replace rhs entry by correct
             // value
