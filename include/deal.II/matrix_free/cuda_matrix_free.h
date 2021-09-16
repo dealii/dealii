@@ -38,10 +38,18 @@
 #  include <deal.II/lac/cuda_vector.h>
 #  include <deal.II/lac/la_parallel_vector.h>
 
-#  include <deal.II/matrix_free/hanging_nodes_internal.h>
 
 
 DEAL_II_NAMESPACE_OPEN
+
+// Forward declaration
+namespace internal
+{
+  namespace MatrixFreeFunctions
+  {
+    enum class ConstraintKinds : std::uint16_t;
+  }
+} // namespace internal
 
 namespace CUDAWrappers
 {
