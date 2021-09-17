@@ -23,6 +23,7 @@
 
 #ifdef DEAL_II_COMPILER_CUDA_AWARE
 
+#  include <deal.II/base/cuda.h>
 #  include <deal.II/base/cuda_size.h>
 #  include <deal.II/base/graph_coloring.h>
 
@@ -31,6 +32,7 @@
 #  include <deal.II/fe/fe_dgq.h>
 #  include <deal.II/fe/fe_values.h>
 
+#  include <deal.II/matrix_free/cuda_hanging_nodes_internal.h>
 #  include <deal.II/matrix_free/shape_info.h>
 
 #  include <cuda_runtime_api.h>
