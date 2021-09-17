@@ -155,6 +155,73 @@ template <int dim, typename VectorType>
 class MGTwoLevelTransfer
 {
 public:
+  using Number = typename VectorType::value_type;
+
+  /**
+   * Set up global coarsening between the given DoFHandler objects (
+   * @p dof_handler_fine and @p dof_handler_coarse). The transfer
+   * can be only performed on active levels.
+   */
+  void
+  reinit_geometric_transfer(
+    const DoFHandler<dim> &          dof_handler_fine,
+    const DoFHandler<dim> &          dof_handler_coarse,
+    const AffineConstraints<Number> &constraint_fine,
+    const AffineConstraints<Number> &constraint_coarse,
+    const unsigned int mg_level_fine   = numbers::invalid_unsigned_int,
+    const unsigned int mg_level_coarse = numbers::invalid_unsigned_int);
+
+  /**
+   * Set up polynomial coarsening between the given DoFHandler objects (
+   * @p dof_handler_fine and @p dof_handler_coarse). Polynomial transfers
+   * can be only performed on active levels (`numbers::invalid_unsigned_int`)
+   * or on coarse-grid levels, i.e., levels without hanging nodes.
+   *
+   * @note The function polynomial_transfer_supported() can be used to
+   *   check if the given polynomial coarsening strategy is supported.
+   */
+  void
+  reinit_polynomial_transfer(
+    const DoFHandler<dim> &          dof_handler_fine,
+    const DoFHandler<dim> &          dof_handler_coarse,
+    const AffineConstraints<Number> &constraint_fine,
+    const AffineConstraints<Number> &constraint_coarse,
+    const unsigned int mg_level_fine   = numbers::invalid_unsigned_int,
+    const unsigned int mg_level_coarse = numbers::invalid_unsigned_int);
+
+  /**
+   * Set up transfer operator between the given DoFHandler objects (
+   * @p dof_handler_fine and @p dof_handler_coarse). Depending on the
+   * underlying Triangulation objects polynomial or geometrical global
+   * coarsening is performed.
+   *
+   * @note While geometric transfer can be only performed on active levels
+   *   (`numbers::invalid_unsigned_int`), polynomial transfers can also be
+   *   performed on coarse-grid levels, i.e., levels without hanging nodes.
+   *
+   * @note The function polynomial_transfer_supported() can be used to
+   *   check if the given polynomial coarsening strategy is supported.
+   */
+  void
+  reinit(const DoFHandler<dim> &          dof_handler_fine,
+         const DoFHandler<dim> &          dof_handler_coarse,
+         const AffineConstraints<Number> &constraint_fine,
+         const AffineConstraints<Number> &constraint_coarse,
+         const unsigned int mg_level_fine   = numbers::invalid_unsigned_int,
+         const unsigned int mg_level_coarse = numbers::invalid_unsigned_int);
+
+  /**
+   * Check if a fast templated version of the polynomial transfer between
+   * @p fe_degree_fine and @p fe_degree_coarse is available.
+   *
+   * @note Currently, the polynomial coarsening strategies: 1) go-to-one,
+   *   2) bisect, and 3) decrease-by-one are precompiled with templates for
+   *   degrees up to 9.
+   */
+  static bool
+  fast_polynomial_transfer_supported(const unsigned int fe_degree_fine,
+                                     const unsigned int fe_degree_coarse);
+
   /**
    * Perform prolongation.
    */
@@ -181,6 +248,12 @@ public:
    */
   std::size_t
   memory_consumption() const;
+
+private:
+  MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>> transfer;
+
+  LinearAlgebra::distributed::Vector<Number> tmp_vector_fine;
+  LinearAlgebra::distributed::Vector<Number> tmp_vector_coarse;
 };
 
 
@@ -704,6 +777,142 @@ MGTransferGlobalCoarsening<dim, VectorType>::memory_consumption() const
 
   return size;
 }
+
+
+
+template <int dim, typename VectorType>
+void
+MGTwoLevelTransfer<dim, VectorType>::prolongate_and_add(
+  VectorType &      dst,
+  const VectorType &src) const
+{
+  tmp_vector_coarse = src; // TODO
+
+  transfer.prolongate_and_add(dst, src);
+
+  dst = tmp_vector_fine; // TODO
+}
+
+
+
+template <int dim, typename VectorType>
+void
+MGTwoLevelTransfer<dim, VectorType>::restrict_and_add(
+  VectorType &      dst,
+  const VectorType &src) const
+{
+  tmp_vector_fine = src; // TODO
+
+  transfer.restrict_and_add(dst, src);
+
+  dst = tmp_vector_coarse; // TODO
+}
+
+
+
+template <int dim, typename VectorType>
+void
+MGTwoLevelTransfer<dim, VectorType>::interpolate(VectorType &      dst,
+                                                 const VectorType &src) const
+{
+  tmp_vector_fine = src; // TODO
+
+  transfer.interpolate(dst, src);
+
+  dst = tmp_vector_coarse; // TODO
+}
+
+
+
+template <int dim, typename VectorType>
+void
+MGTwoLevelTransfer<dim, VectorType>::reinit_geometric_transfer(
+  const DoFHandler<dim> &          dof_handler_fine,
+  const DoFHandler<dim> &          dof_handler_coarse,
+  const AffineConstraints<Number> &constraint_fine,
+  const AffineConstraints<Number> &constraint_coarse,
+  const unsigned int               mg_level_fine,
+  const unsigned int               mg_level_coarse)
+{
+  // TODO: initialize tmp_vector_fine and tmp_vector_coarse
+
+  transfer.reinit_geometric_transfer(dof_handler_fine,
+                                     dof_handler_coarse,
+                                     constraint_fine,
+                                     constraint_coarse,
+                                     mg_level_fine,
+                                     mg_level_coarse);
+}
+
+
+
+template <int dim, typename VectorType>
+void
+MGTwoLevelTransfer<dim, VectorType>::reinit_polynomial_transfer(
+  const DoFHandler<dim> &          dof_handler_fine,
+  const DoFHandler<dim> &          dof_handler_coarse,
+  const AffineConstraints<Number> &constraint_fine,
+  const AffineConstraints<Number> &constraint_coarse,
+  const unsigned int               mg_level_fine,
+  const unsigned int               mg_level_coarse)
+{
+  // TODO: initialize tmp_vector_fine and tmp_vector_coarse
+
+  transfer.reinit_polynomial_transfer(dof_handler_fine,
+                                      dof_handler_coarse,
+                                      constraint_fine,
+                                      constraint_coarse,
+                                      mg_level_fine,
+                                      mg_level_coarse);
+}
+
+
+
+template <int dim, typename VectorType>
+void
+MGTwoLevelTransfer<dim, VectorType>::reinit(
+  const DoFHandler<dim> &          dof_handler_fine,
+  const DoFHandler<dim> &          dof_handler_coarse,
+  const AffineConstraints<Number> &constraint_fine,
+  const AffineConstraints<Number> &constraint_coarse,
+  const unsigned int               mg_level_fine,
+  const unsigned int               mg_level_coarse)
+{
+  transfer.reinit_polynomial_transfer(dof_handler_fine,
+                                      dof_handler_coarse,
+                                      constraint_fine,
+                                      constraint_coarse,
+                                      mg_level_fine,
+                                      mg_level_coarse);
+}
+
+
+
+template <int dim, typename VectorType>
+bool
+MGTwoLevelTransfer<dim, VectorType>::fast_polynomial_transfer_supported(
+  const unsigned int fe_degree_fine,
+  const unsigned int fe_degree_coarse)
+{
+  return MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
+    fast_polynomial_transfer_supported(fe_degree_fine, fe_degree_coarse);
+}
+
+
+
+template <int dim, typename VectorType>
+std::size_t
+MGTwoLevelTransfer<dim, VectorType>::memory_consumption() const
+{
+  std::size_t size = 0;
+
+  size += transfer.memory_consumption();
+  size += tmp_vector_fine.memory_consumption();
+  size += tmp_vector_coarse.memory_consumption();
+
+  return size;
+}
+
 
 #endif
 
