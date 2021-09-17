@@ -399,7 +399,7 @@ namespace Step82
 
     const auto dofs_per_cell = fe.dofs_per_cell;
 
-    for (const auto cell : dof_handler.active_cell_iterators())
+    for (const auto &cell : dof_handler.active_cell_iterators())
       {
         std::vector<types::global_dof_index> dofs(dofs_per_cell);
         cell->get_dof_indices(dofs);
