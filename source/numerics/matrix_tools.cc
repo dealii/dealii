@@ -485,7 +485,7 @@ namespace MatrixTools
 
                     // correct right hand side
                     right_hand_side.block(block_row)(row) -=
-                      p->value() / diagonal_entry * new_rhs;
+                      number(p->value()) / diagonal_entry * new_rhs;
 
                     // set matrix entry to zero
                     p->value() = 0.;
