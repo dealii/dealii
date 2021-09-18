@@ -82,6 +82,7 @@ namespace internal
         const dealii::Triangulation<dim> &triangulation,
         const unsigned int                mg_level,
         const bool                        hold_all_faces_to_owned_cells,
+        const bool                        build_inner_faces,
         std::vector<std::pair<unsigned int, unsigned int>> &cell_levels);
 
       /**
@@ -165,6 +166,7 @@ namespace internal
       const dealii::Triangulation<dim> &triangulation,
       const unsigned int                mg_level,
       const bool                        hold_all_faces_to_owned_cells,
+      const bool                        build_inner_faces,
       std::vector<std::pair<unsigned int, unsigned int>> &cell_levels)
     {
       use_active_cells = mg_level == numbers::invalid_unsigned_int;
@@ -583,6 +585,8 @@ namespace internal
               if (dcell->at_boundary(f) && !dcell->has_periodic_neighbor(f))
                 face_is_owned[dcell->face(f)->index()] =
                   FaceCategory::locally_active_at_boundary;
+              else if (!build_inner_faces)
+                continue;
 
               // treat boundaries of cells of different refinement level
               // inside the domain in case of multigrid separately
