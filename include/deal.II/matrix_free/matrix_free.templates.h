@@ -1029,6 +1029,7 @@ namespace internal
     const std::vector<unsigned int> &cell_vectorization_category,
     const bool                       cell_vectorization_categories_strict,
     const bool                       do_face_integrals,
+    const bool                       build_inner_faces,
     const bool                       overlap_communication_computation,
     MatrixFreeFunctions::TaskInfo &  task_info,
     std::vector<std::pair<unsigned int, unsigned int>> &cell_level_index,
@@ -1041,6 +1042,7 @@ namespace internal
       face_setup.initialize(dof_handler[0]->get_triangulation(),
                             mg_level,
                             hold_all_faces_to_owned_cells,
+                            build_inner_faces,
                             cell_level_index);
 
     const unsigned int n_dof_handlers = dof_handler.size();
@@ -1740,6 +1742,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
     additional_data.cell_vectorization_category,
     additional_data.cell_vectorization_categories_strict,
     do_face_integrals,
+    additional_data.mapping_update_flags_inner_faces != update_default,
     additional_data.overlap_communication_computation,
     task_info,
     cell_level_index,
