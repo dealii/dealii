@@ -377,10 +377,9 @@ public:
      * determinants (JxW), quadrature points, data for Hessians (derivative of
      * Jacobians), and normal vectors.
      *
-     * @note In order to be able to perform a `face_operation` or
-     * `boundary_operation` in the MatrixFree::loop()`, either this field or
-     * @p mapping_update_flags_inner_faces must be set to a value different
-     * from UpdateFlags::update_default.
+     * @note In order to be able to perform a `boundary_operation` in the
+     * MatrixFree::loop(), this field must be set to a value different from
+     * UpdateFlags::update_default.
      */
     UpdateFlags mapping_update_flags_boundary_faces;
 
@@ -398,9 +397,8 @@ public:
      * determinants (JxW), quadrature points, data for Hessians (derivative of
      * Jacobians), and normal vectors.
      *
-     * @note In order to be able to perform a `face_operation` or
-     * `boundary_operation` in the MatrixFree::loop()`, either this field or
-     * @p mapping_update_flags_boundary_faces must be set to a value different
+     * @note In order to be able to perform a `face_operation`
+     * in the MatrixFree::loop(), this field must be set to a value different
      * from UpdateFlags::update_default.
      */
     UpdateFlags mapping_update_flags_inner_faces;
@@ -1668,6 +1666,8 @@ public:
    * in general. The face range in @p loop runs from zero to
    * n_inner_face_batches() (exclusive), so this is the appropriate size if
    * you want to store arrays of data for all interior faces to be worked on.
+   * Note that it returns 0 unless mapping_update_flags_inner_faces is set
+   * to a value different from  UpdateFlags::update_default.
    */
   unsigned int
   n_inner_face_batches() const;
@@ -1679,6 +1679,8 @@ public:
    * n_inner_face_batches()+n_boundary_face_batches() (exclusive), so if you
    * need to store arrays that hold data for all boundary faces but not the
    * interior ones, this number gives the appropriate size.
+   * Note that it returns 0 unless mapping_update_flags_boundary_faces is set
+   * to a value different from UpdateFlags::update_default.
    */
   unsigned int
   n_boundary_face_batches() const;
