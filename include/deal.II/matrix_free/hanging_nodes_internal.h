@@ -374,6 +374,9 @@ namespace internal
                   {
                     const auto &neighbor = cell->neighbor(face);
 
+                    if (neighbor->is_artificial())
+                      continue;
+
                     // Neighbor is coarser than us, i.e., face is constrained
                     if (neighbor->level() < cell->level())
                       {
@@ -613,6 +616,10 @@ namespace internal
                           {
                             // If one of them is coarser than us
                             const auto neighbor_cell = edge_neighbor.first;
+
+                            if (neighbor_cell->is_artificial())
+                              continue;
+
                             if (neighbor_cell->level() < cell->level())
                               {
                                 const unsigned int local_line_neighbor =
