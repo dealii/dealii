@@ -256,6 +256,16 @@ protected:
     mutable std::vector<std::vector<DerivativeForm<1, dim, dim>>> shape_grads;
 
     /**
+     * Storage for shape function hessians on the reference element. We only
+     * pre-compute cell-based DoFs, as the edge- and face-based DoFs depend on
+     * the cell.
+     *
+     * Due to the cell-dependent DoFs, this variable is declared mutable.
+     */
+    mutable std::vector<std::vector<DerivativeForm<2, dim, dim>>>
+      shape_hessians;
+
+    /**
      * Storage for all possible edge parameterization between vertices. These
      * are required in the computation of edge- and face-based DoFs, which are
      * cell-dependent.
