@@ -184,7 +184,7 @@ Furthermore, since we integrate on $K_c$, we only need to evaluate the discrete 
 @f[
 {\rm compute\_discrete\_hessians[i][q]}, \qquad 0\leq {\rm i} < {\rm n\_dofs}, \,\, 0\leq {\rm q} < {\rm n\_q\_points},
 @f]
-where <code>n_dofs = fe_values.dofs_per_cell</code> is the number of degrees of freedom per cell and <code>n_q_points = quad.size()</code> is the number of quadrature points on $K_c$. For any basis function $\varphi^n$ with support on a neighboring cell, the discrete Hessian $H_h(\varphi^n)$ evaluated on $K_c$ contains only the two lifting terms, but not the term involving $D^2)h\varphi^n$, since $\varphi^n|_{K}\equiv 0$. Moreover, only the lifting over the common face $e$ is nonzero on $K_c$, namely for all $x_q\in K_c$
+where <code>n_dofs = fe_values.dofs_per_cell</code> is the number of degrees of freedom per cell and <code>n_q_points = quad.size()</code> is the number of quadrature points on $K_c$. For any basis function $\varphi^n$ with support on a neighboring cell, the discrete Hessian $H_h(\varphi^n)$ evaluated on $K_c$ contains only the two lifting terms, but not the term involving $D^2_h\varphi^n$, since $\varphi^n|_{K}\equiv 0$. Moreover, only the lifting over the common face $e$ is nonzero on $K_c$, namely for all $x_q\in K_c$
 @f[
 H_h(\varphi^n)(x_q)=-r_e\left(\jump{\nabla_h\varphi^n}\right)(x_q)+b_e\left(\jump{\varphi^n}\right)(x_q).
 @f]
