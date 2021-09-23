@@ -113,8 +113,9 @@ namespace dealii
                          Number::size()> &  constraint_mask,
         Number *                            values)
       {
-        const auto &constraint_weights =
-          fe_eval.get_shape_info().data.front().subface_interpolation_matrix;
+        const auto &constraint_weights = fe_eval.get_shape_info()
+                                           .data.front()
+                                           .subface_interpolation_matrices[0];
 
         const unsigned int fe_degree =
           fe_degree_ != -1 ? fe_degree_ :
@@ -252,8 +253,9 @@ namespace dealii
                          Number::size()> &  constraint_mask,
         Number *                            values)
       {
-        const auto &constraint_weights =
-          fe_eval.get_shape_info().data.front().subface_interpolation_matrix;
+        const auto &constraint_weights = fe_eval.get_shape_info()
+                                           .data.front()
+                                           .subface_interpolation_matrices[0];
 
         const unsigned int fe_degree =
           fe_degree_ != -1 ? fe_degree_ :

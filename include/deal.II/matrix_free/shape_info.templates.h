@@ -627,18 +627,27 @@ namespace internal
 
       if (dim > 1 && dynamic_cast<const FE_Q<dim> *>(&fe))
         {
-          auto &subface_interpolation_matrix =
-            univariate_shape_data.subface_interpolation_matrix;
+          auto &subface_interpolation_matrix_0 =
+            univariate_shape_data.subface_interpolation_matrices[0];
+          auto &subface_interpolation_matrix_1 =
+            univariate_shape_data.subface_interpolation_matrices[1];
 
           const auto fe_1d = create_fe<1>(fe);
           const auto fe_2d = create_fe<2>(fe);
 
-          FullMatrix<double> interpolation_matrix(fe_2d->n_dofs_per_face(0),
-                                                  fe_2d->n_dofs_per_face(0));
+          FullMatrix<double> interpolation_matrix_0(fe_2d->n_dofs_per_face(0),
+                                                    fe_2d->n_dofs_per_face(0));
+          FullMatrix<double> interpolation_matrix_1(fe_2d->n_dofs_per_face(0),
+                                                    fe_2d->n_dofs_per_face(0));
 
           fe_2d->get_subface_interpolation_matrix(*fe_2d,
                                                   0,
-                                                  interpolation_matrix,
+                                                  interpolation_matrix_0,
+                                                  0);
+
+          fe_2d->get_subface_interpolation_matrix(*fe_2d,
+                                                  1,
+                                                  interpolation_matrix_1,
                                                   0);
 
           ElementType               element_type;
@@ -652,14 +661,21 @@ namespace internal
                                                 scalar_lexicographic,
                                                 lexicographic_numbering);
 
-          subface_interpolation_matrix.resize(fe_1d->n_dofs_per_cell() *
-                                              fe_1d->n_dofs_per_cell());
+          subface_interpolation_matrix_0.resize(fe_1d->n_dofs_per_cell() *
+                                                fe_1d->n_dofs_per_cell());
+          subface_interpolation_matrix_1.resize(fe_1d->n_dofs_per_cell() *
+                                                fe_1d->n_dofs_per_cell());
 
           for (unsigned int i = 0, c = 0; i < fe_1d->n_dofs_per_cell(); ++i)
             for (unsigned int j = 0; j < fe_1d->n_dofs_per_cell(); ++j, ++c)
-              subface_interpolation_matrix[c] =
-                interpolation_matrix(scalar_lexicographic[i],
-                                     scalar_lexicographic[j]);
+              {
+                subface_interpolation_matrix_0[c] =
+                  interpolation_matrix_0(scalar_lexicographic[i],
+                                         scalar_lexicographic[j]);
+                subface_interpolation_matrix_1[c] =
+                  interpolation_matrix_1(scalar_lexicographic[i],
+                                         scalar_lexicographic[j]);
+              }
         }
 
       // get gradient and Hessian transformation matrix for the polynomial

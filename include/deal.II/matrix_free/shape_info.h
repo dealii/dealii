@@ -262,10 +262,10 @@ namespace internal
       std::array<AlignedVector<Number>, 2> hessians_within_subface;
 
       /**
-       * A 1D subface interpolation matrix to the first quadrant. This data
-       * structure is only set up for FE_Q for dim > 1.
+       * A 1D subface interpolation matrices to the first and second quadrant.
+       * This data structure is only set up for FE_Q for dim > 1.
        */
-      AlignedVector<Number> subface_interpolation_matrix;
+      std::array<AlignedVector<Number>, 2> subface_interpolation_matrices;
 
       /**
        * We store a copy of the one-dimensional quadrature formula
