@@ -4941,29 +4941,6 @@ namespace internal
     template <int fe_degree, unsigned int side, bool transpose>
     static void
     interpolate_2D(const unsigned int given_degree,
-                   bool               is_subface_0,
-                   const unsigned int v,
-                   const Number *     weight,
-                   Number *           values)
-    {
-      if (is_subface_0)
-        interpolate_2D<fe_degree, side, transpose, true>(given_degree,
-                                                         v,
-                                                         weight,
-                                                         values);
-      else
-        interpolate_2D<fe_degree, side, transpose, false>(given_degree,
-                                                          v,
-                                                          weight,
-                                                          values);
-    }
-
-    template <int          fe_degree,
-              unsigned int side,
-              bool         transpose,
-              bool         is_subface_0>
-    static void
-    interpolate_2D(const unsigned int given_degree,
                    const unsigned int v,
                    const Number *     weight,
                    Number *           values)
@@ -4996,10 +4973,8 @@ namespace internal
           {
             typename Number::value_type sum = 0.0;
             for (unsigned int h = 0; h < points; ++h)
-              sum += weight[((transpose ? 1 : points) *
-                             (is_subface_0 ? k : (points - 1 - k))) +
-                            ((transpose ? points : 1) *
-                             (is_subface_0 ? h : (points - 1 - h)))][v] *
+              sum += weight[(transpose ? 1 : points) * k +
+                            (transpose ? points : 1) * h][v] *
                      temp[h];
             values[i * offset + stride + j][v] = sum;
           }
@@ -5007,29 +4982,8 @@ namespace internal
 
     template <int          fe_degree,
               unsigned int direction,
-              unsigned int side,
+              unsigned int d,
               bool         transpose>
-    static void
-    interpolate_3D_face(const unsigned int dof_offset,
-                        const unsigned int given_degree,
-                        bool               is_subface_0,
-                        const unsigned int v,
-                        const Number *     weight,
-                        Number *           values)
-    {
-      if (is_subface_0)
-        interpolate_3D_face<fe_degree, direction, side, transpose, true>(
-          dof_offset, given_degree, v, weight, values);
-      else
-        interpolate_3D_face<fe_degree, direction, side, transpose, false>(
-          dof_offset, given_degree, v, weight, values);
-    }
-
-    template <int          fe_degree,
-              unsigned int direction,
-              unsigned int side,
-              bool         transpose,
-              bool         is_subface_0>
     static void
     interpolate_3D_face(const unsigned int dof_offset,
                         const unsigned int given_degree,
@@ -5045,7 +4999,6 @@ namespace internal
       AssertIndexRange(points, 40);
 
       const unsigned int stride = Utilities::pow(points, direction);
-      const unsigned int d      = side / 2;
 
       // direction   side0   side1   side2
       // 0             -      p^2      p
@@ -5068,10 +5021,8 @@ namespace internal
             {
               typename Number::value_type sum = 0.0;
               for (unsigned int h = 0; h < points; ++h)
-                sum += weight[((transpose ? 1 : points) *
-                               (is_subface_0 ? k : (points - 1 - k))) +
-                              ((transpose ? points : 1) *
-                               (is_subface_0 ? h : (points - 1 - h)))][v] *
+                sum += weight[(transpose ? 1 : points) * k +
+                              (transpose ? points : 1) * h][v] *
                        temp[h];
               values[dof_offset + k * stride + stride2 * g][v] = sum;
             }
@@ -5079,26 +5030,6 @@ namespace internal
     }
 
     template <int fe_degree, unsigned int direction, bool transpose>
-    static void
-    interpolate_3D_edge(const unsigned int p,
-                        const unsigned int given_degree,
-                        bool               is_subface_0,
-                        const unsigned int v,
-                        const Number *     weight,
-                        Number *           values)
-    {
-      if (is_subface_0)
-        interpolate_3D_edge<fe_degree, direction, transpose, true>(
-          p, given_degree, v, weight, values);
-      else
-        interpolate_3D_edge<fe_degree, direction, transpose, false>(
-          p, given_degree, v, weight, values);
-    }
-
-    template <int          fe_degree,
-              unsigned int direction,
-              bool         transpose,
-              bool         is_subface_0>
     static void
     interpolate_3D_edge(const unsigned int p,
                         const unsigned int given_degree,
@@ -5124,10 +5055,8 @@ namespace internal
         {
           typename Number::value_type sum = 0.0;
           for (unsigned int h = 0; h < points; ++h)
-            sum += weight[((transpose ? 1 : points) *
-                           (is_subface_0 ? k : (points - 1 - k))) +
-                          ((transpose ? points : 1) *
-                           (is_subface_0 ? h : (points - 1 - h)))][v] *
+            sum += weight[(transpose ? 1 : points) * k +
+                          (transpose ? points : 1) * h][v] *
                    temp[h];
           values[p + k * stride][v] = sum;
         }
@@ -5144,13 +5073,12 @@ namespace internal
                                   Number::size()> &  constraint_mask,
                  Number *                            values)
     {
-      const Number *weights = fe_eval.get_shape_info()
-                                .data.front()
-                                .subface_interpolation_matrix.data();
-
       const unsigned int given_degree =
         fe_degree != -1 ? fe_degree :
                           fe_eval.get_shape_info().data.front().fe_degree;
+
+      const auto &interpolation_matrices =
+        fe_eval.get_shape_info().data.front().subface_interpolation_matrices;
 
       const auto is_set = [](const auto a, const auto b) -> bool {
         return (a & b) == b;
@@ -5178,20 +5106,22 @@ namespace internal
                       MatrixFreeFunctions::ConstraintKinds::unconstrained)
                     {
                       const bool is_subface_0 =
-                        (mask & MatrixFreeFunctions::ConstraintKinds::type_x) !=
+                        (mask & MatrixFreeFunctions::ConstraintKinds::type_x) ==
                         MatrixFreeFunctions::ConstraintKinds::unconstrained;
+
+                      const Number *weights =
+                        interpolation_matrices[is_subface_0].data();
+
                       if (is_set(mask,
                                  MatrixFreeFunctions::ConstraintKinds::type_y))
                         interpolate_2D<fe_degree, 2, transpose>(
                           given_degree,
-                          is_subface_0,
                           v,
                           weights,
                           values); // face 2
                       else
                         interpolate_2D<fe_degree, 3, transpose>(
                           given_degree,
-                          is_subface_0,
                           v,
                           weights,
                           values); // face 3
@@ -5202,20 +5132,22 @@ namespace internal
                       MatrixFreeFunctions::ConstraintKinds::unconstrained)
                     {
                       const bool is_subface_0 =
-                        (mask & MatrixFreeFunctions::ConstraintKinds::type_y) !=
+                        (mask & MatrixFreeFunctions::ConstraintKinds::type_y) ==
                         MatrixFreeFunctions::ConstraintKinds::unconstrained;
+
+                      const Number *weights =
+                        interpolation_matrices[is_subface_0].data();
+
                       if (is_set(mask,
                                  MatrixFreeFunctions::ConstraintKinds::type_x))
                         interpolate_2D<fe_degree, 0, transpose>(
                           given_degree,
-                          is_subface_0,
                           v,
                           weights,
                           values); // face 0
                       else
                         interpolate_2D<fe_degree, 1, transpose>(
                           given_degree,
-                          is_subface_0,
                           v,
                           weights,
                           values); // face 1
@@ -5336,39 +5268,38 @@ namespace internal
                   // direction 0:
                   {
                     const bool is_subface_0 =
-                      (mask & MatrixFreeFunctions::ConstraintKinds::type_x) !=
+                      (mask & MatrixFreeFunctions::ConstraintKinds::type_x) ==
                       MatrixFreeFunctions::ConstraintKinds::unconstrained;
+
+                    const Number *weights =
+                      interpolation_matrices[is_subface_0].data();
 
                     // ... faces
                     if (is_face_2)
-                      interpolate_3D_face<fe_degree, 0, 2, transpose>(
+                      interpolate_3D_face<fe_degree, 0, 1, transpose>(
                         p0,
                         given_degree,
-                        is_subface_0,
                         v,
                         weights,
                         values); // face 2
                     else if (is_face_3)
-                      interpolate_3D_face<fe_degree, 0, 3, transpose>(
+                      interpolate_3D_face<fe_degree, 0, 1, transpose>(
                         p2,
                         given_degree,
-                        is_subface_0,
                         v,
                         weights,
                         values); // face 3
                     if (is_face_4)
-                      interpolate_3D_face<fe_degree, 0, 4, transpose>(
+                      interpolate_3D_face<fe_degree, 0, 2, transpose>(
                         p0,
                         given_degree,
-                        is_subface_0,
                         v,
                         weights,
                         values); // face 4
                     else if (is_face_5)
-                      interpolate_3D_face<fe_degree, 0, 5, transpose>(
+                      interpolate_3D_face<fe_degree, 0, 2, transpose>(
                         p4,
                         given_degree,
-                        is_subface_0,
                         v,
                         weights,
                         values); // face 5
@@ -5378,7 +5309,6 @@ namespace internal
                       interpolate_3D_edge<fe_degree, 0, transpose>(
                         p0,
                         given_degree,
-                        is_subface_0,
                         v,
                         weights,
                         values); // edge 2
@@ -5386,7 +5316,6 @@ namespace internal
                       interpolate_3D_edge<fe_degree, 0, transpose>(
                         p2,
                         given_degree,
-                        is_subface_0,
                         v,
                         weights,
                         values); // edge 3
@@ -5394,7 +5323,6 @@ namespace internal
                       interpolate_3D_edge<fe_degree, 0, transpose>(
                         p4,
                         given_degree,
-                        is_subface_0,
                         v,
                         weights,
                         values); // edge 6
@@ -5402,7 +5330,6 @@ namespace internal
                       interpolate_3D_edge<fe_degree, 0, transpose>(
                         p6,
                         given_degree,
-                        is_subface_0,
                         v,
                         weights,
                         values); // edge 7
@@ -5411,39 +5338,38 @@ namespace internal
                   // direction 1:
                   {
                     const bool is_subface_0 =
-                      (mask & MatrixFreeFunctions::ConstraintKinds::type_y) !=
+                      (mask & MatrixFreeFunctions::ConstraintKinds::type_y) ==
                       MatrixFreeFunctions::ConstraintKinds::unconstrained;
+
+                    const Number *weights =
+                      interpolation_matrices[is_subface_0].data();
 
                     // ... faces
                     if (is_face_0)
                       interpolate_3D_face<fe_degree, 1, 0, transpose>(
                         p0,
                         given_degree,
-                        is_subface_0,
                         v,
                         weights,
                         values); // face 0
                     else if (is_face_1)
-                      interpolate_3D_face<fe_degree, 1, 1, transpose>(
+                      interpolate_3D_face<fe_degree, 1, 0, transpose>(
                         p1,
                         given_degree,
-                        is_subface_0,
                         v,
                         weights,
                         values); // face 1
                     if (is_face_4)
-                      interpolate_3D_face<fe_degree, 1, 4, transpose>(
+                      interpolate_3D_face<fe_degree, 1, 2, transpose>(
                         p0,
                         given_degree,
-                        is_subface_0,
                         v,
                         weights,
                         values); // face 4
                     else if (is_face_5)
-                      interpolate_3D_face<fe_degree, 1, 5, transpose>(
+                      interpolate_3D_face<fe_degree, 1, 2, transpose>(
                         p4,
                         given_degree,
-                        is_subface_0,
                         v,
                         weights,
                         values); // face 5
@@ -5453,7 +5379,6 @@ namespace internal
                       interpolate_3D_edge<fe_degree, 1, transpose>(
                         p0,
                         given_degree,
-                        is_subface_0,
                         v,
                         weights,
                         values); // edge 0
@@ -5461,7 +5386,6 @@ namespace internal
                       interpolate_3D_edge<fe_degree, 1, transpose>(
                         p1,
                         given_degree,
-                        is_subface_0,
                         v,
                         weights,
                         values); // edge 1
@@ -5469,7 +5393,6 @@ namespace internal
                       interpolate_3D_edge<fe_degree, 1, transpose>(
                         p4,
                         given_degree,
-                        is_subface_0,
                         v,
                         weights,
                         values); // edge 4
@@ -5477,7 +5400,6 @@ namespace internal
                       interpolate_3D_edge<fe_degree, 1, transpose>(
                         p5,
                         given_degree,
-                        is_subface_0,
                         v,
                         weights,
                         values); // edge 5
@@ -5486,39 +5408,38 @@ namespace internal
                   // direction 2:
                   {
                     const bool is_subface_0 =
-                      (mask & MatrixFreeFunctions::ConstraintKinds::type_z) !=
+                      (mask & MatrixFreeFunctions::ConstraintKinds::type_z) ==
                       MatrixFreeFunctions::ConstraintKinds::unconstrained;
+
+                    const Number *weights =
+                      interpolation_matrices[is_subface_0].data();
 
                     // ... faces
                     if (is_face_0)
                       interpolate_3D_face<fe_degree, 2, 0, transpose>(
                         p0,
                         given_degree,
-                        is_subface_0,
                         v,
                         weights,
                         values); // face 0
                     else if (is_face_1)
-                      interpolate_3D_face<fe_degree, 2, 1, transpose>(
+                      interpolate_3D_face<fe_degree, 2, 0, transpose>(
                         p1,
                         given_degree,
-                        is_subface_0,
                         v,
                         weights,
                         values); // face 1
                     if (is_face_2)
-                      interpolate_3D_face<fe_degree, 2, 2, transpose>(
+                      interpolate_3D_face<fe_degree, 2, 1, transpose>(
                         p0,
                         given_degree,
-                        is_subface_0,
                         v,
                         weights,
                         values); // face 2
                     else if (is_face_3)
-                      interpolate_3D_face<fe_degree, 2, 3, transpose>(
+                      interpolate_3D_face<fe_degree, 2, 1, transpose>(
                         p2,
                         given_degree,
-                        is_subface_0,
                         v,
                         weights,
                         values); // face 3
@@ -5528,7 +5449,6 @@ namespace internal
                       interpolate_3D_edge<fe_degree, 2, transpose>(
                         p0,
                         given_degree,
-                        is_subface_0,
                         v,
                         weights,
                         values); // edge 8
@@ -5536,7 +5456,6 @@ namespace internal
                       interpolate_3D_edge<fe_degree, 2, transpose>(
                         p1,
                         given_degree,
-                        is_subface_0,
                         v,
                         weights,
                         values); // edge 9
@@ -5544,7 +5463,6 @@ namespace internal
                       interpolate_3D_edge<fe_degree, 2, transpose>(
                         p2,
                         given_degree,
-                        is_subface_0,
                         v,
                         weights,
                         values); // edge 10
@@ -5552,7 +5470,6 @@ namespace internal
                       interpolate_3D_edge<fe_degree, 2, transpose>(
                         p3,
                         given_degree,
-                        is_subface_0,
                         v,
                         weights,
                         values); // edge 11

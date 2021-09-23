@@ -275,9 +275,9 @@ namespace CUDAWrappers
     {
       cudaError_t error_code = cudaMemcpyToSymbol(
         constraint_weights,
-        shape_info.data.front().subface_interpolation_matrix.data(),
+        shape_info.data.front().subface_interpolation_matrices[0].data(),
         sizeof(double) *
-          shape_info.data.front().subface_interpolation_matrix.size());
+          shape_info.data.front().subface_interpolation_matrices[0].size());
       AssertCuda(error_code);
 
       local_dof_indices.resize(data->dofs_per_cell);
