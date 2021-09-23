@@ -111,7 +111,6 @@ namespace Step82
 
     void compute_discrete_hessians(
       const typename DoFHandler<dim>::active_cell_iterator &cell,
-      const typename DoFHandler<dim>::active_cell_iterator &cell_lift,
       std::vector<std::vector<Tensor<2, dim>>> &            discrete_hessians,
       std::vector<std::vector<std::vector<Tensor<2, dim>>>>
         &discrete_hessians_neigh);
@@ -125,8 +124,7 @@ namespace Step82
     // $[\mathbb{V}_h]^{d\times d}$ used for the two lifting
     // operators. The other member variables below are as in most of the other
     // tutorial programs.
-    FESystem<dim>   fe_lift;
-    DoFHandler<dim> dof_handler_lift;
+    FESystem<dim> fe_lift;
 
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> matrix;
@@ -344,7 +342,6 @@ namespace Step82
     : fe(fe_degree)
     , dof_handler(triangulation)
     , fe_lift(FE_DGQ<dim>(fe_degree), dim * dim)
-    , dof_handler_lift(triangulation)
     , penalty_jump_grad(penalty_jump_grad)
     , penalty_jump_val(penalty_jump_val)
   {}
@@ -390,7 +387,6 @@ namespace Step82
   void BiLaplacianLDGLift<dim>::setup_system()
   {
     dof_handler.distribute_dofs(fe);
-    dof_handler_lift.distribute_dofs(fe_lift);
 
     std::cout << "Number of degrees of freedom: " << dof_handler.n_dofs()
               << std::endl;
@@ -522,14 +518,7 @@ namespace Step82
     Tensor<2, dim> H_i_neigh, H_j_neigh;
     Tensor<2, dim> H_i_neigh2, H_j_neigh2;
 
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
-                                                   endc = dof_handler.end();
-
-    typename DoFHandler<dim>::active_cell_iterator cell_lift =
-      dof_handler_lift.begin_active();
-
-    for (; cell != endc; ++cell, ++cell_lift)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       {
         fe_values.reinit(cell);
         cell->get_dof_indices(local_dof_indices);
@@ -539,7 +528,6 @@ namespace Step82
         // functions with support on the current cell or on one of its
         // neighbors.
         compute_discrete_hessians(cell,
-                                  cell_lift,
                                   discrete_hessians,
                                   discrete_hessians_neigh);
 
@@ -1156,11 +1144,13 @@ namespace Step82
   template <int dim>
   void BiLaplacianLDGLift<dim>::compute_discrete_hessians(
     const typename DoFHandler<dim>::active_cell_iterator &cell,
-    const typename DoFHandler<dim>::active_cell_iterator &cell_lift,
     std::vector<std::vector<Tensor<2, dim>>> &            discrete_hessians,
     std::vector<std::vector<std::vector<Tensor<2, dim>>>>
       &discrete_hessians_neigh)
   {
+    typename Triangulation<dim>::cell_iterator cell_lift(
+      &cell->get_triangulation(), cell->level(), cell->index());
+
     QGauss<dim>     quad(fe.degree + 1);
     QGauss<dim - 1> quad_face(fe.degree + 1);
 
