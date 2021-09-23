@@ -70,7 +70,8 @@ namespace Step82
   class BiLaplacianLDGLift
   {
   public:
-    BiLaplacianLDGLift(const unsigned int fe_degree,
+    BiLaplacianLDGLift(const unsigned int n_refinements,
+                       const unsigned int fe_degree,
                        const double       penalty_jump_grad,
                        const double       penalty_jump_val);
 
@@ -117,10 +118,12 @@ namespace Step82
 
     Triangulation<dim> triangulation;
 
+    const unsigned int n_refinements;
+
     FE_DGQ<dim>     fe;
     DoFHandler<dim> dof_handler;
 
-    // We also need variables that describe the finite element space
+    // We also need a variable that describes the finite element space
     // $[\mathbb{V}_h]^{d\times d}$ used for the two lifting
     // operators. The other member variables below are as in most of the other
     // tutorial programs.
@@ -336,10 +339,12 @@ namespace Step82
   // spaces, we associate the corresponding DoF handlers to the triangulation,
   // and we set the two penalty coefficients.
   template <int dim>
-  BiLaplacianLDGLift<dim>::BiLaplacianLDGLift(const unsigned int fe_degree,
+  BiLaplacianLDGLift<dim>::BiLaplacianLDGLift(const unsigned int n_refinements,
+                                              const unsigned int fe_degree,
                                               const double penalty_jump_grad,
                                               const double penalty_jump_val)
-    : fe(fe_degree)
+    : n_refinements(n_refinements)
+    , fe(fe_degree)
     , dof_handler(triangulation)
     , fe_lift(FE_DGQ<dim>(fe_degree), dim * dim)
     , penalty_jump_grad(penalty_jump_grad)
@@ -361,7 +366,7 @@ namespace Step82
 
     GridGenerator::hyper_cube(triangulation, 0.0, 1.0);
 
-    triangulation.refine_global(3);
+    triangulation.refine_global(n_refinements);
 
     std::cout << "Number of active cells: " << triangulation.n_active_cells()
               << std::endl;
@@ -514,10 +519,6 @@ namespace Step82
       discrete_hessians_neigh(GeometryInfo<dim>::faces_per_cell,
                               discrete_hessians);
 
-    Tensor<2, dim> H_i, H_j;
-    Tensor<2, dim> H_i_neigh, H_j_neigh;
-    Tensor<2, dim> H_i_neigh2, H_j_neigh2;
-
     for (const auto &cell : dof_handler.active_cell_iterators())
       {
         fe_values.reinit(cell);
@@ -541,8 +542,8 @@ namespace Step82
             for (unsigned int i = 0; i < n_dofs; ++i)
               for (unsigned int j = 0; j < n_dofs; ++j)
                 {
-                  H_i = discrete_hessians[i][q];
-                  H_j = discrete_hessians[j][q];
+                  const Tensor<2, dim> &H_i = discrete_hessians[i][q];
+                  const Tensor<2, dim> &H_j = discrete_hessians[j][q];
 
                   stiffness_matrix_cc(i, j) += scalar_product(H_j, H_i) * dx;
                 }
@@ -587,11 +588,11 @@ namespace Step82
                       {
                         for (unsigned int j = 0; j < n_dofs; ++j)
                           {
-                            H_i = discrete_hessians[i][q];
-                            H_j = discrete_hessians[j][q];
+                            const Tensor<2, dim> &H_i = discrete_hessians[i][q];
+                            const Tensor<2, dim> &H_j = discrete_hessians[j][q];
 
-                            H_i_neigh = discrete_hessians_neigh[face_no][i][q];
-                            H_j_neigh = discrete_hessians_neigh[face_no][j][q];
+                            const Tensor<2, dim> &H_i_neigh = discrete_hessians_neigh[face_no][i][q];
+                            const Tensor<2, dim> &H_j_neigh = discrete_hessians_neigh[face_no][j][q];
 
                             stiffness_matrix_cn(i, j) +=
                               scalar_product(H_j_neigh, H_i) * dx;
@@ -667,14 +668,14 @@ namespace Step82
                             for (unsigned int i = 0; i < n_dofs; ++i)
                               for (unsigned int j = 0; j < n_dofs; ++j)
                                 {
-                                  H_i_neigh =
+                                  const Tensor<2, dim> &H_i_neigh =
                                     discrete_hessians_neigh[face_no][i][q];
-                                  H_j_neigh =
+                                  const Tensor<2, dim> &H_j_neigh =
                                     discrete_hessians_neigh[face_no][j][q];
 
-                                  H_i_neigh2 =
+                                  const Tensor<2, dim> &H_i_neigh2 =
                                     discrete_hessians_neigh[face_no_2][i][q];
-                                  H_j_neigh2 =
+                                  const Tensor<2, dim> &H_j_neigh2 =
                                     discrete_hessians_neigh[face_no_2][j][q];
 
                                   stiffness_matrix_n1n2(i, j) +=
@@ -741,11 +742,10 @@ namespace Step82
                 const unsigned int face_no_neighbor =
                   cell->neighbor_of_neighbor(face_no);
 
-                if (neighbor_cell->id().operator<(cell->id()))
-                  { // we need to have a global way to compare the cells in
-                    // order to not calculate the same jump term twice
-                    continue; // skip this face (already considered)
-                  }
+                // In the next step, we need to have a global way to compare the
+                // cells in order to not calculate the same jump term twice:
+                if (neighbor_cell->id() < cell->id())
+                  continue; // skip this face (already considered)  
                 else
                   {
                     fe_face_neighbor.reinit(neighbor_cell, face_no_neighbor);
@@ -1195,7 +1195,7 @@ namespace Step82
       coeffs_re(n_dofs_lift), coeffs_be(n_dofs_lift), coeffs_tmp(n_dofs_lift);
 
     SolverControl solver_control(1000, 1e-12);
-    SolverCG<>    solver(solver_control);
+    SolverCG<Vector<double>> solver(solver_control);
 
     double factor_avg; // 0.5 for interior faces, 1.0 for boundary faces
 
@@ -1212,7 +1212,7 @@ namespace Step82
           discrete_hessians[i][q] = 0;
 
           for (unsigned int face_no = 0;
-               face_no < GeometryInfo<dim>::faces_per_cell;
+               face_no < discrete_hessians_neigh.size();
                ++face_no)
             {
               discrete_hessians_neigh[face_no][i][q] = 0;
@@ -1440,14 +1440,17 @@ namespace Step82
 
 // @sect3{The <code>main</code> function}
 
-// The is the <code>main</code> function. We define here the polynomial degree
-// for the two finite element spaces (for the solution and the two liftings) and
-// the two penalty coefficients. We can also change the dimension to run the
-// code in 3D.
+// This is the <code>main</code> function. We define here the number of mesh
+// refinements, the polynomial degree for the two finite element spaces
+// (for the solution and the two liftings) and the two penalty coefficients.
+// We can also change the dimension to run the code in 3D.
 int main()
 {
   try
     {
+      const unsigned int n_ref =
+        3; // number of mesh refinements
+            
       const unsigned int degree =
         2; // FE degree for u_h and the two lifting terms
 
@@ -1456,7 +1459,7 @@ int main()
       const double penalty_val =
         1.0; // penalty coefficient for the jump of the values
 
-      Step82::BiLaplacianLDGLift<2> problem(degree, penalty_grad, penalty_val);
+      Step82::BiLaplacianLDGLift<2> problem(n_ref, degree, penalty_grad, penalty_val);
 
       problem.run();
     }
