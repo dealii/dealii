@@ -452,6 +452,57 @@ MappingCartesian<dim, spacedim>::fill_fe_values(
 
 template <int dim, int spacedim>
 void
+MappingCartesian<dim, spacedim>::fill_mapping_data_for_generic_points(
+  const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+  const ArrayView<const Point<dim>> &                         unit_points,
+  const UpdateFlags                                           update_flags,
+  dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
+    &output_data) const
+{
+  if (update_flags == update_default)
+    return;
+
+  Assert(update_flags & update_inverse_jacobians ||
+           update_flags & update_jacobians ||
+           update_flags & update_quadrature_points,
+         ExcNotImplemented());
+
+  output_data.initialize(unit_points.size(), update_flags);
+  const unsigned int n_points = unit_points.size();
+
+  InternalData data;
+  data.update_each = update_flags;
+  data.quadrature_points =
+    std::vector<Point<dim>>(unit_points.begin(), unit_points.end());
+
+  update_cell_extents(cell, CellSimilarity::none, data);
+
+  maybe_update_cell_quadrature_points(cell,
+                                      data,
+                                      output_data.quadrature_points);
+
+  for (unsigned int i = 0; i < n_points; ++i)
+    {
+      if (update_flags & update_jacobians)
+        {
+          output_data.jacobians[i] = DerivativeForm<1, dim, spacedim>();
+          for (unsigned int j = 0; j < dim; ++j)
+            output_data.jacobians[i][j][j] = data.cell_extents[j];
+        }
+
+      if (update_flags & update_inverse_jacobians)
+        {
+          output_data.inverse_jacobians[i] = DerivativeForm<1, dim, spacedim>();
+          for (unsigned int j = 0; j < dim; ++j)
+            output_data.inverse_jacobians[i][j][j] = 1. / data.cell_extents[j];
+        }
+    }
+}
+
+
+
+template <int dim, int spacedim>
+void
 MappingCartesian<dim, spacedim>::fill_fe_face_values(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const unsigned int                                          face_no,

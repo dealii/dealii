@@ -26,6 +26,7 @@
 #include <deal.II/base/vectorization.h>
 
 #include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/mapping_cartesian.h>
 #include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/matrix_free/evaluation_flags.h>
@@ -578,10 +579,16 @@ private:
   SmartPointer<const Mapping<dim, spacedim>> mapping;
 
   /**
-   * Pointer to MappingQ class that enables the fast path of this
-   * class.
+   * Pointer to the function of the mapping that computes the necessary
+   * mapping quantities like quadrature points and Jacobians.
    */
-  const MappingQ<dim, spacedim> *mapping_q;
+  std::function<void(
+    const typename Triangulation<dim, spacedim>::cell_iterator & /*cell*/,
+    const ArrayView<const Point<dim>> & /*unit_points*/,
+    const UpdateFlags /*update_flags*/,
+    dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
+      & /*output_data*/)>
+    fill_mapping_data_for_generic_points;
 
   /**
    * Pointer to the FiniteElement object passed to the constructor.
@@ -691,13 +698,47 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::FEPointEvaluation(
   const UpdateFlags         update_flags,
   const unsigned int        first_selected_component)
   : mapping(&mapping)
-  , mapping_q(dynamic_cast<const MappingQ<dim, spacedim> *>(&mapping))
   , fe(&fe)
   , update_flags(update_flags)
   , update_flags_mapping(update_default)
 {
   AssertIndexRange(first_selected_component + n_components,
                    fe.n_components() + 1);
+
+  if (const MappingQ<dim, spacedim> *mapping_q =
+        dynamic_cast<const MappingQ<dim, spacedim> *>(&mapping))
+    {
+      fill_mapping_data_for_generic_points =
+        [mapping_q](
+          const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+          const ArrayView<const Point<dim>> &unit_points,
+          const UpdateFlags                  update_flags,
+          dealii::internal::FEValuesImplementation::MappingRelatedData<dim,
+                                                                       spacedim>
+            &output_data) -> void {
+        mapping_q->fill_mapping_data_for_generic_points(cell,
+                                                        unit_points,
+                                                        update_flags,
+                                                        output_data);
+      };
+    }
+  else if (const MappingCartesian<dim, spacedim> *mapping_cartesian =
+             dynamic_cast<const MappingCartesian<dim, spacedim> *>(&mapping))
+    {
+      fill_mapping_data_for_generic_points =
+        [mapping_cartesian](
+          const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+          const ArrayView<const Point<dim>> &unit_points,
+          const UpdateFlags                  update_flags,
+          dealii::internal::FEValuesImplementation::MappingRelatedData<dim,
+                                                                       spacedim>
+            &output_data) -> void {
+        mapping_cartesian->fill_mapping_data_for_generic_points(cell,
+                                                                unit_points,
+                                                                update_flags,
+                                                                output_data);
+      };
+    }
 
   bool         same_base_element   = true;
   unsigned int base_element_number = 0;
@@ -713,7 +754,7 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::FEPointEvaluation(
       }
     else
       component += fe.element_multiplicity(base_element_number);
-  if (mapping_q != nullptr &&
+  if (fill_mapping_data_for_generic_points &&
       internal::FEPointEvaluation::is_fast_path_supported(
         fe, base_element_number) &&
       same_base_element)
@@ -772,10 +813,10 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::reinit(
   std::copy(unit_points.begin(), unit_points.end(), this->unit_points.begin());
 
   if (!poly.empty())
-    mapping_q->fill_mapping_data_for_generic_points(cell,
-                                                    unit_points,
-                                                    update_flags_mapping,
-                                                    mapping_data);
+    fill_mapping_data_for_generic_points(cell,
+                                         unit_points,
+                                         update_flags_mapping,
+                                         mapping_data);
   else
     {
       fe_values = std::make_shared<FEValues<dim, spacedim>>(
