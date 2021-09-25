@@ -306,7 +306,7 @@ specified boundaries.
 
 <img src="https://www.dealii.org/images/steps/developer/step-49.gmsh_picture_2Dmesh_ids.png" alt="">
 
-Finally, we can choose  <code>Mesh -> Save</code> to save the <code>.msh</code> file, which 
+Finally, we can choose  <code>Mesh -> Save</code> to save the <code>.msh</code> file, which
 deal.II's GridIn class can read. You can also generate the <code>.msh</code> from the
 <code>.geo</code> file by running the command
 

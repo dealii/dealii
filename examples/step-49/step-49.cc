@@ -110,14 +110,14 @@ void print_mesh_info(const Triangulation<dim> &triangulation,
 // GMSH_LIBRARY
 // @endcode
 //
-// when building deal.II, then <code>DEAL_II_GMSH_WITH_API</code> gets defined and
-// and we can use <code>GridIn::read_msh()</code>.  More details on the function
-// can be found in its deal.II documentation.
+// when building deal.II, then <code>DEAL_II_GMSH_WITH_API</code> gets defined
+// and and we can use <code>GridIn::read_msh()</code>.  More details on the
+// function can be found in its deal.II documentation.
 //
 // We will be utilizing the SphericalManifold class for the holes. We need to
 // assign manifold IDs for this purpose. As physical IDs from Gmsh are assigned
-// to boundary IDs in deal.II, we will assign manifold IDs based on the boundary IDs loaded
-// from the file.
+// to boundary IDs in deal.II, we will assign manifold IDs based on the boundary
+// IDs loaded from the file.
 void grid_1()
 {
   const Point<2> Top_right_hole_origin(0.42, 2.0);
@@ -139,8 +139,10 @@ void grid_1()
   // hole. We assign both of these boundary IDs 2 because together they make a
   // circle to match the manifold we assign it later.
   triangulation.set_all_manifold_ids_on_boundary(1, 1); // top right hole
-  triangulation.set_all_manifold_ids_on_boundary(2, 2); // top of bottom left hole
-  triangulation.set_all_manifold_ids_on_boundary(3, 2); // bottom of bottom left hole
+  triangulation.set_all_manifold_ids_on_boundary(2,
+                                                 2); // top of bottom left hole
+  triangulation.set_all_manifold_ids_on_boundary(
+    3, 2); // bottom of bottom left hole
 
   triangulation.set_manifold(1, Top_right_manifold);
   triangulation.set_manifold(2, Bottom_left_manifold);
