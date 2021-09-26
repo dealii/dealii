@@ -166,7 +166,7 @@ Point(104) = {-2.8, -1.54, 0, 1.0}; // left point
 @endcode
 
 Then we use the <code>Circle arc</code> entity, which is found in the same category as
-<code>Point<\code> and <code>Lines</code>.  The file reads "Circle"
+<code>Point</code> and <code>Lines</code>.  The file reads "Circle"
 but the difference to note is that this function uses three points to
 make an arc of a circle, namely the starting point, center, and ending point.
 Splitting the circle into four arcs like this allows for more freedom when declaring the
