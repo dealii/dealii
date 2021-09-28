@@ -23,46 +23,13 @@
 #include <deal.II/matrix_free/evaluation_kernels.h>
 #include <deal.II/matrix_free/evaluation_selector.h>
 #include <deal.II/matrix_free/evaluation_template_factory.h>
+#include <deal.II/matrix_free/evaluation_template_factory_internal.h>
 #include <deal.II/matrix_free/fe_evaluation.h>
-
-#ifndef FE_EVAL_FACTORY_DEGREE_MAX
-#  define FE_EVAL_FACTORY_DEGREE_MAX 6
-#endif
 
 DEAL_II_NAMESPACE_OPEN
 
 namespace internal
 {
-  template <int degree, typename EvaluatorType, typename... Args>
-  bool
-  instantiation_helper_run(const unsigned int given_degree,
-                           const unsigned int n_q_points_1d,
-                           Args &...args)
-  {
-    if (given_degree == degree)
-      {
-        if (n_q_points_1d == degree + 1)
-          return EvaluatorType::template run<degree, degree + 1>(args...);
-        else if (n_q_points_1d == degree + 2)
-          return EvaluatorType::template run<degree, degree + 2>(args...);
-        else if (n_q_points_1d == degree)
-          return EvaluatorType::template run<degree, degree>(args...);
-        else if (n_q_points_1d == (3 * degree) / 2 + 1)
-          return EvaluatorType::template run<degree, (3 * degree) / 2 + 1>(
-            args...);
-        else
-          // slow path
-          return EvaluatorType::template run<-1, 0>(args...);
-      }
-    else if (degree < FE_EVAL_FACTORY_DEGREE_MAX)
-      return instantiation_helper_run<
-        (degree < FE_EVAL_FACTORY_DEGREE_MAX ? degree + 1 : degree),
-        EvaluatorType>(given_degree, n_q_points_1d, args...);
-    else
-      // slow path
-      return EvaluatorType::template run<-1, 0>(args...);
-  }
-
   struct FastEvaluationSupported
   {
     template <int fe_degree, int n_q_points_1d>
@@ -418,57 +385,6 @@ namespace internal
       CellwiseInverseMassMatrixImplTransformFromQPoints<dim,
                                                         VectorizedArrayType>>(
       fe_degree, n_q_points_1d, n_components, fe_eval, in_array, out_array);
-  }
-
-
-
-  template <int dim, typename Number, typename VectorizedArrayType>
-  void
-  FEEvaluationHangingNodesFactory<dim, Number, VectorizedArrayType>::apply(
-    const unsigned int n_components,
-    const unsigned int fe_degree,
-    const FEEvaluationBaseData<dim, Number, false, VectorizedArrayType>
-      &                                            fe_eval,
-    const bool                                     transpose,
-    const std::array<MatrixFreeFunctions::ConstraintKinds,
-                     VectorizedArrayType::size()> &c_mask,
-    VectorizedArrayType *                          values)
-  {
-    instantiation_helper_run<
-      1,
-      FEEvaluationImplHangingNodes<dim, VectorizedArrayType, false>>(
-      fe_degree,
-      fe_degree + 1,
-      n_components,
-      fe_eval,
-      transpose,
-      c_mask,
-      values);
-  }
-
-
-
-  template <int dim, typename Number, typename VectorizedArrayType>
-  void
-  FEEvaluationHangingNodesFactory<dim, Number, VectorizedArrayType>::apply(
-    const unsigned int n_components,
-    const unsigned int fe_degree,
-    const FEEvaluationBaseData<dim, Number, true, VectorizedArrayType> &fe_eval,
-    const bool                                     transpose,
-    const std::array<MatrixFreeFunctions::ConstraintKinds,
-                     VectorizedArrayType::size()> &c_mask,
-    VectorizedArrayType *                          values)
-  {
-    instantiation_helper_run<
-      1,
-      FEEvaluationImplHangingNodes<dim, VectorizedArrayType, true>>(
-      fe_degree,
-      fe_degree + 1,
-      n_components,
-      fe_eval,
-      transpose,
-      c_mask,
-      values);
   }
 
 } // end of namespace internal

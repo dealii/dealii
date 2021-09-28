@@ -24,6 +24,7 @@
 
 #include <deal.II/grid/grid_generator.h>
 
+#include <deal.II/matrix_free/evaluation_kernels_hanging_nodes.h>
 #include <deal.II/matrix_free/fe_evaluation.h>
 #include <deal.II/matrix_free/matrix_free.h>
 
