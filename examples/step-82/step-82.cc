@@ -591,8 +591,10 @@ namespace Step82
                             const Tensor<2, dim> &H_i = discrete_hessians[i][q];
                             const Tensor<2, dim> &H_j = discrete_hessians[j][q];
 
-                            const Tensor<2, dim> &H_i_neigh = discrete_hessians_neigh[face_no][i][q];
-                            const Tensor<2, dim> &H_j_neigh = discrete_hessians_neigh[face_no][j][q];
+                            const Tensor<2, dim> &H_i_neigh =
+                              discrete_hessians_neigh[face_no][i][q];
+                            const Tensor<2, dim> &H_j_neigh =
+                              discrete_hessians_neigh[face_no][j][q];
 
                             stiffness_matrix_cn(i, j) +=
                               scalar_product(H_j_neigh, H_i) * dx;
@@ -745,7 +747,7 @@ namespace Step82
                 // In the next step, we need to have a global way to compare the
                 // cells in order to not calculate the same jump term twice:
                 if (neighbor_cell->id() < cell->id())
-                  continue; // skip this face (already considered)  
+                  continue; // skip this face (already considered)
                 else
                   {
                     fe_face_neighbor.reinit(neighbor_cell, face_no_neighbor);
@@ -1194,7 +1196,7 @@ namespace Step82
     Vector<double> local_rhs_re(n_dofs_lift), local_rhs_be(n_dofs_lift),
       coeffs_re(n_dofs_lift), coeffs_be(n_dofs_lift), coeffs_tmp(n_dofs_lift);
 
-    SolverControl solver_control(1000, 1e-12);
+    SolverControl            solver_control(1000, 1e-12);
     SolverCG<Vector<double>> solver(solver_control);
 
     double factor_avg; // 0.5 for interior faces, 1.0 for boundary faces
@@ -1448,9 +1450,8 @@ int main()
 {
   try
     {
-      const unsigned int n_ref =
-        3; // number of mesh refinements
-            
+      const unsigned int n_ref = 3; // number of mesh refinements
+
       const unsigned int degree =
         2; // FE degree for u_h and the two lifting terms
 
@@ -1459,7 +1460,10 @@ int main()
       const double penalty_val =
         1.0; // penalty coefficient for the jump of the values
 
-      Step82::BiLaplacianLDGLift<2> problem(n_ref, degree, penalty_grad, penalty_val);
+      Step82::BiLaplacianLDGLift<2> problem(n_ref,
+                                            degree,
+                                            penalty_grad,
+                                            penalty_val);
 
       problem.run();
     }
