@@ -666,6 +666,14 @@ public:
     const std::bitset<VectorizedArrayType::size()> &mask =
       std::bitset<VectorizedArrayType::size()>().flip()) const;
 
+  template <typename VectorType>
+  void
+  distribute_local_to_global_plain(
+    VectorType &                                    dst,
+    const unsigned int                              first_index = 0,
+    const std::bitset<VectorizedArrayType::size()> &mask =
+      std::bitset<VectorizedArrayType::size()>().flip()) const;
+
   /**
    * Takes the values stored internally on dof values of the current cell and
    * writes them into the vector @p dst. The function skips the degrees of
@@ -1418,6 +1426,7 @@ private:
   void
   set_data_pointers();
 
+public:
   /**
    * Apply hanging-node constraints.
    */
@@ -5514,6 +5523,39 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
 #  endif
 
   apply_hanging_node_constraints<true>();
+
+  const auto dst_data = internal::get_vector_data<n_components_>(
+    dst,
+    first_index,
+    this->dof_access_index ==
+      internal::MatrixFreeFunctions::DoFInfo::dof_access_cell,
+    this->active_fe_index,
+    this->dof_info);
+
+  internal::VectorDistributorLocalToGlobal<Number, VectorizedArrayType>
+    distributor;
+  read_write_operation(distributor, dst_data.first, dst_data.second, mask);
+}
+
+
+
+template <int dim,
+          int n_components_,
+          typename Number,
+          bool is_face,
+          typename VectorizedArrayType>
+template <typename VectorType>
+inline void
+FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
+  distribute_local_to_global_plain(
+    VectorType &                                    dst,
+    const unsigned int                              first_index,
+    const std::bitset<VectorizedArrayType::size()> &mask) const
+{
+#  ifdef DEBUG
+  Assert(dof_values_initialized == true,
+         internal::ExcAccessToUninitializedField());
+#  endif
 
   const auto dst_data = internal::get_vector_data<n_components_>(
     dst,
