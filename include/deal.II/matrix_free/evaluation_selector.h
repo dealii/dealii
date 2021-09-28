@@ -19,7 +19,9 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/matrix_free/evaluation_flags.h>
 #include <deal.II/matrix_free/evaluation_kernels.h>
+#include <deal.II/matrix_free/shape_info.h>
 
 DEAL_II_NAMESPACE_OPEN
 

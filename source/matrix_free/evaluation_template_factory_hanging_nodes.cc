@@ -14,22 +14,15 @@
 // ---------------------------------------------------------------------
 
 
-for (deal_II_dimension : DIMENSIONS;
-     deal_II_scalar_vectorized : REAL_SCALARS_VECTORIZED)
-  {
-    template struct dealii::internal::FEEvaluationFactory<
-      deal_II_dimension,
-      deal_II_scalar_vectorized::value_type,
-      deal_II_scalar_vectorized>;
+#include <deal.II/matrix_free/evaluation_template_factory_hanging_nodes.templates.h>
 
-    template struct dealii::internal::FEFaceEvaluationFactory<
-      deal_II_dimension,
-      deal_II_scalar_vectorized::value_type,
-      deal_II_scalar_vectorized>;
+DEAL_II_NAMESPACE_OPEN
 
-    // inverse mass
-    template struct dealii::internal::CellwiseInverseMassFactory<
-      deal_II_dimension,
-      deal_II_scalar_vectorized::value_type,
-      deal_II_scalar_vectorized>;
-  }
+#define SPLIT_INSTANTIATIONS_COUNT 6
+#ifndef SPLIT_INSTANTIATIONS_INDEX
+#  define SPLIT_INSTANTIATIONS_INDEX 0
+#endif
+
+#include "evaluation_template_factory_hanging_nodes.inst"
+
+DEAL_II_NAMESPACE_CLOSE
