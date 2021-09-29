@@ -1274,6 +1274,13 @@ protected:
     const std::array<VectorType *, n_components_> &vectors) const;
 
   /**
+   * Apply hanging-node constraints.
+   */
+  template <bool transpose>
+  void
+  apply_hanging_node_constraints() const;
+
+  /**
    * This field stores the values for local degrees of freedom (e.g. after
    * reading out from a vector but before applying unit cell transformations
    * or before distributing them into a result vector). The methods
@@ -1417,13 +1424,6 @@ private:
    */
   void
   set_data_pointers();
-
-  /**
-   * Apply hanging-node constraints.
-   */
-  template <bool transpose>
-  void
-  apply_hanging_node_constraints() const;
 };
 
 
