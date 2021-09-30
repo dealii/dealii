@@ -133,7 +133,7 @@ namespace internal
                    Number *                values)
     {
       typename Trait<Number, VectorizationType>::value_type
-        temp[max_n_points_1D];
+        temp[fe_degree != -1 ? (fe_degree + 1) : max_n_points_1D];
 
       const unsigned int points =
         (fe_degree != -1 ? fe_degree : given_degree) + 1;
@@ -182,7 +182,7 @@ namespace internal
                         Number *                values)
     {
       typename Trait<Number, VectorizationType>::value_type
-        temp[max_n_points_1D];
+        temp[fe_degree != -1 ? (fe_degree + 1) : max_n_points_1D];
 
       const unsigned int points =
         (fe_degree != -1 ? fe_degree : given_degree) + 1;
@@ -213,8 +213,9 @@ namespace internal
           // perform interpolation point by point
           for (unsigned int k = 0; k < points; ++k)
             {
-              typename Trait<Number, VectorizationType>::value_type sum = 0.0;
-              for (unsigned int h = 0; h < points; ++h)
+              auto sum =
+                get_value(weight[(transpose ? 1 : points) * k], v) * temp[0];
+              for (unsigned int h = 1; h < points; ++h)
                 sum += get_value(weight[(transpose ? 1 : points) * k +
                                         (transpose ? points : 1) * h],
                                  v) *
@@ -233,7 +234,7 @@ namespace internal
                         Number *                values)
     {
       typename Trait<Number, VectorizationType>::value_type
-        temp[max_n_points_1D];
+        temp[fe_degree != -1 ? (fe_degree + 1) : max_n_points_1D];
 
       const unsigned int points =
         (fe_degree != -1 ? fe_degree : given_degree) + 1;
@@ -249,8 +250,9 @@ namespace internal
       // perform interpolation point by point
       for (unsigned int k = 0; k < points; ++k)
         {
-          typename Trait<Number, VectorizationType>::value_type sum = 0.0;
-          for (unsigned int h = 0; h < points; ++h)
+          auto sum =
+            get_value(weight[(transpose ? 1 : points) * k], v) * temp[0];
+          for (unsigned int h = 1; h < points; ++h)
             sum += get_value(weight[(transpose ? 1 : points) * k +
                                     (transpose ? points : 1) * h],
                              v) *
