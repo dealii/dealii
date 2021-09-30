@@ -41,7 +41,7 @@ namespace MeshWorker
    * problems, and the evaluation of finite element fields.
    *
    * This class is a drop in ScratchData to use with the WorkStream::run()
-   * function and with the MeshWorker::mesh_loop function().
+   * function and with the MeshWorker::mesh_loop() function.
    *
    * The ScratchData class has three main goals:
    * - to create FEValues, FEFaceValues, FESubfaceValues, and FEInterfaceValues
