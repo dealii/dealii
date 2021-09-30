@@ -65,8 +65,7 @@ namespace internal
     }
 
   private:
-    // using VectorizationType = unsigned int;
-    using VectorizationType = Number;
+    using VectorizationType = unsigned int; // Number
 
     static const unsigned int max_n_points_1D = 40;
 
@@ -127,10 +126,10 @@ namespace internal
 
     template <int fe_degree, unsigned int side, bool transpose>
     static inline DEAL_II_ALWAYS_INLINE void
-    interpolate_2D(const unsigned int      given_degree,
-                   const VectorizationType v,
-                   const Number *          weight,
-                   Number *                values)
+    interpolate_2D(const unsigned int             given_degree,
+                   const VectorizationType        v,
+                   const Number *DEAL_II_RESTRICT weight,
+                   Number *DEAL_II_RESTRICT       values)
     {
       typename Trait<Number, VectorizationType>::value_type
         temp[fe_degree != -1 ? (fe_degree + 1) : max_n_points_1D];
@@ -138,7 +137,7 @@ namespace internal
       const unsigned int points =
         (fe_degree != -1 ? fe_degree : given_degree) + 1;
 
-      AssertIndexRange(points, max_n_points_1D);
+      AssertIndexRange(given_degree, max_n_points_1D);
 
       const unsigned int d = side / 2; // direction
       const unsigned int s = side % 2; // left or right surface
@@ -175,11 +174,11 @@ namespace internal
               bool         transpose,
               bool         skip_borders>
     static inline DEAL_II_ALWAYS_INLINE void
-    interpolate_3D_face(const unsigned int      dof_offset,
-                        const unsigned int      given_degree,
-                        const VectorizationType v,
-                        const Number *          weight,
-                        Number *                values)
+    interpolate_3D_face(const unsigned int             dof_offset,
+                        const unsigned int             given_degree,
+                        const VectorizationType        v,
+                        const Number *DEAL_II_RESTRICT weight,
+                        Number *DEAL_II_RESTRICT       values)
     {
       typename Trait<Number, VectorizationType>::value_type
         temp[fe_degree != -1 ? (fe_degree + 1) : max_n_points_1D];
@@ -187,9 +186,11 @@ namespace internal
       const unsigned int points =
         (fe_degree != -1 ? fe_degree : given_degree) + 1;
 
-      AssertIndexRange(points, max_n_points_1D);
+      AssertIndexRange(given_degree, max_n_points_1D);
 
-      const unsigned int stride = Utilities::pow(points, direction);
+      const unsigned int stride = fe_degree != -1 ?
+                                    Utilities::pow(fe_degree + 1, direction) :
+                                    Utilities::pow(given_degree + 1, direction);
 
       // direction   side0   side1   side2
       // 0             -      p^2      p
@@ -227,11 +228,11 @@ namespace internal
 
     template <int fe_degree, unsigned int direction, bool transpose>
     static inline DEAL_II_ALWAYS_INLINE void
-    interpolate_3D_edge(const unsigned int      p,
-                        const unsigned int      given_degree,
-                        const VectorizationType v,
-                        const Number *          weight,
-                        Number *                values)
+    interpolate_3D_edge(const unsigned int             p,
+                        const unsigned int             given_degree,
+                        const VectorizationType        v,
+                        const Number *DEAL_II_RESTRICT weight,
+                        Number *DEAL_II_RESTRICT       values)
     {
       typename Trait<Number, VectorizationType>::value_type
         temp[fe_degree != -1 ? (fe_degree + 1) : max_n_points_1D];
@@ -239,9 +240,11 @@ namespace internal
       const unsigned int points =
         (fe_degree != -1 ? fe_degree : given_degree) + 1;
 
-      AssertIndexRange(points, max_n_points_1D);
+      AssertIndexRange(given_degree, max_n_points_1D);
 
-      const unsigned int stride = Utilities::pow(points, direction);
+      const unsigned int stride = fe_degree != -1 ?
+                                    Utilities::pow(fe_degree + 1, direction) :
+                                    Utilities::pow(given_degree + 1, direction);
 
       // copy result back
       for (unsigned int k = 0; k < points; ++k)
