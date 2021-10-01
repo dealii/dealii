@@ -181,8 +181,6 @@ public:
     dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
       &output_data) const;
 
-
-private:
   /**
    * @name Interface with FEValues
    * @{
@@ -235,6 +233,7 @@ private:
     std::vector<Point<dim>> quadrature_points;
   };
 
+private:
   // documentation can be found in Mapping::requires_update_flags()
   virtual UpdateFlags
   requires_update_flags(const UpdateFlags update_flags) const override;
