@@ -232,6 +232,31 @@ public:
    */
 
   /**
+   * As opposed to the other fill_fe_values() and fill_fe_face_values()
+   * functions that rely on pre-computed information of InternalDataBase, this
+   * function chooses the flexible evaluation path on the cell and points
+   * passed in to the current function.
+   *
+   * @param[in] cell The cell where to evaluate the mapping
+   *
+   * @param[in] unit_points The points in reference coordinates where the
+   * transformation (Jacobians, positions) should be computed.
+   *
+   * @param[in] update_flags The kind of information that should be computed.
+   *
+   * @param[out] output_data A struct containing the evaluated quantities such
+   * as the Jacobian resulting from application of the mapping on the given
+   * cell with its underlying manifolds.
+   */
+  void
+  fill_mapping_data_for_generic_points(
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+    const ArrayView<const Point<dim>> &                         unit_points,
+    const UpdateFlags                                           update_flags,
+    dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
+      &output_data) const;
+
+  /**
    * @name Interface with FEValues and friends
    * @{
    */
@@ -536,7 +561,7 @@ public:
     mutable AlignedVector<double> volume_elements;
   };
 
-
+protected:
   // documentation can be found in Mapping::requires_update_flags()
   virtual UpdateFlags
   requires_update_flags(const UpdateFlags update_flags) const override;
@@ -590,37 +615,10 @@ public:
     dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
       &output_data) const override;
 
-
-  /**
-   * As opposed to the other fill_fe_values() and fill_fe_face_values()
-   * functions that rely on pre-computed information of InternalDataBase, this
-   * function chooses the flexible evaluation path on the cell and points
-   * passed in to the current function.
-   *
-   * @param[in] cell The cell where to evaluate the mapping
-   *
-   * @param[in] unit_points The points in reference coordinates where the
-   * transformation (Jacobians, positions) should be computed.
-   *
-   * @param[in] update_flags The kind of information that should be computed.
-   *
-   * @param[out] output_data A struct containing the evaluated quantities such
-   * as the Jacobian resulting from application of the mapping on the given
-   * cell with its underlying manifolds.
-   */
-  void
-  fill_mapping_data_for_generic_points(
-    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-    const ArrayView<const Point<dim>> &                         unit_points,
-    const UpdateFlags                                           update_flags,
-    dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
-      &output_data) const;
-
   /**
    * @}
    */
 
-protected:
   /**
    * The degree of the polynomials used as shape functions for the mapping of
    * cells.
