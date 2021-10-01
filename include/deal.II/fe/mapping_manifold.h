@@ -152,7 +152,6 @@ public:
    * @{
    */
 
-public:
   /**
    * Storage for internal data of polynomial mappings. See
    * Mapping::InternalDataBase for an extensive description.
@@ -194,7 +193,6 @@ public:
     initialize_face(const UpdateFlags      update_flags,
                     const Quadrature<dim> &quadrature,
                     const unsigned int     n_original_q_points);
-
 
     /**
      * Compute the weights associated to the Manifold object, that
@@ -238,7 +236,6 @@ public:
      */
     Quadrature<dim> quad;
 
-
     /**
      * Values of quadrature weights for manifold quadrature
      * formulas.
@@ -258,7 +255,6 @@ public:
      * Computed once.
      */
     std::vector<std::vector<double>> cell_manifold_quadrature_weights;
-
 
     /**
      * A vector of weights for use in Manifold::get_new_point(). For
@@ -332,7 +328,7 @@ public:
     mutable SmartPointer<const Manifold<dim, spacedim>> manifold;
   };
 
-
+private:
   // documentation can be found in Mapping::requires_update_flags()
   virtual UpdateFlags
   requires_update_flags(const UpdateFlags update_flags) const override;
