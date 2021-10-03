@@ -654,6 +654,11 @@ private:
   unsigned int dofs_per_component;
 
   /**
+   * The first selected component in the active base element.
+   */
+  unsigned int component_in_base_element;
+
+  /**
    * For complicated FiniteElement objects this variable informs us about
    * which unknowns actually carry degrees of freedom in the selected
    * components.
@@ -742,6 +747,7 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::FEPointEvaluation(
 
   bool         same_base_element   = true;
   unsigned int base_element_number = 0;
+  component_in_base_element        = 0;
   unsigned int component           = 0;
   for (; base_element_number < fe.n_base_elements(); ++base_element_number)
     if (component + fe.element_multiplicity(base_element_number) >
@@ -750,10 +756,12 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::FEPointEvaluation(
         if (first_selected_component + n_components >
             component + fe.element_multiplicity(base_element_number))
           same_base_element = false;
+        component_in_base_element = first_selected_component - component;
         break;
       }
     else
       component += fe.element_multiplicity(base_element_number);
+
   if (fill_mapping_data_for_generic_points &&
       internal::FEPointEvaluation::is_fast_path_supported(
         fe, base_element_number) &&
@@ -868,7 +876,9 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::evaluate(
         for (unsigned int i = 0; i < dofs_per_component; ++i)
           internal::FEPointEvaluation::
             EvaluatorTypeTraits<dim, n_components, Number>::read_value(
-              solution_values[renumber[comp * dofs_per_component + i]],
+              solution_values[renumber[(component_in_base_element + comp) *
+                                         dofs_per_component +
+                                       i]],
               comp,
               solution_renumbered[i]);
 
