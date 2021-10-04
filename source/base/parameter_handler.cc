@@ -1951,6 +1951,15 @@ ParameterHandler::scan_line(std::string        line,
 
           // finally write the new value into the database
           entries->put(path + path_separator + "value", entry_value);
+
+          auto map_iter = entries_set_status.find(path);
+          if (map_iter != entries_set_status.end())
+            map_iter->second =
+              std::pair<bool, bool>(map_iter->second.first, true);
+          else
+            AssertThrow(false,
+                        ExcMessage("Could not find parameter " + path +
+                                   " in map entries_set_status."));
         }
       else
         {
