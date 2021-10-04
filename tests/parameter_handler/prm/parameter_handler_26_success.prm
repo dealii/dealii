@@ -1,0 +1,3 @@
+subsection General
+  set Precision = float
+end
