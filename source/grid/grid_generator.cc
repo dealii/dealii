@@ -7631,10 +7631,16 @@ namespace GridGenerator
   convert_hypercube_to_simplex_mesh(const Triangulation<dim, spacedim> &in_tria,
                                     Triangulation<dim, spacedim> &out_tria)
   {
-    Assert(in_tria.n_global_levels() == 1,
-           ExcMessage("Number of global levels has to be 1."));
-
     Assert(dim > 1, ExcNotImplemented());
+
+    Triangulation<dim, spacedim> temp_tria;
+    if (in_tria.n_global_levels() > 1)
+      {
+        AssertThrow(!in_tria.has_hanging_nodes(), ExcNotImplemented());
+        flatten_triangulation(in_tria, temp_tria);
+      }
+    const Triangulation<dim, spacedim> &ref_tria =
+      in_tria.n_global_levels() > 1 ? temp_tria : in_tria;
 
     /* static tables with the definitions of cells, faces and edges by its
      * vertices for 2D and 3D. For the inheritance of the manifold_id,
@@ -7811,9 +7817,9 @@ namespace GridGenerator
     // store for each vertex and face the assigned index so that we only
     // assign them a value once
     std::vector<unsigned int> old_to_new_vertex_indices(
-      in_tria.n_vertices(), numbers::invalid_unsigned_int);
+      ref_tria.n_vertices(), numbers::invalid_unsigned_int);
     std::vector<unsigned int> face_to_new_vertex_indices(
-      in_tria.n_faces(), numbers::invalid_unsigned_int);
+      ref_tria.n_faces(), numbers::invalid_unsigned_int);
 
     // We first have to create all of the new vertices. To do this, we loop over
     // all cells and on each cell
@@ -7822,7 +7828,7 @@ namespace GridGenerator
     // (ii) create new midpoint vertex locations for each face (and record their
     // new indices in the 'face_to_new_vertex_indices' vector),
     // (iii) create new midpoint vertex locations for each cell (dim = 2 only)
-    for (const auto &cell : in_tria)
+    for (const auto &cell : ref_tria)
       {
         // temporary array storing the global indices of each cell entity in the
         // sequence: vertices, edges/faces, cell
