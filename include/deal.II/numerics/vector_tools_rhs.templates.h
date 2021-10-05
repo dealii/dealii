@@ -457,6 +457,8 @@ namespace VectorTools
                                                      rhs_vector);
             }
       }
+
+    rhs_vector.compress(VectorOperation::values::add);
   }
 
 
@@ -617,6 +619,8 @@ namespace VectorTools
                                                      rhs_vector);
             }
       }
+
+    rhs_vector.compress(VectorOperation::values::add);
   }
 
 
