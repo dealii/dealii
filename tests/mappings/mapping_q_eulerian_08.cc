@@ -207,6 +207,21 @@ test(const unsigned int n_ref = 0)
   const unsigned int min_level = 0;
   MGLevelObject<LinearAlgebra::distributed::Vector<LevelNumberType>>
     displacement_level(min_level, max_level);
+
+  // Important! This preallocation of the displacement vectors with
+  // all relevant ghost indices is required to certain meshes.
+  for (unsigned int level = min_level; level <= max_level; ++level)
+    {
+      IndexSet relevant_mg_dofs;
+      DoFTools::extract_locally_relevant_level_dofs(dof_handler_euler,
+                                                    level,
+                                                    relevant_mg_dofs);
+      displacement_level[level].reinit(dof_handler_euler.locally_owned_mg_dofs(
+                                         level),
+                                       relevant_mg_dofs,
+                                       mpi_communicator);
+    }
+
   mg_transfer_euler.interpolate_to_mg(dof_handler_euler,
                                       displacement_level,
                                       displacement);
