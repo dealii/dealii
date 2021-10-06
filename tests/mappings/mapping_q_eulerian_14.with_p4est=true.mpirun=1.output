@@ -1,15 +1,8 @@
 
-DEAL:2d::refine...
-DEAL:2d::refine...
-DEAL:2d::refine...
-DEAL:2d::Checksum: 4107161474
+DEAL:0::refine...
+DEAL:0::refine...
+DEAL:0::refine...
+DEAL:0::Checksum: 4107161474
 n_active_cells: 520
 n_levels: 3
-DEAL:2d::Mass operator: 
-DEAL:2d::l2_norm:       0.00000
-DEAL:2d::l1_norm:       0.00000
-DEAL:2d::linfty_norm:   0.00000
-DEAL:2d::Laplace operator: 
-DEAL:2d::l2_norm:       0.00000
-DEAL:2d::l1_norm:       0.00000
-DEAL:2d::linfty_norm:   0.00000
+DEAL:0::Ok
