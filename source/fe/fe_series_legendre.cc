@@ -216,7 +216,7 @@ namespace FESeries
         component_ != numbers::invalid_unsigned_int,
         ExcMessage(
           "For vector-valued problems, you need to explicitly specify for "
-          "which vector component you will want to do a Fourier decomposition "
+          "which vector component you will want to do a Legendre decomposition "
           "by setting the 'component' argument of this constructor."));
 
     AssertIndexRange(component, fe_collection[0].n_components());
