@@ -175,7 +175,7 @@ namespace SUNDIALS
    * \f[
    *  z_i^{m+1} = z_i^m +\delta^{m+1},
    * \f]
-   * where $m$ is the Newton index, and the Newton update $\delta^{m+1}$
+   * where $m$ is the Newton step index, and the Newton update $\delta^{m+1}$
    * requires the solution of the linear Newton system
    * \f[
    *  N(z_i^m) \delta^{m+1} = -G(z_i^m),
@@ -294,10 +294,10 @@ namespace SUNDIALS
    * where
    * \f[
    * A \dealcoloneq
-   * \begin{matrix}
+   * \begin{pmatrix}
    * 0 & 1 \\
    * -k^2 &0
-   * \end{matrix}
+   * \end{pmatrix}
    * \f]
    * and $y(0)=(0, k)$.
    *
