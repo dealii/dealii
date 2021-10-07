@@ -54,12 +54,14 @@ namespace parallel
      * vector type, e.g. PETScWrappers::MPI::Vector,
      * TrilinosWrappers::MPI::Vector, or corresponding block vectors.
      * @code
-     * SolutionTransfer<dim, VectorType> soltrans(dof_handler);
+     * parallel::distributed::SolutionTransfer<dim, VectorType>
+     *   soltrans(dof_handler);
      * // flag some cells for refinement and coarsening, e.g.
-     * GridRefinement::refine_and_coarsen_fixed_fraction(tria,
-     *                                                   error_indicators,
-     *                                                   0.3,
-     *                                                   0.05);
+     * parallel::distributed::GridRefinement::
+     *   refine_and_coarsen_fixed_fraction(tria,
+     *                                     error_indicators,
+     *                                     0.3,
+     *                                     0.05);
      *
      * // prepare the triangulation,
      * tria.prepare_coarsening_and_refinement();
@@ -69,10 +71,10 @@ namespace parallel
      * soltrans.prepare_for_coarsening_and_refinement(solution);
      *
      * // actually execute the refinement,
-     * tria.execute_coarsening_and_refinement ();
+     * tria.execute_coarsening_and_refinement();
      *
      * // redistribute dofs,
-     * dof_handler.distribute_dofs (fe);
+     * dof_handler.distribute_dofs(fe);
      *
      * // and interpolate the solution
      * VectorType interpolated_solution;
@@ -90,7 +92,7 @@ namespace parallel
      * IndexSet locally_owned_dofs, locally_relevant_dofs;
      * locally_owned_dofs = dof_handler.locally_owned_dofs();
      * DoFTools::extract_locally_relevant_dofs(dof_handler,
-     * locally_relevant_dofs);
+     *                                         locally_relevant_dofs);
      *
      * // The solution vector only knows about locally owned DoFs
      * TrilinosWrappers::MPI::Vector solution;
@@ -106,7 +108,8 @@ namespace parallel
      * old_solution = solution;
      *
      * // Initialize SolutionTransfer object
-     * SolutionTransfer<dim, VectorType> soltrans(dof_handler);
+     * parallel::distributed::SolutionTransfer<dim, VectorType>
+     *   soltrans(dof_handler);
      * soltrans.prepare_for_coarsening_and_refinement(old_solution);
      * ...
      * // Refine grid
@@ -135,9 +138,9 @@ namespace parallel
      * If vector has the locally relevant DoFs, serialization works as
      * follows:
      * @code
-     * parallel::distributed::SolutionTransfer<dim,VectorType>
+     * parallel::distributed::SolutionTransfer<dim, VectorType>
      *   sol_trans(dof_handler);
-     * sol_trans.prepare_for_serialization (vector);
+     * sol_trans.prepare_for_serialization(vector);
      *
      * triangulation.save(filename);
      * @endcode
@@ -147,9 +150,9 @@ namespace parallel
      * //[create coarse mesh...]
      * triangulation.load(filename);
      *
-     * parallel::distributed::SolutionTransfer<dim,VectorType>
+     * parallel::distributed::SolutionTransfer<dim, VectorType>
      *   sol_trans(dof_handler);
-     * sol_trans.deserialize (distributed_vector);
+     * sol_trans.deserialize(distributed_vector);
      * @endcode
      *
      *
