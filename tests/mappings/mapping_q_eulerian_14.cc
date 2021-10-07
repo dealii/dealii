@@ -14,11 +14,19 @@
 // ---------------------------------------------------------------------
 
 
-// test that MappingQEulerian works in parallel with geometric multigrids.
-// We apply a simple linear deformation which can be represented exactly
-// at the coarse level.
-//
-// inspired by _07
+// test matrix-free Laplace and Mass operators with MappingQEulerian
+// on a refined mesh that triggered the bug below with 4 MPI
+// ranks. This is due to a smaller set of ghost indices used by
+// interpolate_to_mg.
+
+// clang-format off
+/*
+An error occurred in line <1638> of file <../include/deal.II/lac/la_parallel_vector.h> in function
+    Number dealii::LinearAlgebra::distributed::Vector<Number, MemorySpace>::operator()(dealii::LinearAlgebra::distributed::Vector<Number, MemorySpace>::size_type) const [with Number = double; MemorySpace = dealii::MemorySpace::Host; dealii::LinearAlgebra::distributed::Vector<Number, MemorySpace>::size_type = unsigned int]
+The violated condition was:
+    partitioner->in_local_range(global_index) || partitioner->ghost_indices().is_element(global_index)
+*/
+// clang-format on
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/multithread_info.h>
@@ -33,12 +41,14 @@
 
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
+#include <deal.II/fe/mapping_q.h>
 #include <deal.II/fe/mapping_q1.h>
 #include <deal.II/fe/mapping_q_eulerian.h>
 
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_reordering.h>
+#include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
@@ -55,6 +65,7 @@
 
 #include <deal.II/matrix_free/fe_evaluation.h>
 #include <deal.II/matrix_free/matrix_free.h>
+#include <deal.II/matrix_free/operators.h>
 
 #include <deal.II/multigrid/mg_transfer_matrix_free.h>
 
@@ -67,7 +78,30 @@
 #include "../tests.h"
 
 
+const std::vector<std::string> refined = {
+  "0_0:",   "10_0:",  "11_0:",  "12_0:",  "13_0:",  "14_0:",  "15_0:",
+  "1_0:",   "21_0:",  "23_0:",  "26_0:",  "27_0:",  "28_0:",  "29_0:",
+  "2_0:",   "30_0:",  "31_0:",  "32_0:",  "33_0:",  "34_0:",  "34_1:0",
+  "34_1:1", "34_1:2", "34_1:3", "35_0:",  "35_1:0", "35_1:2", "35_1:3",
+  "36_0:",  "37_0:",  "38_0:",  "38_1:2", "39_0:",  "3_0:",   "40_0:",
+  "40_1:0", "40_1:1", "40_1:2", "40_1:3", "41_0:",  "41_1:0", "41_1:1",
+  "41_1:2", "41_1:3", "42_0:",  "42_1:0", "42_1:1", "42_1:2", "42_1:3",
+  "43_0:",  "43_1:0", "43_1:1", "43_1:2", "43_1:3", "44_0:",  "44_1:0",
+  "44_1:1", "44_1:2", "44_1:3", "45_0:",  "46_0:",  "46_1:0", "46_1:1",
+  "46_1:2", "46_1:3", "47_0:",  "47_1:0", "47_1:2", "48_0:",  "49_0:",
+  "4_0:",   "50_0:",  "51_0:",  "52_0:",  "53_0:",  "54_0:",  "55_0:",
+  "56_0:",  "57_0:",  "58_0:",  "59_0:",  "60_0:",  "61_0:",  "62_0:",
+  "63_0:",  "64_0:",  "65_0:",  "66_0:",  "67_0:",  "68_0:",  "69_0:",
+  "6_0:",   "70_0:",  "71_0:",  "72_0:",  "73_0:",  "74_0:",  "75_0:",
+  "76_0:",  "77_0:",  "78_0:",  "79_0:",  "80_0:",  "80_1:0", "80_1:1",
+  "80_1:2", "80_1:3", "81_0:",  "81_1:0", "81_1:1", "81_1:2", "81_1:3",
+  "82_0:",  "82_1:0", "82_1:1", "82_1:2", "82_1:3", "83_0:",  "83_1:0",
+  "83_1:1", "83_1:2", "83_1:3", "84_0:",  "84_1:0", "84_1:1", "84_1:2",
+  "84_1:3", "85_0:",  "85_1:0", "86_0:",  "86_1:0", "86_1:1", "86_1:2",
+  "86_1:3", "87_0:",  "88_0:",  "89_0:",  "8_0:",   "92_0:",  "9_0:"};
 
+
+// Displacement to be applied
 template <int dim>
 class Displacement : public Function<dim>
 {
@@ -113,34 +147,40 @@ test(const unsigned int n_ref = 0)
   Displacement<dim>  displacement_function;
   const unsigned int euler_fe_degree = 2;
 
-  deallog << "dim=" << dim << std::endl;
   MPI_Comm     mpi_communicator(MPI_COMM_WORLD);
   unsigned int myid    = Utilities::MPI::this_mpi_process(mpi_communicator);
   unsigned int numproc = Utilities::MPI::n_mpi_processes(mpi_communicator);
-
-  deallog << "numproc=" << numproc << std::endl;
 
   parallel::distributed::Triangulation<dim> triangulation(
     mpi_communicator,
     Triangulation<dim>::limit_level_difference_at_vertices,
     parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy);
-  GridGenerator::hyper_cube(triangulation, -1, 1);
-  triangulation.refine_global(3);
 
-  // do some adaptive refinement
-  for (unsigned int ref = 0; ref < n_ref; ++ref)
+  GridGenerator::subdivided_hyper_cube(triangulation, 10, -5, 5);
+  while (true)
     {
-      for (typename Triangulation<dim>::active_cell_iterator cell =
-             triangulation.begin_active();
-           cell != triangulation.end();
-           ++cell)
-        if (cell->is_locally_owned() &&
-            ((cell->center().norm() < 0.5 &&
-              (cell->level() < 5 || cell->center().norm() > 0.45)) ||
-             (dim == 2 && cell->center().norm() > 1.2)))
-          cell->set_refine_flag();
+      deallog << "refine..." << std::endl;
+      bool changes = false;
+
+      for (const auto &cell : triangulation.active_cell_iterators())
+
+        if (!cell->is_artificial() &&
+            std::find(std::begin(refined),
+                      std::end(refined),
+                      cell->id().to_string()) != std::end(refined))
+          {
+            cell->set_refine_flag();
+            changes = true;
+          }
+
+      if (Utilities::MPI::max(changes ? 1 : 0, MPI_COMM_WORLD) == 0)
+        break;
+
       triangulation.execute_coarsening_and_refinement();
     }
+  deallog << "Checksum: " << triangulation.get_checksum() << '\n'
+          << "n_active_cells: " << triangulation.n_active_cells() << '\n'
+          << "n_levels: " << triangulation.n_levels() << std::endl;
 
   FE_Q<dim>       fe(fe_degree);
   DoFHandler<dim> dof_handler(triangulation);
@@ -157,6 +197,7 @@ test(const unsigned int n_ref = 0)
   dof_handler_euler.distribute_dofs(fe_euler);
   dof_handler_euler.distribute_mg_dofs();
 
+  // IndexSets and constraints
   const IndexSet &locally_owned_dofs_euler =
     dof_handler_euler.locally_owned_dofs();
   IndexSet locally_relevant_dofs_euler;
@@ -208,8 +249,8 @@ test(const unsigned int n_ref = 0)
   MGLevelObject<LinearAlgebra::distributed::Vector<LevelNumberType>>
     displacement_level(min_level, max_level);
 
-  // Important! This preallocation of the displacement vectors with
-  // all relevant ghost indices is required to certain meshes.
+  // Important! This preallocation of the displacement vectors fixes
+  // the bug observed.
   for (unsigned int level = min_level; level <= max_level; ++level)
     {
       IndexSet relevant_mg_dofs;
@@ -221,7 +262,6 @@ test(const unsigned int n_ref = 0)
                                        relevant_mg_dofs,
                                        mpi_communicator);
     }
-
   mg_transfer_euler.interpolate_to_mg(dof_handler_euler,
                                       displacement_level,
                                       displacement);
