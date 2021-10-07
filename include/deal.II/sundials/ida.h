@@ -163,16 +163,17 @@ namespace SUNDIALS
    *
    * That is $F(y', y, t) = y' + A y = 0 $
    * where
+   * A =
    * \f[
-   * \begin{matrix}
+   * \begin{pmatrix}
    * 0 & -1 \\
    * k^2 &0
-   * \end{matrix}
+   * \end{pmatrix}
    * \f]
    * and $y(0)=(0, k)$, $y'(0) = (k, 0)$.
    *
-   * The exact solution is $y_0(t) = \sin(k t)$, $y_1(t) = y_0'(t) = k \cos(k
-   *t)$, $y_1'(t) = -k^2 \sin(k t)$.
+   * The exact solution is $y_0(t) = \sin(k t)$, $y_1(t) = y_0'(t)
+   * = k \cos(k t)$, $y_1'(t) = -k^2 \sin(k t)$.
    *
    * The Jacobian to assemble is the following:  $J = \alpha I + A$.
    *
