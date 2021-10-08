@@ -1162,8 +1162,8 @@ namespace Step82
   // with a DoFHandler, and consequently no finite element space. In
   // that case, FEValues::reinit() will skip the check that would
   // otherwise lead to an error message. All we have to do is to convert
-  // the DoFHandler cell iterator into a Triangulation cell iterator:
-  // See the first couple of lines of the function below to see how
+  // the DoFHandler cell iterator into a Triangulation cell iterator;
+  // see the first couple of lines of the function below to see how
   // this can be done.
   template <int dim>
   void BiLaplacianLDGLift<dim>::compute_discrete_hessians(
