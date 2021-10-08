@@ -29,6 +29,8 @@
 // @sect3{Include files}
 
 #include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/manifold_lib.h>
@@ -99,14 +101,53 @@ void print_mesh_info(const Triangulation<dim> &triangulation,
 // discussed in the introduction how to generate it. This follows the same
 // pattern as used in step-5 to load a mesh, although there it was written in
 // a different file format (UCD instead of MSH).
+//
+// It's worth noting that it is possible to save manifold ids when using
+// the gmsh api.  If we specify
+//
+// @code
+// GMSH_INCLUDE_DIR
+// GMSH_LIBRARY
+// @endcode
+//
+// when building deal.II, then <code>DEAL_II_GMSH_WITH_API</code> gets defined
+// and and we can use <code>GridIn::read_msh()</code>.  More details on the
+// function can be found in its deal.II documentation.
+//
+// We will be utilizing the SphericalManifold class for the holes. We need to
+// assign manifold IDs for this purpose. As physical IDs from Gmsh are assigned
+// to boundary IDs in deal.II, we will assign manifold IDs based on the boundary
+// IDs loaded from the file.
 void grid_1()
 {
+  const Point<2> Top_right_hole_origin(0.42, 2.0);
+  const Point<2> Bottom_left_hole_origin(-2.1, -1.54);
+
+  const SphericalManifold<2> Top_right_manifold(Top_right_hole_origin);
+  const SphericalManifold<2> Bottom_left_manifold(Bottom_left_hole_origin);
+
   Triangulation<2> triangulation;
 
   GridIn<2> gridin;
   gridin.attach_triangulation(triangulation);
   std::ifstream f("example.msh");
   gridin.read_msh(f);
+
+  // Here is where we get the boundary IDs made in gmsh, which are in the first
+  // coordinate position, and assign them to manifold ids.  With our example, we
+  // have boundary ID 1 on the top right hole and 2 and 3 for the bottom left
+  // hole. We assign both of these boundary IDs 2 because together they make a
+  // circle to match the manifold we assign it later.
+  triangulation.set_all_manifold_ids_on_boundary(1, 1); // top right hole
+  triangulation.set_all_manifold_ids_on_boundary(2,
+                                                 2); // top of bottom left hole
+  triangulation.set_all_manifold_ids_on_boundary(
+    3, 2); // bottom of bottom left hole
+
+  triangulation.set_manifold(1, Top_right_manifold);
+  triangulation.set_manifold(2, Bottom_left_manifold);
+
+  triangulation.refine_global(2);
 
   print_mesh_info(triangulation, "grid-1.vtu");
 }
