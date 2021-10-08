@@ -1043,7 +1043,7 @@ public:
 
   //@}
   /**
-   * @name Entry Access
+   * @name Accessing elements
    */
   //@{
 
@@ -1105,7 +1105,7 @@ public:
 
   //@}
   /**
-   * @name Multiplications
+   * @name Multiplying matrices and vectors
    */
   //@{
   /**
