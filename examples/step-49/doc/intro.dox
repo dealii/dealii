@@ -1,5 +1,5 @@
 <i>This program was contributed by Timo Heister. Parts of the results section
-were contributed by Yuhan Zhou, Wolfgang Bangerth, and David Wells.</i>
+were contributed by Yuhan Zhou, Wolfgang Bangerth, David Wells, and Sean Ingimarson.</i>
 
 <a name="Intro"></a>
 <h1> Introduction </h1>
@@ -221,9 +221,16 @@ Physical Surface(2) = {1, 2, 3, 4};
 
 <h5>Physical IDs</h5>
 
-This section is for assigning physical IDs as these become boundary IDs in deal.II.  Here you press
+This section is for assigning physical IDs as these become boundary IDs in deal.II. "Physical" object are the ones that carry information about the
+boundary indicator (see @ref GlossBoundaryIndicator "this glossary entry").
+Here you press
 <code>Geometry -> Physical groups -> Add -> Curve</code>.  You may do this
 for points as well, but we will only be needing to use curves.
+
+@note It is important that the .geo file contains "physical lines" and "physical
+  surfaces". These give the boundary indicators and material ids for use
+  in deal.II. Without these physical entities, nothing will be imported into
+  deal.II.
 
 We assign boundary ID 0 to the outer boundary.  This is usually here by default
 but we include it anyway:
@@ -311,37 +318,16 @@ deal.II's GridIn class can read. You can also generate the <code>.msh</code> fro
 <code>.geo</code> file by running the command
 
 @code
-gmsh -2 example.geo.
-@endcode
-
-You might want to open the <code>example.geo</code> file in a text editor (it
-is located in the same directory as the <tt>step-49.cc</tt> source file) to
-see how it is structured. You can see how the boundary of the domain is
-composed of a number of lines and how later on we combine several lines into
-"physical lines" (or "physical surfaces") that list the logical lines'
-numbers. "Physical" object are the ones that carry information about the
-boundary indicator (see @ref GlossBoundaryIndicator "this glossary entry").
-
-@note It is important that this file contain "physical lines" and "physical
-  surfaces". These give the boundary indicators and material ids for use
-  in deal.II. Without these physical entities, nothing will be imported into
-  deal.II.
-
-deal.II's GridIn class can read the <code>.msh</code> format written by
-%Gmsh and that contains a mesh created for the geometry described by the
-<code>.geo</code> file. You generate the <code>.msh</code> from the
-<code>.geo</code> by running the commands
-
-@code
 gmsh -2 example.geo
 @endcode
 
-on the command line, or by clicking "Mesh" and then "2D" inside %Gmsh after
-loading the file.  Now this is the mesh read from the <code>.msh</code> file
+Now this is the mesh read from the <code>.msh</code> file
 and saved again by deal.II as an image (see the <code>grid_1</code> function
-of the current program):
+of the current program).
 
-<img src="https://www.dealii.org/images/steps/developer/step-49.grid-1.png" alt="">
+Finally, you might want to open the <code>example.geo</code> file in a text editor (it
+is located in the same directory as the <tt>step-49.cc</tt> source file) to
+see how it is structured.
 
 @note %Gmsh has a number of other interfaces by which one can describe
   geometries to it. In particular, it has the ability to interface with
