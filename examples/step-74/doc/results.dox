@@ -30,7 +30,7 @@ table will look like this:
 <table align="center" class="doxtable">
   <tr>
     <th>cycle</th>
-    <th>n_cellss</th>
+    <th>n_cells</th>
     <th>n_dofs</th>
     <th>L2 </th>
     <th>rate</th>
