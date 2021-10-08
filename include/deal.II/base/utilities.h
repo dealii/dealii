@@ -465,7 +465,8 @@ namespace Utilities
     // The call to __builtin_expect turns out to be problematic.
     if (!(iexp >= 0))
       ::dealii::deal_II_exceptions::internals::issue_error_noreturn(
-        ::dealii::deal_II_exceptions::internals::abort_or_throw_on_exception,
+        ::dealii::deal_II_exceptions::internals::ExceptionHandling::
+          abort_or_throw_on_exception,
         __FILE__,
         __LINE__,
         __PRETTY_FUNCTION__,

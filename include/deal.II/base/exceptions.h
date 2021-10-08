@@ -1310,7 +1310,7 @@ namespace deal_II_exceptions
     /**
      * An enum describing how to treat an exception in issue_error_noreturn.
      */
-    enum ExceptionHandling
+    enum class ExceptionHandling
     {
       /**
        * Abort the program by calling <code>std::abort</code> unless
@@ -1328,7 +1328,7 @@ namespace deal_II_exceptions
      * This routine does the main work for the exception generation mechanism
      * used in the <tt>Assert</tt> and <tt>AssertThrow</tt> macros: as the
      * name implies, this function either ends by throwing an exception (if
-     * @p handling is throw_on_exception, or @p handling is try_abort_exception
+     * @p handling is ExceptionHandling::throw_on_exception, or @p handling is try_abort_exception
      * and deal_II_exceptions::disable_abort_on_exception is false) or with a
      * call to <tt>abort</tt> (if @p handling is try_abort_exception and
      * deal_II_exceptions::disable_abort_on_exception is true).
@@ -1356,7 +1356,7 @@ namespace deal_II_exceptions
 
       switch (handling)
         {
-          case abort_or_throw_on_exception:
+          case ExceptionHandling::abort_or_throw_on_exception:
             {
               if (dealii::deal_II_exceptions::internals::
                     allow_abort_on_exception)
@@ -1367,7 +1367,7 @@ namespace deal_II_exceptions
                   throw e;
                 }
             }
-          case throw_on_exception:
+          case ExceptionHandling::throw_on_exception:
             throw e;
           // this function should never return (and AssertNothrow can);
           // something must have gone wrong in the error handling code for us
@@ -1462,7 +1462,7 @@ namespace deal_II_exceptions
       {                                                                  \
         if (__builtin_expect(!(cond), false))                            \
           ::dealii::deal_II_exceptions::internals::issue_error_noreturn( \
-            ::dealii::deal_II_exceptions::internals::                    \
+            ::dealii::deal_II_exceptions::internals::ExceptionHandling:: \
               abort_or_throw_on_exception,                               \
             __FILE__,                                                    \
             __LINE__,                                                    \
@@ -1476,7 +1476,7 @@ namespace deal_II_exceptions
       {                                                                  \
         if (!(cond))                                                     \
           ::dealii::deal_II_exceptions::internals::issue_error_noreturn( \
-            ::dealii::deal_II_exceptions::internals::                    \
+            ::dealii::deal_II_exceptions::internals::ExceptionHandling:: \
               abort_or_throw_on_exception,                               \
             __FILE__,                                                    \
             __LINE__,                                                    \
@@ -1572,7 +1572,8 @@ namespace deal_II_exceptions
     {                                                                  \
       if (__builtin_expect(!(cond), false))                            \
         ::dealii::deal_II_exceptions::internals::issue_error_noreturn( \
-          ::dealii::deal_II_exceptions::internals::throw_on_exception, \
+          ::dealii::deal_II_exceptions::internals::ExceptionHandling:: \
+            throw_on_exception,                                        \
           __FILE__,                                                    \
           __LINE__,                                                    \
           __PRETTY_FUNCTION__,                                         \
@@ -1585,7 +1586,8 @@ namespace deal_II_exceptions
     {                                                                  \
       if (!(cond))                                                     \
         ::dealii::deal_II_exceptions::internals::issue_error_noreturn( \
-          ::dealii::deal_II_exceptions::internals::throw_on_exception, \
+          ::dealii::deal_II_exceptions::internals::ExceptionHandling:: \
+            throw_on_exception,                                        \
           __FILE__,                                                    \
           __LINE__,                                                    \
           __PRETTY_FUNCTION__,                                         \
