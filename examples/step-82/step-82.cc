@@ -1146,7 +1146,7 @@ namespace Step82
   //
   // In the following, we need to evaluate finite element shape
   // functions for the `fe_lift` finite element on the current
-  // cell. Like in, for example, step-61 this "lift" space is defined
+  // cell. Like for example in step-61, this "lift" space is defined
   // on every cell individually; as a consequence, there is no global
   // DoFHandler associated with this because we simply have no need
   // for such a DoFHandler. That leaves the question of what we should
