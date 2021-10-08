@@ -920,8 +920,7 @@ namespace Step72
     evaluation_point = current_solution;
     evaluation_point.add(alpha, newton_update);
 
-    const QGauss<dim> quadrature_formula(fe.degree + 1);
-    FEValues<dim>     fe_values(fe,
+    FEValues<dim> fe_values(fe,
                             quadrature_formula,
                             update_gradients | update_quadrature_points |
                               update_JxW_values);
