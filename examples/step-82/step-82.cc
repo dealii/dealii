@@ -1136,13 +1136,35 @@ namespace Step82
 
   // @sect4{BiLaplacianLDGLift::compute_discrete_hessians}
 
-  // This function is the main novelty of this program. It computes the discrete
-  // Hessian $H_h(\varphi)$ for all the basis functions $\varphi$ of
-  // $\mathbb{V}_h$ supported on the current cell and those supported on a
-  // neighboring cell. The first two arguments are inputs indicating the current
-  // cell (both refer to the same cell but are attached to different DoF
-  // Handlers), while the last two arguments are output variables that are
-  // filled-in in this function.
+  // This function is the main novelty of this program. It computes
+  // the discrete Hessian $H_h(\varphi)$ for all the basis functions
+  // $\varphi$ of $\mathbb{V}_h$ supported on the current cell and
+  // those supported on a neighboring cell. The first argument
+  // indicates the current cell (referring to the global DoFHandler
+  // object), while the other two arguments are output variables that
+  // are filled by this function.
+  //
+  // In the following, we need to evaluate finite element shape
+  // functions for the `fe_lift` finite element on the current
+  // cell. Like for example in step-61, this "lift" space is defined
+  // on every cell individually; as a consequence, there is no global
+  // DoFHandler associated with this because we simply have no need
+  // for such a DoFHandler. That leaves the question of what we should
+  // initialize the FEValues and FEFaceValues objects with when we ask
+  // them to evaluate shape functions of `fe_lift` on a concrete
+  // cell. If we simply provide the first argument to this function,
+  // `cell`, to FEValues::reinit(), we will receive an error message
+  // that the given `cell` belongs to a DoFHandler that has a
+  // different finite element associated with it than the `fe_lift`
+  // object we want to evaluate. Fortunately, there is a relatively
+  // easy solution: We can call FEValues::reinit() with a cell that
+  // points into a triangulation -- the same cell, but not associated
+  // with a DoFHandler, and consequently no finite element space. In
+  // that case, FEValues::reinit() will skip the check that would
+  // otherwise lead to an error message. All we have to do is to convert
+  // the DoFHandler cell iterator into a Triangulation cell iterator;
+  // see the first couple of lines of the function below to see how
+  // this can be done.
   template <int dim>
   void BiLaplacianLDGLift<dim>::compute_discrete_hessians(
     const typename DoFHandler<dim>::active_cell_iterator &cell,
@@ -1150,8 +1172,8 @@ namespace Step82
     std::vector<std::vector<std::vector<Tensor<2, dim>>>>
       &discrete_hessians_neigh)
   {
-    typename Triangulation<dim>::cell_iterator cell_lift(
-      &cell->get_triangulation(), cell->level(), cell->index());
+    const typename Triangulation<dim>::cell_iterator cell_lift =
+      static_cast<typename Triangulation<dim>::cell_iterator>(cell);
 
     QGauss<dim>     quad(fe.degree + 1);
     QGauss<dim - 1> quad_face(fe.degree + 1);
