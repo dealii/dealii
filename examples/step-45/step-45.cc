@@ -462,19 +462,6 @@ namespace Step45
                                                        fe.component_mask(
                                                          velocities),
                                                        first_vector_components);
-
-      VectorTools::interpolate_boundary_values(mapping,
-                                               dof_handler,
-                                               0,
-                                               BoundaryValues<dim>(),
-                                               constraints,
-                                               fe.component_mask(velocities));
-      VectorTools::interpolate_boundary_values(mapping,
-                                               dof_handler,
-                                               1,
-                                               BoundaryValues<dim>(),
-                                               constraints,
-                                               fe.component_mask(velocities));
     }
 
     constraints.close();
