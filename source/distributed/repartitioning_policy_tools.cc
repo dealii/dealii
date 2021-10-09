@@ -46,12 +46,61 @@ namespace RepartitioningPolicyTools
     }
   } // namespace
 
+
+  template <int dim, int spacedim>
+  DefaultPolicy<dim, spacedim>::DefaultPolicy(const bool tighten)
+    : tighten(tighten)
+  {}
+
   template <int dim, int spacedim>
   LinearAlgebra::distributed::Vector<double>
   DefaultPolicy<dim, spacedim>::partition(
-    const Triangulation<dim, spacedim> &) const
+    const Triangulation<dim, spacedim> &tria_in) const
   {
-    return {}; // nothing to do
+    if (tighten == false)
+      return {}; // nothing to do
+
+    const auto tria =
+      dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
+        &tria_in);
+
+    if (tria == nullptr)
+      return {}; // nothing to do, since serial triangulation
+
+#ifndef DEAL_II_WITH_MPI
+    Assert(false, ExcNeedsMPI());
+    return {};
+#else
+
+    const auto comm = tria->get_communicator();
+
+    const unsigned int process_has_active_locally_owned_cells =
+      tria->n_locally_owned_active_cells() > 0;
+    const unsigned int n_processes_with_active_locally_owned_cells =
+      Utilities::MPI::sum(process_has_active_locally_owned_cells, comm);
+
+    if (n_processes_with_active_locally_owned_cells ==
+        Utilities::MPI::n_mpi_processes(comm))
+      return {}; // nothing to do, since all processes have cells
+
+    unsigned int offset = 0;
+
+    const int ierr = MPI_Exscan(&process_has_active_locally_owned_cells,
+                                &offset,
+                                1,
+                                Utilities::MPI::internal::mpi_type_id(
+                                  &process_has_active_locally_owned_cells),
+                                MPI_SUM,
+                                comm);
+    AssertThrowMPI(ierr);
+
+    LinearAlgebra::distributed::Vector<double> partition(
+      tria->global_active_cell_index_partitioner().lock());
+
+    partition = offset;
+
+    return partition;
+#endif
   }
 
 
