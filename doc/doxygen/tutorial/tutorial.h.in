@@ -659,6 +659,11 @@
  *       isotropic material penalization (SIMP) formulation.
  *       </td></tr>
  *
+ *   <tr valign="top">
+ *       <td>step-82</td>
+ *        <td> Solving the fourth-order biharmonic equation using a lifting operator approach.
+ *       </td></tr>
+ *
  * </table>
  *
  *
@@ -909,7 +914,8 @@
  *       step-59,
  *       step-61,
  *       step-67,
- *       step-74
+ *       step-74,
+ *       step-82
  *     </td>
  *   </tr>
  *
@@ -1051,7 +1057,8 @@
  *       step-47,
  *       step-46,
  *       step-58,
- *       step-62
+ *       step-62,
+ *       step-82
  *     </td>
  *   </tr>
  *
@@ -1281,7 +1288,10 @@
  *   <tr valign="top">
  *     <td> Fourth-order biharmonic equation
  *     </td>
- *     <td>step-47</td>
+ *     <td>
+ *       step-47, 
+ *       step-82
+ *     </td>
  *   </tr>
  *
  *   <tr valign="top">
