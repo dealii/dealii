@@ -211,18 +211,6 @@ namespace VectorTools
         std::vector<std::unique_ptr<FEPointEvaluation<n_components, dim>>>
           evaluators(dof_handler.get_fe_collection().size());
 
-        const auto get_evaluator = [&](const unsigned int active_fe_index)
-          -> FEPointEvaluation<n_components, dim> & {
-          if (evaluators[active_fe_index] == nullptr)
-            evaluators[active_fe_index] =
-              std::make_unique<FEPointEvaluation<n_components, dim>>(
-                cache.get_mapping(),
-                dof_handler.get_fe(active_fe_index),
-                update_values);
-
-          return *evaluators[active_fe_index];
-        };
-
         for (unsigned int i = 0; i < cell_data.cells.size(); ++i)
           {
             typename DoFHandler<dim>::active_cell_iterator cell = {
@@ -243,7 +231,11 @@ namespace VectorTools
                                  solution_values.begin(),
                                  solution_values.end());
 
-            auto &evaluator = get_evaluator(cell->active_fe_index());
+            if (evaluators[cell->active_fe_index()] == nullptr)
+              evaluators[cell->active_fe_index()] =
+                std::make_unique<FEPointEvaluation<n_components, dim>>(
+                  cache.get_mapping(), cell->get_fe(), flags);
+            auto &evaluator = *evaluators[cell->active_fe_index()];
 
             evaluator.reinit(cell, unit_points);
             evaluator.evaluate(solution_values,
