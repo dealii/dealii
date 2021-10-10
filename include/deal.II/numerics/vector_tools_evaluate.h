@@ -234,7 +234,7 @@ namespace VectorTools
             if (evaluators[cell->active_fe_index()] == nullptr)
               evaluators[cell->active_fe_index()] =
                 std::make_unique<FEPointEvaluation<n_components, dim>>(
-                  cache.get_mapping(), cell->get_fe(), update_flags);
+                  cache.get_mapping(), cell->get_fe(), flags);
             auto &evaluator = *evaluators[cell->active_fe_index()];
 
             evaluator.reinit(cell, unit_points);
