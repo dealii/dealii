@@ -599,6 +599,8 @@ public:
     cell_diameter
   };
 
+
+
   /**
    * Implementation of the error estimator described above. You may give a
    * coefficient, but there is a default value which denotes the constant
@@ -639,6 +641,8 @@ public:
     const types::material_id  material_id    = numbers::invalid_material_id,
     const Strategy            strategy       = cell_diameter_over_24);
 
+
+
   /**
    * Call the @p estimate function, see above, with
    * <tt>mapping=MappingQ1<1>()</tt>.
@@ -659,6 +663,8 @@ public:
     const types::subdomain_id subdomain_id   = numbers::invalid_subdomain_id,
     const types::material_id  material_id    = numbers::invalid_material_id,
     const Strategy            strategy       = cell_diameter_over_24);
+
+
 
   /**
    * Same function as above, but accepts more than one solution vectors and
@@ -691,6 +697,8 @@ public:
     const types::material_id  material_id  = numbers::invalid_material_id,
     const Strategy            strategy     = cell_diameter_over_24);
 
+
+
   /**
    * Call the @p estimate function, see above, with
    * <tt>mapping=MappingQ1<1>()</tt>.
@@ -713,6 +721,7 @@ public:
     const Strategy            strategy     = cell_diameter_over_24);
 
 
+
   /**
    * Equivalent to the set of functions above, except that this one takes a
    * quadrature collection for hp-finite element dof handlers.
@@ -736,6 +745,7 @@ public:
     const Strategy            strategy       = cell_diameter_over_24);
 
 
+
   /**
    * Equivalent to the set of functions above, except that this one takes a
    * quadrature collection for hp-finite element dof handlers.
@@ -756,6 +766,7 @@ public:
     const types::subdomain_id subdomain_id   = numbers::invalid_subdomain_id,
     const types::material_id  material_id    = numbers::invalid_material_id,
     const Strategy            strategy       = cell_diameter_over_24);
+
 
 
   /**
@@ -781,6 +792,7 @@ public:
     const Strategy            strategy     = cell_diameter_over_24);
 
 
+
   /**
    * Equivalent to the set of functions above, except that this one takes a
    * quadrature collection for hp-finite element dof handlers.
@@ -801,6 +813,8 @@ public:
     const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
     const types::material_id  material_id  = numbers::invalid_material_id,
     const Strategy            strategy     = cell_diameter_over_24);
+
+
 
   /**
    * Exception
@@ -813,6 +827,7 @@ public:
                    "of vector components of the finite element in use "
                    "by the DoFHandler object. In the latter case, at "
                    "least one component needs to be selected.");
+
   /**
    * Exception
    */
@@ -824,6 +839,7 @@ public:
     "scalar (has one vector component) or has as many vector "
     "components as there are in the finite element used by "
     "the DoFHandler argument.");
+
   /**
    * Exception
    */
@@ -837,6 +853,7 @@ public:
                     "element in use has "
                  << arg3
                  << " components, and these two numbers need to match.");
+
   /**
    * Exception
    */
@@ -847,6 +864,7 @@ public:
                  << " needs to be equal to the number of output vectors, "
                  << arg2
                  << ". This is not the case in your call of this function.");
+
   /**
    * Exception
    */
@@ -854,7 +872,6 @@ public:
                    "You need to specify at least one solution vector as "
                    "input.");
 };
-
 
 
 DEAL_II_NAMESPACE_CLOSE

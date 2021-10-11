@@ -55,7 +55,6 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-
 template <int spacedim>
 template <typename InputVector>
 void
@@ -199,6 +198,7 @@ KellyErrorEstimator<1, spacedim>::estimate(
 }
 
 
+
 template <int spacedim>
 template <typename InputVector>
 void
@@ -271,33 +271,9 @@ template <int spacedim>
 template <typename InputVector>
 void
 KellyErrorEstimator<1, spacedim>::estimate(
-  const Mapping<1, spacedim> & /*mapping*/,
-  const DoFHandler<1, spacedim> & /*dof_handler*/,
+  const Mapping<1, spacedim> &   mapping,
+  const DoFHandler<1, spacedim> &dof_handler,
   const hp::QCollection<0> &,
-  const std::map<types::boundary_id,
-                 const Function<spacedim, typename InputVector::value_type> *>
-    & /*neumann_bc*/,
-  const std::vector<const InputVector *> & /*solutions*/,
-  std::vector<Vector<float> *> & /*errors*/,
-  const ComponentMask & /*component_mask_*/,
-  const Function<spacedim> * /*coefficient*/,
-  const unsigned int,
-  const types::subdomain_id /*subdomain_id*/,
-  const types::material_id /*material_id*/,
-  const Strategy /*strategy*/)
-{
-  Assert(false, ExcInternalError());
-}
-
-
-
-template <int spacedim>
-template <typename InputVector>
-void
-KellyErrorEstimator<1, spacedim>::estimate(
-  const Mapping<1, spacedim> &   mapping,
-  const DoFHandler<1, spacedim> &dof_handler,
-  const Quadrature<0> &,
   const std::map<types::boundary_id,
                  const Function<spacedim, typename InputVector::value_type> *>
     &                                     neumann_bc,
@@ -546,6 +522,43 @@ KellyErrorEstimator<1, spacedim>::estimate(
             std::sqrt((*errors[s])(cell->active_cell_index()));
       }
 }
+
+
+
+template <int spacedim>
+template <typename InputVector>
+void
+KellyErrorEstimator<1, spacedim>::estimate(
+  const Mapping<1, spacedim> &   mapping,
+  const DoFHandler<1, spacedim> &dof_handler,
+  const Quadrature<0> &          quadrature,
+  const std::map<types::boundary_id,
+                 const Function<spacedim, typename InputVector::value_type> *>
+    &                                     neumann_bc,
+  const std::vector<const InputVector *> &solutions,
+  std::vector<Vector<float> *> &          errors,
+  const ComponentMask &                   component_mask,
+  const Function<spacedim> *              coefficients,
+  const unsigned int                      n_threads,
+  const types::subdomain_id               subdomain_id,
+  const types::material_id                material_id,
+  const Strategy                          strategy)
+{
+  const hp::QCollection<0> quadrature_collection(quadrature);
+  estimate(mapping,
+           dof_handler,
+           quadrature_collection,
+           neumann_bc,
+           solutions,
+           errors,
+           component_mask,
+           coefficients,
+           n_threads,
+           subdomain_id,
+           material_id,
+           strategy);
+}
+
 
 
 // explicit instantiations
