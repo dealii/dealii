@@ -1,0 +1,3 @@
+New: Deleted duplicate occurence of VectorTools::interpolate_boundary_values in setup_dofs().
+<br>
+(Raghunandan Pratoori, 2021/10/11)
