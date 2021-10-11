@@ -29,7 +29,7 @@
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/dofs/dof_tools.h>
 
-#include <deal.II/fe/fe_nedelec.h>
+#include <deal.II/fe/fe_nedelec_sz.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_values.h>
@@ -358,7 +358,6 @@ namespace Step81
     unsigned int refinements;
     unsigned int fe_order;
     unsigned int quadrature_order;
-    bool         postprocess;
     unsigned int n_outputs;
 
     void parse_parameters_callback();
@@ -366,7 +365,7 @@ namespace Step81
     void setup_system();
     void assemble_system();
     void solve();
-    void output_results(bool postprocess);
+    void output_results();
 
     Parameters<dim>            parameters;
     PerfectlyMatchedLayer<dim> perfectly_matched_layer;
@@ -413,9 +412,6 @@ namespace Step81
                   quadrature_order,
                   "order of the quadrature");
 
-    postprocess = true;
-    add_parameter("postprocess", postprocess, "solution postprocessing option");
-
     n_outputs = 2;
     add_parameter("number of outputs", n_outputs, "number of output images");
   }
@@ -424,7 +420,7 @@ namespace Step81
   template <int dim>
   void Maxwell<dim>::parse_parameters_callback()
   {
-    fe = std::make_unique<FESystem<dim>>(FE_Nedelec<dim>(fe_order), 2);
+    fe = std::make_unique<FESystem<dim>>(FE_NedelecSZ<dim>(fe_order), 2);
   }
 
 
@@ -702,7 +698,7 @@ namespace Step81
 
 
   template <int dim>
-  void Maxwell<dim>::output_results(bool postprocess)
+  void Maxwell<dim>::output_results()
   {
     DataOut<2> data_out;
     data_out.attach_dof_handler(dof_handler);
@@ -710,30 +706,6 @@ namespace Step81
     data_out.build_patches();
     std::ofstream output("solution.vtk");
     data_out.write_vtk(output);
-
-
-    if (postprocess)
-      {
-        for (unsigned int alpha = 1; alpha <= n_outputs; alpha++)
-          {
-            std::cout << "Running step:" << alpha << std::endl;
-            Vector<double> postprocessed;
-            postprocessed.reinit(solution);
-            for (unsigned int i = 0; i < dof_handler.n_dofs(); i += 2)
-              {
-                postprocessed[i] =
-                  std::cos(-2 / n_outputs * M_PI * alpha) * solution[i] +
-                  std::sin(-2 / n_outputs * M_PI * alpha) * solution[i + 1];
-              }
-            data_out.add_data_vector(postprocessed, "postprocessed");
-            data_out.build_patches();
-            const std::string filename =
-              "postprocessed-" + Utilities::int_to_string(alpha) + ".vtk";
-            std::ofstream output(filename);
-            data_out.write_vtk(output);
-            std::cout << "Done running step:" << alpha << std::endl;
-          }
-      }
   }
 
 
@@ -744,7 +716,7 @@ namespace Step81
     setup_system();
     assemble_system();
     solve();
-    output_results(postprocess);
+    output_results();
   }
 
 } // namespace Step81
