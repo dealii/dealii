@@ -301,7 +301,7 @@ namespace hp
       // 2.) Determine the number of cells for p-refinement and p-coarsening on
       //     basis of the flagged cells.
       //
-      // 3.) Find thresholds for p-refinment and p-coarsening on only those
+      // 3.) Find thresholds for p-refinement and p-coarsening on only those
       //     cells flagged for adaptation.
       //
       //     For cases in which no or all cells flagged for refinement and/or
