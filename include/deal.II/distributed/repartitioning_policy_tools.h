@@ -67,9 +67,20 @@ namespace RepartitioningPolicyTools
   class DefaultPolicy : public Base<dim, spacedim>
   {
   public:
+    /**
+     * Constructor.
+     *
+     * @param tighten allows to renumber of subdomains so that empty ranks are
+     *   positioned at the end.
+     */
+    DefaultPolicy(const bool tighten = false);
+
     virtual LinearAlgebra::distributed::Vector<double>
     partition(
       const Triangulation<dim, spacedim> &tria_coarse_in) const override;
+
+  private:
+    const bool tighten;
   };
 
   /**
