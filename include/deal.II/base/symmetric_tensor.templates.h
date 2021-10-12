@@ -759,15 +759,15 @@ namespace internal
         {
           case (0):
             R = dealii::Physics::Transformations::Rotations::rotation_matrix_3d(
-              {1, 0, 0}, rotation_angle);
+              Tensor<1, 3>({1., 0., 0.}), rotation_angle);
             break;
           case (1):
             R = dealii::Physics::Transformations::Rotations::rotation_matrix_3d(
-              {0, 1, 0}, rotation_angle);
+              Tensor<1, 3>({0., 1., 0.}), rotation_angle);
             break;
           case (2):
             R = dealii::Physics::Transformations::Rotations::rotation_matrix_3d(
-              {0, 0, 1}, rotation_angle);
+              Tensor<1, 3>({0., 0., 1.}), rotation_angle);
             break;
           default:
             AssertThrow(false, ExcNotImplemented());

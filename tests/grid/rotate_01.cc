@@ -65,11 +65,11 @@ test()
   GridGenerator::subdivided_parallelepiped<dim, spacedim>(tria, origin, edges);
 
   // GridOut().write_gnuplot (tria, deallog.get_file_stream());
-  GridTools::rotate(numbers::PI / 3.0, Point<3>({1., 0., 0.}), tria);
+  GridTools::rotate(Tensor<1, 3>({1., 0., 0.}), numbers::PI / 3.0, tria);
   // GridOut().write_gnuplot (tria, deallog.get_file_stream());
-  GridTools::rotate(numbers::PI / 10.0, Point<3>({0., 1., 0.}), tria);
+  GridTools::rotate(Tensor<1, 3>({0., 1., 0.}), numbers::PI / 10.0, tria);
   // GridOut().write_gnuplot (tria, deallog.get_file_stream());
-  GridTools::rotate(-numbers::PI / 5.0, Point<3>({0., 0., 1.}), tria);
+  GridTools::rotate(Tensor<1, 3>({0., 0., 1.}), -numbers::PI / 5.0, tria);
   GridOut().write_gnuplot(tria, deallog.get_file_stream());
 }
 

@@ -4940,7 +4940,7 @@ namespace GridGenerator
                                          n_slices,
                                          2 * half_length,
                                          triangulation);
-    GridTools::rotate(numbers::PI_2, Point<3>({0., 1., 0.}), triangulation);
+    GridTools::rotate(Tensor<1, 3>({0., 1., 0.}), numbers::PI_2, triangulation);
     GridTools::shift(Tensor<1, 3>({-half_length, 0.0, 0.0}), triangulation);
     // At this point we have a cylinder. Multiply the y and z coordinates by a
     // factor that scales (with x) linearly between radius_0 and radius_1 to fix

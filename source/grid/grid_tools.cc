@@ -1972,7 +1972,7 @@ namespace GridTools
     class Rotate3d
     {
     public:
-      Rotate3d(const double angle, const Point<3, double> &axis)
+      Rotate3d(const Tensor<1, 3, double> &axis, const double angle)
         : rotation_matrix(
             Physics::Transformations::Rotations::rotation_matrix_3d(axis,
                                                                     angle))
@@ -2019,11 +2019,11 @@ namespace GridTools
 
   template <int dim>
   void
-  rotate(const double            angle,
-         const Point<3, double> &axis,
-         Triangulation<dim, 3> & triangulation)
+  rotate(const Tensor<1, 3, double> &axis,
+         const double                angle,
+         Triangulation<dim, 3> &     triangulation)
   {
-    transform(internal::Rotate3d(angle, axis), triangulation);
+    transform(internal::Rotate3d(axis, angle), triangulation);
   }
 
 
@@ -2035,10 +2035,10 @@ namespace GridTools
   {
     Assert(axis < 3, ExcMessage("Invalid axis given!"));
 
-    Point<3, double> vector;
+    Tensor<1, 3, double> vector;
     vector[axis] = 1.;
 
-    transform(internal::Rotate3d(angle, vector), triangulation);
+    transform(internal::Rotate3d(vector, angle), triangulation);
   }
 
 

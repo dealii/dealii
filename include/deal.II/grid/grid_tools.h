@@ -569,9 +569,9 @@ namespace GridTools
    */
   template <int dim>
   void
-  rotate(const double            angle,
-         const Point<3, double> &axis,
-         Triangulation<dim, 3> & triangulation);
+  rotate(const Tensor<1, 3, double> &axis,
+         const double                angle,
+         Triangulation<dim, 3> &     triangulation);
 
   /**
    * Rotate all vertices of the given @p triangulation in counter-clockwise
