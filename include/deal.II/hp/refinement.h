@@ -689,7 +689,7 @@ namespace hp
      * flags.
      *
      * In detail, this function limits the level difference of neighboring cells
-     * and thus smoothess the overall function space. Future FE indices will be
+     * and thus smooths the overall function space. Future FE indices will be
      * raised (and never lowered) so that the level difference to neighboring
      * cells is never larger than @p max_difference.
      *
