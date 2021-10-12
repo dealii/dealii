@@ -252,6 +252,36 @@ class VectorizedArrayBase
 {
 public:
   /**
+   * Default constructor.
+   */
+  VectorizedArrayBase() = default;
+
+  /**
+   * Construct an array with the given initializer list.
+   */
+  template <typename U>
+  VectorizedArrayBase(const std::initializer_list<U> &list)
+  {
+    auto i0 = this->begin();
+    auto i1 = list.begin();
+
+    for (; i1 != list.end(); ++i0, ++i1)
+      {
+        Assert(
+          i0 != this->end(),
+          ExcMessage(
+            "Initializer list exceeds size of this VectorizedArray object."));
+
+        *i0 = *i1;
+      }
+
+    for (; i0 != this->end(); ++i0)
+      {
+        *i0 = 0.0;
+      }
+  }
+
+  /**
    * Return the number of elements in the array.
    */
   static constexpr std::size_t
@@ -412,6 +442,14 @@ public:
   {
     this->operator=(scalar);
   }
+
+  /**
+   * Construct an array with the given initializer list.
+   */
+  template <typename U>
+  VectorizedArray(const std::initializer_list<U> &list)
+    : VectorizedArrayBase<VectorizedArray<Number, width>, 1>(list)
+  {}
 
   /**
    * This function assigns a scalar to this class.
@@ -942,6 +980,14 @@ public:
   {
     this->operator=(scalar);
   }
+
+  /**
+   * Construct an array with the given initializer list.
+   */
+  template <typename U>
+  VectorizedArray(const std::initializer_list<U> &list)
+    : VectorizedArrayBase<VectorizedArray<double, 8>, 8>(list)
+  {}
 
   /**
    * This function can be used to set all data fields to a given scalar.
@@ -1491,6 +1537,14 @@ public:
   {
     this->operator=(scalar);
   }
+
+  /**
+   * Construct an array with the given initializer list.
+   */
+  template <typename U>
+  VectorizedArray(const std::initializer_list<U> &list)
+    : VectorizedArrayBase<VectorizedArray<float, 16>, 16>(list)
+  {}
 
   /**
    * This function can be used to set all data fields to a given scalar.
@@ -2138,6 +2192,14 @@ public:
   }
 
   /**
+   * Construct an array with the given initializer list.
+   */
+  template <typename U>
+  VectorizedArray(const std::initializer_list<U> &list)
+    : VectorizedArrayBase<VectorizedArray<double, 4>, 4>(list)
+  {}
+
+  /**
    * This function can be used to set all data fields to a given scalar.
    */
   DEAL_II_ALWAYS_INLINE
@@ -2644,6 +2706,14 @@ public:
   {
     this->operator=(scalar);
   }
+
+  /**
+   * Construct an array with the given initializer list.
+   */
+  template <typename U>
+  VectorizedArray(const std::initializer_list<U> &list)
+    : VectorizedArrayBase<VectorizedArray<float, 8>, 8>(list)
+  {}
 
   /**
    * This function can be used to set all data fields to a given scalar.
@@ -3188,6 +3258,14 @@ public:
   }
 
   /**
+   * Construct an array with the given initializer list.
+   */
+  template <typename U>
+  VectorizedArray(const std::initializer_list<U> &list)
+    : VectorizedArrayBase<VectorizedArray<double, 2>, 2>(list)
+  {}
+
+  /**
    * This function can be used to set all data fields to a given scalar.
    */
   DEAL_II_ALWAYS_INLINE
@@ -3628,6 +3706,14 @@ public:
   {
     this->operator=(scalar);
   }
+
+  /**
+   * Construct an array with the given initializer list.
+   */
+  template <typename U>
+  VectorizedArray(const std::initializer_list<U> &list)
+    : VectorizedArrayBase<VectorizedArray<float, 4>, 4>(list)
+  {}
 
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -4102,6 +4188,14 @@ public:
   }
 
   /**
+   * Construct an array with the given initializer list.
+   */
+  template <typename U>
+  VectorizedArray(const std::initializer_list<U> &list)
+    : VectorizedArrayBase<VectorizedArray<double, 2>, 2>(list)
+  {}
+
+  /**
    * This function assigns a scalar to this class.
    */
   DEAL_II_ALWAYS_INLINE
@@ -4336,6 +4430,14 @@ public:
   {
     this->operator=(scalar);
   }
+
+  /**
+   * Construct an array with the given initializer list.
+   */
+  template <typename U>
+  VectorizedArray(const std::initializer_list<U> &list)
+    : VectorizedArrayBase<VectorizedArray<float, 4>, 4>(list)
+  {}
 
   /**
    * This function assigns a scalar to this class.

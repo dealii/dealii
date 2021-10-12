@@ -1,0 +1,3 @@
+New: VectorizedArray can now be constructed from an initializer list.
+<br>
+(Peter Munch, 2021/10/08)
