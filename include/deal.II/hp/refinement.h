@@ -93,7 +93,7 @@ namespace hp
    * @p future_fe_indices will be used to update the data accordingly.
    * </ol>
    *
-   * As an example, a realisation of pure p-adaptive methods would look like the
+   * As an example, a realization of pure p-adaptive methods would look like the
    * following:
    * @code
    * // step 1: flag cells for refinement or coarsening
@@ -408,7 +408,7 @@ namespace hp
      * or decrease of the degree will thus change its value by a user-defined
      * control parameter @p gamma_p. The assumption of exponential convergence
      * is only valid if both h- and p-adaptive methods are combined in a sense
-     * that they are both utilitzed throughout a mesh, but do not have to be
+     * that they are both utilized throughout a mesh, but do not have to be
      * applied both on a cell simultaneously.
      *
      * The prediction algorithm is formulated as follows with control parameters
@@ -677,7 +677,7 @@ namespace hp
      */
 
     /**
-     * @name Optimiize p-level distribution
+     * @name Optimize p-level distribution
      * @{
      */
 
@@ -689,7 +689,7 @@ namespace hp
      * flags.
      *
      * In detail, this function limits the level difference of neighboring cells
-     * and thus smoothes the overall function space. Future FE indices will be
+     * and thus smoothess the overall function space. Future FE indices will be
      * raised (and never lowered) so that the level difference to neighboring
      * cells is never larger than @p max_difference.
      *
@@ -707,7 +707,7 @@ namespace hp
      * On cells that will be h-coarsened, we enforce the difference criterion as
      * if it is already a parent cell. That means, we set the level of all
      * siblings to the highest one among them. In that case, all sibling cells
-     * need to have the h-coarsenening flags set terminally via
+     * need to have the h-coarsening flags set terminally via
      * Triangulation::prepare_coarsening_and_refinement() beforehand. Otherwise
      * an assertion will be triggered.
      *
