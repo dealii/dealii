@@ -1,0 +1,5 @@
+Changed: The 3D implementation of GridTools::rotate() with an integer
+for a Cartesian coordinate direction has been superseded by the version
+that accepts unit vectors as rotation axes.
+<br>
+(Marc Fehling, 2021/10/11)

@@ -19,6 +19,7 @@
 // and on each of these transformed cells we evaluate the shape
 // functions.
 
+#include <deal.II/base/numbers.h>
 #include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/dofs/dof_accessor.h>
@@ -67,7 +68,7 @@ transform_grid(Triangulation<2> &tria, const unsigned int transform)
 
       // second test: rotate cell
       case 1:
-        GridTools::rotate(3.14159265358 / 2, tria);
+        GridTools::rotate(numbers::PI_2, tria);
         break;
 
       // third test: scale cell by a factor of 2
@@ -79,7 +80,7 @@ transform_grid(Triangulation<2> &tria, const unsigned int transform)
       // stretch
       case 3:
         GridTools::scale(.5, tria);
-        GridTools::rotate(-3.14159265358 / 2, tria);
+        GridTools::rotate(-numbers::PI_2, tria);
         GridTools::transform(&stretch_coordinates, tria);
 
         break;

@@ -56,6 +56,8 @@
 #include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/vector_tools_integrate_difference.h>
 
+#include <deal.II/physics/transformations.h>
+
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_real_distribution.hpp>
@@ -1970,32 +1972,22 @@ namespace GridTools
     class Rotate3d
     {
     public:
-      Rotate3d(const double angle, const unsigned int axis)
-        : angle(angle)
-        , axis(axis)
+      Rotate3d(const double angle, const Point<3, double> &axis)
+        : rotation_matrix(
+            Physics::Transformations::Rotations::rotation_matrix_3d(axis,
+                                                                    angle))
       {}
 
       Point<3>
       operator()(const Point<3> &p) const
       {
-        if (axis == 0)
-          return {p(0),
-                  std::cos(angle) * p(1) - std::sin(angle) * p(2),
-                  std::sin(angle) * p(1) + std::cos(angle) * p(2)};
-        else if (axis == 1)
-          return {std::cos(angle) * p(0) + std::sin(angle) * p(2),
-                  p(1),
-                  -std::sin(angle) * p(0) + std::cos(angle) * p(2)};
-        else
-          return {std::cos(angle) * p(0) - std::sin(angle) * p(1),
-                  std::sin(angle) * p(0) + std::cos(angle) * p(1),
-                  p(2)};
+        return static_cast<Point<3>>(rotation_matrix * p);
       }
 
     private:
-      const double       angle;
-      const unsigned int axis;
+      const Tensor<2, 3, double> rotation_matrix;
     };
+
 
     template <int spacedim>
     class Scale
@@ -2027,14 +2019,28 @@ namespace GridTools
 
   template <int dim>
   void
+  rotate(const double            angle,
+         const Point<3, double> &axis,
+         Triangulation<dim, 3> & triangulation)
+  {
+    transform(internal::Rotate3d(angle, axis), triangulation);
+  }
+
+
+  template <int dim>
+  void
   rotate(const double           angle,
          const unsigned int     axis,
          Triangulation<dim, 3> &triangulation)
   {
     Assert(axis < 3, ExcMessage("Invalid axis given!"));
 
-    transform(internal::Rotate3d(angle, axis), triangulation);
+    Point<3, double> vector;
+    vector[axis] = 1.;
+
+    transform(internal::Rotate3d(angle, vector), triangulation);
   }
+
 
   template <int dim, int spacedim>
   void

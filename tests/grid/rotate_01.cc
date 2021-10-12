@@ -15,6 +15,8 @@
 
 // test GridTools::rotate(), output is checked for correctness visually
 
+#include <deal.II/base/numbers.h>
+
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_tools.h>
@@ -63,11 +65,11 @@ test()
   GridGenerator::subdivided_parallelepiped<dim, spacedim>(tria, origin, edges);
 
   // GridOut().write_gnuplot (tria, deallog.get_file_stream());
-  GridTools::rotate(numbers::PI / 3.0, 0, tria);
+  GridTools::rotate(numbers::PI / 3.0, Point<3>({1., 0., 0.}), tria);
   // GridOut().write_gnuplot (tria, deallog.get_file_stream());
-  GridTools::rotate(numbers::PI / 10.0, 1, tria);
+  GridTools::rotate(numbers::PI / 10.0, Point<3>({0., 1., 0.}), tria);
   // GridOut().write_gnuplot (tria, deallog.get_file_stream());
-  GridTools::rotate(-numbers::PI / 5.0, 2, tria);
+  GridTools::rotate(-numbers::PI / 5.0, Point<3>({0., 0., 1.}), tria);
   GridOut().write_gnuplot(tria, deallog.get_file_stream());
 }
 
