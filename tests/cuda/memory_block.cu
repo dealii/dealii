@@ -70,7 +70,7 @@ test()
                                          memory_block_host.size(),
                                          check_functor_zero);
 
-  // Check
+  // Check reinit
   std::vector<double> vector(5);
   for (unsigned int i = 0; i < vector.size(); ++i)
     vector[i] = 2. * i;

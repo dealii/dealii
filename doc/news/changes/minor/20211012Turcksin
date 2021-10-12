@@ -1,0 +1,6 @@
+New: The new Utilities::MemorySpace namespace contains functions to help
+memory space independent code. The new MemoryBlock class allocates a
+block of memory on the host or the device. The underlying data can be accessed
+using ArrayView.
+<br>
+(Bruno Turcksin, 2021/10/12)
