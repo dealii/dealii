@@ -622,12 +622,12 @@ namespace Step70
     parallel::distributed::Triangulation<spacedim>      fluid_tria;
     parallel::distributed::Triangulation<dim, spacedim> solid_tria;
 
-    // Next come descriptions of the finite elements in use, along with
-    // appropriate quadrature formulas and the corresponding DoFHandler objects.
-    // For the current implementation, only `fluid_fe` is really necessary. For
-    // completeness, and to allow easy extension, we also keep the `solid_fe`
-    // around, which is however initialized to a FE_Nothing finite element
-    // space, i.e., one that has no degrees of freedom.
+    // Next come descriptions of the finite elements in use, along with the
+    // corresponding DoFHandler objects. For the current implementation, only
+    // `fluid_fe` is really necessary. For completeness, and to allow easy
+    // extension, we also keep the `solid_fe` around, which is however
+    // initialized to a FE_Nothing finite element space, i.e., one that has no
+    // degrees of freedom.
     //
     // We declare both finite element spaces as `std::unique_ptr` objects rather
     // than regular member variables, to allow their generation after
@@ -635,9 +635,6 @@ namespace Step70
     // they will be initialized in the `initial_setup()` method.
     std::unique_ptr<FiniteElement<spacedim>>      fluid_fe;
     std::unique_ptr<FiniteElement<dim, spacedim>> solid_fe;
-
-    std::unique_ptr<Quadrature<spacedim>> fluid_quadrature_formula;
-    std::unique_ptr<Quadrature<dim>>      solid_quadrature_formula;
 
     DoFHandler<spacedim>      fluid_dh;
     DoFHandler<dim, spacedim> solid_dh;
@@ -1202,11 +1199,6 @@ namespace Step70
 
     solid_fe = std::make_unique<FE_Nothing<dim, spacedim>>();
     solid_dh.distribute_dofs(*solid_fe);
-
-    fluid_quadrature_formula =
-      std::make_unique<QGauss<spacedim>>(par.velocity_degree + 1);
-    solid_quadrature_formula =
-      std::make_unique<QGauss<dim>>(par.velocity_degree + 1);
   }
 
 
@@ -1335,14 +1327,15 @@ namespace Step70
 
     TimerOutput::Scope t(computing_timer, "Assemble Stokes terms");
 
+    QGauss<spacedim>   quadrature_formula(fluid_fe->degree + 1);
     FEValues<spacedim> fe_values(*fluid_fe,
-                                 *fluid_quadrature_formula,
+                                 quadrature_formula,
                                  update_values | update_gradients |
                                    update_quadrature_points |
                                    update_JxW_values);
 
     const unsigned int dofs_per_cell = fluid_fe->n_dofs_per_cell();
-    const unsigned int n_q_points    = fluid_quadrature_formula->size();
+    const unsigned int n_q_points    = quadrature_formula.size();
 
     FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
     FullMatrix<double> cell_matrix2(dofs_per_cell, dofs_per_cell);
