@@ -33,6 +33,8 @@ namespace Utilities
 {
   /**
    * A namespace for utility structures for CUDA.
+   *
+   * @ingroup utilities
    */
   namespace CUDA
   {

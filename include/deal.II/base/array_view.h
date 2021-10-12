@@ -88,6 +88,11 @@ public:
   using value_type = ElementType;
 
   /**
+   * An alias that denotes the memory space of this conlainer-like class.
+   */
+  using memory_space = MemorySpaceType;
+
+  /**
    * An alias for iterators pointing into the array.
    */
   using iterator = value_type *;
@@ -132,6 +137,7 @@ public:
    * non-@p const view to a @p const view, akin to converting a non-@p const
    * pointer to a @p const pointer.
    */
+  DEAL_II_CUDA_HOST_DEV
   ArrayView(const ArrayView<typename std::remove_cv<value_type>::type,
                             MemorySpaceType> &view);
 
@@ -318,12 +324,9 @@ public:
    * <em>view object</em>. It may however return a reference to a non-@p const
    * memory location depending on whether the template type of the class is @p
    * const or not.
-   *
-   * This function is only allowed to be called if the underlying data is indeed
-   * stored in CPU memory.
    */
-  value_type &
-  operator[](const std::size_t i) const;
+  DEAL_II_CUDA_HOST_DEV value_type &
+                        operator[](const std::size_t i) const;
 
 private:
   /**
@@ -429,7 +432,8 @@ inline ArrayView<ElementType, MemorySpaceType>::ArrayView(ElementType &element)
 
 
 template <typename ElementType, typename MemorySpaceType>
-inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
+inline DEAL_II_CUDA_HOST_DEV
+ArrayView<ElementType, MemorySpaceType>::ArrayView(
   const ArrayView<typename std::remove_cv<value_type>::type, MemorySpaceType>
     &view)
   : starting_element(view.starting_element)
@@ -617,14 +621,13 @@ ArrayView<ElementType, MemorySpaceType>::cend() const
 
 
 template <typename ElementType, typename MemorySpaceType>
-inline typename ArrayView<ElementType, MemorySpaceType>::value_type &
-ArrayView<ElementType, MemorySpaceType>::operator[](const std::size_t i) const
+inline DEAL_II_CUDA_HOST_DEV
+  typename ArrayView<ElementType, MemorySpaceType>::value_type &
+  ArrayView<ElementType, MemorySpaceType>::operator[](const std::size_t i) const
 {
+#ifndef DEAL_II_COMPILER_CUDA_AWARE
   AssertIndexRange(i, n_elements);
-  Assert(
-    (std::is_same<MemorySpaceType, MemorySpace::Host>::value),
-    ExcMessage(
-      "Accessing elements is only allowed if the data is stored in CPU memory!"));
+#endif
 
   return *(starting_element + i);
 }
