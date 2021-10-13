@@ -317,9 +317,17 @@ DataOutFaces<dim, spacedim>::build_one_patch(
 
 template <int dim, int spacedim>
 void
-DataOutFaces<dim, spacedim>::build_patches(const unsigned int n_subdivisions_)
+DataOutFaces<dim, spacedim>::build_patches(const unsigned int n_subdivisions)
 {
-  build_patches(StaticMappingQ1<dim, spacedim>::mapping, n_subdivisions_);
+  if (this->triangulation->get_reference_cells().size() == 1)
+    build_patches(this->triangulation->get_reference_cells()[0]
+                    .template get_default_linear_mapping<dim, spacedim>(),
+                  n_subdivisions);
+  else
+    Assert(false,
+           ExcMessage("The DataOutFaces class can currently not be "
+                      "used on meshes that do not have the same cell type "
+                      "throughout."))
 }
 
 
@@ -418,8 +426,8 @@ DataOutFaces<dim, spacedim>::first_face()
   // simply find first active cell with a face on the boundary
   for (const auto &cell : this->triangulation->active_cell_iterators())
     if (cell->is_locally_owned())
-      for (const unsigned int f : GeometryInfo<dim>::face_indices())
-        if (!surface_only || cell->face(f)->at_boundary())
+      for (const unsigned int f : cell->face_indices())
+        if ((surface_only == false) || cell->face(f)->at_boundary())
           return FaceDescriptor(cell, f);
 
   // just return an invalid descriptor if we haven't found a locally
@@ -439,8 +447,7 @@ DataOutFaces<dim, spacedim>::next_face(const FaceDescriptor &old_face)
   // first check whether the present cell has more faces on the boundary. since
   // we started with this face, its cell must clearly be locally owned
   Assert(face.first->is_locally_owned(), ExcInternalError());
-  for (unsigned int f = face.second + 1; f < GeometryInfo<dim>::faces_per_cell;
-       ++f)
+  for (unsigned int f = face.second + 1; f < face.first->n_faces(); ++f)
     if (!surface_only || face.first->face(f)->at_boundary())
       // yup, that is so, so return it
       {
@@ -464,7 +471,7 @@ DataOutFaces<dim, spacedim>::next_face(const FaceDescriptor &old_face)
       // check all the faces of this active cell. but skip it altogether
       // if it isn't locally owned
       if (active_cell->is_locally_owned())
-        for (const unsigned int f : GeometryInfo<dim>::face_indices())
+        for (const unsigned int f : face.first->face_indices())
           if (!surface_only || active_cell->face(f)->at_boundary())
             {
               face.first  = active_cell;
