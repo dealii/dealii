@@ -147,7 +147,10 @@ template <int dim>
 void
 test(std::ostream & /*out*/)
 {
-  parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
+  parallel::distributed::Triangulation<dim> tr(
+    MPI_COMM_WORLD,
+    Triangulation<dim>::none,
+    parallel::distributed::Triangulation<dim>::communicate_vertices_to_p4est);
 
   create_disconnected_mesh(tr);
 

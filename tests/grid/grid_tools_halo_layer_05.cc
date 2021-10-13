@@ -64,7 +64,6 @@ write_vtk(const DoFHandler<dim> &dof_handler, const std::string filename)
   DataOut<dim> data_out;
   data_out.attach_dof_handler(dof_handler);
   data_out.add_data_vector(active_fe_index,
-
                            data_names,
                            DataOut<dim>::type_cell_data,
                            data_component_interpretation);
