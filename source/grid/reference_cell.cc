@@ -202,10 +202,11 @@ ReferenceCell::get_nodal_type_quadrature() const
   // desired type the first time we encounter a particular
   // reference cell
   const auto create_quadrature = [](const ReferenceCell &reference_cell) {
-    Triangulation<dim> tria;
-    GridGenerator::reference_cell(tria, reference_cell);
+    std::vector<Point<dim>> vertices(reference_cell.n_vertices());
+    for (const unsigned int v : reference_cell.vertex_indices())
+      vertices[v] = reference_cell.vertex<dim>(v);
 
-    return Quadrature<dim>(tria.get_vertices());
+    return Quadrature<dim>(vertices);
   };
 
   if (is_hyper_cube())

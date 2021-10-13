@@ -1743,67 +1743,31 @@ namespace GridGenerator
       {
         GridGenerator::hyper_cube(tria, 0, 1);
       }
-    else if ((dim == 2) && (reference_cell == ReferenceCells::Triangle))
-      {
-        const std::vector<Point<spacedim>> vertices = {
-          Point<spacedim>(),               // the origin
-          Point<spacedim>::unit_vector(0), // unit point along x-axis
-          Point<spacedim>::unit_vector(1)  // unit point along y-axis
-        };
-
-        std::vector<CellData<dim>> cells(1);
-        cells[0].vertices = {0, 1, 2};
-
-        tria.create_triangulation(vertices, cells, {});
-      }
-    else if ((dim == 3) && (reference_cell == ReferenceCells::Tetrahedron))
-      {
-        AssertDimension(spacedim, 3);
-
-        static const std::vector<Point<spacedim>> vertices = {
-          {{0.0, 0.0, 0.0}, {1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, {0.0, 0.0, 1.0}}};
-
-        std::vector<CellData<dim>> cells(1);
-        cells[0].vertices = {0, 1, 2, 3};
-
-        tria.create_triangulation(vertices, cells, {});
-      }
-    else if ((dim == 3) && (reference_cell == ReferenceCells::Pyramid))
-      {
-        AssertDimension(spacedim, 3);
-
-        static const std::vector<Point<spacedim>> vertices = {
-          {{-1.0, -1.0, 0.0},
-           {+1.0, -1.0, 0.0},
-           {-1.0, +1.0, 0.0},
-           {+1.0, +1.0, 0.0},
-           {+0.0, +0.0, 1.0}}};
-
-        std::vector<CellData<dim>> cells(1);
-        cells[0].vertices = {0, 1, 2, 3, 4};
-
-        tria.create_triangulation(vertices, cells, {});
-      }
-    else if ((dim == 3) && (reference_cell == ReferenceCells::Wedge))
-      {
-        AssertDimension(spacedim, 3);
-
-        static const std::vector<Point<spacedim>> vertices = {
-          {{1.0, 0.0, 0.0},
-           {0.0, 1.0, 0.0},
-           {0.0, 0.0, 0.0},
-           {1.0, 0.0, 1.0},
-           {0.0, 1.0, 1.0},
-           {0.0, 0.0, 1.0}}};
-
-        std::vector<CellData<dim>> cells(1);
-        cells[0].vertices = {0, 1, 2, 3, 4, 5};
-
-        tria.create_triangulation(vertices, cells, {});
-      }
     else
       {
-        Assert(false, ExcNotImplemented());
+        // Create an array that contains the vertices of the reference cell.
+        // We can query these points from ReferenceCell, but then we have
+        // to embed them into the spacedim-dimensional space.
+        std::vector<Point<spacedim>> vertices(reference_cell.n_vertices());
+        for (const unsigned int v : reference_cell.vertex_indices())
+          {
+            const Point<dim> this_vertex = reference_cell.vertex<dim>(v);
+            for (unsigned int d = 0; d < dim; ++d)
+              vertices[v][d] = this_vertex[d];
+            // Point<spacedim> initializes everything to zero, so any remaining
+            // elements are left at zero and we don't have to explicitly pad
+            // from 'dim' to 'spacedim' here.
+          }
+
+        // Then make one cell out of these vertices. They are ordered correctly
+        // already, so we just need to enumerate them
+        std::vector<CellData<dim>> cells(1);
+        cells[0].vertices.resize(reference_cell.n_vertices());
+        for (const unsigned int v : reference_cell.vertex_indices())
+          cells[0].vertices[v] = v;
+
+        // Turn all of this into a triangulation
+        tria.create_triangulation(vertices, cells, {});
       }
   }
 
