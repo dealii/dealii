@@ -1705,14 +1705,7 @@ namespace parallel
             Triangulation<dim, spacedim>::limit_level_difference_at_vertices) :
           smooth_grid,
         false)
-#  ifdef DEBUG
-      // Always communicate vertices to p4est in debug mode
-      , settings(
-          static_cast<Settings>(settings | communicate_vertices_to_p4est))
-#  else
       , settings(settings)
-#  endif
-
       , triangulation_has_content(false)
       , connectivity(nullptr)
       , parallel_forest(nullptr)
