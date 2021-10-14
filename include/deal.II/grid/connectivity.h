@@ -1491,6 +1491,23 @@ namespace internal
       // loop over cells and create CRS
       for (const auto &cell : cells)
         {
+#ifdef DEBUG
+          auto vertices_unique = cell.vertices;
+          std::sort(vertices_unique.begin(), vertices_unique.end());
+          vertices_unique.erase(std::unique(vertices_unique.begin(),
+                                            vertices_unique.end()),
+                                vertices_unique.end());
+
+          Assert(vertices_unique.size() == cell.vertices.size(),
+                 ExcMessage(
+                   "The definition of a cell refers to the same vertex several "
+                   "times. This is not possible. A common reason is that "
+                   "CellData::vertices has a size that does not match the "
+                   "size expected from the reference cell. Please resize "
+                   "CellData::vertices or use the appropriate constructor of "
+                   "CellData."));
+#endif
+
           const dealii::ReferenceCell reference_cell =
             dealii::ReferenceCell::n_vertices_to_type(dim,
                                                       cell.vertices.size());
