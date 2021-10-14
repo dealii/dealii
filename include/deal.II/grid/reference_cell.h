@@ -21,6 +21,7 @@
 #include <deal.II/base/array_view.h>
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/ndarray.h>
+#include <deal.II/base/point.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/utilities.h>
 
@@ -233,6 +234,17 @@ public:
    */
   std_cxx20::ranges::iota_view<unsigned int, unsigned int>
   vertex_indices() const;
+
+  /**
+   * Return the location of the `v`th vertex of the reference
+   * cell that corresponds to the current object.
+   *
+   * Because the ReferenceCell class does not have a `dim` argument,
+   * it has to be explicitly specified in the call to this function.
+   */
+  template <int dim>
+  Point<dim>
+  vertex(const unsigned int v) const;
 
   /**
    * Return the number of lines that make up the reference
@@ -848,6 +860,61 @@ ReferenceCell::n_lines() const
   return numbers::invalid_unsigned_int;
 }
 
+
+
+template <int dim>
+Point<dim>
+ReferenceCell::vertex(const unsigned int v) const
+{
+  AssertDimension(dim, get_dimension());
+  AssertIndexRange(v, n_vertices());
+
+  if (*this == ReferenceCells::get_hypercube<dim>())
+    {
+      return GeometryInfo<dim>::unit_cell_vertex(v);
+    }
+  else if ((dim == 2) && (*this == ReferenceCells::Triangle))
+    {
+      static const Point<dim> vertices[3] = {
+        Point<dim>(),               // the origin
+        Point<dim>::unit_vector(0), // unit point along x-axis
+        Point<dim>::unit_vector(1)  // unit point along y-axis
+      };
+      return vertices[v];
+    }
+  else if ((dim == 3) && (*this == ReferenceCells::Tetrahedron))
+    {
+      static const Point<dim> vertices[4] = {Point<dim>{0.0, 0.0, 0.0},
+                                             Point<dim>{1.0, 0.0, 0.0},
+                                             Point<dim>{0.0, 1.0, 0.0},
+                                             Point<dim>{0.0, 0.0, 1.0}};
+      return vertices[v];
+    }
+  else if ((dim == 3) && (*this == ReferenceCells::Pyramid))
+    {
+      static const Point<dim> vertices[5] = {Point<dim>{-1.0, -1.0, 0.0},
+                                             Point<dim>{+1.0, -1.0, 0.0},
+                                             Point<dim>{-1.0, +1.0, 0.0},
+                                             Point<dim>{+1.0, +1.0, 0.0},
+                                             Point<dim>{+0.0, +0.0, 1.0}};
+      return vertices[v];
+    }
+  else if ((dim == 3) && (*this == ReferenceCells::Wedge))
+    {
+      static const Point<dim> vertices[6] = {Point<dim>{1.0, 0.0, 0.0},
+                                             Point<dim>{0.0, 1.0, 0.0},
+                                             Point<dim>{0.0, 0.0, 0.0},
+                                             Point<dim>{1.0, 0.0, 1.0},
+                                             Point<dim>{0.0, 1.0, 1.0},
+                                             Point<dim>{0.0, 0.0, 1.0}};
+      return vertices[v];
+    }
+  else
+    {
+      Assert(false, ExcNotImplemented());
+      return Point<dim>();
+    }
+}
 
 
 inline unsigned int
