@@ -1443,14 +1443,14 @@ namespace parallel
 
       // Make sure we do the following computation in 64bit integers to be able
       // to handle 4GB+ files:
-      const MPI_Offset my_offset =
+      const MPI_Offset my_global_file_position =
         size_header + static_cast<MPI_Offset>(global_first_cell) *
                         sizes_fixed_cumulative.back();
 
       const char *data = src_data_fixed.data();
 
       ierr = MPI_File_write_at(fh,
-                               my_offset,
+                               my_global_file_position,
                                DEAL_II_MPI_CONST_CAST(data),
                                src_data_fixed.size(), // local buffer
                                MPI_CHAR,
@@ -1611,12 +1611,12 @@ namespace parallel
 
       // Make sure we do the following computation in 64bit integers to be able
       // to handle 4GB+ files:
-      const MPI_Offset my_offset =
+      const MPI_Offset my_global_file_position =
         size_header + static_cast<MPI_Offset>(global_first_cell) *
                         sizes_fixed_cumulative.back();
 
       ierr = MPI_File_read_at(fh,
-                              my_offset,
+                              my_global_file_position,
                               dest_data_fixed.data(),
                               dest_data_fixed.size(), // local buffer
                               MPI_CHAR,
