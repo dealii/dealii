@@ -273,6 +273,7 @@ namespace internal
 
           if (needs_wedge_setup)
             {
+              Assert(n_subdivisions == 1, ExcNotImplemented());
               quadrature_wedge = std::make_unique<Quadrature<dim>>(
                 FE_WedgeP<dim, spacedim>(
                   1 /*note: vtk only supports linear wedges*/)
@@ -281,8 +282,7 @@ namespace internal
 
           if (needs_pyramid_setup)
             {
-              Assert(1 <= n_subdivisions && n_subdivisions <= 2,
-                     ExcNotImplemented());
+              Assert(n_subdivisions == 1, ExcNotImplemented());
 
               std::vector<Point<dim>> points;
 
@@ -349,7 +349,7 @@ namespace internal
                 }
             }
         }
-      else
+      else // build FEFaceValues objects instead
         {
           dealii::hp::QCollection<dim - 1> quadrature(
             QIterated<dim - 1>(QTrapezoid<1>(), n_subdivisions));
