@@ -17,6 +17,7 @@
 #define dealii_mg_transfer_global_coarsening_h
 
 #include <deal.II/base/mg_level_object.h>
+#include <deal.II/base/vectorization.h>
 
 #include <deal.II/dofs/dof_handler.h>
 
