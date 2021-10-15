@@ -1248,8 +1248,8 @@ namespace internal
       //   (1) h-refinement
       transfer.schemes.resize(2);
 
-      // check if FE is the same; TODO: better way?
-      AssertDimension(fe_coarse.dofs_per_cell, fe_fine.dofs_per_cell);
+      // check if FE is the same
+      AssertDimension(fe_coarse.n_dofs_per_cell(), fe_fine.n_dofs_per_cell());
 
       // number of dofs on coarse and fine cells
       transfer.schemes[0].dofs_per_cell_coarse =
@@ -1898,7 +1898,9 @@ namespace internal
                      .reference_cell(),
                  ExcNotImplemented());
 
-          if (reference_cell == ReferenceCells::get_hypercube<dim>())
+          if (reference_cell == ReferenceCells::get_hypercube<dim>() &&
+              (dof_handler_coarse.get_fe(fe_index_pair.first) !=
+               dof_handler_fine.get_fe(fe_index_pair.second)))
             {
               const auto fe_fine = create_1D_fe(
                 dof_handler_fine.get_fe(fe_index_pair.second).base_element(0));
@@ -1966,7 +1968,9 @@ namespace internal
                       matrix(renumbering_coarse[i], renumbering_fine[j]);
               }
             }
-          else
+          else if (reference_cell != ReferenceCells::get_hypercube<dim>() &&
+                   (dof_handler_coarse.get_fe(fe_index_pair.first) !=
+                    dof_handler_fine.get_fe(fe_index_pair.second)))
             {
               const auto &fe_fine =
                 dof_handler_fine.get_fe(fe_index_pair.second).base_element(0);
@@ -2316,7 +2320,8 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
   for (const auto &scheme : schemes)
     {
       // identity -> take short cut and work directly on global vectors
-      if (scheme.degree_fine == scheme.degree_coarse)
+      if (scheme.prolongation_matrix.size() == 0 &&
+          scheme.prolongation_matrix_1d.size() == 0)
         {
           for (unsigned int cell = 0; cell < scheme.n_coarse_cells; ++cell)
             {
@@ -2467,7 +2472,8 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
   for (const auto &scheme : schemes)
     {
       // identity -> take short cut and work directly on global vectors
-      if (scheme.degree_fine == scheme.degree_coarse)
+      if (scheme.prolongation_matrix.size() == 0 &&
+          scheme.prolongation_matrix_1d.size() == 0)
         {
           for (unsigned int cell = 0; cell < scheme.n_coarse_cells; ++cell)
             {
@@ -2603,7 +2609,8 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
   for (const auto &scheme : schemes)
     {
       // identity -> take short cut and work directly on global vectors
-      if (scheme.degree_fine == scheme.degree_coarse)
+      if (scheme.restriction_matrix.size() == 0 &&
+          scheme.restriction_matrix_1d.size() == 0)
         {
           for (unsigned int cell = 0; cell < scheme.n_coarse_cells; ++cell)
             {
