@@ -1,0 +1,7 @@
+New: Added an interface to p4est_search.h (>=v2.2) to find the MPI
+rank of cells owning remote points without communication. This
+works in the special (but not uncommon) case that no nontrivial 
+manifold is attached to the triangulation, i.e., the triangulation
+has only FlatManifold attached to it.
+<br>
+(Konrad Simon, 2021/09/24)

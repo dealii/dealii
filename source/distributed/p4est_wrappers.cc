@@ -535,7 +535,21 @@ namespace internal
     void (&functions<2>::transfer_custom_end)(types<2>::transfer_context *tc) =
       p4est_transfer_custom_end;
 
+#  ifdef P4EST_SEARCH_LOCAL
+    void (&functions<2>::search_partition)(
+      types<2>::forest *                  p4est,
+      int                                 call_post,
+      types<2>::search_partition_callback quadrant_fn,
+      types<2>::search_partition_callback point_fn,
+      sc_array_t *                        points) = p4est_search_partition;
+#  endif
 
+    void (&functions<2>::quadrant_coord_to_vertex)(
+      types<2>::connectivity * connectivity,
+      types<2>::topidx         treeid,
+      types<2>::quadrant_coord x,
+      types<2>::quadrant_coord y,
+      double                   vxyz[3]) = p4est_qcoord_to_vertex;
 
     int (&functions<3>::quadrant_compare)(const void *v1, const void *v2) =
       p8est_quadrant_compare;
@@ -743,7 +757,22 @@ namespace internal
     void (&functions<3>::transfer_custom_end)(types<3>::transfer_context *tc) =
       p8est_transfer_custom_end;
 
+#  ifdef P4EST_SEARCH_LOCAL
+    void (&functions<3>::search_partition)(
+      types<3>::forest *                  p4est,
+      int                                 call_post,
+      types<3>::search_partition_callback quadrant_fn,
+      types<3>::search_partition_callback point_fn,
+      sc_array_t *                        points) = p8est_search_partition;
+#  endif
 
+    void (&functions<3>::quadrant_coord_to_vertex)(
+      types<3>::connectivity * connectivity,
+      types<3>::topidx         treeid,
+      types<3>::quadrant_coord x,
+      types<3>::quadrant_coord y,
+      types<3>::quadrant_coord z,
+      double                   vxyz[3]) = p8est_qcoord_to_vertex;
 
     template <int dim>
     void

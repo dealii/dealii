@@ -38,6 +38,11 @@ void
 write_vtk(const parallel::distributed::Triangulation<dim, spacedim> &tria,
           const char *                                               filename)
 {
+  AssertThrow(tria.are_vertices_communicated_to_p4est(),
+              ExcMessage("To use this function the flag "
+                         "Settings::communicate_vertices_to_p4est "
+                         "must be set in the triangulation."));
+
   deallog << "Checksum: " << tria.get_checksum() << std::endl;
 
   tria.write_mesh_vtk(filename);

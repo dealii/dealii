@@ -26,12 +26,14 @@
 #  include <p4est_extended.h>
 #  include <p4est_ghost.h>
 #  include <p4est_iterate.h>
+#  include <p4est_search.h>
 #  include <p4est_vtk.h>
 #  include <p8est_bits.h>
 #  include <p8est_communication.h>
 #  include <p8est_extended.h>
 #  include <p8est_ghost.h>
 #  include <p8est_iterate.h>
+#  include <p8est_search.h>
 #  include <p8est_vtk.h>
 
 #  include <map>
@@ -87,12 +89,16 @@ namespace internal
       using forest           = p4est_t;
       using tree             = p4est_tree_t;
       using quadrant         = p4est_quadrant_t;
+      using quadrant_coord   = p4est_qcoord_t;
       using topidx           = p4est_topidx_t;
       using locidx           = p4est_locidx_t;
       using gloidx           = p4est_gloidx_t;
       using balance_type     = p4est_connect_type_t;
       using ghost            = p4est_ghost_t;
       using transfer_context = p4est_transfer_context_t;
+#  ifdef P4EST_SEARCH_LOCAL
+      using search_partition_callback = p4est_search_partition_t;
+#  endif
     };
 
     template <>
@@ -102,12 +108,16 @@ namespace internal
       using forest           = p8est_t;
       using tree             = p8est_tree_t;
       using quadrant         = p8est_quadrant_t;
+      using quadrant_coord   = p4est_qcoord_t;
       using topidx           = p4est_topidx_t;
       using locidx           = p4est_locidx_t;
       using gloidx           = p4est_gloidx_t;
       using balance_type     = p8est_connect_type_t;
       using ghost            = p8est_ghost_t;
       using transfer_context = p8est_transfer_context_t;
+#  ifdef P4EST_SEARCH_LOCAL
+      using search_partition_callback = p8est_search_partition_t;
+#  endif
     };
 
 
@@ -306,6 +316,22 @@ namespace internal
         const int *             src_sizes);
 
       static void (&transfer_custom_end)(types<2>::transfer_context *tc);
+
+#  ifdef P4EST_SEARCH_LOCAL
+      static void (&search_partition)(
+        types<2>::forest *                  forest,
+        int                                 call_post,
+        types<2>::search_partition_callback quadrant_fn,
+        types<2>::search_partition_callback point_fn,
+        sc_array_t *                        points);
+#  endif
+
+      static void (&quadrant_coord_to_vertex)(
+        types<2>::connectivity * connectivity,
+        types<2>::topidx         treeid,
+        types<2>::quadrant_coord x,
+        types<2>::quadrant_coord y,
+        double                   vxyz[3]);
     };
 
 
@@ -490,6 +516,23 @@ namespace internal
         const int *             src_sizes);
 
       static void (&transfer_custom_end)(types<3>::transfer_context *tc);
+
+#  ifdef P4EST_SEARCH_LOCAL
+      static void (&search_partition)(
+        types<3>::forest *                  forest,
+        int                                 call_post,
+        types<3>::search_partition_callback quadrant_fn,
+        types<3>::search_partition_callback point_fn,
+        sc_array_t *                        points);
+#  endif
+
+      static void (&quadrant_coord_to_vertex)(
+        types<3>::connectivity * connectivity,
+        types<3>::topidx         treeid,
+        types<3>::quadrant_coord x,
+        types<3>::quadrant_coord y,
+        types<3>::quadrant_coord z,
+        double                   vxyz[3]);
     };
 
 
