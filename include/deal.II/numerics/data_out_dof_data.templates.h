@@ -237,13 +237,13 @@ namespace internal
                 const auto reference_cell = (*fe)[i].reference_cell();
 
                 if (reference_cell.is_hyper_cube())
-                  needs_hypercube_setup |= true;
+                  needs_hypercube_setup = true;
                 else if (reference_cell.is_simplex())
-                  needs_simplex_setup |= true;
+                  needs_simplex_setup = true;
                 else if (reference_cell == dealii::ReferenceCells::Wedge)
-                  needs_wedge_setup |= true;
+                  needs_wedge_setup = true;
                 else if (reference_cell == dealii::ReferenceCells::Pyramid)
-                  needs_pyramid_setup |= true;
+                  needs_pyramid_setup = true;
                 else
                   Assert(false, ExcNotImplemented());
               }
