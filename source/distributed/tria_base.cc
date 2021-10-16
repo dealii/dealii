@@ -1438,20 +1438,23 @@ namespace parallel
         }
 
       // Write packed data to file simultaneously.
-      const unsigned int offset_fixed =
+      const MPI_Offset size_header =
         sizes_fixed_cumulative.size() * sizeof(unsigned int);
+
+      // Make sure we do the following computation in 64bit integers to be able
+      // to handle 4GB+ files:
+      const MPI_Offset my_global_file_position =
+        size_header + static_cast<MPI_Offset>(global_first_cell) *
+                        sizes_fixed_cumulative.back();
 
       const char *data = src_data_fixed.data();
 
-      ierr = MPI_File_write_at(
-        fh,
-        offset_fixed +
-          global_first_cell *
-            sizes_fixed_cumulative.back(), // global position in file
-        DEAL_II_MPI_CONST_CAST(data),
-        src_data_fixed.size(), // local buffer
-        MPI_CHAR,
-        MPI_STATUS_IGNORE);
+      ierr = MPI_File_write_at(fh,
+                               my_global_file_position,
+                               DEAL_II_MPI_CONST_CAST(data),
+                               src_data_fixed.size(), // local buffer
+                               MPI_CHAR,
+                               MPI_STATUS_IGNORE);
       AssertThrowMPI(ierr);
 
       ierr = MPI_File_close(&fh);
@@ -1603,17 +1606,21 @@ namespace parallel
       dest_data_fixed.resize(local_num_cells * sizes_fixed_cumulative.back());
 
       // Read packed data from file simultaneously.
-      const unsigned int offset =
+      const MPI_Offset size_header =
         sizes_fixed_cumulative.size() * sizeof(unsigned int);
 
-      ierr = MPI_File_read_at(
-        fh,
-        offset + global_first_cell *
-                   sizes_fixed_cumulative.back(), // global position in file
-        dest_data_fixed.data(),
-        dest_data_fixed.size(), // local buffer
-        MPI_CHAR,
-        MPI_STATUS_IGNORE);
+      // Make sure we do the following computation in 64bit integers to be able
+      // to handle 4GB+ files:
+      const MPI_Offset my_global_file_position =
+        size_header + static_cast<MPI_Offset>(global_first_cell) *
+                        sizes_fixed_cumulative.back();
+
+      ierr = MPI_File_read_at(fh,
+                              my_global_file_position,
+                              dest_data_fixed.data(),
+                              dest_data_fixed.size(), // local buffer
+                              MPI_CHAR,
+                              MPI_STATUS_IGNORE);
       AssertThrowMPI(ierr);
 
       ierr = MPI_File_close(&fh);
