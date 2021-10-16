@@ -131,6 +131,11 @@ public:
   FE_Q_iso_Q1(const unsigned int n_subdivisions);
 
   /**
+   * Construct a FE_Q_iso_Q1 element with a given vector of support points.
+   */
+  FE_Q_iso_Q1(const std::vector<Point<1>> &support_points);
+
+  /**
    * Return a string that uniquely identifies a finite element. This class
    * returns <tt>FE_Q_iso_q1<dim>(equivalent_degree)</tt>, with @p dim and @p
    * equivalent_degree replaced by appropriate values.

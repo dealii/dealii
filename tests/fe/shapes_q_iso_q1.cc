@@ -42,6 +42,16 @@ plot_FE_Q_shape_functions()
   plot_face_shape_functions(m, q2, "Q2_iso_Q1");
   test_compute_functions(m, q2, "Q2_iso_Q1");
 
+  FE_Q_iso_Q1<dim> q1_gl(QGaussLobatto<1>(2).get_points());
+  plot_shape_functions(m, q1_gl, "Q1_gl");
+  plot_face_shape_functions(m, q1_gl, "Q1_gl");
+  test_compute_functions(m, q1_gl, "Q1_gl");
+
+  FE_Q_iso_Q1<dim> q2_gl(QGaussLobatto<1>(3).get_points());
+  plot_shape_functions(m, q2_gl, "Q2_iso_Q1_gl");
+  plot_face_shape_functions(m, q2_gl, "Q2_iso_Q1_gl");
+  test_compute_functions(m, q2_gl, "Q2_iso_Q1_gl");
+
   // skip the following tests to
   // reduce run-time
   if (dim < 3)
@@ -55,6 +65,16 @@ plot_FE_Q_shape_functions()
       plot_shape_functions(m, q4, "Q4_iso_Q1");
       plot_face_shape_functions(m, q4, "Q4_iso_Q1");
       test_compute_functions(m, q4, "Q4_iso_Q1");
+
+      FE_Q_iso_Q1<dim> q3_gl(QGaussLobatto<1>(4).get_points());
+      plot_shape_functions(m, q3_gl, "Q3_iso_Q1_gl");
+      plot_face_shape_functions(m, q3_gl, "Q3_iso_Q1_gl");
+      test_compute_functions(m, q3_gl, "Q3_iso_Q1_gl");
+
+      FE_Q_iso_Q1<dim> q4_gl(QGaussLobatto<1>(5).get_points());
+      plot_shape_functions(m, q4_gl, "Q4_iso_Q1_gl");
+      plot_face_shape_functions(m, q4_gl, "Q4_iso_Q1_gl");
+      test_compute_functions(m, q4_gl, "Q4_iso_Q1_gl");
     };
 }
 

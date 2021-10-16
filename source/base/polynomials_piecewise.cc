@@ -33,9 +33,34 @@ namespace Polynomials
     , n_intervals(n_intervals)
     , interval(interval)
     , spans_two_intervals(spans_next_interval)
+    , index(numbers::invalid_unsigned_int)
   {
     Assert(n_intervals > 0, ExcMessage("No intervals given"));
     AssertIndexRange(interval, n_intervals);
+  }
+
+
+
+  template <typename number>
+  PiecewisePolynomial<number>::PiecewisePolynomial(
+    const std::vector<Point<1, number>> &points,
+    const unsigned int                   index)
+    : n_intervals(numbers::invalid_unsigned_int)
+    , interval(numbers::invalid_unsigned_int)
+    , spans_two_intervals(false)
+    , index(index)
+  {
+    Assert(points.size() > 1, ExcMessage("No enough points given!"));
+    AssertIndexRange(index, points.size());
+
+    this->points.resize(points.size());
+    for (unsigned int i = 0; i < points.size(); ++i)
+      this->points[i] = points[i][0];
+
+    this->one_over_lengths.resize(points.size() - 1);
+    for (unsigned int i = 0; i < points.size() - 1; ++i)
+      this->one_over_lengths[i] =
+        number(1.0) / (points[i + 1][0] - points[i][0]);
   }
 
 
@@ -58,6 +83,36 @@ namespace Polynomials
                                      const unsigned int n_derivatives,
                                      number *           values) const
   {
+    if (points.size() > 0)
+      {
+        if (x > points[index])
+          values[0] = std::max<number>(0.0,
+                                       1.0 - (x - points[index]) *
+                                               one_over_lengths[index]);
+        else if (x < points[index])
+          values[0] = std::max<number>(0.0,
+                                       0.0 + (x - points[index - 1]) *
+                                               one_over_lengths[index - 1]);
+        else
+          values[0] = 1.0;
+
+        if (n_derivatives >= 1)
+          {
+            if ((x > points[index]) && (points[index + 1] >= x))
+              values[1] = -1.0 * one_over_lengths[index];
+            else if ((x < points[index]) && (points[index - 1] <= x))
+              values[1] = +1.0 * one_over_lengths[index - 1];
+            else
+              values[1] = 0.0;
+          }
+
+        // all other derivatives are zero
+        for (unsigned int i = 2; i <= n_derivatives; ++i)
+          values[i] = 0.0;
+
+        return;
+      }
+
     // shift polynomial if necessary
     number y                      = x;
     double derivative_change_sign = 1.;
@@ -125,7 +180,9 @@ namespace Polynomials
     return (polynomial.memory_consumption() +
             MemoryConsumption::memory_consumption(n_intervals) +
             MemoryConsumption::memory_consumption(interval) +
-            MemoryConsumption::memory_consumption(spans_two_intervals));
+            MemoryConsumption::memory_consumption(spans_two_intervals) +
+            MemoryConsumption::memory_consumption(points) +
+            MemoryConsumption::memory_consumption(index));
   }
 
 
@@ -150,6 +207,21 @@ namespace Polynomials
                        n_subdivisions,
                        s,
                        i == (base_degree - 1) && s < n_subdivisions - 1);
+    return p;
+  }
+
+
+
+  std::vector<PiecewisePolynomial<double>>
+  generate_complete_linear_basis_on_subdivisions(
+    const std::vector<Point<1>> &points)
+  {
+    std::vector<PiecewisePolynomial<double>> p;
+    p.reserve(points.size());
+
+    for (unsigned int s = 0; s < points.size(); ++s)
+      p.emplace_back(points, s);
+
     return p;
   }
 
