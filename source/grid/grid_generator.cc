@@ -2564,7 +2564,7 @@ namespace GridGenerator
       }
 
     // calculate deltas and validate input
-    std::vector<Point<spacedim>> delta(dim);
+    std::array<Point<spacedim>, dim> delta;
     for (unsigned int i = 0; i < dim; ++i)
       {
         Assert(repetitions[i] >= 1, ExcInvalidRepetitions(repetitions[i]));
@@ -3077,8 +3077,8 @@ namespace GridGenerator
 
     Assert(spacing.size() == dim, ExcInvalidRepetitionsDimension(dim));
 
-    std::vector<unsigned int> repetitions(dim);
-    double                    delta = std::numeric_limits<double>::max();
+    std::array<unsigned int, dim> repetitions;
+    double                        delta = std::numeric_limits<double>::max();
     for (unsigned int i = 0; i < dim; ++i)
       {
         repetitions[i] = spacing[i].size();
@@ -3192,8 +3192,8 @@ namespace GridGenerator
     // are >= 1, and calculate deltas
     // convert repetitions from double
     // to int by taking the ceiling.
-    std::vector<Point<spacedim>> delta(dim);
-    unsigned int                 repetitions[dim];
+    std::array<Point<spacedim>, dim> delta;
+    std::array<unsigned int, dim>    repetitions;
     for (unsigned int i = 0; i < dim; ++i)
       {
         Assert(holes[i] >= 1,
