@@ -640,8 +640,8 @@ namespace MatrixCreator
     Assert(matrix.n() == dof.n_dofs(),
            ExcDimensionMismatch(matrix.n(), dof.n_dofs()));
 
-    hp::FECollection<dim, spacedim>      fe_collection(dof.get_fe());
-    hp::QCollection<dim>                 q_collection(q);
+    const auto &         fe_collection = dof.get_fe_collection();
+    hp::QCollection<dim> q_collection(q);
     hp::MappingCollection<dim, spacedim> mapping_collection(mapping);
     MatrixCreator::internal::AssemblerData::Scratch<dim, spacedim, number>
       assembler_data(fe_collection,
@@ -715,8 +715,8 @@ namespace MatrixCreator
     Assert(matrix.n() == dof.n_dofs(),
            ExcDimensionMismatch(matrix.n(), dof.n_dofs()));
 
-    hp::FECollection<dim, spacedim>      fe_collection(dof.get_fe());
-    hp::QCollection<dim>                 q_collection(q);
+    const auto &         fe_collection = dof.get_fe_collection();
+    hp::QCollection<dim> q_collection(q);
     hp::MappingCollection<dim, spacedim> mapping_collection(mapping);
     MatrixCreator::internal::AssemblerData::Scratch<dim, spacedim, number>
       assembler_data(fe_collection,
@@ -1871,8 +1871,8 @@ namespace MatrixCreator
     Assert(matrix.n() == dof.n_dofs(),
            ExcDimensionMismatch(matrix.n(), dof.n_dofs()));
 
-    hp::FECollection<dim, spacedim>      fe_collection(dof.get_fe());
-    hp::QCollection<dim>                 q_collection(q);
+    const auto &         fe_collection = dof.get_fe_collection();
+    hp::QCollection<dim> q_collection(q);
     hp::MappingCollection<dim, spacedim> mapping_collection(mapping);
     MatrixCreator::internal::AssemblerData::Scratch<dim, spacedim, double>
       assembler_data(fe_collection,
@@ -1944,8 +1944,8 @@ namespace MatrixCreator
     Assert(matrix.n() == dof.n_dofs(),
            ExcDimensionMismatch(matrix.n(), dof.n_dofs()));
 
-    hp::FECollection<dim, spacedim>      fe_collection(dof.get_fe());
-    hp::QCollection<dim>                 q_collection(q);
+    const auto &         fe_collection = dof.get_fe_collection();
+    hp::QCollection<dim> q_collection(q);
     hp::MappingCollection<dim, spacedim> mapping_collection(mapping);
     MatrixCreator::internal::AssemblerData::Scratch<dim, spacedim, double>
       assembler_data(fe_collection,
