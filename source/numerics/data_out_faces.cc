@@ -99,31 +99,43 @@ DataOutFaces<dim, spacedim>::build_one_patch(
   internal::DataOutFacesImplementation::ParallelData<dim, spacedim> &data,
   DataOutBase::Patch<patch_dim, patch_spacedim> &                    patch)
 {
-  Assert(cell_and_face->first->is_locally_owned(), ExcNotImplemented());
+  const cell_iterator cell        = cell_and_face->first;
+  const unsigned int  face_number = cell_and_face->second;
 
-  // we use the mapping to transform the vertices. However, the mapping works
+  Assert(cell->is_locally_owned(), ExcNotImplemented());
+
+  // First set the kind of object we are dealing with here in the 'patch'
+  // object.
+  patch.reference_cell = cell->face(face_number)->reference_cell();
+
+  // We use the mapping to transform the vertices. However, the mapping works
   // on cells, not faces, so transform the face vertex to a cell vertex, that
   // to a unit cell vertex and then, finally, that to the mapped vertex. In
   // most cases this complicated procedure will be the identity.
   for (unsigned int vertex = 0;
        vertex < GeometryInfo<dim - 1>::vertices_per_cell;
        ++vertex)
-    patch.vertices[vertex] =
-      data.mapping_collection[0].transform_unit_to_real_cell(
-        cell_and_face->first,
-        GeometryInfo<dim>::unit_cell_vertex(
-          GeometryInfo<dim>::face_to_cell_vertices(
-            cell_and_face->second,
+    {
+      const Point<dim> vertex_reference_coordinates =
+        cell->reference_cell().template vertex<dim>(
+          cell->reference_cell().face_to_cell_vertices(
+            face_number,
             vertex,
-            cell_and_face->first->face_orientation(cell_and_face->second),
-            cell_and_face->first->face_flip(cell_and_face->second),
-            cell_and_face->first->face_rotation(cell_and_face->second))));
+            cell->face_orientation(face_number) +
+              4 * cell->face_flip(face_number) +
+              2 * cell->face_rotation(face_number)));
+
+      const Point<dim> vertex_real_coordinates =
+        data.mapping_collection[0].transform_unit_to_real_cell(
+          cell, vertex_reference_coordinates);
+
+      patch.vertices[vertex] = vertex_real_coordinates;
+    }
+
 
   if (data.n_datasets > 0)
     {
-      data.reinit_all_fe_values(this->dof_data,
-                                cell_and_face->first,
-                                cell_and_face->second);
+      data.reinit_all_fe_values(this->dof_data, cell, face_number);
       const FEValuesBase<dim> &fe_patch_values = data.get_present_fe_values(0);
 
       const unsigned int n_q_points = fe_patch_values.n_quadrature_points;
@@ -194,9 +206,9 @@ DataOutFaces<dim, spacedim>::build_one_patch(
                       this_fe_patch_values.get_normal_vectors();
 
                   const typename DoFHandler<dim, spacedim>::active_cell_iterator
-                    dh_cell(&cell_and_face->first->get_triangulation(),
-                            cell_and_face->first->level(),
-                            cell_and_face->first->index(),
+                    dh_cell(&cell->get_triangulation(),
+                            cell->level(),
+                            cell->index(),
                             this->dof_data[dataset]->dof_handler);
                   data.patch_values_scalar.template set_cell<dim>(dh_cell);
 
@@ -237,9 +249,9 @@ DataOutFaces<dim, spacedim>::build_one_patch(
                       this_fe_patch_values.get_normal_vectors();
 
                   const typename DoFHandler<dim, spacedim>::active_cell_iterator
-                    dh_cell(&cell_and_face->first->get_triangulation(),
-                            cell_and_face->first->level(),
-                            cell_and_face->first->index(),
+                    dh_cell(&cell->get_triangulation(),
+                            cell->level(),
+                            cell->index(),
                             this->dof_data[dataset]->dof_handler);
                   data.patch_values_system.template set_cell<dim>(dh_cell);
 
@@ -294,15 +306,14 @@ DataOutFaces<dim, spacedim>::build_one_patch(
           // belongs in order to access the cell data. this is not readily
           // available, so choose the following rather inefficient way:
           Assert(
-            cell_and_face->first->is_active(),
+            cell->is_active(),
             ExcMessage(
               "The current function is trying to generate cell-data output "
               "for a face that does not belong to an active cell. This is "
               "not supported."));
           const unsigned int cell_number = std::distance(
             this->triangulation->begin_active(),
-            typename Triangulation<dim, spacedim>::active_cell_iterator(
-              cell_and_face->first));
+            typename Triangulation<dim, spacedim>::active_cell_iterator(cell));
 
           const double value = this->cell_data[dataset]->get_cell_data_value(
             cell_number,
