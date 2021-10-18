@@ -374,6 +374,18 @@ public:
   QIterated(const Quadrature<1> &base_quadrature, const unsigned int n_copies);
 
   /**
+   * Constructor. Iterate the given quadrature formula on the given subintervals
+   * defined by adjacent points in @p intervals in each direction. The resulting
+   * quadrature rule will have `base_quadrature.size() * (intervals.size() - 1)`
+   * quadrature points if no quadrature point of `base_quadrature` is positioned
+   * on the boundaries.
+   *
+   * @note We require that `intervals.front() == 0` and `interval.back() == 1`.
+   */
+  QIterated(const Quadrature<1> &        base_quadrature,
+            const std::vector<Point<1>> &intervals);
+
+  /**
    * Exception
    */
   DeclExceptionMsg(ExcInvalidQuadratureFormula,
