@@ -52,6 +52,7 @@
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/data_out_dof_data.h>
 
+#include <algorithm>
 #include <memory>
 #include <string>
 #include <utility>
@@ -222,32 +223,68 @@ namespace internal
       std::vector<std::shared_ptr<dealii::hp::FEFaceValues<dim, spacedim>>>
         &x_fe_face_values)
     {
+      // First figure out which reference cell types are present in the
+      // FECollections we got as arguments. To this end, use a lambda
+      // function that for a FECollection object tests whether one of the
+      // elements uses a specific reference cell. Then use this
+      // lambda function in a std::any_of() call that accumulates over
+      // all of the FECollection objects we were given.
+      //
+      // Note that in 1d, we will count a line segment as a hypercube
+      // even though it is *also* a simplex. Furthermore, wedges and
+      // pyramids can only appear in 3d set ups, so we do not need
+      // to test there if dim<3.
+      static const auto has_fe_with_reference_cell =
+        [](const dealii::hp::FECollection<dim, spacedim> &fe_collection,
+           const dealii::ReferenceCell &                  reference_cell) {
+          for (unsigned int i = 0; i < fe_collection.size(); ++i)
+            if (fe_collection[i].reference_cell() == reference_cell)
+              return true;
+          return false;
+        };
+
+      const bool needs_hypercube_setup = std::any_of(
+        finite_elements.begin(),
+        finite_elements.end(),
+        [](const std::shared_ptr<dealii::hp::FECollection<dim, spacedim>>
+             &fe_collection) {
+          return has_fe_with_reference_cell(
+            *fe_collection, ReferenceCells::get_hypercube<dim>());
+        });
+      const bool needs_simplex_setup =
+        (dim > 1 &&
+         std::any_of(
+           finite_elements.begin(),
+           finite_elements.end(),
+           [](const std::shared_ptr<dealii::hp::FECollection<dim, spacedim>>
+                &fe_collection) {
+             return has_fe_with_reference_cell(
+               *fe_collection, ReferenceCells::get_simplex<dim>());
+           }));
+      const bool needs_wedge_setup =
+        (dim == 3 &&
+         std::any_of(
+           finite_elements.begin(),
+           finite_elements.end(),
+           [](const std::shared_ptr<dealii::hp::FECollection<dim, spacedim>>
+                &fe_collection) {
+             return has_fe_with_reference_cell(*fe_collection,
+                                               ReferenceCells::Wedge);
+           }));
+      const bool needs_pyramid_setup =
+        (dim == 3 &&
+         std::any_of(
+           finite_elements.begin(),
+           finite_elements.end(),
+           [](const std::shared_ptr<dealii::hp::FECollection<dim, spacedim>>
+                &fe_collection) {
+             return has_fe_with_reference_cell(*fe_collection,
+                                               ReferenceCells::Pyramid);
+           }));
+
       unsigned int n_q_points = 0;
       if (use_face_values == false)
         {
-          // determine if specific quadrature rules need to set up
-          bool needs_hypercube_setup = false;
-          bool needs_simplex_setup   = false;
-          bool needs_wedge_setup     = false;
-          bool needs_pyramid_setup   = false;
-
-          for (const auto &fe : finite_elements)
-            for (unsigned int i = 0; i < fe->size(); ++i)
-              {
-                const auto reference_cell = (*fe)[i].reference_cell();
-
-                if (reference_cell.is_hyper_cube())
-                  needs_hypercube_setup = true;
-                else if (reference_cell.is_simplex())
-                  needs_simplex_setup = true;
-                else if (reference_cell == dealii::ReferenceCells::Wedge)
-                  needs_wedge_setup = true;
-                else if (reference_cell == dealii::ReferenceCells::Pyramid)
-                  needs_pyramid_setup = true;
-                else
-                  Assert(false, ExcNotImplemented());
-              }
-
           std::unique_ptr<dealii::Quadrature<dim>> quadrature_simplex;
           std::unique_ptr<dealii::Quadrature<dim>> quadrature_hypercube;
           std::unique_ptr<dealii::Quadrature<dim>> quadrature_wedge;
