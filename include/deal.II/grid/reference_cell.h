@@ -884,10 +884,12 @@ ReferenceCell::vertex(const unsigned int v) const
     }
   else if ((dim == 3) && (*this == ReferenceCells::Tetrahedron))
     {
-      static const Point<dim> vertices[4] = {Point<dim>{0.0, 0.0, 0.0},
-                                             Point<dim>{1.0, 0.0, 0.0},
-                                             Point<dim>{0.0, 1.0, 0.0},
-                                             Point<dim>{0.0, 0.0, 1.0}};
+      static const Point<dim> vertices[4] = {
+        Point<dim>(),               // the origin
+        Point<dim>::unit_vector(0), // unit point along x-axis
+        Point<dim>::unit_vector(1), // unit point along y-axis
+        Point<dim>::unit_vector(2)  // unit point along z-axis
+      };
       return vertices[v];
     }
   else if ((dim == 3) && (*this == ReferenceCells::Pyramid))
