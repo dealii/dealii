@@ -939,12 +939,15 @@ ReferenceCell::vertex(const unsigned int v) const
     }
   else if ((dim == 3) && (*this == ReferenceCells::Wedge))
     {
-      static const Point<dim> vertices[6] = {Point<dim>{0.0, 0.0, 0.0},
-                                             Point<dim>{1.0, 0.0, 0.0},
-                                             Point<dim>{0.0, 1.0, 0.0},
-                                             Point<dim>{0.0, 0.0, 1.0},
-                                             Point<dim>{1.0, 0.0, 1.0},
-                                             Point<dim>{0.0, 1.0, 1.0}};
+      static const Point<dim> vertices[6] = {
+        // First the three points on the triangular base of the wedge:
+        Point<dim>(),
+        Point<dim>::unit_vector(0),
+        Point<dim>::unit_vector(1),
+        // And now everything shifted in the z-direction again
+        Point<dim>() + Point<dim>::unit_vector(2),
+        Point<dim>::unit_vector(0) + Point<dim>::unit_vector(2),
+        Point<dim>::unit_vector(1) + Point<dim>::unit_vector(2)};
       return vertices[v];
     }
   else
