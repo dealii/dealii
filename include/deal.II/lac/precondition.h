@@ -1011,10 +1011,21 @@ private:
  * @endcode
  * where the two given functions run before and after the matrix-vector
  * product, respectively. They take as arguments a sub-range among the locally
- * owned elements of the vector, and allow the matrix-vector product to return
- * an index range that fulfills all the requirements. For the example of a
- * class similar to the one in the step-37 tutorial program, the implementation
- * is
+ * owned elements of the vector, defined as half-open intervals. The intervals
+ * are designed to be scheduled close to the time the matrix-vector product
+ * touches upon the entries in the `src` and `dst` vectors, respectively, with
+ * the requirement that
+ * <ul>
+ * <li> the matrix-vector product may only access an entry in `src` or `dst`
+ * once the `operation_before_matrix_vector_product` has been run on that
+ * vector entry; </li>
+ * <li> `operation_after_matrix_vector_product` may first run once the
+ * matrix-vector product does not access the entries in `src` and `dst` any
+ * more. </li>
+ * </ul>
+ * The motivation for this function is to increase data locality and hence
+ * cache usage. For the example of a class similar to the one in the step-37
+ * tutorial program, the implementation is
  * @code
  * void
  * vmult(LinearAlgebra::distributed::Vector<number> &      dst,
@@ -1028,13 +1039,14 @@ private:
  *                  this,
  *                  dst,
  *                  src,
- *                  operation_before_loop,
- *                  operation_after_loop);
+ *                  operation_before_matrix_vector_product,
+ *                  operation_after_matrix_vector_product);
  * }
  * @endcode
  * In terms of the Chebyshev iteration, the operation before the loop will
  * set `dst` to zero, whereas the operation after the loop performs the
- * iteration leading to $x^{n+1}$ described above.
+ * iteration leading to $x^{n+1}$ described above, modifying the `dst` and
+ * `src` vectors.
  */
 template <typename MatrixType         = SparseMatrix<double>,
           typename VectorType         = Vector<double>,
