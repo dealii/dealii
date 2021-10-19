@@ -869,9 +869,45 @@ ReferenceCell::vertex(const unsigned int v) const
   AssertDimension(dim, get_dimension());
   AssertIndexRange(v, n_vertices());
 
-  if (*this == ReferenceCells::get_hypercube<dim>())
+  if ((dim == 0) && (*this == ReferenceCells::Vertex))
     {
-      return GeometryInfo<dim>::unit_cell_vertex(v);
+      return Point<dim>(0);
+    }
+  else if ((dim == 1) && (*this == ReferenceCells::Line))
+    {
+      static const Point<dim> vertices[2] = {
+        Point<dim>(),              // the origin
+        Point<dim>::unit_vector(0) // unit point along x-axis
+      };
+      return vertices[v];
+    }
+  else if ((dim == 2) && (*this == ReferenceCells::Quadrilateral))
+    {
+      static const Point<dim> vertices[4] = {
+        // First the two points on the x-axis
+        Point<dim>(),
+        Point<dim>::unit_vector(0),
+        // Then these two points shifted in the y-direction
+        Point<dim>() + Point<dim>::unit_vector(1),
+        Point<dim>::unit_vector(0) + Point<dim>::unit_vector(1)};
+      return vertices[v];
+    }
+  else if ((dim == 3) && (*this == ReferenceCells::Hexahedron))
+    {
+      static const Point<dim> vertices[8] = {
+        // First the two points on the x-axis
+        Point<dim>(),
+        Point<dim>::unit_vector(0),
+        // Then these two points shifted in the y-direction
+        Point<dim>() + Point<dim>::unit_vector(1),
+        Point<dim>::unit_vector(0) + Point<dim>::unit_vector(1),
+        // And now all four points shifted in the z-direction
+        Point<dim>() + Point<dim>::unit_vector(2),
+        Point<dim>::unit_vector(0) + Point<dim>::unit_vector(2),
+        Point<dim>() + Point<dim>::unit_vector(1) + Point<dim>::unit_vector(2),
+        Point<dim>::unit_vector(0) + Point<dim>::unit_vector(1) +
+          Point<dim>::unit_vector(2)};
+      return vertices[v];
     }
   else if ((dim == 2) && (*this == ReferenceCells::Triangle))
     {
