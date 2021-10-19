@@ -14,13 +14,13 @@
 // ---------------------------------------------------------------------
 
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/function_level_set.h>
+#include <deal.II/base/function_signed_distance.h>
 
 DEAL_II_NAMESPACE_OPEN
 
 namespace Functions
 {
-  namespace LevelSet
+  namespace SignedDistance
   {
     template <int dim>
     Sphere<dim>::Sphere(const Point<dim> &center, const double radius)
@@ -126,9 +126,9 @@ namespace Functions
       return SymmetricTensor<2, dim>();
     }
 
-  } // namespace LevelSet
+  } // namespace SignedDistance
 } // namespace Functions
 
-#include "function_level_set.inst"
+#include "function_signed_distance.inst"
 
 DEAL_II_NAMESPACE_CLOSE

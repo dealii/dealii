@@ -15,6 +15,6 @@
 
 for (deal_II_dimension : SPACE_DIMENSIONS)
   {
-    template class Functions::LevelSet::Sphere<deal_II_dimension>;
-    template class Functions::LevelSet::Plane<deal_II_dimension>;
+    template class Functions::SignedDistance::Sphere<deal_II_dimension>;
+    template class Functions::SignedDistance::Plane<deal_II_dimension>;
   }
