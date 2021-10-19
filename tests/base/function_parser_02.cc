@@ -21,6 +21,7 @@
 // recycle the test to use constants instead of units
 
 #include <deal.II/base/function_parser.h>
+#include <deal.II/base/numbers.h>
 #include <deal.II/base/point.h>
 
 #include <deal.II/lac/vector.h>
@@ -40,7 +41,7 @@ main()
   std::vector<std::string>      function(1);
   std::map<std::string, double> constants;
 
-  constants["PI"] = 3.141592654;
+  constants["PI"] = numbers::PI;
   constants["cm"] = 10;
   constants["m"]  = 1000;
 
