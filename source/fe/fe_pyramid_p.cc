@@ -95,15 +95,14 @@ FE_PyramidPoly<dim, spacedim>::FE_PyramidPoly(
 {
   AssertDimension(dim, 3);
 
-
   if (degree == 1)
     {
-      this->unit_support_points.emplace_back(-1.0, -1.0, 0.0);
-      this->unit_support_points.emplace_back(+1.0, -1.0, 0.0);
-      this->unit_support_points.emplace_back(-1.0, +1.0, 0.0);
-      this->unit_support_points.emplace_back(+1.0, +1.0, 0.0);
-      this->unit_support_points.emplace_back(+0.0, +0.0, 1.0);
+      for (const unsigned int i : ReferenceCells::Pyramid.vertex_indices())
+        this->unit_support_points.emplace_back(
+          ReferenceCells::Pyramid.vertex<dim>(i));
     }
+  else
+    Assert(false, ExcNotImplemented());
 }
 
 

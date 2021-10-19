@@ -80,6 +80,8 @@ namespace
   }
 } // namespace
 
+
+
 template <int dim, int spacedim>
 FE_WedgePoly<dim, spacedim>::FE_WedgePoly(
   const unsigned int                                degree,
@@ -105,12 +107,16 @@ FE_WedgePoly<dim, spacedim>::FE_WedgePoly(
 
   if (degree == 1)
     {
-      this->unit_support_points.emplace_back(0.0, 0.0, 0.0);
-      this->unit_support_points.emplace_back(1.0, 0.0, 0.0);
-      this->unit_support_points.emplace_back(0.0, 1.0, 0.0);
-      this->unit_support_points.emplace_back(0.0, 0.0, 1.0);
-      this->unit_support_points.emplace_back(1.0, 0.0, 1.0);
-      this->unit_support_points.emplace_back(0.0, 1.0, 1.0);
+      for (const unsigned int i : ReferenceCells::Wedge.vertex_indices())
+        this->unit_support_points.emplace_back(
+          ReferenceCells::Wedge.vertex<dim>(i));
+    }
+  else
+    {
+      // TODO: Wedge elements work for higher degrees, but we don't currently
+      // fill their support points. Leaving the array empty is valid, however,
+      // and will simply result in an error when someone tries to access the
+      // array.
     }
 }
 
