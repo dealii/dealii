@@ -976,8 +976,8 @@ private:
  *
  * <h4>Requirements on the templated classes</h4>
  *
- * The class MatrixType must be derived from Subscriptor because a
- * SmartPointer to MatrixType is held in the class. In particular, this means
+ * The class `MatrixType` must be derived from Subscriptor because a
+ * SmartPointer to `MatrixType` is held in the class. In particular, this means
  * that the matrix object needs to persist during the lifetime of
  * PreconditionChebyshev. The preconditioner is held in a shared_ptr that is
  * copied into the AdditionalData member variable of the class, so the
@@ -994,6 +994,59 @@ private:
  * entries that would be needed from the matrix alone), there is a backward
  * compatibility function that can extract the diagonal in case of a serial
  * computation.
+ *
+ * <h4>Optimized operations with specific `MatrixType` argument</h4>
+ *
+ * This class enables to embed the vector updates into the matrix-vector
+ * product in case the `MatrixType` supports this. To this end, the
+ * `VectorType` needs to be of type LinearAlgebra::distributed::Vector, the
+ * `PreconditionerType` needs to be DiagonalMatrix, and the class `MatrixType`
+ * needs to provide a function with the signature
+ * @code
+ * void MatrixType::vmult(
+ *    VectorType &,
+ *    const VectorType &,
+ *    const std::function<void(const unsigned int, const unsigned int)> &,
+ *    const std::function<void(const unsigned int, const unsigned int)> &) const
+ * @endcode
+ * where the two given functions run before and after the matrix-vector
+ * product, respectively. They take as arguments a sub-range among the locally
+ * owned elements of the vector, defined as half-open intervals. The intervals
+ * are designed to be scheduled close to the time the matrix-vector product
+ * touches upon the entries in the `src` and `dst` vectors, respectively, with
+ * the requirement that
+ * <ul>
+ * <li> the matrix-vector product may only access an entry in `src` or `dst`
+ * once the `operation_before_matrix_vector_product` has been run on that
+ * vector entry; </li>
+ * <li> `operation_after_matrix_vector_product` may first run once the
+ * matrix-vector product does not access the entries in `src` and `dst` any
+ * more. </li>
+ * </ul>
+ * The motivation for this function is to increase data locality and hence
+ * cache usage. For the example of a class similar to the one in the step-37
+ * tutorial program, the implementation is
+ * @code
+ * void
+ * vmult(LinearAlgebra::distributed::Vector<number> &      dst,
+ *       const LinearAlgebra::distributed::Vector<number> &src,
+ *       const std::function<void(const unsigned int, const unsigned int)>
+ *         &operation_before_loop,
+ *       const std::function<void(const unsigned int, const unsigned int)>
+ *         &operation_after_loop) const
+ * {
+ *   data.cell_loop(&LaplaceOperator::local_apply,
+ *                  this,
+ *                  dst,
+ *                  src,
+ *                  operation_before_matrix_vector_product,
+ *                  operation_after_matrix_vector_product);
+ * }
+ * @endcode
+ * In terms of the Chebyshev iteration, the operation before the loop will
+ * set `dst` to zero, whereas the operation after the loop performs the
+ * iteration leading to $x^{n+1}$ described above, modifying the `dst` and
+ * `src` vectors.
  */
 template <typename MatrixType         = SparseMatrix<double>,
           typename VectorType         = Vector<double>,
@@ -2036,6 +2089,148 @@ namespace internal
         solution.swap(solution_old);
     }
 
+    // Detector class to find out whether we have a vmult function that takes
+    // two additional std::function objects, which we use to run the operation
+    // on slices of the vector during the matrix-vector product
+    template <typename MatrixType,
+              typename VectorType,
+              typename PreconditionerType>
+    struct supports_vmult_with_std_functions
+    {
+    private:
+      // this will work always
+      static bool
+      detect(...);
+
+      // this detector will work only if we have
+      // "... MatrixType::vmult(VectorType, const VectorType,
+      // const std::function<...>&, const std::function<...>&) const"
+      template <typename MatrixType2>
+      static decltype(std::declval<MatrixType2 const>().vmult(
+        std::declval<VectorType &>(),
+        std::declval<const VectorType &>(),
+        std::declval<const std::function<void(const unsigned int,
+                                              const unsigned int)> &>(),
+        std::declval<const std::function<void(const unsigned int,
+                                              const unsigned int)> &>()))
+      detect(const MatrixType2 &);
+
+    public:
+      // finally here we check if our detector has void return type and
+      // fulfills additional requirements on the vector type and
+      // preconditioner. This will happen if the compiler can use the second
+      // detector, otherwise SFINAE let's it work with the more general first
+      // one that is bool
+      static const bool value =
+        !std::is_same<bool,
+                      decltype(detect(std::declval<MatrixType>()))>::value &&
+        std::is_same<PreconditionerType, DiagonalMatrix<VectorType>>::value &&
+        std::is_same<
+          VectorType,
+          LinearAlgebra::distributed::Vector<typename VectorType::value_type,
+                                             MemorySpace::Host>>::value;
+    };
+
+    // We need to have a separate declaration for static const members
+    template <typename T, typename U, typename V>
+    const bool supports_vmult_with_std_functions<T, U, V>::value;
+
+    template <typename MatrixType,
+              typename VectorType,
+              typename PreconditionerType,
+              typename std::enable_if<
+                !supports_vmult_with_std_functions<MatrixType,
+                                                   VectorType,
+                                                   PreconditionerType>::value,
+                int>::type * = nullptr>
+    inline void
+    vmult_and_update(const MatrixType &        matrix,
+                     const PreconditionerType &preconditioner,
+                     const VectorType &        rhs,
+                     const unsigned int        iteration_index,
+                     const double              factor1,
+                     const double              factor2,
+                     VectorType &              solution,
+                     VectorType &              solution_old,
+                     VectorType &              temp_vector1,
+                     VectorType &              temp_vector2)
+    {
+      if (iteration_index > 0)
+        matrix.vmult(temp_vector1, solution);
+      vector_updates(rhs,
+                     preconditioner,
+                     iteration_index,
+                     factor1,
+                     factor2,
+                     solution_old,
+                     temp_vector1,
+                     temp_vector2,
+                     solution);
+    }
+
+    template <typename MatrixType,
+              typename VectorType,
+              typename PreconditionerType,
+              typename std::enable_if<
+                supports_vmult_with_std_functions<MatrixType,
+                                                  VectorType,
+                                                  PreconditionerType>::value,
+                int>::type * = nullptr>
+    inline void
+    vmult_and_update(const MatrixType &        matrix,
+                     const PreconditionerType &preconditioner,
+                     const VectorType &        rhs,
+                     const unsigned int        iteration_index,
+                     const double              factor1,
+                     const double              factor2,
+                     VectorType &              solution,
+                     VectorType &              solution_old,
+                     VectorType &              temp_vector1,
+                     VectorType &)
+    {
+      using Number = typename VectorType::value_type;
+      VectorUpdater<Number> updater(rhs.begin(),
+                                    preconditioner.get_vector().begin(),
+                                    iteration_index,
+                                    factor1,
+                                    factor2,
+                                    solution_old.begin(),
+                                    temp_vector1.begin(),
+                                    solution.begin());
+      if (iteration_index > 0)
+        matrix.vmult(
+          temp_vector1,
+          solution,
+          [&](const unsigned int start_range, const unsigned int end_range) {
+            // zero 'temp_vector1' before running the vmult
+            // operation
+            if (end_range > start_range)
+              std::memset(temp_vector1.begin() + start_range,
+                          0,
+                          sizeof(Number) * (end_range - start_range));
+          },
+          [&](const unsigned int start_range, const unsigned int end_range) {
+            if (end_range > start_range)
+              updater.apply_to_subrange(start_range, end_range);
+          });
+      else
+        updater.apply_to_subrange(0U, solution.locally_owned_size());
+
+      // swap vectors x^{n+1}->x^{n}, given the updates in the function above
+      if (iteration_index == 0)
+        {
+          // nothing to do here because we can immediately write into the
+          // solution vector without remembering any of the other vectors
+        }
+      else if (iteration_index == 1)
+        {
+          solution.swap(temp_vector1);
+          solution_old.swap(temp_vector1);
+        }
+      else
+        solution.swap(solution_old);
+    }
+
     template <typename MatrixType, typename PreconditionerType>
     inline void
     initialize_preconditioner(
@@ -2421,16 +2616,17 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::vmult(
   if (eigenvalues_are_initialized == false)
     estimate_eigenvalues(rhs);
 
-  internal::PreconditionChebyshevImplementation::vector_updates(
-    rhs,
+  internal::PreconditionChebyshevImplementation::vmult_and_update(
+    *matrix_ptr,
     *data.preconditioner,
+    rhs,
     0,
     0.,
     1. / theta,
+    solution,
     solution_old,
     temp_vector1,
-    temp_vector2,
-    solution);
+    temp_vector2);
 
   // if delta is zero, we do not need to iterate because the updates will be
   // zero
@@ -2440,20 +2636,20 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::vmult(
   double rhok = delta / theta, sigma = theta / delta;
   for (unsigned int k = 0; k < data.degree - 1; ++k)
     {
-      matrix_ptr->vmult(temp_vector1, solution);
       const double rhokp   = 1. / (2. * sigma - rhok);
       const double factor1 = rhokp * rhok, factor2 = 2. * rhokp / delta;
       rhok = rhokp;
-      internal::PreconditionChebyshevImplementation::vector_updates(
-        rhs,
+      internal::PreconditionChebyshevImplementation::vmult_and_update(
+        *matrix_ptr,
         *data.preconditioner,
+        rhs,
         k + 1,
         factor1,
         factor2,
+        solution,
         solution_old,
         temp_vector1,
-        temp_vector2,
-        solution);
+        temp_vector2);
     }
 }
 
@@ -2486,10 +2682,10 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::Tvmult(
   double rhok = delta / theta, sigma = theta / delta;
   for (unsigned int k = 0; k < data.degree - 1; ++k)
     {
-      matrix_ptr->Tvmult(temp_vector1, solution);
       const double rhokp   = 1. / (2. * sigma - rhok);
       const double factor1 = rhokp * rhok, factor2 = 2. * rhokp / delta;
       rhok = rhokp;
+      matrix_ptr->Tvmult(temp_vector1, solution);
       internal::PreconditionChebyshevImplementation::vector_updates(
         rhs,
         *data.preconditioner,
@@ -2515,17 +2711,17 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::step(
   if (eigenvalues_are_initialized == false)
     estimate_eigenvalues(rhs);
 
-  matrix_ptr->vmult(temp_vector1, solution);
-  internal::PreconditionChebyshevImplementation::vector_updates(
-    rhs,
+  internal::PreconditionChebyshevImplementation::vmult_and_update(
+    *matrix_ptr,
     *data.preconditioner,
+    rhs,
     1,
     0.,
     1. / theta,
+    solution,
     solution_old,
     temp_vector1,
-    temp_vector2,
-    solution);
+    temp_vector2);
 
   if (data.degree < 2 || std::abs(delta) < 1e-40)
     return;
@@ -2533,20 +2729,20 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::step(
   double rhok = delta / theta, sigma = theta / delta;
   for (unsigned int k = 0; k < data.degree - 1; ++k)
     {
-      matrix_ptr->vmult(temp_vector1, solution);
       const double rhokp   = 1. / (2. * sigma - rhok);
       const double factor1 = rhokp * rhok, factor2 = 2. * rhokp / delta;
       rhok = rhokp;
-      internal::PreconditionChebyshevImplementation::vector_updates(
-        rhs,
+      internal::PreconditionChebyshevImplementation::vmult_and_update(
+        *matrix_ptr,
         *data.preconditioner,
+        rhs,
         k + 2,
         factor1,
         factor2,
+        solution,
         solution_old,
         temp_vector1,
-        temp_vector2,
-        solution);
+        temp_vector2);
     }
 }
 
@@ -2580,10 +2776,10 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::Tstep(
   double rhok = delta / theta, sigma = theta / delta;
   for (unsigned int k = 0; k < data.degree - 1; ++k)
     {
-      matrix_ptr->Tvmult(temp_vector1, solution);
       const double rhokp   = 1. / (2. * sigma - rhok);
       const double factor1 = rhokp * rhok, factor2 = 2. * rhokp / delta;
       rhok = rhokp;
+      matrix_ptr->Tvmult(temp_vector1, solution);
       internal::PreconditionChebyshevImplementation::vector_updates(
         rhs,
         *data.preconditioner,
