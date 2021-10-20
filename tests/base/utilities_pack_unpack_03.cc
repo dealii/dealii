@@ -18,6 +18,7 @@
 // for trivially-copyable (small) types, packing is just a memcpy
 // operation
 
+#include <deal.II/base/numbers.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/utilities.h>
 
@@ -80,7 +81,7 @@ test()
   deallog << "std::array:" << std::endl;
   check(std::array<int, 3>{{1, 2, 3}});
   deallog << "struct X:" << std::endl;
-  check(X{1, 2, 3.1415926});
+  check(X{1, 2, numbers::PI});
   deallog << "double:" << std::endl;
   check(1.);
 }

@@ -19,6 +19,7 @@
 
 
 #include <deal.II/base/function.h>
+#include <deal.II/base/numbers.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/table_handler.h>
 
@@ -180,8 +181,7 @@ LaplaceProblem<dim>::assemble_and_solve()
 
   output_table.add_value("cells", triangulation.n_active_cells());
   output_table.add_value("|u|_1", norm);
-  output_table.add_value("error",
-                         std::fabs(norm - std::sqrt(3.14159265358 / 2)));
+  output_table.add_value("error", std::fabs(norm - std::sqrt(numbers::PI_2)));
 }
 
 

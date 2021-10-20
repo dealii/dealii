@@ -21,6 +21,7 @@
 // of course, it makes absolutely no sense to work the Stokes equation
 // with a Nedelec element, but this is just to test the library, no?
 
+#include <deal.II/base/numbers.h>
 #include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/dofs/dof_accessor.h>
@@ -73,7 +74,7 @@ create_stokes_matrix_2(const DoFHandler<dim> &dof_handler,
                           quadrature,
                           update_values | update_gradients | update_JxW_values);
 
-  const double nu = 3.14159265358e-2;
+  const double nu = 0.01 * numbers::PI;
 
   for (; cell != endc; ++cell)
     {
@@ -147,7 +148,7 @@ create_stokes_matrix_3(const DoFHandler<dim> &dof_handler,
                           quadrature,
                           update_values | update_gradients | update_JxW_values);
 
-  const double nu = 3.14159265358e-2;
+  const double nu = 0.01 * numbers::PI;
 
   for (; cell != endc; ++cell)
     {

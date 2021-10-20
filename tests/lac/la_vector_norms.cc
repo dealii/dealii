@@ -18,6 +18,8 @@
 // (check the summation algorithm), including an accuracy test (should not
 // lose more than 1 decimal also for 200000 vector entries)
 
+#include <deal.II/base/numbers.h>
+
 #include <deal.II/lac/la_vector.h>
 
 #include "../tests.h"
@@ -45,7 +47,7 @@ check_norms()
                   ExcInternalError());
 
       // test accuracy of summation
-      const long double value = 3.14159265358979323846;
+      constexpr long double value = numbers::PI;
       for (unsigned int i = 0; i < size; ++i)
         vec[i] = (number)value;
       const number l1_norma = vec.l1_norm();
@@ -83,7 +85,7 @@ check_complex_norms()
       AssertThrow(std::abs(l1_norm - sum) < acc * sum, ExcInternalError());
 
       // test accuracy of summation
-      const std::complex<long double> value(3.14159265358979323846, 0.1);
+      constexpr std::complex<long double> value(numbers::PI, 0.1);
       for (unsigned int i = 0; i < size; ++i)
         vec[i] = std::complex<number>(value);
       const number l1_norma = vec.l1_norm();
