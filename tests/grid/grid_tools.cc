@@ -15,6 +15,8 @@
 
 
 
+#include <deal.II/base/numbers.h>
+
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_tools.h>
@@ -77,7 +79,7 @@ test2()
   GridOut().write_gnuplot(tria, logfile);
 
   logfile << "Rotated grid:" << std::endl;
-  GridTools::rotate(3.14159265258 / 4, tria);
+  GridTools::rotate(numbers::PI_4, tria);
   GridOut().write_gnuplot(tria, logfile);
 }
 

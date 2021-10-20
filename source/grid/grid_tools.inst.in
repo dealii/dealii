@@ -273,6 +273,12 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
 #  if deal_II_space_dimension == 3
       template void
       rotate<deal_II_dimension>(
+        const Tensor<1, deal_II_space_dimension, double> &,
+        const double,
+        Triangulation<deal_II_dimension, deal_II_space_dimension> &);
+
+      template void
+      rotate<deal_II_dimension>(
         const double,
         const unsigned int,
         Triangulation<deal_II_dimension, deal_II_space_dimension> &);

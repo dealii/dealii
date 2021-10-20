@@ -18,7 +18,6 @@
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/base/point.h>
 #include <deal.II/base/symmetric_tensor.h>
 #include <deal.II/base/tensor.h>
 
@@ -90,6 +89,15 @@ namespace Physics
        */
       template <typename Number>
       Tensor<2, 3, Number>
+      rotation_matrix_3d(const Tensor<1, 3, Number> &axis, const Number &angle);
+
+      /**
+       * @copydoc Physics::Transformations::Rotations::rotation_matrix_3d()
+       *
+       * @deprecated Use the variant with a Tensor as an axis.
+       */
+      template <typename Number>
+      DEAL_II_DEPRECATED_EARLY Tensor<2, 3, Number>
       rotation_matrix_3d(const Point<3, Number> &axis, const Number &angle);
 
       //@}
@@ -914,8 +922,8 @@ Physics::Transformations::Rotations::rotation_matrix_2d(const Number &angle)
 template <typename Number>
 Tensor<2, 3, Number>
 Physics::Transformations::Rotations::rotation_matrix_3d(
-  const Point<3, Number> &axis,
-  const Number &          angle)
+  const Tensor<1, 3, Number> &axis,
+  const Number &              angle)
 {
   Assert(std::abs(axis.norm() - 1.0) < 1e-9,
          ExcMessage("The supplied axial vector is not a unit vector."));
@@ -932,6 +940,17 @@ Physics::Transformations::Rotations::rotation_matrix_3d(
                                   t * axis[1] * axis[2] + s * axis[0],
                                   t * axis[2] * axis[2] + c}};
   return Tensor<2, 3, Number>(rotation);
+}
+
+
+
+template <typename Number>
+Tensor<2, 3, Number>
+Physics::Transformations::Rotations::rotation_matrix_3d(
+  const Point<3, Number> &axis,
+  const Number &          angle)
+{
+  return rotation_matrix_3d(static_cast<Tensor<1, 3, Number>>(axis), angle);
 }
 
 

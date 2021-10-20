@@ -25,6 +25,7 @@
 
 // perl -n -e 'print if s/DEAL:NedelecK-TransformN::value//' output
 
+#include <deal.II/base/numbers.h>
 #include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/dofs/dof_accessor.h>
@@ -75,7 +76,7 @@ transform_grid(Triangulation<2> &tria, const unsigned int transform)
       // second round: rotate
       // triangulation
       case 1:
-        GridTools::rotate(3.14159265358 / 2, tria);
+        GridTools::rotate(numbers::PI_2, tria);
         break;
 
       // third round: inflate
@@ -89,7 +90,7 @@ transform_grid(Triangulation<2> &tria, const unsigned int transform)
       // stretch
       case 3:
         GridTools::scale(.5, tria);
-        GridTools::rotate(-3.14159265358 / 2, tria);
+        GridTools::rotate(-numbers::PI_2, tria);
         GridTools::transform(&stretch_coordinates, tria);
 
         break;

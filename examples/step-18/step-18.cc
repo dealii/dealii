@@ -287,9 +287,9 @@ namespace Step18
   {
     // Again first compute the curl of the velocity field. This time, it is a
     // real vector:
-    const Point<3> curl(grad_u[2][1] - grad_u[1][2],
-                        grad_u[0][2] - grad_u[2][0],
-                        grad_u[1][0] - grad_u[0][1]);
+    const Tensor<1, 3> curl({grad_u[2][1] - grad_u[1][2],
+                             grad_u[0][2] - grad_u[2][0],
+                             grad_u[1][0] - grad_u[0][1]});
 
     // From this vector, using its magnitude, compute the tangent of the angle
     // of rotation, and from it the actual angle of rotation with respect to
@@ -317,7 +317,7 @@ namespace Step18
     // Otherwise compute the real rotation matrix. For this, again we rely on
     // a predefined function to compute the rotation matrix of the local
     // coordinate system.
-    const Point<3> axis = curl / tan_angle;
+    const Tensor<1, 3> axis = curl / tan_angle;
     return Physics::Transformations::Rotations::rotation_matrix_3d(axis,
                                                                    -angle);
   }

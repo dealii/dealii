@@ -17,6 +17,8 @@
 
 #include <deal.II/grid/grid_tools.h>
 
+#include <deal.II/physics/transformations.h>
+
 #include <vector>
 
 // GridTools functions that are template specializations (i.e., only compiled
@@ -399,24 +401,23 @@ namespace GridTools
 
   namespace
   {
-    // the following class is only
-    // needed in 2d, so avoid trouble
-    // with compilers warning otherwise
+    // the following class is only needed in 2d, so avoid trouble with compilers
+    // warning otherwise
     class Rotate2d
     {
     public:
       explicit Rotate2d(const double angle)
-        : angle(angle)
+        : rotation_matrix(
+            Physics::Transformations::Rotations::rotation_matrix_2d(angle))
       {}
       Point<2>
       operator()(const Point<2> &p) const
       {
-        return {std::cos(angle) * p(0) - std::sin(angle) * p(1),
-                std::sin(angle) * p(0) + std::cos(angle) * p(1)};
+        return static_cast<Point<2>>(rotation_matrix * p);
       }
 
     private:
-      const double angle;
+      const Tensor<2, 2, double> rotation_matrix;
     };
   } // namespace
 
