@@ -1019,9 +1019,9 @@ private:
  * <li> the matrix-vector product may only access an entry in `src` or `dst`
  * once the `operation_before_matrix_vector_product` has been run on that
  * vector entry; </li>
- * <li> `operation_after_matrix_vector_product` may first run once the
- * matrix-vector product does not access the entries in `src` and `dst` any
- * more. </li>
+ * <li> `operation_after_matrix_vector_product` may run on a range of entries
+ * `[i,j)` once the matrix-vector product does not access the entries `[i,j)`
+ * in `src` and `dst` any more. </li>
  * </ul>
  * The motivation for this function is to increase data locality and hence
  * cache usage. For the example of a class similar to the one in the step-37
@@ -1031,9 +1031,9 @@ private:
  * vmult(LinearAlgebra::distributed::Vector<number> &      dst,
  *       const LinearAlgebra::distributed::Vector<number> &src,
  *       const std::function<void(const unsigned int, const unsigned int)>
- *         &operation_before_loop,
+ *         &operation_before_matrix_vector_product,
  *       const std::function<void(const unsigned int, const unsigned int)>
- *         &operation_after_loop) const
+ *         &operation_after_matrix_vector_product) const
  * {
  *   data.cell_loop(&LaplaceOperator::local_apply,
  *                  this,
