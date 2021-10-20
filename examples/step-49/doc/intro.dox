@@ -205,9 +205,10 @@ Point(104) = {-2.8, -1.54, 0, 1.0}; // left point
 Then we use the <code>Circle arc</code> entity, which is found in the same category as
 <code>%Point</code> and <code>Lines</code>.  The file reads "Circle"
 but the difference to note is that this function uses three points to
-make an arc of a circle, namely the starting point, center, and ending point.
-Splitting the circle into four arcs like this allows for more freedom when declaring the
-boundary IDs. Constructing a circle from four arcs then looks as follows
+make an arc of a circle, namely the starting point, center, and ending point. The
+angle of an arc is required to be less than 180 degrees. We therefore split the circle
+into four arcs, which also allows us to set different boundary IDs.
+This then looks as follows
 where point 31 is the common center for all arcs:
 
 @code
@@ -217,13 +218,7 @@ Circle(50) = {104, 31, 33};
 Circle(51) = {33, 31, 103};
 @endcode
 
-For the second circle, we use the alternate <code>Circle</code> entity, which requires the origin, radius,
-and starting and ending angle respectively.
-
-@code
-radius1 = .5;
-Circle(12) = {0.42, 2.0, 0, radius1, 0, 2*Pi};
-@endcode
+We follow the same procedure for the second circle.
 
 
 <h5>Plane surfaces</h5>
@@ -245,8 +240,8 @@ we are describing, whereas the second one is for the hole.
 This can easily be traced back by following along with the numbers in the braces.
 
 @code
-Curve Loop(1) = {40, -43, 14, 57, 59, 60, 58};
-Curve Loop(2) = {12};
+Curve Loop(1) = {40, -43, 10, 57, 59, 60, 58};
+Curve Loop(2) = {12, 13, 14, 15};
 Plane Surface(1) = {1, 2};
 @endcode
 

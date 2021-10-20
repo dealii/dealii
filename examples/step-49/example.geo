@@ -14,7 +14,7 @@ Point(6) = {-0.98 - b, 0.2, 0, 1.0};
 Point(7) = {-0.98, 0, 0, 1.0};
 Point(8) = {-0.98 - b, -0.2, 0, 1.0};
 Point(9) = {-3.5, -0.2, 0, 1.0};
-Point(14) = {3.5, 0, 0, 1.0}; // Tip of slit on left hand side
+Point(10) = {3.5, 0, 0, 1.0}; // Tip of slit on left hand side
 
 // The 2 points below are for separating the left and right side of the mesh
 Point(36) = {-0.98, 3.36, 0, 1.0};
@@ -41,7 +41,7 @@ Line(6) = {6, 7};
 Line(7) = {7, 8};
 Line(8) = {8, 9};
 Line(9) = {9, 1};
-Line(14) = {7, 14}; // Line that bisects domain from top/bottom
+Line(10) = {7, 10}; // Line that bisects domain from top/bottom
 
 // Lines on the bottom/top domain
 Line(38) = {1, 37};
@@ -58,8 +58,8 @@ Line(52) = {2, 107};
 Line(53) = {107, 109};
 Line(54) = {109, 110};
 Line(55) = {110, 108};
-Line(56) = {108, 14};
-Line(57) = {14, 111};
+Line(56) = {108, 10};
+Line(57) = {10, 111};
 Line(58) = {112, 3};
 Line(59) = {111, 113};
 Line(60) = {113, 112};
@@ -74,29 +74,34 @@ Point(33) = {-2.1, -2.24, 0, 1.0}; // bottom point
 Point(103) = {-1.4, -1.54, 0, 1.0}; // right point
 Point(104) = {-2.8, -1.54, 0, 1.0}; // left point
 
-// Bottom left hole
+// Bottom left hole arcs
 Circle(48) = {103, 31, 32};
 Circle(49) = {32, 31, 104};
 Circle(50) = {104, 31, 33};
 Circle(51) = {33, 31, 103};
 
-// The upper right circle
+// Similarly, the upper right circle
 radius1 = .5;
 Point(19) = {0.42, 2.0, 0, 1.0}; // origin 
-Point(22) = {0.42, 2.0 + radius1, 0, 1.0}; // top point
-Point(23) = {0.42, 2.0 - radius1, 0, 1.0}; // bottom point
-Circle(12) = {0.42, 2.0, 0, radius1, 0, 2*Pi};
+Point(20) = {0.42, 2.0 - radius1, 0, 1.0};
+Point(21) = {0.42 + radius1, 2.0, 0, 1.0};
+Point(22) = {0.42, 2.0 + radius1, 0, 1.0};
+Point(23) = {0.42 - radius1, 2.0, 0, 1.0};
+Circle(12) = {20, 19, 21};
+Circle(13) = {21, 19, 22};
+Circle(14) = {22, 19, 23};
+Circle(15) = {23, 19, 20};
 
 //---------------------------------------------------------------------------
 // This section describes the "Plane Surfaces", i.e., the 2D surfaces for meshing
 
 // The surface of the top right partition
-Curve Loop(1) = {40, -43, 14, 57, 59, 60, 58};
-Curve Loop(2) = {12};
+Curve Loop(1) = {40, -43, 10, 57, 59, 60, 58};
+Curve Loop(2) = {12, 13, 14, 15};
 Plane Surface(1) = {1, 2};
 
 // Surface of the bottom right partition
-Curve Loop(3) = {39, 52, 53, 54, 55, 56, -14, -42};
+Curve Loop(3) = {39, 52, 53, 54, 55, 56, -10, -42};
 Plane Surface(2) = {3};
 
 // Surface of bottem left mesh
