@@ -32,6 +32,7 @@
 #include <deal.II/lac/vector_memory.h>
 
 #include <algorithm>
+#include <cstdint>
 #include <fstream>
 #include <iostream>
 #include <numeric>
@@ -1509,12 +1510,12 @@ namespace parallel
         // Gather size of data in bytes we want to store from this
         // processor and compute the prefix sum. We do this in 64 bit
         // to avoid overflow for files larger than 4GB:
-        const unsigned long size_on_proc = src_data_variable.size();
-        unsigned long       prefix_sum   = 0;
+        const std::uint64_t size_on_proc = src_data_variable.size();
+        std::uint64_t       prefix_sum   = 0;
         ierr = MPI_Exscan(DEAL_II_MPI_CONST_CAST(&size_on_proc),
                           &prefix_sum,
                           1,
-                          MPI_UNSIGNED_LONG,
+                          MPI_UINT64_T,
                           MPI_SUM,
                           mpi_communicator);
         AssertThrowMPI(ierr);
@@ -1523,15 +1524,14 @@ namespace parallel
           static_cast<MPI_Offset>(global_num_cells) * sizeof(unsigned int) +
           prefix_sum;
 
-        const char *data = src_data_variable.data();
-
         // Write data consecutively into file.
-        ierr = MPI_File_write_at(fh,
-                                 my_global_file_position,
-                                 DEAL_II_MPI_CONST_CAST(data),
-                                 src_data_variable.size(), // local buffer
-                                 MPI_CHAR,
-                                 MPI_STATUS_IGNORE);
+        ierr =
+          MPI_File_write_at(fh,
+                            my_global_file_position,
+                            DEAL_II_MPI_CONST_CAST(src_data_variable.data()),
+                            src_data_variable.size(),
+                            MPI_CHAR,
+                            MPI_STATUS_IGNORE);
         AssertThrowMPI(ierr);
 
         ierr = MPI_File_close(&fh);
@@ -1605,7 +1605,8 @@ namespace parallel
 
       // Allocate sufficient memory.
       const unsigned int bytes_per_cell = sizes_fixed_cumulative.back();
-      dest_data_fixed.resize(local_num_cells * bytes_per_cell);
+      dest_data_fixed.resize(static_cast<size_t>(local_num_cells) *
+                             bytes_per_cell);
 
       // Read packed data from file simultaneously.
       const MPI_Offset size_header =
@@ -1669,16 +1670,16 @@ namespace parallel
 
         // Compute my data size in bytes and compute prefix sum. We do this in
         // 64 bit to avoid overflow for files larger than 4 GB:
-        const unsigned long size_on_proc =
+        const std::uint64_t size_on_proc =
           std::accumulate(dest_sizes_variable.begin(),
                           dest_sizes_variable.end(),
                           0);
 
-        unsigned long prefix_sum = 0;
+        std::uint64_t prefix_sum = 0;
         ierr = MPI_Exscan(DEAL_II_MPI_CONST_CAST(&size_on_proc),
                           &prefix_sum,
                           1,
-                          MPI_UNSIGNED_LONG,
+                          MPI_UINT64_T,
                           MPI_SUM,
                           mpi_communicator);
         AssertThrowMPI(ierr);
