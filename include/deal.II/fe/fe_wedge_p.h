@@ -41,6 +41,14 @@ public:
   FE_WedgePoly(const unsigned int                                degree,
                const internal::GenericDoFsPerObject &            dpos,
                const typename FiniteElementData<dim>::Conformity conformity);
+
+  /**
+   * @copydoc dealii::FiniteElement::convert_generalized_support_point_values_to_dof_values()
+   */
+  virtual void
+  convert_generalized_support_point_values_to_dof_values(
+    const std::vector<Vector<double>> &support_point_values,
+    std::vector<double> &              nodal_values) const override;
 };
 
 /**

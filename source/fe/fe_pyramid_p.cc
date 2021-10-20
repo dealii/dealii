@@ -109,6 +109,28 @@ FE_PyramidPoly<dim, spacedim>::FE_PyramidPoly(
 
 
 template <int dim, int spacedim>
+void
+FE_PyramidPoly<dim, spacedim>::
+  convert_generalized_support_point_values_to_dof_values(
+    const std::vector<Vector<double>> &support_point_values,
+    std::vector<double> &              nodal_values) const
+{
+  AssertDimension(support_point_values.size(),
+                  this->get_unit_support_points().size());
+  AssertDimension(support_point_values.size(), nodal_values.size());
+  AssertDimension(this->dofs_per_cell, nodal_values.size());
+
+  for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
+    {
+      AssertDimension(support_point_values[i].size(), 1);
+
+      nodal_values[i] = support_point_values[i](0);
+    }
+}
+
+
+
+template <int dim, int spacedim>
 FE_PyramidP<dim, spacedim>::FE_PyramidP(const unsigned int degree)
   : FE_PyramidPoly<dim, spacedim>(degree,
                                   get_dpo_vector_fe_pyramid_p(degree),
