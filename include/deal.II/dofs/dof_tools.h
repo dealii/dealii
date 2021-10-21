@@ -609,9 +609,9 @@ namespace DoFTools
    * bilinear form, and which variables couple with each other in the face
    * integrals. If you passed masks consisting of only 1s to both of these,
    * then you would get the same sparsity pattern as if you had called the
-   * first of the make_sparsity_pattern() functions above. By setting some of
-   * the entries of these masks to zeros, you can get a sparser sparsity
-   * pattern.
+   * first of the make_flux_sparsity_pattern() functions above. By setting
+   * some of the entries of these masks to zeros, you can get a sparser
+   * sparsity pattern.
    *
    * @ingroup constraints
    */
