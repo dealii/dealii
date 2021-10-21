@@ -54,6 +54,8 @@ filename_resolution()
                 GridIn<2>::unv);
   check_file<2>(std::string(SOURCE_DIR "/grid_in_unv_2d/test46"),
                 GridIn<2>::unv);
+  check_file<2>(std::string(SOURCE_DIR "/grid_in_unv_2d/salome_square"),
+                GridIn<2>::unv);
 }
 
 

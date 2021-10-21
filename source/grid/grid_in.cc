@@ -24,6 +24,7 @@
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria.h>
 
+#include <boost/algorithm/string.hpp>
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/io/ios_state.hpp>
 #include <boost/property_tree/ptree.hpp>
@@ -626,15 +627,39 @@ GridIn<dim, spacedim>::read_unv(std::istream &in)
 
   int tmp;
 
-  AssertThrow(in, ExcIO());
-  in >> tmp;
-  AssertThrow(in, ExcIO());
-  in >> tmp;
+  // loop over sections, read until section 2411 is found, and break once found
+  while (true)
+    {
+      AssertThrow(in, ExcIO());
+      in >> tmp;
+      AssertThrow(tmp == -1,
+                  ExcMessage("Invalid UNV file format. "
+                             "Expected '-1' before and after a section."));
 
-  // section 2411 describes vertices: see
-  // http://www.sdrl.uc.edu/sdrl/referenceinfo/universalfileformats/file-format-storehouse/universal-dataset-number-2411
-  AssertThrow(tmp == 2411, ExcUnknownSectionType(tmp));
+      AssertThrow(in, ExcIO());
+      in >> tmp;
+      AssertThrow(tmp >= 0, ExcUnknownSectionType(tmp));
+      if (tmp != 2411)
+        {
+          // read until the end of any section that is not 2411
+          while (true)
+            {
+              std::string line;
+              AssertThrow(in, ExcIO());
+              std::getline(in, line);
+              // remove leading and trailing spaces in the line
+              boost::algorithm::trim(line);
+              if (line.compare("-1") == 0) // end of section
+                break;
+            }
+        }
+      else
+        break; // found section 2411
+    }
 
+  // section 2411 describes vertices: see the following links
+  // https://docs.plm.automation.siemens.com/tdoc/nx/12/nx_help#uid:xid1128419:index_advanced:xid1404601:xid1404604
+  // https://www.ceas3.uc.edu/sdrluff/
   std::vector<Point<spacedim>> vertices; // vector of vertex coordinates
   std::map<int, int>
     vertex_indices; // # vert in unv (key) ---> # vert in deal.II (value)
