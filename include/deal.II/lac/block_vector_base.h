@@ -76,7 +76,7 @@ private:
 
   /**
    * Catch all for all other potential vector types that are not block
-   * matrices.
+   * vectors.
    */
   static std::false_type
   check_for_block_vector(...);
