@@ -112,9 +112,7 @@ DataOutFaces<dim, spacedim>::build_one_patch(
   // on cells, not faces, so transform the face vertex to a cell vertex, that
   // to a unit cell vertex and then, finally, that to the mapped vertex. In
   // most cases this complicated procedure will be the identity.
-  for (unsigned int vertex = 0;
-       vertex < GeometryInfo<dim - 1>::vertices_per_cell;
-       ++vertex)
+  for (const unsigned int vertex : cell->face(face_number)->vertex_indices())
     {
       const Point<dim> vertex_reference_coordinates =
         cell->reference_cell().template vertex<dim>(
@@ -144,9 +142,9 @@ DataOutFaces<dim, spacedim>::build_one_patch(
       Assert(patch.space_dim == dim, ExcInternalError());
       const std::vector<Point<dim>> &q_points =
         fe_patch_values.get_quadrature_points();
-      // resize the patch.data member in order to have enough memory for the
+      // size the patch.data member in order to have enough memory for the
       // quadrature points as well
-      patch.data.reinit(data.n_datasets + dim, patch.data.size(1));
+      patch.data.reinit(data.n_datasets + dim, q_points.size());
       // set the flag indicating that for this cell the points are explicitly
       // given
       patch.points_are_available = true;
@@ -406,9 +404,6 @@ DataOutFaces<dim, spacedim>::build_patches(
     update_flags);
   DataOutBase::Patch<patch_dim, patch_spacedim> sample_patch;
   sample_patch.n_subdivisions = n_subdivisions;
-  sample_patch.data.reinit(n_datasets,
-                           Utilities::fixed_power<patch_dim>(n_subdivisions +
-                                                             1));
 
   // now build the patches in parallel
   WorkStream::run(
