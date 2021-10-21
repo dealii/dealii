@@ -1393,9 +1393,10 @@ namespace DataOutBase
      * internal reordered format.
      */
     void
-    write_cell_single(const unsigned int index,
-                      const unsigned int start,
-                      const unsigned int n_points);
+    write_cell_single(const unsigned int   index,
+                      const unsigned int   start,
+                      const unsigned int   n_points,
+                      const ReferenceCell &reference_cell);
 
     /**
      * Filter and record a data set. If there are multiple values at a given

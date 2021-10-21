@@ -496,18 +496,22 @@ namespace DataOutBase
 
 
   void
-  DataOutFilter::write_cell_single(const unsigned int index,
-                                   const unsigned int start,
-                                   const unsigned int n_points)
+  DataOutFilter::write_cell_single(const unsigned int   index,
+                                   const unsigned int   start,
+                                   const unsigned int   n_points,
+                                   const ReferenceCell &reference_cell)
   {
     ++num_cells;
 
     const unsigned int base_entry = index * n_points;
 
+    static const std::array<unsigned int, 5> table = {{0, 1, 3, 2, 4}};
+
     for (unsigned int i = 0; i < n_points; ++i)
-      {
-        internal_add_cell(base_entry + i, start + i);
-      }
+      internal_add_cell(base_entry + i,
+                        start + (reference_cell == ReferenceCells::Pyramid ?
+                                   table[i] :
+                                   i));
   }
 
 
@@ -781,21 +785,28 @@ namespace
   {
     Point<spacedim> node;
 
+    unsigned int point_no_actual = point_no;
+
+    if (patch.reference_cell == ReferenceCells::Pyramid)
+      {
+        AssertDimension(patch.n_subdivisions, 1);
+
+        static const std::array<unsigned int, 5> table = {{0, 1, 3, 2, 4}};
+        point_no_actual                                = table[point_no];
+      }
+
     if (patch.points_are_available)
       {
         for (unsigned int d = 0; d < spacedim; ++d)
-          node[d] = patch.data(patch.data.size(0) - spacedim + d, point_no);
+          node[d] =
+            patch.data(patch.data.size(0) - spacedim + d, point_no_actual);
         return node;
       }
     else
       {
         AssertDimension(patch.n_subdivisions, 1);
-        Assert(
-          patch.reference_cell != ReferenceCells::Pyramid,
-          ExcMessage(
-            "Pyramids need different ordering of the vertices, which is not implemented yet here."));
 
-        node = patch.vertices[point_no];
+        node = patch.vertices[point_no_actual];
       }
 
     return node;
@@ -1072,13 +1083,15 @@ namespace
      * @note All inheriting classes should implement this function.
      */
     void
-    write_cell_single(const unsigned int index,
-                      const unsigned int start,
-                      const unsigned int n_points)
+    write_cell_single(const unsigned int   index,
+                      const unsigned int   start,
+                      const unsigned int   n_points,
+                      const ReferenceCell &reference_cell)
     {
       (void)index;
       (void)start;
       (void)n_points;
+      (void)reference_cell;
 
       Assert(false,
              ExcMessage("The derived class you are using needs to "
@@ -1299,9 +1312,10 @@ namespace
      * Print vertices [start, start+n_points[
      */
     void
-    write_cell_single(const unsigned int index,
-                      const unsigned int start,
-                      const unsigned int n_points);
+    write_cell_single(const unsigned int   index,
+                      const unsigned int   start,
+                      const unsigned int   n_points,
+                      const ReferenceCell &reference_cell);
 
     /**
      * Write a high-order cell type, i.e., a Lagrange cell
@@ -1350,9 +1364,10 @@ namespace
      * Print vertices [start, start+n_points[
      */
     void
-    write_cell_single(const unsigned int index,
-                      const unsigned int start,
-                      const unsigned int n_points);
+    write_cell_single(const unsigned int   index,
+                      const unsigned int   start,
+                      const unsigned int   n_points,
+                      const ReferenceCell &reference_cell);
 
     /**
      * Write a high-order cell type, i.e., a Lagrange cell
@@ -1749,15 +1764,20 @@ namespace
   }
 
   void
-  VtkStream::write_cell_single(const unsigned int index,
-                               const unsigned int start,
-                               const unsigned int n_points)
+  VtkStream::write_cell_single(const unsigned int   index,
+                               const unsigned int   start,
+                               const unsigned int   n_points,
+                               const ReferenceCell &reference_cell)
   {
     (void)index;
 
+    static const std::array<unsigned int, 5> table = {{0, 1, 3, 2, 4}};
+
     stream << '\t' << n_points;
     for (unsigned int i = 0; i < n_points; ++i)
-      stream << '\t' << start + i;
+      stream << '\t'
+             << start +
+                  (reference_cell == ReferenceCells::Pyramid ? table[i] : i);
     stream << '\n';
   }
 
@@ -1857,19 +1877,25 @@ namespace
   }
 
   void
-  VtuStream::write_cell_single(const unsigned int index,
-                               const unsigned int start,
-                               const unsigned int n_points)
+  VtuStream::write_cell_single(const unsigned int   index,
+                               const unsigned int   start,
+                               const unsigned int   n_points,
+                               const ReferenceCell &reference_cell)
   {
     (void)index;
 
+    static const std::array<unsigned int, 5> table = {{0, 1, 3, 2, 4}};
+
 #if !defined(DEAL_II_WITH_ZLIB)
     for (unsigned int i = 0; i < n_points; ++i)
-      stream << '\t' << start + i;
+      stream << '\t'
+             << start +
+                  (reference_cell == ReferenceCells::Pyramid ? table[i] : i);
     stream << '\n';
 #else
     for (unsigned int i = 0; i < n_points; ++i)
-      cells.push_back(start + i);
+      cells.push_back(
+        start + (reference_cell == ReferenceCells::Pyramid ? table[i] : i));
 #endif
   }
 
@@ -2701,6 +2727,8 @@ namespace DataOutBase
     Assert(dim <= 3, ExcNotImplemented());
     unsigned int count = 0;
 
+    static const std::array<unsigned int, 5> table = {{0, 1, 3, 2, 4}};
+
     for (const auto &patch : patches)
       {
         // special treatment of non-hypercube cells
@@ -2708,7 +2736,13 @@ namespace DataOutBase
           {
             for (unsigned int point_no = 0; point_no < patch.data.n_cols();
                  ++point_no)
-              out.write_point(count++, compute_arbitrary_node(patch, point_no));
+              out.write_point(
+                count++,
+                compute_arbitrary_node(patch,
+                                       (patch.reference_cell ==
+                                            ReferenceCells::Pyramid ?
+                                          table[point_no] :
+                                          point_no)));
           }
         else
           {
@@ -2745,7 +2779,8 @@ namespace DataOutBase
           {
             out.write_cell_single(count++,
                                   first_vertex_of_patch,
-                                  patch.data.n_cols());
+                                  patch.data.n_cols(),
+                                  patch.reference_cell);
             first_vertex_of_patch += patch.data.n_cols();
           }
         else

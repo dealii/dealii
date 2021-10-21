@@ -320,16 +320,10 @@ namespace internal
           if (needs_pyramid_setup)
             {
               Assert(n_subdivisions == 1, ExcNotImplemented());
-
-              std::vector<Point<dim>> points;
-
-              points.emplace_back(-1.0, -1.0, 0.0);
-              points.emplace_back(+1.0, -1.0, 0.0);
-              points.emplace_back(+1.0, +1.0, 0.0);
-              points.emplace_back(-1.0, +1.0, 0.0);
-              points.emplace_back(+0.0, +0.0, 1.0);
-
-              quadrature_pyramid = std::make_unique<Quadrature<dim>>(points);
+              quadrature_pyramid = std::make_unique<Quadrature<dim>>(
+                FE_PyramidP<dim, spacedim>(
+                  1 /*note: vtk only supports linear wedges*/)
+                  .get_unit_support_points());
             }
 
           n_q_points =
