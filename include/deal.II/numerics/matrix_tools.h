@@ -246,28 +246,32 @@ namespace MatrixCreator
    *
    * See the general documentation of this namespace for more information.
    */
-  template <int dim, int spacedim, typename number>
+  template <int dim, int spacedim, typename SparseMatrixType>
   void
   create_mass_matrix(
-    const Mapping<dim, spacedim> &          mapping,
-    const DoFHandler<dim, spacedim> &       dof,
-    const Quadrature<dim> &                 q,
-    SparseMatrix<number> &                  matrix,
-    const Function<spacedim, number> *const a    = nullptr,
-    const AffineConstraints<number> &constraints = AffineConstraints<number>());
+    const Mapping<dim, spacedim> &   mapping,
+    const DoFHandler<dim, spacedim> &dof,
+    const Quadrature<dim> &          q,
+    SparseMatrixType &               matrix,
+    const Function<spacedim, typename SparseMatrixType::value_type> *const a =
+      nullptr,
+    const AffineConstraints<typename SparseMatrixType::value_type> &
+      constraints = AffineConstraints<typename SparseMatrixType::value_type>());
 
   /**
    * Call the create_mass_matrix() function, see above, with
    * <tt>mapping=MappingQ@<dim@>(1)</tt>.
    */
-  template <int dim, int spacedim, typename number>
+  template <int dim, int spacedim, typename SparseMatrixType>
   void
   create_mass_matrix(
-    const DoFHandler<dim, spacedim> &       dof,
-    const Quadrature<dim> &                 q,
-    SparseMatrix<number> &                  matrix,
-    const Function<spacedim, number> *const a    = nullptr,
-    const AffineConstraints<number> &constraints = AffineConstraints<number>());
+    const DoFHandler<dim, spacedim> &dof,
+    const Quadrature<dim> &          q,
+    SparseMatrixType &               matrix,
+    const Function<spacedim, typename SparseMatrixType::value_type> *const a =
+      nullptr,
+    const AffineConstraints<typename SparseMatrixType::value_type> &
+      constraints = AffineConstraints<typename SparseMatrixType::value_type>());
 
   /**
    * Assemble the mass matrix and a right hand side vector. If no coefficient
@@ -288,86 +292,98 @@ namespace MatrixCreator
    *
    * See the general documentation of this namespace for more information.
    */
-  template <int dim, int spacedim, typename number>
+  template <int dim, int spacedim, typename SparseMatrixType>
   void
   create_mass_matrix(
-    const Mapping<dim, spacedim> &          mapping,
-    const DoFHandler<dim, spacedim> &       dof,
-    const Quadrature<dim> &                 q,
-    SparseMatrix<number> &                  matrix,
-    const Function<spacedim, number> &      rhs,
-    Vector<number> &                        rhs_vector,
-    const Function<spacedim, number> *const a    = nullptr,
-    const AffineConstraints<number> &constraints = AffineConstraints<number>());
+    const Mapping<dim, spacedim> &                                   mapping,
+    const DoFHandler<dim, spacedim> &                                dof,
+    const Quadrature<dim> &                                          q,
+    SparseMatrixType &                                               matrix,
+    const Function<spacedim, typename SparseMatrixType::value_type> &rhs,
+    Vector<typename SparseMatrixType::value_type> &                  rhs_vector,
+    const Function<spacedim, typename SparseMatrixType::value_type> *const a =
+      nullptr,
+    const AffineConstraints<typename SparseMatrixType::value_type> &
+      constraints = AffineConstraints<typename SparseMatrixType::value_type>());
 
   /**
    * Call the create_mass_matrix() function, see above, with
    * <tt>mapping=MappingQ@<dim@>(1)</tt>.
    */
-  template <int dim, int spacedim, typename number>
+  template <int dim, int spacedim, typename SparseMatrixType>
   void
   create_mass_matrix(
-    const DoFHandler<dim, spacedim> &       dof,
-    const Quadrature<dim> &                 q,
-    SparseMatrix<number> &                  matrix,
-    const Function<spacedim, number> &      rhs,
-    Vector<number> &                        rhs_vector,
-    const Function<spacedim, number> *const a    = nullptr,
-    const AffineConstraints<number> &constraints = AffineConstraints<number>());
+    const DoFHandler<dim, spacedim> &                                dof,
+    const Quadrature<dim> &                                          q,
+    SparseMatrixType &                                               matrix,
+    const Function<spacedim, typename SparseMatrixType::value_type> &rhs,
+    Vector<typename SparseMatrixType::value_type> &                  rhs_vector,
+    const Function<spacedim, typename SparseMatrixType::value_type> *const a =
+      nullptr,
+    const AffineConstraints<typename SparseMatrixType::value_type> &
+      constraints = AffineConstraints<typename SparseMatrixType::value_type>());
 
   /**
    * Same function as above, but for hp-objects.
    */
-  template <int dim, int spacedim, typename number>
+  template <int dim, int spacedim, typename SparseMatrixType>
   void
   create_mass_matrix(
     const hp::MappingCollection<dim, spacedim> &mapping,
     const DoFHandler<dim, spacedim> &           dof,
     const hp::QCollection<dim> &                q,
-    SparseMatrix<number> &                      matrix,
-    const Function<spacedim, number> *const     a = nullptr,
-    const AffineConstraints<number> &constraints = AffineConstraints<number>());
+    SparseMatrixType &                          matrix,
+    const Function<spacedim, typename SparseMatrixType::value_type> *const a =
+      nullptr,
+    const AffineConstraints<typename SparseMatrixType::value_type> &
+      constraints = AffineConstraints<typename SparseMatrixType::value_type>());
 
   /**
    * Same function as above, but for hp-objects.
    */
-  template <int dim, int spacedim, typename number>
+  template <int dim, int spacedim, typename SparseMatrixType>
   void
   create_mass_matrix(
-    const DoFHandler<dim, spacedim> &       dof,
-    const hp::QCollection<dim> &            q,
-    SparseMatrix<number> &                  matrix,
-    const Function<spacedim, number> *const a    = nullptr,
-    const AffineConstraints<number> &constraints = AffineConstraints<number>());
+    const DoFHandler<dim, spacedim> &dof,
+    const hp::QCollection<dim> &     q,
+    SparseMatrixType &               matrix,
+    const Function<spacedim, typename SparseMatrixType::value_type> *const a =
+      nullptr,
+    const AffineConstraints<typename SparseMatrixType::value_type> &
+      constraints = AffineConstraints<typename SparseMatrixType::value_type>());
 
   /**
    * Same function as above, but for hp-objects.
    */
-  template <int dim, int spacedim, typename number>
+  template <int dim, int spacedim, typename SparseMatrixType>
   void
   create_mass_matrix(
-    const hp::MappingCollection<dim, spacedim> &mapping,
-    const DoFHandler<dim, spacedim> &           dof,
-    const hp::QCollection<dim> &                q,
-    SparseMatrix<number> &                      matrix,
-    const Function<spacedim, number> &          rhs,
-    Vector<number> &                            rhs_vector,
-    const Function<spacedim, number> *const     a = nullptr,
-    const AffineConstraints<number> &constraints = AffineConstraints<number>());
+    const hp::MappingCollection<dim, spacedim> &                     mapping,
+    const DoFHandler<dim, spacedim> &                                dof,
+    const hp::QCollection<dim> &                                     q,
+    SparseMatrixType &                                               matrix,
+    const Function<spacedim, typename SparseMatrixType::value_type> &rhs,
+    Vector<typename SparseMatrixType::value_type> &                  rhs_vector,
+    const Function<spacedim, typename SparseMatrixType::value_type> *const a =
+      nullptr,
+    const AffineConstraints<typename SparseMatrixType::value_type> &
+      constraints = AffineConstraints<typename SparseMatrixType::value_type>());
 
   /**
    * Same function as above, but for hp-objects.
    */
-  template <int dim, int spacedim, typename number>
+  template <int dim, int spacedim, typename SparseMatrixType>
   void
   create_mass_matrix(
-    const DoFHandler<dim, spacedim> &       dof,
-    const hp::QCollection<dim> &            q,
-    SparseMatrix<number> &                  matrix,
-    const Function<spacedim, number> &      rhs,
-    Vector<number> &                        rhs_vector,
-    const Function<spacedim, number> *const a    = nullptr,
-    const AffineConstraints<number> &constraints = AffineConstraints<number>());
+    const DoFHandler<dim, spacedim> &                                dof,
+    const hp::QCollection<dim> &                                     q,
+    SparseMatrixType &                                               matrix,
+    const Function<spacedim, typename SparseMatrixType::value_type> &rhs,
+    Vector<typename SparseMatrixType::value_type> &                  rhs_vector,
+    const Function<spacedim, typename SparseMatrixType::value_type> *const a =
+      nullptr,
+    const AffineConstraints<typename SparseMatrixType::value_type> &
+      constraints = AffineConstraints<typename SparseMatrixType::value_type>());
 
 
   /**
@@ -479,28 +495,32 @@ namespace MatrixCreator
    *
    * See the general documentation of this namespace for more information.
    */
-  template <int dim, int spacedim>
+  template <int dim, int spacedim, typename SparseMatrixType>
   void
   create_laplace_matrix(
     const Mapping<dim, spacedim> &   mapping,
     const DoFHandler<dim, spacedim> &dof,
     const Quadrature<dim> &          q,
-    SparseMatrix<double> &           matrix,
-    const Function<spacedim> *const  a           = nullptr,
-    const AffineConstraints<double> &constraints = AffineConstraints<double>());
+    SparseMatrixType &               matrix,
+    const Function<spacedim, typename SparseMatrixType::value_type> *const a =
+      nullptr,
+    const AffineConstraints<typename SparseMatrixType::value_type> &
+      constraints = AffineConstraints<typename SparseMatrixType::value_type>());
 
   /**
    * Call the create_laplace_matrix() function, see above, with
    * <tt>mapping=MappingQ@<dim@>(1)</tt>.
    */
-  template <int dim, int spacedim>
+  template <int dim, int spacedim, typename SparseMatrixType>
   void
   create_laplace_matrix(
     const DoFHandler<dim, spacedim> &dof,
     const Quadrature<dim> &          q,
-    SparseMatrix<double> &           matrix,
-    const Function<spacedim> *const  a           = nullptr,
-    const AffineConstraints<double> &constraints = AffineConstraints<double>());
+    SparseMatrixType &               matrix,
+    const Function<spacedim, typename SparseMatrixType::value_type> *const a =
+      nullptr,
+    const AffineConstraints<typename SparseMatrixType::value_type> &
+      constraints = AffineConstraints<typename SparseMatrixType::value_type>());
 
   /**
    * Assemble the Laplace matrix and a right hand side vector. If no
@@ -520,86 +540,98 @@ namespace MatrixCreator
    *
    * See the general documentation of this namespace for more information.
    */
-  template <int dim, int spacedim>
+  template <int dim, int spacedim, typename SparseMatrixType>
   void
   create_laplace_matrix(
-    const Mapping<dim, spacedim> &   mapping,
-    const DoFHandler<dim, spacedim> &dof,
-    const Quadrature<dim> &          q,
-    SparseMatrix<double> &           matrix,
-    const Function<spacedim> &       rhs,
-    Vector<double> &                 rhs_vector,
-    const Function<spacedim> *const  a           = nullptr,
-    const AffineConstraints<double> &constraints = AffineConstraints<double>());
+    const Mapping<dim, spacedim> &                                   mapping,
+    const DoFHandler<dim, spacedim> &                                dof,
+    const Quadrature<dim> &                                          q,
+    SparseMatrixType &                                               matrix,
+    const Function<spacedim, typename SparseMatrixType::value_type> &rhs,
+    Vector<typename SparseMatrixType::value_type> &                  rhs_vector,
+    const Function<spacedim, typename SparseMatrixType::value_type> *const a =
+      nullptr,
+    const AffineConstraints<typename SparseMatrixType::value_type> &
+      constraints = AffineConstraints<typename SparseMatrixType::value_type>());
 
   /**
    * Call the create_laplace_matrix() function, see above, with
    * <tt>mapping=MappingQ@<dim@>(1)</tt>.
    */
-  template <int dim, int spacedim>
+  template <int dim, int spacedim, typename SparseMatrixType>
   void
   create_laplace_matrix(
-    const DoFHandler<dim, spacedim> &dof,
-    const Quadrature<dim> &          q,
-    SparseMatrix<double> &           matrix,
-    const Function<spacedim> &       rhs,
-    Vector<double> &                 rhs_vector,
-    const Function<spacedim> *const  a           = nullptr,
-    const AffineConstraints<double> &constraints = AffineConstraints<double>());
+    const DoFHandler<dim, spacedim> &                                dof,
+    const Quadrature<dim> &                                          q,
+    SparseMatrixType &                                               matrix,
+    const Function<spacedim, typename SparseMatrixType::value_type> &rhs,
+    Vector<typename SparseMatrixType::value_type> &                  rhs_vector,
+    const Function<spacedim, typename SparseMatrixType::value_type> *const a =
+      nullptr,
+    const AffineConstraints<typename SparseMatrixType::value_type> &
+      constraints = AffineConstraints<typename SparseMatrixType::value_type>());
 
   /**
    * Like the functions above, but for hp-objects.
    */
-  template <int dim, int spacedim>
+  template <int dim, int spacedim, typename SparseMatrixType>
   void
   create_laplace_matrix(
     const hp::MappingCollection<dim, spacedim> &mapping,
     const DoFHandler<dim, spacedim> &           dof,
     const hp::QCollection<dim> &                q,
-    SparseMatrix<double> &                      matrix,
-    const Function<spacedim> *const             a = nullptr,
-    const AffineConstraints<double> &constraints = AffineConstraints<double>());
+    SparseMatrixType &                          matrix,
+    const Function<spacedim, typename SparseMatrixType::value_type> *const a =
+      nullptr,
+    const AffineConstraints<typename SparseMatrixType::value_type> &
+      constraints = AffineConstraints<typename SparseMatrixType::value_type>());
 
   /**
    * Like the functions above, but for hp-objects.
    */
-  template <int dim, int spacedim>
+  template <int dim, int spacedim, typename SparseMatrixType>
   void
   create_laplace_matrix(
     const DoFHandler<dim, spacedim> &dof,
     const hp::QCollection<dim> &     q,
-    SparseMatrix<double> &           matrix,
-    const Function<spacedim> *const  a           = nullptr,
-    const AffineConstraints<double> &constraints = AffineConstraints<double>());
+    SparseMatrixType &               matrix,
+    const Function<spacedim, typename SparseMatrixType::value_type> *const a =
+      nullptr,
+    const AffineConstraints<typename SparseMatrixType::value_type> &
+      constraints = AffineConstraints<typename SparseMatrixType::value_type>());
 
   /**
    * Like the functions above, but for hp-objects.
    */
-  template <int dim, int spacedim>
+  template <int dim, int spacedim, typename SparseMatrixType>
   void
   create_laplace_matrix(
-    const hp::MappingCollection<dim, spacedim> &mapping,
-    const DoFHandler<dim, spacedim> &           dof,
-    const hp::QCollection<dim> &                q,
-    SparseMatrix<double> &                      matrix,
-    const Function<spacedim> &                  rhs,
-    Vector<double> &                            rhs_vector,
-    const Function<spacedim> *const             a = nullptr,
-    const AffineConstraints<double> &constraints = AffineConstraints<double>());
+    const hp::MappingCollection<dim, spacedim> &                     mapping,
+    const DoFHandler<dim, spacedim> &                                dof,
+    const hp::QCollection<dim> &                                     q,
+    SparseMatrixType &                                               matrix,
+    const Function<spacedim, typename SparseMatrixType::value_type> &rhs,
+    Vector<typename SparseMatrixType::value_type> &                  rhs_vector,
+    const Function<spacedim, typename SparseMatrixType::value_type> *const a =
+      nullptr,
+    const AffineConstraints<typename SparseMatrixType::value_type> &
+      constraints = AffineConstraints<typename SparseMatrixType::value_type>());
 
   /**
    * Like the functions above, but for hp-objects.
    */
-  template <int dim, int spacedim>
+  template <int dim, int spacedim, typename SparseMatrixType>
   void
   create_laplace_matrix(
-    const DoFHandler<dim, spacedim> &dof,
-    const hp::QCollection<dim> &     q,
-    SparseMatrix<double> &           matrix,
-    const Function<spacedim> &       rhs,
-    Vector<double> &                 rhs_vector,
-    const Function<spacedim> *const  a           = nullptr,
-    const AffineConstraints<double> &constraints = AffineConstraints<double>());
+    const DoFHandler<dim, spacedim> &                                dof,
+    const hp::QCollection<dim> &                                     q,
+    SparseMatrixType &                                               matrix,
+    const Function<spacedim, typename SparseMatrixType::value_type> &rhs,
+    Vector<typename SparseMatrixType::value_type> &                  rhs_vector,
+    const Function<spacedim, typename SparseMatrixType::value_type> *const a =
+      nullptr,
+    const AffineConstraints<typename SparseMatrixType::value_type> &
+      constraints = AffineConstraints<typename SparseMatrixType::value_type>());
 
   /**
    * Exception
