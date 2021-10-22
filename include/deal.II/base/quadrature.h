@@ -33,16 +33,20 @@ DEAL_II_NAMESPACE_OPEN
 
 /**
  * Base class for quadrature formulae in arbitrary dimensions. This class
- * stores quadrature points and weights on the unit line [0,1], unit square
- * [0,1]x[0,1], etc.
+ * stores quadrature points and weights in the coordinate system of
+ * a reference cell (see the ReferenceCell class) and as such serves to
+ * represent quadrature points and weights on the unit line segment
+ * $[0,1]$ in 1d, on the unit square or unit triangle in 2d, as well as
+ * the unit tetrahedron, cube, pyramid, and wedge reference cells in 3d.
  *
  * There are a number of derived classes, denoting concrete integration
  * formulae. Their names are prefixed by <tt>Q</tt>. Refer to the list of
  * derived classes for more details.
  *
- * The schemes for higher dimensions are typically tensor products of the one-
- * dimensional formulae, but refer to the section on implementation detail
- * below.
+ * At least for quadrilaterals and hexahedra (or, more precisely, since we work
+ * on reference cells: for the unit square and the unit cube), quadrature
+ * formulas are typically tensor products of one-dimensional formulas (see also
+ * the section on implementation detail below).
  *
  * In order to allow for dimension independent programming, a quadrature
  * formula of dimension zero exists. Since an integral over zero dimensions is
@@ -53,17 +57,20 @@ DEAL_II_NAMESPACE_OPEN
  * of these formulae is their use in QProjector, which will create a useful
  * formula of dimension one out of them.
  *
+ *
  * <h3>Mathematical background</h3>
  *
  * For each quadrature formula we denote by <tt>m</tt>, the maximal degree of
- * polynomials integrated exactly. This number is given in the documentation
- * of each formula. The order of the integration error is <tt>m+1</tt>, that
- * is, the error is the size of the cell to the <tt>m+1</tt> by the Bramble-
- * Hilbert Lemma. The number <tt>m</tt> is to be found in the documentation of
- * each concrete formula. For the optimal formulae QGauss we have $m = 2N-1$,
- * where N is the constructor parameter to QGauss. The tensor product formulae
- * are exact on tensor product polynomials of degree <tt>m</tt> in each space
- * direction, but they are still only of <tt>m+1</tt>st order.
+ * polynomials integrated exactly on the reference cell the quadrature
+ * formula corresponds to. This number is given in the documentation
+ * of each formula. The *order* of the integration error is <tt>m+1</tt>, that
+ * is, the error is the size of the cell to the <tt>m+1</tt> by the
+ * Bramble-Hilbert Lemma. The number <tt>m</tt> is to be found in the
+ * documentation of each concrete formula. For the optimal formulae QGauss we
+ * have $m = 2N-1$, where $N$ is the constructor parameter to QGauss. The tensor
+ * product formulae are exact on tensor product polynomials of degree <tt>m</tt>
+ * in each space direction, but they are still only of <tt>(m+1)</tt>st order.
+ *
  *
  * <h3>Implementation details</h3>
  *
@@ -73,11 +80,7 @@ DEAL_II_NAMESPACE_OPEN
  * one dimension. There is a special constructor to generate a quadrature
  * formula from two others.  For example, the QGauss@<dim@> formulae include
  * <i>N<sup>dim</sup></i> quadrature points in <tt>dim</tt> dimensions, where
- * N is the constructor parameter of QGauss.
- *
- * @note Instantiations for this template are provided for dimensions 0, 1, 2,
- * and 3 (see the section on
- * @ref Instantiations).
+ * $N$ is the constructor parameter of QGauss.
  */
 template <int dim>
 class Quadrature : public Subscriptor
@@ -369,7 +372,9 @@ class QIterated : public Quadrature<dim>
 public:
   /**
    * Constructor. Iterate the given quadrature formula <tt>n_copies</tt> times
-   * in each direction.
+   * in each direction. The result is a tensor product quadrature formula
+   * defined on the unit hypercube (i.e., the line segment, unit square, or
+   * unit cube in 1d, 2d, and 3d respectively).
    */
   QIterated(const Quadrature<1> &base_quadrature, const unsigned int n_copies);
 
@@ -378,7 +383,9 @@ public:
    * defined by adjacent points in @p intervals in each direction. The resulting
    * quadrature rule will have `base_quadrature.size() * (intervals.size() - 1)`
    * quadrature points if no quadrature point of `base_quadrature` is positioned
-   * on the boundaries.
+   * on the boundaries. The result is a tensor product quadrature formula
+   * defined on the unit hypercube (i.e., the line segment, unit square, or
+   * unit cube in 1d, 2d, and 3d respectively).
    *
    * @note We require that `intervals.front() == 0` and `interval.back() == 1`.
    */
