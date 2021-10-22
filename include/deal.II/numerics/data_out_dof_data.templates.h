@@ -282,7 +282,6 @@ namespace internal
                                                ReferenceCells::Pyramid);
            }));
 
-      unsigned int n_q_points = 0;
       if (use_face_values == false)
         {
           std::unique_ptr<dealii::Quadrature<dim>> quadrature_simplex;
@@ -325,12 +324,6 @@ namespace internal
                   1 /*note: vtk only supports linear wedges*/)
                   .get_unit_support_points());
             }
-
-          n_q_points =
-            std::max({needs_wedge_setup ? quadrature_wedge->size() : 0,
-                      needs_simplex_setup ? quadrature_simplex->size() : 0,
-                      needs_hypercube_setup ? quadrature_hypercube->size() : 0,
-                      needs_pyramid_setup ? quadrature_pyramid->size() : 0});
 
           x_fe_values.resize(finite_elements.size());
           for (unsigned int i = 0; i < finite_elements.size(); ++i)
@@ -379,12 +372,19 @@ namespace internal
                         update_flags);
                 }
             }
+
+          // Return maximal number of evaluation points:
+          return std::max(
+            {needs_wedge_setup ? quadrature_wedge->size() : 0,
+             needs_simplex_setup ? quadrature_simplex->size() : 0,
+             needs_hypercube_setup ? quadrature_hypercube->size() : 0,
+             needs_pyramid_setup ? quadrature_pyramid->size() : 0});
         }
       else // build FEFaceValues objects instead
         {
           dealii::hp::QCollection<dim - 1> quadrature(
             QIterated<dim - 1>(QTrapezoid<1>(), n_subdivisions));
-          n_q_points = quadrature[0].size();
+
           x_fe_face_values.resize(finite_elements.size());
           for (unsigned int i = 0; i < finite_elements.size(); ++i)
             {
@@ -404,9 +404,10 @@ namespace internal
                     quadrature,
                     update_flags);
             }
-        }
 
-      return n_q_points;
+          // Return maximal number of evaluation points:
+          return quadrature[0].size();
+        }
     }
 
 
