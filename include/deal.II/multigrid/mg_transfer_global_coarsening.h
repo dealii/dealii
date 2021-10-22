@@ -525,8 +525,16 @@ public:
    *
    * If an inner vector of @p dst is empty or has incorrect locally owned size,
    * it will be resized to locally relevant degrees of freedom on each level.
-   *
-   * @note DoFHandler is not needed here, but is required by the interface.
+   */
+  template <class InVector, int spacedim>
+  void
+  interpolate_to_mg(MGLevelObject<VectorType> &dst, const InVector &src) const;
+
+  /**
+   * Like the above function but with a user-provided DoFHandler as
+   * additional argument. However, this DoFHandler is not used internally, but
+   * is required to be able to use MGTransferGlobalCoarsening and
+   * MGTransferMatrixFree as template argument.
    */
   template <class InVector, int spacedim>
   void
@@ -661,12 +669,9 @@ template <int dim, typename VectorType>
 template <class InVector, int spacedim>
 void
 MGTransferGlobalCoarsening<dim, VectorType>::interpolate_to_mg(
-  const DoFHandler<dim, spacedim> &dof_handler,
-  MGLevelObject<VectorType> &      dst,
-  const InVector &                 src) const
+  MGLevelObject<VectorType> &dst,
+  const InVector &           src) const
 {
-  (void)dof_handler;
-
   Assert(
     initialize_dof_vector,
     ExcMessage(
@@ -687,6 +692,21 @@ MGTransferGlobalCoarsening<dim, VectorType>::interpolate_to_mg(
 
   for (unsigned int l = max_level; l > min_level; --l)
     this->transfer[l].interpolate(dst[l - 1], dst[l]);
+}
+
+
+
+template <int dim, typename VectorType>
+template <class InVector, int spacedim>
+void
+MGTransferGlobalCoarsening<dim, VectorType>::interpolate_to_mg(
+  const DoFHandler<dim, spacedim> &dof_handler,
+  MGLevelObject<VectorType> &      dst,
+  const InVector &                 src) const
+{
+  (void)dof_handler;
+
+  this->interpolate_to_mg(dst, src);
 }
 
 
