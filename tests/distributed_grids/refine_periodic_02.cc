@@ -158,8 +158,9 @@ test()
     typename parallel::distributed::Triangulation<dim>::Settings(
       parallel::distributed::Triangulation<
         dim>::mesh_reconstruction_after_repartitioning |
+      parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy |
       parallel::distributed::Triangulation<
-        dim>::construct_multigrid_hierarchy));
+        dim>::communicate_vertices_to_p4est));
 
   GridGenerator::hyper_cube(tr, 0., 1., true);
 

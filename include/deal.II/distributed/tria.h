@@ -325,11 +325,10 @@ namespace parallel
          */
         no_automatic_repartitioning = 0x4,
         /**
-         * Setting this flag will communicate vertices to p4est. In debug mode,
-         * the vertices will always be communicated. This way one can
-         * use the 'find_point_owner_rank()' to find the MPI rank of the active
-         * cell that owns an arbitrary point in case all attached manifolds are
-         * flat.
+         * Setting this flag will communicate vertices to p4est. This way one
+         * can use the 'find_point_owner_rank()' to find the MPI rank of the
+         * active cell that owns an arbitrary point in case all attached
+         * manifolds are flat.
          */
         communicate_vertices_to_p4est = 0x8
       };
@@ -394,7 +393,7 @@ namespace parallel
       is_multilevel_hierarchy_constructed() const override;
 
       /**
-       * Return if vertices will be communicated to p4est in release mode.
+       * Return if vertices will be communicated to p4est.
        */
       bool
       are_vertices_communicated_to_p4est() const;
@@ -886,7 +885,9 @@ namespace parallel
       {
         default_setting                          = 0x0,
         mesh_reconstruction_after_repartitioning = 0x1,
-        construct_multigrid_hierarchy            = 0x2
+        construct_multigrid_hierarchy            = 0x2,
+        no_automatic_repartitioning              = 0x4,
+        communicate_vertices_to_p4est            = 0x8
       };
 
       /**

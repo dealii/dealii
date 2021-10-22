@@ -52,8 +52,11 @@ template <int dim>
 void
 test(std::ostream & /*out*/)
 {
-  parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
-  Triangulation<dim>                        tr2(
+  parallel::distributed::Triangulation<dim> tr(
+    MPI_COMM_WORLD,
+    Triangulation<dim>::none,
+    parallel::distributed::Triangulation<dim>::communicate_vertices_to_p4est);
+  Triangulation<dim> tr2(
     Triangulation<dim>::limit_level_difference_at_vertices);
 
   GridGenerator::hyper_cube(tr);
