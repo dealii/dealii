@@ -311,19 +311,17 @@ namespace internal
           if (needs_wedge_setup)
             {
               Assert(n_subdivisions == 1, ExcNotImplemented());
+
               quadrature_wedge = std::make_unique<Quadrature<dim>>(
-                FE_WedgeP<dim, spacedim>(
-                  1 /*note: vtk only supports linear wedges*/)
-                  .get_unit_support_points());
+                ReferenceCells::Wedge.get_nodal_type_quadrature<dim>());
             }
 
           if (needs_pyramid_setup)
             {
               Assert(n_subdivisions == 1, ExcNotImplemented());
+
               quadrature_pyramid = std::make_unique<Quadrature<dim>>(
-                FE_PyramidP<dim, spacedim>(
-                  1 /*note: vtk only supports linear wedges*/)
-                  .get_unit_support_points());
+                ReferenceCells::Pyramid.get_nodal_type_quadrature<dim>());
             }
 
           n_q_points =
