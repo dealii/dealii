@@ -1427,11 +1427,10 @@ namespace parallel
       // it is sufficient to let only the first processor perform this task.
       if (myrank == 0)
         {
-          const unsigned int *data = sizes_fixed_cumulative.data();
-
           ierr = MPI_File_write_at(fh,
                                    0,
-                                   DEAL_II_MPI_CONST_CAST(data),
+                                   DEAL_II_MPI_CONST_CAST(
+                                     sizes_fixed_cumulative.data()),
                                    sizes_fixed_cumulative.size(),
                                    MPI_UNSIGNED,
                                    MPI_STATUS_IGNORE);
@@ -1494,14 +1493,13 @@ namespace parallel
           const MPI_Offset my_global_file_position =
             static_cast<MPI_Offset>(global_first_cell) * sizeof(unsigned int);
 
-          const int *data = src_sizes_variable.data();
-
-          ierr = MPI_File_write_at(fh,
-                                   my_global_file_position,
-                                   DEAL_II_MPI_CONST_CAST(data),
-                                   src_sizes_variable.size(), // local buffer
-                                   MPI_INT,
-                                   MPI_STATUS_IGNORE);
+          ierr =
+            MPI_File_write_at(fh,
+                              my_global_file_position,
+                              DEAL_II_MPI_CONST_CAST(src_sizes_variable.data()),
+                              src_sizes_variable.size(),
+                              MPI_INT,
+                              MPI_STATUS_IGNORE);
           AssertThrowMPI(ierr);
         }
 
