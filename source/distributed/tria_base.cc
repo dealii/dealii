@@ -1447,12 +1447,10 @@ namespace parallel
         size_header + static_cast<MPI_Offset>(global_first_cell) *
                         sizes_fixed_cumulative.back();
 
-      const char *data = src_data_fixed.data();
-
       ierr = MPI_File_write_at(fh,
                                my_global_file_position,
-                               DEAL_II_MPI_CONST_CAST(data),
-                               src_data_fixed.size(), // local buffer
+                               DEAL_II_MPI_CONST_CAST(src_data_fixed.data()),
+                               src_data_fixed.size(),
                                MPI_CHAR,
                                MPI_STATUS_IGNORE);
       AssertThrowMPI(ierr);
