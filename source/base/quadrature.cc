@@ -451,7 +451,7 @@ namespace internal
       }
 
       std::vector<Point<1>>
-      create_interval_points(const unsigned int n_copies)
+      create_equidistant_interval_points(const unsigned int n_copies)
       {
         std::vector<Point<1>> support_points(n_copies + 1);
 
@@ -601,9 +601,10 @@ QIterated<1>::QIterated(const Quadrature<1> &        base_quadrature,
 template <>
 QIterated<1>::QIterated(const Quadrature<1> &base_quadrature,
                         const unsigned int   n_copies)
-  : QIterated<1>(base_quadrature,
-                 internal::QIteratedImplementation::create_interval_points(
-                   n_copies))
+  : QIterated<1>(
+      base_quadrature,
+      internal::QIteratedImplementation::create_equidistant_interval_points(
+        n_copies))
 {
   Assert(base_quadrature.size() > 0, ExcNotInitialized());
   Assert(n_copies > 0, ExcZero());
