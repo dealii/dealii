@@ -22,6 +22,7 @@
 #  ifdef DEAL_II_WITH_PETSC
 
 #    include <deal.II/base/index_set.h>
+#    include <deal.II/base/partitioner.h>
 #    include <deal.II/base/subscriptor.h>
 
 #    include <deal.II/lac/exceptions.h>
@@ -355,6 +356,14 @@ namespace PETScWrappers
        */
       void
       reinit(const IndexSet &local, const MPI_Comm &communicator);
+
+      /**
+       * Initialize the vector given to the parallel partitioning described in
+       * @p partitioner.
+       */
+      void
+      reinit(
+        const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner);
 
       /**
        * Return a reference to the MPI communicator object in use with this

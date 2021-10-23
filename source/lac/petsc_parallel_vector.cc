@@ -254,6 +254,15 @@ namespace PETScWrappers
       create_vector(local.size(), local.n_elements());
     }
 
+    void
+    Vector::reinit(
+      const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner)
+    {
+      this->reinit(partitioner->locally_owned_range(),
+                   partitioner->ghost_indices(),
+                   partitioner->get_mpi_communicator());
+    }
+
 
     void
     Vector::create_vector(const size_type n, const size_type locally_owned_size)
