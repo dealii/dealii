@@ -681,6 +681,7 @@ namespace
     void * /* this is always nullptr */ point)
   {
     // point must be nullptr here
+    (void)point;
     Assert(point == nullptr, dealii::ExcInternalError());
 
     // we need the user pointer
