@@ -80,11 +80,11 @@ namespace VectorTools
    * // first usage: set up cache
    * Utilities::MPI::RemotePointEvaluation<dim, spacedim> cache;
    *
-   * const auto result_1 = VectorToos::point_values(
+   * const auto result_1 = VectorTools::point_values(
    *   mapping, dof_handler_1, vector_1, evaluation_points, cache);
    *
    * // further usages: reuse the cache
-   * const auto result_2 = VectorToos::point_values(
+   * const auto result_2 = VectorTools::point_values(
    *   cache, dof_handler_2, vector_2);
    * @endcode
    *
@@ -101,10 +101,10 @@ namespace VectorTools
    * cache.reinit(evaluation_points, triangulation, mapping);
    *
    * // use the cache
-   * const auto result_1 = VectorToos::point_values(
+   * const auto result_1 = VectorTools::point_values(
    *   cache, dof_handler_1, vector_1);
    *
-   * const auto result_2 = VectorToos::point_values(
+   * const auto result_2 = VectorTools::point_values(
    *   cache, dof_handler_2, vector_2);
    * @endcode
    *
