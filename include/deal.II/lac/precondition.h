@@ -870,10 +870,14 @@ private:
  * @p smoothing_range. The algorithm is based on the following three-term
  * recurrence:
  * @f[
- *  x^{n+1} = x^{n} + \rho_n \rho_{n-1} (x^{n} - x^{n-1}) +
- *     \frac{\rho_n}{\lambda_{\max{}}-\lambda_{\min{}}} P^{-1} (b-Ax^n).
+ *  x^{n+1} = x^{n} + \alpha^n_0 (x^{n} - x^{n-1}) + \alpha^n_1 P^{-1} (b-Ax^n)
+ *    \quad\text{with}\quad
+ *    \alpha^0_0 := 0,\;
+ *    \alpha^0_1 := \frac{2\rho_0}{\lambda_{\max}-\lambda_{\min}}\;
+ *    \alpha^n_0 := \rho_n \rho_{n-1},\;\text{and}\;
+ *    \alpha^n_1 := \frac{4\rho_n}{\lambda_{\max}-\lambda_{\min}},
  * @f]
- * where the parameter $\rho_0$ is set to $\rho_0 = 2
+ * where the parameter $\rho_0$ is set to $\rho_0 =
  * \frac{\lambda_{\max{}}-\lambda_{\min{}}}{\lambda_{\max{}}+\lambda_{\min{}}}$
  * for the maximal eigenvalue $\lambda_{\max{}}$ and updated via $\rho_n =
  * \left(2\frac{\lambda_{\max{}}+\lambda_{\min{}}}
