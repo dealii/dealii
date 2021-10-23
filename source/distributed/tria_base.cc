@@ -809,17 +809,15 @@ namespace parallel
     // would destroy the saved data before the second SolutionTransfer can
     // get it. This created a bug that is documented in
     // tests/mpi/p4est_save_03 with more than one SolutionTransfer.
+
     if (cell_attached_data.n_attached_data_sets == 0 &&
         cell_attached_data.n_attached_deserialize == 0)
       {
         // everybody got their data, time for cleanup!
         cell_attached_data.pack_callbacks_fixed.clear();
         cell_attached_data.pack_callbacks_variable.clear();
-      }
+        data_transfer.clear();
 
-    if (this->cell_attached_data.n_attached_data_sets == 0 &&
-        this->cell_attached_data.n_attached_deserialize == 0)
-      {
         // reset all cell_status entries after coarsening/refinement
         for (auto &cell_rel : local_cell_relations)
           cell_rel.second =
