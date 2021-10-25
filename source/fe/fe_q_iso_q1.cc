@@ -56,6 +56,28 @@ FE_Q_iso_Q1<dim, spacedim>::FE_Q_iso_Q1(const unsigned int subdivisions)
 
 
 template <int dim, int spacedim>
+FE_Q_iso_Q1<dim, spacedim>::FE_Q_iso_Q1(
+  const std::vector<Point<1>> &support_points)
+  : FE_Q_Base<dim, spacedim>(
+      TensorProductPolynomials<dim, Polynomials::PiecewisePolynomial<double>>(
+        Polynomials::generate_complete_linear_basis_on_subdivisions(
+          support_points)),
+      FiniteElementData<dim>(this->get_dpo_vector(support_points.size() - 1),
+                             1,
+                             support_points.size() - 1,
+                             FiniteElementData<dim>::H1),
+      std::vector<bool>(1, false))
+{
+  Assert(support_points.size() > 1,
+         ExcMessage("This element can only be used with a positive number of "
+                    "subelements"));
+
+  this->initialize(support_points);
+}
+
+
+
+template <int dim, int spacedim>
 std::string
 FE_Q_iso_Q1<dim, spacedim>::get_name() const
 {

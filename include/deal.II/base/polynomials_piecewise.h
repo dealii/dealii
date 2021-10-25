@@ -81,6 +81,15 @@ namespace Polynomials
                         const bool                spans_next_interval);
 
     /**
+     * Constructor for linear Lagrange polynomial on an interval that is a
+     * subset of the unit interval. It uses a polynomial description that is
+     * scaled to the size of the subinterval compared to the unit interval.
+     * The subintervals are bounded by the adjacent points in @p points.
+     */
+    PiecewisePolynomial(const std::vector<Point<1, number>> &points,
+                        const unsigned int                   index);
+
+    /**
      * Return the value of this polynomial at the given point, evaluating the
      * underlying polynomial. The polynomial evaluates to zero when outside of
      * the given interval (and possible the next one to the right when it
@@ -172,6 +181,24 @@ namespace Polynomials
      * one given in subinterval and the next one.
      */
     bool spans_two_intervals;
+
+    /**
+     * Points bounding the subintervals in the case that piecewise linear
+     * polynomial on varying subintervals is requested.
+     */
+    std::vector<number> points;
+
+    /**
+     * Precomputed inverses of the lengths of the subintervals, i.e.,
+     * `one_over_lengths[i] = 1.0 / (points[i + 1] - points[i]`.
+     */
+    std::vector<number> one_over_lengths;
+
+    /**
+     * A variable storing the index of the current polynomial in the case that
+     * piecewise linear polynomial on varying subintervals is requested.
+     */
+    unsigned int index;
   };
 
 
@@ -186,6 +213,14 @@ namespace Polynomials
     const unsigned int n_subdivisions,
     const unsigned int base_degree);
 
+  /**
+   * Generates a complete linear basis on a subdivision of the unit interval
+   * in smaller intervals for a given vector of points.
+   */
+  std::vector<PiecewisePolynomial<double>>
+  generate_complete_linear_basis_on_subdivisions(
+    const std::vector<Point<1>> &points);
+
 } // namespace Polynomials
 
 
@@ -199,6 +234,8 @@ namespace Polynomials
   inline unsigned int
   PiecewisePolynomial<number>::degree() const
   {
+    if (points.size() > 0)
+      return 1;
     return polynomial.degree();
   }
 
@@ -208,6 +245,20 @@ namespace Polynomials
   inline number
   PiecewisePolynomial<number>::value(const number x) const
   {
+    if (points.size() > 0)
+      {
+        if (x > points[index])
+          return std::max<number>(0.0,
+                                  1.0 - (x - points[index]) *
+                                          one_over_lengths[index]);
+        else if (x < points[index])
+          return std::max<number>(0.0,
+                                  0.0 + (x - points[index - 1]) *
+                                          one_over_lengths[index - 1]);
+        else
+          return 1.0;
+      }
+
     AssertIndexRange(interval, n_intervals);
     number y = x;
     // shift polynomial if necessary
@@ -256,8 +307,10 @@ namespace Polynomials
     ar &n_intervals;
     ar &interval;
     ar &spans_two_intervals;
+    ar &points;
+    ar &one_over_lengths;
+    ar &index;
   }
-
 } // namespace Polynomials
 
 DEAL_II_NAMESPACE_CLOSE
