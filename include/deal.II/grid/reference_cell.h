@@ -25,6 +25,8 @@
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/utilities.h>
 
+#include <iosfwd>
+#include <string>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -582,8 +584,34 @@ private:
    */
   friend DEAL_II_CONSTEXPR ReferenceCell
   internal::ReferenceCell::make_reference_cell_from_int(const std::uint8_t);
+
+  friend std::ostream &
+  operator<<(std::ostream &out, const ReferenceCell &reference_cell);
+
+  friend std::istream &
+  operator>>(std::istream &in, ReferenceCell &reference_cell);
 };
 
+
+/**
+ * Output operator that writes the @p reference_cell object to the stream
+ * in a text format in which the object is represented by an integer. The
+ * details of which integer value represents each kind of reference cell
+ * is unimportant and consequently not specified. If you want a string
+ * representation of what a ReferenceCell is, use ReferenceCell::to_string().
+ */
+std::ostream &
+operator<<(std::ostream &out, const ReferenceCell &reference_cell);
+
+/**
+ * Input operator that reads the @p reference_cell object from the stream
+ * in a text format in which the object is represented by an integer. Which
+ * specific integer value represents which reference cell is unspecified,
+ * but the function uses the same translation as the corresponding
+ * output `operator<<`.
+ */
+std::istream &
+operator>>(std::istream &in, ReferenceCell &reference_cell);
 
 
 inline constexpr ReferenceCell::ReferenceCell(const std::uint8_t kind)
