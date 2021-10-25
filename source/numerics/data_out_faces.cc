@@ -117,11 +117,7 @@ DataOutFaces<dim, spacedim>::build_one_patch(
       const Point<dim> vertex_reference_coordinates =
         cell->reference_cell().template vertex<dim>(
           cell->reference_cell().face_to_cell_vertices(
-            face_number,
-            vertex,
-            cell->face_orientation(face_number) +
-              4 * cell->face_flip(face_number) +
-              2 * cell->face_rotation(face_number)));
+            face_number, vertex, cell->combined_face_orientation(face_number)));
 
       const Point<dim> vertex_real_coordinates =
         data.mapping_collection[0].transform_unit_to_real_cell(

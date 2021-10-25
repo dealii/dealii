@@ -1189,6 +1189,17 @@ TriaAccessor<structdim, dim, spacedim>::quad_index(const unsigned int i) const
 
 
 template <int structdim, int dim, int spacedim>
+inline unsigned char
+TriaAccessor<structdim, dim, spacedim>::combined_face_orientation(
+  const unsigned int face) const
+{
+  return this->face_orientation(face) + 4 * this->face_flip(face) +
+         2 * this->face_rotation(face);
+}
+
+
+
+template <int structdim, int dim, int spacedim>
 inline bool
 TriaAccessor<structdim, dim, spacedim>::face_orientation(
   const unsigned int face) const
@@ -2528,6 +2539,16 @@ TriaAccessor<0, dim, spacedim>::measure() const
 
 
 template <int dim, int spacedim>
+inline unsigned char
+TriaAccessor<0, dim, spacedim>::combined_face_orientation(
+  const unsigned int /*face*/)
+{
+  return 0;
+}
+
+
+
+template <int dim, int spacedim>
 inline bool
 TriaAccessor<0, dim, spacedim>::face_orientation(const unsigned int /*face*/)
 {
@@ -2956,6 +2977,15 @@ TriaAccessor<0, 1, spacedim>::manifold_id() const
     return (*tria->vertex_to_manifold_id_map_1d)[this->vertex_index()];
   else
     return numbers::flat_manifold_id;
+}
+
+
+template <int spacedim>
+inline unsigned char
+TriaAccessor<0, 1, spacedim>::combined_face_orientation(
+  const unsigned int /*face*/)
+{
+  return 0;
 }
 
 

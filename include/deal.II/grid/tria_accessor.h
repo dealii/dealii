@@ -900,6 +900,13 @@ public:
    */
 
   /**
+   * Return an integer representation that uniquely encodes the orientation,
+   * flip, and rotation of a @p face.
+   */
+  unsigned char
+  combined_face_orientation(const unsigned int face) const;
+
+  /**
    * Return whether the face with index @p face has its normal pointing in the
    * standard direction (@p true) or whether it is the opposite (@p false).
    * Which is the standard direction is documented with the GeometryInfo
@@ -2105,6 +2112,12 @@ public:
    */
 
   /**
+   * @brief Always return 0
+   */
+  static unsigned char
+  combined_face_orientation(const unsigned int face);
+
+  /**
    * @brief Always return false
    */
   static bool
@@ -2569,6 +2582,12 @@ public:
   /**
    * @{
    */
+
+  /**
+   * @brief Always return 0
+   */
+  static unsigned char
+  combined_face_orientation(const unsigned int face);
 
   /**
    * @brief Always return false
