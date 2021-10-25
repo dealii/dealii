@@ -296,8 +296,7 @@ namespace internal
                   generate_simplex_evaluation_points<dim>(n_subdivisions));
               else
                 quadrature_simplex = std::make_unique<Quadrature<dim>>(
-                  FE_SimplexP<dim, spacedim>(n_subdivisions)
-                    .get_unit_support_points());
+                  FE_SimplexP<dim>(n_subdivisions).get_unit_support_points());
             }
 
           if (needs_hypercube_setup)
