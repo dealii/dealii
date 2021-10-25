@@ -2070,7 +2070,7 @@ namespace DataOutBase
     Patch<0, spacedim>::no_neighbor};
 
   template <int spacedim>
-  unsigned int Patch<0, spacedim>::n_subdivisions = 1;
+  const unsigned int Patch<0, spacedim>::n_subdivisions = 1;
 
   template <int spacedim>
   const ReferenceCell Patch<0, spacedim>::reference_cell =
@@ -9088,7 +9088,22 @@ namespace DataOutBase
     for (unsigned int i : patch.reference_cell.face_indices())
       in >> patch.neighbors[i];
 
-    in >> patch.patch_index >> patch.n_subdivisions;
+    in >> patch.patch_index;
+
+    // If dim>1, we also need to set the number of subdivisions, whereas
+    // in dim==1, this is a const variable equal to one that can't be changed.
+    unsigned int n_subdivisions;
+    in >> n_subdivisions;
+#ifdef DEAL_II_HAVE_CXX17
+    if constexpr (dim > 1)
+      patch.n_subdivisions = n_subdivisions;
+#else
+    // If we can't use 'if constexpr', work around the fact that we can't
+    // write to a 'const' variable by using a const_cast that is a no-op
+    // whenever the code is actually executed
+    if (dim > 1)
+      const_cast<unsigned int &>(patch.n_subdivisions) = n_subdivisions;
+#endif
 
     in >> patch.points_are_available;
 
