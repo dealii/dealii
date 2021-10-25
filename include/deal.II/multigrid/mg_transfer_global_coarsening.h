@@ -311,15 +311,15 @@ private:
      * @note For tensor-product elements, the value equals
      *   `n_components * (degree_coarse + 1)^dim`.
      */
-    unsigned int dofs_per_cell_coarse;
+    unsigned int n_dofs_per_cell_coarse;
 
     /**
      * Number of degrees of freedom of fine cell.
      *
      * @note For tensor-product elements, the value equals
-     *   `n_components * (dofs_per_cell_fine + 1)^dim`.
+     *   `n_components * (n_dofs_per_cell_fine + 1)^dim`.
      */
-    unsigned int dofs_per_cell_fine;
+    unsigned int n_dofs_per_cell_fine;
 
     /**
      * Polynomial degree of the finite element of a coarse cell.
