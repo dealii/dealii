@@ -1981,6 +1981,9 @@ namespace DataOutBase
   bool
   Patch<dim, spacedim>::operator==(const Patch &patch) const
   {
+    if (reference_cell != patch.reference_cell)
+      return false;
+
     // TODO: make tolerance relative
     const double epsilon = 3e-16;
     for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
@@ -2027,7 +2030,8 @@ namespace DataOutBase
             MemoryConsumption::memory_consumption(patch_index) +
             MemoryConsumption::memory_consumption(n_subdivisions) +
             MemoryConsumption::memory_consumption(data) +
-            MemoryConsumption::memory_consumption(points_are_available));
+            MemoryConsumption::memory_consumption(points_are_available) +
+            sizeof(reference_cell));
   }
 
 
