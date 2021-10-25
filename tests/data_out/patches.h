@@ -34,8 +34,15 @@ create_patches(std::vector<DataOutBase::Patch<dim, spacedim>> &patches)
       const unsigned int nsub  = p + 1;
       const unsigned int nsubp = nsub + 1;
 
-      patch.n_subdivisions = nsub;
-#if DEAL_II_HAVE_CXX17
+#ifdef DEAL_II_HAVE_CXX17
+      if constexpr (dim > 0)
+        patch.n_subdivisions = nsub;
+#else
+      if (dim > 0)
+        const_cast<unsigned int &>(patch.n_subdivisions) = nsub;
+#endif
+
+#ifdef DEAL_II_HAVE_CXX17
       if constexpr (dim > 0)
         patch.reference_cell = ReferenceCells::get_hypercube<dim>();
 #else
@@ -43,6 +50,7 @@ create_patches(std::vector<DataOutBase::Patch<dim, spacedim>> &patches)
         const_cast<ReferenceCell &>(patch.reference_cell) =
           ReferenceCells::get_hypercube<dim>();
 #endif
+
       for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
         for (unsigned int d = 0; d < spacedim; ++d)
           patch.vertices[v](d) =
