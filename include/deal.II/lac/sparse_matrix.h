@@ -697,6 +697,16 @@ public:
   reinit(const SparsityPattern &sparsity);
 
   /**
+   * Reinitialize the sparse matrix with the sparsity pattern of the given
+   * @p sparse_matrix. See also comments of the function above.
+   *
+   * @note The elements of the matrix are set to zero by this function.
+   */
+  template <typename number2>
+  void
+  reinit(const SparseMatrix<number2> &sparse_matrix);
+
+  /**
    * Release all memory and return to a state just like after having called
    * the default constructor. It also forgets the sparsity pattern it was
    * previously tied to.
@@ -1784,6 +1794,16 @@ private:
 
 #  ifndef DOXYGEN
 /*---------------------- Inline functions -----------------------------------*/
+
+
+
+template <typename number>
+template <typename number2>
+void
+SparseMatrix<number>::reinit(const SparseMatrix<number2> &sparse_matrix)
+{
+  this->reinit(sparse_matrix.get_sparsity_pattern());
+}
 
 
 
