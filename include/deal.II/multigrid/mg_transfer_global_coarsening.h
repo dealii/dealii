@@ -526,7 +526,7 @@ public:
    * If an inner vector of @p dst is empty or has incorrect locally owned size,
    * it will be resized to locally relevant degrees of freedom on each level.
    */
-  template <class InVector, int spacedim>
+  template <class InVector>
   void
   interpolate_to_mg(MGLevelObject<VectorType> &dst, const InVector &src) const;
 
@@ -666,7 +666,7 @@ MGTransferGlobalCoarsening<dim, VectorType>::copy_from_mg(
 
 
 template <int dim, typename VectorType>
-template <class InVector, int spacedim>
+template <class InVector>
 void
 MGTransferGlobalCoarsening<dim, VectorType>::interpolate_to_mg(
   MGLevelObject<VectorType> &dst,
