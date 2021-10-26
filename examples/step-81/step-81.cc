@@ -67,7 +67,25 @@ namespace Step81
   using namespace dealii;
   using namespace std::complex_literals;
 
-
+  /**
+   * The Parameters class inherits ParameterAcceptor, and instantiates all the coefficients in our variational equations.
+   * These coefficients are passed through ParameterAcceptor and are editable through a .prm file
+   *
+   * epsilon is the Electric Permitivitty coefficient and it is a rank 2 tensor. Depending on the material,
+   * we assign the i^th diagonal element of the tensor to the material epsilon value
+   * (one of the private epsilon_1_ or epsilon_2_ variables).
+   *
+   * mu_inv  is the inverese of the Magnetic Permiabillity coefficient and it is a complex number.
+   *
+   * sigma is the Surface Conductivity coefficient between material left and material right
+   * and it is a rank 2 tensor. It is only changed if we are at the interface between two
+   * materials. If we are at an interface, we assign the i^th diagonal element of the
+   * tensor to the private sigma_ value.
+   *
+   * J_a is the strength and orientation of the dipole. It is a rank 1 tensor that depends
+   * on the private dipole_position_, dipole_radius_, dipole_strength_, dipole_orientation_
+   * variables.
+   */
 
   template <int dim>
   class Parameters : public ParameterAcceptor
@@ -109,10 +127,6 @@ namespace Step81
     Tensor<1, dim, double> dipole_orientation;
     rank0_type             dipole_strength;
   };
-
-  //////////////////////////////////////////////////////////////////////////////
-  //////////////////////////////////////////////////////////////////////////////
-  //////////////////////////////////////////////////////////////////////////////
 
 
   template <int dim>
@@ -204,11 +218,11 @@ namespace Step81
     return J_a;
   }
 
-
-  //////////////////////////////////////////////////////////////////////////////
-  //////////////////////////////////////////////////////////////////////////////
-  //////////////////////////////////////////////////////////////////////////////
-
+  /**
+   * The PerfectlyMatchedLayer class inherits ParameterAcceptor, and it modifies our coefficients from Parameters.
+   * The radii and the strength of the PML is specified, and the coefficients will be modified using transformation
+   * matrices within the PML region. The radii and strength of the PML are editable through a .prm file
+  */
 
   template <int dim>
   class PerfectlyMatchedLayer : public ParameterAcceptor
@@ -243,11 +257,6 @@ namespace Step81
 
     rank2_type c_matrix(const Point<dim, double> point);
   };
-
-
-  //////////////////////////////////////////////////////////////////////////////
-  //////////////////////////////////////////////////////////////////////////////
-  //////////////////////////////////////////////////////////////////////////////
 
 
   template <int dim>
@@ -340,9 +349,6 @@ namespace Step81
   }
 
 
-  //////////////////////////////////////////////////////////////////////////////
-  //////////////////////////////////////////////////////////////////////////////
-  //////////////////////////////////////////////////////////////////////////////
 
 
   template <int dim>
@@ -382,10 +388,6 @@ namespace Step81
     Vector<double>            system_rhs;
   };
 
-
-  //////////////////////////////////////////////////////////////////////////////
-  //////////////////////////////////////////////////////////////////////////////
-  //////////////////////////////////////////////////////////////////////////////
 
 
   template <int dim>
