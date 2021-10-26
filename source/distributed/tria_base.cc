@@ -32,6 +32,7 @@
 #include <deal.II/lac/vector_memory.h>
 
 #include <algorithm>
+#include <cstdint>
 #include <fstream>
 #include <iostream>
 #include <numeric>
@@ -808,17 +809,15 @@ namespace parallel
     // would destroy the saved data before the second SolutionTransfer can
     // get it. This created a bug that is documented in
     // tests/mpi/p4est_save_03 with more than one SolutionTransfer.
+
     if (cell_attached_data.n_attached_data_sets == 0 &&
         cell_attached_data.n_attached_deserialize == 0)
       {
         // everybody got their data, time for cleanup!
         cell_attached_data.pack_callbacks_fixed.clear();
         cell_attached_data.pack_callbacks_variable.clear();
-      }
+        data_transfer.clear();
 
-    if (this->cell_attached_data.n_attached_data_sets == 0 &&
-        this->cell_attached_data.n_attached_deserialize == 0)
-      {
         // reset all cell_status entries after coarsening/refinement
         for (auto &cell_rel : local_cell_relations)
           cell_rel.second =
@@ -1393,6 +1392,8 @@ namespace parallel
 
     const int myrank = Utilities::MPI::this_mpi_process(mpi_communicator);
 
+    const unsigned int bytes_per_cell = sizes_fixed_cumulative.back();
+
     //
     // ---------- Fixed size data ----------
     //
@@ -1426,11 +1427,10 @@ namespace parallel
       // it is sufficient to let only the first processor perform this task.
       if (myrank == 0)
         {
-          const unsigned int *data = sizes_fixed_cumulative.data();
-
           ierr = MPI_File_write_at(fh,
                                    0,
-                                   DEAL_II_MPI_CONST_CAST(data),
+                                   DEAL_II_MPI_CONST_CAST(
+                                     sizes_fixed_cumulative.data()),
                                    sizes_fixed_cumulative.size(),
                                    MPI_UNSIGNED,
                                    MPI_STATUS_IGNORE);
@@ -1444,8 +1444,8 @@ namespace parallel
       // Make sure we do the following computation in 64bit integers to be able
       // to handle 4GB+ files:
       const MPI_Offset my_global_file_position =
-        size_header + static_cast<MPI_Offset>(global_first_cell) *
-                        sizes_fixed_cumulative.back();
+        size_header +
+        static_cast<MPI_Offset>(global_first_cell) * bytes_per_cell;
 
       ierr = MPI_File_write_at(fh,
                                my_global_file_position,
@@ -1490,45 +1490,44 @@ namespace parallel
 
         // Write sizes of each cell into file simultaneously.
         {
-          const int *data = src_sizes_variable.data();
+          const MPI_Offset my_global_file_position =
+            static_cast<MPI_Offset>(global_first_cell) * sizeof(unsigned int);
+
           ierr =
             MPI_File_write_at(fh,
-                              global_first_cell *
-                                sizeof(unsigned int), // global position in file
-                              DEAL_II_MPI_CONST_CAST(data),
-                              src_sizes_variable.size(), // local buffer
+                              my_global_file_position,
+                              DEAL_II_MPI_CONST_CAST(src_sizes_variable.data()),
+                              src_sizes_variable.size(),
                               MPI_INT,
                               MPI_STATUS_IGNORE);
           AssertThrowMPI(ierr);
         }
 
-
-        const unsigned int offset_variable =
-          global_num_cells * sizeof(unsigned int);
-
-        // Gather size of data in bytes we want to store from this processor.
-        const unsigned int size_on_proc = src_data_variable.size();
-
-        // Compute prefix sum
-        unsigned int prefix_sum = 0;
+        // Gather size of data in bytes we want to store from this
+        // processor and compute the prefix sum. We do this in 64 bit
+        // to avoid overflow for files larger than 4GB:
+        const std::uint64_t size_on_proc = src_data_variable.size();
+        std::uint64_t       prefix_sum   = 0;
         ierr = MPI_Exscan(DEAL_II_MPI_CONST_CAST(&size_on_proc),
                           &prefix_sum,
                           1,
-                          MPI_UNSIGNED,
+                          MPI_UINT64_T,
                           MPI_SUM,
                           mpi_communicator);
         AssertThrowMPI(ierr);
 
-        const char *data = src_data_variable.data();
+        const MPI_Offset my_global_file_position =
+          static_cast<MPI_Offset>(global_num_cells) * sizeof(unsigned int) +
+          prefix_sum;
 
         // Write data consecutively into file.
-        ierr = MPI_File_write_at(fh,
-                                 offset_variable +
-                                   prefix_sum, // global position in file
-                                 DEAL_II_MPI_CONST_CAST(data),
-                                 src_data_variable.size(), // local buffer
-                                 MPI_CHAR,
-                                 MPI_STATUS_IGNORE);
+        ierr =
+          MPI_File_write_at(fh,
+                            my_global_file_position,
+                            DEAL_II_MPI_CONST_CAST(src_data_variable.data()),
+                            src_data_variable.size(),
+                            MPI_CHAR,
+                            MPI_STATUS_IGNORE);
         AssertThrowMPI(ierr);
 
         ierr = MPI_File_close(&fh);
@@ -1601,7 +1600,9 @@ namespace parallel
       AssertThrowMPI(ierr);
 
       // Allocate sufficient memory.
-      dest_data_fixed.resize(local_num_cells * sizes_fixed_cumulative.back());
+      const unsigned int bytes_per_cell = sizes_fixed_cumulative.back();
+      dest_data_fixed.resize(static_cast<size_t>(local_num_cells) *
+                             bytes_per_cell);
 
       // Read packed data from file simultaneously.
       const MPI_Offset size_header =
@@ -1610,8 +1611,8 @@ namespace parallel
       // Make sure we do the following computation in 64bit integers to be able
       // to handle 4GB+ files:
       const MPI_Offset my_global_file_position =
-        size_header + static_cast<MPI_Offset>(global_first_cell) *
-                        sizes_fixed_cumulative.back();
+        size_header +
+        static_cast<MPI_Offset>(global_first_cell) * bytes_per_cell;
 
       ierr = MPI_File_read_at(fh,
                               my_global_file_position,
@@ -1650,34 +1651,42 @@ namespace parallel
 
         // Read sizes of all locally owned cells.
         dest_sizes_variable.resize(local_num_cells);
+
+        const MPI_Offset my_global_file_position_sizes =
+          static_cast<MPI_Offset>(global_first_cell) * sizeof(unsigned int);
+
         ierr = MPI_File_read_at(fh,
-                                global_first_cell * sizeof(unsigned int),
+                                my_global_file_position_sizes,
                                 dest_sizes_variable.data(),
                                 dest_sizes_variable.size(),
                                 MPI_INT,
                                 MPI_STATUS_IGNORE);
         AssertThrowMPI(ierr);
 
-        const unsigned int offset = global_num_cells * sizeof(unsigned int);
 
-        const unsigned int size_on_proc =
+        // Compute my data size in bytes and compute prefix sum. We do this in
+        // 64 bit to avoid overflow for files larger than 4 GB:
+        const std::uint64_t size_on_proc =
           std::accumulate(dest_sizes_variable.begin(),
                           dest_sizes_variable.end(),
                           0);
 
-        // share information among all processors by prefix sum
-        unsigned int prefix_sum = 0;
+        std::uint64_t prefix_sum = 0;
         ierr = MPI_Exscan(DEAL_II_MPI_CONST_CAST(&size_on_proc),
                           &prefix_sum,
                           1,
-                          MPI_UNSIGNED,
+                          MPI_UINT64_T,
                           MPI_SUM,
                           mpi_communicator);
         AssertThrowMPI(ierr);
 
+        const MPI_Offset my_global_file_position =
+          static_cast<MPI_Offset>(global_num_cells) * sizeof(unsigned int) +
+          prefix_sum;
+
         dest_data_variable.resize(size_on_proc);
         ierr = MPI_File_read_at(fh,
-                                offset + prefix_sum,
+                                my_global_file_position,
                                 dest_data_variable.data(),
                                 dest_data_variable.size(),
                                 MPI_CHAR,
