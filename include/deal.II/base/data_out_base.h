@@ -472,9 +472,11 @@ namespace DataOutBase
     bool points_are_available;
 
     /**
-     * Reference-cell type of the underlying cell of this patch.
+     * Reference-cell type of the underlying cell of this patch. Since for
+     * zero-dimensional objects, a patch can only refer to a vertex, this
+     * field is always equal to ReferenceCells::Vertex and can not be changed.
      */
-    ReferenceCell reference_cell;
+    static const ReferenceCell reference_cell;
 
     /**
      * Default constructor. Sets #points_are_available

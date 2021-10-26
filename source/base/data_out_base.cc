@@ -2067,10 +2067,13 @@ namespace DataOutBase
   unsigned int Patch<0, spacedim>::n_subdivisions = 1;
 
   template <int spacedim>
+  const ReferenceCell Patch<0, spacedim>::reference_cell =
+    ReferenceCells::Vertex;
+
+  template <int spacedim>
   Patch<0, spacedim>::Patch()
     : patch_index(no_neighbor)
     , points_are_available(false)
-    , reference_cell(ReferenceCells::get_hypercube<0>())
   {
     Assert(spacedim <= 3, ExcNotImplemented());
   }
