@@ -45,7 +45,7 @@ namespace hp
    * cells of a triangulation.
    *
    * This class has not yet been implemented for the use in the codimension
-   * one case (<tt>spacedim != dim </tt>).
+   * one case (<tt>spacedim != dim</tt>).
    *
    * @ingroup hp hpcollection
    */
@@ -586,7 +586,7 @@ namespace hp
      * By default, the index succeeding @p fe_index will be returned. If @p fe_index
      * already corresponds to the last index, the last index will be returned.
      * A custom hierarchy can be supplied via the member function
-     * set_hierachy().
+     * set_hierarchy().
      */
     unsigned int
     next_in_hierarchy(const unsigned int fe_index) const;
@@ -598,7 +598,7 @@ namespace hp
      * By default, the index preceding @p fe_index will be returned. If @p fe_index
      * already corresponds to the first index, the first index will be returned.
      * A custom hierarchy can be supplied via the member function
-     * set_hierachy().
+     * set_hierarchy().
      */
     unsigned int
     previous_in_hierarchy(const unsigned int fe_index) const;
