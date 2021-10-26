@@ -30,6 +30,7 @@
 #include <deal.II/grid/reference_cell.h>
 #include <deal.II/grid/tria.h>
 
+#include <iostream>
 #include <memory>
 
 DEAL_II_NAMESPACE_OPEN
@@ -454,6 +455,50 @@ ReferenceCell::vtk_lagrange_type() const
 
   return VTKCellType::VTK_INVALID;
 }
+
+
+
+std::ostream &
+operator<<(std::ostream &out, const ReferenceCell &reference_cell)
+{
+  AssertThrow(out, ExcIO());
+
+  // Output as an integer to avoid outputting it as a character with
+  // potentially non-printing value:
+  out << static_cast<unsigned int>(reference_cell.kind);
+  return out;
+}
+
+
+
+std::istream &
+operator>>(std::istream &in, ReferenceCell &reference_cell)
+{
+  AssertThrow(in, ExcIO());
+
+  // Read the information as an integer and convert it to the correct type
+  unsigned int value;
+  in >> value;
+  reference_cell.kind = static_cast<decltype(reference_cell.kind)>(value);
+
+  // Ensure that the object we read is valid
+  Assert(
+    (reference_cell == ReferenceCells::Vertex) ||
+      (reference_cell == ReferenceCells::Line) ||
+      (reference_cell == ReferenceCells::Triangle) ||
+      (reference_cell == ReferenceCells::Quadrilateral) ||
+      (reference_cell == ReferenceCells::Tetrahedron) ||
+      (reference_cell == ReferenceCells::Hexahedron) ||
+      (reference_cell == ReferenceCells::Wedge) ||
+      (reference_cell == ReferenceCells::Pyramid) ||
+      (reference_cell == ReferenceCells::Invalid),
+    ExcMessage(
+      "The reference cell kind just read does not correspond to one of the valid choices. There must be an error."));
+
+  return in;
+}
+
+
 
 #include "reference_cell.inst"
 

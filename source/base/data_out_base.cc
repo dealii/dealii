@@ -1948,7 +1948,7 @@ namespace
 
 namespace DataOutBase
 {
-  const unsigned int Deal_II_IntermediateFlags::format_version = 3;
+  const unsigned int Deal_II_IntermediateFlags::format_version = 4;
 
 
   template <int dim, int spacedim>
@@ -9011,12 +9011,15 @@ namespace DataOutBase
     out << "[deal.II intermediate Patch<" << dim << ',' << spacedim << ">]"
         << '\n';
 
+    // First export what kind of reference cell we are looking at:
+    out << patch.reference_cell << '\n';
+
     // then write all the data that is in this patch
-    for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
-      out << patch.vertices[GeometryInfo<dim>::ucd_to_deal[i]] << ' ';
+    for (const unsigned int i : patch.reference_cell.vertex_indices())
+      out << patch.vertices[i] << ' ';
     out << '\n';
 
-    for (unsigned int i : GeometryInfo<dim>::face_indices())
+    for (unsigned int i : patch.reference_cell.face_indices())
       out << patch.neighbors[i] << ' ';
     out << '\n';
 
@@ -9033,6 +9036,7 @@ namespace DataOutBase
 
     return out;
   }
+
 
 
   template <int dim, int spacedim>
@@ -9059,12 +9063,23 @@ namespace DataOutBase
       Assert(header == s.str(), ExcUnexpectedInput(s.str(), header));
     }
 
+    // First import what kind of reference cell we are looking at:
+#if DEAL_II_HAVE_CXX17
+    if constexpr (dim > 0)
+      in >> patch.reference_cell;
+#else
+    // If we can't use 'if constexpr', work around the fact that we can't
+    // write to a 'const' variable by using a const_cast that is a no-op
+    // whenever the code is actually executed
+    if (dim > 0)
+      in >> const_cast<ReferenceCell &>(patch.reference_cell);
+#endif
 
     // then read all the data that is in this patch
-    for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
-      in >> patch.vertices[GeometryInfo<dim>::ucd_to_deal[i]];
+    for (const unsigned int i : patch.reference_cell.vertex_indices())
+      in >> patch.vertices[i];
 
-    for (unsigned int i : GeometryInfo<dim>::face_indices())
+    for (unsigned int i : patch.reference_cell.face_indices())
       in >> patch.neighbors[i];
 
     in >> patch.patch_index >> patch.n_subdivisions;
