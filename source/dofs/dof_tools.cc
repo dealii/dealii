@@ -2134,7 +2134,8 @@ namespace DoFTools
              ++fe_index)
           {
             // check whether every FE in the collection has support points
-            Assert(fe_collection[fe_index].has_support_points(),
+            Assert((fe_collection[fe_index].n_dofs_per_cell() == 0) ||
+                     (fe_collection[fe_index].has_support_points()),
                    typename FiniteElement<dim>::ExcFEHasNoSupportPoints());
             q_coll_dummy.push_back(Quadrature<dim>(
               fe_collection[fe_index].get_unit_support_points()));
