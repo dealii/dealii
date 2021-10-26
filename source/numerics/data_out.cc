@@ -153,7 +153,7 @@ DataOut<dim, spacedim>::build_one_patch(
       // explicitly given
       patch.points_are_available = true;
 
-      // then resize the patch.data member in order to have enough memory for
+      // then size the patch.data member in order to have enough memory for
       // the quadrature points as well, and copy the quadrature points there
       const std::vector<Point<spacedim>> &q_points =
         fe_patch_values.get_quadrature_points();
