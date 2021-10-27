@@ -29,6 +29,140 @@ DEAL_II_NAMESPACE_OPEN
 namespace hp
 {
   /**
+   * An iterator for hp::Collection.
+   */
+  template <typename T>
+  class CollectionIterator
+  {
+  public:
+    /**
+     * Constructor.
+     *
+     * @param data The actual data of hp::Collection.
+     * @param index The current index.
+     */
+    CollectionIterator(const std::vector<std::shared_ptr<const T>> &data,
+                       const std::size_t                            index)
+      : data(&data)
+      , index(index)
+    {}
+
+    /**
+     * Compare for equality.
+     */
+    bool
+    operator==(const CollectionIterator<T> &other) const
+    {
+      Assert(
+        this->data == other.data,
+        ExcMessage(
+          "You are trying to compare iterators into different hp::Collection objects."));
+      return this->index == other.index;
+    }
+
+    /**
+     * Compare for inequality.
+     */
+    bool
+    operator!=(const CollectionIterator<T> &other) const
+    {
+      Assert(
+        this->data == other.data,
+        ExcMessage(
+          "You are trying to compare iterators into different hp::Collection objects."));
+      return this->index != other.index;
+    }
+
+    /**
+     * Copy assignment.
+     */
+    CollectionIterator<T> &
+    operator=(const CollectionIterator<T> &other) = default;
+
+    /**
+     * Dereferencing operator: returns the value of the current index.
+     */
+    const T &
+    operator*() const
+    {
+      AssertIndexRange(index, data->size());
+      return *(*data)[index];
+    }
+
+    /**
+     * Prefix <tt>++</tt> operator: <tt>++iterator</tt>. This operator advances
+     * the iterator to the next index and returns a reference to
+     * <tt>*this</tt>.
+     */
+    CollectionIterator<T> &
+    operator++()
+    {
+      AssertIndexRange(index + 1, data->size() + 1);
+      index++;
+      return *this;
+    }
+
+    /**
+     * This operator advances the iterator by @p offset and returns a
+     * reference to <tt>*this</tt>.
+     */
+    CollectionIterator<T> &
+    operator+=(const std::size_t offset)
+    {
+      AssertIndexRange(index + offset, data->size() + 1);
+      index += offset;
+      return *this;
+    }
+
+    /**
+     * Prefix <tt>--</tt> operator: <tt>--iterator</tt>. This operator advances
+     * the iterator to the previous index and returns a reference to
+     * <tt>*this</tt>.
+     */
+    CollectionIterator<T> &
+    operator--()
+    {
+      Assert(
+        index > 0,
+        ExcMessage(
+          "You can't decrement an iterator that is already at the beginning of the range."));
+      --index;
+      return *this;
+    }
+
+    /**
+     * Create new iterator, which is shifted by @p offset.
+     */
+    CollectionIterator<T>
+    operator+(const std::size_t &offset) const
+    {
+      AssertIndexRange(index + offset, T::size() + 1);
+      return CollectionIterator<T>(*data, index + offset);
+    }
+
+    /**
+     * Compute distance between this iterator and iterator @p other.
+     */
+    std::ptrdiff_t
+    operator-(const CollectionIterator<T> &other) const
+    {
+      return static_cast<std::ptrdiff_t>(index) -
+             static_cast<ptrdiff_t>(other.index);
+    }
+
+  private:
+    /**
+     * Pointer to the actual data of hp::Collection.
+     */
+    const std::vector<std::shared_ptr<const T>> *data;
+
+    /**
+     * Current index.
+     */
+    std::size_t index;
+  };
+
+  /**
    * This class implements a collection of objects.
    *
    * It implements the concepts stated in the @ref hpcollection
@@ -75,6 +209,20 @@ namespace hp
     std::size_t
     memory_consumption() const;
 
+    /**
+     * @return An iterator pointing to the beginning of the underlying data (`const`
+     * version).
+     */
+    CollectionIterator<T>
+    begin() const;
+
+    /**
+     * @return An iterator pointing to the end of the underlying data (`const`
+     * version).
+     */
+    CollectionIterator<T>
+    end() const;
+
   private:
     /**
      * The real container, which stores pointers to the different objects.
@@ -120,6 +268,24 @@ namespace hp
   {
     AssertIndexRange(index, entries.size());
     return *entries[index];
+  }
+
+
+
+  template <typename T>
+  CollectionIterator<T>
+  Collection<T>::begin() const
+  {
+    return CollectionIterator<T>(entries, 0);
+  }
+
+
+
+  template <typename T>
+  CollectionIterator<T>
+  Collection<T>::end() const
+  {
+    return CollectionIterator<T>(entries, entries.size());
   }
 
 } // namespace hp
