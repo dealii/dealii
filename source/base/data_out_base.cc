@@ -959,6 +959,12 @@ namespace
     n_cells = 0;
     for (const auto &patch : patches)
       {
+        Assert(patch.reference_cell != ReferenceCells::Invalid,
+               ExcMessage(
+                 "The reference cell for this patch is set to 'Invalid', "
+                 "but that is clearly not a valid choice. Did you forget "
+                 "to set the reference cell for the patch?"));
+
         // The following formula doesn't hold for non-tensor products.
         if (patch.reference_cell == ReferenceCells::get_hypercube<dim>())
           {
@@ -1964,7 +1970,7 @@ namespace DataOutBase
     : patch_index(no_neighbor)
     , n_subdivisions(1)
     , points_are_available(false)
-    , reference_cell(ReferenceCells::get_hypercube<dim>())
+    , reference_cell(ReferenceCells::Invalid)
   // all the other data has a constructor of its own, except for the "neighbors"
   // field, which we set to invalid values.
   {

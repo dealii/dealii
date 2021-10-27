@@ -141,9 +141,10 @@ BoundingBoxDataOut<dim>::build_patches(
       boost::geometry::convert(getter(*value), box);
       for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
         {
-          patches[i].vertices[v]          = box.vertex(v);
-          patches[i].patch_index          = i;
-          patches[i].n_subdivisions       = 1;
+          patches[i].vertices[v]    = box.vertex(v);
+          patches[i].patch_index    = i;
+          patches[i].n_subdivisions = 1;
+          patches[i].reference_cell = ReferenceCells::get_hypercube<dim>();
           patches[i].points_are_available = false;
         }
       ++i;

@@ -524,6 +524,8 @@ DataOutRotation<dim, spacedim>::build_patches(
   for (unsigned int i = 0; i < new_patches.size(); ++i)
     {
       new_patches[i].n_subdivisions = n_subdivisions;
+      new_patches[i].reference_cell = ReferenceCells::get_hypercube<dim + 1>();
+
       new_patches[i].data.reinit(
         n_datasets, Utilities::fixed_power<patch_dim>(n_subdivisions + 1));
     }

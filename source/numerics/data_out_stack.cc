@@ -310,6 +310,7 @@ DataOutStack<dim, spacedim, void>::build_patches(
   // the time direction) points
   dealii::DataOutBase::Patch<patch_dim, patch_spacedim> default_patch;
   default_patch.n_subdivisions = n_subdivisions;
+  default_patch.reference_cell = ReferenceCells::get_hypercube<dim + 1>();
   default_patch.data.reinit(n_datasets, n_q_points * (n_subdivisions + 1));
   patches.insert(patches.end(), n_patches, default_patch);
 

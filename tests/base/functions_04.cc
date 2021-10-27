@@ -61,6 +61,7 @@ check_function(const Functions::FlowFunction<dim> &f,
     patches[0].neighbors[i] = numbers::invalid_unsigned_int;
   patches[0].patch_index          = 0;
   patches[0].n_subdivisions       = sub;
+  patches[0].reference_cell       = ReferenceCells::get_hypercube<dim>();
   patches[0].points_are_available = false;
 
   vertex_number = 1;
