@@ -203,8 +203,10 @@ public:
   reinit_geometric_transfer(
     const DoFHandler<dim> &          dof_handler_fine,
     const DoFHandler<dim> &          dof_handler_coarse,
-    const AffineConstraints<Number> &constraint_fine,
-    const AffineConstraints<Number> &constraint_coarse,
+    const AffineConstraints<Number> &constraint_fine =
+      AffineConstraints<Number>(),
+    const AffineConstraints<Number> &constraint_coarse =
+      AffineConstraints<Number>(),
     const unsigned int mg_level_fine   = numbers::invalid_unsigned_int,
     const unsigned int mg_level_coarse = numbers::invalid_unsigned_int);
 
@@ -221,8 +223,10 @@ public:
   reinit_polynomial_transfer(
     const DoFHandler<dim> &          dof_handler_fine,
     const DoFHandler<dim> &          dof_handler_coarse,
-    const AffineConstraints<Number> &constraint_fine,
-    const AffineConstraints<Number> &constraint_coarse,
+    const AffineConstraints<Number> &constraint_fine =
+      AffineConstraints<Number>(),
+    const AffineConstraints<Number> &constraint_coarse =
+      AffineConstraints<Number>(),
     const unsigned int mg_level_fine   = numbers::invalid_unsigned_int,
     const unsigned int mg_level_coarse = numbers::invalid_unsigned_int);
 
@@ -242,8 +246,10 @@ public:
   void
   reinit(const DoFHandler<dim> &          dof_handler_fine,
          const DoFHandler<dim> &          dof_handler_coarse,
-         const AffineConstraints<Number> &constraint_fine,
-         const AffineConstraints<Number> &constraint_coarse,
+         const AffineConstraints<Number> &constraint_fine =
+           AffineConstraints<Number>(),
+         const AffineConstraints<Number> &constraint_coarse =
+           AffineConstraints<Number>(),
          const unsigned int mg_level_fine   = numbers::invalid_unsigned_int,
          const unsigned int mg_level_coarse = numbers::invalid_unsigned_int);
 
