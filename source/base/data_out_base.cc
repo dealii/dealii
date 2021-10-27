@@ -3700,6 +3700,9 @@ namespace DataOutBase
           {
             case 0:
               {
+                Assert(patch.reference_cell == ReferenceCells::Vertex,
+                       ExcInternalError());
+
                 // compute coordinates for this patch point
                 out << compute_hypercube_node(patch, 0, 0, 0, n_subdivisions)
                     << ' ';
@@ -3711,6 +3714,9 @@ namespace DataOutBase
 
             case 1:
               {
+                Assert(patch.reference_cell == ReferenceCells::Line,
+                       ExcInternalError());
+
                 for (unsigned int i1 = 0; i1 < n_points_per_direction; ++i1)
                   {
                     // compute coordinates for this patch point
@@ -3729,6 +3735,9 @@ namespace DataOutBase
 
             case 2:
               {
+                Assert(patch.reference_cell == ReferenceCells::Quadrilateral,
+                       ExcNotImplemented());
+
                 for (unsigned int i2 = 0; i2 < n_points_per_direction; ++i2)
                   {
                     for (unsigned int i1 = 0; i1 < n_points_per_direction; ++i1)
@@ -3752,6 +3761,9 @@ namespace DataOutBase
 
             case 3:
               {
+                Assert(patch.reference_cell == ReferenceCells::Hexahedron,
+                       ExcNotImplemented());
+
                 // for all grid points: draw lines into all positive coordinate
                 // directions if there is another grid point there
                 for (unsigned int i3 = 0; i3 < n_points_per_direction; ++i3)
