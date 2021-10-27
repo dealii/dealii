@@ -449,24 +449,40 @@ namespace SUNDIALS
 
     auto solution_nvector = internal::make_nvector_view(solution);
 
+    int status;
+    (void)status;
+
+    // Explicitly set the stop time as recommended in the ARKODE manual to
+    // achieve a higher accuracy of the solution at the end of the solved
+    // interval. We set the final(!) solution time of the current solution
+    // interval. This means that ARKODE will interpolate the solution at the
+    // intermediate `output_period`s with potentially lower accuracy.
+#  if DEAL_II_SUNDIALS_VERSION_LT(4, 0, 0)
+    status = ARKodeSetStopTime(arkode_mem, time.get_end_time());
+#  else
+    status = ARKStepSetStopTime(arkode_mem, time.get_end_time());
+#  endif
+    AssertARKode(status);
+
+
     while (!time.is_at_end())
       {
         time.set_desired_next_step_size(data.output_period);
         double actual_next_time;
+
 #  if DEAL_II_SUNDIALS_VERSION_LT(4, 0, 0)
-        const auto status = SundialsARKode(arkode_mem,
-                                           time.get_next_time(),
-                                           solution_nvector,
-                                           &actual_next_time,
-                                           ARK_NORMAL);
+        status = SundialsARKode(arkode_mem,
+                                time.get_next_time(),
+                                solution_nvector,
+                                &actual_next_time,
+                                ARK_NORMAL);
 #  else
-        const auto status = ARKStepEvolve(arkode_mem,
-                                          time.get_next_time(),
-                                          solution_nvector,
-                                          &actual_next_time,
-                                          ARK_NORMAL);
+        status = ARKStepEvolve(arkode_mem,
+                               time.get_next_time(),
+                               solution_nvector,
+                               &actual_next_time,
+                               ARK_NORMAL);
 #  endif
-        (void)status;
         AssertARKode(status);
 
         time.set_next_step_size(actual_next_time - time.get_current_time());
@@ -538,9 +554,6 @@ namespace SUNDIALS
     AssertARKode(status);
 
     status = ARKodeSetUserData(arkode_mem, this);
-    AssertARKode(status);
-
-    status = ARKodeSetStopTime(arkode_mem, data.final_time);
     AssertARKode(status);
 
     status =
@@ -648,9 +661,6 @@ namespace SUNDIALS
     setup_mass_solver(solution);
 
     status = ARKStepSetInitStep(arkode_mem, current_time_step);
-    AssertARKode(status);
-
-    status = ARKStepSetStopTime(arkode_mem, data.final_time);
     AssertARKode(status);
 
     status = ARKStepSetOrder(arkode_mem, data.maximum_order);
