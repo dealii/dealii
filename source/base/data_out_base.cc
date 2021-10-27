@@ -9070,7 +9070,7 @@ namespace DataOutBase
     }
 
     // First import what kind of reference cell we are looking at:
-#if DEAL_II_HAVE_CXX17
+#ifdef DEAL_II_HAVE_CXX17
     if constexpr (dim > 0)
       in >> patch.reference_cell;
 #else
