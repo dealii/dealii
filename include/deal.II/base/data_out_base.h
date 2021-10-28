@@ -433,7 +433,7 @@ namespace DataOutBase
      * this variable is not used but exists only to allow access
      * from general code in a generic fashion.
      */
-    static unsigned int n_subdivisions;
+    static const unsigned int n_subdivisions;
 
     /**
      * Data vectors. The format is as follows: <tt>data(i,.)</tt> denotes the
