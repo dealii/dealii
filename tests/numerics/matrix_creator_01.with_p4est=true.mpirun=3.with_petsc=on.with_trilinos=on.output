@@ -1,0 +1,5 @@
+
+DEAL:Trilinos::Laplace matrix: 34.9481
+DEAL:Trilinos::Mass matrix:    0.0916667
+DEAL:PETSc::Laplace matrix: 34.9481
+DEAL:PETSc::Mass matrix:    0.0916667
