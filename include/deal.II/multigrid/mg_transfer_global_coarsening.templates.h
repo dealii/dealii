@@ -1632,14 +1632,31 @@ namespace internal
       transfer.n_components =
         dof_handler_fine.get_fe_collection().n_components();
 
-      transfer.fine_element_is_continuous =
-        dof_handler_fine.get_fe(0).n_dofs_per_vertex() > 0;
+      // TODO: replace with std::all_of once FECellection supports range-based
+      // iterations
+      const auto all_of = [](const auto &fe_collection, const auto &fu) {
+        for (unsigned int i = 0; i < fe_collection.size(); ++i)
+          if (fu(fe_collection[i]) == false)
+            return false;
 
-      for (unsigned int i = 0; i < dof_handler_fine.get_fe_collection().size();
-           ++i)
-        Assert(transfer.fine_element_is_continuous ==
-                 (dof_handler_fine.get_fe(i).n_dofs_per_vertex() > 0),
-               ExcInternalError());
+        return true;
+      };
+
+      transfer.fine_element_is_continuous =
+        all_of(dof_handler_fine.get_fe_collection(), [](const auto &fe) {
+          return fe.n_dofs_per_cell() == 0 || fe.n_dofs_per_vertex() > 0;
+        });
+
+#if DEBUG
+      const bool fine_element_is_discontinuous =
+        all_of(dof_handler_fine.get_fe_collection(), [](const auto &fe) {
+          return fe.n_dofs_per_cell() == 0 || fe.n_dofs_per_vertex() == 0;
+        });
+
+      Assert(transfer.fine_element_is_continuous !=
+               fine_element_is_discontinuous,
+             ExcNotImplemented());
+#endif
 
       const auto process_cells = [&](const auto &fu) {
         loop_over_active_or_level_cells(
@@ -1757,7 +1774,7 @@ namespace internal
                 .reference_cell();
 
             Assert(reference_cell ==
-                     dof_handler_coarse.get_fe(fe_index_pair.first.second)
+                     dof_handler_coarse.get_fe(fe_index_pair.first.first)
                        .reference_cell(),
                    ExcNotImplemented());
 
@@ -1899,13 +1916,17 @@ namespace internal
               .reference_cell();
 
           Assert(reference_cell ==
-                   dof_handler_coarse.get_fe(fe_index_pair_.first.second)
+                   dof_handler_coarse.get_fe(fe_index_pair_.first.first)
                      .reference_cell(),
                  ExcNotImplemented());
 
           if (reference_cell == ReferenceCells::get_hypercube<dim>() &&
               (dof_handler_coarse.get_fe(fe_index_pair.first) !=
-               dof_handler_fine.get_fe(fe_index_pair.second)))
+               dof_handler_fine.get_fe(fe_index_pair.second)) &&
+              (dof_handler_coarse.get_fe(fe_index_pair.first)
+                   .n_dofs_per_cell() != 0 &&
+               dof_handler_fine.get_fe(fe_index_pair.second)
+                   .n_dofs_per_cell() != 0))
             {
               const auto fe_fine = create_1D_fe(
                 dof_handler_fine.get_fe(fe_index_pair.second).base_element(0));
@@ -1979,7 +2000,11 @@ namespace internal
             }
           else if (reference_cell != ReferenceCells::get_hypercube<dim>() &&
                    (dof_handler_coarse.get_fe(fe_index_pair.first) !=
-                    dof_handler_fine.get_fe(fe_index_pair.second)))
+                    dof_handler_fine.get_fe(fe_index_pair.second)) &&
+                   (dof_handler_coarse.get_fe(fe_index_pair.first)
+                        .n_dofs_per_cell() != 0 &&
+                    dof_handler_fine.get_fe(fe_index_pair.second)
+                        .n_dofs_per_cell() != 0))
             {
               const auto &fe_fine =
                 dof_handler_fine.get_fe(fe_index_pair.second).base_element(0);
@@ -2336,14 +2361,21 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
         {
           for (unsigned int cell = 0; cell < scheme.n_coarse_cells; ++cell)
             {
-              if (fine_element_is_continuous)
-                for (unsigned int i = 0; i < scheme.n_dofs_per_cell_fine; ++i)
-                  vec_fine_ptr->local_element(indices_fine[i]) +=
-                    read_dof_values(indices_coarse[i], vec_coarse) * weights[i];
-              else
-                for (unsigned int i = 0; i < scheme.n_dofs_per_cell_fine; ++i)
-                  vec_fine_ptr->local_element(indices_fine[i]) +=
-                    read_dof_values(indices_coarse[i], vec_coarse);
+              if ((scheme.n_dofs_per_cell_fine != 0) &&
+                  (scheme.n_dofs_per_cell_coarse != 0))
+                {
+                  if (fine_element_is_continuous)
+                    for (unsigned int i = 0; i < scheme.n_dofs_per_cell_fine;
+                         ++i)
+                      vec_fine_ptr->local_element(indices_fine[i]) +=
+                        read_dof_values(indices_coarse[i], vec_coarse) *
+                        weights[i];
+                  else
+                    for (unsigned int i = 0; i < scheme.n_dofs_per_cell_fine;
+                         ++i)
+                      vec_fine_ptr->local_element(indices_fine[i]) +=
+                        read_dof_values(indices_coarse[i], vec_coarse);
+                }
 
               indices_fine += scheme.n_dofs_per_cell_fine;
               indices_coarse += scheme.n_dofs_per_cell_coarse;
@@ -2488,18 +2520,25 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
         {
           for (unsigned int cell = 0; cell < scheme.n_coarse_cells; ++cell)
             {
-              if (fine_element_is_continuous)
-                for (unsigned int i = 0; i < scheme.n_dofs_per_cell_fine; ++i)
-                  distribute_local_to_global(
-                    indices_coarse[i],
-                    vec_fine_ptr->local_element(indices_fine[i]) * weights[i],
-                    this->vec_coarse);
-              else
-                for (unsigned int i = 0; i < scheme.n_dofs_per_cell_fine; ++i)
-                  distribute_local_to_global(indices_coarse[i],
-                                             vec_fine_ptr->local_element(
-                                               indices_fine[i]),
-                                             this->vec_coarse);
+              if ((scheme.n_dofs_per_cell_fine != 0) &&
+                  (scheme.n_dofs_per_cell_coarse != 0))
+                {
+                  if (fine_element_is_continuous)
+                    for (unsigned int i = 0; i < scheme.n_dofs_per_cell_fine;
+                         ++i)
+                      distribute_local_to_global(indices_coarse[i],
+                                                 vec_fine_ptr->local_element(
+                                                   indices_fine[i]) *
+                                                   weights[i],
+                                                 this->vec_coarse);
+                  else
+                    for (unsigned int i = 0; i < scheme.n_dofs_per_cell_fine;
+                         ++i)
+                      distribute_local_to_global(indices_coarse[i],
+                                                 vec_fine_ptr->local_element(
+                                                   indices_fine[i]),
+                                                 this->vec_coarse);
+                }
 
               indices_fine += scheme.n_dofs_per_cell_fine;
               indices_coarse += scheme.n_dofs_per_cell_coarse;
@@ -2625,9 +2664,11 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
         {
           for (unsigned int cell = 0; cell < scheme.n_coarse_cells; ++cell)
             {
-              for (unsigned int i = 0; i < scheme.n_dofs_per_cell_fine; ++i)
-                this->vec_coarse.local_element(indices_coarse[i]) =
-                  vec_fine_ptr->local_element(indices_fine[i]);
+              if ((scheme.n_dofs_per_cell_fine != 0) &&
+                  (scheme.n_dofs_per_cell_coarse != 0))
+                for (unsigned int i = 0; i < scheme.n_dofs_per_cell_fine; ++i)
+                  this->vec_coarse.local_element(indices_coarse[i]) =
+                    vec_fine_ptr->local_element(indices_fine[i]);
 
               indices_fine += scheme.n_dofs_per_cell_fine;
               indices_coarse += scheme.n_dofs_per_cell_coarse;
