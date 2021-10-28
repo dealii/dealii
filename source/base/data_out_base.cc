@@ -3674,15 +3674,8 @@ namespace DataOutBase
     // loop over all patches
     for (const auto &patch : patches)
       {
-        const unsigned int n_subdivisions = patch.n_subdivisions;
-        const unsigned int n              = n_subdivisions + 1;
-        // Length of loops in all dimensions
-        const unsigned int n1 = (dim > 0) ? n : 1;
-        const unsigned int n2 = (dim > 1) ? n : 1;
-        const unsigned int n3 = (dim > 2) ? n : 1;
-        unsigned int       d1 = 1;
-        unsigned int       d2 = n;
-        unsigned int       d3 = n * n;
+        const unsigned int n_subdivisions         = patch.n_subdivisions;
+        const unsigned int n_points_per_direction = n_subdivisions + 1;
 
         Assert((patch.data.n_rows() == n_data_sets &&
                 !patch.points_are_available) ||
@@ -3692,129 +3685,164 @@ namespace DataOutBase
                                       (n_data_sets + spacedim) :
                                       n_data_sets,
                                     patch.data.n_rows()));
-        Assert(patch.data.n_cols() == Utilities::fixed_power<dim>(n),
+        Assert(patch.data.n_cols() ==
+                 Utilities::fixed_power<dim>(n_points_per_direction),
                ExcInvalidDatasetSize(patch.data.n_cols(), n_subdivisions + 1));
 
-        Point<spacedim> this_point;
-        if (dim < 3)
+
+        auto output_point_data =
+          [&out, &patch, n_data_sets](const unsigned int point_index) mutable {
+            for (unsigned int data_set = 0; data_set < n_data_sets; ++data_set)
+              out << patch.data(data_set, point_index) << ' ';
+          };
+
+        switch (dim)
           {
-            for (unsigned int i2 = 0; i2 < n2; ++i2)
+            case 0:
               {
-                for (unsigned int i1 = 0; i1 < n1; ++i1)
+                // compute coordinates for this patch point
+                out << compute_hypercube_node(patch, 0, 0, 0, n_subdivisions)
+                    << ' ';
+                output_point_data(0);
+                out << '\n';
+                out << '\n';
+                break;
+              }
+
+            case 1:
+              {
+                for (unsigned int i1 = 0; i1 < n_points_per_direction; ++i1)
                   {
                     // compute coordinates for this patch point
-                    out << compute_hypercube_node(
-                             patch, i1, i2, 0, n_subdivisions)
-                        << ' ';
+                    out
+                      << compute_hypercube_node(patch, i1, 0, 0, n_subdivisions)
+                      << ' ';
 
-                    for (unsigned int data_set = 0; data_set < n_data_sets;
-                         ++data_set)
-                      out << patch.data(data_set, i1 * d1 + i2 * d2) << ' ';
+                    output_point_data(i1);
                     out << '\n';
                   }
-                // end of row in patch
-                if (dim > 1)
-                  out << '\n';
+                // end of patch
+                out << '\n';
+                out << '\n';
+                break;
               }
-            // end of patch
-            if (dim == 1)
-              out << '\n';
-            out << '\n';
-          }
-        else if (dim == 3)
-          {
-            // for all grid points: draw lines into all positive coordinate
-            // directions if there is another grid point there
-            for (unsigned int i3 = 0; i3 < n3; ++i3)
-              for (unsigned int i2 = 0; i2 < n2; ++i2)
-                for (unsigned int i1 = 0; i1 < n1; ++i1)
+
+            case 2:
+              {
+                for (unsigned int i2 = 0; i2 < n_points_per_direction; ++i2)
                   {
-                    // compute coordinates for this patch point
-                    this_point =
-                      compute_hypercube_node(patch, i1, i2, i3, n_subdivisions);
-                    // line into positive x-direction if possible
-                    if (i1 < n_subdivisions)
+                    for (unsigned int i1 = 0; i1 < n_points_per_direction; ++i1)
                       {
-                        // write point here and its data
-                        out << this_point;
-                        for (unsigned int data_set = 0; data_set < n_data_sets;
-                             ++data_set)
-                          out << ' '
-                              << patch.data(data_set,
-                                            i1 * d1 + i2 * d2 + i3 * d3);
-                        out << '\n';
-
-                        // write point there and its data
+                        // compute coordinates for this patch point
                         out << compute_hypercube_node(
-                          patch, i1 + 1, i2, i3, n_subdivisions);
+                                 patch, i1, i2, 0, n_subdivisions)
+                            << ' ';
 
-                        for (unsigned int data_set = 0; data_set < n_data_sets;
-                             ++data_set)
-                          out << ' '
-                              << patch.data(data_set,
-                                            (i1 + 1) * d1 + i2 * d2 + i3 * d3);
+                        output_point_data(i1 + i2 * n_points_per_direction);
                         out << '\n';
-
-                        // end of line
-                        out << '\n' << '\n';
                       }
-
-                    // line into positive y-direction if possible
-                    if (i2 < n_subdivisions)
-                      {
-                        // write point here and its data
-                        out << this_point;
-                        for (unsigned int data_set = 0; data_set < n_data_sets;
-                             ++data_set)
-                          out << ' '
-                              << patch.data(data_set,
-                                            i1 * d1 + i2 * d2 + i3 * d3);
-                        out << '\n';
-
-                        // write point there and its data
-                        out << compute_hypercube_node(
-                          patch, i1, i2 + 1, i3, n_subdivisions);
-
-                        for (unsigned int data_set = 0; data_set < n_data_sets;
-                             ++data_set)
-                          out << ' '
-                              << patch.data(data_set,
-                                            i1 * d1 + (i2 + 1) * d2 + i3 * d3);
-                        out << '\n';
-
-                        // end of line
-                        out << '\n' << '\n';
-                      }
-
-                    // line into positive z-direction if possible
-                    if (i3 < n_subdivisions)
-                      {
-                        // write point here and its data
-                        out << this_point;
-                        for (unsigned int data_set = 0; data_set < n_data_sets;
-                             ++data_set)
-                          out << ' '
-                              << patch.data(data_set,
-                                            i1 * d1 + i2 * d2 + i3 * d3);
-                        out << '\n';
-
-                        // write point there and its data
-                        out << compute_hypercube_node(
-                          patch, i1, i2, i3 + 1, n_subdivisions);
-
-                        for (unsigned int data_set = 0; data_set < n_data_sets;
-                             ++data_set)
-                          out << ' '
-                              << patch.data(data_set,
-                                            i1 * d1 + i2 * d2 + (i3 + 1) * d3);
-                        out << '\n';
-                        // end of line
-                        out << '\n' << '\n';
-                      }
+                    // end of row in patch
+                    out << '\n';
                   }
+                // end of patch
+                out << '\n';
+
+                break;
+              }
+
+            case 3:
+              {
+                // for all grid points: draw lines into all positive coordinate
+                // directions if there is another grid point there
+                for (unsigned int i3 = 0; i3 < n_points_per_direction; ++i3)
+                  for (unsigned int i2 = 0; i2 < n_points_per_direction; ++i2)
+                    for (unsigned int i1 = 0; i1 < n_points_per_direction; ++i1)
+                      {
+                        // compute coordinates for this patch point
+                        const Point<spacedim> this_point =
+                          compute_hypercube_node(
+                            patch, i1, i2, i3, n_subdivisions);
+                        // line into positive x-direction if possible
+                        if (i1 < n_subdivisions)
+                          {
+                            // write point here and its data
+                            out << this_point << ' ';
+                            output_point_data(i1 + i2 * n_points_per_direction +
+                                              i3 * n_points_per_direction *
+                                                n_points_per_direction);
+                            out << '\n';
+
+                            // write point there and its data
+                            out << compute_hypercube_node(
+                                     patch, i1 + 1, i2, i3, n_subdivisions)
+                                << ' ';
+
+                            output_point_data((i1 + 1) +
+                                              i2 * n_points_per_direction +
+                                              i3 * n_points_per_direction *
+                                                n_points_per_direction);
+                            out << '\n';
+
+                            // end of line
+                            out << '\n' << '\n';
+                          }
+
+                        // line into positive y-direction if possible
+                        if (i2 < n_subdivisions)
+                          {
+                            // write point here and its data
+                            out << this_point << ' ';
+                            output_point_data(i1 + i2 * n_points_per_direction +
+                                              i3 * n_points_per_direction *
+                                                n_points_per_direction);
+                            out << '\n';
+
+                            // write point there and its data
+                            out << compute_hypercube_node(
+                                     patch, i1, i2 + 1, i3, n_subdivisions)
+                                << ' ';
+
+                            output_point_data(
+                              i1 + (i2 + 1) * n_points_per_direction +
+                              i3 * n_points_per_direction *
+                                n_points_per_direction);
+                            out << '\n';
+
+                            // end of line
+                            out << '\n' << '\n';
+                          }
+
+                        // line into positive z-direction if possible
+                        if (i3 < n_subdivisions)
+                          {
+                            // write point here and its data
+                            out << this_point << ' ';
+                            output_point_data(i1 + i2 * n_points_per_direction +
+                                              i3 * n_points_per_direction *
+                                                n_points_per_direction);
+                            out << '\n';
+
+                            // write point there and its data
+                            out << compute_hypercube_node(
+                                     patch, i1, i2, i3 + 1, n_subdivisions)
+                                << ' ';
+
+                            output_point_data(i1 + i2 * n_points_per_direction +
+                                              (i3 + 1) *
+                                                n_points_per_direction *
+                                                n_points_per_direction);
+                            out << '\n';
+                            // end of line
+                            out << '\n' << '\n';
+                          }
+                      }
+
+                break;
+              }
+
+            default:
+              Assert(false, ExcNotImplemented());
           }
-        else
-          Assert(false, ExcNotImplemented());
       }
     // make sure everything now gets to disk
     out.flush();
