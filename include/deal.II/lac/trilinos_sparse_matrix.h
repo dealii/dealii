@@ -1829,10 +1829,31 @@ namespace TrilinosWrappers
     /**
      * Exception
      */
-    DeclException1(ExcTrilinosError,
-                   int,
-                   << "An error with error number " << arg1
-                   << " occurred while calling a Trilinos function");
+    DeclException1(
+      ExcTrilinosError,
+      int,
+      << "An error with error number " << arg1
+      << " occurred while calling a Trilinos function. "
+         "\n\n"
+         "For historical reasons, many Trilinos functions express "
+         "errors by returning specific integer values to indicate "
+         "certain errors. Unfortunately, different Trilinos functions "
+         "often use the same integer values for different kinds of "
+         "errors, and in most cases it is also not documented what "
+         "each error code actually means. As a consequence, it is often "
+         "difficult to say what a particular error (in this case, "
+         "the error with integer code '"
+      << arg1
+      << "') represents and how one should fix a code to avoid it. "
+         "The best one can often do is to look up the call stack to "
+         "see which deal.II function generated the error, and which "
+         "Trilinos function the error code had originated from; "
+         "then look up the Trilinos source code of that function (for "
+         "example on github) to see what code path set that error "
+         "code. Short of going through all of that, the only other "
+         "option is to guess the cause of the error from "
+         "the context in which the error appeared.");
+
 
     /**
      * Exception
