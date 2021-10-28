@@ -31,7 +31,7 @@ namespace internal
     /**
      * This class contains information belonging to the faces of a
      * triangulation. These classes are similar to the TriaLevel classes. As
-     * cells are organised in a hierarchical structure of levels, each
+     * cells are organized in a hierarchical structure of levels, each
      * triangulation consists of several such TriaLevels. However the faces of
      * a triangulation, lower dimensional objects like lines in 2D or lines
      * and quads in 3D, do not have to be based on such a hierarchical

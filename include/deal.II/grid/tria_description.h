@@ -455,7 +455,7 @@ namespace TriangulationDescription
      * @endcode
      *
      * Example for parallel::distributed::Triangulation (partitioning can be
-     * skipped, since the trianguation has already been partitioned by p4est):
+     * skipped, since the triangulation has already been partitioned by p4est):
      *
      * @code
      * parallel::distributed::Triangulation<dim, spacedim> tria_base(comm);
@@ -479,7 +479,7 @@ namespace TriangulationDescription
      * @param settings See the description of the Settings enumerator.
      * @param my_rank_in Construct Description for the specified rank (only
      *   working for serial triangulations that have been partitioned by
-     *   functions like GridToold::partition_triangulation()).
+     *   functions like GridTools::partition_triangulation()).
      * @return Description to be used to set up a Triangulation.
      *
      * @note If construct_multigrid_hierarchy is set in the settings, the source
