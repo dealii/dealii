@@ -710,9 +710,9 @@ namespace
                          const unsigned int                       zstep,
                          const unsigned int n_subdivisions)
   {
-    Point<spacedim> node;
     if (patch.points_are_available)
       {
+        Assert(n_subdivisions == patch.n_subdivisions, ExcNotImplemented());
         unsigned int point_no = 0;
         switch (dim)
           {
@@ -735,20 +735,22 @@ namespace
             default:
               Assert(false, ExcNotImplemented());
           }
+        Point<spacedim> node;
         for (unsigned int d = 0; d < spacedim; ++d)
           node[d] = patch.data(patch.data.size(0) - spacedim + d, point_no);
+        return node;
       }
     else
       {
         if (dim == 0)
-          node = patch.vertices[0];
+          return patch.vertices[0];
         else
           {
             // perform a dim-linear interpolation
             const double stepsize = 1. / n_subdivisions,
                          xfrac    = xstep * stepsize;
 
-            node =
+            Point<spacedim> node =
               (patch.vertices[1] * xfrac) + (patch.vertices[0] * (1 - xfrac));
             if (dim > 1)
               {
@@ -770,9 +772,9 @@ namespace
                             zfrac;
                   }
               }
+            return node;
           }
       }
-    return node;
   }
 
   // For a given patch, compute the nodes for arbitrary (non-hypercube) cells.
@@ -3685,10 +3687,6 @@ namespace DataOutBase
                                       (n_data_sets + spacedim) :
                                       n_data_sets,
                                     patch.data.n_rows()));
-        Assert(patch.data.n_cols() ==
-                 Utilities::fixed_power<dim>(n_points_per_direction),
-               ExcInvalidDatasetSize(patch.data.n_cols(), n_subdivisions + 1));
-
 
         auto output_point_data =
           [&out, &patch, n_data_sets](const unsigned int point_index) mutable {
@@ -3700,6 +3698,13 @@ namespace DataOutBase
           {
             case 0:
               {
+                Assert(patch.reference_cell == ReferenceCells::Vertex,
+                       ExcInternalError());
+                Assert(patch.data.n_cols() == 1,
+                       ExcInvalidDatasetSize(patch.data.n_cols(),
+                                             n_subdivisions + 1));
+
+
                 // compute coordinates for this patch point
                 out << compute_hypercube_node(patch, 0, 0, 0, n_subdivisions)
                     << ' ';
@@ -3711,6 +3716,13 @@ namespace DataOutBase
 
             case 1:
               {
+                Assert(patch.reference_cell == ReferenceCells::Line,
+                       ExcInternalError());
+                Assert(patch.data.n_cols() ==
+                         Utilities::fixed_power<dim>(n_points_per_direction),
+                       ExcInvalidDatasetSize(patch.data.n_cols(),
+                                             n_subdivisions + 1));
+
                 for (unsigned int i1 = 0; i1 < n_points_per_direction; ++i1)
                   {
                     // compute coordinates for this patch point
@@ -3729,21 +3741,72 @@ namespace DataOutBase
 
             case 2:
               {
-                for (unsigned int i2 = 0; i2 < n_points_per_direction; ++i2)
+                if (patch.reference_cell == ReferenceCells::Quadrilateral)
                   {
-                    for (unsigned int i1 = 0; i1 < n_points_per_direction; ++i1)
-                      {
-                        // compute coordinates for this patch point
-                        out << compute_hypercube_node(
-                                 patch, i1, i2, 0, n_subdivisions)
-                            << ' ';
+                    Assert(patch.data.n_cols() == Utilities::fixed_power<dim>(
+                                                    n_points_per_direction),
+                           ExcInvalidDatasetSize(patch.data.n_cols(),
+                                                 n_subdivisions + 1));
 
-                        output_point_data(i1 + i2 * n_points_per_direction);
+                    for (unsigned int i2 = 0; i2 < n_points_per_direction; ++i2)
+                      {
+                        for (unsigned int i1 = 0; i1 < n_points_per_direction;
+                             ++i1)
+                          {
+                            // compute coordinates for this patch point
+                            out << compute_hypercube_node(
+                                     patch, i1, i2, 0, n_subdivisions)
+                                << ' ';
+
+                            output_point_data(i1 + i2 * n_points_per_direction);
+                            out << '\n';
+                          }
+                        // end of row in patch
                         out << '\n';
                       }
-                    // end of row in patch
-                    out << '\n';
                   }
+                else if (patch.reference_cell == ReferenceCells::Triangle)
+                  {
+                    Assert(n_subdivisions == 1, ExcNotImplemented());
+
+                    Assert(patch.data.n_cols() == 3, ExcInternalError());
+
+                    // Gnuplot can only plot surfaces if each facet of the
+                    // surface is a bilinear patch, or a subdivided bilinear
+                    // patch with equally many points along each row of the
+                    // subdivision. This is what the code above for
+                    // quadrilaterals does. We emulate this by repeating the
+                    // third point of a triangle twice so that there are two
+                    // points for that row as well -- i.e., we write a 2x2
+                    // bilinear patch where two of the points are collapsed onto
+                    // one vertex.
+                    //
+                    // This also matches the example here:
+                    // https://stackoverflow.com/questions/42784369/drawing-triangular-mesh-using-gnuplot
+                    out << compute_arbitrary_node(patch, 0) << ' ';
+                    output_point_data(0);
+                    out << '\n';
+
+                    out << compute_arbitrary_node(patch, 1) << ' ';
+                    output_point_data(1);
+                    out << '\n';
+                    out << '\n'; // end of one row of points
+
+                    out << compute_arbitrary_node(patch, 2) << ' ';
+                    output_point_data(2);
+                    out << '\n';
+
+                    out << compute_arbitrary_node(patch, 2) << ' ';
+                    output_point_data(2);
+                    out << '\n';
+                    out << '\n'; // end of the second row of points
+                    out << '\n'; // end of the entire patch
+                  }
+                else
+                  // There aren't any other reference cells in 2d than the
+                  // quadrilateral and the triangle. So whatever we got here
+                  // can't be any good
+                  Assert(false, ExcInternalError());
                 // end of patch
                 out << '\n';
 
@@ -3752,6 +3815,13 @@ namespace DataOutBase
 
             case 3:
               {
+                Assert(patch.reference_cell == ReferenceCells::Hexahedron,
+                       ExcNotImplemented());
+                Assert(patch.data.n_cols() ==
+                         Utilities::fixed_power<dim>(n_points_per_direction),
+                       ExcInvalidDatasetSize(patch.data.n_cols(),
+                                             n_subdivisions + 1));
+
                 // for all grid points: draw lines into all positive coordinate
                 // directions if there is another grid point there
                 for (unsigned int i3 = 0; i3 < n_points_per_direction; ++i3)
