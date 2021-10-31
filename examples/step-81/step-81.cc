@@ -19,6 +19,11 @@
 
 // @sect3{Include files}
 
+ // The set of include files is quite standard. The most notable incluse is
+ // the fe/fe_nedelec_sz.h file that allows us to use the FE_NedelecSZ elements.
+ // This is an implementation of the $H^{curl}$ conforming Nédélec Elements
+ // that resolves the sign conflict issues that arise from parametrization.
+
 #include <deal.II/base/function.h>
 #include <deal.II/base/parameter_acceptor.h>
 #include <deal.II/base/quadrature_lib.h>
@@ -61,15 +66,24 @@
 #include <memory>
 
 
+// @sect3{Class Template Declartions}
 
 namespace Step81
 {
   using namespace dealii;
   using namespace std::complex_literals;
 
-  /**
-   * The Parameters class inherits ParameterAcceptor, and instantiates all the coefficients in our variational equations.
-   * These coefficients are passed through ParameterAcceptor and are editable through a .prm file
+   // @sect4{Parameters Class}
+
+   // The Parameters class inherits ParameterAcceptor, and instantiates all the
+   // coefficients in our variational equations.
+   // These coefficients are passed through ParameterAcceptor and are editable
+   // through a .prm file
+   // More explanation on the use and inheritance from the ParameterAcceptor
+   // can be found in step-60.
+  
+
+/**
    *
    * epsilon is the Electric Permitivitty coefficient and it is a rank 2 tensor. Depending on the material,
    * we assign the i^th diagonal element of the tensor to the material epsilon value
@@ -85,7 +99,7 @@ namespace Step81
    * J_a is the strength and orientation of the dipole. It is a rank 1 tensor that depends
    * on the private dipole_position_, dipole_radius_, dipole_strength_, dipole_orientation_
    * variables.
-   */
+*/
 
   template <int dim>
   class Parameters : public ParameterAcceptor
@@ -218,11 +232,10 @@ namespace Step81
     return J_a;
   }
 
-  /**
-   * The PerfectlyMatchedLayer class inherits ParameterAcceptor, and it modifies our coefficients from Parameters.
-   * The radii and the strength of the PML is specified, and the coefficients will be modified using transformation
-   * matrices within the PML region. The radii and strength of the PML are editable through a .prm file
-  */
+   // @sect4{PerfectlyMatchedLayer Class}
+   // The PerfectlyMatchedLayer class inherits ParameterAcceptor, and it modifies our coefficients from Parameters.
+   // The radii and the strength of the PML is specified, and the coefficients will be modified using transformation
+   // matrices within the PML region. The radii and strength of the PML are editable through a .prm file
 
   template <int dim>
   class PerfectlyMatchedLayer : public ParameterAcceptor
@@ -389,6 +402,7 @@ namespace Step81
   };
 
 
+  // @sect4{The Constructor}
 
   template <int dim>
   Maxwell<dim>::Maxwell()
@@ -425,7 +439,7 @@ namespace Step81
     fe = std::make_unique<FESystem<dim>>(FE_NedelecSZ<dim>(fe_order), 2);
   }
 
-
+  // Make the mesh for the domain and generate the triangulation required
   template <int dim>
   void Maxwell<dim>::make_grid()
   {
@@ -441,7 +455,10 @@ namespace Step81
     std::cout << "Number of active cells: " << triangulation.n_active_cells()
               << std::endl;
   }
-
+ 
+  // Enumerate all the degrees of freedom and set up matrix and vector
+  // objects to hold the system data. Enumerating is done by using
+  // DoFHandler::distribute_dofs().
 
   template <int dim>
   void Maxwell<dim>::setup_system()
@@ -464,7 +481,7 @@ namespace Step81
     system_matrix.reinit(sparsity_pattern);
   }
 
-
+  // This is a helper function that takes the tangential component of a tensor.
   template <int dim>
   DEAL_II_ALWAYS_INLINE inline Tensor<1, dim, std::complex<double>>
   tangential_part(const dealii::Tensor<1, dim, std::complex<double>> &tensor,
@@ -476,6 +493,18 @@ namespace Step81
     return result;
   }
 
+
+ // Assemble the stiffness matrix and the right-hand side:
+ //\f{align*}{
+ // A_{ij} = \int_\Omega (\mu_r^{-1}\nabla \times \varphi_i) \cdot (\nabla\times\bar{\varphi}_j)\text{d}x
+ // - \int_\Omega \varepsilon_r\varphi_i \cdot \bar{\varphi}_j\text{d}x
+ // - i\int_\Sigma (\sigma_r^{\Sigma}(\varphi_i)_T) \cdot (\bar{\varphi}_j)_T\text{do}x
+ // - i\int_{\partial\Omega} (\sqrt{\mu_r^{-1}\varepsilon}(\varphi_i)_T) \cdot (\nabla\times(\bar{\varphi}_j)_T)\text{d}x,
+ // \f}
+ // \f{align}{
+ //  F_i = i\int_\Omega J_a \cdot \bar{\varphi_i}\text{d}x - \int_\Omega \mu_r^{-1} \cdot (\nabla \times \bar{\varphi_i}) \text{d}x.
+ // \f}
+ // In addition, we will be modifying the coefficients if the position of the cell is within the PML region.
 
   template <int dim>
   void Maxwell<dim>::assemble_system()
@@ -723,6 +752,8 @@ namespace Step81
 
 } // namespace Step81
 
+// The following main function just calls the class step-81(), initializes the ParameterAcceptor,
+// and calls the run() function.
 
 int main()
 {
