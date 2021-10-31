@@ -382,6 +382,11 @@ namespace internal
         }
       else // build FEFaceValues objects instead
         {
+          // The code following is not quite right for wedges and pyramids.
+          // Assert that we don't have these kinds of meshes.
+          Assert(needs_pyramid_setup == false && needs_wedge_setup == false,
+                 ExcNotImplemented());
+
           std::unique_ptr<dealii::Quadrature<dim - 1>> quadrature_simplex;
           std::unique_ptr<dealii::Quadrature<dim - 1>> quadrature_hypercube;
 
