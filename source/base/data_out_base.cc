@@ -699,20 +699,35 @@ namespace
   //----------------------------------------------------------------------//
   // Auxiliary functions
   //----------------------------------------------------------------------//
-  // For a given patch, compute the node interpolating the corner nodes linearly
-  // at the point (xstep, ystep, zstep)*1./n_subdivisions. If the points are
+
+  // For a given patch that corresponds to a hypercube cell, compute the
+  // location of a node interpolating the corner nodes linearly
+  // at the point lattice_location/n_subdivisions where lattice_location
+  // is a dim-dimensional integer vector. If the points are
   // saved in the patch.data member, return the saved point instead.
   template <int dim, int spacedim>
   inline Point<spacedim>
-  compute_hypercube_node(const DataOutBase::Patch<dim, spacedim> &patch,
-                         const unsigned int                       xstep,
-                         const unsigned int                       ystep,
-                         const unsigned int                       zstep,
-                         const unsigned int n_subdivisions)
+  get_equispaced_location(
+    const DataOutBase::Patch<dim, spacedim> &  patch,
+    const std::initializer_list<unsigned int> &lattice_location,
+    const unsigned int                         n_subdivisions)
   {
+    // This function only makes sense when called on hypercube cells
+    Assert(patch.reference_cell == ReferenceCells::get_hypercube<dim>(),
+           ExcInternalError());
+
+    Assert(lattice_location.size() == dim, ExcInternalError());
+
+    const unsigned int xstep = (dim > 0 ? *(lattice_location.begin() + 0) : 0);
+    const unsigned int ystep = (dim > 1 ? *(lattice_location.begin() + 1) : 0);
+    const unsigned int zstep = (dim > 2 ? *(lattice_location.begin() + 2) : 0);
+
+    // If the patch stores the locations of nodes (rather than of only the
+    // vertices), then obtain the location by direct lookup.
     if (patch.points_are_available)
       {
         Assert(n_subdivisions == patch.n_subdivisions, ExcNotImplemented());
+
         unsigned int point_no = 0;
         switch (dim)
           {
@@ -741,14 +756,16 @@ namespace
         return node;
       }
     else
+      // The patch does not store node locations, so we have to interpolate
+      // between its vertices:
       {
         if (dim == 0)
           return patch.vertices[0];
         else
           {
             // perform a dim-linear interpolation
-            const double stepsize = 1. / n_subdivisions,
-                         xfrac    = xstep * stepsize;
+            const double stepsize = 1. / n_subdivisions;
+            const double xfrac    = xstep * stepsize;
 
             Point<spacedim> node =
               (patch.vertices[1] * xfrac) + (patch.vertices[0] * (1 - xfrac));
@@ -2763,18 +2780,42 @@ namespace DataOutBase
           {
             const unsigned int n_subdivisions = patch.n_subdivisions;
             const unsigned int n              = n_subdivisions + 1;
-            // Length of loops in all dimensions. If a dimension is not used, a
-            // loop of length one will do the job.
-            const unsigned int n1 = (dim > 0) ? n : 1;
-            const unsigned int n2 = (dim > 1) ? n : 1;
-            const unsigned int n3 = (dim > 2) ? n : 1;
 
-            for (unsigned int i3 = 0; i3 < n3; ++i3)
-              for (unsigned int i2 = 0; i2 < n2; ++i2)
-                for (unsigned int i1 = 0; i1 < n1; ++i1)
-                  out.write_point(
-                    count++,
-                    compute_hypercube_node(patch, i1, i2, i3, n_subdivisions));
+            switch (dim)
+              {
+                case 0:
+                  out.write_point(count++,
+                                  get_equispaced_location(patch,
+                                                          {},
+                                                          n_subdivisions));
+                  break;
+                case 1:
+                  for (unsigned int i1 = 0; i1 < n; ++i1)
+                    out.write_point(count++,
+                                    get_equispaced_location(patch,
+                                                            {i1},
+                                                            n_subdivisions));
+                  break;
+                case 2:
+                  for (unsigned int i2 = 0; i2 < n; ++i2)
+                    for (unsigned int i1 = 0; i1 < n; ++i1)
+                      out.write_point(count++,
+                                      get_equispaced_location(patch,
+                                                              {i1, i2},
+                                                              n_subdivisions));
+                  break;
+                case 3:
+                  for (unsigned int i3 = 0; i3 < n; ++i3)
+                    for (unsigned int i2 = 0; i2 < n; ++i2)
+                      for (unsigned int i1 = 0; i1 < n; ++i1)
+                        out.write_point(count++,
+                                        get_equispaced_location(
+                                          patch, {i1, i2, i3}, n_subdivisions));
+                  break;
+
+                default:
+                  Assert(false, ExcInternalError());
+              }
           }
       }
     out.flush_points();
@@ -3706,7 +3747,7 @@ namespace DataOutBase
 
 
                 // compute coordinates for this patch point
-                out << compute_hypercube_node(patch, 0, 0, 0, n_subdivisions)
+                out << get_equispaced_location(patch, {}, n_subdivisions)
                     << ' ';
                 output_point_data(0);
                 out << '\n';
@@ -3726,9 +3767,8 @@ namespace DataOutBase
                 for (unsigned int i1 = 0; i1 < n_points_per_direction; ++i1)
                   {
                     // compute coordinates for this patch point
-                    out
-                      << compute_hypercube_node(patch, i1, 0, 0, n_subdivisions)
-                      << ' ';
+                    out << get_equispaced_location(patch, {i1}, n_subdivisions)
+                        << ' ';
 
                     output_point_data(i1);
                     out << '\n';
@@ -3754,8 +3794,9 @@ namespace DataOutBase
                              ++i1)
                           {
                             // compute coordinates for this patch point
-                            out << compute_hypercube_node(
-                                     patch, i1, i2, 0, n_subdivisions)
+                            out << get_equispaced_location(patch,
+                                                           {i1, i2},
+                                                           n_subdivisions)
                                 << ' ';
 
                             output_point_data(i1 + i2 * n_points_per_direction);
@@ -3830,8 +3871,9 @@ namespace DataOutBase
                       {
                         // compute coordinates for this patch point
                         const Point<spacedim> this_point =
-                          compute_hypercube_node(
-                            patch, i1, i2, i3, n_subdivisions);
+                          get_equispaced_location(patch,
+                                                  {i1, i2, i3},
+                                                  n_subdivisions);
                         // line into positive x-direction if possible
                         if (i1 < n_subdivisions)
                           {
@@ -3843,8 +3885,9 @@ namespace DataOutBase
                             out << '\n';
 
                             // write point there and its data
-                            out << compute_hypercube_node(
-                                     patch, i1 + 1, i2, i3, n_subdivisions)
+                            out << get_equispaced_location(patch,
+                                                           {i1 + 1, i2, i3},
+                                                           n_subdivisions)
                                 << ' ';
 
                             output_point_data((i1 + 1) +
@@ -3868,8 +3911,9 @@ namespace DataOutBase
                             out << '\n';
 
                             // write point there and its data
-                            out << compute_hypercube_node(
-                                     patch, i1, i2 + 1, i3, n_subdivisions)
+                            out << get_equispaced_location(patch,
+                                                           {i1, i2 + 1, i3},
+                                                           n_subdivisions)
                                 << ' ';
 
                             output_point_data(
@@ -3893,8 +3937,9 @@ namespace DataOutBase
                             out << '\n';
 
                             // write point there and its data
-                            out << compute_hypercube_node(
-                                     patch, i1, i2, i3 + 1, n_subdivisions)
+                            out << get_equispaced_location(patch,
+                                                           {i1, i2, i3 + 1},
+                                                           n_subdivisions)
                                 << ' ';
 
                             output_point_data(i1 + i2 * n_points_per_direction +
@@ -4083,7 +4128,7 @@ namespace DataOutBase
             {
               // compute coordinates for this patch point, storing in ver
               ver[i1 * d1 + i2 * d2] =
-                compute_hypercube_node(patch, i1, i2, 0, n_subdivisions);
+                get_equispaced_location(patch, {i1, i2}, n_subdivisions);
             }
 
 
@@ -4326,13 +4371,14 @@ namespace DataOutBase
             {
               Point<spacedim> points[4];
               points[0] =
-                compute_hypercube_node(patch, i1, i2, 0, n_subdivisions);
+                get_equispaced_location(patch, {i1, i2}, n_subdivisions);
               points[1] =
-                compute_hypercube_node(patch, i1 + 1, i2, 0, n_subdivisions);
+                get_equispaced_location(patch, {i1 + 1, i2}, n_subdivisions);
               points[2] =
-                compute_hypercube_node(patch, i1, i2 + 1, 0, n_subdivisions);
-              points[3] = compute_hypercube_node(
-                patch, i1 + 1, i2 + 1, 0, n_subdivisions);
+                get_equispaced_location(patch, {i1, i2 + 1}, n_subdivisions);
+              points[3] = get_equispaced_location(patch,
+                                                  {i1 + 1, i2 + 1},
+                                                  n_subdivisions);
 
               switch (spacedim)
                 {
@@ -6361,7 +6407,7 @@ namespace DataOutBase
     std::array<Point<2>, 4> projection_decompositions;
 
     projected_point =
-      compute_hypercube_node(first_patch, 0, 0, 0, n_subdivisions);
+      get_equispaced_location(first_patch, {0, 0}, n_subdivisions);
 
     if (first_patch.data.n_rows() != 0)
       {
@@ -6388,13 +6434,14 @@ namespace DataOutBase
             for (unsigned int i1 = 0; i1 < n_subdivisions; ++i1)
               {
                 projected_points[0] =
-                  compute_hypercube_node(patch, i1, i2, 0, n_subdivisions);
+                  get_equispaced_location(patch, {i1, i2}, n_subdivisions);
                 projected_points[1] =
-                  compute_hypercube_node(patch, i1 + 1, i2, 0, n_subdivisions);
+                  get_equispaced_location(patch, {i1 + 1, i2}, n_subdivisions);
                 projected_points[2] =
-                  compute_hypercube_node(patch, i1, i2 + 1, 0, n_subdivisions);
-                projected_points[3] = compute_hypercube_node(
-                  patch, i1 + 1, i2 + 1, 0, n_subdivisions);
+                  get_equispaced_location(patch, {i1, i2 + 1}, n_subdivisions);
+                projected_points[3] = get_equispaced_location(patch,
+                                                              {i1 + 1, i2 + 1},
+                                                              n_subdivisions);
 
                 x_min = std::min(x_min, projected_points[0][0]);
                 x_min = std::min(x_min, projected_points[1][0]);
@@ -6570,7 +6617,7 @@ namespace DataOutBase
     Point<3> point;
 
     projected_point =
-      compute_hypercube_node(first_patch, 0, 0, 0, n_subdivisions);
+      get_equispaced_location(first_patch, {0, 0}, n_subdivisions);
 
     if (first_patch.data.n_rows() != 0)
       {
@@ -6603,11 +6650,12 @@ namespace DataOutBase
             for (unsigned int i1 = 0; i1 < n_subdivisions; ++i1)
               {
                 const std::array<Point<spacedim>, 4> projected_vertices{
-                  {compute_hypercube_node(patch, i1, i2, 0, n_subdivisions),
-                   compute_hypercube_node(patch, i1 + 1, i2, 0, n_subdivisions),
-                   compute_hypercube_node(patch, i1, i2 + 1, 0, n_subdivisions),
-                   compute_hypercube_node(
-                     patch, i1 + 1, i2 + 1, 0, n_subdivisions)}};
+                  {get_equispaced_location(patch, {i1, i2}, n_subdivisions),
+                   get_equispaced_location(patch, {i1 + 1, i2}, n_subdivisions),
+                   get_equispaced_location(patch, {i1, i2 + 1}, n_subdivisions),
+                   get_equispaced_location(patch,
+                                           {i1 + 1, i2 + 1},
+                                           n_subdivisions)}};
 
                 Assert((flags.height_vector < patch.data.n_rows()) ||
                          patch.data.n_rows() == 0,
@@ -6745,11 +6793,12 @@ namespace DataOutBase
             for (unsigned int i1 = 0; i1 < n_subdivisions; ++i1)
               {
                 const std::array<Point<spacedim>, 4> projected_vertices = {
-                  {compute_hypercube_node(patch, i1, i2, 0, n_subdivisions),
-                   compute_hypercube_node(patch, i1 + 1, i2, 0, n_subdivisions),
-                   compute_hypercube_node(patch, i1, i2 + 1, 0, n_subdivisions),
-                   compute_hypercube_node(
-                     patch, i1 + 1, i2 + 1, 0, n_subdivisions)}};
+                  {get_equispaced_location(patch, {i1, i2}, n_subdivisions),
+                   get_equispaced_location(patch, {i1 + 1, i2}, n_subdivisions),
+                   get_equispaced_location(patch, {i1, i2 + 1}, n_subdivisions),
+                   get_equispaced_location(patch,
+                                           {i1 + 1, i2 + 1},
+                                           n_subdivisions)}};
 
                 Assert((flags.height_vector < patch.data.n_rows()) ||
                          patch.data.n_rows() == 0,
