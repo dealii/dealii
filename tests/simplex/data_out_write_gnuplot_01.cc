@@ -15,7 +15,7 @@
 
 
 
-// Test DataOut::write_gnuplot() for simplex meshes.
+// Test DataOut::write_gnuplot() for a simplex mesh
 
 #include <deal.II/base/quadrature_lib.h>
 
@@ -55,14 +55,15 @@ public:
   }
 };
 
+
+
 template <int dim, int spacedim = dim>
 void
-test(const FiniteElement<dim, spacedim> &fe,
-     const unsigned int                  n_components,
-     const bool                          do_high_order)
+test(const FiniteElement<dim, spacedim> &fe)
 {
   Triangulation<dim, spacedim> tria;
-  GridGenerator::subdivided_hyper_cube_with_simplices(tria, dim == 2 ? 4 : 2);
+  GridGenerator::reference_cell(tria, ReferenceCells::get_simplex<dim>());
+  tria.refine_global(4);
 
   DoFHandler<dim> dof_handler(tria);
 
@@ -79,7 +80,7 @@ test(const FiniteElement<dim, spacedim> &fe,
                        dof_handler,
                        dummy,
                        QGaussSimplex<dim>(fe.tensor_degree() + 1),
-                       RightHandSideFunction<dim>(n_components),
+                       RightHandSideFunction<dim>(1),
                        solution);
 
 
@@ -105,41 +106,14 @@ int
 main()
 {
   initlog();
+  {
+    const int dim = 2;
+    test<dim>(FE_SimplexP<dim>(1));
+  }
 
-  for (unsigned int i = 0; i < 2; ++i)
+  if (false) // not currently implemented
     {
-      const bool do_high_order = (i == 1);
-
-      if (do_high_order)
-        {
-          const unsigned int dim = 2;
-          test<dim>(FE_SimplexP<dim>(2) /*=degree*/, 1, do_high_order);
-          test<dim>(FESystem<dim>(FE_SimplexP<dim>(2 /*=degree*/), dim),
-                    dim,
-                    do_high_order);
-          test<dim>(FESystem<dim>(FE_SimplexP<dim>(2 /*=degree*/),
-                                  dim,
-                                  FE_SimplexP<dim>(1 /*=degree*/),
-                                  1),
-                    dim + 1,
-                    do_high_order);
-        }
-
-      if (false)
-        if (do_high_order ==
-            false /*TODO: higher-order output not working for 3D*/)
-          {
-            const unsigned int dim = 3;
-            test<dim>(FE_SimplexP<dim>(2) /*=degree*/, 1, do_high_order);
-            test<dim>(FESystem<dim>(FE_SimplexP<dim>(2 /*=degree*/), dim),
-                      dim,
-                      do_high_order);
-            test<dim>(FESystem<dim>(FE_SimplexP<dim>(2 /*=degree*/),
-                                    dim,
-                                    FE_SimplexP<dim>(1 /*=degree*/),
-                                    1),
-                      dim + 1,
-                      do_high_order);
-          }
+      const int dim = 3;
+      test<dim>(FE_SimplexP<dim>(1));
     }
 }
