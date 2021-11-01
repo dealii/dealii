@@ -22,74 +22,11 @@
 
 #include "../tests.h"
 
+#include "../data_out/patches.h"
+
 double cell_coordinates[3][8] = {{0, 1, 0, 1, 0, 1, 0, 1},
                                  {0, 0, 1, 1, 0, 0, 1, 1},
                                  {0, 0, 0, 0, 1, 1, 1, 1}};
-
-
-// This function is a copy from tests/data_out/patches.h, included here
-// to not introduce dependencies between different test targets
-template <int dim, int spacedim>
-void
-create_patches(std::vector<DataOutBase::Patch<dim, spacedim>> &patches)
-{
-  for (unsigned int p = 0; p < patches.size(); ++p)
-    {
-      DataOutBase::Patch<dim, spacedim> &patch = patches[p];
-
-      const unsigned int nsub  = p + 1;
-      const unsigned int nsubp = nsub + 1;
-
-#ifdef DEAL_II_HAVE_CXX17
-      if constexpr (dim > 0)
-        patch.n_subdivisions = nsub;
-#else
-      if (dim > 0)
-        const_cast<unsigned int &>(patch.n_subdivisions) = nsub;
-#endif
-
-#ifdef DEAL_II_HAVE_CXX17
-      if constexpr (dim > 0)
-        patch.reference_cell = ReferenceCells::get_hypercube<dim>();
-#else
-      if (dim > 0)
-        const_cast<ReferenceCell &>(patch.reference_cell) =
-          ReferenceCells::get_hypercube<dim>();
-#endif
-
-      for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
-        for (unsigned int d = 0; d < spacedim; ++d)
-          patch.vertices[v](d) =
-            p + cell_coordinates[d][v] + ((d >= dim) ? v : 0);
-
-      unsigned int n1 = (dim > 0) ? nsubp : 1;
-      unsigned int n2 = (dim > 1) ? nsubp : 1;
-      unsigned int n3 = (dim > 2) ? nsubp : 1;
-      unsigned int n4 = (dim > 3) ? nsubp : 1;
-      patch.data.reinit(5, n1 * n2 * n3 * n4);
-
-      for (unsigned int i4 = 0; i4 < n4; ++i4)
-        for (unsigned int i3 = 0; i3 < n3; ++i3)
-          for (unsigned int i2 = 0; i2 < n2; ++i2)
-            for (unsigned int i1 = 0; i1 < n1; ++i1)
-              {
-                const unsigned int i =
-                  i1 + nsubp * (i2 + nsubp * (i3 + nsubp * i4));
-                const float x1 = 1. * i1 / nsub;
-                const float x2 = 1. * i2 / nsub;
-                const float x3 = 1. * i3 / nsub;
-                const float x4 = 1. * i4 / nsub;
-
-                patch.data(0, i) = p + x1;
-                patch.data(1, i) = p + x2;
-                patch.data(2, i) = p + x3;
-                patch.data(3, i) = p + x4;
-                patch.data(4, i) = i;
-              }
-      patch.patch_index = p;
-    }
-}
-
 
 
 template <int dim, int spacedim>
