@@ -606,13 +606,8 @@ namespace MGTools
 
     const unsigned int dofs_per_cell = dof.get_fe().n_dofs_per_cell();
     std::vector<types::global_dof_index> dofs_on_this_cell(dofs_per_cell);
-    typename DoFHandler<dim, spacedim>::cell_iterator cell = dof.begin(level),
-                                                      endc = dof.end(level);
-    for (; cell != endc; ++cell)
-      if (dof.get_triangulation().locally_owned_subdomain() ==
-            numbers::invalid_subdomain_id ||
-          cell->level_subdomain_id() ==
-            dof.get_triangulation().locally_owned_subdomain())
+    for (const auto &cell : dof.cell_iterators_on_level(level))
+      if (cell->is_locally_owned_on_level())
         {
           cell->get_mg_dof_indices(dofs_on_this_cell);
           constraints.add_entries_local_to_global(dofs_on_this_cell,
@@ -1348,9 +1343,7 @@ namespace MGTools
       {
         for (const auto &cell : dof.cell_iterators())
           {
-            if (dof.get_triangulation().locally_owned_subdomain() !=
-                  numbers::invalid_subdomain_id &&
-                cell->level_subdomain_id() == numbers::artificial_subdomain_id)
+            if (cell->is_artificial_on_level())
               continue;
             const FiniteElement<dim> &fe    = cell->get_fe();
             const unsigned int        level = cell->level();
@@ -1380,9 +1373,7 @@ namespace MGTools
                  "It's probably worthwhile to select at least one component."));
 
         for (const auto &cell : dof.cell_iterators())
-          if (dof.get_triangulation().locally_owned_subdomain() ==
-                numbers::invalid_subdomain_id ||
-              cell->level_subdomain_id() != numbers::artificial_subdomain_id)
+          if (!cell->is_artificial_on_level())
             for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
               {
                 if (cell->at_boundary(face_no) == false)
@@ -1508,9 +1499,7 @@ namespace MGTools
       {
         // Do not look at artificial level cells (in a serial computation we
         // need to ignore the level_subdomain_id() because it is never set).
-        if (mg_dof_handler.get_triangulation().locally_owned_subdomain() !=
-              numbers::invalid_subdomain_id &&
-            cell->level_subdomain_id() == numbers::artificial_subdomain_id)
+        if (cell->is_artificial_on_level())
           continue;
 
         bool has_coarser_neighbor = false;
@@ -1529,11 +1518,7 @@ namespace MGTools
 
                 // only process cell pairs if one or both of them are owned by
                 // me (ignore if running in serial)
-                if (mg_dof_handler.get_triangulation()
-                        .locally_owned_subdomain() !=
-                      numbers::invalid_subdomain_id &&
-                    neighbor->level_subdomain_id() ==
-                      numbers::artificial_subdomain_id)
+                if (neighbor->is_artificial_on_level())
                   continue;
 
                 // Do refinement face from the coarse side

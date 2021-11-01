@@ -215,17 +215,11 @@ MGTransferPrebuilt<VectorType>::build(
       DoFTools::extract_locally_relevant_level_dofs(dof_handler,
                                                     level + 1,
                                                     level_p1_relevant_dofs);
-      DynamicSparsityPattern                  dsp(this->sizes[level + 1],
+      DynamicSparsityPattern dsp(this->sizes[level + 1],
                                  this->sizes[level],
                                  level_p1_relevant_dofs);
-      typename DoFHandler<dim>::cell_iterator cell,
-        endc = dof_handler.end(level);
-      for (cell = dof_handler.begin(level); cell != endc; ++cell)
-        if (cell->has_children() &&
-            (dof_handler.get_triangulation().locally_owned_subdomain() ==
-               numbers::invalid_subdomain_id ||
-             cell->level_subdomain_id() ==
-               dof_handler.get_triangulation().locally_owned_subdomain()))
+      for (const auto &cell : dof_handler.cell_iterators_on_level(level))
+        if (cell->has_children() && cell->is_locally_owned_on_level())
           {
             cell->get_mg_dof_indices(dof_indices_parent);
 
@@ -301,12 +295,8 @@ MGTransferPrebuilt<VectorType>::build(
       FullMatrix<typename VectorType::value_type> prolongation;
 
       // now actually build the matrices
-      for (cell = dof_handler.begin(level); cell != endc; ++cell)
-        if (cell->has_children() &&
-            (dof_handler.get_triangulation().locally_owned_subdomain() ==
-               numbers::invalid_subdomain_id ||
-             cell->level_subdomain_id() ==
-               dof_handler.get_triangulation().locally_owned_subdomain()))
+      for (const auto &cell : dof_handler.cell_iterators_on_level(level))
+        if (cell->has_children() && cell->is_locally_owned_on_level())
           {
             cell->get_mg_dof_indices(dof_indices_parent);
 
