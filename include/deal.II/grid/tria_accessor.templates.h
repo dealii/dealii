@@ -3863,6 +3863,42 @@ CellAccessor<dim, spacedim>::is_level_cell()
 }
 
 
+
+template <int dim, int spacedim>
+inline unsigned int
+CellAccessor<dim, spacedim>::active_cell_index() const
+{
+  Assert(this->is_active(), TriaAccessorExceptions::ExcCellNotActive());
+  return this->tria->levels[this->present_level]
+    ->active_cell_indices[this->present_index];
+}
+
+
+
+template <int dim, int spacedim>
+inline types::global_cell_index
+CellAccessor<dim, spacedim>::global_active_cell_index() const
+{
+  Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
+  Assert(this->is_active(),
+         ExcMessage(
+           "global_active_cell_index() can only be called on active cells!"));
+
+  return this->tria->levels[this->present_level]
+    ->global_active_cell_indices[this->present_index];
+}
+
+
+
+template <int dim, int spacedim>
+inline types::global_cell_index
+CellAccessor<dim, spacedim>::global_level_cell_index() const
+{
+  return this->tria->levels[this->present_level]
+    ->global_level_cell_indices[this->present_index];
+}
+
+
 DEAL_II_NAMESPACE_CLOSE
 
 #endif
