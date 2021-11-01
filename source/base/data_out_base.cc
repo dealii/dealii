@@ -3873,101 +3873,150 @@ namespace DataOutBase
 
             case 3:
               {
-                Assert(patch.reference_cell == ReferenceCells::Hexahedron,
-                       ExcNotImplemented());
-                Assert(patch.data.n_cols() ==
-                         Utilities::fixed_power<dim>(n_points_per_direction),
-                       ExcInvalidDatasetSize(patch.data.n_cols(),
-                                             n_subdivisions + 1));
+                if (patch.reference_cell == ReferenceCells::Hexahedron)
+                  {
+                    Assert(patch.data.n_cols() == Utilities::fixed_power<dim>(
+                                                    n_points_per_direction),
+                           ExcInvalidDatasetSize(patch.data.n_cols(),
+                                                 n_subdivisions + 1));
 
-                // for all grid points: draw lines into all positive coordinate
-                // directions if there is another grid point there
-                for (unsigned int i3 = 0; i3 < n_points_per_direction; ++i3)
-                  for (unsigned int i2 = 0; i2 < n_points_per_direction; ++i2)
-                    for (unsigned int i1 = 0; i1 < n_points_per_direction; ++i1)
-                      {
-                        // compute coordinates for this patch point
-                        const Point<spacedim> this_point =
-                          get_equispaced_location(patch,
-                                                  {i1, i2, i3},
-                                                  n_subdivisions);
-                        // line into positive x-direction if possible
-                        if (i1 < n_subdivisions)
+                    // for all grid points: draw lines into all positive
+                    // coordinate directions if there is another grid point
+                    // there
+                    for (unsigned int i3 = 0; i3 < n_points_per_direction; ++i3)
+                      for (unsigned int i2 = 0; i2 < n_points_per_direction;
+                           ++i2)
+                        for (unsigned int i1 = 0; i1 < n_points_per_direction;
+                             ++i1)
                           {
-                            // write point here and its data
-                            out << this_point << ' ';
-                            output_point_data(i1 + i2 * n_points_per_direction +
-                                              i3 * n_points_per_direction *
-                                                n_points_per_direction);
-                            out << '\n';
+                            // compute coordinates for this patch point
+                            const Point<spacedim> this_point =
+                              get_equispaced_location(patch,
+                                                      {i1, i2, i3},
+                                                      n_subdivisions);
+                            // line into positive x-direction if possible
+                            if (i1 < n_subdivisions)
+                              {
+                                // write point here and its data
+                                out << this_point << ' ';
+                                output_point_data(i1 +
+                                                  i2 * n_points_per_direction +
+                                                  i3 * n_points_per_direction *
+                                                    n_points_per_direction);
+                                out << '\n';
 
-                            // write point there and its data
-                            out << get_equispaced_location(patch,
-                                                           {i1 + 1, i2, i3},
-                                                           n_subdivisions)
-                                << ' ';
+                                // write point there and its data
+                                out << get_equispaced_location(patch,
+                                                               {i1 + 1, i2, i3},
+                                                               n_subdivisions)
+                                    << ' ';
 
-                            output_point_data((i1 + 1) +
-                                              i2 * n_points_per_direction +
-                                              i3 * n_points_per_direction *
-                                                n_points_per_direction);
-                            out << '\n';
+                                output_point_data((i1 + 1) +
+                                                  i2 * n_points_per_direction +
+                                                  i3 * n_points_per_direction *
+                                                    n_points_per_direction);
+                                out << '\n';
 
-                            // end of line
-                            out << '\n' << '\n';
+                                // end of line
+                                out << '\n' << '\n';
+                              }
+
+                            // line into positive y-direction if possible
+                            if (i2 < n_subdivisions)
+                              {
+                                // write point here and its data
+                                out << this_point << ' ';
+                                output_point_data(i1 +
+                                                  i2 * n_points_per_direction +
+                                                  i3 * n_points_per_direction *
+                                                    n_points_per_direction);
+                                out << '\n';
+
+                                // write point there and its data
+                                out << get_equispaced_location(patch,
+                                                               {i1, i2 + 1, i3},
+                                                               n_subdivisions)
+                                    << ' ';
+
+                                output_point_data(
+                                  i1 + (i2 + 1) * n_points_per_direction +
+                                  i3 * n_points_per_direction *
+                                    n_points_per_direction);
+                                out << '\n';
+
+                                // end of line
+                                out << '\n' << '\n';
+                              }
+
+                            // line into positive z-direction if possible
+                            if (i3 < n_subdivisions)
+                              {
+                                // write point here and its data
+                                out << this_point << ' ';
+                                output_point_data(i1 +
+                                                  i2 * n_points_per_direction +
+                                                  i3 * n_points_per_direction *
+                                                    n_points_per_direction);
+                                out << '\n';
+
+                                // write point there and its data
+                                out << get_equispaced_location(patch,
+                                                               {i1, i2, i3 + 1},
+                                                               n_subdivisions)
+                                    << ' ';
+
+                                output_point_data(
+                                  i1 + i2 * n_points_per_direction +
+                                  (i3 + 1) * n_points_per_direction *
+                                    n_points_per_direction);
+                                out << '\n';
+                                // end of line
+                                out << '\n' << '\n';
+                              }
                           }
+                  }
+                else if (patch.reference_cell == ReferenceCells::Tetrahedron)
+                  {
+                    Assert(n_subdivisions == 1, ExcNotImplemented());
 
-                        // line into positive y-direction if possible
-                        if (i2 < n_subdivisions)
-                          {
-                            // write point here and its data
-                            out << this_point << ' ';
-                            output_point_data(i1 + i2 * n_points_per_direction +
-                                              i3 * n_points_per_direction *
-                                                n_points_per_direction);
-                            out << '\n';
+                    // Draw the tetrahedron as a two collections of lines.
+                    out << get_node_location(patch, 0) << ' ';
+                    output_point_data(0);
+                    out << '\n';
 
-                            // write point there and its data
-                            out << get_equispaced_location(patch,
-                                                           {i1, i2 + 1, i3},
-                                                           n_subdivisions)
-                                << ' ';
+                    out << get_node_location(patch, 1) << ' ';
+                    output_point_data(1);
+                    out << '\n';
 
-                            output_point_data(
-                              i1 + (i2 + 1) * n_points_per_direction +
-                              i3 * n_points_per_direction *
-                                n_points_per_direction);
-                            out << '\n';
+                    out << get_node_location(patch, 2) << ' ';
+                    output_point_data(2);
+                    out << '\n';
 
-                            // end of line
-                            out << '\n' << '\n';
-                          }
+                    out << get_node_location(patch, 0) << ' ';
+                    output_point_data(0);
+                    out << '\n';
 
-                        // line into positive z-direction if possible
-                        if (i3 < n_subdivisions)
-                          {
-                            // write point here and its data
-                            out << this_point << ' ';
-                            output_point_data(i1 + i2 * n_points_per_direction +
-                                              i3 * n_points_per_direction *
-                                                n_points_per_direction);
-                            out << '\n';
+                    out << get_node_location(patch, 3) << ' ';
+                    output_point_data(3);
+                    out << '\n';
 
-                            // write point there and its data
-                            out << get_equispaced_location(patch,
-                                                           {i1, i2, i3 + 1},
-                                                           n_subdivisions)
-                                << ' ';
+                    out << get_node_location(patch, 2) << ' ';
+                    output_point_data(2);
+                    out << '\n';
+                    out << '\n'; // end of first line
 
-                            output_point_data(i1 + i2 * n_points_per_direction +
-                                              (i3 + 1) *
-                                                n_points_per_direction *
-                                                n_points_per_direction);
-                            out << '\n';
-                            // end of line
-                            out << '\n' << '\n';
-                          }
-                      }
+                    out << get_node_location(patch, 3) << ' ';
+                    output_point_data(3);
+                    out << '\n';
+
+                    out << get_node_location(patch, 1) << ' ';
+                    output_point_data(1);
+                    out << '\n';
+                    out << '\n'; // end of second line
+                  }
+                else
+                  // No other reference cells are currently implemented
+                  Assert(false, ExcNotImplemented());
 
                 break;
               }
