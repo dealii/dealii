@@ -63,7 +63,11 @@ test(const FiniteElement<dim, spacedim> &fe)
 {
   Triangulation<dim, spacedim> tria;
   GridGenerator::reference_cell(tria, ReferenceCells::get_simplex<dim>());
-  tria.refine_global(4);
+
+  if (dim == 2)
+    tria.refine_global(4);
+  else
+    tria.refine_global(2);
 
   DoFHandler<dim> dof_handler(tria);
 
@@ -111,9 +115,8 @@ main()
     test<dim>(FE_SimplexP<dim>(1));
   }
 
-  if (false) // not currently implemented
-    {
-      const int dim = 3;
-      test<dim>(FE_SimplexP<dim>(1));
-    }
+  {
+    const int dim = 3;
+    test<dim>(FE_SimplexP<dim>(1));
+  }
 }
