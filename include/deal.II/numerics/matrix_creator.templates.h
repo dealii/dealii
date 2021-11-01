@@ -42,7 +42,7 @@
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/vector.h>
 
-#include <deal.II/numerics/matrix_tools.h>
+#include <deal.II/numerics/matrix_creator.h>
 
 #ifdef DEAL_II_WITH_PETSC
 #  include <deal.II/lac/petsc_block_sparse_matrix.h>
