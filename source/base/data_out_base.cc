@@ -799,37 +799,46 @@ namespace
   // instead.
   template <int dim, int spacedim>
   inline Point<spacedim>
-  compute_arbitrary_node(const DataOutBase::Patch<dim, spacedim> &patch,
-                         const unsigned int                       point_no)
+  get_node_location(const DataOutBase::Patch<dim, spacedim> &patch,
+                    const unsigned int                       node_index)
   {
-    Point<spacedim> node;
-
-    unsigned int point_no_actual = point_no;
-
+    // Due to a historical accident, we are using a different indexing
+    // for pyramids in this file than we do where we create patches.
+    // So translate if necessary.
+    unsigned int point_no_actual = node_index;
     if (patch.reference_cell == ReferenceCells::Pyramid)
       {
         AssertDimension(patch.n_subdivisions, 1);
 
         static const std::array<unsigned int, 5> table = {{0, 1, 3, 2, 4}};
-        point_no_actual                                = table[point_no];
+        point_no_actual                                = table[node_index];
       }
 
+    // If the patch stores the locations of nodes (rather than of only the
+    // vertices), then obtain the location by direct lookup.
     if (patch.points_are_available)
       {
+        Point<spacedim> node;
         for (unsigned int d = 0; d < spacedim; ++d)
           node[d] =
             patch.data(patch.data.size(0) - spacedim + d, point_no_actual);
         return node;
       }
     else
+      // The patch does not store node locations, so we have to interpolate
+      // between its vertices. This isn't currently implemented for anything
+      // other than one subdivision, but would go here.
+      //
+      // For n_subdivisions==1, the locations are simply those of vertices, so
+      // get the information from there.
       {
         AssertDimension(patch.n_subdivisions, 1);
 
-        node = patch.vertices[point_no_actual];
+        return patch.vertices[point_no_actual];
       }
-
-    return node;
   }
+
+
 
   /**
    * Given (i,j,k) coordinates within the Lagrange quadrilateral, return an
@@ -874,6 +883,8 @@ namespace
     // nbdy == 0: Face DOF
     return offset + (i - 1) + (order[0] - 1) * ((j - 1));
   }
+
+
 
   /**
    * Given (i,j,k) coordinates within the Lagrange hexahedron, return an
@@ -947,6 +958,8 @@ namespace
            (order[0] - 1) * ((j - 1) + (order[1] - 1) * ((k - 1)));
   }
 
+
+
   int
   vtk_point_index_from_ijk(const unsigned,
                            const unsigned,
@@ -957,6 +970,8 @@ namespace
     return 0;
   }
 
+
+
   int
   vtk_point_index_from_ijk(const unsigned,
                            const unsigned,
@@ -966,6 +981,7 @@ namespace
     Assert(false, ExcNotImplemented());
     return 0;
   }
+
 
 
   template <int dim, int spacedim>
@@ -998,6 +1014,8 @@ namespace
           }
       }
   }
+
+
 
   template <int dim, int spacedim>
   static void
@@ -2768,13 +2786,12 @@ namespace DataOutBase
           {
             for (unsigned int point_no = 0; point_no < patch.data.n_cols();
                  ++point_no)
-              out.write_point(
-                count++,
-                compute_arbitrary_node(patch,
-                                       (patch.reference_cell ==
-                                            ReferenceCells::Pyramid ?
-                                          table[point_no] :
-                                          point_no)));
+              out.write_point(count++,
+                              get_node_location(patch,
+                                                (patch.reference_cell ==
+                                                     ReferenceCells::Pyramid ?
+                                                   table[point_no] :
+                                                   point_no)));
           }
         else
           {
@@ -3824,20 +3841,20 @@ namespace DataOutBase
                     //
                     // This also matches the example here:
                     // https://stackoverflow.com/questions/42784369/drawing-triangular-mesh-using-gnuplot
-                    out << compute_arbitrary_node(patch, 0) << ' ';
+                    out << get_node_location(patch, 0) << ' ';
                     output_point_data(0);
                     out << '\n';
 
-                    out << compute_arbitrary_node(patch, 1) << ' ';
+                    out << get_node_location(patch, 1) << ' ';
                     output_point_data(1);
                     out << '\n';
                     out << '\n'; // end of one row of points
 
-                    out << compute_arbitrary_node(patch, 2) << ' ';
+                    out << get_node_location(patch, 2) << ' ';
                     output_point_data(2);
                     out << '\n';
 
-                    out << compute_arbitrary_node(patch, 2) << ' ';
+                    out << get_node_location(patch, 2) << ' ';
                     output_point_data(2);
                     out << '\n';
                     out << '\n'; // end of the second row of points
