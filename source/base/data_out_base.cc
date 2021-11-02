@@ -4014,6 +4014,53 @@ namespace DataOutBase
                     out << '\n';
                     out << '\n'; // end of second line
                   }
+                else if (patch.reference_cell == ReferenceCells::Pyramid)
+                  {
+                    Assert(n_subdivisions == 1, ExcNotImplemented());
+
+                    // Draw the pyramid as a two collections of lines.
+                    out << get_node_location(patch, 0) << ' ';
+                    output_point_data(0);
+                    out << '\n';
+
+                    out << get_node_location(patch, 1) << ' ';
+                    output_point_data(1);
+                    out << '\n';
+
+                    out << get_node_location(patch, 2) << ' ';
+                    output_point_data(2);
+                    out << '\n';
+
+                    out << get_node_location(patch, 3) << ' ';
+                    output_point_data(3);
+                    out << '\n';
+
+                    out << get_node_location(patch, 0) << ' ';
+                    output_point_data(0);
+                    out << '\n';
+
+                    out << get_node_location(patch, 4) << ' ';
+                    output_point_data(4);
+                    out << '\n';
+
+                    out << get_node_location(patch, 1) << ' ';
+                    output_point_data(1);
+                    out << '\n';
+                    out << '\n'; // end of first line
+
+                    out << get_node_location(patch, 2) << ' ';
+                    output_point_data(2);
+                    out << '\n';
+
+                    out << get_node_location(patch, 4) << ' ';
+                    output_point_data(4);
+                    out << '\n';
+
+                    out << get_node_location(patch, 3) << ' ';
+                    output_point_data(2);
+                    out << '\n';
+                    out << '\n'; // end of second line
+                  }
                 else
                   // No other reference cells are currently implemented
                   Assert(false, ExcNotImplemented());
