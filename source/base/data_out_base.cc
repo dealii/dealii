@@ -4061,6 +4061,66 @@ namespace DataOutBase
                     out << '\n';
                     out << '\n'; // end of second line
                   }
+                else if (patch.reference_cell == ReferenceCells::Wedge)
+                  {
+                    Assert(n_subdivisions == 1, ExcNotImplemented());
+
+                    // Draw the pyramid as three collections of
+                    // lines. The first one wraps around the base,
+                    // goes up to the top, and wraps around that. The
+                    // second and third are just individual lines
+                    // going from base to top.
+                    out << get_node_location(patch, 0) << ' ';
+                    output_point_data(0);
+                    out << '\n';
+
+                    out << get_node_location(patch, 1) << ' ';
+                    output_point_data(1);
+                    out << '\n';
+
+                    out << get_node_location(patch, 2) << ' ';
+                    output_point_data(2);
+                    out << '\n';
+
+                    out << get_node_location(patch, 0) << ' ';
+                    output_point_data(0);
+                    out << '\n';
+
+                    out << get_node_location(patch, 3) << ' ';
+                    output_point_data(3);
+                    out << '\n';
+
+                    out << get_node_location(patch, 4) << ' ';
+                    output_point_data(4);
+                    out << '\n';
+
+                    out << get_node_location(patch, 5) << ' ';
+                    output_point_data(5);
+                    out << '\n';
+
+                    out << get_node_location(patch, 3) << ' ';
+                    output_point_data(3);
+                    out << '\n';
+                    out << '\n'; // end of first line
+
+                    out << get_node_location(patch, 1) << ' ';
+                    output_point_data(1);
+                    out << '\n';
+
+                    out << get_node_location(patch, 4) << ' ';
+                    output_point_data(4);
+                    out << '\n';
+                    out << '\n'; // end of second line
+
+                    out << get_node_location(patch, 2) << ' ';
+                    output_point_data(1);
+                    out << '\n';
+
+                    out << get_node_location(patch, 5) << ' ';
+                    output_point_data(4);
+                    out << '\n';
+                    out << '\n'; // end of second line
+                  }
                 else
                   // No other reference cells are currently implemented
                   Assert(false, ExcNotImplemented());
