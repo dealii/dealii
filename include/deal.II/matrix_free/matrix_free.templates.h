@@ -835,14 +835,12 @@ namespace internal
     template <typename InIterator>
     void
     resolve_cell(const InIterator &                                  cell,
-                 std::vector<std::pair<unsigned int, unsigned int>> &cell_its,
-                 const unsigned int subdomain_id)
+                 std::vector<std::pair<unsigned int, unsigned int>> &cell_its)
     {
       if (cell->has_children())
         for (unsigned int child = 0; child < cell->n_children(); ++child)
-          resolve_cell(cell->child(child), cell_its, subdomain_id);
-      else if (subdomain_id == numbers::invalid_subdomain_id ||
-               cell->subdomain_id() == subdomain_id)
+          resolve_cell(cell->child(child), cell_its);
+      else if (cell->is_locally_owned())
         {
           Assert(cell->is_active(), ExcInternalError());
           cell_its.emplace_back(cell->level(), cell->index());
@@ -868,32 +866,20 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_dof_handlers(
   for (unsigned int no = 0; no < dof_handlers.size(); ++no)
     dof_info[no].vectorization_length = VectorizedArrayType::size();
 
-  const unsigned int n_mpi_procs = task_info.n_procs;
-  const unsigned int my_pid      = task_info.my_pid;
-
   const Triangulation<dim> &tria  = dof_handlers[0]->get_triangulation();
   const unsigned int        level = additional_data.mg_level;
   if (level == numbers::invalid_unsigned_int)
     {
-      if (n_mpi_procs == 1)
-        cell_level_index.reserve(tria.n_active_cells());
-      // For serial Triangulations always take all cells
-      const unsigned int subdomain_id =
-        (dynamic_cast<const parallel::TriangulationBase<dim> *>(
-           &dof_handlers[0]->get_triangulation()) != nullptr) ?
-          my_pid :
-          numbers::invalid_subdomain_id;
+      cell_level_index.reserve(tria.n_active_cells());
 
       // Go through cells on zeroth level and then successively step down into
       // children. This gives a z-ordering of the cells, which is beneficial
       // when setting up neighboring relations between cells for thread
       // parallelization
       for (const auto &cell : tria.cell_iterators_on_level(0))
-        internal::MatrixFreeFunctions::resolve_cell(cell,
-                                                    cell_level_index,
-                                                    subdomain_id);
+        internal::MatrixFreeFunctions::resolve_cell(cell, cell_level_index);
 
-      Assert(n_mpi_procs > 1 ||
+      Assert(task_info.n_procs > 1 ||
                cell_level_index.size() == tria.n_active_cells(),
              ExcInternalError());
     }
@@ -904,7 +890,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_dof_handlers(
         {
           cell_level_index.reserve(tria.n_cells(level));
           for (const auto &cell : tria.cell_iterators_on_level(level))
-            if (cell->level_subdomain_id() == my_pid)
+            if (cell->is_locally_owned_on_level())
               cell_level_index.emplace_back(cell->level(), cell->index());
         }
     }
