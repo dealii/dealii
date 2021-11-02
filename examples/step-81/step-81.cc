@@ -66,7 +66,9 @@
 #include <memory>
 
 
-// @sect3{Class Template Declartions}
+// @sect3{Class Template Declarations}
+// We begin our actual implementation by declaring all classes with their
+// data structures and methods upfront.
 
 namespace Step81
 {
@@ -82,24 +84,20 @@ namespace Step81
    // More explanation on the use and inheritance from the ParameterAcceptor
    // can be found in step-60.
   
-
-/**
-   *
-   * epsilon is the Electric Permitivitty coefficient and it is a rank 2 tensor. Depending on the material,
-   * we assign the i^th diagonal element of the tensor to the material epsilon value
-   * (one of the private epsilon_1_ or epsilon_2_ variables).
-   *
-   * mu_inv  is the inverese of the Magnetic Permiabillity coefficient and it is a complex number.
-   *
-   * sigma is the Surface Conductivity coefficient between material left and material right
-   * and it is a rank 2 tensor. It is only changed if we are at the interface between two
-   * materials. If we are at an interface, we assign the i^th diagonal element of the
-   * tensor to the private sigma_ value.
-   *
-   * J_a is the strength and orientation of the dipole. It is a rank 1 tensor that depends
-   * on the private dipole_position_, dipole_radius_, dipole_strength_, dipole_orientation_
-   * variables.
-*/
+   // epsilon is the Electric Permitivitty coefficient and it is a rank 2 tensor. Depending on the material,
+   // we assign the i^th diagonal element of the tensor to the material epsilon value
+   // (one of the private epsilon_1_ or epsilon_2_ variables).
+   //
+   // mu_inv  is the inverese of the Magnetic Permiabillity coefficient and it is a complex number.
+   
+   // sigma is the Surface Conductivity coefficient between material left and material right
+   // and it is a rank 2 tensor. It is only changed if we are at the interface between two
+   // materials. If we are at an interface, we assign the i^th diagonal element of the
+   // tensor to the private sigma_ value.
+   
+   // J_a is the strength and orientation of the dipole. It is a rank 1 tensor that depends
+   // on the private dipole_position_, dipole_radius_, dipole_strength_, dipole_orientation_
+   // variables.
 
   template <int dim>
   class Parameters : public ParameterAcceptor
@@ -233,9 +231,12 @@ namespace Step81
   }
 
    // @sect4{PerfectlyMatchedLayer Class}
-   // The PerfectlyMatchedLayer class inherits ParameterAcceptor, and it modifies our coefficients from Parameters.
-   // The radii and the strength of the PML is specified, and the coefficients will be modified using transformation
-   // matrices within the PML region. The radii and strength of the PML are editable through a .prm file
+   // The PerfectlyMatchedLayer class inherits ParameterAcceptor,
+   // and it modifies our coefficients from Parameters.
+   // The radii and the strength of the PML is specified, and the
+   // coefficients will be modified using transformation
+   // matrices within the PML region. The radii and strength of
+   // the PML are editable through a .prm file
 
   template <int dim>
   class PerfectlyMatchedLayer : public ParameterAcceptor
@@ -284,7 +285,7 @@ namespace Step81
     add_parameter("outer radius",
                   outer_radius,
                   "outer radius of the PML shell");
-    strength = 0.;
+    strength = 8.;
     add_parameter("strength", strength, "strength of the PML");
   };
 
@@ -362,7 +363,9 @@ namespace Step81
   }
 
 
-
+  // @sect4{Maxwell Class}
+  // At this point we are ready to instantiate all the major functions of
+  // the finite element program and also a list of variables.
 
   template <int dim>
   class Maxwell : public ParameterAcceptor
@@ -403,6 +406,9 @@ namespace Step81
 
 
   // @sect4{The Constructor}
+  // The Constructor simply consists specifications for the mesh
+  // and the order of the fnite elements. These are editable through
+  // the .prm file.
 
   template <int dim>
   Maxwell<dim>::Maxwell()
@@ -415,7 +421,7 @@ namespace Step81
     scaling = 20;
     add_parameter("scaling", scaling, "scale of the hypercube geometry");
 
-    refinements = 8;
+    refinements = 10;
     add_parameter("refinements",
                   refinements,
                   "number of refinements of the geometry");
@@ -427,9 +433,6 @@ namespace Step81
     add_parameter("quadrature order",
                   quadrature_order,
                   "order of the quadrature");
-
-    n_outputs = 2;
-    add_parameter("number of outputs", n_outputs, "number of output images");
   }
 
 
@@ -733,7 +736,7 @@ namespace Step81
   {
     DataOut<2> data_out;
     data_out.attach_dof_handler(dof_handler);
-    data_out.add_data_vector(solution, "solution");
+      data_out.add_data_vector(solution, {"real_Ex", "real_Ey", "imag_Ex", "imag_Ey"});
     data_out.build_patches();
     std::ofstream output("solution.vtk");
     data_out.write_vtk(output);
@@ -752,7 +755,7 @@ namespace Step81
 
 } // namespace Step81
 
-// The following main function just calls the class step-81(), initializes the ParameterAcceptor,
+// The following main function calls the class step-81(), initializes the ParameterAcceptor,
 // and calls the run() function.
 
 int main()
