@@ -221,9 +221,11 @@ namespace Particles
 
     Assert(sorted_locations.size() ==
              locations.size() - currently_available_handles.size(),
-           ExcMessage(
-             "Number of sorted property handles is not equal to number "
-             "of currently registered handles."));
+           ExcMessage("Number of sorted property handles is not equal to "
+                      "number of currently registered handles: " +
+                      std::to_string(sorted_locations.size()) + " vs " +
+                      std::to_string(locations.size()) + " - " +
+                      std::to_string(currently_available_handles.size())));
 
     locations           = std::move(sorted_locations);
     reference_locations = std::move(sorted_reference_locations);

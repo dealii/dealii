@@ -79,8 +79,9 @@ namespace Particles
     /**
      * A type for the storage container for particles.
      */
-    using particle_container =
-      std::vector<std::vector<typename PropertyPool<dim, spacedim>::Handle>>;
+    using particle_container = std::list<
+      std::pair<std::vector<typename PropertyPool<dim, spacedim>::Handle>,
+                typename Triangulation<dim, spacedim>::active_cell_iterator>>;
 
     /**
      * Default constructor.
@@ -879,6 +880,16 @@ namespace Particles
       const ArrayView<const double> &properties = {});
 
     /**
+     * Perform the local insertion operation into the particle container. This
+     * function is used during the higher-level functions inserting particles.
+     */
+    void
+    insert_particle(
+      const typename PropertyPool<dim, spacedim>::Handle          handle,
+      const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+      particle_container &                                        particles);
+
+    /**
      * Address of the triangulation to work on.
      */
     SmartPointer<const Triangulation<dim, spacedim>,
@@ -902,10 +913,21 @@ namespace Particles
     std::unique_ptr<PropertyPool<dim, spacedim>> property_pool;
 
     /**
-     * Set of particles currently living in the local domain including ghost
-     * cells, organized by the active cell index of the cell they are in.
+     * Set of particles currently living in the locally owned cells.
      */
-    particle_container particles;
+    particle_container owned_particles;
+
+    /**
+     * Set of particles currently living in the locally owned cells.
+     */
+    particle_container ghost_particles;
+
+    /**
+     * List from the active cells on the present MPI process to positions in
+     * either `owned_particles` or `ghost_particles` for fast $\mathcal O(1)$
+     * access to the particles of a cell.
+     */
+    std::vector<typename particle_container::iterator> cells_to_particle_cache;
 
     /**
      * This variable stores how many particles are stored globally. It is
@@ -1150,15 +1172,13 @@ namespace Particles
   inline typename ParticleHandler<dim, spacedim>::particle_iterator
   ParticleHandler<dim, spacedim>::begin()
   {
-    if (particles.size() == 0)
+    if (owned_particles.empty())
       return end();
-
-    for (const auto &cell : triangulation->active_cell_iterators())
-      if (cell->is_locally_owned() &&
-          particles[cell->active_cell_index()].size() != 0)
-        return particle_iterator(particles, *property_pool, cell, 0);
-
-    return end();
+    else
+      return particle_iterator(owned_particles,
+                               owned_particles.begin(),
+                               *property_pool,
+                               0);
   }
 
 
@@ -1176,9 +1196,9 @@ namespace Particles
   inline typename ParticleHandler<dim, spacedim>::particle_iterator
   ParticleHandler<dim, spacedim>::end()
   {
-    return particle_iterator(particles,
+    return particle_iterator(owned_particles,
+                             owned_particles.end(),
                              *property_pool,
-                             triangulation->end(),
                              0);
   }
 
@@ -1197,15 +1217,13 @@ namespace Particles
   inline typename ParticleHandler<dim, spacedim>::particle_iterator
   ParticleHandler<dim, spacedim>::begin_ghost()
   {
-    if (particles.size() == 0)
-      return end();
-
-    for (const auto &cell : triangulation->active_cell_iterators())
-      if (cell->is_locally_owned() == false &&
-          particles[cell->active_cell_index()].size() != 0)
-        return particle_iterator(particles, *property_pool, cell, 0);
-
-    return end_ghost();
+    if (ghost_particles.empty())
+      return end_ghost();
+    else
+      return particle_iterator(ghost_particles,
+                               ghost_particles.begin(),
+                               *property_pool,
+                               0);
   }
 
 
@@ -1223,9 +1241,9 @@ namespace Particles
   inline typename ParticleHandler<dim, spacedim>::particle_iterator
   ParticleHandler<dim, spacedim>::end_ghost()
   {
-    return particle_iterator(particles,
+    return particle_iterator(ghost_particles,
+                             ghost_particles.end(),
                              *property_pool,
-                             triangulation->end(),
                              0);
   }
 
