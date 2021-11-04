@@ -114,15 +114,9 @@ expressions.
 In fact, they barely differ from the ways in which we solve the usual
 Laplacian, only requiring the surface coordinate mapping to be provided in the
 constructor of the FEValues class.
-This surface description given, in the codimension one surface case, the two
-routines FEValues::shape_grad and FEValues::JxW
-return
-@f{align*}
-\text{FEValues::shape\_grad}(i,l)&=D \mathbf x_K(p_l) G^{-1}(p_l)D(\varphi_i \circ \mathbf x_K)
-  (p_l)
-\\
-\text{FEValues::JxW}(l) &=  \sqrt{\det (G(p_l))} \ w_l.
-@f}
+The surface description given, in the codimension one case, the two routines we need are the following:
+- <code>FEValues::shape_grad(i,l)</code>, which returns $D \mathbf x_K(p_l) G^{-1}(p_l)D(\varphi_i \circ \mathbf x_K)$
+- <code>FEValues::JxW(l)</code>, which returns $\sqrt{\det (G(p_l))} \ w_l$.
 This provides exactly the terms we need for our computations.
 
 On a more general note, details for the finite element approximation on
