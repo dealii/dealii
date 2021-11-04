@@ -20,6 +20,8 @@
 
 #include <deal.II/base/function.h>
 
+#include <array>
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace Functions
@@ -124,6 +126,63 @@ namespace Functions
       const Tensor<1, dim> normal;
     };
 
+
+    /**
+     * Signed-distance level set function to an ellipsoid defined by:
+     *
+     * @f[
+     * \sum_{i=1}^{dim} \frac{(x_i - c_i)^2}{R_i^2} = 1
+     * @f]
+     *
+     * Here, $c_i$ are the coordinates of the center of the ellipsoid and $R_i$
+     * are the elliptic radii. This function is zero on the ellipsoid, negative
+     * inside the ellipsoid and positive outside the ellipsoid.
+     *
+     * @ingroup functions
+     */
+    template <int dim>
+    class Ellipsoid : public Function<dim>
+    {
+    public:
+      /**
+       * Constructor, takes the center and radii of the ellipsoid.
+       *
+       * @param center Center of the ellipsoid.
+       * @param radii Array of radii of the ellipsoid.
+       * @param tolerance Tolerance of the distance computation.
+       * @param max_iter Max. number of iteration of the distance computation algorithm.
+       */
+      Ellipsoid(const Point<dim> &             center,
+                const std::array<double, dim> &radii,
+                const double                   tolerance = 1e-14,
+                const unsigned int             max_iter  = 10);
+
+      double
+      value(const Point<dim> & point,
+            const unsigned int component = 0) const override;
+
+    private:
+      /**
+       * Evaluates the ellipsoid function:
+       *
+       * @f[
+       * f(\vec{x}) = \sum_{i=1}^{dim} \frac{(x_i - c_i)^2}{R_i^2} - 1
+       * @f]
+       */
+      double
+      evaluate_ellipsoid(const Point<dim> &point) const;
+
+      /**
+       * Compute the signed distance to a 2D ellipsoid i.e. ellipse.
+       */
+      double
+      compute_signed_distance_ellipse(const Point<dim> &point) const;
+
+      const Point<dim>              center;
+      const std::array<double, dim> radii;
+      const double                  tolerance;
+      const unsigned int            max_iter;
+    };
   } // namespace SignedDistance
 } // namespace Functions
 

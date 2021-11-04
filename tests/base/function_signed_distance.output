@@ -1,0 +1,53 @@
+
+DEAL::test_ellipsoid_signed_distance
+DEAL::dim = 1
+DEAL::
+DEAL::center
+DEAL::point = 1.0
+DEAL::value = -2.0
+DEAL::inside
+DEAL::point = 0.0
+DEAL::value = -1.0
+DEAL::point = 1.5
+DEAL::value = -1.5
+DEAL::on ellipse
+DEAL::point = -1.0
+DEAL::value = 0.0
+DEAL::point = 3.0
+DEAL::value = 0.0
+DEAL::outside
+DEAL::point = -2.0
+DEAL::value = 1.0
+DEAL::point = 6.0
+DEAL::value = 3.0
+DEAL::
+DEAL::test_ellipsoid_signed_distance
+DEAL::dim = 2
+DEAL::
+DEAL::center
+DEAL::point = 3.0 2.0
+DEAL::value = -1.0
+DEAL::inside
+DEAL::point = 3.0 1.0
+DEAL::value = -0.816497
+DEAL::point = 3.5 2.0
+DEAL::value = -0.50
+DEAL::point = 3.1 1.9
+DEAL::value = -0.898386
+DEAL::on ellipse
+DEAL::point = 2.0 2.0
+DEAL::value = 0.0
+DEAL::point = 3.0 4.0
+DEAL::value = 0.0
+DEAL::point = 2.5 3.73205
+DEAL::value = 0.0
+DEAL::outside
+DEAL::point = 3.0 -1.0
+DEAL::value = 1.0
+DEAL::point = -1.0 2.0
+DEAL::value = 3.0
+DEAL::point = 0.0 0.0
+DEAL::value = 2.34088
+DEAL::point = 4.0 5.0
+DEAL::value = 1.29718
+DEAL::
