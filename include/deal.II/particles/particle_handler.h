@@ -79,9 +79,8 @@ namespace Particles
     /**
      * A type for the storage container for particles.
      */
-    using particle_container = std::list<
-      std::pair<std::vector<typename PropertyPool<dim, spacedim>::Handle>,
-                typename Triangulation<dim, spacedim>::active_cell_iterator>>;
+    using particle_container =
+      typename ParticleAccessor<dim, spacedim>::particle_container;
 
     /**
      * Default constructor.
@@ -918,7 +917,7 @@ namespace Particles
     particle_container owned_particles;
 
     /**
-     * Set of particles currently living in the locally owned cells.
+     * Set of particles currently living in the ghost cells.
      */
     particle_container ghost_particles;
 

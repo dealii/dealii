@@ -189,12 +189,12 @@ namespace Particles
   ParticleHandler<dim, spacedim>::clear_particles()
   {
     for (auto &particles_in_cell : owned_particles)
-      for (auto &particle : particles_in_cell.first)
+      for (auto &particle : particles_in_cell.particles)
         if (particle != PropertyPool<dim, spacedim>::invalid_handle)
           property_pool->deregister_particle(particle);
 
     for (auto &particles_in_cell : ghost_particles)
-      for (auto &particle : particles_in_cell.first)
+      for (auto &particle : particles_in_cell.particles)
         if (particle != PropertyPool<dim, spacedim>::invalid_handle)
           property_pool->deregister_particle(particle);
 
@@ -221,14 +221,14 @@ namespace Particles
       // sort the particles by the active cell index
       particles.sort([](const typename ParticleContainer::value_type &a,
                         const typename ParticleContainer::value_type &b) {
-        return a.second < b.second;
+        return a.cell_iterator < b.cell_iterator;
       });
 
       std::array<types::particle_index, 3> result = {};
       for (const auto &particles_in_cell : particles)
         {
           const types::particle_index n_particles_in_cell =
-            particles_in_cell.first.size();
+            particles_in_cell.particles.size();
 
           // local_max_particles_per_cell
           result[0] = std::max(result[0], n_particles_in_cell);
@@ -237,7 +237,7 @@ namespace Particles
           result[2] += n_particles_in_cell;
 
           // local_max_particle_index
-          for (const auto &particle : particles_in_cell.first)
+          for (const auto &particle : particles_in_cell.particles)
             {
               result[1] = std::max(result[1], property_pool.get_id(particle));
             }
@@ -258,6 +258,18 @@ namespace Particles
       my_update_cached_numbers(*property_pool, ghost_particles);
     std::array<types::particle_index, 3> result_owned =
       my_update_cached_numbers(*property_pool, owned_particles);
+
+#ifdef DEBUG
+    std::vector<typename particle_container::iterator> verify_cache(
+      triangulation->n_active_cells());
+    for (auto it = owned_particles.begin(); it != owned_particles.end(); ++it)
+      verify_cache[it->cell_iterator->active_cell_index()] = it;
+    for (auto it = ghost_particles.begin(); it != ghost_particles.end(); ++it)
+      verify_cache[it->cell_iterator->active_cell_index()] = it;
+
+    for (unsigned int i = 0; i < verify_cache.size(); ++i)
+      Assert(verify_cache[i] == cells_to_particle_cache[i], ExcInternalError());
+#endif
 
     number_of_locally_owned_particles = result_owned[2];
     result_owned[0] = std::max(result_owned[0], result_ghosted[0]);
@@ -300,7 +312,7 @@ namespace Particles
         return cells_to_particle_cache[cell->active_cell_index()] !=
                    typename particle_container::iterator() ?
                  cells_to_particle_cache[cell->active_cell_index()]
-                   ->first.size() :
+                   ->particles.size() :
                  0;
       }
     else
@@ -346,23 +358,23 @@ namespace Particles
           }
         else
           {
-            typename particle_container::iterator particles =
+            const typename particle_container::iterator particles =
               cells_to_particle_cache[active_cell_index];
+            typename particle_container::iterator next = particles;
+            ++next;
             if (cell->is_locally_owned())
               {
                 return boost::make_iterator_range(
                   particle_iterator(
                     owned_particles, particles, *property_pool, 0),
-                  particle_iterator(
-                    owned_particles, ++particles, *property_pool, 0));
+                  particle_iterator(owned_particles, next, *property_pool, 0));
               }
             else
               {
                 return boost::make_iterator_range(
                   particle_iterator(
                     ghost_particles, particles, *property_pool, 0),
-                  particle_iterator(
-                    ghost_particles, ++particles, *property_pool, 0));
+                  particle_iterator(ghost_particles, next, *property_pool, 0));
               }
           }
       }
@@ -382,7 +394,7 @@ namespace Particles
   ParticleHandler<dim, spacedim>::remove_particle(
     const ParticleHandler<dim, spacedim>::particle_iterator &particle)
   {
-    auto &particles_on_cell = particle->particles_in_cell->first;
+    auto &particles_on_cell = particle->particles_in_cell->particles;
 
     // if the particle has an invalid handle (e.g. because it has
     // been duplicated before calling this function) do not try
@@ -428,15 +440,17 @@ namespace Particles
     // the other function is valid
     std::vector<ParticleHandler<dim, spacedim>::particle_iterator> copy(
       particles_to_remove);
-    std::sort(
-      copy.begin(),
-      copy.end(),
-      [&](const ParticleHandler<dim, spacedim>::particle_iterator &a,
-          const ParticleHandler<dim, spacedim>::particle_iterator &b) {
-        return a->particles_in_cell->second < b->particles_in_cell->second ||
-               (a->particles_in_cell->second == b->particles_in_cell->second &&
-                a->particle_index_within_cell > b->particle_index_within_cell);
-      });
+    std::sort(copy.begin(),
+              copy.end(),
+              [&](const ParticleHandler<dim, spacedim>::particle_iterator &a,
+                  const ParticleHandler<dim, spacedim>::particle_iterator &b) {
+                return a->particles_in_cell->cell_iterator <
+                         b->particles_in_cell->cell_iterator ||
+                       (a->particles_in_cell->cell_iterator ==
+                          b->particles_in_cell->cell_iterator &&
+                        a->particle_index_within_cell >
+                          b->particle_index_within_cell);
+              });
 
     for (const auto &particle : copy)
       remove_particle(particle);
@@ -478,8 +492,8 @@ namespace Particles
         cell);
     else
       {
-        cache->first.push_back(handle);
-        Assert(cache->second == cell, ExcInternalError());
+        cache->particles.push_back(handle);
+        Assert(cache->cell_iterator == cell, ExcInternalError());
       }
   }
 
@@ -504,7 +518,7 @@ namespace Particles
     particle_iterator particle_it(owned_particles,
                                   cache,
                                   *property_pool,
-                                  cache->first.size() - 1);
+                                  cache->particles.size() - 1);
 
     data = particle_it->read_particle_data_from_memory(data);
 
@@ -538,7 +552,7 @@ namespace Particles
     particle_iterator particle_it(owned_particles,
                                   cache,
                                   *property_pool,
-                                  cache->first.size() - 1);
+                                  cache->particles.size() - 1);
 
     particle_it->set_location(position);
     particle_it->set_reference_location(reference_position);
@@ -1293,8 +1307,9 @@ namespace Particles
           // Mark it for MPI transfer otherwise
           if (current_cell->is_locally_owned())
             {
-              auto &old = out_particle->particles_in_cell
-                            ->first[out_particle->particle_index_within_cell];
+              auto &old =
+                out_particle->particles_in_cell
+                  ->particles[out_particle->particle_index_within_cell];
               insert_particle(old, current_cell, owned_particles);
 
               // Avoid deallocating the memory of this particle
@@ -1330,13 +1345,13 @@ namespace Particles
 
     typename PropertyPool<dim, spacedim>::Handle sorted_handle = 0;
     for (auto &particles_in_cell : owned_particles)
-      for (auto &particle : particles_in_cell.first)
+      for (auto &particle : particles_in_cell.particles)
         {
           unsorted_handles.push_back(particle);
           particle = sorted_handle++;
         }
     for (auto &particles_in_cell : ghost_particles)
-      for (auto &particle : particles_in_cell.first)
+      for (auto &particle : particles_in_cell.particles)
         {
           unsorted_handles.push_back(particle);
           particle = sorted_handle++;
@@ -1375,12 +1390,12 @@ namespace Particles
           cells_to_particle_cache[cell->active_cell_index()] !=
             typename particle_container::iterator())
         {
-          Assert(cells_to_particle_cache[cell->active_cell_index()]->second ==
-                   cell,
+          Assert(cells_to_particle_cache[cell->active_cell_index()]
+                     ->cell_iterator == cell,
                  ExcInternalError());
           // Clear particle properties
           for (auto &ghost_particle :
-               cells_to_particle_cache[cell->active_cell_index()]->first)
+               cells_to_particle_cache[cell->active_cell_index()]->particles)
             property_pool->deregister_particle(ghost_particle);
 
           // Clear particles themselves
@@ -1751,12 +1766,12 @@ namespace Particles
                         received_particles);
         const typename particle_container::iterator &cache =
           cells_to_particle_cache[cell->active_cell_index()];
-        Assert(cache->second == cell, ExcInternalError());
+        Assert(cache->cell_iterator == cell, ExcInternalError());
 
         particle_iterator particle_it(received_particles,
                                       cache,
                                       *property_pool,
-                                      cache->first.size() - 1);
+                                      cache->particles.size() - 1);
 
         recv_data_it =
           particle_it->read_particle_data_from_memory(recv_data_it);
@@ -1875,7 +1890,7 @@ namespace Particles
         recv_data_it =
           recv_particle->read_particle_data_from_memory(recv_data_it);
 
-        Assert(recv_particle->particles_in_cell->second->is_ghost(),
+        Assert(recv_particle->particles_in_cell->cell_iterator->is_ghost(),
                ExcInternalError());
 
         if (load_callback)
@@ -2247,7 +2262,7 @@ namespace Particles
               break;
 
             auto particle = loaded_particles_on_cell.begin();
-            for (unsigned int i = 0; i < cache->first.size();)
+            for (unsigned int i = 0; i < cache->particles.size();)
               {
                 for (unsigned int child_index = 0;
                      child_index < GeometryInfo<dim>::max_children_per_cell;
@@ -2271,12 +2286,13 @@ namespace Particles
                             // redo the loop; otherwise move on to next particle
                             if (child_index != 0)
                               {
-                                insert_particle(cache->first[i],
+                                insert_particle(cache->particles[i],
                                                 child,
                                                 owned_particles);
 
-                                cache->first[i] = cache->first.back();
-                                cache->first.resize(cache->first.size() - 1);
+                                cache->particles[i] = cache->particles.back();
+                                cache->particles.resize(
+                                  cache->particles.size() - 1);
                               }
                             else
                               {

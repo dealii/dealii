@@ -63,10 +63,11 @@ test()
 
     typename Particles::ParticleHandler<dim>::particle_container
       particle_container;
-    particle_container.resize(1);
 
     auto particle = pool.register_particle();
-    particle_container[0].push_back(particle);
+    particle_container.emplace_back(
+      std::vector<typename Particles::PropertyPool<dim>::Handle>(1, particle),
+      tr.begin_active());
 
     pool.set_location(particle, position);
     pool.set_reference_location(particle, reference_position);
@@ -78,21 +79,17 @@ test()
               particle_properties.begin());
 
     Particles::ParticleIterator<dim> particle_begin(particle_container,
+                                                    particle_container.begin(),
                                                     pool,
-                                                    tr.begin(),
                                                     0);
     Particles::ParticleIterator<dim> particle_end(particle_container,
+                                                  particle_container.end(),
                                                   pool,
-                                                  tr.end(),
                                                   0);
-    Particles::ParticleIterator<dim> particle_nonexistent1(particle_container,
-                                                           pool,
-                                                           tr.begin(),
-                                                           1);
-    Particles::ParticleIterator<dim> particle_nonexistent2(particle_container,
-                                                           pool,
-                                                           tr.end(),
-                                                           1);
+    Particles::ParticleIterator<dim> particle_nonexistent1(
+      particle_container, particle_container.begin(), pool, 1);
+    Particles::ParticleIterator<dim> particle_nonexistent2(
+      particle_container, particle_container.end(), pool, 1);
     Particles::ParticleIterator<dim> particle_invalid;
 
     Assert(particle_begin->state() == IteratorState::valid, ExcInternalError());

@@ -46,11 +46,43 @@ namespace Particles
   {
   public:
     /**
+     * Data structure to describes the particles in a given cell. This is used
+     * inside an std::list in `particle_container`.
+     */
+    struct ParticlesInCell
+    {
+      /**
+       * Default constructor.
+       */
+      ParticlesInCell() = default;
+
+      /**
+       * Construct from a vector of particles and a cell iterator.
+       */
+      ParticlesInCell(
+        const std::vector<typename PropertyPool<dim, spacedim>::Handle>
+          &particles,
+        const typename Triangulation<dim, spacedim>::active_cell_iterator
+          &cell_iterator)
+        : particles(particles)
+        , cell_iterator(cell_iterator)
+      {}
+
+      /**
+       * A vector of particles on a cell.
+       */
+      std::vector<typename PropertyPool<dim, spacedim>::Handle> particles;
+
+      /**
+       * The underlying cell.
+       */
+      typename Triangulation<dim, spacedim>::active_cell_iterator cell_iterator;
+    };
+
+    /**
      * A type for the storage container for particles.
      */
-    using particle_container = std::list<
-      std::pair<std::vector<typename PropertyPool<dim, spacedim>::Handle>,
-                typename Triangulation<dim, spacedim>::active_cell_iterator>>;
+    using particle_container = std::list<ParticlesInCell>;
 
     /**
      * @copydoc Particle::write_particle_data_to_memory
@@ -744,10 +776,10 @@ namespace Particles
   ParticleAccessor<dim, spacedim>::get_surrounding_cell() const
   {
     Assert(state() == IteratorState::valid, ExcInternalError());
-    Assert(particles_in_cell->second.state() == IteratorState::valid,
+    Assert(particles_in_cell->cell_iterator.state() == IteratorState::valid,
            ExcInternalError());
 
-    return particles_in_cell->second;
+    return particles_in_cell->cell_iterator;
   }
 
 
@@ -758,10 +790,10 @@ namespace Particles
     const Triangulation<dim, spacedim> & /*triangulation*/) const
   {
     Assert(state() == IteratorState::valid, ExcInternalError());
-    Assert(particles_in_cell->second.state() == IteratorState::valid,
+    Assert(particles_in_cell->cell_iterator.state() == IteratorState::valid,
            ExcInternalError());
 
-    return particles_in_cell->second;
+    return particles_in_cell->cell_iterator;
   }
 
 
@@ -803,7 +835,7 @@ namespace Particles
 
     ++particle_index_within_cell;
 
-    if (particle_index_within_cell >= particles_in_cell->first.size())
+    if (particle_index_within_cell >= particles_in_cell->particles.size())
       {
         particle_index_within_cell = 0;
         ++particles_in_cell;
@@ -822,9 +854,17 @@ namespace Particles
       --particle_index_within_cell;
     else
       {
-        --particles_in_cell;
-        if (particles_in_cell != particles->end())
-          particle_index_within_cell = particles_in_cell->first.size() - 1;
+        if (particles_in_cell == particles->begin())
+          {
+            particles_in_cell =
+              const_cast<particle_container *>(particles)->end();
+          }
+        else
+          {
+            --particles_in_cell;
+            particle_index_within_cell =
+              particles_in_cell->particles.size() - 1;
+          }
       }
   }
 
@@ -858,9 +898,9 @@ namespace Particles
   {
     if (particles != nullptr && property_pool != nullptr &&
         particles_in_cell != particles->end() &&
-        particle_index_within_cell < particles_in_cell->first.size())
+        particle_index_within_cell < particles_in_cell->particles.size())
       return IteratorState::valid;
-    else if (particles_in_cell == particles->end() &&
+    else if (particles != nullptr && particles_in_cell == particles->end() &&
              particle_index_within_cell == 0)
       return IteratorState::past_the_end;
     else
@@ -875,7 +915,7 @@ namespace Particles
   inline typename PropertyPool<dim, spacedim>::Handle &
   ParticleAccessor<dim, spacedim>::get_handle()
   {
-    return particles_in_cell->first[particle_index_within_cell];
+    return particles_in_cell->particles[particle_index_within_cell];
   }
 
 
@@ -884,7 +924,7 @@ namespace Particles
   inline const typename PropertyPool<dim, spacedim>::Handle &
   ParticleAccessor<dim, spacedim>::get_handle() const
   {
-    return particles_in_cell->first[particle_index_within_cell];
+    return particles_in_cell->particles[particle_index_within_cell];
   }
 
 } // namespace Particles
