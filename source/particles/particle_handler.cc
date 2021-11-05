@@ -51,6 +51,8 @@ namespace Particles
     }
   } // namespace
 
+
+
   template <int dim, int spacedim>
   ParticleHandler<dim, spacedim>::ParticleHandler()
     : triangulation()
@@ -65,7 +67,9 @@ namespace Particles
     , load_callback()
     , handle(numbers::invalid_unsigned_int)
     , tria_listeners()
-  {}
+  {
+    reset_particle_container(nullptr, particles);
+  }
 
 
 
@@ -77,7 +81,7 @@ namespace Particles
     : triangulation(&triangulation, typeid(*this).name())
     , mapping(&mapping, typeid(*this).name())
     , property_pool(std::make_unique<PropertyPool<dim, spacedim>>(n_properties))
-    , cells_to_particle_cache(triangulation.n_active_cells())
+    , cells_to_particle_cache(triangulation.n_active_cells(), particles.end())
     , global_number_of_particles(0)
     , number_of_locally_owned_particles(0)
     , global_max_particles_per_cell(0)
@@ -91,6 +95,7 @@ namespace Particles
                                                           mapping))
     , tria_listeners()
   {
+    reset_particle_container(&triangulation, particles);
     connect_to_triangulation_signals();
   }
 
@@ -119,6 +124,8 @@ namespace Particles
     triangulation = &new_triangulation;
     mapping       = &new_mapping;
 
+    reset_particle_container(&new_triangulation, particles);
+
     // Create the memory pool that will store all particle properties
     property_pool = std::make_unique<PropertyPool<dim, spacedim>>(n_properties);
 
@@ -128,7 +135,8 @@ namespace Particles
       std::make_unique<GridTools::Cache<dim, spacedim>>(new_triangulation,
                                                         new_mapping);
 
-    cells_to_particle_cache.resize(triangulation->n_active_cells());
+    cells_to_particle_cache.resize(triangulation->n_active_cells(),
+                                   particles.end());
 
     connect_to_triangulation_signals();
   }
@@ -140,9 +148,6 @@ namespace Particles
   ParticleHandler<dim, spacedim>::copy_from(
     const ParticleHandler<dim, spacedim> &particle_handler)
   {
-    // clear this object before copying particles
-    clear();
-
     const unsigned int n_properties =
       particle_handler.property_pool->n_properties_per_slot();
     initialize(*particle_handler.triangulation,
@@ -160,9 +165,16 @@ namespace Particles
     global_max_particles_per_cell =
       particle_handler.global_max_particles_per_cell;
     next_free_particle_index = particle_handler.next_free_particle_index;
-    cells_to_particle_cache  = particle_handler.cells_to_particle_cache;
-    owned_particles          = particle_handler.owned_particles;
-    ghost_particles          = particle_handler.ghost_particles;
+    particles                = particle_handler.particles;
+    owned_particles_end      = particles.begin();
+    for (auto it = particle_handler.particles.begin();
+         it != particle_handler.owned_particles_end;
+         ++it)
+      ++owned_particles_end;
+
+    for (auto it = particles.begin(); it != particles.end(); ++it)
+      if (!it->particles.empty())
+        cells_to_particle_cache[it->cell->active_cell_index()] = it;
 
     ghost_particles_cache.ghost_particles_by_domain =
       particle_handler.ghost_particles_cache.ghost_particles_by_domain;
@@ -188,21 +200,20 @@ namespace Particles
   void
   ParticleHandler<dim, spacedim>::clear_particles()
   {
-    for (auto &particles_in_cell : owned_particles)
-      for (auto &particle : particles_in_cell.particles)
-        if (particle != PropertyPool<dim, spacedim>::invalid_handle)
-          property_pool->deregister_particle(particle);
-
-    for (auto &particles_in_cell : ghost_particles)
+    for (auto &particles_in_cell : particles)
       for (auto &particle : particles_in_cell.particles)
         if (particle != PropertyPool<dim, spacedim>::invalid_handle)
           property_pool->deregister_particle(particle);
 
     cells_to_particle_cache.clear();
-    owned_particles.clear();
-    ghost_particles.clear();
     if (triangulation != nullptr)
-      cells_to_particle_cache.resize(triangulation->n_active_cells());
+      {
+        cells_to_particle_cache.resize(triangulation->n_active_cells(),
+                                       particles.end());
+        reset_particle_container(&*triangulation, particles);
+      }
+    else
+      reset_particle_container(nullptr, particles);
 
     // the particle properties have already been deleted by their destructor,
     // but the memory is still allocated. Return the memory as well.
@@ -211,69 +222,144 @@ namespace Particles
 
 
 
-  namespace
+  template <int dim, int spacedim>
+  void
+  ParticleHandler<dim, spacedim>::reset_particle_container(
+    const Triangulation<dim, spacedim> *triangulation,
+    particle_container &                given_particles)
   {
-    template <int dim, int spacedim, typename ParticleContainer>
-    std::array<types::particle_index, 3>
-    my_update_cached_numbers(const PropertyPool<dim, spacedim> &property_pool,
-                             ParticleContainer &                particles)
-    {
-      // sort the particles by the active cell index
-      particles.sort([](const typename ParticleContainer::value_type &a,
-                        const typename ParticleContainer::value_type &b) {
-        return a.cell_iterator < b.cell_iterator;
-      });
+    TriaActiveIterator<CellAccessor<dim, spacedim>> past_the_end_iterator(
+      triangulation, -1, -1);
+    given_particles.clear();
+    for (unsigned int i = 0; i < 3; ++i)
+      given_particles.emplace_back(
+        std::vector<typename PropertyPool<dim, spacedim>::Handle>(),
+        past_the_end_iterator);
 
-      std::array<types::particle_index, 3> result = {};
-      for (const auto &particles_in_cell : particles)
-        {
-          const types::particle_index n_particles_in_cell =
-            particles_in_cell.particles.size();
-
-          // local_max_particles_per_cell
-          result[0] = std::max(result[0], n_particles_in_cell);
-
-          // number of locally owned particles
-          result[2] += n_particles_in_cell;
-
-          // local_max_particle_index
-          for (const auto &particle : particles_in_cell.particles)
-            {
-              result[1] = std::max(result[1], property_pool.get_id(particle));
-            }
-        }
-
-      return result;
-    }
-  } // namespace
+    // Set the end of owned particles to the middle of the three elements
+    owned_particles_end = ++given_particles.begin();
+  }
 
 
   template <int dim, int spacedim>
   void
   ParticleHandler<dim, spacedim>::update_cached_numbers()
   {
-    // first compute local result with the function above and then compute the
-    // collective results
-    const std::array<types::particle_index, 3> result_ghosted =
-      my_update_cached_numbers(*property_pool, ghost_particles);
-    std::array<types::particle_index, 3> result_owned =
-      my_update_cached_numbers(*property_pool, owned_particles);
+    // first sort the owned particles by the active cell index
+    bool sort_is_necessary = false;
+    {
+      auto previous = ++particles.begin();
+      for (auto next = previous; next != owned_particles_end; ++next)
+        {
+          if (previous->cell.state() == IteratorState::valid &&
+              next->cell.state() == IteratorState::valid &&
+              previous->cell > next->cell)
+            {
+              sort_is_necessary = true;
+              break;
+            }
+          previous = next;
+        }
+    }
+    if (sort_is_necessary)
+      {
+        // we could have tried to call std::list::sort with a custom
+        // comparator to get things sorted, but things are complicated by the
+        // three anchor entries that we do not want to move, and we would
+        // hence pay an O(N log(N)) algorithm with a large constant in front
+        // of it (on the order of 20+ instructions with many
+        // difficult-to-predict branches). Therefore, we simply copy the list
+        // into a new one (keeping alive the possibly large vectors with
+        // particles on cells) into a new container.
+        particle_container sorted_particles;
+        reset_particle_container(&*triangulation, sorted_particles);
+
+        // iterate over cells and insert the entries in the new order
+        for (const auto &cell : triangulation->active_cell_iterators())
+          if (!cell->is_artificial())
+            if (cells_to_particle_cache[cell->active_cell_index()] !=
+                particles.end())
+              {
+                // observe that owned_particles_end was already set to point
+                // into the new sorted_particles array
+                typename particle_container::iterator insert_position =
+                  cell->is_locally_owned() ? owned_particles_end :
+                                             --sorted_particles.end();
+                typename particle_container::iterator new_entry =
+                  sorted_particles.insert(
+                    insert_position, typename particle_container::value_type());
+                new_entry->cell = cell;
+                new_entry->particles =
+                  std::move(cells_to_particle_cache[cell->active_cell_index()]
+                              ->particles);
+              }
+        particles = std::move(sorted_particles);
+
+        // refresh cells_to_particle_cache
+        cells_to_particle_cache.clear();
+        cells_to_particle_cache.resize(triangulation->n_active_cells(),
+                                       particles.end());
+        for (auto it = particles.begin(); it != particles.end(); ++it)
+          if (!it->particles.empty())
+            cells_to_particle_cache[it->cell->active_cell_index()] = it;
+      }
+
+    // Ensure that we did not accidentally modify the anchor entries with
+    // special purpose.
+    Assert(particles.front().cell.state() == IteratorState::past_the_end &&
+             particles.front().particles.empty() &&
+             particles.back().cell.state() == IteratorState::past_the_end &&
+             particles.back().particles.empty() &&
+             owned_particles_end->cell.state() == IteratorState::past_the_end &&
+             owned_particles_end->particles.empty(),
+           ExcInternalError());
 
 #ifdef DEBUG
+    // check that no cache element hits the three anchor states in the list of
+    // particles
+    for (const auto &it : cells_to_particle_cache)
+      Assert(it != particles.begin() && it != owned_particles_end &&
+               it != --(particles.end()),
+             ExcInternalError());
+
+    // check that we only have locally owned particles in the first region of
+    // cells; note that we skip the very first anchor element
+    for (auto it = ++particles.begin(); it != owned_particles_end; ++it)
+      Assert(it->cell->is_locally_owned(), ExcInternalError());
+
+    // check that the cache is consistent with the iterators
     std::vector<typename particle_container::iterator> verify_cache(
-      triangulation->n_active_cells());
-    for (auto it = owned_particles.begin(); it != owned_particles.end(); ++it)
-      verify_cache[it->cell_iterator->active_cell_index()] = it;
-    for (auto it = ghost_particles.begin(); it != ghost_particles.end(); ++it)
-      verify_cache[it->cell_iterator->active_cell_index()] = it;
+      triangulation->n_active_cells(), particles.end());
+    for (auto it = particles.begin(); it != particles.end(); ++it)
+      if (!it->particles.empty())
+        verify_cache[it->cell->active_cell_index()] = it;
 
     for (unsigned int i = 0; i < verify_cache.size(); ++i)
       Assert(verify_cache[i] == cells_to_particle_cache[i], ExcInternalError());
 #endif
 
-    number_of_locally_owned_particles = result_owned[2];
-    result_owned[0] = std::max(result_owned[0], result_ghosted[0]);
-    result_owned[1] = std::max(result_owned[1], result_ghosted[1]);
+    // now compute local result with the function above and then compute the
+    // collective results
+    number_of_locally_owned_particles = 0;
+
+    types::particle_index result[2] = {};
+    for (const auto &particles_in_cell : particles)
+      {
+        const types::particle_index n_particles_in_cell =
+          particles_in_cell.particles.size();
+
+        // local_max_particles_per_cell
+        result[0] = std::max(result[0], n_particles_in_cell);
+
+        // number of locally owned particles
+        if (n_particles_in_cell > 0 &&
+            particles_in_cell.cell->is_locally_owned())
+          number_of_locally_owned_particles += n_particles_in_cell;
+
+        // local_max_particle_index
+        for (const auto &particle : particles_in_cell.particles)
+          result[1] = std::max(result[1], property_pool->get_id(particle));
+      }
 
     global_number_of_particles =
       dealii::Utilities::MPI::sum(number_of_locally_owned_particles,
@@ -286,13 +372,10 @@ namespace Particles
       }
     else
       {
-        Utilities::MPI::max(
-          ArrayView<const types::particle_index>(result_owned.data(), 2),
-          triangulation->get_communicator(),
-          make_array_view(result_owned.data(), result_owned.data() + 2));
+        Utilities::MPI::max(result, triangulation->get_communicator(), result);
 
-        next_free_particle_index      = result_owned[1] + 1;
-        global_max_particles_per_cell = result_owned[0];
+        next_free_particle_index      = result[1] + 1;
+        global_max_particles_per_cell = result[0];
       }
   }
 
@@ -310,7 +393,7 @@ namespace Particles
     if (cell->is_artificial() == false)
       {
         return cells_to_particle_cache[cell->active_cell_index()] !=
-                   typename particle_container::iterator() ?
+                   particles.end() ?
                  cells_to_particle_cache[cell->active_cell_index()]
                    ->particles.size() :
                  0;
@@ -347,35 +430,23 @@ namespace Particles
 
     if (cell->is_artificial() == false)
       {
-        if (cells_to_particle_cache[active_cell_index] ==
-            typename particle_container::iterator())
+        if (cells_to_particle_cache[active_cell_index] == particles.end())
           {
             return boost::make_iterator_range(
-              particle_iterator(
-                owned_particles, owned_particles.end(), *property_pool, 0),
-              particle_iterator(
-                owned_particles, owned_particles.end(), *property_pool, 0));
+              particle_iterator(particles.begin(), *property_pool, 0),
+              particle_iterator(particles.begin(), *property_pool, 0));
           }
         else
           {
-            const typename particle_container::iterator particles =
-              cells_to_particle_cache[active_cell_index];
-            typename particle_container::iterator next = particles;
-            ++next;
-            if (cell->is_locally_owned())
-              {
-                return boost::make_iterator_range(
-                  particle_iterator(
-                    owned_particles, particles, *property_pool, 0),
-                  particle_iterator(owned_particles, next, *property_pool, 0));
-              }
-            else
-              {
-                return boost::make_iterator_range(
-                  particle_iterator(
-                    ghost_particles, particles, *property_pool, 0),
-                  particle_iterator(ghost_particles, next, *property_pool, 0));
-              }
+            const typename particle_container::iterator
+              particles_in_current_cell =
+                cells_to_particle_cache[active_cell_index];
+            typename particle_container::iterator particles_in_next_cell =
+              particles_in_current_cell;
+            ++particles_in_next_cell;
+            return boost::make_iterator_range(
+              particle_iterator(particles_in_current_cell, *property_pool, 0),
+              particle_iterator(particles_in_next_cell, *property_pool, 0));
           }
       }
     else
@@ -419,12 +490,8 @@ namespace Particles
       }
     else
       {
-        if (owned_cell)
-          owned_particles.erase(particle->particles_in_cell);
-        else
-          ghost_particles.erase(particle->particles_in_cell);
-        cells_to_particle_cache[cell->active_cell_index()] =
-          typename particle_container::iterator();
+        particles.erase(particle->particles_in_cell);
+        cells_to_particle_cache[cell->active_cell_index()] = particles.end();
       }
   }
 
@@ -436,24 +503,47 @@ namespace Particles
     const std::vector<ParticleHandler<dim, spacedim>::particle_iterator>
       &particles_to_remove)
   {
-    // sort particles in reverse order on each cell to ensure the removal with
-    // the other function is valid
-    std::vector<ParticleHandler<dim, spacedim>::particle_iterator> copy(
-      particles_to_remove);
-    std::sort(copy.begin(),
-              copy.end(),
-              [&](const ParticleHandler<dim, spacedim>::particle_iterator &a,
-                  const ParticleHandler<dim, spacedim>::particle_iterator &b) {
-                return a->particles_in_cell->cell_iterator <
-                         b->particles_in_cell->cell_iterator ||
-                       (a->particles_in_cell->cell_iterator ==
-                          b->particles_in_cell->cell_iterator &&
-                        a->particle_index_within_cell >
-                          b->particle_index_within_cell);
-              });
+    // We need to remove particles backwards on each cell to keep the particle
+    // iterators alive as we keep removing particles on the same cell. To
+    // ensure that this is safe, we either check if we already have sorted
+    // iterators or if we need to manually sort
+    const auto check_greater = [](const particle_iterator &a,
+                                  const particle_iterator &b) {
+      return a->particles_in_cell->cell > b->particles_in_cell->cell ||
+             (a->particles_in_cell->cell == b->particles_in_cell->cell &&
+              a->particle_index_within_cell > b->particle_index_within_cell);
+    };
 
-    for (const auto &particle : copy)
-      remove_particle(particle);
+    bool particles_are_sorted = true;
+    auto previous             = particles_to_remove.begin();
+    for (auto next = previous; next != particles_to_remove.end(); ++next)
+      {
+        if (check_greater(*previous, *next))
+          {
+            particles_are_sorted = false;
+            break;
+          }
+        previous = next;
+      }
+    if (particles_are_sorted)
+      {
+        // pass along backwards in array
+        for (auto it = particles_to_remove.rbegin();
+             it != particles_to_remove.rend();
+             ++it)
+          remove_particle(*it);
+      }
+    else
+      {
+        std::vector<ParticleHandler<dim, spacedim>::particle_iterator>
+          sorted_particles(particles_to_remove);
+        std::sort(sorted_particles.begin(),
+                  sorted_particles.end(),
+                  check_greater);
+
+        for (const auto &particle : sorted_particles)
+          remove_particle(particle);
+      }
 
     update_cached_numbers();
   }
@@ -476,25 +566,31 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  void
+  typename ParticleHandler<dim, spacedim>::particle_iterator
   ParticleHandler<dim, spacedim>::insert_particle(
     const typename PropertyPool<dim, spacedim>::Handle          handle,
-    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-    particle_container &                                        particles)
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell)
   {
     const unsigned int active_cell_index = cell->active_cell_index();
     typename particle_container::iterator &cache =
       cells_to_particle_cache[active_cell_index];
-    if (cache == typename particle_container::iterator())
-      cache = particles.emplace(
-        particles.end(),
-        std::vector<typename PropertyPool<dim, spacedim>::Handle>{handle},
-        cell);
+    if (cache == particles.end())
+      {
+        const typename particle_container::iterator insert_position =
+          cell->is_locally_owned() ? owned_particles_end : --particles.end();
+        cache = particles.emplace(
+          insert_position,
+          std::vector<typename PropertyPool<dim, spacedim>::Handle>{handle},
+          cell);
+      }
     else
       {
         cache->particles.push_back(handle);
-        Assert(cache->cell_iterator == cell, ExcInternalError());
+        Assert(cache->cell == cell, ExcInternalError());
       }
+    return particle_iterator(cache,
+                             *property_pool,
+                             cache->particles.size() - 1);
   }
 
 
@@ -512,13 +608,8 @@ namespace Particles
            ExcMessage("You tried to insert particles into a cell that is not "
                       "locally owned. This is not supported."));
 
-    insert_particle(property_pool->register_particle(), cell, owned_particles);
-    const typename particle_container::iterator &cache =
-      cells_to_particle_cache[cell->active_cell_index()];
-    particle_iterator particle_it(owned_particles,
-                                  cache,
-                                  *property_pool,
-                                  cache->particles.size() - 1);
+    particle_iterator particle_it =
+      insert_particle(property_pool->register_particle(), cell);
 
     data = particle_it->read_particle_data_from_memory(data);
 
@@ -546,13 +637,8 @@ namespace Particles
            ExcMessage("You tried to insert particles into a cell that is not "
                       "locally owned. This is not supported."));
 
-    insert_particle(property_pool->register_particle(), cell, owned_particles);
-    const typename particle_container::iterator &cache =
-      cells_to_particle_cache[cell->active_cell_index()];
-    particle_iterator particle_it(owned_particles,
-                                  cache,
-                                  *property_pool,
-                                  cache->particles.size() - 1);
+    particle_iterator particle_it =
+      insert_particle(property_pool->register_particle(), cell);
 
     particle_it->set_location(position);
     particle_it->set_reference_location(reference_position);
@@ -1310,7 +1396,7 @@ namespace Particles
               auto &old =
                 out_particle->particles_in_cell
                   ->particles[out_particle->particle_index_within_cell];
-              insert_particle(old, current_cell, owned_particles);
+              insert_particle(old, current_cell);
 
               // Avoid deallocating the memory of this particle
               old = PropertyPool<dim, spacedim>::invalid_handle;
@@ -1332,7 +1418,7 @@ namespace Particles
       {
         if (dealii::Utilities::MPI::n_mpi_processes(
               parallel_triangulation->get_communicator()) > 1)
-          send_recv_particles(moved_particles, owned_particles, moved_cells);
+          send_recv_particles(moved_particles, moved_cells);
       }
 #endif
 
@@ -1344,13 +1430,7 @@ namespace Particles
     unsorted_handles.reserve(property_pool->n_registered_slots());
 
     typename PropertyPool<dim, spacedim>::Handle sorted_handle = 0;
-    for (auto &particles_in_cell : owned_particles)
-      for (auto &particle : particles_in_cell.particles)
-        {
-          unsorted_handles.push_back(particle);
-          particle = sorted_handle++;
-        }
-    for (auto &particles_in_cell : ghost_particles)
+    for (auto &particles_in_cell : particles)
       for (auto &particle : particles_in_cell.particles)
         {
           unsorted_handles.push_back(particle);
@@ -1387,11 +1467,10 @@ namespace Particles
     // Clear ghost particles and their properties
     for (const auto &cell : triangulation->active_cell_iterators())
       if (cell->is_ghost() &&
-          cells_to_particle_cache[cell->active_cell_index()] !=
-            typename particle_container::iterator())
+          cells_to_particle_cache[cell->active_cell_index()] != particles.end())
         {
-          Assert(cells_to_particle_cache[cell->active_cell_index()]
-                     ->cell_iterator == cell,
+          Assert(cells_to_particle_cache[cell->active_cell_index()]->cell ==
+                   cell,
                  ExcInternalError());
           // Clear particle properties
           for (auto &ghost_particle :
@@ -1399,10 +1478,8 @@ namespace Particles
             property_pool->deregister_particle(ghost_particle);
 
           // Clear particles themselves
-          ghost_particles.erase(
-            cells_to_particle_cache[cell->active_cell_index()]);
-          cells_to_particle_cache[cell->active_cell_index()] =
-            typename particle_container::iterator();
+          particles.erase(cells_to_particle_cache[cell->active_cell_index()]);
+          cells_to_particle_cache[cell->active_cell_index()] = particles.end();
         }
 
     // Clear ghost particles cache and invalidate it
@@ -1450,7 +1527,6 @@ namespace Particles
 
     send_recv_particles(
       ghost_particles_cache.ghost_particles_by_domain,
-      ghost_particles,
       std::map<
         types::subdomain_id,
         std::vector<
@@ -1487,7 +1563,7 @@ namespace Particles
 
 
     send_recv_particles_properties_and_location(
-      ghost_particles_cache.ghost_particles_by_domain, ghost_particles);
+      ghost_particles_cache.ghost_particles_by_domain);
 #endif
   }
 
@@ -1498,8 +1574,7 @@ namespace Particles
   void
   ParticleHandler<dim, spacedim>::send_recv_particles(
     const std::map<types::subdomain_id, std::vector<particle_iterator>>
-      &                 particles_to_send,
-    particle_container &received_particles,
+      &particles_to_send,
     const std::map<
       types::subdomain_id,
       std::vector<typename Triangulation<dim, spacedim>::active_cell_iterator>>
@@ -1761,15 +1836,12 @@ namespace Particles
         const typename Triangulation<dim, spacedim>::active_cell_iterator cell =
           triangulation->create_cell_iterator(id);
 
-        insert_particle(property_pool->register_particle(),
-                        cell,
-                        received_particles);
+        insert_particle(property_pool->register_particle(), cell);
         const typename particle_container::iterator &cache =
           cells_to_particle_cache[cell->active_cell_index()];
-        Assert(cache->cell_iterator == cell, ExcInternalError());
+        Assert(cache->cell == cell, ExcInternalError());
 
-        particle_iterator particle_it(received_particles,
-                                      cache,
+        particle_iterator particle_it(cache,
                                       *property_pool,
                                       cache->particles.size() - 1);
 
@@ -1797,8 +1869,7 @@ namespace Particles
   void
   ParticleHandler<dim, spacedim>::send_recv_particles_properties_and_location(
     const std::map<types::subdomain_id, std::vector<particle_iterator>>
-      &                 particles_to_send,
-    particle_container &updated_particles)
+      &particles_to_send)
   {
     const auto parallel_triangulation =
       dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
@@ -1890,13 +1961,12 @@ namespace Particles
         recv_data_it =
           recv_particle->read_particle_data_from_memory(recv_data_it);
 
-        Assert(recv_particle->particles_in_cell->cell_iterator->is_ghost(),
+        Assert(recv_particle->particles_in_cell->cell->is_ghost(),
                ExcInternalError());
 
         if (load_callback)
           recv_data_it = load_callback(
-            particle_iterator(updated_particles,
-                              recv_particle->particles_in_cell,
+            particle_iterator(recv_particle->particles_in_cell,
                               *property_pool,
                               recv_particle->particle_index_within_cell),
             recv_data_it);
@@ -1987,7 +2057,8 @@ namespace Particles
     // Resize the container if it is possible without
     // transferring particles
     if (number_of_locally_owned_particles == 0)
-      cells_to_particle_cache.resize(triangulation->n_active_cells());
+      cells_to_particle_cache.resize(triangulation->n_active_cells(),
+                                     particles.end());
   }
 
 
@@ -2159,7 +2230,6 @@ namespace Particles
 
             for (unsigned int i = 0; i < n_particles; ++i)
               stored_particles_on_cell.push_back(particle_iterator(
-                owned_particles,
                 cells_to_particle_cache[cell->active_cell_index()],
                 *property_pool,
                 i));
@@ -2180,8 +2250,8 @@ namespace Particles
                 const typename particle_container::iterator &cache =
                   cells_to_particle_cache[child->active_cell_index()];
                 for (unsigned int i = 0; i < n_particles; ++i)
-                  stored_particles_on_cell.push_back(particle_iterator(
-                    owned_particles, cache, *property_pool, i));
+                  stored_particles_on_cell.push_back(
+                    particle_iterator(cache, *property_pool, i));
               }
           }
           break;
@@ -2203,25 +2273,30 @@ namespace Particles
     const typename Triangulation<dim, spacedim>::CellStatus         status,
     const boost::iterator_range<std::vector<char>::const_iterator> &data_range)
   {
+    if (data_range.begin() == data_range.end())
+      return;
+
     const auto cell_to_store_particles =
       (status != parallel::TriangulationBase<dim, spacedim>::CELL_REFINE) ?
         cell :
         cell->child(0);
 
     // deserialize particles and insert into local storage
-    {
-      const void *data = static_cast<const void *>(&(*data_range.begin()));
+    if (data_range.begin() != data_range.end())
+      {
+        const void *data = static_cast<const void *>(&(*data_range.begin()));
+        const void *end  = static_cast<const void *>(
+          &(*data_range.begin()) + (data_range.end() - data_range.begin()));
 
-      while (data < &(*data_range.end()))
-        insert_particle(data, cell_to_store_particles);
+        while (data < end)
+          insert_particle(data, cell_to_store_particles);
 
-      Assert(
-        data == &(*data_range.end()),
-        ExcMessage(
-          "The particle data could not be deserialized successfully. "
-          "Check that when deserializing the particles you expect the same "
-          "number of properties that were serialized."));
-    }
+        Assert(data == end,
+               ExcMessage(
+                 "The particle data could not be deserialized successfully. "
+                 "Check that when deserializing the particles you expect "
+                 "the same number of properties that were serialized."));
+      }
 
     auto loaded_particles_on_cell = particles_in_cell(cell_to_store_particles);
 
@@ -2252,15 +2327,15 @@ namespace Particles
           {
             // we need to find the correct child to store the particles and
             // their reference location has changed
-            const typename particle_container::iterator &cache =
+            typename particle_container::iterator &cache =
               cells_to_particle_cache[cell_to_store_particles
                                         ->active_cell_index()];
 
+            // make sure that the call above has inserted an entry
+            Assert(cache != particles.end(), ExcInternalError());
+
             // Cannot use range-based loop, because number of particles in cell
             // is going to change
-            if (cache == typename particle_container::iterator())
-              break;
-
             auto particle = loaded_particles_on_cell.begin();
             for (unsigned int i = 0; i < cache->particles.size();)
               {
@@ -2286,9 +2361,7 @@ namespace Particles
                             // redo the loop; otherwise move on to next particle
                             if (child_index != 0)
                               {
-                                insert_particle(cache->particles[i],
-                                                child,
-                                                owned_particles);
+                                insert_particle(cache->particles[i], child);
 
                                 cache->particles[i] = cache->particles.back();
                                 cache->particles.resize(
@@ -2305,6 +2378,12 @@ namespace Particles
                     catch (typename Mapping<dim>::ExcTransformationFailed &)
                       {}
                   }
+              }
+            // clean up in case child 0 has no particle left
+            if (cache->particles.empty())
+              {
+                particles.erase(cache);
+                cache = particles.end();
               }
           }
           break;

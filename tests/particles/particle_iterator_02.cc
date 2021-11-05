@@ -68,6 +68,10 @@ test()
     particle_container.emplace_back(
       std::vector<typename Particles::PropertyPool<dim>::Handle>(1, particle),
       tr.begin_active());
+    particle_container.emplace_front(
+      std::vector<typename Particles::PropertyPool<dim>::Handle>(), tr.end());
+    particle_container.emplace_back(
+      std::vector<typename Particles::PropertyPool<dim>::Handle>(), tr.end());
 
     pool.set_location(particle, position);
     pool.set_reference_location(particle, reference_position);
@@ -78,18 +82,15 @@ test()
               properties.end(),
               particle_properties.begin());
 
-    Particles::ParticleIterator<dim> particle_begin(particle_container,
-                                                    particle_container.begin(),
-                                                    pool,
-                                                    0);
-    Particles::ParticleIterator<dim> particle_end(particle_container,
-                                                  particle_container.end(),
+    Particles::ParticleIterator<dim> particle_begin(
+      ++particle_container.begin(), pool, 0);
+    Particles::ParticleIterator<dim> particle_end(--particle_container.end(),
                                                   pool,
                                                   0);
     Particles::ParticleIterator<dim> particle_nonexistent1(
-      particle_container, particle_container.begin(), pool, 1);
+      ++particle_container.begin(), pool, 1);
     Particles::ParticleIterator<dim> particle_nonexistent2(
-      particle_container, particle_container.end(), pool, 1);
+      --particle_container.end(), pool, 1);
     Particles::ParticleIterator<dim> particle_invalid;
 
     Assert(particle_begin->state() == IteratorState::valid, ExcInternalError());
