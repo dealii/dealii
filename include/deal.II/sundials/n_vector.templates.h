@@ -962,9 +962,9 @@ SUNDIALS::internal::create_empty_nvector()
   v->ops->nvdotprod   = NVectorOperations::dot_product<VectorType>;
   v->ops->nvmaxnorm   = NVectorOperations::max_norm<VectorType>;
   v->ops->nvwrmsnorm  = NVectorOperations::weighted_rms_norm<VectorType>;
-  v->ops->nvmin       = NVectorOperations::min_element<VectorType>;
-  v->ops->nvwl2norm   = NVectorOperations::weighted_l2_norm<VectorType>;
-  v->ops->nvl1norm    = NVectorOperations::l1_norm<VectorType>;
+  v->ops->nvmin     = NVectorOperations::min_element<VectorType>;
+  v->ops->nvwl2norm = NVectorOperations::weighted_l2_norm<VectorType>;
+  v->ops->nvl1norm  = NVectorOperations::l1_norm<VectorType>;
   v->ops->nvwrmsnormmask =
     NVectorOperations::weighted_rms_norm_mask<VectorType>;
   //  v->ops->nvcompare      = undef;

@@ -99,19 +99,17 @@ public:
       return 0;
     };
 
-    // Used only in ver < 4.0.0
+
     time_stepper.solve_jacobian_system = [&](const VectorType &src,
                                              VectorType &      dst) -> int {
       Jinv.vmult(dst, src);
       return 0;
     };
 
-    // Used in ver >= 4.0.0
-    time_stepper.solve_jacobian_system_up_to_tolerance =
-      [&](const VectorType &src,
-          VectorType &      dst,
-          int &             n_iter,
-          const double) -> int {
+    time_stepper.solve_with_jacobian = [&](const VectorType &src,
+                                           VectorType &      dst,
+                                           int &             n_iter,
+                                           const double) -> int {
       Jinv.vmult(dst, src);
       n_iter = 1;
       return 0;
