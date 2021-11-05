@@ -265,13 +265,13 @@ namespace SUNDIALS
       template <
         typename VectorType,
         typename std::enable_if_t<!IsBlockVector<VectorType>::value, int> = 0>
-      MPI_Comm
+      const MPI_Comm &
       get_communicator(N_Vector v);
 
       template <
         typename VectorType,
         typename std::enable_if_t<IsBlockVector<VectorType>::value, int> = 0>
-      MPI_Comm
+      const MPI_Comm &
       get_communicator(N_Vector v);
 
       /**
@@ -503,7 +503,7 @@ namespace SUNDIALS
 
       template <typename VectorType,
                 std::enable_if_t<IsBlockVector<VectorType>::value, int>>
-      MPI_Comm
+      const MPI_Comm &
       get_communicator(N_Vector v)
       {
         return unwrap_nvector_const<VectorType>(v)
@@ -515,7 +515,7 @@ namespace SUNDIALS
 
       template <typename VectorType,
                 std::enable_if_t<!IsBlockVector<VectorType>::value, int>>
-      MPI_Comm
+      const MPI_Comm &
       get_communicator(N_Vector v)
       {
         return unwrap_nvector_const<VectorType>(v)->get_mpi_communicator();
@@ -545,7 +545,8 @@ namespace SUNDIALS
         (void)v;
         return nullptr;
 #  else
-        return get_communicator<VectorType>(v);
+        // We need to cast away const here, as SUNDIALS demands a pure `void *`.
+        return &(const_cast<MPI_Comm &>(get_communicator<VectorType>(v)));
 #  endif
       }
 
