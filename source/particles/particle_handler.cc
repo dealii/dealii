@@ -208,9 +208,9 @@ namespace Particles
     cells_to_particle_cache.clear();
     if (triangulation != nullptr)
       {
+        reset_particle_container(&*triangulation, particles);
         cells_to_particle_cache.resize(triangulation->n_active_cells(),
                                        particles.end());
-        reset_particle_container(&*triangulation, particles);
       }
     else
       reset_particle_container(nullptr, particles);
@@ -1393,13 +1393,16 @@ namespace Particles
           // Mark it for MPI transfer otherwise
           if (current_cell->is_locally_owned())
             {
-              auto &old =
+              typename PropertyPool<dim, spacedim>::Handle &old =
                 out_particle->particles_in_cell
                   ->particles[out_particle->particle_index_within_cell];
-              insert_particle(old, current_cell);
 
               // Avoid deallocating the memory of this particle
+              const auto old_value = old;
               old = PropertyPool<dim, spacedim>::invalid_handle;
+
+              // Allocate particle with the old handle
+              insert_particle(old_value, current_cell);
             }
           else
             {
