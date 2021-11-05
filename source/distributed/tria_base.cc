@@ -1291,7 +1291,8 @@ namespace parallel
         // Adjust buffer iterator to the offset of the callback
         // function so that we only have to advance its position
         // to the next cell after each iteration.
-        dest_data_it = dest_data_fixed.cbegin() + offset;
+        if (cell_relations.begin() != cell_relations.end())
+          dest_data_it = dest_data_fixed.cbegin() + offset;
       }
 
     // Iterate over all cells and unpack the transferred data.
@@ -1334,8 +1335,10 @@ namespace parallel
                 data_increment -= offset;
               }
 
-            // Advance data size iterators to the next cell.
-            dest_sizes_cell_it += sizes_fixed_cumulative.back();
+            // Advance data size iterators to the next cell, avoid iterating
+            // past the end of dest_sizes_cell_it
+            if (cell_rel_it != cell_relations.end() - 1)
+              dest_sizes_cell_it += sizes_fixed_cumulative.back();
             ++dest_sizes_it;
           }
 
@@ -1369,7 +1372,8 @@ namespace parallel
               break;
           }
 
-        dest_data_it += data_increment;
+        if (cell_rel_it != cell_relations.end() - 1)
+          dest_data_it += data_increment;
       }
   }
 

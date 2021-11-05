@@ -4266,20 +4266,16 @@ namespace GridGenerator
     // compute cells to remove
     std::set<typename Triangulation<dim, spacedim>::active_cell_iterator>
       cells_to_remove;
-    std::copy_if(
-      rectangle.active_cell_iterators().begin(),
-      rectangle.active_cell_iterators().end(),
-      std::inserter(cells_to_remove, cells_to_remove.end()),
-      [&](
-        const typename Triangulation<dim, spacedim>::active_cell_iterator &cell)
-        -> bool {
-        for (unsigned int d = 0; d < dim; ++d)
+    for (const auto &cell : rectangle.active_cell_iterators())
+      {
+        bool remove_cell = true;
+        for (unsigned int d = 0; d < dim && remove_cell; ++d)
           if ((n_cells_to_remove[d] > 0 && cell->center()[d] >= cut_step[d]) ||
               (n_cells_to_remove[d] < 0 && cell->center()[d] <= cut_step[d]))
-            return false;
-
-        return true;
-      });
+            remove_cell = false;
+        if (remove_cell)
+          cells_to_remove.insert(cell);
+      }
 
     GridGenerator::create_triangulation_with_removed_cells(rectangle,
                                                            cells_to_remove,
