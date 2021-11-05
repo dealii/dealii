@@ -15,7 +15,7 @@
 
 
 
-// Test DataOut::write_gnuplot() for a simplex mesh
+// Test DataOut::write_gnuplot() for a wedge mesh
 
 #include <deal.II/base/quadrature_lib.h>
 
@@ -62,12 +62,7 @@ void
 test(const FiniteElement<dim, spacedim> &fe)
 {
   Triangulation<dim, spacedim> tria;
-  GridGenerator::reference_cell(tria, ReferenceCells::get_simplex<dim>());
-
-  if (dim == 2)
-    tria.refine_global(4);
-  else
-    tria.refine_global(2);
+  GridGenerator::reference_cell(tria, ReferenceCells::Wedge);
 
   DoFHandler<dim> dof_handler(tria);
 
@@ -75,7 +70,7 @@ test(const FiniteElement<dim, spacedim> &fe)
 
   Vector<double> solution(dof_handler.n_dofs());
 
-  MappingFE<dim> mapping(FE_SimplexP<dim>(1));
+  MappingFE<dim> mapping(FE_WedgeP<dim>(1));
 
   AffineConstraints<double> dummy;
   dummy.close();
@@ -83,7 +78,7 @@ test(const FiniteElement<dim, spacedim> &fe)
   VectorTools::project(mapping,
                        dof_handler,
                        dummy,
-                       QGaussSimplex<dim>(fe.tensor_degree() + 1),
+                       QGaussWedge<dim>(fe.tensor_degree() + 1),
                        RightHandSideFunction<dim>(1),
                        solution);
 
@@ -110,13 +105,7 @@ int
 main()
 {
   initlog();
-  {
-    const int dim = 2;
-    test<dim>(FE_SimplexP<dim>(1));
-  }
 
-  {
-    const int dim = 3;
-    test<dim>(FE_SimplexP<dim>(1));
-  }
+  const int dim = 3;
+  test<dim>(FE_WedgeP<dim>(1));
 }
