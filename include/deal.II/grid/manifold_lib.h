@@ -471,7 +471,7 @@ private:
   /**
    * Relative tolerance to measure zero distances.
    */
-  double tolerance;
+  const double tolerance;
 };
 
 /**
