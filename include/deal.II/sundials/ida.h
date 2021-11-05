@@ -884,9 +884,30 @@ namespace SUNDIALS
     void *ida_mem;
 
     /**
+     * IDA solution vector.
+     */
+    N_Vector yy;
+
+    /**
+     * IDA solution derivative vector.
+     */
+    N_Vector yp;
+
+    /**
+     * IDA absolute tolerances vector.
+     */
+    N_Vector abs_tolls;
+
+    /**
+     * IDA differential components vector.
+     */
+    N_Vector diff_id;
+
+    /**
      * Number of iteration required to solve the Jacobian system
      */
     int n_iter;
+
 
     /**
      * MPI communicator. SUNDIALS solver runs happily in
