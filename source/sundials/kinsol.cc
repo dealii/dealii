@@ -34,7 +34,7 @@
 #    include <deal.II/lac/petsc_vector.h>
 #  endif
 
-#  include <deal.II/sundials/n_vector.h>
+#  include <deal.II/sundials/copy.h>
 
 // Make sure we #include the SUNDIALS config file...
 #  include <sundials/sundials_config.h>
@@ -137,9 +137,15 @@ namespace SUNDIALS
     {
       KINSOL<VectorType> &solver =
         *static_cast<KINSOL<VectorType> *>(user_data);
+      GrowingVectorMemory<VectorType> mem;
 
-      auto *src_yy = internal::unwrap_nvector_const<VectorType>(yy);
-      auto *dst_FF = internal::unwrap_nvector<VectorType>(FF);
+      typename VectorMemory<VectorType>::Pointer src_yy(mem);
+      solver.reinit_vector(*src_yy);
+
+      typename VectorMemory<VectorType>::Pointer dst_FF(mem);
+      solver.reinit_vector(*dst_FF);
+
+      copy(*src_yy, yy);
 
       int err = 0;
       if (solver.residual)
@@ -148,6 +154,8 @@ namespace SUNDIALS
         err = solver.iteration_function(*src_yy, *dst_FF);
       else
         Assert(false, ExcInternalError());
+
+      copy(FF, *dst_FF);
 
       return err;
     }
@@ -161,11 +169,16 @@ namespace SUNDIALS
     {
       KINSOL<VectorType> &solver =
         *static_cast<KINSOL<VectorType> *>(kinsol_mem->kin_user_data);
+      GrowingVectorMemory<VectorType> mem;
 
-      auto *src_ycur =
-        internal::unwrap_nvector_const<VectorType>(kinsol_mem->kin_uu);
-      auto *src_fcur =
-        internal::unwrap_nvector_const<VectorType>(kinsol_mem->kin_fval);
+      typename VectorMemory<VectorType>::Pointer src_ycur(mem);
+      solver.reinit_vector(*src_ycur);
+
+      typename VectorMemory<VectorType>::Pointer src_fcur(mem);
+      solver.reinit_vector(*src_fcur);
+
+      copy(*src_ycur, kinsol_mem->kin_uu);
+      copy(*src_fcur, kinsol_mem->kin_fval);
 
       int err = solver.setup_jacobian(*src_ycur, *src_fcur);
       return err;
@@ -183,15 +196,27 @@ namespace SUNDIALS
     {
       KINSOL<VectorType> &solver =
         *static_cast<KINSOL<VectorType> *>(kinsol_mem->kin_user_data);
+      GrowingVectorMemory<VectorType> mem;
 
-      auto *src_ycur =
-        internal::unwrap_nvector_const<VectorType>(kinsol_mem->kin_uu);
-      auto *src_fcur =
-        internal::unwrap_nvector_const<VectorType>(kinsol_mem->kin_fval);
-      auto *src = internal::unwrap_nvector_const<VectorType>(b);
-      auto *dst = internal::unwrap_nvector<VectorType>(x);
+      typename VectorMemory<VectorType>::Pointer src_ycur(mem);
+      solver.reinit_vector(*src_ycur);
+
+      typename VectorMemory<VectorType>::Pointer src_fcur(mem);
+      solver.reinit_vector(*src_fcur);
+
+      copy(*src_ycur, kinsol_mem->kin_uu);
+      copy(*src_fcur, kinsol_mem->kin_fval);
+
+      typename VectorMemory<VectorType>::Pointer src(mem);
+      solver.reinit_vector(*src);
+
+      typename VectorMemory<VectorType>::Pointer dst(mem);
+      solver.reinit_vector(*dst);
+
+      copy(*src, b);
 
       int err = solver.solve_jacobian_system(*src_ycur, *src_fcur, *src, *dst);
+      copy(x, *dst);
 
       *sJpnorm = N_VWL2Norm(b, kinsol_mem->kin_fscale);
       N_VProd(b, kinsol_mem->kin_fscale, b);
@@ -218,8 +243,16 @@ namespace SUNDIALS
       const KINSOL<VectorType> &solver =
         *static_cast<const KINSOL<VectorType> *>(user_data);
 
-      auto *ycur = internal::unwrap_nvector_const<VectorType>(u);
-      auto *fcur = internal::unwrap_nvector_const<VectorType>(f);
+      // Allocate temporary (deal.II-type) vectors into which to copy the
+      // N_vectors
+      GrowingVectorMemory<VectorType>            mem;
+      typename VectorMemory<VectorType>::Pointer ycur(mem);
+      typename VectorMemory<VectorType>::Pointer fcur(mem);
+      solver.reinit_vector(*ycur);
+      solver.reinit_vector(*fcur);
+
+      copy(*ycur, u);
+      copy(*fcur, f);
 
       // Call the user-provided setup function with these arguments:
       solver.setup_jacobian(*ycur, *fcur);
@@ -247,10 +280,20 @@ namespace SUNDIALS
       // signals to call. Let's first check the more modern one:
       if (solver.solve_with_jacobian)
         {
-          auto *src_b = internal::unwrap_nvector<VectorType>(b);
-          auto *dst_x = internal::unwrap_nvector<VectorType>(x);
+          // Allocate temporary (deal.II-type) vectors into which to copy the
+          // N_vectors
+          GrowingVectorMemory<VectorType>            mem;
+          typename VectorMemory<VectorType>::Pointer src_b(mem);
+          typename VectorMemory<VectorType>::Pointer dst_x(mem);
+
+          solver.reinit_vector(*src_b);
+          solver.reinit_vector(*dst_x);
+
+          copy(*src_b, b);
 
           const int err = solver.solve_with_jacobian(*src_b, *dst_x, tol);
+
+          copy(x, *dst_x);
 
           return err;
         }
@@ -266,9 +309,13 @@ namespace SUNDIALS
           GrowingVectorMemory<VectorType>            mem;
           typename VectorMemory<VectorType>::Pointer src_ycur(mem);
           typename VectorMemory<VectorType>::Pointer src_fcur(mem);
+          typename VectorMemory<VectorType>::Pointer src_b(mem);
+          typename VectorMemory<VectorType>::Pointer dst_x(mem);
 
-          auto *src_b = internal::unwrap_nvector_const<VectorType>(b);
-          auto *dst_x = internal::unwrap_nvector<VectorType>(x);
+          solver.reinit_vector(*src_b);
+          solver.reinit_vector(*dst_x);
+
+          copy(*src_b, b);
 
           // Call the user-provided setup function with these arguments. Note
           // that Sundials 4.x and later no longer provide values for
@@ -277,6 +324,8 @@ namespace SUNDIALS
           // above.
           const int err =
             solver.solve_jacobian_system(*src_ycur, *src_fcur, *src_b, *dst_x);
+
+          copy(x, *dst_x);
 
           return err;
         }
@@ -292,6 +341,9 @@ namespace SUNDIALS
                              const MPI_Comm &      mpi_comm)
     : data(data)
     , kinsol_mem(nullptr)
+    , solution(nullptr)
+    , u_scale(nullptr)
+    , f_scale(nullptr)
     , communicator(is_serial_vector<VectorType>::value ?
                      MPI_COMM_SELF :
                      Utilities::MPI::duplicate_communicator(mpi_comm))
@@ -325,29 +377,44 @@ namespace SUNDIALS
   {
     unsigned int system_size = initial_guess_and_solution.size();
 
-    NVectorView<VectorType> u_scale, f_scale;
+    // The solution is stored in
+    // solution. Here we take only a
+    // view of it.
+#  ifdef DEAL_II_WITH_MPI
+    if (is_serial_vector<VectorType>::value == false)
+      {
+        const IndexSet is = initial_guess_and_solution.locally_owned_elements();
+        const unsigned int local_system_size = is.n_elements();
 
-    VectorType u_scale_temp, f_scale_temp;
+        solution =
+          N_VNew_Parallel(communicator, local_system_size, system_size);
+
+        u_scale = N_VNew_Parallel(communicator, local_system_size, system_size);
+        N_VConst_Parallel(1.e0, u_scale);
+
+        f_scale = N_VNew_Parallel(communicator, local_system_size, system_size);
+        N_VConst_Parallel(1.e0, f_scale);
+      }
+    else
+#  endif
+      {
+        Assert(is_serial_vector<VectorType>::value,
+               ExcInternalError(
+                 "Trying to use a serial code with a parallel vector."));
+        solution = N_VNew_Serial(system_size);
+        u_scale  = N_VNew_Serial(system_size);
+        N_VConst_Serial(1.e0, u_scale);
+        f_scale = N_VNew_Serial(system_size);
+        N_VConst_Serial(1.e0, f_scale);
+      }
 
     if (get_solution_scaling)
-      u_scale = internal::make_nvector_view(get_solution_scaling());
-    else
-      {
-        reinit_vector(u_scale_temp);
-        u_scale_temp = 1.0;
-        u_scale      = internal::make_nvector_view(u_scale_temp);
-      }
+      copy(u_scale, get_solution_scaling());
 
     if (get_function_scaling)
-      f_scale = internal::make_nvector_view(get_function_scaling());
-    else
-      {
-        reinit_vector(f_scale_temp);
-        f_scale_temp = 1.0;
-        f_scale      = internal::make_nvector_view(f_scale_temp);
-      }
+      copy(f_scale, get_function_scaling());
 
-    auto solution = internal::make_nvector_view(initial_guess_and_solution);
+    copy(solution, initial_guess_and_solution);
 
     if (kinsol_mem)
       KINFree(&kinsol_mem);
@@ -505,6 +572,24 @@ namespace SUNDIALS
     // call to KINSol
     status = KINSol(kinsol_mem, solution, data.strategy, u_scale, f_scale);
     AssertKINSOL(status);
+
+    copy(initial_guess_and_solution, solution);
+
+    // Free the vectors which are no longer used.
+#  ifdef DEAL_II_WITH_MPI
+    if (is_serial_vector<VectorType>::value == false)
+      {
+        N_VDestroy_Parallel(solution);
+        N_VDestroy_Parallel(u_scale);
+        N_VDestroy_Parallel(f_scale);
+      }
+    else
+#  endif
+      {
+        N_VDestroy_Serial(solution);
+        N_VDestroy_Serial(u_scale);
+        N_VDestroy_Serial(f_scale);
+      }
 
     long nniters;
     status = KINGetNumNonlinSolvIters(kinsol_mem, &nniters);
