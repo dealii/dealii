@@ -329,7 +329,9 @@ test_get_communicator()
 {
   auto vector   = create_test_vector<VectorType>();
   auto n_vector = make_nvector_view(vector);
-  Assert(N_VGetCommunicator(n_vector) == MPI_COMM_WORLD, NVectorTestError());
+  Assert(*static_cast<MPI_Comm *>(N_VGetCommunicator(n_vector)) ==
+           MPI_COMM_WORLD,
+         NVectorTestError());
 
   deallog << "test_get_communicator OK" << std::endl;
 }
