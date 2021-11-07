@@ -1321,21 +1321,29 @@ namespace internal
 
         // ---------------------- lexicographic_numbering ----------------------
         std::vector<unsigned int> lexicographic_numbering;
-        if (reference_cell == ReferenceCells::get_hypercube<dim>())
+        if (fe_fine.n_base_elements() == 1 &&
+            fe_fine.base_element(0).n_components() == 1)
           {
-            const Quadrature<1> dummy_quadrature(
-              std::vector<Point<1>>(1, Point<1>()));
-            internal::MatrixFreeFunctions::ShapeInfo<Number> shape_info;
-            shape_info.reinit(dummy_quadrature, fe_fine, 0);
-            lexicographic_numbering = shape_info.lexicographic_numbering;
+            if (reference_cell == ReferenceCells::get_hypercube<dim>())
+              {
+                const Quadrature<1> dummy_quadrature(
+                  std::vector<Point<1>>(1, Point<1>()));
+                internal::MatrixFreeFunctions::ShapeInfo<Number> shape_info;
+                shape_info.reinit(dummy_quadrature, fe_fine, 0);
+                lexicographic_numbering = shape_info.lexicographic_numbering;
+              }
+            else
+              {
+                const auto dummy_quadrature =
+                  reference_cell.template get_gauss_type_quadrature<dim>(1);
+                internal::MatrixFreeFunctions::ShapeInfo<Number> shape_info;
+                shape_info.reinit(dummy_quadrature, fe_fine, 0);
+                lexicographic_numbering = shape_info.lexicographic_numbering;
+              }
           }
         else
           {
-            const auto dummy_quadrature =
-              reference_cell.template get_gauss_type_quadrature<dim>(1);
-            internal::MatrixFreeFunctions::ShapeInfo<Number> shape_info;
-            shape_info.reinit(dummy_quadrature, fe_fine, 0);
-            lexicographic_numbering = shape_info.lexicographic_numbering;
+            AssertThrow(false, ExcNotImplemented());
           }
 
         // ------------------------------ indices ------------------------------
@@ -1434,101 +1442,110 @@ namespace internal
 
       // ----------------------- prolongation matrix (1) -----------------------
       {
-        AssertDimension(fe_fine.n_base_elements(), 1);
-        if (reference_cell == ReferenceCells::get_hypercube<dim>())
+        if (fe_fine.n_base_elements() == 1 &&
+            fe_fine.base_element(0).n_components() == 1)
           {
-            const auto fe = create_1D_fe(fe_fine.base_element(0));
+            if (reference_cell == ReferenceCells::get_hypercube<dim>())
+              {
+                const auto fe = create_1D_fe(fe_fine.base_element(0));
 
-            std::vector<unsigned int> renumbering(fe->n_dofs_per_cell());
-            {
-              AssertIndexRange(fe->n_dofs_per_vertex(), 2);
-              renumbering[0] = 0;
-              for (unsigned int i = 0; i < fe->dofs_per_line; ++i)
-                renumbering[i + fe->n_dofs_per_vertex()] =
-                  GeometryInfo<1>::vertices_per_cell * fe->n_dofs_per_vertex() +
-                  i;
-              if (fe->n_dofs_per_vertex() > 0)
-                renumbering[fe->n_dofs_per_cell() - fe->n_dofs_per_vertex()] =
-                  fe->n_dofs_per_vertex();
-            }
-
-            // TODO: data structures are saved in form of DG data structures
-            // here
-            const unsigned int shift           = fe->n_dofs_per_cell();
-            const unsigned int n_child_dofs_1d = fe->n_dofs_per_cell() * 2;
-
-            {
-              transfer.schemes[1].prolongation_matrix_1d.resize(
-                fe->n_dofs_per_cell() * n_child_dofs_1d);
-
-              for (unsigned int c = 0;
-                   c < GeometryInfo<1>::max_children_per_cell;
-                   ++c)
-                for (unsigned int i = 0; i < fe->n_dofs_per_cell(); ++i)
-                  for (unsigned int j = 0; j < fe->n_dofs_per_cell(); ++j)
-                    transfer.schemes[1]
-                      .prolongation_matrix_1d[i * n_child_dofs_1d + j +
-                                              c * shift] =
-                      fe->get_prolongation_matrix(c)(renumbering[j],
-                                                     renumbering[i]);
-            }
-            {
-              transfer.schemes[1].restriction_matrix_1d.resize(
-                fe->n_dofs_per_cell() * n_child_dofs_1d);
-
-              for (unsigned int c = 0;
-                   c < GeometryInfo<1>::max_children_per_cell;
-                   ++c)
+                std::vector<unsigned int> renumbering(fe->n_dofs_per_cell());
                 {
-                  const auto matrix = get_restriction_matrix(*fe, c);
-                  for (unsigned int i = 0; i < fe->n_dofs_per_cell(); ++i)
-                    for (unsigned int j = 0; j < fe->n_dofs_per_cell(); ++j)
-                      transfer.schemes[1]
-                        .restriction_matrix_1d[i * n_child_dofs_1d + j +
-                                               c * shift] =
-                        matrix(renumbering[i], renumbering[j]);
+                  AssertIndexRange(fe->n_dofs_per_vertex(), 2);
+                  renumbering[0] = 0;
+                  for (unsigned int i = 0; i < fe->dofs_per_line; ++i)
+                    renumbering[i + fe->n_dofs_per_vertex()] =
+                      GeometryInfo<1>::vertices_per_cell *
+                        fe->n_dofs_per_vertex() +
+                      i;
+                  if (fe->n_dofs_per_vertex() > 0)
+                    renumbering[fe->n_dofs_per_cell() -
+                                fe->n_dofs_per_vertex()] =
+                      fe->n_dofs_per_vertex();
                 }
-            }
+
+                // TODO: data structures are saved in form of DG data structures
+                // here
+                const unsigned int shift           = fe->n_dofs_per_cell();
+                const unsigned int n_child_dofs_1d = fe->n_dofs_per_cell() * 2;
+
+                {
+                  transfer.schemes[1].prolongation_matrix_1d.resize(
+                    fe->n_dofs_per_cell() * n_child_dofs_1d);
+
+                  for (unsigned int c = 0;
+                       c < GeometryInfo<1>::max_children_per_cell;
+                       ++c)
+                    for (unsigned int i = 0; i < fe->n_dofs_per_cell(); ++i)
+                      for (unsigned int j = 0; j < fe->n_dofs_per_cell(); ++j)
+                        transfer.schemes[1]
+                          .prolongation_matrix_1d[i * n_child_dofs_1d + j +
+                                                  c * shift] =
+                          fe->get_prolongation_matrix(c)(renumbering[j],
+                                                         renumbering[i]);
+                }
+                {
+                  transfer.schemes[1].restriction_matrix_1d.resize(
+                    fe->n_dofs_per_cell() * n_child_dofs_1d);
+
+                  for (unsigned int c = 0;
+                       c < GeometryInfo<1>::max_children_per_cell;
+                       ++c)
+                    {
+                      const auto matrix = get_restriction_matrix(*fe, c);
+                      for (unsigned int i = 0; i < fe->n_dofs_per_cell(); ++i)
+                        for (unsigned int j = 0; j < fe->n_dofs_per_cell(); ++j)
+                          transfer.schemes[1]
+                            .restriction_matrix_1d[i * n_child_dofs_1d + j +
+                                                   c * shift] =
+                            matrix(renumbering[i], renumbering[j]);
+                    }
+                }
+              }
+            else
+              {
+                const auto &       fe              = fe_fine.base_element(0);
+                const unsigned int n_dofs_per_cell = fe.n_dofs_per_cell();
+
+                {
+                  transfer.schemes[1].prolongation_matrix.resize(
+                    n_dofs_per_cell * n_dofs_per_cell *
+                    GeometryInfo<dim>::max_children_per_cell);
+
+                  for (unsigned int c = 0;
+                       c < GeometryInfo<dim>::max_children_per_cell;
+                       ++c)
+                    for (unsigned int i = 0; i < n_dofs_per_cell; ++i)
+                      for (unsigned int j = 0; j < n_dofs_per_cell; ++j)
+                        transfer.schemes[1].prolongation_matrix
+                          [i * n_dofs_per_cell *
+                             GeometryInfo<dim>::max_children_per_cell +
+                           j + c * n_dofs_per_cell] =
+                          fe.get_prolongation_matrix(c)(j, i);
+                }
+                {
+                  transfer.schemes[1].restriction_matrix.resize(
+                    n_dofs_per_cell * n_dofs_per_cell *
+                    GeometryInfo<dim>::max_children_per_cell);
+
+                  for (unsigned int c = 0;
+                       c < GeometryInfo<dim>::max_children_per_cell;
+                       ++c)
+                    {
+                      const auto matrix = get_restriction_matrix(fe, c);
+                      for (unsigned int i = 0; i < n_dofs_per_cell; ++i)
+                        for (unsigned int j = 0; j < n_dofs_per_cell; ++j)
+                          transfer.schemes[1].restriction_matrix
+                            [i * n_dofs_per_cell *
+                               GeometryInfo<dim>::max_children_per_cell +
+                             j + c * n_dofs_per_cell] = matrix(i, j);
+                    }
+                }
+              }
           }
         else
           {
-            const auto &       fe              = fe_fine.base_element(0);
-            const unsigned int n_dofs_per_cell = fe.n_dofs_per_cell();
-
-            {
-              transfer.schemes[1].prolongation_matrix.resize(
-                n_dofs_per_cell * n_dofs_per_cell *
-                GeometryInfo<dim>::max_children_per_cell);
-
-              for (unsigned int c = 0;
-                   c < GeometryInfo<dim>::max_children_per_cell;
-                   ++c)
-                for (unsigned int i = 0; i < n_dofs_per_cell; ++i)
-                  for (unsigned int j = 0; j < n_dofs_per_cell; ++j)
-                    transfer.schemes[1].prolongation_matrix
-                      [i * n_dofs_per_cell *
-                         GeometryInfo<dim>::max_children_per_cell +
-                       j + c * n_dofs_per_cell] =
-                      fe.get_prolongation_matrix(c)(j, i);
-            }
-            {
-              transfer.schemes[1].restriction_matrix.resize(
-                n_dofs_per_cell * n_dofs_per_cell *
-                GeometryInfo<dim>::max_children_per_cell);
-
-              for (unsigned int c = 0;
-                   c < GeometryInfo<dim>::max_children_per_cell;
-                   ++c)
-                {
-                  const auto matrix = get_restriction_matrix(fe, c);
-                  for (unsigned int i = 0; i < n_dofs_per_cell; ++i)
-                    for (unsigned int j = 0; j < n_dofs_per_cell; ++j)
-                      transfer.schemes[1].restriction_matrix
-                        [i * n_dofs_per_cell *
-                           GeometryInfo<dim>::max_children_per_cell +
-                         j + c * n_dofs_per_cell] = matrix(i, j);
-                }
-            }
+            AssertThrow(false, ExcNotImplemented());
           }
       }
 
@@ -1779,44 +1796,72 @@ namespace internal
                    ExcNotImplemented());
 
             // ------------------- lexicographic_numbering  --------------------
-            if (reference_cell == ReferenceCells::get_hypercube<dim>())
+            if (dof_handler_coarse.get_fe(fe_index_pair.first.first)
+                    .n_base_elements() == 1 &&
+                dof_handler_coarse.get_fe(fe_index_pair.first.first)
+                    .base_element(0)
+                    .n_components() == 1)
               {
-                const Quadrature<1> dummy_quadrature(
-                  std::vector<Point<1>>(1, Point<1>()));
-                internal::MatrixFreeFunctions::ShapeInfo<Number> shape_info;
-                shape_info.reinit(dummy_quadrature,
-                                  dof_handler_fine.get_fe(
-                                    fe_index_pair.first.second),
-                                  0);
-                lexicographic_numbering_fine[fe_index_pair.second] =
-                  shape_info.lexicographic_numbering;
+                if (reference_cell == ReferenceCells::get_hypercube<dim>())
+                  {
+                    const Quadrature<1> dummy_quadrature(
+                      std::vector<Point<1>>(1, Point<1>()));
+                    internal::MatrixFreeFunctions::ShapeInfo<Number> shape_info;
+                    shape_info.reinit(dummy_quadrature,
+                                      dof_handler_fine.get_fe(
+                                        fe_index_pair.first.second),
+                                      0);
+                    lexicographic_numbering_fine[fe_index_pair.second] =
+                      shape_info.lexicographic_numbering;
 
-                shape_info.reinit(dummy_quadrature,
-                                  dof_handler_coarse.get_fe(
-                                    fe_index_pair.first.first),
-                                  0);
-                lexicographic_numbering_coarse[fe_index_pair.second] =
-                  shape_info.lexicographic_numbering;
+                    shape_info.reinit(dummy_quadrature,
+                                      dof_handler_coarse.get_fe(
+                                        fe_index_pair.first.first),
+                                      0);
+                    lexicographic_numbering_coarse[fe_index_pair.second] =
+                      shape_info.lexicographic_numbering;
+                  }
+                else
+                  {
+                    const auto dummy_quadrature =
+                      reference_cell.template get_gauss_type_quadrature<dim>(1);
+
+                    internal::MatrixFreeFunctions::ShapeInfo<Number> shape_info;
+                    shape_info.reinit(dummy_quadrature,
+                                      dof_handler_fine.get_fe(
+                                        fe_index_pair.first.second),
+                                      0);
+                    lexicographic_numbering_fine[fe_index_pair.second] =
+                      shape_info.lexicographic_numbering;
+
+                    shape_info.reinit(dummy_quadrature,
+                                      dof_handler_coarse.get_fe(
+                                        fe_index_pair.first.first),
+                                      0);
+                    lexicographic_numbering_coarse[fe_index_pair.second] =
+                      shape_info.lexicographic_numbering;
+                  }
               }
             else
               {
-                const auto dummy_quadrature =
-                  reference_cell.template get_gauss_type_quadrature<dim>(1);
+                lexicographic_numbering_fine[fe_index_pair.second].resize(
+                  dof_handler_fine.get_fe(fe_index_pair.first.second)
+                    .n_dofs_per_cell());
+                lexicographic_numbering_coarse[fe_index_pair.second].resize(
+                  dof_handler_coarse.get_fe(fe_index_pair.first.first)
+                    .n_dofs_per_cell());
 
-                internal::MatrixFreeFunctions::ShapeInfo<Number> shape_info;
-                shape_info.reinit(dummy_quadrature,
-                                  dof_handler_fine.get_fe(
-                                    fe_index_pair.first.second),
-                                  0);
-                lexicographic_numbering_fine[fe_index_pair.second] =
-                  shape_info.lexicographic_numbering;
+                for (unsigned int i = 0;
+                     i <
+                     lexicographic_numbering_fine[fe_index_pair.second].size();
+                     ++i)
+                  lexicographic_numbering_fine[fe_index_pair.second][i] = i;
 
-                shape_info.reinit(dummy_quadrature,
-                                  dof_handler_coarse.get_fe(
-                                    fe_index_pair.first.first),
-                                  0);
-                lexicographic_numbering_coarse[fe_index_pair.second] =
-                  shape_info.lexicographic_numbering;
+                for (unsigned int i = 0;
+                     i < lexicographic_numbering_coarse[fe_index_pair.second]
+                           .size();
+                     ++i)
+                  lexicographic_numbering_coarse[fe_index_pair.second][i] = i;
               }
           }
 
@@ -1906,10 +1951,15 @@ namespace internal
           const auto &fe_index_no   = fe_index_pair_.second;
 
           AssertDimension(
-            dof_handler_fine.get_fe(fe_index_pair.second).n_base_elements(), 1);
-          AssertDimension(
-            dof_handler_coarse.get_fe(fe_index_pair.first).n_base_elements(),
-            1);
+            dof_handler_fine.get_fe(fe_index_pair.second).n_base_elements(),
+            dof_handler_coarse.get_fe(fe_index_pair.first).n_base_elements());
+
+          AssertDimension(dof_handler_fine.get_fe(fe_index_pair.second)
+                            .base_element(0)
+                            .n_components(),
+                          dof_handler_coarse.get_fe(fe_index_pair.first)
+                            .base_element(0)
+                            .n_components());
 
           const auto reference_cell =
             dof_handler_fine.get_fe(fe_index_pair_.first.second)
@@ -1920,127 +1970,204 @@ namespace internal
                      .reference_cell(),
                  ExcNotImplemented());
 
-          if (reference_cell == ReferenceCells::get_hypercube<dim>() &&
-              (dof_handler_coarse.get_fe(fe_index_pair.first) !=
+          if ((dof_handler_coarse.get_fe(fe_index_pair.first) !=
                dof_handler_fine.get_fe(fe_index_pair.second)) &&
               (dof_handler_coarse.get_fe(fe_index_pair.first)
                    .n_dofs_per_cell() != 0 &&
                dof_handler_fine.get_fe(fe_index_pair.second)
                    .n_dofs_per_cell() != 0))
             {
-              const auto fe_fine = create_1D_fe(
-                dof_handler_fine.get_fe(fe_index_pair.second).base_element(0));
+              if (dof_handler_coarse.get_fe(fe_index_pair.first)
+                      .n_base_elements() == 1 &&
+                  dof_handler_coarse.get_fe(fe_index_pair.first)
+                      .base_element(0)
+                      .n_components() == 1)
+                {
+                  if (reference_cell == ReferenceCells::get_hypercube<dim>())
+                    {
+                      const auto fe_fine = create_1D_fe(
+                        dof_handler_fine.get_fe(fe_index_pair.second)
+                          .base_element(0));
 
-              std::vector<unsigned int> renumbering_fine(
-                fe_fine->n_dofs_per_cell());
-              {
-                AssertIndexRange(fe_fine->n_dofs_per_vertex(), 2);
-                renumbering_fine[0] = 0;
-                for (unsigned int i = 0; i < fe_fine->dofs_per_line; ++i)
-                  renumbering_fine[i + fe_fine->n_dofs_per_vertex()] =
-                    GeometryInfo<1>::vertices_per_cell *
-                      fe_fine->n_dofs_per_vertex() +
-                    i;
-                if (fe_fine->n_dofs_per_vertex() > 0)
-                  renumbering_fine[fe_fine->n_dofs_per_cell() -
-                                   fe_fine->n_dofs_per_vertex()] =
-                    fe_fine->n_dofs_per_vertex();
-              }
+                      std::vector<unsigned int> renumbering_fine(
+                        fe_fine->n_dofs_per_cell());
+                      {
+                        AssertIndexRange(fe_fine->n_dofs_per_vertex(), 2);
+                        renumbering_fine[0] = 0;
+                        for (unsigned int i = 0; i < fe_fine->dofs_per_line;
+                             ++i)
+                          renumbering_fine[i + fe_fine->n_dofs_per_vertex()] =
+                            GeometryInfo<1>::vertices_per_cell *
+                              fe_fine->n_dofs_per_vertex() +
+                            i;
+                        if (fe_fine->n_dofs_per_vertex() > 0)
+                          renumbering_fine[fe_fine->n_dofs_per_cell() -
+                                           fe_fine->n_dofs_per_vertex()] =
+                            fe_fine->n_dofs_per_vertex();
+                      }
 
-              const auto fe_coarse = create_1D_fe(
-                dof_handler_coarse.get_fe(fe_index_pair.first).base_element(0));
+                      const auto fe_coarse = create_1D_fe(
+                        dof_handler_coarse.get_fe(fe_index_pair.first)
+                          .base_element(0));
 
-              std::vector<unsigned int> renumbering_coarse(
-                fe_coarse->n_dofs_per_cell());
-              {
-                AssertIndexRange(fe_coarse->n_dofs_per_vertex(), 2);
-                renumbering_coarse[0] = 0;
-                for (unsigned int i = 0; i < fe_coarse->dofs_per_line; ++i)
-                  renumbering_coarse[i + fe_coarse->n_dofs_per_vertex()] =
-                    GeometryInfo<1>::vertices_per_cell *
-                      fe_coarse->n_dofs_per_vertex() +
-                    i;
-                if (fe_coarse->n_dofs_per_vertex() > 0)
-                  renumbering_coarse[fe_coarse->n_dofs_per_cell() -
-                                     fe_coarse->n_dofs_per_vertex()] =
-                    fe_coarse->n_dofs_per_vertex();
-              }
+                      std::vector<unsigned int> renumbering_coarse(
+                        fe_coarse->n_dofs_per_cell());
+                      {
+                        AssertIndexRange(fe_coarse->n_dofs_per_vertex(), 2);
+                        renumbering_coarse[0] = 0;
+                        for (unsigned int i = 0; i < fe_coarse->dofs_per_line;
+                             ++i)
+                          renumbering_coarse[i +
+                                             fe_coarse->n_dofs_per_vertex()] =
+                            GeometryInfo<1>::vertices_per_cell *
+                              fe_coarse->n_dofs_per_vertex() +
+                            i;
+                        if (fe_coarse->n_dofs_per_vertex() > 0)
+                          renumbering_coarse[fe_coarse->n_dofs_per_cell() -
+                                             fe_coarse->n_dofs_per_vertex()] =
+                            fe_coarse->n_dofs_per_vertex();
+                      }
 
-              {
-                FullMatrix<double> matrix(fe_fine->n_dofs_per_cell(),
-                                          fe_coarse->n_dofs_per_cell());
-                FETools::get_projection_matrix(*fe_coarse, *fe_fine, matrix);
-                transfer.schemes[fe_index_no].prolongation_matrix_1d.resize(
-                  fe_fine->n_dofs_per_cell() * fe_coarse->n_dofs_per_cell());
+                      {
+                        FullMatrix<double> matrix(fe_fine->n_dofs_per_cell(),
+                                                  fe_coarse->n_dofs_per_cell());
+                        FETools::get_projection_matrix(*fe_coarse,
+                                                       *fe_fine,
+                                                       matrix);
+                        transfer.schemes[fe_index_no]
+                          .prolongation_matrix_1d.resize(
+                            fe_fine->n_dofs_per_cell() *
+                            fe_coarse->n_dofs_per_cell());
 
-                for (unsigned int i = 0, k = 0;
-                     i < fe_coarse->n_dofs_per_cell();
-                     ++i)
-                  for (unsigned int j = 0; j < fe_fine->n_dofs_per_cell();
-                       ++j, ++k)
-                    transfer.schemes[fe_index_no].prolongation_matrix_1d[k] =
-                      matrix(renumbering_fine[j], renumbering_coarse[i]);
-              }
+                        for (unsigned int i = 0, k = 0;
+                             i < fe_coarse->n_dofs_per_cell();
+                             ++i)
+                          for (unsigned int j = 0;
+                               j < fe_fine->n_dofs_per_cell();
+                               ++j, ++k)
+                            transfer.schemes[fe_index_no]
+                              .prolongation_matrix_1d[k] =
+                              matrix(renumbering_fine[j],
+                                     renumbering_coarse[i]);
+                      }
 
-              {
-                FullMatrix<double> matrix(fe_coarse->n_dofs_per_cell(),
-                                          fe_fine->n_dofs_per_cell());
-                FETools::get_projection_matrix(*fe_fine, *fe_coarse, matrix);
-                transfer.schemes[fe_index_no].restriction_matrix_1d.resize(
-                  fe_fine->n_dofs_per_cell() * fe_coarse->n_dofs_per_cell());
+                      {
+                        FullMatrix<double> matrix(fe_coarse->n_dofs_per_cell(),
+                                                  fe_fine->n_dofs_per_cell());
+                        FETools::get_projection_matrix(*fe_fine,
+                                                       *fe_coarse,
+                                                       matrix);
+                        transfer.schemes[fe_index_no]
+                          .restriction_matrix_1d.resize(
+                            fe_fine->n_dofs_per_cell() *
+                            fe_coarse->n_dofs_per_cell());
 
-                for (unsigned int i = 0, k = 0;
-                     i < fe_coarse->n_dofs_per_cell();
-                     ++i)
-                  for (unsigned int j = 0; j < fe_fine->n_dofs_per_cell();
-                       ++j, ++k)
-                    transfer.schemes[fe_index_no].restriction_matrix_1d[k] =
-                      matrix(renumbering_coarse[i], renumbering_fine[j]);
-              }
-            }
-          else if (reference_cell != ReferenceCells::get_hypercube<dim>() &&
-                   (dof_handler_coarse.get_fe(fe_index_pair.first) !=
-                    dof_handler_fine.get_fe(fe_index_pair.second)) &&
-                   (dof_handler_coarse.get_fe(fe_index_pair.first)
-                        .n_dofs_per_cell() != 0 &&
-                    dof_handler_fine.get_fe(fe_index_pair.second)
-                        .n_dofs_per_cell() != 0))
-            {
-              const auto &fe_fine =
-                dof_handler_fine.get_fe(fe_index_pair.second).base_element(0);
+                        for (unsigned int i = 0, k = 0;
+                             i < fe_coarse->n_dofs_per_cell();
+                             ++i)
+                          for (unsigned int j = 0;
+                               j < fe_fine->n_dofs_per_cell();
+                               ++j, ++k)
+                            transfer.schemes[fe_index_no]
+                              .restriction_matrix_1d[k] =
+                              matrix(renumbering_coarse[i],
+                                     renumbering_fine[j]);
+                      }
+                    }
+                  else
+                    {
+                      const auto &fe_fine =
+                        dof_handler_fine.get_fe(fe_index_pair.second)
+                          .base_element(0);
 
-              const auto &fe_coarse =
-                dof_handler_coarse.get_fe(fe_index_pair.first).base_element(0);
+                      const auto &fe_coarse =
+                        dof_handler_coarse.get_fe(fe_index_pair.first)
+                          .base_element(0);
 
-              {
-                FullMatrix<double> matrix(fe_fine.n_dofs_per_cell(),
-                                          fe_coarse.n_dofs_per_cell());
-                FETools::get_projection_matrix(fe_coarse, fe_fine, matrix);
-                transfer.schemes[fe_index_no].prolongation_matrix.resize(
-                  fe_fine.n_dofs_per_cell() * fe_coarse.n_dofs_per_cell());
+                      {
+                        FullMatrix<double> matrix(fe_fine.n_dofs_per_cell(),
+                                                  fe_coarse.n_dofs_per_cell());
+                        FETools::get_projection_matrix(fe_coarse,
+                                                       fe_fine,
+                                                       matrix);
+                        transfer.schemes[fe_index_no]
+                          .prolongation_matrix.resize(
+                            fe_fine.n_dofs_per_cell() *
+                            fe_coarse.n_dofs_per_cell());
 
-                for (unsigned int i = 0, k = 0; i < fe_coarse.n_dofs_per_cell();
-                     ++i)
-                  for (unsigned int j = 0; j < fe_fine.n_dofs_per_cell();
-                       ++j, ++k)
-                    transfer.schemes[fe_index_no].prolongation_matrix[k] =
-                      matrix(j, i);
-              }
+                        for (unsigned int i = 0, k = 0;
+                             i < fe_coarse.n_dofs_per_cell();
+                             ++i)
+                          for (unsigned int j = 0;
+                               j < fe_fine.n_dofs_per_cell();
+                               ++j, ++k)
+                            transfer.schemes[fe_index_no]
+                              .prolongation_matrix[k] = matrix(j, i);
+                      }
 
-              {
-                FullMatrix<double> matrix(fe_coarse.n_dofs_per_cell(),
-                                          fe_fine.n_dofs_per_cell());
-                FETools::get_projection_matrix(fe_fine, fe_coarse, matrix);
-                transfer.schemes[fe_index_no].restriction_matrix.resize(
-                  fe_fine.n_dofs_per_cell() * fe_coarse.n_dofs_per_cell());
+                      {
+                        FullMatrix<double> matrix(fe_coarse.n_dofs_per_cell(),
+                                                  fe_fine.n_dofs_per_cell());
+                        FETools::get_projection_matrix(fe_fine,
+                                                       fe_coarse,
+                                                       matrix);
+                        transfer.schemes[fe_index_no].restriction_matrix.resize(
+                          fe_fine.n_dofs_per_cell() *
+                          fe_coarse.n_dofs_per_cell());
 
-                for (unsigned int i = 0, k = 0; i < fe_coarse.n_dofs_per_cell();
-                     ++i)
-                  for (unsigned int j = 0; j < fe_fine.n_dofs_per_cell();
-                       ++j, ++k)
-                    transfer.schemes[fe_index_no].restriction_matrix[k] =
-                      matrix(i, j);
-              }
+                        for (unsigned int i = 0, k = 0;
+                             i < fe_coarse.n_dofs_per_cell();
+                             ++i)
+                          for (unsigned int j = 0;
+                               j < fe_fine.n_dofs_per_cell();
+                               ++j, ++k)
+                            transfer.schemes[fe_index_no]
+                              .restriction_matrix[k] = matrix(i, j);
+                      }
+                    }
+                }
+              else
+                {
+                  transfer.n_components = 1;
+
+                  const auto &fe_fine =
+                    dof_handler_fine.get_fe(fe_index_pair.second);
+
+                  const auto &fe_coarse =
+                    dof_handler_coarse.get_fe(fe_index_pair.first);
+
+                  {
+                    FullMatrix<double> matrix(fe_fine.n_dofs_per_cell(),
+                                              fe_coarse.n_dofs_per_cell());
+                    FETools::get_projection_matrix(fe_coarse, fe_fine, matrix);
+                    transfer.schemes[fe_index_no].prolongation_matrix.resize(
+                      fe_fine.n_dofs_per_cell() * fe_coarse.n_dofs_per_cell());
+
+                    for (unsigned int i = 0, k = 0;
+                         i < fe_coarse.n_dofs_per_cell();
+                         ++i)
+                      for (unsigned int j = 0; j < fe_fine.n_dofs_per_cell();
+                           ++j, ++k)
+                        transfer.schemes[fe_index_no].prolongation_matrix[k] =
+                          matrix(j, i);
+                  }
+
+                  {
+                    FullMatrix<double> matrix(fe_coarse.n_dofs_per_cell(),
+                                              fe_fine.n_dofs_per_cell());
+                    FETools::get_projection_matrix(fe_fine, fe_coarse, matrix);
+                    transfer.schemes[fe_index_no].restriction_matrix.resize(
+                      fe_fine.n_dofs_per_cell() * fe_coarse.n_dofs_per_cell());
+
+                    for (unsigned int i = 0, k = 0;
+                         i < fe_coarse.n_dofs_per_cell();
+                         ++i)
+                      for (unsigned int j = 0; j < fe_fine.n_dofs_per_cell();
+                           ++j, ++k)
+                        transfer.schemes[fe_index_no].restriction_matrix[k] =
+                          matrix(i, j);
+                  }
+                }
             }
         }
 
