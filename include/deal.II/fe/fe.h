@@ -139,9 +139,9 @@ class FESystem;
  * FiniteElement::system_to_component_index() function.
  *
  * On the other hand, if there is at least one shape function that is nonzero
- * in more than one vector component, then we call the entire element "non-
- * primitive". The FiniteElement::get_nonzero_components() can then be used to
- * determine which vector components of a shape function are nonzero. The
+ * in more than one vector component, then we call the entire element
+ * "non-primitive". The FiniteElement::get_nonzero_components() can then be used
+ * to determine which vector components of a shape function are nonzero. The
  * number of nonzero components of a shape function is returned by
  * FiniteElement::n_components(). Whether a shape function is non-primitive
  * can be queried by FiniteElement::is_primitive().
@@ -887,8 +887,8 @@ public:
    * Return the gradient of the @p ith shape function at the point @p p. @p p
    * is a point on the reference element, and likewise the gradient is the
    * gradient on the unit cell with respect to unit cell coordinates. If the
-   * finite element is vector-valued, then return the value of the only non-
-   * zero component of the vector value of this shape function. If the shape
+   * finite element is vector-valued, then return the value of the only
+   * non-zero component of the vector value of this shape function. If the shape
    * function has more than one non-zero component (which we refer to with the
    * term non-primitive), then derived classes implementing this function
    * should throw an exception of type ExcShapeFunctionNotPrimitive. In that
@@ -924,10 +924,10 @@ public:
    * cell with respect to unit cell coordinates. If the finite element is
    * vector-valued, then return the value of the only non-zero component of
    * the vector value of this shape function. If the shape function has more
-   * than one non-zero component (which we refer to with the term non-
-   * primitive), then derived classes implementing this function should throw
-   * an exception of type ExcShapeFunctionNotPrimitive. In that case, use the
-   * shape_grad_grad_component() function.
+   * than one non-zero component (which we refer to with the term
+   * non-primitive), then derived classes implementing this function should
+   * throw an exception of type ExcShapeFunctionNotPrimitive. In that case, use
+   * the shape_grad_grad_component() function.
    *
    * Implementations of this function should throw an exception of type
    * ExcUnitShapeValuesDoNotExist if the shape functions of the FiniteElement
@@ -959,10 +959,10 @@ public:
    * cell with respect to unit cell coordinates. If the finite element is
    * vector-valued, then return the value of the only non-zero component of
    * the vector value of this shape function. If the shape function has more
-   * than one non-zero component (which we refer to with the term non-
-   * primitive), then derived classes implementing this function should throw
-   * an exception of type ExcShapeFunctionNotPrimitive. In that case, use the
-   * shape_3rd_derivative_component() function.
+   * than one non-zero component (which we refer to with the term
+   * non-primitive), then derived classes implementing this function should
+   * throw an exception of type ExcShapeFunctionNotPrimitive. In that case, use
+   * the shape_3rd_derivative_component() function.
    *
    * Implementations of this function should throw an exception of type
    * ExcUnitShapeValuesDoNotExist if the shape functions of the FiniteElement
@@ -994,10 +994,10 @@ public:
    * cell with respect to unit cell coordinates. If the finite element is
    * vector-valued, then return the value of the only non-zero component of
    * the vector value of this shape function. If the shape function has more
-   * than one non-zero component (which we refer to with the term non-
-   * primitive), then derived classes implementing this function should throw
-   * an exception of type ExcShapeFunctionNotPrimitive. In that case, use the
-   * shape_4th_derivative_component() function.
+   * than one non-zero component (which we refer to with the term
+   * non-primitive), then derived classes implementing this function should
+   * throw an exception of type ExcShapeFunctionNotPrimitive. In that case, use
+   * the shape_4th_derivative_component() function.
    *
    * Implementations of this function should throw an exception of type
    * ExcUnitShapeValuesDoNotExist if the shape functions of the FiniteElement
@@ -1581,8 +1581,8 @@ public:
   get_nonzero_components(const unsigned int i) const;
 
   /**
-   * Return in how many vector components the @p ith shape function is non-
-   * zero. This value equals the number of entries equal to @p true in the
+   * Return in how many vector components the @p ith shape function is
+   * non-zero. This value equals the number of entries equal to @p true in the
    * result of the get_nonzero_components() function.
    *
    * For most finite element spaces, the result will be equal to one. It is
@@ -2521,8 +2521,8 @@ protected:
    * case the element is composed of other elements and at least one of them
    * is vector-valued itself.
    *
-   * This array has valid values also in the case of vector-valued (i.e. non-
-   * primitive) shape functions, in contrast to the
+   * This array has valid values also in the case of vector-valued (i.e.
+   * non-primitive) shape functions, in contrast to the
    * #system_to_component_table.
    */
   std::vector<std::pair<std::pair<unsigned int, unsigned int>, unsigned int>>
