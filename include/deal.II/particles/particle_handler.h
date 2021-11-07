@@ -897,7 +897,7 @@ namespace Particles
      * container to check for valid states.
      */
     void
-    reset_particle_container(const Triangulation<dim, spacedim> *trianulation,
+    reset_particle_container(const Triangulation<dim, spacedim> *triangulation,
                              particle_container &                particles);
 
     /**
@@ -929,8 +929,8 @@ namespace Particles
     particle_container particles;
 
     /**
-     * Iterator to the start of the end of the list elements of
-     * particle_container which belong to locally owned elements.
+     * Iterator to the end of the list elements of particle_container which
+     * belong to locally owned elements.
      */
     typename particle_container::iterator owned_particles_end;
 
@@ -1172,6 +1172,8 @@ namespace Particles
   inline typename ParticleHandler<dim, spacedim>::particle_iterator
   ParticleHandler<dim, spacedim>::begin()
   {
+    // We should always have at least the three anchor entries in the list of
+    // particles
     Assert(!particles.empty(), ExcInternalError());
 
     // jump over the first entry which is used for book-keeping
