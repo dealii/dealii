@@ -64,7 +64,7 @@ main(int argc, char **argv)
   ParameterHandler                             prm;
   data.add_parameters(prm);
 
-  std::ifstream ifile(SOURCE_DIR "/kinsol_linesearch.prm");
+  std::ifstream ifile(SOURCE_DIR "/kinsol_01.prm");
   prm.parse_input(ifile);
 
   // Update the Jacobian in each iteration:

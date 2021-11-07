@@ -24,8 +24,7 @@
 
 
 /**
- * Solve the Harmonic oscillator problem, using a direct solver for the
- * jacobian system.
+ * Solve the Harmonic oscillator problem.
  *
  * u'' = -k^2 u
  * u (0) = 0
@@ -99,16 +98,8 @@ public:
       return 0;
     };
 
-    // Used only in ver < 4.0.0
     time_stepper.solve_jacobian_system = [&](const VectorType &src,
                                              VectorType &      dst) -> int {
-      Jinv.vmult(dst, src);
-      return 0;
-    };
-
-    // Used in ver >= 4.0.0
-    time_stepper.solve_with_jacobian =
-      [&](const VectorType &src, VectorType &dst, const double) -> int {
       Jinv.vmult(dst, src);
       return 0;
     };

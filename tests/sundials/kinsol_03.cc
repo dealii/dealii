@@ -58,7 +58,7 @@ main(int argc, char **argv)
   ParameterHandler                             prm;
   data.add_parameters(prm);
 
-  std::ifstream ifile(SOURCE_DIR "/kinsol_newton.prm");
+  std::ifstream ifile(SOURCE_DIR "/kinsol_01.prm");
   prm.parse_input(ifile);
 
   // Size of the problem
