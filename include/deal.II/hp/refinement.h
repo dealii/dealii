@@ -543,7 +543,6 @@ namespace hp
      * // perform adaptation
      * CellDataTransfer<dim, spacedim, Vector<float>> cell_data_transfer(
      *   triangulation,
-     *   false,
      *   &AdaptationStrategies::Refinement::l2_norm<dim, spacedim, float>,
      *   &AdaptationStrategies::Coarsening::l2_norm<dim, spacedim, float>);
      * cell_data_transfer.prepare_coarsening_and_refinement();
