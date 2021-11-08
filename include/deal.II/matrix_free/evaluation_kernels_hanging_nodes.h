@@ -65,15 +65,23 @@ namespace internal
     }
 
   private:
-    using VectorizationType = Number; // Number
+    enum class VectorizationTypes
+    {
+      index,
+      group,
+      mask
+    };
+
+    static const VectorizationTypes VectorizationType =
+      VectorizationTypes::index;
 
     static const unsigned int max_n_points_1D = 40;
 
-    template <typename T1, typename T2>
+    template <typename T1, VectorizationTypes VT>
     struct Trait;
 
     template <typename T1>
-    struct Trait<T1, unsigned int>
+    struct Trait<T1, VectorizationTypes::index>
     {
       using value_type = typename T1::value_type;
       using index_type = unsigned int;
@@ -100,7 +108,7 @@ namespace internal
     };
 
     template <typename T1>
-    struct Trait<T1, T1>
+    struct Trait<T1, VectorizationTypes::mask>
     {
       using value_type = T1;
       using index_type = Number;
@@ -460,11 +468,11 @@ namespace internal
     {
     public:
       inline DEAL_II_ALWAYS_INLINE
-      Helper(const unsigned int &                        given_degree,
-             const bool &                                type_x,
-             const bool &                                type_y,
-             const bool &                                type_z,
-             const VectorizationType &                   v,
+      Helper(const unsigned int &given_degree,
+             const bool &        type_x,
+             const bool &        type_y,
+             const bool &        type_z,
+             const typename Trait<Number, VectorizationType>::index_type &v,
              const std::array<AlignedVector<Number>, 2> &interpolation_matrices,
              Number *                                    values)
         : given_degree(given_degree)
@@ -476,11 +484,11 @@ namespace internal
         , values(values)
       {}
 
-      const unsigned int &                        given_degree;
-      const bool &                                type_x;
-      const bool &                                type_y;
-      const bool &                                type_z;
-      const VectorizationType &                   v;
+      const unsigned int &                                         given_degree;
+      const bool &                                                 type_x;
+      const bool &                                                 type_y;
+      const bool &                                                 type_z;
+      const typename Trait<Number, VectorizationType>::index_type &v;
       const std::array<AlignedVector<Number>, 2> &interpolation_matrices;
       Number *                                    values;
 
