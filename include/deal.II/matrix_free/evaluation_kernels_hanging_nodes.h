@@ -88,7 +88,7 @@ namespace internal
       {
         return value[i];
       }
-  
+
       static inline DEAL_II_ALWAYS_INLINE void
       set_value(Number &                           result,
                 const typename Number::value_type &value,
@@ -116,7 +116,7 @@ namespace internal
       {
         return value;
       }
-  
+
       static inline DEAL_II_ALWAYS_INLINE void
       set_value(Number &result, const Number &value, const Number &i)
       {
@@ -152,7 +152,8 @@ namespace internal
       // copy result back
       for (unsigned int i = 0, k = 0; i < r1; ++i)
         for (unsigned int j = 0; j < r2; ++j, ++k)
-          temp[k] = Trait<Number, VectorizationType>::get_value(values[i * offset + stride + j], v);
+          temp[k] = Trait<Number, VectorizationType>::get_value(
+            values[i * offset + stride + j], v);
 
       // perform interpolation point by point (note: r1 * r2 == points^(dim-1))
       for (unsigned int i = 0, k = 0; i < r1; ++i)
@@ -160,11 +161,13 @@ namespace internal
           {
             typename Trait<Number, VectorizationType>::value_type sum = 0.0;
             for (unsigned int h = 0; h < points; ++h)
-              sum += Trait<Number, VectorizationType>::get_value(weight[(transpose ? 1 : points) * k +
-                                      (transpose ? points : 1) * h],
-                               v) *
+              sum += Trait<Number, VectorizationType>::get_value(
+                       weight[(transpose ? 1 : points) * k +
+                              (transpose ? points : 1) * h],
+                       v) *
                      temp[h];
-            Trait<Number, VectorizationType>::set_value(values[i * offset + stride + j], sum, v);
+            Trait<Number, VectorizationType>::set_value(
+              values[i * offset + stride + j], sum, v);
           }
     }
 
@@ -208,20 +211,23 @@ namespace internal
         {
           // copy result back
           for (unsigned int k = 0; k < points; ++k)
-            temp[k] =
-              Trait<Number, VectorizationType>::get_value(values[dof_offset + k * stride + stride2 * g], v);
+            temp[k] = Trait<Number, VectorizationType>::get_value(
+              values[dof_offset + k * stride + stride2 * g], v);
 
           // perform interpolation point by point
           for (unsigned int k = 0; k < points; ++k)
             {
-              auto sum =
-                Trait<Number, VectorizationType>::get_value(weight[(transpose ? 1 : points) * k], v) * temp[0];
+              auto sum = Trait<Number, VectorizationType>::get_value(
+                           weight[(transpose ? 1 : points) * k], v) *
+                         temp[0];
               for (unsigned int h = 1; h < points; ++h)
-                sum += Trait<Number, VectorizationType>::get_value(weight[(transpose ? 1 : points) * k +
-                                        (transpose ? points : 1) * h],
-                                 v) *
+                sum += Trait<Number, VectorizationType>::get_value(
+                         weight[(transpose ? 1 : points) * k +
+                                (transpose ? points : 1) * h],
+                         v) *
                        temp[h];
-              Trait<Number, VectorizationType>::set_value(values[dof_offset + k * stride + stride2 * g], sum, v);
+              Trait<Number, VectorizationType>::set_value(
+                values[dof_offset + k * stride + stride2 * g], sum, v);
             }
         }
     }
@@ -248,19 +254,25 @@ namespace internal
 
       // copy result back
       for (unsigned int k = 0; k < points; ++k)
-        temp[k] = Trait<Number, VectorizationType>::get_value(values[p + k * stride], v);
+        temp[k] =
+          Trait<Number, VectorizationType>::get_value(values[p + k * stride],
+                                                      v);
 
       // perform interpolation point by point
       for (unsigned int k = 0; k < points; ++k)
         {
-          auto sum =
-            Trait<Number, VectorizationType>::get_value(weight[(transpose ? 1 : points) * k], v) * temp[0];
+          auto sum = Trait<Number, VectorizationType>::get_value(
+                       weight[(transpose ? 1 : points) * k], v) *
+                     temp[0];
           for (unsigned int h = 1; h < points; ++h)
-            sum += Trait<Number, VectorizationType>::get_value(weight[(transpose ? 1 : points) * k +
-                                    (transpose ? points : 1) * h],
-                             v) *
+            sum += Trait<Number, VectorizationType>::get_value(
+                     weight[(transpose ? 1 : points) * k +
+                            (transpose ? points : 1) * h],
+                     v) *
                    temp[h];
-          Trait<Number, VectorizationType>::set_value(values[p + k * stride], sum, v);
+          Trait<Number, VectorizationType>::set_value(values[p + k * stride],
+                                                      sum,
+                                                      v);
         }
     }
 
