@@ -76,6 +76,7 @@ namespace internal
     struct Trait<T1, unsigned int>
     {
       using value_type = typename T1::value_type;
+      using index_type = unsigned int;
 
       static inline DEAL_II_ALWAYS_INLINE unsigned int
       create(const unsigned int v)
@@ -84,7 +85,7 @@ namespace internal
       }
 
       static inline DEAL_II_ALWAYS_INLINE typename Number::value_type
-      get_value(const Number &value, const unsigned int &i)
+      get_value(const Number &value, const index_type &i)
       {
         return value[i];
       }
@@ -92,7 +93,7 @@ namespace internal
       static inline DEAL_II_ALWAYS_INLINE void
       set_value(Number &                           result,
                 const typename Number::value_type &value,
-                const unsigned int &               i)
+                const index_type &                 i)
       {
         result[i] = value;
       }
@@ -102,6 +103,7 @@ namespace internal
     struct Trait<T1, T1>
     {
       using value_type = T1;
+      using index_type = Number;
 
       static inline DEAL_II_ALWAYS_INLINE Number
       create(const unsigned int v)
@@ -112,13 +114,13 @@ namespace internal
       }
 
       static inline DEAL_II_ALWAYS_INLINE Number
-      get_value(const Number &value, const Number &)
+      get_value(const Number &value, const index_type &)
       {
         return value;
       }
 
       static inline DEAL_II_ALWAYS_INLINE void
-      set_value(Number &result, const Number &value, const Number &i)
+      set_value(Number &result, const Number &value, const index_type &i)
       {
         result = result * (Number(1.0) - i) + value * i;
       }
@@ -126,10 +128,11 @@ namespace internal
 
     template <int fe_degree, unsigned int side, bool transpose>
     static inline DEAL_II_ALWAYS_INLINE void
-    interpolate_2D(const unsigned int             given_degree,
-                   const VectorizationType        v,
-                   const Number *DEAL_II_RESTRICT weight,
-                   Number *DEAL_II_RESTRICT       values)
+    interpolate_2D(
+      const unsigned int                                          given_degree,
+      const typename Trait<Number, VectorizationType>::index_type v,
+      const Number *DEAL_II_RESTRICT                              weight,
+      Number *DEAL_II_RESTRICT                                    values)
     {
       typename Trait<Number, VectorizationType>::value_type
         temp[fe_degree != -1 ? (fe_degree + 1) : max_n_points_1D];
@@ -177,11 +180,12 @@ namespace internal
               bool         transpose,
               bool         skip_borders>
     static inline DEAL_II_ALWAYS_INLINE void
-    interpolate_3D_face(const unsigned int             dof_offset,
-                        const unsigned int             given_degree,
-                        const VectorizationType        v,
-                        const Number *DEAL_II_RESTRICT weight,
-                        Number *DEAL_II_RESTRICT       values)
+    interpolate_3D_face(
+      const unsigned int                                          dof_offset,
+      const unsigned int                                          given_degree,
+      const typename Trait<Number, VectorizationType>::index_type v,
+      const Number *DEAL_II_RESTRICT                              weight,
+      Number *DEAL_II_RESTRICT                                    values)
     {
       typename Trait<Number, VectorizationType>::value_type
         temp[fe_degree != -1 ? (fe_degree + 1) : max_n_points_1D];
@@ -234,11 +238,12 @@ namespace internal
 
     template <int fe_degree, unsigned int direction, bool transpose>
     static inline DEAL_II_ALWAYS_INLINE void
-    interpolate_3D_edge(const unsigned int             p,
-                        const unsigned int             given_degree,
-                        const VectorizationType        v,
-                        const Number *DEAL_II_RESTRICT weight,
-                        Number *DEAL_II_RESTRICT       values)
+    interpolate_3D_edge(
+      const unsigned int                                          p,
+      const unsigned int                                          given_degree,
+      const typename Trait<Number, VectorizationType>::index_type v,
+      const Number *DEAL_II_RESTRICT                              weight,
+      Number *DEAL_II_RESTRICT                                    values)
     {
       typename Trait<Number, VectorizationType>::value_type
         temp[fe_degree != -1 ? (fe_degree + 1) : max_n_points_1D];
