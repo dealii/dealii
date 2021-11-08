@@ -87,8 +87,14 @@ namespace internal
       using index_type = unsigned int;
 
       static inline DEAL_II_ALWAYS_INLINE unsigned int
-      create(const unsigned int v)
+      create(const std::array<MatrixFreeFunctions::ConstraintKinds,
+                              Number::size()> mask,
+             const std::array<MatrixFreeFunctions::ConstraintKinds,
+                              Number::size()> mask_new,
+             const unsigned int               v)
       {
+        (void)mask;
+        (void)mask_new;
         return v;
       }
 
@@ -122,8 +128,14 @@ namespace internal
       using index_type = std::pair<Number, Number>;
 
       static inline DEAL_II_ALWAYS_INLINE index_type
-      create(const unsigned int v)
+      create(const std::array<MatrixFreeFunctions::ConstraintKinds,
+                              Number::size()> mask,
+             const std::array<MatrixFreeFunctions::ConstraintKinds,
+                              Number::size()> mask_new,
+             const unsigned int               v)
       {
+        (void)mask;
+        (void)mask_new;
         Number result = 0.0;
         result[v]     = 1.0;
         return {result, Number(1.0) - result};
@@ -157,10 +169,17 @@ namespace internal
       using index_type = std::pair<Number, Number>;
 
       static inline DEAL_II_ALWAYS_INLINE index_type
-      create(const unsigned int v)
+      create(const std::array<MatrixFreeFunctions::ConstraintKinds,
+                              Number::size()> mask,
+             const std::array<MatrixFreeFunctions::ConstraintKinds,
+                              Number::size()> mask_new,
+             const unsigned int               v)
       {
         Number result = 0.0;
-        result[v]     = 1.0;
+
+        for (unsigned int i = 0; i < Number::size(); ++i)
+          result[i] = mask_new[v] == mask[i];
+
         return {result, Number(1.0) - result};
       }
 
@@ -169,7 +188,12 @@ namespace internal
         create_mask(const std::array<MatrixFreeFunctions::ConstraintKinds,
                                      Number::size()> mask)
       {
-        return mask;
+        auto new_mask = mask;
+
+        std::sort(new_mask.begin(), new_mask.end());
+        std::unique(new_mask.begin(), new_mask.end());
+
+        return new_mask;
       }
 
       static inline DEAL_II_ALWAYS_INLINE Number
@@ -370,7 +394,10 @@ namespace internal
               if (mask == MatrixFreeFunctions::ConstraintKinds::unconstrained)
                 continue;
 
-              const auto vv = Trait<Number, VectorizationType>::create(v);
+              const auto vv =
+                Trait<Number, VectorizationType>::create(constraint_mask,
+                                                         constraint_mask_new,
+                                                         v);
 
               if (dim == 2) // 2D: only faces
                 {
