@@ -73,7 +73,7 @@ namespace internal
     };
 
     static const VectorizationTypes VectorizationType =
-      VectorizationTypes::index;
+      VectorizationTypes::mask;
 
     static const unsigned int max_n_points_1D = 40;
 
@@ -121,7 +121,7 @@ namespace internal
       using value_type = T1;
       using index_type = std::pair<Number, Number>;
 
-      static inline DEAL_II_ALWAYS_INLINE Number
+      static inline DEAL_II_ALWAYS_INLINE index_type
       create(const unsigned int v)
       {
         Number result = 0.0;
