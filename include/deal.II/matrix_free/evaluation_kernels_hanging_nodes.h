@@ -92,6 +92,14 @@ namespace internal
         return v;
       }
 
+      static inline DEAL_II_ALWAYS_INLINE
+        std::array<MatrixFreeFunctions::ConstraintKinds, Number::size()>
+        create_mask(const std::array<MatrixFreeFunctions::ConstraintKinds,
+                                     Number::size()> mask)
+      {
+        return mask;
+      }
+
       static inline DEAL_II_ALWAYS_INLINE typename Number::value_type
       get_value(const Number &value, const index_type &i)
       {
@@ -119,6 +127,14 @@ namespace internal
         Number result = 0.0;
         result[v]     = 1.0;
         return result;
+      }
+
+      static inline DEAL_II_ALWAYS_INLINE
+        std::array<MatrixFreeFunctions::ConstraintKinds, Number::size()>
+        create_mask(const std::array<MatrixFreeFunctions::ConstraintKinds,
+                                     Number::size()> mask)
+      {
+        return mask;
       }
 
       static inline DEAL_II_ALWAYS_INLINE Number
@@ -307,11 +323,14 @@ namespace internal
       const auto &interpolation_matrices =
         fe_eval.get_shape_info().data.front().subface_interpolation_matrices;
 
+      const auto constraint_mask_new =
+        Trait<Number, VectorizationType>::create_mask(constraint_mask);
+
       for (unsigned int c = 0; c < n_desired_components; ++c)
         {
           for (unsigned int v = 0; v < Number::size(); ++v)
             {
-              const auto mask = constraint_mask[v];
+              const auto mask = constraint_mask_new[v];
 
               if (mask == MatrixFreeFunctions::ConstraintKinds::unconstrained)
                 continue;
