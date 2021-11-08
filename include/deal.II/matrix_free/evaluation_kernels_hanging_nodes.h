@@ -65,7 +65,7 @@ namespace internal
     }
 
   private:
-    using VectorizationType = unsigned int; // Number
+    using VectorizationType = Number; // Number
 
     static const unsigned int max_n_points_1D = 40;
 
@@ -82,6 +82,20 @@ namespace internal
       {
         return v;
       }
+
+      static inline DEAL_II_ALWAYS_INLINE typename Number::value_type
+      get_value(const Number &value, const unsigned int &i)
+      {
+        return value[i];
+      }
+  
+      static inline DEAL_II_ALWAYS_INLINE void
+      set_value(Number &                           result,
+                const typename Number::value_type &value,
+                const unsigned int &               i)
+      {
+        result[i] = value;
+      }
     };
 
     template <typename T1>
@@ -96,33 +110,19 @@ namespace internal
         result[v]     = 1.0;
         return result;
       }
+
+      static inline DEAL_II_ALWAYS_INLINE Number
+      get_value(const Number &value, const Number &)
+      {
+        return value;
+      }
+  
+      static inline DEAL_II_ALWAYS_INLINE void
+      set_value(Number &result, const Number &value, const Number &i)
+      {
+        result = result * (Number(1.0) - i) + value * i;
+      }
     };
-
-    static inline DEAL_II_ALWAYS_INLINE typename Number::value_type
-    get_value(const Number &value, const unsigned int &i)
-    {
-      return value[i];
-    }
-
-    static inline DEAL_II_ALWAYS_INLINE Number
-    get_value(const Number &value, const Number &)
-    {
-      return value;
-    }
-
-    static inline DEAL_II_ALWAYS_INLINE void
-    set_value(Number &                           result,
-              const typename Number::value_type &value,
-              const unsigned int &               i)
-    {
-      result[i] = value;
-    }
-
-    static inline DEAL_II_ALWAYS_INLINE void
-    set_value(Number &result, const Number &value, const Number &i)
-    {
-      result = result * (Number(1.0) - i) + value * i;
-    }
 
     template <int fe_degree, unsigned int side, bool transpose>
     static inline DEAL_II_ALWAYS_INLINE void
@@ -152,7 +152,7 @@ namespace internal
       // copy result back
       for (unsigned int i = 0, k = 0; i < r1; ++i)
         for (unsigned int j = 0; j < r2; ++j, ++k)
-          temp[k] = get_value(values[i * offset + stride + j], v);
+          temp[k] = Trait<Number, VectorizationType>::get_value(values[i * offset + stride + j], v);
 
       // perform interpolation point by point (note: r1 * r2 == points^(dim-1))
       for (unsigned int i = 0, k = 0; i < r1; ++i)
@@ -160,11 +160,11 @@ namespace internal
           {
             typename Trait<Number, VectorizationType>::value_type sum = 0.0;
             for (unsigned int h = 0; h < points; ++h)
-              sum += get_value(weight[(transpose ? 1 : points) * k +
+              sum += Trait<Number, VectorizationType>::get_value(weight[(transpose ? 1 : points) * k +
                                       (transpose ? points : 1) * h],
                                v) *
                      temp[h];
-            set_value(values[i * offset + stride + j], sum, v);
+            Trait<Number, VectorizationType>::set_value(values[i * offset + stride + j], sum, v);
           }
     }
 
@@ -209,19 +209,19 @@ namespace internal
           // copy result back
           for (unsigned int k = 0; k < points; ++k)
             temp[k] =
-              get_value(values[dof_offset + k * stride + stride2 * g], v);
+              Trait<Number, VectorizationType>::get_value(values[dof_offset + k * stride + stride2 * g], v);
 
           // perform interpolation point by point
           for (unsigned int k = 0; k < points; ++k)
             {
               auto sum =
-                get_value(weight[(transpose ? 1 : points) * k], v) * temp[0];
+                Trait<Number, VectorizationType>::get_value(weight[(transpose ? 1 : points) * k], v) * temp[0];
               for (unsigned int h = 1; h < points; ++h)
-                sum += get_value(weight[(transpose ? 1 : points) * k +
+                sum += Trait<Number, VectorizationType>::get_value(weight[(transpose ? 1 : points) * k +
                                         (transpose ? points : 1) * h],
                                  v) *
                        temp[h];
-              set_value(values[dof_offset + k * stride + stride2 * g], sum, v);
+              Trait<Number, VectorizationType>::set_value(values[dof_offset + k * stride + stride2 * g], sum, v);
             }
         }
     }
@@ -248,19 +248,19 @@ namespace internal
 
       // copy result back
       for (unsigned int k = 0; k < points; ++k)
-        temp[k] = get_value(values[p + k * stride], v);
+        temp[k] = Trait<Number, VectorizationType>::get_value(values[p + k * stride], v);
 
       // perform interpolation point by point
       for (unsigned int k = 0; k < points; ++k)
         {
           auto sum =
-            get_value(weight[(transpose ? 1 : points) * k], v) * temp[0];
+            Trait<Number, VectorizationType>::get_value(weight[(transpose ? 1 : points) * k], v) * temp[0];
           for (unsigned int h = 1; h < points; ++h)
-            sum += get_value(weight[(transpose ? 1 : points) * k +
+            sum += Trait<Number, VectorizationType>::get_value(weight[(transpose ? 1 : points) * k +
                                     (transpose ? points : 1) * h],
                              v) *
                    temp[h];
-          set_value(values[p + k * stride], sum, v);
+          Trait<Number, VectorizationType>::set_value(values[p + k * stride], sum, v);
         }
     }
 
