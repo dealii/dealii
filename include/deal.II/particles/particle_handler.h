@@ -930,9 +930,10 @@ namespace Particles
 
     /**
      * Iterator to the end of the list elements of particle_container which
-     * belong to locally owned elements.
+     * belong to locally owned elements. Made const to avoid accidental
+     * modification.
      */
-    typename particle_container::iterator owned_particles_end;
+    const typename particle_container::iterator owned_particles_end;
 
     /**
      * List from the active cells on the present MPI process to positions in
@@ -1152,6 +1153,34 @@ namespace Particles
       const typename Triangulation<dim, spacedim>::CellStatus     status,
       const boost::iterator_range<std::vector<char>::const_iterator>
         &data_range);
+
+    /**
+     * Internal function returning an iterator to the begin of the container
+     * for owned particles.
+     */
+    typename particle_container::iterator
+    particle_container_owned_begin() const;
+
+    /**
+     * Internal function returning an iterator to the end of the container for
+     * owned particles.
+     */
+    typename particle_container::iterator
+    particle_container_owned_end() const;
+
+    /**
+     * Internal function returning an iterator to the begin of the container
+     * for ghost particles.
+     */
+    typename particle_container::iterator
+    particle_container_ghost_begin() const;
+
+    /**
+     * Internal function returning an iterator to the end of the container for
+     * ghost particles.
+     */
+    typename particle_container::iterator
+    particle_container_ghost_end() const;
   };
 
 
@@ -1172,12 +1201,9 @@ namespace Particles
   inline typename ParticleHandler<dim, spacedim>::particle_iterator
   ParticleHandler<dim, spacedim>::begin()
   {
-    // We should always have at least the three anchor entries in the list of
-    // particles
-    Assert(!particles.empty(), ExcInternalError());
-
-    // jump over the first entry which is used for book-keeping
-    return particle_iterator(++particles.begin(), *property_pool, 0);
+    return particle_iterator(particle_container_owned_begin(),
+                             *property_pool,
+                             0);
   }
 
 
@@ -1195,7 +1221,7 @@ namespace Particles
   inline typename ParticleHandler<dim, spacedim>::particle_iterator
   ParticleHandler<dim, spacedim>::end()
   {
-    return particle_iterator(owned_particles_end, *property_pool, 0);
+    return particle_iterator(particle_container_owned_end(), *property_pool, 0);
   }
 
 
@@ -1213,13 +1239,9 @@ namespace Particles
   inline typename ParticleHandler<dim, spacedim>::particle_iterator
   ParticleHandler<dim, spacedim>::begin_ghost()
   {
-    Assert(!particles.empty(), ExcInternalError());
-    // find the start of ghost particles as one past the end of owned indices;
-    // the index in between is used for book-keeping
-    typename particle_container::iterator ghost_particles_begin =
-      owned_particles_end;
-    ++ghost_particles_begin;
-    return particle_iterator(ghost_particles_begin, *property_pool, 0);
+    return particle_iterator(particle_container_ghost_begin(),
+                             *property_pool,
+                             0);
   }
 
 
@@ -1237,8 +1259,54 @@ namespace Particles
   inline typename ParticleHandler<dim, spacedim>::particle_iterator
   ParticleHandler<dim, spacedim>::end_ghost()
   {
-    // skip the last entry which is used for book-keeping
-    return particle_iterator(--particles.end(), *property_pool, 0);
+    return particle_iterator(particle_container_ghost_end(), *property_pool, 0);
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline typename ParticleHandler<dim, spacedim>::particle_container::iterator
+  ParticleHandler<dim, spacedim>::particle_container_owned_begin() const
+  {
+    // We should always have at least the three anchor entries in the list of
+    // particles
+    Assert(!particles.empty(), ExcInternalError());
+    typename particle_container::iterator begin =
+      const_cast<particle_container &>(particles).begin();
+    return ++begin;
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline typename ParticleHandler<dim, spacedim>::particle_container::iterator
+  ParticleHandler<dim, spacedim>::particle_container_owned_end() const
+  {
+    Assert(!particles.empty(), ExcInternalError());
+    return owned_particles_end;
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline typename ParticleHandler<dim, spacedim>::particle_container::iterator
+  ParticleHandler<dim, spacedim>::particle_container_ghost_begin() const
+  {
+    Assert(!particles.empty(), ExcInternalError());
+    typename particle_container::iterator begin = owned_particles_end;
+    return ++begin;
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline typename ParticleHandler<dim, spacedim>::particle_container::iterator
+  ParticleHandler<dim, spacedim>::particle_container_ghost_end() const
+  {
+    Assert(!particles.empty(), ExcInternalError());
+    typename particle_container::iterator end =
+      const_cast<particle_container &>(particles).end();
+    return --end;
   }
 
 

@@ -165,12 +165,15 @@ namespace Particles
     global_max_particles_per_cell =
       particle_handler.global_max_particles_per_cell;
     next_free_particle_index = particle_handler.next_free_particle_index;
-    particles                = particle_handler.particles;
-    owned_particles_end      = particles.begin();
-    for (auto it = particle_handler.particles.begin();
-         it != particle_handler.owned_particles_end;
-         ++it)
-      ++owned_particles_end;
+
+    // Manually copy over the particles because we do not want to touch the
+    // anchor iterators set by initialize()
+    particles.insert(particle_container_owned_end(),
+                     particle_handler.particle_container_owned_begin(),
+                     particle_handler.particle_container_owned_end());
+    particles.insert(particle_container_ghost_end(),
+                     particle_handler.particle_container_ghost_begin(),
+                     particle_handler.particle_container_ghost_end());
 
     for (auto it = particles.begin(); it != particles.end(); ++it)
       if (!it->particles.empty())
@@ -228,17 +231,17 @@ namespace Particles
     const Triangulation<dim, spacedim> *triangulation,
     particle_container &                given_particles)
   {
-    TriaActiveIterator<CellAccessor<dim, spacedim>> past_the_end_iterator(
-      triangulation, -1, -1);
     given_particles.clear();
     for (unsigned int i = 0; i < 3; ++i)
       given_particles.emplace_back(
         std::vector<typename PropertyPool<dim, spacedim>::Handle>(),
-        past_the_end_iterator);
+        triangulation->end());
 
     // Set the end of owned particles to the middle of the three elements
-    owned_particles_end = ++given_particles.begin();
+    const_cast<typename particle_container::iterator &>(owned_particles_end) =
+      ++given_particles.begin();
   }
+
 
 
   template <int dim, int spacedim>
@@ -248,8 +251,8 @@ namespace Particles
     // first sort the owned particles by the active cell index
     bool sort_is_necessary = false;
     {
-      auto previous = ++particles.begin();
-      for (auto next = previous; next != owned_particles_end; ++next)
+      auto previous = particle_container_owned_begin();
+      for (auto next = previous; next != particle_container_owned_end(); ++next)
         {
           if (previous->cell.state() == IteratorState::valid &&
               next->cell.state() == IteratorState::valid &&
@@ -280,11 +283,9 @@ namespace Particles
             if (cells_to_particle_cache[cell->active_cell_index()] !=
                 particles.end())
               {
-                // observe that owned_particles_end was already set to point
-                // into the new sorted_particles array
                 typename particle_container::iterator insert_position =
-                  cell->is_locally_owned() ? owned_particles_end :
-                                             --sorted_particles.end();
+                  cell->is_locally_owned() ? particle_container_owned_end() :
+                                             particle_container_ghost_end();
                 typename particle_container::iterator new_entry =
                   sorted_particles.insert(
                     insert_position, typename particle_container::value_type());
@@ -324,7 +325,9 @@ namespace Particles
 
     // check that we only have locally owned particles in the first region of
     // cells; note that we skip the very first anchor element
-    for (auto it = ++particles.begin(); it != owned_particles_end; ++it)
+    for (auto it = particle_container_owned_begin();
+         it != particle_container_owned_end();
+         ++it)
       Assert(it->cell->is_locally_owned(), ExcInternalError());
 
     // check that the cache is consistent with the iterators
@@ -577,7 +580,8 @@ namespace Particles
     if (cache == particles.end())
       {
         const typename particle_container::iterator insert_position =
-          cell->is_locally_owned() ? owned_particles_end : --particles.end();
+          cell->is_locally_owned() ? particle_container_owned_end() :
+                                     particle_container_ghost_end();
         cache = particles.emplace(
           insert_position,
           std::vector<typename PropertyPool<dim, spacedim>::Handle>{handle},
