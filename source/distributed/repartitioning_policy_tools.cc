@@ -219,12 +219,14 @@ namespace RepartitioningPolicyTools
     // a repartitioning kicks in with the aim that all processes that own
     // cells have at least the specified number of cells
 
-    const unsigned int n_global_active_cells = tria_in.n_global_active_cells();
+    const types::global_cell_index n_global_active_cells =
+      tria_in.n_global_active_cells();
 
     const unsigned int n_partitions =
       std::max<unsigned int>(1,
-                             std::min(n_global_active_cells / n_min_cells,
-                                      Utilities::MPI::n_mpi_processes(comm)));
+                             std::min<types::global_cell_index>(
+                               n_global_active_cells / n_min_cells,
+                               Utilities::MPI::n_mpi_processes(comm)));
 
     const unsigned int min_cells = n_global_active_cells / n_partitions;
 
@@ -322,6 +324,7 @@ namespace RepartitioningPolicyTools
                      Utilities::MPI::internal::mpi_type_id(&total_weight),
                      n_subdomains - 1,
                      mpi_communicator);
+    AssertThrowMPI(ierr);
 
     // setup partition
     LinearAlgebra::distributed::Vector<double> partition(partitioner);

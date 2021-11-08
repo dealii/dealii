@@ -135,8 +135,8 @@ namespace MGTransferGlobalCoarseningTools
 
   /**
    * Similar to the above function but taking in a constant version of
-   * @p tria and as a consequence not allowing to directly use it for
-   * coarsening, requiring that internally a temporal copy is created.
+   * @p tria. As a consequence, it can not be used for coarsening directly,
+   * so a temporary copy will be created internally.
    */
   template <int dim, int spacedim>
   std::vector<std::shared_ptr<const Triangulation<dim, spacedim>>>

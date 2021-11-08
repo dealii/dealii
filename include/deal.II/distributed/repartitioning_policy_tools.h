@@ -39,7 +39,11 @@ DEAL_II_NAMESPACE_OPEN
 namespace RepartitioningPolicyTools
 {
   /**
-   * A base class of a repartitioning policy.
+   * The base class for repartitioning policies.
+   *
+   * Used in
+   * MGTransferGlobalCoarseningTools::create_geometric_coarsening_sequence().
+   * See the description of RepartitioningPolicyTools for more information.
    */
   template <int dim, int spacedim = dim>
   class Base
@@ -121,8 +125,10 @@ namespace RepartitioningPolicyTools
   };
 
   /**
-   * A policy that allows to specify a minimal number of cells per process. If
-   * a threshold is reached, processes might be left without cells.
+   * A policy that allows to specify a minimal number of cells per
+   * process. If a threshold is reached, processes might be left
+   * without cells. The cells will be distributed evenly among the
+   * remaining processes.
    */
   template <int dim, int spacedim = dim>
   class MinimalGranularityPolicy : public Base<dim, spacedim>
