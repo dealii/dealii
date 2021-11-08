@@ -513,7 +513,7 @@ namespace hp
      * The following code snippet demonstrates how to impose hp-adaptivity based
      * on refinement history in an application:
      * @code
-     * // [initialisation...]
+     * // [initialization...]
      * Vector<float> predicted_error_per_cell(triangulation.n_active_cells());
      * for(unsigned int i = 0; i < triangulation.n_active_cells(); ++i)
      *   predicted_error_per_cell[i] = std::numeric_limits<float>::infinity();
@@ -569,9 +569,9 @@ namespace hp
      * p4est got refined, but before data is prepared for transfer. Refinement
      * and coarsening flags of the Triangulation object need to be matched with
      * the already refined p4est oracle using
-     * internal::parallel::distributed::TemporarilyMatchRefineFlags.
-     * Thus, a construct like the following is necessary to correctly predict
-     * errors in parallel distributed applications.
+     * parallel::distributed::TemporarilyMatchRefineFlags. Thus, a construct
+     * like the following is necessary to correctly predict errors in parallel
+     * distributed applications.
      * @code
      * Vector<float> predicted_errors;
      * triangulation.signals.post_p4est_refinement.connect([&]() {
