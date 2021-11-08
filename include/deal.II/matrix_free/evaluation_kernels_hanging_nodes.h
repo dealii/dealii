@@ -175,7 +175,7 @@ namespace internal
                               Number::size()> mask_new,
              const unsigned int               v)
       {
-        Number result = 0.0;
+        Number result;
 
         for (unsigned int i = 0; i < Number::size(); ++i)
           result[i] = mask_new[v] == mask[i];
@@ -191,7 +191,9 @@ namespace internal
         auto new_mask = mask;
 
         std::sort(new_mask.begin(), new_mask.end());
-        std::unique(new_mask.begin(), new_mask.end());
+        std::fill(std::unique(new_mask.begin(), new_mask.end()),
+                  new_mask.end(),
+                  MatrixFreeFunctions::ConstraintKinds::unconstrained);
 
         return new_mask;
       }
