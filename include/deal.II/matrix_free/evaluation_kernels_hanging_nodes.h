@@ -119,14 +119,14 @@ namespace internal
     struct Trait<T1, VectorizationTypes::mask>
     {
       using value_type = T1;
-      using index_type = Number;
+      using index_type = std::pair<Number, Number>;
 
       static inline DEAL_II_ALWAYS_INLINE Number
       create(const unsigned int v)
       {
         Number result = 0.0;
         result[v]     = 1.0;
-        return result;
+        return {result, Number(1.0) - result};
       }
 
       static inline DEAL_II_ALWAYS_INLINE
@@ -146,7 +146,7 @@ namespace internal
       static inline DEAL_II_ALWAYS_INLINE void
       set_value(Number &result, const Number &value, const index_type &i)
       {
-        result = result * (Number(1.0) - i) + value * i;
+        result = result * i.second + value * i.first;
       }
     };
 
