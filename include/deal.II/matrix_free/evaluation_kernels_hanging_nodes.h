@@ -73,7 +73,7 @@ namespace internal
     };
 
     static const VectorizationTypes VectorizationType =
-      VectorizationTypes::mask;
+      VectorizationTypes::group;
 
     static const unsigned int max_n_points_1D = 40;
 
@@ -117,6 +117,41 @@ namespace internal
 
     template <typename T1>
     struct Trait<T1, VectorizationTypes::mask>
+    {
+      using value_type = T1;
+      using index_type = std::pair<Number, Number>;
+
+      static inline DEAL_II_ALWAYS_INLINE index_type
+      create(const unsigned int v)
+      {
+        Number result = 0.0;
+        result[v]     = 1.0;
+        return {result, Number(1.0) - result};
+      }
+
+      static inline DEAL_II_ALWAYS_INLINE
+        std::array<MatrixFreeFunctions::ConstraintKinds, Number::size()>
+        create_mask(const std::array<MatrixFreeFunctions::ConstraintKinds,
+                                     Number::size()> mask)
+      {
+        return mask;
+      }
+
+      static inline DEAL_II_ALWAYS_INLINE Number
+      get_value(const Number &value, const index_type &)
+      {
+        return value;
+      }
+
+      static inline DEAL_II_ALWAYS_INLINE void
+      set_value(Number &result, const Number &value, const index_type &i)
+      {
+        result = result * i.second + value * i.first;
+      }
+    };
+
+    template <typename T1>
+    struct Trait<T1, VectorizationTypes::group>
     {
       using value_type = T1;
       using index_type = std::pair<Number, Number>;
