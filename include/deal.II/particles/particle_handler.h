@@ -897,8 +897,7 @@ namespace Particles
      * container to check for valid states.
      */
     void
-    reset_particle_container(const Triangulation<dim, spacedim> *triangulation,
-                             particle_container &                particles);
+    reset_particle_container(particle_container &particles);
 
     /**
      * Address of the triangulation to work on.

@@ -68,7 +68,7 @@ namespace Particles
     , handle(numbers::invalid_unsigned_int)
     , tria_listeners()
   {
-    reset_particle_container(nullptr, particles);
+    reset_particle_container(particles);
   }
 
 
@@ -95,7 +95,7 @@ namespace Particles
                                                           mapping))
     , tria_listeners()
   {
-    reset_particle_container(&triangulation, particles);
+    reset_particle_container(particles);
     connect_to_triangulation_signals();
   }
 
@@ -124,7 +124,7 @@ namespace Particles
     triangulation = &new_triangulation;
     mapping       = &new_mapping;
 
-    reset_particle_container(&new_triangulation, particles);
+    reset_particle_container(particles);
 
     // Create the memory pool that will store all particle properties
     property_pool = std::make_unique<PropertyPool<dim, spacedim>>(n_properties);
@@ -209,14 +209,10 @@ namespace Particles
           property_pool->deregister_particle(particle);
 
     cells_to_particle_cache.clear();
+    reset_particle_container(particles);
     if (triangulation != nullptr)
-      {
-        reset_particle_container(&*triangulation, particles);
-        cells_to_particle_cache.resize(triangulation->n_active_cells(),
-                                       particles.end());
-      }
-    else
-      reset_particle_container(nullptr, particles);
+      cells_to_particle_cache.resize(triangulation->n_active_cells(),
+                                     particles.end());
 
     // the particle properties have already been deleted by their destructor,
     // but the memory is still allocated. Return the memory as well.
@@ -228,14 +224,21 @@ namespace Particles
   template <int dim, int spacedim>
   void
   ParticleHandler<dim, spacedim>::reset_particle_container(
-    const Triangulation<dim, spacedim> *triangulation,
-    particle_container &                given_particles)
+    particle_container &given_particles)
   {
+    // Make sure to set a valid past-the-end iterator also in case we have no
+    // triangulation
+    const typename Triangulation<dim, spacedim>::cell_iterator
+      past_the_end_iterator =
+        triangulation != nullptr ?
+          triangulation->end() :
+          typename Triangulation<dim, spacedim>::cell_iterator(nullptr, -1, -1);
+
     given_particles.clear();
     for (unsigned int i = 0; i < 3; ++i)
       given_particles.emplace_back(
         std::vector<typename PropertyPool<dim, spacedim>::Handle>(),
-        triangulation->end());
+        past_the_end_iterator);
 
     // Set the end of owned particles to the middle of the three elements
     const_cast<typename particle_container::iterator &>(owned_particles_end) =
@@ -275,7 +278,7 @@ namespace Particles
         // into a new one (keeping alive the possibly large vectors with
         // particles on cells) into a new container.
         particle_container sorted_particles;
-        reset_particle_container(&*triangulation, sorted_particles);
+        reset_particle_container(sorted_particles);
 
         // iterate over cells and insert the entries in the new order
         for (const auto &cell : triangulation->active_cell_iterators())
