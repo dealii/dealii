@@ -129,10 +129,6 @@ SET(_inst
   fe_tools_interpolate.inst.in
   fe_tools_extrapolate.inst.in
   fe_trace.inst.in
-  fe_values.decl.1.inst.in
-  fe_values.decl.2.inst.in
-  fe_values.impl.1.inst.in
-  fe_values.impl.2.inst.in
   fe_values.inst.in
   fe_wedge_p.inst.in
   mapping_c1.inst.in

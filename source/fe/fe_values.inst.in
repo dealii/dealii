@@ -19,9 +19,6 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
 #if deal_II_dimension <= deal_II_space_dimension
     template class FEValuesBase<deal_II_dimension, deal_II_space_dimension>;
     template class FEValues<deal_II_dimension, deal_II_space_dimension>;
-    template class FEValuesBase<deal_II_dimension, deal_II_space_dimension>::
-      CellIterator<
-        DoFHandler<deal_II_dimension, deal_II_space_dimension>::cell_iterator>;
 
     template class FEFaceValuesBase<deal_II_dimension, deal_II_space_dimension>;
     template class FEFaceValues<deal_II_dimension, deal_II_space_dimension>;
