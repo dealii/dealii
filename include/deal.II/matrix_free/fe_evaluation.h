@@ -444,7 +444,9 @@ protected:
 
   /**
    * Flag holding information whether a face is an interior or exterior face
-   * according to the defined direction of the normal.  Not used for cells.
+   * according to the defined direction of the normal. For cells it defines if
+   * the dof values should be read from the actual cell corresponding to the
+   * interior face or the neighboring cell corresponding to the exterior face.
    */
   bool is_interior_face;
 
@@ -3964,10 +3966,11 @@ FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
   for (unsigned int i = 0; i < v_len; ++i)
     cells[i] = numbers::invalid_unsigned_int;
 
-  if (is_face &&
-      this->dof_access_index ==
-        internal::MatrixFreeFunctions::DoFInfo::dof_access_cell &&
-      this->is_interior_face == false)
+  if ((is_face &&
+       this->dof_access_index ==
+         internal::MatrixFreeFunctions::DoFInfo::dof_access_cell &&
+       this->is_interior_face == false) ||
+      (!is_face && !this->is_interior_face))
     {
       // cell-based face-loop: plus face
       for (unsigned int i = 0; i < v_len; ++i)
@@ -4929,7 +4932,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
       !(is_face &&
         this->dof_access_index ==
           internal::MatrixFreeFunctions::DoFInfo::dof_access_cell &&
-        this->is_interior_face == false))
+        this->is_interior_face == false) &&
+      !(!is_face && !this->is_interior_face))
     {
       const unsigned int dof_index =
         dof_indices_cont[this->cell * VectorizedArrayType::size()] +
@@ -4963,9 +4967,10 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
     this->dof_info->n_vectorization_lanes_filled[ind][this->cell];
 
   const bool is_ecl =
-    this->dof_access_index ==
-      internal::MatrixFreeFunctions::DoFInfo::dof_access_cell &&
-    this->is_interior_face == false;
+    (this->dof_access_index ==
+       internal::MatrixFreeFunctions::DoFInfo::dof_access_cell &&
+     this->is_interior_face == false) ||
+    (!is_face && !this->is_interior_face);
 
   if (vectors_sm[0] != nullptr)
     {
