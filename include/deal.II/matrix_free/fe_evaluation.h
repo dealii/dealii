@@ -592,7 +592,10 @@ public:
    */
   template <typename VectorType>
   void
-  read_dof_values(const VectorType &src, const unsigned int first_index = 0);
+  read_dof_values(const VectorType & src,
+                  const unsigned int first_index = 0,
+                  const std::bitset<VectorizedArrayType::size()> &mask =
+                    std::bitset<VectorizedArrayType::size()>().flip());
 
   /**
    * For the vector @p src, read out the values on the degrees of freedom of
@@ -625,7 +628,9 @@ public:
   template <typename VectorType>
   void
   read_dof_values_plain(const VectorType & src,
-                        const unsigned int first_index = 0);
+                        const unsigned int first_index = 0,
+                        const std::bitset<VectorizedArrayType::size()> &mask =
+                          std::bitset<VectorizedArrayType::size()>().flip());
 
   /**
    * Takes the values stored internally on dof values of the current cell and
@@ -4971,6 +4976,12 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
 
         for (unsigned int v = 0; v < n_filled_lanes; ++v)
           {
+            if (mask[v] == false)
+              {
+                vector_ptrs[v] = nullptr;
+                continue;
+              }
+
             Assert(cells[v] != numbers::invalid_unsigned_int,
                    ExcNotImplemented());
             Assert(ind < this->dof_info->dof_indices_contiguous_sm.size(),
@@ -5437,7 +5448,9 @@ template <int dim,
 template <typename VectorType>
 inline void
 FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
-  read_dof_values(const VectorType &src, const unsigned int first_index)
+  read_dof_values(const VectorType &                              src,
+                  const unsigned int                              first_index,
+                  const std::bitset<VectorizedArrayType::size()> &mask)
 {
   const auto src_data = internal::get_vector_data<n_components_>(
     src,
@@ -5448,11 +5461,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
     this->dof_info);
 
   internal::VectorReader<Number, VectorizedArrayType> reader;
-  read_write_operation(reader,
-                       src_data.first,
-                       src_data.second,
-                       std::bitset<VectorizedArrayType::size()>().flip(),
-                       true);
+  read_write_operation(reader, src_data.first, src_data.second, mask, true);
 
   apply_hanging_node_constraints<false>();
 
@@ -5471,7 +5480,9 @@ template <int dim,
 template <typename VectorType>
 inline void
 FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
-  read_dof_values_plain(const VectorType &src, const unsigned int first_index)
+  read_dof_values_plain(const VectorType & src,
+                        const unsigned int first_index,
+                        const std::bitset<VectorizedArrayType::size()> &mask)
 {
   const auto src_data = internal::get_vector_data<n_components_>(
     src,
@@ -5482,11 +5493,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
     this->dof_info);
 
   internal::VectorReader<Number, VectorizedArrayType> reader;
-  read_write_operation(reader,
-                       src_data.first,
-                       src_data.second,
-                       std::bitset<VectorizedArrayType::size()>().flip(),
-                       false);
+  read_write_operation(reader, src_data.first, src_data.second, mask, false);
 
 #  ifdef DEBUG
   dof_values_initialized = true;
