@@ -2617,7 +2617,179 @@ public:
   virtual types::global_dof_index
   n_dofs_for_dof_handler() const = 0;
 
-#include "fe_values.decl.1.inst"
+  virtual void
+  get_interpolated_dof_values(
+    const Vector<double> &              in,
+    Vector<Vector<double>::value_type> &out) const = 0;
+
+  virtual void
+  get_interpolated_dof_values(const Vector<float> &              in,
+                              Vector<Vector<float>::value_type> &out) const = 0;
+
+  virtual void
+  get_interpolated_dof_values(
+    const BlockVector<double> &              in,
+    Vector<BlockVector<double>::value_type> &out) const = 0;
+
+  virtual void
+  get_interpolated_dof_values(
+    const BlockVector<float> &              in,
+    Vector<BlockVector<float>::value_type> &out) const = 0;
+
+  virtual void
+  get_interpolated_dof_values(
+    const LinearAlgebra::Vector<double> &              in,
+    Vector<LinearAlgebra::Vector<double>::value_type> &out) const = 0;
+
+  virtual void
+  get_interpolated_dof_values(
+    const LinearAlgebra::Vector<float> &              in,
+    Vector<LinearAlgebra::Vector<float>::value_type> &out) const = 0;
+
+  virtual void
+  get_interpolated_dof_values(
+    const LinearAlgebra::distributed::Vector<double> &              in,
+    Vector<LinearAlgebra::distributed::Vector<double>::value_type> &out)
+    const = 0;
+
+  virtual void
+  get_interpolated_dof_values(
+    const LinearAlgebra::distributed::Vector<float> &              in,
+    Vector<LinearAlgebra::distributed::Vector<float>::value_type> &out)
+    const = 0;
+
+  virtual void
+  get_interpolated_dof_values(
+    const LinearAlgebra::distributed::BlockVector<double> &              in,
+    Vector<LinearAlgebra::distributed::BlockVector<double>::value_type> &out)
+    const = 0;
+
+  virtual void
+  get_interpolated_dof_values(
+    const LinearAlgebra::distributed::BlockVector<float> &              in,
+    Vector<LinearAlgebra::distributed::BlockVector<float>::value_type> &out)
+    const = 0;
+
+#ifdef DEAL_II_WITH_COMPLEX_VALUES
+  virtual void
+  get_interpolated_dof_values(
+    const Vector<std::complex<double>> &              in,
+    Vector<Vector<std::complex<double>>::value_type> &out) const = 0;
+
+  virtual void
+  get_interpolated_dof_values(
+    const Vector<std::complex<float>> &              in,
+    Vector<Vector<std::complex<float>>::value_type> &out) const = 0;
+
+  virtual void
+  get_interpolated_dof_values(
+    const BlockVector<std::complex<double>> &              in,
+    Vector<BlockVector<std::complex<double>>::value_type> &out) const = 0;
+
+  virtual void
+  get_interpolated_dof_values(
+    const BlockVector<std::complex<float>> &              in,
+    Vector<BlockVector<std::complex<float>>::value_type> &out) const = 0;
+
+  virtual void
+  get_interpolated_dof_values(
+    const LinearAlgebra::Vector<std::complex<double>> &              in,
+    Vector<LinearAlgebra::Vector<std::complex<double>>::value_type> &out)
+    const = 0;
+
+  virtual void
+  get_interpolated_dof_values(
+    const LinearAlgebra::Vector<std::complex<float>> &              in,
+    Vector<LinearAlgebra::Vector<std::complex<float>>::value_type> &out)
+    const = 0;
+
+  virtual void
+  get_interpolated_dof_values(
+    const LinearAlgebra::distributed::Vector<std::complex<double>> &in,
+    Vector<LinearAlgebra::distributed::Vector<std::complex<double>>::value_type>
+      &out) const = 0;
+
+  virtual void
+  get_interpolated_dof_values(
+    const LinearAlgebra::distributed::Vector<std::complex<float>> &in,
+    Vector<LinearAlgebra::distributed::Vector<std::complex<float>>::value_type>
+      &out) const = 0;
+
+  virtual void
+  get_interpolated_dof_values(
+    const LinearAlgebra::distributed::BlockVector<std::complex<double>> &in,
+    Vector<
+      LinearAlgebra::distributed::BlockVector<std::complex<double>>::value_type>
+      &out) const = 0;
+
+  virtual void
+  get_interpolated_dof_values(
+    const LinearAlgebra::distributed::BlockVector<std::complex<float>> &in,
+    Vector<
+      LinearAlgebra::distributed::BlockVector<std::complex<float>>::value_type>
+      &out) const = 0;
+#endif
+
+#ifdef DEAL_II_WITH_TRILINOS
+  virtual void
+  get_interpolated_dof_values(
+    const TrilinosWrappers::MPI::Vector &              in,
+    Vector<TrilinosWrappers::MPI::Vector::value_type> &out) const = 0;
+
+  virtual void
+  get_interpolated_dof_values(
+    const TrilinosWrappers::MPI::BlockVector &              in,
+    Vector<TrilinosWrappers::MPI::BlockVector::value_type> &out) const = 0;
+
+  virtual void
+  get_interpolated_dof_values(
+    const LinearAlgebra::EpetraWrappers::Vector &              in,
+    Vector<LinearAlgebra::EpetraWrappers::Vector::value_type> &out) const = 0;
+#endif
+
+#ifdef DEAL_II_TRILINOS_WITH_TPETRA
+  virtual void
+  get_interpolated_dof_values(
+    const LinearAlgebra::TpetraWrappers::Vector<double> &              in,
+    Vector<LinearAlgebra::TpetraWrappers::Vector<double>::value_type> &out)
+    const = 0;
+
+  virtual void
+  get_interpolated_dof_values(
+    const LinearAlgebra::TpetraWrappers::Vector<float> &              in,
+    Vector<LinearAlgebra::TpetraWrappers::Vector<float>::value_type> &out)
+    const = 0;
+#endif
+
+#if defined(DEAL_II_TRILINOS_WITH_TPETRA) && \
+  defined(DEAL_II_WITH_COMPLEX_NUMBERS)
+  virtual void
+  get_interpolated_dof_values(
+    const LinearAlgebra::TpetraWrappers::Vector<std::complex<double>> &in,
+    Vector<
+      LinearAlgebra::TpetraWrappers::Vector<std::complex<double>>::value_type>
+      &out) const = 0;
+
+  virtual void
+  get_interpolated_dof_values(
+    const LinearAlgebra::TpetraWrappers::Vector<std::complex<float>> &in,
+    Vector<
+      LinearAlgebra::TpetraWrappers::Vector<std::complex<float>>::value_type>
+      &out) const = 0;
+#endif
+
+#ifdef DEAL_II_WITH_PETSC
+  virtual void
+  get_interpolated_dof_values(
+    const PETScWrappers::MPI::Vector &              in,
+    Vector<PETScWrappers::MPI::Vector::value_type> &out) const = 0;
+
+  virtual void
+  get_interpolated_dof_values(
+    const PETScWrappers::MPI::BlockVector &              in,
+    Vector<PETScWrappers::MPI::BlockVector::value_type> &out) const = 0;
+#endif
+
 
   /**
    * Call @p get_interpolated_dof_values of the iterator with the
@@ -2662,7 +2834,181 @@ public:
   virtual types::global_dof_index
   n_dofs_for_dof_handler() const override;
 
-#include "fe_values.decl.2.inst"
+  virtual void
+  get_interpolated_dof_values(
+    const Vector<double> &              in,
+    Vector<Vector<double>::value_type> &out) const override;
+
+  virtual void
+  get_interpolated_dof_values(
+    const Vector<float> &              in,
+    Vector<Vector<float>::value_type> &out) const override;
+
+  virtual void
+  get_interpolated_dof_values(
+    const BlockVector<double> &              in,
+    Vector<BlockVector<double>::value_type> &out) const override;
+
+  virtual void
+  get_interpolated_dof_values(
+    const BlockVector<float> &              in,
+    Vector<BlockVector<float>::value_type> &out) const override;
+
+  virtual void
+  get_interpolated_dof_values(
+    const LinearAlgebra::Vector<double> &              in,
+    Vector<LinearAlgebra::Vector<double>::value_type> &out) const override;
+
+  virtual void
+  get_interpolated_dof_values(
+    const LinearAlgebra::Vector<float> &              in,
+    Vector<LinearAlgebra::Vector<float>::value_type> &out) const override;
+
+  virtual void
+  get_interpolated_dof_values(
+    const LinearAlgebra::distributed::Vector<double> &              in,
+    Vector<LinearAlgebra::distributed::Vector<double>::value_type> &out)
+    const override;
+
+  virtual void
+  get_interpolated_dof_values(
+    const LinearAlgebra::distributed::Vector<float> &              in,
+    Vector<LinearAlgebra::distributed::Vector<float>::value_type> &out)
+    const override;
+
+  virtual void
+  get_interpolated_dof_values(
+    const LinearAlgebra::distributed::BlockVector<double> &              in,
+    Vector<LinearAlgebra::distributed::BlockVector<double>::value_type> &out)
+    const override;
+
+  virtual void
+  get_interpolated_dof_values(
+    const LinearAlgebra::distributed::BlockVector<float> &              in,
+    Vector<LinearAlgebra::distributed::BlockVector<float>::value_type> &out)
+    const override;
+
+#ifdef DEAL_II_WITH_COMPLEX_VALUES
+  virtual void
+  get_interpolated_dof_values(
+    const Vector<std::complex<double>> &              in,
+    Vector<Vector<std::complex<double>>::value_type> &out) const override;
+
+  virtual void
+  get_interpolated_dof_values(
+    const Vector<std::complex<float>> &              in,
+    Vector<Vector<std::complex<float>>::value_type> &out) const override;
+
+  virtual void
+  get_interpolated_dof_values(
+    const BlockVector<std::complex<double>> &              in,
+    Vector<BlockVector<std::complex<double>>::value_type> &out) const override;
+
+  virtual void
+  get_interpolated_dof_values(
+    const BlockVector<std::complex<float>> &              in,
+    Vector<BlockVector<std::complex<float>>::value_type> &out) const override;
+
+  virtual void
+  get_interpolated_dof_values(
+    const LinearAlgebra::Vector<std::complex<double>> &              in,
+    Vector<LinearAlgebra::Vector<std::complex<double>>::value_type> &out)
+    const override;
+
+  virtual void
+  get_interpolated_dof_values(
+    const LinearAlgebra::Vector<std::complex<float>> &              in,
+    Vector<LinearAlgebra::Vector<std::complex<float>>::value_type> &out)
+    const override;
+
+  virtual void
+  get_interpolated_dof_values(
+    const LinearAlgebra::distributed::Vector<std::complex<double>> &in,
+    Vector<LinearAlgebra::distributed::Vector<std::complex<double>>::value_type>
+      &out) const override;
+
+  virtual void
+  get_interpolated_dof_values(
+    const LinearAlgebra::distributed::Vector<std::complex<float>> &in,
+    Vector<LinearAlgebra::distributed::Vector<std::complex<float>>::value_type>
+      &out) const override;
+
+  virtual void
+  get_interpolated_dof_values(
+    const LinearAlgebra::distributed::BlockVector<std::complex<double>> &in,
+    Vector<
+      LinearAlgebra::distributed::BlockVector<std::complex<double>>::value_type>
+      &out) const override;
+
+  virtual void
+  get_interpolated_dof_values(
+    const LinearAlgebra::distributed::BlockVector<std::complex<float>> &in,
+    Vector<
+      LinearAlgebra::distributed::BlockVector<std::complex<float>>::value_type>
+      &out) const override;
+#endif
+
+#ifdef DEAL_II_WITH_TRILINOS
+  virtual void
+  get_interpolated_dof_values(
+    const TrilinosWrappers::MPI::Vector &              in,
+    Vector<TrilinosWrappers::MPI::Vector::value_type> &out) const override;
+
+  virtual void
+  get_interpolated_dof_values(
+    const TrilinosWrappers::MPI::BlockVector &              in,
+    Vector<TrilinosWrappers::MPI::BlockVector::value_type> &out) const override;
+
+  virtual void
+  get_interpolated_dof_values(
+    const LinearAlgebra::EpetraWrappers::Vector &              in,
+    Vector<LinearAlgebra::EpetraWrappers::Vector::value_type> &out)
+    const override;
+#endif
+
+#ifdef DEAL_II_TRILINOS_WITH_TPETRA
+  virtual void
+  get_interpolated_dof_values(
+    const LinearAlgebra::TpetraWrappers::Vector<double> &              in,
+    Vector<LinearAlgebra::TpetraWrappers::Vector<double>::value_type> &out)
+    const override;
+
+  virtual void
+  get_interpolated_dof_values(
+    const LinearAlgebra::TpetraWrappers::Vector<float> &              in,
+    Vector<LinearAlgebra::TpetraWrappers::Vector<float>::value_type> &out)
+    const override;
+#endif
+
+#if defined(DEAL_II_TRILINOS_WITH_TPETRA) && \
+  defined(DEAL_II_WITH_COMPLEX_NUMBERS)
+  virtual void
+  get_interpolated_dof_values(
+    const LinearAlgebra::TpetraWrappers::Vector<std::complex<double>> &in,
+    Vector<
+      LinearAlgebra::TpetraWrappers::Vector<std::complex<double>>::value_type>
+      &out) const override;
+
+  virtual void
+  get_interpolated_dof_values(
+    const LinearAlgebra::TpetraWrappers::Vector<std::complex<float>> &in,
+    Vector<
+      LinearAlgebra::TpetraWrappers::Vector<std::complex<float>>::value_type>
+      &out) const override;
+#endif
+
+#ifdef DEAL_II_WITH_PETSC
+  virtual void
+  get_interpolated_dof_values(
+    const PETScWrappers::MPI::Vector &              in,
+    Vector<PETScWrappers::MPI::Vector::value_type> &out) const override;
+
+  virtual void
+  get_interpolated_dof_values(
+    const PETScWrappers::MPI::BlockVector &              in,
+    Vector<PETScWrappers::MPI::BlockVector::value_type> &out) const override;
+#endif
+
 
   /**
    * Call @p get_interpolated_dof_values
@@ -2726,7 +3072,181 @@ public:
   virtual types::global_dof_index
   n_dofs_for_dof_handler() const override;
 
-#include "fe_values.decl.2.inst"
+  virtual void
+  get_interpolated_dof_values(
+    const Vector<double> &              in,
+    Vector<Vector<double>::value_type> &out) const override;
+
+  virtual void
+  get_interpolated_dof_values(
+    const Vector<float> &              in,
+    Vector<Vector<float>::value_type> &out) const override;
+
+  virtual void
+  get_interpolated_dof_values(
+    const BlockVector<double> &              in,
+    Vector<BlockVector<double>::value_type> &out) const override;
+
+  virtual void
+  get_interpolated_dof_values(
+    const BlockVector<float> &              in,
+    Vector<BlockVector<float>::value_type> &out) const override;
+
+  virtual void
+  get_interpolated_dof_values(
+    const LinearAlgebra::Vector<double> &              in,
+    Vector<LinearAlgebra::Vector<double>::value_type> &out) const override;
+
+  virtual void
+  get_interpolated_dof_values(
+    const LinearAlgebra::Vector<float> &              in,
+    Vector<LinearAlgebra::Vector<float>::value_type> &out) const override;
+
+  virtual void
+  get_interpolated_dof_values(
+    const LinearAlgebra::distributed::Vector<double> &              in,
+    Vector<LinearAlgebra::distributed::Vector<double>::value_type> &out)
+    const override;
+
+  virtual void
+  get_interpolated_dof_values(
+    const LinearAlgebra::distributed::Vector<float> &              in,
+    Vector<LinearAlgebra::distributed::Vector<float>::value_type> &out)
+    const override;
+
+  virtual void
+  get_interpolated_dof_values(
+    const LinearAlgebra::distributed::BlockVector<double> &              in,
+    Vector<LinearAlgebra::distributed::BlockVector<double>::value_type> &out)
+    const override;
+
+  virtual void
+  get_interpolated_dof_values(
+    const LinearAlgebra::distributed::BlockVector<float> &              in,
+    Vector<LinearAlgebra::distributed::BlockVector<float>::value_type> &out)
+    const override;
+
+#ifdef DEAL_II_WITH_COMPLEX_VALUES
+  virtual void
+  get_interpolated_dof_values(
+    const Vector<std::complex<double>> &              in,
+    Vector<Vector<std::complex<double>>::value_type> &out) const override;
+
+  virtual void
+  get_interpolated_dof_values(
+    const Vector<std::complex<float>> &              in,
+    Vector<Vector<std::complex<float>>::value_type> &out) const override;
+
+  virtual void
+  get_interpolated_dof_values(
+    const BlockVector<std::complex<double>> &              in,
+    Vector<BlockVector<std::complex<double>>::value_type> &out) const override;
+
+  virtual void
+  get_interpolated_dof_values(
+    const BlockVector<std::complex<float>> &              in,
+    Vector<BlockVector<std::complex<float>>::value_type> &out) const override;
+
+  virtual void
+  get_interpolated_dof_values(
+    const LinearAlgebra::Vector<std::complex<double>> &              in,
+    Vector<LinearAlgebra::Vector<std::complex<double>>::value_type> &out)
+    const override;
+
+  virtual void
+  get_interpolated_dof_values(
+    const LinearAlgebra::Vector<std::complex<float>> &              in,
+    Vector<LinearAlgebra::Vector<std::complex<float>>::value_type> &out)
+    const override;
+
+  virtual void
+  get_interpolated_dof_values(
+    const LinearAlgebra::distributed::Vector<std::complex<double>> &in,
+    Vector<LinearAlgebra::distributed::Vector<std::complex<double>>::value_type>
+      &out) const override;
+
+  virtual void
+  get_interpolated_dof_values(
+    const LinearAlgebra::distributed::Vector<std::complex<float>> &in,
+    Vector<LinearAlgebra::distributed::Vector<std::complex<float>>::value_type>
+      &out) const override;
+
+  virtual void
+  get_interpolated_dof_values(
+    const LinearAlgebra::distributed::BlockVector<std::complex<double>> &in,
+    Vector<
+      LinearAlgebra::distributed::BlockVector<std::complex<double>>::value_type>
+      &out) const override;
+
+  virtual void
+  get_interpolated_dof_values(
+    const LinearAlgebra::distributed::BlockVector<std::complex<float>> &in,
+    Vector<
+      LinearAlgebra::distributed::BlockVector<std::complex<float>>::value_type>
+      &out) const override;
+#endif
+
+#ifdef DEAL_II_WITH_TRILINOS
+  virtual void
+  get_interpolated_dof_values(
+    const TrilinosWrappers::MPI::Vector &              in,
+    Vector<TrilinosWrappers::MPI::Vector::value_type> &out) const override;
+
+  virtual void
+  get_interpolated_dof_values(
+    const TrilinosWrappers::MPI::BlockVector &              in,
+    Vector<TrilinosWrappers::MPI::BlockVector::value_type> &out) const override;
+
+  virtual void
+  get_interpolated_dof_values(
+    const LinearAlgebra::EpetraWrappers::Vector &              in,
+    Vector<LinearAlgebra::EpetraWrappers::Vector::value_type> &out)
+    const override;
+#endif
+
+#ifdef DEAL_II_TRILINOS_WITH_TPETRA
+  virtual void
+  get_interpolated_dof_values(
+    const LinearAlgebra::TpetraWrappers::Vector<double> &              in,
+    Vector<LinearAlgebra::TpetraWrappers::Vector<double>::value_type> &out)
+    const override;
+
+  virtual void
+  get_interpolated_dof_values(
+    const LinearAlgebra::TpetraWrappers::Vector<float> &              in,
+    Vector<LinearAlgebra::TpetraWrappers::Vector<float>::value_type> &out)
+    const override;
+#endif
+
+#if defined(DEAL_II_TRILINOS_WITH_TPETRA) && \
+  defined(DEAL_II_WITH_COMPLEX_NUMBERS)
+  virtual void
+  get_interpolated_dof_values(
+    const LinearAlgebra::TpetraWrappers::Vector<std::complex<double>> &in,
+    Vector<
+      LinearAlgebra::TpetraWrappers::Vector<std::complex<double>>::value_type>
+      &out) const override;
+
+  virtual void
+  get_interpolated_dof_values(
+    const LinearAlgebra::TpetraWrappers::Vector<std::complex<float>> &in,
+    Vector<
+      LinearAlgebra::TpetraWrappers::Vector<std::complex<float>>::value_type>
+      &out) const override;
+#endif
+
+#ifdef DEAL_II_WITH_PETSC
+  virtual void
+  get_interpolated_dof_values(
+    const PETScWrappers::MPI::Vector &              in,
+    Vector<PETScWrappers::MPI::Vector::value_type> &out) const override;
+
+  virtual void
+  get_interpolated_dof_values(
+    const PETScWrappers::MPI::BlockVector &              in,
+    Vector<PETScWrappers::MPI::BlockVector::value_type> &out) const override;
+#endif
+
 
   /**
    * Call @p get_interpolated_dof_values of the iterator with the
@@ -2783,7 +3303,364 @@ FEValuesBase<dim, spacedim>::CellIterator<CI>::n_dofs_for_dof_handler() const
 
 
 
-#include "fe_values.impl.1.inst"
+template <int dim, int spacedim>
+template <typename CI>
+void
+FEValuesBase<dim, spacedim>::CellIterator<CI>::get_interpolated_dof_values(
+  const Vector<double> &              in,
+  Vector<Vector<double>::value_type> &out) const
+{
+  cell->get_interpolated_dof_values(in, out);
+}
+
+
+
+template <int dim, int spacedim>
+template <typename CI>
+void
+FEValuesBase<dim, spacedim>::CellIterator<CI>::get_interpolated_dof_values(
+  const Vector<float> &              in,
+  Vector<Vector<float>::value_type> &out) const
+{
+  cell->get_interpolated_dof_values(in, out);
+}
+
+
+
+template <int dim, int spacedim>
+template <typename CI>
+void
+FEValuesBase<dim, spacedim>::CellIterator<CI>::get_interpolated_dof_values(
+  const BlockVector<double> &              in,
+  Vector<BlockVector<double>::value_type> &out) const
+{
+  cell->get_interpolated_dof_values(in, out);
+}
+
+
+
+template <int dim, int spacedim>
+template <typename CI>
+void
+FEValuesBase<dim, spacedim>::CellIterator<CI>::get_interpolated_dof_values(
+  const BlockVector<float> &              in,
+  Vector<BlockVector<float>::value_type> &out) const
+{
+  cell->get_interpolated_dof_values(in, out);
+}
+
+
+
+template <int dim, int spacedim>
+template <typename CI>
+void
+FEValuesBase<dim, spacedim>::CellIterator<CI>::get_interpolated_dof_values(
+  const LinearAlgebra::Vector<double> &              in,
+  Vector<LinearAlgebra::Vector<double>::value_type> &out) const
+{
+  cell->get_interpolated_dof_values(in, out);
+}
+
+
+
+template <int dim, int spacedim>
+template <typename CI>
+void
+FEValuesBase<dim, spacedim>::CellIterator<CI>::get_interpolated_dof_values(
+  const LinearAlgebra::Vector<float> &              in,
+  Vector<LinearAlgebra::Vector<float>::value_type> &out) const
+{
+  cell->get_interpolated_dof_values(in, out);
+}
+
+
+
+template <int dim, int spacedim>
+template <typename CI>
+void
+FEValuesBase<dim, spacedim>::CellIterator<CI>::get_interpolated_dof_values(
+  const LinearAlgebra::distributed::Vector<double> &              in,
+  Vector<LinearAlgebra::distributed::Vector<double>::value_type> &out) const
+{
+  cell->get_interpolated_dof_values(in, out);
+}
+
+
+
+template <int dim, int spacedim>
+template <typename CI>
+void
+FEValuesBase<dim, spacedim>::CellIterator<CI>::get_interpolated_dof_values(
+  const LinearAlgebra::distributed::Vector<float> &              in,
+  Vector<LinearAlgebra::distributed::Vector<float>::value_type> &out) const
+{
+  cell->get_interpolated_dof_values(in, out);
+}
+
+
+
+template <int dim, int spacedim>
+template <typename CI>
+void
+FEValuesBase<dim, spacedim>::CellIterator<CI>::get_interpolated_dof_values(
+  const LinearAlgebra::distributed::BlockVector<double> &              in,
+  Vector<LinearAlgebra::distributed::BlockVector<double>::value_type> &out)
+  const
+{
+  cell->get_interpolated_dof_values(in, out);
+}
+
+
+
+template <int dim, int spacedim>
+template <typename CI>
+void
+FEValuesBase<dim, spacedim>::CellIterator<CI>::get_interpolated_dof_values(
+  const LinearAlgebra::distributed::BlockVector<float> &              in,
+  Vector<LinearAlgebra::distributed::BlockVector<float>::value_type> &out) const
+{
+  cell->get_interpolated_dof_values(in, out);
+}
+
+
+
+#ifdef DEAL_II_WITH_COMPLEX_VALUES
+template <int dim, int spacedim>
+template <typename CI>
+void
+FEValuesBase<dim, spacedim>::CellIterator<CI>::get_interpolated_dof_values(
+  const Vector<std::complex<double>> &              in,
+  Vector<Vector<std::complex<double>>::value_type> &out) const
+{
+  cell->get_interpolated_dof_values(in, out);
+}
+
+
+
+template <int dim, int spacedim>
+template <typename CI>
+void
+FEValuesBase<dim, spacedim>::CellIterator<CI>::get_interpolated_dof_values(
+  const Vector<std::complex<float>> &              in,
+  Vector<Vector<std::complex<float>>::value_type> &out) const
+{
+  cell->get_interpolated_dof_values(in, out);
+}
+
+
+
+template <int dim, int spacedim>
+template <typename CI>
+void
+FEValuesBase<dim, spacedim>::CellIterator<CI>::get_interpolated_dof_values(
+  const BlockVector<std::complex<double>> &              in,
+  Vector<BlockVector<std::complex<double>>::value_type> &out) const
+{
+  cell->get_interpolated_dof_values(in, out);
+}
+
+
+
+template <int dim, int spacedim>
+template <typename CI>
+void
+FEValuesBase<dim, spacedim>::CellIterator<CI>::get_interpolated_dof_values(
+  const BlockVector<std::complex<float>> &              in,
+  Vector<BlockVector<std::complex<float>>::value_type> &out) const
+{
+  cell->get_interpolated_dof_values(in, out);
+}
+
+
+
+template <int dim, int spacedim>
+template <typename CI>
+void
+FEValuesBase<dim, spacedim>::CellIterator<CI>::get_interpolated_dof_values(
+  const LinearAlgebra::Vector<std::complex<double>> &              in,
+  Vector<LinearAlgebra::Vector<std::complex<double>>::value_type> &out) const
+{
+  cell->get_interpolated_dof_values(in, out);
+}
+
+
+
+template <int dim, int spacedim>
+template <typename CI>
+void
+FEValuesBase<dim, spacedim>::CellIterator<CI>::get_interpolated_dof_values(
+  const LinearAlgebra::Vector<std::complex<float>> &              in,
+  Vector<LinearAlgebra::Vector<std::complex<float>>::value_type> &out) const
+{
+  cell->get_interpolated_dof_values(in, out);
+}
+
+
+
+template <int dim, int spacedim>
+template <typename CI>
+void
+FEValuesBase<dim, spacedim>::CellIterator<CI>::get_interpolated_dof_values(
+  const LinearAlgebra::distributed::Vector<std::complex<double>> &in,
+  Vector<LinearAlgebra::distributed::Vector<std::complex<double>>::value_type>
+    &out) const
+{
+  cell->get_interpolated_dof_values(in, out);
+}
+
+
+
+template <int dim, int spacedim>
+template <typename CI>
+void
+FEValuesBase<dim, spacedim>::CellIterator<CI>::get_interpolated_dof_values(
+  const LinearAlgebra::distributed::Vector<std::complex<float>> &in,
+  Vector<LinearAlgebra::distributed::Vector<std::complex<float>>::value_type>
+    &out) const
+{
+  cell->get_interpolated_dof_values(in, out);
+}
+
+
+
+template <int dim, int spacedim>
+template <typename CI>
+void
+FEValuesBase<dim, spacedim>::CellIterator<CI>::get_interpolated_dof_values(
+  const LinearAlgebra::distributed::BlockVector<std::complex<double>> &in,
+  Vector<
+    LinearAlgebra::distributed::BlockVector<std::complex<double>>::value_type>
+    &out) const
+{
+  cell->get_interpolated_dof_values(in, out);
+}
+
+
+
+template <int dim, int spacedim>
+template <typename CI>
+void
+FEValuesBase<dim, spacedim>::CellIterator<CI>::get_interpolated_dof_values(
+  const LinearAlgebra::distributed::BlockVector<std::complex<float>> &in,
+  Vector<
+    LinearAlgebra::distributed::BlockVector<std::complex<float>>::value_type>
+    &out) const
+{
+  cell->get_interpolated_dof_values(in, out);
+}
+#endif
+
+#ifdef DEAL_II_WITH_TRILINOS
+template <int dim, int spacedim>
+template <typename CI>
+void
+FEValuesBase<dim, spacedim>::CellIterator<CI>::get_interpolated_dof_values(
+  const TrilinosWrappers::MPI::Vector &              in,
+  Vector<TrilinosWrappers::MPI::Vector::value_type> &out) const
+{
+  cell->get_interpolated_dof_values(in, out);
+}
+
+
+
+template <int dim, int spacedim>
+template <typename CI>
+void
+FEValuesBase<dim, spacedim>::CellIterator<CI>::get_interpolated_dof_values(
+  const TrilinosWrappers::MPI::BlockVector &              in,
+  Vector<TrilinosWrappers::MPI::BlockVector::value_type> &out) const
+{
+  cell->get_interpolated_dof_values(in, out);
+}
+
+
+
+template <int dim, int spacedim>
+template <typename CI>
+void
+FEValuesBase<dim, spacedim>::CellIterator<CI>::get_interpolated_dof_values(
+  const LinearAlgebra::EpetraWrappers::Vector &              in,
+  Vector<LinearAlgebra::EpetraWrappers::Vector::value_type> &out) const
+{
+  cell->get_interpolated_dof_values(in, out);
+}
+#endif
+
+#ifdef DEAL_II_TRILINOS_WITH_TPETRA
+template <int dim, int spacedim>
+template <typename CI>
+void
+FEValuesBase<dim, spacedim>::CellIterator<CI>::get_interpolated_dof_values(
+  const LinearAlgebra::TpetraWrappers::Vector<double> &              in,
+  Vector<LinearAlgebra::TpetraWrappers::Vector<double>::value_type> &out) const
+{
+  cell->get_interpolated_dof_values(in, out);
+}
+
+
+
+template <int dim, int spacedim>
+template <typename CI>
+void
+FEValuesBase<dim, spacedim>::CellIterator<CI>::get_interpolated_dof_values(
+  const LinearAlgebra::TpetraWrappers::Vector<float> &              in,
+  Vector<LinearAlgebra::TpetraWrappers::Vector<float>::value_type> &out) const
+{
+  cell->get_interpolated_dof_values(in, out);
+}
+#endif
+
+#if defined(DEAL_II_TRILINOS_WITH_TPETRA) && \
+  defined(DEAL_II_WITH_COMPLEX_NUMBERS)
+template <int dim, int spacedim>
+template <typename CI>
+void
+FEValuesBase<dim, spacedim>::CellIterator<CI>::get_interpolated_dof_values(
+  const LinearAlgebra::TpetraWrappers::Vector<std::complex<double>> &in,
+  Vector<
+    LinearAlgebra::TpetraWrappers::Vector<std::complex<double>>::value_type>
+    &out) const
+{
+  cell->get_interpolated_dof_values(in, out);
+}
+
+
+
+template <int dim, int spacedim>
+template <typename CI>
+void
+FEValuesBase<dim, spacedim>::CellIterator<CI>::get_interpolated_dof_values(
+  const LinearAlgebra::TpetraWrappers::Vector<std::complex<float>> &in,
+  Vector<LinearAlgebra::TpetraWrappers::Vector<std::complex<float>>::value_type>
+    &out) const
+{
+  cell->get_interpolated_dof_values(in, out);
+}
+#endif
+
+#ifdef DEAL_II_WITH_PETSC
+template <int dim, int spacedim>
+template <typename CI>
+void
+FEValuesBase<dim, spacedim>::CellIterator<CI>::get_interpolated_dof_values(
+  const PETScWrappers::MPI::Vector &              in,
+  Vector<PETScWrappers::MPI::Vector::value_type> &out) const
+{
+  cell->get_interpolated_dof_values(in, out);
+}
+
+
+
+template <int dim, int spacedim>
+template <typename CI>
+void
+FEValuesBase<dim, spacedim>::CellIterator<CI>::get_interpolated_dof_values(
+  const PETScWrappers::MPI::BlockVector &              in,
+  Vector<PETScWrappers::MPI::BlockVector::value_type> &out) const
+{
+  cell->get_interpolated_dof_values(in, out);
+}
+#endif
 
 
 
@@ -2847,7 +3724,332 @@ FEValuesBase<dim, spacedim>::TriaCellIterator::n_dofs_for_dof_handler() const
 
 
 
-#include "fe_values.impl.2.inst"
+template <int dim, int spacedim>
+void
+FEValuesBase<dim, spacedim>::TriaCellIterator::get_interpolated_dof_values(
+  const Vector<double> &,
+  Vector<Vector<double>::value_type> &) const
+{
+  Assert(false, ExcMessage(message_string));
+}
+
+
+
+template <int dim, int spacedim>
+void
+FEValuesBase<dim, spacedim>::TriaCellIterator::get_interpolated_dof_values(
+  const Vector<float> &,
+  Vector<Vector<float>::value_type> &) const
+{
+  Assert(false, ExcMessage(message_string));
+}
+
+
+
+template <int dim, int spacedim>
+void
+FEValuesBase<dim, spacedim>::TriaCellIterator::get_interpolated_dof_values(
+  const BlockVector<double> &,
+  Vector<BlockVector<double>::value_type> &) const
+{
+  Assert(false, ExcMessage(message_string));
+}
+
+
+
+template <int dim, int spacedim>
+void
+FEValuesBase<dim, spacedim>::TriaCellIterator::get_interpolated_dof_values(
+  const BlockVector<float> &,
+  Vector<BlockVector<float>::value_type> &) const
+{
+  Assert(false, ExcMessage(message_string));
+}
+
+
+
+template <int dim, int spacedim>
+void
+FEValuesBase<dim, spacedim>::TriaCellIterator::get_interpolated_dof_values(
+  const LinearAlgebra::Vector<double> &,
+  Vector<LinearAlgebra::Vector<double>::value_type> &) const
+{
+  Assert(false, ExcMessage(message_string));
+}
+
+
+
+template <int dim, int spacedim>
+void
+FEValuesBase<dim, spacedim>::TriaCellIterator::get_interpolated_dof_values(
+  const LinearAlgebra::Vector<float> &,
+  Vector<LinearAlgebra::Vector<float>::value_type> &) const
+{
+  Assert(false, ExcMessage(message_string));
+}
+
+
+
+template <int dim, int spacedim>
+void
+FEValuesBase<dim, spacedim>::TriaCellIterator::get_interpolated_dof_values(
+  const LinearAlgebra::distributed::Vector<double> &,
+  Vector<LinearAlgebra::distributed::Vector<double>::value_type> &) const
+{
+  Assert(false, ExcMessage(message_string));
+}
+
+
+
+template <int dim, int spacedim>
+void
+FEValuesBase<dim, spacedim>::TriaCellIterator::get_interpolated_dof_values(
+  const LinearAlgebra::distributed::Vector<float> &,
+  Vector<LinearAlgebra::distributed::Vector<float>::value_type> &) const
+{
+  Assert(false, ExcMessage(message_string));
+}
+
+
+
+template <int dim, int spacedim>
+void
+FEValuesBase<dim, spacedim>::TriaCellIterator::get_interpolated_dof_values(
+  const LinearAlgebra::distributed::BlockVector<double> &,
+  Vector<LinearAlgebra::distributed::BlockVector<double>::value_type> &) const
+{
+  Assert(false, ExcMessage(message_string));
+}
+
+
+
+template <int dim, int spacedim>
+void
+FEValuesBase<dim, spacedim>::TriaCellIterator::get_interpolated_dof_values(
+  const LinearAlgebra::distributed::BlockVector<float> &,
+  Vector<LinearAlgebra::distributed::BlockVector<float>::value_type> &) const
+{
+  Assert(false, ExcMessage(message_string));
+}
+
+#ifdef DEAL_II_WITH_COMPLEX_VALUES
+template <int dim, int spacedim>
+void
+FEValuesBase<dim, spacedim>::TriaCellIterator::get_interpolated_dof_values(
+  const Vector<std::complex<double>> &,
+  Vector<Vector<std::complex<double>>::value_type> &) const
+{
+  Assert(false, ExcMessage(message_string));
+}
+
+
+
+template <int dim, int spacedim>
+void
+FEValuesBase<dim, spacedim>::TriaCellIterator::get_interpolated_dof_values(
+  const Vector<std::complex<float>> &,
+  Vector<Vector<std::complex<float>>::value_type> &) const
+{
+  Assert(false, ExcMessage(message_string));
+}
+
+
+
+template <int dim, int spacedim>
+void
+FEValuesBase<dim, spacedim>::TriaCellIterator::get_interpolated_dof_values(
+  const BlockVector<std::complex<double>> &,
+  Vector<BlockVector<std::complex<double>>::value_type> &) const
+{
+  Assert(false, ExcMessage(message_string));
+}
+
+
+
+template <int dim, int spacedim>
+void
+FEValuesBase<dim, spacedim>::TriaCellIterator::get_interpolated_dof_values(
+  const BlockVector<std::complex<float>> &,
+  Vector<BlockVector<std::complex<float>>::value_type> &) const
+{
+  Assert(false, ExcMessage(message_string));
+}
+
+
+
+template <int dim, int spacedim>
+void
+FEValuesBase<dim, spacedim>::TriaCellIterator::get_interpolated_dof_values(
+  const LinearAlgebra::Vector<std::complex<double>> &,
+  Vector<LinearAlgebra::Vector<std::complex<double>>::value_type> &) const
+{
+  Assert(false, ExcMessage(message_string));
+}
+
+
+
+template <int dim, int spacedim>
+void
+FEValuesBase<dim, spacedim>::TriaCellIterator::get_interpolated_dof_values(
+  const LinearAlgebra::Vector<std::complex<float>> &,
+  Vector<LinearAlgebra::Vector<std::complex<float>>::value_type> &) const
+{
+  Assert(false, ExcMessage(message_string));
+}
+
+
+
+template <int dim, int spacedim>
+void
+FEValuesBase<dim, spacedim>::TriaCellIterator::get_interpolated_dof_values(
+  const LinearAlgebra::distributed::Vector<std::complex<double>> &,
+  Vector<LinearAlgebra::distributed::Vector<std::complex<double>>::value_type>
+    &) const
+{
+  Assert(false, ExcMessage(message_string));
+}
+
+
+
+template <int dim, int spacedim>
+void
+FEValuesBase<dim, spacedim>::TriaCellIterator::get_interpolated_dof_values(
+  const LinearAlgebra::distributed::Vector<std::complex<float>> &,
+  Vector<LinearAlgebra::distributed::Vector<std::complex<float>>::value_type> &)
+  const
+{
+  Assert(false, ExcMessage(message_string));
+}
+
+
+
+template <int dim, int spacedim>
+void
+FEValuesBase<dim, spacedim>::TriaCellIterator::get_interpolated_dof_values(
+  const LinearAlgebra::distributed::BlockVector<std::complex<double>> &,
+  Vector<
+    LinearAlgebra::distributed::BlockVector<std::complex<double>>::value_type>
+    &) const
+{
+  Assert(false, ExcMessage(message_string));
+}
+
+
+
+template <int dim, int spacedim>
+void
+FEValuesBase<dim, spacedim>::TriaCellIterator::get_interpolated_dof_values(
+  const LinearAlgebra::distributed::BlockVector<std::complex<float>> &,
+  Vector<
+    LinearAlgebra::distributed::BlockVector<std::complex<float>>::value_type> &)
+  const
+{
+  Assert(false, ExcMessage(message_string));
+}
+#endif
+
+#ifdef DEAL_II_WITH_TRILINOS
+template <int dim, int spacedim>
+void
+FEValuesBase<dim, spacedim>::TriaCellIterator::get_interpolated_dof_values(
+  const TrilinosWrappers::MPI::Vector &,
+  Vector<TrilinosWrappers::MPI::Vector::value_type> &) const
+{
+  Assert(false, ExcMessage(message_string));
+}
+
+
+
+template <int dim, int spacedim>
+void
+FEValuesBase<dim, spacedim>::TriaCellIterator::get_interpolated_dof_values(
+  const TrilinosWrappers::MPI::BlockVector &,
+  Vector<TrilinosWrappers::MPI::BlockVector::value_type> &) const
+{
+  Assert(false, ExcMessage(message_string));
+}
+
+
+
+template <int dim, int spacedim>
+void
+FEValuesBase<dim, spacedim>::TriaCellIterator::get_interpolated_dof_values(
+  const LinearAlgebra::EpetraWrappers::Vector &,
+  Vector<LinearAlgebra::EpetraWrappers::Vector::value_type> &) const
+{
+  Assert(false, ExcMessage(message_string));
+}
+#endif
+
+#ifdef DEAL_II_TRILINOS_WITH_TPETRA
+template <int dim, int spacedim>
+void
+FEValuesBase<dim, spacedim>::TriaCellIterator::get_interpolated_dof_values(
+  const LinearAlgebra::TpetraWrappers::Vector<double> &,
+  Vector<LinearAlgebra::TpetraWrappers::Vector<double>::value_type> &) const
+{
+  Assert(false, ExcMessage(message_string));
+}
+
+
+
+template <int dim, int spacedim>
+void
+FEValuesBase<dim, spacedim>::TriaCellIterator::get_interpolated_dof_values(
+  const LinearAlgebra::TpetraWrappers::Vector<float> &,
+  Vector<LinearAlgebra::TpetraWrappers::Vector<float>::value_type> &) const
+{
+  Assert(false, ExcMessage(message_string));
+}
+#endif
+
+#if defined(DEAL_II_TRILINOS_WITH_TPETRA) && \
+  defined(DEAL_II_WITH_COMPLEX_NUMBERS)
+template <int dim, int spacedim>
+void
+FEValuesBase<dim, spacedim>::TriaCellIterator::get_interpolated_dof_values(
+  const LinearAlgebra::TpetraWrappers::Vector<std::complex<double>> &,
+  Vector<
+    LinearAlgebra::TpetraWrappers::Vector<std::complex<double>>::value_type> &)
+  const
+{
+  Assert(false, ExcMessage(message_string));
+}
+
+
+
+template <int dim, int spacedim>
+void
+FEValuesBase<dim, spacedim>::TriaCellIterator::get_interpolated_dof_values(
+  const LinearAlgebra::TpetraWrappers::Vector<std::complex<float>> &,
+  Vector<LinearAlgebra::TpetraWrappers::Vector<std::complex<float>>::value_type>
+    &) const
+{
+  Assert(false, ExcMessage(message_string));
+}
+#endif
+
+#ifdef DEAL_II_WITH_PETSC
+template <int dim, int spacedim>
+void
+FEValuesBase<dim, spacedim>::TriaCellIterator::get_interpolated_dof_values(
+  const PETScWrappers::MPI::Vector &,
+  Vector<PETScWrappers::MPI::Vector::value_type> &) const
+{
+  Assert(false, ExcMessage(message_string));
+}
+
+
+
+template <int dim, int spacedim>
+void
+FEValuesBase<dim, spacedim>::TriaCellIterator::get_interpolated_dof_values(
+  const PETScWrappers::MPI::BlockVector &,
+  Vector<PETScWrappers::MPI::BlockVector::value_type> &) const
+{
+  Assert(false, ExcMessage(message_string));
+}
+#endif
 
 
 
