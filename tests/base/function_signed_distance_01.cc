@@ -14,10 +14,10 @@
 // ---------------------------------------------------------------------
 
 /**
- * Test the classes Functions::LevelSet::Sphere and Functions::LevelSet::Plane,
- * by creating an object of each class and calling the value, gradient and
- * hessian functions at a point where we know what the function values should
- * be.
+ * Test the classes Functions::SignedDistance::Sphere and
+ * Functions::SignedDistance::Plane, by creating an object of each class and
+ * calling the value, gradient and hessian functions at a point where we know
+ * what the function values should be.
  */
 
 #include <deal.II/base/function_level_set.h>
@@ -49,7 +49,7 @@ namespace
     const Point<dim> center;
     const double     radius = 1;
 
-    const Functions::LevelSet::Sphere<dim> level_set(center, radius);
+    const Functions::SignedDistance::Sphere<dim> level_set(center, radius);
 
     Point<dim> point;
     point[0] = 2 * radius;
@@ -68,7 +68,8 @@ namespace
     const Point<dim>     point_in_plane;
     const Tensor<1, dim> normal = Point<dim>::unit_vector(0);
 
-    const Functions::LevelSet::Plane<dim> level_set(point_in_plane, normal);
+    const Functions::SignedDistance::Plane<dim> level_set(point_in_plane,
+                                                          normal);
 
     Point<dim> point;
     for (unsigned int i = 0; i < dim; ++i)
