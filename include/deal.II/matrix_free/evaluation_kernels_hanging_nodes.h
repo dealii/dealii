@@ -85,15 +85,15 @@ namespace internal
     {
       using value_type         = typename T1::value_type;
       using index_type         = unsigned int;
-      using interpolation_type = Number;
+      using interpolation_type = value_type;
 
       template <typename T>
-      static inline std::array<AlignedVector<Number>, 2>
+      static inline const std::array<AlignedVector<interpolation_type>, 2> &
       get_interpolation_matrix(const T &fe_eval)
       {
         return fe_eval.get_shape_info()
           .data.front()
-          .subface_interpolation_matrices;
+          .subface_interpolation_matrices_scalar;
       }
 
       static inline DEAL_II_ALWAYS_INLINE unsigned int
@@ -114,6 +114,13 @@ namespace internal
                                      Number::size()> mask)
       {
         return mask;
+      }
+
+      static inline DEAL_II_ALWAYS_INLINE typename Number::value_type
+      get_value(const typename Number::value_type &value, const index_type &i)
+      {
+        (void)i;
+        return value;
       }
 
       static inline DEAL_II_ALWAYS_INLINE typename Number::value_type
@@ -139,7 +146,7 @@ namespace internal
       using interpolation_type = Number;
 
       template <typename T>
-      static inline std::array<AlignedVector<Number>, 2>
+      static inline const std::array<AlignedVector<Number>, 2> &
       get_interpolation_matrix(const T &fe_eval)
       {
         return fe_eval.get_shape_info()
@@ -190,7 +197,7 @@ namespace internal
       using interpolation_type = Number;
 
       template <typename T>
-      static inline std::array<AlignedVector<Number>, 2>
+      static inline const std::array<AlignedVector<Number>, 2> &
       get_interpolation_matrix(const T &fe_eval)
       {
         return fe_eval.get_shape_info()
