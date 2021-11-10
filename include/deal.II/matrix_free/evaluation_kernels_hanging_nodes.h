@@ -67,13 +67,26 @@ namespace internal
   private:
     enum class VectorizationTypes
     {
+      /**
+       * TODO
+       */
       index,
+      /**
+       * TODO
+       */
       group,
-      mask
+      /**
+       * TODO
+       */
+      mask,
+      /**
+       * TODO
+       */
+      sorted
     };
 
     static const VectorizationTypes VectorizationType =
-      VectorizationTypes::mask;
+      VectorizationTypes::index;
 
     static constexpr unsigned int max_n_points_1D = 40;
 
@@ -292,6 +305,75 @@ namespace internal
       set_value(Number &result, const Number &value, const index_type &i)
       {
         result = result * i.second + value * i.first;
+      }
+    };
+
+    template <typename T1>
+    struct Trait<T1, VectorizationTypes::sorted>
+    {
+      using value_type         = T1;
+      using index_type         = Number;
+      using interpolation_type = Number;
+
+      template <typename T>
+      static inline const std::array<AlignedVector<Number>, 2> &
+      get_interpolation_matrix(const T &fe_eval)
+      {
+        return fe_eval.get_shape_info()
+          .data.front()
+          .subface_interpolation_matrices;
+      }
+
+      static inline DEAL_II_ALWAYS_INLINE bool
+      do_break(unsigned int v, const MatrixFreeFunctions::ConstraintKinds &kind)
+      {
+        (void)kind;
+        return v > 0;
+      }
+
+      static inline DEAL_II_ALWAYS_INLINE bool
+      do_continue(unsigned int                                v,
+                  const MatrixFreeFunctions::ConstraintKinds &kind)
+      {
+        (void)kind;
+
+        Assert(false, ExcInternalError());
+
+        return v > 0; // should not be called
+      }
+
+      static inline DEAL_II_ALWAYS_INLINE Number
+      create(const std::array<MatrixFreeFunctions::ConstraintKinds,
+                              Number::size()> mask,
+             const std::array<MatrixFreeFunctions::ConstraintKinds,
+                              Number::size()> mask_new,
+             const unsigned int               v)
+      {
+        (void)mask;
+        (void)mask_new;
+        (void)v;
+        return 1.0; // return something since not used
+      }
+
+      static inline DEAL_II_ALWAYS_INLINE
+        std::array<MatrixFreeFunctions::ConstraintKinds, Number::size()>
+        create_mask(const std::array<MatrixFreeFunctions::ConstraintKinds,
+                                     Number::size()> mask)
+      {
+        return mask;
+      }
+
+      static inline DEAL_II_ALWAYS_INLINE Number
+      get_value(const Number &value, const index_type &)
+      {
+        return value;
+      }
+
+      static inline DEAL_II_ALWAYS_INLINE void
+      set_value(Number &result, const Number &value, const index_type &i)
+      {
+        (void)i;
+        result = value;
       }
     };
 
