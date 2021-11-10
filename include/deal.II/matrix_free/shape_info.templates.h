@@ -631,6 +631,10 @@ namespace internal
             univariate_shape_data.subface_interpolation_matrices[0];
           auto &subface_interpolation_matrix_1 =
             univariate_shape_data.subface_interpolation_matrices[1];
+          auto &subface_interpolation_matrix_scalar_0 =
+            univariate_shape_data.subface_interpolation_matrices_scalar[0];
+          auto &subface_interpolation_matrix_scalar_1 =
+            univariate_shape_data.subface_interpolation_matrices_scalar[1];
 
           const auto fe_1d = create_fe<1>(fe);
           const auto fe_2d = create_fe<2>(fe);
@@ -666,6 +670,11 @@ namespace internal
           subface_interpolation_matrix_1.resize(fe_1d->n_dofs_per_cell() *
                                                 fe_1d->n_dofs_per_cell());
 
+          subface_interpolation_matrix_scalar_0.resize(
+            fe_1d->n_dofs_per_cell() * fe_1d->n_dofs_per_cell());
+          subface_interpolation_matrix_scalar_1.resize(
+            fe_1d->n_dofs_per_cell() * fe_1d->n_dofs_per_cell());
+
           for (unsigned int i = 0, c = 0; i < fe_1d->n_dofs_per_cell(); ++i)
             for (unsigned int j = 0; j < fe_1d->n_dofs_per_cell(); ++j, ++c)
               {
@@ -673,6 +682,12 @@ namespace internal
                   interpolation_matrix_0(scalar_lexicographic[i],
                                          scalar_lexicographic[j]);
                 subface_interpolation_matrix_1[c] =
+                  interpolation_matrix_1(scalar_lexicographic[i],
+                                         scalar_lexicographic[j]);
+                subface_interpolation_matrix_scalar_0[c] =
+                  interpolation_matrix_0(scalar_lexicographic[i],
+                                         scalar_lexicographic[j]);
+                subface_interpolation_matrix_scalar_1[c] =
                   interpolation_matrix_1(scalar_lexicographic[i],
                                          scalar_lexicographic[j]);
               }

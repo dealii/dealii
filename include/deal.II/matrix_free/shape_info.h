@@ -99,6 +99,26 @@ namespace internal
       tensor_none = 6
     };
 
+    template <typename T>
+    struct UnivariateShapeDataTrait;
+
+    template <>
+    struct UnivariateShapeDataTrait<double>
+    {
+      using value_type = double;
+    };
+
+    template <>
+    struct UnivariateShapeDataTrait<float>
+    {
+      using value_type = float;
+    };
+
+    template <typename T, std::size_t width>
+    struct UnivariateShapeDataTrait<VectorizedArray<T, width>>
+    {
+      using value_type = T;
+    };
 
 
     /**
@@ -266,6 +286,14 @@ namespace internal
        * This data structure is only set up for FE_Q for dim > 1.
        */
       std::array<AlignedVector<Number>, 2> subface_interpolation_matrices;
+
+      /**
+       * TODO
+       */
+      std::array<
+        AlignedVector<typename UnivariateShapeDataTrait<Number>::value_type>,
+        2>
+        subface_interpolation_matrices_scalar;
 
       /**
        * We store a copy of the one-dimensional quadrature formula

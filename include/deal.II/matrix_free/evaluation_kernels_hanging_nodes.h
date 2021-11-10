@@ -83,8 +83,18 @@ namespace internal
     template <typename T1>
     struct Trait<T1, VectorizationTypes::index>
     {
-      using value_type = typename T1::value_type;
-      using index_type = unsigned int;
+      using value_type         = typename T1::value_type;
+      using index_type         = unsigned int;
+      using interpolation_type = Number;
+
+      template <typename T>
+      static inline std::array<AlignedVector<Number>, 2>
+      get_interpolation_matrix(const T &fe_eval)
+      {
+        return fe_eval.get_shape_info()
+          .data.front()
+          .subface_interpolation_matrices;
+      }
 
       static inline DEAL_II_ALWAYS_INLINE unsigned int
       create(const std::array<MatrixFreeFunctions::ConstraintKinds,
@@ -124,8 +134,18 @@ namespace internal
     template <typename T1>
     struct Trait<T1, VectorizationTypes::mask>
     {
-      using value_type = T1;
-      using index_type = std::pair<Number, Number>;
+      using value_type         = T1;
+      using index_type         = std::pair<Number, Number>;
+      using interpolation_type = Number;
+
+      template <typename T>
+      static inline std::array<AlignedVector<Number>, 2>
+      get_interpolation_matrix(const T &fe_eval)
+      {
+        return fe_eval.get_shape_info()
+          .data.front()
+          .subface_interpolation_matrices;
+      }
 
       static inline DEAL_II_ALWAYS_INLINE index_type
       create(const std::array<MatrixFreeFunctions::ConstraintKinds,
@@ -165,8 +185,18 @@ namespace internal
     template <typename T1>
     struct Trait<T1, VectorizationTypes::group>
     {
-      using value_type = T1;
-      using index_type = std::pair<Number, Number>;
+      using value_type         = T1;
+      using index_type         = std::pair<Number, Number>;
+      using interpolation_type = Number;
+
+      template <typename T>
+      static inline std::array<AlignedVector<Number>, 2>
+      get_interpolation_matrix(const T &fe_eval)
+      {
+        return fe_eval.get_shape_info()
+          .data.front()
+          .subface_interpolation_matrices;
+      }
 
       static inline DEAL_II_ALWAYS_INLINE index_type
       create(const std::array<MatrixFreeFunctions::ConstraintKinds,
@@ -216,8 +246,9 @@ namespace internal
     interpolate_2D(
       const unsigned int                                          given_degree,
       const typename Trait<Number, VectorizationType>::index_type v,
-      const Number *DEAL_II_RESTRICT                              weight,
-      Number *DEAL_II_RESTRICT                                    values)
+      const typename Trait<Number, VectorizationType>::interpolation_type
+        *DEAL_II_RESTRICT      weight,
+      Number *DEAL_II_RESTRICT values)
     {
       typename Trait<Number, VectorizationType>::value_type
         temp[fe_degree != -1 ? (fe_degree + 1) : max_n_points_1D];
@@ -269,8 +300,9 @@ namespace internal
       const unsigned int                                          dof_offset,
       const unsigned int                                          given_degree,
       const typename Trait<Number, VectorizationType>::index_type v,
-      const Number *DEAL_II_RESTRICT                              weight,
-      Number *DEAL_II_RESTRICT                                    values)
+      const typename Trait<Number, VectorizationType>::interpolation_type
+        *DEAL_II_RESTRICT      weight,
+      Number *DEAL_II_RESTRICT values)
     {
       typename Trait<Number, VectorizationType>::value_type
         temp[fe_degree != -1 ? (fe_degree + 1) : max_n_points_1D];
@@ -327,8 +359,9 @@ namespace internal
       const unsigned int                                          p,
       const unsigned int                                          given_degree,
       const typename Trait<Number, VectorizationType>::index_type v,
-      const Number *DEAL_II_RESTRICT                              weight,
-      Number *DEAL_II_RESTRICT                                    values)
+      const typename Trait<Number, VectorizationType>::interpolation_type
+        *DEAL_II_RESTRICT      weight,
+      Number *DEAL_II_RESTRICT values)
     {
       typename Trait<Number, VectorizationType>::value_type
         temp[fe_degree != -1 ? (fe_degree + 1) : max_n_points_1D];
@@ -382,7 +415,7 @@ namespace internal
                           fe_eval.get_shape_info().data.front().fe_degree;
 
       const auto &interpolation_matrices =
-        fe_eval.get_shape_info().data.front().subface_interpolation_matrices;
+        Trait<Number, VectorizationType>::get_interpolation_matrix(fe_eval);
 
       const auto constraint_mask_new =
         Trait<Number, VectorizationType>::create_mask(constraint_mask);
@@ -415,7 +448,7 @@ namespace internal
                         (mask & MatrixFreeFunctions::ConstraintKinds::type_x) ==
                         MatrixFreeFunctions::ConstraintKinds::unconstrained;
 
-                      const Number *weights =
+                      const auto *weights =
                         interpolation_matrices[is_subface_0].data();
 
                       if (is_set(mask,
@@ -441,7 +474,7 @@ namespace internal
                         (mask & MatrixFreeFunctions::ConstraintKinds::type_y) ==
                         MatrixFreeFunctions::ConstraintKinds::unconstrained;
 
-                      const Number *weights =
+                      const auto *weights =
                         interpolation_matrices[is_subface_0].data();
 
                       if (is_set(mask,
@@ -556,8 +589,11 @@ namespace internal
              const bool &        type_y,
              const bool &        type_z,
              const typename Trait<Number, VectorizationType>::index_type &v,
-             const std::array<AlignedVector<Number>, 2> &interpolation_matrices,
-             Number *                                    values)
+             const std::array<
+               AlignedVector<
+                 typename Trait<Number, VectorizationType>::interpolation_type>,
+               2> &  interpolation_matrices,
+             Number *values)
         : given_degree(given_degree)
         , type_x(type_x)
         , type_y(type_y)
@@ -572,8 +608,11 @@ namespace internal
       const bool &                                                 type_y;
       const bool &                                                 type_z;
       const typename Trait<Number, VectorizationType>::index_type &v;
-      const std::array<AlignedVector<Number>, 2> &interpolation_matrices;
-      Number *                                    values;
+      const std::array<
+        AlignedVector<
+          typename Trait<Number, VectorizationType>::interpolation_type>,
+        2> &  interpolation_matrices;
+      Number *values;
 
       template <bool do_x, bool do_y, bool do_z>
       inline DEAL_II_ALWAYS_INLINE void
