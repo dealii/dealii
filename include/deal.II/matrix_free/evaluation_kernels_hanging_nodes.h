@@ -73,7 +73,7 @@ namespace internal
     };
 
     static const VectorizationTypes VectorizationType =
-      VectorizationTypes::index;
+      VectorizationTypes::mask;
 
     static constexpr unsigned int max_n_points_1D = 40;
 
@@ -106,6 +106,22 @@ namespace internal
         (void)mask;
         (void)mask_new;
         return v;
+      }
+
+      static inline DEAL_II_ALWAYS_INLINE bool
+      do_break(unsigned int v, const MatrixFreeFunctions::ConstraintKinds &kind)
+      {
+        (void)v;
+        (void)kind;
+        return false;
+      }
+
+      static inline DEAL_II_ALWAYS_INLINE bool
+      do_continue(unsigned int                                v,
+                  const MatrixFreeFunctions::ConstraintKinds &kind)
+      {
+        (void)v;
+        return kind == MatrixFreeFunctions::ConstraintKinds::unconstrained;
       }
 
       static inline DEAL_II_ALWAYS_INLINE
@@ -152,6 +168,22 @@ namespace internal
         return fe_eval.get_shape_info()
           .data.front()
           .subface_interpolation_matrices;
+      }
+
+      static inline DEAL_II_ALWAYS_INLINE bool
+      do_break(unsigned int v, const MatrixFreeFunctions::ConstraintKinds &kind)
+      {
+        (void)v;
+        (void)kind;
+        return false;
+      }
+
+      static inline DEAL_II_ALWAYS_INLINE bool
+      do_continue(unsigned int                                v,
+                  const MatrixFreeFunctions::ConstraintKinds &kind)
+      {
+        (void)v;
+        return kind == MatrixFreeFunctions::ConstraintKinds::unconstrained;
       }
 
       static inline DEAL_II_ALWAYS_INLINE index_type
@@ -203,6 +235,21 @@ namespace internal
         return fe_eval.get_shape_info()
           .data.front()
           .subface_interpolation_matrices;
+      }
+
+      static inline DEAL_II_ALWAYS_INLINE bool
+      do_break(unsigned int v, const MatrixFreeFunctions::ConstraintKinds &kind)
+      {
+        (void)v;
+        return kind == MatrixFreeFunctions::ConstraintKinds::unconstrained;
+      }
+
+      static inline DEAL_II_ALWAYS_INLINE bool
+      do_continue(unsigned int                                v,
+                  const MatrixFreeFunctions::ConstraintKinds &kind)
+      {
+        (void)v;
+        return kind == MatrixFreeFunctions::ConstraintKinds::unconstrained;
       }
 
       static inline DEAL_II_ALWAYS_INLINE index_type
@@ -424,21 +471,24 @@ namespace internal
       const auto &interpolation_matrices =
         Trait<Number, VectorizationType>::get_interpolation_matrix(fe_eval);
 
-      const auto constraint_mask_new =
+      const auto constraint_mask_sorted =
         Trait<Number, VectorizationType>::create_mask(constraint_mask);
 
       for (unsigned int c = 0; c < n_desired_components; ++c)
         {
           for (unsigned int v = 0; v < Number::size(); ++v)
             {
-              const auto mask = constraint_mask_new[v];
+              const auto mask = constraint_mask_sorted[v];
 
-              if (mask == MatrixFreeFunctions::ConstraintKinds::unconstrained)
+              if (Trait<Number, VectorizationType>::do_break(v, mask))
+                continue;
+
+              if (Trait<Number, VectorizationType>::do_continue(v, mask))
                 continue;
 
               const auto vv =
                 Trait<Number, VectorizationType>::create(constraint_mask,
-                                                         constraint_mask_new,
+                                                         constraint_mask_sorted,
                                                          v);
 
               if (dim == 2) // 2D: only faces
