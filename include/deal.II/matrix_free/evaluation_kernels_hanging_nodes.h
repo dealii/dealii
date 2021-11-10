@@ -73,9 +73,9 @@ namespace internal
     };
 
     static const VectorizationTypes VectorizationType =
-      VectorizationTypes::group;
+      VectorizationTypes::index;
 
-    static const unsigned int max_n_points_1D = 40;
+    static constexpr unsigned int max_n_points_1D = 40;
 
     template <typename T1, VectorizationTypes VT>
     struct Trait;
