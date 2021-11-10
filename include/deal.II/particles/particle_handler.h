@@ -152,6 +152,23 @@ namespace Particles
     clear_particles();
 
     /**
+     * This function can be used to preemptively reserve memory for particle
+     * data. Calling this function before inserting particles will reduce
+     * memory allocations and therefore increase the performance. Calling
+     * this function is optional; if memory is not already allocated it will
+     * be allocated automatically during the insertion. It is recommended to
+     * use this function if you know the number of particles that will be
+     * inserted, but cannot use one of the collective particle insertion
+     * functions.
+     *
+     * @param n_particles Number of particles to reserve memory for. Note that
+     * this is the total number of particles to be stored, not the number of
+     * particles to be newly inserted.
+     */
+    void
+    reserve(std::size_t n_particles);
+
+    /**
      * Update all internally cached numbers. Note that all functions that
      * modify internal data structures and act on multiple particles will
      * call this function automatically (e.g. insert_particles), while
@@ -269,6 +286,20 @@ namespace Particles
     insert_particle(
       const Particle<dim, spacedim> &particle,
       const typename Triangulation<dim, spacedim>::active_cell_iterator &cell);
+
+    /**
+     * Insert a particle into the collection of particles given all the
+     * properties necessary for a particle. This function is used internally to
+     * efficiently generate particles without the detour through a Particle
+     * object.
+     */
+    particle_iterator
+    insert_particle(
+      const Point<spacedim> &     position,
+      const Point<dim> &          reference_position,
+      const types::particle_index particle_index,
+      const typename Triangulation<dim, spacedim>::active_cell_iterator &cell,
+      const ArrayView<const double> &properties = {});
 
     /**
      * Insert a number of particles into the collection of particles.
@@ -863,20 +894,6 @@ namespace Particles
     insert_particle(
       const void *&                                                      data,
       const typename Triangulation<dim, spacedim>::active_cell_iterator &cell);
-
-    /**
-     * Insert a particle into the collection of particles given all the
-     * properties necessary for a particle. This function is used internally to
-     * efficiently generate particles without the detour through a Particle
-     * object.
-     */
-    particle_iterator
-    insert_particle(
-      const Point<spacedim> &     position,
-      const Point<dim> &          reference_position,
-      const types::particle_index particle_index,
-      const typename Triangulation<dim, spacedim>::active_cell_iterator &cell,
-      const ArrayView<const double> &properties = {});
 
     /**
      * Perform the local insertion operation into the particle container. This

@@ -223,6 +223,15 @@ namespace Particles
 
   template <int dim, int spacedim>
   void
+  ParticleHandler<dim, spacedim>::reserve(std::size_t n_particles)
+  {
+    property_pool->reserve(n_particles);
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
   ParticleHandler<dim, spacedim>::reset_particle_container(
     particle_container &given_particles)
   {
@@ -668,6 +677,7 @@ namespace Particles
       typename Triangulation<dim, spacedim>::active_cell_iterator,
       Particle<dim, spacedim>> &new_particles)
   {
+    reserve(n_locally_owned_particles() + new_particles.size());
     for (const auto &cell_and_particle : new_particles)
       insert_particle(cell_and_particle.second, cell_and_particle.first);
 
@@ -684,6 +694,7 @@ namespace Particles
     Assert(triangulation != nullptr, ExcInternalError());
 
     update_cached_numbers();
+    reserve(n_locally_owned_particles() + positions.size());
 
     // Determine the starting particle index of this process, which
     // is the highest currently existing particle index plus the sum
