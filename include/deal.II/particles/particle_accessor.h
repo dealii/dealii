@@ -46,10 +46,71 @@ namespace Particles
   {
   public:
     /**
+     * Data structure to describe the particles in a given cell. This is used
+     * inside an std::list in `particle_container`. The storage of this field
+     * is typically handled by ParticleHandler, using an std::list of this
+     * structure.
+     *
+     * There are four main reasons for the present design:
+     * <ul>
+     * <li>The list represents a compact storage for all particles on a cell,
+     * handling e.g. the case where only a few cells hold particles without
+     * storage overhead.</li>
+     * <li>The particles on a cell are identified by their handle object,
+     * i.e., a single integer, again ensuring only 4 byte storage cost for the
+     * handling of the particles for the case of sufficiently many particles
+     * per cell.</li>
+     * <li>Combined with a cache object that holds an iterator to the
+     * `std::list` of particles (8 bytes per cell), or the `std::list::end` in
+     * case no particles are present on a cell, there is a fast access from a
+     * ParticleAccessor -> surrounding cell (by access to
+     * ParticlesInCell::cell_iterator), as well as fast access from cell ->
+     * all particles (through the cache). It also allows for a fast iteration
+     * through all particles, by incrementing either the index of particles
+     * within a cell, or, if at the end of the cell, to the next element in
+     * the outer list. The cache is simple to keep consistent because the
+     * iterators into `std::list` remain valid upon insertion or deletion of
+     * entries in the list, as specified by `std::list`'s API.
+     * <li>In order to detect the start and end of all cells with particles,
+     * the std::list contains some dummy entry with a `cell_iterator` past the
+     * end of valid cells, which is used as a criterion to terminate the loops
+     * of ParticleAccessor, again minimizing the computational cost of handling
+     * the loop over particles.</li>
+     * </ul>
+     */
+    struct ParticlesInCell
+    {
+      /**
+       * Default constructor.
+       */
+      ParticlesInCell() = default;
+
+      /**
+       * Construct from a vector of particles and a cell iterator.
+       */
+      ParticlesInCell(
+        const std::vector<typename PropertyPool<dim, spacedim>::Handle>
+          &particles,
+        const typename Triangulation<dim, spacedim>::active_cell_iterator &cell)
+        : particles(particles)
+        , cell(cell)
+      {}
+
+      /**
+       * A vector of particles on a cell.
+       */
+      std::vector<typename PropertyPool<dim, spacedim>::Handle> particles;
+
+      /**
+       * The underlying cell.
+       */
+      typename Triangulation<dim, spacedim>::active_cell_iterator cell;
+    };
+
+    /**
      * A type for the storage container for particles.
      */
-    using particle_container =
-      std::vector<std::vector<typename PropertyPool<dim, spacedim>::Handle>>;
+    using particle_container = std::list<ParticlesInCell>;
 
     /**
      * @copydoc Particle::write_particle_data_to_memory
@@ -358,10 +419,9 @@ namespace Particles
      * friend classes.
      */
     ParticleAccessor(
-      const particle_container &         particles,
-      const PropertyPool<dim, spacedim> &property_pool,
-      const typename Triangulation<dim, spacedim>::active_cell_iterator &cell,
-      const unsigned int particle_index_within_cell);
+      const typename particle_container::iterator particles_in_cell,
+      const PropertyPool<dim, spacedim> &         property_pool,
+      const unsigned int                          particle_index_within_cell);
 
     /**
      * Returns a reference to the current Particle. Because the
@@ -378,20 +438,15 @@ namespace Particles
     get_handle();
 
     /**
-     * A pointer to the container that stores the particles. Obviously,
-     * this accessor becomes invalid if the container changes.
+     * An iterator to the particles in the current cell within the
+     * particle_container object.
      */
-    typename particle_container::iterator particles_on_cell;
+    typename particle_container::iterator particles_in_cell;
 
     /**
      * A pointer to the property pool that stores the actual particle data.
      */
     PropertyPool<dim, spacedim> *property_pool;
-
-    /**
-     * Cell iterator to the cell of the current particle.
-     */
-    typename Triangulation<dim, spacedim>::active_cell_iterator cell;
 
     /**
      * Local index of the particle within its current cell.
@@ -468,9 +523,8 @@ namespace Particles
 
   template <int dim, int spacedim>
   inline ParticleAccessor<dim, spacedim>::ParticleAccessor()
-    : particles_on_cell(typename particle_container::iterator())
+    : particles_in_cell(typename particle_container::iterator())
     , property_pool(nullptr)
-    , cell()
     , particle_index_within_cell(numbers::invalid_unsigned_int)
   {}
 
@@ -478,21 +532,13 @@ namespace Particles
 
   template <int dim, int spacedim>
   inline ParticleAccessor<dim, spacedim>::ParticleAccessor(
-    const particle_container &         particles,
-    const PropertyPool<dim, spacedim> &property_pool,
-    const typename Triangulation<dim, spacedim>::active_cell_iterator &cell,
-    const unsigned int particle_index_within_cell)
-    : property_pool(const_cast<PropertyPool<dim, spacedim> *>(&property_pool))
-    , cell(cell)
+    const typename particle_container::iterator particles_in_cell,
+    const PropertyPool<dim, spacedim> &         property_pool,
+    const unsigned int                          particle_index_within_cell)
+    : particles_in_cell(particles_in_cell)
+    , property_pool(const_cast<PropertyPool<dim, spacedim> *>(&property_pool))
     , particle_index_within_cell(particle_index_within_cell)
-  {
-    if (cell.state() == IteratorState::valid)
-      particles_on_cell =
-        const_cast<particle_container *>(&particles)->begin() +
-        cell->active_cell_index();
-    else
-      particles_on_cell = typename particle_container::iterator();
-  }
+  {}
 
 
 
@@ -749,8 +795,10 @@ namespace Particles
   ParticleAccessor<dim, spacedim>::get_surrounding_cell() const
   {
     Assert(state() == IteratorState::valid, ExcInternalError());
+    Assert(particles_in_cell->cell.state() == IteratorState::valid,
+           ExcInternalError());
 
-    return cell;
+    return particles_in_cell->cell;
   }
 
 
@@ -761,8 +809,10 @@ namespace Particles
     const Triangulation<dim, spacedim> & /*triangulation*/) const
   {
     Assert(state() == IteratorState::valid, ExcInternalError());
+    Assert(particles_in_cell->cell.state() == IteratorState::valid,
+           ExcInternalError());
 
-    return cell;
+    return particles_in_cell->cell;
   }
 
 
@@ -804,20 +854,10 @@ namespace Particles
 
     ++particle_index_within_cell;
 
-    if (particle_index_within_cell >= particles_on_cell->size())
+    if (particle_index_within_cell >= particles_in_cell->particles.size())
       {
-        const bool particle_is_locally_owned = cell->is_locally_owned();
-
         particle_index_within_cell = 0;
-
-        do
-          {
-            ++cell;
-            ++particles_on_cell;
-          }
-        while (cell.state() == IteratorState::valid &&
-               (particles_on_cell->empty() ||
-                cell->is_locally_owned() != particle_is_locally_owned));
+        ++particles_in_cell;
       }
   }
 
@@ -833,28 +873,10 @@ namespace Particles
       --particle_index_within_cell;
     else
       {
-        const bool particle_is_locally_owned = cell->is_locally_owned();
-
-        do
-          {
-            --cell;
-            --particles_on_cell;
-
-            if (cell.state() != IteratorState::valid)
-              {
-                particles_on_cell = {};
-                break;
-              }
-
-            if (!particles_on_cell->empty() &&
-                cell->is_locally_owned() == particle_is_locally_owned)
-              {
-                particle_index_within_cell = particles_on_cell->size() - 1;
-                break;
-              }
-          }
-        while (particles_on_cell->size() == 0 ||
-               cell->is_locally_owned() != particle_is_locally_owned);
+        --particles_in_cell;
+        particle_index_within_cell = particles_in_cell->particles.empty() ?
+                                       0 :
+                                       particles_in_cell->particles.size() - 1;
       }
   }
 
@@ -875,7 +897,8 @@ namespace Particles
   ParticleAccessor<dim, spacedim>::operator==(
     const ParticleAccessor<dim, spacedim> &other) const
   {
-    return (property_pool == other.property_pool) && (cell == other.cell) &&
+    return (property_pool == other.property_pool) &&
+           (particles_in_cell == other.particles_in_cell) &&
            (particle_index_within_cell == other.particle_index_within_cell);
   }
 
@@ -885,10 +908,12 @@ namespace Particles
   inline IteratorState::IteratorStates
   ParticleAccessor<dim, spacedim>::state() const
   {
-    if (property_pool != nullptr && cell.state() == IteratorState::valid &&
-        particle_index_within_cell < particles_on_cell->size())
+    if (property_pool != nullptr &&
+        particles_in_cell->cell.state() == IteratorState::valid &&
+        particle_index_within_cell < particles_in_cell->particles.size())
       return IteratorState::valid;
-    else if (cell.state() == IteratorState::past_the_end &&
+    else if (property_pool != nullptr &&
+             particles_in_cell->cell.state() == IteratorState::past_the_end &&
              particle_index_within_cell == 0)
       return IteratorState::past_the_end;
     else
@@ -903,7 +928,7 @@ namespace Particles
   inline typename PropertyPool<dim, spacedim>::Handle &
   ParticleAccessor<dim, spacedim>::get_handle()
   {
-    return (*particles_on_cell)[particle_index_within_cell];
+    return particles_in_cell->particles[particle_index_within_cell];
   }
 
 
@@ -912,7 +937,7 @@ namespace Particles
   inline const typename PropertyPool<dim, spacedim>::Handle &
   ParticleAccessor<dim, spacedim>::get_handle() const
   {
-    return (*particles_on_cell)[particle_index_within_cell];
+    return particles_in_cell->particles[particle_index_within_cell];
   }
 
 } // namespace Particles
