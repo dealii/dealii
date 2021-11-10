@@ -1454,19 +1454,19 @@ namespace FETools
                         const FiniteElement<dim, spacedim> &fe2,
                         FullMatrix<number> &                matrix)
   {
-    Assert(fe1.n_components() == 1, ExcNotImplemented());
-    Assert(fe1.n_components() == fe2.n_components(),
-           ExcDimensionMismatch(fe1.n_components(), fe2.n_components()));
     Assert(matrix.m() == fe2.n_dofs_per_cell() &&
              matrix.n() == fe1.n_dofs_per_cell(),
            ExcMatrixDimensionMismatch(matrix.m(),
                                       matrix.n(),
                                       fe2.n_dofs_per_cell(),
                                       fe1.n_dofs_per_cell()));
+    AssertDimension(fe1.n_components(), fe2.n_components());
+
     matrix = 0;
 
     const unsigned int n1 = fe1.n_dofs_per_cell();
     const unsigned int n2 = fe2.n_dofs_per_cell();
+    const unsigned int nd = fe1.n_components();
 
     const ReferenceCell reference_cell = fe1.reference_cell();
 
@@ -1486,6 +1486,8 @@ namespace FETools
     const auto quadrature =
       reference_cell.get_gauss_type_quadrature<dim>(degree + 1);
 
+    const unsigned int nq = quadrature.size();
+
     // Set up FEValues.
     const UpdateFlags flags =
       update_values | update_quadrature_points | update_JxW_values;
@@ -1498,16 +1500,13 @@ namespace FETools
     // Integrate and invert mass matrix. This happens in the target space
     FullMatrix<double> mass(n2, n2);
 
-    for (unsigned int k = 0; k < quadrature.size(); ++k)
-      {
-        const double dx = val2.JxW(k);
-        for (unsigned int i = 0; i < n2; ++i)
-          {
-            const double v = val2.shape_value(i, k);
-            for (unsigned int j = 0; j < n2; ++j)
-              mass(i, j) += v * val2.shape_value(j, k) * dx;
-          }
-      }
+    for (unsigned int i = 0; i < n2; ++i)
+      for (unsigned int j = 0; j < n2; ++j)
+        for (unsigned int d = 0; d < nd; ++d)
+          for (unsigned int k = 0; k < nq; ++k)
+            mass(i, j) += val2.JxW(k) * val2.shape_value_component(i, k, d) *
+                          val2.shape_value_component(j, k, d);
+
     // Invert the matrix. Gauss-Jordan should be sufficient since we expect
     // the mass matrix to be well-conditioned
     mass.gauss_jordan();
@@ -1522,12 +1521,9 @@ namespace FETools
         b = 0.;
         for (unsigned int i = 0; i < n2; ++i)
           for (unsigned int k = 0; k < quadrature.size(); ++k)
-            {
-              const double dx = val2.JxW(k);
-              const double u  = val1.shape_value(j, k);
-              const double v  = val2.shape_value(i, k);
-              b(i) += u * v * dx;
-            }
+            for (unsigned int d = 0; d < nd; ++d)
+              b(i) += val1.shape_value_component(j, k, d) *
+                      val2.shape_value_component(i, k, d) * val2.JxW(k);
 
         // Multiply by the inverse
         mass.vmult(x, b);
