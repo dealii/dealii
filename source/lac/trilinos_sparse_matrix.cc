@@ -1956,10 +1956,17 @@ namespace TrilinosWrappers
                                 const TrilinosWrappers::MPI::Vector &out)
       {
         Assert(in.trilinos_partitioner().SameAs(m.DomainMap()) == true,
-               ExcMessage(
-                 "Column map of matrix does not fit with vector map!"));
+               ExcMessage("The column partitioning of a matrix does not match "
+                          "the partitioning of a vector you are trying to "
+                          "multiply it with. Are you multiplying the "
+                          "matrix with a vector that has ghost elements?"));
         Assert(out.trilinos_partitioner().SameAs(m.RangeMap()) == true,
-               ExcMessage("Row map of matrix does not fit with vector map!"));
+               ExcMessage("The row partitioning of a matrix does not match "
+                          "the partitioning of a vector you are trying to "
+                          "put the result of a matrix-vector product in. "
+                          "Are you trying to put the product of the "
+                          "matrix with a vector into a vector that has "
+                          "ghost elements?"));
         (void)m;
         (void)in;
         (void)out;
