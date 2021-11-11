@@ -676,7 +676,7 @@ namespace Step43
     {
       darcy_preconditioner_constraints.clear();
 
-      FEValuesExtractors::Scalar pressure(dim);
+      const FEValuesExtractors::Scalar pressure(dim);
 
       DoFTools::make_hanging_node_constraints(darcy_dof_handler,
                                               darcy_preconditioner_constraints);

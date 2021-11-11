@@ -1052,7 +1052,7 @@ namespace Step18
     // which vector components it should apply to; this is a vector of bools
     // for each vector component and because we only want to restrict vertical
     // motion, it has only its last component set:
-    FEValuesExtractors::Scalar                z_component(dim - 1);
+    const FEValuesExtractors::Scalar          z_component(dim - 1);
     std::map<types::global_dof_index, double> boundary_values;
     VectorTools::interpolate_boundary_values(dof_handler,
                                              0,

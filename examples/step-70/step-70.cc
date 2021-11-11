@@ -1240,7 +1240,7 @@ namespace Step70
     {
       constraints.reinit(locally_relevant_dofs);
 
-      FEValuesExtractors::Vector velocities(0);
+      const FEValuesExtractors::Vector velocities(0);
       DoFTools::make_hanging_node_constraints(fluid_dh, constraints);
       VectorTools::interpolate_boundary_values(
         fluid_dh,
