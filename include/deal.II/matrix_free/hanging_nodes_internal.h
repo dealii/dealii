@@ -42,8 +42,7 @@ namespace internal
      * the type, or the position of an element along each direction. The
      * second field determines if there is a constrained face with that
      * direction as normal. The last field determines if there is a
-     * constrained edge of a given pair of coordinate planes, but where
-     * neither of the corresponding faces are constrained (only valid in 3D).
+     * constrained edge in that direction (only valid in 3D).
      *
      * The element is placed in the 'first position' along *-axis. These also
      * determine which face is constrained. For example, in 2D, if
@@ -63,9 +62,9 @@ namespace internal
       face_z = 1 << 5,
 
       // Element has as a constraint at * = 0 or * = fe_degree edge
-      edge_xy = 1 << 6,
-      edge_yz = 1 << 7,
-      edge_zx = 1 << 8
+      edge_x = 1 << 6,
+      edge_y = 1 << 7,
+      edge_z = 1 << 8
     };
 
 
@@ -552,51 +551,51 @@ namespace internal
                 // and what is the type along the edge.
                 const ConstraintKinds line_to_edge[12][4] = {
                   {ConstraintKinds::face_x | ConstraintKinds::face_z,
-                   ConstraintKinds::edge_zx,
+                   ConstraintKinds::edge_y,
                    ConstraintKinds::type_x | ConstraintKinds::type_z,
                    ConstraintKinds::type_y},
                   {ConstraintKinds::face_x | ConstraintKinds::face_z,
-                   ConstraintKinds::edge_zx,
+                   ConstraintKinds::edge_y,
                    ConstraintKinds::type_z,
                    ConstraintKinds::type_y},
                   {ConstraintKinds::face_y | ConstraintKinds::face_z,
-                   ConstraintKinds::edge_yz,
+                   ConstraintKinds::edge_x,
                    ConstraintKinds::type_y | ConstraintKinds::type_z,
                    ConstraintKinds::type_x},
                   {ConstraintKinds::face_y | ConstraintKinds::face_z,
-                   ConstraintKinds::edge_yz,
+                   ConstraintKinds::edge_x,
                    ConstraintKinds::type_z,
                    ConstraintKinds::type_x},
                   {ConstraintKinds::face_x | ConstraintKinds::face_z,
-                   ConstraintKinds::edge_zx,
+                   ConstraintKinds::edge_y,
                    ConstraintKinds::type_x,
                    ConstraintKinds::type_y},
                   {ConstraintKinds::face_x | ConstraintKinds::face_z,
-                   ConstraintKinds::edge_zx,
+                   ConstraintKinds::edge_y,
                    ConstraintKinds::unconstrained,
                    ConstraintKinds::type_y},
                   {ConstraintKinds::face_y | ConstraintKinds::face_z,
-                   ConstraintKinds::edge_yz,
+                   ConstraintKinds::edge_x,
                    ConstraintKinds::type_y,
                    ConstraintKinds::type_x},
                   {ConstraintKinds::face_y | ConstraintKinds::face_z,
-                   ConstraintKinds::edge_yz,
+                   ConstraintKinds::edge_x,
                    ConstraintKinds::unconstrained,
                    ConstraintKinds::type_x},
                   {ConstraintKinds::face_x | ConstraintKinds::face_y,
-                   ConstraintKinds::edge_xy,
+                   ConstraintKinds::edge_z,
                    ConstraintKinds::type_x | ConstraintKinds::type_y,
                    ConstraintKinds::type_z},
                   {ConstraintKinds::face_x | ConstraintKinds::face_y,
-                   ConstraintKinds::edge_xy,
+                   ConstraintKinds::edge_z,
                    ConstraintKinds::type_y,
                    ConstraintKinds::type_z},
                   {ConstraintKinds::face_x | ConstraintKinds::face_y,
-                   ConstraintKinds::edge_xy,
+                   ConstraintKinds::edge_z,
                    ConstraintKinds::type_x,
                    ConstraintKinds::type_z},
                   {ConstraintKinds::face_x | ConstraintKinds::face_y,
-                   ConstraintKinds::edge_xy,
+                   ConstraintKinds::edge_z,
                    ConstraintKinds::unconstrained,
                    ConstraintKinds::type_z}};
 
