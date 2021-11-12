@@ -209,10 +209,10 @@ namespace CUDAWrappers
           dealii::internal::MatrixFreeFunctions::ConstraintKinds::face_y;
       const auto edge =
         (direction == 0) ?
-          dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_yz :
+          dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_x :
         (direction == 1) ?
-          dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_zx :
-          dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_xy;
+          dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_y :
+          dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_z;
       const auto constrained_face = constraint_mask & (face1 | face2 | edge);
 
       const unsigned int interp_idx = (direction == 0) ? x_idx :
