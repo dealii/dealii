@@ -2595,9 +2595,39 @@ template <int dim, int spacedim>
 class FEValuesBase<dim, spacedim>::CellIteratorBase
 {
 public:
+  DeclExceptionMsg(
+    ExcNeedsDoFHandler,
+    "You have previously called the FEValues::reinit function with a "
+    "cell iterator of type Triangulation<dim,spacedim>::cell_iterator. However, "
+    "when you do this, you cannot call some functions in the FEValues "
+    "class, such as the get_function_values/gradients/hessians/third_derivatives "
+    "functions. If you need these functions, then you need to call "
+    "FEValues::reinit with an iterator type that allows to extract "
+    "degrees of freedom, such as DoFHandler<dim,spacedim>::cell_iterator.");
+
   /**
-   * Destructor. Made virtual since we store only
-   * pointers to the base class.
+   * Constructor.
+   */
+  template <bool lda>
+  CellIteratorBase(
+    const TriaIterator<DoFCellAccessor<dim, spacedim, lda>> &cell)
+    : cell(cell)
+    , dof_handler(&cell->get_dof_handler())
+    , level_dof_access(lda)
+  {}
+
+  /**
+   * Constructor.
+   */
+  CellIteratorBase(
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell)
+    : cell(cell)
+    , dof_handler(nullptr)
+    , level_dof_access(false)
+  {}
+
+  /**
+   * Destructor.
    */
   virtual ~CellIteratorBase() = default;
 
@@ -2607,260 +2637,74 @@ public:
    * classes. However, since here we have kind of a parallel class hierarchy,
    * we have to have a conversion operator.
    */
-  virtual
-  operator typename Triangulation<dim, spacedim>::cell_iterator() const = 0;
+  operator typename Triangulation<dim, spacedim>::cell_iterator() const
+  {
+    return cell;
+  }
 
   /**
    * Return the number of degrees of freedom the DoF
    * handler object has to which the iterator belongs to.
    */
-  virtual types::global_dof_index
-  n_dofs_for_dof_handler() const = 0;
-
-#include "fe_values.decl.1.inst"
-
-  /**
-   * Call @p get_interpolated_dof_values of the iterator with the
-   * given arguments.
-   */
-  virtual void
-  get_interpolated_dof_values(const IndexSet &              in,
-                              Vector<IndexSet::value_type> &out) const = 0;
-};
-
-/* --- classes derived from FEValuesBase<dim,spacedim>::CellIteratorBase --- */
-
-
-/**
- * Implementation of derived classes of the CellIteratorBase
- * interface. See there for a description of the use of these classes.
- */
-template <int dim, int spacedim>
-template <typename CI>
-class FEValuesBase<dim, spacedim>::CellIterator
-  : public FEValuesBase<dim, spacedim>::CellIteratorBase
-{
-public:
-  /**
-   * Constructor. Take an iterator and store it in this class.
-   */
-  CellIterator(const CI &cell);
-
-  /**
-   * Conversion operator to an iterator for triangulations. This
-   * conversion is implicit for the original iterators, since they are derived
-   * classes. However, since here we have kind of a parallel class hierarchy,
-   * we have to have a conversion operator.
-   */
-  virtual operator typename Triangulation<dim, spacedim>::cell_iterator()
-    const override;
-
-  /**
-   * Return the number of degrees of freedom the DoF handler object has to
-   * which the iterator belongs to.
-   */
-  virtual types::global_dof_index
-  n_dofs_for_dof_handler() const override;
-
-#include "fe_values.decl.2.inst"
-
-  /**
-   * Call @p get_interpolated_dof_values
-   * of the iterator with the given arguments.
-   */
-  virtual void
-  get_interpolated_dof_values(const IndexSet &              in,
-                              Vector<IndexSet::value_type> &out) const override;
-
-private:
-  /**
-   * Copy of the iterator which we use in this object.
-   */
-  const CI cell;
-};
-
-
-/**
- * Implementation of a derived class of the CellIteratorBase
- * interface. See there for a description of the use of
- * these classes.
- *
- * This class is basically a specialization of the general template for
- * iterators into Triangulation objects (but since C++ does not allow something
- * like this for nested classes, it runs under a separate name). Since these do
- * not implement the interface that we would like to call, the functions of this
- * class cannot be implemented meaningfully. However, most functions of the
- * FEValues class do not make any use of degrees of freedom at all, so it should
- * be possible to call FEValues::reinit() with a tria iterator only; this class
- * makes this possible, but whenever one of the functions of FEValues tries to
- * call any of the functions of this class, an exception will be raised
- * reminding the user that if they want to use these features, then the FEValues
- * object has to be reinitialized with a cell iterator that allows to extract
- * degree of freedom information.
- */
-template <int dim, int spacedim>
-class FEValuesBase<dim, spacedim>::TriaCellIterator
-  : public FEValuesBase<dim, spacedim>::CellIteratorBase
-{
-public:
-  /**
-   * Constructor. Take an iterator and store it in this class.
-   */
-  TriaCellIterator(
-    const typename Triangulation<dim, spacedim>::cell_iterator &cell);
-
-  /**
-   * Conversion operator to an iterator for triangulations. This
-   * conversion is implicit for the original iterators, since they are derived
-   * classes. However, since here we have kind of a parallel class hierarchy,
-   * we have to have a conversion operator. Here, the conversion is trivial,
-   * from and to the same time.
-   */
-  virtual operator typename Triangulation<dim, spacedim>::cell_iterator()
-    const override;
-
-  /**
-   * Implement the respective function of the base class. Since this is not
-   * possible, we just raise an error.
-   */
-  virtual types::global_dof_index
-  n_dofs_for_dof_handler() const override;
-
-#include "fe_values.decl.2.inst"
+  types::global_dof_index
+  n_dofs_for_dof_handler() const
+  {
+    Assert(dof_handler != nullptr, ExcNeedsDoFHandler());
+    return dof_handler->n_dofs();
+  }
 
   /**
    * Call @p get_interpolated_dof_values of the iterator with the
    * given arguments.
    */
-  virtual void
-  get_interpolated_dof_values(const IndexSet &              in,
-                              Vector<IndexSet::value_type> &out) const override;
+  template <typename VectorType>
+  void
+  get_interpolated_dof_values(
+    const VectorType &                       in,
+    Vector<typename VectorType::value_type> &out) const
+  {
+    Assert(dof_handler != nullptr, ExcNeedsDoFHandler());
 
-private:
+    if (level_dof_access)
+      DoFCellAccessor<dim, spacedim, true>(&cell->get_triangulation(),
+                                           cell->level(),
+                                           cell->index(),
+                                           dof_handler)
+        .get_interpolated_dof_values(in, out);
+    else
+      DoFCellAccessor<dim, spacedim, false>(&cell->get_triangulation(),
+                                            cell->level(),
+                                            cell->index(),
+                                            dof_handler)
+        .get_interpolated_dof_values(in, out);
+  }
+
   /**
-   * Copy of the iterator which we use in this object.
+   * Call @p get_interpolated_dof_values of the iterator with the
+   * given arguments.
    */
+  void
+  get_interpolated_dof_values(const IndexSet &              in,
+                              Vector<IndexSet::value_type> &out) const
+  {
+    Assert(dof_handler != nullptr, ExcNeedsDoFHandler());
+    Assert(level_dof_access == false, ExcNotImplemented());
+
+    const DoFCellAccessor<dim, spacedim, false> cell_dofs(
+      &cell->get_triangulation(), cell->level(), cell->index(), dof_handler);
+
+    std::vector<types::global_dof_index> dof_indices(
+      cell_dofs.get_fe().n_dofs_per_cell());
+    cell_dofs.get_dof_indices(dof_indices);
+
+    for (unsigned int i = 0; i < cell_dofs.get_fe().n_dofs_per_cell(); ++i)
+      out[i] = (in.is_element(dof_indices[i]) ? 1 : 0);
+  }
+
   const typename Triangulation<dim, spacedim>::cell_iterator cell;
-
-  /**
-   * String to be displayed whenever one of the functions of this class is
-   * called. Make it a static member variable, since we show the same message
-   * for all member functions.
-   */
-  static const char *const message_string;
+  const DoFHandler<dim, spacedim> *                          dof_handler;
+  const bool                                                 level_dof_access;
 };
-
-
-
-/* ---------------- FEValuesBase<dim,spacedim>::CellIterator<CI> --------- */
-
-
-template <int dim, int spacedim>
-template <typename CI>
-FEValuesBase<dim, spacedim>::CellIterator<CI>::CellIterator(const CI &cell)
-  : cell(cell)
-{}
-
-
-
-template <int dim, int spacedim>
-template <typename CI>
-FEValuesBase<dim, spacedim>::CellIterator<
-  CI>::operator typename Triangulation<dim, spacedim>::cell_iterator() const
-{
-  return cell;
-}
-
-
-
-template <int dim, int spacedim>
-template <typename CI>
-types::global_dof_index
-FEValuesBase<dim, spacedim>::CellIterator<CI>::n_dofs_for_dof_handler() const
-{
-  return cell->get_dof_handler().n_dofs();
-}
-
-
-
-#include "fe_values.impl.1.inst"
-
-
-
-template <int dim, int spacedim>
-template <typename CI>
-void
-FEValuesBase<dim, spacedim>::CellIterator<CI>::get_interpolated_dof_values(
-  const IndexSet &              in,
-  Vector<IndexSet::value_type> &out) const
-{
-  Assert(cell->is_active(), ExcNotImplemented());
-
-  std::vector<types::global_dof_index> dof_indices(
-    cell->get_fe().n_dofs_per_cell());
-  cell->get_dof_indices(dof_indices);
-
-  for (unsigned int i = 0; i < cell->get_fe().n_dofs_per_cell(); ++i)
-    out[i] = (in.is_element(dof_indices[i]) ? 1 : 0);
-}
-
-
-/* ---------------- FEValuesBase<dim,spacedim>::TriaCellIterator --------- */
-
-template <int dim, int spacedim>
-const char *const FEValuesBase<dim,
-                               spacedim>::TriaCellIterator::message_string =
-  ("You have previously called the FEValues::reinit function with a\n"
-   "cell iterator of type Triangulation<dim,spacedim>::cell_iterator. However,\n"
-   "when you do this, you cannot call some functions in the FEValues\n"
-   "class, such as the get_function_values/gradients/hessians/third_derivatives\n"
-   "functions. If you need these functions, then you need to call\n"
-   "FEValues::reinit with an iterator type that allows to extract\n"
-   "degrees of freedom, such as DoFHandler<dim,spacedim>::cell_iterator.");
-
-
-
-template <int dim, int spacedim>
-FEValuesBase<dim, spacedim>::TriaCellIterator::TriaCellIterator(
-  const typename Triangulation<dim, spacedim>::cell_iterator &cell)
-  : cell(cell)
-{}
-
-
-
-template <int dim, int spacedim>
-FEValuesBase<dim, spacedim>::TriaCellIterator::
-operator typename Triangulation<dim, spacedim>::cell_iterator() const
-{
-  return cell;
-}
-
-
-
-template <int dim, int spacedim>
-types::global_dof_index
-FEValuesBase<dim, spacedim>::TriaCellIterator::n_dofs_for_dof_handler() const
-{
-  Assert(false, ExcMessage(message_string));
-  return 0;
-}
-
-
-
-#include "fe_values.impl.2.inst"
-
-
-
-template <int dim, int spacedim>
-void
-FEValuesBase<dim, spacedim>::TriaCellIterator::get_interpolated_dof_values(
-  const IndexSet &,
-  Vector<IndexSet::value_type> &) const
-{
-  Assert(false, ExcMessage(message_string));
-}
-
-
 
 namespace internal
 {
@@ -4498,7 +4342,7 @@ FEValues<dim, spacedim>::reinit(
   this->check_cell_similarity(cell);
 
   reset_pointer_in_place_if_possible<
-    typename FEValuesBase<dim, spacedim>::TriaCellIterator>(this->present_cell,
+    typename FEValuesBase<dim, spacedim>::CellIteratorBase>(this->present_cell,
                                                             cell);
 
   // this was the part of the work that is dependent on the actual
@@ -4532,9 +4376,8 @@ FEValues<dim, spacedim>::reinit(
   this->check_cell_similarity(cell);
 
   reset_pointer_in_place_if_possible<
-    typename FEValuesBase<dim, spacedim>::template CellIterator<
-      TriaIterator<DoFCellAccessor<dim, spacedim, lda>>>>(this->present_cell,
-                                                          cell);
+    typename FEValuesBase<dim, spacedim>::CellIteratorBase>(this->present_cell,
+                                                            cell);
 
   // this was the part of the work that is dependent on the actual
   // data type of the iterator. now pass on to the function doing
@@ -4800,9 +4643,8 @@ FEFaceValues<dim, spacedim>::reinit(
 
   this->maybe_invalidate_previous_present_cell(cell);
   reset_pointer_in_place_if_possible<
-    typename FEValuesBase<dim, spacedim>::template CellIterator<
-      TriaIterator<DoFCellAccessor<dim, spacedim, lda>>>>(this->present_cell,
-                                                          cell);
+    typename FEValuesBase<dim, spacedim>::CellIteratorBase>(this->present_cell,
+                                                            cell);
 
   // this was the part of the work that is dependent on the actual
   // data type of the iterator. now pass on to the function doing
@@ -4835,7 +4677,7 @@ FEFaceValues<dim, spacedim>::reinit(
 
   this->maybe_invalidate_previous_present_cell(cell);
   reset_pointer_in_place_if_possible<
-    typename FEValuesBase<dim, spacedim>::TriaCellIterator>(this->present_cell,
+    typename FEValuesBase<dim, spacedim>::CellIteratorBase>(this->present_cell,
                                                             cell);
 
   // this was the part of the work that is dependent on the actual
@@ -5048,9 +4890,8 @@ FESubfaceValues<dim, spacedim>::reinit(
 
   this->maybe_invalidate_previous_present_cell(cell);
   reset_pointer_in_place_if_possible<
-    typename FEValuesBase<dim, spacedim>::template CellIterator<
-      TriaIterator<DoFCellAccessor<dim, spacedim, lda>>>>(this->present_cell,
-                                                          cell);
+    typename FEValuesBase<dim, spacedim>::CellIteratorBase>(this->present_cell,
+                                                            cell);
 
   // this was the part of the work that is dependent on the actual
   // data type of the iterator. now pass on to the function doing
@@ -5096,7 +4937,7 @@ FESubfaceValues<dim, spacedim>::reinit(
 
   this->maybe_invalidate_previous_present_cell(cell);
   reset_pointer_in_place_if_possible<
-    typename FEValuesBase<dim, spacedim>::TriaCellIterator>(this->present_cell,
+    typename FEValuesBase<dim, spacedim>::CellIteratorBase>(this->present_cell,
                                                             cell);
 
   // this was the part of the work that is dependent on the actual
