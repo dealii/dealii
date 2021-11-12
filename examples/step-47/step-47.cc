@@ -831,8 +831,8 @@ namespace Step47
                               update_values | update_hessians |
                                 update_quadrature_points | update_JxW_values);
 
-      FEValuesExtractors::Scalar scalar(0);
-      const unsigned int         n_q_points = quadrature_formula.size();
+      const FEValuesExtractors::Scalar scalar(0);
+      const unsigned int               n_q_points = quadrature_formula.size();
 
       std::vector<SymmetricTensor<2, dim>> exact_hessians(n_q_points);
       std::vector<Tensor<2, dim>>          hessians(n_q_points);

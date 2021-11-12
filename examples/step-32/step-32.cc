@@ -1894,7 +1894,7 @@ namespace Step32
       DoFTools::make_hanging_node_constraints(stokes_dof_handler,
                                               stokes_constraints);
 
-      FEValuesExtractors::Vector velocity_components(0);
+      const FEValuesExtractors::Vector velocity_components(0);
       VectorTools::interpolate_boundary_values(
         stokes_dof_handler,
         0,
@@ -2162,8 +2162,8 @@ namespace Step32
 
     assemble_stokes_preconditioner();
 
-    std::vector<std::vector<bool>> constant_modes;
-    FEValuesExtractors::Vector     velocity_components(0);
+    std::vector<std::vector<bool>>   constant_modes;
+    const FEValuesExtractors::Vector velocity_components(0);
     DoFTools::extract_constant_modes(stokes_dof_handler,
                                      stokes_fe.component_mask(
                                        velocity_components),

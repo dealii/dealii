@@ -1136,8 +1136,8 @@ namespace Step51
     scratch.fe_values_local.reinit(loc_cell);
     scratch.fe_values.reinit(cell);
 
-    FEValuesExtractors::Vector fluxes(0);
-    FEValuesExtractors::Scalar scalar(dim);
+    const FEValuesExtractors::Vector fluxes(0);
+    const FEValuesExtractors::Scalar scalar(dim);
 
     const unsigned int n_q_points = scratch.fe_values.get_quadrature().size();
     const unsigned int dofs_per_cell = scratch.fe_values.dofs_per_cell;
@@ -1316,7 +1316,7 @@ namespace Step51
               Vector<float> estimated_error_per_cell(
                 triangulation.n_active_cells());
 
-              FEValuesExtractors::Scalar scalar(dim);
+              const FEValuesExtractors::Scalar scalar(dim);
               std::map<types::boundary_id, const Function<dim> *>
                 neumann_boundary;
               KellyErrorEstimator<dim>::estimate(dof_handler_local,
