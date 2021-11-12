@@ -44,10 +44,20 @@ ELSE()
       STRING(REGEX REPLACE "\\$<\\$<LINK_LANGUAGE:CXX>:([^>]*)>" "\\1" KOKKOS_EXTRA_LD_FLAGS "${KOKKOS_EXTRA_LD_FLAGS_FULL}")
       GET_PROPERTY(KOKKOS_COMPILE_FLAGS_FULL TARGET Kokkos::kokkoscore PROPERTY INTERFACE_COMPILE_OPTIONS)
       STRING(REGEX REPLACE "\\$<\\$<COMPILE_LANGUAGE:CXX>:([^>]*)>" "\\1" KOKKOS_COMPILE_FLAGS "${KOKKOS_COMPILE_FLAGS_FULL}")
-      # In serial the flag is empty but ADD_FLAGS does not support adding an empty
-      # flag
-      IF(KOKKOS_COMPILE_FLAGS)
-        ADD_FLAGS(DEAL_II_CXX_FLAGS ${KOKKOS_COMPILE_FLAGS})
+      STRING(REGEX REPLACE ";" " " KOKKOS_COMPILE_FLAGS_STR "${KOKKOS_COMPILE_FLAGS}")
+      ADD_FLAGS(DEAL_II_CXX_FLAGS "${KOKKOS_COMPILE_FLAGS_STR}")
+
+      # We need to disable SIMD vectorization for CUDA device code.
+      # Otherwise, nvcc compilers from version 9 on will emit an error message like:
+      # "[...] contains a vector, which is not supported in device code". We
+      # would like to set the variable in check_01_cpu_feature but at that point
+      # we don't know if CUDA support is enabled in Kokkos
+      IF(Kokkos_ENABLE_CUDA)
+        SET(DEAL_II_VECTORIZATION_WIDTH_IN_BITS 0)
+        IF(DEAL_II_WITH_KOKKOS_BACKEND)
+          # Require lambda support to use Kokkos as a backend
+          KOKKOS_CHECK(OPTIONS CUDA_LAMBDA)
+        ENDIF()
       ENDIF()
 
       DEAL_II_FIND_LIBRARY(KOKKOS_CORE_LIBRARY
