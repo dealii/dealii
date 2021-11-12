@@ -289,9 +289,18 @@ namespace Particles
 
     /**
      * Insert a particle into the collection of particles given all the
-     * properties necessary for a particle. This function is used internally to
+     * properties necessary for creating a particle. This function is used to
      * efficiently generate particles without the detour through a Particle
      * object.
+     *
+     * @param[in] position Initial position of the particle in real space.
+     * @param[in] reference_position Initial position of the particle
+     * in the coordinate system of the reference cell.
+     * @param[in] particle_index Globally unique identifier for this particle.
+     * @param[in] cell The cell in which the particle is located.
+     * @param[in] properties An optional ArrayView that describes the
+     * particle properties. If given this has to be of size
+     * n_properties_per_particle().
      */
     particle_iterator
     insert_particle(
