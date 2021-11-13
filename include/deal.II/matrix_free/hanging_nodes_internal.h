@@ -35,37 +35,77 @@ namespace internal
     /**
      * Here is the system for how we store constraint types in a binary mask.
      * This is not a complete contradiction-free system, i.e., there are
-     * invalid states that we just assume that we never get.
+     * invalid states. You can use internal::MatrixFreeFunctions::check()
+     * to check if the mask is in a valid state.
      *
      * If the mask is zero, there are no constraints. Then, there are three
      * different fields with one bit per dimension. The first field determines
-     * the type, or the position of an element along each direction. The
+     * the subcell, or the position of an element along each direction. The
      * second field determines if there is a constrained face with that
      * direction as normal. The last field determines if there is a
      * constrained edge in that direction (only valid in 3D).
-     *
-     * The element is placed in the 'first position' along *-axis. These also
-     * determine which face is constrained. For example, in 2D, if
-     * face_x and type are set, then x = 0 is constrained.
      */
     enum class ConstraintKinds : std::uint16_t
     {
+      // default: unconstrained cell
       unconstrained = 0,
 
+      // subcell
       type_x = 1 << 0,
       type_y = 1 << 1,
       type_z = 1 << 2,
 
-      // Element has as a constraint at * = 0 or * = fe_degree face
+      // face is constrained
       face_x = 1 << 3,
       face_y = 1 << 4,
       face_z = 1 << 5,
 
-      // Element has as a constraint at * = 0 or * = fe_degree edge
+      // edge is constrained
       edge_x = 1 << 6,
       edge_y = 1 << 7,
       edge_z = 1 << 8
     };
+
+
+
+    /**
+     * Check if the combinations of the bits in @p kind_in are valid.
+     */
+    inline bool
+    check(const ConstraintKinds &kind_in, const unsigned int dim)
+    {
+      const std::uint16_t kind    = static_cast<std::uint16_t>(kind_in);
+      const std::uint16_t subcell = (kind >> 0) & 7;
+      const std::uint16_t face    = (kind >> 3) & 7;
+      const std::uint16_t edge    = (kind >> 6) & 7;
+
+      if ((kind >> 9) > 0)
+        return false;
+
+      if (dim == 2)
+        {
+          if (edge > 0)
+            return false; // in 2D there are no edge constraints
+
+          if (subcell == 0 && face == 0)
+            return true; // no constraints
+          else if (0 < face)
+            return true; // at least one face is constrained
+        }
+      else if (dim == 3)
+        {
+          if (subcell == 0 && face == 0 && edge == 0)
+            return true; // no constraints
+          else if (0 < face && edge == 0)
+            return true; // at least one face is constrained
+          else if (0 == face && 0 < edge)
+            return true; // at least one edge is constrained
+          else if ((face == edge) && (face == 1 || face == 2 || face == 4))
+            return true; // one face and its orthogonal edge is constrained
+        }
+
+      return false;
+    }
 
 
 
@@ -707,6 +747,8 @@ namespace internal
                       }
                   }
               }
+            Assert(check(mask, dim), ExcInternalError());
+
             cell_has_hanging_node_constraints |=
               mask != ConstraintKinds::unconstrained;
           }
