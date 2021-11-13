@@ -2522,22 +2522,25 @@ namespace internal
         if (dim >= 2)
           process_subcelldata(connectivity.entity_to_entities(1, 0),
                               tria.faces->lines,
-                              subcelldata.boundary_lines);
+                              subcelldata.boundary_lines,
+                              vertices);
 
         // SubCellData: quad
         if (dim == 3)
           process_subcelldata(connectivity.entity_to_entities(2, 0),
                               tria.faces->quads,
-                              subcelldata.boundary_quads);
+                              subcelldata.boundary_quads,
+                              vertices);
       }
 
 
-      template <int structdim, typename T>
+      template <int structdim, int spacedim, typename T>
       static void
       process_subcelldata(
         const CRS<T> &                          crs,
         TriaObjects &                           obj,
-        const std::vector<CellData<structdim>> &boundary_objects_in)
+        const std::vector<CellData<structdim>> &boundary_objects_in,
+        const std::vector<Point<spacedim>> &    vertex_locations)
       {
         AssertDimension(obj.structdim, structdim);
 
@@ -2605,8 +2608,29 @@ namespace internal
             if (subcell_object->boundary_id !=
                 numbers::internal_face_boundary_id)
               {
-                AssertThrow(boundary_id != numbers::internal_face_boundary_id,
-                            ExcNotImplemented());
+                (void)vertex_locations;
+                AssertThrow(
+                  boundary_id != numbers::internal_face_boundary_id,
+                  ExcMessage(
+                    "The input arguments for creating a triangulation "
+                    "specified a boundary id for an internal face. This "
+                    "is not allowed."
+                    "\n\n"
+                    "The object in question has vertex indices " +
+                    [subcell_object]() {
+                      std::string s;
+                      for (const auto v : subcell_object->vertices)
+                        s += std::to_string(v) + ',';
+                      return s;
+                    }() +
+                    " which are located at positions " +
+                    [vertex_locations, subcell_object]() {
+                      std::ostringstream s;
+                      for (const auto v : subcell_object->vertices)
+                        s << '(' << vertex_locations[v] << ')';
+                      return s.str();
+                    }() +
+                    "."));
                 boundary_id = subcell_object->boundary_id;
               }
           }
