@@ -33,7 +33,6 @@
 #  include <memory>
 #  include <mutex>
 #  include <thread>
-#  include <tuple>
 #  include <utility>
 #  include <vector>
 
@@ -919,10 +918,8 @@ namespace Threads
     void
     join_all() const
     {
-      for (typename std::list<Thread<RT>>::const_iterator t = threads.begin();
-           t != threads.end();
-           ++t)
-        t->join();
+      for (auto &t : threads)
+        t.join();
     }
 
   private:
