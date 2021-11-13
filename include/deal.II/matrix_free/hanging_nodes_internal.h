@@ -51,9 +51,9 @@ namespace internal
       unconstrained = 0,
 
       // subcell
-      type_x = 1 << 0,
-      type_y = 1 << 1,
-      type_z = 1 << 2,
+      subcell_x = 1 << 0,
+      subcell_y = 1 << 1,
+      subcell_z = 1 << 2,
 
       // face is constrained
       face_x = 1 << 3,
@@ -456,17 +456,17 @@ namespace internal
                               {
                                 mask |= ConstraintKinds::face_x;
                                 if (face == 0)
-                                  mask |= ConstraintKinds::type_x;
+                                  mask |= ConstraintKinds::subcell_x;
                                 if (subface == 0)
-                                  mask |= ConstraintKinds::type_y;
+                                  mask |= ConstraintKinds::subcell_y;
                               }
                             else
                               {
                                 mask |= ConstraintKinds::face_y;
                                 if (face == 2)
-                                  mask |= ConstraintKinds::type_y;
+                                  mask |= ConstraintKinds::subcell_y;
                                 if (subface == 0)
-                                  mask |= ConstraintKinds::type_x;
+                                  mask |= ConstraintKinds::subcell_x;
                               }
 
                             // Reorder neighbor_dofs and copy into faceth face
@@ -516,33 +516,33 @@ namespace internal
                               {
                                 mask |= ConstraintKinds::face_x;
                                 if (face == 0)
-                                  mask |= ConstraintKinds::type_x;
+                                  mask |= ConstraintKinds::subcell_x;
                                 if (subface % 2 == 0)
-                                  mask |= ConstraintKinds::type_y;
+                                  mask |= ConstraintKinds::subcell_y;
                                 if (subface / 2 == 0)
-                                  mask |= ConstraintKinds::type_z;
+                                  mask |= ConstraintKinds::subcell_z;
                               }
                             // XZ-plane
                             else if (face < 4)
                               {
                                 mask |= ConstraintKinds::face_y;
                                 if (face == 2)
-                                  mask |= ConstraintKinds::type_y;
+                                  mask |= ConstraintKinds::subcell_y;
                                 if (subface % 2 == 0)
-                                  mask |= ConstraintKinds::type_z;
+                                  mask |= ConstraintKinds::subcell_z;
                                 if (subface / 2 == 0)
-                                  mask |= ConstraintKinds::type_x;
+                                  mask |= ConstraintKinds::subcell_x;
                               }
                             // XY-plane
                             else
                               {
                                 mask |= ConstraintKinds::face_z;
                                 if (face == 4)
-                                  mask |= ConstraintKinds::type_z;
+                                  mask |= ConstraintKinds::subcell_z;
                                 if (subface % 2 == 0)
-                                  mask |= ConstraintKinds::type_x;
+                                  mask |= ConstraintKinds::subcell_x;
                                 if (subface / 2 == 0)
-                                  mask |= ConstraintKinds::type_y;
+                                  mask |= ConstraintKinds::subcell_y;
                               }
 
                             // Offset if upper/right/back face
@@ -592,52 +592,52 @@ namespace internal
                 const ConstraintKinds line_to_edge[12][4] = {
                   {ConstraintKinds::face_x | ConstraintKinds::face_z,
                    ConstraintKinds::edge_y,
-                   ConstraintKinds::type_x | ConstraintKinds::type_z,
-                   ConstraintKinds::type_y},
+                   ConstraintKinds::subcell_x | ConstraintKinds::subcell_z,
+                   ConstraintKinds::subcell_y},
                   {ConstraintKinds::face_x | ConstraintKinds::face_z,
                    ConstraintKinds::edge_y,
-                   ConstraintKinds::type_z,
-                   ConstraintKinds::type_y},
+                   ConstraintKinds::subcell_z,
+                   ConstraintKinds::subcell_y},
                   {ConstraintKinds::face_y | ConstraintKinds::face_z,
                    ConstraintKinds::edge_x,
-                   ConstraintKinds::type_y | ConstraintKinds::type_z,
-                   ConstraintKinds::type_x},
+                   ConstraintKinds::subcell_y | ConstraintKinds::subcell_z,
+                   ConstraintKinds::subcell_x},
                   {ConstraintKinds::face_y | ConstraintKinds::face_z,
                    ConstraintKinds::edge_x,
-                   ConstraintKinds::type_z,
-                   ConstraintKinds::type_x},
+                   ConstraintKinds::subcell_z,
+                   ConstraintKinds::subcell_x},
                   {ConstraintKinds::face_x | ConstraintKinds::face_z,
                    ConstraintKinds::edge_y,
-                   ConstraintKinds::type_x,
-                   ConstraintKinds::type_y},
+                   ConstraintKinds::subcell_x,
+                   ConstraintKinds::subcell_y},
                   {ConstraintKinds::face_x | ConstraintKinds::face_z,
                    ConstraintKinds::edge_y,
                    ConstraintKinds::unconstrained,
-                   ConstraintKinds::type_y},
+                   ConstraintKinds::subcell_y},
                   {ConstraintKinds::face_y | ConstraintKinds::face_z,
                    ConstraintKinds::edge_x,
-                   ConstraintKinds::type_y,
-                   ConstraintKinds::type_x},
+                   ConstraintKinds::subcell_y,
+                   ConstraintKinds::subcell_x},
                   {ConstraintKinds::face_y | ConstraintKinds::face_z,
                    ConstraintKinds::edge_x,
                    ConstraintKinds::unconstrained,
-                   ConstraintKinds::type_x},
+                   ConstraintKinds::subcell_x},
                   {ConstraintKinds::face_x | ConstraintKinds::face_y,
                    ConstraintKinds::edge_z,
-                   ConstraintKinds::type_x | ConstraintKinds::type_y,
-                   ConstraintKinds::type_z},
+                   ConstraintKinds::subcell_x | ConstraintKinds::subcell_y,
+                   ConstraintKinds::subcell_z},
                   {ConstraintKinds::face_x | ConstraintKinds::face_y,
                    ConstraintKinds::edge_z,
-                   ConstraintKinds::type_y,
-                   ConstraintKinds::type_z},
+                   ConstraintKinds::subcell_y,
+                   ConstraintKinds::subcell_z},
                   {ConstraintKinds::face_x | ConstraintKinds::face_y,
                    ConstraintKinds::edge_z,
-                   ConstraintKinds::type_x,
-                   ConstraintKinds::type_z},
+                   ConstraintKinds::subcell_x,
+                   ConstraintKinds::subcell_z},
                   {ConstraintKinds::face_x | ConstraintKinds::face_y,
                    ConstraintKinds::edge_z,
                    ConstraintKinds::unconstrained,
-                   ConstraintKinds::type_z}};
+                   ConstraintKinds::subcell_z}};
 
                 for (unsigned int local_line = 0;
                      local_line < GeometryInfo<dim>::lines_per_cell;

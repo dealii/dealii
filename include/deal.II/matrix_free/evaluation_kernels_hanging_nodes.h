@@ -233,14 +233,16 @@ namespace internal
                       MatrixFreeFunctions::ConstraintKinds::unconstrained)
                     {
                       const bool is_subface_0 =
-                        (mask & MatrixFreeFunctions::ConstraintKinds::type_x) ==
+                        (mask &
+                         MatrixFreeFunctions::ConstraintKinds::subcell_x) ==
                         MatrixFreeFunctions::ConstraintKinds::unconstrained;
 
                       const Number *weights =
                         interpolation_matrices[is_subface_0].data();
 
-                      if (is_set(mask,
-                                 MatrixFreeFunctions::ConstraintKinds::type_y))
+                      if (is_set(
+                            mask,
+                            MatrixFreeFunctions::ConstraintKinds::subcell_y))
                         interpolate_2D<fe_degree, 2, transpose>(
                           given_degree,
                           v,
@@ -259,14 +261,16 @@ namespace internal
                       MatrixFreeFunctions::ConstraintKinds::unconstrained)
                     {
                       const bool is_subface_0 =
-                        (mask & MatrixFreeFunctions::ConstraintKinds::type_y) ==
+                        (mask &
+                         MatrixFreeFunctions::ConstraintKinds::subcell_y) ==
                         MatrixFreeFunctions::ConstraintKinds::unconstrained;
 
                       const Number *weights =
                         interpolation_matrices[is_subface_0].data();
 
-                      if (is_set(mask,
-                                 MatrixFreeFunctions::ConstraintKinds::type_x))
+                      if (is_set(
+                            mask,
+                            MatrixFreeFunctions::ConstraintKinds::subcell_x))
                         interpolate_2D<fe_degree, 0, transpose>(
                           given_degree,
                           v,
@@ -295,107 +299,126 @@ namespace internal
                   const bool is_face_0 =
                     is_set(mask,
                            MatrixFreeFunctions::ConstraintKinds::face_x) &&
-                    is_set(mask, MatrixFreeFunctions::ConstraintKinds::type_x);
+                    is_set(mask,
+                           MatrixFreeFunctions::ConstraintKinds::subcell_x);
                   const bool is_face_1 =
                     is_set(mask,
                            MatrixFreeFunctions::ConstraintKinds::face_x) &&
-                    not_set(mask, MatrixFreeFunctions::ConstraintKinds::type_x);
+                    not_set(mask,
+                            MatrixFreeFunctions::ConstraintKinds::subcell_x);
                   const bool is_face_2 =
                     is_set(mask,
                            MatrixFreeFunctions::ConstraintKinds::face_y) &&
-                    is_set(mask, MatrixFreeFunctions::ConstraintKinds::type_y);
+                    is_set(mask,
+                           MatrixFreeFunctions::ConstraintKinds::subcell_y);
                   const bool is_face_3 =
                     is_set(mask,
                            MatrixFreeFunctions::ConstraintKinds::face_y) &&
-                    not_set(mask, MatrixFreeFunctions::ConstraintKinds::type_y);
+                    not_set(mask,
+                            MatrixFreeFunctions::ConstraintKinds::subcell_y);
                   const bool is_face_4 =
                     is_set(mask,
                            MatrixFreeFunctions::ConstraintKinds::face_z) &&
-                    is_set(mask, MatrixFreeFunctions::ConstraintKinds::type_z);
+                    is_set(mask,
+                           MatrixFreeFunctions::ConstraintKinds::subcell_z);
                   const bool is_face_5 =
                     is_set(mask,
                            MatrixFreeFunctions::ConstraintKinds::face_z) &&
-                    not_set(mask, MatrixFreeFunctions::ConstraintKinds::type_z);
+                    not_set(mask,
+                            MatrixFreeFunctions::ConstraintKinds::subcell_z);
 
                   const bool is_edge_2 =
                     is_set(mask,
                            MatrixFreeFunctions::ConstraintKinds::edge_x) &&
                     is_set(mask,
-                           MatrixFreeFunctions::ConstraintKinds::type_y) &&
-                    is_set(mask, MatrixFreeFunctions::ConstraintKinds::type_z);
+                           MatrixFreeFunctions::ConstraintKinds::subcell_y) &&
+                    is_set(mask,
+                           MatrixFreeFunctions::ConstraintKinds::subcell_z);
                   const bool is_edge_3 =
                     is_set(mask,
                            MatrixFreeFunctions::ConstraintKinds::edge_x) &&
                     not_set(mask,
-                            MatrixFreeFunctions::ConstraintKinds::type_y) &&
-                    is_set(mask, MatrixFreeFunctions::ConstraintKinds::type_z);
+                            MatrixFreeFunctions::ConstraintKinds::subcell_y) &&
+                    is_set(mask,
+                           MatrixFreeFunctions::ConstraintKinds::subcell_z);
                   const bool is_edge_6 =
                     is_set(mask,
                            MatrixFreeFunctions::ConstraintKinds::edge_x) &&
                     is_set(mask,
-                           MatrixFreeFunctions::ConstraintKinds::type_y) &&
-                    not_set(mask, MatrixFreeFunctions::ConstraintKinds::type_z);
+                           MatrixFreeFunctions::ConstraintKinds::subcell_y) &&
+                    not_set(mask,
+                            MatrixFreeFunctions::ConstraintKinds::subcell_z);
                   const bool is_edge_7 =
                     is_set(mask,
                            MatrixFreeFunctions::ConstraintKinds::edge_x) &&
                     not_set(mask,
-                            MatrixFreeFunctions::ConstraintKinds::type_y) &&
-                    not_set(mask, MatrixFreeFunctions::ConstraintKinds::type_z);
+                            MatrixFreeFunctions::ConstraintKinds::subcell_y) &&
+                    not_set(mask,
+                            MatrixFreeFunctions::ConstraintKinds::subcell_z);
 
                   const bool is_edge_0 =
                     is_set(mask,
                            MatrixFreeFunctions::ConstraintKinds::edge_y) &&
                     is_set(mask,
-                           MatrixFreeFunctions::ConstraintKinds::type_x) &&
-                    is_set(mask, MatrixFreeFunctions::ConstraintKinds::type_z);
+                           MatrixFreeFunctions::ConstraintKinds::subcell_x) &&
+                    is_set(mask,
+                           MatrixFreeFunctions::ConstraintKinds::subcell_z);
                   const bool is_edge_1 =
                     is_set(mask,
                            MatrixFreeFunctions::ConstraintKinds::edge_y) &&
                     not_set(mask,
-                            MatrixFreeFunctions::ConstraintKinds::type_x) &&
-                    is_set(mask, MatrixFreeFunctions::ConstraintKinds::type_z);
+                            MatrixFreeFunctions::ConstraintKinds::subcell_x) &&
+                    is_set(mask,
+                           MatrixFreeFunctions::ConstraintKinds::subcell_z);
                   const bool is_edge_4 =
                     is_set(mask,
                            MatrixFreeFunctions::ConstraintKinds::edge_y) &&
                     is_set(mask,
-                           MatrixFreeFunctions::ConstraintKinds::type_x) &&
-                    not_set(mask, MatrixFreeFunctions::ConstraintKinds::type_z);
+                           MatrixFreeFunctions::ConstraintKinds::subcell_x) &&
+                    not_set(mask,
+                            MatrixFreeFunctions::ConstraintKinds::subcell_z);
                   const bool is_edge_5 =
                     is_set(mask,
                            MatrixFreeFunctions::ConstraintKinds::edge_y) &&
                     not_set(mask,
-                            MatrixFreeFunctions::ConstraintKinds::type_x) &&
-                    not_set(mask, MatrixFreeFunctions::ConstraintKinds::type_z);
+                            MatrixFreeFunctions::ConstraintKinds::subcell_x) &&
+                    not_set(mask,
+                            MatrixFreeFunctions::ConstraintKinds::subcell_z);
 
                   const bool is_edge_8 =
                     is_set(mask,
                            MatrixFreeFunctions::ConstraintKinds::edge_z) &&
                     is_set(mask,
-                           MatrixFreeFunctions::ConstraintKinds::type_x) &&
-                    is_set(mask, MatrixFreeFunctions::ConstraintKinds::type_y);
+                           MatrixFreeFunctions::ConstraintKinds::subcell_x) &&
+                    is_set(mask,
+                           MatrixFreeFunctions::ConstraintKinds::subcell_y);
                   const bool is_edge_9 =
                     is_set(mask,
                            MatrixFreeFunctions::ConstraintKinds::edge_z) &&
                     not_set(mask,
-                            MatrixFreeFunctions::ConstraintKinds::type_x) &&
-                    is_set(mask, MatrixFreeFunctions::ConstraintKinds::type_y);
+                            MatrixFreeFunctions::ConstraintKinds::subcell_x) &&
+                    is_set(mask,
+                           MatrixFreeFunctions::ConstraintKinds::subcell_y);
                   const bool is_edge_10 =
                     is_set(mask,
                            MatrixFreeFunctions::ConstraintKinds::edge_z) &&
                     is_set(mask,
-                           MatrixFreeFunctions::ConstraintKinds::type_x) &&
-                    not_set(mask, MatrixFreeFunctions::ConstraintKinds::type_y);
+                           MatrixFreeFunctions::ConstraintKinds::subcell_x) &&
+                    not_set(mask,
+                            MatrixFreeFunctions::ConstraintKinds::subcell_y);
                   const bool is_edge_11 =
                     is_set(mask,
                            MatrixFreeFunctions::ConstraintKinds::edge_z) &&
                     not_set(mask,
-                            MatrixFreeFunctions::ConstraintKinds::type_x) &&
-                    not_set(mask, MatrixFreeFunctions::ConstraintKinds::type_y);
+                            MatrixFreeFunctions::ConstraintKinds::subcell_x) &&
+                    not_set(mask,
+                            MatrixFreeFunctions::ConstraintKinds::subcell_y);
 
                   // direction 0:
                   {
                     const bool is_subface_0 =
-                      (mask & MatrixFreeFunctions::ConstraintKinds::type_x) ==
+                      (mask &
+                       MatrixFreeFunctions::ConstraintKinds::subcell_x) ==
                       MatrixFreeFunctions::ConstraintKinds::unconstrained;
 
                     const Number *weights =
@@ -465,7 +488,8 @@ namespace internal
                   // direction 1:
                   {
                     const bool is_subface_0 =
-                      (mask & MatrixFreeFunctions::ConstraintKinds::type_y) ==
+                      (mask &
+                       MatrixFreeFunctions::ConstraintKinds::subcell_y) ==
                       MatrixFreeFunctions::ConstraintKinds::unconstrained;
 
                     const Number *weights =
@@ -535,7 +559,8 @@ namespace internal
                   // direction 2:
                   {
                     const bool is_subface_0 =
-                      (mask & MatrixFreeFunctions::ConstraintKinds::type_z) ==
+                      (mask &
+                       MatrixFreeFunctions::ConstraintKinds::subcell_z) ==
                       MatrixFreeFunctions::ConstraintKinds::unconstrained;
 
                     const Number *weights =
