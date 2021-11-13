@@ -62,7 +62,7 @@ test(const char *filename)
   for (Triangulation<dim>::active_cell_iterator c = tria.begin_active();
        c != tria.end();
        ++c, ++index)
-    for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
+    for (const unsigned int i : c->vertex_indices())
       hash += (index * i * c->vertex_index(i)) % (tria.n_active_cells() + 1);
   deallog << "  hash=" << hash << std::endl;
 
