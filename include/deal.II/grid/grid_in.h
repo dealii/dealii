@@ -513,13 +513,8 @@ public:
   read_xda(std::istream &in);
 
   /**
-   * Read grid data from an msh file, either version 1 or version 2 of that
-   * file format. The %Gmsh formats are documented at
+   * Read grid data from an msh file. The %Gmsh formats are documented at
    * http://www.gmsh.info/.
-   *
-   * @note The input function of deal.II does not distinguish between newline
-   * and other whitespace. Therefore, deal.II will be able to read files in a
-   * slightly more general format than %Gmsh.
    *
    * @ingroup simplex
    */
