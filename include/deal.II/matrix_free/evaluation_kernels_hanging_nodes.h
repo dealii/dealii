@@ -64,7 +64,6 @@ namespace internal
       return false;
     }
 
-  private:
     enum class VectorizationTypes
     {
       /**
@@ -88,6 +87,7 @@ namespace internal
     static const VectorizationTypes VectorizationType =
       VectorizationTypes::index;
 
+  private:
     static constexpr unsigned int max_n_points_1D = 40;
 
     template <typename T1, VectorizationTypes VT>
