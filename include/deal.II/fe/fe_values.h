@@ -3796,6 +3796,17 @@ public:
 
 protected:
   /**
+   * Reset a unique_ptr. If we can, do not de-allocate the previously
+   * held memory but re-use it for the next item to avoid the repeated
+   * memory allocation. We do this because FEValues objects are heavily
+   * used in multithreaded contexts where memory allocations are evil.
+   */
+  template <typename Type, typename Pointer, typename Iterator>
+  static void
+  reset_pointer_in_place_if_possible(std::unique_ptr<Pointer> &present_cell,
+                                     const Iterator &          new_cell);
+
+  /**
    * Objects of the FEValues class need to store an iterator
    * to the present cell in order to be able to extract the values of the
    * degrees of freedom on this cell in the get_function_values() and assorted
@@ -3825,15 +3836,75 @@ protected:
    * <a href="https://www.artima.com/cppsource/type_erasure.html">type
    * erasure</a> design pattern.
    */
-  class CellIteratorBase;
+  class CellIteratorBase
+  {
+  public:
+    DeclExceptionMsg(
+      ExcNeedsDoFHandler,
+      "You have previously called the FEValues::reinit function with a "
+      "cell iterator of type Triangulation<dim,spacedim>::cell_iterator. However, "
+      "when you do this, you cannot call some functions in the FEValues "
+      "class, such as the get_function_values/gradients/hessians/third_derivatives "
+      "functions. If you need these functions, then you need to call "
+      "FEValues::reinit with an iterator type that allows to extract "
+      "degrees of freedom, such as DoFHandler<dim,spacedim>::cell_iterator.");
 
-  /**
-   * Forward declaration of classes derived from CellIteratorBase. Their
-   * definition and implementation is given in the .cc file.
-   */
-  template <typename CI>
-  class CellIterator;
-  class TriaCellIterator;
+    /**
+     * Constructor.
+     */
+    template <bool lda>
+    CellIteratorBase(
+      const TriaIterator<DoFCellAccessor<dim, spacedim, lda>> &cell);
+
+    /**
+     * Constructor.
+     */
+    CellIteratorBase(
+      const typename Triangulation<dim, spacedim>::cell_iterator &cell);
+
+    /**
+     * Destructor.
+     */
+    virtual ~CellIteratorBase() = default;
+
+    /**
+     * Conversion operator to an iterator for triangulations. This
+     * conversion is implicit for the original iterators, since they are derived
+     * classes. However, since here we have kind of a parallel class hierarchy,
+     * we have to have a conversion operator.
+     */
+    operator typename Triangulation<dim, spacedim>::cell_iterator() const;
+
+    /**
+     * Return the number of degrees of freedom the DoF
+     * handler object has to which the iterator belongs to.
+     */
+    types::global_dof_index
+    n_dofs_for_dof_handler() const;
+
+    /**
+     * Call @p get_interpolated_dof_values of the iterator with the
+     * given arguments.
+     */
+    template <typename VectorType>
+    void
+    get_interpolated_dof_values(
+      const VectorType &                       in,
+      Vector<typename VectorType::value_type> &out) const;
+
+    /**
+     * Call @p get_interpolated_dof_values of the iterator with the
+     * given arguments.
+     */
+    void
+    get_interpolated_dof_values(const IndexSet &              in,
+                                Vector<IndexSet::value_type> &out) const;
+
+  private:
+    const typename Triangulation<dim, spacedim>::cell_iterator cell;
+    const DoFHandler<dim, spacedim> *                          dof_handler;
+    const bool                                                 level_dof_access;
+  };
 
   /**
    * Store the cell selected last time the reinit() function was called.  This
