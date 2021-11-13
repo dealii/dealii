@@ -112,6 +112,23 @@ namespace Particles
            .template get_default_linear_mapping<dim, spacedim>()));
 
     /**
+     * A function that generates one particle at a random location in cell @p cell and with
+     * index @p id. This version of the function above immediately inserts the generated
+     * particle into the @p particle_handler and returns a iterator to it instead of
+     * a particle object. This avoids unnecessary copies of the particle.
+     */
+    template <int dim, int spacedim = dim>
+    ParticleIterator<dim, spacedim>
+    random_particle_in_cell_insert(
+      const typename Triangulation<dim, spacedim>::active_cell_iterator &cell,
+      const types::particle_index                                        id,
+      std::mt19937 &                  random_number_generator,
+      ParticleHandler<dim, spacedim> &particle_handler,
+      const Mapping<dim, spacedim> &  mapping =
+        (ReferenceCells::get_hypercube<dim>()
+           .template get_default_linear_mapping<dim, spacedim>()));
+
+    /**
      * A function that generates particles randomly in the domain with a
      * particle density
      * according to a provided probability density function @p probability_density_function.
