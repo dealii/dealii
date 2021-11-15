@@ -563,7 +563,7 @@ namespace internal
               const auto mask = constraint_mask_sorted[v];
 
               if (Trait<Number, VectorizationType>::do_break(v, mask))
-                continue;
+                break;
 
               if (Trait<Number, VectorizationType>::do_continue(v, mask))
                 continue;
