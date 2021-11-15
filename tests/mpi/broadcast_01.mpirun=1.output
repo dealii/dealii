@@ -1,3 +1,6 @@
 
 DEAL:0::1 2 3 test
 DEAL:0::-1 0 1 i love democracy
+DEAL:0::23
+DEAL:0::14.32
+DEAL:0::(1.0,2.0)

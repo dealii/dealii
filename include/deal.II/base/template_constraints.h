@@ -466,6 +466,24 @@ struct EnableIfScalar<std::complex<T>>
 };
 
 
+/**
+ * Checks that the data type `U` is inside the given tuple of data types.
+ *
+ * @param[in] type_tuple A tuple of data types.
+ *
+ * @return `true` if `U` has been found in the tuple, `false` otherwise.
+ */
+template <typename U, typename... T>
+constexpr bool contains(std::tuple<T...> type_tuple)
+{
+  (void) type_tuple;
+  return !std::is_same<
+    std::integer_sequence<bool, false, std::is_same<U, T>::value...>,
+    std::integer_sequence<bool, std::is_same<U, T>::value..., false>>::value;
+}
+
+
+
 DEAL_II_NAMESPACE_CLOSE
 
 #endif

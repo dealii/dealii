@@ -17,6 +17,8 @@
 
 // Test Utilities::MPI::broadcast().
 
+#include <iomanip>
+
 #include <deal.II/base/mpi.h>
 
 #include "../tests.h"
@@ -68,6 +70,59 @@ check(const std::vector<int> &int_vector, const std::string &string)
   deallog << std::endl;
 }
 
+void
+check(int int_value)
+{
+  const auto my_proc = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+
+  int buffer;
+  if (my_proc == 0)
+    {
+      buffer = int_value;
+    }
+
+  const auto result = Utilities::MPI::broadcast(MPI_COMM_WORLD, buffer);
+
+  deallog << result << " ";
+  deallog << std::endl;
+}
+
+
+void
+check(double double_value)
+{
+  const auto my_proc = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+
+  double buffer;
+  if (my_proc == 0)
+    {
+      buffer = double_value;
+    }
+
+  const auto result = Utilities::MPI::broadcast(MPI_COMM_WORLD, buffer);
+
+  deallog << std::setprecision(4) << result << " ";
+  deallog << std::endl;
+}
+
+
+void
+check(std::complex<double> complex_value)
+{
+  const auto my_proc = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+
+  std::complex<double> buffer;
+  if (my_proc == 0)
+    {
+      buffer = complex_value;
+    }
+
+  const auto result = Utilities::MPI::broadcast(MPI_COMM_WORLD, buffer);
+
+  deallog << std::setprecision(2) << result << " ";
+  deallog << std::endl;
+}
+
 
 int
 main(int argc, char *argv[])
@@ -80,4 +135,16 @@ main(int argc, char *argv[])
 
   // broadcast test
   check({-1, 0, 1}, "i love democracy");
+
+  // broadcast test
+  check(23);
+
+  // broadcast test
+  double d = 14.32;
+  check(d);
+
+  // broadcast test
+  using namespace std::complex_literals;
+  std::complex<double> z (1., 2.);
+  check(z);
 }

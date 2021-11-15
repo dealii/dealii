@@ -1,0 +1,4 @@
+Improved: Optimized calls to dealii::utilities::MPI::broadcast for
+built-in MPI types.
+<br>
+(Francesco Andreuzzi, 2021/11/23)

@@ -1033,6 +1033,84 @@ namespace Utilities
     }
 
 
+    namespace internal
+    {
+      template <typename T>
+      std::enable_if_t<is_mpi_type<T>(), T>
+      builtin_single_broadcast(const MPI_Comm &   comm,
+                               T                  object_to_send,
+                               const unsigned int root_process)
+      {
+#ifndef DEAL_II_WITH_MPI
+        (void)comm;
+        (void)root_process;
+        return object_to_send;
+#else
+        MPI_Datatype datatype =
+          dealii::Utilities::MPI::internal::mpi_type_id(&object_to_send);
+
+        int ierr = MPI_Bcast(&object_to_send, 1, datatype, root_process, comm);
+        AssertThrowMPI(ierr);
+
+        return object_to_send;
+#endif
+      }
+
+
+      template bool
+      builtin_single_broadcast(const MPI_Comm &, bool, const unsigned int);
+      template char
+      builtin_single_broadcast(const MPI_Comm &, char, const unsigned int);
+      template signed char
+      builtin_single_broadcast(const MPI_Comm &,
+                               signed char,
+                               const unsigned int);
+      template short
+      builtin_single_broadcast(const MPI_Comm &, short, const unsigned int);
+      template int
+      builtin_single_broadcast(const MPI_Comm &, int, const unsigned int);
+      template long int
+      builtin_single_broadcast(const MPI_Comm &, long int, const unsigned int);
+      template unsigned char
+      builtin_single_broadcast(const MPI_Comm &,
+                               unsigned char,
+                               const unsigned int);
+      template unsigned short
+      builtin_single_broadcast(const MPI_Comm &,
+                               unsigned short,
+                               const unsigned int);
+      template unsigned int
+      builtin_single_broadcast(const MPI_Comm &,
+                               unsigned int,
+                               const unsigned int);
+      template unsigned long int
+      builtin_single_broadcast(const MPI_Comm &,
+                               unsigned long int,
+                               const unsigned int);
+      template unsigned long long int
+      builtin_single_broadcast(const MPI_Comm &,
+                               unsigned long long int,
+                               const unsigned int);
+      template float
+      builtin_single_broadcast(const MPI_Comm &, float, const unsigned int);
+      template double
+      builtin_single_broadcast(const MPI_Comm &, double, const unsigned int);
+      template long double
+      builtin_single_broadcast(const MPI_Comm &,
+                               long double,
+                               const unsigned int);
+      template std::complex<float>
+      builtin_single_broadcast(const MPI_Comm &,
+                               std::complex<float>,
+                               const unsigned int);
+      template std::complex<double>
+      builtin_single_broadcast(const MPI_Comm &,
+                               std::complex<double>,
+                               const unsigned int);
+
+    } // namespace internal
+
+
 
     CollectiveMutex::CollectiveMutex()
       : locked(false)

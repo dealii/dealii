@@ -22,12 +22,15 @@
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/mpi_tags.h>
 #include <deal.II/base/numbers.h>
+#include <deal.II/base/template_constraints.h>
 
 #include <boost/signals2.hpp>
 
 #include <map>
 #include <numeric>
 #include <set>
+#include <tuple>
+#include <type_traits>
 #include <vector>
 
 #if !defined(DEAL_II_WITH_MPI) && !defined(DEAL_II_WITH_PETSC)
@@ -1027,6 +1030,35 @@ namespace Utilities
       static std::set<MPI_Request *> requests;
     };
 
+    namespace internal
+    {
+      /**
+       * Return `true` if the type `T` is a type that MPI understands natively and for which send and
+       * receive operations are supported by the MPI standard.
+       */
+      template <typename T>
+      constexpr bool
+      is_mpi_type()
+      {
+        return contains<T>(std::tuple<bool,
+                                      char,
+                                      signed char,
+                                      short,
+                                      int,
+                                      long int,
+                                      unsigned char,
+                                      unsigned short,
+                                      unsigned int,
+                                      unsigned long int,
+                                      unsigned long long int,
+                                      float,
+                                      double,
+                                      long double,
+                                      std::complex<float>,
+                                      std::complex<double>>{});
+      }
+    } // namespace internal
+
     /**
      * Return whether (i) deal.II has been compiled to support MPI (for
      * example by compiling with <code>CXX=mpiCC</code>) and if so whether
@@ -1120,7 +1152,29 @@ namespace Utilities
      *   the @p root_process.
      */
     template <typename T>
-    T
+    std::enable_if_t<!internal::is_mpi_type<T>(), T>
+    broadcast(const MPI_Comm &   comm,
+              const T &          object_to_send,
+              const unsigned int root_process = 0);
+
+    /**
+     * Sends an object @p object_to_send from the process @p root_process
+     * to all other processes.
+     *
+     * A generalization of the classic `MPI_Bcast` function that accepts
+     * built-in MPI types.
+     *
+     * @param[in] comm MPI communicator.
+     * @param[in] object_to_send An object to send to all processes.
+     * @param[in] root_process The process that sends the object to all
+     * processes. By default the process with rank 0 is the root process.
+     *
+     * @return On the root process, return a copy of @p object_to_send.
+     *   On every other process, return a copy of the object sent by
+     *   the @p root_process.
+     */
+    template <typename T>
+    std::enable_if_t<internal::is_mpi_type<T>(), T>
     broadcast(const MPI_Comm &   comm,
               const T &          object_to_send,
               const unsigned int root_process = 0);
@@ -1539,9 +1593,31 @@ namespace Utilities
     }
 
 
+    namespace internal
+    {
+      template <typename T>
+      std::enable_if_t<internal::is_mpi_type<T>(), T>
+      builtin_single_broadcast(const MPI_Comm &   comm,
+                               T                  object_to_send,
+                               const unsigned int root_process);
+    } // namespace internal
+
 
     template <typename T>
-    T
+    std::enable_if_t<internal::is_mpi_type<T>(), T>
+    broadcast(const MPI_Comm &   comm,
+              const T &          object_to_send,
+              const unsigned int root_process)
+    {
+      return internal::builtin_single_broadcast(comm,
+                                                object_to_send,
+                                                root_process);
+    }
+
+
+
+    template <typename T>
+    std::enable_if_t<!internal::is_mpi_type<T>(), T>
     broadcast(const MPI_Comm &   comm,
               const T &          object_to_send,
               const unsigned int root_process)
