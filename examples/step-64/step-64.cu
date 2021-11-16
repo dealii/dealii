@@ -133,8 +133,9 @@ namespace Step64
       : coef(coef)
     {}
 
-    __device__ void
-    operator()(CUDAWrappers::FEEvaluation<dim, fe_degree> *fe_eval) const;
+    __device__ void operator()(
+      CUDAWrappers::FEEvaluation<dim, fe_degree, fe_degree + 1, 1, double>
+        *fe_eval) const;
 
   private:
     double coef;
@@ -150,7 +151,8 @@ namespace Step64
   // here:
   template <int dim, int fe_degree>
   __device__ void HelmholtzOperatorQuad<dim, fe_degree>::operator()(
-    CUDAWrappers::FEEvaluation<dim, fe_degree> *fe_eval) const
+    CUDAWrappers::FEEvaluation<dim, fe_degree, fe_degree + 1, 1, double>
+      *fe_eval) const
   {
     fe_eval->submit_value(coef * fe_eval->get_value());
     fe_eval->submit_gradient(fe_eval->get_gradient());
