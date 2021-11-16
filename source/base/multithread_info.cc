@@ -21,7 +21,11 @@
 #include <thread>
 
 #ifdef DEAL_II_WITH_TBB
-#  include <tbb/task_scheduler_init.h>
+#  ifdef DEAL_II_TBB_WITH_ONEAPI
+#    include <tbb/task_arena.h>
+#  else
+#    include <tbb/task_scheduler_init.h>
+#  endif
 #endif
 
 
