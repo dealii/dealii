@@ -597,7 +597,7 @@ namespace parallel
 #endif
 
     Point<spacedim> invalid_point;
-    for (int d = 0; d < spacedim; ++d)
+    for (unsigned int d = 0; d < spacedim; ++d)
       invalid_point[d] = std::numeric_limits<double>::quiet_NaN();
 
     const auto pack = [&](const auto &cell) {

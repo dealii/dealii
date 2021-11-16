@@ -2796,7 +2796,7 @@ namespace GridTools
         auto p1 = p;
         auto p2 = p;
 
-        for (int d = 0; d < spacedim; ++d)
+        for (unsigned int d = 0; d < spacedim; ++d)
           {
             p1[d] = p1[d] - tolerance;
             p2[d] = p2[d] + tolerance;

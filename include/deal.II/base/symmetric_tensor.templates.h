@@ -225,7 +225,7 @@ namespace internal
         }
       else
         {
-          for (int i = 0; i < dim; ++i)
+          for (unsigned int i = 0; i < dim; ++i)
             d[i] = A[i][i];
 
           // For dim = 3:
@@ -339,7 +339,7 @@ namespace internal
                   g        = c * r - b;
 
                   // Form the eigenvectors
-                  for (int k = 0; k < dim; ++k)
+                  for (unsigned int k = 0; k < dim; ++k)
                     {
                       t           = Q[k][i + 1];
                       Q[k][i + 1] = s * Q[k][i] + c * t;
@@ -399,7 +399,7 @@ namespace internal
       // The diagonal elements of the tridiagonal matrix;
       // this will ultimately store the eigenvalues
       std::array<Number, dim> w;
-      for (int i = 0; i < dim; ++i)
+      for (unsigned int i = 0; i < dim; ++i)
         w[i] = A[i][i];
 
       // Calculate (tr(A))^{2}
@@ -412,7 +412,7 @@ namespace internal
         {
           // Test for convergence
           so = 0.0;
-          for (int p = 0; p < dim; ++p)
+          for (unsigned int p = 0; p < dim; ++p)
             for (int q = p + 1; q < dim; ++q)
               so += std::abs(A[p][q]);
           if (so == 0.0)
@@ -438,8 +438,8 @@ namespace internal
             thresh = 0.0;
 
           // Perform sweep
-          for (int p = 0; p < dim; ++p)
-            for (int q = p + 1; q < dim; ++q)
+          for (unsigned int p = 0; p < dim; ++p)
+            for (unsigned int q = p + 1; q < dim; ++q)
               {
                 g = 100.0 * std::abs(A[p][q]);
 
@@ -486,19 +486,19 @@ namespace internal
                     w[p] -= z;
                     w[q] += z;
                     // ... by executing the various rotations in sequence
-                    for (int r = 0; r < p; ++r)
+                    for (unsigned int r = 0; r < p; ++r)
                       {
                         t       = A[r][p];
                         A[r][p] = c * t - s * A[r][q];
                         A[r][q] = s * t + c * A[r][q];
                       }
-                    for (int r = p + 1; r < q; ++r)
+                    for (unsigned int r = p + 1; r < q; ++r)
                       {
                         t       = A[p][r];
                         A[p][r] = c * t - s * A[r][q];
                         A[r][q] = s * t + c * A[r][q];
                       }
-                    for (int r = q + 1; r < dim; ++r)
+                    for (unsigned int r = q + 1; r < dim; ++r)
                       {
                         t       = A[p][r];
                         A[p][r] = c * t - s * A[q][r];
@@ -506,7 +506,7 @@ namespace internal
                       }
 
                     // Update the eigenvectors
-                    for (int r = 0; r < dim; ++r)
+                    for (unsigned int r = 0; r < dim; ++r)
                       {
                         t       = Q[r][p];
                         Q[r][p] = c * t - s * Q[r][q];

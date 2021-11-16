@@ -2266,10 +2266,10 @@ namespace DoFTools
 
               // ... and rotate all dofs belonging to vector valued components
               // that are selected by first_vector_components:
-              for (int i = 0; i < spacedim; ++i)
+              for (unsigned int i = 0; i < spacedim; ++i)
                 {
                   transformation[vector_dofs[i]][vector_dofs[i]] = 0.;
-                  for (int j = 0; j < spacedim; ++j)
+                  for (unsigned int j = 0; j < spacedim; ++j)
                     transformation[vector_dofs[i]][vector_dofs[j]] =
                       matrix[i][j];
                 }

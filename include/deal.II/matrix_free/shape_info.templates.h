@@ -332,7 +332,7 @@ namespace internal
 
                 const auto grad = fe.shape_grad(i, quad.point(q));
 
-                for (int d = 0; d < dim; ++d)
+                for (unsigned int d = 0; d < dim; ++d)
                   shape_gradients[d * n_dofs * n_q_points + i * n_q_points +
                                   q] = grad[d];
               }
@@ -422,7 +422,7 @@ namespace internal
 
                               const auto grad = fe.shape_grad(i, point);
 
-                              for (int d = 0; d < dim; ++d)
+                              for (unsigned int d = 0; d < dim; ++d)
                                 shape_gradients_face(
                                   f, o, d, i * n_q_points_face + q) = grad[d];
                             }
