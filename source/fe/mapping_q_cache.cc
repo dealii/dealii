@@ -38,8 +38,8 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim, int spacedim>
 MappingQCache<dim, spacedim>::MappingQCache(
-  const unsigned int polynomial_degree)
-  : MappingQ<dim, spacedim>(polynomial_degree)
+  const unsigned int polynomial_degree_)
+  : MappingQ<dim, spacedim>(polynomial_degree_)
   , uses_level_info(false)
 {}
 

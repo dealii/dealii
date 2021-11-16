@@ -48,11 +48,11 @@ ChunkSparsityPattern::ChunkSparsityPattern(const ChunkSparsityPattern &s)
 ChunkSparsityPattern::ChunkSparsityPattern(const size_type m,
                                            const size_type n,
                                            const size_type max_per_row,
-                                           const size_type chunk_size)
+                                           const size_type chunk_size_)
 {
-  Assert(chunk_size > 0, ExcInvalidNumber(chunk_size));
+  Assert(chunk_size_ > 0, ExcInvalidNumber(chunk_size_));
 
-  reinit(m, n, max_per_row, chunk_size);
+  reinit(m, n, max_per_row, chunk_size_);
 }
 
 
@@ -61,20 +61,20 @@ ChunkSparsityPattern::ChunkSparsityPattern(
   const size_type               m,
   const size_type               n,
   const std::vector<size_type> &row_lengths,
-  const size_type               chunk_size)
+  const size_type               chunk_size_)
 {
-  Assert(chunk_size > 0, ExcInvalidNumber(chunk_size));
+  Assert(chunk_size_ > 0, ExcInvalidNumber(chunk_size_));
 
-  reinit(m, n, row_lengths, chunk_size);
+  reinit(m, n, row_lengths, chunk_size_);
 }
 
 
 
 ChunkSparsityPattern::ChunkSparsityPattern(const size_type n,
                                            const size_type max_per_row,
-                                           const size_type chunk_size)
+                                           const size_type chunk_size_)
 {
-  reinit(n, n, max_per_row, chunk_size);
+  reinit(n, n, max_per_row, chunk_size_);
 }
 
 
@@ -82,11 +82,11 @@ ChunkSparsityPattern::ChunkSparsityPattern(const size_type n,
 ChunkSparsityPattern::ChunkSparsityPattern(
   const size_type               m,
   const std::vector<size_type> &row_lengths,
-  const size_type               chunk_size)
+  const size_type               chunk_size_)
 {
-  Assert(chunk_size > 0, ExcInvalidNumber(chunk_size));
+  Assert(chunk_size_ > 0, ExcInvalidNumber(chunk_size_));
 
-  reinit(m, m, row_lengths, chunk_size);
+  reinit(m, m, row_lengths, chunk_size_);
 }
 
 
@@ -116,13 +116,13 @@ void
 ChunkSparsityPattern::reinit(const size_type m,
                              const size_type n,
                              const size_type max_per_row,
-                             const size_type chunk_size)
+                             const size_type chunk_size_)
 {
-  Assert(chunk_size > 0, ExcInvalidNumber(chunk_size));
+  Assert(chunk_size_ > 0, ExcInvalidNumber(chunk_size_));
 
   // simply map this function to the other @p{reinit} function
   const std::vector<size_type> row_lengths(m, max_per_row);
-  reinit(m, n, row_lengths, chunk_size);
+  reinit(m, n, row_lengths, chunk_size_);
 }
 
 
@@ -131,15 +131,15 @@ void
 ChunkSparsityPattern::reinit(const size_type                   m,
                              const size_type                   n,
                              const ArrayView<const size_type> &row_lengths,
-                             const size_type                   chunk_size)
+                             const size_type                   chunk_size_)
 {
   Assert(row_lengths.size() == m, ExcInvalidNumber(m));
-  Assert(chunk_size > 0, ExcInvalidNumber(chunk_size));
+  Assert(chunk_size_ > 0, ExcInvalidNumber(chunk_size_));
 
   rows = m;
   cols = n;
 
-  this->chunk_size = chunk_size;
+  this->chunk_size = chunk_size_;
 
   // pass down to the necessary information to the underlying object. we need
   // to calculate how many chunks we need: we need to round up (m/chunk_size)
@@ -181,10 +181,10 @@ ChunkSparsityPattern::compress()
 template <typename SparsityPatternType>
 void
 ChunkSparsityPattern::copy_from(const SparsityPatternType &dsp,
-                                const size_type            chunk_size)
+                                const size_type            chunk_size_)
 {
-  Assert(chunk_size > 0, ExcInvalidNumber(chunk_size));
-  this->chunk_size = chunk_size;
+  Assert(chunk_size_ > 0, ExcInvalidNumber(chunk_size_));
+  this->chunk_size = chunk_size_;
   rows             = dsp.n_rows();
   cols             = dsp.n_cols();
 
@@ -260,11 +260,11 @@ void
 ChunkSparsityPattern::reinit(const size_type               m,
                              const size_type               n,
                              const std::vector<size_type> &row_lengths,
-                             const size_type               chunk_size)
+                             const size_type               chunk_size_)
 {
-  Assert(chunk_size > 0, ExcInvalidNumber(chunk_size));
+  Assert(chunk_size_ > 0, ExcInvalidNumber(chunk_size_));
 
-  reinit(m, n, make_array_view(row_lengths), chunk_size);
+  reinit(m, n, make_array_view(row_lengths), chunk_size_);
 }
 
 

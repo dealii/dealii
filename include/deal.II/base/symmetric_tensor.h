@@ -1104,10 +1104,10 @@ namespace internal
     template <int rank_, int dim, bool constness, int P, typename Number>
     constexpr DEAL_II_ALWAYS_INLINE
     Accessor<rank_, dim, constness, P, Number>::Accessor(
-      tensor_type &              tensor,
-      const TableIndices<rank_> &previous_indices)
-      : tensor(tensor)
-      , previous_indices(previous_indices)
+      tensor_type &              tensor_,
+      const TableIndices<rank_> &previous_indices_)
+      : tensor(tensor_)
+      , previous_indices(previous_indices_)
     {}
 
 
@@ -1139,10 +1139,10 @@ namespace internal
     template <int rank_, int dim, bool constness, typename Number>
     constexpr DEAL_II_ALWAYS_INLINE
     Accessor<rank_, dim, constness, 1, Number>::Accessor(
-      tensor_type &              tensor,
-      const TableIndices<rank_> &previous_indices)
-      : tensor(tensor)
-      , previous_indices(previous_indices)
+      tensor_type &              tensor_,
+      const TableIndices<rank_> &previous_indices_)
+      : tensor(tensor_)
+      , previous_indices(previous_indices_)
     {}
 
 

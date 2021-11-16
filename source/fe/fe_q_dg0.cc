@@ -32,21 +32,21 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template <int dim, int spacedim>
-FE_Q_DG0<dim, spacedim>::FE_Q_DG0(const unsigned int degree)
+FE_Q_DG0<dim, spacedim>::FE_Q_DG0(const unsigned int degree_)
   : FE_Q_Base<dim, spacedim>(TensorProductPolynomialsConst<dim>(
                                Polynomials::generate_complete_Lagrange_basis(
-                                 QGaussLobatto<1>(degree + 1).get_points())),
-                             FiniteElementData<dim>(get_dpo_vector(degree),
+                                 QGaussLobatto<1>(degree_ + 1).get_points())),
+                             FiniteElementData<dim>(get_dpo_vector(degree_),
                                                     1,
-                                                    degree,
+                                                    degree_,
                                                     FiniteElementData<dim>::L2),
-                             get_riaf_vector(degree))
+                             get_riaf_vector(degree_))
 {
-  Assert(degree > 0,
+  Assert(degree_ > 0,
          ExcMessage("This element can only be used for polynomial degrees "
                     "greater than zero"));
 
-  this->initialize(QGaussLobatto<1>(degree + 1).get_points());
+  this->initialize(QGaussLobatto<1>(degree_ + 1).get_points());
 
   // adjust unit support point for discontinuous node
   Point<dim> point;
@@ -69,10 +69,7 @@ FE_Q_DG0<dim, spacedim>::FE_Q_DG0(const Quadrature<1> &points)
                              FiniteElementData<dim>::L2),
       get_riaf_vector(points.size() - 1))
 {
-  const int degree = points.size() - 1;
-  (void)degree;
-
-  Assert(degree > 0,
+  Assert(points.size() - 1 > 0,
          ExcMessage("This element can only be used for polynomial degrees "
                     "at least zero"));
 
@@ -100,24 +97,23 @@ FE_Q_DG0<dim, spacedim>::get_name() const
   bool                           type     = true;
   const unsigned int             n_points = this->degree + 1;
   std::vector<double>            points(n_points);
-  const unsigned int             dofs_per_cell = this->n_dofs_per_cell();
-  const std::vector<Point<dim>> &unit_support_points =
-    this->unit_support_points;
-  unsigned int index = 0;
+  const unsigned int             n_dofs_per_cell  = this->n_dofs_per_cell();
+  const std::vector<Point<dim>> &unit_support_pts = this->unit_support_points;
+  unsigned int                   index            = 0;
 
   // Decode the support points in one coordinate direction.
-  for (unsigned int j = 0; j < dofs_per_cell; ++j)
+  for (unsigned int j = 0; j < n_dofs_per_cell; ++j)
     {
-      if ((dim > 1) ? (unit_support_points[j](1) == 0 &&
-                       ((dim > 2) ? unit_support_points[j](2) == 0 : true)) :
+      if ((dim > 1) ? (unit_support_pts[j](1) == 0 &&
+                       ((dim > 2) ? unit_support_pts[j](2) == 0 : true)) :
                       true)
         {
           if (index == 0)
-            points[index] = unit_support_points[j](0);
+            points[index] = unit_support_pts[j](0);
           else if (index == 1)
-            points[n_points - 1] = unit_support_points[j](0);
+            points[n_points - 1] = unit_support_pts[j](0);
           else
-            points[index - 1] = unit_support_points[j](0);
+            points[index - 1] = unit_support_pts[j](0);
 
           index++;
         }

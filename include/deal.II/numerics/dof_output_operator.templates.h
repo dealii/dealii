@@ -27,10 +27,10 @@ namespace Algorithms
 {
   template <typename VectorType, int dim, int spacedim>
   DoFOutputOperator<VectorType, dim, spacedim>::DoFOutputOperator(
-    const std::string &filename_base,
-    const unsigned int digits)
-    : filename_base(filename_base)
-    , digits(digits)
+    const std::string &filename_base_,
+    const unsigned int digits_)
+    : filename_base(filename_base_)
+    , digits(digits_)
   {
     out.set_default_format(DataOutBase::gnuplot);
   }

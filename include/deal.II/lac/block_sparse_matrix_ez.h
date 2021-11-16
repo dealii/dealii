@@ -474,12 +474,12 @@ BlockSparseMatrixEZ<number>::print_statistics(StreamType &out, bool full)
         if (full)
           {
             used_by_line_total.resize(used_by_line.size());
-            for (size_type i = 0; i < used_by_line.size(); ++i)
-              if (used_by_line[i] != 0)
+            for (size_type k = 0; k < used_by_line.size(); ++k)
+              if (used_by_line[k] != 0)
                 {
-                  out << "row-entries\t" << i << "\trows\t" << used_by_line[i]
+                  out << "row-entries\t" << k << "\trows\t" << used_by_line[k]
                       << std::endl;
-                  used_by_line_total[i] += used_by_line[i];
+                  used_by_line_total[k] += used_by_line[k];
                 }
           }
       }

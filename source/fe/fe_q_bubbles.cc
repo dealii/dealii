@@ -186,22 +186,22 @@ namespace internal
 
 
 template <int dim, int spacedim>
-FE_Q_Bubbles<dim, spacedim>::FE_Q_Bubbles(const unsigned int q_degree)
+FE_Q_Bubbles<dim, spacedim>::FE_Q_Bubbles(const unsigned int q_degree_)
   : FE_Q_Base<dim, spacedim>(TensorProductPolynomialsBubbles<dim>(
                                Polynomials::generate_complete_Lagrange_basis(
-                                 QGaussLobatto<1>(q_degree + 1).get_points())),
-                             FiniteElementData<dim>(get_dpo_vector(q_degree),
+                                 QGaussLobatto<1>(q_degree_ + 1).get_points())),
+                             FiniteElementData<dim>(get_dpo_vector(q_degree_),
                                                     1,
-                                                    q_degree + 1,
+                                                    q_degree_ + 1,
                                                     FiniteElementData<dim>::H1),
-                             get_riaf_vector(q_degree))
-  , n_bubbles((q_degree <= 1) ? 1 : dim)
+                             get_riaf_vector(q_degree_))
+  , n_bubbles((q_degree_ <= 1) ? 1 : dim)
 {
-  Assert(q_degree > 0,
+  Assert(q_degree_ > 0,
          ExcMessage("This element can only be used for polynomial degrees "
                     "greater than zero"));
 
-  this->initialize(QGaussLobatto<1>(q_degree + 1).get_points());
+  this->initialize(QGaussLobatto<1>(q_degree_ + 1).get_points());
 
   // adjust unit support point for discontinuous node
   Point<dim> point;
@@ -275,24 +275,23 @@ FE_Q_Bubbles<dim, spacedim>::get_name() const
   bool                           type     = true;
   const unsigned int             n_points = this->degree;
   std::vector<double>            points(n_points);
-  const unsigned int             dofs_per_cell = this->n_dofs_per_cell();
-  const std::vector<Point<dim>> &unit_support_points =
-    this->unit_support_points;
-  unsigned int index = 0;
+  const unsigned int             dofs_per_cell    = this->n_dofs_per_cell();
+  const std::vector<Point<dim>> &unit_support_pts = this->unit_support_points;
+  unsigned int                   index            = 0;
 
   // Decode the support points in one coordinate direction.
   for (unsigned int j = 0; j < dofs_per_cell; ++j)
     {
-      if ((dim > 1) ? (unit_support_points[j](1) == 0 &&
-                       ((dim > 2) ? unit_support_points[j](2) == 0 : true)) :
+      if ((dim > 1) ? (unit_support_pts[j](1) == 0 &&
+                       ((dim > 2) ? unit_support_pts[j](2) == 0 : true)) :
                       true)
         {
           if (index == 0)
-            points[index] = unit_support_points[j](0);
+            points[index] = unit_support_pts[j](0);
           else if (index == 1)
-            points[n_points - 1] = unit_support_points[j](0);
+            points[n_points - 1] = unit_support_pts[j](0);
           else
-            points[index - 1] = unit_support_points[j](0);
+            points[index - 1] = unit_support_pts[j](0);
 
           index++;
         }

@@ -167,29 +167,29 @@ namespace internal
     /**
      * Constructor, taking the data from ShapeInfo
      */
-    EvaluatorTensorProduct(const AlignedVector<Number2> &shape_values,
-                           const AlignedVector<Number2> &shape_gradients,
-                           const AlignedVector<Number2> &shape_hessians,
+    EvaluatorTensorProduct(const AlignedVector<Number2> &shape_values_,
+                           const AlignedVector<Number2> &shape_gradients_,
+                           const AlignedVector<Number2> &shape_hessians_,
                            const unsigned int            dummy1 = 0,
                            const unsigned int            dummy2 = 0)
-      : shape_values(shape_values.begin())
-      , shape_gradients(shape_gradients.begin())
-      , shape_hessians(shape_hessians.begin())
+      : shape_values(shape_values_.begin())
+      , shape_gradients(shape_gradients_.begin())
+      , shape_hessians(shape_hessians_.begin())
     {
       // We can enter this function either for the apply() path that has
       // n_rows * n_columns entries or for the apply_face() path that only has
       // n_rows * 3 entries in the array. Since we cannot decide about the use
       // we must allow for both here.
-      Assert(shape_values.size() == 0 ||
-               shape_values.size() == n_rows * n_columns ||
-               shape_values.size() == 3 * n_rows,
-             ExcDimensionMismatch(shape_values.size(), n_rows * n_columns));
-      Assert(shape_gradients.size() == 0 ||
-               shape_gradients.size() == n_rows * n_columns,
-             ExcDimensionMismatch(shape_gradients.size(), n_rows * n_columns));
-      Assert(shape_hessians.size() == 0 ||
-               shape_hessians.size() == n_rows * n_columns,
-             ExcDimensionMismatch(shape_hessians.size(), n_rows * n_columns));
+      Assert(shape_values_.size() == 0 ||
+               shape_values_.size() == n_rows * n_columns ||
+               shape_values_.size() == 3 * n_rows,
+             ExcDimensionMismatch(shape_values_.size(), n_rows * n_columns));
+      Assert(shape_gradients_.size() == 0 ||
+               shape_gradients_.size() == n_rows * n_columns,
+             ExcDimensionMismatch(shape_gradients_.size(), n_rows * n_columns));
+      Assert(shape_hessians_.size() == 0 ||
+               shape_hessians_.size() == n_rows * n_columns,
+             ExcDimensionMismatch(shape_hessians_.size(), n_rows * n_columns));
       (void)dummy1;
       (void)dummy2;
     }
@@ -441,7 +441,7 @@ namespace internal
     AssertIndexRange(face_direction, dim);
     constexpr int stride     = Utilities::pow(n_rows, face_direction);
     constexpr int out_stride = Utilities::pow(n_rows, dim - 1);
-    const Number *DEAL_II_RESTRICT shape_values = this->shape_values;
+    const Number *DEAL_II_RESTRICT shape_val = this->shape_values;
 
     for (int i2 = 0; i2 < n_blocks2; ++i2)
       {
@@ -449,19 +449,19 @@ namespace internal
           {
             if (contract_onto_face == true)
               {
-                Number res0 = shape_values[0] * in[0];
+                Number res0 = shape_val[0] * in[0];
                 Number res1, res2;
                 if (max_derivative > 0)
-                  res1 = shape_values[n_rows] * in[0];
+                  res1 = shape_val[n_rows] * in[0];
                 if (max_derivative > 1)
-                  res2 = shape_values[2 * n_rows] * in[0];
+                  res2 = shape_val[2 * n_rows] * in[0];
                 for (int ind = 1; ind < n_rows; ++ind)
                   {
-                    res0 += shape_values[ind] * in[stride * ind];
+                    res0 += shape_val[ind] * in[stride * ind];
                     if (max_derivative > 0)
-                      res1 += shape_values[ind + n_rows] * in[stride * ind];
+                      res1 += shape_val[ind + n_rows] * in[stride * ind];
                     if (max_derivative > 1)
-                      res2 += shape_values[ind + 2 * n_rows] * in[stride * ind];
+                      res2 += shape_val[ind + 2 * n_rows] * in[stride * ind];
                   }
                 if (add == false)
                   {
@@ -485,15 +485,15 @@ namespace internal
                 for (int col = 0; col < n_rows; ++col)
                   {
                     if (add == false)
-                      out[col * stride] = shape_values[col] * in[0];
+                      out[col * stride] = shape_val[col] * in[0];
                     else
-                      out[col * stride] += shape_values[col] * in[0];
+                      out[col * stride] += shape_val[col] * in[0];
                     if (max_derivative > 0)
                       out[col * stride] +=
-                        shape_values[col + n_rows] * in[out_stride];
+                        shape_val[col + n_rows] * in[out_stride];
                     if (max_derivative > 1)
                       out[col * stride] +=
-                        shape_values[col + 2 * n_rows] * in[2 * out_stride];
+                        shape_val[col + 2 * n_rows] * in[2 * out_stride];
                   }
               }
 
@@ -598,46 +598,46 @@ namespace internal
     /**
      * Constructor, taking the data from ShapeInfo
      */
-    EvaluatorTensorProduct(const AlignedVector<Number2> &shape_values,
-                           const AlignedVector<Number2> &shape_gradients,
-                           const AlignedVector<Number2> &shape_hessians,
-                           const unsigned int            n_rows,
-                           const unsigned int            n_columns)
-      : shape_values(shape_values.begin())
-      , shape_gradients(shape_gradients.begin())
-      , shape_hessians(shape_hessians.begin())
-      , n_rows(n_rows)
-      , n_columns(n_columns)
+    EvaluatorTensorProduct(const AlignedVector<Number2> &shape_values_,
+                           const AlignedVector<Number2> &shape_gradients_,
+                           const AlignedVector<Number2> &shape_hessians_,
+                           const unsigned int            n_rows_,
+                           const unsigned int            n_columns_)
+      : shape_values(shape_values_.begin())
+      , shape_gradients(shape_gradients_.begin())
+      , shape_hessians(shape_hessians_.begin())
+      , n_rows(n_rows_)
+      , n_columns(n_columns_)
     {
       // We can enter this function either for the apply() path that has
       // n_rows * n_columns entries or for the apply_face() path that only has
       // n_rows * 3 entries in the array. Since we cannot decide about the use
       // we must allow for both here.
-      Assert(shape_values.size() == 0 ||
-               shape_values.size() == n_rows * n_columns ||
-               shape_values.size() == n_rows * 3,
-             ExcDimensionMismatch(shape_values.size(), n_rows * n_columns));
-      Assert(shape_gradients.size() == 0 ||
-               shape_gradients.size() == n_rows * n_columns,
-             ExcDimensionMismatch(shape_gradients.size(), n_rows * n_columns));
-      Assert(shape_hessians.size() == 0 ||
-               shape_hessians.size() == n_rows * n_columns,
-             ExcDimensionMismatch(shape_hessians.size(), n_rows * n_columns));
+      Assert(shape_values_.size() == 0 ||
+               shape_values_.size() == n_rows * n_columns ||
+               shape_values_.size() == n_rows * 3,
+             ExcDimensionMismatch(shape_values_.size(), n_rows * n_columns));
+      Assert(shape_gradients_.size() == 0 ||
+               shape_gradients_.size() == n_rows * n_columns,
+             ExcDimensionMismatch(shape_gradients_.size(), n_rows * n_columns));
+      Assert(shape_hessians_.size() == 0 ||
+               shape_hessians_.size() == n_rows * n_columns,
+             ExcDimensionMismatch(shape_hessians_.size(), n_rows * n_columns));
     }
 
     /**
      * Constructor, taking the data from ShapeInfo
      */
-    EvaluatorTensorProduct(const Number2 *    shape_values,
-                           const Number2 *    shape_gradients,
-                           const Number2 *    shape_hessians,
-                           const unsigned int n_rows,
-                           const unsigned int n_columns)
-      : shape_values(shape_values)
-      , shape_gradients(shape_gradients)
-      , shape_hessians(shape_hessians)
-      , n_rows(n_rows)
-      , n_columns(n_columns)
+    EvaluatorTensorProduct(const Number2 *    shape_values_,
+                           const Number2 *    shape_gradients_,
+                           const Number2 *    shape_hessians_,
+                           const unsigned int n_rows_,
+                           const unsigned int n_columns_)
+      : shape_values(shape_values_)
+      , shape_gradients(shape_gradients_)
+      , shape_hessians(shape_hessians_)
+      , n_rows(n_rows_)
+      , n_columns(n_columns_)
     {}
 
     template <int direction, bool contract_over_rows, bool add>
@@ -1028,24 +1028,24 @@ namespace internal
     /**
      * Constructor, taking the data from ShapeInfo
      */
-    EvaluatorTensorProduct(const AlignedVector<Number2> &shape_values,
-                           const AlignedVector<Number2> &shape_gradients,
-                           const AlignedVector<Number2> &shape_hessians,
+    EvaluatorTensorProduct(const AlignedVector<Number2> &shape_values_,
+                           const AlignedVector<Number2> &shape_gradients_,
+                           const AlignedVector<Number2> &shape_hessians_,
                            const unsigned int            dummy1 = 0,
                            const unsigned int            dummy2 = 0)
-      : shape_values(shape_values.begin())
-      , shape_gradients(shape_gradients.begin())
-      , shape_hessians(shape_hessians.begin())
+      : shape_values(shape_values_.begin())
+      , shape_gradients(shape_gradients_.begin())
+      , shape_hessians(shape_hessians_.begin())
     {
-      Assert(shape_values.size() == 0 ||
-               shape_values.size() == n_rows * n_columns,
-             ExcDimensionMismatch(shape_values.size(), n_rows * n_columns));
-      Assert(shape_gradients.size() == 0 ||
-               shape_gradients.size() == n_rows * n_columns,
-             ExcDimensionMismatch(shape_gradients.size(), n_rows * n_columns));
-      Assert(shape_hessians.size() == 0 ||
-               shape_hessians.size() == n_rows * n_columns,
-             ExcDimensionMismatch(shape_hessians.size(), n_rows * n_columns));
+      Assert(shape_values_.size() == 0 ||
+               shape_values_.size() == n_rows * n_columns,
+             ExcDimensionMismatch(shape_values_.size(), n_rows * n_columns));
+      Assert(shape_gradients_.size() == 0 ||
+               shape_gradients_.size() == n_rows * n_columns,
+             ExcDimensionMismatch(shape_gradients_.size(), n_rows * n_columns));
+      Assert(shape_hessians_.size() == 0 ||
+               shape_hessians_.size() == n_rows * n_columns,
+             ExcDimensionMismatch(shape_hessians_.size(), n_rows * n_columns));
       (void)dummy1;
       (void)dummy2;
     }
@@ -1620,35 +1620,36 @@ namespace internal
      * Constructor, taking the data from ShapeInfo (using the even-odd
      * variants stored there)
      */
-    EvaluatorTensorProduct(const AlignedVector<Number2> &shape_values)
-      : shape_values(shape_values.begin())
+    EvaluatorTensorProduct(const AlignedVector<Number2> &shape_values_)
+      : shape_values(shape_values_.begin())
       , shape_gradients(nullptr)
       , shape_hessians(nullptr)
     {
-      AssertDimension(shape_values.size(), n_rows * ((n_columns + 1) / 2));
+      AssertDimension(shape_values_.size(), n_rows * ((n_columns + 1) / 2));
     }
 
     /**
      * Constructor, taking the data from ShapeInfo (using the even-odd
      * variants stored there)
      */
-    EvaluatorTensorProduct(const AlignedVector<Number2> &shape_values,
-                           const AlignedVector<Number2> &shape_gradients,
-                           const AlignedVector<Number2> &shape_hessians,
+    EvaluatorTensorProduct(const AlignedVector<Number2> &shape_values_,
+                           const AlignedVector<Number2> &shape_gradients_,
+                           const AlignedVector<Number2> &shape_hessians_,
                            const unsigned int            dummy1 = 0,
                            const unsigned int            dummy2 = 0)
-      : shape_values(shape_values.begin())
-      , shape_gradients(shape_gradients.begin())
-      , shape_hessians(shape_hessians.begin())
+      : shape_values(shape_values_.begin())
+      , shape_gradients(shape_gradients_.begin())
+      , shape_hessians(shape_hessians_.begin())
     {
       // In this function, we allow for dummy pointers if some of values,
       // gradients or hessians should not be computed
-      if (!shape_values.empty())
-        AssertDimension(shape_values.size(), n_rows * ((n_columns + 1) / 2));
-      if (!shape_gradients.empty())
-        AssertDimension(shape_gradients.size(), n_rows * ((n_columns + 1) / 2));
-      if (!shape_hessians.empty())
-        AssertDimension(shape_hessians.size(), n_rows * ((n_columns + 1) / 2));
+      if (!shape_values_.empty())
+        AssertDimension(shape_values_.size(), n_rows * ((n_columns + 1) / 2));
+      if (!shape_gradients_.empty())
+        AssertDimension(shape_gradients_.size(),
+                        n_rows * ((n_columns + 1) / 2));
+      if (!shape_hessians_.empty())
+        AssertDimension(shape_hessians_.size(), n_rows * ((n_columns + 1) / 2));
       (void)dummy1;
       (void)dummy2;
     }
@@ -2009,8 +2010,8 @@ namespace internal
      * Constructor, taking the data from ShapeInfo (using the even-odd
      * variants stored there)
      */
-    EvaluatorTensorProduct(const AlignedVector<Number> &shape_values)
-      : shape_values(shape_values.begin())
+    EvaluatorTensorProduct(const AlignedVector<Number> &shape_values_)
+      : shape_values(shape_values_.begin())
       , shape_gradients(nullptr)
       , shape_hessians(nullptr)
     {}
@@ -2019,14 +2020,14 @@ namespace internal
      * Constructor, taking the data from ShapeInfo (using the even-odd
      * variants stored there)
      */
-    EvaluatorTensorProduct(const AlignedVector<Number2> &shape_values,
-                           const AlignedVector<Number2> &shape_gradients,
-                           const AlignedVector<Number2> &shape_hessians,
+    EvaluatorTensorProduct(const AlignedVector<Number2> &shape_values_,
+                           const AlignedVector<Number2> &shape_gradients_,
+                           const AlignedVector<Number2> &shape_hessians_,
                            const unsigned int            dummy1 = 0,
                            const unsigned int            dummy2 = 0)
-      : shape_values(shape_values.begin())
-      , shape_gradients(shape_gradients.begin())
-      , shape_hessians(shape_hessians.begin())
+      : shape_values(shape_values_.begin())
+      , shape_gradients(shape_gradients_.begin())
+      , shape_hessians(shape_hessians_.begin())
     {
       (void)dummy1;
       (void)dummy2;

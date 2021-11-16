@@ -63,28 +63,28 @@ namespace internal
 
 
 template <int dim, int spacedim>
-FE_DGQ<dim, spacedim>::FE_DGQ(const unsigned int degree)
+FE_DGQ<dim, spacedim>::FE_DGQ(const unsigned int degree_)
   : FE_Poly<dim, spacedim>(
       TensorProductPolynomials<dim>(
         Polynomials::generate_complete_Lagrange_basis(
-          internal::FE_DGQ::get_QGaussLobatto_points(degree))),
-      FiniteElementData<dim>(get_dpo_vector(degree),
+          internal::FE_DGQ::get_QGaussLobatto_points(degree_))),
+      FiniteElementData<dim>(get_dpo_vector(degree_),
                              1,
-                             degree,
+                             degree_,
                              FiniteElementData<dim>::L2),
       std::vector<bool>(
-        FiniteElementData<dim>(get_dpo_vector(degree), 1, degree)
+        FiniteElementData<dim>(get_dpo_vector(degree_), 1, degree_)
           .n_dofs_per_cell(),
         true),
       std::vector<ComponentMask>(
-        FiniteElementData<dim>(get_dpo_vector(degree), 1, degree)
+        FiniteElementData<dim>(get_dpo_vector(degree_), 1, degree_)
           .n_dofs_per_cell(),
         std::vector<bool>(1, true)))
 {
   // Compute support points, which are the tensor product of the Lagrange
   // interpolation points in the constructor.
   this->unit_support_points =
-    Quadrature<dim>(internal::FE_DGQ::get_QGaussLobatto_points(degree))
+    Quadrature<dim>(internal::FE_DGQ::get_QGaussLobatto_points(degree_))
       .get_points();
 
   // do not initialize embedding and restriction here. these matrices are
@@ -1033,9 +1033,9 @@ FE_DGQLegendre<dim, spacedim>::clone() const
 // ---------------------------------- FE_DGQHermite --------------------------
 
 template <int dim, int spacedim>
-FE_DGQHermite<dim, spacedim>::FE_DGQHermite(const unsigned int degree)
+FE_DGQHermite<dim, spacedim>::FE_DGQHermite(const unsigned int degree_)
   : FE_DGQ<dim, spacedim>(
-      Polynomials::HermiteLikeInterpolation::generate_complete_basis(degree))
+      Polynomials::HermiteLikeInterpolation::generate_complete_basis(degree_))
 {}
 
 

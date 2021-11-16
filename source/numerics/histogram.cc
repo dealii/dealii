@@ -35,9 +35,9 @@ Histogram::logarithmic_less(const number n1, const number n2)
 
 
 
-Histogram::Interval::Interval(const double left_point, const double right_point)
-  : left_point(left_point)
-  , right_point(right_point)
+Histogram::Interval::Interval(const double left_pt, const double right_pt)
+  : left_point(left_pt)
+  , right_point(right_pt)
   , content(0)
 {}
 

@@ -2200,10 +2200,10 @@ namespace internal
   namespace TableBaseAccessors
   {
     template <int N, typename T, bool C, unsigned int P>
-    inline Accessor<N, T, C, P>::Accessor(const TableType &table,
-                                          const iterator   data)
-      : table(table)
-      , data(data)
+    inline Accessor<N, T, C, P>::Accessor(const TableType &table_,
+                                          const iterator   data_)
+      : table(table_)
+      , data(data_)
     {}
 
 
@@ -2243,10 +2243,10 @@ namespace internal
 
 
     template <int N, typename T, bool C>
-    inline Accessor<N, T, C, 1>::Accessor(const TableType &table,
-                                          const iterator   data)
-      : table(table)
-      , data(data)
+    inline Accessor<N, T, C, 1>::Accessor(const TableType &table_,
+                                          const iterator   data_)
+      : table(table_)
+      , data(data_)
     {}
 
 

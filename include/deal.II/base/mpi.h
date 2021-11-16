@@ -348,9 +348,9 @@ namespace Utilities
         /**
          * Constructor. Blocks until it can acquire the lock.
          */
-        explicit ScopedLock(CollectiveMutex &mutex, const MPI_Comm &comm)
-          : mutex(mutex)
-          , comm(comm)
+        explicit ScopedLock(CollectiveMutex &mutex_, const MPI_Comm &comm_)
+          : mutex(mutex_)
+          , comm(comm_)
         {
           mutex.lock(comm);
         }

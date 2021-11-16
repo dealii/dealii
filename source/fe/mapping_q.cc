@@ -50,8 +50,8 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim, int spacedim>
 MappingQ<dim, spacedim>::InternalData::InternalData(
-  const unsigned int polynomial_degree)
-  : polynomial_degree(polynomial_degree)
+  const unsigned int polynomial_degree_)
+  : polynomial_degree(polynomial_degree_)
   , n_shape_functions(Utilities::fixed_power<dim>(polynomial_degree + 1))
   , line_support_points(QGaussLobatto<1>(polynomial_degree + 1))
   , tensor_product_quadrature(false)
@@ -1572,9 +1572,6 @@ MappingQ<3, 3>::add_quad_support_points(
   std::vector<Point<3>> &                   a) const
 {
   const unsigned int faces_per_cell = GeometryInfo<3>::faces_per_cell;
-
-  // used if face quad at boundary or entirely in the interior of the domain
-  std::vector<Point<3>> tmp_points;
 
   // loop over all faces and collect points on them
   for (unsigned int face_no = 0; face_no < faces_per_cell; ++face_no)

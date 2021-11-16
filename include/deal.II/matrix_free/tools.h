@@ -264,8 +264,8 @@ namespace MatrixFreeTools
                                          n_q_points_1d,
                                          n_components,
                                          Number,
-                                         VectorizedArrayType> &phi)
-        : phi(phi)
+                                         VectorizedArrayType> &phi_)
+        : phi(phi_)
       {}
 
       void
@@ -583,8 +583,8 @@ namespace MatrixFreeTools
                               i,
                               upper_bound_fu);
 
-                            for (auto v = j_begin; v != j_end; ++v)
-                              locally_relevant_constrains_temp.emplace_back(*v);
+                            for (auto k = j_begin; k != j_end; ++k)
+                              locally_relevant_constrains_temp.emplace_back(*k);
                           }
                         else
                           {
@@ -680,7 +680,7 @@ namespace MatrixFreeTools
       void
       prepare_basis_vector(const unsigned int i)
       {
-        this->i = i;
+        this->ii = i;
 
         // compute i-th column of element stiffness matrix:
         // this could be simply performed as done at the moment with
@@ -710,14 +710,14 @@ namespace MatrixFreeTools
                 const auto scale_iterator =
                   std::lower_bound(c_pool.col.begin() + c_pool.row[j],
                                    c_pool.col.begin() + c_pool.row[j + 1],
-                                   i);
+                                   ii);
 
                 // explanation: j-th row of C_e^T is empty (see above)
                 if (scale_iterator == c_pool.col.begin() + c_pool.row[j + 1])
                   continue;
 
                 // explanation: C_e^T(j,i) is zero (see above)
-                if (*scale_iterator != i)
+                if (*scale_iterator != ii)
                   continue;
 
                 // apply constraint matrix from the left
@@ -757,7 +757,7 @@ namespace MatrixFreeTools
                    Number,
                    VectorizedArrayType> &phi;
 
-      unsigned int i;
+      unsigned int ii;
 
       std::array<internal::LocalCSR<Number>, n_lanes> c_pools;
 
@@ -801,8 +801,8 @@ namespace MatrixFreeTools
     int dummy = 0;
 
     matrix_free.template cell_loop<VectorType, int>(
-      [&](const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
-          LinearAlgebra::distributed::Vector<Number> &        diagonal_global,
+      [&](const MatrixFree<dim, Number, VectorizedArrayType> &mat_free,
+          LinearAlgebra::distributed::Vector<Number> &        diag_global,
           const int &,
           const std::pair<unsigned int, unsigned int> &range) mutable {
         FEEvaluation<dim,
@@ -811,7 +811,7 @@ namespace MatrixFreeTools
                      n_components,
                      Number,
                      VectorizedArrayType>
-          phi(matrix_free, range, dof_no, quad_no, first_selected_component);
+          phi(mat_free, range, dof_no, quad_no, first_selected_component);
 
         internal::ComputeDiagonalHelper<dim,
                                         fe_degree,
@@ -832,7 +832,7 @@ namespace MatrixFreeTools
                 helper.submit();
               }
 
-            helper.distribute_local_to_global(diagonal_global);
+            helper.distribute_local_to_global(diag_global);
           }
       },
       diagonal_global,

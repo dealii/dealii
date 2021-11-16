@@ -913,10 +913,10 @@ private:
 /*---------------------- Inline functions -----------------------------------*/
 
 template <typename number>
-inline SparseMatrixEZ<number>::Entry::Entry(const size_type column,
-                                            const number &  value)
-  : column(column)
-  , value(value)
+inline SparseMatrixEZ<number>::Entry::Entry(const size_type column_,
+                                            const number &  value_)
+  : column(column_)
+  , value(value_)
 {}
 
 
@@ -929,8 +929,8 @@ inline SparseMatrixEZ<number>::Entry::Entry()
 
 
 template <typename number>
-inline SparseMatrixEZ<number>::RowInfo::RowInfo(const size_type start)
-  : start(start)
+inline SparseMatrixEZ<number>::RowInfo::RowInfo(const size_type start_)
+  : start(start_)
   , length(0)
   , diagonal(invalid_diagonal)
 {}
@@ -939,10 +939,10 @@ inline SparseMatrixEZ<number>::RowInfo::RowInfo(const size_type start)
 //---------------------------------------------------------------------------
 template <typename number>
 inline SparseMatrixEZ<number>::const_iterator::Accessor::Accessor(
-  const SparseMatrixEZ<number> *matrix,
+  const SparseMatrixEZ<number> *matrix_,
   const size_type               r,
   const unsigned short          i)
-  : matrix(matrix)
+  : matrix(matrix_)
   , a_row(r)
   , a_index(i)
 {}

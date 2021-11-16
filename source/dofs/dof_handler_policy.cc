@@ -2851,8 +2851,8 @@ namespace internal
 
       template <int dim, int spacedim>
       Sequential<dim, spacedim>::Sequential(
-        DoFHandler<dim, spacedim> &dof_handler)
-        : dof_handler(&dof_handler)
+        DoFHandler<dim, spacedim> &dof_handler_)
+        : dof_handler(&dof_handler_)
       {}
 
 
@@ -2956,8 +2956,8 @@ namespace internal
 
       template <int dim, int spacedim>
       ParallelShared<dim, spacedim>::ParallelShared(
-        DoFHandler<dim, spacedim> &dof_handler)
-        : dof_handler(&dof_handler)
+        DoFHandler<dim, spacedim> &dof_handler_)
+        : dof_handler(&dof_handler_)
       {}
 
 
@@ -3820,8 +3820,8 @@ namespace internal
 
       template <int dim, int spacedim>
       ParallelDistributed<dim, spacedim>::ParallelDistributed(
-        DoFHandler<dim, spacedim> &dof_handler)
-        : dof_handler(&dof_handler)
+        DoFHandler<dim, spacedim> &dof_handler_)
+        : dof_handler(&dof_handler_)
       {}
 
 

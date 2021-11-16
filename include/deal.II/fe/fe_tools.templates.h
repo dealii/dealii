@@ -2111,16 +2111,14 @@ namespace FETools
       [&reference_cell, &mapping, &fe, &q_fine, n, nd, nq](
         const unsigned int               ref_case,
         const FullMatrix<double> &       inverse_mass_matrix,
-        std::vector<FullMatrix<double>> &matrices) {
+        std::vector<FullMatrix<double>> &mat) {
         const unsigned int nc =
           GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
 
         for (unsigned int i = 0; i < nc; ++i)
           {
-            Assert(matrices[i].n() == n,
-                   ExcDimensionMismatch(matrices[i].n(), n));
-            Assert(matrices[i].m() == n,
-                   ExcDimensionMismatch(matrices[i].m(), n));
+            Assert(mat[i].n() == n, ExcDimensionMismatch(mat[i].n(), n));
+            Assert(mat[i].m() == n, ExcDimensionMismatch(mat[i].m(), n));
           }
 
         // create a respective refinement on the triangulation
@@ -2143,7 +2141,7 @@ namespace FETools
 
         for (unsigned int cell_number = 0; cell_number < nc; ++cell_number)
           {
-            FullMatrix<double> &this_matrix = matrices[cell_number];
+            FullMatrix<double> &this_matrix = mat[cell_number];
 
             // Compute right hand side, which is a fine level basis
             // function tested with the coarse level functions.

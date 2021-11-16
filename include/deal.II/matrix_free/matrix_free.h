@@ -212,38 +212,40 @@ public:
      * Constructor for AdditionalData.
      */
     AdditionalData(
-      const TasksParallelScheme tasks_parallel_scheme = partition_partition,
-      const unsigned int        tasks_block_size      = 0,
-      const UpdateFlags         mapping_update_flags  = update_gradients |
-                                               update_JxW_values,
-      const UpdateFlags  mapping_update_flags_boundary_faces = update_default,
-      const UpdateFlags  mapping_update_flags_inner_faces    = update_default,
-      const UpdateFlags  mapping_update_flags_faces_by_cells = update_default,
-      const unsigned int mg_level            = numbers::invalid_unsigned_int,
-      const bool         store_plain_indices = true,
-      const bool         initialize_indices  = true,
-      const bool         initialize_mapping  = true,
-      const bool         overlap_communication_computation    = true,
-      const bool         hold_all_faces_to_owned_cells        = false,
-      const bool         cell_vectorization_categories_strict = false,
-      const bool         allow_ghosted_vectors_in_loops       = true,
-      const bool         use_fast_hanging_node_algorithm      = true)
-      : tasks_parallel_scheme(tasks_parallel_scheme)
-      , tasks_block_size(tasks_block_size)
-      , mapping_update_flags(mapping_update_flags)
-      , mapping_update_flags_boundary_faces(mapping_update_flags_boundary_faces)
-      , mapping_update_flags_inner_faces(mapping_update_flags_inner_faces)
-      , mapping_update_flags_faces_by_cells(mapping_update_flags_faces_by_cells)
-      , mg_level(mg_level)
-      , store_plain_indices(store_plain_indices)
-      , initialize_indices(initialize_indices)
-      , initialize_mapping(initialize_mapping)
-      , overlap_communication_computation(overlap_communication_computation)
-      , hold_all_faces_to_owned_cells(hold_all_faces_to_owned_cells)
+      const TasksParallelScheme tasks_parallel_scheme_ = partition_partition,
+      const unsigned int        tasks_block_size_      = 0,
+      const UpdateFlags         mapping_update_flags_  = update_gradients |
+                                                update_JxW_values,
+      const UpdateFlags  mapping_update_flags_boundary_faces_ = update_default,
+      const UpdateFlags  mapping_update_flags_inner_faces_    = update_default,
+      const UpdateFlags  mapping_update_flags_faces_by_cells_ = update_default,
+      const unsigned int mg_level_            = numbers::invalid_unsigned_int,
+      const bool         store_plain_indices_ = true,
+      const bool         initialize_indices_  = true,
+      const bool         initialize_mapping_  = true,
+      const bool         overlap_communication_computation_    = true,
+      const bool         hold_all_faces_to_owned_cells_        = false,
+      const bool         cell_vectorization_categories_strict_ = false,
+      const bool         allow_ghosted_vectors_in_loops_       = true,
+      const bool         use_fast_hanging_node_algorithm_      = true)
+      : tasks_parallel_scheme(tasks_parallel_scheme_)
+      , tasks_block_size(tasks_block_size_)
+      , mapping_update_flags(mapping_update_flags_)
+      , mapping_update_flags_boundary_faces(
+          mapping_update_flags_boundary_faces_)
+      , mapping_update_flags_inner_faces(mapping_update_flags_inner_faces_)
+      , mapping_update_flags_faces_by_cells(
+          mapping_update_flags_faces_by_cells_)
+      , mg_level(mg_level_)
+      , store_plain_indices(store_plain_indices_)
+      , initialize_indices(initialize_indices_)
+      , initialize_mapping(initialize_mapping_)
+      , overlap_communication_computation(overlap_communication_computation_)
+      , hold_all_faces_to_owned_cells(hold_all_faces_to_owned_cells_)
       , cell_vectorization_categories_strict(
-          cell_vectorization_categories_strict)
-      , allow_ghosted_vectors_in_loops(allow_ghosted_vectors_in_loops)
-      , use_fast_hanging_node_algorithm(use_fast_hanging_node_algorithm)
+          cell_vectorization_categories_strict_)
+      , allow_ghosted_vectors_in_loops(allow_ghosted_vectors_in_loops_)
+      , use_fast_hanging_node_algorithm(use_fast_hanging_node_algorithm_)
       , communicator_sm(MPI_COMM_SELF)
     {}
 
@@ -2942,24 +2944,24 @@ MatrixFree<dim, Number, VectorizedArrayType>::reinit(
   const typename MatrixFree<dim, Number, VectorizedArrayType>::AdditionalData
     &additional_data)
 {
-  std::vector<const DoFHandler<dim, dim> *>       dof_handlers;
+  std::vector<const DoFHandler<dim, dim> *>       dof_handler_vec;
   std::vector<const AffineConstraints<number2> *> constraints;
   std::vector<QuadratureType>                     quads;
 
-  dof_handlers.push_back(&dof_handler);
+  dof_handler_vec.push_back(&dof_handler);
   constraints.push_back(&constraints_in);
   quads.push_back(quad);
 
   std::vector<IndexSet> locally_owned_sets =
     internal::MatrixFreeImplementation::extract_locally_owned_index_sets(
-      dof_handlers, additional_data.mg_level);
+      dof_handler_vec, additional_data.mg_level);
 
   std::vector<hp::QCollection<dim>> quad_hp;
   quad_hp.emplace_back(quad);
 
   internal_reinit(std::make_shared<hp::MappingCollection<dim>>(
                     StaticMappingQ1<dim>::mapping),
-                  dof_handlers,
+                  dof_handler_vec,
                   constraints,
                   locally_owned_sets,
                   quad_hp,
@@ -2979,21 +2981,21 @@ MatrixFree<dim, Number, VectorizedArrayType>::reinit(
   const typename MatrixFree<dim, Number, VectorizedArrayType>::AdditionalData
     &additional_data)
 {
-  std::vector<const DoFHandler<dim, dim> *>       dof_handlers;
+  std::vector<const DoFHandler<dim, dim> *>       dof_handler_vec;
   std::vector<const AffineConstraints<number2> *> constraints;
 
-  dof_handlers.push_back(&dof_handler);
+  dof_handler_vec.push_back(&dof_handler);
   constraints.push_back(&constraints_in);
 
   std::vector<IndexSet> locally_owned_sets =
     internal::MatrixFreeImplementation::extract_locally_owned_index_sets(
-      dof_handlers, additional_data.mg_level);
+      dof_handler_vec, additional_data.mg_level);
 
   std::vector<hp::QCollection<dim>> quad_hp;
   quad_hp.emplace_back(quad);
 
   internal_reinit(std::make_shared<hp::MappingCollection<dim>>(mapping),
-                  dof_handlers,
+                  dof_handler_vec,
                   constraints,
                   locally_owned_sets,
                   quad_hp,
@@ -3046,12 +3048,12 @@ MatrixFree<dim, Number, VectorizedArrayType>::reinit(
   static_assert(dim == DoFHandlerType::dimension,
                 "Dimension dim not equal to DoFHandlerType::dimension.");
 
-  std::vector<const DoFHandler<dim> *> dof_handlers;
+  std::vector<const DoFHandler<dim> *> dof_handler_vec;
 
   for (const auto dh : dof_handler)
-    dof_handlers.push_back(dh);
+    dof_handler_vec.push_back(dh);
 
-  this->reinit(mapping, dof_handlers, constraint, quad, additional_data);
+  this->reinit(mapping, dof_handler_vec, constraint, quad, additional_data);
 }
 
 
@@ -3095,12 +3097,12 @@ MatrixFree<dim, Number, VectorizedArrayType>::reinit(
   static_assert(dim == DoFHandlerType::dimension,
                 "Dimension dim not equal to DoFHandlerType::dimension.");
 
-  std::vector<const DoFHandler<dim> *> dof_handlers;
+  std::vector<const DoFHandler<dim> *> dof_handler_vec;
 
   for (const auto dh : dof_handler)
-    dof_handlers.push_back(dof_handler);
+    dof_handler_vec.push_back(dh);
 
-  this->reinit(dof_handlers, constraint, quad, additional_data);
+  this->reinit(dof_handler_vec, constraint, quad, additional_data);
 }
 
 
@@ -3176,12 +3178,12 @@ MatrixFree<dim, Number, VectorizedArrayType>::reinit(
   static_assert(dim == DoFHandlerType::dimension,
                 "Dimension dim not equal to DoFHandlerType::dimension.");
 
-  std::vector<const DoFHandler<dim> *> dof_handlers;
+  std::vector<const DoFHandler<dim> *> dof_handler_vec;
 
   for (const auto dh : dof_handler)
-    dof_handlers.push_back(dof_handler);
+    dof_handler_vec.push_back(dh);
 
-  this->reinit(mapping, dof_handlers, constraint, quad, additional_data);
+  this->reinit(mapping, dof_handler_vec, constraint, quad, additional_data);
 }
 
 
@@ -3198,12 +3200,12 @@ MatrixFree<dim, Number, VectorizedArrayType>::reinit(
   static_assert(dim == DoFHandlerType::dimension,
                 "Dimension dim not equal to DoFHandlerType::dimension.");
 
-  std::vector<const DoFHandler<dim> *> dof_handlers;
+  std::vector<const DoFHandler<dim> *> dof_handler_vec;
 
   for (const auto dh : dof_handler)
-    dof_handlers.push_back(dof_handler);
+    dof_handler_vec.push_back(dh);
 
-  this->reinit(dof_handlers, constraint, quad, additional_data);
+  this->reinit(dof_handler_vec, constraint, quad, additional_data);
 }
 
 
@@ -3240,16 +3242,16 @@ namespace internal
      * number of components.
      */
     VectorDataExchange(
-      const dealii::MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
+      const dealii::MatrixFree<dim, Number, VectorizedArrayType> &matrix_free_,
       const typename dealii::MatrixFree<dim, Number, VectorizedArrayType>::
-        DataAccessOnFaces vector_face_access,
+        DataAccessOnFaces vector_face_access_,
       const unsigned int  n_components)
-      : matrix_free(matrix_free)
+      : matrix_free(matrix_free_)
       , vector_face_access(
           matrix_free.get_task_info().face_partition_data.empty() ?
             dealii::MatrixFree<dim, Number, VectorizedArrayType>::
               DataAccessOnFaces::unspecified :
-            vector_face_access)
+            vector_face_access_)
       , ghosts_were_set(false)
 #  ifdef DEAL_II_WITH_MPI
       , tmp_data(n_components)
@@ -4595,30 +4597,30 @@ namespace internal
         function_type;
 
     // constructor, binds all the arguments to this class
-    MFWorker(const MF &                           matrix_free,
-             const InVector &                     src,
-             OutVector &                          dst,
-             const bool                           zero_dst_vector_setting,
-             const Container &                    container,
-             function_type                        cell_function,
-             function_type                        face_function,
-             function_type                        boundary_function,
+    MFWorker(const MF &                           matrix_free_,
+             const InVector &                     src_,
+             OutVector &                          dst_,
+             const bool                           zero_dst_vector_setting_,
+             const Container &                    container_,
+             function_type                        cell_function_,
+             function_type                        face_function_,
+             function_type                        boundary_function_,
              const typename MF::DataAccessOnFaces src_vector_face_access =
                MF::DataAccessOnFaces::none,
              const typename MF::DataAccessOnFaces dst_vector_face_access =
                MF::DataAccessOnFaces::none,
              const std::function<void(const unsigned int, const unsigned int)>
-               &operation_before_loop = {},
+               &operation_before_loop_ = {},
              const std::function<void(const unsigned int, const unsigned int)>
-               &                operation_after_loop       = {},
-             const unsigned int dof_handler_index_pre_post = 0)
-      : matrix_free(matrix_free)
-      , container(const_cast<Container &>(container))
-      , cell_function(cell_function)
-      , face_function(face_function)
-      , boundary_function(boundary_function)
-      , src(src)
-      , dst(dst)
+               &                operation_after_loop_       = {},
+             const unsigned int dof_handler_index_pre_post_ = 0)
+      : matrix_free(matrix_free_)
+      , container(const_cast<Container &>(container_))
+      , cell_function(cell_function_)
+      , face_function(face_function_)
+      , boundary_function(boundary_function_)
+      , src(src_)
+      , dst(dst_)
       , src_data_exchanger(matrix_free,
                            src_vector_face_access,
                            n_components(src))
@@ -4626,11 +4628,11 @@ namespace internal
                            dst_vector_face_access,
                            n_components(dst))
       , src_and_dst_are_same(PointerComparison::equal(&src, &dst))
-      , zero_dst_vector_setting(zero_dst_vector_setting &&
+      , zero_dst_vector_setting(zero_dst_vector_setting_ &&
                                 !src_and_dst_are_same)
-      , operation_before_loop(operation_before_loop)
-      , operation_after_loop(operation_after_loop)
-      , dof_handler_index_pre_post(dof_handler_index_pre_post)
+      , operation_before_loop(operation_before_loop_)
+      , operation_after_loop(operation_after_loop_)
+      , dof_handler_index_pre_post(dof_handler_index_pre_post_)
     {}
 
     // Runs the cell work. If no function is given, nothing is done
@@ -4842,12 +4844,12 @@ namespace internal
                          const InVector &,
                          const std::pair<unsigned int, unsigned int> &)>;
 
-    MFClassWrapper(const function_type cell,
-                   const function_type face,
-                   const function_type boundary)
-      : cell(cell)
-      , face(face)
-      , boundary(boundary)
+    MFClassWrapper(const function_type cell_,
+                   const function_type face_,
+                   const function_type boundary_)
+      : cell(cell_)
+      , face(face_)
+      , boundary(boundary_)
     {}
 
     void

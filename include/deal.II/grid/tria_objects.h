@@ -479,8 +479,8 @@ namespace internal
     {}
 
 
-    inline TriaObjects::TriaObjects(const unsigned int structdim)
-      : structdim(structdim)
+    inline TriaObjects::TriaObjects(const unsigned int structdim_)
+      : structdim(structdim_)
       , next_free_single(numbers::invalid_unsigned_int)
       , next_free_pair(numbers::invalid_unsigned_int)
       , reverse_order_next_free_single(false)

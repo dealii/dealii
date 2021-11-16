@@ -438,8 +438,8 @@ namespace internal
 
             if (update_flags & update_covariant_transformation)
               {
-                const unsigned int n_q_points = data.contravariant.size();
-                for (unsigned int point = 0; point < n_q_points; ++point)
+                const unsigned int n_q_pts = data.contravariant.size();
+                for (unsigned int point = 0; point < n_q_pts; ++point)
                   {
                     data.covariant[point] =
                       (data.contravariant[point]).covariant_form();
@@ -448,8 +448,8 @@ namespace internal
 
             if (update_flags & update_volume_elements)
               {
-                const unsigned int n_q_points = data.contravariant.size();
-                for (unsigned int point = 0; point < n_q_points; ++point)
+                const unsigned int n_q_pts = data.contravariant.size();
+                for (unsigned int point = 0; point < n_q_pts; ++point)
                   data.volume_elements[point] =
                     data.contravariant[point].determinant();
               }

@@ -238,8 +238,8 @@ operator<<(std::ostream &out, const BlockMask &mask);
 #ifndef DOXYGEN
 // -------------------- inline functions ---------------------
 
-inline BlockMask::BlockMask(const std::vector<bool> &block_mask)
-  : block_mask(block_mask)
+inline BlockMask::BlockMask(const std::vector<bool> &block_mask_)
+  : block_mask(block_mask_)
 {}
 
 

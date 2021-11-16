@@ -382,8 +382,8 @@ SparseVanka<number>::memory_consumption() const
 
 template <typename number>
 SparseVanka<number>::AdditionalData::AdditionalData(
-  const std::vector<bool> &selected)
-  : selected(selected)
+  const std::vector<bool> &selected_)
+  : selected(selected_)
 {}
 
 
@@ -404,10 +404,10 @@ template <typename number>
 SparseBlockVanka<number>::SparseBlockVanka(
   const SparseMatrix<number> &M,
   const std::vector<bool> &   selected,
-  const unsigned int          n_blocks,
+  const unsigned int          n_blocks_,
   const BlockingStrategy      blocking_strategy)
   : SparseVanka<number>(M, selected)
-  , n_blocks(n_blocks)
+  , n_blocks(n_blocks_)
   , dof_masks(n_blocks, std::vector<bool>(M.m(), false))
 {
   compute_dof_masks(M, selected, blocking_strategy);

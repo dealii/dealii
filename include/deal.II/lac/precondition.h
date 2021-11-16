@@ -1384,8 +1384,8 @@ PreconditionIdentity::n() const
 //---------------------------------------------------------------------------
 
 inline PreconditionRichardson::AdditionalData::AdditionalData(
-  const double relaxation)
-  : relaxation(relaxation)
+  const double relaxation_)
+  : relaxation(relaxation_)
 {}
 
 
@@ -1819,12 +1819,13 @@ PreconditionPSOR<MatrixType>::Tvmult(VectorType &      dst,
 
 template <typename MatrixType>
 PreconditionPSOR<MatrixType>::AdditionalData::AdditionalData(
-  const std::vector<size_type> &permutation,
-  const std::vector<size_type> &inverse_permutation,
-  const typename PreconditionRelaxation<MatrixType>::AdditionalData &parameters)
-  : permutation(permutation)
-  , inverse_permutation(inverse_permutation)
-  , parameters(parameters)
+  const std::vector<size_type> &permutation_,
+  const std::vector<size_type> &inverse_permutation_,
+  const typename PreconditionRelaxation<MatrixType>::AdditionalData
+    &parameters_)
+  : permutation(permutation_)
+  , inverse_permutation(inverse_permutation_)
+  , parameters(parameters_)
 {}
 
 
@@ -1854,8 +1855,8 @@ PreconditionUseMatrix<MatrixType, VectorType>::vmult(
 
 template <typename MatrixType>
 inline PreconditionRelaxation<MatrixType>::AdditionalData::AdditionalData(
-  const double relaxation)
-  : relaxation(relaxation)
+  const double relaxation_)
+  : relaxation(relaxation_)
 {}
 
 
@@ -1918,22 +1919,22 @@ namespace internal
     template <typename Number>
     struct VectorUpdater
     {
-      VectorUpdater(const Number *     rhs,
-                    const Number *     matrix_diagonal_inverse,
-                    const unsigned int iteration_index,
-                    const Number       factor1,
-                    const Number       factor2,
-                    Number *           solution_old,
-                    Number *           tmp_vector,
-                    Number *           solution)
-        : rhs(rhs)
-        , matrix_diagonal_inverse(matrix_diagonal_inverse)
-        , iteration_index(iteration_index)
-        , factor1(factor1)
-        , factor2(factor2)
-        , solution_old(solution_old)
-        , tmp_vector(tmp_vector)
-        , solution(solution)
+      VectorUpdater(const Number *     rhs_,
+                    const Number *     matrix_diagonal_inverse_,
+                    const unsigned int iteration_index_,
+                    const Number       factor1_,
+                    const Number       factor2_,
+                    Number *           solution_old_,
+                    Number *           tmp_vector_,
+                    Number *           solution_)
+        : rhs(rhs_)
+        , matrix_diagonal_inverse(matrix_diagonal_inverse_)
+        , iteration_index(iteration_index_)
+        , factor1(factor1_)
+        , factor2(factor2_)
+        , solution_old(solution_old_)
+        , tmp_vector(tmp_vector_)
+        , solution(solution_)
       {}
 
       void
@@ -1943,14 +1944,14 @@ namespace internal
         // (https://gcc.gnu.org/bugzilla/show_bug.cgi?id=63945), we create
         // copies of the variables factor1 and factor2 and do not check based on
         // factor1.
-        const Number factor1        = this->factor1;
+        const Number factor1_       = this->factor1;
         const Number factor1_plus_1 = 1. + this->factor1;
-        const Number factor2        = this->factor2;
+        const Number factor2_       = this->factor2;
         if (iteration_index == 0)
           {
             DEAL_II_OPENMP_SIMD_PRAGMA
             for (std::size_t i = begin; i < end; ++i)
-              solution[i] = factor2 * matrix_diagonal_inverse[i] * rhs[i];
+              solution[i] = factor2_ * matrix_diagonal_inverse[i] * rhs[i];
           }
         else if (iteration_index == 1)
           {
@@ -1959,9 +1960,9 @@ namespace internal
             for (std::size_t i = begin; i < end; ++i)
               // for efficiency reason, write back to temp_vector that is
               // already read (avoid read-for-ownership)
-              tmp_vector[i] =
-                factor1_plus_1 * solution[i] +
-                factor2 * matrix_diagonal_inverse[i] * (rhs[i] - tmp_vector[i]);
+              tmp_vector[i] = factor1_plus_1 * solution[i] +
+                              factor2_ * matrix_diagonal_inverse[i] *
+                                (rhs[i] - tmp_vector[i]);
           }
         else
           {
@@ -1969,9 +1970,10 @@ namespace internal
             //           + f_2 * P^{-1} * (b-A*x^{n})
             DEAL_II_OPENMP_SIMD_PRAGMA
             for (std::size_t i = begin; i < end; ++i)
-              solution_old[i] =
-                factor1_plus_1 * solution[i] - factor1 * solution_old[i] +
-                factor2 * matrix_diagonal_inverse[i] * (rhs[i] - tmp_vector[i]);
+              solution_old[i] = factor1_plus_1 * solution[i] -
+                                factor1_ * solution_old[i] +
+                                factor2_ * matrix_diagonal_inverse[i] *
+                                  (rhs[i] - tmp_vector[i]);
           }
       }
 
@@ -1988,9 +1990,9 @@ namespace internal
     template <typename Number>
     struct VectorUpdatesRange : public ::dealii::parallel::ParallelForInteger
     {
-      VectorUpdatesRange(const VectorUpdater<Number> &updater,
+      VectorUpdatesRange(const VectorUpdater<Number> &updater_,
                          const std::size_t            size)
-        : updater(updater)
+        : updater(updater_)
       {
         if (size < internal::VectorImplementation::minimum_parallel_grain_size)
           VectorUpdatesRange::apply_to_subrange(0, size);
@@ -2387,16 +2389,16 @@ namespace internal
 
 template <typename MatrixType, class VectorType, typename PreconditionerType>
 inline PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
-  AdditionalData::AdditionalData(const unsigned int degree,
-                                 const double       smoothing_range,
-                                 const unsigned int eig_cg_n_iterations,
-                                 const double       eig_cg_residual,
-                                 const double       max_eigenvalue)
-  : degree(degree)
-  , smoothing_range(smoothing_range)
-  , eig_cg_n_iterations(eig_cg_n_iterations)
-  , eig_cg_residual(eig_cg_residual)
-  , max_eigenvalue(max_eigenvalue)
+  AdditionalData::AdditionalData(const unsigned int degree_,
+                                 const double       smoothing_range_,
+                                 const unsigned int eig_cg_n_iterations_,
+                                 const double       eig_cg_residual_,
+                                 const double       max_eigenvalue_)
+  : degree(degree_)
+  , smoothing_range(smoothing_range_)
+  , eig_cg_n_iterations(eig_cg_n_iterations_)
+  , eig_cg_residual(eig_cg_residual_)
+  , max_eigenvalue(max_eigenvalue_)
 {}
 
 

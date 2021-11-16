@@ -2560,12 +2560,12 @@ AffineConstraints<number>::add_entries_local_to_global(
 
 template <typename number>
 inline AffineConstraints<number>::ConstraintLine::ConstraintLine(
-  const size_type &                                                  index,
-  const typename AffineConstraints<number>::ConstraintLine::Entries &entries,
-  const number &inhomogeneity)
-  : index(index)
-  , entries(entries)
-  , inhomogeneity(inhomogeneity)
+  const size_type &                                                  index_,
+  const typename AffineConstraints<number>::ConstraintLine::Entries &entries_,
+  const number &inhomogeneity_)
+  : index(index_)
+  , entries(entries_)
+  , inhomogeneity(inhomogeneity_)
 {}
 
 

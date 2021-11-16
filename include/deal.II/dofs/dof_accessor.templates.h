@@ -51,16 +51,16 @@ inline DoFAccessor<structdim, dim, spacedim, level_dof_access>::DoFAccessor()
 
 template <int structdim, int dim, int spacedim, bool level_dof_access>
 inline DoFAccessor<structdim, dim, spacedim, level_dof_access>::DoFAccessor(
-  const Triangulation<dim, spacedim> *tria,
+  const Triangulation<dim, spacedim> *tria_,
   const int                           level,
   const int                           index,
-  const DoFHandler<dim, spacedim> *   dof_handler)
+  const DoFHandler<dim, spacedim> *   dof_handler_)
   : dealii::internal::DoFAccessorImplementation::
-      Inheritance<structdim, dim, spacedim>::BaseClass(tria, level, index)
-  , dof_handler(const_cast<DoFHandler<dim, spacedim> *>(dof_handler))
+      Inheritance<structdim, dim, spacedim>::BaseClass(tria_, level, index)
+  , dof_handler(const_cast<DoFHandler<dim, spacedim> *>(dof_handler_))
 {
   Assert(
-    tria == nullptr || &dof_handler->get_triangulation() == tria,
+    tria_ == nullptr || &dof_handler->get_triangulation() == tria_,
     ExcMessage(
       "You can't create a DoF accessor in which the DoFHandler object "
       "uses a different triangulation than the one you pass as argument."));
@@ -1141,10 +1141,10 @@ namespace internal
         /**
          * Constructor.
          */
-        MGDoFIndexGetter(const FiniteElement<dim, spacedim> &fe,
-                         const unsigned int                  level)
-          : fe(fe)
-          , level(level)
+        MGDoFIndexGetter(const FiniteElement<dim, spacedim> &fe_,
+                         const unsigned int                  level_)
+          : fe(fe_)
+          , level(level_)
         {}
 
         /**
@@ -1223,10 +1223,10 @@ namespace internal
         /**
          * Constructor.
          */
-        MGDoFIndexSetter(const FiniteElement<dim, spacedim> &fe,
-                         const unsigned int                  level)
-          : fe(fe)
-          , level(level)
+        MGDoFIndexSetter(const FiniteElement<dim, spacedim> &fe_,
+                         const unsigned int                  level_)
+          : fe(fe_)
+          , level(level_)
         {}
 
         /**
@@ -1824,22 +1824,22 @@ inline DoFAccessor<0, 1, spacedim, level_dof_access>::DoFAccessor()
 
 template <int spacedim, bool level_dof_access>
 inline DoFAccessor<0, 1, spacedim, level_dof_access>::DoFAccessor(
-  const Triangulation<1, spacedim> *                      tria,
-  const typename TriaAccessor<0, 1, spacedim>::VertexKind vertex_kind,
+  const Triangulation<1, spacedim> *                      tria_,
+  const typename TriaAccessor<0, 1, spacedim>::VertexKind vertex_kind_,
   const unsigned int                                      vertex_index,
-  const DoFHandler<1, spacedim> *                         dof_handler)
-  : BaseClass(tria, vertex_kind, vertex_index)
-  , dof_handler(const_cast<DoFHandler<1, spacedim> *>(dof_handler))
+  const DoFHandler<1, spacedim> *                         dof_handler_)
+  : BaseClass(tria_, vertex_kind_, vertex_index)
+  , dof_handler(const_cast<DoFHandler<1, spacedim> *>(dof_handler_))
 {}
 
 
 
 template <int spacedim, bool level_dof_access>
 inline DoFAccessor<0, 1, spacedim, level_dof_access>::DoFAccessor(
-  const Triangulation<1, spacedim> *tria,
+  const Triangulation<1, spacedim> *triangulation,
   const int                         level,
   const int                         index,
-  const DoFHandler<1, spacedim> *   dof_handler)
+  const DoFHandler<1, spacedim> *   dof_handler_)
   // This is the constructor signature for "ordinary" (non-vertex)
   // accessors and we shouldn't be calling it altogether. But it is also
   // the constructor that the default-constructor of TriaRawIterator
@@ -1849,14 +1849,14 @@ inline DoFAccessor<0, 1, spacedim, level_dof_access>::DoFAccessor(
   // other constructor of this class, and then asserting the condition
   // on level and index.
   : DoFAccessor<0, 1, spacedim, level_dof_access>(
-      tria,
+      triangulation,
       TriaAccessor<0, 1, spacedim>::interior_vertex,
       0U,
-      dof_handler)
+      dof_handler_)
 {
   (void)level;
   (void)index;
-  Assert((tria == nullptr) && (level == -2) && (index == -2) &&
+  Assert((triangulation == nullptr) && (level == -2) && (index == -2) &&
            (dof_handler == nullptr),
          ExcMessage(
            "This constructor can not be called for face iterators in 1d, "
@@ -2406,12 +2406,12 @@ namespace internal
 
 template <int dimension_, int space_dimension_, bool level_dof_access>
 inline DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::
-  DoFCellAccessor(const Triangulation<dimension_, space_dimension_> *tria,
+  DoFCellAccessor(const Triangulation<dimension_, space_dimension_> *tria_,
                   const int                                          level,
                   const int                                          index,
                   const AccessorData *                               local_data)
   : DoFAccessor<dimension_, dimension_, space_dimension_, level_dof_access>(
-      tria,
+      tria_,
       level,
       index,
       local_data)

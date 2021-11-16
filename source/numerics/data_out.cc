@@ -42,23 +42,23 @@ namespace internal
   {
     template <int dim, int spacedim>
     ParallelData<dim, spacedim>::ParallelData(
-      const unsigned int               n_datasets,
-      const unsigned int               n_subdivisions,
-      const std::vector<unsigned int> &n_postprocessor_outputs,
-      const dealii::hp::MappingCollection<dim, spacedim> &mapping,
+      const unsigned int               n_datasets_,
+      const unsigned int               n_subdivisions_,
+      const std::vector<unsigned int> &n_postprocessor_outputs_,
+      const dealii::hp::MappingCollection<dim, spacedim> &mapping_,
       const std::vector<
         std::shared_ptr<dealii::hp::FECollection<dim, spacedim>>>
-        &                                           finite_elements,
-      const UpdateFlags                             update_flags,
-      const std::vector<std::vector<unsigned int>> &cell_to_patch_index_map)
-      : ParallelDataBase<dim, spacedim>(n_datasets,
-                                        n_subdivisions,
-                                        n_postprocessor_outputs,
-                                        mapping,
-                                        finite_elements,
-                                        update_flags,
+        &                                           finite_elements_,
+      const UpdateFlags                             update_flags_,
+      const std::vector<std::vector<unsigned int>> &cell_to_patch_index_map_)
+      : ParallelDataBase<dim, spacedim>(n_datasets_,
+                                        n_subdivisions_,
+                                        n_postprocessor_outputs_,
+                                        mapping_,
+                                        finite_elements_,
+                                        update_flags_,
                                         false)
-      , cell_to_patch_index_map(&cell_to_patch_index_map)
+      , cell_to_patch_index_map(&cell_to_patch_index_map_)
     {}
   } // namespace DataOutImplementation
 } // namespace internal
@@ -1290,13 +1290,13 @@ DataOut<dim, spacedim>::set_cell_selection(
   const FilteredIterator<cell_iterator> &filtered_iterator)
 {
   const auto first_cell =
-    [filtered_iterator](const Triangulation<dim, spacedim> &triangulation) {
+    [filtered_iterator](const Triangulation<dim, spacedim> &tria) {
       // Create a copy of the filtered iterator so that we can
       // call a non-const function -- though we are really only
       // interested in the return value of that function, not the
       // state of the object
       FilteredIterator<cell_iterator> x = filtered_iterator;
-      return x.set_to_next_positive(triangulation.begin());
+      return x.set_to_next_positive(tria.begin());
     };
 
 

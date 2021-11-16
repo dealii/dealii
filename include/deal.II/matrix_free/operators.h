@@ -1011,8 +1011,8 @@ namespace MatrixFreeOperators
                              n_components,
                              Number,
                              false,
-                             VectorizedArrayType> &fe_eval)
-    : fe_eval(fe_eval)
+                             VectorizedArrayType> &fe_eval_)
+    : fe_eval(fe_eval_)
   {}
 
 
@@ -2041,7 +2041,7 @@ namespace MatrixFreeOperators
       const MatrixFree<
         dim,
         typename Base<dim, VectorType, VectorizedArrayType>::value_type,
-        VectorizedArrayType> &                     data,
+        VectorizedArrayType> &                     data_,
       VectorType &                                 dst,
       const VectorType &                           src,
       const std::pair<unsigned int, unsigned int> &cell_range) const
@@ -2054,7 +2054,7 @@ namespace MatrixFreeOperators
                  n_components,
                  Number,
                  VectorizedArrayType>
-      phi(data, this->selected_rows[0]);
+      phi(data_, this->selected_rows[0]);
     for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
       {
         phi.reinit(cell);

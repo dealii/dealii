@@ -1029,9 +1029,9 @@ complete_index_set(const IndexSet::size_type N)
 
 inline IndexSet::IntervalAccessor::IntervalAccessor(
   const IndexSet *          idxset,
-  const IndexSet::size_type range_idx)
+  const IndexSet::size_type range_idx_)
   : index_set(idxset)
-  , range_idx(range_idx)
+  , range_idx(range_idx_)
 {
   Assert(range_idx < idxset->n_intervals(),
          ExcInternalError("Invalid range index"));
@@ -1270,10 +1270,10 @@ IndexSet::IntervalIterator::operator-(
 
 inline IndexSet::ElementIterator::ElementIterator(
   const IndexSet *          idxset,
-  const IndexSet::size_type range_idx,
+  const IndexSet::size_type range_idx_,
   const IndexSet::size_type index)
   : index_set(idxset)
-  , range_idx(range_idx)
+  , range_idx(range_idx_)
   , idx(index)
 {
   Assert(range_idx < index_set->ranges.size(),

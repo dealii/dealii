@@ -32,10 +32,11 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-TimeDependent::TimeSteppingData::TimeSteppingData(const unsigned int look_ahead,
-                                                  const unsigned int look_back)
-  : look_ahead(look_ahead)
-  , look_back(look_back)
+TimeDependent::TimeSteppingData::TimeSteppingData(
+  const unsigned int look_ahead_,
+  const unsigned int look_back_)
+  : look_ahead(look_ahead_)
+  , look_back(look_back_)
 {}
 
 
@@ -265,12 +266,12 @@ TimeDependent::memory_consumption() const
 /* --------------------------------------------------------------------- */
 
 
-TimeStepBase::TimeStepBase(const double time)
+TimeStepBase::TimeStepBase(const double time_)
   : previous_timestep(nullptr)
   , next_timestep(nullptr)
   , sweep_no(numbers::invalid_unsigned_int)
   , timestep_no(numbers::invalid_unsigned_int)
-  , time(time)
+  , time(time_)
   , next_action(numbers::invalid_unsigned_int)
 {}
 
@@ -435,15 +436,15 @@ TimeStepBase_Tria<dim>::TimeStepBase_Tria()
 #ifndef DOXYGEN
 template <int dim>
 TimeStepBase_Tria<dim>::TimeStepBase_Tria(
-  const double              time,
-  const Triangulation<dim> &coarse_grid,
-  const Flags &             flags,
-  const RefinementFlags &   refinement_flags)
-  : TimeStepBase(time)
+  const double              time_,
+  const Triangulation<dim> &coarse_grid_,
+  const Flags &             flags_,
+  const RefinementFlags &   refinement_flags_)
+  : TimeStepBase(time_)
   , tria(nullptr, typeid(*this).name())
-  , coarse_grid(&coarse_grid, typeid(*this).name())
-  , flags(flags)
-  , refinement_flags(refinement_flags)
+  , coarse_grid(&coarse_grid_, typeid(*this).name())
+  , flags(flags_)
+  , refinement_flags(refinement_flags_)
 {}
 #endif
 
@@ -1171,18 +1172,13 @@ TimeStepBase_Tria_Flags::Flags<dim>::Flags()
 
 template <int dim>
 TimeStepBase_Tria_Flags::Flags<dim>::Flags(
-  const bool         delete_and_rebuild_tria,
-  const unsigned int wakeup_level_to_build_grid,
-  const unsigned int sleep_level_to_delete_grid)
-  : delete_and_rebuild_tria(delete_and_rebuild_tria)
-  , wakeup_level_to_build_grid(wakeup_level_to_build_grid)
-  , sleep_level_to_delete_grid(sleep_level_to_delete_grid)
-{
-  //   Assert (!delete_and_rebuild_tria || (wakeup_level_to_build_grid>=1),
-  //        ExcInvalidParameter(wakeup_level_to_build_grid));
-  //   Assert (!delete_and_rebuild_tria || (sleep_level_to_delete_grid>=1),
-  //        ExcInvalidParameter(sleep_level_to_delete_grid));
-}
+  const bool         delete_and_rebuild_tria_,
+  const unsigned int wakeup_level_to_build_grid_,
+  const unsigned int sleep_level_to_delete_grid_)
+  : delete_and_rebuild_tria(delete_and_rebuild_tria_)
+  , wakeup_level_to_build_grid(wakeup_level_to_build_grid_)
+  , sleep_level_to_delete_grid(sleep_level_to_delete_grid_)
+{}
 
 
 template <int dim>
@@ -1197,26 +1193,26 @@ typename TimeStepBase_Tria_Flags::RefinementFlags<dim>::CorrectionRelaxations
 
 template <int dim>
 TimeStepBase_Tria_Flags::RefinementFlags<dim>::RefinementFlags(
-  const unsigned int           max_refinement_level,
-  const unsigned int           first_sweep_with_correction,
-  const unsigned int           min_cells_for_correction,
-  const double                 cell_number_corridor_top,
-  const double                 cell_number_corridor_bottom,
-  const CorrectionRelaxations &correction_relaxations,
-  const unsigned int           cell_number_correction_steps,
-  const bool                   mirror_flags_to_previous_grid,
-  const bool                   adapt_grids)
-  : max_refinement_level(max_refinement_level)
-  , first_sweep_with_correction(first_sweep_with_correction)
-  , min_cells_for_correction(min_cells_for_correction)
-  , cell_number_corridor_top(cell_number_corridor_top)
-  , cell_number_corridor_bottom(cell_number_corridor_bottom)
-  , correction_relaxations(correction_relaxations.size() != 0 ?
-                             correction_relaxations :
+  const unsigned int           max_refinement_level_,
+  const unsigned int           first_sweep_with_correction_,
+  const unsigned int           min_cells_for_correction_,
+  const double                 cell_number_corridor_top_,
+  const double                 cell_number_corridor_bottom_,
+  const CorrectionRelaxations &correction_relaxations_,
+  const unsigned int           cell_number_correction_steps_,
+  const bool                   mirror_flags_to_previous_grid_,
+  const bool                   adapt_grids_)
+  : max_refinement_level(max_refinement_level_)
+  , first_sweep_with_correction(first_sweep_with_correction_)
+  , min_cells_for_correction(min_cells_for_correction_)
+  , cell_number_corridor_top(cell_number_corridor_top_)
+  , cell_number_corridor_bottom(cell_number_corridor_bottom_)
+  , correction_relaxations(correction_relaxations_.size() != 0 ?
+                             correction_relaxations_ :
                              default_correction_relaxations)
-  , cell_number_correction_steps(cell_number_correction_steps)
-  , mirror_flags_to_previous_grid(mirror_flags_to_previous_grid)
-  , adapt_grids(adapt_grids)
+  , cell_number_correction_steps(cell_number_correction_steps_)
+  , mirror_flags_to_previous_grid(mirror_flags_to_previous_grid_)
+  , adapt_grids(adapt_grids_)
 {
   Assert(cell_number_corridor_top >= 0,
          ExcInvalidValue(cell_number_corridor_top));

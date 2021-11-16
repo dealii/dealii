@@ -210,15 +210,15 @@ namespace
 
   template <int dim>
   PolynomialsRaviartThomasNodal<dim>::PolynomialsRaviartThomasNodal(
-    const unsigned int degree)
-    : TensorPolynomialsBase<dim>(degree, n_polynomials(degree))
-    , degree(degree)
+    const unsigned int degree_)
+    : TensorPolynomialsBase<dim>(degree_, n_polynomials(degree_))
+    , degree(degree_)
     , polynomial_space(create_rt_polynomials(dim, degree))
   {
     // create renumbering of the unknowns from the lexicographic order to the
     // actual order required by the finite element class with unknowns on
     // faces placed first
-    const unsigned int n_pols = polynomial_space.n();
+    const unsigned int n_polys = polynomial_space.n();
     hierarchic_to_lexicographic =
       compute_rt_hierarchic_to_lexicographic(dim, degree);
 
@@ -228,13 +228,13 @@ namespace
     // since we only store an anisotropic polynomial for the first component,
     // we set up a second numbering to switch out the actual coordinate
     // direction
-    renumber_aniso[0].resize(n_pols);
-    for (unsigned int i = 0; i < n_pols; ++i)
+    renumber_aniso[0].resize(n_polys);
+    for (unsigned int i = 0; i < n_polys; ++i)
       renumber_aniso[0][i] = i;
     if (dim > 1)
       {
         // switch x and y component (i and j loops)
-        renumber_aniso[1].resize(n_pols);
+        renumber_aniso[1].resize(n_polys);
         for (unsigned int k = 0; k < (dim > 2 ? degree + 1 : 1); ++k)
           for (unsigned int j = 0; j < degree + 2; ++j)
             for (unsigned int i = 0; i < degree + 1; ++i)
@@ -244,7 +244,7 @@ namespace
     if (dim > 2)
       {
         // switch x and z component (i and k loops)
-        renumber_aniso[2].resize(n_pols);
+        renumber_aniso[2].resize(n_polys);
         for (unsigned int k = 0; k < degree + 2; ++k)
           for (unsigned int j = 0; j < degree + 1; ++j)
             for (unsigned int i = 0; i < degree + 1; ++i)
@@ -431,16 +431,16 @@ namespace
 // --------------------- actual implementation of element --------------------
 
 template <int dim>
-FE_RaviartThomasNodal<dim>::FE_RaviartThomasNodal(const unsigned int degree)
-  : FE_PolyTensor<dim>(PolynomialsRaviartThomasNodal<dim>(degree),
-                       FiniteElementData<dim>(get_rt_dpo_vector(dim, degree),
+FE_RaviartThomasNodal<dim>::FE_RaviartThomasNodal(const unsigned int degree_)
+  : FE_PolyTensor<dim>(PolynomialsRaviartThomasNodal<dim>(degree_),
+                       FiniteElementData<dim>(get_rt_dpo_vector(dim, degree_),
                                               dim,
-                                              degree + 1,
+                                              degree_ + 1,
                                               FiniteElementData<dim>::Hdiv),
                        std::vector<bool>(1, false),
                        std::vector<ComponentMask>(
                          PolynomialsRaviartThomasNodal<dim>::n_polynomials(
-                           degree),
+                           degree_),
                          std::vector<bool>(dim, true)))
 {
   Assert(dim >= 2, ExcImpossibleInDim(dim));
@@ -450,15 +450,15 @@ FE_RaviartThomasNodal<dim>::FE_RaviartThomasNodal(const unsigned int degree)
   // First, initialize the generalized support points and quadrature weights,
   // since they are required for interpolation.
   this->generalized_support_points =
-    PolynomialsRaviartThomasNodal<dim>(degree).get_polynomial_support_points();
+    PolynomialsRaviartThomasNodal<dim>(degree_).get_polynomial_support_points();
   AssertDimension(this->generalized_support_points.size(),
                   this->n_dofs_per_cell());
 
   const unsigned int face_no = 0;
   if (dim > 1)
     this->generalized_face_support_points[face_no] =
-      degree == 0 ? QGauss<dim - 1>(1).get_points() :
-                    QGaussLobatto<dim - 1>(degree + 1).get_points();
+      degree_ == 0 ? QGauss<dim - 1>(1).get_points() :
+                     QGaussLobatto<dim - 1>(degree_ + 1).get_points();
 
   FullMatrix<double> face_embeddings[GeometryInfo<dim>::max_children_per_face];
   for (unsigned int i = 0; i < GeometryInfo<dim>::max_children_per_face; ++i)
@@ -567,9 +567,9 @@ FE_RaviartThomasNodal<
         (n - 1 - j) + i * n - local;
 
       // for face_orientation == false, we need to switch the sign
-      for (unsigned int i = 0; i < 4; ++i)
+      for (unsigned int k = 0; k < 4; ++k)
         this->adjust_quad_dof_sign_for_face_orientation_table[face_no](local,
-                                                                       i) = 1;
+                                                                       k) = 1;
     }
 }
 

@@ -742,10 +742,10 @@ private:
 
 namespace DynamicSparsityPatternIterators
 {
-  inline Accessor::Accessor(const DynamicSparsityPattern *sparsity_pattern,
+  inline Accessor::Accessor(const DynamicSparsityPattern *sparsity_pattern_,
                             const size_type               row,
                             const unsigned int            index_within_row)
-    : sparsity_pattern(sparsity_pattern)
+    : sparsity_pattern(sparsity_pattern_)
     , current_row(row)
     , current_entry(
         ((sparsity_pattern->rowset.size() == 0) ?
@@ -778,8 +778,8 @@ namespace DynamicSparsityPatternIterators
   }
 
 
-  inline Accessor::Accessor(const DynamicSparsityPattern *sparsity_pattern)
-    : sparsity_pattern(sparsity_pattern)
+  inline Accessor::Accessor(const DynamicSparsityPattern *sparsity_pattern_)
+    : sparsity_pattern(sparsity_pattern_)
     , current_row(numbers::invalid_size_type)
     , current_entry()
     , end_of_row()

@@ -1461,8 +1461,8 @@ namespace SparsityPatternIterators
   {}
 
 
-  inline Iterator::Iterator(const Accessor &accessor)
-    : LinearIndexIterator<Iterator, Accessor>(accessor)
+  inline Iterator::Iterator(const Accessor &accessor_)
+    : LinearIndexIterator<Iterator, Accessor>(accessor_)
   {}
 
 
@@ -1735,7 +1735,7 @@ SparsityPattern::copy_from(const size_type       n_rows,
     typename std::iterator_traits<ForwardIterator>::value_type::const_iterator;
   for (ForwardIterator i = begin; i != end; ++i, ++row)
     {
-      size_type *          cols = &colnums[rowstart[row]] + (is_square ? 1 : 0);
+      size_type *columns = &colnums[rowstart[row]] + (is_square ? 1 : 0);
       const inner_iterator end_of_row = i->end();
       for (inner_iterator j = i->begin(); j != end_of_row; ++j)
         {
@@ -1744,7 +1744,7 @@ SparsityPattern::copy_from(const size_type       n_rows,
           AssertIndexRange(col, n_cols);
 
           if ((col != row) || !is_square)
-            *cols++ = col;
+            *columns++ = col;
         }
     }
 

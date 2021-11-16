@@ -614,8 +614,8 @@ std::istream &
 operator>>(std::istream &in, ReferenceCell &reference_cell);
 
 
-inline constexpr ReferenceCell::ReferenceCell(const std::uint8_t kind)
-  : kind(kind)
+inline constexpr ReferenceCell::ReferenceCell(const std::uint8_t kind_)
+  : kind(kind_)
 {}
 
 
@@ -1976,12 +1976,12 @@ namespace internal
     /**
      * Constructor.
      */
-    NoPermutation(const dealii::ReferenceCell &entity_type,
-                  const std::array<T, N> &     vertices_0,
-                  const std::array<T, N> &     vertices_1)
-      : entity_type(entity_type)
-      , vertices_0(vertices_0)
-      , vertices_1(vertices_1)
+    NoPermutation(const dealii::ReferenceCell &entity_type_,
+                  const std::array<T, N> &     vertices_0_,
+                  const std::array<T, N> &     vertices_1_)
+      : entity_type(entity_type_)
+      , vertices_0(vertices_0_)
+      , vertices_1(vertices_1_)
     {}
 
     /**

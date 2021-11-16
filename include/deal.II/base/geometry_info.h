@@ -2684,8 +2684,8 @@ GeometryInfo<3>::d_linear_shape_function_gradient(const Point<3> &   xi,
 /* -------------- inline functions ------------- */
 
 
-inline GeometryPrimitive::GeometryPrimitive(const Object object)
-  : object(object)
+inline GeometryPrimitive::GeometryPrimitive(const Object object_)
+  : object(object_)
 {}
 
 

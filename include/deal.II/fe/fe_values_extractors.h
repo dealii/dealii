@@ -282,8 +282,8 @@ namespace FEValuesExtractors
 
 
 
-  inline Scalar::Scalar(const unsigned int component)
-    : component(component)
+  inline Scalar::Scalar(const unsigned int component_)
+    : component(component_)
   {}
 
 
@@ -293,8 +293,8 @@ namespace FEValuesExtractors
   {}
 
 
-  inline Vector::Vector(const unsigned int first_vector_component)
-    : first_vector_component(first_vector_component)
+  inline Vector::Vector(const unsigned int first_vector_component_)
+    : first_vector_component(first_vector_component_)
   {}
 
 
@@ -306,8 +306,8 @@ namespace FEValuesExtractors
 
   template <int rank>
   inline SymmetricTensor<rank>::SymmetricTensor(
-    const unsigned int first_tensor_component)
-    : first_tensor_component(first_tensor_component)
+    const unsigned int first_tensor_component_)
+    : first_tensor_component(first_tensor_component_)
   {}
 
 
@@ -318,8 +318,8 @@ namespace FEValuesExtractors
 
 
   template <int rank>
-  inline Tensor<rank>::Tensor(const unsigned int first_tensor_component)
-    : first_tensor_component(first_tensor_component)
+  inline Tensor<rank>::Tensor(const unsigned int first_tensor_component_)
+    : first_tensor_component(first_tensor_component_)
   {}
 } // namespace FEValuesExtractors
 

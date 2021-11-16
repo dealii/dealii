@@ -41,10 +41,10 @@ namespace hp
      * @param data The actual data of hp::Collection.
      * @param index The current index.
      */
-    CollectionIterator(const std::vector<std::shared_ptr<const T>> &data,
-                       const std::size_t                            index)
-      : data(&data)
-      , index(index)
+    CollectionIterator(const std::vector<std::shared_ptr<const T>> &data_,
+                       const std::size_t                            index_)
+      : data(&data_)
+      , index(index_)
     {}
 
     /**

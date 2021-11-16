@@ -48,14 +48,14 @@ namespace internal
 } // namespace internal
 
 template <int dim, int spacedim>
-FE_FaceQ<dim, spacedim>::FE_FaceQ(const unsigned int degree)
+FE_FaceQ<dim, spacedim>::FE_FaceQ(const unsigned int degree_)
   : FE_PolyFace<TensorProductPolynomials<dim - 1>, dim, spacedim>(
       TensorProductPolynomials<dim - 1>(
         Polynomials::generate_complete_Lagrange_basis(
-          internal::FE_FaceQImplementation::get_QGaussLobatto_points(degree))),
-      FiniteElementData<dim>(get_dpo_vector(degree),
+          internal::FE_FaceQImplementation::get_QGaussLobatto_points(degree_))),
+      FiniteElementData<dim>(get_dpo_vector(degree_),
                              1,
-                             degree,
+                             degree_,
                              FiniteElementData<dim>::L2),
       std::vector<bool>(1, true))
 {
@@ -70,7 +70,8 @@ FE_FaceQ<dim, spacedim>::FE_FaceQ(const unsigned int degree)
   else
     {
       std::vector<Point<1>> points =
-        internal::FE_FaceQImplementation::get_QGaussLobatto_points(degree);
+        internal::FE_FaceQImplementation::get_QGaussLobatto_points(
+          this->degree);
 
       unsigned int k = 0;
       for (unsigned int iz = 0; iz <= ((codim > 2) ? this->degree : 0); ++iz)
@@ -104,7 +105,8 @@ FE_FaceQ<dim, spacedim>::FE_FaceQ(const unsigned int degree)
               // faces in y-direction are oriented differently
               unsigned int renumber = i;
               if (dim == 3 && d == 1)
-                renumber = i / (degree + 1) + (degree + 1) * (i % (degree + 1));
+                renumber = i / (this->degree + 1) +
+                           (this->degree + 1) * (i % (this->degree + 1));
               this->unit_support_points[n_face_dofs * 2 * d + i][e] =
                 this->unit_face_support_points[0][renumber][c];
               this->unit_support_points[n_face_dofs * (2 * d + 1) + i][e] =
@@ -513,11 +515,11 @@ FE_FaceQ<dim, spacedim>::convert_generalized_support_point_values_to_dof_values(
 // ----------------------------- FE_FaceQ<1,spacedim> ------------------------
 
 template <int spacedim>
-FE_FaceQ<1, spacedim>::FE_FaceQ(const unsigned int degree)
+FE_FaceQ<1, spacedim>::FE_FaceQ(const unsigned int degree_)
   : FiniteElement<1, spacedim>(
-      FiniteElementData<1>(get_dpo_vector(degree),
+      FiniteElementData<1>(get_dpo_vector(degree_),
                            1,
-                           degree,
+                           degree_,
                            FiniteElementData<1>::L2),
       std::vector<bool>(1, true),
       std::vector<ComponentMask>(1, ComponentMask(1, true)))
@@ -760,13 +762,13 @@ FE_FaceQ<1, spacedim>::fill_fe_subface_values(
 // --------------------------------------- FE_FaceP --------------------------
 
 template <int dim, int spacedim>
-FE_FaceP<dim, spacedim>::FE_FaceP(const unsigned int degree)
+FE_FaceP<dim, spacedim>::FE_FaceP(const unsigned int degree_)
   : FE_PolyFace<PolynomialSpace<dim - 1>, dim, spacedim>(
       PolynomialSpace<dim - 1>(
-        Polynomials::Legendre::generate_complete_basis(degree)),
-      FiniteElementData<dim>(get_dpo_vector(degree),
+        Polynomials::Legendre::generate_complete_basis(degree_)),
+      FiniteElementData<dim>(get_dpo_vector(degree_),
                              1,
-                             degree,
+                             degree_,
                              FiniteElementData<dim>::L2),
       std::vector<bool>(1, true))
 {}
@@ -1009,8 +1011,8 @@ FE_FaceP<dim, spacedim>::get_constant_modes() const
 
 
 template <int spacedim>
-FE_FaceP<1, spacedim>::FE_FaceP(const unsigned int degree)
-  : FE_FaceQ<1, spacedim>(degree)
+FE_FaceP<1, spacedim>::FE_FaceP(const unsigned int degree_)
+  : FE_FaceQ<1, spacedim>(degree_)
 {}
 
 

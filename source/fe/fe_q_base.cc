@@ -414,16 +414,16 @@ struct FE_Q_Base<xdim, xspacedim>::Implementation
 
 template <int dim, int spacedim>
 FE_Q_Base<dim, spacedim>::FE_Q_Base(
-  const ScalarPolynomialsBase<dim> &poly_space,
+  const ScalarPolynomialsBase<dim> &poly_space_,
   const FiniteElementData<dim> &    fe_data,
-  const std::vector<bool> &         restriction_is_additive_flags)
+  const std::vector<bool> &         restriction_is_additive_flags_)
   : FE_Poly<dim, spacedim>(
-      poly_space,
+      poly_space_,
       fe_data,
-      restriction_is_additive_flags,
+      restriction_is_additive_flags_,
       std::vector<ComponentMask>(1, std::vector<bool>(1, true)))
   , q_degree(dynamic_cast<const TensorProductPolynomialsBubbles<dim> *>(
-               &poly_space) != nullptr ?
+               &poly_space_) != nullptr ?
                this->degree - 1 :
                this->degree)
 {}

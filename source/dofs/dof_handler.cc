@@ -2123,10 +2123,11 @@ DoFHandler<dim, spacedim>::DoFHandler()
 
 
 template <int dim, int spacedim>
-DoFHandler<dim, spacedim>::DoFHandler(const Triangulation<dim, spacedim> &tria)
+DoFHandler<dim, spacedim>::DoFHandler(
+  const Triangulation<dim, spacedim> &triangulation)
   : DoFHandler()
 {
-  reinit(tria);
+  reinit(triangulation);
 }
 
 
@@ -2159,20 +2160,22 @@ DoFHandler<dim, spacedim>::~DoFHandler()
 
 template <int dim, int spacedim>
 void
-DoFHandler<dim, spacedim>::initialize(const Triangulation<dim, spacedim> &tria,
-                                      const FiniteElement<dim, spacedim> &fe)
+DoFHandler<dim, spacedim>::initialize(
+  const Triangulation<dim, spacedim> &triangulation,
+  const FiniteElement<dim, spacedim> &fe)
 {
-  this->initialize(tria, hp::FECollection<dim, spacedim>(fe));
+  this->initialize(triangulation, hp::FECollection<dim, spacedim>(fe));
 }
 
 
 
 template <int dim, int spacedim>
 void
-DoFHandler<dim, spacedim>::initialize(const Triangulation<dim, spacedim> &tria,
-                                      const hp::FECollection<dim, spacedim> &fe)
+DoFHandler<dim, spacedim>::initialize(
+  const Triangulation<dim, spacedim> &   triangulation,
+  const hp::FECollection<dim, spacedim> &fe)
 {
-  this->reinit(tria);
+  this->reinit(triangulation);
   this->distribute_dofs(fe);
 }
 
@@ -2180,7 +2183,8 @@ DoFHandler<dim, spacedim>::initialize(const Triangulation<dim, spacedim> &tria,
 
 template <int dim, int spacedim>
 void
-DoFHandler<dim, spacedim>::reinit(const Triangulation<dim, spacedim> &tria)
+DoFHandler<dim, spacedim>::reinit(
+  const Triangulation<dim, spacedim> &triangulation)
 {
   //
   // call destructor
@@ -2205,7 +2209,7 @@ DoFHandler<dim, spacedim>::reinit(const Triangulation<dim, spacedim> &tria)
   // call constructor
   //
   // establish connection to new triangulation
-  this->tria = &tria;
+  this->tria = &triangulation;
   this->setup_policy();
 
   // start in hp-mode and let distribute_dofs toggle it if necessary

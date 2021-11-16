@@ -33,9 +33,9 @@ DEAL_II_NAMESPACE_OPEN
 template <int dim, int patch_dim, int spacedim>
 DataOutResample<dim, patch_dim, spacedim>::DataOutResample(
   const Triangulation<patch_dim, spacedim> &patch_tria,
-  const Mapping<patch_dim, spacedim> &      patch_mapping)
+  const Mapping<patch_dim, spacedim> &      patch_mapping_)
   : patch_dof_handler(patch_tria)
-  , patch_mapping(&patch_mapping)
+  , patch_mapping(&patch_mapping_)
 {}
 
 
@@ -43,10 +43,10 @@ DataOutResample<dim, patch_dim, spacedim>::DataOutResample(
 template <int dim, int patch_dim, int spacedim>
 void
 DataOutResample<dim, patch_dim, spacedim>::update_mapping(
-  const Mapping<dim, spacedim> &mapping,
+  const Mapping<dim, spacedim> &mapping_,
   const unsigned int            n_subdivisions)
 {
-  this->mapping = &mapping;
+  this->mapping = &mapping_;
   this->point_to_local_vector_indices.clear();
 
   FE_Q_iso_Q1<patch_dim, spacedim> fe(
@@ -109,11 +109,11 @@ DataOutResample<dim, patch_dim, spacedim>::update_mapping(
 template <int dim, int patch_dim, int spacedim>
 void
 DataOutResample<dim, patch_dim, spacedim>::build_patches(
-  const Mapping<dim, spacedim> &                                mapping,
+  const Mapping<dim, spacedim> &                                mapping_,
   const unsigned int                                            n_subdivisions,
   const typename DataOut<patch_dim, spacedim>::CurvedCellRegion curved_region)
 {
-  this->update_mapping(mapping, n_subdivisions);
+  this->update_mapping(mapping_, n_subdivisions);
   this->build_patches(curved_region);
 }
 

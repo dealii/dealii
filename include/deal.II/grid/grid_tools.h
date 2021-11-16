@@ -3519,10 +3519,7 @@ namespace GridTools
     // that we get to all vertices in
     // the triangulation by only
     // visiting the active cells.
-    typename Triangulation<dim, spacedim>::active_cell_iterator
-      cell = triangulation.begin_active(),
-      endc = triangulation.end();
-    for (; cell != endc; ++cell)
+    for (const auto &cell : triangulation.active_cell_iterators())
       for (const unsigned int v : cell->vertex_indices())
         if (treated_vertices[cell->vertex_index(v)] == false)
           {
@@ -3536,10 +3533,7 @@ namespace GridTools
     // now fix any vertices on hanging nodes so that we don't create any holes
     if (dim == 2)
       {
-        typename Triangulation<dim, spacedim>::active_cell_iterator
-          cell = triangulation.begin_active(),
-          endc = triangulation.end();
-        for (; cell != endc; ++cell)
+        for (const auto &cell : triangulation.active_cell_iterators())
           for (const unsigned int face : cell->face_indices())
             if (cell->face(face)->has_children() &&
                 !cell->face(face)->at_boundary())
@@ -3556,10 +3550,7 @@ namespace GridTools
       }
     else if (dim == 3)
       {
-        typename Triangulation<dim, spacedim>::active_cell_iterator
-          cell = triangulation.begin_active(),
-          endc = triangulation.end();
-        for (; cell != endc; ++cell)
+        for (const auto &cell : triangulation.active_cell_iterators())
           for (const unsigned int face : cell->face_indices())
             if (cell->face(face)->has_children() &&
                 !cell->face(face)->at_boundary())

@@ -2143,19 +2143,19 @@ SparseMatrix<number>::copy_from(const ForwardIterator begin,
 namespace SparseMatrixIterators
 {
   template <typename number>
-  inline Accessor<number, true>::Accessor(const MatrixType *matrix,
+  inline Accessor<number, true>::Accessor(const MatrixType *matrix_,
                                           const std::size_t index_within_matrix)
-    : SparsityPatternIterators::Accessor(&matrix->get_sparsity_pattern(),
+    : SparsityPatternIterators::Accessor(&matrix_->get_sparsity_pattern(),
                                          index_within_matrix)
-    , matrix(matrix)
+    , matrix(matrix_)
   {}
 
 
 
   template <typename number>
-  inline Accessor<number, true>::Accessor(const MatrixType *matrix)
-    : SparsityPatternIterators::Accessor(&matrix->get_sparsity_pattern())
-    , matrix(matrix)
+  inline Accessor<number, true>::Accessor(const MatrixType *matrix_)
+    : SparsityPatternIterators::Accessor(&matrix_->get_sparsity_pattern())
+    , matrix(matrix_)
   {}
 
 
@@ -2189,9 +2189,10 @@ namespace SparseMatrixIterators
 
 
   template <typename number>
-  inline Accessor<number, false>::Reference::Reference(const Accessor *accessor,
-                                                       const bool)
-    : accessor(accessor)
+  inline Accessor<number, false>::Reference::Reference(
+    const Accessor *accessor_,
+    const bool)
+    : accessor(accessor_)
   {}
 
 
@@ -2266,18 +2267,19 @@ namespace SparseMatrixIterators
 
 
   template <typename number>
-  inline Accessor<number, false>::Accessor(MatrixType *      matrix,
+  inline Accessor<number, false>::Accessor(MatrixType *      matrix_,
                                            const std::size_t index)
-    : SparsityPatternIterators::Accessor(&matrix->get_sparsity_pattern(), index)
-    , matrix(matrix)
+    : SparsityPatternIterators::Accessor(&matrix_->get_sparsity_pattern(),
+                                         index)
+    , matrix(matrix_)
   {}
 
 
 
   template <typename number>
-  inline Accessor<number, false>::Accessor(MatrixType *matrix)
-    : SparsityPatternIterators::Accessor(&matrix->get_sparsity_pattern())
-    , matrix(matrix)
+  inline Accessor<number, false>::Accessor(MatrixType *matrix_)
+    : SparsityPatternIterators::Accessor(&matrix_->get_sparsity_pattern())
+    , matrix(matrix_)
   {}
 
 

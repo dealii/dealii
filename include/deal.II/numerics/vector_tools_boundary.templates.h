@@ -227,7 +227,7 @@ namespace VectorTools
 
           for (auto const &cell : dof.active_cell_iterators())
             if (!cell->is_artificial())
-              for (const unsigned int face_no : cell->face_indices())
+              for (const unsigned int face_index : cell->face_indices())
                 {
                   const FiniteElement<dim, spacedim> &fe = cell->get_fe();
 
@@ -259,7 +259,7 @@ namespace VectorTools
                     }
 
                   const typename DoFHandler<dim, spacedim>::face_iterator face =
-                    cell->face(face_no);
+                    cell->face(face_index);
                   const types::boundary_id boundary_component =
                     face->boundary_id();
 
@@ -268,16 +268,16 @@ namespace VectorTools
                   // element in use here has DoFs on the face at all
                   if ((function_map.find(boundary_component) !=
                        function_map.end()) &&
-                      (cell->get_fe().n_dofs_per_face(face_no) > 0))
+                      (cell->get_fe().n_dofs_per_face(face_index) > 0))
                     {
                       // face is of the right component
-                      x_fe_values.reinit(cell, face_no);
+                      x_fe_values.reinit(cell, face_index);
                       const dealii::FEFaceValues<dim, spacedim> &fe_values =
                         x_fe_values.get_present_fe_values();
 
                       // get indices, physical location and boundary values of
                       // dofs on this face
-                      face_dofs.resize(fe.n_dofs_per_face(face_no));
+                      face_dofs.resize(fe.n_dofs_per_face(face_index));
                       face->get_dof_indices(face_dofs, cell->active_fe_index());
                       const std::vector<Point<spacedim>> &dof_locations =
                         fe_values.get_quadrature_points();
@@ -287,13 +287,13 @@ namespace VectorTools
                           // resize array. avoid construction of a memory
                           // allocating temporary if possible
                           if (dof_values_system.size() <
-                              fe.n_dofs_per_face(face_no))
+                              fe.n_dofs_per_face(face_index))
                             dof_values_system.resize(
-                              fe.n_dofs_per_face(face_no),
+                              fe.n_dofs_per_face(face_index),
                               Vector<number>(fe.n_components()));
                           else
                             dof_values_system.resize(
-                              fe.n_dofs_per_face(face_no));
+                              fe.n_dofs_per_face(face_index));
 
                           function_map.find(boundary_component)
                             ->second->vector_value_list(dof_locations,
@@ -308,7 +308,8 @@ namespace VectorTools
                               unsigned int component;
                               if (fe.is_primitive())
                                 component =
-                                  fe.face_system_to_component_index(i, face_no)
+                                  fe.face_system_to_component_index(i,
+                                                                    face_index)
                                     .first;
                               else
                                 {
@@ -371,7 +372,8 @@ namespace VectorTools
                         // FE has only one component, so save some computations
                         {
                           // get only the one component that this function has
-                          dof_values_scalar.resize(fe.n_dofs_per_face(face_no));
+                          dof_values_scalar.resize(
+                            fe.n_dofs_per_face(face_index));
                           function_map.find(boundary_component)
                             ->second->value_list(dof_locations,
                                                  dof_values_scalar,
@@ -1505,15 +1507,16 @@ namespace VectorTools
               edge_matrix_inv.vmult(edge_solution, edge_rhs);
 
               // Store computed DoFs
-              for (unsigned int associated_edge_dof_index = 0;
-                   associated_edge_dof_index < associated_edge_dofs;
-                   ++associated_edge_dof_index)
+              for (unsigned int associated_edge_dof_idx = 0;
+                   associated_edge_dof_idx < associated_edge_dofs;
+                   ++associated_edge_dof_idx)
                 {
-                  dof_values[associated_edge_dof_to_face_dof
-                               [associated_edge_dof_index]] =
-                    edge_solution(associated_edge_dof_index);
-                  dofs_processed[associated_edge_dof_to_face_dof
-                                   [associated_edge_dof_index]] = true;
+                  dof_values
+                    [associated_edge_dof_to_face_dof[associated_edge_dof_idx]] =
+                      edge_solution(associated_edge_dof_idx);
+                  dofs_processed
+                    [associated_edge_dof_to_face_dof[associated_edge_dof_idx]] =
+                      true;
                 }
               break;
             }

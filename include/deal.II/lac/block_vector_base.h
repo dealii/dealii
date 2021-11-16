@@ -1014,18 +1014,18 @@ namespace internal
 
     template <class BlockVectorType, bool Constness>
     inline Iterator<BlockVectorType, Constness>::Iterator(
-      BlockVector &   parent,
-      const size_type global_index,
-      const size_type current_block,
-      const size_type index_within_block,
-      const size_type next_break_forward,
-      const size_type next_break_backward)
-      : parent(&parent)
-      , global_index(global_index)
-      , current_block(current_block)
-      , index_within_block(index_within_block)
-      , next_break_forward(next_break_forward)
-      , next_break_backward(next_break_backward)
+      BlockVector &   parent_,
+      const size_type global_index_,
+      const size_type current_block_,
+      const size_type index_within_block_,
+      const size_type next_break_forward_,
+      const size_type next_break_backward_)
+      : parent(&parent_)
+      , global_index(global_index_)
+      , current_block(current_block_)
+      , index_within_block(index_within_block_)
+      , next_break_forward(next_break_forward_)
+      , next_break_backward(next_break_backward_)
     {}
 
 
@@ -1321,10 +1321,11 @@ namespace internal
 
 
     template <class BlockVectorType, bool Constness>
-    Iterator<BlockVectorType, Constness>::Iterator(BlockVector &   parent,
-                                                   const size_type global_index)
-      : parent(&parent)
-      , global_index(global_index)
+    Iterator<BlockVectorType, Constness>::Iterator(
+      BlockVector &   parent_,
+      const size_type global_index_)
+      : parent(&parent_)
+      , global_index(global_index_)
     {
       // find which block we are
       // in. for this, take into
@@ -1332,25 +1333,25 @@ namespace internal
       // times that people want to
       // initialize iterators
       // past-the-end
-      if (global_index < parent.size())
+      if (global_index < parent->size())
         {
           const std::pair<size_type, size_type> indices =
-            parent.block_indices.global_to_local(global_index);
+            parent->block_indices.global_to_local(global_index);
           current_block      = indices.first;
           index_within_block = indices.second;
 
           next_break_backward =
-            parent.block_indices.local_to_global(current_block, 0);
+            parent->block_indices.local_to_global(current_block, 0);
           next_break_forward =
-            (parent.block_indices.local_to_global(current_block, 0) +
-             parent.block_indices.block_size(current_block) - 1);
+            (parent->block_indices.local_to_global(current_block, 0) +
+             parent->block_indices.block_size(current_block) - 1);
         }
       else
         // past the end. only have one
         // value for this
         {
-          this->global_index  = parent.size();
-          current_block       = parent.n_blocks();
+          this->global_index  = parent->size();
+          current_block       = parent->n_blocks();
           index_within_block  = 0;
           next_break_backward = global_index;
           next_break_forward  = numbers::invalid_size_type;

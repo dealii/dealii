@@ -30,14 +30,14 @@ DEAL_II_NAMESPACE_OPEN
 
 template <class PolynomialType, int dim, int spacedim>
 FE_PolyFace<PolynomialType, dim, spacedim>::FE_PolyFace(
-  const PolynomialType &        poly_space,
+  const PolynomialType &        poly_space_,
   const FiniteElementData<dim> &fe_data,
-  const std::vector<bool> &     restriction_is_additive_flags)
+  const std::vector<bool> &     restriction_is_additive_flags_)
   : FiniteElement<dim, spacedim>(
       fe_data,
-      restriction_is_additive_flags,
+      restriction_is_additive_flags_,
       std::vector<ComponentMask>(1, ComponentMask(1, true)))
-  , poly_space(poly_space)
+  , poly_space(poly_space_)
 {
   AssertDimension(dim, PolynomialType::dimension + 1);
 }

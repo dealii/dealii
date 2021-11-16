@@ -103,9 +103,9 @@ public:
    * @param data The actual VectorizedArray.
    * @param lane A pointer to the current lane.
    */
-  VectorizedArrayIterator(T &data, const std::size_t lane)
-    : data(&data)
-    , lane(lane)
+  VectorizedArrayIterator(T &data_, const std::size_t lane_)
+    : data(&data_)
+    , lane(lane_)
   {}
 
   /**

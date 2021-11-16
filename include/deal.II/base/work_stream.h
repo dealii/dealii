@@ -319,14 +319,14 @@ namespace WorkStream
         IteratorRangeToItemStream(const Iterator &   begin,
                                   const Iterator &   end,
                                   const unsigned int buffer_size,
-                                  const unsigned int chunk_size,
-                                  const ScratchData &sample_scratch_data,
+                                  const unsigned int chunk_size_,
+                                  const ScratchData &sample_scratch_data_,
                                   const CopyData &   sample_copy_data)
           : tbb::filter(/*is_serial=*/true)
           , remaining_iterator_range(begin, end)
           , item_buffer(buffer_size)
-          , sample_scratch_data(sample_scratch_data)
-          , chunk_size(chunk_size)
+          , sample_scratch_data(sample_scratch_data_)
+          , chunk_size(chunk_size_)
         {
           // initialize the elements of the ring buffer
           for (unsigned int element = 0; element < item_buffer.size();
@@ -478,11 +478,11 @@ namespace WorkStream
          */
         TBBWorker(
           const std::function<void(const Iterator &, ScratchData &, CopyData &)>
-            &  worker,
-          bool copier_exist = true)
+            &  worker_,
+          bool copier_exist_ = true)
           : tbb::filter(/* is_serial= */ false)
-          , worker(worker)
-          , copier_exist(copier_exist)
+          , worker(worker_)
+          , copier_exist(copier_exist_)
         {}
 
 
@@ -625,9 +625,9 @@ namespace WorkStream
          * copying from the additional data object to the global matrix or
          * similar.
          */
-        TBBCopier(const std::function<void(const CopyData &)> &copier)
+        TBBCopier(const std::function<void(const CopyData &)> &copier_)
           : tbb::filter(/*is_serial=*/true)
-          , copier(copier)
+          , copier(copier_)
         {}
 
 
@@ -881,14 +881,14 @@ namespace WorkStream
          */
         WorkerAndCopier(
           const std::function<void(const Iterator &, ScratchData &, CopyData &)>
-            &                                          worker,
-          const std::function<void(const CopyData &)> &copier,
-          const ScratchData &                          sample_scratch_data,
-          const CopyData &                             sample_copy_data)
-          : worker(worker)
-          , copier(copier)
-          , sample_scratch_data(sample_scratch_data)
-          , sample_copy_data(sample_copy_data)
+            &                                          worker_,
+          const std::function<void(const CopyData &)> &copier_,
+          const ScratchData &                          sample_scratch_data_,
+          const CopyData &                             sample_copy_data_)
+          : worker(worker_)
+          , copier(copier_)
+          , sample_scratch_data(sample_scratch_data_)
+          , sample_copy_data(sample_copy_data_)
         {}
 
 

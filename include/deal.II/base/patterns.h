@@ -1413,16 +1413,16 @@ namespace Patterns
 namespace Patterns
 {
   template <class... PatternTypes>
-  Tuple::Tuple(const char *separator, const PatternTypes &...ps)
+  Tuple::Tuple(const char *separator_, const PatternTypes &...ps)
     : // forward to the version with std::string argument
-    Tuple(std::string(separator), ps...)
+    Tuple(std::string(separator_), ps...)
   {}
 
 
 
   template <class... PatternTypes>
-  Tuple::Tuple(const std::string &separator, const PatternTypes &...ps)
-    : separator(separator)
+  Tuple::Tuple(const std::string &separator_, const PatternTypes &...ps)
+    : separator(separator_)
   {
     static_assert(is_base_of_all<PatternBase, PatternTypes...>::value,
                   "Not all of the input arguments of this function "
@@ -1872,8 +1872,8 @@ namespace Patterns
         std::string s;
         if (vec.size() > 0)
           s = vec[0];
-        for (unsigned int i = 1; i < vec.size(); ++i)
-          s += p->get_separator() + " " + vec[i];
+        for (unsigned int j = 1; j < vec.size(); ++j)
+          s += p->get_separator() + " " + vec[j];
 
         AssertThrow(p->match(s), ExcNoMatch(s, p->description()));
         return s;

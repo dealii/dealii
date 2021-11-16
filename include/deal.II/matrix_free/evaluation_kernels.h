@@ -4139,49 +4139,49 @@ namespace internal
       using Number2_                  = const Number2;
 
       Processor(
-        const unsigned int                          n_components,
-        const bool                                  integrate,
-        const Number2 *                             global_vector_ptr,
-        const std::vector<ArrayView<const Number>> *sm_ptr,
-        const MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> &data,
-        const MatrixFreeFunctions::DoFInfo &                       dof_info,
-        VectorizedArrayType *                                      values_quad,
-        VectorizedArrayType *gradients_quad,
-        VectorizedArrayType *hessians_quad,
-        VectorizedArrayType *scratch_data,
-        const bool           do_values,
-        const bool           do_gradients,
-        const bool           do_hessians,
-        const unsigned int   active_fe_index,
-        const unsigned int   first_selected_component,
-        const std::array<unsigned int, VectorizedArrayType::size()> cells,
-        const std::array<unsigned int, VectorizedArrayType::size()> face_nos,
-        const unsigned int                                 subface_index,
-        const MatrixFreeFunctions::DoFInfo::DoFAccessIndex dof_access_index,
+        const unsigned int                          n_components_,
+        const bool                                  integrate_,
+        const Number2 *                             global_vector_ptr_,
+        const std::vector<ArrayView<const Number>> *sm_ptr_,
+        const MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> &data_,
+        const MatrixFreeFunctions::DoFInfo &                       dof_info_,
+        VectorizedArrayType *                                      values_quad_,
+        VectorizedArrayType *gradients_quad_,
+        VectorizedArrayType *hessians_quad_,
+        VectorizedArrayType *scratch_data_,
+        const bool           do_values_,
+        const bool           do_gradients_,
+        const bool           do_hessians_,
+        const unsigned int   active_fe_index_,
+        const unsigned int   first_selected_component_,
+        const std::array<unsigned int, VectorizedArrayType::size()> cells_,
+        const std::array<unsigned int, VectorizedArrayType::size()> face_nos_,
+        const unsigned int                                 subface_index_,
+        const MatrixFreeFunctions::DoFInfo::DoFAccessIndex dof_access_index_,
         const std::array<unsigned int, VectorizedArrayType::size()>
-                                      face_orientations,
-        const Table<2, unsigned int> &orientation_map)
-        : n_components(n_components)
-        , integrate(integrate)
-        , global_vector_ptr(global_vector_ptr)
-        , sm_ptr(sm_ptr)
-        , data(data)
-        , dof_info(dof_info)
-        , values_quad(values_quad)
-        , gradients_quad(gradients_quad)
-        , hessians_quad(hessians_quad)
-        , scratch_data(scratch_data)
-        , do_values(do_values)
-        , do_gradients(do_gradients)
-        , do_hessians(do_hessians)
-        , active_fe_index(active_fe_index)
-        , first_selected_component(first_selected_component)
-        , cells(cells)
-        , face_nos(face_nos)
-        , subface_index(subface_index)
-        , dof_access_index(dof_access_index)
-        , face_orientations(face_orientations)
-        , orientation_map(orientation_map)
+                                      face_orientations_,
+        const Table<2, unsigned int> &orientation_map_)
+        : n_components(n_components_)
+        , integrate(integrate_)
+        , global_vector_ptr(global_vector_ptr_)
+        , sm_ptr(sm_ptr_)
+        , data(data_)
+        , dof_info(dof_info_)
+        , values_quad(values_quad_)
+        , gradients_quad(gradients_quad_)
+        , hessians_quad(hessians_quad_)
+        , scratch_data(scratch_data_)
+        , do_values(do_values_)
+        , do_gradients(do_gradients_)
+        , do_hessians(do_hessians_)
+        , active_fe_index(active_fe_index_)
+        , first_selected_component(first_selected_component_)
+        , cells(cells_)
+        , face_nos(face_nos_)
+        , subface_index(subface_index_)
+        , dof_access_index(dof_access_index_)
+        , face_orientations(face_orientations_)
+        , orientation_map(orientation_map_)
       {}
 
       template <typename T0, typename T1, typename T2>
@@ -4433,51 +4433,51 @@ namespace internal
 
 
       Processor(
-        VectorizedArrayType *                       values_array,
-        const unsigned int                          n_components,
-        const bool                                  integrate,
-        Number2 *                                   global_vector_ptr,
-        const std::vector<ArrayView<const Number>> *sm_ptr,
-        const MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> &data,
-        const MatrixFreeFunctions::DoFInfo &                       dof_info,
-        VectorizedArrayType *                                      values_quad,
-        VectorizedArrayType *gradients_quad,
-        VectorizedArrayType *hessians_quad,
-        VectorizedArrayType *scratch_data,
-        const bool           do_values,
-        const bool           do_gradients,
-        const bool           do_hessians,
-        const unsigned int   active_fe_index,
-        const unsigned int   first_selected_component,
-        const std::array<unsigned int, VectorizedArrayType::size()> cells,
-        const std::array<unsigned int, VectorizedArrayType::size()> face_nos,
-        const unsigned int                                 subface_index,
-        const MatrixFreeFunctions::DoFInfo::DoFAccessIndex dof_access_index,
+        VectorizedArrayType *                       values_array_,
+        const unsigned int                          n_components_,
+        const bool                                  integrate_,
+        Number2 *                                   global_vector_ptr_,
+        const std::vector<ArrayView<const Number>> *sm_ptr_,
+        const MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> &data_,
+        const MatrixFreeFunctions::DoFInfo &                       dof_info_,
+        VectorizedArrayType *                                      values_quad_,
+        VectorizedArrayType *gradients_quad_,
+        VectorizedArrayType *hessians_quad_,
+        VectorizedArrayType *scratch_data_,
+        const bool           do_values_,
+        const bool           do_gradients_,
+        const bool           do_hessians_,
+        const unsigned int   active_fe_index_,
+        const unsigned int   first_selected_component_,
+        const std::array<unsigned int, VectorizedArrayType::size()> cells_,
+        const std::array<unsigned int, VectorizedArrayType::size()> face_nos_,
+        const unsigned int                                 subface_index_,
+        const MatrixFreeFunctions::DoFInfo::DoFAccessIndex dof_access_index_,
         const std::array<unsigned int, VectorizedArrayType::size()>
-                                      face_orientations,
-        const Table<2, unsigned int> &orientation_map)
-        : values_array(values_array)
-        , n_components(n_components)
-        , integrate(integrate)
-        , global_vector_ptr(global_vector_ptr)
-        , sm_ptr(sm_ptr)
-        , data(data)
-        , dof_info(dof_info)
-        , values_quad(values_quad)
-        , gradients_quad(gradients_quad)
-        , hessians_quad(hessians_quad)
-        , scratch_data(scratch_data)
-        , do_values(do_values)
-        , do_gradients(do_gradients)
-        , do_hessians(do_hessians)
-        , active_fe_index(active_fe_index)
-        , first_selected_component(first_selected_component)
-        , cells(cells)
-        , face_nos(face_nos)
-        , subface_index(subface_index)
-        , dof_access_index(dof_access_index)
-        , face_orientations(face_orientations)
-        , orientation_map(orientation_map)
+                                      face_orientations_,
+        const Table<2, unsigned int> &orientation_map_)
+        : values_array(values_array_)
+        , n_components(n_components_)
+        , integrate(integrate_)
+        , global_vector_ptr(global_vector_ptr_)
+        , sm_ptr(sm_ptr_)
+        , data(data_)
+        , dof_info(dof_info_)
+        , values_quad(values_quad_)
+        , gradients_quad(gradients_quad_)
+        , hessians_quad(hessians_quad_)
+        , scratch_data(scratch_data_)
+        , do_values(do_values_)
+        , do_gradients(do_gradients_)
+        , do_hessians(do_hessians_)
+        , active_fe_index(active_fe_index_)
+        , first_selected_component(first_selected_component_)
+        , cells(cells_)
+        , face_nos(face_nos_)
+        , subface_index(subface_index_)
+        , dof_access_index(dof_access_index_)
+        , face_orientations(face_orientations_)
+        , orientation_map(orientation_map_)
       {}
 
       template <typename T0, typename T1, typename T2, typename T3, typename T4>

@@ -353,13 +353,14 @@ namespace VectorTools
             }
         };
 
-        std::vector<value_type> evaluation_point_results;
+        std::vector<value_type> evaluation_pt_results;
         std::vector<value_type> buffer;
 
-        cache.template evaluate_and_process<value_type>(
-          evaluation_point_results, buffer, evaluation_function);
+        cache.template evaluate_and_process<value_type>(evaluation_pt_results,
+                                                        buffer,
+                                                        evaluation_function);
 
-        return evaluation_point_results;
+        return evaluation_pt_results;
       }();
 
       if (cache.is_map_unique())

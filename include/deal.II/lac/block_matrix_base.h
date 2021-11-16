@@ -1110,10 +1110,10 @@ namespace BlockMatrixIterators
 
   template <class BlockMatrixType>
   inline Accessor<BlockMatrixType, true>::Accessor(
-    const BlockMatrixType *matrix,
+    const BlockMatrixType *matrix_,
     const size_type        row,
     const size_type        col)
-    : matrix(matrix)
+    : matrix(matrix_)
     , base_iterator(matrix->block(0, 0).begin())
   {
     (void)col;
@@ -1310,10 +1310,10 @@ namespace BlockMatrixIterators
 
 
   template <class BlockMatrixType>
-  inline Accessor<BlockMatrixType, false>::Accessor(BlockMatrixType *matrix,
+  inline Accessor<BlockMatrixType, false>::Accessor(BlockMatrixType *matrix_,
                                                     const size_type  row,
                                                     const size_type  col)
-    : matrix(matrix)
+    : matrix(matrix_)
     , base_iterator(matrix->block(0, 0).begin())
   {
     (void)col;

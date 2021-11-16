@@ -1122,8 +1122,8 @@ FilteredIterator<BaseIterator>::operator--(int)
 template <typename BaseIterator>
 template <typename Predicate>
 inline FilteredIterator<BaseIterator>::PredicateTemplate<
-  Predicate>::PredicateTemplate(const Predicate &predicate)
-  : predicate(predicate)
+  Predicate>::PredicateTemplate(const Predicate &predicate_)
+  : predicate(predicate_)
 {}
 
 
@@ -1182,8 +1182,8 @@ namespace IteratorFilters
 
 
   // ---------------- IteratorFilters::LevelEqualTo ---------
-  inline LevelEqualTo::LevelEqualTo(const unsigned int level)
-    : level(level)
+  inline LevelEqualTo::LevelEqualTo(const unsigned int level_)
+    : level(level_)
   {}
 
 
@@ -1199,8 +1199,8 @@ namespace IteratorFilters
 
   // ---------------- IteratorFilters::SubdomainEqualTo ---------
   inline SubdomainEqualTo::SubdomainEqualTo(
-    const types::subdomain_id subdomain_id)
-    : subdomain_id(subdomain_id)
+    const types::subdomain_id subdomain_id_)
+    : subdomain_id(subdomain_id_)
   {}
 
 
@@ -1238,18 +1238,18 @@ namespace IteratorFilters
   // ---------------- IteratorFilters::MaterialIdEqualTo ---------
   inline MaterialIdEqualTo::MaterialIdEqualTo(
     const types::material_id material_id,
-    const bool               only_locally_owned)
+    const bool               only_locally_owned_)
     : material_ids{material_id}
-    , only_locally_owned(only_locally_owned)
+    , only_locally_owned(only_locally_owned_)
   {}
 
 
 
   inline MaterialIdEqualTo::MaterialIdEqualTo(
-    const std::set<types::material_id> &material_ids,
-    const bool                          only_locally_owned)
-    : material_ids(material_ids)
-    , only_locally_owned(only_locally_owned)
+    const std::set<types::material_id> &material_ids_,
+    const bool                          only_locally_owned_)
+    : material_ids(material_ids_)
+    , only_locally_owned(only_locally_owned_)
   {}
 
 
@@ -1269,18 +1269,18 @@ namespace IteratorFilters
   // ---------------- IteratorFilters::ActiveFEIndexEqualTo ---------
   inline ActiveFEIndexEqualTo::ActiveFEIndexEqualTo(
     const unsigned int active_fe_index,
-    const bool         only_locally_owned)
+    const bool         only_locally_owned_)
     : active_fe_indices{active_fe_index}
-    , only_locally_owned(only_locally_owned)
+    , only_locally_owned(only_locally_owned_)
   {}
 
 
 
   inline ActiveFEIndexEqualTo::ActiveFEIndexEqualTo(
-    const std::set<unsigned int> &active_fe_indices,
-    const bool                    only_locally_owned)
-    : active_fe_indices(active_fe_indices)
-    , only_locally_owned(only_locally_owned)
+    const std::set<unsigned int> &active_fe_indices_,
+    const bool                    only_locally_owned_)
+    : active_fe_indices(active_fe_indices_)
+    , only_locally_owned(only_locally_owned_)
   {}
 
 

@@ -1004,10 +1004,10 @@ namespace LinearAlgebra
   template <typename Number2>
   inline void
   ReadWriteVector<Number>::add(const std::vector<size_type> &indices,
-                               const std::vector<Number2> &  values)
+                               const std::vector<Number2> &  val)
   {
-    AssertDimension(indices.size(), values.size());
-    add(indices.size(), indices.data(), values.data());
+    AssertDimension(indices.size(), val.size());
+    add(indices.size(), indices.data(), val.data());
   }
 
 
@@ -1016,7 +1016,7 @@ namespace LinearAlgebra
   template <typename Number2>
   inline void
   ReadWriteVector<Number>::add(const std::vector<size_type> &  indices,
-                               const ReadWriteVector<Number2> &values)
+                               const ReadWriteVector<Number2> &val)
   {
     const size_type size = indices.size();
     for (size_type i = 0; i < size; ++i)
@@ -1025,7 +1025,7 @@ namespace LinearAlgebra
           numbers::is_finite(values[i]),
           ExcMessage(
             "The given value is not finite but either infinite or Not A Number (NaN)"));
-        this->operator()(indices[i]) += values[indices[i]];
+        this->operator()(indices[i]) += val[indices[i]];
       }
   }
 
@@ -1053,10 +1053,10 @@ namespace LinearAlgebra
   template <typename Number>
   template <typename Functor>
   inline ReadWriteVector<Number>::FunctorTemplate<Functor>::FunctorTemplate(
-    ReadWriteVector<Number> &parent,
-    const Functor &          functor)
-    : parent(parent)
-    , functor(functor)
+    ReadWriteVector<Number> &parent_,
+    const Functor &          functor_)
+    : parent(parent_)
+    , functor(functor_)
   {}
 
 

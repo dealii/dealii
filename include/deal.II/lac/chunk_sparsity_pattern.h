@@ -865,9 +865,9 @@ private:
 
 namespace ChunkSparsityPatternIterators
 {
-  inline Accessor::Accessor(const ChunkSparsityPattern *sparsity_pattern,
+  inline Accessor::Accessor(const ChunkSparsityPattern *sparsity_pattern_,
                             const size_type             row)
-    : sparsity_pattern(sparsity_pattern)
+    : sparsity_pattern(sparsity_pattern_)
     , reduced_accessor(row == sparsity_pattern->n_rows() ?
                          *sparsity_pattern->sparsity_pattern.end() :
                          *sparsity_pattern->sparsity_pattern.begin(
@@ -880,8 +880,8 @@ namespace ChunkSparsityPatternIterators
 
 
 
-  inline Accessor::Accessor(const ChunkSparsityPattern *sparsity_pattern)
-    : sparsity_pattern(sparsity_pattern)
+  inline Accessor::Accessor(const ChunkSparsityPattern *sparsity_pattern_)
+    : sparsity_pattern(sparsity_pattern_)
     , reduced_accessor(*sparsity_pattern->sparsity_pattern.end())
     , chunk_row(0)
     , chunk_col(0)
@@ -1174,7 +1174,7 @@ ChunkSparsityPattern::copy_from(const size_type       n_rows,
                                 const size_type       n_cols,
                                 const ForwardIterator begin,
                                 const ForwardIterator end,
-                                const size_type       chunk_size)
+                                const size_type       chunk_size_)
 {
   Assert(static_cast<size_type>(std::distance(begin, end)) == n_rows,
          ExcIteratorRange(std::distance(begin, end), n_rows));
@@ -1189,7 +1189,7 @@ ChunkSparsityPattern::copy_from(const size_type       n_rows,
   for (ForwardIterator i = begin; i != end; ++i)
     row_lengths.push_back(std::distance(i->begin(), i->end()) +
                           (is_square ? 1 : 0));
-  reinit(n_rows, n_cols, row_lengths, chunk_size);
+  reinit(n_rows, n_cols, row_lengths, chunk_size_);
 
   // now enter all the elements into the matrix
   size_type row = 0;

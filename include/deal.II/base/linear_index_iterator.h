@@ -502,8 +502,8 @@ LinearIndexIterator<DerivedIterator, AccessorType>::operator>(
 
 template <class DerivedIterator, class AccessorType>
 inline LinearIndexIterator<DerivedIterator, AccessorType>::LinearIndexIterator(
-  const AccessorType accessor)
-  : accessor(accessor)
+  const AccessorType accessor_)
+  : accessor(accessor_)
 {}
 
 

@@ -394,9 +394,9 @@ BlockVector<Number>::BlockVector(const std::vector<size_type> &block_sizes,
   InputIterator start = first;
   for (size_type b = 0; b < block_sizes.size(); ++b)
     {
-      InputIterator end = start;
-      std::advance(end, static_cast<signed int>(block_sizes[b]));
-      std::copy(start, end, this->block(b).begin());
+      InputIterator finish = start;
+      std::advance(finish, static_cast<signed int>(block_sizes[b]));
+      std::copy(start, finish, this->block(b).begin());
       start = end;
     };
   Assert(start == end, ExcIteratorRangeDoesNotMatchVectorSize());

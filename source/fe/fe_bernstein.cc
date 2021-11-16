@@ -35,12 +35,12 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template <int dim, int spacedim>
-FE_Bernstein<dim, spacedim>::FE_Bernstein(const unsigned int degree)
-  : FE_Q_Base<dim, spacedim>(this->renumber_bases(degree),
+FE_Bernstein<dim, spacedim>::FE_Bernstein(const unsigned int degree_)
+  : FE_Q_Base<dim, spacedim>(this->renumber_bases(degree_),
                              FiniteElementData<dim>(this->get_dpo_vector(
-                                                      degree),
+                                                      degree_),
                                                     1,
-                                                    degree,
+                                                    degree_,
                                                     FiniteElementData<dim>::H1),
                              std::vector<bool>(1, false))
 {}

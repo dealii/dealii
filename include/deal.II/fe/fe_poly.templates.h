@@ -35,14 +35,14 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim, int spacedim>
 FE_Poly<dim, spacedim>::FE_Poly(
-  const ScalarPolynomialsBase<dim> &poly_space,
+  const ScalarPolynomialsBase<dim> &poly_space_,
   const FiniteElementData<dim> &    fe_data,
-  const std::vector<bool> &         restriction_is_additive_flags,
-  const std::vector<ComponentMask> &nonzero_components)
+  const std::vector<bool> &         restriction_is_additive_flags_,
+  const std::vector<ComponentMask> &nonzero_components_)
   : FiniteElement<dim, spacedim>(fe_data,
-                                 restriction_is_additive_flags,
-                                 nonzero_components)
-  , poly_space(poly_space.clone())
+                                 restriction_is_additive_flags_,
+                                 nonzero_components_)
+  , poly_space(poly_space_.clone())
 {}
 
 

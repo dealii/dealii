@@ -42,21 +42,21 @@ namespace internal
   {
     template <int dim, int spacedim>
     ParallelData<dim, spacedim>::ParallelData(
-      const unsigned int               n_datasets,
-      const unsigned int               n_subdivisions,
-      const std::vector<unsigned int> &n_postprocessor_outputs,
-      const Mapping<dim, spacedim> &   mapping,
+      const unsigned int               n_datasets_,
+      const unsigned int               n_subdivisions_,
+      const std::vector<unsigned int> &n_postprocessor_outputs_,
+      const Mapping<dim, spacedim> &   mapping_,
       const std::vector<
         std::shared_ptr<dealii::hp::FECollection<dim, spacedim>>>
-        &               finite_elements,
-      const UpdateFlags update_flags)
+        &               finite_elements_,
+      const UpdateFlags update_flags_)
       : internal::DataOutImplementation::ParallelDataBase<dim, spacedim>(
-          n_datasets,
-          n_subdivisions,
-          n_postprocessor_outputs,
-          mapping,
-          finite_elements,
-          update_flags,
+          n_datasets_,
+          n_subdivisions_,
+          n_postprocessor_outputs_,
+          mapping_,
+          finite_elements_,
+          update_flags_,
           true)
     {}
 

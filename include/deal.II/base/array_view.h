@@ -394,10 +394,10 @@ inline ArrayView<ElementType, MemorySpaceType>::ArrayView()
 
 template <typename ElementType, typename MemorySpaceType>
 inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
-  value_type *      starting_element,
-  const std::size_t n_elements)
-  : starting_element(starting_element)
-  , n_elements(n_elements)
+  value_type *      starting_element_,
+  const std::size_t n_elements_)
+  : starting_element(starting_element_)
+  , n_elements(n_elements_)
 {
   Assert(
     n_elements == 0 ||
@@ -411,10 +411,10 @@ inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
 
 template <typename ElementType, typename MemorySpaceType>
 inline void
-ArrayView<ElementType, MemorySpaceType>::reinit(value_type *starting_element,
-                                                const std::size_t n_elements)
+ArrayView<ElementType, MemorySpaceType>::reinit(value_type *      start_element,
+                                                const std::size_t n_elems)
 {
-  *this = ArrayView(starting_element, n_elements);
+  *this = ArrayView(start_element, n_elems);
 }
 
 

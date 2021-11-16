@@ -51,21 +51,21 @@ namespace internal
 
 template <int dim, int spacedim, typename VectorType>
 CellDataTransfer<dim, spacedim, VectorType>::CellDataTransfer(
-  const Triangulation<dim, spacedim> &               triangulation,
+  const Triangulation<dim, spacedim> &               tria,
   const std::function<std::vector<value_type>(
     const typename Triangulation<dim, spacedim>::cell_iterator &parent,
-    const value_type parent_value)>                  refinement_strategy,
+    const value_type parent_value)>                  refinement_strategy_,
   const std::function<value_type(
     const typename Triangulation<dim, spacedim>::cell_iterator &parent,
-    const std::vector<value_type> &children_values)> coarsening_strategy)
-  : triangulation(&triangulation, typeid(*this).name())
-  , refinement_strategy(refinement_strategy)
-  , coarsening_strategy(coarsening_strategy)
+    const std::vector<value_type> &children_values)> coarsening_strategy_)
+  : triangulation(&tria, typeid(*this).name())
+  , refinement_strategy(refinement_strategy_)
+  , coarsening_strategy(coarsening_strategy_)
   , n_active_cells_pre(numbers::invalid_unsigned_int)
 {
   Assert(
     (dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim> *>(
-       &triangulation) == nullptr),
+       &tria) == nullptr),
     ExcMessage("You are calling the CellDataTransfer class "
                "with a parallel::distributed::Triangulation. "
                "You probably want to use the "

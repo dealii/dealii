@@ -207,18 +207,18 @@ namespace internal
   template <class FE>
   ParallelData<dim, spacedim, number>::ParallelData(
     const FE &                                          fe,
-    const dealii::hp::QCollection<dim - 1> &            face_quadratures,
+    const dealii::hp::QCollection<dim - 1> &            face_quadratures_,
     const dealii::hp::MappingCollection<dim, spacedim> &mapping,
     const bool                                          need_quadrature_points,
     const unsigned int                                  n_solution_vectors,
-    const types::subdomain_id                           subdomain_id,
-    const types::material_id                            material_id,
+    const types::subdomain_id                           subdomain_id_,
+    const types::material_id                            material_id_,
     const std::map<types::boundary_id, const Function<spacedim, number> *>
-      *                       neumann_bc,
-    const ComponentMask &     component_mask,
-    const Function<spacedim> *coefficients)
+      *                       neumann_bc_,
+    const ComponentMask &     component_mask_,
+    const Function<spacedim> *coefficients_)
     : finite_element(fe)
-    , face_quadratures(face_quadratures)
+    , face_quadratures(face_quadratures_)
     , fe_face_values_cell(mapping,
                           finite_element,
                           face_quadratures,
@@ -253,11 +253,11 @@ namespace internal
     , coefficient_values(face_quadratures.max_n_quadrature_points(),
                          dealii::Vector<double>(fe.n_components()))
     , JxW_values(face_quadratures.max_n_quadrature_points())
-    , subdomain_id(subdomain_id)
-    , material_id(material_id)
-    , neumann_bc(neumann_bc)
-    , component_mask(component_mask)
-    , coefficients(coefficients)
+    , subdomain_id(subdomain_id_)
+    , material_id(material_id_)
+    , neumann_bc(neumann_bc_)
+    , component_mask(component_mask_)
+    , coefficients(coefficients_)
   {}
 
 
@@ -1245,11 +1245,11 @@ KellyErrorEstimator<dim, spacedim>::estimate(
     [&solutions, strategy](
       const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
       internal::ParallelData<dim, spacedim, typename InputVector::value_type>
-        &                            parallel_data,
+        &                            par_data,
       std::map<typename DoFHandler<dim, spacedim>::face_iterator,
                std::vector<double>> &local_face_integrals) {
       internal::estimate_one_cell(
-        cell, parallel_data, local_face_integrals, solutions, strategy);
+        cell, par_data, local_face_integrals, solutions, strategy);
     },
     [&face_integrals](
       const std::map<typename DoFHandler<dim, spacedim>::face_iterator,

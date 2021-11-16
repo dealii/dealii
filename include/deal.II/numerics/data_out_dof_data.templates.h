@@ -67,22 +67,22 @@ namespace internal
   {
     template <int dim, int spacedim>
     ParallelDataBase<dim, spacedim>::ParallelDataBase(
-      const unsigned int                    n_datasets,
-      const unsigned int                    n_subdivisions,
+      const unsigned int                    n_datasets_,
+      const unsigned int                    n_subdivisions_,
       const std::vector<unsigned int> &     n_postprocessor_outputs,
       const dealii::Mapping<dim, spacedim> &mapping,
       const std::vector<
         std::shared_ptr<dealii::hp::FECollection<dim, spacedim>>>
-        &               finite_elements,
-      const UpdateFlags update_flags,
+        &               finite_elements_,
+      const UpdateFlags update_flags_,
       const bool        use_face_values)
       : ParallelDataBase<dim, spacedim>(
-          n_datasets,
-          n_subdivisions,
+          n_datasets_,
+          n_subdivisions_,
           n_postprocessor_outputs,
           dealii::hp::MappingCollection<dim, spacedim>(mapping),
-          finite_elements,
-          update_flags,
+          finite_elements_,
+          update_flags_,
           use_face_values)
     {}
 
@@ -472,21 +472,21 @@ namespace internal
 
     template <int dim, int spacedim>
     ParallelDataBase<dim, spacedim>::ParallelDataBase(
-      const unsigned int               n_datasets,
-      const unsigned int               n_subdivisions,
+      const unsigned int               n_datasets_,
+      const unsigned int               n_subdivisions_,
       const std::vector<unsigned int> &n_postprocessor_outputs,
       const dealii::hp::MappingCollection<dim, spacedim> &mapping,
       const std::vector<
         std::shared_ptr<dealii::hp::FECollection<dim, spacedim>>>
-        &               finite_elements,
-      const UpdateFlags update_flags,
+        &               finite_elements_,
+      const UpdateFlags update_flags_,
       const bool        use_face_values)
-      : n_datasets(n_datasets)
-      , n_subdivisions(n_subdivisions)
+      : n_datasets(n_datasets_)
+      , n_subdivisions(n_subdivisions_)
       , postprocessed_values(n_postprocessor_outputs.size())
       , mapping_collection(mapping)
-      , finite_elements(finite_elements)
-      , update_flags(update_flags)
+      , finite_elements(finite_elements_)
+      , update_flags(update_flags_)
     {
       const unsigned int n_q_points =
         setup_parallel_data_base_internal(n_subdivisions,
@@ -803,12 +803,12 @@ namespace internal
       const std::vector<std::string> & names_in,
       const std::vector<
         DataComponentInterpretation::DataComponentInterpretation>
-        &data_component_interpretation)
+        &data_component_interpretation_)
       : dof_handler(
           dofs,
           typeid(dealii::DataOut_DoFData<dim, dim, spacedim, spacedim>).name())
       , names(names_in)
-      , data_component_interpretation(data_component_interpretation)
+      , data_component_interpretation(data_component_interpretation_)
       , postprocessor(nullptr, typeid(*this).name())
       , n_output_variables(names.size())
     {
@@ -1175,12 +1175,14 @@ namespace internal
     DataEntry<dim, spacedim, ScalarType>::DataEntry(
       const DoFHandler<dim, spacedim> *dofs,
       const VectorType *               data,
-      const std::vector<std::string> & names,
+      const std::vector<std::string> & names_,
       const std::vector<
         DataComponentInterpretation::DataComponentInterpretation>
-        &                  data_component_interpretation,
+        &                  data_component_interpretation_,
       const DataVectorType actual_type)
-      : DataEntryBase<dim, spacedim>(dofs, names, data_component_interpretation)
+      : DataEntryBase<dim, spacedim>(dofs,
+                                     names_,
+                                     data_component_interpretation_)
     {
       if (actual_type == DataVectorType::type_dof_data)
         create_dof_vector(*dofs, *data, vector);
@@ -1533,15 +1535,15 @@ namespace internal
     {
     public:
       MGDataEntry(const DoFHandler<dim, spacedim> *dofs,
-                  const MGLevelObject<VectorType> *vectors,
-                  const std::vector<std::string> & names,
+                  const MGLevelObject<VectorType> *vectors_,
+                  const std::vector<std::string> & names_,
                   const std::vector<
                     DataComponentInterpretation::DataComponentInterpretation>
-                    &data_component_interpretation)
+                    &data_component_interpretation_)
         : DataEntryBase<dim, spacedim>(dofs,
-                                       names,
-                                       data_component_interpretation)
-        , vectors(vectors)
+                                       names_,
+                                       data_component_interpretation_)
+        , vectors(vectors_)
       {}
 
       virtual double

@@ -94,9 +94,9 @@ public:
   class NoConvergence : public dealii::ExceptionBase
   {
   public:
-    NoConvergence(const unsigned int last_step, const double last_residual)
-      : last_step(last_step)
-      , last_residual(last_residual)
+    NoConvergence(const unsigned int last_step_, const double last_residual_)
+      : last_step(last_step_)
+      , last_residual(last_residual_)
     {}
 
     virtual ~NoConvergence() noexcept override = default;

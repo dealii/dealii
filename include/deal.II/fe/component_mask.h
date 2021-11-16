@@ -259,8 +259,8 @@ operator<<(std::ostream &out, const ComponentMask &mask);
 #ifndef DOXYGEN
 // -------------------- inline functions ---------------------
 
-inline ComponentMask::ComponentMask(const std::vector<bool> &component_mask)
-  : component_mask(component_mask)
+inline ComponentMask::ComponentMask(const std::vector<bool> &component_mask_)
+  : component_mask(component_mask_)
 {}
 
 

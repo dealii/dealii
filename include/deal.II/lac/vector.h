@@ -1216,10 +1216,10 @@ template <typename Number>
 template <typename OtherNumber>
 inline void
 Vector<Number>::extract_subvector_to(const std::vector<size_type> &indices,
-                                     std::vector<OtherNumber> &    values) const
+                                     std::vector<OtherNumber> &    val) const
 {
   for (size_type i = 0; i < indices.size(); ++i)
-    values[i] = operator()(indices[i]);
+    val[i] = operator()(indices[i]);
 }
 
 
@@ -1258,11 +1258,11 @@ template <typename Number>
 template <typename OtherNumber>
 inline void
 Vector<Number>::add(const std::vector<size_type> &  indices,
-                    const std::vector<OtherNumber> &values)
+                    const std::vector<OtherNumber> &val)
 {
-  Assert(indices.size() == values.size(),
-         ExcDimensionMismatch(indices.size(), values.size()));
-  add(indices.size(), indices.data(), values.data());
+  Assert(indices.size() == val.size(),
+         ExcDimensionMismatch(indices.size(), val.size()));
+  add(indices.size(), indices.data(), val.data());
 }
 
 
@@ -1271,11 +1271,11 @@ template <typename Number>
 template <typename OtherNumber>
 inline void
 Vector<Number>::add(const std::vector<size_type> &indices,
-                    const Vector<OtherNumber> &   values)
+                    const Vector<OtherNumber> &   val)
 {
-  Assert(indices.size() == values.size(),
-         ExcDimensionMismatch(indices.size(), values.size()));
-  add(indices.size(), indices.data(), values.values.begin());
+  Assert(indices.size() == val.size(),
+         ExcDimensionMismatch(indices.size(), val.size()));
+  add(indices.size(), indices.data(), val.values.begin());
 }
 
 
@@ -1285,7 +1285,7 @@ template <typename OtherNumber>
 inline void
 Vector<Number>::add(const size_type    n_indices,
                     const size_type *  indices,
-                    const OtherNumber *values)
+                    const OtherNumber *val)
 {
   for (size_type i = 0; i < n_indices; ++i)
     {
@@ -1295,7 +1295,7 @@ Vector<Number>::add(const size_type    n_indices,
         ExcMessage(
           "The given value is not finite but either infinite or Not A Number (NaN)"));
 
-      this->values[indices[i]] += values[i];
+      this->values[indices[i]] += val[i];
     }
 }
 

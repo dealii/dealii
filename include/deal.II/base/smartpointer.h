@@ -224,8 +224,8 @@ inline SmartPointer<T, P>::SmartPointer()
 
 
 template <typename T, typename P>
-inline SmartPointer<T, P>::SmartPointer(T *t)
-  : t(t)
+inline SmartPointer<T, P>::SmartPointer(T *t_)
+  : t(t_)
   , id(typeid(P).name())
   , pointed_to_object_is_alive(false)
 {
@@ -236,9 +236,9 @@ inline SmartPointer<T, P>::SmartPointer(T *t)
 
 
 template <typename T, typename P>
-inline SmartPointer<T, P>::SmartPointer(T *t, const std::string &id)
-  : t(t)
-  , id(id)
+inline SmartPointer<T, P>::SmartPointer(T *t_, const std::string &id_)
+  : t(t_)
+  , id(id_)
   , pointed_to_object_is_alive(false)
 {
   if (t != nullptr)

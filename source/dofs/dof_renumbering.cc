@@ -1594,22 +1594,23 @@ namespace DoFRenumbering
   compute_cell_wise(
     std::vector<types::global_dof_index> &new_indices,
     std::vector<types::global_dof_index> &reverse,
-    const DoFHandler<dim, spacedim> &     dof,
+    const DoFHandler<dim, spacedim> &     dof_handler,
     const typename std::vector<
       typename DoFHandler<dim, spacedim>::active_cell_iterator> &cells)
   {
     if (const parallel::TriangulationBase<dim, spacedim> *p =
           dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
-            &dof.get_triangulation()))
+            &dof_handler.get_triangulation()))
       {
         AssertDimension(cells.size(), p->n_locally_owned_active_cells());
       }
     else
       {
-        AssertDimension(cells.size(), dof.get_triangulation().n_active_cells());
+        AssertDimension(cells.size(),
+                        dof_handler.get_triangulation().n_active_cells());
       }
 
-    const auto n_owned_dofs = dof.n_locally_owned_dofs();
+    const auto n_owned_dofs = dof_handler.n_locally_owned_dofs();
 
     // Actually, we compute the inverse of the reordering vector, called reverse
     // here. Later, its inverse is computed into new_indices, which is the
@@ -1623,7 +1624,7 @@ namespace DoFRenumbering
     std::vector<bool>                    already_sorted(n_owned_dofs, false);
     std::vector<types::global_dof_index> cell_dofs;
 
-    const auto &owned_dofs = dof.locally_owned_dofs();
+    const auto &owned_dofs = dof_handler.locally_owned_dofs();
 
     unsigned int index = 0;
 
@@ -1963,9 +1964,9 @@ namespace DoFRenumbering
       /**
        * Constructor.
        */
-      ClockCells(const Point<dim> &center, bool counter)
-        : center(center)
-        , counter(counter)
+      ClockCells(const Point<dim> &center_, bool counter_)
+        : center(center_)
+        , counter(counter_)
       {}
 
       /**

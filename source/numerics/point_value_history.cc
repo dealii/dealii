@@ -77,9 +77,9 @@ PointValueHistory<dim>::PointValueHistory(
 
 template <int dim>
 PointValueHistory<dim>::PointValueHistory(
-  const DoFHandler<dim> &dof_handler,
+  const DoFHandler<dim> &dof_handler_,
   const unsigned int     n_independent_variables)
-  : dof_handler(&dof_handler)
+  : dof_handler(&dof_handler_)
   , n_indep(n_independent_variables)
 {
   closed                = false;
@@ -95,7 +95,7 @@ PointValueHistory<dim>::PointValueHistory(
     std::vector<std::vector<double>>(n_indep, std::vector<double>(0));
   indep_names = std::vector<std::string>();
 
-  tria_listener = dof_handler.get_triangulation().signals.any_change.connect(
+  tria_listener = dof_handler->get_triangulation().signals.any_change.connect(
     [this]() { this->tria_change_listener(); });
 }
 

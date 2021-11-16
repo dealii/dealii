@@ -82,8 +82,8 @@ namespace parallel
       /**
        * Constructor. Take and package the given function object.
        */
-      Body(const F &f)
-        : f(f)
+      Body(const F &f_)
+        : f(f_)
       {}
 
       template <typename Range>
@@ -555,13 +555,13 @@ namespace parallel
        * std::plus<int>().
        */
       template <typename Reductor>
-      ReductionOnSubranges(const Function & f,
-                           const Reductor & reductor,
-                           const ResultType neutral_element = ResultType())
-        : result(neutral_element)
-        , f(f)
-        , neutral_element(neutral_element)
-        , reductor(reductor)
+      ReductionOnSubranges(const Function & f_,
+                           const Reductor & reductor_,
+                           const ResultType neutral_element_ = ResultType())
+        : result(neutral_element_)
+        , f(f_)
+        , neutral_element(neutral_element_)
+        , reductor(reductor_)
       {}
 
       /**

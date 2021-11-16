@@ -125,13 +125,13 @@ namespace internal
 
 template <int structdim, int dim, int spacedim>
 inline TriaAccessorBase<structdim, dim, spacedim>::TriaAccessorBase(
-  const Triangulation<dim, spacedim> *tria,
+  const Triangulation<dim, spacedim> *tria_,
   const int                           level,
   const int                           index,
   const AccessorData *)
   : present_level((structdim == dim) ? level : 0)
   , present_index(index)
-  , tria(tria)
+  , tria(tria_)
 {
   // non-cells have no level, so a 0
   // should have been passed, or a -1
@@ -2289,9 +2289,9 @@ TriaAccessor<structdim, dim, spacedim>::face_indices() const
 
 template <int dim, int spacedim>
 inline TriaAccessor<0, dim, spacedim>::TriaAccessor(
-  const Triangulation<dim, spacedim> *tria,
+  const Triangulation<dim, spacedim> *tria_,
   const unsigned int                  vertex_index)
-  : tria(tria)
+  : tria(tria_)
   , global_vertex_index(vertex_index)
 {}
 
@@ -2299,11 +2299,11 @@ inline TriaAccessor<0, dim, spacedim>::TriaAccessor(
 
 template <int dim, int spacedim>
 inline TriaAccessor<0, dim, spacedim>::TriaAccessor(
-  const Triangulation<dim, spacedim> *tria,
+  const Triangulation<dim, spacedim> *tria_,
   const int /*level*/,
   const int index,
   const AccessorData *)
-  : tria(tria)
+  : tria(tria_)
   , global_vertex_index(index)
 {}
 
@@ -2697,11 +2697,11 @@ TriaAccessor<0, dim, spacedim>::used() const
 
 template <int spacedim>
 inline TriaAccessor<0, 1, spacedim>::TriaAccessor(
-  const Triangulation<1, spacedim> *tria,
-  const VertexKind                  vertex_kind,
+  const Triangulation<1, spacedim> *tria_,
+  const VertexKind                  vertex_kind_,
   const unsigned int                vertex_index)
-  : tria(tria)
-  , vertex_kind(vertex_kind)
+  : tria(tria_)
+  , vertex_kind(vertex_kind_)
   , global_vertex_index(vertex_index)
 {}
 
@@ -2709,11 +2709,11 @@ inline TriaAccessor<0, 1, spacedim>::TriaAccessor(
 
 template <int spacedim>
 inline TriaAccessor<0, 1, spacedim>::TriaAccessor(
-  const Triangulation<1, spacedim> *tria,
+  const Triangulation<1, spacedim> *tria_,
   const int                         level,
   const int                         index,
   const AccessorData *)
-  : tria(tria)
+  : tria(tria_)
   , vertex_kind(interior_vertex)
   , global_vertex_index(numbers::invalid_unsigned_int)
 {

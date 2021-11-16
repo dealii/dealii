@@ -546,8 +546,8 @@ public:
 
 template <int dim>
 inline QProjector<dim>::DataSetDescriptor::DataSetDescriptor(
-  const unsigned int dataset_offset)
-  : dataset_offset(dataset_offset)
+  const unsigned int dataset_offset_)
+  : dataset_offset(dataset_offset_)
 {}
 
 

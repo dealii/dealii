@@ -398,28 +398,28 @@ private:
 template <int dim, int spacedim>
 inline void
 MappingManifold<dim, spacedim>::InternalData::store_vertices(
-  const typename Triangulation<dim, spacedim>::cell_iterator &cell) const
+  const typename Triangulation<dim, spacedim>::cell_iterator &cell_) const
 {
   vertices.resize(GeometryInfo<dim>::vertices_per_cell);
   for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
-    vertices[i] = cell->vertex(i);
-  this->cell = cell;
+    vertices[i] = cell_->vertex(i);
+  this->cell = cell_;
 }
 
 
 template <int dim, int spacedim>
 inline void
 MappingManifold<dim, spacedim>::InternalData::
-  compute_manifold_quadrature_weights(const Quadrature<dim> &quad)
+  compute_manifold_quadrature_weights(const Quadrature<dim> &quad_)
 {
   cell_manifold_quadrature_weights.resize(
-    quad.size(), std::vector<double>(GeometryInfo<dim>::vertices_per_cell));
-  for (unsigned int q = 0; q < quad.size(); ++q)
+    quad_.size(), std::vector<double>(GeometryInfo<dim>::vertices_per_cell));
+  for (unsigned int q = 0; q < quad_.size(); ++q)
     {
       for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
         {
           cell_manifold_quadrature_weights[q][i] =
-            GeometryInfo<dim>::d_linear_shape_function(quad.point(q), i);
+            GeometryInfo<dim>::d_linear_shape_function(quad_.point(q), i);
         }
     }
 }

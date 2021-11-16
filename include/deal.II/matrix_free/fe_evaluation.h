@@ -3480,7 +3480,7 @@ inline FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
     const unsigned int quad_no_in,
     const unsigned int fe_degree,
     const unsigned int n_q_points,
-    const bool         is_interior_face,
+    const bool         is_interior_face_,
     const unsigned int active_fe_index_in,
     const unsigned int active_quad_index_in,
     const unsigned int face_type)
@@ -3526,7 +3526,7 @@ inline FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
   , normal_x_jacobian(nullptr)
   , quadrature_weights(descriptor->quadrature_weights.begin())
   , cell(numbers::invalid_unsigned_int)
-  , is_interior_face(is_interior_face)
+  , is_interior_face(is_interior_face_)
   , dof_access_index(
       is_face ?
         (is_interior_face ?
@@ -4159,24 +4159,24 @@ inline FEEvaluationBase<dim,
                         VectorizedArrayType>::
   FEEvaluationBase(const MatrixFree<dim, Number, VectorizedArrayType> &data_in,
                    const unsigned int                                  dof_no,
-                   const unsigned int first_selected_component,
+                   const unsigned int first_selected_component_,
                    const unsigned int quad_no_in,
                    const unsigned int fe_degree,
                    const unsigned int n_q_points,
-                   const bool         is_interior_face,
-                   const unsigned int active_fe_index,
-                   const unsigned int active_quad_index,
+                   const bool         is_interior_face_,
+                   const unsigned int active_fe_index_,
+                   const unsigned int active_quad_index_,
                    const unsigned int face_type)
   : FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>(
       data_in,
       dof_no,
-      first_selected_component,
+      first_selected_component_,
       quad_no_in,
       fe_degree,
       n_q_points,
-      is_interior_face,
-      active_fe_index,
-      active_quad_index,
+      is_interior_face_,
+      active_fe_index_,
+      active_quad_index_,
       face_type)
   , n_fe_components(data_in.get_dof_info(dof_no).start_components.back())
   , dof_values_initialized(false)
@@ -4185,7 +4185,7 @@ inline FEEvaluationBase<dim,
   , hessians_quad_initialized(false)
   , values_quad_submitted(false)
   , gradients_quad_submitted(false)
-  , first_selected_component(first_selected_component)
+  , first_selected_component(first_selected_component_)
 {
   set_data_pointers();
   Assert(
@@ -4234,7 +4234,7 @@ inline FEEvaluationBase<dim,
     const FiniteElement<dim> &fe,
     const Quadrature<1> &     quadrature,
     const UpdateFlags         update_flags,
-    const unsigned int        first_selected_component,
+    const unsigned int        first_selected_component_,
     const FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>
       *other)
   : FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>(
@@ -4253,7 +4253,7 @@ inline FEEvaluationBase<dim,
   , gradients_quad_submitted(false)
   // keep the number of the selected component within the current base element
   // for reading dof values
-  , first_selected_component(first_selected_component)
+  , first_selected_component(first_selected_component_)
 {
   set_data_pointers();
 
@@ -4342,16 +4342,15 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
     Utilities::fixed_power<dim>(this->data->data.front().fe_degree + 1);
   const unsigned int dofs_per_component =
     this->data->dofs_per_component_on_cell;
-  const unsigned int n_quadrature_points = this->n_quadrature_points;
+  const unsigned int n_quadrature_pts = this->n_quadrature_points;
 
   const unsigned int shift =
     std::max(tensor_dofs_per_component + 1, dofs_per_component) *
       n_components_ * 3 +
-    2 * n_quadrature_points;
+    2 * n_quadrature_pts;
   const unsigned int allocated_size =
     shift + n_components_ * dofs_per_component +
-    (n_components_ * ((dim * (dim + 1)) / 2 + 2 * dim + 1) *
-     n_quadrature_points);
+    (n_components_ * ((dim * (dim + 1)) / 2 + 2 * dim + 1) * n_quadrature_pts);
   this->scratch_data_array->resize_fast(allocated_size);
 
   // set the pointers to the correct position in the data array
@@ -4363,17 +4362,16 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   values_quad =
     this->scratch_data_array->begin() + n_components * dofs_per_component;
   gradients_quad = this->scratch_data_array->begin() +
-                   n_components * (dofs_per_component + n_quadrature_points);
+                   n_components * (dofs_per_component + n_quadrature_pts);
   gradients_from_hessians_quad =
     this->scratch_data_array->begin() +
-    n_components * (dofs_per_component + (dim + 1) * n_quadrature_points);
+    n_components * (dofs_per_component + (dim + 1) * n_quadrature_pts);
   hessians_quad =
     this->scratch_data_array->begin() +
-    n_components * (dofs_per_component + (2 * dim + 1) * n_quadrature_points);
-  this->scratch_data = this->scratch_data_array->begin() +
-                       n_components_ * dofs_per_component +
-                       (n_components_ * ((dim * (dim + 1)) / 2 + 2 * dim + 1) *
-                        n_quadrature_points);
+    n_components * (dofs_per_component + (2 * dim + 1) * n_quadrature_pts);
+  this->scratch_data =
+    this->scratch_data_array->begin() + n_components_ * dofs_per_component +
+    (n_components_ * ((dim * (dim + 1)) / 2 + 2 * dim + 1) * n_quadrature_pts);
 }
 
 
@@ -4706,8 +4704,6 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
         is_face ? cells[v] : this->cell * n_lanes + v;
       const unsigned int cell_dof_index =
         cell_index * n_fe_components + first_selected_component;
-      const unsigned int n_components_read =
-        n_fe_components > 1 ? n_components : 1;
       unsigned int index_indicators =
         this->dof_info->row_starts[cell_dof_index].second;
       unsigned int next_index_indicators =
@@ -6566,24 +6562,24 @@ inline FEEvaluationAccess<dim,
   FEEvaluationAccess(
     const MatrixFree<dim, Number, VectorizedArrayType> &data_in,
     const unsigned int                                  dof_no,
-    const unsigned int first_selected_component,
+    const unsigned int first_selected_component_,
     const unsigned int quad_no_in,
     const unsigned int fe_degree,
     const unsigned int n_q_points,
-    const bool         is_interior_face,
-    const unsigned int active_fe_index,
-    const unsigned int active_quad_index,
+    const bool         is_interior_face_,
+    const unsigned int active_fe_index_,
+    const unsigned int active_quad_index_,
     const unsigned int face_type)
   : FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>(
       data_in,
       dof_no,
-      first_selected_component,
+      first_selected_component_,
       quad_no_in,
       fe_degree,
       n_q_points,
-      is_interior_face,
-      active_fe_index,
-      active_quad_index,
+      is_interior_face_,
+      active_fe_index_,
+      active_quad_index_,
       face_type)
 {}
 
@@ -6674,24 +6670,24 @@ inline FEEvaluationAccess<dim, 1, Number, is_face, VectorizedArrayType>::
   FEEvaluationAccess(
     const MatrixFree<dim, Number, VectorizedArrayType> &data_in,
     const unsigned int                                  dof_no,
-    const unsigned int first_selected_component,
+    const unsigned int first_selected_component_,
     const unsigned int quad_no_in,
     const unsigned int fe_degree,
     const unsigned int n_q_points,
-    const bool         is_interior_face,
-    const unsigned int active_fe_index,
-    const unsigned int active_quad_index,
+    const bool         is_interior_face_,
+    const unsigned int active_fe_index_,
+    const unsigned int active_quad_index_,
     const unsigned int face_type)
   : FEEvaluationBase<dim, 1, Number, is_face, VectorizedArrayType>(
       data_in,
       dof_no,
-      first_selected_component,
+      first_selected_component_,
       quad_no_in,
       fe_degree,
       n_q_points,
-      is_interior_face,
-      active_fe_index,
-      active_quad_index,
+      is_interior_face_,
+      active_fe_index_,
+      active_quad_index_,
       face_type)
 {}
 
@@ -6704,7 +6700,7 @@ inline FEEvaluationAccess<dim, 1, Number, is_face, VectorizedArrayType>::
     const FiniteElement<dim> &fe,
     const Quadrature<1> &     quadrature,
     const UpdateFlags         update_flags,
-    const unsigned int        first_selected_component,
+    const unsigned int        first_selected_component_,
     const FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>
       *other)
   : FEEvaluationBase<dim, 1, Number, is_face, VectorizedArrayType>(
@@ -6712,7 +6708,7 @@ inline FEEvaluationAccess<dim, 1, Number, is_face, VectorizedArrayType>::
       fe,
       quadrature,
       update_flags,
-      first_selected_component,
+      first_selected_component_,
       other)
 {}
 
@@ -7001,24 +6997,24 @@ inline FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
   FEEvaluationAccess(
     const MatrixFree<dim, Number, VectorizedArrayType> &data_in,
     const unsigned int                                  dof_no,
-    const unsigned int first_selected_component,
+    const unsigned int first_selected_component_,
     const unsigned int quad_no_in,
     const unsigned int fe_degree,
     const unsigned int n_q_points,
-    const bool         is_interior_face,
-    const unsigned int active_fe_index,
-    const unsigned int active_quad_index,
+    const bool         is_interior_face_,
+    const unsigned int active_fe_index_,
+    const unsigned int active_quad_index_,
     const unsigned int face_type)
   : FEEvaluationBase<dim, dim, Number, is_face, VectorizedArrayType>(
       data_in,
       dof_no,
-      first_selected_component,
+      first_selected_component_,
       quad_no_in,
       fe_degree,
       n_q_points,
-      is_interior_face,
-      active_fe_index,
-      active_quad_index,
+      is_interior_face_,
+      active_fe_index_,
+      active_quad_index_,
       face_type)
 {}
 
@@ -7031,7 +7027,7 @@ inline FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
     const FiniteElement<dim> &fe,
     const Quadrature<1> &     quadrature,
     const UpdateFlags         update_flags,
-    const unsigned int        first_selected_component,
+    const unsigned int        first_selected_component_,
     const FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>
       *other)
   : FEEvaluationBase<dim, dim, Number, is_face, VectorizedArrayType>(
@@ -7039,7 +7035,7 @@ inline FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
       fe,
       quadrature,
       update_flags,
-      first_selected_component,
+      first_selected_component_,
       other)
 {}
 
@@ -7412,24 +7408,24 @@ template <typename Number, bool is_face, typename VectorizedArrayType>
 inline FEEvaluationAccess<1, 1, Number, is_face, VectorizedArrayType>::
   FEEvaluationAccess(const MatrixFree<1, Number, VectorizedArrayType> &data_in,
                      const unsigned int                                dof_no,
-                     const unsigned int first_selected_component,
+                     const unsigned int first_selected_component_,
                      const unsigned int quad_no_in,
                      const unsigned int fe_degree,
                      const unsigned int n_q_points,
-                     const bool         is_interior_face,
-                     const unsigned int active_fe_index,
-                     const unsigned int active_quad_index,
+                     const bool         is_interior_face_,
+                     const unsigned int active_fe_index_,
+                     const unsigned int active_quad_index_,
                      const unsigned int face_type)
   : FEEvaluationBase<1, 1, Number, is_face, VectorizedArrayType>(
       data_in,
       dof_no,
-      first_selected_component,
+      first_selected_component_,
       quad_no_in,
       fe_degree,
       n_q_points,
-      is_interior_face,
-      active_fe_index,
-      active_quad_index,
+      is_interior_face_,
+      active_fe_index_,
+      active_quad_index_,
       face_type)
 {}
 
@@ -7741,19 +7737,19 @@ inline FEEvaluation<dim,
                     VectorizedArrayType>::
   FEEvaluation(const MatrixFree<dim, Number, VectorizedArrayType> &data_in,
                const unsigned int                                  fe_no,
-               const unsigned int                                  quad_no,
-               const unsigned int first_selected_component,
-               const unsigned int active_fe_index,
-               const unsigned int active_quad_index)
+               const unsigned int                                  quad_no_,
+               const unsigned int first_selected_component_,
+               const unsigned int active_fe_index_,
+               const unsigned int active_quad_index_)
   : BaseClass(data_in,
               fe_no,
-              first_selected_component,
-              quad_no,
+              first_selected_component_,
+              quad_no_,
               fe_degree,
               static_n_q_points,
               true /*note: this is not a face*/,
-              active_fe_index,
-              active_quad_index)
+              active_fe_index_,
+              active_quad_index_)
   , dofs_per_component(this->data->dofs_per_component_on_cell)
   , dofs_per_cell(this->data->dofs_per_component_on_cell * n_components_)
   , n_q_points(this->data->n_q_points)
@@ -7778,12 +7774,12 @@ inline FEEvaluation<dim,
   FEEvaluation(const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
                const std::pair<unsigned int, unsigned int> &       range,
                const unsigned int                                  dof_no,
-               const unsigned int                                  quad_no,
-               const unsigned int first_selected_component)
+               const unsigned int                                  quad_no_,
+               const unsigned int first_selected_component_)
   : FEEvaluation(matrix_free,
                  dof_no,
-                 quad_no,
-                 first_selected_component,
+                 quad_no_,
+                 first_selected_component_,
                  matrix_free.get_cell_active_fe_index(range))
 {}
 
@@ -7946,10 +7942,10 @@ FEEvaluation<dim,
              Number,
              VectorizedArrayType>::
   check_template_arguments(const unsigned int dof_no,
-                           const unsigned int first_selected_component)
+                           const unsigned int first_selected_component_)
 {
   (void)dof_no;
-  (void)first_selected_component;
+  (void)first_selected_component_;
 
 #  ifdef DEBUG
   // print error message when the dimensions do not match. Propose a possible
@@ -7967,11 +7963,11 @@ FEEvaluation<dim,
       message += Utilities::int_to_string(n_q_points_1d);
       message += "," + Utilities::int_to_string(n_components);
       message += ",Number>(data";
-      if (first_selected_component != numbers::invalid_unsigned_int)
+      if (first_selected_component_ != numbers::invalid_unsigned_int)
         {
           message += ", " + Utilities::int_to_string(dof_no) + ", ";
           message += Utilities::int_to_string(this->quad_no) + ", ";
-          message += Utilities::int_to_string(first_selected_component);
+          message += Utilities::int_to_string(first_selected_component_);
         }
       message += ")\n";
 
@@ -7986,7 +7982,7 @@ FEEvaluation<dim,
               this->data->data.front().fe_degree)
             {
               proposed_dof_comp = dof_no;
-              proposed_fe_comp  = first_selected_component;
+              proposed_fe_comp  = first_selected_component_;
             }
           else
             for (unsigned int no = 0; no < this->matrix_info->n_components();
@@ -8023,7 +8019,7 @@ FEEvaluation<dim,
       if (proposed_dof_comp != numbers::invalid_unsigned_int &&
           proposed_quad_comp != numbers::invalid_unsigned_int)
         {
-          if (proposed_dof_comp != first_selected_component)
+          if (proposed_dof_comp != first_selected_component_)
             message += "Wrong vector component selection:\n";
           else
             message += "Wrong quadrature formula selection:\n";
@@ -8049,7 +8045,7 @@ FEEvaluation<dim,
             correct_pos += " ^ ";
           else
             correct_pos += "   ";
-          if (proposed_fe_comp != first_selected_component)
+          if (proposed_fe_comp != first_selected_component_)
             correct_pos += " ^\n";
           else
             correct_pos += "  \n";
@@ -8071,7 +8067,7 @@ FEEvaluation<dim,
         {
           message += ", " + Utilities::int_to_string(dof_no) + ", ";
           message += Utilities::int_to_string(this->quad_no);
-          message += ", " + Utilities::int_to_string(first_selected_component);
+          message += ", " + Utilities::int_to_string(first_selected_component_);
         }
       message += ")?\n";
       std::string correct_pos;

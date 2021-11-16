@@ -286,9 +286,9 @@ inline BlockIndices::BlockIndices()
 
 
 
-inline BlockIndices::BlockIndices(const unsigned int n_blocks,
+inline BlockIndices::BlockIndices(const unsigned int n_blocks_,
                                   const size_type    block_size)
-  : n_blocks(n_blocks)
+  : n_blocks(n_blocks_)
   , start_indices(n_blocks + 1)
 {
   for (size_type i = 0; i <= n_blocks; ++i)

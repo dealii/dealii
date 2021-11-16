@@ -60,8 +60,8 @@ namespace internal
        *
        * @param dim Dimension of the Triangulation.
        */
-      TriaLevel(const unsigned int dim)
-        : dim(dim)
+      TriaLevel(const unsigned int dim_)
+        : dim(dim_)
         , cells(dim)
       {}
 

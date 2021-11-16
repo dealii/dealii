@@ -200,9 +200,9 @@ namespace internal
     template <typename Number>
     struct Vector_set
     {
-      Vector_set(const Number value, Number *const dst)
-        : value(value)
-        , dst(dst)
+      Vector_set(const Number value_, Number *const dst_)
+        : value(value_)
+        , dst(dst_)
       {
         Assert(dst != nullptr, ExcInternalError());
       }
@@ -426,9 +426,9 @@ namespace internal
     template <typename Number>
     struct Vectorization_add_v
     {
-      Vectorization_add_v(Number *const val, const Number *const v_val)
-        : val(val)
-        , v_val(v_val)
+      Vectorization_add_v(Number *const val_, const Number *const v_val_)
+        : val(val_)
+        , v_val(v_val_)
       {}
 
       void
@@ -454,16 +454,16 @@ namespace internal
     template <typename Number>
     struct Vectorization_add_avpbw
     {
-      Vectorization_add_avpbw(Number *const       val,
-                              const Number *const v_val,
-                              const Number *const w_val,
-                              const Number        a,
-                              const Number        b)
-        : val(val)
-        , v_val(v_val)
-        , w_val(w_val)
-        , a(a)
-        , b(b)
+      Vectorization_add_avpbw(Number *const       val_,
+                              const Number *const v_val_,
+                              const Number *const w_val_,
+                              const Number        a_,
+                              const Number        b_)
+        : val(val_)
+        , v_val(v_val_)
+        , w_val(w_val_)
+        , a(a_)
+        , b(b_)
       {}
 
       void
@@ -492,12 +492,12 @@ namespace internal
     template <typename Number>
     struct Vectorization_sadd_xv
     {
-      Vectorization_sadd_xv(Number *const       val,
-                            const Number *const v_val,
-                            const Number        x)
-        : val(val)
-        , v_val(v_val)
-        , x(x)
+      Vectorization_sadd_xv(Number *const       val_,
+                            const Number *const v_val_,
+                            const Number        x_)
+        : val(val_)
+        , v_val(v_val_)
+        , x(x_)
       {}
 
       void
@@ -524,18 +524,18 @@ namespace internal
     template <typename Number>
     struct Vectorization_sadd_xavbw
     {
-      Vectorization_sadd_xavbw(Number *      val,
-                               const Number *v_val,
-                               const Number *w_val,
-                               Number        x,
-                               Number        a,
-                               Number        b)
-        : val(val)
-        , v_val(v_val)
-        , w_val(w_val)
-        , x(x)
-        , a(a)
-        , b(b)
+      Vectorization_sadd_xavbw(Number *      val_,
+                               const Number *v_val_,
+                               const Number *w_val_,
+                               Number        x_,
+                               Number        a_,
+                               Number        b_)
+        : val(val_)
+        , v_val(v_val_)
+        , w_val(w_val_)
+        , x(x_)
+        , a(a_)
+        , b(b_)
       {}
 
       void
@@ -565,9 +565,9 @@ namespace internal
     template <typename Number>
     struct Vectorization_scale
     {
-      Vectorization_scale(Number *const val, const Number *const v_val)
-        : val(val)
-        , v_val(v_val)
+      Vectorization_scale(Number *const val_, const Number *const v_val_)
+        : val(val_)
+        , v_val(v_val_)
       {}
 
       void
@@ -593,12 +593,12 @@ namespace internal
     template <typename Number>
     struct Vectorization_equ_au
     {
-      Vectorization_equ_au(Number *const       val,
-                           const Number *const u_val,
-                           const Number        a)
-        : val(val)
-        , u_val(u_val)
-        , a(a)
+      Vectorization_equ_au(Number *const       val_,
+                           const Number *const u_val_,
+                           const Number        a_)
+        : val(val_)
+        , u_val(u_val_)
+        , a(a_)
       {}
 
       void
@@ -625,16 +625,16 @@ namespace internal
     template <typename Number>
     struct Vectorization_equ_aubv
     {
-      Vectorization_equ_aubv(Number *const       val,
-                             const Number *const u_val,
-                             const Number *const v_val,
-                             const Number        a,
-                             const Number        b)
-        : val(val)
-        , u_val(u_val)
-        , v_val(v_val)
-        , a(a)
-        , b(b)
+      Vectorization_equ_aubv(Number *const       val_,
+                             const Number *const u_val_,
+                             const Number *const v_val_,
+                             const Number        a_,
+                             const Number        b_)
+        : val(val_)
+        , u_val(u_val_)
+        , v_val(v_val_)
+        , a(a_)
+        , b(b_)
       {}
 
       void
@@ -663,20 +663,20 @@ namespace internal
     template <typename Number>
     struct Vectorization_equ_aubvcw
     {
-      Vectorization_equ_aubvcw(Number *      val,
-                               const Number *u_val,
-                               const Number *v_val,
-                               const Number *w_val,
-                               const Number  a,
-                               const Number  b,
-                               const Number  c)
-        : val(val)
-        , u_val(u_val)
-        , v_val(v_val)
-        , w_val(w_val)
-        , a(a)
-        , b(b)
-        , c(c)
+      Vectorization_equ_aubvcw(Number *      val_,
+                               const Number *u_val_,
+                               const Number *v_val_,
+                               const Number *w_val_,
+                               const Number  a_,
+                               const Number  b_,
+                               const Number  c_)
+        : val(val_)
+        , u_val(u_val_)
+        , v_val(v_val_)
+        , w_val(w_val_)
+        , a(a_)
+        , b(b_)
+        , c(c_)
       {}
 
       void
@@ -707,10 +707,12 @@ namespace internal
     template <typename Number>
     struct Vectorization_ratio
     {
-      Vectorization_ratio(Number *val, const Number *a_val, const Number *b_val)
-        : val(val)
-        , a_val(a_val)
-        , b_val(b_val)
+      Vectorization_ratio(Number *      val_,
+                          const Number *a_val_,
+                          const Number *b_val_)
+        : val(val_)
+        , a_val(a_val_)
+        , b_val(b_val_)
       {}
 
       void
@@ -747,9 +749,9 @@ namespace internal
       static constexpr bool vectorizes = std::is_same<Number, Number2>::value &&
                                          (VectorizedArray<Number>::size() > 1);
 
-      Dot(const Number *const X, const Number2 *const Y)
-        : X(X)
-        , Y(Y)
+      Dot(const Number *const X_, const Number2 *const Y_)
+        : X(X_)
+        , Y(Y_)
       {}
 
       Number
@@ -787,8 +789,8 @@ namespace internal
     {
       static const bool vectorizes = VectorizedArray<Number>::size() > 1;
 
-      Norm2(const Number *const X)
-        : X(X)
+      Norm2(const Number *const X_)
+        : X(X_)
       {}
 
       RealType
@@ -813,8 +815,8 @@ namespace internal
     {
       static const bool vectorizes = VectorizedArray<Number>::size() > 1;
 
-      Norm1(const Number *X)
-        : X(X)
+      Norm1(const Number *X_)
+        : X(X_)
       {}
 
       RealType
@@ -839,9 +841,9 @@ namespace internal
     {
       static const bool vectorizes = VectorizedArray<Number>::size() > 1;
 
-      NormP(const Number *X, RealType p)
-        : X(X)
-        , p(p)
+      NormP(const Number *X_, RealType p_)
+        : X(X_)
+        , p(p_)
       {}
 
       RealType
@@ -867,8 +869,8 @@ namespace internal
     {
       static const bool vectorizes = VectorizedArray<Number>::size() > 1;
 
-      MeanValue(const Number *X)
-        : X(X)
+      MeanValue(const Number *X_)
+        : X(X_)
       {}
 
       Number
@@ -893,14 +895,14 @@ namespace internal
     {
       static const bool vectorizes = VectorizedArray<Number>::size() > 1;
 
-      AddAndDot(Number *const       X,
-                const Number *const V,
-                const Number *const W,
-                const Number        a)
-        : X(X)
-        , V(V)
-        , W(W)
-        , a(a)
+      AddAndDot(Number *const       X_,
+                const Number *const V_,
+                const Number *const W_,
+                const Number        a_)
+        : X(X_)
+        , V(V_)
+        , W(W_)
+        , a(a_)
       {}
 
       Number
@@ -1264,12 +1266,12 @@ namespace internal
     {
       static const unsigned int threshold_array_allocate = 512;
 
-      TBBReduceFunctor(const Operation &op,
-                       const size_type  start,
-                       const size_type  end)
-        : op(op)
-        , start(start)
-        , end(end)
+      TBBReduceFunctor(const Operation &op_,
+                       const size_type  start_,
+                       const size_type  end_)
+        : op(op_)
+        , start(start_)
+        , end(end_)
       {
         const size_type vec_size = end - start;
         // set chunk size for sub-tasks

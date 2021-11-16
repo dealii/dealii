@@ -352,8 +352,8 @@ namespace DoFRenumbering
     /**
      * Constructor.
      */
-    CompareDownstream(const Tensor<1, dim> &dir)
-      : dir(dir)
+    CompareDownstream(const Tensor<1, dim> &d)
+      : dir(d)
     {}
     /**
      * Return true if c1 less c2.
@@ -386,8 +386,8 @@ namespace DoFRenumbering
     /**
      * Constructor.
      */
-    ComparePointwiseDownstream(const Tensor<1, dim> &dir)
-      : dir(dir)
+    ComparePointwiseDownstream(const Tensor<1, dim> &d)
+      : dir(d)
     {}
     /**
      * Return true if c1 less c2.

@@ -486,13 +486,13 @@ template <typename Value,
           typename Allocators>
 ExtractLevelVisitor<Value, Options, Translator, Box, Allocators>::
   ExtractLevelVisitor(
-    const Translator & translator,
-    const unsigned int target_level,
-    std::vector<BoundingBox<boost::geometry::dimension<Box>::value>> &boxes)
-  : translator(translator)
+    const Translator & translator_,
+    const unsigned int target_level_,
+    std::vector<BoundingBox<boost::geometry::dimension<Box>::value>> &boxes_)
+  : translator(translator_)
   , level(0)
-  , target_level(target_level)
-  , boxes(boxes)
+  , target_level(target_level_)
+  , boxes(boxes_)
 {}
 
 

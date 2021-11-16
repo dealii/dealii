@@ -48,15 +48,15 @@ DEAL_II_NAMESPACE_OPEN
 template <int dim, class VectorType, int spacedim>
 MappingQEulerian<dim, VectorType, spacedim>::MappingQEulerian(
   const unsigned int               degree,
-  const DoFHandler<dim, spacedim> &euler_dof_handler,
-  const VectorType &               euler_vector,
-  const unsigned int               level)
+  const DoFHandler<dim, spacedim> &euler_dof_handler_,
+  const VectorType &               euler_vector_,
+  const unsigned int               level_)
   : MappingQ<dim, spacedim>(degree)
-  , euler_vector(&euler_vector)
-  , euler_dof_handler(&euler_dof_handler)
-  , level(level)
+  , euler_vector(&euler_vector_)
+  , euler_dof_handler(&euler_dof_handler_)
+  , level(level_)
   , support_quadrature(degree)
-  , fe_values(euler_dof_handler.get_fe(),
+  , fe_values(euler_dof_handler_.get_fe(),
               support_quadrature,
               update_values | update_quadrature_points)
 {}

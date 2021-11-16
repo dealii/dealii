@@ -1198,8 +1198,8 @@ namespace Threads
        * Constructor. Initializes an std::future object and assumes
        * that the task so set has not finished yet.
        */
-      TaskData(std::future<RT> &&future)
-        : future(std::move(future))
+      TaskData(std::future<RT> &&future_)
+        : future(std::move(future_))
         , task_has_finished(false)
       {}
 

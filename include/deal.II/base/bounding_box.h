@@ -406,7 +406,7 @@ namespace internal
 template <int spacedim, typename Number>
 inline BoundingBox<spacedim, Number>::BoundingBox(
   const std::pair<Point<spacedim, Number>, Point<spacedim, Number>>
-    &boundary_points)
+    &boundary_pts)
 {
   // We check the Bounding Box is not degenerate
   for (unsigned int i = 0; i < spacedim; ++i)
@@ -414,7 +414,7 @@ inline BoundingBox<spacedim, Number>::BoundingBox(
            ExcMessage("Bounding Box can't be created: the points' "
                       "order should be bottom left, top right!"));
 
-  this->boundary_points = boundary_points;
+  this->boundary_points = boundary_pts;
 }
 
 

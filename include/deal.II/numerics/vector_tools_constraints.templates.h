@@ -23,6 +23,8 @@
 
 #include <deal.II/numerics/vector_tools_constraints.h>
 
+#include <limits>
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace VectorTools
@@ -493,7 +495,7 @@ namespace VectorTools
     // TODO: the implementation makes the assumption that all faces have the
     // same number of dofs
     AssertDimension(dof_handler.get_fe().n_unique_faces(), 1);
-    const unsigned int face_no = 0;
+    const unsigned int face_number = 0;
 
     // now also create a quadrature collection for the faces of a cell. fill
     // it with a quadrature formula with the support points on faces for each
@@ -502,10 +504,10 @@ namespace VectorTools
     for (unsigned int i = 0; i < fe_collection.size(); ++i)
       {
         const std::vector<Point<dim - 1>> &unit_support_points =
-          fe_collection[i].get_unit_face_support_points(face_no);
+          fe_collection[i].get_unit_face_support_points(face_number);
 
         Assert(unit_support_points.size() ==
-                 fe_collection[i].n_dofs_per_face(face_no),
+                 fe_collection[i].n_dofs_per_face(face_number),
                ExcInternalError());
 
         face_quadrature_collection.push_back(
@@ -1086,7 +1088,7 @@ namespace VectorTools
     // TODO: the implementation makes the assumption that all faces have the
     // same number of dofs
     AssertDimension(dof_handler.get_fe().n_unique_faces(), 1);
-    const unsigned int face_no = 0;
+    const unsigned int face_number = 0;
 
     // now also create a quadrature collection for the faces of a cell. fill
     // it with a quadrature formula with the support points on faces for each
@@ -1095,10 +1097,10 @@ namespace VectorTools
     for (unsigned int i = 0; i < fe_collection.size(); ++i)
       {
         const std::vector<Point<dim - 1>> &unit_support_points =
-          fe_collection[i].get_unit_face_support_points(face_no);
+          fe_collection[i].get_unit_face_support_points(face_number);
 
         Assert(unit_support_points.size() ==
-                 fe_collection[i].n_dofs_per_face(face_no),
+                 fe_collection[i].n_dofs_per_face(face_number),
                ExcInternalError());
 
         face_quadrature_collection.push_back(
@@ -1226,7 +1228,8 @@ namespace VectorTools
             // constraint indices will get the normal that contain the other
             // indices.
             Tensor<1, dim> normal;
-            unsigned       constrained_index = -1;
+            unsigned int   constrained_index =
+              std::numeric_limits<unsigned int>::max();
             for (unsigned int d = 0; d < dim; ++d)
               if (is_constrained[d])
                 {

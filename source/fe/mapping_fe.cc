@@ -50,8 +50,8 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim, int spacedim>
 MappingFE<dim, spacedim>::InternalData::InternalData(
-  const FiniteElement<dim, spacedim> &fe)
-  : fe(fe)
+  const FiniteElement<dim, spacedim> &fe_)
+  : fe(fe_)
   , polynomial_degree(fe.tensor_degree())
   , n_shape_functions(fe.n_dofs_per_cell())
 {}
@@ -187,46 +187,46 @@ MappingFE<dim, spacedim>::InternalData::compute_shape_function_values(
 
   const auto &tensor_pols = fe_poly->get_poly_space();
 
-  const unsigned int n_shape_functions = fe.n_dofs_per_cell();
-  const unsigned int n_points          = unit_points.size();
+  const unsigned int n_shape_func = fe.n_dofs_per_cell();
+  const unsigned int n_points     = unit_points.size();
 
   std::vector<double>         values;
   std::vector<Tensor<1, dim>> grads;
   if (shape_values.size() != 0)
     {
-      Assert(shape_values.size() == n_shape_functions * n_points,
+      Assert(shape_values.size() == n_shape_func * n_points,
              ExcInternalError());
-      values.resize(n_shape_functions);
+      values.resize(n_shape_func);
     }
   if (shape_derivatives.size() != 0)
     {
-      Assert(shape_derivatives.size() == n_shape_functions * n_points,
+      Assert(shape_derivatives.size() == n_shape_func * n_points,
              ExcInternalError());
-      grads.resize(n_shape_functions);
+      grads.resize(n_shape_func);
     }
 
   std::vector<Tensor<2, dim>> grad2;
   if (shape_second_derivatives.size() != 0)
     {
-      Assert(shape_second_derivatives.size() == n_shape_functions * n_points,
+      Assert(shape_second_derivatives.size() == n_shape_func * n_points,
              ExcInternalError());
-      grad2.resize(n_shape_functions);
+      grad2.resize(n_shape_func);
     }
 
   std::vector<Tensor<3, dim>> grad3;
   if (shape_third_derivatives.size() != 0)
     {
-      Assert(shape_third_derivatives.size() == n_shape_functions * n_points,
+      Assert(shape_third_derivatives.size() == n_shape_func * n_points,
              ExcInternalError());
-      grad3.resize(n_shape_functions);
+      grad3.resize(n_shape_func);
     }
 
   std::vector<Tensor<4, dim>> grad4;
   if (shape_fourth_derivatives.size() != 0)
     {
-      Assert(shape_fourth_derivatives.size() == n_shape_functions * n_points,
+      Assert(shape_fourth_derivatives.size() == n_shape_func * n_points,
              ExcInternalError());
-      grad4.resize(n_shape_functions);
+      grad4.resize(n_shape_func);
     }
 
 
@@ -240,23 +240,23 @@ MappingFE<dim, spacedim>::InternalData::compute_shape_function_values(
           unit_points[point], values, grads, grad2, grad3, grad4);
 
         if (shape_values.size() != 0)
-          for (unsigned int i = 0; i < n_shape_functions; ++i)
+          for (unsigned int i = 0; i < n_shape_func; ++i)
             shape(point, i) = values[i];
 
         if (shape_derivatives.size() != 0)
-          for (unsigned int i = 0; i < n_shape_functions; ++i)
+          for (unsigned int i = 0; i < n_shape_func; ++i)
             derivative(point, i) = grads[i];
 
         if (shape_second_derivatives.size() != 0)
-          for (unsigned int i = 0; i < n_shape_functions; ++i)
+          for (unsigned int i = 0; i < n_shape_func; ++i)
             second_derivative(point, i) = grad2[i];
 
         if (shape_third_derivatives.size() != 0)
-          for (unsigned int i = 0; i < n_shape_functions; ++i)
+          for (unsigned int i = 0; i < n_shape_func; ++i)
             third_derivative(point, i) = grad3[i];
 
         if (shape_fourth_derivatives.size() != 0)
-          for (unsigned int i = 0; i < n_shape_functions; ++i)
+          for (unsigned int i = 0; i < n_shape_func; ++i)
             fourth_derivative(point, i) = grad4[i];
       }
 }
@@ -843,20 +843,20 @@ namespace internal
 
 
 template <int dim, int spacedim>
-MappingFE<dim, spacedim>::MappingFE(const FiniteElement<dim, spacedim> &fe)
-  : fe(fe.clone())
-  , polynomial_degree(fe.tensor_degree())
+MappingFE<dim, spacedim>::MappingFE(const FiniteElement<dim, spacedim> &fe_)
+  : fe(fe_.clone())
+  , polynomial_degree(fe->tensor_degree())
 {
   Assert(polynomial_degree >= 1,
          ExcMessage("It only makes sense to create polynomial mappings "
                     "with a polynomial degree greater or equal to one."));
-  Assert(fe.n_components() == 1, ExcNotImplemented());
+  Assert(fe->n_components() == 1, ExcNotImplemented());
 
-  Assert(fe.has_support_points(), ExcNotImplemented());
+  Assert(fe->has_support_points(), ExcNotImplemented());
 
-  const auto &mapping_support_points = fe.get_unit_support_points();
+  const auto &mapping_support_points = fe->get_unit_support_points();
 
-  const auto reference_cell = fe.reference_cell();
+  const auto reference_cell = fe->reference_cell();
 
   const unsigned int n_points          = mapping_support_points.size();
   const unsigned int n_shape_functions = reference_cell.n_vertices();
