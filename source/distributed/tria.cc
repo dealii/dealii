@@ -920,7 +920,7 @@ namespace
     const typename internal::p4est::types<2>::quadrant_coord
       quad_length_on_level)
   {
-    constexpr int dim = 2;
+    constexpr unsigned int dim = 2;
 
     // p4est for some reason always needs double vxyz[3] as last argument to
     // quadrant_coord_to_vertex
@@ -929,7 +929,7 @@ namespace
     // A lambda to avoid code duplication.
     const auto copy_vertex = [&](unsigned int vertex_index) -> void {
       // copy into local struct
-      for (size_t d = 0; d < dim; ++d)
+      for (unsigned int d = 0; d < dim; ++d)
         {
           cell_vertices[vertex_index](d) = corner_point[d];
           // reset
@@ -1004,14 +1004,14 @@ namespace
     const typename internal::p4est::types<3>::quadrant_coord
       quad_length_on_level)
   {
-    constexpr int dim = 3;
+    constexpr unsigned int dim = 3;
 
     double corner_point[dim] = {0};
 
     // A lambda to avoid code duplication.
     auto copy_vertex = [&](unsigned int vertex_index) -> void {
       // copy into local struct
-      for (size_t d = 0; d < dim; ++d)
+      for (unsigned int d = 0; d < dim; ++d)
         {
           cell_vertices[vertex_index](d) = corner_point[d];
           // reset
