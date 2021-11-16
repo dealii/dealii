@@ -386,6 +386,66 @@ MappingCartesian<dim, spacedim>::maybe_update_jacobian_derivatives(
 
 
 template <int dim, int spacedim>
+void
+MappingCartesian<dim, spacedim>::maybe_update_volume_elements(
+  const InternalData &data) const
+{
+  if (data.update_each & update_volume_elements)
+    {
+      double volume = data.cell_extents[0];
+      for (unsigned int d = 1; d < dim; ++d)
+        volume *= data.cell_extents[d];
+      data.volume_element = volume;
+    }
+}
+
+
+
+template <int dim, int spacedim>
+void
+MappingCartesian<dim, spacedim>::maybe_update_jacobians(
+  const InternalData &             data,
+  const CellSimilarity::Similarity cell_similarity,
+  internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
+    &output_data) const
+{
+  // "compute" Jacobian at the quadrature points, which are all the
+  // same
+  if (data.update_each & update_jacobians)
+    if (cell_similarity != CellSimilarity::translation)
+      for (unsigned int i = 0; i < output_data.jacobians.size(); ++i)
+        {
+          output_data.jacobians[i] = DerivativeForm<1, dim, spacedim>();
+          for (unsigned int j = 0; j < dim; ++j)
+            output_data.jacobians[i][j][j] = data.cell_extents[j];
+        }
+}
+
+
+
+template <int dim, int spacedim>
+void
+MappingCartesian<dim, spacedim>::maybe_update_inverse_jacobians(
+  const InternalData &             data,
+  const CellSimilarity::Similarity cell_similarity,
+  internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
+    &output_data) const
+{
+  // "compute" inverse Jacobian at the quadrature points, which are
+  // all the same
+  if (data.update_each & update_inverse_jacobians)
+    if (cell_similarity != CellSimilarity::translation)
+      for (unsigned int i = 0; i < output_data.inverse_jacobians.size(); ++i)
+        {
+          output_data.inverse_jacobians[i] = Tensor<2, dim>();
+          for (unsigned int j = 0; j < dim; ++j)
+            output_data.inverse_jacobians[i][j][j] = 1. / data.cell_extents[j];
+        }
+}
+
+
+
+template <int dim, int spacedim>
 CellSimilarity::Similarity
 MappingCartesian<dim, spacedim>::fill_fe_values(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
@@ -421,29 +481,11 @@ MappingCartesian<dim, spacedim>::fill_fe_values(
           for (unsigned int i = 0; i < output_data.JxW_values.size(); ++i)
             output_data.JxW_values[i] = J * quadrature.weight(i);
       }
-  // "compute" Jacobian at the quadrature points, which are all the
-  // same
-  if (data.update_each & update_jacobians)
-    if (cell_similarity != CellSimilarity::translation)
-      for (unsigned int i = 0; i < output_data.jacobians.size(); ++i)
-        {
-          output_data.jacobians[i] = DerivativeForm<1, dim, spacedim>();
-          for (unsigned int j = 0; j < dim; ++j)
-            output_data.jacobians[i][j][j] = data.cell_extents[j];
-        }
 
+
+  maybe_update_jacobians(data, cell_similarity, output_data);
   maybe_update_jacobian_derivatives(data, cell_similarity, output_data);
-
-  // "compute" inverse Jacobian at the quadrature points, which are
-  // all the same
-  if (data.update_each & update_inverse_jacobians)
-    if (cell_similarity != CellSimilarity::translation)
-      for (unsigned int i = 0; i < output_data.inverse_jacobians.size(); ++i)
-        {
-          output_data.inverse_jacobians[i] = Tensor<2, dim>();
-          for (unsigned int j = 0; j < dim; ++j)
-            output_data.inverse_jacobians[i][j][j] = 1. / data.cell_extents[j];
-        }
+  maybe_update_inverse_jacobians(data, cell_similarity, output_data);
 
   return cell_similarity;
 }
@@ -468,7 +510,6 @@ MappingCartesian<dim, spacedim>::fill_mapping_data_for_generic_points(
          ExcNotImplemented());
 
   output_data.initialize(unit_points.size(), update_flags);
-  const unsigned int n_points = unit_points.size();
 
   InternalData data;
   data.update_each = update_flags;
@@ -481,22 +522,8 @@ MappingCartesian<dim, spacedim>::fill_mapping_data_for_generic_points(
                                       data,
                                       output_data.quadrature_points);
 
-  for (unsigned int i = 0; i < n_points; ++i)
-    {
-      if (update_flags & update_jacobians)
-        {
-          output_data.jacobians[i] = DerivativeForm<1, dim, spacedim>();
-          for (unsigned int j = 0; j < dim; ++j)
-            output_data.jacobians[i][j][j] = data.cell_extents[j];
-        }
-
-      if (update_flags & update_inverse_jacobians)
-        {
-          output_data.inverse_jacobians[i] = DerivativeForm<1, dim, spacedim>();
-          for (unsigned int j = 0; j < dim; ++j)
-            output_data.inverse_jacobians[i][j][j] = 1. / data.cell_extents[j];
-        }
-    }
+  maybe_update_jacobians(data, CellSimilarity::none, output_data);
+  maybe_update_inverse_jacobians(data, CellSimilarity::none, output_data);
 }
 
 
@@ -545,31 +572,10 @@ MappingCartesian<dim, spacedim>::fill_fe_face_values(
     for (unsigned int i = 0; i < output_data.boundary_forms.size(); ++i)
       output_data.boundary_forms[i] = J * output_data.normal_vectors[i];
 
-  if (data.update_each & update_volume_elements)
-    {
-      J = data.cell_extents[0];
-      for (unsigned int d = 1; d < dim; ++d)
-        J *= data.cell_extents[d];
-      data.volume_element = J;
-    }
-
-  if (data.update_each & update_jacobians)
-    for (unsigned int i = 0; i < output_data.jacobians.size(); ++i)
-      {
-        output_data.jacobians[i] = DerivativeForm<1, dim, spacedim>();
-        for (unsigned int d = 0; d < dim; ++d)
-          output_data.jacobians[i][d][d] = data.cell_extents[d];
-      }
-
+  maybe_update_volume_elements(data);
+  maybe_update_jacobians(data, CellSimilarity::none, output_data);
   maybe_update_jacobian_derivatives(data, CellSimilarity::none, output_data);
-
-  if (data.update_each & update_inverse_jacobians)
-    for (unsigned int i = 0; i < output_data.inverse_jacobians.size(); ++i)
-      {
-        output_data.inverse_jacobians[i] = DerivativeForm<1, dim, spacedim>();
-        for (unsigned int d = 0; d < dim; ++d)
-          output_data.inverse_jacobians[i][d][d] = 1. / data.cell_extents[d];
-      }
+  maybe_update_inverse_jacobians(data, CellSimilarity::none, output_data);
 }
 
 
@@ -623,31 +629,10 @@ MappingCartesian<dim, spacedim>::fill_fe_subface_values(
     for (unsigned int i = 0; i < output_data.boundary_forms.size(); ++i)
       output_data.boundary_forms[i] = J * output_data.normal_vectors[i];
 
-  if (data.update_each & update_volume_elements)
-    {
-      J = data.cell_extents[0];
-      for (unsigned int d = 1; d < dim; ++d)
-        J *= data.cell_extents[d];
-      data.volume_element = J;
-    }
-
-  if (data.update_each & update_jacobians)
-    for (unsigned int i = 0; i < output_data.jacobians.size(); ++i)
-      {
-        output_data.jacobians[i] = DerivativeForm<1, dim, spacedim>();
-        for (unsigned int d = 0; d < dim; ++d)
-          output_data.jacobians[i][d][d] = data.cell_extents[d];
-      }
-
+  maybe_update_volume_elements(data);
+  maybe_update_jacobians(data, CellSimilarity::none, output_data);
   maybe_update_jacobian_derivatives(data, CellSimilarity::none, output_data);
-
-  if (data.update_each & update_inverse_jacobians)
-    for (unsigned int i = 0; i < output_data.inverse_jacobians.size(); ++i)
-      {
-        output_data.inverse_jacobians[i] = DerivativeForm<1, spacedim, dim>();
-        for (unsigned int d = 0; d < dim; ++d)
-          output_data.inverse_jacobians[i][d][d] = 1. / data.cell_extents[d];
-      }
+  maybe_update_inverse_jacobians(data, CellSimilarity::none, output_data);
 }
 
 
