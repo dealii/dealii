@@ -374,6 +374,18 @@ private:
     const CellSimilarity::Similarity cell_similarity,
     internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
       &output_data) const;
+
+
+  /**
+   * Compute the inverse Jacobians if the UpdateFlags of the incoming
+   * InternalData object say that they should be updated.
+   */
+  void
+  maybe_update_inverse_jacobians(
+    const InternalData &             data,
+    const CellSimilarity::Similarity cell_similarity,
+    internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
+      &output_data) const;
 };
 
 /*@}*/
