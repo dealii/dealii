@@ -110,6 +110,17 @@ namespace internal
 
 
     /**
+     * Return the memory consumption in bytes of this enum class.
+     */
+    inline std::size_t
+    memory_consumption(const ConstraintKinds &)
+    {
+      return sizeof(ConstraintKinds);
+    }
+
+
+
+    /**
      * Global operator which returns an object in which all bits are set which
      * are either set in the first or the second argument. This operator exists
      * since if it did not then the result of the bit-or <tt>operator |</tt>

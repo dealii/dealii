@@ -1478,6 +1478,8 @@ namespace internal
       memory +=
         (row_starts.capacity() * sizeof(std::pair<unsigned int, unsigned int>));
       memory += MemoryConsumption::memory_consumption(dof_indices);
+      memory +=
+        MemoryConsumption::memory_consumption(hanging_node_constraint_masks);
       memory += MemoryConsumption::memory_consumption(row_starts_plain_indices);
       memory += MemoryConsumption::memory_consumption(plain_dof_indices);
       memory += MemoryConsumption::memory_consumption(constraint_indicator);
