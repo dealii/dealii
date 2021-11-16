@@ -377,6 +377,13 @@ private:
 
 
   /**
+   * Compute the volume elements if the UpdateFlags of the incoming
+   * InternalData object say that they should be updated.
+   */
+  void
+  maybe_update_volume_elements(const InternalData &data) const;
+
+  /**
    * Compute the Jacobians if the UpdateFlags of the incoming
    * InternalData object say that they should be updated.
    */

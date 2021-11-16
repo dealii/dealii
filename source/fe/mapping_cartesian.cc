@@ -387,6 +387,22 @@ MappingCartesian<dim, spacedim>::maybe_update_jacobian_derivatives(
 
 template <int dim, int spacedim>
 void
+MappingCartesian<dim, spacedim>::maybe_update_volume_elements(
+  const InternalData &data) const
+{
+  if (data.update_each & update_volume_elements)
+    {
+      double volume = data.cell_extents[0];
+      for (unsigned int d = 1; d < dim; ++d)
+        volume *= data.cell_extents[d];
+      data.volume_element = volume;
+    }
+}
+
+
+
+template <int dim, int spacedim>
+void
 MappingCartesian<dim, spacedim>::maybe_update_jacobians(
   const InternalData &             data,
   const CellSimilarity::Similarity cell_similarity,
@@ -556,14 +572,7 @@ MappingCartesian<dim, spacedim>::fill_fe_face_values(
     for (unsigned int i = 0; i < output_data.boundary_forms.size(); ++i)
       output_data.boundary_forms[i] = J * output_data.normal_vectors[i];
 
-  if (data.update_each & update_volume_elements)
-    {
-      J = data.cell_extents[0];
-      for (unsigned int d = 1; d < dim; ++d)
-        J *= data.cell_extents[d];
-      data.volume_element = J;
-    }
-
+  maybe_update_volume_elements(data);
   maybe_update_jacobians(data, CellSimilarity::none, output_data);
   maybe_update_jacobian_derivatives(data, CellSimilarity::none, output_data);
   maybe_update_inverse_jacobians(data, CellSimilarity::none, output_data);
@@ -620,14 +629,7 @@ MappingCartesian<dim, spacedim>::fill_fe_subface_values(
     for (unsigned int i = 0; i < output_data.boundary_forms.size(); ++i)
       output_data.boundary_forms[i] = J * output_data.normal_vectors[i];
 
-  if (data.update_each & update_volume_elements)
-    {
-      J = data.cell_extents[0];
-      for (unsigned int d = 1; d < dim; ++d)
-        J *= data.cell_extents[d];
-      data.volume_element = J;
-    }
-
+  maybe_update_volume_elements(data);
   maybe_update_jacobians(data, CellSimilarity::none, output_data);
   maybe_update_jacobian_derivatives(data, CellSimilarity::none, output_data);
   maybe_update_inverse_jacobians(data, CellSimilarity::none, output_data);
