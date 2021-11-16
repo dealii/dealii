@@ -3760,6 +3760,14 @@ public:
     << "upon construction.");
 
   /**
+   * FEValues::reinit() has not been called for any cell.
+   *
+   * @ingroup Exceptions
+   */
+  DeclExceptionMsg(ExcNotReinited,
+                   "FEValues object is not reinit'ed to any cell");
+
+  /**
    * Mismatch between the FEValues FiniteElement and
    * cell->get_dof_handler().get_fe()
    *
@@ -3796,76 +3804,47 @@ public:
 
 protected:
   /**
-   * Reset a unique_ptr. If we can, do not de-allocate the previously
-   * held memory but re-use it for the next item to avoid the repeated
-   * memory allocation. We do this because FEValues objects are heavily
-   * used in multithreaded contexts where memory allocations are evil.
-   */
-  template <typename Type, typename Pointer, typename Iterator>
-  static void
-  reset_pointer_in_place_if_possible(std::unique_ptr<Pointer> &present_cell,
-                                     const Iterator &          new_cell);
-
-  /**
    * Objects of the FEValues class need to store an iterator
    * to the present cell in order to be able to extract the values of the
    * degrees of freedom on this cell in the get_function_values() and assorted
-   * functions. On the other hand, this class should also work for different
-   * iterators, as long as they have the same interface to extract the DoF
-   * values (i.e., for example, they need to have a @p
-   * get_interpolated_dof_values function).
-   *
-   * This calls for a common base class of iterator classes, and making the
-   * functions we need here @p virtual. On the other hand, this is the only
-   * place in the library where we need this, and introducing a base class of
-   * iterators and making a function virtual penalizes <em>all</em> users of
-   * the iterators, which are basically intended as very fast accessor
-   * functions. So we do not want to do this. Rather, what we do here is
-   * making the functions we need virtual only for use with <em>this
-   * class</em>. The idea is the following: have a common base class which
-   * declares some pure virtual functions, and for each possible iterator
-   * type, we have a derived class which stores the iterator to the cell and
-   * implements these functions. Since the iterator classes have the same
-   * interface, we can make the derived classes a template, templatized on the
-   * iterator type.
-   *
-   * This way, the use of virtual functions is restricted to only this class,
-   * and other users of iterators do not have to bear the negative effects.
-   *
-   * @note This class is an example of the
-   * <a href="https://www.artima.com/cppsource/type_erasure.html">type
-   * erasure</a> design pattern.
+   * functions.
    */
-  class CellIteratorBase
+  class CellIteratorContainer
   {
   public:
     DeclExceptionMsg(
       ExcNeedsDoFHandler,
-      "You have previously called the FEValues::reinit function with a "
+      "You have previously called the FEValues::reinit() function with a "
       "cell iterator of type Triangulation<dim,spacedim>::cell_iterator. However, "
       "when you do this, you cannot call some functions in the FEValues "
       "class, such as the get_function_values/gradients/hessians/third_derivatives "
       "functions. If you need these functions, then you need to call "
-      "FEValues::reinit with an iterator type that allows to extract "
+      "FEValues::reinit() with an iterator type that allows to extract "
       "degrees of freedom, such as DoFHandler<dim,spacedim>::cell_iterator.");
 
     /**
      * Constructor.
      */
+    CellIteratorContainer();
+
+    /**
+     * Constructor.
+     */
     template <bool lda>
-    CellIteratorBase(
+    CellIteratorContainer(
       const TriaIterator<DoFCellAccessor<dim, spacedim, lda>> &cell);
 
     /**
      * Constructor.
      */
-    CellIteratorBase(
+    CellIteratorContainer(
       const typename Triangulation<dim, spacedim>::cell_iterator &cell);
 
     /**
-     * Destructor.
+     * Indicate whether FEValues::reinit() was called.
      */
-    virtual ~CellIteratorBase() = default;
+    bool
+    is_initialized() const;
 
     /**
      * Conversion operator to an iterator for triangulations. This
@@ -3901,9 +3880,10 @@ protected:
                                 Vector<IndexSet::value_type> &out) const;
 
   private:
-    const typename Triangulation<dim, spacedim>::cell_iterator cell;
-    const DoFHandler<dim, spacedim> *                          dof_handler;
-    const bool                                                 level_dof_access;
+    bool                                                 initialized;
+    typename Triangulation<dim, spacedim>::cell_iterator cell;
+    const DoFHandler<dim, spacedim> *                    dof_handler;
+    bool                                                 level_dof_access;
   };
 
   /**
@@ -3911,7 +3891,7 @@ protected:
    * is necessary for the <tt>get_function_*</tt> functions as well as the
    * functions of same name in the extractor classes.
    */
-  std::unique_ptr<const CellIteratorBase> present_cell;
+  CellIteratorContainer present_cell;
 
   /**
    * A signal connection we use to ensure we get informed whenever the
@@ -5582,8 +5562,7 @@ FEValuesBase<dim, spacedim>::shape_value(const unsigned int i,
   Assert(this->update_flags & update_values,
          ExcAccessToUninitializedField("update_values"));
   Assert(fe->is_primitive(i), ExcShapeFunctionNotPrimitive(i));
-  Assert(present_cell.get() != nullptr,
-         ExcMessage("FEValues object is not reinit'ed to any cell"));
+  Assert(present_cell.is_initialized(), ExcNotReinited());
   // if the entire FE is primitive,
   // then we can take a short-cut:
   if (fe->is_primitive())
@@ -5619,8 +5598,7 @@ FEValuesBase<dim, spacedim>::shape_value_component(
   Assert(this->update_flags & update_values,
          ExcAccessToUninitializedField("update_values"));
   AssertIndexRange(component, fe->n_components());
-  Assert(present_cell.get() != nullptr,
-         ExcMessage("FEValues object is not reinit'ed to any cell"));
+  Assert(present_cell.is_initialized(), ExcNotReinited());
 
   // check whether the shape function
   // is non-zero at all within
@@ -5648,8 +5626,7 @@ FEValuesBase<dim, spacedim>::shape_grad(const unsigned int i,
   Assert(this->update_flags & update_gradients,
          ExcAccessToUninitializedField("update_gradients"));
   Assert(fe->is_primitive(i), ExcShapeFunctionNotPrimitive(i));
-  Assert(present_cell.get() != nullptr,
-         ExcMessage("FEValues object is not reinit'ed to any cell"));
+  Assert(present_cell.is_initialized(), ExcNotReinited());
   // if the entire FE is primitive,
   // then we can take a short-cut:
   if (fe->is_primitive())
@@ -5685,8 +5662,7 @@ FEValuesBase<dim, spacedim>::shape_grad_component(
   Assert(this->update_flags & update_gradients,
          ExcAccessToUninitializedField("update_gradients"));
   AssertIndexRange(component, fe->n_components());
-  Assert(present_cell.get() != nullptr,
-         ExcMessage("FEValues object is not reinit'ed to any cell"));
+  Assert(present_cell.is_initialized(), ExcNotReinited());
   // check whether the shape function
   // is non-zero at all within
   // this component:
@@ -5713,8 +5689,7 @@ FEValuesBase<dim, spacedim>::shape_hessian(const unsigned int i,
   Assert(this->update_flags & update_hessians,
          ExcAccessToUninitializedField("update_hessians"));
   Assert(fe->is_primitive(i), ExcShapeFunctionNotPrimitive(i));
-  Assert(present_cell.get() != nullptr,
-         ExcMessage("FEValues object is not reinit'ed to any cell"));
+  Assert(present_cell.is_initialized(), ExcNotReinited());
   // if the entire FE is primitive,
   // then we can take a short-cut:
   if (fe->is_primitive())
@@ -5750,8 +5725,7 @@ FEValuesBase<dim, spacedim>::shape_hessian_component(
   Assert(this->update_flags & update_hessians,
          ExcAccessToUninitializedField("update_hessians"));
   AssertIndexRange(component, fe->n_components());
-  Assert(present_cell.get() != nullptr,
-         ExcMessage("FEValues object is not reinit'ed to any cell"));
+  Assert(present_cell.is_initialized(), ExcNotReinited());
   // check whether the shape function
   // is non-zero at all within
   // this component:
@@ -5778,8 +5752,7 @@ FEValuesBase<dim, spacedim>::shape_3rd_derivative(const unsigned int i,
   Assert(this->update_flags & update_3rd_derivatives,
          ExcAccessToUninitializedField("update_3rd_derivatives"));
   Assert(fe->is_primitive(i), ExcShapeFunctionNotPrimitive(i));
-  Assert(present_cell.get() != nullptr,
-         ExcMessage("FEValues object is not reinit'ed to any cell"));
+  Assert(present_cell.is_initialized(), ExcNotReinited());
   // if the entire FE is primitive,
   // then we can take a short-cut:
   if (fe->is_primitive())
@@ -5815,8 +5788,7 @@ FEValuesBase<dim, spacedim>::shape_3rd_derivative_component(
   Assert(this->update_flags & update_3rd_derivatives,
          ExcAccessToUninitializedField("update_3rd_derivatives"));
   AssertIndexRange(component, fe->n_components());
-  Assert(present_cell.get() != nullptr,
-         ExcMessage("FEValues object is not reinit'ed to any cell"));
+  Assert(present_cell.is_initialized(), ExcNotReinited());
   // check whether the shape function
   // is non-zero at all within
   // this component:
@@ -5867,8 +5839,7 @@ FEValuesBase<dim, spacedim>::get_quadrature_points() const
 {
   Assert(this->update_flags & update_quadrature_points,
          ExcAccessToUninitializedField("update_quadrature_points"));
-  Assert(present_cell.get() != nullptr,
-         ExcMessage("FEValues object is not reinit'ed to any cell"));
+  Assert(present_cell.is_initialized(), ExcNotReinited());
   return this->mapping_output.quadrature_points;
 }
 
@@ -5880,8 +5851,7 @@ FEValuesBase<dim, spacedim>::get_JxW_values() const
 {
   Assert(this->update_flags & update_JxW_values,
          ExcAccessToUninitializedField("update_JxW_values"));
-  Assert(present_cell.get() != nullptr,
-         ExcMessage("FEValues object is not reinit'ed to any cell"));
+  Assert(present_cell.is_initialized(), ExcNotReinited());
   return this->mapping_output.JxW_values;
 }
 
@@ -5893,8 +5863,7 @@ FEValuesBase<dim, spacedim>::get_jacobians() const
 {
   Assert(this->update_flags & update_jacobians,
          ExcAccessToUninitializedField("update_jacobians"));
-  Assert(present_cell.get() != nullptr,
-         ExcMessage("FEValues object is not reinit'ed to any cell"));
+  Assert(present_cell.is_initialized(), ExcNotReinited());
   return this->mapping_output.jacobians;
 }
 
@@ -5906,8 +5875,7 @@ FEValuesBase<dim, spacedim>::get_jacobian_grads() const
 {
   Assert(this->update_flags & update_jacobian_grads,
          ExcAccessToUninitializedField("update_jacobians_grads"));
-  Assert(present_cell.get() != nullptr,
-         ExcMessage("FEValues object is not reinit'ed to any cell"));
+  Assert(present_cell.is_initialized(), ExcNotReinited());
   return this->mapping_output.jacobian_grads;
 }
 
@@ -5920,8 +5888,7 @@ FEValuesBase<dim, spacedim>::jacobian_pushed_forward_grad(
 {
   Assert(this->update_flags & update_jacobian_pushed_forward_grads,
          ExcAccessToUninitializedField("update_jacobian_pushed_forward_grads"));
-  Assert(present_cell.get() != nullptr,
-         ExcMessage("FEValues object is not reinit'ed to any cell"));
+  Assert(present_cell.is_initialized(), ExcNotReinited());
   return this->mapping_output.jacobian_pushed_forward_grads[i];
 }
 
@@ -5933,8 +5900,7 @@ FEValuesBase<dim, spacedim>::get_jacobian_pushed_forward_grads() const
 {
   Assert(this->update_flags & update_jacobian_pushed_forward_grads,
          ExcAccessToUninitializedField("update_jacobian_pushed_forward_grads"));
-  Assert(present_cell.get() != nullptr,
-         ExcMessage("FEValues object is not reinit'ed to any cell"));
+  Assert(present_cell.is_initialized(), ExcNotReinited());
   return this->mapping_output.jacobian_pushed_forward_grads;
 }
 
@@ -5946,8 +5912,7 @@ FEValuesBase<dim, spacedim>::jacobian_2nd_derivative(const unsigned int i) const
 {
   Assert(this->update_flags & update_jacobian_2nd_derivatives,
          ExcAccessToUninitializedField("update_jacobian_2nd_derivatives"));
-  Assert(present_cell.get() != nullptr,
-         ExcMessage("FEValues object is not reinit'ed to any cell"));
+  Assert(present_cell.is_initialized(), ExcNotReinited());
   return this->mapping_output.jacobian_2nd_derivatives[i];
 }
 
@@ -5959,8 +5924,7 @@ FEValuesBase<dim, spacedim>::get_jacobian_2nd_derivatives() const
 {
   Assert(this->update_flags & update_jacobian_2nd_derivatives,
          ExcAccessToUninitializedField("update_jacobian_2nd_derivatives"));
-  Assert(present_cell.get() != nullptr,
-         ExcMessage("FEValues object is not reinit'ed to any cell"));
+  Assert(present_cell.is_initialized(), ExcNotReinited());
   return this->mapping_output.jacobian_2nd_derivatives;
 }
 
@@ -5974,8 +5938,7 @@ FEValuesBase<dim, spacedim>::jacobian_pushed_forward_2nd_derivative(
   Assert(this->update_flags & update_jacobian_pushed_forward_2nd_derivatives,
          ExcAccessToUninitializedField(
            "update_jacobian_pushed_forward_2nd_derivatives"));
-  Assert(present_cell.get() != nullptr,
-         ExcMessage("FEValues object is not reinit'ed to any cell"));
+  Assert(present_cell.is_initialized(), ExcNotReinited());
   return this->mapping_output.jacobian_pushed_forward_2nd_derivatives[i];
 }
 
@@ -5988,8 +5951,7 @@ FEValuesBase<dim, spacedim>::get_jacobian_pushed_forward_2nd_derivatives() const
   Assert(this->update_flags & update_jacobian_pushed_forward_2nd_derivatives,
          ExcAccessToUninitializedField(
            "update_jacobian_pushed_forward_2nd_derivatives"));
-  Assert(present_cell.get() != nullptr,
-         ExcMessage("FEValues object is not reinit'ed to any cell"));
+  Assert(present_cell.is_initialized(), ExcNotReinited());
   return this->mapping_output.jacobian_pushed_forward_2nd_derivatives;
 }
 
@@ -6001,8 +5963,7 @@ FEValuesBase<dim, spacedim>::jacobian_3rd_derivative(const unsigned int i) const
 {
   Assert(this->update_flags & update_jacobian_3rd_derivatives,
          ExcAccessToUninitializedField("update_jacobian_3rd_derivatives"));
-  Assert(present_cell.get() != nullptr,
-         ExcMessage("FEValues object is not reinit'ed to any cell"));
+  Assert(present_cell.is_initialized(), ExcNotReinited());
   return this->mapping_output.jacobian_3rd_derivatives[i];
 }
 
@@ -6014,8 +5975,7 @@ FEValuesBase<dim, spacedim>::get_jacobian_3rd_derivatives() const
 {
   Assert(this->update_flags & update_jacobian_3rd_derivatives,
          ExcAccessToUninitializedField("update_jacobian_3rd_derivatives"));
-  Assert(present_cell.get() != nullptr,
-         ExcMessage("FEValues object is not reinit'ed to any cell"));
+  Assert(present_cell.is_initialized(), ExcNotReinited());
   return this->mapping_output.jacobian_3rd_derivatives;
 }
 
@@ -6029,8 +5989,7 @@ FEValuesBase<dim, spacedim>::jacobian_pushed_forward_3rd_derivative(
   Assert(this->update_flags & update_jacobian_pushed_forward_3rd_derivatives,
          ExcAccessToUninitializedField(
            "update_jacobian_pushed_forward_3rd_derivatives"));
-  Assert(present_cell.get() != nullptr,
-         ExcMessage("FEValues object is not reinit'ed to any cell"));
+  Assert(present_cell.is_initialized(), ExcNotReinited());
   return this->mapping_output.jacobian_pushed_forward_3rd_derivatives[i];
 }
 
@@ -6043,8 +6002,7 @@ FEValuesBase<dim, spacedim>::get_jacobian_pushed_forward_3rd_derivatives() const
   Assert(this->update_flags & update_jacobian_pushed_forward_3rd_derivatives,
          ExcAccessToUninitializedField(
            "update_jacobian_pushed_forward_3rd_derivatives"));
-  Assert(present_cell.get() != nullptr,
-         ExcMessage("FEValues object is not reinit'ed to any cell"));
+  Assert(present_cell.is_initialized(), ExcNotReinited());
   return this->mapping_output.jacobian_pushed_forward_3rd_derivatives;
 }
 
@@ -6056,8 +6014,7 @@ FEValuesBase<dim, spacedim>::get_inverse_jacobians() const
 {
   Assert(this->update_flags & update_inverse_jacobians,
          ExcAccessToUninitializedField("update_inverse_jacobians"));
-  Assert(present_cell.get() != nullptr,
-         ExcMessage("FEValues object is not reinit'ed to any cell"));
+  Assert(present_cell.is_initialized(), ExcNotReinited());
   return this->mapping_output.inverse_jacobians;
 }
 
@@ -6112,8 +6069,7 @@ FEValuesBase<dim, spacedim>::quadrature_point(const unsigned int i) const
   Assert(this->update_flags & update_quadrature_points,
          ExcAccessToUninitializedField("update_quadrature_points"));
   AssertIndexRange(i, this->mapping_output.quadrature_points.size());
-  Assert(present_cell.get() != nullptr,
-         ExcMessage("FEValues object is not reinit'ed to any cell"));
+  Assert(present_cell.is_initialized(), ExcNotReinited());
 
   return this->mapping_output.quadrature_points[i];
 }
@@ -6127,8 +6083,7 @@ FEValuesBase<dim, spacedim>::JxW(const unsigned int i) const
   Assert(this->update_flags & update_JxW_values,
          ExcAccessToUninitializedField("update_JxW_values"));
   AssertIndexRange(i, this->mapping_output.JxW_values.size());
-  Assert(present_cell.get() != nullptr,
-         ExcMessage("FEValues object is not reinit'ed to any cell"));
+  Assert(present_cell.is_initialized(), ExcNotReinited());
 
   return this->mapping_output.JxW_values[i];
 }
@@ -6142,8 +6097,7 @@ FEValuesBase<dim, spacedim>::jacobian(const unsigned int i) const
   Assert(this->update_flags & update_jacobians,
          ExcAccessToUninitializedField("update_jacobians"));
   AssertIndexRange(i, this->mapping_output.jacobians.size());
-  Assert(present_cell.get() != nullptr,
-         ExcMessage("FEValues object is not reinit'ed to any cell"));
+  Assert(present_cell.is_initialized(), ExcNotReinited());
 
   return this->mapping_output.jacobians[i];
 }
@@ -6157,8 +6111,7 @@ FEValuesBase<dim, spacedim>::jacobian_grad(const unsigned int i) const
   Assert(this->update_flags & update_jacobian_grads,
          ExcAccessToUninitializedField("update_jacobians_grads"));
   AssertIndexRange(i, this->mapping_output.jacobian_grads.size());
-  Assert(present_cell.get() != nullptr,
-         ExcMessage("FEValues object is not reinit'ed to any cell"));
+  Assert(present_cell.is_initialized(), ExcNotReinited());
 
   return this->mapping_output.jacobian_grads[i];
 }
@@ -6172,8 +6125,7 @@ FEValuesBase<dim, spacedim>::inverse_jacobian(const unsigned int i) const
   Assert(this->update_flags & update_inverse_jacobians,
          ExcAccessToUninitializedField("update_inverse_jacobians"));
   AssertIndexRange(i, this->mapping_output.inverse_jacobians.size());
-  Assert(present_cell.get() != nullptr,
-         ExcMessage("FEValues object is not reinit'ed to any cell"));
+  Assert(present_cell.is_initialized(), ExcNotReinited());
 
   return this->mapping_output.inverse_jacobians[i];
 }
@@ -6188,8 +6140,7 @@ FEValuesBase<dim, spacedim>::normal_vector(const unsigned int i) const
          (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
            "update_normal_vectors")));
   AssertIndexRange(i, this->mapping_output.normal_vectors.size());
-  Assert(present_cell.get() != nullptr,
-         ExcMessage("FEValues object is not reinit'ed to any cell"));
+  Assert(present_cell.is_initialized(), ExcNotReinited());
 
   return this->mapping_output.normal_vectors[i];
 }
