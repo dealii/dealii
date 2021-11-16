@@ -73,6 +73,9 @@
 #define DEAL_II_WITH_THREADS
 
 #define TBB_SUPPRESS_DEPRECATED_MESSAGES 1
+
+#cmakedefine DEAL_II_TBB_WITH_ONEAPI
+
 #endif
 
 /***********************************************************************
