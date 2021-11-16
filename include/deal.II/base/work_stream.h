@@ -28,7 +28,11 @@
 #  include <deal.II/base/thread_management.h>
 
 #  ifdef DEAL_II_WITH_TBB
-#    include <tbb/pipeline.h>
+#    ifdef DEAL_II_TBB_WITH_ONEAPI
+#      include <tbb/parallel_pipeline.h>
+#    else
+#      include <tbb/pipeline.h>
+#    endif
 #  endif
 
 #  include <functional>
