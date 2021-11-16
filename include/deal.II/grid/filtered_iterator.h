@@ -856,7 +856,7 @@ namespace internal
  * @ingroup CPP11
  */
 template <typename BaseIterator, typename Predicate>
-IteratorRange<FilteredIterator<BaseIterator>>
+inline IteratorRange<FilteredIterator<BaseIterator>>
 filter_iterators(IteratorRange<BaseIterator> i, const Predicate &p)
 {
   FilteredIterator<BaseIterator> fi(p, *(i.begin()));
@@ -915,6 +915,57 @@ filter_iterators(IteratorRange<BaseIterator> i,
   auto fi = filter_iterators(i, p);
   return filter_iterators(fi, args...);
 }
+
+
+
+/**
+ * Filter the  given range of iterators using a predicate. This allows to
+ * replace:
+ * @code
+ *   DoFHandler<dim> dof_handler;
+ *   ...
+ *   for (const auto &cell : dof_handler.active_cell_iterators())
+ *     {
+ *       if (cell->is_locally_owned())
+ *         {
+ *           fe_values.reinit (cell);
+ *           ...do the local integration on 'cell'...;
+ *         }
+ *     }
+ * @endcode
+ * by:
+ * @code
+ *   DoFHandler<dim> dof_handler;
+ *   ...
+ *   const auto filtered_iterators_range =
+ *     filter_iterators();
+ *   for (const auto &cell :
+ *           dof_handler.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
+ *     {
+ *       fe_values.reinit (cell);
+ *       ...do the local integration on 'cell'...;
+ *     }
+ * @endcode
+ * Here, the `operator|` is to be interpreted in the same way as is done in
+ * the [range adaptors](https://en.cppreference.com/w/cpp/ranges) feature
+ * that is part of [C++20](https://en.wikipedia.org/wiki/C%2B%2B20). It has
+ * the same meaning as the `|` symbol on the command line: It takes what is
+ * on its left as its inputs, and filters and transforms to produce some
+ * output. In the example above, it "filters" all of the active cell iterators
+ * and removes those that do not satisfy the predicate -- that is, it produces
+ * a range of iterators that only contains those cells that are both active
+ * and locally owned.
+ *
+ * @relatesalso FilteredIterator
+ * @ingroup CPP11
+ */
+template <typename BaseIterator, typename Predicate>
+inline IteratorRange<FilteredIterator<BaseIterator>>
+operator|(IteratorRange<BaseIterator> i, const Predicate &p)
+{
+  return filter_iterators(i, p);
+}
+
 
 
 /* ------------------ Inline functions and templates ------------ */
