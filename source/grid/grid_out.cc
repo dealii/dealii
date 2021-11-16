@@ -4411,55 +4411,80 @@ namespace internal
               (!cell->has_boundary_lines() &&
                !gnuplot_flags.curved_inner_cells))
             {
-              // front face
-              out << cell->vertex(0) << ' ' << cell->level() << ' '
-                  << cell->material_id() << '\n'
-                  << cell->vertex(1) << ' ' << cell->level() << ' '
-                  << cell->material_id() << '\n'
-                  << cell->vertex(5) << ' ' << cell->level() << ' '
-                  << cell->material_id() << '\n'
-                  << cell->vertex(4) << ' ' << cell->level() << ' '
-                  << cell->material_id() << '\n'
-                  << cell->vertex(0) << ' ' << cell->level() << ' '
-                  << cell->material_id() << '\n'
-                  << '\n';
-              // back face
-              out << cell->vertex(2) << ' ' << cell->level() << ' '
-                  << cell->material_id() << '\n'
-                  << cell->vertex(3) << ' ' << cell->level() << ' '
-                  << cell->material_id() << '\n'
-                  << cell->vertex(7) << ' ' << cell->level() << ' '
-                  << cell->material_id() << '\n'
-                  << cell->vertex(6) << ' ' << cell->level() << ' '
-                  << cell->material_id() << '\n'
-                  << cell->vertex(2) << ' ' << cell->level() << ' '
-                  << cell->material_id() << '\n'
-                  << '\n';
+              if (cell->reference_cell() == ReferenceCells::Hexahedron)
+                {
+                  // front face
+                  out << cell->vertex(0) << ' ' << cell->level() << ' '
+                      << cell->material_id() << '\n'
+                      << cell->vertex(1) << ' ' << cell->level() << ' '
+                      << cell->material_id() << '\n'
+                      << cell->vertex(5) << ' ' << cell->level() << ' '
+                      << cell->material_id() << '\n'
+                      << cell->vertex(4) << ' ' << cell->level() << ' '
+                      << cell->material_id() << '\n'
+                      << cell->vertex(0) << ' ' << cell->level() << ' '
+                      << cell->material_id() << '\n'
+                      << '\n';
+                  // back face
+                  out << cell->vertex(2) << ' ' << cell->level() << ' '
+                      << cell->material_id() << '\n'
+                      << cell->vertex(3) << ' ' << cell->level() << ' '
+                      << cell->material_id() << '\n'
+                      << cell->vertex(7) << ' ' << cell->level() << ' '
+                      << cell->material_id() << '\n'
+                      << cell->vertex(6) << ' ' << cell->level() << ' '
+                      << cell->material_id() << '\n'
+                      << cell->vertex(2) << ' ' << cell->level() << ' '
+                      << cell->material_id() << '\n'
+                      << '\n';
 
-              // now for the four connecting lines
-              out << cell->vertex(0) << ' ' << cell->level() << ' '
-                  << cell->material_id() << '\n'
-                  << cell->vertex(2) << ' ' << cell->level() << ' '
-                  << cell->material_id() << '\n'
-                  << '\n';
-              out << cell->vertex(1) << ' ' << cell->level() << ' '
-                  << cell->material_id() << '\n'
-                  << cell->vertex(3) << ' ' << cell->level() << ' '
-                  << cell->material_id() << '\n'
-                  << '\n';
-              out << cell->vertex(5) << ' ' << cell->level() << ' '
-                  << cell->material_id() << '\n'
-                  << cell->vertex(7) << ' ' << cell->level() << ' '
-                  << cell->material_id() << '\n'
-                  << '\n';
-              out << cell->vertex(4) << ' ' << cell->level() << ' '
-                  << cell->material_id() << '\n'
-                  << cell->vertex(6) << ' ' << cell->level() << ' '
-                  << cell->material_id() << '\n'
-                  << '\n';
+                  // now for the four connecting lines
+                  out << cell->vertex(0) << ' ' << cell->level() << ' '
+                      << cell->material_id() << '\n'
+                      << cell->vertex(2) << ' ' << cell->level() << ' '
+                      << cell->material_id() << '\n'
+                      << '\n';
+                  out << cell->vertex(1) << ' ' << cell->level() << ' '
+                      << cell->material_id() << '\n'
+                      << cell->vertex(3) << ' ' << cell->level() << ' '
+                      << cell->material_id() << '\n'
+                      << '\n';
+                  out << cell->vertex(5) << ' ' << cell->level() << ' '
+                      << cell->material_id() << '\n'
+                      << cell->vertex(7) << ' ' << cell->level() << ' '
+                      << cell->material_id() << '\n'
+                      << '\n';
+                  out << cell->vertex(4) << ' ' << cell->level() << ' '
+                      << cell->material_id() << '\n'
+                      << cell->vertex(6) << ' ' << cell->level() << ' '
+                      << cell->material_id() << '\n'
+                      << '\n';
+                }
+              else if (cell->reference_cell() == ReferenceCells::Tetrahedron)
+                {
+                  // Draw the tetrahedron as a two collections of lines.
+                  for (const unsigned int v : {0, 1, 2, 0, 3, 2})
+                    {
+                      out << cell->vertex(v) << ' ' << cell->level() << ' '
+                          << cell->material_id() << '\n';
+                    }
+                  out << '\n'; // end of first line
+
+                  for (const unsigned int v : {3, 1})
+                    {
+                      out << cell->vertex(v) << ' ' << cell->level() << ' '
+                          << cell->material_id() << '\n';
+                    }
+                  out << '\n'; // end of second line
+                }
+              else
+                Assert(false, ExcNotImplemented());
             }
           else
             {
+              Assert(cell->reference_cell() == ReferenceCells::Hexahedron,
+                     ExcNotImplemented());
+
               for (const unsigned int face_no :
                    GeometryInfo<dim>::face_indices())
                 {
