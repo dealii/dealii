@@ -1615,11 +1615,14 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
   whole_file >> n_types;
   for (unsigned int type = 0; type < n_types; ++type)
     {
-      std::string object_type;
+      // The object type is prefixed by the number of characters the
+      // object type string takes up (e.g., 3 for 'tri' and 5 for
+      // 'prism'), but we really don't need that.
       {
         unsigned int dummy;
         whole_file >> dummy;
       }
+      std::string object_type;
       whole_file >> object_type;
 
       unsigned int n_vertices_per_element;
@@ -1635,10 +1638,6 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
       else if (object_type == "edg")
         {
           AssertThrow(n_vertices_per_element == 2, ExcInternalError());
-          if (dim == 1)
-            cells.resize(n_elements);
-          else
-            subcelldata.boundary_lines.resize(n_elements);
         }
       else if (object_type == "tri")
         {
@@ -1646,10 +1645,14 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
                       ExcMessage("Triangles should not appear in input files "
                                  "for 1d meshes."));
           AssertThrow(n_vertices_per_element == 3, ExcInternalError());
-          if (dim == 2)
-            cells.resize(n_elements);
-          else
-            subcelldata.boundary_quads.resize(n_elements);
+        }
+      else if (object_type == "quad")
+        {
+          AssertThrow(dim >= 2,
+                      ExcMessage(
+                        "Quadrilaterals should not appear in input files "
+                        "for 1d meshes."));
+          AssertThrow(n_vertices_per_element == 4, ExcInternalError());
         }
       else if (object_type == "tet")
         {
@@ -1657,19 +1660,28 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
                       ExcMessage("Tetrahedra should not appear in input files "
                                  "for 1d or 2d meshes."));
           AssertThrow(n_vertices_per_element == 4, ExcInternalError());
-          if (dim == 3)
-            cells.resize(n_elements);
-          else
-            Assert(false, ExcInternalError());
+        }
+      else if (object_type == "prism")
+        {
+          AssertThrow(dim >= 3,
+                      ExcMessage("Prisms should not appear in input files "
+                                 "for 1d or 2d meshes."));
+          AssertThrow(n_vertices_per_element == 6, ExcInternalError());
         }
       else
         AssertThrow(false, ExcNotImplemented());
 
 
-      // Next, for each element read the vertex numbers. Then we have to decide
-      // what to do with it. If it is a vertex, we ignore the information.
-      // If it is a cell, we have to put it into the appropriate object, and the
-      // same if it is an edge or face.
+      // Next, for each element read the vertex numbers. Then we have
+      // to decide what to do with it. If it is a vertex, we ignore
+      // the information.  If it is a cell, we have to put it into the
+      // appropriate object, and the same if it is an edge or
+      // face. Since multiple object type blocks can refer to cells or
+      // faces (e.g., for mixed meshes, or for prisms where there are
+      // boundary triangles and boundary quads), the element index 'e'
+      // below does not correspond to the index in the 'cells' or
+      // 'subcelldata.boundary_*' objects; we just keep pushing
+      // elements onto the back.
       //
       // In any case, we adjust vertex indices right after reading them based on
       // the starting index read above
@@ -1689,23 +1701,38 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
           else if (object_type == "edg")
             {
               if (spacedim == 1)
-                cells[e].vertices = vertices_for_this_element;
+                {
+                  cells.push_back({});
+                  cells.back().vertices = vertices_for_this_element;
+                }
               else
-                subcelldata.boundary_lines[e].vertices =
-                  vertices_for_this_element;
+                {
+                  subcelldata.boundary_lines.push_back({});
+                  subcelldata.boundary_lines.back().vertices =
+                    vertices_for_this_element;
+                }
             }
-          else if (object_type == "tri")
+          else if ((object_type == "tri") || (object_type == "quad"))
             {
               if (spacedim == 2)
-                cells[e].vertices = vertices_for_this_element;
+                {
+                  cells.push_back({});
+                  cells.back().vertices = vertices_for_this_element;
+                }
               else
-                subcelldata.boundary_quads[e].vertices =
-                  vertices_for_this_element;
+                {
+                  subcelldata.boundary_quads.push_back({});
+                  subcelldata.boundary_quads.back().vertices =
+                    vertices_for_this_element;
+                }
             }
-          else if (object_type == "tet")
+          else if ((object_type == "tet") || (object_type == "prism"))
             {
               if (spacedim == 3)
-                cells[e].vertices = vertices_for_this_element;
+                {
+                  cells.push_back({});
+                  cells.back().vertices = vertices_for_this_element;
+                }
               else
                 Assert(false, ExcInternalError());
             }
@@ -1713,46 +1740,62 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
             Assert(false, ExcNotImplemented());
         }
 
-      // Then also read the "geometric entity indices". There need to be as
-      // many as there were elements to begin with
-      {
-        unsigned int dummy;
-        whole_file >> dummy;
-        AssertThrow(dummy == n_elements, ExcInternalError());
-      }
+      // Then also read the "geometric entity indices". There need to
+      // be as many as there were elements to begin with, or
+      // alternatively zero if no geometric entity indices will be set
+      // at all.
+      unsigned int n_geom_entity_indices;
+      whole_file >> n_geom_entity_indices;
+      AssertThrow((n_geom_entity_indices == 0) ||
+                    (n_geom_entity_indices == n_elements),
+                  ExcInternalError());
 
-      for (unsigned int e = 0; e < n_elements; ++e)
+      // Loop over these objects. Since we pushed them onto the back
+      // of various arrays before, we need to recalculate which index
+      // in these array element 'e' corresponds to when setting
+      // boundary and manifold indicators.
+      if (n_geom_entity_indices != 0)
         {
-          AssertThrow(whole_file, ExcIO());
-          unsigned int geometric_entity_index;
-          whole_file >> geometric_entity_index;
-          if (object_type == "vtx")
-            ; // do nothing
-          else if (object_type == "edg")
+          for (unsigned int e = 0; e < n_geom_entity_indices; ++e)
             {
-              if (spacedim == 1)
-                cells[e].boundary_id = geometric_entity_index;
+              AssertThrow(whole_file, ExcIO());
+              unsigned int geometric_entity_index;
+              whole_file >> geometric_entity_index;
+              if (object_type == "vtx")
+                ; // do nothing
+              else if (object_type == "edg")
+                {
+                  if (spacedim == 1)
+                    cells[cells.size() - n_elements + e].material_id =
+                      geometric_entity_index;
+                  else
+                    subcelldata
+                      .boundary_lines[subcelldata.boundary_lines.size() -
+                                      n_elements + e]
+                      .boundary_id = geometric_entity_index;
+                }
+              else if ((object_type == "tri") || (object_type == "quad"))
+                {
+                  if (spacedim == 2)
+                    cells[cells.size() - n_elements + e].material_id =
+                      geometric_entity_index;
+                  else
+                    subcelldata
+                      .boundary_quads[subcelldata.boundary_quads.size() -
+                                      n_elements + e]
+                      .boundary_id = geometric_entity_index;
+                }
+              else if ((object_type == "tet") || (object_type == "prism"))
+                {
+                  if (spacedim == 3)
+                    cells[cells.size() - n_elements + e].material_id =
+                      geometric_entity_index;
+                  else
+                    Assert(false, ExcInternalError());
+                }
               else
-                subcelldata.boundary_lines[e].boundary_id =
-                  geometric_entity_index;
+                Assert(false, ExcNotImplemented());
             }
-          else if (object_type == "tri")
-            {
-              if (spacedim == 2)
-                cells[e].boundary_id = geometric_entity_index;
-              else
-                subcelldata.boundary_quads[e].boundary_id =
-                  geometric_entity_index;
-            }
-          else if (object_type == "tet")
-            {
-              if (spacedim == 3)
-                cells[e].boundary_id = geometric_entity_index;
-              else
-                Assert(false, ExcInternalError());
-            }
-          else
-            Assert(false, ExcNotImplemented());
         }
     }
   AssertThrow(whole_file, ExcIO());
