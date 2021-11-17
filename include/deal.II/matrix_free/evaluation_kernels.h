@@ -152,18 +152,18 @@ namespace internal
       const internal::MatrixFreeFunctions::UnivariateShapeData<Number>
         *univariate_shape_data)
     {
-      const bool request_even_odd = variant == evaluate_evenodd;
-
-      Eval eval(request_even_odd ? univariate_shape_data->shape_values_eo :
-                                   univariate_shape_data->shape_values,
-                request_even_odd ? univariate_shape_data->shape_gradients_eo :
-                                   univariate_shape_data->shape_gradients,
-                request_even_odd ? univariate_shape_data->shape_hessians_eo :
-                                   univariate_shape_data->shape_hessians,
-                univariate_shape_data->fe_degree + 1,
-                univariate_shape_data->n_q_points_1d);
-
-      return eval;
+      if (variant == evaluate_evenodd)
+        return Eval(univariate_shape_data->shape_values_eo,
+                    univariate_shape_data->shape_gradients_eo,
+                    univariate_shape_data->shape_hessians_eo,
+                    univariate_shape_data->fe_degree + 1,
+                    univariate_shape_data->n_q_points_1d);
+      else
+        return Eval(univariate_shape_data->shape_values,
+                    univariate_shape_data->shape_gradients,
+                    univariate_shape_data->shape_hessians,
+                    univariate_shape_data->fe_degree + 1,
+                    univariate_shape_data->n_q_points_1d);
     }
   };
 
