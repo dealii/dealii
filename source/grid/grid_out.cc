@@ -4436,14 +4436,41 @@ namespace internal
                     }
                   out << '\n'; // end of second line
                 }
+              else if (cell->reference_cell() == ReferenceCells::Wedge)
+                {
+                  // Draw the wedge as three collections of
+                  // lines. The first one wraps around the base,
+                  // goes up to the top, and wraps around that. The
+                  // second and third are just individual lines
+                  // going from base to top.
+                  for (const unsigned int v : {0, 1, 2, 0, 3, 4, 5, 3})
+                    {
+                      out << cell->vertex(v) << ' ' << cell->level() << ' '
+                          << cell->material_id() << '\n';
+                    }
+                  out << '\n'; // end of first line
+
+                  for (const unsigned int v : {1, 4})
+                    {
+                      out << cell->vertex(v) << ' ' << cell->level() << ' '
+                          << cell->material_id() << '\n';
+                    }
+                  out << '\n'; // end of second line
+
+                  for (const unsigned int v : {2, 5})
+                    {
+                      out << cell->vertex(v) << ' ' << cell->level() << ' '
+                          << cell->material_id() << '\n';
+                    }
+                  out << '\n'; // end of third line
+                }
               else
                 Assert(false, ExcNotImplemented());
             }
-          else
+          else // need to handle curved boundaries
             {
               Assert(cell->reference_cell() == ReferenceCells::Hexahedron,
                      ExcNotImplemented());
-
               for (const unsigned int face_no :
                    GeometryInfo<dim>::face_indices())
                 {
