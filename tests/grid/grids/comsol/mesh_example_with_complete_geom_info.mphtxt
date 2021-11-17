@@ -1,0 +1,221 @@
+# Created by COMSOL Multiphysics.
+
+# Major & minor version
+0 1 
+1 # number of tags
+# Tags
+5 mesh2 
+1 # number of types
+# Types
+3 obj 
+
+# --------- Object 0 ----------
+
+0 0 1 
+4 Mesh # class
+4 # version
+3 # sdim
+12 # number of mesh vertices
+0 # lowest mesh vertex index
+
+# Mesh vertex coordinates
+0 1 1 
+0 0 1 
+0 0 0 
+1 0 1 
+0 1 0 
+1 1 1 
+1 0 0 
+2 0 1 
+1 1 0 
+2 1 1 
+2 0 0 
+2 1 0 
+
+6 # number of element types
+
+# Type #0
+
+3 tet # type name
+
+
+4 # number of vertices per element
+5 # number of elements
+# Elements
+2 4 1 6 
+4 0 1 5 
+1 6 4 5 
+1 3 6 5 
+6 8 4 5 
+
+5 # number of geometric entity indices
+# Geometric entity indices
+1 
+1 
+1 
+1 
+1 
+
+# Type #1
+
+5 prism # type name
+
+
+6 # number of vertices per element
+2 # number of elements
+# Elements
+5 3 6 9 7 10 
+6 8 5 10 11 9 
+
+2 # number of geometric entity indices
+# Geometric entity indices
+2 
+2 
+
+# Type #2
+
+3 vtx # type name
+
+
+1 # number of vertices per element
+12 # number of elements
+# Elements
+0 
+1 
+2 
+3 
+4 
+5 
+6 
+7 
+8 
+9 
+10 
+11 
+
+12 # number of geometric entity indices
+# Geometric entity indices
+3 
+1 
+0 
+5 
+2 
+7 
+4 
+9 
+6 
+11 
+8 
+10 
+
+# Type #3
+
+3 edg # type name
+
+
+2 # number of vertices per element
+20 # number of elements
+# Elements
+10 7 
+7 9 
+11 9 
+10 11 
+6 3 
+3 5 
+8 5 
+6 8 
+4 0 
+0 5 
+4 8 
+2 4 
+2 6 
+1 0 
+1 3 
+2 1 
+5 9 
+8 11 
+6 10 
+3 7 
+
+20 # number of geometric entity indices
+# Geometric entity indices
+16 
+18 
+19 
+17 
+8 
+11 
+13 
+9 
+5 
+7 
+6 
+1 
+2 
+3 
+4 
+0 
+15 
+14 
+10 
+12 
+
+# Type #4
+
+3 tri # type name
+
+
+3 # number of vertices per element
+14 # number of elements
+# Elements
+2 1 4 
+2 6 1 
+2 4 6 
+4 1 0 
+4 0 5 
+0 1 5 
+1 6 3 
+1 3 5 
+6 4 8 
+8 4 5 
+5 6 3 
+9 7 10 
+6 5 8 
+10 11 9 
+
+14 # number of geometric entity indices
+# Geometric entity indices
+0 
+1 
+2 
+0 
+4 
+3 
+1 
+3 
+2 
+4 
+5 
+10 
+5 
+10 
+
+# Type #5
+
+4 quad # type name
+
+
+4 # number of vertices per element
+4 # number of elements
+# Elements
+5 3 9 7 
+3 6 7 10 
+6 8 10 11 
+8 5 11 9 
+
+4 # number of geometric entity indices
+# Geometric entity indices
+8 
+6 
+7 
+9 
