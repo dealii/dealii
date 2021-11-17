@@ -18,6 +18,8 @@
 
 #include <deal.II/fe/fe_series.h>
 
+#include <deal.II/grid/filtered_iterator.h>
+
 #include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/q_collection.h>
 
@@ -388,79 +390,77 @@ namespace SmoothnessEstimator
       Vector<number>      local_dof_values;
       std::vector<double> ln_k;
       std::pair<std::vector<unsigned int>, std::vector<double>> res;
-      for (const auto &cell : dof_handler.active_cell_iterators())
-        if (cell->is_locally_owned())
-          {
-            if (!only_flagged_cells || cell->refine_flag_set() ||
-                cell->coarsen_flag_set())
-              {
-                n_modes = fe_fourier.get_n_coefficients_per_direction(
-                  cell->active_fe_index());
-                resize(expansion_coefficients, n_modes);
+      for (const auto &cell : dof_handler.active_cell_iterators() |
+                                IteratorFilters::LocallyOwnedCell())
+        {
+          if (!only_flagged_cells || cell->refine_flag_set() ||
+              cell->coarsen_flag_set())
+            {
+              n_modes = fe_fourier.get_n_coefficients_per_direction(
+                cell->active_fe_index());
+              resize(expansion_coefficients, n_modes);
 
-                // Inside the loop, we first need to get the values of the local
-                // degrees of freedom and then need to compute the series
-                // expansion by multiplying this vector with the matrix ${\cal
-                // F}$ corresponding to this finite element.
-                local_dof_values.reinit(cell->get_fe().n_dofs_per_cell());
-                cell->get_dof_values(solution, local_dof_values);
+              // Inside the loop, we first need to get the values of the local
+              // degrees of freedom and then need to compute the series
+              // expansion by multiplying this vector with the matrix ${\cal
+              // F}$ corresponding to this finite element.
+              local_dof_values.reinit(cell->get_fe().n_dofs_per_cell());
+              cell->get_dof_values(solution, local_dof_values);
 
-                fe_fourier.calculate(local_dof_values,
-                                     cell->active_fe_index(),
-                                     expansion_coefficients);
+              fe_fourier.calculate(local_dof_values,
+                                   cell->active_fe_index(),
+                                   expansion_coefficients);
 
-                // We fit our exponential decay of expansion coefficients to the
-                // provided regression_strategy on each possible value of |k|.
-                // To this end, we use FESeries::process_coefficients() to
-                // rework coefficients into the desired format.
-                res = FESeries::process_coefficients<dim>(
-                  expansion_coefficients,
-                  [n_modes](const TableIndices<dim> &indices) {
-                    return index_norm_greater_than_zero_and_less_than_N_squared(
-                      indices, n_modes);
-                  },
-                  regression_strategy,
-                  smallest_abs_coefficient);
+              // We fit our exponential decay of expansion coefficients to the
+              // provided regression_strategy on each possible value of |k|.
+              // To this end, we use FESeries::process_coefficients() to
+              // rework coefficients into the desired format.
+              res = FESeries::process_coefficients<dim>(
+                expansion_coefficients,
+                [n_modes](const TableIndices<dim> &indices) {
+                  return index_norm_greater_than_zero_and_less_than_N_squared(
+                    indices, n_modes);
+                },
+                regression_strategy,
+                smallest_abs_coefficient);
 
-                Assert(res.first.size() == res.second.size(),
-                       ExcInternalError());
+              Assert(res.first.size() == res.second.size(), ExcInternalError());
 
-                // Last, do the linear regression.
-                float regularity = std::numeric_limits<float>::infinity();
-                if (res.first.size() > 1)
-                  {
-                    // Prepare linear equation for the logarithmic least squares
-                    // fit.
-                    //
-                    // First, calculate ln(|k|).
-                    //
-                    // For Fourier expansion, this translates to
-                    // ln(2*pi*sqrt(predicate)) = ln(2*pi) + 0.5*ln(predicate).
-                    // Since we are just interested in the slope of a linear
-                    // regression later, we omit the ln(2*pi) factor.
-                    ln_k.resize(res.first.size());
-                    for (unsigned int f = 0; f < res.first.size(); ++f)
-                      ln_k[f] =
-                        0.5 * std::log(static_cast<double>(res.first[f]));
+              // Last, do the linear regression.
+              float regularity = std::numeric_limits<float>::infinity();
+              if (res.first.size() > 1)
+                {
+                  // Prepare linear equation for the logarithmic least squares
+                  // fit.
+                  //
+                  // First, calculate ln(|k|).
+                  //
+                  // For Fourier expansion, this translates to
+                  // ln(2*pi*sqrt(predicate)) = ln(2*pi) + 0.5*ln(predicate).
+                  // Since we are just interested in the slope of a linear
+                  // regression later, we omit the ln(2*pi) factor.
+                  ln_k.resize(res.first.size());
+                  for (unsigned int f = 0; f < res.first.size(); ++f)
+                    ln_k[f] = 0.5 * std::log(static_cast<double>(res.first[f]));
 
-                    // Second, calculate ln(U_k).
-                    for (auto &residual_element : res.second)
-                      residual_element = std::log(residual_element);
+                  // Second, calculate ln(U_k).
+                  for (auto &residual_element : res.second)
+                    residual_element = std::log(residual_element);
 
-                    const std::pair<double, double> fit =
-                      FESeries::linear_regression(ln_k, res.second);
-                    // Compute regularity s = mu - dim/2
-                    regularity = static_cast<float>(-fit.first) -
-                                 ((dim > 1) ? (.5 * dim) : 0);
-                  }
+                  const std::pair<double, double> fit =
+                    FESeries::linear_regression(ln_k, res.second);
+                  // Compute regularity s = mu - dim/2
+                  regularity = static_cast<float>(-fit.first) -
+                               ((dim > 1) ? (.5 * dim) : 0);
+                }
 
-                // Store result in the vector of estimated values for each cell.
-                smoothness_indicators(cell->active_cell_index()) = regularity;
-              }
-            else
-              smoothness_indicators(cell->active_cell_index()) =
-                numbers::signaling_nan<float>();
-          }
+              // Store result in the vector of estimated values for each cell.
+              smoothness_indicators(cell->active_cell_index()) = regularity;
+            }
+          else
+            smoothness_indicators(cell->active_cell_index()) =
+              numbers::signaling_nan<float>();
+        }
     }
 
 
@@ -498,78 +498,78 @@ namespace SmoothnessEstimator
       x.reserve(max_degree);
       y.reserve(max_degree);
 
-      for (const auto &cell : dof_handler.active_cell_iterators())
-        if (cell->is_locally_owned())
-          {
-            if (!only_flagged_cells || cell->refine_flag_set() ||
-                cell->coarsen_flag_set())
-              {
-                n_modes = fe_fourier.get_n_coefficients_per_direction(
-                  cell->active_fe_index());
-                resize(expansion_coefficients, n_modes);
+      for (const auto &cell : dof_handler.active_cell_iterators() |
+                                IteratorFilters::LocallyOwnedCell())
+        {
+          if (!only_flagged_cells || cell->refine_flag_set() ||
+              cell->coarsen_flag_set())
+            {
+              n_modes = fe_fourier.get_n_coefficients_per_direction(
+                cell->active_fe_index());
+              resize(expansion_coefficients, n_modes);
 
-                const unsigned int pe = cell->get_fe().degree;
-                Assert(pe > 0, ExcInternalError());
+              const unsigned int pe = cell->get_fe().degree;
+              Assert(pe > 0, ExcInternalError());
 
-                // since we use coefficients with indices [1,pe] in each
-                // direction, the number of coefficients we need to calculate is
-                // at least N=pe+1
-                AssertIndexRange(pe, n_modes);
+              // since we use coefficients with indices [1,pe] in each
+              // direction, the number of coefficients we need to calculate is
+              // at least N=pe+1
+              AssertIndexRange(pe, n_modes);
 
-                local_dof_values.reinit(cell->get_fe().n_dofs_per_cell());
-                cell->get_dof_values(solution, local_dof_values);
+              local_dof_values.reinit(cell->get_fe().n_dofs_per_cell());
+              cell->get_dof_values(solution, local_dof_values);
 
-                fe_fourier.calculate(local_dof_values,
-                                     cell->active_fe_index(),
-                                     expansion_coefficients);
+              fe_fourier.calculate(local_dof_values,
+                                   cell->active_fe_index(),
+                                   expansion_coefficients);
 
-                // choose the smallest decay of coefficients in each direction,
-                // i.e. the maximum decay slope k_v as in exp(-k_v)
-                double k_v = std::numeric_limits<double>::infinity();
-                for (unsigned int d = 0; d < dim; ++d)
-                  {
-                    x.resize(0);
-                    y.resize(0);
+              // choose the smallest decay of coefficients in each direction,
+              // i.e. the maximum decay slope k_v as in exp(-k_v)
+              double k_v = std::numeric_limits<double>::infinity();
+              for (unsigned int d = 0; d < dim; ++d)
+                {
+                  x.resize(0);
+                  y.resize(0);
 
-                    // will use all non-zero coefficients allowed by the
-                    // predicate function
-                    //
-                    // skip i=0 because of logarithm
-                    for (unsigned int i = 1; i <= pe; ++i)
-                      if (coefficients_predicate[i])
-                        {
-                          TableIndices<dim> ind;
-                          ind[d] = i;
-                          const double coeff_abs =
-                            std::abs(expansion_coefficients(ind));
+                  // will use all non-zero coefficients allowed by the
+                  // predicate function
+                  //
+                  // skip i=0 because of logarithm
+                  for (unsigned int i = 1; i <= pe; ++i)
+                    if (coefficients_predicate[i])
+                      {
+                        TableIndices<dim> ind;
+                        ind[d] = i;
+                        const double coeff_abs =
+                          std::abs(expansion_coefficients(ind));
 
-                          if (coeff_abs > smallest_abs_coefficient)
-                            {
-                              x.push_back(std::log(i));
-                              y.push_back(std::log(coeff_abs));
-                            }
-                        }
+                        if (coeff_abs > smallest_abs_coefficient)
+                          {
+                            x.push_back(std::log(i));
+                            y.push_back(std::log(coeff_abs));
+                          }
+                      }
 
-                    // in case we don't have enough non-zero coefficient to fit,
-                    // skip this direction
-                    if (x.size() < 2)
-                      continue;
+                  // in case we don't have enough non-zero coefficient to fit,
+                  // skip this direction
+                  if (x.size() < 2)
+                    continue;
 
-                    const std::pair<double, double> fit =
-                      FESeries::linear_regression(x, y);
+                  const std::pair<double, double> fit =
+                    FESeries::linear_regression(x, y);
 
-                    // decay corresponds to negative slope
-                    // take the lesser negative slope along each direction
-                    k_v = std::min(k_v, -fit.first);
-                  }
+                  // decay corresponds to negative slope
+                  // take the lesser negative slope along each direction
+                  k_v = std::min(k_v, -fit.first);
+                }
 
-                smoothness_indicators(cell->active_cell_index()) =
-                  static_cast<float>(k_v);
-              }
-            else
               smoothness_indicators(cell->active_cell_index()) =
-                numbers::signaling_nan<float>();
-          }
+                static_cast<float>(k_v);
+            }
+          else
+            smoothness_indicators(cell->active_cell_index()) =
+              numbers::signaling_nan<float>();
+        }
     }
 
 

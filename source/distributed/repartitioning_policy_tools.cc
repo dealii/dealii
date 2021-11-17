@@ -21,6 +21,7 @@
 #include <deal.II/distributed/tria_base.h>
 
 #include <deal.II/grid/cell_id_translator.h>
+#include <deal.II/grid/filtered_iterator.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -171,11 +172,11 @@ namespace RepartitioningPolicyTools
     LinearAlgebra::distributed::Vector<double> partition(
       tria->global_active_cell_index_partitioner().lock());
 
-    for (const auto &cell : tria_coarse_in.active_cell_iterators())
-      if (cell->is_locally_owned())
-        partition[cell->global_active_cell_index()] =
-          owning_ranks_of_coarse_cells[is_coarse.index_within_set(
-            cell_id_translator.translate(cell))];
+    for (const auto &cell : tria_coarse_in.active_cell_iterators() |
+                              IteratorFilters::LocallyOwnedCell())
+      partition[cell->global_active_cell_index()] =
+        owning_ranks_of_coarse_cells[is_coarse.index_within_set(
+          cell_id_translator.translate(cell))];
 
     return partition;
   }

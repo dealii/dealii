@@ -19,6 +19,8 @@
 
 #include <deal.II/fe/fe_values.h>
 
+#include <deal.II/grid/filtered_iterator.h>
+
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/la_parallel_block_vector.h>
 #include <deal.II/lac/la_parallel_vector.h>
@@ -143,17 +145,17 @@ namespace VectorTools
     Number                                            mean = Number();
     typename numbers::NumberTraits<Number>::real_type area = 0.;
     // Compute mean value
-    for (const auto &cell : dof.active_cell_iterators())
-      if (cell->is_locally_owned())
-        {
-          fe.reinit(cell);
-          fe.get_function_values(v, values);
-          for (unsigned int k = 0; k < quadrature.size(); ++k)
-            {
-              mean += fe.JxW(k) * values[k](component);
-              area += fe.JxW(k);
-            }
-        }
+    for (const auto &cell :
+         dof.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
+      {
+        fe.reinit(cell);
+        fe.get_function_values(v, values);
+        for (unsigned int k = 0; k < quadrature.size(); ++k)
+          {
+            mean += fe.JxW(k) * values[k](component);
+            area += fe.JxW(k);
+          }
+      }
 
 #ifdef DEAL_II_WITH_MPI
     // if this was a distributed DoFHandler, we need to do the reduction

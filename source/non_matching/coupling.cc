@@ -22,6 +22,7 @@
 
 #include <deal.II/fe/fe_values.h>
 
+#include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/grid_tools_cache.h>
 
@@ -692,31 +693,31 @@ namespace NonMatching
           typename Triangulation<dim1, spacedim>::active_cell_iterator>>
           intersection;
 
-        for (const auto &cell0 : dh0.active_cell_iterators())
-          if (cell0->is_locally_owned())
-            {
-              intersection.resize(0);
-              BoundingBox<spacedim> box0 =
-                cache0.get_mapping().get_bounding_box(cell0);
-              box0.extend(epsilon);
-              boost::geometry::index::query(tree1,
-                                            boost::geometry::index::intersects(
-                                              box0),
-                                            std::back_inserter(intersection));
-              if (!intersection.empty())
-                {
-                  cell0->get_dof_indices(dofs0);
-                  for (const auto &entry : intersection)
-                    {
-                      typename DoFHandler<dim1, spacedim>::cell_iterator cell1(
-                        *entry.second, &dh1);
-                      cell1->get_dof_indices(dofs1);
-                      constraints0.add_entries_local_to_global(dofs0,
-                                                               dofs1,
-                                                               sparsity);
-                    }
-                }
-            }
+        for (const auto &cell0 :
+             dh0.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
+          {
+            intersection.resize(0);
+            BoundingBox<spacedim> box0 =
+              cache0.get_mapping().get_bounding_box(cell0);
+            box0.extend(epsilon);
+            boost::geometry::index::query(tree1,
+                                          boost::geometry::index::intersects(
+                                            box0),
+                                          std::back_inserter(intersection));
+            if (!intersection.empty())
+              {
+                cell0->get_dof_indices(dofs0);
+                for (const auto &entry : intersection)
+                  {
+                    typename DoFHandler<dim1, spacedim>::cell_iterator cell1(
+                      *entry.second, &dh1);
+                    cell1->get_dof_indices(dofs1);
+                    constraints0.add_entries_local_to_global(dofs0,
+                                                             dofs1,
+                                                             sparsity);
+                  }
+              }
+          }
       }
     else
       {
@@ -728,31 +729,31 @@ namespace NonMatching
           typename Triangulation<dim0, spacedim>::active_cell_iterator>>
           intersection;
 
-        for (const auto &cell1 : dh1.active_cell_iterators())
-          if (cell1->is_locally_owned())
-            {
-              intersection.resize(0);
-              BoundingBox<spacedim> box1 =
-                cache1.get_mapping().get_bounding_box(cell1);
-              box1.extend(epsilon);
-              boost::geometry::index::query(tree0,
-                                            boost::geometry::index::intersects(
-                                              box1),
-                                            std::back_inserter(intersection));
-              if (!intersection.empty())
-                {
-                  cell1->get_dof_indices(dofs1);
-                  for (const auto &entry : intersection)
-                    {
-                      typename DoFHandler<dim0, spacedim>::cell_iterator cell0(
-                        *entry.second, &dh0);
-                      cell0->get_dof_indices(dofs0);
-                      constraints0.add_entries_local_to_global(dofs0,
-                                                               dofs1,
-                                                               sparsity);
-                    }
-                }
-            }
+        for (const auto &cell1 :
+             dh1.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
+          {
+            intersection.resize(0);
+            BoundingBox<spacedim> box1 =
+              cache1.get_mapping().get_bounding_box(cell1);
+            box1.extend(epsilon);
+            boost::geometry::index::query(tree0,
+                                          boost::geometry::index::intersects(
+                                            box1),
+                                          std::back_inserter(intersection));
+            if (!intersection.empty())
+              {
+                cell1->get_dof_indices(dofs1);
+                for (const auto &entry : intersection)
+                  {
+                    typename DoFHandler<dim0, spacedim>::cell_iterator cell0(
+                      *entry.second, &dh0);
+                    cell0->get_dof_indices(dofs0);
+                    constraints0.add_entries_local_to_global(dofs0,
+                                                             dofs1,
+                                                             sparsity);
+                  }
+              }
+          }
       }
   }
 
@@ -895,31 +896,31 @@ namespace NonMatching
           typename Triangulation<dim1, spacedim>::active_cell_iterator>>
           intersection;
 
-        for (const auto &cell0 : dh0.active_cell_iterators())
-          if (cell0->is_locally_owned())
-            {
-              intersection.resize(0);
-              BoundingBox<spacedim> box0 =
-                cache0.get_mapping().get_bounding_box(cell0);
-              box0.extend(epsilon);
-              boost::geometry::index::query(tree1,
-                                            boost::geometry::index::intersects(
-                                              box0),
-                                            std::back_inserter(intersection));
-              if (!intersection.empty())
-                {
-                  cell0->get_dof_indices(dofs0);
-                  fev0.reinit(cell0);
-                  for (const auto &entry : intersection)
-                    {
-                      typename DoFHandler<dim1, spacedim>::cell_iterator cell1(
-                        *entry.second, &dh1);
-                      cell1->get_dof_indices(dofs1);
-                      fev1.reinit(cell1);
-                      assemble_one_pair();
-                    }
-                }
-            }
+        for (const auto &cell0 :
+             dh0.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
+          {
+            intersection.resize(0);
+            BoundingBox<spacedim> box0 =
+              cache0.get_mapping().get_bounding_box(cell0);
+            box0.extend(epsilon);
+            boost::geometry::index::query(tree1,
+                                          boost::geometry::index::intersects(
+                                            box0),
+                                          std::back_inserter(intersection));
+            if (!intersection.empty())
+              {
+                cell0->get_dof_indices(dofs0);
+                fev0.reinit(cell0);
+                for (const auto &entry : intersection)
+                  {
+                    typename DoFHandler<dim1, spacedim>::cell_iterator cell1(
+                      *entry.second, &dh1);
+                    cell1->get_dof_indices(dofs1);
+                    fev1.reinit(cell1);
+                    assemble_one_pair();
+                  }
+              }
+          }
       }
     else
       {
@@ -931,31 +932,31 @@ namespace NonMatching
           typename Triangulation<dim0, spacedim>::active_cell_iterator>>
           intersection;
 
-        for (const auto &cell1 : dh1.active_cell_iterators())
-          if (cell1->is_locally_owned())
-            {
-              intersection.resize(0);
-              BoundingBox<spacedim> box1 =
-                cache1.get_mapping().get_bounding_box(cell1);
-              box1.extend(epsilon);
-              boost::geometry::index::query(tree0,
-                                            boost::geometry::index::intersects(
-                                              box1),
-                                            std::back_inserter(intersection));
-              if (!intersection.empty())
-                {
-                  cell1->get_dof_indices(dofs1);
-                  fev1.reinit(cell1);
-                  for (const auto &entry : intersection)
-                    {
-                      typename DoFHandler<dim0, spacedim>::cell_iterator cell0(
-                        *entry.second, &dh0);
-                      cell0->get_dof_indices(dofs0);
-                      fev0.reinit(cell0);
-                      assemble_one_pair();
-                    }
-                }
-            }
+        for (const auto &cell1 :
+             dh1.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
+          {
+            intersection.resize(0);
+            BoundingBox<spacedim> box1 =
+              cache1.get_mapping().get_bounding_box(cell1);
+            box1.extend(epsilon);
+            boost::geometry::index::query(tree0,
+                                          boost::geometry::index::intersects(
+                                            box1),
+                                          std::back_inserter(intersection));
+            if (!intersection.empty())
+              {
+                cell1->get_dof_indices(dofs1);
+                fev1.reinit(cell1);
+                for (const auto &entry : intersection)
+                  {
+                    typename DoFHandler<dim0, spacedim>::cell_iterator cell0(
+                      *entry.second, &dh0);
+                    cell0->get_dof_indices(dofs0);
+                    fev0.reinit(cell0);
+                    assemble_one_pair();
+                  }
+              }
+          }
       }
   }
 

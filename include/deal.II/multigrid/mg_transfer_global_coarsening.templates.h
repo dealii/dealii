@@ -33,6 +33,7 @@
 #include <deal.II/fe/fe_tools.h>
 
 #include <deal.II/grid/cell_id_translator.h>
+#include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria_description.h>
 
@@ -2827,9 +2828,9 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::reinit(
         if (cell->is_locally_owned())
           is_locally_owned_fine.add_index(cell_id_translator.translate(cell));
 
-      for (const auto &cell : dof_handler_coarse.active_cell_iterators())
-        if (cell->is_locally_owned())
-          is_locally_owned_coarse.add_index(cell_id_translator.translate(cell));
+      for (const auto &cell : dof_handler_coarse.active_cell_iterators() |
+                                IteratorFilters::LocallyOwnedCell())
+        is_locally_owned_coarse.add_index(cell_id_translator.translate(cell));
 
       const MPI_Comm communicator = dof_handler_fine.get_communicator();
 

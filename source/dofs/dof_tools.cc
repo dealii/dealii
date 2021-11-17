@@ -224,18 +224,18 @@ namespace DoFTools
 
       // then loop over all cells and do the work
       std::vector<types::global_dof_index> indices;
-      for (const auto &c : dof.active_cell_iterators())
-        if (c->is_locally_owned())
-          {
-            const unsigned int fe_index      = c->active_fe_index();
-            const unsigned int dofs_per_cell = c->get_fe().n_dofs_per_cell();
-            indices.resize(dofs_per_cell);
-            c->get_dof_indices(indices);
-            for (unsigned int i = 0; i < dofs_per_cell; ++i)
-              if (dof.locally_owned_dofs().is_element(indices[i]))
-                dofs_by_component[dof.locally_owned_dofs().index_within_set(
-                  indices[i])] = local_component_association[fe_index][i];
-          }
+      for (const auto &c :
+           dof.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
+        {
+          const unsigned int fe_index      = c->active_fe_index();
+          const unsigned int dofs_per_cell = c->get_fe().n_dofs_per_cell();
+          indices.resize(dofs_per_cell);
+          c->get_dof_indices(indices);
+          for (unsigned int i = 0; i < dofs_per_cell; ++i)
+            if (dof.locally_owned_dofs().is_element(indices[i]))
+              dofs_by_component[dof.locally_owned_dofs().index_within_set(
+                indices[i])] = local_component_association[fe_index][i];
+        }
     }
 
 
@@ -1272,27 +1272,27 @@ namespace DoFTools
 
     // Loop over all owned cells and ask the element for the constant modes
     std::vector<types::global_dof_index> dof_indices;
-    for (const auto &cell : dof_handler.active_cell_iterators())
-      if (cell->is_locally_owned())
-        {
-          dof_indices.resize(cell->get_fe().n_dofs_per_cell());
-          cell->get_dof_indices(dof_indices);
+    for (const auto &cell : dof_handler.active_cell_iterators() |
+                              IteratorFilters::LocallyOwnedCell())
+      {
+        dof_indices.resize(cell->get_fe().n_dofs_per_cell());
+        cell->get_dof_indices(dof_indices);
 
-          for (unsigned int i = 0; i < dof_indices.size(); ++i)
-            if (locally_owned_dofs.is_element(dof_indices[i]))
-              {
-                const unsigned int loc_index =
-                  locally_owned_dofs.index_within_set(dof_indices[i]);
-                const unsigned int comp = dofs_by_component[loc_index];
-                if (component_mask[comp])
-                  for (auto &indices :
-                       constant_mode_to_component_translation[comp])
-                    constant_modes[indices
-                                     .first][component_numbering[loc_index]] =
-                      element_constant_modes[cell->active_fe_index()](
-                        indices.second, i);
-              }
-        }
+        for (unsigned int i = 0; i < dof_indices.size(); ++i)
+          if (locally_owned_dofs.is_element(dof_indices[i]))
+            {
+              const unsigned int loc_index =
+                locally_owned_dofs.index_within_set(dof_indices[i]);
+              const unsigned int comp = dofs_by_component[loc_index];
+              if (component_mask[comp])
+                for (auto &indices :
+                     constant_mode_to_component_translation[comp])
+                  constant_modes[indices
+                                   .first][component_numbering[loc_index]] =
+                    element_constant_modes[cell->active_fe_index()](
+                      indices.second, i);
+            }
+      }
   }
 
 
@@ -1523,9 +1523,9 @@ namespace DoFTools
       }
     else
       {
-        for (const auto &cell : dof_handler.active_cell_iterators())
-          if (cell->is_locally_owned())
-            cell_owners[cell->active_cell_index()] = cell->subdomain_id();
+        for (const auto &cell : dof_handler.active_cell_iterators() |
+                                  IteratorFilters::LocallyOwnedCell())
+          cell_owners[cell->active_cell_index()] = cell->subdomain_id();
       }
 
     // preset all values by an invalid value

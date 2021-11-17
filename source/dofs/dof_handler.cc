@@ -27,6 +27,7 @@
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_handler_policy.h>
 
+#include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
@@ -1793,11 +1794,11 @@ namespace internal
             {
               std::vector<active_fe_index_type> future_fe_indices(
                 tr->n_active_cells(), 0u);
-              for (const auto &cell : dof_handler.active_cell_iterators())
-                if (cell->is_locally_owned())
-                  future_fe_indices[cell->active_cell_index()] =
-                    dof_handler
-                      .hp_cell_future_fe_indices[cell->level()][cell->index()];
+              for (const auto &cell : dof_handler.active_cell_iterators() |
+                                        IteratorFilters::LocallyOwnedCell())
+                future_fe_indices[cell->active_cell_index()] =
+                  dof_handler
+                    .hp_cell_future_fe_indices[cell->level()][cell->index()];
 
               Utilities::MPI::sum(future_fe_indices,
                                   tr->get_communicator(),
