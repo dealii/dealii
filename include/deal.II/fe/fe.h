@@ -40,6 +40,11 @@ template <int dim, int spacedim>
 class FEFaceValues;
 template <int dim, int spacedim>
 class FESubfaceValues;
+namespace NonMatching
+{
+  template <int dim>
+  class FEImmersedSurfaceValues;
+}
 template <int dim, int spacedim>
 class FESystem;
 
@@ -3068,6 +3073,7 @@ protected:
   friend class FEValues<dim, spacedim>;
   friend class FEFaceValues<dim, spacedim>;
   friend class FESubfaceValues<dim, spacedim>;
+  friend class NonMatching::FEImmersedSurfaceValues<dim>;
   friend class FESystem<dim, spacedim>;
 
   // explicitly check for sensible template arguments, but not on windows

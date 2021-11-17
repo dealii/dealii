@@ -28,6 +28,8 @@
 
 #include <deal.II/hp/q_collection.h>
 
+#include <deal.II/non_matching/immersed_surface_quadrature.h>
+
 #include <array>
 #include <cmath>
 #include <memory>
@@ -48,6 +50,11 @@ template <int dim, int spacedim>
 class FEFaceValues;
 template <int dim, int spacedim>
 class FESubfaceValues;
+namespace NonMatching
+{
+  template <int dim>
+  class FEImmersedSurfaceValues;
+}
 
 
 /**
@@ -982,6 +989,20 @@ protected:
       &output_data) const = 0;
 
   /**
+   * The equivalent of Mapping::fill_fe_values(), but for the case that the
+   * quadrature is an ImmersedSurfaceQuadrature. See there for a comprehensive
+   * description of the input parameters. This function is called by
+   * FEImmersedSurfaceValues::reinit().
+   */
+  virtual void
+  fill_fe_immersed_surface_values(
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+    const NonMatching::ImmersedSurfaceQuadrature<dim> &         quadrature,
+    const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
+    dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
+      &output_data) const;
+
+  /**
    * @}
    */
 
@@ -1282,6 +1303,7 @@ public:
   friend class FEValues<dim, spacedim>;
   friend class FEFaceValues<dim, spacedim>;
   friend class FESubfaceValues<dim, spacedim>;
+  friend class NonMatching::FEImmersedSurfaceValues<dim>;
 };
 
 
