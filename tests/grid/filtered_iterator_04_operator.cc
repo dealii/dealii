@@ -14,7 +14,10 @@
 // ---------------------------------------------------------------------
 
 
-// check filtered iterators using multiple predicates
+// Check filtered iterators using multiple predicates
+//
+// Compared to filtered_iterator_04, this test checks the availability
+// of operator| to create the filter.
 
 #include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_generator.h>
@@ -60,10 +63,9 @@ test()
 
 
   unsigned int n_filtered_cells = 0;
-  for (auto filtered_cell :
-       filter_iterators(tria.active_cell_iterators(),
-                        IteratorFilters::AtBoundary(),
-                        IteratorFilters::SubdomainEqualTo(0)))
+  for (auto filtered_cell : tria.active_cell_iterators() |
+                              IteratorFilters::AtBoundary() |
+                              IteratorFilters::SubdomainEqualTo(0))
     {
       AssertThrow(cell_set.count(filtered_cell) == 1,
                   ExcMessage("Wrong cell filtered."));
