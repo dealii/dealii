@@ -5497,6 +5497,19 @@ namespace FEValuesViews
 
 
 template <int dim, int spacedim>
+template <bool lda>
+inline FEValuesBase<dim, spacedim>::CellIteratorContainer::
+  CellIteratorContainer(
+    const TriaIterator<DoFCellAccessor<dim, spacedim, lda>> &cell)
+  : initialized(true)
+  , cell(cell)
+  , dof_handler(&cell->get_dof_handler())
+  , level_dof_access(lda)
+{}
+
+
+
+template <int dim, int spacedim>
 inline const FEValuesViews::Scalar<dim, spacedim> &
 FEValuesBase<dim, spacedim>::operator[](
   const FEValuesExtractors::Scalar &scalar) const
