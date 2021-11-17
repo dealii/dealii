@@ -15,7 +15,7 @@
 
 
 
-// check whether we can read in with the gmsh format
+// Check whether we can read in a mesh in COMSOL's .mphtxt format
 
 #include <deal.II/grid/grid_in.h>
 #include <deal.II/grid/grid_out.h>
@@ -29,7 +29,7 @@
 
 template <int dim>
 void
-gmsh_grid(const char *name)
+comsol_grid(const char *name)
 {
   Triangulation<dim> tria;
   GridIn<dim>        grid_in;
@@ -117,7 +117,7 @@ main()
 
   try
     {
-      gmsh_grid<3>(SOURCE_DIR "/grids/comsol/mesh_1.mphtxt");
+      comsol_grid<3>(SOURCE_DIR "/grids/comsol/mesh_1.mphtxt");
     }
   catch (std::exception &exc)
     {
