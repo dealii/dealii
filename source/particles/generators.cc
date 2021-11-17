@@ -205,23 +205,19 @@ namespace Particles
       particle_handler.reserve(particle_handler.n_locally_owned_particles() +
                                n_particles_to_generate);
 
-      for (const auto &cell : triangulation.active_cell_iterators())
+      for (const auto &cell : triangulation.active_cell_iterators() |
+                                IteratorFilters::LocallyOwnedCell())
         {
-          if (cell->is_locally_owned())
+          for (const auto &reference_location : particle_reference_locations)
             {
-              for (const auto &reference_location :
-                   particle_reference_locations)
-                {
-                  const Point<spacedim> position_real =
-                    mapping.transform_unit_to_real_cell(cell,
-                                                        reference_location);
+              const Point<spacedim> position_real =
+                mapping.transform_unit_to_real_cell(cell, reference_location);
 
-                  particle_handler.insert_particle(position_real,
-                                                   reference_location,
-                                                   particle_index,
-                                                   cell);
-                  ++particle_index;
-                }
+              particle_handler.insert_particle(position_real,
+                                               reference_location,
+                                               particle_index,
+                                               cell);
+              ++particle_index;
             }
         }
 
@@ -398,23 +394,23 @@ namespace Particles
             // between their weight and the local weight integral
             types::particle_index particles_created = 0;
 
-            for (const auto &cell : triangulation.active_cell_iterators())
-              if (cell->is_locally_owned())
-                {
-                  const types::particle_index cumulative_particles_to_create =
-                    std::llround(
-                      static_cast<double>(n_local_particles) *
-                      cumulative_cell_weights[cell->active_cell_index()] /
-                      local_weight_integral);
+            for (const auto &cell : triangulation.active_cell_iterators() |
+                                      IteratorFilters::LocallyOwnedCell())
+              {
+                const types::particle_index cumulative_particles_to_create =
+                  std::llround(
+                    static_cast<double>(n_local_particles) *
+                    cumulative_cell_weights[cell->active_cell_index()] /
+                    local_weight_integral);
 
-                  // Compute particles for this cell as difference between
-                  // number of particles that should be created including this
-                  // cell minus the number of particles already created.
-                  particles_per_cell[cell->active_cell_index()] =
-                    cumulative_particles_to_create - particles_created;
-                  particles_created +=
-                    particles_per_cell[cell->active_cell_index()];
-                }
+                // Compute particles for this cell as difference between
+                // number of particles that should be created including this
+                // cell minus the number of particles already created.
+                particles_per_cell[cell->active_cell_index()] =
+                  cumulative_particles_to_create - particles_created;
+                particles_created +=
+                  particles_per_cell[cell->active_cell_index()];
+              }
           }
       }
 
@@ -424,22 +420,22 @@ namespace Particles
                                  n_local_particles);
         unsigned int current_particle_index = start_particle_id;
 
-        for (const auto &cell : triangulation.active_cell_iterators())
-          if (cell->is_locally_owned())
-            {
-              for (unsigned int i = 0;
-                   i < particles_per_cell[cell->active_cell_index()];
-                   ++i)
-                {
-                  random_particle_in_cell_insert(cell,
-                                                 current_particle_index,
-                                                 random_number_generator,
-                                                 particle_handler,
-                                                 mapping);
+        for (const auto &cell : triangulation.active_cell_iterators() |
+                                  IteratorFilters::LocallyOwnedCell())
+          {
+            for (unsigned int i = 0;
+                 i < particles_per_cell[cell->active_cell_index()];
+                 ++i)
+              {
+                random_particle_in_cell_insert(cell,
+                                               current_particle_index,
+                                               random_number_generator,
+                                               particle_handler,
+                                               mapping);
 
-                  ++current_particle_index;
-                }
-            }
+                ++current_particle_index;
+              }
+          }
 
         particle_handler.update_cached_numbers();
       }
@@ -503,18 +499,14 @@ namespace Particles
                                  triangulation.n_active_cells());
 
       //       Loop through cells and gather gauss points
-      for (const auto &cell : triangulation.active_cell_iterators())
+      for (const auto &cell : triangulation.active_cell_iterators() |
+                                IteratorFilters::LocallyOwnedCell())
         {
-          if (cell->is_locally_owned())
+          for (const auto &reference_location : particle_reference_locations)
             {
-              for (const auto &reference_location :
-                   particle_reference_locations)
-                {
-                  const Point<spacedim> position_real =
-                    mapping.transform_unit_to_real_cell(cell,
-                                                        reference_location);
-                  points_to_generate.push_back(position_real);
-                }
+              const Point<spacedim> position_real =
+                mapping.transform_unit_to_real_cell(cell, reference_location);
+              points_to_generate.push_back(position_real);
             }
         }
       particle_handler.insert_global_particles(points_to_generate,
