@@ -2013,7 +2013,7 @@ namespace GridTools
     std::set<std::pair<CellIterator, unsigned int>> &pairs1,
     std::set<std::pair<typename identity<CellIterator>::type, unsigned int>>
       &                                          pairs2,
-    const int                                    direction,
+    const unsigned int                           direction,
     std::vector<PeriodicFacePair<CellIterator>> &matched_pairs,
     const dealii::Tensor<1, CellIterator::AccessorType::space_dimension>
       &                       offset,
@@ -2106,7 +2106,7 @@ namespace GridTools
   collect_periodic_faces(
     const MeshType &         mesh,
     const types::boundary_id b_id,
-    const int                direction,
+    const unsigned int       direction,
     std::vector<PeriodicFacePair<typename MeshType::cell_iterator>>
       &                                         matched_pairs,
     const Tensor<1, MeshType::space_dimension> &offset,
@@ -2188,7 +2188,7 @@ namespace GridTools
     const MeshType &         mesh,
     const types::boundary_id b_id1,
     const types::boundary_id b_id2,
-    const int                direction,
+    const unsigned int       direction,
     std::vector<PeriodicFacePair<typename MeshType::cell_iterator>>
       &                                         matched_pairs,
     const Tensor<1, MeshType::space_dimension> &offset,
@@ -2275,7 +2275,7 @@ namespace GridTools
   inline bool
   orthogonal_equality(const Point<spacedim> &    point1,
                       const Point<spacedim> &    point2,
-                      const int                  direction,
+                      const unsigned int         direction,
                       const Tensor<1, spacedim> &offset,
                       const FullMatrix<double> & matrix)
   {
@@ -2294,7 +2294,7 @@ namespace GridTools
 
     distance += offset - point2;
 
-    for (int i = 0; i < spacedim; ++i)
+    for (unsigned int i = 0; i < spacedim; ++i)
       {
         // Only compare coordinate-components != direction:
         if (i == direction)
@@ -2414,7 +2414,7 @@ namespace GridTools
     std::bitset<3> &                                              orientation,
     const FaceIterator &                                          face1,
     const FaceIterator &                                          face2,
-    const int                                                     direction,
+    const unsigned int                                            direction,
     const Tensor<1, FaceIterator::AccessorType::space_dimension> &offset,
     const FullMatrix<double> &                                    matrix)
   {
@@ -2466,7 +2466,7 @@ namespace GridTools
   orthogonal_equality(
     const FaceIterator &                                          face1,
     const FaceIterator &                                          face2,
-    const int                                                     direction,
+    const unsigned int                                            direction,
     const Tensor<1, FaceIterator::AccessorType::space_dimension> &offset,
     const FullMatrix<double> &                                    matrix)
   {
