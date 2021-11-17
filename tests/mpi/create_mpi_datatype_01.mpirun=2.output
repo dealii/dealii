@@ -1,0 +1,21 @@
+
+DEAL:0::checking size 0: size32=0 size64=0
+DEAL:0::checking size 1: size32=1 size64=1
+DEAL:0::checking size 1073741824: size32=1073741824 size64=1073741824
+DEAL:0::checking size 2147483648: size32=UNDEFINED (too big) size64=2147483648
+DEAL:0::checking size 4294967296: size32=UNDEFINED (too big) size64=4294967296
+DEAL:0::checking size 8589934592: size32=UNDEFINED (too big) size64=8589934592
+DEAL:0::checking size 36028797018963968: size32=UNDEFINED (too big) size64=36028797018963968
+DEAL:0::checking size 58493729485: size32=UNDEFINED (too big) size64=58493729485
+DEAL:0::send_recv: OK
+
+DEAL:1::checking size 0: size32=0 size64=0
+DEAL:1::checking size 1: size32=1 size64=1
+DEAL:1::checking size 1073741824: size32=1073741824 size64=1073741824
+DEAL:1::checking size 2147483648: size32=UNDEFINED (too big) size64=2147483648
+DEAL:1::checking size 4294967296: size32=UNDEFINED (too big) size64=4294967296
+DEAL:1::checking size 8589934592: size32=UNDEFINED (too big) size64=8589934592
+DEAL:1::checking size 36028797018963968: size32=UNDEFINED (too big) size64=36028797018963968
+DEAL:1::checking size 58493729485: size32=UNDEFINED (too big) size64=58493729485
+DEAL:1::send_recv: OK
+
