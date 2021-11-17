@@ -69,8 +69,8 @@ namespace CUDAWrappers
 
       const auto this_type =
         (direction == 0) ?
-          dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_x :
-          dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_y;
+          dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_x :
+          dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_y;
 
       const unsigned int interp_idx = (direction == 0) ? x_idx : y_idx;
 
@@ -94,15 +94,15 @@ namespace CUDAWrappers
       // fe_degree))
       const bool constrained_dof =
         ((direction == 0) &&
-         (((constraint_mask &
-            dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_y) !=
+         (((constraint_mask & dealii::internal::MatrixFreeFunctions::
+                                ConstraintKinds::subcell_y) !=
            dealii::internal::MatrixFreeFunctions::ConstraintKinds::
              unconstrained) ?
             (y_idx == 0) :
             (y_idx == fe_degree))) ||
         ((direction == 1) &&
-         (((constraint_mask &
-            dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_x) !=
+         (((constraint_mask & dealii::internal::MatrixFreeFunctions::
+                                ConstraintKinds::subcell_x) !=
            dealii::internal::MatrixFreeFunctions::ConstraintKinds::
              unconstrained) ?
             (x_idx == 0) :
@@ -176,22 +176,22 @@ namespace CUDAWrappers
 
       const auto this_type =
         (direction == 0) ?
-          dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_x :
+          dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_x :
         (direction == 1) ?
-          dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_y :
-          dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_z;
+          dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_y :
+          dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_z;
       const auto face1_type =
         (direction == 0) ?
-          dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_y :
+          dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_y :
         (direction == 1) ?
-          dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_z :
-          dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_x;
+          dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_z :
+          dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_x;
       const auto face2_type =
         (direction == 0) ?
-          dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_z :
+          dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_z :
         (direction == 1) ?
-          dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_x :
-          dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_y;
+          dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_x :
+          dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_y;
 
       // If computing in x-direction, need to match against face_y or
       // face_z

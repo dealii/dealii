@@ -136,10 +136,11 @@ namespace dealii
                                         ConstraintKinds::unconstrained)
               continue;
 
-            const auto this_type =
-              (direction == 0) ?
-                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_x :
-                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_y;
+            const auto this_type = (direction == 0) ?
+                                     dealii::internal::MatrixFreeFunctions::
+                                       ConstraintKinds::subcell_x :
+                                     dealii::internal::MatrixFreeFunctions::
+                                       ConstraintKinds::subcell_y;
 
             const bool constrained_face =
               (constraint_mask[v] &
@@ -175,15 +176,15 @@ namespace dealii
                     ((direction == 0) &&
                      (((constraint_mask[v] &
                         dealii::internal::MatrixFreeFunctions::ConstraintKinds::
-                          type_y) != dealii::internal::MatrixFreeFunctions::
-                                       ConstraintKinds::unconstrained) ?
+                          subcell_y) != dealii::internal::MatrixFreeFunctions::
+                                          ConstraintKinds::unconstrained) ?
                         (y_idx == 0) :
                         (y_idx == fe_degree))) ||
                     ((direction == 1) &&
                      (((constraint_mask[v] &
                         dealii::internal::MatrixFreeFunctions::ConstraintKinds::
-                          type_x) != dealii::internal::MatrixFreeFunctions::
-                                       ConstraintKinds::unconstrained) ?
+                          subcell_x) != dealii::internal::MatrixFreeFunctions::
+                                          ConstraintKinds::unconstrained) ?
                         (x_idx == 0) :
                         (x_idx == fe_degree)));
 
@@ -272,22 +273,22 @@ namespace dealii
 
         const auto this_type =
           (direction == 0) ?
-            dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_x :
+            dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_x :
           (direction == 1) ?
-            dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_y :
-            dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_z;
+            dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_y :
+            dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_z;
         const auto face1_type =
           (direction == 0) ?
-            dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_y :
+            dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_y :
           (direction == 1) ?
-            dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_z :
-            dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_x;
+            dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_z :
+            dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_x;
         const auto face2_type =
           (direction == 0) ?
-            dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_z :
+            dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_z :
           (direction == 1) ?
-            dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_x :
-            dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_y;
+            dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_x :
+            dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_y;
 
         // If computing in x-direction, need to match against
         // dealii::internal::MatrixFreeFunctions::ConstraintKinds::face_y or
@@ -521,38 +522,40 @@ main(int argc, char **argv)
         dealii::internal::MatrixFreeFunctions::ConstraintKinds::unconstrained);
       deallog << std::endl;
 
-      test<2>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintKinds::face_x |
-                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_x |
-                dealii::internal::MatrixFreeFunctions::ConstraintKinds::
-                  type_y); // face 0/0
-      test<2>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintKinds::face_x |
-                dealii::internal::MatrixFreeFunctions::ConstraintKinds::
-                  type_x); // face 0/1
+      test<2>(
+        degree,
+        dealii::internal::MatrixFreeFunctions::ConstraintKinds::face_x |
+          dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_x |
+          dealii::internal::MatrixFreeFunctions::ConstraintKinds::
+            subcell_y); // face 0/0
       test<2>(degree,
               dealii::internal::MatrixFreeFunctions::ConstraintKinds::face_x |
                 dealii::internal::MatrixFreeFunctions::ConstraintKinds::
-                  type_y); // face 1/0
+                  subcell_x); // face 0/1
+      test<2>(degree,
+              dealii::internal::MatrixFreeFunctions::ConstraintKinds::face_x |
+                dealii::internal::MatrixFreeFunctions::ConstraintKinds::
+                  subcell_y); // face 1/0
       test<2>(
         degree,
         dealii::internal::MatrixFreeFunctions::ConstraintKinds::face_x); // face
                                                                          // 1/1
       deallog << std::endl;
 
-      test<2>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintKinds::face_y |
-                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_y |
-                dealii::internal::MatrixFreeFunctions::ConstraintKinds::
-                  type_x); // face 2/0
-      test<2>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintKinds::face_y |
-                dealii::internal::MatrixFreeFunctions::ConstraintKinds::
-                  type_y); // face 2/1
+      test<2>(
+        degree,
+        dealii::internal::MatrixFreeFunctions::ConstraintKinds::face_y |
+          dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_y |
+          dealii::internal::MatrixFreeFunctions::ConstraintKinds::
+            subcell_x); // face 2/0
       test<2>(degree,
               dealii::internal::MatrixFreeFunctions::ConstraintKinds::face_y |
                 dealii::internal::MatrixFreeFunctions::ConstraintKinds::
-                  type_x); // face 3/0
+                  subcell_y); // face 2/1
+      test<2>(degree,
+              dealii::internal::MatrixFreeFunctions::ConstraintKinds::face_y |
+                dealii::internal::MatrixFreeFunctions::ConstraintKinds::
+                  subcell_x); // face 3/0
       test<2>(
         degree,
         dealii::internal::MatrixFreeFunctions::ConstraintKinds::face_y); // face
@@ -563,138 +566,162 @@ main(int argc, char **argv)
   for (unsigned int degree = 1; degree <= 3; ++degree)
     {
       // edge 2
-      test<3>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_x |
-                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_y |
-                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_z);
-      test<3>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_x |
-                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_y |
-                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_z |
-                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_x);
+      test<3>(
+        degree,
+        dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_x |
+          dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_y |
+          dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_z);
+      test<3>(
+        degree,
+        dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_x |
+          dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_y |
+          dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_z |
+          dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_x);
 
       // edge 3
-      test<3>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_x |
-                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_z);
-      test<3>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_x |
-                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_z |
-                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_x);
+      test<3>(
+        degree,
+        dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_x |
+          dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_z);
+      test<3>(
+        degree,
+        dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_x |
+          dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_z |
+          dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_x);
 
       // edge 6
-      test<3>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_x |
-                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_y);
-      test<3>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_x |
-                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_y |
-                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_x);
+      test<3>(
+        degree,
+        dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_x |
+          dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_y);
+      test<3>(
+        degree,
+        dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_x |
+          dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_y |
+          dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_x);
 
       // edge 7
       test<3>(degree,
               dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_x);
-      test<3>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_x |
-                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_x);
+      test<3>(
+        degree,
+        dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_x |
+          dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_x);
 
 
       // edge 0
-      test<3>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_y |
-                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_x |
-                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_z);
-      test<3>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_y |
-                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_x |
-                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_z |
-                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_y);
+      test<3>(
+        degree,
+        dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_y |
+          dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_x |
+          dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_z);
+      test<3>(
+        degree,
+        dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_y |
+          dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_x |
+          dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_z |
+          dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_y);
 
       // edge 1
-      test<3>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_y |
-                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_z);
-      test<3>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_y |
-                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_z |
-                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_y);
+      test<3>(
+        degree,
+        dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_y |
+          dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_z);
+      test<3>(
+        degree,
+        dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_y |
+          dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_z |
+          dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_y);
 
       // edge 4
-      test<3>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_y |
-                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_x);
-      test<3>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_y |
-                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_x |
-                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_y);
+      test<3>(
+        degree,
+        dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_y |
+          dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_x);
+      test<3>(
+        degree,
+        dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_y |
+          dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_x |
+          dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_y);
 
       // edge 5
       test<3>(degree,
               dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_y);
-      test<3>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_y |
-                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_y);
+      test<3>(
+        degree,
+        dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_y |
+          dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_y);
 
 
       // edge 8
-      test<3>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_z |
-                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_x |
-                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_y);
-      test<3>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_z |
-                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_x |
-                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_y |
-                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_z);
+      test<3>(
+        degree,
+        dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_z |
+          dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_x |
+          dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_y);
+      test<3>(
+        degree,
+        dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_z |
+          dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_x |
+          dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_y |
+          dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_z);
 
       // edge 9
-      test<3>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_z |
-                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_y);
-      test<3>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_z |
-                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_y |
-                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_z);
+      test<3>(
+        degree,
+        dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_z |
+          dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_y);
+      test<3>(
+        degree,
+        dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_z |
+          dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_y |
+          dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_z);
 
       // edge 10
-      test<3>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_z |
-                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_x);
-      test<3>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_z |
-                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_x |
-                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_z);
+      test<3>(
+        degree,
+        dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_z |
+          dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_x);
+      test<3>(
+        degree,
+        dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_z |
+          dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_x |
+          dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_z);
 
       // edge 11
       test<3>(degree,
               dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_z);
-      test<3>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_z |
-                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_z);
+      test<3>(
+        degree,
+        dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_z |
+          dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_z);
 
 
       // face 0
-      test<3>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintKinds::face_x |
-                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_x);
+      test<3>(
+        degree,
+        dealii::internal::MatrixFreeFunctions::ConstraintKinds::face_x |
+          dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_x);
 
       // face 1
       test<3>(degree,
               dealii::internal::MatrixFreeFunctions::ConstraintKinds::face_x);
 
       // face 2
-      test<3>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintKinds::face_y |
-                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_y);
+      test<3>(
+        degree,
+        dealii::internal::MatrixFreeFunctions::ConstraintKinds::face_y |
+          dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_y);
 
       // face 3
       test<3>(degree,
               dealii::internal::MatrixFreeFunctions::ConstraintKinds::face_y);
 
       // face 4
-      test<3>(degree,
-              dealii::internal::MatrixFreeFunctions::ConstraintKinds::face_z |
-                dealii::internal::MatrixFreeFunctions::ConstraintKinds::type_z);
+      test<3>(
+        degree,
+        dealii::internal::MatrixFreeFunctions::ConstraintKinds::face_z |
+          dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_z);
 
       // face 5
       test<3>(degree,
