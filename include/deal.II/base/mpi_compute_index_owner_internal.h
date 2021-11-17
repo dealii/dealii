@@ -65,7 +65,7 @@ namespace Utilities
             , local_range(local_range)
             , actually_owning_rank_list(actually_owning_rank_list)
           {
-            Assert(local_range.first < local_range.second, ExcInternalError());
+            Assert(local_range.first <= local_range.second, ExcInternalError());
           }
 
           /**
