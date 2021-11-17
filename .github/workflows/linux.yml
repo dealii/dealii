@@ -176,7 +176,8 @@ jobs:
         # oneapi-ci/scripts/install_linux_apt.sh
         sudo apt-get install -y intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic \
                                 intel-oneapi-mpi-devel \
-                                intel-oneapi-mkl-devel
+                                intel-oneapi-mkl-devel \
+                                intel-oneapi-tbb-devel
         sudo apt-get clean
     - name: info
       run: |
@@ -194,9 +195,11 @@ jobs:
               -D DEAL_II_EARLY_DEPRECATIONS=ON \
               -D DEAL_II_WITH_MPI=ON \
               -D DEAL_II_WITH_LAPACK=ON \
+              -D DEAL_II_WITH_TBB=ON \
               -D MPI_DIR=${I_MPI_ROOT} \
               -D BLAS_DIR=${MKLROOT} \
               -D LAPACK_DIR=${MKLROOT} \
+              -D TBB_DIR=${TBBROOT} \
               .
     - name: archive
       uses: actions/upload-artifact@v1
