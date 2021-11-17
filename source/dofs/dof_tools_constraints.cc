@@ -26,6 +26,7 @@
 #include <deal.II/fe/fe_tools.h>
 #include <deal.II/fe/fe_values.h>
 
+#include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/intergrid_map.h>
 #include <deal.II/grid/tria.h>
@@ -3062,15 +3063,15 @@ namespace DoFTools
           std::vector<types::global_dof_index> local_dof_indices(
             fine_fe.n_dofs_per_cell());
 
-          for (const auto &cell : fine_grid.active_cell_iterators())
-            if (cell->is_locally_owned())
-              {
-                cell->get_dof_indices(local_dof_indices);
-                for (unsigned int i = 0; i < fine_fe.n_dofs_per_cell(); ++i)
-                  if (fine_fe.system_to_component_index(i).first ==
-                      fine_component)
-                    dof_is_interesting[local_dof_indices[i]] = true;
-              }
+          for (const auto &cell : fine_grid.active_cell_iterators() |
+                                    IteratorFilters::LocallyOwnedCell())
+            {
+              cell->get_dof_indices(local_dof_indices);
+              for (unsigned int i = 0; i < fine_fe.n_dofs_per_cell(); ++i)
+                if (fine_fe.system_to_component_index(i).first ==
+                    fine_component)
+                  dof_is_interesting[local_dof_indices[i]] = true;
+            }
 
           n_parameters_on_fine_grid = std::count(dof_is_interesting.begin(),
                                                  dof_is_interesting.end(),
@@ -3089,22 +3090,22 @@ namespace DoFTools
           std::vector<types::global_dof_index> local_dof_indices(
             fine_fe.n_dofs_per_cell());
           unsigned int next_free_index = 0;
-          for (const auto &cell : fine_grid.active_cell_iterators())
-            if (cell->is_locally_owned())
-              {
-                cell->get_dof_indices(local_dof_indices);
-                for (unsigned int i = 0; i < fine_fe.n_dofs_per_cell(); ++i)
-                  // if this DoF is a parameter dof and has not yet been
-                  // numbered, then do so
-                  if ((fine_fe.system_to_component_index(i).first ==
-                       fine_component) &&
-                      (weight_mapping[local_dof_indices[i]] ==
-                       numbers::invalid_dof_index))
-                    {
-                      weight_mapping[local_dof_indices[i]] = next_free_index;
-                      ++next_free_index;
-                    }
-              }
+          for (const auto &cell : fine_grid.active_cell_iterators() |
+                                    IteratorFilters::LocallyOwnedCell())
+            {
+              cell->get_dof_indices(local_dof_indices);
+              for (unsigned int i = 0; i < fine_fe.n_dofs_per_cell(); ++i)
+                // if this DoF is a parameter dof and has not yet been
+                // numbered, then do so
+                if ((fine_fe.system_to_component_index(i).first ==
+                     fine_component) &&
+                    (weight_mapping[local_dof_indices[i]] ==
+                     numbers::invalid_dof_index))
+                  {
+                    weight_mapping[local_dof_indices[i]] = next_free_index;
+                    ++next_free_index;
+                  }
+            }
 
           Assert(next_free_index == n_parameters_on_fine_grid,
                  ExcInternalError());
