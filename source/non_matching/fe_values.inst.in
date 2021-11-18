@@ -1,0 +1,55 @@
+// ---------------------------------------------------------------------
+//
+// Copyright (C) 2010 - 2014 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE at
+// the top level of the deal.II distribution.
+//
+// ---------------------------------------------------------------------
+
+
+for (deal_II_dimension : DIMENSIONS)
+  {
+    template class FEValues<deal_II_dimension>;
+  }
+
+for (VEC : REAL_VECTOR_TYPES; deal_II_dimension : DIMENSIONS)
+  {
+    template class internal::FEValuesImplementation::
+      RefSpaceFEFieldFunction<deal_II_dimension, VEC>;
+
+    template FEValues<deal_II_dimension>::FEValues(
+      const hp::MappingCollection<deal_II_dimension> &,
+      const hp::FECollection<deal_II_dimension> &,
+      const hp::QCollection<deal_II_dimension> &,
+      const hp::QCollection<1> &,
+      const RegionUpdateFlags,
+      const MeshClassifier<deal_II_dimension> &,
+      const DoFHandler<deal_II_dimension> &,
+      const VEC &,
+      const typename FEValues<deal_II_dimension>::AdditionalData &);
+
+
+    template FEValues<deal_II_dimension>::FEValues(
+      const hp::FECollection<deal_II_dimension> &,
+      const Quadrature<1> &,
+      const RegionUpdateFlags,
+      const MeshClassifier<deal_II_dimension> &,
+      const DoFHandler<deal_II_dimension> &,
+      const VEC &,
+      const typename FEValues<deal_II_dimension>::AdditionalData &);
+  }
+
+// Template reinit function
+for (deal_II_dimension : DIMENSIONS; lda : BOOL)
+  {
+    template void FEValues<deal_II_dimension>::reinit(
+      const TriaIterator<
+        DoFCellAccessor<deal_II_dimension, deal_II_dimension, lda>> &);
+  }
