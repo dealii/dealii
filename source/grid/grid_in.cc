@@ -1702,12 +1702,12 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
             {
               if (spacedim == 1)
                 {
-                  cells.push_back({});
+                  cells.emplace_back();
                   cells.back().vertices = vertices_for_this_element;
                 }
               else
                 {
-                  subcelldata.boundary_lines.push_back({});
+                  subcelldata.boundary_lines.emplace_back();
                   subcelldata.boundary_lines.back().vertices =
                     vertices_for_this_element;
                 }
@@ -1716,12 +1716,12 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
             {
               if (spacedim == 2)
                 {
-                  cells.push_back({});
+                  cells.emplace_back();
                   cells.back().vertices = vertices_for_this_element;
                 }
               else
                 {
-                  subcelldata.boundary_quads.push_back({});
+                  subcelldata.boundary_quads.emplace_back();
                   subcelldata.boundary_quads.back().vertices =
                     vertices_for_this_element;
                 }
@@ -1730,7 +1730,7 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
             {
               if (spacedim == 3)
                 {
-                  cells.push_back({});
+                  cells.emplace_back();
                   cells.back().vertices = vertices_for_this_element;
                 }
               else
