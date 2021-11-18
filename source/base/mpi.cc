@@ -297,18 +297,18 @@ namespace Utilities
 
 
 
-    void
-    create_mpi_data_type_n_bytes(MPI_Datatype &result, std::size_t n_bytes)
+    MPI_Datatype
+    create_mpi_data_type_n_bytes(std::size_t n_bytes)
     {
 #  ifdef DEAL_II_WITH_MPI
       // Simplified version from BigMPI repository, see
       // https://github.com/jeffhammond/BigMPI/blob/5300b18cc8ec1b2431bf269ee494054ee7bd9f72/src/type_contiguous_x.c#L74
       // (code is MIT licensed)
 
-      // We create an MPI datatype that has the layout A*nB where A is
+      // We create an MPI datatype that has the layout A*n+B where A is
       // max_signed_int bytes repeated n times and B is the remainder.
 
-      const MPI_Count max_signed_int = (1U << 31) - 1;
+      const MPI_Count max_signed_int = std::numeric_limits<int>::max();
 
       const MPI_Count n_chunks          = n_bytes / max_signed_int;
       const MPI_Count n_bytes_remainder = n_bytes % max_signed_int;
@@ -340,6 +340,8 @@ namespace Utilities
         ExcMessage(
           "ERROR in create_mpi_data_type_n_bytes(), size too big to support."));
 
+      MPI_Datatype result;
+
       const MPI_Datatype types[2] = {chunks, remainder};
       ierr =
         MPI_Type_create_struct(2, blocklengths, displacements, types, &result);
@@ -363,10 +365,12 @@ namespace Utilities
       Assert(size64 == static_cast<MPI_Count>(n_bytes), ExcInternalError());
 #      endif
 #    endif
-
+      return result;
 #  else
-      (void)result;
       (void)n_bytes;
+      Assert(false,
+             ExcMessage("This operation is not useful without MPI support."));
+      return MPI_Result(0);
 #  endif
     }
 

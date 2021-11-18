@@ -27,10 +27,9 @@ const bool run_big = false;
 using namespace dealii;
 
 void
-test_data_type(long long n_bytes)
+test_data_type(const std::uint64_t n_bytes)
 {
-  MPI_Datatype bigtype;
-  Utilities::MPI::create_mpi_data_type_n_bytes(bigtype, n_bytes);
+  MPI_Datatype bigtype = Utilities::MPI::create_mpi_data_type_n_bytes(n_bytes);
 
   deallog << "checking size " << n_bytes << ":";
 
@@ -60,15 +59,15 @@ test_data_type(long long n_bytes)
 void
 test_send_recv(MPI_Comm comm)
 {
-  unsigned int    myid    = Utilities::MPI::this_mpi_process(comm);
-  const long long n_bytes = (run_big) ? ((1ULL << 31) + 37) : (37ULL);
+  unsigned int        myid    = Utilities::MPI::this_mpi_process(comm);
+  const std::uint64_t n_bytes = (run_big) ? ((1ULL << 31) + 37) : (37ULL);
 
   if (myid == 0)
     {
       std::vector<char> buffer(n_bytes, 'A');
       buffer[n_bytes - 1] = 'B';
-      MPI_Datatype bigtype;
-      Utilities::MPI::create_mpi_data_type_n_bytes(bigtype, buffer.size());
+      MPI_Datatype bigtype =
+        Utilities::MPI::create_mpi_data_type_n_bytes(buffer.size());
       int ierr =
         MPI_Send(buffer.data(), 1, bigtype, 1 /* dest */, 0 /* tag */, comm);
       AssertThrowMPI(ierr);
@@ -78,8 +77,8 @@ test_send_recv(MPI_Comm comm)
   else if (myid == 1)
     {
       std::vector<char> buffer(n_bytes, '?');
-      MPI_Datatype      bigtype;
-      Utilities::MPI::create_mpi_data_type_n_bytes(bigtype, buffer.size());
+      MPI_Datatype      bigtype =
+        Utilities::MPI::create_mpi_data_type_n_bytes(buffer.size());
       int ierr = MPI_Recv(buffer.data(),
                           1,
                           bigtype,
