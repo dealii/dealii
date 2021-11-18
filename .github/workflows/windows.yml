@@ -2,6 +2,10 @@ name: github-windows
 
 on: [push, pull_request]
 
+concurrency:
+  group: ${ {github.event_name }}-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{github.event_name == 'pull_request'}}
+
 jobs:
   windows-serial:
     # Serial build on Windows
