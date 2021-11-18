@@ -18,6 +18,7 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/ndarray.h>
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/dofs/dof_accessor.h>
@@ -208,9 +209,38 @@ namespace internal
       setup_constraints(
         const CellIterator &                                      cell,
         const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner,
-        const std::vector<unsigned int> &     lexicographic_mapping,
-        std::vector<types::global_dof_index> &dof_indices,
-        const ArrayView<ConstraintKinds> &    mask) const;
+        const std::vector<std::vector<unsigned int>> &lexicographic_mapping,
+        std::vector<types::global_dof_index> &        dof_indices,
+        const ArrayView<ConstraintKinds> &            mask) const;
+
+      /**
+       * Compute the supported components of all entries of the given
+       * hp::FECollection object.
+       */
+      std::vector<std::vector<bool>>
+      compute_supported_components(
+        const dealii::hp::FECollection<dim> &fe) const;
+
+      /**
+       * Determine the refinement configuration of the given cell.
+       */
+      template <typename CellIterator>
+      ConstraintKinds
+      compute_refinement_configuration(const CellIterator &cell) const;
+
+      /**
+       * Update the DoF indices of a given cell for the given refinement
+       * configuration and for the given components.
+       */
+      template <typename CellIterator>
+      void
+      update_dof_indices(
+        const CellIterator &                                      cell,
+        const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner,
+        const std::vector<std::vector<unsigned int>> &lexicographic_mapping,
+        const std::vector<std::vector<bool>> &        component_mask,
+        const ConstraintKinds &                       refinement_configuration,
+        std::vector<types::global_dof_index> &        dof_indices) const;
 
     private:
       /**
@@ -242,6 +272,11 @@ namespace internal
       std::vector<std::vector<
         std::pair<typename Triangulation<dim>::cell_iterator, unsigned int>>>
         line_to_cells;
+
+      const dealii::ndarray<unsigned int, 3, 2, 2> local_lines = {
+        {{{{{7, 3}}, {{6, 2}}}},
+         {{{{5, 1}}, {{4, 0}}}},
+         {{{{11, 9}}, {{10, 8}}}}}};
     };
 
 
@@ -346,22 +381,140 @@ namespace internal
 
 
     template <int dim>
+    inline std::vector<std::vector<bool>>
+    HangingNodes<dim>::compute_supported_components(
+      const dealii::hp::FECollection<dim> &fe_collection) const
+    {
+      std::vector<std::vector<bool>> supported_components(
+        fe_collection.size(),
+        std::vector<bool>(fe_collection.n_components(), false));
+
+      for (unsigned int i = 0; i < fe_collection.size(); ++i)
+        {
+          for (unsigned int base_element_index = 0, comp = 0;
+               base_element_index < fe_collection[i].n_base_elements();
+               ++base_element_index)
+            for (unsigned int c = 0;
+                 c < fe_collection[i].element_multiplicity(base_element_index);
+                 ++c, ++comp)
+              if (dim == 1 || dynamic_cast<const FE_Q<dim> *>(
+                                &fe_collection[i].base_element(
+                                  base_element_index)) == nullptr)
+                supported_components[i][comp] = false;
+              else
+                supported_components[i][comp] = true;
+        }
+
+      return supported_components;
+    }
+
+
+
+    template <int dim>
     template <typename CellIterator>
-    inline bool
-    HangingNodes<dim>::setup_constraints(
+    inline ConstraintKinds
+    HangingNodes<dim>::compute_refinement_configuration(
+      const CellIterator &cell) const
+    {
+      // TODO: for simplex or mixed meshes: nothing to do
+      if ((dim == 3 && line_to_cells.size() == 0) ||
+          (cell->reference_cell().is_hyper_cube() == false))
+        return ConstraintKinds::unconstrained;
+
+      if (cell->level() == 0)
+        return ConstraintKinds::unconstrained;
+
+      const std::uint16_t subcell =
+        cell->parent()->child_iterator_to_index(cell);
+      const std::uint16_t subcell_x = (subcell >> 0) & 1;
+      const std::uint16_t subcell_y = (subcell >> 1) & 1;
+      const std::uint16_t subcell_z = (subcell >> 2) & 1;
+
+      std::uint16_t face = 0;
+      std::uint16_t edge = 0;
+
+      for (unsigned int direction = 0; direction < dim; ++direction)
+        {
+          const auto side    = (subcell >> direction) & 1U;
+          const auto face_no = direction * 2 + side;
+
+          // ignore if at boundary
+          if (cell->at_boundary(face_no))
+            continue;
+
+          const auto &neighbor = cell->neighbor(face_no);
+
+          // ignore neighbors that are artificial or have the same level or
+          // have children
+          if (neighbor->has_children() || neighbor->is_artificial() ||
+              neighbor->level() == cell->level())
+            continue;
+
+          face |= 1 << direction;
+        }
+
+      if (dim == 3)
+        for (unsigned int direction = 0; direction < dim; ++direction)
+          if (face == 0 || face == (1 << direction))
+            {
+              const unsigned int line_no =
+                direction == 0 ?
+                  (local_lines[0][subcell_y == 0][subcell_z == 0]) :
+                  (direction == 1 ?
+                     (local_lines[1][subcell_x == 0][subcell_z == 0]) :
+                     (local_lines[2][subcell_x == 0][subcell_y == 0]));
+
+              const unsigned int line_index = cell->line(line_no)->index();
+
+              const auto edge_neighbor =
+                std::find_if(line_to_cells[line_index].begin(),
+                             line_to_cells[line_index].end(),
+                             [&cell](const auto &edge_neighbor) {
+                               return edge_neighbor.first->is_artificial() ==
+                                        false &&
+                                      edge_neighbor.first->level() <
+                                        cell->level();
+                             });
+
+              if (edge_neighbor == line_to_cells[line_index].end())
+                continue;
+
+              edge |= 1 << direction;
+            }
+
+      if ((face == 0) && (edge == 0))
+        return ConstraintKinds::unconstrained;
+
+      const std::uint16_t inverted_subcell = (subcell ^ (dim == 2 ? 3 : 7));
+
+      const auto refinement_configuration = static_cast<ConstraintKinds>(
+        inverted_subcell + (face << 3) + (edge << 6));
+      Assert(check(refinement_configuration, dim), ExcInternalError());
+      return refinement_configuration;
+    }
+
+
+
+    template <int dim>
+    template <typename CellIterator>
+    inline void
+    HangingNodes<dim>::update_dof_indices(
       const CellIterator &                                      cell,
       const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner,
-      const std::vector<unsigned int> &     lexicographic_mapping,
-      std::vector<types::global_dof_index> &dof_indices,
-      const ArrayView<ConstraintKinds> &    masks) const
+      const std::vector<std::vector<unsigned int>> &lexicographic_mapping,
+      const std::vector<std::vector<bool>> &        supported_components,
+      const ConstraintKinds &                       refinement_configuration,
+      std::vector<types::global_dof_index> &        dof_indices) const
     {
-      bool cell_has_hanging_node_constraints = false;
-
-      // for simplex or mixed meshes: nothing to do
-      if (dim == 3 && line_to_cells.size() == 0)
-        return cell_has_hanging_node_constraints;
+      if (std::find(supported_components[cell->active_fe_index()].begin(),
+                    supported_components[cell->active_fe_index()].end(),
+                    true) ==
+          supported_components[cell->active_fe_index()].end())
+        return;
 
       const auto &fe = cell->get_fe();
+
+      AssertDimension(fe.n_unique_faces(), 1);
 
       std::vector<std::vector<unsigned int>>
         component_to_system_index_face_array(fe.n_components());
@@ -373,7 +526,6 @@ namespace internal
 
       std::vector<unsigned int> idx_offset = {0};
 
-
       for (unsigned int base_element_index = 0;
            base_element_index < cell->get_fe().n_base_elements();
            ++base_element_index)
@@ -384,386 +536,252 @@ namespace internal
             idx_offset.back() +
             cell->get_fe().base_element(base_element_index).n_dofs_per_cell());
 
-      for (unsigned int base_element_index = 0, comp = 0;
-           base_element_index < cell->get_fe().n_base_elements();
-           ++base_element_index)
-        for (unsigned int c = 0;
-             c < cell->get_fe().element_multiplicity(base_element_index);
-             ++c, ++comp)
+      std::vector<types::global_dof_index> neighbor_dofs_all(idx_offset.back());
+      std::vector<types::global_dof_index> neighbor_dofs_all_temp(
+        idx_offset.back());
+
+      const auto get_face_idx = [](const auto n_dofs_1d,
+                                   const auto face_no,
+                                   const auto i,
+                                   const auto j) -> unsigned int {
+        const auto direction = face_no / 2;
+        const auto side      = face_no % 2;
+        const auto offset    = (side == 1) ? (n_dofs_1d - 1) : 0;
+
+        if (dim == 2)
+          return (direction == 0) ? (n_dofs_1d * i + offset) :
+                                    (n_dofs_1d * offset + i);
+        else if (dim == 3)
+          switch (direction)
+            {
+              case 0:
+                return n_dofs_1d * n_dofs_1d * i + n_dofs_1d * j + offset;
+              case 1:
+                return n_dofs_1d * n_dofs_1d * j + n_dofs_1d * offset + i;
+              case 2:
+                return n_dofs_1d * n_dofs_1d * offset + n_dofs_1d * i + j;
+              default:
+                Assert(false, ExcNotImplemented());
+            }
+
+        Assert(false, ExcNotImplemented());
+
+        return 0;
+      };
+
+      const std::uint16_t kind =
+        static_cast<std::uint16_t>(refinement_configuration);
+      const std::uint16_t subcell   = (kind >> 0) & 7;
+      const std::uint16_t subcell_x = (subcell >> 0) & 1;
+      const std::uint16_t subcell_y = (subcell >> 1) & 1;
+      const std::uint16_t subcell_z = (subcell >> 2) & 1;
+      const std::uint16_t face      = (kind >> 3) & 7;
+      const std::uint16_t edge      = (kind >> 6) & 7;
+
+      for (unsigned int direction = 0; direction < dim; ++direction)
+        if ((face >> direction) & 1U)
           {
-            auto &mask = masks[comp];
-            mask       = ConstraintKinds::unconstrained;
+            const auto side    = ((subcell >> direction) & 1U) == 0;
+            const auto face_no = direction * 2 + side;
 
-            const auto &fe_base =
-              cell->get_fe().base_element(base_element_index);
+            // read DoFs of parent of face, ...
+            cell->neighbor(face_no)
+              ->face(cell->neighbor_face_no(face_no))
+              ->get_dof_indices(neighbor_dofs_all,
+                                cell->neighbor(face_no)->active_fe_index());
 
-            if (dim == 1 ||
-                dynamic_cast<const FE_Q<dim> *>(&fe_base) == nullptr)
-              continue;
+            // ... convert the global DoFs to serial ones, and ...
+            if (partitioner)
+              for (auto &index : neighbor_dofs_all)
+                index = partitioner->global_to_local(index);
 
-            const unsigned int fe_degree = fe_base.tensor_degree();
-            const unsigned int n_dofs_1d = fe_degree + 1;
-            const unsigned int dofs_per_face =
-              Utilities::fixed_power<dim - 1>(n_dofs_1d);
+            for (unsigned int base_element_index = 0, comp = 0;
+                 base_element_index < cell->get_fe().n_base_elements();
+                 ++base_element_index)
+              for (unsigned int c = 0;
+                   c < cell->get_fe().element_multiplicity(base_element_index);
+                   ++c, ++comp)
+                {
+                  if (supported_components[cell->active_fe_index()][comp] ==
+                      false)
+                    continue;
 
-            std::vector<types::global_dof_index> neighbor_dofs_all(
-              idx_offset.back());
-            std::vector<types::global_dof_index> neighbor_dofs_all_temp(
-              idx_offset.back());
+                  const unsigned int n_dofs_1d =
+                    cell->get_fe()
+                      .base_element(base_element_index)
+                      .tensor_degree() +
+                    1;
+                  const unsigned int dofs_per_face =
+                    Utilities::pow(n_dofs_1d, dim - 1);
+                  std::vector<types::global_dof_index> neighbor_dofs(
+                    dofs_per_face);
+                  const auto lex_face_mapping =
+                    FETools::lexicographic_to_hierarchic_numbering<dim - 1>(
+                      n_dofs_1d - 1);
 
-            std::vector<types::global_dof_index> neighbor_dofs(dofs_per_face);
+                  // ... extract the DoFs of the current component
+                  for (unsigned int i = 0; i < dofs_per_face; ++i)
+                    neighbor_dofs[i] = neighbor_dofs_all
+                      [component_to_system_index_face_array[comp][i]];
 
-            const auto lex_face_mapping =
-              FETools::lexicographic_to_hierarchic_numbering<dim - 1>(
-                fe_degree);
+                  // fix DoFs depending on orientation, flip, and rotation
+                  if (dim == 2)
+                    {
+                      // TODO: for mixed meshes we need to take care of
+                      // orientation here
+                      Assert(cell->face_orientation(face_no),
+                             ExcNotImplemented());
+                    }
+                  else if (dim == 3)
+                    {
+                      int rotate = 0;                   // TODO
+                      if (cell->face_rotation(face_no)) //
+                        rotate -= 1;                    //
+                      if (cell->face_flip(face_no))     //
+                        rotate -= 2;                    //
 
-            for (const unsigned int face : GeometryInfo<dim>::face_indices())
-              {
-                if ((!cell->at_boundary(face)) &&
-                    (cell->neighbor(face)->has_children() == false))
+                      rotate_face(rotate, n_dofs_1d, neighbor_dofs);
+
+                      if (cell->face_orientation(face_no) == false)
+                        transpose_face(n_dofs_1d - 1, neighbor_dofs);
+                    }
+                  else
+                    {
+                      Assert(false, ExcNotImplemented());
+                    }
+
+                  // update DoF map
+                  for (unsigned int i = 0, k = 0; i < n_dofs_1d; ++i)
+                    for (unsigned int j = 0; j < (dim == 2 ? 1 : n_dofs_1d);
+                         ++j, ++k)
+                      dof_indices[get_face_idx(n_dofs_1d, face_no, i, j) +
+                                  idx_offset[comp]] =
+                        neighbor_dofs[lex_face_mapping[k]];
+                }
+          }
+
+      if (dim == 3)
+        for (unsigned int direction = 0; direction < dim; ++direction)
+          if ((edge >> direction) & 1U)
+            {
+              const unsigned int line_no =
+                direction == 0 ?
+                  (local_lines[0][subcell_y][subcell_z]) :
+                  (direction == 1 ? (local_lines[1][subcell_x][subcell_z]) :
+                                    (local_lines[2][subcell_x][subcell_y]));
+
+              const unsigned int line_index = cell->line(line_no)->index();
+
+              const auto edge_neighbor =
+                std::find_if(line_to_cells[line_index].begin(),
+                             line_to_cells[line_index].end(),
+                             [&cell](const auto &edge_neighbor) {
+                               return edge_neighbor.first->is_artificial() ==
+                                        false &&
+                                      edge_neighbor.first->level() <
+                                        cell->level();
+                             });
+
+              if (edge_neighbor == line_to_cells[line_index].end())
+                continue;
+
+              const auto neighbor_cell       = edge_neighbor->first;
+              const auto local_line_neighbor = edge_neighbor->second;
+
+              DoFCellAccessor<dim, dim, false>(
+                &neighbor_cell->get_triangulation(),
+                neighbor_cell->level(),
+                neighbor_cell->index(),
+                &cell->get_dof_handler())
+                .get_dof_indices(neighbor_dofs_all);
+
+              if (partitioner)
+                for (auto &index : neighbor_dofs_all)
+                  index = partitioner->global_to_local(index);
+
+              for (unsigned int i = 0; i < neighbor_dofs_all_temp.size(); ++i)
+                neighbor_dofs_all_temp[i] = neighbor_dofs_all
+                  [lexicographic_mapping[cell->active_fe_index()][i]];
+
+              const bool flipped =
+                cell->line_orientation(line_no) !=
+                neighbor_cell->line_orientation(local_line_neighbor);
+
+              for (unsigned int base_element_index = 0, comp = 0;
+                   base_element_index < cell->get_fe().n_base_elements();
+                   ++base_element_index)
+                for (unsigned int c = 0;
+                     c <
+                     cell->get_fe().element_multiplicity(base_element_index);
+                     ++c, ++comp)
                   {
-                    const auto &neighbor = cell->neighbor(face);
-
-                    if (neighbor->is_artificial())
+                    if (supported_components[cell->active_fe_index()][comp] ==
+                        false)
                       continue;
 
-                    // Neighbor is coarser than us, i.e., face is constrained
-                    if (neighbor->level() < cell->level())
-                      {
-                        const unsigned int neighbor_face =
-                          cell->neighbor_face_no(face);
+                    const unsigned int n_dofs_1d =
+                      cell->get_fe()
+                        .base_element(base_element_index)
+                        .tensor_degree() +
+                      1;
 
-                        // Find position of face on neighbor
-                        unsigned int subface = 0;
-                        for (;
-                             subface < GeometryInfo<dim>::max_children_per_face;
-                             ++subface)
-                          if (neighbor->neighbor_child_on_subface(neighbor_face,
-                                                                  subface) ==
-                              cell)
-                            break;
-
-                        // Get indices to read
-                        DoFAccessor<dim - 1, dim, dim, false>(
-                          &neighbor->face(neighbor_face)->get_triangulation(),
-                          neighbor->face(neighbor_face)->level(),
-                          neighbor->face(neighbor_face)->index(),
-                          &cell->get_dof_handler())
-                          .get_dof_indices(neighbor_dofs_all);
-
-                        for (unsigned int i = 0; i < dofs_per_face; ++i)
-                          neighbor_dofs[i] = neighbor_dofs_all
-                            [component_to_system_index_face_array[comp][i]];
-
-                        // If the vector is distributed, we need to transform
-                        // the global indices to local ones.
-                        if (partitioner)
-                          for (auto &index : neighbor_dofs)
-                            index = partitioner->global_to_local(index);
-
-                        if (dim == 2)
-                          {
-                            if (face < 2)
-                              {
-                                mask |= ConstraintKinds::face_x;
-                                if (face == 0)
-                                  mask |= ConstraintKinds::subcell_x;
-                                if (subface == 0)
-                                  mask |= ConstraintKinds::subcell_y;
-                              }
-                            else
-                              {
-                                mask |= ConstraintKinds::face_y;
-                                if (face == 2)
-                                  mask |= ConstraintKinds::subcell_y;
-                                if (subface == 0)
-                                  mask |= ConstraintKinds::subcell_x;
-                              }
-
-                            // Reorder neighbor_dofs and copy into faceth face
-                            // of dof_indices
-
-                            // Offset if upper/right face
-                            unsigned int offset =
-                              (face % 2 == 1) ? fe_degree : 0;
-
-                            for (unsigned int i = 0; i < n_dofs_1d; ++i)
-                              {
-                                unsigned int idx = 0;
-                                // If X-line, i.e., if y = 0 or y = fe_degree
-                                if (face > 1)
-                                  idx = n_dofs_1d * offset + i;
-                                // If Y-line, i.e., if x = 0 or x = fe_degree
-                                else
-                                  idx = n_dofs_1d * i + offset;
-
-                                dof_indices[idx + idx_offset[comp]] =
-                                  neighbor_dofs[lex_face_mapping[i]];
-                              }
-                          }
-                        else if (dim == 3)
-                          {
-                            const bool transpose =
-                              !(cell->face_orientation(face));
-
-                            int rotate = 0;
-
-                            if (cell->face_rotation(face))
-                              rotate -= 1;
-                            if (cell->face_flip(face))
-                              rotate -= 2;
-
-                            rotate_face(rotate, n_dofs_1d, neighbor_dofs);
-                            rotate_subface_index(rotate, subface);
-
-                            if (transpose)
-                              {
-                                transpose_face(fe_degree, neighbor_dofs);
-                                transpose_subface_index(subface);
-                              }
-
-                            // YZ-plane
-                            if (face < 2)
-                              {
-                                mask |= ConstraintKinds::face_x;
-                                if (face == 0)
-                                  mask |= ConstraintKinds::subcell_x;
-                                if (subface % 2 == 0)
-                                  mask |= ConstraintKinds::subcell_y;
-                                if (subface / 2 == 0)
-                                  mask |= ConstraintKinds::subcell_z;
-                              }
-                            // XZ-plane
-                            else if (face < 4)
-                              {
-                                mask |= ConstraintKinds::face_y;
-                                if (face == 2)
-                                  mask |= ConstraintKinds::subcell_y;
-                                if (subface % 2 == 0)
-                                  mask |= ConstraintKinds::subcell_z;
-                                if (subface / 2 == 0)
-                                  mask |= ConstraintKinds::subcell_x;
-                              }
-                            // XY-plane
-                            else
-                              {
-                                mask |= ConstraintKinds::face_z;
-                                if (face == 4)
-                                  mask |= ConstraintKinds::subcell_z;
-                                if (subface % 2 == 0)
-                                  mask |= ConstraintKinds::subcell_x;
-                                if (subface / 2 == 0)
-                                  mask |= ConstraintKinds::subcell_y;
-                              }
-
-                            // Offset if upper/right/back face
-                            unsigned int offset =
-                              (face % 2 == 1) ? fe_degree : 0;
-
-                            for (unsigned int i = 0; i < n_dofs_1d; ++i)
-                              {
-                                for (unsigned int j = 0; j < n_dofs_1d; ++j)
-                                  {
-                                    unsigned int idx = 0;
-                                    // If YZ-plane, i.e., if x = 0 or x =
-                                    // fe_degree, and orientation standard
-                                    if (face < 2)
-                                      idx = n_dofs_1d * n_dofs_1d * i +
-                                            n_dofs_1d * j + offset;
-                                    // If XZ-plane, i.e., if y = 0 or y =
-                                    // fe_degree, and orientation standard
-                                    else if (face < 4)
-                                      idx = n_dofs_1d * n_dofs_1d * j +
-                                            n_dofs_1d * offset + i;
-                                    // If XY-plane, i.e., if z = 0 or z =
-                                    // fe_degree, and orientation standard
-                                    else
-                                      idx = n_dofs_1d * n_dofs_1d * offset +
-                                            n_dofs_1d * i + j;
-
-                                    dof_indices[idx + idx_offset[comp]] =
-                                      neighbor_dofs
-                                        [lex_face_mapping[n_dofs_1d * i + j]];
-                                  }
-                              }
-                          }
-                        else
-                          ExcNotImplemented();
-                      }
+                    for (unsigned int i = 0; i < n_dofs_1d; ++i)
+                      dof_indices[line_dof_idx(line_no, i, n_dofs_1d) +
+                                  idx_offset[comp]] = neighbor_dofs_all_temp
+                        [line_dof_idx(local_line_neighbor,
+                                      flipped ? (n_dofs_1d - 1 - i) : i,
+                                      n_dofs_1d) +
+                         idx_offset[comp]];
                   }
-              }
+            }
+    }
 
-            // In 3D we can have a situation where only DoFs on an edge are
-            // constrained. Append these here.
-            if (dim == 3)
-              {
-                // For each line on cell, which faces does it belong to, what is
-                // the edge mask, what is the types of the faces it belong to,
-                // and what is the type along the edge.
-                const ConstraintKinds line_to_edge[12][4] = {
-                  {ConstraintKinds::face_x | ConstraintKinds::face_z,
-                   ConstraintKinds::edge_y,
-                   ConstraintKinds::subcell_x | ConstraintKinds::subcell_z,
-                   ConstraintKinds::subcell_y},
-                  {ConstraintKinds::face_x | ConstraintKinds::face_z,
-                   ConstraintKinds::edge_y,
-                   ConstraintKinds::subcell_z,
-                   ConstraintKinds::subcell_y},
-                  {ConstraintKinds::face_y | ConstraintKinds::face_z,
-                   ConstraintKinds::edge_x,
-                   ConstraintKinds::subcell_y | ConstraintKinds::subcell_z,
-                   ConstraintKinds::subcell_x},
-                  {ConstraintKinds::face_y | ConstraintKinds::face_z,
-                   ConstraintKinds::edge_x,
-                   ConstraintKinds::subcell_z,
-                   ConstraintKinds::subcell_x},
-                  {ConstraintKinds::face_x | ConstraintKinds::face_z,
-                   ConstraintKinds::edge_y,
-                   ConstraintKinds::subcell_x,
-                   ConstraintKinds::subcell_y},
-                  {ConstraintKinds::face_x | ConstraintKinds::face_z,
-                   ConstraintKinds::edge_y,
-                   ConstraintKinds::unconstrained,
-                   ConstraintKinds::subcell_y},
-                  {ConstraintKinds::face_y | ConstraintKinds::face_z,
-                   ConstraintKinds::edge_x,
-                   ConstraintKinds::subcell_y,
-                   ConstraintKinds::subcell_x},
-                  {ConstraintKinds::face_y | ConstraintKinds::face_z,
-                   ConstraintKinds::edge_x,
-                   ConstraintKinds::unconstrained,
-                   ConstraintKinds::subcell_x},
-                  {ConstraintKinds::face_x | ConstraintKinds::face_y,
-                   ConstraintKinds::edge_z,
-                   ConstraintKinds::subcell_x | ConstraintKinds::subcell_y,
-                   ConstraintKinds::subcell_z},
-                  {ConstraintKinds::face_x | ConstraintKinds::face_y,
-                   ConstraintKinds::edge_z,
-                   ConstraintKinds::subcell_y,
-                   ConstraintKinds::subcell_z},
-                  {ConstraintKinds::face_x | ConstraintKinds::face_y,
-                   ConstraintKinds::edge_z,
-                   ConstraintKinds::subcell_x,
-                   ConstraintKinds::subcell_z},
-                  {ConstraintKinds::face_x | ConstraintKinds::face_y,
-                   ConstraintKinds::edge_z,
-                   ConstraintKinds::unconstrained,
-                   ConstraintKinds::subcell_z}};
 
-                for (unsigned int local_line = 0;
-                     local_line < GeometryInfo<dim>::lines_per_cell;
-                     ++local_line)
-                  {
-                    // If we don't already have a constraint for as part of a
-                    // face
-                    if ((mask & line_to_edge[local_line][0]) ==
-                        ConstraintKinds::unconstrained)
-                      {
-                        // For each cell which share that edge
-                        const unsigned int line =
-                          cell->line(local_line)->index();
-                        for (const auto &edge_neighbor : line_to_cells[line])
-                          {
-                            // If one of them is coarser than us
-                            const auto neighbor_cell = edge_neighbor.first;
 
-                            if (neighbor_cell->is_artificial())
-                              continue;
+    template <int dim>
+    template <typename CellIterator>
+    inline bool
+    HangingNodes<dim>::setup_constraints(
+      const CellIterator &                                      cell,
+      const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner,
+      const std::vector<std::vector<unsigned int>> &lexicographic_mapping,
+      std::vector<types::global_dof_index> &        dof_indices,
+      const ArrayView<ConstraintKinds> &            masks) const
+    {
+      // 1) check if finite elements support fast hanging-node algorithm
+      const auto supported_components = compute_supported_components(
+        cell->get_dof_handler().get_fe_collection());
 
-                            if (neighbor_cell->level() < cell->level())
-                              {
-                                const unsigned int local_line_neighbor =
-                                  edge_neighbor.second;
-                                mask |= line_to_edge[local_line][1] |
-                                        line_to_edge[local_line][2];
+      if ([](const auto &supported_components) {
+            return std::none_of(supported_components.begin(),
+                                supported_components.end(),
+                                [](const auto &a) {
+                                  return *std::max_element(a.begin(), a.end());
+                                });
+          }(supported_components))
+        return false;
 
-                                bool flipped = false;
-                                if (cell->line(local_line)->vertex_index(0) ==
-                                    neighbor_cell->line(local_line_neighbor)
-                                      ->vertex_index(0))
-                                  {
-                                    // Assuming line directions match axes
-                                    // directions, we have an unflipped edge of
-                                    // first type
-                                    mask |= line_to_edge[local_line][3];
-                                  }
-                                else if (cell->line(local_line)
-                                           ->vertex_index(1) ==
-                                         neighbor_cell
-                                           ->line(local_line_neighbor)
-                                           ->vertex_index(1))
-                                  {
-                                    // We have an unflipped edge of second type
-                                  }
-                                else if (cell->line(local_line)
-                                           ->vertex_index(1) ==
-                                         neighbor_cell
-                                           ->line(local_line_neighbor)
-                                           ->vertex_index(0))
-                                  {
-                                    // We have a flipped edge of second type
-                                    flipped = true;
-                                  }
-                                else if (cell->line(local_line)
-                                           ->vertex_index(0) ==
-                                         neighbor_cell
-                                           ->line(local_line_neighbor)
-                                           ->vertex_index(1))
-                                  {
-                                    // We have a flipped edge of first type
-                                    mask |= line_to_edge[local_line][3];
-                                    flipped = true;
-                                  }
-                                else
-                                  ExcInternalError();
+      // 2) determine the refinement configuration of the cell
+      const auto refinement_configuration =
+        compute_refinement_configuration(cell);
 
-                                // Copy the unconstrained values
-                                DoFCellAccessor<dim, dim, false>(
-                                  &neighbor_cell->get_triangulation(),
-                                  neighbor_cell->level(),
-                                  neighbor_cell->index(),
-                                  &cell->get_dof_handler())
-                                  .get_dof_indices(neighbor_dofs_all);
-                                // If the vector is distributed, we need to
-                                // transform the global indices to local ones.
-                                if (partitioner)
-                                  for (auto &index : neighbor_dofs_all)
-                                    index = partitioner->global_to_local(index);
+      if (refinement_configuration == ConstraintKinds::unconstrained)
+        return false;
 
-                                for (unsigned int i = 0;
-                                     i < neighbor_dofs_all_temp.size();
-                                     ++i)
-                                  neighbor_dofs_all_temp[i] =
-                                    neighbor_dofs_all[lexicographic_mapping[i]];
+      // 3) update DoF indices of cell for specified components
+      update_dof_indices(cell,
+                         partitioner,
+                         lexicographic_mapping,
+                         supported_components,
+                         refinement_configuration,
+                         dof_indices);
 
-                                for (unsigned int i = 0; i < n_dofs_1d; ++i)
-                                  {
-                                    // Get local dof index along line
-                                    const unsigned int idx =
-                                      line_dof_idx(local_line, i, n_dofs_1d);
+      // 4)  TODO: copy refinement configuration to all components
+      for (unsigned int c = 0; c < supported_components[0].size(); ++c)
+        if (supported_components[cell->active_fe_index()][c])
+          masks[c] = refinement_configuration;
 
-                                    dof_indices[idx + idx_offset[comp]] =
-                                      neighbor_dofs_all_temp
-                                        [line_dof_idx(local_line_neighbor,
-                                                      flipped ? fe_degree - i :
-                                                                i,
-                                                      n_dofs_1d) +
-                                         idx_offset[comp]];
-                                  }
-
-                                // Stop looping over edge neighbors
-                                break;
-                              }
-                          }
-                      }
-                  }
-              }
-            Assert(check(mask, dim), ExcInternalError());
-
-            cell_has_hanging_node_constraints |=
-              mask != ConstraintKinds::unconstrained;
-          }
-      return cell_has_hanging_node_constraints;
+      return true;
     }
 
 

@@ -1023,7 +1023,7 @@ namespace internal
     MatrixFreeFunctions::FaceSetup<dim> &               face_setup,
     MatrixFreeFunctions::ConstraintValues<double> &     constraint_values,
     const bool use_vector_data_exchanger_full,
-    const bool use_fast_hanging_node_algorithm)
+    const bool use_fast_hanging_node_algorithm_in)
   {
     if (do_face_integrals)
       face_setup.initialize(dof_handler[0]->get_triangulation(),
@@ -1048,6 +1048,34 @@ namespace internal
     std::vector<bool> is_fe_dg(n_dof_handlers, false);
 
     bool cell_categorization_enabled = !cell_vectorization_category.empty();
+
+    bool use_fast_hanging_node_algorithm = use_fast_hanging_node_algorithm_in;
+
+    if (use_fast_hanging_node_algorithm)
+      {
+        const auto &reference_cells =
+          dof_handler[0]->get_triangulation().get_reference_cells();
+        use_fast_hanging_node_algorithm =
+          std::all_of(reference_cells.begin(),
+                      reference_cells.end(),
+                      [](const auto &r) {
+                        return r.is_hyper_cube() || r.is_simplex();
+                      });
+      }
+
+    if (use_fast_hanging_node_algorithm)
+      for (unsigned int no = 0; no < n_dof_handlers; ++no)
+        {
+          const dealii::hp::FECollection<dim> &fes =
+            dof_handler[no]->get_fe_collection();
+
+          use_fast_hanging_node_algorithm &=
+            std::all_of(fes.begin(), fes.end(), [&fes](const auto &fe) {
+              return fes[0].compare_for_domination(fe) ==
+                     FiniteElementDomination::Domination::
+                       either_element_can_dominate;
+            });
+        }
 
     for (unsigned int no = 0; no < n_dof_handlers; ++no)
       {
@@ -1171,9 +1199,8 @@ namespace internal
         hanging_nodes = std::make_unique<
           dealii::internal::MatrixFreeFunctions::HangingNodes<dim>>(tria);
         for (unsigned int no = 0; no < n_dof_handlers; ++no)
-          if (dof_handler[no]->get_fe_collection().size() == 1)
-            dof_info[no].hanging_node_constraint_masks.resize(
-              n_active_cells * dof_handler[no]->get_fe().n_components());
+          dof_info[no].hanging_node_constraint_masks.resize(
+            n_active_cells * dof_handler[no]->get_fe().n_components());
       }
 
     for (unsigned int counter = 0; counter < n_active_cells; ++counter)
@@ -1212,15 +1239,14 @@ namespace internal
 
                 bool cell_has_hanging_node_constraints = false;
 
-                if (dim > 1 && use_fast_hanging_node_algorithm &&
-                    dofh->get_fe_collection().size() == 1)
+                if (dim > 1 && use_fast_hanging_node_algorithm)
                   {
                     local_dof_indices_resolved = local_dof_indices;
 
                     cell_has_hanging_node_constraints =
                       dof_info[no].process_hanging_node_constraints(
                         *hanging_nodes,
-                        lexicographic[no][0],
+                        lexicographic[no],
                         counter,
                         cell_it,
                         local_dof_indices_resolved);
