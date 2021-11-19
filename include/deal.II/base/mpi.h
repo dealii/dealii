@@ -498,6 +498,39 @@ namespace Utilities
                                 const MPI_Comm &comm);
 #endif
 
+
+    /**
+     * Create an MPI_Datatype that consists of @p n_bytes bytes.
+     *
+     * The resulting data type can be used in MPI send/recv or MPI IO to process
+     * messages of sizes larger than 2 GB with MPI_Byte as the underlying data
+     * type. This helper is required for MPI versions before 4.0 because
+     * routines like MPI_Send
+     * use a signed interger for the @p count variable. Instead, you can use this
+     * data type with the appropriate size set to the size of your message and
+     * by passing
+     * 1 as the @p count.
+     *
+     * @note You need to free this data type after you are done using it by calling
+     * <code>MPI_Type_free(&result)</code>.
+     *
+     * Usage example:
+     * <code>
+     * std::vector<char> buffer;
+     * if (buffer.size()<(1U<<31))
+     *   MPI_Send(buffer.data(), buffer.size(), MPI_BYTE, dest, tag, comm);
+     * else
+     * {
+     *   MPI_Datatype bigtype =
+     *     Utilities::MPI::create_mpi_data_type_n_bytes(buffer.size());
+     *   MPI_Send(buffer.data(), 1, bigtype, dest, tag, comm);
+     *   MPI_Type_free(&bigtype);
+     * }
+     * </code>
+     */
+    MPI_Datatype
+    create_mpi_data_type_n_bytes(const std::size_t n_bytes);
+
     /**
      * Return the sum over all processors of the value @p t. This function is
      * collective over all processors given in the

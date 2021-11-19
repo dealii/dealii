@@ -281,6 +281,8 @@ namespace Utilities
       return res;
     }
 
+
+
     IndexSet
     create_evenly_distributed_partitioning(const MPI_Comm &          comm,
                                            const IndexSet::size_type total_size)
@@ -291,6 +293,85 @@ namespace Utilities
       return Utilities::create_evenly_distributed_partitioning(this_proc,
                                                                n_proc,
                                                                total_size);
+    }
+
+
+
+    MPI_Datatype
+    create_mpi_data_type_n_bytes(const std::size_t n_bytes)
+    {
+#  ifdef DEAL_II_WITH_MPI
+      // Simplified version from BigMPI repository, see
+      // https://github.com/jeffhammond/BigMPI/blob/5300b18cc8ec1b2431bf269ee494054ee7bd9f72/src/type_contiguous_x.c#L74
+      // (code is MIT licensed)
+
+      // We create an MPI datatype that has the layout A*n+B where A is
+      // max_signed_int bytes repeated n times and B is the remainder.
+
+      const MPI_Count max_signed_int = std::numeric_limits<int>::max();
+
+      const MPI_Count n_chunks          = n_bytes / max_signed_int;
+      const MPI_Count n_bytes_remainder = n_bytes % max_signed_int;
+
+      Assert(static_cast<std::size_t>(max_signed_int * n_chunks +
+                                      n_bytes_remainder) == n_bytes,
+             ExcInternalError());
+
+      MPI_Datatype chunks;
+
+      int ierr = MPI_Type_vector(
+        n_chunks, max_signed_int, max_signed_int, MPI_BYTE, &chunks);
+      AssertThrowMPI(ierr);
+
+      MPI_Datatype remainder;
+      ierr = MPI_Type_contiguous(n_bytes_remainder, MPI_BYTE, &remainder);
+      AssertThrowMPI(ierr);
+
+      const int      blocklengths[2]  = {1, 1};
+      const MPI_Aint displacements[2] = {0,
+                                         static_cast<MPI_Aint>(n_chunks) *
+                                           max_signed_int};
+
+      // This fails if Aint happens to be 32 bits (maybe on some 32bit
+      // systems as it has type "long" which is usually 64bits) or the
+      // message is very, very big.
+      AssertThrow(
+        displacements[1] == n_chunks * max_signed_int,
+        ExcMessage(
+          "ERROR in create_mpi_data_type_n_bytes(), size too big to support."));
+
+      MPI_Datatype result;
+
+      const MPI_Datatype types[2] = {chunks, remainder};
+      ierr =
+        MPI_Type_create_struct(2, blocklengths, displacements, types, &result);
+      AssertThrowMPI(ierr);
+
+      ierr = MPI_Type_commit(&result);
+      AssertThrowMPI(ierr);
+
+      ierr = MPI_Type_free(&chunks);
+      AssertThrowMPI(ierr);
+      ierr = MPI_Type_free(&remainder);
+      AssertThrowMPI(ierr);
+
+#    ifdef DEBUG
+#      if DEAL_II_MPI_VERSION_GTE(3, 0)
+      MPI_Count size64;
+      // this function is only available starting MPI 3.0:
+      ierr = MPI_Type_size_x(result, &size64);
+      AssertThrowMPI(ierr);
+
+      Assert(size64 == static_cast<MPI_Count>(n_bytes), ExcInternalError());
+#      endif
+#    endif
+      return result;
+#  else
+      (void)n_bytes;
+      Assert(false,
+             ExcMessage("This operation is not useful without MPI support."));
+      return MPI_Result(0);
+#  endif
     }
 
 
