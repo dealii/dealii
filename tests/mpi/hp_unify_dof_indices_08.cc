@@ -39,6 +39,7 @@
 
 #include <deal.II/fe/fe_q.h>
 
+#include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_in.h>
 #include <deal.II/grid/intergrid_map.h>
 #include <deal.II/grid/tria_accessor.h>
@@ -89,12 +90,12 @@ test()
   // that to build a hash value from it that is then used to assign an
   // active_fe_index
   DoFHandler<dim> dof_handler(triangulation);
-  for (const auto &cell : dof_handler.active_cell_iterators())
-    if (cell->is_locally_owned())
-      cell->set_active_fe_index(
-        (cell->active_cell_index() +
-         13 * cell->active_cell_index() * cell->active_cell_index()) %
-        fe.size());
+  for (const auto &cell : dof_handler.active_cell_iterators() |
+                            IteratorFilters::LocallyOwnedCell())
+    cell->set_active_fe_index(
+      (cell->active_cell_index() +
+       13 * cell->active_cell_index() * cell->active_cell_index()) %
+      fe.size());
   dof_handler.distribute_dofs(fe);
 
   deallog << "n_globally_active_cells: "

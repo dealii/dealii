@@ -22,6 +22,7 @@
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/mapping_q1.h>
 
+#include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_generator.h>
 
 #include <deal.II/lac/la_vector.h>
@@ -47,9 +48,9 @@ test(const bool enforce_unique_map)
 
   Vector<double> vec(dof_handler.n_dofs());
 
-  for (const auto &cell : dof_handler.active_cell_iterators())
-    if (cell->is_locally_owned())
-      vec[cell->global_active_cell_index()] = cell->global_active_cell_index();
+  for (const auto &cell : dof_handler.active_cell_iterators() |
+                            IteratorFilters::LocallyOwnedCell())
+    vec[cell->global_active_cell_index()] = cell->global_active_cell_index();
 
   MappingQ1<dim> mapping;
 

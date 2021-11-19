@@ -26,6 +26,8 @@
 
 #include <deal.II/fe/fe_q.h>
 
+#include <deal.II/grid/filtered_iterator.h>
+
 #include <deal.II/hp/refinement.h>
 
 #include <deal.II/lac/vector.h>
@@ -133,11 +135,11 @@ test()
 
   // ------ verify ------
   deallog << "post_adaptation" << std::endl;
-  for (const auto &cell : dh.active_cell_iterators())
-    if (cell->is_locally_owned())
-      deallog << " cell:" << cell->id().to_string()
-              << " predicted:" << predicted_errors(cell->active_cell_index())
-              << std::endl;
+  for (const auto &cell :
+       dh.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
+    deallog << " cell:" << cell->id().to_string()
+            << " predicted:" << predicted_errors(cell->active_cell_index())
+            << std::endl;
 
   // make sure no processor is hanging
   MPI_Barrier(MPI_COMM_WORLD);

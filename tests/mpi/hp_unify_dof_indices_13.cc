@@ -26,6 +26,7 @@
 
 #include <deal.II/fe/fe_q.h>
 
+#include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_generator.h>
 
 #include <deal.II/hp/fe_collection.h>
@@ -60,18 +61,18 @@ test()
     fe.push_back(FE_Q<dim>(d));
 
   DoFHandler<dim> dof_handler(triangulation);
-  for (const auto &cell : dof_handler.active_cell_iterators())
-    if (cell->is_locally_owned())
-      {
-        if (cell->id().to_string() == "0_0:")
-          cell->set_active_fe_index(0);
-        if (cell->id().to_string() == "1_0:")
-          cell->set_active_fe_index(1);
-        if (cell->id().to_string() == "2_0:")
-          cell->set_active_fe_index(2);
-        if (cell->id().to_string() == "3_0:")
-          cell->set_active_fe_index(3);
-      }
+  for (const auto &cell : dof_handler.active_cell_iterators() |
+                            IteratorFilters::LocallyOwnedCell())
+    {
+      if (cell->id().to_string() == "0_0:")
+        cell->set_active_fe_index(0);
+      if (cell->id().to_string() == "1_0:")
+        cell->set_active_fe_index(1);
+      if (cell->id().to_string() == "2_0:")
+        cell->set_active_fe_index(2);
+      if (cell->id().to_string() == "3_0:")
+        cell->set_active_fe_index(3);
+    }
   dof_handler.distribute_dofs(fe);
 
   log_dof_diagnostics(dof_handler);

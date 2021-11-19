@@ -174,44 +174,41 @@ namespace Step40
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-    for (const auto &cell : dof_handler.active_cell_iterators())
-      if (cell->is_locally_owned())
-        {
-          cell_matrix = 0.;
-          cell_rhs    = 0.;
+    for (const auto &cell : dof_handler.active_cell_iterators() |
+                              IteratorFilters::LocallyOwnedCell())
+      {
+        cell_matrix = 0.;
+        cell_rhs    = 0.;
 
-          fe_values.reinit(cell);
+        fe_values.reinit(cell);
 
-          for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
-            {
-              const double rhs_value =
-                (fe_values.quadrature_point(q_point)[1] >
-                     0.5 +
-                       0.25 * std::sin(4.0 * numbers::PI *
-                                       fe_values.quadrature_point(q_point)[0]) ?
-                   1. :
-                   -1.);
+        for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+          {
+            const double rhs_value =
+              (fe_values.quadrature_point(q_point)[1] >
+                   0.5 +
+                     0.25 * std::sin(4.0 * numbers::PI *
+                                     fe_values.quadrature_point(q_point)[0]) ?
+                 1. :
+                 -1.);
 
-              for (unsigned int i = 0; i < dofs_per_cell; ++i)
-                {
-                  for (unsigned int j = 0; j < dofs_per_cell; ++j)
-                    cell_matrix(i, j) += fe_values.shape_grad(i, q_point) *
-                                         fe_values.shape_grad(j, q_point) *
-                                         fe_values.JxW(q_point);
+            for (unsigned int i = 0; i < dofs_per_cell; ++i)
+              {
+                for (unsigned int j = 0; j < dofs_per_cell; ++j)
+                  cell_matrix(i, j) += fe_values.shape_grad(i, q_point) *
+                                       fe_values.shape_grad(j, q_point) *
+                                       fe_values.JxW(q_point);
 
-                  cell_rhs(i) += rhs_value *                         //
-                                 fe_values.shape_value(i, q_point) * //
-                                 fe_values.JxW(q_point);
-                }
-            }
+                cell_rhs(i) += rhs_value *                         //
+                               fe_values.shape_value(i, q_point) * //
+                               fe_values.JxW(q_point);
+              }
+          }
 
-          cell->get_dof_indices(local_dof_indices);
-          constraints.distribute_local_to_global(cell_matrix,
-                                                 cell_rhs,
-                                                 local_dof_indices,
-                                                 system_matrix,
-                                                 system_rhs);
-        }
+        cell->get_dof_indices(local_dof_indices);
+        constraints.distribute_local_to_global(
+          cell_matrix, cell_rhs, local_dof_indices, system_matrix, system_rhs);
+      }
 
     system_matrix.compress(VectorOperation::add);
     system_rhs.compress(VectorOperation::add);

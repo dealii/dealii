@@ -33,6 +33,7 @@
 
 #include <deal.II/fe/fe_dgq.h>
 
+#include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_generator.h>
 
 #include <deal.II/hp/fe_collection.h>
@@ -61,9 +62,9 @@ test()
   DoFHandler<dim> dgq_dof_handler(tria);
 
   // randomly assign FEs
-  for (const auto &cell : dgq_dof_handler.active_cell_iterators())
-    if (cell->is_locally_owned())
-      cell->set_active_fe_index(Testing::rand() % max_degree);
+  for (const auto &cell : dgq_dof_handler.active_cell_iterators() |
+                            IteratorFilters::LocallyOwnedCell())
+    cell->set_active_fe_index(Testing::rand() % max_degree);
   dgq_dof_handler.distribute_dofs(fe_dgq);
 
   // prepare index sets

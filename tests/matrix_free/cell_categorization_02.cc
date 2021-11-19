@@ -26,6 +26,7 @@
 
 #include <deal.II/fe/fe_q.h>
 
+#include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
 
@@ -103,13 +104,13 @@ test()
 
   data.cell_vectorization_categories_strict = true;
   data.cell_vectorization_category.resize(tria.n_active_cells());
-  for (const auto &cell : tria.active_cell_iterators())
-    if (cell->is_locally_owned())
-      {
-        AssertIndexRange(cell->active_cell_index(), tria.n_active_cells());
-        data.cell_vectorization_category[cell->active_cell_index()] =
-          cell->material_id();
-      }
+  for (const auto &cell :
+       tria.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
+    {
+      AssertIndexRange(cell->active_cell_index(), tria.n_active_cells());
+      data.cell_vectorization_category[cell->active_cell_index()] =
+        cell->material_id();
+    }
 
   mf_data.reinit(dof, constraints, QGauss<1>(2), data);
 

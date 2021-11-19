@@ -27,6 +27,8 @@
 
 #include <deal.II/fe/fe_q.h>
 
+#include <deal.II/grid/filtered_iterator.h>
+
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/refinement.h>
 
