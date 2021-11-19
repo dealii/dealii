@@ -1622,8 +1622,27 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
         unsigned int dummy;
         whole_file >> dummy;
       }
-      std::string object_type;
-      whole_file >> object_type;
+
+      // Read the object type. Also do a number of safety checks.
+      std::string object_name;
+      whole_file >> object_name;
+
+      static const std::map<std::string, ReferenceCell> name_to_type = {
+        {"vtx", ReferenceCells::Vertex},
+        {"edg", ReferenceCells::Line},
+        {"tri", ReferenceCells::Triangle},
+        {"quad", ReferenceCells::Quadrilateral},
+        {"tet", ReferenceCells::Tetrahedron},
+        {"prism", ReferenceCells::Wedge}
+        // TODO: Add hexahedra and pyramids once we have a sample input file
+        // that contains these
+      };
+      AssertThrow(name_to_type.find(object_name) != name_to_type.end(),
+                  ExcMessage("The input file contains a cell type <" +
+                             object_name +
+                             "> that the reader does not "
+                             "current support"));
+      const ReferenceCell object_type = name_to_type.at(object_name);
 
       unsigned int n_vertices_per_element;
       whole_file >> n_vertices_per_element;
@@ -1631,22 +1650,23 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
       unsigned int n_elements;
       whole_file >> n_elements;
 
-      if (object_type == "vtx")
+
+      if (object_type == ReferenceCells::Vertex)
         {
           AssertThrow(n_vertices_per_element == 1, ExcInternalError());
         }
-      else if (object_type == "edg")
+      else if (object_type == ReferenceCells::Line)
         {
           AssertThrow(n_vertices_per_element == 2, ExcInternalError());
         }
-      else if (object_type == "tri")
+      else if (object_type == ReferenceCells::Triangle)
         {
           AssertThrow(dim >= 2,
                       ExcMessage("Triangles should not appear in input files "
                                  "for 1d meshes."));
           AssertThrow(n_vertices_per_element == 3, ExcInternalError());
         }
-      else if (object_type == "quad")
+      else if (object_type == ReferenceCells::Quadrilateral)
         {
           AssertThrow(dim >= 2,
                       ExcMessage(
@@ -1654,23 +1674,23 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
                         "for 1d meshes."));
           AssertThrow(n_vertices_per_element == 4, ExcInternalError());
         }
-      else if (object_type == "tet")
+      else if (object_type == ReferenceCells::Tetrahedron)
         {
           AssertThrow(dim >= 3,
                       ExcMessage("Tetrahedra should not appear in input files "
                                  "for 1d or 2d meshes."));
           AssertThrow(n_vertices_per_element == 4, ExcInternalError());
         }
-      else if (object_type == "prism")
+      else if (object_type == ReferenceCells::Wedge)
         {
           AssertThrow(dim >= 3,
-                      ExcMessage("Prisms should not appear in input files "
-                                 "for 1d or 2d meshes."));
+                      ExcMessage(
+                        "Prisms (wedges) should not appear in input files "
+                        "for 1d or 2d meshes."));
           AssertThrow(n_vertices_per_element == 6, ExcInternalError());
         }
       else
         AssertThrow(false, ExcNotImplemented());
-
 
       // Next, for each element read the vertex numbers. Then we have
       // to decide what to do with it. If it is a vertex, we ignore
@@ -1696,9 +1716,9 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
               vertices_for_this_element[v] -= starting_vertex_index;
             }
 
-          if (object_type == "vtx")
+          if (object_type == ReferenceCells::Vertex)
             ; // do nothing
-          else if (object_type == "edg")
+          else if (object_type == ReferenceCells::Line)
             {
               if (spacedim == 1)
                 {
@@ -1712,7 +1732,8 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
                     vertices_for_this_element;
                 }
             }
-          else if ((object_type == "tri") || (object_type == "quad"))
+          else if ((object_type == ReferenceCells::Triangle) ||
+                   (object_type == ReferenceCells::Quadrilateral))
             {
               if (spacedim == 2)
                 {
@@ -1726,7 +1747,8 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
                     vertices_for_this_element;
                 }
             }
-          else if ((object_type == "tet") || (object_type == "prism"))
+          else if ((object_type == ReferenceCells::Tetrahedron) ||
+                   (object_type == ReferenceCells::Wedge))
             {
               if (spacedim == 3)
                 {
@@ -1761,9 +1783,9 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
               AssertThrow(whole_file, ExcIO());
               unsigned int geometric_entity_index;
               whole_file >> geometric_entity_index;
-              if (object_type == "vtx")
+              if (object_type == ReferenceCells::Vertex)
                 ; // do nothing
-              else if (object_type == "edg")
+              else if (object_type == ReferenceCells::Line)
                 {
                   if (spacedim == 1)
                     cells[cells.size() - n_elements + e].material_id =
@@ -1774,7 +1796,8 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
                                       n_elements + e]
                       .boundary_id = geometric_entity_index;
                 }
-              else if ((object_type == "tri") || (object_type == "quad"))
+              else if ((object_type == ReferenceCells::Triangle) ||
+                       (object_type == ReferenceCells::Quadrilateral))
                 {
                   if (spacedim == 2)
                     cells[cells.size() - n_elements + e].material_id =
@@ -1785,7 +1808,8 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
                                       n_elements + e]
                       .boundary_id = geometric_entity_index;
                 }
-              else if ((object_type == "tet") || (object_type == "prism"))
+              else if ((object_type == ReferenceCells::Tetrahedron) ||
+                       (object_type == ReferenceCells::Wedge))
                 {
                   if (spacedim == 3)
                     cells[cells.size() - n_elements + e].material_id =
