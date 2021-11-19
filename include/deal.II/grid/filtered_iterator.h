@@ -336,7 +336,7 @@ namespace IteratorFilters
  * DoFHandler iterators by only iterating over elements that satisfy a given
  * filter (called a <em>predicate</em>, following the notation of the C++
  * standard library). Once initialized with a predicate and a value for the
- * iterator, a filtered iterator hops to the next or previous element that
+ * iterator, a filtered iterator advances to the next or previous element that
  * satisfies the predicate if operators ++ or \-- are invoked. Intermediate
  * iterator values that lie in between but do not satisfy the predicate are
  * skipped. It is thus very simple to write loops over a certain class of
@@ -344,6 +344,33 @@ namespace IteratorFilters
  * to satisfy in each loop iteration. This in particular is helpful if
  * functions are called with a pair of iterators denoting a range on which
  * they shall act, by choosing a filtered iterator instead of usual ones.
+ * The use of this class is particularly useful when writing "ranged-based"
+ * `for` loops of the form
+ * @code
+ *   for (const auto &cell : <some FilteredIterator object>)
+ *     { ... }
+ * @endcode
+ * An example is to write
+ * @code
+ *   DoFHandler<dim> dof_handler;
+ *   ...
+ *   for (const auto &cell :
+ *          dof_handler.active_cell_iterators()
+ *          | IteratorFilters::LocallyOwnedCell()
+ *          | IteratorFilters::AtBoundary())
+ *     {
+ *       fe_values.reinit (cell);
+ *       ...do the local integration on 'cell'...;
+ *     }
+ * @endcode
+ * where the resulting loop iterates over all active cells that are also
+ * locally owned and that point to cells that are at the boundary of the
+ * domain.
+ *
+ * This class implements functionality comparable to what was added to C++20
+ * in the form of
+ * [range adaptors](https://en.cppreference.com/w/cpp/ranges/filter_view)
+ * and the filters and filter views that represent them.
  *
  * This class is used in step-32.
  *
@@ -351,7 +378,7 @@ namespace IteratorFilters
  * <h3>Predicates</h3>
  *
  * The object that represent the condition an iterator has to satisfy only
- * have to provide an interface that allows to call the evaluation operator,
+ * has to provide an interface that allows to call the evaluation operator,
  * i.e. <code>bool operator() (const BaseIterator&)</code>. This includes
  * function pointers as well as classes that implement an <code>bool operator
  * ()(const BaseIterator&)</code>. Then, the FilteredIterator will skip all
@@ -381,9 +408,10 @@ namespace IteratorFilters
  *     return (static_cast<unsigned int>(c->level()) == level);
  *   };
  * @endcode
- * then
+ * then the lambda function
  * @code
- *   [](const BIterator& c){ return level_equal_to<active_cell_iterator>(c, 3);}
+ *   [](const BIterator& c) { return level_equal_to<active_cell_iterator>(c,
+ * 3);}
  * @endcode
  * is another valid predicate (here: a function that returns true if either
  * the iterator is past the end or the level is equal to the second argument;
@@ -852,6 +880,24 @@ namespace internal
  *     }
  * @endcode
  *
+ * @note This function is obsolete and should be replaced by calling
+ *   `operator|` instead. The latter is certainly more in the
+ *   spirit of
+ *   [C++20 range
+ * adaptors](https://en.cppreference.com/w/cpp/ranges/filter_view) and results
+ * in the following code instead of the one shown above:
+ *   @code
+ *   DoFHandler<dim> dof_handler;
+ *   ...
+ *   for (const auto &cell :
+ *          dof_handler.active_cell_iterators()
+ *          | IteratorFilters::LocallyOwnedCell())
+ *     {
+ *       fe_values.reinit (cell);
+ *       ...do the local integration on 'cell'...;
+ *     }
+ *   @endcode
+ *
  * @relatesalso FilteredIterator
  * @ingroup CPP11
  */
@@ -899,6 +945,25 @@ filter_iterators(IteratorRange<BaseIterator> i, const Predicate &p)
  *       ...do the local integration on 'cell'...;
  *     }
  * @endcode
+ *
+ * @note This function is obsolete and should be replaced by calling
+ *   `operator|` once or multiple times instead.
+ *   The latter is certainly more in the spirit of
+ *   [C++20 range
+ * adaptors](https://en.cppreference.com/w/cpp/ranges/filter_view) and results
+ * in the following code instead of the one shown above:
+ *   @code
+ *   DoFHandler<dim> dof_handler;
+ *   ...
+ *   for (const auto &cell :
+ *          dof_handler.active_cell_iterators()
+ *          | IteratorFilters::LocallyOwnedCell()
+ *          | IteratorFilters::AtBoundary())
+ *     {
+ *       fe_values.reinit (cell);
+ *       ...do the local integration on 'cell'...;
+ *     }
+ *   @endcode
  *
  * @relatesalso FilteredIterator
  * @ingroup CPP11
@@ -955,6 +1020,23 @@ filter_iterators(IteratorRange<BaseIterator> i,
  * and removes those that do not satisfy the predicate -- that is, it produces
  * a range of iterators that only contains those cells that are both active
  * and locally owned.
+ *
+ * @note The `|` operator can be applied more than once. This results in code
+ *   such as the following:
+ *   @code
+ *   DoFHandler<dim> dof_handler;
+ *   ...
+ *   for (const auto &cell :
+ *          dof_handler.active_cell_iterators()
+ *          | IteratorFilters::LocallyOwnedCell()
+ *          | IteratorFilters::AtBoundary())
+ *     {
+ *       fe_values.reinit (cell);
+ *       ...do the local integration on 'cell'...;
+ *     }
+ *   @endcode
+ *   In this code, the loop executes over all active cells that are both
+ *   locally owned and located at the boundary.
  *
  * @relatesalso FilteredIterator
  * @ingroup CPP11
