@@ -522,14 +522,14 @@ namespace Utilities
      * else
      * {
      *   MPI_Datatype bigtype =
-     * Utilities::MPI::create_mpi_data_type_n_bytes(buffer.size());
+     *     Utilities::MPI::create_mpi_data_type_n_bytes(buffer.size());
      *   MPI_Send(buffer.data(), 1, bigtype, dest, tag, comm);
      *   MPI_Type_free(&bigtype);
      * }
      * </code>
      */
     MPI_Datatype
-    create_mpi_data_type_n_bytes(std::size_t n_bytes);
+    create_mpi_data_type_n_bytes(const std::size_t n_bytes);
 
     /**
      * Return the sum over all processors of the value @p t. This function is

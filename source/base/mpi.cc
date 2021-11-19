@@ -298,7 +298,7 @@ namespace Utilities
 
 
     MPI_Datatype
-    create_mpi_data_type_n_bytes(std::size_t n_bytes)
+    create_mpi_data_type_n_bytes(const std::size_t n_bytes)
     {
 #  ifdef DEAL_II_WITH_MPI
       // Simplified version from BigMPI repository, see
