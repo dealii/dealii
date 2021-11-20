@@ -47,12 +47,17 @@ namespace NonMatching
     // Check that mapping and reference cell type are compatible:
     Assert(this->get_mapping().is_compatible_with(cell->reference_cell()),
            ExcMessage(
-             "You are trying to call FEValues::reinit() with a cell of type " +
+             "You are trying to call FEImmersedSurfaceValues::reinit() with "
+             " a cell of type " +
              cell->reference_cell().to_string() +
              " with a Mapping that is not compatible with it."));
 
     // No FE in this cell, so no assertion necessary here.
-    this->maybe_invalidate_previous_present_cell(cell);
+    Assert(
+      this->present_cell.is_initialized() == false,
+      ExcMessage(
+        "FEImmersedSurfaceValues::reinit() can only be used for one cell!"));
+
     this->present_cell = {cell};
 
     // This was the part of the work that is dependent on the actual data type
@@ -71,7 +76,8 @@ namespace NonMatching
     // Check that mapping and reference cell type are compatible:
     Assert(this->get_mapping().is_compatible_with(cell->reference_cell()),
            ExcMessage(
-             "You are trying to call FEValues::reinit() with a cell of type " +
+             "You are trying to call FEImmersedSurfaceValues::reinit() with "
+             "a cell of type " +
              cell->reference_cell().to_string() +
              " with a Mapping that is not compatible with it."));
 
@@ -81,7 +87,11 @@ namespace NonMatching
              static_cast<const FiniteElementData<dim> &>(cell->get_fe()),
            (typename FEValuesBase<dim>::ExcFEDontMatch()));
 
-    this->maybe_invalidate_previous_present_cell(cell);
+    Assert(
+      this->present_cell.is_initialized() == false,
+      ExcMessage(
+        "FEImmersedSurfaceValues::reinit() can only be used for one cell!"));
+
     this->present_cell = {cell};
 
     // This was the part of the work that is dependent on the actual data type
