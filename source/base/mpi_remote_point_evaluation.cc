@@ -24,6 +24,7 @@
 
 #include <deal.II/fe/mapping.h>
 
+#include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/grid_tools_cache.h>
 #include <deal.II/grid/tria.h>
@@ -80,9 +81,9 @@ namespace Utilities
       this->mapping = &mapping;
 
       std::vector<BoundingBox<spacedim>> local_boxes;
-      for (const auto &cell : tria.active_cell_iterators())
-        if (cell->is_locally_owned())
-          local_boxes.push_back(mapping.get_bounding_box(cell));
+      for (const auto &cell :
+           tria.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
+        local_boxes.push_back(mapping.get_bounding_box(cell));
 
       // create r-tree of bounding boxes
       const auto local_tree = pack_rtree(local_boxes);

@@ -6480,10 +6480,10 @@ namespace GridTools
 
     // 2) collect vertices belonging to local cells
     std::vector<bool> vertex_of_own_cell(tria.n_vertices(), false);
-    for (const auto &cell : tria.active_cell_iterators())
-      if (cell->is_locally_owned())
-        for (const unsigned int v : cell->vertex_indices())
-          vertex_of_own_cell[cell->vertex_index(v)] = true;
+    for (const auto &cell :
+         tria.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
+      for (const unsigned int v : cell->vertex_indices())
+        vertex_of_own_cell[cell->vertex_index(v)] = true;
 
     // 3) for each vertex belonging to a locally owned cell all ghost
     //    neighbors (including the periodic own)
@@ -6574,9 +6574,9 @@ namespace GridTools
     std::vector<Point<dim>> &       vertices,
     std::vector<CellData<dim - 1>> &cells) const
   {
-    for (const auto &cell : background_dof_handler.active_cell_iterators())
-      if (cell->is_locally_owned())
-        process_cell(cell, ls_vector, iso_level, vertices, cells);
+    for (const auto &cell : background_dof_handler.active_cell_iterators() |
+                              IteratorFilters::LocallyOwnedCell())
+      process_cell(cell, ls_vector, iso_level, vertices, cells);
   }
 
 

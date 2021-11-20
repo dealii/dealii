@@ -25,6 +25,7 @@
 #include <deal.II/dofs/dof_accessor.templates.h>
 #include <deal.II/dofs/dof_handler.h>
 
+#include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_refinement.h>
 #include <deal.II/grid/grid_tools.h>
 
@@ -869,10 +870,10 @@ namespace hp
             dof_handler.get_triangulation().n_active_cells());
         }
 
-      for (const auto &cell : dof_handler.active_cell_iterators())
-        if (cell->is_locally_owned())
-          future_levels[cell->global_active_cell_index()] =
-            hierarchy_level_for_fe_index[cell->future_fe_index()];
+      for (const auto &cell : dof_handler.active_cell_iterators() |
+                                IteratorFilters::LocallyOwnedCell())
+        future_levels[cell->global_active_cell_index()] =
+          hierarchy_level_for_fe_index[cell->future_fe_index()];
 
 
       //
@@ -1041,22 +1042,22 @@ namespace hp
       while (levels_changed_in_cycle);
 
       // update future FE indices on locally owned cells
-      for (const auto &cell : dof_handler.active_cell_iterators())
-        if (cell->is_locally_owned())
-          {
-            const level_type cell_level = static_cast<level_type>(
-              future_levels[cell->global_active_cell_index()]);
+      for (const auto &cell : dof_handler.active_cell_iterators() |
+                                IteratorFilters::LocallyOwnedCell())
+        {
+          const level_type cell_level = static_cast<level_type>(
+            future_levels[cell->global_active_cell_index()]);
 
-            if (cell_level != invalid_level)
-              {
-                const unsigned int fe_index =
-                  fe_index_for_hierarchy_level[cell_level];
+          if (cell_level != invalid_level)
+            {
+              const unsigned int fe_index =
+                fe_index_for_hierarchy_level[cell_level];
 
-                // only update if necessary
-                if (fe_index != cell->active_fe_index())
-                  cell->set_future_fe_index(fe_index);
-              }
-          }
+              // only update if necessary
+              if (fe_index != cell->active_fe_index())
+                cell->set_future_fe_index(fe_index);
+            }
+        }
 
       return levels_changed;
     }
