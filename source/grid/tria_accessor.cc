@@ -2894,8 +2894,8 @@ CellAccessor<dim, spacedim>::neighbor_child_on_subface(
                   subface;
 
               const unsigned int neighbor_child_index =
-                ReferenceCells::Triangle.child_cell_on_face(neighbor_face,
-                                                            neighbor_subface);
+                neighbor_cell->reference_cell().child_cell_on_face(
+                  neighbor_face, neighbor_subface);
               const TriaIterator<CellAccessor<dim, spacedim>> sub_neighbor =
                 neighbor_cell->child(neighbor_child_index);
 

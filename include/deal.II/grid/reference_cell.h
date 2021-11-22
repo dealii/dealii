@@ -1104,7 +1104,7 @@ ReferenceCell::child_cell_on_face(
       const bool face_rotation    = Utilities::get_bit(face_orientation_raw, 1);
 
       return GeometryInfo<2>::child_cell_on_face(
-        RefinementCase<2>(RefinementPossibilities<2>::no_refinement),
+        RefinementCase<2>(RefinementPossibilities<2>::isotropic_refinement),
         face,
         subface,
         face_orientation,
@@ -1130,7 +1130,7 @@ ReferenceCell::child_cell_on_face(
       const bool face_rotation    = Utilities::get_bit(face_orientation_raw, 1);
 
       return GeometryInfo<3>::child_cell_on_face(
-        RefinementCase<3>(RefinementPossibilities<3>::no_refinement),
+        RefinementCase<3>(RefinementPossibilities<3>::isotropic_refinement),
         face,
         subface,
         face_orientation,
