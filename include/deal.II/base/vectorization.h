@@ -5214,8 +5214,7 @@ compare_and_apply_mask(const VectorizedArray<float, 8> &left,
     _mm256_cmp_ps(left.data, right.data, static_cast<int>(predicate));
 
   VectorizedArray<float, 8> result;
-  result.data = _mm256_or_ps(_mm256_and_ps(mask, true_values.data),
-                             _mm256_andnot_ps(mask, false_values.data));
+  result.data = _mm256_blendv_ps(false_values.data, true_values.data, mask);
   return result;
 }
 
@@ -5231,8 +5230,7 @@ compare_and_apply_mask(const VectorizedArray<double, 4> &left,
     _mm256_cmp_pd(left.data, right.data, static_cast<int>(predicate));
 
   VectorizedArray<double, 4> result;
-  result.data = _mm256_or_pd(_mm256_and_pd(mask, true_values.data),
-                             _mm256_andnot_pd(mask, false_values.data));
+  result.data = _mm256_blendv_pd(false_values.data, true_values.data, mask);
   return result;
 }
 
