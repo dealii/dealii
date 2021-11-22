@@ -737,19 +737,22 @@ namespace internal
     template <typename T, int fe_degree, bool transpose>
     class HelperBase
     {
-        public:
+    public:
       inline DEAL_II_ALWAYS_INLINE
-      HelperBase(const T & t, const unsigned int &given_degree,
-             const bool &        type_x,
-             const bool &        type_y,
-             const bool &        type_z,
-             const typename Trait<Number, VectorizationType>::index_type &v,
-             const std::array<
-               AlignedVector<
-                 typename Trait<Number, VectorizationType>::interpolation_type>,
-               2> &  interpolation_matrices,
-             Number *values)
-        : t(t), given_degree(given_degree)
+      HelperBase(
+        const T &           t,
+        const unsigned int &given_degree,
+        const bool &        type_x,
+        const bool &        type_y,
+        const bool &        type_z,
+        const typename Trait<Number, VectorizationType>::index_type &v,
+        const std::array<
+          AlignedVector<
+            typename Trait<Number, VectorizationType>::interpolation_type>,
+          2> &  interpolation_matrices,
+        Number *values)
+        : t(t)
+        , given_degree(given_degree)
         , type_x(type_x)
         , type_y(type_y)
         , type_z(type_z)
@@ -757,14 +760,14 @@ namespace internal
         , interpolation_matrices(interpolation_matrices)
         , values(values)
       {}
-        
+
       template <bool do_x, bool do_y, bool do_z>
       inline DEAL_II_ALWAYS_INLINE void
       process_edge() const
       {
         if (do_x)
           interpolate_3D_edge<fe_degree, 0, transpose>(
-            t.line(0,type_y,type_z),
+            t.line(0, type_y, type_z),
             given_degree,
             v,
             interpolation_matrices[!type_x].data(),
@@ -772,7 +775,7 @@ namespace internal
 
         if (do_y)
           interpolate_3D_edge<fe_degree, 1, transpose>(
-            t.line(1,type_x,type_z),
+            t.line(1, type_x, type_z),
             given_degree,
             v,
             interpolation_matrices[!type_y].data(),
@@ -780,7 +783,7 @@ namespace internal
 
         if (do_z)
           interpolate_3D_edge<fe_degree, 2, transpose>(
-            t.line(2,type_x,type_y),
+            t.line(2, type_x, type_y),
             given_degree,
             v,
             interpolation_matrices[!type_z].data(),
@@ -800,7 +803,7 @@ namespace internal
 
         if (!do_x)
           interpolate_3D_face<fe_degree, 0, direction, transpose, false>(
-            t.face(direction,type),
+            t.face(direction, type),
             given_degree,
             v,
             interpolation_matrices[!type_x].data(),
@@ -808,7 +811,7 @@ namespace internal
 
         if (!do_y)
           interpolate_3D_face<fe_degree, 1, direction, transpose, false>(
-            t.face(direction,type),
+            t.face(direction, type),
             given_degree,
             v,
             interpolation_matrices[!type_y].data(),
@@ -816,7 +819,7 @@ namespace internal
 
         if (!do_z)
           interpolate_3D_face<fe_degree, 2, direction, transpose, false>(
-            t.face(direction,type),
+            t.face(direction, type),
             given_degree,
             v,
             interpolation_matrices[!type_z].data(),
@@ -834,7 +837,7 @@ namespace internal
         // direction 0 -> faces
         if (do_y && given_degree > 1)
           interpolate_3D_face<fe_degree, 0, 1, transpose, true>(
-            t.face(1,type_y),
+            t.face(1, type_y),
             given_degree,
             v,
             interpolation_matrices[!type_x].data(),
@@ -842,7 +845,7 @@ namespace internal
 
         if (do_z && given_degree > 1)
           interpolate_3D_face<fe_degree, 0, 2, transpose, true>(
-            t.face(2,type_z),
+            t.face(2, type_z),
             given_degree,
             v,
             interpolation_matrices[!type_x].data(),
@@ -851,9 +854,9 @@ namespace internal
         // direction 0 -> edges
         interpolate_3D_edge<fe_degree, 0, transpose>(
           (do_x && do_y && !do_z) ?
-            (t.lines_plane(0,type_x,type_y,0)) :
-            ((do_x && !do_y && do_z) ? (t.lines_plane(1,type_x,type_z,0)) :
-                                       (t.lines(0,type_y,type_z,0))),
+            (t.lines_plane(0, type_x, type_y, 0)) :
+            ((do_x && !do_y && do_z) ? (t.lines_plane(1, type_x, type_z, 0)) :
+                                       (t.lines(0, type_y, type_z, 0))),
           given_degree,
           v,
           interpolation_matrices[!type_x].data(),
@@ -862,9 +865,9 @@ namespace internal
 
         interpolate_3D_edge<fe_degree, 0, transpose>(
           (do_x && do_y && !do_z) ?
-            (t.lines_plane(0,type_x,type_y,1)) :
-            ((do_x && !do_y && do_z) ? (t.lines_plane(1,type_x,type_z,1)) :
-                                       (t.lines(0,type_y,type_z,1))),
+            (t.lines_plane(0, type_x, type_y, 1)) :
+            ((do_x && !do_y && do_z) ? (t.lines_plane(1, type_x, type_z, 1)) :
+                                       (t.lines(0, type_y, type_z, 1))),
           given_degree,
           v,
           interpolation_matrices[!type_x].data(),
@@ -872,7 +875,7 @@ namespace internal
 
         if (do_y && do_z)
           interpolate_3D_edge<fe_degree, 0, transpose>(
-            t.lines(0,type_y,type_z,2),
+            t.lines(0, type_y, type_z, 2),
             given_degree,
             v,
             interpolation_matrices[!type_x].data(),
@@ -898,9 +901,9 @@ namespace internal
         // direction 1 -> lines
         interpolate_3D_edge<fe_degree, 1, transpose>(
           (do_x && do_y && !do_z) ?
-            (t.lines_plane(0,type_x,type_y,2)) :
-            ((!do_x && do_y && do_z) ? (t.lines_plane(2,type_y,type_z,0)) :
-                                       (t.lines(1,type_x,type_z,0))),
+            (t.lines_plane(0, type_x, type_y, 2)) :
+            ((!do_x && do_y && do_z) ? (t.lines_plane(2, type_y, type_z, 0)) :
+                                       (t.lines(1, type_x, type_z, 0))),
           given_degree,
           v,
           interpolation_matrices[!type_y].data(),
@@ -908,9 +911,9 @@ namespace internal
 
         interpolate_3D_edge<fe_degree, 1, transpose>(
           (do_x && do_y && !do_z) ?
-            (t.lines_plane(0,type_x,type_y,3)) :
-            ((!do_x && do_y && do_z) ? (t.lines_plane(2,type_y,type_z,1)) :
-                                       (t.lines(1,type_x,type_z,1))),
+            (t.lines_plane(0, type_x, type_y, 3)) :
+            ((!do_x && do_y && do_z) ? (t.lines_plane(2, type_y, type_z, 1)) :
+                                       (t.lines(1, type_x, type_z, 1))),
           given_degree,
           v,
           interpolation_matrices[!type_y].data(),
@@ -918,7 +921,7 @@ namespace internal
 
         if (do_x && do_z)
           interpolate_3D_edge<fe_degree, 1, transpose>(
-            t.lines(1,type_x,type_z,2),
+            t.lines(1, type_x, type_z, 2),
             given_degree,
             v,
             interpolation_matrices[!type_y].data(),
@@ -927,7 +930,7 @@ namespace internal
         // direction 2 -> faces
         if (do_x && given_degree > 1)
           interpolate_3D_face<fe_degree, 2, 0, transpose, true>(
-            t.face(0,type_x),
+            t.face(0, type_x),
             given_degree,
             v,
             interpolation_matrices[!type_z].data(),
@@ -935,7 +938,7 @@ namespace internal
 
         if (do_y && given_degree > 1)
           interpolate_3D_face<fe_degree, 2, 1, transpose, true>(
-            t.face(1,type_y),
+            t.face(1, type_y),
             given_degree,
             v,
             interpolation_matrices[!type_z].data(),
@@ -944,9 +947,9 @@ namespace internal
         // direction 2 -> edges
         interpolate_3D_edge<fe_degree, 2, transpose>(
           (do_x && !do_y && do_z) ?
-            (t.lines_plane(1,type_x,type_z,2)) :
-            ((!do_x && do_y && do_z) ? (t.lines_plane(2,type_y,type_z,2)) :
-                                       (t.lines(2,type_x,type_y,0))),
+            (t.lines_plane(1, type_x, type_z, 2)) :
+            ((!do_x && do_y && do_z) ? (t.lines_plane(2, type_y, type_z, 2)) :
+                                       (t.lines(2, type_x, type_y, 0))),
           given_degree,
           v,
           interpolation_matrices[!type_z].data(),
@@ -954,9 +957,9 @@ namespace internal
 
         interpolate_3D_edge<fe_degree, 2, transpose>(
           (do_x && !do_y && do_z) ?
-            (t.lines_plane(1,type_x,type_z,3)) :
-            ((!do_x && do_y && do_z) ? (t.lines_plane(2,type_y,type_z,3)) :
-                                       (t.lines(2,type_x,type_y,1))),
+            (t.lines_plane(1, type_x, type_z, 3)) :
+            ((!do_x && do_y && do_z) ? (t.lines_plane(2, type_y, type_z, 3)) :
+                                       (t.lines(2, type_x, type_y, 1))),
           given_degree,
           v,
           interpolation_matrices[!type_z].data(),
@@ -964,15 +967,15 @@ namespace internal
 
         if (do_x && do_y)
           interpolate_3D_edge<fe_degree, 2, transpose>(
-            t.lines(2,type_x,type_y,2),
+            t.lines(2, type_x, type_y, 2),
             given_degree,
             v,
             interpolation_matrices[!type_z].data(),
             values);
       }
 
-      private:
-      const T & t;
+    private:
+      const T &                                                    t;
       const unsigned int &                                         given_degree;
       const bool &                                                 type_x;
       const bool &                                                 type_y;
@@ -983,14 +986,16 @@ namespace internal
           typename Trait<Number, VectorizationType>::interpolation_type>,
         2> &  interpolation_matrices;
       Number *values;
-            
     };
 
     template <HelperType helper_type, int fe_degree, bool transpose>
     class Helper;
 
     template <int fe_degree, bool transpose>
-    class Helper<HelperType::dynamic, fe_degree, transpose> : public HelperBase<Helper<HelperType::dynamic, fe_degree, transpose>, fe_degree, transpose>
+    class Helper<HelperType::dynamic, fe_degree, transpose>
+      : public HelperBase<Helper<HelperType::dynamic, fe_degree, transpose>,
+                          fe_degree,
+                          transpose>
     {
     public:
       inline DEAL_II_ALWAYS_INLINE
@@ -1004,44 +1009,64 @@ namespace internal
                  typename Trait<Number, VectorizationType>::interpolation_type>,
                2> &  interpolation_matrices,
              Number *values)
-        : HelperBase<Helper<HelperType::dynamic, fe_degree, transpose>, fe_degree, transpose>(*this, given_degree, type_x, type_y, type_z, v, interpolation_matrices, values), points(given_degree + 1)
-      {}
+        : HelperBase<Helper<HelperType::dynamic, fe_degree, transpose>,
+                     fe_degree,
+                     transpose>(*this,
+                                given_degree,
+                                type_x,
+                                type_y,
+                                type_z,
+                                v,
+                                interpolation_matrices,
+                                values)
+        , points(given_degree + 1)
+      {
+        static_assert(fe_degree == -1, "Only working for fe_degree = -1.");
+      }
 
       const unsigned int points;
 
-      inline unsigned int
-      line(unsigned int i, unsigned int j, unsigned int k) const 
+      inline DEAL_II_ALWAYS_INLINE unsigned int
+      line(unsigned int i, unsigned int j, unsigned int k) const
       {
-          return line_array[i][j][k];
+        return line_array[i][j][k];
       }
 
-      inline unsigned int
-      face(unsigned int i, unsigned int j) const 
+      inline DEAL_II_ALWAYS_INLINE unsigned int
+      face(unsigned int i, unsigned int j) const
       {
-          return face_array[i][j];
+        return face_array[i][j];
       }
 
-      inline unsigned int
-      lines_plane(unsigned int i, unsigned int j, unsigned int k, unsigned int l) const 
+      inline DEAL_II_ALWAYS_INLINE unsigned int
+      lines_plane(unsigned int i,
+                  unsigned int j,
+                  unsigned int k,
+                  unsigned int l) const
       {
-          return lines_plane_array[i][j][k][l];
+        return lines_plane_array[i][j][k][l];
       }
 
-      inline unsigned int
-      lines(unsigned int i, unsigned int j, unsigned int k, unsigned int l) const 
+      inline DEAL_II_ALWAYS_INLINE unsigned int
+      lines(unsigned int i,
+            unsigned int j,
+            unsigned int k,
+            unsigned int l) const
       {
-          return lines_array[i][j][k][l];
+        return lines_array[i][j][k][l];
       }
 
-      const std::array<std::array<std::array<unsigned int, 2>, 2>, 3> line_array = {
-        {{{{{points * points * points - points, points *points - points}},
-           {{points * points * points - points * points, 0}}}},
-         {{{{points * points * points - points * points + points - 1,
-             points - 1}},
-           {{points * points * points - points * points, 0}}}},
-         {{{{points * points - 1, points - 1}},
-           {{points * points - points, 0}}}}}};
-      
+    private:
+      const std::array<std::array<std::array<unsigned int, 2>, 2>, 3>
+        line_array = {
+          {{{{{points * points * points - points, points *points - points}},
+             {{points * points * points - points * points, 0}}}},
+           {{{{points * points * points - points * points + points - 1,
+               points - 1}},
+             {{points * points * points - points * points, 0}}}},
+           {{{{points * points - 1, points - 1}},
+             {{points * points - points, 0}}}}}};
+
       const std::array<std::array<unsigned int, 2>, 3> face_array = {
         {{{points - 1, 0}},
          {{points * points - points, 0}},
@@ -1120,7 +1145,10 @@ namespace internal
     };
 
     template <int fe_degree, bool transpose>
-    class Helper<HelperType::constant, fe_degree, transpose> : public HelperBase<Helper<HelperType::constant, fe_degree, transpose>, fe_degree, transpose>
+    class Helper<HelperType::constant, fe_degree, transpose>
+      : public HelperBase<Helper<HelperType::constant, fe_degree, transpose>,
+                          fe_degree,
+                          transpose>
     {
     public:
       inline DEAL_II_ALWAYS_INLINE
@@ -1134,120 +1162,157 @@ namespace internal
                  typename Trait<Number, VectorizationType>::interpolation_type>,
                2> &  interpolation_matrices,
              Number *values)
-        : HelperBase<Helper<HelperType::constant, fe_degree, transpose>, fe_degree, transpose>(*this, given_degree, type_x, type_y, type_z, v, interpolation_matrices, values)
-      {}
-
-      static constexpr unsigned int points = fe_degree + 1;
-
-      inline unsigned int
-      line(unsigned int i, unsigned int j, unsigned int k) const 
+        : HelperBase<Helper<HelperType::constant, fe_degree, transpose>,
+                     fe_degree,
+                     transpose>(*this,
+                                given_degree,
+                                type_x,
+                                type_y,
+                                type_z,
+                                v,
+                                interpolation_matrices,
+                                values)
       {
-          return line_array[i][j][k];
+        static_assert(fe_degree != -1, "Only working for fe_degree != -1.");
       }
 
-      inline unsigned int
-      face(unsigned int i, unsigned int j) const 
+
+      inline DEAL_II_ALWAYS_INLINE unsigned int
+      line(unsigned int i, unsigned int j, unsigned int k) const
       {
-          return face_array[i][j];
-      }
+        static constexpr unsigned int points = fe_degree + 1;
 
-      inline unsigned int
-      lines_plane(unsigned int i, unsigned int j, unsigned int k, unsigned int l) const 
-      {
-          return lines_plane_array[i][j][k][l];
-      }
-
-      inline unsigned int
-      lines(unsigned int i, unsigned int j, unsigned int k, unsigned int l) const 
-      {
-          return lines_array[i][j][k][l];
-      }
-
-      static constexpr std::array<std::array<std::array<unsigned int, 2>, 2>, 3>
-        line_array = {
-          {{{{{points * points * points - points, points *points - points}},
-             {{points * points * points - points * points, 0}}}},
-           {{{{points * points * points - points * points + points - 1,
-               points - 1}},
-             {{points * points * points - points * points, 0}}}},
-           {{{{points * points - 1, points - 1}},
-             {{points * points - points, 0}}}}}};
-
-      static constexpr std::array<std::array<unsigned int, 2>, 3> face_array = {
-        {{{points - 1, 0}},
-         {{points * points - points, 0}},
-         {{points * points * points - points * points, 0}}}};
-
-      static constexpr std::array<
-        std::array<std::array<std::array<unsigned int, 4>, 2>, 2>,
-        3>
-        lines_plane_array = {
-          {{{{{{{points * points - points,
-                 points *points *points - points,
-                 points - 1,
-                 points *points *points - points *points + points - 1}},
-               {{0,
-                 points *points *points - points *points,
-                 points - 1,
-                 points *points *points - points *points + points - 1}}}},
-             {{{{points * points - points,
-                 points *points *points - points,
-                 0,
-                 points *points *points - points *points}},
-               {{0,
-                 points *points *points - points *points,
-                 0,
-                 points *points *points - points *points}}}}}},
-           {{{{{{points * points * points - points * points,
-                 points *points *points - points,
-                 points - 1,
-                 points *points - 1}},
-               {{0, points *points - points, points - 1, points *points - 1}}}},
-             {{{{points * points * points - points * points,
-                 points *points *points - points,
-                 0,
-                 points *points - points}},
-               {{0, points *points - points, 0, points *points - points}}}}}},
-           {{{{{{points * points * points - points * points,
-                 points *points *points - points *points + points - 1,
-                 points *                         points - points,
-                 points *                         points - 1}},
-               {{0, points - 1, points *points - points, points *points - 1}}}},
-             {{{{points * points * points - points * points,
-                 points *points *points - points *points + points - 1,
-                 0,
+        static constexpr std::array<std::array<std::array<unsigned int, 2>, 2>,
+                                    3>
+          line_array = {
+            {{{{{points * points * points - points, points * points - points}},
+               {{points * points * points - points * points, 0}}}},
+             {{{{points * points * points - points * points + points - 1,
                  points - 1}},
-               {{0, points - 1, 0, points - 1}}}}}}}};
+               {{points * points * points - points * points, 0}}}},
+             {{{{points * points - 1, points - 1}},
+               {{points * points - points, 0}}}}}};
 
-      static constexpr std::
-        array<std::array<std::array<std::array<unsigned int, 3>, 2>, 2>, 3>
-          lines_array = {
+        return line_array[i][j][k];
+      }
+
+      inline DEAL_II_ALWAYS_INLINE unsigned int
+      face(unsigned int i, unsigned int j) const
+      {
+        static constexpr unsigned int points = fe_degree + 1;
+
+        static constexpr std::array<std::array<unsigned int, 2>, 3> face_array =
+          {{{{points - 1, 0}},
+            {{points * points - points, 0}},
+            {{points * points * points - points * points, 0}}}};
+
+        return face_array[i][j];
+      }
+
+      inline DEAL_II_ALWAYS_INLINE unsigned int
+      lines_plane(unsigned int i,
+                  unsigned int j,
+                  unsigned int k,
+                  unsigned int l) const
+      {
+        static constexpr unsigned int points = fe_degree + 1;
+
+        static constexpr std::array<
+          std::array<std::array<std::array<unsigned int, 4>, 2>, 2>,
+          3>
+          lines_plane_array = {
             {{{{{{{points * points - points,
-                   points *points *points - points *points,
-                   points *points *points - points}},
+                   points * points * points - points,
+                   points - 1,
+                   points * points * points - points * points + points - 1}},
                  {{0,
-                   points *points - points,
-                   points *points *points - points}}}},
-               {{{{0,
-                   points *points *points - points *points,
-                   points *points *points - points}},
+                   points * points * points - points * points,
+                   points - 1,
+                   points * points * points - points * points + points - 1}}}},
+               {{{{points * points - points,
+                   points * points * points - points,
+                   0,
+                   points * points * points - points * points}},
                  {{0,
-                   points *points - points,
-                   points *points *points - points *points}}}}}},
-             {{{{{{points - 1,
-                   points *points *points - points *points,
-                   points *points *points - points *points + points - 1}},
+                   points * points * points - points * points,
+                   0,
+                   points * points * points - points * points}}}}}},
+             {{{{{{points * points * points - points * points,
+                   points * points * points - points,
+                   points - 1,
+                   points * points - 1}},
+                 {{0,
+                   points * points - points,
+                   points - 1,
+                   points * points - 1}}}},
+               {{{{points * points * points - points * points,
+                   points * points * points - points,
+                   0,
+                   points * points - points}},
+                 {{0,
+                   points * points - points,
+                   0,
+                   points * points - points}}}}}},
+             {{{{{{points * points * points - points * points,
+                   points * points * points - points * points + points - 1,
+                   points * points - points,
+                   points * points - 1}},
                  {{0,
                    points - 1,
-                   points *points *points - points *points + points - 1}}}},
+                   points * points - points,
+                   points * points - 1}}}},
+               {{{{points * points * points - points * points,
+                   points * points * points - points * points + points - 1,
+                   0,
+                   points - 1}},
+                 {{0, points - 1, 0, points - 1}}}}}}}};
+
+        return lines_plane_array[i][j][k][l];
+      }
+
+      inline DEAL_II_ALWAYS_INLINE unsigned int
+      lines(unsigned int i,
+            unsigned int j,
+            unsigned int k,
+            unsigned int l) const
+      {
+        static constexpr unsigned int points = fe_degree + 1;
+
+        static constexpr std::array<
+          std::array<std::array<std::array<unsigned int, 3>, 2>, 2>,
+          3>
+          lines_array = {
+            {{{{{{{points * points - points,
+                   points * points * points - points * points,
+                   points * points * points - points}},
+                 {{0,
+                   points * points - points,
+                   points * points * points - points}}}},
                {{{{0,
-                   points *points *points - points *points,
-                   points *points *points - points *points + points - 1}},
-                 {{0, points - 1, points *points *points - points *points}}}}}},
-             {{{{{{points - 1, points *points - points, points *points - 1}},
-                 {{0, points - 1, points *points - 1}}}},
-               {{{{0, points *points - points, points *points - 1}},
-                 {{0, points - 1, points *points - points}}}}}}}};
+                   points * points * points - points * points,
+                   points * points * points - points}},
+                 {{0,
+                   points * points - points,
+                   points * points * points - points * points}}}}}},
+             {{{{{{points - 1,
+                   points * points * points - points * points,
+                   points * points * points - points * points + points - 1}},
+                 {{0,
+                   points - 1,
+                   points * points * points - points * points + points - 1}}}},
+               {{{{0,
+                   points * points * points - points * points,
+                   points * points * points - points * points + points - 1}},
+                 {{0,
+                   points - 1,
+                   points * points * points - points * points}}}}}},
+             {{{{{{points - 1, points * points - points, points * points - 1}},
+                 {{0, points - 1, points * points - 1}}}},
+               {{{{0, points * points - points, points * points - 1}},
+                 {{0, points - 1, points * points - points}}}}}}}};
+
+        return lines_array[i][j][k][l];
+      }
     };
   };
 
