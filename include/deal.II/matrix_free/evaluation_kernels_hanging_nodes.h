@@ -88,6 +88,18 @@ namespace internal
       VectorizationTypes::index;
 
   private:
+    enum class HelperType
+    {
+      /**
+       * TODO
+       */
+      constant,
+      /**
+       * TODO
+       */
+      dynamic
+    };
+
     static constexpr unsigned int max_n_points_1D = 40;
 
     template <typename T1, VectorizationTypes VT>
@@ -641,13 +653,17 @@ namespace internal
                   const auto faces  = (m >> 3) & 7;
                   const auto edges  = (m >> 6);
 
-                  Helper<fe_degree, transpose> helper(given_degree,
-                                                      type_x,
-                                                      type_y,
-                                                      type_z,
-                                                      vv,
-                                                      interpolation_matrices,
-                                                      values);
+                  Helper<fe_degree == -1 ? HelperType::dynamic :
+                                           HelperType::constant,
+                         fe_degree,
+                         transpose>
+                    helper(given_degree,
+                           type_x,
+                           type_y,
+                           type_z,
+                           vv,
+                           interpolation_matrices,
+                           values);
 
                   if (faces > 0)
                     switch (faces)
@@ -718,7 +734,7 @@ namespace internal
         }
     }
 
-    template <int fe_degree, bool transpose>
+    template <HelperType helper_type, int fe_degree, bool transpose>
     class Helper
     {
     public:
