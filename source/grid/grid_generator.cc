@@ -6463,7 +6463,11 @@ namespace GridGenerator
 
     // reorder the cells to ensure that they satisfy the convention for
     // edge and face directions
-    GridTools::consistently_order_cells(cells);
+    if (std::all_of(cells.begin(), cells.end(), [](const auto &cell) {
+          return cell.vertices.size() ==
+                 ReferenceCells::get_hypercube<dim>().n_vertices();
+        }))
+      GridTools::consistently_order_cells(cells);
     result.clear();
     result.create_triangulation(vertices, cells, subcell_data);
   }
