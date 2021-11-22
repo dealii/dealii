@@ -1569,6 +1569,9 @@ DoFAccessor<structdim, dim, spacedim, level_dof_access>::mg_vertex_dof_index(
       fe_index_;
   (void)fe_index;
   Assert(this->dof_handler != nullptr, ExcInvalidObject());
+  Assert(this->dof_handler->mg_vertex_dofs.size() > 0,
+         ExcMessage("Multigrid DoF indices can only be accessed after "
+                    "DoFHandler::distribute_mg_dofs() has been called!"));
   AssertIndexRange(vertex, this->n_vertices());
   AssertIndexRange(i, this->dof_handler->get_fe(fe_index).n_dofs_per_vertex());
 
@@ -1706,6 +1709,9 @@ DoFAccessor<structdim, dim, spacedim, level_dof_access>::get_mg_dof_indices(
   const unsigned int                    fe_index_) const
 {
   Assert(this->dof_handler != nullptr, ExcInvalidObject());
+  Assert(this->dof_handler->mg_vertex_dofs.size() > 0,
+         ExcMessage("Multigrid DoF indices can only be accessed after "
+                    "DoFHandler::distribute_mg_dofs() has been called!"));
 
   const unsigned int fe_index =
     (this->dof_handler->hp_capability_enabled == false &&
