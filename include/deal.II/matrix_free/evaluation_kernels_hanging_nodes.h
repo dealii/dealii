@@ -764,7 +764,7 @@ namespace internal
       {
         if (do_x)
           interpolate_3D_edge<fe_degree, 0, transpose>(
-            t.line[0][type_y][type_z],
+            t.line(0,type_y,type_z),
             given_degree,
             v,
             interpolation_matrices[!type_x].data(),
@@ -772,7 +772,7 @@ namespace internal
 
         if (do_y)
           interpolate_3D_edge<fe_degree, 1, transpose>(
-            t.line[1][type_x][type_z],
+            t.line(1,type_x,type_z),
             given_degree,
             v,
             interpolation_matrices[!type_y].data(),
@@ -780,7 +780,7 @@ namespace internal
 
         if (do_z)
           interpolate_3D_edge<fe_degree, 2, transpose>(
-            t.line[2][type_x][type_y],
+            t.line(2,type_x,type_y),
             given_degree,
             v,
             interpolation_matrices[!type_z].data(),
@@ -800,7 +800,7 @@ namespace internal
 
         if (!do_x)
           interpolate_3D_face<fe_degree, 0, direction, transpose, false>(
-            t.face[direction][type],
+            t.face(direction,type),
             given_degree,
             v,
             interpolation_matrices[!type_x].data(),
@@ -808,7 +808,7 @@ namespace internal
 
         if (!do_y)
           interpolate_3D_face<fe_degree, 1, direction, transpose, false>(
-            t.face[direction][type],
+            t.face(direction,type),
             given_degree,
             v,
             interpolation_matrices[!type_y].data(),
@@ -816,7 +816,7 @@ namespace internal
 
         if (!do_z)
           interpolate_3D_face<fe_degree, 2, direction, transpose, false>(
-            t.face[direction][type],
+            t.face(direction,type),
             given_degree,
             v,
             interpolation_matrices[!type_z].data(),
@@ -834,7 +834,7 @@ namespace internal
         // direction 0 -> faces
         if (do_y && given_degree > 1)
           interpolate_3D_face<fe_degree, 0, 1, transpose, true>(
-            t.face[1][type_y],
+            t.face(1,type_y),
             given_degree,
             v,
             interpolation_matrices[!type_x].data(),
@@ -842,7 +842,7 @@ namespace internal
 
         if (do_z && given_degree > 1)
           interpolate_3D_face<fe_degree, 0, 2, transpose, true>(
-            t.face[2][type_z],
+            t.face(2,type_z),
             given_degree,
             v,
             interpolation_matrices[!type_x].data(),
@@ -851,9 +851,9 @@ namespace internal
         // direction 0 -> edges
         interpolate_3D_edge<fe_degree, 0, transpose>(
           (do_x && do_y && !do_z) ?
-            (t.lines_plane[0][type_x][type_y][0]) :
-            ((do_x && !do_y && do_z) ? (t.lines_plane[1][type_x][type_z][0]) :
-                                       (t.lines[0][type_y][type_z][0])),
+            (t.lines_plane(0,type_x,type_y,0)) :
+            ((do_x && !do_y && do_z) ? (t.lines_plane(1,type_x,type_z,0)) :
+                                       (t.lines(0,type_y,type_z,0))),
           given_degree,
           v,
           interpolation_matrices[!type_x].data(),
@@ -862,9 +862,9 @@ namespace internal
 
         interpolate_3D_edge<fe_degree, 0, transpose>(
           (do_x && do_y && !do_z) ?
-            (t.lines_plane[0][type_x][type_y][1]) :
-            ((do_x && !do_y && do_z) ? (t.lines_plane[1][type_x][type_z][1]) :
-                                       (t.lines[0][type_y][type_z][1])),
+            (t.lines_plane(0,type_x,type_y,1)) :
+            ((do_x && !do_y && do_z) ? (t.lines_plane(1,type_x,type_z,1)) :
+                                       (t.lines(0,type_y,type_z,1))),
           given_degree,
           v,
           interpolation_matrices[!type_x].data(),
@@ -872,7 +872,7 @@ namespace internal
 
         if (do_y && do_z)
           interpolate_3D_edge<fe_degree, 0, transpose>(
-            t.lines[0][type_y][type_z][2],
+            t.lines(0,type_y,type_z,2),
             given_degree,
             v,
             interpolation_matrices[!type_x].data(),
@@ -881,7 +881,7 @@ namespace internal
         // direction 1 -> faces
         if (do_x && given_degree > 1)
           interpolate_3D_face<fe_degree, 1, 0, transpose, true>(
-            t.face[0][type_x],
+            t.face(0, type_x),
             given_degree,
             v,
             interpolation_matrices[!type_y].data(),
@@ -889,7 +889,7 @@ namespace internal
 
         if (do_z && given_degree > 1)
           interpolate_3D_face<fe_degree, 1, 2, transpose, true>(
-            t.face[2][type_z],
+            t.face(2, type_z),
             given_degree,
             v,
             interpolation_matrices[!type_y].data(),
@@ -898,9 +898,9 @@ namespace internal
         // direction 1 -> lines
         interpolate_3D_edge<fe_degree, 1, transpose>(
           (do_x && do_y && !do_z) ?
-            (t.lines_plane[0][type_x][type_y][2]) :
-            ((!do_x && do_y && do_z) ? (t.lines_plane[2][type_y][type_z][0]) :
-                                       (t.lines[1][type_x][type_z][0])),
+            (t.lines_plane(0,type_x,type_y,2)) :
+            ((!do_x && do_y && do_z) ? (t.lines_plane(2,type_y,type_z,0)) :
+                                       (t.lines(1,type_x,type_z,0))),
           given_degree,
           v,
           interpolation_matrices[!type_y].data(),
@@ -908,9 +908,9 @@ namespace internal
 
         interpolate_3D_edge<fe_degree, 1, transpose>(
           (do_x && do_y && !do_z) ?
-            (t.lines_plane[0][type_x][type_y][3]) :
-            ((!do_x && do_y && do_z) ? (t.lines_plane[2][type_y][type_z][1]) :
-                                       (t.lines[1][type_x][type_z][1])),
+            (t.lines_plane(0,type_x,type_y,3)) :
+            ((!do_x && do_y && do_z) ? (t.lines_plane(2,type_y,type_z,1)) :
+                                       (t.lines(1,type_x,type_z,1))),
           given_degree,
           v,
           interpolation_matrices[!type_y].data(),
@@ -918,7 +918,7 @@ namespace internal
 
         if (do_x && do_z)
           interpolate_3D_edge<fe_degree, 1, transpose>(
-            t.lines[1][type_x][type_z][2],
+            t.lines(1,type_x,type_z,2),
             given_degree,
             v,
             interpolation_matrices[!type_y].data(),
@@ -927,7 +927,7 @@ namespace internal
         // direction 2 -> faces
         if (do_x && given_degree > 1)
           interpolate_3D_face<fe_degree, 2, 0, transpose, true>(
-            t.face[0][type_x],
+            t.face(0,type_x),
             given_degree,
             v,
             interpolation_matrices[!type_z].data(),
@@ -935,7 +935,7 @@ namespace internal
 
         if (do_y && given_degree > 1)
           interpolate_3D_face<fe_degree, 2, 1, transpose, true>(
-            t.face[1][type_y],
+            t.face(1,type_y),
             given_degree,
             v,
             interpolation_matrices[!type_z].data(),
@@ -944,9 +944,9 @@ namespace internal
         // direction 2 -> edges
         interpolate_3D_edge<fe_degree, 2, transpose>(
           (do_x && !do_y && do_z) ?
-            (t.lines_plane[1][type_x][type_z][2]) :
-            ((!do_x && do_y && do_z) ? (t.lines_plane[2][type_y][type_z][2]) :
-                                       (t.lines[2][type_x][type_y][0])),
+            (t.lines_plane(1,type_x,type_z,2)) :
+            ((!do_x && do_y && do_z) ? (t.lines_plane(2,type_y,type_z,2)) :
+                                       (t.lines(2,type_x,type_y,0))),
           given_degree,
           v,
           interpolation_matrices[!type_z].data(),
@@ -954,9 +954,9 @@ namespace internal
 
         interpolate_3D_edge<fe_degree, 2, transpose>(
           (do_x && !do_y && do_z) ?
-            (t.lines_plane[1][type_x][type_z][3]) :
-            ((!do_x && do_y && do_z) ? (t.lines_plane[2][type_y][type_z][3]) :
-                                       (t.lines[2][type_x][type_y][1])),
+            (t.lines_plane(1,type_x,type_z,3)) :
+            ((!do_x && do_y && do_z) ? (t.lines_plane(2,type_y,type_z,3)) :
+                                       (t.lines(2,type_x,type_y,1))),
           given_degree,
           v,
           interpolation_matrices[!type_z].data(),
@@ -964,7 +964,7 @@ namespace internal
 
         if (do_x && do_y)
           interpolate_3D_edge<fe_degree, 2, transpose>(
-            t.lines[2][type_x][type_y][2],
+            t.lines(2,type_x,type_y,2),
             given_degree,
             v,
             interpolation_matrices[!type_z].data(),
@@ -1009,7 +1009,31 @@ namespace internal
 
       const unsigned int points;
 
-      const std::array<std::array<std::array<unsigned int, 2>, 2>, 3> line = {
+      inline unsigned int
+      line(unsigned int i, unsigned int j, unsigned int k) const 
+      {
+          return line_array[i][j][k];
+      }
+
+      inline unsigned int
+      face(unsigned int i, unsigned int j) const 
+      {
+          return face_array[i][j];
+      }
+
+      inline unsigned int
+      lines_plane(unsigned int i, unsigned int j, unsigned int k, unsigned int l) const 
+      {
+          return lines_plane_array[i][j][k][l];
+      }
+
+      inline unsigned int
+      lines(unsigned int i, unsigned int j, unsigned int k, unsigned int l) const 
+      {
+          return lines_array[i][j][k][l];
+      }
+
+      const std::array<std::array<std::array<unsigned int, 2>, 2>, 3> line_array = {
         {{{{{points * points * points - points, points *points - points}},
            {{points * points * points - points * points, 0}}}},
          {{{{points * points * points - points * points + points - 1,
@@ -1017,8 +1041,8 @@ namespace internal
            {{points * points * points - points * points, 0}}}},
          {{{{points * points - 1, points - 1}},
            {{points * points - points, 0}}}}}};
-
-      const std::array<std::array<unsigned int, 2>, 3> face = {
+      
+      const std::array<std::array<unsigned int, 2>, 3> face_array = {
         {{{points - 1, 0}},
          {{points * points - points, 0}},
          {{points * points * points - points * points, 0}}}};
@@ -1026,7 +1050,7 @@ namespace internal
       const std::array<
         std::array<std::array<std::array<unsigned int, 4>, 2>, 2>,
         3>
-        lines_plane = {
+        lines_plane_array = {
           {{{{{{{points * points - points,
                  points *points *points - points,
                  points - 1,
@@ -1066,7 +1090,7 @@ namespace internal
 
       const std::
         array<std::array<std::array<std::array<unsigned int, 3>, 2>, 2>, 3>
-          lines = {
+          lines_array = {
             {{{{{{{points * points - points,
                    points *points *points - points *points,
                    points *points *points - points}},
@@ -1115,8 +1139,32 @@ namespace internal
 
       static constexpr unsigned int points = fe_degree + 1;
 
+      inline unsigned int
+      line(unsigned int i, unsigned int j, unsigned int k) const 
+      {
+          return line_array[i][j][k];
+      }
+
+      inline unsigned int
+      face(unsigned int i, unsigned int j) const 
+      {
+          return face_array[i][j];
+      }
+
+      inline unsigned int
+      lines_plane(unsigned int i, unsigned int j, unsigned int k, unsigned int l) const 
+      {
+          return lines_plane_array[i][j][k][l];
+      }
+
+      inline unsigned int
+      lines(unsigned int i, unsigned int j, unsigned int k, unsigned int l) const 
+      {
+          return lines_array[i][j][k][l];
+      }
+
       static constexpr std::array<std::array<std::array<unsigned int, 2>, 2>, 3>
-        line = {
+        line_array = {
           {{{{{points * points * points - points, points *points - points}},
              {{points * points * points - points * points, 0}}}},
            {{{{points * points * points - points * points + points - 1,
@@ -1125,7 +1173,7 @@ namespace internal
            {{{{points * points - 1, points - 1}},
              {{points * points - points, 0}}}}}};
 
-      static constexpr std::array<std::array<unsigned int, 2>, 3> face = {
+      static constexpr std::array<std::array<unsigned int, 2>, 3> face_array = {
         {{{points - 1, 0}},
          {{points * points - points, 0}},
          {{points * points * points - points * points, 0}}}};
@@ -1133,7 +1181,7 @@ namespace internal
       static constexpr std::array<
         std::array<std::array<std::array<unsigned int, 4>, 2>, 2>,
         3>
-        lines_plane = {
+        lines_plane_array = {
           {{{{{{{points * points - points,
                  points *points *points - points,
                  points - 1,
@@ -1173,7 +1221,7 @@ namespace internal
 
       static constexpr std::
         array<std::array<std::array<std::array<unsigned int, 3>, 2>, 2>, 3>
-          lines = {
+          lines_array = {
             {{{{{{{points * points - points,
                    points *points *points - points *points,
                    points *points *points - points}},
