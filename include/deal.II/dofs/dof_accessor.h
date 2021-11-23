@@ -723,31 +723,6 @@ protected:
                    const unsigned int            i,
                    const types::global_dof_index index) const;
 
-  /**
-   * Set the global index of the <i>i</i> degree on the @p vertex-th vertex of
-   * the present cell to @p index.
-   *
-   * The last argument denotes the finite element index. For the standard
-   * ::DoFHandler class, this value must be equal to its default value since
-   * that class only supports the same finite element on all cells anyway.
-   *
-   * However, when the relevant DoFHandler has hp-capabilities, different
-   * finite element objects may be used on different cells. On faces between
-   * two cells, as well as vertices, there may therefore be two sets of
-   * degrees of freedom, one for each of the finite elements used on the
-   * adjacent cells.  In order to specify which set of degrees of freedom to
-   * work on, the last argument is used to disambiguate. Finally, if this
-   * function is called for a cell object, there can only be a single set of
-   * degrees of freedom, and fe_index has to match the result of
-   * active_fe_index().
-   */
-  void
-  set_vertex_dof_index(const unsigned int            vertex,
-                       const unsigned int            i,
-                       const types::global_dof_index index,
-                       const unsigned int            fe_index =
-                         DoFHandler<dim, spacedim>::invalid_fe_index) const;
-
   void
   set_mg_vertex_dof_index(const int                     level,
                           const unsigned int            vertex,
@@ -1224,31 +1199,6 @@ protected:
    */
   void
   set_dof_index(
-    const unsigned int            i,
-    const types::global_dof_index index,
-    const unsigned int fe_index = AccessorData::invalid_fe_index) const;
-
-  /**
-   * Set the global index of the <i>i</i> degree on the @p vertex-th vertex of
-   * the present cell to @p index.
-   *
-   * The last argument denotes the finite element index. For the standard
-   * ::DoFHandler class, this value must be equal to its default value since
-   * that class only supports the same finite element on all cells anyway.
-   *
-   * However, when the relevant DoFHandler has hp-capabilities, different
-   * finite element objects may be used on different cells. On faces between
-   * two cells, as well as vertices, there may therefore be two sets of
-   * degrees of freedom, one for each of the finite elements used on the
-   * adjacent cells.  In order to specify which set of degrees of freedom to
-   * work on, the last argument is used to disambiguate. Finally, if this
-   * function is called for a cell object, there can only be a single set of
-   * degrees of freedom, and fe_index has to match the result of
-   * active_fe_index().
-   */
-  void
-  set_vertex_dof_index(
-    const unsigned int            vertex,
     const unsigned int            i,
     const types::global_dof_index index,
     const unsigned int fe_index = AccessorData::invalid_fe_index) const;
