@@ -711,10 +711,13 @@ namespace CUDAWrappers
   MatrixFree<dim, Number>::get_data(unsigned int color) const
   {
     Data data_copy;
-    data_copy.q_points        = q_points[color];
+    if (q_points.size() > 0)
+      data_copy.q_points = q_points[color];
+    if (inv_jacobian.size() > 0)
+      data_copy.inv_jacobian = inv_jacobian[color];
+    if (JxW.size() > 0)
+      data_copy.JxW = JxW[color];
     data_copy.local_to_global = local_to_global[color];
-    data_copy.inv_jacobian    = inv_jacobian[color];
-    data_copy.JxW             = JxW[color];
     data_copy.id              = my_id;
     data_copy.n_cells         = n_cells[color];
     data_copy.padding_length  = padding_length;
@@ -898,7 +901,9 @@ namespace CUDAWrappers
     if (typeid(Number) == typeid(double))
       cudaDeviceSetSharedMemConfig(cudaSharedMemBankSizeEightByte);
 
-    const UpdateFlags &update_flags = additional_data.mapping_update_flags;
+    UpdateFlags update_flags = additional_data.mapping_update_flags;
+    if (update_flags & update_gradients)
+      update_flags |= update_JxW_values;
 
     if (additional_data.parallelization_scheme != parallel_over_elem &&
         additional_data.parallelization_scheme != parallel_in_elem)
