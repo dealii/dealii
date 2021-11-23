@@ -293,4 +293,18 @@ namespace hp
 
 DEAL_II_NAMESPACE_CLOSE
 
+namespace std
+{
+  /**
+   * Iterator traits for hp::CollectionIterator.
+   */
+  template <class T>
+  struct iterator_traits<dealii::hp::CollectionIterator<T>>
+  {
+    using iterator_category = random_access_iterator_tag;
+    using value_type        = T;
+    using difference_type   = std::ptrdiff_t;
+  };
+} // namespace std
+
 #endif
