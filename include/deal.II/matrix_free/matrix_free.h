@@ -3087,7 +3087,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::reinit(
   std::vector<const DoFHandler<dim> *> dof_handlers;
 
   for (const auto dh : dof_handler)
-    dof_handlers.push_back(dof_handler);
+    dof_handlers.push_back(dh);
 
   this->reinit(dof_handlers, constraint, quad, additional_data);
 }
@@ -3168,7 +3168,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::reinit(
   std::vector<const DoFHandler<dim> *> dof_handlers;
 
   for (const auto dh : dof_handler)
-    dof_handlers.push_back(dof_handler);
+    dof_handlers.push_back(dh);
 
   this->reinit(mapping, dof_handlers, constraint, quad, additional_data);
 }
@@ -3190,7 +3190,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::reinit(
   std::vector<const DoFHandler<dim> *> dof_handlers;
 
   for (const auto dh : dof_handler)
-    dof_handlers.push_back(dof_handler);
+    dof_handlers.push_back(dh);
 
   this->reinit(dof_handlers, constraint, quad, additional_data);
 }
