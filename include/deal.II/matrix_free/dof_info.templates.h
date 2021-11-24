@@ -277,9 +277,9 @@ namespace internal
     template <int dim>
     bool
     DoFInfo::process_hanging_node_constraints(
-      const HangingNodes<dim> &        hanging_nodes,
-      const std::vector<unsigned int> &lexicographic_mapping,
-      const unsigned int               cell_number,
+      const HangingNodes<dim> &                     hanging_nodes,
+      const std::vector<std::vector<unsigned int>> &lexicographic_mapping,
+      const unsigned int                            cell_number,
       const TriaIterator<DoFCellAccessor<dim, dim, false>> &cell,
       std::vector<types::global_dof_index> &                dof_indices)
     {

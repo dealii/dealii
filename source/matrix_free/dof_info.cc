@@ -1519,21 +1519,21 @@ namespace internal
     template bool
     DoFInfo::process_hanging_node_constraints<1>(
       const HangingNodes<1> &                           hanging_nodes,
-      const std::vector<unsigned int> &                 lexicographic_mapping,
+      const std::vector<std::vector<unsigned int>> &    lexicographic_mapping,
       const unsigned int                                cell_number,
       const TriaIterator<DoFCellAccessor<1, 1, false>> &cell,
       std::vector<types::global_dof_index> &            dof_indices);
     template bool
     DoFInfo::process_hanging_node_constraints<2>(
       const HangingNodes<2> &                           hanging_nodes,
-      const std::vector<unsigned int> &                 lexicographic_mapping,
+      const std::vector<std::vector<unsigned int>> &    lexicographic_mapping,
       const unsigned int                                cell_number,
       const TriaIterator<DoFCellAccessor<2, 2, false>> &cell,
       std::vector<types::global_dof_index> &            dof_indices);
     template bool
     DoFInfo::process_hanging_node_constraints<3>(
       const HangingNodes<3> &                           hanging_nodes,
-      const std::vector<unsigned int> &                 lexicographic_mapping,
+      const std::vector<std::vector<unsigned int>> &    lexicographic_mapping,
       const unsigned int                                cell_number,
       const TriaIterator<DoFCellAccessor<3, 3, false>> &cell,
       std::vector<types::global_dof_index> &            dof_indices);

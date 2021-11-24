@@ -387,7 +387,7 @@ namespace CUDAWrappers
 
       hanging_nodes.setup_constraints(cell,
                                       partitioner,
-                                      lexicographic_inv,
+                                      {lexicographic_inv},
                                       lexicographic_dof_indices,
                                       cell_id_view);
 
