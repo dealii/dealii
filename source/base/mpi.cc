@@ -300,7 +300,6 @@ namespace Utilities
     MPI_Datatype
     create_mpi_data_type_n_bytes(const std::size_t n_bytes)
     {
-#  ifdef DEAL_II_WITH_MPI
       // Simplified version from BigMPI repository, see
       // https://github.com/jeffhammond/BigMPI/blob/5300b18cc8ec1b2431bf269ee494054ee7bd9f72/src/type_contiguous_x.c#L74
       // (code is MIT licensed)
@@ -355,23 +354,17 @@ namespace Utilities
       ierr = MPI_Type_free(&remainder);
       AssertThrowMPI(ierr);
 
-#    ifdef DEBUG
-#      if DEAL_II_MPI_VERSION_GTE(3, 0)
+#  ifdef DEBUG
+#    if DEAL_II_MPI_VERSION_GTE(3, 0)
       MPI_Count size64;
       // this function is only available starting MPI 3.0:
       ierr = MPI_Type_size_x(result, &size64);
       AssertThrowMPI(ierr);
 
       Assert(size64 == static_cast<MPI_Count>(n_bytes), ExcInternalError());
-#      endif
 #    endif
-      return result;
-#  else
-      (void)n_bytes;
-      Assert(false,
-             ExcMessage("This operation is not useful without MPI support."));
-      return MPI_Result(0);
 #  endif
+      return result;
     }
 
 
