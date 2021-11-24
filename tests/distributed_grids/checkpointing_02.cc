@@ -17,7 +17,11 @@
 // Test (de)serialization of Trilinos vectors with checkpointing files >4GB. The
 // test here is of course simplified to run quickly.
 
-// set to true to run a test that generates a 5GB file:
+// Set this to true to run a test that generates an 8GB file. Run with
+// 5 MPI ranks to check correctness with a total file size above 4GB.
+// Run with 2 MPI ranks to test a single process above 2GB. Both cases were
+// broken before this test was made. Warning, you probably need in the
+// order of 32GB of RAM to run this.
 const bool big = false;
 
 #include <deal.II/base/conditional_ostream.h>
@@ -156,7 +160,7 @@ LaplaceProblem<dim>::run(unsigned int n_cycles_global,
 
       setup_system();
 
-      const unsigned int n_vectors = (big) ? 50 : 2;
+      const unsigned int n_vectors = (big) ? 70 : 2;
       {
         deallog << "checkpointing..." << std::endl;
         std::vector<VectorType> vectors(n_vectors);

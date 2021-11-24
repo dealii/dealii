@@ -1451,13 +1451,34 @@ namespace parallel
         size_header +
         static_cast<MPI_Offset>(global_first_cell) * bytes_per_cell;
 
-      ierr = MPI_File_write_at(fh,
-                               my_global_file_position,
-                               DEAL_II_MPI_CONST_CAST(src_data_fixed.data()),
-                               src_data_fixed.size(),
-                               MPI_CHAR,
-                               MPI_STATUS_IGNORE);
-      AssertThrowMPI(ierr);
+      if (src_data_fixed.size() <=
+          static_cast<std::size_t>(std::numeric_limits<int>::max()))
+        {
+          ierr =
+            MPI_File_write_at(fh,
+                              my_global_file_position,
+                              DEAL_II_MPI_CONST_CAST(src_data_fixed.data()),
+                              src_data_fixed.size(),
+                              MPI_BYTE,
+                              MPI_STATUS_IGNORE);
+          AssertThrowMPI(ierr);
+        }
+      else
+        {
+          // Writes bigger than 2GB require some extra care:
+          MPI_Datatype bigtype =
+            Utilities::MPI::create_mpi_data_type_n_bytes(src_data_fixed.size());
+          ierr =
+            MPI_File_write_at(fh,
+                              my_global_file_position,
+                              DEAL_II_MPI_CONST_CAST(src_data_fixed.data()),
+                              1,
+                              bigtype,
+                              MPI_STATUS_IGNORE);
+          AssertThrowMPI(ierr);
+          ierr = MPI_Type_free(&bigtype);
+          AssertThrowMPI(ierr);
+        }
 
       ierr = MPI_File_close(&fh);
       AssertThrowMPI(ierr);
@@ -1497,6 +1518,13 @@ namespace parallel
           const MPI_Offset my_global_file_position =
             static_cast<MPI_Offset>(global_first_cell) * sizeof(unsigned int);
 
+          // It is very unlikely that a single process has more than 2 billion
+          // cells, but we might as well check.
+          AssertThrow(src_sizes_variable.size() <
+                        static_cast<std::size_t>(
+                          std::numeric_limits<int>::max()),
+                      ExcNotImplemented());
+
           ierr =
             MPI_File_write_at(fh,
                               my_global_file_position,
@@ -1525,14 +1553,35 @@ namespace parallel
           prefix_sum;
 
         // Write data consecutively into file.
-        ierr =
-          MPI_File_write_at(fh,
-                            my_global_file_position,
-                            DEAL_II_MPI_CONST_CAST(src_data_variable.data()),
-                            src_data_variable.size(),
-                            MPI_CHAR,
-                            MPI_STATUS_IGNORE);
-        AssertThrowMPI(ierr);
+        if (src_data_variable.size() <=
+            static_cast<std::size_t>(std::numeric_limits<int>::max()))
+          {
+            ierr = MPI_File_write_at(fh,
+                                     my_global_file_position,
+                                     DEAL_II_MPI_CONST_CAST(
+                                       src_data_variable.data()),
+                                     src_data_variable.size(),
+                                     MPI_BYTE,
+                                     MPI_STATUS_IGNORE);
+            AssertThrowMPI(ierr);
+          }
+        else
+          {
+            // Writes bigger than 2GB require some extra care:
+            MPI_Datatype bigtype = Utilities::MPI::create_mpi_data_type_n_bytes(
+              src_data_variable.size());
+            ierr = MPI_File_write_at(fh,
+                                     my_global_file_position,
+                                     DEAL_II_MPI_CONST_CAST(
+                                       src_data_variable.data()),
+                                     1,
+                                     bigtype,
+                                     MPI_STATUS_IGNORE);
+            AssertThrowMPI(ierr);
+            ierr = MPI_Type_free(&bigtype);
+            AssertThrowMPI(ierr);
+          }
+
 
         ierr = MPI_File_close(&fh);
         AssertThrowMPI(ierr);
@@ -1618,13 +1667,32 @@ namespace parallel
         size_header +
         static_cast<MPI_Offset>(global_first_cell) * bytes_per_cell;
 
-      ierr = MPI_File_read_at(fh,
-                              my_global_file_position,
-                              dest_data_fixed.data(),
-                              dest_data_fixed.size(), // local buffer
-                              MPI_CHAR,
-                              MPI_STATUS_IGNORE);
-      AssertThrowMPI(ierr);
+      if (dest_data_fixed.size() <=
+          static_cast<std::size_t>(std::numeric_limits<int>::max()))
+        {
+          ierr = MPI_File_read_at(fh,
+                                  my_global_file_position,
+                                  dest_data_fixed.data(),
+                                  dest_data_fixed.size(),
+                                  MPI_BYTE,
+                                  MPI_STATUS_IGNORE);
+          AssertThrowMPI(ierr);
+        }
+      else
+        {
+          // Reads bigger than 2GB require some extra care:
+          MPI_Datatype bigtype = Utilities::MPI::create_mpi_data_type_n_bytes(
+            dest_data_fixed.size());
+          ierr = MPI_File_read_at(fh,
+                                  my_global_file_position,
+                                  dest_data_fixed.data(),
+                                  1,
+                                  bigtype,
+                                  MPI_STATUS_IGNORE);
+          AssertThrowMPI(ierr);
+          ierr = MPI_Type_free(&bigtype);
+          AssertThrowMPI(ierr);
+        }
 
       ierr = MPI_File_close(&fh);
       AssertThrowMPI(ierr);
@@ -1673,7 +1741,7 @@ namespace parallel
         const std::uint64_t size_on_proc =
           std::accumulate(dest_sizes_variable.begin(),
                           dest_sizes_variable.end(),
-                          0);
+                          0ULL);
 
         std::uint64_t prefix_sum = 0;
         ierr = MPI_Exscan(DEAL_II_MPI_CONST_CAST(&size_on_proc),
@@ -1689,13 +1757,34 @@ namespace parallel
           prefix_sum;
 
         dest_data_variable.resize(size_on_proc);
-        ierr = MPI_File_read_at(fh,
-                                my_global_file_position,
-                                dest_data_variable.data(),
-                                dest_data_variable.size(),
-                                MPI_CHAR,
-                                MPI_STATUS_IGNORE);
-        AssertThrowMPI(ierr);
+
+        if (dest_data_variable.size() <=
+            static_cast<std::size_t>(std::numeric_limits<int>::max()))
+          {
+            ierr = MPI_File_read_at(fh,
+                                    my_global_file_position,
+                                    dest_data_variable.data(),
+                                    dest_data_variable.size(),
+                                    MPI_BYTE,
+                                    MPI_STATUS_IGNORE);
+            AssertThrowMPI(ierr);
+          }
+        else
+          {
+            // Reads bigger than 2GB require some extra care:
+            MPI_Datatype bigtype = Utilities::MPI::create_mpi_data_type_n_bytes(
+              src_data_fixed.size());
+            ierr = MPI_File_read_at(fh,
+                                    my_global_file_position,
+                                    dest_data_variable.data(),
+                                    1,
+                                    bigtype,
+                                    MPI_STATUS_IGNORE);
+            AssertThrowMPI(ierr);
+            ierr = MPI_Type_free(&bigtype);
+            AssertThrowMPI(ierr);
+          }
+
 
         ierr = MPI_File_close(&fh);
         AssertThrowMPI(ierr);
