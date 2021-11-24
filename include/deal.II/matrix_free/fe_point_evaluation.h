@@ -358,12 +358,23 @@ namespace internal
                            const unsigned int base_element_number);
 
     template <int dim, int spacedim>
+    bool
+    is_fast_path_supported(const Mapping<dim, spacedim> &mapping);
+
+    template <int dim, int spacedim>
     std::vector<Polynomials::Polynomial<double>>
     get_polynomial_space(const FiniteElement<dim, spacedim> &fe);
   } // namespace FEPointEvaluation
 } // namespace internal
 
-
+template <int dim, int spacedim>
+void
+compute_mapping_data(
+  const Mapping<dim> &                                        mapping,
+  const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+  const ArrayView<const Point<dim>> &                         unit_points,
+  dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
+    &mapping_data);
 
 /**
  * This class provides an interface to the evaluation of interpolated solution
@@ -616,18 +627,6 @@ private:
   SmartPointer<const Mapping<dim, spacedim>> mapping;
 
   /**
-   * Pointer to the function of the mapping that computes the necessary
-   * mapping quantities like quadrature points and Jacobians.
-   */
-  std::function<void(
-    const typename Triangulation<dim, spacedim>::cell_iterator & /*cell*/,
-    const ArrayView<const Point<dim>> & /*unit_points*/,
-    const UpdateFlags /*update_flags*/,
-    dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
-      & /*output_data*/)>
-    fill_mapping_data_for_generic_points;
-
-  /**
    * Pointer to the FiniteElement object passed to the constructor.
    */
   SmartPointer<const FiniteElement<dim>> fe;
@@ -747,41 +746,6 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::FEPointEvaluation(
   AssertIndexRange(first_selected_component + n_components,
                    fe.n_components() + 1);
 
-  if (const MappingQ<dim, spacedim> *mapping_q =
-        dynamic_cast<const MappingQ<dim, spacedim> *>(&mapping))
-    {
-      fill_mapping_data_for_generic_points =
-        [mapping_q](
-          const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-          const ArrayView<const Point<dim>> &unit_points,
-          const UpdateFlags                  update_flags,
-          dealii::internal::FEValuesImplementation::MappingRelatedData<dim,
-                                                                       spacedim>
-            &output_data) -> void {
-        mapping_q->fill_mapping_data_for_generic_points(cell,
-                                                        unit_points,
-                                                        update_flags,
-                                                        output_data);
-      };
-    }
-  else if (const MappingCartesian<dim, spacedim> *mapping_cartesian =
-             dynamic_cast<const MappingCartesian<dim, spacedim> *>(&mapping))
-    {
-      fill_mapping_data_for_generic_points =
-        [mapping_cartesian](
-          const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-          const ArrayView<const Point<dim>> &unit_points,
-          const UpdateFlags                  update_flags,
-          dealii::internal::FEValuesImplementation::MappingRelatedData<dim,
-                                                                       spacedim>
-            &output_data) -> void {
-        mapping_cartesian->fill_mapping_data_for_generic_points(cell,
-                                                                unit_points,
-                                                                update_flags,
-                                                                output_data);
-      };
-    }
-
   bool         same_base_element   = true;
   unsigned int base_element_number = 0;
   component_in_base_element        = 0;
@@ -799,7 +763,7 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::FEPointEvaluation(
     else
       component += fe.element_multiplicity(base_element_number);
 
-  if (fill_mapping_data_for_generic_points &&
+  if (internal::FEPointEvaluation::is_fast_path_supported(mapping) &&
       internal::FEPointEvaluation::is_fast_path_supported(
         fe, base_element_number) &&
       same_base_element)
@@ -847,6 +811,43 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::FEPointEvaluation(
 }
 
 
+template <int dim, int spacedim>
+void
+compute_mapping_data_for_generic_points(
+  const Mapping<dim> &                                        mapping,
+  const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+  const ArrayView<const Point<dim>> &                         unit_points,
+  const UpdateFlags                                           update_flags,
+  dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
+    &mapping_data)
+{
+  UpdateFlags update_flags_mapping = update_default;
+  // translate update flags
+  if (update_flags & update_jacobians)
+    update_flags_mapping |= update_jacobians;
+  if (update_flags & update_gradients ||
+      update_flags & update_inverse_jacobians)
+    update_flags_mapping |= update_inverse_jacobians;
+  if (update_flags & update_quadrature_points)
+    update_flags_mapping |= update_quadrature_points;
+
+  if (const MappingQ<dim, spacedim> *mapping_q =
+        dynamic_cast<const MappingQ<dim, spacedim> *>(&mapping))
+    {
+      mapping_q->fill_mapping_data_for_generic_points(cell,
+                                                      unit_points,
+                                                      update_flags_mapping,
+                                                      mapping_data);
+    }
+  else if (const MappingCartesian<dim, spacedim> *mapping_cartesian =
+             dynamic_cast<const MappingCartesian<dim, spacedim> *>(&mapping))
+    {
+      mapping_cartesian->fill_mapping_data_for_generic_points(
+        cell, unit_points, update_flags_mapping, mapping_data);
+    }
+}
+
+
 
 template <int n_components, int dim, int spacedim, typename Number>
 void
@@ -856,10 +857,8 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::reinit(
 {
   // If using the fast path, we need to precompute the mapping data.
   if (!poly.empty())
-    fill_mapping_data_for_generic_points(cell,
-                                         unit_points,
-                                         update_flags_mapping,
-                                         mapping_data);
+    compute_mapping_data_for_generic_points(
+      *mapping, cell, unit_points, update_flags_mapping, mapping_data);
 
   // then call the other version of this function with the precomputed data
   reinit(cell, unit_points, mapping_data);

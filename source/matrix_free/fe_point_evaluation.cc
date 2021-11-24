@@ -78,6 +78,27 @@ namespace internal
     }
 
 
+
+    template <int dim, int spacedim>
+    bool
+    is_fast_path_supported(const Mapping<dim, spacedim> &mapping)
+    {
+      if (const MappingQ<dim, spacedim> *mapping_q =
+            dynamic_cast<const MappingQ<dim, spacedim> *>(&mapping))
+        {
+          return true;
+        }
+      else if (const MappingCartesian<dim, spacedim> *mapping_cartesian =
+                 dynamic_cast<const MappingCartesian<dim, spacedim> *>(
+                   &mapping))
+        {
+          return true;
+        }
+      return false;
+    }
+
+
+
     template <int dim, int spacedim>
     std::vector<Polynomials::Polynomial<double>>
     get_polynomial_space(const FiniteElement<dim, spacedim> &fe)
