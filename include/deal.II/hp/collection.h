@@ -48,6 +48,17 @@ namespace hp
     {}
 
     /**
+     * Copy constructor.
+     */
+    CollectionIterator(const CollectionIterator<T> &other) = default;
+
+    /**
+     * Copy assignment.
+     */
+    CollectionIterator<T> &
+    operator=(const CollectionIterator<T> &other) = default;
+
+    /**
      * Compare for equality.
      */
     bool
@@ -72,12 +83,6 @@ namespace hp
           "You are trying to compare iterators into different hp::Collection objects."));
       return this->index != other.index;
     }
-
-    /**
-     * Copy assignment.
-     */
-    CollectionIterator<T> &
-    operator=(const CollectionIterator<T> &other) = default;
 
     /**
      * Dereferencing operator: returns the value of the current index.
