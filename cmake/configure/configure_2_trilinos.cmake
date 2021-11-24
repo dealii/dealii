@@ -178,6 +178,20 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
 
     IF(DEAL_II_TRILINOS_WITH_KOKKOS)
       CHECK_SYMBOL_EXISTS(
+        "KOKKOS_ENABLE_CUDA"
+        "Kokkos_Macros.hpp"
+        DEAL_II_KOKKOS_CUDA_EXISTS
+        )
+      IF(DEAL_II_KOKKOS_CUDA_EXISTS)
+        # We need to disable SIMD vectorization for CUDA device code.
+        # Otherwise, nvcc compilers from version 9 on will emit an error message like:
+        # "[...] contains a vector, which is not supported in device code". We
+        # would like to set the variable in check_01_cpu_feature but at that point
+        # we don't know if CUDA support is enabled in Kokkos
+        SET(DEAL_II_VECTORIZATION_WIDTH_IN_BITS 0)
+      ENDIF()
+
+      CHECK_SYMBOL_EXISTS(
         "KOKKOS_ENABLE_CUDA_LAMBDA"
         "Kokkos_Macros.hpp"
         DEAL_II_KOKKOS_LAMBDA_EXISTS
