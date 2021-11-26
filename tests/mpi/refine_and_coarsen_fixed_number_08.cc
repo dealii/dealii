@@ -21,6 +21,7 @@
 #include <deal.II/distributed/grid_refinement.h>
 #include <deal.II/distributed/tria.h>
 
+#include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_generator.h>
 
 #include <deal.II/lac/vector.h>
@@ -39,20 +40,20 @@ verify(parallel::distributed::Triangulation<dim> &tr,
     tr, criteria, refinement_fraction, coarsening_fraction);
 
   unsigned int n_refine_flags = 0, n_coarsen_flags = 0;
-  for (const auto &cell : tr.active_cell_iterators())
-    if (cell->is_locally_owned())
-      {
-        if (cell->refine_flag_set())
-          {
-            ++n_refine_flags;
-            cell->clear_refine_flag();
-          }
-        if (cell->coarsen_flag_set())
-          {
-            ++n_coarsen_flags;
-            cell->clear_coarsen_flag();
-          }
-      }
+  for (const auto &cell :
+       tr.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
+    {
+      if (cell->refine_flag_set())
+        {
+          ++n_refine_flags;
+          cell->clear_refine_flag();
+        }
+      if (cell->coarsen_flag_set())
+        {
+          ++n_coarsen_flags;
+          cell->clear_coarsen_flag();
+        }
+    }
 
   const unsigned int n_global_refine_flags =
                        Utilities::MPI::sum(n_refine_flags, MPI_COMM_WORLD),

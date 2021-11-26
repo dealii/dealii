@@ -22,6 +22,7 @@
 
 #include <deal.II/distributed/tria.h>
 
+#include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools_cache.h>
 
@@ -59,9 +60,9 @@ test(const unsigned int n_refinements)
 
   std::vector<BoundingBox<2>> all_boxes(tria.n_locally_owned_active_cells());
   unsigned int                i = 0;
-  for (const auto &cell : tria.active_cell_iterators())
-    if (cell->is_locally_owned())
-      all_boxes[i++] = cell->bounding_box();
+  for (const auto &cell :
+       tria.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
+    all_boxes[i++] = cell->bounding_box();
 
   const auto tree  = pack_rtree(all_boxes);
   const auto boxes = extract_rtree_level(tree, 0);

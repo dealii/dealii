@@ -52,10 +52,10 @@ partition_distributed_triangulation(const Triangulation<dim, spacedim> &tria_in,
   LinearAlgebra::distributed::Vector<double> partition(
     tria->global_active_cell_index_partitioner().lock());
 
-  for (const auto &cell : tria_in.active_cell_iterators())
-    if (cell->is_locally_owned())
-      partition[cell->global_active_cell_index()] =
-        std::floor(cell->center()[0] * n_partitions);
+  for (const auto &cell :
+       tria_in.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
+    partition[cell->global_active_cell_index()] =
+      std::floor(cell->center()[0] * n_partitions);
 
   partition.update_ghost_values();
 

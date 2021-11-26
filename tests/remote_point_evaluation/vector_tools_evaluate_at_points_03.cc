@@ -91,9 +91,9 @@ print(const Mapping<dim> &                              mapping,
   const auto &tria = dof_handler.get_triangulation();
 
   Vector<double> ranks(tria.n_active_cells());
-  for (const auto &cell : tria.active_cell_iterators())
-    if (cell->is_locally_owned())
-      ranks(cell->active_cell_index()) = cell->subdomain_id();
+  for (const auto &cell :
+       tria.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
+    ranks(cell->active_cell_index()) = cell->subdomain_id();
   data_out.add_data_vector(ranks, "rank");
   data_out.add_data_vector(result, "result");
 

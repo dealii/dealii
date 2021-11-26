@@ -22,6 +22,7 @@
 #include <deal.II/distributed/grid_refinement.h>
 #include <deal.II/distributed/tria.h>
 
+#include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_generator.h>
 
 #include <deal.II/lac/vector.h>
@@ -82,12 +83,12 @@ test()
   deallog << std::endl;
 
   // reset refinement flags
-  for (const auto &cell : tria.active_cell_iterators())
-    if (cell->is_locally_owned())
-      {
-        cell->clear_refine_flag();
-        cell->clear_coarsen_flag();
-      }
+  for (const auto &cell :
+       tria.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
+    {
+      cell->clear_refine_flag();
+      cell->clear_coarsen_flag();
+    }
 
   deallog << "l2-norm: ";
   parallel::distributed::GridRefinement::refine_and_coarsen_fixed_fraction(

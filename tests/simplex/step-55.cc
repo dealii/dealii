@@ -598,58 +598,55 @@ namespace Step55
     const FEValuesExtractors::Vector     velocities(0);
     const FEValuesExtractors::Scalar     pressure(dim);
 
-    for (const auto &cell : dof_handler.active_cell_iterators())
-      if (cell->is_locally_owned())
-        {
-          cell_matrix  = 0;
-          cell_matrix2 = 0;
-          cell_rhs     = 0;
+    for (const auto &cell : dof_handler.active_cell_iterators() |
+                              IteratorFilters::LocallyOwnedCell())
+      {
+        cell_matrix  = 0;
+        cell_matrix2 = 0;
+        cell_rhs     = 0;
 
-          fe_values.reinit(cell);
-          right_hand_side.vector_value_list(fe_values.get_quadrature_points(),
-                                            rhs_values);
-          for (unsigned int q = 0; q < n_q_points; ++q)
-            {
-              for (unsigned int k = 0; k < dofs_per_cell; ++k)
-                {
-                  grad_phi_u[k] = fe_values[velocities].gradient(k, q);
-                  div_phi_u[k]  = fe_values[velocities].divergence(k, q);
-                  phi_p[k]      = fe_values[pressure].value(k, q);
-                }
+        fe_values.reinit(cell);
+        right_hand_side.vector_value_list(fe_values.get_quadrature_points(),
+                                          rhs_values);
+        for (unsigned int q = 0; q < n_q_points; ++q)
+          {
+            for (unsigned int k = 0; k < dofs_per_cell; ++k)
+              {
+                grad_phi_u[k] = fe_values[velocities].gradient(k, q);
+                div_phi_u[k]  = fe_values[velocities].divergence(k, q);
+                phi_p[k]      = fe_values[pressure].value(k, q);
+              }
 
-              for (unsigned int i = 0; i < dofs_per_cell; ++i)
-                {
-                  for (unsigned int j = 0; j < dofs_per_cell; ++j)
-                    {
-                      cell_matrix(i, j) +=
-                        (viscosity *
-                           scalar_product(grad_phi_u[i], grad_phi_u[j]) -
-                         div_phi_u[i] * phi_p[j] - phi_p[i] * div_phi_u[j]) *
-                        fe_values.JxW(q);
+            for (unsigned int i = 0; i < dofs_per_cell; ++i)
+              {
+                for (unsigned int j = 0; j < dofs_per_cell; ++j)
+                  {
+                    cell_matrix(i, j) +=
+                      (viscosity *
+                         scalar_product(grad_phi_u[i], grad_phi_u[j]) -
+                       div_phi_u[i] * phi_p[j] - phi_p[i] * div_phi_u[j]) *
+                      fe_values.JxW(q);
 
-                      cell_matrix2(i, j) += 1.0 / viscosity * phi_p[i] *
-                                            phi_p[j] * fe_values.JxW(q);
-                    }
+                    cell_matrix2(i, j) +=
+                      1.0 / viscosity * phi_p[i] * phi_p[j] * fe_values.JxW(q);
+                  }
 
-                  const unsigned int component_i =
-                    fe.system_to_component_index(i).first;
-                  cell_rhs(i) += fe_values.shape_value(i, q) *
-                                 rhs_values[q](component_i) * fe_values.JxW(q);
-                }
-            }
+                const unsigned int component_i =
+                  fe.system_to_component_index(i).first;
+                cell_rhs(i) += fe_values.shape_value(i, q) *
+                               rhs_values[q](component_i) * fe_values.JxW(q);
+              }
+          }
 
 
-          cell->get_dof_indices(local_dof_indices);
-          constraints.distribute_local_to_global(cell_matrix,
-                                                 cell_rhs,
-                                                 local_dof_indices,
-                                                 system_matrix,
-                                                 system_rhs);
+        cell->get_dof_indices(local_dof_indices);
+        constraints.distribute_local_to_global(
+          cell_matrix, cell_rhs, local_dof_indices, system_matrix, system_rhs);
 
-          constraints.distribute_local_to_global(cell_matrix2,
-                                                 local_dof_indices,
-                                                 preconditioner_matrix);
-        }
+        constraints.distribute_local_to_global(cell_matrix2,
+                                               local_dof_indices,
+                                               preconditioner_matrix);
+      }
 
     system_matrix.compress(VectorOperation::add);
     preconditioner_matrix.compress(VectorOperation::add);

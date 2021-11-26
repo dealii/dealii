@@ -25,6 +25,7 @@
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/grid/cell_id.h>
+#include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_tools.h>
@@ -57,24 +58,24 @@ test()
     vertices_with_ghost_neighbors =
       GridTools::compute_vertices_with_ghost_neighbors(tria);
 
-  for (const auto &cell : tria.active_cell_iterators())
-    if (cell->is_locally_owned())
-      {
-        for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
-          {
-            const std::map<unsigned int,
-                           std::set<dealii::types::subdomain_id>>::
-              const_iterator neighbor_subdomains_of_vertex =
-                vertices_with_ghost_neighbors.find(cell->vertex_index(v));
+  for (const auto &cell :
+       tria.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
+    {
+      for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
+        {
+          const std::map<unsigned int,
+                         std::set<dealii::types::subdomain_id>>::const_iterator
+            neighbor_subdomains_of_vertex =
+              vertices_with_ghost_neighbors.find(cell->vertex_index(v));
 
-            if (neighbor_subdomains_of_vertex !=
-                vertices_with_ghost_neighbors.end())
-              {
-                map[cell->id()] = ++counter;
-                break;
-              }
-          }
-      }
+          if (neighbor_subdomains_of_vertex !=
+              vertices_with_ghost_neighbors.end())
+            {
+              map[cell->id()] = ++counter;
+              break;
+            }
+        }
+    }
 
   GridTools::
     exchange_cell_data_to_ghosts<DT, parallel::distributed::Triangulation<dim>>(

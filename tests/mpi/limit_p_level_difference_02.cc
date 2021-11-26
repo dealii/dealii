@@ -30,6 +30,7 @@
 
 #include <deal.II/fe/fe_q.h>
 
+#include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_generator.h>
 
 #include <deal.II/hp/fe_collection.h>
@@ -108,17 +109,17 @@ test(const unsigned int fes_size, const unsigned int max_difference)
 
 #ifdef DEBUG
   // check each cell's active FE index by its distance from the center
-  for (const auto &cell : dofh.active_cell_iterators())
-    if (cell->is_locally_owned())
-      {
-        const double       distance = cell->center().distance(Point<dim>());
-        const unsigned int expected_level =
-          (sequence.size() - 1) -
-          max_difference * static_cast<unsigned int>(std::round(distance));
+  for (const auto &cell :
+       dofh.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
+    {
+      const double       distance = cell->center().distance(Point<dim>());
+      const unsigned int expected_level =
+        (sequence.size() - 1) -
+        max_difference * static_cast<unsigned int>(std::round(distance));
 
-        Assert(cell->active_fe_index() == sequence[expected_level],
-               ExcInternalError());
-      }
+      Assert(cell->active_fe_index() == sequence[expected_level],
+             ExcInternalError());
+    }
 #endif
 
   deallog << "OK" << std::endl;

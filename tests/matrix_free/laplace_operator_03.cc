@@ -29,6 +29,7 @@
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
 
+#include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/manifold_lib.h>
 
@@ -71,10 +72,10 @@ test()
   for (unsigned int i = 0; i < 10 - 3 * dim; ++i)
     {
       unsigned int counter = 0;
-      for (const auto &cell : tria.active_cell_iterators())
-        if (cell->is_locally_owned())
-          if (counter++ % (7 - i) == 0)
-            cell->set_refine_flag();
+      for (const auto &cell :
+           tria.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
+        if (counter++ % (7 - i) == 0)
+          cell->set_refine_flag();
       tria.execute_coarsening_and_refinement();
     }
 

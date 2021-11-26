@@ -975,40 +975,39 @@ namespace Step18
     std::vector<std::vector<Tensor<1, dim>>> displacement_increment_grads(
       quadrature_formula.size(), std::vector<Tensor<1, dim>>(dim));
 
-    for (auto &cell : dof_handler.active_cell_iterators())
-      if (cell->is_locally_owned())
-        {
-          PointHistory<dim> *local_quadrature_points_history =
-            reinterpret_cast<PointHistory<dim> *>(cell->user_pointer());
-          Assert(local_quadrature_points_history >=
-                   &quadrature_point_history.front(),
-                 ExcInternalError());
-          Assert(local_quadrature_points_history <=
-                   &quadrature_point_history.back(),
-                 ExcInternalError());
+    for (auto &cell : dof_handler.active_cell_iterators() |
+                        IteratorFilters::LocallyOwnedCell())
+      {
+        PointHistory<dim> *local_quadrature_points_history =
+          reinterpret_cast<PointHistory<dim> *>(cell->user_pointer());
+        Assert(local_quadrature_points_history >=
+                 &quadrature_point_history.front(),
+               ExcInternalError());
+        Assert(local_quadrature_points_history <=
+                 &quadrature_point_history.back(),
+               ExcInternalError());
 
-          fe_values.reinit(cell);
-          fe_values.get_function_gradients(incremental_displacement,
-                                           displacement_increment_grads);
+        fe_values.reinit(cell);
+        fe_values.get_function_gradients(incremental_displacement,
+                                         displacement_increment_grads);
 
-          for (unsigned int q = 0; q < quadrature_formula.size(); ++q)
-            {
-              const SymmetricTensor<2, dim> new_stress =
-                (local_quadrature_points_history[q].old_stress +
-                 (stress_strain_tensor *
-                  get_strain(displacement_increment_grads[q])));
+        for (unsigned int q = 0; q < quadrature_formula.size(); ++q)
+          {
+            const SymmetricTensor<2, dim> new_stress =
+              (local_quadrature_points_history[q].old_stress +
+               (stress_strain_tensor *
+                get_strain(displacement_increment_grads[q])));
 
-              const Tensor<2, dim> rotation =
-                get_rotation_matrix(displacement_increment_grads[q]);
+            const Tensor<2, dim> rotation =
+              get_rotation_matrix(displacement_increment_grads[q]);
 
-              const SymmetricTensor<2, dim> rotated_new_stress =
-                symmetrize(transpose(rotation) *
-                           static_cast<Tensor<2, dim>>(new_stress) * rotation);
+            const SymmetricTensor<2, dim> rotated_new_stress =
+              symmetrize(transpose(rotation) *
+                         static_cast<Tensor<2, dim>>(new_stress) * rotation);
 
-              local_quadrature_points_history[q].old_stress =
-                rotated_new_stress;
-            }
-        }
+            local_quadrature_points_history[q].old_stress = rotated_new_stress;
+          }
+      }
   }
 } // namespace Step18
 

@@ -25,6 +25,8 @@
 
 #include <deal.II/fe/fe_q.h>
 
+#include <deal.II/grid/filtered_iterator.h>
+
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/refinement.h>
 
@@ -102,10 +104,10 @@ test(const unsigned int max_difference, const bool allow_artificial_cells)
   tria.execute_coarsening_and_refinement();
 
   deallog << "active FE indices after adaptation:" << std::endl;
-  for (const auto &cell : dofh.active_cell_iterators())
-    if (cell->is_locally_owned())
-      deallog << " " << cell->id().to_string() << " " << cell->active_fe_index()
-              << std::endl;
+  for (const auto &cell :
+       dofh.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
+    deallog << " " << cell->id().to_string() << " " << cell->active_fe_index()
+            << std::endl;
 
   deallog << "OK" << std::endl;
 }

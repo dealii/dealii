@@ -25,6 +25,8 @@
 
 #include <deal.II/fe/fe_q.h>
 
+#include <deal.II/grid/filtered_iterator.h>
+
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/refinement.h>
 
@@ -101,14 +103,14 @@ test()
 
   // verify
   unsigned int h_flagged_cells = 0, p_flagged_cells = 0;
-  for (const auto &cell : dh.active_cell_iterators())
-    if (cell->is_locally_owned())
-      {
-        if (cell->coarsen_flag_set())
-          ++h_flagged_cells;
-        if (cell->future_fe_index_set())
-          ++p_flagged_cells;
-      }
+  for (const auto &cell :
+       dh.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
+    {
+      if (cell->coarsen_flag_set())
+        ++h_flagged_cells;
+      if (cell->future_fe_index_set())
+        ++p_flagged_cells;
+    }
   const unsigned int global_h_flagged_cells =
                        Utilities::MPI::sum(h_flagged_cells, MPI_COMM_WORLD),
                      global_p_flagged_cells =

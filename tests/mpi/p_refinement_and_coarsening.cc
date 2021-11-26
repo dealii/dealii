@@ -25,6 +25,7 @@
 
 #include <deal.II/fe/fe_q.h>
 
+#include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_generator.h>
 
 #include <deal.II/hp/fe_collection.h>
@@ -65,14 +66,14 @@ test()
   tria.execute_coarsening_and_refinement();
 
   // check if all flags were cleared and verify fe_indices
-  for (const auto &cell : dh.active_cell_iterators())
-    if (cell->is_locally_owned())
-      {
-        Assert(cell->future_fe_index_set() == false, ExcInternalError());
+  for (const auto &cell :
+       dh.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
+    {
+      Assert(cell->future_fe_index_set() == false, ExcInternalError());
 
-        deallog << "cell:" << cell->id().to_string()
-                << ", fe_index:" << cell->active_fe_index() << std::endl;
-      }
+      deallog << "cell:" << cell->id().to_string()
+              << ", fe_index:" << cell->active_fe_index() << std::endl;
+    }
 }
 
 

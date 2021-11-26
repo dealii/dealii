@@ -89,11 +89,11 @@ partition_distributed_triangulation(const Triangulation<dim, spacedim> &tria_in,
 
   const unsigned int n_partitions = Utilities::MPI::n_mpi_processes(comm);
 
-  for (const auto &cell : tria_in.active_cell_iterators())
-    if (cell->is_locally_owned())
-      partition[cell->global_active_cell_index()] =
-        cell->global_active_cell_index() * n_partitions /
-        tria_in.n_global_active_cells();
+  for (const auto &cell :
+       tria_in.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
+    partition[cell->global_active_cell_index()] =
+      cell->global_active_cell_index() * n_partitions /
+      tria_in.n_global_active_cells();
 
   partition.update_ghost_values();
 

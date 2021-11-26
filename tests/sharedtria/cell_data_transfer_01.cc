@@ -21,6 +21,7 @@
 
 #include <deal.II/distributed/shared_tria.h>
 
+#include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_generator.h>
 
 #include <deal.II/lac/petsc_vector.h>
@@ -77,10 +78,10 @@ test()
     tria.n_active_cells(),
     tria.n_locally_owned_active_cells());
 
-  for (const auto &cell : tria.active_cell_iterators())
-    if (cell->is_locally_owned())
-      distributed_cell_ids_pre(cell->active_cell_index()) =
-        cell_ids_pre(cell->active_cell_index());
+  for (const auto &cell :
+       tria.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
+    distributed_cell_ids_pre(cell->active_cell_index()) =
+      cell_ids_pre(cell->active_cell_index());
   distributed_cell_ids_pre.compress(VectorOperation::insert);
 
   cell_ids_pre = distributed_cell_ids_pre;
