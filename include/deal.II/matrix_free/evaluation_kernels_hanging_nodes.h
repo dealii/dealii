@@ -65,60 +65,22 @@ namespace internal
     }
 
   private:
-    template <int fe_degree, unsigned int side, bool transpose>
-    static void
-    interpolate_2D(const unsigned int given_degree,
-                   const unsigned int v,
-                   const Number *     weight,
-                   Number *           values)
-    {
-      typename Number::value_type temp[40];
-
-      const unsigned int points =
-        (fe_degree != -1 ? fe_degree : given_degree) + 1;
-
-      AssertIndexRange(points, 40);
-
-      const unsigned int d = side / 2; // direction
-      const unsigned int s = side % 2; // left or right surface
-
-      const unsigned int offset = dealii::Utilities::pow(points, d + 1);
-      const unsigned int stride =
-        (s == 0 ? 0 : (points - 1)) * dealii::Utilities::pow(points, d);
-
-      const unsigned int r1 = dealii::Utilities::pow(points, dim - d - 1);
-      const unsigned int r2 = dealii::Utilities::pow(points, d);
-
-      // copy result back
-      for (unsigned int i = 0, k = 0; i < r1; ++i)
-        for (unsigned int j = 0; j < r2; ++j, ++k)
-          temp[k] = values[i * offset + stride + j][v];
-
-      // perform interpolation point by point (note: r1 * r2 == points^(dim-1))
-      for (unsigned int i = 0, k = 0; i < r1; ++i)
-        for (unsigned int j = 0; j < r2; ++j, ++k)
-          {
-            typename Number::value_type sum = 0.0;
-            for (unsigned int h = 0; h < points; ++h)
-              sum += weight[(transpose ? 1 : points) * k +
-                            (transpose ? points : 1) * h][v] *
-                     temp[h];
-            values[i * offset + stride + j][v] = sum;
-          }
-    }
-
-    template <int          fe_degree,
+    template <int          structdim,
+              int          fe_degree,
               unsigned int direction,
-              unsigned int d,
               bool         transpose>
     static void
-    interpolate_3D_face(const unsigned int dof_offset,
-                        const unsigned int given_degree,
-                        const unsigned int v,
-                        const Number *     weight,
-                        Number *           values)
+    interpolate(const unsigned int             offset,
+                const unsigned int             outer_stride,
+                const unsigned int             given_degree,
+                const Number                   mask_weight,
+                const Number                   mask_write,
+                const Number *DEAL_II_RESTRICT weights,
+                Number *DEAL_II_RESTRICT       values)
     {
-      typename Number::value_type temp[40];
+      static_assert(structdim == 1 || structdim == 2,
+                    "Only 1D and 2D interpolation implemented");
+      Number temp[fe_degree != -1 ? fe_degree + 1 : 40];
 
       const unsigned int points =
         (fe_degree != -1 ? fe_degree : given_degree) + 1;
@@ -127,71 +89,40 @@ namespace internal
 
       const unsigned int stride = Utilities::pow(points, direction);
 
-      // direction   side0   side1   side2
-      // 0             -      p^2      p
-      // 1            p^2      -       1
-      // 2             p       -       1
-      const unsigned int stride2 =
-        ((direction == 0 && d == 1) || (direction == 1 && d == 0)) ?
-          (points * points) :
-          (((direction == 0 && d == 2) || (direction == 2 && d == 0)) ? points :
-                                                                        1);
-
-      for (unsigned int g = 1; g < points - 1; ++g)
+      const unsigned int end_of_outer_loop = structdim == 1 ? 2 : points - 1;
+      for (unsigned int g = 1; g < end_of_outer_loop; ++g)
         {
-          // copy result back
-          for (unsigned int k = 0; k < points; ++k)
-            temp[k] = values[dof_offset + k * stride + stride2 * g][v];
+          const unsigned int my_offset =
+            offset + (structdim > 1 ? g * outer_stride : 0);
 
-          // perform interpolation point by point
+          // extract values to interpolate
+          for (unsigned int k = 0; k < points; ++k)
+            temp[k] = values[my_offset + k * stride];
+
+          // perform interpolation point by point and write back
           for (unsigned int k = 0; k < points; ++k)
             {
-              typename Number::value_type sum = 0.0;
+              Number sum0 = Number(), sum1 = Number();
               for (unsigned int h = 0; h < points; ++h)
-                sum += weight[(transpose ? 1 : points) * k +
-                              (transpose ? points : 1) * h][v] *
-                       temp[h];
-              values[dof_offset + k * stride + stride2 * g][v] = sum;
+                {
+                  // sum0 belongs to the other interpolation matrix, but we
+                  // can use the symmetry here to reduce the number of loads
+                  sum0 += temp[h] *
+                          weights[(transpose ? 1 : points) * (points - 1 - k) +
+                                  (transpose ? points : 1) * (points - 1 - h)];
+                  sum1 += temp[h] * weights[(transpose ? 1 : points) * k +
+                                            (transpose ? points : 1) * h];
+                }
+              values[my_offset + k * stride] =
+                temp[k] +
+                mask_write * (sum0 + mask_weight * (sum1 - sum0) - temp[k]);
             }
-        }
-    }
-
-    template <int fe_degree, unsigned int direction, bool transpose>
-    static void
-    interpolate_3D_edge(const unsigned int p,
-                        const unsigned int given_degree,
-                        const unsigned int v,
-                        const Number *     weight,
-                        Number *           values)
-    {
-      typename Number::value_type temp[40];
-
-      const unsigned int points =
-        (fe_degree != -1 ? fe_degree : given_degree) + 1;
-
-      AssertIndexRange(points, 40);
-
-      const unsigned int stride = Utilities::pow(points, direction);
-
-      // copy result back
-      for (unsigned int k = 0; k < points; ++k)
-        temp[k] = values[p + k * stride][v];
-
-      // perform interpolation point by point
-      for (unsigned int k = 0; k < points; ++k)
-        {
-          typename Number::value_type sum = 0.0;
-          for (unsigned int h = 0; h < points; ++h)
-            sum += weight[(transpose ? 1 : points) * k +
-                          (transpose ? points : 1) * h][v] *
-                   temp[h];
-          values[p + k * stride][v] = sum;
         }
     }
 
     template <int fe_degree, bool transpose>
     static void
-    run_internal(const unsigned int                  n_desired_components,
+    run_internal(const unsigned int                  n_components,
                  const FEEvaluationBaseData<dim,
                                             typename Number::value_type,
                                             is_face,
@@ -200,440 +131,272 @@ namespace internal
                                   Number::size()> &  constraint_mask,
                  Number *                            values)
     {
+      using Kinds = MatrixFreeFunctions::ConstraintKinds;
       const unsigned int given_degree =
         fe_degree != -1 ? fe_degree :
                           fe_eval.get_shape_info().data.front().fe_degree;
 
-      const auto &interpolation_matrices =
-        fe_eval.get_shape_info().data.front().subface_interpolation_matrices;
+      const Number *DEAL_II_RESTRICT weights =
+        fe_eval.get_shape_info()
+          .data.front()
+          .subface_interpolation_matrices[0]
+          .data();
 
       const auto is_set = [](const auto a, const auto b) -> bool {
         return (a & b) == b;
       };
 
       const auto not_set = [](const auto a, const auto b) -> bool {
-        return (a & b) == MatrixFreeFunctions::ConstraintKinds::unconstrained;
+        return (a & b) == Kinds::unconstrained;
       };
 
       const unsigned int points = given_degree + 1;
+      const unsigned int n_dofs =
+        fe_eval.get_shape_info().dofs_per_component_on_cell;
 
-      for (unsigned int c = 0; c < n_desired_components; ++c)
+      if (dim == 2)
         {
+          // x direction
+          {
+            Number                mask_weights = {};
+            std::array<Number, 2> mask_write   = {};
+            std::array<bool, 2>   do_face      = {};
+            for (unsigned int v = 0; v < Number::size(); ++v)
+              {
+                const Kinds mask = constraint_mask[v];
+                if (is_set(mask, Kinds::face_y))
+                  {
+                    const unsigned int side = not_set(mask, Kinds::subcell_y);
+                    mask_write[side][v]     = 1;
+                    do_face[side]           = true;
+                    mask_weights[v]         = is_set(mask, Kinds::subcell_x);
+                  }
+              }
+            unsigned int offsets[2] = {0, (points - 1) * points};
+            for (unsigned int c = 0; c < n_components; ++c)
+              for (unsigned int face = 0; face < 2; ++face)
+                if (do_face[face])
+                  interpolate<1, fe_degree, 0, transpose>(offsets[face],
+                                                          0,
+                                                          given_degree,
+                                                          mask_weights,
+                                                          mask_write[face],
+                                                          weights,
+                                                          values + c * n_dofs);
+          }
+          // y direction
+          {
+            Number                mask_weights = {};
+            std::array<Number, 2> mask_write   = {};
+            std::array<bool, 2>   do_face      = {};
+            for (unsigned int v = 0; v < Number::size(); ++v)
+              {
+                const Kinds mask = constraint_mask[v];
+                if (is_set(mask, Kinds::face_x))
+                  {
+                    const unsigned int side = not_set(mask, Kinds::subcell_x);
+                    mask_write[side][v]     = 1;
+                    do_face[side]           = true;
+                    mask_weights[v]         = is_set(mask, Kinds::subcell_y);
+                  }
+              }
+            unsigned int offsets[2] = {0, points - 1};
+            for (unsigned int c = 0; c < n_components; ++c)
+              for (unsigned int face = 0; face < 2; ++face)
+                if (do_face[face])
+                  interpolate<1, fe_degree, 1, transpose>(offsets[face],
+                                                          0,
+                                                          given_degree,
+                                                          mask_weights,
+                                                          mask_write[face],
+                                                          weights,
+                                                          values + c * n_dofs);
+          }
+        }
+      else if (dim == 3)
+        {
+          const unsigned int p0 = 0;
+          const unsigned int p1 = points - 1;
+          const unsigned int p2 = points * points - points;
+          const unsigned int p3 = points * points - 1;
+          const unsigned int p4 = points * points * points - points * points;
+          const unsigned int p5 =
+            points * points * points - points * points + points - 1;
+          const unsigned int p6 = points * points * points - points;
+
+          std::array<std::array<bool, 4>, 3>   process_edge = {};
+          std::array<std::array<bool, 4>, 3>   process_face = {};
+          std::array<std::array<Number, 4>, 3> mask_edge    = {};
+          std::array<std::array<Number, 4>, 3> mask_face    = {};
+          std::array<Number, 3>                mask_weights = {};
           for (unsigned int v = 0; v < Number::size(); ++v)
             {
-              const auto mask = constraint_mask[v];
+              const Kinds mask = constraint_mask[v];
 
-              if (mask == MatrixFreeFunctions::ConstraintKinds::unconstrained)
-                continue;
+              if (is_set(mask, Kinds::subcell_x))
+                mask_weights[0][v] = 1;
+              if (is_set(mask, Kinds::subcell_y))
+                mask_weights[1][v] = 1;
+              if (is_set(mask, Kinds::subcell_z))
+                mask_weights[2][v] = 1;
 
-              if (dim == 2) // 2D: only faces
+              if (is_set(mask, Kinds::face_x))
                 {
-                  // direction 0:
-                  if ((mask & MatrixFreeFunctions::ConstraintKinds::face_y) !=
-                      MatrixFreeFunctions::ConstraintKinds::unconstrained)
-                    {
-                      const bool is_subface_0 =
-                        (mask &
-                         MatrixFreeFunctions::ConstraintKinds::subcell_x) ==
-                        MatrixFreeFunctions::ConstraintKinds::unconstrained;
+                  const unsigned int side = not_set(mask, Kinds::subcell_x);
 
-                      const Number *weights =
-                        interpolation_matrices[is_subface_0].data();
-
-                      if (is_set(
-                            mask,
-                            MatrixFreeFunctions::ConstraintKinds::subcell_y))
-                        interpolate_2D<fe_degree, 2, transpose>(
-                          given_degree,
-                          v,
-                          weights,
-                          values); // face 2
-                      else
-                        interpolate_2D<fe_degree, 3, transpose>(
-                          given_degree,
-                          v,
-                          weights,
-                          values); // face 3
-                    }
-
-                  // direction 1:
-                  if ((mask & MatrixFreeFunctions::ConstraintKinds::face_x) !=
-                      MatrixFreeFunctions::ConstraintKinds::unconstrained)
-                    {
-                      const bool is_subface_0 =
-                        (mask &
-                         MatrixFreeFunctions::ConstraintKinds::subcell_y) ==
-                        MatrixFreeFunctions::ConstraintKinds::unconstrained;
-
-                      const Number *weights =
-                        interpolation_matrices[is_subface_0].data();
-
-                      if (is_set(
-                            mask,
-                            MatrixFreeFunctions::ConstraintKinds::subcell_x))
-                        interpolate_2D<fe_degree, 0, transpose>(
-                          given_degree,
-                          v,
-                          weights,
-                          values); // face 0
-                      else
-                        interpolate_2D<fe_degree, 1, transpose>(
-                          given_degree,
-                          v,
-                          weights,
-                          values); // face 1
-                    }
+                  mask_face[1][side][v] = process_face[1][side] = true;
+                  mask_edge[1][side][v] = process_edge[1][side] = true;
+                  mask_edge[1][2 + side][v] = process_edge[1][2 + side] = true;
+                  mask_face[2][side][v] = process_face[2][side] = true;
+                  mask_edge[2][side][v] = process_edge[2][side] = true;
+                  mask_edge[2][2 + side][v] = process_edge[2][2 + side] = true;
                 }
-              else if (dim == 3) // 3D faces and edges
+              if (is_set(mask, Kinds::face_y))
                 {
-                  const unsigned int p0 = 0;
-                  const unsigned int p1 = points - 1;
-                  const unsigned int p2 = points * points - points;
-                  const unsigned int p3 = points * points - 1;
-                  const unsigned int p4 =
-                    points * points * points - points * points;
-                  const unsigned int p5 =
-                    points * points * points - points * points + points - 1;
-                  const unsigned int p6 = points * points * points - points;
+                  const unsigned int side = not_set(mask, Kinds::subcell_y);
 
-                  const bool is_face_0 =
-                    is_set(mask,
-                           MatrixFreeFunctions::ConstraintKinds::face_x) &&
-                    is_set(mask,
-                           MatrixFreeFunctions::ConstraintKinds::subcell_x);
-                  const bool is_face_1 =
-                    is_set(mask,
-                           MatrixFreeFunctions::ConstraintKinds::face_x) &&
-                    not_set(mask,
-                            MatrixFreeFunctions::ConstraintKinds::subcell_x);
-                  const bool is_face_2 =
-                    is_set(mask,
-                           MatrixFreeFunctions::ConstraintKinds::face_y) &&
-                    is_set(mask,
-                           MatrixFreeFunctions::ConstraintKinds::subcell_y);
-                  const bool is_face_3 =
-                    is_set(mask,
-                           MatrixFreeFunctions::ConstraintKinds::face_y) &&
-                    not_set(mask,
-                            MatrixFreeFunctions::ConstraintKinds::subcell_y);
-                  const bool is_face_4 =
-                    is_set(mask,
-                           MatrixFreeFunctions::ConstraintKinds::face_z) &&
-                    is_set(mask,
-                           MatrixFreeFunctions::ConstraintKinds::subcell_z);
-                  const bool is_face_5 =
-                    is_set(mask,
-                           MatrixFreeFunctions::ConstraintKinds::face_z) &&
-                    not_set(mask,
-                            MatrixFreeFunctions::ConstraintKinds::subcell_z);
-
-                  const bool is_edge_2 =
-                    is_set(mask,
-                           MatrixFreeFunctions::ConstraintKinds::edge_x) &&
-                    is_set(mask,
-                           MatrixFreeFunctions::ConstraintKinds::subcell_y) &&
-                    is_set(mask,
-                           MatrixFreeFunctions::ConstraintKinds::subcell_z);
-                  const bool is_edge_3 =
-                    is_set(mask,
-                           MatrixFreeFunctions::ConstraintKinds::edge_x) &&
-                    not_set(mask,
-                            MatrixFreeFunctions::ConstraintKinds::subcell_y) &&
-                    is_set(mask,
-                           MatrixFreeFunctions::ConstraintKinds::subcell_z);
-                  const bool is_edge_6 =
-                    is_set(mask,
-                           MatrixFreeFunctions::ConstraintKinds::edge_x) &&
-                    is_set(mask,
-                           MatrixFreeFunctions::ConstraintKinds::subcell_y) &&
-                    not_set(mask,
-                            MatrixFreeFunctions::ConstraintKinds::subcell_z);
-                  const bool is_edge_7 =
-                    is_set(mask,
-                           MatrixFreeFunctions::ConstraintKinds::edge_x) &&
-                    not_set(mask,
-                            MatrixFreeFunctions::ConstraintKinds::subcell_y) &&
-                    not_set(mask,
-                            MatrixFreeFunctions::ConstraintKinds::subcell_z);
-
-                  const bool is_edge_0 =
-                    is_set(mask,
-                           MatrixFreeFunctions::ConstraintKinds::edge_y) &&
-                    is_set(mask,
-                           MatrixFreeFunctions::ConstraintKinds::subcell_x) &&
-                    is_set(mask,
-                           MatrixFreeFunctions::ConstraintKinds::subcell_z);
-                  const bool is_edge_1 =
-                    is_set(mask,
-                           MatrixFreeFunctions::ConstraintKinds::edge_y) &&
-                    not_set(mask,
-                            MatrixFreeFunctions::ConstraintKinds::subcell_x) &&
-                    is_set(mask,
-                           MatrixFreeFunctions::ConstraintKinds::subcell_z);
-                  const bool is_edge_4 =
-                    is_set(mask,
-                           MatrixFreeFunctions::ConstraintKinds::edge_y) &&
-                    is_set(mask,
-                           MatrixFreeFunctions::ConstraintKinds::subcell_x) &&
-                    not_set(mask,
-                            MatrixFreeFunctions::ConstraintKinds::subcell_z);
-                  const bool is_edge_5 =
-                    is_set(mask,
-                           MatrixFreeFunctions::ConstraintKinds::edge_y) &&
-                    not_set(mask,
-                            MatrixFreeFunctions::ConstraintKinds::subcell_x) &&
-                    not_set(mask,
-                            MatrixFreeFunctions::ConstraintKinds::subcell_z);
-
-                  const bool is_edge_8 =
-                    is_set(mask,
-                           MatrixFreeFunctions::ConstraintKinds::edge_z) &&
-                    is_set(mask,
-                           MatrixFreeFunctions::ConstraintKinds::subcell_x) &&
-                    is_set(mask,
-                           MatrixFreeFunctions::ConstraintKinds::subcell_y);
-                  const bool is_edge_9 =
-                    is_set(mask,
-                           MatrixFreeFunctions::ConstraintKinds::edge_z) &&
-                    not_set(mask,
-                            MatrixFreeFunctions::ConstraintKinds::subcell_x) &&
-                    is_set(mask,
-                           MatrixFreeFunctions::ConstraintKinds::subcell_y);
-                  const bool is_edge_10 =
-                    is_set(mask,
-                           MatrixFreeFunctions::ConstraintKinds::edge_z) &&
-                    is_set(mask,
-                           MatrixFreeFunctions::ConstraintKinds::subcell_x) &&
-                    not_set(mask,
-                            MatrixFreeFunctions::ConstraintKinds::subcell_y);
-                  const bool is_edge_11 =
-                    is_set(mask,
-                           MatrixFreeFunctions::ConstraintKinds::edge_z) &&
-                    not_set(mask,
-                            MatrixFreeFunctions::ConstraintKinds::subcell_x) &&
-                    not_set(mask,
-                            MatrixFreeFunctions::ConstraintKinds::subcell_y);
-
-                  // direction 0:
-                  {
-                    const bool is_subface_0 =
-                      (mask &
-                       MatrixFreeFunctions::ConstraintKinds::subcell_x) ==
-                      MatrixFreeFunctions::ConstraintKinds::unconstrained;
-
-                    const Number *weights =
-                      interpolation_matrices[is_subface_0].data();
-
-                    // ... faces
-                    if (is_face_2)
-                      interpolate_3D_face<fe_degree, 0, 1, transpose>(
-                        p0,
-                        given_degree,
-                        v,
-                        weights,
-                        values); // face 2
-                    else if (is_face_3)
-                      interpolate_3D_face<fe_degree, 0, 1, transpose>(
-                        p2,
-                        given_degree,
-                        v,
-                        weights,
-                        values); // face 3
-                    if (is_face_4)
-                      interpolate_3D_face<fe_degree, 0, 2, transpose>(
-                        p0,
-                        given_degree,
-                        v,
-                        weights,
-                        values); // face 4
-                    else if (is_face_5)
-                      interpolate_3D_face<fe_degree, 0, 2, transpose>(
-                        p4,
-                        given_degree,
-                        v,
-                        weights,
-                        values); // face 5
-
-                    // ... edges
-                    if (is_face_2 || is_face_4 || is_edge_2)
-                      interpolate_3D_edge<fe_degree, 0, transpose>(
-                        p0,
-                        given_degree,
-                        v,
-                        weights,
-                        values); // edge 2
-                    if (is_face_3 || is_face_4 || is_edge_3)
-                      interpolate_3D_edge<fe_degree, 0, transpose>(
-                        p2,
-                        given_degree,
-                        v,
-                        weights,
-                        values); // edge 3
-                    if (is_face_2 || is_face_5 || is_edge_6)
-                      interpolate_3D_edge<fe_degree, 0, transpose>(
-                        p4,
-                        given_degree,
-                        v,
-                        weights,
-                        values); // edge 6
-                    if (is_face_3 || is_face_5 || is_edge_7)
-                      interpolate_3D_edge<fe_degree, 0, transpose>(
-                        p6,
-                        given_degree,
-                        v,
-                        weights,
-                        values); // edge 7
-                  }
-
-                  // direction 1:
-                  {
-                    const bool is_subface_0 =
-                      (mask &
-                       MatrixFreeFunctions::ConstraintKinds::subcell_y) ==
-                      MatrixFreeFunctions::ConstraintKinds::unconstrained;
-
-                    const Number *weights =
-                      interpolation_matrices[is_subface_0].data();
-
-                    // ... faces
-                    if (is_face_0)
-                      interpolate_3D_face<fe_degree, 1, 0, transpose>(
-                        p0,
-                        given_degree,
-                        v,
-                        weights,
-                        values); // face 0
-                    else if (is_face_1)
-                      interpolate_3D_face<fe_degree, 1, 0, transpose>(
-                        p1,
-                        given_degree,
-                        v,
-                        weights,
-                        values); // face 1
-                    if (is_face_4)
-                      interpolate_3D_face<fe_degree, 1, 2, transpose>(
-                        p0,
-                        given_degree,
-                        v,
-                        weights,
-                        values); // face 4
-                    else if (is_face_5)
-                      interpolate_3D_face<fe_degree, 1, 2, transpose>(
-                        p4,
-                        given_degree,
-                        v,
-                        weights,
-                        values); // face 5
-
-                    // ... edges
-                    if (is_face_0 || is_face_4 || is_edge_0)
-                      interpolate_3D_edge<fe_degree, 1, transpose>(
-                        p0,
-                        given_degree,
-                        v,
-                        weights,
-                        values); // edge 0
-                    if (is_face_1 || is_face_4 || is_edge_1)
-                      interpolate_3D_edge<fe_degree, 1, transpose>(
-                        p1,
-                        given_degree,
-                        v,
-                        weights,
-                        values); // edge 1
-                    if (is_face_0 || is_face_5 || is_edge_4)
-                      interpolate_3D_edge<fe_degree, 1, transpose>(
-                        p4,
-                        given_degree,
-                        v,
-                        weights,
-                        values); // edge 4
-                    if (is_face_1 || is_face_5 || is_edge_5)
-                      interpolate_3D_edge<fe_degree, 1, transpose>(
-                        p5,
-                        given_degree,
-                        v,
-                        weights,
-                        values); // edge 5
-                  }
-
-                  // direction 2:
-                  {
-                    const bool is_subface_0 =
-                      (mask &
-                       MatrixFreeFunctions::ConstraintKinds::subcell_z) ==
-                      MatrixFreeFunctions::ConstraintKinds::unconstrained;
-
-                    const Number *weights =
-                      interpolation_matrices[is_subface_0].data();
-
-                    // ... faces
-                    if (is_face_0)
-                      interpolate_3D_face<fe_degree, 2, 0, transpose>(
-                        p0,
-                        given_degree,
-                        v,
-                        weights,
-                        values); // face 0
-                    else if (is_face_1)
-                      interpolate_3D_face<fe_degree, 2, 0, transpose>(
-                        p1,
-                        given_degree,
-                        v,
-                        weights,
-                        values); // face 1
-                    if (is_face_2)
-                      interpolate_3D_face<fe_degree, 2, 1, transpose>(
-                        p0,
-                        given_degree,
-                        v,
-                        weights,
-                        values); // face 2
-                    else if (is_face_3)
-                      interpolate_3D_face<fe_degree, 2, 1, transpose>(
-                        p2,
-                        given_degree,
-                        v,
-                        weights,
-                        values); // face 3
-
-                    // ... edges
-                    if (is_face_0 || is_face_2 || is_edge_8)
-                      interpolate_3D_edge<fe_degree, 2, transpose>(
-                        p0,
-                        given_degree,
-                        v,
-                        weights,
-                        values); // edge 8
-                    if (is_face_1 || is_face_2 || is_edge_9)
-                      interpolate_3D_edge<fe_degree, 2, transpose>(
-                        p1,
-                        given_degree,
-                        v,
-                        weights,
-                        values); // edge 9
-                    if (is_face_0 || is_face_3 || is_edge_10)
-                      interpolate_3D_edge<fe_degree, 2, transpose>(
-                        p2,
-                        given_degree,
-                        v,
-                        weights,
-                        values); // edge 10
-                    if (is_face_1 || is_face_3 || is_edge_11)
-                      interpolate_3D_edge<fe_degree, 2, transpose>(
-                        p3,
-                        given_degree,
-                        v,
-                        weights,
-                        values); // edge 11
-                  }
+                  mask_face[0][side][v] = process_face[0][side] = true;
+                  mask_edge[0][side][v] = process_edge[0][side] = true;
+                  mask_edge[0][2 + side][v] = process_edge[0][2 + side] = true;
+                  mask_face[2][2 + side][v] = process_face[2][2 + side] = true;
+                  mask_edge[2][2 * side][v] = process_edge[2][2 * side] = true;
+                  mask_edge[2][2 * side + 1][v] =
+                    process_edge[2][2 * side + 1] = true;
                 }
-              else
+              if (is_set(mask, Kinds::face_z))
                 {
-                  Assert(false, ExcNotImplemented());
+                  const unsigned int side = not_set(mask, Kinds::subcell_z);
+
+                  mask_face[0][2 + side][v] = process_face[0][2 + side] = true;
+                  mask_edge[0][2 * side][v] = process_edge[0][2 * side] = true;
+                  mask_edge[0][2 * side + 1][v] =
+                    process_edge[0][2 * side + 1] = true;
+                  mask_face[1][2 + side][v] = process_face[1][2 + side] = true;
+                  mask_edge[1][2 * side][v] = process_edge[1][2 * side] = true;
+                  mask_edge[1][2 * side + 1][v] =
+                    process_edge[1][2 * side + 1] = true;
+                }
+              if (is_set(mask, Kinds::edge_x))
+                {
+                  const unsigned int index =
+                    not_set(mask, Kinds::subcell_z) * 2 +
+                    not_set(mask, Kinds::subcell_y);
+                  mask_edge[0][index][v] = process_edge[0][index] = true;
+                }
+              if (is_set(mask, Kinds::edge_y))
+                {
+                  const unsigned int index =
+                    not_set(mask, Kinds::subcell_z) * 2 +
+                    not_set(mask, Kinds::subcell_x);
+                  mask_edge[1][index][v] = process_edge[1][index] = true;
+                }
+              if (is_set(mask, Kinds::edge_z))
+                {
+                  const unsigned int index =
+                    not_set(mask, Kinds::subcell_y) * 2 +
+                    not_set(mask, Kinds::subcell_x);
+                  mask_edge[2][index][v] = process_edge[2][index] = true;
                 }
             }
 
-          values += fe_eval.get_shape_info().dofs_per_component_on_cell;
+          // direction 0:
+          if (given_degree > 1)
+            {
+              unsigned int face_offsets[4]  = {p0, p2, p0, p4};
+              unsigned int outer_strides[2] = {points * points, points};
+              for (unsigned int c = 0; c < n_components; ++c)
+                for (unsigned int face = 0; face < 4; ++face)
+                  if (process_face[0][face])
+                    interpolate<2, fe_degree, 0, transpose>(
+                      face_offsets[face],
+                      outer_strides[face / 2],
+                      given_degree,
+                      mask_weights[0],
+                      mask_face[0][face],
+                      weights,
+                      values + c * n_dofs);
+            }
+          {
+            unsigned int edge_offsets[4] = {p0, p2, p4, p6};
+            for (unsigned int c = 0; c < n_components; ++c)
+              for (unsigned int edge = 0; edge < 4; ++edge)
+                if (process_edge[0][edge])
+                  interpolate<1, fe_degree, 0, transpose>(edge_offsets[edge],
+                                                          0,
+                                                          given_degree,
+                                                          mask_weights[0],
+                                                          mask_edge[0][edge],
+                                                          weights,
+                                                          values + c * n_dofs);
+          }
+
+          // direction 1:
+          if (given_degree > 1)
+            {
+              unsigned int face_offsets[4]  = {p0, p1, p0, p4};
+              unsigned int outer_strides[2] = {points * points, 1};
+              for (unsigned int c = 0; c < n_components; ++c)
+                for (unsigned int face = 0; face < 4; ++face)
+                  if (process_face[1][face])
+                    interpolate<2, fe_degree, 1, transpose>(
+                      face_offsets[face],
+                      outer_strides[face / 2],
+                      given_degree,
+                      mask_weights[1],
+                      mask_face[1][face],
+                      weights,
+                      values + c * n_dofs);
+            }
+
+          {
+            unsigned int edge_offsets[4] = {p0, p1, p4, p5};
+            for (unsigned int c = 0; c < n_components; ++c)
+              for (unsigned int edge = 0; edge < 4; ++edge)
+                if (process_edge[1][edge])
+                  interpolate<1, fe_degree, 1, transpose>(edge_offsets[edge],
+                                                          0,
+                                                          given_degree,
+                                                          mask_weights[1],
+                                                          mask_edge[1][edge],
+                                                          weights,
+                                                          values + c * n_dofs);
+          }
+
+          // direction 2:
+          if (given_degree > 1)
+            {
+              unsigned int face_offsets[4]  = {p0, p1, p0, p2};
+              unsigned int outer_strides[2] = {points, 1};
+              for (unsigned int c = 0; c < n_components; ++c)
+                for (unsigned int face = 0; face < 4; ++face)
+                  if (process_face[2][face])
+                    interpolate<2, fe_degree, 2, transpose>(
+                      face_offsets[face],
+                      outer_strides[face / 2],
+                      given_degree,
+                      mask_weights[2],
+                      mask_face[2][face],
+                      weights,
+                      values + c * n_dofs);
+            }
+
+          {
+            unsigned int edge_offsets[4] = {p0, p1, p2, p3};
+            for (unsigned int c = 0; c < n_components; ++c)
+              for (unsigned int edge = 0; edge < 4; ++edge)
+                if (process_edge[2][edge])
+                  interpolate<1, fe_degree, 2, transpose>(edge_offsets[edge],
+                                                          0,
+                                                          given_degree,
+                                                          mask_weights[2],
+                                                          mask_edge[2][edge],
+                                                          weights,
+                                                          values + c * n_dofs);
+          }
+        }
+      else
+        {
+          Assert(false, ExcNotImplemented());
         }
     }
   };
