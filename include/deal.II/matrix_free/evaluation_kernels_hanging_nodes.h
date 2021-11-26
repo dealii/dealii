@@ -19,6 +19,7 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/ndarray.h>
 #include <deal.II/base/vectorization.h>
 
 #include <deal.II/matrix_free/hanging_nodes_internal.h>
@@ -142,73 +143,68 @@ namespace internal
           .subface_interpolation_matrices[0]
           .data();
 
-      const auto is_set = [](const auto a, const auto b) -> bool {
-        return (a & b) == b;
-      };
-
-      const auto not_set = [](const auto a, const auto b) -> bool {
-        return (a & b) == Kinds::unconstrained;
-      };
-
       const unsigned int points = given_degree + 1;
       const unsigned int n_dofs =
         fe_eval.get_shape_info().dofs_per_component_on_cell;
 
       if (dim == 2)
         {
+          dealii::ndarray<Number, 2>    mask_weights = {};
+          dealii::ndarray<Number, 2, 2> mask_write   = {};
+          dealii::ndarray<bool, 2, 2>   do_face      = {};
+
+          for (unsigned int v = 0; v < Number::size(); ++v)
+            {
+              const auto kind = static_cast<std::uint16_t>(constraint_mask[v]);
+              const bool subcell_x = (kind >> 0) & 1;
+              const bool subcell_y = (kind >> 1) & 1;
+              const bool face_x    = (kind >> 3) & 1;
+              const bool face_y    = (kind >> 4) & 1;
+
+              if (face_y)
+                {
+                  const unsigned int side = !subcell_y;
+                  mask_write[0][side][v]  = 1;
+                  do_face[0][side]        = true;
+                  mask_weights[0][v]      = subcell_x;
+                }
+
+              if (face_x)
+                {
+                  const unsigned int side = !subcell_x;
+                  mask_write[1][side][v]  = 1;
+                  do_face[1][side]        = true;
+                  mask_weights[1][v]      = subcell_y;
+                }
+            }
+
           // x direction
           {
-            Number                mask_weights = {};
-            std::array<Number, 2> mask_write   = {};
-            std::array<bool, 2>   do_face      = {};
-            for (unsigned int v = 0; v < Number::size(); ++v)
-              {
-                const Kinds mask = constraint_mask[v];
-                if (is_set(mask, Kinds::face_y))
-                  {
-                    const unsigned int side = not_set(mask, Kinds::subcell_y);
-                    mask_write[side][v]     = 1;
-                    do_face[side]           = true;
-                    mask_weights[v]         = is_set(mask, Kinds::subcell_x);
-                  }
-              }
-            unsigned int offsets[2] = {0, (points - 1) * points};
+            const std::array<unsigned int, 2> offsets = {
+              {0, (points - 1) * points}};
             for (unsigned int c = 0; c < n_components; ++c)
               for (unsigned int face = 0; face < 2; ++face)
-                if (do_face[face])
+                if (do_face[0][face])
                   interpolate<1, fe_degree, 0, transpose>(offsets[face],
                                                           0,
                                                           given_degree,
-                                                          mask_weights,
-                                                          mask_write[face],
+                                                          mask_weights[0],
+                                                          mask_write[0][face],
                                                           weights,
                                                           values + c * n_dofs);
           }
+
           // y direction
           {
-            Number                mask_weights = {};
-            std::array<Number, 2> mask_write   = {};
-            std::array<bool, 2>   do_face      = {};
-            for (unsigned int v = 0; v < Number::size(); ++v)
-              {
-                const Kinds mask = constraint_mask[v];
-                if (is_set(mask, Kinds::face_x))
-                  {
-                    const unsigned int side = not_set(mask, Kinds::subcell_x);
-                    mask_write[side][v]     = 1;
-                    do_face[side]           = true;
-                    mask_weights[v]         = is_set(mask, Kinds::subcell_y);
-                  }
-              }
-            unsigned int offsets[2] = {0, points - 1};
+            const std::array<unsigned int, 2> offsets = {{0, points - 1}};
             for (unsigned int c = 0; c < n_components; ++c)
               for (unsigned int face = 0; face < 2; ++face)
-                if (do_face[face])
+                if (do_face[1][face])
                   interpolate<1, fe_degree, 1, transpose>(offsets[face],
                                                           0,
                                                           given_degree,
-                                                          mask_weights,
-                                                          mask_write[face],
+                                                          mask_weights[1],
+                                                          mask_write[1][face],
                                                           weights,
                                                           values + c * n_dofs);
           }
@@ -224,25 +220,35 @@ namespace internal
             points * points * points - points * points + points - 1;
           const unsigned int p6 = points * points * points - points;
 
-          std::array<std::array<bool, 4>, 3>   process_edge = {};
-          std::array<std::array<bool, 4>, 3>   process_face = {};
-          std::array<std::array<Number, 4>, 3> mask_edge    = {};
-          std::array<std::array<Number, 4>, 3> mask_face    = {};
-          std::array<Number, 3>                mask_weights = {};
+          dealii::ndarray<bool, 3, 4>   process_edge = {};
+          dealii::ndarray<bool, 3, 4>   process_face = {};
+          dealii::ndarray<Number, 3, 4> mask_edge    = {};
+          dealii::ndarray<Number, 3, 4> mask_face    = {};
+          dealii::ndarray<Number, 3>    mask_weights = {};
+
           for (unsigned int v = 0; v < Number::size(); ++v)
             {
-              const Kinds mask = constraint_mask[v];
+              const auto kind = static_cast<std::uint16_t>(constraint_mask[v]);
+              const bool subcell_x = (kind >> 0) & 1;
+              const bool subcell_y = (kind >> 1) & 1;
+              const bool subcell_z = (kind >> 2) & 1;
+              const bool face_x    = (kind >> 3) & 1;
+              const bool face_y    = (kind >> 4) & 1;
+              const bool face_z    = (kind >> 5) & 1;
+              const bool edge_x    = (kind >> 6) & 1;
+              const bool edge_y    = (kind >> 7) & 1;
+              const bool edge_z    = (kind >> 8) & 1;
 
-              if (is_set(mask, Kinds::subcell_x))
+              if (subcell_x)
                 mask_weights[0][v] = 1;
-              if (is_set(mask, Kinds::subcell_y))
+              if (subcell_y)
                 mask_weights[1][v] = 1;
-              if (is_set(mask, Kinds::subcell_z))
+              if (subcell_z)
                 mask_weights[2][v] = 1;
 
-              if (is_set(mask, Kinds::face_x))
+              if (face_x)
                 {
-                  const unsigned int side = not_set(mask, Kinds::subcell_x);
+                  const unsigned int side = !subcell_x;
 
                   mask_face[1][side][v] = process_face[1][side] = true;
                   mask_edge[1][side][v] = process_edge[1][side] = true;
@@ -251,9 +257,9 @@ namespace internal
                   mask_edge[2][side][v] = process_edge[2][side] = true;
                   mask_edge[2][2 + side][v] = process_edge[2][2 + side] = true;
                 }
-              if (is_set(mask, Kinds::face_y))
+              if (face_y)
                 {
-                  const unsigned int side = not_set(mask, Kinds::subcell_y);
+                  const unsigned int side = !subcell_y;
 
                   mask_face[0][side][v] = process_face[0][side] = true;
                   mask_edge[0][side][v] = process_edge[0][side] = true;
@@ -263,9 +269,9 @@ namespace internal
                   mask_edge[2][2 * side + 1][v] =
                     process_edge[2][2 * side + 1] = true;
                 }
-              if (is_set(mask, Kinds::face_z))
+              if (face_z)
                 {
-                  const unsigned int side = not_set(mask, Kinds::subcell_z);
+                  const unsigned int side = !subcell_z;
 
                   mask_face[0][2 + side][v] = process_face[0][2 + side] = true;
                   mask_edge[0][2 * side][v] = process_edge[0][2 * side] = true;
@@ -276,25 +282,19 @@ namespace internal
                   mask_edge[1][2 * side + 1][v] =
                     process_edge[1][2 * side + 1] = true;
                 }
-              if (is_set(mask, Kinds::edge_x))
+              if (edge_x)
                 {
-                  const unsigned int index =
-                    not_set(mask, Kinds::subcell_z) * 2 +
-                    not_set(mask, Kinds::subcell_y);
+                  const unsigned int index = (!subcell_z) * 2 + (!subcell_y);
                   mask_edge[0][index][v] = process_edge[0][index] = true;
                 }
-              if (is_set(mask, Kinds::edge_y))
+              if (edge_y)
                 {
-                  const unsigned int index =
-                    not_set(mask, Kinds::subcell_z) * 2 +
-                    not_set(mask, Kinds::subcell_x);
+                  const unsigned int index = (!subcell_z) * 2 + (!subcell_x);
                   mask_edge[1][index][v] = process_edge[1][index] = true;
                 }
-              if (is_set(mask, Kinds::edge_z))
+              if (edge_z)
                 {
-                  const unsigned int index =
-                    not_set(mask, Kinds::subcell_y) * 2 +
-                    not_set(mask, Kinds::subcell_x);
+                  const unsigned int index = (!subcell_y) * 2 + (!subcell_x);
                   mask_edge[2][index][v] = process_edge[2][index] = true;
                 }
             }
@@ -302,8 +302,10 @@ namespace internal
           // direction 0:
           if (given_degree > 1)
             {
-              unsigned int face_offsets[4]  = {p0, p2, p0, p4};
-              unsigned int outer_strides[2] = {points * points, points};
+              const std::array<unsigned int, 4> face_offsets = {
+                {p0, p2, p0, p4}};
+              const std::array<unsigned int, 2> outer_strides = {
+                {points * points, points}};
               for (unsigned int c = 0; c < n_components; ++c)
                 for (unsigned int face = 0; face < 4; ++face)
                   if (process_face[0][face])
@@ -317,7 +319,7 @@ namespace internal
                       values + c * n_dofs);
             }
           {
-            unsigned int edge_offsets[4] = {p0, p2, p4, p6};
+            const std::array<unsigned int, 4> edge_offsets = {{p0, p2, p4, p6}};
             for (unsigned int c = 0; c < n_components; ++c)
               for (unsigned int edge = 0; edge < 4; ++edge)
                 if (process_edge[0][edge])
@@ -333,8 +335,10 @@ namespace internal
           // direction 1:
           if (given_degree > 1)
             {
-              unsigned int face_offsets[4]  = {p0, p1, p0, p4};
-              unsigned int outer_strides[2] = {points * points, 1};
+              const std::array<unsigned int, 4> face_offsets = {
+                {p0, p1, p0, p4}};
+              const std::array<unsigned int, 2> outer_strides = {
+                {points * points, 1}};
               for (unsigned int c = 0; c < n_components; ++c)
                 for (unsigned int face = 0; face < 4; ++face)
                   if (process_face[1][face])
@@ -349,7 +353,7 @@ namespace internal
             }
 
           {
-            unsigned int edge_offsets[4] = {p0, p1, p4, p5};
+            const std::array<unsigned int, 4> edge_offsets = {{p0, p1, p4, p5}};
             for (unsigned int c = 0; c < n_components; ++c)
               for (unsigned int edge = 0; edge < 4; ++edge)
                 if (process_edge[1][edge])
@@ -365,8 +369,9 @@ namespace internal
           // direction 2:
           if (given_degree > 1)
             {
-              unsigned int face_offsets[4]  = {p0, p1, p0, p2};
-              unsigned int outer_strides[2] = {points, 1};
+              const std::array<unsigned int, 4> face_offsets = {
+                {p0, p1, p0, p2}};
+              const std::array<unsigned int, 2> outer_strides = {{points, 1}};
               for (unsigned int c = 0; c < n_components; ++c)
                 for (unsigned int face = 0; face < 4; ++face)
                   if (process_face[2][face])
@@ -381,7 +386,7 @@ namespace internal
             }
 
           {
-            unsigned int edge_offsets[4] = {p0, p1, p2, p3};
+            const std::array<unsigned int, 4> edge_offsets = {{p0, p1, p2, p3}};
             for (unsigned int c = 0; c < n_components; ++c)
               for (unsigned int edge = 0; edge < 4; ++edge)
                 if (process_edge[2][edge])
