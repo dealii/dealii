@@ -26,7 +26,8 @@ namespace internal
    */
   template <int dim>
   unsigned int
-  get_degree(const std::vector<BarycentricPolynomial<dim>> &polys)
+  get_degree(
+    const std::vector<typename BarycentricPolynomials<dim>::PolyType> &polys)
   {
     // Since the first variable in a simplex polynomial is, e.g., in 2D,
     //
@@ -57,7 +58,7 @@ template <int dim>
 BarycentricPolynomials<dim>
 BarycentricPolynomials<dim>::get_fe_p_basis(const unsigned int degree)
 {
-  std::vector<BarycentricPolynomial<dim>> polys;
+  std::vector<PolyType> polys;
 
   auto M = [](const unsigned int d) {
     return BarycentricPolynomial<dim, double>::monomial(d);
@@ -102,16 +103,16 @@ BarycentricPolynomials<dim>::get_fe_p_basis(const unsigned int degree)
 
 template <int dim>
 BarycentricPolynomials<dim>::BarycentricPolynomials(
-  const std::vector<BarycentricPolynomial<dim>> &polynomials)
-  : ScalarPolynomialsBase<dim>(internal::get_degree(polynomials),
+  const std::vector<PolyType> &polynomials)
+  : ScalarPolynomialsBase<dim>(internal::get_degree<dim>(polynomials),
                                polynomials.size())
 {
   polys = polynomials;
 
-  poly_grads.reinit({polynomials.size(), dim});
-  poly_hessians.reinit({polynomials.size(), dim, dim});
-  poly_third_derivatives.reinit({polynomials.size(), dim, dim, dim});
-  poly_fourth_derivatives.reinit({polynomials.size(), dim, dim, dim, dim});
+  poly_grads.resize(polynomials.size());
+  poly_hessians.resize(polynomials.size());
+  poly_third_derivatives.resize(polynomials.size());
+  poly_fourth_derivatives.resize(polynomials.size());
 
   for (std::size_t i = 0; i < polynomials.size(); ++i)
     {
@@ -321,9 +322,10 @@ BarycentricPolynomials<dim>::memory_consumption() const
   for (const auto &poly : polys)
     poly_memory += poly.memory_consumption();
   return ScalarPolynomialsBase<dim>::memory_consumption() + poly_memory +
-         poly_grads.memory_consumption() + poly_hessians.memory_consumption() +
-         poly_third_derivatives.memory_consumption() +
-         poly_fourth_derivatives.memory_consumption();
+         MemoryConsumption::memory_consumption(poly_grads) +
+         MemoryConsumption::memory_consumption(poly_hessians) +
+         MemoryConsumption::memory_consumption(poly_third_derivatives) +
+         MemoryConsumption::memory_consumption(poly_fourth_derivatives);
 }
 
 template class BarycentricPolynomials<1>;
