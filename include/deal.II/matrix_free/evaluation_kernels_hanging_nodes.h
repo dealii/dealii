@@ -36,40 +36,32 @@ class FEEvaluationBaseData;
 
 namespace internal
 {
-  template <int dim, typename Number, bool is_face>
-  struct FEEvaluationImplHangingNodes
+  enum class FEEvaluationImplHangingNodesRunnerTypes
   {
-    template <int fe_degree, int n_q_points_1d>
-    static bool
-    run(const unsigned int                  n_desired_components,
-        const FEEvaluationBaseData<dim,
-                                   typename Number::value_type,
-                                   is_face,
-                                   Number> &fe_eval,
-        const bool                          transpose,
-        const std::array<MatrixFreeFunctions::ConstraintKinds, Number::size()>
-          &     c_mask,
-        Number *values)
-    {
-      if (transpose)
-        run_internal<fe_degree, true>(n_desired_components,
-                                      fe_eval,
-                                      c_mask,
-                                      values);
-      else
-        run_internal<fe_degree, false>(n_desired_components,
-                                       fe_eval,
-                                       c_mask,
-                                       values);
+    vectorized
+  };
 
-      return false;
-    }
 
+
+  template <FEEvaluationImplHangingNodesRunnerTypes,
+            int dim,
+            int fe_degree,
+            typename Number,
+            bool is_face>
+  class FEEvaluationImplHangingNodesRunner;
+
+
+
+  template <int dim, int fe_degree, typename Number, bool is_face>
+  class FEEvaluationImplHangingNodesRunner<
+    FEEvaluationImplHangingNodesRunnerTypes::vectorized,
+    dim,
+    fe_degree,
+    Number,
+    is_face>
+  {
   private:
-    template <int          structdim,
-              int          fe_degree,
-              unsigned int direction,
-              bool         transpose>
+    template <int structdim, unsigned int direction, bool transpose>
     static void
     interpolate(const unsigned int             offset,
                 const unsigned int             outer_stride,
@@ -121,7 +113,8 @@ namespace internal
         }
     }
 
-    template <int fe_degree, bool transpose>
+  public:
+    template <bool transpose>
     static void
     run_internal(const unsigned int                  n_components,
                  const FEEvaluationBaseData<dim,
@@ -185,13 +178,13 @@ namespace internal
             for (unsigned int c = 0; c < n_components; ++c)
               for (unsigned int face = 0; face < 2; ++face)
                 if (do_face[0][face])
-                  interpolate<1, fe_degree, 0, transpose>(offsets[face],
-                                                          0,
-                                                          given_degree,
-                                                          mask_weights[0],
-                                                          mask_write[0][face],
-                                                          weights,
-                                                          values + c * n_dofs);
+                  interpolate<1, 0, transpose>(offsets[face],
+                                               0,
+                                               given_degree,
+                                               mask_weights[0],
+                                               mask_write[0][face],
+                                               weights,
+                                               values + c * n_dofs);
           }
 
           // y direction
@@ -200,13 +193,13 @@ namespace internal
             for (unsigned int c = 0; c < n_components; ++c)
               for (unsigned int face = 0; face < 2; ++face)
                 if (do_face[1][face])
-                  interpolate<1, fe_degree, 1, transpose>(offsets[face],
-                                                          0,
-                                                          given_degree,
-                                                          mask_weights[1],
-                                                          mask_write[1][face],
-                                                          weights,
-                                                          values + c * n_dofs);
+                  interpolate<1, 1, transpose>(offsets[face],
+                                               0,
+                                               given_degree,
+                                               mask_weights[1],
+                                               mask_write[1][face],
+                                               weights,
+                                               values + c * n_dofs);
           }
         }
       else if (dim == 3)
@@ -309,27 +302,26 @@ namespace internal
               for (unsigned int c = 0; c < n_components; ++c)
                 for (unsigned int face = 0; face < 4; ++face)
                   if (process_face[0][face])
-                    interpolate<2, fe_degree, 0, transpose>(
-                      face_offsets[face],
-                      outer_strides[face / 2],
-                      given_degree,
-                      mask_weights[0],
-                      mask_face[0][face],
-                      weights,
-                      values + c * n_dofs);
+                    interpolate<2, 0, transpose>(face_offsets[face],
+                                                 outer_strides[face / 2],
+                                                 given_degree,
+                                                 mask_weights[0],
+                                                 mask_face[0][face],
+                                                 weights,
+                                                 values + c * n_dofs);
             }
           {
             const std::array<unsigned int, 4> edge_offsets = {{p0, p2, p4, p6}};
             for (unsigned int c = 0; c < n_components; ++c)
               for (unsigned int edge = 0; edge < 4; ++edge)
                 if (process_edge[0][edge])
-                  interpolate<1, fe_degree, 0, transpose>(edge_offsets[edge],
-                                                          0,
-                                                          given_degree,
-                                                          mask_weights[0],
-                                                          mask_edge[0][edge],
-                                                          weights,
-                                                          values + c * n_dofs);
+                  interpolate<1, 0, transpose>(edge_offsets[edge],
+                                               0,
+                                               given_degree,
+                                               mask_weights[0],
+                                               mask_edge[0][edge],
+                                               weights,
+                                               values + c * n_dofs);
           }
 
           // direction 1:
@@ -342,14 +334,13 @@ namespace internal
               for (unsigned int c = 0; c < n_components; ++c)
                 for (unsigned int face = 0; face < 4; ++face)
                   if (process_face[1][face])
-                    interpolate<2, fe_degree, 1, transpose>(
-                      face_offsets[face],
-                      outer_strides[face / 2],
-                      given_degree,
-                      mask_weights[1],
-                      mask_face[1][face],
-                      weights,
-                      values + c * n_dofs);
+                    interpolate<2, 1, transpose>(face_offsets[face],
+                                                 outer_strides[face / 2],
+                                                 given_degree,
+                                                 mask_weights[1],
+                                                 mask_face[1][face],
+                                                 weights,
+                                                 values + c * n_dofs);
             }
 
           {
@@ -357,13 +348,13 @@ namespace internal
             for (unsigned int c = 0; c < n_components; ++c)
               for (unsigned int edge = 0; edge < 4; ++edge)
                 if (process_edge[1][edge])
-                  interpolate<1, fe_degree, 1, transpose>(edge_offsets[edge],
-                                                          0,
-                                                          given_degree,
-                                                          mask_weights[1],
-                                                          mask_edge[1][edge],
-                                                          weights,
-                                                          values + c * n_dofs);
+                  interpolate<1, 1, transpose>(edge_offsets[edge],
+                                               0,
+                                               given_degree,
+                                               mask_weights[1],
+                                               mask_edge[1][edge],
+                                               weights,
+                                               values + c * n_dofs);
           }
 
           // direction 2:
@@ -375,14 +366,13 @@ namespace internal
               for (unsigned int c = 0; c < n_components; ++c)
                 for (unsigned int face = 0; face < 4; ++face)
                   if (process_face[2][face])
-                    interpolate<2, fe_degree, 2, transpose>(
-                      face_offsets[face],
-                      outer_strides[face / 2],
-                      given_degree,
-                      mask_weights[2],
-                      mask_face[2][face],
-                      weights,
-                      values + c * n_dofs);
+                    interpolate<2, 2, transpose>(face_offsets[face],
+                                                 outer_strides[face / 2],
+                                                 given_degree,
+                                                 mask_weights[2],
+                                                 mask_face[2][face],
+                                                 weights,
+                                                 values + c * n_dofs);
             }
 
           {
@@ -390,19 +380,59 @@ namespace internal
             for (unsigned int c = 0; c < n_components; ++c)
               for (unsigned int edge = 0; edge < 4; ++edge)
                 if (process_edge[2][edge])
-                  interpolate<1, fe_degree, 2, transpose>(edge_offsets[edge],
-                                                          0,
-                                                          given_degree,
-                                                          mask_weights[2],
-                                                          mask_edge[2][edge],
-                                                          weights,
-                                                          values + c * n_dofs);
+                  interpolate<1, 2, transpose>(edge_offsets[edge],
+                                               0,
+                                               given_degree,
+                                               mask_weights[2],
+                                               mask_edge[2][edge],
+                                               weights,
+                                               values + c * n_dofs);
           }
         }
       else
         {
           Assert(false, ExcNotImplemented());
         }
+    }
+  };
+
+
+
+  template <int dim, typename Number, bool is_face>
+  struct FEEvaluationImplHangingNodes
+  {
+  public:
+    template <int fe_degree, int n_q_points_1d>
+    static bool
+    run(const unsigned int                  n_desired_components,
+        const FEEvaluationBaseData<dim,
+                                   typename Number::value_type,
+                                   is_face,
+                                   Number> &fe_eval,
+        const bool                          transpose,
+        const std::array<MatrixFreeFunctions::ConstraintKinds, Number::size()>
+          &     c_mask,
+        Number *values)
+    {
+      using RunnerType = FEEvaluationImplHangingNodesRunner<
+        FEEvaluationImplHangingNodesRunnerTypes::vectorized,
+        dim,
+        fe_degree,
+        Number,
+        is_face>;
+
+      if (transpose)
+        RunnerType::template run_internal<true>(n_desired_components,
+                                                fe_eval,
+                                                c_mask,
+                                                values);
+      else
+        RunnerType::template run_internal<false>(n_desired_components,
+                                                 fe_eval,
+                                                 c_mask,
+                                                 values);
+
+      return false;
     }
   };
 
