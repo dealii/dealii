@@ -216,6 +216,31 @@ class BarycentricPolynomials : public ScalarPolynomialsBase<dim>
 {
 public:
   /**
+   * Alias for polynomial type.
+   */
+  using PolyType = BarycentricPolynomial<dim>;
+
+  /**
+   * Alias for polynomial gradient type.
+   */
+  using GradType = std::array<PolyType, dim>;
+
+  /**
+   * Alias for polynomial hessian type.
+   */
+  using HessianType = std::array<GradType, dim>;
+
+  /**
+   * Alias for polynomial third derivatives type.
+   */
+  using ThirdDerivativesType = std::array<HessianType, dim>;
+
+  /**
+   * Alias for polynomial fourth derivatives type.
+   */
+  using FourthDerivativesType = std::array<ThirdDerivativesType, dim>;
+
+  /**
    * Make the dimension available to the outside.
    */
   static const unsigned int dimension = dim;
@@ -314,15 +339,11 @@ public:
   clone() const override;
 
 protected:
-  std::vector<BarycentricPolynomial<dim>> polys;
-
-  Table<2, BarycentricPolynomial<dim>> poly_grads;
-
-  Table<3, BarycentricPolynomial<dim>> poly_hessians;
-
-  Table<4, BarycentricPolynomial<dim>> poly_third_derivatives;
-
-  Table<5, BarycentricPolynomial<dim>> poly_fourth_derivatives;
+  std::vector<PolyType>              polys;
+  std::vector<GradType>              poly_grads;
+  std::vector<HessianType>           poly_hessians;
+  std::vector<ThirdDerivativesType>  poly_third_derivatives;
+  std::vector<FourthDerivativesType> poly_fourth_derivatives;
 };
 
 // non-member template functions for algebra
