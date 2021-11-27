@@ -527,12 +527,6 @@ namespace Differentiation
       const Expression &             func,
       const std::vector<ReturnType> &cached_evaluation) const
     {
-      Assert(
-        values_substituted() == true,
-        ExcMessage(
-          "The optimizer is not configured to perform evaluation. "
-          "This action can only performed after substitute() has been called."));
-
       // TODO[JPP]: Find a way to fix this bug that crops up in serialization
       // cases, e.g. symengine/batch_optimizer_05. Even though the entry is
       // in the map, it can only be found by an exhaustive search and string
@@ -624,6 +618,12 @@ namespace Differentiation
     ReturnType
     BatchOptimizer<ReturnType>::evaluate(const Expression &func) const
     {
+      Assert(
+        values_substituted() == true,
+        ExcMessage(
+          "The optimizer is not configured to perform evaluation. "
+          "This action can only performed after substitute() has been called."));
+
       return extract(func, dependent_variables_output);
     }
 
@@ -651,6 +651,11 @@ namespace Differentiation
     BatchOptimizer<ReturnType>::evaluate(
       const std::vector<Expression> &funcs) const
     {
+      Assert(
+        values_substituted() == true,
+        ExcMessage(
+          "The optimizer is not configured to perform evaluation. "
+          "This action can only performed after substitute() has been called."));
       return extract(funcs, dependent_variables_output);
     }
 
