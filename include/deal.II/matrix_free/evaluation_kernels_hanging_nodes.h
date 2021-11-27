@@ -38,7 +38,35 @@ namespace internal
 {
   enum class FEEvaluationImplHangingNodesRunnerTypes
   {
+    scalar,
     vectorized
+  };
+
+
+
+  /**
+   * Helper enum to spefify the type of vectorization for
+   * FEEvaluationImplHangingNodesRunnerTypes::scalar.
+   */
+  enum class VectorizationTypes
+  {
+    /**
+     * Process cell by cell.
+     */
+    index,
+    /**
+     * Process cells with the same refinement configuration together.
+     */
+    group,
+    /**
+     * Like index but without access to individual lanes and instead use masks
+     * with a single entry with the value one.
+     */
+    mask,
+    /**
+     * Assume that all lanes have the same refinement configuration.
+     */
+    sorted
   };
 
 
@@ -71,14 +99,16 @@ namespace internal
                 const Number *DEAL_II_RESTRICT weights,
                 Number *DEAL_II_RESTRICT       values)
     {
+      static constexpr unsigned int max_n_points_1D = 40;
+
       static_assert(structdim == 1 || structdim == 2,
                     "Only 1D and 2D interpolation implemented");
-      Number temp[fe_degree != -1 ? fe_degree + 1 : 40];
+      Number temp[fe_degree != -1 ? fe_degree + 1 : max_n_points_1D];
 
       const unsigned int points =
         (fe_degree != -1 ? fe_degree : given_degree) + 1;
 
-      AssertIndexRange(points, 40);
+      AssertIndexRange(points, max_n_points_1D);
 
       const unsigned int stride = Utilities::pow(points, direction);
 
@@ -431,6 +461,1418 @@ namespace internal
     }
   };
 
+  template <typename T1, VectorizationTypes VT>
+  struct Trait;
+
+  template <typename T1>
+  struct Trait<T1, VectorizationTypes::index>
+  {
+    using value_type         = typename T1::value_type;
+    using index_type         = unsigned int;
+    using interpolation_type = value_type;
+
+    template <typename T>
+    static inline const std::array<AlignedVector<interpolation_type>, 2> &
+    get_interpolation_matrix(const T &fe_eval)
+    {
+      return fe_eval.get_shape_info()
+        .data.front()
+        .subface_interpolation_matrices_scalar;
+    }
+
+    static
+#ifndef DEBUG
+      inline DEAL_II_ALWAYS_INLINE
+#endif
+      unsigned int
+      create(
+        const std::array<MatrixFreeFunctions::ConstraintKinds, T1::size()> mask,
+        const std::array<MatrixFreeFunctions::ConstraintKinds, T1::size()>
+                           mask_new,
+        const unsigned int v)
+    {
+      (void)mask;
+      (void)mask_new;
+      return v;
+    }
+
+    static
+#ifndef DEBUG
+      inline DEAL_II_ALWAYS_INLINE
+#endif
+      bool
+      do_break(unsigned int v, const MatrixFreeFunctions::ConstraintKinds &kind)
+    {
+      (void)v;
+      (void)kind;
+      return false;
+    }
+
+    static
+#ifndef DEBUG
+      inline DEAL_II_ALWAYS_INLINE
+#endif
+      bool
+      do_continue(unsigned int                                v,
+                  const MatrixFreeFunctions::ConstraintKinds &kind)
+    {
+      (void)v;
+      return kind == MatrixFreeFunctions::ConstraintKinds::unconstrained;
+    }
+
+    static
+#ifndef DEBUG
+      inline DEAL_II_ALWAYS_INLINE
+#endif
+        std::array<MatrixFreeFunctions::ConstraintKinds, T1::size()>
+        create_mask(const std::array<MatrixFreeFunctions::ConstraintKinds,
+                                     T1::size()> mask)
+    {
+      return mask;
+    }
+
+    static
+#ifndef DEBUG
+      inline DEAL_II_ALWAYS_INLINE
+#endif
+      typename T1::value_type
+      get_value(const typename T1::value_type &value, const index_type &i)
+    {
+      (void)i;
+      return value;
+    }
+
+    static
+#ifndef DEBUG
+      inline DEAL_II_ALWAYS_INLINE
+#endif
+      typename T1::value_type
+      get_value(const T1 &value, const index_type &i)
+    {
+      return value[i];
+    }
+
+    static
+#ifndef DEBUG
+      inline DEAL_II_ALWAYS_INLINE
+#endif
+      void
+      set_value(T1 &                           result,
+                const typename T1::value_type &value,
+                const index_type &             i)
+    {
+      result[i] = value;
+    }
+  };
+
+  template <typename T1>
+  struct Trait<T1, VectorizationTypes::mask>
+  {
+    using value_type         = T1;
+    using index_type         = std::pair<T1, T1>;
+    using interpolation_type = T1;
+
+    template <typename T>
+    static inline const std::array<AlignedVector<T1>, 2> &
+    get_interpolation_matrix(const T &fe_eval)
+    {
+      return fe_eval.get_shape_info()
+        .data.front()
+        .subface_interpolation_matrices;
+    }
+
+    static
+#ifndef DEBUG
+      inline DEAL_II_ALWAYS_INLINE
+#endif
+      bool
+      do_break(unsigned int v, const MatrixFreeFunctions::ConstraintKinds &kind)
+    {
+      (void)v;
+      (void)kind;
+      return false;
+    }
+
+    static
+#ifndef DEBUG
+      inline DEAL_II_ALWAYS_INLINE
+#endif
+      bool
+      do_continue(unsigned int                                v,
+                  const MatrixFreeFunctions::ConstraintKinds &kind)
+    {
+      (void)v;
+      return kind == MatrixFreeFunctions::ConstraintKinds::unconstrained;
+    }
+
+    static
+#ifndef DEBUG
+      inline DEAL_II_ALWAYS_INLINE
+#endif
+        index_type
+        create(const std::array<MatrixFreeFunctions::ConstraintKinds,
+                                T1::size()> mask,
+               const std::array<MatrixFreeFunctions::ConstraintKinds,
+                                T1::size()> mask_new,
+               const unsigned int           v)
+    {
+      (void)mask;
+      (void)mask_new;
+      T1 result = 0.0;
+      result[v] = 1.0;
+      return {result, T1(1.0) - result};
+    }
+
+    static
+#ifndef DEBUG
+      inline DEAL_II_ALWAYS_INLINE
+#endif
+        std::array<MatrixFreeFunctions::ConstraintKinds, T1::size()>
+        create_mask(const std::array<MatrixFreeFunctions::ConstraintKinds,
+                                     T1::size()> mask)
+    {
+      return mask;
+    }
+
+    static
+#ifndef DEBUG
+      inline DEAL_II_ALWAYS_INLINE
+#endif
+        T1
+        get_value(const T1 &value, const index_type &)
+    {
+      return value;
+    }
+
+    static
+#ifndef DEBUG
+      inline DEAL_II_ALWAYS_INLINE
+#endif
+      void
+      set_value(T1 &result, const T1 &value, const index_type &i)
+    {
+      result = result * i.second + value * i.first;
+    }
+  };
+
+  template <typename T1>
+  struct Trait<T1, VectorizationTypes::group>
+  {
+    using value_type         = T1;
+    using index_type         = std::pair<T1, T1>;
+    using interpolation_type = T1;
+
+    template <typename T>
+    static inline const std::array<AlignedVector<T1>, 2> &
+    get_interpolation_matrix(const T &fe_eval)
+    {
+      return fe_eval.get_shape_info()
+        .data.front()
+        .subface_interpolation_matrices;
+    }
+
+    static
+#ifndef DEBUG
+      inline DEAL_II_ALWAYS_INLINE
+#endif
+      bool
+      do_break(unsigned int v, const MatrixFreeFunctions::ConstraintKinds &kind)
+    {
+      (void)v;
+      return kind == MatrixFreeFunctions::ConstraintKinds::unconstrained;
+    }
+
+    static
+#ifndef DEBUG
+      inline DEAL_II_ALWAYS_INLINE
+#endif
+      bool
+      do_continue(unsigned int                                v,
+                  const MatrixFreeFunctions::ConstraintKinds &kind)
+    {
+      (void)v;
+      return kind == MatrixFreeFunctions::ConstraintKinds::unconstrained;
+    }
+
+    static
+#ifndef DEBUG
+      inline DEAL_II_ALWAYS_INLINE
+#endif
+        index_type
+        create(const std::array<MatrixFreeFunctions::ConstraintKinds,
+                                T1::size()> mask,
+               const std::array<MatrixFreeFunctions::ConstraintKinds,
+                                T1::size()> mask_new,
+               const unsigned int           v)
+    {
+      T1 result;
+
+      for (unsigned int i = 0; i < T1::size(); ++i)
+        result[i] = mask_new[v] == mask[i];
+
+      return {result, T1(1.0) - result};
+    }
+
+    static
+#ifndef DEBUG
+      inline DEAL_II_ALWAYS_INLINE
+#endif
+        std::array<MatrixFreeFunctions::ConstraintKinds, T1::size()>
+        create_mask(const std::array<MatrixFreeFunctions::ConstraintKinds,
+                                     T1::size()> mask)
+    {
+      auto new_mask = mask;
+
+      std::sort(new_mask.begin(), new_mask.end());
+      std::fill(std::unique(new_mask.begin(), new_mask.end()),
+                new_mask.end(),
+                MatrixFreeFunctions::ConstraintKinds::unconstrained);
+
+      return new_mask;
+    }
+
+    static
+#ifndef DEBUG
+      inline DEAL_II_ALWAYS_INLINE
+#endif
+        T1
+        get_value(const T1 &value, const index_type &)
+    {
+      return value;
+    }
+
+    static
+#ifndef DEBUG
+      inline DEAL_II_ALWAYS_INLINE
+#endif
+      void
+      set_value(T1 &result, const T1 &value, const index_type &i)
+    {
+      result = result * i.second + value * i.first;
+    }
+  };
+
+  template <typename T1>
+  struct Trait<T1, VectorizationTypes::sorted>
+  {
+    using value_type         = T1;
+    using index_type         = T1;
+    using interpolation_type = T1;
+
+    template <typename T>
+    static inline const std::array<AlignedVector<T1>, 2> &
+    get_interpolation_matrix(const T &fe_eval)
+    {
+      return fe_eval.get_shape_info()
+        .data.front()
+        .subface_interpolation_matrices;
+    }
+
+    static
+#ifndef DEBUG
+      inline DEAL_II_ALWAYS_INLINE
+#endif
+      bool
+      do_break(unsigned int v, const MatrixFreeFunctions::ConstraintKinds &kind)
+    {
+      (void)kind;
+      return v > 0;
+    }
+
+    static
+#ifndef DEBUG
+      inline DEAL_II_ALWAYS_INLINE
+#endif
+      bool
+      do_continue(unsigned int                                v,
+                  const MatrixFreeFunctions::ConstraintKinds &kind)
+    {
+      (void)kind;
+
+      Assert(false, ExcInternalError());
+
+      return v > 0; // should not be called
+    }
+
+    static
+#ifndef DEBUG
+      inline DEAL_II_ALWAYS_INLINE
+#endif
+        T1
+        create(const std::array<MatrixFreeFunctions::ConstraintKinds,
+                                T1::size()> mask,
+               const std::array<MatrixFreeFunctions::ConstraintKinds,
+                                T1::size()> mask_new,
+               const unsigned int           v)
+    {
+      (void)mask;
+      (void)mask_new;
+      (void)v;
+      return 1.0; // return something since not used
+    }
+
+    static
+#ifndef DEBUG
+      inline DEAL_II_ALWAYS_INLINE
+#endif
+        std::array<MatrixFreeFunctions::ConstraintKinds, T1::size()>
+        create_mask(const std::array<MatrixFreeFunctions::ConstraintKinds,
+                                     T1::size()> mask)
+    {
+      return mask;
+    }
+
+    static
+#ifndef DEBUG
+      inline DEAL_II_ALWAYS_INLINE
+#endif
+        T1
+        get_value(const T1 &value, const index_type &)
+    {
+      return value;
+    }
+
+    static
+#ifndef DEBUG
+      inline DEAL_II_ALWAYS_INLINE
+#endif
+      void
+      set_value(T1 &result, const T1 &value, const index_type &i)
+    {
+      (void)i;
+      result = value;
+    }
+  };
+
+
+
+  template <typename T,
+            typename Number,
+            VectorizationTypes VectorizationType,
+            int                fe_degree,
+            bool               transpose>
+  class HelperBase
+  {
+  public:
+    inline DEAL_II_ALWAYS_INLINE
+    HelperBase(
+      const T &                                                    t,
+      const unsigned int &                                         given_degree,
+      const bool &                                                 type_x,
+      const bool &                                                 type_y,
+      const bool &                                                 type_z,
+      const typename Trait<Number, VectorizationType>::index_type &v,
+      const std::array<
+        AlignedVector<
+          typename Trait<Number, VectorizationType>::interpolation_type>,
+        2> &  interpolation_matrices,
+      Number *values)
+      : t(t)
+      , given_degree(given_degree)
+      , type_x(type_x)
+      , type_y(type_y)
+      , type_z(type_z)
+      , v(v)
+      , interpolation_matrices(interpolation_matrices)
+      , values(values)
+    {}
+
+    template <unsigned int direction, unsigned int d, bool skip_borders>
+    static
+#ifndef DEBUG
+      inline DEAL_II_ALWAYS_INLINE
+#endif
+      void
+      interpolate_3D_face(
+        const unsigned int dof_offset,
+        const unsigned int given_degree,
+        const typename Trait<Number, VectorizationType>::index_type v,
+        const typename Trait<Number, VectorizationType>::interpolation_type
+          *DEAL_II_RESTRICT      weight,
+        Number *DEAL_II_RESTRICT values)
+    {
+      static constexpr unsigned int max_n_points_1D = 40;
+
+      typename Trait<Number, VectorizationType>::value_type
+        temp[fe_degree != -1 ? (fe_degree + 1) : max_n_points_1D];
+
+      const unsigned int points =
+        (fe_degree != -1 ? fe_degree : given_degree) + 1;
+
+      AssertIndexRange(given_degree, max_n_points_1D);
+
+      const unsigned int stride = fe_degree != -1 ?
+                                    Utilities::pow(fe_degree + 1, direction) :
+                                    Utilities::pow(given_degree + 1, direction);
+
+      // direction   side0   side1   side2
+      // 0             -      p^2      p
+      // 1            p^2      -       1
+      // 2             p       -       1
+      const unsigned int stride2 =
+        ((direction == 0 && d == 1) || (direction == 1 && d == 0)) ?
+          (points * points) :
+          (((direction == 0 && d == 2) || (direction == 2 && d == 0)) ? points :
+                                                                        1);
+
+      for (unsigned int g = (skip_borders ? 1 : 0);
+           g < points - (skip_borders ? 1 : 0);
+           ++g)
+        {
+          // copy result back
+          for (unsigned int k = 0; k < points; ++k)
+            temp[k] = Trait<Number, VectorizationType>::get_value(
+              values[dof_offset + k * stride + stride2 * g], v);
+
+          // perform interpolation point by point
+          for (unsigned int k = 0; k < points; ++k)
+            {
+              auto sum = Trait<Number, VectorizationType>::get_value(
+                           weight[(transpose ? 1 : points) * k], v) *
+                         temp[0];
+              for (unsigned int h = 1; h < points; ++h)
+                sum += Trait<Number, VectorizationType>::get_value(
+                         weight[(transpose ? 1 : points) * k +
+                                (transpose ? points : 1) * h],
+                         v) *
+                       temp[h];
+              Trait<Number, VectorizationType>::set_value(
+                values[dof_offset + k * stride + stride2 * g], sum, v);
+            }
+        }
+    }
+
+    template <unsigned int direction>
+    static
+#ifndef DEBUG
+      inline DEAL_II_ALWAYS_INLINE
+#endif
+      void
+      interpolate_3D_edge(
+        const unsigned int p,
+        const unsigned int given_degree,
+        const typename Trait<Number, VectorizationType>::index_type v,
+        const typename Trait<Number, VectorizationType>::interpolation_type
+          *DEAL_II_RESTRICT      weight,
+        Number *DEAL_II_RESTRICT values)
+    {
+      static constexpr unsigned int max_n_points_1D = 40;
+
+      typename Trait<Number, VectorizationType>::value_type
+        temp[fe_degree != -1 ? (fe_degree + 1) : max_n_points_1D];
+
+      const unsigned int points =
+        (fe_degree != -1 ? fe_degree : given_degree) + 1;
+
+      AssertIndexRange(given_degree, max_n_points_1D);
+
+      const unsigned int stride = fe_degree != -1 ?
+                                    Utilities::pow(fe_degree + 1, direction) :
+                                    Utilities::pow(given_degree + 1, direction);
+
+      // copy result back
+      for (unsigned int k = 0; k < points; ++k)
+        temp[k] =
+          Trait<Number, VectorizationType>::get_value(values[p + k * stride],
+                                                      v);
+
+      // perform interpolation point by point
+      for (unsigned int k = 0; k < points; ++k)
+        {
+          auto sum = Trait<Number, VectorizationType>::get_value(
+                       weight[(transpose ? 1 : points) * k], v) *
+                     temp[0];
+          for (unsigned int h = 1; h < points; ++h)
+            sum += Trait<Number, VectorizationType>::get_value(
+                     weight[(transpose ? 1 : points) * k +
+                            (transpose ? points : 1) * h],
+                     v) *
+                   temp[h];
+          Trait<Number, VectorizationType>::set_value(values[p + k * stride],
+                                                      sum,
+                                                      v);
+        }
+    }
+
+    template <bool do_x, bool do_y, bool do_z>
+    inline
+#ifndef DEBUG
+      DEAL_II_ALWAYS_INLINE
+#endif
+      void
+      process_edge() const
+    {
+      if (do_x)
+        interpolate_3D_edge<0>(t.line(0, type_y, type_z),
+                               given_degree,
+                               v,
+                               interpolation_matrices[!type_x].data(),
+                               values);
+
+      if (do_y)
+        interpolate_3D_edge<1>(t.line(1, type_x, type_z),
+                               given_degree,
+                               v,
+                               interpolation_matrices[!type_y].data(),
+                               values);
+
+      if (do_z)
+        interpolate_3D_edge<2>(t.line(2, type_x, type_y),
+                               given_degree,
+                               v,
+                               interpolation_matrices[!type_z].data(),
+                               values);
+    }
+
+    template <bool do_x, bool do_y, bool do_z>
+    inline
+#ifndef DEBUG
+      DEAL_II_ALWAYS_INLINE
+#endif
+      void
+      process_faces_fast() const
+    {
+      static_assert((do_x && !do_y && !do_z) || (!do_x && do_y && !do_z) ||
+                      (!do_x && !do_y && do_z),
+                    "Only one face can be chosen.");
+
+      static const unsigned int direction = do_x ? 0 : (do_y ? 1 : 2);
+      const bool                type = do_x ? type_x : (do_y ? type_y : type_z);
+
+      if (!do_x)
+        interpolate_3D_face<0, direction, false>(
+          t.face(direction, type),
+          given_degree,
+          v,
+          interpolation_matrices[!type_x].data(),
+          values);
+
+      if (!do_y)
+        interpolate_3D_face<1, direction, false>(
+          t.face(direction, type),
+          given_degree,
+          v,
+          interpolation_matrices[!type_y].data(),
+          values);
+
+      if (!do_z)
+        interpolate_3D_face<2, direction, false>(
+          t.face(direction, type),
+          given_degree,
+          v,
+          interpolation_matrices[!type_z].data(),
+          values);
+    }
+
+    template <bool do_x, bool do_y, bool do_z>
+    inline
+#ifndef DEBUG
+      DEAL_II_ALWAYS_INLINE
+#endif
+      void
+      process_faces() const
+    {
+      static_assert(((do_x && !do_y && !do_z) || (!do_x && do_y && !do_z) ||
+                     (!do_x && !do_y && do_z)) == false,
+                    "Only one face can be chosen.");
+
+      // direction 0
+      {
+        const auto inpterolation_matrix =
+          interpolation_matrices[!type_x].data();
+
+        // faces
+        if (do_y && given_degree > 1)
+          interpolate_3D_face<0, 1, true>(
+            t.face(1, type_y), given_degree, v, inpterolation_matrix, values);
+
+        if (do_z && given_degree > 1)
+          interpolate_3D_face<0, 2, true>(
+            t.face(2, type_z), given_degree, v, inpterolation_matrix, values);
+
+        // direction 0 -> edges
+        interpolate_3D_edge<0>((do_x && do_y && !do_z) ?
+                                 (t.lines_plane(0, type_x, type_y, 0)) :
+                                 ((do_x && !do_y && do_z) ?
+                                    (t.lines_plane(1, type_x, type_z, 0)) :
+                                    (t.lines(0, type_y, type_z, 0))),
+                               given_degree,
+                               v,
+                               inpterolation_matrix,
+                               values);
+
+
+        interpolate_3D_edge<0>((do_x && do_y && !do_z) ?
+                                 (t.lines_plane(0, type_x, type_y, 1)) :
+                                 ((do_x && !do_y && do_z) ?
+                                    (t.lines_plane(1, type_x, type_z, 1)) :
+                                    (t.lines(0, type_y, type_z, 1))),
+                               given_degree,
+                               v,
+                               inpterolation_matrix,
+                               values);
+
+        if (do_y && do_z)
+          interpolate_3D_edge<0>(t.lines(0, type_y, type_z, 2),
+                                 given_degree,
+                                 v,
+                                 inpterolation_matrix,
+                                 values);
+      }
+
+      // direction 1
+      {
+        const auto inpterolation_matrix =
+          interpolation_matrices[!type_y].data();
+
+        // faces
+        if (do_x && given_degree > 1)
+          interpolate_3D_face<1, 0, true>(
+            t.face(0, type_x), given_degree, v, inpterolation_matrix, values);
+
+        if (do_z && given_degree > 1)
+          interpolate_3D_face<1, 2, true>(
+            t.face(2, type_z), given_degree, v, inpterolation_matrix, values);
+
+        // lines
+        interpolate_3D_edge<1>((do_x && do_y && !do_z) ?
+                                 (t.lines_plane(0, type_x, type_y, 2)) :
+                                 ((!do_x && do_y && do_z) ?
+                                    (t.lines_plane(2, type_y, type_z, 0)) :
+                                    (t.lines(1, type_x, type_z, 0))),
+                               given_degree,
+                               v,
+                               inpterolation_matrix,
+                               values);
+
+        interpolate_3D_edge<1>((do_x && do_y && !do_z) ?
+                                 (t.lines_plane(0, type_x, type_y, 3)) :
+                                 ((!do_x && do_y && do_z) ?
+                                    (t.lines_plane(2, type_y, type_z, 1)) :
+                                    (t.lines(1, type_x, type_z, 1))),
+                               given_degree,
+                               v,
+                               inpterolation_matrix,
+                               values);
+
+        if (do_x && do_z)
+          interpolate_3D_edge<1>(t.lines(1, type_x, type_z, 2),
+                                 given_degree,
+                                 v,
+                                 inpterolation_matrix,
+                                 values);
+      }
+
+      // direction 2 -> faces
+      {
+        const auto inpterolation_matrix =
+          interpolation_matrices[!type_z].data();
+
+        if (do_x && given_degree > 1)
+          interpolate_3D_face<2, 0, true>(
+            t.face(0, type_x), given_degree, v, inpterolation_matrix, values);
+
+        if (do_y && given_degree > 1)
+          interpolate_3D_face<2, 1, true>(
+            t.face(1, type_y), given_degree, v, inpterolation_matrix, values);
+
+        // direction 2 -> edges
+        interpolate_3D_edge<2>((do_x && !do_y && do_z) ?
+                                 (t.lines_plane(1, type_x, type_z, 2)) :
+                                 ((!do_x && do_y && do_z) ?
+                                    (t.lines_plane(2, type_y, type_z, 2)) :
+                                    (t.lines(2, type_x, type_y, 0))),
+                               given_degree,
+                               v,
+                               inpterolation_matrix,
+                               values);
+
+        interpolate_3D_edge<2>((do_x && !do_y && do_z) ?
+                                 (t.lines_plane(1, type_x, type_z, 3)) :
+                                 ((!do_x && do_y && do_z) ?
+                                    (t.lines_plane(2, type_y, type_z, 3)) :
+                                    (t.lines(2, type_x, type_y, 1))),
+                               given_degree,
+                               v,
+                               inpterolation_matrix,
+                               values);
+
+        if (do_x && do_y)
+          interpolate_3D_edge<2>(t.lines(2, type_x, type_y, 2),
+                                 given_degree,
+                                 v,
+                                 inpterolation_matrix,
+                                 values);
+      }
+    }
+
+  private:
+    const T &                                                    t;
+    const unsigned int &                                         given_degree;
+    const bool &                                                 type_x;
+    const bool &                                                 type_y;
+    const bool &                                                 type_z;
+    const typename Trait<Number, VectorizationType>::index_type &v;
+    const std::array<
+      AlignedVector<
+        typename Trait<Number, VectorizationType>::interpolation_type>,
+      2> &  interpolation_matrices;
+    Number *values;
+  };
+
+  /**
+   * Helper enum to specify which Helper implementation should be used.
+   */
+  enum class HelperType
+  {
+    /**
+     * Compute the start indices of faces and edges based on the template
+     * argument fe_degree.
+     */
+    constant,
+    /**
+     * Compute the start indices of faces and edges based on the fe_degree
+     * passed to the constructor (to be used if the template argument is -1).
+     */
+    dynamic
+  };
+
+  template <HelperType helper_type,
+            typename Number,
+            VectorizationTypes VectorizationType,
+            int                fe_degree,
+            bool               transpose>
+  class Helper;
+
+  template <typename Number,
+            VectorizationTypes VectorizationType,
+            int                fe_degree,
+            bool               transpose>
+  class Helper<HelperType::dynamic,
+               Number,
+               VectorizationType,
+               fe_degree,
+               transpose> : public HelperBase<Helper<HelperType::dynamic,
+                                                     Number,
+                                                     VectorizationType,
+                                                     fe_degree,
+                                                     transpose>,
+                                              Number,
+                                              VectorizationType,
+                                              fe_degree,
+                                              transpose>
+  {
+  public:
+#ifndef DEBUG
+    inline DEAL_II_ALWAYS_INLINE
+#endif
+    Helper(const unsigned int &given_degree,
+           const bool &        type_x,
+           const bool &        type_y,
+           const bool &        type_z,
+           const typename Trait<Number, VectorizationType>::index_type &v,
+           const std::array<
+             AlignedVector<
+               typename Trait<Number, VectorizationType>::interpolation_type>,
+             2> &  interpolation_matrices,
+           Number *values)
+      : HelperBase<Helper<HelperType::dynamic,
+                          Number,
+                          VectorizationType,
+                          fe_degree,
+                          transpose>,
+                   Number,
+                   VectorizationType,
+                   fe_degree,
+                   transpose>(*this,
+                              given_degree,
+                              type_x,
+                              type_y,
+                              type_z,
+                              v,
+                              interpolation_matrices,
+                              values)
+      , points(given_degree + 1)
+    {
+      static_assert(fe_degree == -1, "Only working for fe_degree = -1.");
+    }
+
+    const unsigned int points;
+
+#ifndef DEBUG
+    inline DEAL_II_ALWAYS_INLINE
+#endif
+      unsigned int
+      line(unsigned int i, unsigned int j, unsigned int k) const
+    {
+      return line_array[i][j][k];
+    }
+
+#ifndef DEBUG
+    inline DEAL_II_ALWAYS_INLINE
+#endif
+      unsigned int
+      face(unsigned int i, unsigned int j) const
+    {
+      return face_array[i][j];
+    }
+
+#ifndef DEBUG
+    inline DEAL_II_ALWAYS_INLINE
+#endif
+      unsigned int
+      lines_plane(unsigned int i,
+                  unsigned int j,
+                  unsigned int k,
+                  unsigned int l) const
+    {
+      return lines_plane_array[i][j][k][l];
+    }
+
+#ifndef DEBUG
+    inline DEAL_II_ALWAYS_INLINE
+#endif
+      unsigned int
+      lines(unsigned int i,
+            unsigned int j,
+            unsigned int k,
+            unsigned int l) const
+    {
+      return lines_array[i][j][k][l];
+    }
+
+  private:
+    const dealii::ndarray<unsigned int, 3, 2, 2> line_array = {
+      {{{{{points * points * points - points, points *points - points}},
+         {{points * points * points - points * points, 0}}}},
+       {{{{points * points * points - points * points + points - 1,
+           points - 1}},
+         {{points * points * points - points * points, 0}}}},
+       {{{{points * points - 1, points - 1}},
+         {{points * points - points, 0}}}}}};
+
+    const dealii::ndarray<unsigned int, 3, 2> face_array = {
+      {{{points - 1, 0}},
+       {{points * points - points, 0}},
+       {{points * points * points - points * points, 0}}}};
+
+    const dealii::ndarray<unsigned int, 3, 2, 2, 4> lines_plane_array = {
+      {{{{{{{points * points - points,
+             points *points *points - points,
+             points - 1,
+             points *points *points - points *points + points - 1}},
+           {{0,
+             points *points *points - points *points,
+             points - 1,
+             points *points *points - points *points + points - 1}}}},
+         {{{{points * points - points,
+             points *points *points - points,
+             0,
+             points *points *points - points *points}},
+           {{0,
+             points *points *points - points *points,
+             0,
+             points *points *points - points *points}}}}}},
+       {{{{{{points * points * points - points * points,
+             points *points *points - points,
+             points - 1,
+             points *points - 1}},
+           {{0, points *points - points, points - 1, points *points - 1}}}},
+         {{{{points * points * points - points * points,
+             points *points *points - points,
+             0,
+             points *points - points}},
+           {{0, points *points - points, 0, points *points - points}}}}}},
+       {{{{{{points * points * points - points * points,
+             points *points *points - points *points + points - 1,
+             points *                         points - points,
+             points *                         points - 1}},
+           {{0, points - 1, points *points - points, points *points - 1}}}},
+         {{{{points * points * points - points * points,
+             points *points *points - points *points + points - 1,
+             0,
+             points - 1}},
+           {{0, points - 1, 0, points - 1}}}}}}}};
+
+    const dealii::ndarray<unsigned int, 3, 2, 2, 3> lines_array = {
+      {{{{{{{points * points - points,
+             points *points *points - points *points,
+             points *points *points - points}},
+           {{0, points *points - points, points *points *points - points}}}},
+         {{{{0,
+             points *points *points - points *points,
+             points *points *points - points}},
+           {{0,
+             points *points - points,
+             points *points *points - points *points}}}}}},
+       {{{{{{points - 1,
+             points *points *points - points *points,
+             points *points *points - points *points + points - 1}},
+           {{0,
+             points - 1,
+             points *points *points - points *points + points - 1}}}},
+         {{{{0,
+             points *points *points - points *points,
+             points *points *points - points *points + points - 1}},
+           {{0, points - 1, points *points *points - points *points}}}}}},
+       {{{{{{points - 1, points *points - points, points *points - 1}},
+           {{0, points - 1, points *points - 1}}}},
+         {{{{0, points *points - points, points *points - 1}},
+           {{0, points - 1, points *points - points}}}}}}}};
+  };
+
+  template <typename Number,
+            VectorizationTypes VectorizationType,
+            int                fe_degree,
+            bool               transpose>
+  class Helper<HelperType::constant,
+               Number,
+               VectorizationType,
+               fe_degree,
+               transpose> : public HelperBase<Helper<HelperType::constant,
+                                                     Number,
+                                                     VectorizationType,
+                                                     fe_degree,
+                                                     transpose>,
+                                              Number,
+                                              VectorizationType,
+                                              fe_degree,
+                                              transpose>
+  {
+  public:
+#ifndef DEBUG
+    inline DEAL_II_ALWAYS_INLINE
+#endif
+    Helper(const unsigned int &given_degree,
+           const bool &        type_x,
+           const bool &        type_y,
+           const bool &        type_z,
+           const typename Trait<Number, VectorizationType>::index_type &v,
+           const std::array<
+             AlignedVector<
+               typename Trait<Number, VectorizationType>::interpolation_type>,
+             2> &  interpolation_matrices,
+           Number *values)
+      : HelperBase<Helper<HelperType::constant,
+                          Number,
+                          VectorizationType,
+                          fe_degree,
+                          transpose>,
+                   Number,
+                   VectorizationType,
+                   fe_degree,
+                   transpose>(*this,
+                              given_degree,
+                              type_x,
+                              type_y,
+                              type_z,
+                              v,
+                              interpolation_matrices,
+                              values)
+    {
+      static_assert(fe_degree != -1, "Only working for fe_degree != -1.");
+    }
+
+
+#ifndef DEBUG
+    inline DEAL_II_ALWAYS_INLINE
+#endif
+      unsigned int
+      line(unsigned int i, unsigned int j, unsigned int k) const
+    {
+      static constexpr unsigned int points = fe_degree + 1;
+
+      static constexpr dealii::ndarray<unsigned int, 3, 2, 2> line_array = {
+        {{{{{points * points * points - points, points * points - points}},
+           {{points * points * points - points * points, 0}}}},
+         {{{{points * points * points - points * points + points - 1,
+             points - 1}},
+           {{points * points * points - points * points, 0}}}},
+         {{{{points * points - 1, points - 1}},
+           {{points * points - points, 0}}}}}};
+
+      return line_array[i][j][k];
+    }
+
+#ifndef DEBUG
+    inline DEAL_II_ALWAYS_INLINE
+#endif
+      unsigned int
+      face(unsigned int i, unsigned int j) const
+    {
+      static constexpr unsigned int points = fe_degree + 1;
+
+      static constexpr dealii::ndarray<unsigned int, 3, 2> face_array = {
+        {{{points - 1, 0}},
+         {{points * points - points, 0}},
+         {{points * points * points - points * points, 0}}}};
+
+      return face_array[i][j];
+    }
+
+#ifndef DEBUG
+    inline DEAL_II_ALWAYS_INLINE
+#endif
+      unsigned int
+      lines_plane(unsigned int i,
+                  unsigned int j,
+                  unsigned int k,
+                  unsigned int l) const
+    {
+      static constexpr unsigned int points = fe_degree + 1;
+
+      static constexpr dealii::ndarray<unsigned int, 3, 2, 2, 4>
+        lines_plane_array = {
+          {{{{{{{points * points - points,
+                 points * points * points - points,
+                 points - 1,
+                 points * points * points - points * points + points - 1}},
+               {{0,
+                 points * points * points - points * points,
+                 points - 1,
+                 points * points * points - points * points + points - 1}}}},
+             {{{{points * points - points,
+                 points * points * points - points,
+                 0,
+                 points * points * points - points * points}},
+               {{0,
+                 points * points * points - points * points,
+                 0,
+                 points * points * points - points * points}}}}}},
+           {{{{{{points * points * points - points * points,
+                 points * points * points - points,
+                 points - 1,
+                 points * points - 1}},
+               {{0,
+                 points * points - points,
+                 points - 1,
+                 points * points - 1}}}},
+             {{{{points * points * points - points * points,
+                 points * points * points - points,
+                 0,
+                 points * points - points}},
+               {{0, points * points - points, 0, points * points - points}}}}}},
+           {{{{{{points * points * points - points * points,
+                 points * points * points - points * points + points - 1,
+                 points * points - points,
+                 points * points - 1}},
+               {{0,
+                 points - 1,
+                 points * points - points,
+                 points * points - 1}}}},
+             {{{{points * points * points - points * points,
+                 points * points * points - points * points + points - 1,
+                 0,
+                 points - 1}},
+               {{0, points - 1, 0, points - 1}}}}}}}};
+
+      return lines_plane_array[i][j][k][l];
+    }
+
+#ifndef DEBUG
+    inline DEAL_II_ALWAYS_INLINE
+#endif
+      unsigned int
+      lines(unsigned int i,
+            unsigned int j,
+            unsigned int k,
+            unsigned int l) const
+    {
+      static constexpr unsigned int points = fe_degree + 1;
+
+      static constexpr dealii::ndarray<unsigned int, 3, 2, 2, 3> lines_array = {
+        {{{{{{{points * points - points,
+               points * points * points - points * points,
+               points * points * points - points}},
+             {{0,
+               points * points - points,
+               points * points * points - points}}}},
+           {{{{0,
+               points * points * points - points * points,
+               points * points * points - points}},
+             {{0,
+               points * points - points,
+               points * points * points - points * points}}}}}},
+         {{{{{{points - 1,
+               points * points * points - points * points,
+               points * points * points - points * points + points - 1}},
+             {{0,
+               points - 1,
+               points * points * points - points * points + points - 1}}}},
+           {{{{0,
+               points * points * points - points * points,
+               points * points * points - points * points + points - 1}},
+             {{0, points - 1, points * points * points - points * points}}}}}},
+         {{{{{{points - 1, points * points - points, points * points - 1}},
+             {{0, points - 1, points * points - 1}}}},
+           {{{{0, points * points - points, points * points - 1}},
+             {{0, points - 1, points * points - points}}}}}}}};
+
+      return lines_array[i][j][k][l];
+    }
+  };
+
+
+  template <int dim, int fe_degree, typename Number, bool is_face>
+  class FEEvaluationImplHangingNodesRunner<
+    FEEvaluationImplHangingNodesRunnerTypes::scalar,
+    dim,
+    fe_degree,
+    Number,
+    is_face>
+  {
+  public:
+    static const VectorizationTypes VectorizationType =
+      VectorizationTypes::index;
+
+  private:
+    template <unsigned int side, bool transpose>
+    static
+#ifndef DEBUG
+      inline DEAL_II_ALWAYS_INLINE
+#endif
+      void
+      interpolate_2D(
+        const unsigned int given_degree,
+        const typename Trait<Number, VectorizationType>::index_type v,
+        const typename Trait<Number, VectorizationType>::interpolation_type
+          *DEAL_II_RESTRICT      weight,
+        Number *DEAL_II_RESTRICT values)
+    {
+      static constexpr unsigned int max_n_points_1D = 40;
+
+      typename Trait<Number, VectorizationType>::value_type
+        temp[fe_degree != -1 ? (fe_degree + 1) : max_n_points_1D];
+
+      const unsigned int points =
+        (fe_degree != -1 ? fe_degree : given_degree) + 1;
+
+      AssertIndexRange(given_degree, max_n_points_1D);
+
+      const unsigned int d = side / 2; // direction
+      const unsigned int s = side % 2; // left or right surface
+
+      const unsigned int offset = dealii::Utilities::pow(points, d + 1);
+      const unsigned int stride =
+        (s == 0 ? 0 : (points - 1)) * dealii::Utilities::pow(points, d);
+
+      const unsigned int r1 = dealii::Utilities::pow(points, dim - d - 1);
+      const unsigned int r2 = dealii::Utilities::pow(points, d);
+
+      // copy result back
+      for (unsigned int i = 0, k = 0; i < r1; ++i)
+        for (unsigned int j = 0; j < r2; ++j, ++k)
+          temp[k] = Trait<Number, VectorizationType>::get_value(
+            values[i * offset + stride + j], v);
+
+      // perform interpolation point by point (note: r1 * r2 ==
+      // points^(dim-1))
+      for (unsigned int i = 0, k = 0; i < r1; ++i)
+        for (unsigned int j = 0; j < r2; ++j, ++k)
+          {
+            typename Trait<Number, VectorizationType>::value_type sum = 0.0;
+            for (unsigned int h = 0; h < points; ++h)
+              sum += Trait<Number, VectorizationType>::get_value(
+                       weight[(transpose ? 1 : points) * k +
+                              (transpose ? points : 1) * h],
+                       v) *
+                     temp[h];
+            Trait<Number, VectorizationType>::set_value(
+              values[i * offset + stride + j], sum, v);
+          }
+    }
+
+  public:
+    template <bool transpose>
+    static void
+    run_internal(const unsigned int                  n_desired_components,
+                 const FEEvaluationBaseData<dim,
+                                            typename Number::value_type,
+                                            is_face,
+                                            Number> &fe_eval,
+                 const std::array<MatrixFreeFunctions::ConstraintKinds,
+                                  Number::size()> &  constraint_mask,
+                 Number *                            values)
+    {
+      const unsigned int given_degree =
+        fe_degree != -1 ? fe_degree :
+                          fe_eval.get_shape_info().data.front().fe_degree;
+
+      const auto &interpolation_matrices =
+        Trait<Number, VectorizationType>::get_interpolation_matrix(fe_eval);
+
+      const auto constraint_mask_sorted =
+        Trait<Number, VectorizationType>::create_mask(constraint_mask);
+
+      for (unsigned int c = 0; c < n_desired_components; ++c)
+        {
+          for (unsigned int v = 0; v < Number::size(); ++v)
+            {
+              const auto mask = constraint_mask_sorted[v];
+
+              if (Trait<Number, VectorizationType>::do_break(v, mask))
+                break;
+
+              if (Trait<Number, VectorizationType>::do_continue(v, mask))
+                continue;
+
+              const auto vv =
+                Trait<Number, VectorizationType>::create(constraint_mask,
+                                                         constraint_mask_sorted,
+                                                         v);
+
+              if (dim == 2) // 2D: only faces
+                {
+                  const auto is_set = [](const auto a, const auto b) -> bool {
+                    return (a & b) == b;
+                  };
+
+                  // direction 0:
+                  if ((mask & MatrixFreeFunctions::ConstraintKinds::face_y) !=
+                      MatrixFreeFunctions::ConstraintKinds::unconstrained)
+                    {
+                      const bool is_subface_0 =
+                        (mask &
+                         MatrixFreeFunctions::ConstraintKinds::subcell_x) ==
+                        MatrixFreeFunctions::ConstraintKinds::unconstrained;
+
+                      const auto *weights =
+                        interpolation_matrices[is_subface_0].data();
+
+                      if (is_set(
+                            mask,
+                            MatrixFreeFunctions::ConstraintKinds::subcell_y))
+                        interpolate_2D<2, transpose>(given_degree,
+                                                     vv,
+                                                     weights,
+                                                     values); // face 2
+                      else
+                        interpolate_2D<3, transpose>(given_degree,
+                                                     vv,
+                                                     weights,
+                                                     values); // face 3
+                    }
+
+                  // direction 1:
+                  if ((mask & MatrixFreeFunctions::ConstraintKinds::face_x) !=
+                      MatrixFreeFunctions::ConstraintKinds::unconstrained)
+                    {
+                      const bool is_subface_0 =
+                        (mask &
+                         MatrixFreeFunctions::ConstraintKinds::subcell_y) ==
+                        MatrixFreeFunctions::ConstraintKinds::unconstrained;
+
+                      const auto *weights =
+                        interpolation_matrices[is_subface_0].data();
+
+                      if (is_set(
+                            mask,
+                            MatrixFreeFunctions::ConstraintKinds::subcell_x))
+                        interpolate_2D<0, transpose>(given_degree,
+                                                     vv,
+                                                     weights,
+                                                     values); // face 0
+                      else
+                        interpolate_2D<1, transpose>(given_degree,
+                                                     vv,
+                                                     weights,
+                                                     values); // face 1
+                    }
+                }
+              else if (dim == 3) // 3D faces and edges
+                {
+                  const auto m = static_cast<std::uint16_t>(mask);
+
+                  const bool type_x = (m >> 0) & 1;
+                  const bool type_y = (m >> 1) & 1;
+                  const bool type_z = (m >> 2) & 1;
+                  const auto faces  = (m >> 3) & 7;
+                  const auto edges  = (m >> 6);
+
+                  Helper<fe_degree == -1 ? HelperType::dynamic :
+                                           HelperType::constant,
+                         Number,
+                         VectorizationType,
+                         fe_degree,
+                         transpose>
+                    helper(given_degree,
+                           type_x,
+                           type_y,
+                           type_z,
+                           vv,
+                           interpolation_matrices,
+                           values);
+
+                  if (faces > 0)
+                    switch (faces)
+                      {
+                        case 0:
+                          break;
+                        case 1:
+                          helper
+                            .template process_faces_fast<true, false, false>();
+                          break;
+                        case 2:
+                          helper
+                            .template process_faces_fast<false, true, false>();
+                          break;
+                        case 3:
+                          helper.template process_faces<true, true, false>();
+                          break;
+                        case 4:
+                          helper
+                            .template process_faces_fast<false, false, true>();
+                          break;
+                        case 5:
+                          helper.template process_faces<true, false, true>();
+                          break;
+                        case 6:
+                          helper.template process_faces<false, true, true>();
+                          break;
+                        case 7:
+                          helper.template process_faces<true, true, true>();
+                          break;
+                      }
+
+                  if (edges > 0)
+                    switch (edges)
+                      {
+                        case 0:
+                          break;
+                        case 1:
+                          helper.template process_edge<true, false, false>();
+                          break;
+                        case 2:
+                          helper.template process_edge<false, true, false>();
+                          break;
+                        case 3:
+                          helper.template process_edge<true, true, false>();
+                          break;
+                        case 4:
+                          helper.template process_edge<false, false, true>();
+                          break;
+                        case 5:
+                          helper.template process_edge<true, false, true>();
+                          break;
+                        case 6:
+                          helper.template process_edge<false, true, true>();
+                          break;
+                        case 7:
+                          helper.template process_edge<true, true, true>();
+                          break;
+                      }
+                }
+              else
+                {
+                  Assert(false, ExcNotImplemented());
+                }
+            }
+
+          values += fe_eval.get_shape_info().dofs_per_component_on_cell;
+        }
+    }
+  };
+
 
 
   template <int dim, typename Number, bool is_face>
@@ -449,12 +1891,12 @@ namespace internal
           &     c_mask,
         Number *values)
     {
-      using RunnerType = FEEvaluationImplHangingNodesRunner<
-        FEEvaluationImplHangingNodesRunnerTypes::vectorized,
-        dim,
-        fe_degree,
-        Number,
-        is_face>;
+      using RunnerType =
+        FEEvaluationImplHangingNodesRunner<used_runner_type<fe_degree>(),
+                                           dim,
+                                           fe_degree,
+                                           Number,
+                                           is_face>;
 
       if (transpose)
         RunnerType::template run_internal<true>(n_desired_components,
@@ -468,6 +1910,15 @@ namespace internal
                                                  values);
 
       return false;
+    }
+
+    template <int fe_degree>
+    static constexpr FEEvaluationImplHangingNodesRunnerTypes
+    used_runner_type()
+    {
+      return ((Number::size() > 2) && (fe_degree == -1 || fe_degree > 2)) ?
+               FEEvaluationImplHangingNodesRunnerTypes::vectorized :
+               FEEvaluationImplHangingNodesRunnerTypes::scalar;
     }
   };
 
