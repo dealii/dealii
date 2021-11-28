@@ -2020,14 +2020,16 @@ namespace GridGenerator
    * (quadrilaterals, hexahedra) to a triangulation only consisting of
    * simplices (triangles, tetrahedra).
    *
-   * As an example, the following image shows how a set of three hexahedra
-   * meshing one eighths of a sphere are subdivided into tetrahedra, and how
+   * As an example, the following image shows how a set of four hexahedra
+   * meshing one eighth of a sphere are subdivided into tetrahedra, and how
    * the curved surface is taken into account. Colors indicate how boundary
    * indicators are inherited:
    * @image html "convert_hypercube_to_simplex_mesh_visualization_octant.png"
    *
    * In general, each quadrilateral in 2d is subdivided into eight triangles,
-   * and each hexahedron in 3d into 24 tetrahedra as shown here:
+   * and each hexahedron in 3d into 24 tetrahedra, as shown here (top left
+   * for the 2d case, the rest shows vertex numbers and subdivisions for
+   * a single 3d hexahedron):
    * @image html "convert_hypercube_to_simplex_mesh_visualization.png"
    *
    * Material ID and boundary IDs are inherited upon conversion.
