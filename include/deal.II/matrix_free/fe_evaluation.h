@@ -3325,10 +3325,10 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
       for (unsigned int v = 0; v < n_lanes; ++v)
         if (cells[v] != numbers::invalid_unsigned_int &&
             this->dof_info->hanging_node_constraint_masks.size() > 0 &&
-            this->dof_info->hanging_node_constraint_masks
-                [cells[v] * this->n_fe_components +
-                 this->first_selected_component] !=
-              internal::MatrixFreeFunctions::ConstraintKinds::unconstrained)
+            this->dof_info->hanging_node_constraint_masks[cells[v]] !=
+              internal::MatrixFreeFunctions::ConstraintKinds::unconstrained &&
+            this->dof_info->hanging_node_constraint_masks_comp
+              [this->active_fe_index][this->first_selected_component])
           has_hn_constraints = true;
     }
 
@@ -3427,10 +3427,10 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
             has_constraints = true;
 
           if (this->dof_info->hanging_node_constraint_masks.size() > 0 &&
-              this->dof_info->hanging_node_constraint_masks
-                  [cells[v] * this->n_fe_components +
-                   this->first_selected_component] !=
-                internal::MatrixFreeFunctions::ConstraintKinds::unconstrained)
+              this->dof_info->hanging_node_constraint_masks[cells[v]] !=
+                internal::MatrixFreeFunctions::ConstraintKinds::unconstrained &&
+              this->dof_info->hanging_node_constraint_masks_comp
+                [this->active_fe_index][this->first_selected_component])
             has_hn_constraints = true;
 
           Assert(my_index_start[n_components_read].first ==
@@ -3514,9 +3514,11 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
           (this->dof_info->row_starts[cell_dof_index].second !=
              this->dof_info->row_starts[cell_dof_index + n_components_read]
                .second ||
-           (this->dof_info->hanging_node_constraint_masks.size() > 0 &&
-            this->dof_info->hanging_node_constraint_masks[cell_dof_index] !=
-              internal::MatrixFreeFunctions::ConstraintKinds::unconstrained)))
+           ((this->dof_info->hanging_node_constraint_masks.size() > 0 &&
+             this->dof_info->hanging_node_constraint_masks[cell_index] !=
+               internal::MatrixFreeFunctions::ConstraintKinds::unconstrained) &&
+            this->dof_info->hanging_node_constraint_masks_comp
+              [this->active_fe_index][this->first_selected_component])))
         {
           Assert(this->dof_info->row_starts_plain_indices[cell_index] !=
                    numbers::invalid_unsigned_int,
@@ -4152,7 +4154,9 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   apply_hanging_node_constraints(const bool transpose) const
 {
   if (this->dof_info == nullptr ||
-      this->dof_info->hanging_node_constraint_masks.size() == 0)
+      this->dof_info->hanging_node_constraint_masks.size() == 0 ||
+      this->dof_info->hanging_node_constraint_masks_comp
+          [this->active_fe_index][this->first_selected_component] == false)
     return; // nothing to do with faces
 
   constexpr unsigned int n_lanes = VectorizedArrayType::size();
@@ -4174,11 +4178,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
         }
 
       const unsigned int cell_index = cells[v];
-      const unsigned int cell_dof_index =
-        cell_index * this->n_fe_components + this->first_selected_component;
-
-      const auto mask =
-        this->dof_info->hanging_node_constraint_masks[cell_dof_index];
+      const auto         mask =
+        this->dof_info->hanging_node_constraint_masks[cell_index];
       constraint_mask[v] = mask;
 
       hn_available |=
