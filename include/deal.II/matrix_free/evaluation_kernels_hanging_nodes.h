@@ -93,18 +93,53 @@ namespace internal
             temp[k] = values[my_offset + k * stride];
 
           // perform interpolation point by point and write back
-          for (unsigned int k = 0; k < points; ++k)
+          for (unsigned int k = 0; k < points / 2; ++k)
             {
-              Number sum0 = Number(), sum1 = Number();
+              const unsigned int kmirror = points - 1 - k;
+              Number sum0 = Number(), sum1 = Number(), sum2 = Number(),
+                     sum3 = Number();
               for (unsigned int h = 0; h < points; ++h)
                 {
-                  // sum0 belongs to the other interpolation matrix, but we
-                  // can use the symmetry here to reduce the number of loads
-                  sum0 += temp[h] *
-                          weights[(transpose ? 1 : points) * (points - 1 - k) +
-                                  (transpose ? points : 1) * (points - 1 - h)];
-                  sum1 += temp[h] * weights[(transpose ? 1 : points) * k +
+                  const unsigned int hmirror = points - 1 - h;
+                  // load from both sides of the interpolation matrix to
+                  // reflect symmetry between the two subfaces along that
+                  // direction
+                  const Number w0 = weights[(transpose ? 1 : points) * kmirror +
+                                            (transpose ? points : 1) * hmirror];
+                  const Number w1 = weights[(transpose ? 1 : points) * k +
                                             (transpose ? points : 1) * h];
+                  sum0 += temp[h] * w0;
+                  sum1 += temp[h] * w1;
+                  sum2 += temp[hmirror] * w1;
+                  sum3 += temp[hmirror] * w0;
+                }
+              values[my_offset + k * stride] =
+                temp[k] +
+                mask_write * (sum0 + mask_weight * (sum1 - sum0) - temp[k]);
+              values[my_offset + kmirror * stride] =
+                temp[kmirror] +
+                mask_write *
+                  (sum2 + mask_weight * (sum3 - sum2) - temp[kmirror]);
+            }
+
+          // cleanup case
+          if (points % 2)
+            {
+              const unsigned int k = points / 2;
+              Number sum0 = temp[k] * weights[(transpose ? 1 : points) * k +
+                                              (transpose ? points : 1) * k],
+                     sum1 = sum0;
+              for (unsigned int h = 0; h < points / 2; ++h)
+                {
+                  const unsigned int hmirror = points - 1 - h;
+                  const Number       w0 = weights[(transpose ? 1 : points) * k +
+                                            (transpose ? points : 1) * hmirror];
+                  const Number       w1 = weights[(transpose ? 1 : points) * k +
+                                            (transpose ? points : 1) * h];
+                  sum0 += temp[h] * w0;
+                  sum0 += temp[hmirror] * w1;
+                  sum1 += temp[h] * w1;
+                  sum1 += temp[hmirror] * w0;
                 }
               values[my_offset + k * stride] =
                 temp[k] +
