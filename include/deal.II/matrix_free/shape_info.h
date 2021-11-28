@@ -23,6 +23,7 @@
 #include <deal.II/base/aligned_vector.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/vectorization.h>
 
 #include <deal.II/fe/fe.h>
 
@@ -266,6 +267,15 @@ namespace internal
        * This data structure is only set up for FE_Q for dim > 1.
        */
       std::array<AlignedVector<Number>, 2> subface_interpolation_matrices;
+
+      /**
+       * Same as above but stored in a scalar format independent of the type of
+       * Number
+       */
+      std::array<AlignedVector<typename dealii::internal::VectorizedArrayTrait<
+                   Number>::value_type>,
+                 2>
+        subface_interpolation_matrices_scalar;
 
       /**
        * We store a copy of the one-dimensional quadrature formula
