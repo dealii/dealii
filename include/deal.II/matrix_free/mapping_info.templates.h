@@ -100,7 +100,7 @@ namespace internal
       for (unsigned int i = 0; i < n_q_points; ++i)
         quadrature_weights[i] = quadrature.weight(i);
 
-      for (unsigned int d = 0; d < structdim; ++d)
+      for (int d = 0; d < structdim; ++d)
         {
           tensor_quadrature_weights[d].resize(quadrature_1d.size());
           for (unsigned int i = 0; i < quadrature_1d.size(); ++i)
@@ -149,7 +149,7 @@ namespace internal
       std::size_t memory = sizeof(this) + quadrature.memory_consumption() +
                            quadrature_weights.memory_consumption() +
                            face_orientations.memory_consumption();
-      for (unsigned int d = 0; d < structdim; ++d)
+      for (int d = 0; d < structdim; ++d)
         memory += tensor_quadrature_weights[d].memory_consumption();
       return memory;
     }

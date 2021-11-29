@@ -29,7 +29,7 @@ namespace internal
 
     Point<dim + 1> output;
     output(component_in_dim_plus_1) = coordinate_value;
-    for (unsigned int d = 0; d < dim; ++d)
+    for (int d = 0; d < dim; ++d)
       {
         const unsigned int component_to_write_to =
           dealii::internal::coordinate_to_one_dim_higher<dim>(
