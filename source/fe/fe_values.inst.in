@@ -13,10 +13,11 @@
 //
 // ---------------------------------------------------------------------
 
+#ifndef DOXYGEN
 
 for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
   {
-#if deal_II_dimension <= deal_II_space_dimension
+#  if deal_II_dimension <= deal_II_space_dimension
     template class FEValuesBase<deal_II_dimension, deal_II_space_dimension>;
     template class FEValues<deal_II_dimension, deal_II_space_dimension>;
 
@@ -45,14 +46,14 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
                                                 deal_II_space_dimension>;
       \}
     \}
-#endif
+#  endif
   }
 
 
 for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
      lda : BOOL)
   {
-#if deal_II_dimension <= deal_II_space_dimension
+#  if deal_II_dimension <= deal_II_space_dimension
     template void FEValues<deal_II_dimension, deal_II_space_dimension>::reinit(
       const TriaIterator<
         DoFCellAccessor<deal_II_dimension, deal_II_space_dimension, lda>> &);
@@ -87,7 +88,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
       const TriaIterator<TriaAccessor<deal_II_dimension - 1,
                                       deal_II_dimension,
                                       deal_II_space_dimension>> &);
-#endif
+#  endif
   }
 
 
@@ -95,7 +96,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
 for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
      deal_II_space_dimension : SPACE_DIMENSIONS)
   {
-#if deal_II_dimension <= deal_II_space_dimension
+#  if deal_II_dimension <= deal_II_space_dimension
     template void
     FEValuesViews::Scalar<deal_II_dimension, deal_II_space_dimension>::
       get_function_values<dealii::VEC>(
@@ -234,7 +235,7 @@ for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
           ProductType<dealii::VEC::value_type,
                       dealii::Tensor<3, deal_II_space_dimension>>::type> &)
         const;
-#endif
+#  endif
   }
 
 
@@ -242,7 +243,7 @@ for (VEC : GENERAL_CONTAINER_TYPES; Number : ALL_SCALAR_TYPES;
      deal_II_dimension : DIMENSIONS;
      deal_II_space_dimension : SPACE_DIMENSIONS)
   {
-#if deal_II_dimension <= deal_II_space_dimension
+#  if deal_II_dimension <= deal_II_space_dimension
     template void
     FEValuesViews::Scalar<deal_II_dimension, deal_II_space_dimension>::
       get_function_values_from_local_dof_values<VEC<Number>>(
@@ -350,14 +351,14 @@ for (VEC : GENERAL_CONTAINER_TYPES; Number : ALL_SCALAR_TYPES;
       get_function_gradients_from_local_dof_values<VEC<Number>>(
         const VEC<Number> &, std::vector<solution_gradient_type<Number>> &)
         const;
-#endif
+#  endif
   }
 
 
 for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
      deal_II_space_dimension : SPACE_DIMENSIONS)
   {
-#if deal_II_dimension <= deal_II_space_dimension
+#  if deal_II_dimension <= deal_II_space_dimension
 
     template void FEValuesBase<deal_II_dimension, deal_II_space_dimension>::
       get_function_values<VEC>(const VEC &, std::vector<VEC::value_type> &)
@@ -487,5 +488,6 @@ for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
           dealii::Tensor<3, deal_II_space_dimension, VEC::value_type>>>,
         bool) const;
 
-#endif
+#  endif
   }
+#endif
