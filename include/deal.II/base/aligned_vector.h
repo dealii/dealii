@@ -848,7 +848,7 @@ namespace internal
 
 
   /**
-   * A class that given a range of memory locations calls either calls
+   * A class that given a range of memory locations either calls
    * the placement-new operator on these memory locations (if
    * `initialize_memory==true`) or just copies the given initializer
    * into this memory location (if `initialize_memory==false`). The
@@ -1199,11 +1199,22 @@ template <class T>
 inline AlignedVector<T> &
 AlignedVector<T>::operator=(const AlignedVector<T> &vec)
 {
+  const size_type new_size = vec.used_elements_end - vec.elements.get();
+
+  // First throw away everything and re-allocate memory but leave that
+  // memory uninitialized for now:
   resize(0);
-  resize_fast(vec.used_elements_end - vec.elements.get());
+  reserve(new_size);
+
+  // Then copy the elements over by using the copy constructor on these
+  // elements:
   internal::AlignedVectorCopyConstruct<T>(vec.elements.get(),
                                           vec.used_elements_end,
                                           elements.get());
+
+  // Finally adjust the pointer to the end of the elements that are used:
+  used_elements_end = elements.get() + new_size;
+
   return *this;
 }
 
