@@ -1307,7 +1307,7 @@ namespace Utilities
 #else
         (void)allow_compression;
 #endif
-        fisb.push(boost::iostreams::array_source(&*cbegin, &*cend));
+        fisb.push(boost::iostreams::array_source(&*cbegin, cend - cbegin));
 
         boost::archive::binary_iarchive bia(fisb);
         bia >> object;
@@ -1355,7 +1355,7 @@ namespace Utilities
 #else
         (void)allow_compression;
 #endif
-        fisb.push(boost::iostreams::array_source(&*cbegin, &*cend));
+        fisb.push(boost::iostreams::array_source(&*cbegin, cend - cbegin));
 
         boost::archive::binary_iarchive bia(fisb);
         bia >> unpacked_object;
