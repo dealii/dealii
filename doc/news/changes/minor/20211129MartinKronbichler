@@ -1,0 +1,6 @@
+Fixed: MatrixFreeOperators::CellwiseInverseMassMatrix with template argument
+`-1` for the polynomial degree now chooses the pre-compiled code with fast
+tensor-product algorithms if available, rather than a slower general-purpose
+code.
+<br>
+(Martin Kronbichler, 2021/11/29)
