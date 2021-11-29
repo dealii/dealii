@@ -330,12 +330,12 @@ namespace internal
   void
   CellwiseInverseMassFactory<dim, Number, VectorizedArrayType>::apply(
     const unsigned int n_components,
-    const unsigned int fe_degree,
     const FEEvaluationBaseData<dim, Number, false, VectorizedArrayType>
       &                        fe_eval,
     const VectorizedArrayType *in_array,
     VectorizedArrayType *      out_array)
   {
+    const unsigned int fe_degree = fe_eval.get_shape_info().data[0].fe_degree;
     instantiation_helper_run<
       1,
       CellwiseInverseMassMatrixImplBasic<dim, VectorizedArrayType>>(
@@ -373,13 +373,14 @@ namespace internal
   CellwiseInverseMassFactory<dim, Number, VectorizedArrayType>::
     transform_from_q_points_to_basis(
       const unsigned int n_components,
-      const unsigned int fe_degree,
-      const unsigned int n_q_points_1d,
       const FEEvaluationBaseData<dim, Number, false, VectorizedArrayType>
         &                        fe_eval,
       const VectorizedArrayType *in_array,
       VectorizedArrayType *      out_array)
   {
+    const unsigned int fe_degree = fe_eval.get_shape_info().data[0].fe_degree;
+    const unsigned int n_q_points_1d =
+      fe_eval.get_shape_info().data[0].n_q_points_1d;
     instantiation_helper_run<
       1,
       CellwiseInverseMassMatrixImplTransformFromQPoints<dim,

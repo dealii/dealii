@@ -1063,8 +1063,12 @@ namespace MatrixFreeOperators
     VectorizedArrayType>::apply(const VectorizedArrayType *in_array,
                                 VectorizedArrayType *      out_array) const
   {
-    internal::CellwiseInverseMassMatrixImplBasic<dim, VectorizedArrayType>::
-      template run<fe_degree>(n_components, fe_eval, in_array, out_array);
+    if (fe_degree > -1)
+      internal::CellwiseInverseMassMatrixImplBasic<dim, VectorizedArrayType>::
+        template run<fe_degree>(n_components, fe_eval, in_array, out_array);
+    else
+      internal::CellwiseInverseMassFactory<dim, Number, VectorizedArrayType>::
+        apply(n_components, fe_eval, in_array, out_array);
   }
 
 
@@ -1085,13 +1089,25 @@ namespace MatrixFreeOperators
           const VectorizedArrayType *               in_array,
           VectorizedArrayType *                     out_array) const
   {
-    internal::CellwiseInverseMassMatrixImplFlexible<dim, VectorizedArrayType>::
-      template run<fe_degree>(
-        n_actual_components,
-        fe_eval.get_shape_info().data.front().inverse_shape_values_eo,
-        inverse_coefficients,
-        in_array,
-        out_array);
+    const unsigned int given_degree =
+      fe_eval.get_shape_info().data[0].fe_degree;
+    if (fe_degree > -1)
+      internal::CellwiseInverseMassMatrixImplFlexible<dim,
+                                                      VectorizedArrayType>::
+        template run<fe_degree>(
+          n_actual_components,
+          fe_eval.get_shape_info().data.front().inverse_shape_values_eo,
+          inverse_coefficients,
+          in_array,
+          out_array);
+    else
+      internal::CellwiseInverseMassFactory<dim, Number, VectorizedArrayType>::
+        apply(n_actual_components,
+              given_degree,
+              fe_eval.get_shape_info().data.front().inverse_shape_values_eo,
+              inverse_coefficients,
+              in_array,
+              out_array);
   }
 
 
@@ -1124,8 +1140,6 @@ namespace MatrixFreeOperators
     else
       internal::CellwiseInverseMassFactory<dim, Number, VectorizedArrayType>::
         transform_from_q_points_to_basis(n_actual_components,
-                                         fe_degree,
-                                         n_q_points_1d,
                                          fe_eval,
                                          in_array,
                                          out_array);
