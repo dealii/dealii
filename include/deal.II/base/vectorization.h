@@ -5317,6 +5317,22 @@ compare_and_apply_mask(const VectorizedArray<double, 2> &left,
 #endif // DOXYGEN
 
 
+namespace internal
+{
+  template <typename T>
+  struct VectorizedArrayTrait
+  {
+    using value_type = T;
+  };
+
+  template <typename T, std::size_t width>
+  struct VectorizedArrayTrait<VectorizedArray<T, width>>
+  {
+    using value_type = T;
+  };
+} // namespace internal
+
+
 DEAL_II_NAMESPACE_CLOSE
 
 /**
