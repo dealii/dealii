@@ -25,11 +25,14 @@
 
 #  include <memory>
 
+#  ifdef DEAL_II_WITH_TASKFLOW
 // forward declaration from <taskflow/taskflow.hpp>
 namespace tf
 {
   class Executor;
 }
+#  endif
+
 
 DEAL_II_NAMESPACE_OPEN
 
