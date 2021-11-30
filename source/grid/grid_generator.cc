@@ -28,6 +28,8 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
+#include <deal.II/physics/transformations.h>
+
 #include <array>
 #include <cmath>
 #include <limits>
@@ -954,14 +956,10 @@ namespace GridGenerator
           std::vector<bool> vertex_processed(tria.n_vertices(), false);
 
           // rotation matrix for clockwise rotation of block 1 by angle gamma
-          Tensor<2, 2, double> rotation_matrix_1, rotation_matrix_2;
-
-          rotation_matrix_1[0][0] = +std::cos(-gamma);
-          rotation_matrix_1[0][1] = -std::sin(-gamma);
-          rotation_matrix_1[1][0] = +std::sin(-gamma);
-          rotation_matrix_1[1][1] = +std::cos(-gamma);
-
-          rotation_matrix_2 = transpose(rotation_matrix_1);
+          const Tensor<2, 2, double> rotation_matrix_1 =
+            Physics::Transformations::Rotations::rotation_matrix_2d(-gamma);
+          const Tensor<2, 2, double> rotation_matrix_2 =
+            transpose(rotation_matrix_1);
 
           // horizontal offset in order to place coarse-grid node A in the
           // origin
