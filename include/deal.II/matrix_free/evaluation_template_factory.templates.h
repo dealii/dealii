@@ -24,7 +24,6 @@
 #include <deal.II/matrix_free/evaluation_selector.h>
 #include <deal.II/matrix_free/evaluation_template_factory.h>
 #include <deal.II/matrix_free/evaluation_template_factory_internal.h>
-#include <deal.II/matrix_free/fe_evaluation.h>
 
 DEAL_II_NAMESPACE_OPEN
 
