@@ -729,8 +729,7 @@ public:
     const std::vector<std::string> &names,
     const DataVectorType            type = type_automatic,
     const std::vector<DataComponentInterpretation::DataComponentInterpretation>
-      &data_component_interpretation = std::vector<
-        DataComponentInterpretation::DataComponentInterpretation>());
+      &data_component_interpretation = {});
 
   /**
    * This function is an abbreviation to the above one (see there for a
@@ -755,8 +754,7 @@ public:
     const std::string &  name,
     const DataVectorType type = type_automatic,
     const std::vector<DataComponentInterpretation::DataComponentInterpretation>
-      &data_component_interpretation = std::vector<
-        DataComponentInterpretation::DataComponentInterpretation>());
+      &data_component_interpretation = {});
 
   /**
    * This function is an extension of the above one (see there for a
@@ -780,8 +778,7 @@ public:
     const VectorType &               data,
     const std::vector<std::string> & names,
     const std::vector<DataComponentInterpretation::DataComponentInterpretation>
-      &data_component_interpretation = std::vector<
-        DataComponentInterpretation::DataComponentInterpretation>());
+      &data_component_interpretation = {});
 
 
   /**
@@ -795,8 +792,7 @@ public:
     const VectorType &               data,
     const std::string &              name,
     const std::vector<DataComponentInterpretation::DataComponentInterpretation>
-      &data_component_interpretation = std::vector<
-        DataComponentInterpretation::DataComponentInterpretation>());
+      &data_component_interpretation = {});
 
   /**
    * This function is an alternative to the above ones, allowing the output of
