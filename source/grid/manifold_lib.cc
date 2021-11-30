@@ -26,6 +26,8 @@
 
 #include <deal.II/lac/vector.h>
 
+#include <deal.II/physics/vector_relations.h>
+
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/container/small_vector.hpp>
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
@@ -1129,9 +1131,9 @@ CylindricalManifold<dim, spacedim>::pull_back(
 
   // Then compute the angle between the projection direction and
   // another vector orthogonal to the direction vector.
-  const double dot = normal_direction * p_diff;
-  const double det = direction * cross_product_3d(normal_direction, p_diff);
-  const double phi = std::atan2(det, dot);
+  const double phi = Physics::VectorRelations::signed_angle(normal_direction,
+                                                            p_diff,
+                                                            /*axis=*/direction);
 
   // Return distance from the axis, angle and signed distance on the axis.
   return Point<3>(p_diff.norm(), phi, lambda);
