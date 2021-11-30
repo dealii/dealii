@@ -1079,9 +1079,12 @@ namespace internal
     {
       const UpdateFlags update_flags = data.update_each;
 
+      using VectorizedArrayType =
+        typename dealii::MappingQ<dim,
+                                  spacedim>::InternalData::VectorizedArrayType;
       const unsigned int     n_shape_values = data.n_shape_functions;
       const unsigned int     n_q_points     = data.shape_info.n_q_points;
-      constexpr unsigned int n_lanes        = VectorizedArray<double>::size();
+      constexpr unsigned int n_lanes        = VectorizedArrayType::size();
       constexpr unsigned int n_comp         = 1 + (spacedim - 1) / n_lanes;
       constexpr unsigned int n_hessians     = (dim * (dim + 1)) / 2;
 
@@ -1148,7 +1151,7 @@ namespace internal
               }
 
           // do the actual tensorized evaluation
-          internal::FEEvaluationFactory<dim, double, VectorizedArray<double>>::
+          internal::FEEvaluationFactory<dim, double, VectorizedArrayType>::
             evaluate(n_comp,
                      evaluation_flag,
                      data.shape_info,

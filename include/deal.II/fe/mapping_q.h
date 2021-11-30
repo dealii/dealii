@@ -475,42 +475,50 @@ public:
     QGaussLobatto<1> line_support_points;
 
     /**
+     * A vectorized array type to reflect the necessary number of components
+     * for all interpolations to be done by this class.
+     */
+    using VectorizedArrayType =
+      VectorizedArray<double,
+                      std::min<std::size_t>(VectorizedArray<double>::size(),
+                                            (dim <= 2 ? 2 : 4))>;
+
+    /**
      * In case the quadrature rule given represents a tensor product
      * we need to store the evaluations of the 1d polynomials at
      * the 1d quadrature points. That is what this variable is for.
      */
-    internal::MatrixFreeFunctions::ShapeInfo<VectorizedArray<double>>
-      shape_info;
+    internal::MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> shape_info;
 
     /**
      * In case the quadrature rule given represents a tensor product
      * we need to store temporary data in this object.
      */
-    mutable AlignedVector<VectorizedArray<double>> scratch;
+    mutable AlignedVector<VectorizedArrayType> scratch;
 
     /**
      * In case the quadrature rule given represents a tensor product
      * the values at the mapped support points are stored in this object.
      */
-    mutable AlignedVector<VectorizedArray<double>> values_dofs;
+    mutable AlignedVector<VectorizedArrayType> values_dofs;
 
     /**
      * In case the quadrature rule given represents a tensor product
      * the values at the quadrature points are stored in this object.
      */
-    mutable AlignedVector<VectorizedArray<double>> values_quad;
+    mutable AlignedVector<VectorizedArrayType> values_quad;
 
     /**
      * In case the quadrature rule given represents a tensor product
      * the gradients at the quadrature points are stored in this object.
      */
-    mutable AlignedVector<VectorizedArray<double>> gradients_quad;
+    mutable AlignedVector<VectorizedArrayType> gradients_quad;
 
     /**
      * In case the quadrature rule given represents a tensor product
      * the hessians at the quadrature points are stored in this object.
      */
-    mutable AlignedVector<VectorizedArray<double>> hessians_quad;
+    mutable AlignedVector<VectorizedArrayType> hessians_quad;
 
     /**
      * Indicates whether the given Quadrature object is a tensor product.
