@@ -285,7 +285,7 @@ private:
   compute_inverse_diagonal()
   {
     data.initialize_dof_vector(inverse_diagonal_entries);
-    unsigned int dummy;
+    unsigned int dummy = 0;
     data.cell_loop(&LaplaceOperator::local_diagonal_cell,
                    this,
                    inverse_diagonal_entries,
