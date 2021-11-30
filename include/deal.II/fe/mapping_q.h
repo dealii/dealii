@@ -475,42 +475,60 @@ public:
     QGaussLobatto<1> line_support_points;
 
     /**
+     * For the fast tensor-product path of the MappingQ class, we choose SIMD
+     * vectors that are as wide as possible to minimize the number of
+     * arithmetic operations. However, we do not want to choose it wider than
+     * necessary, e.g., we avoid something like 8-wide AVX-512 when we only
+     * compute 3 components of a 3D computation. This is because the
+     * additional lanes would not do useful work, but a few operations on very
+     * wide vectors can already lead to a lower clock frequency of processors
+     * over long time spans (thousands of clock cycles). Hence, we choose
+     * 2-wide SIMD for 1D and 2D and 4-wide SIMD for 3D. Note that we do not
+     * immediately fall back to no SIMD for 1D because all architectures that
+     * support SIMD also support 128-bit vectors (and none is reported to
+     * reduce clock frequency for 128-bit SIMD).
+     */
+    using VectorizedArrayType =
+      VectorizedArray<double,
+                      std::min<std::size_t>(VectorizedArray<double>::size(),
+                                            (dim <= 2 ? 2 : 4))>;
+
+    /**
      * In case the quadrature rule given represents a tensor product
      * we need to store the evaluations of the 1d polynomials at
      * the 1d quadrature points. That is what this variable is for.
      */
-    internal::MatrixFreeFunctions::ShapeInfo<VectorizedArray<double>>
-      shape_info;
+    internal::MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> shape_info;
 
     /**
      * In case the quadrature rule given represents a tensor product
      * we need to store temporary data in this object.
      */
-    mutable AlignedVector<VectorizedArray<double>> scratch;
+    mutable AlignedVector<VectorizedArrayType> scratch;
 
     /**
      * In case the quadrature rule given represents a tensor product
      * the values at the mapped support points are stored in this object.
      */
-    mutable AlignedVector<VectorizedArray<double>> values_dofs;
+    mutable AlignedVector<VectorizedArrayType> values_dofs;
 
     /**
      * In case the quadrature rule given represents a tensor product
      * the values at the quadrature points are stored in this object.
      */
-    mutable AlignedVector<VectorizedArray<double>> values_quad;
+    mutable AlignedVector<VectorizedArrayType> values_quad;
 
     /**
      * In case the quadrature rule given represents a tensor product
      * the gradients at the quadrature points are stored in this object.
      */
-    mutable AlignedVector<VectorizedArray<double>> gradients_quad;
+    mutable AlignedVector<VectorizedArrayType> gradients_quad;
 
     /**
      * In case the quadrature rule given represents a tensor product
      * the hessians at the quadrature points are stored in this object.
      */
-    mutable AlignedVector<VectorizedArray<double>> hessians_quad;
+    mutable AlignedVector<VectorizedArrayType> hessians_quad;
 
     /**
      * Indicates whether the given Quadrature object is a tensor product.
