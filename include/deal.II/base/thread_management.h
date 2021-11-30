@@ -36,7 +36,9 @@
 #  include <utility>
 #  include <vector>
 
-
+#  ifdef DEAL_II_WITH_TBB
+#    include <tbb/task_group.h>
+#  endif
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -1005,8 +1007,97 @@ namespace Threads
     Task(const std::function<RT()> &function_object)
     {
       if (MultithreadInfo::n_threads() > 1)
-        task_data = std::make_shared<TaskData>(
-          std::async(std::launch::async, function_object));
+        {
+#  ifdef DEAL_II_WITH_TBB
+          // Create a promise object and from it extract a future that
+          // we can use to refer to the outcome of the task. For reasons
+          // explained below, we can't just create a std::promise object,
+          // but have to make do with a pointer to such an object.
+          std::unique_ptr<std::promise<RT>> promise =
+            std::make_unique<std::promise<RT>>();
+          task_data = std::make_shared<TaskData>(promise->get_future());
+
+          // Then start the task, using a task_group object (for just this one
+          // task) that is associated with the TaskData object. Note that we
+          // have to *copy* the function object being executed so that it is
+          // guaranteed to live on the called thread as well -- the copying is
+          // facilitated by capturing the 'function_object' variable by value.
+          //
+          // We also have to *move* the promise object into the new task's
+          // memory space because promises can not be copied and we can't refer
+          // to it by reference because it's a local variable of the current
+          // (surrounding) function that may go out of scope before the promise
+          // is ultimately set. This leads to a conundrum: if we had just
+          // declared 'promise' as an object of type std::promise, then we could
+          // capture it in the lambda function via
+          //     [..., promise=std::move(promise)]() {...}
+          // and set the promise in the body of the lambda. But setting a
+          // promise is a non-const operation on the promise, and so we would
+          // actually have to declare the lambda function as 'mutable' because
+          // by default, lambda captures are 'const'. That is, we would have
+          // to write
+          //     [..., promise=std::move(promise)]() mutable {...}
+          // But this leads to other problems: It turns out that the
+          // tbb::task_group::run() function cannot take mutable lambdas as
+          // argument :-(
+          //
+          // We work around this issue by not declaring the 'promise' variable
+          // as an object of type std::promise, but as a pointer to such an
+          // object. This pointer we can move, and the *pointer* itself can
+          // be 'const' (meaning we can leave the lambda as non-mutable)
+          // even though we modify the object *pointed to*. One would think
+          // that a std::unique_ptr would be the right choice for this, but
+          // that's not true: the resulting lambda function can then be
+          // non-mutable, but the lambda function object is not copyable
+          // and at least some TBB variants require that as well. So
+          // instead we move the std::unique_ptr used above into a
+          // std::shared_ptr to be stored within the lambda function object.
+          task_data->task_group.run(
+            [function_object,
+             promise =
+               std::shared_ptr<std::promise<RT>>(std::move(promise))]() {
+              try
+                {
+                  internal::evaluate_and_set_promise(function_object, *promise);
+                }
+              catch (...)
+                {
+                  try
+                    {
+                      // store anything thrown in the promise
+                      promise->set_exception(std::current_exception());
+                    }
+                  catch (...)
+                    {
+                      // set_exception() may throw too. But ignore this on
+                      // the task.
+                    }
+                }
+            });
+
+#  else
+          // If no threading library is supported, just fall back onto C++11
+          // facilities. The problem with this is that the standard does
+          // not actually say what std::async should do. The first
+          // argument to that function can be std::launch::async or
+          // std::launch::deferred, or both. The *intent* of the standard's
+          // authors was probably that if one sets it to
+          //   std::launch::async | std::launch::deferred,
+          // that the task is run in a thread pool. But at least as of
+          // 2021, GCC doesn't do that: It just runs it on a new thread.
+          // If one chooses std::launch::deferred, it runs the task on
+          // the same thread but only when one calls join() on the task's
+          // std::future object. In the former case, this leads to
+          // oversubscription, in the latter case to undersubscription of
+          // resources. We choose oversubscription here.
+          //
+          // The issue illustrates why relying on external libraries
+          // with task schedulers is the way to go.
+          task_data = std::make_shared<TaskData>(
+            std::async(std::launch::async | std::launch::deferred,
+                       function_object));
+#  endif
+        }
       else
         {
           // Only one thread allowed. So let the task run to completion
@@ -1033,8 +1124,10 @@ namespace Threads
                   promise.set_exception(std::current_exception());
                 }
               catch (...)
-                {}
-              // set_exception() may throw too
+                {
+                  // set_exception() may throw too. But ignore this on
+                  // the task.
+                }
             }
         }
     }
@@ -1265,6 +1358,17 @@ namespace Threads
           return;
         else
           {
+#  ifdef DEAL_II_WITH_TBB
+            // If we build on the TBB, then we can't just wait for the
+            // std::future object to get ready. Apparently the TBB happily
+            // enqueues a task into an arena and then just sits on it without
+            // ever executing it unless someone expresses an interest in the
+            // task. The way to avoid this is to add the task to a
+            // tbb::task_group, and then here wait for the single task
+            // associated with that task group.
+            task_group.wait();
+#  endif
+
             // Wait for the task to finish and then move its
             // result. (We could have made the set_from() function
             // that we call here wait for the future to be ready --
@@ -1331,6 +1435,15 @@ namespace Threads
        * has delivered.
        */
       internal::return_value<RT> returned_object;
+
+#  ifdef DEAL_II_WITH_TBB
+      /**
+       * A task group object we can wait for.
+       */
+      tbb::task_group task_group;
+
+      friend class Task<RT>;
+#  endif
     };
 
     /**
