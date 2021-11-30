@@ -18,6 +18,8 @@
 // test the correctness of the inverse_shape_values field of
 // internal::MatrixFreeFunctions::ShapeInfo
 
+#include <deal.II/base/quadrature_lib.h>
+
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_q.h>
 
