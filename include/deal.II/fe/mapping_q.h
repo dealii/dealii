@@ -475,8 +475,18 @@ public:
     QGaussLobatto<1> line_support_points;
 
     /**
-     * A vectorized array type to reflect the necessary number of components
-     * for all interpolations to be done by this class.
+     * For the fast tensor-product path of the MappingQ class, we choose SIMD
+     * vectors that are as wide as possible to minimize the number of
+     * arithmetic operations. However, we do not want to choose it wider than
+     * necessary, e.g., we avoid something like 8-wide AVX-512 when we only
+     * compute 3 components of a 3D computation. This is because the
+     * additional lanes would not do useful work, but a few operations on very
+     * wide vectors can already lead to a lower clock frequency of processors
+     * over long time spans (thousands of clock cycles). Hence, we choose
+     * 2-wide SIMD for 1D and 2D and 4-wide SIMD for 3D. Note that we do not
+     * immediately fall back to no SIMD for 1D because all architectures that
+     * support SIMD also support 128-bit vectors (and none is reported to
+     * reduce clock frequency for 128-bit SIMD).
      */
     using VectorizedArrayType =
       VectorizedArray<double,
