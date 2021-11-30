@@ -47,6 +47,8 @@
 #     DEAL_II_PICKUP_TESTS()
 #
 
+# We use CONTINUE(), which is new in cmake 3.2
+CMAKE_MINIMUM_REQUIRED(VERSION 3.2.0)
 
 #
 # Two very small macros that are used below:
@@ -206,22 +208,20 @@ MACRO(DEAL_II_PICKUP_TESTS)
     # (and including) the first period ("."):
     #
     STRING(REGEX REPLACE "\\..*$" "" _regex_name "${_category}/${_test}")
-    IF( "${TEST_PICKUP_REGEX}" STREQUAL "" OR
-        "${_regex_name}" MATCHES "${TEST_PICKUP_REGEX}" )
-      SET(_define_test TRUE)
-    ELSE()
-      SET(_define_test FALSE)
+    IF( NOT ("${TEST_PICKUP_REGEX}" STREQUAL "" OR
+             "${_regex_name}" MATCHES "${TEST_PICKUP_REGEX}" ))
+      CONTINUE()  # next test
     ENDIF()
 
     # Disable tests using mpirun if MPI is not enabled
     STRING(REGEX MATCH "mpirun=" _matches ${_test})
     IF (_matches AND NOT DEAL_II_WITH_MPI)
-      SET(_define_test FALSE)
+      CONTINUE()  # next test
     ENDIF()
 
     #
     # Query configuration and check whether we support it. Otherwise
-    # set _define_test to FALSE:
+    # skip the test.
     #
 
     SET(_op_regex "=|\\.geq\\.|\\.leq\\.|\\.ge\\.|\\.le\\.")
@@ -231,6 +231,7 @@ MACRO(DEAL_II_PICKUP_TESTS)
       _matches ${_test}
       )
 
+    SET(_skip_test FALSE)
     FOREACH(_match ${_matches})
       #
       # Extract feature name, comparison operator, (a possible) boolean and
@@ -254,7 +255,7 @@ MACRO(DEAL_II_PICKUP_TESTS)
           # If a variable is undefined, assume that we cannot configure a
           # given test
           #
-          SET(_define_test FALSE)
+          SET(_skip_test TRUE)
         ENDIF()
       ENDIF()
 
@@ -273,8 +274,12 @@ Comparison operator \"=\" expected for boolean match.\n"
         # This is why I hate CMake :-/
         IF( (${_variable} AND NOT ${_boolean}) OR
             (NOT ${_variable} AND ${_boolean}) )
-          SET(_define_test FALSE)
+          SET(_skip_test TRUE)
         ENDIF()
+      ENDIF()
+
+      IF(_skip_test)
+        CONTINUE()   # next test
       ENDIF()
 
       #
@@ -293,15 +298,17 @@ Comparison operator \"=\" expected for boolean match.\n"
               "${DEAL_II_${_feature}_VERSION}" VERSION_LESS "${_version}" ) OR
             ( "${_operator}" STREQUAL ".leq." AND
               "${DEAL_II_${_feature}_VERSION}" VERSION_GREATER "${_version}" ) )
-          SET(_define_test FALSE)
+          CONTINUE()   # next test
         ENDIF()
       ENDIF()
     ENDFOREACH()
 
-    IF(_define_test)
-      STRING(REGEX REPLACE "\\..*" "" _test ${_test})
-      DEAL_II_ADD_TEST(${_category} ${_test} ${_comparison})
-    ENDIF()
+    #
+    # We've made it all the way to here, which means that we actually
+    # want to define the test
+    #
+    STRING(REGEX REPLACE "\\..*" "" _test ${_test})
+    DEAL_II_ADD_TEST(${_category} ${_test} ${_comparison})
 
   ENDFOREACH()
 ENDMACRO()
