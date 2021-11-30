@@ -27,6 +27,12 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+#ifdef DEBUG
+#  define DEAL_II_ALWAYS_INLINE_RELEASE
+#else
+#  define DEAL_II_ALWAYS_INLINE_RELEASE DEAL_II_ALWAYS_INLINE
+#endif
+
 
 // forward declaration
 template <int, typename, bool, typename>
@@ -480,86 +486,59 @@ namespace internal
         .subface_interpolation_matrices_scalar;
     }
 
-    static
-#ifndef DEBUG
-      inline DEAL_II_ALWAYS_INLINE
-#endif
-      unsigned int
-      create(
-        const std::array<MatrixFreeFunctions::ConstraintKinds, T1::size()> mask,
-        const std::array<MatrixFreeFunctions::ConstraintKinds, T1::size()>
-                           mask_new,
-        const unsigned int v)
+    static inline DEAL_II_ALWAYS_INLINE_RELEASE unsigned int
+    create(
+      const std::array<MatrixFreeFunctions::ConstraintKinds, T1::size()> mask,
+      const std::array<MatrixFreeFunctions::ConstraintKinds, T1::size()>
+                         mask_new,
+      const unsigned int v)
     {
       (void)mask;
       (void)mask_new;
       return v;
     }
 
-    static
-#ifndef DEBUG
-      inline DEAL_II_ALWAYS_INLINE
-#endif
-      bool
-      do_break(unsigned int v, const MatrixFreeFunctions::ConstraintKinds &kind)
+    static inline DEAL_II_ALWAYS_INLINE_RELEASE bool
+    do_break(unsigned int v, const MatrixFreeFunctions::ConstraintKinds &kind)
     {
       (void)v;
       (void)kind;
       return false;
     }
 
-    static
-#ifndef DEBUG
-      inline DEAL_II_ALWAYS_INLINE
-#endif
-      bool
-      do_continue(unsigned int                                v,
-                  const MatrixFreeFunctions::ConstraintKinds &kind)
+    static inline DEAL_II_ALWAYS_INLINE_RELEASE bool
+    do_continue(unsigned int                                v,
+                const MatrixFreeFunctions::ConstraintKinds &kind)
     {
       (void)v;
       return kind == MatrixFreeFunctions::ConstraintKinds::unconstrained;
     }
 
-    static
-#ifndef DEBUG
-      inline DEAL_II_ALWAYS_INLINE
-#endif
-        std::array<MatrixFreeFunctions::ConstraintKinds, T1::size()>
-        create_mask(const std::array<MatrixFreeFunctions::ConstraintKinds,
-                                     T1::size()> mask)
+    static inline DEAL_II_ALWAYS_INLINE_RELEASE
+      std::array<MatrixFreeFunctions::ConstraintKinds, T1::size()>
+      create_mask(
+        const std::array<MatrixFreeFunctions::ConstraintKinds, T1::size()> mask)
     {
       return mask;
     }
 
-    static
-#ifndef DEBUG
-      inline DEAL_II_ALWAYS_INLINE
-#endif
-      typename T1::value_type
-      get_value(const typename T1::value_type &value, const index_type &i)
+    static inline DEAL_II_ALWAYS_INLINE_RELEASE typename T1::value_type
+    get_value(const typename T1::value_type &value, const index_type &i)
     {
       (void)i;
       return value;
     }
 
-    static
-#ifndef DEBUG
-      inline DEAL_II_ALWAYS_INLINE
-#endif
-      typename T1::value_type
-      get_value(const T1 &value, const index_type &i)
+    static inline DEAL_II_ALWAYS_INLINE_RELEASE typename T1::value_type
+    get_value(const T1 &value, const index_type &i)
     {
       return value[i];
     }
 
-    static
-#ifndef DEBUG
-      inline DEAL_II_ALWAYS_INLINE
-#endif
-      void
-      set_value(T1 &                           result,
-                const typename T1::value_type &value,
-                const index_type &             i)
+    static inline DEAL_II_ALWAYS_INLINE_RELEASE void
+    set_value(T1 &                           result,
+              const typename T1::value_type &value,
+              const index_type &             i)
     {
       result[i] = value;
     }
@@ -581,40 +560,28 @@ namespace internal
         .subface_interpolation_matrices;
     }
 
-    static
-#ifndef DEBUG
-      inline DEAL_II_ALWAYS_INLINE
-#endif
-      bool
-      do_break(unsigned int v, const MatrixFreeFunctions::ConstraintKinds &kind)
+    static inline DEAL_II_ALWAYS_INLINE_RELEASE bool
+    do_break(unsigned int v, const MatrixFreeFunctions::ConstraintKinds &kind)
     {
       (void)v;
       (void)kind;
       return false;
     }
 
-    static
-#ifndef DEBUG
-      inline DEAL_II_ALWAYS_INLINE
-#endif
-      bool
-      do_continue(unsigned int                                v,
-                  const MatrixFreeFunctions::ConstraintKinds &kind)
+    static inline DEAL_II_ALWAYS_INLINE_RELEASE bool
+    do_continue(unsigned int                                v,
+                const MatrixFreeFunctions::ConstraintKinds &kind)
     {
       (void)v;
       return kind == MatrixFreeFunctions::ConstraintKinds::unconstrained;
     }
 
-    static
-#ifndef DEBUG
-      inline DEAL_II_ALWAYS_INLINE
-#endif
-        index_type
-        create(const std::array<MatrixFreeFunctions::ConstraintKinds,
-                                T1::size()> mask,
-               const std::array<MatrixFreeFunctions::ConstraintKinds,
-                                T1::size()> mask_new,
-               const unsigned int           v)
+    static inline DEAL_II_ALWAYS_INLINE_RELEASE index_type
+    create(
+      const std::array<MatrixFreeFunctions::ConstraintKinds, T1::size()> mask,
+      const std::array<MatrixFreeFunctions::ConstraintKinds, T1::size()>
+                         mask_new,
+      const unsigned int v)
     {
       (void)mask;
       (void)mask_new;
@@ -623,33 +590,22 @@ namespace internal
       return {result, T1(1.0) - result};
     }
 
-    static
-#ifndef DEBUG
-      inline DEAL_II_ALWAYS_INLINE
-#endif
-        std::array<MatrixFreeFunctions::ConstraintKinds, T1::size()>
-        create_mask(const std::array<MatrixFreeFunctions::ConstraintKinds,
-                                     T1::size()> mask)
+    static inline DEAL_II_ALWAYS_INLINE_RELEASE
+      std::array<MatrixFreeFunctions::ConstraintKinds, T1::size()>
+      create_mask(
+        const std::array<MatrixFreeFunctions::ConstraintKinds, T1::size()> mask)
     {
       return mask;
     }
 
-    static
-#ifndef DEBUG
-      inline DEAL_II_ALWAYS_INLINE
-#endif
-        T1
-        get_value(const T1 &value, const index_type &)
+    static inline DEAL_II_ALWAYS_INLINE_RELEASE T1
+    get_value(const T1 &value, const index_type &)
     {
       return value;
     }
 
-    static
-#ifndef DEBUG
-      inline DEAL_II_ALWAYS_INLINE
-#endif
-      void
-      set_value(T1 &result, const T1 &value, const index_type &i)
+    static inline DEAL_II_ALWAYS_INLINE_RELEASE void
+    set_value(T1 &result, const T1 &value, const index_type &i)
     {
       result = result * i.second + value * i.first;
     }
@@ -671,39 +627,27 @@ namespace internal
         .subface_interpolation_matrices;
     }
 
-    static
-#ifndef DEBUG
-      inline DEAL_II_ALWAYS_INLINE
-#endif
-      bool
-      do_break(unsigned int v, const MatrixFreeFunctions::ConstraintKinds &kind)
+    static inline DEAL_II_ALWAYS_INLINE_RELEASE bool
+    do_break(unsigned int v, const MatrixFreeFunctions::ConstraintKinds &kind)
     {
       (void)v;
       return kind == MatrixFreeFunctions::ConstraintKinds::unconstrained;
     }
 
-    static
-#ifndef DEBUG
-      inline DEAL_II_ALWAYS_INLINE
-#endif
-      bool
-      do_continue(unsigned int                                v,
-                  const MatrixFreeFunctions::ConstraintKinds &kind)
+    static inline DEAL_II_ALWAYS_INLINE_RELEASE bool
+    do_continue(unsigned int                                v,
+                const MatrixFreeFunctions::ConstraintKinds &kind)
     {
       (void)v;
       return kind == MatrixFreeFunctions::ConstraintKinds::unconstrained;
     }
 
-    static
-#ifndef DEBUG
-      inline DEAL_II_ALWAYS_INLINE
-#endif
-        index_type
-        create(const std::array<MatrixFreeFunctions::ConstraintKinds,
-                                T1::size()> mask,
-               const std::array<MatrixFreeFunctions::ConstraintKinds,
-                                T1::size()> mask_new,
-               const unsigned int           v)
+    static inline DEAL_II_ALWAYS_INLINE_RELEASE index_type
+    create(
+      const std::array<MatrixFreeFunctions::ConstraintKinds, T1::size()> mask,
+      const std::array<MatrixFreeFunctions::ConstraintKinds, T1::size()>
+                         mask_new,
+      const unsigned int v)
     {
       T1 result;
 
@@ -713,13 +657,10 @@ namespace internal
       return {result, T1(1.0) - result};
     }
 
-    static
-#ifndef DEBUG
-      inline DEAL_II_ALWAYS_INLINE
-#endif
-        std::array<MatrixFreeFunctions::ConstraintKinds, T1::size()>
-        create_mask(const std::array<MatrixFreeFunctions::ConstraintKinds,
-                                     T1::size()> mask)
+    static inline DEAL_II_ALWAYS_INLINE_RELEASE
+      std::array<MatrixFreeFunctions::ConstraintKinds, T1::size()>
+      create_mask(
+        const std::array<MatrixFreeFunctions::ConstraintKinds, T1::size()> mask)
     {
       auto new_mask = mask;
 
@@ -731,22 +672,14 @@ namespace internal
       return new_mask;
     }
 
-    static
-#ifndef DEBUG
-      inline DEAL_II_ALWAYS_INLINE
-#endif
-        T1
-        get_value(const T1 &value, const index_type &)
+    static inline DEAL_II_ALWAYS_INLINE_RELEASE T1
+    get_value(const T1 &value, const index_type &)
     {
       return value;
     }
 
-    static
-#ifndef DEBUG
-      inline DEAL_II_ALWAYS_INLINE
-#endif
-      void
-      set_value(T1 &result, const T1 &value, const index_type &i)
+    static inline DEAL_II_ALWAYS_INLINE_RELEASE void
+    set_value(T1 &result, const T1 &value, const index_type &i)
     {
       result = result * i.second + value * i.first;
     }
@@ -768,24 +701,16 @@ namespace internal
         .subface_interpolation_matrices;
     }
 
-    static
-#ifndef DEBUG
-      inline DEAL_II_ALWAYS_INLINE
-#endif
-      bool
-      do_break(unsigned int v, const MatrixFreeFunctions::ConstraintKinds &kind)
+    static inline DEAL_II_ALWAYS_INLINE_RELEASE bool
+    do_break(unsigned int v, const MatrixFreeFunctions::ConstraintKinds &kind)
     {
       (void)kind;
       return v > 0;
     }
 
-    static
-#ifndef DEBUG
-      inline DEAL_II_ALWAYS_INLINE
-#endif
-      bool
-      do_continue(unsigned int                                v,
-                  const MatrixFreeFunctions::ConstraintKinds &kind)
+    static inline DEAL_II_ALWAYS_INLINE_RELEASE bool
+    do_continue(unsigned int                                v,
+                const MatrixFreeFunctions::ConstraintKinds &kind)
     {
       (void)kind;
 
@@ -794,16 +719,12 @@ namespace internal
       return v > 0; // should not be called
     }
 
-    static
-#ifndef DEBUG
-      inline DEAL_II_ALWAYS_INLINE
-#endif
-        T1
-        create(const std::array<MatrixFreeFunctions::ConstraintKinds,
-                                T1::size()> mask,
-               const std::array<MatrixFreeFunctions::ConstraintKinds,
-                                T1::size()> mask_new,
-               const unsigned int           v)
+    static inline DEAL_II_ALWAYS_INLINE_RELEASE T1
+    create(
+      const std::array<MatrixFreeFunctions::ConstraintKinds, T1::size()> mask,
+      const std::array<MatrixFreeFunctions::ConstraintKinds, T1::size()>
+                         mask_new,
+      const unsigned int v)
     {
       (void)mask;
       (void)mask_new;
@@ -811,33 +732,22 @@ namespace internal
       return 1.0; // return something since not used
     }
 
-    static
-#ifndef DEBUG
-      inline DEAL_II_ALWAYS_INLINE
-#endif
-        std::array<MatrixFreeFunctions::ConstraintKinds, T1::size()>
-        create_mask(const std::array<MatrixFreeFunctions::ConstraintKinds,
-                                     T1::size()> mask)
+    static inline DEAL_II_ALWAYS_INLINE_RELEASE
+      std::array<MatrixFreeFunctions::ConstraintKinds, T1::size()>
+      create_mask(
+        const std::array<MatrixFreeFunctions::ConstraintKinds, T1::size()> mask)
     {
       return mask;
     }
 
-    static
-#ifndef DEBUG
-      inline DEAL_II_ALWAYS_INLINE
-#endif
-        T1
-        get_value(const T1 &value, const index_type &)
+    static inline DEAL_II_ALWAYS_INLINE_RELEASE T1
+    get_value(const T1 &value, const index_type &)
     {
       return value;
     }
 
-    static
-#ifndef DEBUG
-      inline DEAL_II_ALWAYS_INLINE
-#endif
-      void
-      set_value(T1 &result, const T1 &value, const index_type &i)
+    static inline DEAL_II_ALWAYS_INLINE_RELEASE void
+    set_value(T1 &result, const T1 &value, const index_type &i)
     {
       (void)i;
       result = value;
@@ -854,7 +764,7 @@ namespace internal
   class HelperBase
   {
   public:
-    inline DEAL_II_ALWAYS_INLINE
+    inline DEAL_II_ALWAYS_INLINE_RELEASE
     HelperBase(
       const T &                                                    t,
       const unsigned int &                                         given_degree,
@@ -878,18 +788,14 @@ namespace internal
     {}
 
     template <unsigned int direction, unsigned int d, bool skip_borders>
-    static
-#ifndef DEBUG
-      inline DEAL_II_ALWAYS_INLINE
-#endif
-      void
-      interpolate_3D_face(
-        const unsigned int dof_offset,
-        const unsigned int given_degree,
-        const typename Trait<Number, VectorizationType>::index_type v,
-        const typename Trait<Number, VectorizationType>::interpolation_type
-          *DEAL_II_RESTRICT      weight,
-        Number *DEAL_II_RESTRICT values)
+    static inline DEAL_II_ALWAYS_INLINE_RELEASE void
+    interpolate_3D_face(
+      const unsigned int                                          dof_offset,
+      const unsigned int                                          given_degree,
+      const typename Trait<Number, VectorizationType>::index_type v,
+      const typename Trait<Number, VectorizationType>::interpolation_type
+        *DEAL_II_RESTRICT      weight,
+      Number *DEAL_II_RESTRICT values)
     {
       static constexpr unsigned int max_n_points_1D = 40;
 
@@ -943,18 +849,14 @@ namespace internal
     }
 
     template <unsigned int direction>
-    static
-#ifndef DEBUG
-      inline DEAL_II_ALWAYS_INLINE
-#endif
-      void
-      interpolate_3D_edge(
-        const unsigned int p,
-        const unsigned int given_degree,
-        const typename Trait<Number, VectorizationType>::index_type v,
-        const typename Trait<Number, VectorizationType>::interpolation_type
-          *DEAL_II_RESTRICT      weight,
-        Number *DEAL_II_RESTRICT values)
+    static inline DEAL_II_ALWAYS_INLINE_RELEASE void
+    interpolate_3D_edge(
+      const unsigned int                                          p,
+      const unsigned int                                          given_degree,
+      const typename Trait<Number, VectorizationType>::index_type v,
+      const typename Trait<Number, VectorizationType>::interpolation_type
+        *DEAL_II_RESTRICT      weight,
+      Number *DEAL_II_RESTRICT values)
     {
       static constexpr unsigned int max_n_points_1D = 40;
 
@@ -995,12 +897,8 @@ namespace internal
     }
 
     template <bool do_x, bool do_y, bool do_z>
-    inline
-#ifndef DEBUG
-      DEAL_II_ALWAYS_INLINE
-#endif
-      void
-      process_edge() const
+    inline DEAL_II_ALWAYS_INLINE_RELEASE void
+    process_edge() const
     {
       if (do_x)
         interpolate_3D_edge<0>(t.line(0, type_y, type_z),
@@ -1025,12 +923,8 @@ namespace internal
     }
 
     template <bool do_x, bool do_y, bool do_z>
-    inline
-#ifndef DEBUG
-      DEAL_II_ALWAYS_INLINE
-#endif
-      void
-      process_faces_fast() const
+    inline DEAL_II_ALWAYS_INLINE_RELEASE void
+    process_faces_fast() const
     {
       static_assert((do_x && !do_y && !do_z) || (!do_x && do_y && !do_z) ||
                       (!do_x && !do_y && do_z),
@@ -1065,12 +959,8 @@ namespace internal
     }
 
     template <bool do_x, bool do_y, bool do_z>
-    inline
-#ifndef DEBUG
-      DEAL_II_ALWAYS_INLINE
-#endif
-      void
-      process_faces() const
+    inline DEAL_II_ALWAYS_INLINE_RELEASE void
+    process_faces() const
     {
       static_assert(((do_x && !do_y && !do_z) || (!do_x && do_y && !do_z) ||
                      (!do_x && !do_y && do_z)) == false,
@@ -1263,9 +1153,7 @@ namespace internal
                                               transpose>
   {
   public:
-#ifndef DEBUG
-    inline DEAL_II_ALWAYS_INLINE
-#endif
+    inline DEAL_II_ALWAYS_INLINE_RELEASE
     Helper(const unsigned int &given_degree,
            const bool &        type_x,
            const bool &        type_y,
@@ -1299,44 +1187,29 @@ namespace internal
 
     const unsigned int points;
 
-#ifndef DEBUG
-    inline DEAL_II_ALWAYS_INLINE
-#endif
-      unsigned int
-      line(unsigned int i, unsigned int j, unsigned int k) const
+    inline DEAL_II_ALWAYS_INLINE_RELEASE unsigned int
+    line(unsigned int i, unsigned int j, unsigned int k) const
     {
       return line_array[i][j][k];
     }
 
-#ifndef DEBUG
-    inline DEAL_II_ALWAYS_INLINE
-#endif
-      unsigned int
-      face(unsigned int i, unsigned int j) const
+    inline DEAL_II_ALWAYS_INLINE_RELEASE unsigned int
+    face(unsigned int i, unsigned int j) const
     {
       return face_array[i][j];
     }
 
-#ifndef DEBUG
-    inline DEAL_II_ALWAYS_INLINE
-#endif
-      unsigned int
-      lines_plane(unsigned int i,
-                  unsigned int j,
-                  unsigned int k,
-                  unsigned int l) const
+    inline DEAL_II_ALWAYS_INLINE_RELEASE unsigned int
+    lines_plane(unsigned int i,
+                unsigned int j,
+                unsigned int k,
+                unsigned int l) const
     {
       return lines_plane_array[i][j][k][l];
     }
 
-#ifndef DEBUG
-    inline DEAL_II_ALWAYS_INLINE
-#endif
-      unsigned int
-      lines(unsigned int i,
-            unsigned int j,
-            unsigned int k,
-            unsigned int l) const
+    inline DEAL_II_ALWAYS_INLINE_RELEASE unsigned int
+    lines(unsigned int i, unsigned int j, unsigned int k, unsigned int l) const
     {
       return lines_array[i][j][k][l];
     }
@@ -1440,9 +1313,7 @@ namespace internal
                                               transpose>
   {
   public:
-#ifndef DEBUG
-    inline DEAL_II_ALWAYS_INLINE
-#endif
+    inline DEAL_II_ALWAYS_INLINE_RELEASE
     Helper(const unsigned int &given_degree,
            const bool &        type_x,
            const bool &        type_y,
@@ -1474,11 +1345,8 @@ namespace internal
     }
 
 
-#ifndef DEBUG
-    inline DEAL_II_ALWAYS_INLINE
-#endif
-      unsigned int
-      line(unsigned int i, unsigned int j, unsigned int k) const
+    inline DEAL_II_ALWAYS_INLINE_RELEASE unsigned int
+    line(unsigned int i, unsigned int j, unsigned int k) const
     {
       static constexpr unsigned int points = fe_degree + 1;
 
@@ -1494,11 +1362,8 @@ namespace internal
       return line_array[i][j][k];
     }
 
-#ifndef DEBUG
-    inline DEAL_II_ALWAYS_INLINE
-#endif
-      unsigned int
-      face(unsigned int i, unsigned int j) const
+    inline DEAL_II_ALWAYS_INLINE_RELEASE unsigned int
+    face(unsigned int i, unsigned int j) const
     {
       static constexpr unsigned int points = fe_degree + 1;
 
@@ -1510,14 +1375,11 @@ namespace internal
       return face_array[i][j];
     }
 
-#ifndef DEBUG
-    inline DEAL_II_ALWAYS_INLINE
-#endif
-      unsigned int
-      lines_plane(unsigned int i,
-                  unsigned int j,
-                  unsigned int k,
-                  unsigned int l) const
+    inline DEAL_II_ALWAYS_INLINE_RELEASE unsigned int
+    lines_plane(unsigned int i,
+                unsigned int j,
+                unsigned int k,
+                unsigned int l) const
     {
       static constexpr unsigned int points = fe_degree + 1;
 
@@ -1569,14 +1431,8 @@ namespace internal
       return lines_plane_array[i][j][k][l];
     }
 
-#ifndef DEBUG
-    inline DEAL_II_ALWAYS_INLINE
-#endif
-      unsigned int
-      lines(unsigned int i,
-            unsigned int j,
-            unsigned int k,
-            unsigned int l) const
+    inline DEAL_II_ALWAYS_INLINE_RELEASE unsigned int
+    lines(unsigned int i, unsigned int j, unsigned int k, unsigned int l) const
     {
       static constexpr unsigned int points = fe_degree + 1;
 
@@ -1627,17 +1483,13 @@ namespace internal
 
   private:
     template <unsigned int side, bool transpose>
-    static
-#ifndef DEBUG
-      inline DEAL_II_ALWAYS_INLINE
-#endif
-      void
-      interpolate_2D(
-        const unsigned int given_degree,
-        const typename Trait<Number, VectorizationType>::index_type v,
-        const typename Trait<Number, VectorizationType>::interpolation_type
-          *DEAL_II_RESTRICT      weight,
-        Number *DEAL_II_RESTRICT values)
+    static inline DEAL_II_ALWAYS_INLINE_RELEASE void
+    interpolate_2D(
+      const unsigned int                                          given_degree,
+      const typename Trait<Number, VectorizationType>::index_type v,
+      const typename Trait<Number, VectorizationType>::interpolation_type
+        *DEAL_II_RESTRICT      weight,
+      Number *DEAL_II_RESTRICT values)
     {
       static constexpr unsigned int max_n_points_1D = 40;
 
@@ -1924,6 +1776,8 @@ namespace internal
 
 
 } // end of namespace internal
+
+#undef DEAL_II_ALWAYS_INLINE_RELEASE
 
 
 DEAL_II_NAMESPACE_CLOSE
