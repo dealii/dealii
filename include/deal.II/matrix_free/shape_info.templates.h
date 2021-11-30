@@ -26,6 +26,7 @@
 #include <deal.II/base/tensor_product_polynomials.h>
 #include <deal.II/base/utilities.h>
 
+#include <deal.II/fe/fe.h>
 #include <deal.II/fe/fe_dgp.h>
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_poly.h>
@@ -61,8 +62,6 @@ namespace internal
     {}
 
 
-
-    // ----------------- actual ShapeInfo functions --------------------
 
     template <typename Number>
     Number
@@ -196,6 +195,8 @@ namespace internal
 
 
 
+    // ----------------- actual ShapeInfo implementation --------------------
+
     template <typename Number>
     ShapeInfo<Number>::ShapeInfo()
       : element_type(tensor_general)
@@ -210,62 +211,33 @@ namespace internal
 
 
     template <typename Number>
-    template <int dim, int spacedim>
-    bool
-    ShapeInfo<Number>::is_supported(const FiniteElement<dim, spacedim> &fe)
+    template <int dim, int spacedim, int dim_q>
+    inline ShapeInfo<Number>::ShapeInfo(
+      const Quadrature<dim_q> &           quad,
+      const FiniteElement<dim, spacedim> &fe_in,
+      const unsigned int                  base_element_number)
+      : element_type(tensor_general)
+      , n_dimensions(0)
+      , n_components(0)
+      , n_q_points(0)
+      , dofs_per_component_on_cell(0)
+      , n_q_points_face(0)
+      , dofs_per_component_on_face(0)
     {
-      if (dim != spacedim)
-        return false;
-
-      for (unsigned int base = 0; base < fe.n_base_elements(); ++base)
-        {
-          const FiniteElement<dim, spacedim> *fe_ptr = &(fe.base_element(base));
-          if (fe_ptr->n_components() != 1)
-            return false;
-
-          // then check if the base element is supported or not
-          if (dynamic_cast<const FE_Poly<dim, spacedim> *>(fe_ptr) != nullptr)
-            {
-              const FE_Poly<dim, spacedim> *fe_poly_ptr =
-                dynamic_cast<const FE_Poly<dim, spacedim> *>(fe_ptr);
-              // Simplices are a special case since the polynomial family is not
-              // indicative of their support
-              if (dynamic_cast<const FE_SimplexP<dim> *>(fe_poly_ptr) ||
-                  dynamic_cast<const FE_SimplexDGP<dim> *>(fe_poly_ptr) ||
-                  dynamic_cast<const FE_WedgeP<dim> *>(fe_poly_ptr) ||
-                  dynamic_cast<const FE_PyramidP<dim> *>(fe_poly_ptr))
-                return true;
-
-              if (dynamic_cast<const TensorProductPolynomials<dim> *>(
-                    &fe_poly_ptr->get_poly_space()) == nullptr &&
-                  dynamic_cast<const TensorProductPolynomials<
-                      dim,
-                      Polynomials::PiecewisePolynomial<double>> *>(
-                    &fe_poly_ptr->get_poly_space()) == nullptr &&
-                  dynamic_cast<const FE_DGP<dim, spacedim> *>(fe_ptr) ==
-                    nullptr &&
-                  dynamic_cast<const FE_Q_DG0<dim, spacedim> *>(fe_ptr) ==
-                    nullptr)
-                return false;
-            }
-          else
-            return false;
-        }
-
-      // if we arrived here, all base elements were supported so we can
-      // support the present element
-      return true;
+      reinit(quad, fe_in, base_element_number);
     }
 
 
 
     template <typename Number>
-    template <int dim, int dim_q>
+    template <int dim, int spacedim, int dim_q>
     void
-    ShapeInfo<Number>::reinit(const Quadrature<dim_q> & quad_in,
-                              const FiniteElement<dim> &fe_in,
-                              const unsigned int        base_element_number)
+    ShapeInfo<Number>::reinit(const Quadrature<dim_q> &           quad_in,
+                              const FiniteElement<dim, spacedim> &fe_in,
+                              const unsigned int base_element_number)
     {
+      static_assert(dim == spacedim,
+                    "Currently, only the case dim=spacedim is implemented");
       if (quad_in.is_tensor_product() == false ||
           dynamic_cast<const FE_SimplexP<dim> *>(
             &fe_in.base_element(base_element_number)) ||
@@ -1130,6 +1102,56 @@ namespace internal
                     1.) > zero_tol)
                 return false;
             }
+      return true;
+    }
+
+
+
+    template <typename Number>
+    template <int dim, int spacedim>
+    bool
+    ShapeInfo<Number>::is_supported(const FiniteElement<dim, spacedim> &fe)
+    {
+      if (dim != spacedim)
+        return false;
+
+      for (unsigned int base = 0; base < fe.n_base_elements(); ++base)
+        {
+          const FiniteElement<dim, spacedim> *fe_ptr = &(fe.base_element(base));
+          if (fe_ptr->n_components() != 1)
+            return false;
+
+          // then check if the base element is supported or not
+          if (dynamic_cast<const FE_Poly<dim, spacedim> *>(fe_ptr) != nullptr)
+            {
+              const FE_Poly<dim, spacedim> *fe_poly_ptr =
+                dynamic_cast<const FE_Poly<dim, spacedim> *>(fe_ptr);
+              // Simplices are a special case since the polynomial family is not
+              // indicative of their support
+              if (dynamic_cast<const FE_SimplexP<dim> *>(fe_poly_ptr) ||
+                  dynamic_cast<const FE_SimplexDGP<dim> *>(fe_poly_ptr) ||
+                  dynamic_cast<const FE_WedgeP<dim> *>(fe_poly_ptr) ||
+                  dynamic_cast<const FE_PyramidP<dim> *>(fe_poly_ptr))
+                return true;
+
+              if (dynamic_cast<const TensorProductPolynomials<dim> *>(
+                    &fe_poly_ptr->get_poly_space()) == nullptr &&
+                  dynamic_cast<const TensorProductPolynomials<
+                      dim,
+                      Polynomials::PiecewisePolynomial<double>> *>(
+                    &fe_poly_ptr->get_poly_space()) == nullptr &&
+                  dynamic_cast<const FE_DGP<dim, spacedim> *>(fe_ptr) ==
+                    nullptr &&
+                  dynamic_cast<const FE_Q_DG0<dim, spacedim> *>(fe_ptr) ==
+                    nullptr)
+                return false;
+            }
+          else
+            return false;
+        }
+
+      // if we arrived here, all base elements were supported so we can
+      // support the present element
       return true;
     }
 

@@ -16,18 +16,28 @@
 
 for (deal_II_dimension : DIMENSIONS; deal_II_scalar : REAL_SCALARS)
   {
-    template void internal::MatrixFreeFunctions::ShapeInfo<deal_II_scalar>::
-      reinit<deal_II_dimension>(
-        const Quadrature<deal_II_dimension> &,
-        const FiniteElement<deal_II_dimension, deal_II_dimension> &,
-        const unsigned int);
+    template internal::MatrixFreeFunctions::ShapeInfo<deal_II_scalar>::
+      ShapeInfo(const Quadrature<deal_II_dimension> &,
+                const FiniteElement<deal_II_dimension, deal_II_dimension> &,
+                const unsigned int);
+
+    template void
+    internal::MatrixFreeFunctions::ShapeInfo<deal_II_scalar>::reinit(
+      const Quadrature<deal_II_dimension> &,
+      const FiniteElement<deal_II_dimension, deal_II_dimension> &,
+      const unsigned int);
 
 #if deal_II_dimension > 1
-    template void internal::MatrixFreeFunctions::ShapeInfo<deal_II_scalar>::
-      reinit<deal_II_dimension>(
-        const Quadrature<1> &,
-        const FiniteElement<deal_II_dimension, deal_II_dimension> &,
-        const unsigned int);
+    template internal::MatrixFreeFunctions::ShapeInfo<deal_II_scalar>::
+      ShapeInfo(const Quadrature<1> &,
+                const FiniteElement<deal_II_dimension, deal_II_dimension> &,
+                const unsigned int);
+
+    template void
+    internal::MatrixFreeFunctions::ShapeInfo<deal_II_scalar>::reinit(
+      const Quadrature<1> &,
+      const FiniteElement<deal_II_dimension, deal_II_dimension> &,
+      const unsigned int);
 #endif
   }
 
@@ -45,18 +55,30 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
 for (deal_II_dimension : DIMENSIONS;
      deal_II_scalar_vectorized : REAL_SCALARS_VECTORIZED)
   {
-    template void internal::MatrixFreeFunctions::
-      ShapeInfo<deal_II_scalar_vectorized>::reinit<deal_II_dimension>(
+    template internal::MatrixFreeFunctions::
+      ShapeInfo<deal_II_scalar_vectorized>::ShapeInfo(
         const Quadrature<deal_II_dimension> &,
         const FiniteElement<deal_II_dimension, deal_II_dimension> &,
         const unsigned int);
 
+    template void
+    internal::MatrixFreeFunctions::ShapeInfo<deal_II_scalar_vectorized>::reinit(
+      const Quadrature<deal_II_dimension> &,
+      const FiniteElement<deal_II_dimension, deal_II_dimension> &,
+      const unsigned int);
+
 #if deal_II_dimension > 1
-    template void internal::MatrixFreeFunctions::
-      ShapeInfo<deal_II_scalar_vectorized>::reinit<deal_II_dimension>(
+    template internal::MatrixFreeFunctions::
+      ShapeInfo<deal_II_scalar_vectorized>::ShapeInfo(
         const Quadrature<1> &,
         const FiniteElement<deal_II_dimension, deal_II_dimension> &,
         const unsigned int);
+
+    template void
+    internal::MatrixFreeFunctions::ShapeInfo<deal_II_scalar_vectorized>::reinit(
+      const Quadrature<1> &,
+      const FiniteElement<deal_II_dimension, deal_II_dimension> &,
+      const unsigned int);
 #endif
   }
 

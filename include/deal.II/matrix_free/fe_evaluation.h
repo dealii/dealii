@@ -232,7 +232,6 @@ public:
   std::array<unsigned int, VectorizedArrayType::size()>
   get_cell_or_face_ids() const;
 
-
   /**
    * Return the numbering of local degrees of freedom within the evaluation
    * routines of FEEvaluation in terms of the standard numbering on finite
