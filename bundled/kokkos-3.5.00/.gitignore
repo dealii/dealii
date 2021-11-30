@@ -1,0 +1,23 @@
+# Standard ignores
+*~
+*.pyc
+\#*#
+.#*
+.*.swp
+.cproject
+.project
+testing/
+.settings/
+/.vs
+/out/build
+/CMakeSettings.json
+/out/mytest
+
+# build directories in source tree
+/build*
+
+# IDE-specific files/folders
+## VSCode
+/.vscode
+## QtCreator
+/CMakeLists.txt.user*
