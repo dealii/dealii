@@ -18,6 +18,8 @@
 // test the correctness of the detection of the elements in
 // internal::MatrixFreeFunctions::ShapeInfo
 
+#include <deal.II/base/quadrature_lib.h>
+
 #include <deal.II/fe/fe_dgp.h>
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_q.h>

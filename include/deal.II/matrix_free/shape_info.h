@@ -22,13 +22,18 @@
 
 #include <deal.II/base/aligned_vector.h>
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/quadrature.h>
+#include <deal.II/base/table.h>
 #include <deal.II/base/vectorization.h>
-
-#include <deal.II/fe/fe.h>
 
 
 DEAL_II_NAMESPACE_OPEN
+
+
+// forward declaration
+template <int dim, int spacedim>
+class FiniteElement;
+
 
 namespace internal
 {
@@ -132,7 +137,7 @@ namespace internal
       ElementType element_type;
 
       /**
-       * Stores the shape values of the 1D finite element evaluated on all 1D
+       * Stores the shape values of the 1D finite element evaluated at all 1D
        * quadrature points. The length of
        * this array is <tt>n_dofs_1d * n_q_points_1d</tt> and quadrature
        * points are the index running fastest.
@@ -140,7 +145,7 @@ namespace internal
       AlignedVector<Number> shape_values;
 
       /**
-       * Stores the shape gradients of the 1D finite element evaluated on all
+       * Stores the shape gradients of the 1D finite element evaluated at all
        * 1D quadrature points. The length of
        * this array is <tt>n_dofs_1d * n_q_points_1d</tt> and quadrature
        * points are the index running fastest.
@@ -148,7 +153,7 @@ namespace internal
       AlignedVector<Number> shape_gradients;
 
       /**
-       * Stores the shape Hessians of the 1D finite element evaluated on all
+       * Stores the shape Hessians of the 1D finite element evaluated at all
        * 1D quadrature points. The length of
        * this array is <tt>n_dofs_1d * n_q_points_1d</tt> and quadrature
        * points are the index running fastest.
@@ -300,16 +305,16 @@ namespace internal
       bool nodal_at_cell_boundaries;
 
       /**
-       * Stores the shape values of the finite element evaluated on all
+       * Stores the shape values of the finite element evaluated at all
        * quadrature points for all faces and orientations (no tensor-product
        * structure exploited).
        */
       Table<3, Number> shape_values_face;
 
       /**
-       * Stores the shape gradients of the finite element evaluated on all
+       * Stores the shape gradients of the finite element evaluated at all
        * quadrature points for all faces, orientations, and directions
-       * (no tensor-product structure  exploited).
+       * (no tensor-product structure exploited).
        */
       Table<4, Number> shape_gradients_face;
     };
@@ -344,10 +349,10 @@ namespace internal
       /**
        * Constructor that initializes the data fields using the reinit method.
        */
-      template <int dim, int dim_q>
-      ShapeInfo(const Quadrature<dim_q> & quad,
-                const FiniteElement<dim> &fe,
-                const unsigned int        base_element = 0);
+      template <int dim, int spacedim, int dim_q>
+      ShapeInfo(const Quadrature<dim_q> &           quad,
+                const FiniteElement<dim, spacedim> &fe,
+                const unsigned int                  base_element = 0);
 
       /**
        * Initializes the data fields. Takes a one-dimensional quadrature
@@ -357,11 +362,11 @@ namespace internal
        * dimensional element by a tensor product and that the zeroth shape
        * function in zero evaluates to one.
        */
-      template <int dim, int dim_q>
+      template <int dim, int spacedim, int dim_q>
       void
-      reinit(const Quadrature<dim_q> & quad,
-             const FiniteElement<dim> &fe_dim,
-             const unsigned int        base_element = 0);
+      reinit(const Quadrature<dim_q> &           quad,
+             const FiniteElement<dim, spacedim> &fe_dim,
+             const unsigned int                  base_element = 0);
 
       /**
        * Return which kinds of elements are supported by MatrixFree.
@@ -555,22 +560,6 @@ namespace internal
 
 
     // ------------------------------------------ inline functions
-
-    template <typename Number>
-    template <int dim, int dim_q>
-    inline ShapeInfo<Number>::ShapeInfo(const Quadrature<dim_q> & quad,
-                                        const FiniteElement<dim> &fe_in,
-                                        const unsigned int base_element_number)
-      : element_type(tensor_general)
-      , n_dimensions(0)
-      , n_components(0)
-      , n_q_points(0)
-      , dofs_per_component_on_cell(0)
-      , n_q_points_face(0)
-      , dofs_per_component_on_face(0)
-    {
-      reinit(quad, fe_in, base_element_number);
-    }
 
     template <typename Number>
     inline const UnivariateShapeData<Number> &
