@@ -148,7 +148,7 @@ public:
   /**
    * Return a reference to the ShapeInfo object currently in use.
    */
-  const internal::MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> &
+  const ShapeInfoType &
   get_shape_info() const;
 
   /**
@@ -243,14 +243,14 @@ protected:
    * more than one quadrature formula selected during construction of
    * `matrix_free`, `quad_no` allows to select the appropriate formula.
    */
-  FEEvaluationBaseData(const ShapeInfoType &         shape_info,
-                       const DoFInfo &               dof_info,
-                       const MappingInfoStorageType &mapping_data,
-                       const unsigned int            quad_no,
-                       const bool                    is_interior_face,
-                       const unsigned int            active_fe_index,
-                       const unsigned int            active_quad_index,
-                       const unsigned int            face_type);
+  FEEvaluationBaseData(const std::tuple<const ShapeInfoType &,
+                                        const DoFInfo &,
+                                        unsigned int,
+                                        unsigned int> &info,
+                       const MappingInfoStorageType &  mapping_data,
+                       const unsigned int              quad_no,
+                       const bool                      is_interior_face,
+                       const unsigned int              face_type);
 
   /**
    * Constructor that comes with reduced functionality and works similar as
@@ -440,20 +440,20 @@ protected:
 
 template <int dim, typename Number, bool is_face, typename VectorizedArrayType>
 inline FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
-  FEEvaluationBaseData(const ShapeInfoType &         shape_info,
-                       const DoFInfo &               dof_info,
-                       const MappingInfoStorageType &mapping_data,
-                       const unsigned int            quad_no,
-                       const bool                    is_interior_face,
-                       const unsigned int            active_fe_index,
-                       const unsigned int            active_quad_index,
-                       const unsigned int            face_type)
-  : data(&shape_info)
-  , dof_info(&dof_info)
+  FEEvaluationBaseData(const std::tuple<const ShapeInfoType &,
+                                        const DoFInfo &,
+                                        unsigned int,
+                                        unsigned int> &shape_dof_info,
+                       const MappingInfoStorageType &  mapping_data,
+                       const unsigned int              quad_no,
+                       const bool                      is_interior_face,
+                       const unsigned int              face_type)
+  : data(&std::get<0>(shape_dof_info))
+  , dof_info(&std::get<1>(shape_dof_info))
   , mapping_data(&mapping_data)
   , quad_no(quad_no)
-  , active_fe_index(active_fe_index)
-  , active_quad_index(active_quad_index)
+  , active_fe_index(std::get<2>(shape_dof_info))
+  , active_quad_index(std::get<3>(shape_dof_info))
   , descriptor(
       &mapping_data.descriptor
          [is_face ?
