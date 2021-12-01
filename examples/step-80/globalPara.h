@@ -13,9 +13,9 @@ double global_init_position_x0 = -50e-6;    // initial spot center position
 
 // # material
 // thin film
-double global_rho_Tio2 = 4200;
-double global_C_Tio2 = 690;
-double global_k_Tio2 = 4.8;
+double global_rho_Tio2 = 4200;      // mass density, [kg/m^3]
+double global_C_Tio2 = 690;         // heat capacity, [J/kg/K]
+double global_k_Tio2 = 4.8;         // thermal conductivity, [W/m/K]
 // substrate
 double global_rho_glass = 2200;
 double global_C_glass = 700;
@@ -24,8 +24,8 @@ double global_k_glass = 1.8;
 double global_film_thickness = 400e-9;  // film thickness, [m]
 
 // # simulation time
-double global_simulation_time_step = 1e-5;
-double global_simulation_end_time = 100e-6 / global_V_scan_x; //
+double global_simulation_time_step = 1e-5;          // 10 [us]
+double global_simulation_end_time = 100e-6 / global_V_scan_x; //    100 [um] / scan speed
 
 // # about the MESH
 #define BOUNDARY_NUM 11

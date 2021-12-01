@@ -39,6 +39,7 @@
 
 // the following files are for petsc, if you want to use
 // pesct instead of trilinos, you can uncomment the following
+
 /*
 #include <deal.II/lac/petsc_parallel_vector.h>
 #include <deal.II/lac/petsc_parallel_sparse_matrix.h>
@@ -48,12 +49,10 @@
 
 #include <deal.II/grid/grid_in.h>
 #include <deal.II/grid/grid_tools.h>
-
 #include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/trilinos_sparse_matrix.h>
 #include <deal.II/lac/trilinos_solver.h>
 #include <deal.II/lac/trilinos_precondition.h>
-
 
 #include <deal.II/lac/sparsity_tools.h>
 #include <deal.II/lac/generic_linear_algebra.h>
@@ -83,6 +82,13 @@
 // defining a class that is inheritaged from Function<dim>
 using namespace dealii;
 
+// In general, it is more clear to separate boundary and initial condictions,
+// as well as the right hand side function from a file holding all the things.
+// To do so, in this work, the globalPara.h file defines physical constants, 
+// laser parameters, and heat characteristics of materials involved. Boundary
+// and initial conditions are defined in boundaryInit.h. The rightHandSide.h
+// defines the heat source, which in this work is a moving Gaussian beam.
+
 #ifndef GLOBAL_PARA
 #define GLOBAL_PARA
 #include "./globalPara.h"
@@ -90,7 +96,7 @@ using namespace dealii;
 #include "./rightHandSide.h"
 #endif
 
-// the main class
+// Now the main class is defined as following
 template <int dim>
 class LaserHeating
 {
@@ -120,35 +126,30 @@ private:
   AffineConstraints<double>     constraints_T;
 
 
-  // system_matrix firstly used for projection of
-  //        system_matrix_T for solving
+  // system_matrix
   TrilinosWrappers::SparseMatrix system_matrix_T;
 
-            //  for storing left Mass matrix
+  // for storing left matrix
   TrilinosWrappers::SparseMatrix left_system_matrix_T;
 
-            //  for storing Right Mass matrix
+  // for storing right matrix
   TrilinosWrappers::SparseMatrix right_system_matrix_T;
 
-
-  // ONLY LOCALLY OWNED CELLS
-  //        System RHS for solving
+  // System_rhs, only locally owned cells
   TrilinosWrappers::MPI::Vector       system_rhs_T;
 
-
-  //    Solutions
-  //       Old Solutions with ghost cells, for output
+  // Solutions
+  // Old Solutions with ghost cells, for output
   TrilinosWrappers::MPI::Vector       old_solution_T; 
 
-  //       Old Solutions only with locally owned cells     
+  // Old Solutions only with locally owned cells     
   TrilinosWrappers::MPI::Vector       old_solution_T_cal; 
 
-  //       New Solutions only with locally owned cells      
+  // New Solutions only with locally owned cells      
   TrilinosWrappers::MPI::Vector       new_solution_T; 
 
-  //       Dynamic RHS for coupling terms
+  // Dynamic assembling of the righthandside terms
   TrilinosWrappers::MPI::Vector       dynamic_rhs_T;
-
 
 
   IndexSet              locally_owned_dofs;
@@ -163,10 +164,7 @@ private:
 
 };
 
-
-
-
-// Constructor
+// the constructor
 template <int dim>
 LaserHeating<dim>::LaserHeating ()
   :
@@ -179,7 +177,7 @@ LaserHeating<dim>::LaserHeating ()
   theta(0.5)
 {}
 
-// Deconstructor
+// the destructor
 template <int dim>
 LaserHeating<dim>::~LaserHeating ()
 {
@@ -196,7 +194,6 @@ void LaserHeating<dim>::make_grid ()
   GridIn<dim> grid_in;
   grid_in.attach_triangulation (triangulation);
   std::ifstream input_file ("geometry.msh");
-//  Assert (dim==3, ExcInternalError());
   grid_in.read_msh (input_file);
   GridTools::scale (1e-6,triangulation);
 
@@ -226,17 +223,14 @@ void LaserHeating<dim>::setup_system ()
   DoFTools::extract_locally_relevant_dofs (dof_handler, locally_relevant_dofs);
 
   // we want to output solution, so here should have ghost cells
-  //    WITH    GHOST CELLS
   old_solution_T.reinit     (locally_owned_dofs,locally_relevant_dofs,mpi_communicator);
 
-  //    LOCALLY OWNED CELLS
+  // locally owned cells
   old_solution_T_cal.reinit (locally_owned_dofs,mpi_communicator);
   new_solution_T.reinit     (locally_owned_dofs,mpi_communicator);
   dynamic_rhs_T.reinit      (locally_owned_dofs,mpi_communicator);
   system_rhs_T.reinit       (locally_owned_dofs,mpi_communicator);
 
-
-//  ======================================================================
   constraints_T.clear();
   constraints_T.reinit (locally_relevant_dofs);
   DoFTools::make_hanging_node_constraints (dof_handler, constraints_T);
@@ -248,8 +242,6 @@ void LaserHeating<dim>::setup_system ()
 */
   constraints_T.close();
 
-
-  //==================================================================
   DynamicSparsityPattern dsp_T(locally_relevant_dofs);
   DoFTools::make_sparsity_pattern (dof_handler, dsp_T,constraints_T,false);
   SparsityTools::distribute_sparsity_pattern (dsp_T,
@@ -369,7 +361,7 @@ void LaserHeating<dim>::assemble_system_matrix_init (double time_step)
 
       cell->get_dof_indices (local_dof_indices);
 
-//---   copy to system_matrix_T and system_rhs_T for projecting initial values
+      // copy to system_matrix_T and system_rhs_T for projecting initial values
       constraints_T.distribute_local_to_global(local_init_matrix,
                                              local_init_T_rhs,
                                              local_dof_indices,
@@ -377,13 +369,13 @@ void LaserHeating<dim>::assemble_system_matrix_init (double time_step)
                                              system_rhs_T);
 
 
-      //---- store M + dt*theta*A as the left_system_matrix
+      // store M + dt*theta*A as the left_system_matrix
 
       constraints_T.distribute_local_to_global(local_rho_c_T_matrix,
                                              local_dof_indices,
                                              left_system_matrix_T);
 
-      //---- store M - dt*(1-theta)*A as the right_system_matrix
+      // store M - dt*(1-theta)*A as the right_system_matrix
       constraints_T.distribute_local_to_global(local_k_T_matrix,
                                              local_dof_indices,
                                              right_system_matrix_T);
@@ -396,13 +388,15 @@ void LaserHeating<dim>::assemble_system_matrix_init (double time_step)
   right_system_matrix_T.compress(VectorOperation::add);
   system_rhs_T.compress(VectorOperation::add);
 
-  }
+}
 
 
 // @sect4{LaserHeating::dynamic_assemble_rhs_T}
-// ASSEMBLE RIGHT_HANDSIDE
+// The right hand side is assembled each time during running, which is necessary as
+// the laser source is moving. To separate the heat source and the right hand 
+// side assembling, the right hand side function is defined as RightHandside<dim>.
 template <int dim>
-void LaserHeating<dim>::dynamic_assemble_rhs_T (double time00, double time_step00)
+void LaserHeating<dim>::dynamic_assemble_rhs_T (double time, double time_step)
 {
 
   TimerOutput::Scope t(computing_timer,"assemble_rhs_T()");
@@ -410,10 +404,10 @@ void LaserHeating<dim>::dynamic_assemble_rhs_T (double time00, double time_step0
   QGauss<dim>  quadrature_formula(2);
 
   RightHandside<dim> rhs_func_T_1;
-  rhs_func_T_1.set_time(time00);
+  rhs_func_T_1.set_time(time);
 
   RightHandside<dim> rhs_func_T_2;
-  rhs_func_T_2.set_time(time00-time_step00);
+  rhs_func_T_2.set_time(time-time_step);
 
   FEValues<dim> fe_values (fe, quadrature_formula,
                            update_values   |
@@ -448,12 +442,12 @@ void LaserHeating<dim>::dynamic_assemble_rhs_T (double time00, double time_step0
             const double            phi_i_u = fe_values.shape_value (i,q);
 
 
-            local_rhs_vector_T(i) +=     time_step00 * theta *
+            local_rhs_vector_T(i) +=     time_step * theta *
                                          (phi_i_u *
                                          rhs_func_T_1.value_v2 (fe_values.quadrature_point (q)) *
                                          fe_values.JxW (q))
                                          +
-                                         time_step00 * (1.0 - theta) *
+                                         time_step * (1.0 - theta) *
                                          (phi_i_u *
                                          rhs_func_T_2.value_v2 (fe_values.quadrature_point (q)) *
                                          fe_values.JxW (q));
@@ -475,7 +469,10 @@ void LaserHeating<dim>::dynamic_assemble_rhs_T (double time00, double time_step0
 
 
 // @sect4{LaserHeating::solve}
-
+// Solving the equation is direct. Recall that we have defined several matrices and vectors,
+// to avoid ambiguous, here, we only use system_matrix_T as the system matrix, system_rhs_T
+// as the system right hand side. The vector completely_distributed_solution is used to store
+// the obtained solution.
 template <int dim>
 void LaserHeating<dim>::solve_T ()
 {
@@ -494,8 +491,8 @@ void LaserHeating<dim>::solve_T ()
   solver.solve (system_matrix_T,completely_distributed_solution,system_rhs_T,preconditioner);
 
 
-  // We have made one addition, though: since we suppress output from the
-  // linear solvers, we have to print the number of iterations by hand.
+  // Print the number of iterations by hand.
+
   pcout     << "   " << solver_control.last_step()
             << " CG iterations needed to obtain convergence." << std::endl
             << "\t initial convergence value = " << solver_control.initial_value() << std::endl
@@ -522,7 +519,8 @@ void LaserHeating<dim>::refine_mesh()
   FEValues<dim> fe_values (fe, quadrature_formula,update_quadrature_points);
 
 
-// only refine mesh above the TiO2 and glass interface
+// only refine mesh 5um above the TiO2 and glass interface 
+
   for (typename Triangulation<dim>::active_cell_iterator
           cell = triangulation.begin_active();
           cell != triangulation.end(); ++cell)
@@ -555,6 +553,7 @@ void LaserHeating<dim>::output_results (int output_num) const
    data_out.add_data_vector (old_solution_T,         "T");
 
    // the length of output numbering
+
    int step_N = 7;
 
    data_out.build_patches ();
@@ -569,6 +568,7 @@ void LaserHeating<dim>::output_results (int output_num) const
 
 
    // output the overall solution
+
    if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
    {
        std::vector<std::string> filenames;
@@ -606,13 +606,16 @@ void LaserHeating<dim>::run ()
     setup_system ();
     assemble_system_matrix_init (global_simulation_time_step);
 
-    //--------PROJECTION-INITIAL-VALUES--------
-    solve_T ();           // solution stored in new_solution_T; 
+    // projection of initial conditions by solving.
+    // solution stored in new_solution_T; 
+
+    solve_T ();
 
     old_solution_T        = new_solution_T;
     old_solution_T_cal    = new_solution_T;
 
     // reinitialization
+
     system_matrix_T = 0;
     system_rhs_T = 0;
 
@@ -621,7 +624,8 @@ void LaserHeating<dim>::run ()
     double time = 0;
     int timestep_number = 0;
 
-    output_results (0);    // output initial values; need ghost cells 
+    // output initial values; need ghost cells 
+    output_results (0);
 
 
       while(time < global_simulation_end_time)
@@ -635,8 +639,7 @@ void LaserHeating<dim>::run ()
                   << " time_step = " << time_step
                   << std::endl;
 
-        //================================================================
-        //-----------Temperature=---------------------
+        // the dynamic solving part
         {
 
             right_system_matrix_T.vmult(system_rhs_T,old_solution_T_cal);
@@ -663,12 +666,14 @@ void LaserHeating<dim>::run ()
             }
 
 
-            solve_T ();     // solve and store solution to new_solution_T
+            solve_T ();
 
-            old_solution_T          = new_solution_T;        // used for output, GHOST CELLS
+            // old_solution_T is used for output, holding ghost cells
+            // old_solution_T_cal is used for calculation, holding only
+            // locally owned cells.
+            old_solution_T          = new_solution_T;
             old_solution_T_cal      = new_solution_T;
 
-            //================================================================
             if (Utilities::MPI::n_mpi_processes(mpi_communicator) <= 96 && (timestep_number % 50  == 0 ))
             {
                 TimerOutput::Scope t(computing_timer,"output");
@@ -694,8 +699,8 @@ int main (int argc, char *argv[])
     {
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
-      LaserHeating<2> laplace_problem_2d;
-      laplace_problem_2d.run ();
+      LaserHeating<2> laserHeating_2d;
+      laserHeating_2d.run ();
 
 
     }
