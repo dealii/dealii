@@ -36,6 +36,7 @@ SET(_separate_src
   grid_in.cc
   grid_out.cc
   grid_generator.cc
+  grid_generator_pipe_junction.cc
   grid_tools.cc
   grid_tools_cache.cc
   grid_tools_nontemplates.cc
@@ -56,6 +57,7 @@ SET(_inst
   cell_id.inst.in
   grid_generator.inst.in
   grid_generator_from_name.inst.in
+  grid_generator_pipe_junction.inst.in
   grid_in.inst.in
   grid_out.inst.in
   grid_refinement.inst.in
