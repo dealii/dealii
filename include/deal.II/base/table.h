@@ -2154,10 +2154,9 @@ TableBase<N, T>::TableBase(const TableIndices<N> &sizes,
 template <int N, typename T>
 TableBase<N, T>::TableBase(const TableBase<N, T> &src)
   : Subscriptor()
-{
-  reinit(src.table_size, true);
-  values = src.values;
-}
+  , values(src.values)
+  , table_size(src.table_size)
+{}
 
 
 
