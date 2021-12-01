@@ -52,7 +52,6 @@
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
-#include <boost/geometry/index/rtree.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/serialization/array.hpp>
 #include <boost/serialization/vector.hpp>
