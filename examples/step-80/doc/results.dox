@@ -1,0 +1,85 @@
+<h1>Results</h1>
+
+
+The results by 4-threads are looked as follows:
+@code
+Solving problem in 2 space dimensions.
+   Number of active cells: 6567
+   Total number of cells: 6567
+   Number of degrees of freedom: 11185
+   9 CG iterations needed to obtain convergence.
+	 initial convergence value = nan
+	 final convergence value = 2.31623e-20
+
+Time step 1 at t=1e-05 time_step = 1e-05
+   80 CG iterations needed to obtain convergence.
+	 initial convergence value = nan
+	 final convergence value = 1.66925e-13
+
+
+
++---------------------------------------------+------------+------------+
+| Total wallclock time elapsed since start    |      2.98s |            |
+|                                             |            |            |
+| Section                         | no. calls |  wall time | % of total |
++---------------------------------+-----------+------------+------------+
+| assemble_rhs_T()                |         1 |     0.107s |       3.6% |
+| assemble_system_matrix_init()   |         1 |     0.245s |       8.2% |
+| make_grid()                     |         1 |      1.11s |        37% |
+| refine_mesh_at_beginning        |         1 |     0.652s |        22% |
+| setup_system()                  |         1 |     0.276s |       9.3% |
+| solve_T()                       |         2 |     0.426s |        14% |
++---------------------------------+-----------+------------+------------+
+
+
+Time step 2 at t=2e-05 time_step = 1e-05
+   79 CG iterations needed to obtain convergence.
+	 initial convergence value = nan
+	 final convergence value = 2.06942e-13
+
+
+
++---------------------------------------------+------------+------------+
+| Total wallclock time elapsed since start    |     0.293s |            |
+|                                             |            |            |
+| Section                         | no. calls |  wall time | % of total |
++---------------------------------+-----------+------------+------------+
+| assemble_rhs_T()                |         1 |    0.0969s |        33% |
+| solve_T()                       |         1 |     0.161s |        55% |
++---------------------------------+-----------+------------+------------+
+
+
+Time step 3 at t=3e-05 time_step = 1e-05
+   80 CG iterations needed to obtain convergence.
+	 initial convergence value = nan
+	 final convergence value = 1.71207e-13
+@endcode
+
+
+The program imports a mesh file <code>geometry.msh</code> (can be generated from gmsh) 
+and produces two types of files: <code>solution-0000xxxx.pvtu</code> and
+<code>solution-0000xxxx.xxxx.vtk</code>, which can be viewed using the programs
+Paraview.
+
+With paraview or Visit, one can plot the real meshes used in simulation.
+
+<p align="center">
+  <img src="https://www.dealii.org/images/steps/developer/step-80-mesh-2d.png" alt="">
+</p>
+
+The real time temperature distribution is moved along with the laser beam as:
+
+<p align="center">
+  <img src="https://www.dealii.org/images/steps/developer/step-80-temperature-2d.png" alt="">
+</p>
+
+
+
+
+<a name="extensions"></a>
+<h3>Possibilities for extensions</h3>
+
+The program can essentially be extended to three-dimensions by modifying the code
+and right hand side. Especially, the right hand side function can be coupled with 
+absorption function to allow further coupling with nanoparticles' growth. In this
+way, multiphysics simulation can be realized for investigating laser-matter interatctions.

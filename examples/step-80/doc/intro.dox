@@ -1,0 +1,63 @@
+<a name="Intro"></a>
+<h1>Introduction</h1>
+
+This program aims at solving non-uniform isotropic heat equation
+@f{align*}
+\rho C_m \frac{\partial T}{\partial t} - \nabla \cdot (\nabla k T) &= f(\mathbf x,t), \qquad\qquad &&
+  \forall \mathbf x \in \Omega, t\in (0,t_i),\\
+  T(\mathbf x, 0) &= u_0(\mathbf x) &&
+  \forall \mathbf x \in \Omega, \\
+  \\
+  T(\mathbf x, t) &= g(\mathbf x,t) &&
+  \forall \mathbf x \in \partial\Omega, t \in (0,t_i).
+@f}
+
+which is identical to the preceding program step-26, but taking advantages of distributed memory parallel computing (step-31, step-32 and and step-40). The matrix form of the equation is then
+@f{align*}
+(M + dt \theta A) U_T^n = [M - dt (1-\theta) A] U_T^{n-1} + dt (1-\theta) F^{n-1} + dt \theta F^{n}
+@f}
+
+where matrices $M$, $A$ and $U_T$ are 
+@f{align*}
+M_{i,j} &= \int \rho C_m T^{'}_i T^{'}_j dV\\
+A_{i,j} &= \int k \nabla T^{'}_i \nabla T^{'}_j dV \\
+F^n_i &= \int T^{'}_i f^n(\mathbf x) dV
+@f}
+
+where $n$ is the time step number, and $dt$ is the time step.
+
+<h3> The initial condition </h3>
+Deall.II has provide an interpolation function (VectorTools::interpolate) to distribute initial conditions. However, in this tutorial,
+we are going to initialize in another way. The mechanism is based on the general form of solution as series of test functions
+@f{align*}
+T &= \sum_i u_i T^'_i = g_0(\mathbf x)\\
+\int u_i T^'_i T^'_j &= \int g_0(\mathbf x) T^'_i dV\\
+M_0 U_0 &= \int g_0(\mathbf x) T^'_i dV\\
+@f}
+
+<h3> The testcase </h3>
+In this test program, a laser spot is focused onto the top layer (a TiO$_2$ thin film). 
+Typical heat characteristics are $C_m = 690 J/kg/K$, thermal conductivity $k = 4.8 W/m/K$, and mass
+density is $4200 kg/m^3$.The laser spot is moving at speed $V$. In fact, experiments are always carried 
+out by translating samples instead as laser system is hard to be moved. The substrate is glass. Typical 
+heat characteristics are $C_m = 700 J/kg/K$, thermal conductivity $k = 1.8 W/m/K$, and mass density is 
+$2200 kg/m^3$. The laser spot size in diameter is $c_0 = 20 \mu m$ at $e^{-2}$ with power $ P_0 = 0.4 W$. The moving speed of the laser beam is
+$V = 10 mm/s$. The initial laser spot center locates at $x_0 = -50 \mu m$ with $50 \mu m$ away from the left boundary.
+The time step is 10 $\mu s$. 
+
+The glass substrate does not absorb the laser energy. In this test program, the TiO$_2$ thin film is assumed to be 
+mixed with silver nanoparticles, which support absorbing photon energy. For simplicity, the absorption coefficient is 
+taken as $\alpha = 10^4 m^{-1}$. The laser intensity is assumed to obey Beer-Lambert law
+@f{align*}
+I(y) &= I_0(x) \exp{-\apha y}\\
+I_0(x)  &= \frac{P_0}{2 \Pi a^2} \exp{-(x - V t - x_0)^2 / (2 a^2)}
+@f}
+where $a = c_0 / 4$ is a gaussian parameter.
+
+
+<p align="center">
+  <img src="https://www.dealii.org/images/steps/developer/step-80-structure-2d.png" alt="">
+</p>
+
+
+<!--We need a blank line to end the above block properly.-->
