@@ -578,118 +578,6 @@ public:
   //@}
 
   /**
-   * @name 3: Access to internal data
-   */
-  //@{
-  /**
-   * Return a read-only pointer to the first field of the dof values. This is
-   * the data field the read_dof_values() functions write into. First come the
-   * dof values for the first component, then all values for the second
-   * component, and so on. This is related to the internal data structures
-   * used in this class. In general, it is safer to use the get_dof_value()
-   * function instead.
-   */
-  const VectorizedArrayType *
-  begin_dof_values() const;
-
-  /**
-   * Return a read and write pointer to the first field of the dof values.
-   * This is the data field the read_dof_values() functions write into. First
-   * come the dof values for the first component, then all values for the
-   * second component, and so on. This is related to the internal data
-   * structures used in this class. In general, it is safer to use the
-   * get_dof_value() function instead.
-   */
-  VectorizedArrayType *
-  begin_dof_values();
-
-  /**
-   * Return a read-only pointer to the first field of function values on
-   * quadrature points. First come the function values on all quadrature
-   * points for the first component, then all values for the second component,
-   * and so on. This is related to the internal data structures used in this
-   * class. The raw data after a call to @p evaluate only contains unit cell
-   * operations, so possible transformations, quadrature weights etc. must be
-   * applied manually. In general, it is safer to use the get_value() function
-   * instead, which does all the transformation internally.
-   */
-  const VectorizedArrayType *
-  begin_values() const;
-
-  /**
-   * Return a read and write pointer to the first field of function values on
-   * quadrature points. First come the function values on all quadrature
-   * points for the first component, then all values for the second component,
-   * and so on. This is related to the internal data structures used in this
-   * class. The raw data after a call to @p evaluate only contains unit cell
-   * operations, so possible transformations, quadrature weights etc. must be
-   * applied manually. In general, it is safer to use the get_value() function
-   * instead, which does all the transformation internally.
-   */
-  VectorizedArrayType *
-  begin_values();
-
-  /**
-   * Return a read-only pointer to the first field of function gradients on
-   * quadrature points. First comes the x-component of the gradient for the
-   * first component on all quadrature points, then the y-component, and so
-   * on. Next comes the x-component of the second component, and so on. This
-   * is related to the internal data structures used in this class. The raw
-   * data after a call to @p evaluate only contains unit cell operations, so
-   * possible transformations, quadrature weights etc. must be applied
-   * manually. In general, it is safer to use the get_gradient() function
-   * instead, which does all the transformation internally.
-   */
-  const VectorizedArrayType *
-  begin_gradients() const;
-
-  /**
-   * Return a read and write pointer to the first field of function gradients
-   * on quadrature points. First comes the x-component of the gradient for the
-   * first component on all quadrature points, then the y-component, and so
-   * on. Next comes the x-component of the second component, and so on. This
-   * is related to the internal data structures used in this class. The raw
-   * data after a call to @p evaluate only contains unit cell operations, so
-   * possible transformations, quadrature weights etc. must be applied
-   * manually. In general, it is safer to use the get_gradient() function
-   * instead, which does all the transformation internally.
-   */
-  VectorizedArrayType *
-  begin_gradients();
-
-  /**
-   * Return a read-only pointer to the first field of function hessians on
-   * quadrature points. First comes the xx-component of the hessian for the
-   * first component on all quadrature points, then the yy-component,
-   * zz-component in (3D), then the xy-component, and so on. Next comes the xx-
-   * component of the second component, and so on. This is related to the
-   * internal data structures used in this class. The raw data after a call to
-   * @p evaluate only contains unit cell operations, so possible
-   * transformations, quadrature weights etc. must be applied manually. In
-   * general, it is safer to use the get_laplacian() or get_hessian()
-   * functions instead, which does all the transformation internally.
-   */
-  const VectorizedArrayType *
-  begin_hessians() const;
-
-  /**
-   * Return a read and write pointer to the first field of function hessians
-   * on quadrature points. First comes the xx-component of the hessian for the
-   * first component on all quadrature points, then the yy-component,
-   * zz-component in (3D), then the xy-component, and so on. Next comes the
-   * xx-component of the second component, and so on. This is related to the
-   * internal data structures used in this class. The raw data after a call to
-   * @p evaluate only contains unit cell operations, so possible
-   * transformations, quadrature weights etc. must be applied manually. In
-   * general, it is safer to use the get_laplacian() or get_hessian()
-   * functions instead, which does all the transformation internally.
-   */
-  VectorizedArrayType *
-  begin_hessians();
-
-  //@}
-
-  /**
    * Provides a unified interface to access data in a vector of
    * VectorizedArray fields of length MatrixFree::n_cell_batches() +
    * MatrixFree::n_ghost_cell_batches() for both cells (plain read) and faces
@@ -906,129 +794,10 @@ protected:
   const MatrixFree<dim, Number, VectorizedArrayType> *matrix_info;
 
   /**
-   * This field stores the values for local degrees of freedom (e.g. after
-   * reading out from a vector but before applying unit cell transformations
-   * or before distributing them into a result vector). The methods
-   * get_dof_value() and submit_dof_value() read from or write to this field.
-   *
-   * The values of this array are stored in the start section of
-   * @p scratch_data_array. Due to its access as a thread local memory, the
-   * memory can get reused between different calls. As opposed to requesting
-   * memory on the stack, this approach allows for very large polynomial
-   * degrees.
-   */
-  VectorizedArrayType *values_dofs[n_components];
-
-  /**
-   * This field stores the values of the finite element function on quadrature
-   * points after applying unit cell transformations or before integrating.
-   * The methods get_value() and submit_value() access this field.
-   *
-   * The values of this array are stored in the start section of
-   * @p scratch_data_array. Due to its access as a thread local memory, the
-   * memory can get reused between different calls. As opposed to requesting
-   * memory on the stack, this approach allows for very large polynomial
-   * degrees.
-   */
-  VectorizedArrayType *values_quad;
-
-  /**
-   * This field stores the gradients of the finite element function on
-   * quadrature points after applying unit cell transformations or before
-   * integrating. The methods get_gradient() and submit_gradient() (as well as
-   * some specializations like get_symmetric_gradient() or get_divergence())
-   * access this field.
-   *
-   * The values of this array are stored in the start section of
-   * @p scratch_data_array. Due to its access as a thread local memory, the
-   * memory can get reused between different calls. As opposed to requesting
-   * memory on the stack, this approach allows for very large polynomial
-   * degrees.
-   */
-  VectorizedArrayType *gradients_quad;
-
-  /**
-   * This field stores the gradients of the finite element function on
-   * quadrature points after applying unit cell transformations or before
-   * integrating. The methods get_hessian() and submit_hessian() (as well as
-   * some specializations like get_hessian_diagonal() or get_laplacian())
-   * access this field for general cell/face types.
-   *
-   * The values of this array are stored in the start section of
-   * @p scratch_data_array. Due to its access as a thread local memory, the
-   * memory can get reused between different calls. As opposed to requesting
-   * memory on the stack, this approach allows for very large polynomial
-   * degrees.
-   */
-  VectorizedArrayType *gradients_from_hessians_quad;
-
-  /**
-   * This field stores the Hessians of the finite element function on
-   * quadrature points after applying unit cell transformations. The methods
-   * get_hessian(), get_laplacian(), get_hessian_diagonal() access this field.
-   *
-   * The values of this array are stored in the start section of
-   * @p scratch_data_array. Due to its access as a thread local memory, the
-   * memory can get reused between different calls. As opposed to requesting
-   * memory on the stack, this approach allows for very large polynomial
-   * degrees.
-   */
-  VectorizedArrayType *hessians_quad;
-
-  /**
    * Stores the number of components in the finite element as detected in the
    * MatrixFree storage class for comparison with the template argument.
    */
   const unsigned int n_fe_components;
-
-  /**
-   * Debug information to track whether dof values have been initialized
-   * before accessed. Used to control exceptions when uninitialized data is
-   * used.
-   */
-  bool dof_values_initialized;
-
-  /**
-   * Debug information to track whether values on quadrature points have been
-   * initialized before accessed. Used to control exceptions when
-   * uninitialized data is used.
-   */
-  bool values_quad_initialized;
-
-  /**
-   * Debug information to track whether gradients on quadrature points have
-   * been initialized before accessed. Used to control exceptions when
-   * uninitialized data is used.
-   */
-  bool gradients_quad_initialized;
-
-  /**
-   * Debug information to track whether Hessians on quadrature points have
-   * been initialized before accessed. Used to control exceptions when
-   * uninitialized data is used.
-   */
-  bool hessians_quad_initialized;
-
-  /**
-   * Debug information to track whether values on quadrature points have been
-   * submitted for integration before the integration is actually stared. Used
-   * to control exceptions when uninitialized data is used.
-   */
-  bool values_quad_submitted;
-
-  /**
-   * Debug information to track whether gradients on quadrature points have
-   * been submitted for integration before the integration is actually stared.
-   * Used to control exceptions when uninitialized data is used.
-   */
-  bool gradients_quad_submitted;
-
-  /**
-   * Debug information to track whether hessians on quadrature points have
-   * been submitted for integration before the integration is actually stared.
-   * Used to control exceptions when uninitialized data is used.
-   */
-  bool hessians_quad_submitted;
 
   /**
    * For a FiniteElement with more than one base element, select at which
@@ -1041,14 +810,6 @@ protected:
    * MatrixFree object was given at initialization.
    */
   mutable std::vector<types::global_dof_index> local_dof_indices;
-
-private:
-  /**
-   * Sets the pointers for values, gradients, hessians to the central
-   * scratch_data_array of the base class.
-   */
-  void
-  set_data_pointers();
 };
 
 
@@ -3096,8 +2857,8 @@ namespace internal
             typename Number,
             typename VectorizedArrayType>
   inline std::tuple<
-    const internal::MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> &,
-    const internal::MatrixFreeFunctions::DoFInfo &,
+    const internal::MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> *,
+    const internal::MatrixFreeFunctions::DoFInfo *,
     unsigned int,
     unsigned int>
   get_shape_info_and_indices(
@@ -3127,15 +2888,16 @@ namespace internal
            std::min<unsigned int>(active_fe_index,
                                   mapping_storage.descriptor.size() - 1)) :
         mapping_storage.quad_index_from_n_q_points(n_q_points);
-    return {data.get_shape_info(
-              dof_no,
-              quad_no,
-              dof_info.component_to_base_index[first_selected_component],
-              active_fe_index,
-              active_quad_index),
-            dof_info,
-            active_fe_index,
-            active_quad_index};
+    return std::make_tuple(
+      &data.get_shape_info(
+        dof_no,
+        quad_no,
+        dof_info.component_to_base_index[first_selected_component],
+        active_fe_index,
+        active_quad_index),
+      &dof_info,
+      active_fe_index,
+      active_quad_index);
   }
 } // namespace internal
 
@@ -3181,15 +2943,9 @@ inline FEEvaluationBase<dim,
   , scratch_data_array(data_in.acquire_scratch_data())
   , matrix_info(&data_in)
   , n_fe_components(this->dof_info->start_components.back())
-  , dof_values_initialized(false)
-  , values_quad_initialized(false)
-  , gradients_quad_initialized(false)
-  , hessians_quad_initialized(false)
-  , values_quad_submitted(false)
-  , gradients_quad_submitted(false)
   , first_selected_component(first_selected_component)
 {
-  set_data_pointers();
+  this->set_data_pointers(scratch_data_array, n_components_);
   Assert(
     this->dof_info->start_components.back() == 1 ||
       static_cast<int>(n_components_) <=
@@ -3252,12 +3008,6 @@ inline FEEvaluationBase<dim,
   , scratch_data_array(new AlignedVector<VectorizedArrayType>())
   , matrix_info(nullptr)
   , n_fe_components(n_components_)
-  , dof_values_initialized(false)
-  , values_quad_initialized(false)
-  , gradients_quad_initialized(false)
-  , hessians_quad_initialized(false)
-  , values_quad_submitted(false)
-  , gradients_quad_submitted(false)
   // keep the number of the selected component within the current base element
   // for reading dof values
   , first_selected_component(first_selected_component)
@@ -3279,7 +3029,7 @@ inline FEEvaluationBase<dim,
       fe,
       fe.component_to_base_index(first_selected_component).first);
 
-  set_data_pointers();
+  this->set_data_pointers(scratch_data_array, n_components_);
 }
 
 
@@ -3305,12 +3055,6 @@ inline FEEvaluationBase<dim,
                          other.matrix_info->acquire_scratch_data())
   , matrix_info(other.matrix_info)
   , n_fe_components(other.n_fe_components)
-  , dof_values_initialized(false)
-  , values_quad_initialized(false)
-  , gradients_quad_initialized(false)
-  , hessians_quad_initialized(false)
-  , values_quad_submitted(false)
-  , gradients_quad_submitted(false)
   , first_selected_component(other.first_selected_component)
 {
   if (other.matrix_info == nullptr)
@@ -3336,7 +3080,7 @@ inline FEEvaluationBase<dim,
         this->mapped_geometry->get_data_storage().JxW_values.begin();
     }
 
-  set_data_pointers();
+  this->set_data_pointers(scratch_data_array, n_components_);
 }
 
 
@@ -3404,7 +3148,7 @@ operator=(const FEEvaluationBase<dim,
   AssertDimension(n_fe_components, other.n_fe_components);
   AssertDimension(first_selected_component, other.first_selected_component);
 
-  set_data_pointers();
+  this->set_data_pointers(scratch_data_array, n_components_);
 
   return *this;
 }
@@ -3436,60 +3180,6 @@ inline FEEvaluationBase<dim,
       delete scratch_data_array;
       delete this->data;
     }
-}
-
-
-
-template <int dim,
-          int n_components_,
-          typename Number,
-          bool is_face,
-          typename VectorizedArrayType>
-inline void
-FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
-  set_data_pointers()
-{
-  Assert(this->scratch_data_array != nullptr, ExcInternalError());
-
-  const unsigned int tensor_dofs_per_component =
-    Utilities::fixed_power<dim>(this->data->data.front().fe_degree + 1);
-  const unsigned int dofs_per_component =
-    this->data->dofs_per_component_on_cell;
-  const unsigned int n_quadrature_points = this->n_quadrature_points;
-
-  const unsigned int size_scratch_data =
-    std::max(tensor_dofs_per_component + 1, dofs_per_component) *
-      n_components_ * 3 +
-    2 * n_quadrature_points;
-  const unsigned int allocated_size =
-    size_scratch_data + n_components_ * dofs_per_component +
-    (n_components_ * ((dim * (dim + 1)) / 2 + 2 * dim + 1) *
-     n_quadrature_points);
-  this->scratch_data_array->resize_fast(allocated_size);
-
-  // set the pointers to the correct position in the data array
-  for (unsigned int c = 0; c < n_components_; ++c)
-    {
-      values_dofs[c] =
-        this->scratch_data_array->begin() + c * dofs_per_component;
-    }
-  values_quad =
-    this->scratch_data_array->begin() + n_components * dofs_per_component;
-  gradients_quad = this->scratch_data_array->begin() +
-                   n_components * (dofs_per_component + n_quadrature_points);
-  gradients_from_hessians_quad =
-    this->scratch_data_array->begin() +
-    n_components * (dofs_per_component + (dim + 1) * n_quadrature_points);
-  hessians_quad =
-    this->scratch_data_array->begin() +
-    n_components * (dofs_per_component + (2 * dim + 1) * n_quadrature_points);
-
-  this->scratch_data.reinit(this->scratch_data_array->begin() +
-                              n_components_ * dofs_per_component +
-                              (n_components_ *
-                               ((dim * (dim + 1)) / 2 + 2 * dim + 1) *
-                               n_quadrature_points),
-                            size_scratch_data);
 }
 
 
@@ -3937,8 +3627,12 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                          internal::is_vectorizable<VectorType, Number>::value>
     vector_selector;
 
-  const unsigned int dofs_per_component =
-    this->data->dofs_per_component_on_cell;
+  const std::size_t dofs_per_component = this->data->dofs_per_component_on_cell;
+  std::array<VectorizedArrayType *, n_components> values_dofs;
+  for (unsigned int c = 0; c < n_components; ++c)
+    values_dofs[c] = const_cast<VectorizedArrayType *>(this->values_dofs) +
+                     c * dofs_per_component;
+
   if (this->dof_info->index_storage_variants
           [is_face ? this->dof_access_index :
                      internal::MatrixFreeFunctions::DoFInfo::dof_access_cell]
@@ -3972,9 +3666,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
       return;
     }
 
-  const unsigned int *  dof_indices[n_lanes];
-  VectorizedArrayType **values_dofs =
-    const_cast<VectorizedArrayType **>(&this->values_dofs[0]);
+  const unsigned int *dof_indices[n_lanes];
 
   // Assign the appropriate cell ids for face/cell case and get the pointers
   // to the dof indices of the cells on all lanes
@@ -4259,18 +3951,18 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
 {
   Assert(!local_dof_indices.empty(), ExcNotInitialized());
 
-  unsigned int index =
-    first_selected_component * this->data->dofs_per_component_on_cell;
+  const std::size_t dofs_per_component = this->data->dofs_per_component_on_cell;
+  unsigned int      index = first_selected_component * dofs_per_component;
   for (unsigned int comp = 0; comp < n_components; ++comp)
     {
-      for (unsigned int i = 0; i < this->data->dofs_per_component_on_cell;
-           ++i, ++index)
+      for (unsigned int i = 0; i < dofs_per_component; ++i, ++index)
         {
-          operation.process_empty(values_dofs[comp][i]);
+          operation.process_empty(
+            this->values_dofs[comp * dofs_per_component + i]);
           operation.process_dof_global(
             local_dof_indices[this->data->lexicographic_numbering[index]],
             *src[0],
-            values_dofs[comp][i][0]);
+            this->values_dofs[comp * dofs_per_component + i][0]);
         }
     }
 }
@@ -4311,6 +4003,12 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   const std::vector<unsigned int> &dof_indices_cont =
     this->dof_info->dof_indices_contiguous[ind];
 
+  const std::size_t dofs_per_component = this->data->dofs_per_component_on_cell;
+  std::array<VectorizedArrayType *, n_components> values_dofs;
+  for (unsigned int c = 0; c < n_components; ++c)
+    values_dofs[c] = const_cast<VectorizedArrayType *>(this->values_dofs) +
+                     c * dofs_per_component;
+
   // Simple case: We have contiguous storage, so we can simply copy out the
   // data
   if ((this->dof_info->index_storage_variants[ind][this->cell] ==
@@ -4330,19 +4028,17 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
           VectorizedArrayType::size();
       if (n_components == 1 || n_fe_components == 1)
         for (unsigned int comp = 0; comp < n_components; ++comp)
-          operation.process_dofs_vectorized(
-            this->data->dofs_per_component_on_cell,
-            dof_index,
-            *src[comp],
-            values_dofs[comp],
-            vector_selector);
+          operation.process_dofs_vectorized(dofs_per_component,
+                                            dof_index,
+                                            *src[comp],
+                                            values_dofs[comp],
+                                            vector_selector);
       else
-        operation.process_dofs_vectorized(
-          this->data->dofs_per_component_on_cell * n_components,
-          dof_index,
-          *src[0],
-          values_dofs[0],
-          vector_selector);
+        operation.process_dofs_vectorized(dofs_per_component * n_components,
+                                          dof_index,
+                                          *src[0],
+                                          values_dofs[0],
+                                          vector_selector);
       return;
     }
 
@@ -4414,7 +4110,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                 {
                   auto vector_ptrs = compute_vector_ptrs(comp);
                   operation.process_dofs_vectorized_transpose(
-                    this->data->dofs_per_component_on_cell,
+                    dofs_per_component,
                     vector_ptrs,
                     values_dofs[comp],
                     vector_selector);
@@ -4423,11 +4119,11 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
           else
             {
               auto vector_ptrs = compute_vector_ptrs(0);
-              operation.process_dofs_vectorized_transpose(
-                this->data->dofs_per_component_on_cell * n_components,
-                vector_ptrs,
-                &values_dofs[0][0],
-                vector_selector);
+              operation.process_dofs_vectorized_transpose(dofs_per_component *
+                                                            n_components,
+                                                          vector_ptrs,
+                                                          &values_dofs[0][0],
+                                                          vector_selector);
             }
         }
       else
@@ -4436,17 +4132,14 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
             auto vector_ptrs = compute_vector_ptrs(
               (n_components == 1 || n_fe_components == 1) ? comp : 0);
 
-            for (unsigned int i = 0; i < this->data->dofs_per_component_on_cell;
-                 ++i)
+            for (unsigned int i = 0; i < dofs_per_component; ++i)
               operation.process_empty(values_dofs[comp][i]);
 
             if (n_components == 1 || n_fe_components == 1)
               {
                 for (unsigned int v = 0; v < n_filled_lanes; ++v)
                   if (mask[v] == true)
-                    for (unsigned int i = 0;
-                         i < this->data->dofs_per_component_on_cell;
-                         ++i)
+                    for (unsigned int i = 0; i < dofs_per_component; ++i)
                       operation.process_dof(vector_ptrs[v][i],
                                             values_dofs[comp][i][v]);
               }
@@ -4454,13 +4147,9 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
               {
                 for (unsigned int v = 0; v < n_filled_lanes; ++v)
                   if (mask[v] == true)
-                    for (unsigned int i = 0;
-                         i < this->data->dofs_per_component_on_cell;
-                         ++i)
+                    for (unsigned int i = 0; i < dofs_per_component; ++i)
                       operation.process_dof(
-                        vector_ptrs[v]
-                                   [i + comp * this->data
-                                                 ->dofs_per_component_on_cell],
+                        vector_ptrs[v][i + comp * dofs_per_component],
                         values_dofs[comp][i][v]);
               }
           }
@@ -4494,27 +4183,25 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
         {
           if (n_components == 1 || n_fe_components == 1)
             for (unsigned int comp = 0; comp < n_components; ++comp)
-              operation.process_dofs_vectorized_transpose(
-                this->data->dofs_per_component_on_cell,
-                dof_indices,
-                *src[comp],
-                values_dofs[comp],
-                vector_selector);
+              operation.process_dofs_vectorized_transpose(dofs_per_component,
+                                                          dof_indices,
+                                                          *src[comp],
+                                                          values_dofs[comp],
+                                                          vector_selector);
           else
-            operation.process_dofs_vectorized_transpose(
-              this->data->dofs_per_component_on_cell * n_components,
-              dof_indices,
-              *src[0],
-              &values_dofs[0][0],
-              vector_selector);
+            operation.process_dofs_vectorized_transpose(dofs_per_component *
+                                                          n_components,
+                                                        dof_indices,
+                                                        *src[0],
+                                                        &values_dofs[0][0],
+                                                        vector_selector);
         }
       else if (this->dof_info->index_storage_variants[ind][this->cell] ==
                internal::MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
                  interleaved_contiguous_strided)
         {
           if (n_components == 1 || n_fe_components == 1)
-            for (unsigned int i = 0; i < this->data->dofs_per_component_on_cell;
-                 ++i)
+            for (unsigned int i = 0; i < dofs_per_component; ++i)
               {
                 for (unsigned int comp = 0; comp < n_components; ++comp)
                   operation.process_dof_gather(dof_indices,
@@ -4525,17 +4212,14 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
               }
           else
             for (unsigned int comp = 0; comp < n_components; ++comp)
-              for (unsigned int i = 0;
-                   i < this->data->dofs_per_component_on_cell;
-                   ++i)
+              for (unsigned int i = 0; i < dofs_per_component; ++i)
                 {
-                  operation.process_dof_gather(
-                    dof_indices,
-                    *src[0],
-                    (comp * this->data->dofs_per_component_on_cell + i) *
-                      VectorizedArrayType::size(),
-                    values_dofs[comp][i],
-                    vector_selector);
+                  operation.process_dof_gather(dof_indices,
+                                               *src[0],
+                                               (comp * dofs_per_component + i) *
+                                                 VectorizedArrayType::size(),
+                                               values_dofs[comp][i],
+                                               vector_selector);
                 }
         }
       else
@@ -4548,8 +4232,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
             &this->dof_info->dof_indices_interleave_strides
                [ind][VectorizedArrayType::size() * this->cell];
           if (n_components == 1 || n_fe_components == 1)
-            for (unsigned int i = 0; i < this->data->dofs_per_component_on_cell;
-                 ++i)
+            for (unsigned int i = 0; i < dofs_per_component; ++i)
               {
                 for (unsigned int comp = 0; comp < n_components; ++comp)
                   operation.process_dof_gather(dof_indices,
@@ -4563,9 +4246,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
               }
           else
             for (unsigned int comp = 0; comp < n_components; ++comp)
-              for (unsigned int i = 0;
-                   i < this->data->dofs_per_component_on_cell;
-                   ++i)
+              for (unsigned int i = 0; i < dofs_per_component; ++i)
                 {
                   operation.process_dof_gather(dof_indices,
                                                *src[0],
@@ -4581,8 +4262,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   else
     for (unsigned int comp = 0; comp < n_components; ++comp)
       {
-        for (unsigned int i = 0; i < this->data->dofs_per_component_on_cell;
-             ++i)
+        for (unsigned int i = 0; i < dofs_per_component; ++i)
           operation.process_empty(values_dofs[comp][i]);
         if (this->dof_info->index_storage_variants[ind][this->cell] ==
             internal::MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
@@ -4592,9 +4272,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
               {
                 for (unsigned int v = 0; v < n_filled_lanes; ++v)
                   if (mask[v] == true)
-                    for (unsigned int i = 0;
-                         i < this->data->dofs_per_component_on_cell;
-                         ++i)
+                    for (unsigned int i = 0; i < dofs_per_component; ++i)
                       operation.process_dof(dof_indices[v] + i,
                                             *src[comp],
                                             values_dofs[comp][i][v]);
@@ -4603,14 +4281,11 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
               {
                 for (unsigned int v = 0; v < n_filled_lanes; ++v)
                   if (mask[v] == true)
-                    for (unsigned int i = 0;
-                         i < this->data->dofs_per_component_on_cell;
-                         ++i)
-                      operation.process_dof(
-                        dof_indices[v] + i +
-                          comp * this->data->dofs_per_component_on_cell,
-                        *src[0],
-                        values_dofs[comp][i][v]);
+                    for (unsigned int i = 0; i < dofs_per_component; ++i)
+                      operation.process_dof(dof_indices[v] + i +
+                                              comp * dofs_per_component,
+                                            *src[0],
+                                            values_dofs[comp][i][v]);
               }
           }
         else
@@ -4624,9 +4299,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
               for (unsigned int v = 0; v < n_filled_lanes; ++v)
                 {
                   if (mask[v] == true)
-                    for (unsigned int i = 0;
-                         i < this->data->dofs_per_component_on_cell;
-                         ++i)
+                    for (unsigned int i = 0; i < dofs_per_component; ++i)
                       operation.process_dof(dof_indices[v] + i * offsets[v],
                                             *src[comp],
                                             values_dofs[comp][i][v]);
@@ -4635,15 +4308,12 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
               {
                 for (unsigned int v = 0; v < n_filled_lanes; ++v)
                   if (mask[v] == true)
-                    for (unsigned int i = 0;
-                         i < this->data->dofs_per_component_on_cell;
-                         ++i)
-                      operation.process_dof(
-                        dof_indices[v] +
-                          (i + comp * this->data->dofs_per_component_on_cell) *
-                            offsets[v],
-                        *src[0],
-                        values_dofs[comp][i][v]);
+                    for (unsigned int i = 0; i < dofs_per_component; ++i)
+                      operation.process_dof(dof_indices[v] +
+                                              (i + comp * dofs_per_component) *
+                                                offsets[v],
+                                            *src[0],
+                                            values_dofs[comp][i][v]);
               }
           }
       }
@@ -4828,7 +4498,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
           *this,
           transpose,
           constraint_mask,
-          values_dofs[0]);
+          this->values_dofs);
 }
 
 
@@ -4859,7 +4529,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   apply_hanging_node_constraints<false>();
 
 #  ifdef DEBUG
-  dof_values_initialized = true;
+  this->dof_values_initialized = true;
 #  endif
 }
 
@@ -4889,7 +4559,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   read_write_operation(reader, src_data.first, src_data.second, mask, false);
 
 #  ifdef DEBUG
-  dof_values_initialized = true;
+  this->dof_values_initialized = true;
 #  endif
 }
 
@@ -4909,7 +4579,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
     const std::bitset<VectorizedArrayType::size()> &mask) const
 {
 #  ifdef DEBUG
-  Assert(dof_values_initialized == true,
+  Assert(this->dof_values_initialized == true,
          internal::ExcAccessToUninitializedField());
 #  endif
 
@@ -4943,7 +4613,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                  const std::bitset<VectorizedArrayType::size()> &mask) const
 {
 #  ifdef DEBUG
-  Assert(dof_values_initialized == true,
+  Assert(this->dof_values_initialized == true,
          internal::ExcAccessToUninitializedField());
 #  endif
 
@@ -4975,7 +4645,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
     const std::bitset<VectorizedArrayType::size()> &mask) const
 {
 #  ifdef DEBUG
-  Assert(dof_values_initialized == true,
+  Assert(this->dof_values_initialized == true,
          internal::ExcAccessToUninitializedField());
 #  endif
 
@@ -4994,144 +4664,6 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
 
 
 /*------------------------------ access to data fields ----------------------*/
-
-
-
-template <int dim,
-          int n_components,
-          typename Number,
-          bool is_face,
-          typename VectorizedArrayType>
-inline const VectorizedArrayType *
-FEEvaluationBase<dim, n_components, Number, is_face, VectorizedArrayType>::
-  begin_dof_values() const
-{
-  return &values_dofs[0][0];
-}
-
-
-
-template <int dim,
-          int n_components,
-          typename Number,
-          bool is_face,
-          typename VectorizedArrayType>
-inline VectorizedArrayType *
-FEEvaluationBase<dim, n_components, Number, is_face, VectorizedArrayType>::
-  begin_dof_values()
-{
-#  ifdef DEBUG
-  dof_values_initialized = true;
-#  endif
-  return &values_dofs[0][0];
-}
-
-
-
-template <int dim,
-          int n_components,
-          typename Number,
-          bool is_face,
-          typename VectorizedArrayType>
-inline const VectorizedArrayType *
-FEEvaluationBase<dim, n_components, Number, is_face, VectorizedArrayType>::
-  begin_values() const
-{
-#  ifdef DEBUG
-  Assert(values_quad_initialized || values_quad_submitted, ExcNotInitialized());
-#  endif
-  return values_quad;
-}
-
-
-
-template <int dim,
-          int n_components,
-          typename Number,
-          bool is_face,
-          typename VectorizedArrayType>
-inline VectorizedArrayType *
-FEEvaluationBase<dim, n_components, Number, is_face, VectorizedArrayType>::
-  begin_values()
-{
-#  ifdef DEBUG
-  values_quad_initialized = true;
-  values_quad_submitted   = true;
-#  endif
-  return values_quad;
-}
-
-
-
-template <int dim,
-          int n_components,
-          typename Number,
-          bool is_face,
-          typename VectorizedArrayType>
-inline const VectorizedArrayType *
-FEEvaluationBase<dim, n_components, Number, is_face, VectorizedArrayType>::
-  begin_gradients() const
-{
-#  ifdef DEBUG
-  Assert(gradients_quad_initialized || gradients_quad_submitted,
-         ExcNotInitialized());
-#  endif
-  return gradients_quad;
-}
-
-
-
-template <int dim,
-          int n_components,
-          typename Number,
-          bool is_face,
-          typename VectorizedArrayType>
-inline VectorizedArrayType *
-FEEvaluationBase<dim, n_components, Number, is_face, VectorizedArrayType>::
-  begin_gradients()
-{
-#  ifdef DEBUG
-  gradients_quad_submitted   = true;
-  gradients_quad_initialized = true;
-#  endif
-  return gradients_quad;
-}
-
-
-
-template <int dim,
-          int n_components,
-          typename Number,
-          bool is_face,
-          typename VectorizedArrayType>
-inline const VectorizedArrayType *
-FEEvaluationBase<dim, n_components, Number, is_face, VectorizedArrayType>::
-  begin_hessians() const
-{
-#  ifdef DEBUG
-  Assert(hessians_quad_initialized, ExcNotInitialized());
-#  endif
-  return hessians_quad;
-}
-
-
-
-template <int dim,
-          int n_components,
-          typename Number,
-          bool is_face,
-          typename VectorizedArrayType>
-inline VectorizedArrayType *
-FEEvaluationBase<dim, n_components, Number, is_face, VectorizedArrayType>::
-  begin_hessians()
-{
-#  ifdef DEBUG
-  hessians_quad_initialized = true;
-#  endif
-  return hessians_quad;
-}
-
-
 
 template <int dim,
           int n_components,
@@ -5157,9 +4689,10 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   get_dof_value(const unsigned int dof) const
 {
   AssertIndexRange(dof, this->data->dofs_per_component_on_cell);
+  const std::size_t dofs = this->data->dofs_per_component_on_cell;
   Tensor<1, n_components_, VectorizedArrayType> return_value;
   for (unsigned int comp = 0; comp < n_components; ++comp)
-    return_value[comp] = this->values_dofs[comp][dof];
+    return_value[comp] = this->values_dofs[comp * dofs + dof];
   return return_value;
 }
 
@@ -5183,7 +4716,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   const std::size_t                             nqp = this->n_quadrature_points;
   Tensor<1, n_components_, VectorizedArrayType> return_value;
   for (unsigned int comp = 0; comp < n_components; ++comp)
-    return_value[comp] = values_quad[comp * nqp + q_point];
+    return_value[comp] = this->values_quad[comp * nqp + q_point];
   return return_value;
 }
 
@@ -5216,8 +4749,9 @@ inline DEAL_II_ALWAYS_INLINE
     {
       for (unsigned int d = 0; d < dim; ++d)
         for (unsigned int comp = 0; comp < n_components; ++comp)
-          grad_out[comp][d] = gradients_quad[(comp * dim + d) * nqp + q_point] *
-                              this->jacobian[0][d][d];
+          grad_out[comp][d] =
+            this->gradients_quad[(comp * dim + d) * nqp + q_point] *
+            this->jacobian[0][d][d];
     }
   // cell with general/affine Jacobian
   else
@@ -5230,10 +4764,11 @@ inline DEAL_II_ALWAYS_INLINE
         for (unsigned int d = 0; d < dim; ++d)
           {
             grad_out[comp][d] =
-              jac[d][0] * gradients_quad[(comp * dim) * nqp + q_point];
+              jac[d][0] * this->gradients_quad[(comp * dim) * nqp + q_point];
             for (unsigned int e = 1; e < dim; ++e)
               grad_out[comp][d] +=
-                jac[d][e] * gradients_quad[(comp * dim + e) * nqp + q_point];
+                jac[d][e] *
+                this->gradients_quad[(comp * dim + e) * nqp + q_point];
           }
     }
   return grad_out;
@@ -5265,19 +4800,21 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
 
   if (this->cell_type == internal::MatrixFreeFunctions::cartesian)
     for (unsigned int comp = 0; comp < n_components; ++comp)
-      grad_out[comp] = gradients_quad[(comp * dim + dim - 1) * nqp + q_point] *
-                       (this->normal_x_jacobian[0][dim - 1]);
+      grad_out[comp] =
+        this->gradients_quad[(comp * dim + dim - 1) * nqp + q_point] *
+        (this->normal_x_jacobian[0][dim - 1]);
   else
     {
       const std::size_t index =
         this->cell_type <= internal::MatrixFreeFunctions::affine ? 0 : q_point;
       for (unsigned int comp = 0; comp < n_components; ++comp)
         {
-          grad_out[comp] = gradients_quad[comp * dim * nqp + q_point] *
+          grad_out[comp] = this->gradients_quad[comp * dim * nqp + q_point] *
                            this->normal_x_jacobian[index][0];
           for (unsigned int d = 1; d < dim; ++d)
-            grad_out[comp] += gradients_quad[(comp * dim + d) * nqp + q_point] *
-                              this->normal_x_jacobian[index][d];
+            grad_out[comp] +=
+              this->gradients_quad[(comp * dim + d) * nqp + q_point] *
+              this->normal_x_jacobian[index][d];
         }
     }
   return grad_out;
@@ -5373,7 +4910,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
         {
           for (unsigned int d = 0; d < dim; ++d)
             hessian_out[comp][d][d] =
-              hessians_quad[(comp * hdim + d) * nqp + q_point] *
+              this->hessians_quad[(comp * hdim + d) * nqp + q_point] *
               (jac[d][d] * jac[d][d]);
           switch (dim)
             {
@@ -5381,18 +4918,18 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                 break;
               case 2:
                 hessian_out[comp][0][1] =
-                  hessians_quad[(comp * hdim + 2) * nqp + q_point] *
+                  this->hessians_quad[(comp * hdim + 2) * nqp + q_point] *
                   (jac[0][0] * jac[1][1]);
                 break;
               case 3:
                 hessian_out[comp][0][1] =
-                  hessians_quad[(comp * hdim + 3) * nqp + q_point] *
+                  this->hessians_quad[(comp * hdim + 3) * nqp + q_point] *
                   (jac[0][0] * jac[1][1]);
                 hessian_out[comp][0][2] =
-                  hessians_quad[(comp * hdim + 4) * nqp + q_point] *
+                  this->hessians_quad[(comp * hdim + 4) * nqp + q_point] *
                   (jac[0][0] * jac[2][2]);
                 hessian_out[comp][1][2] =
-                  hessians_quad[(comp * hdim + 5) * nqp + q_point] *
+                  this->hessians_quad[(comp * hdim + 5) * nqp + q_point] *
                   (jac[1][1] * jac[2][2]);
                 break;
               default:
@@ -5410,7 +4947,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
         {
           VectorizedArrayType tmp[dim][dim];
           internal::hessian_unit_times_jac(
-            jac, hessians_quad + comp * hdim * nqp + q_point, nqp, tmp);
+            jac, this->hessians_quad + comp * hdim * nqp + q_point, nqp, tmp);
 
           // compute first part of hessian, J * tmp = J * hess_unit(u) * J^T
           for (unsigned int d = 0; d < dim; ++d)
@@ -5441,7 +4978,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
         {
           VectorizedArrayType tmp[dim][dim];
           internal::hessian_unit_times_jac(
-            jac, hessians_quad + comp * hdim * nqp + q_point, nqp, tmp);
+            jac, this->hessians_quad + comp * hdim * nqp + q_point, nqp, tmp);
 
           // compute first part of hessian, J * tmp = J * hess_unit(u) * J^T
           for (unsigned int d = 0; d < dim; ++d)
@@ -5457,7 +4994,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
             for (unsigned int e = 0; e < dim; ++e)
               hessian_out[comp][d][d] +=
                 jac_grad[d][e] *
-                gradients_from_hessians_quad[(comp * dim + e) * nqp + q_point];
+                this->gradients_from_hessians_quad[(comp * dim + e) * nqp +
+                                                   q_point];
 
           // add off-diagonal part of J' * grad(u)
           for (unsigned int d = 0, count = dim; d < dim; ++d)
@@ -5465,8 +5003,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
               for (unsigned int f = 0; f < dim; ++f)
                 hessian_out[comp][d][e] +=
                   jac_grad[count][f] *
-                  gradients_from_hessians_quad[(comp * dim + f) * nqp +
-                                               q_point];
+                  this->gradients_from_hessians_quad[(comp * dim + f) * nqp +
+                                                     q_point];
 
           // take symmetric part
           for (unsigned int d = 0; d < dim; ++d)
@@ -5511,7 +5049,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
       for (unsigned int comp = 0; comp < n_components; ++comp)
         for (unsigned int d = 0; d < dim; ++d)
           hessian_out[comp][d] =
-            hessians_quad[(comp * hdim + d) * nqp + q_point] *
+            this->hessians_quad[(comp * hdim + d) * nqp + q_point] *
             (jac[d][d] * jac[d][d]);
     }
   // cell with general Jacobian, but constant within the cell
@@ -5523,7 +5061,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
           // unscaled gradient data
           VectorizedArrayType tmp[dim][dim];
           internal::hessian_unit_times_jac(
-            jac, hessians_quad + comp * hdim * nqp + q_point, nqp, tmp);
+            jac, this->hessians_quad + comp * hdim * nqp + q_point, nqp, tmp);
 
           // compute only the trace part of hessian, J * tmp = J *
           // hess_unit(u) * J^T
@@ -5548,7 +5086,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
           // unscaled gradient data
           VectorizedArrayType tmp[dim][dim];
           internal::hessian_unit_times_jac(
-            jac, hessians_quad + comp * hdim * nqp + q_point, nqp, tmp);
+            jac, this->hessians_quad + comp * hdim * nqp + q_point, nqp, tmp);
 
           // compute only the trace part of hessian, J * tmp = J *
           // hess_unit(u) * J^T
@@ -5563,7 +5101,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
             for (unsigned int e = 0; e < dim; ++e)
               hessian_out[comp][d] +=
                 jac_grad[d][e] *
-                gradients_from_hessians_quad[(comp * dim + e) * nqp + q_point];
+                this->gradients_from_hessians_quad[(comp * dim + e) * nqp +
+                                                   q_point];
         }
     }
   return hessian_out;
@@ -5613,9 +5152,10 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
 #  ifdef DEBUG
   this->dof_values_initialized = true;
 #  endif
+  const std::size_t dofs = this->data->dofs_per_component_on_cell;
   AssertIndexRange(dof, this->data->dofs_per_component_on_cell);
   for (unsigned int comp = 0; comp < n_components; ++comp)
-    this->values_dofs[comp][dof] = val_in[comp];
+    this->values_dofs[comp * dofs + dof] = val_in[comp];
 }
 
 
@@ -5645,13 +5185,13 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
       const VectorizedArrayType JxW =
         this->J_value[0] * this->quadrature_weights[q_point];
       for (unsigned int comp = 0; comp < n_components; ++comp)
-        values_quad[comp * nqp + q_point] = val_in[comp] * JxW;
+        this->values_quad[comp * nqp + q_point] = val_in[comp] * JxW;
     }
   else
     {
       const VectorizedArrayType JxW = this->J_value[q_point];
       for (unsigned int comp = 0; comp < n_components; ++comp)
-        values_quad[comp * nqp + q_point] = val_in[comp] * JxW;
+        this->values_quad[comp * nqp + q_point] = val_in[comp] * JxW;
     }
 }
 
@@ -5689,7 +5229,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
         {
           const VectorizedArrayType factor = this->jacobian[0][d][d] * JxW;
           for (unsigned int comp = 0; comp < n_components; ++comp)
-            gradients_quad[(comp * dim + d) * nqp + q_point] =
+            this->gradients_quad[(comp * dim + d) * nqp + q_point] =
               grad_in[comp][d] * factor;
         }
     }
@@ -5709,7 +5249,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
             VectorizedArrayType new_val = jac[0][d] * grad_in[comp][0];
             for (unsigned int e = 1; e < dim; ++e)
               new_val += (jac[e][d] * grad_in[comp][e]);
-            gradients_quad[(comp * dim + d) * nqp + q_point] = new_val * JxW;
+            this->gradients_quad[(comp * dim + d) * nqp + q_point] =
+              new_val * JxW;
           }
     }
 }
@@ -5740,9 +5281,9 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
     for (unsigned int comp = 0; comp < n_components; ++comp)
       {
         for (unsigned int d = 0; d < dim - 1; ++d)
-          gradients_quad[(comp * dim + d) * nqp + q_point] =
+          this->gradients_quad[(comp * dim + d) * nqp + q_point] =
             VectorizedArrayType();
-        gradients_quad[(comp * dim + dim - 1) * nqp + q_point] =
+        this->gradients_quad[(comp * dim + dim - 1) * nqp + q_point] =
           grad_in[comp] *
           (this->normal_x_jacobian[0][dim - 1] * this->J_value[0] *
            this->quadrature_weights[q_point]);
@@ -5759,7 +5300,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
           if (this->cell_type <= internal::MatrixFreeFunctions::affine)
             factor = factor * this->quadrature_weights[q_point];
           for (unsigned int d = 0; d < dim; ++d)
-            gradients_quad[(comp * dim + d) * nqp + q_point] = factor * jac[d];
+            this->gradients_quad[(comp * dim + d) * nqp + q_point] =
+              factor * jac[d];
         }
     }
 }
@@ -5804,7 +5346,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
           const auto                jac_d  = this->jacobian[0][d][d];
           const VectorizedArrayType factor = jac_d * jac_d * JxW;
           for (unsigned int comp = 0; comp < n_components; ++comp)
-            hessians_quad[(comp * hdim + d) * nqp + q_point] =
+            this->hessians_quad[(comp * hdim + d) * nqp + q_point] =
               hessian_in[comp][d][d] * factor;
         }
 
@@ -5816,7 +5358,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
             const auto                jac_e  = this->jacobian[0][e][e];
             const VectorizedArrayType factor = jac_d * jac_e * JxW;
             for (unsigned int comp = 0; comp < n_components; ++comp)
-              hessians_quad[(comp * hdim + off_dia) * nqp + q_point] =
+              this->hessians_quad[(comp * hdim + off_dia) * nqp + q_point] =
                 (hessian_in[comp][d][e] + hessian_in[comp][e][d]) * factor;
           }
     }
@@ -5850,12 +5392,13 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
 
           // diagonal part
           for (unsigned int d = 0; d < dim; ++d)
-            hessians_quad[(comp * hdim + d) * nqp + q_point] = tmp2[d][d] * JxW;
+            this->hessians_quad[(comp * hdim + d) * nqp + q_point] =
+              tmp2[d][d] * JxW;
 
           // off diagonal part
           for (unsigned int d = 0, off_diag = dim; d < dim; ++d)
             for (unsigned int e = d + 1; e < dim; ++e, ++off_diag)
-              hessians_quad[(comp * hdim + off_diag) * nqp + q_point] =
+              this->hessians_quad[(comp * hdim + off_diag) * nqp + q_point] =
                 (tmp2[d][e] + tmp2[e][d]) * JxW;
         }
     }
@@ -5891,12 +5434,13 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
 
           // diagonal part
           for (unsigned int d = 0; d < dim; ++d)
-            hessians_quad[(comp * hdim + d) * nqp + q_point] = tmp2[d][d] * JxW;
+            this->hessians_quad[(comp * hdim + d) * nqp + q_point] =
+              tmp2[d][d] * JxW;
 
           // off diagonal part
           for (unsigned int d = 0, off_diag = dim; d < dim; ++d)
             for (unsigned int e = d + 1; e < dim; ++e, ++off_diag)
-              hessians_quad[(comp * hdim + off_diag) * nqp + q_point] =
+              this->hessians_quad[(comp * hdim + off_diag) * nqp + q_point] =
                 (tmp2[d][e] + tmp2[e][d]) * JxW;
 
           // 3. gradient_unit = J' ** hessian_in
@@ -5909,8 +5453,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                 for (unsigned int f = e + 1; f < dim; ++f, ++count)
                   sum += (hessian_in[comp][e][f] + hessian_in[comp][f][e]) *
                          jac_grad[count][d];
-              gradients_from_hessians_quad[(comp * dim + d) * nqp + q_point] =
-                sum * JxW;
+              this->gradients_from_hessians_quad[(comp * dim + d) * nqp +
+                                                 q_point] = sum * JxW;
             }
         }
     }
@@ -6140,7 +5684,7 @@ FEEvaluationAccess<dim, 1, Number, is_face, VectorizedArrayType>::get_dof_value(
   const unsigned int dof) const
 {
   AssertIndexRange(dof, this->data->dofs_per_component_on_cell);
-  return this->values_dofs[0][dof];
+  return this->values_dofs[dof];
 }
 
 
@@ -6255,7 +5799,7 @@ FEEvaluationAccess<dim, 1, Number, is_face, VectorizedArrayType>::
   this->dof_values_initialized = true;
   AssertIndexRange(dof, this->data->dofs_per_component_on_cell);
 #  endif
-  this->values_dofs[0][dof] = val_in;
+  this->values_dofs[dof] = val_in;
 }
 
 
@@ -6875,7 +6419,7 @@ FEEvaluationAccess<1, 1, Number, is_face, VectorizedArrayType>::get_dof_value(
   const unsigned int dof) const
 {
   AssertIndexRange(dof, this->data->dofs_per_component_on_cell);
-  return this->values_dofs[0][dof];
+  return this->values_dofs[dof];
 }
 
 
@@ -6981,7 +6525,7 @@ FEEvaluationAccess<1, 1, Number, is_face, VectorizedArrayType>::
   this->dof_values_initialized = true;
   AssertIndexRange(dof, this->data->dofs_per_component_on_cell);
 #  endif
-  this->values_dofs[0][dof] = val_in;
+  this->values_dofs[dof] = val_in;
 }
 
 
@@ -7673,7 +7217,7 @@ FEEvaluation<dim,
   Assert(this->dof_values_initialized == true,
          internal::ExcAccessToUninitializedField());
 #  endif
-  evaluate(this->values_dofs[0],
+  evaluate(this->values_dofs,
            evaluate_values,
            evaluate_gradients,
            evaluate_hessians);
@@ -7699,7 +7243,7 @@ FEEvaluation<dim,
   Assert(this->dof_values_initialized == true,
          internal::ExcAccessToUninitializedField());
 #  endif
-  evaluate(this->values_dofs[0], evaluation_flags);
+  evaluate(this->values_dofs, evaluation_flags);
 }
 
 
@@ -8075,7 +7619,7 @@ FEEvaluation<dim,
              VectorizedArrayType>::integrate(const bool integrate_values,
                                              const bool integrate_gradients)
 {
-  integrate(integrate_values, integrate_gradients, this->values_dofs[0]);
+  integrate(integrate_values, integrate_gradients, this->values_dofs);
 
 #  ifdef DEBUG
   this->dof_values_initialized = true;
@@ -8099,7 +7643,7 @@ FEEvaluation<dim,
              VectorizedArrayType>::
   integrate(const EvaluationFlags::EvaluationFlags integration_flag)
 {
-  integrate(integration_flag, this->values_dofs[0]);
+  integrate(integration_flag, this->values_dofs);
 
 #  ifdef DEBUG
   this->dof_values_initialized = true;
@@ -8528,7 +8072,7 @@ FEFaceEvaluation<dim,
   Assert(this->dof_values_initialized, ExcNotInitialized());
 #  endif
 
-  evaluate(this->values_dofs[0], evaluate_values, evaluate_gradients);
+  evaluate(this->values_dofs, evaluate_values, evaluate_gradients);
 }
 
 
@@ -8552,7 +8096,7 @@ FEFaceEvaluation<dim,
   Assert(this->dof_values_initialized, ExcNotInitialized());
 #  endif
 
-  evaluate(this->values_dofs[0], evaluation_flag);
+  evaluate(this->values_dofs, evaluation_flag);
 }
 
 
@@ -8726,7 +8270,7 @@ FEFaceEvaluation<dim,
                  VectorizedArrayType>::
   integrate(const EvaluationFlags::EvaluationFlags evaluation_flag)
 {
-  integrate(evaluation_flag, this->values_dofs[0]);
+  integrate(evaluation_flag, this->values_dofs);
 
 #  ifdef DEBUG
   this->dof_values_initialized = true;
@@ -8750,7 +8294,7 @@ FEFaceEvaluation<dim,
                  VectorizedArrayType>::integrate(const bool integrate_values,
                                                  const bool integrate_gradients)
 {
-  integrate(integrate_values, integrate_gradients, this->values_dofs[0]);
+  integrate(integrate_values, integrate_gradients, this->values_dofs);
 
 #  ifdef DEBUG
   this->dof_values_initialized = true;

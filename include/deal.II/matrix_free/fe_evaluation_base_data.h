@@ -126,36 +126,9 @@ public:
   static constexpr unsigned int dimension = dim;
 
   /**
-   * Return the index offset within the geometry fields for the cell the @p
-   * reinit() function has been called for. This index can be used to access
-   * an index into a field that has the same compression behavior as the
-   * Jacobian of the geometry, e.g., to store an effective coefficient tensors
-   * that combines a coefficient with the geometry for lower memory transfer
-   * as the available data fields.
+   * @name 1: Access to geometry data at quadrature points
    */
-  unsigned int
-  get_mapping_data_index_offset() const;
-
-  /**
-   * Return the type of the cell the @p reinit() function has been called for.
-   * Valid values are @p cartesian for Cartesian cells (which allows for
-   * considerable data compression), @p affine for cells with affine mappings,
-   * and @p general for general cells without any compressed storage applied.
-   */
-  internal::MatrixFreeFunctions::GeometryType
-  get_cell_type() const;
-
-  /**
-   * Return a reference to the ShapeInfo object currently in use.
-   */
-  const ShapeInfoType &
-  get_shape_info() const;
-
-  /**
-   * Return a reference to the DoFInfo object currently in use.
-   */
-  const internal::MatrixFreeFunctions::DoFInfo &
-  get_dof_info() const;
+  //@{
 
   /**
    * Return an ArrayView to internal memory for temporary use. Note that some
@@ -202,6 +175,157 @@ public:
   Tensor<1, dim, VectorizedArrayType>
   get_normal_vector(const unsigned int q_point) const;
 
+  //@}
+
+  /**
+   * @name 2: Access to internal data arrays
+   */
+  //@{
+  /**
+   * Return a read-only pointer to the first field of the dof values. This is
+   * the data field the read_dof_values() functions write into. First come the
+   * dof values for the first component, then all values for the second
+   * component, and so on. This is related to the internal data structures
+   * used in this class. In general, it is safer to use the get_dof_value()
+   * function instead.
+   */
+  const VectorizedArrayType *
+  begin_dof_values() const;
+
+  /**
+   * Return a read and write pointer to the first field of the dof values.
+   * This is the data field the read_dof_values() functions write into. First
+   * come the dof values for the first component, then all values for the
+   * second component, and so on. This is related to the internal data
+   * structures used in this class. In general, it is safer to use the
+   * get_dof_value() function instead.
+   */
+  VectorizedArrayType *
+  begin_dof_values();
+
+  /**
+   * Return a read-only pointer to the first field of function values on
+   * quadrature points. First come the function values on all quadrature
+   * points for the first component, then all values for the second component,
+   * and so on. This is related to the internal data structures used in this
+   * class. The raw data after a call to @p evaluate only contains unit cell
+   * operations, so possible transformations, quadrature weights etc. must be
+   * applied manually. In general, it is safer to use the get_value() function
+   * instead, which does all the transformation internally.
+   */
+  const VectorizedArrayType *
+  begin_values() const;
+
+  /**
+   * Return a read and write pointer to the first field of function values on
+   * quadrature points. First come the function values on all quadrature
+   * points for the first component, then all values for the second component,
+   * and so on. This is related to the internal data structures used in this
+   * class. The raw data after a call to @p evaluate only contains unit cell
+   * operations, so possible transformations, quadrature weights etc. must be
+   * applied manually. In general, it is safer to use the get_value() function
+   * instead, which does all the transformation internally.
+   */
+  VectorizedArrayType *
+  begin_values();
+
+  /**
+   * Return a read-only pointer to the first field of function gradients on
+   * quadrature points. First comes the x-component of the gradient for the
+   * first component on all quadrature points, then the y-component, and so
+   * on. Next comes the x-component of the second component, and so on. This
+   * is related to the internal data structures used in this class. The raw
+   * data after a call to @p evaluate only contains unit cell operations, so
+   * possible transformations, quadrature weights etc. must be applied
+   * manually. In general, it is safer to use the get_gradient() function
+   * instead, which does all the transformation internally.
+   */
+  const VectorizedArrayType *
+  begin_gradients() const;
+
+  /**
+   * Return a read and write pointer to the first field of function gradients
+   * on quadrature points. First comes the x-component of the gradient for the
+   * first component on all quadrature points, then the y-component, and so
+   * on. Next comes the x-component of the second component, and so on. This
+   * is related to the internal data structures used in this class. The raw
+   * data after a call to @p evaluate only contains unit cell operations, so
+   * possible transformations, quadrature weights etc. must be applied
+   * manually. In general, it is safer to use the get_gradient() function
+   * instead, which does all the transformation internally.
+   */
+  VectorizedArrayType *
+  begin_gradients();
+
+  /**
+   * Return a read-only pointer to the first field of function hessians on
+   * quadrature points. First comes the xx-component of the hessian for the
+   * first component on all quadrature points, then the yy-component,
+   * zz-component in (3D), then the xy-component, and so on. Next comes the xx-
+   * component of the second component, and so on. This is related to the
+   * internal data structures used in this class. The raw data after a call to
+   * @p evaluate only contains unit cell operations, so possible
+   * transformations, quadrature weights etc. must be applied manually. In
+   * general, it is safer to use the get_laplacian() or get_hessian()
+   * functions instead, which does all the transformation internally.
+   */
+  const VectorizedArrayType *
+  begin_hessians() const;
+
+  /**
+   * Return a read and write pointer to the first field of function hessians
+   * on quadrature points. First comes the xx-component of the hessian for the
+   * first component on all quadrature points, then the yy-component,
+   * zz-component in (3D), then the xy-component, and so on. Next comes the
+   * xx-component of the second component, and so on. This is related to the
+   * internal data structures used in this class. The raw data after a call to
+   * @p evaluate only contains unit cell operations, so possible
+   * transformations, quadrature weights etc. must be applied manually. In
+   * general, it is safer to use the get_laplacian() or get_hessian()
+   * functions instead, which does all the transformation internally.
+   */
+  VectorizedArrayType *
+  begin_hessians();
+
+  //@}
+
+  /**
+   * @name 3: Information about the current cell this class operates on
+   */
+  //@{
+
+  /**
+   * Return the index offset within the geometry fields for the cell the @p
+   * reinit() function has been called for. This index can be used to access
+   * an index into a field that has the same compression behavior as the
+   * Jacobian of the geometry, e.g., to store an effective coefficient tensors
+   * that combines a coefficient with the geometry for lower memory transfer
+   * as the available data fields.
+   */
+  unsigned int
+  get_mapping_data_index_offset() const;
+
+  /**
+   * Return the type of the cell the @p reinit() function has been called for.
+   * Valid values are @p cartesian for Cartesian cells (which allows for
+   * considerable data compression), @p affine for cells with affine mappings,
+   * and @p general for general cells without any compressed storage applied.
+   */
+  internal::MatrixFreeFunctions::GeometryType
+  get_cell_type() const;
+
+  /**
+   * Return a reference to the ShapeInfo object currently in use.
+   */
+  const ShapeInfoType &
+  get_shape_info() const;
+
+  /**
+   * Return a reference to the DoFInfo object currently in use.
+   */
+  const internal::MatrixFreeFunctions::DoFInfo &
+  get_dof_info() const;
+
   /**
    * Return the numbering of local degrees of freedom within the evaluation
    * routines of FEEvaluation in terms of the standard numbering on finite
@@ -236,6 +360,8 @@ public:
   unsigned int
   get_active_quadrature_index() const;
 
+  //@}
+
 protected:
   /**
    * Constructor. Made protected to prevent users from directly using this
@@ -243,8 +369,8 @@ protected:
    * more than one quadrature formula selected during construction of
    * `matrix_free`, `quad_no` allows to select the appropriate formula.
    */
-  FEEvaluationBaseData(const std::tuple<const ShapeInfoType &,
-                                        const DoFInfo &,
+  FEEvaluationBaseData(const std::tuple<const ShapeInfoType *,
+                                        const DoFInfo *,
                                         unsigned int,
                                         unsigned int> &info,
                        const MappingInfoStorageType &  mapping_data,
@@ -274,6 +400,15 @@ protected:
    */
   FEEvaluationBaseData &
   operator=(const FEEvaluationBaseData &other);
+
+  /**
+   * Sets the pointers for values, gradients, hessians to the central
+   * scratch_data_array inside the given scratch array, for a given number of
+   * components as provided by one of the derived classes.
+   */
+  void
+  set_data_pointers(AlignedVector<VectorizedArrayType> *scratch_data,
+                    const unsigned int                  n_components);
 
   /**
    * A pointer to the unit cell shape data, i.e., values, gradients and
@@ -366,6 +501,115 @@ protected:
   mutable ArrayView<VectorizedArrayType> scratch_data;
 
   /**
+   * This field stores the values for local degrees of freedom (e.g. after
+   * reading out from a vector but before applying unit cell transformations
+   * or before distributing them into a result vector). The methods
+   * get_dof_value() and submit_dof_value() read from or write to this field.
+   *
+   * The values of this array are stored in the start section of
+   * @p scratch_data_array. Due to its access as a thread local memory, the
+   * memory can get reused between different calls.
+   */
+  VectorizedArrayType *values_dofs;
+
+  /**
+   * This field stores the values of the finite element function on quadrature
+   * points after applying unit cell transformations or before integrating.
+   * The methods get_value() and submit_value() access this field.
+   *
+   * The values of this array are stored in the start section of
+   * @p scratch_data_array. Due to its access as a thread local memory, the
+   * memory can get reused between different calls.
+   */
+  VectorizedArrayType *values_quad;
+
+  /**
+   * This field stores the gradients of the finite element function on
+   * quadrature points after applying unit cell transformations or before
+   * integrating. The methods get_gradient() and submit_gradient() (as well as
+   * some specializations like get_symmetric_gradient() or get_divergence())
+   * access this field.
+   *
+   * The values of this array are stored in the start section of
+   * @p scratch_data_array. Due to its access as a thread local memory, the
+   * memory can get reused between different calls.
+   */
+  VectorizedArrayType *gradients_quad;
+
+  /**
+   * This field stores the gradients of the finite element function on
+   * quadrature points after applying unit cell transformations or before
+   * integrating. The methods get_hessian() and submit_hessian() (as well as
+   * some specializations like get_hessian_diagonal() or get_laplacian())
+   * access this field for general cell/face types.
+   *
+   * The values of this array are stored in the start section of
+   * @p scratch_data_array. Due to its access as a thread local memory, the
+   * memory can get reused between different calls.
+   */
+  VectorizedArrayType *gradients_from_hessians_quad;
+
+  /**
+   * This field stores the Hessians of the finite element function on
+   * quadrature points after applying unit cell transformations. The methods
+   * get_hessian(), get_laplacian(), get_hessian_diagonal() access this field.
+   *
+   * The values of this array are stored in the start section of
+   * @p scratch_data_array. Due to its access as a thread local memory, the
+   * memory can get reused between different calls.
+   */
+  VectorizedArrayType *hessians_quad;
+
+  /**
+   * Debug information to track whether dof values have been initialized
+   * before accessed. Used to control exceptions when uninitialized data is
+   * used.
+   */
+  bool dof_values_initialized;
+
+  /**
+   * Debug information to track whether values on quadrature points have been
+   * initialized before accessed. Used to control exceptions when
+   * uninitialized data is used.
+   */
+  bool values_quad_initialized;
+
+  /**
+   * Debug information to track whether gradients on quadrature points have
+   * been initialized before accessed. Used to control exceptions when
+   * uninitialized data is used.
+   */
+  bool gradients_quad_initialized;
+
+  /**
+   * Debug information to track whether Hessians on quadrature points have
+   * been initialized before accessed. Used to control exceptions when
+   * uninitialized data is used.
+   */
+  bool hessians_quad_initialized;
+
+  /**
+   * Debug information to track whether values on quadrature points have been
+   * submitted for integration before the integration is actually stared. Used
+   * to control exceptions when uninitialized data is used.
+   */
+  bool values_quad_submitted;
+
+  /**
+   * Debug information to track whether gradients on quadrature points have
+   * been submitted for integration before the integration is actually stared.
+   * Used to control exceptions when uninitialized data is used.
+   */
+  bool gradients_quad_submitted;
+
+  /**
+   * Debug information to track whether hessians on quadrature points have
+   * been submitted for integration before the integration is actually stared.
+   * Used to control exceptions when uninitialized data is used.
+   */
+  bool hessians_quad_submitted;
+
+  /**
    * After a call to reinit(), stores the number of the cell we are currently
    * working with.
    */
@@ -440,16 +684,16 @@ protected:
 
 template <int dim, typename Number, bool is_face, typename VectorizedArrayType>
 inline FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
-  FEEvaluationBaseData(const std::tuple<const ShapeInfoType &,
-                                        const DoFInfo &,
+  FEEvaluationBaseData(const std::tuple<const ShapeInfoType *,
+                                        const DoFInfo *,
                                         unsigned int,
                                         unsigned int> &shape_dof_info,
                        const MappingInfoStorageType &  mapping_data,
                        const unsigned int              quad_no,
                        const bool                      is_interior_face,
                        const unsigned int              face_type)
-  : data(&std::get<0>(shape_dof_info))
-  , dof_info(&std::get<1>(shape_dof_info))
+  : data(std::get<0>(shape_dof_info))
+  , dof_info(std::get<1>(shape_dof_info))
   , mapping_data(&mapping_data)
   , quad_no(quad_no)
   , active_fe_index(std::get<2>(shape_dof_info))
@@ -466,6 +710,12 @@ inline FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
   , normal_vectors(nullptr)
   , normal_x_jacobian(nullptr)
   , quadrature_weights(descriptor->quadrature_weights.begin())
+  , dof_values_initialized(false)
+  , values_quad_initialized(false)
+  , gradients_quad_initialized(false)
+  , hessians_quad_initialized(false)
+  , values_quad_submitted(false)
+  , gradients_quad_submitted(false)
   , cell(numbers::invalid_unsigned_int)
   , is_interior_face(is_interior_face)
   , dof_access_index(
@@ -531,6 +781,12 @@ inline FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
   , normal_vectors(nullptr)
   , normal_x_jacobian(nullptr)
   , quadrature_weights(other.quadrature_weights)
+  , dof_values_initialized(false)
+  , values_quad_initialized(false)
+  , gradients_quad_initialized(false)
+  , hessians_quad_initialized(false)
+  , values_quad_submitted(false)
+  , gradients_quad_submitted(false)
   , cell(numbers::invalid_unsigned_int)
   , is_interior_face(other.is_interior_face)
   , dof_access_index(
@@ -566,8 +822,16 @@ FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::operator=(
   normal_vectors     = nullptr;
   normal_x_jacobian  = nullptr;
   quadrature_weights = other.quadrature_weights;
-  cell               = numbers::invalid_unsigned_int;
-  is_interior_face   = other.is_interior_face;
+
+  dof_values_initialized     = false;
+  values_quad_initialized    = false;
+  gradients_quad_initialized = false;
+  hessians_quad_initialized  = false;
+  values_quad_submitted      = false;
+  gradients_quad_submitted   = false;
+
+  cell             = numbers::invalid_unsigned_int;
+  is_interior_face = other.is_interior_face;
   dof_access_index =
     is_face ?
       (is_interior_face ?
@@ -580,6 +844,163 @@ FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::operator=(
   cell_type        = internal::MatrixFreeFunctions::general;
 
   return *this;
+}
+
+
+
+template <int dim, typename Number, bool is_face, typename VectorizedArrayType>
+inline DEAL_II_ALWAYS_INLINE Tensor<1, dim, VectorizedArrayType>
+FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
+  get_normal_vector(const unsigned int q_point) const
+{
+  AssertIndexRange(q_point, n_quadrature_points);
+  Assert(normal_vectors != nullptr,
+         internal::ExcMatrixFreeAccessToUninitializedMappingField(
+           "update_normal_vectors"));
+  if (cell_type <= internal::MatrixFreeFunctions::flat_faces)
+    return normal_vectors[0];
+  else
+    return normal_vectors[q_point];
+}
+
+
+
+template <int dim, typename Number, bool is_face, typename VectorizedArrayType>
+inline DEAL_II_ALWAYS_INLINE VectorizedArrayType
+FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::JxW(
+  const unsigned int q_point) const
+{
+  AssertIndexRange(q_point, n_quadrature_points);
+  Assert(J_value != nullptr,
+         internal::ExcMatrixFreeAccessToUninitializedMappingField(
+           "update_values|update_gradients"));
+  if (cell_type <= internal::MatrixFreeFunctions::affine)
+    {
+      Assert(quadrature_weights != nullptr, ExcInternalError());
+      return J_value[0] * quadrature_weights[q_point];
+    }
+  else
+    return J_value[q_point];
+}
+
+
+
+template <int dim, typename Number, bool is_face, typename VectorizedArrayType>
+inline DEAL_II_ALWAYS_INLINE Tensor<2, dim, VectorizedArrayType>
+FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
+  inverse_jacobian(const unsigned int q_point) const
+{
+  AssertIndexRange(q_point, n_quadrature_points);
+  Assert(jacobian != nullptr,
+         internal::ExcMatrixFreeAccessToUninitializedMappingField(
+           "update_gradients"));
+  if (cell_type <= internal::MatrixFreeFunctions::affine)
+    return jacobian[0];
+  else
+    return jacobian[q_point];
+}
+
+
+
+template <int dim, typename Number, bool is_face, typename VectorizedArrayType>
+inline const VectorizedArrayType *
+FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
+  begin_dof_values() const
+{
+  return values_dofs;
+}
+
+
+
+template <int dim, typename Number, bool is_face, typename VectorizedArrayType>
+inline VectorizedArrayType *
+FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
+  begin_dof_values()
+{
+#  ifdef DEBUG
+  dof_values_initialized = true;
+#  endif
+  return values_dofs;
+}
+
+
+
+template <int dim, typename Number, bool is_face, typename VectorizedArrayType>
+inline const VectorizedArrayType *
+FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::begin_values()
+  const
+{
+#  ifdef DEBUG
+  Assert(values_quad_initialized || values_quad_submitted, ExcNotInitialized());
+#  endif
+  return values_quad;
+}
+
+
+
+template <int dim, typename Number, bool is_face, typename VectorizedArrayType>
+inline VectorizedArrayType *
+FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::begin_values()
+{
+#  ifdef DEBUG
+  values_quad_initialized = true;
+  values_quad_submitted   = true;
+#  endif
+  return values_quad;
+}
+
+
+
+template <int dim, typename Number, bool is_face, typename VectorizedArrayType>
+inline const VectorizedArrayType *
+FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
+  begin_gradients() const
+{
+#  ifdef DEBUG
+  Assert(gradients_quad_initialized || gradients_quad_submitted,
+         ExcNotInitialized());
+#  endif
+  return gradients_quad;
+}
+
+
+
+template <int dim, typename Number, bool is_face, typename VectorizedArrayType>
+inline VectorizedArrayType *
+FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
+  begin_gradients()
+{
+#  ifdef DEBUG
+  gradients_quad_submitted   = true;
+  gradients_quad_initialized = true;
+#  endif
+  return gradients_quad;
+}
+
+
+
+template <int dim, typename Number, bool is_face, typename VectorizedArrayType>
+inline const VectorizedArrayType *
+FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
+  begin_hessians() const
+{
+#  ifdef DEBUG
+  Assert(hessians_quad_initialized, ExcNotInitialized());
+#  endif
+  return hessians_quad;
+}
+
+
+
+template <int dim, typename Number, bool is_face, typename VectorizedArrayType>
+inline VectorizedArrayType *
+FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
+  begin_hessians()
+{
+#  ifdef DEBUG
+  hessians_quad_initialized = true;
+#  endif
+  return hessians_quad;
 }
 
 
@@ -638,60 +1059,6 @@ FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::get_dof_info()
 
 
 template <int dim, typename Number, bool is_face, typename VectorizedArrayType>
-inline DEAL_II_ALWAYS_INLINE Tensor<1, dim, VectorizedArrayType>
-FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
-  get_normal_vector(const unsigned int q_point) const
-{
-  AssertIndexRange(q_point, n_quadrature_points);
-  Assert(normal_vectors != nullptr,
-         internal::ExcMatrixFreeAccessToUninitializedMappingField(
-           "update_normal_vectors"));
-  if (this->cell_type <= internal::MatrixFreeFunctions::flat_faces)
-    return normal_vectors[0];
-  else
-    return normal_vectors[q_point];
-}
-
-
-
-template <int dim, typename Number, bool is_face, typename VectorizedArrayType>
-inline DEAL_II_ALWAYS_INLINE VectorizedArrayType
-FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::JxW(
-  const unsigned int q_point) const
-{
-  AssertIndexRange(q_point, n_quadrature_points);
-  Assert(J_value != nullptr,
-         internal::ExcMatrixFreeAccessToUninitializedMappingField(
-           "update_values|update_gradients"));
-  if (this->cell_type <= internal::MatrixFreeFunctions::affine)
-    {
-      Assert(this->quadrature_weights != nullptr, ExcInternalError());
-      return J_value[0] * this->quadrature_weights[q_point];
-    }
-  else
-    return J_value[q_point];
-}
-
-
-
-template <int dim, typename Number, bool is_face, typename VectorizedArrayType>
-inline DEAL_II_ALWAYS_INLINE Tensor<2, dim, VectorizedArrayType>
-FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
-  inverse_jacobian(const unsigned int q_point) const
-{
-  AssertIndexRange(q_point, n_quadrature_points);
-  Assert(this->jacobian != nullptr,
-         internal::ExcMatrixFreeAccessToUninitializedMappingField(
-           "update_gradients"));
-  if (this->cell_type <= internal::MatrixFreeFunctions::affine)
-    return jacobian[0];
-  else
-    return jacobian[q_point];
-}
-
-
-
-template <int dim, typename Number, bool is_face, typename VectorizedArrayType>
 inline const std::vector<unsigned int> &
 FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
   get_internal_dof_numbering() const
@@ -706,7 +1073,7 @@ inline unsigned int
 FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
   get_quadrature_index() const
 {
-  return this->quad_no;
+  return quad_no;
 }
 
 
@@ -716,11 +1083,11 @@ inline unsigned int
 FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
   get_current_cell_index() const
 {
-  if (is_face && this->dof_access_index ==
+  if (is_face && dof_access_index ==
                    internal::MatrixFreeFunctions::DoFInfo::dof_access_cell)
-    return this->cell * GeometryInfo<dim>::faces_per_cell + this->face_no;
+    return cell * GeometryInfo<dim>::faces_per_cell + face_no;
   else
-    return this->cell;
+    return cell;
 }
 
 
@@ -751,6 +1118,47 @@ FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
   get_scratch_data() const
 {
   return scratch_data;
+}
+
+
+
+template <int dim, typename Number, bool is_face, typename VectorizedArrayType>
+inline void
+FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
+  set_data_pointers(AlignedVector<VectorizedArrayType> *scratch_data_array,
+                    const unsigned int                  n_components)
+{
+  Assert(scratch_data_array != nullptr, ExcInternalError());
+
+  const unsigned int tensor_dofs_per_component =
+    Utilities::fixed_power<dim>(data->data.front().fe_degree + 1);
+  const unsigned int dofs_per_component = data->dofs_per_component_on_cell;
+
+  const unsigned int size_scratch_data =
+    std::max(tensor_dofs_per_component + 1, dofs_per_component) * n_components *
+      3 +
+    2 * n_quadrature_points;
+  const unsigned int size_data_arrays =
+    n_components * dofs_per_component +
+    (n_components * ((dim * (dim + 1)) / 2 + 2 * dim + 1) *
+     n_quadrature_points);
+
+  const unsigned int allocated_size = size_scratch_data + size_data_arrays;
+  scratch_data_array->resize_fast(allocated_size);
+  scratch_data.reinit(scratch_data_array->begin() + size_data_arrays,
+                      size_scratch_data);
+
+  // set the pointers to the correct position in the data array
+  values_dofs = scratch_data_array->begin();
+  values_quad = scratch_data_array->begin() + n_components * dofs_per_component;
+  gradients_quad = scratch_data_array->begin() +
+                   n_components * (dofs_per_component + n_quadrature_points);
+  gradients_from_hessians_quad =
+    scratch_data_array->begin() +
+    n_components * (dofs_per_component + (dim + 1) * n_quadrature_points);
+  hessians_quad =
+    scratch_data_array->begin() +
+    n_components * (dofs_per_component + (2 * dim + 1) * n_quadrature_points);
 }
 
 
