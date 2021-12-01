@@ -32,7 +32,13 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
  * can include rtree.hpp. Otherwise a compilation error within boost
  * headers is encountered.
  */
+#ifdef DEAL_II_BOOST_HAS_BROKEN_HEADER_DEPRECATIONS
+#  define BOOST_ALLOW_DEPRECATED_HEADERS
+#endif
 #include <boost/geometry/index/rtree.hpp>
+#ifdef DEAL_II_BOOST_HAS_BROKEN_HEADER_DEPRECATIONS
+#  undef BOOST_ALLOW_DEPRECATED_HEADERS
+#endif
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <memory>
