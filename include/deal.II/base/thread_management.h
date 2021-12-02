@@ -1203,6 +1203,47 @@ namespace Threads
         , task_has_finished(false)
       {}
 
+
+      /**
+       * Destructor. Wait for the results to be ready. This ensures that the
+       * last Task object holding a shared pointer to the current TaskData
+       * object blocks until the task has actually finished -- in essence,
+       * this makes sure that one cannot just abandon a task completely
+       * by letting all Task objects that point to it go out of scope.
+       */
+      ~TaskData()
+      {
+        // Explicitly wait for the results to be ready. This class stores
+        // a std::future object, and we could just let the compiler generate
+        // the destructor which would then call the destructor of std::future
+        // which *may* block until the future is ready. As explained in
+        //   https://en.cppreference.com/w/cpp/thread/future/~future
+        // this is only a *may*, not a *must*. (The standard does not
+        // appear to say anything about it at all.) As a consequence,
+        // let's be explicit about waiting.
+        //
+        // One of the corner cases we have to worry about is that if a task
+        // ends by throwing an exception, then wait() will re-throw that
+        // exception on the thread that calls it, the first time around
+        // someone calls wait() (or the return_value() function of the
+        // surrounding class). So if we get to this constructor and an exception
+        // is thrown by wait(), then that means that the last Task object
+        // referring to a task is going out of scope with nobody having
+        // ever checked the return value of the task itself. In that case,
+        // one could argue that they would also not have cared about whether
+        // an exception is thrown, and that we should simply ignore the
+        // exception. This is what we do here. It is also the simplest solution,
+        // because we don't know what one should do with the exception to begin
+        // with: destructors aren't allowed to throw exceptions, so we can't
+        // just rethrow it here if one had been triggered.
+        try
+          {
+            wait();
+          }
+        catch (...)
+          {}
+      }
+
       /**
        * Wait for the std::future object to be ready, i.e., for the
        * time when the std::promise receives its value. If this has
