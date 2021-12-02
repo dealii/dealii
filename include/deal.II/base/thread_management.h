@@ -1296,6 +1296,31 @@ namespace Threads
         , task_has_finished(false)
       {}
 
+      /**
+       * There can only be one TaskData object referencing
+       * a task. Make sure that these objects are not copied.
+       */
+      TaskData(const TaskData &) = delete;
+
+      /**
+       * There can only be one TaskData object referencing
+       * a task. Make sure that these objects are not moved.
+       */
+      TaskData(TaskData &&) = delete;
+
+      /**
+       * There can only be one TaskData object referencing
+       * a task. Make sure that these objects are not copied.
+       */
+      TaskData &
+      operator=(const TaskData &) = delete;
+
+      /**
+       * There can only be one TaskData object referencing
+       * a task. Make sure that these objects are not moved.
+       */
+      TaskData &
+      operator=(TaskData &&) = delete;
 
       /**
        * Destructor. Wait for the results to be ready. This ensures that the
