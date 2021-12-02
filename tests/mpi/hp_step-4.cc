@@ -23,6 +23,7 @@
 #include <deal.II/base/conditional_ostream.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/logstream.h>
+#include <deal.II/base/mpi.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/utilities.h>
 
@@ -199,15 +200,19 @@ namespace Step4
 #ifdef DEBUG
     // We did not think about hp-constraints on ghost cells yet.
     // Thus, we are content with verifying their consistency for now.
+    const std::vector<IndexSet> locally_owned_dofs_per_processor =
+      Utilities::MPI::all_gather(communicator,
+                                 dof_handler.locally_owned_dofs());
+
     IndexSet locally_active_dofs;
     DoFTools::extract_locally_active_dofs(dof_handler, locally_active_dofs);
-    AssertThrow(constraints.is_consistent_in_parallel(
-                  dof_handler.locally_owned_dofs_per_processor(),
-                  locally_active_dofs,
-                  communicator,
-                  /*verbose=*/true),
-                ExcMessage(
-                  "AffineConstraints object contains inconsistencies!"));
+
+    AssertThrow(
+      constraints.is_consistent_in_parallel(locally_owned_dofs_per_processor,
+                                            locally_active_dofs,
+                                            communicator,
+                                            /*verbose=*/true),
+      ExcMessage("AffineConstraints object contains inconsistencies!"));
 #endif
 
     constraints.close();
