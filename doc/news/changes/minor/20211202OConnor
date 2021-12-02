@@ -1,0 +1,4 @@
+Changed: The function TrilinosWrappers::Vector::is_non_negative() now also works in parallel.
+<br>
+(Justin O'Connor, 2021/12/02)
+
