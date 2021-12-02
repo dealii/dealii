@@ -14,7 +14,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-2019, windows-2016]
+        os: [windows-2019, windows-2022]
 
     steps:
     - uses: actions/checkout@v2
@@ -41,7 +41,6 @@ jobs:
         cd c:/project
         7z a dealii-windows.zip *
     - name: test library
-      if: matrix.os != 'windows-2016' #TODO: For windows-2016 this step does not terminate (12.12.2020)
       shell: bash
       run: |
         cmake --build build  --target test -- -m
