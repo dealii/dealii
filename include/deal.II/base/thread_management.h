@@ -1015,7 +1015,8 @@ namespace Threads
           // but have to make do with a pointer to such an object.
           std::unique_ptr<std::promise<RT>> promise =
             std::make_unique<std::promise<RT>>();
-          task_data = std::make_shared<TaskData>(promise->get_future());
+          task_data =
+            std::make_shared<TaskData>(std::move(promise->get_future()));
 
           // Then start the task, using a task_group object (for just this one
           // task) that is associated with the TaskData object. Note that we
@@ -1291,7 +1292,7 @@ namespace Threads
        * Constructor. Initializes an std::future object and assumes
        * that the task so set has not finished yet.
        */
-      TaskData(std::future<RT> &&future)
+      TaskData(std::future<RT> &&future) noexcept
         : future(std::move(future))
         , task_has_finished(false)
       {}
@@ -1329,7 +1330,7 @@ namespace Threads
        * this makes sure that one cannot just abandon a task completely
        * by letting all Task objects that point to it go out of scope.
        */
-      ~TaskData()
+      ~TaskData() noexcept
       {
         // Explicitly wait for the results to be ready. This class stores
         // a std::future object, and we could just let the compiler generate
