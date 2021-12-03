@@ -121,8 +121,8 @@ Physics::VectorRelations::signed_angle(const Tensor<1, spacedim, Number> &a,
 
   Assert(std::abs(axis.norm() - 1.) < 1.e-12,
          ExcMessage("The axial vector is not a unit vector."));
-  Assert(std::abs(axis * a) < 1.e-12 * b.norm() &&
-           std::abs(axis * b) < 1.e-12 * a.norm(),
+  Assert(std::abs(axis * a) < 1.e-12 * a.norm() &&
+           std::abs(axis * b) < 1.e-12 * b.norm(),
          ExcMessage("The vectors are not perpendicular to the axial vector."));
 
   const Number dot = a * b;
