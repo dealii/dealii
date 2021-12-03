@@ -204,7 +204,8 @@ DataOutFaces<dim, spacedim>::build_one_patch(
                             cell->level(),
                             cell->index(),
                             this->dof_data[dataset]->dof_handler);
-                  data.patch_values_scalar.template set_cell<dim>(dh_cell);
+                  data.patch_values_scalar.template set_cell_and_face<dim>(
+                    dh_cell, face_number);
 
                   postprocessor->evaluate_scalar_field(
                     data.patch_values_scalar,
@@ -247,7 +248,8 @@ DataOutFaces<dim, spacedim>::build_one_patch(
                             cell->level(),
                             cell->index(),
                             this->dof_data[dataset]->dof_handler);
-                  data.patch_values_system.template set_cell<dim>(dh_cell);
+                  data.patch_values_system.template set_cell_and_face<dim>(
+                    dh_cell, face_number);
 
                   postprocessor->evaluate_vector_field(
                     data.patch_values_system,
