@@ -655,26 +655,27 @@ namespace WorkStream
           tbb::filter::serial,
           [copier = std::function<void(const CopyData &)>(copier)](
             ItemType *&current_item) {
-            // Initiate copying data. For the same reasons as in the worker
-            // class above, catch exceptions rather than letting them propagate
-            // into unknown territories:
-            for (unsigned int i = 0; i < current_item->n_items; ++i)
+            if (copier)
               {
-                try
+                // Initiate copying data. For the same reasons as in the worker
+                // class above, catch exceptions rather than letting them
+                // propagate into unknown territories:
+                for (unsigned int i = 0; i < current_item->n_items; ++i)
                   {
-                    if (copier)
-                      copier(current_item->copy_datas[i]);
-                  }
-                catch (const std::exception &exc)
-                  {
-                    Threads::internal::handle_std_exception(exc);
-                  }
-                catch (...)
-                  {
-                    Threads::internal::handle_unknown_exception();
+                    try
+                      {
+                        copier(current_item->copy_datas[i]);
+                      }
+                    catch (const std::exception &exc)
+                      {
+                        Threads::internal::handle_std_exception(exc);
+                      }
+                    catch (...)
+                      {
+                        Threads::internal::handle_unknown_exception();
+                      }
                   }
               }
-
             // mark current item as usable again
             current_item->currently_in_use = false;
           });
