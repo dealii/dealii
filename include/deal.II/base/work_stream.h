@@ -351,7 +351,7 @@ namespace WorkStream
         /**
          * Create an item and return a pointer to it.
          */
-        void *
+        ItemType *
         operator()()
         {
           // find first unused item. we know that there must be one
@@ -474,6 +474,10 @@ namespace WorkStream
       class TBBWorker
       {
       public:
+        using ItemType = typename IteratorRangeToItemStream<Iterator,
+                                                            ScratchData,
+                                                            CopyData>::ItemType;
+
         /**
          * Constructor. Takes a reference to the object on which we will
          * operate as well as a pointer to the function that will do the
@@ -491,17 +495,9 @@ namespace WorkStream
         /**
          * Work on an item.
          */
-        void *
-        operator()(void *&item) const
+        ItemType *
+        operator()(ItemType *&current_item) const
         {
-          // first unpack the current item
-          using ItemType =
-            typename IteratorRangeToItemStream<Iterator,
-                                               ScratchData,
-                                               CopyData>::ItemType;
-
-          ItemType *current_item = static_cast<ItemType *>(item);
-
           // we need to find an unused scratch data object in the list that
           // corresponds to the current thread and then mark it as used. if
           // we can't find one, create one
@@ -589,9 +585,9 @@ namespace WorkStream
             current_item->currently_in_use = false;
 
 
-          // then return the original pointer
-          // to the now modified object
-          return item;
+          // Then return the original pointer
+          // to the now modified object. The copier will work on it next.
+          return current_item;
         }
 
 
@@ -621,6 +617,10 @@ namespace WorkStream
       class TBBCopier
       {
       public:
+        using ItemType = typename IteratorRangeToItemStream<Iterator,
+                                                            ScratchData,
+                                                            CopyData>::ItemType;
+
         /**
          * Constructor. Takes a reference to the object on which we will
          * operate as well as a pointer to the function that will do the
@@ -635,17 +635,9 @@ namespace WorkStream
         /**
          * Work on a single item.
          */
-        void *
-        operator()(void *&item) const
+        ItemType *
+        operator()(ItemType *&current_item) const
         {
-          // first unpack the current item
-          using ItemType =
-            typename IteratorRangeToItemStream<Iterator,
-                                               ScratchData,
-                                               CopyData>::ItemType;
-
-          ItemType *current_item = static_cast<ItemType *>(item);
-
           // initiate copying data. for the same reasons as in the worker class
           // above, catch exceptions rather than letting it propagate into
           // unknown territories
@@ -670,7 +662,7 @@ namespace WorkStream
           current_item->currently_in_use = false;
 
 
-          // return an invalid item since we are at the end of the
+          // Return an invalid item since we are at the end of the
           // pipeline
           return nullptr;
         }
@@ -698,6 +690,10 @@ namespace WorkStream
           const unsigned int                       queue_length,
           const unsigned int                       chunk_size)
       {
+        using ItemType = typename IteratorRangeToItemStream<Iterator,
+                                                            ScratchData,
+                                                            CopyData>::ItemType;
+
         // create the three stages of the pipeline
         IteratorRangeToItemStream<Iterator, ScratchData, CopyData>
              iterator_range_to_item_stream(begin,
@@ -706,8 +702,8 @@ namespace WorkStream
                                         chunk_size,
                                         sample_scratch_data,
                                         sample_copy_data);
-        auto tbb_item_stream_filter = tbb::make_filter<void, void *>(
-          tbb::filter::serial, [&](tbb::flow_control &fc) -> void * {
+        auto tbb_item_stream_filter = tbb::make_filter<void, ItemType *>(
+          tbb::filter::serial, [&](tbb::flow_control &fc) -> ItemType * {
             if (const auto item = iterator_range_to_item_stream())
               return item;
             else
@@ -719,12 +715,13 @@ namespace WorkStream
 
         TBBWorker<Iterator, ScratchData, CopyData> worker_filter(worker);
         auto                                       tbb_worker_filter =
-          tbb::make_filter<void *, void *>(tbb::filter::parallel,
-                                           worker_filter);
+          tbb::make_filter<ItemType *, ItemType *>(tbb::filter::parallel,
+                                                   worker_filter);
 
         TBBCopier<Iterator, ScratchData, CopyData> copier_filter(copier);
         auto                                       tbb_copier_filter =
-          tbb::make_filter<void *, void>(tbb::filter::serial, copier_filter);
+          tbb::make_filter<ItemType *, void>(tbb::filter::serial,
+                                             copier_filter);
 
         // now create a pipeline from these stages
         tbb::parallel_pipeline(queue_length,
