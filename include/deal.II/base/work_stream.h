@@ -480,7 +480,13 @@ namespace WorkStream
                                                             ScratchData,
                                                             CopyData>::ItemType;
 
-        // create the three stages of the pipeline
+        // Create the three stages of the pipeline:
+
+        //
+        // ----- Stage 1 -----
+        //
+        // The first stage is the one that provides us with chunks of data
+        // to work on (the stream of "items"). This stage runs sequentially.
         IteratorRangeToItemStream<Iterator, ScratchData, CopyData>
              iterator_range_to_item_stream(begin,
                                         end,
@@ -499,6 +505,11 @@ namespace WorkStream
               }
           });
 
+        //
+        // ----- Stage 2 -----
+        //
+        // The second stage is the one that does the actual work. This is the
+        // stage that runs in parallel
         auto tbb_worker_filter = tbb::make_filter<ItemType *, ItemType *>(
           tbb::filter::parallel,
           [worker =
@@ -599,6 +610,12 @@ namespace WorkStream
             return current_item;
           });
 
+
+        //
+        // ----- Stage 3 -----
+        //
+        // The last stage is the one that copies data from the CopyData objects
+        // to the final destination. This stage runs sequentially again.
         auto tbb_copier_filter = tbb::make_filter<ItemType *, void>(
           tbb::filter::serial,
           [copier = std::function<void(const CopyData &)>(copier)](
@@ -628,6 +645,10 @@ namespace WorkStream
             current_item->currently_in_use = false;
           });
 
+
+        //
+        // ----- The pipeline -----
+        //
         // Now create a pipeline from these stages and execute it:
         tbb::parallel_pipeline(queue_length,
                                tbb_item_stream_filter & tbb_worker_filter &
