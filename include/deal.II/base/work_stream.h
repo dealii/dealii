@@ -504,7 +504,7 @@ namespace WorkStream
           [worker =
              std::function<void(const Iterator &, ScratchData &, CopyData &)>(
                worker),
-           copier_exist =
+           copier_exists =
              static_cast<bool>(std::function<void(const CopyData &)>(copier))](
             ItemType *&current_item) {
             // we need to find an unused scratch data object in the list that
@@ -590,7 +590,7 @@ namespace WorkStream
             }
 
             // if there is no copier, mark current item as usable again
-            if (copier_exist == false)
+            if (copier_exists == false)
               current_item->currently_in_use = false;
 
 
