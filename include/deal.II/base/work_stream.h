@@ -182,7 +182,7 @@ namespace WorkStream
        * A class that creates a sequence of items from a range of iterators.
        */
       template <typename Iterator, typename ScratchData, typename CopyData>
-      class IteratorRangeToItemStream : public tbb::filter
+      class IteratorRangeToItemStream
       {
       public:
         /**
@@ -322,8 +322,7 @@ namespace WorkStream
                                   const unsigned int chunk_size,
                                   const ScratchData &sample_scratch_data,
                                   const CopyData &   sample_copy_data)
-          : tbb::filter(/*is_serial=*/true)
-          , remaining_iterator_range(begin, end)
+          : remaining_iterator_range(begin, end)
           , item_buffer(buffer_size)
           , sample_scratch_data(sample_scratch_data)
           , chunk_size(chunk_size)
@@ -348,8 +347,8 @@ namespace WorkStream
         /**
          * Create an item and return a pointer to it.
          */
-        virtual void *
-        operator()(void *) override
+        void *
+        operator()()
         {
           // find first unused item. we know that there must be one
           // because we have set the maximal number of tokens in flight
@@ -468,7 +467,7 @@ namespace WorkStream
        * can run in parallel.
        */
       template <typename Iterator, typename ScratchData, typename CopyData>
-      class TBBWorker : public tbb::filter
+      class TBBWorker
       {
       public:
         /**
@@ -480,8 +479,7 @@ namespace WorkStream
           const std::function<void(const Iterator &, ScratchData &, CopyData &)>
             &  worker,
           bool copier_exist = true)
-          : tbb::filter(/* is_serial= */ false)
-          , worker(worker)
+          : worker(worker)
           , copier_exist(copier_exist)
         {}
 
@@ -490,7 +488,7 @@ namespace WorkStream
          * Work on an item.
          */
         void *
-        operator()(void *item) override
+        operator()(void *&item) const
         {
           // first unpack the current item
           using ItemType =
@@ -605,7 +603,7 @@ namespace WorkStream
          * This flag is true if the copier stage exist. If it does not, the
          * worker has to free the buffer. Otherwise the copier will do it.
          */
-        bool copier_exist;
+        const bool copier_exist;
       };
 
 
@@ -616,7 +614,7 @@ namespace WorkStream
        * items are copied in the same order in which they are created.
        */
       template <typename Iterator, typename ScratchData, typename CopyData>
-      class TBBCopier : public tbb::filter
+      class TBBCopier
       {
       public:
         /**
@@ -626,8 +624,7 @@ namespace WorkStream
          * similar.
          */
         TBBCopier(const std::function<void(const CopyData &)> &copier)
-          : tbb::filter(/*is_serial=*/true)
-          , copier(copier)
+          : copier(copier)
         {}
 
 
@@ -635,7 +632,7 @@ namespace WorkStream
          * Work on a single item.
          */
         void *
-        operator()(void *item) override
+        operator()(void *&item) const
         {
           // first unpack the current item
           using ItemType =
@@ -699,26 +696,36 @@ namespace WorkStream
       {
         // create the three stages of the pipeline
         IteratorRangeToItemStream<Iterator, ScratchData, CopyData>
-          iterator_range_to_item_stream(begin,
+             iterator_range_to_item_stream(begin,
                                         end,
                                         queue_length,
                                         chunk_size,
                                         sample_scratch_data,
                                         sample_copy_data);
+        auto tbb_item_stream_filter = tbb::make_filter<void, void *>(
+          tbb::filter::serial, [&](tbb::flow_control &fc) -> void * {
+            if (const auto item = iterator_range_to_item_stream())
+              return item;
+            else
+              {
+                fc.stop();
+                return nullptr;
+              }
+          });
 
         TBBWorker<Iterator, ScratchData, CopyData> worker_filter(worker);
+        auto                                       tbb_worker_filter =
+          tbb::make_filter<void *, void *>(tbb::filter::parallel,
+                                           worker_filter);
+
         TBBCopier<Iterator, ScratchData, CopyData> copier_filter(copier);
+        auto                                       tbb_copier_filter =
+          tbb::make_filter<void *, void>(tbb::filter::serial, copier_filter);
 
         // now create a pipeline from these stages
-        tbb::pipeline assembly_line;
-        assembly_line.add_filter(iterator_range_to_item_stream);
-        assembly_line.add_filter(worker_filter);
-        assembly_line.add_filter(copier_filter);
-
-        // and run it
-        assembly_line.run(queue_length);
-
-        assembly_line.clear();
+        tbb::parallel_pipeline(queue_length,
+                               tbb_item_stream_filter & tbb_worker_filter &
+                                 tbb_copier_filter);
       }
 
     }    // namespace tbb_no_coloring
