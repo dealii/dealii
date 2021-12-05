@@ -608,73 +608,6 @@ namespace WorkStream
 
 
 
-      /**
-       * A class that manages calling the copier function. Note that it is, in
-       * the TBB notation, a filter that runs sequentially, ensuring that all
-       * items are copied in the same order in which they are created.
-       */
-      template <typename Iterator, typename ScratchData, typename CopyData>
-      class TBBCopier
-      {
-      public:
-        using ItemType = typename IteratorRangeToItemStream<Iterator,
-                                                            ScratchData,
-                                                            CopyData>::ItemType;
-
-        /**
-         * Constructor. Takes a reference to the object on which we will
-         * operate as well as a pointer to the function that will do the
-         * copying from the additional data object to the global matrix or
-         * similar.
-         */
-        TBBCopier(const std::function<void(const CopyData &)> &copier)
-          : copier(copier)
-        {}
-
-
-        /**
-         * Work on a single item.
-         */
-        ItemType *
-        operator()(ItemType *&current_item) const
-        {
-          // initiate copying data. for the same reasons as in the worker class
-          // above, catch exceptions rather than letting it propagate into
-          // unknown territories
-          for (unsigned int i = 0; i < current_item->n_items; ++i)
-            {
-              try
-                {
-                  if (copier)
-                    copier(current_item->copy_datas[i]);
-                }
-              catch (const std::exception &exc)
-                {
-                  Threads::internal::handle_std_exception(exc);
-                }
-              catch (...)
-                {
-                  Threads::internal::handle_unknown_exception();
-                }
-            }
-
-          // mark current item as usable again
-          current_item->currently_in_use = false;
-
-
-          // Return an invalid item since we are at the end of the
-          // pipeline
-          return nullptr;
-        }
-
-
-      private:
-        /**
-         * Pointer to the function that does the copying of data.
-         */
-        const std::function<void(const CopyData &)> copier;
-      };
-
       template <typename Worker,
                 typename Copier,
                 typename Iterator,
@@ -718,12 +651,35 @@ namespace WorkStream
           tbb::make_filter<ItemType *, ItemType *>(tbb::filter::parallel,
                                                    worker_filter);
 
-        TBBCopier<Iterator, ScratchData, CopyData> copier_filter(copier);
-        auto                                       tbb_copier_filter =
-          tbb::make_filter<ItemType *, void>(tbb::filter::serial,
-                                             copier_filter);
+        auto tbb_copier_filter = tbb::make_filter<ItemType *, void>(
+          tbb::filter::serial,
+          [copier = std::function<void(const CopyData &)>(copier)](
+            ItemType *&current_item) {
+            // Initiate copying data. For the same reasons as in the worker
+            // class above, catch exceptions rather than letting them propagate
+            // into unknown territories:
+            for (unsigned int i = 0; i < current_item->n_items; ++i)
+              {
+                try
+                  {
+                    if (copier)
+                      copier(current_item->copy_datas[i]);
+                  }
+                catch (const std::exception &exc)
+                  {
+                    Threads::internal::handle_std_exception(exc);
+                  }
+                catch (...)
+                  {
+                    Threads::internal::handle_unknown_exception();
+                  }
+              }
 
-        // now create a pipeline from these stages
+            // mark current item as usable again
+            current_item->currently_in_use = false;
+          });
+
+        // Now create a pipeline from these stages and execute it:
         tbb::parallel_pipeline(queue_length,
                                tbb_item_stream_filter & tbb_worker_filter &
                                  tbb_copier_filter);
