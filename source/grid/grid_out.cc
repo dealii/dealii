@@ -1068,67 +1068,28 @@ GridOut::write_msh(const Triangulation<dim, spacedim> &tria,
             (msh_flags.write_lines ? n_boundary_lines(tria) : 0))
       << '\n';
 
-  /*
-    elm-type
-    defines the geometrical type of the n-th element:
-    1
-    Line (2 nodes).
-    2
-    Triangle (3 nodes).
-    3
-    Quadrangle (4 nodes).
-    4
-    Tetrahedron (4 nodes).
-    5
-    Hexahedron (8 nodes).
-    6
-    Prism (6 nodes).
-    7
-    Pyramid (5 nodes).
-    8
-    Second order line (3 nodes: 2 associated with the vertices and 1 with the
-    edge).
-    9
-    Second order triangle (6 nodes: 3 associated with the vertices and 3 with
-    the edges). 10 Second order quadrangle (9 nodes: 4 associated with the
-    vertices, 4 with the edges and 1 with the face). 11 Second order tetrahedron
-    (10 nodes: 4 associated with the vertices and 6 with the edges). 12 Second
-    order hexahedron (27 nodes: 8 associated with the vertices, 12 with the
-    edges, 6 with the faces and 1 with the volume). 13 Second order prism (18
-    nodes: 6 associated with the vertices, 9 with the edges and 3 with the
-    quadrangular faces). 14 Second order pyramid (14 nodes: 5 associated with
-    the vertices, 8 with the edges and 1 with the quadrangular face). 15 Point
-    (1 node).
-  */
-  unsigned int elm_type;
-  switch (dim)
-    {
-      case 1:
-        elm_type = 1;
-        break;
-      case 2:
-        elm_type = 3;
-        break;
-      case 3:
-        elm_type = 5;
-        break;
-      default:
-        Assert(false, ExcNotImplemented());
-    }
-
   // write cells. Enumerate cells
   // consecutively, starting with 1
   for (const auto &cell : tria.active_cell_iterators())
     {
-      out << cell->active_cell_index() + 1 << ' ' << elm_type << ' '
+      out << cell->active_cell_index() + 1 << ' '
+          << cell->reference_cell().gmsh_element_type() << ' '
           << cell->material_id() << ' ' << cell->subdomain_id() << ' '
           << cell->n_vertices() << ' ';
 
       // Vertex numbering follows UCD conventions.
 
-      for (const unsigned int vertex : GeometryInfo<dim>::vertex_indices())
-        out << cell->vertex_index(GeometryInfo<dim>::ucd_to_deal[vertex]) + 1
-            << ' ';
+      for (const unsigned int vertex : cell->vertex_indices())
+        {
+          if (cell->reference_cell() == ReferenceCells::get_hypercube<dim>())
+            out << cell->vertex_index(GeometryInfo<dim>::ucd_to_deal[vertex]) +
+                     1
+                << ' ';
+          else if (cell->reference_cell() == ReferenceCells::get_simplex<dim>())
+            out << cell->vertex_index(vertex) + 1 << ' ';
+          else
+            Assert(false, ExcNotImplemented());
+        }
       out << '\n';
     }
 
@@ -3951,35 +3912,32 @@ GridOut::write_msh_faces(const Triangulation<dim, spacedim> &tria,
   for (const auto &face : tria.active_face_iterators())
     if (face->at_boundary() && (face->boundary_id() != 0))
       {
-        out << current_element_index << ' ';
-        switch (dim)
-          {
-            case 2:
-              out << 1 << ' ';
-              break;
-            case 3:
-              out << 3 << ' ';
-              break;
-            default:
-              Assert(false, ExcNotImplemented());
-          }
+        out << current_element_index << ' '
+            << face->reference_cell().gmsh_element_type() << ' ';
         out << static_cast<unsigned int>(face->boundary_id()) << ' '
             << static_cast<unsigned int>(face->boundary_id()) << ' '
-            << GeometryInfo<dim>::vertices_per_face;
+            << face->n_vertices();
         // note: vertex numbers are 1-base
-        for (unsigned int vertex = 0;
-             vertex < GeometryInfo<dim>::vertices_per_face;
-             ++vertex)
-          out << ' '
-              << face->vertex_index(
-                   GeometryInfo<dim - 1>::ucd_to_deal[vertex]) +
-                   1;
+        for (unsigned int vertex : face->vertex_indices())
+          {
+            if (face->reference_cell() == ReferenceCells::Quadrilateral)
+              out << ' '
+                  << face->vertex_index(
+                       GeometryInfo<dim - 1>::ucd_to_deal[vertex]) +
+                       1;
+            else if ((face->reference_cell() == ReferenceCells::Triangle) ||
+                     (face->reference_cell() == ReferenceCells::Line))
+              out << ' ' << face->vertex_index(vertex) + 1;
+            else
+              Assert(false, ExcInternalError());
+          }
         out << '\n';
 
         ++current_element_index;
       }
   return current_element_index;
 }
+
 
 
 template <int dim, int spacedim>
@@ -4004,10 +3962,11 @@ GridOut::write_msh_lines(const Triangulation<dim, spacedim> &tria,
       if (cell->line(l)->at_boundary() && (cell->line(l)->boundary_id() != 0) &&
           (cell->line(l)->user_flag_set() == false))
         {
-          out << next_element_index << " 1 ";
+          out << next_element_index << ' '
+              << ReferenceCells::Line.gmsh_element_type() << ' ';
           out << static_cast<unsigned int>(cell->line(l)->boundary_id()) << ' '
               << static_cast<unsigned int>(cell->line(l)->boundary_id())
-              << " 2 ";
+              << " 2 "; // two vertex indices to follow
           // note: vertex numbers are 1-base
           for (unsigned int vertex = 0; vertex < 2; ++vertex)
             out << ' '
