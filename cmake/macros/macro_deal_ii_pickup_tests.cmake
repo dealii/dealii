@@ -256,6 +256,7 @@ MACRO(DEAL_II_PICKUP_TESTS)
           # given test
           #
           SET(_skip_test TRUE)
+          CONTINUE() # drop out of "FOREACH(_match ${_matches})"
         ENDIF()
       ENDIF()
 
@@ -275,11 +276,8 @@ Comparison operator \"=\" expected for boolean match.\n"
         IF( (${_variable} AND NOT ${_boolean}) OR
             (NOT ${_variable} AND ${_boolean}) )
           SET(_skip_test TRUE)
+          CONTINUE() # drop out of "FOREACH(_match ${_matches})"
         ENDIF()
-      ENDIF()
-
-      IF(_skip_test)
-        CONTINUE()   # next test
       ENDIF()
 
       #
@@ -298,10 +296,15 @@ Comparison operator \"=\" expected for boolean match.\n"
               "${DEAL_II_${_feature}_VERSION}" VERSION_LESS "${_version}" ) OR
             ( "${_operator}" STREQUAL ".leq." AND
               "${DEAL_II_${_feature}_VERSION}" VERSION_GREATER "${_version}" ) )
-          CONTINUE()   # next test
+          SET(_skip_test TRUE)
+          CONTINUE() # drop out of "FOREACH(_match ${_matches})"
         ENDIF()
       ENDIF()
     ENDFOREACH()
+
+    IF(_skip_test)
+      CONTINUE() # next test
+    ENDIF()
 
     #
     # We've made it all the way to here, which means that we actually
