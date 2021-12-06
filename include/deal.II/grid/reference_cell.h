@@ -519,6 +519,12 @@ public:
   vtk_lagrange_type() const;
 
   /**
+   * Return the GMSH element type code that corresponds to the reference cell.
+   */
+  unsigned int
+  gmsh_element_type() const;
+
+  /**
    * @}
    */
 
