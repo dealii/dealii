@@ -517,7 +517,7 @@ namespace WorkStream
                worker),
            copier_exists =
              static_cast<bool>(std::function<void(const CopyData &)>(copier))](
-            ItemType *&current_item) {
+            ItemType *current_item) {
             // we need to find an unused scratch data object in the list that
             // corresponds to the current thread and then mark it as used. if
             // we can't find one, create one
@@ -619,7 +619,7 @@ namespace WorkStream
         auto tbb_copier_filter = tbb::make_filter<ItemType *, void>(
           tbb::filter::serial,
           [copier = std::function<void(const CopyData &)>(copier)](
-            ItemType *&current_item) {
+            ItemType *current_item) {
             if (copier)
               {
                 // Initiate copying data. For the same reasons as in the worker
