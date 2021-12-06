@@ -126,6 +126,17 @@ public:
   static constexpr unsigned int dimension = dim;
 
   /**
+   * Copy constructor.
+   */
+  FEEvaluationBaseData(const FEEvaluationBaseData &other) = default;
+
+  /**
+   * Copy assignment operator.
+   */
+  FEEvaluationBaseData &
+  operator=(const FEEvaluationBaseData &other);
+
+  /**
    * @name 1: Access to geometry data at quadrature points
    */
   //@{
@@ -386,20 +397,6 @@ protected:
     const std::shared_ptr<
       internal::MatrixFreeFunctions::
         MappingDataOnTheFly<dim, Number, VectorizedArrayType>> &mapping_data);
-
-  /**
-   * Copy constructor.
-   */
-  FEEvaluationBaseData(const FEEvaluationBaseData &other);
-
-  /**
-   * Copy assignment operator. If FEEvaluationBase was constructed from a
-   * mapping, fe, quadrature, and update flags, the underlying geometry
-   * evaluation based on FEValues will be deep-copied in order to allow for
-   * using in parallel with threads.
-   */
-  FEEvaluationBaseData &
-  operator=(const FEEvaluationBaseData &other);
 
   /**
    * Sets the pointers for values, gradients, hessians to the central
@@ -762,44 +759,6 @@ inline FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
   jacobian     = mapped_geometry->get_data_storage().jacobians[0].begin();
   J_value      = mapped_geometry->get_data_storage().JxW_values.begin();
 }
-
-
-
-template <int dim, typename Number, bool is_face, typename VectorizedArrayType>
-inline FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
-  FEEvaluationBaseData(const FEEvaluationBaseData &other)
-  : data(other.data)
-  , dof_info(other.dof_info)
-  , mapping_data(other.mapping_data)
-  , quad_no(other.quad_no)
-  , active_fe_index(other.active_fe_index)
-  , active_quad_index(other.active_quad_index)
-  , descriptor(other.descriptor)
-  , n_quadrature_points(other.n_quadrature_points)
-  , jacobian(nullptr)
-  , J_value(nullptr)
-  , normal_vectors(nullptr)
-  , normal_x_jacobian(nullptr)
-  , quadrature_weights(other.quadrature_weights)
-  , dof_values_initialized(false)
-  , values_quad_initialized(false)
-  , gradients_quad_initialized(false)
-  , hessians_quad_initialized(false)
-  , values_quad_submitted(false)
-  , gradients_quad_submitted(false)
-  , cell(numbers::invalid_unsigned_int)
-  , is_interior_face(other.is_interior_face)
-  , dof_access_index(
-      is_face ?
-        (is_interior_face ?
-           internal::MatrixFreeFunctions::DoFInfo::dof_access_face_interior :
-           internal::MatrixFreeFunctions::DoFInfo::dof_access_face_exterior) :
-        internal::MatrixFreeFunctions::DoFInfo::dof_access_cell)
-  , face_no(0)
-  , face_orientation(0)
-  , subface_index(0)
-  , cell_type(internal::MatrixFreeFunctions::general)
-{}
 
 
 
