@@ -32,10 +32,10 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  define BOOST_ALLOW_DEPRECATED_HEADERS
 #endif
 #include <boost/geometry/index/rtree.hpp>
+#include <boost/geometry/strategies/strategies.hpp>
 #ifdef DEAL_II_BOOST_HAS_BROKEN_HEADER_DEPRECATIONS
 #  undef BOOST_ALLOW_DEPRECATED_HEADERS
 #endif
-#include <boost/geometry/strategies/strategies.hpp>
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 

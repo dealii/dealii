@@ -26,16 +26,11 @@
 #include <deal.II/boost_adaptors/segment.h>
 
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
-#include <boost/geometry/strategies/strategies.hpp>
-/*
- * For boost 1.77 compatibility we need to include strategies.hpp before we
- * can include rtree.hpp. Otherwise a compilation error within boost
- * headers is encountered.
- */
 #ifdef DEAL_II_BOOST_HAS_BROKEN_HEADER_DEPRECATIONS
 #  define BOOST_ALLOW_DEPRECATED_HEADERS
 #endif
 #include <boost/geometry/index/rtree.hpp>
+#include <boost/geometry/strategies/strategies.hpp>
 #ifdef DEAL_II_BOOST_HAS_BROKEN_HEADER_DEPRECATIONS
 #  undef BOOST_ALLOW_DEPRECATED_HEADERS
 #endif
