@@ -117,6 +117,8 @@ IncludeCategories:
     Priority: 300
   - Regex:    "deal.II/sundials/.*\\.h"
     Priority: 310
+  - Regex:    "deal.II/tests/.*\\.h"
+    Priority: 320
 # put boost right after deal:
   - Regex: "<boost.*>"
     Priority: 500

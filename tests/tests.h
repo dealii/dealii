@@ -32,6 +32,8 @@
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/utilities.h>
 
+#include <deal.II/tests/tests.h>
+
 #include <cmath>
 #include <cstdlib>
 #include <fstream>
@@ -75,6 +77,7 @@ struct DisableWindowsDebugRuntimeDialog
 // implicitly use the deal.II namespace everywhere, without us having to say
 // so in each and every testcase
 using namespace dealii;
+using namespace dealii::Testing;
 
 
 // ------------------------- Utility functions used in tests ------------------
@@ -153,93 +156,95 @@ get_real_assert_zero_imag(const number &a)
 // fail. This here is a reimplementation that gives the same sequence of numbers
 // as a program that uses rand() on a typical linux machine. we put this into a
 // namespace to not conflict with stdlib
-namespace Testing
+namespace dealii
 {
-  /**
-   * This function defines how to deal with signed overflow, which is undefined
-   * behavior otherwise, in sums. Since unsigned overflow is well-defined there
-   * is no reason to resort to this function.
-   * The way we want to define the overflow is the following:
-   * The value after the maximal value is the minimal one and the value
-   * before the minimal one is the maximal one. Hence, we have to distinguish
-   * three cases:
-   * 1. $a+b>max$: This can only happen if both @p a and @p b are positive. By
-   *               adding $min-max-1$ we are mapping $max+n$ to $min+n-1$ for
-   *               $n>1$.
-   * 2. $a+b<min$: This can only happen if both @p a and @p b are negative. By
-   *               adding $max-min+1$ we are mapping $min-n$ to $max-n+1$ for
-   *               $n>1$.
-   * 3. $min<=a+b<=max$: No overflow.
-   */
-  template <typename Number>
-  Number
-  nonoverflow_add(Number a, Number b)
+  namespace Testing
   {
-    constexpr Number max = std::numeric_limits<Number>::max();
-    constexpr Number min = std::numeric_limits<Number>::min();
-    if (b > 0 && a > max - b)
-      return (min + a) + (b - max) - 1;
-    if (b < 0 && a < min - b)
-      return (max + a) + (b - min) + 1;
-    return a + b;
-  }
+    /**
+     * This function defines how to deal with signed overflow, which is
+     * undefined behavior otherwise, in sums. Since unsigned overflow is
+     * well-defined there is no reason to resort to this function. The way we
+     * want to define the overflow is the following: The value after the maximal
+     * value is the minimal one and the value before the minimal one is the
+     * maximal one. Hence, we have to distinguish three cases:
+     * 1. $a+b>max$: This can only happen if both @p a and @p b are positive. By
+     *               adding $min-max-1$ we are mapping $max+n$ to $min+n-1$ for
+     *               $n>1$.
+     * 2. $a+b<min$: This can only happen if both @p a and @p b are negative. By
+     *               adding $max-min+1$ we are mapping $min-n$ to $max-n+1$ for
+     *               $n>1$.
+     * 3. $min<=a+b<=max$: No overflow.
+     */
+    template <typename Number>
+    Number
+    nonoverflow_add(Number a, Number b)
+    {
+      constexpr Number max = std::numeric_limits<Number>::max();
+      constexpr Number min = std::numeric_limits<Number>::min();
+      if (b > 0 && a > max - b)
+        return (min + a) + (b - max) - 1;
+      if (b < 0 && a < min - b)
+        return (max + a) + (b - min) + 1;
+      return a + b;
+    }
 
-  int
-  rand(const bool reseed = false, const int seed = 1)
-  {
-    static int  r[32];
-    static int  k;
-    static bool inited = false;
+    int
+    rand(const bool reseed = false, const int seed = 1)
+    {
+      static int  r[32];
+      static int  k;
+      static bool inited = false;
 
-    if (!inited || reseed)
-      {
-        // srand treats a seed 0 as 1 for some reason
-        r[0]          = (seed == 0) ? 1 : seed;
-        long int word = r[0];
+      if (!inited || reseed)
+        {
+          // srand treats a seed 0 as 1 for some reason
+          r[0]          = (seed == 0) ? 1 : seed;
+          long int word = r[0];
 
-        for (int i = 1; i < 31; ++i)
-          {
-            // This does:
-            //   r[i] = (16807 * r[i-1]) % 2147483647;
-            // but avoids overflowing 31 bits.
-            const long int hi = word / 127773;
-            const long int lo = word % 127773;
-            word              = 16807 * lo - 2836 * hi;
-            if (word < 0)
-              word += 2147483647;
-            r[i] = word;
-          }
-        k = 31;
-        for (int i = 31; i < 34; ++i)
-          {
-            r[k % 32] = r[(k + 32 - 31) % 32];
-            k         = (k + 1) % 32;
-          }
+          for (int i = 1; i < 31; ++i)
+            {
+              // This does:
+              //   r[i] = (16807 * r[i-1]) % 2147483647;
+              // but avoids overflowing 31 bits.
+              const long int hi = word / 127773;
+              const long int lo = word % 127773;
+              word              = 16807 * lo - 2836 * hi;
+              if (word < 0)
+                word += 2147483647;
+              r[i] = word;
+            }
+          k = 31;
+          for (int i = 31; i < 34; ++i)
+            {
+              r[k % 32] = r[(k + 32 - 31) % 32];
+              k         = (k + 1) % 32;
+            }
 
-        for (int i = 34; i < 344; ++i)
-          {
-            r[k % 32] =
-              nonoverflow_add(r[(k + 32 - 31) % 32], r[(k + 32 - 3) % 32]);
-            k = (k + 1) % 32;
-          }
-        inited = true;
-        if (reseed == true)
-          return 0; // do not generate new no
-      }
+          for (int i = 34; i < 344; ++i)
+            {
+              r[k % 32] =
+                nonoverflow_add(r[(k + 32 - 31) % 32], r[(k + 32 - 3) % 32]);
+              k = (k + 1) % 32;
+            }
+          inited = true;
+          if (reseed == true)
+            return 0; // do not generate new no
+        }
 
-    r[k % 32] = nonoverflow_add(r[(k + 32 - 31) % 32], r[(k + 32 - 3) % 32]);
-    int ret   = r[k % 32];
-    k         = (k + 1) % 32;
-    return static_cast<unsigned int>(ret) >> 1;
-  }
+      r[k % 32] = nonoverflow_add(r[(k + 32 - 31) % 32], r[(k + 32 - 3) % 32]);
+      int ret   = r[k % 32];
+      k         = (k + 1) % 32;
+      return static_cast<unsigned int>(ret) >> 1;
+    }
 
-  // reseed our random number generator
-  void
-  srand(const int seed)
-  {
-    rand(true, seed);
-  }
-} // namespace Testing
+    // reseed our random number generator
+    void
+    srand(const int seed)
+    {
+      rand(true, seed);
+    }
+  } // namespace Testing
+} // namespace dealii
 
 
 
@@ -279,22 +284,6 @@ random_box(const double &min = 0.0, const double &max = 1.0)
   std::vector<Point<dim>> p = {random_point<dim>(min, max),
                                random_point<dim>(min, max)};
   return BoundingBox<dim>(p);
-}
-
-
-
-// given the name of a file, copy it to deallog
-// and then delete it
-void
-cat_file(const char *filename)
-{
-  {
-    std::ifstream in(filename);
-    Assert(in, dealii::ExcIO());
-    deallog.get_file_stream() << in.rdbuf() << "\n";
-  }
-
-  std::remove(filename);
 }
 
 
@@ -482,126 +471,6 @@ namespace
   }
 } // namespace
 #endif
-
-
-// Function to initialize deallog. Normally, it should be called at
-// the beginning of main() like
-//
-// initlog();
-//
-// This will open the correct output file, divert log output there and
-// switch off screen output. If screen output is desired, provide the
-// optional first argument as 'true'.
-std::string   deallogname;
-std::ofstream deallogfile;
-
-void
-initlog(const bool                    console = false,
-        const std::ios_base::fmtflags flags   = std::ios::showpoint |
-                                              std::ios::left)
-{
-  deallogname = "output";
-  deallogfile.open(deallogname);
-  deallog.attach(deallogfile, true, flags);
-  deallog.depth_console(console ? 10 : 0);
-}
-
-
-inline void
-mpi_initlog(const bool                    console = false,
-            const std::ios_base::fmtflags flags   = std::ios::showpoint |
-                                                  std::ios::left)
-{
-#ifdef DEAL_II_WITH_MPI
-  unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
-  if (myid == 0)
-    {
-      deallogname = "output";
-      deallogfile.open(deallogname.c_str());
-      deallog.attach(deallogfile, true, flags);
-      deallog.depth_console(console ? 10 : 0);
-    }
-#else
-  (void)console;
-  (void)flags;
-  // can't use this function if not using MPI
-  Assert(false, ExcInternalError());
-#endif
-}
-
-
-
-/**
- * A helper class that gives each MPI process its own output file
- * for the `deallog` stream, and at the end of the program (or,
- * more correctly, the end of the current object), concatenates them
- * all into the output file used on processor 0.
- */
-struct MPILogInitAll
-{
-  MPILogInitAll(const bool                    console = false,
-                const std::ios_base::fmtflags flags   = std::ios::showpoint |
-                                                      std::ios::left)
-  {
-#ifdef DEAL_II_WITH_MPI
-    const unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
-#else
-    constexpr unsigned int myid = 0;
-#endif
-    if (myid == 0)
-      {
-        if (!deallog.has_file())
-          {
-            deallogfile.open("output");
-            deallog.attach(deallogfile, true, flags);
-          }
-      }
-    else
-      {
-        deallogname = "output" + Utilities::int_to_string(myid);
-        deallogfile.open(deallogname.c_str());
-        deallog.attach(deallogfile, true, flags);
-      }
-
-    deallog.depth_console(console ? 10 : 0);
-
-    deallog.push(Utilities::int_to_string(myid));
-  }
-
-  ~MPILogInitAll()
-  {
-    // pop the prefix for the MPI rank of the current process
-    deallog.pop();
-
-#ifdef DEAL_II_WITH_MPI
-    const unsigned int myid  = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
-    const unsigned int nproc = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
-
-    if (myid != 0)
-      {
-        deallog.detach();
-        deallogfile.close();
-      }
-
-    MPI_Barrier(MPI_COMM_WORLD);
-
-#  ifdef DEAL_II_WITH_PETSC
-    check_petsc_allocations();
-    MPI_Barrier(MPI_COMM_WORLD);
-#  endif
-
-    if (myid == 0)
-      {
-        for (unsigned int i = 1; i < nproc; ++i)
-          {
-            std::string filename = "output" + Utilities::int_to_string(i);
-            cat_file(filename.c_str());
-          }
-      }
-    MPI_Barrier(MPI_COMM_WORLD);
-#endif
-  }
-};
 
 
 #ifdef DEAL_II_COMPILER_CUDA_AWARE
