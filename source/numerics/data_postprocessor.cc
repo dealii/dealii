@@ -19,6 +19,29 @@ DEAL_II_NAMESPACE_OPEN
 
 
 
+namespace DataPostprocessorInputs
+{
+  template <int spacedim>
+  CommonInputs<spacedim>::CommonInputs()
+    : face_number(numbers::invalid_unsigned_int)
+  {}
+
+
+
+  template <int spacedim>
+  unsigned int
+  CommonInputs<spacedim>::get_face_number() const
+  {
+    Assert(
+      face_number != numbers::invalid_unsigned_int,
+      ExcMessage(
+        "This function can only be called if set_cell_and_face() has "
+        "previously been called. Typically, this would be by using DataOutFaces "
+        "or a related class."));
+    return face_number;
+  }
+} // namespace DataPostprocessorInputs
+
 // -------------------------- DataPostprocessor ---------------------------
 
 template <int dim>
@@ -54,7 +77,7 @@ DataPostprocessor<dim>::get_data_component_interpretation() const
 }
 
 
-// -------------------------- DataPostprocessorScalar -------------------------
+// -------------------- DataPostprocessorScalar -------------------------
 
 template <int dim>
 DataPostprocessorScalar<dim>::DataPostprocessorScalar(
@@ -93,7 +116,8 @@ DataPostprocessorScalar<dim>::get_needed_update_flags() const
 
 
 
-// -------------------------- DataPostprocessorVector -------------------------
+// -------------------------- DataPostprocessorVector
+// -------------------------
 
 template <int dim>
 DataPostprocessorVector<dim>::DataPostprocessorVector(
@@ -132,7 +156,8 @@ DataPostprocessorVector<dim>::get_needed_update_flags() const
 
 
 
-// -------------------------- DataPostprocessorTensor -------------------------
+// -------------------------- DataPostprocessorTensor
+// -------------------------
 
 template <int dim>
 DataPostprocessorTensor<dim>::DataPostprocessorTensor(

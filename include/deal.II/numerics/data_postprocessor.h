@@ -66,6 +66,7 @@ namespace DataPostprocessorInputs
    * then the @p normal_vectors member variable does not contain anything
    * useful.
    *
+   *
    * <h4>Cell access</h4>
    *
    * DataPostprocessor is typically called from classes such as DataOut
@@ -144,10 +145,58 @@ namespace DataPostprocessorInputs
    *       }
    *   };
    * @endcode
+   *
+   *
+   * <h4>Face access</h4>
+   *
+   * When a DataPostprocessor object is used for output via the DataOutFaces
+   * class, it is sometimes necessary to also know which face is currently
+   * being worked on. Like accessing the cell as shown above, postprocessors
+   * can then query the face number via the CommonInputs::get_face_number()
+   * function. An example postprocessor that ignores its input and
+   * only puts the @ref GlossBoundaryIndicator "Boundary indicator"
+   * into the output file would then look as follows:
+   * @code
+   * template <int dim>
+   * class BoundaryIds : public DataPostprocessorScalar<dim>
+   * {
+   * public:
+   *   BoundaryIds()
+   *     : DataPostprocessorScalar<dim>("boundary_id", update_quadrature_points)
+   *   {}
+   *
+   *
+   *   virtual void
+   *   evaluate_scalar_field(
+   *     const DataPostprocessorInputs::Scalar<dim> &inputs,
+   *     std::vector<Vector<double>> &computed_quantities) const override
+   *   {
+   *     AssertDimension(computed_quantities.size(),
+   *                     inputs.solution_values.size());
+   *
+   *     // Get the cell and face we are currently dealing with:
+   *     const typename DoFHandler<dim>::active_cell_iterator cell =
+   *       inputs.template get_cell<dim>();
+   *     const unsigned int face = inputs.get_face_number();
+   *
+   *     // Then fill the output fields with the boundary_id of the face
+   *     for (auto &output : computed_quantities)
+   *       {
+   *         AssertDimension(output.size(), 1);
+   *         output(0) = cell->face(face)->boundary_id();
+   *       }
+   *   }
+   * };
+   * @endcode
    */
   template <int spacedim>
   struct CommonInputs
   {
+    /**
+     * Constructor.
+     */
+    CommonInputs();
+
     /**
      * An array of vectors normal to the faces of cells, evaluated at the points
      * at which we are generating graphical output. This array is only used by
@@ -193,6 +242,22 @@ namespace DataPostprocessorInputs
     set_cell(const typename DoFHandler<dim, spacedim>::cell_iterator &cell);
 
     /**
+     * Set the cell and face number that is currently being used in evaluating
+     * the data for which the DataPostprocessor object is being called. Given
+     * that a face is required, this function is meant to be called by a class
+     * such as DataOutFaces.
+     *
+     * This function is not usually called from user space, but is instead
+     * called by DataOutFaces and similar classes when creating the object that
+     * is then passed to DataPostprocessor.
+     */
+    template <int dim>
+    void
+    set_cell_and_face(
+      const typename DoFHandler<dim, spacedim>::cell_iterator &cell,
+      const unsigned int                                       face_number);
+
+    /**
      * Set the cell that is currently being used in evaluating the data
      * for which the DataPostprocessor object is being called.
      *
@@ -228,6 +293,18 @@ namespace DataPostprocessorInputs
     DEAL_II_DEPRECATED typename DoFHandlerType::cell_iterator
     get_cell() const;
 
+    /**
+     * Query the face number on which we currently produce graphical output.
+     * See the documentation of the current class for an example on how
+     * to use the related get_cell() function that is meant to query the cell
+     * currently being worked on.
+     *
+     * This function is intended for use when producing graphical output on
+     * faces, for example through the DataOutFaces class.
+     */
+    unsigned int
+    get_face_number() const;
+
   private:
     /**
      * The place where set_cell() stores the cell. Since the actual data
@@ -237,6 +314,12 @@ namespace DataPostprocessorInputs
      * get_cell().
      */
     boost::any cell;
+
+    /**
+     * The place where set_cell_and_face() stores the number of the face
+     * being worked on.
+     */
+    unsigned int face_number;
   };
 
   /**
@@ -1224,6 +1307,23 @@ namespace DataPostprocessorInputs
       // if we had nothing stored before, or if we had stored a different
       // data type, just let boost::any replace things
       cell = new_cell;
+
+    // Also reset the face number, just to make sure nobody
+    // accidentally uses an outdated value.
+    face_number = numbers::invalid_unsigned_int;
+  }
+
+
+
+  template <int spacedim>
+  template <int dim>
+  void
+  CommonInputs<spacedim>::set_cell_and_face(
+    const typename DoFHandler<dim, spacedim>::cell_iterator &new_cell,
+    const unsigned int                                       new_face_number)
+  {
+    set_cell<dim>(new_cell);
+    face_number = new_face_number;
   }
 
 
