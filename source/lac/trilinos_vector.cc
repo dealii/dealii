@@ -774,7 +774,8 @@ namespace TrilinosWrappers
 
       // in parallel, check that the vector
       // is zero on _all_ processors.
-      const auto max_n_negative = Utilities::MPI::max(flag, get_mpi_communicator());
+      const auto max_n_negative =
+        Utilities::MPI::max(flag, get_mpi_communicator());
       return max_n_negative == 0;
     }
 
