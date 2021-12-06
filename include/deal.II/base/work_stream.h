@@ -488,7 +488,7 @@ namespace WorkStream
          * Work on an item.
          */
         void *
-        operator()(void *&item) const
+        operator()(void *item) const
         {
           // first unpack the current item
           using ItemType =
@@ -632,7 +632,7 @@ namespace WorkStream
          * Work on a single item.
          */
         void *
-        operator()(void *&item) const
+        operator()(void *item) const
         {
           // first unpack the current item
           using ItemType =
