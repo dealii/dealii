@@ -39,6 +39,12 @@ namespace GridTools
   template <typename CellIterator>
   struct PeriodicFacePair;
 }
+
+namespace RepartitioningPolicyTools
+{
+  template <int dim, int spacedim>
+  class Base;
+}
 #endif
 
 namespace parallel
@@ -197,6 +203,20 @@ namespace parallel
         const TriangulationDescription::Settings &     settings);
 
       /**
+       * TODO
+       */
+      void
+      set_partitioner(
+        const RepartitioningPolicyTools::Base<dim, spacedim> &partitioner,
+        const TriangulationDescription::Settings &            settings);
+
+      /**
+       * TODO
+       */
+      void
+      repartition();
+
+      /**
        * Coarsen and refine the mesh according to refinement and coarsening
        * flags set.
        *
@@ -300,6 +320,12 @@ namespace parallel
       std::function<void(dealii::Triangulation<dim, spacedim> &,
                          const unsigned int)>
         partitioner;
+
+      /**
+       * TODO
+       */
+      SmartPointer<const RepartitioningPolicyTools::Base<dim, spacedim>>
+        partitioner_distributed;
 
       /**
        * Sorted list of pairs of coarse-cell ids and their indices.

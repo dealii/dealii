@@ -17,6 +17,7 @@
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/mpi_consensus_algorithms.h>
 
+#include <deal.II/distributed/fully_distributed_tria.h>
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/dofs/dof_accessor.h>
@@ -109,7 +110,8 @@ namespace TriangulationDescription
         collect(
           const std::vector<unsigned int> &                  relevant_processes,
           const std::vector<DescriptionTemp<dim, spacedim>> &description_temp,
-          const MPI_Comm &                                   comm)
+          const MPI_Comm &                                   comm,
+          const bool vertices_have_unique_ids)
         {
           dealii::Utilities::MPI::ConsensusAlgorithms::AnonymousProcess<char,
                                                                         char>
@@ -135,7 +137,8 @@ namespace TriangulationDescription
                   std::vector<char> &) {
                 this->merge(
                   dealii::Utilities::unpack<DescriptionTemp<dim, spacedim>>(
-                    recv_buffer, false));
+                    recv_buffer, false),
+                  vertices_have_unique_ids);
               });
 
           dealii::Utilities::MPI::ConsensusAlgorithms::Selector<char, char>(
@@ -149,17 +152,66 @@ namespace TriangulationDescription
          * This done by the reduce() function.
          */
         void
-        merge(const DescriptionTemp<dim, spacedim> &other)
+        merge(const DescriptionTemp<dim, spacedim> &other,
+              const bool                            vertices_have_unique_ids)
         {
           this->cell_infos.resize(
             std::max(other.cell_infos.size(), this->cell_infos.size()));
 
-          this->coarse_cells.insert(this->coarse_cells.end(),
-                                    other.coarse_cells.begin(),
-                                    other.coarse_cells.end());
-          this->coarse_cell_vertices.insert(this->coarse_cell_vertices.end(),
-                                            other.coarse_cell_vertices.begin(),
-                                            other.coarse_cell_vertices.end());
+          if (vertices_have_unique_ids == false)
+            {
+              const auto comp = [](const auto &a, const auto &b) {
+                const double tolerance = 1e-10;
+
+                if (a.distance(b) < tolerance)
+                  return false;
+
+                for (unsigned int i = 0; i < spacedim; ++i)
+                  if (std::abs(a[i] - b[i]) > tolerance)
+                    return a[i] < b[i];
+
+                return false;
+              };
+
+              std::map<Point<spacedim>, unsigned int, decltype(comp)> map(comp);
+              std::map<unsigned int, unsigned int>                    map_i;
+
+              for (unsigned int i = 0; i < this->coarse_cell_vertices.size();
+                   ++i)
+                map[coarse_cell_vertices[i].second] = i;
+
+              unsigned int counter = coarse_cell_vertices.size();
+
+              for (const auto p : other.coarse_cell_vertices)
+                if (map.find(p.second) == map.end())
+                  {
+                    this->coarse_cell_vertices.emplace_back(counter, p.second);
+                    map[p.second] = map_i[p.first] = counter++;
+                  }
+                else
+                  map_i[p.first] = map[p.second];
+
+              for (auto cell : other.coarse_cells)
+                {
+                  for (auto &v : cell.vertices)
+                    v = map_i[v];
+                }
+
+              this->coarse_cells.insert(this->coarse_cells.end(),
+                                        other.coarse_cells.begin(),
+                                        other.coarse_cells.end());
+            }
+          else
+            {
+              this->coarse_cells.insert(this->coarse_cells.end(),
+                                        other.coarse_cells.begin(),
+                                        other.coarse_cells.end());
+              this->coarse_cell_vertices.insert(
+                this->coarse_cell_vertices.end(),
+                other.coarse_cell_vertices.begin(),
+                other.coarse_cell_vertices.end());
+            }
+
           this->coarse_cell_index_to_coarse_cell_id.insert(
             this->coarse_cell_index_to_coarse_cell_id.end(),
             other.coarse_cell_index_to_coarse_cell_id.begin(),
@@ -1025,9 +1077,13 @@ namespace TriangulationDescription
       // collect description from all processes that used to own locally-owned
       // active cells of this process in a single description
       DescriptionTemp<dim, spacedim> description_merged;
-      description_merged.collect(relevant_processes,
-                                 descriptions_per_rank,
-                                 partition.get_mpi_communicator());
+      description_merged.collect(
+        relevant_processes,
+        descriptions_per_rank,
+        partition.get_mpi_communicator(),
+        dynamic_cast<
+          const parallel::fullydistributed::Triangulation<dim, spacedim> *>(
+          &tria) != nullptr);
 
       // remove redundant entries
       description_merged.reduce();

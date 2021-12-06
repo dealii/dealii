@@ -46,7 +46,7 @@ namespace RepartitioningPolicyTools
    * See the description of RepartitioningPolicyTools for more information.
    */
   template <int dim, int spacedim = dim>
-  class Base
+  class Base : public Subscriptor
   {
   public:
     /**

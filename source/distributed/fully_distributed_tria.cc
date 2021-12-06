@@ -18,6 +18,7 @@
 #include <deal.II/base/mpi.h>
 
 #include <deal.II/distributed/fully_distributed_tria.h>
+#include <deal.II/distributed/repartitioning_policy_tools.h>
 
 #include <deal.II/grid/grid_tools.h>
 
@@ -306,6 +307,37 @@ namespace parallel
     {
       this->partitioner = partitioner;
       this->settings    = settings;
+    }
+
+
+
+    template <int dim, int spacedim>
+    void
+    Triangulation<dim, spacedim>::set_partitioner(
+      const RepartitioningPolicyTools::Base<dim, spacedim> &partitioner,
+      const TriangulationDescription::Settings &            settings)
+    {
+      this->partitioner_distributed = &partitioner;
+      this->settings                = settings;
+    }
+
+
+
+    template <int dim, int spacedim>
+    void
+    Triangulation<dim, spacedim>::repartition()
+    {
+      this->signals.pre_distributed_repartition();
+
+      const auto construction_data = TriangulationDescription::Utilities::
+        create_description_from_triangulation(
+          *this,
+          this->partitioner_distributed->partition(*this),
+          this->settings);
+
+      this->create_triangulation(construction_data);
+
+      this->signals.post_distributed_repartition();
     }
 
 
