@@ -34,6 +34,7 @@
 
 #include <deal.II/matrix_free/face_info.h>
 #include <deal.II/matrix_free/helper_functions.h>
+#include <deal.II/matrix_free/mapping_info_storage.h>
 
 #include <memory>
 
@@ -45,285 +46,6 @@ namespace internal
 {
   namespace MatrixFreeFunctions
   {
-    /**
-     * An enum to identify various types of cells and faces. The most general
-     * type is what we typically compute in the FEValues context but for many
-     * geometries we can save significant storage.
-     *
-     * @ingroup matrixfree
-     */
-    enum GeometryType : unsigned char
-    {
-      /**
-       * The cell or face is Cartesian.
-       */
-      cartesian = 0,
-
-      /**
-       * The cell or face can be described with an affine mapping.
-       */
-      affine = 1,
-
-      /**
-       * The face is flat, i.e., the normal factor on a face is the same on
-       * all quadrature points. This type is not assigned for cells.
-       */
-      flat_faces = 2,
-
-      /**
-       * There is no special information available for compressing the
-       * representation of the object under consideration.
-       */
-      general = 3
-    };
-
-
-
-    /**
-     * Definition of a structure that stores all cached data related to the
-     * evaluated geometry from the mapping. In order to support hp-adaptivity
-     * and compressed storage (in particular for Jacobians, JxW values, and
-     * normals), storage length can be different for different rows. Thus, it
-     * allows to jump at the data of individual rows similar to compressed row
-     * storage in sparse matrices. We have two different start indices for
-     * fields with different sizes. The first category of offsets are the
-     * indices for Jacobians of the transformation from unit to real cell (we
-     * store the inverse Jacobian), second derivatives, JxW values, and normal
-     * vectors. We keep separate arrays for all these data structures because
-     * a user code might access only some of them. In such a case, one array
-     * will be gone through in a contiguous order with access to all entries,
-     * which makes it easy for the processor to prefetch data. Having all data
-     * in a single array would require some strides in the access pattern,
-     * which is much more complicated for the processor to predict (and indeed
-     * leads to prefetching of data that does not get used on Intel processors
-     * such as BroadwellEP).
-     *
-     * The second category of indices are the offsets for the quadrature
-     * points. Quadrature points can be compressed less than the other fields
-     * and thus need longer fields. Quadrature point indices are often used in
-     * other contexts such as evaluation of right hand sides.
-     *
-     * The third component is a descriptor of data from the unit cells, called
-     * QuadratureDescriptor, which contains the quadrature weights and
-     * permutations of how to go through quadrature points in case of face
-     * data. The latter comes in a vector for the support of hp-adaptivity,
-     * with several data fields for the individual quadrature formulas.
-     *
-     * @ingroup matrixfree
-     */
-    template <int structdim,
-              int spacedim,
-              typename Number,
-              typename VectorizedArrayType>
-    struct MappingInfoStorage
-    {
-      static_assert(
-        std::is_same<Number, typename VectorizedArrayType::value_type>::value,
-        "Type of Number and of VectorizedArrayType do not match.");
-
-      struct QuadratureDescriptor
-      {
-        /**
-         * Constructor. Does nothing.
-         */
-        QuadratureDescriptor();
-
-        /**
-         * Set up the lengths in the various members of this struct.
-         */
-        template <int dim_q>
-        void
-        initialize(const Quadrature<dim_q> &quadrature,
-                   const UpdateFlags update_flags_inner_faces = update_default);
-
-        /**
-         * Set up the lengths in the various members of this struct.
-         */
-        void
-        initialize(const Quadrature<1> &quadrature_1d,
-                   const UpdateFlags update_flags_inner_faces = update_default);
-
-        /**
-         * Returns the memory consumption in bytes.
-         */
-        std::size_t
-        memory_consumption() const;
-
-        /**
-         * Number of quadrature points applied on the given cell or face.
-         */
-        unsigned int n_q_points;
-
-        /**
-         * Original one-dimensional quadrature formula applied on the given
-         * cell or face.
-         */
-        Quadrature<1> quadrature_1d;
-
-        /**
-         * Quadrature formula applied on the given cell or face.
-         */
-        Quadrature<structdim> quadrature;
-
-        /**
-         * Quadrature weights separated by dimension for use in specific
-         * situations.
-         */
-        std::array<AlignedVector<Number>, structdim> tensor_quadrature_weights;
-
-        /**
-         * A cached vector of quadrature weights in the given number format
-         * (non-vectorized, as it is cheap to broadcast the value to all lanes
-         * when it is used in a vectorized context).
-         */
-        AlignedVector<Number> quadrature_weights;
-
-        /**
-         * For quadrature on faces, the evaluation of basis functions is not
-         * in the correct order if a face is not in the standard orientation
-         * to a given element. This data structure is used to re-order the
-         * data evaluated on quadrature points to represent the correct order.
-         */
-        dealii::Table<2, unsigned int> face_orientations;
-      };
-
-      /**
-       * A class describing the layout of the sections in the @p data_storage
-       * field and also includes some data that depends on the number of
-       * quadrature points in the hp-context such as the inner quadrature
-       * formula and re-indexing for faces that are not in the standard
-       * orientation.
-       */
-      std::vector<QuadratureDescriptor> descriptor;
-
-      /**
-       * Collection of quadrature formulae applied on the given face.
-       *
-       * @note Only filled for faces, since faces might be quadrilateral or
-       *   triangle shaped.
-       */
-      std::vector<dealii::hp::QCollection<structdim>> q_collection;
-
-      /**
-       * Stores the index offset into the arrays @p jxw_values, @p jacobians,
-       * @p normal_vectors and the second derivatives. Note that affine cells
-       * have shorter fields of length 1, where the others have lengths equal
-       * to the number of quadrature points of the given cell.
-       */
-      AlignedVector<unsigned int> data_index_offsets;
-
-      /**
-       * The storage of the Jacobian determinant (times the quadrature weight
-       * in case the transformation is non-affine) on quadrature
-       * points.
-       *
-       * Indexed by @p data_index_offsets.
-       */
-      AlignedVector<VectorizedArrayType> JxW_values;
-
-      /**
-       * Stores the normal vectors.
-       *
-       * Indexed by @p data_index_offsets.
-       */
-      AlignedVector<Tensor<1, spacedim, VectorizedArrayType>> normal_vectors;
-
-      /**
-       * The storage of covariant transformation on quadrature points, i.e.,
-       * the inverse and transposed Jacobians of the transformation from the
-       * unit to the real cell.
-       *
-       * Indexed by @p data_index_offsets.
-       *
-       * Contains two fields for access from both sides for interior faces,
-       * but the default case (cell integrals or boundary integrals) only
-       * fills the zeroth component and ignores the first one.
-       */
-      std::array<AlignedVector<Tensor<2, spacedim, VectorizedArrayType>>, 2>
-        jacobians;
-
-      /**
-       * The storage of the gradients of the inverse Jacobian
-       * transformation. Because of symmetry, only the upper diagonal and
-       * diagonal part are needed. The first index runs through the
-       * derivatives, starting with the diagonal and then continuing row-wise,
-       * i.e., $\partial^2/\partial x_1 \partial x_2$ first, then
-       * $\partial^2/\partial x_1 \partial x_3$, and so on. The second index
-       * is the spatial coordinate.
-       *
-       * Indexed by @p data_index_offsets.
-       *
-       * Contains two fields for access from both sides for interior faces,
-       * but the default case (cell integrals or boundary integrals) only
-       * fills the zeroth component and ignores the first one.
-       */
-      std::array<
-        AlignedVector<Tensor<1,
-                             spacedim *(spacedim + 1) / 2,
-                             Tensor<1, spacedim, VectorizedArrayType>>>,
-        2>
-        jacobian_gradients;
-
-      /**
-       * Stores the Jacobian transformations times the normal vector (this
-       * represents a shortcut that is accessed often and can thus get higher
-       * performance).
-       *
-       * Indexed by @p data_index_offsets.
-       */
-      std::array<AlignedVector<Tensor<1, spacedim, VectorizedArrayType>>, 2>
-        normals_times_jacobians;
-
-      /**
-       * Stores the index offset of a particular cell into the quadrature
-       * points array in real coordinates. Note that Cartesian cells have
-       * shorter fields (length is @p n_q_points_1d) than non-Cartesian cells
-       * (length is @p n_q_points) or faces.
-       */
-      AlignedVector<unsigned int> quadrature_point_offsets;
-
-      /**
-       * Stores the quadrature points in real coordinates, including a
-       * compression scheme for Cartesian cells where we do not need to store
-       * the full data on all points.
-       *
-       * Indexed by @p quadrature_point_offsets.
-       */
-      AlignedVector<Point<spacedim, VectorizedArrayType>> quadrature_points;
-
-      /**
-       * Clears all data fields except the descriptor vector.
-       */
-      void
-      clear_data_fields();
-
-      /**
-       * Returns the quadrature index for a given number of quadrature
-       * points. If not in hp-mode or if the index is not found, this
-       * function always returns index 0. Hence, this function does not
-       * check whether the given degree is actually present.
-       */
-      unsigned int
-      quad_index_from_n_q_points(const unsigned int n_q_points) const;
-
-      /**
-       * Prints a detailed summary of memory consumption in the different
-       * structures of this class to the given output stream.
-       */
-      template <typename StreamType>
-      void
-      print_memory_consumption(StreamType &    out,
-                               const TaskInfo &task_info) const;
-
-      /**
-       * Returns the memory consumption in bytes.
-       */
-      std::size_t
-      memory_consumption() const;
-    };
-
-
-
     /**
      * The class that stores all geometry-dependent data related with cell
      * interiors for use in the matrix-free class.
@@ -555,12 +277,12 @@ namespace internal
     template <int dim, typename Number, typename VectorizedArrayType>
     struct MappingInfoCellsOrFaces<dim, Number, false, VectorizedArrayType>
     {
-      static const MappingInfoStorage<dim, dim, Number, VectorizedArrayType> *
+      static const MappingInfoStorage<dim, dim, Number, VectorizedArrayType> &
       get(const MappingInfo<dim, Number, VectorizedArrayType> &mapping_info,
           const unsigned int                                   quad_no)
       {
         AssertIndexRange(quad_no, mapping_info.cell_data.size());
-        return &mapping_info.cell_data[quad_no];
+        return mapping_info.cell_data[quad_no];
       }
     };
 
@@ -568,12 +290,12 @@ namespace internal
     struct MappingInfoCellsOrFaces<dim, Number, true, VectorizedArrayType>
     {
       static const MappingInfoStorage<dim - 1, dim, Number, VectorizedArrayType>
-        *
+        &
         get(const MappingInfo<dim, Number, VectorizedArrayType> &mapping_info,
             const unsigned int                                   quad_no)
       {
         AssertIndexRange(quad_no, mapping_info.face_data.size());
-        return &mapping_info.face_data[quad_no];
+        return mapping_info.face_data[quad_no];
       }
     };
 
@@ -650,22 +372,6 @@ namespace internal
 
 
     /* ------------------- inline functions ----------------------------- */
-
-    template <int structdim,
-              int spacedim,
-              typename Number,
-              typename VectorizedArrayType>
-    inline unsigned int
-    MappingInfoStorage<structdim, spacedim, Number, VectorizedArrayType>::
-      quad_index_from_n_q_points(const unsigned int n_q_points) const
-    {
-      for (unsigned int i = 0; i < descriptor.size(); ++i)
-        if (n_q_points == descriptor[i].n_q_points)
-          return i;
-      return 0;
-    }
-
-
 
     template <int dim, typename Number, typename VectorizedArrayType>
     inline GeometryType

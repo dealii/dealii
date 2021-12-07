@@ -31,7 +31,6 @@
 
 #include <deal.II/matrix_free/face_info.h>
 #include <deal.II/matrix_free/hanging_nodes_internal.h>
-#include <deal.II/matrix_free/mapping_info.h>
 #include <deal.II/matrix_free/shape_info.h>
 #include <deal.II/matrix_free/task_info.h>
 #include <deal.II/matrix_free/vector_data_exchange.h>
@@ -49,7 +48,10 @@ namespace internal
   {
     template <int dim>
     class HangingNodes;
-  }
+
+    template <typename, typename>
+    struct FPArrayComparator;
+  } // namespace MatrixFreeFunctions
 } // namespace internal
 #endif
 
@@ -86,7 +88,7 @@ namespace internal
       std::pair<std::vector<Number>, types::global_dof_index> next_constraint;
       std::map<std::vector<Number>,
                types::global_dof_index,
-               FPArrayComparator<Number>>
+               FPArrayComparator<Number, VectorizedArray<Number>>>
         constraints;
     };
 

@@ -414,7 +414,8 @@ inline void
 ArrayView<ElementType, MemorySpaceType>::reinit(value_type *starting_element,
                                                 const std::size_t n_elements)
 {
-  *this = ArrayView(starting_element, n_elements);
+  this->starting_element = starting_element;
+  this->n_elements       = n_elements;
 }
 
 

@@ -23,7 +23,7 @@
 #include <deal.II/matrix_free/evaluation_kernels_hanging_nodes.h>
 #include <deal.II/matrix_free/evaluation_template_factory.h>
 #include <deal.II/matrix_free/evaluation_template_factory_internal.h>
-#include <deal.II/matrix_free/fe_evaluation.h>
+#include <deal.II/matrix_free/fe_evaluation_base_data.h>
 
 DEAL_II_NAMESPACE_OPEN
 

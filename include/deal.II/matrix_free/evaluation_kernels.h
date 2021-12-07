@@ -26,6 +26,7 @@
 
 #include <deal.II/matrix_free/dof_info.h>
 #include <deal.II/matrix_free/evaluation_flags.h>
+#include <deal.II/matrix_free/fe_evaluation_base_data.h>
 #include <deal.II/matrix_free/hanging_nodes_internal.h>
 #include <deal.II/matrix_free/shape_info.h>
 #include <deal.II/matrix_free/tensor_product_kernels.h>
@@ -33,12 +34,6 @@
 
 
 DEAL_II_NAMESPACE_OPEN
-
-
-// forward declaration
-template <int, typename, bool, typename>
-class FEEvaluationBaseData;
-
 
 
 namespace internal
