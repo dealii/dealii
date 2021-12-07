@@ -163,9 +163,6 @@ namespace TriangulationDescription
               const auto comp = [](const auto &a, const auto &b) {
                 const double tolerance = 1e-10;
 
-                if (a.distance(b) < tolerance)
-                  return false;
-
                 for (unsigned int i = 0; i < spacedim; ++i)
                   if (std::abs(a[i] - b[i]) > tolerance)
                     return a[i] < b[i];
@@ -191,15 +188,17 @@ namespace TriangulationDescription
                 else
                   map_i[p.first] = map[p.second];
 
-              for (auto cell : other.coarse_cells)
+              auto other_coarse_cells_copy = other.coarse_cells;
+
+              for (auto &cell : other_coarse_cells_copy)
                 {
                   for (auto &v : cell.vertices)
                     v = map_i[v];
                 }
 
               this->coarse_cells.insert(this->coarse_cells.end(),
-                                        other.coarse_cells.begin(),
-                                        other.coarse_cells.end());
+                                        other_coarse_cells_copy.begin(),
+                                        other_coarse_cells_copy.end());
             }
           else
             {
@@ -280,7 +279,13 @@ namespace TriangulationDescription
               std::unique(this->coarse_cell_vertices.begin(),
                           this->coarse_cell_vertices.end(),
                           [](const auto &a, const auto &b) {
-                            return a.first == b.first;
+                            if (a.first == b.first)
+                              {
+                                Assert(a.second.distance(b.second) < 10e-8,
+                                       ExcInternalError());
+                                return true;
+                              }
+                            return false;
                           }),
               this->coarse_cell_vertices.end());
           }
@@ -1083,7 +1088,7 @@ namespace TriangulationDescription
         partition.get_mpi_communicator(),
         dynamic_cast<
           const parallel::fullydistributed::Triangulation<dim, spacedim> *>(
-          &tria) != nullptr);
+          &tria) == nullptr);
 
       // remove redundant entries
       description_merged.reduce();

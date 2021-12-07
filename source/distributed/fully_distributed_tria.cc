@@ -335,6 +335,10 @@ namespace parallel
           this->partitioner_distributed->partition(*this),
           this->settings);
 
+      this->clear();
+      this->coarse_cell_id_to_coarse_cell_index_vector.clear();
+      this->coarse_cell_index_to_coarse_cell_id_vector.clear();
+
       this->create_triangulation(construction_data);
 
       this->signals.post_distributed_repartition();
