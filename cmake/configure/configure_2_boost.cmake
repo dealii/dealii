@@ -146,6 +146,25 @@ MACRO(FEATURE_BOOST_FIND_EXTERNAL var)
   IF(BOOST_FOUND)
     SET(${var} TRUE)
 
+    #
+    # Set BOOST_DIR to something meaningful if empty
+    #
+    IF("${BOOST_DIR}" STREQUAL "")
+      SET(BOOST_DIR "<system location>")
+    ENDIF()
+
+    IF(BOOST_VERSION VERSION_EQUAL 1.77)
+      MESSAGE(STATUS "Could not find a sufficient Boost installation: "
+        "deal.II is not compatible with Boost version 1.77."
+        )
+      SET(BOOST_ADDITIONAL_ERROR_STRING
+        ${BOOST_ADDITIONAL_ERROR_STRING}
+        "The Boost installation (found at \"${BOOST_DIR}\")\n"
+        "with version ${BOOST_VERSION} is not compatible with deal.II.\n\n"
+        )
+      SET(${var} FALSE)
+    ENDIF()
+
     IF(DEAL_II_WITH_ZLIB)
       #
       # Test that Boost.Iostreams is usable.
