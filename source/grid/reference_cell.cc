@@ -458,6 +458,91 @@ ReferenceCell::vtk_lagrange_type() const
 
 
 
+unsigned int
+ReferenceCell::gmsh_element_type() const
+{
+  /*
+    From the GMSH documentation:
+
+    elm-type
+    defines the geometrical type of the n-th element:
+
+    1
+    Line (2 nodes).
+
+    2
+    Triangle (3 nodes).
+
+    3
+    Quadrangle (4 nodes).
+
+    4
+    Tetrahedron (4 nodes).
+
+    5
+    Hexahedron (8 nodes).
+
+    6
+    Prism (6 nodes).
+
+    7
+    Pyramid (5 nodes).
+
+    8
+    Second order line (3 nodes: 2 associated with the vertices and 1 with the
+    edge).
+
+    9
+    Second order triangle (6 nodes: 3 associated with the vertices and 3 with
+    the edges).
+
+    10 Second order quadrangle (9 nodes: 4 associated with the
+    vertices, 4 with the edges and 1 with the face).
+
+    11 Second order tetrahedron (10 nodes: 4 associated with the vertices and 6
+    with the edges).
+
+    12 Second order hexahedron (27 nodes: 8 associated with the vertices, 12
+    with the edges, 6 with the faces and 1 with the volume).
+
+    13 Second order prism (18 nodes: 6 associated with the vertices, 9 with the
+    edges and 3 with the quadrangular faces).
+
+    14 Second order pyramid (14 nodes: 5 associated with the vertices, 8 with
+    the edges and 1 with the quadrangular face).
+
+    15 Point (1 node).
+  */
+
+  if (*this == ReferenceCells::Vertex)
+    return 15;
+  else if (*this == ReferenceCells::Line)
+    return 1;
+  else if (*this == ReferenceCells::Triangle)
+    return 2;
+  else if (*this == ReferenceCells::Quadrilateral)
+    return 3;
+  else if (*this == ReferenceCells::Tetrahedron)
+    return 4;
+  else if (*this == ReferenceCells::Pyramid)
+    return 7;
+  else if (*this == ReferenceCells::Wedge)
+    return 6;
+  else if (*this == ReferenceCells::Hexahedron)
+    return 5;
+  else if (*this == ReferenceCells::Invalid)
+    {
+      Assert(false, ExcNotImplemented());
+      return numbers::invalid_unsigned_int;
+    }
+
+  Assert(false, ExcNotImplemented());
+
+  return numbers::invalid_unsigned_int;
+}
+
+
+
 std::ostream &
 operator<<(std::ostream &out, const ReferenceCell &reference_cell)
 {
