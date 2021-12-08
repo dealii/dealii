@@ -3416,6 +3416,21 @@ public:
   bool
   all_reference_cells_are_hyper_cube() const;
 
+  /**
+   * Indicate if the triangulation only consists of simplex-like cells, i.e.,
+   * lines, triangles, or tetrahedra.
+   */
+  bool
+  all_reference_cells_are_simplex() const;
+
+  /**
+   * Indicate if the triangulation consists of different cell types (mix of
+   * simplices, hypercubes, ...) or different face types, as in the case
+   * of pyramids or wedges..
+   */
+  bool
+  is_mixed_mesh() const;
+
 #ifdef DOXYGEN
   /**
    * Write and read the data of this object from a stream for the purpose
