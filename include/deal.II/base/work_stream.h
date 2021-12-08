@@ -350,7 +350,7 @@ namespace WorkStream
          * Create an item and return a pointer to it.
          */
         ItemType *
-        operator()()
+        get_item()
         {
           // find first unused item. we know that there must be one
           // because we have set the maximal number of tokens in flight
@@ -492,7 +492,7 @@ namespace WorkStream
                                         sample_copy_data);
         auto tbb_item_stream_filter = tbb::make_filter<void, ItemType *>(
           tbb::filter::serial, [&](tbb::flow_control &fc) -> ItemType * {
-            if (const auto item = iterator_range_to_item_stream())
+            if (const auto item = iterator_range_to_item_stream.get_item())
               return item;
             else
               {
