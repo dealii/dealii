@@ -328,18 +328,16 @@ namespace WorkStream
           , chunk_size(chunk_size)
         {
           // initialize the elements of the ring buffer
-          for (unsigned int element = 0; element < item_buffer.size();
-               ++element)
+          for (auto &item : item_buffer)
             {
-              Assert(item_buffer[element].n_items == 0, ExcInternalError());
+              Assert(item.n_items == 0, ExcInternalError());
 
-              item_buffer[element].work_items.resize(
-                chunk_size, remaining_iterator_range.second);
-              item_buffer[element].scratch_data        = &thread_local_scratch;
-              item_buffer[element].sample_scratch_data = &sample_scratch_data;
-              item_buffer[element].copy_datas.resize(chunk_size,
-                                                     sample_copy_data);
-              item_buffer[element].currently_in_use = false;
+              item.work_items.resize(chunk_size,
+                                     remaining_iterator_range.second);
+              item.scratch_data        = &thread_local_scratch;
+              item.sample_scratch_data = &sample_scratch_data;
+              item.copy_datas.resize(chunk_size, sample_copy_data);
+              item.currently_in_use = false;
             }
         }
 
@@ -531,19 +529,14 @@ namespace WorkStream
             // not have to lock the following section
             ScratchData *scratch_data = nullptr;
             {
-              typename ItemType::ScratchDataList &scratch_data_list =
-                current_item->scratch_data->get();
-
               // see if there is an unused object. if so, grab it and mark
               // it as used
-              for (typename ItemType::ScratchDataList::iterator p =
-                     scratch_data_list.begin();
-                   p != scratch_data_list.end();
-                   ++p)
+              for (auto &p : current_item->scratch_data->get())
                 if (p->currently_in_use == false)
                   {
-                    scratch_data        = p->scratch_data.get();
-                    p->currently_in_use = true;
+                    scratch_data       = p.scratch_data.get();
+                    p.currently_in_use = true;
+
                     break;
                   }
 
@@ -552,10 +545,7 @@ namespace WorkStream
                 {
                   scratch_data =
                     new ScratchData(*current_item->sample_scratch_data);
-
-                  typename ItemType::ScratchDataList::value_type
-                    new_scratch_object(scratch_data, true);
-                  scratch_data_list.push_back(std::move(new_scratch_object));
+                  current_item->scratch_data->get().emplace_back(scratch_data, true);
                 }
             }
 
@@ -585,22 +575,14 @@ namespace WorkStream
             // finally mark the scratch object as unused again. as above, there
             // is no need to lock anything here since the object we work on
             // is thread-local
-            {
-              typename ItemType::ScratchDataList &scratch_data_list =
-                current_item->scratch_data->get();
+            for (auto &p : current_item->scratch_data->get())
+              if (p.scratch_data.get() == scratch_data)
+                {
+                  Assert(p.currently_in_use == true, ExcInternalError());
+                  p.currently_in_use = false;
 
-              for (typename ItemType::ScratchDataList::iterator p =
-                     scratch_data_list.begin();
-                   p != scratch_data_list.end();
-                   ++p)
-                if (p->scratch_data.get() == scratch_data)
-                  {
-                    Assert(p->currently_in_use == true, ExcInternalError());
-                    p->currently_in_use = false;
-
-                    break;
-                  }
-            }
+                  break;
+                }
 
             // if there is no copier, mark current item as usable again
             if (copier_exists == false)
