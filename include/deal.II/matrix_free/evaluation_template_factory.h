@@ -199,33 +199,14 @@ namespace internal
             typename VectorizedArrayType = VectorizedArray<Number>>
   struct FEEvaluationHangingNodesFactory
   {
-    /**
-     * For cells.
-     */
     static void
     apply(const unsigned int n_components,
           const unsigned int fe_degree,
-          const FEEvaluationBaseData<dim, Number, false, VectorizedArrayType>
-            &                                            fe_eval,
-          const bool                                     transpose,
+          const MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> &shape_info,
+          const bool                                                 transpose,
           const std::array<MatrixFreeFunctions::ConstraintKinds,
-                           VectorizedArrayType::size()> &c_mask,
-          VectorizedArrayType *                          values);
-
-    /**
-     * For faces.
-     *
-     * @note Not implemented.
-     */
-    static void
-    apply(const unsigned int n_components,
-          const unsigned int fe_degree,
-          const FEEvaluationBaseData<dim, Number, true, VectorizedArrayType>
-            &                                            fe_eval,
-          const bool                                     transpose,
-          const std::array<MatrixFreeFunctions::ConstraintKinds,
-                           VectorizedArrayType::size()> &c_mask,
-          VectorizedArrayType *                          values);
+                           VectorizedArrayType::size()> &            c_mask,
+          VectorizedArrayType *                                      values);
   };
 
 } // end of namespace internal

@@ -23,7 +23,7 @@
 #include <deal.II/matrix_free/evaluation_kernels_hanging_nodes.h>
 #include <deal.II/matrix_free/evaluation_template_factory.h>
 #include <deal.II/matrix_free/evaluation_template_factory_internal.h>
-#include <deal.II/matrix_free/fe_evaluation_base_data.h>
+#include <deal.II/matrix_free/shape_info.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -32,38 +32,18 @@ namespace internal
   template <int dim, typename Number, typename VectorizedArrayType>
   void
   FEEvaluationHangingNodesFactory<dim, Number, VectorizedArrayType>::apply(
-    const unsigned int n_components,
-    const unsigned int fe_degree,
-    const FEEvaluationBaseData<dim, Number, false, VectorizedArrayType>
-      &                                            fe_eval,
-    const bool                                     transpose,
+    const unsigned int                                         n_components,
+    const unsigned int                                         fe_degree,
+    const MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> &shape_info,
+    const bool                                                 transpose,
     const std::array<MatrixFreeFunctions::ConstraintKinds,
-                     VectorizedArrayType::size()> &c_mask,
-    VectorizedArrayType *                          values)
+                     VectorizedArrayType::size()> &            c_mask,
+    VectorizedArrayType *                                      values)
   {
     instantiation_helper_degree_run<
       1,
-      FEEvaluationImplHangingNodes<dim, VectorizedArrayType, false>>(
-      fe_degree, n_components, fe_eval, transpose, c_mask, values);
-  }
-
-
-
-  template <int dim, typename Number, typename VectorizedArrayType>
-  void
-  FEEvaluationHangingNodesFactory<dim, Number, VectorizedArrayType>::apply(
-    const unsigned int n_components,
-    const unsigned int fe_degree,
-    const FEEvaluationBaseData<dim, Number, true, VectorizedArrayType> &fe_eval,
-    const bool                                     transpose,
-    const std::array<MatrixFreeFunctions::ConstraintKinds,
-                     VectorizedArrayType::size()> &c_mask,
-    VectorizedArrayType *                          values)
-  {
-    instantiation_helper_degree_run<
-      1,
-      FEEvaluationImplHangingNodes<dim, VectorizedArrayType, true>>(
-      fe_degree, n_components, fe_eval, transpose, c_mask, values);
+      FEEvaluationImplHangingNodes<dim, VectorizedArrayType>>(
+      fe_degree, n_components, shape_info, transpose, c_mask, values);
   }
 } // end of namespace internal
 

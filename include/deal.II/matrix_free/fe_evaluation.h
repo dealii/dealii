@@ -4495,7 +4495,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   internal::FEEvaluationHangingNodesFactory<dim, Number, VectorizedArrayType>::
     apply(n_components,
           this->data->data.front().fe_degree,
-          *this,
+          this->get_shape_info(),
           transpose,
           constraint_mask,
           this->values_dofs);
