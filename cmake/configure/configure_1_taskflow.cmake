@@ -18,6 +18,11 @@
 # library:
 #
 
+#
+# Disallow the default detection of taskflow for the time being to avoid
+# unpleasant surprises on user side.
+#
+SET(DEAL_II_WITH_TASKFLOW OFF CACHE BOOL "")
 
 MACRO(FEATURE_TASKFLOW_FIND_EXTERNAL var)
   FIND_PACKAGE(TASKFLOW)
