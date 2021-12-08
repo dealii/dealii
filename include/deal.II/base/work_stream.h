@@ -234,23 +234,23 @@ namespace WorkStream
 
           /**
            * A list of iterators that need to be worked on. Only the first
-           * n_items are relevant.
+           * n_iterators are relevant.
            */
-          std::vector<Iterator> work_items;
+          std::vector<Iterator> iterators;
 
           /**
            * The CopyData objects that the Worker part of the pipeline fills
-           * for each work item. Again, only the first n_items elements are
+           * for each work item. Again, only the first n_iterators elements are
            * what we care about.
            */
           std::vector<CopyData> copy_datas;
 
           /**
-           * Number of items identified by the work_items array that the
+           * Number of items identified by the iterators array that the
            * Worker and Copier pipeline stage need to work on. The maximum
            * value of this variable will be chunk_size.
            */
-          unsigned int n_items;
+          unsigned int n_iterators;
 
           /**
            * Pointer to a thread local variable identifying the scratch data
@@ -303,7 +303,7 @@ namespace WorkStream
            * default constructor itself.
            */
           ItemType()
-            : n_items(0)
+            : n_iterators(0)
             , scratch_data(nullptr)
             , sample_scratch_data(nullptr)
             , currently_in_use(false)
@@ -330,10 +330,10 @@ namespace WorkStream
           // initialize the elements of the ring buffer
           for (auto &item : item_buffer)
             {
-              Assert(item.n_items == 0, ExcInternalError());
+              Assert(item.n_iterators == 0, ExcInternalError());
 
-              item.work_items.resize(chunk_size,
-                                     remaining_iterator_range.second);
+              item.iterators.resize(chunk_size,
+                                    remaining_iterator_range.second);
               item.scratch_data        = &thread_local_scratch;
               item.sample_scratch_data = &sample_scratch_data;
               item.copy_datas.resize(chunk_size, sample_copy_data);
@@ -376,19 +376,19 @@ namespace WorkStream
           // initialize the next item. it may
           // consist of at most chunk_size
           // elements
-          current_item->n_items = 0;
+          current_item->n_iterators = 0;
           while ((remaining_iterator_range.first !=
                   remaining_iterator_range.second) &&
-                 (current_item->n_items < chunk_size))
+                 (current_item->n_iterators < chunk_size))
             {
-              current_item->work_items[current_item->n_items] =
+              current_item->iterators[current_item->n_iterators] =
                 remaining_iterator_range.first;
 
               ++remaining_iterator_range.first;
-              ++current_item->n_items;
+              ++current_item->n_iterators;
             }
 
-          if (current_item->n_items == 0)
+          if (current_item->n_iterators == 0)
             // there were no items
             // left. terminate the pipeline
             return nullptr;
@@ -532,7 +532,7 @@ namespace WorkStream
               // see if there is an unused object. if so, grab it and mark
               // it as used
               for (auto &p : current_item->scratch_data->get())
-                if (p->currently_in_use == false)
+                if (p.currently_in_use == false)
                   {
                     scratch_data       = p.scratch_data.get();
                     p.currently_in_use = true;
@@ -545,7 +545,8 @@ namespace WorkStream
                 {
                   scratch_data =
                     new ScratchData(*current_item->sample_scratch_data);
-                  current_item->scratch_data->get().emplace_back(scratch_data, true);
+                  current_item->scratch_data->get().emplace_back(scratch_data,
+                                                                 true);
                 }
             }
 
@@ -553,12 +554,12 @@ namespace WorkStream
             // were given. since these worker functions are called on separate
             // threads, nothing good can happen if they throw an exception and
             // we are best off catching it and showing an error message
-            for (unsigned int i = 0; i < current_item->n_items; ++i)
+            for (unsigned int i = 0; i < current_item->n_iterators; ++i)
               {
                 try
                   {
                     if (worker)
-                      worker(current_item->work_items[i],
+                      worker(current_item->iterators[i],
                              *scratch_data,
                              current_item->copy_datas[i]);
                   }
@@ -609,7 +610,7 @@ namespace WorkStream
                 // Initiate copying data. For the same reasons as in the worker
                 // class above, catch exceptions rather than letting them
                 // propagate into unknown territories:
-                for (unsigned int i = 0; i < current_item->n_items; ++i)
+                for (unsigned int i = 0; i < current_item->n_iterators; ++i)
                   {
                     try
                       {
