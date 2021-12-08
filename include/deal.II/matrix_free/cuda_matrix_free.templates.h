@@ -587,7 +587,7 @@ namespace CUDAWrappers
         local_cell + cells_per_block * (blockIdx.x + gridDim.x * blockIdx.y);
 
       Number *gq[dim];
-      for (int d = 0; d < dim; ++d)
+      for (unsigned int d = 0; d < dim; ++d)
         gq[d] = &gradients[d][local_cell * Functor::n_q_points];
 
       SharedData<dim, Number> shared_data(

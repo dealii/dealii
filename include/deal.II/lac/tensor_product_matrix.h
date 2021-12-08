@@ -670,7 +670,7 @@ TensorProductMatrixSymmetricSum<dim, Number, n_rows_1d>::reinit_impl(
   this->mass_matrix          = mass_matrices;
   this->derivative_matrix    = derivative_matrices;
 
-  for (int dir = 0; dir < dim; ++dir)
+  for (unsigned int dir = 0; dir < dim; ++dir)
     {
       Assert(n_rows_1d == -1 ||
                (n_rows_1d > 0 && static_cast<unsigned int>(n_rows_1d) ==
@@ -811,7 +811,7 @@ TensorProductMatrixSymmetricSum<dim, VectorizedArray<Number>, n_rows_1d>::
   eigenvectors_flat.resize(nm_flat_size_max);
   std::array<unsigned int, macro_size> offsets_nm;
   std::array<unsigned int, macro_size> offsets_n;
-  for (int dir = 0; dir < dim; ++dir)
+  for (unsigned int dir = 0; dir < dim; ++dir)
     {
       Assert(n_rows_1d == -1 ||
                (n_rows_1d > 0 && static_cast<unsigned int>(n_rows_1d) ==

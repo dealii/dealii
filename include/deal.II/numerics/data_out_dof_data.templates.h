@@ -942,6 +942,22 @@ namespace internal
 
         for (unsigned int b = 0; b < src.n_blocks(); ++b)
           {
+            Assert(src.block(b).locally_owned_elements().is_contiguous(),
+                   ExcMessage(
+                     "Using non-contiguous vector blocks is not currently "
+                     "supported by DataOut and related classes. The typical "
+                     "way you may end up with such vectors is if you order "
+                     "degrees of freedom via DoFRenumber::component_wise() "
+                     "but then group several vector components into one "
+                     "vector block -- for example, all 'dim' components "
+                     "of a velocity are grouped into the same vector block. "
+                     "If you do this, you don't want to renumber degrees "
+                     "of freedom based on vector component, but instead "
+                     "based on the 'blocks' you will later use for grouping "
+                     "things into vectors. Take a look at step-32 and step-55 "
+                     "and how they use the second argument of "
+                     "DoFRenumber::component_wise()."));
+
             dst.block(b).reinit(locally_owned_dofs_b[b],
                                 locally_relevant_dofs_b[b],
                                 dof_handler.get_communicator());

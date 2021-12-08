@@ -2286,8 +2286,8 @@ namespace GridTools
     Point<spacedim> distance;
 
     if (matrix.m() == spacedim)
-      for (int i = 0; i < spacedim; ++i)
-        for (int j = 0; j < spacedim; ++j)
+      for (unsigned int i = 0; i < spacedim; ++i)
+        for (unsigned int j = 0; j < spacedim; ++j)
           distance(i) += matrix(i, j) * point1(j);
     else
       distance = point1;

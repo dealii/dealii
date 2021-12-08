@@ -67,7 +67,7 @@ namespace internal
       increment_indices(unsigned int (&indices)[dim], const unsigned int dofs1d)
       {
         ++indices[0];
-        for (int d = 0; d < dim - 1; ++d)
+        for (unsigned int d = 0; d < dim - 1; ++d)
           if (indices[d] == dofs1d)
             {
               indices[d] = 0;

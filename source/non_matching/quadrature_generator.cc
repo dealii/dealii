@@ -273,7 +273,7 @@ namespace NonMatching
                 if (!min_lower_abs_grad)
                   {
                     min_lower_abs_grad.emplace();
-                    for (int d = 0; d < dim; ++d)
+                    for (unsigned int d = 0; d < dim; ++d)
                       {
                         (*min_lower_abs_grad)[d] =
                           lower_bound_on_abs(bounds.gradient[d]);
@@ -281,7 +281,7 @@ namespace NonMatching
                   }
                 else
                   {
-                    for (int d = 0; d < dim; ++d)
+                    for (unsigned int d = 0; d < dim; ++d)
                       {
                         (*min_lower_abs_grad)[d] =
                           std::min((*min_lower_abs_grad)[d],
@@ -945,7 +945,7 @@ namespace NonMatching
       {
         // Get the side lengths for each direction and sort them.
         std::array<std::pair<double, unsigned int>, dim> side_lengths;
-        for (int i = 0; i < dim; ++i)
+        for (unsigned int i = 0; i < dim; ++i)
           {
             side_lengths[i].first  = box.side_length(i);
             side_lengths[i].second = i;

@@ -140,7 +140,7 @@ namespace Functions
       , tolerance(tolerance)
       , max_iter(max_iter)
     {
-      for (int d = 0; d < dim; ++d)
+      for (unsigned int d = 0; d < dim; ++d)
         Assert(radii[d] > 0, ExcMessage("All radii must be positive."))
     }
 
@@ -171,7 +171,7 @@ namespace Functions
     Ellipsoid<dim>::evaluate_ellipsoid(const Point<dim> &point) const
     {
       double val = 0.0;
-      for (int d = 0; d < dim; ++d)
+      for (unsigned int d = 0; d < dim; ++d)
         val += std::pow((point[d] - center[d]) / radii[d], 2);
       return val - 1.0;
     }

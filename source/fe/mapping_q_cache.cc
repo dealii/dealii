@@ -268,7 +268,7 @@ MappingQCache<dim, spacedim>::initialize(
     tria,
     [&](const auto &, const auto &point) {
       Point<spacedim> new_point;
-      for (int c = 0; c < spacedim; ++c)
+      for (unsigned int c = 0; c < spacedim; ++c)
         new_point[c] = transformation_function.value(point, c);
       return new_point;
     },

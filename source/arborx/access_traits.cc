@@ -95,7 +95,7 @@ namespace ArborXWrappers
         auto boundary_points                  = bb[i].get_boundary_points();
         dealii::Point<dim, Number> min_corner = boundary_points.first;
         dealii::Point<dim, Number> max_corner = boundary_points.second;
-        for (int d = 0; d < dim; ++d)
+        for (unsigned int d = 0; d < dim; ++d)
           {
             min_corner_arborx[d] = static_cast<float>(min_corner[d]);
             max_corner_arborx[d] = static_cast<float>(max_corner[d]);
