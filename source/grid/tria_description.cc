@@ -158,8 +158,9 @@ namespace TriangulationDescription
           this->cell_infos.resize(
             std::max(other.cell_infos.size(), this->cell_infos.size()));
 
-          if (vertices_have_unique_ids == false)
+          if (vertices_have_unique_ids == false) // need to compare points
             {
+              // comparator of points
               const auto comp = [](const auto &a, const auto &b) {
                 const double tolerance = 1e-10;
 
@@ -170,31 +171,40 @@ namespace TriangulationDescription
                 return false;
               };
 
-              std::map<Point<spacedim>, unsigned int, decltype(comp)> map(comp);
-              std::map<unsigned int, unsigned int>                    map_i;
+              // map point to local vertex index
+              std::map<Point<spacedim>, unsigned int, decltype(comp)>
+                map_point_to_local_vertex_index(comp);
 
+              // ... initialize map with existing points
               for (unsigned int i = 0; i < this->coarse_cell_vertices.size();
                    ++i)
-                map[coarse_cell_vertices[i].second] = i;
+                map_point_to_local_vertex_index[coarse_cell_vertices[i]
+                                                  .second] = i;
 
+              // map local vertex indices within other to the new local indices
+              std::map<unsigned int, unsigned int>
+                map_old_to_new_local_vertex_index;
+
+              // 1) renumerate vertices in other and insert into maps
               unsigned int counter = coarse_cell_vertices.size();
-
-              for (const auto p : other.coarse_cell_vertices)
-                if (map.find(p.second) == map.end())
+              for (const auto &p : other.coarse_cell_vertices)
+                if (map_point_to_local_vertex_index.find(p.second) ==
+                    map_point_to_local_vertex_index.end())
                   {
                     this->coarse_cell_vertices.emplace_back(counter, p.second);
-                    map[p.second] = map_i[p.first] = counter++;
+                    map_point_to_local_vertex_index[p.second] =
+                      map_old_to_new_local_vertex_index[p.first] = counter++;
                   }
                 else
-                  map_i[p.first] = map[p.second];
+                  map_old_to_new_local_vertex_index[p.first] =
+                    map_point_to_local_vertex_index[p.second];
 
+              // 2) renumerate vertices of cells
               auto other_coarse_cells_copy = other.coarse_cells;
 
               for (auto &cell : other_coarse_cells_copy)
-                {
-                  for (auto &v : cell.vertices)
-                    v = map_i[v];
-                }
+                for (auto &v : cell.vertices)
+                  v = map_old_to_new_local_vertex_index[v];
 
               this->coarse_cells.insert(this->coarse_cells.end(),
                                         other_coarse_cells_copy.begin(),

@@ -19,6 +19,7 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/distributed/repartitioning_policy_tools.h>
 #include <deal.II/distributed/tria_base.h>
 
 #include <deal.II/grid/grid_tools.h>
@@ -38,12 +39,6 @@ namespace GridTools
 {
   template <typename CellIterator>
   struct PeriodicFacePair;
-}
-
-namespace RepartitioningPolicyTools
-{
-  template <int dim, int spacedim>
-  class Base;
 }
 #endif
 
@@ -203,7 +198,8 @@ namespace parallel
         const TriangulationDescription::Settings &     settings);
 
       /**
-       * TODO
+       * Register a partitioner, which is used within the method
+       * repartition().
        */
       void
       set_partitioner(
@@ -211,7 +207,8 @@ namespace parallel
         const TriangulationDescription::Settings &            settings);
 
       /**
-       * TODO
+       * Execute repartitioning and use the partitioner attached by the
+       * method set_partitioner();
        */
       void
       repartition();
@@ -322,7 +319,7 @@ namespace parallel
         partitioner;
 
       /**
-       * TODO
+       * Partitioner used during repartition().
        */
       SmartPointer<const RepartitioningPolicyTools::Base<dim, spacedim>>
         partitioner_distributed;

@@ -327,20 +327,25 @@ namespace parallel
     void
     Triangulation<dim, spacedim>::repartition()
     {
+      // signal that repartitioning has started
       this->signals.pre_distributed_repartition();
 
+      // create construction_data with the help of the partitioner
       const auto construction_data = TriangulationDescription::Utilities::
         create_description_from_triangulation(
           *this,
           this->partitioner_distributed->partition(*this),
           this->settings);
 
+      // clear old content
       this->clear();
       this->coarse_cell_id_to_coarse_cell_index_vector.clear();
       this->coarse_cell_index_to_coarse_cell_id_vector.clear();
 
+      // use construction_data to set up new triangulation
       this->create_triangulation(construction_data);
 
+      // signal that repartitioning has completed
       this->signals.post_distributed_repartition();
     }
 
