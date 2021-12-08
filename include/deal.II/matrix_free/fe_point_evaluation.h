@@ -377,8 +377,7 @@ namespace internal
       const typename Triangulation<dim, spacedim>::cell_iterator &cell,
       const ArrayView<const Point<dim>> &                         unit_points,
       const UpdateFlags                                           update_flags,
-      internal::FEValuesImplementation::MappingRelatedData<dim,
-                                                                   spacedim>
+      internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
         &mapping_data)
     {
       UpdateFlags update_flags_mapping = update_default;
