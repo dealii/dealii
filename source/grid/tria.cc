@@ -14655,7 +14655,36 @@ Triangulation<dim, spacedim>::all_reference_cells_are_hyper_cube() const
                     "cells used by this triangulation if the "
                     "triangulation doesn't yet have any cells in it."));
   return (this->reference_cells.size() == 1 &&
-          this->reference_cells[0] == ReferenceCells::get_hypercube<dim>());
+          this->reference_cells[0].is_hyper_cube());
+}
+
+
+
+template <int dim, int spacedim>
+bool
+Triangulation<dim, spacedim>::all_reference_cells_are_simplex() const
+{
+  Assert(this->reference_cells.size() > 0,
+         ExcMessage("You can't ask about the kinds of reference "
+                    "cells used by this triangulation if the "
+                    "triangulation doesn't yet have any cells in it."));
+  return (this->reference_cells.size() == 1 &&
+          this->reference_cells[0].is_simplex());
+}
+
+
+
+template <int dim, int spacedim>
+bool
+Triangulation<dim, spacedim>::is_mixed_mesh() const
+{
+  Assert(this->reference_cells.size() > 0,
+         ExcMessage("You can't ask about the kinds of reference "
+                    "cells used by this triangulation if the "
+                    "triangulation doesn't yet have any cells in it."));
+  return reference_cells.size() > 1 ||
+         ((reference_cells[0].is_hyper_cube() == false) &&
+          (reference_cells[0].is_simplex() == false));
 }
 
 
