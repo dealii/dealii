@@ -590,6 +590,8 @@ namespace WorkStream
                   {
                     Assert(p->currently_in_use == true, ExcInternalError());
                     p->currently_in_use = false;
+
+                    break;
                   }
             }
 
