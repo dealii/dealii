@@ -24,11 +24,6 @@ SET(_src
   evaluation_template_factory_inst5.cc
   evaluation_template_factory_inst6.cc
   evaluation_template_factory_hanging_nodes.cc
-  evaluation_template_factory_hanging_nodes_inst2.cc
-  evaluation_template_factory_hanging_nodes_inst3.cc
-  evaluation_template_factory_hanging_nodes_inst4.cc
-  evaluation_template_factory_hanging_nodes_inst5.cc
-  evaluation_template_factory_hanging_nodes_inst6.cc
   fe_point_evaluation.cc
   mapping_info.cc
   mapping_info_inst2.cc
