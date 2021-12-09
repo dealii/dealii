@@ -25,6 +25,19 @@ MACRO(FEATURE_TBB_FIND_EXTERNAL var)
     SET(${var} TRUE)
   ENDIF()
 
+  SET(DEAL_II_TBB_WITH_ONEAPI ${TBB_WITH_ONEAPI})
+
+  IF(TBB_WITH_ONEAPI)
+    MESSAGE(STATUS
+      "deal.II is not fully ported to the new TBB oneAPI interface, disabling external TBB"
+      )
+    SET(TBB_ADDITIONAL_ERROR_STRING
+      "deal.II is not fully ported to the new TBB oneAPI interface.\n"
+      "Disabling external TBB for now...\n\n"
+      )
+    SET(${var} FALSE)
+  ENDIF()
+
   #
   # TBB currently uses the version numbering scheme
   #
@@ -75,6 +88,8 @@ MACRO(FEATURE_TBB_CONFIGURE_BUNDLED)
   LIST(APPEND TBB_LIBRARIES ${CMAKE_DL_LIBS})
 
   LIST(APPEND TBB_BUNDLED_INCLUDE_DIRS ${TBB_FOLDER}/include)
+
+  SET(DEAL_II_TBB_WITH_ONEAPI FALSE)
 ENDMACRO()
 
 

@@ -21,6 +21,7 @@
 #   TBB_LIBRARIES
 #   TBB_INCLUDE_DIRS
 #   TBB_WITH_DEBUGLIB
+#   TBB_WITH_ONEAPI
 #   TBB_VERSION
 #   TBB_VERSION_MAJOR
 #   TBB_VERSION_MINOR
@@ -56,6 +57,10 @@ ELSE()
   SET(_libraries TBB_LIBRARY)
 ENDIF()
 
+#
+# Check for old TBB header layout:
+#
+
 DEAL_II_FIND_PATH(TBB_INCLUDE_DIR tbb/tbb_stddef.h
   HINTS
     ${TBB_DIR}
@@ -76,6 +81,37 @@ IF(EXISTS ${TBB_INCLUDE_DIR}/tbb/tbb_stddef.h)
   SET(TBB_VERSION
     "${TBB_VERSION_MAJOR}.${TBB_VERSION_MINOR}"
     )
+
+  SET(TBB_WITH_ONEAPI FALSE)
+ELSE()
+
+  #
+  # Check for new oneAPI TBB header layout:
+  #
+
+  DEAL_II_FIND_PATH(TBB_INCLUDE_DIR oneapi/tbb/version.h
+    HINTS
+      ${TBB_DIR}
+    PATH_SUFFIXES include include/tbb tbb
+    )
+
+  IF(EXISTS ${TBB_INCLUDE_DIR}/oneapi/tbb/version.h)
+    FILE(STRINGS "${TBB_INCLUDE_DIR}/oneapi/tbb/version.h" TBB_VERSION_MAJOR_STRING
+      REGEX "#define.*TBB_VERSION_MAJOR")
+    STRING(REGEX REPLACE "^.*TBB_VERSION_MAJOR +([0-9]+).*" "\\1"
+      TBB_VERSION_MAJOR "${TBB_VERSION_MAJOR_STRING}"
+      )
+    FILE(STRINGS "${TBB_INCLUDE_DIR}/oneapi/tbb/version.h" TBB_VERSION_MINOR_STRING
+      REGEX "#define.*TBB_VERSION_MINOR")
+    STRING(REGEX REPLACE "^.*TBB_VERSION_MINOR +([0-9]+).*" "\\1"
+      TBB_VERSION_MINOR "${TBB_VERSION_MINOR_STRING}"
+      )
+    SET(TBB_VERSION
+      "${TBB_VERSION_MAJOR}.${TBB_VERSION_MINOR}"
+      )
+  ENDIF()
+
+  SET(TBB_WITH_ONEAPI TRUE)
 ENDIF()
 
 DEAL_II_PACKAGE_HANDLE(TBB
