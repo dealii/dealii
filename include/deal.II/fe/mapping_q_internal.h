@@ -35,6 +35,8 @@
 
 #include <deal.II/matrix_free/evaluation_flags.h>
 #include <deal.II/matrix_free/evaluation_template_factory.h>
+#include <deal.II/matrix_free/fe_evaluation_base_data.h>
+#include <deal.II/matrix_free/mapping_info_storage.h>
 #include <deal.II/matrix_free/shape_info.h>
 #include <deal.II/matrix_free/tensor_product_kernels.h>
 
@@ -1128,16 +1130,18 @@ namespace internal
           return;
         }
 
+      internal::MatrixFreeFunctions::
+        MappingInfoStorage<dim, dim, double, VectorizedArrayType>
+          temp_data;
+      temp_data.descriptor.resize(1);
+      temp_data.descriptor[0].n_q_points = n_q_points;
+      FEEvaluationBaseData<dim, double, false, VectorizedArrayType> eval(
+        {&data.shape_info, nullptr, &temp_data, 0, 0}, 0, false, 0);
+
       // prepare arrays
       if (evaluation_flag != EvaluationFlags::nothing)
         {
-          data.values_dofs.resize(n_comp * n_shape_values);
-          data.values_quad.resize(n_comp * n_q_points);
-          data.gradients_quad.resize(n_comp * n_q_points * dim);
-          data.scratch.resize(2 * std::max(n_q_points, n_shape_values));
-
-          if (evaluation_flag & EvaluationFlags::hessians)
-            data.hessians_quad.resize(n_comp * n_q_points * n_hessians);
+          eval.set_data_pointers(&data.scratch, n_comp);
 
           const std::vector<unsigned int> &renumber_to_lexicographic =
             data.shape_info.lexicographic_numbering;
@@ -1146,20 +1150,14 @@ namespace internal
               {
                 const unsigned int in_comp  = d % n_lanes;
                 const unsigned int out_comp = d / n_lanes;
-                data.values_dofs[out_comp * n_shape_values + i][in_comp] =
+                eval
+                  .begin_dof_values()[out_comp * n_shape_values + i][in_comp] =
                   data.mapping_support_points[renumber_to_lexicographic[i]][d];
               }
 
           // do the actual tensorized evaluation
           internal::FEEvaluationFactory<dim, double, VectorizedArrayType>::
-            evaluate(n_comp,
-                     evaluation_flag,
-                     data.shape_info,
-                     data.values_dofs.begin(),
-                     data.values_quad.begin(),
-                     data.gradients_quad.begin(),
-                     data.hessians_quad.begin(),
-                     data.scratch.begin());
+            evaluate(n_comp, evaluation_flag, eval.begin_dof_values(), eval);
         }
 
       // do the postprocessing
@@ -1171,7 +1169,7 @@ namespace internal
                    in_comp < n_lanes && in_comp < spacedim - out_comp * n_lanes;
                    ++in_comp)
                 quadrature_points[i][out_comp * n_lanes + in_comp] =
-                  data.values_quad[out_comp * n_q_points + i][in_comp];
+                  eval.begin_values()[out_comp * n_q_points + i][in_comp];
         }
 
       if (evaluation_flag & EvaluationFlags::gradients)
@@ -1193,9 +1191,9 @@ namespace internal
                     const unsigned int new_point    = total_number % n_q_points;
                     data.contravariant[new_point][out_comp * n_lanes + in_comp]
                                       [new_comp] =
-                      data
-                        .gradients_quad[(out_comp * n_q_points + point) * dim +
-                                        j][in_comp];
+                      eval.begin_gradients()[(out_comp * n_q_points + point) *
+                                               dim +
+                                             j][in_comp];
                   }
         }
       if (update_flags & update_covariant_transformation)
@@ -1236,9 +1234,9 @@ namespace internal
                       dim == 2 ? desymmetrize_2d[new_hessian_comp][1] :
                                  desymmetrize_3d[new_hessian_comp][1];
                     const double value =
-                      data.hessians_quad[(out_comp * n_q_points + point) *
-                                           n_hessians +
-                                         j][in_comp];
+                      eval.begin_hessians()[(out_comp * n_q_points + point) *
+                                              n_hessians +
+                                            j][in_comp];
                     jacobian_grads[new_point][out_comp * n_lanes + in_comp]
                                   [new_hessian_comp_i][new_hessian_comp_j] =
                                     value;

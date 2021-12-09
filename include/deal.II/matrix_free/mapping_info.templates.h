@@ -29,6 +29,7 @@
 #include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/matrix_free/evaluation_template_factory.h>
+#include <deal.II/matrix_free/fe_evaluation_base_data.h>
 #include <deal.II/matrix_free/mapping_info.h>
 #include <deal.II/matrix_free/mapping_info_storage.templates.h>
 #include <deal.II/matrix_free/util.h>
@@ -1175,13 +1176,13 @@ namespace internal
           shape_info.dofs_per_component_on_cell;
         constexpr unsigned int hess_dim = dim * (dim + 1) / 2;
 
-        AlignedVector<VectorizedDouble> cell_points(dim * n_mapping_points);
-        AlignedVector<VectorizedDouble> cell_quads(dim * n_q_points);
-        AlignedVector<VectorizedDouble> cell_grads(dim * dim * n_q_points);
-        AlignedVector<VectorizedDouble> cell_grad_grads(dim * hess_dim *
-                                                        n_q_points);
-        AlignedVector<VectorizedDouble> scratch_data(
-          dim * (2 * n_q_points + 3 * n_mapping_points));
+        MappingInfoStorage<dim, dim, double, VectorizedDouble> temp_data;
+        temp_data.copy_descriptor(my_data);
+        FEEvaluationBaseData<dim, double, false, VectorizedDouble> eval(
+          {&shape_info, nullptr, &temp_data, 0, 0}, 0, false, 0);
+
+        AlignedVector<VectorizedDouble> evaluation_data;
+        eval.set_data_pointers(&evaluation_data, dim);
 
         for (unsigned int cell = begin_cell; cell < end_cell; ++cell)
           for (unsigned vv = 0; vv < n_lanes; vv += n_lanes_d)
@@ -1195,7 +1196,7 @@ namespace internal
                   vectorized_load_and_transpose(n_mapping_points * dim,
                                                 plain_quadrature_points.data(),
                                                 start_indices,
-                                                cell_points.data());
+                                                eval.begin_dof_values());
 
                   FEEvaluationFactory<dim, double, VectorizedDouble>::evaluate(
                     dim,
@@ -1203,12 +1204,8 @@ namespace internal
                       (update_flags_cells & update_jacobian_grads ?
                          EvaluationFlags::hessians :
                          EvaluationFlags::nothing),
-                    shape_info,
-                    cell_points.data(),
-                    cell_quads.data(),
-                    cell_grads.data(),
-                    cell_grad_grads.data(),
-                    scratch_data.data());
+                    eval.begin_dof_values(),
+                    eval);
                 }
               if (update_flags_cells & update_quadrature_points)
                 {
@@ -1225,9 +1222,10 @@ namespace internal
                   else
                     for (unsigned int d = 0; d < dim; ++d)
                       for (unsigned int q = 0; q < n_q_points; ++q)
-                        store_vectorized_array(cell_quads[q + d * n_q_points],
-                                               vv,
-                                               quadrature_points[q][d]);
+                        store_vectorized_array(
+                          eval.begin_values()[q + d * n_q_points],
+                          vv,
+                          quadrature_points[q][d]);
                 }
 
               const unsigned int n_points =
@@ -1240,7 +1238,9 @@ namespace internal
                     Tensor<2, dim, VectorizedDouble> jac;
                     for (unsigned int d = 0; d < dim; ++d)
                       for (unsigned int e = 0; e < dim; ++e)
-                        jac[d][e] = cell_grads[q + (d * dim + e) * n_q_points];
+                        jac[d][e] =
+                          eval
+                            .begin_gradients()[q + (d * dim + e) * n_q_points];
 
                     // eliminate roundoff errors
                     if (cell_type[cell] == cartesian)
@@ -1288,13 +1288,13 @@ namespace internal
                           {
                             for (unsigned int e = 0; e < dim; ++e)
                               jac_grad[d][e][e] =
-                                cell_grad_grads[q + (d * hess_dim + e) *
-                                                      n_q_points];
+                                eval.begin_hessians()[q + (d * hess_dim + e) *
+                                                            n_q_points];
                             for (unsigned int c = dim, e = 0; e < dim; ++e)
                               for (unsigned int f = e + 1; f < dim; ++f, ++c)
                                 jac_grad[d][e][f] = jac_grad[d][f][e] =
-                                  cell_grad_grads[q + (d * hess_dim + c) *
-                                                        n_q_points];
+                                  eval.begin_hessians()[q + (d * hess_dim + c) *
+                                                              n_q_points];
                             const auto inv_jac_grad =
                               process_jacobian_gradient(inv_jac,
                                                         inv_jac,
@@ -2088,21 +2088,30 @@ namespace internal
           shape_info.dofs_per_component_on_cell;
         constexpr unsigned int hess_dim = dim * (dim + 1) / 2;
 
-        AlignedVector<VectorizedDouble> cell_points(dim * n_mapping_points);
-        AlignedVector<VectorizedDouble> face_quads(dim * n_q_points);
-        AlignedVector<VectorizedDouble> face_grads(dim * dim * n_q_points);
-        AlignedVector<VectorizedDouble> face_grad_grads(dim * hess_dim *
-                                                        n_q_points);
+        MappingInfoStorage<dim - 1, dim, double, VectorizedDouble> temp_data;
+        temp_data.copy_descriptor(my_data);
+        FEEvaluationBaseData<dim, double, true, VectorizedDouble> eval_int(
+          {&shape_info, nullptr, &temp_data, 0, 0}, 0, true, 0);
+        FEEvaluationBaseData<dim, double, true, VectorizedDouble> eval_ext(
+          {&shape_info, nullptr, &temp_data, 0, 0}, 0, false, 0);
 
-        AlignedVector<VectorizedDouble> scratch_data(
-          dim * (2 * n_q_points + 3 * n_mapping_points));
+        AlignedVector<VectorizedDouble> evaluation_data, evaluation_data_ext;
+        eval_int.set_data_pointers(&evaluation_data, dim);
+        eval_ext.set_data_pointers(&evaluation_data_ext, dim);
 
         for (unsigned int face = begin_face; face < end_face; ++face)
           for (unsigned vv = 0; vv < n_lanes; vv += n_lanes_d)
             {
+              internal::MatrixFreeFunctions::FaceToCellTopology<
+                VectorizedDouble::size()>
+                face_double;
+              face_double.interior_face_no = faces[face].interior_face_no;
+              face_double.exterior_face_no = faces[face].exterior_face_no;
+              face_double.face_orientation = faces[face].face_orientation;
+              face_double.subface_index    = faces[face].subface_index;
+
               // load the geometry field for all SIMD lanes
-              unsigned int       start_indices[n_lanes_d];
-              const unsigned int face_no = faces[face].interior_face_no;
+              unsigned int start_indices[n_lanes_d];
               for (unsigned int v = 0; v < n_lanes_d; ++v)
                 if (faces[face].cells_interior[vv + v] !=
                     numbers::invalid_unsigned_int)
@@ -2111,37 +2120,29 @@ namespace internal
                 else
                   start_indices[v] =
                     faces[face].cells_interior[0] * n_mapping_points * dim;
+
+              eval_int.reinit_face(face_double);
               vectorized_load_and_transpose(n_mapping_points * dim,
                                             plain_quadrature_points.data(),
                                             start_indices,
-                                            cell_points.data());
+                                            eval_int.begin_dof_values());
 
               // now let the matrix-free evaluators provide us with the
               // data on faces
               FEFaceEvaluationFactory<dim, double, VectorizedDouble>::evaluate(
                 dim,
-                shape_info,
-                cell_points.data(),
-                face_quads.data(),
-                face_grads.data(),
-                face_grad_grads.data(),
-                scratch_data.data(),
-                true,
-                true,
-                update_flags_faces & update_jacobian_grads,
-                face_no,
-                GeometryInfo<dim>::max_children_per_cell,
-                faces[face].face_orientation > 8 ?
-                  faces[face].face_orientation - 8 :
-                  0,
-                my_data.descriptor[0].face_orientations);
-
+                EvaluationFlags::values | EvaluationFlags::gradients |
+                  (update_flags_faces & update_jacobian_grads ?
+                     EvaluationFlags::hessians :
+                     EvaluationFlags::nothing),
+                eval_int.begin_dof_values(),
+                eval_int);
 
               if (update_flags_faces & update_quadrature_points)
                 for (unsigned int q = 0; q < n_q_points; ++q)
                   for (unsigned int d = 0; d < dim; ++d)
                     store_vectorized_array(
-                      face_quads[d * n_q_points + q],
+                      eval_int.begin_values()[d * n_q_points + q],
                       vv,
                       my_data.quadrature_points
                         [my_data.quadrature_point_offsets[face] + q][d]);
@@ -2155,7 +2156,9 @@ namespace internal
                 [&](unsigned int                     face_no,
                     int                              is_exterior,
                     unsigned int                     q,
-                    Tensor<2, dim, VectorizedDouble> inv_jac) {
+                    Tensor<2, dim, VectorizedDouble> inv_jac,
+                    FEEvaluationBaseData<dim, double, true, VectorizedDouble>
+                      &eval) {
                   Tensor<2, dim, VectorizedDouble> inv_transp_jac_permut;
                   for (unsigned int d = 0; d < dim; ++d)
                     for (unsigned int e = 0; e < dim; ++e)
@@ -2168,7 +2171,8 @@ namespace internal
                   Tensor<2, dim, VectorizedDouble> jacobi;
                   for (unsigned int e = 0; e < dim; ++e)
                     for (unsigned int d = 0; d < dim; ++d)
-                      jacobi[d][e] = face_grads[(d * dim + e) * n_q_points + q];
+                      jacobi[d][e] =
+                        eval.begin_gradients()[(d * dim + e) * n_q_points + q];
                   Tensor<2, dim, VectorizedDouble> inv_transp_jac =
                     transpose(invert(jacobi));
                   Tensor<3, dim, VectorizedDouble> jac_grad;
@@ -2176,12 +2180,13 @@ namespace internal
                     {
                       for (unsigned int e = 0; e < dim; ++e)
                         jac_grad[d][e][e] =
-                          face_grad_grads[q + (d * hess_dim + e) * n_q_points];
+                          eval.begin_gradients()[q + (d * hess_dim + e) *
+                                                       n_q_points];
                       for (unsigned int c = dim, e = 0; e < dim; ++e)
                         for (unsigned int f = e + 1; f < dim; ++f, ++c)
                           jac_grad[d][e][f] = jac_grad[d][f][e] =
-                            face_grad_grads[q +
-                                            (d * hess_dim + c) * n_q_points];
+                            eval.begin_gradients()[q + (d * hess_dim + c) *
+                                                         n_q_points];
                       const auto inv_jac_grad =
                         process_jacobian_gradient(inv_transp_jac_permut,
                                                   inv_transp_jac,
@@ -2203,6 +2208,7 @@ namespace internal
                 face_type[face] <= affine ? 1 : n_q_points;
               for (unsigned int q = 0; q < n_points_compute; ++q)
                 {
+                  const unsigned int face_no = faces[face].interior_face_no;
                   Tensor<2, dim, VectorizedDouble> jac;
                   for (unsigned int e = 0; e < dim; ++e)
                     {
@@ -2210,7 +2216,9 @@ namespace internal
                         ExtractFaceHelper::reorder_face_derivative_indices<dim>(
                           face_no, e);
                       for (unsigned int d = 0; d < dim; ++d)
-                        jac[d][ee] = face_grads[(d * dim + e) * n_q_points + q];
+                        jac[d][ee] =
+                          eval_int
+                            .begin_gradients()[(d * dim + e) * n_q_points + q];
                     }
                   Tensor<2, dim, VectorizedDouble> inv_jac = invert(jac);
                   for (unsigned int e = 0; e < dim; ++e)
@@ -2227,7 +2235,7 @@ namespace internal
 
                   if (update_flags_faces & update_jacobian_grads)
                     {
-                      compute_jacobian_grad(face_no, 0, q, inv_jac);
+                      compute_jacobian_grad(face_no, 0, q, inv_jac, eval_int);
                     }
 
                   std::array<Tensor<1, dim, VectorizedDouble>, dim - 1>
@@ -2285,47 +2293,43 @@ namespace internal
                       start_indices[v] =
                         faces[face].cells_exterior[0] * n_mapping_points * dim;
 
+                  eval_ext.reinit_face(face_double);
                   vectorized_load_and_transpose(n_mapping_points * dim,
                                                 plain_quadrature_points.data(),
                                                 start_indices,
-                                                cell_points.data());
+                                                eval_ext.begin_dof_values());
 
                   FEFaceEvaluationFactory<dim, double, VectorizedDouble>::
                     evaluate(dim,
-                             shape_info,
-                             cell_points.data(),
-                             face_quads.data(),
-                             face_grads.data(),
-                             face_grad_grads.data(),
-                             scratch_data.data(),
-                             false,
-                             true,
-                             update_flags_faces & update_jacobian_grads,
-                             faces[face].exterior_face_no,
-                             faces[face].subface_index,
-                             faces[face].face_orientation < 8 ?
-                               faces[face].face_orientation :
-                               0,
-                             my_data.descriptor[0].face_orientations);
+                             EvaluationFlags::values |
+                               EvaluationFlags::gradients |
+                               (update_flags_faces & update_jacobian_grads ?
+                                  EvaluationFlags::hessians :
+                                  EvaluationFlags::nothing),
+                             eval_ext.begin_dof_values(),
+                             eval_ext);
 
                   for (unsigned int q = 0; q < n_points_compute; ++q)
                     {
+                      const unsigned int face_no = faces[face].exterior_face_no;
                       Tensor<2, dim, VectorizedDouble> jac;
                       for (unsigned int e = 0; e < dim; ++e)
                         {
                           const unsigned int ee =
                             ExtractFaceHelper::reorder_face_derivative_indices<
-                              dim>(faces[face].exterior_face_no, e);
+                              dim>(face_no, e);
                           for (unsigned int d = 0; d < dim; ++d)
                             jac[d][ee] =
-                              face_grads[(d * dim + e) * n_q_points + q];
+                              eval_ext
+                                .begin_gradients()[(d * dim + e) * n_q_points +
+                                                   q];
                         }
                       Tensor<2, dim, VectorizedDouble> inv_jac = invert(jac);
                       for (unsigned int e = 0; e < dim; ++e)
                         {
                           const unsigned int ee =
                             ExtractFaceHelper::reorder_face_derivative_indices<
-                              dim>(faces[face].exterior_face_no, e);
+                              dim>(face_no, e);
                           for (unsigned int d = 0; d < dim; ++d)
                             store_vectorized_array(
                               inv_jac[ee][d],
@@ -2335,10 +2339,8 @@ namespace internal
 
                       if (update_flags_faces & update_jacobian_grads)
                         {
-                          compute_jacobian_grad(faces[face].exterior_face_no,
-                                                1,
-                                                q,
-                                                inv_jac);
+                          compute_jacobian_grad(
+                            face_no, 1, q, inv_jac, eval_ext);
                         }
 
                       my_data.normals_times_jacobians[1][offset + q] =

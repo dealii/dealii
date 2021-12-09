@@ -44,28 +44,20 @@ namespace internal
   template <int dim, typename Number, typename VectorizedArrayType>
   void
   FEEvaluationFactory<dim, Number, VectorizedArrayType>::evaluate(
-    const unsigned int                                         n_components,
-    const EvaluationFlags::EvaluationFlags                     evaluation_flag,
-    const MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> &shape_info,
-    VectorizedArrayType *values_dofs_actual,
-    VectorizedArrayType *values_quad,
-    VectorizedArrayType *gradients_quad,
-    VectorizedArrayType *hessians_quad,
-    VectorizedArrayType *scratch_data)
+    const unsigned int                     n_components,
+    const EvaluationFlags::EvaluationFlags evaluation_flag,
+    const VectorizedArrayType *            values_dofs,
+    FEEvaluationBaseData<dim, Number, false, VectorizedArrayType> &eval)
   {
     instantiation_helper_run<
       1,
       FEEvaluationImplEvaluateSelector<dim, VectorizedArrayType>>(
-      shape_info.data[0].fe_degree,
-      shape_info.data[0].n_q_points_1d,
+      eval.get_shape_info().data[0].fe_degree,
+      eval.get_shape_info().data[0].n_q_points_1d,
       n_components,
       evaluation_flag,
-      shape_info,
-      values_dofs_actual,
-      values_quad,
-      gradients_quad,
-      hessians_quad,
-      scratch_data);
+      values_dofs,
+      eval);
   }
 
 
@@ -73,29 +65,21 @@ namespace internal
   template <int dim, typename Number, typename VectorizedArrayType>
   void
   FEEvaluationFactory<dim, Number, VectorizedArrayType>::integrate(
-    const unsigned int                                         n_components,
-    const EvaluationFlags::EvaluationFlags                     integration_flag,
-    const MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> &shape_info,
-    VectorizedArrayType *values_dofs_actual,
-    VectorizedArrayType *values_quad,
-    VectorizedArrayType *gradients_quad,
-    VectorizedArrayType *hessians_quad,
-    VectorizedArrayType *scratch_data,
-    const bool           sum_into_values_array)
+    const unsigned int                     n_components,
+    const EvaluationFlags::EvaluationFlags integration_flag,
+    VectorizedArrayType *                  values_dofs,
+    FEEvaluationBaseData<dim, Number, false, VectorizedArrayType> &eval,
+    const bool sum_into_values_array)
   {
     instantiation_helper_run<
       1,
       FEEvaluationImplIntegrateSelector<dim, VectorizedArrayType>>(
-      shape_info.data[0].fe_degree,
-      shape_info.data[0].n_q_points_1d,
+      eval.get_shape_info().data[0].fe_degree,
+      eval.get_shape_info().data[0].n_q_points_1d,
       n_components,
       integration_flag,
-      shape_info,
-      values_dofs_actual,
-      values_quad,
-      gradients_quad,
-      hessians_quad,
-      scratch_data,
+      values_dofs,
+      eval,
       sum_into_values_array);
   }
 
@@ -116,40 +100,20 @@ namespace internal
   template <int dim, typename Number, typename VectorizedArrayType>
   void
   FEFaceEvaluationFactory<dim, Number, VectorizedArrayType>::evaluate(
-    const unsigned int                                         n_components,
-    const MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> &data,
-    const VectorizedArrayType *                                values_array,
-    VectorizedArrayType *                                      values_quad,
-    VectorizedArrayType *                                      gradients_quad,
-    VectorizedArrayType *                                      hessians_quad,
-    VectorizedArrayType *                                      scratch_data,
-    const bool                                                 evaluate_values,
-    const bool                    evaluate_gradients,
-    const bool                    evaluate_hessians,
-    const unsigned int            face_no,
-    const unsigned int            subface_index,
-    const unsigned int            face_orientation,
-    const Table<2, unsigned int> &orientation_map)
+    const unsigned int                     n_components,
+    const EvaluationFlags::EvaluationFlags evaluation_flag,
+    const VectorizedArrayType *            values_dofs,
+    FEEvaluationBaseData<dim, Number, true, VectorizedArrayType> &eval)
   {
     instantiation_helper_run<
       1,
       FEFaceEvaluationImplEvaluateSelector<dim, VectorizedArrayType>>(
-      data.data[0].fe_degree,
-      data.data[0].n_q_points_1d,
+      eval.get_shape_info().data[0].fe_degree,
+      eval.get_shape_info().data[0].n_q_points_1d,
       n_components,
-      data,
-      values_array,
-      values_quad,
-      gradients_quad,
-      hessians_quad,
-      scratch_data,
-      evaluate_values,
-      evaluate_gradients,
-      evaluate_hessians,
-      face_no,
-      subface_index,
-      face_orientation,
-      orientation_map);
+      evaluation_flag,
+      values_dofs,
+      eval);
   }
 
 
@@ -157,158 +121,70 @@ namespace internal
   template <int dim, typename Number, typename VectorizedArrayType>
   void
   FEFaceEvaluationFactory<dim, Number, VectorizedArrayType>::integrate(
-    const unsigned int                                         n_components,
-    const MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> &data,
-    VectorizedArrayType *                                      values_array,
-    VectorizedArrayType *                                      values_quad,
-    VectorizedArrayType *                                      gradients_quad,
-    VectorizedArrayType *                                      hessians_quad,
-    VectorizedArrayType *                                      scratch_data,
-    const bool                                                 integrate_values,
-    const bool                    integrate_gradients,
-    const bool                    integrate_hessians,
-    const unsigned int            face_no,
-    const unsigned int            subface_index,
-    const unsigned int            face_orientation,
-    const Table<2, unsigned int> &orientation_map)
+    const unsigned int                     n_components,
+    const EvaluationFlags::EvaluationFlags integration_flag,
+    VectorizedArrayType *                  values_dofs,
+    FEEvaluationBaseData<dim, Number, true, VectorizedArrayType> &eval)
   {
     instantiation_helper_run<
       1,
       FEFaceEvaluationImplIntegrateSelector<dim, VectorizedArrayType>>(
-      data.data[0].fe_degree,
-      data.data[0].n_q_points_1d,
+      eval.get_shape_info().data[0].fe_degree,
+      eval.get_shape_info().data[0].n_q_points_1d,
       n_components,
-      data,
-      values_array,
-      values_quad,
-      gradients_quad,
-      hessians_quad,
-      scratch_data,
-      integrate_values,
-      integrate_gradients,
-      integrate_hessians,
-      face_no,
-      subface_index,
-      face_orientation,
-      orientation_map);
+      integration_flag,
+      values_dofs,
+      eval);
   }
 
 
 
   template <int dim, typename Number, typename VectorizedArrayType>
-  bool
+  void
   FEFaceEvaluationFactory<dim, Number, VectorizedArrayType>::gather_evaluate(
     const unsigned int                          n_components,
-    const std::size_t                           n_face_orientations,
+    const EvaluationFlags::EvaluationFlags      evaluation_flag,
     const Number *                              src_ptr,
     const std::vector<ArrayView<const Number>> *sm_ptr,
-    const MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> &data,
-    const MatrixFreeFunctions::DoFInfo &                       dof_info,
-    VectorizedArrayType *                                      values_quad,
-    VectorizedArrayType *                                      gradients_quad,
-    VectorizedArrayType *                                      hessians_quad,
-    VectorizedArrayType *                                      scratch_data,
-    const bool                                                 evaluate_values,
-    const bool         evaluate_gradients,
-    const bool         evaluate_hessians,
-    const unsigned int active_fe_index,
-    const unsigned int first_selected_component,
-    const std::array<unsigned int, VectorizedArrayType::size()> cells,
-    const std::array<unsigned int, VectorizedArrayType::size()> face_nos,
-    const unsigned int                                          subface_index,
-    const MatrixFreeFunctions::DoFInfo::DoFAccessIndex dof_access_index,
-    const std::array<unsigned int, VectorizedArrayType::size()>
-                                  face_orientations,
-    const Table<2, unsigned int> &orientation_map)
+    FEEvaluationBaseData<dim, Number, true, VectorizedArrayType> &eval)
   {
-    return instantiation_helper_run<
+    instantiation_helper_run<
       1,
       FEFaceEvaluationImplGatherEvaluateSelector<dim,
                                                  Number,
                                                  VectorizedArrayType>>(
-      data.data[0].fe_degree,
-      data.data[0].n_q_points_1d,
+      eval.get_shape_info().data[0].fe_degree,
+      eval.get_shape_info().data[0].n_q_points_1d,
       n_components,
-      n_face_orientations,
+      evaluation_flag,
       src_ptr,
       sm_ptr,
-      data,
-      dof_info,
-      values_quad,
-      gradients_quad,
-      hessians_quad,
-      scratch_data,
-      evaluate_values,
-      evaluate_gradients,
-      evaluate_hessians,
-      active_fe_index,
-      first_selected_component,
-      cells,
-      face_nos,
-      subface_index,
-      dof_access_index,
-      face_orientations,
-      orientation_map);
+      eval);
   }
 
 
 
   template <int dim, typename Number, typename VectorizedArrayType>
-  bool
+  void
   FEFaceEvaluationFactory<dim, Number, VectorizedArrayType>::integrate_scatter(
     const unsigned int                          n_components,
-    const std::size_t                           n_face_orientations,
+    const EvaluationFlags::EvaluationFlags      integration_flag,
     Number *                                    dst_ptr,
     const std::vector<ArrayView<const Number>> *sm_ptr,
-    const MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> &data,
-    const MatrixFreeFunctions::DoFInfo &                       dof_info,
-    VectorizedArrayType *                                      values_array,
-    VectorizedArrayType *                                      values_quad,
-    VectorizedArrayType *                                      gradients_quad,
-    VectorizedArrayType *                                      hessians_quad,
-    VectorizedArrayType *                                      scratch_data,
-    const bool                                                 integrate_values,
-    const bool         integrate_gradients,
-    const bool         integrate_hessians,
-    const unsigned int active_fe_index,
-    const unsigned int first_selected_component,
-    const std::array<unsigned int, VectorizedArrayType::size()> cells,
-    const std::array<unsigned int, VectorizedArrayType::size()> face_nos,
-    const unsigned int                                          subface_index,
-    const MatrixFreeFunctions::DoFInfo::DoFAccessIndex dof_access_index,
-    const std::array<unsigned int, VectorizedArrayType::size()>
-                                  face_orientations,
-    const Table<2, unsigned int> &orientation_map)
+    FEEvaluationBaseData<dim, Number, true, VectorizedArrayType> &eval)
   {
-    return instantiation_helper_run<
+    instantiation_helper_run<
       1,
       FEFaceEvaluationImplIntegrateScatterSelector<dim,
                                                    Number,
                                                    VectorizedArrayType>>(
-      data.data[0].fe_degree,
-      data.data[0].n_q_points_1d,
+      eval.get_shape_info().data[0].fe_degree,
+      eval.get_shape_info().data[0].n_q_points_1d,
       n_components,
-      n_face_orientations,
+      integration_flag,
       dst_ptr,
       sm_ptr,
-      data,
-      dof_info,
-      values_array,
-      values_quad,
-      gradients_quad,
-      hessians_quad,
-      scratch_data,
-      integrate_values,
-      integrate_gradients,
-      integrate_hessians,
-      active_fe_index,
-      first_selected_component,
-      cells,
-      face_nos,
-      subface_index,
-      dof_access_index,
-      face_orientations,
-      orientation_map);
+      eval);
   }
 
 

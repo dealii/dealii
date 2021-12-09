@@ -125,6 +125,22 @@ class FEEvaluationBaseData
 public:
   static constexpr unsigned int dimension = dim;
 
+  using NumberType = VectorizedArrayType;
+
+  /**
+   * Constructor, taking data stored in MatrixFree. If applied to problems
+   * with more than one quadrature formula selected during construction of
+   * `matrix_free`, `quad_no` allows to select the appropriate formula.
+   */
+  FEEvaluationBaseData(const std::tuple<const ShapeInfoType *,
+                                        const DoFInfo *,
+                                        const MappingInfoStorageType *,
+                                        unsigned int,
+                                        unsigned int> &info,
+                       const unsigned int              quad_no,
+                       const bool                      is_interior_face,
+                       const unsigned int              face_type);
+
   /**
    * Copy constructor.
    */
@@ -135,6 +151,23 @@ public:
    */
   FEEvaluationBaseData &
   operator=(const FEEvaluationBaseData &other);
+
+  /**
+   * Sets the pointers for values, gradients, hessians to the central
+   * scratch_data_array inside the given scratch array, for a given number of
+   * components as provided by one of the derived classes.
+   */
+  void
+  set_data_pointers(AlignedVector<VectorizedArrayType> *scratch_data,
+                    const unsigned int                  n_components);
+
+  /**
+   * Initialize the indices related to the given face description. Used during
+   * the reinit() call of the FEFaceEvaluation class.
+   */
+  void
+  reinit_face(const internal::MatrixFreeFunctions::FaceToCellTopology<
+              VectorizedArrayType::size()> &face);
 
   /**
    * @name 1: Access to geometry data at quadrature points
@@ -371,41 +404,84 @@ public:
   unsigned int
   get_active_quadrature_index() const;
 
+  /**
+   * If is_face is true, this function returns the face number within a cell for
+   * the face this object was initialized to. On cells where the face makes no
+   * sense, an exception is thrown.
+   *
+   * @note This function depends on the internal representation of data, which
+   * is not stable between releases of deal.II, and is hence mostly for
+   * internal use.
+   */
+  unsigned int
+  get_face_no() const;
+
+  /**
+   * If is_face is true, this function returns the index of a subface along a
+   * face in case this object was initialized to a face with hanging nodes. On
+   * faces On cells where the face makes no sense, an exception is thrown.
+   *
+   * @note This function depends on the internal representation of data, which
+   * is not stable between releases of deal.II, and is hence mostly for
+   * internal use.
+   */
+  unsigned int
+  get_subface_index() const;
+
+  /**
+   * If is_face is true, this function returns the orientation index within an
+   * array of orientations as returned by get_orientation_map().
+   *
+   * @note This function depends on the internal representation of data, which
+   * is not stable between releases of deal.II, and is hence mostly for
+   * internal use.
+   */
+  unsigned int
+  get_face_orientation() const;
+
+  /**
+   * If is_face is true, this function returns the map re-ordering from face
+   * quadrature points in standard orientation to a specific orientation.
+   *
+   * @note This function depends on the internal representation of data, which
+   * is not stable between releases of deal.II, and is hence mostly for
+   * internal use.
+   */
+  const Table<2, unsigned int> &
+  get_orientation_map() const;
+
+  /**
+   * Return the current index in the access to compressed indices.
+   *
+   * @note This function depends on the internal representation of data, which
+   * is not stable between releases of deal.II, and is hence mostly for
+   * internal use.
+   */
+  internal::MatrixFreeFunctions::DoFInfo::DoFAccessIndex
+  get_dof_access_index() const;
+
+  /**
+   * Return whether this object was set up to work on what is called
+   * "interior" faces in the evaluation context.
+   *
+   * @note This function depends on the internal representation of data, which
+   * is not stable between releases of deal.II, and is hence mostly for
+   * internal use.
+   */
+  bool
+  get_is_interior_face() const;
+
   //@}
 
 protected:
   /**
-   * Constructor. Made protected to prevent users from directly using this
-   * class. Takes all data stored in MatrixFree. If applied to problems with
-   * more than one quadrature formula selected during construction of
-   * `matrix_free`, `quad_no` allows to select the appropriate formula.
-   */
-  FEEvaluationBaseData(const std::tuple<const ShapeInfoType *,
-                                        const DoFInfo *,
-                                        unsigned int,
-                                        unsigned int> &info,
-                       const MappingInfoStorageType &  mapping_data,
-                       const unsigned int              quad_no,
-                       const bool                      is_interior_face,
-                       const unsigned int              face_type);
-
-  /**
-   * Constructor that comes with reduced functionality and works similar as
+   * Constructor that comes with reduced functionality and works similarly as
    * FEValues.
    */
   FEEvaluationBaseData(
     const std::shared_ptr<
       internal::MatrixFreeFunctions::
         MappingDataOnTheFly<dim, Number, VectorizedArrayType>> &mapping_data);
-
-  /**
-   * Sets the pointers for values, gradients, hessians to the central
-   * scratch_data_array inside the given scratch array, for a given number of
-   * components as provided by one of the derived classes.
-   */
-  void
-  set_data_pointers(AlignedVector<VectorizedArrayType> *scratch_data,
-                    const unsigned int                  n_components);
 
   /**
    * A pointer to the unit cell shape data, i.e., values, gradients and
@@ -683,20 +759,20 @@ template <int dim, typename Number, bool is_face, typename VectorizedArrayType>
 inline FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
   FEEvaluationBaseData(const std::tuple<const ShapeInfoType *,
                                         const DoFInfo *,
+                                        const MappingInfoStorageType *,
                                         unsigned int,
                                         unsigned int> &shape_dof_info,
-                       const MappingInfoStorageType &  mapping_data,
                        const unsigned int              quad_no,
                        const bool                      is_interior_face,
                        const unsigned int              face_type)
   : data(std::get<0>(shape_dof_info))
   , dof_info(std::get<1>(shape_dof_info))
-  , mapping_data(&mapping_data)
+  , mapping_data(std::get<2>(shape_dof_info))
   , quad_no(quad_no)
-  , active_fe_index(std::get<2>(shape_dof_info))
-  , active_quad_index(std::get<3>(shape_dof_info))
+  , active_fe_index(std::get<3>(shape_dof_info))
+  , active_quad_index(std::get<4>(shape_dof_info))
   , descriptor(
-      &mapping_data.descriptor
+      &mapping_data->descriptor
          [is_face ?
             (active_quad_index * std::max<unsigned int>(1, dim - 1) +
              (face_type == numbers::invalid_unsigned_int ? 0 : face_type)) :
@@ -1082,6 +1158,67 @@ FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
 
 
 template <int dim, typename Number, bool is_face, typename VectorizedArrayType>
+inline unsigned int
+FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::get_face_no()
+  const
+{
+  return face_no;
+}
+
+
+
+template <int dim, typename Number, bool is_face, typename VectorizedArrayType>
+inline unsigned int
+FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
+  get_subface_index() const
+{
+  return subface_index;
+}
+
+
+
+template <int dim, typename Number, bool is_face, typename VectorizedArrayType>
+inline unsigned int
+FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
+  get_face_orientation() const
+{
+  return face_orientation;
+}
+
+
+
+template <int dim, typename Number, bool is_face, typename VectorizedArrayType>
+inline const Table<2, unsigned int> &
+FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
+  get_orientation_map() const
+{
+  Assert(descriptor != nullptr, ExcNotInitialized());
+  return descriptor->face_orientations;
+}
+
+
+
+template <int dim, typename Number, bool is_face, typename VectorizedArrayType>
+inline internal::MatrixFreeFunctions::DoFInfo::DoFAccessIndex
+FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
+  get_dof_access_index() const
+{
+  return dof_access_index;
+}
+
+
+
+template <int dim, typename Number, bool is_face, typename VectorizedArrayType>
+inline bool
+FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
+  get_is_interior_face() const
+{
+  return is_interior_face;
+}
+
+
+
+template <int dim, typename Number, bool is_face, typename VectorizedArrayType>
 inline void
 FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
   set_data_pointers(AlignedVector<VectorizedArrayType> *scratch_data_array,
@@ -1118,6 +1255,29 @@ FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
   hessians_quad =
     scratch_data_array->begin() +
     n_components * (dofs_per_component + (2 * dim + 1) * n_quadrature_points);
+}
+
+
+
+template <int dim, typename Number, bool is_face, typename VectorizedArrayType>
+inline void
+FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::reinit_face(
+  const internal::MatrixFreeFunctions::FaceToCellTopology<
+    VectorizedArrayType::size()> &face)
+{
+  face_no = (is_interior_face ? face.interior_face_no : face.exterior_face_no);
+  subface_index = is_interior_face == true ?
+                    GeometryInfo<dim>::max_children_per_cell :
+                    face.subface_index;
+
+  // First check if interior or exterior cell has non-standard orientation
+  // (i.e. the third bit is one or not). Then set zero if this cell has
+  // standard-orientation else copy the first three bits
+  // (which is equivalent to modulo 8). See also the documentation of
+  // internal::MatrixFreeFunctions::FaceToCellTopology::face_orientation.
+  face_orientation = (is_interior_face == (face.face_orientation >= 8)) ?
+                       (face.face_orientation % 8) :
+                       0;
 }
 
 

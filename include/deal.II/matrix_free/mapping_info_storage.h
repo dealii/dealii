@@ -305,6 +305,17 @@ namespace internal
       quad_index_from_n_q_points(const unsigned int n_q_points) const;
 
       /**
+       * Get the descriptor from another instance of QuadratureDescriptor,
+       * clearing all other data fields.
+       */
+      template <typename Number2, typename VectorizedArrayType2>
+      void
+      copy_descriptor(const MappingInfoStorage<structdim,
+                                               spacedim,
+                                               Number2,
+                                               VectorizedArrayType2> &other);
+
+      /**
        * Prints a detailed summary of memory consumption in the different
        * structures of this class to the given output stream.
        */

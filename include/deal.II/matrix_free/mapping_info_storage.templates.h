@@ -182,6 +182,47 @@ namespace internal
               int spacedim,
               typename Number,
               typename VectorizedArrayType>
+    template <typename Number2, typename VectorizedArrayType2>
+    void
+    MappingInfoStorage<structdim, spacedim, Number, VectorizedArrayType>::
+      copy_descriptor(const MappingInfoStorage<structdim,
+                                               spacedim,
+                                               Number2,
+                                               VectorizedArrayType2> &other)
+    {
+      clear_data_fields();
+      descriptor.clear();
+      descriptor.resize(other.descriptor.size());
+      for (unsigned int i = 0; i < descriptor.size(); ++i)
+        {
+          descriptor[i].n_q_points    = other.descriptor[i].n_q_points;
+          descriptor[i].quadrature_1d = other.descriptor[i].quadrature_1d;
+          descriptor[i].quadrature    = other.descriptor[i].quadrature;
+          for (unsigned int d = 0; d < structdim; ++d)
+            {
+              descriptor[i].tensor_quadrature_weights[d].resize(
+                other.descriptor[i].tensor_quadrature_weights[d].size());
+              std::copy(
+                other.descriptor[i].tensor_quadrature_weights[d].begin(),
+                other.descriptor[i].tensor_quadrature_weights[d].end(),
+                descriptor[i].tensor_quadrature_weights[d].begin());
+            }
+          descriptor[i].quadrature_weights.resize(
+            other.descriptor[i].quadrature_weights.size());
+          std::copy(other.descriptor[i].quadrature_weights.begin(),
+                    other.descriptor[i].quadrature_weights.end(),
+                    descriptor[i].quadrature_weights.begin());
+          descriptor[i].face_orientations =
+            other.descriptor[i].face_orientations;
+        }
+    }
+
+
+
+    template <int structdim,
+              int spacedim,
+              typename Number,
+              typename VectorizedArrayType>
     std::size_t
     MappingInfoStorage<structdim, spacedim, Number, VectorizedArrayType>::
       memory_consumption() const

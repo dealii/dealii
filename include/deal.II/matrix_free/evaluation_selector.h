@@ -35,6 +35,9 @@ DEAL_II_NAMESPACE_OPEN
 template <int dim, int fe_degree, int n_q_points_1d, typename Number>
 struct SelectEvaluator
 {
+  using ScalarNumber =
+    typename internal::VectorizedArrayTrait<Number>::value_type;
+
   /**
    * Chooses an appropriate evaluation strategy for the evaluate function, i.e.
    * this calls internal::FEEvaluationImpl::evaluate(),
@@ -45,12 +48,8 @@ struct SelectEvaluator
   static void
   evaluate(const unsigned int                     n_components,
            const EvaluationFlags::EvaluationFlags evaluation_flag,
-           const internal::MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
-           Number *values_dofs_actual,
-           Number *values_quad,
-           Number *gradients_quad,
-           Number *hessians_quad,
-           Number *scratch_data);
+           const Number *                         values_dofs,
+           FEEvaluationBaseData<dim, ScalarNumber, false, Number> &eval);
 
   /**
    * Chooses an appropriate evaluation strategy for the integrate function, i.e.
@@ -62,12 +61,8 @@ struct SelectEvaluator
   static void
   integrate(const unsigned int                     n_components,
             const EvaluationFlags::EvaluationFlags integration_flag,
-            const internal::MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
-            Number *   values_dofs_actual,
-            Number *   values_quad,
-            Number *   gradients_quad,
-            Number *   hessians_quad,
-            Number *   scratch_data,
+            Number *                               values_dofs,
+            FEEvaluationBaseData<dim, ScalarNumber, false, Number> &eval,
             const bool sum_into_values_array = false);
 };
 
@@ -79,24 +74,14 @@ inline void
 SelectEvaluator<dim, fe_degree, n_q_points_1d, Number>::evaluate(
   const unsigned int                                      n_components,
   const EvaluationFlags::EvaluationFlags                  evaluation_flag,
-  const internal::MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
-  Number *                                                values_dofs_actual,
-  Number *                                                values_quad,
-  Number *                                                gradients_quad,
-  Number *                                                hessians_quad,
-  Number *                                                scratch_data)
+  const Number *                                          values_dofs,
+  FEEvaluationBaseData<dim, ScalarNumber, false, Number> &eval)
 {
   Assert(fe_degree >= 0 && n_q_points_1d > 0, ExcInternalError());
 
-  internal::FEEvaluationImplEvaluateSelector<dim, Number>::
-    template run<fe_degree, n_q_points_1d>(n_components,
-                                           evaluation_flag,
-                                           shape_info,
-                                           values_dofs_actual,
-                                           values_quad,
-                                           gradients_quad,
-                                           hessians_quad,
-                                           scratch_data);
+  internal::FEEvaluationImplEvaluateSelector<dim, Number>::template run<
+    fe_degree,
+    n_q_points_1d>(n_components, evaluation_flag, values_dofs, eval);
 }
 
 
@@ -106,26 +91,15 @@ inline void
 SelectEvaluator<dim, fe_degree, n_q_points_1d, Number>::integrate(
   const unsigned int                                      n_components,
   const EvaluationFlags::EvaluationFlags                  integration_flag,
-  const internal::MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
-  Number *                                                values_dofs_actual,
-  Number *                                                values_quad,
-  Number *                                                gradients_quad,
-  Number *                                                hessians_quad,
-  Number *                                                scratch_data,
+  Number *                                                values_dofs,
+  FEEvaluationBaseData<dim, ScalarNumber, false, Number> &eval,
   const bool                                              sum_into_values_array)
 {
   Assert(fe_degree >= 0 && n_q_points_1d > 0, ExcInternalError());
 
   internal::FEEvaluationImplIntegrateSelector<dim, Number>::
-    template run<fe_degree, n_q_points_1d>(n_components,
-                                           integration_flag,
-                                           shape_info,
-                                           values_dofs_actual,
-                                           values_quad,
-                                           gradients_quad,
-                                           hessians_quad,
-                                           scratch_data,
-                                           sum_into_values_array);
+    template run<fe_degree, n_q_points_1d>(
+      n_components, integration_flag, values_dofs, eval, sum_into_values_array);
 }
 #endif // DOXYGEN
 
