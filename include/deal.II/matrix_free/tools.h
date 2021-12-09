@@ -489,7 +489,7 @@ namespace MatrixFreeTools
                                                           phi.get_shape_info()
                                                             .data.front()
                                                             .fe_degree,
-                                                          phi,
+                                                          phi.get_shape_info(),
                                                           false,
                                                           constraint_mask,
                                                           values_dofs.data());

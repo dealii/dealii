@@ -23,6 +23,7 @@
 #include <deal.II/base/vectorization.h>
 
 #include <deal.II/matrix_free/hanging_nodes_internal.h>
+#include <deal.II/matrix_free/shape_info.h>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -80,19 +81,17 @@ namespace internal
   template <FEEvaluationImplHangingNodesRunnerTypes,
             int dim,
             int fe_degree,
-            typename Number,
-            bool is_face>
+            typename Number>
   class FEEvaluationImplHangingNodesRunner;
 
 
 
-  template <int dim, int fe_degree, typename Number, bool is_face>
+  template <int dim, int fe_degree, typename Number>
   class FEEvaluationImplHangingNodesRunner<
     FEEvaluationImplHangingNodesRunnerTypes::vectorized,
     dim,
     fe_degree,
-    Number,
-    is_face>
+    Number>
   {
   private:
     template <int structdim, unsigned int direction, bool transpose>
@@ -187,29 +186,21 @@ namespace internal
   public:
     template <bool transpose>
     static void
-    run_internal(const unsigned int                  n_components,
-                 const FEEvaluationBaseData<dim,
-                                            typename Number::value_type,
-                                            is_face,
-                                            Number> &fe_eval,
+    run_internal(const unsigned int                            n_components,
+                 const MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
                  const std::array<MatrixFreeFunctions::ConstraintKinds,
-                                  Number::size()> &  constraint_mask,
-                 Number *                            values)
+                                  Number::size()> &            constraint_mask,
+                 Number *                                      values)
     {
       using Kinds = MatrixFreeFunctions::ConstraintKinds;
       const unsigned int given_degree =
-        fe_degree != -1 ? fe_degree :
-                          fe_eval.get_shape_info().data.front().fe_degree;
+        fe_degree != -1 ? fe_degree : shape_info.data.front().fe_degree;
 
       const Number *DEAL_II_RESTRICT weights =
-        fe_eval.get_shape_info()
-          .data.front()
-          .subface_interpolation_matrices[0]
-          .data();
+        shape_info.data.front().subface_interpolation_matrices[0].data();
 
       const unsigned int points = given_degree + 1;
-      const unsigned int n_dofs =
-        fe_eval.get_shape_info().dofs_per_component_on_cell;
+      const unsigned int n_dofs = shape_info.dofs_per_component_on_cell;
 
       if (dim == 2)
         {
@@ -479,11 +470,9 @@ namespace internal
 
     template <typename T>
     static inline const std::array<AlignedVector<interpolation_type>, 2> &
-    get_interpolation_matrix(const T &fe_eval)
+    get_interpolation_matrix(const T &shape_info)
     {
-      return fe_eval.get_shape_info()
-        .data.front()
-        .subface_interpolation_matrices_scalar;
+      return shape_info.data.front().subface_interpolation_matrices_scalar;
     }
 
     static inline DEAL_II_ALWAYS_INLINE_RELEASE unsigned int
@@ -553,11 +542,9 @@ namespace internal
 
     template <typename T>
     static inline const std::array<AlignedVector<T1>, 2> &
-    get_interpolation_matrix(const T &fe_eval)
+    get_interpolation_matrix(const T &shape_info)
     {
-      return fe_eval.get_shape_info()
-        .data.front()
-        .subface_interpolation_matrices;
+      return shape_info.data.front().subface_interpolation_matrices;
     }
 
     static inline DEAL_II_ALWAYS_INLINE_RELEASE bool
@@ -620,11 +607,9 @@ namespace internal
 
     template <typename T>
     static inline const std::array<AlignedVector<T1>, 2> &
-    get_interpolation_matrix(const T &fe_eval)
+    get_interpolation_matrix(const T &shape_info)
     {
-      return fe_eval.get_shape_info()
-        .data.front()
-        .subface_interpolation_matrices;
+      return shape_info.data.front().subface_interpolation_matrices;
     }
 
     static inline DEAL_II_ALWAYS_INLINE_RELEASE bool
@@ -694,11 +679,9 @@ namespace internal
 
     template <typename T>
     static inline const std::array<AlignedVector<T1>, 2> &
-    get_interpolation_matrix(const T &fe_eval)
+    get_interpolation_matrix(const T &shape_info)
     {
-      return fe_eval.get_shape_info()
-        .data.front()
-        .subface_interpolation_matrices;
+      return shape_info.data.front().subface_interpolation_matrices;
     }
 
     static inline DEAL_II_ALWAYS_INLINE_RELEASE bool
@@ -1469,13 +1452,12 @@ namespace internal
   };
 
 
-  template <int dim, int fe_degree, typename Number, bool is_face>
+  template <int dim, int fe_degree, typename Number>
   class FEEvaluationImplHangingNodesRunner<
     FEEvaluationImplHangingNodesRunnerTypes::scalar,
     dim,
     fe_degree,
-    Number,
-    is_face>
+    Number>
   {
   public:
     static const VectorizationTypes VectorizationType =
@@ -1537,21 +1519,17 @@ namespace internal
   public:
     template <bool transpose>
     static void
-    run_internal(const unsigned int                  n_desired_components,
-                 const FEEvaluationBaseData<dim,
-                                            typename Number::value_type,
-                                            is_face,
-                                            Number> &fe_eval,
+    run_internal(const unsigned int n_desired_components,
+                 const MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
                  const std::array<MatrixFreeFunctions::ConstraintKinds,
-                                  Number::size()> &  constraint_mask,
-                 Number *                            values)
+                                  Number::size()> &            constraint_mask,
+                 Number *                                      values)
     {
       const unsigned int given_degree =
-        fe_degree != -1 ? fe_degree :
-                          fe_eval.get_shape_info().data.front().fe_degree;
+        fe_degree != -1 ? fe_degree : shape_info.data.front().fe_degree;
 
       const auto &interpolation_matrices =
-        Trait<Number, VectorizationType>::get_interpolation_matrix(fe_eval);
+        Trait<Number, VectorizationType>::get_interpolation_matrix(shape_info);
 
       const auto constraint_mask_sorted =
         Trait<Number, VectorizationType>::create_mask(constraint_mask);
@@ -1720,25 +1698,22 @@ namespace internal
                 }
             }
 
-          values += fe_eval.get_shape_info().dofs_per_component_on_cell;
+          values += shape_info.dofs_per_component_on_cell;
         }
     }
   };
 
 
 
-  template <int dim, typename Number, bool is_face>
+  template <int dim, typename Number>
   struct FEEvaluationImplHangingNodes
   {
   public:
     template <int fe_degree, int n_q_points_1d>
     static bool
-    run(const unsigned int                  n_desired_components,
-        const FEEvaluationBaseData<dim,
-                                   typename Number::value_type,
-                                   is_face,
-                                   Number> &fe_eval,
-        const bool                          transpose,
+    run(const unsigned int                            n_desired_components,
+        const MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
+        const bool                                    transpose,
         const std::array<MatrixFreeFunctions::ConstraintKinds, Number::size()>
           &     c_mask,
         Number *values)
@@ -1747,17 +1722,16 @@ namespace internal
         FEEvaluationImplHangingNodesRunner<used_runner_type<fe_degree>(),
                                            dim,
                                            fe_degree,
-                                           Number,
-                                           is_face>;
+                                           Number>;
 
       if (transpose)
         RunnerType::template run_internal<true>(n_desired_components,
-                                                fe_eval,
+                                                shape_info,
                                                 c_mask,
                                                 values);
       else
         RunnerType::template run_internal<false>(n_desired_components,
-                                                 fe_eval,
+                                                 shape_info,
                                                  c_mask,
                                                  values);
 
