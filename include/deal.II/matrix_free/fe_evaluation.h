@@ -779,9 +779,8 @@ protected:
   /**
    * Apply hanging-node constraints.
    */
-  template <bool transpose>
   void
-  apply_hanging_node_constraints() const;
+  apply_hanging_node_constraints(const bool transpose) const;
 
   /**
    * This is the general array for all data fields.
@@ -4433,16 +4432,15 @@ template <int dim,
           typename Number,
           bool is_face,
           typename VectorizedArrayType>
-template <bool transpose>
 inline void
 FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
-  apply_hanging_node_constraints() const
+  apply_hanging_node_constraints(const bool transpose) const
 {
   if (this->dof_info == nullptr ||
       this->dof_info->hanging_node_constraint_masks.size() == 0)
     return; // nothing to do with faces
 
-  unsigned int n_vectorization_actual =
+  const unsigned int n_vectorization_actual =
     this->dof_info
       ->n_vectorization_lanes_filled[this->dof_access_index][this->cell];
 
@@ -4526,7 +4524,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   internal::VectorReader<Number, VectorizedArrayType> reader;
   read_write_operation(reader, src_data.first, src_data.second, mask, true);
 
-  apply_hanging_node_constraints<false>();
+  apply_hanging_node_constraints(false);
 
 #  ifdef DEBUG
   this->dof_values_initialized = true;
@@ -4583,7 +4581,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
          internal::ExcAccessToUninitializedField());
 #  endif
 
-  apply_hanging_node_constraints<true>();
+  apply_hanging_node_constraints(true);
 
   const auto dst_data = internal::get_vector_data<n_components_>(
     dst,
