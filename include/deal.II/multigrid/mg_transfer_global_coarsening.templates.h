@@ -1321,14 +1321,17 @@ namespace internal
           transfer.schemes[0].n_dofs_per_cell_coarse);
 
         // ---------------------- lexicographic_numbering ----------------------
-        std::vector<unsigned int> lexicographic_numbering;
+        std::vector<unsigned int> lexicographic_numbering_fine;
+        std::vector<unsigned int> lexicographic_numbering_coarse;
         if (reference_cell == ReferenceCells::get_hypercube<dim>())
           {
             const Quadrature<1> dummy_quadrature(
               std::vector<Point<1>>(1, Point<1>()));
             internal::MatrixFreeFunctions::ShapeInfo<Number> shape_info;
             shape_info.reinit(dummy_quadrature, fe_fine, 0);
-            lexicographic_numbering = shape_info.lexicographic_numbering;
+            lexicographic_numbering_fine = shape_info.lexicographic_numbering;
+            shape_info.reinit(dummy_quadrature, fe_coarse, 0);
+            lexicographic_numbering_coarse = shape_info.lexicographic_numbering;
           }
         else
           {
@@ -1336,7 +1339,9 @@ namespace internal
               reference_cell.template get_gauss_type_quadrature<dim>(1);
             internal::MatrixFreeFunctions::ShapeInfo<Number> shape_info;
             shape_info.reinit(dummy_quadrature, fe_fine, 0);
-            lexicographic_numbering = shape_info.lexicographic_numbering;
+            lexicographic_numbering_fine = shape_info.lexicographic_numbering;
+            shape_info.reinit(dummy_quadrature, fe_coarse, 0);
+            lexicographic_numbering_coarse = shape_info.lexicographic_numbering;
           }
 
         // ------------------------------ indices ------------------------------
@@ -1367,7 +1372,7 @@ namespace internal
                    i++)
                 level_dof_indices_coarse_0[i] =
                   transfer.partitioner_coarse->global_to_local(
-                    local_dof_indices[lexicographic_numbering[i]]);
+                    local_dof_indices[lexicographic_numbering_coarse[i]]);
             }
 
             // child
@@ -1378,7 +1383,7 @@ namespace internal
                    i++)
                 level_dof_indices_fine_0[i] =
                   transfer.partitioner_fine->global_to_local(
-                    local_dof_indices[lexicographic_numbering[i]]);
+                    local_dof_indices[lexicographic_numbering_fine[i]]);
             }
 
             // move pointers
@@ -1403,7 +1408,7 @@ namespace internal
                      i++)
                   level_dof_indices_coarse_1[i] =
                     transfer.partitioner_coarse->global_to_local(
-                      local_dof_indices[lexicographic_numbering[i]]);
+                      local_dof_indices[lexicographic_numbering_coarse[i]]);
               }
 
             // child
@@ -1414,7 +1419,7 @@ namespace internal
                    i++)
                 level_dof_indices_fine_1[cell_local_chilren_indices[c][i]] =
                   transfer.partitioner_fine->global_to_local(
-                    local_dof_indices[lexicographic_numbering[i]]);
+                    local_dof_indices[lexicographic_numbering_fine[i]]);
             }
 
             // move pointers (only once at the end)
