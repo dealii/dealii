@@ -29,7 +29,7 @@
 #include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/matrix_free/evaluation_template_factory.h>
-#include <deal.II/matrix_free/fe_evaluation_base_data.h>
+#include <deal.II/matrix_free/fe_evaluation_data.h>
 #include <deal.II/matrix_free/mapping_info.h>
 #include <deal.II/matrix_free/mapping_info_storage.templates.h>
 #include <deal.II/matrix_free/util.h>
@@ -52,53 +52,6 @@ namespace internal
       face_type.clear();
       mapping_collection = nullptr;
       mapping            = nullptr;
-    }
-
-
-
-    template <int dim, typename Number, typename VectorizedArrayType>
-    UpdateFlags
-    MappingInfo<dim, Number, VectorizedArrayType>::compute_update_flags(
-      const UpdateFlags                                update_flags,
-      const std::vector<dealii::hp::QCollection<dim>> &quad)
-    {
-      // this class is build around the evaluation of jacobians, so compute
-      // them in any case. The Jacobians will be inverted manually. Since we
-      // always do support integration, we also include the JxW values
-      UpdateFlags new_flags = update_jacobians | update_JxW_values;
-
-      // for Hessian information, need inverse Jacobians and the derivative of
-      // Jacobians (these two together will give use the gradients of the
-      // inverse Jacobians, which is what we need)
-      if (update_flags & update_hessians ||
-          update_flags & update_jacobian_grads)
-        new_flags |= update_jacobian_grads;
-
-      if (update_flags & update_quadrature_points)
-        new_flags |= update_quadrature_points;
-
-      // there is one more thing: if we have a quadrature formula with only
-      // one quadrature point on the first component, but more points on later
-      // components, we need to have Jacobian gradients anyway in order to
-      // determine whether the Jacobian is constant throughout a cell
-      if (quad.empty() == false)
-        {
-          bool formula_with_one_point = false;
-          for (unsigned int i = 0; i < quad[0].size(); ++i)
-            if (quad[0][i].size() == 1)
-              {
-                formula_with_one_point = true;
-                break;
-              }
-          if (formula_with_one_point == true)
-            for (unsigned int comp = 1; comp < quad.size(); ++comp)
-              for (unsigned int i = 0; i < quad[comp].size(); ++i)
-                if (quad[comp][i].size() > 1)
-                  {
-                    new_flags |= update_jacobian_grads;
-                  }
-        }
-      return new_flags;
     }
 
 
@@ -130,7 +83,9 @@ namespace internal
       // dummy FE that is used to set up an FEValues object. Do not need the
       // actual finite element because we will only evaluate quantities for
       // the mapping that are independent of the FE
-      this->update_flags_cells = compute_update_flags(update_flags_cells, quad);
+      this->update_flags_cells =
+        MappingInfoStorage<dim, dim, VectorizedArrayType>::compute_update_flags(
+          update_flags_cells, quad);
 
       this->update_flags_boundary_faces =
         ((update_flags_inner_faces | update_flags_boundary_faces) &
@@ -646,9 +601,9 @@ namespace internal
         const std::vector<unsigned int> &              active_fe_index,
         const dealii::hp::MappingCollection<dim> &     mapping,
         MappingInfo<dim, Number, VectorizedArrayType> &mapping_info,
-        std::pair<std::vector<
-                    MappingInfoStorage<dim, dim, Number, VectorizedArrayType>>,
-                  CompressedCellData<dim, Number, VectorizedArrayType>> &data)
+        std::pair<
+          std::vector<MappingInfoStorage<dim, dim, VectorizedArrayType>>,
+          CompressedCellData<dim, Number, VectorizedArrayType>> &data)
       {
         FE_Nothing<dim> dummy_fe;
 
@@ -923,14 +878,14 @@ namespace internal
                 typename Number,
                 typename VectorizedArrayType>
       void
-      copy_data(const unsigned int                first_cell,
-                const std::array<std::size_t, 2> &data_shift,
-                const std::vector<unsigned int> & indices_compressed,
-                const std::vector<GeometryType> & cell_type,
-                MappingInfoStorage<structdim, dim, Number, VectorizedArrayType>
-                  &data_cells_local,
-                MappingInfoStorage<structdim, dim, Number, VectorizedArrayType>
-                  &data_cells)
+      copy_data(
+        const unsigned int                first_cell,
+        const std::array<std::size_t, 2> &data_shift,
+        const std::vector<unsigned int> & indices_compressed,
+        const std::vector<GeometryType> & cell_type,
+        MappingInfoStorage<structdim, dim, VectorizedArrayType>
+          &data_cells_local,
+        MappingInfoStorage<structdim, dim, VectorizedArrayType> &data_cells)
       {
         // Copy the index offsets and shift by the appropriate value
         for (unsigned int lcell = 0;
@@ -1166,7 +1121,7 @@ namespace internal
         const UpdateFlags                  update_flags_cells,
         const AlignedVector<double> &      plain_quadrature_points,
         const ShapeInfo<VectorizedDouble> &shape_info,
-        MappingInfoStorage<dim, dim, Number, VectorizedArrayType> &my_data)
+        MappingInfoStorage<dim, dim, VectorizedArrayType> &my_data)
       {
         constexpr unsigned int n_lanes   = VectorizedArrayType::size();
         constexpr unsigned int n_lanes_d = VectorizedDouble::size();
@@ -1176,9 +1131,9 @@ namespace internal
           shape_info.dofs_per_component_on_cell;
         constexpr unsigned int hess_dim = dim * (dim + 1) / 2;
 
-        MappingInfoStorage<dim, dim, double, VectorizedDouble> temp_data;
+        MappingInfoStorage<dim, dim, VectorizedDouble> temp_data;
         temp_data.copy_descriptor(my_data);
-        FEEvaluationBaseData<dim, double, false, VectorizedDouble> eval(
+        FEEvaluationData<dim, VectorizedDouble, false> eval(
           {&shape_info, nullptr, &temp_data, 0, 0});
 
         AlignedVector<VectorizedDouble> evaluation_data;
@@ -1198,7 +1153,7 @@ namespace internal
                                                 start_indices,
                                                 eval.begin_dof_values());
 
-                  FEEvaluationFactory<dim, double, VectorizedDouble>::evaluate(
+                  FEEvaluationFactory<dim, VectorizedDouble>::evaluate(
                     dim,
                     EvaluationFlags::values | EvaluationFlags::gradients |
                       (update_flags_cells & update_jacobian_grads ?
@@ -1339,7 +1294,7 @@ namespace internal
                    MultithreadInfo::n_threads());
 
       std::vector<std::pair<
-        std::vector<MappingInfoStorage<dim, dim, Number, VectorizedArrayType>>,
+        std::vector<MappingInfoStorage<dim, dim, VectorizedArrayType>>,
         ExtractCellHelper::
           CompressedCellData<dim, Number, VectorizedArrayType>>>
         data_cells_local;
@@ -1353,8 +1308,7 @@ namespace internal
         while (cell_range.first < n_cell_batches)
           {
             data_cells_local.push_back(std::make_pair(
-              std::vector<
-                MappingInfoStorage<dim, dim, Number, VectorizedArrayType>>(
+              std::vector<MappingInfoStorage<dim, dim, VectorizedArrayType>>(
                 cell_data.size()),
               ExtractCellHelper::
                 CompressedCellData<dim, Number, VectorizedArrayType>(
@@ -1569,8 +1523,7 @@ namespace internal
         const dealii::hp::MappingCollection<dim> &     mapping_in,
         MappingInfo<dim, Number, VectorizedArrayType> &mapping_info,
         std::pair<
-          std::vector<
-            MappingInfoStorage<dim - 1, dim, Number, VectorizedArrayType>>,
+          std::vector<MappingInfoStorage<dim - 1, dim, VectorizedArrayType>>,
           CompressedFaceData<dim, Number, VectorizedArrayType>> &data)
       {
         std::vector<std::vector<std::shared_ptr<FE_Nothing<dim>>>> dummy_fe(
@@ -2029,9 +1982,8 @@ namespace internal
         const unsigned int               last_face,
         const std::vector<GeometryType> &face_type,
         const std::vector<FaceToCellTopology<VectorizedArrayType::size()>>
-          &faces,
-        MappingInfoStorage<dim - 1, dim, Number, VectorizedArrayType>
-          &data_faces)
+          &                                                    faces,
+        MappingInfoStorage<dim - 1, dim, VectorizedArrayType> &data_faces)
       {
         for (unsigned int face = first_face; face < last_face; ++face)
           {
@@ -2078,7 +2030,7 @@ namespace internal
         const UpdateFlags                  update_flags_faces,
         const AlignedVector<double> &      plain_quadrature_points,
         const ShapeInfo<VectorizedDouble> &shape_info,
-        MappingInfoStorage<dim - 1, dim, Number, VectorizedArrayType> &my_data)
+        MappingInfoStorage<dim - 1, dim, VectorizedArrayType> &my_data)
       {
         constexpr unsigned int n_lanes   = VectorizedArrayType::size();
         constexpr unsigned int n_lanes_d = VectorizedDouble::size();
@@ -2088,11 +2040,11 @@ namespace internal
           shape_info.dofs_per_component_on_cell;
         constexpr unsigned int hess_dim = dim * (dim + 1) / 2;
 
-        MappingInfoStorage<dim - 1, dim, double, VectorizedDouble> temp_data;
+        MappingInfoStorage<dim - 1, dim, VectorizedDouble> temp_data;
         temp_data.copy_descriptor(my_data);
-        FEEvaluationBaseData<dim, double, true, VectorizedDouble> eval_int(
+        FEEvaluationData<dim, VectorizedDouble, true> eval_int(
           {&shape_info, nullptr, &temp_data, 0, 0}, true);
-        FEEvaluationBaseData<dim, double, true, VectorizedDouble> eval_ext(
+        FEEvaluationData<dim, VectorizedDouble, true> eval_ext(
           {&shape_info, nullptr, &temp_data, 0, 0}, false);
 
         AlignedVector<VectorizedDouble> evaluation_data, evaluation_data_ext;
@@ -2129,7 +2081,7 @@ namespace internal
 
               // now let the matrix-free evaluators provide us with the
               // data on faces
-              FEFaceEvaluationFactory<dim, double, VectorizedDouble>::evaluate(
+              FEFaceEvaluationFactory<dim, VectorizedDouble>::evaluate(
                 dim,
                 EvaluationFlags::values | EvaluationFlags::gradients |
                   (update_flags_faces & update_jacobian_grads ?
@@ -2153,12 +2105,11 @@ namespace internal
               const unsigned int offset = my_data.data_index_offsets[face];
 
               const auto compute_jacobian_grad =
-                [&](unsigned int                     face_no,
-                    int                              is_exterior,
-                    unsigned int                     q,
-                    Tensor<2, dim, VectorizedDouble> inv_jac,
-                    FEEvaluationBaseData<dim, double, true, VectorizedDouble>
-                      &eval) {
+                [&](unsigned int                                   face_no,
+                    int                                            is_exterior,
+                    unsigned int                                   q,
+                    Tensor<2, dim, VectorizedDouble>               inv_jac,
+                    FEEvaluationData<dim, VectorizedDouble, true> &eval) {
                   Tensor<2, dim, VectorizedDouble> inv_transp_jac_permut;
                   for (unsigned int d = 0; d < dim; ++d)
                     for (unsigned int e = 0; e < dim; ++e)
@@ -2299,15 +2250,14 @@ namespace internal
                                                 start_indices,
                                                 eval_ext.begin_dof_values());
 
-                  FEFaceEvaluationFactory<dim, double, VectorizedDouble>::
-                    evaluate(dim,
-                             EvaluationFlags::values |
-                               EvaluationFlags::gradients |
-                               (update_flags_faces & update_jacobian_grads ?
-                                  EvaluationFlags::hessians :
-                                  EvaluationFlags::nothing),
-                             eval_ext.begin_dof_values(),
-                             eval_ext);
+                  FEFaceEvaluationFactory<dim, VectorizedDouble>::evaluate(
+                    dim,
+                    EvaluationFlags::values | EvaluationFlags::gradients |
+                      (update_flags_faces & update_jacobian_grads ?
+                         EvaluationFlags::hessians :
+                         EvaluationFlags::nothing),
+                    eval_ext.begin_dof_values(),
+                    eval_ext);
 
                   for (unsigned int q = 0; q < n_points_compute; ++q)
                     {
@@ -2377,8 +2327,7 @@ namespace internal
                    MultithreadInfo::n_threads());
 
       std::vector<std::pair<
-        std::vector<
-          MappingInfoStorage<dim - 1, dim, Number, VectorizedArrayType>>,
+        std::vector<MappingInfoStorage<dim - 1, dim, VectorizedArrayType>>,
         ExtractFaceHelper::
           CompressedFaceData<dim, Number, VectorizedArrayType>>>
         data_faces_local;
@@ -2393,7 +2342,7 @@ namespace internal
           {
             data_faces_local.push_back(std::make_pair(
               std::vector<
-                MappingInfoStorage<dim - 1, dim, Number, VectorizedArrayType>>(
+                MappingInfoStorage<dim - 1, dim, VectorizedArrayType>>(
                 face_data.size()),
               ExtractFaceHelper::
                 CompressedFaceData<dim, Number, VectorizedArrayType>(
@@ -2678,7 +2627,7 @@ namespace internal
       // points, filling up all SIMD lanes as appropriate
       for (unsigned int my_q = 0; my_q < cell_data.size(); ++my_q)
         {
-          MappingInfoStorage<dim, dim, Number, VectorizedArrayType> &my_data =
+          MappingInfoStorage<dim, dim, VectorizedArrayType> &my_data =
             cell_data[my_q];
 
           // step 4a: set the index offsets, find out how much to allocate,
@@ -2800,8 +2749,8 @@ namespace internal
       // points, filling up all SIMD lanes as appropriate
       for (unsigned int my_q = 0; my_q < face_data.size(); ++my_q)
         {
-          MappingInfoStorage<dim - 1, dim, Number, VectorizedArrayType>
-            &my_data = face_data[my_q];
+          MappingInfoStorage<dim - 1, dim, VectorizedArrayType> &my_data =
+            face_data[my_q];
 
           // step 6a: set the index offsets, find out how much to allocate,
           // and allocate the memory

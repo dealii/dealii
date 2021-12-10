@@ -109,18 +109,18 @@ namespace internal
      *
      * @ingroup matrixfree
      */
-    template <int structdim,
-              int spacedim,
-              typename Number,
-              typename VectorizedArrayType>
+    template <int structdim, int spacedim, typename Number>
     struct MappingInfoStorage
     {
-      static_assert(
-        std::is_same<Number, typename VectorizedArrayType::value_type>::value,
-        "Type of Number and of VectorizedArrayType do not match.");
-
       struct QuadratureDescriptor
       {
+        /**
+         * In case this class is instantiated for VectorizedArray types, this
+         * indicates the underlying scalar type for data which is the same on
+         * all lanes like the quadrature weights.
+         */
+        using ScalarNumber = typename VectorizedArrayTrait<Number>::value_type;
+
         /**
          * Constructor. Does nothing.
          */
@@ -167,14 +167,15 @@ namespace internal
          * Quadrature weights separated by dimension for use in specific
          * situations.
          */
-        std::array<AlignedVector<Number>, structdim> tensor_quadrature_weights;
+        std::array<AlignedVector<ScalarNumber>, structdim>
+          tensor_quadrature_weights;
 
         /**
          * A cached vector of quadrature weights in the given number format
          * (non-vectorized, as it is cheap to broadcast the value to all lanes
          * when it is used in a vectorized context).
          */
-        AlignedVector<Number> quadrature_weights;
+        AlignedVector<ScalarNumber> quadrature_weights;
 
         /**
          * For quadrature on faces, the evaluation of basis functions is not
@@ -217,14 +218,14 @@ namespace internal
        *
        * Indexed by @p data_index_offsets.
        */
-      AlignedVector<VectorizedArrayType> JxW_values;
+      AlignedVector<Number> JxW_values;
 
       /**
        * Stores the normal vectors.
        *
        * Indexed by @p data_index_offsets.
        */
-      AlignedVector<Tensor<1, spacedim, VectorizedArrayType>> normal_vectors;
+      AlignedVector<Tensor<1, spacedim, Number>> normal_vectors;
 
       /**
        * The storage of covariant transformation on quadrature points, i.e.,
@@ -237,8 +238,7 @@ namespace internal
        * but the default case (cell integrals or boundary integrals) only
        * fills the zeroth component and ignores the first one.
        */
-      std::array<AlignedVector<Tensor<2, spacedim, VectorizedArrayType>>, 2>
-        jacobians;
+      std::array<AlignedVector<Tensor<2, spacedim, Number>>, 2> jacobians;
 
       /**
        * The storage of the gradients of the inverse Jacobian
@@ -256,9 +256,8 @@ namespace internal
        * fills the zeroth component and ignores the first one.
        */
       std::array<
-        AlignedVector<Tensor<1,
-                             spacedim *(spacedim + 1) / 2,
-                             Tensor<1, spacedim, VectorizedArrayType>>>,
+        AlignedVector<
+          Tensor<1, spacedim *(spacedim + 1) / 2, Tensor<1, spacedim, Number>>>,
         2>
         jacobian_gradients;
 
@@ -269,7 +268,7 @@ namespace internal
        *
        * Indexed by @p data_index_offsets.
        */
-      std::array<AlignedVector<Tensor<1, spacedim, VectorizedArrayType>>, 2>
+      std::array<AlignedVector<Tensor<1, spacedim, Number>>, 2>
         normals_times_jacobians;
 
       /**
@@ -287,7 +286,7 @@ namespace internal
        *
        * Indexed by @p quadrature_point_offsets.
        */
-      AlignedVector<Point<spacedim, VectorizedArrayType>> quadrature_points;
+      AlignedVector<Point<spacedim, Number>> quadrature_points;
 
       /**
        * Clears all data fields except the descriptor vector.
@@ -308,12 +307,20 @@ namespace internal
        * Get the descriptor from another instance of QuadratureDescriptor,
        * clearing all other data fields.
        */
-      template <typename Number2, typename VectorizedArrayType2>
+      template <typename Number2>
       void
-      copy_descriptor(const MappingInfoStorage<structdim,
-                                               spacedim,
-                                               Number2,
-                                               VectorizedArrayType2> &other);
+      copy_descriptor(
+        const MappingInfoStorage<structdim, spacedim, Number2> &other);
+
+      /**
+       * Helper function to determine which update flags must be set in the
+       * internal functions to initialize all data as requested by the user.
+       */
+      static UpdateFlags
+      compute_update_flags(
+        const UpdateFlags                                     update_flags,
+        const std::vector<dealii::hp::QCollection<spacedim>> &quad =
+          std::vector<dealii::hp::QCollection<spacedim>>());
 
       /**
        * Prints a detailed summary of memory consumption in the different
@@ -335,13 +342,10 @@ namespace internal
 
     /* ------------------- inline functions ----------------------------- */
 
-    template <int structdim,
-              int spacedim,
-              typename Number,
-              typename VectorizedArrayType>
+    template <int structdim, int spacedim, typename Number>
     inline unsigned int
-    MappingInfoStorage<structdim, spacedim, Number, VectorizedArrayType>::
-      quad_index_from_n_q_points(const unsigned int n_q_points) const
+    MappingInfoStorage<structdim, spacedim, Number>::quad_index_from_n_q_points(
+      const unsigned int n_q_points) const
     {
       for (unsigned int i = 0; i < descriptor.size(); ++i)
         if (n_q_points == descriptor[i].n_q_points)

@@ -41,17 +41,15 @@ namespace internal
 
 
 
-  template <int dim, typename Number, typename VectorizedArrayType>
+  template <int dim, typename Number>
   void
-  FEEvaluationFactory<dim, Number, VectorizedArrayType>::evaluate(
+  FEEvaluationFactory<dim, Number>::evaluate(
     const unsigned int                     n_components,
     const EvaluationFlags::EvaluationFlags evaluation_flag,
-    const VectorizedArrayType *            values_dofs,
-    FEEvaluationBaseData<dim, Number, false, VectorizedArrayType> &eval)
+    const Number *                         values_dofs,
+    FEEvaluationData<dim, Number, false> & eval)
   {
-    instantiation_helper_run<
-      1,
-      FEEvaluationImplEvaluateSelector<dim, VectorizedArrayType>>(
+    instantiation_helper_run<1, FEEvaluationImplEvaluateSelector<dim, Number>>(
       eval.get_shape_info().data[0].fe_degree,
       eval.get_shape_info().data[0].n_q_points_1d,
       n_components,
@@ -62,18 +60,16 @@ namespace internal
 
 
 
-  template <int dim, typename Number, typename VectorizedArrayType>
+  template <int dim, typename Number>
   void
-  FEEvaluationFactory<dim, Number, VectorizedArrayType>::integrate(
+  FEEvaluationFactory<dim, Number>::integrate(
     const unsigned int                     n_components,
     const EvaluationFlags::EvaluationFlags integration_flag,
-    VectorizedArrayType *                  values_dofs,
-    FEEvaluationBaseData<dim, Number, false, VectorizedArrayType> &eval,
-    const bool sum_into_values_array)
+    Number *                               values_dofs,
+    FEEvaluationData<dim, Number, false> & eval,
+    const bool                             sum_into_values_array)
   {
-    instantiation_helper_run<
-      1,
-      FEEvaluationImplIntegrateSelector<dim, VectorizedArrayType>>(
+    instantiation_helper_run<1, FEEvaluationImplIntegrateSelector<dim, Number>>(
       eval.get_shape_info().data[0].fe_degree,
       eval.get_shape_info().data[0].n_q_points_1d,
       n_components,
@@ -85,11 +81,11 @@ namespace internal
 
 
 
-  template <int dim, typename Number, typename VectorizedArrayType>
+  template <int dim, typename Number>
   bool
-  FEEvaluationFactory<dim, Number, VectorizedArrayType>::
-    fast_evaluation_supported(const unsigned int given_degree,
-                              const unsigned int n_q_points_1d)
+  FEEvaluationFactory<dim, Number>::fast_evaluation_supported(
+    const unsigned int given_degree,
+    const unsigned int n_q_points_1d)
   {
     return instantiation_helper_run<1, FastEvaluationSupported>(given_degree,
                                                                 n_q_points_1d);
@@ -97,17 +93,16 @@ namespace internal
 
 
 
-  template <int dim, typename Number, typename VectorizedArrayType>
+  template <int dim, typename Number>
   void
-  FEFaceEvaluationFactory<dim, Number, VectorizedArrayType>::evaluate(
+  FEFaceEvaluationFactory<dim, Number>::evaluate(
     const unsigned int                     n_components,
     const EvaluationFlags::EvaluationFlags evaluation_flag,
-    const VectorizedArrayType *            values_dofs,
-    FEEvaluationBaseData<dim, Number, true, VectorizedArrayType> &eval)
+    const Number *                         values_dofs,
+    FEEvaluationData<dim, Number, true> &  eval)
   {
-    instantiation_helper_run<
-      1,
-      FEFaceEvaluationImplEvaluateSelector<dim, VectorizedArrayType>>(
+    instantiation_helper_run<1,
+                             FEFaceEvaluationImplEvaluateSelector<dim, Number>>(
       eval.get_shape_info().data[0].fe_degree,
       eval.get_shape_info().data[0].n_q_points_1d,
       n_components,
@@ -118,17 +113,17 @@ namespace internal
 
 
 
-  template <int dim, typename Number, typename VectorizedArrayType>
+  template <int dim, typename Number>
   void
-  FEFaceEvaluationFactory<dim, Number, VectorizedArrayType>::integrate(
+  FEFaceEvaluationFactory<dim, Number>::integrate(
     const unsigned int                     n_components,
     const EvaluationFlags::EvaluationFlags integration_flag,
-    VectorizedArrayType *                  values_dofs,
-    FEEvaluationBaseData<dim, Number, true, VectorizedArrayType> &eval)
+    Number *                               values_dofs,
+    FEEvaluationData<dim, Number, true> &  eval)
   {
     instantiation_helper_run<
       1,
-      FEFaceEvaluationImplIntegrateSelector<dim, VectorizedArrayType>>(
+      FEFaceEvaluationImplIntegrateSelector<dim, Number>>(
       eval.get_shape_info().data[0].fe_degree,
       eval.get_shape_info().data[0].n_q_points_1d,
       n_components,
@@ -141,12 +136,12 @@ namespace internal
 
   template <int dim, typename Number, typename VectorizedArrayType>
   void
-  FEFaceEvaluationFactory<dim, Number, VectorizedArrayType>::gather_evaluate(
-    const unsigned int                          n_components,
-    const EvaluationFlags::EvaluationFlags      evaluation_flag,
-    const Number *                              src_ptr,
-    const std::vector<ArrayView<const Number>> *sm_ptr,
-    FEEvaluationBaseData<dim, Number, true, VectorizedArrayType> &eval)
+  FEFaceEvaluationGatherFactory<dim, Number, VectorizedArrayType>::evaluate(
+    const unsigned int                                n_components,
+    const EvaluationFlags::EvaluationFlags            evaluation_flag,
+    const Number *                                    src_ptr,
+    const std::vector<ArrayView<const Number>> *      sm_ptr,
+    FEEvaluationData<dim, VectorizedArrayType, true> &eval)
   {
     instantiation_helper_run<
       1,
@@ -166,12 +161,12 @@ namespace internal
 
   template <int dim, typename Number, typename VectorizedArrayType>
   void
-  FEFaceEvaluationFactory<dim, Number, VectorizedArrayType>::integrate_scatter(
-    const unsigned int                          n_components,
-    const EvaluationFlags::EvaluationFlags      integration_flag,
-    Number *                                    dst_ptr,
-    const std::vector<ArrayView<const Number>> *sm_ptr,
-    FEEvaluationBaseData<dim, Number, true, VectorizedArrayType> &eval)
+  FEFaceEvaluationGatherFactory<dim, Number, VectorizedArrayType>::integrate(
+    const unsigned int                                n_components,
+    const EvaluationFlags::EvaluationFlags            integration_flag,
+    Number *                                          dst_ptr,
+    const std::vector<ArrayView<const Number>> *      sm_ptr,
+    FEEvaluationData<dim, VectorizedArrayType, true> &eval)
   {
     instantiation_helper_run<
       1,
@@ -189,11 +184,11 @@ namespace internal
 
 
 
-  template <int dim, typename Number, typename VectorizedArrayType>
+  template <int dim, typename Number>
   bool
-  FEFaceEvaluationFactory<dim, Number, VectorizedArrayType>::
-    fast_evaluation_supported(const unsigned int given_degree,
-                              const unsigned int n_q_points_1d)
+  FEFaceEvaluationFactory<dim, Number>::fast_evaluation_supported(
+    const unsigned int given_degree,
+    const unsigned int n_q_points_1d)
   {
     return instantiation_helper_run<1, FastEvaluationSupported>(given_degree,
                                                                 n_q_points_1d);
@@ -201,65 +196,59 @@ namespace internal
 
 
 
-  template <int dim, typename Number, typename VectorizedArrayType>
+  template <int dim, typename Number>
   void
-  CellwiseInverseMassFactory<dim, Number, VectorizedArrayType>::apply(
-    const unsigned int n_components,
-    const FEEvaluationBaseData<dim, Number, false, VectorizedArrayType>
-      &                        fe_eval,
-    const VectorizedArrayType *in_array,
-    VectorizedArrayType *      out_array)
+  CellwiseInverseMassFactory<dim, Number>::apply(
+    const unsigned int                          n_components,
+    const FEEvaluationData<dim, Number, false> &fe_eval,
+    const Number *                              in_array,
+    Number *                                    out_array)
   {
     const unsigned int fe_degree = fe_eval.get_shape_info().data[0].fe_degree;
-    instantiation_helper_run<
-      1,
-      CellwiseInverseMassMatrixImplBasic<dim, VectorizedArrayType>>(
+    instantiation_helper_run<1,
+                             CellwiseInverseMassMatrixImplBasic<dim, Number>>(
       fe_degree, fe_degree + 1, n_components, fe_eval, in_array, out_array);
   }
 
 
 
-  template <int dim, typename Number, typename VectorizedArrayType>
+  template <int dim, typename Number>
   void
-  CellwiseInverseMassFactory<dim, Number, VectorizedArrayType>::apply(
-    const unsigned int                        n_components,
-    const unsigned int                        fe_degree,
-    const AlignedVector<VectorizedArrayType> &inverse_shape,
-    const AlignedVector<VectorizedArrayType> &inverse_coefficients,
-    const VectorizedArrayType *               in_array,
-    VectorizedArrayType *                     out_array)
+  CellwiseInverseMassFactory<dim, Number>::apply(
+    const unsigned int           n_components,
+    const unsigned int           fe_degree,
+    const AlignedVector<Number> &inverse_shape,
+    const AlignedVector<Number> &inverse_coefficients,
+    const Number *               in_array,
+    Number *                     out_array)
   {
     instantiation_helper_run<
       1,
-      CellwiseInverseMassMatrixImplFlexible<dim, VectorizedArrayType>>(
-      fe_degree,
-      fe_degree + 1,
-      n_components,
-      inverse_shape,
-      inverse_coefficients,
-      in_array,
-      out_array);
+      CellwiseInverseMassMatrixImplFlexible<dim, Number>>(fe_degree,
+                                                          fe_degree + 1,
+                                                          n_components,
+                                                          inverse_shape,
+                                                          inverse_coefficients,
+                                                          in_array,
+                                                          out_array);
   }
 
 
 
-  template <int dim, typename Number, typename VectorizedArrayType>
+  template <int dim, typename Number>
   void
-  CellwiseInverseMassFactory<dim, Number, VectorizedArrayType>::
-    transform_from_q_points_to_basis(
-      const unsigned int n_components,
-      const FEEvaluationBaseData<dim, Number, false, VectorizedArrayType>
-        &                        fe_eval,
-      const VectorizedArrayType *in_array,
-      VectorizedArrayType *      out_array)
+  CellwiseInverseMassFactory<dim, Number>::transform_from_q_points_to_basis(
+    const unsigned int                          n_components,
+    const FEEvaluationData<dim, Number, false> &fe_eval,
+    const Number *                              in_array,
+    Number *                                    out_array)
   {
     const unsigned int fe_degree = fe_eval.get_shape_info().data[0].fe_degree;
     const unsigned int n_q_points_1d =
       fe_eval.get_shape_info().data[0].n_q_points_1d;
     instantiation_helper_run<
       1,
-      CellwiseInverseMassMatrixImplTransformFromQPoints<dim,
-                                                        VectorizedArrayType>>(
+      CellwiseInverseMassMatrixImplTransformFromQPoints<dim, Number>>(
       fe_degree, n_q_points_1d, n_components, fe_eval, in_array, out_array);
   }
 

@@ -33,7 +33,7 @@
 #include <deal.II/matrix_free/evaluation_kernels.h>
 #include <deal.II/matrix_free/evaluation_selector.h>
 #include <deal.II/matrix_free/evaluation_template_factory.h>
-#include <deal.II/matrix_free/fe_evaluation_base_data.h>
+#include <deal.II/matrix_free/fe_evaluation_data.h>
 #include <deal.II/matrix_free/mapping_data_on_the_fly.h>
 #include <deal.II/matrix_free/matrix_free.h>
 #include <deal.II/matrix_free/shape_info.h>
@@ -59,7 +59,7 @@ DEAL_II_NAMESPACE_OPEN
  * FEEvaluationBase::distribute_local_to_global() functions, as well as
  * methods to access values and gradients of finite element functions. It also
  * inherits the geometry access functions provided by the class
- * FEEvaluationBaseData.
+ * FEEvaluationData.
  *
  * This class has five template arguments:
  *
@@ -91,7 +91,7 @@ template <int dim,
           bool is_face,
           typename VectorizedArrayType>
 class FEEvaluationBase
-  : public FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>
+  : public FEEvaluationData<dim, VectorizedArrayType, is_face>
 {
 public:
   using number_type = Number;
@@ -671,7 +671,7 @@ protected:
    * possibly within the element if the evaluate/integrate routines are
    * combined inside user code (e.g. for computing cell matrices).
    *
-   * The optional FEEvaluationBaseData object allows several
+   * The optional FEEvaluationData object allows several
    * FEEvaluation objects to share the geometry evaluation, i.e., the
    * underlying mapping and quadrature points do only need to be evaluated
    * once. This only works if the quadrature formulas are the same. Otherwise,
@@ -686,8 +686,7 @@ protected:
     const Quadrature<1> &     quadrature,
     const UpdateFlags         update_flags,
     const unsigned int        first_selected_component,
-    const FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>
-      *other);
+    const FEEvaluationData<dim, VectorizedArrayType, is_face> *other);
 
   /**
    * Copy constructor. If FEEvaluationBase was constructed from a mapping, fe,
@@ -845,8 +844,7 @@ protected:
     const Quadrature<1> &     quadrature,
     const UpdateFlags         update_flags,
     const unsigned int        first_selected_component,
-    const FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>
-      *other);
+    const FEEvaluationData<dim, VectorizedArrayType, is_face> *other);
 
   /**
    * Copy constructor
@@ -1003,8 +1001,7 @@ protected:
     const Quadrature<1> &     quadrature,
     const UpdateFlags         update_flags,
     const unsigned int        first_selected_component,
-    const FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>
-      *other);
+    const FEEvaluationData<dim, VectorizedArrayType, is_face> *other);
 
   /**
    * Copy constructor
@@ -1169,8 +1166,7 @@ protected:
     const Quadrature<1> &     quadrature,
     const UpdateFlags         update_flags,
     const unsigned int        first_selected_component,
-    const FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>
-      *other);
+    const FEEvaluationData<dim, VectorizedArrayType, is_face> *other);
 
   /**
    * Copy constructor
@@ -1351,7 +1347,7 @@ protected:
     const Quadrature<1> &   quadrature,
     const UpdateFlags       update_flags,
     const unsigned int      first_selected_component,
-    const FEEvaluationBaseData<1, Number, is_face, VectorizedArrayType> *other);
+    const FEEvaluationData<1, VectorizedArrayType, is_face> *other);
 
   /**
    * Copy constructor
@@ -2122,10 +2118,9 @@ public:
    * use the FEEvaluation object in %parallel to the given one because
    * otherwise the intended sharing may create race conditions.
    */
-  FEEvaluation(
-    const FiniteElement<dim> &                                           fe,
-    const FEEvaluationBaseData<dim, Number, false, VectorizedArrayType> &other,
-    const unsigned int first_selected_component = 0);
+  FEEvaluation(const FiniteElement<dim> &                               fe,
+               const FEEvaluationData<dim, VectorizedArrayType, false> &other,
+               const unsigned int first_selected_component = 0);
 
   /**
    * Copy constructor. If FEEvaluationBase was constructed from a mapping, fe,
@@ -2815,7 +2810,7 @@ namespace internal
     const internal::MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> *,
     const internal::MatrixFreeFunctions::DoFInfo *,
     const internal::MatrixFreeFunctions::
-      MappingInfoStorage<dim - is_face, dim, Number, VectorizedArrayType> *,
+      MappingInfoStorage<dim - is_face, dim, VectorizedArrayType> *,
     unsigned int,
     unsigned int>
   get_shape_info_and_indices(
@@ -2882,7 +2877,7 @@ inline FEEvaluationBase<dim,
                    const unsigned int active_fe_index,
                    const unsigned int active_quad_index,
                    const unsigned int face_type)
-  : FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>(
+  : FEEvaluationData<dim, VectorizedArrayType, is_face>(
       internal::get_shape_info_and_indices<is_face>(data_in,
                                                     dof_no,
                                                     first_selected_component,
@@ -2946,15 +2941,13 @@ inline FEEvaluationBase<dim,
     const Quadrature<1> &     quadrature,
     const UpdateFlags         update_flags,
     const unsigned int        first_selected_component,
-    const FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>
-      *other)
-  : FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>(
+    const FEEvaluationData<dim, VectorizedArrayType, is_face> *other)
+  : FEEvaluationData<dim, VectorizedArrayType, is_face>(
       other != nullptr &&
           other->mapped_geometry->get_quadrature() == quadrature ?
         other->mapped_geometry :
-        std::make_shared<
-          internal::MatrixFreeFunctions::
-            MappingDataOnTheFly<dim, Number, VectorizedArrayType>>(
+        std::make_shared<internal::MatrixFreeFunctions::
+                           MappingDataOnTheFly<dim, VectorizedArrayType>>(
           mapping,
           quadrature,
           update_flags),
@@ -3000,7 +2993,7 @@ inline FEEvaluationBase<dim,
                                           Number,
                                           is_face,
                                           VectorizedArrayType> &other)
-  : FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>(other)
+  : FEEvaluationData<dim, VectorizedArrayType, is_face>(other)
   , scratch_data_array(other.matrix_info == nullptr ?
                          new AlignedVector<VectorizedArrayType>() :
                          other.matrix_info->acquire_scratch_data())
@@ -3014,12 +3007,12 @@ inline FEEvaluationBase<dim,
           *other.data);
 
       // Create deep copy of mapped geometry for use in parallel
-      this->mapped_geometry = std::make_shared<
-        internal::MatrixFreeFunctions::
-          MappingDataOnTheFly<dim, Number, VectorizedArrayType>>(
-        other.mapped_geometry->get_fe_values().get_mapping(),
-        other.mapped_geometry->get_quadrature(),
-        other.mapped_geometry->get_fe_values().get_update_flags());
+      this->mapped_geometry =
+        std::make_shared<internal::MatrixFreeFunctions::
+                           MappingDataOnTheFly<dim, VectorizedArrayType>>(
+          other.mapped_geometry->get_fe_values().get_mapping(),
+          other.mapped_geometry->get_quadrature(),
+          other.mapped_geometry->get_fe_values().get_update_flags());
       this->mapping_data = &this->mapped_geometry->get_data_storage();
       this->cell         = 0;
 
@@ -3062,8 +3055,7 @@ operator=(const FEEvaluationBase<dim,
       matrix_info->release_scratch_data(scratch_data_array);
     }
 
-  this->FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
-  operator=(other);
+  this->FEEvaluationData<dim, VectorizedArrayType, is_face>::operator=(other);
 
   matrix_info = other.matrix_info;
 
@@ -3076,12 +3068,12 @@ operator=(const FEEvaluationBase<dim,
       scratch_data_array = new AlignedVector<VectorizedArrayType>();
 
       // Create deep copy of mapped geometry for use in parallel
-      this->mapped_geometry = std::make_shared<
-        internal::MatrixFreeFunctions::
-          MappingDataOnTheFly<dim, Number, VectorizedArrayType>>(
-        other.mapped_geometry->get_fe_values().get_mapping(),
-        other.mapped_geometry->get_quadrature(),
-        other.mapped_geometry->get_fe_values().get_update_flags());
+      this->mapped_geometry =
+        std::make_shared<internal::MatrixFreeFunctions::
+                           MappingDataOnTheFly<dim, VectorizedArrayType>>(
+          other.mapped_geometry->get_fe_values().get_mapping(),
+          other.mapped_geometry->get_quadrature(),
+          other.mapped_geometry->get_fe_values().get_update_flags());
       this->cell         = 0;
       this->mapping_data = &this->mapped_geometry->get_data_storage();
       this->jacobian =
@@ -5332,8 +5324,7 @@ inline FEEvaluationAccess<dim,
     const Quadrature<1> &     quadrature,
     const UpdateFlags         update_flags,
     const unsigned int        first_selected_component,
-    const FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>
-      *other)
+    const FEEvaluationData<dim, VectorizedArrayType, is_face> *other)
   : FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>(
       mapping,
       fe,
@@ -5432,8 +5423,7 @@ inline FEEvaluationAccess<dim, 1, Number, is_face, VectorizedArrayType>::
     const Quadrature<1> &     quadrature,
     const UpdateFlags         update_flags,
     const unsigned int        first_selected_component,
-    const FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>
-      *other)
+    const FEEvaluationData<dim, VectorizedArrayType, is_face> *other)
   : FEEvaluationBase<dim, 1, Number, is_face, VectorizedArrayType>(
       mapping,
       fe,
@@ -5759,8 +5749,7 @@ inline FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
     const Quadrature<1> &     quadrature,
     const UpdateFlags         update_flags,
     const unsigned int        first_selected_component,
-    const FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>
-      *other)
+    const FEEvaluationData<dim, VectorizedArrayType, is_face> *other)
   : FEEvaluationBase<dim, dim, Number, is_face, VectorizedArrayType>(
       mapping,
       fe,
@@ -6170,7 +6159,7 @@ inline FEEvaluationAccess<1, 1, Number, is_face, VectorizedArrayType>::
     const Quadrature<1> &   quadrature,
     const UpdateFlags       update_flags,
     const unsigned int      first_selected_component,
-    const FEEvaluationBaseData<1, Number, is_face, VectorizedArrayType> *other)
+    const FEEvaluationData<1, VectorizedArrayType, is_face> *other)
   : FEEvaluationBase<1, 1, Number, is_face, VectorizedArrayType>(
       mapping,
       fe,
@@ -6591,10 +6580,9 @@ inline FEEvaluation<dim,
                     n_components_,
                     Number,
                     VectorizedArrayType>::
-  FEEvaluation(
-    const FiniteElement<dim> &                                           fe,
-    const FEEvaluationBaseData<dim, Number, false, VectorizedArrayType> &other,
-    const unsigned int first_selected_component)
+  FEEvaluation(const FiniteElement<dim> &                               fe,
+               const FEEvaluationData<dim, VectorizedArrayType, false> &other,
+               const unsigned int first_selected_component)
   : BaseClass(other.mapped_geometry->get_fe_values().get_mapping(),
               fe,
               other.mapped_geometry->get_quadrature(),
@@ -7098,7 +7086,7 @@ FEEvaluation<dim,
     SelectEvaluator<dim, fe_degree, n_q_points_1d, VectorizedArrayType>::
       evaluate(n_components, evaluation_flag_actual, values_array, *this);
   else
-    internal::FEEvaluationFactory<dim, Number, VectorizedArrayType>::evaluate(
+    internal::FEEvaluationFactory<dim, VectorizedArrayType>::evaluate(
       n_components,
       evaluation_flag_actual,
       const_cast<VectorizedArrayType *>(values_array),
@@ -7267,10 +7255,10 @@ namespace internal
         VectorizedArrayType *vec_values =
           reinterpret_cast<VectorizedArrayType *>(
             destination.begin() +
-            dof_info->dof_indices_contiguous
+            dof_info.dof_indices_contiguous
               [internal::MatrixFreeFunctions::DoFInfo::dof_access_cell]
               [cell * VectorizedArrayType::size()] +
-            dof_info->component_dof_indices_offset
+            dof_info.component_dof_indices_offset
                 [phi.get_active_fe_index()]
                 [phi.get_first_selected_component()] *
               VectorizedArrayType::size());
@@ -7470,7 +7458,7 @@ FEEvaluation<dim,
                 *this,
                 sum_into_values_array);
   else
-    internal::FEEvaluationFactory<dim, Number, VectorizedArrayType>::integrate(
+    internal::FEEvaluationFactory<dim, VectorizedArrayType>::integrate(
       n_components,
       integration_flag_actual,
       values_array,
@@ -7925,8 +7913,8 @@ FEFaceEvaluation<dim,
                                              values_array,
                                              *this);
   else
-    internal::FEFaceEvaluationFactory<dim, Number, VectorizedArrayType>::
-      evaluate(n_components, evaluation_flag_actual, values_array, *this);
+    internal::FEFaceEvaluationFactory<dim, VectorizedArrayType>::evaluate(
+      n_components, evaluation_flag_actual, values_array, *this);
 
 #  ifdef DEBUG
   if (evaluation_flag_actual & EvaluationFlags::values)
@@ -8062,8 +8050,8 @@ FEFaceEvaluation<dim,
                                              values_array,
                                              *this);
   else
-    internal::FEFaceEvaluationFactory<dim, Number, VectorizedArrayType>::
-      integrate(n_components, integration_flag_actual, values_array, *this);
+    internal::FEFaceEvaluationFactory<dim, VectorizedArrayType>::integrate(
+      n_components, integration_flag_actual, values_array, *this);
 }
 
 
@@ -8149,12 +8137,15 @@ FEFaceEvaluation<dim,
           shared_vector_data,
           *this);
       else
-        internal::FEFaceEvaluationFactory<dim, Number, VectorizedArrayType>::
-          gather_evaluate(n_components,
-                          evaluation_flag,
-                          internal::get_beginning<Number>(input_vector),
-                          shared_vector_data,
-                          *this);
+        internal::FEFaceEvaluationGatherFactory<
+          dim,
+          Number,
+          VectorizedArrayType>::evaluate(n_components,
+                                         evaluation_flag,
+                                         internal::get_beginning<Number>(
+                                           input_vector),
+                                         shared_vector_data,
+                                         *this);
     }
   else
     {
@@ -8254,12 +8245,15 @@ FEFaceEvaluation<dim,
           shared_vector_data,
           *this);
       else
-        internal::FEFaceEvaluationFactory<dim, Number, VectorizedArrayType>::
-          integrate_scatter(n_components,
-                            integration_flag,
-                            internal::get_beginning<Number>(destination),
-                            shared_vector_data,
-                            *this);
+        internal::FEFaceEvaluationGatherFactory<
+          dim,
+          Number,
+          VectorizedArrayType>::integrate(n_components,
+                                          integration_flag,
+                                          internal::get_beginning<Number>(
+                                            destination),
+                                          shared_vector_data,
+                                          *this);
     }
   else
     {
@@ -8337,7 +8331,7 @@ FEEvaluation<dim,
                             const unsigned int give_n_q_points_1d)
 {
   return fe_degree == -1 ?
-           internal::FEEvaluationFactory<dim, Number, VectorizedArrayType>::
+           internal::FEEvaluationFactory<dim, VectorizedArrayType>::
              fast_evaluation_supported(given_degree, give_n_q_points_1d) :
            true;
 }
@@ -8361,7 +8355,7 @@ FEFaceEvaluation<dim,
                             const unsigned int give_n_q_points_1d)
 {
   return fe_degree == -1 ?
-           internal::FEFaceEvaluationFactory<dim, Number, VectorizedArrayType>::
+           internal::FEFaceEvaluationFactory<dim, VectorizedArrayType>::
              fast_evaluation_supported(given_degree, give_n_q_points_1d) :
            true;
 }

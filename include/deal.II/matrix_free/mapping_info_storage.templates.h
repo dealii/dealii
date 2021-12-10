@@ -40,27 +40,20 @@ namespace internal
 {
   namespace MatrixFreeFunctions
   {
-    template <int structdim,
-              int spacedim,
-              typename Number,
-              typename VectorizedArrayType>
-    MappingInfoStorage<structdim, spacedim, Number, VectorizedArrayType>::
-      QuadratureDescriptor::QuadratureDescriptor()
+    template <int structdim, int spacedim, typename Number>
+    MappingInfoStorage<structdim, spacedim, Number>::QuadratureDescriptor::
+      QuadratureDescriptor()
       : n_q_points(numbers::invalid_unsigned_int)
     {}
 
 
 
-    template <int structdim,
-              int spacedim,
-              typename Number,
-              typename VectorizedArrayType>
+    template <int structdim, int spacedim, typename Number>
     template <int dim_q>
     void
-    MappingInfoStorage<structdim, spacedim, Number, VectorizedArrayType>::
-      QuadratureDescriptor::initialize(
-        const Quadrature<dim_q> &quadrature,
-        const UpdateFlags        update_flags_inner_faces)
+    MappingInfoStorage<structdim, spacedim, Number>::QuadratureDescriptor::
+      initialize(const Quadrature<dim_q> &quadrature,
+                 const UpdateFlags        update_flags_inner_faces)
     {
       Assert(structdim + 1 <= spacedim ||
                update_flags_inner_faces == update_default,
@@ -79,15 +72,11 @@ namespace internal
 
 
 
-    template <int structdim,
-              int spacedim,
-              typename Number,
-              typename VectorizedArrayType>
+    template <int structdim, int spacedim, typename Number>
     void
-    MappingInfoStorage<structdim, spacedim, Number, VectorizedArrayType>::
-      QuadratureDescriptor::initialize(
-        const Quadrature<1> &quadrature_1d,
-        const UpdateFlags    update_flags_inner_faces)
+    MappingInfoStorage<structdim, spacedim, Number>::QuadratureDescriptor::
+      initialize(const Quadrature<1> &quadrature_1d,
+                 const UpdateFlags    update_flags_inner_faces)
     {
       Assert(structdim + 1 <= spacedim ||
                update_flags_inner_faces == update_default,
@@ -137,13 +126,10 @@ namespace internal
 
 
 
-    template <int structdim,
-              int spacedim,
-              typename Number,
-              typename VectorizedArrayType>
+    template <int structdim, int spacedim, typename Number>
     std::size_t
-    MappingInfoStorage<structdim, spacedim, Number, VectorizedArrayType>::
-      QuadratureDescriptor::memory_consumption() const
+    MappingInfoStorage<structdim, spacedim, Number>::QuadratureDescriptor::
+      memory_consumption() const
     {
       std::size_t memory = sizeof(this) + quadrature.memory_consumption() +
                            quadrature_weights.memory_consumption() +
@@ -155,13 +141,9 @@ namespace internal
 
 
 
-    template <int structdim,
-              int spacedim,
-              typename Number,
-              typename VectorizedArrayType>
+    template <int structdim, int spacedim, typename Number>
     void
-    MappingInfoStorage<structdim, spacedim, Number, VectorizedArrayType>::
-      clear_data_fields()
+    MappingInfoStorage<structdim, spacedim, Number>::clear_data_fields()
     {
       data_index_offsets.clear();
       JxW_values.clear();
@@ -178,17 +160,11 @@ namespace internal
 
 
 
-    template <int structdim,
-              int spacedim,
-              typename Number,
-              typename VectorizedArrayType>
-    template <typename Number2, typename VectorizedArrayType2>
+    template <int structdim, int spacedim, typename Number>
+    template <typename Number2>
     void
-    MappingInfoStorage<structdim, spacedim, Number, VectorizedArrayType>::
-      copy_descriptor(const MappingInfoStorage<structdim,
-                                               spacedim,
-                                               Number2,
-                                               VectorizedArrayType2> &other)
+    MappingInfoStorage<structdim, spacedim, Number>::copy_descriptor(
+      const MappingInfoStorage<structdim, spacedim, Number2> &other)
     {
       clear_data_fields();
       descriptor.clear();
@@ -219,13 +195,56 @@ namespace internal
 
 
 
-    template <int structdim,
-              int spacedim,
-              typename Number,
-              typename VectorizedArrayType>
+    template <int structdim, int spacedim, typename Number>
+    UpdateFlags
+    MappingInfoStorage<structdim, spacedim, Number>::compute_update_flags(
+      const UpdateFlags                                     update_flags,
+      const std::vector<dealii::hp::QCollection<spacedim>> &quad)
+    {
+      // this class is build around the evaluation of jacobians, so compute
+      // them in any case. The Jacobians will be inverted manually. Since we
+      // always do support integration, we also include the JxW values
+      UpdateFlags new_flags = update_jacobians | update_JxW_values;
+
+      // for Hessian information, need inverse Jacobians and the derivative of
+      // Jacobians (these two together will give use the gradients of the
+      // inverse Jacobians, which is what we need)
+      if (update_flags & update_hessians ||
+          update_flags & update_jacobian_grads)
+        new_flags |= update_jacobian_grads;
+
+      if (update_flags & update_quadrature_points)
+        new_flags |= update_quadrature_points;
+
+      // there is one more thing: if we have a quadrature formula with only
+      // one quadrature point on the first component, but more points on later
+      // components, we need to have Jacobian gradients anyway in order to
+      // determine whether the Jacobian is constant throughout a cell
+      if (quad.empty() == false)
+        {
+          bool formula_with_one_point = false;
+          for (unsigned int i = 0; i < quad[0].size(); ++i)
+            if (quad[0][i].size() == 1)
+              {
+                formula_with_one_point = true;
+                break;
+              }
+          if (formula_with_one_point == true)
+            for (unsigned int comp = 1; comp < quad.size(); ++comp)
+              for (unsigned int i = 0; i < quad[comp].size(); ++i)
+                if (quad[comp][i].size() > 1)
+                  {
+                    new_flags |= update_jacobian_grads;
+                  }
+        }
+      return new_flags;
+    }
+
+
+
+    template <int structdim, int spacedim, typename Number>
     std::size_t
-    MappingInfoStorage<structdim, spacedim, Number, VectorizedArrayType>::
-      memory_consumption() const
+    MappingInfoStorage<structdim, spacedim, Number>::memory_consumption() const
     {
       return MemoryConsumption::memory_consumption(descriptor) +
              MemoryConsumption::memory_consumption(data_index_offsets) +
@@ -243,14 +262,12 @@ namespace internal
 
 
 
-    template <int structdim,
-              int spacedim,
-              typename Number,
-              typename VectorizedArrayType>
+    template <int structdim, int spacedim, typename Number>
     template <typename StreamType>
     void
-    MappingInfoStorage<structdim, spacedim, Number, VectorizedArrayType>::
-      print_memory_consumption(StreamType &out, const TaskInfo &task_info) const
+    MappingInfoStorage<structdim, spacedim, Number>::print_memory_consumption(
+      StreamType &    out,
+      const TaskInfo &task_info) const
     {
       // print_memory_statistics involves global communication, so we can
       // disable the check here only if no processor has any such data

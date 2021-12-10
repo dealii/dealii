@@ -160,20 +160,19 @@ namespace internal
       /**
        * The data cache for the cells.
        */
-      std::vector<MappingInfoStorage<dim, dim, Number, VectorizedArrayType>>
-        cell_data;
+      std::vector<MappingInfoStorage<dim, dim, VectorizedArrayType>> cell_data;
 
       /**
        * The data cache for the faces.
        */
-      std::vector<MappingInfoStorage<dim - 1, dim, Number, VectorizedArrayType>>
+      std::vector<MappingInfoStorage<dim - 1, dim, VectorizedArrayType>>
         face_data;
 
       /**
        * The data cache for the face-associated-with-cell topology, following
        * the @p cell_type variable for the cell types.
        */
-      std::vector<MappingInfoStorage<dim - 1, dim, Number, VectorizedArrayType>>
+      std::vector<MappingInfoStorage<dim - 1, dim, VectorizedArrayType>>
         face_data_by_cells;
 
       /**
@@ -253,16 +252,6 @@ namespace internal
         const dealii::Triangulation<dim> &                        tria,
         const std::vector<std::pair<unsigned int, unsigned int>> &cells,
         const dealii::hp::MappingCollection<dim> &                mapping);
-
-      /**
-       * Helper function to determine which update flags must be set in the
-       * internal functions to initialize all data as requested by the user.
-       */
-      static UpdateFlags
-      compute_update_flags(
-        const UpdateFlags                                update_flags,
-        const std::vector<dealii::hp::QCollection<dim>> &quad =
-          std::vector<dealii::hp::QCollection<dim>>());
     };
 
 
@@ -277,7 +266,7 @@ namespace internal
     template <int dim, typename Number, typename VectorizedArrayType>
     struct MappingInfoCellsOrFaces<dim, Number, false, VectorizedArrayType>
     {
-      static const MappingInfoStorage<dim, dim, Number, VectorizedArrayType> &
+      static const MappingInfoStorage<dim, dim, VectorizedArrayType> &
       get(const MappingInfo<dim, Number, VectorizedArrayType> &mapping_info,
           const unsigned int                                   quad_no)
       {
@@ -289,10 +278,9 @@ namespace internal
     template <int dim, typename Number, typename VectorizedArrayType>
     struct MappingInfoCellsOrFaces<dim, Number, true, VectorizedArrayType>
     {
-      static const MappingInfoStorage<dim - 1, dim, Number, VectorizedArrayType>
-        &
-        get(const MappingInfo<dim, Number, VectorizedArrayType> &mapping_info,
-            const unsigned int                                   quad_no)
+      static const MappingInfoStorage<dim - 1, dim, VectorizedArrayType> &
+      get(const MappingInfo<dim, Number, VectorizedArrayType> &mapping_info,
+          const unsigned int                                   quad_no)
       {
         AssertIndexRange(quad_no, mapping_info.face_data.size());
         return mapping_info.face_data[quad_no];

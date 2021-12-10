@@ -35,9 +35,6 @@ DEAL_II_NAMESPACE_OPEN
 template <int dim, int fe_degree, int n_q_points_1d, typename Number>
 struct SelectEvaluator
 {
-  using ScalarNumber =
-    typename internal::VectorizedArrayTrait<Number>::value_type;
-
   /**
    * Chooses an appropriate evaluation strategy for the evaluate function, i.e.
    * this calls internal::FEEvaluationImpl::evaluate(),
@@ -49,7 +46,7 @@ struct SelectEvaluator
   evaluate(const unsigned int                     n_components,
            const EvaluationFlags::EvaluationFlags evaluation_flag,
            const Number *                         values_dofs,
-           FEEvaluationBaseData<dim, ScalarNumber, false, Number> &eval);
+           FEEvaluationData<dim, Number, false> & eval);
 
   /**
    * Chooses an appropriate evaluation strategy for the integrate function, i.e.
@@ -62,7 +59,7 @@ struct SelectEvaluator
   integrate(const unsigned int                     n_components,
             const EvaluationFlags::EvaluationFlags integration_flag,
             Number *                               values_dofs,
-            FEEvaluationBaseData<dim, ScalarNumber, false, Number> &eval,
+            FEEvaluationData<dim, Number, false> & eval,
             const bool sum_into_values_array = false);
 };
 
@@ -72,10 +69,10 @@ struct SelectEvaluator
 template <int dim, int fe_degree, int n_q_points_1d, typename Number>
 inline void
 SelectEvaluator<dim, fe_degree, n_q_points_1d, Number>::evaluate(
-  const unsigned int                                      n_components,
-  const EvaluationFlags::EvaluationFlags                  evaluation_flag,
-  const Number *                                          values_dofs,
-  FEEvaluationBaseData<dim, ScalarNumber, false, Number> &eval)
+  const unsigned int                     n_components,
+  const EvaluationFlags::EvaluationFlags evaluation_flag,
+  const Number *                         values_dofs,
+  FEEvaluationData<dim, Number, false> & eval)
 {
   Assert(fe_degree >= 0 && n_q_points_1d > 0, ExcInternalError());
 
@@ -89,11 +86,11 @@ SelectEvaluator<dim, fe_degree, n_q_points_1d, Number>::evaluate(
 template <int dim, int fe_degree, int n_q_points_1d, typename Number>
 inline void
 SelectEvaluator<dim, fe_degree, n_q_points_1d, Number>::integrate(
-  const unsigned int                                      n_components,
-  const EvaluationFlags::EvaluationFlags                  integration_flag,
-  Number *                                                values_dofs,
-  FEEvaluationBaseData<dim, ScalarNumber, false, Number> &eval,
-  const bool                                              sum_into_values_array)
+  const unsigned int                     n_components,
+  const EvaluationFlags::EvaluationFlags integration_flag,
+  Number *                               values_dofs,
+  FEEvaluationData<dim, Number, false> & eval,
+  const bool                             sum_into_values_array)
 {
   Assert(fe_degree >= 0 && n_q_points_1d > 0, ExcInternalError());
 

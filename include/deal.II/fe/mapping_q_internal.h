@@ -35,7 +35,7 @@
 
 #include <deal.II/matrix_free/evaluation_flags.h>
 #include <deal.II/matrix_free/evaluation_template_factory.h>
-#include <deal.II/matrix_free/fe_evaluation_base_data.h>
+#include <deal.II/matrix_free/fe_evaluation_data.h>
 #include <deal.II/matrix_free/mapping_info_storage.h>
 #include <deal.II/matrix_free/shape_info.h>
 #include <deal.II/matrix_free/tensor_product_kernels.h>
@@ -1131,11 +1131,11 @@ namespace internal
         }
 
       internal::MatrixFreeFunctions::
-        MappingInfoStorage<dim, dim, double, VectorizedArrayType>
+        MappingInfoStorage<dim, dim, VectorizedArrayType>
           temp_data;
       temp_data.descriptor.resize(1);
       temp_data.descriptor[0].n_q_points = n_q_points;
-      FEEvaluationBaseData<dim, double, false, VectorizedArrayType> eval(
+      FEEvaluationData<dim, VectorizedArrayType, false> eval(
         {&data.shape_info, nullptr, &temp_data, 0, 0});
 
       // prepare arrays
@@ -1156,8 +1156,8 @@ namespace internal
               }
 
           // do the actual tensorized evaluation
-          internal::FEEvaluationFactory<dim, double, VectorizedArrayType>::
-            evaluate(n_comp, evaluation_flag, eval.begin_dof_values(), eval);
+          internal::FEEvaluationFactory<dim, VectorizedArrayType>::evaluate(
+            n_comp, evaluation_flag, eval.begin_dof_values(), eval);
         }
 
       // do the postprocessing

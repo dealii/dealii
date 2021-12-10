@@ -45,10 +45,10 @@ namespace internal
      * deal.II information in a form that FEEvaluation and friends can use for
      * vectorized access. Since no vectorization over cells is available with
      * the DoFHandler/Triangulation cell iterators, the interface to
-     * FEEvaluation's vectorization model is to use @p
-     * VectorizedArray::n_array_element copies of the same element. This
-     * interface is thus primarily useful for evaluating several operators on
-     * the same cell, e.g., when assembling cell matrices.
+     * FEEvaluation's vectorization model is to use VectorizedArray::size()
+     * copies of the same element. This interface is thus primarily useful for
+     * evaluating several operators on the same cell, e.g., when assembling
+     * cell matrices.
      *
      * As opposed to the Mapping classes in deal.II, this class does not
      * actually provide a boundary description that can be used to evaluate
@@ -56,13 +56,9 @@ namespace internal
      * given deal.II mapping (as passed to the constructor of this class) in a
      * form accessible to FEEvaluation.
      */
-    template <int dim, typename Number, typename VectorizedArrayType>
+    template <int dim, typename Number>
     class MappingDataOnTheFly
     {
-      static_assert(
-        std::is_same<Number, typename VectorizedArrayType::value_type>::value,
-        "Type of Number and of VectorizedArrayType do not match.");
-
     public:
       /**
        * Constructor, similar to FEValues. Since this class only evaluates the
@@ -116,7 +112,7 @@ namespace internal
        * MappingInfo. This ensures compatibility with the precomputed data
        * fields in the MappingInfo class.
        */
-      const MappingInfoStorage<dim, dim, Number, VectorizedArrayType> &
+      const MappingInfoStorage<dim, dim, Number> &
       get_data_storage() const;
 
       /**
@@ -152,24 +148,22 @@ namespace internal
        * The storage part created for a single cell and held in analogy to
        * MappingInfo.
        */
-      MappingInfoStorage<dim, dim, Number, VectorizedArrayType>
-        mapping_info_storage;
+      MappingInfoStorage<dim, dim, Number> mapping_info_storage;
     };
 
 
     /*-------------------------- Inline functions ---------------------------*/
 
-    template <int dim, typename Number, typename VectorizedArrayType>
-    inline MappingDataOnTheFly<dim, Number, VectorizedArrayType>::
-      MappingDataOnTheFly(const Mapping<dim> & mapping,
-                          const Quadrature<1> &quadrature,
-                          const UpdateFlags    update_flags)
-      : fe_values(
-          mapping,
-          fe_dummy,
-          Quadrature<dim>(quadrature),
-          MappingInfo<dim, Number, VectorizedArrayType>::compute_update_flags(
-            update_flags))
+    template <int dim, typename Number>
+    inline MappingDataOnTheFly<dim, Number>::MappingDataOnTheFly(
+      const Mapping<dim> & mapping,
+      const Quadrature<1> &quadrature,
+      const UpdateFlags    update_flags)
+      : fe_values(mapping,
+                  fe_dummy,
+                  Quadrature<dim>(quadrature),
+                  MappingInfoStorage<dim, dim, Number>::compute_update_flags(
+                    update_flags))
       , quadrature_1d(quadrature)
     {
       mapping_info_storage.descriptor.resize(1);
@@ -196,10 +190,10 @@ namespace internal
 
 
 
-    template <int dim, typename Number, typename VectorizedArrayType>
-    inline MappingDataOnTheFly<dim, Number, VectorizedArrayType>::
-      MappingDataOnTheFly(const Quadrature<1> &quadrature,
-                          const UpdateFlags    update_flags)
+    template <int dim, typename Number>
+    inline MappingDataOnTheFly<dim, Number>::MappingDataOnTheFly(
+      const Quadrature<1> &quadrature,
+      const UpdateFlags    update_flags)
       : MappingDataOnTheFly(::dealii::StaticMappingQ1<dim, dim>::mapping,
                             quadrature,
                             update_flags)
@@ -207,9 +201,9 @@ namespace internal
 
 
 
-    template <int dim, typename Number, typename VectorizedArrayType>
+    template <int dim, typename Number>
     inline void
-    MappingDataOnTheFly<dim, Number, VectorizedArrayType>::reinit(
+    MappingDataOnTheFly<dim, Number>::reinit(
       typename dealii::Triangulation<dim>::cell_iterator cell)
     {
       if (present_cell == cell)
@@ -246,10 +240,9 @@ namespace internal
 
 
 
-    template <int dim, typename Number, typename VectorizedArrayType>
+    template <int dim, typename Number>
     inline bool
-    MappingDataOnTheFly<dim, Number, VectorizedArrayType>::is_initialized()
-      const
+    MappingDataOnTheFly<dim, Number>::is_initialized() const
     {
       return present_cell !=
              typename dealii::Triangulation<dim>::cell_iterator();
@@ -257,38 +250,36 @@ namespace internal
 
 
 
-    template <int dim, typename Number, typename VectorizedArrayType>
+    template <int dim, typename Number>
     inline typename dealii::Triangulation<dim>::cell_iterator
-    MappingDataOnTheFly<dim, Number, VectorizedArrayType>::get_cell() const
+    MappingDataOnTheFly<dim, Number>::get_cell() const
     {
       return fe_values.get_cell();
     }
 
 
 
-    template <int dim, typename Number, typename VectorizedArrayType>
+    template <int dim, typename Number>
     inline const dealii::FEValues<dim> &
-    MappingDataOnTheFly<dim, Number, VectorizedArrayType>::get_fe_values() const
+    MappingDataOnTheFly<dim, Number>::get_fe_values() const
     {
       return fe_values;
     }
 
 
 
-    template <int dim, typename Number, typename VectorizedArrayType>
-    inline const MappingInfoStorage<dim, dim, Number, VectorizedArrayType> &
-    MappingDataOnTheFly<dim, Number, VectorizedArrayType>::get_data_storage()
-      const
+    template <int dim, typename Number>
+    inline const MappingInfoStorage<dim, dim, Number> &
+    MappingDataOnTheFly<dim, Number>::get_data_storage() const
     {
       return mapping_info_storage;
     }
 
 
 
-    template <int dim, typename Number, typename VectorizedArrayType>
+    template <int dim, typename Number>
     inline const Quadrature<1> &
-    MappingDataOnTheFly<dim, Number, VectorizedArrayType>::get_quadrature()
-      const
+    MappingDataOnTheFly<dim, Number>::get_quadrature() const
     {
       return quadrature_1d;
     }
