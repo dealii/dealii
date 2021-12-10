@@ -33,8 +33,7 @@
 #include "ecl.h"
 
 
-// Compare the evaluation of a SIP Laplace operator with face- and element-
-// centric loops on a structured grid.
+// Like ecl_01.cc but running with shared-memory MPI enabled.
 
 int
 main(int argc, char **argv)
@@ -42,5 +41,25 @@ main(int argc, char **argv)
   Utilities::MPI::MPI_InitFinalize mpi_init(argc, argv, 1);
 
   mpi_initlog();
-  test<2, 2, 3, double, VectorizedArray<double>>();
+
+  // test without shared memory
+  {
+    test<2, 2, 3, double, VectorizedArray<double>>(6, false, MPI_COMM_SELF);
+  }
+
+  // test with shared memory
+  {
+    const auto rank = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+
+    MPI_Comm subcommunicator;
+    MPI_Comm_split_type(MPI_COMM_WORLD,
+                        MPI_COMM_TYPE_SHARED,
+                        rank,
+                        MPI_INFO_NULL,
+                        &subcommunicator);
+
+    test<2, 2, 3, double, VectorizedArray<double>>(6, false, subcommunicator);
+
+    MPI_Comm_free(&subcommunicator);
+  }
 }
