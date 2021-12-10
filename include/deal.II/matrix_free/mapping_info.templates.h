@@ -2131,13 +2131,13 @@ namespace internal
                     {
                       for (unsigned int e = 0; e < dim; ++e)
                         jac_grad[d][e][e] =
-                          eval.begin_gradients()[q + (d * hess_dim + e) *
-                                                       n_q_points];
+                          eval.begin_hessians()[q + (d * hess_dim + e) *
+                                                      n_q_points];
                       for (unsigned int c = dim, e = 0; e < dim; ++e)
                         for (unsigned int f = e + 1; f < dim; ++f, ++c)
                           jac_grad[d][e][f] = jac_grad[d][f][e] =
-                            eval.begin_gradients()[q + (d * hess_dim + c) *
-                                                         n_q_points];
+                            eval.begin_hessians()[q + (d * hess_dim + c) *
+                                                        n_q_points];
                       const auto inv_jac_grad =
                         process_jacobian_gradient(inv_transp_jac_permut,
                                                   inv_transp_jac,

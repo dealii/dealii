@@ -1143,6 +1143,11 @@ namespace internal
         {
           eval.set_data_pointers(&data.scratch, n_comp);
 
+          // make sure to initialize on all lanes also when some are unused in
+          // the code below
+          for (unsigned int i = 0; i < n_shape_values * n_comp; ++i)
+            eval.begin_dof_values()[i] = VectorizedArrayType();
+
           const std::vector<unsigned int> &renumber_to_lexicographic =
             data.shape_info.lexicographic_numbering;
           for (unsigned int i = 0; i < n_shape_values; ++i)
