@@ -1136,7 +1136,7 @@ namespace internal
       temp_data.descriptor.resize(1);
       temp_data.descriptor[0].n_q_points = n_q_points;
       FEEvaluationBaseData<dim, double, false, VectorizedArrayType> eval(
-        {&data.shape_info, nullptr, &temp_data, 0, 0}, 0, false, 0);
+        {&data.shape_info, nullptr, &temp_data, 0, 0});
 
       // prepare arrays
       if (evaluation_flag != EvaluationFlags::nothing)

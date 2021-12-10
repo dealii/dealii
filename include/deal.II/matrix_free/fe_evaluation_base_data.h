@@ -84,8 +84,10 @@ namespace internal
  * This base class of the FEEvaluation and FEFaceEvaluation classes handles
  * mapping-related information independent of the degrees of freedom and
  * finite element in use. This class provides access functionality for user
- * code but is otherwise invisible without any public constructor. The usage
- * is through the class FEEvaluation instead.
+ * code. The main usage is through the class FEEvaluation. However, there is
+ * functionality to construct an object of type FEEvaluationBaseData given
+ * suitable data pointers to internal data, which allows usage in some
+ * scenarios where no full MatrixFree object is available.
  *
  * This class has four template arguments:
  *
@@ -137,9 +139,10 @@ public:
                                         const MappingInfoStorageType *,
                                         unsigned int,
                                         unsigned int> &info,
-                       const unsigned int              quad_no,
-                       const bool                      is_interior_face,
-                       const unsigned int              face_type);
+                       const bool                      is_interior_face = true,
+                       const unsigned int              quad_no          = 0,
+                       const unsigned int              face_type        = 0,
+                       const unsigned int first_selected_component      = 0);
 
   /**
    * Copy constructor.
@@ -405,6 +408,12 @@ public:
   get_active_quadrature_index() const;
 
   /**
+   * Return the first selected component in a multi-component system.
+   */
+  unsigned int
+  get_first_selected_component() const;
+
+  /**
    * If is_face is true, this function returns the face number within a cell for
    * the face this object was initialized to. On cells where the face makes no
    * sense, an exception is thrown.
@@ -471,6 +480,46 @@ public:
   bool
   get_is_interior_face() const;
 
+  /**
+   * Return the id of the cells this FEEvaluation or FEFaceEvaluation is
+   * associated with.
+   */
+  const std::array<unsigned int, VectorizedArrayType::size()> &
+  get_cell_ids() const;
+
+  /**
+   * Return the id of the cells/faces this FEEvaluation/FEFaceEvaluation is
+   * associated with.
+   */
+  const std::array<unsigned int, VectorizedArrayType::size()> &
+  get_cell_or_face_ids() const;
+
+  /**
+   * Return the (non-vectorized) number of faces within cells in case of ECL
+   * for the exterior cells where the single number accessible via
+   * get_face_no() is not enough to cover all cases.
+   *
+   * @note Only available for `dof_access_index == dof_access_cell` and
+   * `is_interior_face == false`.
+   *
+   * @note This function depends on the internal representation of data, which
+   * is not stable between releases of deal.II, and is hence mostly for
+   * internal use.
+   */
+  const std::array<std::uint8_t, VectorizedArrayType::size()> &
+  get_all_face_numbers() const;
+
+  /**
+   * Store the orientation of the neighbor's faces with respect to the current
+   * cell for the case of exterior faces on ECL with possibly different
+   * orientations behind different cells.
+   *
+   * @note Only available for `dof_access_index == dof_access_cell` and
+   * `is_interior_face == false`.
+   */
+  const std::array<std::uint8_t, VectorizedArrayType::size()> &
+  get_all_face_orientations() const;
+
   //@}
 
 protected:
@@ -481,7 +530,9 @@ protected:
   FEEvaluationBaseData(
     const std::shared_ptr<
       internal::MatrixFreeFunctions::
-        MappingDataOnTheFly<dim, Number, VectorizedArrayType>> &mapping_data);
+        MappingDataOnTheFly<dim, Number, VectorizedArrayType>> &mapping_data,
+    const unsigned int                                          n_fe_components,
+    const unsigned int first_selected_component);
 
   /**
    * A pointer to the unit cell shape data, i.e., values, gradients and
@@ -512,6 +563,18 @@ protected:
    * classes.
    */
   const unsigned int quad_no;
+
+  /**
+   * Stores the number of components in the finite element as detected in the
+   * MatrixFree storage class for comparison with the template argument.
+   */
+  const unsigned int n_fe_components;
+
+  /**
+   * For a FiniteElement with more than one base element, select at which
+   * component this data structure should start.
+   */
+  const unsigned int first_selected_component;
 
   /**
    * The active FE index for this class for efficient indexing in the hp-case.
@@ -732,6 +795,38 @@ protected:
   internal::MatrixFreeFunctions::GeometryType cell_type;
 
   /**
+   * Stores the (non-vectorized) id of the cells or faces this object is
+   * initialized to. Relevant for ECL.
+   */
+  std::array<unsigned int, VectorizedArrayType::size()> cell_ids;
+
+  /**
+   * Stores the (non-vectorized) id of the cells or faces this object is
+   * initialized to. Relevant for ECL.
+   */
+  std::array<unsigned int, VectorizedArrayType::size()> cell_or_face_ids;
+
+  /**
+   * Stores the (non-vectorized) number of faces within cells in case of ECL
+   * for the exterior cells where the single number `face_no` is not enough to
+   * cover all cases.
+   *
+   * @note Only available for `dof_access_index == dof_access_cell` and
+   * `is_interior_face == false`.
+   */
+  std::array<std::uint8_t, VectorizedArrayType::size()> all_face_numbers;
+
+  /**
+   * Store the orientation of the neighbor's faces with respect to the current
+   * cell for the case of exterior faces on ECL with possibly different
+   * orientations behind different cells.
+   *
+   * @note Only available for `dof_access_index == dof_access_cell` and
+   * `is_interior_face == false`.
+   */
+  std::array<std::uint8_t, VectorizedArrayType::size()> all_face_orientations;
+
+  /**
    * Geometry data that can be generated FEValues on the fly with the
    * respective constructor, as an alternative to the entry point with
    * MatrixFree.
@@ -762,13 +857,16 @@ inline FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
                                         const MappingInfoStorageType *,
                                         unsigned int,
                                         unsigned int> &shape_dof_info,
-                       const unsigned int              quad_no,
                        const bool                      is_interior_face,
-                       const unsigned int              face_type)
+                       const unsigned int              quad_no,
+                       const unsigned int              face_type,
+                       const unsigned int              first_selected_component)
   : data(std::get<0>(shape_dof_info))
   , dof_info(std::get<1>(shape_dof_info))
   , mapping_data(std::get<2>(shape_dof_info))
   , quad_no(quad_no)
+  , n_fe_components(dof_info != nullptr ? dof_info->start_components.back() : 0)
+  , first_selected_component(first_selected_component)
   , active_fe_index(std::get<3>(shape_dof_info))
   , active_quad_index(std::get<4>(shape_dof_info))
   , descriptor(
@@ -810,11 +908,15 @@ inline FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
   FEEvaluationBaseData(
     const std::shared_ptr<
       internal::MatrixFreeFunctions::
-        MappingDataOnTheFly<dim, Number, VectorizedArrayType>> &mapped_geometry)
+        MappingDataOnTheFly<dim, Number, VectorizedArrayType>> &mapped_geometry,
+    const unsigned int                                          n_fe_components,
+    const unsigned int first_selected_component)
   : data(nullptr)
   , dof_info(nullptr)
   , mapping_data(nullptr)
   , quad_no(numbers::invalid_unsigned_int)
+  , n_fe_components(n_fe_components)
+  , first_selected_component(first_selected_component)
   , active_fe_index(numbers::invalid_unsigned_int)
   , active_quad_index(numbers::invalid_unsigned_int)
   , descriptor(nullptr)
@@ -844,6 +946,8 @@ FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::operator=(
   const FEEvaluationBaseData &other)
 {
   AssertDimension(quad_no, other.quad_no);
+  AssertDimension(n_fe_components, other.n_fe_components);
+  AssertDimension(first_selected_component, other.first_selected_component);
   AssertDimension(active_fe_index, other.active_fe_index);
   AssertDimension(active_quad_index, other.active_quad_index);
   AssertDimension(n_quadrature_points, descriptor->n_q_points);
@@ -879,6 +983,78 @@ FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::operator=(
   cell_type        = internal::MatrixFreeFunctions::general;
 
   return *this;
+}
+
+
+
+template <int dim, typename Number, bool is_face, typename VectorizedArrayType>
+inline void
+FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
+  set_data_pointers(AlignedVector<VectorizedArrayType> *scratch_data_array,
+                    const unsigned int                  n_components)
+{
+  Assert(scratch_data_array != nullptr, ExcInternalError());
+
+  const unsigned int tensor_dofs_per_component =
+    Utilities::fixed_power<dim>(data->data.front().fe_degree + 1);
+  const unsigned int dofs_per_component = data->dofs_per_component_on_cell;
+
+  const unsigned int size_scratch_data =
+    std::max(tensor_dofs_per_component + 1, dofs_per_component) * n_components *
+      3 +
+    2 * n_quadrature_points;
+  const unsigned int size_data_arrays =
+    n_components * dofs_per_component +
+    (n_components * ((dim * (dim + 1)) / 2 + 2 * dim + 1) *
+     n_quadrature_points);
+
+  const unsigned int allocated_size = size_scratch_data + size_data_arrays;
+  scratch_data_array->resize_fast(allocated_size);
+  scratch_data.reinit(scratch_data_array->begin() + size_data_arrays,
+                      size_scratch_data);
+
+  // set the pointers to the correct position in the data array
+  values_dofs = scratch_data_array->begin();
+  values_quad = scratch_data_array->begin() + n_components * dofs_per_component;
+  gradients_quad = scratch_data_array->begin() +
+                   n_components * (dofs_per_component + n_quadrature_points);
+  gradients_from_hessians_quad =
+    scratch_data_array->begin() +
+    n_components * (dofs_per_component + (dim + 1) * n_quadrature_points);
+  hessians_quad =
+    scratch_data_array->begin() +
+    n_components * (dofs_per_component + (2 * dim + 1) * n_quadrature_points);
+}
+
+
+
+template <int dim, typename Number, bool is_face, typename VectorizedArrayType>
+inline void
+FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::reinit_face(
+  const internal::MatrixFreeFunctions::FaceToCellTopology<
+    VectorizedArrayType::size()> &face)
+{
+  Assert(is_face == true,
+         ExcMessage("Faces can only be set if the is_face template parameter "
+                    "is true"));
+  face_no = (is_interior_face ? face.interior_face_no : face.exterior_face_no);
+  subface_index = is_interior_face == true ?
+                    GeometryInfo<dim>::max_children_per_cell :
+                    face.subface_index;
+
+  // First check if interior or exterior cell has non-standard orientation
+  // (i.e. the third bit is one or not). Then set zero if this cell has
+  // standard-orientation else copy the first three bits
+  // (which is equivalent to modulo 8). See also the documentation of
+  // internal::MatrixFreeFunctions::FaceToCellTopology::face_orientation.
+  face_orientation = (is_interior_face == (face.face_orientation >= 8)) ?
+                       (face.face_orientation % 8) :
+                       0;
+
+  if (is_interior_face)
+    cell_ids = face.cells_interior;
+  else
+    cell_ids = face.cells_exterior;
 }
 
 
@@ -1148,6 +1324,16 @@ FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
 
 
 template <int dim, typename Number, bool is_face, typename VectorizedArrayType>
+inline unsigned int
+FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
+  get_first_selected_component() const
+{
+  return first_selected_component;
+}
+
+
+
+template <int dim, typename Number, bool is_face, typename VectorizedArrayType>
 inline ArrayView<VectorizedArrayType>
 FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
   get_scratch_data() const
@@ -1219,65 +1405,63 @@ FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
 
 
 template <int dim, typename Number, bool is_face, typename VectorizedArrayType>
-inline void
-FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
-  set_data_pointers(AlignedVector<VectorizedArrayType> *scratch_data_array,
-                    const unsigned int                  n_components)
+inline const std::array<unsigned int, VectorizedArrayType::size()> &
+FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::get_cell_ids()
+  const
 {
-  Assert(scratch_data_array != nullptr, ExcInternalError());
-
-  const unsigned int tensor_dofs_per_component =
-    Utilities::fixed_power<dim>(data->data.front().fe_degree + 1);
-  const unsigned int dofs_per_component = data->dofs_per_component_on_cell;
-
-  const unsigned int size_scratch_data =
-    std::max(tensor_dofs_per_component + 1, dofs_per_component) * n_components *
-      3 +
-    2 * n_quadrature_points;
-  const unsigned int size_data_arrays =
-    n_components * dofs_per_component +
-    (n_components * ((dim * (dim + 1)) / 2 + 2 * dim + 1) *
-     n_quadrature_points);
-
-  const unsigned int allocated_size = size_scratch_data + size_data_arrays;
-  scratch_data_array->resize_fast(allocated_size);
-  scratch_data.reinit(scratch_data_array->begin() + size_data_arrays,
-                      size_scratch_data);
-
-  // set the pointers to the correct position in the data array
-  values_dofs = scratch_data_array->begin();
-  values_quad = scratch_data_array->begin() + n_components * dofs_per_component;
-  gradients_quad = scratch_data_array->begin() +
-                   n_components * (dofs_per_component + n_quadrature_points);
-  gradients_from_hessians_quad =
-    scratch_data_array->begin() +
-    n_components * (dofs_per_component + (dim + 1) * n_quadrature_points);
-  hessians_quad =
-    scratch_data_array->begin() +
-    n_components * (dofs_per_component + (2 * dim + 1) * n_quadrature_points);
+  Assert(cell != numbers::invalid_unsigned_int, ExcNotInitialized());
+  return cell_ids;
 }
 
 
 
 template <int dim, typename Number, bool is_face, typename VectorizedArrayType>
-inline void
-FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::reinit_face(
-  const internal::MatrixFreeFunctions::FaceToCellTopology<
-    VectorizedArrayType::size()> &face)
+inline const std::array<unsigned int, VectorizedArrayType::size()> &
+FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
+  get_cell_or_face_ids() const
 {
-  face_no = (is_interior_face ? face.interior_face_no : face.exterior_face_no);
-  subface_index = is_interior_face == true ?
-                    GeometryInfo<dim>::max_children_per_cell :
-                    face.subface_index;
+  Assert(cell != numbers::invalid_unsigned_int, ExcNotInitialized());
+  if (!is_face || dof_access_index ==
+                    internal::MatrixFreeFunctions::DoFInfo::dof_access_cell)
+    return cell_ids;
+  else
+    return cell_or_face_ids;
+}
 
-  // First check if interior or exterior cell has non-standard orientation
-  // (i.e. the third bit is one or not). Then set zero if this cell has
-  // standard-orientation else copy the first three bits
-  // (which is equivalent to modulo 8). See also the documentation of
-  // internal::MatrixFreeFunctions::FaceToCellTopology::face_orientation.
-  face_orientation = (is_interior_face == (face.face_orientation >= 8)) ?
-                       (face.face_orientation % 8) :
-                       0;
+
+
+template <int dim, typename Number, bool is_face, typename VectorizedArrayType>
+inline const std::array<std::uint8_t, VectorizedArrayType::size()> &
+FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
+  get_all_face_numbers() const
+{
+  Assert(cell != numbers::invalid_unsigned_int, ExcNotInitialized());
+  Assert(is_face &&
+           dof_access_index ==
+             internal::MatrixFreeFunctions::DoFInfo::dof_access_cell &&
+           is_interior_face == false,
+         ExcMessage("All face numbers can only be queried for ECL at exterior "
+                    "faces. Use get_face_no() in other cases."));
+
+  return all_face_numbers;
+}
+
+
+
+template <int dim, typename Number, bool is_face, typename VectorizedArrayType>
+inline const std::array<std::uint8_t, VectorizedArrayType::size()> &
+FEEvaluationBaseData<dim, Number, is_face, VectorizedArrayType>::
+  get_all_face_orientations() const
+{
+  Assert(cell != numbers::invalid_unsigned_int, ExcNotInitialized());
+  Assert(is_face &&
+           dof_access_index ==
+             internal::MatrixFreeFunctions::DoFInfo::dof_access_cell &&
+           is_interior_face == false,
+         ExcMessage("All face numbers can only be queried for ECL at exterior "
+                    "faces. Use get_face_no() in other cases."));
+
+  return all_face_orientations;
 }
 
 

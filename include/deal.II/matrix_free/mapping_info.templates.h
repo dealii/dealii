@@ -1179,7 +1179,7 @@ namespace internal
         MappingInfoStorage<dim, dim, double, VectorizedDouble> temp_data;
         temp_data.copy_descriptor(my_data);
         FEEvaluationBaseData<dim, double, false, VectorizedDouble> eval(
-          {&shape_info, nullptr, &temp_data, 0, 0}, 0, false, 0);
+          {&shape_info, nullptr, &temp_data, 0, 0});
 
         AlignedVector<VectorizedDouble> evaluation_data;
         eval.set_data_pointers(&evaluation_data, dim);
@@ -2091,9 +2091,9 @@ namespace internal
         MappingInfoStorage<dim - 1, dim, double, VectorizedDouble> temp_data;
         temp_data.copy_descriptor(my_data);
         FEEvaluationBaseData<dim, double, true, VectorizedDouble> eval_int(
-          {&shape_info, nullptr, &temp_data, 0, 0}, 0, true, 0);
+          {&shape_info, nullptr, &temp_data, 0, 0}, true);
         FEEvaluationBaseData<dim, double, true, VectorizedDouble> eval_ext(
-          {&shape_info, nullptr, &temp_data, 0, 0}, 0, false, 0);
+          {&shape_info, nullptr, &temp_data, 0, 0}, false);
 
         AlignedVector<VectorizedDouble> evaluation_data, evaluation_data_ext;
         eval_int.set_data_pointers(&evaluation_data, dim);

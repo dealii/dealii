@@ -2553,7 +2553,7 @@ namespace internal
 
   private:
     template <bool do_evaluate, bool add_into_output, int face_direction = 0>
-    static void
+    static DEAL_II_ALWAYS_INLINE void
     interpolate_generic(const unsigned int                     n_components,
                         const Number *                         input,
                         Number *                               output,
@@ -3136,6 +3136,20 @@ namespace internal
 
     // re-orientation
     std::array<const unsigned int *, n_face_orientations> orientation = {};
+
+#  ifdef DEBUG
+      // currently on structured meshes are supported -> face numbers and
+      // orientations have to be the same for all filled lanes
+      for (unsigned int v = 1; v < n_lanes; ++v)
+        {
+          if (this->all_face_numbers[v] != static_cast<std::uint8_t>(-1))
+            AssertDimension(this->all_face_numbers[0],
+                            this->all_face_numbers[v]);
+          if (this->all_face_orientations[v] != static_cast<std::uint8_t>(-1))
+            AssertDimension(this->all_face_orientations[0],
+                            this->all_face_orientations[v]);
+        }
+#  endif
 
     if (n_face_orientations == 1)
       orientation[0] =
