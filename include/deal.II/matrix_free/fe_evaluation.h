@@ -8919,7 +8919,7 @@ FEFaceEvaluation<dim,
                   // invert (see also:
                   // Triangulation::update_periodic_face_map())
                   static const std::array<unsigned int, 8> table{
-                    {0, 1, 0, 3, 6, 5, 4, 7}};
+                    {0, 1, 2, 3, 6, 5, 4, 7}};
 
                   face_orientation = table[face_orientation];
                 }

@@ -3996,6 +3996,8 @@ namespace internal
                               proc.value(
                                 temp1[reorientate(v, i)][v],
                                 vector_ptrs[v][index_array_nodal[v][i]]);
+                            else if (integrate == false)
+                              temp1[i][v] = 0.0;
                         }
                   }
               }
