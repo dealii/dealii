@@ -47,14 +47,11 @@ namespace dealii
       template <int fe_degree, int n_q_points_1d>
       static bool
       run(
-        const FEEvaluationBaseData<dim,
-                                   typename Number::value_type,
-                                   is_face,
-                                   Number> &fe_eval,
-        const bool                          transpose,
+        const FEEvaluationData<dim, Number, is_face> &fe_eval,
+        const bool                                    transpose,
         const std::array<dealii::internal::MatrixFreeFunctions::ConstraintKinds,
-                         Number::size()> &  c_mask,
-        Number *                            values)
+                         Number::size()> &            c_mask,
+        Number *                                      values)
       {
         Assert(is_face == false, ExcInternalError());
 
@@ -106,13 +103,10 @@ namespace dealii
       template <int fe_degree_, unsigned int direction, bool transpose>
       static void
       run_2D(
-        const FEEvaluationBaseData<dim,
-                                   typename Number::value_type,
-                                   is_face,
-                                   Number> &fe_eval,
+        const FEEvaluationData<dim, Number, is_face> &fe_eval,
         const std::array<dealii::internal::MatrixFreeFunctions::ConstraintKinds,
-                         Number::size()> &  constraint_mask,
-        Number *                            values)
+                         Number::size()> &            constraint_mask,
+        Number *                                      values)
       {
         const auto &constraint_weights = fe_eval.get_shape_info()
                                            .data.front()
@@ -247,13 +241,10 @@ namespace dealii
       template <int fe_degree_, unsigned int direction, bool transpose>
       static void
       run_3D(
-        const FEEvaluationBaseData<dim,
-                                   typename Number::value_type,
-                                   is_face,
-                                   Number> &fe_eval,
+        const FEEvaluationData<dim, Number, is_face> &fe_eval,
         const std::array<dealii::internal::MatrixFreeFunctions::ConstraintKinds,
-                         Number::size()> &  constraint_mask,
-        Number *                            values)
+                         Number::size()> &            constraint_mask,
+        Number *                                      values)
       {
         const auto &constraint_weights = fe_eval.get_shape_info()
                                            .data.front()
