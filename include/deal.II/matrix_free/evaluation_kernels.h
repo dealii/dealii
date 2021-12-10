@@ -2083,7 +2083,8 @@ namespace internal
       // keep a copy of the original pointer for the case of the Hessians
       Number *values_dofs_ptr = values_dofs;
 
-      if (evaluation_flag == EvaluationFlags::values)
+      if (evaluation_flag & EvaluationFlags::values &&
+          !(evaluation_flag & EvaluationFlags::gradients))
         for (unsigned int c = 0; c < n_components; ++c)
           {
             switch (dim)
@@ -2283,7 +2284,8 @@ namespace internal
       // keep a copy of the original pointer for the case of the Hessians
       Number *values_dofs_ptr = values_dofs;
 
-      if (integration_flag == EvaluationFlags::values)
+      if (integration_flag & EvaluationFlags::values &&
+          !(integration_flag & EvaluationFlags::gradients))
         for (unsigned int c = 0; c < n_components; ++c)
           {
             switch (dim)
