@@ -4438,7 +4438,7 @@ namespace internal
                 }
               else if (cell->reference_cell() == ReferenceCells::Wedge)
                 {
-                  // Draw the wedge as three collections of
+                  // Draw the wedge as a collection of three
                   // lines. The first one wraps around the base,
                   // goes up to the top, and wraps around that. The
                   // second and third are just individual lines
@@ -4463,6 +4463,23 @@ namespace internal
                           << cell->material_id() << '\n';
                     }
                   out << '\n'; // end of third line
+                }
+              else if (cell->reference_cell() == ReferenceCells::Pyramid)
+                {
+                  // Draw the pyramid as a collections of two lines.
+                  for (const unsigned int v : {0, 1, 3, 2, 0, 4, 1})
+                    {
+                      out << cell->vertex(v) << ' ' << cell->level() << ' '
+                          << cell->material_id() << '\n';
+                    }
+                  out << '\n'; // end of first line
+
+                  for (const unsigned int v : {2, 4, 3})
+                    {
+                      out << cell->vertex(v) << ' ' << cell->level() << ' '
+                          << cell->material_id() << '\n';
+                    }
+                  out << '\n'; // end of second line
                 }
               else
                 Assert(false, ExcNotImplemented());
