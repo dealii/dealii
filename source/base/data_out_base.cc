@@ -3979,7 +3979,7 @@ namespace DataOutBase
                   {
                     Assert(n_subdivisions == 1, ExcNotImplemented());
 
-                    // Draw the tetrahedron as a two collections of lines.
+                    // Draw the tetrahedron as a collection of two lines.
                     for (const unsigned int v : {0, 1, 2, 0, 3, 2})
                       {
                         out << get_node_location(patch, v) << ' ';
@@ -4000,8 +4000,8 @@ namespace DataOutBase
                   {
                     Assert(n_subdivisions == 1, ExcNotImplemented());
 
-                    // Draw the pyramid as a two collections of lines.
-                    for (const unsigned int v : {0, 1, 2, 3, 0, 4, 1})
+                    // Draw the pyramid as a collection of two lines.
+                    for (const unsigned int v : {0, 1, 3, 2, 0, 4, 1})
                       {
                         out << get_node_location(patch, v) << ' ';
                         output_point_data(v);
@@ -4021,7 +4021,7 @@ namespace DataOutBase
                   {
                     Assert(n_subdivisions == 1, ExcNotImplemented());
 
-                    // Draw the wedge as three collections of
+                    // Draw the wedge as a collection of three
                     // lines. The first one wraps around the base,
                     // goes up to the top, and wraps around that. The
                     // second and third are just individual lines
