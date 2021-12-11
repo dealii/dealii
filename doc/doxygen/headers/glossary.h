@@ -1113,7 +1113,7 @@
  * that the current processor stores but does not own (i.e., the
  * "ghost elements") are simply mirror images of a primary value somewhere
  * else -- thus, the name "ghost". This is also the case for the
- * parallel::distributed::Vector class.
+ * LinearAlgebra::distributed::Vector class.
  *
  * On the other hand, in Trilinos (and consequently in
  * TrilinosWrappers::MPI::Vector), a ghosted vector is simply a view
