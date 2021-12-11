@@ -665,8 +665,8 @@ public:
    * space.
    *
    * This function does not imply a model of keeping data on different processes
-   * in sync, as parallel::distributed::Vector and other vector classes do where
-   * there exists a notion of certain elements of the vector owned by each
+   * in sync, as LinearAlgebra::distributed::Vector and other vector classes do
+   * where there exists a notion of certain elements of the vector owned by each
    * process and possibly ghost elements that are mirrored from its owning
    * process to other processes. Rather, the elements of the current object are
    * simply copied to the other processes, and it is useful to think of this

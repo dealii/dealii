@@ -402,7 +402,7 @@
  * to the solution values for all degrees of freedom that are <i>locally
  * relevant</i>. On the other hand, both of the packages we can use for
  * parallel linear algebra (PETSc and Trilinos) as well as
- * parallel::distributed::Vector subdivide vectors into chunks
+ * LinearAlgebra::distributed::Vector subdivide vectors into chunks
  * each processor owns and chunks stored on other processors. To postprocess
  * stuff therefore means that we have to tell PETSc or Trilinos that it should
  * also import <i>ghost elements</i>, i.e. additional vector elements of the
