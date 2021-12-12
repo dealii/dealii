@@ -2056,7 +2056,7 @@ namespace internal
             {
               internal::MatrixFreeFunctions::FaceToCellTopology<
                 VectorizedDouble::size()>
-                face_double;
+                face_double = {};
               face_double.interior_face_no = faces[face].interior_face_no;
               face_double.exterior_face_no = faces[face].exterior_face_no;
               face_double.face_orientation = faces[face].face_orientation;

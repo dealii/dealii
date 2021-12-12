@@ -3265,7 +3265,7 @@ namespace internal
     const unsigned int subface_index = eval.get_subface_index();
     const auto reorientate = [&](const unsigned int v, const unsigned int i) {
       return (dim < 3 || orientation[v] == nullptr ||
-              subface_index < Utilities::pow(2, dim)) ?
+              subface_index < Utilities::pow(2U, dim)) ?
                i :
                orientation[v][i];
     };
@@ -3493,6 +3493,7 @@ namespace internal
 
             if (vectorization_possible == false)
               {
+                vector_ptrs = {};
                 if (n_face_orientations == 1)
                   {
                     for (unsigned int v = 0; v < n_filled_lanes; ++v)

@@ -7141,7 +7141,7 @@ namespace internal
    */
   template <typename Number,
             typename VectorType,
-            typename T,
+            typename EvaluatorType,
             typename std::enable_if<
               internal::has_begin<VectorType>::value &&
                 std::is_same<decltype(std::declval<VectorType>().begin()),
@@ -7149,7 +7149,7 @@ namespace internal
               VectorType>::type * = nullptr>
   bool
   try_gather_evaluate_inplace(
-    T &                                    phi,
+    EvaluatorType &                        phi,
     const VectorType &                     input_vector,
     const EvaluationFlags::EvaluationFlags evaluation_flag)
   {
@@ -7199,14 +7199,14 @@ namespace internal
    */
   template <typename Number,
             typename VectorType,
-            typename T,
+            typename EvaluatorType,
             typename std::enable_if<
               !internal::has_begin<VectorType>::value ||
                 !std::is_same<decltype(std::declval<VectorType>().begin()),
                               Number *>::value,
               VectorType>::type * = nullptr>
   bool
-  try_gather_evaluate_inplace(T &,
+  try_gather_evaluate_inplace(EvaluatorType &,
                               const VectorType &,
                               const EvaluationFlags::EvaluationFlags)
   {
@@ -7218,7 +7218,7 @@ namespace internal
    */
   template <typename Number,
             typename VectorType,
-            typename T,
+            typename EvaluatorType,
             typename std::enable_if<
               internal::has_begin<VectorType>::value &&
                 std::is_same<decltype(std::declval<VectorType>().begin()),
@@ -7226,7 +7226,7 @@ namespace internal
               VectorType>::type * = nullptr>
   bool
   try_integrate_scatter_inplace(
-    T &                                    phi,
+    EvaluatorType &                        phi,
     VectorType &                           destination,
     const EvaluationFlags::EvaluationFlags evaluation_flag)
   {
@@ -7276,14 +7276,14 @@ namespace internal
    */
   template <typename Number,
             typename VectorType,
-            typename T,
+            typename EvaluatorType,
             typename std::enable_if<
               !internal::has_begin<VectorType>::value ||
                 !std::is_same<decltype(std::declval<VectorType>().begin()),
                               Number *>::value,
               VectorType>::type * = nullptr>
   bool
-  try_integrate_scatter_inplace(T,
+  try_integrate_scatter_inplace(EvaluatorType &,
                                 VectorType &,
                                 const EvaluationFlags::EvaluationFlags)
   {
