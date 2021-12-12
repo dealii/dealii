@@ -482,14 +482,40 @@ public:
    * associated with.
    */
   const std::array<unsigned int, n_lanes> &
-  get_cell_ids() const;
+  get_cell_ids() const
+  {
+    // implemented inline to avoid compilation problems on Windows
+    Assert(cell != numbers::invalid_unsigned_int, ExcNotInitialized());
+    return cell_ids;
+  }
+
+  /**
+   * Return the id of the cell/face batch this FEEvaluation/FEFaceEvaluation is
+   * associated with.
+   */
+  unsigned int
+  get_cell_or_face_batch_id() const
+  {
+    // implemented inline to avoid compilation problems on Windows
+    Assert(cell != numbers::invalid_unsigned_int, ExcNotInitialized());
+    return cell;
+  }
 
   /**
    * Return the id of the cells/faces this FEEvaluation/FEFaceEvaluation is
    * associated with.
    */
   const std::array<unsigned int, n_lanes> &
-  get_cell_or_face_ids() const;
+  get_cell_or_face_ids() const
+  {
+    // implemented inline to avoid compilation problems on Windows
+    Assert(cell != numbers::invalid_unsigned_int, ExcNotInitialized());
+    if (!is_face || dof_access_index ==
+                      internal::MatrixFreeFunctions::DoFInfo::dof_access_cell)
+      return cell_ids;
+    else
+      return cell_or_face_ids;
+  }
 
   /**
    * Return the (non-vectorized) number of faces within cells in case of ECL
@@ -504,7 +530,20 @@ public:
    * internal use.
    */
   const std::array<std::uint8_t, n_lanes> &
-  get_all_face_numbers() const;
+  get_all_face_numbers() const
+  {
+    // implemented inline to avoid compilation problems on Windows
+    Assert(cell != numbers::invalid_unsigned_int, ExcNotInitialized());
+    Assert(is_face &&
+             dof_access_index ==
+               internal::MatrixFreeFunctions::DoFInfo::dof_access_cell &&
+             is_interior_face == false,
+           ExcMessage(
+             "All face numbers can only be queried for ECL at exterior "
+             "faces. Use get_face_no() in other cases."));
+
+    return all_face_numbers;
+  }
 
   /**
    * Store the orientation of the neighbor's faces with respect to the current
@@ -515,7 +554,20 @@ public:
    * `is_interior_face == false`.
    */
   const std::array<std::uint8_t, n_lanes> &
-  get_all_face_orientations() const;
+  get_all_face_orientations() const
+  {
+    // implemented inline to avoid compilation problems on Windows
+    Assert(cell != numbers::invalid_unsigned_int, ExcNotInitialized());
+    Assert(is_face &&
+             dof_access_index ==
+               internal::MatrixFreeFunctions::DoFInfo::dof_access_cell &&
+             is_interior_face == false,
+           ExcMessage(
+             "All face numbers can only be queried for ECL at exterior "
+             "faces. Use get_face_no() in other cases."));
+
+    return all_face_orientations;
+  }
 
   //@}
 
@@ -1369,68 +1421,6 @@ inline bool
 FEEvaluationData<dim, Number, is_face>::get_is_interior_face() const
 {
   return is_interior_face;
-}
-
-
-
-template <int dim, typename Number, bool is_face>
-inline const std::array<unsigned int,
-                        FEEvaluationData<dim, Number, is_face>::n_lanes> &
-FEEvaluationData<dim, Number, is_face>::get_cell_ids() const
-{
-  Assert(cell != numbers::invalid_unsigned_int, ExcNotInitialized());
-  return cell_ids;
-}
-
-
-
-template <int dim, typename Number, bool is_face>
-inline const std::array<unsigned int,
-                        FEEvaluationData<dim, Number, is_face>::n_lanes> &
-FEEvaluationData<dim, Number, is_face>::get_cell_or_face_ids() const
-{
-  Assert(cell != numbers::invalid_unsigned_int, ExcNotInitialized());
-  if (!is_face || dof_access_index ==
-                    internal::MatrixFreeFunctions::DoFInfo::dof_access_cell)
-    return cell_ids;
-  else
-    return cell_or_face_ids;
-}
-
-
-
-template <int dim, typename Number, bool is_face>
-inline const std::array<std::uint8_t,
-                        FEEvaluationData<dim, Number, is_face>::n_lanes> &
-FEEvaluationData<dim, Number, is_face>::get_all_face_numbers() const
-{
-  Assert(cell != numbers::invalid_unsigned_int, ExcNotInitialized());
-  Assert(is_face &&
-           dof_access_index ==
-             internal::MatrixFreeFunctions::DoFInfo::dof_access_cell &&
-           is_interior_face == false,
-         ExcMessage("All face numbers can only be queried for ECL at exterior "
-                    "faces. Use get_face_no() in other cases."));
-
-  return all_face_numbers;
-}
-
-
-
-template <int dim, typename Number, bool is_face>
-inline const std::array<std::uint8_t,
-                        FEEvaluationData<dim, Number, is_face>::n_lanes> &
-FEEvaluationData<dim, Number, is_face>::get_all_face_orientations() const
-{
-  Assert(cell != numbers::invalid_unsigned_int, ExcNotInitialized());
-  Assert(is_face &&
-           dof_access_index ==
-             internal::MatrixFreeFunctions::DoFInfo::dof_access_cell &&
-           is_interior_face == false,
-         ExcMessage("All face numbers can only be queried for ECL at exterior "
-                    "faces. Use get_face_no() in other cases."));
-
-  return all_face_orientations;
 }
 
 

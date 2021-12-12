@@ -7153,7 +7153,7 @@ namespace internal
     const VectorType &                     input_vector,
     const EvaluationFlags::EvaluationFlags evaluation_flag)
   {
-    const unsigned int cell     = phi.get_current_cell_index();
+    const unsigned int cell     = phi.get_cell_or_face_batch_id();
     const auto &       dof_info = phi.get_dof_info();
     using VectorizedArrayType =
       typename std::remove_reference<decltype(*phi.begin_dof_values())>::type;
@@ -7230,7 +7230,7 @@ namespace internal
     VectorType &                           destination,
     const EvaluationFlags::EvaluationFlags evaluation_flag)
   {
-    const unsigned int cell     = phi.get_current_cell_index();
+    const unsigned int cell     = phi.get_cell_or_face_batch_id();
     const auto &       dof_info = phi.get_dof_info();
     using VectorizedArrayType =
       typename std::remove_reference<decltype(*phi.begin_dof_values())>::type;
