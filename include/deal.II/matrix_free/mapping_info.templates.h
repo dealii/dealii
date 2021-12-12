@@ -1134,7 +1134,7 @@ namespace internal
         MappingInfoStorage<dim, dim, VectorizedDouble> temp_data;
         temp_data.copy_descriptor(my_data);
         FEEvaluationData<dim, VectorizedDouble, false> eval(
-          {&shape_info, nullptr, &temp_data, 0, 0});
+          std::make_tuple(&shape_info, nullptr, &temp_data, 0, 0));
 
         AlignedVector<VectorizedDouble> evaluation_data;
         eval.set_data_pointers(&evaluation_data, dim);
@@ -2043,9 +2043,9 @@ namespace internal
         MappingInfoStorage<dim - 1, dim, VectorizedDouble> temp_data;
         temp_data.copy_descriptor(my_data);
         FEEvaluationData<dim, VectorizedDouble, true> eval_int(
-          {&shape_info, nullptr, &temp_data, 0, 0}, true);
+          std::make_tuple(&shape_info, nullptr, &temp_data, 0, 0), true);
         FEEvaluationData<dim, VectorizedDouble, true> eval_ext(
-          {&shape_info, nullptr, &temp_data, 0, 0}, false);
+          std::make_tuple(&shape_info, nullptr, &temp_data, 0, 0), false);
 
         AlignedVector<VectorizedDouble> evaluation_data, evaluation_data_ext;
         eval_int.set_data_pointers(&evaluation_data, dim);
@@ -2159,13 +2159,14 @@ namespace internal
                 face_type[face] <= affine ? 1 : n_q_points;
               for (unsigned int q = 0; q < n_points_compute; ++q)
                 {
-                  const unsigned int face_no = faces[face].interior_face_no;
+                  const unsigned int interior_face_no =
+                    faces[face].interior_face_no;
                   Tensor<2, dim, VectorizedDouble> jac;
                   for (unsigned int e = 0; e < dim; ++e)
                     {
                       const unsigned int ee =
                         ExtractFaceHelper::reorder_face_derivative_indices<dim>(
-                          face_no, e);
+                          interior_face_no, e);
                       for (unsigned int d = 0; d < dim; ++d)
                         jac[d][ee] =
                           eval_int
@@ -2176,7 +2177,7 @@ namespace internal
                     {
                       const unsigned int ee =
                         ExtractFaceHelper::reorder_face_derivative_indices<dim>(
-                          face_no, e);
+                          interior_face_no, e);
                       for (unsigned int d = 0; d < dim; ++d)
                         store_vectorized_array(
                           inv_jac[ee][d],
@@ -2186,7 +2187,8 @@ namespace internal
 
                   if (update_flags_faces & update_jacobian_grads)
                     {
-                      compute_jacobian_grad(face_no, 0, q, inv_jac, eval_int);
+                      compute_jacobian_grad(
+                        interior_face_no, 0, q, inv_jac, eval_int);
                     }
 
                   std::array<Tensor<1, dim, VectorizedDouble>, dim - 1>
@@ -2195,13 +2197,12 @@ namespace internal
                     for (unsigned int e = 0; e < dim; ++e)
                       for (unsigned int f = 0; f < dim; ++f)
                         tangential_vectors[d][e] +=
-                          jac[e][f] *
-                          GeometryInfo<dim>::unit_tangential_vectors[face_no][d]
-                                                                    [f];
+                          jac[e][f] * GeometryInfo<dim>::unit_tangential_vectors
+                                        [interior_face_no][d][f];
 
                   Tensor<1, dim, VectorizedDouble> boundary_form;
                   if (dim == 1)
-                    boundary_form[0] = face_no == 0 ? -1. : 1.;
+                    boundary_form[0] = interior_face_no == 0 ? -1. : 1.;
                   else if (dim == 2)
                     boundary_form = cross_product_2d(tangential_vectors[0]);
                   else if (dim == 3)
@@ -2261,13 +2262,14 @@ namespace internal
 
                   for (unsigned int q = 0; q < n_points_compute; ++q)
                     {
-                      const unsigned int face_no = faces[face].exterior_face_no;
+                      const unsigned int exterior_face_no =
+                        faces[face].exterior_face_no;
                       Tensor<2, dim, VectorizedDouble> jac;
                       for (unsigned int e = 0; e < dim; ++e)
                         {
                           const unsigned int ee =
                             ExtractFaceHelper::reorder_face_derivative_indices<
-                              dim>(face_no, e);
+                              dim>(exterior_face_no, e);
                           for (unsigned int d = 0; d < dim; ++d)
                             jac[d][ee] =
                               eval_ext
@@ -2279,7 +2281,7 @@ namespace internal
                         {
                           const unsigned int ee =
                             ExtractFaceHelper::reorder_face_derivative_indices<
-                              dim>(face_no, e);
+                              dim>(exterior_face_no, e);
                           for (unsigned int d = 0; d < dim; ++d)
                             store_vectorized_array(
                               inv_jac[ee][d],
@@ -2290,7 +2292,7 @@ namespace internal
                       if (update_flags_faces & update_jacobian_grads)
                         {
                           compute_jacobian_grad(
-                            face_no, 1, q, inv_jac, eval_ext);
+                            exterior_face_no, 1, q, inv_jac, eval_ext);
                         }
 
                       my_data.normals_times_jacobians[1][offset + q] =

@@ -3265,7 +3265,7 @@ namespace internal
     const unsigned int subface_index = eval.get_subface_index();
     const auto reorientate = [&](const unsigned int v, const unsigned int i) {
       return (dim < 3 || orientation[v] == nullptr ||
-              subface_index < GeometryInfo<dim>::max_children_per_cell) ?
+              subface_index < Utilities::pow(2, dim)) ?
                i :
                orientation[v][i];
     };
