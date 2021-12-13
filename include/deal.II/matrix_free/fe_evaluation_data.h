@@ -904,6 +904,17 @@ protected:
 };
 
 
+/**
+ * This class is equivalent to FEEvaluationData and exists merely for backward
+ * compatibility.
+ */
+template <int dim,
+          typename Number,
+          bool is_face,
+          typename VectorizedArrayType = VectorizedArray<Number>>
+using FEEvaluationBaseData =
+  FEEvaluationData<dim, VectorizedArrayType, is_face>;
+
 
 /*----------------------- Inline functions ----------------------------------*/
 
