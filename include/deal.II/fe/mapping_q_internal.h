@@ -1130,13 +1130,7 @@ namespace internal
           return;
         }
 
-      internal::MatrixFreeFunctions::
-        MappingInfoStorage<dim, dim, VectorizedArrayType>
-          temp_data;
-      temp_data.descriptor.resize(1);
-      temp_data.descriptor[0].n_q_points = n_q_points;
-      FEEvaluationData<dim, VectorizedArrayType, false> eval(
-        std::make_tuple(&data.shape_info, nullptr, &temp_data, 0, 0));
+      FEEvaluationData<dim, VectorizedArrayType, false> eval(data.shape_info);
 
       // prepare arrays
       if (evaluation_flag != EvaluationFlags::nothing)

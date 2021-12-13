@@ -2972,7 +2972,7 @@ namespace internal
           dim,
           n_components,
           evaluation_flag,
-          &eval.get_orientation_map()(face_orientation, 0),
+          &eval.get_shape_info().face_orientations_quad(face_orientation, 0),
           false,
           data.n_q_points_face,
           temp,
@@ -3080,7 +3080,7 @@ namespace internal
           dim,
           n_components,
           integration_flag,
-          &eval.get_orientation_map()(face_orientation, 0),
+          &eval.get_shape_info().face_orientations_quad(face_orientation, 0),
           true,
           data.n_q_points_face,
           temp,
@@ -3203,13 +3203,12 @@ namespace internal
 
           if (shape_data.nodal_at_cell_boundaries &&
               eval.get_all_face_orientations()[v] != 0)
-            orientation[v] =
-              &eval.get_shape_info()
-                 .face_orientations[eval.get_all_face_orientations()[v]][0];
+            orientation[v] = &eval.get_shape_info().face_orientations_dofs(
+              eval.get_all_face_orientations()[v], 0);
         }
     else if (eval.get_face_orientation() != 0)
-      orientation[0] =
-        &eval.get_orientation_map()(eval.get_face_orientation(), 0);
+      orientation[0] = &eval.get_shape_info().face_orientations_dofs(
+        eval.get_face_orientation(), 0);
 
     // face_to_cell_index_hermite
     std::array<const unsigned int *, n_face_orientations> index_array_hermite =
@@ -3489,7 +3488,8 @@ namespace internal
             const bool vectorization_possible =
               all_faces_are_same && (sm_ptr == nullptr);
 
-            std::array<Number2_ *, n_lanes> vector_ptrs;
+            std::array<Number2_ *, n_lanes>   vector_ptrs;
+            std::array<unsigned int, n_lanes> reordered_indices;
 
             if (vectorization_possible == false)
               {
@@ -3542,6 +3542,14 @@ namespace internal
                   {
                     Assert(false, ExcNotImplemented());
                   }
+              }
+            else if (n_face_orientations == n_lanes)
+              {
+                for (unsigned int v = 0; v < n_lanes; ++v)
+                  reordered_indices[v] =
+                    dof_info.dof_indices_contiguous[dof_access_index]
+                                                   [eval.get_cell_ids()[v]];
+                dof_indices = reordered_indices.data();
               }
 
             if (fe_degree > 1 && (evaluation_flag & EvaluationFlags::gradients))
@@ -3741,8 +3749,8 @@ namespace internal
                       n_components,
                       v,
                       evaluation_flag,
-                      &eval.get_orientation_map()
-                         [eval.get_all_face_orientations()[v]][0],
+                      &eval.get_shape_info().face_orientations_quad(
+                        eval.get_all_face_orientations()[v], 0),
                       false,
                       Utilities::pow(n_q_points_1d, dim - 1),
                       &temp[0][0],
@@ -3757,7 +3765,8 @@ namespace internal
                 dim,
                 n_components,
                 evaluation_flag,
-                &eval.get_orientation_map()[eval.get_face_orientation()][0],
+                &eval.get_shape_info().face_orientations_quad(
+                  eval.get_face_orientation(), 0),
                 false,
                 Utilities::pow(n_q_points_1d, dim - 1),
                 temp,
@@ -3918,8 +3927,8 @@ namespace internal
                     n_components,
                     v,
                     integration_flag,
-                    &eval.get_orientation_map()
-                       [eval.get_all_face_orientations()[v]][0],
+                    &eval.get_shape_info().face_orientations_quad(
+                      eval.get_all_face_orientations()[v], 0),
                     true,
                     Utilities::pow(n_q_points_1d, dim - 1),
                     &temp[0][0],
@@ -3932,7 +3941,8 @@ namespace internal
               dim,
               n_components,
               integration_flag,
-              &eval.get_orientation_map()[eval.get_face_orientation()][0],
+              &eval.get_shape_info().face_orientations_quad(
+                eval.get_face_orientation(), 0),
               true,
               Utilities::pow(n_q_points_1d, dim - 1),
               temp,

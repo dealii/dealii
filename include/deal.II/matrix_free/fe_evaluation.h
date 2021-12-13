@@ -2806,51 +2806,58 @@ namespace internal
             int  dim,
             typename Number,
             typename VectorizedArrayType>
-  inline std::tuple<
-    const internal::MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> *,
-    const internal::MatrixFreeFunctions::DoFInfo *,
-    const internal::MatrixFreeFunctions::
-      MappingInfoStorage<dim - is_face, dim, VectorizedArrayType> *,
-    unsigned int,
-    unsigned int>
-  get_shape_info_and_indices(
-    const MatrixFree<dim, Number, VectorizedArrayType> &data,
-    const unsigned int                                  dof_no,
-    const unsigned int first_selected_component,
-    const unsigned int quad_no,
-    const unsigned int fe_degree,
-    const unsigned int n_q_points,
-    const unsigned int active_fe_index_given,
-    const unsigned int active_quad_index_given)
+  inline typename FEEvaluationData<dim, VectorizedArrayType, is_face>::
+    InitializationData
+    get_shape_info_and_indices(
+      const MatrixFree<dim, Number, VectorizedArrayType> &data,
+      const unsigned int                                  dof_no,
+      const unsigned int first_selected_component,
+      const unsigned int quad_no,
+      const unsigned int fe_degree,
+      const unsigned int n_q_points,
+      const unsigned int active_fe_index_given,
+      const unsigned int active_quad_index_given,
+      const unsigned int face_type)
   {
-    const auto &dof_info        = data.get_dof_info(dof_no);
-    const auto &mapping_storage = internal::MatrixFreeFunctions::
-      MappingInfoCellsOrFaces<dim, Number, is_face, VectorizedArrayType>::get(
-        data.get_mapping_info(), quad_no);
-    const unsigned int active_fe_index =
+    typename FEEvaluationData<dim, VectorizedArrayType, is_face>::
+      InitializationData init_data;
+
+    init_data.dof_info = &data.get_dof_info(dof_no);
+    init_data.mapping_data =
+      &internal::MatrixFreeFunctions::
+        MappingInfoCellsOrFaces<dim, Number, is_face, VectorizedArrayType>::get(
+          data.get_mapping_info(), quad_no);
+
+    init_data.active_fe_index =
       fe_degree != numbers::invalid_unsigned_int ?
-        dof_info.fe_index_from_degree(first_selected_component, fe_degree) :
+        init_data.dof_info->fe_index_from_degree(first_selected_component,
+                                                 fe_degree) :
         (active_fe_index_given != numbers::invalid_unsigned_int ?
            active_fe_index_given :
            0);
-    const unsigned int active_quad_index =
+    init_data.active_quad_index =
       fe_degree == numbers::invalid_unsigned_int ?
         (active_quad_index_given != numbers::invalid_unsigned_int ?
            active_quad_index_given :
-           std::min<unsigned int>(active_fe_index,
-                                  mapping_storage.descriptor.size() - 1)) :
-        mapping_storage.quad_index_from_n_q_points(n_q_points);
-    return std::make_tuple(
-      &data.get_shape_info(
-        dof_no,
-        quad_no,
-        dof_info.component_to_base_index[first_selected_component],
-        active_fe_index,
-        active_quad_index),
-      &dof_info,
-      &mapping_storage,
-      active_fe_index,
-      active_quad_index);
+           std::min<unsigned int>(init_data.active_fe_index,
+                                  init_data.mapping_data->descriptor.size() -
+                                    1)) :
+        init_data.mapping_data->quad_index_from_n_q_points(n_q_points);
+
+    init_data.shape_info = &data.get_shape_info(
+      dof_no,
+      quad_no,
+      init_data.dof_info->component_to_base_index[first_selected_component],
+      init_data.active_fe_index,
+      init_data.active_quad_index);
+    init_data.descriptor =
+      &init_data.mapping_data->descriptor
+         [is_face ?
+            (init_data.active_quad_index * std::max<unsigned int>(1, dim - 1) +
+             (face_type == numbers::invalid_unsigned_int ? 0 : face_type)) :
+            init_data.active_quad_index];
+
+    return init_data;
   }
 } // namespace internal
 
@@ -2885,10 +2892,10 @@ inline FEEvaluationBase<dim,
                                                     fe_degree,
                                                     n_q_points,
                                                     active_fe_index,
-                                                    active_quad_index),
+                                                    active_quad_index,
+                                                    face_type),
       is_interior_face,
       quad_no,
-      face_type,
       first_selected_component)
   , scratch_data_array(data_in.acquire_scratch_data())
   , matrix_info(&data_in)

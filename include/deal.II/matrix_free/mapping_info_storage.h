@@ -131,15 +131,13 @@ namespace internal
          */
         template <int dim_q>
         void
-        initialize(const Quadrature<dim_q> &quadrature,
-                   const UpdateFlags update_flags_inner_faces = update_default);
+        initialize(const Quadrature<dim_q> &quadrature);
 
         /**
          * Set up the lengths in the various members of this struct.
          */
         void
-        initialize(const Quadrature<1> &quadrature_1d,
-                   const UpdateFlags update_flags_inner_faces = update_default);
+        initialize(const Quadrature<1> &quadrature_1d);
 
         /**
          * Returns the memory consumption in bytes.
@@ -176,14 +174,6 @@ namespace internal
          * when it is used in a vectorized context).
          */
         AlignedVector<ScalarNumber> quadrature_weights;
-
-        /**
-         * For quadrature on faces, the evaluation of basis functions is not
-         * in the correct order if a face is not in the standard orientation
-         * to a given element. This data structure is used to re-order the
-         * data evaluated on quadrature points to represent the correct order.
-         */
-        dealii::Table<2, unsigned int> face_orientations;
       };
 
       /**
@@ -302,15 +292,6 @@ namespace internal
        */
       unsigned int
       quad_index_from_n_q_points(const unsigned int n_q_points) const;
-
-      /**
-       * Get the descriptor from another instance of QuadratureDescriptor,
-       * clearing all other data fields.
-       */
-      template <typename Number2>
-      void
-      copy_descriptor(
-        const MappingInfoStorage<structdim, spacedim, Number2> &other);
 
       /**
        * Helper function to determine which update flags must be set in the

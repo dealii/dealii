@@ -127,19 +127,14 @@ public:
   static constexpr unsigned int n_lanes = sizeof(Number) / sizeof(ScalarNumber);
 
   /**
-   * Constructor, taking data stored in MatrixFree. If applied to problems
-   * with more than one quadrature formula selected during construction of
-   * `matrix_free`, `quad_no` allows to select the appropriate formula.
+   * Constructor, taking a single ShapeInfo object to inject the capability
+   * for evaluation and set up some data containers, compatible with the
+   * internal evaluation kernels of FEEvaluationImpl and friends. For actual
+   * use, select one of the derived classes FEEvaluation or FEFaceEvaluation
+   * with their respective arguments.
    */
-  FEEvaluationData(const std::tuple<const ShapeInfoType *,
-                                    const DoFInfo *,
-                                    const MappingInfoStorageType *,
-                                    unsigned int,
-                                    unsigned int> &info,
-                   const bool                      is_interior_face = true,
-                   const unsigned int              quad_no          = 0,
-                   const unsigned int              face_type        = 0,
-                   const unsigned int first_selected_component      = 0);
+  FEEvaluationData(const ShapeInfoType &info,
+                   const bool           is_interior_face = true);
 
   /**
    * Copy constructor.
@@ -436,7 +431,8 @@ public:
 
   /**
    * If is_face is true, this function returns the orientation index within an
-   * array of orientations as returned by get_orientation_map().
+   * array of orientations as stored in ShapeInfo for unknowns and quadrature
+   * points.
    *
    * @note This function depends on the internal representation of data, which
    * is not stable between releases of deal.II, and is hence mostly for
@@ -444,17 +440,6 @@ public:
    */
   unsigned int
   get_face_orientation() const;
-
-  /**
-   * If is_face is true, this function returns the map re-ordering from face
-   * quadrature points in standard orientation to a specific orientation.
-   *
-   * @note This function depends on the internal representation of data, which
-   * is not stable between releases of deal.II, and is hence mostly for
-   * internal use.
-   */
-  const Table<2, unsigned int> &
-  get_orientation_map() const;
 
   /**
    * Return the current index in the access to compressed indices.
@@ -571,7 +556,32 @@ public:
 
   //@}
 
+  /**
+   * This data structure is used for the initialization by the derived
+   * FEEvaluation classes.
+   */
+  struct InitializationData
+  {
+    const ShapeInfoType *         shape_info;
+    const DoFInfo *               dof_info;
+    const MappingInfoStorageType *mapping_data;
+    unsigned int                  active_fe_index;
+    unsigned int                  active_quad_index;
+    const typename MappingInfoStorageType::QuadratureDescriptor *descriptor;
+  };
+
 protected:
+  /**
+   * Constructor filling information available from a MatrixFree class,
+   * collected in an internal data structure to reduce overhead of
+   * initialization. Used in derived classes when this class is initialized
+   * from a MatrixFree object.
+   */
+  FEEvaluationData(const InitializationData &info,
+                   const bool                is_interior_face,
+                   const unsigned int        quad_no,
+                   const unsigned int        first_selected_component);
+
   /**
    * Constructor that comes with reduced functionality and works similarly as
    * FEValues.
@@ -901,41 +911,46 @@ protected:
 
 template <int dim, typename Number, bool is_face>
 inline FEEvaluationData<dim, Number, is_face>::FEEvaluationData(
-  const std::tuple<const ShapeInfoType *,
-                   const DoFInfo *,
-                   const MappingInfoStorageType *,
-                   unsigned int,
-                   unsigned int> &shape_dof_info,
-  const bool                      is_interior_face,
-  const unsigned int              quad_no,
-  const unsigned int              face_type,
-  const unsigned int              first_selected_component)
-  : data(std::get<0>(shape_dof_info))
-  , dof_info(std::get<1>(shape_dof_info))
-  , mapping_data(std::get<2>(shape_dof_info))
+  const ShapeInfoType &shape_info,
+  const bool           is_interior_face)
+  : FEEvaluationData(
+      InitializationData{&shape_info, nullptr, nullptr, 0, 0, nullptr},
+      is_interior_face,
+      0,
+      0)
+{}
+
+
+template <int dim, typename Number, bool is_face>
+inline FEEvaluationData<dim, Number, is_face>::FEEvaluationData(
+  const InitializationData &initialization_data,
+  const bool                is_interior_face,
+  const unsigned int        quad_no,
+  const unsigned int        first_selected_component)
+  : data(initialization_data.shape_info)
+  , dof_info(initialization_data.dof_info)
+  , mapping_data(initialization_data.mapping_data)
   , quad_no(quad_no)
   , n_fe_components(dof_info != nullptr ? dof_info->start_components.back() : 0)
   , first_selected_component(first_selected_component)
-  , active_fe_index(std::get<3>(shape_dof_info))
-  , active_quad_index(std::get<4>(shape_dof_info))
-  , descriptor(
-      &mapping_data->descriptor
-         [is_face ?
-            (active_quad_index * std::max<unsigned int>(1, dim - 1) +
-             (face_type == numbers::invalid_unsigned_int ? 0 : face_type)) :
-            active_quad_index])
-  , n_quadrature_points(descriptor->n_q_points)
+  , active_fe_index(initialization_data.active_fe_index)
+  , active_quad_index(initialization_data.active_quad_index)
+  , descriptor(initialization_data.descriptor)
+  , n_quadrature_points(is_face ? data->n_q_points_face : data->n_q_points)
   , jacobian(nullptr)
   , J_value(nullptr)
   , normal_vectors(nullptr)
   , normal_x_jacobian(nullptr)
-  , quadrature_weights(descriptor->quadrature_weights.begin())
+  , quadrature_weights(
+      descriptor != nullptr ? descriptor->quadrature_weights.begin() : nullptr)
+#  ifdef DEBUG
   , dof_values_initialized(false)
   , values_quad_initialized(false)
   , gradients_quad_initialized(false)
   , hessians_quad_initialized(false)
   , values_quad_submitted(false)
   , gradients_quad_submitted(false)
+#  endif
   , cell(numbers::invalid_unsigned_int)
   , is_interior_face(is_interior_face)
   , dof_access_index(
@@ -948,7 +963,11 @@ inline FEEvaluationData<dim, Number, is_face>::FEEvaluationData(
   , face_orientation(0)
   , subface_index(0)
   , cell_type(internal::MatrixFreeFunctions::general)
-{}
+{
+  // TODO: This currently fails for simplex/matrix_free_face_integral_01
+  // if (descriptor != nullptr)
+  // AssertDimension(n_quadrature_points, descriptor->n_q_points);
+}
 
 
 
@@ -1009,12 +1028,14 @@ FEEvaluationData<dim, Number, is_face>::operator=(const FEEvaluationData &other)
   normal_x_jacobian  = nullptr;
   quadrature_weights = other.quadrature_weights;
 
+#  ifdef DEBUG
   dof_values_initialized     = false;
   values_quad_initialized    = false;
   gradients_quad_initialized = false;
   hessians_quad_initialized  = false;
   values_quad_submitted      = false;
   gradients_quad_submitted   = false;
+#  endif
 
   cell             = numbers::invalid_unsigned_int;
   is_interior_face = other.is_interior_face;
@@ -1132,7 +1153,7 @@ FEEvaluationData<dim, Number, is_face>::JxW(const unsigned int q_point) const
            "update_values|update_gradients"));
   if (cell_type <= internal::MatrixFreeFunctions::affine)
     {
-      Assert(quadrature_weights != nullptr, ExcInternalError());
+      Assert(quadrature_weights != nullptr, ExcNotInitialized());
       return J_value[0] * quadrature_weights[q_point];
     }
   else
@@ -1393,16 +1414,6 @@ inline unsigned int
 FEEvaluationData<dim, Number, is_face>::get_face_orientation() const
 {
   return face_orientation;
-}
-
-
-
-template <int dim, typename Number, bool is_face>
-inline const Table<2, unsigned int> &
-FEEvaluationData<dim, Number, is_face>::get_orientation_map() const
-{
-  Assert(descriptor != nullptr, ExcNotInitialized());
-  return descriptor->face_orientations;
 }
 
 

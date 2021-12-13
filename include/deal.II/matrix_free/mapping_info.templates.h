@@ -126,18 +126,17 @@ namespace internal
 
               if (flag == false)
                 {
-                  cell_data[my_q].descriptor[hpq].initialize(quad[my_q][hpq],
-                                                             update_default);
+                  cell_data[my_q].descriptor[hpq].initialize(quad[my_q][hpq]);
                   const auto quad_face =
                     get_unique_face_quadratures(quad[my_q][hpq]);
 
                   if (quad_face.first.size() > 0) // line, quad
                     {
                       face_data[my_q].descriptor[hpq * scale].initialize(
-                        quad_face.first, update_default);
+                        quad_face.first);
                       face_data_by_cells[my_q]
                         .descriptor[hpq * scale]
-                        .initialize(quad_face.first, update_default);
+                        .initialize(quad_face.first);
                     }
 
                   if (quad_face.second.size() > 0) // triangle
@@ -145,10 +144,10 @@ namespace internal
                       AssertDimension(dim, 3);
                       face_data[my_q]
                         .descriptor[hpq * scale + (is_mixed_mesh ? 1 : 0)]
-                        .initialize(quad_face.second, update_default);
+                        .initialize(quad_face.second);
                       face_data_by_cells[my_q]
                         .descriptor[hpq * scale + (is_mixed_mesh ? 1 : 0)]
-                        .initialize(quad_face.second, update_default);
+                        .initialize(quad_face.second);
                     }
 
                   const auto face_quadrature_collection =
@@ -163,15 +162,14 @@ namespace internal
               else
                 {
                   cell_data[my_q].descriptor[hpq].initialize(
-                    quad[my_q][hpq].get_tensor_basis()[0], update_default);
+                    quad[my_q][hpq].get_tensor_basis()[0]);
 
                   const auto quad_face = quad[my_q][hpq].get_tensor_basis()[0];
-                  face_data[my_q].descriptor[hpq * scale].initialize(
-                    quad_face, this->update_flags_boundary_faces);
+                  face_data[my_q].descriptor[hpq * scale].initialize(quad_face);
                   face_data[my_q].q_collection[hpq] =
                     dealii::hp::QCollection<dim - 1>(quad_face);
                   face_data_by_cells[my_q].descriptor[hpq * scale].initialize(
-                    quad_face, update_default);
+                    quad_face);
                   reference_cell_types[my_q][hpq] =
                     dealii::ReferenceCells::get_hypercube<dim>();
                 }
@@ -1131,10 +1129,7 @@ namespace internal
           shape_info.dofs_per_component_on_cell;
         constexpr unsigned int hess_dim = dim * (dim + 1) / 2;
 
-        MappingInfoStorage<dim, dim, VectorizedDouble> temp_data;
-        temp_data.copy_descriptor(my_data);
-        FEEvaluationData<dim, VectorizedDouble, false> eval(
-          std::make_tuple(&shape_info, nullptr, &temp_data, 0, 0));
+        FEEvaluationData<dim, VectorizedDouble, false> eval(shape_info);
 
         AlignedVector<VectorizedDouble> evaluation_data;
         eval.set_data_pointers(&evaluation_data, dim);
@@ -2040,23 +2035,23 @@ namespace internal
           shape_info.dofs_per_component_on_cell;
         constexpr unsigned int hess_dim = dim * (dim + 1) / 2;
 
-        MappingInfoStorage<dim - 1, dim, VectorizedDouble> temp_data;
-        temp_data.copy_descriptor(my_data);
-        FEEvaluationData<dim, VectorizedDouble, true> eval_int(
-          std::make_tuple(&shape_info, nullptr, &temp_data, 0, 0), true);
-        FEEvaluationData<dim, VectorizedDouble, true> eval_ext(
-          std::make_tuple(&shape_info, nullptr, &temp_data, 0, 0), false);
+        FEEvaluationData<dim, VectorizedDouble, true> eval_int(shape_info,
+                                                               true);
+        FEEvaluationData<dim, VectorizedDouble, true> eval_ext(shape_info,
+                                                               false);
 
-        AlignedVector<VectorizedDouble> evaluation_data, evaluation_data_ext;
+        // Let both evaluators use the same array as their use will not
+        // overlap
+        AlignedVector<VectorizedDouble> evaluation_data;
         eval_int.set_data_pointers(&evaluation_data, dim);
-        eval_ext.set_data_pointers(&evaluation_data_ext, dim);
+        eval_ext.set_data_pointers(&evaluation_data, dim);
 
         for (unsigned int face = begin_face; face < end_face; ++face)
           for (unsigned vv = 0; vv < n_lanes; vv += n_lanes_d)
             {
               internal::MatrixFreeFunctions::FaceToCellTopology<
                 VectorizedDouble::size()>
-                face_double = {};
+                face_double                = {};
               face_double.interior_face_no = faces[face].interior_face_no;
               face_double.exterior_face_no = faces[face].exterior_face_no;
               face_double.face_orientation = faces[face].face_orientation;

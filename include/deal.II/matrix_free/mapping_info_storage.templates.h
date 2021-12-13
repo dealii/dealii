@@ -52,12 +52,8 @@ namespace internal
     template <int dim_q>
     void
     MappingInfoStorage<structdim, spacedim, Number>::QuadratureDescriptor::
-      initialize(const Quadrature<dim_q> &quadrature,
-                 const UpdateFlags        update_flags_inner_faces)
+      initialize(const Quadrature<dim_q> &quadrature)
     {
-      Assert(structdim + 1 <= spacedim ||
-               update_flags_inner_faces == update_default,
-             ExcMessage("Volume cells do not allow for setting inner faces"));
       this->quadrature = quadrature;
       n_q_points       = quadrature.size();
       quadrature_weights.resize(n_q_points);
@@ -65,9 +61,6 @@ namespace internal
         quadrature_weights[i] = quadrature.weight(i);
 
       // note: quadrature_1d and tensor_quadrature_weights are not set up
-
-      // TODO: set up face_orientations
-      (void)update_flags_inner_faces;
     }
 
 
@@ -75,12 +68,8 @@ namespace internal
     template <int structdim, int spacedim, typename Number>
     void
     MappingInfoStorage<structdim, spacedim, Number>::QuadratureDescriptor::
-      initialize(const Quadrature<1> &quadrature_1d,
-                 const UpdateFlags    update_flags_inner_faces)
+      initialize(const Quadrature<1> &quadrature_1d)
     {
-      Assert(structdim + 1 <= spacedim ||
-               update_flags_inner_faces == update_default,
-             ExcMessage("Volume cells do not allow for setting inner faces"));
       this->quadrature_1d = quadrature_1d;
       quadrature          = Quadrature<structdim>(quadrature_1d);
       n_q_points          = quadrature.size();
@@ -94,34 +83,6 @@ namespace internal
           for (unsigned int i = 0; i < quadrature_1d.size(); ++i)
             tensor_quadrature_weights[d][i] = quadrature_1d.weight(i);
         }
-
-      // face orientation for faces in 3D
-      if (structdim == spacedim - 1 && spacedim == 3 &&
-          update_flags_inner_faces != update_default)
-        {
-          const unsigned int n = quadrature_1d.size();
-          face_orientations.reinit(8, n * n);
-          for (unsigned int j = 0, i = 0; j < n; ++j)
-            for (unsigned int k = 0; k < n; ++k, ++i)
-              {
-                // face_orientation=true,  face_flip=false, face_rotation=false
-                face_orientations[0][i] = i;
-                // face_orientation=false, face_flip=false, face_rotation=false
-                face_orientations[1][i] = j + k * n;
-                // face_orientation=true,  face_flip=true,  face_rotation=false
-                face_orientations[2][i] = (n - 1 - k) + (n - 1 - j) * n;
-                // face_orientation=false, face_flip=true,  face_rotation=false
-                face_orientations[3][i] = (n - 1 - j) + (n - 1 - k) * n;
-                // face_orientation=true,  face_flip=false, face_rotation=true
-                face_orientations[4][i] = j + (n - 1 - k) * n;
-                // face_orientation=false, face_flip=false, face_rotation=true
-                face_orientations[5][i] = k + (n - 1 - j) * n;
-                // face_orientation=true,  face_flip=true,  face_rotation=true
-                face_orientations[6][i] = (n - 1 - j) + k * n;
-                // face_orientation=false, face_flip=true,  face_rotation=true
-                face_orientations[7][i] = (n - 1 - k) + j * n;
-              }
-        }
     }
 
 
@@ -132,8 +93,7 @@ namespace internal
       memory_consumption() const
     {
       std::size_t memory = sizeof(this) + quadrature.memory_consumption() +
-                           quadrature_weights.memory_consumption() +
-                           face_orientations.memory_consumption();
+                           quadrature_weights.memory_consumption();
       for (int d = 0; d < structdim; ++d)
         memory += tensor_quadrature_weights[d].memory_consumption();
       return memory;
@@ -156,41 +116,6 @@ namespace internal
         }
       quadrature_point_offsets.clear();
       quadrature_points.clear();
-    }
-
-
-
-    template <int structdim, int spacedim, typename Number>
-    template <typename Number2>
-    void
-    MappingInfoStorage<structdim, spacedim, Number>::copy_descriptor(
-      const MappingInfoStorage<structdim, spacedim, Number2> &other)
-    {
-      clear_data_fields();
-      descriptor.clear();
-      descriptor.resize(other.descriptor.size());
-      for (unsigned int i = 0; i < descriptor.size(); ++i)
-        {
-          descriptor[i].n_q_points    = other.descriptor[i].n_q_points;
-          descriptor[i].quadrature_1d = other.descriptor[i].quadrature_1d;
-          descriptor[i].quadrature    = other.descriptor[i].quadrature;
-          for (unsigned int d = 0; d < structdim; ++d)
-            {
-              descriptor[i].tensor_quadrature_weights[d].resize(
-                other.descriptor[i].tensor_quadrature_weights[d].size());
-              std::copy(
-                other.descriptor[i].tensor_quadrature_weights[d].begin(),
-                other.descriptor[i].tensor_quadrature_weights[d].end(),
-                descriptor[i].tensor_quadrature_weights[d].begin());
-            }
-          descriptor[i].quadrature_weights.resize(
-            other.descriptor[i].quadrature_weights.size());
-          std::copy(other.descriptor[i].quadrature_weights.begin(),
-                    other.descriptor[i].quadrature_weights.end(),
-                    descriptor[i].quadrature_weights.begin());
-          descriptor[i].face_orientations =
-            other.descriptor[i].face_orientations;
-        }
     }
 
 
