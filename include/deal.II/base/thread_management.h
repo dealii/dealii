@@ -37,7 +37,9 @@
 #  include <vector>
 
 #  ifdef DEAL_II_WITH_TBB
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #    include <tbb/task_group.h>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #  endif
 
 DEAL_II_NAMESPACE_OPEN
