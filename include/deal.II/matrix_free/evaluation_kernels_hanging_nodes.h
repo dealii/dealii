@@ -35,11 +35,6 @@ DEAL_II_NAMESPACE_OPEN
 #endif
 
 
-// forward declaration
-template <int, typename, bool, typename>
-class FEEvaluationBaseData;
-
-
 
 namespace internal
 {
