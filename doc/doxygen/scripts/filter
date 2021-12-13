@@ -54,7 +54,7 @@ while (<>)
     #
     # Now, as of doxygen 1.5, this still produces the wrong result, but
     # that's not our fault. This is reported here:
-    #    http://bugzilla.gnome.org/show_bug.cgi?id=365053
+    #    https://github.com/doxygen/doxygen/issues/2285
     if (m/^ *(::)?dealii::.*\\$/)
     {
         s/::dealii::(.*)\\$/::\1        \\/g;
