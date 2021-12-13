@@ -26,11 +26,11 @@ while (<>)
     ########################################################
 
 
-    # make sure we can just write $...$ for formulas.
-    s/\$/\@f\$/g;
-
-    # however, undo that change if the dollar sign was escaped with a backslash
-    s/\\\@f\$/\$/g;
+    # Make sure we can just write $...$ for formulas, except if
+    # the dollar sign was escaped with a backslash (use negative
+    # look-behind to detect that case, using (?<!\\) to make sure
+    # the preceding character -- if there is any -- is not a backslash):
+    s#(?<!\\)\$#\@f\$#g;
 
     # We don't let doxygen put everything into a namespace
     # dealii. consequently, doxygen can't link references that contain an
