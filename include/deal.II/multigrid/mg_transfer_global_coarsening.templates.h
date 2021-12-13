@@ -1031,6 +1031,12 @@ namespace internal
         &                                         transfer,
       LinearAlgebra::distributed::Vector<Number> &touch_count)
     {
+      touch_count.reinit(transfer.partitioner_fine);
+
+      for (const auto i : transfer.level_dof_indices_fine)
+        touch_count.local_element(i) += 1;
+      touch_count.compress(VectorOperation::add);
+
       IndexSet locally_relevant_dofs;
       if (mg_level_fine == numbers::invalid_unsigned_int)
         DoFTools::extract_locally_relevant_dofs(dof_handler_fine,
@@ -1052,23 +1058,7 @@ namespace internal
       LinearAlgebra::distributed::Vector<Number> touch_count_;
       touch_count_.reinit(partitioner_fine_);
 
-      std::vector<types::global_dof_index> local_dof_indices;
-
-      loop_over_active_or_level_cells(
-        dof_handler_fine, mg_level_fine, [&](const auto &cell) {
-          local_dof_indices.resize(cell->get_fe().n_dofs_per_cell());
-
-          if (mg_level_fine == numbers::invalid_unsigned_int)
-            cell->get_dof_indices(local_dof_indices);
-          else
-            cell->get_mg_dof_indices(local_dof_indices);
-
-          for (auto i : local_dof_indices)
-            if (constraint_fine.is_constrained(i) == false)
-              touch_count_[i] += 1;
-        });
-
-      touch_count_.compress(VectorOperation::add);
+      touch_count_.copy_locally_owned_data_from(touch_count);
 
       for (unsigned int i = 0; i < touch_count_.local_size(); ++i)
         touch_count_.local_element(i) =
