@@ -28,11 +28,13 @@
 #  include <deal.II/base/thread_management.h>
 
 #  ifdef DEAL_II_WITH_TBB
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #    ifdef DEAL_II_TBB_WITH_ONEAPI
 #      include <tbb/parallel_pipeline.h>
 #    else
 #      include <tbb/pipeline.h>
 #    endif
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #  endif
 
 #  include <functional>
