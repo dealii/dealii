@@ -854,7 +854,7 @@ namespace internal
           // (similar to MappingInfoStorage::QuadratureDescriptor::initialize)
           if (dim == 3)
             {
-              auto compute_orientations =
+              const auto compute_orientations =
                 [](const unsigned int      n,
                    Table<2, unsigned int> &face_orientations) {
                   face_orientations.reinit(8, n * n);
