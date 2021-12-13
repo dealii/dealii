@@ -1,0 +1,4 @@
+Fixed: IndexSet::subtract_set would previously run in quadratic complexity in
+the number of ranges. This is now fixed.
+<br>
+(Martin Kronbichler, 2021/12/13)
