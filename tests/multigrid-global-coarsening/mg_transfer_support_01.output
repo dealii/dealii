@@ -8,15 +8,15 @@ DEAL::1   1   1 1
 DEAL::1   1     1 1                                   
 DEAL::1     1     1 1                                 
 DEAL::1     1       1 1                               
-DEAL::                                                
 DEAL::        1                                       
-DEAL::                                                
+DEAL::        1                                       
 DEAL::          1                                     
-DEAL::                                                
+DEAL::          1                                     
 DEAL::            1                                   
-DEAL::                                                
+DEAL::            1                                   
 DEAL::              1                                 
-DEAL::                                                
+DEAL::              1                                 
+DEAL::                1                               
 DEAL::                1                               
 DEAL::                                                
 DEAL::                                                
