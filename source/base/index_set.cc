@@ -270,7 +270,7 @@ IndexSet::subtract_set(const IndexSet &other)
   is_compressed = false;
 
 
-  // we save new ranges to be added to our IndexSet in an temporary vector and
+  // we save all new ranges to our IndexSet in an temporary vector and
   // add all of them in one go at the end.
   std::vector<Range> new_ranges;
 
@@ -282,6 +282,7 @@ IndexSet::subtract_set(const IndexSet &other)
       // advance own iterator until we get an overlap
       if (own_it->end <= other_it->begin)
         {
+          new_ranges.push_back(*own_it);
           ++own_it;
           continue;
         }
@@ -314,15 +315,11 @@ IndexSet::subtract_set(const IndexSet &other)
       // next.
     }
 
-  // Now delete all empty ranges we might
-  // have created.
-  for (std::vector<Range>::iterator it = ranges.begin(); it != ranges.end();)
-    {
-      if (it->begin >= it->end)
-        it = ranges.erase(it);
-      else
-        ++it;
-    }
+  // make sure to take over the remaining ranges
+  for (; own_it != ranges.end(); ++own_it)
+    new_ranges.push_back(*own_it);
+
+  ranges.clear();
 
   // done, now add the temporary ranges
   const std::vector<Range>::iterator end = new_ranges.end();
