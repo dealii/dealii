@@ -936,7 +936,9 @@ inline FEEvaluationData<dim, Number, is_face>::FEEvaluationData(
   , active_fe_index(initialization_data.active_fe_index)
   , active_quad_index(initialization_data.active_quad_index)
   , descriptor(initialization_data.descriptor)
-  , n_quadrature_points(is_face ? data->n_q_points_face : data->n_q_points)
+  , n_quadrature_points(descriptor == nullptr ?
+                          (is_face ? data->n_q_points_face : data->n_q_points) :
+                          descriptor->n_q_points)
   , jacobian(nullptr)
   , J_value(nullptr)
   , normal_vectors(nullptr)
@@ -963,11 +965,7 @@ inline FEEvaluationData<dim, Number, is_face>::FEEvaluationData(
   , face_orientation(0)
   , subface_index(0)
   , cell_type(internal::MatrixFreeFunctions::general)
-{
-  // TODO: This currently fails for simplex/matrix_free_face_integral_01
-  // if (descriptor != nullptr)
-  // AssertDimension(n_quadrature_points, descriptor->n_q_points);
-}
+{}
 
 
 
