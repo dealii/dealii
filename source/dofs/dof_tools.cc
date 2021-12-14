@@ -1061,16 +1061,16 @@ namespace DoFTools
     std::vector<types::global_dof_index> dof_indices;
     std::set<types::global_dof_index>    global_dof_indices;
 
-    for (const auto &cell : dof_handler.active_cell_iterators())
-      if (cell->is_locally_owned())
-        {
-          dof_indices.resize(cell->get_fe().n_dofs_per_cell());
-          cell->get_dof_indices(dof_indices);
+    for (const auto &cell : dof_handler.active_cell_iterators() |
+                              IteratorFilters::LocallyOwnedCell())
+      {
+        dof_indices.resize(cell->get_fe().n_dofs_per_cell());
+        cell->get_dof_indices(dof_indices);
 
-          for (const types::global_dof_index dof_index : dof_indices)
-            if (!dof_set.is_element(dof_index))
-              global_dof_indices.insert(dof_index);
-        }
+        for (const types::global_dof_index dof_index : dof_indices)
+          if (!dof_set.is_element(dof_index))
+            global_dof_indices.insert(dof_index);
+      }
 
     dof_set.add_indices(global_dof_indices.begin(), global_dof_indices.end());
 

@@ -65,15 +65,15 @@ test()
 
   Vector<float> indicator(tria.n_active_cells());
   // assign each cell a globally unique cellid
-  for (const auto &cell : tria.active_cell_iterators())
-    if (cell->is_locally_owned())
-      {
-        const std::string  cellid = cell->id().to_string();
-        const unsigned int fine_cellid =
-          std::stoul(cellid.substr(cellid.find(':') + 1, std::string::npos));
+  for (const auto &cell :
+       tria.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
+    {
+      const std::string  cellid = cell->id().to_string();
+      const unsigned int fine_cellid =
+        std::stoul(cellid.substr(cellid.find(':') + 1, std::string::npos));
 
-        indicator[cell->active_cell_index()] = fine_cellid + 1;
-      }
+      indicator[cell->active_cell_index()] = fine_cellid + 1;
+    }
 
   deallog << "l1-norm: ";
   parallel::distributed::GridRefinement::refine_and_coarsen_fixed_fraction(

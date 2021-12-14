@@ -55,10 +55,10 @@ test()
   parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
   GridGenerator::hyper_cube(tria);
   tria.refine_global(1);
-  for (const auto &cell : tria.active_cell_iterators())
-    if (cell->is_locally_owned())
-      if (cell->center().norm() < 0.2)
-        cell->set_refine_flag();
+  for (const auto &cell :
+       tria.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
+    if (cell->center().norm() < 0.2)
+      cell->set_refine_flag();
   tria.execute_coarsening_and_refinement();
   if (dim < 3 && fe_degree < 2)
     tria.refine_global(2);

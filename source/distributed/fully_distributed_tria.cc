@@ -173,7 +173,7 @@ namespace parallel
 
           // 4a) set all cells artificial (and set the actual
           //     (level_)subdomain_ids in the next step)
-          for (auto cell = this->begin(); cell != this->end(); ++cell)
+          for (const auto &cell : this->cell_iterators())
             {
               if (cell->is_active())
                 cell->set_subdomain_id(

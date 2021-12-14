@@ -206,10 +206,10 @@ namespace RepartitioningPolicyTools
 
     // step 1) check if all processes have enough cells
 
-    unsigned int n_locally_owned_active_cells = 0;
-    for (const auto &cell : tria_in.active_cell_iterators())
-      if (cell->is_locally_owned())
-        ++n_locally_owned_active_cells;
+    const auto locally_owned_cells =
+      tria_in.active_cell_iterators() | IteratorFilters::LocallyOwnedCell();
+    const unsigned int n_locally_owned_active_cells =
+      std::distance(locally_owned_cells.begin(), locally_owned_cells.end());
 
     const auto comm = tria_in.get_communicator();
 
@@ -293,12 +293,11 @@ namespace RepartitioningPolicyTools
     const auto n_subdomains = Utilities::MPI::n_mpi_processes(mpi_communicator);
 
     // determine weight of each cell
-    for (const auto &cell : tria->active_cell_iterators())
-      if (cell->is_locally_owned())
-        weights[partitioner->global_to_local(
-          cell->global_active_cell_index())] =
-          weighting_function(
-            cell, Triangulation<dim, spacedim>::CellStatus::CELL_PERSIST);
+    for (const auto &cell :
+         tria->active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
+      weights[partitioner->global_to_local(cell->global_active_cell_index())] =
+        weighting_function(
+          cell, Triangulation<dim, spacedim>::CellStatus::CELL_PERSIST);
 
     // determine weight of all the cells locally owned by this process
     uint64_t process_local_weight = 0;

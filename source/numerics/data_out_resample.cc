@@ -69,11 +69,9 @@ DataOutResample<dim, patch_dim, spacedim>::update_mapping(
   partitioner = std::make_shared<Utilities::MPI::Partitioner>(
     patch_dof_handler.locally_owned_dofs(), active_dofs, MPI_COMM_WORLD);
 
-  for (const auto &cell : patch_dof_handler.active_cell_iterators())
+  for (const auto &cell : patch_dof_handler.active_cell_iterators() |
+                            IteratorFilters::LocallyOwnedCell())
     {
-      if (cell->is_locally_owned() == false)
-        continue;
-
       fe_values.reinit(cell);
 
       cell->get_dof_indices(dof_indices);
