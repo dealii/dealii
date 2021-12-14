@@ -72,11 +72,9 @@ namespace internal
               const EvaluationFlags::EvaluationFlags integration_flag,
               Number *                               values_dofs,
               FEEvaluationData<dim, Number, true> &  eval);
-
-    static bool
-    fast_evaluation_supported(const unsigned int given_degree,
-                              const unsigned int n_q_points_1d);
   };
+
+
 
   template <int dim, typename Number, typename VectorizedArrayType>
   struct FEFaceEvaluationGatherFactory

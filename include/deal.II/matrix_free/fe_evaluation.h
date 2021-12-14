@@ -2802,13 +2802,16 @@ namespace internal
 
 namespace internal
 {
+  // Extract all internal data pointers and indices in a single function that
+  // get passed on to the constructor of FEEvaluationData, avoiding to look
+  // things up multiple times
   template <bool is_face,
             int  dim,
             typename Number,
             typename VectorizedArrayType>
   inline typename FEEvaluationData<dim, VectorizedArrayType, is_face>::
     InitializationData
-    get_shape_info_and_indices(
+    extract_initialization_data(
       const MatrixFree<dim, Number, VectorizedArrayType> &data,
       const unsigned int                                  dof_no,
       const unsigned int first_selected_component,
@@ -2862,6 +2865,7 @@ namespace internal
 } // namespace internal
 
 
+
 /*----------------------- FEEvaluationBase ----------------------------------*/
 
 template <int dim,
@@ -2885,15 +2889,15 @@ inline FEEvaluationBase<dim,
                    const unsigned int active_quad_index,
                    const unsigned int face_type)
   : FEEvaluationData<dim, VectorizedArrayType, is_face>(
-      internal::get_shape_info_and_indices<is_face>(data_in,
-                                                    dof_no,
-                                                    first_selected_component,
-                                                    quad_no,
-                                                    fe_degree,
-                                                    n_q_points,
-                                                    active_fe_index,
-                                                    active_quad_index,
-                                                    face_type),
+      internal::extract_initialization_data<is_face>(data_in,
+                                                     dof_no,
+                                                     first_selected_component,
+                                                     quad_no,
+                                                     fe_degree,
+                                                     n_q_points,
+                                                     active_fe_index,
+                                                     active_quad_index,
+                                                     face_type),
       is_interior_face,
       quad_no,
       first_selected_component)
@@ -7147,6 +7151,7 @@ namespace internal
    * Implementation for standard vectors (that have the begin() methods).
    */
   template <typename Number,
+            typename VectorizedArrayType,
             typename VectorType,
             typename EvaluatorType,
             typename std::enable_if<
@@ -7154,57 +7159,48 @@ namespace internal
                 std::is_same<decltype(std::declval<VectorType>().begin()),
                              Number *>::value,
               VectorType>::type * = nullptr>
-  bool
-  try_gather_evaluate_inplace(
-    EvaluatorType &                        phi,
-    const VectorType &                     input_vector,
-    const EvaluationFlags::EvaluationFlags evaluation_flag)
+  VectorizedArrayType *
+  check_vector_access_inplace(const EvaluatorType &phi, VectorType &vector)
   {
     const unsigned int cell     = phi.get_cell_or_face_batch_id();
     const auto &       dof_info = phi.get_dof_info();
-    using VectorizedArrayType =
-      typename std::remove_reference<decltype(*phi.begin_dof_values())>::type;
 
-    // If the index storage is interleaved and contiguous and the vector storage
-    // has the correct alignment, we can directly pass the pointer into the
-    // vector to the evaluate() call, without reading the vector entries into a
-    // separate data field. This saves some operations.
+    // If the index storage is interleaved and contiguous and the vector
+    // storage has the correct alignment, we can directly pass the pointer
+    // into the vector to the evaluate() and integrate() calls, without
+    // reading the vector entries into a separate data field. This saves some
+    // operations.
     if (std::is_same<typename VectorType::value_type, Number>::value &&
         dof_info.index_storage_variants
             [internal::MatrixFreeFunctions::DoFInfo::dof_access_cell][cell] ==
           internal::MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
             interleaved_contiguous &&
         reinterpret_cast<std::size_t>(
-          input_vector.begin() +
+          vector.begin() +
           dof_info.dof_indices_contiguous
             [internal::MatrixFreeFunctions::DoFInfo::dof_access_cell]
             [cell * VectorizedArrayType::size()]) %
             sizeof(VectorizedArrayType) ==
           0)
       {
-        const VectorizedArrayType *vec_values =
-          reinterpret_cast<const VectorizedArrayType *>(
-            input_vector.begin() +
-            dof_info.dof_indices_contiguous
-              [internal::MatrixFreeFunctions::DoFInfo::dof_access_cell]
-              [cell * VectorizedArrayType::size()] +
-            dof_info.component_dof_indices_offset
-                [phi.get_active_fe_index()]
-                [phi.get_first_selected_component()] *
-              VectorizedArrayType::size());
-
-        phi.evaluate(vec_values, evaluation_flag);
-
-        return true;
+        return reinterpret_cast<VectorizedArrayType *>(
+          vector.begin() +
+          dof_info.dof_indices_contiguous
+            [internal::MatrixFreeFunctions::DoFInfo::dof_access_cell]
+            [cell * VectorizedArrayType::size()] +
+          dof_info.component_dof_indices_offset
+              [phi.get_active_fe_index()][phi.get_first_selected_component()] *
+            VectorizedArrayType::size());
       }
-
-    return false;
+    else
+      return nullptr;
   }
 
   /**
    * Implementation for block vectors.
    */
   template <typename Number,
+            typename VectorizedArrayType,
             typename VectorType,
             typename EvaluatorType,
             typename std::enable_if<
@@ -7212,89 +7208,10 @@ namespace internal
                 !std::is_same<decltype(std::declval<VectorType>().begin()),
                               Number *>::value,
               VectorType>::type * = nullptr>
-  bool
-  try_gather_evaluate_inplace(EvaluatorType &,
-                              const VectorType &,
-                              const EvaluationFlags::EvaluationFlags)
+  VectorizedArrayType *
+  check_vector_access_inplace(const EvaluatorType &, VectorType &)
   {
-    return false;
-  }
-
-  /**
-   * Implementation for vectors that have the begin() methods.
-   */
-  template <typename Number,
-            typename VectorType,
-            typename EvaluatorType,
-            typename std::enable_if<
-              internal::has_begin<VectorType>::value &&
-                std::is_same<decltype(std::declval<VectorType>().begin()),
-                             Number *>::value,
-              VectorType>::type * = nullptr>
-  bool
-  try_integrate_scatter_inplace(
-    EvaluatorType &                        phi,
-    VectorType &                           destination,
-    const EvaluationFlags::EvaluationFlags evaluation_flag)
-  {
-    const unsigned int cell     = phi.get_cell_or_face_batch_id();
-    const auto &       dof_info = phi.get_dof_info();
-    using VectorizedArrayType =
-      typename std::remove_reference<decltype(*phi.begin_dof_values())>::type;
-
-    // If the index storage is interleaved and contiguous and the vector storage
-    // has the correct alignment, we can directly pass the pointer into the
-    // vector to the evaluate() call, without reading the vector entries into a
-    // separate data field. This saves some operations.
-    if (std::is_same<typename VectorType::value_type, Number>::value &&
-        dof_info.index_storage_variants
-            [internal::MatrixFreeFunctions::DoFInfo::dof_access_cell][cell] ==
-          internal::MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
-            interleaved_contiguous &&
-        reinterpret_cast<std::size_t>(
-          destination.begin() +
-          dof_info.dof_indices_contiguous
-            [internal::MatrixFreeFunctions::DoFInfo::dof_access_cell]
-            [cell * VectorizedArrayType::size()]) %
-            sizeof(VectorizedArrayType) ==
-          0)
-      {
-        VectorizedArrayType *vec_values =
-          reinterpret_cast<VectorizedArrayType *>(
-            destination.begin() +
-            dof_info.dof_indices_contiguous
-              [internal::MatrixFreeFunctions::DoFInfo::dof_access_cell]
-              [cell * VectorizedArrayType::size()] +
-            dof_info.component_dof_indices_offset
-                [phi.get_active_fe_index()]
-                [phi.get_first_selected_component()] *
-              VectorizedArrayType::size());
-
-        phi.integrate(evaluation_flag, vec_values, true);
-
-        return true;
-      }
-
-    return false;
-  }
-
-  /**
-   * Implementation for all other vectors like block vectors.
-   */
-  template <typename Number,
-            typename VectorType,
-            typename EvaluatorType,
-            typename std::enable_if<
-              !internal::has_begin<VectorType>::value ||
-                !std::is_same<decltype(std::declval<VectorType>().begin()),
-                              Number *>::value,
-              VectorType>::type * = nullptr>
-  bool
-  try_integrate_scatter_inplace(EvaluatorType &,
-                                VectorType &,
-                                const EvaluationFlags::EvaluationFlags)
-  {
-    return false;
+    return nullptr;
   }
 } // namespace internal
 
@@ -7317,9 +7234,12 @@ FEEvaluation<dim,
   gather_evaluate(const VectorType &                     input_vector,
                   const EvaluationFlags::EvaluationFlags evaluation_flag)
 {
-  if (internal::try_gather_evaluate_inplace<Number>(*this,
-                                                    input_vector,
-                                                    evaluation_flag) == false)
+  const VectorizedArrayType *src_ptr =
+    internal::check_vector_access_inplace<Number, const VectorizedArrayType>(
+      *this, input_vector);
+  if (src_ptr != nullptr)
+    evaluate(src_ptr, evaluation_flag);
+  else
     {
       this->read_dof_values(input_vector);
       evaluate(this->begin_dof_values(), evaluation_flag);
@@ -7524,8 +7444,12 @@ FEEvaluation<dim,
   integrate_scatter(const EvaluationFlags::EvaluationFlags integration_flag,
                     VectorType &                           destination)
 {
-  if (internal::try_integrate_scatter_inplace<Number>(
-        *this, destination, integration_flag) == false)
+  VectorizedArrayType *dst_ptr =
+    internal::check_vector_access_inplace<Number, VectorizedArrayType>(
+      *this, destination);
+  if (dst_ptr != nullptr)
+    integrate(integration_flag, dst_ptr, true);
+  else
     {
       integrate(integration_flag, this->begin_dof_values());
       this->distribute_local_to_global(destination);
@@ -8121,7 +8045,9 @@ FEFaceEvaluation<dim,
     this->active_fe_index,
     this->dof_info);
 
-  if (fe_degree > 0 &&
+  if (this->data->data.front().fe_degree > 0 &&
+      fast_evaluation_supported(this->data->data.front().fe_degree,
+                                this->data->data.front().n_q_points_1d) &&
       internal::FEFaceEvaluationImplGatherEvaluateSelector<
         dim,
         Number,
@@ -8229,7 +8155,9 @@ FEFaceEvaluation<dim,
     this->active_fe_index,
     this->dof_info);
 
-  if (fe_degree > 0 &&
+  if (this->data->data.front().fe_degree > 0 &&
+      fast_evaluation_supported(this->data->data.front().fe_degree,
+                                this->data->data.front().n_q_points_1d) &&
       internal::FEFaceEvaluationImplGatherEvaluateSelector<
         dim,
         Number,
@@ -8362,7 +8290,7 @@ FEFaceEvaluation<dim,
                             const unsigned int give_n_q_points_1d)
 {
   return fe_degree == -1 ?
-           internal::FEFaceEvaluationFactory<dim, VectorizedArrayType>::
+           internal::FEEvaluationFactory<dim, VectorizedArrayType>::
              fast_evaluation_supported(given_degree, give_n_q_points_1d) :
            true;
 }

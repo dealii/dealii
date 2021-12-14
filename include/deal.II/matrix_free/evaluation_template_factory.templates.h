@@ -185,18 +185,6 @@ namespace internal
 
 
   template <int dim, typename Number>
-  bool
-  FEFaceEvaluationFactory<dim, Number>::fast_evaluation_supported(
-    const unsigned int given_degree,
-    const unsigned int n_q_points_1d)
-  {
-    return instantiation_helper_run<1, FastEvaluationSupported>(given_degree,
-                                                                n_q_points_1d);
-  }
-
-
-
-  template <int dim, typename Number>
   void
   CellwiseInverseMassFactory<dim, Number>::apply(
     const unsigned int                          n_components,
