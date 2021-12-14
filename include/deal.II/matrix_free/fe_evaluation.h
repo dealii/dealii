@@ -8059,24 +8059,26 @@ FEFaceEvaluation<dim,
                                 this->data->data.front().n_q_points_1d) &&
       internal::FEFaceEvaluationImplGatherEvaluateSelector<
         dim,
-        Number,
-        VectorizedArrayType>::supports(evaluation_flag,
-                                       *this->data,
-                                       internal::get_beginning<Number>(
-                                         input_vector),
-                                       this->dof_info->index_storage_variants
-                                         [this->dof_access_index][this->cell]))
+        typename VectorType::value_type,
+        VectorizedArrayType>::
+        supports(evaluation_flag,
+                 *this->data,
+                 internal::get_beginning<typename VectorType::value_type>(
+                   input_vector),
+                 this->dof_info->index_storage_variants[this->dof_access_index]
+                                                       [this->cell]))
     {
       if (fe_degree > -1)
         {
           internal::FEFaceEvaluationImplGatherEvaluateSelector<
             dim,
-            Number,
+            typename VectorType::value_type,
             VectorizedArrayType>::template run<fe_degree,
                                                n_q_points_1d>(
             n_components,
             evaluation_flag,
-            internal::get_beginning<Number>(input_vector),
+            internal::get_beginning<typename VectorType::value_type>(
+              input_vector),
             shared_vector_data,
             *this);
         }
@@ -8084,10 +8086,11 @@ FEFaceEvaluation<dim,
         {
           internal::FEFaceEvaluationGatherFactory<
             dim,
-            Number,
+            typename VectorType::value_type,
             VectorizedArrayType>::evaluate(n_components,
                                            evaluation_flag,
-                                           internal::get_beginning<Number>(
+                                           internal::get_beginning<
+                                             typename VectorType::value_type>(
                                              input_vector),
                                            shared_vector_data,
                                            *this);
@@ -8173,24 +8176,26 @@ FEFaceEvaluation<dim,
                                 this->data->data.front().n_q_points_1d) &&
       internal::FEFaceEvaluationImplGatherEvaluateSelector<
         dim,
-        Number,
-        VectorizedArrayType>::supports(integration_flag,
-                                       *this->data,
-                                       internal::get_beginning<Number>(
-                                         destination),
-                                       this->dof_info->index_storage_variants
-                                         [this->dof_access_index][this->cell]))
+        typename VectorType::value_type,
+        VectorizedArrayType>::
+        supports(integration_flag,
+                 *this->data,
+                 internal::get_beginning<typename VectorType::value_type>(
+                   destination),
+                 this->dof_info->index_storage_variants[this->dof_access_index]
+                                                       [this->cell]))
     {
       if (fe_degree > -1)
         {
           internal::FEFaceEvaluationImplIntegrateScatterSelector<
             dim,
-            Number,
+            typename VectorType::value_type,
             VectorizedArrayType>::template run<fe_degree,
                                                n_q_points_1d>(
             n_components,
             integration_flag,
-            internal::get_beginning<Number>(destination),
+            internal::get_beginning<typename VectorType::value_type>(
+              destination),
             shared_vector_data,
             *this);
         }
@@ -8198,10 +8203,11 @@ FEFaceEvaluation<dim,
         {
           internal::FEFaceEvaluationGatherFactory<
             dim,
-            Number,
+            typename VectorType::value_type,
             VectorizedArrayType>::integrate(n_components,
                                             integration_flag,
-                                            internal::get_beginning<Number>(
+                                            internal::get_beginning<
+                                              typename VectorType::value_type>(
                                               destination),
                                             shared_vector_data,
                                             *this);
