@@ -47,15 +47,15 @@ namespace internal
     const unsigned int                     n_components,
     const EvaluationFlags::EvaluationFlags evaluation_flag,
     const Number *                         values_dofs,
-    FEEvaluationData<dim, Number, false> & eval)
+    FEEvaluationData<dim, Number, false> & fe_eval)
   {
     instantiation_helper_run<1, FEEvaluationImplEvaluateSelector<dim, Number>>(
-      eval.get_shape_info().data[0].fe_degree,
-      eval.get_shape_info().data[0].n_q_points_1d,
+      fe_eval.get_shape_info().data[0].fe_degree,
+      fe_eval.get_shape_info().data[0].n_q_points_1d,
       n_components,
       evaluation_flag,
       values_dofs,
-      eval);
+      fe_eval);
   }
 
 
@@ -66,16 +66,16 @@ namespace internal
     const unsigned int                     n_components,
     const EvaluationFlags::EvaluationFlags integration_flag,
     Number *                               values_dofs,
-    FEEvaluationData<dim, Number, false> & eval,
+    FEEvaluationData<dim, Number, false> & fe_eval,
     const bool                             sum_into_values_array)
   {
     instantiation_helper_run<1, FEEvaluationImplIntegrateSelector<dim, Number>>(
-      eval.get_shape_info().data[0].fe_degree,
-      eval.get_shape_info().data[0].n_q_points_1d,
+      fe_eval.get_shape_info().data[0].fe_degree,
+      fe_eval.get_shape_info().data[0].n_q_points_1d,
       n_components,
       integration_flag,
       values_dofs,
-      eval,
+      fe_eval,
       sum_into_values_array);
   }
 
@@ -99,16 +99,16 @@ namespace internal
     const unsigned int                     n_components,
     const EvaluationFlags::EvaluationFlags evaluation_flag,
     const Number *                         values_dofs,
-    FEEvaluationData<dim, Number, true> &  eval)
+    FEEvaluationData<dim, Number, true> &  fe_eval)
   {
     instantiation_helper_run<1,
                              FEFaceEvaluationImplEvaluateSelector<dim, Number>>(
-      eval.get_shape_info().data[0].fe_degree,
-      eval.get_shape_info().data[0].n_q_points_1d,
+      fe_eval.get_shape_info().data[0].fe_degree,
+      fe_eval.get_shape_info().data[0].n_q_points_1d,
       n_components,
       evaluation_flag,
       values_dofs,
-      eval);
+      fe_eval);
   }
 
 
@@ -119,17 +119,17 @@ namespace internal
     const unsigned int                     n_components,
     const EvaluationFlags::EvaluationFlags integration_flag,
     Number *                               values_dofs,
-    FEEvaluationData<dim, Number, true> &  eval)
+    FEEvaluationData<dim, Number, true> &  fe_eval)
   {
     instantiation_helper_run<
       1,
       FEFaceEvaluationImplIntegrateSelector<dim, Number>>(
-      eval.get_shape_info().data[0].fe_degree,
-      eval.get_shape_info().data[0].n_q_points_1d,
+      fe_eval.get_shape_info().data[0].fe_degree,
+      fe_eval.get_shape_info().data[0].n_q_points_1d,
       n_components,
       integration_flag,
       values_dofs,
-      eval);
+      fe_eval);
   }
 
 
@@ -141,20 +141,20 @@ namespace internal
     const EvaluationFlags::EvaluationFlags            evaluation_flag,
     const Number *                                    src_ptr,
     const std::vector<ArrayView<const Number>> *      sm_ptr,
-    FEEvaluationData<dim, VectorizedArrayType, true> &eval)
+    FEEvaluationData<dim, VectorizedArrayType, true> &fe_eval)
   {
     instantiation_helper_run<
       1,
       FEFaceEvaluationImplGatherEvaluateSelector<dim,
                                                  Number,
                                                  VectorizedArrayType>>(
-      eval.get_shape_info().data[0].fe_degree,
-      eval.get_shape_info().data[0].n_q_points_1d,
+      fe_eval.get_shape_info().data[0].fe_degree,
+      fe_eval.get_shape_info().data[0].n_q_points_1d,
       n_components,
       evaluation_flag,
       src_ptr,
       sm_ptr,
-      eval);
+      fe_eval);
   }
 
 
@@ -166,20 +166,20 @@ namespace internal
     const EvaluationFlags::EvaluationFlags            integration_flag,
     Number *                                          dst_ptr,
     const std::vector<ArrayView<const Number>> *      sm_ptr,
-    FEEvaluationData<dim, VectorizedArrayType, true> &eval)
+    FEEvaluationData<dim, VectorizedArrayType, true> &fe_eval)
   {
     instantiation_helper_run<
       1,
       FEFaceEvaluationImplIntegrateScatterSelector<dim,
                                                    Number,
                                                    VectorizedArrayType>>(
-      eval.get_shape_info().data[0].fe_degree,
-      eval.get_shape_info().data[0].n_q_points_1d,
+      fe_eval.get_shape_info().data[0].fe_degree,
+      fe_eval.get_shape_info().data[0].n_q_points_1d,
       n_components,
       integration_flag,
       dst_ptr,
       sm_ptr,
-      eval);
+      fe_eval);
   }
 
 

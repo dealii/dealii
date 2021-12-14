@@ -42,13 +42,13 @@ namespace internal
     evaluate(const unsigned int                     n_components,
              const EvaluationFlags::EvaluationFlags evaluation_flag,
              const Number *                         values_dofs,
-             FEEvaluationData<dim, Number, false> & eval);
+             FEEvaluationData<dim, Number, false> & fe_eval);
 
     static void
     integrate(const unsigned int                     n_components,
               const EvaluationFlags::EvaluationFlags integration_flag,
               Number *                               values_dofs,
-              FEEvaluationData<dim, Number, false> & eval,
+              FEEvaluationData<dim, Number, false> & fe_eval,
               const bool                             sum_into_values_array);
 
     static bool
@@ -65,13 +65,13 @@ namespace internal
     evaluate(const unsigned int                     n_components,
              const EvaluationFlags::EvaluationFlags evaluation_flag,
              const Number *                         values_dofs,
-             FEEvaluationData<dim, Number, true> &  eval);
+             FEEvaluationData<dim, Number, true> &  fe_eval);
 
     static void
     integrate(const unsigned int                     n_components,
               const EvaluationFlags::EvaluationFlags integration_flag,
               Number *                               values_dofs,
-              FEEvaluationData<dim, Number, true> &  eval);
+              FEEvaluationData<dim, Number, true> &  fe_eval);
   };
 
 
@@ -84,14 +84,14 @@ namespace internal
              const EvaluationFlags::EvaluationFlags            evaluation_flag,
              const Number *                                    src_ptr,
              const std::vector<ArrayView<const Number>> *      sm_ptr,
-             FEEvaluationData<dim, VectorizedArrayType, true> &eval);
+             FEEvaluationData<dim, VectorizedArrayType, true> &fe_eval);
 
     static void
     integrate(const unsigned int                          n_components,
               const EvaluationFlags::EvaluationFlags      integration_flag,
               Number *                                    dst_ptr,
               const std::vector<ArrayView<const Number>> *sm_ptr,
-              FEEvaluationData<dim, VectorizedArrayType, true> &eval);
+              FEEvaluationData<dim, VectorizedArrayType, true> &fe_eval);
   };
 
 
@@ -101,7 +101,7 @@ namespace internal
   {
     static void
     apply(const unsigned int                          n_components,
-          const FEEvaluationData<dim, Number, false> &fe_eval,
+          const FEEvaluationData<dim, Number, false> &fe_fe_eval,
           const Number *                              in_array,
           Number *                                    out_array);
 
@@ -116,7 +116,7 @@ namespace internal
     static void
     transform_from_q_points_to_basis(
       const unsigned int                          n_components,
-      const FEEvaluationData<dim, Number, false> &fe_eval,
+      const FEEvaluationData<dim, Number, false> &fe_fe_eval,
       const Number *                              in_array,
       Number *                                    out_array);
   };

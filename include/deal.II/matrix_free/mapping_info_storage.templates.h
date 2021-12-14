@@ -124,7 +124,7 @@ namespace internal
     UpdateFlags
     MappingInfoStorage<structdim, spacedim, Number>::compute_update_flags(
       const UpdateFlags                                     update_flags,
-      const std::vector<dealii::hp::QCollection<spacedim>> &quad)
+      const std::vector<dealii::hp::QCollection<spacedim>> &quads)
     {
       // this class is build around the evaluation of jacobians, so compute
       // them in any case. The Jacobians will be inverted manually. Since we
@@ -145,19 +145,19 @@ namespace internal
       // one quadrature point on the first component, but more points on later
       // components, we need to have Jacobian gradients anyway in order to
       // determine whether the Jacobian is constant throughout a cell
-      if (quad.empty() == false)
+      if (quads.empty() == false)
         {
           bool formula_with_one_point = false;
-          for (unsigned int i = 0; i < quad[0].size(); ++i)
-            if (quad[0][i].size() == 1)
+          for (unsigned int i = 0; i < quads[0].size(); ++i)
+            if (quads[0][i].size() == 1)
               {
                 formula_with_one_point = true;
                 break;
               }
           if (formula_with_one_point == true)
-            for (unsigned int comp = 1; comp < quad.size(); ++comp)
-              for (unsigned int i = 0; i < quad[comp].size(); ++i)
-                if (quad[comp][i].size() > 1)
+            for (unsigned int comp = 1; comp < quads.size(); ++comp)
+              for (unsigned int i = 0; i < quads[comp].size(); ++i)
+                if (quads[comp][i].size() > 1)
                   {
                     new_flags |= update_jacobian_grads;
                   }

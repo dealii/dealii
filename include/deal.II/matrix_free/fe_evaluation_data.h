@@ -133,7 +133,7 @@ public:
    * use, select one of the derived classes FEEvaluation or FEFaceEvaluation
    * with their respective arguments.
    */
-  FEEvaluationData(const ShapeInfoType &info,
+  FEEvaluationData(const ShapeInfoType &shape_info,
                    const bool           is_interior_face = true);
 
   /**
@@ -577,7 +577,7 @@ protected:
    * initialization. Used in derived classes when this class is initialized
    * from a MatrixFree object.
    */
-  FEEvaluationData(const InitializationData &info,
+  FEEvaluationData(const InitializationData &initialization_data,
                    const bool                is_interior_face,
                    const unsigned int        quad_no,
                    const unsigned int        first_selected_component);
