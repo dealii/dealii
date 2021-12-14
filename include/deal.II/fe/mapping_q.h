@@ -507,30 +507,6 @@ public:
     mutable AlignedVector<VectorizedArrayType> scratch;
 
     /**
-     * In case the quadrature rule given represents a tensor product
-     * the values at the mapped support points are stored in this object.
-     */
-    mutable AlignedVector<VectorizedArrayType> values_dofs;
-
-    /**
-     * In case the quadrature rule given represents a tensor product
-     * the values at the quadrature points are stored in this object.
-     */
-    mutable AlignedVector<VectorizedArrayType> values_quad;
-
-    /**
-     * In case the quadrature rule given represents a tensor product
-     * the gradients at the quadrature points are stored in this object.
-     */
-    mutable AlignedVector<VectorizedArrayType> gradients_quad;
-
-    /**
-     * In case the quadrature rule given represents a tensor product
-     * the hessians at the quadrature points are stored in this object.
-     */
-    mutable AlignedVector<VectorizedArrayType> hessians_quad;
-
-    /**
      * Indicates whether the given Quadrature object is a tensor product.
      */
     bool tensor_product_quadrature;

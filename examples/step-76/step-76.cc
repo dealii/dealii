@@ -790,11 +790,10 @@ namespace Euler_DG
                                                      VectorizedArrayType>::
                   template interpolate_quadrature<true, false>(
                     dim + 2,
+                    EvaluationFlags::values,
                     data.get_shape_info(),
                     buffer.data(),
                     phi_m.begin_values(),
-                    false,
-                    false,
                     face);
 
                 // Check if the face is an internal or a boundary face and
@@ -893,11 +892,10 @@ namespace Euler_DG
                                                      VectorizedArrayType>::
                   template interpolate_quadrature<false, true>(
                     dim + 2,
+                    EvaluationFlags::values,
                     data.get_shape_info(),
                     phi_m.begin_values(),
                     phi.begin_values(),
-                    false,
-                    false,
                     face);
               }
 

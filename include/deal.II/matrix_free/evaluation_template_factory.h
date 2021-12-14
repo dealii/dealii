@@ -29,39 +29,27 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-template <int, typename, bool, typename>
-class FEEvaluationBaseData;
+template <int, typename, bool>
+class FEEvaluationData;
 
 
 namespace internal
 {
-  template <int dim,
-            typename Number,
-            typename VectorizedArrayType = VectorizedArray<Number>>
+  template <int dim, typename Number>
   struct FEEvaluationFactory
   {
     static void
-    evaluate(
-      const unsigned int                     n_components,
-      const EvaluationFlags::EvaluationFlags evaluation_flag,
-      const MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> &shape_info,
-      VectorizedArrayType *values_dofs_actual,
-      VectorizedArrayType *values_quad,
-      VectorizedArrayType *gradients_quad,
-      VectorizedArrayType *hessians_quad,
-      VectorizedArrayType *scratch_data);
+    evaluate(const unsigned int                     n_components,
+             const EvaluationFlags::EvaluationFlags evaluation_flag,
+             const Number *                         values_dofs,
+             FEEvaluationData<dim, Number, false> & fe_eval);
 
     static void
-    integrate(
-      const unsigned int                     n_components,
-      const EvaluationFlags::EvaluationFlags integration_flag,
-      const MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> &shape_info,
-      VectorizedArrayType *values_dofs_actual,
-      VectorizedArrayType *values_quad,
-      VectorizedArrayType *gradients_quad,
-      VectorizedArrayType *hessians_quad,
-      VectorizedArrayType *scratch_data,
-      const bool           sum_into_values_array);
+    integrate(const unsigned int                     n_components,
+              const EvaluationFlags::EvaluationFlags integration_flag,
+              Number *                               values_dofs,
+              FEEvaluationData<dim, Number, false> & fe_eval,
+              const bool                             sum_into_values_array);
 
     static bool
     fast_evaluation_supported(const unsigned int given_degree,
@@ -70,128 +58,67 @@ namespace internal
 
 
 
-  template <int dim,
-            typename Number,
-            typename VectorizedArrayType = VectorizedArray<Number>>
+  template <int dim, typename Number>
   struct FEFaceEvaluationFactory
   {
     static void
-    evaluate(const unsigned int n_components,
-             const MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> &data,
-             const VectorizedArrayType *   values_array,
-             VectorizedArrayType *         values_quad,
-             VectorizedArrayType *         gradients_quad,
-             VectorizedArrayType *         hessians_quad,
-             VectorizedArrayType *         scratch_data,
-             const bool                    evaluate_values,
-             const bool                    evaluate_gradients,
-             const bool                    evaluate_hessians,
-             const unsigned int            face_no,
-             const unsigned int            subface_index,
-             const unsigned int            face_orientation,
-             const Table<2, unsigned int> &orientation_map);
+    evaluate(const unsigned int                     n_components,
+             const EvaluationFlags::EvaluationFlags evaluation_flag,
+             const Number *                         values_dofs,
+             FEEvaluationData<dim, Number, true> &  fe_eval);
 
     static void
-    integrate(const unsigned int n_components,
-              const MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> &data,
-              VectorizedArrayType *         values_array,
-              VectorizedArrayType *         values_quad,
-              VectorizedArrayType *         gradients_quad,
-              VectorizedArrayType *         hessians_quad,
-              VectorizedArrayType *         scratch_data,
-              const bool                    integrate_values,
-              const bool                    integrate_gradients,
-              const bool                    integrate_hessians,
-              const unsigned int            face_no,
-              const unsigned int            subface_index,
-              const unsigned int            face_orientation,
-              const Table<2, unsigned int> &orientation_map);
-
-    static bool
-    gather_evaluate(
-      const unsigned int                          n_components,
-      const std::size_t                           n_face_orientations,
-      const Number *                              src_ptr,
-      const std::vector<ArrayView<const Number>> *sm_ptr,
-      const MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> &data,
-      const MatrixFreeFunctions::DoFInfo &                       dof_info,
-      VectorizedArrayType *                                      values_quad,
-      VectorizedArrayType *                                      gradients_quad,
-      VectorizedArrayType *                                      hessians_quad,
-      VectorizedArrayType *                                      scratch_data,
-      const bool         evaluate_values,
-      const bool         evaluate_gradients,
-      const bool         evaluate_hessians,
-      const unsigned int active_fe_index,
-      const unsigned int first_selected_component,
-      const std::array<unsigned int, VectorizedArrayType::size()> cells,
-      const std::array<unsigned int, VectorizedArrayType::size()> face_nos,
-      const unsigned int                                          subface_index,
-      const MatrixFreeFunctions::DoFInfo::DoFAccessIndex dof_access_index,
-      const std::array<unsigned int, VectorizedArrayType::size()>
-                                    face_orientations,
-      const Table<2, unsigned int> &orientation_map);
-
-    static bool
-    integrate_scatter(
-      const unsigned int                          n_components,
-      const std::size_t                           n_face_orientations,
-      Number *                                    dst_ptr,
-      const std::vector<ArrayView<const Number>> *sm_ptr,
-      const MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> &data,
-      const MatrixFreeFunctions::DoFInfo &                       dof_info,
-      VectorizedArrayType *                                      values_array,
-      VectorizedArrayType *                                      values_quad,
-      VectorizedArrayType *                                      gradients_quad,
-      VectorizedArrayType *                                      hessians_quad,
-      VectorizedArrayType *                                      scratch_data,
-      const bool         integrate_values,
-      const bool         integrate_gradients,
-      const bool         integrate_hessians,
-      const unsigned int active_fe_index,
-      const unsigned int first_selected_component,
-      const std::array<unsigned int, VectorizedArrayType::size()> cells,
-      const std::array<unsigned int, VectorizedArrayType::size()> face_nos,
-      const unsigned int                                          subface_index,
-      const MatrixFreeFunctions::DoFInfo::DoFAccessIndex dof_access_index,
-      const std::array<unsigned int, VectorizedArrayType::size()>
-                                    face_orientations,
-      const Table<2, unsigned int> &orientation_map);
-
-    static bool
-    fast_evaluation_supported(const unsigned int given_degree,
-                              const unsigned int n_q_points_1d);
+    integrate(const unsigned int                     n_components,
+              const EvaluationFlags::EvaluationFlags integration_flag,
+              Number *                               values_dofs,
+              FEEvaluationData<dim, Number, true> &  fe_eval);
   };
 
 
 
-  template <int dim,
-            typename Number,
-            typename VectorizedArrayType = VectorizedArray<Number>>
+  template <int dim, typename Number, typename VectorizedArrayType>
+  struct FEFaceEvaluationGatherFactory
+  {
+    static void
+    evaluate(const unsigned int                                n_components,
+             const EvaluationFlags::EvaluationFlags            evaluation_flag,
+             const Number *                                    src_ptr,
+             const std::vector<ArrayView<const Number>> *      sm_ptr,
+             FEEvaluationData<dim, VectorizedArrayType, true> &fe_eval);
+
+    static void
+    integrate(const unsigned int                          n_components,
+              const EvaluationFlags::EvaluationFlags      integration_flag,
+              Number *                                    dst_ptr,
+              const std::vector<ArrayView<const Number>> *sm_ptr,
+              FEEvaluationData<dim, VectorizedArrayType, true> &fe_eval);
+  };
+
+
+
+  template <int dim, typename Number>
   struct CellwiseInverseMassFactory
   {
     static void
-    apply(const unsigned int n_components,
-          const FEEvaluationBaseData<dim, Number, false, VectorizedArrayType>
-            &                        fe_eval,
-          const VectorizedArrayType *in_array,
-          VectorizedArrayType *      out_array);
+    apply(const unsigned int                          n_components,
+          const FEEvaluationData<dim, Number, false> &fe_fe_eval,
+          const Number *                              in_array,
+          Number *                                    out_array);
 
     static void
-    apply(const unsigned int                        n_components,
-          const unsigned int                        fe_degree,
-          const AlignedVector<VectorizedArrayType> &inverse_shape,
-          const AlignedVector<VectorizedArrayType> &inverse_coefficients,
-          const VectorizedArrayType *               in_array,
-          VectorizedArrayType *                     out_array);
+    apply(const unsigned int           n_components,
+          const unsigned int           fe_degree,
+          const AlignedVector<Number> &inverse_shape,
+          const AlignedVector<Number> &inverse_coefficients,
+          const Number *               in_array,
+          Number *                     out_array);
 
     static void
     transform_from_q_points_to_basis(
-      const unsigned int n_components,
-      const FEEvaluationBaseData<dim, Number, false, VectorizedArrayType>
-        &                        fe_eval,
-      const VectorizedArrayType *in_array,
-      VectorizedArrayType *      out_array);
+      const unsigned int                          n_components,
+      const FEEvaluationData<dim, Number, false> &fe_fe_eval,
+      const Number *                              in_array,
+      Number *                                    out_array);
   };
 
   template <int dim,

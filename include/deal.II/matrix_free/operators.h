@@ -1067,8 +1067,8 @@ namespace MatrixFreeOperators
       internal::CellwiseInverseMassMatrixImplBasic<dim, VectorizedArrayType>::
         template run<fe_degree>(n_components, fe_eval, in_array, out_array);
     else
-      internal::CellwiseInverseMassFactory<dim, Number, VectorizedArrayType>::
-        apply(n_components, fe_eval, in_array, out_array);
+      internal::CellwiseInverseMassFactory<dim, VectorizedArrayType>::apply(
+        n_components, fe_eval, in_array, out_array);
   }
 
 
@@ -1101,13 +1101,13 @@ namespace MatrixFreeOperators
           in_array,
           out_array);
     else
-      internal::CellwiseInverseMassFactory<dim, Number, VectorizedArrayType>::
-        apply(n_actual_components,
-              given_degree,
-              fe_eval.get_shape_info().data.front().inverse_shape_values_eo,
-              inverse_coefficients,
-              in_array,
-              out_array);
+      internal::CellwiseInverseMassFactory<dim, VectorizedArrayType>::apply(
+        n_actual_components,
+        given_degree,
+        fe_eval.get_shape_info().data.front().inverse_shape_values_eo,
+        inverse_coefficients,
+        in_array,
+        out_array);
   }
 
 
@@ -1138,7 +1138,7 @@ namespace MatrixFreeOperators
                                                           in_array,
                                                           out_array);
     else
-      internal::CellwiseInverseMassFactory<dim, Number, VectorizedArrayType>::
+      internal::CellwiseInverseMassFactory<dim, VectorizedArrayType>::
         transform_from_q_points_to_basis(n_actual_components,
                                          fe_eval,
                                          in_array,
