@@ -29,6 +29,7 @@
 #include <deal.II/lac/la_parallel_vector.h>
 
 #include <deal.II/matrix_free/evaluation_kernels.h>
+#include <deal.II/matrix_free/tensor_product_kernels.h>
 
 #include <deal.II/multigrid/mg_tools.h>
 #include <deal.II/multigrid/mg_transfer_internal.h>
@@ -355,41 +356,6 @@ MGTransferMatrixFree<dim, Number>::restrict_and_add(
 
 
 
-namespace
-{
-  template <int dim, int degree, typename Number>
-  void
-  weight_dofs_on_child(const VectorizedArray<Number> *weights,
-                       const unsigned int             n_components,
-                       const unsigned int             fe_degree,
-                       VectorizedArray<Number> *      data)
-  {
-    Assert(fe_degree > 0, ExcNotImplemented());
-    Assert(fe_degree < 100, ExcNotImplemented());
-    const int loop_length = degree != -1 ? 2 * degree + 1 : 2 * fe_degree + 1;
-    unsigned int degree_to_3[100];
-    degree_to_3[0] = 0;
-    for (int i = 1; i < loop_length - 1; ++i)
-      degree_to_3[i] = 1;
-    degree_to_3[loop_length - 1] = 2;
-    for (unsigned int c = 0; c < n_components; ++c)
-      for (int k = 0; k < (dim > 2 ? loop_length : 1); ++k)
-        for (int j = 0; j < (dim > 1 ? loop_length : 1); ++j)
-          {
-            const unsigned int shift = 9 * degree_to_3[k] + 3 * degree_to_3[j];
-            data[0] *= weights[shift];
-            // loop bound as int avoids compiler warnings in case loop_length
-            // == 1 (polynomial degree 0)
-            for (int i = 1; i < loop_length - 1; ++i)
-              data[i] *= weights[shift + 1];
-            data[loop_length - 1] *= weights[shift + 2];
-            data += loop_length;
-          }
-  }
-} // namespace
-
-
-
 template <int dim, typename Number>
 template <int degree>
 void
@@ -494,10 +460,13 @@ MGTransferMatrixFree<dim, Number>::do_prolongate_add(
                                                      c * n_scalar_cell_dofs,
                                                    fe_degree + 1,
                                                    2 * fe_degree + 1);
-          weight_dofs_on_child<dim, degree, Number>(
+          internal::weight_fe_q_dofs_by_entity<dim,
+                                               degree != -1 ? 2 * degree + 1 :
+                                                              -1,
+                                               Number>(
             &weights_on_refined[to_level - 1][(cell / vec_size) * three_to_dim],
             n_components,
-            fe_degree,
+            2 * fe_degree + 1,
             evaluation_data.begin());
         }
       else
@@ -575,12 +544,14 @@ MGTransferMatrixFree<dim, Number>::do_restrict_add(
       // perform tensorized operation
       if (element_is_continuous)
         {
-          weight_dofs_on_child<dim, degree, Number>(
-            &weights_on_refined[from_level - 1]
-                               [(cell / vec_size) * three_to_dim],
-            n_components,
-            fe_degree,
-            evaluation_data.data());
+          internal::weight_fe_q_dofs_by_entity<
+            dim,
+            degree != -1 ? 2 * degree + 1 : -1,
+            Number>(&weights_on_refined[from_level - 1]
+                                       [(cell / vec_size) * three_to_dim],
+                    n_components,
+                    2 * fe_degree + 1,
+                    evaluation_data.data());
           for (unsigned int c = 0; c < n_components; ++c)
             internal::FEEvaluationImplBasisChange<
               internal::evaluate_general,
