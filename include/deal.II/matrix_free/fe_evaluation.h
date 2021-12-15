@@ -7658,9 +7658,9 @@ FEFaceEvaluation<dim,
 
           if (face_index == numbers::invalid_unsigned_int)
             {
-              this->cell_ids[i]              = numbers::invalid_unsigned_int;
-              this->all_face_numbers[i]      = static_cast<std::uint8_t>(-1);
-              this->all_face_orientations[i] = static_cast<std::uint8_t>(-1);
+              this->cell_ids[i]          = numbers::invalid_unsigned_int;
+              this->face_numbers[i]      = static_cast<std::uint8_t>(-1);
+              this->face_orientations[i] = static_cast<std::uint8_t>(-1);
               continue; // invalid face ID: no neighbor on boundary
             }
 
@@ -7678,13 +7678,13 @@ FEFaceEvaluation<dim,
           // compare the IDs with the given cell ID
           if (face_identifies_as_interior)
             {
-              this->cell_ids[i]         = cell_m; // neighbor has the other ID
-              this->all_face_numbers[i] = faces.interior_face_no;
+              this->cell_ids[i]     = cell_m; // neighbor has the other ID
+              this->face_numbers[i] = faces.interior_face_no;
             }
           else
             {
-              this->cell_ids[i]         = cell_p;
-              this->all_face_numbers[i] = faces.exterior_face_no;
+              this->cell_ids[i]     = cell_p;
+              this->face_numbers[i] = faces.exterior_face_no;
             }
 
           const bool   orientation_interior_face = faces.face_orientation >= 8;
@@ -7695,16 +7695,13 @@ FEFaceEvaluation<dim,
                 {0, 1, 2, 3, 6, 5, 4, 7}};
               face_orientation = table[face_orientation];
             }
-          this->all_face_orientations[i] = face_orientation;
+          this->face_orientations[i] = face_orientation;
         }
-
-      this->face_no          = this->all_face_numbers[0];
-      this->face_orientation = this->all_face_orientations[0];
     }
   else
     {
-      this->face_orientation = 0;
-      this->face_no          = face_number;
+      this->face_orientations[0] = 0;
+      this->face_numbers[0]      = face_number;
       for (unsigned int i = 0; i < n_lanes; ++i)
         this->cell_ids[i] = cell_index * n_lanes + i;
     }
@@ -8250,7 +8247,7 @@ FEFaceEvaluation<dim,
              internal::ExcMatrixFreeAccessToUninitializedMappingField(
                "update_quadrature_points"));
       const unsigned int index =
-        this->cell * GeometryInfo<dim>::faces_per_cell + this->face_no;
+        this->cell * GeometryInfo<dim>::faces_per_cell + this->face_numbers[0];
       AssertIndexRange(index,
                        this->matrix_free->get_mapping_info()
                          .face_data_by_cells[this->quad_no]
