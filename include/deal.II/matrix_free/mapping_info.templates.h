@@ -2049,9 +2049,7 @@ namespace internal
         for (unsigned int face = begin_face; face < end_face; ++face)
           for (unsigned vv = 0; vv < n_lanes; vv += n_lanes_d)
             {
-              internal::MatrixFreeFunctions::FaceToCellTopology<
-                VectorizedDouble::size()>
-                face_double                = {};
+              FaceToCellTopology<VectorizedDouble::size()> face_double = {};
               face_double.interior_face_no = faces[face].interior_face_no;
               face_double.exterior_face_no = faces[face].exterior_face_no;
               face_double.face_orientation = faces[face].face_orientation;
