@@ -406,16 +406,19 @@ public:
   get_first_selected_component() const;
 
   /**
-   * If is_face is true, this function returns the face number within a cell for
-   * the face this object was initialized to. On cells where the face makes no
-   * sense, an exception is thrown.
+   * If is_face is true, this function returns the face number of the given lane
+   * within a cell for the face this object was initialized to. On cells where
+   * the face makes no sense, an exception is thrown.
+   *
+   * @note Only available for `dof_access_index == dof_access_cell` and
+   * `is_interior_face == false`.
    *
    * @note This function depends on the internal representation of data, which
    * is not stable between releases of deal.II, and is hence mostly for
    * internal use.
    */
-  unsigned int
-  get_face_no() const;
+  std::uint8_t
+  get_face_no(const unsigned int v = 0) const;
 
   /**
    * If is_face is true, this function returns the index of a subface along a
@@ -430,16 +433,15 @@ public:
   get_subface_index() const;
 
   /**
-   * If is_face is true, this function returns the orientation index within an
-   * array of orientations as stored in ShapeInfo for unknowns and quadrature
-   * points.
+   * If is_face is true, this function returns for a given lane the
+   * orientation index within an array of orientations as stored in
+   * ShapeInfo for unknowns and quadrature points.
    *
-   * @note This function depends on the internal representation of data, which
-   * is not stable between releases of deal.II, and is hence mostly for
-   * internal use.
+   * @note Only available for `dof_access_index == dof_access_cell` and
+   * `is_interior_face == false`.
    */
-  unsigned int
-  get_face_orientation() const;
+  std::uint8_t
+  get_face_orientation(const unsigned int v = 0) const;
 
   /**
    * Return the current index in the access to compressed indices.
@@ -500,58 +502,6 @@ public:
       return cell_ids;
     else
       return cell_or_face_ids;
-  }
-
-  /**
-   * Return the (non-vectorized) number of faces within cells in case of ECL
-   * for the exterior cells where the single number accessible via
-   * get_face_no() is not enough to cover all cases.
-   *
-   * @note Only available for `dof_access_index == dof_access_cell` and
-   * `is_interior_face == false`.
-   *
-   * @note This function depends on the internal representation of data, which
-   * is not stable between releases of deal.II, and is hence mostly for
-   * internal use.
-   */
-  const std::array<std::uint8_t, n_lanes> &
-  get_all_face_numbers() const
-  {
-    // implemented inline to avoid compilation problems on Windows
-    Assert(cell != numbers::invalid_unsigned_int, ExcNotInitialized());
-    Assert(is_face &&
-             dof_access_index ==
-               internal::MatrixFreeFunctions::DoFInfo::dof_access_cell &&
-             is_interior_face == false,
-           ExcMessage(
-             "All face numbers can only be queried for ECL at exterior "
-             "faces. Use get_face_no() in other cases."));
-
-    return all_face_numbers;
-  }
-
-  /**
-   * Store the orientation of the neighbor's faces with respect to the current
-   * cell for the case of exterior faces on ECL with possibly different
-   * orientations behind different cells.
-   *
-   * @note Only available for `dof_access_index == dof_access_cell` and
-   * `is_interior_face == false`.
-   */
-  const std::array<std::uint8_t, n_lanes> &
-  get_all_face_orientations() const
-  {
-    // implemented inline to avoid compilation problems on Windows
-    Assert(cell != numbers::invalid_unsigned_int, ExcNotInitialized());
-    Assert(is_face &&
-             dof_access_index ==
-               internal::MatrixFreeFunctions::DoFInfo::dof_access_cell &&
-             is_interior_face == false,
-           ExcMessage(
-             "All face numbers can only be queried for ECL at exterior "
-             "faces. Use get_face_no() in other cases."));
-
-    return all_face_orientations;
   }
 
   //@}
@@ -825,16 +775,24 @@ protected:
   internal::MatrixFreeFunctions::DoFInfo::DoFAccessIndex dof_access_index;
 
   /**
-   * Stores the current number of a face within the given cell in case
-   * `is_face==true`, using values between `0` and `2*dim`.
+   * Stores the (non-vectorized) number of faces within cells in case of ECL
+   * for the exterior cells where the single number `face_no` is not enough to
+   * cover all cases.
+   *
+   * @note Only available for `dof_access_index == dof_access_cell` and
+   * `is_interior_face == false`.
    */
-  unsigned int face_no;
+  std::array<std::uint8_t, n_lanes> face_numbers;
 
   /**
-   * Stores the orientation of the given face with respect to the standard
-   * orientation, 0 if in standard orientation.
+   * Store the orientation of the neighbor's faces with respect to the current
+   * cell for the case of exterior faces on ECL with possibly different
+   * orientations behind different cells.
+   *
+   * @note Only available for `dof_access_index == dof_access_cell` and
+   * `is_interior_face == false`.
    */
-  unsigned int face_orientation;
+  std::array<std::uint8_t, n_lanes> face_orientations;
 
   /**
    * Stores the subface index of the given face. Usually, this variable takes
@@ -864,26 +822,6 @@ protected:
    * initialized to. Relevant for ECL.
    */
   std::array<unsigned int, n_lanes> cell_or_face_ids;
-
-  /**
-   * Stores the (non-vectorized) number of faces within cells in case of ECL
-   * for the exterior cells where the single number `face_no` is not enough to
-   * cover all cases.
-   *
-   * @note Only available for `dof_access_index == dof_access_cell` and
-   * `is_interior_face == false`.
-   */
-  std::array<std::uint8_t, n_lanes> all_face_numbers;
-
-  /**
-   * Store the orientation of the neighbor's faces with respect to the current
-   * cell for the case of exterior faces on ECL with possibly different
-   * orientations behind different cells.
-   *
-   * @note Only available for `dof_access_index == dof_access_cell` and
-   * `is_interior_face == false`.
-   */
-  std::array<std::uint8_t, n_lanes> all_face_orientations;
 
   /**
    * Geometry data that can be generated FEValues on the fly with the
@@ -972,8 +910,6 @@ inline FEEvaluationData<dim, Number, is_face>::FEEvaluationData(
            internal::MatrixFreeFunctions::DoFInfo::dof_access_face_interior :
            internal::MatrixFreeFunctions::DoFInfo::dof_access_face_exterior) :
         internal::MatrixFreeFunctions::DoFInfo::dof_access_cell)
-  , face_no(0)
-  , face_orientation(0)
   , subface_index(0)
   , cell_type(internal::MatrixFreeFunctions::general)
 {}
@@ -1054,10 +990,10 @@ FEEvaluationData<dim, Number, is_face>::operator=(const FEEvaluationData &other)
          internal::MatrixFreeFunctions::DoFInfo::dof_access_face_interior :
          internal::MatrixFreeFunctions::DoFInfo::dof_access_face_exterior) :
       internal::MatrixFreeFunctions::DoFInfo::dof_access_cell;
-  face_no          = 0;
-  face_orientation = 0;
-  subface_index    = 0;
-  cell_type        = internal::MatrixFreeFunctions::general;
+  face_numbers[0]      = 0;
+  face_orientations[0] = 0;
+  subface_index        = 0;
+  cell_type            = internal::MatrixFreeFunctions::general;
 
   return *this;
 }
@@ -1113,7 +1049,8 @@ FEEvaluationData<dim, Number, is_face>::reinit_face(
   Assert(is_face == true,
          ExcMessage("Faces can only be set if the is_face template parameter "
                     "is true"));
-  face_no = (is_interior_face ? face.interior_face_no : face.exterior_face_no);
+  face_numbers[0] =
+    (is_interior_face ? face.interior_face_no : face.exterior_face_no);
   subface_index = is_interior_face == true ?
                     GeometryInfo<dim>::max_children_per_cell :
                     face.subface_index;
@@ -1123,9 +1060,9 @@ FEEvaluationData<dim, Number, is_face>::reinit_face(
   // standard-orientation else copy the first three bits
   // (which is equivalent to modulo 8). See also the documentation of
   // internal::MatrixFreeFunctions::FaceToCellTopology::face_orientation.
-  face_orientation = (is_interior_face == (face.face_orientation >= 8)) ?
-                       (face.face_orientation % 8) :
-                       0;
+  face_orientations[0] = (is_interior_face == (face.face_orientation >= 8)) ?
+                           (face.face_orientation % 8) :
+                           0;
 
   if (is_interior_face)
     cell_ids = face.cells_interior;
@@ -1357,7 +1294,7 @@ FEEvaluationData<dim, Number, is_face>::get_current_cell_index() const
 {
   if (is_face && dof_access_index ==
                    internal::MatrixFreeFunctions::DoFInfo::dof_access_cell)
-    return cell * GeometryInfo<dim>::faces_per_cell + face_no;
+    return cell * GeometryInfo<dim>::faces_per_cell + face_numbers[0];
   else
     return cell;
 }
@@ -1401,10 +1338,18 @@ FEEvaluationData<dim, Number, is_face>::get_scratch_data() const
 
 
 template <int dim, typename Number, bool is_face>
-inline unsigned int
-FEEvaluationData<dim, Number, is_face>::get_face_no() const
+std::uint8_t
+FEEvaluationData<dim, Number, is_face>::get_face_no(const unsigned int v) const
 {
-  return face_no;
+  Assert(is_face, ExcNotInitialized());
+  Assert(v == 0 || (cell != numbers::invalid_unsigned_int &&
+                    dof_access_index ==
+                      internal::MatrixFreeFunctions::DoFInfo::dof_access_cell &&
+                    is_interior_face == false),
+         ExcMessage("All face numbers can only be queried for ECL at exterior "
+                    "faces. Use get_face_no() in other cases."));
+
+  return face_numbers[v];
 }
 
 
@@ -1419,10 +1364,19 @@ FEEvaluationData<dim, Number, is_face>::get_subface_index() const
 
 
 template <int dim, typename Number, bool is_face>
-inline unsigned int
-FEEvaluationData<dim, Number, is_face>::get_face_orientation() const
+std::uint8_t
+FEEvaluationData<dim, Number, is_face>::get_face_orientation(
+  const unsigned int v) const
 {
-  return face_orientation;
+  Assert(is_face, ExcNotInitialized());
+  Assert(v == 0 || (cell != numbers::invalid_unsigned_int &&
+                    dof_access_index ==
+                      internal::MatrixFreeFunctions::DoFInfo::dof_access_cell &&
+                    is_interior_face == false),
+         ExcMessage("All face numbers can only be queried for ECL at exterior "
+                    "faces. Use get_face_no() in other cases."));
+
+  return face_orientations[v];
 }
 
 

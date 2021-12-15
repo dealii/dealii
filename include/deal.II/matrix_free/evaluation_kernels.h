@@ -3192,10 +3192,8 @@ namespace internal
     bool all_faces_are_same = n_filled_lanes == n_lanes;
     if (n_face_orientations == n_lanes)
       for (unsigned int v = 1; v < n_lanes; ++v)
-        if (fe_eval.get_all_face_numbers()[v] !=
-              fe_eval.get_all_face_numbers()[0] ||
-            fe_eval.get_all_face_orientations()[v] !=
-              fe_eval.get_all_face_orientations()[0])
+        if (fe_eval.get_face_no(v) != fe_eval.get_face_no(0) ||
+            fe_eval.get_face_orientation(v) != fe_eval.get_face_orientation(0))
           {
             all_faces_are_same = false;
             break;
@@ -3224,9 +3222,9 @@ namespace internal
             continue;
 
           if (shape_data.nodal_at_cell_boundaries &&
-              fe_eval.get_all_face_orientations()[v] != 0)
+              fe_eval.get_face_orientation(v) != 0)
             orientation[v] = &fe_eval.get_shape_info().face_orientations_dofs(
-              fe_eval.get_all_face_orientations()[v], 0);
+              fe_eval.get_face_orientation(v), 0);
         }
     else if (fe_eval.get_face_orientation() != 0)
       orientation[0] = &fe_eval.get_shape_info().face_orientations_dofs(
@@ -3242,20 +3240,22 @@ namespace internal
             &fe_eval.get_shape_info().face_to_cell_index_hermite(face_no, 0);
         else
           {
-            const auto &face_nos = fe_eval.get_all_face_numbers();
             for (unsigned int v = 0; v < n_lanes; ++v)
               {
                 if (fe_eval.get_cell_ids()[v] == numbers::invalid_unsigned_int)
                   continue;
 
+                const auto face_no = fe_eval.get_face_no(v);
+
                 grad_weight[v] =
-                  shape_data.shape_data_on_face
-                    [0][fe_degree + (integrate ? (2 - (face_nos[v] % 2)) :
-                                                 (1 + (face_nos[v] % 2)))][0];
+                  shape_data.shape_data_on_face[0][fe_degree +
+                                                   (integrate ?
+                                                      (2 - (face_no % 2)) :
+                                                      (1 + (face_no % 2)))][0];
 
                 index_array_hermite[v] =
-                  &fe_eval.get_shape_info().face_to_cell_index_hermite(
-                    face_nos[v], 0);
+                  &fe_eval.get_shape_info().face_to_cell_index_hermite(face_no,
+                                                                       0);
               }
           }
       }
@@ -3270,15 +3270,16 @@ namespace internal
             &fe_eval.get_shape_info().face_to_cell_index_nodal(face_no, 0);
         else
           {
-            const auto &face_nos = fe_eval.get_all_face_numbers();
             for (unsigned int v = 0; v < n_lanes; ++v)
               {
                 if (fe_eval.get_cell_ids()[v] == numbers::invalid_unsigned_int)
                   continue;
 
+                const auto face_no = fe_eval.get_face_no(v);
+
                 index_array_nodal[v] =
-                  &fe_eval.get_shape_info().face_to_cell_index_nodal(
-                    face_nos[v], 0);
+                  &fe_eval.get_shape_info().face_to_cell_index_nodal(face_no,
+                                                                     0);
               }
           }
       }
@@ -3766,14 +3767,14 @@ namespace internal
                       numbers::invalid_unsigned_int)
                     continue;
 
-                  if (fe_eval.get_all_face_orientations()[v] != 0)
+                  if (fe_eval.get_face_orientation(v) != 0)
                     adjust_for_face_orientation_per_lane(
                       dim,
                       n_components,
                       v,
                       evaluation_flag,
                       &fe_eval.get_shape_info().face_orientations_quad(
-                        fe_eval.get_all_face_orientations()[v], 0),
+                        fe_eval.get_face_orientation(v), 0),
                       false,
                       Utilities::pow(n_q_points_1d, dim - 1),
                       &temp[0][0],
@@ -3944,14 +3945,14 @@ namespace internal
                 if (fe_eval.get_cell_ids()[v] == numbers::invalid_unsigned_int)
                   continue;
 
-                if (fe_eval.get_all_face_orientations()[v] != 0)
+                if (fe_eval.get_face_orientation(v) != 0)
                   adjust_for_face_orientation_per_lane(
                     dim,
                     n_components,
                     v,
                     integration_flag,
                     &fe_eval.get_shape_info().face_orientations_quad(
-                      fe_eval.get_all_face_orientations()[v], 0),
+                      fe_eval.get_face_orientation(v), 0),
                     true,
                     Utilities::pow(n_q_points_1d, dim - 1),
                     &temp[0][0],
