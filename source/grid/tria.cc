@@ -11871,11 +11871,8 @@ Triangulation<dim, spacedim>::create_triangulation(
 
           // boundary ids
           for (auto pair : cell_info->boundary_ids)
-            {
-              Assert(cell->at_boundary(pair.first),
-                     ExcMessage("Cell face is not on the boundary!"));
+            if (cell->face(pair.first)->at_boundary())
               cell->face(pair.first)->set_boundary_id(pair.second);
-            }
         }
     }
 }

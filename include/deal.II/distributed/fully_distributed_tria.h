@@ -19,6 +19,7 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/distributed/repartitioning_policy_tools.h>
 #include <deal.II/distributed/tria_base.h>
 
 #include <deal.II/grid/grid_tools.h>
@@ -197,6 +198,22 @@ namespace parallel
         const TriangulationDescription::Settings &     settings);
 
       /**
+       * Register a partitioner, which is used within the method
+       * repartition().
+       */
+      void
+      set_partitioner(
+        const RepartitioningPolicyTools::Base<dim, spacedim> &partitioner,
+        const TriangulationDescription::Settings &            settings);
+
+      /**
+       * Execute repartitioning and use the partitioner attached by the
+       * method set_partitioner();
+       */
+      void
+      repartition();
+
+      /**
        * Coarsen and refine the mesh according to refinement and coarsening
        * flags set.
        *
@@ -300,6 +317,12 @@ namespace parallel
       std::function<void(dealii::Triangulation<dim, spacedim> &,
                          const unsigned int)>
         partitioner;
+
+      /**
+       * Partitioner used during repartition().
+       */
+      SmartPointer<const RepartitioningPolicyTools::Base<dim, spacedim>>
+        partitioner_distributed;
 
       /**
        * Sorted list of pairs of coarse-cell ids and their indices.
