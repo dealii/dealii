@@ -37,8 +37,10 @@ namespace Utilities
     namespace ConsensusAlgorithms
     {
       /**
-       * An interface to be able to use the Interface classes. The main
-       * functionality of the implementations is to return a list of process
+       * A base class for concrete implementations of classes that
+       * provide the information that the algorithms derived from
+       * the ConsensusAlgorithms::Interface base class require. The main
+       * functionality of this class is to return a list of process
        * ranks this process wants data from and to deal with the optional
        * payload of the messages sent/received by the ConsensusAlgorithm
        * classes.
@@ -47,23 +49,24 @@ namespace Utilities
        * - send/request message: A message consisting of a data request
        *   which should be answered by another process. This message is
        *   considered as a request message by the receiving rank.
-       * - recv message: The answer to a send/request message.
+       * - receive message: The answer to a send/request message.
        *
-       * @tparam T1 the type of the elements of the vector to sent
-       * @tparam T2 the type of the elements of the vector to received
+       * @tparam T1 The type of the elements of the vector to sent.
+       * @tparam T2 The type of the elements of the vector to received.
        *
        * @note Since the payloads of the messages are optional, users have
-       *       to deal with buffers themselves. The ConsensusAlgorithm classes
-       * 1) deliver only references to empty vectors (of size 0) the data to be
-       * sent can be inserted to or read from, and 2) communicate these vectors
-       * blindly.
+       *    to deal with buffers themselves. The ConsensusAlgorithm classes
+       *    (1) deliver only references to empty vectors (of size 0) the data
+       *    to be sent can be inserted to or read from, and (2) communicate
+       *    these vectors blindly.
        */
       template <typename T1, typename T2>
       class Process
       {
       public:
         /**
-         * Destructor.
+         * Destructor. Made `virtual` to ensure that one can work with
+         * derived classes.
          */
         virtual ~Process() = default;
 
@@ -77,11 +80,11 @@ namespace Utilities
         compute_targets() = 0;
 
         /**
-         * Add to the request to the process with the specified rank a payload.
+         * Add a payload to the request to the process with the specified rank.
          *
-         * @param[in]  other_rank rank of the process
+         * @param[in]  other_rank Rank of the process.
          * @param[out] send_buffer data to be sent part of the request
-         * (optional)
+         * (optional).
          *
          * @note The buffer is empty. Before using it, you have to set its size.
          */
@@ -95,9 +98,9 @@ namespace Utilities
          * task is to resize the buffer, since it is empty when the function is
          * called.
          *
-         * @param[in]  other_rank rank of the process
-         * @param[out] recv_buffer data to be sent part of the request
-         * (optional)
+         * @param[in]  other_rank Rank of the process.
+         * @param[out] recv_buffer Data to be sent as part of the request
+         * (optional).
          */
         virtual void
         prepare_buffer_for_answer(const unsigned int other_rank,
@@ -107,10 +110,10 @@ namespace Utilities
          * Prepare the buffer where the payload of the answer of the request to
          * the process with the specified rank is saved in.
          *
-         * @param[in]  other_rank rank of the process
-         * @param[in]  buffer_recv received payload (optional)
-         * @param[out] request_buffer payload to be sent as part of the request
-         *             (optional)
+         * @param[in]  other_rank Rank of the process.
+         * @param[in]  buffer_recv Received payload (optional).
+         * @param[out] request_buffer Payload to be sent as part of the request
+         *             (optional).
          *
          * @note The request_buffer is empty. Before using it, you have to set
          *       its size.
@@ -149,8 +152,8 @@ namespace Utilities
        *
        * Naturally, the user has to provide:
        * - A communicator.
-       * - For each rank a list of ranks of processes this process should
-       *   communicate to.
+       * - For each rank a list of ranks of processes this process wants to
+       *   communicate with.
        * - Functionality to pack/unpack data to be sent/received.
        *
        * This base class only introduces a basic interface to achieve
@@ -166,15 +169,22 @@ namespace Utilities
       class Interface
       {
       public:
+        /**
+         * Constructor. `process` is an object that provides information
+         * about what processes the current process wants to communicate with,
+         * and the data to be sent/received. `comm` is the communicator on
+         * which this communication is to happen.
+         */
         Interface(Process<T1, T2> &process, const MPI_Comm &comm);
 
         /**
-         * Destructor.
+         * Destructor. Made `virtual` to ensure that one can work with
+         * derived classes.
          */
         virtual ~Interface() = default;
 
         /**
-         * Run consensus algorithm and return the requesting processes.
+         * Run the consensus algorithm and return the requesting processes.
          */
         virtual std::vector<unsigned int>
         run() = 0;
