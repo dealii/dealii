@@ -127,7 +127,6 @@ namespace Utilities
 
         return std::vector<unsigned int>(requesting_processes.begin(),
                                          requesting_processes.end());
-        ;
       }
 
 
