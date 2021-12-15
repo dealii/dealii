@@ -79,8 +79,6 @@ namespace LinearAlgebra
         return a;
       }
 
-
-
       // Resize the underlying array on the host or on the device
       template <typename Number, typename MemorySpaceType>
       struct la_parallel_vector_templates_functions
@@ -134,17 +132,21 @@ namespace LinearAlgebra
         {
           if (comm_shared == MPI_COMM_SELF)
             {
+#ifdef DEAL_II_USE_KOKKOS_BACKEND
+              Kokkos::realloc(data.values, new_alloc_size);
+#else
               Number *new_val;
               Utilities::System::posix_memalign(
                 reinterpret_cast<void **>(&new_val),
                 64,
                 sizeof(Number) * new_alloc_size);
               data.values = {new_val, [](Number *data) { std::free(data); }};
-
+#endif
               allocated_size = new_alloc_size;
 
+
               data.values_sm = {
-                ArrayView<const Number>(data.values.get(), new_alloc_size)};
+                ArrayView<const Number>(data.data(), new_alloc_size)};
             }
           else
             {
@@ -230,6 +232,26 @@ namespace LinearAlgebra
                 data.values_sm[i] =
                   ArrayView<const Number>(others[i], new_alloc_sizes[i]);
 
+#    ifdef DEAL_II_USE_KOKKOS_BACKEND
+              data.values =
+                Kokkos::View<Number *,
+                             ::dealii::MemorySpace::Host,
+                             Kokkos::MemoryTraits<Kokkos::Unmanaged>>(
+                  ptr_aligned, new_alloc_size);
+
+              // Kokkos will not free the memory because the memory is
+              // unmanaged. Instead we use a shared pointer to take care of
+              // that.
+              data.values_sm_ptr = {ptr_aligned,
+                                    [mpi_window](Number *) mutable {
+                                      // note: we are creating here a copy of
+                                      // the window other approaches led to
+                                      // segmentation faults
+                                      const auto ierr =
+                                        MPI_Win_free(&mpi_window);
+                                      AssertThrowMPI(ierr);
+                                    }};
+#    else
               data.values = {ptr_aligned, [mpi_window](Number *) mutable {
                                // note: we are creating here a copy of the
                                // window other approaches led to segmentation
@@ -237,6 +259,7 @@ namespace LinearAlgebra
                                const auto ierr = MPI_Win_free(&mpi_window);
                                AssertThrowMPI(ierr);
                              }};
+#    endif
 #  else
               AssertThrow(false,
                           ExcMessage(
@@ -268,6 +291,73 @@ namespace LinearAlgebra
           ::dealii::LinearAlgebra::distributed::
             Vector<Number, ::dealii::MemorySpace::Host>
               tmp_vector(communication_pattern);
+#ifdef DEAL_II_USE_KOKKOS_BACKEND
+          // fill entries from ReadWriteVector into the distributed vector,
+          // including ghost entries. this is not really efficient right now
+          // because indices are translated twice, once by
+          // nth_index_in_set(i) and once for operator() of tmp_vector
+          const IndexSet &v_stored   = V.get_stored_elements();
+          const size_type n_elements = v_stored.n_elements();
+          Kokkos::View<size_type *, ::dealii::MemorySpace::Host> indices(
+            "indices", n_elements);
+          auto indices_host = Kokkos::create_mirror_view(indices);
+          Kokkos::View<Number *, ::dealii::MemorySpace::Host> V_view(
+            "V_view", n_elements);
+          auto V_view_host = Kokkos::create_mirror_view(V_view);
+
+          using execution_space =
+            typename ::dealii::MemorySpace::Host::execution_space;
+          using host_execution_space = Kokkos::DefaultHostExecutionSpace;
+          Kokkos::parallel_for(
+            Kokkos::RangePolicy<host_execution_space>(0, n_elements),
+            [&](int i) {
+              indices_host(i) = communication_pattern->global_to_local(
+                v_stored.nth_index_in_set(i));
+              V_view_host.local_element(i) = V.local_element(i);
+            });
+
+          Kokkos::deep_copy(execution_space{}, indices, indices_host);
+          Kokkos::deep_copy(execution_space{}, V_view, V_view_host);
+
+          Kokkos::parallel_for(
+            Kokkos::RangePolicy<execution_space>(0, n_elements),
+            KOKKOS_LAMBDA(int i) {
+              tmp_vector.data.values(indices(i)) = V_view(i);
+            });
+
+          tmp_vector.compress(operation);
+
+          // Copy the local elements of tmp_vector to the right place in val
+          IndexSet        tmp_index_set  = tmp_vector.locally_owned_elements();
+          const size_type tmp_n_elements = tmp_index_set.n_elements();
+          Kokkos::View<size_type *, ::dealii::MemorySpace::Host> tmp_indices(
+            "tmp_indices", tmp_n_elements);
+          auto tmp_indices_host = Kokkos::create_mirror_view(tmp_indices);
+          Kokkos::parallel_for(
+            Kokkos::RangePolicy<host_execution_space>(0, n_elements),
+            [&](int i) {
+              tmp_indices_host(i) = locally_owned_elem.index_within_set(
+                tmp_index_set.nth_index_in_set(i));
+            });
+          Kokkos::deep_copy(execution_space{}, tmp_indices, tmp_indices_host);
+
+          if (operation == VectorOperation::add)
+            {
+              Kokkos::parallel_for(
+                Kokkos::RangePolicy<execution_space>(0, tmp_n_elements),
+                KOKKOS_LAMBDA(int i) {
+                  data.values(tmp_indices(i)) += tmp_vector.data.values(i);
+                });
+            }
+          else
+            {
+              Kokkos::parallel_for(
+                Kokkos::RangePolicy<execution_space>(0, tmp_n_elements),
+                KOKKOS_LAMBDA(int i) {
+                  data.values(tmp_indices(i)) = tmp_vector.data.values(i);
+                });
+            }
+#else
 
           // fill entries from ReadWriteVector into the distributed vector,
           // including ghost entries. this is not really efficient right now
@@ -299,6 +389,7 @@ namespace LinearAlgebra
                     tmp_vector.local_element(i);
                 }
             }
+#endif
         }
 
         template <typename RealType>
@@ -309,9 +400,24 @@ namespace LinearAlgebra
                           const unsigned int              size,
                           RealType &                      max)
         {
+#ifdef DEAL_II_USE_KOKKOS_BACKEND
+          RealType max_reduce;
+          Kokkos::parallel_reduce(
+            Kokkos::RangePolicy<
+              typename ::dealii::MemorySpace::Host::execution_space>(0, size),
+            KOKKOS_LAMBDA(int i, RealType &value) {
+              if (std::abs(data.values(i)) > value)
+                value = std::abs(data.values(i));
+            },
+            Kokkos::Max<RealType>(max_reduce));
+
+          if (max_reduce > max)
+            max = max_reduce;
+#else
           for (size_type i = 0; i < size; ++i)
             max =
               std::max(numbers::NumberTraits<Number>::abs(data.values[i]), max);
+#endif
         }
       };
 
@@ -529,8 +635,12 @@ namespace LinearAlgebra
       resize_val(size, comm_sm);
 
       // delete previous content in import data
+#ifdef DEAL_II_USE_KOKKOS_BACKEND
+      Kokkos::resize(import_data.values, 0);
+#else
       import_data.values.reset();
       import_data.values_dev.reset();
+#endif
 
       // set partitioner to serial version
       partitioner = std::make_shared<Utilities::MPI::Partitioner>(size);
@@ -560,8 +670,12 @@ namespace LinearAlgebra
       resize_val(local_size + ghost_size, comm_sm);
 
       // delete previous content in import data
+#ifdef DEAL_II_USE_KOKKOS_BACKEND
+      Kokkos::resize(import_data.values, 0);
+#else
       import_data.values.reset();
       import_data.values_dev.reset();
+#endif
 
       // create partitioner
       partitioner = std::make_shared<Utilities::MPI::Partitioner>(local_size,
@@ -602,12 +716,16 @@ namespace LinearAlgebra
       else
         zero_out_ghost_values();
 
-      // do not reallocate import_data directly, but only upon request. It
-      // is only used as temporary storage for compress() and
-      // update_ghost_values, and we might have vectors where we never
-      // call these methods and hence do not need to have the storage.
+        // do not reallocate import_data directly, but only upon request. It
+        // is only used as temporary storage for compress() and
+        // update_ghost_values, and we might have vectors where we never
+        // call these methods and hence do not need to have the storage.
+#ifdef DEAL_II_USE_KOKKOS_BACKEND
+      Kokkos::resize(import_data.values, 0);
+#else
       import_data.values.reset();
       import_data.values_dev.reset();
+#endif
 
       thread_loop_partitioner = v.thread_loop_partitioner;
     }
@@ -666,8 +784,12 @@ namespace LinearAlgebra
       // is only used as temporary storage for compress() and
       // update_ghost_values, and we might have vectors where we never
       // call these methods and hence do not need to have the storage.
+#ifdef DEAL_II_USE_KOKKOS_BACKEND
+      Kokkos::resize(import_data.values, 0);
+#else
       import_data.values.reset();
       import_data.values_dev.reset();
+#endif
 
       vector_is_ghosted = false;
     }
@@ -943,8 +1065,8 @@ namespace LinearAlgebra
     void
     Vector<Number, MemorySpaceType>::zero_out_ghost_values() const
     {
-      if (data.values != nullptr)
-        std::fill_n(data.values.get() + partitioner->locally_owned_size(),
+      if (data.has_data_on_host())
+        std::fill_n(data.data() + partitioner->locally_owned_size(),
                     partitioner->n_ghost_indices(),
                     Number());
 #ifdef DEAL_II_COMPILER_CUDA_AWARE
@@ -999,14 +1121,19 @@ namespace LinearAlgebra
                 std::is_same<MemorySpaceType, dealii::MemorySpace::Host>::value,
                 "This code path should only be compiled for CUDA-aware-MPI for MemorySpace::Host!");
 #  endif
-              if (import_data.values == nullptr)
+              if (!import_data.has_data_on_host())
                 {
-                  Number *new_val;
-                  Utilities::System::posix_memalign(
-                    reinterpret_cast<void **>(&new_val),
-                    64,
-                    sizeof(Number) * partitioner->n_import_indices());
-                  import_data.values.reset(new_val);
+#  ifdef DEAL_II_USE_KOKKOS_BACKEND
+                  Kokkos::resize(import_data.values,
+                                 partitioner->n_import_indices());
+#  else
+                Number *new_val;
+                Utilities::System::posix_memalign(
+                  reinterpret_cast<void **>(&new_val),
+                  64,
+                  sizeof(Number) * partitioner->n_import_indices());
+                import_data.values.reset(new_val);
+#  endif
                 }
             }
         }
@@ -1056,10 +1183,10 @@ namespace LinearAlgebra
             operation,
             communication_channel,
             ArrayView<Number, MemorySpace::Host>(
-              data.values.get() + partitioner->locally_owned_size(),
+              data.data() + partitioner->locally_owned_size(),
               partitioner->n_ghost_indices()),
             ArrayView<Number, MemorySpace::Host>(
-              import_data.values.get(), partitioner->n_import_indices()),
+              import_data.data(), partitioner->n_import_indices()),
             compress_requests);
         }
 #else
@@ -1107,17 +1234,17 @@ namespace LinearAlgebra
 #  endif
         {
           Assert(partitioner->n_import_indices() == 0 ||
-                   import_data.values != nullptr,
+                   import_data.has_data_on_host(),
                  ExcNotInitialized());
           partitioner
             ->import_from_ghosted_array_finish<Number, MemorySpace::Host>(
               operation,
               ArrayView<const Number, MemorySpace::Host>(
-                import_data.values.get(), partitioner->n_import_indices()),
+                import_data.data(), partitioner->n_import_indices()),
               ArrayView<Number, MemorySpace::Host>(
-                data.values.get(), partitioner->locally_owned_size()),
+                data.data(), partitioner->locally_owned_size()),
               ArrayView<Number, MemorySpace::Host>(
-                data.values.get() + partitioner->locally_owned_size(),
+                data.data() + partitioner->locally_owned_size(),
                 partitioner->n_ghost_indices()),
               compress_requests);
         }
@@ -1179,14 +1306,19 @@ namespace LinearAlgebra
             std::is_same<MemorySpaceType, dealii::MemorySpace::Host>::value,
             "This code path should only be compiled for CUDA-aware-MPI for MemorySpace::Host!");
 #    endif
-          if (import_data.values == nullptr)
+          if (!import_data.has_data_on_host())
             {
+#    ifdef DEAL_II_USE_KOKKOS_BACKEND
+              Kokkos::resize(import_data.values,
+                             partitioner->n_import_indices());
+#    else
               Number *new_val;
               Utilities::System::posix_memalign(
                 reinterpret_cast<void **>(&new_val),
                 64,
                 sizeof(Number) * partitioner->n_import_indices());
               import_data.values.reset(new_val);
+#    endif
             }
 #  endif
         }
@@ -1216,11 +1348,11 @@ namespace LinearAlgebra
       partitioner->export_to_ghosted_array_start<Number, MemorySpace::Host>(
         communication_channel,
         ArrayView<const Number, MemorySpace::Host>(
-          data.values.get(), partitioner->locally_owned_size()),
-        ArrayView<Number, MemorySpace::Host>(import_data.values.get(),
+          data.data(), partitioner->locally_owned_size()),
+        ArrayView<Number, MemorySpace::Host>(import_data.data(),
                                              partitioner->n_import_indices()),
         ArrayView<Number, MemorySpace::Host>(
-          data.values.get() + partitioner->locally_owned_size(),
+          data.data() + partitioner->locally_owned_size(),
           partitioner->n_ghost_indices()),
         update_ghost_values_requests);
 #  else
@@ -1262,7 +1394,7 @@ namespace LinearAlgebra
         defined(DEAL_II_MPI_WITH_CUDA_SUPPORT))
           partitioner->export_to_ghosted_array_finish(
             ArrayView<Number, MemorySpace::Host>(
-              data.values.get() + partitioner->locally_owned_size(),
+              data.data() + partitioner->locally_owned_size(),
               partitioner->n_ghost_indices()),
             update_ghost_values_requests);
 #  else
@@ -2096,7 +2228,11 @@ namespace LinearAlgebra
       if (partitioner.use_count() > 0)
         memory +=
           partitioner->memory_consumption() / partitioner.use_count() + 1;
-      if (import_data.values != nullptr || import_data.values_dev != nullptr)
+#ifdef DEAL_II_USE_KOKKOS_BACKEND
+      if (import_data.has_data_on_host())
+#else
+      if (import_data.has_data_on_host() || import_data.values_dev != nullptr)
+#endif
         memory += (static_cast<std::size_t>(partitioner->n_import_indices()) *
                    sizeof(Number));
       return memory;

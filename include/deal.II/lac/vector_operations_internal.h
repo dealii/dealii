@@ -1665,8 +1665,7 @@ namespace internal
                                                   ::dealii::MemorySpace::Host>
              &data)
       {
-        Vector_copy<Number, Number2> copier(v_data.values.get(),
-                                            data.values.get());
+        Vector_copy<Number, Number2> copier(v_data.data(), data.data());
         parallel_for(copier, 0, size, thread_loop_partitioner);
       }
 
@@ -1679,7 +1678,7 @@ namespace internal
                                                  ::dealii::MemorySpace::Host>
             &data)
       {
-        Vector_set<Number> setter(s, data.values.get());
+        Vector_set<Number> setter(s, data.data());
         parallel_for(setter, 0, size, thread_loop_partitioner);
       }
 
@@ -1694,8 +1693,7 @@ namespace internal
                                                ::dealii::MemorySpace::Host>
           &data)
       {
-        Vectorization_add_v<Number> vector_add(data.values.get(),
-                                               v_data.values.get());
+        Vectorization_add_v<Number> vector_add(data.data(), v_data.data());
         parallel_for(vector_add, 0, size, thread_loop_partitioner);
       }
 
@@ -1710,8 +1708,8 @@ namespace internal
                                                ::dealii::MemorySpace::Host>
           &data)
       {
-        Vectorization_subtract_v<Number> vector_subtract(data.values.get(),
-                                                         v_data.values.get());
+        Vectorization_subtract_v<Number> vector_subtract(data.data(),
+                                                         v_data.data());
         parallel_for(vector_subtract, 0, size, thread_loop_partitioner);
       }
 
@@ -1725,7 +1723,7 @@ namespace internal
                                                ::dealii::MemorySpace::Host>
           &data)
       {
-        Vectorization_add_factor<Number> vector_add(data.values.get(), a);
+        Vectorization_add_factor<Number> vector_add(data.data(), a);
         parallel_for(vector_add, 0, size, thread_loop_partitioner);
       }
 
@@ -1740,9 +1738,7 @@ namespace internal
                                                     ::dealii::MemorySpace::Host>
                &data)
       {
-        Vectorization_add_av<Number> vector_add(data.values.get(),
-                                                v_data.values.get(),
-                                                a);
+        Vectorization_add_av<Number> vector_add(data.data(), v_data.data(), a);
         parallel_for(vector_add, 0, size, thread_loop_partitioner);
       }
 
@@ -1762,7 +1758,7 @@ namespace internal
           &data)
       {
         Vectorization_add_avpbw<Number> vector_add(
-          data.values.get(), v_data.values.get(), w_data.values.get(), a, b);
+          data.data(), v_data.data(), w_data.data(), a, b);
         parallel_for(vector_add, 0, size, thread_loop_partitioner);
       }
 
@@ -1778,8 +1774,8 @@ namespace internal
                                                ::dealii::MemorySpace::Host>
           &data)
       {
-        Vectorization_sadd_xv<Number> vector_sadd(data.values.get(),
-                                                  v_data.values.get(),
+        Vectorization_sadd_xv<Number> vector_sadd(data.data(),
+                                                  v_data.data(),
                                                   x);
         parallel_for(vector_sadd, 0, size, thread_loop_partitioner);
       }
@@ -1797,8 +1793,8 @@ namespace internal
                                                ::dealii::MemorySpace::Host>
           &data)
       {
-        Vectorization_sadd_xav<Number> vector_sadd(data.values.get(),
-                                                   v_data.values.get(),
+        Vectorization_sadd_xav<Number> vector_sadd(data.data(),
+                                                   v_data.data(),
                                                    a,
                                                    x);
         parallel_for(vector_sadd, 0, size, thread_loop_partitioner);
@@ -1821,7 +1817,7 @@ namespace internal
           &data)
       {
         Vectorization_sadd_xavbw<Number> vector_sadd(
-          data.values.get(), v_data.values.get(), w_data.values.get(), x, a, b);
+          data.data(), v_data.data(), w_data.data(), x, a, b);
         parallel_for(vector_sadd, 0, size, thread_loop_partitioner);
       }
 
@@ -1835,7 +1831,7 @@ namespace internal
                                                ::dealii::MemorySpace::Host>
           &data)
       {
-        Vectorization_multiply_factor<Number> vector_multiply(data.values.get(),
+        Vectorization_multiply_factor<Number> vector_multiply(data.data(),
                                                               factor);
         parallel_for(vector_multiply, 0, size, thread_loop_partitioner);
       }
@@ -1850,8 +1846,7 @@ namespace internal
                                                    ::dealii::MemorySpace::Host>
               &data)
       {
-        Vectorization_scale<Number> vector_scale(data.values.get(),
-                                                 v_data.values.get());
+        Vectorization_scale<Number> vector_scale(data.data(), v_data.data());
         parallel_for(vector_scale, 0, size, thread_loop_partitioner);
       }
 
@@ -1866,9 +1861,7 @@ namespace internal
                                                     ::dealii::MemorySpace::Host>
                &data)
       {
-        Vectorization_equ_au<Number> vector_equ(data.values.get(),
-                                                v_data.values.get(),
-                                                a);
+        Vectorization_equ_au<Number> vector_equ(data.data(), v_data.data(), a);
         parallel_for(vector_equ, 0, size, thread_loop_partitioner);
       }
 
@@ -1888,7 +1881,7 @@ namespace internal
           &data)
       {
         Vectorization_equ_aubv<Number> vector_equ(
-          data.values.get(), v_data.values.get(), w_data.values.get(), a, b);
+          data.data(), v_data.data(), w_data.data(), a, b);
         parallel_for(vector_equ, 0, size, thread_loop_partitioner);
       }
 
@@ -1904,7 +1897,7 @@ namespace internal
       {
         Number                                                   sum;
         dealii::internal::VectorOperations::Dot<Number, Number2> dot(
-          data.values.get(), v_data.values.get());
+          data.data(), v_data.data());
         dealii::internal::VectorOperations::parallel_reduce(
           dot, 0, size, sum, thread_loop_partitioner);
         AssertIsFinite(sum);
@@ -1922,7 +1915,7 @@ namespace internal
                                                     ::dealii::MemorySpace::Host>
                &data)
       {
-        Norm2<Number, real_type> norm2(data.values.get());
+        Norm2<Number, real_type> norm2(data.data());
         parallel_reduce(norm2, 0, size, sum, thread_loop_partitioner);
       }
 
@@ -1935,7 +1928,7 @@ namespace internal
           MemorySpaceData<Number, ::dealii::MemorySpace::Host> &data)
       {
         Number            sum;
-        MeanValue<Number> mean(data.values.get());
+        MeanValue<Number> mean(data.data());
         parallel_reduce(mean, 0, size, sum, thread_loop_partitioner);
 
         return sum;
@@ -1951,7 +1944,7 @@ namespace internal
                                                     ::dealii::MemorySpace::Host>
                &data)
       {
-        Norm1<Number, real_type> norm1(data.values.get());
+        Norm1<Number, real_type> norm1(data.data());
         parallel_reduce(norm1, 0, size, sum, thread_loop_partitioner);
       }
 
@@ -1966,7 +1959,7 @@ namespace internal
                                                     ::dealii::MemorySpace::Host>
                &data)
       {
-        NormP<Number, real_type> normp(data.values.get(), p);
+        NormP<Number, real_type> normp(data.data(), p);
         parallel_reduce(normp, 0, size, sum, thread_loop_partitioner);
       }
 
@@ -1985,10 +1978,7 @@ namespace internal
           &data)
       {
         Number            sum;
-        AddAndDot<Number> adder(data.values.get(),
-                                v_data.values.get(),
-                                w_data.values.get(),
-                                a);
+        AddAndDot<Number> adder(data.data(), v_data.data(), w_data.data(), a);
         parallel_reduce(adder, 0, size, sum, thread_loop_partitioner);
 
         return sum;

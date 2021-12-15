@@ -46,6 +46,7 @@
 #cmakedefine DEAL_II_WITH_GSL
 #cmakedefine DEAL_II_WITH_HDF5
 #cmakedefine DEAL_II_WITH_KOKKOS
+#cmakedefine DEAL_II_USE_KOKKOS_BACKEND
 #cmakedefine DEAL_II_WITH_LAPACK
 #cmakedefine LAPACK_WITH_64BIT_BLAS_INDICES
 #cmakedefine DEAL_II_LAPACK_WITH_MKL

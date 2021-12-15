@@ -1471,7 +1471,7 @@ namespace LinearAlgebra
           begin(::dealii::MemorySpace::
                   MemorySpaceData<Number, ::dealii::MemorySpace::Host> &data)
         {
-          return data.values.get();
+          return data.data();
         }
 
         static inline
@@ -1479,14 +1479,14 @@ namespace LinearAlgebra
           begin(const ::dealii::MemorySpace::
                   MemorySpaceData<Number, ::dealii::MemorySpace::Host> &data)
         {
-          return data.values.get();
+          return data.data();
         }
 
         static inline Number *
         get_values(::dealii::MemorySpace::
                      MemorySpaceData<Number, ::dealii::MemorySpace::Host> &data)
         {
-          return data.values.get();
+          return data.data();
         }
       };
 
@@ -1647,7 +1647,7 @@ namespace LinearAlgebra
                vector_is_ghosted == true,
              ExcMessage("You tried to read a ghost element of this vector, "
                         "but it has not imported its ghost values."));
-      return data.values[partitioner->global_to_local(global_index)];
+      return data(partitioner->global_to_local(global_index));
     }
 
 
@@ -1672,7 +1672,7 @@ namespace LinearAlgebra
       // (then, the compiler picks this method according to the C++ rule book
       // even if a human would pick the const method when this subsequent use
       // is just a read)
-      return data.values[partitioner->global_to_local(global_index)];
+      return data(partitioner->global_to_local(global_index));
     }
 
 
@@ -1711,7 +1711,7 @@ namespace LinearAlgebra
              ExcMessage("You tried to read a ghost element of this vector, "
                         "but it has not imported its ghost values."));
 
-      return data.values[local_index];
+      return data(local_index);
     }
 
 
@@ -1728,7 +1728,7 @@ namespace LinearAlgebra
                        partitioner->locally_owned_size() +
                          partitioner->n_ghost_indices());
 
-      return data.values[local_index];
+      return data(local_index);
     }
 
 

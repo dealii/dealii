@@ -19,17 +19,28 @@
 
 #include <deal.II/base/config.h>
 
+#ifdef DEAL_II_USE_KOKKOS_BACKEND
+#  include <Kokkos_Core.hpp>
+#endif
+
 DEAL_II_NAMESPACE_OPEN
 
 /**
  */
 namespace MemorySpace
 {
+#ifdef DEAL_II_USE_KOKKOS_BACKEND
+  /**
+   * Structure describing Host memory space.
+   */
+  using Host = ::Kokkos::HostSpace;
+#else
   /**
    * Structure describing Host memory space.
    */
   struct Host
   {};
+#endif
 
 
 
