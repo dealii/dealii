@@ -32,7 +32,7 @@ namespace RepartitioningPolicyTools
   {
     template <int dim, int spacedim>
     void
-    add_indices_recursevly_for_first_child_policy(
+    add_indices_recursively_for_first_child_policy(
       const TriaIterator<CellAccessor<dim, spacedim>> &cell,
       const internal::CellIDTranslator<dim> &          cell_id_translator,
       IndexSet &                                       is_fine)
@@ -41,9 +41,9 @@ namespace RepartitioningPolicyTools
 
       if (cell->level() > 0 &&
           (cell->index() % GeometryInfo<dim>::max_children_per_cell) == 0)
-        add_indices_recursevly_for_first_child_policy(cell->parent(),
-                                                      cell_id_translator,
-                                                      is_fine);
+        add_indices_recursively_for_first_child_policy(cell->parent(),
+                                                       cell_id_translator,
+                                                       is_fine);
     }
   } // namespace
 
@@ -123,9 +123,9 @@ namespace RepartitioningPolicyTools
 
     for (const auto &cell : tria_fine.active_cell_iterators())
       if (cell->is_locally_owned())
-        add_indices_recursevly_for_first_child_policy(cell,
-                                                      cell_id_translator,
-                                                      is_level_partitions);
+        add_indices_recursively_for_first_child_policy(cell,
+                                                       cell_id_translator,
+                                                       is_level_partitions);
   }
 
 
