@@ -2628,7 +2628,7 @@ namespace internal
 
   // internal helper function for reading data; specialized version where we
   // can use a dedicated load function
-  template <typename Number, unsigned int width>
+  template <typename Number, std::size_t width>
   void
   do_vectorized_read(const Number *src_ptr, VectorizedArray<Number, width> &dst)
   {
@@ -2652,7 +2652,7 @@ namespace internal
 
   // internal helper function for reading data; specialized version where we
   // can use a dedicated gather function
-  template <typename Number, unsigned int width>
+  template <typename Number, std::size_t width>
   void
   do_vectorized_gather(const Number *                  src_ptr,
                        const unsigned int *            indices,
@@ -2676,7 +2676,7 @@ namespace internal
 
   // internal helper function for reading data; specialized version where we
   // can use a dedicated load function
-  template <typename Number, unsigned int width>
+  template <typename Number, std::size_t width>
   void
   do_vectorized_add(const VectorizedArray<Number, width> src, Number *dst_ptr)
   {
@@ -2702,7 +2702,7 @@ namespace internal
 
   // internal helper function for reading data; specialized version where we
   // can use a dedicated gather function
-  template <typename Number, unsigned int width>
+  template <typename Number, std::size_t width>
   void
   do_vectorized_scatter_add(const VectorizedArray<Number, width> src,
                             const unsigned int *                 indices,
