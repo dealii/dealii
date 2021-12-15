@@ -3163,9 +3163,9 @@ namespace internal
     const unsigned int                     n_components,
     const EvaluationFlags::EvaluationFlags evaluation_flag,
     typename Processor::Number2_ *         global_vector_ptr,
-    const std::vector<ArrayView<const typename Processor::Number_>> *sm_ptr,
-    const EvaluationData &                                           fe_eval,
-    typename Processor::VectorizedArrayType_ *                       temp1)
+    const std::vector<ArrayView<const typename Processor::Number2_>> *sm_ptr,
+    const EvaluationData &                                            fe_eval,
+    typename Processor::VectorizedArrayType_ *                        temp1)
   {
     constexpr int dim         = Processor::dim_;
     constexpr int fe_degree   = Processor::fe_degree_;
@@ -3530,7 +3530,7 @@ namespace internal
                             dof_info
                               .dof_indices_contiguous_sm[dof_access_index]
                                                         [cell * n_lanes + v];
-                          vector_ptrs[v] = const_cast<Number *>(
+                          vector_ptrs[v] = const_cast<Number2_ *>(
                             sm_ptr->operator[](temp.first).data() +
                             temp.second + index_offset);
                         }
@@ -3555,7 +3555,7 @@ namespace internal
                                 dof_info
                                   .dof_indices_contiguous_sm[dof_access_index]
                                                             [cells[v]];
-                              vector_ptrs[v] = const_cast<Number *>(
+                              vector_ptrs[v] = const_cast<Number2_ *>(
                                 sm_ptr->operator[](temp.first).data() +
                                 temp.second + index_offset);
                             }
@@ -3682,18 +3682,17 @@ namespace internal
 
 
 
-  template <int dim,
-            typename Number,
-            typename VectorizedArrayType,
-            typename Number2 = Number>
+  template <int dim, typename Number2, typename VectorizedArrayType>
   struct FEFaceEvaluationImplGatherEvaluateSelector
   {
+    using Number = typename VectorizedArrayType::value_type;
+
     template <int fe_degree, int n_q_points_1d>
     static bool
     run(const unsigned int                                n_components,
         const EvaluationFlags::EvaluationFlags            evaluation_flag,
         const Number2 *                                   src_ptr,
-        const std::vector<ArrayView<const Number>> *      sm_ptr,
+        const std::vector<ArrayView<const Number2>> *     sm_ptr,
         FEEvaluationData<dim, VectorizedArrayType, true> &fe_eval)
     {
       Assert(fe_degree > -1, ExcInternalError());
@@ -3806,7 +3805,7 @@ namespace internal
     supports(
       const EvaluationFlags::EvaluationFlags evaluation_flag,
       const MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> &shape_info,
-      const Number *                                             vector_ptr,
+      const Number2 *                                            vector_ptr,
       MatrixFreeFunctions::DoFInfo::IndexStorageVariants         storage)
     {
       const unsigned int fe_degree = shape_info.data.front().fe_degree;
@@ -3884,7 +3883,7 @@ namespace internal
       hermite_grad(T0 &      temp_1,
                    T0 &      temp_2,
                    const T1 &src_ptr_1,
-                   const T2 &src_ptr_2,
+                   const T1 &src_ptr_2,
                    const T2 &grad_weight)
       {
         // case 3a)
@@ -3904,12 +3903,11 @@ namespace internal
 
 
 
-  template <int dim,
-            typename Number,
-            typename VectorizedArrayType,
-            typename Number2 = Number>
+  template <int dim, typename Number2, typename VectorizedArrayType>
   struct FEFaceEvaluationImplIntegrateScatterSelector
   {
+    using Number = typename VectorizedArrayType::value_type;
+
     template <int fe_degree, int n_q_points_1d>
     static bool
     run(const unsigned int                                n_components,
