@@ -3474,7 +3474,10 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
       return;
     }
 
-  const unsigned int *dof_indices[n_lanes];
+  // Allocate pointers, then initialize all of them to nullptrs and
+  // below overwrite the ones we actually use:
+  std::array<const unsigned int *, n_lanes> dof_indices;
+  dof_indices.fill(nullptr);
 
   // Assign the appropriate cell ids for face/cell case and get the pointers
   // to the dof indices of the cells on all lanes
@@ -3515,8 +3518,6 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
           dof_indices[v] =
             this->dof_info->dof_indices.data() + my_index_start[0].first;
         }
-      for (unsigned int v = n_vectorization_actual; v < n_lanes; ++v)
-        dof_indices[v] = nullptr;
     }
   else
     {
@@ -3548,8 +3549,6 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
           dof_indices[v] =
             this->dof_info->dof_indices.data() + my_index_start[0].first;
         }
-      for (unsigned int v = n_vectorization_actual; v < n_lanes; ++v)
-        dof_indices[v] = nullptr;
     }
 
   // Case where we have no constraints throughout the whole cell: Can go
