@@ -2893,7 +2893,7 @@ namespace GridTools
         double best_distance = tolerance;
 
         // Search all of the cells adjacent to the closest vertex of the cell
-        // hint Most likely we will find the point in them.
+        // hint. Most likely we will find the point in them.
         for (unsigned int i = 0; i < n_neighbor_cells; ++i)
           {
             try
