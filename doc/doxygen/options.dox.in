@@ -75,12 +75,12 @@ EXAMPLE_PATH           = @CMAKE_BINARY_DIR@/doc/doxygen/tutorial \
                          @CMAKE_SOURCE_DIR@/examples/doxygen
 EXAMPLE_RECURSIVE      = NO
 IMAGE_PATH             =
-INPUT_FILTER           = ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/filter
+INPUT_FILTER           = ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/filter.pl
 FILTER_SOURCE_FILES    = YES
 
 # Have some user defined commands that we can use in the documentation
 # and that expands to specific text. For some more transformations, see
-# the scripts/filter perl script that is run over the header files before
+# the scripts/filter.pl perl script that is run over the header files before
 # doxygen sees it and that can expand more complex expressions.
 ALIASES += dealiiRequiresUpdateFlags{1}="@note For this function to work properly, the underlying FEValues, FEFaceValues, or FESubfaceValues object on which you call it must have computed the information you are requesting. To do so, the <code>\1</code> flag must be an element of the list of UpdateFlags that you passed to the constructor of this object. See @ref UpdateFlags for more information."
 
