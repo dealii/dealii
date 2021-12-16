@@ -3706,7 +3706,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
           dof_indices[v] =
             this->dof_info->dof_indices.data() + my_index_start[0].first;
         }
-      for (unsigned int v = n_vectorization_actual; v < n_lanes; ++v)
+      for (std::size_t v = n_vectorization_actual; v < n_lanes; ++v)
         dof_indices[v] = nullptr;
     }
   else
@@ -3740,7 +3740,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
           dof_indices[v] =
             this->dof_info->dof_indices.data() + my_index_start[0].first;
         }
-      for (unsigned int v = n_vectorization_actual; v < n_lanes; ++v)
+      for (std::size_t v = n_vectorization_actual; v < n_lanes; ++v)
         dof_indices[v] = nullptr;
     }
 
