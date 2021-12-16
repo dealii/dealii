@@ -68,7 +68,9 @@ namespace
     bool
     run(Fu &fu)
     {
-      if ((degree_fine == (2 * deg + 1)) && (degree_coarse == deg))
+      if ((degree_fine == (2 * deg)) && (degree_coarse == deg))
+        fu.template run<2 * deg, deg>(); // h-MG (FE_Q)
+      else if ((degree_fine == (2 * deg + 1)) && (degree_coarse == deg))
         fu.template run<2 * deg + 1, deg>(); // h-MG
       else if ((degree_fine == deg) && (degree_coarse == std::max(deg / 2, 1u)))
         fu.template run<deg, std::max(deg / 2u, 1u)>(); // p-MG: bisection
@@ -1242,18 +1244,27 @@ namespace internal
       // check if FE is the same
       AssertDimension(fe_coarse.n_dofs_per_cell(), fe_fine.n_dofs_per_cell());
 
+
+      const bool is_feq =
+        fe_fine.n_base_elements() == 1 &&
+        (dynamic_cast<const FE_Q<dim> *>(&fe_fine.base_element(0)) != nullptr);
+
       // number of dofs on coarse and fine cells
       transfer.schemes[0].n_dofs_per_cell_coarse =
         transfer.schemes[0].n_dofs_per_cell_fine =
           transfer.schemes[1].n_dofs_per_cell_coarse =
             fe_coarse.n_dofs_per_cell();
       transfer.schemes[1].n_dofs_per_cell_fine =
-        fe_coarse.n_dofs_per_cell() * GeometryInfo<dim>::max_children_per_cell;
+        is_feq ? (fe_fine.n_components() *
+                  Utilities::pow(2 * fe_fine.degree + 1, dim)) :
+                 (fe_coarse.n_dofs_per_cell() *
+                  GeometryInfo<dim>::max_children_per_cell);
 
       // degree of FE on coarse and fine cell
       transfer.schemes[0].degree_coarse   = transfer.schemes[0].degree_fine =
         transfer.schemes[1].degree_coarse = fe_coarse.degree;
-      transfer.schemes[1].degree_fine     = fe_coarse.degree * 2 + 1;
+      transfer.schemes[1].degree_fine =
+        is_feq ? (fe_coarse.degree * 2) : (fe_coarse.degree * 2 + 1);
 
       // continuous or discontinuous
       transfer.fine_element_is_continuous = fe_fine.n_dofs_per_vertex() > 0;
@@ -1278,7 +1289,7 @@ namespace internal
       const auto cell_local_chilren_indices =
         (reference_cell == ReferenceCells::get_hypercube<dim>()) ?
           get_child_offsets<dim>(transfer.schemes[0].n_dofs_per_cell_coarse,
-                                 fe_fine.degree + 1,
+                                 is_feq ? fe_fine.degree : (fe_fine.degree + 1),
                                  fe_fine.degree) :
           get_child_offsets_general<dim>(
             transfer.schemes[0].n_dofs_per_cell_coarse);
@@ -1450,8 +1461,12 @@ namespace internal
 
             // TODO: data structures are saved in form of DG data structures
             // here
-            const unsigned int shift           = fe->n_dofs_per_cell();
-            const unsigned int n_child_dofs_1d = fe->n_dofs_per_cell() * 2;
+            const unsigned int shift =
+              is_feq ? (fe->n_dofs_per_cell() - fe->n_dofs_per_vertex()) :
+                       (fe->n_dofs_per_cell());
+            const unsigned int n_child_dofs_1d =
+              is_feq ? (fe->n_dofs_per_cell() * 2 - fe->n_dofs_per_vertex()) :
+                       (fe->n_dofs_per_cell() * 2);
 
             {
               transfer.schemes[1].prolongation_matrix_1d.resize(
