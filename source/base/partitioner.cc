@@ -296,8 +296,8 @@ namespace Utilities
               {
                 Assert(i >= ghost_targets_data.back().first,
                        ExcInternalError(
-                         "Expect result of ConsensusAlgorithmsProcess to be "
-                         "sorted"));
+                         "Expect result of ConsensusAlgorithms::Process to be "
+                         "sorted."));
                 if (i == ghost_targets_data.back().first)
                   ghost_targets_data.back().second++;
                 else
