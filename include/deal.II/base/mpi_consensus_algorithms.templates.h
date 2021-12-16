@@ -104,23 +104,36 @@ namespace Utilities
         static CollectiveMutex      mutex;
         CollectiveMutex::ScopedLock lock(mutex, this->comm);
 
-        // 1) send requests and start receiving the answers
+        // 1) Send data to identified targets and start receiving
+        //    the answers from these very same processes.
         start_communication();
 
-        // 2) answer requests and check if all requests of this process have
-        //    been answered
-        while (!check_own_state())
-          answer_requests();
+        // 2) Until all posted receive operations are known to have completed,
+        //    answer requests and keep checking whether all requests of
+        //    this process have been answered.
+        //
+        //    The requests that we catch in the answer_requests() function
+        //    originate elsewhere, that is, they are not in response
+        //    to our own messages
+        //
+        //    Note also that we may not catch all incoming requests in
+        //    the following two lines: our own requests may have been
+        //    satisfied before we've dealt with all incoming requests.
+        //    That's ok: We will get around to dealing with all remaining
+        //    message later. We just want to move on to the next step
+        //    as early as possible.
+        while (all_locally_originated_receives_are_completed() == false)
+          maybe_answer_one_request();
 
-        // 3) signal to all other processes that all requests of this process
+        // 3) Signal to all other processes that all requests of this process
         //    have been answered
         signal_finish();
 
-        // 4) nevertheless, this process has to keep on answering (potential)
+        // 4) Nevertheless, this process has to keep on answering (potential)
         //    incoming requests until all processes have received the
         //    answer to all requests
-        while (!check_global_state())
-          answer_requests();
+        while (all_remotely_originated_receives_are_completed() == false)
+          maybe_answer_one_request();
 
         // 5) process the answer to all requests
         clean_up_and_end_communication();
@@ -133,7 +146,7 @@ namespace Utilities
 
       template <typename T1, typename T2>
       bool
-      NBX<T1, T2>::check_own_state()
+      NBX<T1, T2>::all_locally_originated_receives_are_completed()
       {
 #ifdef DEAL_II_WITH_MPI
         int        all_receive_requests_are_done;
@@ -172,7 +185,7 @@ namespace Utilities
 
       template <typename T1, typename T2>
       bool
-      NBX<T1, T2>::check_global_state()
+      NBX<T1, T2>::all_remotely_originated_receives_are_completed()
       {
 #ifdef DEAL_II_WITH_MPI
         int        all_ranks_reached_barrier;
@@ -190,7 +203,7 @@ namespace Utilities
 
       template <typename T1, typename T2>
       void
-      NBX<T1, T2>::answer_requests()
+      NBX<T1, T2>::maybe_answer_one_request()
       {
 #ifdef DEAL_II_WITH_MPI
 
@@ -199,7 +212,13 @@ namespace Utilities
         const int tag_deliver = Utilities::MPI::internal::Tags::
           consensus_algorithm_nbx_process_deliver;
 
-        // check if there is a request pending
+        // Check if there is a request pending. By selecting the
+        // tag_request tag, these are other processes asking for
+        // our own replies, not these other processes' replies
+        // to our own requests.
+        //
+        // There may be multiple such pending messages. We
+        // only answer one.
         MPI_Status status;
         int        request_is_pending;
         const auto ierr = MPI_Iprobe(MPI_ANY_SOURCE,
@@ -209,9 +228,10 @@ namespace Utilities
                                      &status);
         AssertThrowMPI(ierr);
 
-        if (request_is_pending) // request is pending
+        if (request_is_pending)
           {
-            // get rank of requesting process
+            // Get the rank of the requesting process and add it to the
+            // list of requesting processes (which may contain duplicates).
             const auto other_rank = status.MPI_SOURCE;
 
             Assert(requesting_processes.find(other_rank) ==
@@ -219,7 +239,6 @@ namespace Utilities
                    ExcMessage("Process is requesting a second time!"));
             requesting_processes.insert(other_rank);
 
-            std::vector<T1> buffer_recv;
             // get size of incoming message
             int  number_amount;
             auto ierr = MPI_Get_count(&status, MPI_BYTE, &number_amount);
@@ -227,7 +246,7 @@ namespace Utilities
 
             // allocate memory for incoming message
             Assert(number_amount % sizeof(T1) == 0, ExcInternalError());
-            buffer_recv.resize(number_amount / sizeof(T1));
+            std::vector<T1> buffer_recv(number_amount / sizeof(T1));
             ierr = MPI_Recv(buffer_recv.data(),
                             number_amount,
                             MPI_BYTE,
@@ -237,17 +256,16 @@ namespace Utilities
                             &status);
             AssertThrowMPI(ierr);
 
-            // allocate memory for answer message
+            // Allocate memory for an answer message to the current request,
+            // and ask the 'process' object to produce an answer:
             request_buffers.emplace_back(std::make_unique<std::vector<T2>>());
-            request_requests.emplace_back(std::make_unique<MPI_Request>());
-
-            // process request
             auto &request_buffer = *request_buffers.back();
             this->process.answer_request(other_rank,
                                          buffer_recv,
                                          request_buffer);
 
-            // start to send answer back
+            // Then initiate sending the answer back to the requester.
+            request_requests.emplace_back(std::make_unique<MPI_Request>());
             ierr = MPI_Isend(request_buffer.data(),
                              request_buffer.size() * sizeof(T2),
                              MPI_BYTE,
@@ -284,16 +302,14 @@ namespace Utilities
 
         {
           // 4) send and receive
-          for (unsigned int i = 0; i < n_targets; ++i)
+          for (unsigned int index = 0; index < n_targets; ++index)
             {
-              const unsigned int rank  = targets[i];
-              const unsigned int index = i;
+              const unsigned int rank = targets[index];
 
-              // translate index set to a list of pairs
               auto &send_buffer = send_buffers[index];
               this->process.create_request(rank, send_buffer);
 
-              // start to send data
+              // Post a request to send data
               auto ierr = MPI_Isend(send_buffer.data(),
                                     send_buffer.size() * sizeof(T1),
                                     MPI_BYTE,
@@ -303,7 +319,8 @@ namespace Utilities
                                     &send_requests[index]);
               AssertThrowMPI(ierr);
 
-              // start to receive data
+              // Post a request to receive data from the same
+              // process we sent information to above:
               auto &recv_buffer = recv_buffers[index];
               this->process.prepare_buffer_for_answer(rank, recv_buffer);
               ierr = MPI_Irecv(recv_buffer.data(),

@@ -348,10 +348,12 @@ namespace Utilities
         std::set<unsigned int> requesting_processes;
 
         /**
-         * Check if all request answers have been received by this rank.
+         * Check whether all of the requests for answers that were created by
+         * the communication posted from the current process to other ranks
+         * have been satisfied.
          */
         bool
-        check_own_state();
+        all_locally_originated_receives_are_completed();
 
         /**
          * Signal to all other ranks that this rank has received all request
@@ -361,18 +363,20 @@ namespace Utilities
         signal_finish();
 
         /**
-         * Check if all ranks have received all their request answers, i.e.
-         * all ranks have reached the IBarrier.
+         * Check whether all of the requests for answers that were created by
+         * communication posted from other processes to the current rank
+         * have been satisfied.
          */
         bool
-        check_global_state();
+        all_remotely_originated_receives_are_completed();
 
         /**
-         * A request message from another rank has been received: process the
-         * request and send an answer.
+         * Check whether a request message from another rank has been received,
+         * and if so, process the request by storing the data and sending an
+         * answer.
          */
         void
-        answer_requests();
+        maybe_answer_one_request();
 
         /**
          * Start to send all requests via ISend and post IRecvs for the incoming
