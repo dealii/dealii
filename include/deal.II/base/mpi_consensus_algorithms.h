@@ -532,20 +532,15 @@ namespace Utilities
           const std::function<std::vector<unsigned int>()>
             &function_compute_targets,
           const std::function<void(const unsigned int, std::vector<T1> &)>
-            &function_create_request =
-              [](const unsigned int, std::vector<T1> &) {},
+            &function_create_request = {},
           const std::function<void(const unsigned int,
                                    const std::vector<T1> &,
                                    std::vector<T2> &)>
-            &function_answer_request = [](const unsigned int,
-                                          const std::vector<T1> &,
-                                          std::vector<T2> &) {},
+            &function_answer_request = {},
           const std::function<void(const unsigned int, std::vector<T2> &)>
-            &function_prepare_buffer_for_answer =
-              [](const unsigned int, std::vector<T2> &) {},
+            &function_prepare_buffer_for_answer = {},
           const std::function<void(const unsigned int, const std::vector<T2> &)>
-            &function_read_answer =
-              [](const unsigned int, const std::vector<T2> &) {});
+            &function_read_answer = {});
 
         /**
          * @copydoc Process::compute_targets()
@@ -634,7 +629,8 @@ namespace Utilities
       AnonymousProcess<T1, T2>::create_request(const unsigned int other_rank,
                                                std::vector<T1> &  send_buffer)
       {
-        function_create_request(other_rank, send_buffer);
+        if (function_create_request)
+          function_create_request(other_rank, send_buffer);
       }
 
 
@@ -646,7 +642,8 @@ namespace Utilities
         const std::vector<T1> &buffer_recv,
         std::vector<T2> &      request_buffer)
       {
-        function_answer_request(other_rank, buffer_recv, request_buffer);
+        if (function_answer_request)
+          function_answer_request(other_rank, buffer_recv, request_buffer);
       }
 
 
@@ -657,7 +654,8 @@ namespace Utilities
         const unsigned int other_rank,
         std::vector<T2> &  recv_buffer)
       {
-        function_prepare_buffer_for_answer(other_rank, recv_buffer);
+        if (function_prepare_buffer_for_answer)
+          function_prepare_buffer_for_answer(other_rank, recv_buffer);
       }
 
 
@@ -667,7 +665,8 @@ namespace Utilities
       AnonymousProcess<T1, T2>::read_answer(const unsigned int     other_rank,
                                             const std::vector<T2> &recv_buffer)
       {
-        function_read_answer(other_rank, recv_buffer);
+        if (function_read_answer)
+          function_read_answer(other_rank, recv_buffer);
       }
 
 
