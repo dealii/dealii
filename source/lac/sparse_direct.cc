@@ -199,7 +199,7 @@ SparseDirectUMFPACK::sort_arrays(const BlockSparseMatrix<number> &matrix)
 
               std::swap(Ax[element], Ax[element + 1]);
               if (numbers::NumberTraits<number>::is_complex == true)
-                std::swap(Az[cursor], Az[cursor + 1]);
+                std::swap(Az[element], Az[element + 1]);
 
               ++element;
             }
