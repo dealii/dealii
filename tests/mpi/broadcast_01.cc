@@ -144,7 +144,6 @@ main(int argc, char *argv[])
   check(d);
 
   // broadcast test
-  using namespace std::complex_literals;
   std::complex<double> z (1., 2.);
   check(z);
 }
