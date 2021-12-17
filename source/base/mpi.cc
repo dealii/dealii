@@ -1057,7 +1057,7 @@ namespace Utilities
       }
 
 
-      template bool
+      template std::enable_if_t<true,bool>
       builtin_single_broadcast(const MPI_Comm &, bool, const unsigned int);
       template char
       builtin_single_broadcast(const MPI_Comm &, char, const unsigned int);
