@@ -237,16 +237,15 @@ namespace VectorTools
                   // interested in, however. make sure that all shape functions
                   // that are non-zero for the components we are interested in,
                   // are in fact primitive
-                  for (unsigned int i = 0; i < cell->get_fe().n_dofs_per_cell();
-                       ++i)
+                  for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
                     {
                       const ComponentMask &nonzero_component_array =
-                        cell->get_fe().get_nonzero_components(i);
+                        fe.get_nonzero_components(i);
                       for (unsigned int c = 0; c < n_components; ++c)
                         if ((nonzero_component_array[c] == true) &&
                             (component_mask[c] == true))
                           Assert(
-                            cell->get_fe().is_primitive(i),
+                            fe.is_primitive(i),
                             ExcMessage(
                               "This function can only deal with requested boundary "
                               "values that correspond to primitive (scalar) base "
@@ -268,7 +267,7 @@ namespace VectorTools
                   // element in use here has DoFs on the face at all
                   if ((function_map.find(boundary_component) !=
                        function_map.end()) &&
-                      (cell->get_fe().n_dofs_per_face(face_no) > 0))
+                      (fe.n_dofs_per_face(face_no) > 0))
                     {
                       // face is of the right component
                       x_fe_values.reinit(cell, face_no);
@@ -1034,7 +1033,7 @@ namespace VectorTools
       // (dim of them, starting at first_vector_component) within the
       // overall finite element (which may be an FESystem).
       std::pair<unsigned int, unsigned int> base_indices(0, 0);
-      if (dynamic_cast<const FESystem<dim> *>(&cell->get_fe()) != nullptr)
+      if (dynamic_cast<const FESystem<dim> *>(&fe) != nullptr)
         {
           unsigned int fe_index     = 0;
           unsigned int fe_index_old = 0;
@@ -1066,10 +1065,8 @@ namespace VectorTools
         // FE_Nedelec, which has one base element and one copy of it
         // (with 3 components). In that case, the values of
         // 'base_indices' as initialized above are correct.
-        Assert((dynamic_cast<const FE_Nedelec<dim> *>(&cell->get_fe()) !=
-                nullptr) ||
-                 (dynamic_cast<const FE_NedelecSZ<dim> *>(&cell->get_fe()) !=
-                  nullptr),
+        Assert((dynamic_cast<const FE_Nedelec<dim> *>(&fe) != nullptr) ||
+                 (dynamic_cast<const FE_NedelecSZ<dim> *>(&fe) != nullptr),
                ExcNotImplemented());
 
 
@@ -1344,7 +1341,7 @@ namespace VectorTools
       // If not using FESystem then must be using FE_Nedelec,
       // which has one base element and one copy of it (with 3 components).
       std::pair<unsigned int, unsigned int> base_indices(0, 0);
-      if (dynamic_cast<const FESystem<dim> *>(&cell->get_fe()) != nullptr)
+      if (dynamic_cast<const FESystem<dim> *>(&fe) != nullptr)
         {
           unsigned int fe_index     = 0;
           unsigned int fe_index_old = 0;
@@ -1374,10 +1371,8 @@ namespace VectorTools
         {
           // Assert that the FE is in fact an FE_Nedelec, so that the default
           // base_indices == (0,0) is correct.
-          Assert((dynamic_cast<const FE_Nedelec<dim> *>(&cell->get_fe()) !=
-                  nullptr) ||
-                   (dynamic_cast<const FE_NedelecSZ<dim> *>(&cell->get_fe()) !=
-                    nullptr),
+          Assert((dynamic_cast<const FE_Nedelec<dim> *>(&fe) != nullptr) ||
+                   (dynamic_cast<const FE_NedelecSZ<dim> *>(&fe) != nullptr),
                  ExcNotImplemented());
         }
       const unsigned int degree =
@@ -1873,10 +1868,12 @@ namespace VectorTools
                           if (cell->face(face)->boundary_id() ==
                               boundary_component)
                             {
+                              const FiniteElement<dim> &fe = cell->get_fe();
+
                               // If the FE is an FE_Nothing object there is no
                               // work to do
-                              if (dynamic_cast<const FE_Nothing<dim> *>(
-                                    &cell->get_fe()) != nullptr)
+                              if (dynamic_cast<const FE_Nothing<dim> *>(&fe) !=
+                                  nullptr)
                                 {
                                   return;
                                 }
@@ -1884,20 +1881,20 @@ namespace VectorTools
                               // This is only implemented for FE_Nedelec
                               // elements. If the FE is a FESystem we cannot
                               // check this.
-                              if (dynamic_cast<const FESystem<dim> *>(
-                                    &cell->get_fe()) == nullptr)
+                              if (dynamic_cast<const FESystem<dim> *>(&fe) ==
+                                  nullptr)
                                 {
                                   AssertThrow(
                                     (dynamic_cast<const FE_Nedelec<dim> *>(
-                                       &cell->get_fe()) != nullptr) ||
+                                       &fe) != nullptr) ||
                                       (dynamic_cast<const FE_NedelecSZ<dim> *>(
-                                         &cell->get_fe()) != nullptr),
+                                         &fe) != nullptr),
                                     typename FiniteElement<
                                       dim>::ExcInterpolationNotImplemented());
                                 }
 
                               const unsigned int dofs_per_face =
-                                cell->get_fe().n_dofs_per_face(face);
+                                fe.n_dofs_per_face(face);
 
                               dofs_processed.resize(dofs_per_face);
                               dof_values.resize(dofs_per_face);
@@ -1991,6 +1988,7 @@ namespace VectorTools
                 {
                   if (cell->at_boundary() && cell->is_locally_owned())
                     {
+                      const FiniteElement<dim> &fe = cell->get_fe();
                       for (const unsigned int face : cell->face_indices())
                         {
                           if (cell->face(face)->boundary_id() ==
@@ -1998,8 +1996,8 @@ namespace VectorTools
                             {
                               // If the FE is an FE_Nothing object there is no
                               // work to do
-                              if (dynamic_cast<const FE_Nothing<dim> *>(
-                                    &cell->get_fe()) != nullptr)
+                              if (dynamic_cast<const FE_Nothing<dim> *>(&fe) !=
+                                  nullptr)
                                 {
                                   return;
                                 }
@@ -2007,23 +2005,22 @@ namespace VectorTools
                               // This is only implemented for FE_Nedelec
                               // elements. If the FE is a FESystem we cannot
                               // check this.
-                              if (dynamic_cast<const FESystem<dim> *>(
-                                    &cell->get_fe()) == nullptr)
+                              if (dynamic_cast<const FESystem<dim> *>(&fe) ==
+                                  nullptr)
                                 {
                                   AssertThrow(
                                     (dynamic_cast<const FE_Nedelec<dim> *>(
-                                       &cell->get_fe()) != nullptr) ||
+                                       &fe) != nullptr) ||
                                       (dynamic_cast<const FE_NedelecSZ<dim> *>(
-                                         &cell->get_fe()) != nullptr),
+                                         &fe) != nullptr),
                                     typename FiniteElement<
                                       dim>::ExcInterpolationNotImplemented());
                                 }
 
-                              const unsigned int superdegree =
-                                cell->get_fe().degree;
-                              const unsigned int degree = superdegree - 1;
+                              const unsigned int superdegree = fe.degree;
+                              const unsigned int degree      = superdegree - 1;
                               const unsigned int dofs_per_face =
-                                cell->get_fe().n_dofs_per_face(face);
+                                fe.n_dofs_per_face(face);
 
                               dofs_processed.resize(dofs_per_face);
                               dof_values.resize(dofs_per_face);
@@ -2416,12 +2413,13 @@ namespace VectorTools
                 for (const unsigned int face : cell->face_indices())
                   if (cell->face(face)->boundary_id() == boundary_component)
                     {
+                      const FiniteElement<dim> &fe = cell->get_fe();
+
                       // if the FE is a
                       // FE_Nothing object
                       // there is no work to
                       // do
-                      if (dynamic_cast<const FE_Nothing<dim> *>(
-                            &cell->get_fe()) != nullptr)
+                      if (dynamic_cast<const FE_Nothing<dim> *>(&fe) != nullptr)
                         return;
 
                       // This is only
@@ -2430,12 +2428,11 @@ namespace VectorTools
                       // element. If the FE is
                       // a FESystem we cannot
                       // check this.
-                      if (dynamic_cast<const FESystem<dim> *>(
-                            &cell->get_fe()) == nullptr)
+                      if (dynamic_cast<const FESystem<dim> *>(&fe) == nullptr)
                         {
                           AssertThrow(
-                            dynamic_cast<const FE_RaviartThomas<dim> *>(
-                              &cell->get_fe()) != nullptr,
+                            dynamic_cast<const FE_RaviartThomas<dim> *>(&fe) !=
+                              nullptr,
                             typename FiniteElement<
                               dim>::ExcInterpolationNotImplemented());
                         }
@@ -2486,12 +2483,11 @@ namespace VectorTools
                       // This is only implemented, if the FE is a
                       // Raviart-Thomas element. If the FE is a FESystem we
                       // cannot check this.
-                      if (dynamic_cast<const FESystem<dim> *>(
-                            &cell->get_fe()) == nullptr)
+                      if (dynamic_cast<const FESystem<dim> *>(&fe) == nullptr)
                         {
                           AssertThrow(
-                            dynamic_cast<const FE_RaviartThomas<dim> *>(
-                              &cell->get_fe()) != nullptr,
+                            dynamic_cast<const FE_RaviartThomas<dim> *>(&fe) !=
+                              nullptr,
                             typename FiniteElement<
                               dim>::ExcInterpolationNotImplemented());
                         }
