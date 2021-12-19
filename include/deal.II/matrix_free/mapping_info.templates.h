@@ -3039,8 +3039,8 @@ namespace internal
                               for (unsigned int e = 0; e < dim; ++e)
                                 {
                                   const unsigned int ee = ExtractFaceHelper::
-                                    reorder_face_derivative_indices<dim>(face,
-                                                                         e);
+                                    reorder_face_derivative_indices<dim>(
+                                      fe_val_neigh.get_face_number(), e);
                                   face_data_by_cells[my_q]
                                     .jacobians[1][offset][d][e][v] =
                                     inv_jac[d][ee];
@@ -3078,6 +3078,23 @@ namespace internal
                                                                          e);
                                   face_data_by_cells[my_q]
                                     .jacobians[0][offset + q][d][e][v] =
+                                    inv_jac[d][ee];
+                                }
+                          }
+                      if (is_local && (update_flags & update_jacobians))
+                        for (unsigned int q = 0; q < fe_val.n_quadrature_points;
+                             ++q)
+                          {
+                            DerivativeForm<1, dim, dim> inv_jac =
+                              fe_val_neigh.jacobian(q).covariant_form();
+                            for (unsigned int d = 0; d < dim; ++d)
+                              for (unsigned int e = 0; e < dim; ++e)
+                                {
+                                  const unsigned int ee = ExtractFaceHelper::
+                                    reorder_face_derivative_indices<dim>(
+                                      fe_val_neigh.get_face_number(), e);
+                                  face_data_by_cells[my_q]
+                                    .jacobians[1][offset + q][d][e][v] =
                                     inv_jac[d][ee];
                                 }
                           }

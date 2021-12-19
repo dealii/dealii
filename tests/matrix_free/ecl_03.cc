@@ -44,7 +44,7 @@ main(int argc, char **argv)
 
   // test without shared memory
   {
-    test<2, 2, 3, double, VectorizedArray<double>>(6, false, MPI_COMM_SELF);
+    test<2, 2, 3, double, VectorizedArray<double>>(0, 6, false, MPI_COMM_SELF);
   }
 
   // test with shared memory
@@ -58,7 +58,10 @@ main(int argc, char **argv)
                         MPI_INFO_NULL,
                         &subcommunicator);
 
-    test<2, 2, 3, double, VectorizedArray<double>>(6, false, subcommunicator);
+    test<2, 2, 3, double, VectorizedArray<double>>(0,
+                                                   6,
+                                                   false,
+                                                   subcommunicator);
 
     MPI_Comm_free(&subcommunicator);
   }
