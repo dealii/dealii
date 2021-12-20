@@ -376,6 +376,13 @@ namespace internal
       is_supported(const FiniteElement<dim, spacedim> &fe);
 
       /**
+       * Compute a table with numbers of re-orientation for all versions of
+       * face flips, orientation, and rotation (relating only to 3D elements).
+       */
+      static Table<2, unsigned int>
+      compute_orientation_table(const unsigned int n_points_per_dim);
+
+      /**
        * Return data of univariate shape functions which defines the
        * dimension @p dimension of tensor product shape functions
        * regarding vector component @p component of the underlying

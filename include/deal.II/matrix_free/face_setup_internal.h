@@ -28,6 +28,7 @@
 #include <deal.II/grid/tria_accessor.h>
 
 #include <deal.II/matrix_free/face_info.h>
+#include <deal.II/matrix_free/shape_info.h>
 #include <deal.II/matrix_free/task_info.h>
 
 #include <fstream>
@@ -1041,6 +1042,20 @@ namespace internal
         }
       else
         info.face_orientation = exterior_face_orientation;
+
+      // make sure to select correct subface index in case of non-standard
+      // orientation of the coarser neighbor face
+      if (cell->level() > neighbor->level() && exterior_face_orientation > 0)
+        {
+          const Table<2, unsigned int> orientation =
+            ShapeInfo<double>::compute_orientation_table(2);
+          const std::array<unsigned int, 8> inverted_orientations{
+            {0, 1, 2, 3, 6, 5, 4, 7}};
+          info.subface_index =
+            orientation[inverted_orientations[exterior_face_orientation]]
+                       [info.subface_index];
+        }
+
       return info;
     }
 
