@@ -409,8 +409,12 @@ namespace Step8
 
 
 int
-main()
+main(int argc, char *argv[])
 {
+#ifdef DEAL_II_USE_KOKKOS_BACKEND
+  Kokkos::ScopeGuard kokkos_guard(argc, argv);
+#endif
+
   initlog();
 
   Step8::ElasticProblem<2> elastic_problem_2d;

@@ -164,6 +164,10 @@ test(const unsigned int n_refinements, const unsigned int fe_degree_fine)
 int
 main(int argc, char **argv)
 {
+#ifdef DEAL_II_USE_KOKKOS_BACKEND
+  Kokkos::ScopeGuard kokkos_guard(argc, argv);
+#endif
+
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   MPILogInitAll                    all;
 
@@ -172,4 +176,6 @@ main(int argc, char **argv)
   for (unsigned int n_refinements = 2; n_refinements <= 4; ++n_refinements)
     for (unsigned int degree = 2; degree <= 4; ++degree)
       test<2>(n_refinements, degree);
+
+  return 0;
 }

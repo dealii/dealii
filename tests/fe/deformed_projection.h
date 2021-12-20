@@ -702,8 +702,12 @@ plot_shapes(DoFHandler<2> &dof_handler)
 
 
 int
-main(int /*argc*/, char ** /*argv*/)
+main(int argc, char *argv[])
 {
+#ifdef DEAL_II_USE_KOKKOS_BACKEND
+  Kokkos::ScopeGuard kokkos_guard(argc, argv);
+#endif
+
   std::ofstream logfile(logname);
   logfile.precision(PRECISION);
   logfile.setf(std::ios::fixed);

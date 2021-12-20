@@ -39,6 +39,7 @@
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/vector.h>
+#include <deal.II/lac/vector_memory.h>
 
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/matrix_tools.h>
@@ -437,6 +438,10 @@ namespace Step23
 int
 main(int argc, char **argv)
 {
+#ifdef DEAL_II_USE_KOKKOS_BACKEND
+  Kokkos::ScopeGuard kokkos_guard(argc, argv);
+#endif
+
   initlog();
 
   deallog.depth_file(1);
@@ -475,6 +480,9 @@ main(int argc, char **argv)
                 << std::endl;
       return 1;
     }
+
+  GrowingVectorMemory<
+    LinearAlgebra::distributed::Vector<double>>::release_unused_memory();
 
   return 0;
 }

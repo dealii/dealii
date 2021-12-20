@@ -180,8 +180,12 @@ check()
 
 
 int
-main()
+main(int argc, char *argv[])
 {
+#ifdef DEAL_II_USE_KOKKOS_BACKEND
+  Kokkos::ScopeGuard kokkos_guard(argc, argv);
+#endif
+
   // do not run multithreaded estimate() because that would break the order of
   // the function evaluations that we log above
   MultithreadInfo::set_thread_limit(1);

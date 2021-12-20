@@ -137,9 +137,15 @@ check(const unsigned int fe_degree)
 int
 main(int argc, char **argv)
 {
+#ifdef DEAL_II_USE_KOKKOS_BACKEND
+  Kokkos::ScopeGuard kokkos_guard(argc, argv);
+#endif
+
   // no threading in this test...
   Utilities::MPI::MPI_InitFinalize mpi(argc, argv, 1);
   mpi_initlog();
 
   check<2, double>(1);
+
+  return 0;
 }

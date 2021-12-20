@@ -485,8 +485,15 @@ namespace Step12
 
 
 int
-main()
+main(int argc, char **argv)
 {
+#ifdef DEAL_II_USE_KOKKOS_BACKEND
+  Kokkos::ScopeGuard kokkos_guard(argc, argv);
+#else
+  (void)argc;
+  (void)argv;
+#endif
+
   try
     {
       Step12::AdvectionProblem<2> dgmethod;

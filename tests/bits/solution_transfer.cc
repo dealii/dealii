@@ -32,6 +32,7 @@
 #include <deal.II/grid/tria_iterator.h>
 
 #include <deal.II/lac/vector.h>
+#include <deal.II/lac/vector_memory.h>
 
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/solution_transfer.h>
@@ -192,8 +193,12 @@ transfer(std::ostream &out)
 
 
 int
-main()
+main(int argc, char *argv[])
 {
+#ifdef DEAL_II_USE_KOKKOS_BACKEND
+  Kokkos::ScopeGuard kokkos_guard(argc, argv);
+#endif
+
   initlog();
 
   deallog << "   1D solution transfer" << std::endl;
@@ -204,4 +209,9 @@ main()
 
   deallog << "   3D solution transfer" << std::endl;
   transfer<3>(deallog.get_file_stream());
+
+  GrowingVectorMemory<
+    LinearAlgebra::distributed::Vector<double>>::release_unused_memory();
+
+  return 0;
 }

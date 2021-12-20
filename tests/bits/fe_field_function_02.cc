@@ -34,6 +34,8 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 
+#include <deal.II/lac/vector_memory.h>
+
 #include <deal.II/numerics/fe_field_function.h>
 #include <deal.II/numerics/vector_tools.h>
 
@@ -87,13 +89,19 @@ test()
 }
 
 int
-main()
+main(int argc, char *argv[])
 {
+#ifdef DEAL_II_USE_KOKKOS_BACKEND
+  Kokkos::ScopeGuard kokkos_guard(argc, argv);
+#endif
   initlog();
 
   test<1>();
   test<2>();
   test<3>();
+
+  GrowingVectorMemory<
+    LinearAlgebra::distributed::Vector<double>>::release_unused_memory();
 
   return 0;
 }

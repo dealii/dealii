@@ -688,8 +688,12 @@ namespace Step7
 } // namespace Step7
 
 int
-main()
+main(int argc, char **argv)
 {
+#ifdef DEAL_II_USE_KOKKOS_BACKEND
+  Kokkos::ScopeGuard kokkos_guard(argc, argv);
+#endif
+
   initlog();
 
   const unsigned int dim = 2;

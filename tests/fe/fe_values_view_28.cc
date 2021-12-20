@@ -31,6 +31,7 @@
 #include <deal.II/grid/manifold_lib.h>
 
 #include <deal.II/lac/vector.h>
+#include <deal.II/lac/vector_memory.h>
 
 #include <deal.II/numerics/vector_tools.h>
 
@@ -138,10 +139,17 @@ test_hyper_cube()
 
 
 int
-main()
+main(int argc, char *argv[])
 {
+#ifdef DEAL_II_USE_KOKKOS_BACKEND
+  Kokkos::ScopeGuard kokkos_guard(argc, argv);
+#endif
+
   initlog();
   deallog << std::setprecision(3);
 
   test_hyper_cube<2>();
+
+  GrowingVectorMemory<
+    LinearAlgebra::distributed::Vector<double>>::release_unused_memory();
 }

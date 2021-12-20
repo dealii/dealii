@@ -896,6 +896,11 @@ main(int argc, char **argv)
 {
   initlog();
 #endif
+
+#ifdef DEAL_II_USE_KOKKOS_BACKEND
+  Kokkos::ScopeGuard kokkos_guard(argc, argv);
+#endif
+
   deallog << std::setprecision(3);
 
   {
@@ -908,4 +913,6 @@ main(int argc, char **argv)
     test<3, 2>();
     deallog.pop();
   }
+
+  return 0;
 }

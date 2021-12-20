@@ -144,8 +144,12 @@ do_test(const unsigned int n_refine)
 
 
 int
-main()
+main(int argc, char *argv[])
 {
+#ifdef DEAL_II_USE_KOKKOS_BACKEND
+  Kokkos::ScopeGuard kokkos_guard(argc, argv);
+#endif
+
   initlog();
 
   do_test<2, 1>(0);

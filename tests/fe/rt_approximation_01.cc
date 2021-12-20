@@ -423,8 +423,12 @@ TestProjection(Mapping<2> &mapping, DoFHandler<2> *dof_handler)
 
 
 int
-main()
+main(int argc, char *argv[])
 {
+#ifdef DEAL_II_USE_KOKKOS_BACKEND
+  Kokkos::ScopeGuard kokkos_guard(argc, argv);
+#endif
+
   deallog << std::setprecision(PRECISION);
   deallog << std::fixed;
   logfile << std::setprecision(PRECISION);
@@ -517,6 +521,10 @@ main()
     deallog << "Arbitrary\n" << std::endl;
     TestProjection(mapping_euler, dof_handler);
   }
+
+  GrowingVectorMemory<
+    LinearAlgebra::distributed::Vector<double>>::release_unused_memory();
+
 
   delete (dof_handler);
   delete (dof_handler_def);

@@ -146,8 +146,12 @@ check_parallelepiped(bool colorize, bool log, const unsigned int (&subd)[dim])
 }
 
 int
-main()
+main(int argc, char *argv[])
 {
+#ifdef DEAL_II_USE_KOKKOS_BACKEND
+  Kokkos::ScopeGuard kokkos_guard(argc, argv);
+#endif
+
   initlog(true);
 
   // check_parallelepiped<1> (false, true);

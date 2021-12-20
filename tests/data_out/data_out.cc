@@ -34,6 +34,7 @@
 #include <deal.II/grid/tria_iterator.h>
 
 #include <deal.II/lac/vector.h>
+#include <deal.II/lac/vector_memory.h>
 
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/data_out_faces.h>
@@ -221,8 +222,12 @@ LaplaceProblem<dim>::run()
 
 
 int
-main()
+main(int argc, char *argv[])
 {
+#ifdef DEAL_II_USE_KOKKOS_BACKEND
+  Kokkos::ScopeGuard kokkos_guard(argc, argv);
+#endif
+
   logfile << std::setprecision(2);
   deallog << std::setprecision(2);
 
@@ -231,6 +236,9 @@ main()
 
   LaplaceProblem<3> laplace_problem_3d;
   laplace_problem_3d.run();
+
+  GrowingVectorMemory<
+    LinearAlgebra::distributed::Vector<double>>::release_unused_memory();
 
   return 0;
 }

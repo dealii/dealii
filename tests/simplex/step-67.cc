@@ -2506,6 +2506,10 @@ namespace Euler_DG
 int
 main(int argc, char **argv)
 {
+#ifdef DEAL_II_USE_KOKKOS_BACKEND
+  Kokkos::ScopeGuard kokkos_guard(argc, argv);
+#endif
+
   using namespace Euler_DG;
   using namespace dealii;
 

@@ -275,6 +275,10 @@ test()
 int
 main(int argc, char **argv)
 {
+#ifdef DEAL_II_USE_KOKKOS_BACKEND
+  Kokkos::ScopeGuard kokkos_guard(argc, argv);
+#endif
+
   Utilities::MPI::MPI_InitFinalize mpi_init(argc, argv, 1);
   mpi_initlog();
 
@@ -288,4 +292,6 @@ main(int argc, char **argv)
     test<3, 2>();
     deallog.pop();
   }
+
+  return 0;
 }

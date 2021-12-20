@@ -658,8 +658,12 @@ test()
 
 
 int
-main(int argc, char **argv)
+main(int argc, char *argv[])
 {
+#ifdef DEAL_II_USE_KOKKOS_BACKEND
+  Kokkos::ScopeGuard kokkos_guard(argc, argv);
+#endif
+
   // The original issue with partition_color
   // is hit with 2 threads and 4 cores.
   Utilities::MPI::MPI_InitFinalize mpi_init(argc, argv, 2);

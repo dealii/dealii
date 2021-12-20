@@ -146,8 +146,12 @@ test(const unsigned int n_refinements = 1)
 }
 
 int
-main()
+main(int argc, char *argv[])
 {
+#ifdef DEAL_II_USE_KOKKOS_BACKEND
+  Kokkos::ScopeGuard kokkos_guard(argc, argv);
+#endif
+
   initlog();
   test<2, 1, 2, double, VectorizedArray<double>>();
   test<3, 1, 2, double, VectorizedArray<double>>();

@@ -584,8 +584,12 @@ create_alternate_unitsquare(Triangulation<2> &tria)
 
 
 int
-main(int /*argc*/, char ** /*argv*/)
+main(int argc, char *argv[])
 {
+#ifdef DEAL_II_USE_KOKKOS_BACKEND
+  Kokkos::ScopeGuard kokkos_guard(argc, argv);
+#endif
+
   std::ofstream logfile("output");
   deallog << std::setprecision(PRECISION);
   deallog << std::fixed;
