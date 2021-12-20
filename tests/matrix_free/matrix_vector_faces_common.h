@@ -633,8 +633,9 @@ private:
                                 n_components,
                                 number,
                                 VectorizedArrayType>::value_type;
-    value_type u_plus;
-    u_plus = make_vectorized_array<number, VectorizedArrayType::size()>(1.3);
+    value_type u_plus = {};
+    for (unsigned int d = 0; d < n_components; ++d)
+      u_plus[d] = 1.3;
 
     for (unsigned int face = face_range.first; face < face_range.second; ++face)
       {
