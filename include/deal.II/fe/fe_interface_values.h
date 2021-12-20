@@ -871,7 +871,7 @@ namespace FEInterfaceViews
     //@{
 
     /**
-     * Return the average vector $\average{\mathbf{u}}=\frac{1}{2}(\matbf{u_1} +
+     * Return the average vector $\average{\mathbf{u}}=\frac{1}{2}(\mathbf{u_1} +
      * \mathbf{u_2})$ on the interface for the shape
      * function @p interface_dof_index in the quadrature point @p q_point.
      */
