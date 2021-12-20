@@ -60,19 +60,20 @@ embedded domain (`dim`) is always smaller by one or equal with respect to the
 dimension of the embedding domain $\Omega$ (`spacedim`).
 
 We are going to solve the following differential problem: given a sufficiently
-regular function $g$ on $\Gamma$, find the solution $u$ to
+regular function $g$ on $\Gamma$, a forcing term $f \in L^2(\Omega)$ and a Dirichlet boundary condition
+$u_D$ on $\partial \Omega$, find the solution $u$ to
 
 @f{eqnarray*}{
-- \Delta u + \gamma^T \lambda &=& 0  \text{ in } \Omega\\
+- \Delta u + \gamma^T \lambda &=& f  \text{ in } \Omega\\
 \gamma u &=& g  \text{ in } \Gamma \\
-u & = & 0 \text{ on } \partial\Omega.
+u & = & u_D \text{ on } \partial\Omega.
 @f}
 
-This is a constrained problem, where we are looking for a harmonic function $u$
-that satisfies homogeneous boundary conditions on $\partial\Omega$, subject to
-the constraint $\gamma u = g$ using a Lagrange multiplier.
+This is a constrained problem, where we are looking for a function $u$ that solves the
+Poisson equation and that satisfies Dirichlet boundary conditions $u=u_D$ on $\partial \Omega$,
+subject to the constraint $\gamma u = g$ using a Lagrange multiplier.
 
-This problem has a physical interpretation: harmonic functions, i.e., functions
+When $f=0$ this problem has a physical interpretation: harmonic functions, i.e., functions
 that satisfy the Laplace equation, can be thought of as the displacements of a
 membrane whose boundary values are prescribed. The current situation then
 corresponds to finding the shape of a membrane for which not only the
@@ -98,7 +99,7 @@ conditions on $\partial\Omega$, we obtain the following variational problem:
 
 Given a sufficiently regular function $g$ on $\Gamma$, find the solution $u$ to
 @f{eqnarray*}{
-(\nabla u, \nabla v)_{\Omega} + (\lambda, \gamma v)_{\Gamma} &=& 0 \qquad \forall v \in V(\Omega) \\
+(\nabla u, \nabla v)_{\Omega} + (\lambda, \gamma v)_{\Gamma} &=& (f,v)_{\Omega} \qquad \forall v \in V(\Omega) \\
 (\gamma u, q)_{\Gamma} &=& (g,q)_{\Gamma} \qquad \forall q \in Q(\Gamma),
 @f}
 
@@ -200,7 +201,7 @@ u \\
 \end{pmatrix}
 =
 \begin{pmatrix}
-0 \\
+F \\
 G
 \end{pmatrix}
 \f]
@@ -210,6 +211,7 @@ where
 @f{eqnarray*}{
 K_{ij} &\dealcoloneq& (\nabla v_j, \nabla v_i)_\Omega   \qquad i,j=1,\dots,n \\
 C_{\alpha j} &\dealcoloneq& (v_j, q_\alpha)_\Gamma  \qquad j=1,\dots,n, \alpha = 1,\dots, m \\\\
+F_{i} &\dealcoloneq& (f, v_i)_\Omega   \qquad i=1,\dots,n \\
 G_{\alpha} &\dealcoloneq& (g, q_\alpha)_\Gamma \qquad \alpha = 1,\dots, m.
 @f}
 

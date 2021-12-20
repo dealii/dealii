@@ -32,11 +32,11 @@ parameter file, we see the following:
 # ---------------------
 subsection Distributed Lagrange<1,2>
   set Coupling quadrature order                    = 3
+  set Dirichlet boundary ids                       = 0, 1, 2, 3
   set Embedded configuration finite element degree = 1
   set Embedded space finite element degree         = 1
   set Embedding space finite element degree        = 1
-  set Homogeneous Dirichlet boundary ids           = 0, 1, 2, 3
-  set Initial embedded space refinement            = 7
+  set Initial embedded space refinement            = 8
   set Initial embedding space refinement           = 4
   set Local refinements steps near embedded domain = 3
   set Use displacement in embedded interface       = false
@@ -125,6 +125,88 @@ subsection Distributed Lagrange<1,2>
     set Variable names      = x,y,t
   end
 
+  subsection Embedding Dirichlet boundary conditions
+    # Sometimes it is convenient to use symbolic constants in the expression
+    # that describes the function, rather than having to use its numeric value
+    # everywhere the constant appears. These values can be defined using this
+    # parameter, in the form `var1=value1, var2=value2, ...'.
+    #
+    # A typical example would be to set this runtime parameter to
+    # `pi=3.1415926536' and then use `pi' in the expression of the actual
+    # formula. (That said, for convenience this class actually defines both
+    # `pi' and `Pi' by default, but you get the idea.)
+    set Function constants  =
+
+    # The formula that denotes the function you want to evaluate for
+    # particular values of the independent variables. This expression may
+    # contain any of the usual operations such as addition or multiplication,
+    # as well as all of the common functions such as `sin' or `cos'. In
+    # addition, it may contain expressions like `if(x>0, 1, -1)' where the
+    # expression evaluates to the second argument if the first argument is
+    # true, and to the third argument otherwise. For a full overview of
+    # possible expressions accepted see the documentation of the muparser
+    # library at http://muparser.beltoforion.de/.
+    #
+    # If the function you are describing represents a vector-valued function
+    # with multiple components, then separate the expressions for individual
+    # components by a semicolon.
+    set Function expression = 0
+
+    # The names of the variables as they will be used in the function,
+    # separated by commas. By default, the names of variables at which the
+    # function will be evaluated are `x' (in 1d), `x,y' (in 2d) or `x,y,z' (in
+    # 3d) for spatial coordinates and `t' for time. You can then use these
+    # variable names in your function expression and they will be replaced by
+    # the values of these variables at which the function is currently
+    # evaluated. However, you can also choose a different set of names for the
+    # independent variables at which to evaluate your function expression. For
+    # example, if you work in spherical coordinates, you may wish to set this
+    # input parameter to `r,phi,theta,t' and then use these variable names in
+    # your function expression.
+    set Variable names      = x,y,t
+  end
+
+  subsection Embedding rhs function
+    # Sometimes it is convenient to use symbolic constants in the expression
+    # that describes the function, rather than having to use its numeric value
+    # everywhere the constant appears. These values can be defined using this
+    # parameter, in the form `var1=value1, var2=value2, ...'.
+    #
+    # A typical example would be to set this runtime parameter to
+    # `pi=3.1415926536' and then use `pi' in the expression of the actual
+    # formula. (That said, for convenience this class actually defines both
+    # `pi' and `Pi' by default, but you get the idea.)
+    set Function constants  =
+
+    # The formula that denotes the function you want to evaluate for
+    # particular values of the independent variables. This expression may
+    # contain any of the usual operations such as addition or multiplication,
+    # as well as all of the common functions such as `sin' or `cos'. In
+    # addition, it may contain expressions like `if(x>0, 1, -1)' where the
+    # expression evaluates to the second argument if the first argument is
+    # true, and to the third argument otherwise. For a full overview of
+    # possible expressions accepted see the documentation of the muparser
+    # library at http://muparser.beltoforion.de/.
+    #
+    # If the function you are describing represents a vector-valued function
+    # with multiple components, then separate the expressions for individual
+    # components by a semicolon.
+    set Function expression = 0
+
+    # The names of the variables as they will be used in the function,
+    # separated by commas. By default, the names of variables at which the
+    # function will be evaluated are `x' (in 1d), `x,y' (in 2d) or `x,y,z' (in
+    # 3d) for spatial coordinates and `t' for time. You can then use these
+    # variable names in your function expression and they will be replaced by
+    # the values of these variables at which the function is currently
+    # evaluated. However, you can also choose a different set of names for the
+    # independent variables at which to evaluate your function expression. For
+    # example, if you work in spherical coordinates, you may wish to set this
+    # input parameter to `r,phi,theta,t' and then use these variable names in
+    # your function expression.
+    set Variable names      = x,y,t
+  end
+
   subsection Schur solver control
     set Log frequency = 1
     set Log history   = false
@@ -141,15 +223,13 @@ If you now run the program, you will get a file called `used_parameters.prm`,
 containing a shorter version of the above parameters (without comments and
 documentation), documenting all parameters that were used to run your program:
 @code
-# Parameter file generated with
-# DEAL_II_PACKAGE_VERSION = 9.0.0
 subsection Distributed Lagrange<1,2>
   set Coupling quadrature order                    = 3
+  set Dirichlet boundary ids                       = 0, 1, 2, 3
   set Embedded configuration finite element degree = 1
   set Embedded space finite element degree         = 1
   set Embedding space finite element degree        = 1
-  set Homogeneous Dirichlet boundary ids           = 0, 1, 2, 3
-  set Initial embedded space refinement            = 7
+  set Initial embedded space refinement            = 8
   set Initial embedding space refinement           = 4
   set Local refinements steps near embedded domain = 3
   set Use displacement in embedded interface       = false
@@ -162,6 +242,16 @@ subsection Distributed Lagrange<1,2>
   subsection Embedded value
     set Function constants  =
     set Function expression = 1
+    set Variable names      = x,y,t
+  end
+  subsection Embedding Dirichlet boundary conditions
+    set Function constants  =
+    set Function expression = 0
+    set Variable names      = x,y,t
+  end
+  subsection Embedding rhs function
+    set Function constants  =
+    set Function expression = 0
     set Variable names      = x,y,t
   end
   subsection Schur solver control
@@ -184,7 +274,7 @@ For example, you could use the following (perfectly valid) parameter file with
 this tutorial program:
 @code
 subsection Distributed Lagrange<1,2>
-  set Initial embedded space refinement            = 7
+  set Initial embedded space refinement            = 8
   set Initial embedding space refinement           = 4
   set Local refinements steps near embedded domain = 3
   subsection Embedded configuration
@@ -195,6 +285,16 @@ subsection Distributed Lagrange<1,2>
   subsection Embedded value
     set Function constants  =
     set Function expression = 1
+    set Variable names      = x,y,t
+  end
+  subsection Embedding Dirichlet boundary conditions
+    set Function constants  =
+    set Function expression = 0
+    set Variable names      = x,y,t
+  end
+  subsection Embedding rhs function
+    set Function constants  =
+    set Function expression = 0
     set Variable names      = x,y,t
   end
 end
@@ -230,47 +330,42 @@ as boundary of the portion of $\Omega$ inside $\Gamma$. Similarly on $\partial
 The output of the program will look like the following:
 
 @code
-DEAL::Embedded dofs: 129
-DEAL::Embedding minimal diameter: 0.0110485, embedded maximal diameter: 0.00781250, ratio: 0.707107
+DEAL::Embedded dofs: 257
+DEAL::Embedding minimal diameter: 0.0110485, embedded maximal diameter: 0.00736292, ratio: 0.666416
 DEAL::Embedding dofs: 2429
-DEAL:cg::Starting value 0.166266
-DEAL:cg::Convergence step 108 value 7.65958e-13
+DEAL:cg::Starting value 0.117692
+DEAL:cg::Convergence step 594 value 8.06558e-13
 
 
 +---------------------------------------------+------------+------------+
-| Total CPU time elapsed since start          |     0.586s |            |
+| Total CPU time elapsed since start          |      1.48s |            |
 |                                             |            |            |
 | Section                         | no. calls |  CPU time  | % of total |
 +---------------------------------+-----------+------------+------------+
-| Assemble coupling system        |         1 |     0.132s |        23% |
-| Assemble system                 |         1 |    0.0733s |        12% |
-| Output results                  |         1 |     0.087s |        15% |
-| Setup coupling                  |         1 |    0.0244s |       4.2% |
-| Setup grids and dofs            |         1 |    0.0907s |        15% |
-| Solve system                    |         1 |     0.178s |        30% |
+| Assemble coupling system        |         1 |    0.0381s |       2.6% |
+| Assemble system                 |         1 |     0.153s |        10% |
+| Output results                  |         1 |      0.11s |       7.4% |
+| Setup coupling                  |         1 |    0.0364s |       2.5% |
+| Setup grids and dofs            |         1 |     0.168s |        11% |
+| Solve system                    |         1 |     0.974s |        66% |
 +---------------------------------+-----------+------------+------------+
 
 
 
 +---------------------------------------------+------------+------------+
-| Total wallclock time elapsed since start    |     0.301s |            |
+| Total wallclock time elapsed since start    |     0.798s |            |
 |                                             |            |            |
 | Section                         | no. calls |  wall time | % of total |
 +---------------------------------+-----------+------------+------------+
-| Assemble coupling system        |         1 |    0.0385s |        13% |
-| Assemble system                 |         1 |    0.0131s |       4.3% |
-| Output results                  |         1 |    0.0736s |        24% |
-| Setup coupling                  |         1 |    0.0234s |       7.7% |
-| Setup grids and dofs            |         1 |    0.0679s |        23% |
-| Solve system                    |         1 |    0.0832s |        28% |
+| Assemble coupling system        |         1 |    0.0469s |       5.9% |
+| Assemble system                 |         1 |    0.0348s |       4.4% |
+| Output results                  |         1 |    0.0821s |        10% |
+| Setup coupling                  |         1 |    0.0371s |       4.7% |
+| Setup grids and dofs            |         1 |     0.157s |        20% |
+| Solve system                    |         1 |     0.436s |        55% |
 +---------------------------------+-----------+------------+------------+
 
 @endcode
-
-You may notice that, in terms of CPU time, assembling the coupling system is
-twice as expensive as assembling the standard Poisson system, even though the
-matrix is smaller. This is due to the non-matching nature of the discretization.
-Whether this is acceptable or not, depends on the applications.
 
 If the problem was set in a three-dimensional setting, and the immersed mesh was
 time dependent, it would be much more expensive to recreate the mesh at each
@@ -278,7 +373,7 @@ step rather than use the technique we present here. Moreover, you may be able to
 create a very fast and optimized solver on a uniformly refined square or cubic
 grid, and embed the domain where you want to perform your computation using the
 technique presented here. This would require you to only have a surface
-representatio of your domain (a much cheaper and easier mesh to produce).
+representation of your domain (a much cheaper and easier mesh to produce).
 
 To play around a little bit, we are going to complicate a little the fictitious
 domain as well as the boundary conditions we impose on it.
@@ -308,11 +403,21 @@ subsection Distributed Lagrange<1,2>
     set Function expression = x-.5
     set Variable names      = x,y,t
   end
+  subsection Embedding Dirichlet boundary conditions
+    set Function constants  =
+    set Function expression = 0
+    set Variable names      = x,y,t
+  end
+  subsection Embedding rhs function
+    set Function constants  =
+    set Function expression = 0.0
+    set Variable names      = x,y,t
+  end
   subsection Schur solver control
     set Log frequency = 1
     set Log history   = false
     set Log result    = true
-    set Max steps     = 100000
+    set Max steps     = 1000
     set Reduction     = 1.e-12
     set Tolerance     = 1.e-12
   end
