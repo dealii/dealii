@@ -56,6 +56,7 @@
 #  include <symengine/derivative.h>
 
 #  include <algorithm>
+#  include <functional>
 #  include <memory>
 #  include <sstream>
 #  include <type_traits>
@@ -428,6 +429,27 @@ namespace Differentiation
        */
       std::ostream &
       print(std::ostream &stream) const;
+
+      /**
+       * Computes the hash for the @p expression that this object represents.
+       */
+      void
+      compute_hash();
+
+      /**
+       * Returns @p true if the @p hash for this object has been calculated.
+       */
+      bool
+      is_hashed() const;
+
+      /**
+       * Returns the @p hash for this @p expression.
+       *
+       * This function can only be called if compute_hash() has been called on
+       * @p this expression.
+       */
+      SymEngine::hash_t
+      get_hash() const;
 
       /**
        * Save the value stored by this object to the @p stream.
@@ -869,6 +891,26 @@ namespace Differentiation
        * represent.
        */
       SymEngine::Expression expression;
+
+      /**
+       * A cached value of the hash of the SymEngine class instance.
+       * This can be used to rapidly compare two expressions for equality.
+       * By default, this is not computed and will only be initialized when
+       * compute_hash() is called. This value persists when the object is
+       * copied or serialized/deserialized.
+       */
+      SymEngine::hash_t hash;
+
+      /**
+       * A flag to indicate if this object has been hashed or not.
+       */
+      bool hash_computed;
+
+      /**
+       * Resets the @p hash to an uninitialized state.
+       */
+      void
+      reset_hash();
     };
 
     /**
@@ -1256,6 +1298,8 @@ namespace Differentiation
       sstream << *this;
       const std::string expr = sstream.str();
       ar &              expr;
+      ar &              hash;
+      ar &              hash_computed;
     }
 
 
@@ -1265,6 +1309,8 @@ namespace Differentiation
     {
       std::string expr;
       ar &        expr;
+      ar &        hash;
+      ar &        hash_computed;
       parse(expr);
     }
 

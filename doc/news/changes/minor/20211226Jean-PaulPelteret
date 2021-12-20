@@ -1,0 +1,8 @@
+New: A symbolic expression can now be hashed using the
+SD::Expression::compute_hash() function. The (cached) hash can then be retrieved
+using the SD::Expression::get_hash() function. In some circumstances this can
+aid comparing expressions without resorting to the more costly comparator
+provided by SymEngine.
+
+<br>
+(Jean-Paul Pelteret, 2021/12/26)
