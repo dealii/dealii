@@ -820,10 +820,27 @@ namespace internal
               AssertThrow(false, ExcNotImplemented()); // should not happen!
             }
         },
-        []() -> unsigned int {
-          AssertThrow(false, ExcNotImplemented()); // currently we do not need
-                                                   // active_fe_index() for
-                                                   // children
+        [cell, is_cell_locally_owned, is_cell_remotly_owned, c, id, this]()
+          -> unsigned int {
+          if (is_cell_locally_owned)
+            {
+              const auto cell_fine =
+                (typename DoFHandler<dim>::cell_iterator(
+                   *dof_handler_fine.get_triangulation().create_cell_iterator(
+                     cell->id()),
+                   &dof_handler_fine))
+                  ->child(c);
+
+              return cell_fine->active_fe_index();
+            }
+          else if (is_cell_remotly_owned)
+            {
+              AssertThrow(false, ExcNotImplemented());
+            }
+          else
+            {
+              AssertThrow(false, ExcNotImplemented()); // should not happen!
+            }
 
           return 0;
         });
@@ -1034,7 +1051,7 @@ namespace internal
       touch_count.reinit(transfer.partitioner_fine);
 
       for (const auto i : transfer.level_dof_indices_fine)
-        if (i != numbers::invalid_dof_index)
+        if (i != numbers::invalid_unsigned_int)
           touch_count.local_element(i) += 1;
       touch_count.compress(VectorOperation::add);
 
@@ -1379,7 +1396,7 @@ namespace internal
                 for (unsigned int i = 0;
                      i < transfer.schemes[0].n_dofs_per_cell_coarse;
                      i++)
-                  level_dof_indices_coarse_0[i] = numbers::invalid_dof_index;
+                  level_dof_indices_coarse_0[i] = numbers::invalid_unsigned_int;
               }
 
             // child
@@ -1398,7 +1415,7 @@ namespace internal
                 for (unsigned int i = 0;
                      i < transfer.schemes[0].n_dofs_per_cell_coarse;
                      i++)
-                  level_dof_indices_fine_0[i] = numbers::invalid_dof_index;
+                  level_dof_indices_fine_0[i] = numbers::invalid_unsigned_int;
               }
 
             // move pointers
@@ -1433,7 +1450,7 @@ namespace internal
                          i < transfer.schemes[1].n_dofs_per_cell_coarse;
                          i++)
                       level_dof_indices_coarse_1[i] =
-                        numbers::invalid_dof_index;
+                        numbers::invalid_unsigned_int;
                   }
               }
 
@@ -1454,7 +1471,7 @@ namespace internal
                      i < transfer.schemes[1].n_dofs_per_cell_coarse;
                      i++)
                   level_dof_indices_fine_1[cell_local_chilren_indices[c][i]] =
-                    numbers::invalid_dof_index;
+                    numbers::invalid_unsigned_int;
               }
 
             // move pointers (only once at the end)
@@ -1610,9 +1627,11 @@ namespace internal
               for (unsigned int i = 0;
                    i < transfer.schemes[1].n_dofs_per_cell_coarse;
                    i++)
-                weights_1[cell_local_chilren_indices[c][i]] =
-                  weight_vector.local_element(
-                    dof_indices_fine_1[cell_local_chilren_indices[c][i]]);
+                if (dof_indices_fine_1[cell_local_chilren_indices[c][i]] !=
+                    numbers::invalid_unsigned_int)
+                  weights_1[cell_local_chilren_indices[c][i]] =
+                    weight_vector.local_element(
+                      dof_indices_fine_1[cell_local_chilren_indices[c][i]]);
 
               // move pointers (only once at the end)
               if (c + 1 == GeometryInfo<dim>::max_children_per_cell)
@@ -2408,14 +2427,20 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
                   if (fine_element_is_continuous)
                     for (unsigned int i = 0; i < scheme.n_dofs_per_cell_fine;
                          ++i)
-                      vec_fine_ptr->local_element(indices_fine[i]) +=
-                        read_dof_values(indices_coarse[i], vec_coarse) *
-                        weights[i];
-                  else
-                    for (unsigned int i = 0; i < scheme.n_dofs_per_cell_fine;
-                         ++i)
-                      vec_fine_ptr->local_element(indices_fine[i]) +=
-                        read_dof_values(indices_coarse[i], vec_coarse);
+                      if (indices_coarse[i] != numbers::invalid_unsigned_int &&
+                          indices_fine[i] != numbers::invalid_unsigned_int)
+                        vec_fine_ptr->local_element(indices_fine[i]) +=
+                          read_dof_values(indices_coarse[i], vec_coarse) *
+                          weights[i];
+                      else
+                        for (unsigned int i = 0;
+                             i < scheme.n_dofs_per_cell_fine;
+                             ++i)
+                          if (indices_coarse[i] !=
+                                numbers::invalid_unsigned_int &&
+                              indices_fine[i] != numbers::invalid_unsigned_int)
+                            vec_fine_ptr->local_element(indices_fine[i]) +=
+                              read_dof_values(indices_coarse[i], vec_coarse);
                 }
 
               indices_fine += scheme.n_dofs_per_cell_fine;
@@ -2452,7 +2477,9 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
             {
               for (unsigned int i = 0; i < scheme.n_dofs_per_cell_coarse; ++i)
                 evaluation_data_coarse[i][v] =
-                  read_dof_values(indices_coarse[i], this->vec_coarse);
+                  (indices_coarse[i] != numbers::invalid_unsigned_int) ?
+                    read_dof_values(indices_coarse[i], this->vec_coarse) :
+                    0.0;
               indices_coarse += scheme.n_dofs_per_cell_coarse;
             }
 
@@ -2478,12 +2505,15 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
             {
               if (fine_element_is_continuous)
                 for (unsigned int i = 0; i < scheme.n_dofs_per_cell_fine; ++i)
-                  vec_fine_ptr->local_element(indices_fine[i]) +=
-                    evaluation_data_fine[i][v] * weights[i];
-              else
-                for (unsigned int i = 0; i < scheme.n_dofs_per_cell_fine; ++i)
-                  vec_fine_ptr->local_element(indices_fine[i]) +=
-                    evaluation_data_fine[i][v];
+                  if (indices_fine[i] != numbers::invalid_unsigned_int)
+                    vec_fine_ptr->local_element(indices_fine[i]) +=
+                      evaluation_data_fine[i][v] * weights[i];
+                  else
+                    for (unsigned int i = 0; i < scheme.n_dofs_per_cell_fine;
+                         ++i)
+                      if (indices_fine[i] != numbers::invalid_unsigned_int)
+                        vec_fine_ptr->local_element(indices_fine[i]) +=
+                          evaluation_data_fine[i][v];
 
               indices_fine += scheme.n_dofs_per_cell_fine;
 
@@ -2567,18 +2597,24 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
                   if (fine_element_is_continuous)
                     for (unsigned int i = 0; i < scheme.n_dofs_per_cell_fine;
                          ++i)
-                      distribute_local_to_global(indices_coarse[i],
-                                                 vec_fine_ptr->local_element(
-                                                   indices_fine[i]) *
-                                                   weights[i],
-                                                 this->vec_coarse);
-                  else
-                    for (unsigned int i = 0; i < scheme.n_dofs_per_cell_fine;
-                         ++i)
-                      distribute_local_to_global(indices_coarse[i],
-                                                 vec_fine_ptr->local_element(
-                                                   indices_fine[i]),
-                                                 this->vec_coarse);
+                      if (indices_coarse[i] != numbers::invalid_unsigned_int &&
+                          indices_fine[i] != numbers::invalid_unsigned_int)
+                        distribute_local_to_global(indices_coarse[i],
+                                                   vec_fine_ptr->local_element(
+                                                     indices_fine[i]) *
+                                                     weights[i],
+                                                   this->vec_coarse);
+                      else
+                        for (unsigned int i = 0;
+                             i < scheme.n_dofs_per_cell_fine;
+                             ++i)
+                          if (indices_coarse[i] !=
+                                numbers::invalid_unsigned_int &&
+                              indices_fine[i] != numbers::invalid_unsigned_int)
+                            distribute_local_to_global(
+                              indices_coarse[i],
+                              vec_fine_ptr->local_element(indices_fine[i]),
+                              this->vec_coarse);
                 }
 
               indices_fine += scheme.n_dofs_per_cell_fine;
@@ -2616,11 +2652,16 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
               if (fine_element_is_continuous)
                 for (unsigned int i = 0; i < scheme.n_dofs_per_cell_fine; ++i)
                   evaluation_data_fine[i][v] =
-                    vec_fine_ptr->local_element(indices_fine[i]) * weights[i];
+                    (indices_fine[i] != numbers::invalid_unsigned_int) ?
+                      vec_fine_ptr->local_element(indices_fine[i]) *
+                        weights[i] :
+                      0.0;
               else
                 for (unsigned int i = 0; i < scheme.n_dofs_per_cell_fine; ++i)
                   evaluation_data_fine[i][v] =
-                    vec_fine_ptr->local_element(indices_fine[i]);
+                    (indices_fine[i] != numbers::invalid_unsigned_int) ?
+                      vec_fine_ptr->local_element(indices_fine[i]) :
+                      0.0;
 
               indices_fine += scheme.n_dofs_per_cell_fine;
 
@@ -2649,9 +2690,10 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
           for (unsigned int v = 0; v < n_lanes_filled; ++v)
             {
               for (unsigned int i = 0; i < scheme.n_dofs_per_cell_coarse; ++i)
-                distribute_local_to_global(indices_coarse[i],
-                                           evaluation_data_coarse[i][v],
-                                           this->vec_coarse);
+                if (indices_coarse[i] != numbers::invalid_unsigned_int)
+                  distribute_local_to_global(indices_coarse[i],
+                                             evaluation_data_coarse[i][v],
+                                             this->vec_coarse);
               indices_coarse += scheme.n_dofs_per_cell_coarse;
             }
         }
@@ -2744,7 +2786,9 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
             {
               for (unsigned int i = 0; i < scheme.n_dofs_per_cell_fine; ++i)
                 evaluation_data_fine[i][v] =
-                  vec_fine_ptr->local_element(indices_fine[i]);
+                  (indices_fine[i] != numbers::invalid_unsigned_int) ?
+                    vec_fine_ptr->local_element(indices_fine[i]) :
+                    0.0;
 
               indices_fine += scheme.n_dofs_per_cell_fine;
             }
@@ -2770,8 +2814,9 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
           for (unsigned int v = 0; v < n_lanes_filled; ++v)
             {
               for (unsigned int i = 0; i < scheme.n_dofs_per_cell_coarse; ++i)
-                this->vec_coarse.local_element(indices_coarse[i]) =
-                  evaluation_data_coarse[i][v];
+                if (indices_coarse[i] != numbers::invalid_unsigned_int)
+                  this->vec_coarse.local_element(indices_coarse[i]) =
+                    evaluation_data_coarse[i][v];
               indices_coarse += scheme.n_dofs_per_cell_coarse;
             }
         }
