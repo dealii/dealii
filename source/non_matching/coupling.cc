@@ -959,8 +959,9 @@ namespace NonMatching
           }
       }
   }
-
-#include "coupling.inst"
+#ifndef DOXYGEN
+#  include "coupling.inst"
+#endif
 } // namespace NonMatching
 
 DEAL_II_NAMESPACE_CLOSE
