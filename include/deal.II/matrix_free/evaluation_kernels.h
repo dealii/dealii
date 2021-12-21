@@ -3783,19 +3783,18 @@ namespace internal
                 }
             }
           else if (fe_eval.get_face_orientation() != 0)
-            for (unsigned int c = 0; c < n_components; ++c)
-              adjust_for_face_orientation(
-                dim,
-                n_components,
-                evaluation_flag,
-                &fe_eval.get_shape_info().face_orientations_quad(
-                  fe_eval.get_face_orientation(), 0),
-                false,
-                Utilities::pow(n_q_points_1d, dim - 1),
-                temp,
-                fe_eval.begin_values(),
-                fe_eval.begin_gradients(),
-                fe_eval.begin_hessians());
+            adjust_for_face_orientation(
+              dim,
+              n_components,
+              evaluation_flag,
+              &fe_eval.get_shape_info().face_orientations_quad(
+                fe_eval.get_face_orientation(), 0),
+              false,
+              Utilities::pow(n_q_points_1d, dim - 1),
+              temp,
+              fe_eval.begin_values(),
+              fe_eval.begin_gradients(),
+              fe_eval.begin_hessians());
         }
 
       return false;

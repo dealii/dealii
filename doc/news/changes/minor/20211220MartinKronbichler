@@ -1,0 +1,5 @@
+Fixed: The matrix-free FEFaceEvaluation would produce wrong results in case
+hanging nodes were present on faces with non-standard orientation. This is now
+fixed.
+<br>
+(Martin Kronbichler, 2021/12/20)

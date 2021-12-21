@@ -1,0 +1,145 @@
+
+DEAL:3d::Testing orientation case 0
+DEAL:3d::Orientation index within MatrixFree: 0
+DEAL:3d::Standard cell refined, oriented cell unrefined
+DEAL:3d::Testing FESystem<3>[FE_DGQ<3>(1)^3]
+DEAL:3d::Norm of difference gather_evaluate: 0.00
+DEAL:3d::Orientation index within MatrixFree: 0
+DEAL:3d::Standard cell unrefined, oriented cell refined
+DEAL:3d::Testing FESystem<3>[FE_DGQ<3>(1)^3]
+DEAL:3d::Norm of difference gather_evaluate: 0.00
+DEAL:3d::Testing orientation case 1
+DEAL:3d::Orientation index within MatrixFree: 6
+DEAL:3d::Standard cell refined, oriented cell unrefined
+DEAL:3d::Testing FESystem<3>[FE_DGQ<3>(1)^3]
+DEAL:3d::Norm of difference gather_evaluate: 0.00
+DEAL:3d::Orientation index within MatrixFree: 6
+DEAL:3d::Standard cell unrefined, oriented cell refined
+DEAL:3d::Testing FESystem<3>[FE_DGQ<3>(1)^3]
+DEAL:3d::Norm of difference gather_evaluate: 7.17e-17
+DEAL:3d::Testing orientation case 2
+DEAL:3d::Orientation index within MatrixFree: 2
+DEAL:3d::Standard cell refined, oriented cell unrefined
+DEAL:3d::Testing FESystem<3>[FE_DGQ<3>(1)^3]
+DEAL:3d::Norm of difference gather_evaluate: 0.00
+DEAL:3d::Orientation index within MatrixFree: 2
+DEAL:3d::Standard cell unrefined, oriented cell refined
+DEAL:3d::Testing FESystem<3>[FE_DGQ<3>(1)^3]
+DEAL:3d::Norm of difference gather_evaluate: 0.00
+DEAL:3d::Testing orientation case 3
+DEAL:3d::Orientation index within MatrixFree: 4
+DEAL:3d::Standard cell refined, oriented cell unrefined
+DEAL:3d::Testing FESystem<3>[FE_DGQ<3>(1)^3]
+DEAL:3d::Norm of difference gather_evaluate: 0.00
+DEAL:3d::Orientation index within MatrixFree: 4
+DEAL:3d::Standard cell unrefined, oriented cell refined
+DEAL:3d::Testing FESystem<3>[FE_DGQ<3>(1)^3]
+DEAL:3d::Norm of difference gather_evaluate: 2.69e-17
+DEAL:3d::Testing orientation case 4
+DEAL:3d::Orientation index within MatrixFree: 7
+DEAL:3d::Standard cell refined, oriented cell unrefined
+DEAL:3d::Testing FESystem<3>[FE_DGQ<3>(1)^3]
+DEAL:3d::Norm of difference gather_evaluate: 0.00
+DEAL:3d::Orientation index within MatrixFree: 7
+DEAL:3d::Standard cell unrefined, oriented cell refined
+DEAL:3d::Testing FESystem<3>[FE_DGQ<3>(1)^3]
+DEAL:3d::Norm of difference gather_evaluate: 0.00
+DEAL:3d::Testing orientation case 5
+DEAL:3d::Orientation index within MatrixFree: 1
+DEAL:3d::Standard cell refined, oriented cell unrefined
+DEAL:3d::Testing FESystem<3>[FE_DGQ<3>(1)^3]
+DEAL:3d::Norm of difference gather_evaluate: 0.00
+DEAL:3d::Orientation index within MatrixFree: 1
+DEAL:3d::Standard cell unrefined, oriented cell refined
+DEAL:3d::Testing FESystem<3>[FE_DGQ<3>(1)^3]
+DEAL:3d::Norm of difference gather_evaluate: 7.17e-17
+DEAL:3d::Testing orientation case 6
+DEAL:3d::Orientation index within MatrixFree: 5
+DEAL:3d::Standard cell refined, oriented cell unrefined
+DEAL:3d::Testing FESystem<3>[FE_DGQ<3>(1)^3]
+DEAL:3d::Norm of difference gather_evaluate: 0.00
+DEAL:3d::Orientation index within MatrixFree: 5
+DEAL:3d::Standard cell unrefined, oriented cell refined
+DEAL:3d::Testing FESystem<3>[FE_DGQ<3>(1)^3]
+DEAL:3d::Norm of difference gather_evaluate: 0.00
+DEAL:3d::Testing orientation case 7
+DEAL:3d::Orientation index within MatrixFree: 3
+DEAL:3d::Standard cell refined, oriented cell unrefined
+DEAL:3d::Testing FESystem<3>[FE_DGQ<3>(1)^3]
+DEAL:3d::Norm of difference gather_evaluate: 0.00
+DEAL:3d::Orientation index within MatrixFree: 3
+DEAL:3d::Standard cell unrefined, oriented cell refined
+DEAL:3d::Testing FESystem<3>[FE_DGQ<3>(1)^3]
+DEAL:3d::Norm of difference gather_evaluate: 1.79e-17
+DEAL:3d::Testing orientation case 0
+DEAL:3d::Orientation index within MatrixFree: 0
+DEAL:3d::Standard cell refined, oriented cell unrefined
+DEAL:3d::Testing FESystem<3>[FE_DGQ<3>(2)^3]
+DEAL:3d::Norm of difference gather_evaluate: 0.00
+DEAL:3d::Orientation index within MatrixFree: 0
+DEAL:3d::Standard cell unrefined, oriented cell refined
+DEAL:3d::Testing FESystem<3>[FE_DGQ<3>(2)^3]
+DEAL:3d::Norm of difference gather_evaluate: 0.00
+DEAL:3d::Testing orientation case 1
+DEAL:3d::Orientation index within MatrixFree: 6
+DEAL:3d::Standard cell refined, oriented cell unrefined
+DEAL:3d::Testing FESystem<3>[FE_DGQ<3>(2)^3]
+DEAL:3d::Norm of difference gather_evaluate: 0.00
+DEAL:3d::Orientation index within MatrixFree: 6
+DEAL:3d::Standard cell unrefined, oriented cell refined
+DEAL:3d::Testing FESystem<3>[FE_DGQ<3>(2)^3]
+DEAL:3d::Norm of difference gather_evaluate: 2.24e-17
+DEAL:3d::Testing orientation case 2
+DEAL:3d::Orientation index within MatrixFree: 2
+DEAL:3d::Standard cell refined, oriented cell unrefined
+DEAL:3d::Testing FESystem<3>[FE_DGQ<3>(2)^3]
+DEAL:3d::Norm of difference gather_evaluate: 0.00
+DEAL:3d::Orientation index within MatrixFree: 2
+DEAL:3d::Standard cell unrefined, oriented cell refined
+DEAL:3d::Testing FESystem<3>[FE_DGQ<3>(2)^3]
+DEAL:3d::Norm of difference gather_evaluate: 0.00
+DEAL:3d::Testing orientation case 3
+DEAL:3d::Orientation index within MatrixFree: 4
+DEAL:3d::Standard cell refined, oriented cell unrefined
+DEAL:3d::Testing FESystem<3>[FE_DGQ<3>(2)^3]
+DEAL:3d::Norm of difference gather_evaluate: 0.00
+DEAL:3d::Orientation index within MatrixFree: 4
+DEAL:3d::Standard cell unrefined, oriented cell refined
+DEAL:3d::Testing FESystem<3>[FE_DGQ<3>(2)^3]
+DEAL:3d::Norm of difference gather_evaluate: 4.48e-17
+DEAL:3d::Testing orientation case 4
+DEAL:3d::Orientation index within MatrixFree: 7
+DEAL:3d::Standard cell refined, oriented cell unrefined
+DEAL:3d::Testing FESystem<3>[FE_DGQ<3>(2)^3]
+DEAL:3d::Norm of difference gather_evaluate: 0.00
+DEAL:3d::Orientation index within MatrixFree: 7
+DEAL:3d::Standard cell unrefined, oriented cell refined
+DEAL:3d::Testing FESystem<3>[FE_DGQ<3>(2)^3]
+DEAL:3d::Norm of difference gather_evaluate: 0.00
+DEAL:3d::Testing orientation case 5
+DEAL:3d::Orientation index within MatrixFree: 1
+DEAL:3d::Standard cell refined, oriented cell unrefined
+DEAL:3d::Testing FESystem<3>[FE_DGQ<3>(2)^3]
+DEAL:3d::Norm of difference gather_evaluate: 0.00
+DEAL:3d::Orientation index within MatrixFree: 1
+DEAL:3d::Standard cell unrefined, oriented cell refined
+DEAL:3d::Testing FESystem<3>[FE_DGQ<3>(2)^3]
+DEAL:3d::Norm of difference gather_evaluate: 2.24e-17
+DEAL:3d::Testing orientation case 6
+DEAL:3d::Orientation index within MatrixFree: 5
+DEAL:3d::Standard cell refined, oriented cell unrefined
+DEAL:3d::Testing FESystem<3>[FE_DGQ<3>(2)^3]
+DEAL:3d::Norm of difference gather_evaluate: 0.00
+DEAL:3d::Orientation index within MatrixFree: 5
+DEAL:3d::Standard cell unrefined, oriented cell refined
+DEAL:3d::Testing FESystem<3>[FE_DGQ<3>(2)^3]
+DEAL:3d::Norm of difference gather_evaluate: 0.00
+DEAL:3d::Testing orientation case 7
+DEAL:3d::Orientation index within MatrixFree: 3
+DEAL:3d::Standard cell refined, oriented cell unrefined
+DEAL:3d::Testing FESystem<3>[FE_DGQ<3>(2)^3]
+DEAL:3d::Norm of difference gather_evaluate: 0.00
+DEAL:3d::Orientation index within MatrixFree: 3
+DEAL:3d::Standard cell unrefined, oriented cell refined
+DEAL:3d::Testing FESystem<3>[FE_DGQ<3>(2)^3]
+DEAL:3d::Norm of difference gather_evaluate: 2.24e-17
