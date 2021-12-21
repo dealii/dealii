@@ -281,7 +281,7 @@ MGCoarseGridApplySmoother<VectorType>::operator()(const unsigned int level,
                                                   VectorType &       dst,
                                                   const VectorType & src) const
 {
-  coarse_smooth->smooth(level, dst, src);
+  coarse_smooth->apply(level, dst, src);
 }
 
 /* ------------------ Functions for MGCoarseGridIterativeSolver ------------ */
@@ -425,6 +425,7 @@ void
   Assert(matrix != nullptr, ExcNotInitialized());
   Assert(preconditioner != nullptr, ExcNotInitialized());
 
+  dst = 0;
   internal::MGCoarseGridIterativeSolver::solve(
     *solver, *matrix, *preconditioner, dst, src);
 }
