@@ -2586,6 +2586,40 @@ namespace internal
   }
 
 
+  template <int dim, int loop_length_template, typename Number>
+  inline void
+  weight_fe_q_dofs_by_entity(const VectorizedArray<Number> *weights,
+                             const unsigned int             n_components,
+                             const int                loop_length_non_template,
+                             VectorizedArray<Number> *data)
+  {
+    const int loop_length = loop_length_template != -1 ?
+                              loop_length_template :
+                              loop_length_non_template;
+
+    Assert(loop_length > 0, ExcNotImplemented());
+    Assert(loop_length < 100, ExcNotImplemented());
+    unsigned int degree_to_3[100];
+    degree_to_3[0] = 0;
+    for (int i = 1; i < loop_length - 1; ++i)
+      degree_to_3[i] = 1;
+    degree_to_3[loop_length - 1] = 2;
+    for (unsigned int c = 0; c < n_components; ++c)
+      for (int k = 0; k < (dim > 2 ? loop_length : 1); ++k)
+        for (int j = 0; j < (dim > 1 ? loop_length : 1); ++j)
+          {
+            const unsigned int shift = 9 * degree_to_3[k] + 3 * degree_to_3[j];
+            data[0] *= weights[shift];
+            // loop bound as int avoids compiler warnings in case loop_length
+            // == 1 (polynomial degree 0)
+            for (int i = 1; i < loop_length - 1; ++i)
+              data[i] *= weights[shift + 1];
+            data[loop_length - 1] *= weights[shift + 2];
+            data += loop_length;
+          }
+  }
+
+
 } // end of namespace internal
 
 

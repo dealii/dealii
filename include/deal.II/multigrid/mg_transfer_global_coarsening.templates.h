@@ -40,6 +40,7 @@
 #include <deal.II/hp/dof_handler.h>
 
 #include <deal.II/matrix_free/evaluation_kernels.h>
+#include <deal.II/matrix_free/tensor_product_kernels.h>
 
 #include <deal.II/multigrid/mg_tools.h>
 #include <deal.II/multigrid/mg_transfer_global_coarsening.h>
@@ -1079,6 +1080,121 @@ namespace internal
 
 
 
+    /**
+     * Try to compress weights to Utilities::pow(3, dim) doubles.
+     * Weights of a cell can be compressed if all components have the
+     * same weights.
+     */
+    template <int dim, typename Number>
+    static void
+    compress_weights(
+      MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>
+        &transfer)
+    {
+      const Number *weights = transfer.weights.data();
+
+      // Helper function that extracts the weight. Before doing so,
+      //  it checks the values already set.
+      const auto set = [](auto &mask, const auto &weight) {
+        if (mask == -1.0 || mask == weight)
+          {
+            mask = weight;
+            return true;
+          }
+
+        return false;
+      };
+
+      std::vector<std::array<Number, Utilities::pow(3, dim)>> masks;
+
+      // loop over all schemes
+      for (const auto &scheme : transfer.schemes)
+        {
+          const int    loop_length = scheme.degree_fine + 1;
+          unsigned int degree_to_3[100];
+          degree_to_3[0] = 0;
+          for (int i = 1; i < loop_length - 1; ++i)
+            degree_to_3[i] = 1;
+          degree_to_3[loop_length - 1] = 2;
+
+          // loop over all cells
+          for (unsigned int cell = 0; cell < scheme.n_coarse_cells; ++cell)
+            {
+              std::vector<std::array<Number, Utilities::pow(3, dim)>> mask(
+                transfer.n_components);
+
+              // loop over all components
+              for (unsigned int c = 0; c < transfer.n_components; ++c)
+                mask[c].fill(-1.0);
+
+              for (unsigned int c = 0; c < transfer.n_components; ++c)
+                for (int k = 0; k < (dim > 2 ? loop_length : 1); ++k)
+                  for (int j = 0; j < (dim > 1 ? loop_length : 1); ++j)
+                    {
+                      const unsigned int shift =
+                        9 * degree_to_3[k] + 3 * degree_to_3[j];
+
+                      if (!set(mask[c][shift], weights[0]))
+                        return; // early return, since the entry already
+                                // had a different weight
+
+                      for (int i = 1; i < loop_length - 1; ++i)
+                        if (!set(mask[c][shift + 1], weights[i]))
+                          return;
+
+                      if (!set(mask[c][shift + 2], weights[loop_length - 1]))
+                        return;
+
+                      weights += loop_length;
+                    }
+
+              if (std::find_if(mask.begin(), mask.end(), [&](const auto &a) {
+                    return a != mask[0];
+                  }) != mask.end())
+                return;
+
+              masks.push_back(mask[0]);
+            }
+        }
+
+      // vectorize weights
+      std::vector<std::array<VectorizedArray<Number>, Utilities::pow(3, dim)>>
+        masks_vectorized;
+
+      const unsigned int n_lanes = VectorizedArray<Number>::size();
+
+      unsigned int c = 0;
+
+      for (const auto &scheme : transfer.schemes)
+        {
+          for (unsigned int cell = 0; cell < scheme.n_coarse_cells;
+               cell += n_lanes)
+            {
+              const unsigned int n_lanes_filled =
+                (cell + n_lanes > scheme.n_coarse_cells) ?
+                  (scheme.n_coarse_cells - cell) :
+                  n_lanes;
+
+              std::array<VectorizedArray<Number>, Utilities::pow(3, dim)> mask;
+
+              for (unsigned int v = 0; v < n_lanes_filled; ++v, ++c)
+                {
+                  for (unsigned int i = 0;
+                       i < Utilities::pow<unsigned int>(3, dim);
+                       ++i)
+                    mask[i][v] = masks[c][i];
+                }
+
+              masks_vectorized.push_back(mask);
+            }
+        }
+
+      // copy result
+      transfer.weights_compressed = masks_vectorized;
+    }
+
+
+
   public:
     template <int dim, typename Number>
     static void
@@ -1592,6 +1708,9 @@ namespace internal
                   weights_1 += transfer.schemes[1].n_dofs_per_cell_fine;
                 }
             });
+
+          if (is_feq)
+            compress_weights(transfer);
         }
     }
 
@@ -1668,6 +1787,16 @@ namespace internal
                fine_element_is_discontinuous,
              ExcNotImplemented());
 #endif
+
+      const bool is_feq =
+        std::all_of(dof_handler_fine.get_fe_collection().begin(),
+                    dof_handler_fine.get_fe_collection().end(),
+                    [](const auto &fe) {
+                      return fe.n_base_elements() == 1 &&
+                             (dynamic_cast<const FE_Q<dim> *>(
+                                &fe.base_element(0)) != nullptr);
+                      ;
+                    });
 
       const auto process_cells = [&](const auto &fu) {
         loop_over_active_or_level_cells(
@@ -2096,6 +2225,9 @@ namespace internal
             weights_[fe_pair_no] +=
               transfer.schemes[fe_pair_no].n_dofs_per_cell_fine;
           });
+
+          if (is_feq)
+            compress_weights(transfer);
         }
     }
   };
@@ -2360,9 +2492,14 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
   const unsigned int *indices_coarse = level_dof_indices_coarse.data();
   const unsigned int *indices_fine   = level_dof_indices_fine.data();
   const Number *      weights        = nullptr;
+  const std::array<VectorizedArray<Number>, Utilities::pow(3, dim)>
+    *weights_compressed = nullptr;
 
   if (fine_element_is_continuous)
-    weights = this->weights.data();
+    {
+      weights            = this->weights.data();
+      weights_compressed = this->weights_compressed.data();
+    }
 
   for (const auto &scheme : schemes)
     {
@@ -2370,29 +2507,44 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
       if (scheme.prolongation_matrix.size() == 0 &&
           scheme.prolongation_matrix_1d.size() == 0)
         {
-          for (unsigned int cell = 0; cell < scheme.n_coarse_cells; ++cell)
+          for (unsigned int cell = 0; cell < scheme.n_coarse_cells;
+               cell += n_lanes)
             {
-              if ((scheme.n_dofs_per_cell_fine != 0) &&
-                  (scheme.n_dofs_per_cell_coarse != 0))
+              const unsigned int n_lanes_filled =
+                (cell + n_lanes > scheme.n_coarse_cells) ?
+                  (scheme.n_coarse_cells - cell) :
+                  n_lanes;
+
+              // read from source vector
+              for (unsigned int v = 0; v < n_lanes_filled; ++v)
                 {
+                  if ((scheme.n_dofs_per_cell_fine != 0) &&
+                      (scheme.n_dofs_per_cell_coarse != 0))
+                    {
+                      if (fine_element_is_continuous)
+                        for (unsigned int i = 0;
+                             i < scheme.n_dofs_per_cell_fine;
+                             ++i)
+                          vec_fine_ptr->local_element(indices_fine[i]) +=
+                            read_dof_values(indices_coarse[i], vec_coarse) *
+                            weights[i];
+                      else
+                        for (unsigned int i = 0;
+                             i < scheme.n_dofs_per_cell_fine;
+                             ++i)
+                          vec_fine_ptr->local_element(indices_fine[i]) +=
+                            read_dof_values(indices_coarse[i], vec_coarse);
+                    }
+
+                  indices_fine += scheme.n_dofs_per_cell_fine;
+                  indices_coarse += scheme.n_dofs_per_cell_coarse;
+
                   if (fine_element_is_continuous)
-                    for (unsigned int i = 0; i < scheme.n_dofs_per_cell_fine;
-                         ++i)
-                      vec_fine_ptr->local_element(indices_fine[i]) +=
-                        read_dof_values(indices_coarse[i], vec_coarse) *
-                        weights[i];
-                  else
-                    for (unsigned int i = 0; i < scheme.n_dofs_per_cell_fine;
-                         ++i)
-                      vec_fine_ptr->local_element(indices_fine[i]) +=
-                        read_dof_values(indices_coarse[i], vec_coarse);
+                    weights += scheme.n_dofs_per_cell_fine;
                 }
 
-              indices_fine += scheme.n_dofs_per_cell_fine;
-              indices_coarse += scheme.n_dofs_per_cell_coarse;
-
               if (fine_element_is_continuous)
-                weights += scheme.n_dofs_per_cell_fine;
+                weights_compressed += 1;
             }
 
           continue;
@@ -2444,9 +2596,20 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
           // ------------------------------ fine -------------------------------
 
           // weight and write into dst vector
+          if (fine_element_is_continuous && this->weights_compressed.size() > 0)
+            {
+              internal::weight_fe_q_dofs_by_entity<dim, -1, Number>(
+                weights_compressed->data(),
+                n_components,
+                scheme.degree_fine + 1,
+                evaluation_data_fine.begin());
+              weights_compressed += 1;
+            }
+
           for (unsigned int v = 0; v < n_lanes_filled; ++v)
             {
-              if (fine_element_is_continuous)
+              if (fine_element_is_continuous &&
+                  this->weights_compressed.size() == 0)
                 for (unsigned int i = 0; i < scheme.n_dofs_per_cell_fine; ++i)
                   vec_fine_ptr->local_element(indices_fine[i]) +=
                     evaluation_data_fine[i][v] * weights[i];
@@ -2519,9 +2682,14 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
   const unsigned int *indices_coarse = level_dof_indices_coarse.data();
   const unsigned int *indices_fine   = level_dof_indices_fine.data();
   const Number *      weights        = nullptr;
+  const std::array<VectorizedArray<Number>, Utilities::pow(3, dim)>
+    *weights_compressed = nullptr;
 
   if (fine_element_is_continuous)
-    weights = this->weights.data();
+    {
+      weights            = this->weights.data();
+      weights_compressed = this->weights_compressed.data();
+    }
 
   for (const auto &scheme : schemes)
     {
@@ -2529,33 +2697,47 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
       if (scheme.prolongation_matrix.size() == 0 &&
           scheme.prolongation_matrix_1d.size() == 0)
         {
-          for (unsigned int cell = 0; cell < scheme.n_coarse_cells; ++cell)
+          for (unsigned int cell = 0; cell < scheme.n_coarse_cells;
+               cell += n_lanes)
             {
-              if ((scheme.n_dofs_per_cell_fine != 0) &&
-                  (scheme.n_dofs_per_cell_coarse != 0))
+              const unsigned int n_lanes_filled =
+                (cell + n_lanes > scheme.n_coarse_cells) ?
+                  (scheme.n_coarse_cells - cell) :
+                  n_lanes;
+
+              for (unsigned int v = 0; v < n_lanes_filled; ++v)
                 {
+                  if ((scheme.n_dofs_per_cell_fine != 0) &&
+                      (scheme.n_dofs_per_cell_coarse != 0))
+                    {
+                      if (fine_element_is_continuous)
+                        for (unsigned int i = 0;
+                             i < scheme.n_dofs_per_cell_fine;
+                             ++i)
+                          distribute_local_to_global(
+                            indices_coarse[i],
+                            vec_fine_ptr->local_element(indices_fine[i]) *
+                              weights[i],
+                            this->vec_coarse);
+                      else
+                        for (unsigned int i = 0;
+                             i < scheme.n_dofs_per_cell_fine;
+                             ++i)
+                          distribute_local_to_global(
+                            indices_coarse[i],
+                            vec_fine_ptr->local_element(indices_fine[i]),
+                            this->vec_coarse);
+                    }
+
+                  indices_fine += scheme.n_dofs_per_cell_fine;
+                  indices_coarse += scheme.n_dofs_per_cell_coarse;
+
                   if (fine_element_is_continuous)
-                    for (unsigned int i = 0; i < scheme.n_dofs_per_cell_fine;
-                         ++i)
-                      distribute_local_to_global(indices_coarse[i],
-                                                 vec_fine_ptr->local_element(
-                                                   indices_fine[i]) *
-                                                   weights[i],
-                                                 this->vec_coarse);
-                  else
-                    for (unsigned int i = 0; i < scheme.n_dofs_per_cell_fine;
-                         ++i)
-                      distribute_local_to_global(indices_coarse[i],
-                                                 vec_fine_ptr->local_element(
-                                                   indices_fine[i]),
-                                                 this->vec_coarse);
+                    weights += scheme.n_dofs_per_cell_fine;
                 }
 
-              indices_fine += scheme.n_dofs_per_cell_fine;
-              indices_coarse += scheme.n_dofs_per_cell_coarse;
-
               if (fine_element_is_continuous)
-                weights += scheme.n_dofs_per_cell_fine;
+                weights_compressed += 1;
             }
 
           continue;
@@ -2583,7 +2765,8 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
           // read from source vector and weight
           for (unsigned int v = 0; v < n_lanes_filled; ++v)
             {
-              if (fine_element_is_continuous)
+              if (fine_element_is_continuous &&
+                  this->weights_compressed.size() == 0)
                 for (unsigned int i = 0; i < scheme.n_dofs_per_cell_fine; ++i)
                   evaluation_data_fine[i][v] =
                     vec_fine_ptr->local_element(indices_fine[i]) * weights[i];
@@ -2596,6 +2779,16 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
 
               if (fine_element_is_continuous)
                 weights += scheme.n_dofs_per_cell_fine;
+            }
+
+          if (fine_element_is_continuous && this->weights_compressed.size() > 0)
+            {
+              internal::weight_fe_q_dofs_by_entity<dim, -1, Number>(
+                weights_compressed->data(),
+                n_components,
+                scheme.degree_fine + 1,
+                evaluation_data_fine.begin());
+              weights_compressed += 1;
             }
 
           // ------------------------------ fine -------------------------------

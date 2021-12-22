@@ -420,6 +420,13 @@ private:
   std::vector<Number> weights;
 
   /**
+   * Weights for continuous elements, compressed into 3^dim doubles per
+   * cell if possible.
+   */
+  std::vector<std::array<VectorizedArray<Number>, Utilities::pow(3, dim)>>
+    weights_compressed;
+
+  /**
    * DoF indices of the coarse cells, expressed in indices local to the MPI
    * rank.
    */
