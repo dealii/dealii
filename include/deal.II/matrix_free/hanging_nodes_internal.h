@@ -217,9 +217,8 @@ namespace internal
        * Compute the supported components of all entries of the given
        * hp::FECollection object.
        */
-      std::vector<std::vector<bool>>
-      compute_supported_components(
-        const dealii::hp::FECollection<dim> &fe) const;
+      static std::vector<std::vector<bool>>
+      compute_supported_components(const dealii::hp::FECollection<dim> &fe);
 
       /**
        * Determine the refinement configuration of the given cell.
@@ -383,7 +382,7 @@ namespace internal
     template <int dim>
     inline std::vector<std::vector<bool>>
     HangingNodes<dim>::compute_supported_components(
-      const dealii::hp::FECollection<dim> &fe_collection) const
+      const dealii::hp::FECollection<dim> &fe_collection)
     {
       std::vector<std::vector<bool>> supported_components(
         fe_collection.size(),
@@ -539,6 +538,9 @@ namespace internal
       std::vector<types::global_dof_index> neighbor_dofs_all(idx_offset.back());
       std::vector<types::global_dof_index> neighbor_dofs_all_temp(
         idx_offset.back());
+      std::vector<types::global_dof_index> neighbor_dofs_face(
+        fe.n_dofs_per_face(/*face_no=*/0));
+
 
       const auto get_face_idx = [](const auto n_dofs_1d,
                                    const auto face_no,
@@ -587,12 +589,12 @@ namespace internal
             // read DoFs of parent of face, ...
             cell->neighbor(face_no)
               ->face(cell->neighbor_face_no(face_no))
-              ->get_dof_indices(neighbor_dofs_all,
+              ->get_dof_indices(neighbor_dofs_face,
                                 cell->neighbor(face_no)->active_fe_index());
 
             // ... convert the global DoFs to serial ones, and ...
             if (partitioner)
-              for (auto &index : neighbor_dofs_all)
+              for (auto &index : neighbor_dofs_face)
                 index = partitioner->global_to_local(index);
 
             for (unsigned int base_element_index = 0, comp = 0;
@@ -621,7 +623,7 @@ namespace internal
 
                   // ... extract the DoFs of the current component
                   for (unsigned int i = 0; i < dofs_per_face; ++i)
-                    neighbor_dofs[i] = neighbor_dofs_all
+                    neighbor_dofs[i] = neighbor_dofs_face
                       [component_to_system_index_face_array[comp][i]];
 
                   // fix DoFs depending on orientation, flip, and rotation
