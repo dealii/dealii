@@ -37,8 +37,10 @@ namespace Utilities
     namespace ConsensusAlgorithms
     {
       /**
-       * An interface to be able to use the Interface classes. The main
-       * functionality of the implementations is to return a list of process
+       * A base class for concrete implementations of classes that
+       * provide the information that the algorithms derived from
+       * the ConsensusAlgorithms::Interface base class require. The main
+       * functionality of this class is to return a list of process
        * ranks this process wants data from and to deal with the optional
        * payload of the messages sent/received by the ConsensusAlgorithm
        * classes.
@@ -47,23 +49,24 @@ namespace Utilities
        * - send/request message: A message consisting of a data request
        *   which should be answered by another process. This message is
        *   considered as a request message by the receiving rank.
-       * - recv message: The answer to a send/request message.
+       * - receive message: The answer to a send/request message.
        *
-       * @tparam T1 the type of the elements of the vector to sent
-       * @tparam T2 the type of the elements of the vector to received
+       * @tparam T1 The type of the elements of the vector to sent.
+       * @tparam T2 The type of the elements of the vector to received.
        *
        * @note Since the payloads of the messages are optional, users have
-       *       to deal with buffers themselves. The ConsensusAlgorithm classes
-       * 1) deliver only references to empty vectors (of size 0) the data to be
-       * sent can be inserted to or read from, and 2) communicate these vectors
-       * blindly.
+       *    to deal with buffers themselves. The ConsensusAlgorithm classes
+       *    (1) deliver only references to empty vectors (of size 0) the data
+       *    to be sent can be inserted to or read from, and (2) communicate
+       *    these vectors blindly.
        */
       template <typename T1, typename T2>
       class Process
       {
       public:
         /**
-         * Destructor.
+         * Destructor. Made `virtual` to ensure that one can work with
+         * derived classes.
          */
         virtual ~Process() = default;
 
@@ -77,11 +80,11 @@ namespace Utilities
         compute_targets() = 0;
 
         /**
-         * Add to the request to the process with the specified rank a payload.
+         * Add a payload to the request to the process with the specified rank.
          *
-         * @param[in]  other_rank rank of the process
+         * @param[in]  other_rank Rank of the process.
          * @param[out] send_buffer data to be sent part of the request
-         * (optional)
+         * (optional).
          *
          * @note The buffer is empty. Before using it, you have to set its size.
          */
@@ -95,9 +98,9 @@ namespace Utilities
          * task is to resize the buffer, since it is empty when the function is
          * called.
          *
-         * @param[in]  other_rank rank of the process
-         * @param[out] recv_buffer data to be sent part of the request
-         * (optional)
+         * @param[in]  other_rank Rank of the process.
+         * @param[out] recv_buffer Data to be sent as part of the request
+         * (optional).
          */
         virtual void
         prepare_buffer_for_answer(const unsigned int other_rank,
@@ -107,10 +110,10 @@ namespace Utilities
          * Prepare the buffer where the payload of the answer of the request to
          * the process with the specified rank is saved in.
          *
-         * @param[in]  other_rank rank of the process
-         * @param[in]  buffer_recv received payload (optional)
-         * @param[out] request_buffer payload to be sent as part of the request
-         *             (optional)
+         * @param[in]  other_rank Rank of the process.
+         * @param[in]  buffer_recv Received payload (optional).
+         * @param[out] request_buffer Payload to be sent as part of the request
+         *             (optional).
          *
          * @note The request_buffer is empty. Before using it, you have to set
          *       its size.
@@ -141,23 +144,69 @@ namespace Utilities
        * <a href="https://en.wikipedia.org/wiki/Consensus_algorithm">consensus
        * problem</a>.
        *
-       * Dynamic-sparse means in this context:
-       * - By the time this function is called, the other processes do
+       * The problem consensus algorithms are trying to solve is this: Let's
+       * say you have $P$ processes that work together via MPI. Each (or at
+       * least some) of these want to send information to some of the other
+       * processes, or request information from other processes. No process
+       * knows which other process wants to communicate with them. The challenge
+       * is to determine who needs to talk to whom and what information needs to
+       * be sent, and to come up with an algorithm that ensures that this
+       * communication happens.
+       *
+       * That this is not a trivial problem can be seen by an analogy of the
+       * postal service. There, some senders may request information from some
+       * other participants in the postal service. So they send a letter that
+       * requests the information, but the recipients do not know how many such
+       * letters they need to expect (or that they should expect any at all).
+       * They also do not know how long they need to keep checking their mailbox
+       * for incoming requests. The recipients can be considered reliable,
+       * however: We can assume that everyone who is sent a request puts a
+       * letter with the answer in the mail. This time at least the recipients
+       * of these answers know that they are waiting for these answers because
+       * they have previously sent a request. They do not know in advance,
+       * however, when the answer will arrive and how long to wait. The goal of
+       * a consensus algorithm is then to come up with a strategy in which every
+       * participant can say who they want to send requests to, what that
+       * request is, and is then guaranteed an answer. The algorithm will only
+       * return when all requests by all participants have been answered and the
+       * answer delivered to the requesters.
+       *
+       * The problem is generally posed in terms of *requests* and *answers*.
+       * In practice, either of these two may be empty messages. For example,
+       * processes may simply want to send information to others that they know
+       * these others need; in this case, the "answer" message may be empty
+       * and its meaning is simply an affirmation that the information was
+       * received. Similarly, in some cases processes simply need to inform
+       * others that they want information, but the destination process knows
+       * what information is being requested (based on where in the program
+       * the request happens) and can send that information without there be
+       * any identifying information in the request; in that case, the
+       * request message may be empty and simply serve to identify the
+       * requester. (Each message can be queried for its sender.)
+       *
+       * As mentioned in the first paragraph, the algorithms we are interested
+       * in are what are call "dynamic-sparse". Dynamic-sparse in this context
+       * means the following:
+       * - Dynamic: By the time tha algorithm is called, the other processes do
        *   not know yet that they have to answer requests.
-       * - Each process only has to communicate with a small subset of
+       * - Sparse: Each process only has to communicate with a small subset of
        *   processes of the MPI communicator.
        *
-       * Naturally, the user has to provide:
-       * - A communicator.
-       * - For each rank a list of ranks of processes this process should
-       *   communicate to.
-       * - Functionality to pack/unpack data to be sent/received.
+       * In order to run the communication algorithms, users of this class have
+       * to provide a number of pieces of information:
+       * - An MPI communicator.
+       * - On each process, a list of ranks of processes to communicate with.
+       * - Functionality to pack/unpack data to send as either the original
+       *   request or as part of the answer.
+       * This information is encoded through the `virtual` functions of classes
+       * derived from ConsensusAlgorithm::Process, and the constructor of the
+       * current class receives an object of a type derived from that class as
+       * an argument.
        *
        * This base class only introduces a basic interface to achieve
        * these goals, while derived classes implement different algorithms
-       * to actually compute such communication patterns.
-       * The last two features of the list above this paragraph are implemented
-       * in classes derived from ConsensusAlgorithm::Process.
+       * to actually compute such communication patterns and perform the
+       * communication.
        *
        * @tparam T1 The type of the elements of the vector to be sent.
        * @tparam T2 The type of the elements of the vector to be received.
@@ -166,15 +215,22 @@ namespace Utilities
       class Interface
       {
       public:
+        /**
+         * Constructor. @p process is an object that provides information
+         * about what processes the current process wants to communicate with,
+         * and the data to be sent/received. @p comm is the communicator on
+         * which this communication is to happen.
+         */
         Interface(Process<T1, T2> &process, const MPI_Comm &comm);
 
         /**
-         * Destructor.
+         * Destructor. Made `virtual` to ensure that one can work with
+         * derived classes.
          */
         virtual ~Interface() = default;
 
         /**
-         * Run consensus algorithm and return the requesting processes.
+         * Run the consensus algorithm and return the requesting processes.
          */
         virtual std::vector<unsigned int>
         run() = 0;
