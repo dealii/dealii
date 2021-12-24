@@ -1449,24 +1449,7 @@ namespace Step44
     // Setup the sparsity pattern and tangent matrix
     tangent_matrix.clear();
     {
-      const types::global_dof_index n_dofs_u = dofs_per_block[u_dof];
-      const types::global_dof_index n_dofs_p = dofs_per_block[p_dof];
-      const types::global_dof_index n_dofs_J = dofs_per_block[J_dof];
-
-      BlockDynamicSparsityPattern dsp(n_blocks, n_blocks);
-
-      dsp.block(u_dof, u_dof).reinit(n_dofs_u, n_dofs_u);
-      dsp.block(u_dof, p_dof).reinit(n_dofs_u, n_dofs_p);
-      dsp.block(u_dof, J_dof).reinit(n_dofs_u, n_dofs_J);
-
-      dsp.block(p_dof, u_dof).reinit(n_dofs_p, n_dofs_u);
-      dsp.block(p_dof, p_dof).reinit(n_dofs_p, n_dofs_p);
-      dsp.block(p_dof, J_dof).reinit(n_dofs_p, n_dofs_J);
-
-      dsp.block(J_dof, u_dof).reinit(n_dofs_J, n_dofs_u);
-      dsp.block(J_dof, p_dof).reinit(n_dofs_J, n_dofs_p);
-      dsp.block(J_dof, J_dof).reinit(n_dofs_J, n_dofs_J);
-      dsp.collect_sizes();
+      BlockDynamicSparsityPattern dsp(dofs_per_block, dofs_per_block);
 
       // The global system matrix initially has the following structure
       // @f{align*}
@@ -1511,10 +1494,7 @@ namespace Step44
 
     // We then set up storage vectors
     system_rhs.reinit(dofs_per_block);
-    system_rhs.collect_sizes();
-
     solution_n.reinit(dofs_per_block);
-    solution_n.collect_sizes();
 
     // ...and finally set up the quadrature
     // point history:

@@ -441,11 +441,7 @@ namespace SAND
     const std::vector<BlockVector<double>::size_type> block_sizes = {
       n_p, n_u, n_p, n_u, n_p, n_p, n_p, n_p, n_p};
 
-    BlockDynamicSparsityPattern dsp(9, 9);
-    for (unsigned int k = 0; k < 9; ++k)
-      for (unsigned int j = 0; j < 9; ++j)
-        dsp.block(j, k).reinit(block_sizes[j], block_sizes[k]);
-    dsp.collect_sizes();
+    BlockDynamicSparsityPattern dsp(block_sizes, block_sizes);
 
 
     // The bulk of the function is in setting up which of these

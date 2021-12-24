@@ -695,6 +695,7 @@ namespace Step43
     const unsigned int n_u = darcy_dofs_per_block[0],
                        n_p = darcy_dofs_per_block[1],
                        n_s = saturation_dof_handler.n_dofs();
+    const std::vector<unsigned int> darcy_block_sizes = {n_u, n_p};
 
     std::cout << "Number of active cells: " << triangulation.n_active_cells()
               << " (on " << triangulation.n_levels() << " levels)" << std::endl
@@ -705,17 +706,9 @@ namespace Step43
     {
       darcy_matrix.clear();
 
-      BlockDynamicSparsityPattern dsp(2, 2);
-
-      dsp.block(0, 0).reinit(n_u, n_u);
-      dsp.block(0, 1).reinit(n_u, n_p);
-      dsp.block(1, 0).reinit(n_p, n_u);
-      dsp.block(1, 1).reinit(n_p, n_p);
-
-      dsp.collect_sizes();
+      BlockDynamicSparsityPattern dsp(darcy_block_sizes, darcy_block_sizes);
 
       Table<2, DoFTools::Coupling> coupling(dim + 1, dim + 1);
-
       for (unsigned int c = 0; c < dim + 1; ++c)
         for (unsigned int d = 0; d < dim + 1; ++d)
           if (!((c == dim) && (d == dim)))
@@ -735,14 +728,7 @@ namespace Step43
       Mp_preconditioner.reset();
       darcy_preconditioner_matrix.clear();
 
-      BlockDynamicSparsityPattern dsp(2, 2);
-
-      dsp.block(0, 0).reinit(n_u, n_u);
-      dsp.block(0, 1).reinit(n_u, n_p);
-      dsp.block(1, 0).reinit(n_p, n_u);
-      dsp.block(1, 1).reinit(n_p, n_p);
-
-      dsp.collect_sizes();
+      BlockDynamicSparsityPattern dsp(darcy_block_sizes, darcy_block_sizes);
 
       Table<2, DoFTools::Coupling> coupling(dim + 1, dim + 1);
       for (unsigned int c = 0; c < dim + 1; ++c)
@@ -773,23 +759,19 @@ namespace Step43
       saturation_matrix.reinit(dsp);
     }
 
-    std::vector<IndexSet> darcy_partitioning(2);
-    darcy_partitioning[0] = complete_index_set(n_u);
-    darcy_partitioning[1] = complete_index_set(n_p);
+    const std::vector<IndexSet> darcy_partitioning = {complete_index_set(n_u),
+                                                      complete_index_set(n_p)};
+
     darcy_solution.reinit(darcy_partitioning, MPI_COMM_WORLD);
-    darcy_solution.collect_sizes();
 
     last_computed_darcy_solution.reinit(darcy_partitioning, MPI_COMM_WORLD);
-    last_computed_darcy_solution.collect_sizes();
 
     second_last_computed_darcy_solution.reinit(darcy_partitioning,
                                                MPI_COMM_WORLD);
-    second_last_computed_darcy_solution.collect_sizes();
 
     darcy_rhs.reinit(darcy_partitioning, MPI_COMM_WORLD);
-    darcy_rhs.collect_sizes();
 
-    IndexSet saturation_partitioning = complete_index_set(n_s);
+    const IndexSet saturation_partitioning = complete_index_set(n_s);
     saturation_solution.reinit(saturation_partitioning, MPI_COMM_WORLD);
     old_saturation_solution.reinit(saturation_partitioning, MPI_COMM_WORLD);
     old_old_saturation_solution.reinit(saturation_partitioning, MPI_COMM_WORLD);
