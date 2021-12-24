@@ -943,7 +943,7 @@ namespace Step19
     // properties -- namely, as a single vector indicating the velocity, rather
     // than as `dim` scalar properties. The rest is then the same as above:
     {
-      Particles::DataOut<dim, dim> particle_out;
+      Particles::DataOut<dim> particle_out;
       particle_out.build_patches(
         particle_handler,
         std::vector<std::string>(dim, "velocity"),
