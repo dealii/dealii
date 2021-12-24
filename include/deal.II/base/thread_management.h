@@ -753,10 +753,12 @@ namespace Threads
    * function object without arguments and returning an object of type RT (or
    * void).
    *
+   * @deprecated Use std::thread or std::jthread instead.
+   *
    * @ingroup threads
    */
   template <typename RT>
-  inline Thread<RT>
+  DEAL_II_DEPRECATED inline Thread<RT>
   new_thread(const std::function<RT()> &function)
   {
     return Thread<RT>(function);
@@ -826,10 +828,12 @@ namespace Threads
    *   or capture have a lifetime that extends at least until the time
    *   where the thread finishes.
    *
+   * @deprecated Use std::thread or std::jthread instead.
+   *
    * @ingroup CPP11
    */
   template <typename FunctionObjectType>
-  inline auto
+  DEAL_II_DEPRECATED inline auto
   new_thread(FunctionObjectType function_object)
     -> Thread<decltype(function_object())>
   {
@@ -843,10 +847,12 @@ namespace Threads
    * Overload of the new_thread function for non-member or static member
    * functions.
    *
+   * @deprecated Use std::thread or std::jthread instead.
+   *
    * @ingroup threads
    */
   template <typename RT, typename... Args>
-  inline Thread<RT>
+  DEAL_II_DEPRECATED inline Thread<RT>
   new_thread(RT (*fun_ptr)(Args...), typename identity<Args>::type... args)
   {
     auto dummy = std::make_tuple(internal::maybe_make_ref<Args>::act(args)...);
@@ -859,10 +865,12 @@ namespace Threads
   /**
    * Overload of the non-const new_thread function for member functions.
    *
+   * @deprecated Use std::thread or std::jthread instead.
+   *
    * @ingroup threads
    */
   template <typename RT, typename C, typename... Args>
-  inline Thread<RT>
+  DEAL_II_DEPRECATED inline Thread<RT>
   new_thread(RT (C::*fun_ptr)(Args...),
              typename identity<C>::type &c,
              typename identity<Args>::type... args)
@@ -875,10 +883,12 @@ namespace Threads
   /**
    * Overload of the new_thread function for const member functions.
    *
+   * @deprecated Use std::thread or std::jthread instead.
+   *
    * @ingroup threads
    */
   template <typename RT, typename C, typename... Args>
-  inline Thread<RT>
+  DEAL_II_DEPRECATED inline Thread<RT>
   new_thread(RT (C::*fun_ptr)(Args...) const,
              typename identity<const C>::type &c,
              typename identity<Args>::type... args)
