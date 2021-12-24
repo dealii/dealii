@@ -19,6 +19,7 @@
 #include <deal.II/distributed/shared_tria.h>
 #include <deal.II/distributed/tria.h>
 
+#include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_reordering.h>
 #include <deal.II/grid/grid_tools.h>
@@ -7493,35 +7494,29 @@ namespace GridGenerator
   flatten_triangulation(const Triangulation<dim, spacedim1> &in_tria,
                         Triangulation<dim, spacedim2> &      out_tria)
   {
-    const parallel::distributed::Triangulation<dim, spacedim1> *pt =
-      dynamic_cast<
-        const parallel::distributed::Triangulation<dim, spacedim1> *>(&in_tria);
+    Assert((dynamic_cast<
+              const parallel::distributed::Triangulation<dim, spacedim1> *>(
+              &in_tria) == nullptr),
+           ExcMessage(
+             "This function cannot be used on "
+             "parallel::distributed::Triangulation objects as inputs."));
 
-    (void)pt;
-    Assert(
-      pt == nullptr,
-      ExcMessage(
-        "Cannot use this function on parallel::distributed::Triangulation."));
-
-    std::vector<Point<spacedim2>> v;
-    std::vector<CellData<dim>>    cells;
-    SubCellData                   subcelldata;
 
     const unsigned int spacedim = std::min(spacedim1, spacedim2);
     const std::vector<Point<spacedim1>> &in_vertices = in_tria.get_vertices();
 
-    v.resize(in_vertices.size());
+    // Create an array of vertices, with components either truncated
+    // or extended by zeroes.
+    std::vector<Point<spacedim2>> v(in_vertices.size());
     for (unsigned int i = 0; i < in_vertices.size(); ++i)
       for (unsigned int d = 0; d < spacedim; ++d)
         v[i][d] = in_vertices[i][d];
 
-    cells.resize(in_tria.n_active_cells());
-    typename Triangulation<dim, spacedim1>::active_cell_iterator
-      cell = in_tria.begin_active(),
-      endc = in_tria.end();
-
-    for (unsigned int id = 0; cell != endc; ++cell, ++id)
+    std::vector<CellData<dim>> cells(in_tria.n_active_cells());
+    for (const auto &cell : in_tria.active_cell_iterators())
       {
+        const unsigned int id = cell->active_cell_index();
+
         cells[id].vertices.resize(cell->n_vertices());
         for (const auto i : cell->vertex_indices())
           cells[id].vertices[i] = cell->vertex_index(i);
@@ -7529,60 +7524,60 @@ namespace GridGenerator
         cells[id].manifold_id = cell->manifold_id();
       }
 
-    if (dim > 1)
+    SubCellData subcelldata;
+    switch (dim)
       {
-        typename Triangulation<dim, spacedim1>::active_face_iterator
-          face = in_tria.begin_active_face(),
-          endf = in_tria.end_face();
-
-        // Face counter for both dim == 2 and dim == 3
-        unsigned int f = 0;
-        switch (dim)
+        case 1:
           {
-            case 2:
-              {
-                subcelldata.boundary_lines.resize(in_tria.n_active_faces());
-                for (; face != endf; ++face)
-                  if (face->at_boundary())
-                    {
-                      subcelldata.boundary_lines[f].vertices.resize(
-                        face->n_vertices());
-                      for (const auto i : face->vertex_indices())
-                        subcelldata.boundary_lines[f].vertices[i] =
-                          face->vertex_index(i);
-                      subcelldata.boundary_lines[f].boundary_id =
-                        face->boundary_id();
-                      subcelldata.boundary_lines[f].manifold_id =
-                        face->manifold_id();
-                      ++f;
-                    }
-                subcelldata.boundary_lines.resize(f);
-              }
-              break;
-            case 3:
-              {
-                subcelldata.boundary_quads.resize(in_tria.n_active_faces());
-                for (; face != endf; ++face)
-                  if (face->at_boundary())
-                    {
-                      subcelldata.boundary_quads[f].vertices.resize(
-                        face->n_vertices());
-                      for (const auto i : face->vertex_indices())
-                        subcelldata.boundary_quads[f].vertices[i] =
-                          face->vertex_index(i);
-                      subcelldata.boundary_quads[f].boundary_id =
-                        face->boundary_id();
-                      subcelldata.boundary_quads[f].manifold_id =
-                        face->manifold_id();
-                      ++f;
-                    }
-                subcelldata.boundary_quads.resize(f);
-              }
-              break;
-            default:
-              Assert(false, ExcInternalError());
+            // Nothing to do in 1d
+            break;
           }
+
+        case 2:
+          {
+            unsigned int f = 0;
+            subcelldata.boundary_lines.resize(in_tria.n_active_faces());
+            for (const auto &face : in_tria.active_face_iterators() |
+                                      IteratorFilters::AtBoundary())
+              {
+                subcelldata.boundary_lines[f].vertices.resize(
+                  face->n_vertices());
+                for (const auto i : face->vertex_indices())
+                  subcelldata.boundary_lines[f].vertices[i] =
+                    face->vertex_index(i);
+                subcelldata.boundary_lines[f].boundary_id = face->boundary_id();
+                subcelldata.boundary_lines[f].manifold_id = face->manifold_id();
+                ++f;
+              }
+            subcelldata.boundary_lines.resize(f);
+
+            break;
+          }
+
+        case 3:
+          {
+            unsigned int f = 0;
+            subcelldata.boundary_quads.resize(in_tria.n_active_faces());
+            for (const auto &face : in_tria.active_face_iterators() |
+                                      IteratorFilters::AtBoundary())
+              {
+                subcelldata.boundary_quads[f].vertices.resize(
+                  face->n_vertices());
+                for (const auto i : face->vertex_indices())
+                  subcelldata.boundary_quads[f].vertices[i] =
+                    face->vertex_index(i);
+                subcelldata.boundary_quads[f].boundary_id = face->boundary_id();
+                subcelldata.boundary_quads[f].manifold_id = face->manifold_id();
+                ++f;
+              }
+            subcelldata.boundary_quads.resize(f);
+
+            break;
+          }
+        default:
+          Assert(false, ExcInternalError());
       }
+
     out_tria.create_triangulation(v, cells, subcelldata);
   }
 
