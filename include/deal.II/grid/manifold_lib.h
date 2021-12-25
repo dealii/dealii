@@ -472,6 +472,11 @@ private:
    * Relative tolerance to measure zero distances.
    */
   const double tolerance;
+
+  /**
+   * The direction vector perpendicular to both direction and normal_direction.
+   */
+  const Tensor<1, spacedim> dxn;
 };
 
 /**
