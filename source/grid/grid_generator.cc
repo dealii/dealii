@@ -7535,42 +7535,40 @@ namespace GridGenerator
 
         case 2:
           {
-            unsigned int f = 0;
-            subcelldata.boundary_lines.resize(in_tria.n_active_faces());
             for (const auto &face : in_tria.active_face_iterators() |
                                       IteratorFilters::AtBoundary())
               {
-                subcelldata.boundary_lines[f].vertices.resize(
-                  face->n_vertices());
+                CellData<1> boundary_line;
+
+                boundary_line.vertices.resize(face->n_vertices());
                 for (const auto i : face->vertex_indices())
-                  subcelldata.boundary_lines[f].vertices[i] =
-                    face->vertex_index(i);
-                subcelldata.boundary_lines[f].boundary_id = face->boundary_id();
-                subcelldata.boundary_lines[f].manifold_id = face->manifold_id();
-                ++f;
+                  boundary_line.vertices[i] = face->vertex_index(i);
+                boundary_line.boundary_id = face->boundary_id();
+                boundary_line.manifold_id = face->manifold_id();
+
+                subcelldata.boundary_lines.emplace_back(
+                  std::move(boundary_line));
               }
-            subcelldata.boundary_lines.resize(f);
 
             break;
           }
 
         case 3:
           {
-            unsigned int f = 0;
-            subcelldata.boundary_quads.resize(in_tria.n_active_faces());
             for (const auto &face : in_tria.active_face_iterators() |
                                       IteratorFilters::AtBoundary())
               {
-                subcelldata.boundary_quads[f].vertices.resize(
-                  face->n_vertices());
+                CellData<2> boundary_face;
+
+                boundary_face.vertices.resize(face->n_vertices());
                 for (const auto i : face->vertex_indices())
-                  subcelldata.boundary_quads[f].vertices[i] =
-                    face->vertex_index(i);
-                subcelldata.boundary_quads[f].boundary_id = face->boundary_id();
-                subcelldata.boundary_quads[f].manifold_id = face->manifold_id();
-                ++f;
+                  boundary_face.vertices[i] = face->vertex_index(i);
+                boundary_face.boundary_id = face->boundary_id();
+                boundary_face.manifold_id = face->manifold_id();
+
+                subcelldata.boundary_quads.emplace_back(
+                  std::move(boundary_face));
               }
-            subcelldata.boundary_quads.resize(f);
 
             break;
           }
