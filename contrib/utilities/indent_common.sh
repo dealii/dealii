@@ -259,8 +259,8 @@ fix_permissions()
 export -f fix_permissions
 
 #
-# Collect all files found in a list of directories "${1}$" matching a
-# regular expression "${2}$", and process them with a command "${3}" on 10
+# Collect all files found in a list of directories "${1}" matching a
+# regular expression "${2}", and process them with a command "${3}" on 10
 # threads in parallel.
 #
 # The command line is a bit complicated, so let's discuss the more
@@ -271,9 +271,9 @@ export -f fix_permissions
 #   serves as a good candidate to separate individual file names.
 # - For 'xargs', -0 does the opposite: it separates filenames that are
 #   delimited by \0
-# - the options "-n 1 -P 10" make sure that the following script will be
-#   called exactly with one file name as argument at a time, but we allow
-#   execution for up to 10 times in parallel
+# - the option "-P 10" starts up to 10 processes in parallel. -0 implies '-L 1'
+#   (one argument to each command) so each launch of clang-format corresponds
+#   to exactly one file.
 #
 
 process()
@@ -282,11 +282,11 @@ process()
   case "${OSTYPE}" in
     darwin*)
       find -E ${directories} -regex "${2}" -print0 |
-        xargs -0 -n 1 -P 10 -I {} bash -c "${3} {}"
+        xargs -0 -P 10 -I {} bash -c "${3} {}"
       ;;
     *)
       find ${directories} -regextype egrep -regex "${2}" -print0 |
-        xargs -0 -n 1 -P 10 -I {} bash -c "${3} {}"
+        xargs -0 -P 10 -I {} bash -c "${3} {}"
       ;;
   esac
 }
@@ -318,7 +318,7 @@ process_changed()
       sort -u |
       xargs -n 1 ls -d 2>/dev/null |
       grep -E "^${2}$" |
-      ${XARGS} '\n' -n 1 -P 10 -I {} bash -c "${3} {}"
+      ${XARGS} '\n' -P 10 -I {} bash -c "${3} {}"
 }
 
 #
