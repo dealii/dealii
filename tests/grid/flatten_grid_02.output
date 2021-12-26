@@ -1,0 +1,423 @@
+
+DEAL::2d
+DEAL::Face 1
+DEAL::  center = 0.00000 0.250000
+DEAL::  boundary id = 101
+DEAL::  manifold id = 102
+DEAL::Face 0
+DEAL::  center = 0.250000 0.00000
+DEAL::  boundary id = 101
+DEAL::  manifold id = 102
+DEAL::Face 2
+DEAL::  center = 1.00000 0.250000
+DEAL::  boundary id = 101
+DEAL::  manifold id = 102
+DEAL::Face 4
+DEAL::  center = 0.750000 0.00000
+DEAL::  boundary id = 101
+DEAL::  manifold id = 102
+DEAL::Face 6
+DEAL::  center = 0.00000 0.750000
+DEAL::  boundary id = 101
+DEAL::  manifold id = 102
+DEAL::Face 3
+DEAL::  center = 0.250000 1.00000
+DEAL::  boundary id = 101
+DEAL::  manifold id = 102
+DEAL::Face 8
+DEAL::  center = 1.00000 0.750000
+DEAL::  boundary id = 101
+DEAL::  manifold id = 102
+DEAL::Face 9
+DEAL::  center = 0.750000 1.00000
+DEAL::  boundary id = 101
+DEAL::  manifold id = 102
+DEAL::
+DEAL::
+DEAL::3d
+DEAL::Face 2
+DEAL::  center = 0.00000 0.250000 0.250000
+DEAL::  boundary id = 101
+DEAL::  manifold id = 102
+DEAL::  Edge 2
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 17
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 1
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 20
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::Face 0
+DEAL::  center = 0.250000 0.00000 0.250000
+DEAL::  boundary id = 101
+DEAL::  manifold id = 102
+DEAL::  Edge 0
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 19
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 2
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 13
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::Face 1
+DEAL::  center = 0.250000 0.250000 0.00000
+DEAL::  boundary id = 101
+DEAL::  manifold id = 102
+DEAL::  Edge 1
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 14
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 0
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 16
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::Face 3
+DEAL::  center = 1.00000 0.250000 0.250000
+DEAL::  boundary id = 101
+DEAL::  manifold id = 102
+DEAL::  Edge 4
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 22
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 3
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 24
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::Face 6
+DEAL::  center = 0.750000 0.00000 0.250000
+DEAL::  boundary id = 101
+DEAL::  manifold id = 102
+DEAL::  Edge 12
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 36
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 13
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 4
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::Face 8
+DEAL::  center = 0.750000 0.250000 0.00000
+DEAL::  boundary id = 101
+DEAL::  manifold id = 102
+DEAL::  Edge 14
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 3
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 12
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 39
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::Face 11
+DEAL::  center = 0.00000 0.750000 0.250000
+DEAL::  boundary id = 101
+DEAL::  manifold id = 102
+DEAL::  Edge 17
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 6
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 15
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 42
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::Face 4
+DEAL::  center = 0.250000 1.00000 0.250000
+DEAL::  boundary id = 101
+DEAL::  manifold id = 102
+DEAL::  Edge 5
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 28
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 6
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 26
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::Face 9
+DEAL::  center = 0.250000 0.750000 0.00000
+DEAL::  boundary id = 101
+DEAL::  manifold id = 102
+DEAL::  Edge 15
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 40
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 16
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 5
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::Face 15
+DEAL::  center = 1.00000 0.750000 0.250000
+DEAL::  boundary id = 101
+DEAL::  manifold id = 102
+DEAL::  Edge 22
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 7
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 21
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 45
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::Face 17
+DEAL::  center = 0.750000 1.00000 0.250000
+DEAL::  boundary id = 101
+DEAL::  manifold id = 102
+DEAL::  Edge 25
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 47
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 26
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 7
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::Face 25
+DEAL::  center = 0.750000 0.750000 0.00000
+DEAL::  boundary id = 101
+DEAL::  manifold id = 102
+DEAL::  Edge 40
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 21
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 39
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 25
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::Face 12
+DEAL::  center = 0.00000 0.250000 0.750000
+DEAL::  boundary id = 101
+DEAL::  manifold id = 102
+DEAL::  Edge 18
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 43
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 20
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 9
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::Face 13
+DEAL::  center = 0.250000 0.00000 0.750000
+DEAL::  boundary id = 101
+DEAL::  manifold id = 102
+DEAL::  Edge 19
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 8
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 18
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 37
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::Face 5
+DEAL::  center = 0.250000 0.250000 1.00000
+DEAL::  boundary id = 101
+DEAL::  manifold id = 102
+DEAL::  Edge 9
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 31
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 8
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 33
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::Face 16
+DEAL::  center = 1.00000 0.250000 0.750000
+DEAL::  boundary id = 101
+DEAL::  manifold id = 102
+DEAL::  Edge 23
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 46
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 24
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 10
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::Face 21
+DEAL::  center = 0.750000 0.00000 0.750000
+DEAL::  boundary id = 101
+DEAL::  manifold id = 102
+DEAL::  Edge 36
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 30
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 37
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 23
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::Face 19
+DEAL::  center = 0.750000 0.250000 1.00000
+DEAL::  boundary id = 101
+DEAL::  manifold id = 102
+DEAL::  Edge 31
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 10
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 30
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 49
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::Face 28
+DEAL::  center = 0.00000 0.750000 0.750000
+DEAL::  boundary id = 101
+DEAL::  manifold id = 102
+DEAL::  Edge 43
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 27
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 42
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 32
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::Face 18
+DEAL::  center = 0.250000 1.00000 0.750000
+DEAL::  boundary id = 101
+DEAL::  manifold id = 102
+DEAL::  Edge 28
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 11
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 27
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 48
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::Face 20
+DEAL::  center = 0.250000 0.750000 1.00000
+DEAL::  boundary id = 101
+DEAL::  manifold id = 102
+DEAL::  Edge 32
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 50
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 33
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 11
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::Face 30
+DEAL::  center = 1.00000 0.750000 0.750000
+DEAL::  boundary id = 101
+DEAL::  manifold id = 102
+DEAL::  Edge 46
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 29
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 45
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 34
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::Face 31
+DEAL::  center = 0.750000 1.00000 0.750000
+DEAL::  boundary id = 101
+DEAL::  manifold id = 102
+DEAL::  Edge 47
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 35
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 48
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 29
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::Face 32
+DEAL::  center = 0.750000 0.750000 1.00000
+DEAL::  boundary id = 101
+DEAL::  manifold id = 102
+DEAL::  Edge 50
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 34
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 49
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::  Edge 35
+DEAL::    boundary id = 201
+DEAL::    manifold id = 202
+DEAL::
+DEAL::
