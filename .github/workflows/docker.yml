@@ -33,7 +33,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: ./contrib/docker/
-          file: {context}/Dockerfile.root
+          file: Dockerfile.root
           cache-from: type=registry,ref=dealii/dealii:master-focal
           cache-to: type=inline
           push: true
