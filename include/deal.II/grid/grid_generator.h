@@ -1982,31 +1982,35 @@ namespace GridGenerator
    * Given an input triangulation @p in_tria, this function makes a new flat
    * triangulation @p out_tria which contains a single level with all active
    * cells of the input triangulation. If @p spacedim1 and @p spacedim2 are
-   * different, only the smallest spacedim components of the vertices are
+   * different, only the first few components of the vertex coordinates are
    * copied over. This is useful to create a Triangulation<2,3> out of a
    * Triangulation<2,2>, or to project a Triangulation<2,3> into a
-   * Triangulation<2,2>, by neglecting the z components of the vertices.
+   * Triangulation<2,2>, by neglecting the $z$ components of the vertices.
    *
    * No internal checks are performed on the vertices, which are assumed to
    * make sense topologically in the target @p spacedim2 dimensional space. If
    * this is not the case, you will encounter problems when using the
    * triangulation later on.
    *
-   * All information about cell manifold_ids and material ids are copied from
-   * one triangulation to the other, and only the boundary manifold_ids and
-   * boundary_ids are copied over from the faces of @p in_tria to the faces of
-   * @p out_tria. If you need to specify manifold ids on interior faces, they
-   * have to be specified manually after the triangulation is created.
+   * All information about cell
+   * @ref GlossManifoldIndicator "manifold indicators" and
+   * @ref GlossMaterialId "material indicators" are copied from
+   * one triangulation to the other. However, only manifold and
+   * boundary indicators of faces are copied over for faces that
+   * are located at the boundary of the triangulation. If you need
+   * to specify manifold ids on interior faces, they
+   * have to be re-set manually after the triangulation is created.
    *
    * This function will fail if the input Triangulation is of type
    * parallel::distributed::Triangulation, as well as when the input
-   * Triangulation contains hanging nodes.
+   * Triangulation contains hanging nodes. In other words, this function
+   * only works for globally refined triangulations.
    *
    * @param[in] in_tria The base input for a new flat triangulation.
    * @param[out] out_tria The desired flattened triangulation constructed from
    * the in_tria.
    *
-   * @note Since @p input and @p output have different spatial dimensions no
+   * @note Since @p input and @p output have different spatial dimensions, no
    * manifold objects are copied by this function: you must attach new
    * manifold objects to @p out_tria.
    */
