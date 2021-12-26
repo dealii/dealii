@@ -1066,6 +1066,7 @@ CylindricalManifold<dim, spacedim>::CylindricalManifold(
   , direction(direction / direction.norm())
   , point_on_axis(point_on_axis)
   , tolerance(tolerance)
+  , dxn(cross_product_3d(this->direction, normal_direction))
 {
   // do not use static_assert to make dimension-independent programming
   // easier.
@@ -1150,9 +1151,8 @@ CylindricalManifold<dim, spacedim>::push_forward(
          ExcMessage("CylindricalManifold can only be used for spacedim==3!"));
 
   // Rotate the orthogonal direction by the given angle
-  const double sine_r           = std::sin(chart_point(1)) * chart_point(0);
-  const double cosine_r         = std::cos(chart_point(1)) * chart_point(0);
-  const Tensor<1, spacedim> dxn = cross_product_3d(direction, normal_direction);
+  const double sine_r   = std::sin(chart_point(1)) * chart_point(0);
+  const double cosine_r = std::cos(chart_point(1)) * chart_point(0);
   const Tensor<1, spacedim> intermediate =
     normal_direction * cosine_r + dxn * sine_r;
 
@@ -1175,7 +1175,6 @@ CylindricalManifold<dim, spacedim>::push_forward_gradient(
   // Rotate the orthogonal direction by the given angle
   const double              sine   = std::sin(chart_point(1));
   const double              cosine = std::cos(chart_point(1));
-  const Tensor<1, spacedim> dxn = cross_product_3d(direction, normal_direction);
   const Tensor<1, spacedim> intermediate =
     normal_direction * cosine + dxn * sine;
 
