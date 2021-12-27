@@ -63,6 +63,7 @@ namespace Differentiation
       , dependent_variables_output(0)
       , map_dep_expr_vec_entry(other.map_dep_expr_vec_entry)
       , ready_for_value_extraction(false)
+      , has_been_serialized(false)
     {}
 
 
@@ -215,7 +216,7 @@ namespace Differentiation
 
     template <typename ReturnType>
     SD::types::symbol_vector
-    BatchOptimizer<ReturnType>::get_independent_symbols(void) const
+    BatchOptimizer<ReturnType>::get_independent_symbols() const
     {
       return Utilities::extract_symbols(independent_variables_symbols);
     }
@@ -224,7 +225,7 @@ namespace Differentiation
 
     template <typename ReturnType>
     std::size_t
-    BatchOptimizer<ReturnType>::n_independent_variables(void) const
+    BatchOptimizer<ReturnType>::n_independent_variables() const
     {
       return independent_variables_symbols.size();
     }
@@ -271,7 +272,7 @@ namespace Differentiation
 
     template <typename ReturnType>
     const SD::types::symbol_vector &
-    BatchOptimizer<ReturnType>::get_dependent_functions(void) const
+    BatchOptimizer<ReturnType>::get_dependent_functions() const
     {
       return dependent_variables_functions;
     }
@@ -280,7 +281,7 @@ namespace Differentiation
 
     template <typename ReturnType>
     std::size_t
-    BatchOptimizer<ReturnType>::n_dependent_variables(void) const
+    BatchOptimizer<ReturnType>::n_dependent_variables() const
     {
       if (has_been_serialized == false)
         {
