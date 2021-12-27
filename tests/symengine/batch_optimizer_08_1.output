@@ -1,0 +1,74 @@
+
+DEAL:Copy:Float::f: x*y
+DEAL:Copy:Float::g: x/y
+DEAL:Copy:Float::f(x,y): 20.00000000
+DEAL:Copy:Float::g(x,y): 5.000000000
+DEAL:Copy:Float::
+DEAL:Copy:Float::Before copy
+DEAL:Copy:Float::f: x1*y1
+DEAL:Copy:Float::g: x1/y1
+DEAL:Copy:Float::f(x,y): 60.00000000
+DEAL:Copy:Float::g(x,y): 6.666666508
+DEAL:Copy:Float::
+DEAL:Copy:Float::After copy
+DEAL:Copy:Float::f: x*y
+DEAL:Copy:Float::g: x/y
+DEAL:Copy:Float::f(x,y): 20.00000000
+DEAL:Copy:Float::g(x,y): 5.000000000
+DEAL:Copy:Float::
+DEAL:Copy:Float::OK
+DEAL:Copy:Double::f: x*y
+DEAL:Copy:Double::g: x/y
+DEAL:Copy:Double::f(x,y): 20.00000000
+DEAL:Copy:Double::g(x,y): 5.000000000
+DEAL:Copy:Double::
+DEAL:Copy:Double::Before copy
+DEAL:Copy:Double::f: x1*y1
+DEAL:Copy:Double::g: x1/y1
+DEAL:Copy:Double::f(x,y): 60.00000000
+DEAL:Copy:Double::g(x,y): 6.666666667
+DEAL:Copy:Double::
+DEAL:Copy:Double::After copy
+DEAL:Copy:Double::f: x*y
+DEAL:Copy:Double::g: x/y
+DEAL:Copy:Double::f(x,y): 20.00000000
+DEAL:Copy:Double::g(x,y): 5.000000000
+DEAL:Copy:Double::
+DEAL:Copy:Double::OK
+DEAL:Copy:Complex float::f: x*y
+DEAL:Copy:Complex float::g: x/y
+DEAL:Copy:Complex float::f(x,y): (20.00000000,0.000000000)
+DEAL:Copy:Complex float::g(x,y): (5.000000000,0.000000000)
+DEAL:Copy:Complex float::
+DEAL:Copy:Complex float::Before copy
+DEAL:Copy:Complex float::f: x1*y1
+DEAL:Copy:Complex float::g: x1/y1
+DEAL:Copy:Complex float::f(x,y): (60.00000000,0.000000000)
+DEAL:Copy:Complex float::g(x,y): (6.666666508,0.000000000)
+DEAL:Copy:Complex float::
+DEAL:Copy:Complex float::After copy
+DEAL:Copy:Complex float::f: x*y
+DEAL:Copy:Complex float::g: x/y
+DEAL:Copy:Complex float::f(x,y): (20.00000000,0.000000000)
+DEAL:Copy:Complex float::g(x,y): (5.000000000,0.000000000)
+DEAL:Copy:Complex float::
+DEAL:Copy:Complex float::OK
+DEAL:Copy:Complex double::f: x*y
+DEAL:Copy:Complex double::g: x/y
+DEAL:Copy:Complex double::f(x,y): (20.00000000,0.000000000)
+DEAL:Copy:Complex double::g(x,y): (5.000000000,0.000000000)
+DEAL:Copy:Complex double::
+DEAL:Copy:Complex double::Before copy
+DEAL:Copy:Complex double::f: x1*y1
+DEAL:Copy:Complex double::g: x1/y1
+DEAL:Copy:Complex double::f(x,y): (60.00000000,0.000000000)
+DEAL:Copy:Complex double::g(x,y): (6.666666667,0.000000000)
+DEAL:Copy:Complex double::
+DEAL:Copy:Complex double::After copy
+DEAL:Copy:Complex double::f: x*y
+DEAL:Copy:Complex double::g: x/y
+DEAL:Copy:Complex double::f(x,y): (20.00000000,0.000000000)
+DEAL:Copy:Complex double::g(x,y): (5.000000000,0.000000000)
+DEAL:Copy:Complex double::
+DEAL:Copy:Complex double::OK
+DEAL::OK
