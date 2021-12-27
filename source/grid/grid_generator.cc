@@ -7500,6 +7500,9 @@ namespace GridGenerator
            ExcMessage(
              "This function cannot be used on "
              "parallel::distributed::Triangulation objects as inputs."));
+    Assert(in_tria.has_hanging_nodes() == false,
+           ExcMessage("This function does not work for meshes that have "
+                      "hanging nodes."));
 
 
     const unsigned int spacedim = std::min(spacedim1, spacedim2);
