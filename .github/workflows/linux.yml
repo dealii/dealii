@@ -158,21 +158,38 @@ jobs:
 
   linux-debug-intel-oneapi:
     # parallel debug build with Intel oneAPI including MPI and MKL
+    #
+    # Based on https://github.com/oneapi-src/oneapi-ci
+    # For a list of Intel packages see https://oneapi-src.github.io/oneapi-ci/#linux-apt
 
     name: linux debug intel oneapi
     runs-on: [ubuntu-18.04]
 
     steps:
-    - name: modules
+    - uses: actions/checkout@v2
+    - name: setup apt repo
       run: |
-        # Based on https://github.com/oneapi-src/oneapi-ci
-        # Setup Intel repository
         # oneapi-ci/scripts/setup_apt_repo_linux.sh
         wget https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS-2023.PUB
         sudo apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS-2023.PUB
         echo "deb https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
         sudo apt-get update -o Dir::Etc::sourcelist="sources.list.d/oneAPI.list" -o APT::Get::List-Cleanup="0"
-        # Install Intel packages -- see https://oneapi-src.github.io/oneapi-ci/#linux-apt
+    - name: collect versioned dependencies of apt packages
+      run : |
+        # oneapi-ci/scripts/apt_depends.sh
+        apt-cache depends intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic \
+                          intel-oneapi-mpi-devel \
+                          intel-oneapi-mkl-devel \
+                          intel-oneapi-tbb-devel | tee dependencies.txt
+    - name: cache install
+      id: cache-install
+      uses: actions/cache@v2
+      with:
+        path: /opt/intel/oneapi
+        key: install-${{ hashFiles('**/dependencies.txt') }}
+    - name: install
+      if: steps.cache-install.outputs.cache-hit != 'true'
+      run: |
         # oneapi-ci/scripts/install_linux_apt.sh
         sudo apt-get install -y intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic \
                                 intel-oneapi-mpi-devel \
@@ -184,8 +201,6 @@ jobs:
         source /opt/intel/oneapi/setvars.sh
         mpiicpc -v
         cmake --version
-    - name: checkout
-      uses: actions/checkout@v2
     - name: configure
       run: |
         source /opt/intel/oneapi/setvars.sh
