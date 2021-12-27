@@ -1477,16 +1477,15 @@ namespace Differentiation
                        OptimizationFlags::optimize_all);
 
       /**
-       * Copy constructor
+       * Copy constructor.
        *
-       * The @p copy_initialized flag, which is set to <code>true</code> by default,
-       * determines whether or not all of the optimized data is copied over from
-       * the @p other optimizer instance. Only with the flag set to <code>false</code>
-       * is it possible to re-optimize the data stored in this class with a
-       * different optimization scheme.
+       * @note The optimized data and results from previous substitutions
+       * executed by the @p other optimizer instance are not copied over.
+       * It is therefore necessary to re-optimize the data stored in
+       * this class, and it is possible to do so with a different optimization
+       * scheme.
        */
-      BatchOptimizer(const BatchOptimizer &other/*,
-                     const bool            copy_initialized = true*/);
+      BatchOptimizer(const BatchOptimizer &other);
 
       /**
        * Move constructor.
