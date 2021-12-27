@@ -1499,6 +1499,19 @@ namespace Differentiation
       ~BatchOptimizer() = default;
 
       /**
+       * Duplicate the data stored in an @p other BatchOptimizer instance.
+       *
+       * @note The optimized data and results from previous substitutions
+       * executed by the @p other optimizer instance are not copied over.
+       * It is therefore necessary to call optimize() before it is possible to
+       * substitute() values and evaluate() data. One may, however, still
+       * extract() values using @p this optimizer instance if those results are
+       * stored elsewhere.
+       */
+      void
+      copy_from(const BatchOptimizer &other);
+
+      /**
        * Print some information on state of the internal data
        * structures stored in the class.
        *

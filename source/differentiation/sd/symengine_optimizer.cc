@@ -69,6 +69,23 @@ namespace Differentiation
 
     template <typename ReturnType>
     void
+    BatchOptimizer<ReturnType>::copy_from(
+      const BatchOptimizer<ReturnType> &other)
+    {
+      method                        = other.method;
+      flags                         = other.flags;
+      independent_variables_symbols = other.independent_variables_symbols;
+      dependent_variables_functions = other.dependent_variables_functions;
+      dependent_variables_output.clear();
+      map_dep_expr_vec_entry     = other.map_dep_expr_vec_entry;
+      ready_for_value_extraction = false;
+      has_been_serialized        = false;
+    }
+
+
+
+    template <typename ReturnType>
+    void
     BatchOptimizer<ReturnType>::set_optimization_method(
       const enum OptimizerType &    optimization_method,
       const enum OptimizationFlags &optimization_flags)
