@@ -2517,12 +2517,6 @@ namespace Differentiation
       const Tensor<rank, dim, Expression> &funcs,
       const std::vector<ReturnType> &      cached_evaluation) const
     {
-      Assert(
-        values_substituted() == true,
-        ExcMessage(
-          "The optimizer is not configured to perform evaluation. "
-          "This action can only performed after substitute() has been called."));
-
       return internal::tensor_evaluate_optimized(funcs,
                                                  cached_evaluation,
                                                  *this);
@@ -2536,6 +2530,12 @@ namespace Differentiation
     BatchOptimizer<ReturnType>::evaluate(
       const Tensor<rank, dim, Expression> &funcs) const
     {
+      Assert(
+        values_substituted() == true,
+        ExcMessage(
+          "The optimizer is not configured to perform evaluation. "
+          "This action can only performed after substitute() has been called."));
+
       return extract(funcs, dependent_variables_output);
     }
 
@@ -2548,12 +2548,6 @@ namespace Differentiation
       const SymmetricTensor<rank, dim, Expression> &funcs,
       const std::vector<ReturnType> &               cached_evaluation) const
     {
-      Assert(
-        values_substituted() == true,
-        ExcMessage(
-          "The optimizer is not configured to perform evaluation. "
-          "This action can only performed after substitute() has been called."));
-
       return internal::tensor_evaluate_optimized(funcs,
                                                  cached_evaluation,
                                                  *this);
@@ -2567,6 +2561,12 @@ namespace Differentiation
     BatchOptimizer<ReturnType>::evaluate(
       const SymmetricTensor<rank, dim, Expression> &funcs) const
     {
+      Assert(
+        values_substituted() == true,
+        ExcMessage(
+          "The optimizer is not configured to perform evaluation. "
+          "This action can only performed after substitute() has been called."));
+
       return extract(funcs, dependent_variables_output);
     }
 
