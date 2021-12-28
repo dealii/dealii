@@ -1798,6 +1798,190 @@ TriaAccessor<structdim, dim, spacedim>::center(
 }
 
 
+/*---------------- Functions: TriaAccessor<0,1,spacedim> -------------------*/
+
+
+template <int spacedim>
+bool
+TriaAccessor<0, 1, spacedim>::user_flag_set() const
+{
+  Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
+  Assert(false, ExcNotImplemented());
+  return true;
+}
+
+
+
+template <int spacedim>
+void
+TriaAccessor<0, 1, spacedim>::set_user_flag() const
+{
+  Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
+  Assert(false, ExcNotImplemented());
+}
+
+
+
+template <int spacedim>
+void
+TriaAccessor<0, 1, spacedim>::clear_user_flag() const
+{
+  Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
+  Assert(false, ExcNotImplemented());
+}
+
+
+
+template <int spacedim>
+void
+TriaAccessor<0, 1, spacedim>::recursively_set_user_flag() const
+{
+  set_user_flag();
+
+  if (this->has_children())
+    for (unsigned int c = 0; c < this->n_children(); ++c)
+      this->child(c)->recursively_set_user_flag();
+}
+
+
+
+template <int spacedim>
+void
+TriaAccessor<0, 1, spacedim>::recursively_clear_user_flag() const
+{
+  clear_user_flag();
+
+  if (this->has_children())
+    for (unsigned int c = 0; c < this->n_children(); ++c)
+      this->child(c)->recursively_clear_user_flag();
+}
+
+
+
+template <int spacedim>
+void
+TriaAccessor<0, 1, spacedim>::clear_user_data() const
+{
+  Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
+  Assert(false, ExcNotImplemented());
+}
+
+
+
+template <int spacedim>
+void
+TriaAccessor<0, 1, spacedim>::set_user_pointer(void *) const
+{
+  Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
+  Assert(false, ExcNotImplemented());
+}
+
+
+
+template <int spacedim>
+void
+TriaAccessor<0, 1, spacedim>::clear_user_pointer() const
+{
+  Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
+  Assert(false, ExcNotImplemented());
+}
+
+
+
+template <int spacedim>
+void *
+TriaAccessor<0, 1, spacedim>::user_pointer() const
+{
+  Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
+  Assert(false, ExcNotImplemented());
+  return nullptr;
+}
+
+
+
+template <int spacedim>
+void
+TriaAccessor<0, 1, spacedim>::recursively_set_user_pointer(void *p) const
+{
+  set_user_pointer(p);
+
+  if (this->has_children())
+    for (unsigned int c = 0; c < this->n_children(); ++c)
+      this->child(c)->recursively_set_user_pointer(p);
+}
+
+
+
+template <int spacedim>
+void
+TriaAccessor<0, 1, spacedim>::recursively_clear_user_pointer() const
+{
+  clear_user_pointer();
+
+  if (this->has_children())
+    for (unsigned int c = 0; c < this->n_children(); ++c)
+      this->child(c)->recursively_clear_user_pointer();
+}
+
+
+
+template <int spacedim>
+void
+TriaAccessor<0, 1, spacedim>::set_user_index(const unsigned int) const
+{
+  Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
+  Assert(false, ExcNotImplemented());
+}
+
+
+
+template <int spacedim>
+void
+TriaAccessor<0, 1, spacedim>::clear_user_index() const
+{
+  Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
+  Assert(false, ExcNotImplemented());
+}
+
+
+
+template <int spacedim>
+unsigned int
+TriaAccessor<0, 1, spacedim>::user_index() const
+{
+  Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
+  Assert(false, ExcNotImplemented());
+  return 0;
+}
+
+
+
+template <int spacedim>
+void
+TriaAccessor<0, 1, spacedim>::recursively_set_user_index(unsigned int p) const
+{
+  set_user_index(p);
+
+  if (this->has_children())
+    for (unsigned int c = 0; c < this->n_children(); ++c)
+      this->child(c)->recursively_set_user_index(p);
+}
+
+
+
+template <int spacedim>
+void
+TriaAccessor<0, 1, spacedim>::recursively_clear_user_index() const
+{
+  clear_user_index();
+
+  if (this->has_children())
+    for (unsigned int c = 0; c < this->n_children(); ++c)
+      this->child(c)->recursively_clear_user_index();
+}
+
+
+
 /*------------------------ Functions: CellAccessor<1> -----------------------*/
 
 
