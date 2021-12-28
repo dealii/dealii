@@ -613,7 +613,7 @@ namespace Differentiation
                   new_map_expr.get_value().__str__())
                 {
                   map_dep_expr_vec_entry[func] = e.second;
-                  return evaluate(func);
+                  return extract(func, cached_evaluation);
                 }
             }
 
