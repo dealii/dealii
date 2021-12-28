@@ -1995,11 +1995,9 @@ namespace GridGenerator
    * All information about cell
    * @ref GlossManifoldIndicator "manifold indicators" and
    * @ref GlossMaterialId "material indicators" are copied from
-   * one triangulation to the other. However, only manifold and
-   * boundary indicators of faces are copied over for faces that
-   * are located at the boundary of the triangulation. If you need
-   * to specify manifold ids on interior faces, they
-   * have to be re-set manually after the triangulation is created.
+   * one triangulation to the other. The same is true for the manifold
+   * indicators and, if an object is at the boundary, the boundary
+   * indicators of faces and edges of the triangulation.
    *
    * This function will fail if the input Triangulation is of type
    * parallel::distributed::Triangulation, as well as when the input
