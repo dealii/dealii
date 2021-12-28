@@ -4104,7 +4104,8 @@ namespace DataOutBase
       if (patches.size() == 0)
         return;
 #endif
-      constexpr int dim      = 2;
+      constexpr int dim = 2;
+      (void)dim;
       constexpr int spacedim = 2;
 
       const unsigned int n_data_sets = data_names.size();
