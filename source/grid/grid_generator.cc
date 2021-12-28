@@ -7808,6 +7808,7 @@ namespace GridGenerator
                 vertices.push_back(cell.vertex(v));
               }
 
+            AssertIndexRange(v, local_vertex_indices.size());
             local_vertex_indices[v] = old_to_new_vertex_indices[v_global];
           }
 
@@ -7824,6 +7825,8 @@ namespace GridGenerator
                   cell.face(f)->center(/*respect_manifold*/ true));
               }
 
+            AssertIndexRange(cell.n_vertices() + f,
+                             local_vertex_indices.size());
             local_vertex_indices[cell.n_vertices() + f] =
               face_to_new_vertex_indices[f_global];
           }
@@ -7831,6 +7834,8 @@ namespace GridGenerator
         // (iii) create new midpoint vertex locations for each cell
         if (dim == 2)
           {
+            AssertIndexRange(cell.n_vertices() + cell.n_faces(),
+                             local_vertex_indices.size());
             local_vertex_indices[cell.n_vertices() + cell.n_faces()] =
               vertices.size();
             vertices.push_back(cell.center(/*respect_manifold*/ true));
@@ -7862,6 +7867,8 @@ namespace GridGenerator
               CellData<dim> cell_data(index_vertices.size());
               for (unsigned int i = 0; i < index_vertices.size(); ++i)
                 {
+                  AssertIndexRange(index_vertices[i],
+                                   local_vertex_indices.size());
                   cell_data.vertices[i] =
                     local_vertex_indices[index_vertices[i]];
                   cell_data.material_id =
@@ -7879,6 +7886,8 @@ namespace GridGenerator
               boundary_line.manifold_id = manifold_id;
               for (unsigned int i = 0; i < index_vertices.size(); ++i)
                 {
+                  AssertIndexRange(index_vertices[i],
+                                   local_vertex_indices.size());
                   boundary_line.vertices[i] =
                     local_vertex_indices[index_vertices[i]];
                 }
@@ -7892,6 +7901,8 @@ namespace GridGenerator
               boundary_quad.manifold_id = manifold_id;
               for (unsigned int i = 0; i < index_vertices.size(); ++i)
                 {
+                  AssertIndexRange(index_vertices[i],
+                                   local_vertex_indices.size());
                   boundary_quad.vertices[i] =
                     local_vertex_indices[index_vertices[i]];
                 }
@@ -7904,6 +7915,8 @@ namespace GridGenerator
               boundary_line.manifold_id = manifold_id;
               for (unsigned int i = 0; i < index_vertices.size(); ++i)
                 {
+                  AssertIndexRange(index_vertices[i],
+                                   local_vertex_indices.size());
                   boundary_line.vertices[i] =
                     local_vertex_indices[index_vertices[i]];
                 }
@@ -7988,7 +8001,6 @@ namespace GridGenerator
                      vertex_ids_for_boundary_edges_3d[f])
                   add_cell(1, edge_vertices, bid, mid);
               }
-
             else
               Assert(false, ExcNotImplemented());
           }
