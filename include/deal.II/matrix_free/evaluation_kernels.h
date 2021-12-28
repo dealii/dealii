@@ -3156,7 +3156,8 @@ namespace internal
 
   template <int n_face_orientations,
             typename Processor,
-            typename EvaluationData>
+            typename EvaluationData,
+            const bool check_face_orientations = false>
   void
   fe_face_evaluation_process_and_io(
     Processor &                            proc,
@@ -3186,6 +3187,8 @@ namespace internal
                      dof_info.index_storage_variants[dof_access_index].size());
     constexpr unsigned int dofs_per_face =
       Utilities::pow(fe_degree + 1, dim - 1);
+    const unsigned int subface_index = fe_eval.get_subface_index();
+
     const unsigned int n_filled_lanes =
       dof_info.n_vectorization_lanes_filled[dof_access_index][cell];
 
@@ -3199,19 +3202,10 @@ namespace internal
             break;
           }
 
-    // we know that the gradient weights for the Hermite case on the
-    // right (side==1) are the negative from the value at the left
-    // (side==0), so we only read out one of them.
-    VectorizedArrayType grad_weight =
-      shape_data
-        .shape_data_on_face[0][fe_degree + (integrate ? (2 - face_no % 2) :
-                                                        (1 + face_no % 2))];
-
-    // re-orientation
+    // check for re-orientation ...
     std::array<const unsigned int *, n_face_orientations> orientation = {};
 
-    if (n_face_orientations == n_lanes &&
-        dof_access_index == MatrixFreeFunctions::DoFInfo::dof_access_cell &&
+    if (dim == 3 && n_face_orientations == n_lanes && !all_faces_are_same &&
         fe_eval.get_is_interior_face() == 0)
       for (unsigned int v = 0; v < n_lanes; ++v)
         {
@@ -3223,12 +3217,58 @@ namespace internal
 
           if (shape_data.nodal_at_cell_boundaries &&
               fe_eval.get_face_orientation(v) != 0)
-            orientation[v] = &fe_eval.get_shape_info().face_orientations_dofs(
-              fe_eval.get_face_orientation(v), 0);
+            {
+              // ... and in case we detect a re-orientation, go to the other
+              // version of this function that actually allows for this
+              if (subface_index == GeometryInfo<dim>::max_children_per_cell &&
+                  check_face_orientations == false)
+                {
+                  fe_face_evaluation_process_and_io<n_face_orientations,
+                                                    Processor,
+                                                    EvaluationData,
+                                                    true>(proc,
+                                                          n_components,
+                                                          evaluation_flag,
+                                                          global_vector_ptr,
+                                                          sm_ptr,
+                                                          fe_eval,
+                                                          temp1);
+                  return;
+                }
+              orientation[v] = &fe_eval.get_shape_info().face_orientations_dofs(
+                fe_eval.get_face_orientation(v), 0);
+            }
         }
-    else if (fe_eval.get_face_orientation() != 0)
-      orientation[0] = &fe_eval.get_shape_info().face_orientations_dofs(
-        fe_eval.get_face_orientation(), 0);
+    else if (dim == 3 && fe_eval.get_face_orientation() != 0)
+      {
+        // go to the other version of this function
+        if (subface_index == GeometryInfo<dim>::max_children_per_cell &&
+            check_face_orientations == false)
+          {
+            fe_face_evaluation_process_and_io<n_face_orientations,
+                                              Processor,
+                                              EvaluationData,
+                                              true>(proc,
+                                                    n_components,
+                                                    evaluation_flag,
+                                                    global_vector_ptr,
+                                                    sm_ptr,
+                                                    fe_eval,
+                                                    temp1);
+            return;
+          }
+        for (unsigned int v = 0; v < n_face_orientations; ++v)
+          orientation[v] = &fe_eval.get_shape_info().face_orientations_dofs(
+            fe_eval.get_face_orientation(), 0);
+      }
+
+    // we know that the gradient weights for the Hermite case on the
+    // right (side==1) are the negative from the value at the left
+    // (side==0), so we only read out one of them.
+    VectorizedArrayType grad_weight =
+      shape_data
+        .shape_data_on_face[0][fe_degree + (integrate ? (2 - face_no % 2) :
+                                                        (1 + face_no % 2))];
 
     // face_to_cell_index_hermite
     std::array<const unsigned int *, n_face_orientations> index_array_hermite =
@@ -3284,10 +3324,9 @@ namespace internal
           }
       }
 
-    const unsigned int subface_index = fe_eval.get_subface_index();
+
     const auto reorientate = [&](const unsigned int v, const unsigned int i) {
-      return (dim < 3 || orientation[v] == nullptr ||
-              subface_index < Utilities::pow(2U, dim)) ?
+      return (!check_face_orientations || orientation[v] == nullptr) ?
                i :
                orientation[v][i];
     };
