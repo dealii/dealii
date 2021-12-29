@@ -808,33 +808,6 @@ namespace internal
 
 namespace parallel
 {
-#ifdef DEAL_II_WITH_TBB
-
-  namespace internal
-  {
-    /**
-     * This is the function actually called by TBB for the ParallelForInteger
-     * class.
-     */
-    struct ParallelForWrapper
-    {
-      ParallelForWrapper(const parallel::ParallelForInteger &worker)
-        : worker_(worker)
-      {}
-
-      void
-      operator()(const tbb::blocked_range<std::size_t> &range) const
-      {
-        worker_.apply_to_subrange(range.begin(), range.end());
-      }
-
-      const parallel::ParallelForInteger &worker_;
-    };
-  } // namespace internal
-
-#endif
-
-
   inline void
   ParallelForInteger::apply_parallel(
     const std::size_t begin,
@@ -848,8 +821,13 @@ namespace parallel
 
     apply_to_subrange(begin, end);
 #else
-    internal::ParallelForWrapper worker(*this);
-    internal::parallel_for(begin, end, worker, minimum_parallel_grain_size);
+    internal::parallel_for(
+      begin,
+      end,
+      [this](const tbb::blocked_range<std::size_t> &range) {
+        apply_to_subrange(range.begin(), range.end());
+      },
+      minimum_parallel_grain_size);
 #endif
   }
 
