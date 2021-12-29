@@ -2385,6 +2385,14 @@ public:
   copy_from(const TriaAccessor &);
 
   /**
+   * Copy operator. We need this function to support generic
+   * programming, but it just throws an exception because it cannot do
+   * the required operations.
+   */
+  void
+  copy_from(const TriaAccessorBase<0, 1, spacedim> &);
+
+  /**
    * Return the state of the iterator. Since an iterator to points can not be
    * incremented or decremented, its state remains constant, and in particular
    * equal to IteratorState::valid.

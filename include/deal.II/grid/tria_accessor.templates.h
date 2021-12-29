@@ -2770,6 +2770,19 @@ TriaAccessor<0, 1, spacedim>::copy_from(const TriaAccessor &t)
 
 
 template <int spacedim>
+inline void
+TriaAccessor<0, 1, spacedim>::copy_from(
+  const TriaAccessorBase<0, 1, spacedim> &)
+{
+  // We cannot convert from TriaAccessorBase to
+  // TriaAccessor<0,1,spacedim> because the latter is not derived from
+  // the former. We should never get here.
+  Assert(false, ExcInternalError());
+}
+
+
+
+template <int spacedim>
 inline bool
 TriaAccessor<0, 1, spacedim>::operator<(
   const TriaAccessor<0, 1, spacedim> &other) const
