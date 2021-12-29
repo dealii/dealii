@@ -692,10 +692,9 @@ namespace Step43
     const std::vector<types::global_dof_index> darcy_dofs_per_block =
       DoFTools::count_dofs_per_fe_block(darcy_dof_handler,
                                         darcy_block_component);
-    const unsigned int n_u = darcy_dofs_per_block[0],
-                       n_p = darcy_dofs_per_block[1],
-                       n_s = saturation_dof_handler.n_dofs();
-    const std::vector<unsigned int> darcy_block_sizes = {n_u, n_p};
+    const types::global_dof_index n_u = darcy_dofs_per_block[0],
+                                  n_p = darcy_dofs_per_block[1],
+                                  n_s = saturation_dof_handler.n_dofs();
 
     std::cout << "Number of active cells: " << triangulation.n_active_cells()
               << " (on " << triangulation.n_levels() << " levels)" << std::endl
@@ -706,7 +705,8 @@ namespace Step43
     {
       darcy_matrix.clear();
 
-      BlockDynamicSparsityPattern dsp(darcy_block_sizes, darcy_block_sizes);
+      BlockDynamicSparsityPattern dsp(darcy_dofs_per_block,
+                                      darcy_dofs_per_block);
 
       Table<2, DoFTools::Coupling> coupling(dim + 1, dim + 1);
       for (unsigned int c = 0; c < dim + 1; ++c)
@@ -728,7 +728,8 @@ namespace Step43
       Mp_preconditioner.reset();
       darcy_preconditioner_matrix.clear();
 
-      BlockDynamicSparsityPattern dsp(darcy_block_sizes, darcy_block_sizes);
+      BlockDynamicSparsityPattern dsp(darcy_dofs_per_block,
+                                      darcy_dofs_per_block);
 
       Table<2, DoFTools::Coupling> coupling(dim + 1, dim + 1);
       for (unsigned int c = 0; c < dim + 1; ++c)

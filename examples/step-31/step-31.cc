@@ -867,10 +867,9 @@ namespace Step31
     const std::vector<types::global_dof_index> stokes_dofs_per_block =
       DoFTools::count_dofs_per_fe_block(stokes_dof_handler, stokes_sub_blocks);
 
-    const unsigned int n_u = stokes_dofs_per_block[0],
-                       n_p = stokes_dofs_per_block[1],
-                       n_T = temperature_dof_handler.n_dofs();
-    const std::vector<unsigned int> stokes_block_sizes = {n_u, n_p};
+    const types::global_dof_index n_u = stokes_dofs_per_block[0],
+                                  n_p = stokes_dofs_per_block[1],
+                                  n_T = temperature_dof_handler.n_dofs();
 
     std::cout << "Number of active cells: " << triangulation.n_active_cells()
               << " (on " << triangulation.n_levels() << " levels)" << std::endl
@@ -920,7 +919,8 @@ namespace Step31
     {
       stokes_matrix.clear();
 
-      BlockDynamicSparsityPattern dsp(stokes_block_sizes, stokes_block_sizes);
+      BlockDynamicSparsityPattern dsp(stokes_dofs_per_block,
+                                      stokes_dofs_per_block);
 
       Table<2, DoFTools::Coupling> coupling(dim + 1, dim + 1);
 
@@ -942,7 +942,8 @@ namespace Step31
       Mp_preconditioner.reset();
       stokes_preconditioner_matrix.clear();
 
-      BlockDynamicSparsityPattern dsp(stokes_block_sizes, stokes_block_sizes);
+      BlockDynamicSparsityPattern dsp(stokes_dofs_per_block,
+                                      stokes_dofs_per_block);
 
       Table<2, DoFTools::Coupling> coupling(dim + 1, dim + 1);
       for (unsigned int c = 0; c < dim + 1; ++c)

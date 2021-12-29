@@ -502,8 +502,8 @@ namespace Step22
     // velocity and pressure block via <code>block_component</code>.
     const std::vector<types::global_dof_index> dofs_per_block =
       DoFTools::count_dofs_per_fe_block(dof_handler, block_component);
-    const unsigned int n_u = dofs_per_block[0];
-    const unsigned int n_p = dofs_per_block[1];
+    const types::global_dof_index n_u = dofs_per_block[0];
+    const types::global_dof_index n_p = dofs_per_block[1];
 
     std::cout << "   Number of active cells: " << triangulation.n_active_cells()
               << std::endl
