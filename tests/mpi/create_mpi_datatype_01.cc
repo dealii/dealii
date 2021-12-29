@@ -29,12 +29,12 @@ using namespace dealii;
 void
 test_data_type(const std::uint64_t n_bytes)
 {
-  MPI_Datatype bigtype = Utilities::MPI::create_mpi_data_type_n_bytes(n_bytes);
+  const auto bigtype = Utilities::MPI::create_mpi_data_type_n_bytes(n_bytes);
 
   deallog << "checking size " << n_bytes << ":";
 
   int size32;
-  int ierr = MPI_Type_size(bigtype, &size32);
+  int ierr = MPI_Type_size(*bigtype, &size32);
   AssertThrowMPI(ierr);
 
   if (size32 == MPI_UNDEFINED)
@@ -45,16 +45,16 @@ test_data_type(const std::uint64_t n_bytes)
 
 #if DEAL_II_MPI_VERSION_GTE(3, 0)
   MPI_Count size64;
-  ierr = MPI_Type_size_x(bigtype, &size64);
+  ierr = MPI_Type_size_x(*bigtype, &size64);
   AssertThrowMPI(ierr);
 
   deallog << " size64=" << size64;
 #endif
 
   deallog << std::endl;
-
-  MPI_Type_free(&bigtype);
 }
+
+
 
 void
 test_send_recv(MPI_Comm comm)
@@ -66,28 +66,24 @@ test_send_recv(MPI_Comm comm)
     {
       std::vector<char> buffer(n_bytes, 'A');
       buffer[n_bytes - 1] = 'B';
-      MPI_Datatype bigtype =
+      const auto bigtype =
         Utilities::MPI::create_mpi_data_type_n_bytes(buffer.size());
       int ierr =
-        MPI_Send(buffer.data(), 1, bigtype, 1 /* dest */, 0 /* tag */, comm);
-      AssertThrowMPI(ierr);
-      ierr = MPI_Type_free(&bigtype);
+        MPI_Send(buffer.data(), 1, *bigtype, 1 /* dest */, 0 /* tag */, comm);
       AssertThrowMPI(ierr);
     }
   else if (myid == 1)
     {
       std::vector<char> buffer(n_bytes, '?');
-      MPI_Datatype      bigtype =
+      const auto        bigtype =
         Utilities::MPI::create_mpi_data_type_n_bytes(buffer.size());
       int ierr = MPI_Recv(buffer.data(),
                           1,
-                          bigtype,
+                          *bigtype,
                           0 /* src */,
                           0 /* tag */,
                           comm,
                           MPI_STATUS_IGNORE);
-      AssertThrowMPI(ierr);
-      ierr = MPI_Type_free(&bigtype);
       AssertThrowMPI(ierr);
 
       AssertThrow(buffer[0] == 'A', ExcInternalError());

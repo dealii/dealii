@@ -297,7 +297,7 @@ namespace Utilities
 
 
 
-    MPI_Datatype
+    std::unique_ptr<MPI_Datatype, void (*)(MPI_Datatype *)>
     create_mpi_data_type_n_bytes(const std::size_t n_bytes)
     {
       // Simplified version from BigMPI repository, see
@@ -337,7 +337,7 @@ namespace Utilities
       AssertThrow(
         displacements[1] == n_chunks * max_signed_int,
         ExcMessage(
-          "ERROR in create_mpi_data_type_n_bytes(), size too big to support."));
+          "Error in create_mpi_data_type_n_bytes(): the size is too big to support."));
 
       MPI_Datatype result;
 
@@ -357,14 +357,33 @@ namespace Utilities
 #  ifdef DEBUG
 #    if DEAL_II_MPI_VERSION_GTE(3, 0)
       MPI_Count size64;
-      // this function is only available starting MPI 3.0:
+      // this function is only available starting with MPI 3.0:
       ierr = MPI_Type_size_x(result, &size64);
       AssertThrowMPI(ierr);
 
       Assert(size64 == static_cast<MPI_Count>(n_bytes), ExcInternalError());
 #    endif
 #  endif
-      return result;
+
+      // Now put the new data type into a std::unique_ptr with a custom
+      // deleter. We call the std::unique_ptr constructor that as first
+      // argument takes a pointer (here, a pointer to a copy of the `result`
+      // object, and as second argument a pointer-to-function, for which
+      // we here use a lambda function without captures that acts as the
+      // 'deleter' object: it calls `MPI_Type_free` and then deletes the
+      // pointer.
+      return {// The copy of the object:
+              new MPI_Datatype(result),
+              // The deleter:
+              [](MPI_Datatype *p) {
+                if (p != nullptr)
+                  {
+                    const int ierr = MPI_Type_free(p);
+                    AssertThrowMPI(ierr);
+
+                    delete p;
+                  }
+              }};
     }
 
 
