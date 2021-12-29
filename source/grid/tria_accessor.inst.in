@@ -51,3 +51,8 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : DIMENSIONS)
       CellAccessor<deal_II_dimension, deal_II_space_dimension>>;
 #endif
   }
+
+for (deal_II_space_dimension : DIMENSIONS)
+  {
+    template class TriaIterator<TriaAccessor<0, 1, deal_II_space_dimension>>;
+  }
