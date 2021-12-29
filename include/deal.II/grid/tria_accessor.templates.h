@@ -1753,7 +1753,8 @@ TriaAccessor<structdim, dim, spacedim>::recursively_clear_user_pointer() const
 
 template <int structdim, int dim, int spacedim>
 void
-TriaAccessor<structdim, dim, spacedim>::set_user_index(unsigned int p) const
+TriaAccessor<structdim, dim, spacedim>::set_user_index(
+  const unsigned int p) const
 {
   Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
   this->objects().user_index(this->present_index) = p;
@@ -1784,7 +1785,7 @@ TriaAccessor<structdim, dim, spacedim>::user_index() const
 template <int structdim, int dim, int spacedim>
 void
 TriaAccessor<structdim, dim, spacedim>::recursively_set_user_index(
-  unsigned int p) const
+  const unsigned int p) const
 {
   set_user_index(p);
 
