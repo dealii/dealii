@@ -417,7 +417,7 @@ public:
   bool
   standard_vs_true_line_orientation(const unsigned int  line,
                                     const unsigned char face_orientation,
-                                    const unsigned char line_orientation) const;
+                                    const bool          line_orientation) const;
 
   /**
    * @}
@@ -1940,7 +1940,7 @@ inline bool
 ReferenceCell::standard_vs_true_line_orientation(
   const unsigned int  line,
   const unsigned char face_orientation_raw,
-  const unsigned char line_orientation) const
+  const bool          line_orientation) const
 {
   if (*this == ReferenceCells::Hexahedron)
     {
@@ -1962,7 +1962,7 @@ ReferenceCell::standard_vs_true_line_orientation(
       const bool face_flip        = Utilities::get_bit(face_orientation_raw, 2);
       const bool face_rotation    = Utilities::get_bit(face_orientation_raw, 1);
 
-      return (static_cast<bool>(line_orientation) ==
+      return (line_orientation ==
               bool_table[line / 2][face_orientation][face_flip][face_rotation]);
     }
   else
