@@ -544,22 +544,34 @@ namespace Utilities
       const MPI_Comm &                 mpi_comm,
       const std::vector<unsigned int> &destinations)
     {
-      // check if destinations contain duplicates
-      auto destinations_unique = destinations;
-      std::sort(destinations_unique.begin(), destinations_unique.end());
-      destinations_unique.erase(std::unique(destinations_unique.begin(),
-                                            destinations_unique.end()),
-                                destinations_unique.end());
+      // Have a little function that checks if destinations provided
+      // to the current process are unique:
+      const bool my_destinations_are_unique = [destinations]() {
+        std::vector<unsigned int> my_destinations = destinations;
+        const unsigned int        n_destinations  = my_destinations.size();
+        std::sort(my_destinations.begin(), my_destinations.end());
+        my_destinations.erase(std::unique(my_destinations.begin(),
+                                          my_destinations.end()),
+                              my_destinations.end());
+        return (my_destinations.size() == n_destinations);
+      }();
 
-      if (Utilities::MPI::min<unsigned int>(destinations.size() ==
-                                              destinations_unique.size(),
-                                            mpi_comm))
+      // If all processes report that they have unique destinations,
+      // then we can short-cut the process using a consensus algorithm (which
+      // is implemented only for the case of unique destinations, and also only
+      // for MPI 3 and later):
+#  if DEAL_II_MPI_VERSION_GTE(3, 0)
+      if (Utilities::MPI::min((my_destinations_are_unique ? 1 : 0), mpi_comm) ==
+          1)
         {
-          return compute_point_to_point_communication_pattern(mpi_comm,
-                                                              destinations)
-            .size();
+          ConsensusAlgorithms::AnonymousProcess<char, char> process(
+            [&]() { return destinations; });
+          ConsensusAlgorithms::NBX<char, char> consensus_algorithm(process,
+                                                                   mpi_comm);
+          return consensus_algorithm.run().size();
         }
       else
+#  endif
         {
           const unsigned int n_procs =
             Utilities::MPI::n_mpi_processes(mpi_comm);
@@ -594,31 +606,31 @@ namespace Utilities
 
           return n_recv_from;
 #  else
-          // Find out how many processes will send to this one
-          // by reducing with sum and then scattering the
-          // results over all processes
-          std::vector<unsigned int> buffer(dest_vector.size());
-          unsigned int              n_recv_from = 0;
+        // Find out how many processes will send to this one
+        // by reducing with sum and then scattering the
+        // results over all processes
+        std::vector<unsigned int> buffer(dest_vector.size());
+        unsigned int              n_recv_from = 0;
 
-          int ierr = MPI_Reduce(dest_vector.data(),
-                                buffer.data(),
-                                dest_vector.size(),
-                                MPI_UNSIGNED,
-                                MPI_SUM,
-                                0,
-                                mpi_comm);
-          AssertThrowMPI(ierr);
-          ierr = MPI_Scatter(buffer.data(),
-                             1,
-                             MPI_UNSIGNED,
-                             &n_recv_from,
-                             1,
-                             MPI_UNSIGNED,
-                             0,
-                             mpi_comm);
-          AssertThrowMPI(ierr);
+        int ierr = MPI_Reduce(dest_vector.data(),
+                              buffer.data(),
+                              dest_vector.size(),
+                              MPI_UNSIGNED,
+                              MPI_SUM,
+                              0,
+                              mpi_comm);
+        AssertThrowMPI(ierr);
+        ierr = MPI_Scatter(buffer.data(),
+                           1,
+                           MPI_UNSIGNED,
+                           &n_recv_from,
+                           1,
+                           MPI_UNSIGNED,
+                           0,
+                           mpi_comm);
+        AssertThrowMPI(ierr);
 
-          return n_recv_from;
+        return n_recv_from;
 #  endif
         }
     }
