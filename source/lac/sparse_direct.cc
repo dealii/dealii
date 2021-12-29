@@ -116,31 +116,37 @@ SparseDirectUMFPACK::sort_arrays(const SparseMatrix<number> &matrix)
   // column index of the second entry in a row
   //
   // ignore rows with only one or no entry
-  for (size_type row = 0; row < matrix.m(); ++row)
-    {
-      // we may have to move some elements that are left of the diagonal
-      // but presently after the diagonal entry to the left, whereas the
-      // diagonal entry has to move to the right. we could first figure out
-      // where to move everything to, but for simplicity we just make a
-      // series of swaps instead (this is kind of a single run of
-      // bubble-sort, which gives us the desired result since the array is
-      // already "almost" sorted)
-      //
-      // in the first loop, the condition in the while-header also checks
-      // that the row has at least two entries and that the diagonal entry
-      // is really in the wrong place
-      long int cursor = Ap[row];
-      while ((cursor < Ap[row + 1] - 1) && (Ai[cursor] > Ai[cursor + 1]))
+  parallel::apply_to_subranges(
+    0,
+    matrix.m(),
+    [this](const size_type row_begin, const size_type row_end) {
+      for (size_type row = row_begin; row < row_end; ++row)
         {
-          std::swap(Ai[cursor], Ai[cursor + 1]);
+          // we may have to move some elements that are left of the diagonal
+          // but presently after the diagonal entry to the left, whereas the
+          // diagonal entry has to move to the right. we could first figure out
+          // where to move everything to, but for simplicity we just make a
+          // series of swaps instead (this is kind of a single run of
+          // bubble-sort, which gives us the desired result since the array is
+          // already "almost" sorted)
+          //
+          // in the first loop, the condition in the while-header also checks
+          // that the row has at least two entries and that the diagonal entry
+          // is really in the wrong place
+          long int cursor = Ap[row];
+          while ((cursor < Ap[row + 1] - 1) && (Ai[cursor] > Ai[cursor + 1]))
+            {
+              std::swap(Ai[cursor], Ai[cursor + 1]);
 
-          std::swap(Ax[cursor], Ax[cursor + 1]);
-          if (numbers::NumberTraits<number>::is_complex == true)
-            std::swap(Az[cursor], Az[cursor + 1]);
+              std::swap(Ax[cursor], Ax[cursor + 1]);
+              if (numbers::NumberTraits<number>::is_complex == true)
+                std::swap(Az[cursor], Az[cursor + 1]);
 
-          ++cursor;
+              ++cursor;
+            }
         }
-    }
+    },
+    /* grain size = */ 50);
 }
 
 
@@ -150,20 +156,26 @@ void
 SparseDirectUMFPACK::sort_arrays(const SparseMatrixEZ<number> &matrix)
 {
   // same thing for SparseMatrixEZ
-  for (size_type row = 0; row < matrix.m(); ++row)
-    {
-      long int cursor = Ap[row];
-      while ((cursor < Ap[row + 1] - 1) && (Ai[cursor] > Ai[cursor + 1]))
+  parallel::apply_to_subranges(
+    0,
+    matrix.m(),
+    [this](const size_type row_begin, const size_type row_end) {
+      for (size_type row = row_begin; row < row_end; ++row)
         {
-          std::swap(Ai[cursor], Ai[cursor + 1]);
+          long int cursor = Ap[row];
+          while ((cursor < Ap[row + 1] - 1) && (Ai[cursor] > Ai[cursor + 1]))
+            {
+              std::swap(Ai[cursor], Ai[cursor + 1]);
 
-          std::swap(Ax[cursor], Ax[cursor + 1]);
-          if (numbers::NumberTraits<number>::is_complex == true)
-            std::swap(Az[cursor], Az[cursor + 1]);
+              std::swap(Ax[cursor], Ax[cursor + 1]);
+              if (numbers::NumberTraits<number>::is_complex == true)
+                std::swap(Az[cursor], Az[cursor + 1]);
 
-          ++cursor;
+              ++cursor;
+            }
         }
-    }
+    },
+    /* grain size = */ 50);
 }
 
 
