@@ -153,8 +153,9 @@ namespace parallel
     internal::parallel_for(
       SyncIterators(x_begin),
       SyncIterators(x_end),
-      [predicate](const std::tuple<InputIterator, OutputIterator> &p) {
-        *std::get<1>(p) = predicate(*std::get<0>(p));
+      [predicate](const auto &range) {
+        for (const auto &p : range)
+          *std::get<1>(p) = predicate(*std::get<0>(p));
       },
       grainsize);
 #endif
@@ -213,9 +214,9 @@ namespace parallel
     internal::parallel_for(
       SyncIterators(x_begin),
       SyncIterators(x_end),
-      [predicate](
-        const std::tuple<InputIterator1, InputIterator2, OutputIterator> &p) {
-        *std::get<2>(p) = predicate(*std::get<0>(p), *std::get<1>(p));
+      [predicate](const auto &range) {
+        for (const auto &p : range)
+          *std::get<2>(p) = predicate(*std::get<0>(p), *std::get<1>(p));
       },
       grainsize);
 #endif
@@ -279,12 +280,10 @@ namespace parallel
     internal::parallel_for(
       SyncIterators(x_begin),
       SyncIterators(x_end),
-      [predicate](
-        const std::
-          tuple<InputIterator1, InputIterator2, InputIterator3, OutputIterator>
-            &p) {
-        *std::get<3>(p) =
-          predicate(*std::get<0>(p), *std::get<1>(p), *std::get<2>(p));
+      [predicate](const auto &range) {
+        for (const auto &p : range)
+          *std::get<3>(p) =
+            predicate(*std::get<0>(p), *std::get<1>(p), *std::get<2>(p));
       },
       grainsize);
 #endif
