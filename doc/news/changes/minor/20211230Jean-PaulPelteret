@@ -1,0 +1,5 @@
+New: The IteratorFilters::BoundaryIdEqualTo and IteratorFilters::ManifoldIdEqualTo
+filtered iterator predicates have been added to help select cell faces that
+have, respectively, one or more specified boundary ID(s) and manifold ID(s).
+<br>
+(Jean-Paul Pelteret, 2021/12/30)
