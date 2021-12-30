@@ -366,6 +366,44 @@ namespace IteratorFilters
      */
     const std::set<types::boundary_id> boundary_ids;
   };
+
+
+  /**
+   * Filter for iterators that evaluates to true if the iterator of the object
+   * pointed to is equal to a value or set of values given to the constructor,
+   * assuming that the iterator allows querying for a manifold id.
+   *
+   * @ingroup Iterators
+   */
+  class ManifoldIdEqualTo
+  {
+  public:
+    /**
+     * Constructor. Store the boundary id which iterators shall have to be
+     * evaluated to true.
+     */
+    ManifoldIdEqualTo(const types::manifold_id manifold_id);
+
+    /**
+     * Constructor. Store a collection of boundary ids which iterators shall
+     * have to be evaluated to true.
+     */
+    ManifoldIdEqualTo(const std::set<types::manifold_id> &manifold_ids);
+
+    /**
+     * Evaluation operator. Returns true if the boundary id of the object
+     * pointed to is equal within the stored set of value allowable values.
+     */
+    template <class Iterator>
+    bool
+    operator()(const Iterator &i) const;
+
+  protected:
+    /**
+     * Stored value to compare the material id with.
+     */
+    const std::set<types::manifold_id> manifold_ids;
+  };
 } // namespace IteratorFilters
 
 
@@ -1501,6 +1539,30 @@ namespace IteratorFilters
   BoundaryIdEqualTo::operator()(const Iterator &i) const
   {
     return boundary_ids.find(i->boundary_id()) != boundary_ids.end();
+  }
+
+
+
+  // ---------------- IteratorFilters::ManifoldIdEqualTo ---------
+  inline ManifoldIdEqualTo::ManifoldIdEqualTo(
+    const types::manifold_id manifold_id)
+    : manifold_ids{manifold_id}
+  {}
+
+
+
+  inline ManifoldIdEqualTo::ManifoldIdEqualTo(
+    const std::set<types::manifold_id> &manifold_ids)
+    : manifold_ids(manifold_ids)
+  {}
+
+
+
+  template <class Iterator>
+  inline bool
+  ManifoldIdEqualTo::operator()(const Iterator &i) const
+  {
+    return manifold_ids.find(i->manifold_id()) != manifold_ids.end();
   }
 } // namespace IteratorFilters
 
