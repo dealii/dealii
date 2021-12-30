@@ -71,84 +71,6 @@ namespace parallel
 #endif
 
 
-
-    /**
-     * Convert a function object of type F into an object that can be applied
-     * to all elements of a range of synchronous iterators.
-     */
-    template <typename F>
-    struct Body
-    {
-      /**
-       * Constructor. Take and package the given function object.
-       */
-      Body(const F &f)
-        : f(f)
-      {}
-
-      template <typename Range>
-      void
-      operator()(const Range &range) const
-      {
-        for (typename Range::const_iterator p = range.begin(); p != range.end();
-             ++p)
-          apply(f, *p);
-      }
-
-    private:
-      /**
-       * The stored function object.
-       */
-      const F f;
-
-      /**
-       * Apply F to a set of iterators with two elements.
-       */
-      template <typename I1, typename I2>
-      static void
-      apply(const F &f, const std::tuple<I1, I2> &p)
-      {
-        *std::get<1>(p) = f(*std::get<0>(p));
-      }
-
-      /**
-       * Apply F to a set of iterators with three elements.
-       */
-      template <typename I1, typename I2, typename I3>
-      static void
-      apply(const F &f, const std::tuple<I1, I2, I3> &p)
-      {
-        *std::get<2>(p) = f(*std::get<0>(p), *std::get<1>(p));
-      }
-
-      /**
-       * Apply F to a set of iterators with three elements.
-       */
-      template <typename I1, typename I2, typename I3, typename I4>
-      static void
-      apply(const F &f, const std::tuple<I1, I2, I3, I4> &p)
-      {
-        *std::get<3>(p) = f(*std::get<0>(p), *std::get<1>(p), *std::get<2>(p));
-      }
-    };
-
-
-
-    /**
-     * Take a function object and create a Body object from it. We do this in
-     * this helper function since alternatively we would have to specify the
-     * actual data type of F -- which for function objects is often
-     * extraordinarily complicated.
-     */
-    template <typename F>
-    Body<F>
-    make_body(const F &f)
-    {
-      return Body<F>(f);
-    }
-
-
-
 #ifdef DEAL_II_WITH_TBB
     /**
      * Encapsulate tbb::parallel_for.
@@ -228,10 +150,14 @@ namespace parallel
     using SyncIterators = SynchronousIterators<Iterators>;
     Iterators x_begin(begin_in, out);
     Iterators x_end(end_in, OutputIterator());
-    internal::parallel_for(SyncIterators(x_begin),
-                           SyncIterators(x_end),
-                           internal::make_body(predicate),
-                           grainsize);
+    internal::parallel_for(
+      SyncIterators(x_begin),
+      SyncIterators(x_end),
+      [predicate](const auto &range) {
+        for (const auto &p : range)
+          *std::get<1>(p) = predicate(*std::get<0>(p));
+      },
+      grainsize);
 #endif
   }
 
@@ -285,10 +211,14 @@ namespace parallel
     using SyncIterators = SynchronousIterators<Iterators>;
     Iterators x_begin(begin_in1, in2, out);
     Iterators x_end(end_in1, InputIterator2(), OutputIterator());
-    internal::parallel_for(SyncIterators(x_begin),
-                           SyncIterators(x_end),
-                           internal::make_body(predicate),
-                           grainsize);
+    internal::parallel_for(
+      SyncIterators(x_begin),
+      SyncIterators(x_end),
+      [predicate](const auto &range) {
+        for (const auto &p : range)
+          *std::get<2>(p) = predicate(*std::get<0>(p), *std::get<1>(p));
+      },
+      grainsize);
 #endif
   }
 
@@ -347,10 +277,15 @@ namespace parallel
                     InputIterator2(),
                     InputIterator3(),
                     OutputIterator());
-    internal::parallel_for(SyncIterators(x_begin),
-                           SyncIterators(x_end),
-                           internal::make_body(predicate),
-                           grainsize);
+    internal::parallel_for(
+      SyncIterators(x_begin),
+      SyncIterators(x_end),
+      [predicate](const auto &range) {
+        for (const auto &p : range)
+          *std::get<3>(p) =
+            predicate(*std::get<0>(p), *std::get<1>(p), *std::get<2>(p));
+      },
+      grainsize);
 #endif
   }
 
