@@ -528,100 +528,11 @@ namespace parallel
 
 
 
-  namespace internal
-  {
-#ifdef DEAL_II_WITH_TBB
-    /**
-     * A class that conforms to the Body requirements of the TBB
-     * parallel_reduce function. The first template argument denotes the type
-     * on which the reduction is to be done. The second denotes the type of
-     * the function object that shall be called for each subrange.
-     */
-    template <typename ResultType, typename Function>
-    struct ReductionOnSubranges
-    {
-      /**
-       * A variable that will hold the result of the reduction.
-       */
-      ResultType result;
-
-      /**
-       * Constructor. Take the function object to call on each sub-range as
-       * well as the neutral element with respect to the reduction operation.
-       *
-       * The second argument denotes a function object that will be used to
-       * reduce the result of two computations into one number. An example if
-       * we want to simply accumulate integer results would be
-       * std::plus<int>().
-       */
-      template <typename Reductor>
-      ReductionOnSubranges(const Function & f,
-                           const Reductor & reductor,
-                           const ResultType neutral_element = ResultType())
-        : result(neutral_element)
-        , f(f)
-        , neutral_element(neutral_element)
-        , reductor(reductor)
-      {}
-
-      /**
-       * Splitting constructor. See the TBB book for more details about this.
-       */
-      ReductionOnSubranges(const ReductionOnSubranges &r, tbb::split)
-        : result(r.neutral_element)
-        , f(r.f)
-        , neutral_element(r.neutral_element)
-        , reductor(r.reductor)
-      {}
-
-      /**
-       * Join operation: merge the results from computations on different sub-
-       * intervals.
-       */
-      void
-      join(const ReductionOnSubranges &r)
-      {
-        result = reductor(result, r.result);
-      }
-
-      /**
-       * Execute the given function on the specified range.
-       */
-      template <typename RangeType>
-      void
-      operator()(const tbb::blocked_range<RangeType> &range)
-      {
-        result = reductor(result, f(range.begin(), range.end()));
-      }
-
-    private:
-      /**
-       * The function object to call on every sub-range.
-       */
-      const Function f;
-
-      /**
-       * The neutral element with respect to the reduction operation. This is
-       * needed when calling the splitting constructor since we have to re-set
-       * the result variable in this case.
-       */
-      const ResultType neutral_element;
-
-      /**
-       * The function object to be used to reduce the result of two calls into
-       * one number.
-       */
-      const std::function<ResultType(ResultType, ResultType)> reductor;
-    };
-#endif
-  } // namespace internal
-
-
   /**
-   * This function works a lot like the apply_to_subranges(), but it allows to
-   * accumulate numerical results computed on each subrange into one number.
-   * The type of this number is given by the ResultType template argument that
-   * needs to be explicitly specified.
+   * This function works a lot like the apply_to_subranges() function, but it
+   * allows to accumulate numerical results computed on each subrange into one
+   * number. The type of this number is given by the `ResultType` template
+   * argument that needs to be explicitly specified.
    *
    * An example of use of this function is to compute the value of the
    * expression $x^T A x$ for a square matrix $A$ and a vector $x$. The sum
@@ -691,12 +602,16 @@ namespace parallel
 
     return f(begin, end);
 #else
-    internal::ReductionOnSubranges<ResultType, Function> reductor(
-      f, std::plus<ResultType>(), 0);
-    tbb::parallel_reduce(tbb::blocked_range<RangeType>(begin, end, grainsize),
-                         reductor,
-                         tbb::auto_partitioner());
-    return reductor.result;
+    return tbb::parallel_reduce(
+      tbb::blocked_range<RangeType>(begin, end, grainsize),
+      ResultType(0),
+      [f](const auto &range, const ResultType &starting_value) {
+        ResultType value = starting_value;
+        value += f(range.begin(), range.end());
+        return value;
+      },
+      std::plus<ResultType>(),
+      tbb::auto_partitioner());
 #endif
   }
 
