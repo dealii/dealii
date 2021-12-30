@@ -324,6 +324,18 @@ public:
   virtual std::unique_ptr<FiniteElement<dim, dim>>
   clone() const override;
 
+  /**
+   * For a finite element of degree larger than @p sub_degree, we return a
+   * vector which maps the numbering on an FE of degree @p sub_degree into the
+   * numbering on this element.
+   *
+   * Note that for the Nedelec element, by @p sub_degree,
+   * we refer to the maximal polynomial degree (in any coordinate direction) as
+   * opposed to the Nedelec degree.
+   */
+  std::vector<unsigned int>
+  get_embedding_dofs(const unsigned int sub_degree) const;
+
 private:
   /**
    * Only for internal use. Its full name is @p get_dofs_per_object_vector
