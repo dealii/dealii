@@ -34,7 +34,8 @@ void
 test()
 {
   Triangulation<dim, spacedim> tria;
-  GridGenerator::hyper_cube(tria);
+  GridGenerator::hyper_cube(tria, 0, 1, true);
+
   // refine the boundary cells a few times
   for (unsigned int i = 0; i < 5; ++i)
     {
@@ -51,28 +52,47 @@ test()
       ++i;
     }
 
-  // Count the faces that are on the boundary and have a manifold_id of 0
+  // Count the faces that are on the boundary and have a boundary_id of 0 and a
+  // manifold_id of 0
+  const types::boundary_id boundary_id = 0;
   const types::manifold_id manifold_id = 0;
   std::set<typename Triangulation<dim, spacedim>::active_face_iterator>
-    face_set;
+    boundary_face_set, manifold_face_set;
+
   for (const auto &cell : tria.active_cell_iterators())
     for (const unsigned int face_n : GeometryInfo<dim>::face_indices())
-      if (cell->face(face_n)->at_boundary() &&
-          cell->face(face_n)->manifold_id() == manifold_id)
-        face_set.insert(cell->face(face_n));
+      if (cell->face(face_n)->at_boundary())
+        {
+          if (cell->face(face_n)->boundary_id() == boundary_id)
+            boundary_face_set.insert(cell->face(face_n));
 
-  std::size_t n_filtered_cells = 0;
-  for (const auto filtered_cell :
+          if (cell->face(face_n)->manifold_id() == manifold_id)
+            manifold_face_set.insert(cell->face(face_n));
+        }
+
+  std::size_t n_boundary_filtered_cells = 0;
+  for (const auto &filtered_cell :
        tria.active_face_iterators() | IteratorFilters::AtBoundary() |
-         [=](const typename Triangulation<dim, spacedim>::active_face_iterator
-               &face) { return face->manifold_id() == manifold_id; })
+         IteratorFilters::BoundaryIdEqualTo(boundary_id))
     {
-      AssertThrow(face_set.count(filtered_cell) == 1,
+      AssertThrow(boundary_face_set.count(filtered_cell) == 1,
                   ExcMessage("Wrong cell filtered."));
-      ++n_filtered_cells;
+      ++n_boundary_filtered_cells;
     }
-  AssertThrow(n_filtered_cells == face_set.size(),
-              ExcMessage("Filtered cells missing."));
+  AssertThrow(n_boundary_filtered_cells == boundary_face_set.size(),
+              ExcMessage("Boundary filtered cells missing."));
+
+  std::size_t n_manifold_filtered_cells = 0;
+  for (const auto &filtered_cell :
+       tria.active_face_iterators() | IteratorFilters::AtBoundary() |
+         IteratorFilters::ManifoldIdEqualTo(manifold_id))
+    {
+      AssertThrow(manifold_face_set.count(filtered_cell) == 1,
+                  ExcMessage("Wrong cell filtered."));
+      ++n_manifold_filtered_cells;
+    }
+  AssertThrow(n_manifold_filtered_cells == manifold_face_set.size(),
+              ExcMessage("Manifold filtered cells missing."));
 }
 
 int
