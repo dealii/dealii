@@ -328,6 +328,44 @@ namespace IteratorFilters
     bool
     operator()(const Iterator &i) const;
   };
+
+
+  /**
+   * Filter for iterators that evaluates to true if the iterator of the object
+   * pointed to is equal to a value or set of values given to the constructor,
+   * assuming that the iterator allows querying for a boundary id.
+   *
+   * @ingroup Iterators
+   */
+  class BoundaryIdEqualTo
+  {
+  public:
+    /**
+     * Constructor. Store the boundary id which iterators shall have to be
+     * evaluated to true.
+     */
+    BoundaryIdEqualTo(const types::boundary_id boundary_id);
+
+    /**
+     * Constructor. Store a collection of boundary ids which iterators shall
+     * have to be evaluated to true.
+     */
+    BoundaryIdEqualTo(const std::set<types::boundary_id> &boundary_ids);
+
+    /**
+     * Evaluation operator. Returns true if the boundary id of the object
+     * pointed to is equal within the stored set of value allowable values.
+     */
+    template <class Iterator>
+    bool
+    operator()(const Iterator &i) const;
+
+  protected:
+    /**
+     * Stored value to compare the material id with.
+     */
+    const std::set<types::boundary_id> boundary_ids;
+  };
 } // namespace IteratorFilters
 
 
@@ -1439,6 +1477,30 @@ namespace IteratorFilters
   AtBoundary::operator()(const Iterator &i) const
   {
     return (i->at_boundary());
+  }
+
+
+
+  // ---------------- IteratorFilters::BoundaryIdEqualTo ---------
+  inline BoundaryIdEqualTo::BoundaryIdEqualTo(
+    const types::boundary_id boundary_id)
+    : boundary_ids{boundary_id}
+  {}
+
+
+
+  inline BoundaryIdEqualTo::BoundaryIdEqualTo(
+    const std::set<types::boundary_id> &boundary_ids)
+    : boundary_ids(boundary_ids)
+  {}
+
+
+
+  template <class Iterator>
+  inline bool
+  BoundaryIdEqualTo::operator()(const Iterator &i) const
+  {
+    return boundary_ids.find(i->boundary_id()) != boundary_ids.end();
   }
 } // namespace IteratorFilters
 
