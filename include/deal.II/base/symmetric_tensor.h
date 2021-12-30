@@ -99,7 +99,7 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE SymmetricTensor<4, dim, Number>
  * In index notation, we can write the general form
  * \f[
  *   \mathcal{I}_{ijkl} = \frac 12 \left( \delta_{ik} \delta_{jl} +
- *                                        \delta_{il} \delta_{jl} \right).
+ *                                        \delta_{il} \delta_{jk} \right).
  * \f]
  * To see why this factor of $1 / 2$ is necessary, consider computing
  * $\mathbf A= \mathbb I : \mathbf B$.
