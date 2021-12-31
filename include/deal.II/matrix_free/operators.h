@@ -385,7 +385,6 @@ namespace MatrixFreeOperators
     const std::shared_ptr<DiagonalMatrix<VectorType>> &
     get_matrix_diagonal() const;
 
-
     /**
      * Apply the Jacobi preconditioner, which multiplies every element of the
      * <tt>src</tt> vector by the inverse of the respective diagonal element and
