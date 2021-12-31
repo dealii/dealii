@@ -1,7 +1,7 @@
 <br>
 
 <i>
-This program was contributed by Timo Heister and Jiaqi Zhang.
+This program was contributed by Jiaqi Zhang and Timo Heister.
 <br>
 This material is based upon work partly supported by the National
 Science Foundation Award DMS-2028346, OAC-2015848, EAR-1925575, by the Computational
@@ -9,6 +9,7 @@ Infrastructure in Geodynamics initiative (CIG), through the NSF under Award
 EAR-0949446 and EAR-1550901 and The University of California -- Davis.
 </i>
 
+@dealiiTutorialDOI{10.5281/zenodo.5812174,https://zenodo.org/badge/DOI/10.5281/zenodo.5812174.svg}
 
 <a name="Intro"></a>
 <h1><em>Symmetric interior penalty Galerkin</em> (SIPG) method for Poisson's equation</h1>
