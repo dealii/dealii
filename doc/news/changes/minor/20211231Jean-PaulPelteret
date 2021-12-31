@@ -1,0 +1,5 @@
+New: More "getter" functions have been added to MeshWorker::ScratchData,
+facilitating the construction of other FEValues-type objects with some of 
+the same objects as those used in a ScratchData instance.
+<br>
+(Jean-Paul Pelteret, 2021/12/31)

@@ -533,6 +533,48 @@ namespace MeshWorker
     get_mapping() const;
 
     /**
+     * Return a reference to the selected finite element object.
+     */
+    const FiniteElement<dim, spacedim> &
+    get_fe() const;
+
+    /**
+     * Return a reference to the cell quadrature object in use.
+     */
+    const Quadrature<dim> &
+    get_cell_quadrature() const;
+
+    /**
+     * Return a reference to the face quadrature object in use.
+     */
+    const Quadrature<dim - 1> &
+    get_face_quadrature() const;
+
+    /**
+     * Return the cell update flags set.
+     */
+    UpdateFlags
+    get_cell_update_flags() const;
+
+    /**
+     * Return the neighbor cell update flags set.
+     */
+    UpdateFlags
+    get_neighbor_cell_update_flags() const;
+
+    /**
+     * Return the face update flags set.
+     */
+    UpdateFlags
+    get_face_update_flags() const;
+
+    /**
+     * Return the neighbor face update flags set.
+     */
+    UpdateFlags
+    get_neighbor_face_update_flags() const;
+
+    /**
      * @name Evaluation of finite element fields and their derivatives on the current cell
      */
     /** @{ */ // CurrentCellEvaluation
