@@ -189,34 +189,42 @@ SparseDirectUMFPACK::sort_arrays(const BlockSparseMatrix<number> &matrix)
   // first. however, that means that there may be as many entries per row
   // in the wrong place as there are block columns. we can do the same
   // thing as above, but we have to do it multiple times
-  for (size_type row = 0; row < matrix.m(); ++row)
-    {
-      long int cursor = Ap[row];
-      for (size_type block = 0; block < matrix.n_block_cols(); ++block)
+  parallel::apply_to_subranges(
+    0,
+    matrix.m(),
+    [this, &matrix](const size_type row_begin, const size_type row_end) {
+      for (size_type row = row_begin; row < row_end; ++row)
         {
-          // find the next out-of-order element
-          while ((cursor < Ap[row + 1] - 1) && (Ai[cursor] < Ai[cursor + 1]))
-            ++cursor;
-
-          // if there is none, then just go on
-          if (cursor == Ap[row + 1] - 1)
-            break;
-
-          // otherwise swap this entry with successive ones as long as
-          // necessary
-          long int element = cursor;
-          while ((element < Ap[row + 1] - 1) && (Ai[element] > Ai[element + 1]))
+          long int cursor = Ap[row];
+          for (size_type block = 0; block < matrix.n_block_cols(); ++block)
             {
-              std::swap(Ai[element], Ai[element + 1]);
+              // find the next out-of-order element
+              while ((cursor < Ap[row + 1] - 1) &&
+                     (Ai[cursor] < Ai[cursor + 1]))
+                ++cursor;
 
-              std::swap(Ax[element], Ax[element + 1]);
-              if (numbers::NumberTraits<number>::is_complex == true)
-                std::swap(Az[element], Az[element + 1]);
+              // if there is none, then just go on
+              if (cursor == Ap[row + 1] - 1)
+                break;
 
-              ++element;
+              // otherwise swap this entry with successive ones as long as
+              // necessary
+              long int element = cursor;
+              while ((element < Ap[row + 1] - 1) &&
+                     (Ai[element] > Ai[element + 1]))
+                {
+                  std::swap(Ai[element], Ai[element + 1]);
+
+                  std::swap(Ax[element], Ax[element + 1]);
+                  if (numbers::NumberTraits<number>::is_complex == true)
+                    std::swap(Az[element], Az[element + 1]);
+
+                  ++element;
+                }
             }
         }
-    }
+    },
+    /* grain size = */ 50);
 }
 
 
@@ -268,30 +276,31 @@ SparseDirectUMFPACK::factorize(const Matrix &matrix)
 
   // then copy over matrix elements. note that for sparse matrices,
   // iterators are sorted so that they traverse each row from start to end
-  // before moving on to the next row. however, this isn't true for block
-  // matrices, so we have to do a bit of book keeping
-
-  // loop over the elements of the matrix row by row, as suggested in the
-  // documentation of the sparse matrix iterator class
-  for (size_type row = 0; row < matrix.m(); ++row)
-    {
-      long int index = Ap[row];
-      for (typename Matrix::const_iterator p = matrix.begin(row);
-           p != matrix.end(row);
-           ++p)
+  // before moving on to the next row.
+  parallel::apply_to_subranges(
+    0,
+    matrix.m(),
+    [this, &matrix](const size_type row_begin, const size_type row_end) {
+      for (size_type row = row_begin; row < row_end; ++row)
         {
-          // write entry into the first free one for this row
-          Ai[index] = p->column();
-          Ax[index] = std::real(p->value());
-          if (numbers::NumberTraits<number>::is_complex == true)
-            Az[index] = std::imag(p->value());
+          long int index = Ap[row];
+          for (typename Matrix::const_iterator p = matrix.begin(row);
+               p != matrix.end(row);
+               ++p)
+            {
+              // write entry into the first free one for this row
+              Ai[index] = p->column();
+              Ax[index] = std::real(p->value());
+              if (numbers::NumberTraits<number>::is_complex == true)
+                Az[index] = std::imag(p->value());
 
-          // then move pointer ahead
-          ++index;
+              // then move pointer ahead
+              ++index;
+            }
+          Assert(index == Ap[row + 1], ExcInternalError());
         }
-
-      Assert(index == Ap[row + 1], ExcInternalError());
-    }
+    },
+    /* grain size = */ 50);
 
   // make sure that the elements in each row are sorted. we have to be more
   // careful for block sparse matrices, so ship this task out to a
