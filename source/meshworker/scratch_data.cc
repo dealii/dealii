@@ -403,6 +403,69 @@ namespace MeshWorker
     return *mapping;
   }
 
+
+
+  template <int dim, int spacedim>
+  const FiniteElement<dim, spacedim> &
+  ScratchData<dim, spacedim>::get_fe() const
+  {
+    return *fe;
+  }
+
+
+
+  template <int dim, int spacedim>
+  const Quadrature<dim> &
+  ScratchData<dim, spacedim>::get_cell_quadrature() const
+  {
+    return cell_quadrature;
+  }
+
+
+
+  template <int dim, int spacedim>
+  const Quadrature<dim - 1> &
+  ScratchData<dim, spacedim>::get_face_quadrature() const
+  {
+    return face_quadrature;
+  }
+
+
+
+  template <int dim, int spacedim>
+  UpdateFlags
+  ScratchData<dim, spacedim>::get_cell_update_flags() const
+  {
+    return cell_update_flags;
+  }
+
+
+
+  template <int dim, int spacedim>
+  UpdateFlags
+  ScratchData<dim, spacedim>::get_neighbor_cell_update_flags() const
+  {
+    return neighbor_cell_update_flags;
+  }
+
+
+
+  template <int dim, int spacedim>
+  UpdateFlags
+  ScratchData<dim, spacedim>::get_face_update_flags() const
+  {
+    return face_update_flags;
+  }
+
+
+
+  template <int dim, int spacedim>
+  UpdateFlags
+  ScratchData<dim, spacedim>::get_neighbor_face_update_flags() const
+  {
+    return neighbor_face_update_flags;
+  }
+
 } // namespace MeshWorker
 DEAL_II_NAMESPACE_CLOSE
 
