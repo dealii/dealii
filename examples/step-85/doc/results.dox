@@ -1,0 +1,20 @@
+<h1>Results</h1>
+
+The numerical solution for one of the refinements is shown in the below figure.
+The zero-contour of the level set function is shown as a white line.
+On the intersected cells,
+we see that the numerical solution has a value also outside $\overline{\Omega}$.
+As mentioned earlier, this extension of the solution is artificial.
+
+The results of the convergence study is shown in the table below.
+We see that the $L^2$ error decreases as we refine and that the estimated
+order of convergence, EOC, is close to 2.
+
+@image html step-85-solution.png
+
+| Cycle | Mesh size | $L^2$-Error | EOC  |
+|:-----:|:---------:|:-----------:|:----:|
+|   0   |  0.3025   |  8.0657e-02 |  -   |
+|   1   |  0.1513   |  1.8711e-02 | 2.11 |
+|   2   |  0.0756   |  4.1624e-03 | 2.17 |
+|   3   |  0.0378   |  9.3979e-04 | 2.15 |
