@@ -92,8 +92,8 @@ namespace internal
           update_quadrature_points) != 0u ?
            update_quadrature_points :
            update_default) |
-        ((update_flags_inner_faces | update_flags_boundary_faces) &
-             (update_jacobian_grads | update_hessians) ?
+        (((update_flags_inner_faces | update_flags_boundary_faces) &
+          (update_jacobian_grads | update_hessians)) != 0u ?
            update_jacobian_grads :
            update_default) |
         update_normal_vectors | update_JxW_values | update_jacobians;

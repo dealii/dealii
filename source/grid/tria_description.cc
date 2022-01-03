@@ -424,9 +424,9 @@ namespace TriangulationDescription
           , level_subdomain_id_function(level_subdomain_id_function)
           , comm(comm)
           , settings(settings)
-          , construct_multigrid(
-              settings &
-              TriangulationDescription::Settings::construct_multigrid_hierarchy)
+          , construct_multigrid((settings & TriangulationDescription::Settings::
+                                              construct_multigrid_hierarchy) !=
+                                0u)
         {
           Assert(
             !(settings & TriangulationDescription::Settings::
