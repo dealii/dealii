@@ -281,7 +281,7 @@ namespace CUDAWrappers
     reinit(const DoFHandler<dim> &          dof_handler,
            const AffineConstraints<Number> &constraints,
            const Quadrature<1> &            quad,
-           const AdditionalData &           AdditionalData = AdditionalData());
+           const AdditionalData &           additional_data = AdditionalData());
 
     /**
      * Return the Data structure associated with @p color.
