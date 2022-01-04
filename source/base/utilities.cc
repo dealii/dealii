@@ -611,7 +611,7 @@ namespace Utilities
     std::string s = s_;
     while ((s.size() > 0) && (s[0] == ' '))
       s.erase(s.begin());
-    while ((s.size() > 0) && (s[s.size() - 1] == ' '))
+    while ((s.size() > 0) && (s.back() == ' '))
       s.erase(s.end() - 1);
 
     // Now convert and see whether we succeed. Note that strtol only
@@ -659,7 +659,7 @@ namespace Utilities
     std::string s = s_;
     while ((s.size() > 0) && (s[0] == ' '))
       s.erase(s.begin());
-    while ((s.size() > 0) && (s[s.size() - 1] == ' '))
+    while ((s.size() > 0) && (s.back() == ' '))
       s.erase(s.end() - 1);
 
     // Now convert and see whether we succeed. Note that strtol only
@@ -709,7 +709,7 @@ namespace Utilities
 
     // as discussed in the documentation, eat whitespace from the end
     // of the string
-    while (tmp.size() != 0 && tmp[tmp.size() - 1] == ' ')
+    while (tmp.size() != 0 && tmp.back() == ' ')
       tmp.erase(tmp.size() - 1, 1);
 
     // split the input list until it is empty. since in every iteration
@@ -735,7 +735,7 @@ namespace Utilities
         // strip spaces from this element's front and end
         while ((name.size() != 0) && (name[0] == ' '))
           name.erase(0, 1);
-        while (name.size() != 0 && name[name.size() - 1] == ' ')
+        while (name.size() != 0 && name.back() == ' ')
           name.erase(name.size() - 1, 1);
 
         split_list.push_back(name);
@@ -763,7 +763,7 @@ namespace Utilities
     std::vector<std::string> lines;
 
     // remove trailing spaces
-    while ((text.size() != 0) && (text[text.size() - 1] == delimiter))
+    while ((text.size() != 0) && (text.back() == delimiter))
       text.erase(text.size() - 1, 1);
 
     // then split the text into lines
@@ -778,7 +778,7 @@ namespace Utilities
         if (pos_newline != std::string::npos && pos_newline <= width)
           {
             std::string line(text, 0, pos_newline);
-            while ((line.size() != 0) && (line[line.size() - 1] == delimiter))
+            while ((line.size() != 0) && (line.back() == delimiter))
               line.erase(line.size() - 1, 1);
             lines.push_back(line);
             text.erase(0, pos_newline + 1);
@@ -791,7 +791,7 @@ namespace Utilities
         if (text.size() < width)
           {
             // remove trailing spaces
-            while ((text.size() != 0) && (text[text.size() - 1] == delimiter))
+            while ((text.size() != 0) && (text.back() == delimiter))
               text.erase(text.size() - 1, 1);
             lines.push_back(text);
             text = "";
@@ -819,7 +819,7 @@ namespace Utilities
             // location and put it into a single
             // line, and remove it from 'text'
             std::string line(text, 0, location);
-            while ((line.size() != 0) && (line[line.size() - 1] == delimiter))
+            while ((line.size() != 0) && (line.back() == delimiter))
               line.erase(line.size() - 1, 1);
             lines.push_back(line);
             text.erase(0, location);
