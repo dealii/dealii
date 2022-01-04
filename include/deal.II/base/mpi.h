@@ -500,35 +500,53 @@ namespace Utilities
 
 
     /**
-     * Create an MPI_Datatype that consists of @p n_bytes bytes.
+     * Create a object that contains an `MPI_Datatype` that represents @p n_bytes bytes.
      *
-     * The resulting data type can be used in MPI send/recv or MPI IO to process
-     * messages of sizes larger than 2 GB with MPI_Byte as the underlying data
-     * type. This helper is required for MPI versions before 4.0 because
-     * routines like MPI_Send
+     * The resulting data type can be used in MPI send/receive or MPI IO to
+     * process messages of sizes larger than 2 GB with MPI_Byte as the
+     * underlying data type. This helper is required for MPI versions before 4.0
+     * because routines like `MPI_Send`
      * use a signed interger for the @p count variable. Instead, you can use this
      * data type with the appropriate size set to the size of your message and
      * by passing
      * 1 as the @p count.
      *
-     * @note You need to free this data type after you are done using it by calling
-     * <code>MPI_Type_free(&result)</code>.
+     * @note The function does not just return an object of type `MPI_Datatype`
+     *   because such objects need to be destroyed by a call to `MPI_Type_free`
+     *   and it is easy to forget to do so (thereby creating a resource leak).
+     *   Rather, the function returns an object that *points* to such an
+     *   `MPI_Datatype` object, but also has a "deleter" function that ensures
+     *   that `MPI_Type_free` is called whenever the object returned by this
+     *   function goes out of scope.
      *
      * Usage example:
      * <code>
      * std::vector<char> buffer;
+     * [...]
      * if (buffer.size()<(1U<<31))
+     * {                               // less than 2GB of data
      *   MPI_Send(buffer.data(), buffer.size(), MPI_BYTE, dest, tag, comm);
+     * }
      * else
-     * {
-     *   MPI_Datatype bigtype =
+     * {                               // more than 2GB of data
+     *   const auto bigtype =
      *     Utilities::MPI::create_mpi_data_type_n_bytes(buffer.size());
-     *   MPI_Send(buffer.data(), 1, bigtype, dest, tag, comm);
-     *   MPI_Type_free(&bigtype);
+     *   MPI_Send(buffer.data(), 1, *bigtype, dest, tag, comm);
+     * }
+     * </code>
+     * Alternatively, the code in the `else` branch can be simplified to
+     * the following:
+     * <code>
+     * [...]
+     * else
+     * {                               // more than 2GB of data
+     *   MPI_Send(buffer.data(), 1,
+     *            *Utilities::MPI::create_mpi_data_type_n_bytes(buffer.size()),
+     *            dest, tag, comm);
      * }
      * </code>
      */
-    MPI_Datatype
+    std::unique_ptr<MPI_Datatype, void (*)(MPI_Datatype *)>
     create_mpi_data_type_n_bytes(const std::size_t n_bytes);
 
     /**

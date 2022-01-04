@@ -1466,23 +1466,22 @@ namespace parallel
       else
         {
           // Writes bigger than 2GB require some extra care:
-          MPI_Datatype bigtype =
-            Utilities::MPI::create_mpi_data_type_n_bytes(src_data_fixed.size());
           ierr =
             MPI_File_write_at(fh,
                               my_global_file_position,
                               DEAL_II_MPI_CONST_CAST(src_data_fixed.data()),
                               1,
-                              bigtype,
+                              *Utilities::MPI::create_mpi_data_type_n_bytes(
+                                src_data_fixed.size()),
                               MPI_STATUS_IGNORE);
-          AssertThrowMPI(ierr);
-          ierr = MPI_Type_free(&bigtype);
           AssertThrowMPI(ierr);
         }
 
       ierr = MPI_File_close(&fh);
       AssertThrowMPI(ierr);
     }
+
+
 
     //
     // ---------- Variable size data ----------
@@ -1568,17 +1567,15 @@ namespace parallel
         else
           {
             // Writes bigger than 2GB require some extra care:
-            MPI_Datatype bigtype = Utilities::MPI::create_mpi_data_type_n_bytes(
-              src_data_variable.size());
-            ierr = MPI_File_write_at(fh,
-                                     my_global_file_position,
-                                     DEAL_II_MPI_CONST_CAST(
-                                       src_data_variable.data()),
-                                     1,
-                                     bigtype,
-                                     MPI_STATUS_IGNORE);
-            AssertThrowMPI(ierr);
-            ierr = MPI_Type_free(&bigtype);
+            ierr =
+              MPI_File_write_at(fh,
+                                my_global_file_position,
+                                DEAL_II_MPI_CONST_CAST(
+                                  src_data_variable.data()),
+                                1,
+                                *Utilities::MPI::create_mpi_data_type_n_bytes(
+                                  src_data_variable.size()),
+                                MPI_STATUS_IGNORE);
             AssertThrowMPI(ierr);
           }
 
@@ -1681,16 +1678,13 @@ namespace parallel
       else
         {
           // Reads bigger than 2GB require some extra care:
-          MPI_Datatype bigtype = Utilities::MPI::create_mpi_data_type_n_bytes(
-            dest_data_fixed.size());
           ierr = MPI_File_read_at(fh,
                                   my_global_file_position,
                                   dest_data_fixed.data(),
                                   1,
-                                  bigtype,
+                                  *Utilities::MPI::create_mpi_data_type_n_bytes(
+                                    dest_data_fixed.size()),
                                   MPI_STATUS_IGNORE);
-          AssertThrowMPI(ierr);
-          ierr = MPI_Type_free(&bigtype);
           AssertThrowMPI(ierr);
         }
 
@@ -1772,16 +1766,14 @@ namespace parallel
         else
           {
             // Reads bigger than 2GB require some extra care:
-            MPI_Datatype bigtype = Utilities::MPI::create_mpi_data_type_n_bytes(
-              src_data_fixed.size());
-            ierr = MPI_File_read_at(fh,
-                                    my_global_file_position,
-                                    dest_data_variable.data(),
-                                    1,
-                                    bigtype,
-                                    MPI_STATUS_IGNORE);
-            AssertThrowMPI(ierr);
-            ierr = MPI_Type_free(&bigtype);
+            ierr =
+              MPI_File_read_at(fh,
+                               my_global_file_position,
+                               dest_data_variable.data(),
+                               1,
+                               *Utilities::MPI::create_mpi_data_type_n_bytes(
+                                 src_data_fixed.size()),
+                               MPI_STATUS_IGNORE);
             AssertThrowMPI(ierr);
           }
 
