@@ -26,6 +26,8 @@
 #include <deal.II/boost_adaptors/segment.h>
 
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
+#include <boost/geometry/algorithms/distance.hpp>
+
 #ifdef DEAL_II_BOOST_HAS_BROKEN_HEADER_DEPRECATIONS
 #  define BOOST_ALLOW_DEPRECATED_HEADERS
 #endif
