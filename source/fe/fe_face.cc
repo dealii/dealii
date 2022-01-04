@@ -956,7 +956,7 @@ FE_FaceP<dim, spacedim>::get_subface_interpolation_matrix(
           for (unsigned int k = 0; k < face_quadrature.size(); ++k)
             {
               const Point<dim - 1> p =
-                numbers::invalid_unsigned_int != 0u ?
+                subface == numbers::invalid_unsigned_int ?
                   face_quadrature.point(k) :
                   GeometryInfo<dim - 1>::child_to_cell_coordinates(
                     face_quadrature.point(k), subface);
