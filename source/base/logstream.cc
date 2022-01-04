@@ -91,7 +91,7 @@ LogStream::~LogStream()
   // if there was anything left in the stream that is current to this
   // thread, make sure we flush it before it gets lost
   {
-    if (get_stream().str().length() > 0)
+    if (get_stream().str().size() > 0)
       {
         // except the situation is not quite that simple. if this object is
         // the 'deallog' object, then it is destroyed upon exit of the

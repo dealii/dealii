@@ -548,7 +548,7 @@ namespace Patterns
     std::string tmp(sequence);
 
     // remove whitespace at beginning
-    while ((tmp.length() != 0) && (std::isspace(tmp.front()) != 0))
+    while ((tmp.size() != 0) && (std::isspace(tmp.front()) != 0))
       tmp.erase(0, 1);
 
     // check the different possibilities
@@ -561,7 +561,7 @@ namespace Patterns
       }
 
     // remove whitespace at the end
-    while ((tmp.length() != 0) && (std::isspace(tmp.back()) != 0))
+    while ((tmp.size() != 0) && (std::isspace(tmp.back()) != 0))
       tmp.erase(tmp.end() - 1);
 
     // check last choice, not finished by |
@@ -635,7 +635,7 @@ namespace Patterns
         std::string sequence(description);
 
         sequence.erase(0, std::strlen(description_init) + 1);
-        sequence.erase(sequence.length() - 2, 2);
+        sequence.erase(sequence.size() - 2, 2);
 
         return std::make_unique<Selection>(sequence);
       }
@@ -1259,7 +1259,7 @@ namespace Patterns
     std::vector<std::string> split_names;
 
     // first split the input list
-    while (tmp.length() != 0)
+    while (tmp.size() != 0)
       {
         std::string name;
         name = tmp;
@@ -1272,10 +1272,10 @@ namespace Patterns
         else
           tmp = "";
 
-        while ((name.length() != 0) && (std::isspace(name.front()) != 0))
+        while ((name.size() != 0) && (std::isspace(name.front()) != 0))
           name.erase(0, 1);
-        while ((name.length() != 0) && (std::isspace(name.back()) != 0))
-          name.erase(name.length() - 1, 1);
+        while ((name.size() != 0) && (std::isspace(name.back()) != 0))
+          name.erase(name.size() - 1, 1);
 
         split_names.push_back(name);
       }
@@ -1376,7 +1376,7 @@ namespace Patterns
         std::string sequence(description);
 
         sequence.erase(0, std::strlen(description_init) + 1);
-        sequence.erase(sequence.length() - 2, 2);
+        sequence.erase(sequence.size() - 2, 2);
 
         return std::make_unique<MultipleSelection>(sequence);
       }

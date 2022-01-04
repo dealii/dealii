@@ -3945,7 +3945,7 @@ GridIn<dim, spacedim>::skip_empty_lines(std::istream &in)
           }) != line.end())
         {
           in.putback('\n');
-          for (int i = line.length() - 1; i >= 0; --i)
+          for (int i = line.size() - 1; i >= 0; --i)
             in.putback(line[i]);
           return;
         }
@@ -4146,7 +4146,7 @@ GridIn<dim, spacedim>::read(const std::string &filename, Format format)
     {
       const std::string::size_type slashpos = name.find_last_of('/');
       const std::string::size_type dotpos   = name.find_last_of('.');
-      if (dotpos < name.length() &&
+      if (dotpos < name.size() &&
           (dotpos > slashpos || slashpos == std::string::npos))
         {
           std::string ext = name.substr(dotpos + 1);

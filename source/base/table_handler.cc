@@ -171,7 +171,7 @@ TableHandler::Column::pad_column_below(const unsigned int size)
       entry.cache_string(scientific, precision);
       max_length =
         std::max(max_length,
-                 static_cast<unsigned int>(entry.get_cached_string().length()));
+                 static_cast<unsigned int>(entry.get_cached_string().size()));
     }
 }
 
@@ -186,7 +186,7 @@ TableHandler::Column::invalidate_cache()
       entry.cache_string(this->scientific, this->precision);
       max_length =
         std::max(max_length,
-                 static_cast<unsigned int>(entry.get_cached_string().length()));
+                 static_cast<unsigned int>(entry.get_cached_string().size()));
     }
 }
 
@@ -234,8 +234,7 @@ TableHandler::start_new_row()
         entry.cache_string(column.second.scientific, column.second.precision);
         column.second.max_length =
           std::max(column.second.max_length,
-                   static_cast<unsigned int>(
-                     entry.get_cached_string().length()));
+                   static_cast<unsigned int>(entry.get_cached_string().size()));
       }
 }
 
@@ -430,7 +429,7 @@ TableHandler::write_text(std::ostream &out, const TextOutputFormat format) const
               const std::string &key = sel_columns[j];
               column_widths[j] =
                 std::max(column_widths[j],
-                         static_cast<unsigned int>(key.length()));
+                         static_cast<unsigned int>(key.size()));
               out << std::setw(column_widths[j]);
               out << key << " | ";
             }
@@ -529,7 +528,7 @@ TableHandler::write_text(std::ostream &out, const TextOutputFormat format) const
               }
 
               // header is longer than the column(s) under it
-              if (width < key.length())
+              if (width < key.size())
                 {
                   // make the column or the last column in this
                   // supercolumn wide enough
@@ -548,18 +547,18 @@ TableHandler::write_text(std::ostream &out, const TextOutputFormat format) const
                     {
                       if (sel_columns[i] == colname)
                         {
-                          column_widths[i] += key.length() - width;
+                          column_widths[i] += key.size() - width;
                           break;
                         }
                     }
 
-                  width = key.length();
+                  width = key.size();
                 }
 
               // now write key. try to center it somehow
-              const unsigned int front_padding = (width - key.length()) / 2,
+              const unsigned int front_padding = (width - key.size()) / 2,
                                  rear_padding =
-                                   (width - key.length()) - front_padding;
+                                   (width - key.size()) - front_padding;
               for (unsigned int i = 0; i < front_padding; ++i)
                 out << ' ';
               out << key;

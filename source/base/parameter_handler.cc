@@ -457,15 +457,15 @@ ParameterHandler::parse_input(std::istream &     input,
 
       // If we see the line which is the same as @p last_line ,
       // terminate the parsing.
-      if (last_line.length() != 0 && input_line == last_line)
+      if (last_line.size() != 0 && input_line == last_line)
         break;
 
       // Check whether or not the current line should be joined with the next
       // line before calling scan_line.
-      if (input_line.length() != 0 &&
-          input_line.find_last_of('\\') == input_line.length() - 1)
+      if (input_line.size() != 0 &&
+          input_line.find_last_of('\\') == input_line.size() - 1)
         {
-          input_line.erase(input_line.length() - 1); // remove the last '\'
+          input_line.erase(input_line.size() - 1); // remove the last '\'
           is_concatenated = true;
 
           fully_concatenated_line += input_line;
@@ -1409,10 +1409,9 @@ ParameterHandler::recursively_print_parameters(
       for (const auto &p : current_section)
         if (is_parameter_node(p.second) == true)
           {
-            longest_name = std::max(longest_name, demangle(p.first).length());
-            longest_value =
-              std::max(longest_value,
-                       p.second.get<std::string>("value").length());
+            longest_name  = std::max(longest_name, demangle(p.first).size());
+            longest_value = std::max(longest_value,
+                                     p.second.get<std::string>("value").size());
           }
 
       // print entries one by one
@@ -1448,8 +1447,7 @@ ParameterHandler::recursively_print_parameters(
             // print name and value of this entry
             out << std::setw(overall_indent_level * 2) << ""
                 << "set " << demangle(p.first)
-                << std::setw(longest_name - demangle(p.first).length() + 1)
-                << " "
+                << std::setw(longest_name - demangle(p.first).size() + 1) << " "
                 << "= " << value;
 
             // finally print the default value, but only if it differs
@@ -1457,7 +1455,7 @@ ParameterHandler::recursively_print_parameters(
             if (!is_short &&
                 value != p.second.get<std::string>("default_value"))
               {
-                out << std::setw(longest_value - value.length() + 1) << ' '
+                out << std::setw(longest_value - value.size() + 1) << ' '
                     << "# ";
                 out << "default: "
                     << p.second.get<std::string>("default_value");
@@ -1605,7 +1603,7 @@ ParameterHandler::recursively_print_parameters(
       std::size_t longest_name = 0;
       for (const auto &p : current_section)
         if (is_parameter_node(p.second) == true)
-          longest_name = std::max(longest_name, demangle(p.first).length());
+          longest_name = std::max(longest_name, demangle(p.first).size());
 
       // print entries one by one
       for (const auto &p : current_section)
@@ -1614,8 +1612,7 @@ ParameterHandler::recursively_print_parameters(
             // print name and value
             out << std::setw(overall_indent_level * 2) << ""
                 << "set " << demangle(p.first)
-                << std::setw(longest_name - demangle(p.first).length() + 1)
-                << " "
+                << std::setw(longest_name - demangle(p.first).size() + 1) << " "
                 << " = ";
 
             // print possible values:
@@ -1640,7 +1637,7 @@ ParameterHandler::recursively_print_parameters(
 
             // if there is a documenting string, print it as well
             if (!is_short &&
-                p.second.get<std::string>("documentation").length() != 0)
+                p.second.get<std::string>("documentation").size() != 0)
               out << std::setw(overall_indent_level * 2 + longest_name + 10)
                   << ""
                   << "(" << p.second.get<std::string>("documentation") << ")"
@@ -1832,7 +1829,7 @@ ParameterHandler::scan_line(std::string        line,
   line = Utilities::trim(line);
 
   // if line is now empty: leave
-  if (line.length() == 0)
+  if (line.size() == 0)
     {
       return;
     }
@@ -1841,7 +1838,7 @@ ParameterHandler::scan_line(std::string        line,
            Utilities::match_at_string_start(line, "subsection "))
     {
       // delete this prefix
-      line.erase(0, std::string("subsection").length() + 1);
+      line.erase(0, std::string("subsection").size() + 1);
 
       const std::string subsection = Utilities::trim(line);
 
