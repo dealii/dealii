@@ -757,36 +757,26 @@ namespace TrilinosWrappers
     bool
     Vector::is_non_negative() const
     {
-      // if this vector is a parallel one, then
-      // we need to communicate to determine
-      // the answer to the current
-      // function. this still has to be
-      // implemented
-      AssertThrow(local_size() == size(), ExcNotImplemented());
       // get a representation of the vector and
       // loop over all the elements
-      TrilinosScalar *start_ptr;
-      int             leading_dimension;
-      int ierr = vector->ExtractView(&start_ptr, &leading_dimension);
-      AssertThrow(ierr == 0, ExcTrilinosError(ierr));
-
-      // TODO: This
-      // won't work in parallel like
-      // this. Find out a better way to
-      // this in that case.
-      const TrilinosScalar *ptr = start_ptr, *eptr = start_ptr + size();
-      bool                  flag = true;
+      TrilinosScalar *      start_ptr = (*vector)[0];
+      const TrilinosScalar *ptr = start_ptr, *eptr = start_ptr + local_size();
+      unsigned int          flag = 0;
       while (ptr != eptr)
         {
           if (*ptr < 0.0)
             {
-              flag = false;
+              flag = 1;
               break;
             }
           ++ptr;
         }
 
-      return flag;
+      // in parallel, check that the vector
+      // is zero on _all_ processors.
+      const auto max_n_negative =
+        Utilities::MPI::max(flag, get_mpi_communicator());
+      return max_n_negative == 0;
     }
 
 
