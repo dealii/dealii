@@ -19,6 +19,7 @@
 
 #include <deal.II/boost_adaptors/point.h>
 
+#include <boost/geometry/algorithms/distance.hpp>
 #include <boost/geometry/index/rtree.hpp>
 #include <boost/geometry/strategies/strategies.hpp>
 
