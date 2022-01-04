@@ -258,34 +258,28 @@ SparseDirectUMFPACK::factorize(const Matrix &matrix)
   // iterators are sorted so that they traverse each row from start to end
   // before moving on to the next row. however, this isn't true for block
   // matrices, so we have to do a bit of book keeping
-  {
-    // have an array that for each row points to the first entry not yet
-    // written to
-    std::vector<long int> row_pointers = Ap;
 
-    // loop over the elements of the matrix row by row, as suggested in the
-    // documentation of the sparse matrix iterator class
-    for (size_type row = 0; row < matrix.m(); ++row)
-      {
-        for (typename Matrix::const_iterator p = matrix.begin(row);
-             p != matrix.end(row);
-             ++p)
-          {
-            // write entry into the first free one for this row
-            Ai[row_pointers[row]] = p->column();
-            Ax[row_pointers[row]] = std::real(p->value());
-            if (numbers::NumberTraits<number>::is_complex == true)
-              Az[row_pointers[row]] = std::imag(p->value());
+  // loop over the elements of the matrix row by row, as suggested in the
+  // documentation of the sparse matrix iterator class
+  for (size_type row = 0; row < matrix.m(); ++row)
+    {
+      long int index = Ap[row];
+      for (typename Matrix::const_iterator p = matrix.begin(row);
+           p != matrix.end(row);
+           ++p)
+        {
+          // write entry into the first free one for this row
+          Ai[index] = p->column();
+          Ax[index] = std::real(p->value());
+          if (numbers::NumberTraits<number>::is_complex == true)
+            Az[index] = std::imag(p->value());
 
-            // then move pointer ahead
-            ++row_pointers[row];
-          }
-      }
+          // then move pointer ahead
+          ++index;
+        }
 
-    // at the end, we should have written all rows completely
-    for (size_type i = 0; i < Ap.size() - 1; ++i)
-      Assert(row_pointers[i] == Ap[i + 1], ExcInternalError());
-  }
+      Assert(index == Ap[row + 1], ExcInternalError());
+    }
 
   // make sure that the elements in each row are sorted. we have to be more
   // careful for block sparse matrices, so ship this task out to a
