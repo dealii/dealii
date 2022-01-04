@@ -3827,7 +3827,7 @@ GeometryInfo<3>::line_refinement_case(
   const unsigned int direction[lines_per_cell] = {
     1, 1, 0, 0, 1, 1, 0, 0, 2, 2, 2, 2};
 
-  return ((cell_refinement_case & cut_one[direction[line_no]]) ?
+  return ((cell_refinement_case & cut_one[direction[line_no]]) != 0u ?
             RefinementCase<1>::cut_x :
             RefinementCase<1>::no_refinement);
 }
@@ -3879,8 +3879,8 @@ GeometryInfo<2>::min_cell_refinement_case_for_face_refinement(
   AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
 
   if (face_refinement_case == RefinementCase<dim>::cut_x)
-    return (face_no / 2) ? RefinementCase<dim>::cut_x :
-                           RefinementCase<dim>::cut_y;
+    return (face_no / 2) != 0u ? RefinementCase<dim>::cut_x :
+                                 RefinementCase<dim>::cut_y;
   else
     return RefinementCase<dim>::no_refinement;
 }
@@ -3975,7 +3975,8 @@ GeometryInfo<2>::min_cell_refinement_case_for_line_refinement(
   (void)dim;
   AssertIndexRange(line_no, GeometryInfo<dim>::lines_per_cell);
 
-  return (line_no / 2) ? RefinementCase<2>::cut_x : RefinementCase<2>::cut_y;
+  return (line_no / 2) != 0u ? RefinementCase<2>::cut_x :
+                               RefinementCase<2>::cut_y;
 }
 
 

@@ -1366,7 +1366,7 @@ ReferenceCell::face_to_cell_vertices(const unsigned int  face,
       static const ndarray<unsigned int, 3, 2> table = {
         {{{0, 1}}, {{1, 2}}, {{2, 0}}}};
 
-      return table[face][face_orientation ? vertex : (1 - vertex)];
+      return table[face][face_orientation != 0u ? vertex : (1 - vertex)];
     }
   else if (*this == ReferenceCells::Quadrilateral)
     {
@@ -1451,7 +1451,8 @@ ReferenceCell::standard_to_real_face_vertex(
   else if (*this == ReferenceCells::Quadrilateral)
     {
       return GeometryInfo<2>::standard_to_real_line_vertex(vertex,
-                                                           face_orientation);
+                                                           face_orientation !=
+                                                             0u);
     }
   else if (*this == ReferenceCells::Tetrahedron)
     {

@@ -499,13 +499,13 @@ SparseMatrixEZ<number>::print_formatted(std::ostream &     out,
   if (scientific)
     {
       out.setf(std::ios::scientific, std::ios::floatfield);
-      if (!width)
+      if (width == 0u)
         width = precision + 7;
     }
   else
     {
       out.setf(std::ios::fixed, std::ios::floatfield);
-      if (!width)
+      if (width == 0u)
         width = precision + 2;
     }
 

@@ -59,7 +59,7 @@ SparseLUDecomposition<number>::clear()
 
   SparseMatrix<number>::clear();
 
-  if (own_sparsity)
+  if (own_sparsity != nullptr)
     {
       delete own_sparsity;
       own_sparsity = nullptr;

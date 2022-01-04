@@ -1385,7 +1385,7 @@ namespace Utilities
     // source:
     // https://stackoverflow.com/questions/47981/how-do-you-set-clear-and-toggle-a-single-bit
     // "Checking a bit"
-    return (number >> n) & 1U;
+    return ((number >> n) & 1U) != 0u;
   }
 
 

@@ -1055,7 +1055,7 @@ namespace SparsityTools
         const auto rlen = dsp.row_length(row);
 
         // skip empty lines
-        if (!rlen)
+        if (rlen == 0)
           continue;
 
         // save entries
@@ -1137,7 +1137,7 @@ namespace SparsityTools
         BlockDynamicSparsityPattern::size_type rlen = dsp.row_length(row);
 
         // skip empty lines
-        if (!rlen)
+        if (rlen == 0)
           continue;
 
         // save entries
@@ -1238,7 +1238,7 @@ namespace SparsityTools
     }
 
     // complete all sends, so that we can safely destroy the buffers.
-    if (requests.size())
+    if (requests.size() > 0)
       {
         const int ierr =
           MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);

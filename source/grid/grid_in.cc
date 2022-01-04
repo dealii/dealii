@@ -4369,7 +4369,7 @@ namespace
     std::string tmp;
     for (const char c : s)
       {
-        if (isdigit(c))
+        if (isdigit(c) != 0)
           {
             tmp += c;
           }

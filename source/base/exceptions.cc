@@ -469,7 +469,7 @@ namespace deal_II_exceptions
 #ifdef DEAL_II_WITH_MPI
       int is_initialized;
       MPI_Initialized(&is_initialized);
-      if (is_initialized)
+      if (is_initialized != 0)
         {
           // do the same as in Utilities::MPI::n_mpi_processes() here,
           // but without error checking to not throw again.

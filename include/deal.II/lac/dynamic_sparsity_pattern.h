@@ -1093,7 +1093,7 @@ DynamicSparsityPattern::column_number(const size_type row,
   Assert(rowset.size() == 0 || rowset.is_element(row), ExcInternalError());
 
   const size_type local_row =
-    rowset.size() ? rowset.index_within_set(row) : row;
+    rowset.size() != 0u ? rowset.index_within_set(row) : row;
   AssertIndexRange(index, lines[local_row].entries.size());
   return lines[local_row].entries[index];
 }

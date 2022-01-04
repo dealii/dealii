@@ -1342,7 +1342,7 @@ namespace
     // if there are no more cells in our list the current cell can't be
     // flagged for refinement
     if (this_object->current_refine_pointer == this_object->refine_list.end())
-      return false;
+      return 0;
 
     Assert(coarse_cell_index <=
              this_object->current_refine_pointer->p.which_tree,
@@ -1351,7 +1351,7 @@ namespace
     // if p4est hasn't yet reached the tree of the next flagged cell the
     // current cell can't be flagged for refinement
     if (coarse_cell_index < this_object->current_refine_pointer->p.which_tree)
-      return false;
+      return 0;
 
     // now we're in the right tree in the forest
     Assert(coarse_cell_index <=
@@ -1369,11 +1369,11 @@ namespace
           quadrant, &*this_object->current_refine_pointer))
       {
         ++this_object->current_refine_pointer;
-        return true;
+        return 1;
       }
 
     // p4est cell is not in list
-    return false;
+    return 0;
   }
 
 
@@ -1392,7 +1392,7 @@ namespace
     // if there are no more cells in our list the current cell can't be
     // flagged for coarsening
     if (this_object->current_coarsen_pointer == this_object->coarsen_list.end())
-      return false;
+      return 0;
 
     Assert(coarse_cell_index <=
              this_object->current_coarsen_pointer->p.which_tree,
@@ -1401,7 +1401,7 @@ namespace
     // if p4est hasn't yet reached the tree of the next flagged cell the
     // current cell can't be flagged for coarsening
     if (coarse_cell_index < this_object->current_coarsen_pointer->p.which_tree)
-      return false;
+      return 0;
 
     // now we're in the right tree in the forest
     Assert(coarse_cell_index <=
@@ -1433,11 +1433,11 @@ namespace
             ++this_object->current_coarsen_pointer;
           }
 
-        return true;
+        return 1;
       }
 
     // p4est cell is not in list
-    return false;
+    return 0;
   }
 
 

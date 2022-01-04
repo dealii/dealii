@@ -499,7 +499,7 @@ IndexSet::block_read(std::istream &in)
   ranges.clear();
   set_size(size);
   ranges.resize(n_ranges, Range(0, 0));
-  if (n_ranges)
+  if (n_ranges != 0u)
     in.read(reinterpret_cast<char *>(&*ranges.begin()),
             ranges.size() * sizeof(Range));
 
