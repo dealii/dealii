@@ -1405,14 +1405,14 @@ public:
    * @param[in] sub_face_no_neighbor Like `sub_face_no`, just for the
    *   neighboring cell.
    */
-  template <class CellIteratorType>
+  template <class CellIteratorType, class CellNeighborIteratorType>
   void
-  reinit(const CellIteratorType &                         cell,
-         const unsigned int                               face_no,
-         const unsigned int                               sub_face_no,
-         const typename identity<CellIteratorType>::type &cell_neighbor,
-         const unsigned int                               face_no_neighbor,
-         const unsigned int                               sub_face_no_neighbor);
+  reinit(const CellIteratorType &        cell,
+         const unsigned int              face_no,
+         const unsigned int              sub_face_no,
+         const CellNeighborIteratorType &cell_neighbor,
+         const unsigned int              face_no_neighbor,
+         const unsigned int              sub_face_no_neighbor);
 
   /**
    * Re-initialize this object to be used on an interface given by a single face
@@ -2028,15 +2028,15 @@ FEInterfaceValues<dim, spacedim>::FEInterfaceValues(
 
 
 template <int dim, int spacedim>
-template <class CellIteratorType>
+template <class CellIteratorType, class CellNeighborIteratorType>
 void
 FEInterfaceValues<dim, spacedim>::reinit(
-  const CellIteratorType &                         cell,
-  const unsigned int                               face_no,
-  const unsigned int                               sub_face_no,
-  const typename identity<CellIteratorType>::type &cell_neighbor,
-  const unsigned int                               face_no_neighbor,
-  const unsigned int                               sub_face_no_neighbor)
+  const CellIteratorType &        cell,
+  const unsigned int              face_no,
+  const unsigned int              sub_face_no,
+  const CellNeighborIteratorType &cell_neighbor,
+  const unsigned int              face_no_neighbor,
+  const unsigned int              sub_face_no_neighbor)
 {
   if (sub_face_no == numbers::invalid_unsigned_int)
     {
