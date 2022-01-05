@@ -548,7 +548,7 @@ namespace Patterns
     std::string tmp(sequence);
 
     // remove whitespace at beginning
-    while ((tmp.length() != 0) && ((std::isspace(tmp[0])) != 0))
+    while ((tmp.length() != 0) && (std::isspace(tmp.front()) != 0))
       tmp.erase(0, 1);
 
     // check the different possibilities
@@ -561,7 +561,7 @@ namespace Patterns
       }
 
     // remove whitespace at the end
-    while ((tmp.length() != 0) && ((std::isspace(*(tmp.end() - 1))) != 0))
+    while ((tmp.length() != 0) && (std::isspace(tmp.back()) != 0))
       tmp.erase(tmp.end() - 1);
 
     // check last choice, not finished by |
@@ -1272,9 +1272,9 @@ namespace Patterns
         else
           tmp = "";
 
-        while ((name.length() != 0) && ((std::isspace(name[0])) != 0))
+        while ((name.length() != 0) && (std::isspace(name.front()) != 0))
           name.erase(0, 1);
-        while (std::isspace(name[name.length() - 1]) != 0)
+        while ((name.length() != 0) && (std::isspace(name.back()) != 0))
           name.erase(name.length() - 1, 1);
 
         split_names.push_back(name);
