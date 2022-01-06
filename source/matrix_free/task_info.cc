@@ -28,7 +28,9 @@
 #  include <tbb/blocked_range.h>
 #  include <tbb/parallel_for.h>
 #  include <tbb/task.h>
-#  include <tbb/task_scheduler_init.h>
+#  ifndef DEAL_II_TBB_WITH_ONEAPI
+#    include <tbb/task_scheduler_init.h>
+#  endif
 #endif
 
 #include <iostream>
