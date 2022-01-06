@@ -24,7 +24,10 @@
 
 #include <deal.II/fe/fe_interface_values.h>
 #include <deal.II/fe/fe_values.h>
-#include <deal.II/fe/mapping_q1.h>
+
+#include <deal.II/hp/fe_values.h>
+#include <deal.II/hp/mapping_collection.h>
+#include <deal.II/hp/q_collection.h>
 
 #include <boost/any.hpp>
 
@@ -274,7 +277,7 @@ namespace MeshWorker
       const UpdateFlags &        neighbor_face_update_flags = update_default);
 
     /**
-     * Same as the other constructor, using the default MappingQ1.
+     * Same as the other constructor, using the default linear mapping.
      *
      * @param fe The finite element
      * @param quadrature The cell quadrature
@@ -293,7 +296,7 @@ namespace MeshWorker
       const UpdateFlags &        face_update_flags = update_default);
 
     /**
-     * Same as the other constructor, using the default MappingQ1.
+     * Same as the other constructor, using the default linear mapping.
      *
      * @param fe The finite element
      * @param quadrature The cell quadrature
@@ -314,6 +317,101 @@ namespace MeshWorker
       const Quadrature<dim - 1> &face_quadrature   = Quadrature<dim - 1>(),
       const UpdateFlags &        face_update_flags = update_default,
       const UpdateFlags &        neighbor_face_update_flags = update_default);
+
+    /**
+     * Create an empty ScratchData object. A SmartPointer pointing to
+     * @p mapping_collection and @p fe_collection is stored internally. Make sure they live longer
+     * than this class instance.
+     *
+     * The constructor does not initialize any of the internal hp::FEValues
+     * objects. These are initialized the first time one of the reinit()
+     * functions is called, using the arguments passed here.
+     *
+     * @param mapping_collection The mapping collection to use in the internal hp::FEValues objects
+     * @param fe_collection The finite element collection
+     * @param cell_quadrature_collection The cell quadrature collection
+     * @param cell_update_flags UpdateFlags for the current cell hp::FEValues and
+     * neighbor cell hp::FEValues
+     * @param face_quadrature_collection The face quadrature collection, used for hp::FEFaceValues and
+     * hp::FESubfaceValues for both the current cell and the neighbor cell
+     * @param face_update_flags UpdateFlags used for FEFaceValues and
+     * hp::FESubfaceValues for both the current cell and the neighbor cell
+     */
+    ScratchData(const hp::MappingCollection<dim, spacedim> &mapping_collection,
+                const hp::FECollection<dim, spacedim> &     fe_collection,
+                const hp::QCollection<dim> &    cell_quadrature_collection,
+                const UpdateFlags &             cell_update_flags,
+                const hp::QCollection<dim - 1> &face_quadrature_collection =
+                  hp::QCollection<dim - 1>(),
+                const UpdateFlags &face_update_flags = update_default);
+
+    /**
+     * Similar to the other constructor, but this one allows to specify
+     * different flags for neighbor cells and faces.
+     *
+     * @param mapping_collection The mapping collection to use in the internal hp::FEValues objects
+     * @param fe_collection The finite element collection
+     * @param cell_quadrature_collection The cell quadrature collection
+     * @param cell_update_flags UpdateFlags for the current cell hp::FEValues
+     * @param neighbor_cell_update_flags UpdateFlags for the neighbor cell hp::FEValues
+     * @param face_quadrature_collection The face quadrature collection, used for hp::FEFaceValues and
+     * hp::FESubfaceValues for both the current cell and the neighbor cell
+     * @param face_update_flags UpdateFlags used for FEFaceValues and
+     * hp::FESubfaceValues for the current cell
+     * @param neighbor_face_update_flags UpdateFlags used for hp::FEFaceValues and
+     * hp::FESubfaceValues for the neighbor cell
+     */
+    ScratchData(const hp::MappingCollection<dim, spacedim> &mapping_collection,
+                const hp::FECollection<dim, spacedim> &     fe_collection,
+                const hp::QCollection<dim> &    cell_quadrature_collection,
+                const UpdateFlags &             cell_update_flags,
+                const UpdateFlags &             neighbor_cell_update_flags,
+                const hp::QCollection<dim - 1> &face_quadrature_collection =
+                  hp::QCollection<dim - 1>(),
+                const UpdateFlags &face_update_flags          = update_default,
+                const UpdateFlags &neighbor_face_update_flags = update_default);
+
+    /**
+     * Same as the other constructor, using the default linear mapping.
+     *
+     * @param fe_collection The finite element collection
+     * @param cell_quadrature_collection The cell quadrature collection
+     * @param cell_update_flags UpdateFlags for the current cell hp::FEValues and
+     * neighbor cell hp::FEValues
+     * @param face_quadrature_collection The face quadrature collection, used for hp::FEFaceValues and
+     * hp::FESubfaceValues for both the current cell and the neighbor cell
+     * @param face_update_flags UpdateFlags used for FEFaceValues and
+     * hp::FESubfaceValues for both the current cell and the neighbor cell
+     */
+    ScratchData(const hp::FECollection<dim, spacedim> &fe_collection,
+                const hp::QCollection<dim> &    cell_quadrature_collection,
+                const UpdateFlags &             cell_update_flags,
+                const hp::QCollection<dim - 1> &face_quadrature_collection =
+                  hp::QCollection<dim - 1>(),
+                const UpdateFlags &face_update_flags = update_default);
+
+    /**
+     * Same as the other constructor, using the default linear mapping.
+     *
+     * @param fe_collection The finite element collection
+     * @param cell_quadrature_collection The cell quadrature collection
+     * @param cell_update_flags UpdateFlags for the current cell hp::FEValues
+     * @param neighbor_cell_update_flags UpdateFlags for the neighbor cell hp::FEValues
+     * @param face_quadrature_collection The face quadrature collection, used for hp::FEFaceValues and
+     * hp::FESubfaceValues for both the current cell and the neighbor cell
+     * @param face_update_flags UpdateFlags used for FEFaceValues and
+     * hp::FESubfaceValues for the current cell
+     * @param neighbor_face_update_flags UpdateFlags used for hp::FEFaceValues and
+     * hp::FESubfaceValues for the neighbor cell
+     */
+    ScratchData(const hp::FECollection<dim, spacedim> &fe_collection,
+                const hp::QCollection<dim> &    cell_quadrature_collection,
+                const UpdateFlags &             cell_update_flags,
+                const UpdateFlags &             neighbor_cell_update_flags,
+                const hp::QCollection<dim - 1> &face_quadrature_collection =
+                  hp::QCollection<dim - 1>(),
+                const UpdateFlags &face_update_flags          = update_default,
+                const UpdateFlags &neighbor_face_update_flags = update_default);
 
     /**
      * Deep copy constructor. FEValues objects are not copied.
@@ -549,6 +647,37 @@ namespace MeshWorker
      */
     const Quadrature<dim - 1> &
     get_face_quadrature() const;
+
+    /**
+     * Return a reference to the used mapping.
+     */
+    const hp::MappingCollection<dim, spacedim> &
+    get_mapping_collection() const;
+
+    /**
+     * Return a reference to the selected finite element object.
+     */
+    const hp::FECollection<dim, spacedim> &
+    get_fe_collection() const;
+
+    /**
+     * Return a reference to the cell quadrature object in use.
+     */
+    const hp::QCollection<dim> &
+    get_cell_quadrature_collection() const;
+
+    /**
+     * Return a reference to the face quadrature object in use.
+     */
+    const hp::QCollection<dim - 1> &
+    get_face_quadrature_collection() const;
+
+    /**
+     * Returns a boolean indicating whether or not this ScratchData object has
+     * hp-capabilities enabled.
+     */
+    bool
+    has_hp_capabilities() const;
 
     /**
      * Return the cell update flags set.
@@ -1101,6 +1230,11 @@ namespace MeshWorker
                          const Number &     exemplar_number) const;
 
     /**
+     * @name Data that supports the standard FE implementation
+     */
+    /** @{ */ // non-hp data
+
+    /**
      * The mapping used by the internal FEValues. Make sure it lives
      * longer than this class.
      */
@@ -1123,28 +1257,6 @@ namespace MeshWorker
      * faces and subfaces.
      */
     Quadrature<dim - 1> face_quadrature;
-
-    /**
-     * UpdateFlags to use when initializing the cell FEValues object.
-     */
-    UpdateFlags cell_update_flags;
-
-    /**
-     * UpdateFlags to use when initializing the neighbor cell FEValues objects.
-     */
-    UpdateFlags neighbor_cell_update_flags;
-
-    /**
-     * UpdateFlags to use when initializing FEFaceValues and FESubfaceValues
-     * objects.
-     */
-    UpdateFlags face_update_flags;
-
-    /**
-     * UpdateFlags to use when initializing neighbor FEFaceValues and
-     * FESubfaceValues objects.
-     */
-    UpdateFlags neighbor_face_update_flags;
 
     /**
      * Finite element values on the current cell.
@@ -1180,6 +1292,118 @@ namespace MeshWorker
      * Interface values on facets.
      */
     std::unique_ptr<FEInterfaceValues<dim, spacedim>> interface_fe_values;
+
+    /** @} */ // non-hp data
+
+    /**
+     * @name Data that supports the hp-FE implementation
+     */
+    /** @{ */ // hp data
+
+    /**
+     * The mapping collection used by the internal hp::FEValues. Make sure it
+     * lives longer than this class.
+     */
+    SmartPointer<const hp::MappingCollection<dim, spacedim>> mapping_collection;
+
+    /**
+     * The finite element used by the internal FEValues. Make sure it lives
+     * longer than this class.
+     */
+    SmartPointer<const hp::FECollection<dim, spacedim>> fe_collection;
+
+    /**
+     * Quadrature formula used to integrate on the current cell, and on its
+     * neighbor.
+     */
+    hp::QCollection<dim> cell_quadrature_collection;
+
+    /**
+     * Quadrature formula used to integrate on faces, subfaces, and neighbor
+     * faces and subfaces.
+     */
+    hp::QCollection<dim - 1> face_quadrature_collection;
+
+    /**
+     * Boolean indicating whether or not the current ScratchData has hp-
+     * capabilities.
+     */
+    bool hp_capability_enabled;
+
+    /**
+     * Finite element values on the current cell.
+     */
+    std::unique_ptr<hp::FEValues<dim, spacedim>> hp_fe_values;
+
+    /**
+     * Finite element values on the current face.
+     */
+    std::unique_ptr<hp::FEFaceValues<dim, spacedim>> hp_fe_face_values;
+
+    /**
+     * Finite element values on the current subface.
+     */
+    std::unique_ptr<hp::FESubfaceValues<dim, spacedim>> hp_fe_subface_values;
+
+    /**
+     * Finite element values on the neighbor cell.
+     */
+    std::unique_ptr<hp::FEValues<dim, spacedim>> neighbor_hp_fe_values;
+
+    /**
+     * Finite element values on the neighbor face.
+     */
+    std::unique_ptr<hp::FEFaceValues<dim, spacedim>> neighbor_hp_fe_face_values;
+
+    /**
+     * Finite element values on the neighbor subface.
+     */
+    std::unique_ptr<hp::FESubfaceValues<dim, spacedim>>
+      neighbor_hp_fe_subface_values;
+
+    /**
+     * Exception used when a certain feature doesn't make sense when
+     * ScratchData does has hp-capabilities enabled.
+     *
+     * @ingroup Exceptions
+     */
+    DeclExceptionMsg(ExcOnlyAvailableWithoutHP,
+                     "The current function doesn't make sense when used with a "
+                     "ScratchData object with hp-capabilities.");
+
+    /**
+     * Exception used when a certain feature doesn't make sense when
+     * ScratchData does not have hp-capabilities enabled.
+     *
+     * @ingroup Exceptions
+     */
+    DeclExceptionMsg(ExcOnlyAvailableWithHP,
+                     "The current function doesn't make sense when used with a "
+                     "ScratchData object without hp-capabilities.");
+
+    /** @} */ // hp data
+
+    /**
+     * UpdateFlags to use when initializing the cell FEValues object.
+     */
+    UpdateFlags cell_update_flags;
+
+    /**
+     * UpdateFlags to use when initializing the neighbor cell FEValues objects.
+     */
+    UpdateFlags neighbor_cell_update_flags;
+
+    /**
+     * UpdateFlags to use when initializing FEFaceValues and FESubfaceValues
+     * objects.
+     */
+    UpdateFlags face_update_flags;
+
+    /**
+     * UpdateFlags to use when initializing neighbor FEFaceValues and
+     * FESubfaceValues objects.
+     */
+    UpdateFlags neighbor_face_update_flags;
 
     /**
      * Dof indices on the current cell.
