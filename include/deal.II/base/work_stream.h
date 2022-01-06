@@ -491,7 +491,12 @@ namespace WorkStream
                                         sample_scratch_data,
                                         sample_copy_data);
         auto tbb_item_stream_filter = tbb::make_filter<void, ItemType *>(
-          tbb::filter::serial, [&](tbb::flow_control &fc) -> ItemType * {
+#    ifdef DEAL_II_TBB_WITH_ONEAPI
+          tbb::filter_mode::serial_in_order,
+#    else
+          tbb::filter::serial,
+#    endif
+          [&](tbb::flow_control &fc) -> ItemType * {
             if (const auto item = iterator_range_to_item_stream.get_item())
               return item;
             else
@@ -502,7 +507,11 @@ namespace WorkStream
           });
 
         auto tbb_worker_filter = tbb::make_filter<ItemType *, ItemType *>(
+#    ifdef DEAL_II_TBB_WITH_ONEAPI
+          tbb::filter_mode::parallel,
+#    else
           tbb::filter::parallel,
+#    endif
           [worker =
              std::function<void(const Iterator &, ScratchData &, CopyData &)>(
                worker),
@@ -589,7 +598,11 @@ namespace WorkStream
           });
 
         auto tbb_copier_filter = tbb::make_filter<ItemType *, void>(
+#    ifdef DEAL_II_TBB_WITH_ONEAPI
+          tbb::filter_mode::serial_in_order,
+#    else
           tbb::filter::serial,
+#    endif
           [copier = std::function<void(const CopyData &)>(copier)](
             ItemType *current_item) {
             if (copier)
