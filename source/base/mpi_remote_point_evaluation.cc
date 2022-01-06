@@ -38,12 +38,14 @@ namespace Utilities
   {
     template <int dim, int spacedim>
     RemotePointEvaluation<dim, spacedim>::RemotePointEvaluation(
-      const double       tolerance,
-      const bool         enforce_unique_mapping,
-      const unsigned int rtree_level)
+      const double                              tolerance,
+      const bool                                enforce_unique_mapping,
+      const unsigned int                        rtree_level,
+      const std::function<std::vector<bool>()> &marked_vertices)
       : tolerance(tolerance)
       , enforce_unique_mapping(enforce_unique_mapping)
       , rtree_level(rtree_level)
+      , marked_vertices(marked_vertices)
       , ready_flag(false)
     {}
 
@@ -103,6 +105,7 @@ namespace Utilities
           cache,
           points,
           global_bboxes,
+          marked_vertices ? marked_vertices() : std::vector<bool>(),
           tolerance,
           true,
           enforce_unique_mapping);

@@ -146,6 +146,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const Cache<deal_II_dimension, deal_II_space_dimension> &,
         const std::vector<Point<deal_II_space_dimension>> &,
         const std::vector<std::vector<BoundingBox<deal_II_space_dimension>>> &,
+        const std::vector<bool> &marked_vertices,
         const double,
         const bool,
         const bool);
