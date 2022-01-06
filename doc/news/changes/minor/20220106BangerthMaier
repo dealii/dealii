@@ -1,0 +1,4 @@
+Fixed: deal.II has been updated to support the new OneAPI api interface
+introduced by the Intel Threading Building Blocks Library.
+<br>
+(Wolfgang Bangerth, Matthias Maier, 2022/01/06)
