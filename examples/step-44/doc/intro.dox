@@ -319,9 +319,8 @@ The fourth-order elasticity tensor in the spatial description $\mathfrak{c}$ is 
 		\qquad \text{and thus} \qquad
 	J\mathfrak{c} = 4 \mathbf{b} \dfrac{\partial^2 \Psi(\mathbf{b})} {\partial \mathbf{b} \partial \mathbf{b}} \mathbf{b}	\, .
 @f]
-The fourth-order elasticity tensors (for hyperelastic materials) possess both major and minor symmetries.
-
-The fourth-order spatial elasticity tensor can be written in the following decoupled form:
+This tensor (for hyperelastic materials) possesses both major and minor symmetries, and it
+can be written in the following decoupled form:
 @f[
 	\mathfrak{c} = \mathfrak{c}_{\text{vol}} + \mathfrak{c}_{\text{iso}} \, ,
 @f]
@@ -330,7 +329,7 @@ where
 	J \mathfrak{c}_{\text{vol}}
 		&= 4 \mathbf{b} \dfrac{\partial^2 \Psi_{\text{vol}}(J)} {\partial \mathbf{b} \partial \mathbf{b}} \mathbf{b}
 		\\
-		&= J[\widehat{p}\, \mathbf{I} \otimes \mathbf{I} - 2p \mathcal{I}]
+		&= J[\widehat{p}\, \mathbf{I} \otimes \mathbf{I} - 2p \mathcal{S}]
 			\qquad \text{where} \qquad
 		\widehat{p} \dealcoloneq p + \dfrac{\textrm{d} p}{\textrm{d}J} \, ,
 		\\
