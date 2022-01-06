@@ -22,7 +22,7 @@
 
 #ifdef DEAL_II_WITH_TBB
 #  ifdef DEAL_II_TBB_WITH_ONEAPI
-#    include <tbb/task_arena.h>
+#    include <tbb/global_control.h>
 #  else
 #    include <tbb/task_scheduler_init.h>
 #  endif
@@ -90,11 +90,16 @@ MultithreadInfo::set_thread_limit(const unsigned int max_threads)
     n_max_threads = n_cores();
 
 #ifdef DEAL_II_WITH_TBB
+#  ifdef DEAL_II_TBB_WITH_ONEAPI
+  tbb::global_control(tbb::global_control::max_allowed_parallelism,
+                      n_max_threads);
+#  else
   // Initialize the scheduler and destroy the old one before doing so
   static tbb::task_scheduler_init dummy(tbb::task_scheduler_init::deferred);
   if (dummy.is_active())
     dummy.terminate();
   dummy.initialize(n_max_threads);
+#  endif
 #endif
 }
 
