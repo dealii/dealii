@@ -28,6 +28,14 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+namespace hp
+{
+  template <int dim, int spacedim>
+  class MappingCollection;
+}
+
+
 namespace hp
 {
   /**
@@ -267,6 +275,17 @@ namespace hp
      */
     unsigned int
     max_dofs_per_cell() const;
+
+    /**
+     * Return a mapping collection that consists of the default linear mappings
+     * matching the reference cells for each hp index. More details may be found
+     * in the documentation for ReferenceCell::get_default_linear_mapping().
+     *
+     * @note This FECollection object must remain in scope for as long as the
+     * reference cell default linear mapping is in use.
+     */
+    const MappingCollection<dim, spacedim> &
+    get_reference_cell_default_linear_mapping() const;
 
     /**
      * @}
@@ -829,6 +848,13 @@ namespace hp
      */
 
   private:
+    /**
+     * A linear mapping collection for all reference cell types of each index
+     * of this object.
+     */
+    std::shared_ptr<MappingCollection<dim, spacedim>>
+      reference_cell_default_linear_mapping;
+
     /**
      * %Function returning the index of the finite element following the given
      * one in hierarchy.
