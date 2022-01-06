@@ -270,13 +270,13 @@ namespace internal
         return value[component];
       }
 
-      static Tensor<1, dim> &
+      static Tensor<1, dim, Number> &
       access(gradient_type &value, const unsigned int component)
       {
         return value[component];
       }
 
-      static const Tensor<1, dim> &
+      static const Tensor<1, dim, Number> &
       access(const gradient_type &value, const unsigned int component)
       {
         return value[component];
@@ -926,9 +926,12 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::evaluate(
                     Number>::set_gradient(val_and_grad.second,
                                           j,
                                           unit_gradients[i + j]);
-                  gradients[i + j] = apply_transformation(
+                  gradients[i + j] = static_cast<
+                    typename internal::FEPointEvaluation::
+                      EvaluatorTypeTraits<dim, n_components, double>::
+                        gradient_type>(apply_transformation(
                     mapping_data.inverse_jacobians[i + j].transpose(),
-                    unit_gradients[i + j]);
+                    unit_gradients[i + j]));
                 }
             }
         }
@@ -1055,8 +1058,11 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::integrate(
                 Assert(update_flags_mapping & update_inverse_jacobians,
                        ExcNotInitialized());
                 gradients[i + j] =
-                  apply_transformation(mapping_data.inverse_jacobians[i + j],
-                                       gradients[i + j]);
+                  static_cast<typename internal::FEPointEvaluation::
+                                EvaluatorTypeTraits<dim, n_components, double>::
+                                  gradient_type>(
+                    apply_transformation(mapping_data.inverse_jacobians[i + j],
+                                         gradients[i + j]));
                 internal::FEPointEvaluation::
                   EvaluatorTypeTraits<dim, n_components, Number>::get_gradient(
                     gradient, j, gradients[i + j]);
