@@ -906,13 +906,30 @@ namespace internal
 {
 #ifdef DEAL_II_WITH_TBB
 
+#  ifdef DEAL_II_TBB_WITH_ONEAPI
+  struct unsigned_int_pair_hash
+  {
+    std::size_t
+    operator()(const std::pair<unsigned int, unsigned int> &pair) const
+    {
+      return std::hash<unsigned int>()(pair.first) ^
+             std::hash<unsigned int>()(pair.second);
+    }
+  };
+#  endif
+
   inline void
   fill_index_subrange(
     const unsigned int                                        begin,
     const unsigned int                                        end,
     const std::vector<std::pair<unsigned int, unsigned int>> &cell_level_index,
     tbb::concurrent_unordered_map<std::pair<unsigned int, unsigned int>,
-                                  unsigned int> &             map)
+                                  unsigned int
+#  ifdef DEAL_II_TBB_WITH_ONEAPI
+                                  ,
+                                  unsigned_int_pair_hash
+#  endif
+                                  > &map)
   {
     if (cell_level_index.empty())
       return;
@@ -932,8 +949,13 @@ namespace internal
     const dealii::Triangulation<dim> &                        tria,
     const std::vector<std::pair<unsigned int, unsigned int>> &cell_level_index,
     const tbb::concurrent_unordered_map<std::pair<unsigned int, unsigned int>,
-                                        unsigned int> &       map,
-    DynamicSparsityPattern &connectivity_direct)
+                                        unsigned int
+#  ifdef DEAL_II_TBB_WITH_ONEAPI
+                                        ,
+                                        unsigned_int_pair_hash
+#  endif
+                                        > &map,
+    DynamicSparsityPattern &               connectivity_direct)
   {
     std::vector<types::global_dof_index> new_indices;
     for (unsigned int cell = begin; cell < end; ++cell)
@@ -1559,7 +1581,12 @@ namespace internal
             // step 1: build map between the index in the matrix-free context
             // and the one in the triangulation
             tbb::concurrent_unordered_map<std::pair<unsigned int, unsigned int>,
-                                          unsigned int>
+                                          unsigned int
+#  ifdef DEAL_II_TBB_WITH_ONEAPI
+                                          ,
+                                          unsigned_int_pair_hash
+#  endif
+                                          >
               map;
             dealii::parallel::apply_to_subranges(
               0,
