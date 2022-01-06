@@ -306,7 +306,7 @@ namespace MemoryConsumption
   inline std::size_t
   memory_consumption(const std::string &s)
   {
-    return sizeof(s) + s.length();
+    return sizeof(s) + s.size();
   }
 
 

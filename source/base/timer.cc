@@ -541,8 +541,7 @@ TimerOutput::print_summary() const
   // get the maximum width among all sections
   unsigned int max_width = 0;
   for (const auto &i : sections)
-    max_width =
-      std::max(max_width, static_cast<unsigned int>(i.first.length()));
+    max_width = std::max(max_width, static_cast<unsigned int>(i.first.size()));
 
   // 32 is the default width until | character
   max_width = std::max(max_width + 1, static_cast<unsigned int>(32));
@@ -856,8 +855,7 @@ TimerOutput::print_wall_time_statistics(const MPI_Comm &mpi_comm,
   // get the maximum width among all sections
   unsigned int max_width = 0;
   for (const auto &i : sections)
-    max_width =
-      std::max(max_width, static_cast<unsigned int>(i.first.length()));
+    max_width = std::max(max_width, static_cast<unsigned int>(i.first.size()));
 
   // 17 is the default width until | character
   max_width = std::max(max_width + 1, static_cast<unsigned int>(17));

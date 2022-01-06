@@ -619,7 +619,7 @@ namespace GridGenerator
                            const unsigned int number_points,
                            const bool         is_upper)
         {
-          Assert(serialnumber.length() == 4,
+          Assert(serialnumber.size() == 4,
                  ExcMessage("This NACA-serial number is not implemented!"));
 
           return naca_create_points_4_digits(serialnumber,
