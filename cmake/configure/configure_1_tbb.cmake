@@ -27,17 +27,6 @@ MACRO(FEATURE_TBB_FIND_EXTERNAL var)
 
   SET(DEAL_II_TBB_WITH_ONEAPI ${TBB_WITH_ONEAPI})
 
-  IF(TBB_WITH_ONEAPI)
-    MESSAGE(STATUS
-      "deal.II is not fully ported to the new TBB oneAPI interface, disabling external TBB"
-      )
-    SET(TBB_ADDITIONAL_ERROR_STRING
-      "deal.II is not fully ported to the new TBB oneAPI interface.\n"
-      "Disabling external TBB for now...\n\n"
-      )
-    SET(${var} FALSE)
-  ENDIF()
-
   #
   # TBB currently uses the version numbering scheme
   #
