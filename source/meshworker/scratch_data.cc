@@ -516,7 +516,6 @@ namespace MeshWorker
 
             neighbor_dof_indices.resize(neighbor_fe.n_dofs_per_cell());
             cell->get_dof_indices(neighbor_dof_indices);
-            cell->get_dof_indices(neighbor_dof_indices);
 
             current_neighbor_fe_values = &neighbor_fe_subface_values;
             return neighbor_fe_subface_values;
@@ -619,10 +618,28 @@ namespace MeshWorker
 
 
   template <int dim, int spacedim>
+  unsigned int
+  ScratchData<dim, spacedim>::n_dofs_per_cell() const
+  {
+    return local_dof_indices.size();
+  }
+
+
+
+  template <int dim, int spacedim>
   const std::vector<types::global_dof_index> &
   ScratchData<dim, spacedim>::get_neighbor_dof_indices() const
   {
     return neighbor_dof_indices;
+  }
+
+
+
+  template <int dim, int spacedim>
+  unsigned int
+  ScratchData<dim, spacedim>::n_neighbor_dofs_per_cell() const
+  {
+    return neighbor_dof_indices.size();
   }
 
 

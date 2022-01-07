@@ -527,6 +527,13 @@ namespace MeshWorker
     const std::vector<types::global_dof_index> &
     get_local_dof_indices() const;
 
+    /**
+     * Return the number of local dof indices for the cell passed the last time
+     * the reinit() function was called.
+     */
+    unsigned int
+    n_dofs_per_cell() const;
+
     /** @} */ // CurrentCellMethods
 
     /**
@@ -605,6 +612,13 @@ namespace MeshWorker
      */
     const std::vector<types::global_dof_index> &
     get_neighbor_dof_indices() const;
+
+    /**
+     * Return the number of local dof indices for the neighbor passed the last
+     * time the reinit_neighbor() function was called.
+     */
+    unsigned int
+    n_neighbor_dofs_per_cell() const;
 
     /** @} */ // NeighborCellMethods
 
