@@ -5917,6 +5917,22 @@ namespace GridTools
         return other_rank_index;
       };
 
+      Assert(
+        (marked_vertices.size() == 0) ||
+          (marked_vertices.size() == cache.get_triangulation().n_vertices()),
+        ExcMessage(
+          "The marked_vertices vector has to be either empty or its size has "
+          "to equal the number of vertices of the triangulation."));
+
+      // In the case that a marked_vertices vector has been given and none
+      // of its entries is true, we know that this process does not own
+      // any of the incoming points (and it will not send any data) so
+      // that we can take a short cut.
+      const bool has_relevant_vertices =
+        (marked_vertices.size() == 0) ||
+        (std::find(marked_vertices.begin(), marked_vertices.end(), true) !=
+         marked_vertices.end());
+
       Utilities::MPI::ConsensusAlgorithms::AnonymousProcess<char, char> process(
         [&]() { return potential_owners_ranks; },
         [&](const unsigned int other_rank, std::vector<char> &send_buffer) {
@@ -5944,36 +5960,39 @@ namespace GridTools
           std::vector<unsigned int> request_buffer_temp(
             recv_buffer_unpacked.size(), 0);
 
-          cell_hint = cache.get_triangulation().begin_active();
-
-          for (unsigned int i = 0; i < recv_buffer_unpacked.size(); ++i)
+          if (has_relevant_vertices)
             {
-              const auto &index_and_point = recv_buffer_unpacked[i];
+              cell_hint = cache.get_triangulation().begin_active();
 
-              const auto cells_and_reference_positions =
-                find_all_locally_owned_active_cells_around_point(
-                  cache,
-                  index_and_point.second,
-                  cell_hint,
-                  marked_vertices,
-                  tolerance,
-                  enforce_unique_mapping);
-
-              for (const auto &cell_and_reference_position :
-                   cells_and_reference_positions)
+              for (unsigned int i = 0; i < recv_buffer_unpacked.size(); ++i)
                 {
-                  send_components.emplace_back(
-                    std::pair<int, int>(
-                      cell_and_reference_position.first->level(),
-                      cell_and_reference_position.first->index()),
-                    other_rank,
-                    index_and_point.first,
-                    cell_and_reference_position.second,
-                    index_and_point.second,
-                    numbers::invalid_unsigned_int);
-                }
+                  const auto &index_and_point = recv_buffer_unpacked[i];
 
-              request_buffer_temp[i] = cells_and_reference_positions.size();
+                  const auto cells_and_reference_positions =
+                    find_all_locally_owned_active_cells_around_point(
+                      cache,
+                      index_and_point.second,
+                      cell_hint,
+                      marked_vertices,
+                      tolerance,
+                      enforce_unique_mapping);
+
+                  for (const auto &cell_and_reference_position :
+                       cells_and_reference_positions)
+                    {
+                      send_components.emplace_back(
+                        std::pair<int, int>(
+                          cell_and_reference_position.first->level(),
+                          cell_and_reference_position.first->index()),
+                        other_rank,
+                        index_and_point.first,
+                        cell_and_reference_position.second,
+                        index_and_point.second,
+                        numbers::invalid_unsigned_int);
+                    }
+
+                  request_buffer_temp[i] = cells_and_reference_positions.size();
+                }
             }
 
           if (perform_handshake)
