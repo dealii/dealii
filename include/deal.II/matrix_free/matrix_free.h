@@ -4688,11 +4688,15 @@ namespace internal
       if (fu == nullptr)
         return;
 
+      AssertIndexRange(range_index + 1, ptr.size());
       for (unsigned int i = ptr[range_index]; i < ptr[range_index + 1]; ++i)
-        (container.*fu)(matrix_free,
-                        this->dst,
-                        this->src,
-                        std::make_pair(data[2 * i], data[2 * i + 1]));
+        {
+          AssertIndexRange(2 * i + 1, data.size());
+          (container.*fu)(matrix_free,
+                          this->dst,
+                          this->src,
+                          std::make_pair(data[2 * i], data[2 * i + 1]));
+        }
     }
 
   public:
