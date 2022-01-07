@@ -426,7 +426,7 @@ namespace Step43
 
   // The definition of the class that defines the top-level logic of solving
   // the time-dependent advection-dominated two-phase flow problem (or
-  // Buckley-Leverett problem [Buckley 1942]) is mainly based on tutorial
+  // Buckley-Leverett problem @cite Buckley1942) is mainly based on tutorial
   // programs step-21 and step-33, and in particular on step-31 where we have
   // used basically the same general structure as done here. As in step-31,
   // the key routines to look for in the implementation below are the
