@@ -349,9 +349,7 @@ namespace Step10
                   }
             // Then store the evaluated values in the table...
             table.add_value("eval.pi", static_cast<double>(perimeter / 2.0));
-            table.add_value("error",
-                            static_cast<double>(
-                              std::fabs(perimeter / 2.0 - numbers::PI)));
+            table.add_value("error", std::fabs(perimeter / 2.0 - numbers::PI));
           }
 
         // ...and end this function as we did in the previous one:
