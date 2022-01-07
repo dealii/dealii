@@ -549,45 +549,16 @@ namespace Step21
               << " (" << n_u << '+' << n_p << '+' << n_s << ')' << std::endl
               << std::endl;
 
-    const unsigned int n_couplings = dof_handler.max_couplings_between_dofs();
+    const std::vector<types::global_dof_index> block_sizes = {n_u, n_p, n_s};
+    BlockDynamicSparsityPattern                dsp(block_sizes, block_sizes);
+    DoFTools::make_sparsity_pattern(dof_handler, dsp);
 
-    sparsity_pattern.reinit(3, 3);
-    sparsity_pattern.block(0, 0).reinit(n_u, n_u, n_couplings);
-    sparsity_pattern.block(1, 0).reinit(n_p, n_u, n_couplings);
-    sparsity_pattern.block(2, 0).reinit(n_s, n_u, n_couplings);
-    sparsity_pattern.block(0, 1).reinit(n_u, n_p, n_couplings);
-    sparsity_pattern.block(1, 1).reinit(n_p, n_p, n_couplings);
-    sparsity_pattern.block(2, 1).reinit(n_s, n_p, n_couplings);
-    sparsity_pattern.block(0, 2).reinit(n_u, n_s, n_couplings);
-    sparsity_pattern.block(1, 2).reinit(n_p, n_s, n_couplings);
-    sparsity_pattern.block(2, 2).reinit(n_s, n_s, n_couplings);
-
-    sparsity_pattern.collect_sizes();
-
-    DoFTools::make_sparsity_pattern(dof_handler, sparsity_pattern);
-    sparsity_pattern.compress();
-
-
+    sparsity_pattern.copy_from(dsp);
     system_matrix.reinit(sparsity_pattern);
 
-
-    solution.reinit(3);
-    solution.block(0).reinit(n_u);
-    solution.block(1).reinit(n_p);
-    solution.block(2).reinit(n_s);
-    solution.collect_sizes();
-
-    old_solution.reinit(3);
-    old_solution.block(0).reinit(n_u);
-    old_solution.block(1).reinit(n_p);
-    old_solution.block(2).reinit(n_s);
-    old_solution.collect_sizes();
-
-    system_rhs.reinit(3);
-    system_rhs.block(0).reinit(n_u);
-    system_rhs.block(1).reinit(n_p);
-    system_rhs.block(2).reinit(n_s);
-    system_rhs.collect_sizes();
+    solution.reinit(block_sizes);
+    old_solution.reinit(block_sizes);
+    system_rhs.reinit(block_sizes);
   }
 
 
