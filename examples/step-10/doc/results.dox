@@ -100,7 +100,8 @@ cells.
 
 
 The second purpose of the program was to compute the value of pi to
-good accuracy. This is the output of this part of the program:
+good accuracy. This is the output of this part of the program the last
+time it was updated:
 @code
 Output of grids into gnuplot files:
 ===================================
@@ -118,10 +119,10 @@ Computation of Pi by the area:
 ==============================
 Degree = 1
 cells      eval.pi            error
-    5 1.9999999999999993 1.1416e+00    -
+    5 1.9999999999999991 1.1416e+00    -
    20 2.8284271247461890 3.1317e-01 1.87
    80 3.0614674589207174 8.0125e-02 1.97
-  320 3.1214451522580511 2.0148e-02 1.99
+  320 3.1214451522580515 2.0148e-02 1.99
  1280 3.1365484905459380 5.0442e-03 2.00
  5120 3.1403311569547516 1.2615e-03 2.00
 
@@ -129,28 +130,28 @@ Degree = 2
 cells      eval.pi            error
     5 3.1045694996615860 3.7023e-02    -
    20 3.1391475703122267 2.4451e-03 3.92
-   80 3.1414377167038290 1.5494e-04 3.98
-  320 3.1415829366419006 9.7169e-06 4.00
- 1280 3.1415920457576898 6.0783e-07 4.00
- 5120 3.1415926155921117 3.7998e-08 4.00
+   80 3.1414377167038294 1.5494e-04 3.98
+  320 3.1415829366419010 9.7169e-06 4.00
+ 1280 3.1415920457576911 6.0783e-07 4.00
+ 5120 3.1415926155921130 3.7998e-08 4.00
 
 Degree = 3
 cells      eval.pi            error
-    5 3.1410033851499288 5.8927e-04    -
-   20 3.1415830393583839 9.6142e-06 5.94
-   80 3.1415925017363797 1.5185e-07 5.98
-  320 3.1415926512106696 2.3791e-09 6.00
- 1280 3.1415926535525927 3.7200e-11 6.00
- 5120 3.1415926535892100 5.8302e-13 6.00
+    5 3.1410033851499310 5.8927e-04    -
+   20 3.1415830393583857 9.6142e-06 5.94
+   80 3.1415925017363828 1.5185e-07 5.98
+  320 3.1415926512106704 2.3791e-09 6.00
+ 1280 3.1415926535525944 3.7199e-11 6.00
+ 5120 3.1415926535892122 5.8117e-13 6.00
 
 Degree = 4
 cells      eval.pi            error
-    5 3.1415871927401131 5.4608e-06    -
-   20 3.1415926314742428 2.2116e-08 7.95
-   80 3.1415926535026202 8.7173e-11 7.99
-  320 3.1415926535894498 3.4350e-13 7.99
- 1280 3.1415926535897896 3.4671e-15 6.63
- 5120 3.1415926535897909 2.4009e-15 0.53
+    5 3.1415871927401136 5.4608e-06    -
+   20 3.1415926314742446 2.2116e-08 7.95
+   80 3.1415926535026215 8.7172e-11 7.99
+  320 3.1415926535894516 3.4157e-13 8.00
+ 1280 3.1415926535897918 1.5339e-15 7.80
+ 5120 3.1415926535897927 5.2649e-16 1.54
 
 Computation of Pi by the perimeter:
 ===================================
@@ -169,7 +170,7 @@ cells      eval.pi            error
    20 3.1404050605605449 1.1876e-03 3.81
    80 3.1415157631807009 7.6890e-05 3.95
   320 3.1415878042798613 4.8493e-06 3.99
- 1280 3.1415923498174534 3.0377e-07 4.00
+ 1280 3.1415923498174529 3.0377e-07 4.00
  5120 3.1415926345931995 1.8997e-08 4.00
 
 Degree = 3
@@ -178,23 +179,28 @@ cells      eval.pi            error
    20 3.1415913432549156 1.3103e-06 6.23
    80 3.1415926341726910 1.9417e-08 6.08
   320 3.1415926532906897 2.9910e-10 6.02
- 1280 3.1415926535851355 4.6578e-12 6.00
- 5120 3.1415926535897190 7.4216e-14 5.97
+ 1280 3.1415926535851364 4.6570e-12 6.01
+ 5120 3.1415926535897190 7.4157e-14 5.97
 
 Degree = 4
 cells      eval.pi            error
     5 3.1415921029432572 5.5065e-07     -
    20 3.1415926513737595 2.2160e-09  7.96
-   80 3.1415926535810712 8.7222e-12  7.99
-  320 3.1415926535897576 3.5525e-14  7.94
- 1280 3.1415926535897936 4.6729e-16  6.25
- 5120 3.1415926535897918 1.4929e-15 -1.68
+   80 3.1415926535810703 8.7230e-12  7.99
+  320 3.1415926535897576 3.5705e-14  7.93
+ 1280 3.1415926535897918 1.3785e-15  4.70
+ 5120 3.1415926535897944 1.3798e-15 -0.00
 @endcode
 
+@note Once the error reaches a level on the
+  order of $10^{-14}$ or $10^{-15}$, it is essentially dominated by
+  round-off and consequently dominated by what precisely the library is doing
+  in internal computations. Since these things change, the precise values
+  and errors change from release to release at these round-off levels,
+  though the overall order of errors should of course remain the same.
 
-
-One of the immediate observations from the output is that in all cases the
-values converge quickly to the true value of
+One of the immediate observations from the output above is that in all cases
+the values converge quickly to the true value of
 $\pi=3.141592653589793238462643$. Note that for the $Q_4$ mapping, we are
 already in the regime of roundoff errors and the convergence rate levels off,
 which is already quite a lot. However, also note that for the $Q_1$ mapping,
