@@ -9348,7 +9348,7 @@ namespace DataOutBase
       do
         {
           getline(in, header);
-          while ((header.size() != 0) && (header[header.size() - 1] == ' '))
+          while ((header.size() != 0) && (header.back() == ' '))
             header.erase(header.size() - 1);
         }
       while ((header.empty()) && in);

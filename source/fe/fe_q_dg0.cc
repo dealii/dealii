@@ -199,7 +199,7 @@ FE_Q_DG0<dim, spacedim>::convert_generalized_support_point_values_to_dof_values(
     }
 
   // We don't need the discontinuous function for local interpolation
-  nodal_dofs[nodal_dofs.size() - 1] = 0.;
+  nodal_dofs.back() = 0.;
 }
 
 
@@ -236,7 +236,7 @@ std::vector<bool>
 FE_Q_DG0<dim, spacedim>::get_riaf_vector(const unsigned int deg)
 {
   std::vector<bool> riaf(Utilities::fixed_power<dim>(deg + 1) + 1, false);
-  riaf[riaf.size() - 1] = true;
+  riaf.back() = true;
   return riaf;
 }
 

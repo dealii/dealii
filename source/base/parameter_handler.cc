@@ -2285,13 +2285,13 @@ MultipleParameterLoop::Entry::split_different_values()
   // pair of braces
   if (multiple[0] == '{')
     multiple.erase(0, 1);
-  if (multiple[multiple.size() - 1] == '}')
+  if (multiple.back() == '}')
     multiple.erase(multiple.size() - 1, 1);
   // erase leading and trailing spaces
   // in multiple
   while (std::isspace(multiple[0]) != 0)
     multiple.erase(0, 1);
-  while (std::isspace(multiple[multiple.size() - 1]) != 0)
+  while (std::isspace(multiple.back()) != 0)
     multiple.erase(multiple.size() - 1, 1);
 
   // delete spaces around '|'
