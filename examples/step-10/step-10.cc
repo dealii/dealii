@@ -48,17 +48,6 @@ namespace Step10
 {
   using namespace dealii;
 
-  // Now, as we want to compute the value of $\pi$, we have to compare to
-  // something. These are the first few digits of $\pi$, which we define
-  // beforehand for later use. Since we would like to compute the difference
-  // between two numbers which are quite accurate, with the accuracy of the
-  // computed approximation to $\pi$ being in the range of the number of
-  // digits which a double variable can hold, we rather declare the reference
-  // value as a <code>long double</code> and give it a number of extra digits:
-  const long double pi = 3.141592653589793238462643L;
-
-
-
   // Then, the first task will be to generate some output. Since this program
   // is so small, we do not employ object oriented techniques in it and do not
   // declare classes (although, of course, we use the object oriented features
@@ -258,31 +247,21 @@ namespace Step10
             // function below.
             dof_handler.distribute_dofs(fe);
 
-            // We define the variable area as `long double` like we did for
-            // the `pi` variable before.
-            long double area = 0;
-
             // Now we loop over all cells, reinitialize the FEValues object
             // for each cell, and add up all the `JxW` values for this cell to
             // `area`...
+            double area = 0;
             for (const auto &cell : dof_handler.active_cell_iterators())
               {
                 fe_values.reinit(cell);
                 for (unsigned int i = 0; i < fe_values.n_quadrature_points; ++i)
-                  area += static_cast<long double>(fe_values.JxW(i));
+                  area += fe_values.JxW(i);
               }
 
             // ...and store the resulting area values and the errors in the
-            // table. We need a static cast to double as there is no
-            // add_value(string, long double) function implemented. Note that
-            // this also concerns the second call as the <code>fabs</code>
-            // function in the <code>std</code> namespace is overloaded on its
-            // argument types, so there exists a version taking and returning
-            // a <code>long double</code>, in contrast to the global namespace
-            // where only one such function is declared (which takes and
-            // returns a double).
-            table.add_value("eval.pi", static_cast<double>(area));
-            table.add_value("error", static_cast<double>(std::fabs(area - pi)));
+            // table:
+            table.add_value("eval.pi", area);
+            table.add_value("error", std::fabs(area - numbers::PI));
           }
 
         // We want to compute the convergence rates of the `error`
@@ -354,8 +333,8 @@ namespace Step10
 
             // Now we run over all cells and over all faces of each cell. Only
             // the contributions of the `JxW` values on boundary faces are
-            // added to the long double variable `perimeter`.
-            long double perimeter = 0;
+            // added to the variable `perimeter`.
+            double perimeter = 0;
             for (const auto &cell : dof_handler.active_cell_iterators())
               for (const auto &face : cell->face_iterators())
                 if (face->at_boundary())
@@ -366,13 +345,13 @@ namespace Step10
                     for (unsigned int i = 0;
                          i < fe_face_values.n_quadrature_points;
                          ++i)
-                      perimeter +=
-                        static_cast<long double>(fe_face_values.JxW(i));
+                      perimeter += fe_face_values.JxW(i);
                   }
             // Then store the evaluated values in the table...
-            table.add_value("eval.pi", static_cast<double>(perimeter / 2.0L));
-            table.add_value(
-              "error", static_cast<double>(std::fabs(perimeter / 2.0L - pi)));
+            table.add_value("eval.pi", static_cast<double>(perimeter / 2.0));
+            table.add_value("error",
+                            static_cast<double>(
+                              std::fabs(perimeter / 2.0 - numbers::PI)));
           }
 
         // ...and end this function as we did in the previous one:
