@@ -5695,7 +5695,7 @@ namespace GridTools
   {
     // run internal function ...
     const auto all = internal::distributed_compute_point_locations(
-                       cache, points, global_bboxes, tolerance, false, true)
+                       cache, points, global_bboxes, {}, tolerance, false, true)
                        .send_components;
 
     // ... and reshuffle the data
@@ -5881,6 +5881,7 @@ namespace GridTools
       const GridTools::Cache<dim, spacedim> &                cache,
       const std::vector<Point<spacedim>> &                   points,
       const std::vector<std::vector<BoundingBox<spacedim>>> &global_bboxes,
+      const std::vector<bool> &                              marked_vertices,
       const double                                           tolerance,
       const bool                                             perform_handshake,
       const bool enforce_unique_mapping)
@@ -5901,7 +5902,6 @@ namespace GridTools
       const auto &potential_owners_ptrs    = std::get<1>(potential_owners);
       const auto &potential_owners_indices = std::get<2>(potential_owners);
 
-      const std::vector<bool> marked_vertices;
       auto cell_hint = cache.get_triangulation().begin_active();
 
       const auto translate = [&](const unsigned int other_rank) {
