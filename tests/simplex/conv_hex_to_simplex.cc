@@ -98,6 +98,10 @@ check_file() // for dim = spaceim
         flags.output_only_relevant = false;
       }
 
+    // Demonstrate a bug with copying manifold ids more clearly:
+    if (dim == 3)
+      flags.output_only_relevant = false;
+
     GridOut grid_out;
     grid_out.set_flags(flags);
 
