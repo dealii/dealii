@@ -7716,58 +7716,21 @@ namespace GridGenerator
     /* Boundary-edges 3D:
      * For each of the 6 boundary-faces of the hexahedron, there are 8 edges (of
      * different tetrahedrons) that coincide with the boundary, i.e.
-     * boundary-edges. Each boundary-edge is defined by 2 vertices.
+     * boundary-edges. Each boundary-edge is defined by 2 vertices. 4 of these
+     * edges are new (they are placed in the middle of a presently existing
+     * face); the other 4 coincide with edges present in the hexahedral
+     * triangulation. The new 4 edges inherit the manifold id of the relevant
+     * face, but the other 4 need to be copied from the input and thus do not
+     * require a lookup table.
      */
-    static const ndarray<unsigned int, 6, 8, 2>
-      vertex_ids_for_boundary_edges_3d = {{{{{{4, 6}},
-                                             {{4, 8}},
-                                             {{6, 8}},
-                                             {{4, 0}},
-                                             {{6, 2}},
-                                             {{0, 8}},
-                                             {{2, 8}},
-                                             {{0, 2}}}},
-                                           {{{{5, 7}},
-                                             {{5, 9}},
-                                             {{7, 9}},
-                                             {{5, 1}},
-                                             {{7, 3}},
-                                             {{1, 9}},
-                                             {{3, 9}},
-                                             {{1, 3}}}},
-                                           {{{{4, 5}},
-                                             {{4, 10}},
-                                             {{5, 10}},
-                                             {{4, 0}},
-                                             {{5, 1}},
-                                             {{0, 10}},
-                                             {{1, 10}},
-                                             {{0, 1}}}},
-                                           {{{{6, 7}},
-                                             {{6, 11}},
-                                             {{7, 11}},
-                                             {{6, 2}},
-                                             {{7, 3}},
-                                             {{2, 11}},
-                                             {{3, 11}},
-                                             {{2, 3}}}},
-                                           {{{{2, 3}},
-                                             {{2, 12}},
-                                             {{3, 12}},
-                                             {{2, 0}},
-                                             {{3, 1}},
-                                             {{0, 12}},
-                                             {{1, 12}},
-                                             {{0, 1}}}},
-                                           {{{{6, 7}},
-                                             {{6, 13}},
-                                             {{7, 13}},
-                                             {{6, 4}},
-                                             {{7, 5}},
-                                             {{4, 13}},
-                                             {{5, 13}},
-                                             {{4, 5}}}}}};
-
+    static const ndarray<unsigned int, 6, 4, 2>
+      vertex_ids_for_new_boundary_edges_3d = {
+        {{{{{4, 8}}, {{6, 8}}, {{0, 8}}, {{2, 8}}}},
+         {{{{5, 9}}, {{7, 9}}, {{1, 9}}, {{3, 9}}}},
+         {{{{4, 10}}, {{5, 10}}, {{0, 10}}, {{1, 10}}}},
+         {{{{6, 11}}, {{7, 11}}, {{2, 11}}, {{3, 11}}}},
+         {{{{2, 12}}, {{3, 12}}, {{0, 12}}, {{1, 12}}}},
+         {{{{6, 13}}, {{7, 13}}, {{4, 13}}, {{5, 13}}}}}};
 
     std::vector<Point<spacedim>> vertices;
     std::vector<CellData<dim>>   cells;
@@ -7981,25 +7944,48 @@ namespace GridGenerator
 
             // process boundary-faces: set boundary and manifold ids
             if (dim == 2) // 2D boundary-faces
-              for (const auto &face_vertices :
-                   vertex_ids_for_boundary_faces_2d[f])
-                add_cell(1, face_vertices, bid, mid);
-
+              {
+                for (const auto &face_vertices :
+                     vertex_ids_for_boundary_faces_2d[f])
+                  add_cell(1, face_vertices, bid, mid);
+              }
             else if (dim == 3) // 3D boundary-faces
               {
-                // set manifold id of tet-boundary-faces according to
+                // set manifold ids of tet-boundary-faces according to
                 // hex-boundary-faces
                 for (const auto &face_vertices :
                      vertex_ids_for_boundary_faces_3d[f])
                   add_cell(2, face_vertices, bid, mid);
-                // set manifold id of tet-boundary-edges according to
+                // set manifold ids of new tet-boundary-edges according to
                 // hex-boundary-faces
                 for (const auto &edge_vertices :
-                     vertex_ids_for_boundary_edges_3d[f])
+                     vertex_ids_for_new_boundary_edges_3d[f])
                   add_cell(1, edge_vertices, bid, mid);
               }
             else
               Assert(false, ExcNotImplemented());
+          }
+
+        // set manifold ids of edges that were already present in the
+        // triangulation.
+        if (dim == 3)
+          {
+            for (const auto e : cell.line_indices())
+              {
+                auto edge = cell.line(e);
+                // Rather than use add_cell(), which does additional index
+                // translation, just add edges directly into subcell_data since
+                // we already know the correct global vertex indices.
+                CellData<1> edge_data;
+                edge_data.vertices[0] =
+                  old_to_new_vertex_indices[edge->vertex_index(0)];
+                edge_data.vertices[1] =
+                  old_to_new_vertex_indices[edge->vertex_index(1)];
+                edge_data.boundary_id = edge->boundary_id();
+                edge_data.manifold_id = edge->manifold_id();
+
+                subcell_data.boundary_lines.push_back(std::move(edge_data));
+              }
           }
       }
 

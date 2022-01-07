@@ -3265,11 +3265,11 @@ DEAL::    edge=233, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=312, boundary_id=4294967295, manifold_id=4294967295
 DEAL::cell=0.192, material_id=0, manifold_id=4294967295
 DEAL::  face=631, boundary_id=1, manifold_id=4294967295
-DEAL::    edge=387, boundary_id=0, manifold_id=0
+DEAL::    edge=387, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=393, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=458, boundary_id=0, manifold_id=4294967295
 DEAL::  face=630, boundary_id=0, manifold_id=0
-DEAL::    edge=387, boundary_id=0, manifold_id=0
+DEAL::    edge=387, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=389, boundary_id=0, manifold_id=0
 DEAL::    edge=392, boundary_id=0, manifold_id=0
 DEAL::  face=749, boundary_id=4294967295, manifold_id=4294967295
@@ -3316,11 +3316,11 @@ DEAL::    edge=427, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=457, boundary_id=4294967295, manifold_id=4294967295
 DEAL::cell=0.195, material_id=0, manifold_id=4294967295
 DEAL::  face=679, boundary_id=4294967295, manifold_id=4294967295
-DEAL::    edge=415, boundary_id=0, manifold_id=0
+DEAL::    edge=415, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=413, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=461, boundary_id=4294967295, manifold_id=4294967295
 DEAL::  face=681, boundary_id=0, manifold_id=0
-DEAL::    edge=415, boundary_id=0, manifold_id=0
+DEAL::    edge=415, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=417, boundary_id=0, manifold_id=0
 DEAL::    edge=412, boundary_id=0, manifold_id=0
 DEAL::  face=758, boundary_id=4294967295, manifold_id=4294967295
@@ -3403,13 +3403,13 @@ DEAL::cell=0.200, material_id=0, manifold_id=4294967295
 DEAL::  face=736, boundary_id=1, manifold_id=4294967295
 DEAL::    edge=443, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=411, boundary_id=0, manifold_id=4294967295
-DEAL::    edge=409, boundary_id=0, manifold_id=0
+DEAL::    edge=409, boundary_id=0, manifold_id=4294967295
 DEAL::  face=735, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=443, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=389, boundary_id=0, manifold_id=0
 DEAL::    edge=444, boundary_id=4294967295, manifold_id=4294967295
 DEAL::  face=671, boundary_id=0, manifold_id=0
-DEAL::    edge=409, boundary_id=0, manifold_id=0
+DEAL::    edge=409, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=412, boundary_id=0, manifold_id=0
 DEAL::    edge=389, boundary_id=0, manifold_id=0
 DEAL::  face=675, boundary_id=4294967295, manifold_id=4294967295
@@ -3418,11 +3418,11 @@ DEAL::    edge=444, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=412, boundary_id=0, manifold_id=0
 DEAL::cell=0.201, material_id=0, manifold_id=4294967295
 DEAL::  face=635, boundary_id=4294967295, manifold_id=4294967295
-DEAL::    edge=390, boundary_id=0, manifold_id=0
+DEAL::    edge=390, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=416, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=391, boundary_id=4294967295, manifold_id=4294967295
 DEAL::  face=634, boundary_id=0, manifold_id=0
-DEAL::    edge=390, boundary_id=0, manifold_id=0
+DEAL::    edge=390, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=392, boundary_id=0, manifold_id=0
 DEAL::    edge=417, boundary_id=0, manifold_id=0
 DEAL::  face=640, boundary_id=4294967295, manifold_id=4294967295
@@ -3724,11 +3724,11 @@ DEAL::    edge=437, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=513, boundary_id=4294967295, manifold_id=4294967295
 DEAL::cell=0.219, material_id=0, manifold_id=4294967295
 DEAL::  face=792, boundary_id=4294967295, manifold_id=4294967295
-DEAL::    edge=482, boundary_id=0, manifold_id=0
+DEAL::    edge=482, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=419, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=518, boundary_id=4294967295, manifold_id=4294967295
 DEAL::  face=794, boundary_id=0, manifold_id=0
-DEAL::    edge=482, boundary_id=0, manifold_id=0
+DEAL::    edge=482, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=484, boundary_id=0, manifold_id=0
 DEAL::    edge=418, boundary_id=0, manifold_id=0
 DEAL::  face=855, boundary_id=4294967295, manifold_id=4294967295
@@ -3809,7 +3809,7 @@ DEAL::    edge=505, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=476, boundary_id=0, manifold_id=4294967295
 DEAL::cell=0.224, material_id=0, manifold_id=4294967295
 DEAL::  face=635, boundary_id=4294967295, manifold_id=4294967295
-DEAL::    edge=390, boundary_id=0, manifold_id=0
+DEAL::    edge=390, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=416, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=391, boundary_id=4294967295, manifold_id=4294967295
 DEAL::  face=638, boundary_id=4294967295, manifold_id=4294967295
@@ -3817,7 +3817,7 @@ DEAL::    edge=391, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=395, boundary_id=0, manifold_id=0
 DEAL::    edge=450, boundary_id=4294967295, manifold_id=4294967295
 DEAL::  face=636, boundary_id=0, manifold_id=0
-DEAL::    edge=390, boundary_id=0, manifold_id=0
+DEAL::    edge=390, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=418, boundary_id=0, manifold_id=0
 DEAL::    edge=395, boundary_id=0, manifold_id=0
 DEAL::  face=683, boundary_id=4294967295, manifold_id=4294967295
@@ -3826,11 +3826,11 @@ DEAL::    edge=450, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=418, boundary_id=0, manifold_id=0
 DEAL::cell=0.225, material_id=0, manifold_id=4294967295
 DEAL::  face=768, boundary_id=4294967295, manifold_id=4294967295
-DEAL::    edge=467, boundary_id=0, manifold_id=0
+DEAL::    edge=467, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=483, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=468, boundary_id=4294967295, manifold_id=4294967295
 DEAL::  face=767, boundary_id=0, manifold_id=0
-DEAL::    edge=467, boundary_id=0, manifold_id=0
+DEAL::    edge=467, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=469, boundary_id=0, manifold_id=0
 DEAL::    edge=484, boundary_id=0, manifold_id=0
 DEAL::  face=772, boundary_id=4294967295, manifold_id=4294967295
@@ -4897,11 +4897,11 @@ DEAL::    edge=549, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=509, boundary_id=4294967295, manifold_id=4294967295
 DEAL::cell=0.288, material_id=0, manifold_id=4294967295
 DEAL::  face=679, boundary_id=4294967295, manifold_id=4294967295
-DEAL::    edge=415, boundary_id=0, manifold_id=0
+DEAL::    edge=415, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=413, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=461, boundary_id=4294967295, manifold_id=4294967295
 DEAL::  face=680, boundary_id=0, manifold_id=0
-DEAL::    edge=415, boundary_id=0, manifold_id=0
+DEAL::    edge=415, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=414, boundary_id=0, manifold_id=0
 DEAL::    edge=422, boundary_id=0, manifold_id=0
 DEAL::  face=678, boundary_id=4294967295, manifold_id=4294967295
@@ -4948,11 +4948,11 @@ DEAL::    edge=574, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=605, boundary_id=4294967295, manifold_id=4294967295
 DEAL::cell=0.291, material_id=0, manifold_id=4294967295
 DEAL::  face=924, boundary_id=4294967295, manifold_id=4294967295
-DEAL::    edge=564, boundary_id=0, manifold_id=0
+DEAL::    edge=564, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=561, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=606, boundary_id=4294967295, manifold_id=4294967295
 DEAL::  face=925, boundary_id=0, manifold_id=0
-DEAL::    edge=564, boundary_id=0, manifold_id=0
+DEAL::    edge=564, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=566, boundary_id=0, manifold_id=0
 DEAL::    edge=560, boundary_id=0, manifold_id=0
 DEAL::  face=991, boundary_id=4294967295, manifold_id=4294967295
@@ -5050,11 +5050,11 @@ DEAL::    edge=593, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=560, boundary_id=0, manifold_id=0
 DEAL::cell=0.297, material_id=0, manifold_id=4294967295
 DEAL::  face=688, boundary_id=4294967295, manifold_id=4294967295
-DEAL::    edge=420, boundary_id=0, manifold_id=0
+DEAL::    edge=420, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=565, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=421, boundary_id=4294967295, manifold_id=4294967295
 DEAL::  face=687, boundary_id=0, manifold_id=0
-DEAL::    edge=420, boundary_id=0, manifold_id=0
+DEAL::    edge=420, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=422, boundary_id=0, manifold_id=0
 DEAL::    edge=566, boundary_id=0, manifold_id=0
 DEAL::  face=694, boundary_id=4294967295, manifold_id=4294967295
@@ -5305,11 +5305,11 @@ DEAL::    edge=465, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=414, boundary_id=0, manifold_id=0
 DEAL::cell=0.312, material_id=0, manifold_id=4294967295
 DEAL::  face=792, boundary_id=4294967295, manifold_id=4294967295
-DEAL::    edge=482, boundary_id=0, manifold_id=0
+DEAL::    edge=482, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=419, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=518, boundary_id=4294967295, manifold_id=4294967295
 DEAL::  face=793, boundary_id=0, manifold_id=0
-DEAL::    edge=482, boundary_id=0, manifold_id=0
+DEAL::    edge=482, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=423, boundary_id=0, manifold_id=0
 DEAL::    edge=487, boundary_id=0, manifold_id=0
 DEAL::  face=686, boundary_id=4294967295, manifold_id=4294967295
@@ -5356,11 +5356,11 @@ DEAL::    edge=585, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=638, boundary_id=4294967295, manifold_id=4294967295
 DEAL::cell=0.315, material_id=0, manifold_id=4294967295
 DEAL::  face=996, boundary_id=4294967295, manifold_id=4294967295
-DEAL::    edge=612, boundary_id=0, manifold_id=0
+DEAL::    edge=612, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=568, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=640, boundary_id=4294967295, manifold_id=4294967295
 DEAL::  face=997, boundary_id=0, manifold_id=0
-DEAL::    edge=612, boundary_id=0, manifold_id=0
+DEAL::    edge=612, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=614, boundary_id=0, manifold_id=0
 DEAL::    edge=567, boundary_id=0, manifold_id=0
 DEAL::  face=1041, boundary_id=4294967295, manifold_id=4294967295
@@ -5441,7 +5441,7 @@ DEAL::    edge=629, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=494, boundary_id=4294967295, manifold_id=4294967295
 DEAL::cell=0.320, material_id=0, manifold_id=4294967295
 DEAL::  face=688, boundary_id=4294967295, manifold_id=4294967295
-DEAL::    edge=420, boundary_id=0, manifold_id=0
+DEAL::    edge=420, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=565, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=421, boundary_id=4294967295, manifold_id=4294967295
 DEAL::  face=690, boundary_id=4294967295, manifold_id=4294967295
@@ -5449,7 +5449,7 @@ DEAL::    edge=421, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=423, boundary_id=0, manifold_id=0
 DEAL::    edge=599, boundary_id=4294967295, manifold_id=4294967295
 DEAL::  face=689, boundary_id=0, manifold_id=0
-DEAL::    edge=420, boundary_id=0, manifold_id=0
+DEAL::    edge=420, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=567, boundary_id=0, manifold_id=0
 DEAL::    edge=423, boundary_id=0, manifold_id=0
 DEAL::  face=927, boundary_id=4294967295, manifold_id=4294967295
@@ -5458,11 +5458,11 @@ DEAL::    edge=599, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=567, boundary_id=0, manifold_id=0
 DEAL::cell=0.321, material_id=0, manifold_id=4294967295
 DEAL::  face=798, boundary_id=4294967295, manifold_id=4294967295
-DEAL::    edge=485, boundary_id=0, manifold_id=0
+DEAL::    edge=485, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=613, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=486, boundary_id=4294967295, manifold_id=4294967295
 DEAL::  face=797, boundary_id=0, manifold_id=0
-DEAL::    edge=485, boundary_id=0, manifold_id=0
+DEAL::    edge=485, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=487, boundary_id=0, manifold_id=0
 DEAL::    edge=614, boundary_id=0, manifold_id=0
 DEAL::  face=802, boundary_id=4294967295, manifold_id=4294967295
@@ -6597,11 +6597,11 @@ DEAL::    edge=698, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=750, boundary_id=4294967295, manifold_id=4294967295
 DEAL::cell=0.388, material_id=0, manifold_id=4294967295
 DEAL::  face=1076, boundary_id=0, manifold_id=0
-DEAL::    edge=674, boundary_id=0, manifold_id=0
+DEAL::    edge=674, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=685, boundary_id=0, manifold_id=0
 DEAL::    edge=729, boundary_id=0, manifold_id=0
 DEAL::  face=1077, boundary_id=1, manifold_id=4294967295
-DEAL::    edge=674, boundary_id=0, manifold_id=0
+DEAL::    edge=674, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=744, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=686, boundary_id=0, manifold_id=4294967295
 DEAL::  face=1181, boundary_id=4294967295, manifold_id=4294967295
@@ -6614,11 +6614,11 @@ DEAL::    edge=686, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=732, boundary_id=4294967295, manifold_id=4294967295
 DEAL::cell=0.389, material_id=0, manifold_id=4294967295
 DEAL::  face=1117, boundary_id=4294967295, manifold_id=4294967295
-DEAL::    edge=696, boundary_id=0, manifold_id=0
+DEAL::    edge=696, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=713, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=699, boundary_id=4294967295, manifold_id=4294967295
 DEAL::  face=1116, boundary_id=0, manifold_id=0
-DEAL::    edge=696, boundary_id=0, manifold_id=0
+DEAL::    edge=696, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=697, boundary_id=0, manifold_id=0
 DEAL::    edge=711, boundary_id=0, manifold_id=0
 DEAL::  face=1121, boundary_id=4294967295, manifold_id=4294967295
@@ -6716,11 +6716,11 @@ DEAL::    edge=720, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=741, boundary_id=4294967295, manifold_id=4294967295
 DEAL::cell=0.395, material_id=0, manifold_id=4294967295
 DEAL::  face=1094, boundary_id=0, manifold_id=0
-DEAL::    edge=684, boundary_id=0, manifold_id=0
+DEAL::    edge=684, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=711, boundary_id=0, manifold_id=0
 DEAL::    edge=685, boundary_id=0, manifold_id=0
 DEAL::  face=1095, boundary_id=4294967295, manifold_id=4294967295
-DEAL::    edge=684, boundary_id=0, manifold_id=0
+DEAL::    edge=684, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=739, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=712, boundary_id=4294967295, manifold_id=4294967295
 DEAL::  face=1097, boundary_id=4294967295, manifold_id=4294967295
@@ -7413,11 +7413,11 @@ DEAL::    edge=712, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=781, boundary_id=4294967295, manifold_id=4294967295
 DEAL::cell=0.436, material_id=0, manifold_id=4294967295
 DEAL::  face=1089, boundary_id=0, manifold_id=0
-DEAL::    edge=682, boundary_id=0, manifold_id=0
+DEAL::    edge=682, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=471, boundary_id=0, manifold_id=0
 DEAL::    edge=768, boundary_id=0, manifold_id=0
 DEAL::  face=1090, boundary_id=1, manifold_id=4294967295
-DEAL::    edge=682, boundary_id=0, manifold_id=0
+DEAL::    edge=682, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=777, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=472, boundary_id=0, manifold_id=4294967295
 DEAL::  face=1236, boundary_id=4294967295, manifold_id=4294967295
@@ -7430,11 +7430,11 @@ DEAL::    edge=472, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=770, boundary_id=4294967295, manifold_id=4294967295
 DEAL::cell=0.437, material_id=0, manifold_id=4294967295
 DEAL::  face=1139, boundary_id=4294967295, manifold_id=4294967295
-DEAL::    edge=710, boundary_id=0, manifold_id=0
+DEAL::    edge=710, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=489, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=715, boundary_id=4294967295, manifold_id=4294967295
 DEAL::  face=1141, boundary_id=0, manifold_id=0
-DEAL::    edge=710, boundary_id=0, manifold_id=0
+DEAL::    edge=710, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=714, boundary_id=0, manifold_id=0
 DEAL::    edge=488, boundary_id=0, manifold_id=0
 DEAL::  face=1147, boundary_id=4294967295, manifold_id=4294967295
@@ -7483,13 +7483,13 @@ DEAL::cell=0.440, material_id=0, manifold_id=4294967295
 DEAL::  face=1234, boundary_id=0, manifold_id=0
 DEAL::    edge=768, boundary_id=0, manifold_id=0
 DEAL::    edge=714, boundary_id=0, manifold_id=0
-DEAL::    edge=684, boundary_id=0, manifold_id=0
+DEAL::    edge=684, boundary_id=0, manifold_id=4294967295
 DEAL::  face=1235, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=768, boundary_id=0, manifold_id=0
 DEAL::    edge=739, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=769, boundary_id=4294967295, manifold_id=4294967295
 DEAL::  face=1095, boundary_id=4294967295, manifold_id=4294967295
-DEAL::    edge=684, boundary_id=0, manifold_id=0
+DEAL::    edge=684, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=739, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=712, boundary_id=4294967295, manifold_id=4294967295
 DEAL::  face=1145, boundary_id=4294967295, manifold_id=4294967295
@@ -7532,11 +7532,11 @@ DEAL::    edge=500, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=506, boundary_id=4294967295, manifold_id=4294967295
 DEAL::cell=0.443, material_id=0, manifold_id=4294967295
 DEAL::  face=769, boundary_id=0, manifold_id=0
-DEAL::    edge=467, boundary_id=0, manifold_id=0
+DEAL::    edge=467, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=488, boundary_id=0, manifold_id=0
 DEAL::    edge=471, boundary_id=0, manifold_id=0
 DEAL::  face=768, boundary_id=4294967295, manifold_id=4294967295
-DEAL::    edge=467, boundary_id=0, manifold_id=0
+DEAL::    edge=467, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=483, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=468, boundary_id=4294967295, manifold_id=4294967295
 DEAL::  face=776, boundary_id=4294967295, manifold_id=4294967295
@@ -8229,11 +8229,11 @@ DEAL::    edge=798, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=850, boundary_id=4294967295, manifold_id=4294967295
 DEAL::cell=0.484, material_id=0, manifold_id=4294967295
 DEAL::  face=1118, boundary_id=0, manifold_id=0
-DEAL::    edge=696, boundary_id=0, manifold_id=0
+DEAL::    edge=696, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=717, boundary_id=0, manifold_id=0
 DEAL::    edge=832, boundary_id=0, manifold_id=0
 DEAL::  face=1117, boundary_id=4294967295, manifold_id=4294967295
-DEAL::    edge=696, boundary_id=0, manifold_id=0
+DEAL::    edge=696, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=713, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=699, boundary_id=4294967295, manifold_id=4294967295
 DEAL::  face=1345, boundary_id=4294967295, manifold_id=4294967295
@@ -8246,11 +8246,11 @@ DEAL::    edge=713, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=833, boundary_id=4294967295, manifold_id=4294967295
 DEAL::cell=0.485, material_id=0, manifold_id=4294967295
 DEAL::  face=1281, boundary_id=4294967295, manifold_id=4294967295
-DEAL::    edge=796, boundary_id=0, manifold_id=0
+DEAL::    edge=796, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=813, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=799, boundary_id=4294967295, manifold_id=4294967295
 DEAL::  face=1280, boundary_id=0, manifold_id=0
-DEAL::    edge=796, boundary_id=0, manifold_id=0
+DEAL::    edge=796, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=797, boundary_id=0, manifold_id=0
 DEAL::    edge=811, boundary_id=0, manifold_id=0
 DEAL::  face=1286, boundary_id=4294967295, manifold_id=4294967295
@@ -8348,11 +8348,11 @@ DEAL::    edge=822, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=845, boundary_id=4294967295, manifold_id=4294967295
 DEAL::cell=0.491, material_id=0, manifold_id=4294967295
 DEAL::  face=1149, boundary_id=0, manifold_id=0
-DEAL::    edge=716, boundary_id=0, manifold_id=0
+DEAL::    edge=716, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=811, boundary_id=0, manifold_id=0
 DEAL::    edge=717, boundary_id=0, manifold_id=0
 DEAL::  face=1150, boundary_id=4294967295, manifold_id=4294967295
-DEAL::    edge=716, boundary_id=0, manifold_id=0
+DEAL::    edge=716, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=842, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=812, boundary_id=4294967295, manifold_id=4294967295
 DEAL::  face=1152, boundary_id=4294967295, manifold_id=4294967295
@@ -9045,11 +9045,11 @@ DEAL::    edge=812, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=878, boundary_id=4294967295, manifold_id=4294967295
 DEAL::cell=0.532, material_id=0, manifold_id=4294967295
 DEAL::  face=1140, boundary_id=0, manifold_id=0
-DEAL::    edge=710, boundary_id=0, manifold_id=0
+DEAL::    edge=710, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=490, boundary_id=0, manifold_id=0
 DEAL::    edge=867, boundary_id=0, manifold_id=0
 DEAL::  face=1139, boundary_id=4294967295, manifold_id=4294967295
-DEAL::    edge=710, boundary_id=0, manifold_id=0
+DEAL::    edge=710, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=489, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=715, boundary_id=4294967295, manifold_id=4294967295
 DEAL::  face=1382, boundary_id=4294967295, manifold_id=4294967295
@@ -9062,11 +9062,11 @@ DEAL::    edge=489, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=868, boundary_id=4294967295, manifold_id=4294967295
 DEAL::cell=0.533, material_id=0, manifold_id=4294967295
 DEAL::  face=1301, boundary_id=4294967295, manifold_id=4294967295
-DEAL::    edge=810, boundary_id=0, manifold_id=0
+DEAL::    edge=810, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=616, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=815, boundary_id=4294967295, manifold_id=4294967295
 DEAL::  face=1303, boundary_id=0, manifold_id=0
-DEAL::    edge=810, boundary_id=0, manifold_id=0
+DEAL::    edge=810, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=814, boundary_id=0, manifold_id=0
 DEAL::    edge=615, boundary_id=0, manifold_id=0
 DEAL::  face=1312, boundary_id=4294967295, manifold_id=4294967295
@@ -9115,13 +9115,13 @@ DEAL::cell=0.536, material_id=0, manifold_id=4294967295
 DEAL::  face=1380, boundary_id=0, manifold_id=0
 DEAL::    edge=867, boundary_id=0, manifold_id=0
 DEAL::    edge=814, boundary_id=0, manifold_id=0
-DEAL::    edge=716, boundary_id=0, manifold_id=0
+DEAL::    edge=716, boundary_id=0, manifold_id=4294967295
 DEAL::  face=1381, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=867, boundary_id=0, manifold_id=0
 DEAL::    edge=842, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=869, boundary_id=4294967295, manifold_id=4294967295
 DEAL::  face=1150, boundary_id=4294967295, manifold_id=4294967295
-DEAL::    edge=716, boundary_id=0, manifold_id=0
+DEAL::    edge=716, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=842, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=812, boundary_id=4294967295, manifold_id=4294967295
 DEAL::  face=1309, boundary_id=4294967295, manifold_id=4294967295
@@ -9164,11 +9164,11 @@ DEAL::    edge=624, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=632, boundary_id=4294967295, manifold_id=4294967295
 DEAL::cell=0.539, material_id=0, manifold_id=4294967295
 DEAL::  face=799, boundary_id=0, manifold_id=0
-DEAL::    edge=485, boundary_id=0, manifold_id=0
+DEAL::    edge=485, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=615, boundary_id=0, manifold_id=0
 DEAL::    edge=490, boundary_id=0, manifold_id=0
 DEAL::  face=798, boundary_id=4294967295, manifold_id=4294967295
-DEAL::    edge=485, boundary_id=0, manifold_id=0
+DEAL::    edge=485, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=613, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=486, boundary_id=4294967295, manifold_id=4294967295
 DEAL::  face=807, boundary_id=4294967295, manifold_id=4294967295
@@ -11459,11 +11459,11 @@ DEAL::    edge=916, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=1013, boundary_id=4294967295, manifold_id=4294967295
 DEAL::cell=0.674, material_id=0, manifold_id=4294967295
 DEAL::  face=1569, boundary_id=4294967295, manifold_id=4294967295
-DEAL::    edge=995, boundary_id=0, manifold_id=0
+DEAL::    edge=995, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=990, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=1014, boundary_id=4294967295, manifold_id=4294967295
 DEAL::  face=1571, boundary_id=0, manifold_id=0
-DEAL::    edge=995, boundary_id=0, manifold_id=0
+DEAL::    edge=995, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=997, boundary_id=0, manifold_id=0
 DEAL::    edge=991, boundary_id=0, manifold_id=0
 DEAL::  face=1592, boundary_id=4294967295, manifold_id=4294967295
@@ -11476,11 +11476,11 @@ DEAL::    edge=991, boundary_id=0, manifold_id=0
 DEAL::    edge=1016, boundary_id=4294967295, manifold_id=4294967295
 DEAL::cell=0.675, material_id=0, manifold_id=4294967295
 DEAL::  face=1553, boundary_id=0, manifold_id=0
-DEAL::    edge=983, boundary_id=0, manifold_id=0
+DEAL::    edge=983, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=982, boundary_id=0, manifold_id=0
 DEAL::    edge=1017, boundary_id=0, manifold_id=0
 DEAL::  face=1554, boundary_id=1, manifold_id=4294967295
-DEAL::    edge=983, boundary_id=0, manifold_id=0
+DEAL::    edge=983, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=985, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=981, boundary_id=0, manifold_id=4294967295
 DEAL::  face=1596, boundary_id=4294967295, manifold_id=4294967295
@@ -11529,13 +11529,13 @@ DEAL::cell=0.678, material_id=0, manifold_id=4294967295
 DEAL::  face=1595, boundary_id=0, manifold_id=0
 DEAL::    edge=1017, boundary_id=0, manifold_id=0
 DEAL::    edge=997, boundary_id=0, manifold_id=0
-DEAL::    edge=994, boundary_id=0, manifold_id=0
+DEAL::    edge=994, boundary_id=0, manifold_id=4294967295
 DEAL::  face=1594, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=1017, boundary_id=0, manifold_id=0
 DEAL::    edge=984, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=1019, boundary_id=4294967295, manifold_id=4294967295
 DEAL::  face=1567, boundary_id=4294967295, manifold_id=4294967295
-DEAL::    edge=994, boundary_id=0, manifold_id=0
+DEAL::    edge=994, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=996, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=984, boundary_id=4294967295, manifold_id=4294967295
 DEAL::  face=1573, boundary_id=4294967295, manifold_id=4294967295
@@ -11867,11 +11867,11 @@ DEAL::    edge=589, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=1024, boundary_id=4294967295, manifold_id=4294967295
 DEAL::cell=0.698, material_id=0, manifold_id=4294967295
 DEAL::  face=932, boundary_id=4294967295, manifold_id=4294967295
-DEAL::    edge=569, boundary_id=0, manifold_id=0
+DEAL::    edge=569, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=998, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=1021, boundary_id=4294967295, manifold_id=4294967295
 DEAL::  face=931, boundary_id=0, manifold_id=0
-DEAL::    edge=569, boundary_id=0, manifold_id=0
+DEAL::    edge=569, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=570, boundary_id=0, manifold_id=0
 DEAL::    edge=999, boundary_id=0, manifold_id=0
 DEAL::  face=1601, boundary_id=4294967295, manifold_id=4294967295
@@ -11884,11 +11884,11 @@ DEAL::    edge=999, boundary_id=0, manifold_id=0
 DEAL::    edge=1025, boundary_id=4294967295, manifold_id=4294967295
 DEAL::cell=0.699, material_id=0, manifold_id=4294967295
 DEAL::  face=923, boundary_id=0, manifold_id=0
-DEAL::    edge=562, boundary_id=0, manifold_id=0
+DEAL::    edge=562, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=987, boundary_id=0, manifold_id=0
 DEAL::    edge=1026, boundary_id=0, manifold_id=0
 DEAL::  face=922, boundary_id=1, manifold_id=4294967295
-DEAL::    edge=562, boundary_id=0, manifold_id=0
+DEAL::    edge=562, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=563, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=986, boundary_id=0, manifold_id=4294967295
 DEAL::  face=1607, boundary_id=4294967295, manifold_id=4294967295
@@ -11918,11 +11918,11 @@ DEAL::    edge=918, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=1008, boundary_id=4294967295, manifold_id=4294967295
 DEAL::cell=0.701, material_id=0, manifold_id=4294967295
 DEAL::  face=1568, boundary_id=0, manifold_id=0
-DEAL::    edge=994, boundary_id=0, manifold_id=0
+DEAL::    edge=994, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=999, boundary_id=0, manifold_id=0
 DEAL::    edge=987, boundary_id=0, manifold_id=0
 DEAL::  face=1567, boundary_id=4294967295, manifold_id=4294967295
-DEAL::    edge=994, boundary_id=0, manifold_id=0
+DEAL::    edge=994, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=996, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=984, boundary_id=4294967295, manifold_id=4294967295
 DEAL::  face=1558, boundary_id=4294967295, manifold_id=4294967295
@@ -11937,13 +11937,13 @@ DEAL::cell=0.702, material_id=0, manifold_id=4294967295
 DEAL::  face=1606, boundary_id=0, manifold_id=0
 DEAL::    edge=1026, boundary_id=0, manifold_id=0
 DEAL::    edge=570, boundary_id=0, manifold_id=0
-DEAL::    edge=564, boundary_id=0, manifold_id=0
+DEAL::    edge=564, boundary_id=0, manifold_id=4294967295
 DEAL::  face=1605, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=1026, boundary_id=0, manifold_id=0
 DEAL::    edge=561, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=1027, boundary_id=4294967295, manifold_id=4294967295
 DEAL::  face=924, boundary_id=4294967295, manifold_id=4294967295
-DEAL::    edge=564, boundary_id=0, manifold_id=0
+DEAL::    edge=564, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=561, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=606, boundary_id=4294967295, manifold_id=4294967295
 DEAL::  face=934, boundary_id=4294967295, manifold_id=4294967295
@@ -12275,11 +12275,11 @@ DEAL::    edge=830, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=851, boundary_id=4294967295, manifold_id=4294967295
 DEAL::cell=0.722, material_id=0, manifold_id=4294967295
 DEAL::  face=1281, boundary_id=4294967295, manifold_id=4294967295
-DEAL::    edge=796, boundary_id=0, manifold_id=0
+DEAL::    edge=796, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=813, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=799, boundary_id=4294967295, manifold_id=4294967295
 DEAL::  face=1282, boundary_id=0, manifold_id=0
-DEAL::    edge=796, boundary_id=0, manifold_id=0
+DEAL::    edge=796, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=818, boundary_id=0, manifold_id=0
 DEAL::    edge=801, boundary_id=0, manifold_id=0
 DEAL::  face=1308, boundary_id=4294967295, manifold_id=4294967295
@@ -12292,11 +12292,11 @@ DEAL::    edge=801, boundary_id=0, manifold_id=0
 DEAL::    edge=853, boundary_id=4294967295, manifold_id=4294967295
 DEAL::cell=0.723, material_id=0, manifold_id=4294967295
 DEAL::  face=1570, boundary_id=0, manifold_id=0
-DEAL::    edge=995, boundary_id=0, manifold_id=0
+DEAL::    edge=995, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=993, boundary_id=0, manifold_id=0
 DEAL::    edge=1040, boundary_id=0, manifold_id=0
 DEAL::  face=1569, boundary_id=4294967295, manifold_id=4294967295
-DEAL::    edge=995, boundary_id=0, manifold_id=0
+DEAL::    edge=995, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=990, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=1014, boundary_id=4294967295, manifold_id=4294967295
 DEAL::  face=1622, boundary_id=4294967295, manifold_id=4294967295
@@ -12345,13 +12345,13 @@ DEAL::cell=0.726, material_id=0, manifold_id=4294967295
 DEAL::  face=1620, boundary_id=0, manifold_id=0
 DEAL::    edge=1040, boundary_id=0, manifold_id=0
 DEAL::    edge=818, boundary_id=0, manifold_id=0
-DEAL::    edge=816, boundary_id=0, manifold_id=0
+DEAL::    edge=816, boundary_id=0, manifold_id=4294967295
 DEAL::  face=1621, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=1040, boundary_id=0, manifold_id=0
 DEAL::    edge=1000, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=1043, boundary_id=4294967295, manifold_id=4294967295
 DEAL::  face=1313, boundary_id=4294967295, manifold_id=4294967295
-DEAL::    edge=816, boundary_id=0, manifold_id=0
+DEAL::    edge=816, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=817, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=1000, boundary_id=4294967295, manifold_id=4294967295
 DEAL::  face=1316, boundary_id=4294967295, manifold_id=4294967295
@@ -12683,11 +12683,11 @@ DEAL::    edge=627, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=881, boundary_id=4294967295, manifold_id=4294967295
 DEAL::cell=0.746, material_id=0, manifold_id=4294967295
 DEAL::  face=1301, boundary_id=4294967295, manifold_id=4294967295
-DEAL::    edge=810, boundary_id=0, manifold_id=0
+DEAL::    edge=810, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=616, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=815, boundary_id=4294967295, manifold_id=4294967295
 DEAL::  face=1302, boundary_id=0, manifold_id=0
-DEAL::    edge=810, boundary_id=0, manifold_id=0
+DEAL::    edge=810, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=617, boundary_id=0, manifold_id=0
 DEAL::    edge=819, boundary_id=0, manifold_id=0
 DEAL::  face=1003, boundary_id=4294967295, manifold_id=4294967295
@@ -12700,11 +12700,11 @@ DEAL::    edge=819, boundary_id=0, manifold_id=0
 DEAL::    edge=882, boundary_id=4294967295, manifold_id=4294967295
 DEAL::cell=0.747, material_id=0, manifold_id=4294967295
 DEAL::  face=933, boundary_id=0, manifold_id=0
-DEAL::    edge=569, boundary_id=0, manifold_id=0
+DEAL::    edge=569, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=1001, boundary_id=0, manifold_id=0
 DEAL::    edge=1044, boundary_id=0, manifold_id=0
 DEAL::  face=932, boundary_id=4294967295, manifold_id=4294967295
-DEAL::    edge=569, boundary_id=0, manifold_id=0
+DEAL::    edge=569, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=998, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=1021, boundary_id=4294967295, manifold_id=4294967295
 DEAL::  face=1628, boundary_id=4294967295, manifold_id=4294967295
@@ -12734,11 +12734,11 @@ DEAL::    edge=831, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=1037, boundary_id=4294967295, manifold_id=4294967295
 DEAL::cell=0.749, material_id=0, manifold_id=4294967295
 DEAL::  face=1314, boundary_id=0, manifold_id=0
-DEAL::    edge=816, boundary_id=0, manifold_id=0
+DEAL::    edge=816, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=819, boundary_id=0, manifold_id=0
 DEAL::    edge=1001, boundary_id=0, manifold_id=0
 DEAL::  face=1313, boundary_id=4294967295, manifold_id=4294967295
-DEAL::    edge=816, boundary_id=0, manifold_id=0
+DEAL::    edge=816, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=817, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=1000, boundary_id=4294967295, manifold_id=4294967295
 DEAL::  face=1579, boundary_id=4294967295, manifold_id=4294967295
@@ -12753,13 +12753,13 @@ DEAL::cell=0.750, material_id=0, manifold_id=4294967295
 DEAL::  face=1627, boundary_id=0, manifold_id=0
 DEAL::    edge=1044, boundary_id=0, manifold_id=0
 DEAL::    edge=617, boundary_id=0, manifold_id=0
-DEAL::    edge=612, boundary_id=0, manifold_id=0
+DEAL::    edge=612, boundary_id=0, manifold_id=4294967295
 DEAL::  face=1626, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=1044, boundary_id=0, manifold_id=0
 DEAL::    edge=568, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=1045, boundary_id=4294967295, manifold_id=4294967295
 DEAL::  face=996, boundary_id=4294967295, manifold_id=4294967295
-DEAL::    edge=612, boundary_id=0, manifold_id=0
+DEAL::    edge=612, boundary_id=0, manifold_id=4294967295
 DEAL::    edge=568, boundary_id=4294967295, manifold_id=4294967295
 DEAL::    edge=640, boundary_id=4294967295, manifold_id=4294967295
 DEAL::  face=1004, boundary_id=4294967295, manifold_id=4294967295

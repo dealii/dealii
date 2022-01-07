@@ -1,0 +1,4 @@
+Fixed: GridGenerator::convert_hypercube_to_simplex_mesh() now correctly copies
+line manifold ids in 3D.
+<br>
+(David Wells, 2022/01/07)
