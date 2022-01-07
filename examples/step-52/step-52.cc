@@ -662,8 +662,8 @@ namespace Step52
   // @sect4{<code>Diffusion::run</code>}
   //
   // The following is the main function of the program. At the top, we create
-  // the grid (a [0,5]x[0,5] square) and refine it four times to get a mesh
-  // that has 16 by 16 cells, for a total of 256.  We then set the boundary
+  // the grid (a $[0,5]\times [0,5]$ square) and refine it four times to get a
+  // mesh that has 16 by 16 cells, for a total of 256.  We then set the boundary
   // indicator to 1 for those parts of the boundary where $x=0$ and $x=5$.
   void Diffusion::run()
   {
