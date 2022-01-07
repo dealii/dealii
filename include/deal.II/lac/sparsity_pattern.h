@@ -1644,13 +1644,15 @@ SparsityPatternBase::operator==(const SparsityPatternBase &sp2) const
   if (rows != sp2.rows || cols != sp2.cols || compressed != sp2.compressed)
     return false;
 
-  for (size_type i = 0; i < rows + 1; ++i)
-    if (rowstart[i] != sp2.rowstart[i])
-      return false;
+  if (rows > 0)
+    for (size_type i = 0; i < rows + 1; ++i)
+      if (rowstart[i] != sp2.rowstart[i])
+        return false;
 
-  for (size_type i = 0; i < rowstart[rows]; ++i)
-    if (colnums[i] != sp2.colnums[i])
-      return false;
+  if (rows > 0)
+    for (size_type i = 0; i < rowstart[rows]; ++i)
+      if (colnums[i] != sp2.colnums[i])
+        return false;
 
   return true;
 }
