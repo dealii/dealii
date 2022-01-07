@@ -885,11 +885,37 @@ public:
    * be a double contraction over two indices, while it is defined as a single
    * contraction over only one index for regular <tt>Tensor</tt> objects. For
    * symmetric tensors it therefore acts in a way that is commonly denoted by
-   * a "colon multiplication" in the mathematical literature.
+   * a "colon multiplication" in the mathematical literature (the two dots of
+   * the colon suggesting that it is a contraction over two indices), which
+   * corresponds to a scalar product between tensors.
    *
-   * There are global functions <tt>double_contract</tt> that do the same work
-   * as this operator, but rather than returning the result as a return value,
-   * they write it into the first argument to the function.
+   * It is worth pointing out that this definition of `operator*` between
+   * symmetric tensors is different to how the (in general non-symmetric)
+   * Tensor class defines `operator*`, namely as the single-contraction
+   * product over the last index of the first operand and the first index of
+   * the second operand. For the double contraction of Tensor objects,
+   * you will need to use the `double_contract()` function.
+   *
+   * To maintain at least a modicum of resemblance between the interfaces
+   * of Tensor and SymmetricTensor, there are also global functions
+   * double_contract() for symmetric tensors that then do the same work
+   * as this operator. However, rather than returning the result as a return
+   * value, they write it into the first argument to the function in the same
+   * way as the corresponding functions for the Tensor class do things.
+   *
+   * @note The origin of the difference in how `operator*()` is implemented between
+   *   Tensor and SymmetricTensor is that for the former, the product between
+   *   two Tensor objects of same rank and dimension results in another Tensor
+   *   object -- that it, `operator*()` corresponds to the multiplicative group
+   *   action within the group of tensors. On the other hand, there is no
+   *   corresponding multiplicative group action with the set of symmetric
+   *   tensors because, in general, the product of two symmetric tensors is a
+   *   *nonsymmetric* tensor. As a consequence, for a mathematician, it is clear
+   *   that `operator*()` for symmetric tensors must have a different meaning:
+   *   namely the *dot* or *scalar product* that maps two symmetric tensors of
+   *   rank 2 to a scalar. This corresponds to the double-dot (colon) operator
+   *   whose meaning is then extended to the product of any two even-ranked
+   *   symmetric tensors.
    */
   template <typename OtherNumber>
   DEAL_II_CONSTEXPR typename internal::SymmetricTensorAccessors::
@@ -897,8 +923,8 @@ public:
     operator*(const SymmetricTensor<2, dim, OtherNumber> &s) const;
 
   /**
-   * Contraction over two indices of the present object with the rank-4
-   * symmetric tensor given as argument.
+   * Contraction over the last two indices of the present object with the first
+   * two indices of the rank-4 symmetric tensor given as argument.
    */
   template <typename OtherNumber>
   DEAL_II_CONSTEXPR typename internal::SymmetricTensorAccessors::
