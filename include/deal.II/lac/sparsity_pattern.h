@@ -1588,8 +1588,15 @@ SparsityPatternBase::save(Archive &ar, const unsigned int) const
 
   ar &max_dim &rows &cols &max_vec_len &max_row_length &compressed;
 
-  ar &boost::serialization::make_array(rowstart.get(), max_dim + 1);
-  ar &boost::serialization::make_array(colnums.get(), max_vec_len);
+  if (max_dim != 0)
+    ar &boost::serialization::make_array(rowstart.get(), max_dim + 1);
+  else
+    Assert(rowstart.get() == nullptr, ExcInternalError());
+
+  if (max_vec_len != 0)
+    ar &boost::serialization::make_array(colnums.get(), max_vec_len);
+  else
+    Assert(colnums.get() == nullptr, ExcInternalError());
 }
 
 
@@ -1603,11 +1610,21 @@ SparsityPatternBase::load(Archive &ar, const unsigned int)
 
   ar &max_dim &rows &cols &max_vec_len &max_row_length &compressed;
 
-  rowstart = std::make_unique<std::size_t[]>(max_dim + 1);
-  colnums  = std::make_unique<size_type[]>(max_vec_len);
+  if (max_dim != 0)
+    {
+      rowstart = std::make_unique<std::size_t[]>(max_dim + 1);
+      ar &boost::serialization::make_array(rowstart.get(), max_dim + 1);
+    }
+  else
+    rowstart.reset();
 
-  ar &boost::serialization::make_array(rowstart.get(), max_dim + 1);
-  ar &boost::serialization::make_array(colnums.get(), max_vec_len);
+  if (max_vec_len != 0)
+    {
+      colnums = std::make_unique<size_type[]>(max_vec_len);
+      ar &boost::serialization::make_array(colnums.get(), max_vec_len);
+    }
+  else
+    colnums.reset();
 }
 
 
@@ -1644,13 +1661,15 @@ SparsityPatternBase::operator==(const SparsityPatternBase &sp2) const
   if (rows != sp2.rows || cols != sp2.cols || compressed != sp2.compressed)
     return false;
 
-  for (size_type i = 0; i < rows + 1; ++i)
-    if (rowstart[i] != sp2.rowstart[i])
-      return false;
+  if (rows > 0)
+    for (size_type i = 0; i < rows + 1; ++i)
+      if (rowstart[i] != sp2.rowstart[i])
+        return false;
 
-  for (size_type i = 0; i < rowstart[rows]; ++i)
-    if (colnums[i] != sp2.colnums[i])
-      return false;
+  if (rows > 0)
+    for (size_type i = 0; i < rowstart[rows]; ++i)
+      if (colnums[i] != sp2.colnums[i])
+        return false;
 
   return true;
 }

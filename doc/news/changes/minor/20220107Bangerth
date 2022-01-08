@@ -1,0 +1,4 @@
+Fixed: Serializing empty sparsity patterns ran into a segmentation
+fault. This is now fixed.
+<br>
+(Lucas Myers, Wolfgang Bangerth, 2022/01/05)
