@@ -456,6 +456,20 @@ the result of the transport accuracy of the high-order DG method.
 
 <img src="https://www.dealii.org/images/steps/developer/step-67.pressure_elevated.jpg" alt="" width="40%">
 
+If we run the program with degree 2 and 6 levels of global refinements (410k
+cells, 14.7M unknowns), we get the following evolution of the pressure
+(elevation plot, colored by the value of the density):
+
+@htmlonly
+<p align="center">
+  <iframe width="560" height="315" src="https://www.youtube.com/embed/ivxCLiSdQpc"
+   frameborder="0"
+   allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+   allowfullscreen></iframe>
+ </p>
+@endhtmlonly
+
+
 With 2 levels of global refinement with 1,600 cells, the mesh and its
 partitioning on 40 MPI processes looks as follows:
 
