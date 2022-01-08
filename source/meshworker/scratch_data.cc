@@ -283,23 +283,58 @@ namespace MeshWorker
       }
     else
       {
-        if (!hp_fe_face_values)
-          hp_fe_face_values = std::make_unique<hp::FEFaceValues<dim, spacedim>>(
-            *mapping_collection,
-            *fe_collection,
-            face_quadrature_collection,
-            face_update_flags);
-
-        hp_fe_face_values->reinit(cell, face_no);
-        const auto &fe_face_values = hp_fe_face_values->get_present_fe_values();
-        const auto &fe             = (*fe_collection)[cell->active_fe_index()];
-
-        local_dof_indices.resize(fe.n_dofs_per_cell());
-        cell->get_dof_indices(local_dof_indices);
-
-        current_fe_values = &fe_face_values;
-        return fe_face_values;
+        return reinit(cell, cell, face_no);
       }
+  }
+
+
+
+  template <int dim, int spacedim>
+  const FEFaceValues<dim, spacedim> &
+  ScratchData<dim, spacedim>::reinit(
+    const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
+    const typename DoFHandler<dim, spacedim>::active_cell_iterator
+      &                neighbor_cell,
+    const unsigned int face_no)
+  {
+    Assert(hp_capability_enabled, ExcOnlyAvailableWithHP());
+
+    if (!hp_fe_face_values)
+      hp_fe_face_values = std::make_unique<hp::FEFaceValues<dim, spacedim>>(
+        *mapping_collection,
+        *fe_collection,
+        face_quadrature_collection,
+        face_update_flags);
+
+    if (neighbor_cell == cell)
+      {
+        hp_fe_face_values->reinit(cell, face_no);
+      }
+    else
+      {
+        // When we want to ensure some agreement between the cell face and its
+        // neighbor on the quadrature order and mapping to use on this face,
+        // then we defer to the dominance of one FE over another. This should
+        // ensure that the optimal integration order and mapping order are
+        // selected for this situation.
+        const unsigned int dominated_fe_index =
+          fe_collection->find_dominated_fe(
+            {cell->active_fe_index(), neighbor_cell->active_fe_index()});
+
+        hp_fe_face_values->reinit(cell,
+                                  face_no,
+                                  dominated_fe_index,
+                                  dominated_fe_index);
+      }
+
+    const auto &fe_face_values = hp_fe_face_values->get_present_fe_values();
+    const auto &fe             = (*fe_collection)[cell->active_fe_index()];
+
+    local_dof_indices.resize(fe.n_dofs_per_cell());
+    cell->get_dof_indices(local_dof_indices);
+
+    current_fe_values = &fe_face_values;
+    return fe_face_values;
   }
 
 
@@ -328,28 +363,72 @@ namespace MeshWorker
           }
         else
           {
-            if (!hp_fe_subface_values)
-              hp_fe_subface_values =
-                std::make_unique<hp::FESubfaceValues<dim, spacedim>>(
-                  *mapping_collection,
-                  *fe_collection,
-                  face_quadrature_collection,
-                  face_update_flags);
-
-            hp_fe_subface_values->reinit(cell, face_no, subface_no);
-            const auto &fe_subface_values =
-              hp_fe_subface_values->get_present_fe_values();
-            const auto &fe = (*fe_collection)[cell->active_fe_index()];
-
-            local_dof_indices.resize(fe.n_dofs_per_cell());
-            cell->get_dof_indices(local_dof_indices);
-
-            current_fe_values = &fe_subface_values;
-            return fe_subface_values;
+            return reinit(cell, cell, face_no, subface_no);
           }
       }
     else
       return reinit(cell, face_no);
+  }
+
+
+
+  template <int dim, int spacedim>
+  const FEFaceValuesBase<dim, spacedim> &
+  ScratchData<dim, spacedim>::reinit(
+    const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
+    const typename DoFHandler<dim, spacedim>::active_cell_iterator
+      &                neighbor_cell,
+    const unsigned int face_no,
+    const unsigned int subface_no)
+  {
+    Assert(hp_capability_enabled, ExcOnlyAvailableWithHP());
+
+    if (subface_no != numbers::invalid_unsigned_int)
+      {
+        if (!hp_fe_subface_values)
+          hp_fe_subface_values =
+            std::make_unique<hp::FESubfaceValues<dim, spacedim>>(
+              *mapping_collection,
+              *fe_collection,
+              face_quadrature_collection,
+              face_update_flags);
+
+        if (neighbor_cell == cell)
+          {
+            hp_fe_subface_values->reinit(cell, face_no, subface_no);
+          }
+        else
+          {
+            // When we want to ensure some agreement between the cell face and
+            // its neighbor on the quadrature order and mapping to use on this
+            // face, then we defer to the dominance of one FE over another. This
+            // should ensure that the optimal integration order and mapping
+            // order are selected for this situation.
+            const unsigned int dominated_fe_index =
+              fe_collection->find_dominated_fe(
+                {cell->active_fe_index(), neighbor_cell->active_fe_index()});
+
+            hp_fe_subface_values->reinit(cell,
+                                         face_no,
+                                         subface_no,
+                                         dominated_fe_index,
+                                         dominated_fe_index);
+          }
+
+        const auto &fe_subface_values =
+          hp_fe_subface_values->get_present_fe_values();
+        const auto &fe = (*fe_collection)[cell->active_fe_index()];
+
+        local_dof_indices.resize(fe.n_dofs_per_cell());
+        cell->get_dof_indices(local_dof_indices);
+
+        current_fe_values = &fe_subface_values;
+        return fe_subface_values;
+      }
+    else
+      {
+        return reinit(cell, neighbor_cell, face_no);
+      }
   }
 
 
@@ -456,25 +535,61 @@ namespace MeshWorker
       }
     else
       {
-        if (!neighbor_hp_fe_face_values)
-          neighbor_hp_fe_face_values =
-            std::make_unique<hp::FEFaceValues<dim, spacedim>>(
-              *mapping_collection,
-              *fe_collection,
-              face_quadrature_collection,
-              neighbor_face_update_flags);
-
-        neighbor_hp_fe_face_values->reinit(cell, face_no);
-        const auto &neighbor_fe_face_values =
-          neighbor_hp_fe_face_values->get_present_fe_values();
-        const auto &neighbor_fe = (*fe_collection)[cell->active_fe_index()];
-
-        neighbor_dof_indices.resize(neighbor_fe.n_dofs_per_cell());
-        cell->get_dof_indices(neighbor_dof_indices);
-
-        current_neighbor_fe_values = &neighbor_fe_face_values;
-        return neighbor_fe_face_values;
+        return reinit_neighbor(cell, cell, face_no);
       }
+  }
+
+
+
+  template <int dim, int spacedim>
+  const FEFaceValues<dim, spacedim> &
+  ScratchData<dim, spacedim>::reinit_neighbor(
+    const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
+    const typename DoFHandler<dim, spacedim>::active_cell_iterator
+      &                neighbor_cell,
+    const unsigned int face_no)
+  {
+    Assert(hp_capability_enabled, ExcOnlyAvailableWithHP());
+
+    if (!neighbor_hp_fe_face_values)
+      neighbor_hp_fe_face_values =
+        std::make_unique<hp::FEFaceValues<dim, spacedim>>(
+          *mapping_collection,
+          *fe_collection,
+          face_quadrature_collection,
+          neighbor_face_update_flags);
+
+    if (neighbor_cell == cell)
+      {
+        neighbor_hp_fe_face_values->reinit(neighbor_cell, face_no);
+      }
+    else
+      {
+        // When we want to ensure some agreement between the cell face and its
+        // neighbor on the quadrature order and mapping to use on this face,
+        // then we defer to the dominance of one FE over another. This should
+        // ensure that the optimal integration order and mapping order are
+        // selected for this situation.
+        const unsigned int dominated_fe_index =
+          fe_collection->find_dominated_fe(
+            {cell->active_fe_index(), neighbor_cell->active_fe_index()});
+
+        neighbor_hp_fe_face_values->reinit(neighbor_cell,
+                                           face_no,
+                                           dominated_fe_index,
+                                           dominated_fe_index);
+      }
+
+    const auto &neighbor_fe_face_values =
+      neighbor_hp_fe_face_values->get_present_fe_values();
+    const auto &neighbor_fe =
+      (*fe_collection)[neighbor_cell->active_fe_index()];
+
+    neighbor_dof_indices.resize(neighbor_fe.n_dofs_per_cell());
+    neighbor_cell->get_dof_indices(neighbor_dof_indices);
+
+    current_neighbor_fe_values = &neighbor_fe_face_values;
+    return neighbor_fe_face_values;
   }
 
 
@@ -501,28 +616,75 @@ namespace MeshWorker
           }
         else
           {
-            if (!neighbor_hp_fe_subface_values)
-              neighbor_hp_fe_subface_values =
-                std::make_unique<hp::FESubfaceValues<dim, spacedim>>(
-                  *mapping_collection,
-                  *fe_collection,
-                  face_quadrature_collection,
-                  neighbor_face_update_flags);
-
-            neighbor_hp_fe_subface_values->reinit(cell, face_no, subface_no);
-            const auto &neighbor_fe_subface_values =
-              neighbor_hp_fe_subface_values->get_present_fe_values();
-            const auto &neighbor_fe = (*fe_collection)[cell->active_fe_index()];
-
-            neighbor_dof_indices.resize(neighbor_fe.n_dofs_per_cell());
-            cell->get_dof_indices(neighbor_dof_indices);
-
-            current_neighbor_fe_values = &neighbor_fe_subface_values;
-            return neighbor_fe_subface_values;
+            return reinit_neighbor(cell, cell, face_no, subface_no);
           }
       }
     else
       return reinit_neighbor(cell, face_no);
+  }
+
+
+
+  template <int dim, int spacedim>
+  const FEFaceValuesBase<dim, spacedim> &
+  ScratchData<dim, spacedim>::reinit_neighbor(
+    const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
+    const typename DoFHandler<dim, spacedim>::active_cell_iterator
+      &                neighbor_cell,
+    const unsigned int face_no,
+    const unsigned int subface_no)
+  {
+    Assert(hp_capability_enabled, ExcOnlyAvailableWithHP());
+
+    if (subface_no != numbers::invalid_unsigned_int)
+      {
+        if (!neighbor_hp_fe_subface_values)
+          neighbor_hp_fe_subface_values =
+            std::make_unique<hp::FESubfaceValues<dim, spacedim>>(
+              *mapping_collection,
+              *fe_collection,
+              face_quadrature_collection,
+              neighbor_face_update_flags);
+
+        if (neighbor_cell == cell)
+          {
+            neighbor_hp_fe_subface_values->reinit(neighbor_cell,
+                                                  face_no,
+                                                  subface_no);
+          }
+        else
+          {
+            // When we want to ensure some agreement between the cell face and
+            // its neighbor on the quadrature order and mapping to use on this
+            // face, then we defer to the dominance of one FE over another. This
+            // should ensure that the optimal integration order and mapping
+            // order are selected for this situation.
+            const unsigned int dominated_fe_index =
+              fe_collection->find_dominated_fe(
+                {cell->active_fe_index(), neighbor_cell->active_fe_index()});
+
+            neighbor_hp_fe_subface_values->reinit(neighbor_cell,
+                                                  face_no,
+                                                  subface_no,
+                                                  dominated_fe_index,
+                                                  dominated_fe_index);
+          }
+
+        const auto &neighbor_fe_subface_values =
+          neighbor_hp_fe_subface_values->get_present_fe_values();
+        const auto &neighbor_fe =
+          (*fe_collection)[neighbor_cell->active_fe_index()];
+
+        neighbor_dof_indices.resize(neighbor_fe.n_dofs_per_cell());
+        neighbor_cell->get_dof_indices(neighbor_dof_indices);
+
+        current_neighbor_fe_values = &neighbor_fe_subface_values;
+        return neighbor_fe_subface_values;
+      }
+    else
+      {
+        return reinit_neighbor(cell, neighbor_cell, face_no);
+      }
   }
 
 

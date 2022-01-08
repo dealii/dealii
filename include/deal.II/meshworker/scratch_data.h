@@ -623,6 +623,107 @@ namespace MeshWorker
     /** @} */ // NeighborCellMethods
 
     /**
+     * @name hp-compatible methods to work on cells and neighbor cells
+     */
+    /** @{ */ // hpCellMethods
+
+    /**
+     * Initialize the internal FEFaceValues to use the given @p face_no on the given
+     * @p cell, and return a reference to it.
+     *
+     * This variant of the reinit() function compares the active finite element
+     * on each cell, and chooses the dominated finite element's index to select
+     * the quadrature rule and mapping for the returned FEFaceValues object.
+     * This is useful in instances where the shape functions of the elements on
+     * either side of a face are being evaluated at the same time (such as is
+     * done in DG methods). See FECollection::find_dominated_fe() for more
+     * information on the selection process.
+     *
+     * After calling this function, get_current_fe_values() will return the
+     * same object of this method, as an FEValuesBase reference.
+     */
+    const FEFaceValues<dim, spacedim> &
+    reinit(const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
+           const typename DoFHandler<dim, spacedim>::active_cell_iterator
+             &                neighbor_cell,
+           const unsigned int face_no);
+
+    /**
+     * Initialize the internal FESubfaceValues to use the given @p subface_no,
+     * on @p face_no, on the given @p cell, and return a reference to it.
+     *
+     * This variant of the reinit() function compares the active finite element
+     * on each cell, and chooses the dominated finite element's index to select
+     * the quadrature rule and mapping for the returned FEFaceValues object.
+     * This is useful in instances where the shape functions of the elements on
+     * either side of a face are being evaluated at the same time (such as is
+     * done in DG methods). See FECollection::find_dominated_fe() for more
+     * information on the selection process.
+     *
+     * After calling this function, get_current_fe_values() will return the
+     * same object of this method, as an FEValuesBase reference.
+     *
+     * If @p subface_no is numbers::invalid_unsigned_int, the reinit() function
+     * that takes only the @p cell and the @p face_no is called.
+     */
+    const FEFaceValuesBase<dim, spacedim> &
+    reinit(const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
+           const typename DoFHandler<dim, spacedim>::active_cell_iterator
+             &                neighbor_cell,
+           const unsigned int face_no,
+           const unsigned int subface_no);
+
+    /**
+     * Initialize the internal FEFaceValues to use the given @p face_no on the
+     * given @p neighbor_cell, and return a reference to it.
+     *
+     * This variant of the reinit() function compares the active finite element
+     * on each cell, and chooses the dominated finite element's index to select
+     * the quadrature rule and mapping for the returned FEFaceValues object.
+     * This is useful in instances where the shape functions of the elements on
+     * either side of a face are being evaluated at the same time (such as is
+     * done in DG methods). See FECollection::find_dominated_fe() for more
+     * information on the selection process.
+     *
+     * After calling this function, get_current_neighbor_fe_values() will return
+     * the same object of this method, as an FEValuesBase reference.
+     */
+    const FEFaceValues<dim, spacedim> &
+    reinit_neighbor(
+      const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
+      const typename DoFHandler<dim, spacedim>::active_cell_iterator
+        &                neighbor_cell,
+      const unsigned int face_no);
+
+    /**
+     * Initialize the internal FESubfaceValues to use the given @p subface_no,
+     * on @p face_no, on the given @p neighbor_cell, and return a reference to it.
+     *
+     * This variant of the reinit() function compares the active finite element
+     * on each cell, and chooses the dominated finite element's index to select
+     * the quadrature rule and mapping for the returned FEFaceValues object.
+     * This is useful in instances where the shape functions of the elements on
+     * either side of a face are being evaluated at the same time (such as is
+     * done in DG methods). See FECollection::find_dominated_fe() for more
+     * information on the selection process.
+     *
+     * After calling this function, get_current_neighbor_fe_values() will return
+     * the same object of this method, as an FEValuesBase reference.
+     *
+     * If @p subface_no is numbers::invalid_unsigned_int, the reinit() function
+     * that takes only the @p neighbor_cell and the @p face_no is called.
+     */
+    const FEFaceValuesBase<dim, spacedim> &
+    reinit_neighbor(
+      const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
+      const typename DoFHandler<dim, spacedim>::active_cell_iterator
+        &                neighbor_cell,
+      const unsigned int face_no,
+      const unsigned int subface_no);
+
+    /** @} */ // hpCellMethods
+
+    /**
      * Return a GeneralDataStorage object that can be used to store any amount
      * of data, of any type, which is then made accessible by an identifier
      * string.
