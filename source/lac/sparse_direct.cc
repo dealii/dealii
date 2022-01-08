@@ -38,6 +38,25 @@ DEAL_II_NAMESPACE_OPEN
 #endif
 
 
+namespace
+{
+  /**
+   * For a given matrix, compute a reasonable "grain size" when parallelizing
+   * some copying and sorting operations. The grain size is the minimal number
+   * of rows each thread should work on. We define it by assuming that
+   * dealing with 1000 matrix entries is a reasonable lower bound for parallel
+   * operations.
+   */
+  template <typename SparseMatrixType>
+  unsigned int
+  parallel_grainsize(const SparseMatrixType &matrix)
+  {
+    const unsigned int avg_entries_per_row =
+      matrix.n_nonzero_elements() / matrix.m();
+    return std::max(1000 / avg_entries_per_row, 1u);
+  }
+} // namespace
+
 
 SparseDirectUMFPACK::~SparseDirectUMFPACK()
 {
@@ -146,7 +165,7 @@ SparseDirectUMFPACK::sort_arrays(const SparseMatrix<number> &matrix)
             }
         }
     },
-    /* grain size = */ 50);
+    parallel_grainsize(matrix));
 }
 
 
@@ -175,7 +194,7 @@ SparseDirectUMFPACK::sort_arrays(const SparseMatrixEZ<number> &matrix)
             }
         }
     },
-    /* grain size = */ 50);
+    parallel_grainsize(matrix));
 }
 
 
@@ -224,7 +243,7 @@ SparseDirectUMFPACK::sort_arrays(const BlockSparseMatrix<number> &matrix)
             }
         }
     },
-    /* grain size = */ 50);
+    parallel_grainsize(matrix));
 }
 
 
@@ -300,7 +319,7 @@ SparseDirectUMFPACK::factorize(const Matrix &matrix)
           Assert(index == Ap[row + 1], ExcInternalError());
         }
     },
-    /* grain size = */ 50);
+    parallel_grainsize(matrix));
 
   // make sure that the elements in each row are sorted. we have to be more
   // careful for block sparse matrices, so ship this task out to a
