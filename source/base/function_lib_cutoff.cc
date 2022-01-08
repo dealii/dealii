@@ -174,7 +174,7 @@ namespace Functions
 
 
 
-  //////////////////////////////////////////////////////////////////////
+  //--------------------------------------------------------------------
   namespace
   {
     // Integral of CutOffFunctionLinfty in dimension 1, 2, and 3 when the radius

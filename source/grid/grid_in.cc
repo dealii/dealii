@@ -154,7 +154,7 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
       }
   }
 
-  ///////////////////Declaring storage and mappings//////////////////
+  //-----------------Declaring storage and mappings------------------
 
   std::vector<Point<spacedim>> vertices;
   std::vector<CellData<dim>>   cells;
@@ -164,7 +164,7 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
 
   in >> keyword;
 
-  //////////////////Processing the POINTS section///////////////
+  //----------------Processing the POINTS section---------------
 
   if (keyword == "POINTS")
     {

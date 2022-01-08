@@ -1671,8 +1671,8 @@ double
 TriaAccessor<2, 2, 2>::extent_in_direction(const unsigned int axis) const
 {
   const unsigned int lines[2][2] = {
-    {2, 3},  /// Lines along x-axis, see GeometryInfo
-    {0, 1}}; /// Lines along y-axis
+    {2, 3},  //  Lines along x-axis, see GeometryInfo
+    {0, 1}}; //  Lines along y-axis
 
   AssertIndexRange(axis, 2);
 
@@ -1685,8 +1685,8 @@ double
 TriaAccessor<2, 2, 3>::extent_in_direction(const unsigned int axis) const
 {
   const unsigned int lines[2][2] = {
-    {2, 3},  /// Lines along x-axis, see GeometryInfo
-    {0, 1}}; /// Lines along y-axis
+    {2, 3},  //  Lines along x-axis, see GeometryInfo
+    {0, 1}}; //  Lines along y-axis
 
   AssertIndexRange(axis, 2);
 
@@ -1700,9 +1700,9 @@ double
 TriaAccessor<3, 3, 3>::extent_in_direction(const unsigned int axis) const
 {
   const unsigned int lines[3][4] = {
-    {2, 3, 6, 7},    /// Lines along x-axis, see GeometryInfo
-    {0, 1, 4, 5},    /// Lines along y-axis
-    {8, 9, 10, 11}}; /// Lines along z-axis
+    {2, 3, 6, 7},    // Lines along x-axis, see GeometryInfo
+    {0, 1, 4, 5},    // Lines along y-axis
+    {8, 9, 10, 11}}; // Lines along z-axis
 
   AssertIndexRange(axis, 3);
 

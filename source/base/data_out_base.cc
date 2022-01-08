@@ -16,7 +16,7 @@
 
 // TODO: Do neighbors for dx and povray smooth triangles
 
-//////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------
 // Remarks on the implementations
 //
 // Variable names: in most functions, variable names have been
@@ -29,7 +29,7 @@
 //
 // d1, d2, di Multiplicators for ii to find positions in the
 //    array of nodes.
-//////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------
 
 #include <deal.II/base/data_out_base.h>
 #include <deal.II/base/memory_consumption.h>
@@ -3348,7 +3348,7 @@ namespace DataOutBase
     unsigned int n_nodes;
     unsigned int n_cells;
     compute_sizes<dim, spacedim>(patches, n_nodes, n_cells);
-    ///////////////////////
+    //---------------------
     // preamble
     if (flags.write_preamble)
       {
@@ -3374,7 +3374,7 @@ namespace DataOutBase
     write_cells(patches, ucd_out);
     out << '\n';
 
-    /////////////////////////////
+    //---------------------------
     // now write data
     if (n_data_sets != 0)
       {
@@ -3456,10 +3456,10 @@ namespace DataOutBase
         write_nodes(patches, dx_out);
       }
 
-    ///////////////////////////////
+    //-----------------------------
     // first write the coordinates of all vertices
 
-    /////////////////////////////////////////
+    //---------------------------------------
     // write cells
     out << "object \"cells\" class array type int rank 1 shape "
         << GeometryInfo<dim>::vertices_per_cell << " items " << n_cells;
@@ -3487,7 +3487,7 @@ namespace DataOutBase
     out << "\"" << '\n' << "attribute \"ref\" string \"positions\"" << '\n';
 
     // TODO:[GK] Patches must be of same size!
-    /////////////////////////////
+    //---------------------------
     // write neighbor information
     if (flags.write_neighbors)
       {
@@ -3620,7 +3620,7 @@ namespace DataOutBase
             out << '\n';
           }
       }
-    /////////////////////////////
+    //---------------------------
     // now write data
     if (n_data_sets != 0)
       {
@@ -4821,7 +4821,7 @@ namespace DataOutBase
                                   n_data_sets,
                                 patches[0].data.n_rows()));
 
-    ///////////////////////
+    //---------------------
     // preamble
     out << "gmvinput ascii" << '\n' << '\n';
 
@@ -4849,7 +4849,7 @@ namespace DataOutBase
     Threads::Task<> reorder_task =
       Threads::new_task(fun_ptr, patches, data_vectors);
 
-    ///////////////////////////////
+    //-----------------------------
     // first make up a list of used vertices along with their coordinates
     //
     // note that we have to print 3 dimensions
@@ -4869,12 +4869,12 @@ namespace DataOutBase
         out << '\n';
       }
 
-    /////////////////////////////////
+    //-------------------------------
     // now for the cells. note that vertices are counted from 1 onwards
     out << "cells " << n_cells << '\n';
     write_cells(patches, gmv_out);
 
-    ///////////////////////////////////////
+    //-------------------------------------
     // data output.
     out << "variable" << '\n';
 
@@ -4962,7 +4962,7 @@ namespace DataOutBase
     unsigned int n_cells;
     compute_sizes<dim, spacedim>(patches, n_nodes, n_cells);
 
-    ///////////
+    //---------
     // preamble
     {
       out
@@ -5030,7 +5030,7 @@ namespace DataOutBase
     Threads::Task<> reorder_task =
       Threads::new_task(fun_ptr, patches, data_vectors);
 
-    ///////////////////////////////
+    //-----------------------------
     // first make up a list of used vertices along with their coordinates
 
 
@@ -5042,7 +5042,7 @@ namespace DataOutBase
       }
 
 
-    ///////////////////////////////////////
+    //-------------------------------------
     // data output.
     //
     // now write the data vectors to @p{out} first make sure that all data is in
@@ -5269,7 +5269,7 @@ namespace DataOutBase
     Threads::Task<> reorder_task =
       Threads::new_task(fun_ptr, patches, data_vectors);
 
-    ///////////////////////////////
+    //-----------------------------
     // first make up a list of used vertices along with their coordinates
     for (unsigned int d = 1; d <= spacedim; ++d)
       {
@@ -5339,7 +5339,7 @@ namespace DataOutBase
       }
 
 
-    ///////////////////////////////////////
+    //-------------------------------------
     // data output.
     //
     reorder_task.join();
@@ -5353,7 +5353,7 @@ namespace DataOutBase
 
 
 
-    /////////////////////////////////
+    //-------------------------------
     // now for the cells. note that vertices are counted from 1 onwards
     unsigned int first_vertex_of_patch = 0;
     unsigned int elem                  = 0;
@@ -5508,7 +5508,7 @@ namespace DataOutBase
         AssertDimension(n_data_sets, patches[0].data.n_rows())
       }
 
-    ///////////////////////
+    //---------------------
     // preamble
     {
       out << "# vtk DataFile Version 3.0" << '\n'
@@ -5575,14 +5575,14 @@ namespace DataOutBase
     Threads::Task<> reorder_task =
       Threads::new_task(fun_ptr, patches, data_vectors);
 
-    ///////////////////////////////
+    //-----------------------------
     // first make up a list of used vertices along with their coordinates
     //
     // note that we have to print d=1..3 dimensions
     out << "POINTS " << n_nodes << " double" << '\n';
     write_nodes(patches, vtk_out);
     out << '\n';
-    /////////////////////////////////
+    //-------------------------------
     // now for the cells
     out << "CELLS " << n_cells << ' ' << n_points_and_n_cells << '\n';
     if (flags.write_higher_order_cells)
@@ -5606,7 +5606,7 @@ namespace DataOutBase
       }
 
     out << '\n';
-    ///////////////////////////////////////
+    //-------------------------------------
     // data output.
 
     // now write the data vectors to @p{out} first make sure that all data is in
@@ -5956,7 +5956,7 @@ namespace DataOutBase
     Threads::Task<> reorder_task =
       Threads::new_task(fun_ptr, patches, data_vectors);
 
-    ///////////////////////////////
+    //-----------------------------
     // first make up a list of used vertices along with their coordinates
     //
     // note that according to the standard, we have to print d=1..3 dimensions,
@@ -5969,7 +5969,7 @@ namespace DataOutBase
     write_nodes(patches, vtu_out);
     out << "    </DataArray>\n";
     out << "  </Points>\n\n";
-    /////////////////////////////////
+    //-------------------------------
     // now for the cells
     out << "  <Cells>\n";
     out << "    <DataArray type=\"Int32\" Name=\"connectivity\" format=\""
@@ -6028,7 +6028,7 @@ namespace DataOutBase
     out << "  </Cells>\n";
 
 
-    ///////////////////////////////////////
+    //-------------------------------------
     // data output.
 
     // now write the data vectors to @p{out} first make sure that all data is in

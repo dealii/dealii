@@ -38,7 +38,6 @@ namespace internal
 {
   namespace PointValueHistoryImplementation
   {
-    /// Only a constructor needed for this class (a struct really)
     template <int dim>
     PointGeometryData<dim>::PointGeometryData(
       const Point<dim> &                          new_requested_location,
