@@ -409,6 +409,8 @@ namespace internal
   } // namespace FEPointEvaluation
 } // namespace internal
 
+
+
 /**
  * This class provides an interface to the evaluation of interpolated solution
  * values and gradients on cells on arbitrary reference point positions. These
@@ -494,8 +496,8 @@ public:
    * a precomputed @p mapping_data object. This function can be used
    * to avoid duplicated evaluation of the mapping if multiple
    * FEPointEvaluation objects for the different components of the same FESystem
-   * are used. You can precompute the mapping data
-   * using the function internal::FEPointEvaluation::compute_mapping_data().
+   * are used. You can get the mapping data from an initialized FEPointEvaluation
+   * object by calling the function get_mapping_data().
    *
    * @param[in] cell An iterator to the current cell
    *
@@ -511,6 +513,18 @@ public:
          const ArrayView<const Point<dim>> &unit_points,
          const dealii::internal::FEValuesImplementation::
            MappingRelatedData<dim, spacedim> &mapping_data);
+
+  /**
+   * Returns the mapping data that was computed during the last call to
+   * the reinit() function. This can be useful if multiple FEPointEvaluation
+   * objects are used for multiple components of a FESystem. The mapping data
+   * can be retrieved from the first FEPointEvaluation object and subsequently
+   * passed to the other objects, avoiding the need to recompute the mapping
+   * data.
+   */
+  const dealii::internal::FEValuesImplementation::MappingRelatedData<dim,
+                                                                     spacedim> &
+  get_mapping_data() const;
 
   /**
    * This function interpolates the finite element solution, represented by
@@ -911,6 +925,16 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::reinit(
   if (update_flags & update_gradients)
     gradients.resize(unit_points.size(),
                      numbers::signaling_nan<gradient_type>());
+}
+
+
+
+template <int n_components, int dim, int spacedim, typename Number>
+const dealii::internal::FEValuesImplementation::MappingRelatedData<dim,
+                                                                   spacedim> &
+FEPointEvaluation<n_components, dim, spacedim, Number>::get_mapping_data() const
+{
+  return mapping_data;
 }
 
 

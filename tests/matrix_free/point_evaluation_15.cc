@@ -112,15 +112,7 @@ test()
       evaluator1.evaluate(solution_values,
                           EvaluationFlags::values | EvaluationFlags::gradients);
 
-      internal::FEValuesImplementation::MappingRelatedData<dim> mapping_data;
-      internal::FEPointEvaluation::compute_mapping_data_for_generic_points<dim>(
-        mapping,
-        cell,
-        unit_points,
-        update_values | update_gradients,
-        mapping_data);
-
-      evaluator2.reinit(cell, unit_points, mapping_data);
+      evaluator2.reinit(cell, unit_points, evaluator1.get_mapping_data());
       evaluator2.evaluate(solution_values,
                           EvaluationFlags::values | EvaluationFlags::gradients);
 
