@@ -61,6 +61,9 @@ namespace internal
     class PointGeometryData
     {
     public:
+      /**
+       * Only a constructor needed for this class (a struct really)
+       */
       PointGeometryData(
         const Point<dim> &                          new_requested_location,
         const std::vector<Point<dim>> &             new_locations,
