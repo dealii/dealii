@@ -99,92 +99,54 @@ namespace FETools
       };
 
 
-      // A structure holding all data
-      // of cells needed from other processes
-      // for the extrapolate algorithm.
+      /**
+       * A structure holding all data of cells needed from other processes
+       * for the extrapolate algorithm.
+       */
       struct CellData
       {
+        /**
+         * Default constructor.
+         */
         CellData();
 
+        /**
+         * Constructor setting the `dof_values` member to the right size.
+         */
         CellData(const unsigned int dofs_per_cell);
 
+        /**
+         * Comparison operator.
+         */
+        bool
+        operator<(const CellData &rhs) const;
+
+        /**
+         * Pack the data of this object into a char[] buffer.
+         */
+        void
+        pack_data(std::vector<char> &buffer) const;
+
+        /**
+         * Unpack the data of the given buffer into the members of this object.
+         */
+        void
+        unpack_data(const std::vector<char> &buffer);
+
+
+        /**
+         * The values of degrees of freedom associated with the current cell.
+         */
         Vector<value_type> dof_values;
 
-        unsigned int tree_index;
-
+        /**
+         * The tree within the forest (i.e., the coarse cell) and which of its
+         * descendents we are currently working on.
+         */
+        unsigned int                                           tree_index;
         typename dealii::internal::p4est::types<dim>::quadrant quadrant;
 
         int receiver;
-
-        bool
-        operator<(const CellData &rhs) const
-        {
-          if (dealii::internal::p4est::functions<dim>::quadrant_compare(
-                &quadrant, &rhs.quadrant) < 0)
-            return true;
-
-          return false;
-        }
-
-        unsigned int
-        bytes_for_buffer() const
-        {
-          return (sizeof(unsigned int) +                   // dofs_per_cell
-                  dof_values.size() * sizeof(value_type) + // dof_values
-                  sizeof(unsigned int) +                   // tree_index
-                  sizeof(typename dealii::internal::p4est::types<
-                         dim>::quadrant)); // quadrant
-        }
-
-        void
-        pack_data(std::vector<char> &buffer) const
-        {
-          buffer.resize(bytes_for_buffer());
-
-          char *ptr = buffer.data();
-
-          unsigned int n_dofs = dof_values.size();
-          std::memcpy(ptr, &n_dofs, sizeof(unsigned int));
-          ptr += sizeof(unsigned int);
-
-          std::memcpy(ptr, dof_values.begin(), n_dofs * sizeof(value_type));
-          ptr += n_dofs * sizeof(value_type);
-
-          std::memcpy(ptr, &tree_index, sizeof(unsigned int));
-          ptr += sizeof(unsigned int);
-
-          std::memcpy(
-            ptr,
-            &quadrant,
-            sizeof(typename dealii::internal::p4est::types<dim>::quadrant));
-          ptr += sizeof(typename dealii::internal::p4est::types<dim>::quadrant);
-
-          Assert(ptr == buffer.data() + buffer.size(), ExcInternalError());
-        }
-
-        void
-        unpack_data(const std::vector<char> &buffer)
-        {
-          const char * ptr = buffer.data();
-          unsigned int n_dofs;
-          memcpy(&n_dofs, ptr, sizeof(unsigned int));
-          ptr += sizeof(unsigned int);
-
-          dof_values.reinit(n_dofs);
-          std::memcpy(dof_values.begin(), ptr, n_dofs * sizeof(value_type));
-          ptr += n_dofs * sizeof(value_type);
-
-          std::memcpy(&tree_index, ptr, sizeof(unsigned int));
-          ptr += sizeof(unsigned int);
-
-          std::memcpy(
-            &quadrant,
-            ptr,
-            sizeof(typename dealii::internal::p4est::types<dim>::quadrant));
-          ptr += sizeof(typename dealii::internal::p4est::types<dim>::quadrant);
-
-          Assert(ptr == buffer.data() + buffer.size(), ExcInternalError());
-        }
       };
 
       // Problem: The function extrapolates a polynomial
@@ -400,6 +362,8 @@ namespace FETools
       unsigned int round;
     };
 
+
+
     template <class OutVector>
     class ExtrapolateImplementation<1, 1, OutVector>
     {
@@ -472,10 +436,90 @@ namespace FETools
     template <int dim, int spacedim, class OutVector>
     ExtrapolateImplementation<dim, spacedim, OutVector>::CellData::CellData(
       const unsigned int dofs_per_cell)
-      : tree_index(0)
+      : dof_values(dofs_per_cell)
+      , tree_index(0)
       , receiver(0)
+    {}
+
+
+
+    template <int dim, int spacedim, class OutVector>
+    bool
+    ExtrapolateImplementation<dim, spacedim, OutVector>::CellData::operator<(
+      const CellData &rhs) const
     {
-      dof_values.reinit(dofs_per_cell);
+      if (dealii::internal::p4est::functions<dim>::quadrant_compare(
+            &quadrant, &rhs.quadrant) < 0)
+        return true;
+
+      return false;
+    }
+
+
+
+    template <int dim, int spacedim, class OutVector>
+    void
+    ExtrapolateImplementation<dim, spacedim, OutVector>::CellData::pack_data(
+      std::vector<char> &buffer) const
+    {
+      // Compute how much memory we need to pack the data of this
+      // structure into a char[] buffer.
+      const unsigned int bytes_for_buffer =
+        (sizeof(unsigned int) +                   // dofs_per_cell
+         dof_values.size() * sizeof(value_type) + // dof_values
+         sizeof(unsigned int) +                   // tree_index
+         sizeof(
+           typename dealii::internal::p4est::types<dim>::quadrant)); // quadrant
+
+      buffer.resize(bytes_for_buffer);
+
+      char *ptr = buffer.data();
+
+      unsigned int n_dofs = dof_values.size();
+      std::memcpy(ptr, &n_dofs, sizeof(unsigned int));
+      ptr += sizeof(unsigned int);
+
+      std::memcpy(ptr, dof_values.begin(), n_dofs * sizeof(value_type));
+      ptr += n_dofs * sizeof(value_type);
+
+      std::memcpy(ptr, &tree_index, sizeof(unsigned int));
+      ptr += sizeof(unsigned int);
+
+      std::memcpy(ptr,
+                  &quadrant,
+                  sizeof(
+                    typename dealii::internal::p4est::types<dim>::quadrant));
+      ptr += sizeof(typename dealii::internal::p4est::types<dim>::quadrant);
+
+      Assert(ptr == buffer.data() + buffer.size(), ExcInternalError());
+    }
+
+
+
+    template <int dim, int spacedim, class OutVector>
+    void
+    ExtrapolateImplementation<dim, spacedim, OutVector>::CellData::unpack_data(
+      const std::vector<char> &buffer)
+    {
+      const char * ptr = buffer.data();
+      unsigned int n_dofs;
+      memcpy(&n_dofs, ptr, sizeof(unsigned int));
+      ptr += sizeof(unsigned int);
+
+      dof_values.reinit(n_dofs);
+      std::memcpy(dof_values.begin(), ptr, n_dofs * sizeof(value_type));
+      ptr += n_dofs * sizeof(value_type);
+
+      std::memcpy(&tree_index, ptr, sizeof(unsigned int));
+      ptr += sizeof(unsigned int);
+
+      std::memcpy(&quadrant,
+                  ptr,
+                  sizeof(
+                    typename dealii::internal::p4est::types<dim>::quadrant));
+      ptr += sizeof(typename dealii::internal::p4est::types<dim>::quadrant);
+
+      Assert(ptr == buffer.data() + buffer.size(), ExcInternalError());
     }
 
 
