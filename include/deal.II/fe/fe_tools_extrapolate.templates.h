@@ -781,9 +781,7 @@ namespace FETools
 
       Assert(tr != nullptr, ExcInternalError());
 
-      typename DoFHandler<dim, spacedim>::cell_iterator cell = dof2.begin(0),
-                                                        endc = dof2.end(0);
-      for (; cell != endc; ++cell)
+      for (const auto &cell : dof2.cell_iterators_on_level(0))
         {
           if (dealii::internal::p4est::tree_exists_locally<dim>(
                 tr->parallel_forest,
@@ -987,15 +985,10 @@ namespace FETools
       // collect in a set all trees this
       // process has to compute cells on
       std::set<unsigned int> trees;
-      for (typename std::vector<CellData>::const_iterator it =
-             cells_to_compute.begin();
-           it != cells_to_compute.end();
-           ++it)
-        trees.insert(it->tree_index);
+      for (const auto &c : cells_to_compute)
+        trees.insert(c.tree_index);
 
-      typename DoFHandler<dim, spacedim>::cell_iterator cell = dof2.begin(0),
-                                                        endc = dof2.end(0);
-      for (; cell != endc; ++cell)
+      for (const auto &cell : dof2.cell_iterators_on_level(0))
         {
           // check if this is a tree this process has to
           // work on and that this tree is in the p4est
@@ -1321,13 +1314,10 @@ namespace FETools
             Utilities::MPI::sum(new_needs.size() + cells_to_compute.size(),
                                 communicator);
 
-          for (typename std::vector<CellData>::const_iterator comp =
-                 computed_cells.begin();
-               comp != computed_cells.end();
-               ++comp)
+          for (const auto &comp : computed_cells)
             {
               // store computed cells...
-              cell_data_insert(*comp, available_cells);
+              cell_data_insert(comp, available_cells);
 
               // ...and generate a vector of computed cells with correct
               // receivers, then delete this received need from the list
@@ -1336,9 +1326,9 @@ namespace FETools
               while (recv != received_needs.end())
                 {
                   if (dealii::internal::p4est::quadrant_is_equal<dim>(
-                        recv->quadrant, comp->quadrant))
+                        recv->quadrant, comp.quadrant))
                     {
-                      recv->dof_values = comp->dof_values;
+                      recv->dof_values = comp.dof_values;
                       cells_to_send.push_back(*recv);
                       received_needs.erase(recv);
                       recv = received_needs.begin();
@@ -1355,12 +1345,9 @@ namespace FETools
           send_cells(cells_to_send, received_cells);
 
           // store received cell_data
-          for (typename std::vector<CellData>::const_iterator recv =
-                 received_cells.begin();
-               recv != received_cells.end();
-               ++recv)
+          for (const auto &recv : received_cells)
             {
-              cell_data_insert(*recv, available_cells);
+              cell_data_insert(recv, available_cells);
             }
 
           // increase the round counter, such that we are sure to only send
@@ -1402,15 +1389,12 @@ namespace FETools
         {
           const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
           std::vector<types::global_dof_index> indices(dofs_per_cell);
-          typename DoFHandler<dim, spacedim>::active_cell_iterator
-            cell = dof2.begin_active(),
-            endc = dof2.end();
-          for (; cell != endc; ++cell)
+
+          for (const auto &cell : dof2.active_cell_iterators())
             if (cell->is_ghost())
               {
                 cell->get_dof_indices(indices);
-                for (const unsigned int face :
-                     GeometryInfo<dim>::face_indices())
+                for (const unsigned int face : cell->face_indices())
                   if (!cell->at_boundary(face))
                     {
                       const typename DoFHandler<dim, spacedim>::cell_iterator
@@ -1444,9 +1428,7 @@ namespace FETools
 
       std::queue<WorkPackage> queue;
       {
-        typename DoFHandler<dim, spacedim>::cell_iterator cell = dof2.begin(0),
-                                                          endc = dof2.end(0);
-        for (; cell != endc; ++cell)
+        for (const auto &cell : dof2.cell_iterators_on_level(0))
           {
             if (dealii::internal::p4est::tree_exists_locally<dim>(
                   tr->parallel_forest,
@@ -1705,18 +1687,13 @@ namespace FETools
       const unsigned int dofs_per_cell = dof2.get_fe().n_dofs_per_cell();
       Vector<typename OutVector::value_type> dof_values(dofs_per_cell);
 
-      // then traverse grid bottom up
+      // Then traverse grid bottom up, excluding the finest level
       for (unsigned int level = 0;
            level < dof2.get_triangulation().n_levels() - 1;
            ++level)
         {
-          typename DoFHandler<dim, spacedim>::cell_iterator cell =
-                                                              dof2.begin(level),
-                                                            endc =
-                                                              dof2.end(level);
-
-          for (; cell != endc; ++cell)
-            if (!cell->is_active())
+          for (const auto &cell : dof2.cell_iterators_on_level(level))
+            if (cell->has_children())
               {
                 // check whether this
                 // cell has active
@@ -1782,13 +1759,9 @@ namespace FETools
 
     // make sure that each cell on the coarsest level is at least once refined,
     // otherwise, these cells can't be treated and would generate a bogus result
-    {
-      typename DoFHandler<dim, spacedim>::cell_iterator cell = dof2.begin(0),
-                                                        endc = dof2.end(0);
-      for (; cell != endc; ++cell)
-        Assert(cell->has_children() || cell->is_artificial(),
-               ExcGridNotRefinedAtLeastOnce());
-    }
+    for (const auto &cell : dof2.cell_iterators_on_level(0))
+      Assert(cell->has_children() || cell->is_artificial(),
+             ExcGridNotRefinedAtLeastOnce());
 
 
     internal::BlockType<OutVector> u3;
