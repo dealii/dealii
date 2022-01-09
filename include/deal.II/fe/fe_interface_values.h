@@ -187,6 +187,10 @@ namespace FEInterfaceViews
      * function
      * @p interface_dof_index in the quadrature point @p q_point
      * of the component selected by this view.
+     *
+     * @note The name of the function is supposed to be read as "the jump
+     *   (singular) in the values (plural: one or two possible values) of
+     *   the shape function (singular)".
      */
     value_type
     jump_in_values(const unsigned int interface_dof_index,
@@ -207,6 +211,10 @@ namespace FEInterfaceViews
      * the shape
      * function @p interface_dof_index in the quadrature point @p q_point
      * of the component selected by this view.
+     *
+     * @note The name of the function is supposed to be read as "the jump
+     *   (singular) in the gradients (plural: one or two possible gradients)
+     *   of the shape function (singular)".
      */
     gradient_type
     jump_in_gradients(const unsigned int interface_dof_index,
@@ -227,6 +235,10 @@ namespace FEInterfaceViews
      * - \nabla u_{\text{cell1}}$ on the interface for the shape function @p
      * interface_dof_index at the quadrature point @p q_point of
      * the component selected by this view.
+     *
+     * @note The name of the function is supposed to be read as "the jump
+     *   (singular) in the Hessians (plural: one or two possible values
+     *   for the second derivative) of the shape function (singular)".
      */
     hessian_type
     jump_in_hessians(const unsigned int interface_dof_index,
@@ -247,6 +259,10 @@ namespace FEInterfaceViews
      * u_{\text{cell0}} - \nabla^3 u_{\text{cell1}}$ on the interface for the
      * shape function @p interface_dof_index at the quadrature point @p q_point of
      * the component selected by this view.
+     *
+     * @note The name of the function is supposed to be read as "the jump
+     *   (singular) in the third derivatives (plural: one or two possible values
+     *   for the third derivative) of the shape function (singular)".
      */
     third_derivative_type
     jump_in_third_derivatives(const unsigned int interface_dof_index,
@@ -274,6 +290,10 @@ namespace FEInterfaceViews
      * interface for the shape
      * function @p interface_dof_index in the quadrature point @p q_point
      * of the component selected by this view.
+     *
+     * @note The name of the function is supposed to be read as "the average
+     *   (singular) of the values (plural: one or two possible values) of
+     *   the shape function (singular)".
      */
     value_type
     average_of_values(const unsigned int interface_dof_index,
@@ -304,6 +324,10 @@ namespace FEInterfaceViews
      * for the shape
      * function @p interface_dof_index in the quadrature point @p q_point
      * of the component selected by this view.
+     *
+     * @note The name of the function is supposed to be read as "the average
+     *   (singular) of the gradients (plural: one or two possible values of
+     *   the derivative) of the shape function (singular)".
      */
     gradient_type
     average_of_gradients(const unsigned int interface_dof_index,
@@ -325,6 +349,10 @@ namespace FEInterfaceViews
      * u_{\text{cell1}}$ on the interface
      * for the shape function @p interface_dof_index at the quadrature point @p
      * q_point of the component selected by this view.
+     *
+     * @note The name of the function is supposed to be read as "the average
+     *   (singular) in the Hessians (plural: one or two possible values of
+     *   the second derivative) of the shape function (singular)".
      */
     hessian_type
     average_of_hessians(const unsigned int interface_dof_index,
@@ -791,6 +819,10 @@ namespace FEInterfaceViews
      * Return the jump vector $[\mathbf{u}]=\mathbf{u_1} - \mathbf{u_2}$ on the
      * interface for the shape function
      * @p interface_dof_index in the quadrature point @p q_point.
+     *
+     * @note The name of the function is supposed to be read as "the jump
+     *   (singular) in the values (plural: one or two possible values) of
+     *   the shape function (singular)".
      */
     value_type
     jump_in_values(const unsigned int interface_dof_index,
@@ -810,6 +842,10 @@ namespace FEInterfaceViews
      * Return the jump of the gradient (a tensor of rank 2) $\jump{\nabla
      * \mathbf{u}}$ on the interface for the shape
      * function @p interface_dof_index in the quadrature point @p q_point.
+     *
+     * @note The name of the function is supposed to be read as "the jump
+     *   (singular) in the gradients (plural: one or two possible gradients)
+     *   of the shape function (singular)".
      */
     gradient_type
     jump_in_gradients(const unsigned int interface_dof_index,
@@ -829,6 +865,10 @@ namespace FEInterfaceViews
      * - \nabla u_{\text{cell1}}$ on the interface for the shape function @p
      * interface_dof_index at the quadrature point @p q_point of
      * the component selected by this view.
+     *
+     * @note The name of the function is supposed to be read as "the jump
+     *   (singular) in the Hessians (plural: one or two possible values
+     *   for the second derivative) of the shape function (singular)".
      */
     hessian_type
     jump_in_hessians(const unsigned int interface_dof_index,
@@ -848,6 +888,10 @@ namespace FEInterfaceViews
      * u_{\text{cell0}} - \nabla^3 u_{\text{cell1}}$ on the interface for the
      * shape function @p interface_dof_index at the quadrature point @p q_point of
      * the component selected by this view.
+     *
+     * @note The name of the function is supposed to be read as "the jump
+     *   (singular) in the third derivatives (plural: one or two possible values
+     *   for the third derivative) of the shape function (singular)".
      */
     third_derivative_type
     jump_in_third_derivatives(const unsigned int interface_dof_index,
@@ -874,6 +918,10 @@ namespace FEInterfaceViews
      * Return the average vector $\average{\mathbf{u}}=\frac{1}{2}(\mathbf{u_1}
      * + \mathbf{u_2})$ on the interface for the shape
      * function @p interface_dof_index in the quadrature point @p q_point.
+     *
+     * @note The name of the function is supposed to be read as "the average
+     *   (singular) of the values (plural: one or two possible values) of
+     *   the shape function (singular)".
      */
     value_type
     average_of_values(const unsigned int interface_dof_index,
@@ -893,6 +941,10 @@ namespace FEInterfaceViews
      * Return the average of the gradient (a tensor of rank 2) $\average{\nabla
      * \mathbf{u}}$ on the interface for the shape
      * function @p interface_dof_index in the quadrature point @p q_point.
+     *
+     * @note The name of the function is supposed to be read as "the average
+     *   (singular) of the gradients (plural: one or two possible values
+     *   of the derivative) of the shape function (singular)".
      */
     gradient_type
     average_of_gradients(const unsigned int interface_dof_index,
@@ -914,6 +966,10 @@ namespace FEInterfaceViews
      * u_{\text{cell1}}$ on the interface
      * for the shape function @p interface_dof_index at the quadrature point @p
      * q_point of the component selected by this view.
+     *
+     * @note The name of the function is supposed to be read as "the average
+     *   (singular) in the Hessians (plural: one or two possible values of
+     *   the second derivative) of the shape function (singular)".
      */
     hessian_type
     average_of_hessians(const unsigned int interface_dof_index,
@@ -1671,7 +1727,7 @@ public:
    */
 
   /**
-   * @name Access to jumps in shape functions and their derivatives
+   * @name Access to jumps in shape function values and their derivatives
    * @{
    */
 
@@ -1687,7 +1743,11 @@ public:
    * here uses "value here minus value there", as seen from the first cell.
    *
    * If this is a boundary face (at_boundary() returns true), then
-   * $\jump{u}=u_{\text{cell0}}$.
+   * $\jump{u}=u_{\text{cell0}}$, that is "the value here (minus zero)".
+   *
+   * @note The name of the function is supposed to be read as "the jump
+   *   (singular) in the values (plural: one or two possible values)
+   *   of the shape function (singular)".
    */
   double
   jump_in_shape_values(const unsigned int interface_dof_index,
@@ -1713,6 +1773,10 @@ public:
    *
    * If this is a boundary face (at_boundary() returns true), then
    * $\jump{\nabla u}=\nabla u_{\text{cell0}}$.
+   *
+   * @note The name of the function is supposed to be read as "the jump
+   *   (singular) in the gradients (plural: one or two possible gradients)
+   *   of the shape function (singular)".
    */
   Tensor<1, spacedim>
   jump_in_shape_gradients(const unsigned int interface_dof_index,
@@ -1739,6 +1803,10 @@ public:
    *
    * If this is a boundary face (at_boundary() returns true), then
    * $\jump{\nabla^2 u} = \nabla^2 u_{\text{cell0}}$.
+   *
+   * @note The name of the function is supposed to be read as "the jump
+   *   (singular) in the Hessians (plural: one or two possible values
+   *   for the derivative) of the shape function (singular)".
    */
   Tensor<2, spacedim>
   jump_in_shape_hessians(const unsigned int interface_dof_index,
@@ -1764,6 +1832,10 @@ public:
    *
    * If this is a boundary face (at_boundary() returns true), then
    * $\jump{\nabla^3 u} = \nabla^3 u_{\text{cell0}}$.
+   *
+   * @note The name of the function is supposed to be read as "the jump
+   *   (singular) in the third derivatives (plural: one or two possible values
+   *   for the derivative) of the shape function (singular)".
    */
   Tensor<3, spacedim>
   jump_in_shape_3rd_derivatives(const unsigned int interface_dof_index,
@@ -1786,7 +1858,7 @@ public:
    */
 
   /**
-   * @name Access to the average of shape functions and their derivatives
+   * @name Access to the average of shape function values and their derivatives
    * @{
    */
 
@@ -1798,6 +1870,10 @@ public:
    *
    * If this is a boundary face (at_boundary() returns true), then
    * $\average{u}=u_{\text{cell0}}$.
+   *
+   * @note The name of the function is supposed to be read as "the average
+   *   (singular) of the values (plural: one or two possible values)
+   *   of the shape function (singular)".
    */
   double
   average_of_shape_values(const unsigned int interface_dof_index,
@@ -1823,6 +1899,10 @@ public:
    *
    * If this is a boundary face (at_boundary() returns true), then
    * $\average{\nabla u}=\nabla u_{\text{cell0}}$.
+   *
+   * @note The name of the function is supposed to be read as "the average
+   *   (singular) of the gradients (plural: one or two possible values
+   *   for the gradient) of the shape function (singular)".
    */
   Tensor<1, spacedim>
   average_of_shape_gradients(const unsigned int interface_dof_index,
@@ -1849,6 +1929,10 @@ public:
    *
    * If this is a boundary face (at_boundary() returns true), then
    * $\average{\nabla^2 u}=\nabla^2 u_{\text{cell0}}$.
+   *
+   * @note The name of the function is supposed to be read as "the average
+   *   (singular) of the Hessians (plural: one or two possible values
+   *   for the second derivatives) of the shape function (singular)".
    */
   Tensor<2, spacedim>
   average_of_shape_hessians(const unsigned int interface_dof_index,
