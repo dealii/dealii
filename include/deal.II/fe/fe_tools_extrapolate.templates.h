@@ -1215,13 +1215,14 @@ namespace FETools
 
       Assert(destinations.size() == cells_to_send.size(), ExcInternalError());
 
+      // Now start receiving the messages sent above (sent on other processes,
+      // that is). First, figure out how many messages we are supposed to get:
       const unsigned int n_senders =
         Utilities::MPI::compute_n_point_to_point_communications(communicator,
                                                                 destinations);
 
-      // receive data
-      std::vector<char> receive;
-      CellData          cell_data;
+      // Then receive data:
+      std::vector<char> receive_buffer;
       for (unsigned int index = 0; index < n_senders; ++index)
         {
           MPI_Status status;
@@ -1231,10 +1232,9 @@ namespace FETools
           int len;
           ierr = MPI_Get_count(&status, MPI_BYTE, &len);
           AssertThrowMPI(ierr);
-          receive.resize(len);
 
-          char *buf = receive.data();
-          ierr      = MPI_Recv(buf,
+          receive_buffer.resize(len);
+          ierr = MPI_Recv(receive_buffer.data(),
                           len,
                           MPI_BYTE,
                           status.MPI_SOURCE,
@@ -1243,25 +1243,30 @@ namespace FETools
                           &status);
           AssertThrowMPI(ierr);
 
-          cell_data.unpack_data(receive);
+          CellData cell_data;
+          cell_data.unpack_data(receive_buffer);
 
           // this process has to send this
           // cell back to the sender
           // the receiver is the old sender
           cell_data.receiver = status.MPI_SOURCE;
 
-          received_cells.push_back(cell_data);
+          received_cells.emplace_back(std::move(cell_data));
         }
 
+      // Finally sort the list of cells. We do this because we receive the
+      // information above in random order, and we'd like them to be provided
+      // in some kind of stable order.
+      std::sort(received_cells.begin(), received_cells.end());
+
+      // Finally, make sure that all of the send requests above have been
+      // processed and that we know that we can move on.
       if (requests.size() > 0)
         {
           const int ierr =
             MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
           AssertThrowMPI(ierr);
         }
-
-      // finally sort the list of cells
-      std::sort(received_cells.begin(), received_cells.end());
     }
 
 
