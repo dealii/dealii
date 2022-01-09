@@ -1808,8 +1808,11 @@ namespace FETools
     // make sure that each cell on the coarsest level is at least once refined,
     // otherwise, these cells can't be treated and would generate a bogus result
     for (const auto &cell : dof2.cell_iterators_on_level(0))
-      Assert(cell->has_children() || cell->is_artificial(),
-             ExcGridNotRefinedAtLeastOnce());
+      {
+        (void)cell;
+        Assert(cell->has_children() || cell->is_artificial(),
+               ExcGridNotRefinedAtLeastOnce());
+      }
 
 
     internal::BlockType<OutVector> u3;
