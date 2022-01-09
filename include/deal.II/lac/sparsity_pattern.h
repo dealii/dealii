@@ -306,15 +306,16 @@ namespace SparsityPatternIterators
 
 
 /**
- * A class that can store which elements of a matrix are nonzero (or, in fact,
- * <i>may</i> be nonzero) and for which we have to allocate memory to store
- * their values. This class is an example of the "static" type of sparsity
- * patters (see
+ * A class that can store which elements of a matrix are nonzero (or, to be
+ * precise, <i>may</i> be nonzero) and for which we have to allocate memory to
+ * store their values. This class is an example of the "static" type of sparsity
+ * patterns (see
  * @ref Sparsity).
  * It uses the <a
  * href="https://en.wikipedia.org/wiki/Sparse_matrix">compressed row storage
  * (CSR)</a> format to store data, and is used as the basis for the
- * derived SparsityPattern class and SparseMatrix class.
+ * derived SparsityPattern class, which is in turn used by the SparseMatrix
+ * class.
  *
  * The elements of a SparsityPatternBase, corresponding to the places where
  * SparseMatrix objects can store nonzero entries, are stored row-by-row.
@@ -365,8 +366,10 @@ public:
    *
    * Constructors, destructor, functions initializing, copying and filling an
    * object.
+   *
+   * @{
    */
-  // @{
+
   /**
    * Initialize the matrix empty, that is with no memory allocated. This is
    * useful if you want such objects as member variables in other classes. You
@@ -434,12 +437,15 @@ public:
   void
   add(const size_type i, const size_type j);
 
-  // @}
+  /**
+   * @}
+   */
 
   /**
    * @name Iterators
+   *
+   * @{
    */
-  // @{
 
   /**
    * Iterator starting at the first entry of the matrix. The resulting
@@ -484,12 +490,15 @@ public:
   end(const size_type r) const;
 
 
-  // @}
+  /**
+   * @}
+   */
 
   /**
    * @name Querying information
+   *
+   * @{
    */
-  // @{
 
   /**
    * Test for equality of two SparsityPatterns.
@@ -574,12 +583,15 @@ public:
   std::size_t
   memory_consumption() const;
 
-  // @}
+  /**
+   * @}
+   */
 
   /**
    * @name Accessing entries
+   *
+   * @{
    */
-  // @{
 
   /**
    * Access to column number field.  Return the column number of the
@@ -618,12 +630,15 @@ public:
   std::pair<size_type, size_type>
   matrix_position(const std::size_t global_index) const;
 
-  // @}
+  /**
+   * @}
+   */
 
   /**
    * @name Input/Output
+   *
+   * @{
    */
-  // @{
 
   /**
    * Print the sparsity of the matrix. The output consists of one line per row
@@ -692,10 +707,13 @@ public:
   BOOST_SERIALIZATION_SPLIT_MEMBER()
 #endif
 
-  // @}
+  /**
+   * @}
+   */
 
   /**
    * @addtogroup Exceptions
+   *
    * @{
    */
 
@@ -728,7 +746,9 @@ public:
     "The operation you attempted changes the structure of the SparsityPattern "
     "and is not possible after compress() has been called.");
 
-  // @}
+  /**
+   * @}
+   */
 
 
 protected:
@@ -901,7 +921,10 @@ public:
    * Constructors, destructor, functions initializing, copying and filling an
    * object.
    */
-  // @{
+  /**
+   * @{
+   */
+
   /**
    * Initialize the matrix empty, that is with no memory allocated. This is
    * useful if you want such objects as member variables in other classes. You
@@ -1163,13 +1186,18 @@ public:
               ForwardIterator end,
               const bool      indices_are_sorted = false);
 
-  // @}
+  /**
+   * @}
+   */
 
 
   /**
    * @name Querying information
    */
-  // @{
+  /**
+   * @{
+   */
+
   /**
    * Test for equality of two SparsityPatterns.
    */
@@ -1198,11 +1226,16 @@ public:
   std::size_t
   memory_consumption() const;
 
-  // @}
+  /**
+   * @}
+   */
+
   /**
    * @name Accessing entries
+   *
+   * @{
    */
-  // @{
+
   /**
    * Return the index of the matrix element with row number <tt>i</tt> and
    * column number <tt>j</tt>. If the matrix element is not a nonzero one,
@@ -1228,11 +1261,16 @@ public:
   size_type
   operator()(const size_type i, const size_type j) const;
 
-  // @}
+  /**
+   * @}
+   */
+
   /**
    * @name Input/Output
    */
-  // @{
+  /**
+   * @{
+   */
 
   /**
    * Write the data of this object en bloc to a file. This is done in a binary
@@ -1293,10 +1331,13 @@ public:
   BOOST_SERIALIZATION_SPLIT_MEMBER()
 #endif
 
-  // @}
+  /**
+   * @}
+   */
 
   /**
    * @addtogroup Exceptions
+   *
    * @{
    */
   /**
@@ -1314,7 +1355,9 @@ public:
                  int,
                  << "The number of partitions you gave is " << arg1
                  << ", but must be greater than zero.");
-  //@}
+  /**
+   * @}
+   */
 private:
   /**
    * Is special treatment of diagonals enabled?
@@ -1341,7 +1384,9 @@ private:
 };
 
 
-/*@}*/
+/**
+ * @}
+ */
 /*---------------------- Inline functions -----------------------------------*/
 
 #ifndef DOXYGEN
