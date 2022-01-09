@@ -1169,8 +1169,10 @@ namespace FETools
       std::vector<CellData> &      received_cells) const
     {
       std::vector<std::vector<char>> sendbuffers(cells_to_send.size());
-      std::vector<MPI_Request>       requests(cells_to_send.size());
-      std::vector<unsigned int>      destinations;
+      std::vector<MPI_Request>       requests;
+      requests.reserve(cells_to_send.size());
+
+      std::vector<unsigned int> destinations;
 
       // Protect the communication below:
       static Utilities::MPI::CollectiveMutex      mutex;
@@ -1182,23 +1184,23 @@ namespace FETools
 
       // send data
       std::vector<std::vector<char>>::iterator buffer = sendbuffers.begin();
-      unsigned int                             idx    = 0;
-      for (typename std::vector<CellData>::const_iterator it =
-             cells_to_send.begin();
-           it != cells_to_send.end();
-           ++it, ++idx)
+      for (const auto &cell_to_send : cells_to_send)
         {
-          destinations.push_back(it->receiver);
+          destinations.push_back(cell_to_send.receiver);
 
-          *buffer        = it->pack_data();
-          const int ierr = MPI_Isend(buffer->data(),
+          *buffer = cell_to_send.pack_data();
+
+          MPI_Request request;
+          const int   ierr = MPI_Isend(buffer->data(),
                                      buffer->size(),
                                      MPI_BYTE,
-                                     it->receiver,
+                                     cell_to_send.receiver,
                                      mpi_tag,
                                      communicator,
-                                     &requests[idx]);
+                                     &request);
           AssertThrowMPI(ierr);
+
+          requests.emplace_back(request);
 
           ++buffer;
         }
