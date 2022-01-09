@@ -96,21 +96,6 @@ namespace FETools
         const typename dealii::internal::p4est::types<dim>::locidx tree_index;
         const typename DoFHandler<dim, spacedim>::cell_iterator    dealii_cell;
         const typename dealii::internal::p4est::types<dim>::quadrant p4est_cell;
-
-        WorkPackage(
-          const typename dealii::internal::p4est::types<dim>::forest &forest_,
-          const typename dealii::internal::p4est::types<dim>::tree &  tree_,
-          const typename dealii::internal::p4est::types<dim>::locidx
-            &                                                      tree_index_,
-          const typename DoFHandler<dim, spacedim>::cell_iterator &dealii_cell_,
-          const typename dealii::internal::p4est::types<dim>::quadrant
-            &p4est_cell_)
-          : forest(forest_)
-          , tree(tree_)
-          , tree_index(tree_index_)
-          , dealii_cell(dealii_cell_)
-          , p4est_cell(p4est_cell_)
-        {}
       };
 
 
@@ -1470,19 +1455,21 @@ namespace FETools
               continue;
 
             typename dealii::internal::p4est::types<dim>::quadrant
-                               p4est_coarse_cell;
-            const unsigned int tree_index =
-              tr->coarse_cell_to_p4est_tree_permutation[cell->index()];
+              p4est_coarse_cell;
+            const typename dealii::internal::p4est::types<dim>::locidx
+              tree_index =
+                tr->coarse_cell_to_p4est_tree_permutation[cell->index()];
             typename dealii::internal::p4est::types<dim>::tree *tree =
               tr->init_tree(cell->index());
 
             dealii::internal::p4est::init_coarse_quadrant<dim>(
               p4est_coarse_cell);
 
-            const WorkPackage data(
-              *tr->parallel_forest, *tree, tree_index, cell, p4est_coarse_cell);
-
-            queue.push(data);
+            queue.push({*tr->parallel_forest,
+                        *tree,
+                        tree_index,
+                        cell,
+                        p4est_coarse_cell});
           }
       }
 
@@ -1517,11 +1504,11 @@ namespace FETools
               for (unsigned int c = 0;
                    c < GeometryInfo<dim>::max_children_per_cell;
                    ++c)
-                queue.push(WorkPackage(forest,
-                                       tree,
-                                       tree_index,
-                                       dealii_cell->child(c),
-                                       p4est_child[c]));
+                queue.push({forest,
+                            tree,
+                            tree_index,
+                            dealii_cell->child(c),
+                            p4est_child[c]});
             }
           queue.pop();
         }
