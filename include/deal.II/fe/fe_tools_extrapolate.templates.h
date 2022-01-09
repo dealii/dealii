@@ -122,10 +122,10 @@ namespace FETools
         operator<(const CellData &rhs) const;
 
         /**
-         * Pack the data of this object into a char[] buffer.
+         * Pack the data of this object into a buffer.
          */
-        void
-        pack_data(std::vector<char> &buffer) const;
+        std::vector<char>
+        pack_data() const;
 
         /**
          * Unpack the data of the given buffer into the members of this object.
@@ -458,9 +458,9 @@ namespace FETools
 
 
     template <int dim, int spacedim, class OutVector>
-    void
-    ExtrapolateImplementation<dim, spacedim, OutVector>::CellData::pack_data(
-      std::vector<char> &buffer) const
+    std::vector<char>
+    ExtrapolateImplementation<dim, spacedim, OutVector>::CellData::pack_data()
+      const
     {
       // Compute how much memory we need to pack the data of this
       // structure into a char[] buffer.
@@ -470,8 +470,7 @@ namespace FETools
          sizeof(unsigned int) +                   // tree_index
          sizeof(
            typename dealii::internal::p4est::types<dim>::quadrant)); // quadrant
-
-      buffer.resize(bytes_for_buffer);
+      std::vector<char> buffer(bytes_for_buffer);
 
       char *ptr = buffer.data();
 
@@ -492,6 +491,8 @@ namespace FETools
       ptr += sizeof(typename dealii::internal::p4est::types<dim>::quadrant);
 
       Assert(ptr == buffer.data() + buffer.size(), ExcInternalError());
+
+      return buffer;
     }
 
 
@@ -1189,7 +1190,7 @@ namespace FETools
         {
           destinations.push_back(it->receiver);
 
-          it->pack_data(*buffer);
+          *buffer        = it->pack_data();
           const int ierr = MPI_Isend(buffer->data(),
                                      buffer->size(),
                                      MPI_BYTE,
