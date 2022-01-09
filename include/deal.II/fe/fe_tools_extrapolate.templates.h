@@ -68,9 +68,13 @@ namespace FETools
         Assert(false, ExcNotImplemented())
       }
     };
+
 #else
-    // Implementation of the @p extrapolate function
-    // on parallel distributed grids.
+
+    /**
+     * Implementation of the FETools::extrapolate() function
+     * on parallel distributed grids.
+     */
     template <int dim, int spacedim, class OutVector>
     class ExtrapolateImplementation
     {
@@ -84,11 +88,15 @@ namespace FETools
                            OutVector &                      u2);
 
     private:
-      // A shortcut for the type of the OutVector
+      /**
+       *  A shortcut for the type of the OutVector.
+       */
       using value_type = typename OutVector::value_type;
 
-      // A structure holding all data to
-      // set dofs recursively on cells of arbitrary level
+      /**
+       * A structure holding all data to set dofs recursively on cells of
+       * arbitrary level.
+       */
       struct WorkPackage
       {
         const typename dealii::internal::p4est::types<dim>::forest forest;
@@ -1727,6 +1735,10 @@ namespace FETools
 
 
 
+    /**
+     * Perform the extrapolation of a finite element field to patch-based
+     * values for serial triangulations.
+     */
     template <int dim, class InVector, class OutVector, int spacedim>
     void
     extrapolate_serial(const InVector &                 u3,
@@ -1744,9 +1756,7 @@ namespace FETools
           for (const auto &cell : dof2.cell_iterators_on_level(level))
             if (cell->has_children())
               {
-                // check whether this
-                // cell has active
-                // children
+                // Check whether this cell has active children
                 bool active_children = false;
                 for (unsigned int child_n = 0; child_n < cell->n_children();
                      ++child_n)
@@ -1756,13 +1766,13 @@ namespace FETools
                       break;
                     }
 
-                // if there are active
-                // children, this process
-                // has to work on this
-                // cell. get the data
-                // from the one vector
-                // and set it on the
-                // other
+                // If there are active children, this process
+                // has to work on this cell. Get the values from the input
+                // vector on this cell and interpolate it from the current
+                // cell to its children in the other vector. If any of the
+                // children have children themselves, then we will visit it
+                // later in the outer loop here and overwrite the results in
+                // u2.
                 if (active_children)
                   {
                     cell->get_interpolated_dof_values(u3, dof_values);
@@ -1773,6 +1783,8 @@ namespace FETools
     }
   } // namespace internal
 
+
+
   template <int dim, class InVector, class OutVector, int spacedim>
   void
   extrapolate(const DoFHandler<dim, spacedim> &dof1,
@@ -1780,6 +1792,8 @@ namespace FETools
               const DoFHandler<dim, spacedim> &dof2,
               OutVector &                      u2)
   {
+    // Forward to the other function using an empty set of
+    // constraints.
     AffineConstraints<typename OutVector::value_type> dummy;
     dummy.close();
     extrapolate(dof1, u1, dof2, dummy, u2);
