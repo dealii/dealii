@@ -6,10 +6,11 @@ Wolfgang Bangerth. Results from this program are used and discussed in the
 following publications (in particular in the second one):
 - Chih-Che Chueh, Marc Secanell, Wolfgang Bangerth, Ned Djilali. Multi-level
   adaptive simulation of transient two-phase flow in heterogeneous porous
-  media. Computers &amp; Fluids, 39:1585-1596, 2010
+  media. Computers &amp; Fluids, 39:1585-1596, 2010 (see @cite Chueh2010).
 - Chih-Che Chueh, Ned Djilali, Wolfgang Bangerth. An h-adaptive operator
   splitting method for two-phase flow in 3D heterogeneous porous
-  media. SIAM Journal on Scientific Computing, 35:B149-B175, 2013.
+  media. SIAM Journal on Scientific Computing, 35:B149-B175, 2013
+  (see @cite Chueh2013).
 
 The implementation discussed here uses and extends
 parts of the step-21 and step-31 tutorial programs.
@@ -116,8 +117,7 @@ operator splitting" scheme.
 
 Here, we use the following a posteriori criterion to decide when to re-compute
 pressure and velocity variables
-(detailed derivations and descriptions can be found in [Chueh, Djilali
-and Bangerth 2011]):
+(detailed derivations and descriptions can be found in @cite Chueh2013):
 @f{align*}
   \theta(n,n_p)
   =
@@ -197,7 +197,7 @@ equations. Specifically, we use mixed finite elements to ensure high order appro
 for both vector (e.g. a fluid velocity) and scalar variables (e.g. pressure)
 simultaneously. For saddle point problems, it is well established that
 the so-called Babuska-Brezzi or Ladyzhenskaya-Babuska-Brezzi (LBB) conditions
-[Brezzi 1991, Chen 2005] need to be satisfied to ensure stability of
+@cite BrezziFortin, @cite Chen2005 need to be satisfied to ensure stability of
 the pressure-velocity system. These stability conditions are satisfied in the
 present work by using elements for velocity that are one order higher than for
 the pressure, i.e. $u_h \in Q^d_{p+1}$ and $p_h \in Q_p$, where $p=1$, $d$ is
@@ -211,12 +211,12 @@ The chosen $Q_1$ elements for the saturation equation do not lead to a stable
 discretization without upwinding or other kinds of stabilization, and spurious
 oscillations will appear in the numerical solution. Adding an artificial
 diffusion term is one approach to eliminating these oscillations
-[Chen 2005]. On the other hand, adding too much diffusion smears sharp
+@cite Chen2005. On the other hand, adding too much diffusion smears sharp
 fronts in the solution and suffers from grid-orientation difficulties
-[Chen 2005]. To avoid these effects, we use the artificial diffusion
-term proposed by [Guermond and Pasquetti 2008] and
-validated in [Chueh, Djilali, Bangerth 2011] and
-[Kronbichler, Heister and Bangerth, 2011], as well as in step-31.
+@cite Chen2005. To avoid these effects, we use the artificial diffusion
+term proposed by @cite GuermondPasquetti2008 and
+validated in @cite Chueh2013 and
+@cite KHB12, as well as in step-31.
 
 This method modifies the (discrete) weak form of the saturation equation
 to read
@@ -238,15 +238,15 @@ where $\nu$ is the artificial diffusion parameter and $\hat F$ is an
 appropriately chosen numerical flux on the boundary of the domain (we choose
 the obvious full upwind flux for this).
 
-Following [Guermond and Pasquetti 2008] (and as detailed in
-[Chueh, Djilali and Bangerth 2011]), we use
+Following @cite GuermondPasquetti2008 (and as detailed in
+@cite Chueh2013), we use
 the parameter as a piecewise
 constant function set on each cell $K$ with the diameter $h_{K}$ as
 @f[
    \nu(S_h)|_{K} = \beta \| \mathbf{u}_t \max\{F'(S_h),1\} \|_{L^{\infty}(K)} \textrm{min} \left\{ h_{K},h^{\alpha}_{K} \frac{\|\textrm{Res}(S_h)\|_{L^{\infty}(K)}}{c(\mathbf{u}_t,S)} \right\}
 @f]
 where $\alpha$ is a stabilization exponent and $\beta$ is a dimensionless
-user-defined stabilization constant. Following [Guermond and Pasquetti 2008]
+user-defined stabilization constant. Following @cite GuermondPasquetti2008
 as well as the implementation in step-31, the velocity and saturation global
 normalization constant, $c(\mathbf{u}_t,S)$, and the residual $\textrm{Res}(S)$
 are respectively given by
@@ -304,7 +304,7 @@ neighboring boundary $\partial\Omega_{(-)}$.
 Choosing meshes adaptively to resolve sharp
 saturation fronts is an essential ingredient to achieve efficiency in our
 algorithm. Here, we use the same shock-type refinement approach used in
-[Chueh, Djilali and Bangerth 2011] to select those cells that should be refined or
+@cite Chueh2013 to select those cells that should be refined or
 coarsened. The refinement indicator for each cell $K$ of the triangulation is
 computed by
 @f[
@@ -395,8 +395,9 @@ requires us to solve
   \end{array}
  \right)
 @f]
-We apply the Generalized Minimal Residual (GMRES) method [Saad and Schultz
-1986] to this linear system. The ideal preconditioner for the
+We apply the Generalized Minimal Residual (GMRES) method
+@cite Saad1986
+to this linear system. The ideal preconditioner for the
 velocity-pressure system is
 @f{align*}
 \mathbf{P} =
@@ -417,7 +418,7 @@ velocity-pressure system is
  @f}
 where
 $\mathbf{S}=\mathbf{B}\left(\mathbf{M}^{\mathbf{u}}\right)^{-1}\mathbf{B}^T$ is
-the Schur complement [Zhang 2005] of the system. This preconditioner is
+the Schur complement @cite Zhang2005 of the system. This preconditioner is
 optimal since
 @f{align*}
  \mathbf{P}^{-1}
@@ -439,8 +440,9 @@ for which it can be shown that GMRES converges in two iterations.
 
 However, we cannot of course expect to use exact inverses of the
 velocity mass matrix and the Schur complement. We therefore follow the
-approach by [Silvester and Wathen 1994] originally proposed for
-the Stokes system. Adapting it to the current set of equations yield the
+approach by @cite SW94 originally proposed for
+the Stokes system. (See also the note in the "Possibilities for extensions"
+section of step-22.) Adapting it to the current set of equations yield the
 preconditioner
 @f{align*}
  \mathbf{\tilde{P}}^{-1} =
@@ -459,7 +461,7 @@ particular, since $\left(\mathbf{{M}}^{\mathbf{u}}\right)^{-1}=\left( \left(
 is a sparse symmetric and positive definite matrix, we choose for
 $\widetilde{\left(\mathbf{{M}}^{\mathbf{u}}\right)^{-1}}$ a single application of
 a sparse incomplete Cholesky decomposition of this matrix
-[Golub and Van Loan 1996].
+@cite GolubVanLoan.
 We note that the Schur complement that corresponds to the porous
 media flow operator in non-mixed form, $-\nabla \cdot [\mathbf K
 \lambda_t(S)]\nabla$ and
@@ -496,7 +498,7 @@ We show numerical results for some two-phase flow equations augmented by
 appropriate initial and boundary conditions in conjunction with two different
 choices of the permeability model. In the problems considered, there is no
 internal source term ($q=0$). As mentioned above, quantitative numerical
-results are presented in [Chueh, Djilali and Bangerth 2011].
+results are presented in @cite Chueh2013.
 
 For simplicity, we choose $\Omega=[0,1]^d,d=2,3$, though all methods (as well
 as our implementation) should work equally well on general unstructured meshes.
@@ -560,73 +562,3 @@ We note that while we use the TrilinosWrappers::MPI::BlockVector class to store
 vectors, the program does not actually use MPI (or any other way to run in
 parallel): There is no non-MPI vector class in the TrilinosWrappers namespace,
 but we can use the MPI version to also run a sequential code as we do here.
-
-
-
-<h3>List of references</h3>
-
-
-<ol>
-<li>
-CC Chueh, N Djilali and W Bangerth.
-<br> An h-adaptive operator splitting method for two-phase flow in 3D
-  heterogeneous porous media.
-<br> SIAM Journal on Scientific Computing, vol. 35 (2013), pp. B149-B175
-
-<li>
-M. Kronbichler, T. Heister, and W. Bangerth
-<br> High Accuracy Mantle Convection Simulation through Modern Numerical
-Methods.
-<br> Geophysics Journal International, vol. 191 (2012), pp. 12-29
-
-<li>
-F Brezzi and M Fortin.
-<br> <i>Mixed and Hybrid Finite Element Methods</i>.
-<br> Springer-Verlag, 1991.
-
-<li>
-Z Chen.
-<br> <i>Finite Element Methods and Their Applications</i>.
-<br> Springer, 2005.
-
-<li>
-JL Guermond and R Pasquetti.
-<br> Entropy-based nonlinear viscosity for Fourier approximations of
-  conservation laws.
-<br> <i>Comptes Rendus Mathematique</i>, 346(13-14):801-806, 2008.
-
-<li>
-CC Chueh, M Secanell, W Bangerth, and N Djilali.
-<br> Multi-level adaptive simulation of transient two-phase flow in
-  heterogeneous porous media.
-<br> <i>Computers and Fluids</i>, 39:1585-1596, 2010.
-
-<li>
-Y Saad and MH Schultz.
-<br> Gmres: A generalized minimal residual algorithm for solving
-  nonsymmetric linear systems.
-<br> <i>SIAM Journal on Scientific and Statistical Computing</i>,
-  7(3):856-869, 1986.
-
-<li>
-F Zhang.
-<br> <i>The Schur Complement and its Applications</i>.
-<br> Springer, 2005.
-
-<li>
-D Silvester and A Wathen.
-<br> Fast iterative solution of stabilised Stokes systems part ii: Using
-  general block preconditioners.
-<br> <i>SIAM Journal on Numerical Analysis</i>, 31(5):1352-1367, 1994.
-
-<li>
-GH Golub and CF van Loan.
-<br> <i>Matrix Computations</i>.
-<br> 3rd Edition, Johns Hopkins, 1996.
-
-<li>
-SE Buckley and MC Leverett.
-<br> Mechanism of fluid displacements in sands.
-<br> <i>AIME Trans.</i>, 146:107-116, 1942.
-
-</ol>
