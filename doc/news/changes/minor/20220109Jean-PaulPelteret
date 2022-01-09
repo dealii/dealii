@@ -1,0 +1,10 @@
+New: MeshWorker::ScratchData and MeshWorker::CopyData now have hp-capabilities.
+Creation of a ScratchData object with an hp::FECollection and hp::QCollection
+enables those capabilities. A few specialized MeshWorker::ScratchData::reinit()
+were added to support face integration where the integration rule and mapping
+differs on either side of an interface. Additionally, some
+MeshWorker::CopyData::reinit() methods have been implemented to cater for the
+change in number of degrees-of-freedom between cells iterated over during
+assembly.
+<br>
+(Jean-Paul Pelteret, 2022/01/09)
