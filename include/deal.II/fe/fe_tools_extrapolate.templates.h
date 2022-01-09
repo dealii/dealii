@@ -1747,6 +1747,9 @@ namespace FETools
     const AffineConstraints<typename OutVector::value_type> &constraints,
     OutVector &                                              u2)
   {
+    Assert(dof1.get_fe_collection().size() == 1, ExcNotImplemented());
+    Assert(dof2.get_fe_collection().size() == 1, ExcNotImplemented());
+
     Assert(dof1.get_fe(0).n_components() == dof2.get_fe(0).n_components(),
            ExcDimensionMismatch(dof1.get_fe(0).n_components(),
                                 dof2.get_fe(0).n_components()));
@@ -1769,6 +1772,13 @@ namespace FETools
     if (dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim>
                        *>(&dof2.get_triangulation()) != nullptr)
       {
+        Assert(dof1.get_fe()[0].reference_cell() ==
+                 ReferenceCells::get_hypercube<dim>(),
+               ExcNotImplemented());
+        Assert(dof2.get_fe()[0].reference_cell() ==
+                 ReferenceCells::get_hypercube<dim>(),
+               ExcNotImplemented());
+
         interpolate(dof1, u1, dof2, constraints, u3);
 
         internal::BlockType<OutVector> u3_relevant;
