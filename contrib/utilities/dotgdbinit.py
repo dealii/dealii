@@ -130,14 +130,10 @@ class VectorPrinter(object):
         self.begin = gdb.parse_and_eval(eval_string);
         self.length = int(self.end - self.begin )
 
-    def children(self):
-        return (("values", self.val['values']),
-                ("thread_loop_partitioner",
-                 self.val['thread_loop_partitioner']))
-
     def to_string(self):
-        return "Vector<{}>({})".format(self.val.type.template_argument(0),
-                                       self.length)
+        return ("Vector<{}>({})".format(self.val.type.template_argument(0),
+                                        self.length) +
+                build_output_string(['values'], self.val))
 
 
 class QuadraturePrinter(object):
