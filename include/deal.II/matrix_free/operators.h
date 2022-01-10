@@ -1959,7 +1959,7 @@ namespace MatrixFreeOperators
     // entries here.
     for (size_type i = 0; i < locally_owned_size; ++i)
       {
-        if (inverse_lumped_diagonal_vector.local_element(i) == Number(0.))
+        if (lumped_diagonal_vector.local_element(i) == Number(0.))
           inverse_lumped_diagonal_vector.local_element(i) = Number(1.);
         else
           inverse_lumped_diagonal_vector.local_element(i) =
