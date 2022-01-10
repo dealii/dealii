@@ -2282,7 +2282,8 @@ inline constexpr DEAL_II_ALWAYS_INLINE
 
 
 /**
- * The dot product (single contraction) for tensors: Return a tensor of rank
+ * The dot product (single contraction) for tensors. This function return a
+ * tensor of rank
  * $(\text{rank}_1 + \text{rank}_2 - 2)$ that is the contraction of the last
  * index of a tensor @p src1 of rank @p rank_1 with the first index of a
  * tensor @p src2 of rank @p rank_2:
@@ -2295,11 +2296,24 @@ inline constexpr DEAL_II_ALWAYS_INLINE
  *
  * @note For the Tensor class, the multiplication operator only performs a
  * contraction over a single pair of indices. This is in contrast to the
- * multiplication operator for SymmetricTensor, which does the double
- * contraction.
+ * multiplication operator for SymmetricTensor, for which the corresponding
+ * `operator*()` performs a double contraction.  The origin of the difference in
+ * how `operator*()` is implemented between Tensor and SymmetricTensor is that
+ * for the former, the product between two Tensor objects of same rank and
+ * dimension results in another Tensor object -- that it, `operator*()`
+ * corresponds to the multiplicative group action within the group of tensors.
+ * On the other hand, there is no corresponding multiplicative group action with
+ * the set of symmetric tensors because, in general, the product of two
+ * symmetric tensors is a *nonsymmetric* tensor. As a consequence, for a
+ * mathematician, it is clear that `operator*()` for symmetric tensors must have
+ * a different meaning: namely the *dot* or *scalar product* that maps two
+ * symmetric tensors of rank 2 to a scalar. This corresponds to the double-dot
+ * (colon) operator whose meaning is then extended to the product of any two
+ * even-ranked symmetric tensors.
  *
- * @note In case the contraction yields a tensor of rank 0 the scalar number
- * is returned as an unwrapped number type.
+ * @note In case the contraction yields a tensor of rank 0, that is, if
+ *   `rank_1==rank_2==1`, then a scalar number is returned as an unwrapped
+ *   number type.
  *
  * @relatesalso Tensor
  */
