@@ -19,6 +19,8 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/mpi_consensus_algorithms.h>
+
 #include <deal.II/distributed/p4est_wrappers.h>
 #include <deal.II/distributed/tria.h>
 
@@ -154,7 +156,7 @@ namespace FETools
         unsigned int                                           tree_index;
         typename dealii::internal::p4est::types<dim>::quadrant quadrant;
 
-        int receiver;
+        types::subdomain_id receiver;
       };
 
       // Problem: The function extrapolates a polynomial
@@ -1176,97 +1178,89 @@ namespace FETools
       const std::vector<CellData> &cells_to_send,
       std::vector<CellData> &      received_cells) const
     {
-      std::vector<std::vector<char>> sendbuffers(cells_to_send.size());
-      std::vector<MPI_Request>       requests;
-      requests.reserve(cells_to_send.size());
+      // First figure out where we need to send stuff. Some of the cells
+      // in the input argument to this function might be destined for
+      // the same process, so we have to only look at the unique set of
+      // destinations:
+      std::set<types::subdomain_id> destinations;
+      for (const auto &cell : cells_to_send)
+        destinations.insert(cell.receiver);
 
-      std::vector<unsigned int> destinations;
+      // Then set up the send/receive operation. This is best done through
+      // the 'consensus algorithm' setup that is used for point-to-point
+      // communication of information in cases where we do not know up
+      // front which processes (and from how many processes) we have to
+      // expect information from.
+      const auto get_destinations = [&destinations]() {
+        return std::vector<unsigned int>(destinations.begin(),
+                                         destinations.end());
+      };
 
-      // Protect the communication below:
-      static Utilities::MPI::CollectiveMutex      mutex;
-      Utilities::MPI::CollectiveMutex::ScopedLock lock(mutex, communicator);
+      const auto create_request =
+        [&cells_to_send](const types::subdomain_id other_rank,
+                         std::vector<char> &       send_buffer) {
+          // We have to create a single std::vector<char> that encodes the
+          // information from all cells that are to be sent to 'other_rank'.
+          // Each of the objects we want to send has a 'pack_data()'
+          // function, so we can just create a vector of std::vector<char>
+          // into which we put these strings, and then use the serialization
+          // framework to get it all into one string.
+          std::vector<std::vector<char>> array_of_strings;
+          for (const auto &cell : cells_to_send)
+            if (cell.receiver == other_rank)
+              array_of_strings.emplace_back(cell.pack_data());
 
-      // We pick a new tag in each round. Wrap around after 10 rounds:
-      const int mpi_tag =
-        Utilities::MPI::internal::Tags::fe_tools_extrapolate + round % 10;
+          send_buffer = Utilities::pack(array_of_strings, false);
+        };
 
-      // send data
-      std::vector<std::vector<char>>::iterator buffer = sendbuffers.begin();
-      for (const auto &cell_to_send : cells_to_send)
-        {
-          destinations.push_back(cell_to_send.receiver);
+      const auto prepare_buffer_for_answer =
+        [](const unsigned int /*other_rank*/, std::vector<char> &recv_buffer) {
+          // Nothing to do here, we don't actually want to send an answer
+          recv_buffer.clear();
+        };
 
-          *buffer = cell_to_send.pack_data();
+      const auto answer_request =
+        [&received_cells](const unsigned int       other_rank,
+                          const std::vector<char> &buffer_recv,
+                          std::vector<char> &      request_buffer) {
+          // We got a message from 'other_rank', so let us decode the
+          // message in the same way as we have assembled it above
+          const std::vector<std::vector<char>> array_of_strings =
+            Utilities::unpack<std::vector<std::vector<char>>>(buffer_recv,
+                                                              false);
 
-          MPI_Request request;
-          const int   ierr = MPI_Isend(buffer->data(),
-                                     buffer->size(),
-                                     MPI_BYTE,
-                                     cell_to_send.receiver,
-                                     mpi_tag,
-                                     communicator,
-                                     &request);
-          AssertThrowMPI(ierr);
+          for (const auto &s : array_of_strings)
+            {
+              CellData cell_data;
+              cell_data.unpack_data(s);
+              cell_data.receiver = other_rank;
 
-          requests.emplace_back(request);
+              received_cells.emplace_back(std::move(cell_data));
+            }
 
-          ++buffer;
-        }
+          // Nothing left to do here, we don't actually need to provide an
+          // answer:
+          request_buffer.clear();
+        };
 
-      Assert(destinations.size() == cells_to_send.size(), ExcInternalError());
+      const auto read_answer = [](const unsigned int /*other_rank*/,
+                                  const std::vector<char> &recv_buffer) {
+        // We don't put anything into the answers, so nothing should
+        // have been coming out at this end either:
+        (void)recv_buffer;
+        Assert(recv_buffer.size() == 0, ExcInternalError());
+      };
 
-      // Now start receiving the messages sent above (sent on other processes,
-      // that is). First, figure out how many messages we are supposed to get:
-      const unsigned int n_senders =
-        Utilities::MPI::compute_n_point_to_point_communications(communicator,
-                                                                destinations);
+      Utilities::MPI::ConsensusAlgorithms::AnonymousProcess<char, char>
+        operations(get_destinations,
+                   create_request,
+                   answer_request,
+                   prepare_buffer_for_answer,
+                   read_answer);
 
-      // Then receive data:
-      std::vector<char> receive_buffer;
-      for (unsigned int index = 0; index < n_senders; ++index)
-        {
-          MPI_Status status;
-          int ierr = MPI_Probe(MPI_ANY_SOURCE, mpi_tag, communicator, &status);
-          AssertThrowMPI(ierr);
-
-          int len;
-          ierr = MPI_Get_count(&status, MPI_BYTE, &len);
-          AssertThrowMPI(ierr);
-
-          receive_buffer.resize(len);
-          ierr = MPI_Recv(receive_buffer.data(),
-                          len,
-                          MPI_BYTE,
-                          status.MPI_SOURCE,
-                          status.MPI_TAG,
-                          communicator,
-                          &status);
-          AssertThrowMPI(ierr);
-
-          CellData cell_data;
-          cell_data.unpack_data(receive_buffer);
-
-          // this process has to send this
-          // cell back to the sender
-          // the receiver is the old sender
-          cell_data.receiver = status.MPI_SOURCE;
-
-          received_cells.emplace_back(std::move(cell_data));
-        }
-
-      // Finally sort the list of cells. We do this because we receive the
-      // information above in random order, and we'd like them to be provided
-      // in some kind of stable order.
-      std::sort(received_cells.begin(), received_cells.end());
-
-      // Finally, make sure that all of the send requests above have been
-      // processed and that we know that we can move on.
-      if (requests.size() > 0)
-        {
-          const int ierr =
-            MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
-          AssertThrowMPI(ierr);
-        }
+      Utilities::MPI::ConsensusAlgorithms::NBX<char, char>(operations,
+                                                           communicator)
+        .run();
     }
 
 
