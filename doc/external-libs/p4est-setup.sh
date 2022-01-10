@@ -122,7 +122,8 @@ cd "$BUILD_FAST"
 make -C sc -j 8 > make.output || bdie "Error in make sc"
 make -j 8 >> make.output || bdie "Error in make p4est"
 # ensure that we built p4est with zlib
-grep -q 'P4EST_HAVE_ZLIB *1' "$BUILD_FAST/src/p4est_config.h" \
+find "$BUILD_FAST" -name "p4est_config.h" -type f -exec \
+    grep -q "P4EST_HAVE_ZLIB *1" {} \; \
     || bdie "$MISSING_ZLIB_MESSAGE"
 make install >> make.output || bdie "Error in make install"
 echo "FAST version installed in $INSTALL_FAST"
@@ -139,7 +140,8 @@ cd "$BUILD_DEBUG"
 make -C sc -j 8 > make.output || bdie "Error in make sc"
 make -j 8 >> make.output || bdie "Error in make p4est"
 # ensure that we built p4est with zlib
-grep -q 'P4EST_HAVE_ZLIB *1' "$BUILD_DEBUG/src/p4est_config.h" \
+find "$BUILD_DEBUG" -name "p4est_config.h" -type f -exec \
+    grep -q "P4EST_HAVE_ZLIB *1" {} \; \
     || bdie "$MISSING_ZLIB_MESSAGE"
 make install >> make.output || bdie "Error in make install"
 echo "DEBUG version installed in $INSTALL_DEBUG"
