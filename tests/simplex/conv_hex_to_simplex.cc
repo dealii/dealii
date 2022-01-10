@@ -50,7 +50,7 @@ create_triangulation(Triangulation<dim, dim> &triangulation)
 
 template <int dim, int spacedim>
 void
-check_file() // for dim = spaceim
+check_file(unsigned int n_refinements = 0) // for dim = spaceim
 {
   Triangulation<dim, spacedim> in_tria, out_tria;
   create_triangulation(in_tria);
@@ -83,7 +83,7 @@ check_file() // for dim = spaceim
     if (i != numbers::flat_manifold_id)
       out_tria.set_manifold(i, in_tria.get_manifold(i));
 
-  // out_tria.refine_global(2);
+  out_tria.refine_global(n_refinements);
 
   // write 2 outputs (total mesh and only surface mesh)
   const auto grid_out = [](const auto &tria,
@@ -97,6 +97,10 @@ check_file() // for dim = spaceim
         flags.output_edges         = false;
         flags.output_only_relevant = false;
       }
+
+    // Demonstrate a bug with copying manifold ids more clearly:
+    if (dim == 3)
+      flags.output_only_relevant = false;
 
     GridOut grid_out;
     grid_out.set_flags(flags);
@@ -134,5 +138,12 @@ main()
   deallog.push(
     "3D: conversion triangulation with tet elements to hex elements: ");
   check_file<3, 3>();
+  deallog.pop();
+
+  // TETRAHEDRAL ELEMENTS
+  // dim = spacedim = 3
+  deallog.push(
+    "3D: conversion triangulation with tet elements to hex elements + refinement: ");
+  check_file<3, 3>(1);
   deallog.pop();
 }
