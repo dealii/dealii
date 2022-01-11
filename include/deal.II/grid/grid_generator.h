@@ -1026,6 +1026,113 @@ namespace GridGenerator
                  const double        half_length = 1.0);
 
   /**
+   * Initialize the given triangulation with a pipe junction, which is the
+   * intersection of three truncated cones.
+   *
+   * The geometry has four characteristic cross sections, located at the three
+   * openings and the bifurcation. They need to be specified via the function's
+   * arguments: each cross section is described by a characteristic point and a
+   * radius. The cross sections at the openings are circles and are described by
+   * their center point and radius. The bifurcation point describes where the
+   * symmetry axes of all cones meet.
+   *
+   * Each truncated cone is transformed so that the three merge seamlessly into
+   * each other. The bifurcation radius describes the radius that each original,
+   * untransformed, truncated cone would have at the bifurcation. This radius is
+   * necessary for the construction of the geometry and can, in general, no
+   * longer be found in the final result.
+   *
+   * Each cone will be assigned a distinct <em>material ID</em> that matches the
+   * index of their opening in the argument @p openings. For example, the cone
+   * which connects to opening with index 0 in @p openings will have material ID 0.
+   *
+   * Similarly, <em>boundary IDs</em> are assigned to the cross-sections of each
+   * opening to match their index. All other boundary faces will be assigned
+   * boundary ID 3.
+   *
+   * <em>Manifold IDs</em> will be set on the mantles of each truncated cone in
+   * the same way. Currently, no manifold objects will be attached.
+   *
+   * @pre The triangulation passed as argument needs to be empty when calling
+   * this function.
+   *
+   * @note Only implemented for `dim = 3` and `spacedim = 3`.
+   *
+   * @param tria An empty triangulation which will hold the pipe junction geometry.
+   * @param openings Center point and radius of each of the three openings.
+   *                 The container has to be of size three.
+   * @param bifurcation Center point of the bifurcation and hypothetical radius of
+   *                    each truncated cone at the bifurcation.
+   * @param aspect_ratio Aspect ratio of cells, specified as radial over z-extension.
+   *                     Default ratio is $\Delta r/\Delta z = 1/2$.
+   *
+   * Common configurations of tee fittings that can be generated with the
+   * following sets of parameters are:
+   * <div class="threecolumn" style="width: 80%; text-align: center;">
+   *   <div>
+   *     \htmlonly <style>div.image
+   *       img[src="tee_corner.png"]{width:100%}</style>
+   *     \endhtmlonly
+   *     @image html tee_corner.png
+   *     <table class="doxtable" style="display: inline-table;">
+   *       <tr><th colspan="3">Corner piece
+   *       <tr><td>
+   *           <td>Point
+   *           <td>Radius
+   *       <tr><td>Openings
+   *           <td>$(2,0,0)$<br>$(0,2,0)$<br>$(0,0,2)$
+   *           <td>$1$<br>$1$<br>$1$
+   *       <tr><td>Bifurcation
+   *           <td>$(0,0,0)$
+   *           <td>$1$
+   *     </table>
+   *   </div>
+   *   <div>
+   *     \htmlonly <style>div.image
+   *       img[src="tee_tpipe.png"]{width:100%}</style>
+   *     \endhtmlonly
+   *     @image html tee_tpipe.png
+   *     <table class="doxtable" style="display: inline-table;">
+   *       <tr><th colspan="3">T-pipe
+   *       <tr><td>
+   *           <td>Point
+   *           <td>Radius
+   *       <tr><td>Openings
+   *           <td>$(-2,0,0)$<br>$(0,2,0)$<br>$(2,0,0)$
+   *           <td>$1$<br>$1$<br>$1$
+   *       <tr><td>Bifurcation
+   *           <td>$(0,0,0)$
+   *           <td>$1$
+   *     </table>
+   *   </div>
+   *   <div>
+   *     \htmlonly <style>div.image
+   *       img[src="tee_ypipe.png"]{width:100%}</style>
+   *     \endhtmlonly
+   *     @image html tee_ypipe.png
+   *     <table class="doxtable" style="display: inline-table;">
+   *       <tr><th colspan="3">Y-pipe
+   *       <tr><td>
+   *           <td>Point
+   *           <td>Radius
+   *       <tr><td>Openings
+   *           <td>$(-2,0,0)$<br>$(1,\sqrt{3},1)$<br>$(1,-\sqrt{3},1)$
+   *           <td>$1$<br>$1$<br>$1$
+   *       <tr><td>Bifurcation
+   *           <td>$(0,0,0)$
+   *           <td>$1$
+   *     </table>
+   *   </div>
+   * </div>
+   */
+  template <int dim, int spacedim>
+  void
+  pipe_junction(Triangulation<dim, spacedim> &                         tria,
+                const std::vector<std::pair<Point<spacedim>, double>> &openings,
+                const std::pair<Point<spacedim>, double> &bifurcation,
+                const double                              aspect_ratio = 0.5);
+
+  /**
    * \brief A center cell with stacks of cell protruding from each surface.
    *
    * Each of the square mesh cells is Cartesian and has size one in each

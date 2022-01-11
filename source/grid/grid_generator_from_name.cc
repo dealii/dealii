@@ -151,6 +151,13 @@ namespace GridGenerator
                                                            arguments,
                                                            tria);
 
+      else if (name == "pipe_junction")
+        parse_and_create<dim,
+                         dim,
+                         const std::vector<std::pair<Point<dim>, double>> &,
+                         const std::pair<Point<dim>, double> &,
+                         double>(pipe_junction, arguments, tria);
+
       else if (name == "hyper_L")
         parse_and_create<dim, dim, double, double, bool>(hyper_L,
                                                          arguments,
