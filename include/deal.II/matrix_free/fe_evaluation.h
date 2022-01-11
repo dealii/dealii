@@ -2980,7 +2980,7 @@ inline FEEvaluationBase<dim,
   Assert(this->data == nullptr, ExcInternalError());
   this->data =
     new internal::MatrixFreeFunctions::ShapeInfo<VectorizedArrayType>(
-      Quadrature<dim - is_face>(quadrature),
+      Quadrature<(is_face ? dim - 1 : dim)>(quadrature),
       fe,
       fe.component_to_base_index(first_selected_component).first);
 
@@ -7349,7 +7349,7 @@ FEEvaluation<dim,
   if ((integration_flag & EvaluationFlags::gradients) != 0u)
     Assert(this->gradients_quad_submitted == true,
            internal::ExcAccessToUninitializedField());
-  if (integration_flag & EvaluationFlags::hessians)
+  if ((integration_flag & EvaluationFlags::hessians) != 0u)
     Assert(this->hessians_quad_submitted == true,
            internal::ExcAccessToUninitializedField());
 #  endif
@@ -7368,7 +7368,7 @@ FEEvaluation<dim,
       (this->cell_type > internal::MatrixFreeFunctions::affine))
     {
       unsigned int size = n_components * dim * n_q_points;
-      if (integration_flag & EvaluationFlags::gradients)
+      if ((integration_flag & EvaluationFlags::gradients) != 0u)
         {
           for (unsigned int i = 0; i < size; ++i)
             this->gradients_quad[i] += this->gradients_from_hessians_quad[i];
@@ -7857,7 +7857,7 @@ FEFaceEvaluation<dim,
     this->values_quad_initialized = true;
   if ((evaluation_flag_actual & EvaluationFlags::gradients) != 0u)
     this->gradients_quad_initialized = true;
-  if (evaluation_flag_actual & EvaluationFlags::hessians)
+  if ((evaluation_flag_actual & EvaluationFlags::hessians) != 0u)
     this->hessians_quad_initialized = true;
 #  endif
 }
@@ -7966,7 +7966,7 @@ FEFaceEvaluation<dim,
       (this->cell_type > internal::MatrixFreeFunctions::affine))
     {
       unsigned int size = n_components * dim * n_q_points;
-      if (integration_flag & EvaluationFlags::gradients)
+      if ((integration_flag & EvaluationFlags::gradients) != 0u)
         {
           for (unsigned int i = 0; i < size; ++i)
             this->gradients_quad[i] += this->gradients_from_hessians_quad[i];

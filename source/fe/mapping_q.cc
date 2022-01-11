@@ -1332,7 +1332,7 @@ MappingQ<dim, spacedim>::fill_fe_immersed_surface_values(
   const UpdateFlags          update_flags = data.update_each;
   const std::vector<double> &weights      = quadrature.get_weights();
 
-  if (update_flags & (update_normal_vectors | update_JxW_values))
+  if ((update_flags & (update_normal_vectors | update_JxW_values)) != 0u)
     {
       AssertDimension(output_data.JxW_values.size(), n_q_points);
 
@@ -1364,7 +1364,7 @@ MappingQ<dim, spacedim>::fill_fe_immersed_surface_values(
 
           output_data.JxW_values[point] = weights[point] * det * normal.norm();
 
-          if (update_flags & update_normal_vectors)
+          if ((update_flags & update_normal_vectors) != 0u)
             {
               normal /= normal.norm();
               output_data.normal_vectors[point] = normal;
@@ -1373,7 +1373,7 @@ MappingQ<dim, spacedim>::fill_fe_immersed_surface_values(
     }
 
   // copy values from InternalData to vector given by reference
-  if (update_flags & update_jacobians)
+  if ((update_flags & update_jacobians) != 0u)
     {
       AssertDimension(output_data.jacobians.size(), n_q_points);
       for (unsigned int point = 0; point < n_q_points; ++point)
@@ -1381,7 +1381,7 @@ MappingQ<dim, spacedim>::fill_fe_immersed_surface_values(
     }
 
   // copy values from InternalData to vector given by reference
-  if (update_flags & update_inverse_jacobians)
+  if ((update_flags & update_inverse_jacobians) != 0u)
     {
       AssertDimension(output_data.inverse_jacobians.size(), n_q_points);
       for (unsigned int point = 0; point < n_q_points; ++point)
