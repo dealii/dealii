@@ -196,13 +196,13 @@ namespace Utilities
         // immediately with a return code that indicates whether
         // it has found a message from a given process with a given
         // tag
-        for (unsigned int i = 0; i < targets.size(); ++i)
+        for (const auto target : targets)
           {
             const int tag_deliver = Utilities::MPI::internal::Tags::
               consensus_algorithm_nbx_process_deliver;
 
             int        request_is_pending;
-            const auto ierr = MPI_Iprobe(targets[i],
+            const auto ierr = MPI_Iprobe(target,
                                          tag_deliver,
                                          this->comm,
                                          &request_is_pending,
@@ -379,7 +379,7 @@ namespace Utilities
         // requests have received answers, but we have not actually
         // gotten the data from MPI. Do so and unpack the data.
         {
-          for (unsigned int i = 0; i < targets.size(); ++i)
+          for (const auto target : targets)
             {
               const int tag_deliver = Utilities::MPI::internal::Tags::
                 consensus_algorithm_nbx_process_deliver;
@@ -392,7 +392,7 @@ namespace Utilities
               int        request_is_pending;
               MPI_Status status;
               {
-                const int ierr = MPI_Iprobe(targets[i],
+                const int ierr = MPI_Iprobe(target,
                                             tag_deliver,
                                             this->comm,
                                             &request_is_pending,
@@ -417,14 +417,14 @@ namespace Utilities
                 const int ierr = MPI_Recv(recv_buffer.data(),
                                           recv_buffer.size() * sizeof(T2),
                                           MPI_BYTE,
-                                          targets[i],
+                                          target,
                                           tag_deliver,
                                           this->comm,
                                           MPI_STATUS_IGNORE);
                 AssertThrowMPI(ierr);
               }
 
-              this->process.read_answer(targets[i], recv_buffer);
+              this->process.read_answer(target, recv_buffer);
             }
         }
 #endif
