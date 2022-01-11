@@ -145,6 +145,64 @@ namespace Utilities
 
 
       template <typename T1, typename T2>
+      void
+      NBX<T1, T2>::start_communication()
+      {
+#ifdef DEAL_II_WITH_MPI
+        // 1)
+        targets              = this->process.compute_targets();
+        const auto n_targets = targets.size();
+
+        const int tag_request = Utilities::MPI::internal::Tags::
+          consensus_algorithm_nbx_answer_request;
+        const int tag_deliver = Utilities::MPI::internal::Tags::
+          consensus_algorithm_nbx_process_deliver;
+
+        // 2) allocate memory
+        recv_buffers.resize(n_targets);
+        recv_requests.resize(n_targets);
+        send_requests.resize(n_targets);
+        send_buffers.resize(n_targets);
+
+        {
+          // 4) send and receive
+          for (unsigned int index = 0; index < n_targets; ++index)
+            {
+              const unsigned int rank = targets[index];
+
+              auto &send_buffer = send_buffers[index];
+              this->process.create_request(rank, send_buffer);
+
+              // Post a request to send data
+              auto ierr = MPI_Isend(send_buffer.data(),
+                                    send_buffer.size() * sizeof(T1),
+                                    MPI_BYTE,
+                                    rank,
+                                    tag_request,
+                                    this->comm,
+                                    &send_requests[index]);
+              AssertThrowMPI(ierr);
+
+              // Post a request to receive data from the same
+              // process we sent information to above:
+              auto &recv_buffer = recv_buffers[index];
+              this->process.prepare_buffer_for_answer(rank, recv_buffer);
+              ierr = MPI_Irecv(recv_buffer.data(),
+                               recv_buffer.size() * sizeof(T2),
+                               MPI_BYTE,
+                               rank,
+                               tag_deliver,
+                               this->comm,
+                               &recv_requests[index]);
+              AssertThrowMPI(ierr);
+            }
+        }
+#endif
+      }
+
+
+
+      template <typename T1, typename T2>
       bool
       NBX<T1, T2>::all_locally_originated_receives_are_completed()
       {
@@ -157,43 +215,6 @@ namespace Utilities
         AssertThrowMPI(ierr);
 
         return all_receive_requests_are_done != 0;
-#else
-        return true;
-#endif
-      }
-
-
-
-      template <typename T1, typename T2>
-      void
-      NBX<T1, T2>::signal_finish()
-      {
-#ifdef DEAL_II_WITH_MPI
-#  if DEAL_II_MPI_VERSION_GTE(3, 0)
-        const auto ierr = MPI_Ibarrier(this->comm, &barrier_request);
-        AssertThrowMPI(ierr);
-#  else
-        AssertThrow(
-          false,
-          ExcMessage(
-            "ConsensusAlgorithms::NBX uses MPI 3.0 features. You should compile with at least MPI 3.0."));
-#  endif
-#endif
-      }
-
-
-
-      template <typename T1, typename T2>
-      bool
-      NBX<T1, T2>::all_remotely_originated_receives_are_completed()
-      {
-#ifdef DEAL_II_WITH_MPI
-        int        all_ranks_reached_barrier;
-        const auto ierr = MPI_Test(&barrier_request,
-                                   &all_ranks_reached_barrier,
-                                   MPI_STATUSES_IGNORE);
-        AssertThrowMPI(ierr);
-        return all_ranks_reached_barrier != 0;
 #else
         return true;
 #endif
@@ -282,57 +303,36 @@ namespace Utilities
 
       template <typename T1, typename T2>
       void
-      NBX<T1, T2>::start_communication()
+      NBX<T1, T2>::signal_finish()
       {
 #ifdef DEAL_II_WITH_MPI
-        // 1)
-        targets              = this->process.compute_targets();
-        const auto n_targets = targets.size();
+#  if DEAL_II_MPI_VERSION_GTE(3, 0)
+        const auto ierr = MPI_Ibarrier(this->comm, &barrier_request);
+        AssertThrowMPI(ierr);
+#  else
+        AssertThrow(
+          false,
+          ExcMessage(
+            "ConsensusAlgorithms::NBX uses MPI 3.0 features. You should compile with at least MPI 3.0."));
+#  endif
+#endif
+      }
 
-        const int tag_request = Utilities::MPI::internal::Tags::
-          consensus_algorithm_nbx_answer_request;
-        const int tag_deliver = Utilities::MPI::internal::Tags::
-          consensus_algorithm_nbx_process_deliver;
 
-        // 2) allocate memory
-        recv_buffers.resize(n_targets);
-        recv_requests.resize(n_targets);
-        send_requests.resize(n_targets);
-        send_buffers.resize(n_targets);
 
-        {
-          // 4) send and receive
-          for (unsigned int index = 0; index < n_targets; ++index)
-            {
-              const unsigned int rank = targets[index];
-
-              auto &send_buffer = send_buffers[index];
-              this->process.create_request(rank, send_buffer);
-
-              // Post a request to send data
-              auto ierr = MPI_Isend(send_buffer.data(),
-                                    send_buffer.size() * sizeof(T1),
-                                    MPI_BYTE,
-                                    rank,
-                                    tag_request,
-                                    this->comm,
-                                    &send_requests[index]);
-              AssertThrowMPI(ierr);
-
-              // Post a request to receive data from the same
-              // process we sent information to above:
-              auto &recv_buffer = recv_buffers[index];
-              this->process.prepare_buffer_for_answer(rank, recv_buffer);
-              ierr = MPI_Irecv(recv_buffer.data(),
-                               recv_buffer.size() * sizeof(T2),
-                               MPI_BYTE,
-                               rank,
-                               tag_deliver,
-                               this->comm,
-                               &recv_requests[index]);
-              AssertThrowMPI(ierr);
-            }
-        }
+      template <typename T1, typename T2>
+      bool
+      NBX<T1, T2>::all_remotely_originated_receives_are_completed()
+      {
+#ifdef DEAL_II_WITH_MPI
+        int        all_ranks_reached_barrier;
+        const auto ierr = MPI_Test(&barrier_request,
+                                   &all_ranks_reached_barrier,
+                                   MPI_STATUSES_IGNORE);
+        AssertThrowMPI(ierr);
+        return all_ranks_reached_barrier != 0;
+#else
+        return true;
 #endif
       }
 
