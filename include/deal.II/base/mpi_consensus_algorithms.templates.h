@@ -253,7 +253,7 @@ namespace Utilities
                             other_rank,
                             tag_request,
                             this->comm,
-                            &status);
+                            MPI_STATUS_IGNORE);
             AssertThrowMPI(ierr);
 
             // Allocate memory for an answer message to the current request,
