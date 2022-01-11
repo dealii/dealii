@@ -101,7 +101,7 @@ namespace internal
   {
     static void
     apply(const unsigned int                          n_components,
-          const FEEvaluationData<dim, Number, false> &fe_fe_eval,
+          const FEEvaluationData<dim, Number, false> &fe_eval,
           const Number *                              in_array,
           Number *                                    out_array);
 
@@ -116,7 +116,7 @@ namespace internal
     static void
     transform_from_q_points_to_basis(
       const unsigned int                          n_components,
-      const FEEvaluationData<dim, Number, false> &fe_fe_eval,
+      const FEEvaluationData<dim, Number, false> &fe_eval,
       const Number *                              in_array,
       Number *                                    out_array);
   };
