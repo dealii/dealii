@@ -24,11 +24,6 @@
 
 #include "../data_out/patches.h"
 
-double cell_coordinates[3][8] = {{0, 1, 0, 1, 0, 1, 0, 1},
-                                 {0, 0, 1, 1, 0, 0, 1, 1},
-                                 {0, 0, 0, 0, 1, 1, 1, 1}};
-
-
 template <int dim, int spacedim>
 void
 check()
