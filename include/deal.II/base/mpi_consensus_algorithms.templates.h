@@ -193,12 +193,8 @@ namespace Utilities
 
         const int tag_request = Utilities::MPI::internal::Tags::
           consensus_algorithm_nbx_answer_request;
-        const int tag_deliver = Utilities::MPI::internal::Tags::
-          consensus_algorithm_nbx_process_deliver;
 
         // 2) allocate memory
-        recv_buffers.resize(n_targets);
-        recv_requests.resize(n_targets);
         send_requests.resize(n_targets);
         send_buffers.resize(n_targets);
 
@@ -222,19 +218,6 @@ namespace Utilities
                                     this->comm,
                                     &send_requests[index]);
               AssertThrowMPI(ierr);
-
-              // Post a request to receive data from the same
-              // process we sent information to above:
-              auto &recv_buffer = recv_buffers[index];
-              this->process.prepare_buffer_for_answer(rank, recv_buffer);
-              ierr = MPI_Irecv(recv_buffer.data(),
-                               recv_buffer.size() * sizeof(T2),
-                               MPI_BYTE,
-                               rank,
-                               tag_deliver,
-                               this->comm,
-                               &recv_requests[index]);
-              AssertThrowMPI(ierr);
             }
         }
 #endif
@@ -247,14 +230,36 @@ namespace Utilities
       NBX<T1, T2>::all_locally_originated_receives_are_completed()
       {
 #ifdef DEAL_II_WITH_MPI
-        int        all_receive_requests_are_done;
-        const auto ierr = MPI_Testall(recv_requests.size(),
-                                      recv_requests.data(),
-                                      &all_receive_requests_are_done,
-                                      MPI_STATUSES_IGNORE);
-        AssertThrowMPI(ierr);
+        // We know that all requests have come in when we have pending
+        // messages from all targets with the right tag. We can check
+        // for pending messages with MPI_IProbe, which returns
+        // immediately with a return code that indicates whether
+        // it has found a message from a given process with a given
+        // tag
+        for (const unsigned int target : targets)
+          {
+            const int tag_deliver = Utilities::MPI::internal::Tags::
+              consensus_algorithm_nbx_process_deliver;
 
-        return all_receive_requests_are_done != 0;
+            int        request_is_pending;
+            const auto ierr = MPI_Iprobe(target,
+                                         tag_deliver,
+                                         this->comm,
+                                         &request_is_pending,
+                                         MPI_STATUS_IGNORE);
+            AssertThrowMPI(ierr);
+
+            // If there is no pending message from that process,
+            // then we are clearly not done receiving everything
+            // yet -- so return false:
+            if (request_is_pending == 0)
+              return false;
+          }
+
+        // If we have made it here, then we have received an answer
+        // from everyone and can return true:
+        return true;
+
 #else
         return true;
 #endif
@@ -393,15 +398,6 @@ namespace Utilities
               AssertThrowMPI(ierr);
             }
 
-          if (recv_requests.size() > 0)
-            {
-              const int ierr = MPI_Waitall(recv_requests.size(),
-                                           recv_requests.data(),
-                                           MPI_STATUSES_IGNORE);
-              AssertThrowMPI(ierr);
-            }
-
-
           int ierr = MPI_Wait(&barrier_request, MPI_STATUS_IGNORE);
           AssertThrowMPI(ierr);
 
@@ -419,10 +415,48 @@ namespace Utilities
 #  endif
         }
 
-        // unpack data
+        // We know from the various calls to MPI_Iprobe that all of our
+        // requests have received answers, but we have not actually
+        // gotten the data from MPI. Do so and unpack the data.
         {
-          for (unsigned int i = 0; i < targets.size(); ++i)
-            this->process.read_answer(targets[i], recv_buffers[i]);
+          for (const unsigned int target : targets)
+            {
+              const int tag_deliver = Utilities::MPI::internal::Tags::
+                consensus_algorithm_nbx_process_deliver;
+
+#  ifdef DEBUG
+              // Just to be sure, double check that the message really
+              // is already here -- in other words, that the following
+              // MPI_Recv is going to return immediately
+              {
+                int        request_is_pending;
+                const auto ierr = MPI_Iprobe(target,
+                                             tag_deliver,
+                                             this->comm,
+                                             &request_is_pending,
+                                             MPI_STATUS_IGNORE);
+                AssertThrowMPI(ierr);
+
+                (void)request_is_pending;
+                Assert(request_is_pending, ExcInternalError());
+              }
+#  endif
+
+              // OK, so yes, a message is here. Receive it.
+              std::vector<T2> recv_buffer;
+              this->process.prepare_buffer_for_answer(target, recv_buffer);
+
+              const int ierr = MPI_Recv(recv_buffer.data(),
+                                        recv_buffer.size() * sizeof(T2),
+                                        MPI_BYTE,
+                                        target,
+                                        tag_deliver,
+                                        this->comm,
+                                        MPI_STATUS_IGNORE);
+              AssertThrowMPI(ierr);
+
+              this->process.read_answer(target, recv_buffer);
+            }
         }
 #endif
       }
