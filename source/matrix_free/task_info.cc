@@ -51,9 +51,6 @@
 //
 // Matthias Maier, Martin Kronbichler, 2021
 //
-#ifdef DEAL_II_TBB_WITH_ONEAPI
-#  undef DEAL_II_WITH_TBB
-#endif
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -64,7 +61,7 @@ namespace internal
 {
   namespace MatrixFreeFunctions
   {
-#ifdef DEAL_II_WITH_TBB
+#if defined(DEAL_II_WITH_TBB) && !defined(DEAL_II_TBB_WITH_ONEAPI)
 
     // This defines the TBB data structures that are needed to schedule the
     // partition-partition variant
@@ -362,7 +359,7 @@ namespace internal
 
       funct.vector_update_ghosts_start();
 
-#ifdef DEAL_II_WITH_TBB
+#if defined(DEAL_II_WITH_TBB) && !defined(DEAL_II_TBB_WITH_ONEAPI)
 
       if (scheme != none)
         {
