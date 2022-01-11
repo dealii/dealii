@@ -68,9 +68,6 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 //
 // Matthias Maier, Martin Kronbichler, 2021
 //
-#ifdef DEAL_II_TBB_WITH_ONEAPI
-#  undef DEAL_II_WITH_TBB
-#endif
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -460,7 +457,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
 
         // initialize the basic multithreading information that needs to be
         // passed to the DoFInfo structure
-#ifdef DEAL_II_WITH_TBB
+#if defined(DEAL_II_WITH_TBB) && !defined(DEAL_II_TBB_WITH_ONEAPI)
       if (additional_data.tasks_parallel_scheme != AdditionalData::none &&
           MultithreadInfo::n_threads() > 1)
         {
@@ -922,7 +919,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_dof_handlers(
 
 namespace internal
 {
-#ifdef DEAL_II_WITH_TBB
+#if defined(DEAL_II_WITH_TBB) && !defined(DEAL_II_TBB_WITH_ONEAPI)
 
 #  ifdef DEAL_II_TBB_WITH_ONEAPI
   struct unsigned_int_pair_hash
@@ -1595,7 +1592,7 @@ namespace internal
         connectivity.reinit(task_info.n_active_cells, task_info.n_active_cells);
         if (do_face_integrals)
           {
-#ifdef DEAL_II_WITH_TBB
+#if defined(DEAL_II_WITH_TBB) && !defined(DEAL_II_TBB_WITH_ONEAPI)
             // step 1: build map between the index in the matrix-free context
             // and the one in the triangulation
             tbb::concurrent_unordered_map<std::pair<unsigned int, unsigned int>,
@@ -2286,9 +2283,5 @@ MatrixFree<dim, Number, VectorizedArrayType>::print(std::ostream &out) const
 
 
 DEAL_II_NAMESPACE_CLOSE
-
-#ifdef DEAL_II_TBB_WITH_ONEAPI
-#  define DEAL_II_WITH_TBB
-#endif
 
 #endif
