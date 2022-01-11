@@ -1079,9 +1079,13 @@ namespace GridGenerator
    *       <tr><td>
    *           <td>Point
    *           <td>Radius
-   *       <tr><td>Openings
-   *           <td>$(2,0,0)$<br>$(0,2,0)$<br>$(0,0,2)$
-   *           <td>$1$<br>$1$<br>$1$
+   *       <tr><td rowspan="3">Openings
+   *           <td>$(2,0,0)$
+   *           <td>$1$
+   *       <tr><td>$(0,2,0)$
+   *           <td>$1$
+   *       <tr><td>$(0,0,2)$
+   *           <td>$1$
    *       <tr><td>Bifurcation
    *           <td>$(0,0,0)$
    *           <td>$1$
@@ -1097,9 +1101,13 @@ namespace GridGenerator
    *       <tr><td>
    *           <td>Point
    *           <td>Radius
-   *       <tr><td>Openings
-   *           <td>$(-2,0,0)$<br>$(0,2,0)$<br>$(2,0,0)$
-   *           <td>$1$<br>$1$<br>$1$
+   *       <tr><td rowspan="3">Openings
+   *           <td>$(-2,0,0)$
+   *           <td>$1$
+   *       <tr><td>$(0,2,0)$
+   *           <td>$1$
+   *       <tr><td>$(2,0,0)$
+   *           <td>$1$
    *       <tr><td>Bifurcation
    *           <td>$(0,0,0)$
    *           <td>$1$
@@ -1115,9 +1123,13 @@ namespace GridGenerator
    *       <tr><td>
    *           <td>Point
    *           <td>Radius
-   *       <tr><td>Openings
-   *           <td>$(-2,0,0)$<br>$(1,\sqrt{3},1)$<br>$(1,-\sqrt{3},1)$
-   *           <td>$1$<br>$1$<br>$1$
+   *       <tr><td rowspan="3">Openings
+   *           <td>$(-2,0,0)$
+   *           <td>$1$
+   *       <tr><td>$(1,\sqrt{3},1)$
+   *           <td>$1$
+   *       <tr><td>$(1,-\sqrt{3},1)$
+   *           <td>$1$
    *       <tr><td>Bifurcation
    *           <td>$(0,0,0)$
    *           <td>$1$
