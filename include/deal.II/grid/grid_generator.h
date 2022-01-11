@@ -1051,7 +1051,16 @@ namespace GridGenerator
    * boundary ID 3.
    *
    * <em>Manifold IDs</em> will be set on the mantles of each truncated cone in
-   * the same way. Currently, no manifold objects will be attached.
+   * the same way. Each cone will have a special manifold object assigned, which
+   * is based on the CylindricalManifold class. Further, all cells adjacent to
+   * the mantle are given the manifold ID 3. If desired, you can assign an
+   * (expensive) TransfiniteInterpolationManifold object to that particular
+   * layer of cells with the following code snippet.
+   * @code
+   * TransfiniteInterpolationManifold<3> transfinite;
+   * transfinite.initialize(triangulation);
+   * triangulation.set_manifold(3, transfinite);
+   * @endcode
    *
    * @pre The triangulation passed as argument needs to be empty when calling
    * this function.
