@@ -424,36 +424,45 @@ namespace Utilities
               const int tag_deliver = Utilities::MPI::internal::Tags::
                 consensus_algorithm_nbx_process_deliver;
 
-#  ifdef DEBUG
               // Just to be sure, double check that the message really
               // is already here -- in other words, that the following
-              // MPI_Recv is going to return immediately
+              // MPI_Recv is going to return immediately. But as part of
+              // this, we also use the status object to query the size
+              // of the message so that we can resize the receive buffer.
+              int        request_is_pending;
+              MPI_Status status;
               {
-                int        request_is_pending;
-                const auto ierr = MPI_Iprobe(target,
-                                             tag_deliver,
-                                             this->comm,
-                                             &request_is_pending,
-                                             MPI_STATUS_IGNORE);
+                const int ierr = MPI_Iprobe(target,
+                                            tag_deliver,
+                                            this->comm,
+                                            &request_is_pending,
+                                            &status);
                 AssertThrowMPI(ierr);
-
-                (void)request_is_pending;
-                Assert(request_is_pending, ExcInternalError());
               }
-#  endif
+
+              (void)request_is_pending;
+              Assert(request_is_pending, ExcInternalError());
 
               // OK, so yes, a message is here. Receive it.
-              std::vector<T2> recv_buffer;
-              this->process.prepare_buffer_for_answer(target, recv_buffer);
+              int message_size;
+              {
+                const int ierr =
+                  MPI_Get_count(&status, MPI_BYTE, &message_size);
+                AssertThrowMPI(ierr);
+              }
+              Assert(message_size % sizeof(T2) == 0, ExcInternalError());
+              std::vector<T2> recv_buffer(message_size / sizeof(T2));
 
-              const int ierr = MPI_Recv(recv_buffer.data(),
-                                        recv_buffer.size() * sizeof(T2),
-                                        MPI_BYTE,
-                                        target,
-                                        tag_deliver,
-                                        this->comm,
-                                        MPI_STATUS_IGNORE);
-              AssertThrowMPI(ierr);
+              {
+                const int ierr = MPI_Recv(recv_buffer.data(),
+                                          recv_buffer.size() * sizeof(T2),
+                                          MPI_BYTE,
+                                          target,
+                                          tag_deliver,
+                                          this->comm,
+                                          MPI_STATUS_IGNORE);
+                AssertThrowMPI(ierr);
+              }
 
               this->process.read_answer(target, recv_buffer);
             }
