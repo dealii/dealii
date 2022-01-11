@@ -88,6 +88,9 @@ namespace GridGenerator
 
 
 
+  // hide the template specialization from doxygen
+#ifndef DOXYGEN
+
   template <>
   void
   pipe_junction(Triangulation<3, 3> &                           tria,
@@ -102,7 +105,7 @@ namespace GridGenerator
     constexpr unsigned int n_pipes   = 3;
     constexpr double       tolerance = 1.e-12;
 
-#ifdef DEBUG
+#  ifdef DEBUG
     // Verify user input.
     Assert(bifurcation.second > 0,
            ExcMessage("Invalid input: negative radius."));
@@ -110,7 +113,7 @@ namespace GridGenerator
            ExcMessage("Invalid input: only 3 openings allowed."));
     for (const auto &opening : openings)
       Assert(opening.second > 0, ExcMessage("Invalid input: negative radius."));
-#endif
+#  endif
 
     // Each pipe segment will be identified by the index of its opening in the
     // parameter array. To determine the next and previous entry in the array
@@ -428,6 +431,9 @@ namespace GridGenerator
               face->set_boundary_id(n_pipes);
           }
   }
+
+#endif
+
 } // namespace GridGenerator
 
 
