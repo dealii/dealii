@@ -36,6 +36,22 @@
 #include <iostream>
 #include <set>
 
+//
+// TBB with oneAPI API has deprecated and removed the
+// <code>tbb::tasks</code> backend. With this it is no longer possible to
+// compile the following code that builds a directed acyclic graph (DAG) of
+// (thread parallel) tasks without a major porting effort. It turned out
+// that such a dynamic handling of dependencies and structures is not as
+// competitive as initially assumed. Consequently, this part of the matrix
+// free infrastructure has seen less attention than the rest over the last
+// years and is (presumably) not used that often.
+//
+// In case of detected oneAPI backend we simply disable threading in the
+// matrix free backend for now.
+//
+// Matthias Maier, Martin Kronbichler, 2021
+//
+
 DEAL_II_NAMESPACE_OPEN
 
 
@@ -45,7 +61,7 @@ namespace internal
 {
   namespace MatrixFreeFunctions
   {
-#ifdef DEAL_II_WITH_TBB
+#if defined(DEAL_II_WITH_TBB) && !defined(DEAL_II_TBB_WITH_ONEAPI)
 
     // This defines the TBB data structures that are needed to schedule the
     // partition-partition variant
@@ -343,7 +359,7 @@ namespace internal
 
       funct.vector_update_ghosts_start();
 
-#ifdef DEAL_II_WITH_TBB
+#if defined(DEAL_II_WITH_TBB) && !defined(DEAL_II_TBB_WITH_ONEAPI)
 
       if (scheme != none)
         {
