@@ -1126,9 +1126,9 @@ namespace GridGenerator
    *       <tr><td rowspan="3">Openings
    *           <td>$(-2,0,0)$
    *           <td>$1$
-   *       <tr><td>$(1,\sqrt{3},1)$
+   *       <tr><td>$(1,\sqrt{3},0)$
    *           <td>$1$
-   *       <tr><td>$(1,-\sqrt{3},1)$
+   *       <tr><td>$(1,-\sqrt{3},0)$
    *           <td>$1$
    *       <tr><td>Bifurcation
    *           <td>$(0,0,0)$
