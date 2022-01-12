@@ -165,20 +165,20 @@ FE_NedelecSZ<dim, spacedim>::get_data(
                                 vertices_per_cell, std::vector<double>(dim)));
 
   // Resize shape function arrays according to update flags:
-  if ((flags & update_values) != 0u)
+  if (contains(flags, update_values))
     {
       data.shape_values.resize(this->n_dofs_per_cell(),
                                std::vector<Tensor<1, dim>>(n_q_points));
     }
 
-  if ((flags & update_gradients) != 0u)
+  if (contains(flags, update_gradients))
     {
       data.shape_grads.resize(this->n_dofs_per_cell(),
                               std::vector<DerivativeForm<1, dim, dim>>(
                                 n_q_points));
     }
   // Not implementing second derivatives yet:
-  if ((flags & update_hessians) != 0u)
+  if (contains(flags, update_hessians))
     {
       Assert(false, ExcNotImplemented());
     }
@@ -446,7 +446,7 @@ FE_NedelecSZ<dim, spacedim>::get_data(
                         cell_points[q][1], polyy[i]);
                     }
                   // Now use these to compute the shape functions:
-                  if ((flags & update_values) != 0u)
+                  if (contains(flags, update_values))
                     {
                       for (unsigned int j = 0; j < degree; ++j)
                         {
@@ -483,7 +483,7 @@ FE_NedelecSZ<dim, spacedim>::get_data(
                           data.shape_values[dof_index3_2][q][1] = polyx[j][0];
                         }
                     }
-                  if ((flags & update_gradients) != 0u)
+                  if (contains(flags, update_gradients))
                     {
                       for (unsigned int j = 0; j < degree; ++j)
                         {
@@ -882,7 +882,7 @@ FE_NedelecSZ<dim, spacedim>::get_data(
                             cell_points[q][2], polyz[i]);
                         }
                       // Now use these to compute the shape functions:
-                      if ((flags & update_values) != 0u)
+                      if (contains(flags, update_values))
                         {
                           for (unsigned int k = 0; k < degree; ++k)
                             {
@@ -965,7 +965,7 @@ FE_NedelecSZ<dim, spacedim>::get_data(
                                 }
                             }
                         }
-                      if ((flags & update_gradients) != 0u)
+                      if (contains(flags, update_gradients))
                         {
                           for (unsigned int k = 0; k < degree; ++k)
                             {
@@ -1267,7 +1267,7 @@ FE_NedelecSZ<dim, spacedim>::fill_edge_values(
                           IntegratedLegendrePolynomials[i + 1].value(
                             edge_sigma_values[m][q], poly[i - 1]);
                         }
-                      if ((flags & update_values) != 0u)
+                      if (contains(flags, update_values))
                         {
                           // Lowest order edge shape functions:
                           for (unsigned int d = 0; d < dim; ++d)
@@ -1292,7 +1292,7 @@ FE_NedelecSZ<dim, spacedim>::fill_edge_values(
                                 }
                             }
                         }
-                      if ((flags & update_gradients) != 0u)
+                      if (contains(flags, update_gradients))
                         {
                           // Lowest order edge shape functions:
                           for (unsigned int d1 = 0; d1 < dim; ++d1)
@@ -1454,7 +1454,7 @@ FE_NedelecSZ<dim, spacedim>::fill_edge_values(
                                 edge_sigma_values[m][q], poly[i]);
                             }
                         }
-                      if ((flags & update_values) != 0u)
+                      if (contains(flags, update_values))
                         {
                           // Lowest order shape functions:
                           for (unsigned int d = 0; d < dim; ++d)
@@ -1478,7 +1478,7 @@ FE_NedelecSZ<dim, spacedim>::fill_edge_values(
                                 }
                             }
                         }
-                      if ((flags & update_gradients) != 0u)
+                      if (contains(flags, update_gradients))
                         {
                           // Lowest order shape functions:
                           for (unsigned int d1 = 0; d1 < dim; ++d1)
@@ -1753,7 +1753,7 @@ FE_NedelecSZ<dim, spacedim>::fill_face_values(
                         face_eta_values[m][q], polyeta[i]);
                     }
                   // Now use these to compute the shape functions:
-                  if ((flags & update_values) != 0u)
+                  if (contains(flags, update_values))
                     {
                       for (unsigned int j = 0; j < degree; ++j)
                         {
@@ -1805,7 +1805,7 @@ FE_NedelecSZ<dim, spacedim>::fill_face_values(
                             }
                         }
                     }
-                  if ((flags & update_gradients) != 0u)
+                  if (contains(flags, update_gradients))
                     {
                       for (unsigned int j = 0; j < degree; ++j)
                         {
@@ -1902,7 +1902,7 @@ FE_NedelecSZ<dim, spacedim>::fill_face_values(
                 }
             }
         }
-      if ((flags & update_hessians) != 0u)
+      if (contains(flags, update_hessians))
         {
           Assert(false, ExcNotImplemented());
         }
@@ -1950,7 +1950,7 @@ FE_NedelecSZ<dim, spacedim>::fill_fe_values(
            fe_data.shape_values[0].size() == n_q_points,
          ExcDimensionMismatch(fe_data.shape_values[0].size(), n_q_points));
 
-  if ((flags & update_values) != 0u)
+  if (contains(flags, update_values))
     {
       // Now have all shape_values stored on the reference cell.
       // Must now transform to the physical cell.
@@ -1976,7 +1976,7 @@ FE_NedelecSZ<dim, spacedim>::fill_fe_values(
             }
         }
     }
-  if ((flags & update_gradients) != 0u)
+  if (contains(flags, update_gradients))
     {
       // Now have all shape_grads stored on the reference cell.
       // Must now transform to the physical cell.
@@ -2083,7 +2083,7 @@ FE_NedelecSZ<dim, spacedim>::fill_fe_face_values(
                                              cell->face_rotation(face_no),
                                              n_q_points);
 
-  if ((flags & update_values) != 0u)
+  if (contains(flags, update_values))
     {
       // Now have all shape_values stored on the reference cell.
       // Must now transform to the physical cell.
@@ -2112,7 +2112,7 @@ FE_NedelecSZ<dim, spacedim>::fill_fe_face_values(
             }
         }
     }
-  if ((flags & update_gradients) != 0u)
+  if (contains(flags, update_gradients))
     {
       // Now have all shape_grads stored on the reference cell.
       // Must now transform to the physical cell.
@@ -2188,15 +2188,15 @@ FE_NedelecSZ<dim, spacedim>::requires_update_flags(
 {
   UpdateFlags out = update_default;
 
-  if ((flags & update_values) != 0u)
+  if (contains(flags, update_values))
     out |= update_values | update_covariant_transformation;
 
-  if ((flags & update_gradients) != 0u)
+  if (contains(flags, update_gradients))
     out |= update_gradients | update_values |
            update_jacobian_pushed_forward_grads |
            update_covariant_transformation;
 
-  if ((flags & update_hessians) != 0u)
+  if (contains(flags, update_hessians))
     //     Assert (false, ExcNotImplemented());
     out |= update_hessians | update_values | update_gradients |
            update_jacobian_pushed_forward_grads |
