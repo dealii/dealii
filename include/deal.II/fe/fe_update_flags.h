@@ -296,8 +296,9 @@ operator<<(StreamType &s, const UpdateFlags u)
 inline UpdateFlags
 operator|(const UpdateFlags f1, const UpdateFlags f2)
 {
-  return static_cast<UpdateFlags>(static_cast<unsigned int>(f1) |
-                                  static_cast<unsigned int>(f2));
+  using enum_type = std::underlying_type_t<UpdateFlags>;
+  return static_cast<UpdateFlags>(static_cast<enum_type>(f1) |
+                                  static_cast<enum_type>(f2));
 }
 
 
@@ -326,10 +327,17 @@ operator|=(UpdateFlags &f1, const UpdateFlags f2)
  * @ref UpdateFlags
  */
 inline UpdateFlags
-operator&(const UpdateFlags f1, const UpdateFlags f2)
+operator&(const UpdateFlags f1, const UpdateFlags f2) = delete;
+/*{
+  using enum_type = std::underlying_type_t<UpdateFlags>;
+  return static_cast<UpdateFlags>(static_cast<enum_type>(f1) &
+                                  static_cast<enum_type>(f2));
+}*/
+
+bool contains(const UpdateFlags flags, const UpdateFlags mask)
 {
-  return static_cast<UpdateFlags>(static_cast<unsigned int>(f1) &
-                                  static_cast<unsigned int>(f2));
+  using enum_type = std::underlying_type_t<UpdateFlags>;
+  return (static_cast<enum_type>(flags) & static_cast<enum_type>(mask)) !=0;
 }
 
 
@@ -340,11 +348,11 @@ operator&(const UpdateFlags f1, const UpdateFlags f2)
  * @ref UpdateFlags
  */
 inline UpdateFlags &
-operator&=(UpdateFlags &f1, const UpdateFlags f2)
-{
+operator&=(UpdateFlags &f1, const UpdateFlags f2) = delete;
+/*{
   f1 = f1 & f2;
   return f1;
-}
+}*/
 
 
 
