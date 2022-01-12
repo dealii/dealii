@@ -330,6 +330,11 @@ namespace Utilities
          */
         std::vector<std::unique_ptr<MPI_Request>> request_requests;
 
+        /**
+         * The ranks of processes from which we are still expecting answers.
+         */
+        std::set<unsigned int> outstanding_answers;
+
         // request for barrier
         MPI_Request barrier_request;
 #endif

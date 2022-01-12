@@ -197,6 +197,7 @@ namespace Utilities
         // 2) allocate memory
         send_requests.resize(n_targets);
         send_buffers.resize(n_targets);
+        outstanding_answers.clear();
 
         {
           // 4) send and receive
@@ -218,6 +219,8 @@ namespace Utilities
                                     this->comm,
                                     &send_requests[index]);
               AssertThrowMPI(ierr);
+
+              outstanding_answers.insert(rank);
             }
         }
 #endif
@@ -236,7 +239,8 @@ namespace Utilities
         // immediately with a return code that indicates whether
         // it has found a message from a given process with a given
         // tag
-        for (const unsigned int target : targets)
+        std::set<unsigned int> received_answers;
+        for (const unsigned int target : outstanding_answers)
           {
             const int tag_deliver = Utilities::MPI::internal::Tags::
               consensus_algorithm_nbx_process_deliver;
@@ -251,13 +255,43 @@ namespace Utilities
 
             // If there is no pending message from that process,
             // then we are clearly not done receiving everything
-            // yet -- so return false:
+            // yet -- so return false.
+            //
+            // Before doing so, remove the ranks for which we have
+            // (in previous loop iterations) found answers from the
+            // list of outstanding answers.
+            //
+            // Note that it is possible that we have indeed received
+            // more messages, just from ranks that we would consider
+            // *after* the current one. We could keep checking for
+            // those as well, but we don't need to: We will eventually
+            // get to those once the message from the rank we are
+            // currently processing has arrived, at which point we
+            // will run the current loop beyong the current 'target'
+            // rank.
             if (request_is_pending == 0)
-              return false;
+              {
+                for (const unsigned int r : received_answers)
+                  outstanding_answers.erase(r);
+                return false;
+              }
+            else
+              {
+                // We can record that we have received an answer
+                // from this process. We would like to just remove this
+                // rank from 'outstanding_answers' then, but that would
+                // break the loop we are currently in, so just keep
+                // track of that and remove these ranks after we are
+                // done with the loop (either by completing the loop
+                // or via the 'if' above).
+                received_answers.insert(target);
+              }
           }
 
         // If we have made it here, then we have received an answer
         // from everyone and can return true:
+        Assert(received_answers == outstanding_answers, ExcInternalError());
+        outstanding_answers.clear();
         return true;
 
 #else
