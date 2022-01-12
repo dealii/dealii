@@ -28,7 +28,11 @@
 #  include <deal.II/base/thread_management.h>
 
 #  ifdef DEAL_II_WITH_TBB
-#    include <tbb/pipeline.h>
+#    ifdef DEAL_II_TBB_WITH_ONEAPI
+#      include <tbb/parallel_pipeline.h>
+#    else
+#      include <tbb/pipeline.h>
+#    endif
 #  endif
 
 #  include <functional>
@@ -182,7 +186,7 @@ namespace WorkStream
        * A class that creates a sequence of items from a range of iterators.
        */
       template <typename Iterator, typename ScratchData, typename CopyData>
-      class IteratorRangeToItemStream : public tbb::filter
+      class IteratorRangeToItemStream
       {
       public:
         /**
@@ -234,23 +238,23 @@ namespace WorkStream
 
           /**
            * A list of iterators that need to be worked on. Only the first
-           * n_items are relevant.
+           * n_iterators are relevant.
            */
-          std::vector<Iterator> work_items;
+          std::vector<Iterator> iterators;
 
           /**
            * The CopyData objects that the Worker part of the pipeline fills
-           * for each work item. Again, only the first n_items elements are
+           * for each work item. Again, only the first n_iterators elements are
            * what we care about.
            */
           std::vector<CopyData> copy_datas;
 
           /**
-           * Number of items identified by the work_items array that the
+           * Number of items identified by the iterators array that the
            * Worker and Copier pipeline stage need to work on. The maximum
            * value of this variable will be chunk_size.
            */
-          unsigned int n_items;
+          unsigned int n_iterators;
 
           /**
            * Pointer to a thread local variable identifying the scratch data
@@ -303,7 +307,7 @@ namespace WorkStream
            * default constructor itself.
            */
           ItemType()
-            : n_items(0)
+            : n_iterators(0)
             , scratch_data(nullptr)
             , sample_scratch_data(nullptr)
             , currently_in_use(false)
@@ -322,25 +326,22 @@ namespace WorkStream
                                   const unsigned int chunk_size,
                                   const ScratchData &sample_scratch_data,
                                   const CopyData &   sample_copy_data)
-          : tbb::filter(/*is_serial=*/true)
-          , remaining_iterator_range(begin, end)
+          : remaining_iterator_range(begin, end)
           , item_buffer(buffer_size)
           , sample_scratch_data(sample_scratch_data)
           , chunk_size(chunk_size)
         {
           // initialize the elements of the ring buffer
-          for (unsigned int element = 0; element < item_buffer.size();
-               ++element)
+          for (auto &item : item_buffer)
             {
-              Assert(item_buffer[element].n_items == 0, ExcInternalError());
+              Assert(item.n_iterators == 0, ExcInternalError());
 
-              item_buffer[element].work_items.resize(
-                chunk_size, remaining_iterator_range.second);
-              item_buffer[element].scratch_data        = &thread_local_scratch;
-              item_buffer[element].sample_scratch_data = &sample_scratch_data;
-              item_buffer[element].copy_datas.resize(chunk_size,
-                                                     sample_copy_data);
-              item_buffer[element].currently_in_use = false;
+              item.iterators.resize(chunk_size,
+                                    remaining_iterator_range.second);
+              item.scratch_data        = &thread_local_scratch;
+              item.sample_scratch_data = &sample_scratch_data;
+              item.copy_datas.resize(chunk_size, sample_copy_data);
+              item.currently_in_use = false;
             }
         }
 
@@ -348,8 +349,8 @@ namespace WorkStream
         /**
          * Create an item and return a pointer to it.
          */
-        virtual void *
-        operator()(void *) override
+        ItemType *
+        get_item()
         {
           // find first unused item. we know that there must be one
           // because we have set the maximal number of tokens in flight
@@ -379,19 +380,19 @@ namespace WorkStream
           // initialize the next item. it may
           // consist of at most chunk_size
           // elements
-          current_item->n_items = 0;
+          current_item->n_iterators = 0;
           while ((remaining_iterator_range.first !=
                   remaining_iterator_range.second) &&
-                 (current_item->n_items < chunk_size))
+                 (current_item->n_iterators < chunk_size))
             {
-              current_item->work_items[current_item->n_items] =
+              current_item->iterators[current_item->n_iterators] =
                 remaining_iterator_range.first;
 
               ++remaining_iterator_range.first;
-              ++current_item->n_items;
+              ++current_item->n_iterators;
             }
 
-          if (current_item->n_items == 0)
+          if (current_item->n_iterators == 0)
             // there were no items
             // left. terminate the pipeline
             return nullptr;
@@ -462,226 +463,6 @@ namespace WorkStream
 
 
 
-      /**
-       * A class that manages calling the worker function on a number of
-       * parallel threads. Note that it is, in the TBB notation, a filter that
-       * can run in parallel.
-       */
-      template <typename Iterator, typename ScratchData, typename CopyData>
-      class TBBWorker : public tbb::filter
-      {
-      public:
-        /**
-         * Constructor. Takes a reference to the object on which we will
-         * operate as well as a pointer to the function that will do the
-         * assembly.
-         */
-        TBBWorker(
-          const std::function<void(const Iterator &, ScratchData &, CopyData &)>
-            &  worker,
-          bool copier_exist = true)
-          : tbb::filter(/* is_serial= */ false)
-          , worker(worker)
-          , copier_exist(copier_exist)
-        {}
-
-
-        /**
-         * Work on an item.
-         */
-        void *
-        operator()(void *item) override
-        {
-          // first unpack the current item
-          using ItemType =
-            typename IteratorRangeToItemStream<Iterator,
-                                               ScratchData,
-                                               CopyData>::ItemType;
-
-          ItemType *current_item = static_cast<ItemType *>(item);
-
-          // we need to find an unused scratch data object in the list that
-          // corresponds to the current thread and then mark it as used. if
-          // we can't find one, create one
-          //
-          // as discussed in the discussion of the documentation of the
-          // IteratorRangeToItemStream::scratch_data variable, there is no
-          // need to synchronize access to this variable using a mutex
-          // as long as we have no yield-point in between. this means that
-          // we can't take an iterator into the list now and expect it to
-          // still be valid after calling the worker, but we at least do
-          // not have to lock the following section
-          ScratchData *scratch_data = nullptr;
-          {
-            typename ItemType::ScratchDataList &scratch_data_list =
-              current_item->scratch_data->get();
-
-            // see if there is an unused object. if so, grab it and mark
-            // it as used
-            for (typename ItemType::ScratchDataList::iterator p =
-                   scratch_data_list.begin();
-                 p != scratch_data_list.end();
-                 ++p)
-              if (p->currently_in_use == false)
-                {
-                  scratch_data        = p->scratch_data.get();
-                  p->currently_in_use = true;
-                  break;
-                }
-
-            // if no object was found, create one and mark it as used
-            if (scratch_data == nullptr)
-              {
-                scratch_data =
-                  new ScratchData(*current_item->sample_scratch_data);
-
-                typename ItemType::ScratchDataList::value_type
-                  new_scratch_object(scratch_data, true);
-                scratch_data_list.push_back(std::move(new_scratch_object));
-              }
-          }
-
-          // then call the worker function on each element of the chunk we were
-          // given. since these worker functions are called on separate threads,
-          // nothing good can happen if they throw an exception and we are best
-          // off catching it and showing an error message
-          for (unsigned int i = 0; i < current_item->n_items; ++i)
-            {
-              try
-                {
-                  if (worker)
-                    worker(current_item->work_items[i],
-                           *scratch_data,
-                           current_item->copy_datas[i]);
-                }
-              catch (const std::exception &exc)
-                {
-                  Threads::internal::handle_std_exception(exc);
-                }
-              catch (...)
-                {
-                  Threads::internal::handle_unknown_exception();
-                }
-            }
-
-          // finally mark the scratch object as unused again. as above, there
-          // is no need to lock anything here since the object we work on
-          // is thread-local
-          {
-            typename ItemType::ScratchDataList &scratch_data_list =
-              current_item->scratch_data->get();
-
-            for (typename ItemType::ScratchDataList::iterator p =
-                   scratch_data_list.begin();
-                 p != scratch_data_list.end();
-                 ++p)
-              if (p->scratch_data.get() == scratch_data)
-                {
-                  Assert(p->currently_in_use == true, ExcInternalError());
-                  p->currently_in_use = false;
-                }
-          }
-
-          // if there is no copier, mark current item as usable again
-          if (copier_exist == false)
-            current_item->currently_in_use = false;
-
-
-          // then return the original pointer
-          // to the now modified object
-          return item;
-        }
-
-
-      private:
-        /**
-         * Pointer to the function that does the assembling on the sequence of
-         * cells.
-         */
-        const std::function<void(const Iterator &, ScratchData &, CopyData &)>
-          worker;
-
-        /**
-         * This flag is true if the copier stage exist. If it does not, the
-         * worker has to free the buffer. Otherwise the copier will do it.
-         */
-        bool copier_exist;
-      };
-
-
-
-      /**
-       * A class that manages calling the copier function. Note that it is, in
-       * the TBB notation, a filter that runs sequentially, ensuring that all
-       * items are copied in the same order in which they are created.
-       */
-      template <typename Iterator, typename ScratchData, typename CopyData>
-      class TBBCopier : public tbb::filter
-      {
-      public:
-        /**
-         * Constructor. Takes a reference to the object on which we will
-         * operate as well as a pointer to the function that will do the
-         * copying from the additional data object to the global matrix or
-         * similar.
-         */
-        TBBCopier(const std::function<void(const CopyData &)> &copier)
-          : tbb::filter(/*is_serial=*/true)
-          , copier(copier)
-        {}
-
-
-        /**
-         * Work on a single item.
-         */
-        void *
-        operator()(void *item) override
-        {
-          // first unpack the current item
-          using ItemType =
-            typename IteratorRangeToItemStream<Iterator,
-                                               ScratchData,
-                                               CopyData>::ItemType;
-
-          ItemType *current_item = static_cast<ItemType *>(item);
-
-          // initiate copying data. for the same reasons as in the worker class
-          // above, catch exceptions rather than letting it propagate into
-          // unknown territories
-          for (unsigned int i = 0; i < current_item->n_items; ++i)
-            {
-              try
-                {
-                  if (copier)
-                    copier(current_item->copy_datas[i]);
-                }
-              catch (const std::exception &exc)
-                {
-                  Threads::internal::handle_std_exception(exc);
-                }
-              catch (...)
-                {
-                  Threads::internal::handle_unknown_exception();
-                }
-            }
-
-          // mark current item as usable again
-          current_item->currently_in_use = false;
-
-
-          // return an invalid item since we are at the end of the
-          // pipeline
-          return nullptr;
-        }
-
-
-      private:
-        /**
-         * Pointer to the function that does the copying of data.
-         */
-        const std::function<void(const CopyData &)> copier;
-      };
-
       template <typename Worker,
                 typename Copier,
                 typename Iterator,
@@ -697,28 +478,162 @@ namespace WorkStream
           const unsigned int                       queue_length,
           const unsigned int                       chunk_size)
       {
+        using ItemType = typename IteratorRangeToItemStream<Iterator,
+                                                            ScratchData,
+                                                            CopyData>::ItemType;
+
         // create the three stages of the pipeline
         IteratorRangeToItemStream<Iterator, ScratchData, CopyData>
-          iterator_range_to_item_stream(begin,
+             iterator_range_to_item_stream(begin,
                                         end,
                                         queue_length,
                                         chunk_size,
                                         sample_scratch_data,
                                         sample_copy_data);
+        auto tbb_item_stream_filter = tbb::make_filter<void, ItemType *>(
+#    ifdef DEAL_II_TBB_WITH_ONEAPI
+          tbb::filter_mode::serial_in_order,
+#    else
+          tbb::filter::serial,
+#    endif
+          [&](tbb::flow_control &fc) -> ItemType * {
+            if (const auto item = iterator_range_to_item_stream.get_item())
+              return item;
+            else
+              {
+                fc.stop();
+                return nullptr;
+              }
+          });
 
-        TBBWorker<Iterator, ScratchData, CopyData> worker_filter(worker);
-        TBBCopier<Iterator, ScratchData, CopyData> copier_filter(copier);
+        auto tbb_worker_filter = tbb::make_filter<ItemType *, ItemType *>(
+#    ifdef DEAL_II_TBB_WITH_ONEAPI
+          tbb::filter_mode::parallel,
+#    else
+          tbb::filter::parallel,
+#    endif
+          [worker =
+             std::function<void(const Iterator &, ScratchData &, CopyData &)>(
+               worker),
+           copier_exist =
+             static_cast<bool>(std::function<void(const CopyData &)>(copier))](
+            ItemType *current_item) {
+            // we need to find an unused scratch data object in the list that
+            // corresponds to the current thread and then mark it as used. if
+            // we can't find one, create one
+            //
+            // as discussed in the discussion of the documentation of the
+            // IteratorRangeToItemStream::scratch_data variable, there is no
+            // need to synchronize access to this variable using a mutex
+            // as long as we have no yield-point in between. this means that
+            // we can't take an iterator into the list now and expect it to
+            // still be valid after calling the worker, but we at least do
+            // not have to lock the following section
+            ScratchData *scratch_data = nullptr;
+            {
+              // see if there is an unused object. if so, grab it and mark
+              // it as used
+              for (auto &p : current_item->scratch_data->get())
+                if (p.currently_in_use == false)
+                  {
+                    scratch_data       = p.scratch_data.get();
+                    p.currently_in_use = true;
 
-        // now create a pipeline from these stages
-        tbb::pipeline assembly_line;
-        assembly_line.add_filter(iterator_range_to_item_stream);
-        assembly_line.add_filter(worker_filter);
-        assembly_line.add_filter(copier_filter);
+                    break;
+                  }
 
-        // and run it
-        assembly_line.run(queue_length);
+              // if no object was found, create one and mark it as used
+              if (scratch_data == nullptr)
+                {
+                  scratch_data =
+                    new ScratchData(*current_item->sample_scratch_data);
+                  current_item->scratch_data->get().emplace_back(scratch_data,
+                                                                 true);
+                }
+            }
 
-        assembly_line.clear();
+            // then call the worker function on each element of the chunk we
+            // were given. since these worker functions are called on separate
+            // threads, nothing good can happen if they throw an exception and
+            // we are best off catching it and showing an error message
+            for (unsigned int i = 0; i < current_item->n_iterators; ++i)
+              {
+                try
+                  {
+                    if (worker)
+                      worker(current_item->iterators[i],
+                             *scratch_data,
+                             current_item->copy_datas[i]);
+                  }
+                catch (const std::exception &exc)
+                  {
+                    Threads::internal::handle_std_exception(exc);
+                  }
+                catch (...)
+                  {
+                    Threads::internal::handle_unknown_exception();
+                  }
+              }
+
+            // finally mark the scratch object as unused again. as above, there
+            // is no need to lock anything here since the object we work on
+            // is thread-local
+            for (auto &p : current_item->scratch_data->get())
+              if (p.scratch_data.get() == scratch_data)
+                {
+                  Assert(p.currently_in_use == true, ExcInternalError());
+                  p.currently_in_use = false;
+
+                  break;
+                }
+
+            // if there is no copier, mark current item as usable again
+            if (copier_exist == false)
+              current_item->currently_in_use = false;
+
+
+            // Then return the original pointer
+            // to the now modified object. The copier will work on it next.
+            return current_item;
+          });
+
+        auto tbb_copier_filter = tbb::make_filter<ItemType *, void>(
+#    ifdef DEAL_II_TBB_WITH_ONEAPI
+          tbb::filter_mode::serial_in_order,
+#    else
+          tbb::filter::serial,
+#    endif
+          [copier = std::function<void(const CopyData &)>(copier)](
+            ItemType *current_item) {
+            if (copier)
+              {
+                // Initiate copying data. For the same reasons as in the worker
+                // class above, catch exceptions rather than letting them
+                // propagate into unknown territories:
+                for (unsigned int i = 0; i < current_item->n_iterators; ++i)
+                  {
+                    try
+                      {
+                        copier(current_item->copy_datas[i]);
+                      }
+                    catch (const std::exception &exc)
+                      {
+                        Threads::internal::handle_std_exception(exc);
+                      }
+                    catch (...)
+                      {
+                        Threads::internal::handle_unknown_exception();
+                      }
+                  }
+              }
+            // mark current item as usable again
+            current_item->currently_in_use = false;
+          });
+
+        // Now create a pipeline from these stages and execute it:
+        tbb::parallel_pipeline(queue_length,
+                               tbb_item_stream_filter & tbb_worker_filter &
+                                 tbb_copier_filter);
       }
 
     }    // namespace tbb_no_coloring

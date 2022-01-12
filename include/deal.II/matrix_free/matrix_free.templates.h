@@ -52,6 +52,21 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <fstream>
 
+//
+// TBB with oneAPI API has deprecated and removed the
+// <code>tbb::tasks</code> backend. With this it is no longer possible to
+// compile the following code that builds a directed acyclic graph (DAG) of
+// (thread parallel) tasks without a major porting effort. It turned out
+// that such a dynamic handling of dependencies and structures is not as
+// competitive as initially assumed. Consequently, this part of the matrix
+// free infrastructure has seen less attention than the rest over the last
+// years and is (presumably) not used that often.
+//
+// In case of detected oneAPI backend we simply disable threading in the
+// matrix free backend for now.
+//
+// Matthias Maier, Martin Kronbichler, 2021
+//
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -438,7 +453,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
 
         // initialize the basic multithreading information that needs to be
         // passed to the DoFInfo structure
-#ifdef DEAL_II_WITH_TBB
+#if defined(DEAL_II_WITH_TBB) && !defined(DEAL_II_TBB_WITH_ONEAPI)
       if (additional_data.tasks_parallel_scheme != AdditionalData::none &&
           MultithreadInfo::n_threads() > 1)
         {
@@ -914,7 +929,19 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_dof_handlers(
 
 namespace internal
 {
-#ifdef DEAL_II_WITH_TBB
+#if defined(DEAL_II_WITH_TBB) && !defined(DEAL_II_TBB_WITH_ONEAPI)
+
+#  ifdef DEAL_II_TBB_WITH_ONEAPI
+  struct unsigned_int_pair_hash
+  {
+    std::size_t
+    operator()(const std::pair<unsigned int, unsigned int> &pair) const
+    {
+      return std::hash<unsigned int>()(pair.first) ^
+             std::hash<unsigned int>()(pair.second);
+    }
+  };
+#  endif
 
   inline void
   fill_index_subrange(
@@ -922,7 +949,12 @@ namespace internal
     const unsigned int                                        end,
     const std::vector<std::pair<unsigned int, unsigned int>> &cell_level_index,
     tbb::concurrent_unordered_map<std::pair<unsigned int, unsigned int>,
-                                  unsigned int> &             map)
+                                  unsigned int
+#  ifdef DEAL_II_TBB_WITH_ONEAPI
+                                  ,
+                                  unsigned_int_pair_hash
+#  endif
+                                  > &map)
   {
     if (cell_level_index.empty())
       return;
@@ -942,8 +974,13 @@ namespace internal
     const dealii::Triangulation<dim> &                        tria,
     const std::vector<std::pair<unsigned int, unsigned int>> &cell_level_index,
     const tbb::concurrent_unordered_map<std::pair<unsigned int, unsigned int>,
-                                        unsigned int> &       map,
-    DynamicSparsityPattern &connectivity_direct)
+                                        unsigned int
+#  ifdef DEAL_II_TBB_WITH_ONEAPI
+                                        ,
+                                        unsigned_int_pair_hash
+#  endif
+                                        > &map,
+    DynamicSparsityPattern &               connectivity_direct)
   {
     std::vector<types::global_dof_index> new_indices;
     for (unsigned int cell = begin; cell < end; ++cell)
@@ -1473,11 +1510,16 @@ namespace internal
         connectivity.reinit(task_info.n_active_cells, task_info.n_active_cells);
         if (do_face_integrals)
           {
-#ifdef DEAL_II_WITH_TBB
+#if defined(DEAL_II_WITH_TBB) && !defined(DEAL_II_TBB_WITH_ONEAPI)
             // step 1: build map between the index in the matrix-free context
             // and the one in the triangulation
             tbb::concurrent_unordered_map<std::pair<unsigned int, unsigned int>,
-                                          unsigned int>
+                                          unsigned int
+#  ifdef DEAL_II_TBB_WITH_ONEAPI
+                                          ,
+                                          unsigned_int_pair_hash
+#  endif
+                                          >
               map;
             dealii::parallel::apply_to_subranges(
               0,
