@@ -1222,7 +1222,7 @@ DataOut<dim, spacedim>::build_patches(
   // perhaps update_normal_vectors is present, which would only be useful on
   // faces, but we may not use it here.
   Assert(
-    !(update_flags & update_normal_vectors),
+    !contains(update_flags, update_normal_vectors),
     ExcMessage(
       "The update of normal vectors may not be requested for evaluation of "
       "data on cells via DataPostprocessor."));

@@ -301,8 +301,7 @@ protected:
     std::vector<Tensor<4, dim>> third_derivatives(0);
     std::vector<Tensor<5, dim>> fourth_derivatives(0);
 
-    if ((update_flags & (update_values | update_gradients | update_hessians)) !=
-        0u)
+    if (contains(update_flags, (update_values | update_gradients | update_hessians)))
       data.dof_sign_change.resize(this->dofs_per_cell);
 
     // initialize fields only if really
@@ -359,7 +358,7 @@ protected:
     // node values N_i holds
     // N_i(v_j)=\delta_ij for all basis
     // functions v_j
-    if ((update_flags & (update_values | update_gradients)) != 0u)
+    if (contains(update_flags, (update_values | update_gradients)))
       for (unsigned int k = 0; k < n_q_points; ++k)
         {
           poly_space->evaluate(quadrature.point(k),

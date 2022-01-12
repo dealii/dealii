@@ -305,15 +305,15 @@ FE_Enriched<dim, spacedim>::requires_update_flags(const UpdateFlags flags) const
   if (is_enriched)
     {
       // if we ask for values or gradients, then we would need quadrature points
-      if ((flags & (update_values | update_gradients)) != 0u)
+      if (contains(flags, (update_values | update_gradients)))
         out |= update_quadrature_points;
 
       // if need gradients, add update_values due to product rule
-      if ((out & update_gradients) != 0u)
+      if (contains(out, update_gradients))
         out |= update_values;
     }
 
-  Assert(!(flags & update_3rd_derivatives), ExcNotImplemented());
+  Assert(!contains(flags, update_3rd_derivatives), ExcNotImplemented());
 
   return out;
 }

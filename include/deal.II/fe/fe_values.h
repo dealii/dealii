@@ -5572,7 +5572,7 @@ FEValuesBase<dim, spacedim>::shape_value(const unsigned int i,
                                          const unsigned int j) const
 {
   AssertIndexRange(i, fe->n_dofs_per_cell());
-  Assert(this->update_flags & update_values,
+  Assert(contains(this->update_flags, update_values),
          ExcAccessToUninitializedField("update_values"));
   Assert(fe->is_primitive(i), ExcShapeFunctionNotPrimitive(i));
   Assert(present_cell.is_initialized(), ExcNotReinited());
@@ -5608,7 +5608,7 @@ FEValuesBase<dim, spacedim>::shape_value_component(
   const unsigned int component) const
 {
   AssertIndexRange(i, fe->n_dofs_per_cell());
-  Assert(this->update_flags & update_values,
+  Assert(contains(this->update_flags, update_values),
          ExcAccessToUninitializedField("update_values"));
   AssertIndexRange(component, fe->n_components());
   Assert(present_cell.is_initialized(), ExcNotReinited());
@@ -5636,7 +5636,7 @@ FEValuesBase<dim, spacedim>::shape_grad(const unsigned int i,
                                         const unsigned int j) const
 {
   AssertIndexRange(i, fe->n_dofs_per_cell());
-  Assert(this->update_flags & update_gradients,
+  Assert(contains(this->update_flags, update_gradients),
          ExcAccessToUninitializedField("update_gradients"));
   Assert(fe->is_primitive(i), ExcShapeFunctionNotPrimitive(i));
   Assert(present_cell.is_initialized(), ExcNotReinited());
@@ -5672,7 +5672,7 @@ FEValuesBase<dim, spacedim>::shape_grad_component(
   const unsigned int component) const
 {
   AssertIndexRange(i, fe->n_dofs_per_cell());
-  Assert(this->update_flags & update_gradients,
+  Assert(contains(this->update_flags, update_gradients),
          ExcAccessToUninitializedField("update_gradients"));
   AssertIndexRange(component, fe->n_components());
   Assert(present_cell.is_initialized(), ExcNotReinited());
@@ -5699,7 +5699,7 @@ FEValuesBase<dim, spacedim>::shape_hessian(const unsigned int i,
                                            const unsigned int j) const
 {
   AssertIndexRange(i, fe->n_dofs_per_cell());
-  Assert(this->update_flags & update_hessians,
+  Assert(contains(this->update_flags, update_hessians),
          ExcAccessToUninitializedField("update_hessians"));
   Assert(fe->is_primitive(i), ExcShapeFunctionNotPrimitive(i));
   Assert(present_cell.is_initialized(), ExcNotReinited());
@@ -5735,7 +5735,7 @@ FEValuesBase<dim, spacedim>::shape_hessian_component(
   const unsigned int component) const
 {
   AssertIndexRange(i, fe->n_dofs_per_cell());
-  Assert(this->update_flags & update_hessians,
+  Assert(contains(this->update_flags, update_hessians),
          ExcAccessToUninitializedField("update_hessians"));
   AssertIndexRange(component, fe->n_components());
   Assert(present_cell.is_initialized(), ExcNotReinited());
@@ -5762,7 +5762,7 @@ FEValuesBase<dim, spacedim>::shape_3rd_derivative(const unsigned int i,
                                                   const unsigned int j) const
 {
   AssertIndexRange(i, fe->n_dofs_per_cell());
-  Assert(this->update_flags & update_3rd_derivatives,
+  Assert(contains(this->update_flags, update_3rd_derivatives),
          ExcAccessToUninitializedField("update_3rd_derivatives"));
   Assert(fe->is_primitive(i), ExcShapeFunctionNotPrimitive(i));
   Assert(present_cell.is_initialized(), ExcNotReinited());
@@ -5798,7 +5798,7 @@ FEValuesBase<dim, spacedim>::shape_3rd_derivative_component(
   const unsigned int component) const
 {
   AssertIndexRange(i, fe->n_dofs_per_cell());
-  Assert(this->update_flags & update_3rd_derivatives,
+  Assert(contains(this->update_flags, update_3rd_derivatives),
          ExcAccessToUninitializedField("update_3rd_derivatives"));
   AssertIndexRange(component, fe->n_components());
   Assert(present_cell.is_initialized(), ExcNotReinited());
@@ -5850,7 +5850,7 @@ template <int dim, int spacedim>
 inline const std::vector<Point<spacedim>> &
 FEValuesBase<dim, spacedim>::get_quadrature_points() const
 {
-  Assert(this->update_flags & update_quadrature_points,
+  Assert(contains(this->update_flags, update_quadrature_points),
          ExcAccessToUninitializedField("update_quadrature_points"));
   Assert(present_cell.is_initialized(), ExcNotReinited());
   return this->mapping_output.quadrature_points;
@@ -5862,7 +5862,7 @@ template <int dim, int spacedim>
 inline const std::vector<double> &
 FEValuesBase<dim, spacedim>::get_JxW_values() const
 {
-  Assert(this->update_flags & update_JxW_values,
+  Assert(contains(this->update_flags, update_JxW_values),
          ExcAccessToUninitializedField("update_JxW_values"));
   Assert(present_cell.is_initialized(), ExcNotReinited());
   return this->mapping_output.JxW_values;
@@ -5874,7 +5874,7 @@ template <int dim, int spacedim>
 inline const std::vector<DerivativeForm<1, dim, spacedim>> &
 FEValuesBase<dim, spacedim>::get_jacobians() const
 {
-  Assert(this->update_flags & update_jacobians,
+  Assert(contains(this->update_flags, update_jacobians),
          ExcAccessToUninitializedField("update_jacobians"));
   Assert(present_cell.is_initialized(), ExcNotReinited());
   return this->mapping_output.jacobians;
@@ -5886,7 +5886,7 @@ template <int dim, int spacedim>
 inline const std::vector<DerivativeForm<2, dim, spacedim>> &
 FEValuesBase<dim, spacedim>::get_jacobian_grads() const
 {
-  Assert(this->update_flags & update_jacobian_grads,
+  Assert(contains(this->update_flags, update_jacobian_grads),
          ExcAccessToUninitializedField("update_jacobians_grads"));
   Assert(present_cell.is_initialized(), ExcNotReinited());
   return this->mapping_output.jacobian_grads;
@@ -5899,7 +5899,7 @@ inline const Tensor<3, spacedim> &
 FEValuesBase<dim, spacedim>::jacobian_pushed_forward_grad(
   const unsigned int i) const
 {
-  Assert(this->update_flags & update_jacobian_pushed_forward_grads,
+  Assert(contains(this->update_flags, update_jacobian_pushed_forward_grads),
          ExcAccessToUninitializedField("update_jacobian_pushed_forward_grads"));
   Assert(present_cell.is_initialized(), ExcNotReinited());
   return this->mapping_output.jacobian_pushed_forward_grads[i];
@@ -5911,7 +5911,7 @@ template <int dim, int spacedim>
 inline const std::vector<Tensor<3, spacedim>> &
 FEValuesBase<dim, spacedim>::get_jacobian_pushed_forward_grads() const
 {
-  Assert(this->update_flags & update_jacobian_pushed_forward_grads,
+  Assert(contains(this->update_flags, update_jacobian_pushed_forward_grads),
          ExcAccessToUninitializedField("update_jacobian_pushed_forward_grads"));
   Assert(present_cell.is_initialized(), ExcNotReinited());
   return this->mapping_output.jacobian_pushed_forward_grads;
@@ -5923,7 +5923,7 @@ template <int dim, int spacedim>
 inline const DerivativeForm<3, dim, spacedim> &
 FEValuesBase<dim, spacedim>::jacobian_2nd_derivative(const unsigned int i) const
 {
-  Assert(this->update_flags & update_jacobian_2nd_derivatives,
+  Assert(contains(this->update_flags, update_jacobian_2nd_derivatives),
          ExcAccessToUninitializedField("update_jacobian_2nd_derivatives"));
   Assert(present_cell.is_initialized(), ExcNotReinited());
   return this->mapping_output.jacobian_2nd_derivatives[i];
@@ -5935,7 +5935,7 @@ template <int dim, int spacedim>
 inline const std::vector<DerivativeForm<3, dim, spacedim>> &
 FEValuesBase<dim, spacedim>::get_jacobian_2nd_derivatives() const
 {
-  Assert(this->update_flags & update_jacobian_2nd_derivatives,
+  Assert(contains(this->update_flags, update_jacobian_2nd_derivatives),
          ExcAccessToUninitializedField("update_jacobian_2nd_derivatives"));
   Assert(present_cell.is_initialized(), ExcNotReinited());
   return this->mapping_output.jacobian_2nd_derivatives;
@@ -5948,7 +5948,7 @@ inline const Tensor<4, spacedim> &
 FEValuesBase<dim, spacedim>::jacobian_pushed_forward_2nd_derivative(
   const unsigned int i) const
 {
-  Assert(this->update_flags & update_jacobian_pushed_forward_2nd_derivatives,
+  Assert(contains(this->update_flags, update_jacobian_pushed_forward_2nd_derivatives),
          ExcAccessToUninitializedField(
            "update_jacobian_pushed_forward_2nd_derivatives"));
   Assert(present_cell.is_initialized(), ExcNotReinited());
@@ -5961,7 +5961,7 @@ template <int dim, int spacedim>
 inline const std::vector<Tensor<4, spacedim>> &
 FEValuesBase<dim, spacedim>::get_jacobian_pushed_forward_2nd_derivatives() const
 {
-  Assert(this->update_flags & update_jacobian_pushed_forward_2nd_derivatives,
+  Assert(contains(this->update_flags, update_jacobian_pushed_forward_2nd_derivatives),
          ExcAccessToUninitializedField(
            "update_jacobian_pushed_forward_2nd_derivatives"));
   Assert(present_cell.is_initialized(), ExcNotReinited());
@@ -5974,7 +5974,7 @@ template <int dim, int spacedim>
 inline const DerivativeForm<4, dim, spacedim> &
 FEValuesBase<dim, spacedim>::jacobian_3rd_derivative(const unsigned int i) const
 {
-  Assert(this->update_flags & update_jacobian_3rd_derivatives,
+  Assert(contains(this->update_flags, update_jacobian_3rd_derivatives),
          ExcAccessToUninitializedField("update_jacobian_3rd_derivatives"));
   Assert(present_cell.is_initialized(), ExcNotReinited());
   return this->mapping_output.jacobian_3rd_derivatives[i];
@@ -5986,7 +5986,7 @@ template <int dim, int spacedim>
 inline const std::vector<DerivativeForm<4, dim, spacedim>> &
 FEValuesBase<dim, spacedim>::get_jacobian_3rd_derivatives() const
 {
-  Assert(this->update_flags & update_jacobian_3rd_derivatives,
+  Assert(contains(this->update_flags, update_jacobian_3rd_derivatives),
          ExcAccessToUninitializedField("update_jacobian_3rd_derivatives"));
   Assert(present_cell.is_initialized(), ExcNotReinited());
   return this->mapping_output.jacobian_3rd_derivatives;
@@ -5999,7 +5999,7 @@ inline const Tensor<5, spacedim> &
 FEValuesBase<dim, spacedim>::jacobian_pushed_forward_3rd_derivative(
   const unsigned int i) const
 {
-  Assert(this->update_flags & update_jacobian_pushed_forward_3rd_derivatives,
+  Assert(contains(this->update_flags, update_jacobian_pushed_forward_3rd_derivatives),
          ExcAccessToUninitializedField(
            "update_jacobian_pushed_forward_3rd_derivatives"));
   Assert(present_cell.is_initialized(), ExcNotReinited());
@@ -6012,7 +6012,7 @@ template <int dim, int spacedim>
 inline const std::vector<Tensor<5, spacedim>> &
 FEValuesBase<dim, spacedim>::get_jacobian_pushed_forward_3rd_derivatives() const
 {
-  Assert(this->update_flags & update_jacobian_pushed_forward_3rd_derivatives,
+  Assert(contains(this->update_flags, update_jacobian_pushed_forward_3rd_derivatives),
          ExcAccessToUninitializedField(
            "update_jacobian_pushed_forward_3rd_derivatives"));
   Assert(present_cell.is_initialized(), ExcNotReinited());
@@ -6025,7 +6025,7 @@ template <int dim, int spacedim>
 inline const std::vector<DerivativeForm<1, spacedim, dim>> &
 FEValuesBase<dim, spacedim>::get_inverse_jacobians() const
 {
-  Assert(this->update_flags & update_inverse_jacobians,
+  Assert(contains(this->update_flags, update_inverse_jacobians),
          ExcAccessToUninitializedField("update_inverse_jacobians"));
   Assert(present_cell.is_initialized(), ExcNotReinited());
   return this->mapping_output.inverse_jacobians;
@@ -6079,7 +6079,7 @@ template <int dim, int spacedim>
 inline const Point<spacedim> &
 FEValuesBase<dim, spacedim>::quadrature_point(const unsigned int i) const
 {
-  Assert(this->update_flags & update_quadrature_points,
+  Assert(contains(this->update_flags, update_quadrature_points),
          ExcAccessToUninitializedField("update_quadrature_points"));
   AssertIndexRange(i, this->mapping_output.quadrature_points.size());
   Assert(present_cell.is_initialized(), ExcNotReinited());
@@ -6093,7 +6093,7 @@ template <int dim, int spacedim>
 inline double
 FEValuesBase<dim, spacedim>::JxW(const unsigned int i) const
 {
-  Assert(this->update_flags & update_JxW_values,
+  Assert(contains(this->update_flags, update_JxW_values),
          ExcAccessToUninitializedField("update_JxW_values"));
   AssertIndexRange(i, this->mapping_output.JxW_values.size());
   Assert(present_cell.is_initialized(), ExcNotReinited());
@@ -6107,7 +6107,7 @@ template <int dim, int spacedim>
 inline const DerivativeForm<1, dim, spacedim> &
 FEValuesBase<dim, spacedim>::jacobian(const unsigned int i) const
 {
-  Assert(this->update_flags & update_jacobians,
+  Assert(contains(this->update_flags, update_jacobians),
          ExcAccessToUninitializedField("update_jacobians"));
   AssertIndexRange(i, this->mapping_output.jacobians.size());
   Assert(present_cell.is_initialized(), ExcNotReinited());
@@ -6121,7 +6121,7 @@ template <int dim, int spacedim>
 inline const DerivativeForm<2, dim, spacedim> &
 FEValuesBase<dim, spacedim>::jacobian_grad(const unsigned int i) const
 {
-  Assert(this->update_flags & update_jacobian_grads,
+  Assert(contains(this->update_flags, update_jacobian_grads),
          ExcAccessToUninitializedField("update_jacobians_grads"));
   AssertIndexRange(i, this->mapping_output.jacobian_grads.size());
   Assert(present_cell.is_initialized(), ExcNotReinited());
@@ -6135,7 +6135,7 @@ template <int dim, int spacedim>
 inline const DerivativeForm<1, spacedim, dim> &
 FEValuesBase<dim, spacedim>::inverse_jacobian(const unsigned int i) const
 {
-  Assert(this->update_flags & update_inverse_jacobians,
+  Assert(contains(this->update_flags, update_inverse_jacobians),
          ExcAccessToUninitializedField("update_inverse_jacobians"));
   AssertIndexRange(i, this->mapping_output.inverse_jacobians.size());
   Assert(present_cell.is_initialized(), ExcNotReinited());
@@ -6149,7 +6149,7 @@ template <int dim, int spacedim>
 inline const Tensor<1, spacedim> &
 FEValuesBase<dim, spacedim>::normal_vector(const unsigned int i) const
 {
-  Assert(this->update_flags & update_normal_vectors,
+  Assert(contains(this->update_flags, update_normal_vectors),
          (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
            "update_normal_vectors")));
   AssertIndexRange(i, this->mapping_output.normal_vectors.size());
@@ -6233,7 +6233,7 @@ inline const Tensor<1, spacedim> &
 FEFaceValuesBase<dim, spacedim>::boundary_form(const unsigned int i) const
 {
   AssertIndexRange(i, this->mapping_output.boundary_forms.size());
-  Assert(this->update_flags & update_boundary_forms,
+  Assert(contains(this->update_flags, update_boundary_forms),
          (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
            "update_boundary_forms")));
 
