@@ -322,12 +322,17 @@ FE_DGPNonparametric<dim, spacedim>::fill_fe_values(
 
   const unsigned int n_q_points = mapping_data.quadrature_points.size();
 
-  std::vector<double> values(
-    contains(fe_internal.update_each, update_values) ? this->n_dofs_per_cell() : 0);
+  std::vector<double> values(contains(fe_internal.update_each, update_values) ?
+                               this->n_dofs_per_cell() :
+                               0);
   std::vector<Tensor<1, dim>> grads(
-    contains(fe_internal.update_each, update_gradients) ? this->n_dofs_per_cell() : 0);
+    contains(fe_internal.update_each, update_gradients) ?
+      this->n_dofs_per_cell() :
+      0);
   std::vector<Tensor<2, dim>> grad_grads(
-    contains(fe_internal.update_each, update_hessians) ? this->n_dofs_per_cell() : 0);
+    contains(fe_internal.update_each, update_hessians) ?
+      this->n_dofs_per_cell() :
+      0);
   std::vector<Tensor<3, dim>> empty_vector_of_3rd_order_tensors;
   std::vector<Tensor<4, dim>> empty_vector_of_4th_order_tensors;
 
@@ -378,16 +383,21 @@ FE_DGPNonparametric<dim, spacedim>::fill_fe_face_values(
 
   const unsigned int n_q_points = mapping_data.quadrature_points.size();
 
-  std::vector<double> values(
-    contains(fe_internal.update_each, update_values) ? this->n_dofs_per_cell() : 0);
+  std::vector<double> values(contains(fe_internal.update_each, update_values) ?
+                               this->n_dofs_per_cell() :
+                               0);
   std::vector<Tensor<1, dim>> grads(
-    contains(fe_internal.update_each, update_gradients) ? this->n_dofs_per_cell() : 0);
+    contains(fe_internal.update_each, update_gradients) ?
+      this->n_dofs_per_cell() :
+      0);
   std::vector<Tensor<2, dim>> grad_grads(
-    contains(fe_internal.update_each, update_hessians) ? this->n_dofs_per_cell() : 0);
+    contains(fe_internal.update_each, update_hessians) ?
+      this->n_dofs_per_cell() :
+      0);
   std::vector<Tensor<3, dim>> empty_vector_of_3rd_order_tensors;
   std::vector<Tensor<4, dim>> empty_vector_of_4th_order_tensors;
 
-  if (contains(fe_internal.update_each , (update_values | update_gradients)))
+  if (contains(fe_internal.update_each, (update_values | update_gradients)))
     for (unsigned int i = 0; i < n_q_points; ++i)
       {
         polynomial_space.evaluate(mapping_data.quadrature_points[i],
@@ -435,12 +445,17 @@ FE_DGPNonparametric<dim, spacedim>::fill_fe_subface_values(
 
   const unsigned int n_q_points = mapping_data.quadrature_points.size();
 
-  std::vector<double> values(
-    contains(fe_internal.update_each, update_values) ? this->n_dofs_per_cell() : 0);
+  std::vector<double> values(contains(fe_internal.update_each, update_values) ?
+                               this->n_dofs_per_cell() :
+                               0);
   std::vector<Tensor<1, dim>> grads(
-    contains(fe_internal.update_each, update_gradients) ? this->n_dofs_per_cell() : 0);
+    contains(fe_internal.update_each, update_gradients) ?
+      this->n_dofs_per_cell() :
+      0);
   std::vector<Tensor<2, dim>> grad_grads(
-    contains(fe_internal.update_each, update_hessians) ? this->n_dofs_per_cell() : 0);
+    contains(fe_internal.update_each, update_hessians) ?
+      this->n_dofs_per_cell() :
+      0);
   std::vector<Tensor<3, dim>> empty_vector_of_3rd_order_tensors;
   std::vector<Tensor<4, dim>> empty_vector_of_4th_order_tensors;
 

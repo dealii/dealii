@@ -62,12 +62,14 @@ FE_PolyFace<PolynomialType, dim, spacedim>::requires_update_flags(
   const UpdateFlags flags) const
 {
   // FIXME
-  UpdateFlags out = static_cast<UpdateFlags>(static_cast<unsigned int>(flags) & static_cast<unsigned int>(update_values));
-  if(contains(flags, update_gradients))
+  UpdateFlags out =
+    static_cast<UpdateFlags>(static_cast<unsigned int>(flags) &
+                             static_cast<unsigned int>(update_values));
+  if (contains(flags, update_gradients))
     out |= update_gradients | update_covariant_transformation;
-  if(contains(flags, update_hessians))
+  if (contains(flags, update_hessians))
     out |= update_hessians | update_covariant_transformation;
-  if(contains(flags, update_normal_vectors))
+  if (contains(flags, update_normal_vectors))
     out |= update_normal_vectors | update_JxW_values;
 
   return out;
@@ -134,7 +136,7 @@ FE_PolyFace<PolynomialType, dim, spacedim>::fill_fe_face_values(
 
   AssertDimension(quadrature.size(), 1);
 
-  if(contains(fe_data.update_each, update_values))
+  if (contains(fe_data.update_each, update_values))
     for (unsigned int i = 0; i < quadrature[0].size(); ++i)
       {
         for (unsigned int k = 0; k < this->n_dofs_per_cell(); ++k)
@@ -231,7 +233,7 @@ FE_PolyFace<PolynomialType, dim, spacedim>::fill_fe_subface_values(
   const unsigned int foffset = fe_data.shape_values.size() * face_no;
   const unsigned int offset  = sub_no * quadrature.size();
 
-  if(contains(fe_data.update_each, update_values))
+  if (contains(fe_data.update_each, update_values))
     {
       for (unsigned int k = 0; k < this->n_dofs_per_cell(); ++k)
         for (unsigned int i = 0; i < quadrature.size(); ++i)

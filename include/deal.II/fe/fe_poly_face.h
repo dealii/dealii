@@ -136,7 +136,7 @@ protected:
     // initialize fields only if really
     // necessary. otherwise, don't
     // allocate memory
-    if(contains(data.update_each, update_values))
+    if (contains(data.update_each, update_values))
       {
         values.resize(poly_space.n());
         data.shape_values.resize(poly_space.n(),

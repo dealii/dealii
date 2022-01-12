@@ -107,7 +107,7 @@ namespace NonMatching
   {
     // First call the mapping and let it generate the data specific to the
     // mapping.
-    if (this->update_flags & update_mapping)
+    if (contains(this->update_flags, update_mapping))
       {
         this->get_mapping().fill_fe_immersed_surface_values(
           this->present_cell,
@@ -176,7 +176,7 @@ namespace NonMatching
   {
     UpdateFlags flags = this->compute_update_flags(update_flags);
 
-    if ((flags & (update_JxW_values | update_normal_vectors)) != 0u)
+    if (contains(flags, (update_JxW_values | update_normal_vectors)))
       flags |= update_covariant_transformation;
 
     // Initialize the base classes.

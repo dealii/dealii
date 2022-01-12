@@ -429,7 +429,7 @@ FE_NedelecSZ<dim, spacedim>::get_data(
                   // Note that this will need to be updated if we're supporting
                   // update_hessians.
                   const unsigned int poly_length(
-                    contains(flags, update_gradients)? 3 : 2);
+                    contains(flags, update_gradients) ? 3 : 2);
 
                   std::vector<std::vector<double>> polyx(
                     degree, std::vector<double>(poly_length));
@@ -855,7 +855,7 @@ FE_NedelecSZ<dim, spacedim>::get_data(
                   // only need poly values and 1st derivative for update_values,
                   // but need 2nd derivative too for update_gradients.
                   const unsigned int poly_length(
-                    contains(flags, update_gradients)? 3 : 2);
+                    contains(flags, update_gradients) ? 3 : 2);
                   // Loop through quad points:
                   for (unsigned int q = 0; q < n_q_points; ++q)
                     {
@@ -1249,7 +1249,7 @@ FE_NedelecSZ<dim, spacedim>::fill_edge_values(
               // derivatives of the 1d polynomials, but only first derivatives
               // for the shape values.
               const unsigned int poly_length(
-                contains(flags, update_gradients)? 3 : 2);
+                contains(flags, update_gradients) ? 3 : 2);
 
               for (unsigned int m = 0; m < lines_per_cell; ++m)
                 {
@@ -1437,7 +1437,7 @@ FE_NedelecSZ<dim, spacedim>::fill_edge_values(
               // derivatives of the 1d polynomials, but only first derivatives
               // for the shape values.
               const unsigned int poly_length(
-                contains(flags, update_gradients)? 3 : 2);
+                contains(flags, update_gradients) ? 3 : 2);
               std::vector<std::vector<double>> poly(
                 degree, std::vector<double>(poly_length));
               for (unsigned int m = 0; m < lines_per_cell; ++m)
@@ -1688,8 +1688,8 @@ FE_NedelecSZ<dim, spacedim>::fill_face_values(
                 }
             }
           // Now can generate the basis
-          const unsigned int poly_length(contains(flags, update_gradients)? 3 :
-                                                                            2);
+          const unsigned int poly_length(contains(flags, update_gradients) ? 3 :
+                                                                             2);
           std::vector<std::vector<double>> polyxi(
             degree, std::vector<double>(poly_length));
           std::vector<std::vector<double>> polyeta(

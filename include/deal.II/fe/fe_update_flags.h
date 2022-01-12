@@ -334,10 +334,11 @@ operator&(const UpdateFlags f1, const UpdateFlags f2) = delete;
                                   static_cast<enum_type>(f2));
 }*/
 
-bool contains(const UpdateFlags flags, const UpdateFlags mask)
+inline bool
+contains(const UpdateFlags flags, const UpdateFlags mask)
 {
   using enum_type = std::underlying_type_t<UpdateFlags>;
-  return (static_cast<enum_type>(flags) & static_cast<enum_type>(mask)) !=0;
+  return (static_cast<enum_type>(flags) & static_cast<enum_type>(mask)) != 0;
 }
 
 

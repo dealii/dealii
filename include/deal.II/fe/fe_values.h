@@ -4653,7 +4653,7 @@ namespace FEValuesViews
   {
     AssertIndexRange(shape_function, fe_values->fe->n_dofs_per_cell());
     Assert(
-      fe_values->update_flags & update_values,
+      contains(fe_values->update_flags, update_values),
       ((typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
         "update_values"))));
 
@@ -5948,7 +5948,8 @@ inline const Tensor<4, spacedim> &
 FEValuesBase<dim, spacedim>::jacobian_pushed_forward_2nd_derivative(
   const unsigned int i) const
 {
-  Assert(contains(this->update_flags, update_jacobian_pushed_forward_2nd_derivatives),
+  Assert(contains(this->update_flags,
+                  update_jacobian_pushed_forward_2nd_derivatives),
          ExcAccessToUninitializedField(
            "update_jacobian_pushed_forward_2nd_derivatives"));
   Assert(present_cell.is_initialized(), ExcNotReinited());
@@ -5961,7 +5962,8 @@ template <int dim, int spacedim>
 inline const std::vector<Tensor<4, spacedim>> &
 FEValuesBase<dim, spacedim>::get_jacobian_pushed_forward_2nd_derivatives() const
 {
-  Assert(contains(this->update_flags, update_jacobian_pushed_forward_2nd_derivatives),
+  Assert(contains(this->update_flags,
+                  update_jacobian_pushed_forward_2nd_derivatives),
          ExcAccessToUninitializedField(
            "update_jacobian_pushed_forward_2nd_derivatives"));
   Assert(present_cell.is_initialized(), ExcNotReinited());
@@ -5999,7 +6001,8 @@ inline const Tensor<5, spacedim> &
 FEValuesBase<dim, spacedim>::jacobian_pushed_forward_3rd_derivative(
   const unsigned int i) const
 {
-  Assert(contains(this->update_flags, update_jacobian_pushed_forward_3rd_derivatives),
+  Assert(contains(this->update_flags,
+                  update_jacobian_pushed_forward_3rd_derivatives),
          ExcAccessToUninitializedField(
            "update_jacobian_pushed_forward_3rd_derivatives"));
   Assert(present_cell.is_initialized(), ExcNotReinited());
@@ -6012,7 +6015,8 @@ template <int dim, int spacedim>
 inline const std::vector<Tensor<5, spacedim>> &
 FEValuesBase<dim, spacedim>::get_jacobian_pushed_forward_3rd_derivatives() const
 {
-  Assert(contains(this->update_flags, update_jacobian_pushed_forward_3rd_derivatives),
+  Assert(contains(this->update_flags,
+                  update_jacobian_pushed_forward_3rd_derivatives),
          ExcAccessToUninitializedField(
            "update_jacobian_pushed_forward_3rd_derivatives"));
   Assert(present_cell.is_initialized(), ExcNotReinited());

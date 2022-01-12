@@ -288,7 +288,7 @@ protected:
       contains(update_flags, update_hessians) ? this->n_dofs_per_cell() : 0);
     std::vector<Tensor<3, dim>> third_derivatives(
       contains(update_flags, update_3rd_derivatives) ? this->n_dofs_per_cell() :
-                                                      0);
+                                                       0);
     std::vector<Tensor<4, dim>>
       fourth_derivatives; // won't be needed, so leave empty
 
@@ -325,8 +325,9 @@ protected:
     // next already fill those fields of which we have information by
     // now. note that the shape gradients are only those on the unit
     // cell, and need to be transformed when visiting an actual cell
-    if (contains(update_flags, (update_values | update_gradients | update_hessians |
-                         update_3rd_derivatives)))
+    if (contains(update_flags,
+                 (update_values | update_gradients | update_hessians |
+                  update_3rd_derivatives)))
       for (unsigned int i = 0; i < n_q_points; ++i)
         {
           poly_space->evaluate(quadrature.point(i),

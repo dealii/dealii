@@ -669,7 +669,7 @@ PointValueHistory<dim>::evaluate_field(
   const UpdateFlags update_flags =
     data_postprocessor.get_needed_update_flags() | update_quadrature_points;
   Assert(
-    !(update_flags & update_normal_vectors),
+    !(contains(update_flags, update_normal_vectors)),
     ExcMessage(
       "The update of normal vectors may not be requested for evaluation of "
       "data on cells via DataPostprocessor."));
@@ -756,13 +756,13 @@ PointValueHistory<dim>::evaluate_field(
           // type of the solution vector may be different from 'double',
           // but the DataPostprocessorInputs only allow for 'double'
           // data types
-          if (update_flags & update_values)
+          if (contains(update_flags, update_values))
             {
               fe_values.get_function_values(solution, scalar_solution_values);
               postprocessor_input.solution_values =
                 std::vector<double>(1, scalar_solution_values[selected_point]);
             }
-          if (update_flags & update_gradients)
+          if (contains(update_flags, update_gradients))
             {
               fe_values.get_function_gradients(solution,
                                                scalar_solution_gradients);
@@ -770,7 +770,7 @@ PointValueHistory<dim>::evaluate_field(
                 std::vector<Tensor<1, dim>>(
                   1, scalar_solution_gradients[selected_point]);
             }
-          if (update_flags & update_hessians)
+          if (contains(update_flags, update_hessians))
             {
               fe_values.get_function_hessians(solution,
                                               scalar_solution_hessians);
@@ -792,7 +792,7 @@ PointValueHistory<dim>::evaluate_field(
           // exact same idea as above
           DataPostprocessorInputs::Vector<dim> postprocessor_input;
 
-          if (update_flags & update_values)
+          if (contains(update_flags, update_values))
             {
               fe_values.get_function_values(solution, vector_solution_values);
               postprocessor_input.solution_values.resize(
@@ -801,7 +801,7 @@ PointValueHistory<dim>::evaluate_field(
                         vector_solution_values[selected_point].end(),
                         postprocessor_input.solution_values[0].begin());
             }
-          if (update_flags & update_gradients)
+          if (contains(update_flags, update_gradients))
             {
               fe_values.get_function_gradients(solution,
                                                vector_solution_gradients);
@@ -811,7 +811,7 @@ PointValueHistory<dim>::evaluate_field(
                         vector_solution_gradients[selected_point].end(),
                         postprocessor_input.solution_gradients[0].begin());
             }
-          if (update_flags & update_hessians)
+          if (contains(update_flags, update_hessians))
             {
               fe_values.get_function_hessians(solution,
                                               vector_solution_hessians);

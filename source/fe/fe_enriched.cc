@@ -347,13 +347,13 @@ FE_Enriched<dim, spacedim>::setup_data(
       data.enrichment[base].resize(this->element_multiplicity(base));
       for (unsigned int m = 0; m < this->element_multiplicity(base); ++m)
         {
-          if(contains(flags, update_values))
+          if (contains(flags, update_values))
             data.enrichment[base][m].values.resize(n_q_points);
 
-          if(contains(flags, update_gradients))
+          if (contains(flags, update_gradients))
             data.enrichment[base][m].gradients.resize(n_q_points);
 
-          if(contains(flags, update_hessians))
+          if (contains(flags, update_hessians))
             data.enrichment[base][m].hessians.resize(n_q_points);
         }
     }
@@ -703,17 +703,17 @@ FE_Enriched<dim, spacedim>::multiply_by_enrichment(
                    s < this->n_nonzero_components(system_index);
                    ++s)
                 {
-                  if(contains(base_flags, update_values))
+                  if (contains(base_flags, update_values))
                     for (unsigned int q = 0; q < n_q_points; ++q)
                       output_data.shape_values[out_index + s][q] =
                         base_data.shape_values(in_index + s, q);
 
-                  if(contains(base_flags, update_gradients))
+                  if (contains(base_flags, update_gradients))
                     for (unsigned int q = 0; q < n_q_points; ++q)
                       output_data.shape_gradients[out_index + s][q] =
                         base_data.shape_gradients[in_index + s][q];
 
-                  if(contains(base_flags, update_hessians))
+                  if (contains(base_flags, update_hessians))
                     for (unsigned int q = 0; q < n_q_points; ++q)
                       output_data.shape_hessians[out_index + s][q] =
                         base_data.shape_hessians[in_index + s][q];
@@ -750,7 +750,7 @@ FE_Enriched<dim, spacedim>::multiply_by_enrichment(
                  ExcMessage(
                    "Only scalar-valued enrichment functions are allowed"));
 
-          if(contains(flags, update_hessians))
+          if (contains(flags, update_hessians))
             {
               Assert(fe_data.enrichment[base_no][m].hessians.size() ==
                        n_q_points,
@@ -763,7 +763,7 @@ FE_Enriched<dim, spacedim>::multiply_by_enrichment(
                     mapping_data.quadrature_points[q]);
             }
 
-          if(contains(flags, update_gradients))
+          if (contains(flags, update_gradients))
             {
               Assert(fe_data.enrichment[base_no][m].gradients.size() ==
                        n_q_points,
@@ -776,7 +776,7 @@ FE_Enriched<dim, spacedim>::multiply_by_enrichment(
                     mapping_data.quadrature_points[q]);
             }
 
-          if(contains(flags, update_values))
+          if (contains(flags, update_values))
             {
               Assert(fe_data.enrichment[base_no][m].values.size() == n_q_points,
                      ExcDimensionMismatch(
@@ -796,7 +796,7 @@ FE_Enriched<dim, spacedim>::multiply_by_enrichment(
   // output_data.shape_XYZ contains values of standard FEM and we overwrite
   // it with the updated one in the following order: hessians -> gradients ->
   // values
-  if(contains(flags, update_hessians))
+  if (contains(flags, update_hessians))
     {
       for (unsigned int base_no = 1; base_no < this->n_base_elements();
            base_no++)
@@ -829,7 +829,7 @@ FE_Enriched<dim, spacedim>::multiply_by_enrichment(
         }
     }
 
-  if(contains(flags, update_gradients))
+  if (contains(flags, update_gradients))
     for (unsigned int base_no = 1; base_no < this->n_base_elements(); ++base_no)
       {
         for (unsigned int m = 0;
@@ -852,7 +852,7 @@ FE_Enriched<dim, spacedim>::multiply_by_enrichment(
             }
       }
 
-  if(contains(flags, update_values))
+  if (contains(flags, update_values))
     for (unsigned int base_no = 1; base_no < this->n_base_elements(); ++base_no)
       {
         for (unsigned int m = 0;

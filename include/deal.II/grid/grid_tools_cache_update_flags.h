@@ -170,10 +170,10 @@ namespace GridTools
    */
   inline CacheUpdateFlags
   operator&(const CacheUpdateFlags f1, const CacheUpdateFlags f2) = delete;
-/*  {
-    return static_cast<CacheUpdateFlags>(static_cast<unsigned int>(f1) &
-                                         static_cast<unsigned int>(f2));
-  }*/
+  /*  {
+      return static_cast<CacheUpdateFlags>(static_cast<unsigned int>(f1) &
+                                           static_cast<unsigned int>(f2));
+    }*/
 
 
   /**
@@ -184,16 +184,17 @@ namespace GridTools
    */
   inline CacheUpdateFlags &
   operator&=(CacheUpdateFlags &f1, const CacheUpdateFlags f2) = delete;
-/*  {
-    f1 = f1 & f2;
-    return f1;
-  }*/
+  /*  {
+      f1 = f1 & f2;
+      return f1;
+    }*/
 
-bool contains(const CacheUpdateFlags flags, const CacheUpdateFlags mask)
-{
-  using enum_type = std::underlying_type_t<CacheUpdateFlags>;
-  return (static_cast<enum_type>(flags) & static_cast<enum_type>(mask)) !=0;
-}
+  inline bool
+  contains(const CacheUpdateFlags flags, const CacheUpdateFlags mask)
+  {
+    using enum_type = std::underlying_type_t<CacheUpdateFlags>;
+    return (static_cast<enum_type>(flags) & static_cast<enum_type>(mask)) != 0;
+  }
 
 } // namespace GridTools
 DEAL_II_NAMESPACE_CLOSE

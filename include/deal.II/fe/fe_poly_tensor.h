@@ -301,7 +301,8 @@ protected:
     std::vector<Tensor<4, dim>> third_derivatives(0);
     std::vector<Tensor<5, dim>> fourth_derivatives(0);
 
-    if (contains(update_flags, (update_values | update_gradients | update_hessians)))
+    if (contains(update_flags,
+                 (update_values | update_gradients | update_hessians)))
       data.dof_sign_change.resize(this->dofs_per_cell);
 
     // initialize fields only if really

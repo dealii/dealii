@@ -360,7 +360,8 @@ MappingCartesian<dim, spacedim>::maybe_update_jacobian_derivatives(
           output_data.jacobian_2nd_derivatives[i] =
             DerivativeForm<3, dim, spacedim>();
 
-      if (contains(data.update_each, update_jacobian_pushed_forward_2nd_derivatives))
+      if (contains(data.update_each,
+                   update_jacobian_pushed_forward_2nd_derivatives))
         for (unsigned int i = 0;
              i < output_data.jacobian_pushed_forward_2nd_derivatives.size();
              ++i)
@@ -374,7 +375,8 @@ MappingCartesian<dim, spacedim>::maybe_update_jacobian_derivatives(
           output_data.jacobian_3rd_derivatives[i] =
             DerivativeForm<4, dim, spacedim>();
 
-      if (contains(data.update_each, update_jacobian_pushed_forward_3rd_derivatives))
+      if (contains(data.update_each,
+                   update_jacobian_pushed_forward_3rd_derivatives))
         for (unsigned int i = 0;
              i < output_data.jacobian_pushed_forward_3rd_derivatives.size();
              ++i)
@@ -729,7 +731,8 @@ MappingCartesian<dim, spacedim>::transform(
 
       case mapping_contravariant:
         {
-          Assert(contains(data.update_each, update_contravariant_transformation),
+          Assert(contains(data.update_each,
+                          update_contravariant_transformation),
                  typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                    "update_contravariant_transformation"));
 
@@ -740,7 +743,8 @@ MappingCartesian<dim, spacedim>::transform(
         }
       case mapping_piola:
         {
-          Assert(contains(data.update_each, update_contravariant_transformation),
+          Assert(contains(data.update_each,
+                          update_contravariant_transformation),
                  typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                    "update_contravariant_transformation"));
           Assert(contains(data.update_each, update_volume_elements),
@@ -790,7 +794,8 @@ MappingCartesian<dim, spacedim>::transform(
 
       case mapping_contravariant:
         {
-          Assert(contains(data.update_each, update_contravariant_transformation),
+          Assert(contains(data.update_each,
+                          update_contravariant_transformation),
                  typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                    "update_contravariant_transformation"));
 
@@ -817,7 +822,8 @@ MappingCartesian<dim, spacedim>::transform(
 
       case mapping_contravariant_gradient:
         {
-          Assert(contains(data.update_each, update_contravariant_transformation),
+          Assert(contains(data.update_each,
+                          update_contravariant_transformation),
                  typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                    "update_contravariant_transformation"));
 
@@ -831,7 +837,8 @@ MappingCartesian<dim, spacedim>::transform(
 
       case mapping_piola:
         {
-          Assert(contains(data.update_each, update_contravariant_transformation),
+          Assert(contains(data.update_each,
+                          update_contravariant_transformation),
                  typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                    "update_contravariant_transformation"));
           Assert(contains(data.update_each, update_volume_elements),
@@ -848,7 +855,8 @@ MappingCartesian<dim, spacedim>::transform(
 
       case mapping_piola_gradient:
         {
-          Assert(contains(data.update_each, update_contravariant_transformation),
+          Assert(contains(data.update_each,
+                          update_contravariant_transformation),
                  typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                    "update_contravariant_transformation"));
           Assert(contains(data.update_each, update_volume_elements),
@@ -900,7 +908,8 @@ MappingCartesian<dim, spacedim>::transform(
 
       case mapping_contravariant:
         {
-          Assert(contains(data.update_each, update_contravariant_transformation),
+          Assert(contains(data.update_each,
+                          update_contravariant_transformation),
                  typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                    "update_contravariant_transformation"));
 
@@ -927,7 +936,8 @@ MappingCartesian<dim, spacedim>::transform(
 
       case mapping_contravariant_gradient:
         {
-          Assert(contains(data.update_each, update_contravariant_transformation),
+          Assert(contains(data.update_each,
+                          update_contravariant_transformation),
                  typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                    "update_contravariant_transformation"));
 
@@ -941,7 +951,8 @@ MappingCartesian<dim, spacedim>::transform(
 
       case mapping_piola:
         {
-          Assert(contains(data.update_each, update_contravariant_transformation),
+          Assert(contains(data.update_each,
+                          update_contravariant_transformation),
                  typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                    "update_contravariant_transformation"));
           Assert(contains(data.update_each, update_volume_elements),
@@ -958,7 +969,8 @@ MappingCartesian<dim, spacedim>::transform(
 
       case mapping_piola_gradient:
         {
-          Assert(contains(data.update_each, update_contravariant_transformation),
+          Assert(contains(data.update_each,
+                          update_contravariant_transformation),
                  typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                    "update_contravariant_transformation"));
           Assert(contains(data.update_each, update_volume_elements),
@@ -997,7 +1009,8 @@ MappingCartesian<dim, spacedim>::transform(
     {
       case mapping_covariant_gradient:
         {
-          Assert(contains(data.update_each, update_contravariant_transformation),
+          Assert(contains(data.update_each,
+                          update_contravariant_transformation),
                  typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                    "update_covariant_transformation"));
 
@@ -1039,7 +1052,8 @@ MappingCartesian<dim, spacedim>::transform(
           Assert(contains(data.update_each, update_covariant_transformation),
                  typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                    "update_covariant_transformation"));
-          Assert(contains(data.update_each, update_contravariant_transformation),
+          Assert(contains(data.update_each,
+                          update_contravariant_transformation),
                  typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                    "update_contravariant_transformation"));
 
@@ -1079,7 +1093,8 @@ MappingCartesian<dim, spacedim>::transform(
           Assert(contains(data.update_each, update_covariant_transformation),
                  typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                    "update_covariant_transformation"));
-          Assert(contains(data.update_each, update_contravariant_transformation),
+          Assert(contains(data.update_each,
+                          update_contravariant_transformation),
                  typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                    "update_contravariant_transformation"));
           Assert(contains(data.update_each, update_volume_elements),

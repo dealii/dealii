@@ -997,12 +997,13 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::evaluate(
                   val_and_grad.first, j, values[i + j]);
           if ((evaluation_flag & EvaluationFlags::gradients) != 0u)
             {
-              Assert(update_flags & update_gradients ||
-                       update_flags & update_inverse_jacobians,
+              Assert(contains(update_flags,
+                              update_gradients | update_inverse_jacobians),
                      ExcNotInitialized());
               for (unsigned int j = 0; j < n_lanes && i + j < n_points; ++j)
                 {
-                  Assert(update_flags_mapping & update_inverse_jacobians,
+                  Assert(contains(update_flags_mapping,
+                                  update_inverse_jacobians),
                          ExcNotInitialized());
                   internal::FEPointEvaluation::EvaluatorTypeTraits<
                     dim,
@@ -1139,7 +1140,7 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::integrate(
           if ((integration_flags & EvaluationFlags::gradients) != 0u)
             for (unsigned int j = 0; j < n_lanes && i + j < n_points; ++j)
               {
-                Assert(update_flags_mapping & update_inverse_jacobians,
+                Assert(contains(update_flags_mapping, update_inverse_jacobians),
                        ExcNotInitialized());
                 gradients[i + j] =
                   static_cast<typename internal::FEPointEvaluation::
@@ -1308,7 +1309,7 @@ inline DerivativeForm<1, dim, spacedim>
 FEPointEvaluation<n_components, dim, spacedim, Number>::jacobian(
   const unsigned int point_index) const
 {
-  Assert(update_flags_mapping & update_jacobians, ExcNotInitialized());
+  Assert(contains(update_flags_mapping, update_jacobians), ExcNotInitialized());
   AssertIndexRange(point_index, mapping_data.jacobians.size());
   return mapping_data.jacobians[point_index];
 }
@@ -1320,7 +1321,7 @@ inline DerivativeForm<1, spacedim, dim>
 FEPointEvaluation<n_components, dim, spacedim, Number>::inverse_jacobian(
   const unsigned int point_index) const
 {
-  Assert(update_flags_mapping & update_inverse_jacobians ||
+  Assert(contains(update_flags_mapping, update_inverse_jacobians) ||
            update_flags_mapping & update_gradients,
          ExcNotInitialized());
   AssertIndexRange(point_index, mapping_data.inverse_jacobians.size());
@@ -1334,7 +1335,8 @@ inline Point<spacedim>
 FEPointEvaluation<n_components, dim, spacedim, Number>::real_point(
   const unsigned int point_index) const
 {
-  Assert(update_flags_mapping & update_quadrature_points, ExcNotInitialized());
+  Assert(contains(update_flags_mapping, update_quadrature_points),
+         ExcNotInitialized());
   AssertIndexRange(point_index, mapping_data.quadrature_points.size());
   return mapping_data.quadrature_points[point_index];
 }
