@@ -63,7 +63,8 @@ namespace GridTools
     if (contains(update_flags, update_vertex_to_cell_map))
       {
         vertex_to_cells = GridTools::vertex_to_cell_map(*tria);
-        update_flags    = update_flags & ~update_vertex_to_cell_map;
+	// FIXME
+        update_flags    = static_cast<UpdateFlags>(static_cast<unsigned int>(update_flags) & static_cast<unsigned int>(~update_vertex_to_cell_map));
       }
     return vertex_to_cells;
   }
@@ -112,7 +113,8 @@ namespace GridTools
         for (const auto &it : used_vertices)
           vertices[i++] = std::make_pair(it.second, it.first);
         used_vertices_rtree = pack_rtree(vertices);
-        update_flags        = update_flags & ~update_used_vertices_rtree;
+	// FIXME
+        update_flags        = static_cast<CacheUpdateFlags>(static_cast<unsigned int>(update_flags) & static_cast<unsigned int>(~update_used_vertices_rtree));
       }
     return used_vertices_rtree;
   }

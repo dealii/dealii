@@ -136,7 +136,7 @@ protected:
     // initialize fields only if really
     // necessary. otherwise, don't
     // allocate memory
-    if (data.update_each & update_values)
+    if(contains(data.update_each, update_values))
       {
         values.resize(poly_space.n());
         data.shape_values.resize(poly_space.n(),
@@ -156,8 +156,7 @@ protected:
       }
     // No derivatives of this element
     // are implemented.
-    if (data.update_each & update_gradients ||
-        data.update_each & update_hessians)
+    if (contains(data.update_each, update_gradients | update_hessians))
       {
         Assert(false, ExcNotImplemented());
       }

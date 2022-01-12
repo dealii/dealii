@@ -372,8 +372,7 @@ protected:
     (void)n_q_points;
 
     // No derivatives of this element are implemented.
-    if (data_ptr->update_each & update_gradients ||
-        data_ptr->update_each & update_hessians)
+    if (contains(data_ptr->update_each, update_gradients | update_hessians))
       {
         Assert(false, ExcNotImplemented());
       }

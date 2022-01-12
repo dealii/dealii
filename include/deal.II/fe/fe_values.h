@@ -4675,7 +4675,7 @@ namespace FEValuesViews
                                   const unsigned int q_point) const
   {
     AssertIndexRange(shape_function, fe_values->fe->n_dofs_per_cell());
-    Assert(fe_values->update_flags & update_gradients,
+    Assert(contains(fe_values->update_flags, update_gradients),
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_gradients")));
 
@@ -4698,7 +4698,7 @@ namespace FEValuesViews
                                  const unsigned int q_point) const
   {
     AssertIndexRange(shape_function, fe_values->fe->n_dofs_per_cell());
-    Assert(fe_values->update_flags & update_hessians,
+    Assert(contains(fe_values->update_flags, update_hessians),
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_hessians")));
 
@@ -4720,7 +4720,7 @@ namespace FEValuesViews
                                           const unsigned int q_point) const
   {
     AssertIndexRange(shape_function, fe_values->fe->n_dofs_per_cell());
-    Assert(fe_values->update_flags & update_3rd_derivatives,
+    Assert(contains(fe_values->update_flags, update_3rd_derivatives),
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_3rd_derivatives")));
 
@@ -4743,7 +4743,7 @@ namespace FEValuesViews
                                const unsigned int q_point) const
   {
     AssertIndexRange(shape_function, fe_values->fe->n_dofs_per_cell());
-    Assert(fe_values->update_flags & update_values,
+    Assert(contains(fe_values->update_flags, update_values),
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_values")));
 
@@ -4781,7 +4781,7 @@ namespace FEValuesViews
                                   const unsigned int q_point) const
   {
     AssertIndexRange(shape_function, fe_values->fe->n_dofs_per_cell());
-    Assert(fe_values->update_flags & update_gradients,
+    Assert(contains(fe_values->update_flags, update_gradients),
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_gradients")));
 
@@ -4821,7 +4821,7 @@ namespace FEValuesViews
   {
     // this function works like in the case above
     AssertIndexRange(shape_function, fe_values->fe->n_dofs_per_cell());
-    Assert(fe_values->update_flags & update_gradients,
+    Assert(contains(fe_values->update_flags, update_gradients),
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_gradients")));
 
@@ -4858,7 +4858,7 @@ namespace FEValuesViews
     // this function works like in the case above
 
     AssertIndexRange(shape_function, fe_values->fe->n_dofs_per_cell());
-    Assert(fe_values->update_flags & update_gradients,
+    Assert(contains(fe_values->update_flags, update_gradients),
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_gradients")));
     // same as for the scalar case except that we have one more index
@@ -5030,7 +5030,7 @@ namespace FEValuesViews
   {
     // this function works like in the case above
     AssertIndexRange(shape_function, fe_values->fe->n_dofs_per_cell());
-    Assert(fe_values->update_flags & update_hessians,
+    Assert(contains(fe_values->update_flags, update_hessians),
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_hessians")));
 
@@ -5070,7 +5070,7 @@ namespace FEValuesViews
   {
     // this function works like in the case above
     AssertIndexRange(shape_function, fe_values->fe->n_dofs_per_cell());
-    Assert(fe_values->update_flags & update_3rd_derivatives,
+    Assert(contains(fe_values->update_flags, update_3rd_derivatives),
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_3rd_derivatives")));
 
@@ -5177,7 +5177,7 @@ namespace FEValuesViews
                                             const unsigned int q_point) const
   {
     AssertIndexRange(shape_function, fe_values->fe->n_dofs_per_cell());
-    Assert(fe_values->update_flags & update_gradients,
+    Assert(contains(fe_values->update_flags, update_gradients),
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_gradients")));
 
@@ -5212,7 +5212,7 @@ namespace FEValuesViews
                                            const unsigned int q_point) const
   {
     AssertIndexRange(shape_function, fe_values->fe->n_dofs_per_cell());
-    Assert(fe_values->update_flags & update_values,
+    Assert(contains(fe_values->update_flags, update_values),
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_values")));
 
@@ -5257,7 +5257,7 @@ namespace FEValuesViews
     const unsigned int q_point) const
   {
     AssertIndexRange(shape_function, fe_values->fe->n_dofs_per_cell());
-    Assert(fe_values->update_flags & update_gradients,
+    Assert(contains(fe_values->update_flags, update_gradients),
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_gradients")));
 
@@ -5335,7 +5335,7 @@ namespace FEValuesViews
                                   const unsigned int q_point) const
   {
     AssertIndexRange(shape_function, fe_values->fe->n_dofs_per_cell());
-    Assert(fe_values->update_flags & update_values,
+    Assert(contains(fe_values->update_flags, update_values),
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_values")));
 
@@ -5385,7 +5385,7 @@ namespace FEValuesViews
                                        const unsigned int q_point) const
   {
     AssertIndexRange(shape_function, fe_values->fe->n_dofs_per_cell());
-    Assert(fe_values->update_flags & update_gradients,
+    Assert(contains(fe_values->update_flags, update_gradients),
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_gradients")));
 
@@ -5441,7 +5441,7 @@ namespace FEValuesViews
                                      const unsigned int q_point) const
   {
     AssertIndexRange(shape_function, fe_values->fe->n_dofs_per_cell());
-    Assert(fe_values->update_flags & update_gradients,
+    Assert(contains(fe_values->update_flags, update_gradients),
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_gradients")));
 
