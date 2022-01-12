@@ -454,11 +454,11 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
 
   const unsigned int n_q_points = quadrature.size();
 
-  Assert(!(fe_data.update_each & update_values) ||
+  Assert(!contains(fe_data.update_each, update_values) ||
            fe_data.shape_values.size()[0] == this->n_dofs_per_cell(),
          ExcDimensionMismatch(fe_data.shape_values.size()[0],
                               this->n_dofs_per_cell()));
-  Assert(!(fe_data.update_each & update_values) ||
+  Assert(!contains(fe_data.update_each, update_values) ||
            fe_data.shape_values.size()[1] == n_q_points,
          ExcDimensionMismatch(fe_data.shape_values.size()[1], n_q_points));
 
@@ -513,7 +513,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
       // fe_poly_tensor.h.
       double dof_sign = 1.0;
       // under some circumstances fe_data.dof_sign_change is not allocated
-      if (fe_data.update_each & update_values)
+      if (contains(fe_data.update_each, update_values))
         dof_sign = fe_data.dof_sign_change[dof_index];
 
       if (is_quad_dof)
@@ -550,7 +550,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
       // the previous one; or, even if it is a translation, if we use
       // mappings other than the standard mappings that require us to
       // recompute values and derivatives because of possible sign changes
-      if (fe_data.update_each & update_values &&
+      if (contains(fe_data.update_each, update_values) &&
           ((cell_similarity != CellSimilarity::translation) ||
            ((mapping_kind == mapping_piola) ||
             (mapping_kind == mapping_raviart_thomas) ||
@@ -621,7 +621,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
         }
 
       // update gradients. apply the same logic as above
-      if (fe_data.update_each & update_gradients &&
+      if (contains(fe_data.update_each, update_gradients) &&
           ((cell_similarity != CellSimilarity::translation) ||
            ((mapping_kind == mapping_piola) ||
             (mapping_kind == mapping_raviart_thomas) ||
@@ -764,7 +764,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
         }
 
       // update hessians. apply the same logic as above
-      if (fe_data.update_each & update_hessians &&
+      if (contains(fe_data.update_each, update_hessians) &&
           ((cell_similarity != CellSimilarity::translation) ||
            ((mapping_kind == mapping_piola) ||
             (mapping_kind == mapping_raviart_thomas) ||
@@ -1038,7 +1038,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
         }
 
       // third derivatives are not implemented
-      if (fe_data.update_each & update_3rd_derivatives &&
+      if (contains(fe_data.update_each, update_3rd_derivatives) &&
           ((cell_similarity != CellSimilarity::translation) ||
            ((mapping_kind == mapping_piola) ||
             (mapping_kind == mapping_raviart_thomas) ||
@@ -1143,7 +1143,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
       // fe_poly_tensor.h.
       double dof_sign = 1.0;
       // under some circumstances fe_data.dof_sign_change is not allocated
-      if (fe_data.update_each & update_values)
+      if (contains(fe_data.update_each, update_values))
         dof_sign = fe_data.dof_sign_change[dof_index];
 
       if (is_quad_dof)
@@ -1174,7 +1174,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
           [dof_index * this->n_components() +
            this->get_nonzero_components(dof_index).first_selected_component()];
 
-      if (fe_data.update_each & update_values)
+      if (contains(fe_data.update_each, update_values))
         {
           switch (mapping_kind)
             {
@@ -1260,7 +1260,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
             }
         }
 
-      if (fe_data.update_each & update_gradients)
+      if (contains(fe_data.update_each, update_gradients))
         {
           switch (mapping_kind)
             {
@@ -1428,7 +1428,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
             }
         }
 
-      if (fe_data.update_each & update_hessians)
+      if (contains(fe_data.update_each, update_hessians))
         {
           switch (mapping_kind)
             {
@@ -1727,7 +1727,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
         }
 
       // third derivatives are not implemented
-      if (fe_data.update_each & update_3rd_derivatives)
+      if (contains(fe_data.update_each, update_3rd_derivatives))
         {
           Assert(false, ExcNotImplemented())
         }
@@ -1829,7 +1829,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
       // fe_poly_tensor.h.
       double dof_sign = 1.0;
       // under some circumstances fe_data.dof_sign_change is not allocated
-      if (fe_data.update_each & update_values)
+      if (contains(fe_data.update_each, update_values))
         dof_sign = fe_data.dof_sign_change[dof_index];
 
       if (is_quad_dof)
@@ -1860,7 +1860,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
           [dof_index * this->n_components() +
            this->get_nonzero_components(dof_index).first_selected_component()];
 
-      if (fe_data.update_each & update_values)
+      if (contains(fe_data.update_each, update_values))
         {
           switch (mapping_kind)
             {
@@ -1949,7 +1949,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
             }
         }
 
-      if (fe_data.update_each & update_gradients)
+      if (contains(fe_data.update_each, update_gradients))
         {
           const ArrayView<Tensor<2, spacedim>> transformed_shape_grads =
             make_array_view(fe_data.transformed_shape_grads,
@@ -2103,7 +2103,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
             }
         }
 
-      if (fe_data.update_each & update_hessians)
+      if (contains(fe_data.update_each, update_hessians))
         {
           switch (mapping_kind)
             {
@@ -2401,7 +2401,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
         }
 
       // third derivatives are not implemented
-      if (fe_data.update_each & update_3rd_derivatives)
+      if (contains(fe_data.update_each, update_3rd_derivatives))
         {
           Assert(false, ExcNotImplemented())
         }

@@ -1225,8 +1225,8 @@ FESystem<dim, spacedim>::compute_fill(
   // want to avoid this if this class is called in a WorkStream context where
   // we very carefully allocate objects only on the thread where they
   // will actually be used; spawning new tasks here would be counterproductive
-  if (flags & (update_values | update_gradients | update_hessians |
-               update_3rd_derivatives))
+  if (contains(flags,(update_values | update_gradients | update_hessians |
+               update_3rd_derivatives)))
     for (unsigned int base_no = 0; base_no < this->n_base_elements(); ++base_no)
       {
         const FiniteElement<dim, spacedim> &base_fe = base_element(base_no);
@@ -1368,7 +1368,7 @@ FESystem<dim, spacedim>::compute_fill(
                        base_fe.n_nonzero_components(base_index),
                      ExcInternalError());
 
-              if (base_flags & update_values)
+              if(contains(base_flags, update_values))
                 for (unsigned int s = 0;
                      s < this->n_nonzero_components(system_index);
                      ++s)
@@ -1376,7 +1376,7 @@ FESystem<dim, spacedim>::compute_fill(
                     output_data.shape_values[out_index + s][q] =
                       base_data.shape_values(in_index + s, q);
 
-              if (base_flags & update_gradients)
+              if(contains(base_flags, update_gradients))
                 for (unsigned int s = 0;
                      s < this->n_nonzero_components(system_index);
                      ++s)
@@ -1384,7 +1384,7 @@ FESystem<dim, spacedim>::compute_fill(
                     output_data.shape_gradients[out_index + s][q] =
                       base_data.shape_gradients[in_index + s][q];
 
-              if (base_flags & update_hessians)
+              if(contains(base_flags, update_hessians))
                 for (unsigned int s = 0;
                      s < this->n_nonzero_components(system_index);
                      ++s)
@@ -1392,7 +1392,7 @@ FESystem<dim, spacedim>::compute_fill(
                     output_data.shape_hessians[out_index + s][q] =
                       base_data.shape_hessians[in_index + s][q];
 
-              if (base_flags & update_3rd_derivatives)
+              if(contains(base_flags, update_3rd_derivatives))
                 for (unsigned int s = 0;
                      s < this->n_nonzero_components(system_index);
                      ++s)

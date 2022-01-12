@@ -64,7 +64,7 @@ namespace GridTools
       {
         vertex_to_cells = GridTools::vertex_to_cell_map(*tria);
 	// FIXME
-        update_flags    = static_cast<UpdateFlags>(static_cast<unsigned int>(update_flags) & static_cast<unsigned int>(~update_vertex_to_cell_map));
+        update_flags    = static_cast<CacheUpdateFlags>(static_cast<unsigned int>(update_flags) & static_cast<unsigned int>(~update_vertex_to_cell_map));
       }
     return vertex_to_cells;
   }
@@ -79,7 +79,8 @@ namespace GridTools
       {
         vertex_to_cell_centers = GridTools::vertex_to_cell_centers_directions(
           *tria, get_vertex_to_cell_map());
-        update_flags = update_flags & ~update_vertex_to_cell_centers_directions;
+	// FIXME
+        update_flags    = static_cast<CacheUpdateFlags>(static_cast<unsigned int>(update_flags) & static_cast<unsigned int>(~update_vertex_to_cell_centers_directions));
       }
     return vertex_to_cell_centers;
   }
@@ -93,7 +94,8 @@ namespace GridTools
     if (contains(update_flags, update_used_vertices))
       {
         used_vertices = GridTools::extract_used_vertices(*tria, *mapping);
-        update_flags  = update_flags & ~update_used_vertices;
+	// FIXME
+        update_flags    = static_cast<CacheUpdateFlags>(static_cast<unsigned int>(update_flags) & static_cast<unsigned int>(~update_used_vertices));
       }
     return used_vertices;
   }
@@ -138,7 +140,8 @@ namespace GridTools
           boxes[i++] = std::make_pair(mapping->get_bounding_box(cell), cell);
 
         cell_bounding_boxes_rtree = pack_rtree(boxes);
-        update_flags = update_flags & ~update_cell_bounding_boxes_rtree;
+	// FIXME
+        update_flags    = static_cast<CacheUpdateFlags>(static_cast<unsigned int>(update_flags) & static_cast<unsigned int>(~update_cell_bounding_boxes_rtree));
       }
     return cell_bounding_boxes_rtree;
   }
@@ -163,8 +166,8 @@ namespace GridTools
           boxes.emplace_back(mapping->get_bounding_box(cell), cell);
 
         locally_owned_cell_bounding_boxes_rtree = pack_rtree(boxes);
-        update_flags =
-          update_flags & ~update_locally_owned_cell_bounding_boxes_rtree;
+	// FIXME
+        update_flags    = static_cast<CacheUpdateFlags>(static_cast<unsigned int>(update_flags) & static_cast<unsigned int>(~update_locally_owned_cell_bounding_boxes_rtree));
       }
     return locally_owned_cell_bounding_boxes_rtree;
   }
@@ -175,7 +178,7 @@ namespace GridTools
   const RTree<std::pair<BoundingBox<spacedim>, unsigned int>> &
   Cache<dim, spacedim>::get_covering_rtree(const unsigned int level) const
   {
-    if (update_flags & update_covering_rtree ||
+    if (contains(update_flags, update_covering_rtree) ||
         covering_rtree.find(level) == covering_rtree.end())
       {
         const auto boxes =
@@ -194,7 +197,8 @@ namespace GridTools
             covering_rtree[level] =
               GridTools::build_global_description_tree(boxes, MPI_COMM_SELF);
           }
-        update_flags = update_flags & ~update_covering_rtree;
+	// FIXME
+        update_flags    = static_cast<CacheUpdateFlags>(static_cast<unsigned int>(update_flags) & static_cast<unsigned int>(~update_covering_rtree));
       }
 
     return covering_rtree[level];
@@ -215,7 +219,8 @@ namespace GridTools
                 vertex_to_neighbor_subdomain[cell->vertex_index(v)].insert(
                   cell->subdomain_id());
           }
-        update_flags = update_flags & ~update_vertex_to_neighbor_subdomain;
+	// FIXME
+        update_flags    = static_cast<CacheUpdateFlags>(static_cast<unsigned int>(update_flags) & static_cast<unsigned int>(~update_vertex_to_neighbor_subdomain));
       }
     return vertex_to_neighbor_subdomain;
   }

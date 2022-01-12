@@ -175,7 +175,7 @@ namespace VectorTools
         }
 
 
-      if (update_flags & update_values)
+      if (contains(update_flags, update_values))
         {
           // first compute the exact solution (vectors) at the quadrature
           // points. try to do this as efficient as possible by avoiding a
@@ -209,7 +209,7 @@ namespace VectorTools
         }
 
       // Do the same for gradients, if required
-      if (update_flags & update_gradients)
+      if (contains(update_flags, update_gradients))
         {
           // try to be a little clever to avoid recursive virtual function
           // calls when calling gradient_list for functions that are really
@@ -236,7 +236,7 @@ namespace VectorTools
           // tangential gradients in the finite element function, not the full
           // gradient. This is taken care of, by subtracting the normal
           // component of the gradient from the exact function.
-          if (update_flags & update_normal_vectors)
+          if (contains(update_flags, update_normal_vectors))
             for (unsigned int k = 0; k < n_components; ++k)
               for (const auto q : fe_values.quadrature_point_indices())
                 {
@@ -292,7 +292,7 @@ namespace VectorTools
               }
 
             // Compute the root only if no derivative values are added later
-            if (!(update_flags & update_gradients))
+            if (!(contains(update_flags, update_gradients)))
               diff = std::pow(diff, 1. / exponent);
             break;
 
@@ -524,9 +524,9 @@ namespace VectorTools
             const unsigned int n_q_points = fe_values.n_quadrature_points;
             data.resize_vectors(n_q_points, n_components);
 
-            if (update_flags & update_values)
+            if (contains(update_flags, update_values))
               fe_values.get_function_values(fe_function, data.function_values);
-            if (update_flags & update_gradients)
+            if (contains(update_flags, update_gradients))
               fe_values.get_function_gradients(fe_function,
                                                data.function_grads);
 

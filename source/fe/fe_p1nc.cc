@@ -148,7 +148,7 @@ FE_P1NC::get_data(
   output_data.initialize(n_q_points, FE_P1NC(), data_ptr->update_each);
 
   // this is a linear element, so its second derivatives are zero
-  if ((data_ptr->update_each & update_hessians) != 0u)
+  if (contains(data_ptr->update_each, update_hessians))
     output_data.shape_hessians.fill(Tensor<2, 2>());
 
   return data_ptr;
@@ -174,7 +174,7 @@ FE_P1NC::get_face_data(
   output_data.initialize(n_q_points, FE_P1NC(), data_ptr->update_each);
 
   // this is a linear element, so its second derivatives are zero
-  if ((data_ptr->update_each & update_hessians) != 0u)
+  if (contains(data_ptr->update_each, update_hessians))
     output_data.shape_hessians.fill(Tensor<2, 2>());
 
   return data_ptr;
@@ -198,7 +198,7 @@ FE_P1NC::get_subface_data(
   output_data.initialize(n_q_points, FE_P1NC(), data_ptr->update_each);
 
   // this is a linear element, so its second derivatives are zero
-  if ((data_ptr->update_each & update_hessians) != 0u)
+  if (contains(data_ptr->update_each, update_hessians))
     output_data.shape_hessians.fill(Tensor<2, 2>());
 
   return data_ptr;

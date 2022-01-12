@@ -909,13 +909,13 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::reinit(
         update_flags | update_flags_mapping);
       fe_values->reinit(cell);
       mapping_data.initialize(unit_points.size(), update_flags_mapping);
-      if ((update_flags_mapping & update_jacobians) != 0)
+      if (contains(update_flags_mapping, update_jacobians))
         for (unsigned int q = 0; q < unit_points.size(); ++q)
           mapping_data.jacobians[q] = fe_values->jacobian(q);
-      if ((update_flags_mapping & update_inverse_jacobians) != 0)
+      if (contains(update_flags_mapping, update_inverse_jacobians))
         for (unsigned int q = 0; q < unit_points.size(); ++q)
           mapping_data.inverse_jacobians[q] = fe_values->inverse_jacobian(q);
-      if ((update_flags_mapping & update_quadrature_points) != 0)
+      if (contains(update_flags_mapping, update_quadrature_points))
         for (unsigned int q = 0; q < unit_points.size(); ++q)
           mapping_data.quadrature_points[q] = fe_values->quadrature_point(q);
     }

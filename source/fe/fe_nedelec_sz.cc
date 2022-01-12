@@ -401,7 +401,7 @@ FE_NedelecSZ<dim, spacedim>::get_data(
             cell_type2_offset + degree * degree;
           const unsigned int cell_type3_offset2 = cell_type3_offset1 + degree;
 
-          if ((flags & (update_values | update_gradients)) != 0u)
+          if (contains(flags, (update_values | update_gradients)))
             {
               // compute all points we must evaluate the 1d polynomials at:
               std::vector<Point<dim>> cell_points(n_q_points);
@@ -429,7 +429,7 @@ FE_NedelecSZ<dim, spacedim>::get_data(
                   // Note that this will need to be updated if we're supporting
                   // update_hessians.
                   const unsigned int poly_length(
-                    (flags & update_gradients) != 0u ? 3 : 2);
+                    contains(flags, update_gradients)? 3 : 2);
 
                   std::vector<std::vector<double>> polyx(
                     degree, std::vector<double>(poly_length));
@@ -799,7 +799,7 @@ FE_NedelecSZ<dim, spacedim>::get_data(
 
               // for cell-based shape functions:
               // these don't depend on the cell, so can precompute all here:
-              if ((flags & (update_values | update_gradients)) != 0u)
+              if (contains(flags, (update_values | update_gradients)))
                 {
                   // Cell-based shape functions:
                   //
@@ -855,7 +855,7 @@ FE_NedelecSZ<dim, spacedim>::get_data(
                   // only need poly values and 1st derivative for update_values,
                   // but need 2nd derivative too for update_gradients.
                   const unsigned int poly_length(
-                    (flags & update_gradients) != 0u ? 3 : 2);
+                    contains(flags, update_gradients)? 3 : 2);
                   // Loop through quad points:
                   for (unsigned int q = 0; q < n_q_points; ++q)
                     {
@@ -1129,11 +1129,11 @@ FE_NedelecSZ<dim, spacedim>::fill_edge_values(
   const UpdateFlags  flags(fe_data.update_each);
   const unsigned int n_q_points = quadrature.size();
 
-  Assert(!(flags & update_values) ||
+  Assert(!contains(flags, update_values) ||
            fe_data.shape_values.size() == this->n_dofs_per_cell(),
          ExcDimensionMismatch(fe_data.shape_values.size(),
                               this->n_dofs_per_cell()));
-  Assert(!(flags & update_values) ||
+  Assert(!contains(flags, update_values) ||
            fe_data.shape_values[0].size() == n_q_points,
          ExcDimensionMismatch(fe_data.shape_values[0].size(), n_q_points));
 
@@ -1155,7 +1155,7 @@ FE_NedelecSZ<dim, spacedim>::fill_edge_values(
     {
       case 2:
         {
-          if ((flags & (update_values | update_gradients)) != 0u)
+          if (contains(flags, (update_values | update_gradients)))
             {
               // Define an edge numbering so that each edge, E_{m} = [e^{m}_{1},
               // e^{m}_{2}] e1 = higher global numbering of the two local
@@ -1249,7 +1249,7 @@ FE_NedelecSZ<dim, spacedim>::fill_edge_values(
               // derivatives of the 1d polynomials, but only first derivatives
               // for the shape values.
               const unsigned int poly_length(
-                (flags & update_gradients) != 0u ? 3 : 2);
+                contains(flags, update_gradients)? 3 : 2);
 
               for (unsigned int m = 0; m < lines_per_cell; ++m)
                 {
@@ -1340,7 +1340,7 @@ FE_NedelecSZ<dim, spacedim>::fill_edge_values(
         }
       case 3:
         {
-          if ((flags & (update_values | update_gradients)) != 0u)
+          if (contains(flags, (update_values | update_gradients)))
             {
               // Define an edge numbering so that each edge, E_{m} = [e^{m}_{1},
               // e^{m}_{2}] e1 = higher global numbering of the two local
@@ -1437,7 +1437,7 @@ FE_NedelecSZ<dim, spacedim>::fill_edge_values(
               // derivatives of the 1d polynomials, but only first derivatives
               // for the shape values.
               const unsigned int poly_length(
-                (flags & update_gradients) != 0u ? 3 : 2);
+                contains(flags, update_gradients)? 3 : 2);
               std::vector<std::vector<double>> poly(
                 degree, std::vector<double>(poly_length));
               for (unsigned int m = 0; m < lines_per_cell; ++m)
@@ -1562,15 +1562,15 @@ FE_NedelecSZ<dim, spacedim>::fill_face_values(
     {
       const UpdateFlags flags(fe_data.update_each);
 
-      if ((flags & (update_values | update_gradients)) != 0u)
+      if (contains(flags, (update_values | update_gradients)))
         {
           const unsigned int n_q_points = quadrature.size();
 
-          Assert(!(flags & update_values) ||
+          Assert(!contains(flags, update_values) ||
                    fe_data.shape_values.size() == this->n_dofs_per_cell(),
                  ExcDimensionMismatch(fe_data.shape_values.size(),
                                       this->n_dofs_per_cell()));
-          Assert(!(flags & update_values) ||
+          Assert(!contains(flags, update_values) ||
                    fe_data.shape_values[0].size() == n_q_points,
                  ExcDimensionMismatch(fe_data.shape_values[0].size(),
                                       n_q_points));
@@ -1688,7 +1688,7 @@ FE_NedelecSZ<dim, spacedim>::fill_face_values(
                 }
             }
           // Now can generate the basis
-          const unsigned int poly_length((flags & update_gradients) != 0u ? 3 :
+          const unsigned int poly_length(contains(flags, update_gradients)? 3 :
                                                                             2);
           std::vector<std::vector<double>> polyxi(
             degree, std::vector<double>(poly_length));
@@ -1942,11 +1942,11 @@ FE_NedelecSZ<dim, spacedim>::fill_fe_values(
   const UpdateFlags  flags(fe_data.update_each);
   const unsigned int n_q_points = quadrature.size();
 
-  Assert(!(flags & update_values) ||
+  Assert(!contains(flags, update_values) ||
            fe_data.shape_values.size() == this->n_dofs_per_cell(),
          ExcDimensionMismatch(fe_data.shape_values.size(),
                               this->n_dofs_per_cell()));
-  Assert(!(flags & update_values) ||
+  Assert(!contains(flags, update_values) ||
            fe_data.shape_values[0].size() == n_q_points,
          ExcDimensionMismatch(fe_data.shape_values[0].size(), n_q_points));
 
