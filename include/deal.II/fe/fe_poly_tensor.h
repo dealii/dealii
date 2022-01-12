@@ -325,7 +325,7 @@ protected:
     const bool update_transformed_shape_hessian_tensors =
       update_transformed_shape_values;
 
-    if ((update_flags & update_values) != 0u)
+    if (contains(update_flags, update_values))
       {
         values.resize(this->n_dofs_per_cell());
         data.shape_values.reinit(this->n_dofs_per_cell(), n_q_points);
@@ -333,7 +333,7 @@ protected:
           data.transformed_shape_values.resize(n_q_points);
       }
 
-    if ((update_flags & update_gradients) != 0u)
+    if (contains(update_flags, update_gradients))
       {
         grads.resize(this->n_dofs_per_cell());
         data.shape_grads.reinit(this->n_dofs_per_cell(), n_q_points);
@@ -343,7 +343,7 @@ protected:
           data.untransformed_shape_grads.resize(n_q_points);
       }
 
-    if ((update_flags & update_hessians) != 0u)
+    if (contains(update_flags, update_hessians))
       {
         grad_grads.resize(this->n_dofs_per_cell());
         data.shape_grad_grads.reinit(this->n_dofs_per_cell(), n_q_points);
@@ -369,7 +369,7 @@ protected:
                                third_derivatives,
                                fourth_derivatives);
 
-          if ((update_flags & update_values) != 0u)
+          if (contains(update_flags, update_values))
             {
               if (inverse_node_matrix.n_cols() == 0)
                 for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
@@ -384,7 +384,7 @@ protected:
                   }
             }
 
-          if ((update_flags & update_gradients) != 0u)
+          if (contains(update_flags, update_gradients))
             {
               if (inverse_node_matrix.n_cols() == 0)
                 for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
@@ -399,7 +399,7 @@ protected:
                   }
             }
 
-          if ((update_flags & update_hessians) != 0u)
+          if (contains(update_flags, update_hessians))
             {
               if (inverse_node_matrix.n_cols() == 0)
                 for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)

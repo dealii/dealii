@@ -1099,12 +1099,12 @@ MappingQ<dim, spacedim>::fill_fe_values(
                     CellSimilarity::inverted_translation)
                   {
                     // we only need to flip the normal
-                    if ((update_flags & update_normal_vectors) != 0u)
+                    if (contains(update_flags, update_normal_vectors))
                       output_data.normal_vectors[point] *= -1.;
                   }
                 else
                   {
-                    if ((update_flags & update_normal_vectors) != 0u)
+                    if (contains(update_flags, update_normal_vectors))
                       {
                         Assert(spacedim == dim + 1,
                                ExcMessage(
@@ -1137,7 +1137,7 @@ MappingQ<dim, spacedim>::fill_fe_values(
 
 
   // copy values from InternalData to vector given by reference
-  if ((update_flags & update_jacobians) != 0u)
+  if (contains(update_flags, update_jacobians))
     {
       AssertDimension(output_data.jacobians.size(), n_q_points);
       if (computed_cell_similarity != CellSimilarity::translation)
@@ -1146,7 +1146,7 @@ MappingQ<dim, spacedim>::fill_fe_values(
     }
 
   // copy values from InternalData to vector given by reference
-  if ((update_flags & update_inverse_jacobians) != 0u)
+  if (contains(update_flags, update_inverse_jacobians))
     {
       AssertDimension(output_data.inverse_jacobians.size(), n_q_points);
       if (computed_cell_similarity != CellSimilarity::translation)
@@ -1364,7 +1364,7 @@ MappingQ<dim, spacedim>::fill_fe_immersed_surface_values(
 
           output_data.JxW_values[point] = weights[point] * det * normal.norm();
 
-          if ((update_flags & update_normal_vectors) != 0u)
+          if (contains(update_flags, update_normal_vectors))
             {
               normal /= normal.norm();
               output_data.normal_vectors[point] = normal;
@@ -1373,7 +1373,7 @@ MappingQ<dim, spacedim>::fill_fe_immersed_surface_values(
     }
 
   // copy values from InternalData to vector given by reference
-  if ((update_flags & update_jacobians) != 0u)
+  if (contains(update_flags, update_jacobians))
     {
       AssertDimension(output_data.jacobians.size(), n_q_points);
       for (unsigned int point = 0; point < n_q_points; ++point)
@@ -1381,7 +1381,7 @@ MappingQ<dim, spacedim>::fill_fe_immersed_surface_values(
     }
 
   // copy values from InternalData to vector given by reference
-  if ((update_flags & update_inverse_jacobians) != 0u)
+  if (contains(update_flags, update_inverse_jacobians))
     {
       AssertDimension(output_data.inverse_jacobians.size(), n_q_points);
       for (unsigned int point = 0; point < n_q_points; ++point)
@@ -1438,18 +1438,18 @@ MappingQ<dim, spacedim>::fill_mapping_data_for_generic_points(
             polynomial_degree == 1,
             renumber_lexicographic_to_hierarchic);
 
-        if ((update_flags & update_quadrature_points) != 0u)
+        if (contains(update_flags, update_quadrature_points))
           for (unsigned int j = 0; j < n_lanes && i + j < n_points; ++j)
             for (unsigned int d = 0; d < spacedim; ++d)
               output_data.quadrature_points[i + j][d] = result.first[d][j];
 
-        if ((update_flags & update_jacobians) != 0u)
+        if (contains(update_flags, update_jacobians))
           for (unsigned int j = 0; j < n_lanes && i + j < n_points; ++j)
             for (unsigned int d = 0; d < spacedim; ++d)
               for (unsigned int e = 0; e < dim; ++e)
                 output_data.jacobians[i + j][d][e] = result.second[e][d][j];
 
-        if ((update_flags & update_inverse_jacobians) != 0u)
+        if (contains(update_flags, update_inverse_jacobians))
           {
             DerivativeForm<1, spacedim, dim, VectorizedArray<double>> jac(
               result.second);
@@ -1471,16 +1471,16 @@ MappingQ<dim, spacedim>::fill_mapping_data_for_generic_points(
             polynomial_degree == 1,
             renumber_lexicographic_to_hierarchic);
 
-        if ((update_flags & update_quadrature_points) != 0u)
+        if (contains(update_flags, update_quadrature_points))
           output_data.quadrature_points[i] = result.first;
 
-        if ((update_flags & update_jacobians) != 0u)
+        if (contains(update_flags, update_jacobians))
           {
             DerivativeForm<1, spacedim, dim> jac = result.second;
             output_data.jacobians[i]             = jac.transpose();
           }
 
-        if ((update_flags & update_inverse_jacobians) != 0u)
+        if (contains(update_flags, update_inverse_jacobians))
           {
             DerivativeForm<1, spacedim, dim> jac(result.second);
             DerivativeForm<1, spacedim, dim> inv_jac = jac.covariant_form();

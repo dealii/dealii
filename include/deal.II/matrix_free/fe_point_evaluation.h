@@ -836,12 +836,12 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::FEPointEvaluation(
     }
 
   // translate update flags
-  if ((update_flags & update_jacobians) != 0u)
+  if (contains(update_flags, update_jacobians))
     update_flags_mapping |= update_jacobians;
-  if (((update_flags & update_gradients) != 0u) ||
-      ((update_flags & update_inverse_jacobians) != 0u))
+  if ((contains(update_flags, update_gradients)) ||
+      (contains(update_flags, update_inverse_jacobians)))
     update_flags_mapping |= update_inverse_jacobians;
-  if ((update_flags & update_quadrature_points) != 0u)
+  if (contains(update_flags, update_quadrature_points))
     update_flags_mapping |= update_quadrature_points;
 }
 
@@ -920,9 +920,9 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::reinit(
           mapping_data.quadrature_points[q] = fe_values->quadrature_point(q);
     }
 
-  if ((update_flags & update_values) != 0)
+  if (contains(update_flags, update_values))
     values.resize(unit_points.size(), numbers::signaling_nan<value_type>());
-  if ((update_flags & update_gradients) != 0)
+  if (contains(update_flags, update_gradients))
     gradients.resize(unit_points.size(),
                      numbers::signaling_nan<gradient_type>());
 }

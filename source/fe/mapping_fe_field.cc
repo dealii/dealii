@@ -1574,7 +1574,7 @@ MappingFEField<dim, spacedim, VectorType, void>::fill_fe_values(
               output_data.JxW_values[point] =
                 std::sqrt(determinant(G)) * weights[point];
 
-              if ((update_flags & update_normal_vectors) != 0u)
+              if (contains(update_flags, update_normal_vectors))
                 {
                   Assert(spacedim - dim == 1,
                          ExcMessage("There is no cell normal in codim 2."));
@@ -1603,7 +1603,7 @@ MappingFEField<dim, spacedim, VectorType, void>::fill_fe_values(
     }
 
   // copy values from InternalData to vector given by reference
-  if ((update_flags & update_jacobians) != 0u)
+  if (contains(update_flags, update_jacobians))
     {
       AssertDimension(output_data.jacobians.size(), n_q_points);
       for (unsigned int point = 0; point < n_q_points; ++point)
@@ -1611,7 +1611,7 @@ MappingFEField<dim, spacedim, VectorType, void>::fill_fe_values(
     }
 
   // copy values from InternalData to vector given by reference
-  if ((update_flags & update_inverse_jacobians) != 0u)
+  if (contains(update_flags, update_inverse_jacobians))
     {
       AssertDimension(output_data.inverse_jacobians.size(), n_q_points);
       for (unsigned int point = 0; point < n_q_points; ++point)

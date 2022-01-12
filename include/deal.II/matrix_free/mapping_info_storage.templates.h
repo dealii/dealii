@@ -134,11 +134,11 @@ namespace internal
       // for Hessian information, need inverse Jacobians and the derivative of
       // Jacobians (these two together will give use the gradients of the
       // inverse Jacobians, which is what we need)
-      if ((update_flags & update_hessians) != 0u ||
-          (update_flags & update_jacobian_grads) != 0u)
+      if (contains(update_flags, update_hessians) ||
+          contains(update_flags, update_jacobian_grads))
         new_flags |= update_jacobian_grads;
 
-      if ((update_flags & update_quadrature_points) != 0u)
+      if (contains(update_flags, update_quadrature_points))
         new_flags |= update_quadrature_points;
 
       // there is one more thing: if we have a quadrature formula with only

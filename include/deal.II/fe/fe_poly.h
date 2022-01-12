@@ -308,7 +308,7 @@ protected:
     // quadrature points summed over *all* faces or subfaces, whereas
     // the number of output slots equals the number of quadrature
     // points on only *one* face)
-    if ((update_flags & update_values) &&
+    if (contains(update_flags, update_values) &&
         !((output_data.shape_values.n_rows() > 0) &&
           (output_data.shape_values.n_cols() == n_q_points)))
       data.shape_values.reinit(this->n_dofs_per_cell(), n_q_points);
@@ -325,8 +325,8 @@ protected:
     // next already fill those fields of which we have information by
     // now. note that the shape gradients are only those on the unit
     // cell, and need to be transformed when visiting an actual cell
-    if ((update_flags & (update_values | update_gradients | update_hessians |
-                         update_3rd_derivatives)) != 0u)
+    if (contains(update_flags, (update_values | update_gradients | update_hessians |
+                         update_3rd_derivatives)))
       for (unsigned int i = 0; i < n_q_points; ++i)
         {
           poly_space->evaluate(quadrature.point(i),
