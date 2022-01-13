@@ -1,0 +1,5 @@
+New: contains_bits() provides a convenience global function allowing for
+UpdateFlags, CacheUpdateFlags, EvaluationFlags, and AssembleFlags to check if
+given flags contain other flags.
+<br>
+(Daniel Arndt, 2022/01/13)
