@@ -423,67 +423,6 @@ namespace Utilities
 
 
       template <typename T1, typename T2>
-      void
-      PEX<T1, T2>::answer_requests(int index)
-      {
-#ifdef DEAL_II_WITH_MPI
-        const int tag_request = Utilities::MPI::internal::Tags::
-          consensus_algorithm_pex_answer_request;
-        const int tag_deliver = Utilities::MPI::internal::Tags::
-          consensus_algorithm_pex_process_deliver;
-
-        MPI_Status status;
-        auto ierr = MPI_Probe(MPI_ANY_SOURCE, tag_request, this->comm, &status);
-        AssertThrowMPI(ierr);
-
-        // get rank of incoming message
-        const auto other_rank = status.MPI_SOURCE;
-
-        Assert(requesting_processes.find(other_rank) ==
-                 requesting_processes.end(),
-               ExcMessage("Process is requesting a second time!"));
-        requesting_processes.insert(other_rank);
-
-        std::vector<T1> buffer_recv;
-
-        // get size of incoming message
-        int number_amount;
-        ierr = MPI_Get_count(&status, MPI_BYTE, &number_amount);
-        AssertThrowMPI(ierr);
-
-        // allocate memory for incoming message
-        Assert(number_amount % sizeof(T1) == 0, ExcInternalError());
-        buffer_recv.resize(number_amount / sizeof(T1));
-        ierr = MPI_Recv(buffer_recv.data(),
-                        number_amount,
-                        MPI_BYTE,
-                        other_rank,
-                        tag_request,
-                        this->comm,
-                        &status);
-        AssertThrowMPI(ierr);
-
-        // process request
-        auto &request_buffer = requests_buffers[index];
-        this->process.answer_request(other_rank, buffer_recv, request_buffer);
-
-        // start to send answer back
-        ierr = MPI_Isend(request_buffer.data(),
-                         request_buffer.size() * sizeof(T2),
-                         MPI_BYTE,
-                         other_rank,
-                         tag_deliver,
-                         this->comm,
-                         &requests_answers[index]);
-        AssertThrowMPI(ierr);
-#else
-        (void)index;
-#endif
-      }
-
-
-
-      template <typename T1, typename T2>
       unsigned int
       PEX<T1, T2>::start_communication()
       {
@@ -547,6 +486,67 @@ namespace Utilities
         return sources.size();
 #else
         return 0;
+#endif
+      }
+
+
+
+      template <typename T1, typename T2>
+      void
+      PEX<T1, T2>::answer_requests(int index)
+      {
+#ifdef DEAL_II_WITH_MPI
+        const int tag_request = Utilities::MPI::internal::Tags::
+          consensus_algorithm_pex_answer_request;
+        const int tag_deliver = Utilities::MPI::internal::Tags::
+          consensus_algorithm_pex_process_deliver;
+
+        MPI_Status status;
+        auto ierr = MPI_Probe(MPI_ANY_SOURCE, tag_request, this->comm, &status);
+        AssertThrowMPI(ierr);
+
+        // get rank of incoming message
+        const auto other_rank = status.MPI_SOURCE;
+
+        Assert(requesting_processes.find(other_rank) ==
+                 requesting_processes.end(),
+               ExcMessage("Process is requesting a second time!"));
+        requesting_processes.insert(other_rank);
+
+        std::vector<T1> buffer_recv;
+
+        // get size of incoming message
+        int number_amount;
+        ierr = MPI_Get_count(&status, MPI_BYTE, &number_amount);
+        AssertThrowMPI(ierr);
+
+        // allocate memory for incoming message
+        Assert(number_amount % sizeof(T1) == 0, ExcInternalError());
+        buffer_recv.resize(number_amount / sizeof(T1));
+        ierr = MPI_Recv(buffer_recv.data(),
+                        number_amount,
+                        MPI_BYTE,
+                        other_rank,
+                        tag_request,
+                        this->comm,
+                        &status);
+        AssertThrowMPI(ierr);
+
+        // process request
+        auto &request_buffer = requests_buffers[index];
+        this->process.answer_request(other_rank, buffer_recv, request_buffer);
+
+        // start to send answer back
+        ierr = MPI_Isend(request_buffer.data(),
+                         request_buffer.size() * sizeof(T2),
+                         MPI_BYTE,
+                         other_rank,
+                         tag_deliver,
+                         this->comm,
+                         &requests_answers[index]);
+        AssertThrowMPI(ierr);
+#else
+        (void)index;
 #endif
       }
 

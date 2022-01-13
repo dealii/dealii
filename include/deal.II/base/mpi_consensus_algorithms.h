@@ -485,18 +485,18 @@ namespace Utilities
         std::set<unsigned int> requesting_processes;
 
         /**
-         * The ith request message from another rank has been received: process
-         * the request and send an answer.
-         */
-        void
-        answer_requests(int index);
-
-        /**
          * Start to send all requests via ISend and post IRecvs for the incoming
          * answer messages.
          */
         unsigned int
         start_communication();
+
+        /**
+         * The ith request message from another rank has been received: process
+         * the request and send an answer.
+         */
+        void
+        answer_requests(int index);
 
         /**
          * After all answers have been exchanged, the MPI data structures can be
