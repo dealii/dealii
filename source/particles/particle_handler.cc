@@ -1312,8 +1312,12 @@ namespace Particles
 
       // Reuse these vectors below, but only with a single element.
       // Avoid resizing for every particle.
-      reference_locations.resize(1);
-      real_locations.resize(1);
+      Point<dim>      invalid_reference_point;
+      Point<spacedim> invalid_point;
+      invalid_reference_point[0] = std::numeric_limits<double>::infinity();
+      invalid_point[0]           = std::numeric_limits<double>::infinity();
+      reference_locations.resize(1, invalid_reference_point);
+      real_locations.resize(1, invalid_point);
 
       // Find the cells that the particles moved to.
       for (auto &out_particle : particles_out_of_cell)
@@ -1409,19 +1413,20 @@ namespace Particles
                         reference_locations[0]))
                     {
                       current_cell = cell;
+                      found_cell   = true;
                       break;
                     }
                 }
+            }
 
-              if (current_cell.state() != IteratorState::valid)
-                {
-                  // We can find no cell for this particle. It has left the
-                  // domain due to an integration error or an open boundary.
-                  // Signal the loss and move on.
-                  signals.particle_lost(out_particle,
-                                        out_particle->get_surrounding_cell());
-                  continue;
-                }
+          if (!found_cell)
+            {
+              // We can find no cell for this particle. It has left the
+              // domain due to an integration error or an open boundary.
+              // Signal the loss and move on.
+              signals.particle_lost(out_particle,
+                                    out_particle->get_surrounding_cell());
+              continue;
             }
 
           // If we are here, we found a cell and reference position for this
