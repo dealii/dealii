@@ -163,7 +163,7 @@ namespace GridTools
 
         locally_owned_cell_bounding_boxes_rtree = pack_rtree(boxes);
         update_flags =
-          update_flag & ~update_locally_owned_cell_bounding_boxes_rtree;
+          update_flags & ~update_locally_owned_cell_bounding_boxes_rtree;
       }
     return locally_owned_cell_bounding_boxes_rtree;
   }
