@@ -405,15 +405,16 @@ namespace Utilities
         static CollectiveMutex      mutex;
         CollectiveMutex::ScopedLock lock(mutex, this->comm);
 
-        // 1) send requests and start receiving the answers
-        //    especially determine how many requests are expected
+        // 1) Send requests and start receiving the answers.
+        //    In particular, determine how many requests we should expect
+        //    on the current process.
         const unsigned int n_requests = start_communication();
 
-        // 2) Answer requests
+        // 2) Answer requests:
         for (unsigned int request = 0; request < n_requests; ++request)
           answer_one_request(request);
 
-        // 3) process answers
+        // 3) Process answers:
         clean_up_and_end_communication();
 
         return std::vector<unsigned int>(requesting_processes.begin(),
@@ -439,8 +440,8 @@ namespace Utilities
         sources =
           compute_point_to_point_communication_pattern(this->comm, targets);
 
-        const auto n_targets = targets.size();
-        const auto n_sources = sources.size();
+        const unsigned int n_targets = targets.size();
+        const unsigned int n_sources = sources.size();
 
         // 2) allocate memory
         recv_buffers.resize(n_targets);
@@ -471,7 +472,7 @@ namespace Utilities
                         &send_request_and_recv_answer_requests[n_targets + i]);
             AssertThrowMPI(ierr);
 
-            // start to receive data
+            // Post the operation that receives the answers
             auto &recv_buffer = recv_buffers[i];
             this->process.prepare_buffer_for_answer(rank, recv_buffer);
             ierr = MPI_Irecv(recv_buffer.data(),
@@ -502,27 +503,35 @@ namespace Utilities
         const int tag_deliver = Utilities::MPI::internal::Tags::
           consensus_algorithm_pex_process_deliver;
 
+        // Wait until we have a message ready for retrieval, though we don't
+        // care which process it is from. We know that the source must be
+        // listed in the 'sources' array, though.
         MPI_Status status;
-        auto ierr = MPI_Probe(MPI_ANY_SOURCE, tag_request, this->comm, &status);
+        int ierr = MPI_Probe(MPI_ANY_SOURCE, tag_request, this->comm, &status);
         AssertThrowMPI(ierr);
 
-        // get rank of incoming message
-        const auto other_rank = status.MPI_SOURCE;
+        // Get rank of incoming message and verify that it makes sense
+        const unsigned int other_rank = status.MPI_SOURCE;
+        Assert(std::find(sources.begin(), sources.end(), other_rank) !=
+                 sources.end(),
+               ExcInternalError());
 
         Assert(requesting_processes.find(other_rank) ==
                  requesting_processes.end(),
-               ExcMessage("Process is requesting a second time!"));
+               ExcMessage(
+                 "A process is sending a request after a request from "
+                 "the same process has previously already been "
+                 "received. This algorithm does not expect this to happen."));
         requesting_processes.insert(other_rank);
 
         std::vector<T1> buffer_recv;
 
-        // get size of incoming message
+        // Actually get the incoming message:
         int number_amount;
         ierr = MPI_Get_count(&status, MPI_BYTE, &number_amount);
         AssertThrowMPI(ierr);
-
-        // allocate memory for incoming message
         Assert(number_amount % sizeof(T1) == 0, ExcInternalError());
+
         buffer_recv.resize(number_amount / sizeof(T1));
         ierr = MPI_Recv(buffer_recv.data(),
                         number_amount,
@@ -533,11 +542,11 @@ namespace Utilities
                         &status);
         AssertThrowMPI(ierr);
 
-        // process request
+        // Process request by asking the user-provided function for
+        // the answer and post a send for it.
         auto &request_buffer = requests_buffers[index];
         this->process.answer_request(other_rank, buffer_recv, request_buffer);
 
-        // start to send answer back
         ierr = MPI_Isend(request_buffer.data(),
                          request_buffer.size() * sizeof(T2),
                          MPI_BYTE,
@@ -578,7 +587,9 @@ namespace Utilities
             AssertThrowMPI(ierr);
           }
 
-        // unpack received data
+        // We now know that all answers to the requests we have sent
+        // have been received and put in their respective buffers.
+        // Pass them on to the user-provided functions:
         for (unsigned int i = 0; i < targets.size(); ++i)
           this->process.read_answer(targets[i], recv_buffers[i]);
 #endif
