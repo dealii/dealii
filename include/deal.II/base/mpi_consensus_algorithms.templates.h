@@ -610,10 +610,19 @@ namespace Utilities
       {
         const auto targets = this->process.compute_targets();
 
+        // The only valid target for a serial program is itself.
         if (targets.size() != 0)
           {
+            Assert(targets.size() == 1,
+                   ExcMessage(
+                     "On a single process, the only valid target "
+                     "is process zero (the process itself), which can only be "
+                     "listed once."));
             AssertDimension(targets[0], 0);
 
+            // Since the caller indicates that there is a target, and since we
+            // know that it is the current process, let the process send
+            // something to itself.
             std::vector<T1> send_buffer;
             std::vector<T2> recv_buffer;
             std::vector<T2> request_buffer;
