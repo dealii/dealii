@@ -445,9 +445,9 @@ namespace Utilities
         // 2) allocate memory
         recv_buffers.resize(n_targets);
         send_buffers.resize(n_targets);
-        send_and_recv_buffers.resize(2 * n_targets);
+        send_request_and_recv_answer_requests.resize(2 * n_targets);
 
-        requests_answers.resize(n_sources);
+        send_answer_requests.resize(n_sources);
         requests_buffers.resize(n_sources);
 
         // 4) send and receive
@@ -461,13 +461,14 @@ namespace Utilities
             this->process.create_request(rank, send_buffer);
 
             // start to send data
-            auto ierr = MPI_Isend(send_buffer.data(),
-                                  send_buffer.size() * sizeof(T1),
-                                  MPI_BYTE,
-                                  rank,
-                                  tag_request,
-                                  this->comm,
-                                  &send_and_recv_buffers[n_targets + i]);
+            auto ierr =
+              MPI_Isend(send_buffer.data(),
+                        send_buffer.size() * sizeof(T1),
+                        MPI_BYTE,
+                        rank,
+                        tag_request,
+                        this->comm,
+                        &send_request_and_recv_answer_requests[n_targets + i]);
             AssertThrowMPI(ierr);
 
             // start to receive data
@@ -479,7 +480,7 @@ namespace Utilities
                              rank,
                              tag_deliver,
                              this->comm,
-                             &send_and_recv_buffers[i]);
+                             &send_request_and_recv_answer_requests[i]);
             AssertThrowMPI(ierr);
           }
 
@@ -543,7 +544,7 @@ namespace Utilities
                          other_rank,
                          tag_deliver,
                          this->comm,
-                         &requests_answers[index]);
+                         &send_answer_requests[index]);
         AssertThrowMPI(ierr);
 #else
         (void)index;
@@ -557,20 +558,23 @@ namespace Utilities
       PEX<T1, T2>::clean_up_and_end_communication()
       {
 #ifdef DEAL_II_WITH_MPI
-        // finalize all MPI_Requests
-        if (send_and_recv_buffers.size() > 0)
+        // Finalize all MPI_Request objects for both the
+        // send-request and receive-answer operations.
+        if (send_request_and_recv_answer_requests.size() > 0)
           {
-            auto ierr = MPI_Waitall(send_and_recv_buffers.size(),
-                                    send_and_recv_buffers.data(),
-                                    MPI_STATUSES_IGNORE);
+            const int ierr =
+              MPI_Waitall(send_request_and_recv_answer_requests.size(),
+                          send_request_and_recv_answer_requests.data(),
+                          MPI_STATUSES_IGNORE);
             AssertThrowMPI(ierr);
           }
 
-        if (requests_answers.size() > 0)
+        // Then also check the send-answer requests.
+        if (send_answer_requests.size() > 0)
           {
-            auto ierr = MPI_Waitall(requests_answers.size(),
-                                    requests_answers.data(),
-                                    MPI_STATUSES_IGNORE);
+            const int ierr = MPI_Waitall(send_answer_requests.size(),
+                                         send_answer_requests.data(),
+                                         MPI_STATUSES_IGNORE);
             AssertThrowMPI(ierr);
           }
 

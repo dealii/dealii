@@ -466,8 +466,11 @@ namespace Utilities
 
         /**
          * Requests for sending requests and receiving answers to requests.
+         * The first half of the array is used for the receive-answer
+         * requests objects, the second half for the send-request request
+         * objects.
          */
-        std::vector<MPI_Request> send_and_recv_buffers;
+        std::vector<MPI_Request> send_request_and_recv_answer_requests;
 
         /**
          * Buffers for sending answers to requests.
@@ -477,7 +480,7 @@ namespace Utilities
         /**
          * Requests for sending answers to requests.
          */
-        std::vector<MPI_Request> requests_answers;
+        std::vector<MPI_Request> send_answer_requests;
 #endif
         /**
          * List of processes who have made a request to this process.
