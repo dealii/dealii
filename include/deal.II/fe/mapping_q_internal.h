@@ -1137,18 +1137,19 @@ namespace internal
            EvaluationFlags::hessians :
            EvaluationFlags::nothing);
 
-      Assert(!(evaluation_flag & EvaluationFlags::values) || n_q_points > 0,
+      Assert(!(contains(evaluation_flag, EvaluationFlags::values)) ||
+               n_q_points > 0,
              ExcInternalError());
-      Assert(!(evaluation_flag & EvaluationFlags::values) ||
+      Assert(!(contains(evaluation_flag, EvaluationFlags::values)) ||
                n_q_points == quadrature_points.size(),
              ExcDimensionMismatch(n_q_points, quadrature_points.size()));
-      Assert(!(evaluation_flag & EvaluationFlags::gradients) ||
+      Assert(!(contains(evaluation_flag, EvaluationFlags::gradients)) ||
                data.n_shape_functions > 0,
              ExcInternalError());
-      Assert(!(evaluation_flag & EvaluationFlags::gradients) ||
+      Assert(!(contains(evaluation_flag, EvaluationFlags::gradients)) ||
                n_q_points == data.contravariant.size(),
              ExcDimensionMismatch(n_q_points, data.contravariant.size()));
-      Assert(!(evaluation_flag & EvaluationFlags::hessians) ||
+      Assert(!(contains(evaluation_flag, EvaluationFlags::hessians)) ||
                n_q_points == jacobian_grads.size(),
              ExcDimensionMismatch(n_q_points, jacobian_grads.size()));
 
@@ -1195,7 +1196,7 @@ namespace internal
         }
 
       // do the postprocessing
-      if (evaluation_flag & EvaluationFlags::values)
+      if (contains(evaluation_flag, EvaluationFlags::values))
         {
           for (unsigned int out_comp = 0; out_comp < n_comp; ++out_comp)
             for (unsigned int i = 0; i < n_q_points; ++i)
@@ -1206,7 +1207,7 @@ namespace internal
                   eval.begin_values()[out_comp * n_q_points + i][in_comp];
         }
 
-      if (evaluation_flag & EvaluationFlags::gradients)
+      if (contains(evaluation_flag, EvaluationFlags::gradients))
         {
           std::fill(data.contravariant.begin(),
                     data.contravariant.end(),
@@ -1242,7 +1243,7 @@ namespace internal
             data.volume_elements[point] =
               data.contravariant[point].determinant();
 
-      if (evaluation_flag & EvaluationFlags::hessians)
+      if (contains(evaluation_flag, EvaluationFlags::hessians))
         {
           constexpr int desymmetrize_3d[6][2] = {
             {0, 0}, {1, 1}, {2, 2}, {0, 1}, {0, 2}, {1, 2}};

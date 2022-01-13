@@ -949,8 +949,8 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::evaluate(
     return;
 
   AssertDimension(solution_values.size(), fe->dofs_per_cell);
-  if ((((evaluation_flag & EvaluationFlags::values) != 0u) ||
-       ((evaluation_flag & EvaluationFlags::gradients) != 0u)) &&
+  if (((contains(evaluation_flag, EvaluationFlags::values)) ||
+       (contains(evaluation_flag, EvaluationFlags::gradients))) &&
       !poly.empty())
     {
       // fast path with tensor product evaluation
@@ -990,12 +990,12 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::evaluate(
               polynomials_are_hat_functions);
 
           // convert back to standard format
-          if ((evaluation_flag & EvaluationFlags::values) != 0u)
+          if (contains(evaluation_flag, EvaluationFlags::values))
             for (unsigned int j = 0; j < n_lanes && i + j < n_points; ++j)
               internal::FEPointEvaluation::
                 EvaluatorTypeTraits<dim, n_components, Number>::set_value(
                   val_and_grad.first, j, values[i + j]);
-          if ((evaluation_flag & EvaluationFlags::gradients) != 0u)
+          if (contains(evaluation_flag, EvaluationFlags::gradients))
             {
               Assert(contains(update_flags,
                               update_gradients | update_inverse_jacobians),
@@ -1021,15 +1021,15 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::evaluate(
             }
         }
     }
-  else if (((evaluation_flag & EvaluationFlags::values) != 0u) ||
-           ((evaluation_flag & EvaluationFlags::gradients) != 0u))
+  else if ((contains(evaluation_flag, EvaluationFlags::values)) ||
+           (contains(evaluation_flag, EvaluationFlags::gradients)))
     {
       // slow path with FEValues
       Assert(fe_values.get() != nullptr,
              ExcMessage(
                "Not initialized. Please call FEPointEvaluation::reinit()!"));
 
-      if ((evaluation_flag & EvaluationFlags::values) != 0u)
+      if (contains(evaluation_flag, EvaluationFlags::values))
         {
           values.resize(unit_points.size());
           std::fill(values.begin(), values.end(), value_type());
@@ -1052,7 +1052,7 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::evaluate(
             }
         }
 
-      if ((evaluation_flag & EvaluationFlags::gradients) != 0u)
+      if (contains(evaluation_flag, EvaluationFlags::gradients))
         {
           gradients.resize(unit_points.size());
           std::fill(gradients.begin(), gradients.end(), gradient_type());

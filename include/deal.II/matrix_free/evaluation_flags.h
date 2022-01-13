@@ -102,12 +102,13 @@ namespace EvaluationFlags
    * @ref EvaluationFlags
    */
   inline EvaluationFlags
-  operator&(const EvaluationFlags f1, const EvaluationFlags f2)
-  {
-    return static_cast<EvaluationFlags>(static_cast<unsigned int>(f1) &
-                                        static_cast<unsigned int>(f2));
-  }
+  operator&(const EvaluationFlags f1, const EvaluationFlags f2) = delete;
 
+  inline bool
+  contains(EvaluationFlags f1, EvaluationFlags f2)
+  {
+    return static_cast<unsigned int>(f1) & static_cast<unsigned int>(f2) == 0;
+  }
 
   /**
    * Global operator which clears all the bits in the first argument if they are
@@ -116,12 +117,14 @@ namespace EvaluationFlags
    * @ref EvaluationFlags
    */
   inline EvaluationFlags &
-  operator&=(EvaluationFlags &f1, const EvaluationFlags f2)
-  {
-    f1 = f1 & f2;
-    return f1;
-  }
+  operator&=(EvaluationFlags &f1, const EvaluationFlags f2) = delete;
 
+  inline EvaluationFlags
+  operator~(const EvaluationFlags f)
+  {
+    using enum_type = std::underlying_type_t<EvaluationFlags>;
+    return static_cast<EvaluationFlags>(~static_cast<enum_type>(f));
+  }
 } // namespace EvaluationFlags
 
 

@@ -7087,7 +7087,7 @@ FEEvaluation<dim,
            const EvaluationFlags::EvaluationFlags evaluation_flag)
 {
   const bool hessians_on_general_cells =
-    evaluation_flag & EvaluationFlags::hessians &&
+    contains(evaluation_flag, EvaluationFlags::hessians) &&
     (this->cell_type > internal::MatrixFreeFunctions::affine);
   EvaluationFlags::EvaluationFlags evaluation_flag_actual = evaluation_flag;
   if (hessians_on_general_cells)
@@ -7108,11 +7108,11 @@ FEEvaluation<dim,
     }
 
 #  ifdef DEBUG
-  if ((evaluation_flag_actual & EvaluationFlags::values) != 0u)
+  if (contains(evaluation_flag_actual, EvaluationFlags::values))
     this->values_quad_initialized = true;
-  if ((evaluation_flag_actual & EvaluationFlags::gradients) != 0u)
+  if (contains(evaluation_flag_actual, EvaluationFlags::gradients))
     this->gradients_quad_initialized = true;
-  if ((evaluation_flag_actual & EvaluationFlags::hessians) != 0u)
+  if (contains(evaluation_flag_actual, EvaluationFlags::hessians))
     this->hessians_quad_initialized = true;
 #  endif
 }
@@ -7344,13 +7344,13 @@ FEEvaluation<dim,
             const bool                             sum_into_values_array)
 {
 #  ifdef DEBUG
-  if ((integration_flag & EvaluationFlags::values) != 0u)
+  if (contains(integration_flag, EvaluationFlags::values))
     Assert(this->values_quad_submitted == true,
            internal::ExcAccessToUninitializedField());
-  if ((integration_flag & EvaluationFlags::gradients) != 0u)
+  if (contains(integration_flag, EvaluationFlags::gradients))
     Assert(this->gradients_quad_submitted == true,
            internal::ExcAccessToUninitializedField());
-  if ((integration_flag & EvaluationFlags::hessians) != 0u)
+  if (contains(integration_flag, EvaluationFlags::hessians))
     Assert(this->hessians_quad_submitted == true,
            internal::ExcAccessToUninitializedField());
 #  endif
@@ -7358,18 +7358,20 @@ FEEvaluation<dim,
            this->mapped_geometry->is_initialized(),
          ExcNotInitialized());
 
-  Assert(
-    (integration_flag & ~(EvaluationFlags::values | EvaluationFlags::gradients |
-                          EvaluationFlags::hessians)) == 0,
-    ExcMessage("Only EvaluationFlags::values, EvaluationFlags::gradients, and "
-               "EvaluationFlags::hessians are supported."));
+  Assert(!contains(integration_flag,
+                   static_cast<EvaluationFlags::EvaluationFlags>(
+                     ~(EvaluationFlags::values | EvaluationFlags::gradients |
+                       EvaluationFlags::hessians))),
+         ExcMessage(
+           "Only EvaluationFlags::values, EvaluationFlags::gradients, and "
+           "EvaluationFlags::hessians are supported."));
 
   EvaluationFlags::EvaluationFlags integration_flag_actual = integration_flag;
-  if (integration_flag & EvaluationFlags::hessians &&
+  if (contains(integration_flag, EvaluationFlags::hessians) &&
       (this->cell_type > internal::MatrixFreeFunctions::affine))
     {
       unsigned int size = n_components * dim * n_q_points;
-      if ((integration_flag & EvaluationFlags::gradients) != 0u)
+      if (contains(integration_flag, EvaluationFlags::gradients))
         {
           for (unsigned int i = 0; i < size; ++i)
             this->gradients_quad[i] += this->gradients_from_hessians_quad[i];
@@ -7870,14 +7872,15 @@ FEFaceEvaluation<dim,
   evaluate(const VectorizedArrayType *            values_array,
            const EvaluationFlags::EvaluationFlags evaluation_flag)
 {
-  Assert((evaluation_flag &
-          ~(EvaluationFlags::values | EvaluationFlags::gradients |
-            EvaluationFlags::hessians)) == 0,
+  Assert(!contains(evaluation_flag,
+                   static_cast<EvaluationFlags::EvaluationFlags>(
+                     ~(EvaluationFlags::values | EvaluationFlags::gradients |
+                       EvaluationFlags::hessians))),
          ExcMessage("Only EvaluationFlags::values, EvaluationFlags::gradients, "
                     "and EvaluationFlags::hessians are supported."));
 
   const bool hessians_on_general_cells =
-    evaluation_flag & EvaluationFlags::hessians &&
+    contains(evaluation_flag, EvaluationFlags::hessians) &&
     (this->cell_type > internal::MatrixFreeFunctions::affine);
   EvaluationFlags::EvaluationFlags evaluation_flag_actual = evaluation_flag;
   if (hessians_on_general_cells)
@@ -7894,11 +7897,11 @@ FEFaceEvaluation<dim,
       n_components, evaluation_flag_actual, values_array, *this);
 
 #  ifdef DEBUG
-  if ((evaluation_flag_actual & EvaluationFlags::values) != 0u)
+  if (contains(evaluation_flag_actual, EvaluationFlags::values))
     this->values_quad_initialized = true;
-  if ((evaluation_flag_actual & EvaluationFlags::gradients) != 0u)
+  if (contains(evaluation_flag_actual, EvaluationFlags::gradients))
     this->gradients_quad_initialized = true;
-  if ((evaluation_flag_actual & EvaluationFlags::hessians) != 0u)
+  if (contains(evaluation_flag_actual, EvaluationFlags::hessians))
     this->hessians_quad_initialized = true;
 #  endif
 }
@@ -7996,18 +7999,18 @@ FEFaceEvaluation<dim,
   integrate(const EvaluationFlags::EvaluationFlags integration_flag,
             VectorizedArrayType *                  values_array)
 {
-  Assert((integration_flag &
-          ~(EvaluationFlags::values | EvaluationFlags::gradients |
-            EvaluationFlags::hessians)) == 0,
+  Assert(!contains(integration_flag,
+                   ~(EvaluationFlags::values | EvaluationFlags::gradients |
+                     EvaluationFlags::hessians)),
          ExcMessage("Only EvaluationFlags::values, EvaluationFlags::gradients, "
                     "and EvaluationFlags::hessians are supported."));
 
   EvaluationFlags::EvaluationFlags integration_flag_actual = integration_flag;
-  if (((integration_flag & EvaluationFlags::hessians) != 0u) &&
+  if ((contains(integration_flag, EvaluationFlags::hessians)) &&
       (this->cell_type > internal::MatrixFreeFunctions::affine))
     {
       unsigned int size = n_components * dim * n_q_points;
-      if ((integration_flag & EvaluationFlags::gradients) != 0u)
+      if (contains(integration_flag, EvaluationFlags::gradients))
         {
           for (unsigned int i = 0; i < size; ++i)
             this->gradients_quad[i] += this->gradients_from_hessians_quad[i];
@@ -8078,9 +8081,9 @@ FEFaceEvaluation<dim,
   gather_evaluate(const VectorType &                     input_vector,
                   const EvaluationFlags::EvaluationFlags evaluation_flag)
 {
-  Assert((evaluation_flag &
-          ~(EvaluationFlags::values | EvaluationFlags::gradients |
-            EvaluationFlags::hessians)) == 0,
+  Assert(!contains(evaluation_flag,
+                   ~(EvaluationFlags::values | EvaluationFlags::gradients |
+                     EvaluationFlags::hessians)),
          ExcMessage("Only EvaluationFlags::values, EvaluationFlags::gradients, "
                     "and EvaluationFlags::hessians are supported."));
 
@@ -8140,11 +8143,11 @@ FEFaceEvaluation<dim,
     }
 
 #  ifdef DEBUG
-  if (evaluation_flag & EvaluationFlags::values)
+  if (contains(evaluation_flag, EvaluationFlags::values))
     this->values_quad_initialized = true;
-  if (evaluation_flag & EvaluationFlags::gradients)
+  if (contains(evaluation_flag, EvaluationFlags::gradients))
     this->gradients_quad_initialized = true;
-  if (evaluation_flag & EvaluationFlags::hessians)
+  if (contains(evaluation_flag, EvaluationFlags::hessians))
     this->hessians_quad_initialized = true;
 #  endif
 }

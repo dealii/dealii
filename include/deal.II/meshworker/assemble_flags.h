@@ -174,10 +174,12 @@ namespace MeshWorker
    * @ref AssembleFlags
    */
   inline AssembleFlags
-  operator&(AssembleFlags f1, AssembleFlags f2)
+  operator&(AssembleFlags f1, AssembleFlags f2) = delete;
+
+  inline bool
+  contains(AssembleFlags f1, AssembleFlags f2)
   {
-    return static_cast<AssembleFlags>(static_cast<unsigned int>(f1) &
-                                      static_cast<unsigned int>(f2));
+    return static_cast<unsigned int>(f1) & static_cast<unsigned int>(f2) == 0;
   }
 
 
@@ -188,11 +190,7 @@ namespace MeshWorker
    * @ref AssembleFlags
    */
   inline AssembleFlags &
-  operator&=(AssembleFlags &f1, AssembleFlags f2)
-  {
-    f1 = f1 & f2;
-    return f1;
-  }
+  operator&=(AssembleFlags &f1, AssembleFlags f2) = delete;
 } // namespace MeshWorker
 
 /*@}*/
