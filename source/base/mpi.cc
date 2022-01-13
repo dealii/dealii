@@ -419,12 +419,9 @@ namespace Utilities
           {
             std::vector<unsigned int> my_destinations = destinations;
             std::sort(my_destinations.begin(), my_destinations.end());
-
-            for (unsigned int i = 0; i < my_destinations.size() - 1; ++i)
-              if (my_destinations[i] == my_destinations[i + 1])
-                return false;
-
-            return true;
+            return (std::adjacent_find(my_destinations.begin(),
+                                       my_destinations.end()) ==
+                    my_destinations.end());
           }
       }();
 
