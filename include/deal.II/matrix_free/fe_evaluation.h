@@ -7359,9 +7359,8 @@ FEEvaluation<dim,
          ExcNotInitialized());
 
   Assert(!contains(integration_flag,
-                   static_cast<EvaluationFlags::EvaluationFlags>(
-                     ~(EvaluationFlags::values | EvaluationFlags::gradients |
-                       EvaluationFlags::hessians))),
+                   ~(EvaluationFlags::values | EvaluationFlags::gradients |
+                     EvaluationFlags::hessians)),
          ExcMessage(
            "Only EvaluationFlags::values, EvaluationFlags::gradients, and "
            "EvaluationFlags::hessians are supported."));
@@ -7873,9 +7872,8 @@ FEFaceEvaluation<dim,
            const EvaluationFlags::EvaluationFlags evaluation_flag)
 {
   Assert(!contains(evaluation_flag,
-                   static_cast<EvaluationFlags::EvaluationFlags>(
-                     ~(EvaluationFlags::values | EvaluationFlags::gradients |
-                       EvaluationFlags::hessians))),
+                   ~(EvaluationFlags::values | EvaluationFlags::gradients |
+                     EvaluationFlags::hessians)),
          ExcMessage("Only EvaluationFlags::values, EvaluationFlags::gradients, "
                     "and EvaluationFlags::hessians are supported."));
 

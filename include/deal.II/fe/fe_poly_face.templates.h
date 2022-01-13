@@ -61,10 +61,7 @@ UpdateFlags
 FE_PolyFace<PolynomialType, dim, spacedim>::requires_update_flags(
   const UpdateFlags flags) const
 {
-  // FIXME
-  UpdateFlags out =
-    static_cast<UpdateFlags>(static_cast<unsigned int>(flags) &
-                             static_cast<unsigned int>(update_values));
+  UpdateFlags out = flags & update_values;
   if (contains(flags, update_gradients))
     out |= update_gradients | update_covariant_transformation;
   if (contains(flags, update_hessians))

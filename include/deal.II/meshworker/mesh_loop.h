@@ -366,20 +366,15 @@ namespace MeshWorker
              "conditions is not satisfied."));
 
     Assert(
-      static_cast<AssembleFlags>(
-        static_cast<unsigned>(flags) &
-        static_cast<unsigned>(assemble_own_interior_faces_once |
-                              assemble_own_interior_faces_both)) !=
-        (assemble_own_interior_faces_once | assemble_own_interior_faces_both),
+      flags &
+        (assemble_own_interior_faces_once | assemble_own_interior_faces_both) !=
+          (assemble_own_interior_faces_once | assemble_own_interior_faces_both),
       ExcMessage(
         "You can only specify 'assemble_own_interior_faces_once' "
         "OR 'assemble_own_interior_faces_both', but not both of these flags."));
 
-    Assert(static_cast<AssembleFlags>(
-             static_cast<unsigned>(flags) &
-             static_cast<unsigned>(assemble_ghost_faces_once |
-                                   assemble_ghost_faces_both)) !=
-             (assemble_ghost_faces_once | assemble_ghost_faces_both),
+    Assert(flags & (assemble_ghost_faces_once | assemble_ghost_faces_both) !=
+                     (assemble_ghost_faces_once | assemble_ghost_faces_both),
            ExcMessage(
              "You can only specify 'assemble_ghost_faces_once' "
              "OR 'assemble_ghost_faces_both', but not both of these flags."));

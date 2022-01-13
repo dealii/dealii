@@ -1666,10 +1666,8 @@ namespace internal
                      (EvaluationFlags::gradients | EvaluationFlags::hessians)))
           FEEvaluationImplCollocation<dim, n_q_points_1d - 1, Number>::
             do_evaluate(shape_data,
-                        static_cast<EvaluationFlags::EvaluationFlags>(
-                          unsigned(evaluation_flag) &
-                          unsigned(EvaluationFlags::gradients |
-                                   EvaluationFlags::hessians)),
+                        evaluation_flag & (EvaluationFlags::gradients |
+                                           EvaluationFlags::hessians),
                         fe_eval.begin_values() + c * n_q_points,
                         fe_eval.begin_gradients() + c * dim * n_q_points,
                         fe_eval.begin_hessians() +
@@ -1707,10 +1705,8 @@ namespace internal
                      (EvaluationFlags::gradients | EvaluationFlags::hessians)))
           FEEvaluationImplCollocation<dim, n_q_points_1d - 1, Number>::
             do_integrate(shape_data,
-                         static_cast<EvaluationFlags::EvaluationFlags>(
-                           static_cast<unsigned int>(integration_flag) &
-                           static_cast<unsigned>(EvaluationFlags::gradients |
-                                                 EvaluationFlags::hessians)),
+                         integration_flag & (EvaluationFlags::gradients |
+                                             EvaluationFlags::hessians),
                          fe_eval.begin_values() + c * n_q_points,
                          fe_eval.begin_gradients() + c * dim * n_q_points,
                          fe_eval.begin_hessians() +
