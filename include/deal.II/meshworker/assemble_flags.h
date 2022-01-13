@@ -144,8 +144,9 @@ namespace MeshWorker
   inline AssembleFlags
   operator|(AssembleFlags f1, AssembleFlags f2)
   {
-    return static_cast<AssembleFlags>(static_cast<unsigned int>(f1) |
-                                      static_cast<unsigned int>(f2));
+    using enum_type = std::underlying_type_t<AssembleFlags>;
+    return static_cast<AssembleFlags>(static_cast<enum_type>(f1) |
+                                      static_cast<enum_type>(f2));
   }
 
 
@@ -174,12 +175,11 @@ namespace MeshWorker
    * @ref AssembleFlags
    */
   inline AssembleFlags
-  operator&(AssembleFlags f1, AssembleFlags f2) = delete;
-
-  inline bool
-  contains(AssembleFlags f1, AssembleFlags f2)
+  operator&(AssembleFlags f1, AssembleFlags f2)
   {
-    return static_cast<unsigned int>(f1) & static_cast<unsigned int>(f2) == 0;
+    using enum_type = std::underlying_type_t<AssembleFlags>;
+    return static_cast<AssembleFlags>(static_cast<enum_type>(f1) &
+                                      static_cast<enum_type>(f2));
   }
 
 
@@ -190,7 +190,42 @@ namespace MeshWorker
    * @ref AssembleFlags
    */
   inline AssembleFlags &
-  operator&=(AssembleFlags &f1, AssembleFlags f2) = delete;
+  operator&=(AssembleFlags &f1, AssembleFlags f2)
+  {
+    f1 = f1 & f2;
+    return f1;
+  }
+
+
+  /**
+   * Global operator which returns an object in which all bits are set which are
+   * not set in the argument. This operator exists since
+   * if it did not then the result of the bit-negation <tt>operator ~</tt> would
+   * be an integer which would in turn trigger a compiler warning when we tried
+   * to assign it to an object of type AssembleFlags.
+   *
+   * @ref AssembleFlags
+   */
+  inline AssembleFlags
+  operator~(const AssembleFlags f)
+  {
+    using enum_type = std::underlying_type_t<AssembleFlags>;
+    return static_cast<AssembleFlags>(~static_cast<enum_type>(f));
+  }
+
+
+  /**
+   * Global operator which checks if the flags contained in the first argument
+   * contain the flags contained in the second argument.
+   *
+   * @ref AssembleFlags
+   */
+  inline bool
+  contains(const AssembleFlags flags, const AssembleFlags mask)
+  {
+    using enum_type = std::underlying_type_t<AssembleFlags>;
+    return (static_cast<enum_type>(flags) & static_cast<enum_type>(mask)) != 0;
+  }
 } // namespace MeshWorker
 
 /*@}*/

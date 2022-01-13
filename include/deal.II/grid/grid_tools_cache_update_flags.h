@@ -123,8 +123,9 @@ namespace GridTools
   inline CacheUpdateFlags
   operator|(const CacheUpdateFlags f1, const CacheUpdateFlags f2)
   {
-    return static_cast<CacheUpdateFlags>(static_cast<unsigned int>(f1) |
-                                         static_cast<unsigned int>(f2));
+    using enum_type = std::underlying_type_t<CacheUpdateFlags>;
+    return static_cast<CacheUpdateFlags>(static_cast<enum_type>(f1) |
+                                         static_cast<enum_type>(f2));
   }
 
   /**
@@ -139,8 +140,9 @@ namespace GridTools
   inline CacheUpdateFlags
   operator~(const CacheUpdateFlags f1)
   {
-    return static_cast<CacheUpdateFlags>(static_cast<unsigned int>(f1) ^
-                                         static_cast<unsigned int>(update_all));
+    using enum_type = std::underlying_type_t<CacheUpdateFlags>;
+    return static_cast<CacheUpdateFlags>(static_cast<enum_type>(f1) ^
+                                         static_cast<enum_type>(update_all));
   }
 
 
@@ -169,11 +171,12 @@ namespace GridTools
    * @ref CacheUpdateFlags
    */
   inline CacheUpdateFlags
-  operator&(const CacheUpdateFlags f1, const CacheUpdateFlags f2) = delete;
-  /*  {
-      return static_cast<CacheUpdateFlags>(static_cast<unsigned int>(f1) &
-                                           static_cast<unsigned int>(f2));
-    }*/
+  operator&(const CacheUpdateFlags f1, const CacheUpdateFlags f2)
+  {
+    using enum_type = std::underlying_type_t<CacheUpdateFlags>;
+    return static_cast<CacheUpdateFlags>(static_cast<enum_type>(f1) &
+                                         static_cast<enum_type>(f2));
+  }
 
 
   /**
@@ -183,19 +186,25 @@ namespace GridTools
    * @ref CacheUpdateFlags
    */
   inline CacheUpdateFlags &
-  operator&=(CacheUpdateFlags &f1, const CacheUpdateFlags f2) = delete;
-  /*  {
-      f1 = f1 & f2;
-      return f1;
-    }*/
+  operator&=(CacheUpdateFlags &f1, const CacheUpdateFlags f2)
+  {
+    f1 = f1 & f2;
+    return f1;
+  }
 
+
+  /**
+   * Global operator which checks if the flags contained in the first argument
+   * contain the flags contained in the second argument.
+   *
+   * @ref CacheUpdateFlags
+   */
   inline bool
   contains(const CacheUpdateFlags flags, const CacheUpdateFlags mask)
   {
     using enum_type = std::underlying_type_t<CacheUpdateFlags>;
     return (static_cast<enum_type>(flags) & static_cast<enum_type>(mask)) != 0;
   }
-
 } // namespace GridTools
 DEAL_II_NAMESPACE_CLOSE
 

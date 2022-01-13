@@ -72,8 +72,9 @@ namespace EvaluationFlags
   inline EvaluationFlags
   operator|(const EvaluationFlags f1, const EvaluationFlags f2)
   {
-    return static_cast<EvaluationFlags>(static_cast<unsigned int>(f1) |
-                                        static_cast<unsigned int>(f2));
+    using enum_type = std::underlying_type_t<EvaluationFlags>;
+    return static_cast<EvaluationFlags>(static_cast<enum_type>(f1) |
+                                        static_cast<enum_type>(f2));
   }
 
 
@@ -102,13 +103,13 @@ namespace EvaluationFlags
    * @ref EvaluationFlags
    */
   inline EvaluationFlags
-  operator&(const EvaluationFlags f1, const EvaluationFlags f2) = delete;
-
-  inline bool
-  contains(EvaluationFlags f1, EvaluationFlags f2)
+  operator&(const EvaluationFlags f1, const EvaluationFlags f2)
   {
-    return static_cast<unsigned int>(f1) & static_cast<unsigned int>(f2) == 0;
+    using enum_type = std::underlying_type_t<EvaluationFlags>;
+    return static_cast<EvaluationFlags>(static_cast<enum_type>(f1) &
+                                        static_cast<enum_type>(f2));
   }
+
 
   /**
    * Global operator which clears all the bits in the first argument if they are
@@ -117,13 +118,41 @@ namespace EvaluationFlags
    * @ref EvaluationFlags
    */
   inline EvaluationFlags &
-  operator&=(EvaluationFlags &f1, const EvaluationFlags f2) = delete;
+  operator&=(EvaluationFlags &f1, const EvaluationFlags f2)
+  {
+    f1 = f1 & f2;
+    return f1;
+  }
 
+
+  /**
+   * Global operator which returns an object in which all bits are set which are
+   * not set in the argument. This operator exists since
+   * if it did not then the result of the bit-negation <tt>operator ~</tt> would
+   * be an integer which would in turn trigger a compiler warning when we tried
+   * to assign it to an object of type EvaluationFlags.
+   *
+   * @ref EvaluationFlags
+   */
   inline EvaluationFlags
   operator~(const EvaluationFlags f)
   {
     using enum_type = std::underlying_type_t<EvaluationFlags>;
     return static_cast<EvaluationFlags>(~static_cast<enum_type>(f));
+  }
+
+
+  /**
+   * Global operator which checks if the flags contained in the first argument
+   * contain the flags contained in the second argument.
+   *
+   * @ref EvaluationFlags
+   */
+  inline bool
+  contains(const EvaluationFlags flags, const EvaluationFlags mask)
+  {
+    using enum_type = std::underlying_type_t<EvaluationFlags>;
+    return (static_cast<enum_type>(flags) & static_cast<enum_type>(mask)) != 0;
   }
 } // namespace EvaluationFlags
 
