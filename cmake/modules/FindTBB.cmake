@@ -30,7 +30,7 @@
 SET(TBB_DIR "" CACHE PATH "An optional hint to a TBB installation")
 SET_IF_EMPTY(TBB_DIR "$ENV{TBB_DIR}")
 
-FILE(GLOB _path ${TBB_DIR}/build/*_release)
+FILE(GLOB _path ${TBB_DIR}/build/*_release ${TBB_DIR}/lib/intel64/gcc*)
 DEAL_II_FIND_LIBRARY(TBB_LIBRARY
   NAMES tbb
   HINTS
@@ -42,7 +42,7 @@ DEAL_II_FIND_LIBRARY(TBB_LIBRARY
 #
 # Also search for the debug library:
 #
-FILE(GLOB _path ${TBB_DIR}/build/*_debug)
+FILE(GLOB _path ${TBB_DIR}/build/*_debug ${TBB_DIR}/lib/intel64/gcc*)
 DEAL_II_FIND_LIBRARY(TBB_DEBUG_LIBRARY
   NAMES tbb_debug
   HINTS
