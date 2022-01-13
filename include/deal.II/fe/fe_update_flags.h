@@ -356,7 +356,7 @@ operator&=(UpdateFlags &f1, const UpdateFlags f2)
  * @ref UpdateFlags
  */
 inline bool
-contains(const UpdateFlags flags, const UpdateFlags mask)
+contains_bits(const UpdateFlags flags, const UpdateFlags mask)
 {
   using enum_type = std::underlying_type_t<UpdateFlags>;
   return (static_cast<enum_type>(flags) & static_cast<enum_type>(mask)) != 0;

@@ -221,7 +221,7 @@ namespace MeshWorker
    * @ref AssembleFlags
    */
   inline bool
-  contains(const AssembleFlags flags, const AssembleFlags mask)
+  contains_bits(const AssembleFlags flags, const AssembleFlags mask)
   {
     using enum_type = std::underlying_type_t<AssembleFlags>;
     return (static_cast<enum_type>(flags) & static_cast<enum_type>(mask)) != 0;

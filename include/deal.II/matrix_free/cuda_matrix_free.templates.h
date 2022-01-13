@@ -300,13 +300,13 @@ namespace CUDAWrappers
 
       data->row_start.resize(n_colors);
 
-      if (contains(update_flags, update_quadrature_points))
+      if (contains_bits(update_flags, update_quadrature_points))
         data->q_points.resize(n_colors);
 
-      if (contains(update_flags, update_JxW_values))
+      if (contains_bits(update_flags, update_JxW_values))
         data->JxW.resize(n_colors);
 
-      if (contains(update_flags, update_gradients))
+      if (contains_bits(update_flags, update_gradients))
         data->inv_jacobian.resize(n_colors);
     }
 
@@ -349,13 +349,13 @@ namespace CUDAWrappers
 
       local_to_global_host.resize(n_cells * padding_length);
 
-      if (contains(update_flags, update_quadrature_points))
+      if (contains_bits(update_flags, update_quadrature_points))
         q_points_host.resize(n_cells * padding_length);
 
-      if (contains(update_flags, update_JxW_values))
+      if (contains_bits(update_flags, update_JxW_values))
         JxW_host.resize(n_cells * padding_length);
 
-      if (contains(update_flags, update_gradients))
+      if (contains_bits(update_flags, update_gradients))
         inv_jacobian_host.resize(n_cells * padding_length * dim * dim);
 
       constraint_mask_host.resize(n_cells);
@@ -398,7 +398,7 @@ namespace CUDAWrappers
       fe_values.reinit(cell);
 
       // Quadrature points
-      if (contains(update_flags, update_quadrature_points))
+      if (contains_bits(update_flags, update_quadrature_points))
         {
           const std::vector<Point<dim>> &q_points =
             fe_values.get_quadrature_points();
@@ -407,7 +407,7 @@ namespace CUDAWrappers
                     &q_points_host[cell_id * padding_length]);
         }
 
-      if (contains(update_flags, update_JxW_values))
+      if (contains_bits(update_flags, update_JxW_values))
         {
           std::vector<double> JxW_values_double = fe_values.get_JxW_values();
           const unsigned int  offset            = cell_id * padding_length;
@@ -415,7 +415,7 @@ namespace CUDAWrappers
             JxW_host[i + offset] = static_cast<Number>(JxW_values_double[i]);
         }
 
-      if (contains(update_flags, update_gradients))
+      if (contains_bits(update_flags, update_gradients))
         {
           const std::vector<DerivativeForm<1, dim, dim>> &inv_jacobians =
             fe_values.get_inverse_jacobians();
@@ -447,7 +447,7 @@ namespace CUDAWrappers
         n_cells * padding_length);
 
       // Quadrature points
-      if (contains(update_flags, update_quadrature_points))
+      if (contains_bits(update_flags, update_quadrature_points))
         {
           if (data->parallelization_scheme ==
               MatrixFree<dim, Number>::parallel_over_elem)
@@ -460,7 +460,7 @@ namespace CUDAWrappers
         }
 
       // Jacobian determinants/quadrature weights
-      if (contains(update_flags, update_JxW_values))
+      if (contains_bits(update_flags, update_JxW_values))
         {
           if (data->parallelization_scheme ==
               MatrixFree<dim, Number>::parallel_over_elem)
@@ -473,7 +473,7 @@ namespace CUDAWrappers
         }
 
       // Inverse jacobians
-      if (contains(update_flags, update_gradients))
+      if (contains_bits(update_flags, update_gradients))
         {
           // Reorder so that all J_11 elements are together, all J_12 elements
           // are together, etc., i.e., reorder indices from
@@ -902,7 +902,7 @@ namespace CUDAWrappers
       cudaDeviceSetSharedMemConfig(cudaSharedMemBankSizeEightByte);
 
     UpdateFlags update_flags = additional_data.mapping_update_flags;
-    if (contains(update_flags, update_gradients))
+    if (contains_bits(update_flags, update_gradients))
       update_flags |= update_JxW_values;
 
     if (additional_data.parallelization_scheme != parallel_over_elem &&
@@ -972,7 +972,7 @@ namespace CUDAWrappers
                          cudaMemcpyHostToDevice);
     AssertCuda(cuda_error);
 
-    if (contains(update_flags, update_gradients))
+    if (contains_bits(update_flags, update_gradients))
       {
         cuda_error =
           cudaMemcpyToSymbol(internal::get_global_shape_gradients<Number>(0),

@@ -149,7 +149,7 @@ namespace EvaluationFlags
    * @ref EvaluationFlags
    */
   inline bool
-  contains(const EvaluationFlags flags, const EvaluationFlags mask)
+  contains_bits(const EvaluationFlags flags, const EvaluationFlags mask)
   {
     using enum_type = std::underlying_type_t<EvaluationFlags>;
     return (static_cast<enum_type>(flags) & static_cast<enum_type>(mask)) != 0;

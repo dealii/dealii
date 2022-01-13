@@ -677,11 +677,11 @@ UpdateFlags
 FE_FaceQ<1, spacedim>::requires_update_flags(const UpdateFlags flags) const
 {
   UpdateFlags out = flags & update_values;
-  if (contains(flags, update_gradients))
+  if (contains_bits(flags, update_gradients))
     out |= update_gradients | update_covariant_transformation;
-  if (contains(flags, update_hessians))
+  if (contains_bits(flags, update_hessians))
     out |= update_hessians | update_covariant_transformation;
-  if (contains(flags, update_normal_vectors))
+  if (contains_bits(flags, update_normal_vectors))
     out |= update_normal_vectors | update_JxW_values;
 
   return out;
@@ -726,7 +726,7 @@ FE_FaceQ<1, spacedim>::fill_fe_face_values(
     &output_data) const
 {
   const unsigned int foffset = face;
-  if (contains(fe_internal.update_each, update_values))
+  if (contains_bits(fe_internal.update_each, update_values))
     {
       for (unsigned int k = 0; k < this->n_dofs_per_cell(); ++k)
         output_data.shape_values(k, 0) = 0.;

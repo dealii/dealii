@@ -107,7 +107,7 @@ namespace NonMatching
   {
     // First call the mapping and let it generate the data specific to the
     // mapping.
-    if (contains(this->update_flags, update_mapping))
+    if (contains_bits(this->update_flags, update_mapping))
       {
         this->get_mapping().fill_fe_immersed_surface_values(
           this->present_cell,
@@ -176,11 +176,11 @@ namespace NonMatching
   {
     UpdateFlags flags = this->compute_update_flags(update_flags);
 
-    if (contains(flags, (update_JxW_values | update_normal_vectors)))
+    if (contains_bits(flags, (update_JxW_values | update_normal_vectors)))
       flags |= update_covariant_transformation;
 
     // Initialize the base classes.
-    if (contains(flags, update_mapping))
+    if (contains_bits(flags, update_mapping))
       this->mapping_output.initialize(this->n_quadrature_points, flags);
     this->finite_element_output.initialize(this->n_quadrature_points,
                                            *this->fe,
@@ -200,7 +200,7 @@ namespace NonMatching
 
     Threads::Task<std::unique_ptr<typename Mapping<dim>::InternalDataBase>>
       mapping_get_data;
-    if (contains(flags, update_mapping))
+    if (contains_bits(flags, update_mapping))
       mapping_get_data = Threads::new_task(&Mapping<dim>::get_data,
                                            *this->mapping,
                                            flags,
@@ -210,7 +210,7 @@ namespace NonMatching
 
     // Then collect answers from the two task above.
     this->fe_data = std::move(fe_get_data.return_value());
-    if (contains(flags, update_mapping))
+    if (contains_bits(flags, update_mapping))
       this->mapping_data = std::move(mapping_get_data.return_value());
     else
       this->mapping_data =

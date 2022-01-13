@@ -200,7 +200,7 @@ namespace GridTools
    * @ref CacheUpdateFlags
    */
   inline bool
-  contains(const CacheUpdateFlags flags, const CacheUpdateFlags mask)
+  contains_bits(const CacheUpdateFlags flags, const CacheUpdateFlags mask)
   {
     using enum_type = std::underlying_type_t<CacheUpdateFlags>;
     return (static_cast<enum_type>(flags) & static_cast<enum_type>(mask)) != 0;

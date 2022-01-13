@@ -860,7 +860,7 @@ namespace CUDAWrappers
 
     const unsigned int n_elements =
       data_host.n_cells * data_host.padding_length;
-    if (contains(update_flags, update_quadrature_points))
+    if (contains_bits(update_flags, update_quadrature_points))
       {
         data_host.q_points.resize(n_elements);
         Utilities::CUDA::copy_to_host(data.q_points, data_host.q_points);
@@ -870,14 +870,14 @@ namespace CUDAWrappers
     Utilities::CUDA::copy_to_host(data.local_to_global,
                                   data_host.local_to_global);
 
-    if (contains(update_flags, update_gradients))
+    if (contains_bits(update_flags, update_gradients))
       {
         data_host.inv_jacobian.resize(n_elements * dim * dim);
         Utilities::CUDA::copy_to_host(data.inv_jacobian,
                                       data_host.inv_jacobian);
       }
 
-    if (contains(update_flags, update_JxW_values))
+    if (contains_bits(update_flags, update_JxW_values))
       {
         data_host.JxW.resize(n_elements);
         Utilities::CUDA::copy_to_host(data.JxW, data_host.JxW);

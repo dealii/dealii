@@ -94,20 +94,20 @@ MappingQ<dim, spacedim>::InternalData::initialize(
   const unsigned int n_q_points = q.size();
 
   const bool needs_higher_order_terms =
-    contains(this->update_each,
-             (update_jacobian_pushed_forward_grads |
-              update_jacobian_2nd_derivatives |
-              update_jacobian_pushed_forward_2nd_derivatives |
-              update_jacobian_3rd_derivatives |
-              update_jacobian_pushed_forward_3rd_derivatives));
+    contains_bits(this->update_each,
+                  (update_jacobian_pushed_forward_grads |
+                   update_jacobian_2nd_derivatives |
+                   update_jacobian_pushed_forward_2nd_derivatives |
+                   update_jacobian_3rd_derivatives |
+                   update_jacobian_pushed_forward_3rd_derivatives));
 
-  if (contains(this->update_each, update_covariant_transformation))
+  if (contains_bits(this->update_each, update_covariant_transformation))
     covariant.resize(n_original_q_points);
 
-  if (contains(this->update_each, update_contravariant_transformation))
+  if (contains_bits(this->update_each, update_contravariant_transformation))
     contravariant.resize(n_original_q_points);
 
-  if (contains(this->update_each, update_volume_elements))
+  if (contains_bits(this->update_each, update_volume_elements))
     volume_elements.resize(n_original_q_points);
 
   tensor_product_quadrature = q.is_tensor_product();
@@ -177,35 +177,35 @@ MappingQ<dim, spacedim>::InternalData::initialize(
     {
       // see if we need the (transformation) shape function values
       // and/or gradients and resize the necessary arrays
-      if (contains(this->update_each, update_quadrature_points))
+      if (contains_bits(this->update_each, update_quadrature_points))
         shape_values.resize(n_shape_functions * n_q_points);
 
-      if (contains(this->update_each,
-                   (update_covariant_transformation |
-                    update_contravariant_transformation | update_JxW_values |
-                    update_boundary_forms | update_normal_vectors |
-                    update_jacobians | update_jacobian_grads |
-                    update_inverse_jacobians |
-                    update_jacobian_pushed_forward_grads |
-                    update_jacobian_2nd_derivatives |
-                    update_jacobian_pushed_forward_2nd_derivatives |
-                    update_jacobian_3rd_derivatives |
-                    update_jacobian_pushed_forward_3rd_derivatives)))
+      if (contains_bits(this->update_each,
+                        (update_covariant_transformation |
+                         update_contravariant_transformation |
+                         update_JxW_values | update_boundary_forms |
+                         update_normal_vectors | update_jacobians |
+                         update_jacobian_grads | update_inverse_jacobians |
+                         update_jacobian_pushed_forward_grads |
+                         update_jacobian_2nd_derivatives |
+                         update_jacobian_pushed_forward_2nd_derivatives |
+                         update_jacobian_3rd_derivatives |
+                         update_jacobian_pushed_forward_3rd_derivatives)))
         shape_derivatives.resize(n_shape_functions * n_q_points);
 
-      if (contains(this->update_each,
-                   (update_jacobian_grads |
-                    update_jacobian_pushed_forward_grads)))
+      if (contains_bits(this->update_each,
+                        (update_jacobian_grads |
+                         update_jacobian_pushed_forward_grads)))
         shape_second_derivatives.resize(n_shape_functions * n_q_points);
 
-      if (contains(this->update_each,
-                   (update_jacobian_2nd_derivatives |
-                    update_jacobian_pushed_forward_2nd_derivatives)))
+      if (contains_bits(this->update_each,
+                        (update_jacobian_2nd_derivatives |
+                         update_jacobian_pushed_forward_2nd_derivatives)))
         shape_third_derivatives.resize(n_shape_functions * n_q_points);
 
-      if (contains(this->update_each,
-                   (update_jacobian_3rd_derivatives |
-                    update_jacobian_pushed_forward_3rd_derivatives)))
+      if (contains_bits(this->update_each,
+                        (update_jacobian_3rd_derivatives |
+                         update_jacobian_pushed_forward_3rd_derivatives)))
         shape_fourth_derivatives.resize(n_shape_functions * n_q_points);
 
       // now also fill the various fields with their correct values
@@ -239,10 +239,10 @@ MappingQ<dim, spacedim>::InternalData::initialize_face(
 
   if (dim > 1)
     {
-      if (contains(this->update_each,
-                   (update_boundary_forms | update_normal_vectors |
-                    update_jacobians | update_JxW_values |
-                    update_inverse_jacobians)))
+      if (contains_bits(this->update_each,
+                        (update_boundary_forms | update_normal_vectors |
+                         update_jacobians | update_JxW_values |
+                         update_inverse_jacobians)))
         {
           aux.resize(dim - 1,
                      AlignedVector<Tensor<1, spacedim>>(n_original_q_points));
@@ -857,20 +857,20 @@ MappingQ<dim, spacedim>::requires_update_flags(const UpdateFlags in) const
       // update_boundary_forms is simply
       // ignored for the interior of a
       // cell.
-      if (contains(out, (update_JxW_values | update_normal_vectors)))
+      if (contains_bits(out, (update_JxW_values | update_normal_vectors)))
         out |= update_boundary_forms;
 
-      if (contains(out,
-                   (update_covariant_transformation | update_JxW_values |
-                    update_jacobians | update_jacobian_grads |
-                    update_boundary_forms | update_normal_vectors)))
+      if (contains_bits(out,
+                        (update_covariant_transformation | update_JxW_values |
+                         update_jacobians | update_jacobian_grads |
+                         update_boundary_forms | update_normal_vectors)))
         out |= update_contravariant_transformation;
 
-      if (contains(out,
-                   (update_inverse_jacobians |
-                    update_jacobian_pushed_forward_grads |
-                    update_jacobian_pushed_forward_2nd_derivatives |
-                    update_jacobian_pushed_forward_3rd_derivatives)))
+      if (contains_bits(out,
+                        (update_inverse_jacobians |
+                         update_jacobian_pushed_forward_grads |
+                         update_jacobian_pushed_forward_2nd_derivatives |
+                         update_jacobian_pushed_forward_3rd_derivatives)))
         out |= update_covariant_transformation;
 
       // The contravariant transformation is used in the Piola
@@ -879,12 +879,12 @@ MappingQ<dim, spacedim>::requires_update_flags(const UpdateFlags in) const
       // knowing here whether the finite element wants to use the
       // contravariant or the Piola transforms, we add the JxW values
       // to the list of flags to be updated for each cell.
-      if (contains(out, update_contravariant_transformation))
+      if (contains_bits(out, update_contravariant_transformation))
         out |= update_volume_elements;
 
       // the same is true when computing normal vectors: they require
       // the determinant of the Jacobian
-      if (contains(out, update_normal_vectors))
+      if (contains_bits(out, update_normal_vectors))
         out |= update_volume_elements;
     }
 
@@ -1055,11 +1055,11 @@ MappingQ<dim, spacedim>::fill_fe_values(
   // Multiply quadrature weights by absolute value of Jacobian determinants or
   // the area element g=sqrt(DX^t DX) in case of codim > 0
 
-  if (contains(update_flags, (update_normal_vectors | update_JxW_values)))
+  if (contains_bits(update_flags, (update_normal_vectors | update_JxW_values)))
     {
       AssertDimension(output_data.JxW_values.size(), n_q_points);
 
-      Assert(!contains(update_flags, update_normal_vectors) ||
+      Assert(!contains_bits(update_flags, update_normal_vectors) ||
                (output_data.normal_vectors.size() == n_q_points),
              ExcDimensionMismatch(output_data.normal_vectors.size(),
                                   n_q_points));
@@ -1107,12 +1107,12 @@ MappingQ<dim, spacedim>::fill_fe_values(
                     CellSimilarity::inverted_translation)
                   {
                     // we only need to flip the normal
-                    if (contains(update_flags, update_normal_vectors))
+                    if (contains_bits(update_flags, update_normal_vectors))
                       output_data.normal_vectors[point] *= -1.;
                   }
                 else
                   {
-                    if (contains(update_flags, update_normal_vectors))
+                    if (contains_bits(update_flags, update_normal_vectors))
                       {
                         Assert(spacedim == dim + 1,
                                ExcMessage(
@@ -1145,7 +1145,7 @@ MappingQ<dim, spacedim>::fill_fe_values(
 
 
   // copy values from InternalData to vector given by reference
-  if (contains(update_flags, update_jacobians))
+  if (contains_bits(update_flags, update_jacobians))
     {
       AssertDimension(output_data.jacobians.size(), n_q_points);
       if (computed_cell_similarity != CellSimilarity::translation)
@@ -1154,7 +1154,7 @@ MappingQ<dim, spacedim>::fill_fe_values(
     }
 
   // copy values from InternalData to vector given by reference
-  if (contains(update_flags, update_inverse_jacobians))
+  if (contains_bits(update_flags, update_inverse_jacobians))
     {
       AssertDimension(output_data.inverse_jacobians.size(), n_q_points);
       if (computed_cell_similarity != CellSimilarity::translation)
@@ -1340,11 +1340,11 @@ MappingQ<dim, spacedim>::fill_fe_immersed_surface_values(
   const UpdateFlags          update_flags = data.update_each;
   const std::vector<double> &weights      = quadrature.get_weights();
 
-  if (contains(update_flags, (update_normal_vectors | update_JxW_values)))
+  if (contains_bits(update_flags, (update_normal_vectors | update_JxW_values)))
     {
       AssertDimension(output_data.JxW_values.size(), n_q_points);
 
-      Assert(!contains(update_flags, update_normal_vectors) ||
+      Assert(!contains_bits(update_flags, update_normal_vectors) ||
                (output_data.normal_vectors.size() == n_q_points),
              ExcDimensionMismatch(output_data.normal_vectors.size(),
                                   n_q_points));
@@ -1372,7 +1372,7 @@ MappingQ<dim, spacedim>::fill_fe_immersed_surface_values(
 
           output_data.JxW_values[point] = weights[point] * det * normal.norm();
 
-          if (contains(update_flags, update_normal_vectors))
+          if (contains_bits(update_flags, update_normal_vectors))
             {
               normal /= normal.norm();
               output_data.normal_vectors[point] = normal;
@@ -1381,7 +1381,7 @@ MappingQ<dim, spacedim>::fill_fe_immersed_surface_values(
     }
 
   // copy values from InternalData to vector given by reference
-  if (contains(update_flags, update_jacobians))
+  if (contains_bits(update_flags, update_jacobians))
     {
       AssertDimension(output_data.jacobians.size(), n_q_points);
       for (unsigned int point = 0; point < n_q_points; ++point)
@@ -1389,7 +1389,7 @@ MappingQ<dim, spacedim>::fill_fe_immersed_surface_values(
     }
 
   // copy values from InternalData to vector given by reference
-  if (contains(update_flags, update_inverse_jacobians))
+  if (contains_bits(update_flags, update_inverse_jacobians))
     {
       AssertDimension(output_data.inverse_jacobians.size(), n_q_points);
       for (unsigned int point = 0; point < n_q_points; ++point)
@@ -1412,9 +1412,9 @@ MappingQ<dim, spacedim>::fill_mapping_data_for_generic_points(
   if (update_flags == update_default)
     return;
 
-  Assert(contains(update_flags,
-                  update_inverse_jacobians | update_jacobians |
-                    update_quadrature_points),
+  Assert(contains_bits(update_flags,
+                       update_inverse_jacobians | update_jacobians |
+                         update_quadrature_points),
          ExcNotImplemented());
 
   output_data.initialize(unit_points.size(), update_flags);
@@ -1446,18 +1446,18 @@ MappingQ<dim, spacedim>::fill_mapping_data_for_generic_points(
             polynomial_degree == 1,
             renumber_lexicographic_to_hierarchic);
 
-        if (contains(update_flags, update_quadrature_points))
+        if (contains_bits(update_flags, update_quadrature_points))
           for (unsigned int j = 0; j < n_lanes && i + j < n_points; ++j)
             for (unsigned int d = 0; d < spacedim; ++d)
               output_data.quadrature_points[i + j][d] = result.first[d][j];
 
-        if (contains(update_flags, update_jacobians))
+        if (contains_bits(update_flags, update_jacobians))
           for (unsigned int j = 0; j < n_lanes && i + j < n_points; ++j)
             for (unsigned int d = 0; d < spacedim; ++d)
               for (unsigned int e = 0; e < dim; ++e)
                 output_data.jacobians[i + j][d][e] = result.second[e][d][j];
 
-        if (contains(update_flags, update_inverse_jacobians))
+        if (contains_bits(update_flags, update_inverse_jacobians))
           {
             DerivativeForm<1, spacedim, dim, VectorizedArray<double>> jac(
               result.second);
@@ -1479,16 +1479,16 @@ MappingQ<dim, spacedim>::fill_mapping_data_for_generic_points(
             polynomial_degree == 1,
             renumber_lexicographic_to_hierarchic);
 
-        if (contains(update_flags, update_quadrature_points))
+        if (contains_bits(update_flags, update_quadrature_points))
           output_data.quadrature_points[i] = result.first;
 
-        if (contains(update_flags, update_jacobians))
+        if (contains_bits(update_flags, update_jacobians))
           {
             DerivativeForm<1, spacedim, dim> jac = result.second;
             output_data.jacobians[i]             = jac.transpose();
           }
 
-        if (contains(update_flags, update_inverse_jacobians))
+        if (contains_bits(update_flags, update_inverse_jacobians))
           {
             DerivativeForm<1, spacedim, dim> jac(result.second);
             DerivativeForm<1, spacedim, dim> inv_jac = jac.covariant_form();
@@ -1582,8 +1582,8 @@ MappingQ<dim, spacedim>::transform(
     {
       case mapping_covariant_gradient:
         {
-          Assert(contains(data.update_each,
-                          update_contravariant_transformation),
+          Assert(contains_bits(data.update_each,
+                               update_contravariant_transformation),
                  typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                    "update_covariant_transformation"));
 

@@ -60,7 +60,7 @@ namespace GridTools
     std::set<typename Triangulation<dim, spacedim>::active_cell_iterator>> &
   Cache<dim, spacedim>::get_vertex_to_cell_map() const
   {
-    if (contains(update_flags, update_vertex_to_cell_map))
+    if (contains_bits(update_flags, update_vertex_to_cell_map))
       {
         vertex_to_cells = GridTools::vertex_to_cell_map(*tria);
         update_flags    = update_flags & ~update_vertex_to_cell_map;
@@ -74,7 +74,7 @@ namespace GridTools
   const std::vector<std::vector<Tensor<1, spacedim>>> &
   Cache<dim, spacedim>::get_vertex_to_cell_centers_directions() const
   {
-    if (contains(update_flags, update_vertex_to_cell_centers_directions))
+    if (contains_bits(update_flags, update_vertex_to_cell_centers_directions))
       {
         vertex_to_cell_centers = GridTools::vertex_to_cell_centers_directions(
           *tria, get_vertex_to_cell_map());
@@ -89,7 +89,7 @@ namespace GridTools
   const std::map<unsigned int, Point<spacedim>> &
   Cache<dim, spacedim>::get_used_vertices() const
   {
-    if (contains(update_flags, update_used_vertices))
+    if (contains_bits(update_flags, update_used_vertices))
       {
         used_vertices = GridTools::extract_used_vertices(*tria, *mapping);
         update_flags  = update_flags & ~update_used_vertices;
@@ -103,7 +103,7 @@ namespace GridTools
   const RTree<std::pair<Point<spacedim>, unsigned int>> &
   Cache<dim, spacedim>::get_used_vertices_rtree() const
   {
-    if (contains(update_flags, update_used_vertices_rtree))
+    if (contains_bits(update_flags, update_used_vertices_rtree))
       {
         const auto &used_vertices = get_used_vertices();
         std::vector<std::pair<Point<spacedim>, unsigned int>> vertices(
@@ -125,7 +125,7 @@ namespace GridTools
               typename Triangulation<dim, spacedim>::active_cell_iterator>> &
   Cache<dim, spacedim>::get_cell_bounding_boxes_rtree() const
   {
-    if (contains(update_flags, update_cell_bounding_boxes_rtree))
+    if (contains_bits(update_flags, update_cell_bounding_boxes_rtree))
       {
         std::vector<std::pair<
           BoundingBox<spacedim>,
@@ -149,7 +149,8 @@ namespace GridTools
               typename Triangulation<dim, spacedim>::active_cell_iterator>> &
   Cache<dim, spacedim>::get_locally_owned_cell_bounding_boxes_rtree() const
   {
-    if (contains(update_flags, update_locally_owned_cell_bounding_boxes_rtree))
+    if (contains_bits(update_flags,
+                      update_locally_owned_cell_bounding_boxes_rtree))
       {
         std::vector<std::pair<
           BoundingBox<spacedim>,
@@ -173,7 +174,7 @@ namespace GridTools
   const RTree<std::pair<BoundingBox<spacedim>, unsigned int>> &
   Cache<dim, spacedim>::get_covering_rtree(const unsigned int level) const
   {
-    if (contains(update_flags, update_covering_rtree) ||
+    if (contains_bits(update_flags, update_covering_rtree) ||
         covering_rtree.find(level) == covering_rtree.end())
       {
         const auto boxes =
@@ -202,7 +203,7 @@ namespace GridTools
   const std::vector<std::set<unsigned int>> &
   Cache<dim, spacedim>::get_vertex_to_neighbor_subdomain() const
   {
-    if (contains(update_flags, update_vertex_to_neighbor_subdomain))
+    if (contains_bits(update_flags, update_vertex_to_neighbor_subdomain))
       {
         vertex_to_neighbor_subdomain.clear();
         vertex_to_neighbor_subdomain.resize(tria->n_vertices());

@@ -98,7 +98,7 @@ MappingCartesian<dim, spacedim>::requires_update_flags(
   // since they can be computed from the normal vectors without much
   // further ado
   UpdateFlags out = in;
-  if (contains(out, update_boundary_forms))
+  if (contains_bits(out, update_boundary_forms))
     out |= update_normal_vectors;
 
   return out;
@@ -220,7 +220,7 @@ MappingCartesian<dim, spacedim>::maybe_update_cell_quadrature_points(
   const InternalData &                                        data,
   std::vector<Point<dim>> &quadrature_points) const
 {
-  if (contains(data.update_each, update_quadrature_points))
+  if (contains_bits(data.update_each, update_quadrature_points))
     {
       const auto offset = QProjector<dim>::DataSetDescriptor::cell();
 
@@ -240,7 +240,7 @@ MappingCartesian<dim, spacedim>::maybe_update_face_quadrature_points(
 {
   AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
 
-  if (contains(data.update_each, update_quadrature_points))
+  if (contains_bits(data.update_each, update_quadrature_points))
     {
       const auto offset = QProjector<dim>::DataSetDescriptor::face(
         ReferenceCells::get_hypercube<dim>(),
@@ -273,7 +273,7 @@ MappingCartesian<dim, spacedim>::maybe_update_subface_quadrature_points(
       AssertIndexRange(sub_no, cell->face(face_no)->n_children());
     }
 
-  if (contains(data.update_each, update_quadrature_points))
+  if (contains_bits(data.update_each, update_quadrature_points))
     {
       const auto offset = QProjector<dim>::DataSetDescriptor::subface(
         ReferenceCells::get_hypercube<dim>(),
@@ -322,7 +322,7 @@ MappingCartesian<dim, spacedim>::maybe_update_normal_vectors(
   std::vector<Tensor<1, dim>> &normal_vectors) const
 {
   // compute normal vectors. All normals on a face have the same value.
-  if (contains(data.update_each, update_normal_vectors))
+  if (contains_bits(data.update_each, update_normal_vectors))
     {
       Assert(face_no < GeometryInfo<dim>::faces_per_cell, ExcInternalError());
       std::fill(normal_vectors.begin(),
@@ -343,40 +343,40 @@ MappingCartesian<dim, spacedim>::maybe_update_jacobian_derivatives(
 {
   if (cell_similarity != CellSimilarity::translation)
     {
-      if (contains(data.update_each, update_jacobian_grads))
+      if (contains_bits(data.update_each, update_jacobian_grads))
         for (unsigned int i = 0; i < output_data.jacobian_grads.size(); ++i)
           output_data.jacobian_grads[i] = DerivativeForm<2, dim, spacedim>();
 
-      if (contains(data.update_each, update_jacobian_pushed_forward_grads))
+      if (contains_bits(data.update_each, update_jacobian_pushed_forward_grads))
         for (unsigned int i = 0;
              i < output_data.jacobian_pushed_forward_grads.size();
              ++i)
           output_data.jacobian_pushed_forward_grads[i] = Tensor<3, spacedim>();
 
-      if (contains(data.update_each, update_jacobian_2nd_derivatives))
+      if (contains_bits(data.update_each, update_jacobian_2nd_derivatives))
         for (unsigned int i = 0;
              i < output_data.jacobian_2nd_derivatives.size();
              ++i)
           output_data.jacobian_2nd_derivatives[i] =
             DerivativeForm<3, dim, spacedim>();
 
-      if (contains(data.update_each,
-                   update_jacobian_pushed_forward_2nd_derivatives))
+      if (contains_bits(data.update_each,
+                        update_jacobian_pushed_forward_2nd_derivatives))
         for (unsigned int i = 0;
              i < output_data.jacobian_pushed_forward_2nd_derivatives.size();
              ++i)
           output_data.jacobian_pushed_forward_2nd_derivatives[i] =
             Tensor<4, spacedim>();
 
-      if (contains(data.update_each, update_jacobian_3rd_derivatives))
+      if (contains_bits(data.update_each, update_jacobian_3rd_derivatives))
         for (unsigned int i = 0;
              i < output_data.jacobian_3rd_derivatives.size();
              ++i)
           output_data.jacobian_3rd_derivatives[i] =
             DerivativeForm<4, dim, spacedim>();
 
-      if (contains(data.update_each,
-                   update_jacobian_pushed_forward_3rd_derivatives))
+      if (contains_bits(data.update_each,
+                        update_jacobian_pushed_forward_3rd_derivatives))
         for (unsigned int i = 0;
              i < output_data.jacobian_pushed_forward_3rd_derivatives.size();
              ++i)
@@ -392,7 +392,7 @@ void
 MappingCartesian<dim, spacedim>::maybe_update_volume_elements(
   const InternalData &data) const
 {
-  if (contains(data.update_each, update_volume_elements))
+  if (contains_bits(data.update_each, update_volume_elements))
     {
       double volume = data.cell_extents[0];
       for (unsigned int d = 1; d < dim; ++d)
@@ -413,7 +413,7 @@ MappingCartesian<dim, spacedim>::maybe_update_jacobians(
 {
   // "compute" Jacobian at the quadrature points, which are all the
   // same
-  if (contains(data.update_each, update_jacobians))
+  if (contains_bits(data.update_each, update_jacobians))
     if (cell_similarity != CellSimilarity::translation)
       for (unsigned int i = 0; i < output_data.jacobians.size(); ++i)
         {
@@ -435,7 +435,7 @@ MappingCartesian<dim, spacedim>::maybe_update_inverse_jacobians(
 {
   // "compute" inverse Jacobian at the quadrature points, which are
   // all the same
-  if (contains(data.update_each, update_inverse_jacobians))
+  if (contains_bits(data.update_each, update_inverse_jacobians))
     if (cell_similarity != CellSimilarity::translation)
       for (unsigned int i = 0; i < output_data.inverse_jacobians.size(); ++i)
         {
@@ -472,14 +472,15 @@ MappingCartesian<dim, spacedim>::fill_fe_values(
 
   // compute Jacobian determinant. all values are equal and are the
   // product of the local lengths in each coordinate direction
-  if (contains(data.update_each, (update_JxW_values | update_volume_elements)))
+  if (contains_bits(data.update_each,
+                    (update_JxW_values | update_volume_elements)))
     if (cell_similarity != CellSimilarity::translation)
       {
         double J = data.cell_extents[0];
         for (unsigned int d = 1; d < dim; ++d)
           J *= data.cell_extents[d];
         data.volume_element = J;
-        if (contains(data.update_each, update_JxW_values))
+        if (contains_bits(data.update_each, update_JxW_values))
           for (unsigned int i = 0; i < output_data.JxW_values.size(); ++i)
             output_data.JxW_values[i] = J * quadrature.weight(i);
       }
@@ -506,9 +507,9 @@ MappingCartesian<dim, spacedim>::fill_mapping_data_for_generic_points(
   if (update_flags == update_default)
     return;
 
-  Assert(contains(update_flags, update_inverse_jacobians) ||
-           contains(update_flags, update_jacobians) ||
-           contains(update_flags, update_quadrature_points),
+  Assert(contains_bits(update_flags, update_inverse_jacobians) ||
+           contains_bits(update_flags, update_jacobians) ||
+           contains_bits(update_flags, update_quadrature_points),
          ExcNotImplemented());
 
   output_data.initialize(unit_points.size(), update_flags);
@@ -566,11 +567,11 @@ MappingCartesian<dim, spacedim>::fill_fe_face_values(
     if (d != GeometryInfo<dim>::unit_normal_direction[face_no])
       J *= data.cell_extents[d];
 
-  if (contains(data.update_each, update_JxW_values))
+  if (contains_bits(data.update_each, update_JxW_values))
     for (unsigned int i = 0; i < output_data.JxW_values.size(); ++i)
       output_data.JxW_values[i] = J * quadrature[0].weight(i);
 
-  if (contains(data.update_each, update_boundary_forms))
+  if (contains_bits(data.update_each, update_boundary_forms))
     for (unsigned int i = 0; i < output_data.boundary_forms.size(); ++i)
       output_data.boundary_forms[i] = J * output_data.normal_vectors[i];
 
@@ -613,7 +614,7 @@ MappingCartesian<dim, spacedim>::fill_fe_subface_values(
     if (d != GeometryInfo<dim>::unit_normal_direction[face_no])
       J *= data.cell_extents[d];
 
-  if (contains(data.update_each, update_JxW_values))
+  if (contains_bits(data.update_each, update_JxW_values))
     {
       // Here, cell->face(face_no)->n_children() would be the right
       // choice, but unfortunately the current function is also called
@@ -627,7 +628,7 @@ MappingCartesian<dim, spacedim>::fill_fe_subface_values(
         output_data.JxW_values[i] = J * quadrature.weight(i) / n_subfaces;
     }
 
-  if (contains(data.update_each, update_boundary_forms))
+  if (contains_bits(data.update_each, update_boundary_forms))
     for (unsigned int i = 0; i < output_data.boundary_forms.size(); ++i)
       output_data.boundary_forms[i] = J * output_data.normal_vectors[i];
 
@@ -663,7 +664,7 @@ MappingCartesian<dim, spacedim>::fill_fe_immersed_surface_values(
                                       data,
                                       output_data.quadrature_points);
 
-  if (contains(data.update_each, update_normal_vectors))
+  if (contains_bits(data.update_each, update_normal_vectors))
     for (unsigned int i = 0; i < output_data.normal_vectors.size(); ++i)
       {
         // The normals are n = J^{-T} * \hat{n} before normalizing.
@@ -677,7 +678,7 @@ MappingCartesian<dim, spacedim>::fill_fe_immersed_surface_values(
         output_data.normal_vectors[i] = normal;
       }
 
-  if (contains(data.update_each, update_JxW_values))
+  if (contains_bits(data.update_each, update_JxW_values))
     for (unsigned int i = 0; i < output_data.JxW_values.size(); ++i)
       {
         const Tensor<1, dim> &ref_space_normal = quadrature.normal_vector(i);
@@ -719,7 +720,8 @@ MappingCartesian<dim, spacedim>::transform(
     {
       case mapping_covariant:
         {
-          Assert(contains(data.update_each, update_covariant_transformation),
+          Assert(contains_bits(data.update_each,
+                               update_covariant_transformation),
                  typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                    "update_covariant_transformation"));
 
@@ -731,8 +733,8 @@ MappingCartesian<dim, spacedim>::transform(
 
       case mapping_contravariant:
         {
-          Assert(contains(data.update_each,
-                          update_contravariant_transformation),
+          Assert(contains_bits(data.update_each,
+                               update_contravariant_transformation),
                  typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                    "update_contravariant_transformation"));
 
@@ -743,11 +745,11 @@ MappingCartesian<dim, spacedim>::transform(
         }
       case mapping_piola:
         {
-          Assert(contains(data.update_each,
-                          update_contravariant_transformation),
+          Assert(contains_bits(data.update_each,
+                               update_contravariant_transformation),
                  typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                    "update_contravariant_transformation"));
-          Assert(contains(data.update_each, update_volume_elements),
+          Assert(contains_bits(data.update_each, update_volume_elements),
                  typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                    "update_volume_elements"));
 
@@ -781,7 +783,8 @@ MappingCartesian<dim, spacedim>::transform(
     {
       case mapping_covariant:
         {
-          Assert(contains(data.update_each, update_covariant_transformation),
+          Assert(contains_bits(data.update_each,
+                               update_covariant_transformation),
                  typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                    "update_covariant_transformation"));
 
@@ -794,8 +797,8 @@ MappingCartesian<dim, spacedim>::transform(
 
       case mapping_contravariant:
         {
-          Assert(contains(data.update_each,
-                          update_contravariant_transformation),
+          Assert(contains_bits(data.update_each,
+                               update_contravariant_transformation),
                  typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                    "update_contravariant_transformation"));
 
@@ -808,7 +811,8 @@ MappingCartesian<dim, spacedim>::transform(
 
       case mapping_covariant_gradient:
         {
-          Assert(contains(data.update_each, update_covariant_transformation),
+          Assert(contains_bits(data.update_each,
+                               update_covariant_transformation),
                  typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                    "update_covariant_transformation"));
 
@@ -822,8 +826,8 @@ MappingCartesian<dim, spacedim>::transform(
 
       case mapping_contravariant_gradient:
         {
-          Assert(contains(data.update_each,
-                          update_contravariant_transformation),
+          Assert(contains_bits(data.update_each,
+                               update_contravariant_transformation),
                  typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                    "update_contravariant_transformation"));
 
@@ -837,11 +841,11 @@ MappingCartesian<dim, spacedim>::transform(
 
       case mapping_piola:
         {
-          Assert(contains(data.update_each,
-                          update_contravariant_transformation),
+          Assert(contains_bits(data.update_each,
+                               update_contravariant_transformation),
                  typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                    "update_contravariant_transformation"));
-          Assert(contains(data.update_each, update_volume_elements),
+          Assert(contains_bits(data.update_each, update_volume_elements),
                  typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                    "update_volume_elements"));
 
@@ -855,11 +859,11 @@ MappingCartesian<dim, spacedim>::transform(
 
       case mapping_piola_gradient:
         {
-          Assert(contains(data.update_each,
-                          update_contravariant_transformation),
+          Assert(contains_bits(data.update_each,
+                               update_contravariant_transformation),
                  typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                    "update_contravariant_transformation"));
-          Assert(contains(data.update_each, update_volume_elements),
+          Assert(contains_bits(data.update_each, update_volume_elements),
                  typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                    "update_volume_elements"));
 
@@ -895,7 +899,8 @@ MappingCartesian<dim, spacedim>::transform(
     {
       case mapping_covariant:
         {
-          Assert(contains(data.update_each, update_covariant_transformation),
+          Assert(contains_bits(data.update_each,
+                               update_covariant_transformation),
                  typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                    "update_covariant_transformation"));
 
@@ -908,8 +913,8 @@ MappingCartesian<dim, spacedim>::transform(
 
       case mapping_contravariant:
         {
-          Assert(contains(data.update_each,
-                          update_contravariant_transformation),
+          Assert(contains_bits(data.update_each,
+                               update_contravariant_transformation),
                  typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                    "update_contravariant_transformation"));
 
@@ -922,7 +927,8 @@ MappingCartesian<dim, spacedim>::transform(
 
       case mapping_covariant_gradient:
         {
-          Assert(contains(data.update_each, update_covariant_transformation),
+          Assert(contains_bits(data.update_each,
+                               update_covariant_transformation),
                  typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                    "update_covariant_transformation"));
 
@@ -936,8 +942,8 @@ MappingCartesian<dim, spacedim>::transform(
 
       case mapping_contravariant_gradient:
         {
-          Assert(contains(data.update_each,
-                          update_contravariant_transformation),
+          Assert(contains_bits(data.update_each,
+                               update_contravariant_transformation),
                  typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                    "update_contravariant_transformation"));
 
@@ -951,11 +957,11 @@ MappingCartesian<dim, spacedim>::transform(
 
       case mapping_piola:
         {
-          Assert(contains(data.update_each,
-                          update_contravariant_transformation),
+          Assert(contains_bits(data.update_each,
+                               update_contravariant_transformation),
                  typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                    "update_contravariant_transformation"));
-          Assert(contains(data.update_each, update_volume_elements),
+          Assert(contains_bits(data.update_each, update_volume_elements),
                  typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                    "update_volume_elements"));
 
@@ -969,11 +975,11 @@ MappingCartesian<dim, spacedim>::transform(
 
       case mapping_piola_gradient:
         {
-          Assert(contains(data.update_each,
-                          update_contravariant_transformation),
+          Assert(contains_bits(data.update_each,
+                               update_contravariant_transformation),
                  typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                    "update_contravariant_transformation"));
-          Assert(contains(data.update_each, update_volume_elements),
+          Assert(contains_bits(data.update_each, update_volume_elements),
                  typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                    "update_volume_elements"));
 
@@ -1009,8 +1015,8 @@ MappingCartesian<dim, spacedim>::transform(
     {
       case mapping_covariant_gradient:
         {
-          Assert(contains(data.update_each,
-                          update_contravariant_transformation),
+          Assert(contains_bits(data.update_each,
+                               update_contravariant_transformation),
                  typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                    "update_covariant_transformation"));
 
@@ -1049,11 +1055,12 @@ MappingCartesian<dim, spacedim>::transform(
     {
       case mapping_contravariant_hessian:
         {
-          Assert(contains(data.update_each, update_covariant_transformation),
+          Assert(contains_bits(data.update_each,
+                               update_covariant_transformation),
                  typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                    "update_covariant_transformation"));
-          Assert(contains(data.update_each,
-                          update_contravariant_transformation),
+          Assert(contains_bits(data.update_each,
+                               update_contravariant_transformation),
                  typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                    "update_contravariant_transformation"));
 
@@ -1071,7 +1078,8 @@ MappingCartesian<dim, spacedim>::transform(
 
       case mapping_covariant_hessian:
         {
-          Assert(contains(data.update_each, update_covariant_transformation),
+          Assert(contains_bits(data.update_each,
+                               update_covariant_transformation),
                  typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                    "update_covariant_transformation"));
 
@@ -1090,14 +1098,15 @@ MappingCartesian<dim, spacedim>::transform(
 
       case mapping_piola_hessian:
         {
-          Assert(contains(data.update_each, update_covariant_transformation),
+          Assert(contains_bits(data.update_each,
+                               update_covariant_transformation),
                  typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                    "update_covariant_transformation"));
-          Assert(contains(data.update_each,
-                          update_contravariant_transformation),
+          Assert(contains_bits(data.update_each,
+                               update_contravariant_transformation),
                  typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                    "update_contravariant_transformation"));
-          Assert(contains(data.update_each, update_volume_elements),
+          Assert(contains_bits(data.update_each, update_volume_elements),
                  typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                    "update_volume_elements"));
 

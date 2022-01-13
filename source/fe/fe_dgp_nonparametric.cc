@@ -262,7 +262,8 @@ FE_DGPNonparametric<dim, spacedim>::requires_update_flags(
 {
   UpdateFlags out = flags;
 
-  if (contains(flags, (update_values | update_gradients | update_hessians)))
+  if (contains_bits(flags,
+                    (update_values | update_gradients | update_hessians)))
     out |= update_quadrature_points;
 
   return out;
@@ -317,26 +318,28 @@ FE_DGPNonparametric<dim, spacedim>::fill_fe_values(
                                                                      spacedim>
     &output_data) const
 {
-  Assert(contains(fe_internal.update_each, update_quadrature_points),
+  Assert(contains_bits(fe_internal.update_each, update_quadrature_points),
          ExcInternalError());
 
   const unsigned int n_q_points = mapping_data.quadrature_points.size();
 
-  std::vector<double> values(contains(fe_internal.update_each, update_values) ?
-                               this->n_dofs_per_cell() :
-                               0);
+  std::vector<double> values(
+    contains_bits(fe_internal.update_each, update_values) ?
+      this->n_dofs_per_cell() :
+      0);
   std::vector<Tensor<1, dim>> grads(
-    contains(fe_internal.update_each, update_gradients) ?
+    contains_bits(fe_internal.update_each, update_gradients) ?
       this->n_dofs_per_cell() :
       0);
   std::vector<Tensor<2, dim>> grad_grads(
-    contains(fe_internal.update_each, update_hessians) ?
+    contains_bits(fe_internal.update_each, update_hessians) ?
       this->n_dofs_per_cell() :
       0);
   std::vector<Tensor<3, dim>> empty_vector_of_3rd_order_tensors;
   std::vector<Tensor<4, dim>> empty_vector_of_4th_order_tensors;
 
-  if (contains(fe_internal.update_each, (update_values | update_gradients)))
+  if (contains_bits(fe_internal.update_each,
+                    (update_values | update_gradients)))
     for (unsigned int i = 0; i < n_q_points; ++i)
       {
         polynomial_space.evaluate(mapping_data.quadrature_points[i],
@@ -346,15 +349,15 @@ FE_DGPNonparametric<dim, spacedim>::fill_fe_values(
                                   empty_vector_of_3rd_order_tensors,
                                   empty_vector_of_4th_order_tensors);
 
-        if (contains(fe_internal.update_each, update_values))
+        if (contains_bits(fe_internal.update_each, update_values))
           for (unsigned int k = 0; k < this->n_dofs_per_cell(); ++k)
             output_data.shape_values[k][i] = values[k];
 
-        if (contains(fe_internal.update_each, update_gradients))
+        if (contains_bits(fe_internal.update_each, update_gradients))
           for (unsigned int k = 0; k < this->n_dofs_per_cell(); ++k)
             output_data.shape_gradients[k][i] = grads[k];
 
-        if (contains(fe_internal.update_each, update_hessians))
+        if (contains_bits(fe_internal.update_each, update_hessians))
           for (unsigned int k = 0; k < this->n_dofs_per_cell(); ++k)
             output_data.shape_hessians[k][i] = grad_grads[k];
       }
@@ -378,26 +381,28 @@ FE_DGPNonparametric<dim, spacedim>::fill_fe_face_values(
                                                                      spacedim>
     &output_data) const
 {
-  Assert(contains(fe_internal.update_each, update_quadrature_points),
+  Assert(contains_bits(fe_internal.update_each, update_quadrature_points),
          ExcInternalError());
 
   const unsigned int n_q_points = mapping_data.quadrature_points.size();
 
-  std::vector<double> values(contains(fe_internal.update_each, update_values) ?
-                               this->n_dofs_per_cell() :
-                               0);
+  std::vector<double> values(
+    contains_bits(fe_internal.update_each, update_values) ?
+      this->n_dofs_per_cell() :
+      0);
   std::vector<Tensor<1, dim>> grads(
-    contains(fe_internal.update_each, update_gradients) ?
+    contains_bits(fe_internal.update_each, update_gradients) ?
       this->n_dofs_per_cell() :
       0);
   std::vector<Tensor<2, dim>> grad_grads(
-    contains(fe_internal.update_each, update_hessians) ?
+    contains_bits(fe_internal.update_each, update_hessians) ?
       this->n_dofs_per_cell() :
       0);
   std::vector<Tensor<3, dim>> empty_vector_of_3rd_order_tensors;
   std::vector<Tensor<4, dim>> empty_vector_of_4th_order_tensors;
 
-  if (contains(fe_internal.update_each, (update_values | update_gradients)))
+  if (contains_bits(fe_internal.update_each,
+                    (update_values | update_gradients)))
     for (unsigned int i = 0; i < n_q_points; ++i)
       {
         polynomial_space.evaluate(mapping_data.quadrature_points[i],
@@ -407,15 +412,15 @@ FE_DGPNonparametric<dim, spacedim>::fill_fe_face_values(
                                   empty_vector_of_3rd_order_tensors,
                                   empty_vector_of_4th_order_tensors);
 
-        if (contains(fe_internal.update_each, update_values))
+        if (contains_bits(fe_internal.update_each, update_values))
           for (unsigned int k = 0; k < this->n_dofs_per_cell(); ++k)
             output_data.shape_values[k][i] = values[k];
 
-        if (contains(fe_internal.update_each, update_gradients))
+        if (contains_bits(fe_internal.update_each, update_gradients))
           for (unsigned int k = 0; k < this->n_dofs_per_cell(); ++k)
             output_data.shape_gradients[k][i] = grads[k];
 
-        if (contains(fe_internal.update_each, update_hessians))
+        if (contains_bits(fe_internal.update_each, update_hessians))
           for (unsigned int k = 0; k < this->n_dofs_per_cell(); ++k)
             output_data.shape_hessians[k][i] = grad_grads[k];
       }
@@ -440,26 +445,28 @@ FE_DGPNonparametric<dim, spacedim>::fill_fe_subface_values(
                                                                      spacedim>
     &output_data) const
 {
-  Assert(contains(fe_internal.update_each, update_quadrature_points),
+  Assert(contains_bits(fe_internal.update_each, update_quadrature_points),
          ExcInternalError());
 
   const unsigned int n_q_points = mapping_data.quadrature_points.size();
 
-  std::vector<double> values(contains(fe_internal.update_each, update_values) ?
-                               this->n_dofs_per_cell() :
-                               0);
+  std::vector<double> values(
+    contains_bits(fe_internal.update_each, update_values) ?
+      this->n_dofs_per_cell() :
+      0);
   std::vector<Tensor<1, dim>> grads(
-    contains(fe_internal.update_each, update_gradients) ?
+    contains_bits(fe_internal.update_each, update_gradients) ?
       this->n_dofs_per_cell() :
       0);
   std::vector<Tensor<2, dim>> grad_grads(
-    contains(fe_internal.update_each, update_hessians) ?
+    contains_bits(fe_internal.update_each, update_hessians) ?
       this->n_dofs_per_cell() :
       0);
   std::vector<Tensor<3, dim>> empty_vector_of_3rd_order_tensors;
   std::vector<Tensor<4, dim>> empty_vector_of_4th_order_tensors;
 
-  if (contains(fe_internal.update_each, (update_values | update_gradients)))
+  if (contains_bits(fe_internal.update_each,
+                    (update_values | update_gradients)))
     for (unsigned int i = 0; i < n_q_points; ++i)
       {
         polynomial_space.evaluate(mapping_data.quadrature_points[i],
@@ -469,15 +476,15 @@ FE_DGPNonparametric<dim, spacedim>::fill_fe_subface_values(
                                   empty_vector_of_3rd_order_tensors,
                                   empty_vector_of_4th_order_tensors);
 
-        if (contains(fe_internal.update_each, update_values))
+        if (contains_bits(fe_internal.update_each, update_values))
           for (unsigned int k = 0; k < this->n_dofs_per_cell(); ++k)
             output_data.shape_values[k][i] = values[k];
 
-        if (contains(fe_internal.update_each, update_gradients))
+        if (contains_bits(fe_internal.update_each, update_gradients))
           for (unsigned int k = 0; k < this->n_dofs_per_cell(); ++k)
             output_data.shape_gradients[k][i] = grads[k];
 
-        if (contains(fe_internal.update_each, update_hessians))
+        if (contains_bits(fe_internal.update_each, update_hessians))
           for (unsigned int k = 0; k < this->n_dofs_per_cell(); ++k)
             output_data.shape_hessians[k][i] = grad_grads[k];
       }

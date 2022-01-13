@@ -171,7 +171,7 @@ namespace internal
       mapping_info_storage.data_index_offsets.resize(1);
       mapping_info_storage.JxW_values.resize(fe_values.n_quadrature_points);
       mapping_info_storage.jacobians[0].resize(fe_values.n_quadrature_points);
-      if (contains(update_flags, update_quadrature_points))
+      if (contains_bits(update_flags, update_quadrature_points))
         {
           mapping_info_storage.quadrature_point_offsets.resize(1, 0);
           mapping_info_storage.quadrature_points.resize(
