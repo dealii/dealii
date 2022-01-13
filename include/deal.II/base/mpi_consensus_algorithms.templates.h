@@ -169,6 +169,8 @@ namespace Utilities
           for (unsigned int index = 0; index < n_targets; ++index)
             {
               const unsigned int rank = targets[index];
+              AssertIndexRange(rank,
+                               Utilities::MPI::n_mpi_processes(this->comm));
 
               auto &send_buffer = send_buffers[index];
               this->process.create_request(rank, send_buffer);
@@ -513,6 +515,7 @@ namespace Utilities
         for (unsigned int i = 0; i < n_targets; ++i)
           {
             const unsigned int rank = targets[i];
+            AssertIndexRange(rank, Utilities::MPI::n_mpi_processes(this->comm));
 
             // pack data which should be sent
             auto &send_buffer = send_buffers[i];
