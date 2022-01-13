@@ -496,8 +496,8 @@ public:
    * a precomputed @p mapping_data object. This function can be used
    * to avoid duplicated evaluation of the mapping if multiple
    * FEPointEvaluation objects for the different components of the same FESystem
-   * are used. You can get the mapping data from an initialized FEPointEvaluation
-   * object by calling the function get_mapping_data().
+   * are used. You can get the mapping data from an initialized
+   * FEPointEvaluation object by calling the function get_mapping_data().
    *
    * @param[in] cell An iterator to the current cell
    *
