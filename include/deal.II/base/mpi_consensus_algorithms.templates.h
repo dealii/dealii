@@ -409,9 +409,9 @@ namespace Utilities
         //    especially determine how many requests are expected
         const unsigned int n_requests = start_communication();
 
-        // 2) answer requests
+        // 2) Answer requests
         for (unsigned int request = 0; request < n_requests; ++request)
-          answer_requests(request);
+          answer_one_request(request);
 
         // 3) process answers
         clean_up_and_end_communication();
@@ -493,7 +493,7 @@ namespace Utilities
 
       template <typename T1, typename T2>
       void
-      PEX<T1, T2>::answer_requests(int index)
+      PEX<T1, T2>::answer_one_request(const unsigned int index)
       {
 #ifdef DEAL_II_WITH_MPI
         const int tag_request = Utilities::MPI::internal::Tags::

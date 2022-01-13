@@ -496,7 +496,7 @@ namespace Utilities
          * the request and send an answer.
          */
         void
-        answer_requests(int index);
+        answer_one_request(const unsigned int index);
 
         /**
          * After all answers have been exchanged, the MPI data structures can be
